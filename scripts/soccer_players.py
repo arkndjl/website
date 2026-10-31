@@ -551,6 +551,13 @@ def backup(rows, F, S):
     for r in rows:
         if r['S'] == S:
             squads[(r['team'], r['pos'])].append(r)
+    try:                                                  # ages for the xGap rank (scripts/backup_age.py)
+        lk = D.load(MV_LINK)
+        dob = {u: lk['dob'].get(str(t)) for u, t in lk['p'].items()}
+    except Exception as e:
+        print('backup watch ages:', e); dob = {}
+    today = dt.date.today()
+    age = lambda u: round((today - dt.date.fromisoformat(dob[u][:10])).days / 365.25, 1) if dob.get(u) else None
     out = []
     for (team, pos), rs in squads.items():
         rs.sort(key=lambda r: -r['min'])
@@ -563,10 +570,12 @@ def backup(rows, F, S):
             g = grade[r['p']]
             if r['min'] >= BW_MIN and g - grade[low['p']] >= BW_GAP:
                 out.append({'name': r['n'], 'team': team, 'lg': r['lg'], 'pos': pos, 'str': 2 if i < n else 3,
-                            'g': round(g, 2), 'use': r['min'],
-                            'starter': {'name': low['n'], 'g': round(grade[low['p']], 2), 'use': low['min']},
+                            'g': round(g, 2), 'use': r['min'], 'age': age(r['p']),
+                            'starter': {'name': low['n'], 'g': round(grade[low['p']], 2), 'use': low['min'], 'age': age(low['p'])},
                             'gap': round(g - grade[low['p']], 2)})
     out.sort(key=lambda o: -o['gap'])
+    import backup_age
+    backup_age.apply('soccer', out)                       # ranked by xGap: the gap two seasons on, with the age gap
     try:
         import photos
         photos.attach('soccer', out)     # Transfermarkt portrait and crest from the player board

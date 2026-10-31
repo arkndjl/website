@@ -25,6 +25,8 @@ CBB     No college depth charts, so the order is minutes: this season's minutes 
         project files). Top five = starters, 6-10 2nd string, 11-15 3rd. A backup is compared with the lowest-graded
         starter in his group (G, F, C; a group with no starter falls back to the next one) and listed when his FV
         (headline = mean outcome) beats that starter's by FV_GAP or more.
+Every sport's rows are ranked by xGap (scripts/backup_age.py): the gap projected over the next two seasons from
+today's gap and the age gap to the starter, fit on past seasons by scripts/backup_age_fit.py.
 """
 import bisect
 import json
@@ -100,7 +102,20 @@ def r1(x): return None if x is None else round(x, 1)
 def r2(x): return None if x is None else round(x, 2)
 
 
-def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name=str.upper, need=0):
+AGES = {}
+
+
+def espn_age(league, aid):
+    """age from ESPN's athlete page, for a listed player the board has no age for (a rookie with no minutes)"""
+    if not league or not aid:
+        return None
+    if (league, aid) not in AGES:
+        d = get(f'https://site.web.api.espn.com/apis/common/v3/sports/{league}/athletes/{aid}') or {}
+        AGES[(league, aid)] = (d.get('athlete') or {}).get('age')
+    return AGES[(league, aid)]
+
+
+def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name=str.upper, need=0, league=None):
     """the shared ESPN-chart logic: (backups above their slot's starter, slots compared). grade(name, team) -> dict
     with g (grade) and n (sample) or None"""
     starters, listed = set(), {}
@@ -117,14 +132,17 @@ def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name
         if s is None:
             continue
         n += 1
-        for i, (nm, *_) in enumerate(ath[1:3], start=2):
+        for i, (nm, aid, _) in enumerate(ath[1:3], start=2):
             if (t, NM.key(nm)) in starters:
                 continue
             b = grade(nm, t)
             if b is None or b['n'] < need or b['g'] <= s['g']:
                 continue
+            b = {**b, 'age': b.get('age') or espn_age(league, aid)}
+            s = {**s, 'age': s.get('age') or espn_age(league, ath[0][1])}
             row = {'name': nm, 'team': t, 'pos': slot_name(slot), 'str': i, 'g': b['g'], 'use': b['n'], 'pos2': b.get('pos'),
-                   'starter': {'name': ath[0][0], 'g': s['g'], 'use': s['n']}, 'gap': round(b['g'] - s['g'], 2)}
+                   'age': b.get('age'), 'starter': {'name': ath[0][0], 'g': s['g'], 'use': s['n'], 'age': s.get('age')},
+                   'gap': round(b['g'] - s['g'], 2)}
             k = (t, NM.key(nm)); old = out.get(k)
             if old is None or (i, -row['gap']) < (old['str'], -old['gap']):
                 out[k] = row
@@ -220,12 +238,12 @@ def nfl():
         if p is None:
             return None
         sn = p.get('sn') or 0
-        return {'g': round(1000 * (p.get('war') or 0) / (sn + NFL_K), 2), 'n': sn, 'pos': p.get('pos')}
+        return {'g': round(1000 * (p.get('war') or 0) / (sn + NFL_K), 2), 'n': sn, 'pos': p.get('pos'), 'age': p.get('age')}
     # the base defense and the 3-WR offense (ESPN lists both units for every team; a team can carry a nickel chart too)
     charts = espn_depth('football/nfl')
     rows, n = depth_rows(charts, grade, lambda a: NFL_TEAM.get(a, a), need=NFL_MIN,
                          skip=lambda chart, slot: slot in NFL_SKIP or slot not in NFL_SLOT or 'special' in chart.lower(),
-                         slot_name=lambda s: NFL_SLOT[s])
+                         slot_name=lambda s: NFL_SLOT[s], league='football/nfl')
     tm = lambda a: NFL_TEAM.get(a, a)
     write_depth('nfl', {'season': W['season'], 'week': W['week'], 'asof': W['last'], 'grade': 'WAR/1k', 'use': 'snaps',
                         'fmt': 2, 'min': NFL_MIN, 'k': NFL_K},
@@ -239,11 +257,12 @@ def nba():
     seasons = sorted(int(f[:4]) for f in os.listdir(D) if f[:4].isdigit())
     S = [json.load(open(os.path.join(D, f'{y}.json'))) for y in seasons[::-1][:len(NBA_W)]]
     cur, acc = S[0], {}
-    for d, w in zip(S, NBA_W):
+    for j, (d, w) in enumerate(zip(S, NBA_W)):
         for p in d['players']:
             if p.get('xpm') is None:
                 continue
-            a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'num': 0.0, 'den': 0.0, 'mp': 0})
+            a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'num': 0.0, 'den': 0.0, 'mp': 0,
+                                         'age': p['age'] + j if p.get('age') is not None else None})   # this season's age
             a['num'] += w * p['mp'] * p['xpm']; a['den'] += w * p['mp']; a['mp'] += p['mp']
     for p in cur['players']:          # this season's team
         acc[p['id']]['tm'] = p['tm']
@@ -254,9 +273,9 @@ def nba():
         p, _ = M.find(nm, team=t)
         if p is None:
             return {'g': NBA_REPL, 'n': 0}          # no NBA minutes yet (a rookie): the shrink target
-        return {'g': round((p['num'] + NBA_K * NBA_REPL) / (p['den'] + NBA_K), 2), 'n': p['mp']}
+        return {'g': round((p['num'] + NBA_K * NBA_REPL) / (p['den'] + NBA_K), 2), 'n': p['mp'], 'age': p['age']}
     charts = espn_depth('basketball/nba')
-    rows, n = depth_rows(charts, grade, lambda a: NBA_TEAM.get(a, a), need=NBA_MIN)
+    rows, n = depth_rows(charts, grade, lambda a: NBA_TEAM.get(a, a), need=NBA_MIN, league='basketball/nba')
     write_depth('nba', {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'grade': 'XPM', 'use': 'MP',
                         'fmt': 1, 'min': NBA_MIN, 'k': NBA_K, 'repl': NBA_REPL},
                 espn_depth_teams(charts, lambda nm, t, slot: grade(nm, t), lambda a: NBA_TEAM.get(a, a),
@@ -272,11 +291,12 @@ def nhl():
     seasons = sorted(int(f[:4]) for f in os.listdir(D) if f[:4].isdigit())
     S = [json.load(open(os.path.join(D, f'{y}.json'))) for y in seasons[::-1][:len(NHL_W)]]
     cur, acc = S[0], {}
-    for d, w in zip(S, NHL_W):
+    for j, (d, w) in enumerate(zip(S, NHL_W)):
         for p in d['players']:
             if p.get('hpm') is None or not p.get('toi'):
                 continue
-            a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'grp': p['grp'], 'pos': p['pos'], 'num': 0.0, 'den': 0.0, 'toi': 0})
+            a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'grp': p['grp'], 'pos': p['pos'], 'num': 0.0, 'den': 0.0, 'toi': 0,
+                                         'age': p['age'] + j if p.get('age') is not None else None})
             a['num'] += w * p['toi'] * p['hpm']; a['den'] += w * p['toi']; a['toi'] += p['toi']
     for p in cur['players']:          # this season's team
         if p['id'] in acc:
@@ -289,11 +309,12 @@ def nhl():
         p, _ = M.find(nm, team=t)
         if p is None:
             return {'g': round(r, 3), 'n': 0}       # no NHL minutes yet: the shrink target
-        return {'g': round((p['num'] + k * r) / (p['den'] + k), 3), 'n': round(p['toi']), 'pos': p['pos']}
+        return {'g': round((p['num'] + k * r) / (p['den'] + k), 3), 'n': round(p['toi']), 'pos': p['pos'], 'age': p['age']}
     charts = [c for c in espn_depth('hockey/nhl') if c[1].lower() in ('default', '')]
     rows = []; n = 0
     for grp, slots in (('F', ('c', 'lw', 'rw')), ('D', ('ld', 'rd')), ('G', ('g',))):
-        r, m = depth_rows([c for c in charts if c[2] in slots], lambda nm, t, g=grp: grade(nm, t, g), N.team, need=NHL_MIN)
+        r, m = depth_rows([c for c in charts if c[2] in slots], lambda nm, t, g=grp: grade(nm, t, g), N.team, need=NHL_MIN,
+                          league='hockey/nhl')
         rows += r; n += m
     for r in rows:
         r['logo'] = f"/img/nhl/{r['team'].lower()}.png"
@@ -407,6 +428,8 @@ def main():
             photos.attach(s, d['rows'])         # each backup's photo and team logo from the sport's board
         except Exception as e:
             print(f'backup watch {s}: photos not attached ({e})')
+        import backup_age
+        backup_age.apply(s, d['rows'])              # ranked by xGap: the gap projected two seasons on, with the age gap
         json.dump(clean(d), open(os.path.join(ROOT, 'data', f'backup_{s}.json'), 'w'), indent=1)
         print(f"backup watch {s}: {len(d['rows'])} backups above the starter")
 
