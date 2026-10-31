@@ -9,7 +9,7 @@
        position, team, age, search. Filters ride in the address (#season=2025&pos=D&side=x). */ -}}
 {{- $idx := site.Data.nhl_war -}}
 {{- $pos := slice "C" "L" "R" "D" "G" -}}
-<div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-src="{{ "data/nhl-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,pWAR,HPM,Off,Def,Pos,TOI">
+<div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-gfx-logo="/img/nhl/{}.png" data-src="{{ "data/nhl-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,pWAR,HPM,Off,Def,Pos,TOI">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ .Get "title" | default "nhl_war.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

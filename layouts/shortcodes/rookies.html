@@ -6,7 +6,7 @@
        both among the rows shown that have one: + = playing above where he was picked. Phones keep rank, player,
        the ranked number, the pre-draft grade and Δ. */ -}}
 {{- $sport := .Get "sport" -}}
-<div class="win cfb nbaxpm rookies"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rookies data-src="{{ printf "data/rookies/%s.json" $sport | relURL }}" data-sport="{{ $sport }}" data-gfx-cols="RK,Player">
+<div class="win cfb nbaxpm rookies"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rookies {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ printf "data/rookies/%s.json" $sport | relURL }}" data-sport="{{ $sport }}" data-gfx-cols="RK,Player">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "trophy" }}"/></svg>{{ .Get "title" | default "rookies.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

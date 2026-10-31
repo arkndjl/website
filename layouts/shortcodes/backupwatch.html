@@ -45,7 +45,7 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name"><b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
     <td>{{ .pos }}</td>
-    {{- $logo := .logo }}{{ if and (not $logo) (eq $sport "soccer") }}{{ with index site.Data.soccer_logos.espn (.team | default "") }}{{ $logo = printf "/img/soccer/%v.png" . }}{{ end }}{{ end }}
+    {{- $logo := .logo }}{{ if and (not $logo) (eq $sport "soccer") }}{{ with index site.Data.soccer_logos.espn (.team | default "") }}{{ $logo = printf "/img/soccer/%v.png" . }}{{ end }}{{ end }}{{ if and (not $logo) .team (in (slice "nba" "nfl" "nhl") $sport) }}{{ $logo = printf "/img/%s/%s.png" $sport (lower .team) }}{{ end }}
     <td class="cfb__team">{{ with $logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     {{- if $college }}<td class="bw__x">{{ .conf }}</td>{{ end }}
     <td>{{ cond (eq (int .str) 2) "2nd" "3rd" }}</td>

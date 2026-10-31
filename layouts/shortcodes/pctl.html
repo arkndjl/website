@@ -4,7 +4,7 @@
        the season. NFL PPR/G has its own season quantiles (ssn: a ratio's percentiles aren't to date + rest of season). Every row has every column for the stat shown (players outside a stat's positions are left out).
        Phones keep rank, player and the three percentiles. */ -}}
 {{- $sport := .Get "sport" -}}
-<div class="win cfb nbaxpm pctl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-pctl data-src="{{ printf "data/pctl-%s.json" $sport | relURL }}" data-gfx-cols="RK,Player,P20,P50,P80">
+<div class="win cfb nbaxpm pctl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-pctl {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ printf "data/pctl-%s.json" $sport | relURL }}" data-gfx-cols="RK,Player,P20,P50,P80">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "trophy" }}"/></svg>{{ .Get "title" | default "projections.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

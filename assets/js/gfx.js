@@ -101,11 +101,19 @@
   // the least important columns (rightmost) drop before the text shrinks. A subtitle says what's shown:
   // how many, the filters in force and the sort.
   // The mock draft adds a round picker (a whole round, whatever the filters) and a trade list under the table.
-  var ROWS_DEFAULT = 30, ROWS_OPTS = [10, 15, 20, 25, 30, 40, 50, 60];
+  // A league table (one row per team: NHL/NFL 32, NBA 30, a soccer league 18-20) starts at "all", so every team is on it.
+  var ROWS_DEFAULT = 30, ROWS_MAX = 60, ROWS_OPTS = [10, 15, 20, 25, 30, 40, 50, 60];
   function rowsWanted(win, btn) {
     var sel = btn.parentNode && btn.parentNode.querySelector('.gfx-rows select');
     if (btn.hasAttribute('data-gfx-all')) return Infinity;   // every row (the week's picks)
+    if (sel && sel.value === 'all') return ROWS_MAX;
     return +(sel && sel.value) || ROWS_DEFAULT;
+  }
+  // name, class and team stay on every graphic: when columns have to go for width, these go last
+  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i;
+  function isTeamTable(heads) {
+    var key = heads.filter(function (h) { return !/^(rk|#|spot|lg)$/i.test(h.replace(/!$/, '')); })[0] || '';
+    return /^(team|club)$/i.test(key);
   }
   function filterSummary(win) {
     var bits = [], bar = win.querySelector('form');
@@ -138,7 +146,16 @@
     var idx = want.length ? want.map(function (n) { var io = /!$/.test(n); n = n.replace(/!$/, '');
                               var i = heads.findIndex(function (h) { return h.toLowerCase() === n; }); if (io) iconOnly[i] = 1; return i; }).filter(function (i) { return i >= 0; })
                           : heads.slice(0, 6).map(function (_, i) { return i; });
-    var all = [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; });
+    // the board's class and team columns join the graphic beside the name when the preset leaves them out
+    var nameAt = idx.findIndex(function (i) { return NAME_COL.test(heads[i]); });
+    if (nameAt >= 0 && !/^(team|club|matchup|match|game|bet)$/i.test(heads[idx[nameAt]])) {
+      [CLASS_COL, TEAM_COL].forEach(function (re) {
+        if (idx.some(function (i) { return re.test(heads[i]); })) return;
+        var j = heads.findIndex(function (h) { return re.test(h); }); if (j >= 0) idx.splice(++nameAt, 0, j);
+      });
+    }
+    var teamK = idx.findIndex(function (i) { return TEAM_COL.test(heads[i]); });
+    var all =[].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; });
     var rows = all.slice(0, rowsWanted(win, btn));
     // the round picker (tables with an Rd column, e.g. the mock draft): every pick of that round, whatever the filters
     var rdPick = btn.parentNode && btn.parentNode.querySelector('.gfx-round select'), rdWant = rdPick && rdPick.value;
@@ -159,7 +176,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
-        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag').forEach(function (e) { e.remove(); });
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
@@ -174,7 +191,17 @@
         var col = c && (c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null));
         if (col && !ark) cell.color = col.classList.contains('cfb__up') ? C.teal : C.down;
         return cell;
-      }));
+      })).then(async function (cells) {
+        // every row carries its team logo: a logo elsewhere in the row, or the window's logo path for the team's code
+        if (cells.some(function (c) { return c.img; })) return cells;
+        var lg = [].slice.call(r.querySelectorAll('img.cfb__logo')).find(function (e) { return !e.closest('.pxframe'); }), src = lg && (lg.currentSrc || lg.src);
+        var tpl = win.getAttribute('data-gfx-logo'), tc = teamK >= 0 ? cells[teamK] : null;
+        var sp = r.querySelector('.nbaxpm__tm, .nflwar__tm'), code = tc && tc.t ? tc.t : sp ? txt(sp).split(/[\s·]/)[0] : '';
+        if (!src && tpl && code) src = tpl.replace('{}', code.split('/').pop().trim().toLowerCase());
+        var at = tc || cells[Math.max(0, nameAt)];
+        if (src && at && !at.chip) at.img = await loadImg(src);
+        return cells;
+      });
     }));
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
@@ -249,7 +276,9 @@
     }
     // largest crisp size that fits the row height and width; if even 24 px doesn't fit, drop the rightmost column
     var size, colW;
-    // 48, 40 or 32 px; when none fits the width, the rightmost column goes; 24 px only as a last resort
+    // 48, 40 or 32 px; when none fits the width, the rightmost column goes, but never the rank, name, class or
+    // team (or any column with logos); 24 px only as a last resort
+    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || NAME_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
     for (;;) {
       var ok = false;
       for (var sizes = [48, 40, 32], si = 0; si < sizes.length; si++) {
@@ -257,8 +286,9 @@
         colW = widths(size); if (sum(colW) <= gw) { ok = true; break; }
       }
       if (ok) break;
-      if (cols.length <= 4) { size = rowH >= 32 * 1.35 && sum(widths(32)) <= gw ? 32 : 24; colW = widths(size); break; }
-      cols.pop(); cdata.forEach(function (r) { r.pop(); });
+      var drop = -1; for (var dk = cols.length - 1; dk >= 0; dk--) if (!keep(dk)) { drop = dk; break; }
+      if (cols.length <= 4 || drop < 0) { size = rowH >= 32 * 1.35 && sum(widths(32)) <= gw ? 32 : 24; colW = widths(size); break; }
+      cols.splice(drop, 1); cdata.forEach(function (r) { r.splice(drop, 1); });
     }
     var spare = gw - sum(colW);
     if (spare > 0) { var nameK = cols.findIndex(function (ci) { return /player|team|coach|matchup/i.test(heads[ci]); }); if (nameK < 0) nameK = 1; colW[Math.min(nameK, colW.length - 1)] += spare; }
@@ -314,7 +344,11 @@
       // a table with a round column (the mock draft) starts at its data-gfx-max (32: all of round 1)
       var heads0 = [].slice.call(win.querySelector('table').tHead.rows[0].cells).map(function (c) { return txt(c).toLowerCase(); });
       var gmax = +win.getAttribute('data-gfx-max'), def = heads0.indexOf('rd') >= 0 && gmax ? gmax : ROWS_DEFAULT;
-      var opts = ROWS_OPTS.indexOf(def) < 0 ? ROWS_OPTS.concat([def]).sort(function (a, b) { return a - b; }) : ROWS_OPTS;
+      // a league table (up to 40 teams, or not built yet) starts at all of it
+      var wantH = (win.getAttribute('data-gfx-cols') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      var nBody = win.querySelector('table').tBodies[0].rows.length;
+      if (isTeamTable(wantH.length ? wantH : heads0) && nBody <= 40) def = 'all';
+      var opts = ROWS_OPTS.indexOf(def) < 0 ? ROWS_OPTS.concat([def]).sort(function (a, b) { return (a === 'all') - (b === 'all') || a - b; }) : ROWS_OPTS;
       var lab = document.createElement('label'); lab.className = 'cfb__field gfx-rows'; lab.title = 'rows on the graphic';
       lab.innerHTML = '<span>rows</span><select>' + opts.map(function (o) { return '<option' + (o === def ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select>';
       btn.insertAdjacentElement('afterend', lab);
@@ -1355,7 +1389,7 @@
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }

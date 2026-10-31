@@ -8,7 +8,7 @@
        headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
-<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
+<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_xpm.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
