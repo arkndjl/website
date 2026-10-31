@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-31T21:26:33Z",
+ "asof": "2026-10-31T21:48:44Z",
  "recenter": {
-  "week": 1.46
+  "week": 1.47
  },
  "monitor": {
   "clocks": {
@@ -441,10 +441,10 @@
    "mk": "spread",
    "side": "away",
    "line": -13.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 6.0,
    "x": 6.0,
-   "why": "no edge at -111",
+   "why": "no edge at -108",
    "m": -19.5,
    "tm": 58.0
   },
@@ -489,28 +489,12 @@
    "mk": "spread",
    "side": "away",
    "line": 20.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 4.2,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
    "m": 16.3,
    "tm": 50.1
-  },
-  {
-   "id": "401858280",
-   "sport": "cfb",
-   "kick": "2026-10-31T23:00:00.000Z",
-   "home": "Florida State",
-   "away": "Clemson",
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -104.0,
-   "edge": 3.1,
-   "x": 5.0,
-   "why": "edge under 5 (line: 3-7)",
-   "m": 2.4,
-   "tm": 47.5
   },
   {
    "id": "401858509",
@@ -577,22 +561,6 @@
    "tm": 57.5
   },
   {
-   "id": "401869846",
-   "sport": "cfb",
-   "kick": "2026-10-31T22:30:00.000Z",
-   "home": "Georgia Southern",
-   "away": "App State",
-   "mk": "total",
-   "side": "under",
-   "line": 55.5,
-   "price": -108.0,
-   "edge": 5.9,
-   "x": null,
-   "why": "total market off",
-   "m": 5.7,
-   "tm": 49.6
-  },
-  {
    "id": "401856847",
    "sport": "cfb",
    "kick": "2026-10-31T23:00:00.000Z",
@@ -609,6 +577,22 @@
    "tm": 53.2
   },
   {
+   "id": "401869846",
+   "sport": "cfb",
+   "kick": "2026-10-31T22:30:00.000Z",
+   "home": "Georgia Southern",
+   "away": "App State",
+   "mk": "total",
+   "side": "under",
+   "line": 54.5,
+   "price": 104.0,
+   "edge": 4.9,
+   "x": null,
+   "why": "total market off",
+   "m": 5.7,
+   "tm": 49.6
+  },
+  {
    "id": "401856733",
    "sport": "cfb",
    "kick": "2026-10-31T23:45:00.000Z",
@@ -617,7 +601,7 @@
    "mk": "total",
    "side": "under",
    "line": 48.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 3.7,
    "x": null,
    "why": "total market off",
@@ -641,6 +625,22 @@
    "tm": 50.9
   },
   {
+   "id": "401858280",
+   "sport": "cfb",
+   "kick": "2026-10-31T23:00:00.000Z",
+   "home": "Florida State",
+   "away": "Clemson",
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -102.0,
+   "edge": 3.0,
+   "x": null,
+   "why": "total market off",
+   "m": 2.4,
+   "tm": 47.5
+  },
+  {
    "id": "401860924",
    "sport": "cfb",
    "kick": "2026-11-01T03:00:00.000Z",
@@ -648,9 +648,9 @@
    "away": "Oregon State",
    "mk": "total",
    "side": "under",
-   "line": 57.5,
-   "price": -108.0,
-   "edge": 3.3,
+   "line": 56.5,
+   "price": 104.0,
+   "edge": 2.3,
    "x": null,
    "why": "total market off",
    "m": -4.7,
@@ -674,7 +674,7 @@
    "mk": "spread",
    "side": "away",
    "line": -13.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 6.0,
    "ev": null,
    "units": 0.0,
@@ -686,7 +686,7 @@
    "mk": "spread",
    "side": "away",
    "line": 20.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -710,7 +710,7 @@
    "mk": "total",
    "side": "under",
    "line": 48.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -719,16 +719,16 @@
    "state": "off"
   },
   "401858280": {
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -104.0,
-   "edge": 3.1,
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -102.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Florida State",
    "away": "Clemson",
-   "state": "under"
+   "state": "off"
   },
   "401862814": {
    "mk": "total",
@@ -769,9 +769,9 @@
   "401860924": {
    "mk": "total",
    "side": "under",
-   "line": 57.5,
-   "price": -108.0,
-   "edge": 3.3,
+   "line": 56.5,
+   "price": 104.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "Fresno State",
@@ -805,9 +805,9 @@
   "401869846": {
    "mk": "total",
    "side": "under",
-   "line": 55.5,
-   "price": -108.0,
-   "edge": 5.9,
+   "line": 54.5,
+   "price": 104.0,
+   "edge": 4.9,
    "ev": null,
    "units": 0.0,
    "home": "Georgia Southern",
@@ -867,34 +867,34 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3432,
+  "snapshots": 3441,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 948,
-    "clvRet": -0.0436,
-    "clvT": -18.1,
-    "clv": 0.22,
+    "clvRet": -0.0423,
+    "clvT": -17.17,
+    "clv": 0.24,
     "beat": 0.349,
     "still": 0.426
    },
    {
     "when": "6-24h",
     "clvN": 198,
-    "clvRet": -0.0485,
-    "clvT": -11.1,
-    "clv": 0.08,
-    "beat": 0.202,
-    "still": 0.662
+    "clvRet": -0.0454,
+    "clvT": -9.68,
+    "clv": 0.14,
+    "beat": 0.217,
+    "still": 0.646
    },
    {
     "when": "1-6h",
-    "clvN": 81,
-    "clvRet": -0.0503,
-    "clvT": -8.41,
-    "clv": 0.09,
-    "beat": 0.148,
-    "still": 0.79
+    "clvN": 86,
+    "clvRet": -0.0441,
+    "clvT": -7.01,
+    "clv": 0.19,
+    "beat": 0.244,
+    "still": 0.698
    },
    {
     "when": "<1h",
