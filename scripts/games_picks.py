@@ -1082,7 +1082,10 @@ def live(sport):
     if gone:
         log = [e for e in log if e not in gone]
         print(f'{sport}: withdrew {len(gone)} open picks whose rule is off:', ', '.join(f"{e['away']}@{e['home']} {e['mk']} {e['side']}" for e in gone))
-    seen = {e['id'] for e in log}
+    # one pick a game per family, the side (spread or its moneyline) and the total (Noah, Oct 31 2026: a game whose total
+    # was flagged first never got its spread, Denver at Phoenix); both size on the slate's pick count
+    fam = lambda mk: 'total' if mk == 'total' else 'side'
+    seen = {(e['id'], fam(e['mk'])) for e in log}
     G = {g['id']: g for g in games}
     cur = {}
     top = []
@@ -1092,8 +1095,9 @@ def live(sport):
     slate = lambda g: 'week' if sport in ('cfb', 'nfl') else (iso(g['kick']) - datetime.timedelta(hours=4)).date().isoformat()
     n_slate = {}
     for g in games:
-        if ahead.get(g['id'], ([], []))[0]:
-            n_slate[slate(g)] = n_slate.get(slate(g), 0) + 1
+        n = len({fam(o['mk']) for o in ahead.get(g['id'], ([], []))[0]})
+        if n:
+            n_slate[slate(g)] = n_slate.get(slate(g), 0) + n
     for g in games:
         if g['id'] not in ahead:
             continue
@@ -1102,18 +1106,21 @@ def live(sport):
         for o in opts:
             o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], szd(o)))
             cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
-        pick = max(opts, key=lambda o: o['ev']) if opts else None
-        if pick:
+        best = {}
+        for o in opts:
+            if fam(o['mk']) not in best or o['ev'] > best[fam(o['mk'])]['ev']:
+                best[fam(o['mk'])] = o
+        for pick in sorted(best.values(), key=lambda o: o['ev']):
             c_ = pick.pop('_c')
             pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], szd(pick))
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
-            if g['id'] not in seen:
-                seen.add(g['id'])
+            if (g['id'], fam(pick['mk'])) not in seen:
+                seen.add((g['id'], fam(pick['mk'])))
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
                             **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}), 'flagged': stamp})
-        elif near:
+        if not best and near:
             n = max(near, key=lambda o: o['edge'])
             gtab[str(g['id'])] = {**{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge')}, 'ev': None, 'units': 0.0,
                                   'home': g['home'], 'away': g['away'], 'state': 'off' if n['x'] is None else 'under'}
@@ -1212,8 +1219,8 @@ def live(sport):
                     p.pop('pass', None)
             picks.append(p)
     picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
-    live_ids = {e['id'] for e in log}
-    wd = [w for w in wd if w['id'] not in live_ids]
+    live_ids = {(e['id'], fam(e['mk'])) for e in log}
+    wd = [w for w in wd if (w['id'], fam(w['mk'])) not in live_ids]
     top.sort(key=lambda b: (b['x'] is None, -(b['edge'] / b['x']) if b['x'] else -b['edge']))
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
