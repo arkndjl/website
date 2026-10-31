@@ -1231,6 +1231,7 @@ def check_tiebreaks(games, seasons=range(2015, 2026)):
     return bad
 GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB'}
 SIMS = 10000
+ORDERS_KEPT = 400   # simulated draft orders kept for the CFB mock's simulated drafts (P(#1 pick) moves with who picks first)
 RATING_SD = 5.0      # uncertainty in a team's true rating before week 1, points (drawn once a simulated season)
 
 
@@ -1456,6 +1457,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
     wsum = dict.fromkeys(teams, 0.0)
     slot = dict.fromkeys(teams, 0.0)      # draft slot, summed over the sims (the mock draft's order: draft_slots)
     top = dict.fromkeys(teams, 0)         # sims with a top-5 pick
+    orders = []                           # the first ORDERS_KEPT simulated draft orders (the mock's simulated drafts: mockSims)
     rng = random.Random(7)
     drng = random.Random(11)              # the draft order's coin flips, apart from the game draws
     t0 = time.time()
@@ -1494,7 +1496,10 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
         cnt[sbw]['sb'] += 1
         exits[champs[0] if sbw == champs[1] else champs[1]] = 4
         exits[sbw] = 5
-        for i, t in enumerate(lg.draft_order(res, exits, drng)):
+        do = lg.draft_order(res, exits, drng)
+        if len(orders) < ORDERS_KEPT:
+            orders.append(' '.join(do))
+        for i, t in enumerate(do):
             slot[t] += i + 1
             top[t] += i < 5
     print(f'nfl games: {SIMS} season sims in {time.time() - t0:.1f}s (rating sd {rsd:.2f})')
@@ -1575,7 +1580,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
         for q in qbt: q.pop('logo', None)
     except Exception as e:
         print('QB photos skipped', e)
-    return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': round(rsd, 2), 'left': len(left)}
+    return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': round(rsd, 2), 'left': len(left), 'draftOrders': orders}
 
 
 def qbs_items():

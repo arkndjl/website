@@ -17,13 +17,14 @@
   {
    "h": "2  PICK RULE",
    "l": [
-    "u = -ln xPick + .45 need - dup - run - qb",
+    "u = -ln xPick + .45 need + top - dup - run - qb",
     "K: + .8 (need(K) - .65); need(K) = 1 if age 35+ or FG < 80% on 15+",
     "dup = .15 per earlier pick at pos by the same team (QB, K, P 1.0)",
     "run = .15 (k - c + 1) if k >= c; k = picks at pos this round, c = round(1.25 E[k]), rounds 1-7",
     "qb = .80 in rounds 1-3 if need(QB) < .60",
+    "top = Q e^-(pick-1)/4, QB if need(QB) >= .60; Q .94 Apr .. 1.40 Oct; blend x.5",
     "pick = argmax u over the pool",
-    "conviction: same rule on u = -lnP(r_mod*) + .45 need - dup - qb  (no run)"
+    "conviction: same rule on u = -lnP(r_mod*) + .45 need - dup - qb  (no run, no top)"
    ]
   },
   {
@@ -75,6 +76,7 @@
     "pos count error by round: rules 35.0, board order 37.3; mktPosAdj 33.6 -> 29.6",
     "pick-rule sweep (432 sets, nested LODO): no set beats current on all 3",
     "fall-curve refit: wins 3/5 drafts, loses 2024-25: kept",
+    "QB top premium (2020-26, LODO): log lik t 1.8-2.5, 19/23; QB #1 Brier .37 -> .15",
     "7-round replay 2020-25: run caps R1-7 cut pos count error 113.7 -> 111.0 (5/6)",
     "K/P slots: 2 K, 2 P a draft (real 2.2, 2.0); kicker need z 2.9 (2010-25)",
     "rejected: per-slot needs, team/coach tendencies (size, speed, school, age, pos)"
