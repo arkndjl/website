@@ -6,7 +6,7 @@
        same minutes, $ per win grown with the cap; a player option counts only when it costs the team (he opts in when
        paid over his value), a team option only when it pays. Views: contract (the default) or this season. Filters ride
        in the address with a c prefix, apart from the XPM tab's (#cteam=OKC&cview=s). */ -}}
-<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-src="{{ "data/nba-proj.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,Value,Surplus,Contract">
+<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,Value,Surplus,Contract">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_contracts.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

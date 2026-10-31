@@ -15,7 +15,7 @@
   <tbody>
   {{- range $i, $q := .qbs }}
   <tr>
-    <td class="cfb__rk">{{ add $i 1 }}</td><td><b>{{ .n }}</b></td><td>{{ .t }}</td>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td><b>{{ .n }}</b></td><td>{{ with .t }}<img class="cfb__logo" src="/img/nfl/{{ lower . }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td>
     <td class="cfb__num nflwar__war is-key">{{ printf "%+.1f" (float .pts) }}</td>
     <td class="cfb__num">{{ printf "%+.3f" (float .val) }}</td>
     <td class="cfb__num">{{ with .epa }}{{ printf "%+.3f" (float .) }}{{ end }}</td>

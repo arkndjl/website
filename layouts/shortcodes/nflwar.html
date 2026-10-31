@@ -13,7 +13,7 @@
 {{- $fit := site.Data.nfl_war_fit -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" -}}
 {{- $teams := slice "ARI" "ATL" "BAL" "BUF" "CAR" "CHI" "CIN" "CLE" "DAL" "DEN" "DET" "GB" "HOU" "IND" "JAX" "KC" "LA" "LAC" "LV" "MIA" "MIN" "NE" "NO" "NYG" "NYJ" "PHI" "PIT" "SEA" "SF" "TB" "TEN" "WAS" -}}
-<div class="win cfb nflwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflwar data-src="{{ "data/nfl-war.json" | relURL }}" data-gfx-cols="RK,Player,WAR,WAR/17,WAA,Pos,Team,AV"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+<div class="win cfb nflwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflwar data-gfx-logo="/img/nfl/{}.png" data-src="{{ "data/nfl-war.json" | relURL }}" data-gfx-cols="RK,Player,WAR,WAR/17,WAA,Pos,Team,AV"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "nfl_war.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
