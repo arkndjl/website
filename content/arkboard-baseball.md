@@ -16,19 +16,20 @@ cover = "/og/baseball.png"
 {{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 10)" icon="baseball" filter="FV,TEAM,POS" tab="U19 MiLB" >}}
 {{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" icon="baseball" filter="FV,Org/Lvl,H-Pos" tab="White Sox org" >}}
 {{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" tab="fv scale" >}}
-| FV | Hitter | Starting pitcher | Reliever | WAR |
+| FV | Hitter | Starting pitcher | Reliever | WAR / season |
 | :---: | ----- | ----- | ----- | :---: |
-| 80 | top 1–2 | #1 starter | — | 7.0 |
-| 75 | top 2–3 | #1 | — | 6.0 |
-| 70 | top 5 | #1/2 | — | 5.0 |
-| 65 | All-Star | #2/3 | — | 4.0 |
-| 60 | plus | #3 | high closer | 3.0 |
-| 55 | above average | #3/4 | mid closer | 2.5 |
-| 50 | average regular | #4 | low closer / high setup | 2.0 |
-| 45 | platoon / utility | #5 | low setup | 1.5 |
-| 40 | bench | swing / spot starter | middle relief | 1.0 |
-| 35 | emergency call-up | emergency call-up | emergency call-up | 0.0 |
-| 30 | organizational | organizational | organizational | -1.0 |
+| 80 | top 5 overall | #1 (top 1–3 arm) | — | 7.0+ |
+| 75 | top 5–10 | #1/2 | — | 6.0 |
+| 70 | top 10 overall | #2 | — | 5.0–7.0 |
+| 65 | perennial All-Star | #2/3 | — | 4.2 |
+| 60 | All-Star | #3 | high closer | 3.4–4.9 |
+| 55 | above-average regular | #3/4 | mid closer | 2.5–3.3 |
+| 50 | average everyday player | #4 | low closer / high setup | 1.6–2.4 |
+| 45 | low-end regular / platoon | #4/5 | low setup | 0.8–1.5 |
+| 40 | bench | back-end / spot starter | middle relief | 0.0–0.7 |
+| 35 | emergency call-up | emergency call-up | emergency call-up | ~0 |
+| 30 | up and down | up and down | up and down | < -0.1 |
+| 20 | organizational | organizational | organizational | — |
 {{< /wintable >}}
 {{< winlist title="mlb.exe" icon="baseball" tab="reading" >}}
 - [Evaluating Every U19 Prospect In MiLB](/posts/u19-milb-evaluations-may26/) | 13 ranked + profiles | May 10

@@ -7,15 +7,15 @@
 {{- $hkPer := dict "80" "1 in 4 classes" "75" "1 in 2 classes" "70" "#1 / class" "65" "top 2 / class" "60" "top 5 / class" "55" "top 10 / class" "50" "top 20 / class" "45" "top 30 / class" "40" "top 45 / class" -}}
 {{- $spPer := dict "80" "#1 / 2 birth years" "75" "#1 / birth year" "70" "top 3 / birth year" "65" "top 8 / birth year" "60" "top 20 / birth year" "55" "top 45 / birth year" "50" "top 90 / birth year (big-five regular)" "45" "top 150 / birth year" "40" "top 250 / birth year (top-flight regular)" -}}
 {{- $rows := slice
-  (slice "80" "generational" "5+ time All-Pro" "7+ All-NBA teams" "top 1–2 player")
-  (slice "70" "star" "2-time All-Pro" "3+ All-NBA teams" "top 5 player")
-  (slice "60" "plus" "Pro Bowler" "2+ All-Star" "plus regular / #3 SP")
+  (slice "80" "generational" "5+ time All-Pro" "7+ All-NBA teams" "top 5 overall")
+  (slice "70" "star" "2-time All-Pro" "3+ All-NBA teams" "top 10 overall")
+  (slice "60" "plus" "Pro Bowler" "2+ All-Star" "All-Star / #3 SP")
   (slice "55" "above average" "6+ seasons starting" "above-avg starter" "above-average regular")
   (slice "50" "average" "4+ seasons starting" "average starter" "average regular")
-  (slice "45" "below average" "2+ seasons starting" "low-end starter" "platoon / utility")
+  (slice "45" "below average" "2+ seasons starting" "low-end starter" "low-end regular / platoon")
   (slice "40" "bench" "rotational" "end of rotation" "bench")
-  (slice "30" "organizational" "camp body" "two-way / fringe" "organizational")
-  (slice "20" "non-pro" "non-NFL" "G-League" "—") -}}
+  (slice "30" "organizational" "camp body" "two-way / fringe" "up and down")
+  (slice "20" "non-pro" "non-NFL" "G-League" "organizational") -}}
 {{- $md := "| FV | Tier | Football | Basketball | Hockey | Soccer | Baseball |\n| :---: | ----- | ----- | ----- | ----- | ----- | ----- |\n" -}}
 {{- range $rows }}{{ $fv := index . 0 -}}
 {{- $h := cond (eq $fv "30") "some NHL games" (cond (eq $fv "20") "no NHL games" "—") -}}
