@@ -11,11 +11,12 @@ value on held-out seasons.
 
   python3 scripts/nba_xpm.py 2010 2026     # seasons from..to (end year: 2026 = 2025-26)
   python3 scripts/nba_xpm.py --current     # the season in progress, for the daily refresh
+  python3 scripts/nba_xpm.py --shrink      # recompute shrunk XPM (sxpm, SHRINK_K) in every published file
 
 Inputs: bbref's advanced table, fetched into scripts/.cache/nba/adv_<season>.html (refetched for the current
 season); DPM from scripts/.cache/cbb/dpm/<season>.json (node scripts/cbb_dpm.mjs <season>). A season with no
 DPM file keeps the DPM already in its published file, or goes out BPM-only. Stdlib only."""
-import datetime as dt, html, json, os, re, sys, time, urllib.request
+import datetime as dt, html, json, math, os, re, sys, time, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as NM
 
@@ -25,6 +26,13 @@ DPM = os.path.join(ROOT, 'scripts', '.cache', 'cbb', 'dpm')
 OUT = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
 INDEX = os.path.join(ROOT, 'data', 'nba_xpm.json')
 VORX_K, VORX_REP = 0.030, -1.4                   # win% per point of team net; replacement-level XPM
+# shrunk XPM (the board's XPM column): raw XPM pulled toward a role mean by minutes, w = MP / (MP + SHRINK_K), the
+# role mean = MU0 + MU1 x ln(1 + MP82 / 100) per side (MP82: minutes on an 82-game pace). Fit Oct 31 2026 on next-season
+# XPM 2011-26 (players with 250+ MP next season, weighted by those minutes), the same values picked in all 15
+# leave-one-season-out folds: held-out RMSE 1.26 vs 1.59 raw (under 100 MP 1.7 vs 7.3). An odd/even-game split of
+# box XPM 2014-26 agrees (k 200-300, mean near -1). Display only: game models and the CBB board read raw xpm.
+SHRINK_K = 300
+SHRINK_MU = {'o': (-0.75, 0.375), 'd': (-0.25, 0.125)}
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 
 
@@ -151,6 +159,26 @@ def prior_xpm(season, n0=600.0, rook=-2.0, w2=0.5):
     return get
 
 
+def shrink(p, games):
+    """adds sxpm / soxpm / sdxpm (shrunk) to a player row; a row on the prior keeps the prior"""
+    if p.get('pr') or p.get('xpm') is None or p.get('oxpm') is None:
+        p['sxpm'], p['soxpm'], p['sdxpm'] = p.get('xpm'), p.get('oxpm'), p.get('dxpm'); return p
+    m = p['mp']; w = m / (m + SHRINK_K); lm = math.log(1 + m * 82 / max(games, 1) / 100)
+    so, sd = ((a + b * lm) + (p[k] - (a + b * lm)) * w for k, (a, b) in (('oxpm', SHRINK_MU['o']), ('dxpm', SHRINK_MU['d'])))
+    p['soxpm'], p['sdxpm'] = r1(so), r1(sd); p['sxpm'] = r1(so + sd)
+    return p
+
+
+def reshrink():
+    """recompute the shrunk columns in every published season file (no refetch)"""
+    for f in sorted(os.listdir(OUT)):
+        if not f.endswith('.json'): continue
+        fn = os.path.join(OUT, f); d = json.load(open(fn))
+        for p in d['players']: shrink(p, d['games'])
+        json.dump(d, open(fn, 'w'), separators=(',', ':'))
+        print(f, len(d['players']))
+
+
 def build(season, fresh=False):
     h = fetch(season, fresh)
     rows = parse(h) if h else []
@@ -182,6 +210,7 @@ def build(season, fresh=False):
     except Exception as e:
         print(season, 'faces skipped', e)
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82
+    for p in players: shrink(p, gmax)
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'n': len(players), 'games': gmax, 'dpmSrc': src, 'dpmShare': round(hitmp / allmp, 3) if allmp else 0,
            'players': players}
@@ -209,7 +238,9 @@ def write_index():
 
 if __name__ == '__main__':
     a = sys.argv[1:]
-    if a and a[0] == '--current':
+    if a and a[0] == '--shrink':
+        reshrink()
+    elif a and a[0] == '--current':
         s = current_season()
         if not build(s, fresh=True): build(s - 1, fresh=True)    # before opening night: last season's final
     else:
