@@ -1520,8 +1520,11 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   if (!FCS) posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
-    // "+": a young, highly ranked talent whose production hasn't caught up yet
-    p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
+    // "+" removed (Oct 31 2026): the old rule (On3 z >= 1.5, age <= 20.5, On3 z - production z >= .75) failed held out
+    // on the 2019-23 boards (5,769 rows, 247 pedigree in On3's place, class out): star odds beyond the FV t -.71 (55+),
+    // -.34 (60+), 2/5 and 1/5 classes; no threshold variant passes. A "+" returns only with a signal that passes.
+    // plus stays false for older readers
+    p.plus = false;
   }
   // FV as a distribution (scripts/fv_dist.mjs, data/fv_dist.json): the odds of each outcome tier around the final
   // grade, its 80% range (p.fvd, the scouting report's FV outlook) and the expected NFL AV a season over the tiers
@@ -1878,7 +1881,6 @@ function scoutReport(p) {
     p.bmi ? `BMI ${p.bmi.toFixed(1)}` : null].filter(Boolean).join(', ');
   // the frame FV counts is frameFV (size against drafted NFL players at the position); sizeZ isn't in the composite
   if (Math.abs(p.frameFV ?? 0) >= 0.5) (p.frameFV > 0 ? plus : minus).push(`NFL frame ${frame} (${sg(p.frameFV, 1)} FV)`);
-  if (p.plus) plus.push('"+" flag: On3 grade ahead of production, young');
   // playing time, QBR, class, availability, consensus
   if (p.snapShare != null && (p.snaps ?? 0) >= 100) {
     const pc = Math.round(p.snapShare * 100);
