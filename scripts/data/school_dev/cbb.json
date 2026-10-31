@@ -1,0 +1,4350 @@
+{
+ "asof": "2026-10-31",
+ "sport": "cbb",
+ "outcomes": {
+  "fv": {
+   "n": 2816,
+   "classes": [
+    2009,
+    2020
+   ],
+   "schools": 193,
+   "programCoef": [
+    -0.1523,
+    -0.075,
+    0.133,
+    0.0
+   ],
+   "raw": {
+    "rolling": {
+     "n": 2279,
+     "slope": 1.592,
+     "t": 0.64,
+     "mseGainPct": 0.035,
+     "r": 0.0201,
+     "classesWon": "1/9",
+     "byClass": [
+      {
+       "cls": 2012,
+       "n": 198,
+       "slope": 1.596,
+       "t": 0.65,
+       "mseGainPct": 0.418,
+       "r": 0.0704
+      },
+      {
+       "cls": 2013,
+       "n": 290,
+       "slope": -583606308.861,
+       "t": -0.94,
+       "mseGainPct": -0.0,
+       "r": -0.0396
+      },
+      {
+       "cls": 2014,
+       "n": 278,
+       "slope": -249484639.617,
+       "t": -0.36,
+       "mseGainPct": -0.0,
+       "r": -0.0181
+      },
+      {
+       "cls": 2015,
+       "n": 271,
+       "slope": 1783849990.072,
+       "t": 1.61,
+       "mseGainPct": 0.0,
+       "r": 0.0993
+      },
+      {
+       "cls": 2016,
+       "n": 243,
+       "slope": 163740683.303,
+       "t": 0.22,
+       "mseGainPct": 0.0,
+       "r": 0.016
+      },
+      {
+       "cls": 2017,
+       "n": 253,
+       "slope": 1055967697.625,
+       "t": 1.04,
+       "mseGainPct": 0.0,
+       "r": 0.0941
+      },
+      {
+       "cls": 2018,
+       "n": 249,
+       "slope": -8514020.833,
+       "t": -0.02,
+       "mseGainPct": -0.0,
+       "r": -0.001
+      },
+      {
+       "cls": 2019,
+       "n": 251,
+       "slope": 323374899.515,
+       "t": 0.37,
+       "mseGainPct": 0.0,
+       "r": 0.0403
+      },
+      {
+       "cls": 2020,
+       "n": 246,
+       "slope": -390243504.667,
+       "t": -0.99,
+       "mseGainPct": -0.0,
+       "r": -0.0608
+      }
+     ]
+    },
+    "split": {
+     "train": "2009-2014",
+     "test": "2015-2020",
+     "n": 1513,
+     "slope": 747384209.184,
+     "t": 2.11,
+     "mseGainPct": 0.0,
+     "r": 0.0542,
+     "hyper": {
+      "sd": 7.891712895227388,
+      "tau2": 1e-09,
+      "tau": 3.1622776601683795e-05,
+      "tau2raw": -1.5342235374297766,
+      "k": 62279132420.69824,
+      "Q": 90.67734622448697,
+      "df": 167
+     }
+    },
+    "halves": {
+     "schools": 17,
+     "r": 0.46,
+     "t": 2.26,
+     "spearmanBrown": 0.63
+    },
+    "tauCI": [
+     0.0,
+     0.0,
+     0.75
+    ],
+    "k25": {
+     "rolling": {
+      "n": 2279,
+      "slope": 0.183,
+      "t": 0.79,
+      "mseGainPct": -0.653,
+      "r": 0.0187,
+      "classesWon": "3/9"
+     },
+     "split": {
+      "train": "2009-2014",
+      "test": "2015-2020",
+      "n": 1513,
+      "slope": 0.661,
+      "t": 2.01,
+      "mseGainPct": 0.233,
+      "r": 0.0563
+     }
+    },
+    "k75": {
+     "rolling": {
+      "n": 2279,
+      "slope": 0.355,
+      "t": 0.77,
+      "mseGainPct": -0.079,
+      "r": 0.0185,
+      "classesWon": "3/9"
+     },
+     "split": {
+      "train": "2009-2014",
+      "test": "2015-2020",
+      "n": 1513,
+      "slope": 1.294,
+      "t": 2.0,
+      "mseGainPct": 0.284,
+      "r": 0.0548
+     }
+    }
+   },
+   "netProgram": {
+    "rolling": {
+     "n": 2279,
+     "slope": 1.534,
+     "t": 0.61,
+     "mseGainPct": 0.033,
+     "r": 0.0193,
+     "classesWon": "1/9",
+     "byClass": [
+      {
+       "cls": 2012,
+       "n": 198,
+       "slope": 1.538,
+       "t": 0.62,
+       "mseGainPct": 0.394,
+       "r": 0.0677
+      },
+      {
+       "cls": 2013,
+       "n": 290,
+       "slope": -710596386.885,
+       "t": -1.14,
+       "mseGainPct": -0.0,
+       "r": -0.048
+      },
+      {
+       "cls": 2014,
+       "n": 278,
+       "slope": -410591167.727,
+       "t": -0.56,
+       "mseGainPct": -0.0,
+       "r": -0.0297
+      },
+      {
+       "cls": 2015,
+       "n": 271,
+       "slope": 1633852273.476,
+       "t": 1.42,
+       "mseGainPct": 0.0,
+       "r": 0.0883
+      },
+      {
+       "cls": 2016,
+       "n": 243,
+       "slope": 12123984.181,
+       "t": 0.02,
+       "mseGainPct": 0.0,
+       "r": 0.0012
+      },
+      {
+       "cls": 2017,
+       "n": 253,
+       "slope": 983956891.418,
+       "t": 0.96,
+       "mseGainPct": 0.0,
+       "r": 0.0845
+      },
+      {
+       "cls": 2018,
+       "n": 249,
+       "slope": -141869654.751,
+       "t": -0.35,
+       "mseGainPct": -0.0,
+       "r": -0.0152
+      },
+      {
+       "cls": 2019,
+       "n": 251,
+       "slope": 360349194.319,
+       "t": 0.41,
+       "mseGainPct": 0.0,
+       "r": 0.0434
+      },
+      {
+       "cls": 2020,
+       "n": 246,
+       "slope": -413089900.235,
+       "t": -1.0,
+       "mseGainPct": -0.0,
+       "r": -0.0621
+      }
+     ]
+    },
+    "split": {
+     "train": "2009-2014",
+     "test": "2015-2020",
+     "n": 1513,
+     "slope": 682843470.175,
+     "t": 1.88,
+     "mseGainPct": 0.0,
+     "r": 0.0479,
+     "hyper": {
+      "sd": 7.891712895227388,
+      "tau2": 1e-09,
+      "tau": 3.1622776601683795e-05,
+      "tau2raw": -1.589735569538001,
+      "k": 62279132420.69824,
+      "Q": 87.91580235320146,
+      "df": 167
+     }
+    },
+    "halves": {
+     "schools": 17,
+     "r": 0.426,
+     "t": 2.01,
+     "spearmanBrown": 0.597
+    },
+    "tauCI": [
+     0.0,
+     0.0,
+     0.666
+    ],
+    "k25": {
+     "rolling": {
+      "n": 2279,
+      "slope": 0.107,
+      "t": 0.46,
+      "mseGainPct": -0.784,
+      "r": 0.0107,
+      "classesWon": "2/9"
+     },
+     "split": {
+      "train": "2009-2014",
+      "test": "2015-2020",
+      "n": 1513,
+      "slope": 0.593,
+      "t": 1.82,
+      "mseGainPct": 0.129,
+      "r": 0.0494
+     }
+    },
+    "k75": {
+     "rolling": {
+      "n": 2279,
+      "slope": 0.208,
+      "t": 0.44,
+      "mseGainPct": -0.152,
+      "r": 0.0106,
+      "classesWon": "3/9"
+     },
+     "split": {
+      "train": "2009-2014",
+      "test": "2015-2020",
+      "n": 1513,
+      "slope": 1.165,
+      "t": 1.8,
+      "mseGainPct": 0.226,
+      "r": 0.0481
+     }
+    }
+   },
+   "hyper": {
+    "sd": 7.682343714087301,
+    "tau2": 1e-09,
+    "tau": 3.1622776601683795e-05,
+    "tau2raw": -0.01576766055943008,
+    "k": 59018404941.376656,
+    "Q": 190.337780597477,
+    "df": 192
+   },
+   "hyperNet": {
+    "sd": 7.682343714087301,
+    "tau2": 1e-09,
+    "tau": 3.1622776601683795e-05,
+    "tau2raw": -0.11099615803985871,
+    "k": 59018404941.376656,
+    "Q": 180.29883692612734,
+    "df": 192
+   },
+   "schoolsAll": [
+    {
+     "school": "Michigan",
+     "u": 0.0,
+     "n": 41,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 1115.0,
+     "sumE": 959.34,
+     "id": "Michigan"
+    },
+    {
+     "school": "Iowa St.",
+     "u": 0.0,
+     "n": 19,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 525.0,
+     "sumE": 433.74,
+     "id": "Iowa St."
+    },
+    {
+     "school": "Villanova",
+     "u": 0.0,
+     "n": 33,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 945.0,
+     "sumE": 883.89,
+     "id": "Villanova"
+    },
+    {
+     "school": "Virginia",
+     "u": 0.0,
+     "n": 25,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 690.0,
+     "sumE": 600.74,
+     "id": "Virginia"
+    },
+    {
+     "school": "Iowa",
+     "u": 0.0,
+     "n": 32,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 720.0,
+     "sumE": 692.86,
+     "id": "Iowa"
+    },
+    {
+     "school": "West Virginia",
+     "u": 0.0,
+     "n": 27,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 600.0,
+     "sumE": 601.92,
+     "id": "West Virginia"
+    },
+    {
+     "school": "Houston",
+     "u": 0.0,
+     "n": 11,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 290.0,
+     "sumE": 253.87,
+     "id": "Houston"
+    },
+    {
+     "school": "Tennessee",
+     "u": 0.0,
+     "n": 25,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 655.0,
+     "sumE": 616.66,
+     "id": "Tennessee"
+    },
+    {
+     "school": "Kentucky",
+     "u": 0.0,
+     "n": 63,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 2460.0,
+     "sumE": 2171.45,
+     "id": "Kentucky"
+    },
+    {
+     "school": "Washington St.",
+     "u": 0.0,
+     "n": 10,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 225.0,
+     "sumE": 212.12,
+     "id": "Washington St."
+    },
+    {
+     "school": "Kansas",
+     "u": 0.0,
+     "n": 38,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 1185.0,
+     "sumE": 1166.81,
+     "id": "Kansas"
+    },
+    {
+     "school": "Indiana",
+     "u": 0.0,
+     "n": 43,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 1075.0,
+     "sumE": 1062.37,
+     "id": "Indiana"
+    },
+    {
+     "school": "San Diego St.",
+     "u": 0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 575.0,
+     "sumE": 518.98,
+     "id": "San Diego St."
+    },
+    {
+     "school": "Wisconsin",
+     "u": 0.0,
+     "n": 32,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 720.0,
+     "sumE": 705.77,
+     "id": "Wisconsin"
+    },
+    {
+     "school": "Colorado St.",
+     "u": 0.0,
+     "n": 9,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 205.0,
+     "sumE": 188.75,
+     "id": "Colorado St."
+    },
+    {
+     "school": "Utah",
+     "u": 0.0,
+     "n": 18,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 420.0,
+     "sumE": 394.5,
+     "id": "Utah"
+    },
+    {
+     "school": "Texas Tech",
+     "u": 0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 535.0,
+     "sumE": 518.79,
+     "id": "Texas Tech"
+    },
+    {
+     "school": "Clemson",
+     "u": 0.0,
+     "n": 27,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 620.0,
+     "sumE": 604.01,
+     "id": "Clemson"
+    },
+    {
+     "school": "Fresno St.",
+     "u": 0.0,
+     "n": 9,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 205.0,
+     "sumE": 192.54,
+     "id": "Fresno St."
+    },
+    {
+     "school": "Vanderbilt",
+     "u": 0.0,
+     "n": 29,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 735.0,
+     "sumE": 674.53,
+     "id": "Vanderbilt"
+    },
+    {
+     "school": "Florida St.",
+     "u": 0.0,
+     "n": 27,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 760.0,
+     "sumE": 699.77,
+     "id": "Florida St."
+    },
+    {
+     "school": "Syracuse",
+     "u": 0.0,
+     "n": 33,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 855.0,
+     "sumE": 813.18,
+     "id": "Syracuse"
+    },
+    {
+     "school": "Colorado",
+     "u": 0.0,
+     "n": 18,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 425.0,
+     "sumE": 404.3,
+     "id": "Colorado"
+    },
+    {
+     "school": "Georgia",
+     "u": 0.0,
+     "n": 29,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 735.0,
+     "sumE": 684.55,
+     "id": "Georgia"
+    },
+    {
+     "school": "Cincinnati",
+     "u": 0.0,
+     "n": 21,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 520.0,
+     "sumE": 487.35,
+     "id": "Cincinnati"
+    },
+    {
+     "school": "SMU",
+     "u": 0.0,
+     "n": 9,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 225.0,
+     "sumE": 207.45,
+     "id": "SMU"
+    },
+    {
+     "school": "Tulane",
+     "u": 0.0,
+     "n": 8,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 180.0,
+     "sumE": 170.45,
+     "id": "Tulane"
+    },
+    {
+     "school": "Gonzaga",
+     "u": 0.0,
+     "n": 20,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 530.0,
+     "sumE": 484.98,
+     "id": "Gonzaga"
+    },
+    {
+     "school": "Connecticut",
+     "u": 0.0,
+     "n": 26,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 670.0,
+     "sumE": 651.46,
+     "id": "Connecticut"
+    },
+    {
+     "school": "Notre Dame",
+     "u": 0.0,
+     "n": 21,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 490.0,
+     "sumE": 478.73,
+     "id": "Notre Dame"
+    },
+    {
+     "school": "UCLA",
+     "u": 0.0,
+     "n": 40,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 1100.0,
+     "sumE": 1075.44,
+     "id": "UCLA"
+    },
+    {
+     "school": "Charlotte",
+     "u": 0.0,
+     "n": 8,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 170.0,
+     "sumE": 164.33,
+     "id": "Charlotte"
+    },
+    {
+     "school": "Washington",
+     "u": 0.0,
+     "n": 30,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 840.0,
+     "sumE": 773.49,
+     "id": "Washington"
+    },
+    {
+     "school": "Kansas St.",
+     "u": 0.0,
+     "n": 20,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 455.0,
+     "sumE": 449.49,
+     "id": "Kansas St."
+    },
+    {
+     "school": "New Mexico",
+     "u": 0.0,
+     "n": 15,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 335.0,
+     "sumE": 317.66,
+     "id": "New Mexico"
+    },
+    {
+     "school": "Creighton",
+     "u": 0.0,
+     "n": 16,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 360.0,
+     "sumE": 356.65,
+     "id": "Creighton"
+    },
+    {
+     "school": "Nevada",
+     "u": 0.0,
+     "n": 12,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 260.0,
+     "sumE": 264.1,
+     "id": "Nevada"
+    },
+    {
+     "school": "Rice",
+     "u": 0.0,
+     "n": 9,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 190.0,
+     "sumE": 190.02,
+     "id": "Rice"
+    },
+    {
+     "school": "Richmond",
+     "u": 0.0,
+     "n": 10,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 220.0,
+     "sumE": 210.65,
+     "id": "Richmond"
+    },
+    {
+     "school": "Purdue",
+     "u": 0.0,
+     "n": 36,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 805.0,
+     "sumE": 814.49,
+     "id": "Purdue"
+    },
+    {
+     "school": "Rhode Island",
+     "u": 0.0,
+     "n": 14,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 305.0,
+     "sumE": 304.14,
+     "id": "Rhode Island"
+    },
+    {
+     "school": "Oklahoma St.",
+     "u": 0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 600.0,
+     "sumE": 591.14,
+     "id": "Oklahoma St."
+    },
+    {
+     "school": "UTEP",
+     "u": 0.0,
+     "n": 8,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 180.0,
+     "sumE": 175.52,
+     "id": "UTEP"
+    },
+    {
+     "school": "Arizona",
+     "u": 0.0,
+     "n": 40,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 1140.0,
+     "sumE": 1170.11,
+     "id": "Arizona"
+    },
+    {
+     "school": "Oregon St.",
+     "u": -0.0,
+     "n": 21,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 470.0,
+     "sumE": 464.21,
+     "id": "Oregon St."
+    },
+    {
+     "school": "Alabama",
+     "u": -0.0,
+     "n": 31,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 735.0,
+     "sumE": 754.79,
+     "id": "Alabama"
+    },
+    {
+     "school": "Duke",
+     "u": -0.0,
+     "n": 50,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 1765.0,
+     "sumE": 1742.91,
+     "id": "Duke"
+    },
+    {
+     "school": "Texas A&M",
+     "u": -0.0,
+     "n": 32,
+     "se": 0.0,
+     "uNet": 0.0,
+     "sumY": 745.0,
+     "sumE": 744.74,
+     "id": "Texas A&M"
+    },
+    {
+     "school": "VCU",
+     "u": -0.0,
+     "n": 18,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 370.0,
+     "sumE": 396.74,
+     "id": "VCU"
+    },
+    {
+     "school": "Arkansas",
+     "u": -0.0,
+     "n": 25,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 605.0,
+     "sumE": 589.5,
+     "id": "Arkansas"
+    },
+    {
+     "school": "Louisville",
+     "u": -0.0,
+     "n": 36,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 920.0,
+     "sumE": 908.78,
+     "id": "Louisville"
+    },
+    {
+     "school": "Xavier",
+     "u": -0.0,
+     "n": 28,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 635.0,
+     "sumE": 655.18,
+     "id": "Xavier"
+    },
+    {
+     "school": "Wake Forest",
+     "u": -0.0,
+     "n": 26,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 575.0,
+     "sumE": 600.99,
+     "id": "Wake Forest"
+    },
+    {
+     "school": "LSU",
+     "u": -0.0,
+     "n": 32,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 865.0,
+     "sumE": 841.99,
+     "id": "LSU"
+    },
+    {
+     "school": "UCF",
+     "u": -0.0,
+     "n": 12,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 250.0,
+     "sumE": 254.18,
+     "id": "UCF"
+    },
+    {
+     "school": "East Carolina",
+     "u": -0.0,
+     "n": 10,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 210.0,
+     "sumE": 213.24,
+     "id": "East Carolina"
+    },
+    {
+     "school": "UNLV",
+     "u": -0.0,
+     "n": 26,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 630.0,
+     "sumE": 656.29,
+     "id": "UNLV"
+    },
+    {
+     "school": "Auburn",
+     "u": -0.0,
+     "n": 36,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 845.0,
+     "sumE": 833.66,
+     "id": "Auburn"
+    },
+    {
+     "school": "Marquette",
+     "u": -0.0,
+     "n": 30,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 705.0,
+     "sumE": 723.72,
+     "id": "Marquette"
+    },
+    {
+     "school": "Michigan St.",
+     "u": -0.0,
+     "n": 36,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 940.0,
+     "sumE": 915.54,
+     "id": "Michigan St."
+    },
+    {
+     "school": "BYU",
+     "u": -0.0,
+     "n": 11,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 240.0,
+     "sumE": 244.45,
+     "id": "BYU"
+    },
+    {
+     "school": "Texas",
+     "u": -0.0,
+     "n": 39,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 1035.0,
+     "sumE": 1077.95,
+     "id": "Texas"
+    },
+    {
+     "school": "Memphis",
+     "u": -0.0,
+     "n": 31,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 730.0,
+     "sumE": 832.45,
+     "id": "Memphis"
+    },
+    {
+     "school": "La Salle",
+     "u": -0.0,
+     "n": 8,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 160.0,
+     "sumE": 165.73,
+     "id": "La Salle"
+    },
+    {
+     "school": "USC",
+     "u": -0.0,
+     "n": 30,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 765.0,
+     "sumE": 743.11,
+     "id": "USC"
+    },
+    {
+     "school": "Georgetown",
+     "u": -0.0,
+     "n": 29,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 660.0,
+     "sumE": 692.43,
+     "id": "Georgetown"
+    },
+    {
+     "school": "Pittsburgh",
+     "u": -0.0,
+     "n": 27,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 615.0,
+     "sumE": 644.27,
+     "id": "Pittsburgh"
+    },
+    {
+     "school": "Saint Louis",
+     "u": -0.0,
+     "n": 12,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 260.0,
+     "sumE": 261.56,
+     "id": "Saint Louis"
+    },
+    {
+     "school": "Penn St.",
+     "u": -0.0,
+     "n": 31,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 670.0,
+     "sumE": 664.23,
+     "id": "Penn St."
+    },
+    {
+     "school": "Miami FL",
+     "u": -0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 550.0,
+     "sumE": 560.05,
+     "id": "Miami FL"
+    },
+    {
+     "school": "Oregon",
+     "u": -0.0,
+     "n": 33,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 815.0,
+     "sumE": 841.33,
+     "id": "Oregon"
+    },
+    {
+     "school": "Western Kentucky",
+     "u": -0.0,
+     "n": 9,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 195.0,
+     "sumE": 212.99,
+     "id": "Western Kentucky"
+    },
+    {
+     "school": "Oklahoma",
+     "u": -0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 545.0,
+     "sumE": 541.65,
+     "id": "Oklahoma"
+    },
+    {
+     "school": "South Florida",
+     "u": -0.0,
+     "n": 16,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 330.0,
+     "sumE": 351.62,
+     "id": "South Florida"
+    },
+    {
+     "school": "Mississippi",
+     "u": -0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 485.0,
+     "sumE": 519.35,
+     "id": "Mississippi"
+    },
+    {
+     "school": "Ball St.",
+     "u": -0.0,
+     "n": 8,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 160.0,
+     "sumE": 169.25,
+     "id": "Ball St."
+    },
+    {
+     "school": "Virginia Tech",
+     "u": -0.0,
+     "n": 21,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 490.0,
+     "sumE": 500.51,
+     "id": "Virginia Tech"
+    },
+    {
+     "school": "N.C. State",
+     "u": -0.0,
+     "n": 32,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 765.0,
+     "sumE": 799.11,
+     "id": "N.C. State"
+    },
+    {
+     "school": "Georgia Tech",
+     "u": -0.0,
+     "n": 26,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 595.0,
+     "sumE": 617.04,
+     "id": "Georgia Tech"
+    },
+    {
+     "school": "Seton Hall",
+     "u": -0.0,
+     "n": 20,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 440.0,
+     "sumE": 452.49,
+     "id": "Seton Hall"
+    },
+    {
+     "school": "California",
+     "u": -0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 570.0,
+     "sumE": 563.18,
+     "id": "California"
+    },
+    {
+     "school": "Ohio St.",
+     "u": -0.0,
+     "n": 39,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 940.0,
+     "sumE": 990.26,
+     "id": "Ohio St."
+    },
+    {
+     "school": "Baylor",
+     "u": -0.0,
+     "n": 24,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 550.0,
+     "sumE": 618.31,
+     "id": "Baylor"
+    },
+    {
+     "school": "DePaul",
+     "u": -0.0,
+     "n": 13,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 270.0,
+     "sumE": 283.76,
+     "id": "DePaul"
+    },
+    {
+     "school": "St. John's",
+     "u": -0.0,
+     "n": 16,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 345.0,
+     "sumE": 382.08,
+     "id": "St. John's"
+    },
+    {
+     "school": "Massachusetts",
+     "u": -0.0,
+     "n": 13,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 270.0,
+     "sumE": 288.23,
+     "id": "Massachusetts"
+    },
+    {
+     "school": "TCU",
+     "u": -0.0,
+     "n": 17,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 350.0,
+     "sumE": 379.47,
+     "id": "TCU"
+    },
+    {
+     "school": "Arizona St.",
+     "u": -0.0,
+     "n": 23,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 505.0,
+     "sumE": 547.36,
+     "id": "Arizona St."
+    },
+    {
+     "school": "Dayton",
+     "u": -0.0,
+     "n": 14,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 290.0,
+     "sumE": 309.45,
+     "id": "Dayton"
+    },
+    {
+     "school": "Maryland",
+     "u": -0.0,
+     "n": 37,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 865.0,
+     "sumE": 896.02,
+     "id": "Maryland"
+    },
+    {
+     "school": "Missouri",
+     "u": -0.0,
+     "n": 28,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 625.0,
+     "sumE": 665.05,
+     "id": "Missouri"
+    },
+    {
+     "school": "Mississippi St.",
+     "u": -0.0,
+     "n": 31,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 695.0,
+     "sumE": 751.67,
+     "id": "Mississippi St."
+    },
+    {
+     "school": "George Washington",
+     "u": -0.0,
+     "n": 10,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 200.0,
+     "sumE": 209.84,
+     "id": "George Washington"
+    },
+    {
+     "school": "Nebraska",
+     "u": -0.0,
+     "n": 26,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 535.0,
+     "sumE": 561.45,
+     "id": "Nebraska"
+    },
+    {
+     "school": "South Carolina",
+     "u": -0.0,
+     "n": 32,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 695.0,
+     "sumE": 715.52,
+     "id": "South Carolina"
+    },
+    {
+     "school": "Stanford",
+     "u": -0.0,
+     "n": 28,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 650.0,
+     "sumE": 676.76,
+     "id": "Stanford"
+    },
+    {
+     "school": "Providence",
+     "u": -0.0,
+     "n": 20,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 450.0,
+     "sumE": 474.09,
+     "id": "Providence"
+    },
+    {
+     "school": "Boston College",
+     "u": -0.0,
+     "n": 18,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 360.0,
+     "sumE": 384.07,
+     "id": "Boston College"
+    },
+    {
+     "school": "North Carolina",
+     "u": -0.0,
+     "n": 45,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 1245.0,
+     "sumE": 1321.37,
+     "id": "North Carolina"
+    },
+    {
+     "school": "Temple",
+     "u": -0.0,
+     "n": 15,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 300.0,
+     "sumE": 327.57,
+     "id": "Temple"
+    },
+    {
+     "school": "Florida",
+     "u": -0.0,
+     "n": 33,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 815.0,
+     "sumE": 889.44,
+     "id": "Florida"
+    },
+    {
+     "school": "Butler",
+     "u": -0.0,
+     "n": 24,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 490.0,
+     "sumE": 523.58,
+     "id": "Butler"
+    },
+    {
+     "school": "Northwestern",
+     "u": -0.0,
+     "n": 26,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 540.0,
+     "sumE": 568.75,
+     "id": "Northwestern"
+    },
+    {
+     "school": "Illinois",
+     "u": -0.0,
+     "n": 37,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 825.0,
+     "sumE": 879.58,
+     "id": "Illinois"
+    },
+    {
+     "school": "Minnesota",
+     "u": -0.0,
+     "n": 28,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 590.0,
+     "sumE": 622.35,
+     "id": "Minnesota"
+    },
+    {
+     "school": "Rutgers",
+     "u": -0.0,
+     "n": 31,
+     "se": 0.0,
+     "uNet": -0.0,
+     "sumY": 630.0,
+     "sumE": 677.71,
+     "id": "Rutgers"
+    }
+   ]
+  },
+  "col": {
+   "n": 3206,
+   "classes": [
+    2009,
+    2023
+   ],
+   "schools": 222,
+   "programCoef": [
+    -0.2601,
+    0.1777,
+    0.039,
+    0.0
+   ],
+   "raw": {
+    "rolling": {
+     "n": 2669,
+     "slope": 0.832,
+     "t": 3.03,
+     "mseGainPct": 0.33,
+     "r": 0.0588,
+     "classesWon": "8/12",
+     "byClass": [
+      {
+       "cls": 2012,
+       "n": 198,
+       "slope": 0.243,
+       "t": 0.33,
+       "mseGainPct": -0.417,
+       "r": 0.0219
+      },
+      {
+       "cls": 2013,
+       "n": 290,
+       "slope": 3.278,
+       "t": 3.33,
+       "mseGainPct": 1.517,
+       "r": 0.1718
+      },
+      {
+       "cls": 2014,
+       "n": 278,
+       "slope": 1.613,
+       "t": 1.81,
+       "mseGainPct": 1.316,
+       "r": 0.124
+      },
+      {
+       "cls": 2015,
+       "n": 271,
+       "slope": -1.145,
+       "t": -1.54,
+       "mseGainPct": -2.47,
+       "r": -0.0992
+      },
+      {
+       "cls": 2016,
+       "n": 243,
+       "slope": 2.497,
+       "t": 0.89,
+       "mseGainPct": 0.421,
+       "r": 0.0811
+      },
+      {
+       "cls": 2017,
+       "n": 253,
+       "slope": 1.031,
+       "t": 0.71,
+       "mseGainPct": 0.331,
+       "r": 0.0576
+      },
+      {
+       "cls": 2018,
+       "n": 249,
+       "slope": 1.123,
+       "t": 1.4,
+       "mseGainPct": 0.517,
+       "r": 0.0724
+      },
+      {
+       "cls": 2019,
+       "n": 251,
+       "slope": 3.17,
+       "t": 2.91,
+       "mseGainPct": 1.309,
+       "r": 0.1572
+      },
+      {
+       "cls": 2020,
+       "n": 246,
+       "slope": 1.193,
+       "t": 1.34,
+       "mseGainPct": 0.716,
+       "r": 0.0868
+      },
+      {
+       "cls": 2021,
+       "n": 131,
+       "slope": 0.119,
+       "t": 0.19,
+       "mseGainPct": -0.83,
+       "r": 0.0127
+      },
+      {
+       "cls": 2022,
+       "n": 257,
+       "slope": 0.884,
+       "t": 1.02,
+       "mseGainPct": 0.512,
+       "r": 0.0727
+      },
+      {
+       "cls": 2023,
+       "n": 2,
+       "slope": -72.737,
+       "t": 0.0,
+       "mseGainPct": -1.384,
+       "r": -1.0
+      }
+     ]
+    },
+    "split": {
+     "train": "2009-2015",
+     "test": "2016-2023",
+     "n": 1632,
+     "slope": 0.835,
+     "t": 0.86,
+     "mseGainPct": 0.077,
+     "r": 0.0284,
+     "hyper": {
+      "sd": 2.7268558165658203,
+      "tau2": 0.06326997248886294,
+      "tau": 0.2515352311086122,
+      "tau2raw": 0.06326997248886294,
+      "k": 117.52403789408505,
+      "Q": 185.38471647244688,
+      "df": 172
+     }
+    },
+    "halves": {
+     "schools": 29,
+     "r": 0.289,
+     "t": 1.64,
+     "spearmanBrown": 0.449
+    },
+    "tauCI": [
+     0.138,
+     0.362,
+     0.49
+    ],
+    "k25": {
+     "rolling": {
+      "n": 2669,
+      "slope": 0.63,
+      "t": 3.27,
+      "mseGainPct": 0.308,
+      "r": 0.0687,
+      "classesWon": "7/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1632,
+      "slope": 0.293,
+      "t": 0.97,
+      "mseGainPct": -0.485,
+      "r": 0.0319
+     }
+    },
+    "k75": {
+     "rolling": {
+      "n": 2669,
+      "slope": 1.326,
+      "t": 3.39,
+      "mseGainPct": 0.437,
+      "r": 0.0683,
+      "classesWon": "9/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1632,
+      "slope": 0.586,
+      "t": 0.88,
+      "mseGainPct": 0.042,
+      "r": 0.029
+     }
+    }
+   },
+   "netProgram": {
+    "rolling": {
+     "n": 2669,
+     "slope": 0.351,
+     "t": 0.77,
+     "mseGainPct": -0.045,
+     "r": 0.0137,
+     "classesWon": "7/12",
+     "byClass": [
+      {
+       "cls": 2012,
+       "n": 198,
+       "slope": -0.229,
+       "t": -0.23,
+       "mseGainPct": -0.787,
+       "r": -0.0168
+      },
+      {
+       "cls": 2013,
+       "n": 290,
+       "slope": 6.373,
+       "t": 2.77,
+       "mseGainPct": 0.602,
+       "r": 0.1444
+      },
+      {
+       "cls": 2014,
+       "n": 278,
+       "slope": 1.844,
+       "t": 1.35,
+       "mseGainPct": 0.686,
+       "r": 0.0932
+      },
+      {
+       "cls": 2015,
+       "n": 271,
+       "slope": -2.578,
+       "t": -2.02,
+       "mseGainPct": -1.611,
+       "r": -0.132
+      },
+      {
+       "cls": 2016,
+       "n": 243,
+       "slope": 80685117.101,
+       "t": 0.48,
+       "mseGainPct": 0.0,
+       "r": 0.0436
+      },
+      {
+       "cls": 2017,
+       "n": 253,
+       "slope": 2.376,
+       "t": 0.52,
+       "mseGainPct": 0.104,
+       "r": 0.0397
+      },
+      {
+       "cls": 2018,
+       "n": 249,
+       "slope": 0.995,
+       "t": 0.34,
+       "mseGainPct": 0.028,
+       "r": 0.0166
+      },
+      {
+       "cls": 2019,
+       "n": 251,
+       "slope": 36.01,
+       "t": 2.27,
+       "mseGainPct": 0.097,
+       "r": 0.1334
+      },
+      {
+       "cls": 2020,
+       "n": 246,
+       "slope": 2.88,
+       "t": 1.18,
+       "mseGainPct": 0.377,
+       "r": 0.0814
+      },
+      {
+       "cls": 2021,
+       "n": 131,
+       "slope": -0.049,
+       "t": -0.05,
+       "mseGainPct": -0.406,
+       "r": -0.003
+      },
+      {
+       "cls": 2022,
+       "n": 257,
+       "slope": 0.649,
+       "t": 0.44,
+       "mseGainPct": 0.067,
+       "r": 0.0309
+      },
+      {
+       "cls": 2023,
+       "n": 2,
+       "slope": -212.14,
+       "t": 0.0,
+       "mseGainPct": -0.472,
+       "r": -1.0
+      }
+     ]
+    },
+    "split": {
+     "train": "2009-2015",
+     "test": "2016-2023",
+     "n": 1632,
+     "slope": 8873819.781,
+     "t": 0.16,
+     "mseGainPct": 0.0,
+     "r": 0.005,
+     "hyper": {
+      "sd": 2.7268558165658203,
+      "tau2": 1e-09,
+      "tau": 3.1622776601683795e-05,
+      "tau2raw": -0.012590469961288634,
+      "k": 7435742644.338847,
+      "Q": 169.33649527481032,
+      "df": 172
+     }
+    },
+    "halves": {
+     "schools": 29,
+     "r": 0.154,
+     "t": 0.82,
+     "spearmanBrown": 0.266
+    },
+    "tauCI": [
+     0.0,
+     0.217,
+     0.382
+    ],
+    "k25": {
+     "rolling": {
+      "n": 2669,
+      "slope": 0.368,
+      "t": 1.71,
+      "mseGainPct": -0.27,
+      "r": 0.0372,
+      "classesWon": "5/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1632,
+      "slope": 0.079,
+      "t": 0.25,
+      "mseGainPct": -0.848,
+      "r": 0.008
+     }
+    },
+    "k75": {
+     "rolling": {
+      "n": 2669,
+      "slope": 0.809,
+      "t": 1.82,
+      "mseGainPct": 0.14,
+      "r": 0.0384,
+      "classesWon": "7/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1632,
+      "slope": 0.135,
+      "t": 0.19,
+      "mseGainPct": -0.152,
+      "r": 0.0061
+     }
+    }
+   },
+   "hyper": {
+    "sd": 2.7265900961552636,
+    "tau2": 0.13827837969730963,
+    "tau": 0.3718580101292826,
+    "tau2raw": 0.13827837969730963,
+    "k": 53.76323882826502,
+    "Q": 280.56917381477956,
+    "df": 221
+   },
+   "hyperNet": {
+    "sd": 2.7265900961552636,
+    "tau2": 0.05652587340349699,
+    "tau": 0.23775170536401413,
+    "tau2raw": 0.05652587340349699,
+    "k": 131.52018898291,
+    "Q": 245.3508752790994,
+    "df": 221
+   },
+   "schoolsAll": [
+    {
+     "school": "Virginia",
+     "u": 0.654,
+     "n": 28,
+     "se": 0.303,
+     "uNet": 0.31,
+     "sumY": 178.6,
+     "sumE": 124.44,
+     "id": "Virginia"
+    },
+    {
+     "school": "Michigan",
+     "u": 0.556,
+     "n": 51,
+     "se": 0.266,
+     "uNet": 0.269,
+     "sumY": 275.73,
+     "sumE": 216.35,
+     "id": "Michigan"
+    },
+    {
+     "school": "Purdue",
+     "u": 0.53,
+     "n": 40,
+     "se": 0.282,
+     "uNet": 0.257,
+     "sumY": 205.94,
+     "sumE": 158.31,
+     "id": "Purdue"
+    },
+    {
+     "school": "Gonzaga",
+     "u": 0.528,
+     "n": 24,
+     "se": 0.31,
+     "uNet": 0.212,
+     "sumY": 152.0,
+     "sumE": 109.31,
+     "id": "Gonzaga"
+    },
+    {
+     "school": "Villanova",
+     "u": 0.483,
+     "n": 38,
+     "se": 0.284,
+     "uNet": 0.205,
+     "sumY": 230.53,
+     "sumE": 184.98,
+     "id": "Villanova"
+    },
+    {
+     "school": "Iowa",
+     "u": 0.467,
+     "n": 35,
+     "se": 0.288,
+     "uNet": 0.242,
+     "sumY": 156.79,
+     "sumE": 116.54,
+     "id": "Iowa"
+    },
+    {
+     "school": "Wisconsin",
+     "u": 0.451,
+     "n": 36,
+     "se": 0.286,
+     "uNet": 0.189,
+     "sumY": 162.78,
+     "sumE": 122.93,
+     "id": "Wisconsin"
+    },
+    {
+     "school": "Houston",
+     "u": 0.449,
+     "n": 14,
+     "se": 0.331,
+     "uNet": 0.2,
+     "sumY": 88.76,
+     "sumE": 58.07,
+     "id": "Houston"
+    },
+    {
+     "school": "Kansas",
+     "u": 0.345,
+     "n": 45,
+     "se": 0.276,
+     "uNet": 0.117,
+     "sumY": 267.84,
+     "sumE": 236.47,
+     "id": "Kansas"
+    },
+    {
+     "school": "Tennessee",
+     "u": 0.334,
+     "n": 32,
+     "se": 0.293,
+     "uNet": 0.159,
+     "sumY": 163.1,
+     "sumE": 134.17,
+     "id": "Tennessee"
+    },
+    {
+     "school": "Duke",
+     "u": 0.301,
+     "n": 61,
+     "se": 0.258,
+     "uNet": 0.076,
+     "sumY": 378.57,
+     "sumE": 350.5,
+     "id": "Duke"
+    },
+    {
+     "school": "Notre Dame",
+     "u": 0.282,
+     "n": 25,
+     "se": 0.308,
+     "uNet": 0.134,
+     "sumY": 124.01,
+     "sumE": 100.74,
+     "id": "Notre Dame"
+    },
+    {
+     "school": "Clemson",
+     "u": 0.251,
+     "n": 30,
+     "se": 0.297,
+     "uNet": 0.13,
+     "sumY": 131.43,
+     "sumE": 110.89,
+     "id": "Clemson"
+    },
+    {
+     "school": "Washington St.",
+     "u": 0.243,
+     "n": 12,
+     "se": 0.335,
+     "uNet": 0.127,
+     "sumY": 55.05,
+     "sumE": 40.23,
+     "id": "Washington St."
+    },
+    {
+     "school": "Michigan St.",
+     "u": 0.242,
+     "n": 40,
+     "se": 0.281,
+     "uNet": 0.085,
+     "sumY": 210.82,
+     "sumE": 187.87,
+     "id": "Michigan St."
+    },
+    {
+     "school": "SMU",
+     "u": 0.198,
+     "n": 9,
+     "se": 0.344,
+     "uNet": 0.093,
+     "sumY": 47.82,
+     "sumE": 35.04,
+     "id": "SMU"
+    },
+    {
+     "school": "Iowa St.",
+     "u": 0.19,
+     "n": 22,
+     "se": 0.314,
+     "uNet": 0.092,
+     "sumY": 101.25,
+     "sumE": 87.31,
+     "id": "Iowa St."
+    },
+    {
+     "school": "Ohio St.",
+     "u": 0.179,
+     "n": 46,
+     "se": 0.274,
+     "uNet": 0.054,
+     "sumY": 228.61,
+     "sumE": 210.81,
+     "id": "Ohio St."
+    },
+    {
+     "school": "Oklahoma",
+     "u": 0.175,
+     "n": 26,
+     "se": 0.306,
+     "uNet": 0.076,
+     "sumY": 123.48,
+     "sumE": 109.05,
+     "id": "Oklahoma"
+    },
+    {
+     "school": "Cincinnati",
+     "u": 0.172,
+     "n": 24,
+     "se": 0.309,
+     "uNet": 0.079,
+     "sumY": 110.07,
+     "sumE": 95.92,
+     "id": "Cincinnati"
+    },
+    {
+     "school": "Kansas St.",
+     "u": 0.172,
+     "n": 21,
+     "se": 0.315,
+     "uNet": 0.081,
+     "sumY": 90.64,
+     "sumE": 77.89,
+     "id": "Kansas St."
+    },
+    {
+     "school": "San Diego St.",
+     "u": 0.171,
+     "n": 25,
+     "se": 0.306,
+     "uNet": 0.081,
+     "sumY": 105.4,
+     "sumE": 91.77,
+     "id": "San Diego St."
+    },
+    {
+     "school": "West Virginia",
+     "u": 0.166,
+     "n": 29,
+     "se": 0.299,
+     "uNet": 0.067,
+     "sumY": 118.96,
+     "sumE": 107.56,
+     "id": "West Virginia"
+    },
+    {
+     "school": "Creighton",
+     "u": 0.149,
+     "n": 23,
+     "se": 0.311,
+     "uNet": 0.065,
+     "sumY": 98.12,
+     "sumE": 86.8,
+     "id": "Creighton"
+    },
+    {
+     "school": "St. John's",
+     "u": 0.142,
+     "n": 18,
+     "se": 0.322,
+     "uNet": 0.076,
+     "sumY": 84.99,
+     "sumE": 75.0,
+     "id": "St. John's"
+    },
+    {
+     "school": "North Carolina",
+     "u": 0.135,
+     "n": 51,
+     "se": 0.267,
+     "uNet": 0.015,
+     "sumY": 267.39,
+     "sumE": 258.41,
+     "id": "North Carolina"
+    },
+    {
+     "school": "Alabama",
+     "u": 0.124,
+     "n": 38,
+     "se": 0.285,
+     "uNet": 0.067,
+     "sumY": 182.08,
+     "sumE": 171.32,
+     "id": "Alabama"
+    },
+    {
+     "school": "Vanderbilt",
+     "u": 0.124,
+     "n": 34,
+     "se": 0.291,
+     "uNet": 0.076,
+     "sumY": 145.85,
+     "sumE": 135.12,
+     "id": "Vanderbilt"
+    },
+    {
+     "school": "Nevada",
+     "u": 0.116,
+     "n": 15,
+     "se": 0.328,
+     "uNet": 0.073,
+     "sumY": 57.75,
+     "sumE": 50.26,
+     "id": "Nevada"
+    },
+    {
+     "school": "Dayton",
+     "u": 0.114,
+     "n": 16,
+     "se": 0.326,
+     "uNet": 0.053,
+     "sumY": 66.27,
+     "sumE": 58.1,
+     "id": "Dayton"
+    },
+    {
+     "school": "Richmond",
+     "u": 0.113,
+     "n": 10,
+     "se": 0.34,
+     "uNet": 0.059,
+     "sumY": 35.63,
+     "sumE": 28.63,
+     "id": "Richmond"
+    },
+    {
+     "school": "Colorado St.",
+     "u": 0.107,
+     "n": 9,
+     "se": 0.342,
+     "uNet": 0.059,
+     "sumY": 31.2,
+     "sumE": 25.04,
+     "id": "Colorado St."
+    },
+    {
+     "school": "Utah",
+     "u": 0.104,
+     "n": 20,
+     "se": 0.317,
+     "uNet": 0.066,
+     "sumY": 77.41,
+     "sumE": 69.35,
+     "id": "Utah"
+    },
+    {
+     "school": "Colorado",
+     "u": 0.101,
+     "n": 20,
+     "se": 0.318,
+     "uNet": 0.051,
+     "sumY": 87.86,
+     "sumE": 80.07,
+     "id": "Colorado"
+    },
+    {
+     "school": "BYU",
+     "u": 0.1,
+     "n": 11,
+     "se": 0.338,
+     "uNet": 0.041,
+     "sumY": 45.98,
+     "sumE": 39.37,
+     "id": "BYU"
+    },
+    {
+     "school": "Syracuse",
+     "u": 0.094,
+     "n": 40,
+     "se": 0.282,
+     "uNet": 0.023,
+     "sumY": 185.52,
+     "sumE": 177.64,
+     "id": "Syracuse"
+    },
+    {
+     "school": "Butler",
+     "u": 0.082,
+     "n": 25,
+     "se": 0.307,
+     "uNet": 0.035,
+     "sumY": 93.27,
+     "sumE": 87.34,
+     "id": "Butler"
+    },
+    {
+     "school": "Georgia",
+     "u": 0.069,
+     "n": 30,
+     "se": 0.299,
+     "uNet": 0.054,
+     "sumY": 121.78,
+     "sumE": 117.71,
+     "id": "Georgia"
+    },
+    {
+     "school": "Fresno St.",
+     "u": 0.049,
+     "n": 9,
+     "se": 0.343,
+     "uNet": 0.034,
+     "sumY": 30.77,
+     "sumE": 28.06,
+     "id": "Fresno St."
+    },
+    {
+     "school": "Baylor",
+     "u": 0.046,
+     "n": 29,
+     "se": 0.301,
+     "uNet": -0.014,
+     "sumY": 133.55,
+     "sumE": 129.53,
+     "id": "Baylor"
+    },
+    {
+     "school": "Western Kentucky",
+     "u": 0.045,
+     "n": 9,
+     "se": 0.343,
+     "uNet": 0.036,
+     "sumY": 37.75,
+     "sumE": 35.79,
+     "id": "Western Kentucky"
+    },
+    {
+     "school": "Texas Tech",
+     "u": 0.042,
+     "n": 27,
+     "se": 0.302,
+     "uNet": 0.009,
+     "sumY": 102.91,
+     "sumE": 100.2,
+     "id": "Texas Tech"
+    },
+    {
+     "school": "Wyoming",
+     "u": 0.042,
+     "n": 9,
+     "se": 0.342,
+     "uNet": 0.032,
+     "sumY": 25.77,
+     "sumE": 23.78,
+     "id": "Wyoming"
+    },
+    {
+     "school": "VCU",
+     "u": 0.039,
+     "n": 19,
+     "se": 0.318,
+     "uNet": 0.012,
+     "sumY": 68.48,
+     "sumE": 66.52,
+     "id": "VCU"
+    },
+    {
+     "school": "Rhode Island",
+     "u": 0.037,
+     "n": 14,
+     "se": 0.33,
+     "uNet": 0.031,
+     "sumY": 49.39,
+     "sumE": 47.41,
+     "id": "Rhode Island"
+    },
+    {
+     "school": "Charlotte",
+     "u": 0.032,
+     "n": 8,
+     "se": 0.346,
+     "uNet": 0.031,
+     "sumY": 24.14,
+     "sumE": 22.65,
+     "id": "Charlotte"
+    },
+    {
+     "school": "Connecticut",
+     "u": 0.024,
+     "n": 31,
+     "se": 0.297,
+     "uNet": 0.0,
+     "sumY": 148.18,
+     "sumE": 145.52,
+     "id": "Connecticut"
+    },
+    {
+     "school": "Temple",
+     "u": 0.019,
+     "n": 15,
+     "se": 0.328,
+     "uNet": 0.019,
+     "sumY": 51.95,
+     "sumE": 50.86,
+     "id": "Temple"
+    },
+    {
+     "school": "California",
+     "u": 0.019,
+     "n": 24,
+     "se": 0.309,
+     "uNet": 0.021,
+     "sumY": 94.34,
+     "sumE": 93.87,
+     "id": "California"
+    },
+    {
+     "school": "Miami FL",
+     "u": 0.015,
+     "n": 29,
+     "se": 0.3,
+     "uNet": 0.006,
+     "sumY": 126.94,
+     "sumE": 125.31,
+     "id": "Miami FL"
+    },
+    {
+     "school": "Maryland",
+     "u": 0.013,
+     "n": 40,
+     "se": 0.282,
+     "uNet": -0.002,
+     "sumY": 172.6,
+     "sumE": 172.36,
+     "id": "Maryland"
+    },
+    {
+     "school": "Illinois",
+     "u": 0.008,
+     "n": 45,
+     "se": 0.275,
+     "uNet": -0.004,
+     "sumY": 192.08,
+     "sumE": 190.95,
+     "id": "Illinois"
+    },
+    {
+     "school": "Virginia Tech",
+     "u": 0.006,
+     "n": 22,
+     "se": 0.314,
+     "uNet": 0.01,
+     "sumY": 97.98,
+     "sumE": 97.61,
+     "id": "Virginia Tech"
+    },
+    {
+     "school": "Florida St.",
+     "u": 0.005,
+     "n": 35,
+     "se": 0.289,
+     "uNet": -0.002,
+     "sumY": 159.79,
+     "sumE": 158.79,
+     "id": "Florida St."
+    },
+    {
+     "school": "Auburn",
+     "u": -0.002,
+     "n": 40,
+     "se": 0.28,
+     "uNet": 0.012,
+     "sumY": 163.2,
+     "sumE": 162.59,
+     "id": "Auburn"
+    },
+    {
+     "school": "Saint Joseph's",
+     "u": -0.003,
+     "n": 8,
+     "se": 0.346,
+     "uNet": 0.008,
+     "sumY": 26.13,
+     "sumE": 25.93,
+     "id": "Saint Joseph's"
+    },
+    {
+     "school": "Northwestern",
+     "u": -0.006,
+     "n": 29,
+     "se": 0.299,
+     "uNet": 0.015,
+     "sumY": 101.22,
+     "sumE": 102.21,
+     "id": "Northwestern"
+    },
+    {
+     "school": "Georgetown",
+     "u": -0.011,
+     "n": 32,
+     "se": 0.295,
+     "uNet": -0.01,
+     "sumY": 138.9,
+     "sumE": 140.29,
+     "id": "Georgetown"
+    },
+    {
+     "school": "New Mexico",
+     "u": -0.014,
+     "n": 15,
+     "se": 0.327,
+     "uNet": -0.005,
+     "sumY": 47.65,
+     "sumE": 48.45,
+     "id": "New Mexico"
+    },
+    {
+     "school": "Arkansas",
+     "u": -0.03,
+     "n": 32,
+     "se": 0.295,
+     "uNet": -0.013,
+     "sumY": 133.77,
+     "sumE": 138.21,
+     "id": "Arkansas"
+    },
+    {
+     "school": "Providence",
+     "u": -0.032,
+     "n": 22,
+     "se": 0.313,
+     "uNet": -0.014,
+     "sumY": 88.08,
+     "sumE": 90.69,
+     "id": "Providence"
+    },
+    {
+     "school": "Saint Louis",
+     "u": -0.037,
+     "n": 13,
+     "se": 0.332,
+     "uNet": -0.007,
+     "sumY": 40.79,
+     "sumE": 42.84,
+     "id": "Saint Louis"
+    },
+    {
+     "school": "Tulane",
+     "u": -0.045,
+     "n": 9,
+     "se": 0.343,
+     "uNet": -0.001,
+     "sumY": 23.54,
+     "sumE": 26.24,
+     "id": "Tulane"
+    },
+    {
+     "school": "Ball St.",
+     "u": -0.048,
+     "n": 8,
+     "se": 0.345,
+     "uNet": -0.002,
+     "sumY": 21.31,
+     "sumE": 23.97,
+     "id": "Ball St."
+    },
+    {
+     "school": "Seton Hall",
+     "u": -0.06,
+     "n": 22,
+     "se": 0.312,
+     "uNet": -0.027,
+     "sumY": 76.7,
+     "sumE": 80.88,
+     "id": "Seton Hall"
+    },
+    {
+     "school": "UTEP",
+     "u": -0.062,
+     "n": 8,
+     "se": 0.347,
+     "uNet": -0.017,
+     "sumY": 26.06,
+     "sumE": 29.66,
+     "id": "UTEP"
+    },
+    {
+     "school": "East Carolina",
+     "u": -0.066,
+     "n": 10,
+     "se": 0.34,
+     "uNet": -0.009,
+     "sumY": 27.41,
+     "sumE": 31.42,
+     "id": "East Carolina"
+    },
+    {
+     "school": "Florida",
+     "u": -0.071,
+     "n": 36,
+     "se": 0.288,
+     "uNet": -0.075,
+     "sumY": 164.82,
+     "sumE": 170.05,
+     "id": "Florida"
+    },
+    {
+     "school": "Minnesota",
+     "u": -0.076,
+     "n": 31,
+     "se": 0.296,
+     "uNet": -0.033,
+     "sumY": 104.85,
+     "sumE": 110.69,
+     "id": "Minnesota"
+    },
+    {
+     "school": "Boise St.",
+     "u": -0.077,
+     "n": 8,
+     "se": 0.346,
+     "uNet": -0.029,
+     "sumY": 21.08,
+     "sumE": 25.56,
+     "id": "Boise St."
+    },
+    {
+     "school": "Rutgers",
+     "u": -0.081,
+     "n": 34,
+     "se": 0.29,
+     "uNet": -0.011,
+     "sumY": 108.34,
+     "sumE": 116.48,
+     "id": "Rutgers"
+    },
+    {
+     "school": "Pepperdine",
+     "u": -0.081,
+     "n": 10,
+     "se": 0.34,
+     "uNet": -0.017,
+     "sumY": 24.79,
+     "sumE": 29.74,
+     "id": "Pepperdine"
+    },
+    {
+     "school": "Penn St.",
+     "u": -0.088,
+     "n": 36,
+     "se": 0.286,
+     "uNet": -0.035,
+     "sumY": 110.81,
+     "sumE": 116.5,
+     "id": "Penn St."
+    },
+    {
+     "school": "Pittsburgh",
+     "u": -0.091,
+     "n": 29,
+     "se": 0.299,
+     "uNet": -0.042,
+     "sumY": 103.87,
+     "sumE": 111.77,
+     "id": "Pittsburgh"
+    },
+    {
+     "school": "Mississippi",
+     "u": -0.096,
+     "n": 26,
+     "se": 0.305,
+     "uNet": -0.036,
+     "sumY": 93.13,
+     "sumE": 100.66,
+     "id": "Mississippi"
+    },
+    {
+     "school": "Mississippi St.",
+     "u": -0.097,
+     "n": 34,
+     "se": 0.291,
+     "uNet": -0.025,
+     "sumY": 131.48,
+     "sumE": 139.42,
+     "id": "Mississippi St."
+    },
+    {
+     "school": "Texas",
+     "u": -0.098,
+     "n": 43,
+     "se": 0.278,
+     "uNet": -0.069,
+     "sumY": 207.46,
+     "sumE": 215.02,
+     "id": "Texas"
+    },
+    {
+     "school": "La Salle",
+     "u": -0.104,
+     "n": 8,
+     "se": 0.345,
+     "uNet": -0.031,
+     "sumY": 14.13,
+     "sumE": 20.45,
+     "id": "La Salle"
+    },
+    {
+     "school": "UCLA",
+     "u": -0.105,
+     "n": 45,
+     "se": 0.275,
+     "uNet": -0.074,
+     "sumY": 213.19,
+     "sumE": 222.49,
+     "id": "UCLA"
+    },
+    {
+     "school": "N.C. State",
+     "u": -0.108,
+     "n": 35,
+     "se": 0.289,
+     "uNet": -0.055,
+     "sumY": 147.39,
+     "sumE": 156.53,
+     "id": "N.C. State"
+    },
+    {
+     "school": "Oregon St.",
+     "u": -0.108,
+     "n": 25,
+     "se": 0.306,
+     "uNet": -0.027,
+     "sumY": 78.38,
+     "sumE": 85.98,
+     "id": "Oregon St."
+    },
+    {
+     "school": "TCU",
+     "u": -0.112,
+     "n": 18,
+     "se": 0.322,
+     "uNet": -0.045,
+     "sumY": 57.51,
+     "sumE": 65.66,
+     "id": "TCU"
+    },
+    {
+     "school": "Massachusetts",
+     "u": -0.117,
+     "n": 14,
+     "se": 0.331,
+     "uNet": -0.032,
+     "sumY": 40.4,
+     "sumE": 48.28,
+     "id": "Massachusetts"
+    },
+    {
+     "school": "Marquette",
+     "u": -0.125,
+     "n": 35,
+     "se": 0.29,
+     "uNet": -0.073,
+     "sumY": 140.54,
+     "sumE": 151.99,
+     "id": "Marquette"
+    },
+    {
+     "school": "Oklahoma St.",
+     "u": -0.132,
+     "n": 24,
+     "se": 0.311,
+     "uNet": -0.066,
+     "sumY": 96.32,
+     "sumE": 107.88,
+     "id": "Oklahoma St."
+    },
+    {
+     "school": "South Florida",
+     "u": -0.133,
+     "n": 17,
+     "se": 0.323,
+     "uNet": -0.031,
+     "sumY": 46.37,
+     "sumE": 57.25,
+     "id": "South Florida"
+    },
+    {
+     "school": "Indiana",
+     "u": -0.142,
+     "n": 49,
+     "se": 0.269,
+     "uNet": -0.093,
+     "sumY": 202.1,
+     "sumE": 216.89,
+     "id": "Indiana"
+    },
+    {
+     "school": "Rice",
+     "u": -0.149,
+     "n": 10,
+     "se": 0.339,
+     "uNet": -0.04,
+     "sumY": 18.32,
+     "sumE": 27.59,
+     "id": "Rice"
+    },
+    {
+     "school": "George Washington",
+     "u": -0.152,
+     "n": 10,
+     "se": 0.339,
+     "uNet": -0.062,
+     "sumY": 17.44,
+     "sumE": 26.5,
+     "id": "George Washington"
+    },
+    {
+     "school": "South Carolina",
+     "u": -0.157,
+     "n": 35,
+     "se": 0.288,
+     "uNet": -0.057,
+     "sumY": 112.74,
+     "sumE": 126.52,
+     "id": "South Carolina"
+    },
+    {
+     "school": "Washington",
+     "u": -0.164,
+     "n": 34,
+     "se": 0.291,
+     "uNet": -0.069,
+     "sumY": 128.04,
+     "sumE": 141.33,
+     "id": "Washington"
+    },
+    {
+     "school": "Arizona",
+     "u": -0.164,
+     "n": 43,
+     "se": 0.278,
+     "uNet": -0.122,
+     "sumY": 212.23,
+     "sumE": 224.23,
+     "id": "Arizona"
+    },
+    {
+     "school": "USC",
+     "u": -0.175,
+     "n": 35,
+     "se": 0.29,
+     "uNet": -0.078,
+     "sumY": 138.41,
+     "sumE": 152.31,
+     "id": "USC"
+    },
+    {
+     "school": "Boston College",
+     "u": -0.176,
+     "n": 22,
+     "se": 0.311,
+     "uNet": -0.061,
+     "sumY": 55.7,
+     "sumE": 68.73,
+     "id": "Boston College"
+    },
+    {
+     "school": "UCF",
+     "u": -0.185,
+     "n": 13,
+     "se": 0.332,
+     "uNet": -0.068,
+     "sumY": 30.91,
+     "sumE": 42.19,
+     "id": "UCF"
+    },
+    {
+     "school": "Xavier",
+     "u": -0.2,
+     "n": 30,
+     "se": 0.3,
+     "uNet": -0.107,
+     "sumY": 114.07,
+     "sumE": 131.21,
+     "id": "Xavier"
+    },
+    {
+     "school": "George Mason",
+     "u": -0.201,
+     "n": 8,
+     "se": 0.345,
+     "uNet": -0.081,
+     "sumY": 11.47,
+     "sumE": 23.35,
+     "id": "George Mason"
+    },
+    {
+     "school": "Georgia Tech",
+     "u": -0.229,
+     "n": 28,
+     "se": 0.302,
+     "uNet": -0.099,
+     "sumY": 92.41,
+     "sumE": 110.22,
+     "id": "Georgia Tech"
+    },
+    {
+     "school": "Memphis",
+     "u": -0.236,
+     "n": 34,
+     "se": 0.291,
+     "uNet": -0.118,
+     "sumY": 136.26,
+     "sumE": 162.4,
+     "id": "Memphis"
+    },
+    {
+     "school": "Kentucky",
+     "u": -0.237,
+     "n": 70,
+     "se": 0.245,
+     "uNet": -0.229,
+     "sumY": 387.06,
+     "sumE": 406.7,
+     "id": "Kentucky"
+    },
+    {
+     "school": "Texas A&M",
+     "u": -0.252,
+     "n": 34,
+     "se": 0.292,
+     "uNet": -0.116,
+     "sumY": 120.37,
+     "sumE": 141.78,
+     "id": "Texas A&M"
+    },
+    {
+     "school": "DePaul",
+     "u": -0.256,
+     "n": 14,
+     "se": 0.33,
+     "uNet": -0.098,
+     "sumY": 31.15,
+     "sumE": 48.57,
+     "id": "DePaul"
+    },
+    {
+     "school": "LSU",
+     "u": -0.272,
+     "n": 38,
+     "se": 0.285,
+     "uNet": -0.139,
+     "sumY": 156.89,
+     "sumE": 179.85,
+     "id": "LSU"
+    },
+    {
+     "school": "Nebraska",
+     "u": -0.282,
+     "n": 31,
+     "se": 0.295,
+     "uNet": -0.124,
+     "sumY": 82.66,
+     "sumE": 105.91,
+     "id": "Nebraska"
+    },
+    {
+     "school": "Missouri",
+     "u": -0.291,
+     "n": 30,
+     "se": 0.299,
+     "uNet": -0.138,
+     "sumY": 92.23,
+     "sumE": 120.23,
+     "id": "Missouri"
+    },
+    {
+     "school": "Oregon",
+     "u": -0.302,
+     "n": 35,
+     "se": 0.29,
+     "uNet": -0.169,
+     "sumY": 133.79,
+     "sumE": 161.13,
+     "id": "Oregon"
+    },
+    {
+     "school": "Louisville",
+     "u": -0.322,
+     "n": 41,
+     "se": 0.281,
+     "uNet": -0.228,
+     "sumY": 164.31,
+     "sumE": 194.72,
+     "id": "Louisville"
+    },
+    {
+     "school": "Arizona St.",
+     "u": -0.33,
+     "n": 26,
+     "se": 0.306,
+     "uNet": -0.158,
+     "sumY": 83.33,
+     "sumE": 109.71,
+     "id": "Arizona St."
+    },
+    {
+     "school": "Wake Forest",
+     "u": -0.341,
+     "n": 29,
+     "se": 0.299,
+     "uNet": -0.156,
+     "sumY": 85.78,
+     "sumE": 113.33,
+     "id": "Wake Forest"
+    },
+    {
+     "school": "Stanford",
+     "u": -0.345,
+     "n": 31,
+     "se": 0.297,
+     "uNet": -0.169,
+     "sumY": 102.78,
+     "sumE": 133.4,
+     "id": "Stanford"
+    },
+    {
+     "school": "UNLV",
+     "u": -0.552,
+     "n": 27,
+     "se": 0.302,
+     "uNet": -0.262,
+     "sumY": 74.86,
+     "sumE": 116.89,
+     "id": "UNLV"
+    }
+   ]
+  },
+  "bpm": {
+   "n": 3006,
+   "classes": [
+    2009,
+    2023
+   ],
+   "schools": 214,
+   "programCoef": [
+    -0.8221,
+    0.7317,
+    0.0237,
+    0.0
+   ],
+   "raw": {
+    "rolling": {
+     "n": 2498,
+     "slope": 0.866,
+     "t": 7.17,
+     "mseGainPct": 2.495,
+     "r": 0.1607,
+     "classesWon": "9/12",
+     "byClass": [
+      {
+       "cls": 2012,
+       "n": 189,
+       "slope": 0.942,
+       "t": 1.87,
+       "mseGainPct": 2.297,
+       "r": 0.1521
+      },
+      {
+       "cls": 2013,
+       "n": 278,
+       "slope": 1.381,
+       "t": 4.79,
+       "mseGainPct": 4.984,
+       "r": 0.2326
+      },
+      {
+       "cls": 2014,
+       "n": 265,
+       "slope": 1.383,
+       "t": 3.49,
+       "mseGainPct": 4.382,
+       "r": 0.2183
+      },
+      {
+       "cls": 2015,
+       "n": 259,
+       "slope": 0.024,
+       "t": 0.08,
+       "mseGainPct": -4.003,
+       "r": 0.0049
+      },
+      {
+       "cls": 2016,
+       "n": 227,
+       "slope": 1.726,
+       "t": 4.26,
+       "mseGainPct": 6.855,
+       "r": 0.289
+      },
+      {
+       "cls": 2017,
+       "n": 233,
+       "slope": 1.131,
+       "t": 3.08,
+       "mseGainPct": 4.729,
+       "r": 0.2203
+      },
+      {
+       "cls": 2018,
+       "n": 232,
+       "slope": 1.007,
+       "t": 3.69,
+       "mseGainPct": 4.154,
+       "r": 0.2048
+      },
+      {
+       "cls": 2019,
+       "n": 232,
+       "slope": 0.613,
+       "t": 1.71,
+       "mseGainPct": 0.952,
+       "r": 0.1266
+      },
+      {
+       "cls": 2020,
+       "n": 217,
+       "slope": 0.738,
+       "t": 2.27,
+       "mseGainPct": 1.77,
+       "r": 0.1454
+      },
+      {
+       "cls": 2021,
+       "n": 123,
+       "slope": 0.117,
+       "t": 0.33,
+       "mseGainPct": -4.076,
+       "r": 0.0284
+      },
+      {
+       "cls": 2022,
+       "n": 242,
+       "slope": 0.994,
+       "t": 2.21,
+       "mseGainPct": 2.511,
+       "r": 0.1602
+      },
+      {
+       "cls": 2023,
+       "n": 1,
+       "slope": 0.0,
+       "t": 0.0,
+       "mseGainPct": 0.0,
+       "r": 0.0
+      }
+     ]
+    },
+    "split": {
+     "train": "2009-2015",
+     "test": "2016-2023",
+     "n": 1507,
+     "slope": 0.68,
+     "t": 2.87,
+     "mseGainPct": 0.941,
+     "r": 0.1108,
+     "hyper": {
+      "sd": 3.252610385879519,
+      "tau2": 0.6279420776649052,
+      "tau": 0.7924279637070522,
+      "tau2raw": 0.6279420776649052,
+      "k": 16.84785061971423,
+      "Q": 259.23639398598266,
+      "df": 170
+     }
+    },
+    "halves": {
+     "schools": 23,
+     "r": 0.459,
+     "t": 2.66,
+     "spearmanBrown": 0.629
+    },
+    "tauCI": [
+     0.632,
+     0.825,
+     0.965
+    ],
+    "k25": {
+     "rolling": {
+      "n": 2498,
+      "slope": 1.177,
+      "t": 7.22,
+      "mseGainPct": 2.457,
+      "r": 0.1597,
+      "classesWon": "9/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1507,
+      "slope": 0.829,
+      "t": 2.84,
+      "mseGainPct": 1.125,
+      "r": 0.1094
+     }
+    },
+    "k75": {
+     "rolling": {
+      "n": 2498,
+      "slope": 2.335,
+      "t": 6.98,
+      "mseGainPct": 1.56,
+      "r": 0.1539,
+      "classesWon": "9/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1507,
+      "slope": 1.722,
+      "t": 2.77,
+      "mseGainPct": 0.909,
+      "r": 0.1064
+     }
+    }
+   },
+   "netProgram": {
+    "rolling": {
+     "n": 2498,
+     "slope": 0.594,
+     "t": 1.75,
+     "mseGainPct": 0.098,
+     "r": 0.0429,
+     "classesWon": "7/12",
+     "byClass": [
+      {
+       "cls": 2012,
+       "n": 189,
+       "slope": 0.255,
+       "t": 0.28,
+       "mseGainPct": -0.619,
+       "r": 0.0288
+      },
+      {
+       "cls": 2013,
+       "n": 278,
+       "slope": 1.406,
+       "t": 2.32,
+       "mseGainPct": 1.27,
+       "r": 0.1179
+      },
+      {
+       "cls": 2014,
+       "n": 265,
+       "slope": 2.207,
+       "t": 2.34,
+       "mseGainPct": 1.404,
+       "r": 0.1416
+      },
+      {
+       "cls": 2015,
+       "n": 259,
+       "slope": -1.424,
+       "t": -2.02,
+       "mseGainPct": -3.311,
+       "r": -0.1327
+      },
+      {
+       "cls": 2016,
+       "n": 227,
+       "slope": 4.478,
+       "t": 1.72,
+       "mseGainPct": 0.78,
+       "r": 0.1403
+      },
+      {
+       "cls": 2017,
+       "n": 233,
+       "slope": 1.652,
+       "t": 1.43,
+       "mseGainPct": 0.822,
+       "r": 0.0987
+      },
+      {
+       "cls": 2018,
+       "n": 232,
+       "slope": 1.119,
+       "t": 1.28,
+       "mseGainPct": 0.545,
+       "r": 0.0744
+      },
+      {
+       "cls": 2019,
+       "n": 232,
+       "slope": 0.415,
+       "t": 0.38,
+       "mseGainPct": -0.066,
+       "r": 0.0259
+      },
+      {
+       "cls": 2020,
+       "n": 217,
+       "slope": 1.644,
+       "t": 1.47,
+       "mseGainPct": 0.865,
+       "r": 0.1019
+      },
+      {
+       "cls": 2021,
+       "n": 123,
+       "slope": -0.518,
+       "t": -0.65,
+       "mseGainPct": -1.783,
+       "r": -0.0492
+      },
+      {
+       "cls": 2022,
+       "n": 242,
+       "slope": 1.091,
+       "t": 0.82,
+       "mseGainPct": 0.357,
+       "r": 0.0602
+      },
+      {
+       "cls": 2023,
+       "n": 1,
+       "slope": 0.0,
+       "t": 0.0,
+       "mseGainPct": 0.0,
+       "r": 0.0
+      }
+     ]
+    },
+    "split": {
+     "train": "2009-2015",
+     "test": "2016-2023",
+     "n": 1507,
+     "slope": 0.6,
+     "t": 0.52,
+     "mseGainPct": 0.017,
+     "r": 0.0177,
+     "hyper": {
+      "sd": 3.252610385879519,
+      "tau2": 0.08090464799427068,
+      "tau": 0.2844374236880068,
+      "tau2raw": 0.08090464799427068,
+      "k": 130.76472841313773,
+      "Q": 181.49730094622942,
+      "df": 170
+     }
+    },
+    "halves": {
+     "schools": 23,
+     "r": 0.04,
+     "t": 0.18,
+     "spearmanBrown": 0.077
+    },
+    "tauCI": [
+     0.0,
+     0.373,
+     0.556
+    ],
+    "k25": {
+     "rolling": {
+      "n": 2498,
+      "slope": 0.509,
+      "t": 2.18,
+      "mseGainPct": 0.021,
+      "r": 0.0543,
+      "classesWon": "7/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1507,
+      "slope": 0.196,
+      "t": 0.58,
+      "mseGainPct": -0.651,
+      "r": 0.0203
+     }
+    },
+    "k75": {
+     "rolling": {
+      "n": 2498,
+      "slope": 1.064,
+      "t": 2.17,
+      "mseGainPct": 0.281,
+      "r": 0.0532,
+      "classesWon": "8/12"
+     },
+     "split": {
+      "train": "2009-2015",
+      "test": "2016-2023",
+      "n": 1507,
+      "slope": 0.389,
+      "t": 0.53,
+      "mseGainPct": -0.05,
+      "r": 0.0184
+     }
+    }
+   },
+   "hyper": {
+    "sd": 3.2609976049640106,
+    "tau2": 0.6852461439986094,
+    "tau": 0.8277959555340975,
+    "tau2raw": 0.6852461439986094,
+    "k": 15.51866504133527,
+    "Q": 407.3567003776786,
+    "df": 213
+   },
+   "hyperNet": {
+    "sd": 3.2609976049640106,
+    "tau2": 0.1437927758273039,
+    "tau": 0.3792001790971411,
+    "tau2raw": 0.1437927758273039,
+    "k": 73.95437857290304,
+    "Q": 253.78401563102955,
+    "df": 213
+   },
+   "schoolsAll": [
+    {
+     "school": "Gonzaga",
+     "u": 1.952,
+     "n": 21,
+     "se": 0.533,
+     "uNet": 0.554,
+     "sumY": 135.7,
+     "sumE": 63.05,
+     "id": "Gonzaga"
+    },
+    {
+     "school": "Virginia",
+     "u": 1.506,
+     "n": 28,
+     "se": 0.484,
+     "uNet": 0.546,
+     "sumY": 137.3,
+     "sumE": 73.35,
+     "id": "Virginia"
+    },
+    {
+     "school": "Kansas",
+     "u": 1.381,
+     "n": 40,
+     "se": 0.429,
+     "uNet": 0.378,
+     "sumY": 225.37,
+     "sumE": 155.62,
+     "id": "Kansas"
+    },
+    {
+     "school": "Purdue",
+     "u": 1.36,
+     "n": 39,
+     "se": 0.439,
+     "uNet": 0.505,
+     "sumY": 156.76,
+     "sumE": 78.76,
+     "id": "Purdue"
+    },
+    {
+     "school": "Wisconsin",
+     "u": 1.296,
+     "n": 32,
+     "se": 0.479,
+     "uNet": 0.369,
+     "sumY": 108.74,
+     "sumE": 45.2,
+     "id": "Wisconsin"
+    },
+    {
+     "school": "Michigan",
+     "u": 1.183,
+     "n": 49,
+     "se": 0.398,
+     "uNet": 0.413,
+     "sumY": 199.47,
+     "sumE": 122.08,
+     "id": "Michigan"
+    },
+    {
+     "school": "Iowa",
+     "u": 1.135,
+     "n": 34,
+     "se": 0.472,
+     "uNet": 0.472,
+     "sumY": 104.05,
+     "sumE": 43.73,
+     "id": "Iowa"
+    },
+    {
+     "school": "Villanova",
+     "u": 1.127,
+     "n": 35,
+     "se": 0.443,
+     "uNet": 0.304,
+     "sumY": 176.17,
+     "sumE": 117.32,
+     "id": "Villanova"
+    },
+    {
+     "school": "Michigan St.",
+     "u": 1.068,
+     "n": 40,
+     "se": 0.426,
+     "uNet": 0.315,
+     "sumY": 175.79,
+     "sumE": 118.39,
+     "id": "Michigan St."
+    },
+    {
+     "school": "Houston",
+     "u": 0.951,
+     "n": 14,
+     "se": 0.596,
+     "uNet": 0.283,
+     "sumY": 61.2,
+     "sumE": 33.53,
+     "id": "Houston"
+    },
+    {
+     "school": "San Diego St.",
+     "u": 0.854,
+     "n": 21,
+     "se": 0.542,
+     "uNet": 0.303,
+     "sumY": 72.16,
+     "sumE": 39.1,
+     "id": "San Diego St."
+    },
+    {
+     "school": "Ohio St.",
+     "u": 0.844,
+     "n": 44,
+     "se": 0.413,
+     "uNet": 0.222,
+     "sumY": 171.3,
+     "sumE": 122.84,
+     "id": "Ohio St."
+    },
+    {
+     "school": "Duke",
+     "u": 0.824,
+     "n": 59,
+     "se": 0.373,
+     "uNet": 0.057,
+     "sumY": 338.63,
+     "sumE": 284.25,
+     "id": "Duke"
+    },
+    {
+     "school": "North Carolina",
+     "u": 0.731,
+     "n": 48,
+     "se": 0.398,
+     "uNet": 0.14,
+     "sumY": 215.43,
+     "sumE": 173.32,
+     "id": "North Carolina"
+    },
+    {
+     "school": "Baylor",
+     "u": 0.71,
+     "n": 26,
+     "se": 0.499,
+     "uNet": 0.138,
+     "sumY": 104.64,
+     "sumE": 74.75,
+     "id": "Baylor"
+    },
+    {
+     "school": "Kentucky",
+     "u": 0.652,
+     "n": 66,
+     "se": 0.352,
+     "uNet": 0.057,
+     "sumY": 371.94,
+     "sumE": 311.7,
+     "id": "Kentucky"
+    },
+    {
+     "school": "Tennessee",
+     "u": 0.645,
+     "n": 32,
+     "se": 0.47,
+     "uNet": 0.203,
+     "sumY": 109.31,
+     "sumE": 77.34,
+     "id": "Tennessee"
+    },
+    {
+     "school": "West Virginia",
+     "u": 0.567,
+     "n": 28,
+     "se": 0.497,
+     "uNet": 0.155,
+     "sumY": 76.18,
+     "sumE": 48.35,
+     "id": "West Virginia"
+    },
+    {
+     "school": "Utah",
+     "u": 0.479,
+     "n": 17,
+     "se": 0.574,
+     "uNet": 0.237,
+     "sumY": 42.4,
+     "sumE": 25.96,
+     "id": "Utah"
+    },
+    {
+     "school": "Iowa St.",
+     "u": 0.452,
+     "n": 20,
+     "se": 0.544,
+     "uNet": 0.147,
+     "sumY": 59.97,
+     "sumE": 41.28,
+     "id": "Iowa St."
+    },
+    {
+     "school": "BYU",
+     "u": 0.45,
+     "n": 11,
+     "se": 0.639,
+     "uNet": 0.11,
+     "sumY": 28.63,
+     "sumE": 16.16,
+     "id": "BYU"
+    },
+    {
+     "school": "Notre Dame",
+     "u": 0.44,
+     "n": 23,
+     "se": 0.521,
+     "uNet": 0.122,
+     "sumY": 66.44,
+     "sumE": 48.37,
+     "id": "Notre Dame"
+    },
+    {
+     "school": "Cincinnati",
+     "u": 0.415,
+     "n": 23,
+     "se": 0.524,
+     "uNet": 0.117,
+     "sumY": 66.7,
+     "sumE": 49.33,
+     "id": "Cincinnati"
+    },
+    {
+     "school": "Butler",
+     "u": 0.402,
+     "n": 23,
+     "se": 0.533,
+     "uNet": 0.118,
+     "sumY": 51.21,
+     "sumE": 34.06,
+     "id": "Butler"
+    },
+    {
+     "school": "Creighton",
+     "u": 0.401,
+     "n": 21,
+     "se": 0.538,
+     "uNet": 0.101,
+     "sumY": 52.85,
+     "sumE": 37.07,
+     "id": "Creighton"
+    },
+    {
+     "school": "SMU",
+     "u": 0.399,
+     "n": 9,
+     "se": 0.661,
+     "uNet": 0.137,
+     "sumY": 26.95,
+     "sumE": 16.81,
+     "id": "SMU"
+    },
+    {
+     "school": "Florida",
+     "u": 0.373,
+     "n": 31,
+     "se": 0.466,
+     "uNet": 0.011,
+     "sumY": 118.26,
+     "sumE": 100.07,
+     "id": "Florida"
+    },
+    {
+     "school": "Arkansas",
+     "u": 0.334,
+     "n": 31,
+     "se": 0.474,
+     "uNet": 0.149,
+     "sumY": 90.87,
+     "sumE": 78.84,
+     "id": "Arkansas"
+    },
+    {
+     "school": "Oklahoma",
+     "u": 0.321,
+     "n": 25,
+     "se": 0.507,
+     "uNet": 0.058,
+     "sumY": 72.47,
+     "sumE": 59.52,
+     "id": "Oklahoma"
+    },
+    {
+     "school": "Clemson",
+     "u": 0.281,
+     "n": 28,
+     "se": 0.498,
+     "uNet": 0.101,
+     "sumY": 63.58,
+     "sumE": 48.19,
+     "id": "Clemson"
+    },
+    {
+     "school": "Alabama",
+     "u": 0.278,
+     "n": 37,
+     "se": 0.441,
+     "uNet": 0.112,
+     "sumY": 117.81,
+     "sumE": 103.83,
+     "id": "Alabama"
+    },
+    {
+     "school": "Richmond",
+     "u": 0.233,
+     "n": 10,
+     "se": 0.653,
+     "uNet": 0.101,
+     "sumY": 11.51,
+     "sumE": 5.13,
+     "id": "Richmond"
+    },
+    {
+     "school": "UCLA",
+     "u": 0.199,
+     "n": 42,
+     "se": 0.418,
+     "uNet": 0.01,
+     "sumY": 157.29,
+     "sumE": 145.27,
+     "id": "UCLA"
+    },
+    {
+     "school": "Pittsburgh",
+     "u": 0.158,
+     "n": 25,
+     "se": 0.513,
+     "uNet": 0.079,
+     "sumY": 60.91,
+     "sumE": 53.6,
+     "id": "Pittsburgh"
+    },
+    {
+     "school": "Indiana",
+     "u": 0.154,
+     "n": 45,
+     "se": 0.412,
+     "uNet": 0.017,
+     "sumY": 136.04,
+     "sumE": 123.14,
+     "id": "Indiana"
+    },
+    {
+     "school": "St. John's",
+     "u": 0.152,
+     "n": 18,
+     "se": 0.56,
+     "uNet": 0.09,
+     "sumY": 45.53,
+     "sumE": 40.25,
+     "id": "St. John's"
+    },
+    {
+     "school": "Syracuse",
+     "u": 0.149,
+     "n": 37,
+     "se": 0.44,
+     "uNet": -0.07,
+     "sumY": 114.49,
+     "sumE": 100.86,
+     "id": "Syracuse"
+    },
+    {
+     "school": "Connecticut",
+     "u": 0.143,
+     "n": 30,
+     "se": 0.47,
+     "uNet": 0.009,
+     "sumY": 91.36,
+     "sumE": 88.02,
+     "id": "Connecticut"
+    },
+    {
+     "school": "Rhode Island",
+     "u": 0.143,
+     "n": 11,
+     "se": 0.64,
+     "uNet": 0.102,
+     "sumY": 20.89,
+     "sumE": 15.37,
+     "id": "Rhode Island"
+    },
+    {
+     "school": "Florida St.",
+     "u": 0.141,
+     "n": 35,
+     "se": 0.449,
+     "uNet": 0.027,
+     "sumY": 107.71,
+     "sumE": 98.59,
+     "id": "Florida St."
+    },
+    {
+     "school": "Arizona",
+     "u": 0.113,
+     "n": 41,
+     "se": 0.42,
+     "uNet": -0.093,
+     "sumY": 168.6,
+     "sumE": 156.54,
+     "id": "Arizona"
+    },
+    {
+     "school": "Washington St.",
+     "u": 0.109,
+     "n": 11,
+     "se": 0.635,
+     "uNet": 0.093,
+     "sumY": 17.82,
+     "sumE": 14.22,
+     "id": "Washington St."
+    },
+    {
+     "school": "Texas Tech",
+     "u": 0.095,
+     "n": 24,
+     "se": 0.52,
+     "uNet": -0.041,
+     "sumY": 51.5,
+     "sumE": 44.82,
+     "id": "Texas Tech"
+    },
+    {
+     "school": "VCU",
+     "u": 0.093,
+     "n": 18,
+     "se": 0.57,
+     "uNet": -0.005,
+     "sumY": 32.99,
+     "sumE": 27.66,
+     "id": "VCU"
+    },
+    {
+     "school": "Colorado",
+     "u": 0.078,
+     "n": 19,
+     "se": 0.552,
+     "uNet": 0.028,
+     "sumY": 42.86,
+     "sumE": 40.49,
+     "id": "Colorado"
+    },
+    {
+     "school": "Western Kentucky",
+     "u": 0.077,
+     "n": 8,
+     "se": 0.669,
+     "uNet": 0.101,
+     "sumY": 17.79,
+     "sumE": 15.75,
+     "id": "Western Kentucky"
+    },
+    {
+     "school": "Illinois",
+     "u": 0.045,
+     "n": 41,
+     "se": 0.426,
+     "uNet": -0.035,
+     "sumY": 105.39,
+     "sumE": 100.35,
+     "id": "Illinois"
+    },
+    {
+     "school": "Vanderbilt",
+     "u": 0.037,
+     "n": 32,
+     "se": 0.473,
+     "uNet": 0.046,
+     "sumY": 66.86,
+     "sumE": 64.32,
+     "id": "Vanderbilt"
+    },
+    {
+     "school": "Kansas St.",
+     "u": 0.03,
+     "n": 21,
+     "se": 0.542,
+     "uNet": -0.017,
+     "sumY": 38.61,
+     "sumE": 36.34,
+     "id": "Kansas St."
+    },
+    {
+     "school": "Auburn",
+     "u": 0.014,
+     "n": 39,
+     "se": 0.439,
+     "uNet": 0.067,
+     "sumY": 83.27,
+     "sumE": 83.23,
+     "id": "Auburn"
+    },
+    {
+     "school": "Dayton",
+     "u": 0.011,
+     "n": 16,
+     "se": 0.583,
+     "uNet": -0.001,
+     "sumY": 25.45,
+     "sumE": 25.66,
+     "id": "Dayton"
+    },
+    {
+     "school": "New Mexico",
+     "u": 0.003,
+     "n": 15,
+     "se": 0.601,
+     "uNet": 0.0,
+     "sumY": 16.09,
+     "sumE": 15.33,
+     "id": "New Mexico"
+    },
+    {
+     "school": "Georgetown",
+     "u": -0.003,
+     "n": 30,
+     "se": 0.476,
+     "uNet": -0.031,
+     "sumY": 73.28,
+     "sumE": 74.53,
+     "id": "Georgetown"
+    },
+    {
+     "school": "Northwestern",
+     "u": -0.014,
+     "n": 27,
+     "se": 0.507,
+     "uNet": 0.057,
+     "sumY": 42.09,
+     "sumE": 41.09,
+     "id": "Northwestern"
+    },
+    {
+     "school": "Texas",
+     "u": -0.044,
+     "n": 42,
+     "se": 0.417,
+     "uNet": -0.106,
+     "sumY": 150.9,
+     "sumE": 148.9,
+     "id": "Texas"
+    },
+    {
+     "school": "Georgia",
+     "u": -0.045,
+     "n": 29,
+     "se": 0.492,
+     "uNet": 0.055,
+     "sumY": 60.16,
+     "sumE": 61.83,
+     "id": "Georgia"
+    },
+    {
+     "school": "Fresno St.",
+     "u": -0.069,
+     "n": 9,
+     "se": 0.67,
+     "uNet": 0.033,
+     "sumY": 7.62,
+     "sumE": 9.59,
+     "id": "Fresno St."
+    },
+    {
+     "school": "Oregon",
+     "u": -0.074,
+     "n": 29,
+     "se": 0.478,
+     "uNet": -0.084,
+     "sumY": 88.02,
+     "sumE": 90.63,
+     "id": "Oregon"
+    },
+    {
+     "school": "Temple",
+     "u": -0.105,
+     "n": 15,
+     "se": 0.6,
+     "uNet": 0.005,
+     "sumY": 17.35,
+     "sumE": 20.49,
+     "id": "Temple"
+    },
+    {
+     "school": "Mississippi",
+     "u": -0.123,
+     "n": 24,
+     "se": 0.518,
+     "uNet": -0.007,
+     "sumY": 40.68,
+     "sumE": 45.7,
+     "id": "Mississippi"
+    },
+    {
+     "school": "Saint Joseph's",
+     "u": -0.127,
+     "n": 8,
+     "se": 0.684,
+     "uNet": 0.009,
+     "sumY": 4.14,
+     "sumE": 8.15,
+     "id": "Saint Joseph's"
+    },
+    {
+     "school": "Saint Louis",
+     "u": -0.139,
+     "n": 11,
+     "se": 0.64,
+     "uNet": 0.007,
+     "sumY": 8.29,
+     "sumE": 12.02,
+     "id": "Saint Louis"
+    },
+    {
+     "school": "Providence",
+     "u": -0.14,
+     "n": 20,
+     "se": 0.542,
+     "uNet": -0.055,
+     "sumY": 41.91,
+     "sumE": 46.15,
+     "id": "Providence"
+    },
+    {
+     "school": "Maryland",
+     "u": -0.162,
+     "n": 39,
+     "se": 0.434,
+     "uNet": -0.136,
+     "sumY": 89.41,
+     "sumE": 97.7,
+     "id": "Maryland"
+    },
+    {
+     "school": "Colorado St.",
+     "u": -0.187,
+     "n": 8,
+     "se": 0.684,
+     "uNet": -0.009,
+     "sumY": 1.48,
+     "sumE": 4.91,
+     "id": "Colorado St."
+    },
+    {
+     "school": "Nevada",
+     "u": -0.192,
+     "n": 15,
+     "se": 0.598,
+     "uNet": 0.019,
+     "sumY": 14.25,
+     "sumE": 18.95,
+     "id": "Nevada"
+    },
+    {
+     "school": "Minnesota",
+     "u": -0.222,
+     "n": 29,
+     "se": 0.494,
+     "uNet": -0.065,
+     "sumY": 35.55,
+     "sumE": 45.11,
+     "id": "Minnesota"
+    },
+    {
+     "school": "Charlotte",
+     "u": -0.227,
+     "n": 8,
+     "se": 0.685,
+     "uNet": 0.019,
+     "sumY": 0.01,
+     "sumE": 5.74,
+     "id": "Charlotte"
+    },
+    {
+     "school": "Seton Hall",
+     "u": -0.232,
+     "n": 20,
+     "se": 0.552,
+     "uNet": -0.089,
+     "sumY": 25.88,
+     "sumE": 35.04,
+     "id": "Seton Hall"
+    },
+    {
+     "school": "Oklahoma St.",
+     "u": -0.253,
+     "n": 23,
+     "se": 0.518,
+     "uNet": -0.116,
+     "sumY": 59.03,
+     "sumE": 69.29,
+     "id": "Oklahoma St."
+    },
+    {
+     "school": "Marquette",
+     "u": -0.275,
+     "n": 34,
+     "se": 0.455,
+     "uNet": -0.174,
+     "sumY": 73.03,
+     "sumE": 84.94,
+     "id": "Marquette"
+    },
+    {
+     "school": "Wyoming",
+     "u": -0.276,
+     "n": 9,
+     "se": 0.665,
+     "uNet": -0.023,
+     "sumY": -6.0,
+     "sumE": 2.11,
+     "id": "Wyoming"
+    },
+    {
+     "school": "Virginia Tech",
+     "u": -0.29,
+     "n": 22,
+     "se": 0.524,
+     "uNet": -0.084,
+     "sumY": 45.45,
+     "sumE": 56.73,
+     "id": "Virginia Tech"
+    },
+    {
+     "school": "Penn St.",
+     "u": -0.311,
+     "n": 34,
+     "se": 0.474,
+     "uNet": -0.094,
+     "sumY": 21.23,
+     "sumE": 37.91,
+     "id": "Penn St."
+    },
+    {
+     "school": "California",
+     "u": -0.314,
+     "n": 24,
+     "se": 0.522,
+     "uNet": -0.076,
+     "sumY": 34.95,
+     "sumE": 48.18,
+     "id": "California"
+    },
+    {
+     "school": "Texas A&M",
+     "u": -0.316,
+     "n": 34,
+     "se": 0.459,
+     "uNet": -0.084,
+     "sumY": 60.73,
+     "sumE": 78.28,
+     "id": "Texas A&M"
+    },
+    {
+     "school": "Louisville",
+     "u": -0.337,
+     "n": 38,
+     "se": 0.432,
+     "uNet": -0.398,
+     "sumY": 100.42,
+     "sumE": 117.23,
+     "id": "Louisville"
+    },
+    {
+     "school": "Rutgers",
+     "u": -0.344,
+     "n": 32,
+     "se": 0.48,
+     "uNet": -0.018,
+     "sumY": 28.15,
+     "sumE": 42.97,
+     "id": "Rutgers"
+    },
+    {
+     "school": "Miami FL",
+     "u": -0.353,
+     "n": 28,
+     "se": 0.487,
+     "uNet": -0.173,
+     "sumY": 55.94,
+     "sumE": 70.49,
+     "id": "Miami FL"
+    },
+    {
+     "school": "Washington",
+     "u": -0.431,
+     "n": 30,
+     "se": 0.484,
+     "uNet": -0.128,
+     "sumY": 55.02,
+     "sumE": 74.04,
+     "id": "Washington"
+    },
+    {
+     "school": "Memphis",
+     "u": -0.437,
+     "n": 32,
+     "se": 0.464,
+     "uNet": -0.182,
+     "sumY": 74.58,
+     "sumE": 98.39,
+     "id": "Memphis"
+    },
+    {
+     "school": "Pepperdine",
+     "u": -0.45,
+     "n": 9,
+     "se": 0.665,
+     "uNet": -0.041,
+     "sumY": -5.12,
+     "sumE": 6.69,
+     "id": "Pepperdine"
+    },
+    {
+     "school": "South Carolina",
+     "u": -0.477,
+     "n": 31,
+     "se": 0.481,
+     "uNet": -0.092,
+     "sumY": 27.39,
+     "sumE": 48.8,
+     "id": "South Carolina"
+    },
+    {
+     "school": "Massachusetts",
+     "u": -0.484,
+     "n": 13,
+     "se": 0.616,
+     "uNet": -0.057,
+     "sumY": 4.36,
+     "sumE": 18.52,
+     "id": "Massachusetts"
+    },
+    {
+     "school": "USC",
+     "u": -0.5,
+     "n": 32,
+     "se": 0.467,
+     "uNet": -0.172,
+     "sumY": 63.54,
+     "sumE": 85.02,
+     "id": "USC"
+    },
+    {
+     "school": "UCF",
+     "u": -0.508,
+     "n": 11,
+     "se": 0.641,
+     "uNet": -0.067,
+     "sumY": -2.44,
+     "sumE": 12.74,
+     "id": "UCF"
+    },
+    {
+     "school": "Xavier",
+     "u": -0.508,
+     "n": 29,
+     "se": 0.48,
+     "uNet": -0.262,
+     "sumY": 54.49,
+     "sumE": 75.73,
+     "id": "Xavier"
+    },
+    {
+     "school": "La Salle",
+     "u": -0.534,
+     "n": 8,
+     "se": 0.68,
+     "uNet": -0.081,
+     "sumY": -12.04,
+     "sumE": 1.97,
+     "id": "La Salle"
+    },
+    {
+     "school": "N.C. State",
+     "u": -0.547,
+     "n": 33,
+     "se": 0.458,
+     "uNet": -0.257,
+     "sumY": 67.75,
+     "sumE": 92.41,
+     "id": "N.C. State"
+    },
+    {
+     "school": "Ball St.",
+     "u": -0.548,
+     "n": 8,
+     "se": 0.681,
+     "uNet": -0.053,
+     "sumY": -7.98,
+     "sumE": 5.82,
+     "id": "Ball St."
+    },
+    {
+     "school": "Missouri",
+     "u": -0.549,
+     "n": 29,
+     "se": 0.49,
+     "uNet": -0.184,
+     "sumY": 33.04,
+     "sumE": 57.09,
+     "id": "Missouri"
+    },
+    {
+     "school": "DePaul",
+     "u": -0.574,
+     "n": 12,
+     "se": 0.628,
+     "uNet": -0.088,
+     "sumY": 1.13,
+     "sumE": 15.91,
+     "id": "DePaul"
+    },
+    {
+     "school": "East Carolina",
+     "u": -0.586,
+     "n": 10,
+     "se": 0.656,
+     "uNet": -0.068,
+     "sumY": -5.91,
+     "sumE": 10.03,
+     "id": "East Carolina"
+    },
+    {
+     "school": "South Florida",
+     "u": -0.589,
+     "n": 16,
+     "se": 0.586,
+     "uNet": -0.043,
+     "sumY": 2.34,
+     "sumE": 20.76,
+     "id": "South Florida"
+    },
+    {
+     "school": "Mississippi St.",
+     "u": -0.656,
+     "n": 33,
+     "se": 0.464,
+     "uNet": -0.201,
+     "sumY": 46.14,
+     "sumE": 76.77,
+     "id": "Mississippi St."
+    },
+    {
+     "school": "George Washington",
+     "u": -0.673,
+     "n": 8,
+     "se": 0.679,
+     "uNet": -0.178,
+     "sumY": -14.2,
+     "sumE": 3.23,
+     "id": "George Washington"
+    },
+    {
+     "school": "Oregon St.",
+     "u": -0.683,
+     "n": 24,
+     "se": 0.526,
+     "uNet": -0.151,
+     "sumY": 4.33,
+     "sumE": 32.74,
+     "id": "Oregon St."
+    },
+    {
+     "school": "LSU",
+     "u": -0.723,
+     "n": 38,
+     "se": 0.437,
+     "uNet": -0.327,
+     "sumY": 82.09,
+     "sumE": 117.81,
+     "id": "LSU"
+    },
+    {
+     "school": "TCU",
+     "u": -0.75,
+     "n": 17,
+     "se": 0.574,
+     "uNet": -0.223,
+     "sumY": 6.13,
+     "sumE": 29.74,
+     "id": "TCU"
+    },
+    {
+     "school": "Rice",
+     "u": -0.796,
+     "n": 10,
+     "se": 0.662,
+     "uNet": -0.093,
+     "sumY": -16.91,
+     "sumE": 5.51,
+     "id": "Rice"
+    },
+    {
+     "school": "Nebraska",
+     "u": -0.819,
+     "n": 30,
+     "se": 0.492,
+     "uNet": -0.265,
+     "sumY": 3.4,
+     "sumE": 41.0,
+     "id": "Nebraska"
+    },
+    {
+     "school": "Georgia Tech",
+     "u": -0.885,
+     "n": 26,
+     "se": 0.508,
+     "uNet": -0.286,
+     "sumY": 20.0,
+     "sumE": 55.39,
+     "id": "Georgia Tech"
+    },
+    {
+     "school": "Boston College",
+     "u": -0.917,
+     "n": 21,
+     "se": 0.55,
+     "uNet": -0.242,
+     "sumY": -11.77,
+     "sumE": 20.84,
+     "id": "Boston College"
+    },
+    {
+     "school": "Stanford",
+     "u": -0.926,
+     "n": 30,
+     "se": 0.478,
+     "uNet": -0.378,
+     "sumY": 31.94,
+     "sumE": 75.53,
+     "id": "Stanford"
+    },
+    {
+     "school": "Arizona St.",
+     "u": -0.996,
+     "n": 23,
+     "se": 0.519,
+     "uNet": -0.376,
+     "sumY": 18.82,
+     "sumE": 54.27,
+     "id": "Arizona St."
+    },
+    {
+     "school": "Wake Forest",
+     "u": -1.193,
+     "n": 27,
+     "se": 0.499,
+     "uNet": -0.414,
+     "sumY": 2.55,
+     "sumE": 53.5,
+     "id": "Wake Forest"
+    },
+    {
+     "school": "UNLV",
+     "u": -1.776,
+     "n": 27,
+     "se": 0.498,
+     "uNet": -0.666,
+     "sumY": -5.91,
+     "sumE": 69.72,
+     "id": "UNLV"
+    }
+   ]
+  }
+ }
+}

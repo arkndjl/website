@@ -1,0 +1,50 @@
+{{- /* Development: recruit outcome over what his recruiting rating predicted, by signing school (scripts/school_dev.py,
+       data/school_dev.json). sport="cfb": NFL outcome on the FV scale, ESPN/247 classes 2011-19. sport="cbb": minutes-
+       weighted college BPM, On3 classes 2009-23 (the NBA FV version showed no school spread beyond chance), with the
+       current head coach's own number (his recruits at any school, 2014 on). Shrunk toward 0 by sample (empirical
+       Bayes); ± = 1 SD. Net = with program strength at signing taken out. */ -}}
+{{- $sp := $.Get "sport" | default "cfb" -}}
+{{- with index site.Data.school_dev $sp -}}
+{{- $cbb := eq $sp "cbb" -}}
+{{- $unit := cond $cbb "BPM" "FV" -}}
+{{- $cols := cond $cbb "RK,Team,Dev,Net,Recruits,Coach,Coach Dev" "RK,Team,Dev,Net,Signees,Drafted,xDrafted" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "development") "filter" "Conf" "rerank" true "tab" ($.Get "tab") "icon" (cond $cbb "basketball" "football") "gfxCols" $cols "gfxDate" (lower ((time site.Data.school_dev.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table sdev">
+  <thead><tr><th>RK</th><th>Team</th><th>Conf</th>
+    <th title="{{ $unit }} per recruit over what his recruiting rating predicted, shrunk by sample; ± 1 SD">Dev</th>
+    <th title="Dev with program strength at signing taken out">Net</th>
+    <th title="{{ if $cbb }}raw mean BPM over expected, no shrink{{ else }}raw mean FV over expected, no shrink{{ end }}">Raw</th>
+    <th>{{ if $cbb }}Recruits{{ else }}Signees{{ end }}</th>
+    {{- if $cbb }}<th>Coach</th><th title="current head coach: BPM per recruit over expected, his recruits at any school since 2014, shrunk; ± 1 SD">Coach Dev</th>
+    {{- else }}<th title="signees drafted (NFL drafts through 2025)">Drafted</th><th title="expected drafted from the signees' ratings">xDrafted</th>{{ end }}
+  </tr></thead>
+  <tbody>
+  {{- range $r := .rows }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .t }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num is-key" data-l="Dev" data-v="{{ .dev }}"><b class="{{ if ge .dev 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge .dev 0.0 }}+{{ end }}{{ printf "%.2f" .dev }}</b> <span class="cfb__dim">±{{ printf "%.2f" .se }}</span></td>
+    <td class="cfb__num" data-l="Net" data-v="{{ .net }}">{{ if ge .net 0.0 }}+{{ end }}{{ printf "%.2f" .net }}</td>
+    <td class="cfb__num" data-l="Raw" data-v="{{ .raw }}">{{ if ge .raw 0.0 }}+{{ end }}{{ printf "%.2f" .raw }}</td>
+    <td class="cfb__num" data-l="N" data-v="{{ .n }}">{{ .n }}</td>
+    {{- if $cbb }}
+    <td>{{ .coach | default "-" }}</td>
+    <td class="cfb__num" data-l="Coach" data-v="{{ .cdev | default -99 }}">{{ with $r.cdev }}{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }} <span class="cfb__dim">±{{ printf "%.2f" $r.cse }}</span>{{ else }}-{{ end }}</td>
+    {{- else }}
+    <td class="cfb__num" data-l="Drafted" data-v="{{ .dr }}">{{ .dr }}</td>
+    <td class="cfb__num" data-l="xDrafted" data-v="{{ .xdr }}">{{ printf "%.1f" .xdr }}</td>
+    {{- end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $t := .test -}}
+{{- $about := "" -}}
+{{- if $cbb -}}
+{{- $about = printf "Dev = minutes-weighted BPM over a recruit's first four college seasons minus the BPM his On3 rank predicted (On3 classes %v-%v, %v recruits who played), credited to the signing school, shrunk by sample. Coach = the current head coach's Dev on his recruits at any school since 2014 (8+ recruits). Held out, a school's earlier classes predict later recruits' Dev (t %.1f, %s classes); coach t %.1f, %.1f with program strength out. NBA FV over the On3 expectation shows no school spread beyond chance (at most %.2f FV a recruit), so it is not used." (index .classes 0) (index .classes 1) .n $t.rolling.t $t.rolling.classesWon $t.coachSplit.t $t.coachNetSplit .nbaFail.tauHi -}}
+{{- else -}}
+{{- $about = printf "Dev = NFL outcome on the FV scale (AV a season and draft slot) per signee minus what his ESPN/247 rating and position predicted (ESPN classes %v-%v, %v signees), credited to the signing school whether or not he transferred, shrunk by sample. Net = Dev with program strength at signing taken out. Held out, a school's earlier classes predict later signees' Dev in %s classes (t %.1f; net t %.1f)." (index .classes 0) (index .classes 1) .n $t.rolling.classesWon $t.rolling.t $t.netRolling -}}
+{{- end -}}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" (printf "Dev in %s per recruit · updated %s" $unit (lower ((time site.Data.school_dev.asof).Format "Jan 2, 2006"))) "about" $about) -}}
+{{- end -}}
