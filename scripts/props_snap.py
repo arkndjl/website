@@ -27,6 +27,8 @@ NFL (Oct 29 2026, ARK Edge Sweep) -> scripts/data/props/nfl-<yyyy-mm>.jsonl, the
     game markets   a = 'game', s in 1hs (first-half home-margin line, oO/oU = home/away price), 1hml (oO/oU = home/
                    away), 1ht (first-half total), ttH / ttA (team totals; m = the game model's team points),
                    tt1hH / tt1hA (team first-half totals, DraftKings only)
+NHL (Oct 31 2026) -> scripts/data/props/nhl-<yyyy-mm>.jsonl: every DraftKings prop (s in sog g ast pts sv blk ppp hit ga,
+scripts/props_archive.py) for the forward archive; m only on saves (data/nhl_props.json) for the saves paper test.
 ESPN serves DraftKings' NFL lines without prices (oO/oU None on a 'dk' row); Novig's rows carry its asks. ESPN still
 served DraftKings' NFL props for every 2026 game on Oct 29 2026, but the snapshot is what records the moves and the close.
 """
@@ -129,6 +131,11 @@ def main():
             nfl(now)
         except Exception as ex:          # the NBA rows above are written already
             print('nfl props failed:', ex)
+    if now.month in SEASON:
+        try:
+            nhl(now)
+        except Exception as ex:
+            print('nhl props failed:', ex)
 
 
 def nba(now):
@@ -366,6 +373,96 @@ def nfl(now):
                 f.write(json.dumps(r, separators=(',', ':')) + '\n')
     print('nfl:', len(games), 'games,', sum(len(v[0]) for v in got.values()), 'player props,',
           sum(len(v[1]) for v in got.values()), 'game markets (', len(src), 'Novig ),', len(rows), 'rows written')
+
+
+NHL_SITE = 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl'
+NHL_CORE = 'https://sports.core.api.espn.com/v2/sports/hockey/leagues/nhl'
+NHL_PROJ = os.path.join(ROOT, 'data', 'nhl_props.json')
+
+
+def nhl_props(gid):
+    """DraftKings' NHL player props for one game through ESPN: {(athlete, stat): [L, over, under, open L, open over,
+    open under]}; ESPN's over/under marks decide the sides where it gives them (ESPN BET listed some under first)"""
+    from props_archive import SP, am
+    types = SP['nhl'][3]
+    items, page = [], 1
+    while True:
+        j = get(f'{NHL_CORE}/events/{gid}/competitions/{gid}/odds/100/propBets?limit=1000&page={page}')
+        if not j:
+            break
+        items += j.get('items', [])
+        if page >= j.get('pageCount', 1):
+            break
+        page += 1
+    by = {}
+    for it in items:
+        st = types.get((it.get('type') or {}).get('name'))
+        ref = (it.get('athlete') or {}).get('$ref', '')
+        if not st or '/athletes/' not in ref:
+            continue
+        try:
+            L, Lo = float(it['current']['target']['value']), float(it['open']['target']['value'])
+        except (KeyError, TypeError, ValueError):
+            continue
+        side = next((k for k in ('over', 'under') if k in (it.get('current') or {}) or k in (it.get('open') or {})), None)
+        by.setdefault((ref.split('/athletes/')[1].split('?')[0], st), []).append(
+            (L, am(it.get('odds'), 'value'), side, Lo, am(it.get('odds'), 'open')))
+    out = {}
+    for k, v in by.items():
+        tw = [x for x in {i[0] for i in v} if sum(i[0] == x for i in v) == 2]
+        if len(tw) != 1:
+            continue
+        o, u = [i for i in v if i[0] == tw[0]]
+        if (o[2], u[2]) == ('under', 'over'):
+            o, u = u, o
+        if o[1] is None or u[1] is None:
+            continue
+        out[k] = [o[0], o[1], u[1], o[3], o[4], u[4]]
+    return out
+
+
+def nhl(now):
+    """NHL player props (Oct 31 2026): every DraftKings prop for the forward archive, our projected saves (data/
+    nhl_props.json, the NHL build) on the saves rows for the saves paper test (scripts/props_daily.py)"""
+    games = {}
+    for d in (-1, 0, 1):
+        day = (now + datetime.timedelta(days=d)).strftime('%Y%m%d')
+        j = get(f'{NHL_SITE}/scoreboard?dates={day}&limit=100') or {}
+        for e in j.get('events', []):
+            if e.get('status', {}).get('type', {}).get('state') == 'pre':
+                games[e['id']] = e['date']
+    if not games:
+        return print('nhl: no games ahead')
+    try:
+        P = {(g['id'], a): v for g in json.load(open(NHL_PROJ)).get('games', []) for a, v in g['sv'].items()}
+    except (OSError, ValueError):
+        P = {}
+    with ThreadPoolExecutor(6) as ex:
+        got = dict(zip(games, ex.map(nhl_props, games)))
+    os.makedirs(OUT, exist_ok=True)
+    fn = os.path.join(OUT, f"nhl-{now.strftime('%Y-%m')}.jsonl")
+    prev = os.path.join(OUT, f"nhl-{(now.replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m')}.jsonl")
+    last = last_rows([prev, fn])
+    t = now.strftime('%Y-%m-%dT%H:%MZ')
+    rows = []
+    for gid, pr in got.items():
+        for (a, s), v in pr.items():
+            me = P.get((gid, a)) if s == 'sv' else None
+            r = {'t': t, 'id': gid, 'k': games[gid], 'a': a, 's': s, 'L': v[0], 'oO': v[1], 'oU': v[2],
+                 'm': me['m'] if me else None, 'src': 'dk'}
+            old = last.get((gid, a, s))
+            if old and all(old.get(k) == r[k] for k in ('L', 'oO', 'oU', 'm')):
+                continue
+            if not old:
+                r['open'] = v[3:]
+                if me:
+                    r['n'] = me['n']
+            rows.append(r)
+    if rows:
+        with open(fn, 'a') as f:
+            for r in rows:
+                f.write(json.dumps(r, separators=(',', ':')) + '\n')
+    print('nhl:', len(games), 'games,', sum(len(v) for v in got.values()), 'props,', len(rows), 'rows written')
 
 
 if __name__ == '__main__':
