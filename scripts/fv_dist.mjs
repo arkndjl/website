@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fvOf } from './fv_scale.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 let FIT = null;
@@ -79,7 +80,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     const pos = r[ci.pos], fv = ci.fvg != null && r[ci.fvg] != null ? r[ci.fvg] : r[ci.fvx];   // the odds come off the grade
     const z = cfbZ({ pos, cls: r[ci.cls], cons: r[ci.consRk] != null, fv });
     r[ci.fvd] = fv != null && pos !== 'K' && pos !== 'P' ? fvdOf(fvDist('cfb', fv, z)) : null;
-    if (ci.fvg != null && r[ci.fvg] != null) { const d = fvDist('cfb', fv, z); if (d) { r[ci.fvx] = Math.round(Math.max(20, Math.min(80, d.mean)) * 100) / 100; r[ci.fv] = Math.round(r[ci.fvx]); } }
+    if (ci.fvg != null && r[ci.fvg] != null) { const d = fvDist('cfb', fv, z); if (d) { r[ci.fvx] = Math.round(Math.max(20, Math.min(80, d.mean)) * 100) / 100; r[ci.fv] = fvOf('cfb', r[ci.fvx]); } }
     if (r[ci.fvd]) n++;
   }
   fs.writeFileSync(f, JSON.stringify(A));

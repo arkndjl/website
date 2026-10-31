@@ -49,6 +49,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import soccer_prospect_data as SD
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 
 CACHE = os.path.join(HERE, '.cache', 'soccer_prospects')
 DUMPD = os.path.join(CACHE, 'dump')
@@ -953,7 +954,7 @@ def build():
             'id': int(i), 'name': P.name.get(i) or str(i), 'pos': POSS.get(sp, {'G': 'GK', 'D': 'D', 'M': 'M', 'F': 'F'}[r.grp]),
             'grp': r.grp, 'club': names.get(int(club)) if pd.notna(club) else None,
             'lg': SHORT.get(comp) if isinstance(comp, str) else None, 'league': LEAGUE.get(comp) if isinstance(comp, str) else None,
-            'age': round(float(r.age), 1), 'fv': int(round(r.fvx)), 'fvx': round(float(r.fvx), 2),
+            'age': round(float(r.age), 1), 'fv': FS.fv_of('soccer', float(r.fvx)), 'fvx': round(float(r.fvx), 2),
             'mv': None if pd.isna(r.mv) else int(r.mv),
             'min': int(r.mins_td) if pd.notna(r.mins_td) else 0, 'min1': int(r.mins1) if pd.notna(r.mins1) else 0,
             'gar': round(float(F.gar_td[i]), 2), 'gar1': round(float(F.gar1[i]), 2),
@@ -967,6 +968,7 @@ def build():
                              'ht': None if pd.isna(r.ht) else int(r.ht), 'rc': None if pd.isna(r.rclub_td) else round(float(r.rclub_td), 2),
                              'ym': int(r.ymins1 if pd.notna(r.ymins1) else 0) + int(r.ymins_td if pd.notna(r.ymins_td) else 0)})
     past = json.load(gzip.open(PAST, 'rt'))
+    FS.restate_obj(past, 'soccer', keep=True)   # fvx the grade, fv on the stretched top
     out = {'asof': dt.date.today().isoformat(), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
            'snap': key, 'pool': len(rows), 'mvLevel': [round(lvl, 3), fitj['mvRef'][key]], 'board': rows[:2000], 'past': past[:400],
            'fit': {k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',

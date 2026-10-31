@@ -58,6 +58,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import names as NM
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 import nhl_data as D
 
 CACHE = os.path.join(HERE, '.cache', 'hockey')
@@ -877,7 +878,7 @@ def build():
         board.append({'rk': t['rk'], 'name': t['name'], 'pos': 'D' if r['D'] else t['pos'], 'posFull': t['posFull'], 'club': t['club'],
                       'league': t['league'], 'grp': group_of(lg), 'ht': t['ht'], 'wt': t['wt'], 'age': round(r['age'], 1) if r['age'] else None,
                       'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None else None, 'nhle': round(nh_raw, 1) if nh_raw is not None else None,
-                      'nat': t.get('nat'), 'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                      'nat': t.get('nat'), 'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), 'p40': round(p40, 3), 'p50': round(p50, 3),
                       'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
     # provisional grades (Oct 25 2026): draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board,
     # graded up from the 20 floor (scripts/hockey_provisional.py) and ranked with the board; the table shows those above
@@ -917,7 +918,7 @@ def build():
                      'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
                      'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
-                     'nhlgp': gp_all, 'fv0': int(round(x0)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                     'nhlgp': gp_all, 'fv0': FS.fv_of('hockey', x0), 'fv0x': round(x0, 2), 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), 'p40': round(p40, 3), 'p50': round(p50, 3),
                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
                      'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
                      'wjc': int(bool(px.get('wjc'))) if k else 0, 'progp': px.get('progp') if k else None,
@@ -928,7 +929,7 @@ def build():
     past = []
     for r, pg, yo in zip(tr, p0, y):
         past.append({'name': r['name'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
-                     'fv': int(round(pg)), 'out': int(round(yo)), 'gp': r['nhl_gp'], 'peak': round(r['peak'], 2) if not r['G'] else None,
+                     'fv': FS.fv_of('hockey', pg), 'fvx': round(float(pg), 2), 'out': int(round(yo)), 'gp': r['nhl_gp'], 'peak': round(r['peak'], 2) if not r['G'] else None,
                      'gpeak': round(r['gpeak'], 1) if r['G'] else None})
     past = [p for p in past if p['pick'] <= 64 or p['fv'] >= 35 or p['out'] >= 45]
     asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')

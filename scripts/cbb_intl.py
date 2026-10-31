@@ -40,6 +40,7 @@ import cbb_data as D
 import names as N
 import cbb_fit as F
 from fv_dist import at_mean, cbb_z
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 
 DAILY = '--daily' in sys.argv
 SEASON = 2027
@@ -741,7 +742,7 @@ def grade_live(fit, L):
         # that grade's outcome odds, as on the D-I board (fv_dist.at_mean), the grade kept as fvg
         fm = at_mean('cbb', fvx, cbb_z(None, True, pos_of(p['pos']), fvx))
         rows.append([p['name'], CLUB.get(p['school'], p['school']), None, lastd['lg'] if lastd else 'Intl', pos_of(p['pos']), None, 0, 0,
-                     int(round(fm)), False, round(fm, 2), round(pn, 4), None, 'Intl', 0,
+                     FS.fv_of('cbb', fm), False, round(fm, 2), round(pn, 4), None, 'Intl', 0,
                      round(age, 1) if age else None, None if age else round(f['age'] - 0.7, 1), ht_str(info.get('hti')), None, None, 0,
                      lastd, None, lab, report(p, f, parts, lastd, fit), ({'bbref': f"{BBREF}/players/{p['slug']}.html"} if p['slug'] else {}),
                      1, p['cons'], p['nb'], round(e, 3), round(fvx, 2)])

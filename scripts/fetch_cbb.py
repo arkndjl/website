@@ -20,6 +20,7 @@ import cbb_fit as F
 import cbb_combine as CB
 import names as N
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 
 SEASON = 2027                     # Barttorvik's year for 2026-27
 OFFLINE = '--offline' in sys.argv
@@ -257,7 +258,7 @@ def restate(r, cls, new, pos):
     fv its whole number, fvg the grade (the scale the cuts, the mocks and the provisional fit work on)"""
     g = r['fvx']
     m = at_mean('cbb', g, cbb_z(cls, new, pos, g))
-    r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), int(round(m)), False
+    r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), FS.fv_of('cbb', m), False
     return r
 
 

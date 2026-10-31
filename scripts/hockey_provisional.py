@@ -45,6 +45,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import hockey_prospects as H
 import names as NM
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 import nhl_data as D
 
 CHLD = os.path.join(H.CACHE, 'chl')
@@ -460,7 +461,7 @@ def live(year, board, rows):
                     'pm': int(p['pm']) if p.get('pm') is not None else None, 'pim': int(p['pim']) if p.get('pim') is not None else None,
                     'prevLine': int(q['prev'] is not None),
                     'nhle': round(82 * H.nhle_of(p['lg']) * p['pts'] / p['gp'], 1) if p['gp'] else None,
-                    'xslot': None, 'fvx': round(x, 2), 'fv': int(round(x)), **odds,
+                    'xslot': None, 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), **odds,
                     'parts': sorted(parts, key=lambda q: -abs(q[1])), 'prov': 1})
     out.sort(key=lambda r: -r['fvx'])
     return out

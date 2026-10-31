@@ -1,0 +1,61 @@
+{
+ "asof": "2026-10-31",
+ "method": "scripts/fv_scale.py --fit",
+ "rule": "FV = mean up to K (3 a season); linear above to 80 at T (one a season x 0.2), capped at the board's reach",
+ "boards": {
+  "cfb": {
+   "K": 67.76,
+   "T": 76.79,
+   "tail": 6.0,
+   "tailT": 84.01,
+   "reach": 76.79,
+   "seasons": 4,
+   "src": "held-out FBS player-seasons 2019-22 (data/fv_dist.json cfb scorecard)"
+  },
+  "cbb": {
+   "K": 46.59,
+   "T": 54.72,
+   "tail": 3.0,
+   "tailT": 54.72,
+   "reach": 64.82,
+   "seasons": 7,
+   "src": "held-out top 300 of the 2009-10 to 2015-16 preseason boards (data/fv_dist.json cbb scorecard)"
+  },
+  "hockey": {
+   "K": 54,
+   "T": 72.73,
+   "tail": 6.92,
+   "tailT": 72.73,
+   "reach": 80.0,
+   "seasons": 12,
+   "src": "the 2008-19 draft classes as graded on the board (data/hockey.json past)"
+  },
+  "soccer": {
+   "K": 64.05,
+   "T": 72.36,
+   "tail": 3.07,
+   "tailT": 72.36,
+   "reach": 80.0,
+   "seasons": 8,
+   "src": "held-out prospect seasons 2013-20 (data/soccer_prospects.json fit calib)"
+  },
+  "atp": {
+   "K": 63.4,
+   "T": 76.41,
+   "tail": 4.81,
+   "tailT": 76.41,
+   "reach": 80.0,
+   "seasons": 19,
+   "src": "held-out October grades, players born 1979-97: 19 seasons of pools (data/tennis_prospects_fit.json)"
+  },
+  "wta": {
+   "K": 60.24,
+   "T": 74.98,
+   "tail": 5.44,
+   "tailT": 74.98,
+   "reach": 80.0,
+   "seasons": 19,
+   "src": "held-out October grades, players born 1979-97: 19 seasons of pools (data/tennis_prospects_fit.json)"
+  }
+ }
+}

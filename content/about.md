@@ -38,7 +38,7 @@ i work across quantitative, qualitative and creative fields: sabermetrics, prosp
 {{< winpane title="arkndjl.net.exe" icon="arkboard" status="2025 - present" class="desk__wide" >}}
 **arkndjl.net** :: portfolio, blog and the home of ARKBOARD. Hugo site, Python and Node data pipelines, scheduled refreshes in season.
 
-- **[ARKBOARD](/arkboard/)**: prospect boards on the 20-80 Future Value scale, where FV is the mean outcome of past prospects with the same profile, with outcome odds and ceiling in each player's dropdown.
+- **[ARKBOARD](/arkboard/)**: prospect boards on the 20-80 Future Value scale, where FV is the mean outcome of past prospects with the same profile (stretched at the top, so an 80 comes about once every five seasons on each board), with outcome odds and ceiling in each player's dropdown.
   - **[football](/arkboard-college-football/)**: every FBS + FCS player graded, 2027 NFL draft board and three mock drafts (predictive, blended, conviction), transfer portal and Transfer%, NIL market value (xNIL), recruits, team builder, coaching staffs, game projections and season odds.
   - **[basketball](/arkboard-college-basketball/)**: every D-I player and the international prospects graded against peak NBA impact, FV drivers backtested on NBA careers, 2027 NBA mocks, NCAA tournament odds from bracket and conference-tournament sims.
   - **[hockey](/arkboard-hockey-prospects/)** and **[soccer](/arkboard-soccer-prospects/)** prospects: the 2027 NHL draft class and drafted players (fitted NHLe, backtested on the 2008-19 classes); every under-22 in 33 soccer leagues (backtested on 2013-20).

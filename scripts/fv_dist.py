@@ -72,6 +72,7 @@ if __name__ == '__main__':
     # python3 scripts/fv_dist.py --annotate: refresh the fvd column of static/data/cbb-all.json in place (after a refit)
     import sys
     if '--past' in sys.argv:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import fv_scale   # the stretched top (Oct 31 2026)
         # once, and after cbb_fit.py rewrites static/data/cbb-past.json: the past boards at the mean (fvg the grade),
         # and the board's calibration table keyed by the headline FV (data/cbb_fit.json calibMean; calib stays keyed by
         # the grade, which cbb_intl's outcome map reads), from the 2010-16 boards' top PAST_N; the floor row (everyone
@@ -84,13 +85,13 @@ if __name__ == '__main__':
         for r in A['rows']:
             g = r[ci['fvg']]
             m = at_mean('cbb', g, cbb_z(r[ci['cls']], r[ci['new']], r[ci['pos']], g))
-            r[ci['fvx']], r[ci['fv']], r[ci['plus']] = round(m, 2), int(round(m)), False
+            r[ci['fvx']], r[ci['fv']], r[ci['plus']] = round(m, 2), fv_scale.fv_of('cbb', m), False
         json.dump(A, open(f, 'w'), separators=(',', ':'))
         tier = lambda x: 20 if x < 30 else min(80, int(x // 5 * 5))
         cal = {}
         for r in A['rows']:
             y = r[ci['outcome']]
-            if r[ci['season']] <= 2016 and y is not None and r[ci['fv']] >= 30: cal.setdefault(tier(r[ci['fv']]), []).append(y)
+            if r[ci['season']] <= 2016 and y is not None and r[ci['fvx']] >= 29.5: cal.setdefault(tier(round(r[ci['fvx']])), []).append(y)   # on the mean, not the stretched top
         fn = os.path.join(ROOT, 'data', 'cbb_fit.json'); F = json.load(open(fn))
         floor = F['calib'].get('20')
         mean = lambda v: sum(v) / len(v)

@@ -20,7 +20,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" $tl)) "icon" "tennis" "filter" "nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Age,Rank,Elo" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk sp" data-pd-kind="tn-board" data-pd-src="{{ (resources.FromString (printf "data/tennis-prospects-%s.json" $tour) (jsonify $rows)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th>
+    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1), stretched at the top so 80 is about one every five seasons">FV</th>
     <th title="age today ({{ $tl }} prospects are under 22 on July 1)">Age</th>
     <th title="{{ $tl }} singles ranking (Tennis Abstract, this week); career high in grey">Rank</th>
     <th title="our Elo on every pro match since 1991: Slams, tour, qualifying, Challenger / 125, Futures / ITF, team events (start 1500)">Elo</th>
@@ -52,7 +52,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "tennis_prospects" "note" (printf "Sackmann archive + Tennis Abstract · updated %s" $date) "about" (printf "The top %d of %d %s players born on or after %s with a ranking or a pro match in the last year, graded on what past prospects with the same profile became: age, ranking, our Elo on every pro match, results over the last year and how long they have played pro. FV is the mean outcome, so it sits below the best case: a 60 averages out to about a top-12 peak, with busts and stars around it. Provisional (prov) players have no ranking this week. Headshots: ESPN, Wikimedia Commons or Tennis Abstract." (len $rows) $t.pool $tl (lower ((time $d.born).Format "January 2, 2006")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "tennis_prospects" "note" (printf "Sackmann archive + Tennis Abstract · updated %s" $date) "about" (printf "The top %d of %d %s players born on or after %s with a ranking or a pro match in the last year, graded on what past prospects with the same profile became: age, ranking, our Elo on every pro match, results over the last year and how long they have played pro. FV is the mean outcome, so it sits below the best case: a 60 averages out to about a top-12 peak, with busts and stars around it. Above the board's top few players a season the scale stretches, so an 80 comes about once every five seasons; the order is the mean's. Provisional (prov) players have no ranking this week. Headshots: ESPN, Wikimedia Commons or Tennis Abstract." (len $rows) $t.pool $tl (lower ((time $d.born).Format "January 2, 2006")))) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: past prospects, grade vs outcome" $tl)) "icon" "tennis" "filter" "Season" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Season,Age,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
