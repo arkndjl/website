@@ -3,11 +3,14 @@
        dropdown of the distinct values for each named column (FV sorts by grade, "45+" above "45"),
        an "age ≤" box when an Age column exists, day chips (all, today, tomorrow, then each day) when rows carry
        data-day (an ET date), and click-to-sort on every header. Without
-       JavaScript the bar stays hidden and the table shows in full. */ -}}
-<form class="cfb__bar tf__bar" data-tf-bar data-cols="{{ . }}" hidden onsubmit="return false" aria-label="filter the table">
+       JavaScript the bar stays hidden and the table shows in full. Or a dict "cols" "rank" (rank: add a TOP 25 button,
+       the ARK Top 25 graphic from the window's data-gfx-rank). */ -}}
+{{- $cols := . }}{{ $rank := false }}{{ if reflect.IsMap . }}{{ $cols = .cols }}{{ $rank = .rank }}{{ end }}
+<form class="cfb__bar tf__bar" data-tf-bar data-cols="{{ $cols }}" hidden onsubmit="return false" aria-label="filter the table">
   <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="search" autocomplete="off"></label>
   <button type="reset" class="cfb__btn">reset</button>
   <button type="button" class="cfb__btn cfb__gfx" data-gfx title="graphic of the rows on screen">GFX</button>
+  {{- if $rank }}<button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="rank" title="graphic of the ARK Ranking Top 25 (4:5)">TOP 25</button>{{ end }}
 </form>
-{{- partial "gfx.html" . -}}
+{{- partial "gfx.html" $cols -}}
 {{- partial "js.html" "tablefilter" -}}

@@ -1,10 +1,10 @@
 {{- /* Opening chrome of a table window built in a template (same markup as render-table.html):
-       dict "title" "icon" "filter" (column names for the sort/filter bar) "rerank" (RK cells recount 1..n over the rows a filter leaves, in their first order) "wait" (rows filled by a script: the bar starts once it drops data-tf-wait and calls window.__arkTfInit) "tab" "gfxCols" "gfxMax" (GFX columns and rows). Close with
+       dict "title" "icon" "filter" (column names for the sort/filter bar) "rerank" (RK cells recount 1..n over the rows a filter leaves, in their first order) "wait" (rows filled by a script: the bar starts once it drops data-tf-wait and calls window.__arkTfInit) "tab" "gfxCols" "gfxMax" (GFX columns and rows) "gfxRank" (JSON for the TOP 25 graphic, gfx.js buildRank). Close with
        partial "wintable-close.html" (dict "rows" N). */ -}}
-<div class="win wintable"{{ with .tab }} data-tab="{{ . }}"{{ end }}{{ with .filter }} data-tfilter="{{ . }}"{{ end }}{{ if .wait }} data-tf-wait{{ end }}{{ if .rerank }} data-tf-rerank{{ end }}{{ with .gfxCols }} data-gfx-cols="{{ . }}"{{ end }}{{ with .gfxMax }} data-gfx-max="{{ . }}"{{ end }}{{ with .gfxDate }} data-gfx-date="{{ . }}"{{ end }}>
+<div class="win wintable"{{ with .tab }} data-tab="{{ . }}"{{ end }}{{ with .filter }} data-tfilter="{{ . }}"{{ end }}{{ if .wait }} data-tf-wait{{ end }}{{ if .rerank }} data-tf-rerank{{ end }}{{ with .gfxCols }} data-gfx-cols="{{ . }}"{{ end }}{{ with .gfxMax }} data-gfx-max="{{ . }}"{{ end }}{{ with .gfxDate }} data-gfx-date="{{ . }}"{{ end }}{{ with .gfxRank }} data-gfx-rank="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .icon | default "football" }}"/></svg>{{ .title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  {{- with .filter }}{{ partial "tablefilter.html" . }}{{ end }}
+  {{- with .filter }}{{ partial "tablefilter.html" (cond (ne $.gfxRank nil) (dict "cols" . "rank" true) .) }}{{ end }}
   <div class="wintable__scroll">
