@@ -1,4 +1,4 @@
-{{- /* Soccer matches: the next four days in every league on the page (big five + 13 more) and the UEFA cups (data/soccer_games.json,
+{{- /* Soccer matches: the next four days in every league on the page (big five + 13 more + MLS) and the UEFA cups (data/soccer_games.json,
        scripts/soccer_games.py), one card per match in kickoff order. Home win, draw and away win from the
        Dixon-Coles score matrix on each side's expected goals (club attack and defence on goals, Understat xG and
        earlier matches' closing prices, league strength, home edge); fair odds without the vig, projected score,
@@ -8,7 +8,7 @@
 {{- $d := . -}}
 {{- $pred := ne ($.Get "sport" | default "") "" -}}
 {{- $only := $.Get "lg" | default "" -}}
-{{- $short := dict "eng.1" "EPL" "esp.1" "LA LIGA" "ger.1" "BUNDESLIGA" "ita.1" "SERIE A" "fra.1" "LIGUE 1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" "ned.1" "EREDIVISIE" "por.1" "PRIMEIRA" "bel.1" "PRO LEAGUE" "tur.1" "SUPER LIG" "cze.1" "CZECH LIGA" "gre.1" "GREECE" "pol.1" "EKSTRAKLASA" "den.1" "SUPERLIGA" "sui.1" "SWISS SL" "nor.1" "ELITESERIEN" "aut.1" "AUSTRIA" "sco.1" "SCOTLAND" "swe.1" "ALLSVENSKAN" -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "LA LIGA" "ger.1" "BUNDESLIGA" "ita.1" "SERIE A" "fra.1" "LIGUE 1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" "ned.1" "EREDIVISIE" "por.1" "PRIMEIRA" "bel.1" "PRO LEAGUE" "tur.1" "SUPER LIG" "cze.1" "CZECH LIGA" "gre.1" "GREECE" "pol.1" "EKSTRAKLASA" "den.1" "SUPERLIGA" "sui.1" "SWISS SL" "nor.1" "ELITESERIEN" "aut.1" "AUSTRIA" "sco.1" "SCOTLAND" "swe.1" "ALLSVENSKAN" "usa.1" "MLS" -}}
 {{- $games := .games }}{{ with $only }}{{ $games = where $games "lg" . }}{{ end -}}
 {{- $days := slice }}{{ range $games }}{{ $k := lower ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2") }}{{ if not (in $days $k) }}{{ $days = $days | append $k }}{{ end }}{{ end -}}
 <div class="win games soccergames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit (first 4 $days) ", " }}">

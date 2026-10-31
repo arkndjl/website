@@ -4,7 +4,7 @@
 
     python3 scripts/soccer_games.py           # upcoming matches, power rankings, league and European cup odds (numpy)
     python3 scripts/soccer_games.py --hist    # join ESPN, football-data.co.uk and Understat into scripts/soccer_games_hist.json.gz
-    python3 scripts/soccer_games.py --fmxg    # add FotMob xG (D.FMX_LG) to the frozen history in place
+    python3 scripts/soccer_games.py --fmxg [lg]  # add FotMob xG (D.FMX_LG, or one league) to the frozen history in place
     python3 scripts/soccer_games.py --fit     # tune, walk-forward backtest against the closing 1X2 price, refit
 
 Data: ESPN (every match since 2005 in 37 competitions: the big five leagues, their second tiers, the twelve other
@@ -268,13 +268,13 @@ def fm_xg_join(es, lg, S, fresh=False):
     return len(j)
 
 
-def patch_fmxg():
-    """add FotMob xG to the frozen history in place (the clubs' names come from NAMES for the join)"""
+def patch_fmxg(only=None):
+    """add FotMob xG to the frozen history in place (the clubs' names come from NAMES for the join); only: one league"""
     rows = D.load(HIST)
     names = D.load(NAMES)
     by = defaultdict(list)
     for r in rows:
-        if r['lg'] in D.FMX_LG and r.get('hs') is not None:
+        if r['lg'] in D.FMX_LG and r.get('hs') is not None and only in (None, r['lg']):
             r['hn'], r['an'] = (names.get(r['h']) or ['?'])[0], (names.get(r['a']) or ['?'])[0]
             by[(r['lg'], D.season_of(r['day'], r['lg']))].append(r)
     n = 0
@@ -996,14 +996,21 @@ SIMS = 10000
 REL = {'eng.1': (3, 0), 'esp.1': (3, 0), 'ita.1': (3, 0), 'ger.1': (2, 1), 'fra.1': (2, 1),
        'ned.1': (2, 1), 'por.1': (2, 1), 'bel.1': (2, 0), 'tur.1': (3, 0), 'cze.1': (1, 2), 'gre.1': (2, 0),
        'pol.1': (3, 0), 'den.1': (2, 0), 'sui.1': (1, 1), 'nor.1': (2, 1), 'aut.1': (1, 0), 'sco.1': (1, 1),
-       'swe.1': (2, 1)}
+       'swe.1': (2, 1), 'usa.1': (0, 0)}
 # leagues that split after a regular phase (2026-27 rules): matches a club plays before the split, then each group
 # (size, matches a club plays in it), top group first; points carried, or halved at the split (Austria). Czechia's
 # 7-10 group is a knockout for a European place, so the table there is frozen at the split.
 SPLIT = {'den.1': (22, [(6, 10), (6, 10)]), 'aut.1': (22, [(6, 10), (6, 10)], 'halve'),
          'sco.1': (33, [(6, 5), (6, 5)]), 'sui.1': (33, [(6, 5), (6, 5)]),
          'gre.1': (26, [(4, 6), (4, 6), (6, 5)]), 'cze.1': (30, [(6, 5), (4, 0), (6, 5)])}
-LEAGUES_SHOWN = D.BIG5 + D.SHOWN
+# MLS (Noah, Oct 31 2026): its own tab with conference tables, playoff and MLS Cup odds (mls_playoffs). It meets the
+# European leagues only at the Club World Cup, so its strength against them is unknown: its clubs stay out of the
+# one-scale ARK Ranking and are rated against the average MLS club. No MLS picks: the model trails the close by .011
+# log loss a match held out (2023-26) and its side of the close lost at every edge cut (scripts/soccer_mls_research.py).
+MLS = 'usa.1'
+NOLINK = {MLS}
+GP = {MLS: 34}                                      # matches a club plays where it isn't a double round robin
+LEAGUES_SHOWN = D.BIG5 + D.SHOWN + [MLS]
 UEFA = ['uefa.champions', 'uefa.europa', 'uefa.europa.conf']
 GPM = 1.4                                           # goals a side a match: margin error -> log-rate shift
 
@@ -1130,9 +1137,12 @@ def rank_sim(teams, T0, fx, gh, ga, rng):
     return pos, pts, gd
 
 
-def season_rows(L, lg, S):
+def season_rows(L, lg, S, groups=None):
+    """league matches of season S; with groups (club -> conference), the regular season only: no all-star game, no
+    play-offs"""
     return [r for r in L.rows if r['lg'] == lg and D.season_of(r['day'], lg) == S
-            and (r.get('hs') is not None or r['st'] not in ('abandoned', 'canceled', 'cancelled'))]
+            and (r.get('hs') is not None or r['st'] not in ('abandoned', 'canceled', 'cancelled'))
+            and (groups is None or r['h'] in groups and r['a'] in groups and r.get('slug') in (None, 'regular-season'))]
 
 
 def split_phase(rs, G):
@@ -1146,15 +1156,17 @@ def split_phase(rs, G):
 
 
 def league_odds(L, lg, S, rng, n=SIMS):
-    rs = season_rows(L, lg, S)
+    groups = D.espn_groups(lg) if lg == MLS else None
+    rs = season_rows(L, lg, S, groups)
     teams = sorted({r['h'] for r in rs} | {r['a'] for r in rs})
     nt = len(teams)
+    gpc = GP.get(lg, 2 * (nt - 1))
     sp = SPLIT.get(lg)
     reg, post = split_phase(rs, sp[0]) if sp else (rs, [])
     played = [r for r in rs if r.get('hs') is not None]
-    fx = [r for r in reg if r.get('hs') is None] + unlisted(reg, teams, sp[0] if sp else 2 * (nt - 1), lg)
+    fx = [r for r in reg if r.get('hs') is None] + unlisted(reg, teams, sp[0] if sp else gpc, lg)
     T0 = table(played)
-    total = nt * (sp[0] if sp else 2 * (nt - 1)) // 2 + (sum(m * k // 2 for m, k in sp[1]) if sp else 0)
+    total = nt * (sp[0] if sp else gpc) // 2 + (sum(m * k // 2 for m, k in sp[1]) if sp else 0)
     if sp:
         # post-split matches still to come: the ones listed, or (before the split's fixtures are out) every pairing
         # the format calls for, drawn inside each simulated group
@@ -1210,7 +1222,93 @@ def league_odds(L, lg, S, rng, n=SIMS):
                   'pos': round(float(p.mean()) + 1, 1)}
         if sp:
             out[t]['top6'] = round(float((p < sp[1][0][0]).mean()), 4)
+    if groups:
+        por = [r for r in L.rows if r['lg'] == lg and D.season_of(r['day'], lg) == S and 'playoff' in (r.get('slug') or '')
+              or r['lg'] == lg and D.season_of(r['day'], lg) == S and r.get('slug') == 'mls-cup']
+        mls_playoffs(L, lg, teams, groups, pts, gd, gf, dl, rng, share, knobs, por, out)
     return out, left, total, teams
+
+
+def mls_playoffs(L, lg, teams, groups, pts, gd, gf, dl, rng, share, knobs, po, out):
+    """MLS play-offs (2024+ format) on each simulated final table: the top 9 in each conference; 8 v 9 wild card at
+    8; round one best of three (1 v wild card, 2 v 7, 3 v 6, 4 v 5; the better seed hosts games 1 and 3); then one
+    match a round, the better seed at home (1/WC v 4/5, 2/7 v 3/6, conference final); MLS Cup at the club with more
+    points. Wild card and round one level after 90 go straight to penalties; later rounds play 30 minutes of extra
+    time first. Penalties are a coin flip. Play-off matches already played are kept (po). Adds conf, cpos (mean
+    conference place), po (top 9), r1 (top 7: straight to round one), cf (conference title), cup (MLS Cup)."""
+    n, nt = pts.shape
+    ar = np.arange(n)
+    ix = {t: i for i, t in enumerate(teams)}
+    day = dt.date.today().isoformat()
+    LH = np.zeros((nt, nt)); LA = np.zeros((nt, nt))
+    for i, t in enumerate(teams):
+        for j, u in enumerate(teams):
+            if i != j:
+                LH[i, j], LA[i, j] = L.lam({'h': t, 'a': u, 'lg': lg, 'day': day, 'neu': 0})
+    if knobs:
+        E = np.array([L.R.eff(t) for t in teams])
+        dA, dD = E[:, 0] - E[:, 0].mean(), E[:, 1] - E[:, 1].mean()
+        f = knobs[0] * share
+        LH = LH * np.exp(-f * (dA[:, None] - dD[None, :])); LA = LA * np.exp(-f * (dA[None, :] - dD[:, None]))
+    # finished play-off matches: pair -> winners in date order
+    done = defaultdict(list)
+    for r in sorted(po, key=lambda r: r['day']):
+        if r.get('hs') is None or r['h'] not in ix or r['a'] not in ix:
+            continue
+        w = r['h'] if r['hs'] > r['as'] else r['a'] if r['as'] > r['hs'] else (r['h'] if r.get('hw') else r['a'])
+        done[frozenset((ix[r['h']], ix[r['a']]))].append(ix[w])
+
+    def game(x, y, et, k=0):
+        """winner of x (home) v y, or the k-th listed result between them"""
+        s_ = (dl[ar, x] - dl[ar, y]) / (2 * GPM)
+        lh, la = LH[x, y] * np.exp(s_), LA[x, y] * np.exp(-s_)
+        g1, g2 = rng.poisson(lh).astype(float), rng.poisson(la).astype(float)
+        if et:
+            lv = g1 == g2
+            g1 = g1 + np.where(lv, rng.poisson(lh / 3), 0); g2 = g2 + np.where(lv, rng.poisson(la / 3), 0)
+        w = np.where(g1 > g2, x, np.where(g2 > g1, y, np.where(rng.random(n) < 0.5, x, y)))
+        for pair, ws in done.items():
+            if len(ws) > k:
+                a, b = tuple(pair)
+                m = ((x == a) & (y == b)) | ((x == b) & (y == a))
+                w = np.where(m, ws[k], w)
+        return w
+
+    def bo3(x, y):
+        w1, w2 = game(x, y, False, 0), game(y, x, False, 1)
+        w3 = game(x, y, False, 2)
+        return np.where(w1 == w2, w1, w3)
+    key = pts * 1e6 + (gd + 500) * 1e3 + gf + rng.random(pts.shape)
+    seed = np.zeros((n, nt), int)
+    champ = {}
+    res = {k: np.zeros((n, nt)) for k in ('po', 'r1', 'cf')}
+    for c in sorted({groups[t] for t in teams}):
+        cols = np.array([ix[t] for t in teams if groups[t] == c])
+        order = cols[np.argsort(-key[:, cols], axis=1)]          # n x conference size: seed k's club
+        seed[ar[:, None], order] = np.arange(len(cols))[None, :]
+        S_ = [order[:, k] for k in range(min(9, len(cols)))]
+        wc = game(S_[7], S_[8], False)
+        a, b, c_, d_ = bo3(S_[0], wc), bo3(S_[3], S_[4]), bo3(S_[1], S_[6]), bo3(S_[2], S_[5])
+
+        def single(x, y):
+            hx = seed[ar, x] < seed[ar, y]
+            return game(np.where(hx, x, y), np.where(hx, y, x), True)
+        champ[c] = single(single(a, b), single(c_, d_))
+        for k in range(9):
+            res['po'][ar, S_[k]] = 1
+            if k < 7:
+                res['r1'][ar, S_[k]] = 1
+        res['cf'][ar, champ[c]] = 1
+    cs = list(champ.values())
+    cup = np.zeros((n, nt))
+    if len(cs) == 2:
+        x, y = cs
+        hx = key[ar, x] >= key[ar, y]
+        cup[ar, game(np.where(hx, x, y), np.where(hx, y, x), True)] = 1
+    for i, t in enumerate(teams):
+        out[t].update(conf=groups[t], cpos=round(float(seed[:, i].mean()) + 1, 1),
+                      po=round(float(res['po'][:, i].mean()), 4), r1=round(float(res['r1'][:, i].mean()), 4),
+                      cf=round(float(res['cf'][:, i].mean()), 4), cup=round(float(cup[:, i].mean()), 4))
 
 
 def unlisted(reg, teams, G, lg):
@@ -1453,7 +1551,16 @@ def build(days_ahead=4):
     AB, DB = L.base(S)
     mu = math.exp(M0 + AB - DB)
     pw = []
-    clubs = {t: lg for lg in leagues for t in leagues[lg]}
+    clubs = {t: lg for lg in leagues if lg not in NOLINK for t in leagues[lg]}
+    for lg in NOLINK & set(leagues):
+        # rating against the league's average club (goals a match, neutral ground)
+        E = {t: R.eff(t, own=True) for t in leagues[lg]}
+        ma, md = sum(e[0] for e in E.values()) / len(E), sum(e[1] for e in E.values()) / len(E)
+        for t, (a, d) in E.items():
+            lf, la_ = math.exp(M0 + R.env[lg] / 2 + a - md), math.exp(M0 + R.env[lg] / 2 + ma - d)
+            leagues[lg][t]['rating'] = round(lf - la_, 3)
+        for i, t in enumerate(sorted(E, key=lambda t: -leagues[lg][t]['rating']), 1):
+            leagues[lg][t]['rrk'] = i
     for lg, u in uefa.items():
         for t in (u or {}).get('teams', {}):
             clubs.setdefault(t, R.lg.get(t, 'x'))
@@ -1560,7 +1667,7 @@ def build(days_ahead=4):
                 g[c + 'rec'] = leagues[lgx][r[c]]['rec']
         games.append(g)
     games.sort(key=lambda g: (g['tip'], g['id']))
-    for t in clubs:
+    for t in list(clubs) + [t for lg in NOLINK & set(leagues) for t in leagues[lg]]:
         logo(t)
     hfa = {lg: round(math.exp(R.hfa[lg]) - 1, 3) for lg in D.BIG5}
     hfa['UEFA'] = round(math.exp(R.hfa['E']) - 1, 3)
@@ -1584,7 +1691,7 @@ if __name__ == '__main__':
     if '--hist' in sys.argv:
         make_hist()
     elif '--fmxg' in sys.argv:
-        patch_fmxg()
+        patch_fmxg(sys.argv[sys.argv.index('--fmxg') + 1] if len(sys.argv) > sys.argv.index('--fmxg') + 1 else None)
     elif '--fit' in sys.argv:
         fit()
     elif '--eval' in sys.argv:

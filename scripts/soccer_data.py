@@ -68,10 +68,11 @@ FM_EURO = {'uefa.champions': 42, 'uefa.europa': 73, 'uefa.europa.conf': 10216, '
 FM = 'https://www.fotmob.com/api/data/leagues'
 NO_ESPN = {'pol.1', 'cze.1'}
 # FotMob team xG (matchDetails) outside the big five: these leagues from FMX_FROM (season end year; calendar leagues
-# the year). The other second tiers, Greece, Poland and Czechia have it only from 2026-27.
+# the year). The other second tiers, Greece, Poland and Czechia have it only from 2026-27. MLS (id 130) from 2020
+# (Oct 31 2026: held-out 2023-26 log loss -.0017 a match, t -2.1; scripts/soccer_mls_research.py).
 FMX_LG = {'eng.2': 48, 'ger.2': 146, 'por.1': 61, 'ned.1': 57, 'bel.1': 40, 'sco.1': 64, 'tur.1': 71, 'aut.1': 38,
-          'sui.1': 69, 'den.1': 46, 'nor.1': 59, 'swe.1': 67}
-FMX_FROM = {'tur.1': 2023, 'ger.2': 2022, 'nor.1': 2020, 'swe.1': 2020}
+          'sui.1': 69, 'den.1': 46, 'nor.1': 59, 'swe.1': 67, 'usa.1': 130}
+FMX_FROM = {'tur.1': 2023, 'ger.2': 2022, 'nor.1': 2020, 'swe.1': 2020, 'usa.1': 2020}
 US_LG = {'eng.1': 'EPL', 'esp.1': 'La_liga', 'ger.1': 'Bundesliga', 'ita.1': 'Serie_A', 'fra.1': 'Ligue_1'}
 # calendar-year leagues (spring to autumn): their season is the calendar year
 CAL = {'nor.1', 'swe.1', 'usa.1'}
@@ -183,6 +184,21 @@ def espn_year(lg, y, fresh=False):
         rows.append(r)
     save(p, rows)
     return rows
+
+
+def espn_groups(lg):
+    """club id -> group name from ESPN's standings (MLS conferences), saved to scripts/data/soccer_groups_<lg>.json
+    so a failed pull keeps the last good one"""
+    p = os.path.join(ROOT, 'scripts', 'data', f'soccer_groups_{lg}.json')
+    d = get(f'https://site.api.espn.com/apis/v2/sports/soccer/{lg}/standings')
+    out = {}
+    for ch in (d or {}).get('children') or []:
+        for e in (ch.get('standings') or {}).get('entries') or []:
+            out[str(e['team']['id'])] = ch.get('name')
+    if len(out) >= 10:
+        json.dump(out, open(p, 'w'), indent=0, sort_keys=True)
+        return out
+    return json.load(open(p)) if os.path.exists(p) else {}
 
 
 def espn_day(lg, day):
