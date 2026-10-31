@@ -33,6 +33,7 @@ import { BADGES } from './cfb_badges.mjs';
 import { pastAtMean } from './fv_dist.mjs';
 import { fvOf } from './fv_scale.mjs';
 import { NFLPOS, famOf } from './cfb_nflpos.mjs';
+import { Matcher, teamKey } from './names.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SP = path.join(ROOT, 'scripts', '.cache', 'statplus'), SRC = path.join(ROOT, 'scripts', '.cache', 'sources');
@@ -292,7 +293,55 @@ const RECV_KEYS = ['adot', 'cdep', 'croe', 'yprrD', 'yacoe', 'aXy', 'aXc', 'tprr
 const GAME_KEYS = ['gNfl', 'gComp', 'gTrend', 'gNflR'];
 const GSPL = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'game_splits.json'), 'utf8')); } catch { return {}; } })();
 const GUNIT = { QB: 'qb', RB: 'scr', WR: 'rec', TE: 'rec', EDGE: 'sk', DL: 'sk', LB: 'sk' };
-const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS];
+// evaluator and special-teams terms (Oct 31 2026 sweep; scripts/cfb_fv_extras.py -> scripts/.cache/fvrefit/extras.json,
+// joined through scripts/names.mjs on name + team, crossTeam none). Honors are announced in early December, after the
+// regular season the board grades, so a live board could read season-s honors only from then on.
+//   acf / acfB / acfMax  postseason all-conference level this season (1st team 3, 2nd 2, 3rd or HM 1, 0 unhonored;
+//                        null when his conference-season has no parsed page), blended 5/4/3 like production, best so far
+//   aaB                  All-America selectors (blend), for reference (failed Oct 14 as a source)
+//   ret / retTD / isRet  kick + punt return yards a team game, return TDs, 10+ returns (blend; ESPN boxes, all FBS games)
+//   krAvg / prAvg        yards a kick (punt) return over his blend, shrunk at 8 returns to 21 (8.5)
+//   dPd / dFF / dInt     ESPN season defense: passes defended (2016+), forced fumbles, INT a game (blend)
+// Result (`--wide --stage=cand --gates`, 10 classes 2014-23): nothing ships. acf passes the fold rule (t 3.56, 8/10, AV
+// r +.011 / +.014, forward +.014 / +.016, Spearman .429 -> .437) but lowers the top 32 a class (AV -.15, t -2.3, 3/10;
+// forward 3.51 -> 3.30): it lifts honored fourth-year players over unhonored younger, higher-pedigree ones (--eval
+// --swaps --candeval=acf=.12). Every honors variant does the same (acfB, acfMax, acfR, acf0, acfY4) or loses the fold
+// rule. acfY|QB (all-conference in years 1-3, QBs) t 3.29 9/10, top 32 AV +.028 but capital -.018 (3/10): fails; retest
+// when the 2024 class adds a fold. Returns (ret, retTD, isRet, krAvg, prAvg, pooled and RB/WR) and ESPN defense
+// (dPd, dFF, dInt) are noise (|t| < 1.3, dFF -2.3)
+const X_KEYS = ['acf', 'acfB', 'acfMax', 'acfR', 'acfY', 'acfY2', 'acfY4', 'acfYc', 'acf1Y', 'acf0', 'aaB', 'ret', 'retTD', 'isRet', 'krAvg', 'prAvg', 'dPd', 'dFF', 'dInt'];
+const XM = {}, XC = new Map();
+{
+  let X = {}; try { X = JSON.parse(fs.readFileSync(path.join(C, 'extras.json'), 'utf8')); } catch { /* no extras: the X terms stay null */ }
+  for (const [S, d] of Object.entries(X)) XM[S] = { ret: new Matcher(d.ret, { pos: null }), def: new Matcher(d.def), conf: new Matcher(d.conf, { pos: null }), aa: new Matcher(d.aa, { pos: null }),
+    pages: new Set(d.pages), confOf: new Map(Object.entries(d.teamConf).map(([t, c]) => [teamKey(t), c])) };
+}
+const DPOS = { EDGE: 'DE', DL: 'DT', LB: 'LB' };
+function xfind(kind, S, row) {
+  const X = XM[S]; if (!X) return undefined;
+  const ck = kind + '|' + S + '|' + row.id + '|' + row.name; if (XC.has(ck)) return XC.get(ck);
+  const [hit] = X[kind].find(row.name, { team: row.team, pos: kind === 'def' ? DPOS[row._g] ?? null : null, crossTeam: 'none' });
+  XC.set(ck, hit); return hit;
+}
+function xRaw(o, hist, tgOf) {
+  const bl = f => { let a = 0, w = 0; for (const h of hist) { const v = f(h); if (v != null && isFinite(v)) { a += CUR.W[h.k] * v; w += CUR.W[h.k]; } } return w ? a / w : null; };
+  const acfOf = h => { const X = XM[h.s]; if (!X) return null; const c = X.confOf.get(teamKey(h.row.team)); if (!c || !X.pages.has(c)) return null; return xfind('conf', h.s, h.row)?.lv ?? 0; };
+  o.acf = hist[0]?.k === 0 ? acfOf(hist[0]) : null;
+  o.acfB = bl(acfOf);
+  const am = hist.map(acfOf).filter(v => v != null); o.acfMax = am.length ? Math.max(...am) : null;
+  o.aaB = bl(h => XM[h.s] ? xfind('aa', h.s, h.row)?.n ?? 0 : null);
+  const rt = h => XM[h.s] ? xfind('ret', h.s, h.row) ?? { kr: 0, kry: 0, krt: 0, pr: 0, pry: 0, prt: 0 } : null;
+  o.ret = bl(h => { const x = rt(h); return x ? (x.kry + x.pry) / (tgOf(h) || 12) : null; });
+  o.retTD = bl(h => { const x = rt(h); return x ? x.krt + x.prt : null; });
+  o.isRet = bl(h => { const x = rt(h); return x ? +(x.kr + x.pr >= 10) : null; });
+  let kr = 0, kry = 0, pr = 0, pry = 0, any = false;
+  for (const h of hist) { const x = rt(h); if (!x) continue; any = true; const f = CUR.W[h.k] / CUR.W[0]; kr += f * x.kr; kry += f * x.kry; pr += f * x.pr; pry += f * x.pry; }
+  o.krAvg = any && kr > 0 ? (kry + 8 * 21) / (kr + 8) : null;
+  o.prAvg = any && pr > 0 ? (pry + 8 * 8.5) / (pr + 8) : null;
+  const df = (h, k) => { if (!DPOS[h.row._g] || !XM[h.s]) return null; const x = xfind('def', h.s, h.row); if (!x) return null; const g = x.gamesPlayed || tgOf(h) || 12; return x[k] != null ? x[k] / g : null; };
+  o.dPd = bl(h => h.s >= 2016 ? df(h, 'passesDefended') : null); o.dFF = bl(h => df(h, 'fumblesForced')); o.dInt = bl(h => df(h, 'interceptions'));
+}
+const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS, ...X_KEYS];
 let CANDW = {}, REC_TERMS = false;
 function candTerm(p, g) {
   let t = 0;
@@ -330,6 +379,7 @@ function candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg) {
     let a = 0, w = 0; for (const h of hist) { const x = gl(h), v = x ? f(x) : null; if (v != null && isFinite(v)) { a += CUR.W[h.k] * v; w += CUR.W[h.k]; } }
     o[k] = w ? a / w : null;
   }
+  xRaw(o, hist, h => games[h.s]?.[h.sch]);
   return o;
 }
 // the receiving depth terms on one position-season pool: rates shrunk to the pool's target-weighted mean at RECV_K
@@ -457,6 +507,17 @@ for (const g of GP) {
     }
     if (g === 'WR' || g === 'TE') recvTerms(P);
     roomTerms(P, g);
+    // honors beyond what the board already reads: acf's residual on production, years and pedigree within the pool
+    // (acfR); acf for players in their first three years only (acfY)
+    {
+      const H = P.filter(p => p.cr.acf != null), X = H.map(p => [1, p.zPfn, p.years, p.hsRaw]), y = H.map(p => p.cr.acf);
+      let b = null;
+      if (H.length > 30) { const k = 4, A = Array.from({ length: k }, () => Array(k + 1).fill(0)); X.forEach((x, n) => { for (let i = 0; i < k; i++) { A[i][k] += x[i] * y[n]; for (let j = 0; j < k; j++) A[i][j] += x[i] * x[j] + (i === j ? 1e-6 : 0); } });
+        for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) if (j !== i) { const f = A[j][i] / A[i][i]; for (let c = 0; c <= k; c++) A[j][c] -= f * A[i][c]; } b = A.map((r, i) => r[k] / r[i]); }
+      for (const p of P) { p.cr.acfR = b && p.cr.acf != null ? p.cr.acf - [1, p.zPfn, p.years, p.hsRaw].reduce((a, v, i) => a + v * b[i], 0) : null; p.cr.acfY = p.cr.acf != null ? (p.years <= 3 ? p.cr.acf : 0) : null;
+        p.cr.acfY2 = p.cr.acf != null ? (p.years <= 2 ? p.cr.acf : 0) : null; p.cr.acfY4 = p.cr.acf != null ? (p.years <= 4 ? p.cr.acf : 0) : null;
+        p.cr.acfYc = p.cr.acf != null ? p.cr.acf * Math.min(1, Math.max(0, (4.5 - p.years) / 2)) : null; p.cr.acf1Y = p.cr.acf != null ? +(p.years <= 3 && p.cr.acf === 3) : null; p.cr.acf0 = p.cr.acf ?? 0; }
+    }
     // candidate drivers (--stage=cand): z within the pool, missing at the pool mean
     for (const k of CAND_KEYS) {
       const v = P.map(p => p.cr[k]).filter(x => x != null && isFinite(x)), cm = mean(v), cs = sdv(v);
@@ -496,6 +557,12 @@ for (const p of PAST ? [] : rows) {
 }
 console.log('rows', rows.length, 'finals', finals.length, 'drafted', finals.filter(p => p.pick).length, '247 matched', r3(mean(finals.map(p => +!p.walkOn))),
   'roster ht', r3(mean(finals.map(p => +!!p.ht))), 'elo', r3(mean(finals.map(p => +(p.team != null)))), 'board', finals.filter(p => p.dt).length, 'ath', finals.filter(p => p.ath != null).length);
+if (process.argv.includes('--xcov')) for (const k of X_KEYS) {
+  // coverage and a raw read of the extras terms on last seasons: share carried, share nonzero, drafted rate and AV by value
+  const S = finals.filter(p => p.cr[k] != null), nz = S.filter(p => p.cr[k] > 0);
+  console.log('xcov', k.padEnd(7), 'carried', r3(S.length / finals.length), 'nonzero', r3(nz.length / Math.max(1, S.length)), 'drafted nz/z', r3(mean(nz.map(p => +!!p.pick))), r3(mean(S.filter(p => !(p.cr[k] > 0)).map(p => +!!p.pick))),
+    'AV nz/z', r3(mean(nz.map(p => p.av))), r3(mean(S.filter(p => !(p.cr[k] > 0)).map(p => p.av))), 'byPos carried', JSON.stringify(Object.fromEntries(G7.map(g => [g, r3(finals.filter(p => p.g === g && p.cr[k] != null).length / finals.filter(p => p.g === g).length)]))));
+}
 
 // ---- grading under a set of multipliers ---------------------------------------------------------------------
 // M: multiplier per driver (1 = today). prod_<g> scales FV_PROD_POS, the rest scale one constant each
@@ -1174,6 +1241,15 @@ if (BOX || process.argv.includes('--eval')) {
         const sp = G7.map(g => { const T = U.filter(p => p.g === g && G.has(p)); return corr(rk(T.map(p => G.get(p).fm)), rk(T.map(p => p.av))); });
         const D = finals.filter(p => p.pick && G.has(p));
         console.log(lab, JSON.stringify(report(G)), 'spearman within', r3(mean(sp)), 'drafted r', r3(corr(D.map(p => G.get(p).fm), D.map(p => p.av))));
+        if (lab === 'cand' && process.argv.includes('--swaps')) {
+          // who the candidate moves into / out of the top 32 model FV a class (last seasons)
+          const top = (G, c) => new Set(finals.filter(p => p.last === c && G.has(p)).sort((a, b) => G.get(b).fm - G.get(a).fm).slice(0, 32));
+          const inn = [], out = [];
+          for (const c of CLASSES) { const a = top(G0, c), b = top(G1, c); for (const p of b) if (!a.has(p)) inn.push(p); for (const p of a) if (!b.has(p)) out.push(p); }
+          const desc = S => ({ n: S.length, av: r3(mean(S.map(p => p.av))), cap: r3(mean(S.map(p => p.cap))), years: r3(mean(S.map(p => p.years))), hs: r3(mean(S.map(p => p.hsRaw))), zPfn: r3(mean(S.map(p => p.zPfn))),
+            acf: r3(mean(S.map(p => p.cr.acf ?? -1))), pos: Object.fromEntries(G7.map(g => [g, S.filter(p => p.g === g).length])) });
+          console.log('swaps in ', JSON.stringify(desc(inn))); console.log('swaps out', JSON.stringify(desc(out)));
+        }
         for (const y of [1, 2, 3, 4, 5]) { const T = U.filter(p => Math.min(5, Math.round(p.years)) === y && G.has(p)); console.log('  years', y, 'n', T.length, 'AV', r3(mean(T.map(p => p.av))), 'avOf FV', r3(mean(T.map(p => avOf(G.get(p).fm)))), 'r', r3(corr(T.map(p => G.get(p).fm), T.map(p => p.av)))); }
       }
       process.exit(0);
@@ -1324,7 +1400,7 @@ if (BOX || process.argv.includes('--eval')) {
   // cand: each new driver alone at a weight per SD picked on the training classes, scored on the held-out class;
   // --cand=k,k|POS limits the list, --candbase=k=w,... holds earlier picks fixed underneath
   if (stages.includes('cand')) {
-    const grid = [-0.2, -0.12, -0.06, -0.03, 0, 0.03, 0.06, 0.12, 0.2];
+    const grid = arg('grid').length ? arg('grid').map(Number) : [-0.2, -0.12, -0.06, -0.03, 0, 0.03, 0.06, 0.12, 0.2];
     const base = Object.fromEntries(arg('candbase').map(x => x.split('=')).map(([k, v]) => [k, +v]));
     const list = arg('cand').length ? arg('cand') : [...CAND_KEYS, ...CAND_KEYS.flatMap(k => G7.map(g => k + '|' + g))];
     CANDW = { ...base };
@@ -1332,6 +1408,7 @@ if (BOX || process.argv.includes('--eval')) {
     const bScore = G => { const v = report(G); return v; };
     const b0 = bScore(B), objF = (G, S) => obj(G, S);
     W.cand = { base, results: {} };
+    let fwdNu = null;
     for (const k of list) {
       const Gs = new Map();
       const gOf = (nu, v) => { const key = JSON.stringify(nu) + '|' + v; if (!Gs.has(key)) { CANDW = { ...base, [k]: v }; Gs.set(key, gradeM(nu)); CANDW = { ...base }; } return Gs.get(key); };
@@ -1340,6 +1417,21 @@ if (BOX || process.argv.includes('--eval')) {
       const fg = folds.map(f => r3(objF(oof, f.test) - objF(B, f.test))), m = mean(fg), se = sdv(fg) * Math.sqrt(fg.length / (fg.length - 1)) / Math.sqrt(fg.length);
       const v = report(oof), gain = Object.fromEntries(Object.entries(v).map(([e, x]) => [e, [r3(x[0] - b0[e][0]), r3(x[1] - b0[e][1])]]));
       W.cand.results[k] = { folds: pick, gain, foldGain: fg, won: fg.filter(x => x > 0).length, t: r3(m / se) };
+      // Oct 31 2026 gates on top of the fold t: within-position Spearman (held out), the top 32 model FV a class (last
+      // seasons, AV and capital, held out), and forward (weight picked on the 2014-18 classes, 2019-23 graded)
+      if (process.argv.includes('--gates')) {
+        const rk = xs => { const o = xs.map((x, i) => [x, i]).sort((a, b) => a[0] - b[0]), r = Array(xs.length); for (let i = 0; i < o.length;) { let j = i; while (j + 1 < o.length && o[j + 1][0] === o[i][0]) j++; for (let q = i; q <= j; q++) r[o[q][1]] = (i + j) / 2; i = j + 1; } return r; };
+        const spw = G => mean(G7.map(g => { const T = U.filter(p => p.g === g && G.has(p)); return corr(rk(T.map(p => G.get(p).fm)), rk(T.map(p => p.av))); }));
+        const top = (G, c) => finals.filter(p => p.last === c && G.has(p)).sort((a, b) => G.get(b).fm - G.get(a).fm).slice(0, 32);
+        const t32 = t => { const d = CLASSES.map(c => mean(top(oof, c).map(p => p[t])) - mean(top(B, c).map(p => p[t]))); const mm = mean(d), s2 = sdv(d) / Math.sqrt(d.length); return [r3(mm), r3(mm / s2), d.filter(x => x > 1e-9).length]; };
+        const tr = U.filter(p => p.last <= 2018), te = U.filter(p => p.last >= 2019), nu = fwdNu ??= pbOf(tr);
+        const wf = grid.reduce((b, v) => objF(gOf(nu, v), tr) > objF(gOf(nu, b), tr) + 1e-9 ? v : b, 0), F1 = gOf(nu, wf), F0 = gOf(nu, 0);
+        const cs = CLASSES.filter(c => c >= 2019), fs1 = score(F1, te), fs0 = score(F0, te);
+        const fwd = { w: wf, pooled: r3(fs1.pooled - fs0.pooled), within: r3(fs1.within - fs0.within), cap: r3(score(F1, te, 'cap').within - score(F0, te, 'cap').within),
+          top32: [r3(mean(cs.map(c => mean(top(F0, c).map(p => p.av))))), r3(mean(cs.map(c => mean(top(F1, c).map(p => p.av)))))] };
+        Object.assign(W.cand.results[k], { spearman: [r3(spw(B)), r3(spw(oof))], top32av: t32('av'), top32cap: t32('cap'), forward: fwd });
+        console.log('   gates', k, JSON.stringify({ spearman: W.cand.results[k].spearman, top32av: W.cand.results[k].top32av, top32cap: W.cand.results[k].top32cap, forward: fwd }));
+      }
       console.log('cand', k.padEnd(16), JSON.stringify(pick), JSON.stringify({ all: gain.all_av, cap: gain.all_cap, pfn: gain.pfn_av, box: gain.box_av, last: gain.last_av, earlier: gain.earlier_av }), 'won', W.cand.results[k].won, 't', W.cand.results[k].t, ((Date.now() - t0) / 1000).toFixed(0) + 's');
     }
     save('cand', ['cand']);

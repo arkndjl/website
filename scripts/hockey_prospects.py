@@ -29,7 +29,9 @@ Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's ou
           public AHL feed, 2008-09 on); inputs kept on the same rule (the last four also had to pass top-of-board and
           forward checks, scripts/hockey_fv_drivers.py). Stages 3-4 fit on picks not yet graduated and add any NHL
           game so far and comps: the mean miss from the stage model of the 30 nearest past picks at that stage
-          (Oct 30 2026, scripts/fv_comps_test.py; pool in data/hockey_comps.json).
+          (Oct 30 2026, scripts/fv_comps_test.py; pool in data/hockey_comps.json). Stages 1, 2 and 4 also carry a
+          second fit with his share of his NHL team's preseason games the fall after that season (NHL boxscores,
+          scripts/hockey_data.py --pre; Oct 31 2026), used from October, once that preseason is in (PRE_STAGES).
 Live      2027 class from Tankathon's NHL big board (rank, league, size, birth month, this season's line). Rank stands in
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
@@ -68,6 +70,7 @@ ROWS = os.path.join(HERE, 'data', 'hockey_rows.json.gz')        # the pulled cla
 AHL = os.path.join(HERE, 'data', 'hockey_ahl.json.gz')          # AHL skater shots by season (scripts/hockey_data.py --ahl)
 EURO = os.path.join(HERE, 'data', 'hockey_euro.json.gz')        # Liiga/SHL TOI and SOG by season (hockey_data.py --euro)
 CHLP = os.path.join(HERE, 'data', 'hockey_chl_priority.json')   # NHL id -> his CHL priority selection (chl_priority)
+PRE = os.path.join(HERE, 'data', 'hockey_pre.json.gz')          # NHL preseason games by start year (hockey_data.py --pre)
 OUT = os.path.join(ROOT, 'data', 'hockey.json')
 TANK = 'https://tankathon.com/nhl/big-board'
 FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
@@ -540,6 +543,46 @@ def onboard(r, k):
     return k not in POP_STAGES or r['gp_k'].get(k, 0) < GRAD[r['G']]
 
 
+# NHL preseason (Oct 31 2026 FV sweep; NHL game-center boxscores, scripts/hockey_data.py --pre). pnS = his share of his
+# NHL team's games in the preseason after the stage's season (the September after season draft year + k): the team's
+# own read of where he stands. Each stage keeps its model, and a second fit adds pnS ('pre' in the stage entry); the
+# build uses it once that preseason is in (October to July) and the plain model from August to the end of the
+# preseason. Seasons without a preseason (2012 lockout, 2020) take the stage mean in the fit. Share, not games: the
+# 2026 preseason was cut to 4 games a team from 6-9, and the share held (pipeline means .08-.24 by stage, as before).
+# Class-out on the stage rows, on top of the stage model with comps: k1 MSE 83.66 -> 82.09 (t 2.49, 9/12), k2 70.72
+# -> 65.30 (t 3.75, 10/12), k4 33.10 -> 30.19 (t 4.62, 10/12); top-64 picks MSE -0.28 / -5.17 / -1.90 and Spearman
+# up; forward (fit 2008-15, grade 2016-19) MSE -1.23 / -4.14 / -2.57, top-64 MSE and Spearman better at all three, and
+# the same with the 2020 class added to the graded set (6 of 7 seasons in). Stage 3 passes class-out (MSE -4.05, t 2.90,
+# 10/12; top-64 and forward MSE better) but forward top-64 Spearman drops .003: not offered. Failed: preseason games
+# in the stage's own season (the September before it: t .6-1.8), preseason TOI, points, any game, the first
+# preseason after the draft for the draft grade (t 1.9, forward top-64 MSE worse).
+PRE_STAGES = (1, 2, 4)
+_PRE = {}
+
+
+def pre_share(r, k):
+    """his share of his NHL team's games in the preseason that starts in year draft + k, None when that preseason is
+    not in the frozen table (not played yet, or none that year)"""
+    if 'd' not in _PRE:
+        _PRE['d'] = json.load(gzip.open(PRE, 'rt')) if os.path.exists(PRE) else {}
+    t = _PRE['d'].get(str(r['year'] + k))
+    if not t:
+        return None
+    v = t.get(str(r.get('id')))                        # a pick with no NHL player id has never dressed for one
+    return min(1.0, v[0] / v[1]) if v else 0.0
+
+
+def pre_fill(Fk, sub, k, mean=None):
+    """pnS on each stage row (the stage mean where the preseason is missing); returns the mean"""
+    v = [pre_share(r, k) for r in sub]
+    if mean is None:
+        a = [x for x in v if x is not None]
+        mean = float(np.mean(a)) if a else 0.0
+    for f, x in zip(Fk, v):
+        f['pnS'] = mean if x is None else x
+    return mean
+
+
 # Comps (Noah, Oct 30 2026: player comps as an FV driver). A stage-k prospect's 30 nearest past picks at the same stage
 # (same position group, never his own class; equal weights on the z-scored stage inputs below), and their mean miss
 # from the stage model: what picks with his profile went on to do beyond what the linear grade said. Offered after the
@@ -697,6 +740,14 @@ def fit(frozen=False, scorecard=False):
         stages[k] = {'kept': kk, 'coef': dict(zip(['const'] + kk, [round(float(v), 4) for v in bk])),
                      'mse': round(float(curk.mean()), 2), 'mseDraft': round(float(s0.mean()), 2), 'ev': evk}
         print('stage', k, kk, 'mse', stages[k]['mse'], 'vs draft grade', stages[k]['mseDraft'])
+        if k in PRE_STAGES:
+            pm = pre_fill(Fk, sub, k)
+            kp, evp, curp = select(Fk, yk, ck, kk, ['pnS'])
+            if 'pnS' in kp:
+                bp = ols(np.array([[f[c] for c in kp] for f in Fk]), yk)
+                stages[k]['pre'] = {'kept': kp, 'coef': dict(zip(['const'] + kp, [round(float(v), 4) for v in bp])),
+                                    'mse': round(float(curp.mean()), 2), 'mseDraft': stages[k]['mseDraft'], 'ev': evp, 'pnMean': round(pm, 4)}
+                print('  + preseason', 'mse', stages[k]['pre']['mse'], evp['pnS'])
     # slot <- in-season rank: Central Scouting midterm (January) vs the June slot, NA skaters ranked both times
     xs, ys = [], []
     for y0 in range(FIRST, 2027):
@@ -841,6 +892,9 @@ def build():
             for f, r in zip(sub, sub_r):
                 f['comp'] = comp_of(pools[int(k)], f, comp_grp(r), own=r['year'])
         meank[k] = {c: float(np.mean([f[c] for f in sub])) for c in st['kept']}
+        if st.get('pre'):
+            pre_fill(sub, sub_r, int(k), st['pre']['pnMean'])
+            meank[k + 'pre'] = {c: float(np.mean([f[c] for f in sub])) for c in st['pre']['kept']}
     r2s, ns = fitd['rank2slot'], fitd['nhleSlot']
     # 1. the coming draft class
     year, tk = tankathon()
@@ -905,9 +959,13 @@ def build():
             x, pp = x0, parts(fitd['coef'], fitd['kept'], f0, mean0)
         else:
             st, fk = fitd['stages'][str(k)], stage_feats(r, k, x0)
+            mk = meank[str(k)]
             if 'comp' in st['kept']:
                 fk['comp'], comps = comp_of(pools[k], fk, comp_grp(r), show=3)
-            x, pp = sgrade(st, fk), parts(st['coef'], st['kept'], fk, meank[str(k)])
+            pn = pre_share(r, k)
+            if st.get('pre') and pn is not None:            # his team's preseason since that season is in
+                st, fk['pnS'], mk = st['pre'], pn, meank[str(k) + 'pre']
+            x, pp = sgrade(st, fk), parts(st['coef'], st['kept'], fk, mk)
         px = (r.get('px') or {}).get(k) or {}
         p40, p50 = odds(fitd, x)
         q = r['post'].get(k) if k else r['d0']
@@ -922,7 +980,8 @@ def build():
                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
                      'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
                      'wjc': int(bool(px.get('wjc'))) if k else 0, 'progp': px.get('progp') if k else None,
-                     'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None, 'comps': comps})
+                     'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None, 'comps': comps,
+                     'pre': round(pn, 2) if k and pn is not None else None})
     pipe.sort(key=lambda r: -r['fvx'])
     pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
     # 3. past classes: the out-of-class draft grade and what each pick became
@@ -945,7 +1004,7 @@ def build():
            'classStrength': {'k': CS_K, 'live': round(S_live - A['mean'], 2) if A and S_live is not None else None,
                              'byClass': {str(c): round(v - A['mean'], 2) for c, v in Sall.items()} if A else {}},
            'rungs': rung,
-           'stages': {k: {kk: v[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
+           'stages': {k: {kk: (v.get('pre') or v)[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
     try:   # headshots from the CHL/USHL HockeyTech rosters (scripts/faces.py); the board builds without them
         import faces
         print('hockey faces:', faces.hockey_attach(board), 'of', len(board))
