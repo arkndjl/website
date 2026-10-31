@@ -2,7 +2,12 @@
        points against an average D-I team on a neutral floor (the game model's efficiency, Elo and market terms at its
        weights), adjusted offense and defense per 100 possessions, tempo, record and the preseason prior. */ -}}
 {{- with site.Data.cbb_games -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- /* the ARK Top 25 graphic (gfx.js buildRank, the CFB one's layout): model order, unfiltered; next ten in the spare slot */ -}}
+{{- $gfx := slice }}{{ range first 25 .power }}{{ $gfx = $gfx | append (dict "rk" .rk "n" .t "l" (.logo | default "") "rec" (cond (gt .g 0) .rec "") "s" .rating) }}{{ end }}
+{{- $more := slice }}{{ range first 10 (after 25 .power) }}{{ $more = $more | append (dict "rk" .rk "n" .t "s" .rating) }}{{ end }}
+{{- $played := 0 }}{{ range .power }}{{ $played = add $played .g }}{{ end }}
+{{- $rank := dict "title" (printf "CBB ARK Top 25 :: %s" (cond (gt $played 0) .season "preseason")) "name" "arkboard-cbb-ark-top-25" "teams" $gfx "more" $more "foot" (slice "rating = margin vs avg D-I team, neutral floor" "rating = expected margin vs average D-I team, neutral floor · bar vs #1") }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25" "gfxRank" ($rank | jsonify)) -}}
 <table class="cfb__table tstick2" data-td-kind="cbb" data-td-src="/data/teams/cbb.json" data-td-rows="{{ (resources.FromString "data/cbb-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
