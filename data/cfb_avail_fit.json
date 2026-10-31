@@ -529,5 +529,37 @@
     }
    }
   }
- ]
+ ],
+ "reports": {
+  "asof": "2026-10-31",
+  "n": 10624,
+  "listed": 1069,
+  "p0Starter": 0.889,
+  "pre": {
+   "const": 0.033,
+   "logitBox": 1.128,
+   "Active": 0.414,
+   "Probable": 0.116,
+   "Questionable": -3.279,
+   "Doubtful": -9.688,
+   "Out": -11.024,
+   "QmissedLast": 2.602
+  },
+  "gd": {
+   "const": 0.075,
+   "logitBox": 1.12,
+   "Active": 0.177,
+   "Questionable": -2.01,
+   "Game Time Decision": -2.057,
+   "Out": -11.622,
+   "QmissedLast": 2.16
+  },
+  "source": "scripts/cfb_avail_reports_backtest.mjs",
+  "starter": {
+   "Probable": 0.924,
+   "Questionable": 0.289,
+   "Game Time Decision": 0.586,
+   "Doubtful": 0.001
+  }
+ }
 }

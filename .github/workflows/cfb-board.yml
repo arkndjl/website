@@ -52,8 +52,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Playwright (Chromium, for On3)
-        if: env.REFRESH != 'true'
+      # Chromium: On3 (full runs) and the conference availability reports (every run)
+      - name: Playwright (Chromium, for On3 and the availability reports)
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
@@ -95,6 +95,13 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: python3 scripts/novig.py --live cfb
+      # the SEC, ACC, MAC and American availability reports (scripts/cfb_avail_reports.mjs -> scripts/data/
+      # cfb_avail_reports.json; posted 9 p.m. CT Wednesday to Friday, game day 90 minutes before kickoff), read by
+      # fetch_cfb.mjs into the availability log
+      - name: Conference availability reports, college football
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node scripts/cfb_avail_reports.mjs
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs
@@ -140,7 +147,7 @@ jobs:
         run: python3 scripts/team_detail.py cfb
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json scripts/data/cfb_ranks.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json static/data/rookies/cfb.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+          git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json static/data/rookies/cfb.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -158,7 +165,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json scripts/data/cfb_ranks.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json static/data/rookies/cfb.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+            git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json static/data/rookies/cfb.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done

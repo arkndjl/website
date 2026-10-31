@@ -191,5 +191,8 @@ const out = { asof: new Date().toISOString().slice(0, 10), seasons: SEASONS, min
   cells: Object.fromEntries(Object.entries(cells).sort().map(([k, c]) => [k, { n: c.n, p: r3(c.played / c.n) }])),
   calib: Object.entries(calib).sort((a, b) => a[0] - b[0]).map(([, c]) => ({ n: c.n, p: r3(c.p / c.n), played: r3(c.y / c.n) })),
   pooled, test };
+// the conference reports' fit (scripts/cfb_avail_reports_backtest.mjs) rides along: it fits on the box P(plays) above;
+// rerun that script after a refit here
+try { const prev = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_avail_fit.json'), 'utf8')); if (prev.reports) out.reports = prev.reports; } catch {}
 fs.writeFileSync(path.join(ROOT, 'data', 'cfb_avail_fit.json'), JSON.stringify(out, null, 1) + '\n');
 console.log('fit', JSON.stringify({ coef: out.coef, m: mAll, beta: bAll, status, cells: out.cells }));
