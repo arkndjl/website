@@ -11,7 +11,7 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: Europe's top leagues and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:player value,player stats,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,depth chart|leagues:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League" label="Soccer views" >}}
+{{< wintabs groups="players:player value,player stats,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,depth chart|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|UEFA cups:Champions League,Europa League,Conference League" side="true" label="Soccer views" >}}
 {{< soccergames title="matches" tab="games" >}}
 {{< soccergametable title="match table" tab="game table" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}

@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="counter_strike.exe :: pro CS2" icon="cs" sprite="px/hero-cs" status="Valve VRS · Liquipedia" class="winpane--art" />}}
 
-{{< wintabs groups="ranking:ARK Ranking|series:matches,results|model:model" label="Counter-Strike views" >}}
+{{< wintabs groups="games:matches,results|teams:ARK Ranking|model:model" side="true" label="Counter-Strike views" >}}
 {{< cs2rank title="Counter-Strike :: ARK Ranking" tab="ARK Ranking" >}}
 {{< cs2matches title="matches :: upcoming pro series" tab="matches" >}}
 {{< cs2matches view="results" title="results :: against the model" tab="results" >}}

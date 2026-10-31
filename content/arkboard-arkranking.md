@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="CFB · NFL · CBB · NBA · NHL · SOCCER · TENNIS · CS2" class="winpane--art" />}}
 
-{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
+{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
 {{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB :: ARK Ranking, with the AP and Coaches Top 25" tab="CFB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CFB odds" >}}{{< cfbsim title="CFB season odds :: 10,000 simulated seasons" tab="CFB odds" >}}{{< /lazytab >}}
