@@ -51,6 +51,10 @@ import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } fro
 import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
+// the headline's stretched top (Oct 31 2026): fv in memory stays the mean (the builder, mocks, portal and team talent
+// read it); the files carry it on the stretched scale, via FVR (and val() for cfb-all)
+import { fvOf, fvReplacer } from './fv_scale.mjs';
+const FVR = fvReplacer('cfb');
 import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -2423,7 +2427,7 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
-  const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : r[c] ?? null;
+  const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : c === 'fv' && r.fv != null ? fvOf('cfb', r.fvx, r.fv) : r[c] ?? null;
   const body = JSON.stringify({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) });
   fs.writeFileSync(ALL_OUT, body);
   writeComps(rows.filter(r => r._comp).map(r => ({ key: `${r.name}|${r.team}`, ...r._comp })), COMPS_OUT);
@@ -2760,7 +2764,7 @@ if (fs.existsSync(TFIT)) {
     let dev = null; try { dev = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_dev_fit.json'), 'utf8')); } catch {}   // scripts/cfb_dev_fit.py
     const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, dev, coachFlows: coachMkt?.flows || [],
       coachOpen: Object.fromEntries((coachMkt?.teams || []).map(t => [t.tid, t.open ?? 0])) });
-    fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
+    fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }, FVR));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings; development x${tb.dev.k} (league next/now: ${tb.dev.flat} flat, ${tb.dev.measured} measured, ${tb.dev.level} scaled)`);
   }
   for (const r of all) { delete r._home; delete r._past; }
@@ -2786,7 +2790,7 @@ try {
 } catch (e) { console.log(`bowl opt-outs: ${e.message.slice(0, 200)}`); }
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
   { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam, avail, optout }) : [];
-fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
+fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, FVR, 1) + '\n');
 // top performers (data/cfb_top.json): the latest week with nearly every game played, from CFBD box scores
 // (one call a week; a played week's box scores don't change, so each is cached)
 {
@@ -2806,7 +2810,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
     const teamOf = x => { const r = byEspnId[x.id], tid = r?.tid || roster[x.id]?.tid || idxTeams.resolve(x.team), t = TL[tid];
       return { team: t?.team || x.team, logo: t?.logo || null, fv: r?.fv ?? null, star: r?.star || null, cls: r?.cls || null }; };
     const top = boxes ? topPerformers(boxes, posOf, teamOf) : null;
-    if (top) fs.writeFileSync(path.join(ROOT, 'data', 'cfb_top.json'), JSON.stringify({ asof: out.asof, week: last, groups: TOP_GROUPS, top }, null, 1) + '\n');
+    if (top) fs.writeFileSync(path.join(ROOT, 'data', 'cfb_top.json'), JSON.stringify({ asof: out.asof, week: last, groups: TOP_GROUPS, top }, FVR, 1) + '\n');
   }
 }
 // transfer portal (data/cfb_portal.json): CFBD's portal list for this season matched to the board at the
@@ -2833,7 +2837,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
   const teams = Object.entries(net).map(([tid, x]) => ({ team: TL[tid].team, logo: TL[tid].logo, conf: TL[tid].conf, in: r1(x.in), out: r1(x.out), net: r1(x.in - x.out), nIn: x.nIn, nOut: x.nOut }))
     .sort((a, b) => b.net - a.net);
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_portal.json'), JSON.stringify({ asof: out.asof, season: SEASON,
-    moves: moves.sort((a, b) => (b.fv ?? 0) - (a.fv ?? 0) || (b.rating ?? 0) - (a.rating ?? 0)).map(({ fromTid, toTid, ...m }) => m), teams }, null, 1) + '\n');
+    moves: moves.sort((a, b) => (b.fv ?? 0) - (a.fv ?? 0) || (b.rating ?? 0) - (a.rating ?? 0)).map(({ fromTid, toTid, ...m }) => m), teams }, FVR, 1) + '\n');
   console.log(`portal: ${moves.length} moves, ${moves.filter(m => m.fv != null).length} graded`);
 }
 // breakout watch (data/cfb_breakout.json): first- and second-year players whose touches + targets per game
@@ -2852,7 +2856,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
       list.push({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, photo: r.photo || null, cls: r.cls, fv: r.fv, star: r.star || null, games: gs, before: r1(before), last: r1(last), jump: r1(last - before) });
   }
   list.sort((a, b) => b.jump - a.jump);
-  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_breakout.json'), JSON.stringify({ asof: out.asof, players: list.slice(0, 60) }, null, 1) + '\n');
+  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_breakout.json'), JSON.stringify({ asof: out.asof, players: list.slice(0, 60) }, FVR, 1) + '\n');
   console.log(`breakouts: ${list.length}`);
 }
 // scheme fingerprints for the staff tab: offense tempo (plays a game), run rate, 4th-down go rate (plays
@@ -2956,7 +2960,7 @@ const projPlayers = (() => {
   const all = slate.players || [], seen = {};
   return all.filter((p, i) => { const k = p.game + '|' + p.team; seen[k] = (seen[k] || 0) + 1; return i < 300 || seen[k] <= PROJ_PER_TEAM; });
 })();
-fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: projPlayers }) + '\n');
+fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: projPlayers }, FVR) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];
 const r2s = x => x == null ? null : Math.round(x * 100) / 100;
 // coach photos: each coach's Wikipedia article image (pageimages, 50 titles a call), cached by title; the
@@ -3004,7 +3008,7 @@ let market = null;
   }
 }
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
-  weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
+  weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, FVR, 1) + '\n');
 // recruits (scripts/cfb_recruit.mjs, fit in data/cfb_recruit_fit.json by scripts/cfb_recruit_fit.py): the next
 // class's commitments (ESPN) and every rostered player without snaps, projected to FV, and next season's
 // rosters with them (data/cfb_recruits.json for the page, static/data/cfb-recruits.json for the team builder)
@@ -3024,7 +3028,7 @@ if (model && teamList.length) {
     const weeksPlayed = games?.some(g => g.done) ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0;
     const R = teamRankings({ model, teamList, coaches, talentZ: Object.fromEntries(tl.map(t => [String(t.tid), (t.talent - tm) / ts])), late: (nextWeek ?? 0) >= 5,
       polls: readPolls(espnPolls), hist, resolve: n => idxTeams.resolve(n), prev, week: weeksPlayed, inj: slate.inj || null });
-    fs.writeFileSync(RANK_OUT, JSON.stringify({ asof: out.asof, ...R }, null, 1) + '\n');
+    fs.writeFileSync(RANK_OUT, JSON.stringify({ asof: out.asof, ...R }, FVR, 1) + '\n');
     const ev = R.evidence;
     console.log(`rankings: ${R.teams.length} teams · polls ${Object.keys(R.polls).join(', ')} · staff ${R.staffUsed.join(', ') || 'none'} · ` +
       (ev.vsPolls || []).map(v => `${v.season} ${v.poll} ${v.pollPct} vs ours ${v.oursPct} (n ${v.n})`).join(' · '));
@@ -3055,13 +3059,13 @@ if (tank) {
     // each pick's ESPN headshot from his board row (the mock tables' photos)
     const ph = new Map([...out.all, ...outFcs.all].map(r => [`${r.name}|${r.team}`, r.photo]));
     for (const k of [...picks, ...udfa]) k.photo = ph.get(`${k.name}|${k.school}`) || null;
-    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks, udfa }, null, 1) + '\n');
+    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks, udfa }, FVR, 1) + '\n');
   }
 }
 if (tank) writeAll();   // the board rows again, now with the mock sims (mk)
 console.log(`teams: ${teamList.length} (${games?.length ?? 0} games) · coaches: ${coaches.length} · mock: ${tank ? 'yes' : 'no'}`);
 const { all, ...boardOut } = out;
-fs.writeFileSync(OUT, JSON.stringify(boardOut, null, 1) + '\n');
+fs.writeFileSync(OUT, JSON.stringify(boardOut, FVR, 1) + '\n');
 const tiers = {};
 for (const p of out.players) { const t = Math.floor(p.fv / 5) * 5; tiers[t] = (tiers[t] || 0) + 1; }
 console.log(`board: ${out.count} players of ${out.population} graded · FV tiers`, tiers);

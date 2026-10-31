@@ -38,6 +38,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as N   # noqa: E402
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ON3 = os.path.join(ROOT, 'scripts', '.cache', 'cbb', 'on3')
@@ -897,7 +898,7 @@ def grade(M, F, shrink):
     for pi, mi in zip(p, mu):
         pi, mi = float(pi), float(mi)
         e = pi * math.exp(mi) * M.smear
-        out.append({'p': round(pi, 3), 'ets': round(e, 5), 'fv': round(fv_of(e)), 'fvx': round(fv_of(e), 1),
+        out.append({'p': round(pi, 3), 'ets': round(e, 5), 'fv': FS.fv_of('cbb', fv_of(e)), 'fvx': round(fv_of(e), 1),
                     'fvIf': round(fv_of(math.exp(mi) * M.smear), 1),
                     'p40': round(M.above(pi, mi, ts_of(40)), 3), 'p50': round(M.above(pi, mi, ts_of(50)), 3),
                     'p60': round(M.above(pi, mi, ts_of(60)), 3),

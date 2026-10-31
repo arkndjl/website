@@ -34,6 +34,7 @@ import sys
 import time
 
 import numpy as np
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -727,7 +728,7 @@ def fit(scorecard_only=False):
                 Xp = Xp[(Xp['head'] >= 45) | (Xp.out >= 55)].sort_values('head', ascending=False)
                 Pn = B[tour]['P']
                 T_['past'] = [dict(pid=int(r.pid), name=f"{Pn.at[r.pid, 'first']} {Pn.at[r.pid, 'last']}", season=int(r.season),
-                                   age=round(float(r.age), 1), rank=int(r.rank), fv=int(round(r.head)), out=int(round(r.out)),
+                                   age=round(float(r.age), 1), rank=int(r.rank), fv=FS.fv_of(tour, float(r.head)), fvx=round(float(r.head), 2), out=int(round(r.out)),
                                    peak=round(float(r.pk) * 20, 2), pkr=None if r.pk <= 0 or np.isnan(xrank([r.pk], T_['rank'])[0]) else int(round(float(xrank([r.pk], T_['rank'])[0]))),
                                    nat=tennis_data.iso2(r.ioc) or None)
                               for r in Xp.itertuples()]
@@ -1034,7 +1035,7 @@ def build():
                              ep=None if elo is None or r.elon < 10 else int(round(100 + 25 * (r.elo - (a * r.age + b0)) / sd)),
                              n=int(r.n), w=int(r.w), nT=int(r.nT), wT=int(r.wT), nC=int(r.nC), wC=int(r.wC), nS=int(r.nS), wS=int(r.wS),
                              nQ=int(r.nQ), wQ=int(r.wQ), car=int(r.elon), deb=None if pd.isna(r['first']) else round(float(r['first']), 1),
-                             fvx=round(float(mean[i]), 2), fv=int(round(mean[i])), lo=int(round(lo[i])), hi=int(round(hi[i])),
+                             fvx=round(float(mean[i]), 2), fv=FS.fv_of(tour, float(mean[i])), lo=int(round(lo[i])), hi=int(round(hi[i])),
                              p30=round(float(odds[30][i]), 3), p40=round(float(odds[40][i]), 3), p50=round(float(odds[50][i]), 3),
                              p60=round(float(odds[60][i]), 3), pv=round(float(p[i]), 3), prov=bool(pd.isna(r['rank'])),
                              parts=sorted([[k, round(x, 2)] for k, x in pr.items()], key=lambda t: -abs(t[1]))))

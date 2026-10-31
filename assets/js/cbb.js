@@ -41,7 +41,7 @@
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
         (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
-      '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="FV ' + (+r.fvx).toFixed(2) + '; decimals break ties">' + fv + '</span></td>' +
+      '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="mean outcome ' + (+r.fvx).toFixed(2) + '">' + fv + '</span></td>' +
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
       (past ? '<td>' + outcome(r) + '</td>' : '<td class="cfb__num">' + (r.xbpm == null ? dim : '<span class="' + (r.xbpm >= 0 ? '' : 'cfb__down') + '">' + sgn(r.xbpm) + '</span>') + '</td>') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +

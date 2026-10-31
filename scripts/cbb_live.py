@@ -26,6 +26,7 @@ import cbb_data as D
 import cbb_fit as F
 import cbb_combine as CB
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
+import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 
 SEASON = 2027
 OFFLINE = '--offline' in sys.argv
@@ -431,7 +432,7 @@ def main():
     for r in recs:   # the headline at the mean outcome, the grade kept as fvg (fetch_cbb.restate)
         g = r['fvx']; row = r['row']
         m = at_mean('cbb', g, cbb_z(row[ci['cls']], row[ci['new']], row[ci['pos']], g))
-        r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), int(round(m)), False
+        r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), FS.fv_of('cbb', m), False
     recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
     add = [c for c in ('fvd', 'fvg') if c not in ci]   # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade

@@ -13,7 +13,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk sp" data-pd-b="{{ $w := .fit.prob.p40 }}{{ if gt (len $w) 2 }}{{ printf "%.4f" (add (index $w 1) (index $w 3)) }}{{ else }}{{ index $w 1 }}{{ end }},{{ index .fit.prob.p60 1 }}" data-pd-kind="sp-board" data-pd-src="{{ (resources.FromString "data/soccer-prospects-detail.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
+    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1), stretched at the top so 80 is about one every five seasons">FV</th><th>Pos</th><th>Club</th><th>League</th>
     <th title="age on July 1 of this season">Age</th>
     <th class="hk__x" title="Transfermarkt market value, euros">Value</th>
     <th class="hk__x" title="minutes this season in league and European games">Min</th>
@@ -44,7 +44,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "soccer_prospects" "note" (printf "Transfermarkt lineups · updated %s" $date) "about" (printf "The top %d of %d players born on or after %s with a lineup spot in a covered league, academy league or feeder league last season or this one, graded on what past prospects with the same profile became: age, market value, this season's and last season's value at their club's strength, minutes share, scoring rate, size and position. FV is the mean outcome, so it sits below the best case: a 60 averages out to one of the 20 best of his birth year at his position, with busts and stars around it. Provisional (prov) players have no senior minutes yet." (len $rows) .pool .born)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "soccer_prospects" "note" (printf "Transfermarkt lineups · updated %s" $date) "about" (printf "The top %d of %d players born on or after %s with a lineup spot in a covered league, academy league or feeder league last season or this one, graded on what past prospects with the same profile became: age, market value, this season's and last season's value at their club's strength, minutes share, scoring rate, size and position. FV is the mean outcome, so it sits below the best case: a 60 averages out to one of the 20 best of his birth year at his position, with busts and stars around it. Above the board's top few players a season the scale stretches, so an 80 comes about once every five seasons; the order is the mean's. Provisional (prov) players have no senior minutes yet." (len $rows) .pool .born)) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past prospects :: grade vs outcome") "icon" "soccer" "filter" "Season,Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Season,Age,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
