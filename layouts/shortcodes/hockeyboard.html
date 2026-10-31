@@ -23,7 +23,7 @@
   {{- range $i, $r := .board }}
   <tr data-pi="{{ $i }}" data-pk="{{ anchorize .name }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ partial "hockeyface.html" . }}<button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "not on Tankathon's board; graded up from the 20 floor on this season's NHLe, age, weight and position, from what off-board CHL draft-eligibles became (2008-19)") }}{{ end }}{{ with .nhle }} <span class="cfb__dim" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's fitted translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "not on Tankathon's board; graded up from the 20 floor on this season's NHLe, age, weight and position, from what off-board CHL draft-eligibles became (2008-19)") }}{{ end }}{{ with .nhle }} <span class="cfb__dim" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's fitted translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</span></td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td>{{ .club }}</td>
@@ -56,7 +56,7 @@
   {{- range $i, $r := .pipe }}
   <tr data-pi="{{ $i }}" data-pk="{{ with .id }}n{{ . }}{{ else }}{{ anchorize $r.name }}{{ end }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ partial "hockeyface.html" . }}<button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .age }} <span class="cfb__dim">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ printf "%.1f" (float .) }} min TOI{{ with $r.esog }}, {{ printf "%.2f" (float .) }} shots on goal a game{{ end }}{{ end }}">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ with .age }} <span class="cfb__dim">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ printf "%.1f" (float .) }} min TOI{{ with $r.esog }}, {{ printf "%.2f" (float .) }} shots on goal a game{{ end }}{{ end }}">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</span></td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>

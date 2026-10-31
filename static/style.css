@@ -3643,6 +3643,9 @@ table.trophycase__hist td.trophycase__post {
 .pxframe--coach { width: 132px; height: 150px; }
 .pxframe img[src$="/img/face.svg"] { object-fit: contain; image-rendering: pixelated; }   /* no photo: the neutral frame */
 .cfb__name { white-space: nowrap; }
+/* a country's pixel flag in a name cell (partials/px/flag.html; the 1NT pages size their own) */
+.cfb__name .esea-flag { flex: none; width: 16px; height: 11px; margin-right: 6px; vertical-align: -1px; image-rendering: pixelated; }
+.cfb__name .esea-flag--cc { display: inline-block; width: auto; height: auto; padding: 0 3px; font-size: .7em; color: var(--win-dark); background: var(--accent); vertical-align: 1px; }
 @media (max-width: 684px) { .pxframe--row { width: 26px; height: 26px; margin-right: 6px; } .pxframe--card { width: 84px; height: 84px; } }
 
 /* staff: the coach detail row */
@@ -4058,6 +4061,16 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 
 /* hockey prospects: the secondary columns fold away on phones */
 @media (max-width: 640px) { .hk .hk__x { display: none; } }
+/* hockey prospects on phones: the player cell (photo, flag, name, line) wraps inside a narrow pinned column so the
+   numbers keep most of the screen; the table scrolls sideways with momentum and never drags the page */
+@media (max-width: 684px) {
+  .wintable__scroll:has(> table.hk) { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scroll-behavior: smooth; touch-action: pan-x pan-y; }
+  .hk td.cfb__name { white-space: normal; min-width: 44vw; width: 44vw; max-width: 44vw; }
+  .hk td.cfb__name .pxframe--row { float: left; margin: 1px 6px 0 0; }
+  .hk td.cfb__name .hk__nm { display: flow-root; }
+  .hk td.cfb__name .cfb__who { white-space: normal; text-align: left; padding-block: 6px; margin-block: -6px; }
+  .hk td.cfb__name .cfb__dim { white-space: nowrap; }
+}
 
 /* touch: every control at least 24x24 CSS px (WCAG 2.2 target size), phones and coarse pointers */
 @media (max-width: 684px), (pointer: coarse) {

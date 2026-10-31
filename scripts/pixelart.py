@@ -1034,6 +1034,45 @@ def counterstrike():
     g = Grid(16, 11); g.rect(0, 0, 16, 11, "#00008b"); g.rect(0, 0, 7, 5, "#012169"); g.rect(3, 0, 1, 5, "#ffffff"); g.rect(0, 2, 7, 1, "#ffffff")
     for (x, y) in ((3, 8), (11, 3), (13, 6), (10, 8), (12, 9)): g.set(x, y, "#ffffff")
     S["px-flag-au"] = g
+    # hockey nations (prospect boards)
+    S["px-flag-at"] = tri(False, ("#c8102e", "#ffffff", "#c8102e"))
+    S["px-flag-hu"] = tri(False, ("#ce2939", "#ffffff", "#477050"))
+    S["px-flag-lt"] = tri(False, ("#fdb913", "#006a44", "#c1272d"))
+    S["px-flag-ee"] = tri(False, ("#0072ce", "#000000", "#ffffff"))
+    S["px-flag-lv"] = tri(False, ("#9e3039", "#ffffff", "#9e3039")); S["px-flag-lv"].rect(0, 4, 16, 3, "#9e3039"); S["px-flag-lv"].rect(0, 5, 16, 1, "#ffffff")
+    S["px-flag-md"] = tri(True, ("#0046ae", "#ffd200", "#cc092f")); S["px-flag-md"].rect(7, 4, 2, 3, "#9b6a2f")
+    g = Grid(16, 11); g.rect(0, 0, 16, 6, "#ffffff"); g.rect(0, 6, 16, 5, "#d7141a")   # Czechia: blue wedge from the hoist
+    for k in range(6): g.rect(0, k, 1 + round(k * 1.4), 1, "#11457e"); g.rect(0, 10 - k, 1 + round(k * 1.4), 1, "#11457e")
+    S["px-flag-cz"] = g
+    g = tri(False, ("#ffffff", "#0b4ea2", "#ee1c25"))   # Slovakia: red shield, white double cross, blue hills
+    g.art(3, 2, ["#####", "#####", "#####", "#####", ".###.", "..#.."], {"#": "#ee1c25"})
+    g.art(4, 2, [".#.", "###", ".#.", "###", ".#."], {"#": "#ffffff"}); g.rect(4, 6, 3, 1, "#0b4ea2")
+    S["px-flag-sk"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 7, "#c8313e"); g.rect(0, 7, 16, 4, "#4aa657"); g.rect(0, 0, 3, 11, "#ffffff")   # Belarus
+    for y in range(0, 11, 2): g.set(1, y, "#c8313e")
+    S["px-flag-by"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#da291c"); g.rect(7, 2, 2, 7, "#ffffff"); g.rect(5, 4, 6, 3, "#ffffff")   # Switzerland
+    S["px-flag-ch"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#00afca"); g.disc(8, 4.5, 2.2, "#fec50c")   # Kazakhstan: sun, eagle line, hoist ornament
+    g.rect(5, 8, 7, 1, "#fec50c")
+    for y in range(1, 11, 2): g.set(1, y, "#fec50c")
+    S["px-flag-kz"] = g
+    g = tri(False, ("#ffffff", "#005da4", "#ed1c24")); g.art(3, 1, ["###", "###", "#.#", ".#."], {"#": "#005da4"}); g.set(4, 2, "#ffffff")   # Slovenia
+    S["px-flag-si"] = g
+    g = tri(False, ("#ff0000", "#ffffff", "#171796"))   # Croatia: checkered shield
+    for y in range(3, 8):
+        for x in range(6, 10): g.set(x, y, "#ff0000" if (x + y) % 2 else "#ffffff")
+    S["px-flag-hr"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#ee1c25"); g.art(1, 1, [".#.", "###", ".#."], {"#": "#ffff00"})   # China
+    for (x, y) in ((5, 1), (6, 2), (6, 4), (5, 5)): g.set(x, y, "#ffff00")
+    S["px-flag-cn"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#ffffff"); g.disc(8, 5.5, 3, "#bc002d")   # Japan
+    S["px-flag-jp"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 5, "#e03c31"); g.rect(0, 6, 16, 5, "#001489"); g.rect(0, 4, 16, 3, "#ffffff")   # South Africa
+    g.rect(0, 5, 16, 1, "#007749")
+    for k in range(6): g.rect(0, k, 1 + k, 1, "#007749"); g.rect(0, 10 - k, 1 + k, 1, "#007749")
+    for k in range(4): g.rect(0, 2 + k, 1 + k, 1, "#000000"); g.rect(0, 8 - k, 1 + k, 1, "#000000")
+    S["px-flag-za"] = g
     # sub: two swap arrows in a chip (a substitute in a box score)
     g = Grid(11, 11)
     g.rect(0, 0, 11, 11, "#ffd166"); g.rect(0, 10, 11, 1, "#b8860b"); g.rect(10, 0, 1, 11, "#b8860b")

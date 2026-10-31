@@ -73,6 +73,28 @@ FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
 NHLE_K = 20
 GOALIE_GP = 50          # NHL games in the window before a goalie's GSAx sets his outcome (FV audit, Oct 26 2026)
 PROV_SHOW = 22          # provisional rows on the board table: graded above the floor
+# nationality -> lowercase ISO 2 (the pixel flag's id, partials/px/flag.html): the NHL API gives ISO 3, Liiga IOC codes,
+# HockeyTech country names, Tankathon the flag file's ISO 2
+NAT = {'CAN': 'ca', 'USA': 'us', 'SWE': 'se', 'RUS': 'ru', 'FIN': 'fi', 'CZE': 'cz', 'SVK': 'sk', 'BLR': 'by', 'DEU': 'de',
+       'GER': 'de', 'CHE': 'ch', 'SUI': 'ch', 'LVA': 'lv', 'LAT': 'lv', 'NOR': 'no', 'KAZ': 'kz', 'AUT': 'at', 'DNK': 'dk',
+       'DEN': 'dk', 'CHN': 'cn', 'ITA': 'it', 'SVN': 'si', 'SLO': 'si', 'GBR': 'gb', 'UKR': 'ua', 'POL': 'pl', 'FRA': 'fr',
+       'ZAF': 'za', 'AUS': 'au', 'HRV': 'hr', 'CRO': 'hr', 'HUN': 'hu', 'MDA': 'md', 'EST': 'ee', 'LTU': 'lt', 'JPN': 'jp',
+       'KOR': 'kr', 'NLD': 'nl', 'NED': 'nl', 'BEL': 'be', 'CYM': 'ky', 'CAY': 'ky',
+       'Canada': 'ca', 'United States': 'us', 'USA': 'us', 'Sweden': 'se', 'Russia': 'ru', 'Finland': 'fi', 'Czechia': 'cz',
+       'Czech Republic': 'cz', 'Slovakia': 'sk', 'Belarus': 'by', 'Germany': 'de', 'Switzerland': 'ch', 'Latvia': 'lv',
+       'Norway': 'no', 'Kazakhstan': 'kz', 'Austria': 'at', 'Denmark': 'dk', 'China': 'cn', 'Italy': 'it', 'Slovenia': 'si',
+       'United Kingdom': 'gb', 'Great Britain': 'gb', 'England': 'gb', 'Scotland': 'gb', 'Ukraine': 'ua', 'Poland': 'pl',
+       'France': 'fr', 'South Africa': 'za', 'Australia': 'au', 'Croatia': 'hr', 'Hungary': 'hu', 'Moldova': 'md',
+       'Estonia': 'ee', 'Lithuania': 'lt', 'Japan': 'jp', 'South Korea': 'kr', 'Netherlands': 'nl', 'Belgium': 'be',
+       'Cayman Islands': 'ky'}
+
+
+def nat(c):
+    """a country as the source gives it -> lowercase ISO 2, or None"""
+    c = (c or '').strip()
+    if not c:
+        return None
+    return NAT.get(c) or NAT.get(c.upper()) or (c.lower() if re.fullmatch(r'[a-z]{2}', c) else None)
 CUTS = [(80, 0.25), (75, 0.5), (70, 1), (65, 2), (60, 5), (55, 10), (50, 20), (45, 30), (40, 45)]   # FV, picks a class
 
 # NHLe hand constants: NHL points a point in each league (public translation factors; Tankathon's for the CHL and NCAA).
@@ -733,7 +755,8 @@ def tankathon():
                     'club': club.strip().replace('&amp;', '&'), 'league': (g(r'league-name">([^<]*)') or '').replace('\u2011', '-'),
                     'ht': hti, 'wt': int(g(r'class="weight">(\d+)')) if g(r'class="weight">(\d+)') else None,
                     'birth': f"{yr[0]}-{mon.get(mo, 6):02d}-15" if yr else None,
-                    'gp': num('GAMES'), 'g': num('GOALS'), 'a': num('ASSISTS'), 'p': num('POINTS')})
+                    'gp': num('GAMES'), 'g': num('GOALS'), 'a': num('ASSISTS'), 'p': num('POINTS'),
+                    'nat': nat(g(r'mock-row-logo">\s*<img[^>]*/flags/([a-z]{2})-'))})
     return year, out
 
 
@@ -854,7 +877,7 @@ def build():
         board.append({'rk': t['rk'], 'name': t['name'], 'pos': 'D' if r['D'] else t['pos'], 'posFull': t['posFull'], 'club': t['club'],
                       'league': t['league'], 'grp': group_of(lg), 'ht': t['ht'], 'wt': t['wt'], 'age': round(r['age'], 1) if r['age'] else None,
                       'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None else None, 'nhle': round(nh_raw, 1) if nh_raw is not None else None,
-                      'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                      'nat': t.get('nat'), 'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
                       'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
     # provisional grades (Oct 25 2026): draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board,
     # graded up from the 20 floor (scripts/hockey_provisional.py) and ranked with the board; the table shows those above
@@ -890,6 +913,7 @@ def build():
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
         etoi, esog = euro_line(r, r['year'] + k, (q or {}).get('lg'))
         pipe.append({'name': r['name'], 'id': r['id'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
+                     'nat': nat(r.get('country')),
                      'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
                      'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,

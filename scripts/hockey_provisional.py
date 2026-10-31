@@ -86,6 +86,19 @@ def _flip(s):
     return f'{b} {a}'.strip() if sep else s
 
 
+CA_PROV = {'AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT'}
+US_ST = set('AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK '
+            'OR PA RI SC SD TN TX UT VA VT WA WI WV WY'.split())
+
+
+def ht_nat(p):
+    """a HockeyTech player's country (the flag only, not a model input): home country, else birth country, else the
+    home province or state (WHL rows often leave the country blank; a 3-letter province is a country code)"""
+    pv = (p.get('homeprov') or '').strip().upper()
+    return (p.get('homecntry') or p.get('birthcntry') or ('Canada' if pv in CA_PROV else 'United States' if pv in US_ST else pv)
+            or None)
+
+
 def ht_players(d, lg):
     out = []
     for p in d or []:
@@ -95,7 +108,7 @@ def ht_players(d, lg):
         out.append({'name': _flip(p.get('name') or f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()), 'birth': _birth(p.get('birthdate')),
                     'pos': 'D' if p.get('position') == 'D' else 'F', 'ht': _ht(p.get('height')), 'wt': _num(p.get('weight')) or None,
                     'gp': _num(p.get('games_played')), 'pts': _num(p.get('points')), 'g': _num(p.get('goals')), 'lg': lg,
-                    'club': _flip(p.get('team_name')), 'pid': p.get('player_id'),
+                    'club': _flip(p.get('team_name')), 'pid': p.get('player_id'), 'nat': ht_nat(p),
                     'C': int(p.get('position') == 'C'), 'shoots': p.get('shoots') or None, 'rookie': int(p.get('rookie') == '1'),
                     'imp': int(bool(cn) and cn not in ('Canada', 'United States')), 'ppp': _num(p.get('power_play_points')),
                     'shp': _num(p.get('short_handed_points')), 'pm': _num(p.get('plus_minus')), 'pim': _num(p.get('penalty_minutes')),
@@ -387,7 +400,7 @@ def liiga_current(season_end):
         out.append({'name': f"{p.get('firstName', '')} {p.get('lastName', '')}".strip(), 'birth': info.get('birth'),
                     'pos': 'D' if (p.get('role') or '').endswith('P') else 'F', 'ht': info.get('ht'), 'wt': info.get('wt'),
                     'shoots': info.get('shoots'), 'gp': float(p['playedGames']), 'pts': float(p.get('points') or 0),
-                    'g': float(p.get('goals') or 0), 'lg': 'Liiga', 'club': p.get('teamName')})
+                    'g': float(p.get('goals') or 0), 'lg': 'Liiga', 'club': p.get('teamName'), 'nat': p.get('nationality')})
     return out
 
 
@@ -441,6 +454,7 @@ def live(year, board, rows):
         parts = [[k, round(b[k] * (f[k] - P['mean'][k]), 2)] for k in P['kept'] if abs(b[k] * (f[k] - P['mean'][k])) >= .05]
         age = H.age_at(p['birth'], year) if p['birth'] else None
         out.append({'rk': None, 'name': p['name'], 'pos': p['pos'], 'posFull': p['pos'], 'club': p['club'], 'league': p['lg'],
+                    'nat': H.nat(p.get('nat')),
                     'grp': H.group_of(p['lg']), 'ht': p.get('ht'), 'wt': int(p['wt']) if p.get('wt') else None,
                     'age': round(age, 1) if age else None, 'gp': int(p['gp']), 'pts': int(p['pts']),
                     'pm': int(p['pm']) if p.get('pm') is not None else None, 'pim': int(p['pim']) if p.get('pim') is not None else None,
