@@ -1,6 +1,9 @@
 (function () {
   if (window.__arkTf) return; window.__arkTf = true;
   function txt(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim(); }
+  // search ignores accents and letters with no plain form, so "yildiz" finds Yıldız and "odegaard" Ødegaard (same folds as partials/namekey.html)
+  var LET = { 'ø': 'o', 'Ø': 'o', 'ł': 'l', 'Ł': 'l', 'đ': 'd', 'Đ': 'd', 'ð': 'd', 'þ': 'th', 'ß': 'ss', 'æ': 'ae', 'Æ': 'ae', 'œ': 'oe', 'Œ': 'oe', 'ı': 'i', 'ħ': 'h' };
+  function fold(s) { return String(s).replace(/[øØłŁđĐðþßæÆœŒıħ]/g, function (c) { return LET[c]; }).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
   function num(s, isHt) {   // "#12" -> 12, "45+" -> 45.5, "6'2\"" or "L-6'2/180" -> 74 (height columns), "$1.2M" or "INT/$998k" -> dollars
     var h = isHt && /(\d)['-](\d{1,2}(?:\.\d+)?)/.exec(s); if (h) return h[1] * 12 + +h[2];
     var $ = /\$([\d.]+)\s*([KM]?)/i.exec(s); if ($) return +$[1] * ($[2].toUpperCase() === 'M' ? 1e6 : $[2] ? 1e3 : 1);
@@ -69,9 +72,9 @@
       }
       // FV dropdown means "at least": 50 keeps 50, 50+, 55…
       function apply() {
-        var q = bar.elements.q.value.trim().toLowerCase(), n = 0, amax = ageSel ? parseFloat(ageSel.value) : NaN;
+        var q = fold(bar.elements.q.value.trim()), n = 0, amax = ageSel ? parseFloat(ageSel.value) : NaN;
         rows.forEach(function (r) {
-          var ok = (!q || txt(r).toLowerCase().indexOf(q) >= 0) && (!day || r.dataset.day === day);
+          var ok = (!q || fold(txt(r)).indexOf(q) >= 0) && (!day || r.dataset.day === day);
           sels.forEach(function (s) {
             if (!ok || !s.el.value) return;
             var v = s.attr ? r.getAttribute(s.attr) || '' : txt(r.cells[s.c]);
