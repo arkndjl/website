@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T15:24:03Z",
+ "asof": "2026-10-31T16:14:05Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 108.7,
   "peak": 109.8,
   "drawdown": 0.01,
-  "open": 77.25,
+  "open": 79.25,
   "path": [
    101.5,
    101.6,
@@ -41,12 +41,12 @@
   ]
  },
  "record": {
-  "n": 97,
-  "clvN": 35,
-  "clvRet": -0.0149,
-  "clvT": -1.68,
-  "clv": -0.03,
-  "beat": 0.233,
+  "n": 99,
+  "clvN": 37,
+  "clvRet": -0.0158,
+  "clvT": -1.87,
+  "clv": -0.09,
+  "beat": 0.219,
   "settled": 29,
   "w": 20,
   "l": 9,
@@ -57,28 +57,28 @@
   "risked": 34.0,
   "yield": 0.255
  },
- "tEff": -1.68,
+ "tEff": -1.88,
  "corr": {
   "rho": 0.0,
-  "n": 35,
+  "n": 37,
   "slates": 8,
-  "nEff": 35.0,
-  "avgSlate": 4.38
+  "nEff": 37.0,
+  "avgSlate": 4.62
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 35,
+   "value": 37,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.5% t -1.68",
+   "value": "-1.6% t -1.88",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "23%",
+   "value": "22%",
    "pass": false
   },
   {
@@ -183,12 +183,12 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 25,
-   "clvN": 20,
-   "clvRet": -0.0128,
-   "clvT": -1.5,
-   "clv": 0.2,
-   "beat": 0.25,
+   "n": 26,
+   "clvN": 22,
+   "clvRet": -0.0145,
+   "clvT": -1.85,
+   "clv": 0.1,
+   "beat": 0.227,
    "settled": 14,
    "w": 11,
    "l": 3,
@@ -204,7 +204,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 50,
+   "n": 51,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -409,7 +409,11 @@
    "edge": 5.1,
    "ev": 0.0033,
    "event": "Erste Bank Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.026,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.2925
   },
   {
    "rule": "tennis-ml",
@@ -429,7 +433,11 @@
    "edge": 10.3,
    "ev": 0.006,
    "event": "Swiss Indoors Basel",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0375,
+   "clv": -1.5,
+   "beat": -1,
+   "close": 0.65
   },
   {
    "rule": "nba-total",
@@ -1223,7 +1231,7 @@
    "edge": 11.8,
    "ev": 0.0573,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1931,6 +1939,46 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186444",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Aguilar",
+   "a": "Blockx",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 133,
+   "bet": "Aguilar ML +133",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 1.5,
+   "edge": 10.7,
+   "ev": 0.0214,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186446",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Rinderknech",
+   "a": "Cerundolo",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 203,
+   "bet": "Rinderknech ML +203",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 0.25,
+   "edge": 9.0,
+   "ev": 0.0026,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186453",
    "k": "2026-11-02T05:00:00Z",
    "slate": "tennis:2026-11-02",
@@ -1966,7 +2014,7 @@
    "edge": 4.4,
    "ev": 0.0015,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nfl-total",
@@ -4416,7 +4464,11 @@
    "edge": 5.1,
    "ev": 0.0033,
    "event": "Erste Bank Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.026,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.2925
   },
   {
    "rule": "tennis-ml",
@@ -4436,7 +4488,11 @@
    "edge": 10.3,
    "ev": 0.006,
    "event": "Swiss Indoors Basel",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0375,
+   "clv": -1.5,
+   "beat": -1,
+   "close": 0.65
   },
   {
    "rule": "nba-total",
@@ -5230,7 +5286,7 @@
    "edge": 11.8,
    "ev": 0.0573,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -5938,6 +5994,46 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186444",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Aguilar",
+   "a": "Blockx",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 133,
+   "bet": "Aguilar ML +133",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 1.5,
+   "edge": 10.7,
+   "ev": 0.0214,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186446",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Rinderknech",
+   "a": "Cerundolo",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 203,
+   "bet": "Rinderknech ML +203",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 0.25,
+   "edge": 9.0,
+   "ev": 0.0026,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186453",
    "k": "2026-11-02T05:00:00Z",
    "slate": "tennis:2026-11-02",
@@ -5973,7 +6069,7 @@
    "edge": 4.4,
    "ev": 0.0015,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nfl-total",
