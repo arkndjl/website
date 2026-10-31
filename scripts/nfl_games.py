@@ -19,7 +19,8 @@ Margin (home minus away, points) is a linear model on:
     inj     injuries, away minus home: each non-QB on the game status report at his WAR a game (nfl_war.py, to that
             week) x 36 points a win x his chance to miss by status (2016-25 reports against snap counts). This week's
             reports merge the league's report, ESPN's and Rotoballer's news, latest item first; a questionable QB
-            starts at his chance to play, his backup in for the rest
+            starts at his chance to play, his backup in for the rest. A questionable non-QB on the league's report is
+            priced by how he practised on the last day (PRACTICE_Q, Nov 1 2026)
             Tested Oct 2026 and not kept: returning players (missed the team's last game, active again, at WAR a game x
             P(plays)), all of them or only those listed out or doubtful the week before: walk-forward MAE worse in
             2017-20 (t +1.6, +1.1), better in 2021-25 (t -1.2, -1.3), so no consistent gain
@@ -332,9 +333,25 @@ INJ_FIRST = 2016      # nflverse game status reports and snap counts start here
 GONE = {'Injured Reserve', 'Physically Unable to Perform', 'Non Football Injury', 'Suspended', 'Out (season)'}
 
 
-def play_prob(status, recent=True):
+# a questionable non-QB's chance to play by his last practice that week (nflverse game status reports x snap counts,
+# 2016-25; Nov 1 2026 sweep, scripts/sweep_nov01/nfl_practice.py): (practice, played the team's last game) -> P(plays).
+# Fit on 2016-20, held 2021-25 player Brier .2080 vs .2202 for the flat .75/.5 (t -5.8); game model MAE better in both
+# periods (2017-20 -.010, t -1.25; 2021-25 -.004, t -0.7), and the change also predicts result minus the close (b 2.3, t 1.6;
+# 3.7, t 2.5): the close prices practice news only in part. Pooled 2016-25 rates
+PRACTICE_Q = {('dnp', True): 0.48, ('limited', True): 0.76, ('full', True): 0.90,
+              ('dnp', False): 0.23, ('limited', False): 0.55, ('full', False): 0.70}
+
+
+def practice_of(s):
+    """'dnp', 'limited', 'full' or None from the report's practice_status"""
+    s = (s or '').strip().lower()
+    return 'full' if s.startswith('full') else 'limited' if s.startswith('limited') else 'dnp' if s.startswith('did not') else None
+
+
+def play_prob(status, recent=True, practice=None):
     """Chance a listed player plays. Out 0; doubtful .02, questionable .75 for a player who played the team's last
-    game and .5 for one who didn't (2016-25 game status reports against snap counts: 1.6%, 75% and 51%); probable .95
+    game and .5 for one who didn't (2016-25 game status reports against snap counts: 1.6%, 75% and 51%), or by his last
+    practice when the league's report gives it (PRACTICE_Q: did not participate .48, limited .76, full .90); probable .95
     (news only: the league dropped the designation in 2016); last week's designation before this week's report, CARRY.
     Players on IR, PUP or suspended are off the roster: the team's ratings already carry the games without them, as in
     the weekly reports, which don't list them."""
@@ -347,6 +364,9 @@ def play_prob(status, recent=True):
     if status == 'Doubtful':
         return 0.02
     if status == 'Questionable':
+        q = PRACTICE_Q.get((practice, bool(recent)))
+        if q is not None:
+            return q
         return 0.75 if recent else 0.5
     if status == 'Probable':
         return 0.95
@@ -364,7 +384,7 @@ def injury_history(games, years, live=None):
     the loss; continuing: he missed it too. Each player's value is his WAR a game to that week (nfl_war.py's model,
     no look-ahead), costed at 1 - P(plays) by his status on the game status report."""
     import nfl_war as W
-    cp = os.path.join(CACHE, 'inj_hist_v1.json')
+    cp = os.path.join(CACHE, 'inj_hist_v2.json')      # v2: questionable by last practice (Nov 1 2026)
     try:
         cache = json.load(open(cp))
     except (OSError, ValueError):
@@ -379,7 +399,7 @@ def injury_history(games, years, live=None):
         rep = defaultdict(list)
         for r in rows(get(f'injuries_{y}.csv', f'{REL}/injuries/injuries_{y}.csv')):
             if r['report_status'] and r['position'] != 'QB':
-                rep[(team(r['team']), int(r['week']))].append((r['gsis_id'], r['report_status']))
+                rep[(team(r['team']), int(r['week']))].append((r['gsis_id'], r['report_status'], practice_of(r['practice_status'])))
         sg = [g for g in games if int(g['season']) == y and g['home_score'] not in ('', 'NA')]
         last_wk = {}
         out = {}
@@ -390,14 +410,14 @@ def injury_history(games, years, live=None):
                 t = team(g[f'{side}_team'])
                 pw = last_wk.get(t)
                 fresh = cont = 0.0
-                for gsis, stt in rep.get((t, w), []):
+                for gsis, stt, prac in rep.get((t, w), []):
                     L = led[min(w, 19, top + 1)]
                     v = player_value(prev.get(gsis, (0.0, 0)), L.get(gsis, (0.0, 0)))
                     if pw is None or pw >= 18 or w > 18:
                         played = True
                     else:
                         played = led[pw + 1].get(gsis, (0, 0))[1] > led[pw].get(gsis, (0, 0))[1]
-                    c = (1 - play_prob(stt, played)) * max(v, 0.0) * PTS_PER_WIN
+                    c = (1 - play_prob(stt, played, prac)) * max(v, 0.0) * PTS_PER_WIN
                     if played:
                         fresh += c
                     else:
@@ -634,7 +654,8 @@ def live_injuries(last, week, games):
                 e = {'status': 'Physically Unable to Perform' if r.get('status_description_abbr') == 'R04' else 'Injured Reserve', 'src': 'roster', 'ts': 0.0}
             elif L and L['report_status']:
                 late = v and v['firm'] and v['ts'] > max(asof, ko.get(t, 0) - LATE)
-                e = v if late else {'status': L['report_status'], 'src': 'league', 'ts': asof}
+                e = v if late else {'status': L['report_status'], 'src': 'league', 'ts': asof,
+                                    'prac': practice_of(L.get('practice_status'))}
             elif R and (final or not L or L['practice_status'].startswith('Full')):
                 e = v if fresh else {'status': 'Active', 'src': 'league', 'ts': asof}
             else:
@@ -689,7 +710,7 @@ def injury_costs(last, week, games, coef):
                 rec_ = cur.get(gsis, (0, 0))[1] > before[pw].get(gsis, (0, 0))[1]
             else:
                 rec_ = True
-            miss = 1 - play_prob(p['status'], rec_)
+            miss = 1 - play_prob(p['status'], rec_, p.get('prac'))
             v = max(player_value(prev.get(gsis, (0.0, 0)), cur.get(gsis, (0.0, 0))), 0.0)
             raw = miss * v * PTS_PER_WIN
             if v > 0:
