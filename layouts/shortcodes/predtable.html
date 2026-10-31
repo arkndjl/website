@@ -1,0 +1,80 @@
+{{- /* Every prediction on the picks tab (Noah, Oct 31 2026: "a full table of every graded prediction ... auto-sorted by
+       edge"): each upcoming game's spread, total and moneyline that has a market price, picks or not, one row per market
+       on the side the model favours, sorted by Edge % (the model's chance for that side minus the market's).
+       Spreads and totals: the model's chance = Phi(points off the line / the model's error sd) against 50%; sd from each
+       games file (NFL total sd from nfl_games_fit.json; CFB from the game's own simulation, 10th-90th percentile;
+       NHL total: Poisson, sd = sqrt(model total)). Moneylines: model win chance against the no-vig price. Raw model
+       chances, before the pick calibration, so they read high next to the picks' calibrated chances. */ -}}
+{{- $num := `^[+-]?[0-9]+(\.[0-9]+)?$` -}}
+{{- $raw := slice -}}
+{{- with site.Data.cfb_games }}{{ range .games }}{{ $g := . }}{{ with .proj }}
+{{- $sd := 15.0 }}{{ $tsd := 15.0 }}{{ with .sim }}{{ if and .m10 .m90 }}{{ $sd = div (sub (float .m90) (float .m10)) 2.5631 }}{{ end }}{{ if and .t10 .t90 }}{{ $tsd = div (sub (float .t90) (float .t10)) 2.5631 }}{{ end }}{{ end }}
+{{- $raw = $raw | append (dict "sp" "CFB" "s" "cfb" "id" $g.id "kick" $g.date "h" $g.home.name "a" $g.away.name "p" $g.pHome "m" .margin "L" (cond (ne $g.market nil) (mul -1.0 (float ($g.market | default 0))) nil) "t" .total "T" $g.total "sd" $sd "tsd" $tsd "mh" (partial "mlpair.html" (dict "ml" $g.ml "s" "home")) "ma" (partial "mlpair.html" (dict "ml" $g.ml "s" "away"))) }}
+{{- end }}{{ end }}{{ end -}}
+{{- with site.Data.nfl_games }}{{ $sd := .sd }}{{ $tsd := site.Data.nfl_games_fit.tsd | default 13.5 }}{{ range .games }}{{ if not .final }}
+{{- $raw = $raw | append (dict "sp" "NFL" "s" "nfl" "id" .id "kick" .kick "h" .home "a" .away "p" .pHome "m" .margin "L" .line "t" .total "T" .tline "sd" $sd "tsd" $tsd "mh" (partial "mlpair.html" (dict "ml" .ml "s" "home")) "ma" (partial "mlpair.html" (dict "ml" .ml "s" "away"))) }}
+{{- end }}{{ end }}{{ end -}}
+{{- with site.Data.cbb_games }}{{ $sd := .sd }}{{ $tsd := .tsd }}{{ range .games }}{{ if not .final }}
+{{- $raw = $raw | append (dict "sp" "CBB" "s" "cbb" "id" .id "kick" .kick "h" (.home.ab | default .home.n) "a" (.away.ab | default .away.n) "p" .pHome "m" .margin "L" .line "t" .total "T" .tline "sd" $sd "tsd" $tsd "mh" (partial "mlpair.html" (dict "ml" .ml "s" "home")) "ma" (partial "mlpair.html" (dict "ml" .ml "s" "away"))) }}
+{{- end }}{{ end }}{{ end -}}
+{{- with site.Data.nba_games }}{{ $sd := .sd }}{{ $tsd := .tsd }}{{ range .games }}{{ if not .final }}
+{{- $raw = $raw | append (dict "sp" "NBA" "s" "nba" "id" .id "kick" .tip "h" .home "a" .away "p" .pHome "m" .margin "L" .line "t" .total "T" .tline "sd" $sd "tsd" $tsd "mh" (partial "mlpair.html" (dict "ml" .ml "s" "home")) "ma" (partial "mlpair.html" (dict "ml" .ml "s" "away"))) }}
+{{- end }}{{ end }}{{ end -}}
+{{- with site.Data.nhl_games }}{{ range .games }}{{ if not .final }}
+{{- $raw = $raw | append (dict "sp" "NHL" "s" "nhl" "id" .id "kick" .tip "h" .home "a" .away "p" .pHome "m" nil "L" nil "t" .total "T" .tline "sd" 1.0 "tsd" (math.Sqrt (float (.total | default 6))) "mh" (partial "mlpair.html" (dict "ml" .ml "s" "home")) "ma" (partial "mlpair.html" (dict "ml" .ml "s" "away"))) }}
+{{- end }}{{ end }}{{ end -}}
+{{- with site.Data.tennis }}{{ range .matches }}{{ if and (eq .state "pre") .nv .p }}
+{{- $raw = $raw | append (dict "sp" "Tennis" "s" "tennis" "id" .id "kick" .tip "h" (index (last 1 (split .b.n " ")) 0) "a" (index (last 1 (split .a.n " ")) 0) "p" (sub 1 (float .p)) "m" nil "L" nil "t" nil "T" nil "sd" 1.0 "tsd" 1.0 "mh" (index .nv.o 1) "ma" (index .nv.o 0) "v" true) }}
+{{- end }}{{ end }}{{ end -}}
+{{- /* open picks (not passes), keyed sport|game|market|side, for the Kelly % column */ -}}
+{{- $pk := dict }}{{ range slice "cfb" "nfl" "cbb" "nba" "tennis" }}{{ with index site.Data (printf "games_picks_%s" .) }}{{ range .picks }}{{ if not .pass }}{{ $pk = merge $pk (dict (lower (printf "%s|%v|%s|%s" .sport .id .mk .side)) .units) }}{{ end }}{{ end }}{{ end }}{{ end -}}
+{{- $rows := slice -}}
+{{- range $raw }}{{ $r := . }}
+{{- if and .kick (gt (time .kick).Unix now.Unix) }}
+{{- /* spread: L and m are the home side's expected margin */ -}}
+{{- if and (ne .m nil) (ne .L nil) }}{{ $d := sub (float .m) (float .L) }}{{ if ne $d 0.0 }}
+{{- $home := gt $d 0.0 }}{{ $pm := partial "normcdf.html" (div (math.Abs $d) (float .sd)) }}{{ $hl := mul -1.0 (float .L) }}
+{{- $rows = $rows | append (dict "r" $r "mk" "spread" "side" (cond $home "home" "away") "bet" (printf "%s %s" (cond $home .h .a) (cond (eq $hl 0.0) "pk" (printf "%+g" (cond $home $hl (mul -1.0 $hl))))) "model" (printf "%+.1f" (cond $home (mul -1.0 (float .m)) (float .m))) "edge" (printf "%.1f pts" (math.Abs $d)) "pm" $pm "q" 0.5 "e" (sub $pm 0.5)) }}
+{{- end }}{{ end }}
+{{- /* total */ -}}
+{{- if and (ne .t nil) (ne .T nil) }}{{ $d := sub (float .t) (float .T) }}{{ if ne $d 0.0 }}
+{{- $over := gt $d 0.0 }}{{ $pm := partial "normcdf.html" (div (math.Abs $d) (float .tsd)) }}
+{{- $rows = $rows | append (dict "r" $r "mk" "total" "side" (cond $over "over" "under") "bet" (printf "%s %g" (cond $over "over" "under") (float .T)) "model" (printf (cond (eq .sp "NHL") "%.2f" "%.1f") (float .t)) "edge" (printf (cond (eq .sp "NHL") "%.2f gls" "%.1f pts") (math.Abs $d)) "pm" $pm "q" 0.5 "e" (sub $pm 0.5)) }}
+{{- end }}{{ end }}
+{{- /* moneyline: model win chance against the no-vig price */ -}}
+{{- $mh := printf "%v" (.mh | default "") }}{{ $ma := printf "%v" (.ma | default "") }}
+{{- if and .p (findRE $num $mh) (findRE $num $ma) }}{{ $oh := float $mh }}{{ $oa := float $ma }}
+{{- if and (ge (math.Abs $oh) 100.0) (ge (math.Abs $oa) 100.0) }}
+{{- $ih := div (math.Abs $oh) (add (math.Abs $oh) 100.0) }}{{ if gt $oh 0.0 }}{{ $ih = div 100.0 (add $oh 100.0) }}{{ end }}
+{{- $ia := div (math.Abs $oa) (add (math.Abs $oa) 100.0) }}{{ if gt $oa 0.0 }}{{ $ia = div 100.0 (add $oa 100.0) }}{{ end }}
+{{- $qh := div $ih (add $ih $ia) }}{{ $ph := float .p }}{{ $d := sub $ph $qh }}{{ if ne $d 0.0 }}
+{{- $home := gt $d 0.0 }}{{ $o := cond $home $oh $oa }}{{ $pm := cond $home $ph (sub 1.0 $ph) }}{{ $q := cond $home $qh (sub 1.0 $qh) }}
+{{- $fair := 0.0 }}{{ if ge $pm 0.5 }}{{ $fair = div (mul -100.0 $pm) (sub 1.0 $pm) }}{{ else }}{{ $fair = div (mul 100.0 (sub 1.0 $pm)) $pm }}{{ end }}
+{{- $rows = $rows | append (dict "r" $r "mk" "ML" "side" (cond $home "home" "away") "bet" (printf "%s %+.0f" (cond $home .h .a) $o) "model" (printf "%+.0f" $fair) "edge" (printf "%.1f%%" (mul 100 (math.Abs $d))) "pm" $pm "q" $q "e" (math.Abs $d)) }}
+{{- end }}{{ end }}{{ end }}
+{{- end }}{{ end -}}
+{{- with $rows }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "every prediction :: by edge") "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab") "rerank" true) -}}
+<table class="cfb__table cfbm__t tstick">
+  <thead><tr><th>RK</th><th title="the side the model favours against the market, at the market's line or price">Bet</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="the model's line, total or fair moneyline for that side">Model</th><th title="model minus market: points for spreads and totals, % for moneylines">Edge</th><th title="the model's chance for that side">Model %</th><th title="the market's chance: 50% for spreads and totals, the no-vig price for moneylines">Mkt %</th><th title="model % minus market %">Edge %</th><th title="stake when this market is an open pick, % of bankroll">Kelly %</th></tr></thead>
+  <tbody>
+  {{- range $i, $x := sort . "e" "desc" }}{{ with $x }}{{ $k := time.In "America/New_York" (time .r.kick) }}{{ $u := index $pk (lower (printf "%s|%v|%s|%s" .r.s .r.id (cond (eq .mk "ML") "ml" .mk) .side)) }}
+  <tr data-day="{{ $k.Format "2006-01-02" }}">
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td>{{ if $u }}<b>{{ .bet }}</b>{{ else }}{{ .bet }}{{ end }}</td>
+    <td>{{ .r.sp }}</td>
+    <td>{{ .mk }}</td>
+    <td class="cfb__dim">{{ .r.a }} {{ if .r.v }}v{{ else }}@{{ end }} {{ .r.h }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
+    <td class="cfb__num">{{ .model }}</td>
+    <td class="cfb__num">{{ .edge }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (mul .pm 100) }}%</td>
+    <td class="cfb__num">{{ printf "%.1f" (mul .q 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .e }}"><b>{{ printf "%+.1f" (mul .e 100) }}</b></td>
+    <td class="cfb__num" data-v="{{ $u | default 0 }}">{{ with $u }}<b>{{ . }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+  </tr>
+  {{- end }}{{ end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "tennis") "note" "predictions, not picks; bold = open pick" "about" "Every upcoming spread, total and moneyline with a market price, picks or not, on the side the model favours, sorted by Edge % (model chance minus market chance). Spreads and totals: model chance from points off the line over each model's error sd, against 50%. Moneylines: model win chance against the no-vig price. Raw model chances, before the pick calibration. Prices: DraftKings via ESPN (tennis: Novig). Soccer and Counter-Strike have no market here.") -}}
+{{- end -}}

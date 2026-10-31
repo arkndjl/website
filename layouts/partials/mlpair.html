@@ -1,0 +1,3 @@
+{{- /* one side's moneyline from a nullable {home, away} map: dict "ml" "s" ("home"/"away"); "" when missing */ -}}
+{{- $v := "" }}{{ with .ml }}{{ with index . $.s }}{{ $v = printf "%v" . }}{{ end }}{{ end -}}
+{{- return $v -}}
