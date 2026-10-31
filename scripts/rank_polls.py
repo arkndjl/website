@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pull the AP and Coaches polls for college football and college basketball from ESPN's core API (free) into
-scripts/data/polls/<sport>.json: every weekly release, its date and the ranked teams' ESPN ids, plus an id -> team
-name map in the game files' spelling. scripts/rank_odds.py --record scores ARK against them.
+scripts/data/polls/<sport>.json: every weekly release, its date and the ranked teams' ESPN ids, with each team's points
+(receiving-votes teams under 'others') and ESPN's lastUpdated stamp, plus an id -> team name map in the game files' spelling. scripts/rank_odds.py --record scores ARK against them.
 
     python3 scripts/rank_polls.py cbb 2016 2026
     python3 scripts/rank_polls.py cfb 2025 2026     # a cross-check only; the CFB record is scripts/cfb_rank.mjs evidence.vsPolls
@@ -38,7 +38,8 @@ def main(sport, y0, y1, only=None):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     out = json.load(open(path)) if os.path.exists(path) else {'releases': [], 'names': {}}
     out['releases'] = [r for r in out['releases'] if r.get('date')]
-    have = {(r['S'], r['poll'], r['type'], r['week']) for r in out['releases']}
+    have = {(r['S'], r['poll'], r['type'], r['week']) for r in out['releases'] if 'others' in r}   # older pulls lack points: pull again
+    out['releases'] = [r for r in out['releases'] if 'others' in r or r['poll'] not in polls.values()]
     core = f'https://sports.core.api.espn.com/v2/sports/{LG[sport]}'
     for S in range(y0, y1 + 1):
         out['releases'] = [r for r in out['releases'] if r['S'] != y1 or S != y1]
@@ -52,11 +53,14 @@ def main(sport, y0, y1, only=None):
                     d = get(f'{core}/seasons/{S}/types/{typ}/weeks/{w}/rankings/{pid}')
                     if not d or not d.get('ranks'):
                         continue
-                    ranks = [{'rk': x['current'], 'id': x['team']['$ref'].split('/teams/')[1].split('?')[0]} for x in d['ranks']]
+                    tid = lambda x: x['team']['$ref'].split('/teams/')[1].split('?')[0]
+                    ranks = [{'rk': x['current'], 'id': tid(x), 'pts': x.get('points')} for x in d['ranks']]
+                    others = [{'id': tid(x), 'pts': x.get('points')} for x in d.get('others') or [] if x.get('points')]   # receiving votes
                     date = d.get('date')
                     if not date:                   # older releases (2016) carry no date: the poll week's start
                         date = (get(f'{core}/seasons/{S}/types/{typ}/weeks/{w}') or {}).get('startDate')
-                    out['releases'].append({'S': S, 'poll': poll, 'type': typ, 'week': w, 'date': date, 'ranks': ranks})
+                    out['releases'].append({'S': S, 'poll': poll, 'type': typ, 'week': w, 'date': date, 'upd': d.get('lastUpdated'),
+                                            'ranks': ranks, 'others': others})
             print(sport, S, typ, len([r for r in out['releases'] if r['S'] == S]), flush=True)
     teams = get(f'https://site.api.espn.com/apis/site/v2/sports/{SITE[sport]}/teams?limit=1000') or {}
     for lg in teams.get('sports', [{}])[0].get('leagues', []):
