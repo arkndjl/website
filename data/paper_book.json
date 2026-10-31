@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T14:29:55Z",
+ "asof": "2026-10-31T15:24:03Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 108.7,
   "peak": 109.8,
   "drawdown": 0.01,
-  "open": 77.0,
+  "open": 77.25,
   "path": [
    101.5,
    101.6,
@@ -41,12 +41,12 @@
   ]
  },
  "record": {
-  "n": 96,
-  "clvN": 34,
-  "clvRet": -0.0152,
-  "clvT": -1.66,
-  "clv": -0.05,
-  "beat": 0.241,
+  "n": 97,
+  "clvN": 35,
+  "clvRet": -0.0149,
+  "clvT": -1.68,
+  "clv": -0.03,
+  "beat": 0.233,
   "settled": 29,
   "w": 20,
   "l": 9,
@@ -57,28 +57,28 @@
   "risked": 34.0,
   "yield": 0.255
  },
- "tEff": -1.66,
+ "tEff": -1.68,
  "corr": {
   "rho": 0.0,
-  "n": 34,
+  "n": 35,
   "slates": 8,
-  "nEff": 34.0,
-  "avgSlate": 4.25
+  "nEff": 35.0,
+  "avgSlate": 4.38
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 34,
+   "value": 35,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.5% t -1.66",
+   "value": "-1.5% t -1.68",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "24%",
+   "value": "23%",
    "pass": false
   },
   {
@@ -183,12 +183,12 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 24,
-   "clvN": 19,
-   "clvRet": -0.0132,
-   "clvT": -1.47,
-   "clv": 0.19,
-   "beat": 0.263,
+   "n": 25,
+   "clvN": 20,
+   "clvRet": -0.0128,
+   "clvT": -1.5,
+   "clv": 0.2,
+   "beat": 0.25,
    "settled": 14,
    "w": 11,
    "l": 3,
@@ -385,7 +385,11 @@
    "edge": 12.5,
    "ev": 0.0158,
    "event": "Valle D'Aosta Ladies Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0042,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.5975
   },
   {
    "rule": "tennis-ml",
@@ -446,7 +450,7 @@
    "ev": 0.0463,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 232.5
   },
   {
    "rule": "cfb-ml",
@@ -530,7 +534,7 @@
    "ev": 0.0229,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 230.5
   },
   {
    "rule": "nba-total",
@@ -1941,6 +1945,26 @@
    "stake": 0.25,
    "edge": 4.6,
    "ev": 0.0019,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186454",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Rublev",
+   "a": "Etcheverry",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 239,
+   "bet": "Etcheverry ML +239",
+   "placed": "2026-10-31T15:24:03Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0015,
    "event": "Rolex Paris Masters",
    "pass": false
   },
@@ -4368,7 +4392,11 @@
    "edge": 12.5,
    "ev": 0.0158,
    "event": "Valle D'Aosta Ladies Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0042,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.5975
   },
   {
    "rule": "tennis-ml",
@@ -4429,7 +4457,7 @@
    "ev": 0.0463,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 232.5
   },
   {
    "rule": "cfb-ml",
@@ -4513,7 +4541,7 @@
    "ev": 0.0229,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 230.5
   },
   {
    "rule": "nba-total",
@@ -5924,6 +5952,26 @@
    "stake": 0.25,
    "edge": 4.6,
    "ev": 0.0019,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186454",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Rublev",
+   "a": "Etcheverry",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 239,
+   "bet": "Etcheverry ML +239",
+   "placed": "2026-10-31T15:24:03Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0015,
    "event": "Rolex Paris Masters",
    "pass": false
   },
