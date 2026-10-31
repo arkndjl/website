@@ -70,6 +70,15 @@ jobs:
           python3 scripts/player_pctl.py nhl || echo "nhl percentiles: not updated"   # p20/p50/p80 WAR and stats
       - name: Project games, power rankings and season odds
         run: python3 scripts/nhl_games.py
+      # goalies' projected saves for the saves paper test (scripts/nhl_props.py; props_snap.py joins them to DraftKings)
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/nhl_box
+          key: nhl-box-${{ github.run_id }}
+          restore-keys: nhl-box-
+      - name: Projected saves
+        continue-on-error: true
+        run: python3 scripts/nhl_props.py
       - name: Mock drafts (after the season sims)
         run: |
           python3 scripts/hockey_mock.py || echo "hockey mock: not updated"
@@ -83,7 +92,7 @@ jobs:
         run: python3 scripts/model_monitor.py nhl
       - name: Commit if anything changed
         run: |
-          files="static/data/pctl-nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/nhl_games.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json static/data/nhl-war data/hockey.json scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json"
+          files="static/data/pctl-nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/nhl_games.json data/nhl_props.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json static/data/nhl-war data/hockey.json scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
