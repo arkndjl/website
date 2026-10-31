@@ -109,8 +109,8 @@
     if (sel && sel.value === 'all') return ROWS_MAX;
     return +(sel && sel.value) || ROWS_DEFAULT;
   }
-  // name, position, class and team stay on every graphic: when columns have to go for width, these go last
-  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, POS_COL = /^(pos|position)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i;
+  // name, position, class, team and FV stay on every graphic: when columns have to go for width, these go last
+  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, POS_COL = /^(pos|position)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i, FV_COL = /^x?fv$/i;
   function isTeamTable(heads) {
     var key = heads.filter(function (h) { return !/^(rk|#|spot|lg)$/i.test(h.replace(/!$/, '')); })[0] || '';
     return /^(team|club)$/i.test(key);
@@ -146,12 +146,16 @@
     var idx = want.length ? want.map(function (n) { var io = /!$/.test(n); n = n.replace(/!$/, '');
                               var i = heads.findIndex(function (h) { return h.toLowerCase() === n; }); if (io) iconOnly[i] = 1; return i; }).filter(function (i) { return i >= 0; })
                           : heads.slice(0, 6).map(function (_, i) { return i; });
-    // the board's position, class and team columns join the graphic beside the name when the preset leaves them out
+    // the board's position, class, team and FV columns join the graphic beside the name when the preset leaves them out
     var nameAt = idx.findIndex(function (i) { return NAME_COL.test(heads[i]); });
     if (nameAt >= 0 && !/^(team|club|matchup|match|game|bet)$/i.test(heads[idx[nameAt]])) {
-      [POS_COL, CLASS_COL, TEAM_COL].forEach(function (re) {
+      [POS_COL, CLASS_COL, TEAM_COL, FV_COL].forEach(function (re) {
         if (idx.some(function (i) { return re.test(heads[i]); })) return;
-        var j = heads.findIndex(function (h) { return re.test(h); }); if (j >= 0) idx.splice(++nameAt, 0, j);
+        var j = heads.findIndex(function (h) { return re.test(h); }); if (j < 0) return;
+        // only a column the board fills in: at least half of the first rows carry a value
+        var body = [].slice.call(table.tBodies[0].rows).filter(function (r) { return r.cells.length > j && !r.classList.contains('cfb__detail'); }).slice(0, 30);
+        var filled = body.filter(function (r) { return /[\w\d]/.test(txt(r.cells[j]).replace(/^[-–—]$/, '')); }).length;
+        if (body.length && filled * 2 >= body.length) idx.splice(++nameAt, 0, j);
       });
     }
     var teamK = idx.findIndex(function (i) { return TEAM_COL.test(heads[i]); });
@@ -274,24 +278,35 @@
         return m + sz * 0.7;
       });
     }
-    // largest crisp size that fits the row height and width; if even 24 px doesn't fit, drop the rightmost column
-    var size, colW;
-    // 48, 40 or 32 px; when none fits the width, the rightmost column goes, but never the rank, name, position, class or
-    // team (or any column with logos); 24 px only as a last resort
-    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
+    // the largest size (64 down to 32 px, steps of 8) that fits the row height and the width. When none fits, the rightmost
+    // column goes, but never the rank, name, position, class, team or FV (or any column with logos). With nothing left to
+    // drop: first names to initials, then the team as its logo alone, then 24 px; text is cut short only past all of that.
+    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
+    var size, colW, SIZES = [64, 56, 48, 40, 32];
+    var fits = function (sizes) {
+      for (var si = 0; si < sizes.length; si++) { size = sizes[si]; if (rowH < size * 1.3) continue; colW = widths(size); if (sum(colW) <= gw) return true; }
+      return false;
+    };
+    var squeezes = [
+      function () {   // "Connor McDavid" -> "C. McDavid"
+        var k = cols.findIndex(function (ci) { return NAME_COL.test(heads[ci]) && !/^(team|club|matchup|match|game|bet)$/i.test(heads[ci]); });
+        if (k >= 0) cdata.forEach(function (r) { r[k].t = r[k].t.replace(/^([A-Z])[\w'’.-]*\s+(?=\S)/, '$1. '); });
+      },
+      function () { cdata.forEach(function (r) { r.forEach(function (c, k) { if (c.img && TEAM_COL.test(heads[cols[k]])) c.t = ''; }); }); }
+    ];
     for (;;) {
-      var ok = false;
-      for (var sizes = [48, 40, 32], si = 0; si < sizes.length; si++) {
-        size = sizes[si]; if (rowH < size * 1.35) continue;
-        colW = widths(size); if (sum(colW) <= gw) { ok = true; break; }
-      }
-      if (ok) break;
+      if (fits(SIZES)) break;
       var drop = -1; for (var dk = cols.length - 1; dk >= 0; dk--) if (!keep(dk)) { drop = dk; break; }
-      if (cols.length <= 4 || drop < 0) { size = rowH >= 32 * 1.35 && sum(widths(32)) <= gw ? 32 : 24; colW = widths(size); break; }
-      cols.splice(drop, 1); cdata.forEach(function (r) { r.splice(drop, 1); });
+      if (cols.length > 4 && drop >= 0) { cols.splice(drop, 1); cdata.forEach(function (r) { r.splice(drop, 1); }); continue; }
+      var done = false;
+      for (var q = 0; q < squeezes.length && !done; q++) { squeezes[q](); done = fits(SIZES); }
+      if (!done && !fits([24])) { size = 24; colW = widths(24); }
+      break;
     }
+    // what's left over spreads evenly between the columns, so the table runs edge to edge without one wide gap
     var spare = gw - sum(colW);
-    if (spare > 0) { var nameK = cols.findIndex(function (ci) { return /player|team|coach|matchup/i.test(heads[ci]); }); if (nameK < 0) nameK = 1; colW[Math.min(nameK, colW.length - 1)] += spare; }
+    if (spare > 0 && colW.length > 1) colW = colW.map(function (w, k) { return k < colW.length - 1 ? w + spare / (colW.length - 1) : w; });
+    else if (spare > 0) colW[0] += spare;
     g.font = size + 'px ' + FONT;
     for (var gi = 0; gi < groups; gi++) {
       var x0 = ix + PADI + gi * (gw + 40), y0 = iy + PADI;

@@ -22,7 +22,7 @@
   {{- $ph := index .p 0 }}{{ $pd := index .p 1 }}{{ $pa := index .p 2 }}
   {{- $lgn := index $short .lg | default .lg }}
   {{- $fav := cond (ge $ph $pa) .hab .aab }}{{ $fp := math.Max $ph $pa }}
-  {{- $tiles := slice (dict "l" "HOME / DRAW / AWAY" "v" (printf "%.0f%% / %.0f%% / %.0f%%" (mul $ph 100) (mul $pd 100) (mul $pa 100)) "s" (cond (and $pred (ne .dk nil)) (printf "%s %+.0f / %+.0f / %+.0f" (.book | default "DraftKings") (float .dk.h) (float .dk.d) (float .dk.a)) (printf "fair %+d / %+d / %+d" (index .fair 0) (index .fair 1) (index .fair 2)))) }}
+  {{- $tiles := slice (dict "l" "HOME / DRAW / AWAY" "v" (printf "%.0f%% / %.0f%% / %.0f%%" (mul $ph 100) (mul $pd 100) (mul $pa 100)) "s" (cond (and $pred (ne .dk nil)) (printf "%s %+.0f / %+.0f / %+.0f" (.book | default "DraftKings") (float .dk.h) (float .dk.d) (float .dk.a)) (printf "fair %+.0f / %+.0f / %+.0f" (float (index .fair 0)) (float (index .fair 1)) (float (index .fair 2))))) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.1f, %s %.1f" .hab (float (index .l 0)) .aab (float (index .l 1))) "s" (printf "most likely %s (%.0f%%)" .top (mul .pTop 100))) }}
   {{- $tiles = $tiles | append (dict "l" "GOALS" "v" (printf "over 2.5: %.0f%%" (mul .o25 100)) "s" (printf "both score %.0f%%" (mul .btts 100))) }}
   {{- $one := dict "lg" $lgn "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" $ph "pD" $pd "pA" $pa "tiles" $tiles
