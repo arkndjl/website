@@ -178,7 +178,7 @@
     if (!rows.length) return null;
     var data = await Promise.all(rows.map(async function (r) {
       return Promise.all(idx.map(async function (i) {
-        var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img)');
+        var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img):not(.flag)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
         var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
@@ -192,6 +192,10 @@
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
         if (img) cell.img = await loadImg(img.currentSrc || img.src);
+        // nationality flag beside the name: a pixel sprite (hockey, CS, tennis) or the small flag image (soccer)
+        var fl = c && c.querySelector('svg.esea-flag'), fi = c && c.querySelector('img.flag');
+        if (fl) cell.flag = await flagImg((fl.getAttribute('aria-label') || '').toLowerCase());
+        else if (fi) cell.flag = await loadImg(fi.currentSrc || fi.src);
         var col = c && (c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null));
         if (col && !ark) cell.color = col.classList.contains('cfb__up') ? C.teal : C.down;
         return cell;
@@ -274,7 +278,7 @@
       g.font = sz + 'px ' + FONT;
       return cols.map(function (ci, k) {
         var m = g.measureText(capHead(heads[ci])).width;
-        cdata.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.95 + 10 : 0) + (c.chip ? 24 : 0) + tagsW(c, sz)); g.font = sz + 'px ' + FONT; });
+        cdata.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.95 + 10 : 0) + (c.flag ? sz + 10 : 0) + (c.chip ? 24 : 0) + tagsW(c, sz)); g.font = sz + 'px ' + FONT; });
         return m + sz * 0.7;
       });
     }
@@ -292,7 +296,8 @@
         var k = cols.findIndex(function (ci) { return NAME_COL.test(heads[ci]) && !/^(team|club|matchup|match|game|bet)$/i.test(heads[ci]); });
         if (k >= 0) cdata.forEach(function (r) { r[k].t = r[k].t.replace(/^([A-Z])[\w'’.-]*\s+(?=\S)/, '$1. '); });
       },
-      function () { cdata.forEach(function (r) { r.forEach(function (c, k) { if (c.img && TEAM_COL.test(heads[cols[k]])) c.t = ''; }); }); }
+      function () { cdata.forEach(function (r) { r.forEach(function (c, k) { if (c.img && TEAM_COL.test(heads[cols[k]])) c.t = ''; }); }); },
+      function () { cdata.forEach(function (r) { r.forEach(function (c) { delete c.flag; }); }); }   // flags go last, before 24 px
     ];
     for (;;) {
       if (fits(SIZES)) break;
@@ -329,6 +334,7 @@
             g.fillStyle = c.ink; g.fillText(c.t, tx, cy);
           } else {
             if (c.img) { var s = size * 0.95; drawLogo(g, c.img, tx, cy - s / 2, s, s); tx += s + 10; }
+            if (c.flag) { var fh = Math.round(size * 0.69); g.save(); g.imageSmoothingEnabled = false; g.drawImage(c.flag, tx, Math.round(cy - fh / 2), size, fh); g.restore(); tx += size + 10; }
             g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 ? C.white : C.teal);
             var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
             if (c.glow) {   // 5-star+: white pixel outline, teal glow, teal stars on top
