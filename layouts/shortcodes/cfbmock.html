@@ -16,6 +16,8 @@
 {{- with index site.Data ($.Get "src" | default "cfb_mock") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 {{- with site.Data.cfb_mock_method }}<p class="cfbm__method"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="method" data-gfx-name="mock-draft-method" data-gfx-method="{{ jsonify . }}" title="method graphic: xPick, pick rule, needs, order, trades, backtest">method GFX</button></p>{{ end }}
+{{- /* the #1 pick across the predictive mock's simulated drafts (mockSims: P(a QB goes #1), each prospect's P(#1)); the QB premium at the top: QB_TOP, cfb_teams.mjs */ -}}
+{{- with and (not $conv) .first }}{{ $pc := "%.0f%%" }}<p class="cfbm__first">#1 pick, {{ .sims }} simulated drafts{{ if not .orders }} (today's order){{ end }}: QB {{ printf $pc (mul .qb 100.0) }}{{ range .top }} · {{ .name }} {{ .pos }} {{ printf $pc (mul .p 100.0) }}{{ end }}</p>{{ end }}
 <table class="cfb__table cfbm">
   <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th>{{ if $conv }}<th title="model FV before the consensus blend; the conviction mock drafts on it">mFV</th>{{ end }}<th>Class</th><th>Age</th>
     <th title="need rank of the position for the team; source: ESPN rosters, contracts; nflverse draft slots">Need</th><th title="industry consensus board rank; – = unranked">Cons</th><th title="ARK draft-eligible big board rank">BB</th>{{ range $others }}<th title="pick in the {{ index $names . }} mock; – = undrafted there">{{ index $short . }}</th>{{ end }}</tr></thead>

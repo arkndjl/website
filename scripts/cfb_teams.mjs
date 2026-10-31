@@ -759,6 +759,22 @@ function nflSimSlots(season) {
     return Object.keys(xs).length === 32 ? xs : null;
   } catch { return null; }
 }
+// the season sims' draft orders (scripts/nfl_games.py keeps ORDERS_KEPT of them in data/nfl_games.json), each a list
+// of the 32 teams from the #1 pick; null once the regular season is over (the order is set) or when they're missing
+export function nflSimOrders(season) {
+  try {
+    const d = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'nfl_games.json'), 'utf8'));
+    if (d.season !== season || !d.left || !d.draftOrders?.length) return null;
+    return d.draftOrders.map(o => o.split(' ').map(t => NFL_ESPN[t] || t)).filter(o => o.length === 32);
+  } catch { return null; }
+}
+// an order (fetchNflOrder, real trades applied) re-slotted to a simulated standings order: each pick moves with the
+// team it originally belonged to (via, for a traded pick)
+export function reslotOrder(order, seq) {
+  const at = new Map(seq.map((t, i) => [t, i])), n = seq.length;
+  if (order.some(o => !at.has(o.via || o.team))) return order;
+  return order.map(o => ({ ...o, pick: (o.round - 1) * n + at.get(o.via || o.team) + 1 })).sort((a, b) => a.pick - b.pick);
+}
 export async function fetchNflOrder(season = SEASON, rounds = 7) {
   const S = await nflSeason(season), xs = S.games.some(g => !g.done) ? nflSimSlots(season) : null;
   let base = nflDraftOrder(S);
@@ -1084,6 +1100,17 @@ export async function fetchCombine(draftYear) {
   return { n: Object.keys(players).length, players, groups };
 }
 const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of need (0-1, fetchNflNeeds): the worst room lets a team reach ~35%; a listed need is 0.6+
+// QB premium at the top (scripts/nfl_qb_premium.py, data/cfb_qb_premium.json): a team with a QB need (a listed need,
+// NEED_MIN+) pulls harder to a QB the nearer the top it picks, QB_TOP(days to the draft) x exp(-(pick - 1) / QB_TOP_TAU)
+// log-pick units on top of the need. 2000-26: 19 of 24 teams with a QB need at #1 took a QB, 14 of 41 at #2-3,
+// 13 of 118 at #4-10. Fit as a choice among the declared players left at each real first-round pick (2020-26, the
+// mock's need and set-QB block already in), leaving one draft out: held-out log likelihood better on PFF fall boards
+// (t 1.8, 4/5 drafts), winter (t 2.2, 5/5), final (t 1.9, 5/7) and DraftTek finals (t 2.5, 5/6); P(QB at #1) Brier
+// .37 -> .15 on fall boards; top-100 pick error 31.1 -> 30.4. Fall boards need more (1.40: QBs rise into the top
+// picks over the winter) than final ones (.94), which price part of it. A flat QB shift and a best-QB-left
+// (scarcity) term did not help. Predictive mock in full, blended at half, conviction none (it ranks talent and fit,
+// not the league's habit of paying up for a QB)
+const QB_TOP_K = [[3, 0.94], [71, 1.13], [181, 1.40]], QB_TOP_TAU = 4, QB_TOP = (asof, year) => byDays(QB_TOP_K)(asof, year);
 const QB_DUP_LN = 1.0, DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
@@ -1312,12 +1339,13 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
 const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
 const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
-function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [] }, conv) {
+function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [], top = 0 }, conv) {
   const needs = scored.map(([g]) => g), nk = k.group || k.pos, lines = [], ni = needs.indexOf(nk);
   // need: where the position ranks among the team's needs, and who's in the room now
   let need = ni === 0 ? `${nk} #1` : ni > 0 ? `${nk} #${ni + 1} (top: ${needs[0]})`
     : `${nk} not a need${needs.length ? ` (top: ${needs.slice(0, 3).join(', ')})` : ''}; BPA`;
   if (dup > 0) need += `; ${ordinal(dup + 1)} ${k.pos} of the draft`;
+  if (top >= 0.05) need += "; QB premium at the top";   // QB_TOP
   lines.push(['Need', need + '.']);
   // every need the team has left at this pick (NEED_MIN and up), with its weight: 1 = an empty room
   if (scored.length) lines.push(['Needs', scored.map(([g, v]) => `${g} ${v.toFixed(2).replace(/^0/, '')}`).join(', ') + '.']);
@@ -1418,7 +1446,9 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
   const needList = tn => Object.entries(tn).filter(([, n]) => n.score >= NEED_MIN).sort((a, b) => b[1].score - a[1].score).map(([g]) => g);
   // a team's utility for a player at a spot, in log-pick units (higher = better)
   // nk: the NFL room the pick fills (the position, or for a lineman OT, G or C)
-  const util = (team, round, p, pos, moved, nk = pos) => {
+  const qbTop = conv ? 0 : QB_TOP(P.asof || new Date(), P.draftYear) * (mode === 'blend' ? 0.5 : 1);
+  const qbPrem = pick => qbTop * Math.exp(-((pick ?? 99) - 1) / QB_TOP_TAU);
+  const util = (team, round, p, pos, moved, nk = pos, pick = null) => {
     const tn = needOf(team), pr = P.perRound[pos], ri = Math.min(round, pr?.length || 3) - 1, spec = !!SPEC_SLOT[pos];
     const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' || spec ? QB_DUP_LN : DUP_LN);   // a second QB (or kicker) in one draft is rare
     const exp = pr?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
@@ -1426,15 +1456,16 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
     const cap = Math.max(1, Math.round(exp * 1.25)), run = !conv && ran >= cap ? RUN_LN * (mode === 'blend' ? 0.5 : 1) * (ran - cap + 1) : 0;
     const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
     const need = pos === 'K' ? SPEC_NEED_LN * ((tn.K?.score ?? SPEC_CENTER) - SPEC_CENTER) : spec ? 0 : NEED_W * (tn[nk]?.score ?? 0);
-    return -Math.log(p._x) + need - dup - run - qbBlock - (moved ? MOVE_LN : 0);
+    const top = pos === 'QB' && !dup && (tn.QB?.score ?? 0) >= NEED_MIN ? qbPrem(pick) : 0;   // QB premium at the top (QB_TOP)
+    return -Math.log(p._x) + need + top - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
   // a player's best fit for a team (over his position, a projected move and, for a lineman, the OL rooms)
-  const fitFor = (team, round, p) => {
+  const fitFor = (team, round, p, pick = null) => {
     let best = null;
     const alt = MOVE_GROUP[p.move];
     for (const [pos, moved] of [[p.pos, false], ...(alt && alt !== p.pos ? [[alt, true]] : [])]) {
       for (const [nk, mv] of pos === 'OL' ? olRooms(p).map(([k, m]) => [k, m || moved]) : [[pos, moved]]) {
-        const v = util(team, round, p, pos, mv, nk);
+        const v = util(team, round, p, pos, mv, nk, pick);
         if (!best || v > best.v) best = { p, pos, nk, v, ol: pos === 'OL' && mv && !moved };
       }
     }
@@ -1442,24 +1473,24 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
   };
   // a team's best available player; gone = players assumed taken first (the market's top n before its pick).
   // The scan runs down the xPick order and stops once no player further down can beat the best so far (MAX_BONUS)
-  const bestFor = (team, round, gone = null) => {
-    let best = null;
+  const bestFor = (team, round, gone = null, pick = null) => {
+    let best = null; const mb = MAX_BONUS + qbPrem(pick);
     for (const p of byX) {
       if (taken.has(p) || gone?.has(p)) continue;
-      if (best && -Math.log(p._x) + MAX_BONUS < best.v) break;
-      const f = fitFor(team, round, p);
+      if (best && -Math.log(p._x) + mb < best.v) break;
+      const f = fitFor(team, round, p, pick);
       if (!best || f.v > best.v) best = f;
     }
     return best;
   };
   // a team's pick as a logit over its utilities (log-pick units, so a player it values at slot 10 is twice as
   // likely as one at slot 20): each player's weight, their sum, and its likeliest pick (which joins `gone`)
-  const takeDist = (team, round, gone) => {
-    let sum = 0, best = null; const w = new Map();
+  const takeDist = (team, round, gone, pick = null) => {
+    let sum = 0, best = null; const w = new Map(), mb = MAX_BONUS + qbPrem(pick);
     for (const p of byX) {
       if (taken.has(p) || gone.has(p)) continue;
-      if (best && -Math.log(p._x) + MAX_BONUS < best.v - 2) break;    // e^-12 of the top: nothing
-      const f = fitFor(team, round, p), e = Math.exp(TRADE_LOGIT * f.v);
+      if (best && -Math.log(p._x) + mb < best.v - 2) break;    // e^-12 of the top: nothing
+      const f = fitFor(team, round, p, pick), e = Math.exp(TRADE_LOGIT * f.v);
       sum += e; w.set(p, e);
       if (!best || f.v > best.v) best = f;
     }
@@ -1469,13 +1500,13 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
   const marketTop = n => { const s = new Set(); for (const p of byX) { if (s.size >= n) break; if (!taken.has(p)) s.add(p); } return s; };
   // a simulated pick: every utility plus Gumbel noise at the round's scale (the scan stops where even a large draw,
   // 8 scales, can't lift a player past the best so far)
-  const noisyBest = (team, round) => {
-    const b = noise.k * noise.beta[round === 1 ? 0 : round <= 3 ? 1 : 2];
+  const noisyBest = (team, round, pick = null) => {
+    const b = noise.k * noise.beta[round === 1 ? 0 : round <= 3 ? 1 : 2], mb = MAX_BONUS + qbPrem(pick);
     let best = null;
     for (const p of byX) {
       if (taken.has(p)) continue;
-      if (best && -Math.log(p._x) + MAX_BONUS + 8 * b < best.v) break;
-      const f = fitFor(team, round, p); f.v += b * noise.gumbel();
+      if (best && -Math.log(p._x) + mb + 8 * b < best.v) break;
+      const f = fitFor(team, round, p, pick); f.v += b * noise.gumbel();
       if (!best || f.v > best.v) best = f;
     }
     return best;
@@ -1484,18 +1515,18 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
     let o = order[i];
     // trade-up offers for this pick (none in a simulated draft: the sims run on the real order)
     if (!o.trade && !noise) {
-      const here = bestFor(o.team, o.round), W = TRADE_WINDOW[o.round - 1] ?? 35;
+      const here = bestFor(o.team, o.round, null, o.pick), W = TRADE_WINDOW[o.round - 1] ?? 35;
       // the teams picking from here on, each by its logit, each taking its likeliest player before the next picks
       const dist = [], ahead = new Set();
       for (let k = i; k < order.length && order[k].pick - o.pick <= W; k++) {
-        const d = takeDist(order[k].team, order[k].round, ahead); dist.push({ ...d, ahead: new Set(ahead) });
+        const d = takeDist(order[k].team, order[k].round, ahead, order[k].pick); dist.push({ ...d, ahead: new Set(ahead) });
         if (d.best) ahead.add(d.best.p);
       }
       let deal = null;
       for (let j = i + 1; j < order.length && order[j].pick - o.pick <= W; j++) {
         const s = order[j], S = s.team;
         if (S === o.team || s.trade || tradedUp.has(S + '|' + o.round) || deal?.team === S) continue;
-        const want = bestFor(S, o.round);
+        const want = bestFor(S, o.round, null, o.pick);
         if (!want) continue;
         // the team on the clock wants the same player: it won't move back and hand him over
         if (here?.p === want.p) continue;
@@ -1506,7 +1537,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
           safe *= 1 - (d.w.get(want.p) ?? 0) / (d.sum || 1);
         }
         const gone = new Set(dist[j - i]?.ahead ?? []); gone.add(want.p);
-        const alt = bestFor(S, s.round, gone);
+        const alt = bestFor(S, s.round, gone, s.pick);
         if (!alt) continue;
         const gain = TRADE_KAPPA * (1 - safe) * (slotV(want.v) - slotV(alt.v));
         // payment: S's pick plus its smallest later pick(s) this year covering the chart gap plus the premium; when
@@ -1526,7 +1557,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
         // the team on the clock: what it gives up by moving back to s, against what it's paid on top
         // (the picks between go to the market's top players, and S takes its target)
         const mt = marketTop(j - i - 1); mt.add(want.p);
-        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, mt) || here).v) : 0;
+        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, mt, s.pick) || here).v) : 0;
         const sameDiv = tank.teams?.[S]?.div && tank.teams[S].div === tank.teams?.[o.team]?.div;
         const net = (gain - paid) * (sameDiv ? TRADE_DIV : 1) / mtv(o.pick);
         if (paid - Math.max(0, tLoss) < 0 || net <= (margins[o.round] ?? TRADE_MARGIN)) continue;
@@ -1547,7 +1578,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
     }
     o = order[i];
     const tn = needOf(o.team), needs = needList(tn);
-    const best = noise ? noisyBest(o.team, o.round) : bestFor(o.team, o.round);
+    const best = noise ? noisyBest(o.team, o.round, o.pick) : bestFor(o.team, o.round, null, o.pick);
     if (!best) break;
     const { p: pl, pos: bestPos, nk } = best, ni = needs.indexOf(nk);
     if (noise) {
@@ -1557,10 +1588,11 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
       picks.push({ pick: o.pick, round: o.round, team: o.team, key: pl.name + '|' + pl.team });
       continue;
     }
+    const top = bestPos === 'QB' && !(teamPos[o.team] || []).includes('QB') && (tn.QB?.score ?? 0) >= NEED_MIN ? qbPrem(o.pick) : 0;
     taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== pl.pos;
-    ctx.push({ p: pl, needs: needs.map(g => [g, tn[g].score]), room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    ctx.push({ top, p: pl, needs: needs.map(g => [g, tn[g].score]), room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
     // the pick joins the room: his draft capital fills part of the need for the team's later picks
     if (tn[nk]) tn[nk].score *= SPEC_SLOT[nk] ? 0 : 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[nk] || 2);
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp, trade: o.trade || null,
@@ -1656,7 +1688,8 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, mode 
 // at its final-month sd (t 1.1, a tie; 80% pick ranges held 88% of real picks). Before the final board the shock
 // widens by the board's own movement from now to April (DRAFT_SD: sd^2 = .5^2 + draftSd(today)^2 - .56^2, about 1.25
 // in October), and each prospect declares at declareOdds, so the sims and Draft% agree on who goes. The sims run on
-// the real order (real trades in, no projected ones); the headline mock stays the modal one.
+// the real order (real trades in, no projected ones); in season each sim takes one of the NFL season sims' standings
+// orders (nflSimOrders), so P(#1 overall) and P(a QB goes #1) carry who ends up picking first. The headline mock stays the modal one.
 const MOCK_NOISE = { beta: [0.4, 0.525, 0.625], sp: 0.5, k: 0.5, sims: 200 };
 const mulberry = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 export function mockSims(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, sims) {
@@ -1666,9 +1699,15 @@ export function mockSims(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, sims) 
   const gumbel = () => -Math.log(-Math.log(1 - rng() * (1 - 1e-12)));
   const sp = Math.sqrt(M.sp ** 2 + Math.max(0, draftSd(P.asof || new Date(), P.draftYear) ** 2 - DRAFT_SD[0][1] ** 2));
   const noise = { rng, normal, gumbel, sp, beta: M.beta, k: M.k };
-  const by = new Map(), R1 = tank.order.filter(o => o.round === 1).length;
+  const by = new Map(), R1 = tank.order.filter(o => o.round === 1).length, pos = new Map(rows.map(r => [`${r.name}|${r.team}`, r.pos]));
+  // in season each simulated draft takes one of the season sims' orders (nflSimOrders): who picks first is open too
+  const orders = R1 === 32 ? nflSimOrders((P.draftYear ?? SEASON + 1) - 1) : null;
+  let qb1 = 0; const team1 = {};
   for (let s = 0; s < n; s++) {
-    for (const k of mockDraftOnce(rows, tank, rounds, P, {}, 'pred', noise).picks) {
+    const tk = orders ? { ...tank, order: reslotOrder(tank.order, orders[s % orders.length]) } : tank;
+    for (const k of mockDraftOnce(rows, tk, rounds, P, {}, 'pred', noise).picks) {
+      if (k.pick === 1) team1[k.team] = (team1[k.team] || 0) + 1;
+      if (k.pick === 1 && pos.get(k.key) === 'QB') qb1++;
       const e = by.get(k.key) || by.set(k.key, { picks: [], teams: {} }).get(k.key);
       e.picks.push(k.pick); e.teams[k.team] = (e.teams[k.team] || 0) + 1;
     }
@@ -1678,10 +1717,14 @@ export function mockSims(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, sims) 
     if (e.picks.length < 0.01 * n) continue;
     const ps = e.picks.sort((a, b) => a - b), q = f => { const i = Math.floor(f * n); return i < ps.length ? ps[i] : null; };
     const [tm, c] = Object.entries(e.teams).sort((a, b) => b[1] - a[1])[0];
-    players[key] = { r1: Math.round(ps.filter(x => x <= R1).length / n * 100) / 100, dr: Math.round(ps.length / n * 100) / 100,
+    players[key] = { r1: Math.round(ps.filter(x => x <= R1).length / n * 100) / 100, p1: Math.round(ps.filter(x => x === 1).length / n * 1000) / 1000, dr: Math.round(ps.length / n * 100) / 100,
       lo: q(0.1), hi: q(0.9), tm, tp: Math.round(c / n * 100) / 100 };
   }
-  return { sims: n, sp: Math.round(sp * 100) / 100, players };
+  // the #1 pick: P(a QB goes #1) and each prospect's P(#1 overall), the five likeliest
+  const first = { sims: n, orders: !!orders, qb: Math.round(qb1 / n * 1000) / 1000,
+    teams: Object.entries(team1).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([t, c]) => ({ t, p: Math.round(c / n * 1000) / 1000 })), top: Object.entries(players).filter(([, x]) => x.p1 > 0).sort((a, b) => b[1].p1 - a[1].p1).slice(0, 5)
+    .map(([key, x]) => ({ name: key.split('|')[0], school: key.split('|')[1], pos: pos.get(key) === 'DL' ? 'DT' : pos.get(key), p: x.p1 })) };
+  return { sims: n, sp: Math.round(sp * 100) / 100, players, first };
 }
 // Cross-grading: a mock's picks are graded by another mock's slot for the same player (undrafted in it: GRADE_UND,
 // the backtests' undrafted slot). A pick the other mock makes GRADE_RATIO times later or more, and GRADE_SPOTS or more

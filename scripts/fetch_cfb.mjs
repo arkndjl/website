@@ -3064,9 +3064,9 @@ if (tank) {
   const pc = x => x >= 0.995 ? '>99%' : x < 0.005 ? '<1%' : `${Math.round(x * 100)}%`;
   for (const picks of [pred, blend, conv]) for (const k of picks) {
     const x = sims.players[`${k.name}|${k.school}`];
-    k.sim = x ? { r1: x.r1, lo: x.lo, hi: x.hi, tm: x.tm, tp: x.tp } : null;
+    k.sim = x ? { r1: x.r1, p1: x.p1, lo: x.lo, hi: x.hi, tm: x.tm, tp: x.tp } : null;
     const i = k.rep.lines.findIndex(([h]) => h === 'Slot');
-    k.rep.lines.splice(i + 1, 0, ['Sims', x ? `round 1 ${pc(x.r1)}; picks ${x.lo}-${x.hi ?? 'UDFA'} in 80% of ${sims.sims} simulated drafts; likeliest team ${x.tm} (${pc(x.tp)}).`
+    k.rep.lines.splice(i + 1, 0, ['Sims', x ? `${x.p1 >= 0.005 ? `#1 overall ${pc(x.p1)}; ` : ''}round 1 ${pc(x.r1)}; picks ${x.lo}-${x.hi ?? 'UDFA'} in 80% of ${sims.sims} simulated drafts; likeliest team ${x.tm} (${pc(x.tp)}).`
       : `drafted in under 1% of ${sims.sims} simulated drafts.`]);
   }
   console.log(`mock sims: ${sims.sims} drafts, board shock sd ${sims.sp}, ${Object.keys(sims.players).length} prospects drafted in 1%+`);
@@ -3077,7 +3077,7 @@ if (tank) {
     // each pick's ESPN headshot from his board row (the mock tables' photos)
     const ph = new Map([...out.all, ...outFcs.all].map(r => [`${r.name}|${r.team}`, r.photo]));
     for (const k of [...picks, ...udfa]) k.photo = ph.get(`${k.name}|${k.school}`) || null;
-    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks, udfa }, FVR, 1) + '\n');
+    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), first: sims.first, picks, udfa }, FVR, 1) + '\n');
   }
 }
 if (tank) writeAll();   // the board rows again, now with the mock sims (mk)
