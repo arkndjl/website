@@ -652,6 +652,83 @@ def calibrate(p, knots):
     return out
 
 
+# "+" (Oct 31 2026): star odds beyond the FV. At the same grade, younger prospects reach a 55+ / 60+ peak more often
+# (Oct 24 rows 2013-20, 53,665 rows, birth cohort out, player-clustered t: 55+ 5.0 10/10 cohorts, 60+ 4.1 9/10). A
+# prospect gets a "+" when the 60+ odds from grade and age reach a grade 2.5 higher's odds from the grade alone
+# (FanGraphs' + sits about half a tier up); the flag, cohort out: 55+ t 3.3 10/10, 60+ 2.8 8/10, about twice the 60+
+# rate at the same grade with the same mean. 24 other signals tried: market value ahead of production passes alone
+# (t 3.5 / 3.8) but not once age is in (.8 / 1.9), and production, minutes, club, league, youth and academy play,
+# scoring, height and position fail. Fit on the Oct 24 rows (--plus refits only this), used at every snapshot, for
+# players on the board's own lineup sheets (academy-only players were not in the test)
+PLUS_CUT, PLUS_STEP = 60, 2.5
+
+
+def plus_x(fv):
+    fv = np.asarray(fv, float)
+    return np.column_stack([np.ones(len(fv)), (fv - 50) / 10, np.maximum(fv - 50, 0) / 10, np.maximum(fv - 40, 0) / 10])
+
+
+def _logit(X, y, l2=1e-3, it=60):
+    b = np.zeros(X.shape[1])
+    for _ in range(it):
+        p = 1 / (1 + np.exp(-np.clip(X @ b, -30, 30)))
+        d = np.linalg.solve(X.T @ (X * (p * (1 - p) + 1e-9)[:, None]) + l2 * np.eye(len(b)), X.T @ (y - p) - l2 * b)
+        b += d
+        if np.abs(d).max() < 1e-8:
+            break
+    return b
+
+
+def plus_fit(fv, y, age):
+    yc = (np.asarray(y) >= PLUS_CUT).astype(float)
+    return {'b0': np.round(_logit(plus_x(fv), yc), 4).tolist(),
+            'b1': np.round(_logit(np.column_stack([plus_x(fv), -np.asarray(age, float)]), yc), 4).tolist()}
+
+
+def plus_flag(fv, age, pf):
+    if not pf:
+        return np.zeros(len(np.atleast_1d(fv)), bool)
+    z1 = np.column_stack([plus_x(fv), -np.asarray(age, float)]) @ np.array(pf['b1'])
+    return z1 >= plus_x(np.asarray(fv, float) + PLUS_STEP) @ np.array(pf['b0'])
+
+
+def plus_refit():
+    """--plus: rebuild the Oct 24 rows, grade them cohort out with the fit's inputs and isotonic map (as fit() does),
+    and refit only the "+" logits into data/soccer_prospects_fit.json. The rows go to the cache for tests"""
+    G, A, P, V = load()
+    for c in ('mins', 'gl', 'ast', 'mv', 'age', 'start'):
+        A[c] = pd.to_numeric(A[c], errors='coerce').astype(float)
+    V['mv'] = pd.to_numeric(V.mv, errors='coerce').astype(float)
+    R = club_ratings(G, A, V)
+    A = add_value(A, R)
+    O, _ = outcome(A, P)
+    TG = team_games(G)
+    done = O[O.s22 <= COHORTS[1]]
+    fitj = json.load(open(FIT))
+    xs = []
+    for t in range(ROWS[0], ROWS[1] + 1):
+        X = features(A, P, V, R, TG, t, snapdate(t, SEL_SNAP))
+        X['mvlvl'] = mv_level(X.mv)
+        X = X[X.index.isin(done.index) & X.old]
+        X['fv_out'], X['s22'] = done.fv.reindex(X.index), done.s22.reindex(X.index)
+        xs.append(X.reset_index().rename(columns={'index': 'player_id'}))
+    S = pd.concat(xs, ignore_index=True)
+    S['mvd'] = S.mv * np.exp(float(S.groupby('t').mvlvl.first().mean()) - S.mvlvl)
+    F = design(S)
+    y, co = S.fv_out.values, S.s22.values
+    _, p = loso(F, y, co, fitj['kept'])
+    iso = lambda pp, yy: {'k': isotonic(pp, yy), 'slope': round(float(np.polyfit(pp[pp >= 50].astype(float), yy[pp >= 50].astype(float), 1)[0]), 3)}
+    pc = np.zeros(len(p))
+    for c in np.unique(co):
+        m = co == c
+        pc[m] = calibrate(p[m], iso(p[~m], y[~m]))
+    S['fvh'] = pc
+    S.to_pickle(os.path.join(CACHE, 'plus_rows.pkl'))
+    fitj['plus'] = plus_fit(pc, y, S.age.values)
+    json.dump(fitj, open(FIT, 'w'), indent=1)
+    print('rows', len(S), 'mse', round(float(((y - pc) ** 2).mean()), 2), 'plus', fitj['plus'])
+
+
 def fit(scorecard=False):
     """scorecard: write only the held-out FV scorecard (scripts/fv_scorecard.py) into data/soccer_prospects_fit.json"""
     t0 = dt.datetime.now()
@@ -763,6 +840,7 @@ def fit(scorecard=False):
     fitj = {'asof': dt.date.today().isoformat(), 'rows': [int(t.min()), int(t.max())], 'n': int(len(y)),
             'cohorts': list(COHORTS), 'peakAges': list(PEAK_AGES), 'ageCut': AGE_CUT, 'repl': REPL,
             'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'provLine': prov_line, 'provN': int(len(acad)), 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
+            'plus': plus_fit(p, y, S.age.values),
             'mse': round(float(((y - p) ** 2).mean()), 2), 'mseBase': round(float((e_base ** 2).mean()), 2),
             'r2': round(float(1 - ((y - p) ** 2).mean() / y.var()), 3), 'top50': round(float(np.mean(top)), 1),
             'scale': {'nco': scale['nco'], 'sh': scale['sh'], 'v40': scale['v40'],
@@ -938,6 +1016,7 @@ def build():
         a, c = fitj['provLine']
         fvx = np.where(X.old.values, fvx, (20 + a * (fvx - 20) + c).clip(20, 80))
     X['fvx'] = fvx
+    X['plus'] = plus_flag(fvx, X.age.values, fitj.get('plus')) & X.old.values & (fvx < 80)
     pr = fitj['prob']
     sig = lambda w, x: odds(w, x)[0]
     names = club_names(pd.concat([X.club_td, X.club1, X.aclub]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
@@ -954,7 +1033,7 @@ def build():
             'id': int(i), 'name': P.name.get(i) or str(i), 'pos': POSS.get(sp, {'G': 'GK', 'D': 'D', 'M': 'M', 'F': 'F'}[r.grp]),
             'grp': r.grp, 'club': names.get(int(club)) if pd.notna(club) else None,
             'lg': SHORT.get(comp) if isinstance(comp, str) else None, 'league': LEAGUE.get(comp) if isinstance(comp, str) else None,
-            'age': round(float(r.age), 1), 'fv': FS.fv_of('soccer', float(r.fvx)), 'fvx': round(float(r.fvx), 2),
+            'age': round(float(r.age), 1), 'fv': FS.fv_of('soccer', float(r.fvx)), 'fvx': round(float(r.fvx), 2), 'plus': bool(r.plus),
             'mv': None if pd.isna(r.mv) else int(r.mv),
             'min': int(r.mins_td) if pd.notna(r.mins_td) else 0, 'min1': int(r.mins1) if pd.notna(r.mins1) else 0,
             'gar': round(float(F.gar_td[i]), 2), 'gar1': round(float(F.gar1[i]), 2),
@@ -983,5 +1062,7 @@ if __name__ == '__main__':
         fit()
     elif '--scorecard' in sys.argv:
         fit(scorecard=True)
+    elif '--plus' in sys.argv:
+        plus_refit()
     else:
         build()
