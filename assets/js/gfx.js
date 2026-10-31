@@ -109,7 +109,7 @@
     if (sel && sel.value === 'all') return ROWS_MAX;
     return +(sel && sel.value) || ROWS_DEFAULT;
   }
-  // name, position, class, team and FV stay on every graphic: when columns have to go for width, these go last
+  // name, position, class, team, FV and the sorted column stay on every graphic: when columns have to go for width, these go last
   var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, POS_COL = /^(pos|position)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i, FV_COL = /^x?fv$/i;
   function isTeamTable(heads) {
     var key = heads.filter(function (h) { return !/^(rk|#|spot|lg)$/i.test(h.replace(/!$/, '')); })[0] || '';
@@ -131,6 +131,17 @@
     var th = win.querySelector('th[aria-sort]'), sort = th ? txt(th).toLowerCase() : '';
     var tf = win.querySelector('th.is-sorted, th[data-sorted]'); if (!th && tf) sort = txt(tf).toLowerCase();
     return { filters: bits, sort: sort && sort !== 'rk' ? 'sorted by ' + sort + (th && th.getAttribute('aria-sort') === 'ascending' ? ' ↑' : '') : '' };
+  }
+
+  // index (in hcells) of the column the rows are ordered by, or -1 for the board's own order. A sort on RK means the board's
+  // order, unless a "rank by" view drives it: then the view's column, marked is-key in the rows (VORX, XPM, WAR ...).
+  function sortedCol(table, hcells) {
+    var th = hcells.find(function (h) { return h.hasAttribute('aria-sort'); }) || hcells.find(function (h) { return h.matches('.is-sorted, [data-sorted]'); });
+    var i = th ? hcells.indexOf(th) : -1;
+    if (i >= 0 && !/^(rk|#|spot|pick)$/i.test(txt(th))) return i;
+    var r = [].slice.call(table.tBodies[0].rows).find(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2; });
+    var kc = r && [].slice.call(r.cells).findIndex(function (c) { return c.classList.contains('is-key'); });
+    return kc >= 0 && r.cells.length === hcells.length ? kc : -1;
   }
 
   async function build(win, btn) {
@@ -158,6 +169,15 @@
         if (body.length && filled * 2 >= body.length) idx.splice(++nameAt, 0, j);
       });
     }
+    // the column the table is sorted by (a header click, or the "rank by" view when the order is RK) is on every graphic and
+    // never auto-dropped, like FV: added after the name's columns when the preset leaves it out
+    var sortI = sortedCol(table, hcells);
+    if (sortI >= 0 && idx.indexOf(sortI) < 0) {
+      var fvAt = idx.findIndex(function (i) { return FV_COL.test(heads[i]); });
+      var at0 = fvAt >= 0 ? fvAt + 1 : nameAt >= 0 ? nameAt + 1 : idx.length;
+      while (at0 < idx.length && [POS_COL, CLASS_COL, TEAM_COL, FV_COL].some(function (re) { return re.test(heads[idx[at0]]); })) at0++;
+      idx.splice(at0, 0, sortI);
+    }
     var teamK = idx.findIndex(function (i) { return TEAM_COL.test(heads[i]); });
     var all =[].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; });
     var rows = all.slice(0, rowsWanted(win, btn));
@@ -180,7 +200,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img):not(.flag)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
-        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm').forEach(function (e) { e.remove(); });
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, .nbaxpm__od').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
@@ -285,7 +305,7 @@
     // the largest size (64 down to 32 px, steps of 8) that fits the row height and the width. When none fits, the rightmost
     // column goes, but never the rank, name, position, class, team or FV (or any column with logos). With nothing left to
     // drop: first names to initials, then the team as its logo alone, then 24 px; text is cut short only past all of that.
-    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
+    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || cols[k] === sortI || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
     var size, colW, SIZES = [64, 56, 48, 40, 32];
     var fits = function (sizes) {
       for (var si = 0; si < sizes.length; si++) { size = sizes[si]; if (rowH < size * 1.3) continue; colW = widths(size); if (sum(colW) <= gw) return true; }
