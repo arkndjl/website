@@ -109,8 +109,8 @@
     if (sel && sel.value === 'all') return ROWS_MAX;
     return +(sel && sel.value) || ROWS_DEFAULT;
   }
-  // name, class and team stay on every graphic: when columns have to go for width, these go last
-  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i;
+  // name, position, class and team stay on every graphic: when columns have to go for width, these go last
+  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, POS_COL = /^(pos|position)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i;
   function isTeamTable(heads) {
     var key = heads.filter(function (h) { return !/^(rk|#|spot|lg)$/i.test(h.replace(/!$/, '')); })[0] || '';
     return /^(team|club)$/i.test(key);
@@ -146,10 +146,10 @@
     var idx = want.length ? want.map(function (n) { var io = /!$/.test(n); n = n.replace(/!$/, '');
                               var i = heads.findIndex(function (h) { return h.toLowerCase() === n; }); if (io) iconOnly[i] = 1; return i; }).filter(function (i) { return i >= 0; })
                           : heads.slice(0, 6).map(function (_, i) { return i; });
-    // the board's class and team columns join the graphic beside the name when the preset leaves them out
+    // the board's position, class and team columns join the graphic beside the name when the preset leaves them out
     var nameAt = idx.findIndex(function (i) { return NAME_COL.test(heads[i]); });
     if (nameAt >= 0 && !/^(team|club|matchup|match|game|bet)$/i.test(heads[idx[nameAt]])) {
-      [CLASS_COL, TEAM_COL].forEach(function (re) {
+      [POS_COL, CLASS_COL, TEAM_COL].forEach(function (re) {
         if (idx.some(function (i) { return re.test(heads[i]); })) return;
         var j = heads.findIndex(function (h) { return re.test(h); }); if (j >= 0) idx.splice(++nameAt, 0, j);
       });
@@ -276,9 +276,9 @@
     }
     // largest crisp size that fits the row height and width; if even 24 px doesn't fit, drop the rightmost column
     var size, colW;
-    // 48, 40 or 32 px; when none fits the width, the rightmost column goes, but never the rank, name, class or
+    // 48, 40 or 32 px; when none fits the width, the rightmost column goes, but never the rank, name, position, class or
     // team (or any column with logos); 24 px only as a last resort
-    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || NAME_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
+    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
     for (;;) {
       var ok = false;
       for (var sizes = [48, 40, 32], si = 0; si < sizes.length; si++) {
