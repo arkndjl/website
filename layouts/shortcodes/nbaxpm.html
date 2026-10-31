@@ -138,7 +138,7 @@
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
-        '<td class="cfb__num nbaxpm__v' + k('sxpm') + '">' + sg(p.sxpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + (p.pr ? '' : '<span class="cfb__dim nbaxpm__od" title="raw XPM">raw ' + (p.xpm > 0 ? '+' : '') + p.xpm.toFixed(1) + '</span>') + '</td>' +
+        '<td class="cfb__num nbaxpm__v' + k('sxpm') + '">' + sg(p.sxpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + (p.bpm == null && p.dpm == null ? '' : '<span class="cfb__dim nbaxpm__od" title="raw XPM">raw ' + (p.xpm > 0 ? '+' : '') + p.xpm.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('soxpm') + '">' + sg(p.soxpm) + '</td>' +
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('sdxpm') + '">' + sg(p.sdxpm) + '</td>' +
