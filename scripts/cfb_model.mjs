@@ -761,10 +761,54 @@ export async function weather(rows, cache = {}, forecast = false) {
 const WX = w => w ? [Math.max(0, w.w - 10), w.p > 2 ? 1 : 0, w.t < 35 ? 1 : 0] : [0, 0, 0];
 // totals inputs past the raw projection: weather, and an FCS side (its pooled efficiency misplaces the total;
 // season-swap MAE 12.59 -> 12.49, t -2.3, Oct 2026)
-const TX = (r, wx, fcs) => [...WX(r.dome ? null : wx[r.id]), fcs ? 1 : 0];
+// Market ratings on totals (Nov 1 2026, scripts/cfb_nearmiss_nov01.mjs, data/cfb_nearmiss_nov01.json): each team's
+// offense and defense points implied by the closes of its earlier games this season (home (total + spread) / 2, away
+// (total - spread) / 2; ridge lam 3 toward last season's final x .5, FCS pooled), summed into a market-rating total;
+// the input is that total minus the projection. Walk-forward on 2015-26 ESPN history, totals weights from 2016:
+// MAE tune 2017-20 -0.26 (t -5.3), held 2021-26 -0.28 (t -5.5), 12.95 -> 12.67 against the close's 12.47. Failed on
+// the 2026 season alone in Oct; it needed the longer record.
+const TX = (r, wx, fcs, tot) => [...WX(r.dome ? null : wx[r.id]), fcs ? 1 : 0, r.mkTot != null && isFinite(tot) ? r.mkTot - tot : 0];
+export const MKT_TOT = { c: 0.5, lam: 3, minGames: 100 };
+function mktRatings(games, prev, c, lam) {
+  const obs = [];
+  for (const r of games) { const h = (r.closeTot + r.close) / 2, a = (r.closeTot - r.close) / 2, s = r.n ? 0 : 1;
+    const H = r.hc === 'fbs' ? r.h : FCS, A = r.ac === 'fbs' ? r.a : FCS;
+    obs.push([H, A, s, h], [A, H, -s, a]); }
+  const O = {}, D = {}; let mu = obs.length ? mean(obs.map(o => o[3])) : 28, hh = 0;
+  for (const t of new Set(obs.flatMap(o => [o[0], o[1]]))) { O[t] = c * (prev?.O[t] ?? 0); D[t] = c * (prev?.D[t] ?? 0); }
+  const cO = { ...O }, cD = { ...D };
+  for (let it = 0; it < 30; it++) {
+    const so = {}, no = {}, sd2 = {}, nd = {};
+    let sm = 0, sh = 0, nh = 0;
+    for (const [o, d, s, y] of obs) { const e = y - mu - O[o] - D[d] - hh * s; sm += e; if (s) { sh += e * s; nh++; }
+      so[o] = (so[o] || 0) + y - mu - D[d] - hh * s; no[o] = (no[o] || 0) + 1; }
+    mu += sm / Math.max(1, obs.length); hh += nh ? sh / nh : 0;
+    for (const t in O) O[t] = (so[t] + lam * cO[t]) / (no[t] + lam);
+    for (const [o, d, s, y] of obs) { sd2[d] = (sd2[d] || 0) + y - mu - O[o] - hh * s; nd[d] = (nd[d] || 0) + 1; }
+    for (const t in D) D[t] = ((sd2[t] || 0) + lam * cD[t]) / ((nd[t] || 0) + lam);
+  }
+  return { mu, O, D, n: obs.length };
+}
+// sets r.mkTot on every row: the market-rating total from games with both closes in earlier weeks of its season
+export function mktTotals(rows, { c, lam, minGames } = MKT_TOT) {
+  let prev = null;
+  for (const S of [...new Set(rows.map(r => r.S))].sort((a, b) => a - b)) {
+    const rs = rows.filter(r => r.S === S), g = rs.filter(r => r.done && r.close != null && r.closeTot != null);
+    for (const w of [...new Set(rs.map(r => r.w))].sort((a, b) => a - b)) {
+      const R = mktRatings(g.filter(r => r.w < w), prev, c, lam);
+      for (const r of rs.filter(r => r.w === w)) {
+        if (R.n < minGames && !prev) { r.mkTot = null; continue; }
+        const H = r.hc === 'fbs' ? r.h : FCS, A = r.ac === 'fbs' ? r.a : FCS, mu = R.n >= minGames ? R.mu : prev.mu;
+        r.mkTot = 2 * mu + (R.O[H] ?? 0) + (R.D[A] ?? 0) + (R.O[A] ?? 0) + (R.D[H] ?? 0);
+      }
+    }
+    prev = mktRatings(g, prev, c, lam);
+  }
+  return rows;
+}
 function fitTotals(preds, wx) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame && p.t.tot > 0 && isFinite(p.t.tot));
-  const x = p => [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)];
+  const x = p => [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0, p.t.tot)];
   const b = ols(ok.map(x), ok.map(p => p.r.tot), 1);
   const res = ok.map(p => p.r.tot - dot(b, x(p)));
   const mk = ok.filter(p => p.r.closeTot != null);
@@ -1009,7 +1053,7 @@ export async function runModel(data, SEASON, opts = {}) {
   }
   const allGames = seasons.flatMap(S => data.games[S]);
   const geo = places(data.venues, data.teamsFbs, allGames);
-  const rows = prepare(seasons, data, geo);
+  const rows = mktTotals(prepare(seasons, data, geo));
   const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
   const LD = letdowns(rows);
   // the candidate inputs (CAND) are chosen below, after the hyperparameters; until then the base model only
@@ -1202,7 +1246,7 @@ export async function runModel(data, SEASON, opts = {}) {
         const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null, ek = earlyK(p.r);
         const ld = ldOf(LD, p.r);
         out.push({ r: p.r, m: (g != null ? stk.a * m0 + stk.b * g : m0) * ek + ld, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, ld, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
-          tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)]) : null });
+          tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0, p.t.tot)]) : null });
       }
       wf.push(...earlyTotals(out));
     }
@@ -1222,7 +1266,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const { beta, sigma } = fitAll;
   // the model's margin before the early-season stretch (predict applies it) and with the letdown spot
   const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return (g != null ? stackNow.a * m0 + stackNow.b * g : m0) + ldOf(LD, r); };
-  const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a))]); };
+  const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a), t.tot)]); };
   // the mean model total of a week's FBS games (the early-season totals shrink toward it)
   const wkTot = {}, weekTot = w => wkTot[w] ??= (xs => xs.length ? mean(xs) : NaN)(cur.filter(r => r.w === w && r.fbsGame).map(tOf).filter(isFinite));
   // a neutral-field rating in points, for display and the sim's tiebreaks
@@ -1270,7 +1314,7 @@ export async function runModel(data, SEASON, opts = {}) {
     hist: HI ? { first: HI.first, seasons: [S0, SEASON], fitGames: hist.filter(p => p.r.done && p.r.fbsGame).length + train.filter(p => p.r.done && p.r.fbsGame).length } : null,
     eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
-      b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side'] },
+      b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side', 'market-rating total minus projection'] },
     st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
     weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest, fit: HI?.fit || null,
     fpiStack: stackNow ? { from: FP.from, model: r3(stackNow.a), fpi: r3(stackNow.b), sigma: r1(stackNow.sigma), games: stackNow.n } : null,

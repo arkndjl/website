@@ -74,7 +74,12 @@ const PRI = {
   // transfer level jump (scripts/cfb_roster_prior.py --jump): transfers in from stronger S-1 teams, and the signed jump
   rosterJDn: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.jDn ?? 0],
   rosterJump: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.jump ?? 0],
+  // CFBD SP+ (last season's final, SPX map) alongside last final Elo: Nov 1 2026, scripts/cfb_nearmiss_nov01.mjs
+  rosterSpx: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.spx ?? f.sp],
 };
+// SP+ by season and team id, set by a caller (setSpx) for rosterSpx; absent, spx falls back to the Elo anchor
+let SPX = {};
+export const setSpx = m => { SPX = m || {}; };
 function pooledFit(list) {
   // list of [F, final]: merge with season-prefixed keys
   const F = {}, fin = { mass: {}, eff: { ppa: { O: {}, D: {} }, ppp: { O: {}, D: {} }, pace: { O: {}, D: {} } } };
@@ -100,7 +105,7 @@ function chain(priKey, win = 'pooled', P = P0, minFit = SEASONS[0] + 1) {
     const F = I.priorFeatures(S, data, fbsBy[S], nameId, finals);
     const f = finals[S - 1];
     for (const x of Object.values(F)) x.mass = NaN;
-    for (const [t, x] of Object.entries(F)) { x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15; const w = RW[S]?.[t]; x.av = w?.av ?? 0; x.avRest = w?.avRest ?? 0; x.qbW = w?.qb ?? 0; }
+    for (const [t, x] of Object.entries(F)) { x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15; const w = RW[S]?.[t]; x.av = w?.av ?? 0; x.avRest = w?.avRest ?? 0; x.qbW = w?.qb ?? 0; x.spx = SPX[S - 1]?.[t] ?? x.sp; }
     Fs[S] = F;
     raw[S] = I.finalOf(S, rows, effBy[S], fbsBy[S], null, P, finals);   // the target (Massey needs no prior)
     const from = SEASONS.filter(s => s >= minFit && s < S && (win === 'pooled' || s === S - 1));
@@ -285,4 +290,4 @@ report.ship = { extra: SHIPX, prior: SHIPPRI, P: bestP, priorWeights2026: chShip
   bySeason: Object.fromEntries(SEASONS.filter(A21).map(S => [S, { live: sumUp(oLive.filter(x => x.S === S)), ship: sumUp(oShip.filter(x => x.S === S)) }])) };
 console.log('ship', JSON.stringify(report.ship));
 fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtest.json'), JSON.stringify(report, null, 1));
-export { SEASONS, rows, chain, walkAll, predict, cmp, split, report };
+export { SEASONS, rows, chain, walkAll, predict, cmp, split, report, nameId, PRI };
