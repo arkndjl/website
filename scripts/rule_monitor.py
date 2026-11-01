@@ -40,7 +40,8 @@ def iso(t):
 
 def day(kick):
     """the game day a bet belongs to (US Eastern date of the start): the cluster"""
-    return (iso(kick) - datetime.timedelta(hours=4)).date().isoformat()
+    from zoneinfo import ZoneInfo
+    return iso(kick).astimezone(ZoneInfo('America/New_York')).date().isoformat()
 
 
 def fp(d):

@@ -187,6 +187,30 @@ def closes():
     return out
 
 
+def espn_results(log, now):
+    """ESPN's finished singles for open picks tennis.json's results miss (it keeps 48, and only matches the model
+    priced before the start), by the pick's tour and UTC day: {id: result in tennis.json's shape}"""
+    import urllib.request
+    import tennis_data as TD
+    out, days = {}, {}
+    for e in log:
+        if e.get('res') is None and e.get('tour') in ('atp', 'wta') and e['kick'] <= (now - datetime.timedelta(hours=3)).strftime('%Y-%m-%dT%H:%M:%SZ'):
+            days.setdefault((e['tour'], e['kick'][:10].replace('-', '')), set()).add(str(e['id']))
+    for (lg_, day), ids in days.items():
+        try:
+            req = urllib.request.Request(f'{TD.ESPN}{lg_}/scoreboard?dates={day}', headers={'User-Agent': 'Mozilla/5.0 (arkndjl.net arkboard)'})
+            sb = json.load(urllib.request.urlopen(req, timeout=30))
+        except Exception as ex:  # noqa: BLE001
+            print(f'tennis {lg_} {day}: ESPN results failed ({ex})')
+            continue
+        for c in TD.espn_comps(sb, lg_):
+            if c['id'] in ids and c['done']:
+                a, b = c['players']
+                out[c['id']] = {'id': c['id'], 'detail': c.get('detail', ''), 'a': {'won': a[4]}, 'b': {'won': b[4]},
+                                'sc': ' '.join(f'{x}-{y}' for x, y in zip(a[5], b[5]))}
+    return out
+
+
 def stake(pc, o):
     """DU: 1x Kelly on the calibrated chance pc at American price o, quarter units, 0.25 to CAP"""
     b = dec(o) - 1
@@ -270,6 +294,7 @@ def live():
                 board.append({**row, 'why': why})
     # grade from tennis.json's results, judge at Novig's last pregame price
     res = {str(r['id']): r for r in T.get('results', [])}
+    res.update({k: v for k, v in espn_results([e for e in log.values() if str(e['id']) not in res], now).items() if k not in res})
     cl = closes()
     for e in log.values():
         if e.get('res') is not None:

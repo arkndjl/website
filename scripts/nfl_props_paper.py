@@ -246,8 +246,13 @@ def main():
         wk[week(b['k'])].append(b)
     for bs in wk.values():
         raw = {id(b): kelly(R, b['ch'], b['o'], len(bs)) for b in bs}
-        sc = min(1.0, R['budget'] / sum(raw.values())) if sum(raw.values()) > 0 else 1.0
-        while sc > .01 and sum(units(R, f, sc) for f in raw.values()) > R['budget']:
+        # stakes already fixed (graded, or started at a posted stake) use up their share of the budget first
+        fixed = {id(b): (done.get(k) or {}).get('u', posted.get(k)) for b in bs
+                 for k in [(b['id'], b['a'], b['s'])] if k in done or (b['k'] <= now and k in posted)}
+        free = [raw[id(b)] for b in bs if id(b) not in fixed]
+        room = max(0.0, R['budget'] - sum(fixed.values()))
+        sc = min(1.0, room / sum(free)) if sum(free) > 0 else 1.0
+        while sc > .01 and sum(units(R, f, sc) for f in free) > room:
             sc *= .98                                # rounding and the .25 floor stay inside the budget
         for b in bs:
             key = (b['id'], b['a'], b['s'])
@@ -353,7 +358,8 @@ def write_picks(R, bets, now, rec):
     picks = [e for e in log if e['kick'] > now or (e['kick'] > (datetime.datetime.fromisoformat(now.replace('Z', '+00:00')) - datetime.timedelta(hours=12)).strftime('%Y-%m-%dT%H:%M:%SZ'))]
     out = {'sport': 'nflprops', 'name': 'NFL props', 'asof': now, 'rule': R, 'picks': picks, 'withdrawn': [], 'board': [],
            'record': {'n': rec['graded'], 'w': rec['w'], 'l': rec['l'], 'clvN': rec['clvN'], 'clvRet': rec['clvRet'], 'clvT': rec['clvT'],
-                      'sized': {'units': rec['units'], 'roi': rec['roi']}},
+                      'sized': {'units': rec['units'], 'risked': rec['staked'],
+                                'roi': round(rec['units'] / rec['staked'], 3) if rec['staked'] else None}},
            'log': log}
     try:
         old = json.load(open(PICKS))
