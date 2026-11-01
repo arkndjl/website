@@ -1,29 +1,35 @@
 {
- "asof": "2026-11-01T01:34:00Z",
+ "asof": "2026-11-01T09:49:48Z",
  "sport": "nhl",
  "season": 2027,
  "loss": "win log loss",
- "n": 54,
- "logged": 63,
+ "n": 58,
+ "logged": 67,
  "expectFrom": "walk-forward 2022-2026, same calendar month",
- "model": 0.6439,
- "expected": 0.6713,
- "z": 0.103,
+ "model": 0.6329,
+ "expected": 0.6712,
+ "z": 0.146,
  "line": null,
  "lineN": 0,
  "byMonth": [
   {
    "month": "oct",
-   "n": 54,
-   "model": 0.6439,
+   "n": 56,
+   "model": 0.6423,
    "expected": 0.6713
+  },
+  {
+   "month": "nov",
+   "n": 2,
+   "model": 0.3694,
+   "expected": 0.6699
   }
  ],
  "test": {
-  "n": 54,
-  "window": 54,
-  "mean": 0.103,
-  "t": 1.23,
+  "n": 58,
+  "window": 58,
+  "mean": 0.1461,
+  "t": 1.5,
   "days": 8,
   "sd": 1.0,
   "cusum": 0.0,
