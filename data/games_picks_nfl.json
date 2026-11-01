@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T12:38:40Z",
+ "asof": "2026-11-01T13:30:47Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -129,8 +129,8 @@
     "mk": "total",
     "side": "over",
     "line": 40.5,
-    "price": 102.0,
-    "ev": 0.072,
+    "price": -100.0,
+    "ev": 0.061,
     "units": 3.0
    }
   },
@@ -224,8 +224,8 @@
     "mk": "total",
     "side": "over",
     "line": 42.5,
-    "price": -100.0,
-    "ev": 0.073,
+    "price": 106.0,
+    "ev": 0.105,
     "units": 3.0
    }
   },
@@ -252,8 +252,14 @@
    "flagged": "2026-10-31T00:16:07Z",
    "betTo": 46.0,
    "close": 45.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 45.5,
+    "price": -106.0,
+    "ev": 0.031,
+    "units": 1.0
+   }
   },
   {
    "id": "2026_08_KC_DEN",
@@ -372,9 +378,9 @@
     "mk": "total",
     "side": "under",
     "line": 54.5,
-    "price": -102.0,
-    "ev": 0.042,
-    "units": 2.25
+    "price": -100.0,
+    "ev": 0.052,
+    "units": 3.0
    }
   },
   {
@@ -415,10 +421,10 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 2.0,
    "x": 1.5,
-   "why": "no edge at -108",
+   "why": "no edge at -111",
    "m": 0.3,
    "tm": 42.5
   },
@@ -431,12 +437,28 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 2.6,
    "x": 4.0,
    "why": "edge under 4",
    "m": 6.1,
    "tm": 38.1
+  },
+  {
+   "id": "2026_08_IND_JAX",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "JAX",
+   "away": "IND",
+   "mk": "spread",
+   "side": "away",
+   "line": 10.5,
+   "price": -111.0,
+   "edge": 2.2,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": 8.3,
+   "tm": 47.1
   },
   {
    "id": "2026_08_LAC_LA",
@@ -485,22 +507,6 @@
    "why": "edge under 4",
    "m": -0.1,
    "tm": 43.3
-  },
-  {
-   "id": "2026_08_IND_JAX",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "JAX",
-   "away": "IND",
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": 108.0,
-   "edge": 1.2,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 8.3,
-   "tm": 47.1
   }
  ],
  "games": {
@@ -532,10 +538,10 @@
    "mk": "total",
    "side": "under",
    "line": 54.5,
-   "price": -102.0,
-   "ev": 0.042,
+   "price": -100.0,
+   "ev": 0.052,
    "edge": 1.8,
-   "units": 2.25,
+   "units": 3.0,
    "home": "BUF",
    "away": "BAL",
    "state": "pick"
@@ -544,7 +550,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -555,9 +561,9 @@
   "2026_08_IND_JAX": {
    "mk": "spread",
    "side": "away",
-   "line": 9.5,
-   "price": 108.0,
-   "edge": 1.2,
+   "line": 10.5,
+   "price": -111.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "JAX",
@@ -616,7 +622,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -628,8 +634,8 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -100.0,
-   "ev": 0.073,
+   "price": 106.0,
+   "ev": 0.105,
    "edge": 2.5,
    "units": 3.0,
    "home": "MIA",
@@ -640,8 +646,8 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": 102.0,
-   "ev": 0.072,
+   "price": -100.0,
+   "ev": 0.061,
    "edge": 2.1,
    "units": 3.0,
    "home": "WAS",
@@ -701,14 +707,14 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1012,
+  "snapshots": 1022,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 377,
-    "clvRet": -0.0555,
-    "clvT": -22.28,
-    "clv": 0.36,
+    "clvRet": -0.055,
+    "clvT": -21.85,
+    "clv": 0.37,
     "beat": 0.305,
     "still": 0.666
    },
@@ -723,9 +729,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 4,
-    "clvRet": -0.0673,
-    "clvT": -2.62,
+    "clvN": 6,
+    "clvRet": -0.0756,
+    "clvT": -4.39,
     "clv": 0.0,
     "beat": 0.0,
     "still": 1.0
@@ -983,8 +989,7 @@
    "tm": 47.6,
    "flagged": "2026-10-31T00:16:07Z",
    "betTo": 46.0,
-   "close": 45.5,
-   "pass": true
+   "close": 45.5
   },
   {
    "id": "2026_08_BAL_BUF",
