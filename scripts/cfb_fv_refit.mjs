@@ -292,6 +292,13 @@ const RECV_KEYS = ['adot', 'cdep', 'croe', 'yprrD', 'yacoe', 'aXy', 'aXc', 'tprr
 // Not shipped. Retest gNfl with our own OL grades as the opponent read once PFN's 2024+ OL lines have NFL seasons
 const GAME_KEYS = ['gNfl', 'gComp', 'gTrend', 'gNflR'];
 const GSPL = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'game_splits.json'), 'utf8')); } catch { return {}; } })();
+// big-time throws proxy (Nov 1 2026, scripts/qb_btt_research.py --cfb-fv -> scripts/.cache/fvrefit/btt.json): QB
+// completions gaining 25+ yards a dropback from ESPN play text (2015+; ESPN spots air yards only from 2026, so depth is
+// yards gained), each season shrunk to the QB mean at BTT_K dropbacks, blended 5/4/3 like production. bttQ|QB
+// Result: FAILED. bttQ|QB fold t -2.45 (1/10 classes), bttV|QB (a team game) t -1.88 (0/10), pooled bttQ = bttQ|QB;
+// Spearman .429 -> .428, top 32 AV -.032, forward weight 0. Retest with true air-yard BTT once 2026 spots have NFL years.
+const BTT = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'btt.json'), 'utf8')); } catch { return {}; } })(), BTT_K = 150;
+const BTT_M = (() => { let a = 0, n = 0; for (const v of Object.values(BTT)) { a += v.btt; n += v.db; } return n ? a / n : 0; })();
 const GUNIT = { QB: 'qb', RB: 'scr', WR: 'rec', TE: 'rec', EDGE: 'sk', DL: 'sk', LB: 'sk' };
 // evaluator and special-teams terms (Oct 31 2026 sweep; scripts/cfb_fv_extras.py -> scripts/.cache/fvrefit/extras.json,
 // joined through scripts/names.mjs on name + team, crossTeam none). Honors are announced in early December, after the
@@ -341,7 +348,7 @@ function xRaw(o, hist, tgOf) {
   const df = (h, k) => { if (!DPOS[h.row._g] || !XM[h.s]) return null; const x = xfind('def', h.s, h.row); if (!x) return null; const g = x.gamesPlayed || tgOf(h) || 12; return x[k] != null ? x[k] / g : null; };
   o.dPd = bl(h => h.s >= 2016 ? df(h, 'passesDefended') : null); o.dFF = bl(h => df(h, 'fumblesForced')); o.dInt = bl(h => df(h, 'interceptions'));
 }
-const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS, ...X_KEYS];
+const CAND_KEYS = ['bttQ', 'bttV', 'avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS, ...X_KEYS];
 let CANDW = {}, REC_TERMS = false;
 function candTerm(p, g) {
   let t = 0;
@@ -379,6 +386,9 @@ function candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg) {
     let a = 0, w = 0; for (const h of hist) { const x = gl(h), v = x ? f(x) : null; if (v != null && isFinite(v)) { a += CUR.W[h.k] * v; w += CUR.W[h.k]; } }
     o[k] = w ? a / w : null;
   }
+  { let a = 0, w = 0, v = 0, wv = 0; for (const h of hist) { const x = r._g === 'QB' ? BTT[h.s + '|' + nm(h.row.name) + '|' + school(h.row.team)] : null; if (!x) continue;
+      a += CUR.W[h.k] * (x.btt + BTT_K * BTT_M) / (x.db + BTT_K); w += CUR.W[h.k]; const tg = games[h.s]?.[h.sch]; if (tg) { v += CUR.W[h.k] * x.btt / tg; wv += CUR.W[h.k]; } }
+    o.bttQ = w ? a / w : null; o.bttV = wv ? v / wv : null; }
   xRaw(o, hist, h => games[h.s]?.[h.sch]);
   return o;
 }
