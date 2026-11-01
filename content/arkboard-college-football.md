@@ -11,7 +11,7 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,true freshmen,breakouts,portal,backup watch,ARKLIST|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,staff,coaching jobs,coach pay,team builder,development,depth chart|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,true freshmen,breakouts,portal,backup watch,ARKLIST|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,staff,coaching jobs,coach pay,team builder,development,depth chart|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -136,4 +136,7 @@ cover = "/og/college-football.png"
 {{< schooldev sport="cfb" title="development :: NFL FV over recruiting rating, by school" tab="development" >}}
 {{< /lazytab >}}
 {{< depthchart sport="cfb" title="depth chart :: every team" tab="depth chart" >}}
+{{< lazytab tab="all-time FV" >}}
+{{< fvalltime sport="cfb" tab="all-time FV" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}
