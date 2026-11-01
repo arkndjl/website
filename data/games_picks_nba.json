@@ -1,15 +1,15 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-01T21:27:46Z",
+ "asof": "2026-11-01T22:20:14Z",
  "recenter": {
   "2026-11-01": 0.28
  },
  "monitor": {
   "clocks": {
    "total": {
-    "hash": "8c325ab2e3",
-    "since": "2026-11-01T05:42:56Z"
+    "hash": "38b1f5552a",
+    "since": "2026-11-01T22:20:14Z"
    },
    "total | season: late": {
     "hash": "ec10fc7346",
@@ -28,36 +28,40 @@
     "since": "2026-10-23T05:29:26Z"
    },
    "spread | role: favorite": {
-    "hash": "57b544a3b1",
-    "since": "2026-10-23T00:55:10Z"
+    "hash": "b950658f8e",
+    "since": "2026-11-01T22:20:14Z"
    },
    "spread | line: 4-9": {
-    "hash": "b70707429f",
-    "since": "2026-11-01T05:42:56Z"
+    "hash": "67e8df8c99",
+    "since": "2026-11-01T22:20:14Z"
    },
    "spread | season: late": {
-    "hash": "5114f32030",
-    "since": "2026-11-01T05:42:56Z"
+    "hash": "c5bdded527",
+    "since": "2026-11-01T22:20:14Z"
    },
    "spread | venue: away": {
     "hash": "1fa9a56648",
     "since": "2026-11-01T05:42:56Z"
    },
    "spread | venue: home": {
-    "hash": "646709a6b9",
-    "since": "2026-11-01T05:42:56Z"
+    "hash": "84c5488ef9",
+    "since": "2026-11-01T22:20:14Z"
    },
    "spread | line: <4": {
-    "hash": "f4b744e854",
-    "since": "2026-11-01T05:42:56Z"
+    "hash": "9e46bbc2b4",
+    "since": "2026-11-01T22:20:14Z"
    },
    "spread | role: dog": {
-    "hash": "e1af7c77b1",
-    "since": "2026-11-01T05:42:56Z"
+    "hash": "e19fd36c8a",
+    "since": "2026-11-01T22:20:14Z"
    },
    "spread | line: 9-15": {
-    "hash": "a998f7ad7d",
-    "since": "2026-10-28"
+    "hash": "30d0719d51",
+    "since": "2026-11-01T22:20:14Z"
+   },
+   "spread | line: 15+": {
+    "hash": "c4c9109f13",
+    "since": "2026-11-01"
    }
   },
   "stopped": {},
@@ -68,17 +72,17 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1415,
+    "sd": 0.1424,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0311,
+     "mu1": 0.0301,
      "n": 0,
-     "sd": 0.1415,
-     "rho": 0.016,
+     "sd": 0.1424,
+     "rho": 0.011,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -87,7 +91,35 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 122
+     "need": 132
+    }
+   },
+   "spread | line: 15+": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1293,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0137,
+     "n": 0,
+     "sd": 0.1293,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 522
     }
    },
    "spread | line: 4-9": {
@@ -96,16 +128,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1378,
+    "sd": 0.1342,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0321,
+     "mu1": 0.0281,
      "n": 0,
-     "sd": 0.1378,
+     "sd": 0.1342,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -115,122 +147,10 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 108
+     "need": 134
     }
    },
-   "spread | line: <4": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1557,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0315,
-     "n": 0,
-     "sd": 0.1557,
-     "rho": 0.0,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 144
-    }
-   },
-   "spread | role: dog": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1516,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0251,
-     "n": 0,
-     "sd": 0.1516,
-     "rho": 0.0,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 214
-    }
-   },
-   "spread | season: late": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1481,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.029,
-     "n": 0,
-     "sd": 0.1481,
-     "rho": 0.0,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 154
-    }
-   },
-   "spread | venue: away": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1561,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0374,
-     "n": 0,
-     "sd": 0.1561,
-     "rho": 0.0,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 103
-    }
-   },
-   "spread | venue: home": {
+   "spread | line: 9-15": {
     "n": 0,
     "window": 0,
     "mean": null,
@@ -243,7 +163,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0257,
+     "mu1": 0.0192,
      "n": 0,
      "sd": 0.1369,
      "rho": 0.0,
@@ -255,7 +175,147 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 167
+     "need": 299
+    }
+   },
+   "spread | line: <4": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.142,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0316,
+     "n": 0,
+     "sd": 0.142,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 119
+    }
+   },
+   "spread | role: dog": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1549,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0271,
+     "n": 0,
+     "sd": 0.1549,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 193
+    }
+   },
+   "spread | role: favorite": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.118,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0241,
+     "n": 0,
+     "sd": 0.118,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 141
+    }
+   },
+   "spread | season: late": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.16,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0339,
+     "n": 0,
+     "sd": 0.16,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 131
+    }
+   },
+   "spread | venue: home": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1235,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0212,
+     "n": 0,
+     "sd": 0.1235,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 200
     }
    }
   }
@@ -277,8 +337,8 @@
    "units": 4.75,
    "edge": 3.9,
    "x": 3.0,
-   "pDU": 0.5147,
-   "evDU": 0.05,
+   "pDU": 0.5143,
+   "evDU": 0.0492,
    "m": 0.6,
    "tm": 223.4,
    "tmRaw": 223.6,
@@ -319,22 +379,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401909904",
-   "sport": "nba",
-   "kick": "2026-11-01T22:00:00Z",
-   "home": "IND",
-   "away": "BKN",
-   "mk": "total",
-   "side": "over",
-   "line": 229.5,
-   "price": -102.0,
-   "edge": 2.8,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 3.3,
-   "tm": 232.3
-  },
-  {
    "id": "401909905",
    "sport": "nba",
    "kick": "2026-11-02T01:30:00Z",
@@ -343,7 +387,7 @@
    "mk": "total",
    "side": "over",
    "line": 220.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.8,
    "x": 3.0,
    "why": "edge under 3",
@@ -368,23 +412,11 @@
   }
  ],
  "games": {
-  "401909904": {
-   "mk": "total",
-   "side": "over",
-   "line": 229.5,
-   "price": -102.0,
-   "edge": 2.8,
-   "ev": null,
-   "units": 0.0,
-   "home": "IND",
-   "away": "BKN",
-   "state": "under"
-  },
   "401909905": {
    "mk": "total",
    "side": "over",
    "line": 220.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -457,7 +489,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1154,
+  "snapshots": 1156,
   "buckets": [
    {
     "when": "24h+",
@@ -479,12 +511,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 77,
-    "clvRet": -0.0474,
-    "clvT": -10.87,
+    "clvN": 78,
+    "clvRet": -0.0475,
+    "clvT": -11.03,
     "clv": 0.01,
-    "beat": 0.13,
-    "still": 0.766
+    "beat": 0.128,
+    "still": 0.769
    },
    {
     "when": "<1h",
@@ -3141,8 +3173,8 @@
    "units": 4.75,
    "edge": 3.9,
    "x": 3.0,
-   "pDU": 0.5147,
-   "evDU": 0.05,
+   "pDU": 0.5143,
+   "evDU": 0.0492,
    "m": 0.6,
    "tm": 223.4,
    "tmRaw": 223.6,
