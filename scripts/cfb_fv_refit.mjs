@@ -48,8 +48,12 @@ const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55, OL: 65, 
 // (scripts/cfb_fv_boxlines.py: ESPN boxes and season leaderboards, PFN's score fit on 2019-22). --boxonly grades the
 // 2019-22 classes on those stand-ins alone, to measure what they lose against PFN. Both read
 // scripts/.cache/fvrefit/box_lines.json and write their stages to data/cfb_fv_wide.json (see the --wide block below)
-const WIDE = process.argv.includes('--wide'), BOXONLY = process.argv.includes('--boxonly'), BOX = WIDE || BOXONLY;
-const FIRST = WIDE ? 2014 : 2019, SEASONS = Array.from({ length: 2023 - FIRST }, (_, i) => FIRST + i), NFL_THROUGH = 2025;
+// --alltime=<file> (Nov 1 2026): every FBS season 2014-25 at QB-LB graded under the shipped weights (box-score stand-ins
+// for 2014-18 as --wide, PFN from 2019), the board as it stood at the end of each season with no combine or consensus
+// (as --past), each row with the draft that followed and its NFL AV, for the all-time lists (scripts/fv_alltime.py)
+const ALLTIME = process.argv.some(a => a.startsWith('--alltime='));
+const WIDE = process.argv.includes('--wide') || ALLTIME, BOXONLY = process.argv.includes('--boxonly'), BOX = WIDE || BOXONLY;
+const FIRST = WIDE ? 2014 : 2019, SEASONS = Array.from({ length: (ALLTIME ? 2026 : 2023) - FIRST }, (_, i) => FIRST + i), NFL_THROUGH = 2025;
 const HIST0 = WIDE ? 2012 : 2019;     // first season with a production line (the 3-season blend and breakouts reach back to it)
 // --past: every FBS PFN season 2019-25 graded under the shipped weights, written for the board's past-season grades
 // (static/data/cfb-past.json; see the --past block below). OL, CB and S join there: PFN has their lines from 2024
@@ -161,7 +165,7 @@ function pull(file, url) {
 
 // ---- data -----------------------------------------------------------------------------------------------------
 const picksAll = PAST ? [] : csv(fs.readFileSync(path.join(SP, 'draft_picks.csv'), 'utf8'));
-const picks = picksAll.filter(r => +r.season >= FIRST + 1 && +r.season <= 2025);
+const picks = picksAll.filter(r => +r.season >= FIRST + 1 && +r.season <= (ALLTIME ? 2026 : 2025));
 // draft capital: AV a season by slot, a + b ln(pick), fit on the 2012-19 drafts
 const capital = (() => {
   const S = picksAll.filter(r => +r.season >= 2012 && +r.season <= 2019 && +r.pick > 0), x = S.map(r => Math.log(+r.pick)), y = S.map(r => (+r.w_av || 0) / (NFL_THROUGH - +r.season + 1));
@@ -170,7 +174,7 @@ const capital = (() => {
 })();
 // 247 composite, high school classes 2014-21 (--wide: 2009-21)
 const rec = {};
-for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST ? 2025 : 2021); y++, rk = 0) for (let pg = 1; pg <= 60; pg++) {
+for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST || ALLTIME ? 2025 : 2021); y++, rk = 0) for (let pg = 1; pg <= 60; pg++) {
   const h = pull(`247/c_${y}_${pg}.html`, `https://247sports.com/season/${y}-football/compositerecruitrankings/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page=${pg}`);
   const items = h.split('rankings-page__list-item"').slice(1); if (!items.length) break;
   for (const x of items) {
@@ -181,7 +185,7 @@ for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST ? 2025 : 2021); y++, rk = 0)
 }
 // rosters (height, weight, ESPN class) and team schedules (games, start-of-season Elo)
 const ros = {}, elo = {}, games = {};
-for (let y = WIDE ? 2012 : 2017; y <= (PAST ? 2025 : 2022); y++) {
+for (let y = WIDE ? 2012 : 2017; y <= (PAST || ALLTIME ? 2025 : 2022); y++) {
   for (const r of csv(pull(`ros/r${y}.csv`, `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/csv/cfb_rosters_${y}.csv`))) {
     const k = y + '|' + nm(r.first_name + ' ' + r.last_name);
     (ros[k] ||= []).push({ team: school(r.team), ht: +r.height || null, wt: +r.weight || null, year: +r.year });
@@ -523,7 +527,11 @@ for (const g of GP) {
   }
   const byId = {}; for (const r of all) (byId[r.id] ||= {})[r.season] = r;
   for (const s of ROW_SEASONS) {
-    const pool = all.filter(r => r.season === s), P = [];
+    let pool = all.filter(r => r.season === s); const P = [];
+    // --alltime: PFN's 2025 lists run long at some positions (RB 269 vs ~165 a season 2019-24), and a longer, weaker pool
+    // lifts every z in it; trim a PFN season to the 2019-24 median pool by snaps, as the box-score pools are cut
+    if (ALLTIME && s >= 2019) { const med = [2019, 2020, 2021, 2022, 2023, 2024].map(y => all.filter(r => r.season === y).length).sort((x, y) => x - y)[3];
+      if (pool.length > med * 1.15) pool = pool.sort((x, y) => y._v - x._v).slice(0, med); }
     for (const r of pool) {
       const by = byId[r.id], n = nm(r.name), sch = school(r.team);
       let a = 0, d = 0; const hist = [];
@@ -597,14 +605,20 @@ for (const g of GP) {
 const finals = [], early = [];
 const NT = process.argv.includes('--target') ? JSON.parse(fs.readFileSync(path.join(C, 'nfl_targets.json'), 'utf8')) : null;
 if (PAST) for (const p of rows) Object.assign(p, { av: 0, ath: null, dt: null });     // graded, never scored
+// --alltime matches draftees within the position family (a college DT drafted as an edge or linebacker, Rashan Gary)
+const FAMPOS = (() => { const F = [['QB'], ['RB', 'WR', 'TE'], ['EDGE', 'DL', 'LB']], o = {}; for (const f of F) { const u = [...new Set(f.flatMap(g => NFLPOS[g] || []))]; for (const g of f) o[g] = u; } return o; })();
+if (ALLTIME) for (const p of rows) Object.assign(p, { av: 0, cap: 0, pick: null, pfr: null, ap: 0, pb: 0, ath: null, dt: null, open: true });
 for (const p of PAST ? [] : rows) {
-  if (p.last > 2023) continue;
-  const D = p.last + 1, n = nm(p.name), tm = school(p.lastRow.team), cand = picks.filter(x => nm(x.pfr_player_name) === n && NFLPOS[p.g].includes(x.position));
+  if (p.last > (ALLTIME ? 2025 : 2023)) continue;
+  const D = p.last + 1, n = nm(p.name), tm = school(p.lastRow.team), cand = picks.filter(x => nm(x.pfr_player_name) === n && (ALLTIME ? FAMPOS[p.g] : NFLPOS[p.g]).includes(x.position));
   let pk = cand.find(x => +x.season === D && school(x.college) === tm) || cand.find(x => +x.season === D);
+  // --alltime: a later draft within two years at his last school or under his name alone (an opt-out season, or PFN
+  // listing him under another id in his last season) is his draft
+  if (!pk && ALLTIME) pk = cand.filter(x => +x.season > D && +x.season <= D + 2).sort((x, y) => (school(y.college) === tm) - (school(x.college) === tm) || x.season - y.season)[0];
   if (!pk && cand.some(x => +x.season > D)) continue;
   // no exact name: the one draftee that year with his last name, position group and school
   if (!pk) { const c = picks.filter(x => +x.season === D && lastName(x.pfr_player_name) === lastName(p.name) && NFLPOS[p.g].includes(x.position) && school(x.college) === tm); if (c.length === 1) pk = c[0]; }
-  p.av = pk ? (+pk.w_av || 0) / (NFL_THROUGH - D + 1) : 0;
+  p.av = pk ? (+pk.w_av || 0) / (NFL_THROUGH - (ALLTIME ? +pk.season : D) + 1) : 0; p.draftY = pk ? +pk.season : null;
   p.cap = pk ? capital(+pk.pick) : 0;
   p.pick = pk ? +pk.pick : null; p.pfr = pk?.pfr_player_id || null;
   // --target outcomes (scripts/cfb_fv_target.py): NFL WAR a season since the draft (seasons from 2016) and the second
@@ -613,7 +627,8 @@ for (const p of PAST ? [] : rows) {
     p.war = t ? Object.entries(t.seasons).reduce((a, [y, v]) => a + (+y >= y0 ? v[1] : 0), 0) / (NFL_THROUGH - y0 + 1) : 0;
     p.apy = D <= 2018 ? (t ? t.apy * 100 : 0) : null; }
   p.ap = pk ? +pk.allpro || 0 : 0; p.pb = pk ? +pk.probowls || 0 : 0;
-  p.ath = null; p.dt = null;
+  p.ath = null; p.dt = null; p.open = false;
+  if (ALLTIME) continue;      // the board at season's end: no combine, no final boards
   if (p.final) {
     const a = ath[D + '|' + n]; p.ath = a && (a.school === tm || pk) && !INSEASON ? a.ath : null;
     const B = INSEASON ? pffIn : board;
@@ -861,6 +876,14 @@ const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
 // --teamfv=<file>: every graded row (the board at the end of each season, shipped weights; --wide adds 2014-18 on box
 // lines) at the grade and at its mean outcome, with the draft slot that followed (not --past), for the game-model test
 // of FV-based team talent and rookie inputs (scripts/fv_mean_games.py)
+if (ALLTIME) {
+  const G = grade({ ...ONE, ...SHIP, prodBox: 1, hsBox: 1.25 }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
+  const S = rows.filter(p => G.has(p)).map(p => ({ s: p.s, g: p.g, name: p.name, team: p.row.team, id: p.row.id ?? null, years: p.years, final: p.final, last: p.last,
+    stars: p.stars, fm: r3(G.get(p).fm), fvx: r3(pastAtMean(G.get(p).fm, p.g, p.years)), draft: p.pick ? p.draftY : null, pick: p.pick, av: p.open ? null : r3(p.av), ap: p.ap, pb: p.pb }));
+  fs.writeFileSync(arg('alltime')[0], JSON.stringify(S));
+  console.log('alltime rows', S.length, 'by season', JSON.stringify(Object.fromEntries(SEASONS.map(s => [s, S.filter(r => r.s === s).length]))), 'drafted', S.filter(r => r.final && r.pick).length);
+  process.exit(0);
+}
 if (arg('teamfv').length) {
   const G = grade({ ...ONE, ...SHIP, ...(WIDE ? { prodBox: 1, hsBox: 1.25 } : {}) }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
   const S = rows.filter(p => G.has(p)).map(p => { const fm = G.get(p).fm, mu = pastAtMean(fm, p.g, p.years);

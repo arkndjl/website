@@ -1,0 +1,74 @@
+{{- /* All-time FV lists by position, and how the grades turned out (data/fv_alltime.json, scripts/fv_alltime.py).
+       {{< fvalltime sport="cfb|cbb|hockey|soccer|tennis" tab="all-time FV" >}}
+       Two windows: the list (each player once, at his best season's grade; the Pos filter re-ranks within a position)
+       and the check (the all-time top 25 per position and every graded row in bands: the mean FV given against the FV
+       the careers became). */ -}}
+{{- $sport := $.Get "sport" -}}
+{{- $cfg := dict
+    "cfb" (dict "icon" "football" "unit" "player-seasons" "what" "FBS seasons" "out" "NFL AV a season through 2025, read on the FV scale; drafts 2015-23 (later picks show as pending, players still in college as college)")
+    "cbb" (dict "icon" "basketball" "unit" "board rows" "what" "seasons (top 300 each)" "out" "peak NBA value (XPM and role) on the FV scale")
+    "hockey" (dict "icon" "hockey" "unit" "picks" "what" "draft classes" "out" "peak NHL WAR (goalies GSAx) on the FV scale")
+    "soccer" (dict "icon" "soccer" "unit" "player-seasons" "what" "seasons" "out" "peak market value on the FV scale")
+    "tennis" (dict "icon" "tennis" "unit" "player-seasons" "what" "seasons" "out" "peak ranking on the FV scale") -}}
+{{- $c := index $cfg $sport -}}
+{{- with index site.Data.fv_alltime $sport -}}
+{{- $d := . -}}
+{{- $s0 := index .seasons 0 }}{{ $s1 := index .seasons 1 -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "all-time FV :: best grades %v-%v by position" $s0 $s1)) "icon" $c.icon "filter" "Pos,Season,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,Season,FV,Out" "gfxMax" "25") -}}
+<table class="cfb__table fvat">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th>Pos</th><th>Season</th><th>{{ if eq $sport "tennis" }}Nat{{ else }}Team{{ end }}</th>
+    <th class="cfb__g" title="the grade at his best season: the mean outcome, stretched above the board's top few a season">FV</th>
+    <th class="cfb__num" title="the exact mean outcome behind the FV">Mean</th>
+    <th title="what his career became, on the same scale">Out</th>
+    {{- if in (slice "cfb" "cbb" "hockey") $sport }}<th class="cfb__num" title="draft year and overall pick">Draft</th>{{ end }}
+    <th class="fvat__x">{{ if eq $sport "cfb" }}NFL{{ else if eq $sport "cbb" }}NBA{{ else if eq $sport "hockey" }}NHL{{ else if eq $sport "soccer" }}Age{{ else }}Peak{{ end }}</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b></td>
+    <td>{{ if eq $sport "hockey" }}{{ .grp }}{{ else }}{{ .pos }}{{ end }}</td>
+    <td>{{ .season }}</td>
+    <td class="cfb__team"><span>{{ if eq $sport "tennis" }}{{ upper (.team | default "") }}{{ else }}{{ .team }}{{ end }}</span></td>
+    <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td class="cfb__num cfb__dim">{{ printf "%.1f" (float .fvx) }}</td>
+    {{- with .out }}
+    <td class="fv" data-v="{{ . }}"><span class="fv-chip" data-fv="{{ mul (div (int (math.Round .)) 5) 5 }}">{{ math.Round . }}</span></td>
+    {{- else }}
+    <td class="cfb__dim" data-v="0">{{ if eq $r.status "college" }}college{{ else }}pending{{ end }}</td>
+    {{- end }}
+    {{- if in (slice "cfb" "cbb" "hockey") $sport }}<td class="cfb__num">{{ with .pick }}{{ $r.draft }} #{{ . }}{{ else }}{{ if eq $r.status "college" }}{{ else }}<span class="cfb__dim">undrafted</span>{{ end }}{{ end }}</td>{{ end }}
+    <td class="fvat__x cfb__dim">
+      {{- if eq $sport "cfb" }}{{ with .av }}{{ printf "%.1f" (float .) }} AV/season{{ end }}{{ with .pb }} · {{ . }} PB{{ end }}{{ with .ap }} · {{ . }} AP{{ end }}
+      {{- else if eq $sport "cbb" }}{{ .role }}
+      {{- else if eq $sport "hockey" }}{{ with .gp }}{{ . }} GP{{ end }}{{ with .peak }} · {{ printf "%.1f" (float .) }} WAR{{ end }}{{ with .gpeak }} · {{ printf "%+.0f" (float .) }} GSAx{{ end }}
+      {{- else if eq $sport "soccer" }}{{ .age }}
+      {{- else }}{{ with .pkr }}No. {{ . }}{{ end }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" (printf "%v-%v %s · %s %s" $s0 $s1 $c.what (lang.FormatNumber 0 .n) $c.unit)
+    "about" (printf "%v-%v %s, graded the way the board grades today, each player once at his best grade. FV is the mean outcome (Mean, exact), stretched above the board's top few a season. Out: %s. The top %d at each position are listed; pick a position to rank within it.%s%s" $s0 $s1 $c.what $c.out 50 (cond (eq $sport "cfb") " Seasons 2014-18 grade on box-score stand-ins for PFN's line, 2019 onward on PFN's (box-era grades ran hot against the NFL, so their means are put on what such grades became, fit with each draft class held out); no combine or consensus (the board as it stood at the end of each season). OL, CB and S have PFN lines only from 2024, so they are not listed." "") (cond (isset $d "complete") (printf " Listed: %s." (index $d "complete")) ""))) -}}
+
+{{- with .check -}}
+{{- partial "wintable-open.html" (dict "title" "all-time FV :: how the grades turned out" "icon" $c.icon) -}}
+<table class="cfb__table fvsc">
+  <thead><tr><th>Group</th><th class="cfb__num">N</th><th class="cfb__num" title="mean FV given (exact mean)">Given</th><th class="cfb__num" title="mean FV the careers became">Became</th><th class="cfb__num" title="became minus given, with its standard error">Gap</th><th class="cfb__num" title="players who reached their grade or better">Reached</th></tr></thead>
+  <tbody>
+  {{- range .top }}
+    <tr><td>top 25 {{ .pos }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f" (float .given) }}</td><td class="cfb__num"><b>{{ printf "%.1f" (float .became) }}</b></td>
+      <td class="cfb__num">{{ printf "%+.1f" (sub (float .became) (float .given)) }}<span class="fvsc__s cfb__dim">± {{ printf "%.1f" (float .se) }}</span></td><td class="cfb__num">{{ .hit }} of {{ .n }}</td></tr>
+  {{- end }}
+  {{- range .bands }}
+    <tr><td><span class="fv-chip" data-fv="{{ mul (div (int .lo) 5) 5 }}">{{ .lo }}{{ with .hi }}-{{ sub . 1 }}{{ else }}+{{ end }}</span></td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ printf "%.1f" (float .given) }}</td><td class="cfb__num"><b>{{ printf "%.1f" (float .became) }}</b></td>
+      <td class="cfb__num">{{ printf "%+.1f" (sub (float .became) (float .given)) }}{{ with .se }}<span class="fvsc__s cfb__dim">± {{ printf "%.1f" (float .) }}</span>{{ end }}</td><td></td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (add (len .top) (len .bands)) "note" (printf "%s with an outcome" (lang.FormatNumber 0 .n))
+    "about" (printf "Top 25: the all-time top 25 at each position by grade (only players whose outcome is in), the mean FV they were given against the mean FV their careers became. Bands: all %s with an outcome, by the grade's exact mean. A gap inside about two standard errors is noise. The all-time top is picked on the grade, so some fall-back is expected there. Over all of them: became minus given %+.1f, slope %.2f (1 = a point of FV is worth a point of outcome)." $c.unit (float .bias) (float .slope))) -}}
+{{- end -}}
+{{- end -}}

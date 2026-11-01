@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="tennis_prospects.exe :: under-22 big boards" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · Tennis Abstract · every pro level" class="winpane--art" />}}
 
-{{< wintabs groups="players:ATP board,WTA board|model:fv model,ATP past,WTA past" side="true" label="Tennis prospects views" >}}
+{{< wintabs groups="players:ATP board,WTA board|model:fv model,ATP past,WTA past,all-time FV" side="true" label="Tennis prospects views" >}}
 {{< tennisprospects view="board" tour="atp" tab="ATP board" >}}
 {{< lazytab tab="WTA board" >}}{{< tennisprospects view="board" tour="wta" tab="WTA board" >}}{{< /lazytab >}}
 {{< lazytab tab="ATP past" >}}{{< tennisprospects view="past" tour="atp" tab="ATP past" >}}{{< /lazytab >}}
@@ -26,5 +26,8 @@ draft = false
 {{< fvcard sport="tennis-wta" title="WTA :: fv scorecard, tier odds vs what happened, held out" >}}
 {{< /deskcol >}}
 {{< /desk >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time FV" >}}
+{{< fvalltime sport="tennis" tab="all-time FV" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
