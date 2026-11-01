@@ -176,7 +176,7 @@ for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST ? 2025 : 2021); y++, rk = 0)
   for (const x of items) {
     const g = p => (x.match(p) || [])[1], sc = g(/class="score">([\d.]+)/), name = g(/name-link"[^>]*>([^<]*)/); if (!sc || !name) continue;
     const stars = (x.match(/icon-starsolid yellow/g) || []).length, sch = g(/class="img-link"[^>]*>\s*<img alt="([^"]*)"/) || '';
-    (rec[nm(name.replace(/&#39;/g, "'"))] ||= []).push({ y, rating: +sc, stars, school: school(sch), rank: ++rk });
+    (rec[nm(name.replace(/&#39;/g, "'"))] ||= []).push({ y, rating: +sc, stars, school: school(sch), sraw: sch, rank: ++rk });
   }
 }
 // rosters (height, weight, ESPN class) and team schedules (games, start-of-season Elo)
@@ -348,7 +348,34 @@ function xRaw(o, hist, tgOf) {
   const df = (h, k) => { if (!DPOS[h.row._g] || !XM[h.s]) return null; const x = xfind('def', h.s, h.row); if (!x) return null; const g = x.gamesPlayed || tgOf(h) || 12; return x[k] != null ? x[k] / g : null; };
   o.dPd = bl(h => h.s >= 2016 ? df(h, 'passesDefended') : null); o.dFF = bl(h => df(h, 'fumblesForced')); o.dInt = bl(h => df(h, 'interceptions'));
 }
-const CAND_KEYS = ['bttQ', 'bttV', 'avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS, ...X_KEYS];
+// Nov 1 2026 sweep (FV proxy drivers; /mnt/project-files/fv/sweep-nov01/cfb.md):
+//   sdS / sdC / sdP / sdH  rolling development effect (scripts/cfb_fv_schooldev.py -> scripts/.cache/fvrefit/schooldev.json):
+//                          draft capital over the recruiting rating's expectation, classes <= s - 5 only, shrunk; of the
+//                          signing school, the current school, the current school's position group, the current head coach
+//   blk / blkS / blkLow    blocked by talent: same-group teammates this season with more snaps who were 4-star+ 247
+//                          recruits (count), their summed pedigree z above 0, and blk only when his production is below
+//                          the pool mean (low output behind talent is less damning)
+//   dShare / dShareY       snap share (snaps / 68 team-game plays) change on last season; dShareY its residual on years
+//   ppa / ppaPD / use / usePD / dUse  CFBD player PPA a play (all, passing downs; shrunk at 40 plays) and usage share
+//                          (overall, passing downs), blended 5/4/3, and usage change on last season (cfb-game-research
+//                          artifact, scripts/.cache/cfb/hist/{ppaplayers,usage}<S>.json, 2015-25; QB, RB, WR, TE)
+// Result (`--wide --stage=cand --gates`, 10 classes): nothing ships. Pooled, all 14 fail the fold rule (best sdH t 1.33
+// 8/10, usePD .98; dShare -1.71, ppaPD -1.63). By position (55 tests) only sdS|TE (t 2.27, 8/10) and usePD|QB (t 2.14,
+// 6/10) clear t 2, both at the grid edge .2, both lower the top 32 (AV -.038 / -.024) and the forward top 32 (3.51 ->
+// 3.49): chance level for ~70 tests. dUse and dShare are negative nearly everywhere (share gains read as late bloomers)
+const N1_KEYS = ['sdS', 'sdC', 'sdP', 'sdH', 'blk', 'blkS', 'blkLow', 'dShare', 'dShareY', 'ppa', 'ppaPD', 'use', 'usePD', 'dUse'];
+const SDV = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'schooldev.json'), 'utf8')); } catch { return null; } })();
+const CFBD = {};
+for (let S = 2015; S <= 2022; S++) {
+  const H = path.join(ROOT, 'scripts', '.cache', 'cfb', 'hist'), rd = f => { try { return JSON.parse(fs.readFileSync(path.join(H, f), 'utf8')); } catch { return null; } };
+  const pp = rd(`ppaplayers${S}.json`), us = rd(`usage${S}.json`); if (!pp || !us) continue;
+  const U = new Map(us.map(x => [x.id, x.usage])), R = pp.map(x => ({ ...x, usage: U.get(x.id) || null }));
+  CFBD[S] = new Matcher(R, { pos: 'position' });
+}
+const CFBD_POS = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE' };
+const cfbdOf = h => { const M = CFBD[h.s]; if (!M || !CFBD_POS[h.row._g]) return undefined; const ck = 'cfbd|' + h.s + '|' + h.row.id; if (XC.has(ck)) return XC.get(ck);
+  const [hit] = M.find(h.row.name, { team: h.row.team, pos: CFBD_POS[h.row._g], crossTeam: 'none' }); XC.set(ck, hit || null); return hit || null; };
+const CAND_KEYS = ['bttQ', 'bttV', 'avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS, ...X_KEYS, ...N1_KEYS];
 let CANDW = {}, REC_TERMS = false;
 function candTerm(p, g) {
   let t = 0;
@@ -390,6 +417,22 @@ function candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg) {
       a += CUR.W[h.k] * (x.btt + BTT_K * BTT_M) / (x.db + BTT_K); w += CUR.W[h.k]; const tg = games[h.s]?.[h.sch]; if (tg) { v += CUR.W[h.k] * x.btt / tg; wv += CUR.W[h.k]; } }
     o.bttQ = w ? a / w : null; o.bttV = wv ? v / wv : null; }
   xRaw(o, hist, h => games[h.s]?.[h.sch]);
+  // Nov 1 2026 terms (see N1_KEYS)
+  const sd = SDV && (k => SDV[k]?.[s]);
+  o.sdS = sd && rc?.sraw ? sd('school')?.[teamKey(rc.sraw)] ?? null : null;
+  o.sdC = sd ? sd('school')?.[teamKey(r.team)] ?? null : null;
+  o.sdP = sd ? sd('pos')?.[teamKey(r.team) + '|' + r._g] ?? null : null;
+  { const co = SDV?.hc?.[s]?.[teamKey(r.team)]; o.sdH = sd && co ? sd('coach')?.[co] ?? null : null; }
+  const shr = (x, ss) => { const t = games[ss]?.[school(x.team)]; return x._v != null && t ? Math.min(1, x._v / (68 * t)) : null; };
+  const prev = by[s - 1] && s - 1 >= h0 ? by[s - 1] : null;
+  o.dShare = prev ? (shr(r, s) ?? NaN) - (shr(prev, s - 1) ?? NaN) : null; if (!isFinite(o.dShare)) o.dShare = null;
+  const cb = f => { let a = 0, w = 0; for (const h of hist) { const x = cfbdOf(h); const v = x ? f(x) : null; if (v != null && isFinite(v)) { a += CUR.W[h.k] * v; w += CUR.W[h.k]; } } return w ? a / w : null; };
+  const pl = (x, k) => x.averagePPA?.[k] ? x.totalPPA[k] / x.averagePPA[k] : 0;
+  o.ppa = cb(x => x.totalPPA?.all != null ? x.totalPPA.all / (pl(x, 'all') + 40) : null);
+  o.ppaPD = cb(x => x.totalPPA?.passingDowns != null ? x.totalPPA.passingDowns / (pl(x, 'passingDowns') + 40) : null);
+  o.use = cb(x => x.usage?.overall ?? null); o.usePD = cb(x => x.usage?.passingDowns ?? null);
+  { const a = hist[0]?.k === 0 ? cfbdOf(hist[0]) : null, b = hist.find(h => h.k === 1), bb = b ? cfbdOf(b) : null;
+    o.dUse = a?.usage?.overall != null && bb?.usage?.overall != null ? a.usage.overall - bb.usage.overall : null; }
   return o;
 }
 // the receiving depth terms on one position-season pool: rates shrunk to the pool's target-weighted mean at RECV_K
@@ -528,6 +571,19 @@ for (const g of GP) {
         p.cr.acfY2 = p.cr.acf != null ? (p.years <= 2 ? p.cr.acf : 0) : null; p.cr.acfY4 = p.cr.acf != null ? (p.years <= 4 ? p.cr.acf : 0) : null;
         p.cr.acfYc = p.cr.acf != null ? p.cr.acf * Math.min(1, Math.max(0, (4.5 - p.years) / 2)) : null; p.cr.acf1Y = p.cr.acf != null ? +(p.years <= 3 && p.cr.acf === 3) : null; p.cr.acf0 = p.cr.acf ?? 0; }
     }
+    // Nov 1 2026: blocked by talent (same-group teammates ahead of him on snaps, 4-star+ recruits), dShare net of years
+    {
+      const T = {}; for (const p of P) (T[school(p.row.team)] ||= []).push(p);
+      for (const p of P) {
+        const ahead = T[school(p.row.team)].filter(q => q !== p && q.snapsN > p.snapsN);
+        p.cr.blk = ahead.filter(q => q.rating != null && q.rating >= 0.8900).length;
+        p.cr.blkS = ahead.reduce((a, q) => a + Math.max(0, q.hsRaw), 0);
+        p.cr.blkLow = p.zPfn < 0 ? p.cr.blk : 0;
+      }
+      const D = P.filter(p => p.cr.dShare != null), my = mean(D.map(p => p.cr.dShare)), mx = mean(D.map(p => p.years));
+      const b = D.reduce((a, p) => a + (p.years - mx) * (p.cr.dShare - my), 0) / Math.max(1e-9, D.reduce((a, p) => a + (p.years - mx) ** 2, 0));
+      for (const p of P) p.cr.dShareY = p.cr.dShare != null ? p.cr.dShare - my - b * (p.years - mx) : null;
+    }
     // candidate drivers (--stage=cand): z within the pool, missing at the pool mean
     for (const k of CAND_KEYS) {
       const v = P.map(p => p.cr[k]).filter(x => x != null && isFinite(x)), cm = mean(v), cs = sdv(v);
@@ -567,7 +623,7 @@ for (const p of PAST ? [] : rows) {
 }
 console.log('rows', rows.length, 'finals', finals.length, 'drafted', finals.filter(p => p.pick).length, '247 matched', r3(mean(finals.map(p => +!p.walkOn))),
   'roster ht', r3(mean(finals.map(p => +!!p.ht))), 'elo', r3(mean(finals.map(p => +(p.team != null)))), 'board', finals.filter(p => p.dt).length, 'ath', finals.filter(p => p.ath != null).length);
-if (process.argv.includes('--xcov')) for (const k of X_KEYS) {
+if (process.argv.includes('--xcov')) for (const k of [...X_KEYS, ...N1_KEYS]) {
   // coverage and a raw read of the extras terms on last seasons: share carried, share nonzero, drafted rate and AV by value
   const S = finals.filter(p => p.cr[k] != null), nz = S.filter(p => p.cr[k] > 0);
   console.log('xcov', k.padEnd(7), 'carried', r3(S.length / finals.length), 'nonzero', r3(nz.length / Math.max(1, S.length)), 'drafted nz/z', r3(mean(nz.map(p => +!!p.pick))), r3(mean(S.filter(p => !(p.cr[k] > 0)).map(p => +!!p.pick))),
