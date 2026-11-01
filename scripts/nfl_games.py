@@ -101,7 +101,11 @@ INJ_OUT = os.path.join(ROOT, 'data', 'nfl_injuries.json')     # this week's stat
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 FIRST = 2009                       # EPA history starts here; ratings warm up for three seasons before scoring
-FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt']
+FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt', 'ret']
+# ret: the Return Game team badge (scripts/team_badges.py, Nov 1 2026): kick and punt return yards a return, season to
+# date, shrunk to half last season's team rate and half the league's worth RET_N0 games, against the league this season.
+# Passed vs the close (tune 2015-21 t 1.95, held 2022-26 b +.65 t 2.5, held SE t -1.7) and vs this model held out.
+RET_N0 = 10
 LK_QB, LK_INJ = 0.45, 1.36           # the qb and inj terms' points a unit (fit Oct 2026), for the lineup gap      # epa out Oct 21 2026 (harness re-score)
 TFEATS = ['pts', 'dome', 'one', 'epa', 'tmkt']
 # team renames: one franchise, one rating
@@ -150,6 +154,8 @@ def load(last, fresh=False):
             n = num(r['attempts']) + num(r['sacks_suffered']) + num(r['carries'])
             b = box[(gid, team(r['team']))]
             b['epa'] += e; b['plays'] += n
+            b['ry'] = b.get('ry', 0.0) + num(r.get('punt_return_yards')) + num(r.get('kickoff_return_yards'))
+            b['rn'] = b.get('rn', 0.0) + num(r.get('punt_returns')) + num(r.get('kickoff_returns'))
             if r['position'] == 'QB':
                 q = qbs[(gid, r['player_id'])]
                 q['epa'] += e; q['plays'] += n
@@ -184,6 +190,21 @@ class Model:
         self.season = None
         self.lg = [0.0, 0.0]                           # league EPA a play (running)
         self.lgpts = 21.5
+        self.rt = defaultdict(lambda: [0.0, 0.0, 0])     # (season, team) -> return yards, returns, games
+        self.rlg = defaultdict(lambda: [0.0, 0.0, 0])    # season -> the league's
+
+    def retv(self, t):
+        """the Return Game badge value: yards a return to date, shrunk, minus the league's (0 with no history)"""
+        S = self.season
+        lg = self.rlg[S - 1] if self.rlg[S - 1][1] > 0 else self.rlg[S]
+        if lg[1] <= 0:
+            return 0.0
+        lr, dpg = lg[0] / lg[1], lg[1] / max(lg[2], 1)
+        last = self.rt.get((S - 1, t))
+        p = 0.5 * lr + 0.5 * last[0] / last[1] if last and last[1] > 0 else lr
+        c, k = self.rt[(S, t)], RET_N0 * dpg
+        now = self.rlg[S] if self.rlg[S][1] > 0 else lg
+        return (c[0] + k * p) / (c[1] + k) - now[0] / now[1]
 
     def new_season(self, s):
         for t in list(self.elo):
@@ -223,7 +244,7 @@ class Model:
         x = {'elo': (self.elo[h] - self.elo[a]) / 25, 'epa': (net(h) - net(a)) * 62,
              'qb': (qadj(h, g['home_qb_id']) - qadj(a, g['away_qb_id'])) * 38,
              'rest': rest(g['home_rest']) - rest(g['away_rest']), 'home': home, 'inj': 0.0,
-             'mkt': self.mkt[h] - self.mkt[a]}
+             'mkt': self.mkt[h] - self.mkt[a], 'ret': self.retv(h) - self.retv(a)}
         if self.lk or self.lk_mkt:
             r = self.inj.get(g['game_id']) or (0.0, 0.0, 0.0, 0.0)
             self._gap[g['game_id']] = (self.lq * 38 * qadj(h, g['home_qb_id']) - self.li * (r[0] + r[1]),
@@ -280,6 +301,9 @@ class Model:
             if b and b['plays'] > 20:
                 self.lg[0] = self.lg[0] * 0.999 + b['epa']; self.lg[1] = self.lg[1] * 0.999 + b['plays']
             self.lgpts = self.lgpts * 0.995 + sc * 0.005
+            if b and b.get('rn', 0) > 0:
+                for d_ in (self.rt[(self.season, t)], self.rlg[self.season]):
+                    d_[0] += b['ry']; d_[1] += b['rn']; d_[2] += 1
             # the QB(s) who played: career line, and the team's QB EPA a play
             qid = g['home_qb_id'] if t == h else g['away_qb_id']
             tq = [0.0, 0.0]
@@ -905,9 +929,9 @@ def build():
                  'home_moneyline': str(px['mlH']) if px.get('mlH') is not None else g['home_moneyline'],
                  'away_moneyline': str(px['mlA']) if px.get('mlA') is not None else g['away_moneyline']}
         x, tx = proj[g['game_id']]
-        parts = {f: round(b[f] * x[f], 1) for f in FEATS}
+        parts = {f: round(b.get(f, 0.0) * x[f], 1) for f in FEATS}
         parts['roster'] = round(x.get('roster', 0.0), 1)
-        mar = sum(b[f] * x[f] for f in FEATS) + x.get('roster', 0.0)
+        mar = sum(b.get(f, 0.0) * x[f] for f in FEATS) + x.get('roster', 0.0)
         tot = sum(tb[f] * tx[f] for f in TFEATS)
         line = num(g['spread_line'], None); tl = num(g['total_line'], None)
         r = {'id': g['game_id'], 'espn': g['espn'], 'kick': kick(g), 'week': int(g['week']), 'date': g['gameday'], 'time': g['gametime'], 'day': g['weekday'][:3],
@@ -1396,7 +1420,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
         else:
             a = qa(t, q)
         return (b['elo'] * (m.elo[t] - 1505) / 25 + b.get('epa', 0.0) * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * a * 38
-                + b.get('mkt', 0.0) * m.mkt[t] + roster.get(t, 0.0))
+                + b.get('mkt', 0.0) * m.mkt[t] + b.get('ret', 0.0) * m.retv(t) + roster.get(t, 0.0))
     # this week: the starter and the week's injury reports
     R = {t: rating(t) - inj.get(t, 0.0) for t in teams}
     RL = {t: rating(t, later) for t in teams}
@@ -1534,7 +1558,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
             else:
                 a = qa(t, q)
             comps[t] = {'elo': b['elo'] * (m.elo[t] - 1505) / 25, 'eff': b.get('epa', 0.0) * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62,
-                        'qb': b['qb'] * a * 38, 'mkt': b.get('mkt', 0.0) * m.mkt[t], 'roster': roster.get(t, 0.0), 'inj': -inj.get(t, 0.0)}
+                        'qb': b['qb'] * a * 38, 'mkt': b.get('mkt', 0.0) * m.mkt[t], 'ret': b.get('ret', 0.0) * m.retv(t), 'roster': roster.get(t, 0.0), 'inj': -inj.get(t, 0.0)}
         parts = team_detail.center(comps, R, rest='inj')
         mu_of = {k: mu for k, _, _, mu in mus}
         sch = []

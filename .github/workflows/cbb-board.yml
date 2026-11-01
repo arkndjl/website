@@ -54,6 +54,13 @@ jobs:
         run: |
           python3 scripts/cbb_polls_live.py || echo "polls not updated"
           python3 scripts/rank_polls.py cbb $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") || echo "poll history not updated"
+      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/cbb.json and the team file
+      - name: Team badges
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          python3 -m venv /tmp/tbv && /tmp/tbv/bin/pip install -q numpy
+          /tmp/tbv/bin/python scripts/team_badges.py build cbb
       - name: Project games, re-rate teams, log picks
         # a failed game build keeps yesterday's files rather than holding back the board
         run: python3 scripts/cbb_games.py || echo "games not updated"
@@ -89,7 +96,7 @@ jobs:
         run: python3 scripts/model_monitor.py cbb
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json static/data/rookies/cbb.json data/backup_cbb.json static/data/depth/cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_polls.json scripts/data/polls/cbb.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json static/data/teams/cbb.json"
+          files="static/data/cbb-all.json static/data/rookies/cbb.json data/backup_cbb.json static/data/depth/cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_polls.json scripts/data/polls/cbb.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json static/data/teams/cbb.json data/team_badges"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

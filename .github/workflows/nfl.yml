@@ -101,6 +101,13 @@ jobs:
         run: python3 scripts/rookies.py nfl
       # game projections, season sims (odds and expected draft slots for the mock draft's order), this week's injury
       # statuses and the picks (scripts/nfl_picks.py)
+      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/nfl.json and the team file
+      - name: Team badges
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          python3 -m venv /tmp/tbv && /tmp/tbv/bin/pip install -q numpy
+          /tmp/tbv/bin/python scripts/team_badges.py build nfl
       - name: NFL games
         run: python3 scripts/nfl_games.py
       - name: Predictions picks, NFL
@@ -120,7 +127,7 @@ jobs:
         run: python3 scripts/model_monitor.py nfl
       - name: Commit if anything changed
         run: |
-          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json"
+          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
           add() { for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done; }
           add; git add data/rule_monitor.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi

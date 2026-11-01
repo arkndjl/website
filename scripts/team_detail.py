@@ -154,13 +154,19 @@ def save(sport, teams, names=None, asof=None):
     """teams: {key: {'parts': [...], 'pparts': [...], 'sch': [...]}} (any may be missing); names: {opponent key: name}"""
     pm, pl = players(sport)
     yg = young(sport)
+    try:            # this season's team badges (scripts/team_badges_build.py), built in their own step
+        bdg = json.load(open(os.path.join(ROOT, 'data', 'team_badges', f'{sport}.json'))).get('teams', {})
+    except (OSError, ValueError):
+        bdg = {}
     out = {}
     for k, v in teams.items():
-        v = {a: b for a, b in v.items() if b and a not in ('pl', 'yg')}
+        v = {a: b for a, b in v.items() if b and a not in ('pl', 'yg', 'bdg')}
         if pl.get(k):
             v['pl'] = pl[k]
         if yg.get(k):
             v['yg'] = yg[k]
+        if bdg.get(k):
+            v['bdg'] = bdg[k]
         out[k] = v
     for k in pl:
         out.setdefault(k, {'pl': pl[k]})

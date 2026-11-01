@@ -1629,6 +1629,11 @@ def build(days_ahead=4):
                 sch.append(row)
         for t, sr in team_detail.schedules(sch, list(TD)).items():
             TD[t]['sch'] = sr
+        try:      # team badges (scripts/team_badges.py): shots on target from football-data, each league on its own
+            import team_badges_build as TB
+            TB.write('soccer', {t: b for t, b in TB.soccer(rows).items() if t in TD})
+        except Exception as e:
+            print('team badges failed:', repr(e))
         team_detail.save('soccer', TD, names={k: v[0] for g in sch for k in (g['h'], g['a']) if k not in TD for v in [L.names.get(k) or [k]]})
     except Exception as e:            # the dropdowns keep the last file rather than stop the build
         print('team breakdowns failed:', repr(e))

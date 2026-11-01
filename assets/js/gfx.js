@@ -1251,9 +1251,21 @@
       else py2 = plist(x, py2 + 24, w, 'YOUNG TALENT', d.yd, yg, d.ym);
     }
     y = Math.max(gy, py2, cy0) + 40;
+    // team badges (when the team file carries them: [[name, tier]]), before the unit line and strengths (both are
+    // also in the dropdown; the badges take the room first)
+    if (d.badges && d.badges.length && y + 150 < bottom) {
+      y += 4; rule('BADGES'); y -= 10;
+      // up to four in a row, smaller medals than the player card's (the card has less room)
+      var bl = d.badges.slice(0, 4), bw = w / 4, bu = 6;
+      bl.forEach(function (b, i) {
+        var bx = x + i * bw;
+        medal(g, bx, y, b[1], bu);
+        g.font = '28px ' + FONT; g.fillStyle = TIERS[b[1]][2]; g.fillText(TIERS[b[1]][0], bx + 12 * bu + 16, y + 26);
+        g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, b[0].toUpperCase(), bw - 12 * bu - 28), bx + 12 * bu + 16, y + 64);
+      });
+      y += 12 * bu + 34;
+    }
     if (d.group && y + 60 < bottom) { g.fillStyle = C.dark; g.fillRect(x, y - 30, w, 3); g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.group, w), x, y + 16); y += 84; }
-    // team badges (when the team file carries them: [[name, tier]]), as on the player card
-    if (d.badges && d.badges.length && y + 150 < bottom) { y += 10; y += badgeRows(g, d.badges, x, y, w); }
     // strengths and concerns, side by side, in the room left
     if ((d.plus.length || d.minus.length) && y + 130 < bottom) {
       y += 8;
