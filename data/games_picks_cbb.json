@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-01T00:50:25Z",
+ "asof": "2026-11-01T01:28:06Z",
  "recenter": {
   "2026-11-01": -10.6,
-  "2026-11-02": -11.44
+  "2026-11-02": -11.34
  },
  "monitor": {
   "clocks": {
@@ -125,8 +125,8 @@
    "flagged": "2026-11-01T00:09:20Z",
    "betTo": 17.0,
    "close": 12.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401921423",
@@ -183,8 +183,8 @@
    "betTo": 147.0,
    "close": 147.5,
    "tmRaw": 133.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401921422",
@@ -207,11 +207,11 @@
    "m": -0.1,
    "tm": 134.5,
    "flagged": "2026-11-01T00:09:20Z",
-   "betTo": 137.0,
-   "close": 136.5,
+   "betTo": 136.5,
+   "close": 135.5,
    "tmRaw": 123.1,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   }
  ],
  "withdrawn": [
@@ -293,6 +293,22 @@
  ],
  "board": [
   {
+   "id": "401909771",
+   "sport": "cbb",
+   "kick": "2026-11-03T00:00:00Z",
+   "home": "Iowa State",
+   "away": "Memphis",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -125.0,
+   "edge": 7.2,
+   "x": 2.5,
+   "why": "no edge at -125",
+   "m": 19.7,
+   "tm": 155.0
+  },
+  {
    "id": "401911532",
    "sport": "cbb",
    "kick": "2026-11-02T19:00:00Z",
@@ -302,11 +318,11 @@
    "side": "over",
    "line": 148.5,
    "price": -110.0,
-   "edge": 5.0,
+   "edge": 4.9,
    "x": 2.0,
    "why": "no edge at -110",
    "m": 0.7,
-   "tm": 153.5
+   "tm": 153.4
   },
   {
    "id": "401911707",
@@ -318,11 +334,11 @@
    "side": "over",
    "line": 160.5,
    "price": -110.0,
-   "edge": 4.3,
+   "edge": 4.2,
    "x": 2.0,
    "why": "no edge at -110",
    "m": -8.5,
-   "tm": 164.8
+   "tm": 164.7
   },
   {
    "id": "401919014",
@@ -334,11 +350,11 @@
    "side": "over",
    "line": 148.5,
    "price": -110.0,
-   "edge": 3.7,
+   "edge": 3.6,
    "x": 2.0,
    "why": "no edge at -110",
    "m": 4.1,
-   "tm": 152.2
+   "tm": 152.1
   },
   {
    "id": "401920912",
@@ -354,7 +370,7 @@
    "x": 2.5,
    "why": "no edge at -110",
    "m": 1.2,
-   "tm": 144.9
+   "tm": 144.8
   },
   {
    "id": "401921422",
@@ -370,23 +386,7 @@
    "x": 2.5,
    "why": "no edge at -108",
    "m": -0.1,
-   "tm": 134.5
-  },
-  {
-   "id": "401909771",
-   "sport": "cbb",
-   "kick": "2026-11-03T00:00:00Z",
-   "home": "Iowa State",
-   "away": "Memphis",
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -120.0,
-   "edge": 1.4,
-   "x": 2.0,
-   "why": "edge under 2",
-   "m": 19.7,
-   "tm": 155.1
+   "tm": 134.4
   },
   {
    "id": "401920409",
@@ -402,7 +402,7 @@
    "x": 2.5,
    "why": "edge under 2.5",
    "m": 9.0,
-   "tm": 154.4
+   "tm": 154.3
   },
   {
    "id": "401920982",
@@ -434,7 +434,7 @@
    "x": 2.5,
    "why": "edge under 2.5",
    "m": 4.5,
-   "tm": 156.6
+   "tm": 156.5
   }
  ],
  "games": {
@@ -475,11 +475,11 @@
    "state": "under"
   },
   "401909771": {
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -120.0,
-   "edge": 1.4,
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -125.0,
+   "edge": 7.2,
    "ev": null,
    "units": 0.0,
    "home": "Iowa State",
@@ -491,7 +491,7 @@
    "side": "over",
    "line": 148.5,
    "price": -110.0,
-   "edge": 3.7,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "McNeese",
@@ -515,7 +515,7 @@
    "side": "over",
    "line": 148.5,
    "price": -110.0,
-   "edge": 5.0,
+   "edge": 4.9,
    "ev": null,
    "units": 0.0,
    "home": "Northern Kentucky",
@@ -527,7 +527,7 @@
    "side": "over",
    "line": 160.5,
    "price": -110.0,
-   "edge": 4.3,
+   "edge": 4.2,
    "ev": null,
    "units": 0.0,
    "home": "Tennessee State",
@@ -599,16 +599,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 30,
+  "snapshots": 34,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 8,
-    "clvRet": -0.0688,
-    "clvT": -6.37,
-    "clv": -0.25,
+    "clvN": 10,
+    "clvRet": -0.0641,
+    "clvT": -7.07,
+    "clv": -0.2,
     "beat": 0.0,
-    "still": 0.75
+    "still": 0.8
    },
    {
     "when": "6-24h",
@@ -687,8 +687,8 @@
    "m": -0.1,
    "tm": 134.5,
    "flagged": "2026-11-01T00:09:20Z",
-   "betTo": 137.0,
-   "close": 136.5,
+   "betTo": 136.5,
+   "close": 135.5,
    "tmRaw": 123.1,
    "pass": true
   },

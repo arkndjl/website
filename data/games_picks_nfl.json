@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T00:50:21Z",
+ "asof": "2026-11-01T01:28:04Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -71,8 +71,8 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 167.0,
-    "ev": 0.194,
+    "price": 163.0,
+    "ev": 0.176,
     "units": 3.0
    }
   },
@@ -220,8 +220,14 @@
    "flagged": "2026-10-28T15:30:23Z",
    "betTo": 43.0,
    "close": 42.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 42.5,
+    "price": -102.0,
+    "ev": 0.059,
+    "units": 3.0
+   }
   },
   {
    "id": "2026_08_MIN_DET",
@@ -278,14 +284,8 @@
    "flagged": "2026-10-28T02:43:45Z",
    "betTo": 41.0,
    "close": 40.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 40.5,
-    "price": -106.0,
-    "ev": 0.029,
-    "units": 0.75
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "2026_08_ARI_DAL",
@@ -346,9 +346,9 @@
     "mk": "total",
     "side": "under",
     "line": 46.5,
-    "price": -111.0,
-    "ev": 0.049,
-    "units": 0.75
+    "price": -106.0,
+    "ev": 0.072,
+    "units": 3.0
    }
   },
   {
@@ -413,20 +413,20 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "2026_08_NE_MIA",
+   "id": "2026_08_KC_DEN",
    "sport": "nfl",
    "kick": "2026-11-01T21:25:00Z",
-   "home": "MIA",
-   "away": "NE",
+   "home": "DEN",
+   "away": "KC",
    "mk": "total",
    "side": "over",
-   "line": 42.5,
-   "price": -111.0,
-   "edge": 2.4,
+   "line": 40.5,
+   "price": -108.0,
+   "edge": 2.0,
    "x": 1.5,
-   "why": "no edge at -111",
-   "m": -5.5,
-   "tm": 44.9
+   "why": "no edge at -108",
+   "m": -1.3,
+   "tm": 42.5
   },
   {
    "id": "2026_08_CLE_PIT",
@@ -453,7 +453,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.4,
    "x": 4.0,
    "why": "edge under 4",
@@ -526,7 +526,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -571,12 +571,12 @@
    "state": "under"
   },
   "2026_08_LV_NYJ": {
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 115.0,
-   "ev": 0.069,
-   "edge": 4.2,
+   "mk": "total",
+   "side": "under",
+   "line": 46.5,
+   "price": -106.0,
+   "ev": 0.072,
+   "edge": 3.6,
    "units": 3.0,
    "home": "NYJ",
    "away": "LV",
@@ -586,8 +586,8 @@
    "mk": "ml",
    "side": "away",
    "line": null,
-   "price": 167.0,
-   "ev": 0.194,
+   "price": 163.0,
+   "ev": 0.176,
    "edge": 5.2,
    "units": 3.0,
    "home": "DET",
@@ -622,25 +622,25 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -106.0,
-   "ev": 0.029,
+   "price": -108.0,
    "edge": 2.0,
-   "units": 0.75,
+   "ev": null,
+   "units": 0.0,
    "home": "DEN",
    "away": "KC",
-   "state": "pick"
+   "state": "under"
   },
   "2026_08_NE_MIA": {
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -111.0,
+   "price": -102.0,
+   "ev": 0.059,
    "edge": 2.4,
-   "ev": null,
-   "units": 0.0,
+   "units": 3.0,
    "home": "MIA",
    "away": "NE",
-   "state": "under"
+   "state": "pick"
   },
   "2026_08_PHI_WAS": {
    "mk": "total",
@@ -707,7 +707,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 924,
+  "snapshots": 935,
   "buckets": [
    {
     "when": "24h+",
@@ -720,12 +720,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 38,
-    "clvRet": -0.0851,
-    "clvT": -20.31,
-    "clv": 0.03,
-    "beat": 0.053,
-    "still": 0.947
+    "clvN": 42,
+    "clvRet": -0.0833,
+    "clvT": -18.83,
+    "clv": 0.02,
+    "beat": 0.048,
+    "still": 0.952
    },
    {
     "when": "1-6h",
@@ -892,7 +892,8 @@
    "tm": 42.5,
    "flagged": "2026-10-28T02:43:45Z",
    "betTo": 41.0,
-   "close": 40.5
+   "close": 40.5,
+   "pass": true
   },
   {
    "id": "2026_08_CHI_SEA",
@@ -964,8 +965,7 @@
    "tm": 45.0,
    "flagged": "2026-10-28T15:30:23Z",
    "betTo": 43.0,
-   "close": 42.5,
-   "pass": true
+   "close": 42.5
   },
   {
    "id": "2026_08_MIN_DET",
