@@ -222,7 +222,7 @@ def live():
         nv = novig.h2h_price(nvg, a['n'], b['n'], lg=g['tour'].upper()) if nvg else None
         if not nv:
             continue
-        ng, _ = novig.h2h_find(nvg, a['n'], b['n'], lg=g['tour'].upper())
+        ng, fl = novig.h2h_find(nvg, a['n'], b['n'], lg=g['tour'].upper())
         pm, pn = float(g['p']), nv['p']                   # first player's chance: model, Novig no-vig
         e = pm - pn
         side = 'away' if e > 0 else 'home'                 # away = the first player (a), home = the second (b)
@@ -230,7 +230,7 @@ def live():
         o = nv['o'][0] if e > 0 else nv['o'][1]
         pc = sig(lg(sn) + k * (lg(sm) - lg(sn)))
         u, ev = stake(pc, o)
-        row = {'id': g['id'], 'nid': ng['nid'] if ng else None, 'sport': 'tennis', 'tour': g['tour'], 'ev_': g['ev'],
+        row = {'id': g['id'], 'nid': ng['nid'] if ng else None, 'fl': fl, 'sport': 'tennis', 'tour': g['tour'], 'ev_': g['ev'],
                'kick': g['tip'], 'home': short(b['n']), 'away': short(a['n']), 'homeN': b['n'], 'awayN': a['n'],
                'mk': 'ml', 'side': side, 'line': None, 'price': o, 'edge': round(abs(e) * 100, 1), 'x': round(X * 100) if X else None,
                'm': round(sm, 4), 'mkt': round(sn, 4), 'p': round(pc, 4), 'ev': round(ev, 4), 'pDU': round(pc, 4), 'evDU': round(ev, 4)}
@@ -287,7 +287,8 @@ def live():
             e['score'] = r.get('sc')
         c = cl.get(e.get('nid'))
         if c and e.get('close') is None and e['kick'] <= stamp:
-            pcl = 1 - c['p'] if e['side'] == 'away' else c['p']
+            pb = 1 - c['p'] if e.get('fl') else c['p']      # the archive's p is Novig's second side; fl: a is that side
+            pcl = 1 - pb if e['side'] == 'away' else pb
             e['close'] = round(pcl, 4)
             e['clvRet'] = round(pcl * dec(e['price']) - 1, 4)
             e['clv'] = round((pcl - e['mkt']) * 100, 1)

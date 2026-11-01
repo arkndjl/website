@@ -674,10 +674,14 @@ def walk(games, P, upcoming=(), starters=None, moves=None, up_moves=None):
     up = []
     if up_moves is not None:
         m.moves = up_moves
+    last0 = dict(m.lastday)
     for g in upcoming:
         m.advance(g['day'], g['S'])
         st = (starters or {}).get(g['id'], {})
+        g = dict(g, rest={'home': m.rest(g['h'], g['day']), 'away': m.rest(g['a'], g['day'])})
         up.append((g, m.feats(g, st.get('h'), st.get('a'), 0.0 if g.get('neutral') else 1.0)))
+        m.lastday[g['h']] = m.lastday[g['a']] = g['day']    # tomorrow's rest counts tonight's unplayed game
+    m.lastday = last0
     return m, rows, up
 
 
@@ -1185,6 +1189,9 @@ def build():
             ga, sa = pick_starter(m0, g['a'], s.get('a'), d)
             starters[g['id']] = {'h': gh, 'a': ga}
             gsrc[g['id']] = {'h': sh, 'a': sa}
+        for g in up:          # the second date's back-to-backs: tonight's games aren't final yet
+            if g['day'] == d:
+                m0.lastday[g['h']] = m0.lastday[g['a']] = d
     pending = [g for g in up if g['id'] not in done_ids]
     try:   # trades and claims since each club's last game (its NHL roster now)
         mv = live_moves(S, finals)
@@ -1221,7 +1228,7 @@ def build():
                'fair': {'home': american(p), 'away': american(1 - p)},
                'parts': {k: round(fit['coef'][k] * f[k], 3) for k in fit['feats']},
                'elo': {'home': round(m.elo.r[g['h']]), 'away': round(m.elo.r[g['a']])},
-               'rest': {'home': m.rest(g['h'], g['day']), 'away': m.rest(g['a'], g['day'])},
+               'rest': g['rest'],
                'goalie': {s: {'name': m.gk.name.get(st.get(s[0])) if st.get(s[0]) else None,
                               'gsax': round(m.gk.rating(st.get(s[0])), 2) if st.get(s[0]) else None,
                               'src': gsrc.get(g['id'], {}).get(s[0])} for s in ('home', 'away')},
