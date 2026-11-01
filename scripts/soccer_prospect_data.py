@@ -36,6 +36,12 @@ ACADEMY = ['19YL', 'GB18', 'IJ1', 'F19A', 'F19B', 'F19C', 'F19D', 'DKDL', 'T191'
 U23 = ['PT23', 'CHPR']
 RESERVE = ['L3', 'RLB3', 'RLW3', 'RLSW', 'RLN3', 'RLN4', 'IT3A', 'IT3B', 'IT3C', 'ES3A', 'ES3B', 'ES3C', 'ES3D', 'E3G1',
            'E3G2', 'FR3', 'A2', 'BE2', 'TS2', 'KR2', 'DK2', 'NO2', 'SE2', 'SC2', 'MNP3', 'USL']
+# youth internationals (Oct 31 2026, scripts/soccer_youth_intl_research.py): competition -> (age cap, finals tournament).
+# U17/U20 World Cups, U17/U19/U21 Euros and the UEFA qualifiers, CONCACAF U17/U20 and U20 qualifying, South American
+# U17/U20, Asian U17/U20, African U20/U17. Transfermarkt files a tournament under the season it starts in
+YOUTH_INTL = {'17WC': (17, 1), '20WC': (20, 1), 'U17Q': (17, 0), 'U19Q': (19, 0), 'U21Q': (21, 0), '17EU': (17, 1),
+              '19EU': (19, 1), '21EU': (21, 1), 'SAM7': (17, 1), '2SAM': (20, 1), '17AC': (17, 1), '20AC': (20, 1),
+              'CO17': (17, 1), 'C220': (20, 1), 'C20Q': (20, 0), 'AU2C': (20, 1), 'AA17': (17, 1)}
 
 
 def get(path, tries=5):
