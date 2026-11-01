@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T01:26:49Z",
+ "asof": "2026-11-01T01:29:51Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -840,19 +840,19 @@
    "status": "on",
    "stopped": null,
    "n": 14,
-   "clvN": 12,
-   "clvRet": -0.0283,
-   "clvT": -3.17,
+   "clvN": 11,
+   "clvRet": -0.0268,
+   "clvT": -2.7,
    "days": 4,
-   "beat": 0.167,
-   "settled": 12,
-   "w": 5,
+   "beat": 0.182,
+   "settled": 11,
+   "w": 4,
    "l": 7,
-   "roi": -0.1789,
+   "roi": -0.2861,
    "week": {
-    "n": 12,
-    "clvRet": -0.0283,
-    "clvT": -3.17
+    "n": 11,
+    "clvRet": -0.0268,
+    "clvT": -2.7
    },
    "exp": {
     "clvRet": 0.1237,
@@ -861,8 +861,8 @@
     "n": 732
    },
    "vsExp": {
-    "gap": -0.152,
-    "z": -17.03,
+    "gap": -0.1505,
+    "z": -15.17,
     "read": "below the backtest"
    },
    "check": {
@@ -984,19 +984,19 @@
    "status": "on",
    "stopped": null,
    "n": 5,
-   "clvN": 4,
-   "clvRet": 0.0202,
-   "clvT": 0.7,
-   "days": 2,
-   "beat": 0.5,
-   "settled": 4,
+   "clvN": 3,
+   "clvRet": 0.0394,
+   "clvT": null,
+   "days": 1,
+   "beat": 0.667,
+   "settled": 3,
    "w": 2,
-   "l": 2,
-   "roi": -0.141,
+   "l": 1,
+   "roi": 0.1453,
    "week": {
-    "n": 4,
-    "clvRet": 0.0202,
-    "clvT": 0.7
+    "n": 3,
+    "clvRet": 0.0394,
+    "clvT": null
    },
    "exp": {
     "clvRet": 0.1325,
@@ -1005,9 +1005,9 @@
     "n": 71
    },
    "vsExp": {
-    "gap": -0.1123,
-    "z": -3.9,
-    "read": "below the backtest"
+    "gap": -0.0931,
+    "z": -1.02,
+    "read": "in line"
    },
    "check": {
     "n": 3,
@@ -1236,32 +1236,31 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 21,
-   "du": 70.75,
-   "clvRet": 0.0159,
-   "clvT": 0.86,
-   "flat": 0.012,
-   "adds": 0.0039,
-   "expEdge": 0.0187,
+   "n": 20,
+   "du": 68.75,
+   "clvRet": 0.0174,
+   "clvT": 0.91,
+   "flat": 0.0145,
+   "adds": 0.0029,
+   "expEdge": 0.0186,
    "basis": "backtest + live picks"
   },
   {
    "sport": "nba",
    "mk": "total",
    "label": "NBA total",
-   "n": 20,
-   "du": 55.25,
-   "clvRet": -0.0013,
-   "clvT": -0.06,
-   "flat": -0.0122,
-   "adds": 0.0109,
-   "expEdge": 0.0314,
+   "n": 19,
+   "du": 52.75,
+   "clvRet": 0.0008,
+   "clvT": 0.04,
+   "flat": -0.0105,
+   "adds": 0.0113,
+   "expEdge": 0.0324,
    "basis": "backtest + live picks"
   }
  ],
  "stopped": [],
  "flags": [
-  "pick:nba:total",
-  "pick:nba:spread | line: <4"
+  "pick:nba:total"
  ]
 }
