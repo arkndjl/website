@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T09:47:29Z",
+ "asof": "2026-11-01T09:50:36Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -252,14 +252,8 @@
    "flagged": "2026-10-31T00:16:07Z",
    "betTo": 46.0,
    "close": 45.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 45.5,
-    "price": -106.0,
-    "ev": 0.031,
-    "units": 1.0
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "2026_08_KC_DEN",
@@ -384,9 +378,9 @@
     "mk": "total",
     "side": "under",
     "line": 54.5,
-    "price": -104.0,
-    "ev": 0.032,
-    "units": 1.5
+    "price": -102.0,
+    "ev": 0.042,
+    "units": 2.25
    }
   },
   {
@@ -459,7 +453,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 1.8,
    "x": 4.0,
    "why": "edge under 4",
@@ -528,10 +522,10 @@
    "mk": "total",
    "side": "under",
    "line": 54.5,
-   "price": -104.0,
-   "ev": 0.032,
+   "price": -102.0,
+   "ev": 0.042,
    "edge": 1.8,
-   "units": 1.5,
+   "units": 2.25,
    "home": "BUF",
    "away": "BAL",
    "state": "pick"
@@ -588,7 +582,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -697,7 +691,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 976,
+  "snapshots": 979,
   "buckets": [
    {
     "when": "24h+",
@@ -710,12 +704,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 65,
-    "clvRet": -0.0694,
-    "clvT": -13.03,
+    "clvN": 66,
+    "clvRet": -0.0682,
+    "clvT": -12.69,
     "clv": 0.15,
-    "beat": 0.169,
-    "still": 0.831
+    "beat": 0.167,
+    "still": 0.833
    },
    {
     "when": "1-6h",
@@ -978,7 +972,8 @@
    "tm": 47.6,
    "flagged": "2026-10-31T00:16:07Z",
    "betTo": 46.0,
-   "close": 45.5
+   "close": 45.5,
+   "pass": true
   },
   {
    "id": "2026_08_BAL_BUF",
