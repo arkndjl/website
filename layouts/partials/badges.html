@@ -6,7 +6,7 @@
 {{- $T := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" -}}
 {{- with .b -}}
 {{- $lines := slice -}}
-{{- range . }}{{ $n := index . 2 }}{{ $sfx := "th" }}{{ $m := mod $n 100 }}{{ if not (and (ge $m 11) (le $m 13)) }}{{ $d := mod $n 10 }}{{ if eq $d 1 }}{{ $sfx = "st" }}{{ else if eq $d 2 }}{{ $sfx = "nd" }}{{ else if eq $d 3 }}{{ $sfx = "rd" }}{{ end }}{{ end }}{{ $lines = $lines | append (printf "%s %s: %d%s pct at position, %s" (index $T (index . 1)) (index . 0) $n $sfx (index . 3)) }}{{ end -}}
+{{- range . }}{{ $n := int (index . 2) }}{{ $sfx := "th" }}{{ $m := mod $n 100 }}{{ if not (and (ge $m 11) (le $m 13)) }}{{ $d := mod $n 10 }}{{ if eq $d 1 }}{{ $sfx = "st" }}{{ else if eq $d 2 }}{{ $sfx = "nd" }}{{ else if eq $d 3 }}{{ $sfx = "rd" }}{{ end }}{{ end }}{{ $lines = $lines | append (printf "%s %s: %d%s pct at position, %s" (index $T (index . 1)) (index . 0) $n $sfx (index . 3)) }}{{ end -}}
 {{- $tip := printf "%s\npredictive of %s beyond the grade" (delimit $lines "\n") ($.of | default "pro value") -}}
 {{- if $.chips -}}
 <p class="cfb__badges">{{ range $i, $x := . }}<span class="cfb__bdg cfb__bdg--{{ index $x 1 }}" data-n="{{ index $x 0 }}" title="{{ index $lines $i }}">{{ index $T (index $x 1) }} {{ index $x 0 }}</span>{{ end }}</p>
