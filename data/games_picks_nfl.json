@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T21:15:10Z",
+ "asof": "2026-11-01T21:25:41Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -45,62 +45,36 @@
     }
    },
    "total": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 4,
+    "window": 4,
+    "mean": 0.0174,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1256,
     "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusumMax": 0.44,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0167,
-     "n": 0,
+     "n": 4,
      "sd": 0.1256,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": 0.038,
+     "info": 0.07,
+     "real": 1.04,
+     "realSe": 3.761,
      "need": 333
     }
    }
   }
  },
  "picks": [
-  {
-   "id": "2026_08_BAL_BUF",
-   "espn": "401873026",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "BUF",
-   "away": "BAL",
-   "mk": "spread",
-   "side": "home",
-   "line": 3.5,
-   "price": 108.0,
-   "p": 0.518,
-   "ev": 0.078,
-   "units": 3.0,
-   "edge": 4.6,
-   "x": 4.0,
-   "pDU": 0.5128,
-   "evDU": 0.0666,
-   "m": 8.1,
-   "tm": 52.7,
-   "flagged": "2026-10-28T02:43:45Z",
-   "betTo": 2.5,
-   "close": 3.5,
-   "pass": true,
-   "now": null
-  },
   {
    "id": "2026_08_PHI_WAS",
    "espn": "401873035",
@@ -188,14 +162,7 @@
    "flagged": "2026-10-28T15:30:23Z",
    "betTo": 43.0,
    "close": 41.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 41.5,
-    "price": 104.0,
-    "ev": 0.121,
-    "units": 3.0
-   }
+   "now": null
   },
   {
    "id": "2026_08_KC_DEN",
@@ -247,77 +214,11 @@
    "betTo": 54.0,
    "close": 54.5,
    "now": null
-  },
-  {
-   "id": "2026_08_BAL_BUF",
-   "espn": "401873026",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "BUF",
-   "away": "BAL",
-   "mk": "total",
-   "side": "under",
-   "line": 54.5,
-   "price": -106.0,
-   "p": 0.526,
-   "ev": 0.022,
-   "units": 0.5,
-   "edge": 1.8,
-   "x": 1.5,
-   "pDU": 0.5167,
-   "evDU": 0.0042,
-   "m": 7.3,
-   "tm": 52.7,
-   "flagged": "2026-10-31T09:34:10Z",
-   "betTo": 54.5,
-   "close": 55.5,
-   "now": null
   }
  ],
  "withdrawn": [],
- "board": [
-  {
-   "id": "2026_08_KC_DEN",
-   "sport": "nfl",
-   "kick": "2026-11-01T21:25:00Z",
-   "home": "DEN",
-   "away": "KC",
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -111.0,
-   "edge": 1.3,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 0.2,
-   "tm": 42.5
-  }
- ],
+ "board": [],
  "games": {
-  "2026_08_KC_DEN": {
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -111.0,
-   "edge": 1.3,
-   "ev": null,
-   "units": 0.0,
-   "home": "DEN",
-   "away": "KC",
-   "state": "under"
-  },
-  "2026_08_NE_MIA": {
-   "mk": "total",
-   "side": "over",
-   "line": 41.5,
-   "price": 104.0,
-   "ev": 0.121,
-   "edge": 3.4,
-   "units": 3.0,
-   "home": "MIA",
-   "away": "NE",
-   "state": "pick"
-  },
   "2026_08_PHI_WAS": {
    "mk": "total",
    "side": "over",
@@ -344,25 +245,25 @@
   }
  },
  "record": {
-  "n": 4,
-  "w": 2,
+  "n": 5,
+  "w": 3,
   "l": 2,
-  "units": 0.1,
-  "roi": 0.033,
-  "t": 0.06,
-  "ev": 0.086,
+  "units": 1.1,
+  "roi": 0.215,
+  "t": 0.43,
+  "ev": 0.073,
   "sized": {
-   "units": -0.0,
-   "risked": 8.5,
-   "roi": -0.003,
-   "bank": 0.9985
+   "units": 0.4,
+   "risked": 9.0,
+   "roi": 0.049,
+   "bank": 1.0032
   },
-  "clvN": 4,
-  "clvRet": -0.0301,
-  "clvT": -1.51,
-  "clv": -0.5,
-  "beat": 0.25,
-  "still": 0.25,
+  "clvN": 5,
+  "clvRet": -0.0414,
+  "clvT": -2.17,
+  "clv": -0.67,
+  "beat": 0.2,
+  "still": 0.2,
   "byMarket": {
    "spread": {
     "clvN": 0,
@@ -383,13 +284,13 @@
     "n": 2
    },
    "total": {
-    "clvN": 2,
-    "clvRet": -0.053,
-    "clvT": -1.56,
-    "clv": -0.5,
+    "clvN": 3,
+    "clvRet": -0.0643,
+    "clvT": -2.84,
+    "clv": -0.67,
     "beat": 0.0,
-    "still": 0.5,
-    "n": 2
+    "still": 0.333,
+    "n": 3
    }
   }
  },
@@ -503,6 +404,39 @@
    ],
    "clvRet": -0.0191,
    "clv": null,
+   "beat": -1
+  },
+  {
+   "id": "2026_08_BAL_BUF",
+   "espn": "401873026",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "BUF",
+   "away": "BAL",
+   "mk": "total",
+   "side": "under",
+   "line": 54.5,
+   "price": -106.0,
+   "p": 0.526,
+   "ev": 0.022,
+   "units": 0.5,
+   "edge": 1.8,
+   "x": 1.5,
+   "pDU": 0.5167,
+   "evDU": 0.0042,
+   "m": 7.3,
+   "tm": 52.7,
+   "flagged": "2026-10-31T09:34:10Z",
+   "betTo": 54.5,
+   "close": 55.5,
+   "score": [
+    10.0,
+    36.0
+   ],
+   "res": "w",
+   "profit": 0.943,
+   "clvRet": -0.0869,
+   "clv": -1.0,
    "beat": -1
   },
   {
@@ -657,7 +591,16 @@
    "flagged": "2026-10-28T02:43:45Z",
    "betTo": 2.5,
    "close": 3.5,
-   "pass": true
+   "pass": true,
+   "score": [
+    10.0,
+    36.0
+   ],
+   "res": "w",
+   "profit": 1.08,
+   "clvRet": -0.0196,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_08_LV_NYJ",
@@ -881,7 +824,16 @@
    "tm": 52.7,
    "flagged": "2026-10-31T09:34:10Z",
    "betTo": 54.5,
-   "close": 55.5
+   "close": 55.5,
+   "score": [
+    10.0,
+    36.0
+   ],
+   "res": "w",
+   "profit": 0.943,
+   "clvRet": -0.0869,
+   "clv": -1.0,
+   "beat": -1
   },
   {
    "id": "2026_08_LV_NYJ",
