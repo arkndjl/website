@@ -1214,7 +1214,7 @@
       gy += 104;
       var logos = await Promise.all(d.next.map(function (n) { return loadImg(n.logo); }));
       d.next.forEach(function (n, i) {
-        if (gy + 40 > bottom - 120) return;
+        if (gy + 40 > bottom - 120 || ((d.yg || []).length && i >= 3)) return;
         g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(n.day, x, gy);
         var ox = x + 180; g.fillText(n.at, ox, gy); ox += 64;
         if (logos[i]) { drawLogo(g, logos[i], ox, gy - 26, 52, 52); ox += 68; }
@@ -1225,25 +1225,35 @@
         if (rk) { var nw = g.measureText(nm).width; g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(rk, ox + nw + 8, gy + 2); }
         gy += 66;
       });
-      if (d.next.length) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'win chance from the game model', half), x, gy); gy += 40; }
+      if (d.next.length) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'win chance from the game model', half), x, gy - 6); gy += 30; }
     }
-    if (d.pl.length) {
-      var px = d.next.length || d.last ? x + half + 60 : x, pwid = d.next.length || d.last ? half : w;
-      var hh = half; half = pwid; colHead(px, 'KEY PLAYERS', 'by ' + d.pm); half = hh;
-      py2 += 104;
-      d.pl.forEach(function (p) {
-        if (py2 + 40 > bottom - 120) return;
-        var val = d.pm === 'FV' ? String(p[2]) : (p[2] > 0 ? '+' : p[2] < 0 ? '−' : '') + Math.abs(+p[2]).toFixed(2);
-        g.font = '44px ' + FONT; var vw = g.measureText(val).width; g.fillStyle = C.teal; g.fillText(val, px + pwid - vw, py2);
+    // a player list (key players, young talent): name, position, metric at the right, the note under it
+    function plist(px, py, pwid, label, sub, list, metric) {
+      var hh = half; half = pwid; y = py; colHead(px, label, sub); half = hh;
+      py += 104;
+      list.forEach(function (p) {
+        if (py + 40 > bottom - 120) return;
+        var val = metric === 'FV' ? String(p[2]) : (p[2] > 0 ? '+' : p[2] < 0 ? '−' : '') + Math.abs(+p[2]).toFixed(2);
+        g.font = '44px ' + FONT; var vw = g.measureText(val).width; g.fillStyle = C.teal; g.fillText(val, px + pwid - vw, py);
         g.font = '30px ' + FONT; var pos = String(p[1] || ''), posw = pos ? g.measureText(pos).width + 16 : 0;
-        g.font = '40px ' + FONT; g.fillStyle = C.white; var pn = fit(g, p[0], pwid - vw - 32 - posw); g.fillText(pn, px, py2);
+        g.font = '40px ' + FONT; g.fillStyle = C.white; var pn = fit(g, p[0], pwid - vw - 32 - posw); g.fillText(pn, px, py);
         var pnw = g.measureText(pn).width;
-        if (pos) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(pos, px + pnw + 16, py2 + 2); }
-        if (p[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p[3], pwid), px, py2 + 40); py2 += 94; } else py2 += 68;
+        if (pos) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(pos, px + pnw + 16, py + 2); }
+        if (p[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p[3], pwid), px, py + 40); py += 94; } else py += 68;
       });
+      return py;
+    }
+    var two = d.next.length || d.last, yg = d.yg || [];
+    if (d.pl.length) py2 = plist(two ? x + half + 60 : x, py2, two ? half : w, 'KEY PLAYERS', 'by ' + d.pm, d.pl, d.pm);
+    // elite young talent: under the next games (or beside key players when there is no schedule)
+    if (yg.length) {
+      if (two) gy = plist(x, gy + 40, half, 'YOUNG TALENT', d.yd, yg, d.ym);
+      else py2 = plist(x, py2 + 24, w, 'YOUNG TALENT', d.yd, yg, d.ym);
     }
     y = Math.max(gy, py2, cy0) + 40;
     if (d.group && y + 60 < bottom) { g.fillStyle = C.dark; g.fillRect(x, y - 30, w, 3); g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.group, w), x, y + 16); y += 84; }
+    // team badges (when the team file carries them: [[name, tier]]), as on the player card
+    if (d.badges && d.badges.length && y + 150 < bottom) { y += 10; y += badgeRows(g, d.badges, x, y, w); }
     // strengths and concerns, side by side, in the room left
     if ((d.plus.length || d.minus.length) && y + 130 < bottom) {
       y += 8;

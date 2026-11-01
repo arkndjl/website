@@ -130,6 +130,9 @@
     // key players
     if (T.pl && T.pl.length) out += '<p class="tdx__h"><span class="cfb__pastk">key players</span> <span class="cfb__dim">by ' + esc(F.pm) + '</span></p><ul class="tdx__pl">' +
       T.pl.map(function (p) { return '<li><b>' + esc(p[0]) + '</b> <span class="cfb__dim">' + esc(p[1]) + '</span> ' + esc(F.pm) + ' ' + (F.pm === 'FV' ? p[2] : sgn(p[2], 2)) + (p[3] ? ' <span class="cfb__dim">· ' + esc(p[3]) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
+    // elite young talent (team_detail.py young(): YOUNG says who counts as young per sport)
+    if (T.yg && T.yg.length) out += '<p class="tdx__h"><span class="cfb__pastk">young talent</span> <span class="cfb__dim">' + esc(F.yd || '') + '</span></p><ul class="tdx__pl">' +
+      T.yg.map(function (p) { return '<li><b>' + esc(p[0]) + '</b> <span class="cfb__dim">' + esc(p[1]) + '</span> ' + esc(F.ym) + ' ' + (F.ym === 'FV' ? p[2] : sgn(p[2], 2)) + (p[3] ? ' <span class="cfb__dim">· ' + esc(p[3]) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
     if (c.group) { var gl = c.group(r); if (gl) out += '<p class="cfb__dim">' + esc(gl) + '</p>'; }
     // season odds
     var od = odds(c.odds(r));
@@ -145,7 +148,7 @@
       plus: plain(plus), minus: plain(minus), last: gp.slice(-5).map(gres).join(' '),
       xw: gl.filter(function (g) { return g[5] != null; }).reduce(function (s_, g) { return s_ + (c.draws ? 3 * g[5] + (g[7] || 0) : g[5]); }, 0), left: gl.length, draws: !!c.draws,
       next: gl.slice(0, 5).map(function (g) { var o = by[g[1]]; return { day: day(g[0]), at: g[2] === '@' ? '@' : g[2] === 'n' ? 'vs' : 'vs', n: txt(nm(g[1])), rk: o ? o.rk : null, logo: c.logo(g[1], o), p: g[5], m: g[6] }; }),
-      pl: (T.pl || []).slice(0, 6), pm: F.pm || '', group: c.group ? c.group(r) : '',
+      pl: (T.pl || []).slice(0, 6), pm: F.pm || '', yg: (T.yg || []).slice(0, 3), ym: F.ym || F.pm || '', yd: F.yd || '', badges: T.badges || T.bdg || [], group: c.group ? c.group(r) : '',
       odds: c.odds(r).filter(function (x) { return x[1] != null; }).map(function (x) { return [x[0], txt(x[1])]; }) };
     // the inputs
     if (parts.length) {
