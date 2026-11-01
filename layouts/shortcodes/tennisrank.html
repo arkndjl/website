@@ -30,7 +30,7 @@
   {{- range $t.players }}{{ $r := . }}
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>
-    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ partial "badges.html" (dict "b" .bdg "of" "next season's Elo") }}</td>
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
     <td class="cfb__num" data-v="{{ .pH }}">{{ printf "%.0f" (mul .pH 100) }}% <span class="cfb__dim">#{{ .rkH }}</span></td>
     <td class="cfb__num" data-v="{{ .pC }}">{{ printf "%.0f" (mul .pC 100) }}% <span class="cfb__dim">#{{ .rkC }}</span></td>
@@ -48,5 +48,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. %d active players, top %d shown." $tl (int $t.active) (len $t.players))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. Badges (medals by the name): traits that predicted next season's Elo change with Elo, ARK and age held fixed, 2006-24 year-ends, t clustered by player, each season held out; ATP Big Server (aces a serve point) and Grass Court (grass Elo over hard-court Elo) pass; return points, first and second serve, break points saved and converted, tiebreaks and clay are noise or add nothing, and no WTA trait passes (scripts/tennis_badge_backtest.py). %d active players, top %d shown." $tl (int $t.active) (len $t.players))) -}}
 {{- end -}}
