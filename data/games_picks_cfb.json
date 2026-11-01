@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-01T20:39:27Z",
+ "asof": "2026-11-01T20:40:33Z",
  "recenter": {
   "week": 0.77
  },
@@ -803,8 +803,8 @@
    "flagged": "2026-11-01T20:38:27Z",
    "betTo": 50.0,
    "close": 52.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   }
  ],
  "withdrawn": [],
@@ -834,7 +834,7 @@
    "mk": "total",
    "side": "over",
    "line": 38.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 7.1,
    "x": 2.5,
    "why": "no edge at -110",
@@ -866,7 +866,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 6.3,
    "x": 2.5,
    "why": "no edge at -110",
@@ -1066,6 +1066,22 @@
    "tm": 52.6
   },
   {
+   "id": "401858514",
+   "sport": "cfb",
+   "kick": "2026-11-07T20:30:00.000Z",
+   "home": "Ohio State",
+   "away": "Oregon",
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": -104.0,
+   "edge": 4.4,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": 5.1,
+   "tm": 53.8
+  },
+  {
    "id": "401869936",
    "sport": "cfb",
    "kick": "2026-11-07T20:00:00.000Z",
@@ -1122,7 +1138,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -133.0,
+   "price": -135.0,
    "edge": 3.8,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1192,22 +1208,6 @@
    "why": "edge under 6 (season: late)",
    "m": -14.9,
    "tm": 50.2
-  },
-  {
-   "id": "401869927",
-   "sport": "cfb",
-   "kick": "2026-11-07T19:30:00.000Z",
-   "home": "App State",
-   "away": "Georgia State",
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -115.0,
-   "edge": 1.1,
-   "x": 2.0,
-   "why": "edge under 2 (conf: Sun Belt)",
-   "m": 2.8,
-   "tm": 56.4
   }
  ],
  "games": {
@@ -1238,9 +1238,9 @@
   "401858514": {
    "mk": "spread",
    "side": "away",
-   "line": 7.5,
-   "price": -125.0,
-   "edge": 2.4,
+   "line": 9.5,
+   "price": -104.0,
+   "edge": 4.4,
    "ev": null,
    "units": 0.0,
    "home": "Ohio State",
@@ -1323,7 +1323,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 6.3,
    "ev": null,
    "units": 0.0,
@@ -1371,7 +1371,7 @@
    "mk": "spread",
    "side": "away",
    "line": -5.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -1394,9 +1394,9 @@
   "401856851": {
    "mk": "spread",
    "side": "home",
-   "line": 11.5,
-   "price": -105.0,
-   "edge": 1.1,
+   "line": 10.5,
+   "price": -110.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "Houston",
@@ -1443,7 +1443,7 @@
    "mk": "total",
    "side": "over",
    "line": 38.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 7.1,
    "ev": null,
    "units": 0.0,
@@ -1503,7 +1503,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -133.0,
+   "price": -135.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -2008,16 +2008,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4058,
+  "snapshots": 4072,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1055,
-    "clvRet": -0.0386,
-    "clvT": -16.92,
-    "clv": 0.27,
-    "beat": 0.351,
-    "still": 0.411
+    "clvN": 1058,
+    "clvRet": -0.04,
+    "clvT": -17.95,
+    "clv": 0.24,
+    "beat": 0.339,
+    "still": 0.423
    },
    {
     "when": "6-24h",
