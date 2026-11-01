@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T16:31:07Z",
+ "asof": "2026-11-01T16:34:30Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -103,8 +103,8 @@
     "mk": "spread",
     "side": "home",
     "line": 3.5,
-    "price": 120.0,
-    "ev": 0.133,
+    "price": 117.0,
+    "ev": 0.118,
     "units": 3.0
    }
   },
@@ -358,6 +358,38 @@
    }
   },
   {
+   "id": "2026_08_IND_JAX",
+   "espn": "401873028",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "JAX",
+   "away": "IND",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -104.0,
+   "p": 0.523,
+   "ev": 0.026,
+   "units": 1.0,
+   "edge": 1.6,
+   "x": 1.5,
+   "pDU": 0.5153,
+   "evDU": 0.0108,
+   "m": 9.2,
+   "tm": 47.1,
+   "flagged": "2026-11-01T16:34:30Z",
+   "betTo": 45.5,
+   "close": 45.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 45.5,
+    "price": -104.0,
+    "ev": 0.026,
+    "units": 1.0
+   }
+  },
+  {
    "id": "2026_08_BAL_BUF",
    "espn": "401873026",
    "sport": "nfl",
@@ -418,22 +450,6 @@
  ],
  "withdrawn": [],
  "board": [
-  {
-   "id": "2026_08_IND_JAX",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "JAX",
-   "away": "IND",
-   "mk": "total",
-   "side": "over",
-   "line": 45.5,
-   "price": -108.0,
-   "edge": 1.6,
-   "x": 1.5,
-   "why": "no edge at -108",
-   "m": 9.2,
-   "tm": 47.1
-  },
   {
    "id": "2026_08_CLE_PIT",
    "sport": "nfl",
@@ -507,7 +523,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 1.7,
    "x": 4.0,
    "why": "edge under 4",
@@ -544,8 +560,8 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 120.0,
-   "ev": 0.133,
+   "price": 117.0,
+   "ev": 0.118,
    "edge": 4.3,
    "units": 3.0,
    "home": "BUF",
@@ -568,13 +584,13 @@
    "mk": "total",
    "side": "over",
    "line": 45.5,
-   "price": -108.0,
+   "price": -104.0,
+   "ev": 0.026,
    "edge": 1.6,
-   "ev": null,
-   "units": 0.0,
+   "units": 1.0,
    "home": "JAX",
    "away": "IND",
-   "state": "under"
+   "state": "pick"
   },
   "2026_08_LV_NYJ": {
    "mk": "total",
@@ -628,7 +644,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -713,7 +729,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1077,
+  "snapshots": 1082,
   "buckets": [
    {
     "when": "24h+",
@@ -735,9 +751,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 26,
-    "clvRet": -0.0557,
-    "clvT": -5.31,
+    "clvN": 27,
+    "clvRet": -0.0574,
+    "clvT": -5.61,
     "clv": 0.0,
     "beat": 0.0,
     "still": 1.0
@@ -1042,6 +1058,30 @@
    "tm": 42.9,
    "flagged": "2026-10-31T09:34:10Z",
    "close": 1.5
+  },
+  {
+   "id": "2026_08_IND_JAX",
+   "espn": "401873028",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "JAX",
+   "away": "IND",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -104.0,
+   "p": 0.523,
+   "ev": 0.026,
+   "units": 1.0,
+   "edge": 1.6,
+   "x": 1.5,
+   "pDU": 0.5153,
+   "evDU": 0.0108,
+   "m": 9.2,
+   "tm": 47.1,
+   "flagged": "2026-11-01T16:34:30Z",
+   "betTo": 45.5,
+   "close": 45.5
   }
  ]
 }

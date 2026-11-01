@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T16:31:14Z",
+ "asof": "2026-11-01T16:34:41Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 109.25,
+  "open": 111.0,
   "path": [
    101.5,
    101.6,
@@ -51,7 +51,7 @@
   ]
  },
  "record": {
-  "n": 132,
+  "n": 131,
   "clvN": 46,
   "clvRet": -0.018,
   "clvT": -2.3,
@@ -130,7 +130,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 2,
+   "n": 3,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -193,7 +193,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 7,
+   "n": 8,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -256,7 +256,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 5,
+   "n": 4,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -298,7 +298,7 @@
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 13,
+   "n": 12,
    "clvN": 12,
    "clvRet": -0.0475,
    "clvT": -2.05,
@@ -340,7 +340,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 51,
+   "n": 50,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -610,6 +610,27 @@
    "event": null,
    "pass": false,
    "close": 54.5
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_08_IND_JAX",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nfl:2026-11-01",
+   "h": "JAX",
+   "a": "IND",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -104.0,
+   "bet": "over 45.5 -104",
+   "placed": "2026-11-01T16:34:30Z",
+   "stake": 1.0,
+   "edge": 1.6,
+   "ev": 0.0108,
+   "event": null,
+   "pass": false,
+   "close": 45.5
   },
   {
    "rule": "nfl-ml",
@@ -1313,7 +1334,7 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1895,7 +1916,7 @@
    "edge": 3.0,
    "ev": 0.0029,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 229.5
   },
   {
@@ -2423,7 +2444,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 161.5
+   "close": 163.5
   },
   {
    "rule": "cbb-total",
@@ -2444,7 +2465,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": false,
-   "close": 148.5
+   "close": 147.5
   },
   {
    "rule": "cbb-ml",
@@ -2632,7 +2653,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -2817,8 +2838,8 @@
    "edge": 7.7,
    "ev": 0.0296,
    "event": null,
-   "pass": true,
-   "close": 42.5
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -6207,6 +6228,27 @@
    "close": 54.5
   },
   {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_08_IND_JAX",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nfl:2026-11-01",
+   "h": "JAX",
+   "a": "IND",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -104.0,
+   "bet": "over 45.5 -104",
+   "placed": "2026-11-01T16:34:30Z",
+   "stake": 1.0,
+   "edge": 1.6,
+   "ev": 0.0108,
+   "event": null,
+   "pass": false,
+   "close": 45.5
+  },
+  {
    "rule": "nfl-ml",
    "sport": "nfl",
    "id": "2026_08_LV_NYJ",
@@ -6908,7 +6950,7 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -7490,7 +7532,7 @@
    "edge": 3.0,
    "ev": 0.0029,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 229.5
   },
   {
@@ -8018,7 +8060,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 161.5
+   "close": 163.5
   },
   {
    "rule": "cbb-total",
@@ -8039,7 +8081,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": false,
-   "close": 148.5
+   "close": 147.5
   },
   {
    "rule": "cbb-ml",
@@ -8227,7 +8269,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -8412,8 +8454,8 @@
    "edge": 7.7,
    "ev": 0.0296,
    "event": null,
-   "pass": true,
-   "close": 42.5
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
