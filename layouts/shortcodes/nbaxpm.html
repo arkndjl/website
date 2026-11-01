@@ -6,7 +6,8 @@
        (sxpm: w = MP / (MP + 300) toward a role mean, scripts/nba_xpm.py shrink()); raw XPM sits under it. VORX = .030 x (XPM + 1.4) x MP / 48: wins over replacement, both constants fit to NBA wins (scripts/nba_xpm.py).
        Views: VORX (the default), XPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
        per 82 team games), position, team, search. RK and the position rank count within the filters and the view;
-       headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM). */ -}}
+       headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM).
+       Medals in the name cell: bdg, the predictive badges (scripts/nba_badges.py; data/nba_badge_backtest.json). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
 <div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
@@ -44,7 +45,7 @@
     <table class="cfb__table nbaxpm__table">
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (VORX, XPM, offense or defense)">RK</th>
-        <th data-sort="n">Player</th>
+        <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 500+ MP): Shot Creator (usage %), Playmaker (assist %), Disruptor (steal %), Foul Drawer (free throws a shot). Each predicted next-season XPM beyond this season's XPM, minutes and age, held out (scripts/nba_badge_backtest.py)">Player</th>
         <th data-sort="sxpm" data-num title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player, shrunk by minutes: raw x MP / (MP + 300) + role mean x 300 / (MP + 300), role mean -1 + .5 ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26. Below: raw. * = BPM only (no DPM row)">XPM</th>
         <th data-sort="pxpm" data-num class="c-pxpm" title="XPM (proj): XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only"><span class="nbaxpm__ph">XPM </span>(proj)</th>
         <th data-sort="soxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM, shrunk by minutes">O-XPM</th>
@@ -62,6 +63,7 @@
     </table>
     <p class="cfb__none" data-nx-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-nx-none hidden>no players match.</p>
+    <p class="cfb__dim cfb__bdgnote">medals: Shot Creator, Playmaker, Disruptor, Foul Drawer, the 4 of 12 trait badges that predicted next-season XPM beyond this season's XPM, minutes and age (2010-26, leave one season out, t clustered by player). hover for the stat and percentile.</p>
   </div>
   <div class="win__status"><span data-nx-count></span>
     <span class="winpager" data-nx-pager hidden>
@@ -80,6 +82,10 @@
   var PER = 50, KEY = { '': 'vorx', p: 'pxpm', x: 'sxpm', o: 'soxpm', d: 'sdxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // predictive badges (scripts/nba_badges.py, the CFB board's pixel medals): [name, tier, pct, stat], best first
+  var TIER = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
+  function nth(n) { var t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return n + t; }
+  function medals(p) { return p.bdg ? '<span class="cfb__medals" title="' + esc(p.bdg.map(function (b) { return TIER[b[1]] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct at position, ' + b[3]; }).join('\n') + '\npredictive of next-season XPM beyond the XPM') + '">' + p.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
   // ESPN headshot (ph = ESPN id, scripts/faces.py) through ESPN's resizer; none, or one that fails, shows the neutral frame (lazy, so only the rows in view load)
   // team logo (static/img/nba/<abbr>.png), 16 px inline; a code with no file drops it
   function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nba/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
@@ -137,7 +143,7 @@
     table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP' + medals(p) + '</span></td>' +
         '<td class="cfb__num nbaxpm__v' + k('sxpm') + '">' + sg(p.sxpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + (p.bpm == null && p.dpm == null ? '' : '<span class="cfb__dim nbaxpm__od" title="raw XPM">raw ' + (p.xpm > 0 ? '+' : '') + p.xpm.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('soxpm') + '">' + sg(p.soxpm) + '</td>' +

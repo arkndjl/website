@@ -12,8 +12,9 @@ value on held-out seasons.
   python3 scripts/nba_xpm.py 2010 2026     # seasons from..to (end year: 2026 = 2025-26)
   python3 scripts/nba_xpm.py --current     # the season in progress, for the daily refresh
   python3 scripts/nba_xpm.py --shrink      # recompute shrunk XPM (sxpm, SHRINK_K) in every published file
+  python3 scripts/nba_xpm.py --badges      # recompute the predictive badges (bdg, scripts/nba_badges.py) in every published file
 
-Inputs: bbref's advanced table, fetched into scripts/.cache/nba/adv_<season>.html (refetched for the current
+Inputs: bbref's advanced and totals tables, fetched into scripts/.cache/nba/adv_<season>.html and tot_<season>.html (refetched for the current
 season); DPM from scripts/.cache/cbb/dpm/<season>.json (node scripts/cbb_dpm.mjs <season>). A season with no
 DPM file keeps the DPM already in its published file, or goes out BPM-only. Stdlib only."""
 import datetime as dt, html, json, math, os, re, sys, time, urllib.request
@@ -41,12 +42,13 @@ def current_season(today=None):
     return t.year + 1 if t.month >= 10 else t.year          # the 2026-27 season is 2027 from October
 
 
-def fetch(season, fresh):
+def fetch(season, fresh, table='advanced'):
+    """bbref's season table: advanced (XPM's BPM) or totals (the badges' shooting lines)"""
     os.makedirs(CACHE, exist_ok=True)
-    fn = os.path.join(CACHE, f'adv_{season}.html')
+    fn = os.path.join(CACHE, f"{'adv' if table == 'advanced' else 'tot'}_{season}.html")
     if not fresh and os.path.exists(fn) and os.path.getsize(fn) > 50000:
         return open(fn, encoding='utf-8').read()
-    url = f'https://www.basketball-reference.com/leagues/NBA_{season}_advanced.html'
+    url = f'https://www.basketball-reference.com/leagues/NBA_{season}_{table}.html'
     for attempt in range(4):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': UA})
@@ -211,6 +213,7 @@ def build(season, fresh=False):
         print(season, 'faces skipped', e)
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82
     for p in players: shrink(p, gmax)
+    badges(players, h, fetch(season, fresh, 'totals'), gmax)
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'n': len(players), 'games': gmax, 'dpmSrc': src, 'dpmShare': round(hitmp / allmp, 3) if allmp else 0,
            'players': players}
@@ -221,6 +224,31 @@ def build(season, fresh=False):
     json.dump(out, open(fn, 'w'), separators=(',', ':'))
     print(f"{season}: {len(players)} players, DPM on {hit} ({out['dpmShare']:.0%} of minutes), {npr} on the prior, {gmax} games")
     return out
+
+
+def badges(players, adv, tot, games):
+    """bdg on each row: the predictive badges (scripts/nba_badges.py; only those that beat this season's XPM on next
+    season's, held out), positional percentiles among 500+ MP players, pro-rated to the games so far"""
+    try:
+        import nba_badges
+        b = nba_badges.board_badges(nba_badges.season_stats(adv, tot), frac=max(games, 1) / 82)
+    except Exception as e:
+        print('badges skipped', e); return
+    for p in players:
+        p.pop('bdg', None)
+        if p['id'] in b and not p.get('pr'): p['bdg'] = b[p['id']]
+
+
+def rebadge():
+    """recompute the badges in every published season file from the cached bbref tables (no refetch)"""
+    for f in sorted(os.listdir(OUT)):
+        if not f.endswith('.json'): continue
+        s = int(f[:4]); fa, ft = (os.path.join(CACHE, f'{t}_{s}.html') for t in ('adv', 'tot'))
+        if not (os.path.exists(fa) and os.path.exists(ft)): print(f, 'no cached tables'); continue
+        fn = os.path.join(OUT, f); d = json.load(open(fn))
+        badges(d['players'], open(fa, encoding='utf-8').read(), open(ft, encoding='utf-8').read(), d['games'])
+        json.dump(d, open(fn, 'w'), separators=(',', ':'))
+        print(f, sum(1 for p in d['players'] if p.get('bdg')), 'with badges')
 
 
 def write_index():
@@ -240,6 +268,8 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     if a and a[0] == '--shrink':
         reshrink()
+    elif a and a[0] == '--badges':
+        rebadge()
     elif a and a[0] == '--current':
         s = current_season()
         if not build(s, fresh=True): build(s - 1, fresh=True)    # before opening night: last season's final

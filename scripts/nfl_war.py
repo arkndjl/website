@@ -566,10 +566,18 @@ def board(y, thru=None, fresh=False):
     # XV (scripts/nfl_xv.py): WAR on the stat-line parts that track team margin; the board's WAR blends it with AV's
     try:
         import nfl_xv
-        xvs, alpha = nfl_xv.board_xv(y, sd, ros, b)
+        prow = []
+        xvs, alpha = nfl_xv.board_xv(y, sd, ros, b, rows_out=prow)
     except Exception as e:   # the board still builds on AV alone
         print(f'nfl war: XV skipped ({e!r})')
-        xvs, alpha = None, None
+        xvs, alpha, prow = None, None, []
+    # predictive badges (scripts/nfl_badges.py: only those that beat this season's WAR on next season's, held out)
+    try:
+        import nfl_badges
+        bdg = nfl_badges.board_badges(y, prow, thru=thru, frac=max(teamg.values() or [17]) / 17) if prow else {}
+    except Exception as e:
+        print(f'nfl war: badges skipped ({e!r})')
+        bdg = {}
     out = []
     for pfr, a in agg.items():
         if a['snaps'] <= 0:
@@ -599,7 +607,7 @@ def board(y, thru=None, fresh=False):
                     'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
-                    '_st': dict(st), '_g': g})
+                    '_st': dict(st), '_g': g, **({'bdg': bdg[pfr]} if pfr in bdg else {})})
     out = [p for p in out if p['sn'] >= 1]
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
         ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))

@@ -3382,6 +3382,8 @@ table.trophycase__hist td.trophycase__post {
 .cfb__medal--g, .cfb__bdg--g { --tier: #ffd34d; }
 .cfb__medal--p, .cfb__bdg--p { --tier: #b9f2ff; }
 .cfb__badges { margin: 4px 0; }
+/* the NFL WAR / NBA XPM boards' one-line note on which badges passed their backtest */
+.cfb__bdgnote { margin: 6px 8px !important; font-size: 0.75em; }
 /* FV by season in the scouting report and the past-seasons tab: one chip a season, newest first, wrapping on a phone */
 .cfb__past { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 4px 0 8px !important; }
 .cfb__pastk { color: var(--accent); }
@@ -3924,6 +3926,8 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 @media (max-width: 684px) {
   .nbaxpm__table .nbaxpm__team, .nbaxpm__table .nbaxpm__src, .nbaxpm__table .nbaxpm__ph { display: none; }
   .nbaxpm__tm { display: block; font-size: 0.85em; }
+  /* badge medals ride on the team line, so a long name doesn't widen the table */
+  .nbaxpm__table b + .cfb__medals { display: none; }
   .nbaxpm__table th, .nbaxpm__table td { padding-left: 4px; padding-right: 4px; }
   /* XPM and the number the view ranks by; the other splits are a tap away */
   .nbaxpm__table:not([data-key=pxpm]) .c-pxpm, .nbaxpm__table:not([data-key=soxpm]) .c-oxpm, .nbaxpm__table:not([data-key=sdxpm]) .c-dxpm, .nbaxpm__table:not([data-key=vorx]) .c-vorx { display: none; }
