@@ -2,7 +2,7 @@
 // (games, advanced box scores, drives, lines, talent, returning production, SP+, recruiting classes) and per-game
 // passing lines (who started at QB). Each file is pulled once into scripts/.cache/cfb/hist/. Needs CFBD_API_KEY.
 // EXTRA=1 also pulls player-level history for the FV and transfer models (one call a season each): player PPA, usage,
-// season stats, opponent-adjusted EPA (WEPA), draft picks, portal, older recruit classes, and the coach list; SIT_FROM
+// season stats, draft picks (WEPA is Patreon-only: 401 on the free tier), portal, older recruit classes, and the coach list; SIT_FROM
 // (e.g. 2021) adds CFBD play-by-play reduced to situational splits (sit2-*, as fetch_cfb.mjs builds) back to that season.
 // Stops once fewer than MIN_LEFT calls remain (default 500: the rest of the month's board runs need ~15 a full run).
 //   node scripts/cfb_game_history.mjs [first season] [last season]
@@ -62,7 +62,6 @@ if (process.env.EXTRA) {
       await once(`ppaplayers${S}.json`, `ppa/players/season?year=${S}&excludeGarbageTime=true`);
       await once(`usage${S}.json`, `player/usage?year=${S}&excludeGarbageTime=true`);
       await once(`pstats${S}.json`, `stats/player/season?year=${S}`);
-      for (const k of ['passing', 'rushing']) await once(`wepa${k}${S}.json`, `wepa/players/${k}?year=${S}`);
       if (S >= 2021) await once(`portal${S}.json`, `player/portal?year=${S}`);
     }
     await once(`draft${S}.json`, `draft/picks?year=${S}`);
