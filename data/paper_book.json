@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T16:40:47Z",
+ "asof": "2026-11-01T17:01:11Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 104.0,
+  "open": 101.0,
   "path": [
    101.5,
    101.6,
@@ -51,7 +51,7 @@
   ]
  },
  "record": {
-  "n": 134,
+  "n": 129,
   "clvN": 46,
   "clvRet": -0.018,
   "clvT": -2.3,
@@ -130,7 +130,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 2,
+   "n": 3,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -235,7 +235,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 4,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -319,7 +319,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 52,
+   "n": 48,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -546,7 +546,7 @@
    "ev": 0.0005,
    "event": null,
    "pass": true,
-   "close": 43.5
+   "close": 42.5
   },
   {
    "rule": "nfl-spread",
@@ -588,7 +588,7 @@
    "ev": 0.0042,
    "event": null,
    "pass": false,
-   "close": 54.5
+   "close": 55.5
   },
   {
    "rule": "nfl-total",
@@ -1073,7 +1073,7 @@
    "edge": 31.8,
    "ev": 0.1072,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1313,7 +1313,7 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1433,7 +1433,7 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1493,7 +1493,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -2339,7 +2339,7 @@
    "ev": 0.0145,
    "event": null,
    "pass": true,
-   "close": 5.5
+   "close": -5.5
   },
   {
    "rule": "cbb-total",
@@ -2360,7 +2360,7 @@
    "ev": -0.0233,
    "event": null,
    "pass": true,
-   "close": 146.5
+   "close": 147.5
   },
   {
    "rule": "cbb-total",
@@ -2485,7 +2485,7 @@
    "edge": 4.4,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 163.5
   },
   {
@@ -2674,8 +2674,8 @@
    "edge": 6.2,
    "ev": 0.0154,
    "event": null,
-   "pass": false,
-   "close": 142.5
+   "pass": true,
+   "close": 141.5
   },
   {
    "rule": "cbb-ml",
@@ -2943,8 +2943,29 @@
    "edge": 7.7,
    "ev": 0.0296,
    "event": null,
+   "pass": true,
+   "close": 38.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401856849",
+   "k": "2026-11-07T17:00:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Utah",
+   "a": "BYU",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -102.0,
+   "bet": "over 45.5 -102",
+   "placed": "2026-11-01T17:00:54Z",
+   "stake": 2.5,
+   "edge": 6.5,
+   "ev": 0.0249,
+   "event": null,
    "pass": false,
-   "close": 40.5
+   "close": 45.5
   },
   {
    "rule": "cfb-total",
@@ -2966,6 +2987,27 @@
    "event": null,
    "pass": true,
    "close": 47.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401858291",
+   "k": "2026-11-08T00:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Notre Dame",
+   "a": "Miami",
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -104.0,
+   "bet": "under 57.5 -104",
+   "placed": "2026-11-01T17:00:54Z",
+   "stake": 2.25,
+   "edge": 8.4,
+   "ev": 0.0225,
+   "event": null,
+   "pass": false,
+   "close": 57.5
   }
  ],
  "recent": [
@@ -6288,7 +6330,7 @@
    "ev": 0.0005,
    "event": null,
    "pass": true,
-   "close": 43.5
+   "close": 42.5
   },
   {
    "rule": "nfl-spread",
@@ -6330,7 +6372,7 @@
    "ev": 0.0042,
    "event": null,
    "pass": false,
-   "close": 54.5
+   "close": 55.5
   },
   {
    "rule": "nfl-total",
@@ -6815,7 +6857,7 @@
    "edge": 31.8,
    "ev": 0.1072,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -7055,7 +7097,7 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -7175,7 +7217,7 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -7235,7 +7277,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -8081,7 +8123,7 @@
    "ev": 0.0145,
    "event": null,
    "pass": true,
-   "close": 5.5
+   "close": -5.5
   },
   {
    "rule": "cbb-total",
@@ -8102,7 +8144,7 @@
    "ev": -0.0233,
    "event": null,
    "pass": true,
-   "close": 146.5
+   "close": 147.5
   },
   {
    "rule": "cbb-total",
@@ -8227,7 +8269,7 @@
    "edge": 4.4,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 163.5
   },
   {
@@ -8416,8 +8458,8 @@
    "edge": 6.2,
    "ev": 0.0154,
    "event": null,
-   "pass": false,
-   "close": 142.5
+   "pass": true,
+   "close": 141.5
   },
   {
    "rule": "cbb-ml",
@@ -8685,8 +8727,29 @@
    "edge": 7.7,
    "ev": 0.0296,
    "event": null,
+   "pass": true,
+   "close": 38.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401856849",
+   "k": "2026-11-07T17:00:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Utah",
+   "a": "BYU",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -102.0,
+   "bet": "over 45.5 -102",
+   "placed": "2026-11-01T17:00:54Z",
+   "stake": 2.5,
+   "edge": 6.5,
+   "ev": 0.0249,
+   "event": null,
    "pass": false,
-   "close": 40.5
+   "close": 45.5
   },
   {
    "rule": "cfb-total",
@@ -8708,6 +8771,27 @@
    "event": null,
    "pass": true,
    "close": 47.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401858291",
+   "k": "2026-11-08T00:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Notre Dame",
+   "a": "Miami",
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -104.0,
+   "bet": "under 57.5 -104",
+   "placed": "2026-11-01T17:00:54Z",
+   "stake": 2.25,
+   "edge": 8.4,
+   "ev": 0.0225,
+   "event": null,
+   "pass": false,
+   "close": 57.5
   }
  ]
 }
