@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-01T20:23:05Z",
+ "asof": "2026-11-01T20:27:01Z",
  "recenter": {
-  "2026-11-02": -12.09,
+  "2026-11-02": -12.1,
   "2026-11-03": -10.2
  },
  "monitor": {
@@ -375,7 +375,7 @@
     "side": "under",
     "line": 160.5,
     "price": -100.0,
-    "ev": 0.058,
+    "ev": 0.057,
     "units": 2.75
    }
   },
@@ -501,7 +501,7 @@
     "side": "under",
     "line": 158.5,
     "price": -113.0,
-    "ev": 0.104,
+    "ev": 0.103,
     "units": 2.25
    }
   },
@@ -645,8 +645,8 @@
    "tm": 155.4,
    "flagged": "2026-11-01T00:09:20Z",
    "close": 1.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401911333",
@@ -729,10 +729,10 @@
    "tm": 149.2,
    "tmRaw": 137.4,
    "flagged": "2026-11-01T12:42:33Z",
-   "betTo": 151.5,
+   "betTo": 152.0,
    "close": 155.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401920679",
@@ -789,7 +789,7 @@
    "tm": 164.8,
    "tmRaw": 153.4,
    "flagged": "2026-11-01T05:42:55Z",
-   "betTo": 163.0,
+   "betTo": 163.5,
    "close": 163.5,
    "pass": true,
    "now": null
@@ -1104,9 +1104,9 @@
     "mk": "total",
     "side": "under",
     "line": 148.5,
-    "price": -115.0,
-    "ev": 0.074,
-    "units": 0.25
+    "price": -113.0,
+    "ev": 0.083,
+    "units": 1.0
    }
   },
   {
@@ -1449,25 +1449,9 @@
    "price": -105.0,
    "edge": 2.0,
    "x": 2.0,
-   "why": "edge under 2",
+   "why": "no edge at -105",
    "m": -8.5,
    "tm": 165.5
-  },
-  {
-   "id": "401928995",
-   "sport": "cbb",
-   "kick": "2026-11-03T01:00:00Z",
-   "home": "Valparaiso",
-   "away": "Western Illinois",
-   "mk": "total",
-   "side": "over",
-   "line": 143.5,
-   "price": -111.0,
-   "edge": 2.0,
-   "x": 2.0,
-   "why": "edge under 2",
-   "m": 22.7,
-   "tm": 145.5
   },
   {
    "id": "401926771",
@@ -1644,6 +1628,22 @@
    "why": "edge under 2.5",
    "m": -0.4,
    "tm": 157.7
+  },
+  {
+   "id": "401911390",
+   "sport": "cbb",
+   "kick": "2026-11-03T02:00:00Z",
+   "home": "UConn",
+   "away": "Gardner-Webb",
+   "mk": "spread",
+   "side": "home",
+   "line": 38.5,
+   "price": -110.0,
+   "edge": 1.9,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 40.4,
+   "tm": 146.4
   }
  ],
  "games": {
@@ -1688,7 +1688,7 @@
    "side": "under",
    "line": 160.5,
    "price": -100.0,
-   "ev": 0.058,
+   "ev": 0.057,
    "edge": 3.1,
    "units": 2.75,
    "home": "BYU",
@@ -1734,9 +1734,9 @@
   "401925811": {
    "mk": "spread",
    "side": "home",
-   "line": 27.5,
+   "line": 28.5,
    "price": -127.0,
-   "edge": 1.6,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Houston",
@@ -1795,10 +1795,10 @@
    "mk": "total",
    "side": "under",
    "line": 148.5,
-   "price": -115.0,
-   "ev": 0.074,
+   "price": -113.0,
+   "ev": 0.083,
    "edge": 8.1,
-   "units": 0.25,
+   "units": 1.0,
    "home": "Saint Mary's",
    "away": "Illinois State",
    "state": "pick"
@@ -1891,7 +1891,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -113.0,
+   "price": -115.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -1987,7 +1987,7 @@
    "mk": "spread",
    "side": "home",
    "line": 30.5,
-   "price": -122.0,
+   "price": -127.0,
    "edge": 1.3,
    "ev": null,
    "units": 0.0,
@@ -2275,7 +2275,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -117.0,
+   "price": -104.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -2384,7 +2384,7 @@
    "side": "under",
    "line": 158.5,
    "price": -113.0,
-   "ev": 0.104,
+   "ev": 0.103,
    "edge": 9.3,
    "units": 2.25,
    "home": "Georgia Southern",
@@ -2461,18 +2461,6 @@
    "units": 0.0,
    "home": "Belmont",
    "away": "Southern Indiana",
-   "state": "under"
-  },
-  "401928995": {
-   "mk": "total",
-   "side": "over",
-   "line": 143.5,
-   "price": -111.0,
-   "edge": 2.0,
-   "ev": null,
-   "units": 0.0,
-   "home": "Valparaiso",
-   "away": "Western Illinois",
    "state": "under"
   },
   "401920231": {
@@ -2552,16 +2540,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 869,
+  "snapshots": 883,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 227,
-    "clvRet": 0.0007,
-    "clvT": 0.08,
-    "clv": 0.76,
-    "beat": 0.33,
-    "still": 0.599
+    "clvN": 233,
+    "clvRet": -0.0006,
+    "clvT": -0.06,
+    "clv": 0.74,
+    "beat": 0.322,
+    "still": 0.609
    },
    {
     "when": "6-24h",
@@ -2716,7 +2704,7 @@
    "tm": 164.8,
    "tmRaw": 153.4,
    "flagged": "2026-11-01T05:42:55Z",
-   "betTo": 163.0,
+   "betTo": 163.5,
    "close": 163.5,
    "pass": true
   },
@@ -2766,7 +2754,7 @@
    "tm": 149.2,
    "tmRaw": 137.4,
    "flagged": "2026-11-01T12:42:33Z",
-   "betTo": 151.5,
+   "betTo": 152.0,
    "close": 155.5,
    "pass": true
   },
