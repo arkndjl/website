@@ -4104,6 +4104,7 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .hub__card .win__status { gap: 8px; }
 @media (max-width: 684px) {
   .ark-fresh.is-stale, .hub__card .ark-fresh { display: inline; }
+  .ark-fresh.is-stale { white-space: normal; min-width: 0; text-align: right; }
 }
 
 /* rookie / first-year leaderboards ({{< rookies >}}): no team column, so the team rides beside the name everywhere;
