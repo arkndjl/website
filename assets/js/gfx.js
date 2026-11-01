@@ -891,6 +891,258 @@
     return F.canvas;
   }
 
+  // ---- player card for any board (every sport but the CFB board, which has its own): read from the player's table row
+  // and, where the board has one, its dropdown (photo, role lines, strengths and concerns, FV inputs, badges). The header
+  // carries photo, logo, flag, name, position, team, class and FV; the sorted column is the featured tile with the player's
+  // place in the view; every other column is a tile with where the value sits among the rows in view (pNN, 0 = lowest).
+  var PC_SKIP = /^(rk|#|pick|spot|tm)$/i, PC_SUB = /^(pos|position|team|school|club|org|league|lg|conf|class|yr|year|season|plays|tag|stage)$/i;
+  var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;
+  var PC_MARKS = '.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, svg, img';
+  function pcRows(table) { return [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; }); }
+  function pcHeads(table) {
+    var hc = [].slice.call(table.tHead.rows[0].cells), vis = hc.filter(function (h) { return !h.hidden; }), r0 = pcRows(table)[0];
+    return r0 && vis.length < hc.length && r0.cells.length === vis.length ? vis : hc;
+  }
+  function pcNameAt(heads) { return heads.findIndex(function (h) { return /^(player|goalie|qb|recruit|prospect|name)$/i.test(h); }); }
+  // a cell's main text and its small print (the dim splits: raw XPM, 80% range, position rank)
+  function pcCell(c) {
+    if (!c) return { t: '', sub: '' };
+    var cc = c.cloneNode(true); cc.querySelectorAll(PC_MARKS).forEach(function (e) { e.remove(); });
+    var subs = [].slice.call(cc.querySelectorAll('.nbaxpm__od, .cfb__dim')).map(function (e) { var s = txt(e); e.remove(); return s; }).filter(Boolean);
+    var t = txt(cc).replace(/[▾▴▸★↗]/g, '').trim(), sub = subs.join(' · ');
+    if (!t && sub) { t = sub; sub = ''; }
+    var col = c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null);
+    return { t: t || '—', sub: sub, color: col ? (col.classList.contains('cfb__up') ? C.teal : C.down) : null };
+  }
+  function pcNum(c, t) {
+    var v = c && c.getAttribute('data-v');
+    if (v != null && v !== '' && isFinite(+v)) return +v;
+    if (!t || /\d\s*-\s*\d/.test(t)) return null;
+    var m = String(t).replace(/−/g, '-').replace(/,/g, '').match(/[-+]?\d+(\.\d+)?/); if (!m) return null;
+    var n = +m[0], s = String(t).toLowerCase();
+    if (/\d\s*m\b/.test(s)) n *= 1e6; else if (/\d\s*k\b/.test(s)) n *= 1e3;
+    return n;
+  }
+  // a bigger copy of a row thumbnail: ESPN combiner, NFL Cloudinary, Transfermarkt, Wikimedia
+  function pcBig(src) {
+    if (!src || /\/img\/face\.svg/.test(src)) return null;
+    return src.replace(/([?&])w=\d+&h=\d+/, '$1w=700&h=509').replace(/\/w_\d+\//, '/w_600/').replace(/\/portrait\/(medium|small)\//, '/portrait/big/').replace(/([?&])width=\d+/, '$1width=600');
+  }
+  function pcBadges(els) {
+    var out = [], seen = {};
+    els.forEach(function (el) {
+      if (!el) return;
+      // [[name, tier]] on the row (data-badges), or the dropdown's chips (span.cfb__bdg--<tier>, name in data-n)
+      var raw = el.getAttribute && el.getAttribute('data-badges');
+      if (raw) { try { JSON.parse(raw).forEach(function (b) { if (!seen[b[0]]) { seen[b[0]] = 1; out.push([b[0], b[1]]); } }); } catch (e) {} }
+      [].slice.call(el.querySelectorAll('.cfb__bdg')).forEach(function (s) {
+        var m = s.className.match(/cfb__bdg--([bsgp])\b/); if (!m) return;
+        var n = s.getAttribute('data-n') || txt(s).replace(/^\S+\s+/, ''); if (n && !seen[n]) { seen[n] = 1; out.push([n, m[1]]); }
+      });
+    });
+    var rank = { p: 0, g: 1, s: 2, b: 3 };
+    return out.sort(function (a, b) { return rank[a[1]] - rank[b[1]]; });
+  }
+  // the row's dropdown: open it for the card when it is closed (the name button toggles it), and close it after
+  async function pcDetail(row) {
+    var nx = row.nextElementSibling;
+    if (nx && nx.classList.contains('cfb__detail')) return { el: nx, opened: false };
+    var who = row.querySelector('button.cfb__who'); if (!who) return { el: null };
+    who.click();
+    for (var k = 0; k < 40; k++) { nx = row.nextElementSibling; if (nx && nx.classList.contains('cfb__detail')) break; await new Promise(function (r) { setTimeout(r, 50); }); }
+    return nx && nx.classList.contains('cfb__detail') ? { el: nx, opened: true, who: who } : { el: null };
+  }
+  async function buildPCard(win, row) {
+    var table = row.closest('table'); if (!table) return null;
+    var hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
+    var rows = pcRows(table), at = rows.indexOf(row), nameI = pcNameAt(heads);
+    var det = await pcDetail(row), d = det.el;
+    var gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
+    var nameC = cells[nameI >= 0 ? nameI : 1];
+    var name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : txt(d && d.querySelector('.cfb__dhead b'));
+    var teamI = gi(TEAM_COL), posI = gi(POS_COL), clsI = gi(CLASS_COL), fvI = gi(FV_COL), lgI = gi(/^(league|lg|conf)$/i);
+    var tm = row.querySelector('.nbaxpm__tm, .nflwar__tm');
+    var team = teamI >= 0 ? pcCell(cells[teamI]).t : tm ? txt(tm).split('·')[0].trim() : '';
+    var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) posC.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); });
+    var sub = [posC ? txt(posC) : '', team, lgI >= 0 ? pcCell(cells[lgI]).t : tm ? (txt(tm).split('·')[1] || '').trim() : '', clsI >= 0 ? pcCell(cells[clsI]).t : ''].filter(function (s) { return s && s !== '—'; });
+    var fvChip = fvI >= 0 && cells[fvI] && cells[fvI].querySelector('.fv-chip'), fvT = fvI >= 0 ? pcCell(cells[fvI]).t : '';
+    var fvN = fvChip ? parseFloat(fvChip.getAttribute('data-fv')) : parseFloat(fvT);
+    // photo: the dropdown's card photo, else the row thumbnail upsized; logo: the row's team logo or the window's path
+    var ph = d && d.querySelector('.pxframe--card img'), th0 = row.querySelector('.pxframe img');
+    var photo = await loadPhoto(pcBig(ph && (ph.currentSrc || ph.src)) || pcBig(th0 && (th0.currentSrc || th0.src)));
+    if (!photo && ph) photo = await loadPhoto(ph.currentSrc || ph.src);
+    var lg = [].slice.call(row.querySelectorAll('img.cfb__logo')).find(function (e) { return !e.closest('.pxframe'); }), lsrc = lg && (lg.currentSrc || lg.src);
+    var tpl = win.getAttribute('data-gfx-logo'); if (!lsrc && tpl && team) lsrc = tpl.replace('{}', team.split('/').pop().trim().toLowerCase());
+    var logo = await loadImg(lsrc);
+    var fl = row.querySelector('svg.esea-flag'), fi = row.querySelector('img.flag');
+    var flag = fl ? await flagImg((fl.getAttribute('aria-label') || '').toLowerCase()) : fi ? await loadImg(fi.currentSrc || fi.src) : null;
+    // the featured stat: the sorted column (or the rank-by view's key column), else the first number after the name
+    var sortI = sortedCol(table, hcells), desc = (hcells[sortI] || { getAttribute: function () {} }).getAttribute('aria-sort') !== 'ascending';
+    var tiles = [], lines = [];
+    heads.forEach(function (h, i) {
+      if (i === nameI || i === fvI || PC_SKIP.test(h) || PC_SUB.test(h) || !h || (hcells[i] && hcells[i].hidden) || !cells[i] || cells[i].hidden) return;
+      var c = pcCell(cells[i]); if (c.t === '—' && !c.sub) return;
+      if (c.t.length > 18) { lines.push([h, c.t + (c.sub ? ' · ' + c.sub : '')]); return; }
+      var n = PC_NOPCT.test(h) ? null : pcNum(cells[i], c.t), pct = null;
+      if (n != null) {
+        var vals = rows.map(function (r) { var cc = r.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
+        if (vals.length >= 5) pct = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
+      }
+      tiles.push({ i: i, h: h, t: c.t, sub: c.sub, color: c.color, pct: pct, tip: hcells[i] ? hcells[i].getAttribute('title') : '' });
+    });
+    var feat = tiles.find(function (t) { return t.i === sortI; }) || (fvI < 0 ? tiles.find(function (t) { return t.pct != null; }) : null);
+    if (feat) tiles.splice(tiles.indexOf(feat), 1);
+    var wt = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
+    var base = wt.split('::')[0].trim(); if (/^[a-z0-9]/.test(base)) base = SITE.split('/').pop().toUpperCase() + ' ' + base;
+    var pk = row.getAttribute('data-pk'), link = tabLink(win);
+    if (pk && /#/.test(link)) link += ':p=' + pk;
+    else if (win.getAttribute('data-cbb') && window.__arkCbbPid && row.hasAttribute('data-i') && window.__arkCbbRecs) { var rec = window.__arkCbbRecs[+row.getAttribute('data-i')]; if (rec) link = SITE + '#' + win.getAttribute('data-cbb') + ':p=' + window.__arkCbbPid(rec); }
+    var F = await frame(2160, 2700, base + ' :: ' + name, win.getAttribute('data-gfx-date'), link);
+    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, bottom = F.y + F.h - 30;
+    well(g, F.x, F.y, F.w, F.h);
+    var px = photo ? 400 : 0;
+    if (photo) photoFrame(g, photo, x, y - 60, 370, 400);
+    if (logo) drawLogo(g, logo, x + px, y - 48, 96, 96);
+    var nx = x + px + (logo ? 120 : 0);
+    if (flag) { g.imageSmoothingEnabled = false; g.drawImage(flag, nx, y - 33, 96, 66); nx += 120; }
+    g.font = '96px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, name, x + w - nx - (fvT ? 300 : 0)), nx, y);
+    if (fvT && fvT !== '—') chip(g, x + w - 260, y, fvT, 112, isFinite(fvN) ? fvN : 20);
+    y += 110;
+    g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub.join(' · '), w - px), x + px, y); y += 80;
+    // the dropdown's role / outlook lines, a few, under the name
+    var roles = d ? [].slice.call(d.querySelectorAll('.cfb__role')).map(txt).filter(Boolean) : [];
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac;
+    var rl = []; roles.forEach(function (r) { wrap(g, r, w - px).forEach(function (l) { rl.push(l); }); });
+    rl.slice(0, Math.max(0, Math.floor((top + 330 - y) / 56))).forEach(function (l) { g.fillText(l, x + px, y); y += 56; });
+    y = Math.max(y, top + 360) + 30;
+    function rule(label) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(label, x, y);
+      var lw = g.measureText(label).width; g.fillStyle = C.dark; g.fillRect(x + lw + 24, y - 1, w - lw - 24, 3); y += 44;
+    }
+    // the sorted column: big value, place in the view, where it sits in the view's range
+    if (feat) {
+      rule('SORTED BY ' + capHead(feat.h));
+      var fh = 230;
+      g.fillStyle = C.face; g.fillRect(x, y, w, fh); bevel(g, x, y, w, fh, true, 3);
+      g.strokeStyle = C.teal; g.lineWidth = 6; g.strokeRect(x + 3, y + 3, w - 6, fh - 6);
+      g.font = '150px ' + FONT; g.fillStyle = feat.color || C.teal; g.fillText(feat.t, x + 40, y + fh / 2);
+      var vx = x + 80 + g.measureText(feat.t).width;
+      g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText('#' + (at + 1) + ' of ' + rows.length + ' in view', vx, y + 78);
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac;
+      g.fillText(fit(g, [feat.sub, sortI === feat.i ? (desc ? 'sorted high to low' : 'sorted low to high') : 'board order'].filter(Boolean).join(' · '), x + w - vx - 40), vx, y + 140);
+      if (feat.pct != null) { var bw0 = x + w - vx - 40; g.fillStyle = C.dark; g.fillRect(vx, y + 176, bw0, 24); g.fillStyle = C.teal; g.fillRect(vx, y + 176, bw0 * feat.pct / 100, 24); }
+      y += fh + 40;
+    }
+    // the reserve at the bottom for the dropdown (badges, strengths and concerns, FV inputs)
+    var plus = d ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
+    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
+    var badges = pcBadges([row, d]);
+    var partsH = parts.length ? 130 + Math.ceil(Math.min(parts.length, 10) / 2) * 60 : 0;
+    var repH = plus.length || minus.length ? 140 + Math.min(6, Math.max(plus.length, minus.length, 1)) * 70 : 0, bdgH = badges.length ? 200 : 0;
+    // tiles: four across, as many rows as the room leaves
+    var cols = tiles.length <= 9 ? 3 : 4, gap = 24, tw = (w - (cols - 1) * gap) / cols, th = 200;
+    var room = bottom - y - partsH - repH - bdgH - (lines.length ? 60 + Math.min(lines.length, 3) * 64 : 0) - 44;
+    var maxRows = Math.max(1, Math.floor((room + 40) / (th + 24)));
+    // fewer tiles than room: taller tiles and bigger type, so the card fills
+    var nRows = Math.ceil(Math.min(tiles.length, maxRows * cols) / cols);
+    if (nRows) th = Math.max(200, Math.min(340, Math.floor((room + 24) / nRows) - 24));
+    var ts = th / 200;
+    if (tiles.length) {
+      rule('NUMBERS · pNN = place among the ' + rows.length + ' in view');
+      tiles.slice(0, maxRows * cols).forEach(function (t, k) {
+        var tx = x + (k % cols) * (tw + gap), ty = y + Math.floor(k / cols) * (th + 24);
+        g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
+        g.font = Math.round(34 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, capHead(t.h), tw - 48), tx + 24, ty + 40 * ts);
+        g.font = Math.round(72 * Math.min(ts, 1.6)) + 'px ' + FONT; g.fillStyle = t.color || C.white; g.fillText(fit(g, t.t, tw - 48), tx + 24, ty + 102 * ts);
+        g.font = Math.round(30 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = C.lilac;
+        var foot = [t.sub, t.pct != null ? 'p' + t.pct : ''].filter(Boolean).join(' · ');
+        if (foot) g.fillText(fit(g, foot, tw - 48), tx + 24, ty + 150 * ts);
+        if (t.pct != null) { var bh = Math.round(10 * ts); g.fillStyle = C.dark; g.fillRect(tx + 24, ty + th - 28 - bh, tw - 48, bh); g.fillStyle = C.teal; g.fillRect(tx + 24, ty + th - 28 - bh, (tw - 48) * t.pct / 100, bh); }
+      });
+      y += Math.ceil(Math.min(tiles.length, maxRows * cols) / cols) * (th + 24) + 20;
+    }
+    if (lines.length) {
+      lines.slice(0, 3).forEach(function (l) {
+        g.font = '40px ' + FONT; g.fillStyle = C.lilac; var lw = g.measureText(l[0].toUpperCase() + '  ').width; g.fillText(l[0].toUpperCase(), x, y);
+        g.fillStyle = C.white; g.fillText(fit(g, l[1], w - lw), x + lw, y); y += 64;
+      });
+      y += 20;
+    }
+    // badges: the slot for the board's predictive badges (only badges that pass a held-out test are on a board)
+    if (badges.length) { y += 10; rule('BADGES'); y += 6; y += badgeRows(g, badges, x, y, w); }
+    if (repH) {
+      y += 20; var half = (w - 60) / 2, lim = bottom - partsH - 20;
+      [['+ strengths', plus, C.teal, x], ['− concerns', minus, C.down, x + half + 60]].forEach(function (L) {
+        var ly = y; g.font = '56px ' + FONT; g.fillStyle = L[2]; g.fillText(L[0], L[3], ly); ly += 76; g.font = '40px ' + FONT;
+        (L[1].length ? L[1] : ['none']).forEach(function (it) {
+          var ls = wrap(g, it, half - 56); if (ly + ls.length * 54 > lim) return;
+          g.fillStyle = L[2]; g.fillText(L[0][0], L[3] + 4, ly); g.fillStyle = C.lilac; ls.forEach(function (l) { g.fillText(l, L[3] + 56, ly); ly += 54; }); ly += 12;
+        });
+      });
+    }
+    // FV inputs: each driver's push on the grade, two columns of bars pinned to the bottom
+    if (parts.length) {
+      var ps = parts.slice(0, 10), by = bottom - partsH + 20, cw2 = (w - 80) / 2, mx = Math.max(1, Math.max.apply(null, ps.map(function (p) { return Math.abs(p[1]); })));
+      g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
+      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('FV inputs: each one\'s push on the grade', x, by + 30);
+      g.font = '36px ' + FONT;
+      var perCol = Math.ceil(ps.length / 2);
+      ps.forEach(function (p, i) {
+        var cx = x + Math.floor(i / perCol) * (cw2 + 80), yy = by + 110 + (i % perCol) * 60, bx0 = cx + 470, bwid = cw2 - 470 - 130, mid = bx0 + bwid / 2, hw = bwid / 2;
+        var v = p[1], bw = Math.min(hw, Math.abs(v) / mx * hw);
+        g.fillStyle = C.lilac; g.fillText(fit(g, p[0], 450), cx, yy);
+        g.fillStyle = C.well; g.fillRect(bx0, yy - 18, bwid, 36); g.fillStyle = C.dark; g.fillRect(mid - 1, yy - 24, 3, 48);
+        g.fillStyle = v < 0 ? C.down : C.teal; g.fillRect(v < 0 ? mid - bw : mid + 2, yy - 14, bw, 28);
+        var lab = (v > 0 ? '+' : '') + v.toFixed(2); g.fillStyle = C.lilac; g.fillText(lab, cx + cw2 - g.measureText(lab).width, yy);
+      });
+    }
+    if (det.opened && det.who) det.who.click();
+    return F.canvas;
+  }
+  // the card picker beside a player table's GFX button (the players in view, in the table's order), and a "GFX card"
+  // button in every dropdown that has none (the CFB board draws its own card)
+  function pcName(r, ni) { var c = r.cells[ni]; if (!c) return ''; c = (c.querySelector('button.cfb__who, b') || c).cloneNode(true); c.querySelectorAll('svg, .gfx-off, .cfb__dim').forEach(function (e) { e.remove(); }); return txt(c); }
+  function addCardPickers() {
+    if (/1nt$/.test(SITE)) return;
+    document.querySelectorAll('[data-gfx]').forEach(function (btn) {
+      if (btn.getAttribute('data-gfx-mode') || btn.dataset.gfxCard) return;
+      var win = btn.closest('.win'), table = win && win.querySelector('table'); if (!table || !table.tHead || win.hasAttribute('data-cfb')) return;
+      var ni = pcNameAt(pcHeads(table).map(txt)); if (ni < 0) return;
+      btn.dataset.gfxCard = '1';
+      var lab = document.createElement('label'); lab.className = 'cfb__field gfx-card'; lab.title = 'one player\'s card graphic (4:5)';
+      lab.innerHTML = '<span>card</span><select><option value="">player</option></select>';
+      var anchor = btn.parentNode.querySelector('.gfx-round') || btn.parentNode.querySelector('.gfx-rows') || btn;
+      anchor.insertAdjacentElement('afterend', lab);
+      var sel = lab.querySelector('select');
+      function fill() {
+        var t = win.querySelector('table'), hs = pcHeads(t).map(txt), k = pcNameAt(hs); if (k < 0) return;
+        sel.innerHTML = '<option value="">player</option>' + pcRows(t).slice(0, 300).map(function (r, i) {
+          return '<option value="' + i + '">' + (i + 1) + '. ' + pcName(r, k).replace(/[<&"]/g, '') + '</option>'; }).join('');
+      }
+      sel.addEventListener('focus', fill); sel.addEventListener('mousedown', fill); sel.addEventListener('touchstart', fill, { passive: true });
+      sel.addEventListener('change', async function () {
+        if (sel.value === '') return;
+        var t = win.querySelector('table'), r = pcRows(t)[+sel.value], k = pcNameAt(pcHeads(t).map(txt)); sel.value = ''; if (!r) return;
+        sel.disabled = true;
+        try { var cv = await buildPCard(win, r); if (cv) preview(cv, 'arkboard-' + pcName(r, k).toLowerCase().replace(/[^a-z0-9]+/g, '-')); } finally { sel.disabled = false; }
+      });
+    });
+  }
+  function addCardButtons() {
+    if (/1nt$/.test(SITE)) return;
+    document.querySelectorAll('tr.cfb__detail').forEach(function (d) {
+      if (d.querySelector('[data-gfx]') || d.closest('[data-cfb]')) return;
+      var row = d.previousElementSibling, table = d.closest('table'); if (!row || !table || pcNameAt(pcHeads(table).map(txt)) < 0) return;
+      var host = d.querySelector('.cfb__dhead') || d.querySelector('.cfb__dwrap') || d.cells[0]; if (!host) return;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'cfb__btn cfb__cardbtn'; b.textContent = 'GFX card'; b.title = 'player card graphic (4:5)';
+      b.setAttribute('data-gfx', ''); b.setAttribute('data-gfx-mode', 'pcard');
+      host.appendChild(document.createTextNode(' ')); host.appendChild(b);
+    });
+  }
+  document.addEventListener('click', function () { setTimeout(addCardButtons, 0); });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(addCardPickers, 0); }); else setTimeout(addCardPickers, 0);
+  document.addEventListener('ark:lazy', function () { setTimeout(addCardPickers, 0); });
+
   // ---- games: the matchups on screen (cards carry data-gfx-game) ----
   async function buildGames(win, btn) {
     var cards = [].slice.call(win.querySelectorAll('[data-gfx-game]')).filter(function (c) { return !c.hidden; }).slice(0, 8);
@@ -1424,13 +1676,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr.cfb__detail').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr.cfb__detail').querySelector('.cfb__dhead b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }
