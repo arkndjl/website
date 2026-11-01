@@ -3382,6 +3382,8 @@ table.trophycase__hist td.trophycase__post {
 .cfb__medal--g, .cfb__bdg--g { --tier: #ffd34d; }
 .cfb__medal--p, .cfb__bdg--p { --tier: #b9f2ff; }
 .cfb__badges { margin: 4px 0; }
+/* the NFL WAR / NBA XPM boards' one-line note on which badges passed their backtest */
+.cfb__bdgnote { margin: 6px 8px !important; font-size: 0.75em; }
 /* FV by season in the scouting report and the past-seasons tab: one chip a season, newest first, wrapping on a phone */
 .cfb__past { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 4px 0 8px !important; }
 .cfb__pastk { color: var(--accent); }
@@ -3396,6 +3398,7 @@ table.trophycase__hist td.trophycase__post {
 .cfb.is-yr .cfb__now { display: none; }
 .cfb__bdg { display: inline-block; margin: 0 4px 4px 0; padding: 0 5px; font-size: 0.8em; line-height: 1.5; color: var(--tier); border: 1px solid var(--tier); white-space: nowrap; }
 .cfb__bdg--p { box-shadow: 0 0 6px rgba(185, 242, 255, 0.6); }
+.soccerpl__about { margin: 6px 8px; font-size: 0.85em; line-height: 1.4; }
 /* ARKLIST star: a 9x9 pixel star in place of the font's ★ */
 .cfb__star { display: inline-block; width: 11px; height: 11px; margin-left: 4px; vertical-align: -1px; overflow: hidden; font-size: 0; line-height: 0; color: var(--accent); background: currentColor; -webkit-mask: var(--px-glyph) no-repeat 0 0 / 11px 11px; mask: var(--px-glyph) no-repeat 0 0 / 11px 11px; }
 .cfb__carried { margin-left: 4px; padding: 0 3px; border: 1px dashed currentColor; color: var(--muted, #a9a3d6); font-size: 0.75em; white-space: nowrap; }
@@ -3816,6 +3819,9 @@ table.trophycase__hist td.trophycase__post {
 .tb__need li { margin: 0 0 4px; }
 .tb__fcs { margin: 8px 0 0; }
 .tb__note { margin: 6px 0 0; font-size: 0.85em; }
+.nhlwar__note { margin: 6px 8px; font-size: 0.85em; }
+.nhlwar__mdt { display: none; }
+@media (max-width: 684px) { .nhlwar__mdn { display: none; } .nhlwar__mdt { display: inline; } }
 .tb__btick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #fff; }
 i.tb__seg--over { width: 2px !important; background: #fff; }
 .tb__dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 12px; }
@@ -3924,6 +3930,8 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 @media (max-width: 684px) {
   .nbaxpm__table .nbaxpm__team, .nbaxpm__table .nbaxpm__src, .nbaxpm__table .nbaxpm__ph { display: none; }
   .nbaxpm__tm { display: block; font-size: 0.85em; }
+  /* badge medals ride on the team line, so a long name doesn't widen the table */
+  .nbaxpm__table b + .cfb__medals { display: none; }
   .nbaxpm__table th, .nbaxpm__table td { padding-left: 4px; padding-right: 4px; }
   /* XPM and the number the view ranks by; the other splits are a tap away */
   .nbaxpm__table:not([data-key=pxpm]) .c-pxpm, .nbaxpm__table:not([data-key=soxpm]) .c-oxpm, .nbaxpm__table:not([data-key=sdxpm]) .c-dxpm, .nbaxpm__table:not([data-key=vorx]) .c-vorx { display: none; }

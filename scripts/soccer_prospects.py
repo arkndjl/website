@@ -1194,6 +1194,9 @@ def build():
     fvx = np.where(X.old.values, fvx, prov_grade(F, fvx, X, yi_feats(Y, ydob, X.index, today), fitj))
     X['fvx'] = fvx
     X['plus'] = plus_flag(fvx, X.age.values, fitj.get('plus')) & X.old.values & (fvx < 80)
+    # predictive badges (scripts/soccer_badges.py; backtest scripts/soccer_badge_backtest.py prospects): display only
+    import soccer_badges as BG
+    bdg = BG.prospect_badges(X[~X.yionly.astype(bool)])
     pr = fitj['prob']
     sig = lambda w, x: odds(w, x)[0]
     names = club_names(pd.concat([X.club_td, X.club1, X.aclub]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
@@ -1218,6 +1221,8 @@ def build():
             'p40': round(float(sig(pr['p40'], r.fvx - 40)), 3), 'p50': round(float(sig(pr['p50'], r.fvx - 50)), 3),
             'p60': round(float(sig(pr['p60'], r.fvx - 60)), 3),
             'prov': bool(F.noseen[i] > 0)})
+        if i in bdg:
+            rows[-1]['bdg'] = bdg[i]
         if n < 500:
             pp = push.loc[i]
             rows[-1].update({'parts': [[k, round(float(v), 2)] for k, v in pp[pp.abs() >= .05].sort_values(key=abs, ascending=False).items()],

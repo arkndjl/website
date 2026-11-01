@@ -1,0 +1,632 @@
+{
+ "method": "see scripts/nhl_badge_backtest.py",
+ "controls": [
+  "war",
+  "pwar",
+  "hpm"
+ ],
+ "outcome": "next-season WAR per 82 team games",
+ "groups": {
+  "F": {
+   "badges": {
+    "scorer": {
+     "name": "Scorer",
+     "pairs": 6663,
+     "r": 0.565,
+     "volN": 1009.82,
+     "k": 778.234,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.224,
+     "t": 9.67,
+     "oosGain": 1.066,
+     "pass": true
+    },
+    "sniper": {
+     "name": "Sniper",
+     "pairs": 6663,
+     "r": 0.167,
+     "volN": 169.712,
+     "k": 843.967,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.002,
+     "t": 0.11,
+     "oosGain": -0.025,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "shooter": {
+     "name": "Shooter",
+     "pairs": 6663,
+     "r": 0.759,
+     "volN": 1009.82,
+     "k": 320.162,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.227,
+     "t": 12.48,
+     "oosGain": 1.732,
+     "pass": true
+    },
+    "chances": {
+     "name": "Chance Getter",
+     "pairs": 6663,
+     "r": 0.654,
+     "volN": 1009.82,
+     "k": 533.299,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.223,
+     "t": 11.64,
+     "oosGain": 1.515,
+     "pass": true
+    },
+    "playmaker": {
+     "name": "Playmaker",
+     "pairs": 6663,
+     "r": 0.574,
+     "volN": 1009.82,
+     "k": 749.754,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.155,
+     "t": 6.11,
+     "oosGain": 0.405,
+     "pass": true
+    },
+    "driver": {
+     "name": "Play Driver",
+     "pairs": 6663,
+     "r": 0.549,
+     "volN": 808.294,
+     "k": 662.732,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.154,
+     "t": 7.07,
+     "oosGain": 0.443,
+     "pass": true
+    },
+    "suppress": {
+     "name": "Shot Suppressor",
+     "pairs": 6663,
+     "r": 0.343,
+     "volN": 808.294,
+     "k": 1550.133,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.008,
+     "t": 0.45,
+     "oosGain": -0.017,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "pp": {
+     "name": "Power Play",
+     "pairs": 4897,
+     "r": 0.296,
+     "volN": 139.896,
+     "k": 332.617,
+     "n": 5690,
+     "players": 1108,
+     "coef": 0.098,
+     "t": 4.15,
+     "oosGain": 0.299,
+     "pass": true
+    },
+    "physical": {
+     "name": "Physical",
+     "pairs": 6663,
+     "r": 0.906,
+     "volN": 1009.82,
+     "k": 104.763,
+     "n": 7561,
+     "players": 1394,
+     "coef": -0.104,
+     "t": -7.61,
+     "oosGain": 0.349,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "takeaway": {
+     "name": "Takeaways",
+     "pairs": 6663,
+     "r": 0.549,
+     "volN": 1009.82,
+     "k": 829.213,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.148,
+     "t": 9.43,
+     "oosGain": 0.872,
+     "pass": true
+    },
+    "blocker": {
+     "name": "Shot Blocker",
+     "pairs": 6663,
+     "r": 0.739,
+     "volN": 1009.82,
+     "k": 355.819,
+     "n": 7561,
+     "players": 1394,
+     "coef": -0.084,
+     "t": -5.41,
+     "oosGain": 0.254,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "faceoff": {
+     "name": "Faceoffs",
+     "pairs": 2391,
+     "r": 0.735,
+     "volN": 826.426,
+     "k": 298.179,
+     "n": 2886,
+     "players": 590,
+     "coef": -0.06,
+     "t": -2.09,
+     "oosGain": 0.062,
+     "pass": false,
+     "why": "negative sign"
+    }
+   },
+   "joint": {
+    "n": 7561,
+    "rounds": [
+     {
+      "scorer": {
+       "coef": 0.078,
+       "t": 2.38,
+       "oosGain": 0.047,
+       "ship": true
+      },
+      "shooter": {
+       "coef": 0.135,
+       "t": 5.07,
+       "oosGain": 0.3,
+       "ship": true
+      },
+      "chances": {
+       "coef": 0.055,
+       "t": 1.6,
+       "oosGain": 0.015,
+       "ship": false
+      },
+      "playmaker": {
+       "coef": 0.086,
+       "t": 3.45,
+       "oosGain": 0.08,
+       "ship": true
+      },
+      "driver": {
+       "coef": 0.075,
+       "t": 2.7,
+       "oosGain": 0.053,
+       "ship": true
+      },
+      "pp": {
+       "coef": 0.042,
+       "t": 1.71,
+       "oosGain": 0.029,
+       "ship": false
+      },
+      "takeaway": {
+       "coef": 0.143,
+       "t": 9.1,
+       "oosGain": 0.811,
+       "ship": true
+      }
+     },
+     {
+      "scorer": {
+       "coef": 0.11,
+       "t": 3.96,
+       "oosGain": 0.166,
+       "ship": true
+      },
+      "shooter": {
+       "coef": 0.153,
+       "t": 6.88,
+       "oosGain": 0.501,
+       "ship": true
+      },
+      "playmaker": {
+       "coef": 0.076,
+       "t": 3.06,
+       "oosGain": 0.059,
+       "ship": true
+      },
+      "driver": {
+       "coef": 0.098,
+       "t": 3.96,
+       "oosGain": 0.132,
+       "ship": true
+      },
+      "pp": {
+       "coef": 0.045,
+       "t": 1.81,
+       "oosGain": 0.034,
+       "ship": false
+      },
+      "takeaway": {
+       "coef": 0.144,
+       "t": 9.14,
+       "oosGain": 0.821,
+       "ship": true
+      }
+     },
+     {
+      "scorer": {
+       "coef": 0.118,
+       "t": 4.25,
+       "oosGain": 0.199,
+       "ship": true
+      },
+      "shooter": {
+       "coef": 0.153,
+       "t": 6.85,
+       "oosGain": 0.5,
+       "ship": true
+      },
+      "playmaker": {
+       "coef": 0.094,
+       "t": 3.7,
+       "oosGain": 0.127,
+       "ship": true
+      },
+      "driver": {
+       "coef": 0.087,
+       "t": 3.77,
+       "oosGain": 0.102,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.144,
+       "t": 9.1,
+       "oosGain": 0.819,
+       "ship": true
+      }
+     }
+    ],
+    "ship": [
+     "scorer",
+     "shooter",
+     "playmaker",
+     "driver",
+     "takeaway"
+    ],
+    "oosGainAll": 3.037
+   }
+  },
+  "D": {
+   "badges": {
+    "scorer": {
+     "name": "Scorer",
+     "pairs": 3661,
+     "r": 0.482,
+     "volN": 1228.799,
+     "k": 1319.132,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.076,
+     "t": 3.39,
+     "oosGain": 0.237,
+     "pass": true
+    },
+    "sniper": {
+     "name": "Sniper",
+     "pairs": 3661,
+     "r": 0.033,
+     "volN": 126.685,
+     "k": 3716.296,
+     "pass": false,
+     "why": "year-to-year r under .15"
+    },
+    "shooter": {
+     "name": "Shooter",
+     "pairs": 3661,
+     "r": 0.768,
+     "volN": 1228.799,
+     "k": 370.173,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.108,
+     "t": 4.66,
+     "oosGain": 0.633,
+     "pass": true
+    },
+    "chances": {
+     "name": "Chance Getter",
+     "pairs": 3661,
+     "r": 0.704,
+     "volN": 1228.799,
+     "k": 516.255,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.165,
+     "t": 7.57,
+     "oosGain": 1.343,
+     "pass": true
+    },
+    "playmaker": {
+     "name": "Playmaker",
+     "pairs": 3661,
+     "r": 0.524,
+     "volN": 1228.799,
+     "k": 1114.841,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.076,
+     "t": 3.19,
+     "oosGain": 0.192,
+     "pass": true
+    },
+    "driver": {
+     "name": "Play Driver",
+     "pairs": 3661,
+     "r": 0.279,
+     "volN": 1000.565,
+     "k": 2587.863,
+     "n": 4173,
+     "players": 783,
+     "coef": -0.037,
+     "t": -1.54,
+     "oosGain": 0.023,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "suppress": {
+     "name": "Shot Suppressor",
+     "pairs": 3661,
+     "r": 0.402,
+     "volN": 1000.565,
+     "k": 1487.714,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.139,
+     "t": 6.66,
+     "oosGain": 0.855,
+     "pass": true
+    },
+    "pp": {
+     "name": "Power Play",
+     "pairs": 2087,
+     "r": 0.248,
+     "volN": 126.633,
+     "k": 383.267,
+     "n": 2546,
+     "players": 544,
+     "coef": 0.036,
+     "t": 1.37,
+     "oosGain": -0.035,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "physical": {
+     "name": "Physical",
+     "pairs": 3661,
+     "r": 0.87,
+     "volN": 1228.799,
+     "k": 184.188,
+     "n": 4173,
+     "players": 783,
+     "coef": -0.087,
+     "t": -4.89,
+     "oosGain": 0.438,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "takeaway": {
+     "name": "Takeaways",
+     "pairs": 3661,
+     "r": 0.561,
+     "volN": 1228.799,
+     "k": 959.806,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.143,
+     "t": 6.32,
+     "oosGain": 1.305,
+     "pass": true
+    },
+    "blocker": {
+     "name": "Shot Blocker",
+     "pairs": 3661,
+     "r": 0.692,
+     "volN": 1228.799,
+     "k": 545.938,
+     "n": 4173,
+     "players": 783,
+     "coef": -0.05,
+     "t": -2.86,
+     "oosGain": 0.148,
+     "pass": false,
+     "why": "negative sign"
+    }
+   },
+   "joint": {
+    "n": 4173,
+    "rounds": [
+     {
+      "scorer": {
+       "coef": -0.036,
+       "t": -1.19,
+       "oosGain": -0.006,
+       "ship": false
+      },
+      "shooter": {
+       "coef": -0.027,
+       "t": -0.78,
+       "oosGain": -0.012,
+       "ship": false
+      },
+      "chances": {
+       "coef": 0.191,
+       "t": 4.89,
+       "oosGain": 0.549,
+       "ship": true
+      },
+      "playmaker": {
+       "coef": 0.008,
+       "t": 0.33,
+       "oosGain": -0.047,
+       "ship": false
+      },
+      "suppress": {
+       "coef": 0.125,
+       "t": 6.08,
+       "oosGain": 0.658,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.109,
+       "t": 4.52,
+       "oosGain": 0.714,
+       "ship": true
+      }
+     },
+     {
+      "shooter": {
+       "coef": -0.029,
+       "t": -0.84,
+       "oosGain": -0.01,
+       "ship": false
+      },
+      "chances": {
+       "coef": 0.168,
+       "t": 5.13,
+       "oosGain": 0.547,
+       "ship": true
+      },
+      "playmaker": {
+       "coef": 0.006,
+       "t": 0.22,
+       "oosGain": -0.046,
+       "ship": false
+      },
+      "suppress": {
+       "coef": 0.131,
+       "t": 6.45,
+       "oosGain": 0.749,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.109,
+       "t": 4.5,
+       "oosGain": 0.712,
+       "ship": true
+      }
+     },
+     {
+      "chances": {
+       "coef": 0.147,
+       "t": 5.78,
+       "oosGain": 0.881,
+       "ship": true
+      },
+      "playmaker": {
+       "coef": 0.002,
+       "t": 0.07,
+       "oosGain": -0.049,
+       "ship": false
+      },
+      "suppress": {
+       "coef": 0.131,
+       "t": 6.45,
+       "oosGain": 0.751,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.109,
+       "t": 4.5,
+       "oosGain": 0.707,
+       "ship": true
+      }
+     },
+     {
+      "chances": {
+       "coef": 0.147,
+       "t": 6.21,
+       "oosGain": 1.008,
+       "ship": true
+      },
+      "suppress": {
+       "coef": 0.131,
+       "t": 6.45,
+       "oosGain": 0.748,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.109,
+       "t": 4.49,
+       "oosGain": 0.712,
+       "ship": true
+      }
+     }
+    ],
+    "ship": [
+     "chances",
+     "suppress",
+     "takeaway"
+    ],
+    "oosGainAll": 2.977
+   }
+  },
+  "G": {
+   "badges": {
+    "stopper": {
+     "name": "Shot Stopper",
+     "pairs": 968,
+     "r": 0.121,
+     "volN": 2102.198,
+     "k": 15202.816,
+     "pass": false,
+     "why": "year-to-year r under .15"
+    },
+    "hd": {
+     "name": "High Danger",
+     "pairs": 968,
+     "r": 0.344,
+     "volN": 94.69,
+     "k": 180.741,
+     "n": 1118,
+     "players": 206,
+     "coef": 0.075,
+     "t": 1.03,
+     "oosGain": -0.097,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "rebound": {
+     "name": "Rebound Control",
+     "pairs": 968,
+     "r": 0.639,
+     "volN": 2102.198,
+     "k": 1188.782,
+     "n": 1118,
+     "players": 206,
+     "coef": 0.05,
+     "t": 0.62,
+     "oosGain": -0.042,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "freeze": {
+     "name": "Puck Control",
+     "pairs": 968,
+     "r": 0.504,
+     "volN": 2102.198,
+     "k": 2065.147,
+     "n": 1118,
+     "players": 206,
+     "coef": 0.07,
+     "t": 0.9,
+     "oosGain": -0.048,
+     "pass": false,
+     "why": "t under 2"
+    }
+   }
+  }
+ }
+}

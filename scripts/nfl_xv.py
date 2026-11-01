@@ -535,9 +535,10 @@ def backtest(lams=(5, 20, 50, 150, 400)):
 ALPHAS = (0, 0.25, 0.4, 0.5, 0.6, 0.75, 1)
 
 
-def board_xv(y, sd, ros, b, fresh=False):
+def board_xv(y, sd, ros, b, fresh=False, rows_out=None):
     """{pfr id: XV} for this season (nfl_war.py build), on the weights in data/nfl_xv.json; None without the file.
-    z pools are this season's regulars (40%+ of the snaps so far), so mid-season rates shrink more (smaller samples)."""
+    z pools are this season's regulars (40%+ of the snaps so far), so mid-season rates shrink more (smaller samples).
+    rows_out: a list that gets the season's player-team rows (the badges read their counts, scripts/nfl_badges.py)."""
     try:
         with open(OUT) as f:
             M = json.load(f)['model']
@@ -545,6 +546,8 @@ def board_xv(y, sd, ros, b, fresh=False):
         return None, None
     _, value, _ = W.sub_lines()
     S = {y: season_players(y, sd, ros, b, fresh)}
+    if rows_out is not None:
+        rows_out.extend(S[y]['players'])
     zscore(S)
     out = defaultdict(float)
     for p, v in zip(S[y]['players'], xv_of(S, y, M['weights'], value, M['qMean'])):

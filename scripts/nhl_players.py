@@ -41,6 +41,7 @@ from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import nhl_data as D
+import nhl_badges
 
 ROOT = os.path.dirname(HERE)
 MPD = os.path.join(D.CACHE, 'mp')
@@ -490,6 +491,8 @@ def build(seasons=None):
             continue
         asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
         gmax = max(r['gp'] for r in rows)
+        # predictive badges (scripts/nhl_badges.py; tested against next season's WAR in scripts/nhl_badge_backtest.py)
+        nhl_badges.assign(S, rows, gmax)
         try:   # headshots: ESPN ids by NHL id (scripts/faces.py); the board writes without them
             import faces
             faces.nhl_attach(rows, fresh=S == cur)   # the old seasons reuse the map

@@ -80,6 +80,9 @@
     <p class="cfb__none" data-sp-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-sp-none hidden>no players match.</p>
   </div>
+  {{- if ne $view "stats" }}
+  <p class="cfb__dim soccerpl__about">Medals: traits that predicted next season's GAR a 90 beyond this season's GAR, last season's, minutes and age (2015-26, t >= 2 clustered by player, leave-one-season-out gain): Chance Creator (key passes a 90), Shot Volume (shots, F and M), Progressor (xGBuildup, M and D). Each stat is regressed by minutes; tier = percentile at the position, bronze 75th, silver 90th, gold 97th, platinum 99th. Finishing and keeper shot stopping are too noisy year to year; FotMob ball winning and dribbles failed.</p>
+  {{- end }}
   <div class="win__status"><span data-sp-count></span>
     <span class="winpager" data-sp-pager hidden>
       <button type="button" class="winpager__btn" data-sp-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
@@ -100,6 +103,15 @@
   function face(p) {
     var u = p.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + p.ph : p.fph ? 'https://images.fotmob.com/image_resources/playerimages/' + p.fph + '.png' : '/img/face.svg';
     return '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
+  }
+  // predictive badges (scripts/soccer_badges.py; cfb.js medals()): [name, tier letter, percentile, stat], best first,
+  // only badges that predicted next season's GAR a 90 beyond this season's (scripts/soccer_badge_backtest.py)
+  var TIER = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
+  function nth(n) { var t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return n + t; }
+  function medals(p) {
+    if (!p.bdg) return '';
+    var tip = p.bdg.map(function (b) { return TIER[b[1]] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct at position, ' + b[3] + ' (regressed by minutes)'; }).join('\n') + '\npredictive of next season\'s GAR beyond this one';
+    return '<span class="cfb__medals" title="' + esc(tip) + '">' + p.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>';
   }
   function lgo(p) { return p.lid ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + p.lid + '.png" alt="" width="16" height="16" loading="lazy"> ' : logo(p.team); }
   var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden', 'usa.1': 'MLS' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
@@ -177,7 +189,7 @@
       } else if (dir < 0) list = list.slice().reverse();
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
-        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
+        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'

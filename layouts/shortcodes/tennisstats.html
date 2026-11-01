@@ -37,7 +37,7 @@
   {{- range $t.players }}
   <tr>
     <td class="cfb__rk" data-v="{{ .rk }}">{{ .rk }}</td>
-    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ partial "badges.html" (dict "b" .bdg "of" "next season's Elo") }}</td>
     <td class="cfb__num" data-v="{{ .spwp }}"><b>{{ printf "%+.1f" (float .spwp) }}</b></td>
     <td class="cfb__num" data-v="{{ .rpwp }}"><b>{{ printf "%+.1f" (float .rpwp) }}</b></td>
     <td class="cfb__num" data-v="{{ .xhold }}">{{ printf "%.0f" (float .xhold) }}%</td>
