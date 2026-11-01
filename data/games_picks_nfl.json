@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T16:34:30Z",
+ "asof": "2026-11-01T16:39:17Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -97,16 +97,10 @@
    "m": 8.1,
    "tm": 52.7,
    "flagged": "2026-10-28T02:43:45Z",
-   "betTo": 3.5,
+   "betTo": 3.0,
    "close": 3.5,
-   "now": {
-    "mk": "spread",
-    "side": "home",
-    "line": 3.5,
-    "price": 117.0,
-    "ev": 0.118,
-    "units": 3.0
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "2026_08_PHI_WAS",
@@ -557,12 +551,12 @@
    "state": "under"
   },
   "2026_08_BAL_BUF": {
-   "mk": "spread",
-   "side": "home",
-   "line": 3.5,
-   "price": 117.0,
-   "ev": 0.118,
-   "edge": 4.3,
+   "mk": "total",
+   "side": "under",
+   "line": 54.5,
+   "price": 106.0,
+   "ev": 0.084,
+   "edge": 1.8,
    "units": 3.0,
    "home": "BUF",
    "away": "BAL",
@@ -729,7 +723,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1082,
+  "snapshots": 1089,
   "buckets": [
    {
     "when": "24h+",
@@ -751,9 +745,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 27,
-    "clvRet": -0.0574,
-    "clvT": -5.61,
+    "clvN": 29,
+    "clvRet": -0.0598,
+    "clvT": -6.18,
     "clv": 0.0,
     "beat": 0.0,
     "still": 1.0
@@ -841,8 +835,9 @@
    "m": 8.1,
    "tm": 52.7,
    "flagged": "2026-10-28T02:43:45Z",
-   "betTo": 3.5,
-   "close": 3.5
+   "betTo": 3.0,
+   "close": 3.5,
+   "pass": true
   },
   {
    "id": "2026_08_LV_NYJ",
