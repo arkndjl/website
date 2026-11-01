@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-01T10:37:28Z",
+ "asof": "2026-11-01T10:44:24Z",
  "recenter": {
   "week": 1.74
  },
@@ -385,6 +385,22 @@
    "tm": 45.2
   },
   {
+   "id": "401856743",
+   "sport": "cfb",
+   "kick": "2026-11-07T17:00:00.000Z",
+   "home": "Missouri",
+   "away": "Texas",
+   "mk": "spread",
+   "side": "away",
+   "line": -3.5,
+   "price": -110.0,
+   "edge": 2.9,
+   "x": 5.0,
+   "why": "edge under 5 (line: 3-7)",
+   "m": -6.4,
+   "tm": 46.4
+  },
+  {
    "id": "401856849",
    "sport": "cfb",
    "kick": "2026-11-07T17:00:00.000Z",
@@ -607,22 +623,6 @@
    "why": "total market off",
    "m": -8.5,
    "tm": 62.3
-  },
-  {
-   "id": "401856743",
-   "sport": "cfb",
-   "kick": "2026-11-07T17:00:00.000Z",
-   "home": "Missouri",
-   "away": "Texas",
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -110,
-   "edge": 2.1,
-   "x": null,
-   "why": "total market off",
-   "m": -9.1,
-   "tm": 46.4
   }
  ],
  "games": {
@@ -687,27 +687,15 @@
    "state": "under"
   },
   "401856743": {
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -110,
-   "edge": 2.1,
+   "mk": "spread",
+   "side": "away",
+   "line": -3.5,
+   "price": -110.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "Missouri",
    "away": "Texas",
-   "state": "off"
-  },
-  "401856745": {
-   "mk": "total",
-   "side": "over",
-   "line": 50.5,
-   "price": -117.0,
-   "edge": 1.5,
-   "ev": null,
-   "units": 0.0,
-   "home": "Tennessee",
-   "away": "Kentucky",
    "state": "under"
   },
   "401858513": {
@@ -720,6 +708,18 @@
    "units": 0.0,
    "home": "Northwestern",
    "away": "Iowa",
+   "state": "under"
+  },
+  "401856745": {
+   "mk": "total",
+   "side": "over",
+   "line": 50.5,
+   "price": -117.0,
+   "edge": 1.5,
+   "ev": null,
+   "units": 0.0,
+   "home": "Tennessee",
+   "away": "Kentucky",
    "state": "under"
   },
   "401856739": {
@@ -955,16 +955,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3494,
+  "snapshots": 3498,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 948,
+    "clvN": 950,
     "clvRet": -0.0421,
-    "clvT": -17.41,
+    "clvT": -17.45,
     "clv": 0.25,
-    "beat": 0.35,
-    "still": 0.398
+    "beat": 0.349,
+    "still": 0.399
    },
    {
     "when": "6-24h",
