@@ -7,7 +7,7 @@
   function num(s, isHt) {   // "#12" -> 12, "45+" -> 45.5, "6'2\"" or "L-6'2/180" -> 74 (height columns), "$1.2M" or "INT/$998k" -> dollars
     var h = isHt && /(\d)['-](\d{1,2}(?:\.\d+)?)/.exec(s); if (h) return h[1] * 12 + +h[2];
     var $ = /\$([\d.]+)\s*([KM]?)/i.exec(s); if ($) return +$[1] * ($[2].toUpperCase() === 'M' ? 1e6 : $[2] ? 1e3 : 1);
-    var m = /-?\d+(?:\.\d+)?/.exec(s.replace(/,/g, '')); if (!m) return NaN;
+    var m = /-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i.exec(s.replace(/,/g, '')); if (!m) return NaN;   // Hugo writes big floats as 2.2e+08
     return +m[0] + (/\d\+/.test(s) ? 0.5 : 0);
   }
   function init() {
@@ -99,8 +99,8 @@
         function key(r) { var cell = r.cells[c]; return cell && cell.hasAttribute('data-v') ? cell.getAttribute('data-v') : txt(cell); }
         function go() {
           var h = heads[c].toLowerCase(), isHt = /(^|\W)(ht|height)\b/.test(h),
-              vals = rows.map(key), isNum = vals.filter(Boolean).every(function (v) { return !isNaN(num(v, isHt)); }),
-              asc = !isNum || /^(rk|pick|rd|age|bb|#|power)$/.test(h);
+              vals = rows.map(key).filter(function (v) { return !/^[-–—]?$/.test(v); }), isNum = vals.length && vals.every(function (v) { return !isNaN(num(v, isHt)); }),
+              asc = !isNum || /^(rk|pick|rd|age|bb|#|power|seed)$/.test(h);
           dir = c === cur ? -dir : (asc ? 1 : -1); cur = c;
           rows.sort(function (a, b) {
             var x = key(a), y = key(b);

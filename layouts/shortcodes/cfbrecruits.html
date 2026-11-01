@@ -78,7 +78,7 @@
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .comp | default 0 }}">{{ with .comp }}{{ printf "%.4f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ .rank | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ .rank | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
     <td>{{ .conf }}</td>
@@ -124,7 +124,7 @@
     <td class="cfb__num" data-v="{{ .grade }}">{{ printf "%.0f" .grade }}</td>
     <td class="cfb__dim" data-v="{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}">{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}</td>
     {{- if $hasEsp }}
-    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ if and .rank (eq .src "espn") }}{{ .rank }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ if and .rank (eq .src "espn") }}{{ .rank }}{{ else }}—{{ end }}</td>
     {{- end }}
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>

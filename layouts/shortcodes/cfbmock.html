@@ -43,7 +43,7 @@
     <td>{{ with .need }}<span class="cfb__new">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     <td class="cfb__num">{{ .bb }}</td>
-    {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ (index $sl .) | default 999 }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
+    {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ with (index $sl .) }}{{ . }}{{ end }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
   </tr>
   {{- end }}
   </tbody>

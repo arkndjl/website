@@ -72,8 +72,8 @@
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 4 25)) }}
     <td class="cfb__num" data-v="{{ .g }}">{{ .rec }}{{ if ne .crec "0-0" }} <span class="cfb__dim">({{ .crec }})</span>{{ end }}</td>
     {{- if $P }}{{ $a := index $apk .id }}{{ $c := index $cok .id }}
-    <td class="cfb__num" data-v="{{ $a | default 99 }}">{{ with $a }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ $c | default 99 }}">{{ with $c }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    <td class="cfb__num" data-v="{{ with $a }}{{ . }}{{ end }}">{{ with $a }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with $c }}{{ . }}{{ end }}">{{ with $c }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
     <td class="cfb__num">{{ printf "%.1f" (float .off) }}</td>
     <td class="cfb__num" data-v="{{ mul -1 .def }}">{{ printf "%.1f" (float .def) }}</td>
     <td class="cfb__num">{{ with .tempo }}{{ printf "%.1f" (float .) }}{{ end }}</td>

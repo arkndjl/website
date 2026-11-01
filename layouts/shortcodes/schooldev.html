@@ -30,7 +30,7 @@
     <td class="cfb__num" data-l="N" data-v="{{ .n }}">{{ .n }}</td>
     {{- if $cbb }}
     <td>{{ .coach | default "-" }}</td>
-    <td class="cfb__num" data-l="Coach" data-v="{{ .cdev | default -99 }}">{{ with $r.cdev }}{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }} <span class="cfb__dim">±{{ printf "%.2f" $r.cse }}</span>{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-l="Coach" data-v="{{ if ne .cdev nil }}{{ .cdev }}{{ end }}">{{ with $r.cdev }}{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }} <span class="cfb__dim">±{{ printf "%.2f" $r.cse }}</span>{{ else }}-{{ end }}</td>
     {{- else }}
     <td class="cfb__num" data-l="Drafted" data-v="{{ .dr }}">{{ .dr }}</td>
     <td class="cfb__num" data-l="xDrafted" data-v="{{ .xdr }}">{{ printf "%.1f" .xdr }}</td>
