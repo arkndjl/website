@@ -1171,31 +1171,32 @@
     wrap(g, d.head.join(' · '), tw).slice(0, 2).forEach(function (l) { g.fillText(l, tx, y); y += 64; });
     g.font = '40px ' + FONT; g.fillStyle = C.lilac; y += 8;
     wrap(g, d.rating + ' ' + d.unit + ' a game against ' + d.vs + '.', w - LS - 40).slice(0, 3).forEach(function (l) { g.fillText(l, tx, y); y += 54; });
-    y = Math.max(y, ly + LS) + 64;
+    y = Math.max(y, ly + LS) + 44;
     // labelled bands of tiles, as on the player card
     function rule(label) {
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(label, x, y);
       var lw = g.measureText(label).width; g.fillStyle = C.dark; g.fillRect(x + lw + 24, y - 1, w - lw - 24, 3);
-      y += 44;
+      y += 52;
     }
     function band(label, tiles, cols, th) {
       rule(label);
       var gap = 24, tw2 = (w - (cols - 1) * gap) / cols;
-      th = th || 176;
+      th = th || 200;
       tiles.forEach(function (t, i) {
-        var bx = x + (i % cols) * (tw2 + gap), by = y + Math.floor(i / cols) * (th + gap);
+        // label, value, note on fixed rows inside the tile, each clear of the next and of the bevel
+        var bx = x + (i % cols) * (tw2 + gap), by = y + Math.floor(i / cols) * (th + gap), sub = th >= 190;
         g.fillStyle = C.face; g.fillRect(bx, by, tw2, th); bevel(g, bx, by, tw2, th, true, 3);
-        g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[0].toUpperCase(), tw2 - 48), bx + 24, by + 42);
-        g.font = (th < 170 ? 64 : 72) + 'px ' + FONT; g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw2 - 48), bx + 24, by + (th < 170 ? th - 42 : 104));
-        if (t[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[3], tw2 - 48), bx + 24, by + 150); }
+        g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[0].toUpperCase(), tw2 - 48), bx + 24, by + 44);
+        g.font = (sub ? 72 : 64) + 'px ' + FONT; g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw2 - 48), bx + 24, by + (sub ? 110 : th - 52));
+        if (t[3] && sub) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[3], tw2 - 48), bx + 24, by + th - 36); }
       });
-      var rows = Math.ceil(tiles.length / cols); y += rows * th + (rows - 1) * gap + 40;
+      var rows = Math.ceil(tiles.length / cols); y += rows * th + (rows - 1) * gap + 64;
     }
     var neg = /^[−-]/.test(d.rating), nlast = d.last ? d.last.split(' ').length : 0;
     band('ARK RANKING', [['rating', d.rating, neg ? C.down : C.teal, d.unit + ' vs average'],
-                         ['80% range', d.rkLo ? '#' + d.rkLo + (d.rkHi !== d.rkLo ? '–' + d.rkHi : '') : dash, null, 'rank range'],
+                         ['80% range', d.rkLo ? '#' + d.rkLo + (d.rkHi !== d.rkLo ? '-' + d.rkHi : '') : dash, null, 'rank range'],
                          ['record', d.rec || dash, null, nlast ? 'last ' + nlast + ': ' + d.last : null]], 3);
-    if (d.odds.length) { var oc = d.odds.length > 4 ? Math.ceil(d.odds.length / 2) : d.odds.length; band('SEASON ODDS', d.odds.slice(0, 8).map(function (o) { return [o[0], o[1]]; }), Math.max(3, Math.min(4, oc)), 130); }
+    if (d.odds.length) { var oc = d.odds.length > 4 ? Math.ceil(d.odds.length / 2) : d.odds.length; band('SEASON ODDS', d.odds.slice(0, 8).map(function (o) { return [o[0], o[1]]; }), Math.max(3, Math.min(4, oc)), 150); }
     // what the rating is made of: each input's push, bars from the middle, pinned to the bottom
     var parts = d.parts.slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); }).slice(0, 8), prow = Math.ceil(parts.length / 2);
     var barsH = parts.length ? 100 + prow * 60 : 0, bottom = F.y + F.h - 40 - barsH;
@@ -1222,7 +1223,7 @@
         var rk = n.rk ? ' #' + n.rk : ''; g.font = '40px ' + FONT; g.fillStyle = C.white;
         var room = x + half - pvw - 24 - ox, nm = fit(g, n.n, room - (rk ? 90 : 0)); g.fillText(nm, ox, gy);
         if (rk) { var nw = g.measureText(nm).width; g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(rk, ox + nw + 8, gy + 2); }
-        gy += 72;
+        gy += 66;
       });
       if (d.next.length) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'win chance from the game model', half), x, gy); gy += 40; }
     }
@@ -1238,14 +1239,14 @@
         g.font = '40px ' + FONT; g.fillStyle = C.white; var pn = fit(g, p[0], pwid - vw - 32 - posw); g.fillText(pn, px, py2);
         var pnw = g.measureText(pn).width;
         if (pos) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(pos, px + pnw + 16, py2 + 2); }
-        if (p[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p[3], pwid), px, py2 + 42); py2 += 104; } else py2 += 72;
+        if (p[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p[3], pwid), px, py2 + 40); py2 += 94; } else py2 += 68;
       });
     }
-    y = Math.max(gy, py2, cy0) + 24;
-    if (d.group && y + 60 < bottom) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.group, w), x, y); y += 72; }
+    y = Math.max(gy, py2, cy0) + 40;
+    if (d.group && y + 60 < bottom) { g.fillStyle = C.dark; g.fillRect(x, y - 30, w, 3); g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.group, w), x, y + 16); y += 84; }
     // strengths and concerns, side by side, in the room left
-    if ((d.plus.length || d.minus.length) && y + 160 < bottom) {
-      y += 24;
+    if ((d.plus.length || d.minus.length) && y + 130 < bottom) {
+      y += 8;
       [[ '+ strengths', d.plus, C.teal, x ], [ '− concerns', d.minus, C.down, x + half + 60 ]].forEach(function (L) {
         var yy = y; g.font = '52px ' + FONT; g.fillStyle = L[2]; g.fillText(L[0], L[3], yy); yy += 72;
         g.font = '38px ' + FONT;
