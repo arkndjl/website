@@ -844,6 +844,16 @@ def tipdt(r):
     return dt.datetime.fromisoformat(r['tip'].replace('Z', '+00:00'))
 
 
+LOCAL_DAY = True
+
+
+def gday(t):
+    """a tip's game day: its US date (UTC minus 7 h puts every noon-11 pm local tip on its own day). Rest used to be
+    read off UTC dates, where a 7:30 pm Eastern tip falls on the next day: 38% of the "back-to-backs" weren't, and 14%
+    of the real ones were missed (scripts/rest_research.py, Nov 2026)"""
+    return (t - dt.timedelta(hours=7)).date() if LOCAL_DAY else t.date()
+
+
 class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
@@ -1136,7 +1146,7 @@ class Model:
     def sched(self, g, t, arena):
         tip = tipdt(g)
         last = self.last.get(t)
-        rest = 3 if not last else max(0, min(3, (tip.date() - last[0].date()).days - 1))
+        rest = 3 if not last else max(0, min(3, (gday(tip) - gday(last[0])).days - 1))
         km = hav(ARENA[last[1]], ARENA[arena]) if last else 0.0
         tz = (ARENA[arena][2] - ARENA[last[1]][2]) if last else 0
         n4 = sum(1 for x in self.recent[t] if (tip - x).total_seconds() < 3.5 * 86400)
