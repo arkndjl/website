@@ -415,7 +415,7 @@ def rosters(y, fresh=False):
         if r['pfr_id']:
             ros[r['pfr_id']] = r
         else:
-            by_name[(r['full_name'].lower(), r['team'])] = r
+            by_name[(NM.key(r['full_name']), r['team'])] = r
     return ros, by_name
 
 
@@ -545,8 +545,8 @@ def board(y, thru=None, fresh=False):
     # match the snap-count players without a PFR id in the roster by name and team, so their play stats (joined by
     # gsis id), age and experience still land
     for (pfr, t), s_ in sd['snaps'].items():
-        if pfr not in ros and (s_['name'].lower(), t) in by_name:
-            ros[pfr] = by_name[(s_['name'].lower(), t)]
+        if pfr not in ros and (NM.key(s_['name']), t) in by_name:
+            ros[pfr] = by_name[(NM.key(s_['name']), t)]
     lines, value, spread = sub_lines()
     agg = {}
     for o in team_rows(sd, b, ros):
@@ -649,13 +649,13 @@ def age(bd, y):
 
 # ---------------------------------------------------------------- WAR by gsis id (game projections' injury costs)
 def gsis_map(y, fresh=False):
-    """pfr id -> gsis id from the season's roster file, and (lower name, team) -> gsis id for rows without a pfr id."""
+    """pfr id -> gsis id from the season's roster file, and (name key, team) -> gsis id for rows without a pfr id."""
     by_pfr, by_name = {}, {}
     for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh)):
         if r['gsis_id']:
             if r['pfr_id']:
                 by_pfr[r['pfr_id']] = r['gsis_id']
-            by_name[(r['full_name'].lower(), r['team'])] = r['gsis_id']
+            by_name[(NM.key(r['full_name']), r['team'])] = r['gsis_id']
     return by_pfr, by_name
 
 
@@ -667,7 +667,7 @@ def war_ledger(y, thru=None, maps=None, fresh=False):
     sd = season_data(y, fresh, thru)
     out = {}
     for (pfr, t), s in sd['snaps'].items():
-        gsis = by_pfr.get(pfr) or by_name.get((s['name'].lower(), t))
+        gsis = by_pfr.get(pfr) or by_name.get((NM.key(s['name']), t))
         g, _ = group_of(s['pos'], '')
         if not gsis or not g:
             continue
@@ -832,8 +832,8 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
         sd = season_data(y)
         ros, by_name = rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
-            if pfr not in ros and (s_['name'].lower(), t) in by_name:
-                ros[pfr] = by_name[(s_['name'].lower(), t)]
+            if pfr not in ros and (NM.key(s_['name']), t) in by_name:
+                ros[pfr] = by_name[(NM.key(s_['name']), t)]
         TR = team_rows(sd, b, ros)
         for o in TR:
             if 0.05 <= o['share'] < 0.35:
@@ -1000,8 +1000,8 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
             continue
         sd = season_data(y); ros, by_name = rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
-            if pfr not in ros and (s_['name'].lower(), t) in by_name:
-                ros[pfr] = by_name[(s_['name'].lower(), t)]
+            if pfr not in ros and (NM.key(s_['name']), t) in by_name:
+                ros[pfr] = by_name[(NM.key(s_['name']), t)]
         for o in team_rows(sd, b, ros):
             if o['share'] >= 0.3:
                 cs = [c_[:4] for c_ in con.get(norm(o['name']), []) if c_[0] == y + 1 and c_[3] is not None and c_[0] - c_[3] >= 3 and NM.pos_fits(c_[4], o['sub'])]
@@ -1094,8 +1094,8 @@ def fv_curves(b, line, k, value=None, spread=None):
         sd = season_data(y)
         ros, by_name = rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
-            if pfr not in ros and (s_['name'].lower(), t) in by_name:
-                ros[pfr] = by_name[(s_['name'].lower(), t)]
+            if pfr not in ros and (NM.key(s_['name']), t) in by_name:
+                ros[pfr] = by_name[(NM.key(s_['name']), t)]
         agg = defaultdict(lambda: [0.0, 0.0])
         for o in team_rows(sd, b, ros):
             w = war_of(o['av'], o['share'], o['sub'], line, value, spread)
@@ -1216,8 +1216,8 @@ def defense(years=range(2018, 2026)):
         sd = season_data(y); W[y] = sd
         ros, by_name = rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
-            if pfr not in ros and (s_['name'].lower(), t) in by_name:
-                ros[pfr] = by_name[(s_['name'].lower(), t)]
+            if pfr not in ros and (NM.key(s_['name']), t) in by_name:
+                ros[pfr] = by_name[(NM.key(s_['name']), t)]
         for o in team_rows(sd, b, ros):
             if o['g'] in OFFENSE:
                 continue

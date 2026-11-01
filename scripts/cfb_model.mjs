@@ -162,7 +162,8 @@ function prepare(seasons, data, geo) {
         close: pick?.spread != null ? -pick.spread : null,                // market home margin (closing)
         closeTot: pick?.overUnder ?? null, open: pick?.spreadOpen != null ? -pick.spreadOpen : null,
       });
-      if (g.completed) { last[g.homeId] = when; last[g.awayId] = when; }
+      // scheduled games count too, so later weeks' rest isn't measured from the last game played
+      if (g.completed || when > Date.now()) { last[g.homeId] = when; last[g.awayId] = when; }
     }
   }
   return rows;

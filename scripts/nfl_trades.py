@@ -46,7 +46,7 @@ def _snaps(y, tw=None):
         if r['gsis_id']:
             if r.get('pfr_id'):
                 by_pfr.setdefault(r['pfr_id'], r['gsis_id'])
-            by_name.setdefault((r['full_name'].lower(), r['team']), r['gsis_id'])
+            by_name.setdefault((N.NM.key(r['full_name']), r['team']), r['gsis_id'])
     out = defaultdict(lambda: defaultdict(set))
     for r in N.rows(N.get(f'snap_counts_{y}.csv', f'{N.REL}/snap_counts/snap_counts_{y}.csv')):
         if r['game_type'] != 'REG':
@@ -54,7 +54,7 @@ def _snaps(y, tw=None):
         if N.num(r['offense_snaps']) + N.num(r['defense_snaps']) <= 0:
             continue
         t = N.team(r['team'])
-        g = by_pfr.get(r['pfr_player_id']) or by_name.get((r['player'].lower(), r['team']))
+        g = by_pfr.get(r['pfr_player_id']) or by_name.get((N.NM.key(r['player']), r['team']))
         if g:
             out[g][t].add(int(r['week']))
     if tw is not None:            # a week the weekly roster puts him on another club is a crossed id: dropped

@@ -42,7 +42,7 @@ def ledger(y, thru=None, maps=None):
     sd = W.season_data(y, False, thru)
     out = {}
     for (pfr, t), s in sd['snaps'].items():
-        gsis = by_pfr.get(pfr) or by_name.get((s['name'].lower(), t))
+        gsis = by_pfr.get(pfr) or by_name.get((W.NM.key(s['name']), t))
         g, _ = W.group_of(s['pos'], '')
         if not gsis or not g:
             continue

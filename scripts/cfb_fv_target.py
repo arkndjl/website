@@ -34,8 +34,8 @@ def main():
         sd = W.season_data(y)
         ros, by_name = W.rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
-            if pfr not in ros and (s_['name'].lower(), t) in by_name:
-                ros[pfr] = by_name[(s_['name'].lower(), t)]
+            if pfr not in ros and (W.NM.key(s_['name']), t) in by_name:
+                ros[pfr] = by_name[(W.NM.key(s_['name']), t)]
         for o in W.team_rows(sd, b, ros):
             if o['pfr'] not in want:
                 continue

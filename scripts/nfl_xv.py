@@ -80,8 +80,8 @@ def season_players(y, sd=None, ros=None, b=None, fresh=False):
     if ros is None:
         ros, by_name = W.rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
-            if pfr not in ros and (s_['name'].lower(), t) in by_name:
-                ros[pfr] = by_name[(s_['name'].lower(), t)]
+            if pfr not in ros and (W.NM.key(s_['name']), t) in by_name:
+                ros[pfr] = by_name[(W.NM.key(s_['name']), t)]
     lines, value, spread = W.sub_lines()
     team_alias = {a_: b_ for a_, b_ in (('LV', 'OAK'), ('OAK', 'LV'), ('LA', 'LAR'), ('LAR', 'LA'), ('LAC', 'SD'), ('SD', 'LAC'))
                   if a_ not in sd['team'] and b_ in sd['team']}
