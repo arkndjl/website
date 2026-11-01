@@ -151,9 +151,33 @@ def write_hist(lo, hi):
         json.dump({'games': out, 'names': names}, f, separators=(',', ':'))
 
 
+OPEN_DAYS = 14        # past seasons: on the opening roster only if the first game played comes this soon after opening night
+_FIRST = {}           # past (all-final) season -> {player id: (first tip, team)}, from the box scores
+
+
+def dated_firsts(games):
+    """each complete season's first appearance per player, so past opening rosters leave out later signees (the season's
+    board file lists everyone who played for a team, including a January signing, from game 1)"""
+    by = defaultdict(list)
+    for g in games:
+        by[g['S']].append(g)
+    for S, gs in by.items():
+        if not all(g.get('fin') for g in gs):
+            continue
+        open_ = min(g['tip'] for g in gs)
+        f = {}
+        for g in sorted(gs, key=lambda g: g['tip']):
+            for t, rows in (g.get('pl') or {}).items():
+                for pid, m in rows:
+                    if m > 0 and pid not in f:
+                        f[pid] = (g['tip'], t)
+        _FIRST[S] = (open_, f)
+
+
 def load_hist():
     with gzip.open(HIST, 'rt') as f:
         d = json.load(f)
+    dated_firsts(d['games'])
     return d['games'], d['names']
 
 
@@ -802,11 +826,20 @@ def young_coef(S, n0=600.0, icpt=True):
 
 
 def opening_rosters(S, names):
-    """opening-night rosters: each player's first team in season S's board file (rosters are set before the season)"""
+    """opening-night rosters: each player's first team in season S's board file (rosters are set before the season); a
+    past season keeps only players whose first game came within OPEN_DAYS of opening night for that team (later ones
+    join on their first game)"""
     out = {}
+    fd = _FIRST.get(S)
+    if fd:
+        cut = (dt.datetime.fromisoformat(fd[0].replace('Z', '+00:00')) + dt.timedelta(days=OPEN_DAYS)).strftime('%Y-%m-%dT%H:%MZ')
     for pid, nm in names.items():
         v = lookup(S, nm)
         if v:
+            if fd:
+                f = fd[1].get(pid)
+                if not f or f[0] > cut or f[1] != v[2]:
+                    continue
             out[pid] = v[2]
     return out
 
