@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T20:27:05Z",
+ "asof": "2026-11-01T20:38:41Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 124.75,
+  "open": 122.25,
   "path": [
    101.5,
    101.6,
@@ -51,7 +51,7 @@
   ]
  },
  "record": {
-  "n": 154,
+  "n": 155,
   "clvN": 87,
   "clvRet": -0.0292,
   "clvT": -3.78,
@@ -105,6 +105,27 @@
  "gatesPass": false,
  "markets": [
   {
+   "id": "cfb-ml",
+   "label": "CFB moneyline",
+   "sport": "cfb",
+   "mk": "ml",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
    "id": "cfb-spread",
    "label": "CFB spread",
    "sport": "cfb",
@@ -130,7 +151,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 4,
+   "n": 5,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -235,7 +256,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 9,
+   "n": 8,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -1757,7 +1778,7 @@
    "ev": 0.0293,
    "event": null,
    "pass": false,
-   "close": 41.5
+   "close": 40.5
   },
   {
    "rule": "nflprops-prop",
@@ -3193,7 +3214,7 @@
    "edge": 8.1,
    "ev": 0.0011,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 148.5
   },
   {
@@ -3276,7 +3297,7 @@
    "ev": 0.0036,
    "event": null,
    "pass": true,
-   "close": 49.5
+   "close": 50.5
   },
   {
    "rule": "cfb-total",
@@ -3318,7 +3339,28 @@
    "ev": 0.0378,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 71.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401862818",
+   "k": "2026-11-07T00:30:00.000Z",
+   "slate": "cfb:2026-11-06",
+   "h": "East Carolina",
+   "a": "South Florida",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -106.0,
+   "bet": "over 40.5 -106",
+   "placed": "2026-11-01T20:36:45Z",
+   "stake": 1.75,
+   "edge": 9.1,
+   "ev": 0.0158,
+   "event": null,
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -3384,6 +3426,27 @@
    "close": 45.5
   },
   {
+   "rule": "cfb-ml",
+   "sport": "cfb",
+   "id": "401856744",
+   "k": "2026-11-07T20:00:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "South Carolina",
+   "a": "Texas A&M",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 228.0,
+   "bet": "Texas A&M ML +228",
+   "placed": "2026-11-01T20:36:45Z",
+   "stake": 0.75,
+   "edge": 6.9,
+   "ev": 0.0188,
+   "event": null,
+   "pass": false,
+   "close": 7.0
+  },
+  {
    "rule": "cfb-total",
    "sport": "cfb",
    "id": "401858514",
@@ -3403,6 +3466,27 @@
    "event": null,
    "pass": true,
    "close": 48.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401862820",
+   "k": "2026-11-07T20:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Navy",
+   "a": "Temple",
+   "mk": "total",
+   "side": "under",
+   "line": 52.5,
+   "price": -106.0,
+   "bet": "under 52.5 -106",
+   "placed": "2026-11-01T20:38:27Z",
+   "stake": 0.25,
+   "edge": 5.1,
+   "ev": 0.0004,
+   "event": null,
+   "pass": false,
+   "close": 52.5
   },
   {
    "rule": "cfb-total",
@@ -3464,7 +3548,7 @@
    "edge": 4.4,
    "ev": 0.0679,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 67.5
   }
  ],
@@ -7999,7 +8083,7 @@
    "ev": 0.0293,
    "event": null,
    "pass": false,
-   "close": 41.5
+   "close": 40.5
   },
   {
    "rule": "nflprops-prop",
@@ -9435,7 +9519,7 @@
    "edge": 8.1,
    "ev": 0.0011,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 148.5
   },
   {
@@ -9518,7 +9602,7 @@
    "ev": 0.0036,
    "event": null,
    "pass": true,
-   "close": 49.5
+   "close": 50.5
   },
   {
    "rule": "cfb-total",
@@ -9560,7 +9644,28 @@
    "ev": 0.0378,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 71.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401862818",
+   "k": "2026-11-07T00:30:00.000Z",
+   "slate": "cfb:2026-11-06",
+   "h": "East Carolina",
+   "a": "South Florida",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -106.0,
+   "bet": "over 40.5 -106",
+   "placed": "2026-11-01T20:36:45Z",
+   "stake": 1.75,
+   "edge": 9.1,
+   "ev": 0.0158,
+   "event": null,
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -9626,6 +9731,27 @@
    "close": 45.5
   },
   {
+   "rule": "cfb-ml",
+   "sport": "cfb",
+   "id": "401856744",
+   "k": "2026-11-07T20:00:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "South Carolina",
+   "a": "Texas A&M",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 228.0,
+   "bet": "Texas A&M ML +228",
+   "placed": "2026-11-01T20:36:45Z",
+   "stake": 0.75,
+   "edge": 6.9,
+   "ev": 0.0188,
+   "event": null,
+   "pass": false,
+   "close": 7.0
+  },
+  {
    "rule": "cfb-total",
    "sport": "cfb",
    "id": "401858514",
@@ -9645,6 +9771,27 @@
    "event": null,
    "pass": true,
    "close": 48.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401862820",
+   "k": "2026-11-07T20:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Navy",
+   "a": "Temple",
+   "mk": "total",
+   "side": "under",
+   "line": 52.5,
+   "price": -106.0,
+   "bet": "under 52.5 -106",
+   "placed": "2026-11-01T20:38:27Z",
+   "stake": 0.25,
+   "edge": 5.1,
+   "ev": 0.0004,
+   "event": null,
+   "pass": false,
+   "close": 52.5
   },
   {
    "rule": "cfb-total",
@@ -9706,7 +9853,7 @@
    "edge": 4.4,
    "ev": 0.0679,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 67.5
   }
  ]

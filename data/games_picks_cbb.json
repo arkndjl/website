@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-01T20:27:01Z",
+ "asof": "2026-11-01T20:38:34Z",
  "recenter": {
-  "2026-11-02": -12.1,
+  "2026-11-02": -12.13,
   "2026-11-03": -10.2
  },
  "monitor": {
@@ -216,9 +216,9 @@
     "mk": "spread",
     "side": "home",
     "line": 13.5,
-    "price": -104.0,
-    "ev": 0.079,
-    "units": 2.25
+    "price": -102.0,
+    "ev": 0.09,
+    "units": 3.25
    }
   },
   {
@@ -250,7 +250,7 @@
     "side": "under",
     "line": 155.5,
     "price": -100.0,
-    "ev": 0.1,
+    "ev": 0.099,
     "units": 4.75
    }
   },
@@ -435,7 +435,7 @@
     "side": "under",
     "line": 142.5,
     "price": -115.0,
-    "ev": 0.086,
+    "ev": 0.085,
     "units": 0.75
    }
   },
@@ -468,7 +468,7 @@
     "side": "under",
     "line": 158.5,
     "price": -108.0,
-    "ev": 0.082,
+    "ev": 0.081,
     "units": 2.0
    }
   },
@@ -973,7 +973,7 @@
     "side": "over",
     "line": 147.5,
     "price": -110.0,
-    "ev": 0.072,
+    "ev": 0.073,
     "units": 1.25
    }
   },
@@ -1100,14 +1100,8 @@
    "flagged": "2026-11-01T20:23:05Z",
    "betTo": 142.5,
    "close": 148.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 148.5,
-    "price": -113.0,
-    "ev": 0.083,
-    "units": 1.0
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "401924717",
@@ -1138,7 +1132,7 @@
     "side": "over",
     "line": 163.5,
     "price": -108.0,
-    "ev": 0.041,
+    "ev": 0.042,
     "units": 0.25
    }
   },
@@ -1260,6 +1254,22 @@
    "why": "no edge at -117",
    "m": 8.7,
    "tm": 148.7
+  },
+  {
+   "id": "401917507",
+   "sport": "cbb",
+   "kick": "2026-11-03T03:00:00Z",
+   "home": "Saint Mary's",
+   "away": "Illinois State",
+   "mk": "total",
+   "side": "under",
+   "line": 148.5,
+   "price": -117.0,
+   "edge": 8.1,
+   "x": 2.0,
+   "why": "no edge at -117",
+   "m": 10.1,
+   "tm": 140.4
   },
   {
    "id": "401921704",
@@ -1404,6 +1414,22 @@
    "why": "no edge at -106",
    "m": 4.5,
    "tm": 157.3
+  },
+  {
+   "id": "401920893",
+   "sport": "cbb",
+   "kick": "2026-11-03T00:30:00Z",
+   "home": "Wisconsin",
+   "away": "Denver",
+   "mk": "spread",
+   "side": "home",
+   "line": 23.5,
+   "price": -113.0,
+   "edge": 4.0,
+   "x": 2.5,
+   "why": "no edge at -113",
+   "m": 27.5,
+   "tm": 162.6
   },
   {
    "id": "401910998",
@@ -1612,38 +1638,6 @@
    "why": "edge under 2.5",
    "m": 16.5,
    "tm": 144.5
-  },
-  {
-   "id": "401911002",
-   "sport": "cbb",
-   "kick": "2026-11-03T00:00:00Z",
-   "home": "James Madison",
-   "away": "Miami (OH)",
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -130.0,
-   "edge": 1.9,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": -0.4,
-   "tm": 157.7
-  },
-  {
-   "id": "401911390",
-   "sport": "cbb",
-   "kick": "2026-11-03T02:00:00Z",
-   "home": "UConn",
-   "away": "Gardner-Webb",
-   "mk": "spread",
-   "side": "home",
-   "line": 38.5,
-   "price": -110.0,
-   "edge": 1.9,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 40.4,
-   "tm": 146.4
   }
  ],
  "games": {
@@ -1711,10 +1705,10 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -104.0,
-   "ev": 0.079,
+   "price": -102.0,
+   "ev": 0.09,
    "edge": 6.2,
-   "units": 2.25,
+   "units": 3.25,
    "home": "Iowa State",
    "away": "Memphis",
    "state": "pick"
@@ -1735,7 +1729,7 @@
    "mk": "spread",
    "side": "home",
    "line": 28.5,
-   "price": -127.0,
+   "price": -133.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -1795,13 +1789,13 @@
    "mk": "total",
    "side": "under",
    "line": 148.5,
-   "price": -113.0,
-   "ev": 0.083,
+   "price": -117.0,
    "edge": 8.1,
-   "units": 1.0,
+   "ev": null,
+   "units": 0.0,
    "home": "Saint Mary's",
    "away": "Illinois State",
-   "state": "pick"
+   "state": "under"
   },
   "401925733": {
    "mk": "spread",
@@ -1987,7 +1981,7 @@
    "mk": "spread",
    "side": "home",
    "line": 30.5,
-   "price": -127.0,
+   "price": -133.0,
    "edge": 1.3,
    "ev": null,
    "units": 0.0,
@@ -1999,7 +1993,7 @@
    "mk": "spread",
    "side": "away",
    "line": 21.5,
-   "price": -122.0,
+   "price": -117.0,
    "edge": 0.2,
    "ev": null,
    "units": 0.0,
@@ -2036,7 +2030,7 @@
    "side": "under",
    "line": 142.5,
    "price": -115.0,
-   "ev": 0.086,
+   "ev": 0.085,
    "edge": 8.8,
    "units": 0.75,
    "home": "West Virginia",
@@ -2067,12 +2061,24 @@
    "away": "Massachusetts",
    "state": "under"
   },
+  "401920893": {
+   "mk": "spread",
+   "side": "home",
+   "line": 23.5,
+   "price": -113.0,
+   "edge": 4.0,
+   "ev": null,
+   "units": 0.0,
+   "home": "Wisconsin",
+   "away": "Denver",
+   "state": "under"
+  },
   "401910994": {
    "mk": "total",
    "side": "under",
    "line": 158.5,
    "price": -108.0,
-   "ev": 0.082,
+   "ev": 0.081,
    "edge": 6.7,
    "units": 2.0,
    "home": "Georgia State",
@@ -2252,7 +2258,7 @@
    "side": "over",
    "line": 147.5,
    "price": -110.0,
-   "ev": 0.072,
+   "ev": 0.073,
    "edge": 6.7,
    "units": 1.25,
    "home": "Northern Kentucky",
@@ -2275,7 +2281,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -104.0,
+   "price": -117.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -2300,7 +2306,7 @@
    "side": "under",
    "line": 155.5,
    "price": -100.0,
-   "ev": 0.1,
+   "ev": 0.099,
    "edge": 5.4,
    "units": 4.75,
    "home": "Oregon State",
@@ -2478,9 +2484,9 @@
   "401921423": {
    "mk": "total",
    "side": "over",
-   "line": 166.5,
-   "price": -112.0,
-   "edge": 1.0,
+   "line": 167.5,
+   "price": -105.0,
+   "edge": 0.0,
    "ev": null,
    "units": 0.0,
    "home": "Queens University",
@@ -2540,25 +2546,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 883,
+  "snapshots": 902,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 233,
-    "clvRet": -0.0006,
-    "clvT": -0.06,
-    "clv": 0.74,
-    "beat": 0.322,
-    "still": 0.609
+    "clvN": 239,
+    "clvRet": -0.0038,
+    "clvT": -0.44,
+    "clv": 0.69,
+    "beat": 0.314,
+    "still": 0.59
    },
    {
     "when": "6-24h",
-    "clvN": 26,
-    "clvRet": 0.1852,
-    "clvT": 2.93,
-    "clv": 4.0,
-    "beat": 0.385,
-    "still": 0.577
+    "clvN": 27,
+    "clvRet": 0.1758,
+    "clvT": 2.86,
+    "clv": 3.85,
+    "beat": 0.37,
+    "still": 0.593
    },
    {
     "when": "1-6h",
@@ -3433,7 +3439,8 @@
    "tmRaw": 128.3,
    "flagged": "2026-11-01T20:23:05Z",
    "betTo": 142.5,
-   "close": 148.5
+   "close": 148.5,
+   "pass": true
   }
  ]
 }
