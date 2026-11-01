@@ -308,6 +308,51 @@ def age_at(birth, year):
     return (dt.date(year, 9, 15) - b).days / 365.25
 
 
+# Goalie save percentage (FV reachability audit, Nov 1 2026): skaters carry NHLe, NHLe growth and AHL shots into the stage
+# models, goalies carried no performance input at all, so a goalie's stage grade could not separate a .930 AHL starter
+# from a .890 backup, and the best goalie prospects at stages 3-4 realized 6-15 FV above their grades. gsvc: save
+# percentage over the league-season mean (the drafted goalies' GP-weighted mean in that league and season, the league's
+# all-season mean under GSV_MIN games), summed over every club line since the draft x games, over games + GSV_K, in
+# points of save percentage. Class-out on top of each live stage model: k1 t 2.6 (9/12), k2 t 6.0 (12/12), k3 t 2.6
+# (9/12), k4 t 2.2 (10/12); forward (fit 2008-15, grade 2016-19) better at every stage, goalie MSE down at every stage
+# (k2 103.5 -> 93.8). Live: Fowler 41 -> 46, Murashov 37 -> 40; skaters move a point at most (the G intercept refits).
+# (A draft-year save% over league failed the draft model before, Oct 2026: it stays out there.)
+GSV_K, GSV_MIN = 20, 60
+GSV_MEAN = {}
+
+
+def gsv_lines(seasons):
+    """[season, league, games, save%] for a goalie's regular-season club lines with a save percentage"""
+    return [[s['season'], s['leagueAbbrev'], s['gamesPlayed'], s['savePctg']] for s in seasons
+            if s.get('gameTypeId') == 2 and (s.get('gamesPlayed') or 0) > 0 and s.get('savePctg')
+            and not TOURN.match(s.get('leagueAbbrev') or '')]
+
+
+def set_gsv(rows):
+    """league-season save% means over the drafted goalies (GP-weighted)"""
+    acc, lg = {}, {}
+    for r in rows:
+        for sid, l, gp, sv in r.get('gsv') or []:
+            for key, d in (((l, sid), acc), (l, lg)):
+                a = d.setdefault(key, [0.0, 0.0]); a[0] += gp * sv; a[1] += gp
+    GSV_MEAN.clear()
+    GSV_MEAN.update({k: a / b for k, (a, b) in acc.items() if b >= GSV_MIN})
+    GSV_MEAN.update({k: a / b for k, (a, b) in lg.items()})
+
+
+def gsvc(r, k):
+    """career save% over league through stage k (0 for skaters and goalies with no lines)"""
+    if not r['G']:
+        return 0.0
+    ss = {(r['year'] + j - 1) * 10000 + r['year'] + j for j in range(1, k + 1)}
+    num = den = 0.0
+    for sid, l, gp, sv in r.get('gsv') or []:
+        m = GSV_MEAN.get((l, sid), GSV_MEAN.get(l))
+        if sid in ss and m is not None:
+            num += gp * (sv - m); den += gp
+    return 100 * num / (den + GSV_K)
+
+
 def load_rows(W):
     """one row per pick, 2008-26: draft-time features, post-draft lines, NHL outcome"""
     rows = []
@@ -325,6 +370,8 @@ def load_rows(W):
                  'G': int(g), 'D': int(p['pos'] == 'D'), 'ht': p.get('ht'), 'wt': p.get('wt'), 'birth': p.get('birth'),
                  'age': age_at(p.get('birth'), y), 'league': p.get('league'), 'club': p.get('club'), 'country': p.get('country'),
                  'css': p.get('css')}
+            if g:
+                r['gsv'] = gsv_lines(seasons)
             r['d0'] = line_feats(main_line(seasons, (y - 1) * 10000 + y))
             r['dm1'] = line_feats(main_line(seasons, (y - 2) * 10000 + y - 1))
             r['post'], r['px'] = {}, {}
@@ -336,6 +383,7 @@ def load_rows(W):
                 r['px'][k] = post_extra(seasons, (S - 1) * 10000 + S)
             outcome(r, W, cur)
             rows.append(r)
+    set_gsv(rows)
     return chl_rows(ahl_shots(rows), fetch=True)
 
 
@@ -519,7 +567,7 @@ def stage_feats(r, k, fv0):
             'pro': int(bool(q) and is_pro(q['lg'])), 'age': (r['age'] or 18.5) - 18.5,
             'gp': min(r['gp_k'].get(k, 0), 164) / 82, 'war': war, 'G': r['G'], 'D': r['D'],
             'nany': int(r['gp_k'].get(k, 0) > 0),
-            'dur': r['dur_k'][k] - .85 if k in r.get('dur_k', {}) else 0.0}
+            'dur': r['dur_k'][k] - .85 if k in r.get('dur_k', {}) else 0.0, 'gsvc': gsvc(r, k)}
 
 
 SBASE = ['fv0']
@@ -549,6 +597,8 @@ SNEW[3] = SNEW[3] + ['nany']; SNEW[4] = SNEW[4] + ['nany']
 # At k3 it goes after comps (SPOST): offered before them it is kept and the comps then fail, ending worse (52.81 vs 52.44).
 SLATE[1] = SLATE[1] + ['nhgrow']; SLATE[4] = SLATE[4] + ['dur']
 SPOST = {1: [], 2: [], 3: ['nhgrow'], 4: []}
+# Nov 1 2026: goalie save% over league (gsvc, above), offered last at every stage, as it was tested
+for _k in SPOST: SPOST[_k] = SPOST[_k] + ['gsvc']
 GRAD = {0: 100, 1: 50}           # NHL games (skater, goalie) that graduate a pick off the pipeline
 POP_STAGES = (3, 4)
 
@@ -703,6 +753,7 @@ def read_rows(W):
         renhle(r.get('d0')); renhle(r.get('dm1'))
         r['px'] = {int(k): v for k, v in (r.get('px') or {}).items()}
         outcome(r, W, D.current_season())
+    set_gsv(rows)
     return chl_rows(ahl_shots(rows))
 
 
