@@ -1,20 +1,47 @@
-{{- /* Homepage ticker (Noah, Nov 1 2026): the next game of each of his teams, then 1NT's next matches.
-       Data: data/ticker.json from scripts/fetch_ticker.py (ESPN schedules + the site's game models; 1NT from
-       data/esea.json), refreshed by the odds-snap and picks-refresh workflows. Times are ET. Each team carries up to
-       three games; the script below shows the first one not yet finished, so the strip stays right between refreshes.
-       Model win chance only, never a betting line (those stay on Predictions). */ -}}
+{{- /* Homepage ticker (Noah, Nov 1 2026): 1NT's next matches first (Noah, Nov 1: "prioritize 1NT first"), then the
+       next game of each of his teams. Data: data/ticker.json from scripts/fetch_ticker.py (ESPN schedules + the site's
+       game models; 1NT from data/esea.json), refreshed by the odds-snap and picks-refresh workflows. Times are ET.
+       Each team carries up to three games; the script shows the first one not yet finished.
+       Live (Nov 1): during a game the page reads ESPN's public scoreboard every 30 s and moves the model's pregame win
+       chance with the score and clock (static/js/livewp.js; fits and backtest in data/live_wp_research.json). 1NT's
+       live number comes from live/1nt.json (scripts/nt_live.mjs, the FACEIT room: veto and map results). Model win
+       chance only, never a betting line (those stay on Predictions). */ -}}
 {{- with $.Site.Data.ticker }}
 {{- $links := dict "knicks" "/arkboard/nba/" "rangers" "/arkboard/nhl/" "ravens" "/arkboard/nfl/" "barcelona" "/arkboard/soccer/" }}
 <aside class="tick" aria-label="next games">
   <div class="tick__track">
     <div class="tick__run">
-      <span class="tick__tag">next</span>
+      {{- with .nt }}
+      <span class="tick__tag tick__tag--nt">1NT</span>
+      {{- if .games }}
+      {{- $h := .hours }}
+      {{- range .games }}
+      <a class="tick__g tick__g--nt" href="/laursen_111/#1nt" data-at="{{ .at }}" data-h="{{ $h }}" data-nt="{{ .id }}" data-bo="{{ .bo }}">
+        <span class="tick__l1">
+          <span class="tick__ha">vs</span>
+          {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          <span class="tick__opp">{{ .opp }}</span>
+          {{- with .oppRank }}<span class="tick__note">#{{ . }}</span>{{ end -}}
+        </span>
+        <span class="tick__l2">
+          <span class="tick__when">{{ .day }}{{ with .time }} {{ . }} ET{{ end }}</span>
+          <span class="tick__score" hidden></span>
+          <span class="tick__note tick__bo">bo{{ .bo }}</span>
+          <span class="tick__p"{{ with .p }} data-pre="{{ . }}"{{ else }} hidden{{ end }}>{{ with .p }}win {{ . }}%{{ end }}</span>
+        </span>
+      </a>
+      {{- end }}
+      {{- else }}
+      <span class="tick__g tick__g--off"><span class="tick__l2"><span class="tick__when">no match scheduled</span></span></span>
+      {{- end }}
+      {{- end }}
+      <span class="tick__tag tick__tag--next">next</span>
       {{- range .teams }}
       {{- $t := . }}
       <div class="tick__team" data-team="{{ .key }}">
         {{- range $i, $g := .games }}
         {{- $href := index $links $t.key }}
-        <a class="tick__g"{{ with $href }} href="{{ . }}"{{ end }} data-at="{{ $g.at }}" data-h="{{ $t.hours }}"{{ if $i }} hidden{{ end }}>
+        <a class="tick__g"{{ with $href }} href="{{ . }}"{{ end }} data-at="{{ $g.at }}" data-h="{{ $t.hours }}" data-id="{{ $g.id }}" data-sport="{{ $t.sport }}" data-path="{{ $t.path }}"{{ with $g.lg }} data-lg="{{ . }}"{{ end }} data-home="{{ if $g.home }}1{{ else }}0{{ end }}"{{ with $g.live }} data-live="{{ jsonify . }}"{{ end }}{{ if $i }} hidden{{ end }}>
           <span class="tick__l1">
             {{- with $t.logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
             <span class="tick__me">{{ $t.label }}</span>
@@ -24,8 +51,9 @@
           </span>
           <span class="tick__l2">
             <span class="tick__when">{{ $g.day }}{{ with $g.time }} {{ . }} ET{{ end }}</span>
+            <span class="tick__score" hidden></span>
             {{- with $g.note }}<span class="tick__note">{{ . }}</span>{{ end -}}
-            {{- with $g.p }}<span class="tick__p">win {{ . }}%</span>{{ end -}}
+            <span class="tick__p"{{ with $g.p }} data-pre="{{ . }}"{{ else }} hidden{{ end }}>{{ with $g.p }}win {{ . }}%{{ end }}</span>
           </span>
         </a>
         {{- end }}
@@ -37,43 +65,21 @@
         {{- end }}
       </div>
       {{- end }}
-      {{- with .nt }}
-      <span class="tick__tag tick__tag--nt">1NT</span>
-      {{- if .games }}
-      {{- $h := .hours }}
-      {{- range .games }}
-      <a class="tick__g tick__g--nt" href="/laursen_111/#1nt" data-at="{{ .at }}" data-h="{{ $h }}">
-        <span class="tick__l1">
-          <span class="tick__ha">vs</span>
-          {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
-          <span class="tick__opp">{{ .opp }}</span>
-          {{- with .oppRank }}<span class="tick__note">#{{ . }}</span>{{ end -}}
-        </span>
-        <span class="tick__l2">
-          <span class="tick__when">{{ .day }}{{ with .time }} {{ . }} ET{{ end }}</span>
-          <span class="tick__note">bo{{ .bo }}</span>
-          {{- with .p }}<span class="tick__p">win {{ . }}%</span>{{ end -}}
-        </span>
-      </a>
-      {{- end }}
-      {{- else }}
-      <span class="tick__g tick__g--off"><span class="tick__l2"><span class="tick__when">no match scheduled</span></span></span>
-      {{- end }}
-      {{- end }}
     </div>
   </div>
 </aside>
+<script src="{{ "js/livewp.js" | relURL }}"></script>
 <script>
 (function () {
   var box = document.querySelector('.tick'); if (!box) return;
   var now = Date.now();
-  function done(a) { return now > Date.parse(a.dataset.at) + parseFloat(a.dataset.h || 3) * 3600e3; }
-  function mark(a) {
-    if (now >= Date.parse(a.dataset.at) && !a.querySelector('.tick__live')) {
-      var s = document.createElement('span'); s.className = 'tick__live'; s.textContent = 'now';
-      a.querySelector('.tick__l2').prepend(s); var w = a.querySelector('.tick__when'); if (w) w.hidden = true;
-    }
+  function done(a) { return Date.now() > Date.parse(a.dataset.at) + parseFloat(a.dataset.h || 3) * 3600e3; }
+  function badge(a, txt) {
+    var s = a.querySelector('.tick__live');
+    if (!s) { s = document.createElement('span'); s.className = 'tick__live'; a.querySelector('.tick__l2').prepend(s); }
+    s.textContent = txt; var w = a.querySelector('.tick__when'); if (w) w.hidden = true;
   }
+  function mark(a) { if (now >= Date.parse(a.dataset.at) && !a.querySelector('.tick__live')) badge(a, 'now'); }
   // each team: the first game not finished yet
   box.querySelectorAll('.tick__team').forEach(function (t) {
     var gs = t.querySelectorAll('a.tick__g'); if (!gs.length) return;
@@ -81,11 +87,108 @@
     gs.forEach(function (a) { a.hidden = true; if (!shown && !done(a)) shown = a; });
     if (shown) { shown.hidden = false; mark(shown); t.dataset.at = shown.dataset.at; } else t.hidden = true;
   });
-  // soonest game first (Noah, Nov 1); teams with nothing scheduled go last
-  var teams = [].slice.call(box.querySelectorAll('.tick__team')), anchor = box.querySelector('.tick__tag--nt');
+  // 1NT first; then the teams, soonest game first (Noah, Nov 1); teams with nothing scheduled go last
+  var run0 = box.querySelector('.tick__run'), teams = [].slice.call(box.querySelectorAll('.tick__team'));
   teams.sort(function (a, b) { return (Date.parse(a.dataset.at) || 9e15) - (Date.parse(b.dataset.at) || 9e15); });
-  teams.forEach(function (t) { t.parentNode.insertBefore(t, anchor); });
+  teams.forEach(function (t) { run0.appendChild(t); });
   box.querySelectorAll('a.tick__g--nt').forEach(function (a) { if (done(a)) a.hidden = true; else mark(a); });
+
+  // ---- live: score, clock and the in-game win chance ---------------------------------------------------------
+  var W = window.LiveWP, ESPN = 'https://site.api.espn.com/apis/site/v2/sports/',
+      NT = 'https://raw.githubusercontent.com/arkndjl/website/main/live/1nt.json';
+  function inWindow(a) { var t = Date.parse(a.dataset.at); return Date.now() >= t - 10 * 60e3 && !done(a); }
+  function all(sel) { return box.querySelectorAll(sel); }   // the crawl's copy carries the same games
+  function setP(a, p, extra) {
+    var el = a.querySelector('.tick__p'); if (!el || p == null || isNaN(p)) return;
+    el.hidden = false; el.textContent = 'win ' + Math.round(p) + '%' + (extra || '');
+    if (el.dataset.pre) el.title = 'pregame ' + el.dataset.pre + '%';
+  }
+  function setScore(a, txt) { var s = a.querySelector('.tick__score'); if (s) { s.hidden = !txt; s.textContent = txt || ''; } }
+  function etDate(iso) { return new Date(Date.parse(iso)).toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).replace(/-/g, ''); }
+  function url(a) {
+    var p = a.dataset.sport === 'soccer' ? 'soccer/' + (a.dataset.lg || 'esp.1') : a.dataset.path;
+    return ESPN + p + '/scoreboard?dates=' + etDate(a.dataset.at);
+  }
+  // the home side's win chance from ESPN's competition object, or null
+  function homeP(a, c) {
+    var L = JSON.parse(a.dataset.live || 'null'), sp = a.dataset.sport, st = c.status, per = st.period || 0, clk = st.clock || 0;
+    var h = c.competitors.find(function (x) { return x.homeAway === 'home'; }), w = c.competitors.find(function (x) { return x.homeAway === 'away'; });
+    var lead = (+h.score || 0) - (+w.score || 0), fin = st.type.state === 'post';
+    if (fin) return sp === 'soccer' ? { w: lead > 0 ? 1 : 0, d: lead === 0 ? 1 : 0 } : { w: lead > 0 ? 1 : lead < 0 ? 0 : 0.5 };
+    if (!L || !W) return null;
+    if (sp === 'nfl' || sp === 'nba') {
+      var len = sp === 'nfl' ? 900 : 720, reg = len * 4;
+      var r = per <= 4 ? ((4 - per) * len + clk) / reg : clk / reg;
+      var s = { p0: L.ph, sd: L.sd, lead: lead, r: r };
+      var si = c.situation;
+      if (sp === 'nfl' && si && si.possession) {
+        s.pos = si.possession === h.id ? 1 : -1;
+        var m = /^(\S+)\s+(\d+)$/.exec(si.possessionText || ''), poss = c.competitors.find(function (x) { return x.id === si.possession; });
+        if (m && poss) s.ytez = m[1] === poss.team.abbreviation ? 100 - +m[2] : +m[2];
+        else if (si.yardLine === 50) s.ytez = 50;
+      }
+      return { w: W.margin(sp, s) };
+    }
+    if (sp === 'nhl') {
+      if (per > 3) return { w: W.nhl({ p0: L.ph, total: L.t, lead: lead, ot: true }) };
+      return { w: W.nhl({ p0: L.ph, total: L.t, lead: lead, r: ((3 - per) * 1200 + clk) / 3600 }) };
+    }
+    if (sp === 'soccer' && L.l) {
+      var min = st.type.name === 'STATUS_HALFTIME' ? 45 : clk / 60, rh = 0, ra = 0;
+      (c.details || []).forEach(function (d) { if (d.redCard) { if (d.team && d.team.id === h.team.id) rh++; else ra++; } });
+      var x = W.soccer({ lh: L.l[0], la: L.l[1], lead: lead, min: min, redH: rh, redA: ra });
+      return { w: x[0], d: x[1], l: x[2] };
+    }
+    return null;
+  }
+  function espn() {
+    var by = {};
+    all('a.tick__g[data-id]').forEach(function (a) { if (!a.hidden && inWindow(a)) (by[url(a)] = by[url(a)] || []).push(a); });
+    Object.keys(by).forEach(function (u) {
+      fetch(u).then(function (r) { return r.json(); }).then(function (d) {
+        by[u].forEach(function (a) {
+          var e = (d.events || []).find(function (x) { return x.id === a.dataset.id; }); if (!e) return;
+          var c = e.competitions[0], st = c.status, state = st.type.state; if (state === 'pre') return;
+          var home = a.dataset.home === '1';
+          var me = c.competitors.find(function (x) { return (x.homeAway === 'home') === home; }),
+              op = c.competitors.find(function (x) { return (x.homeAway === 'home') !== home; });
+          var ms = +me.score || 0, os = +op.score || 0, fin = state === 'post';
+          badge(a, fin ? (ms > os ? 'W' : ms < os ? 'L' : 'D') : 'live');
+          setScore(a, ms + '-' + os + ' ' + (fin ? 'final' : st.type.shortDetail.replace(/ - /, ' ')));
+          var p = homeP(a, c); if (!p) return;
+          var mine = home ? p.w : (p.l != null ? p.l : 1 - p.w);
+          if (fin) { var el = a.querySelector('.tick__p'); if (el) el.hidden = true; return; }
+          setP(a, 100 * mine, a.dataset.sport === 'soccer' && p.d != null ? ' draw ' + Math.round(100 * p.d) + '%' : '');
+        });
+      }).catch(function () {});
+    });
+  }
+  var MAP = function (m) { return String(m || '').replace(/^de_/, '').toLowerCase(); };
+  function nt() {
+    var live = [].filter.call(all('a.tick__g--nt'), function (a) { return !a.hidden && inWindow(a); });
+    if (!live.length) return;
+    fetch(NT, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+      live.forEach(function (a) {
+        if (j.id !== a.dataset.nt) return;
+        var bo = +(j.bo || a.dataset.bo || 1), st = String(j.status || '').toUpperCase();
+        if (j.winner) { badge(a, j.winner === 'us' ? 'W' : 'L'); setScore(a, bo > 1 ? j.won + '-' + j.lost + ' final' : 'final'); var el = a.querySelector('.tick__p'); if (el) el.hidden = true; return; }
+        badge(a, st === 'ONGOING' ? 'live' : st === 'VOTING' ? 'veto' : 'now');
+        var maps = (j.picks || []).map(MAP);
+        var txt = (bo > 1 ? j.won + '-' + j.lost + ' ' : '') + (maps.length ? maps[Math.min(j.won + j.lost, maps.length - 1)] : '');
+        setScore(a, txt.trim());
+        if (j.p != null) setP(a, j.p);
+      });
+    }).catch(function () {});
+  }
+  function tick() {
+    if (document.hidden) return;
+    espn(); nt();
+  }
+  var anyLive = function () { return [].some.call(all('a.tick__g'), function (a) { return !a.hidden && inWindow(a); }); };
+  setTimeout(function () { if (anyLive()) tick(); }, 0);   // after the crawl's copy exists, so both get the numbers
+  setInterval(function () { if (anyLive()) tick(); }, 30000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && anyLive()) tick(); });
+
   // a slow 1px crawl when the strip is wider than the screen; touch, hover or focus pauses it
   var track = box.querySelector('.tick__track'), run = box.querySelector('.tick__run');
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || run.scrollWidth <= track.clientWidth + 2) return;

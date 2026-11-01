@@ -65,6 +65,15 @@ jobs:
       - name: Homepage ticker
         continue-on-error: true
         run: python3 scripts/fetch_ticker.py
+      # 1NT live win chance: start .github/workflows/nt-live.yml when a 1NT match is due and none is following it
+      - name: 1NT live
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$(node scripts/nt_live.mjs --due)" = due ] && [ -z "$(gh run list -w nt-live.yml -s in_progress -L 1 --json databaseId -q '.[].databaseId')" ] && [ -z "$(gh run list -w nt-live.yml -s queued -L 1 --json databaseId -q '.[].databaseId')" ]; then
+            gh workflow run nt-live.yml && echo "dispatched 1nt live"
+          fi
       - name: Commit if it changed
         run: |
           git config user.name "arkboard-bot"

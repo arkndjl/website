@@ -1,0 +1,34 @@
+# 1NT's live win chance for the homepage ticker (scripts/nt_live.mjs): polls the FACEIT match room every minute from
+# 15 minutes before a 1NT match until it is finished and commits live/1nt.json ([skip ci], no site rebuild); the page
+# reads that file from raw.githubusercontent.com. The odds-snap and esea workflows dispatch this run when a match is
+# due (GitHub fires this repo's schedules late, so the schedule below is only a backup).
+name: 1nt live
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "40 23,0,1,2 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nt-live
+  cancel-in-progress: false
+
+jobs:
+  follow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Follow the match
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          node scripts/nt_live.mjs

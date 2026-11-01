@@ -5,6 +5,8 @@
    "label": "Ravens",
    "logo": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png",
    "hours": 3.5,
+   "path": "football/nfl",
+   "sport": "nfl",
    "games": [
     {
      "id": "401873026",
@@ -17,7 +19,12 @@
      "oppAbbr": "BUF",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png",
      "note": null,
-     "p": 30
+     "p": 30,
+     "live": {
+      "ph": 0.698,
+      "sd": 12.86
+     },
+     "lg": null
     },
     {
      "id": "401873037",
@@ -30,7 +37,9 @@
      "oppAbbr": "JAX",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     },
     {
      "id": "401873065",
@@ -43,7 +52,9 @@
      "oppAbbr": "LAC",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nfl/500/lac.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     }
    ],
    "off": false
@@ -53,6 +64,8 @@
    "label": "Rangers",
    "logo": "https://a.espncdn.com/i/teamlogos/nhl/500/nyr.png",
    "hours": 3,
+   "path": "hockey/nhl",
+   "sport": "nhl",
    "games": [
     {
      "id": "401892627",
@@ -65,7 +78,12 @@
      "oppAbbr": "EDM",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nhl/500/edm.png",
      "note": null,
-     "p": 54
+     "p": 54,
+     "live": {
+      "ph": 0.544,
+      "t": 6.32
+     },
+     "lg": null
     },
     {
      "id": "401892637",
@@ -78,7 +96,9 @@
      "oppAbbr": "STL",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nhl/500/stl.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     },
     {
      "id": "401892653",
@@ -91,7 +111,9 @@
      "oppAbbr": "PHI",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nhl/500/phi.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     }
    ],
    "off": false
@@ -101,6 +123,8 @@
    "label": "Knicks",
    "logo": "https://a.espncdn.com/i/teamlogos/nba/500/ny.png",
    "hours": 3,
+   "path": "basketball/nba",
+   "sport": "nba",
    "games": [
     {
      "id": "401909910",
@@ -113,7 +137,12 @@
      "oppAbbr": "BKN",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nba/500/bkn.png",
      "note": null,
-     "p": 91
+     "p": 91,
+     "live": {
+      "ph": 0.913,
+      "sd": 12.25
+     },
+     "lg": null
     },
     {
      "id": "401909926",
@@ -126,7 +155,9 @@
      "oppAbbr": "CHI",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nba/500/chi.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     },
     {
      "id": "401909940",
@@ -139,7 +170,9 @@
      "oppAbbr": "CLE",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/nba/500/cle.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     }
    ],
    "off": false
@@ -149,6 +182,8 @@
    "label": "Barcelona",
    "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/83.png",
    "hours": 2.25,
+   "path": "soccer/all",
+   "sport": "soccer",
    "games": [
     {
      "id": "401915387",
@@ -161,7 +196,14 @@
      "oppAbbr": "AVL",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png",
      "note": "UCL",
-     "p": 85
+     "p": 85,
+     "live": {
+      "l": [
+       3.97,
+       1.18
+      ]
+     },
+     "lg": "uefa.champions"
     },
     {
      "id": "401882816",
@@ -174,7 +216,9 @@
      "oppAbbr": "ATM",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/soccer/500/1068.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": "esp.1"
     },
     {
      "id": "401882804",
@@ -187,7 +231,9 @@
      "oppAbbr": "VIL",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/soccer/500/102.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": "esp.1"
     }
    ],
    "off": false
@@ -197,6 +243,8 @@
    "label": "Mets",
    "logo": "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png",
    "hours": 3.5,
+   "path": "baseball/mlb",
+   "sport": "mlb",
    "games": [
     {
      "id": "401893775",
@@ -209,7 +257,9 @@
      "oppAbbr": "MIA",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/mlb/500/mia.png",
      "note": "opening day",
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     },
     {
      "id": "401893795",
@@ -222,7 +272,9 @@
      "oppAbbr": "MIA",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/mlb/500/mia.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     },
     {
      "id": "401893808",
@@ -235,7 +287,9 @@
      "oppAbbr": "MIA",
      "oppLogo": "https://a.espncdn.com/i/teamlogos/mlb/500/mia.png",
      "note": null,
-     "p": null
+     "p": null,
+     "live": null,
+     "lg": null
     }
    ],
    "off": false
@@ -273,5 +327,5 @@
    }
   ]
  },
- "asof": "2026-11-01T17:01:13Z"
+ "asof": "2026-11-01T18:43:03Z"
 }
