@@ -1170,6 +1170,11 @@ def build():
             sch.append(row)
         for t, s in team_detail.schedules(sch, TEAMS).items():
             TD[t]['sch'] = s
+        try:      # team badges (scripts/team_badges.py): last season's and this season's MoneyPuck lines
+            import team_badges_build as TB
+            TB.write('nhl', TB.nhl([g for g in hist if g.get('S') == S - 1], finals, S))
+        except Exception as e:
+            print('team badges failed:', repr(e), file=sys.stderr)
         team_detail.save('nhl', TD)
     except Exception as e:            # the dropdowns keep the last file rather than stop the build
         print('team breakdowns failed:', repr(e), file=sys.stderr)

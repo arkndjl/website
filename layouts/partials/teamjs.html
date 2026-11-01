@@ -51,9 +51,9 @@
         ['CFP', s.cfp != null ? pc(s.cfp) : null], ['bye', s.bye != null ? pc(s.bye) : null], ['national title', s.natl != null ? pc(s.natl) : null]]; } },
     nfl: { key: 't', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 6, thr: 0.5, vs: 'an average team on a neutral field', logo: function (k) { return '/img/nfl/' + k.toLowerCase() + '.png'; },
       head: function (r) { return [r.dv, r.rec, r.qb ? 'QB ' + r.qb + (r.qb1 ? ' (for ' + r.qb1 + ')' : '') : null, r.war != null ? 'team WAR ' + f1(r.war) : null]; },
-      lab: { elo: 'Elo', eff: 'EPA/play', qb: 'QB', mkt: 'market', roster: 'roster prior', inj: 'injuries' },
+      lab: { elo: 'Elo', eff: 'EPA/play', qb: 'QB', mkt: 'market', ret: 'return game', roster: 'roster prior', inj: 'injuries' },
       say: { elo: ['Elo: wins and margins', 'Elo: wins and margins'], eff: ['opponent-adjusted EPA per play', 'opponent-adjusted EPA per play'], qb: ['this week\'s QB over a replacement', 'this week\'s QB below the team\'s usual level'],
-        mkt: ['priced well by earlier closing spreads', 'priced low by earlier closing spreads'], roster: ['offseason roster prior', 'offseason roster prior'], inj: ['healthier than the league this week', 'this week\'s injury reports'] },
+        mkt: ['priced well by earlier closing spreads', 'priced low by earlier closing spreads'], ret: ['kick and punt returns gain yards', 'kick and punt returns gain few yards'], roster: ['offseason roster prior', 'offseason roster prior'], inj: ['healthier than the league this week', 'this week\'s injury reports'] },
       odds: function (r) { return [['xW', f1(r.wins)], ['playoff', pc(r.playoff)], ['division', pc(r.div)], ['1 seed', pc(r.seed1)], ['conf title', pc(r.conf)], ['Super Bowl', pc(r.sb)], ['top-5 pick', r.pTop5 ? pc(r.pTop5) : null]]; },
       group: function (r) { var w = r.wars || {}; var ks = Object.keys(w); return ks.length ? 'WAR by unit: ' + ks.sort(function (a, b) { return w[b] - w[a]; }).map(function (k) { return k + ' ' + sgn(w[k]); }).join(' · ') : ''; } },
     nba: { key: 't', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 6, thr: 0.5, vs: 'an average team on a neutral floor',
@@ -99,6 +99,12 @@
     out += '<p class="cfb__role">#' + r.rk + ' of ' + N + (r.rkLo ? ' (80% rank range #' + r.rkLo + (r.rkHi !== r.rkLo ? '–' + r.rkHi : '') + ')' : '') + ': ' + sgn(rt, c.d) + ' ' + c.unit + ' a game against ' + c.vs + '.' +
       (big.length ? ' Biggest input: ' + esc(c.lab[big[0][0]] || big[0][0]) + ' (' + sgn(big[0][1], c.d) + ')' + (big[1] ? ', then ' + esc(c.lab[big[1][0]] || big[1][0]) + ' (' + sgn(big[1][1], c.d) + ')' : '') + '.' : '') + '</p>';
     if (c.note) out += '<p class="cfb__dim">' + esc(c.note(r)) + '</p>';
+    // team badges (scripts/team_badges.py): one trait each, this season to date shrunk toward last season and the
+    // league, tiered by percentile among every team-season since 2015 (bronze 75th, silver 90th, gold 97th, platinum 99th);
+    // only traits that hold up over the rest of a season are shown
+    var TB = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
+    if (T.bdg && T.bdg.length) out += '<p class="cfb__badges"><span class="cfb__pastk">badges</span> ' + T.bdg.map(function (b) {
+      return '<span class="cfb__bdg cfb__bdg--' + esc(b[1]) + '" title="' + esc(TB[b[1]] + ' ' + b[0] + ': ' + b[2] + 'th pct of team-seasons, ' + b[3]) + '">' + esc(TB[b[1]] + ' ' + b[0]) + '</span>'; }).join('') + '</p>';
     // + strengths / − concerns: the inputs (the prior's roster terms in place of the prior) that move the rating most
     var cand = (pp.length ? parts.filter(function (p) { return p[0] !== 'prior'; }).concat(pp) : parts).slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
     var li = function (xs, cl) { return xs.map(function (p) { var s = (c.say[p[0]] || [c.lab[p[0]] || p[0], c.lab[p[0]] || p[0]])[p[1] > 0 ? 0 : 1]; return '<li class="' + cl + '">' + esc(s) + ' (' + sgn(p[1], c.d) + ')</li>'; }).join(''); };
