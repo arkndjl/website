@@ -1319,6 +1319,8 @@
     // what the rating is made of: each input's push, bars from the middle, pinned to the bottom
     var parts = d.parts.slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); }).slice(0, 8), prow = Math.ceil(parts.length / 2);
     var barsH = parts.length ? 100 + prow * 60 : 0, bottom = F.y + F.h - 40 - barsH;
+    // the team badges' band is reserved before the lists fill, so key players and young talent never push it off
+    var bdgs = (d.badges || []).filter(function (b) { return b && TIERS[b[1]]; }).slice(0, 4), bdgH = bdgs.length ? 176 : 0, lbot = bottom - bdgH;
     // next games beside key players
     var half = (w - 60) / 2, cy0 = y, ly2;
     function colHead(cx, label, sub) {
@@ -1333,7 +1335,7 @@
       gy += 104;
       var logos = await Promise.all(d.next.map(function (n) { return loadImg(n.logo); }));
       d.next.forEach(function (n, i) {
-        if (gy + 40 > bottom - 120 || ((d.yg || []).length && i >= 3)) return;
+        if (gy + 40 > lbot - 120 || ((d.yg || []).length && i >= 3)) return;
         g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(n.day, x, gy);
         var ox = x + 180; g.fillText(n.at, ox, gy); ox += 64;
         if (logos[i]) { drawLogo(g, logos[i], ox, gy - 26, 52, 52); ox += 68; }
@@ -1351,7 +1353,7 @@
       var hh = half; half = pwid; y = py; colHead(px, label, sub); half = hh;
       py += 104;
       list.forEach(function (p) {
-        if (py + 40 > bottom - 120) return;
+        if (py + 40 > lbot - 120) return;
         var val = metric === 'FV' ? String(p[2]) : (p[2] > 0 ? '+' : p[2] < 0 ? '−' : '') + Math.abs(+p[2]).toFixed(2);
         g.font = '44px ' + FONT; var vw = g.measureText(val).width; g.fillStyle = C.teal; g.fillText(val, px + pwid - vw, py);
         g.font = '30px ' + FONT; var pos = String(p[1] || ''), posw = pos ? g.measureText(pos).width + 16 : 0;
@@ -1372,17 +1374,18 @@
     y = Math.max(gy, py2, cy0) + 40;
     // team badges (when the team file carries them: [[name, tier]]), before the unit line and strengths (both are
     // also in the dropdown; the badges take the room first)
-    if (d.badges && d.badges.length && y + 150 < bottom) {
+    // team badges ([[name, tier, pct, line]]): medal, tier and percentile, name; four in a row in the reserved band
+    if (bdgs.length) {
       y += 4; rule('BADGES'); y -= 10;
-      // up to four in a row, smaller medals than the player card's (the card has less room)
-      var bl = d.badges.slice(0, 4), bw = w / 4, bu = 6;
-      bl.forEach(function (b, i) {
+      var bw = w / 4, bu = 6;
+      bdgs.forEach(function (b, i) {
         var bx = x + i * bw;
         medal(g, bx, y, b[1], bu);
-        g.font = '28px ' + FONT; g.fillStyle = TIERS[b[1]][2]; g.fillText(TIERS[b[1]][0], bx + 12 * bu + 16, y + 26);
-        g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, b[0].toUpperCase(), bw - 12 * bu - 28), bx + 12 * bu + 16, y + 64);
+        g.font = '28px ' + FONT; g.fillStyle = TIERS[b[1]][2];
+        g.fillText(fit(g, TIERS[b[1]][0] + (b[2] != null ? ' · ' + b[2] + ' PCT' : ''), bw - 12 * bu - 28), bx + 12 * bu + 16, y + 26);
+        g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, String(b[0]).toUpperCase(), bw - 12 * bu - 28), bx + 12 * bu + 16, y + 64);
       });
-      y += 12 * bu + 34;
+      y += 12 * bu + 50;
     }
     if (d.group && y + 60 < bottom) { g.fillStyle = C.dark; g.fillRect(x, y - 30, w, 3); g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.group, w), x, y + 16); y += 84; }
     // strengths and concerns, side by side, in the room left
