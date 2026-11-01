@@ -32,6 +32,9 @@ Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's ou
           (Oct 30 2026, scripts/fv_comps_test.py; pool in data/hockey_comps.json). Stages 1, 2 and 4 also carry a
           second fit with his share of his NHL team's preseason games the fall after that season (NHL boxscores,
           scripts/hockey_data.py --pre; Oct 31 2026), used from October, once that preseason is in (PRE_STAGES).
+          Nov 1 2026 (scripts/hockey_fv_sweep2.py): NHLe growth since the draft year also at stages 1 and 3 (offered
+          after the other inputs; at 3 after comps), and at stage 4 durability: games played that season (club lines
+          plus NHL call-ups) over his league's schedule (durability()).
 Live      2027 class from Tankathon's NHL big board (rank, league, size, birth month, this season's line). Rank stands in
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
@@ -515,7 +518,8 @@ def stage_feats(r, k, fv0):
             'nhD': 0.0 if r['G'] or nh is None else r['D'] * nh / 10,
             'pro': int(bool(q) and is_pro(q['lg'])), 'age': (r['age'] or 18.5) - 18.5,
             'gp': min(r['gp_k'].get(k, 0), 164) / 82, 'war': war, 'G': r['G'], 'D': r['D'],
-            'nany': int(r['gp_k'].get(k, 0) > 0)}
+            'nany': int(r['gp_k'].get(k, 0) > 0),
+            'dur': r['dur_k'][k] - .85 if k in r.get('dur_k', {}) else 0.0}
 
 
 SBASE = ['fv0']
@@ -534,6 +538,17 @@ SLATE = {1: [], 2: ['ahls'], 3: [], 4: []}
 # forward and top-64 better. At k2 it cuts class-out MSE (t 3.2) but raises forward top-64 MSE (91.2 -> 93.5): not offered,
 # and k1-2 keep fitting on every pick.
 SNEW[3] = SNEW[3] + ['nany']; SNEW[4] = SNEW[4] + ['nany']
+# Nov 1 2026 FV sweep (scripts/hockey_fv_sweep2.py): NHLe growth since the draft year, re-offered at stages 1 and 3 after
+# each stage's other inputs are chosen (SLATE, as it was tested: offered in the first pass it changes the greedy path,
+# drops nh/war at k1 and comps at k3, and ends worse) on the current stage models (NHLe refit, nany, comps and the preseason share all came after the Oct 24 test that kept it
+# at stage 2 only). On top of each live stage model: k1 class-out MSE -2.42 (t 5.62, 11/12), k3 -0.77 (t 3.37, 9/12);
+# top-64 picks MSE -3.51 / -1.86 and Spearman up; forward (fit 2008-15, grade 2016-19) MSE -0.96 / -1.03, top-64 MSE
+# -3.54 / -2.76 and Spearman up. (The sweep's even-strength version, CHL ES NHLe growth, passed at k1 too but adds
+# nothing on top of it: t .37.) Durability (dur) offered at stage 4: games over the schedule in the stage season,
+# class-out t 2.10-3.21 on top of the stage model with or without the preseason share; see durability().
+# At k3 it goes after comps (SPOST): offered before them it is kept and the comps then fail, ending worse (52.81 vs 52.44).
+SLATE[1] = SLATE[1] + ['nhgrow']; SLATE[4] = SLATE[4] + ['dur']
+SPOST = {1: [], 2: [], 3: ['nhgrow'], 4: []}
 GRAD = {0: 100, 1: 50}           # NHL games (skater, goalie) that graduate a pick off the pipeline
 POP_STAGES = (3, 4)
 
@@ -643,10 +658,32 @@ def nhl_so_far(rows, W):
             if q:
                 gp += q.get('gp') or 0; wl.append(q.get('war') or 0.0)
             r['gp_k'][k] = gp; r['war_k'][k] = list(wl)
+    durability(rows)
+
+
+# Durability (Nov 1 2026 FV sweep, scripts/hockey_fv_sweep2.py): games played in a stage season over his league's
+# schedule that season (the most games any pick's main line had in that league-season), with his NHL games added when
+# the main line is not the NHL (a call-up is not a missed game), capped at 1. Skaters only (a goalie's games are a role
+# share). A stage season without a line takes 0 (the mean is ~.85 and the term is centred there).
+def durability(rows):
+    sched = {}
+    for r in rows:
+        for j, q in list((r.get('post') or {}).items()) + [(0, r.get('d0'))]:
+            if q:
+                key = (q['lg'], r['year'] + int(j)); sched[key] = max(sched.get(key, 0), q['gp'])
+    for r in rows:
+        r['dur_k'] = {}
+        for k, q in (r.get('post') or {}).items():
+            k = int(k)
+            n = sched.get((q['lg'], r['year'] + k)) if q else None
+            if r['G'] or not q or not n or n < 20:
+                continue
+            ngp = r['gp_k'].get(k, 0) - r['gp_k'].get(k - 1, 0)
+            r['dur_k'][k] = min((q['gp'] + (ngp if q['lg'] != 'NHL' else 0)) / n, 1.0)
 
 
 def save_rows(rows):
-    keep = [{k: v for k, v in r.items() if k not in ('gp_k', 'war_k')} for r in rows]
+    keep = [{k: v for k, v in r.items() if k not in ('gp_k', 'war_k', 'dur_k')} for r in rows]
     with gzip.open(ROWS, 'wt') as f:
         json.dump(keep, f, separators=(',', ':'))
 
@@ -736,6 +773,8 @@ def fit(frozen=False, scorecard=False):
             kk, ev2, curk = select(Fk, yk, ck, kk, ['comp']); evk.update(ev2)
             if 'comp' in kk:
                 pools[k] = pool_json(pool)
+        if SPOST[k]:
+            kk, ev2, curk = select(Fk, yk, ck, kk, SPOST[k]); evk.update(ev2)
         Xk = np.array([[f[c] for c in kk] for f in Fk]); bk = ols(Xk, yk)
         stages[k] = {'kept': kk, 'coef': dict(zip(['const'] + kk, [round(float(v), 4) for v in bk])),
                      'mse': round(float(curk.mean()), 2), 'mseDraft': round(float(s0.mean()), 2), 'ev': evk}
