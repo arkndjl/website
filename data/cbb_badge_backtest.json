@@ -1,0 +1,533 @@
+{
+ "asof": "2026-11-01",
+ "method": "see scripts/cbb_badge_backtest.py",
+ "rows": 23106,
+ "players": 12119,
+ "boards": "2009-2016",
+ "yty": {
+  "tp": {
+   "pairs": 28188,
+   "r": 0.388,
+   "n": 77.0,
+   "k": 121
+  },
+  "tpa100": {
+   "pairs": 28188,
+   "r": 0.866,
+   "n": 739.1,
+   "k": 115
+  },
+  "ft": {
+   "pairs": 28188,
+   "r": 0.489,
+   "n": 75.0,
+   "k": 78
+  },
+  "ast": {
+   "pairs": 28188,
+   "r": 0.716,
+   "n": 739.1,
+   "k": 293
+  },
+  "stl": {
+   "pairs": 28188,
+   "r": 0.622,
+   "n": 739.1,
+   "k": 449
+  },
+  "blk": {
+   "pairs": 28188,
+   "r": 0.802,
+   "n": 739.1,
+   "k": 182
+  },
+  "drb": {
+   "pairs": 28188,
+   "r": 0.661,
+   "n": 739.1,
+   "k": 379
+  },
+  "orb": {
+   "pairs": 28188,
+   "r": 0.752,
+   "n": 739.1,
+   "k": 244
+  },
+  "nto": {
+   "pairs": 28188,
+   "r": 0.595,
+   "n": 739.1,
+   "k": 502
+  },
+  "rim": {
+   "pairs": 25085,
+   "r": 0.295,
+   "n": 75.8,
+   "k": 181
+  }
+ },
+ "groups": {
+  "G": {
+   "n": 5418,
+   "nba": 218,
+   "badges": {
+    "shooter": {
+     "name": "Shooter",
+     "stat": "3P% and 3PA rate",
+     "fvDriver": false,
+     "r": 0.388,
+     "k": {
+      "tp": 121,
+      "tpa100": 115
+     },
+     "holders": 983,
+     "beta": -0.014,
+     "t": -0.14,
+     "tCurve": -0.16,
+     "oosGain": -0.034,
+     "seasons": "0/8",
+     "ladderGain": -0.012,
+     "ladderT": -1.1,
+     "fwdGain": -0.041,
+     "fwdT": 2.82,
+     "fwdN": 1892,
+     "pass": false
+    },
+    "ft": {
+     "name": "FT Touch",
+     "stat": "FT%",
+     "fvDriver": false,
+     "r": 0.489,
+     "k": {
+      "ft": 78
+     },
+     "holders": 983,
+     "beta": 0.122,
+     "t": 1.02,
+     "tCurve": 1.07,
+     "oosGain": -0.027,
+     "seasons": "4/8",
+     "ladderGain": -0.017,
+     "ladderT": -0.96,
+     "fwdGain": 0.149,
+     "fwdT": 1.36,
+     "fwdN": 1892,
+     "pass": false
+    },
+    "playmaker": {
+     "name": "Playmaker",
+     "stat": "assist rate",
+     "fvDriver": true,
+     "r": 0.716,
+     "k": {
+      "ast": 293
+     },
+     "holders": 983,
+     "beta": 0.149,
+     "t": 1.2,
+     "tCurve": 1.19,
+     "oosGain": 0.031,
+     "seasons": "5/8",
+     "ladderGain": -0.15,
+     "ladderT": -1.6,
+     "fwdGain": -0.172,
+     "fwdT": -1.3,
+     "fwdN": 1892,
+     "pass": false
+    },
+    "ballhawk": {
+     "name": "Ball Hawk",
+     "stat": "steal rate",
+     "fvDriver": true,
+     "r": 0.622,
+     "k": {
+      "stl": 449
+     },
+     "holders": 983,
+     "beta": 0.164,
+     "t": 1.09,
+     "tCurve": 1.08,
+     "oosGain": -0.007,
+     "seasons": "4/8",
+     "ladderGain": 0.168,
+     "ladderT": 1.24,
+     "fwdGain": -0.192,
+     "fwdT": -0.55,
+     "fwdN": 1892,
+     "pass": false
+    },
+    "secure": {
+     "name": "Ball Security",
+     "stat": "turnover rate",
+     "fvDriver": false,
+     "r": 0.595,
+     "k": {
+      "nto": 502
+     },
+     "holders": 983,
+     "beta": 0.077,
+     "t": 0.64,
+     "tCurve": 0.66,
+     "oosGain": -0.026,
+     "seasons": "3/8",
+     "ladderGain": -0.023,
+     "ladderT": -2.09,
+     "fwdGain": 0.009,
+     "fwdT": 0.49,
+     "fwdN": 1892,
+     "pass": false
+    },
+    "finisher": {
+     "name": "Finisher",
+     "stat": "FG% at the rim",
+     "fvDriver": true,
+     "r": 0.295,
+     "k": {
+      "rim": 181
+     },
+     "holders": 984,
+     "beta": -0.07,
+     "t": -0.46,
+     "tCurve": -0.53,
+     "oosGain": -0.074,
+     "seasons": "2/8",
+     "ladderGain": 0.018,
+     "ladderT": 0.26,
+     "fwdGain": -0.098,
+     "fwdT": 1.22,
+     "fwdN": 1892,
+     "pass": false
+    }
+   }
+  },
+  "W": {
+   "n": 11046,
+   "nba": 499,
+   "badges": {
+    "shooter": {
+     "name": "Shooter",
+     "stat": "3P% and 3PA rate",
+     "fvDriver": false,
+     "r": 0.388,
+     "k": {
+      "tp": 121,
+      "tpa100": 115
+     },
+     "holders": 1824,
+     "beta": -0.013,
+     "t": -0.16,
+     "tCurve": -0.15,
+     "oosGain": -0.014,
+     "seasons": "3/8",
+     "ladderGain": -0.21,
+     "ladderT": -2.03,
+     "fwdGain": -0.015,
+     "fwdT": 1.63,
+     "fwdN": 1996,
+     "pass": false
+    },
+    "ft": {
+     "name": "FT Touch",
+     "stat": "FT%",
+     "fvDriver": false,
+     "r": 0.489,
+     "k": {
+      "ft": 78
+     },
+     "holders": 1824,
+     "beta": 0.173,
+     "t": 1.65,
+     "tCurve": 1.67,
+     "oosGain": 0.023,
+     "seasons": "6/8",
+     "ladderGain": -0.153,
+     "ladderT": -1.65,
+     "fwdGain": 0.066,
+     "fwdT": 1.58,
+     "fwdN": 1996,
+     "pass": false
+    },
+    "playmaker": {
+     "name": "Playmaker",
+     "stat": "assist rate",
+     "fvDriver": true,
+     "r": 0.716,
+     "k": {
+      "ast": 293
+     },
+     "holders": 1824,
+     "beta": 0.048,
+     "t": 0.47,
+     "tCurve": 0.48,
+     "oosGain": -0.004,
+     "seasons": "5/8",
+     "ladderGain": 0.021,
+     "ladderT": 0.18,
+     "fwdGain": 0.029,
+     "fwdT": 0.1,
+     "fwdN": 1996,
+     "pass": false
+    },
+    "ballhawk": {
+     "name": "Ball Hawk",
+     "stat": "steal rate",
+     "fvDriver": true,
+     "r": 0.622,
+     "k": {
+      "stl": 449
+     },
+     "holders": 1824,
+     "beta": -0.145,
+     "t": -1.46,
+     "tCurve": -1.44,
+     "oosGain": 0.009,
+     "seasons": "5/8",
+     "ladderGain": -0.181,
+     "ladderT": -1.93,
+     "fwdGain": -0.078,
+     "fwdT": -0.26,
+     "fwdN": 1996,
+     "pass": false
+    },
+    "rimprot": {
+     "name": "Rim Protector",
+     "stat": "block rate",
+     "fvDriver": true,
+     "r": 0.802,
+     "k": {
+      "blk": 182
+     },
+     "holders": 1824,
+     "beta": -0.124,
+     "t": -1.12,
+     "tCurve": -1.13,
+     "oosGain": -0.01,
+     "seasons": "5/8",
+     "ladderGain": -0.084,
+     "ladderT": -1.33,
+     "fwdGain": -0.069,
+     "fwdT": 0.23,
+     "fwdN": 1996,
+     "pass": false
+    },
+    "rebounder": {
+     "name": "Rebounder",
+     "stat": "defensive rebounding",
+     "fvDriver": false,
+     "r": 0.661,
+     "k": {
+      "drb": 379
+     },
+     "holders": 1824,
+     "beta": -0.061,
+     "t": -0.6,
+     "tCurve": -0.58,
+     "oosGain": -0.068,
+     "seasons": "5/8",
+     "ladderGain": -0.184,
+     "ladderT": -2.65,
+     "fwdGain": 0.025,
+     "fwdT": -0.43,
+     "fwdN": 1996,
+     "pass": false
+    },
+    "finisher": {
+     "name": "Finisher",
+     "stat": "FG% at the rim",
+     "fvDriver": true,
+     "r": 0.295,
+     "k": {
+      "rim": 181
+     },
+     "holders": 910,
+     "beta": -0.189,
+     "t": -1.41,
+     "tCurve": -1.43,
+     "oosGain": -0.019,
+     "seasons": "6/8",
+     "ladderGain": -0.072,
+     "ladderT": -1.62,
+     "fwdGain": -0.506,
+     "fwdT": 1.23,
+     "fwdN": 1996,
+     "pass": false
+    }
+   }
+  },
+  "B": {
+   "n": 6642,
+   "nba": 272,
+   "badges": {
+    "rimprot": {
+     "name": "Rim Protector",
+     "stat": "block rate",
+     "fvDriver": true,
+     "r": 0.802,
+     "k": {
+      "blk": 182
+     },
+     "holders": 859,
+     "beta": -0.265,
+     "t": -1.62,
+     "tCurve": -1.46,
+     "oosGain": 0.074,
+     "seasons": "4/8",
+     "ladderGain": 0.039,
+     "ladderT": 1.31,
+     "fwdGain": -0.271,
+     "fwdT": 0.56,
+     "fwdN": 2419,
+     "pass": false
+    },
+    "rebounder": {
+     "name": "Rebounder",
+     "stat": "defensive rebounding",
+     "fvDriver": false,
+     "r": 0.661,
+     "k": {
+      "drb": 379
+     },
+     "holders": 859,
+     "beta": 0.435,
+     "t": 2.61,
+     "tCurve": 2.75,
+     "oosGain": 0.329,
+     "seasons": "5/8",
+     "ladderGain": -0.078,
+     "ladderT": -1.35,
+     "fwdGain": -0.276,
+     "fwdT": 0.07,
+     "fwdN": 2419,
+     "pass": false
+    },
+    "glass": {
+     "name": "Offensive Glass",
+     "stat": "offensive rebounding",
+     "fvDriver": false,
+     "r": 0.752,
+     "k": {
+      "orb": 244
+     },
+     "holders": 859,
+     "beta": 0.154,
+     "t": 1.05,
+     "tCurve": 1.15,
+     "oosGain": 0.007,
+     "seasons": "4/8",
+     "ladderGain": -0.083,
+     "ladderT": -1.58,
+     "fwdGain": 0.132,
+     "fwdT": 1.29,
+     "fwdN": 2419,
+     "pass": false
+    },
+    "finisher": {
+     "name": "Finisher",
+     "stat": "FG% at the rim",
+     "fvDriver": true,
+     "r": 0.295,
+     "k": {
+      "rim": 181
+     },
+     "holders": 860,
+     "beta": 0.335,
+     "t": 1.79,
+     "tCurve": 2.16,
+     "oosGain": 0.171,
+     "seasons": "5/8",
+     "ladderGain": -0.067,
+     "ladderT": -0.88,
+     "fwdGain": 0.304,
+     "fwdT": 1.2,
+     "fwdN": 2419,
+     "pass": false
+    },
+    "shooter": {
+     "name": "Shooter",
+     "stat": "3P% and 3PA rate",
+     "fvDriver": false,
+     "r": 0.388,
+     "k": {
+      "tp": 121,
+      "tpa100": 115
+     },
+     "holders": 859,
+     "beta": 0.46,
+     "t": 2.42,
+     "tCurve": 2.59,
+     "oosGain": 0.375,
+     "seasons": "5/8",
+     "ladderGain": 0.018,
+     "ladderT": 0.27,
+     "fwdGain": 0.151,
+     "fwdT": 1.4,
+     "fwdN": 2419,
+     "pass": true,
+     "joint": {
+      "with": [
+       "ft"
+      ],
+      "t": 1.55,
+      "oosAdd": 0.093,
+      "kept": false
+     }
+    },
+    "ft": {
+     "name": "FT Touch",
+     "stat": "FT%",
+     "fvDriver": false,
+     "r": 0.489,
+     "k": {
+      "ft": 78
+     },
+     "holders": 860,
+     "beta": 0.585,
+     "t": 3.01,
+     "tCurve": 3.33,
+     "oosGain": 0.655,
+     "seasons": "5/8",
+     "ladderGain": -0.033,
+     "ladderT": -0.69,
+     "fwdGain": 0.394,
+     "fwdT": 1.86,
+     "fwdN": 2419,
+     "pass": true
+    },
+    "playmaker": {
+     "name": "Playmaker",
+     "stat": "assist rate",
+     "fvDriver": true,
+     "r": 0.716,
+     "k": {
+      "ast": 293
+     },
+     "holders": 859,
+     "beta": -0.039,
+     "t": -0.25,
+     "tCurve": -0.12,
+     "oosGain": -0.046,
+     "seasons": "3/8",
+     "ladderGain": -0.135,
+     "ladderT": -1.33,
+     "fwdGain": 0.008,
+     "fwdT": -0.25,
+     "fwdN": 2419,
+     "pass": false
+    }
+   },
+   "ship": [
+    "ft"
+   ],
+   "shipFwd": {
+    "gain": 0.394,
+    "t": 1.86,
+    "n": 2419
+   }
+  }
+ },
+ "ship": {
+  "B": [
+   "ft"
+  ]
+ }
+}

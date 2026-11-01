@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
 import cbb_combine as CB
+import cbb_badges as CBADGE
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 
@@ -380,7 +381,9 @@ def main():
     full_games = lf.get('fullGames', 31.0)
     season_label = f'{SEASON - 1}-{str(SEASON)[2:]}'
     recs, used = [], set()
-    for row, m in zip(prior['rows'], prior['careers']):
+    # badges (scripts/cbb_badges.py): from last college season, the line the preseason grade reads; shown, not in FV
+    bdg = CBADGE.prior_badges(prior)
+    for row, m, bd in zip(prior['rows'], prior['careers'], bdg):
         cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': m['dob'], 'rec': m['rec'], 'seasons': [dict(zip(keep, s)) for s in m['seasons']]}
         i = len(cc['seasons']) - 1
         f_pre = F.features(cc, i)
@@ -389,7 +392,7 @@ def main():
         pid = m['pid'] if m['pid'] in lines else keys.get((m['key'], m['bt']))
         if pid in used: pid = None          # two board rows can't share one Barttorvik player
         ln = lines.get(pid) if pid else None
-        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None}
+        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd}
         if ln:
             used.add(pid)
             grp = 'newcomer' if f_pre['newcomer'] else 'returner'
@@ -435,7 +438,7 @@ def main():
         r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), FS.fv_of('cbb', m), False
     recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
-    add = [c for c in ('fvd', 'fvg') if c not in ci]   # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade
+    add = [c for c in ('fvd', 'fvg', 'bdg') if c not in ci]   # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
     for k, r in enumerate(recs, 1):
@@ -449,7 +452,7 @@ def main():
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
         fvd = fvd_of(fv_dist('cbb', r['fvg'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvg'])))
-        new = {'fvd': fvd, 'fvg': r['fvg']}
+        new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg')}
         for c in new:
             if c in ci: row[ci[c]] = new[c]
         out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + [new[c] for c in add])
