@@ -434,6 +434,10 @@ def espn_score(c):
     return ' '.join(sets) + ret, wi
 
 
+RDAY = {'Q1': -3, 'Q2': -2, 'Q3': -1, 'Q4': -1, 'R128': 0, 'R64': 1, 'R32': 2, 'R16': 4, 'RR': 3, 'QF': 5, 'SF': 6,
+        'BR': 6, 'F': 7}      # tennis_model.RDAY
+
+
 def espn_rows(comps, eid, kind, hist):
     """finished ESPN singles matches the history doesn't hold yet (the days since the weekly feed's last update)"""
     last = {}
@@ -444,8 +448,9 @@ def espn_rows(comps, eid, kind, hist):
     out = []
     for c in comps:
         if not c['done'] or not c['date']: continue
-        d = int(c['date'][:10].replace('-', ''))
-        if d <= last.get(c['tour'], 0) - 7: continue
+        d0 = dt.date.fromisoformat(c['date'][:10])
+        lt = last.get(c['tour'])
+        if lt and d0 <= dt.date(lt // 10000, lt // 100 % 100, lt % 100) - dt.timedelta(days=7): continue
         sc, wi = espn_score(c)
         if sc is None: continue
         w, l = eid.get(c['players'][wi][0]), eid.get(c['players'][1 - wi][0])
@@ -455,6 +460,9 @@ def espn_rows(comps, eid, kind, hist):
         have.add(key)
         lv, sf = kind.get(c['tid'], ('A', 'H'))
         rd = espn_round(c['rd'])
+        # history rows carry the tournament's start date and the model adds the round's day (tennis_model.RDAY):
+        # back the match date off by that offset so the model's day is the day it was played
+        d = int((d0 - dt.timedelta(days=RDAY.get(rd, 2))).strftime('%Y%m%d'))
         if rd.startswith('Q'): lv = 'Q'
         out.append([d, c['tour'], lv, sf, rd, 5 if (lv == 'G' and c['tour'] == 'atp' and not rd.startswith('Q')) else 3,
                     f"{c['tour'][0]}e{c['eid']}", w, l, sc, None, None, None, None, None, None, c['tn']])
