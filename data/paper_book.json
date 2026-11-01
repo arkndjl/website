@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T17:20:32Z",
+ "asof": "2026-11-01T18:23:59Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 97.25,
+  "open": 104.0,
   "path": [
    101.5,
    101.6,
@@ -51,10 +51,10 @@
   ]
  },
  "record": {
-  "n": 132,
-  "clvN": 46,
-  "clvRet": -0.018,
-  "clvT": -2.3,
+  "n": 147,
+  "clvN": 87,
+  "clvRet": -0.0292,
+  "clvT": -3.78,
   "clv": -0.15,
   "beat": 0.22,
   "settled": 39,
@@ -67,23 +67,23 @@
   "risked": 54.0,
   "yield": 0.1132
  },
- "tEff": -2.3,
+ "tEff": -3.78,
  "corr": {
   "rho": 0.0,
-  "n": 46,
-  "slates": 11,
-  "nEff": 46.0,
-  "avgSlate": 4.18
+  "n": 87,
+  "slates": 12,
+  "nEff": 87.0,
+  "avgSlate": 7.25
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 46,
+   "value": 87,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.8% t -2.3",
+   "value": "-2.9% t -3.78",
    "pass": false
   },
   {
@@ -93,7 +93,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nflprops-prop: -2.2%",
+   "value": "without cfb-spread: -3.0%",
    "pass": false
   },
   {
@@ -130,7 +130,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 1,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -214,7 +214,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 7,
+   "n": 4,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -235,7 +235,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 5,
+   "n": 7,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -319,10 +319,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 47,
-   "clvN": 5,
-   "clvRet": 0.019,
-   "clvT": 1.06,
+   "n": 62,
+   "clvN": 46,
+   "clvRet": -0.0351,
+   "clvT": -2.78,
    "clv": null,
    "beat": null,
    "settled": 5,
@@ -713,7 +713,9 @@
    "edge": 15.7,
    "ev": 0.0099,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.168,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -733,7 +735,9 @@
    "edge": 15.2,
    "ev": 0.171,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.033,
+   "close": 1.5
   },
   {
    "rule": "nflprops-prop",
@@ -753,7 +757,9 @@
    "edge": 14.9,
    "ev": 0.0824,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1277,
+   "close": 13.5
   },
   {
    "rule": "nflprops-prop",
@@ -773,7 +779,9 @@
    "edge": 20.3,
    "ev": 0.1008,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0112,
+   "close": 19.5
   },
   {
    "rule": "nflprops-prop",
@@ -793,7 +801,9 @@
    "edge": 12.8,
    "ev": 0.0063,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0101,
+   "close": 58.5
   },
   {
    "rule": "nflprops-prop",
@@ -813,7 +823,9 @@
    "edge": 14.2,
    "ev": 0.0172,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0703,
+   "close": 15.5
   },
   {
    "rule": "nflprops-prop",
@@ -833,7 +845,9 @@
    "edge": 10.1,
    "ev": 0.0303,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.057,
+   "close": 79.5
   },
   {
    "rule": "nflprops-prop",
@@ -853,7 +867,9 @@
    "edge": 18.8,
    "ev": 0.0518,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.2366,
+   "close": 6.5
   },
   {
    "rule": "nflprops-prop",
@@ -873,7 +889,9 @@
    "edge": 10.6,
    "ev": 0.0572,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.1428,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -893,7 +911,9 @@
    "edge": 15.6,
    "ev": 0.0099,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.023,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -913,7 +933,9 @@
    "edge": 28.1,
    "ev": 0.1209,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0665,
+   "close": 54.5
   },
   {
    "rule": "nflprops-prop",
@@ -933,7 +955,9 @@
    "edge": 30.8,
    "ev": 0.1819,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.055,
+   "close": 236.5
   },
   {
    "rule": "nflprops-prop",
@@ -953,7 +977,9 @@
    "edge": 12.6,
    "ev": 0.0728,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0349,
+   "close": 36.5
   },
   {
    "rule": "nflprops-prop",
@@ -973,7 +999,9 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0157,
+   "close": 1.5
   },
   {
    "rule": "nflprops-prop",
@@ -993,7 +1021,9 @@
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0021,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -1013,7 +1043,9 @@
    "edge": 14.5,
    "ev": 0.0556,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.2806,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -1033,7 +1065,9 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0398,
+   "close": 208.5
   },
   {
    "rule": "nflprops-prop",
@@ -1053,7 +1087,9 @@
    "edge": 10.7,
    "ev": 0.1587,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.1293,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -1073,7 +1109,9 @@
    "edge": 31.8,
    "ev": 0.1072,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.1761,
+   "close": 0.5
   },
   {
    "rule": "nflprops-prop",
@@ -1093,7 +1131,9 @@
    "edge": 19.5,
    "ev": 0.002,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0183,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -1113,7 +1153,9 @@
    "edge": 18.9,
    "ev": 0.0518,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0758,
+   "close": 15.5
   },
   {
    "rule": "nflprops-prop",
@@ -1133,7 +1175,9 @@
    "edge": 12.9,
    "ev": 0.0424,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0862,
+   "close": 214.5
   },
   {
    "rule": "nflprops-prop",
@@ -1153,7 +1197,9 @@
    "edge": 10.7,
    "ev": 0.0477,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0669,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -1173,7 +1219,9 @@
    "edge": 13.8,
    "ev": 0.0499,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1639,
+   "close": 235.5
   },
   {
    "rule": "nflprops-prop",
@@ -1193,7 +1241,9 @@
    "edge": 29.5,
    "ev": 0.1724,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0239,
+   "close": 10.5
   },
   {
    "rule": "nflprops-prop",
@@ -1213,7 +1263,9 @@
    "edge": 11.8,
    "ev": 0.0573,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0645,
+   "close": 231.5
   },
   {
    "rule": "nflprops-prop",
@@ -1233,7 +1285,9 @@
    "edge": 23.0,
    "ev": 0.0908,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0403,
+   "close": 6.5
   },
   {
    "rule": "nflprops-prop",
@@ -1253,7 +1307,9 @@
    "edge": 26.7,
    "ev": 0.11,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0172,
+   "close": 19.5
   },
   {
    "rule": "nflprops-prop",
@@ -1273,7 +1329,9 @@
    "edge": 10.5,
    "ev": 0.0969,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0053,
+   "close": 69.5
   },
   {
    "rule": "nflprops-prop",
@@ -1293,7 +1351,9 @@
    "edge": 10.1,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0051,
+   "close": 25.5
   },
   {
    "rule": "nflprops-prop",
@@ -1313,7 +1373,9 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0847,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -1333,7 +1395,9 @@
    "edge": 17.9,
    "ev": 0.082,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0289,
+   "close": 41.5
   },
   {
    "rule": "nflprops-prop",
@@ -1353,7 +1417,9 @@
    "edge": 23.6,
    "ev": 0.0882,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1689,
+   "close": 27.5
   },
   {
    "rule": "nflprops-prop",
@@ -1373,7 +1439,9 @@
    "edge": 11.1,
    "ev": 0.092,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0702,
+   "close": 1.5
   },
   {
    "rule": "nflprops-prop",
@@ -1393,7 +1461,9 @@
    "edge": 16.7,
    "ev": 0.0816,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0632,
+   "close": 4.5
   },
   {
    "rule": "nflprops-prop",
@@ -1413,7 +1483,9 @@
    "edge": 19.4,
    "ev": 0.276,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0456,
+   "close": 6.5
   },
   {
    "rule": "nflprops-prop",
@@ -1433,7 +1505,9 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0489,
+   "close": 49.5
   },
   {
    "rule": "nflprops-prop",
@@ -1453,7 +1527,9 @@
    "edge": 12.4,
    "ev": 0.0301,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.077,
+   "close": 42.5
   },
   {
    "rule": "nflprops-prop",
@@ -1473,7 +1549,9 @@
    "edge": 12.1,
    "ev": 0.0201,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0009,
+   "close": 22.5
   },
   {
    "rule": "nflprops-prop",
@@ -1493,7 +1571,9 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0413,
+   "close": 20.5
   },
   {
    "rule": "nflprops-prop",
@@ -1513,7 +1593,9 @@
    "edge": 10.3,
    "ev": 0.1674,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.034,
+   "close": 80.5
   },
   {
    "rule": "nflprops-prop",
@@ -1815,7 +1897,7 @@
    "edge": 13.1,
    "ev": 0.0443,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -2138,7 +2220,7 @@
    "edge": 4.6,
    "ev": 0.0019,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": true
   },
   {
    "rule": "tennis-ml",
@@ -2341,6 +2423,26 @@
    "pass": false
   },
   {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186622",
+   "k": "2026-11-02T07:30:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Volynets",
+   "a": "Sasnovich",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 120,
+   "bet": "Volynets ML +120",
+   "placed": "2026-11-01T18:23:59Z",
+   "stake": 0.25,
+   "edge": 8.8,
+   "ev": 0.0034,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
+  },
+  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401920912",
@@ -2488,6 +2590,27 @@
    "close": 147.5
   },
   {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401910994",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Georgia State",
+   "a": "Bowling Green",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": -108.0,
+   "bet": "under 158.5 -108",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 2.0,
+   "edge": 6.7,
+   "ev": 0.0196,
+   "event": null,
+   "pass": false,
+   "close": 158.5
+  },
+  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401924717",
@@ -2568,7 +2691,7 @@
    "edge": 3.6,
    "ev": 0.005,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 27.5
   },
   {
@@ -2736,8 +2859,8 @@
    "edge": 6.2,
    "ev": 0.0154,
    "event": null,
-   "pass": false,
-   "close": 142.5
+   "pass": true,
+   "close": 140.5
   },
   {
    "rule": "cbb-spread",
@@ -2757,8 +2880,29 @@
    "edge": 3.1,
    "ev": 0.0016,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 27.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401921766",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "West Virginia",
+   "a": "Niagara",
+   "mk": "total",
+   "side": "under",
+   "line": 142.5,
+   "price": -111.0,
+   "bet": "under 142.5 -111",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 2.5,
+   "edge": 8.8,
+   "ev": 0.0236,
+   "event": null,
+   "pass": false,
+   "close": 142.5
   },
   {
    "rule": "cbb-ml",
@@ -2779,7 +2923,7 @@
    "ev": 0.0103,
    "event": null,
    "pass": false,
-   "close": -3.5
+   "close": -4.5
   },
   {
    "rule": "cbb-spread",
@@ -2799,8 +2943,29 @@
    "edge": 4.1,
    "ev": 0.0692,
    "event": null,
+   "pass": true,
+   "close": 17.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401910996",
+   "k": "2026-11-03T00:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "UL Monroe",
+   "a": "Central Michigan",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -106.0,
+   "bet": "UL Monroe +2.5 -106",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0017,
+   "event": null,
    "pass": false,
-   "close": 18.5
+   "close": -2.5
   },
   {
    "rule": "cbb-ml",
@@ -2841,8 +3006,8 @@
    "edge": 5.0,
    "ev": 0.0241,
    "event": null,
-   "pass": false,
-   "close": 22.5
+   "pass": true,
+   "close": 23.5
   },
   {
    "rule": "cbb-total",
@@ -2862,7 +3027,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 155.5
   },
   {
@@ -3152,7 +3317,7 @@
    "edge": 8.4,
    "ev": 0.0225,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 57.5
   }
  ],
@@ -6643,7 +6808,9 @@
    "edge": 15.7,
    "ev": 0.0099,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.168,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -6663,7 +6830,9 @@
    "edge": 15.2,
    "ev": 0.171,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.033,
+   "close": 1.5
   },
   {
    "rule": "nflprops-prop",
@@ -6683,7 +6852,9 @@
    "edge": 14.9,
    "ev": 0.0824,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1277,
+   "close": 13.5
   },
   {
    "rule": "nflprops-prop",
@@ -6703,7 +6874,9 @@
    "edge": 20.3,
    "ev": 0.1008,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0112,
+   "close": 19.5
   },
   {
    "rule": "nflprops-prop",
@@ -6723,7 +6896,9 @@
    "edge": 12.8,
    "ev": 0.0063,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0101,
+   "close": 58.5
   },
   {
    "rule": "nflprops-prop",
@@ -6743,7 +6918,9 @@
    "edge": 14.2,
    "ev": 0.0172,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0703,
+   "close": 15.5
   },
   {
    "rule": "nflprops-prop",
@@ -6763,7 +6940,9 @@
    "edge": 10.1,
    "ev": 0.0303,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.057,
+   "close": 79.5
   },
   {
    "rule": "nflprops-prop",
@@ -6783,7 +6962,9 @@
    "edge": 18.8,
    "ev": 0.0518,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.2366,
+   "close": 6.5
   },
   {
    "rule": "nflprops-prop",
@@ -6803,7 +6984,9 @@
    "edge": 10.6,
    "ev": 0.0572,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.1428,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -6823,7 +7006,9 @@
    "edge": 15.6,
    "ev": 0.0099,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.023,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -6843,7 +7028,9 @@
    "edge": 28.1,
    "ev": 0.1209,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0665,
+   "close": 54.5
   },
   {
    "rule": "nflprops-prop",
@@ -6863,7 +7050,9 @@
    "edge": 30.8,
    "ev": 0.1819,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.055,
+   "close": 236.5
   },
   {
    "rule": "nflprops-prop",
@@ -6883,7 +7072,9 @@
    "edge": 12.6,
    "ev": 0.0728,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0349,
+   "close": 36.5
   },
   {
    "rule": "nflprops-prop",
@@ -6903,7 +7094,9 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0157,
+   "close": 1.5
   },
   {
    "rule": "nflprops-prop",
@@ -6923,7 +7116,9 @@
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0021,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -6943,7 +7138,9 @@
    "edge": 14.5,
    "ev": 0.0556,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.2806,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -6963,7 +7160,9 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0398,
+   "close": 208.5
   },
   {
    "rule": "nflprops-prop",
@@ -6983,7 +7182,9 @@
    "edge": 10.7,
    "ev": 0.1587,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.1293,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -7003,7 +7204,9 @@
    "edge": 31.8,
    "ev": 0.1072,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.1761,
+   "close": 0.5
   },
   {
    "rule": "nflprops-prop",
@@ -7023,7 +7226,9 @@
    "edge": 19.5,
    "ev": 0.002,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0183,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -7043,7 +7248,9 @@
    "edge": 18.9,
    "ev": 0.0518,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0758,
+   "close": 15.5
   },
   {
    "rule": "nflprops-prop",
@@ -7063,7 +7270,9 @@
    "edge": 12.9,
    "ev": 0.0424,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0862,
+   "close": 214.5
   },
   {
    "rule": "nflprops-prop",
@@ -7083,7 +7292,9 @@
    "edge": 10.7,
    "ev": 0.0477,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0669,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -7103,7 +7314,9 @@
    "edge": 13.8,
    "ev": 0.0499,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1639,
+   "close": 235.5
   },
   {
    "rule": "nflprops-prop",
@@ -7123,7 +7336,9 @@
    "edge": 29.5,
    "ev": 0.1724,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0239,
+   "close": 10.5
   },
   {
    "rule": "nflprops-prop",
@@ -7143,7 +7358,9 @@
    "edge": 11.8,
    "ev": 0.0573,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0645,
+   "close": 231.5
   },
   {
    "rule": "nflprops-prop",
@@ -7163,7 +7380,9 @@
    "edge": 23.0,
    "ev": 0.0908,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0403,
+   "close": 6.5
   },
   {
    "rule": "nflprops-prop",
@@ -7183,7 +7402,9 @@
    "edge": 26.7,
    "ev": 0.11,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0172,
+   "close": 19.5
   },
   {
    "rule": "nflprops-prop",
@@ -7203,7 +7424,9 @@
    "edge": 10.5,
    "ev": 0.0969,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0053,
+   "close": 69.5
   },
   {
    "rule": "nflprops-prop",
@@ -7223,7 +7446,9 @@
    "edge": 10.1,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0051,
+   "close": 25.5
   },
   {
    "rule": "nflprops-prop",
@@ -7243,7 +7468,9 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0847,
+   "close": 2.5
   },
   {
    "rule": "nflprops-prop",
@@ -7263,7 +7490,9 @@
    "edge": 17.9,
    "ev": 0.082,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0289,
+   "close": 41.5
   },
   {
    "rule": "nflprops-prop",
@@ -7283,7 +7512,9 @@
    "edge": 23.6,
    "ev": 0.0882,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1689,
+   "close": 27.5
   },
   {
    "rule": "nflprops-prop",
@@ -7303,7 +7534,9 @@
    "edge": 11.1,
    "ev": 0.092,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0702,
+   "close": 1.5
   },
   {
    "rule": "nflprops-prop",
@@ -7323,7 +7556,9 @@
    "edge": 16.7,
    "ev": 0.0816,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0632,
+   "close": 4.5
   },
   {
    "rule": "nflprops-prop",
@@ -7343,7 +7578,9 @@
    "edge": 19.4,
    "ev": 0.276,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0456,
+   "close": 6.5
   },
   {
    "rule": "nflprops-prop",
@@ -7363,7 +7600,9 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0489,
+   "close": 49.5
   },
   {
    "rule": "nflprops-prop",
@@ -7383,7 +7622,9 @@
    "edge": 12.4,
    "ev": 0.0301,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.077,
+   "close": 42.5
   },
   {
    "rule": "nflprops-prop",
@@ -7403,7 +7644,9 @@
    "edge": 12.1,
    "ev": 0.0201,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.0009,
+   "close": 22.5
   },
   {
    "rule": "nflprops-prop",
@@ -7423,7 +7666,9 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": 0.0413,
+   "close": 20.5
   },
   {
    "rule": "nflprops-prop",
@@ -7443,7 +7688,9 @@
    "edge": 10.3,
    "ev": 0.1674,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.034,
+   "close": 80.5
   },
   {
    "rule": "nflprops-prop",
@@ -7745,7 +7992,7 @@
    "edge": 13.1,
    "ev": 0.0443,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -8068,7 +8315,7 @@
    "edge": 4.6,
    "ev": 0.0019,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": true
   },
   {
    "rule": "tennis-ml",
@@ -8271,6 +8518,26 @@
    "pass": false
   },
   {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186622",
+   "k": "2026-11-02T07:30:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Volynets",
+   "a": "Sasnovich",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 120,
+   "bet": "Volynets ML +120",
+   "placed": "2026-11-01T18:23:59Z",
+   "stake": 0.25,
+   "edge": 8.8,
+   "ev": 0.0034,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
+  },
+  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401920912",
@@ -8418,6 +8685,27 @@
    "close": 147.5
   },
   {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401910994",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Georgia State",
+   "a": "Bowling Green",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": -108.0,
+   "bet": "under 158.5 -108",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 2.0,
+   "edge": 6.7,
+   "ev": 0.0196,
+   "event": null,
+   "pass": false,
+   "close": 158.5
+  },
+  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401924717",
@@ -8498,7 +8786,7 @@
    "edge": 3.6,
    "ev": 0.005,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 27.5
   },
   {
@@ -8666,8 +8954,8 @@
    "edge": 6.2,
    "ev": 0.0154,
    "event": null,
-   "pass": false,
-   "close": 142.5
+   "pass": true,
+   "close": 140.5
   },
   {
    "rule": "cbb-spread",
@@ -8687,8 +8975,29 @@
    "edge": 3.1,
    "ev": 0.0016,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 27.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401921766",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "West Virginia",
+   "a": "Niagara",
+   "mk": "total",
+   "side": "under",
+   "line": 142.5,
+   "price": -111.0,
+   "bet": "under 142.5 -111",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 2.5,
+   "edge": 8.8,
+   "ev": 0.0236,
+   "event": null,
+   "pass": false,
+   "close": 142.5
   },
   {
    "rule": "cbb-ml",
@@ -8709,7 +9018,7 @@
    "ev": 0.0103,
    "event": null,
    "pass": false,
-   "close": -3.5
+   "close": -4.5
   },
   {
    "rule": "cbb-spread",
@@ -8729,8 +9038,29 @@
    "edge": 4.1,
    "ev": 0.0692,
    "event": null,
+   "pass": true,
+   "close": 17.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401910996",
+   "k": "2026-11-03T00:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "UL Monroe",
+   "a": "Central Michigan",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -106.0,
+   "bet": "UL Monroe +2.5 -106",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0017,
+   "event": null,
    "pass": false,
-   "close": 18.5
+   "close": -2.5
   },
   {
    "rule": "cbb-ml",
@@ -8771,8 +9101,8 @@
    "edge": 5.0,
    "ev": 0.0241,
    "event": null,
-   "pass": false,
-   "close": 22.5
+   "pass": true,
+   "close": 23.5
   },
   {
    "rule": "cbb-total",
@@ -8792,7 +9122,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 155.5
   },
   {
@@ -9082,7 +9412,7 @@
    "edge": 8.4,
    "ev": 0.0225,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 57.5
   }
  ]
