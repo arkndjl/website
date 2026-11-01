@@ -1,0 +1,598 @@
+{
+ "pro": {
+  "asof": "2026-11-01",
+  "outcome": "next season's GAR a 90 (900+ minutes both seasons)",
+  "base": [
+   "GAR a 90 this season",
+   "last season (flag if none)",
+   "log minutes",
+   "age",
+   "age^2"
+  ],
+  "fotmobJoin": {
+   "listed": 17010,
+   "joined": 14421
+  },
+  "candidates": {
+   "fin": {
+    "name": "Finisher",
+    "pos": "FM",
+    "stat": "goals minus xG a 90",
+    "r": 0.072,
+    "k": 298.9,
+    "pairs": 5698,
+    "n90": 23.0
+   },
+   "vol": {
+    "name": "Shot Volume",
+    "pos": "FM",
+    "stat": "shots a 90",
+    "r": 0.75,
+    "k": 7.7,
+    "pairs": 5698,
+    "n90": 23.0
+   },
+   "cre": {
+    "name": "Chance Creator",
+    "pos": "FMD",
+    "stat": "xA a 90",
+    "r": 0.662,
+    "k": 11.9,
+    "pairs": 9681,
+    "n90": 23.4
+   },
+   "kp": {
+    "name": "Key Passer",
+    "pos": "FMD",
+    "stat": "key passes a 90",
+    "r": 0.761,
+    "k": 7.4,
+    "pairs": 9681,
+    "n90": 23.4
+   },
+   "prg": {
+    "name": "Progressor",
+    "pos": "MD",
+    "stat": "xGBuildup a 90",
+    "r": 0.685,
+    "k": 10.9,
+    "pairs": 7564,
+    "n90": 23.7
+   },
+   "chn": {
+    "name": "Final Third",
+    "pos": "FM",
+    "stat": "xGChain minus xGBuildup a 90",
+    "r": 0.669,
+    "k": 11.4,
+    "pairs": 5698,
+    "n90": 23.0
+   },
+   "gks": {
+    "name": "Shot Stopper",
+    "pos": "G",
+    "stat": "goals saved vs xG faced a 90",
+    "r": 0.114,
+    "k": 234.0,
+    "pairs": 864,
+    "n90": 30.2
+   },
+   "bw": {
+    "name": "Ball Winner",
+    "pos": "DM",
+    "stat": "tackles + interceptions a 90 (FotMob)",
+    "r": 0.671,
+    "k": 12.0,
+    "pairs": 5397,
+    "n90": 24.4,
+    "seasons": [
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ]
+   },
+   "dc": {
+    "name": "Defensive Actions",
+    "pos": "DM",
+    "stat": "defensive actions a 90 (FotMob)",
+    "r": 0.695,
+    "k": 10.7,
+    "pairs": 5397,
+    "n90": 24.4,
+    "seasons": [
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ]
+   },
+   "lbp": {
+    "name": "Line Breaker",
+    "pos": "DM",
+    "stat": "line-breaking passes a 90 (FotMob)",
+    "r": 0.541,
+    "k": 20.0,
+    "pairs": 370,
+    "n90": 23.6,
+    "seasons": [
+     2025,
+     2026
+    ]
+   },
+   "drb": {
+    "name": "Dribbler",
+    "pos": "FM",
+    "stat": "dribbles won a 90 (FotMob)",
+    "r": 0.788,
+    "k": 6.3,
+    "pairs": 4672,
+    "n90": 23.2,
+    "seasons": [
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ]
+   },
+   "gp": {
+    "name": "Shot Stopper (xGOT)",
+    "pos": "G",
+    "stat": "goals prevented vs xGOT a 90 (FotMob)",
+    "r": 0.159,
+    "k": 169.8,
+    "pairs": 321,
+    "n90": 32.1,
+    "seasons": [
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ]
+   }
+  },
+  "tests": {
+   "F": {
+    "n": 2510,
+    "players": 933,
+    "baseOosR2": 0.495,
+    "vol": {
+     "coef": 0.0036,
+     "t": 2.47,
+     "oosGain": 0.0035,
+     "oosR2Gain": 0.0004,
+     "wins": 7,
+     "of": 11,
+     "n": 2510,
+     "pass": true
+    },
+    "cre": {
+     "coef": 0.004,
+     "t": 2.02,
+     "oosGain": 0.0072,
+     "oosR2Gain": 0.0009,
+     "wins": 6,
+     "of": 11,
+     "n": 2510,
+     "pass": true
+    },
+    "kp": {
+     "coef": 0.0091,
+     "t": 5.34,
+     "oosGain": 0.0643,
+     "oosR2Gain": 0.0078,
+     "wins": 8,
+     "of": 11,
+     "n": 2510,
+     "pass": true
+    },
+    "chn": {
+     "coef": -0.0036,
+     "t": -1.77,
+     "oosGain": 0.0026,
+     "oosR2Gain": 0.0003,
+     "wins": 5,
+     "of": 11,
+     "n": 2510,
+     "pass": false
+    },
+    "drb": {
+     "coef": 0.0065,
+     "t": 3.42,
+     "oosGain": 0.0301,
+     "oosR2Gain": 0.0036,
+     "wins": 6,
+     "of": 9,
+     "n": 1833,
+     "pass": true
+    },
+    "joint": {
+     "passers": [
+      "vol",
+      "cre",
+      "kp",
+      "drb"
+     ],
+     "kept": [
+      "kp",
+      "vol"
+     ],
+     "steps": [
+      {
+       "add": "kp",
+       "oosR2": 0.5025,
+       "t": {
+        "kp": 5.34
+       },
+       "coef": {
+        "kp": 0.0091
+       }
+      },
+      {
+       "add": "vol",
+       "oosR2": 0.5049,
+       "t": {
+        "kp": 6.16,
+        "vol": 4.14
+       },
+       "coef": {
+        "kp": 0.0107,
+        "vol": 0.0063
+       }
+      }
+     ],
+     "corr": [
+      [
+       1.0,
+       0.24,
+       0.12,
+       0.05
+      ],
+      [
+       0.24,
+       1.0,
+       0.83,
+       0.37
+      ],
+      [
+       0.12,
+       0.83,
+       1.0,
+       0.39
+      ],
+      [
+       0.05,
+       0.37,
+       0.39,
+       1.0
+      ]
+     ]
+    }
+   },
+   "M": {
+    "n": 4172,
+    "players": 1550,
+    "baseOosR2": 0.519,
+    "vol": {
+     "coef": 0.0037,
+     "t": 3.38,
+     "oosGain": 0.0082,
+     "oosR2Gain": 0.0012,
+     "wins": 8,
+     "of": 11,
+     "n": 4172,
+     "pass": true
+    },
+    "cre": {
+     "coef": 0.0043,
+     "t": 3.28,
+     "oosGain": 0.0054,
+     "oosR2Gain": 0.0008,
+     "wins": 8,
+     "of": 11,
+     "n": 4172,
+     "pass": true
+    },
+    "kp": {
+     "coef": 0.0072,
+     "t": 6.59,
+     "oosGain": 0.0285,
+     "oosR2Gain": 0.0043,
+     "wins": 7,
+     "of": 11,
+     "n": 4172,
+     "pass": true
+    },
+    "prg": {
+     "coef": 0.0045,
+     "t": 3.86,
+     "oosGain": 0.0117,
+     "oosR2Gain": 0.0018,
+     "wins": 9,
+     "of": 11,
+     "n": 4172,
+     "pass": true
+    },
+    "chn": {
+     "coef": 0.0013,
+     "t": 1.09,
+     "oosGain": -0.0015,
+     "oosR2Gain": -0.0002,
+     "wins": 5,
+     "of": 11,
+     "n": 4172,
+     "pass": false
+    },
+    "bw": {
+     "coef": -0.0009,
+     "t": -0.91,
+     "oosGain": -0.0007,
+     "oosR2Gain": -0.0001,
+     "wins": 4,
+     "of": 9,
+     "n": 3093,
+     "pass": false
+    },
+    "dc": {
+     "coef": -0.0008,
+     "t": -0.71,
+     "oosGain": -0.0014,
+     "oosR2Gain": -0.0002,
+     "wins": 4,
+     "of": 9,
+     "n": 3093,
+     "pass": false
+    },
+    "lbp": {
+     "coef": 0.0028,
+     "t": 0.71,
+     "oosGain": 0.0,
+     "oosR2Gain": 0.0,
+     "wins": 0,
+     "of": 1,
+     "n": 215,
+     "pass": false
+    },
+    "drb": {
+     "coef": 0.0031,
+     "t": 2.84,
+     "oosGain": 0.0053,
+     "oosR2Gain": 0.0008,
+     "wins": 6,
+     "of": 9,
+     "n": 3088,
+     "pass": true
+    },
+    "joint": {
+     "passers": [
+      "vol",
+      "cre",
+      "kp",
+      "prg",
+      "drb"
+     ],
+     "kept": [
+      "kp",
+      "prg",
+      "vol"
+     ],
+     "steps": [
+      {
+       "add": "kp",
+       "oosR2": 0.5231,
+       "t": {
+        "kp": 6.59
+       },
+       "coef": {
+        "kp": 0.0072
+       }
+      },
+      {
+       "add": "prg",
+       "oosR2": 0.5279,
+       "t": {
+        "kp": 8.21,
+        "prg": 6.27
+       },
+       "coef": {
+        "kp": 0.0097,
+        "prg": 0.0079
+       }
+      },
+      {
+       "add": "vol",
+       "oosR2": 0.5298,
+       "t": {
+        "kp": 6.98,
+        "prg": 7.57,
+        "vol": 4.01
+       },
+       "coef": {
+        "kp": 0.0085,
+        "prg": 0.0101,
+        "vol": 0.0049
+       }
+      }
+     ],
+     "corr": [
+      [
+       1.0,
+       0.54,
+       0.53,
+       0.05,
+       0.35
+      ],
+      [
+       0.54,
+       1.0,
+       0.88,
+       0.27,
+       0.3
+      ],
+      [
+       0.53,
+       0.88,
+       1.0,
+       0.25,
+       0.28
+      ],
+      [
+       0.05,
+       0.27,
+       0.25,
+       1.0,
+       0.03
+      ],
+      [
+       0.35,
+       0.3,
+       0.28,
+       0.03,
+       1.0
+      ]
+     ]
+    }
+   },
+   "D": {
+    "n": 4207,
+    "players": 1409,
+    "baseOosR2": 0.487,
+    "cre": {
+     "coef": 0.0009,
+     "t": 0.95,
+     "oosGain": -0.0008,
+     "oosR2Gain": -0.0002,
+     "wins": 6,
+     "of": 11,
+     "n": 4207,
+     "pass": false
+    },
+    "kp": {
+     "coef": 0.0025,
+     "t": 2.88,
+     "oosGain": 0.0034,
+     "oosR2Gain": 0.0008,
+     "wins": 7,
+     "of": 11,
+     "n": 4207,
+     "pass": true
+    },
+    "prg": {
+     "coef": 0.0091,
+     "t": 7.1,
+     "oosGain": 0.0273,
+     "oosR2Gain": 0.0061,
+     "wins": 9,
+     "of": 11,
+     "n": 4207,
+     "pass": true
+    },
+    "bw": {
+     "coef": 0.0002,
+     "t": 0.23,
+     "oosGain": -0.0023,
+     "oosR2Gain": -0.0005,
+     "wins": 1,
+     "of": 9,
+     "n": 2797,
+     "pass": false
+    },
+    "dc": {
+     "coef": -0.003,
+     "t": -3.05,
+     "oosGain": 0.0062,
+     "oosR2Gain": 0.0013,
+     "wins": 5,
+     "of": 9,
+     "n": 2797,
+     "pass": false
+    },
+    "lbp": {
+     "note": "too few rows",
+     "n": 181
+    },
+    "joint": {
+     "passers": [
+      "kp",
+      "prg"
+     ],
+     "kept": [
+      "prg",
+      "kp"
+     ],
+     "steps": [
+      {
+       "add": "prg",
+       "oosR2": 0.493,
+       "t": {
+        "prg": 7.1
+       },
+       "coef": {
+        "prg": 0.0091
+       }
+      },
+      {
+       "add": "kp",
+       "oosR2": 0.4953,
+       "t": {
+        "prg": 7.87,
+        "kp": 4.44
+       },
+       "coef": {
+        "prg": 0.0104,
+        "kp": 0.0038
+       }
+      }
+     ],
+     "corr": [
+      [
+       1.0,
+       0.27
+      ],
+      [
+       0.27,
+       1.0
+      ]
+     ]
+    }
+   },
+   "G": {
+    "n": 864,
+    "players": 252,
+    "baseOosR2": 0.217,
+    "gp": {
+     "coef": -0.0033,
+     "t": -0.9,
+     "oosGain": -0.0129,
+     "oosR2Gain": -0.0036,
+     "wins": 4,
+     "of": 7,
+     "n": 357,
+     "pass": false
+    }
+   }
+  }
+ }
+}
