@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T22:20:08Z",
+ "asof": "2026-11-01T22:39:06Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -45,9 +45,9 @@
     }
    },
    "total": {
-    "n": 5,
-    "window": 5,
-    "mean": -0.0035,
+    "n": 6,
+    "window": 6,
+    "mean": -0.0061,
     "t": null,
     "days": 1,
     "sd": 0.1256,
@@ -58,17 +58,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0167,
-     "n": 5,
+     "n": 6,
      "sd": 0.1256,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.063,
-     "info": 0.09,
-     "real": -0.208,
-     "realSe": 3.364,
+     "llr": -0.092,
+     "info": 0.11,
+     "real": -0.365,
+     "realSe": 3.071,
      "need": 333
     }
    }
@@ -271,7 +271,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1151,
+  "snapshots": 1153,
   "buckets": [
    {
     "when": "24h+",
