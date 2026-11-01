@@ -57,20 +57,29 @@ def et_text(dt, time_ok=True):
 
 
 def model_p(sport, eid, home):
-    """The team's win chance (0-100) from the site's game model, or None."""
+    """The team's win chance (0-100) from the site's game model and the pregame numbers the page's in-game model
+    starts from (home side's view: NFL/NBA win chance + margin sd, NHL win chance + total, soccer expected goals)."""
     if not sport:
-        return None
-    games = load(f'{sport}_games.json').get('games') or []
-    for g in games:
+        return None, None
+    d = load(f'{sport}_games.json')
+    for g in d.get('games') or []:
         gid = str(g.get('espn') or g.get('id')) if sport in ('nhl', 'nfl') else str(g.get('id'))
         if gid != eid:
             continue
         if sport == 'soccer':
-            p = g.get('p') or []
-            return round(100 * (p[0] if home else p[2])) if len(p) == 3 else None
+            p, l = g.get('p') or [], g.get('l') or []
+            live = {'l': l} if len(l) == 2 else None
+            return (round(100 * (p[0] if home else p[2])) if len(p) == 3 else None), live
         ph = g.get('pHome')
-        return None if ph is None else round(100 * (ph if home else 1 - ph))
-    return None
+        if ph is None:
+            return None, None
+        live = {'ph': round(ph, 4)}
+        if sport in ('nfl', 'nba') and d.get('sd'):
+            live['sd'] = d['sd']
+        if sport == 'nhl':
+            live['t'] = g.get('total')
+        return round(100 * (ph if home else 1 - ph)), live
+    return None, None
 
 
 def logo(team):
@@ -122,16 +131,17 @@ def team_rows(key, label, path, tid, sport, hours):
         elif lg and lg != 'esp.1':
             note = COMP.get(lg, (e.get('league') or {}).get('abbreviation') or lg)
         o = op['team']
+        p, live = model_p(sport, str(e['id']), home)
         rows.append({
             'id': str(e['id']), 'at': at.strftime('%Y-%m-%dT%H:%M:%SZ'), 'day': day, 'time': clock,
             'home': home, 'neutral': bool(c.get('neutralSite')),
             'opp': o.get('shortDisplayName') or o.get('displayName') or o.get('name'),
             'oppAbbr': o.get('abbreviation'), 'oppLogo': logo(o), 'note': note,
-            'p': model_p(sport, str(e['id']), home),
+            'p': p, 'live': live, 'lg': lg if sport == 'soccer' else None,
         })
         if len(rows) >= KEEP:
             break
-    return {'key': key, 'label': label, 'logo': me_logo, 'hours': hours, 'games': rows,
+    return {'key': key, 'label': label, 'logo': me_logo, 'hours': hours, 'path': path, 'sport': sport or path.split('/')[1], 'games': rows,
             'off': not rows}
 
 

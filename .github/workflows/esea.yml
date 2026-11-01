@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # starts nt-live.yml when a 1NT match is due
 
 concurrency:
   group: esea
@@ -40,6 +41,14 @@ jobs:
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_DEMO_PROBE: ${{ inputs.probe && '1' || '' }}
+      - name: 1NT live
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$(node scripts/nt_live.mjs --due)" = due ] && [ -z "$(gh run list -w nt-live.yml -s in_progress -L 1 --json databaseId -q '.[].databaseId')" ] && [ -z "$(gh run list -w nt-live.yml -s queued -L 1 --json databaseId -q '.[].databaseId')" ]; then
+            gh workflow run nt-live.yml && echo "dispatched 1nt live"
+          fi
       - name: 1NTERLYTICS history book
         run: python3 scripts/esea_1nt_lab.py
       - name: Commit if it changed

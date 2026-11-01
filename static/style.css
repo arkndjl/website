@@ -4359,7 +4359,8 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
   letter-spacing: 0.125em;
   box-shadow: 2px 2px 0 var(--win-dark);
 }
-.tick__tag--nt { margin-left: 8px; background: var(--win-dark); color: var(--foreground); box-shadow: 2px 2px 0 #000; }
+.tick__tag--nt { background: var(--win-dark); color: var(--foreground); box-shadow: 2px 2px 0 #000; }
+.tick__tag--next { margin-left: 8px; }
 .tick__g {
   display: flex;
   flex: none;
@@ -4383,6 +4384,8 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .tick__when { color: var(--accent); font-size: 0.875em; }
 .tick__note { color: var(--accent); font-size: 0.875em; opacity: 0.8; }
 .tick__p { color: var(--foreground); font-size: 0.875em; }
+.tick__score { color: var(--foreground); font-size: 0.875em; }
+.tick__score[hidden], .tick__p[hidden] { display: none; }
 .tick__live { padding: 0 4px; background: var(--foreground); color: var(--win-dark); font-size: 0.875em; text-transform: uppercase; }
 .tick__g--off { justify-content: center; }
 @media (max-width: 684px) {
