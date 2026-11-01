@@ -54,7 +54,7 @@ PARTS = {
     'RB': ['repa', 'fd', 'yco', 'btk', 'recv'],
     'WR': ['recv', 'tgt', 'fd', 'drop', 'btk'],
     'TE': ['recv', 'tgt', 'fd', 'drop', 'pen'],
-    'OL': ['pen'],
+    'OL': ['pen'],   # on-field pressure, sacks, line yards, run/pass EPA, gap runs, yards before contact: scripts/nfl_ol.py (all fail)
     'EDGE': ['prss', 'sk', 'stop', 'tfl', 'mtk', 'pen'],
     'DT': ['prss', 'sk', 'stop', 'tfl', 'mtk', 'pen'],
     'LB': ['stop', 'tfl', 'prss', 'mtk', 'covy', 'rtg', 'ball'],
