@@ -4,3 +4,9 @@ data/cfb*.json -merge -diff
 static/data/cfb-all.json -merge -diff
 data/nfl*.json -merge -diff
 static/data/nfl-war.json -merge -diff
+# Append-only snapshot logs: two snaps that both appended lines keep both (union merge), never a conflict.
+scripts/data/odds_novig/*.jsonl merge=union
+scripts/data/odds_novig_ladder/*.jsonl merge=union
+scripts/data/props/*.jsonl merge=union
+scripts/data/odds_tp/*.jsonl merge=union
+scripts/data/odds_dense/*.jsonl merge=union
