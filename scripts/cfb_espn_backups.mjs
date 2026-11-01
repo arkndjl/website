@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { compact, Matcher } from './names.mjs';
 import { frameFV, bmiOf } from './cfb_frame.mjs';
 import { atMean, cfbZ } from './fv_dist.mjs';
+import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const FLOOR = 20, TRAIN_SNAPS = 60, RIDGE = 5;
@@ -164,8 +165,7 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
 
 // standalone: rebuild the backups on the current cfb-all.json from live ESPN rosters
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
-  const ALL = path.join(ROOT, 'static', 'data', 'cfb-all.json');
-  const d = JSON.parse(fs.readFileSync(ALL, 'utf8'));
+  const d = readCfbAll(ROOT);   // cfb-all + cfb-detail merged
   if (!d.cols.includes('src')) { d.cols.push('src'); d.rows.forEach(r => r.push(null)); }
   const rows = d.rows.map(a => Object.fromEntries(d.cols.map((c, j) => [c, a[j]]))).filter(r => r.src !== 'espn');
   const get = async u => { for (let i = 0; i < 3; i++) { try { const r = await fetch(u); if (r.ok) return r.json(); } catch {} await new Promise(s => setTimeout(s, 1000 * (i + 1))); } return null; };
@@ -186,5 +186,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const seen = {};
   all.forEach((r, i) => { r.ovr = i + 1; if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; r.posRank = seen[k] = (seen[k] || 0) + 1; } });
   d.rows = all.map(r => d.cols.map(c => r[c] ?? null));
-  fs.writeFileSync(ALL, JSON.stringify(d));
+  writeCfbAll(d, ROOT);
 }

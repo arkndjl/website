@@ -78,7 +78,8 @@ def snap_cfb():
     cols = ['name', 'pos', 'team', 'div', 'cls', 'age', 'on3', 'pfn', 'cons', 'consRk', 'fv', 'fvx', 'fvg', 'fvd', 'parts',
             'draftP', 'ovr', 'posRank'] + zs
     rows = []
-    for r in table('static/data/cfb-all.json'):
+    import cfb_all                      # the board is two files (cfb-all + cfb-detail: fvd, parts); merged here
+    for r in (dict(zip(c['cols'], x)) for c in [cfb_all.read_cfb_all()] for x in c['rows']):
         # the 2027 class: draft-eligible next spring, and either a real Draft% or an On3 grade (the weight under test)
         if not r.get('draft27') or not ((r.get('draftP') or 0) >= 0.005 or r.get('on3')):
             continue

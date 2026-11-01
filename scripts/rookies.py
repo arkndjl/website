@@ -312,7 +312,8 @@ def soccer():
 
 # ---------------------------------------------------------------- CFB true freshmen
 def cfb():
-    d = json.load(open(os.path.join(SD, 'cfb-all.json')))
+    import cfb_all
+    d = cfb_all.read_cfb_all(os.path.join(SD, 'cfb-all.json'))
     c = d['cols']
     fr = [dict(zip(c, r)) for r in d['rows']]
     yr = int(d['asof'][:4]) if d.get('asof') else dt.date.today().year

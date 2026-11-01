@@ -1,6 +1,9 @@
 (function () {
   if (window.__arkCfb) return; window.__arkCfb = true;
   var PER = 50, DATA = null;
+  // the cfb-detail.json state (detail(), below), declared up here: Hugo's minifier folded a later declaration into
+  // load()'s callback as a local, so the dk never reached detail()
+  var DETAIL_URL = null, DK = null, DETAIL = null, DETAIL_ON = false;
   // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
   var PARTS = [['talent', 'On3 order at the position (unranked: production + recruiting)'], ['production', 'Stat+ (PFN position score), 3 seasons, regressed; weight by position = fit to NFL careers'],
                ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus scaled by position rarity of young contributors'], ['breakout', 'class year of first top-15% production season'],
@@ -325,15 +328,22 @@
       page += +b.getAttribute('data-cfb-step'); show();
       var top = w.getBoundingClientRect().top; if (top < 0) w.scrollIntoView({ block: 'start' });
     }); });
+    // warm the report columns when a pointer or keyboard reaches the table, so the first dropdown rarely waits
+    ['pointerover', 'focusin'].forEach(function (ev) { body.addEventListener(ev, function () { detail(); }, { once: true, passive: true }); });
     body.addEventListener('click', function (e) {
       if (e.target.closest('a')) return;
       var tr = e.target.closest('tr'); if (!tr || tr.classList.contains('cfb__detail')) return;
       var was = open && open.previousElementSibling === tr;
       closeDetail(); openP = ''; if (was) return writeHash();
       openP = pid(byI[tr.dataset.i]); writeHash();
-      var sc = w.querySelector('.cfb__scroll');
-      tr.insertAdjacentHTML('afterend', detailHtml(byI[tr.dataset.i], cols, Math.max(260, sc.clientWidth - 30)));
-      open = tr.nextElementSibling; fillComps(open);
+      var sc = w.querySelector('.cfb__scroll'), r = byI[tr.dataset.i];
+      var put = function () { tr.insertAdjacentHTML('afterend', detailHtml(r, cols, Math.max(260, sc.clientWidth - 30))); open = tr.nextElementSibling; fillComps(open); };
+      if (DETAIL_ON) put();
+      else {     // the report columns' first fetch: a loading line under the row until they are in
+        tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + cols + '" class="cfb__dim">loading report…</td></tr>');
+        var wait = open = tr.nextElementSibling;
+        detail().then(function () { if (open !== wait) return; wait.remove(); put(); });
+      }
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
     var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'war' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1, sort0 = [cur, dir];
@@ -370,8 +380,10 @@
   function load(src) {
     var json = window.__arkJson;
     COMPS_URL = src.replace(/cfb-all\.json$/, 'cfb-comps.json');
+    DETAIL_URL = src.replace(/cfb-all\.json$/, 'cfb-detail.json');
     if (!DATA) DATA = Promise.all([json(src), json(src.replace(/cfb-all\.json$/, 'cfb-past.json')).catch(function () { return null; })]).then(function (res) {
       var d = res[0], past = res[1];
+      DK = d.dk || null;
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
       // photo 1 = ESPN's standard headshot for his ESPN id (scripts/fetch_cfb.mjs photoCode)
       recs.forEach(function (r) { if (r.photo === 1) { var m = /\/id\/(\d+)/.exec(r.espnl || ''); r.photo = m ? 'https://a.espncdn.com/i/headshots/college-football/players/full/' + m[1] + '.png' : null; } });
@@ -381,8 +393,7 @@
       // (names matched by the shared rules in namekey.html, so "Neo" finds "Neoklis" and "Will" finds "William")
       var ark = []; [].forEach.call(document.querySelectorAll('[data-arklist]'), function (el) { ark = ark.concat(JSON.parse(el.getAttribute('data-arklist') || '[]')); });
       ark.forEach(function (e) { var b = String(e).split('|'); window.arkName.find(recs, b[0].trim(), b[1] && b[1].trim()).forEach(function (r) { r.star = true; }); });
-      recs.forEach(function (r) { r.pos = dt(r.pos); r.move = dt(r.move); r.moveWhy = dt(r.moveWhy);
-        if (r.report) { r.report.role = dt(r.report.role); ['plus', 'minus'].forEach(function (k) { if (r.report[k]) r.report[k] = r.report[k].map(dt); }); } });
+      recs.forEach(function (r) { r.pos = dt(r.pos); r.move = dt(r.move); r.moveWhy = dt(r.moveWhy); });
       // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).
       // 25 a SD gives OPS+'s spread: ~125 is a good regular, 150+ elite, 75 well below average
       // a group where most lines carry no snaps (FBS WR and RB) is weighted equally: a missing snap count as 1 next
@@ -409,11 +420,30 @@
     });
     return DATA;
   }
+  // the scouting-report columns (report, parts, fvd, mk) live in cfb-detail.json (scripts/cfb_all.mjs), fetched the
+  // first time a dropdown or card is wanted and merged onto the records by row; dk ties it to the cfb-all.json loaded
+  // (a mismatched pair, mid-deploy, leaves the reports off rather than putting one player's on another)
+  function detail() {
+    if (!DATA) return Promise.resolve(null);
+    return DETAIL || (DETAIL = DATA.then(function (recs) {
+      if (!DK) { DETAIL_ON = true; return recs; }     // a file from before the split carries the columns itself
+      return window.__arkJson(DETAIL_URL + '?v=' + DK).then(function (d) {
+        if (d.dk === DK && d.rows.length === recs.length) {
+          var dt = function (x) { return typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x; };
+          recs.forEach(function (r, i) { var a = d.rows[i]; d.cols.forEach(function (c, j) { r[c] = a[j]; });
+            if (r.report) { r.report = Object.assign({}, r.report, { role: dt(r.report.role) });
+              ['plus', 'minus'].forEach(function (k) { if (r.report[k]) r.report[k] = r.report[k].map(dt); }); } });
+        }
+        DETAIL_ON = true; return recs;
+      }).catch(function () { DETAIL = null; return recs; });
+    }));
+  }
+  window.__arkCfbDetail = detail;
   // a player's card (the board's scouting report) in a window over the page, for names on other tabs:
   // window.__arkCfbCard(name, team), or any element with data-cfb-card="name|team"
   function cardFor(name, team) {
     var src = document.querySelector('[data-cfb-src]');
-    return load(src ? src.getAttribute('data-cfb-src') : '/data/cfb-all.json').then(function (recs) {
+    return load(src ? src.getAttribute('data-cfb-src') : '/data/cfb-all.json').then(detail).then(function (recs) {
       return recs.filter(function (r) { return r.name === name && r.team === team; })[0] || recs.filter(function (r) { return r.name === name; })[0] || null;
     });
   }
