@@ -12,6 +12,8 @@
 
 <div class="{{- $container -}}{{- cond ($.Site.Params.oneHeadingSize | default false) " headings--one-size" "" }}">
 
+  {{ if .IsHome }}{{ partial "ticker.html" . }}{{ end }}
+
   {{ partial "header.html" . }}
 
   {{ if not .IsHome }}{{ partial "back.html" . }}{{ end }}

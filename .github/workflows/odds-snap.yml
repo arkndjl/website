@@ -61,16 +61,20 @@ jobs:
       - name: Ladder test
         continue-on-error: true
         run: python3 scripts/novig_ladder_test.py
+      # homepage ticker: next games of Noah's teams and 1NT (scripts/fetch_ticker.py; ESPN + the site's game models)
+      - name: Homepage ticker
+        continue-on-error: true
+        run: python3 scripts/fetch_ticker.py
       - name: Commit if it changed
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add scripts/data/odds_dense data/paper_book.json
+          git add scripts/data/odds_dense data/paper_book.json data/ticker.json
           for d in scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_tp data/novig_ladder_test.json; do if [ -e "$d" ]; then git add "$d"; fi; done
           for f in scripts/data/props data/props_paper.json data/props_paper_nfl.json data/props_paper_nhl.json data/games_picks_nflprops.json scripts/data/refs data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           # Only the paper books and the picks are on the site; a snapshot-only commit skips the Cloudflare build.
-          skip=""; git diff --cached --quiet -- data/paper_book.json data/props_paper.json data/props_paper_nfl.json data/games_picks_*.json && skip=" [skip ci]"
+          skip=""; git diff --cached --quiet -- data/ticker.json data/paper_book.json data/props_paper.json data/props_paper_nfl.json data/games_picks_*.json && skip=" [skip ci]"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -q -m "Odds snapshot, paper book and picks ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
           for i in 1 2 3 4; do
