@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-01T16:08:35Z",
+ "asof": "2026-11-01T16:10:54Z",
  "recenter": {
   "week": 0.83
  },
@@ -361,13 +361,35 @@
    "tmRaw": 53.8,
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 50.0,
-   "close": 48.5,
-   "pass": true,
-   "now": null
+   "close": 49.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 49.5,
+    "price": -104.0,
+    "ev": 0.014,
+    "units": 0.25
+   }
   }
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401858291",
+   "sport": "cfb",
+   "kick": "2026-11-08T00:30:00.000Z",
+   "home": "Notre Dame",
+   "away": "Miami",
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -111.0,
+   "edge": 8.3,
+   "x": 2.5,
+   "why": "no edge at -111",
+   "m": -0.1,
+   "tm": 49.2
+  },
   {
    "id": "401862817",
    "sport": "cfb",
@@ -376,11 +398,11 @@
    "away": "UTSA",
    "mk": "total",
    "side": "under",
-   "line": 73.5,
-   "price": -117.0,
-   "edge": 10.3,
+   "line": 71.5,
+   "price": -110,
+   "edge": 8.3,
    "x": 2.5,
-   "why": "no edge at -117",
+   "why": "no edge at -110",
    "m": -8.5,
    "tm": 63.2
   },
@@ -417,22 +439,6 @@
    "tm": 48.1
   },
   {
-   "id": "401866453",
-   "sport": "cfb",
-   "kick": "2026-11-04T00:00:00.000Z",
-   "home": "Akron",
-   "away": "Ohio",
-   "mk": "total",
-   "side": "over",
-   "line": 48.5,
-   "price": -108.0,
-   "edge": 4.5,
-   "x": 2.5,
-   "why": "no edge at -108",
-   "m": -14.9,
-   "tm": 53.0
-  },
-  {
    "id": "401856745",
    "sport": "cfb",
    "kick": "2026-11-07T23:15:00.000Z",
@@ -447,22 +453,6 @@
    "why": "edge under 2.5",
    "m": 6.8,
    "tm": 52.9
-  },
-  {
-   "id": "401858291",
-   "sport": "cfb",
-   "kick": "2026-11-08T00:30:00.000Z",
-   "home": "Notre Dame",
-   "away": "Miami",
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
-   "price": -111.0,
-   "edge": 4.6,
-   "x": 5.0,
-   "why": "edge under 5 (line: 3-7)",
-   "m": -0.1,
-   "tm": 49.2
   },
   {
    "id": "401858514",
@@ -489,7 +479,7 @@
    "mk": "spread",
    "side": "away",
    "line": 5.5,
-   "price": -104.0,
+   "price": -111.0,
    "edge": 3.6,
    "x": 5.0,
    "why": "edge under 5 (line: 3-7)",
@@ -537,7 +527,7 @@
    "mk": "spread",
    "side": "away",
    "line": -14.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 3.4,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -585,7 +575,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -115.0,
+   "price": -113.0,
    "edge": 2.7,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -707,11 +697,11 @@
  ],
  "games": {
   "401858291": {
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
    "price": -111.0,
-   "edge": 4.6,
+   "edge": 8.3,
    "ev": null,
    "units": 0.0,
    "home": "Notre Dame",
@@ -806,7 +796,7 @@
    "mk": "spread",
    "side": "away",
    "line": 5.5,
-   "price": -104.0,
+   "price": -111.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -889,9 +879,9 @@
   "401862817": {
    "mk": "total",
    "side": "under",
-   "line": 73.5,
-   "price": -117.0,
-   "edge": 10.3,
+   "line": 71.5,
+   "price": -110,
+   "edge": 8.3,
    "ev": null,
    "units": 0.0,
    "home": "Florida Atlantic",
@@ -902,7 +892,7 @@
    "mk": "spread",
    "side": "away",
    "line": -14.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -950,7 +940,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -115.0,
+   "price": -113.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -961,14 +951,14 @@
   "401866453": {
    "mk": "total",
    "side": "over",
-   "line": 48.5,
-   "price": -108.0,
-   "edge": 4.5,
-   "ev": null,
-   "units": 0.0,
+   "line": 49.5,
+   "price": -104.0,
+   "ev": 0.014,
+   "edge": 3.5,
+   "units": 0.25,
    "home": "Akron",
    "away": "Ohio",
-   "state": "under"
+   "state": "pick"
   },
   "401866455": {
    "mk": "spread",
@@ -1035,16 +1025,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3613,
+  "snapshots": 3624,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 975,
-    "clvRet": -0.0414,
-    "clvT": -17.51,
+    "clvN": 979,
+    "clvRet": -0.0413,
+    "clvT": -17.53,
     "clv": 0.25,
-    "beat": 0.356,
-    "still": 0.395
+    "beat": 0.354,
+    "still": 0.397
    },
    {
     "when": "6-24h",
@@ -1300,8 +1290,7 @@
    "tmRaw": 53.8,
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 50.0,
-   "close": 48.5,
-   "pass": true
+   "close": 49.5
   },
   {
    "id": "401858512",
