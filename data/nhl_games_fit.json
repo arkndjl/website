@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-30",
+ "updated": "2026-11-01",
  "params": {
   "K": 4,
   "reg": 0.2,
@@ -29,18 +29,18 @@
   "one"
  ],
  "coef": {
-  "elo": 0.3166,
-  "xg": 0.3539,
+  "elo": 0.3152,
+  "xg": 0.3535,
   "b2b": -0.2892,
   "home": 0.1308,
-  "rv": 0.3311
+  "rv": 0.3344
  },
  "mcoef": {
-  "elo": 0.3605,
-  "xg": 0.5307,
-  "b2b": -0.3205,
-  "home": 0.212,
-  "rv": 0.5059
+  "elo": 0.3593,
+  "xg": 0.5309,
+  "b2b": -0.3204,
+  "home": 0.2119,
+  "rv": 0.5067
  },
  "tcoef": {
   "xgT": 0.3487,
@@ -51,20 +51,20 @@
  },
  "pl": {
   "home2": [
-   -1.305,
-   0.6698,
-   0.0617
+   -1.3094,
+   0.669,
+   0.0624
   ],
   "away2": [
-   -2.3163,
-   -0.714,
-   0.232
+   -2.3125,
+   -0.7139,
+   0.2314
   ]
  },
  "ot": [
-  -0.1879,
-  -0.0991,
-  -0.1629
+  -0.1839,
+  -0.0974,
+  -0.1637
  ],
  "sdMargin": 2.481,
  "sdTotal": 2.298,
@@ -72,18 +72,18 @@
  "evidence": {
   "elo": {
    "kept": true,
-   "tTune": 1.86,
-   "tHeld": -0.81,
-   "dTune": 2.276,
-   "dHeld": -0.75,
+   "tTune": 1.84,
+   "tHeld": -0.82,
+   "dTune": 2.248,
+   "dHeld": -0.756,
    "split": "2021-23 / 2024-26 lined"
   },
   "xg": {
    "kept": true,
-   "tTune": 2.24,
-   "tHeld": 1.94,
-   "dTune": 2.525,
-   "dHeld": 1.564,
+   "tTune": 2.25,
+   "tHeld": 1.92,
+   "dTune": 2.537,
+   "dHeld": 1.552,
    "split": "2021-23 / 2024-26 lined"
   },
   "g": {
@@ -114,16 +114,16 @@
    "kept": true,
    "tTune": 3.38,
    "tHeld": 1.89,
-   "dTune": 2.765,
-   "dHeld": 2.218,
+   "dTune": 2.761,
+   "dHeld": 2.211,
    "split": "2021-23 / 2024-26 lined"
   },
   "home": {
    "kept": true,
    "tTune": 1.18,
-   "tHeld": 2.49,
-   "dTune": 0.972,
-   "dHeld": 2.013,
+   "tHeld": 2.48,
+   "dTune": 0.969,
+   "dHeld": 2.009,
    "split": "2021-23 / 2024-26 lined"
   },
   "x5": {
@@ -144,10 +144,10 @@
   },
   "rv": {
    "kept": true,
-   "tTune": 2.66,
-   "tHeld": 2.53,
-   "dTune": 1.822,
-   "dHeld": 2.46,
+   "tTune": 2.68,
+   "tHeld": 2.59,
+   "dTune": 1.805,
+   "dHeld": 2.511,
    "split": "2021-23 / 2024-26 lined"
   },
   "bk": {
@@ -168,10 +168,10 @@
   },
   "mkt": {
    "kept": false,
-   "tTune": 0.15,
-   "tHeld": 0.18,
-   "dTune": 0.071,
-   "dHeld": 0.052,
+   "tTune": 0.14,
+   "tHeld": 0.15,
+   "dTune": 0.065,
+   "dHeld": 0.044,
    "split": "2021-23 / 2024-26 lined"
   }
  },
@@ -183,7 +183,7 @@
    "lined": 3752,
    "logLossLinedModel": 0.6517,
    "logLossMarket": 0.6516,
-   "tVsMarket": 0.06,
+   "tVsMarket": 0.05,
    "rModelVsMarket": 0.946,
    "hitModel": 0.62,
    "hitMarket": 0.628,
@@ -194,12 +194,12 @@
   },
   "2024-26 (held out)": {
    "games": 4192,
-   "logLossModel": 0.6675,
+   "logLossModel": 0.6674,
    "brierModel": 0.2376,
    "lined": 4190,
    "logLossLinedModel": 0.6675,
    "logLossMarket": 0.6645,
-   "tVsMarket": 2.02,
+   "tVsMarket": 1.98,
    "rModelVsMarket": 0.936,
    "hitModel": 0.58,
    "hitMarket": 0.593,
@@ -212,45 +212,45 @@
  "calib": [
   {
    "bin": 0.5,
-   "n": 1159,
+   "n": 1161,
    "model": 0.525,
    "won": 0.494
   },
   {
    "bin": 0.55,
-   "n": 1085,
+   "n": 1080,
    "model": 0.574,
-   "won": 0.539
+   "won": 0.537
   },
   {
    "bin": 0.6,
-   "n": 834,
+   "n": 837,
    "model": 0.624,
    "won": 0.601
   },
   {
    "bin": 0.65,
-   "n": 543,
+   "n": 541,
    "model": 0.674,
-   "won": 0.676
+   "won": 0.673
   },
   {
    "bin": 0.7,
-   "n": 321,
+   "n": 323,
    "model": 0.724,
-   "won": 0.664
+   "won": 0.669
   },
   {
    "bin": 0.75,
-   "n": 177,
+   "n": 178,
    "model": 0.772,
-   "won": 0.746
+   "won": 0.747
   },
   {
    "bin": 0.8,
-   "n": 65,
+   "n": 64,
    "model": 0.821,
-   "won": 0.862
+   "won": 0.859
   }
  ],
  "plCheck": {
