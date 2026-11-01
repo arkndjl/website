@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T16:34:41Z",
+ "asof": "2026-11-01T16:40:47Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 111.0,
+  "open": 104.0,
   "path": [
    101.5,
    101.6,
@@ -51,7 +51,7 @@
   ]
  },
  "record": {
-  "n": 131,
+  "n": 134,
   "clvN": 46,
   "clvRet": -0.018,
   "clvT": -2.3,
@@ -130,7 +130,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 3,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -152,27 +152,6 @@
    "sport": "nfl",
    "mk": "ml",
    "n": 2,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "clv": null,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "p": 0,
-   "roi": null,
-   "roiT": null,
-   "profit": 0,
-   "risked": 0,
-   "yield": null
-  },
-  {
-   "id": "nfl-spread",
-   "label": "NFL spread",
-   "sport": "nfl",
-   "mk": "spread",
-   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -214,7 +193,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 4,
+   "n": 5,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -235,7 +214,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 3,
+   "n": 5,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -340,7 +319,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 50,
+   "n": 52,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -587,7 +566,7 @@
    "edge": 4.6,
    "ev": 0.0666,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 3.5
   },
   {
@@ -1334,7 +1313,7 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1454,7 +1433,7 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -2489,6 +2468,69 @@
    "close": -2.5
   },
   {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401924717",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Cornell",
+   "a": "Pepperdine",
+   "mk": "total",
+   "side": "over",
+   "line": 163.5,
+   "price": -108.0,
+   "bet": "over 163.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0004,
+   "event": null,
+   "pass": false,
+   "close": 163.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401925733",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Michigan",
+   "a": "Oakland",
+   "mk": "spread",
+   "side": "home",
+   "line": 26.5,
+   "price": 104.0,
+   "bet": "Michigan -26.5 +104",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 3.0,
+   "edge": 2.7,
+   "ev": 0.0389,
+   "event": null,
+   "pass": false,
+   "close": 26.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909705",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Pittsburgh",
+   "a": "Rider",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -106.0,
+   "bet": "Rider +26.5 -106",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.5,
+   "edge": 4.8,
+   "ev": 0.0037,
+   "event": null,
+   "pass": false,
+   "close": 26.5
+  },
+  {
    "rule": "cbb-spread",
    "sport": "cbb",
    "id": "401909771",
@@ -2506,8 +2548,8 @@
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
-   "pass": false,
-   "close": 13.5
+   "pass": true,
+   "close": 12.5
   },
   {
    "rule": "cbb-ml",
@@ -2548,8 +2590,29 @@
    "edge": 9.3,
    "ev": 0.0191,
    "event": null,
+   "pass": true,
+   "close": 156.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401911333",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Wright State",
+   "a": "Air Force",
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": -108.0,
+   "bet": "Wright State -10.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.25,
+   "edge": 5.8,
+   "ev": 0.0012,
+   "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 10.5
   },
   {
    "rule": "cbb-total",
@@ -2590,8 +2653,50 @@
    "edge": 2.9,
    "ev": 0.0464,
    "event": null,
+   "pass": true,
+   "close": 154.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401920231",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Marist",
+   "a": "Dartmouth",
+   "mk": "total",
+   "side": "over",
+   "line": 142.5,
+   "price": -108.0,
+   "bet": "over 142.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 1.75,
+   "edge": 6.2,
+   "ev": 0.0154,
+   "event": null,
    "pass": false,
-   "close": 153.5
+   "close": 142.5
+  },
+  {
+   "rule": "cbb-ml",
+   "sport": "cbb",
+   "id": "401925818",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Indiana State",
+   "a": "Charlotte",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 141.0,
+   "bet": "Indiana State ML +141",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.75,
+   "edge": 5.8,
+   "ev": 0.0103,
+   "event": null,
+   "pass": false,
+   "close": -3.5
   },
   {
    "rule": "cbb-spread",
@@ -2796,8 +2901,8 @@
    "edge": 3.5,
    "ev": 0.0036,
    "event": null,
-   "pass": false,
-   "close": 49.5
+   "pass": true,
+   "close": 48.5
   },
   {
    "rule": "cfb-total",
@@ -6203,7 +6308,7 @@
    "edge": 4.6,
    "ev": 0.0666,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 3.5
   },
   {
@@ -6950,7 +7055,7 @@
    "edge": 10.6,
    "ev": 0.1968,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -7070,7 +7175,7 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -8105,6 +8210,69 @@
    "close": -2.5
   },
   {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401924717",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Cornell",
+   "a": "Pepperdine",
+   "mk": "total",
+   "side": "over",
+   "line": 163.5,
+   "price": -108.0,
+   "bet": "over 163.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0004,
+   "event": null,
+   "pass": false,
+   "close": 163.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401925733",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Michigan",
+   "a": "Oakland",
+   "mk": "spread",
+   "side": "home",
+   "line": 26.5,
+   "price": 104.0,
+   "bet": "Michigan -26.5 +104",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 3.0,
+   "edge": 2.7,
+   "ev": 0.0389,
+   "event": null,
+   "pass": false,
+   "close": 26.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909705",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Pittsburgh",
+   "a": "Rider",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -106.0,
+   "bet": "Rider +26.5 -106",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.5,
+   "edge": 4.8,
+   "ev": 0.0037,
+   "event": null,
+   "pass": false,
+   "close": 26.5
+  },
+  {
    "rule": "cbb-spread",
    "sport": "cbb",
    "id": "401909771",
@@ -8122,8 +8290,8 @@
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
-   "pass": false,
-   "close": 13.5
+   "pass": true,
+   "close": 12.5
   },
   {
    "rule": "cbb-ml",
@@ -8164,8 +8332,29 @@
    "edge": 9.3,
    "ev": 0.0191,
    "event": null,
+   "pass": true,
+   "close": 156.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401911333",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Wright State",
+   "a": "Air Force",
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": -108.0,
+   "bet": "Wright State -10.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.25,
+   "edge": 5.8,
+   "ev": 0.0012,
+   "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 10.5
   },
   {
    "rule": "cbb-total",
@@ -8206,8 +8395,50 @@
    "edge": 2.9,
    "ev": 0.0464,
    "event": null,
+   "pass": true,
+   "close": 154.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401920231",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Marist",
+   "a": "Dartmouth",
+   "mk": "total",
+   "side": "over",
+   "line": 142.5,
+   "price": -108.0,
+   "bet": "over 142.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 1.75,
+   "edge": 6.2,
+   "ev": 0.0154,
+   "event": null,
    "pass": false,
-   "close": 153.5
+   "close": 142.5
+  },
+  {
+   "rule": "cbb-ml",
+   "sport": "cbb",
+   "id": "401925818",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Indiana State",
+   "a": "Charlotte",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 141.0,
+   "bet": "Indiana State ML +141",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.75,
+   "edge": 5.8,
+   "ev": 0.0103,
+   "event": null,
+   "pass": false,
+   "close": -3.5
   },
   {
    "rule": "cbb-spread",
@@ -8412,8 +8643,8 @@
    "edge": 3.5,
    "ev": 0.0036,
    "event": null,
-   "pass": false,
-   "close": 49.5
+   "pass": true,
+   "close": 48.5
   },
   {
    "rule": "cfb-total",
