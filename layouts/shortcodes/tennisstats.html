@@ -43,15 +43,15 @@
     <td class="cfb__num" data-v="{{ .xhold }}">{{ printf "%.0f" (float .xhold) }}%</td>
     <td class="cfb__num" data-v="{{ .xbrk }}">{{ printf "%.0f" (float .xbrk) }}%</td>
     {{- range $v := slice .spw .rpw .hold .brk }}
-    <td class="cfb__num" data-v="{{ $v | default -1 }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%.1f" (float $v) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne $v nil }}{{ $v }}{{ end }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%.1f" (float $v) }}{{ end }}</td>
     {{- end }}
-    <td class="cfb__num" data-v="{{ .dr | default -1 }}">{{ with .dr }}{{ printf "%.2f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne .dr nil }}{{ .dr }}{{ end }}">{{ with .dr }}{{ printf "%.2f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     {{- range $v := slice .ace .df .fin .fw .sw }}
-    <td class="cfb__num" data-v="{{ $v | default -1 }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%.1f" (float $v) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne $v nil }}{{ $v }}{{ end }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%.1f" (float $v) }}{{ end }}</td>
     {{- end }}
-    <td class="cfb__num" data-v="{{ .bps | default -1 }}">{{ with .bps }}{{ printf "%.0f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpsx }} <span class="cfb__dim">{{ printf "%+.1f" (float .) }}</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .bpc | default -1 }}">{{ with .bpc }}{{ printf "%.0f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpcx }} <span class="cfb__dim">{{ printf "%+.1f" (float .) }}</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .gwp | default -1 }}">{{ with .gwp }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne .bps nil }}{{ .bps }}{{ end }}">{{ with .bps }}{{ printf "%.0f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpsx }} <span class="cfb__dim">{{ printf "%+.1f" (float .) }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne .bpc nil }}{{ .bpc }}{{ end }}">{{ with .bpc }}{{ printf "%.0f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpcx }} <span class="cfb__dim">{{ printf "%+.1f" (float .) }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne .gwp nil }}{{ .gwp }}{{ end }}">{{ with .gwp }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .sm }}</td>
   </tr>
   {{- end }}

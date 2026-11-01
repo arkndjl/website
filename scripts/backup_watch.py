@@ -245,11 +245,11 @@ def nfl():
                          skip=lambda chart, slot: slot in NFL_SKIP or slot not in NFL_SLOT or 'special' in chart.lower(),
                          slot_name=lambda s: NFL_SLOT[s], league='football/nfl')
     tm = lambda a: NFL_TEAM.get(a, a)
-    write_depth('nfl', {'season': W['season'], 'week': W['week'], 'asof': W['last'], 'grade': 'WAR/1k', 'use': 'snaps',
+    write_depth('nfl', {'season': W['season'], 'week': W['week'], 'asof': time.strftime('%Y-%m-%d'), 'through': W['last'], 'grade': 'WAR/1k', 'use': 'snaps',
                         'fmt': 2, 'min': NFL_MIN, 'k': NFL_K},
                 espn_depth_teams(charts, lambda nm, t, slot: grade(nm, t), tm, NFL_LAYOUT, lambda slot: 3,
                                  lambda slot: NFL_GROUP.get(slot, 'ST'), NFL_MIN, lambda t: f'/img/nfl/{t.lower()}.png'))
-    return {'season': W['season'], 'week': W['week'], 'asof': W['last'], 'slots': n, 'k': NFL_K, 'min': NFL_MIN, 'rows': rows}
+    return {'season': W['season'], 'week': W['week'], 'asof': time.strftime('%Y-%m-%d'), 'through': W['last'], 'slots': n, 'k': NFL_K, 'min': NFL_MIN, 'rows': rows}
 
 
 def nba():

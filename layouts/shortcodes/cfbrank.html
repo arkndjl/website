@@ -83,9 +83,9 @@
       <td class="cfb__num" data-v="{{ $v }}"><span class="{{ if ge $v 0.5 }}cfb__up{{ else if le $v -0.5 }}cfb__down{{ else }}cfb__dim{{ end }}">{{ if gt $v 0.0 }}+{{ end }}{{ printf "%.1f" $v }}</span></td>
       {{- end }}
       {{- if $R.injUsed }}<td class="cfb__num cfb__dim" data-v="{{ .full }}">{{ if gt .full 0.0 }}+{{ end }}{{ printf "%.1f" (.full | default .score) }}</td>{{ end }}
-      <td class="cfb__num" data-v="{{ .ap | default 99 }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-      <td class="cfb__num" data-v="{{ .coaches | default 99 }}">{{ with .coaches }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-      {{- if $R.polls.cfp }}<td class="cfb__num" data-v="{{ .cfp | default 99 }}">{{ with .cfp }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+      <td class="cfb__num" data-v="{{ with .ap }}{{ . }}{{ end }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      <td class="cfb__num" data-v="{{ with .coaches }}{{ . }}{{ end }}">{{ with .coaches }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      {{- if $R.polls.cfp }}<td class="cfb__num" data-v="{{ with .cfp }}{{ . }}{{ end }}">{{ with .cfp }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
     </tr>
     {{- end }}
     </tbody>

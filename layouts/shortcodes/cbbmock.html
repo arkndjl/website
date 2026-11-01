@@ -37,9 +37,9 @@
     <td>{{ .cls | default "–" }}</td>
     <td class="cfb__num" data-v="{{ .declare | default 1 }}">{{ printf "%.0f" (mul (.declare | default 1) 100) }}%</td>
     <td class="cfb__num" data-v="{{ .age | default 0 }}">{{ with .age }}{{ if $p.ageEst }}<span class="cfb__dim">~{{ printf "%.1f" . }}</span>{{ else }}{{ printf "%.1f" . }}{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .cons | default 999 }}">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .cons }}{{ . }}{{ end }}">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     {{- with .sim }}<td class="cfb__num" data-v="{{ .top5 }}">{{ if lt .top5 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (mul .top5 100) }}%{{ end }}</td><td class="cfb__num" data-v="{{ .lo }}">{{ .lo }}-{{ with .hi }}{{ . }}{{ else }}60+{{ end }}</td>{{ end }}
-    {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ (index $sl .) | default 999 }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
+    {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ with (index $sl .) }}{{ . }}{{ end }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
   </tr>
   {{- end }}
   </tbody>

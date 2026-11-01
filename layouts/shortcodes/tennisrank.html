@@ -40,7 +40,7 @@
     <td class="cfb__num" data-v="{{ .peak | default 0 }}">{{ with .peak }}{{ . }}{{ with $r.peakd }} <span class="cfb__dim">’{{ printf "%02d" (mod (div (int .) 10000) 100) }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .spwp }}">{{ printf "%+.1f" (float .spwp) }}</td>
     <td class="cfb__num" data-v="{{ .rpwp }}">{{ printf "%+.1f" (float .rpwp) }}</td>
-    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ with .rank }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .pts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ with .rank }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .pts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .w }}">{{ .w }}-{{ .l }} <span class="cfb__dim">({{ .tw }}-{{ .tl }})</span></td>
     <td class="cfb__num" data-v="{{ .age | default 0 }}">{{ with .age }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ cond (eq .hand "L") "left" (cond (eq .hand "R") "right" "—") }}</td>

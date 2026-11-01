@@ -27,7 +27,7 @@
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
     <td class="cfb__num" data-v="{{ .elo }}">{{ .elo }}</td>
     <td class="cfb__num" data-v="{{ .d30 | default 0 }}">{{ with .d30 }}{{ printf "%+d" (int .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .vrk | default 9999 }}">{{ with .vrk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .vpts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .vrk }}{{ . }}{{ end }}">{{ with .vrk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .vpts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .w90 }}">{{ .w90 }}-{{ .l90 }}</td>
     <td class="cs__form">{{ range split .form "" }}<i class="cs__f cs__f--{{ lower . }}">{{ . }}</i>{{ end }}</td>
     <td data-filter="{{ .rg | default "—" }}">{{ .rg | default "—" }}</td>
