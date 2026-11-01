@@ -58,7 +58,10 @@ jobs:
       # ESPN lines and stats-API logs already pulled (final games never change)
       - uses: actions/cache@v4
         with:
-          path: scripts/.cache/nhl/espn
+          # all_teams.csv too: a MoneyPuck download that fails with no cached copy crashed the build (Nov 1 00:05Z)
+          path: |
+            scripts/.cache/nhl/espn
+            scripts/.cache/nhl/all_teams.csv
           key: nhl-espn-${{ github.run_id }}
           restore-keys: nhl-espn-
       - name: Player WAR this season (MoneyPuck) and backup watch (ESPN depth charts)

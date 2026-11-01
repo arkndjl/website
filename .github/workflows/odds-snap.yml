@@ -31,7 +31,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # ref main: a workflow_run event pins GITHUB_SHA to main as it was when the build finished, so a snap that
+      # queued behind another one started on a stale commit and its jsonl appends conflicted on the push (27 lost
+      # snapshots Oct 29-Nov 1)
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Snapshot the lines
         run: python3 scripts/odds_snap.py
       # NBA and NFL player props (Novig, DraftKings through ESPN), NFL first-half lines and team totals, and the paper
