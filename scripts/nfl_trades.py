@@ -30,9 +30,10 @@ ON = ('ACT', 'INA', 'RES')          # on a club's roster that week (reserve list
 # floored or not) the best cell is arrivals only, direct, hl 4, c .25: -.0008 (t -1.1) / .0000 (t 0.0); the injury
 # weight on both sides (c 1, hl 2, direct) -.0010 (t -0.3) / +.0021 (t +0.5). Result minus the close on the term is
 # noise (t -1.4 to +0.5, signs flip by period): the close prices these moves at about their value. A typical move is
-# 0.3-0.9 points (McCaffrey 2022 1.0, Simmons 2026 0.9), so 11 seasons can't tell it from zero. The margin leaves it
-# out (c 0); the game cards list the week's moves for reading.
-TRADES = {'c': 0.0, 'hl': 2.0}
+# 0.3-0.9 points (McCaffrey 2022 1.0, Simmons 2026 0.9), so 11 seasons can't tell it from zero.
+# Noah chose (Nov 1 2026) to put it in the line anyway: direct moves, both sides, at the injury term's fitted weight
+# (nfl_games_fit.json coef inj), fading with a half-life of 2 club games, outside the fit (as the roster prior).
+TRADES = {'on': True, 'hl': 2.0, 'direct': True}
 
 
 def _snaps(y, tw=None):
@@ -188,15 +189,17 @@ def points(ms, hl, kind='both', floor=False, direct=False, share=0.0):
     return v * N.PTS_PER_WIN
 
 
-def card(ms, names, top=4):
-    """the moves a game card lists: direct moves since the club's last two games, in points a game (WAR x 36)"""
+def card(ms, names, top=4, c=1.0):
+    """the moves a game card lists: direct moves since the club's last two games, in model points (WAR a game x 36
+    x the weight c x the fade)"""
     out = []
     for k, x, n, d, sh, p, other in ms:
         if not d or n >= 2:
             continue
         nm, ps = names.get(p, (p, ''))
+        f = 0.5 ** (n / TRADES['hl'])
         out.append({'name': nm, 'pos': ps, 'dir': 'in' if k == 'arr' else 'out', 'team': other,
-                    'pts': round(x * N.PTS_PER_WIN * (1 if k == 'arr' else -1), 1)})
+                    'pts': round(x * N.PTS_PER_WIN * c * f * (1 if k == 'arr' else -1), 1)})
     out.sort(key=lambda r: -abs(r['pts']))
     return [r for r in out if abs(r['pts']) >= 0.1][:top]
 
