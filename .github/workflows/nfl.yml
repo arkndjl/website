@@ -15,10 +15,15 @@ on:
     - cron: "27 11 * 9-12,1,2 0,1,2,3,5,6"
     # a backup for the week's rollover (the board turns to the next week once Monday night's game is final)
     - cron: "57 15 * 9-12,1,2 2"
-    # availability refreshes: after each day's practice reports, a late backup, and Sunday's inactives for the late games
+    # availability refreshes: after each day's practice reports, a late backup, and gameday inactives (posted 90
+    # minutes before kickoff: ~16:30 UTC for 1 PM ET games, ~19:35/19:55 for 4:05/4:25, ~23:50 for SNF, ~23:45 Monday
+    # for MNF; UTC times shift an hour earlier under daylight time, so each run lands after both)
     - cron: "47 22 * 9-12,1,2 *"
     - cron: "17 3 * 9-12,1,2 *"
     - cron: "7 19 * 9-12,1,2 0"
+    - cron: "41 16 * 9-12,1,2 0"
+    - cron: "3 20 * 9-12,1,2 0"
+    - cron: "57 23 * 9-12,1,2 0,1"
   workflow_dispatch:
     inputs:
       refresh:
@@ -69,7 +74,7 @@ jobs:
               refresh = age('data/nfl_war.json') < dt.timedelta(hours=20)
           else:
               go = True
-              refresh = sched in ('47 22 * 9-12,1,2 *', '17 3 * 9-12,1,2 *', '7 19 * 9-12,1,2 0') or os.environ['MANUAL_REFRESH'] == 'true'
+              refresh = sched in ('47 22 * 9-12,1,2 *', '17 3 * 9-12,1,2 *', '7 19 * 9-12,1,2 0', '41 16 * 9-12,1,2 0', '3 20 * 9-12,1,2 0', '57 23 * 9-12,1,2 0,1') or os.environ['MANUAL_REFRESH'] == 'true'
           print('go=' + str(go).lower())
           print('refresh=' + str(refresh).lower())
           PY
