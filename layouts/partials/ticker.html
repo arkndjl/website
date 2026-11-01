@@ -79,8 +79,12 @@
     var gs = t.querySelectorAll('a.tick__g'); if (!gs.length) return;
     var shown = null;
     gs.forEach(function (a) { a.hidden = true; if (!shown && !done(a)) shown = a; });
-    if (shown) { shown.hidden = false; mark(shown); } else t.hidden = true;
+    if (shown) { shown.hidden = false; mark(shown); t.dataset.at = shown.dataset.at; } else t.hidden = true;
   });
+  // soonest game first (Noah, Nov 1); teams with nothing scheduled go last
+  var teams = [].slice.call(box.querySelectorAll('.tick__team')), anchor = box.querySelector('.tick__tag--nt');
+  teams.sort(function (a, b) { return (Date.parse(a.dataset.at) || 9e15) - (Date.parse(b.dataset.at) || 9e15); });
+  teams.forEach(function (t) { t.parentNode.insertBefore(t, anchor); });
   box.querySelectorAll('a.tick__g--nt').forEach(function (a) { if (done(a)) a.hidden = true; else mark(a); });
   // a slow 1px crawl when the strip is wider than the screen; touch, hover or focus pauses it
   var track = box.querySelector('.tick__track'), run = box.querySelector('.tick__run');
