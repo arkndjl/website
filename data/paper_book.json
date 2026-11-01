@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T05:42:58Z",
+ "asof": "2026-11-01T09:47:20Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 104.83,
   "peak": 111.35,
   "drawdown": 0.0585,
-  "open": 78.5,
+  "open": 78.25,
   "path": [
    101.5,
    101.6,
@@ -50,7 +50,7 @@
   ]
  },
  "record": {
-  "n": 112,
+  "n": 113,
   "clvN": 44,
   "clvRet": -0.0185,
   "clvT": -2.26,
@@ -209,27 +209,6 @@
    "yield": null
   },
   {
-   "id": "cbb-total",
-   "label": "CBB total",
-   "sport": "cbb",
-   "mk": "total",
-   "n": 1,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "clv": null,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "p": 0,
-   "roi": null,
-   "roiT": null,
-   "profit": 0,
-   "risked": 0,
-   "yield": null
-  },
-  {
    "id": "nba-ml",
    "label": "NBA moneyline",
    "sport": "nba",
@@ -276,7 +255,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 32,
+   "n": 33,
    "clvN": 23,
    "clvRet": -0.0131,
    "clvT": -1.73,
@@ -297,7 +276,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 52,
+   "n": 53,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -459,6 +438,26 @@
    "clv": 1.2,
    "beat": 1,
    "close": 0.615
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "185781",
+   "k": "2026-11-01T14:00:00Z",
+   "slate": "tennis:2026-11-01",
+   "h": "Tubello",
+   "a": "Grabher",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 120,
+   "bet": "Tubello ML +120",
+   "placed": "2026-11-01T09:47:20Z",
+   "stake": 0.75,
+   "edge": 13.2,
+   "ev": 0.0102,
+   "event": "Curitiba Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -926,7 +925,7 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1608,7 +1607,7 @@
    "edge": 15.6,
    "ev": 0.2543,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1648,7 +1647,7 @@
    "edge": 21.1,
    "ev": 0.0681,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -2152,7 +2151,7 @@
    "edge": 3.3,
    "ev": 0.0048,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 161.5
   },
   {
@@ -5441,6 +5440,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "185781",
+   "k": "2026-11-01T14:00:00Z",
+   "slate": "tennis:2026-11-01",
+   "h": "Tubello",
+   "a": "Grabher",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 120,
+   "bet": "Tubello ML +120",
+   "placed": "2026-11-01T09:47:20Z",
+   "stake": 0.75,
+   "edge": 13.2,
+   "ev": 0.0102,
+   "event": "Curitiba Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "185159",
    "k": "2026-11-01T14:30:00Z",
    "slate": "tennis:2026-11-01",
@@ -5904,7 +5923,7 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -6586,7 +6605,7 @@
    "edge": 15.6,
    "ev": 0.2543,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -6626,7 +6645,7 @@
    "edge": 21.1,
    "ev": 0.0681,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -7130,7 +7149,7 @@
    "edge": 3.3,
    "ev": 0.0048,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 161.5
   },
   {

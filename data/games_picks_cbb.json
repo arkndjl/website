@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-01T06:29:26Z",
+ "asof": "2026-11-01T09:47:18Z",
  "recenter": {
   "2026-11-01": -10.6,
   "2026-11-02": -11.44
@@ -189,14 +189,8 @@
    "flagged": "2026-11-01T05:42:55Z",
    "betTo": 162.5,
    "close": 161.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 161.5,
-    "price": -105.0,
-    "ev": 0.036,
-    "units": 0.5
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "401920912",
@@ -349,20 +343,20 @@
    "tm": 152.2
   },
   {
-   "id": "401920912",
+   "id": "401911707",
    "sport": "cbb",
-   "kick": "2026-11-02T08:00:00Z",
-   "home": "Northern Illinois",
-   "away": "Grambling",
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
+   "kick": "2026-11-02T16:30:00Z",
+   "home": "Tennessee State",
+   "away": "Murray State",
+   "mk": "total",
+   "side": "over",
+   "line": 161.5,
    "price": -110.0,
-   "edge": 4.3,
-   "x": 2.5,
+   "edge": 3.3,
+   "x": 2.0,
    "why": "no edge at -110",
-   "m": 1.2,
-   "tm": 144.9
+   "m": -8.5,
+   "tm": 164.8
   },
   {
    "id": "401921422",
@@ -518,24 +512,12 @@
    "mk": "total",
    "side": "over",
    "line": 161.5,
-   "price": -105.0,
-   "ev": 0.036,
-   "edge": 3.3,
-   "units": 0.5,
-   "home": "Tennessee State",
-   "away": "Murray State",
-   "state": "pick"
-  },
-  "401920912": {
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
    "price": -110.0,
-   "edge": 4.3,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
-   "home": "Northern Illinois",
-   "away": "Grambling",
+   "home": "Tennessee State",
+   "away": "Murray State",
    "state": "under"
   },
   "401921423": {
@@ -591,16 +573,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 59,
+  "snapshots": 63,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 18,
-    "clvRet": -0.0389,
-    "clvT": -5.37,
-    "clv": 0.17,
-    "beat": 0.167,
-    "still": 0.833
+    "clvN": 20,
+    "clvRet": -0.0396,
+    "clvT": -6.07,
+    "clv": 0.15,
+    "beat": 0.15,
+    "still": 0.85
    },
    {
     "when": "6-24h",
@@ -755,7 +737,8 @@
    "tmRaw": 153.4,
    "flagged": "2026-11-01T05:42:55Z",
    "betTo": 162.5,
-   "close": 161.5
+   "close": 161.5,
+   "pass": true
   }
  ]
 }
