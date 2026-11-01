@@ -1,6 +1,9 @@
 (function () {
   if (window.__arkCfb) return; window.__arkCfb = true;
   var PER = 50, DATA = null;
+  // the cfb-detail.json state (detail(), below), declared up here: Hugo's minifier folded a later declaration into
+  // load()'s callback as a local, so the dk never reached detail()
+  var DETAIL_URL = null, DK = null, DETAIL = null, DETAIL_ON = false;
   // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
   var PARTS = [['talent', 'On3 order at the position (unranked: production + recruiting)'], ['production', 'Stat+ (PFN position score), 3 seasons, regressed; weight by position = fit to NFL careers'],
                ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus scaled by position rarity of young contributors'], ['breakout', 'class year of first top-15% production season'],
@@ -420,7 +423,6 @@
   // the scouting-report columns (report, parts, fvd, mk) live in cfb-detail.json (scripts/cfb_all.mjs), fetched the
   // first time a dropdown or card is wanted and merged onto the records by row; dk ties it to the cfb-all.json loaded
   // (a mismatched pair, mid-deploy, leaves the reports off rather than putting one player's on another)
-  var DETAIL_URL = null, DK = null, DETAIL = null, DETAIL_ON = false;
   function detail() {
     if (!DATA) return Promise.resolve(null);
     return DETAIL || (DETAIL = DATA.then(function (recs) {
