@@ -214,7 +214,11 @@ def load_wf(sport):
 # Held out it is as good or better at the close (NBA 7+: +14.8% on 78 vs +13.0% on 92; CFB 7+: +3.3% on 29 vs +2.2% on
 # 39) and the sides even out (NBA test 53 overs / 25 unders vs 71 / 21; CFB 17 / 12 vs 36 / 3), with no slate-wide
 # correlated bet. Display totals stay the model's own; picks use the recentred ones. CFB and NBA (the totals markets).
-RC_SPORTS, RC_N = ('cfb', 'nba'), 100
+# CBB added Nov 1 2026: its first picks of 2026-27 were 7 of 9 unders, the model 11.5 under every opening-day line. The
+# walk-forward opener ran under in every season (-9.6 on 2025-26's, 100 of 100 games) while openers went over the line
+# (+4.9); held-out opening-day unders at 2+ were 96-144 and lost to the close. Recentred, CBB totals X 2 held out
+# (2024-26): clvRet +4.41% -> +4.93% (t 34.2 -> 37.4), ROI +5.2% -> +6.4%, every season better; book growth 58.8 -> 72.4.
+RC_SPORTS, RC_N = ('cfb', 'nba', 'cbb'), 100
 
 
 def recenter_wf(sport, rows):
@@ -1074,6 +1078,13 @@ def live(sport):
                 and 'tmRaw' not in e and e.get('line') is not None):
             e['edge'] = round((g['tm'] - e['line']) * (1 if e['side'] == 'over' else -1), 1)
             e['tmRaw'], e['tm'] = round(g['tmRaw'], 1), round(g['tm'], 1)
+            # the gap it is sized on follows the new edge (Nov 1 2026: CBB opener picks flagged at 10-14 kept the cap's
+            # 10.4 after recentring to 2-3 and were staked as if still at the cap)
+            tc = R['_cap'].get('total')
+            if tc is not None and e['edge'] > tc:
+                e['sz'] = round(tc, 1)
+            else:
+                e.pop('sz', None)
     gone = [e for e in log if e.get('res') is None and iso(e['kick']) > now and not ruled(e)]
     # withdrawn picks stay listed (out of the record) until their game is over, so a bet already placed on one is not
     # left without a trace on the board
@@ -1149,6 +1160,7 @@ def live(sport):
         if c is not None:
             e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, szd(e)))
             e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], szd(e))
+            e['p'], e['ev'] = round(c[0], 3), round(c[0] * (dec(e['price']) - 1) - c[2], 3)
             # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
             # against the bet): past it, the line has moved through the edge
             mm = g.get('tm') if e['mk'] == 'total' else g.get('m')
