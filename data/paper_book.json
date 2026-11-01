@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T22:46:12Z",
+ "asof": "2026-11-01T23:26:29Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 111.89,
   "peak": 114.8,
   "drawdown": 0.0254,
-  "open": 131.75,
+  "open": 135.5,
   "path": [
    101.5,
    101.6,
@@ -100,7 +100,7 @@
   ]
  },
  "record": {
-  "n": 190,
+  "n": 192,
   "clvN": 104,
   "clvRet": -0.023,
   "clvT": -2.86,
@@ -200,7 +200,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 11,
+   "n": 10,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -305,7 +305,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 28,
+   "n": 30,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -368,7 +368,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 41,
+   "n": 42,
    "clvN": 23,
    "clvRet": -0.0083,
    "clvT": -1.34,
@@ -1270,6 +1270,26 @@
    "close": 1.5
   },
   {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186460",
+   "k": "2026-11-02T14:30:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Jacquet",
+   "a": "Machac",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 141,
+   "bet": "Jacquet ML +141",
+   "placed": "2026-11-01T23:26:28Z",
+   "stake": 0.25,
+   "edge": 7.4,
+   "ev": 0.0044,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401911707",
@@ -1412,7 +1432,7 @@
    "ev": 0.0334,
    "event": null,
    "pass": false,
-   "close": -2.5
+   "close": -3.5
   },
   {
    "rule": "cbb-total",
@@ -1601,7 +1621,7 @@
    "ev": 0.0106,
    "event": null,
    "pass": false,
-   "close": 143.5
+   "close": 142.5
   },
   {
    "rule": "cbb-total",
@@ -1665,6 +1685,27 @@
    "event": null,
    "pass": false,
    "close": 10.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401911261",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "St. Bonaventure",
+   "a": "Youngstown State",
+   "mk": "total",
+   "side": "under",
+   "line": 153.5,
+   "price": -104.0,
+   "bet": "under 153.5 -104",
+   "placed": "2026-11-01T23:26:23Z",
+   "stake": 0.25,
+   "edge": 2.4,
+   "ev": 0.0019,
+   "event": null,
+   "pass": false,
+   "close": 153.5
   },
   {
    "rule": "cbb-spread",
@@ -1769,7 +1810,7 @@
    "ev": 0.0154,
    "event": null,
    "pass": false,
-   "close": 140.5
+   "close": 139.5
   },
   {
    "rule": "cbb-spread",
@@ -2125,6 +2166,27 @@
    "ev": 0.2384,
    "event": null,
    "pass": false
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401917913",
+   "k": "2026-11-03T01:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Central Arkansas",
+   "a": "Oral Roberts",
+   "mk": "total",
+   "side": "under",
+   "line": 154.5,
+   "price": 102.0,
+   "bet": "under 154.5 +102",
+   "placed": "2026-11-01T23:26:23Z",
+   "stake": 3.0,
+   "edge": 2.4,
+   "ev": 0.0317,
+   "event": null,
+   "pass": false,
+   "close": 154.5
   },
   {
    "rule": "cbb-total",
@@ -2725,7 +2787,7 @@
    "edge": 7.0,
    "ev": 0.0269,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 38.5
   },
   {
@@ -2747,7 +2809,7 @@
    "ev": 0.0047,
    "event": null,
    "pass": false,
-   "close": 44.5
+   "close": 43.5
   },
   {
    "rule": "cfb-total",
@@ -2893,7 +2955,7 @@
    "edge": 6.2,
    "ev": 0.0046,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 48.5
   },
   {
@@ -2956,8 +3018,8 @@
    "edge": 3.2,
    "ev": 0.012,
    "event": null,
-   "pass": false,
-   "close": 51.5
+   "pass": true,
+   "close": 52.5
   },
   {
    "rule": "cfb-total",
@@ -2977,8 +3039,8 @@
    "edge": 3.6,
    "ev": 0.0136,
    "event": null,
-   "pass": false,
-   "close": 49.5
+   "pass": true,
+   "close": 51.5
   },
   {
    "rule": "cfb-total",
@@ -3019,8 +3081,8 @@
    "edge": 2.3,
    "ev": 0.0185,
    "event": null,
-   "pass": false,
-   "close": 57.5
+   "pass": true,
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -3041,7 +3103,7 @@
    "ev": 0.0,
    "event": null,
    "pass": true,
-   "close": 69.5
+   "close": 68.5
   },
   {
    "rule": "cfb-total",
@@ -3125,7 +3187,7 @@
    "ev": 0.0209,
    "event": null,
    "pass": true,
-   "close": 49.5
+   "close": 48.5
   }
  ],
  "recent": [
@@ -8706,6 +8768,26 @@
    "close": 1.5
   },
   {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186460",
+   "k": "2026-11-02T14:30:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Jacquet",
+   "a": "Machac",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 141,
+   "bet": "Jacquet ML +141",
+   "placed": "2026-11-01T23:26:28Z",
+   "stake": 0.25,
+   "edge": 7.4,
+   "ev": 0.0044,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401911707",
@@ -8848,7 +8930,7 @@
    "ev": 0.0334,
    "event": null,
    "pass": false,
-   "close": -2.5
+   "close": -3.5
   },
   {
    "rule": "cbb-total",
@@ -9037,7 +9119,7 @@
    "ev": 0.0106,
    "event": null,
    "pass": false,
-   "close": 143.5
+   "close": 142.5
   },
   {
    "rule": "cbb-total",
@@ -9101,6 +9183,27 @@
    "event": null,
    "pass": false,
    "close": 10.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401911261",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "St. Bonaventure",
+   "a": "Youngstown State",
+   "mk": "total",
+   "side": "under",
+   "line": 153.5,
+   "price": -104.0,
+   "bet": "under 153.5 -104",
+   "placed": "2026-11-01T23:26:23Z",
+   "stake": 0.25,
+   "edge": 2.4,
+   "ev": 0.0019,
+   "event": null,
+   "pass": false,
+   "close": 153.5
   },
   {
    "rule": "cbb-spread",
@@ -9205,7 +9308,7 @@
    "ev": 0.0154,
    "event": null,
    "pass": false,
-   "close": 140.5
+   "close": 139.5
   },
   {
    "rule": "cbb-spread",
@@ -9561,6 +9664,27 @@
    "ev": 0.2384,
    "event": null,
    "pass": false
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401917913",
+   "k": "2026-11-03T01:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Central Arkansas",
+   "a": "Oral Roberts",
+   "mk": "total",
+   "side": "under",
+   "line": 154.5,
+   "price": 102.0,
+   "bet": "under 154.5 +102",
+   "placed": "2026-11-01T23:26:23Z",
+   "stake": 3.0,
+   "edge": 2.4,
+   "ev": 0.0317,
+   "event": null,
+   "pass": false,
+   "close": 154.5
   },
   {
    "rule": "cbb-total",
@@ -10161,7 +10285,7 @@
    "edge": 7.0,
    "ev": 0.0269,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 38.5
   },
   {
@@ -10183,7 +10307,7 @@
    "ev": 0.0047,
    "event": null,
    "pass": false,
-   "close": 44.5
+   "close": 43.5
   },
   {
    "rule": "cfb-total",
@@ -10329,7 +10453,7 @@
    "edge": 6.2,
    "ev": 0.0046,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 48.5
   },
   {
@@ -10392,8 +10516,8 @@
    "edge": 3.2,
    "ev": 0.012,
    "event": null,
-   "pass": false,
-   "close": 51.5
+   "pass": true,
+   "close": 52.5
   },
   {
    "rule": "cfb-total",
@@ -10413,8 +10537,8 @@
    "edge": 3.6,
    "ev": 0.0136,
    "event": null,
-   "pass": false,
-   "close": 49.5
+   "pass": true,
+   "close": 51.5
   },
   {
    "rule": "cfb-total",
@@ -10455,8 +10579,8 @@
    "edge": 2.3,
    "ev": 0.0185,
    "event": null,
-   "pass": false,
-   "close": 57.5
+   "pass": true,
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -10477,7 +10601,7 @@
    "ev": 0.0,
    "event": null,
    "pass": true,
-   "close": 69.5
+   "close": 68.5
   },
   {
    "rule": "cfb-total",
@@ -10561,7 +10685,7 @@
    "ev": 0.0209,
    "event": null,
    "pass": true,
-   "close": 49.5
+   "close": 48.5
   }
  ]
 }
