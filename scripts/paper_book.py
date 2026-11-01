@@ -45,8 +45,9 @@ def iso(t):
 
 
 def slate(sport, kick):
-    """one sport's US day (kick moved to US Eastern, about UTC-5)"""
-    return f"{sport}:{(iso(kick) - datetime.timedelta(hours=5)).date().isoformat()}"
+    """one sport's US day (kick in US Eastern time)"""
+    from zoneinfo import ZoneInfo
+    return f"{sport}:{iso(kick).astimezone(ZoneInfo('America/New_York')).date().isoformat()}"
 
 
 def mean_t(xs):
@@ -87,6 +88,8 @@ def bet_of(sport, e):
     if e.get('res') in ('w', 'l', 'p'):
         flat = 0.0 if e['res'] == 'p' else (round(C.dec(e['price']) - 1, 4) if e['res'] == 'w' else -1.0)
         b.update({'res': e['res'], 'ret': flat, 'profit': round(units * flat, 4)})
+    elif e.get('res') == 'void' or e.get('void'):
+        b.update({'res': 'void', 'pass': True})        # no match / didn't play: settled, never a bet
     return b
 
 
@@ -211,6 +214,7 @@ def test():
          'price': -110, 'units': 2.0, 'flagged': '2026-10-28T12:00:00Z', 'res': 'w', 'clvRet': .02}
     b = bet_of('nba', e)
     assert b['res'] == 'w' and abs(b['profit'] - 2 * 100 / 110) < 1e-3 and b['stake'] == 2.0
+    assert bet_of('tennis', {**e, 'res': 'void'})['pass'] and bet_of('nflprops', {**e, 'res': None, 'pass': True, 'void': True})['res'] == 'void'
     assert bet_of('nba', {**e, 'res': 'p'})['profit'] == 0 and bet_of('nba', {**e, 'res': None}).get('res') is None
     c = icc([{'slate': s, 'clvRet': v} for s, v in (('a', .1), ('a', .1), ('b', -.1), ('b', -.1), ('c', 0), ('c', 0.01))])
     assert c['rho'] > 0.8 and c['nEff'] < 4, c

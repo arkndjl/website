@@ -525,6 +525,8 @@ def grade(led):
         if p.get('res') in ('w', 'l', 'p'):
             b['res'] = p['res']
             b['pnl'] = round({'w': f['qty'] / 100 - f['cost'], 'l': -f['cost'], 'p': 0.0}[p['res']] - f.get('fee', 0), 2)
+        elif p.get('res') == 'void':                # walkover / didn't play: the stake comes back
+            b['res'], b['pnl'] = 'void', round(-f.get('fee', 0), 2)
 
 
 def summary(led, cash=None, basis=None):
@@ -560,7 +562,7 @@ def stats(bs):
     cf = [b['clvFill'] for b in filled if b.get('clvFill') is not None]
     cp = [b['clvPick'] for b in filled if b.get('clvFill') is not None and b.get('clvPick') is not None]
     done = [b for b in filled if b.get('res')]
-    risk = sum(b['fill']['cost'] for b in done)
+    risk = sum(b['fill']['cost'] for b in done if b['res'] != 'void')
     pnl = sum(b['pnl'] for b in done)
     out = {'picks': len(bs), 'sent': len(sent), 'filled': len(filled), 'fillRate': round(got / want, 3) if want else None,
            'noMarket': sum(1 for b in bs if b.get('status') == 'nomarket'),
