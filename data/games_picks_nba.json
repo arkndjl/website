@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-01T18:23:58Z",
+ "asof": "2026-11-01T18:58:11Z",
  "recenter": {
-  "2026-11-01": 0.27
+  "2026-11-01": 0.28
  },
  "monitor": {
   "clocks": {
@@ -73,7 +73,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0311,
+     "n": 0,
+     "sd": 0.1415,
+     "rho": 0.016,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 122
+    }
    },
    "spread | line: 4-9": {
     "n": 0,
@@ -86,7 +101,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0321,
+     "n": 0,
+     "sd": 0.1378,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 108
+    }
    },
    "spread | line: <4": {
     "n": 0,
@@ -99,7 +129,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0315,
+     "n": 0,
+     "sd": 0.1557,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 144
+    }
    },
    "spread | role: dog": {
     "n": 0,
@@ -112,7 +157,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0251,
+     "n": 0,
+     "sd": 0.1516,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 214
+    }
    },
    "spread | season: late": {
     "n": 0,
@@ -125,7 +185,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.029,
+     "n": 0,
+     "sd": 0.1481,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 154
+    }
    },
    "spread | venue: away": {
     "n": 0,
@@ -138,7 +213,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0374,
+     "n": 0,
+     "sd": 0.1561,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 103
+    }
    },
    "spread | venue: home": {
     "n": 0,
@@ -151,7 +241,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0257,
+     "n": 0,
+     "sd": 0.1369,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 167
+    }
    }
   }
  },
@@ -179,7 +284,7 @@
    "tmRaw": 223.6,
    "flagged": "2026-11-01T10:26:22Z",
    "betTo": 220.0,
-   "close": 221.5,
+   "close": 220.5,
    "pass": true,
    "now": null
   },
@@ -222,12 +327,28 @@
    "mk": "total",
    "side": "over",
    "line": 229.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 2.8,
    "x": 3.0,
    "why": "edge under 3",
    "m": 3.3,
    "tm": 232.3
+  },
+  {
+   "id": "401909905",
+   "sport": "nba",
+   "kick": "2026-11-02T01:30:00Z",
+   "home": "GS",
+   "away": "LAC",
+   "mk": "total",
+   "side": "over",
+   "line": 220.5,
+   "price": -106.0,
+   "edge": 2.8,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 0.5,
+   "tm": 223.3
   },
   {
    "id": "401909903",
@@ -238,28 +359,12 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -100.0,
+   "price": 104.0,
    "edge": 2.3,
    "x": 4.0,
    "why": "edge under 4 (line: 4-9)",
    "m": -5.2,
    "tm": 224.1
-  },
-  {
-   "id": "401909905",
-   "sport": "nba",
-   "kick": "2026-11-02T01:30:00Z",
-   "home": "GS",
-   "away": "LAC",
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": -111.0,
-   "edge": 2.0,
-   "x": 4.0,
-   "why": "edge under 4 (line: <4)",
-   "m": 0.5,
-   "tm": 223.3
   },
   {
    "id": "401909906",
@@ -283,7 +388,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -100.0,
+   "price": 104.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -295,7 +400,7 @@
    "mk": "total",
    "side": "over",
    "line": 229.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -304,11 +409,11 @@
    "state": "under"
   },
   "401909905": {
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": -111.0,
-   "edge": 2.0,
+   "mk": "total",
+   "side": "over",
+   "line": 220.5,
+   "price": -106.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "GS",
@@ -380,7 +485,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1134,
+  "snapshots": 1138,
   "buckets": [
    {
     "when": "24h+",
@@ -393,21 +498,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 279,
-    "clvRet": -0.0013,
-    "clvT": -0.25,
+    "clvN": 280,
+    "clvRet": -0.0015,
+    "clvT": -0.29,
     "clv": 0.73,
-    "beat": 0.466,
-    "still": 0.437
+    "beat": 0.464,
+    "still": 0.439
    },
    {
     "when": "1-6h",
-    "clvN": 71,
+    "clvN": 72,
     "clvRet": -0.0469,
-    "clvT": -9.94,
+    "clvT": -10.08,
     "clv": 0.01,
-    "beat": 0.141,
-    "still": 0.746
+    "beat": 0.139,
+    "still": 0.75
    },
    {
     "when": "<1h",
@@ -3071,7 +3176,7 @@
    "tmRaw": 223.6,
    "flagged": "2026-11-01T10:26:22Z",
    "betTo": 220.0,
-   "close": 221.5,
+   "close": 220.5,
    "pass": true
   },
   {

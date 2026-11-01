@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T18:23:54Z",
+ "asof": "2026-11-01T18:58:05Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -27,7 +27,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0478,
+     "n": 0,
+     "sd": 0.1257,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 41
+    }
    },
    "total": {
     "n": 0,
@@ -40,7 +55,22 @@
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
-    "why": ""
+    "why": "",
+    "drift": {
+     "mu1": 0.0167,
+     "n": 0,
+     "sd": 0.1256,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 333
+    }
    }
   }
  },
@@ -210,8 +240,8 @@
     "mk": "total",
     "side": "over",
     "line": 40.5,
-    "price": -108.0,
-    "ev": 0.086,
+    "price": -106.0,
+    "ev": 0.095,
     "units": 3.0
    }
   },
@@ -458,8 +488,8 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -108.0,
-   "ev": 0.086,
+   "price": -106.0,
+   "ev": 0.095,
    "edge": 4.4,
    "units": 3.0,
    "home": "MIA",
@@ -531,7 +561,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1130,
+  "snapshots": 1133,
   "buckets": [
    {
     "when": "24h+",
