@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-01T17:14:23Z",
+ "asof": "2026-11-01T17:17:21Z",
  "recenter": {
-  "2026-11-01": 0.27
+  "2026-11-01": 0.26
  },
  "monitor": {
   "clocks": {
@@ -235,13 +235,13 @@
    "kick": "2026-11-01T20:30:00Z",
    "home": "ORL",
    "away": "BOS",
-   "mk": "total",
-   "side": "over",
-   "line": 221.5,
-   "price": -104.0,
-   "edge": 2.6,
-   "x": 3.0,
-   "why": "edge under 3",
+   "mk": "spread",
+   "side": "home",
+   "line": -7.5,
+   "price": -108.0,
+   "edge": 2.3,
+   "x": 4.0,
+   "why": "edge under 4 (line: 4-9)",
    "m": -5.2,
    "tm": 224.1
   },
@@ -280,11 +280,11 @@
  ],
  "games": {
   "401909903": {
-   "mk": "total",
-   "side": "over",
-   "line": 221.5,
-   "price": -104.0,
-   "edge": 2.6,
+   "mk": "spread",
+   "side": "home",
+   "line": -7.5,
+   "price": -108.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "ORL",
@@ -380,7 +380,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1126,
+  "snapshots": 1127,
   "buckets": [
    {
     "when": "24h+",
@@ -402,12 +402,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 69,
+    "clvN": 70,
     "clvRet": -0.047,
-    "clvT": -9.67,
+    "clvT": -9.8,
     "clv": 0.01,
-    "beat": 0.145,
-    "still": 0.739
+    "beat": 0.143,
+    "still": 0.743
    },
    {
     "when": "<1h",
