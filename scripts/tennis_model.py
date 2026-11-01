@@ -594,6 +594,7 @@ def raw52(rows, since):
         for me, op, mine, theirs, won in ((r[7], r[8], r[10], r[11], 1), (r[8], r[7], r[11], r[10], 0)):
             x = out.setdefault(me, {'w': 0, 'l': 0, 'tw': 0, 'tl': 0, 'st': [0] * 9, 'rt': [0] * 9, 'gw': 0, 'gl': 0, 'm': 0})
             x['w' if won else 'l'] += 1
+            x['s' + r[3]] = x.get('s' + r[3], 0) + 1
             if r[2] in TOUR_LV or r[2] == 'D': x['tw' if won else 'tl'] += 1
             gw, gl, _ = games(r[9])
             x['gw'] += gw if won else gl
@@ -661,7 +662,7 @@ def faces(ids, wds=()):
 RATINGS = os.path.join(HERE, 'data', 'tennis_ratings.json.gz')
 
 
-def export_ratings(m, players, tday):
+def export_ratings(m, players, tday, raw=None):
     """every player with a match in the last year, any level: today's ratings (the tennis prospects board reads these)"""
     out = {'asof': dt.date.today().isoformat(), 'about': 'scripts/tennis_model.py: elo = overall Elo (start 1500, K = KC / (n + KO) ^ KS '
            'over every level), eH/eC/eG surface Elo, n = matches, g = games rating (log-odds of a game), s / r = serve / return '
@@ -675,9 +676,18 @@ def export_ratings(m, players, tday):
                                'eH': round(e[2]['H'][0], 1), 'eC': round(e[2]['C'][0], 1), 'eG': round(e[2]['G'][0], 1),
                                'g': round(g[0], 4), 's': round(x[0], 4), 'r': round(x[2], 4),
                                'su': round(x[1] ** 0.5, 4), 'ru': round(x[3] ** 0.5, 4),
-                               'last': (DAY0 + dt.timedelta(days=d)).isoformat()}
+                               'sv': sv52(raw, pid), 'last': (DAY0 + dt.timedelta(days=d)).isoformat()}
     with gzip.open(RATINGS, 'wt') as fh: json.dump(out, fh, separators=(',', ':'))
     print(f"ratings: {len(out['players'])} active players -> {os.path.relpath(RATINGS, ROOT)}")
+
+
+def sv52(raw, pid):
+    """last 52 weeks' serve / return counts for the badges (scripts/tennis_badges.py): [serve points, won, aces, return
+    points, won], or None without statistics"""
+    x = (raw or {}).get(pid)
+    if not x or not x['st'][0]: return None
+    st, rt = x['st'], x['rt']
+    return [st[0], st[2] + st[3], st[7], rt[0], rt[0] - rt[2] - rt[3]]
 
 
 def fair(p):
@@ -709,8 +719,8 @@ def build(rows, players, tn):
             recent.append((r, m.predict(r[7], r[8], r[1], r[3], day, r[5])[0]))
         m.update(r)
     old = old or {}
-    export_ratings(m, players, tday)
     raw = raw52(rows, since)
+    export_ratings(m, players, tday, raw)
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'tours': {}}
     shown = set()
     allrk = {}
@@ -766,9 +776,21 @@ def build(rows, players, tn):
                 # above their own return-point rate (pp)
                 'bpsx': round(bps - spw, 1) if bps is not None and spw is not None and st[6] >= 20 else None,
                 'bpcx': round(bpc - rpw, 1) if bpc is not None and rpw is not None and rt[6] >= 20 else None,
-                'last': (DAY0 + dt.timedelta(days=m.last[p])).isoformat(), 'nm': m.nm.get(p, 0)})
+                'last': (DAY0 + dt.timedelta(days=m.last[p])).isoformat(), 'nm': m.nm.get(p, 0),
+                '_b': (st[7], st[0], e[2]['G'][0] - e[2]['H'][0], rw.get('sG', 0))})
         rowsout.sort(key=lambda r: -r['ark'])
         for i, r in enumerate(rowsout): r['rk'] = i + 1
+        # predictive badges (scripts/tennis_badges.py): only those that beat next season's Elo change held out with
+        # Elo, ARK and age fixed (scripts/tennis_badge_backtest.py); pool = the tour's top 300 by ARK
+        import numpy as np
+        import tennis_badges as TB
+        bx = np.array([r.pop('_b') for r in rowsout], float)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            bv = {'ace': bx[:, 0] / bx[:, 1], 'grass': bx[:, 2]}
+        bn = {'ace': bx[:, 1], 'grass': bx[:, 3]}
+        bdg = TB.assign(bv, bn, [d for d in TB.passed('pro', tour) if d['key'] in bv], np.arange(len(rowsout)) < 300)
+        for r, b in zip(rowsout, bdg):
+            if b: r['bdg'] = b
         # serve / return against the average top-100 player (the ratings' level is only fixed up to a constant)
         t100 = rowsout[:100]
         sb, rb = sum(r['_s'] for r in t100) / len(t100), sum(r['_r'] for r in t100) / len(t100)

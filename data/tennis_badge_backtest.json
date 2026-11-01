@@ -1,0 +1,561 @@
+{
+ "asof": "2026-11-01",
+ "method": "see scripts/tennis_badge_backtest.py",
+ "prospects": {
+  "atp": {
+   "n": 32349,
+   "players": 11422,
+   "outcome": "peak FV (best three seasons at 22-28)",
+   "grade": "FV held out by birth year",
+   "badges": {
+    "ace": {
+     "name": "Big Server",
+     "stat": "aces a serve point",
+     "vmin": 150,
+     "r": 0.746,
+     "pairs": 988,
+     "k": 424.0,
+     "nbar": 1242.1,
+     "n": 1919,
+     "players": 871,
+     "beta": 0.413,
+     "t": 1.11,
+     "oos": -0.059,
+     "folds": [
+      7,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "spw": {
+     "name": "Server",
+     "stat": "serve points won",
+     "vmin": 150,
+     "r": 0.507,
+     "pairs": 988,
+     "k": 1208.3,
+     "nbar": 1242.1,
+     "n": 1919,
+     "players": 871,
+     "beta": 0.068,
+     "t": 0.17,
+     "oos": -0.045,
+     "folds": [
+      7,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "ret": {
+     "name": "Returner",
+     "stat": "return points won",
+     "vmin": 150,
+     "r": 0.475,
+     "pairs": 988,
+     "k": 1370.1,
+     "nbar": 1242.1,
+     "n": 1919,
+     "players": 871,
+     "beta": 0.105,
+     "t": 0.31,
+     "oos": -0.088,
+     "folds": [
+      9,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "gdx": {
+     "name": "Dominator",
+     "stat": "games won over what the Elo gap predicts",
+     "vmin": 10,
+     "r": 0.059,
+     "pairs": 5776,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "tb": {
+     "name": "Tiebreaker",
+     "stat": "tiebreaks won",
+     "vmin": 4,
+     "r": 0.033,
+     "pairs": 4150,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "upset": {
+     "name": "Giant Killer",
+     "stat": "wins over players 100+ Elo higher, per match",
+     "vmin": 15,
+     "r": 0.188,
+     "pairs": 4431,
+     "k": 160.4,
+     "nbar": 37.1,
+     "n": 7265,
+     "players": 2697,
+     "beta": -0.17,
+     "t": -1.47,
+     "oos": 0.009,
+     "folds": [
+      11,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    }
+   }
+  },
+  "wta": {
+   "n": 32948,
+   "players": 10341,
+   "outcome": "peak FV (best three seasons at 22-28)",
+   "grade": "FV held out by birth year",
+   "badges": {
+    "ace": {
+     "name": "Big Server",
+     "stat": "aces a serve point",
+     "vmin": 150,
+     "r": 0.695,
+     "pairs": 732,
+     "k": 541.8,
+     "nbar": 1236.3,
+     "n": 1332,
+     "players": 536,
+     "beta": 0.836,
+     "t": 1.07,
+     "oos": -0.713,
+     "folds": [
+      9,
+      17
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "spw": {
+     "name": "Server",
+     "stat": "serve points won",
+     "vmin": 150,
+     "r": 0.396,
+     "pairs": 732,
+     "k": 1884.3,
+     "nbar": 1236.3,
+     "n": 1332,
+     "players": 536,
+     "beta": 1.214,
+     "t": 2.01,
+     "oos": 0.117,
+     "folds": [
+      11,
+      17
+     ],
+     "why": "",
+     "pass": true
+    },
+    "ret": {
+     "name": "Returner",
+     "stat": "return points won",
+     "vmin": 150,
+     "r": 0.355,
+     "pairs": 732,
+     "k": 2243.3,
+     "nbar": 1236.3,
+     "n": 1332,
+     "players": 536,
+     "beta": -0.456,
+     "t": -0.8,
+     "oos": -0.512,
+     "folds": [
+      7,
+      17
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "gdx": {
+     "name": "Dominator",
+     "stat": "games won over what the Elo gap predicts",
+     "vmin": 10,
+     "r": 0.067,
+     "pairs": 7312,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "tb": {
+     "name": "Tiebreaker",
+     "stat": "tiebreaks won",
+     "vmin": 4,
+     "r": -0.007,
+     "pairs": 3703,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "upset": {
+     "name": "Giant Killer",
+     "stat": "wins over players 100+ Elo higher, per match",
+     "vmin": 15,
+     "r": 0.19,
+     "pairs": 5466,
+     "k": 149.9,
+     "nbar": 35.1,
+     "n": 8461,
+     "players": 2713,
+     "beta": 0.165,
+     "t": 1.36,
+     "oos": 0.001,
+     "folds": [
+      11,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    }
+   }
+  }
+ },
+ "pro": {
+  "atp": {
+   "n": 4449,
+   "players": 875,
+   "seasons": [
+    2006,
+    2024
+   ],
+   "outcome": "overall Elo change, next season",
+   "grade": "Elo, logit ARK, age, age^2",
+   "r2Grade": 0.101,
+   "badges": {
+    "ace": {
+     "name": "Big Server",
+     "stat": "aces a serve point",
+     "vmin": 500,
+     "r": 0.893,
+     "pairs": 6802,
+     "k": 353.5,
+     "nbar": 2944.6,
+     "n": 4449,
+     "players": 875,
+     "beta": 3.341,
+     "t": 3.3,
+     "oos": 0.104,
+     "folds": [
+      11,
+      19
+     ],
+     "why": "",
+     "tJoint": 3.07,
+     "pass": true,
+     "robust": {
+      "t": 3.21,
+      "oos": 0.091,
+      "n": 4361,
+      "grade": "+ last season Elo change, hard-court Elo"
+     }
+    },
+    "first": {
+     "name": "First Strike",
+     "stat": "first-serve points won",
+     "vmin": 300,
+     "r": 0.779,
+     "pairs": 6818,
+     "k": 511.7,
+     "nbar": 1802.4,
+     "n": 4449,
+     "players": 875,
+     "beta": 3.001,
+     "t": 2.47,
+     "oos": 0.031,
+     "folds": [
+      10,
+      19
+     ],
+     "why": "joint t -0.57 beside Big Server, Grass Court",
+     "tJoint": -0.57,
+     "pass": false
+    },
+    "second": {
+     "name": "Second Serve",
+     "stat": "second-serve points won",
+     "vmin": 200,
+     "r": 0.463,
+     "pairs": 6756,
+     "k": 1330.8,
+     "nbar": 1146.0,
+     "n": 4448,
+     "players": 875,
+     "beta": 2.169,
+     "t": 1.67,
+     "oos": -0.041,
+     "folds": [
+      11,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "ret": {
+     "name": "Returner",
+     "stat": "return points won",
+     "vmin": 500,
+     "r": 0.629,
+     "pairs": 6761,
+     "k": 1751.6,
+     "nbar": 2971.5,
+     "n": 4449,
+     "players": 875,
+     "beta": -1.729,
+     "t": -1.68,
+     "oos": -0.035,
+     "folds": [
+      10,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "bps": {
+     "name": "Break Saver",
+     "stat": "break points saved over own serve-point rate",
+     "vmin": 30,
+     "r": 0.022,
+     "pairs": 7968,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "bpc": {
+     "name": "Converter",
+     "stat": "break points converted over own return-point rate",
+     "vmin": 30,
+     "r": 0.038,
+     "pairs": 7405,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "tb": {
+     "name": "Tiebreaker",
+     "stat": "tiebreaks won",
+     "vmin": 5,
+     "r": 0.037,
+     "pairs": 13621,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "clay": {
+     "name": "Clay Court",
+     "stat": "clay Elo over hard-court Elo",
+     "vmin": 10,
+     "r": 0.678,
+     "pairs": 10214,
+     "k": 14.6,
+     "nbar": 30.8,
+     "n": 3385,
+     "players": 779,
+     "beta": 0.909,
+     "t": 0.77,
+     "oos": -0.082,
+     "folds": [
+      11,
+      19
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "grass": {
+     "name": "Grass Court",
+     "stat": "grass Elo over hard-court Elo",
+     "vmin": 5,
+     "r": 0.778,
+     "pairs": 1193,
+     "k": 2.4,
+     "nbar": 8.3,
+     "n": 1583,
+     "players": 448,
+     "beta": 10.941,
+     "t": 4.21,
+     "oos": 0.827,
+     "folds": [
+      12,
+      18
+     ],
+     "why": "",
+     "tJoint": 3.16,
+     "pass": true,
+     "robust": {
+      "t": 2.23,
+      "oos": 0.165,
+      "n": 1561,
+      "grade": "+ last season Elo change, hard-court Elo"
+     }
+    }
+   }
+  },
+  "wta": {
+   "n": 1858,
+   "players": 476,
+   "seasons": [
+    2006,
+    2024
+   ],
+   "outcome": "overall Elo change, next season",
+   "grade": "Elo, logit ARK, age, age^2",
+   "r2Grade": 0.043,
+   "badges": {
+    "ace": {
+     "name": "Big Server",
+     "stat": "aces a serve point",
+     "vmin": 500,
+     "r": 0.873,
+     "pairs": 2017,
+     "k": 327.8,
+     "nbar": 2246.1,
+     "n": 1857,
+     "players": 476,
+     "beta": 3.169,
+     "t": 1.54,
+     "oos": 0.029,
+     "folds": [
+      6,
+      10
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "first": {
+     "name": "First Strike",
+     "stat": "first-serve points won",
+     "vmin": 300,
+     "r": 0.731,
+     "pairs": 2039,
+     "k": 513.8,
+     "nbar": 1394.5,
+     "n": 1858,
+     "players": 476,
+     "beta": 2.032,
+     "t": 0.94,
+     "oos": -0.001,
+     "folds": [
+      5,
+      10
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "second": {
+     "name": "Second Serve",
+     "stat": "second-serve points won",
+     "vmin": 200,
+     "r": 0.43,
+     "pairs": 1950,
+     "k": 1143.6,
+     "nbar": 863.1,
+     "n": 1850,
+     "players": 474,
+     "beta": 1.318,
+     "t": 0.66,
+     "oos": -0.046,
+     "folds": [
+      7,
+      10
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "ret": {
+     "name": "Returner",
+     "stat": "return points won",
+     "vmin": 500,
+     "r": 0.433,
+     "pairs": 2023,
+     "k": 2936.7,
+     "nbar": 2246.7,
+     "n": 1858,
+     "players": 476,
+     "beta": -4.423,
+     "t": -2.61,
+     "oos": 0.181,
+     "folds": [
+      7,
+      10
+     ],
+     "why": "negative",
+     "pass": false
+    },
+    "bps": {
+     "name": "Break Saver",
+     "stat": "break points saved over own serve-point rate",
+     "vmin": 30,
+     "r": 0.037,
+     "pairs": 2587,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "bpc": {
+     "name": "Converter",
+     "stat": "break points converted over own return-point rate",
+     "vmin": 30,
+     "r": 0.019,
+     "pairs": 2469,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "tb": {
+     "name": "Tiebreaker",
+     "stat": "tiebreaks won",
+     "vmin": 5,
+     "r": 0.009,
+     "pairs": 8247,
+     "why": "year-to-year r under 0.15",
+     "pass": false
+    },
+    "clay": {
+     "name": "Clay Court",
+     "stat": "clay Elo over hard-court Elo",
+     "vmin": 10,
+     "r": 0.618,
+     "pairs": 8136,
+     "k": 15.7,
+     "nbar": 25.3,
+     "n": 1249,
+     "players": 408,
+     "beta": -1.877,
+     "t": -0.74,
+     "oos": -0.066,
+     "folds": [
+      5,
+      10
+     ],
+     "why": "t under 2",
+     "pass": false
+    },
+    "grass": {
+     "name": "Grass Court",
+     "stat": "grass Elo over hard-court Elo",
+     "vmin": 5,
+     "r": 0.766,
+     "pairs": 940,
+     "k": 2.4,
+     "nbar": 7.9,
+     "n": 821,
+     "players": 307,
+     "beta": 7.895,
+     "t": 2.23,
+     "oos": 0.262,
+     "folds": [
+      5,
+      9
+     ],
+     "why": "not robust: t 1.22, oos -0.132 beside last season's Elo change and hard-court Elo",
+     "pass": false,
+     "robust": {
+      "t": 1.22,
+      "oos": -0.132,
+      "n": 801,
+      "grade": "+ last season Elo change, hard-court Elo"
+     }
+    }
+   }
+  }
+ }
+}

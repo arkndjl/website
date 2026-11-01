@@ -184,6 +184,7 @@
         ' · T100 ' + pc(r.p40) + ' · T50 ' + pc(r.p50) + ' · T12 ' + pc(r.p60) + '</p>' +
         '<p class="cfb__role">' + (r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'unranked this week') + ' · age ' + f1(r.age) + (r.elo ? ' · Elo ' + r.elo + (r.ep ? ' (' + r.ep + ' Elo+)' : '') : '') +
         (r.prov ? ' · provisional: graded up from the 20 floor' : '') + '.</p>' +
+        (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (b) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[b[1]]; return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(T + ' ' + b[0] + ': ' + b[2] + ' pct among prospects, ' + b[3] + ', last 52 weeks (regressed by volume); predictive of peak value beyond the FV') + '">' + T + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
         '<p class="cfb__role">last 52 weeks: ' + wl(r.w, r.n) + ' · tour ' + wl(r.wT, r.nT) + ' · qualifying ' + wl(r.wQ, r.nQ) + ' · Challenger / 125 ' + wl(r.wC, r.nC) + ' · Futures / ITF ' + wl(r.wS, r.nS) +
         (r.deb ? ' · pro since ' + f1(r.deb) + ', ' + r.car + ' matches' : '') + '.</p>' +
         outlook([[30, r.p30], [40, r.p40], [50, r.p50], [60, r.p60]], B, TN_TIERS, [0, 1, 2, 3, 4], TN_TIP, [r.lo, r.hi]) + report(p, tnSay(r)) +

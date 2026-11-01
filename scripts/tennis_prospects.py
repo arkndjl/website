@@ -34,6 +34,7 @@ import sys
 import time
 
 import numpy as np
+import tennis_badges as TB
 import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 import pandas as pd
 
@@ -1050,6 +1051,13 @@ def build():
         mean, odds, lo, hi, parts, p, mu = grade(X, tf['snaps'][snap], kept)
         plus = plus_flag(mean, X.age.values, tf['snaps'][snap].get('plus')) & (mean < 80)
         a, b0, sd = tf['eloplus']
+        # predictive badges (scripts/tennis_badges.py): only the ones that beat the FV held out
+        # (scripts/tennis_badge_backtest.py), from the section's last-52-week serve and return counts
+        sv = np.array([(pl.get(k) or {}).get('sv') or [0, 0, 0, 0, 0] for k in X.index], float)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            bv = {'spw': sv[:, 1] / sv[:, 0], 'ace': sv[:, 2] / sv[:, 0], 'ret': sv[:, 4] / sv[:, 3]}
+        bn = {'spw': sv[:, 0], 'ace': sv[:, 0], 'ret': sv[:, 3]}
+        bdg = TB.assign(bv, bn, [d for d in TB.passed('prospects', tour) if d['key'] in bv], np.ones(len(X), bool))
         rows = []
         for i, (pid, r) in enumerate(X.iterrows()):
             v = sp.get(pid) or {}
@@ -1068,7 +1076,8 @@ def build():
                              fvx=round(float(mean[i]), 2), fv=FS.fv_of(tour, float(mean[i])), plus=bool(plus[i]), lo=int(round(lo[i])), hi=int(round(hi[i])),
                              p30=round(float(odds[30][i]), 3), p40=round(float(odds[40][i]), 3), p50=round(float(odds[50][i]), 3),
                              p60=round(float(odds[60][i]), 3), pv=round(float(p[i]), 3), prov=bool(pd.isna(r['rank'])),
-                             parts=sorted([[k, round(x, 2)] for k, x in pr.items()], key=lambda t: -abs(t[1]))))
+                             parts=sorted([[k, round(x, 2)] for k, x in pr.items()], key=lambda t: -abs(t[1])),
+                             **({'bdg': bdg[i]} if bdg[i] else {})))
         rows.sort(key=lambda r: (-r['fvx'], r['rank'] or 9999))
         rows = rows[:SHOW]
         # headshots: ESPN's when it has one (scripts/tennis_model.faces), else Tennis Abstract's photo
