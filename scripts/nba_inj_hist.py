@@ -5,6 +5,7 @@ takes the last report before it. Needs pdftotext (poppler-utils). Research only:
     python3 scripts/nba_inj_hist.py 2020 2026     # seasons from..to; writes scripts/.cache/nba/inj_hist.json
 """
 import datetime as dt, json, os, re, subprocess, sys, time, urllib.request
+from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -12,6 +13,7 @@ import nba_espn as E
 
 CACHE = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'injrep')
 OUT = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'inj_hist.json')
+ET = ZoneInfo('America/New_York')
 URL = 'https://ak-static.cms.nba.com/referee/injury/Injury-Report_{d}_{t}.pdf'
 STATUS = ('Out', 'Doubtful', 'Questionable', 'Probable', 'Available')
 LINE = re.compile(r'([A-Z][^,\d]{1,40}?, [^\s].{0,40}?)\s{2,}(' + '|'.join(STATUS) + r')\b')
@@ -69,7 +71,8 @@ def build(lo, hi):
         gs = [g for g in E.games(S) if g['final']]
         byday = {}
         for g in gs:
-            tip = dt.datetime.fromisoformat(g['tip'].replace('Z', '+00:00')) - dt.timedelta(hours=4)   # ET (close enough)
+            # ET with DST: a flat UTC-4 put winter tips an hour late, so 4:30-5:30 pm tips took the 5 PM report
+            tip = dt.datetime.fromisoformat(g['tip'].replace('Z', '+00:00')).astimezone(ET)
             byday.setdefault(tip.date().isoformat(), []).append((g, tip.hour + tip.minute / 60))
         jobs = []
         for d, lst in byday.items():
