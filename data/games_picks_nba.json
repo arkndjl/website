@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-31T23:41:37Z",
+ "asof": "2026-11-01T00:06:04Z",
  "recenter": {
   "2026-10-31": 0.19
  },
@@ -206,14 +206,7 @@
    "flagged": "2026-10-31T12:39:43Z",
    "betTo": 232.5,
    "close": 227.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 227.5,
-    "price": 102.0,
-    "ev": 0.246,
-    "units": 5.0
-   }
+   "now": null
   },
   {
    "id": "401909899",
@@ -314,77 +307,9 @@
    "why": "edge under 4 (line: <4)",
    "m": -0.6,
    "tm": 222.3
-  },
-  {
-   "id": "401909901",
-   "sport": "nba",
-   "kick": "2026-11-01T00:00:00Z",
-   "home": "SA",
-   "away": "MIN",
-   "mk": "spread",
-   "side": "home",
-   "line": 12.5,
-   "price": -104.0,
-   "edge": 2.1,
-   "x": 3.0,
-   "why": "edge under 3 (line: 9-15)",
-   "m": 14.6,
-   "tm": 227.7
-  },
-  {
-   "id": "401909900",
-   "sport": "nba",
-   "kick": "2026-11-01T00:00:00Z",
-   "home": "MIL",
-   "away": "CLE",
-   "mk": "total",
-   "side": "over",
-   "line": 235.5,
-   "price": -100.0,
-   "edge": 1.5,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -8.2,
-   "tm": 237.0
   }
  ],
  "games": {
-  "401909899": {
-   "mk": "total",
-   "side": "over",
-   "line": 227.5,
-   "price": 102.0,
-   "ev": 0.246,
-   "edge": 8.3,
-   "units": 5.0,
-   "home": "MEM",
-   "away": "SAC",
-   "state": "pick"
-  },
-  "401909900": {
-   "mk": "total",
-   "side": "over",
-   "line": 235.5,
-   "price": -100.0,
-   "edge": 1.5,
-   "ev": null,
-   "units": 0.0,
-   "home": "MIL",
-   "away": "CLE",
-   "state": "under"
-  },
-  "401909901": {
-   "mk": "spread",
-   "side": "home",
-   "line": 12.5,
-   "price": -104.0,
-   "edge": 2.1,
-   "ev": null,
-   "units": 0.0,
-   "home": "SA",
-   "away": "MIN",
-   "state": "under"
-  },
   "401909902": {
    "mk": "spread",
    "side": "away",
@@ -450,7 +375,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1054,
+  "snapshots": 1055,
   "buckets": [
    {
     "when": "24h+",
@@ -481,12 +406,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 11,
-    "clvRet": -0.0434,
-    "clvT": -7.67,
-    "clv": 0.09,
-    "beat": 0.091,
-    "still": 0.909
+    "clvN": 12,
+    "clvRet": -0.0445,
+    "clvT": -8.44,
+    "clv": 0.08,
+    "beat": 0.083,
+    "still": 0.917
    }
   ]
  },
