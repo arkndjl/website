@@ -1,0 +1,754 @@
+{
+ "kept": [
+  "age",
+  "lmv",
+  "nomv",
+  "gar_td",
+  "ht",
+  "rclub_td",
+  "lmv2",
+  "res_parm",
+  "share_td",
+  "ymins",
+  "uyl_young",
+  "gar1",
+  "acad_ga",
+  "fwd",
+  "lmv_fwd",
+  "ga90_td",
+  "res_young",
+  "ht_gk",
+  "lmv_gk",
+  "gk",
+  "age2"
+ ],
+ "pools": {
+  "board": 54806,
+  "acad": 42435,
+  "yi": 23495
+ },
+ "coverage": {
+  "board": 20717,
+  "acad": 5642,
+  "yi": 23495
+ },
+ "board": {
+  "n": 54806,
+  "mse": 53.97,
+  "top50": 56.34,
+  "cands": {
+   "yi_calls": {
+    "gain": 0.259,
+    "t": 3.03,
+    "wins": 6,
+    "of": 8,
+    "top50": 0.14,
+    "top100": 0.02,
+    "fwdMse": 0.012,
+    "fwdTop50": 0.08,
+    "coef": {
+     "yi_calls": 0.52
+    },
+    "nz": 20717,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   },
+   "yi_m": {
+    "gain": 0.297,
+    "t": 3.35,
+    "wins": 6,
+    "of": 8,
+    "top50": 0.13,
+    "top100": -0.05,
+    "fwdMse": -0.014,
+    "fwdTop50": -0.26,
+    "coef": {
+     "yi_m": 1.42
+    },
+    "nz": 19762,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   },
+   "yi_fin": {
+    "gain": 0.208,
+    "t": 3.54,
+    "wins": 7,
+    "of": 8,
+    "top50": 0.15,
+    "top100": -0.04,
+    "fwdMse": -0.13,
+    "fwdTop50": 0.05,
+    "coef": {
+     "yi_fin": 0.782
+    },
+    "nz": 8482,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": true
+   },
+   "yi_wc": {
+    "gain": 0.027,
+    "t": 1.77,
+    "wins": 5,
+    "of": 8,
+    "top50": 0.05,
+    "top100": 0.02,
+    "fwdMse": -0.069,
+    "fwdTop50": -0.11,
+    "coef": {
+     "yi_wc": 0.475
+    },
+    "nz": 3511,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": false,
+    "pass": false
+   },
+   "yi_young": {
+    "gain": 0.184,
+    "t": 2.71,
+    "wins": 6,
+    "of": 8,
+    "top50": 0.15,
+    "top100": 0.12,
+    "fwdMse": -0.067,
+    "fwdTop50": 0.12,
+    "coef": {
+     "yi_young": 1.34
+    },
+    "nz": 18149,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": true
+   },
+   "yi_lvl": {
+    "gain": 0.22,
+    "t": 2.93,
+    "wins": 6,
+    "of": 8,
+    "top50": 0.03,
+    "top100": 0.24,
+    "fwdMse": 0.023,
+    "fwdTop50": -0.33,
+    "coef": {
+     "yi_lvl": 0.471
+    },
+    "nz": 19762,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   },
+   "yi_ga": {
+    "gain": 0.159,
+    "t": 6.0,
+    "wins": 8,
+    "of": 8,
+    "top50": -0.02,
+    "top100": -0.01,
+    "fwdMse": -0.234,
+    "fwdTop50": -0.35,
+    "coef": {
+     "yi_ga": 2.321
+    },
+    "nz": 8022,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   },
+   "yi_any": {
+    "gain": 0.184,
+    "t": 2.83,
+    "wins": 7,
+    "of": 8,
+    "top50": 0.05,
+    "top100": 0.05,
+    "fwdMse": 0.012,
+    "fwdTop50": -0.06,
+    "coef": {
+     "yi_any": 0.973
+    },
+    "nz": 20717,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   },
+   "yi_m+yi_young": {
+    "gain": 0.295,
+    "t": 3.28,
+    "wins": 6,
+    "of": 8,
+    "top50": 0.12,
+    "top100": -0.05,
+    "fwdMse": -0.016,
+    "fwdTop50": -0.26,
+    "coef": {
+     "yi_m": 1.344,
+     "yi_young": 0.122
+    },
+    "nz": 19762,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   },
+   "yi_fin+yi_lvl": {
+    "gain": 0.315,
+    "t": 3.31,
+    "wins": 7,
+    "of": 8,
+    "top50": 0.03,
+    "top100": 0.1,
+    "fwdMse": -0.059,
+    "fwdTop50": -0.15,
+    "coef": {
+     "yi_fin": 0.567,
+     "yi_lvl": 0.356
+    },
+    "nz": 19762,
+    "seasons": [
+     2013,
+     2020
+    ],
+    "cv": true,
+    "pass": false
+   }
+  }
+ },
+ "acad": {
+  "n": 42435,
+  "outcome": {
+   "mean": 21.4,
+   "p40": 0.0189,
+   "p50": 0.0058
+  },
+  "cands": {
+   "yi_calls": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.555,
+     "top50Line": 27.5,
+     "top50LineX": 27.97
+    },
+    "n": 42435,
+    "nz": 5642,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.281,
+    "t": 3.15,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.768,
+     "g": 0.749,
+     "yi_calls": 0.706
+    }
+   },
+   "yi_m": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.599,
+     "top50Line": 27.5,
+     "top50LineX": 27.65
+    },
+    "n": 42435,
+    "nz": 5353,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.279,
+    "t": 2.4,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.746,
+     "g": 0.758,
+     "yi_m": 2.536
+    }
+   },
+   "yi_fin": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.719,
+     "top50Line": 27.5,
+     "top50LineX": 27.31
+    },
+    "n": 42435,
+    "nz": 2100,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.31,
+    "t": 1.3,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.738,
+     "g": 0.767,
+     "yi_fin": 1.295
+    }
+   },
+   "yi_wc": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.629,
+     "top50Line": 27.5,
+     "top50LineX": 27.15
+    },
+    "n": 42435,
+    "nz": 601,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.45,
+    "t": 1.13,
+    "wins": 4,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.746,
+     "g": 0.797,
+     "yi_wc": 1.236
+    }
+   },
+   "yi_young": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.591,
+     "top50Line": 27.5,
+     "top50LineX": 27.72
+    },
+    "n": 42435,
+    "nz": 4817,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.419,
+    "t": 2.02,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.741,
+     "g": 0.785,
+     "yi_young": 2.021
+    }
+   },
+   "yi_lvl": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.481,
+     "top50Line": 27.5,
+     "top50LineX": 27.95
+    },
+    "n": 42435,
+    "nz": 5353,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.308,
+    "t": 4.63,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.783,
+     "g": 0.763,
+     "yi_lvl": 0.763
+    }
+   },
+   "yi_ga": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.488,
+     "top50Line": 27.5,
+     "top50LineX": 27.76
+    },
+    "n": 42435,
+    "nz": 1387,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.356,
+    "t": 3.61,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.744,
+     "g": 0.785,
+     "yi_ga": 4.388
+    }
+   },
+   "yi_any": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.547,
+     "top50Line": 27.5,
+     "top50LineX": 27.48
+    },
+    "n": 42435,
+    "nz": 5642,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.335,
+    "t": 3.3,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.773,
+     "g": 0.757,
+     "yi_any": 1.192
+    }
+   },
+   "yi_m+yi_young": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.575,
+     "top50Line": 27.5,
+     "top50LineX": 27.69
+    },
+    "n": 42435,
+    "nz": 5353,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.265,
+    "t": 2.62,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.75,
+     "g": 0.759,
+     "yi_m": 3.274,
+     "yi_young": -1.37
+    }
+   },
+   "yi_fin+yi_lvl": {
+    "fwd": {
+     "mseFloor": 16.331,
+     "mseLine": 13.578,
+     "mseLineX": 13.658,
+     "top50Line": 27.5,
+     "top50LineX": 27.11
+    },
+    "n": 42435,
+    "nz": 5353,
+    "mseFloor": 24.826,
+    "mseLine": 20.487,
+    "mseLineX": 20.256,
+    "t": 2.04,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 8.41,
+    "coef": {
+     "const": -0.764,
+     "g": 0.751,
+     "yi_fin": 0.904,
+     "yi_lvl": 0.491
+    }
+   }
+  }
+ },
+ "yi": {
+  "n": 23495,
+  "outcome": {
+   "mean": 21.31,
+   "p40": 0.0207,
+   "p50": 0.0063
+  },
+  "cands": {
+   "yi_calls": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.534,
+     "top50Line": 23.7,
+     "top50LineX": 23.63
+    },
+    "n": 23495,
+    "nz": 23495,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 22.006,
+    "t": 1.35,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -1.463,
+     "g": 0.531,
+     "yi_calls": 0.669
+    }
+   },
+   "yi_m": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.586,
+     "top50Line": 23.7,
+     "top50LineX": 23.54
+    },
+    "n": 23495,
+    "nz": 21303,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 21.981,
+    "t": 0.96,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.601,
+     "g": 0.51,
+     "yi_m": 1.178
+    }
+   },
+   "yi_fin": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.643,
+     "top50Line": 23.7,
+     "top50LineX": 23.93
+    },
+    "n": 23495,
+    "nz": 8516,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 22.021,
+    "t": 0.64,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.456,
+     "g": 0.509,
+     "yi_fin": 0.438
+    }
+   },
+   "yi_wc": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.42,
+     "top50Line": 23.7,
+     "top50LineX": 24.01
+    },
+    "n": 23495,
+    "nz": 3724,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 22.045,
+    "t": 3.69,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.28,
+     "g": 0.49,
+     "yi_wc": 0.545
+    }
+   },
+   "yi_young": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.514,
+     "top50Line": 23.7,
+     "top50LineX": 23.8
+    },
+    "n": 23495,
+    "nz": 18924,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 22.102,
+    "t": 0.42,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.26,
+     "g": 0.489,
+     "yi_young": 0.463
+    }
+   },
+   "yi_lvl": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.461,
+     "top50Line": 23.7,
+     "top50LineX": 23.85
+    },
+    "n": 23495,
+    "nz": 21303,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 22.081,
+    "t": 1.78,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.717,
+     "g": 0.532,
+     "yi_lvl": 0.265
+    }
+   },
+   "yi_ga": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 11.236,
+     "top50Line": 23.7,
+     "top50LineX": 21.6
+    },
+    "n": 23495,
+    "nz": 3812,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 21.918,
+    "t": 0.11,
+    "wins": 5,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.342,
+     "g": 0.493,
+     "yi_ga": 2.981
+    }
+   },
+   "yi_any": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.491,
+     "top50Line": 23.7,
+     "top50LineX": 23.7
+    },
+    "n": 23495,
+    "nz": 23495,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 22.125,
+    "t": 0.0,
+    "wins": 0,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.072,
+     "g": 0.483,
+     "yi_any": -0.072
+    }
+   },
+   "yi_m+yi_young": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.547,
+     "top50Line": 23.7,
+     "top50LineX": 23.93
+    },
+    "n": 23495,
+    "nz": 21303,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 21.953,
+    "t": 1.17,
+    "wins": 7,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -0.647,
+     "g": 0.515,
+     "yi_m": 1.804,
+     "yi_young": -0.782
+    }
+   },
+   "yi_fin+yi_lvl": {
+    "fwd": {
+     "mseFloor": 11.455,
+     "mseLine": 10.491,
+     "mseLineX": 10.581,
+     "top50Line": 23.7,
+     "top50LineX": 24.02
+    },
+    "n": 23495,
+    "nz": 21303,
+    "mseFloor": 24.573,
+    "mseLine": 22.125,
+    "mseLineX": 21.964,
+    "t": 1.17,
+    "wins": 6,
+    "of": 8,
+    "tLineVsFloor": 4.96,
+    "coef": {
+     "const": -1.019,
+     "g": 0.558,
+     "yi_fin": 0.436,
+     "yi_lvl": 0.261
+    }
+   }
+  },
+  "byLevel": {
+   "0": {
+    "n": 2192,
+    "mean": 20.8,
+    "p40": 0.014,
+    "p50": 0.003
+   },
+   "1": {
+    "n": 8276,
+    "mean": 21.85,
+    "p40": 0.031,
+    "p50": 0.012
+   },
+   "2": {
+    "n": 9587,
+    "mean": 21.04,
+    "p40": 0.015,
+    "p50": 0.004
+   },
+   "3": {
+    "n": 3440,
+    "mean": 21.09,
+    "p40": 0.014,
+    "p50": 0.002
+   }
+  }
+ }
+}

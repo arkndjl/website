@@ -106,7 +106,11 @@ LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bun
           'E3G1': 'Primera Federacion', 'E3G2': 'Primera Federacion', 'FR3': 'National', 'A2': 'Austrian 2. Liga',
           'BE2': 'Challenger Pro League', 'TS2': 'Czech second tier', 'KR2': 'Croatian second tier',
           'DK2': 'Danish 1st Division', 'NO2': 'Norwegian second tier', 'SE2': 'Superettan', 'SC2': 'Scottish Championship',
-          'MNP3': 'MLS NEXT Pro', 'USL': 'USL Championship'}
+          'MNP3': 'MLS NEXT Pro', 'USL': 'USL Championship', '17WC': 'U17 World Cup', '20WC': 'U20 World Cup',
+          'U17Q': 'U17 Euro qualifying', 'U19Q': 'U19 Euro qualifying', 'U21Q': 'U21 Euro qualifying', '17EU': 'U17 Euro',
+          '19EU': 'U19 Euro', '21EU': 'U21 Euro', 'SAM7': 'South American U17', '2SAM': 'South American U20',
+          '17AC': 'AFC U17 Asian Cup', '20AC': 'AFC U20 Asian Cup', 'CO17': 'CONCACAF U17', 'C220': 'CONCACAF U20',
+          'C20Q': 'CONCACAF U20 qualifying', 'AU2C': 'Africa U20 Cup', 'AA17': 'Africa U17 Cup'}
 SHORT = {'GB1': 'EPL', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'BuLi', 'FR1': 'Ligue 1', 'NL1': 'Erediv.',
          'PO1': 'Portugal', 'BE1': 'Belgium', 'TR1': 'Turkey', 'RU1': 'Russia', 'SC1': 'Scotland', 'GR1': 'Greece',
          'DK1': 'Denmark', 'UKR1': 'Ukraine', 'GB2': 'Champ.', 'L2': 'BuLi 2', 'IT2': 'Serie B', 'ES2': 'LaLiga 2',
@@ -118,7 +122,10 @@ SHORT = {'GB1': 'EPL', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'BuLi', 'FR1': '
          'RLB3': 'RL Bayern', 'RLW3': 'RL West', 'RLSW': 'RL SW', 'RLN3': 'RL Nord', 'RLN4': 'RL NO', 'IT3A': 'Serie C',
          'IT3B': 'Serie C', 'IT3C': 'Serie C', 'ES3A': 'Seg. B', 'ES3B': 'Seg. B', 'ES3C': 'Seg. B', 'ES3D': 'Seg. B',
          'E3G1': '1a RFEF', 'E3G2': '1a RFEF', 'FR3': 'National', 'A2': 'Aut 2', 'BE2': 'Bel 2', 'TS2': 'Cze 2',
-         'KR2': 'Cro 2', 'DK2': 'Den 2', 'NO2': 'Nor 2', 'SE2': 'Swe 2', 'SC2': 'Sco 2', 'MNP3': 'NEXT Pro', 'USL': 'USL'}
+         'KR2': 'Cro 2', 'DK2': 'Den 2', 'NO2': 'Nor 2', 'SE2': 'Swe 2', 'SC2': 'Sco 2', 'MNP3': 'NEXT Pro', 'USL': 'USL',
+         '17WC': 'U17 WC', '20WC': 'U20 WC', 'U17Q': 'U17 EQ', 'U19Q': 'U19 EQ', 'U21Q': 'U21 EQ', '17EU': 'U17 Euro',
+         '19EU': 'U19 Euro', '21EU': 'U21 Euro', 'SAM7': 'CSA U17', '2SAM': 'CSA U20', '17AC': 'AFC U17', '20AC': 'AFC U20',
+         'CO17': 'CCF U17', 'C220': 'CCF U20', 'C20Q': 'CCF U20 Q', 'AU2C': 'CAF U20', 'AA17': 'CAF U17'}
 
 
 def season_of(d):
@@ -484,6 +491,121 @@ def academy(X, w, P, R, t):
     X['acad_ga'] = ((a.groupby('player_id').gl.sum() + a.groupby('player_id').ast.sum()) / am.clip(lower=1) * 90).where(am >= 450).reindex(ids)
 
 
+YI = os.path.join(HERE, 'data', 'soccer_youth_intl.json.gz')
+YI_POSG = {'GK': 'G', 'CB': 'D', 'LB': 'D', 'RB': 'D', 'LW': 'F', 'RW': 'F', 'SS': 'F', 'CF': 'F'}
+
+
+def youth_intl(seasons):
+    """youth international appearances (bench rows have minutes 0) from the Transfermarkt pull"""
+    G, A = tm_games(list(SD.YOUTH_INTL), seasons)
+    if not len(A):
+        return pd.DataFrame(columns=['player_id', 'date', 'comp', 'mins', 'gl', 'ast', 'start', 'pos', 'age', 'mv', 'cap', 'fin'])
+    A = A.merge(G[['game_id', 'comp', 'date']], on='game_id')
+    A['cap'] = A.comp.map(lambda c: SD.YOUTH_INTL[c][0])
+    A['fin'] = A.comp.map(lambda c: SD.YOUTH_INTL[c][1])
+    return A
+
+
+YI_COLS = ['game_id', 'player_id', 'date', 'comp', 'mins', 'gl', 'ast', 'start', 'pos', 'age', 'mv']
+
+
+def yi_freeze():
+    """freeze the youth international games before last season for players who can still be under 22 (rerun each
+    summer with LAST): python3 scripts/soccer_prospects.py --freeze-yi"""
+    Y = youth_intl(range(2010, LAST - 1))
+    Y = Y[(Y.date - pd.to_timedelta((Y.age.fillna(15) + 1) * 365.25, unit='D')) >= pd.Timestamp(f'{LAST - AGE_CUT - 1}-07-01')]
+    Y = Y.assign(date=Y.date.dt.strftime('%Y-%m-%d'))[YI_COLS]
+    Y = Y.astype(object).where(Y.notna(), None)
+    with gzip.open(YI, 'wt') as f:
+        json.dump({'cols': YI_COLS, 'seasons': [2010, LAST - 2], 'rows': Y.values.tolist()}, f, separators=(',', ':'))
+    print('froze', len(Y), 'youth international appearances')
+
+
+def yi_frozen():
+    if not os.path.exists(YI):
+        return pd.DataFrame(columns=YI_COLS + ['cap', 'fin'])
+    d = json.load(gzip.open(YI, 'rt'))
+    Y = pd.DataFrame(d['rows'], columns=d['cols'])
+    Y['date'] = pd.to_datetime(Y.date)
+    for c in ('mins', 'gl', 'ast', 'start', 'age', 'mv'):
+        Y[c] = pd.to_numeric(Y[c], errors='coerce')
+    Y['cap'] = Y.comp.map(lambda c: SD.YOUTH_INTL[c][0])
+    Y['fin'] = Y.comp.map(lambda c: SD.YOUTH_INTL[c][1])
+    return Y
+
+
+def yi_feats(Y, dob, ids, snap):
+    """youth international inputs from games before the snapshot, whole career (Oct 31 2026). Kept: yi_lvl (the
+    highest level played: U21 3, U19/U20 2, U17 1) on the academy-only line, yi_wc (U17/U20 World Cup games, log) on
+    the youth-international-only line; the rest are the research candidates"""
+    y = Y[Y.player_id.isin(ids) & (Y.date < pd.Timestamp(snap))]
+    a = y[y.mins > 0].copy()
+    a['age_g'] = (a.date - a.player_id.map(dob)).dt.days / 365.25
+    E = pd.DataFrame(index=ids)
+    E['yi_calls'] = np.log1p(y.groupby('player_id').size().reindex(ids).fillna(0))
+    E['yi_m'] = (a.groupby('player_id').mins.sum().reindex(ids).fillna(0) / 900).clip(upper=3)
+    E['yi_fin'] = np.log1p(a[a.fin.eq(1)].groupby('player_id').size().reindex(ids).fillna(0))
+    E['yi_wc'] = np.log1p(a[a.comp.isin(['17WC', '20WC'])].groupby('player_id').size().reindex(ids).fillna(0))
+    E['yi_young'] = ((a.cap - a.age_g).clip(lower=0) * a.mins / 900).groupby(a.player_id).sum().reindex(ids).fillna(0).clip(upper=3)
+    E['yi_lvl'] = a.cap.map({17: 1, 19: 2, 20: 2, 21: 3}).groupby(a.player_id).max().reindex(ids).fillna(0)
+    E['yi_ga'] = np.where(E.yi_m * 900 >= 270, (a.groupby('player_id').gl.sum() + a.groupby('player_id').ast.sum()).reindex(ids).fillna(0)
+                          / (E.yi_m * 900).clip(lower=1) * 90, 0)
+    E['yi_any'] = (E.yi_calls > 0).astype(float)
+    return E
+
+
+def yi_dob(Y, P):
+    """birth dates: the dump and profiles, else the youth lineup ages"""
+    ag = Y[Y.age.notna()]
+    est = (ag.date - pd.to_timedelta((ag.age + .5) * 365.25, unit='D')).groupby(ag.player_id).median()
+    return P.dob.reindex(P.index.union(est.index)).fillna(est)
+
+
+def yi_pool(Y, dob, t, snap, exclude, mv=None):
+    """players with a youth international game in the two years before the snapshot, under 22 on July 1, and not in
+    the club pool: graded provisionally on age, market value, position and youth caps. Hindsight guards (the
+    research): market value from youth lineups only (the dump's valuation history exists only for players who later
+    reached its leagues), no height and the youth-lineup position (profiles were pulled for players later seen in club
+    games). Live, mv is the profile's current value"""
+    snap = pd.Timestamp(snap)
+    w = Y[(Y.date < snap) & (Y.date >= snap - pd.Timedelta(days=730))]
+    yi = w.player_id.unique()
+    age = (pd.Timestamp(f'{t}-07-01') - dob.reindex(yi)).dt.days / 365.25
+    new = age[(age < AGE_CUT) & (age >= 15)].index.difference(exclude)
+    N = pd.DataFrame(index=new)
+    N['age'] = age.loc[new]
+    yv = Y[Y.mv.notna() & Y.player_id.isin(new) & (Y.date <= snap)].sort_values('date')
+    N['mv'] = yv.groupby('player_id').mv.last()
+    N['mv1'] = yv[yv.date <= snap - pd.Timedelta(days=365)].groupby('player_id').mv.last()
+    if mv is not None:
+        N['mv'] = pd.Series(mv).reindex(N.index).fillna(N.mv)
+    sp = Y[Y.pos.notna() & Y.start.eq(1) & Y.player_id.isin(new)].groupby('player_id').pos.agg(lambda s: s.value_counts().index[0])
+    N['grp'] = sp.map(lambda p: YI_POSG.get(p, 'M')).reindex(new).fillna('M')
+    N['ht'] = np.nan
+    for c in ('rclub_td', 'rclub1', 'rlg_td', 'club_td', 'club1', 'comp1', 'comp_td', 'aclub', 'acomp'):
+        N[c] = np.nan
+    last = w[w.player_id.isin(new)].sort_values('date').groupby('player_id').comp.last()
+    N['ycomp'] = last.reindex(new)
+    N['old'], N['t'] = False, t
+    return N
+
+
+def prov_grade(F, fvx, X, E, fitj):
+    """provisional grades: academy-only players on their line + youth level, youth-international-only on theirs"""
+    out = np.asarray(fvx, dtype=float).copy()
+    acad = (~X.old.values) & ~X.yionly.values if 'yionly' in X else ~X.old.values
+    if 'provLine2' in fitj:
+        L = fitj['provLine2']
+        out[acad] = 20 + L['const'] + L['g'] * (out[acad] - 20) + L['yi_lvl'] * E.yi_lvl.values[acad]
+    elif 'provLine' in fitj:
+        a, c = fitj['provLine']
+        out[acad] = 20 + a * (out[acad] - 20) + c
+    if 'yiLine' in fitj and 'yionly' in X:
+        L, m = fitj['yiLine'], X.yionly.values
+        out[m] = 20 + L['const'] + L['g'] * (out[m] - 20) + L['yi_wc'] * E.yi_wc.values[m]
+    return out.clip(20, 80)
+
+
 def mv_level(mv):
     """a pool's market level: the mean log value of its top MV_N"""
     return float(np.log(mv.dropna().astype(float).clip(lower=25000)).nlargest(MV_N).mean())
@@ -739,7 +861,9 @@ def fit(scorecard=False):
     O, scale = outcome(A, P)
     TG = team_games(G)
     done = O[O.s22 <= COHORTS[1]]
-    rows, mv_ref, acad = {}, {}, None
+    rows, mv_ref, acad, yip = {}, {}, None, []
+    Y = youth_intl(range(2010, LAST + 1))
+    ydob = yi_dob(Y, P)
     for md in SNAPS:
         xs = []
         for t in range(ROWS[0], ROWS[1] + 1):
@@ -748,6 +872,12 @@ def fit(scorecard=False):
             if md == SEL_SNAP:
                 n = X[X.index.isin(done.index) & ~X.old].assign(fv_out=done.fv)
                 acad = n if acad is None else pd.concat([acad, n])
+                N = yi_pool(Y, ydob, t, snapdate(t, md), X.index)
+                s22 = ydob.reindex(N.index).dt.year + 22 - (ydob.reindex(N.index).dt.month >= 7).astype(int)
+                N = N[s22.between(*COHORTS)]
+                N['fv_out'] = done.fv.reindex(N.index).fillna(20.0)    # never on a lineup in a covered league: the floor
+                N['mvlvl'] = X.mvlvl.iloc[0]
+                yip.append(N)
             X = X[X.index.isin(done.index) & X.old]      # fit on the board's pool (academy-only players: graded, not fit)
             X['fv_out'] = done.fv.reindex(X.index)
             X['peak'] = done.peak.reindex(X.index)
@@ -811,6 +941,24 @@ def fit(scorecard=False):
     pa = calibrate(pred(design(acad), kept, np.array([m['coef'][c] for c in ['const'] + kept])), m['iso']).clip(20, 80)
     prov_line = [round(float(v), 4) for v in np.polyfit(pa - 20, acad.fv_out.values - 20, 1)]
     print('academy-only rows', len(acad), 'line', prov_line, flush=True)
+    # youth internationals (Oct 31 2026, scripts/soccer_youth_intl_research.py): the highest youth level played adds
+    # to the academy-only line (season-out t 4.6, 7/8; forward MSE 13.58 -> 13.48, top 50 27.5 -> 28.0); players seen
+    # only at youth internationals get their own line on the same grade + World Cup games (line vs the 20 floor t 5.0,
+    # forward MSE 11.46 -> 10.49; + yi_wc t 3.7, 7/8, forward 10.42, top 50 23.7 -> 24.0)
+    def line(g, y, Xc):
+        F = pd.concat([pd.DataFrame({'g': g - 20}, index=Xc.index), Xc], axis=1)
+        cols = ['g'] + list(Xc.columns)
+        return dict(zip(['const'] + cols, [round(float(v), 4) for v in ols(F, y - 20, cols)]))
+    ea = pd.concat([yi_feats(Y, ydob, acad.index[acad.t.eq(t)].unique(), snapdate(t, SEL_SNAP)).reindex(acad.index[acad.t.eq(t)])
+                    for t in sorted(acad.t.unique())])
+    prov_line2 = line(pa, acad.fv_out.values, ea[['yi_lvl']].set_axis(acad.index))
+    YP = pd.concat(yip)
+    YP['mvd'] = YP.mv * np.exp(mv_ref['%02d-%02d' % SEL_SNAP] - YP.mvlvl)
+    py = calibrate(pred(design(YP), kept, np.array([m['coef'][c] for c in ['const'] + kept])), m['iso']).clip(20, 80)
+    ey = pd.concat([yi_feats(Y, ydob, YP.index[YP.t.eq(t)].unique(), snapdate(t, SEL_SNAP)).reindex(YP.index[YP.t.eq(t)])
+                    for t in sorted(YP.t.unique())])
+    yi_line = line(py, YP.fv_out.values, ey[['yi_wc']].set_axis(YP.index))
+    print('academy-only line + youth level', prov_line2, '; youth-international-only rows', len(YP), yi_line, flush=True)
     # chances of a 40+ (top-flight career) and 50+ (big-five regular level) outcome from the out-of-sample grade
     p = oosc[SEL_SNAP]
     pr = {k: logit_fit(p - c, (y >= c).astype(float), ODDS_HINGES[k]) for k, c in (('p40', 40), ('p50', 50), ('p60', 60))}
@@ -839,7 +987,7 @@ def fit(scorecard=False):
         top.append(float(y[m][o].mean()))
     fitj = {'asof': dt.date.today().isoformat(), 'rows': [int(t.min()), int(t.max())], 'n': int(len(y)),
             'cohorts': list(COHORTS), 'peakAges': list(PEAK_AGES), 'ageCut': AGE_CUT, 'repl': REPL,
-            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'provLine': prov_line, 'provN': int(len(acad)), 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
+            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'provLine': prov_line, 'provN': int(len(acad)), 'provLine2': prov_line2, 'yiLine': yi_line, 'yiN': int(len(YP)), 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
             'plus': plus_fit(p, y, S.age.values),
             'mse': round(float(((y - p) ** 2).mean()), 2), 'mseBase': round(float((e_base ** 2).mean()), 2),
             'r2': round(float(1 - ((y - p) ** 2).mean() / y.var()), 3), 'top50': round(float(np.mean(top)), 1),
@@ -934,7 +1082,7 @@ def refresh_profiles(ids, days=7):
         for i, r in zip(todo, ex.map(lambda i: SD.get(f'/player/{i}'), todo)):
             if r and r.get('data'):
                 d = r['data']
-                keep = {k: d.get(k) for k in ('name', 'lifeDates', 'attributes', 'marketValueDetails')}
+                keep = {k: d.get(k) for k in ('name', 'lifeDates', 'attributes', 'marketValueDetails', 'clubAssignments')}
                 keep['_got'] = today
                 have[i] = keep
     with gzip.open(fn, 'wt') as f:
@@ -1004,17 +1152,46 @@ def build():
             live_mv[i] = cur
     P['dob'] = pd.to_datetime(P.dob)
     X = features(A, P, V, R, TG, t, today, live=live_mv)
+    # youth internationals (Oct 31 2026): this season's and last season's tournaments pulled, earlier ones frozen in
+    # scripts/data/soccer_youth_intl.json.gz; players seen only there join the pool as provisional
+    for s in (t - 1, t):
+        SD.main_pull(list(SD.YOUTH_INTL), s)
+    Y = pd.concat([yi_frozen(), youth_intl([t - 1, t])], ignore_index=True).drop_duplicates(['game_id', 'player_id'])
+    ydob = yi_dob(Y, P)
+    N = yi_pool(Y, ydob, t, today, X.index)
+    yprof = refresh_profiles(N.index)
+    ymv, yclub = {}, {}
+    for i in N.index:
+        d = yprof.get(str(i))
+        if not d:
+            continue
+        ld, at = d.get('lifeDates') or {}, d.get('attributes') or {}
+        dob = pd.to_datetime(ld.get('dateOfBirth'), errors='coerce')
+        if pd.notna(dob):
+            ydob.loc[i] = dob
+        cur = ((d.get('marketValueDetails') or {}).get('current') or {}).get('value')
+        if cur:
+            ymv[i] = cur
+        ca = [c for c in d.get('clubAssignments') or [] if c.get('type') == 'current']
+        if ca:
+            yclub[i] = int(ca[0]['clubId'])
+        pos = at.get('position') or {}
+        P.loc[i, ['name', 'sub_position', 'dob']] = [d.get('name'), pos.get('name'), dob]
+    N = yi_pool(Y, ydob, t, today, X.index, mv=ymv)
+    N['aclub'], N['acomp'] = pd.Series(yclub, dtype=float).reindex(N.index), N.ycomp
+    X['yionly'], N['yionly'] = False, True
+    print('youth internationals', len(Y), 'appearances,', len(N), 'youth-only players', flush=True)
+    X = pd.concat([X, N[[c for c in N.columns if c != 'ycomp']]])
     doy = lambda d: (d - pd.Timestamp(year=d.year if d.month >= 7 else d.year - 1, month=7, day=1)).days
     key = min(fitj['models'], key=lambda k: abs(doy(snapdate(t if int(k[:2]) >= 7 else t, (int(k[:2]), int(k[3:])))) - doy(today)))
-    lvl = mv_level(X.mv)
+    lvl = mv_level(X.mv[~X.yionly.astype(bool)])          # the club pool's level (as fit)
     X['mvd'] = X.mv * np.exp(fitj['mvRef'][key] - lvl)
     F = design(X)
     m = fitj['models'][key]
     cols = [c for c in m['coef'] if c != 'const']
     fvx = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
-    if 'provLine' in fitj:                              # academy-only players: their own line (fit)
-        a, c = fitj['provLine']
-        fvx = np.where(X.old.values, fvx, (20 + a * (fvx - 20) + c).clip(20, 80))
+    # provisional players: academy-only on their own line + youth level, youth-international-only on theirs (fit)
+    fvx = np.where(X.old.values, fvx, prov_grade(F, fvx, X, yi_feats(Y, ydob, X.index, today), fitj))
     X['fvx'] = fvx
     X['plus'] = plus_flag(fvx, X.age.values, fitj.get('plus')) & X.old.values & (fvx < 80)
     pr = fitj['prob']
@@ -1060,6 +1237,8 @@ def build():
 if __name__ == '__main__':
     if '--fit' in sys.argv:
         fit()
+    elif '--freeze-yi' in sys.argv:
+        yi_freeze()
     elif '--scorecard' in sys.argv:
         fit(scorecard=True)
     elif '--plus' in sys.argv:
