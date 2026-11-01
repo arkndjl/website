@@ -6,7 +6,9 @@
        Projected: HPM = goals a 60 over an average player, MoneyPuck components weighted by how well each carries to
        next season's team goal differential (data/nhl_war_fit.json); pWAR = (HPM - replacement) x TOI / 60 / goals a win.
        Views: WAR (default), pWAR, HPM, offense, defense. Filters: season, ice time (qualified = 400 min per 82 team games),
-       position, team, age, search. Filters ride in the address (#season=2025&pos=D&side=x). */ -}}
+       position, team, age, search. Filters ride in the address (#season=2025&pos=D&side=x).
+       Badges (bdg, scripts/nhl_badges.py): medals by the name, only traits that predicted next season's WAR beyond this
+       season's WAR, pWAR and HPM (scripts/nhl_badge_backtest.py). */ -}}
 {{- $idx := site.Data.nhl_war -}}
 {{- $pos := slice "C" "L" "R" "D" "G" -}}
 <div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-gfx-logo="/img/nhl/{}.png" data-src="{{ "data/nhl-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,pWAR,HPM,Off,Def,Pos,TOI">
@@ -62,6 +64,7 @@
     <p class="cfb__none" data-nx-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-nx-none hidden>no players match.</p>
   </div>
+  <p class="cfb__dim nhlwar__note">badges (medals by the name, hover for the stat): Scorer, Shooter, Playmaker, Play Driver, Takeaways (forwards); Chance Getter, Shot Suppressor, Takeaways (defence). Each stat is regressed by volume and tiered by percentile at the position: bronze 75th, silver 90th, gold 97th, platinum 99th. Each predicted next season's WAR beyond this season's WAR, pWAR and HPM over 17 held-out seasons (t clustered by player, scripts/nhl_badge_backtest.py). No goalie stat passed.</p>
   <div class="win__status"><span data-nx-count></span>
     <span class="winpager" data-nx-pager hidden>
       <button type="button" class="winpager__btn" data-nx-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
@@ -83,6 +86,12 @@
   // team logo (static/img/nhl/<abbr>.png), 16 px inline; a code with no file drops it
   function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nhl/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  // predictive badges (scripts/nhl_badges.py, the CFB board's medals): [name, tier letter, percentile, stat], best first;
+  // only traits that predicted next season's WAR beyond this season's WAR, pWAR and HPM (scripts/nhl_badge_backtest.py)
+  var TIER = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
+  function nth(n) { return n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'); }
+  // drawn twice: after the name (desktop) and on the team line under it (phones, so the name column stays narrow)
+  function medals(p, where) { return p.bdg ? ' <span class="cfb__medals nhlwar__md' + where + '" title="' + esc(p.bdg.map(function (b) { return TIER[b[1]] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct at position, ' + b[3]; }).join('\n') + '\npredictive of next season\'s WAR beyond the grade') + '">' + p.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
   function od(o, d) { return o == null ? '' : '<span class="cfb__dim nbaxpm__od">' + (o > 0 ? '+' : '') + o.toFixed(1) + ' / ' + (d > 0 ? '+' : '') + d.toFixed(1) + '</span>'; }
   function chips() {
@@ -134,7 +143,7 @@
     function sg2(x) { return sg(x, 2); }
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('pwar') + '">' + (p.pwar == null ? '' : p.pwar.toFixed(1)) + '</td>' +
         '<td class="cfb__num nbaxpm__v' + k('hpm') + '">' + sg2(p.hpm) + '</td>' +
