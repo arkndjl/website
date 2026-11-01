@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-01T16:07:38Z",
+ "asof": "2026-11-01T16:28:36Z",
  "recenter": {
-  "2026-11-01": 0.25
+  "2026-11-01": 0.27
  },
  "monitor": {
   "clocks": {
@@ -182,6 +182,39 @@
    "close": 221.5,
    "pass": true,
    "now": null
+  },
+  {
+   "id": "401909904",
+   "espn": "401909904",
+   "sport": "nba",
+   "kick": "2026-11-01T22:00:00Z",
+   "home": "IND",
+   "away": "BKN",
+   "mk": "total",
+   "side": "over",
+   "line": 229.5,
+   "price": -104.0,
+   "p": 0.543,
+   "ev": 0.065,
+   "units": 0.25,
+   "edge": 3.0,
+   "x": 3.0,
+   "pDU": 0.5113,
+   "evDU": 0.0029,
+   "m": 3.7,
+   "tm": 232.5,
+   "tmRaw": 232.8,
+   "flagged": "2026-11-01T16:28:36Z",
+   "betTo": 229.5,
+   "close": 229.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 229.5,
+    "price": -104.0,
+    "ev": 0.066,
+    "units": 0.25
+   }
   }
  ],
  "withdrawn": [],
@@ -201,22 +234,6 @@
    "why": "edge under 3",
    "m": -5.3,
    "tm": 223.8
-  },
-  {
-   "id": "401909904",
-   "sport": "nba",
-   "kick": "2026-11-01T22:00:00Z",
-   "home": "IND",
-   "away": "BKN",
-   "mk": "total",
-   "side": "over",
-   "line": 230.5,
-   "price": 102.0,
-   "edge": 2.0,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 3.7,
-   "tm": 232.5
   },
   {
    "id": "401909905",
@@ -267,14 +284,14 @@
   "401909904": {
    "mk": "total",
    "side": "over",
-   "line": 230.5,
-   "price": 102.0,
-   "edge": 2.0,
-   "ev": null,
-   "units": 0.0,
+   "line": 229.5,
+   "price": -104.0,
+   "ev": 0.066,
+   "edge": 3.0,
+   "units": 0.25,
    "home": "IND",
    "away": "BKN",
-   "state": "under"
+   "state": "pick"
   },
   "401909905": {
    "mk": "spread",
@@ -353,7 +370,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1113,
+  "snapshots": 1116,
   "buckets": [
    {
     "when": "24h+",
@@ -3046,6 +3063,31 @@
    "betTo": 220.0,
    "close": 221.5,
    "pass": true
+  },
+  {
+   "id": "401909904",
+   "espn": "401909904",
+   "sport": "nba",
+   "kick": "2026-11-01T22:00:00Z",
+   "home": "IND",
+   "away": "BKN",
+   "mk": "total",
+   "side": "over",
+   "line": 229.5,
+   "price": -104.0,
+   "p": 0.543,
+   "ev": 0.065,
+   "units": 0.25,
+   "edge": 3.0,
+   "x": 3.0,
+   "pDU": 0.5113,
+   "evDU": 0.0029,
+   "m": 3.7,
+   "tm": 232.5,
+   "tmRaw": 232.8,
+   "flagged": "2026-11-01T16:28:36Z",
+   "betTo": 229.5,
+   "close": 229.5
   }
  ]
 }
