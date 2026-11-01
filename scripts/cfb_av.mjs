@@ -123,6 +123,8 @@ export const CWAR_QB_OWN = 1.25;
 // +.0005 (t 1.6, 4,280 games 2021-26, seven), first 4 weeks +.0036 and +.0017. In-season XV can't be tested: PFN
 // publishes season-to-date lines only (the web archive holds one preseason page), so past seasons hold no
 // week-by-week XV; the board commits p.xv with every run from 2026-10-16, which is the history that test needs
+// OL (2026-11-01, scripts/cfb_ol_backtest.py): PFN sacks and pressures allowed a snap, block scores alone, or the score
+// alone all land within .01 r of these parts on held-out seasons and next season's offense, so OL stays as is
 export const XV_W = { QB: 2.1, RB: 0.49, WR: 0.52, TE: 0.34, OL: 0.2, EDGE: 0.73, DL: 0.08, LB: 0.32, CB: 0.29, S: 0.67 };
 export const XV_C = { QB: { cmp: 0.842, nypa: 0.24, intr: 0.164, rush: 0.298 }, RB: { ypc: 0.147, elu: 0.372 }, WR: { ypr: 0.051 },
   OL: { prs: 0.116, rb: 0.214 }, EDGE: { sk: 0.104, spl: 0.274 }, DL: { spl: 0.695, sk: 0.041 }, LB: { cov: 0.754, prs: 0.337 },
