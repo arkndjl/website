@@ -511,7 +511,14 @@ def write(rows, F, ts, all_seasons=False):
             o['def'] = round(sum(c[f_] for f_ in ('ona', 'gk')), 2)
             o['oth'] = round(c['rel'] + o.pop('lgx'), 2)          # on-off and league strength
         games = max([r['mp'] for r in rs] or [1])
-        import soccer_mv as MV                            # estimated market value next to GAR (scripts/soccer_mv.py)
+        # predictive badges (scripts/soccer_badges.py; backtest scripts/soccer_badge_backtest.py): pool and badge at
+        # 900 minutes, this season scaled to the matches played like the board's "qualified"
+        import soccer_badges as B
+        bd = B.badges([r for r in rows if r['S'] == S], S, 900 if S != cur else max(270, round(900 * min(1, games / 38))))
+        for o in out:
+            if o['p'] in bd:
+                o['bdg'] = bd[o['p']]
+        import soccer_mv as MV                           # estimated market value next to GAR (scripts/soccer_mv.py)
         MV.attach(S, out)
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
                           'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
@@ -633,8 +640,32 @@ def current():
     write(rows, F, None)
 
 
+def inject_badges():
+    """--badges: recompute the badges in every written season file (static/data/soccer-war/<season>.json) from its
+    own lines, leaving the rest of the file (market values, faces) as it is"""
+    import soccer_badges as B
+    cur = D.current_season()
+    for fn in sorted(os.listdir(SDIR)):
+        S = int(fn[:4])
+        path = os.path.join(SDIR, fn)
+        d = json.load(open(path))
+        rows = [{'p': o['p'], 'S': S, 'n': o['n'], 'pos': o['pos'], 'lg': o['lg'], 'team': o['team'], 'min': o['min'],
+                 'g': o['g'], 'x': o['xg'], 'pen': 0, 'xA': o['xa'], 'kp': o['kp'], 'bu': o['bu'], 'ch': o['ch'],
+                 'sh': o['sh'], 'gks': 0} for o in d['players']]
+        games = d.get('games') or 38
+        bd = B.badges(rows, S, 900 if S != cur else max(270, round(900 * min(1, games / 38))))
+        for o in d['players']:
+            o.pop('bdg', None)
+            if o['p'] in bd:
+                o['bdg'] = bd[o['p']]
+        open(path, 'w').write(json.dumps(d, separators=(',', ':'), allow_nan=False))
+        print(S, sum(1 for o in d['players'] if o.get('bdg')), 'players with badges', flush=True)
+
+
 if __name__ == '__main__':
-    if '--fit' in sys.argv:
+    if '--badges' in sys.argv:
+        inject_badges()
+    elif '--fit' in sys.argv:
         fit()
     elif '--backup' in sys.argv:                      # from the cached rows, no pull
         F = json.load(open(FIT)); rows = D.load(ROWS); prep(rows, F['shrink'])

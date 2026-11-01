@@ -200,6 +200,8 @@
         '<p class="cfb__role">this season: ' + r.min + ' min' + (r.sh ? ' (' + Math.round(r.sh * 100) + '% of league minutes)' : '') + ', ' + r.ga + ' goals + assists, ' + f1(r.gar) + ' GAR' +
         (r.rc != null ? ' · club rating ' + sgn(r.rc, 2) : '') + ' · last season: ' + r.min1 + ' min, ' + f1(r.gar1) + ' GAR' + (r.ym ? ' · ' + r.ym + ' PL2 min' : '') + '.</p>' +
         '<p class="cfb__role">market value ' + eur(r.mv) + (r.ht ? ' · ' + r.ht + ' cm' : '') + ' · age ' + f1(r.age) + (r.prov ? ' · provisional: no senior minutes yet' : '') + '.</p>' +
+        // predictive badges (scripts/soccer_badges.py), the chips of layouts/partials/badges.html
+        (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (x) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[x[1]]; return '<span class="cfb__bdg cfb__bdg--' + esc(x[1]) + '" title="' + esc(T + ' ' + x[0] + ': ' + x[2] + ' pct at position, ' + x[3] + '; predictive of outcome FV beyond the grade') + '">' + esc(T + ' ' + x[0]) + '</span>'; }).join('') + '</p>' : '') +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +
         (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) +
         '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
