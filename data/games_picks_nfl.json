@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T13:30:47Z",
+ "asof": "2026-11-01T13:34:20Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -160,9 +160,9 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 113.0,
-    "ev": 0.059,
-    "units": 2.5
+    "price": 115.0,
+    "ev": 0.069,
+    "units": 3.0
    }
   },
   {
@@ -445,22 +445,6 @@
    "tm": 38.1
   },
   {
-   "id": "2026_08_IND_JAX",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "JAX",
-   "away": "IND",
-   "mk": "spread",
-   "side": "away",
-   "line": 10.5,
-   "price": -111.0,
-   "edge": 2.2,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 8.3,
-   "tm": 47.1
-  },
-  {
    "id": "2026_08_LAC_LA",
    "sport": "nfl",
    "kick": "2026-11-01T21:05:00Z",
@@ -507,6 +491,22 @@
    "why": "edge under 4",
    "m": -0.1,
    "tm": 43.3
+  },
+  {
+   "id": "2026_08_IND_JAX",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "JAX",
+   "away": "IND",
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": 111.0,
+   "edge": 1.2,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": 8.3,
+   "tm": 47.1
   }
  ],
  "games": {
@@ -561,9 +561,9 @@
   "2026_08_IND_JAX": {
    "mk": "spread",
    "side": "away",
-   "line": 10.5,
-   "price": -111.0,
-   "edge": 2.2,
+   "line": 9.5,
+   "price": 111.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "JAX",
@@ -707,14 +707,14 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1022,
+  "snapshots": 1024,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 377,
-    "clvRet": -0.055,
-    "clvT": -21.85,
-    "clv": 0.37,
+    "clvRet": -0.0555,
+    "clvT": -22.28,
+    "clv": 0.36,
     "beat": 0.305,
     "still": 0.666
    },
@@ -729,12 +729,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 6,
-    "clvRet": -0.0756,
-    "clvT": -4.39,
-    "clv": 0.0,
-    "beat": 0.0,
-    "still": 1.0
+    "clvN": 8,
+    "clvRet": -0.0565,
+    "clvT": -2.36,
+    "clv": 0.12,
+    "beat": 0.125,
+    "still": 0.875
    },
    {
     "when": "<1h",
