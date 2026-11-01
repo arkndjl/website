@@ -790,8 +790,13 @@ const consFV = avg => { const r = Math.max(1, avg); return Math.max(30, Math.min
 // curve (log-linear through 30-55, then FV_TOP_SLOPE) put 1.37 QBs a class at 60+ where 2.86 a class made a Pro Bowl,
 // and .77 at 65+ against 1.43, so the board held no 60+ QB while boards rank three QBs in the top 32 (a normal class).
 // (65 = All-Pro or 3+ Pro Bowls keeps the Pro Bowl route: a QB All-Pro is one a year, so All-Pro alone would starve QBs)
+// RB and LB joined Nov 1 2026 (FV reachability audit): their 45-55 tiers are starter-season counts, which short RB/LB
+// careers keep low, so the smoothed top ran far under the measured Pro Bowl / All-Pro counts (RB 60+ 1.2 a class vs
+// 3.7 measured, 65+ .5 vs 2.0; LB 60+ 2.6 vs 4.1, 75+ .2 vs .7) and RB grades topped out ~66. Scored on the 2020-23
+// drafts (the counts come from 2012-18, so out of sample): MSE vs NFL outcome lower in 4/4 classes (t 5.4), top 32 a
+// class 223.2 -> 220.1; flooring every position fails (EDGE top 10 over-graded), as do RB/LB location shifts (class-out)
 // Other positions' smoothed tops sit within ~30% of their counts, or below them on purpose (FV_POS_VALUE)
-const FV_TIER_FLOOR = new Set(['QB']);
+const FV_TIER_FLOOR = new Set(['QB', 'RB', 'LB']);
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
   const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;

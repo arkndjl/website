@@ -1,14 +1,14 @@
 {
- "asof": "2026-10-31",
+ "asof": "2026-11-01",
  "method": "scripts/fv_scale.py --fit",
  "rule": "FV = mean up to K (3 a season); linear above to 80 at T (one a season x 0.2), capped at the board's reach",
  "boards": {
   "cfb": {
-   "K": 67.76,
-   "T": 76.79,
-   "tail": 6.0,
-   "tailT": 84.01,
-   "reach": 76.79,
+   "K": 67.85,
+   "T": 76.8,
+   "tail": 6.2,
+   "tailT": 84.64,
+   "reach": 76.8,
    "seasons": 4,
    "src": "held-out FBS player-seasons 2019-22 (data/fv_dist.json cfb scorecard)"
   },

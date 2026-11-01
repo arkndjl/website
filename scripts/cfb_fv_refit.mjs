@@ -71,7 +71,7 @@ const CUR = {
 const POS_SHIFT = BOARD.posShift, FV_POS_STRENGTH = 1;   // data/cfb.json posShift already carries FV_POS_STRENGTH
 const RELI = Object.fromEntries(Object.entries(CAL.reliability).map(([g, r]) => [g, Math.round((r + 0.05) * 100) / 100]));
 const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 }, FV_QB_MID = 1.6, FV_TOP_SLOPE = -0.115, FV_PEAK_SLOPE = -0.173;
-const FV_TIER_FLOOR = new Set(['QB']);   // as fetch_cfb.mjs
+const FV_TIER_FLOOR = new Set(['QB', 'RB', 'LB']);   // as fetch_cfb.mjs
 // --target refits FV_POS_VALUE: tiersOf(g, a, pv) builds one position's tiers at a positional value, setPV swaps them in
 const tiersOf = (g, a, pvg = FV_POS_VALUE[g] ?? 1) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
