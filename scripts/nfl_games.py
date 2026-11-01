@@ -539,6 +539,7 @@ def modified(url):
 # again (plays at the questionable rate), doubtful, out. Players moved to a reserve list are left out: the roster has them.
 CARRY = {'Questionable': 0.84, 'Doubtful': 0.55, 'Out': 0.38}
 LATE = 26 * 3600      # news this close to kickoff (Saturday's activations, gameday inactives) beats the final report
+INACT = 100 * 60      # gameday inactives post 90 minutes before kickoff; ESPN dates them then
 
 
 def live_injuries(last, week, games):
@@ -693,6 +694,18 @@ def live_injuries(last, week, games):
             e['pos'] = e.get('pos') or (L or {}).get('position') or r.get('position', '')
             e.pop('firm', None)
             out[t][gsis] = e
+    # once a team's gameday inactives are out (ESPN marks the five to seven names Out in the last 100 minutes before
+    # kickoff), everyone still Questionable or Doubtful, or carried from last week, is dressed: Active
+    for t, ps in out.items():
+        k = ko.get(t)
+        posted = k and sum(1 for v in news[t].values() if v['src'] == 'espn' and v['status'] == 'Out'
+                           and k - INACT <= v['ts'] <= k) >= 3
+        if not posted:
+            continue
+        for gsis, e in ps.items():
+            if e['status'] not in GONE and e['status'] != 'Out' and e['status'] != 'Active':
+                ps[gsis] = dict(e, status='Active', src='inactives', ts=k - INACT)
+                n['inactives'] += 1
     n['league'] = sum(len(R) for R in rep.values())
     return out, dict(n)
 
