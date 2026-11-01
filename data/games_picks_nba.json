@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-01T00:06:04Z",
+ "asof": "2026-11-01T00:25:08Z",
  "recenter": {
   "2026-10-31": 0.19
  },
@@ -269,6 +269,39 @@
    "kick": "2026-11-01T00:30:00Z",
    "home": "HOU",
    "away": "OKC",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 135.0,
+   "p": 0.453,
+   "ev": 0.064,
+   "units": 1.0,
+   "edge": 4.1,
+   "x": 4.0,
+   "pDU": 0.4309,
+   "evDU": 0.0126,
+   "seg": "line: <4",
+   "m": -0.6,
+   "tm": 222.3,
+   "tmRaw": 222.5,
+   "flagged": "2026-11-01T00:25:08Z",
+   "close": 3.5,
+   "now": {
+    "mk": "ml",
+    "side": "away",
+    "line": null,
+    "price": 135.0,
+    "ev": 0.064,
+    "units": 1.0
+   }
+  },
+  {
+   "id": "401909902",
+   "espn": "401909902",
+   "sport": "nba",
+   "kick": "2026-11-01T00:30:00Z",
+   "home": "HOU",
+   "away": "OKC",
    "mk": "total",
    "side": "over",
    "line": 218.5,
@@ -291,36 +324,19 @@
   }
  ],
  "withdrawn": [],
- "board": [
-  {
-   "id": "401909902",
-   "sport": "nba",
-   "kick": "2026-11-01T00:30:00Z",
-   "home": "HOU",
-   "away": "OKC",
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": 102.0,
-   "edge": 3.1,
-   "x": 4.0,
-   "why": "edge under 4 (line: <4)",
-   "m": -0.6,
-   "tm": 222.3
-  }
- ],
+ "board": [],
  "games": {
   "401909902": {
-   "mk": "spread",
+   "mk": "ml",
    "side": "away",
-   "line": 2.5,
-   "price": 102.0,
-   "edge": 3.1,
-   "ev": null,
-   "units": 0.0,
+   "line": null,
+   "price": 135.0,
+   "ev": 0.064,
+   "edge": 4.1,
+   "units": 1.0,
    "home": "HOU",
    "away": "OKC",
-   "state": "under"
+   "state": "pick"
   }
  },
  "record": {
@@ -375,7 +391,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1055,
+  "snapshots": 1056,
   "buckets": [
    {
     "when": "24h+",
@@ -389,29 +405,29 @@
    {
     "when": "6-24h",
     "clvN": 269,
-    "clvRet": -0.0019,
-    "clvT": -0.36,
+    "clvRet": -0.0024,
+    "clvT": -0.45,
     "clv": 0.72,
-    "beat": 0.468,
-    "still": 0.431
+    "beat": 0.461,
+    "still": 0.439
    },
    {
     "when": "1-6h",
     "clvN": 67,
-    "clvRet": -0.0441,
-    "clvT": -9.57,
-    "clv": 0.06,
+    "clvRet": -0.047,
+    "clvT": -9.39,
+    "clv": 0.01,
     "beat": 0.149,
-    "still": 0.776
+    "still": 0.731
    },
    {
     "when": "<1h",
-    "clvN": 12,
-    "clvRet": -0.0445,
-    "clvT": -8.44,
-    "clv": 0.08,
-    "beat": 0.083,
-    "still": 0.917
+    "clvN": 13,
+    "clvRet": -0.0604,
+    "clvT": -5.66,
+    "clv": -0.15,
+    "beat": 0.077,
+    "still": 0.692
    }
   ]
  },
@@ -2811,6 +2827,31 @@
    "tmRaw": 214.8,
    "flagged": "2026-10-31T20:43:02Z",
    "close": -1.5
+  },
+  {
+   "id": "401909902",
+   "espn": "401909902",
+   "sport": "nba",
+   "kick": "2026-11-01T00:30:00Z",
+   "home": "HOU",
+   "away": "OKC",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 135.0,
+   "p": 0.453,
+   "ev": 0.064,
+   "units": 1.0,
+   "edge": 4.1,
+   "x": 4.0,
+   "pDU": 0.4309,
+   "evDU": 0.0126,
+   "seg": "line: <4",
+   "m": -0.6,
+   "tm": 222.3,
+   "tmRaw": 222.5,
+   "flagged": "2026-11-01T00:25:08Z",
+   "close": 3.5
   }
  ]
 }
