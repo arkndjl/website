@@ -67,7 +67,13 @@ SUBS = {'x': ('hx', 'ax'), 'm': ('mh', 'ma'), 's': ('hsg', 'asg'), 'n': ('nh', '
 P0 = {'k': 0.02592, 'kl': 0.00346, 'ke': 2e-05, 'kh': 0.0012, 'car': 1.0, 'boost': 1.5, 'nb': 9, 'rho': -0.04,
       'prom': 0.0, 'cup': 0.36, 'kx': 0.1106, 'carx': 1.0, 'wx': 0.108, 'km': 0.128, 'carm': 1.0, 'wm': 1.0,
       'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0, 'mv': 0.0317,
-      'kn': 0.128, 'carn': 1.0, 'wn': 1.0, 'av': 0.35}
+      'kn': 0.128, 'carn': 1.0, 'wn': 1.0, 'av': 0.35, 'r45': -0.02}
+# r45 (Nov 1 2026, scripts/rest_research.py): a club 4-5 days off its last match in any competition (mostly after a
+# Champions League Tuesday or Wednesday) is .02 log goals worse each way (both sides' lambdas). Pre-registered band;
+# in the model on top of everything else, log loss 2013-22 -.00019 a match (t -2.2 by day), 2023-27 -.00027 (t -1.7),
+# big five 2023-27 -.00035 (t -2.1). -.04 / -.06 gain less held out. The close misses it too (result minus close,
+# tune t -2.3, held t -3.0). <= 3 days off (Thursday Europa League, holiday rounds) is no worse than a week off in
+# the model, and the close overprices it (clubs on <= 3 days beat it, held t +3.3); r3 either sign fails
 MVF = os.path.join(HERE, 'data', 'soccer_squad_mv.json.gz')
 TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
 
@@ -655,6 +661,9 @@ class Ratings:
         rs = 0.0
         if self.P.get('rest'):
             rs = self.P['rest'] * (self.rest(h, r['day']) - self.rest(a, r['day']))
+        for k, lo, hi in (('r45', 4, 5), ('r3', 0, 3)):          # rest-day bands, home minus away (rest_research.py)
+            if self.P.get(k):
+                rs += self.P[k] * (float(lo <= self.gap(h, r['day']) <= hi) - float(lo <= self.gap(a, r['day']) <= hi))
         mv = self.P.get('mv', 0.0) * r.get('mvz', 0.0)     # squad market value edge (before kickoff, non-market)
         mv += self.P.get('av', 0.0) * r.get('avz', 0.0)    # injuries and suspensions (soccer_tm_injuries.add_avz)
         x = M0 + env + hm + sh + ah - sa - da + rs + mv
@@ -662,6 +671,11 @@ class Ratings:
         sp = self.P.get('sp', 1.0)                  # spread: the ratings' gap stretched (the blend shrinks it)
         m, g = (x + y) / 2, (x - y) / 2 * sp
         return ex(m + g), ex(m - g)
+
+    def gap(self, t, day):
+        """days since the club's last match in any competition (99 before its first)"""
+        l = self.last.get(t)
+        return (dt.date.fromisoformat(day) - dt.date.fromisoformat(l)).days if l else 99
 
     def rest(self, t, day):
         """days since the club's last match, capped at 7 (a full week off) and floored at 2"""
@@ -947,6 +961,8 @@ def fit():
          "every spell of any age, sat out last match and red cards from line-ups alone all failed)")
     for nm, Q, note in (('+ rest days', dict(P, rest=0.01), 'days since the last match, 2 to 7, home minus away'),
                         ('+ rest days (other sign)', dict(P, rest=-0.01), ''),
+                        ('no 4-5 day rest band', dict(P, r45=0.0), 'r45: 4-5 days off its last match, home minus away (kept: rest_research.py)'),
+                        ('+ <= 3 day rest band', dict(P, r3=-0.02), 'r3: 3 or fewer days off, home minus away'),
                         ('+ shots on target', dict(P, ws=0.05), "football-data's shots on target as goals (30% conversion)"),
                         ('no early-season boost', dict(P, boost=0.0), 'learning rate x (1 + boost) in a season\'s first matches'),
                         ('summer regression 0.85', dict(P, car=0.85, carx=0.85, carm=0.85), 'pull 15% back to the league mean each summer'),
