@@ -1,7 +1,7 @@
 {
  "season": 2026,
  "week": 8,
- "asof": "2026-11-01T20:15:31Z",
+ "asof": "2026-11-01T22:42:29Z",
  "picks": [
   {
    "id": "2026_08_BAL_BUF",
@@ -19,7 +19,8 @@
    "units": 1.0,
    "flagged": "2026-10-27T03:52:45Z",
    "now": null,
-   "started": true
+   "started": true,
+   "won": true
   },
   {
    "id": "2026_08_LV_NYJ",
@@ -37,7 +38,8 @@
    "units": 0.75,
    "flagged": "2026-10-31T09:34:10Z",
    "now": null,
-   "started": true
+   "started": true,
+   "won": true
   },
   {
    "id": "2026_08_MIN_DET",
@@ -55,7 +57,8 @@
    "units": 1.0,
    "flagged": "2026-10-27T03:52:45Z",
    "now": null,
-   "started": true
+   "started": true,
+   "won": false
   }
  ],
  "upsetBt": {
@@ -980,78 +983,78 @@
  },
  "record": {
   "upset": {
-   "n": 0,
-   "won": 0,
-   "w": 0,
-   "l": 0,
+   "n": 2,
+   "won": 1,
+   "w": 1,
+   "l": 1,
    "p": 0,
-   "units": 0,
-   "roi": null,
+   "units": 0.2,
+   "roi": 0.085,
    "sized": {
-    "units": 0,
-    "risked": 0,
-    "roi": null
+    "units": -0.1,
+    "risked": 1.8,
+    "roi": -0.07
    },
-   "clv": null,
-   "clvPos": null,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "beat": null,
-   "still": null
+   "clv": 0.0,
+   "clvPos": 0.0,
+   "clvN": 2,
+   "clvRet": -0.0133,
+   "clvT": -0.48,
+   "beat": 0.0,
+   "still": 1.0
   },
   "fav": {
-   "n": 0,
-   "won": 0,
-   "w": 0,
+   "n": 1,
+   "won": 1,
+   "w": 1,
    "l": 0,
    "p": 0,
-   "units": 0,
-   "roi": null,
+   "units": 0.5,
+   "roi": 0.521,
    "sized": {
-    "units": 0,
-    "risked": 0,
-    "roi": null
+    "units": 0.5,
+    "risked": 1.0,
+    "roi": 0.521
    },
-   "clv": null,
-   "clvPos": null,
-   "clvN": 0,
-   "clvRet": null,
+   "clv": -0.5,
+   "clvPos": 0.0,
+   "clvN": 1,
+   "clvRet": -0.0976,
    "clvT": null,
-   "beat": null,
-   "still": null
+   "beat": 0.0,
+   "still": 0.0
   }
  },
  "sofar": {
   "upset": {
-   "n": 6,
-   "w": 3,
-   "l": 3,
+   "n": 8,
+   "w": 4,
+   "l": 4,
    "p": 0,
-   "units": 0.3,
-   "roi": 0.055,
+   "units": 0.4,
+   "roi": 0.047,
    "t": 0.12,
    "sized": {
-    "risked": 6.0,
-    "units": 0.3,
-    "roi": 0.055
+    "risked": 8.0,
+    "units": 0.4,
+    "roi": 0.047
    },
-   "won": 3
+   "won": 4
   },
   "fav": {
-   "n": 3,
-   "w": 3,
+   "n": 4,
+   "w": 4,
    "l": 0,
    "p": 0,
-   "units": 2.4,
-   "roi": 0.799,
-   "t": 14.67,
+   "units": 3.0,
+   "roi": 0.754,
+   "t": 12.65,
    "sized": {
-    "risked": 3.0,
-    "units": 2.4,
-    "roi": 0.799
+    "risked": 4.0,
+    "units": 3.0,
+    "roi": 0.754
    },
-   "won": 3
+   "won": 4
   }
  },
  "log": [
@@ -1072,7 +1075,15 @@
    "edge": 6.2,
    "p": 0.774,
    "units": 1.0,
-   "flagged": "2026-10-27T03:52:45Z"
+   "flagged": "2026-10-27T03:52:45Z",
+   "res": 26.0,
+   "close": 3.0,
+   "won": true,
+   "profit": 0.521,
+   "ats": 0.909,
+   "clvRet": -0.0976,
+   "clv": -0.5,
+   "beat": -1
   },
   {
    "id": "2026_08_MIN_DET",
@@ -1091,7 +1102,15 @@
    "edge": 4.9,
    "p": 0.559,
    "units": 1.0,
-   "flagged": "2026-10-27T03:52:45Z"
+   "flagged": "2026-10-27T03:52:45Z",
+   "res": 4.0,
+   "close": 3.0,
+   "won": false,
+   "profit": -1.0,
+   "ats": -1.0,
+   "clvRet": -0.0411,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_08_LV_NYJ",
@@ -1110,7 +1129,15 @@
    "edge": 4.3,
    "p": 0.586,
    "units": 0.75,
-   "flagged": "2026-10-31T09:34:10Z"
+   "flagged": "2026-10-31T09:34:10Z",
+   "res": -5.0,
+   "close": 1.5,
+   "won": true,
+   "profit": 1.17,
+   "ats": 0.909,
+   "clvRet": 0.0145,
+   "clv": 0.0,
+   "beat": 0
   }
  ]
 }

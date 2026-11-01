@@ -1,7 +1,7 @@
 {
  "season": 2026,
  "week": 8,
- "asof": "2026-11-01T20:50:50Z",
+ "asof": "2026-11-01T22:42:25Z",
  "games": [
   {
    "id": "2026_08_CAR_GB",
@@ -65,29 +65,28 @@
    "away": "ARI",
    "neutral": false,
    "stadium": "AT&T Stadium",
-   "roof": "",
+   "roof": "closed",
    "div": false,
    "hqb": "Dak Prescott",
    "aqb": "Jacoby Brissett",
-   "margin": 8.0,
-   "pHome": 0.734,
-   "total": 52.5,
-   "hs": 30.3,
-   "as": 22.2,
+   "margin": 7.6,
+   "pHome": 0.723,
+   "total": 55.0,
+   "hs": 31.3,
+   "as": 23.7,
    "parts": {
     "elo": 2.0,
     "qb": 0.3,
     "rest": -0.1,
     "home": 2.0,
-    "inj": -0.6,
+    "inj": -0.9,
     "mkt": 4.6,
     "ret": -0.4,
-    "roster": 0.1,
-    "trade": 0.1
+    "roster": 0.1
    },
    "elo": {
-    "home": 1471,
-    "away": 1379
+    "home": 1451,
+    "away": 1400
    },
    "line": 7.0,
    "tline": 54.5,
@@ -95,79 +94,14 @@
     "home": "-340",
     "away": "270"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "Jake Ferguson",
-      "pos": "TE",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.6
-     },
-     {
-      "name": "Dee Winters",
-      "pos": "LB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.6
-     },
-     {
-      "name": "KaVontae Turpin",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.4
-     },
-     {
-      "name": "Tyrus Wheat",
-      "pos": "LB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     },
-     {
-      "name": "Luke Schoonmaker",
-      "pos": "TE",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ],
-    "away": [
-     {
-      "name": "Kendrick Bourne",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.6
-     },
-     {
-      "name": "Bam Knight",
-      "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.3
-     },
-     {
-      "name": "Jon Gaines II",
-      "pos": "G",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     },
-     {
-      "name": "Walter Nolen III",
-      "pos": "DT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "edge": 1.0,
-   "cover": 0.503,
+   "edge": 0.6,
+   "cover": 0.502,
    "side": "home",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 30,
+    "away": 33
+   }
   },
   {
    "id": "2026_08_ATL_TB",
@@ -185,24 +119,24 @@
    "div": true,
    "hqb": "Baker Mayfield",
    "aqb": "Michael Penix Jr.",
-   "margin": 0.3,
-   "pHome": 0.509,
+   "margin": 0.5,
+   "pHome": 0.514,
    "total": 43.3,
-   "hs": 21.8,
-   "as": 21.5,
+   "hs": 21.9,
+   "as": 21.4,
    "parts": {
     "elo": -0.3,
     "qb": -0.6,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -0.6,
+    "inj": -0.4,
     "mkt": -0.9,
     "ret": 0.6,
     "roster": 0.1
    },
    "elo": {
-    "home": 1476,
-    "away": 1489
+    "home": 1501,
+    "away": 1464
    },
    "line": 2.5,
    "tline": 42.5,
@@ -210,44 +144,14 @@
     "home": "-130",
     "away": "110"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "Emeka Egbuka",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.9
-     },
-     {
-      "name": "Luke Haggard",
-      "pos": "G",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ],
-    "away": [
-     {
-      "name": "Brian Robinson Jr.",
-      "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.4
-     },
-     {
-      "name": "Zachariah Branch",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "edge": -2.2,
+   "edge": -2.0,
    "cover": 0.505,
    "side": "away",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 16,
+    "away": 0
+   }
   },
   {
    "id": "2026_08_BAL_BUF",
@@ -264,26 +168,25 @@
    "roof": "outdoors",
    "div": false,
    "hqb": "Josh Allen",
-   "aqb": "Skylar Thompson",
-   "margin": 12.8,
-   "pHome": 0.84,
+   "aqb": "Lamar Jackson",
+   "margin": 7.2,
+   "pHome": 0.712,
    "total": 52.6,
-   "hs": 32.7,
-   "as": 19.9,
+   "hs": 29.9,
+   "as": 22.7,
    "parts": {
     "elo": 3.0,
-    "qb": 5.8,
+    "qb": -0.6,
     "rest": 0.7,
     "home": 2.0,
-    "inj": -1.1,
+    "inj": -0.5,
     "mkt": 2.5,
     "ret": 0.0,
-    "roster": 0.0,
-    "trade": -0.2
+    "roster": 0.0
    },
    "elo": {
-    "home": 1653,
-    "away": 1517
+    "home": 1669,
+    "away": 1502
    },
    "line": 3.0,
    "tline": 54.5,
@@ -291,91 +194,14 @@
     "home": "-162",
     "away": "136"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "Spencer Brown",
-      "pos": "OT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 1.0
-     },
-     {
-      "name": "Dee Alford",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.7
-     },
-     {
-      "name": "Joshua Palmer",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.5
-     },
-     {
-      "name": "Mike Danna",
-      "pos": "DE",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.4
-     }
-    ],
-    "away": [
-     {
-      "name": "Jaylinn Hawkins",
-      "pos": "S",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.6
-     },
-     {
-      "name": "Olaivavega Ioane",
-      "pos": "G",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.4
-     },
-     {
-      "name": "Emery Jones Jr.",
-      "pos": "OT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.2
-     },
-     {
-      "name": "Chandler Rivers",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.2
-     },
-     {
-      "name": "Aeneas Peebles",
-      "pos": "DT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "moves": {
-    "home": [],
-    "away": [
-     {
-      "name": "Christian Haynes",
-      "pos": "OL",
-      "dir": "in",
-      "team": "SEA",
-      "pts": 0.1
-     }
-    ]
-   },
-   "edge": 9.8,
-   "cover": 0.524,
+   "edge": 4.2,
+   "cover": 0.511,
    "side": "home",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 36,
+    "away": 10
+   }
   },
   {
    "id": "2026_08_CLE_PIT",
@@ -393,24 +219,24 @@
    "div": true,
    "hqb": "Aaron Rodgers",
    "aqb": "Deshaun Watson",
-   "margin": 5.5,
-   "pHome": 0.664,
+   "margin": 5.7,
+   "pHome": 0.67,
    "total": 38.1,
-   "hs": 21.8,
-   "as": 16.3,
+   "hs": 21.9,
+   "as": 16.2,
    "parts": {
     "elo": 2.0,
     "qb": -0.3,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -0.2,
+    "inj": 0.0,
     "mkt": 2.7,
     "ret": -0.5,
     "roster": -0.2
    },
    "elo": {
-    "home": 1558,
-    "away": 1469
+    "home": 1576,
+    "away": 1450
    },
    "line": 3.5,
    "tline": 38.5,
@@ -418,37 +244,14 @@
     "home": "-198",
     "away": "164"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "Brandin Echols",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.4
-     }
-    ],
-    "away": [
-     {
-      "name": "Audric Estime",
-      "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     },
-     {
-      "name": "Noah Igbinoghene",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "edge": 2.0,
+   "edge": 2.2,
    "cover": 0.505,
    "side": "home",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 27,
+    "away": 6
+   }
   },
   {
    "id": "2026_08_IND_JAX",
@@ -466,25 +269,24 @@
    "div": true,
    "hqb": "Trevor Lawrence",
    "aqb": "Daniel Jones",
-   "margin": 9.1,
-   "pHome": 0.76,
+   "margin": 7.7,
+   "pHome": 0.725,
    "total": 47.1,
-   "hs": 28.1,
-   "as": 19.0,
+   "hs": 27.4,
+   "as": 19.7,
    "parts": {
     "elo": 4.2,
     "qb": -1.6,
     "rest": 0.7,
     "home": 2.0,
-    "inj": -0.6,
+    "inj": -0.5,
     "mkt": 3.5,
     "ret": -0.7,
-    "roster": 0.1,
-    "trade": 1.5
+    "roster": 0.1
    },
    "elo": {
-    "home": 1608,
-    "away": 1419
+    "home": 1621,
+    "away": 1405
    },
    "line": 10.0,
    "tline": 45.5,
@@ -492,84 +294,14 @@
     "home": "-485",
     "away": "370"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "Antonio Johnson",
-      "pos": "S",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.9
-     },
-     {
-      "name": "Alijah Huzzie",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.6
-     },
-     {
-      "name": "Jamal Hill",
-      "pos": "LB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.2
-     }
-    ],
-    "away": [
-     {
-      "name": "Justin Walley",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.8
-     },
-     {
-      "name": "Charlie Heck",
-      "pos": "OT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.2
-     },
-     {
-      "name": "Bryce Boettcher",
-      "pos": "LB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     },
-     {
-      "name": "Kevin Givens",
-      "pos": "DT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "moves": {
-    "home": [],
-    "away": [
-     {
-      "name": "Quenton Nelson",
-      "pos": "OL",
-      "dir": "out",
-      "team": "SEA",
-      "pts": -0.7
-     },
-     {
-      "name": "DeForest Buckner",
-      "pos": "DL",
-      "dir": "out",
-      "team": "SF",
-      "pts": -0.7
-     }
-    ]
-   },
-   "edge": -0.9,
-   "cover": 0.502,
+   "edge": -2.3,
+   "cover": 0.506,
    "side": "away",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 42,
+    "away": 7
+   }
   },
   {
    "id": "2026_08_LV_NYJ",
@@ -587,25 +319,24 @@
    "div": false,
    "hqb": "Geno Smith",
    "aqb": "Kirk Cousins",
-   "margin": -4.3,
-   "pHome": 0.37,
+   "margin": -3.2,
+   "pHome": 0.401,
    "total": 42.9,
-   "hs": 19.3,
-   "as": 23.6,
+   "hs": 19.9,
+   "as": 23.1,
    "parts": {
     "elo": -0.8,
     "qb": -1.0,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -3.3,
+    "inj": -2.2,
     "mkt": -1.1,
     "ret": -0.3,
-    "roster": 0.1,
-    "trade": 0.1
+    "roster": 0.1
    },
    "elo": {
-    "home": 1365,
-    "away": 1401
+    "home": 1346,
+    "away": 1420
    },
    "line": 1.5,
    "tline": 46.5,
@@ -613,77 +344,14 @@
     "home": "-125",
     "away": "105"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "David Bailey",
-      "pos": "LB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 1.5
-     },
-     {
-      "name": "Breece Hall",
-      "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.9
-     },
-     {
-      "name": "Nahshon Wright",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.9
-     },
-     {
-      "name": "Joseph Ossai",
-      "pos": "DE",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.3
-     },
-     {
-      "name": "Tim Patrick",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ],
-    "away": [
-     {
-      "name": "JJ Pegues",
-      "pos": "DT",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.2
-     },
-     {
-      "name": "Tristin McCollum",
-      "pos": "S",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "moves": {
-    "home": [],
-    "away": [
-     {
-      "name": "Jonah Laulu",
-      "pos": "DL",
-      "dir": "out",
-      "team": "TEN",
-      "pts": -0.1
-     }
-    ]
-   },
-   "edge": -5.8,
-   "cover": 0.514,
+   "edge": -4.7,
+   "cover": 0.512,
    "side": "away",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 33,
+    "away": 38
+   }
   },
   {
    "id": "2026_08_MIN_DET",
@@ -701,24 +369,24 @@
    "div": true,
    "hqb": "Jared Goff",
    "aqb": "Kyler Murray",
-   "margin": -2.2,
-   "pHome": 0.431,
+   "margin": -2.8,
+   "pHome": 0.415,
    "total": 47.6,
-   "hs": 22.7,
-   "as": 24.9,
+   "hs": 22.4,
+   "as": 25.2,
    "parts": {
     "elo": -1.6,
     "qb": -2.5,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -0.0,
+    "inj": -0.6,
     "mkt": 0.6,
     "ret": -0.5,
     "roster": -0.2
    },
    "elo": {
-    "home": 1565,
-    "away": 1637
+    "home": 1582,
+    "away": 1619
    },
    "line": 3.0,
    "tline": 46.5,
@@ -726,14 +394,14 @@
     "home": "-170",
     "away": "142"
    },
-   "inj": {
-    "home": [],
-    "away": []
-   },
-   "edge": -5.2,
-   "cover": 0.513,
+   "edge": -5.8,
+   "cover": 0.514,
    "side": "away",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 19,
+    "away": 15
+   }
   },
   {
    "id": "2026_08_TEN_CIN",
@@ -751,25 +419,24 @@
    "div": false,
    "hqb": "Joe Burrow",
    "aqb": "Cam Ward",
-   "margin": 15.2,
-   "pHome": 0.882,
+   "margin": 14.2,
+   "pHome": 0.865,
    "total": 45.6,
-   "hs": 30.4,
-   "as": 15.2,
+   "hs": 29.9,
+   "as": 15.7,
    "parts": {
     "elo": 5.6,
     "qb": 0.5,
     "rest": 0.0,
     "home": 2.0,
-    "inj": 0.5,
+    "inj": 0.7,
     "mkt": 5.9,
     "ret": -0.2,
-    "roster": -0.2,
-    "trade": 1.2
+    "roster": -0.2
    },
    "elo": {
-    "home": 1566,
-    "away": 1315
+    "home": 1571,
+    "away": 1309
    },
    "line": 13.5,
    "tline": 45.5,
@@ -777,63 +444,14 @@
     "home": "-900",
     "away": "600"
    },
-   "inj": {
-    "home": [
-     {
-      "name": "Kyle Dugger",
-      "pos": "S",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.3
-     },
-     {
-      "name": "Mitchell Tinsley",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ],
-    "away": [
-     {
-      "name": "Carnell Tate",
-      "pos": "WR",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.8
-     },
-     {
-      "name": "Jaylon Jones",
-      "pos": "CB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.1
-     }
-    ]
-   },
-   "moves": {
-    "home": [],
-    "away": [
-     {
-      "name": "Jeffery Simmons",
-      "pos": "DL",
-      "dir": "out",
-      "team": "CHI",
-      "pts": -1.3
-     },
-     {
-      "name": "Jonah Laulu",
-      "pos": "DL",
-      "dir": "in",
-      "team": "LV",
-      "pts": 0.1
-     }
-    ]
-   },
-   "edge": 1.7,
-   "cover": 0.504,
+   "edge": 0.7,
+   "cover": 0.502,
    "side": "home",
-   "over": 0.5
+   "over": 0.5,
+   "final": {
+    "home": 43,
+    "away": 36
+   }
   },
   {
    "id": "2026_08_LAC_LA",
@@ -871,10 +489,10 @@
     "away": 1409
    },
    "line": 6.5,
-   "tline": 45.5,
+   "tline": 46.5,
    "ml": {
     "home": "-285",
-    "away": "277"
+    "away": "230"
    },
    "inj": {
     "home": [
@@ -942,7 +560,7 @@
    "pHome": 0.506,
    "total": 42.5,
    "hs": 21.3,
-   "as": 21.1,
+   "as": 21.2,
    "parts": {
     "elo": 1.4,
     "qb": -1.4,
@@ -960,8 +578,8 @@
    "line": 1.5,
    "tline": 41.5,
    "ml": {
-    "home": "-102",
-    "away": "-100"
+    "home": "-112",
+    "away": "-108"
    },
    "inj": {
     "home": [
@@ -998,7 +616,7 @@
    "aqb": "Drake Maye",
    "margin": -4.8,
    "pHome": 0.353,
-   "total": 44.9,
+   "total": 45.0,
    "hs": 20.1,
    "as": 24.9,
    "parts": {
@@ -1006,27 +624,34 @@
     "qb": 0.2,
     "rest": -0.3,
     "home": 2.0,
-    "inj": 2.0,
+    "inj": 1.9,
     "mkt": -4.9,
     "ret": 0.6,
     "roster": 0.2,
-    "trade": 0.0
+    "trade": 0.1
    },
    "elo": {
     "home": 1390,
     "away": 1598
    },
-   "line": -6.5,
+   "line": -7.0,
    "tline": 41.5,
    "ml": {
-    "home": "300",
-    "away": "-308"
+    "home": "275",
+    "away": "-345"
    },
    "inj": {
     "home": [
      {
       "name": "Jaylin Simpson",
       "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     },
+     {
+      "name": "Christian Haynes",
+      "pos": "G",
       "status": "Out",
       "miss": 1.0,
       "pts": 0.1
@@ -1048,23 +673,35 @@
       "pts": 0.8
      },
      {
-      "name": "Channing Canada",
-      "pos": "CB",
+      "name": "Elliott Davison",
+      "pos": "S",
       "status": "Out",
       "miss": 1.0,
       "pts": 0.1
      },
      {
-      "name": "Elliott Davison",
-      "pos": "S",
+      "name": "Channing Canada",
+      "pos": "CB",
       "status": "Out",
       "miss": 1.0,
       "pts": 0.1
      }
     ]
    },
-   "edge": 1.7,
-   "cover": 0.504,
+   "moves": {
+    "home": [
+     {
+      "name": "Christian Haynes",
+      "pos": "OL",
+      "dir": "in",
+      "team": "SEA",
+      "pts": 0.1
+     }
+    ],
+    "away": []
+   },
+   "edge": 2.2,
+   "cover": 0.505,
    "side": "home",
    "over": 0.5
   },
@@ -1084,7 +721,7 @@
    "div": true,
    "hqb": "Jayden Daniels",
    "aqb": "Tanner McKee",
-   "margin": 6.8,
+   "margin": 6.7,
    "pHome": 0.7,
    "total": 42.6,
    "hs": 24.7,
@@ -1094,7 +731,7 @@
     "qb": 2.7,
     "rest": 0.7,
     "home": 2.0,
-    "inj": 1.6,
+    "inj": 1.5,
     "mkt": -1.1,
     "ret": 1.0,
     "roster": 0.5,
@@ -1120,17 +757,17 @@
       "pts": 0.5
      },
      {
-      "name": "Treylon Burks",
-      "pos": "WR",
-      "status": "Questionable",
-      "miss": 0.24,
-      "pts": 0.1
-     },
-     {
       "name": "Javon Kinlaw",
       "pos": "DT",
       "status": "Out",
       "miss": 1.0,
+      "pts": 0.1
+     },
+     {
+      "name": "Treylon Burks",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.24,
       "pts": 0.1
      }
     ],
@@ -1158,7 +795,7 @@
      }
     ]
    },
-   "edge": 1.3,
+   "edge": 1.2,
    "cover": 0.503,
    "side": "home",
    "over": 0.5
@@ -1182,7 +819,7 @@
    "margin": 3.6,
    "pHome": 0.609,
    "total": 44.5,
-   "hs": 24.0,
+   "hs": 24.1,
    "as": 20.5,
    "parts": {
     "elo": 2.0,
@@ -1202,8 +839,8 @@
    "line": 3.5,
    "tline": 46.5,
    "ml": {
-    "home": "-163",
-    "away": "160"
+    "home": "-160",
+    "away": "156"
    },
    "inj": {
     "home": [
@@ -1236,10 +873,10 @@
       "pts": 0.2
      },
      {
-      "name": "Velus Jones Jr.",
-      "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
+      "name": "Patrick O'Connell",
+      "pos": "LB",
+      "status": "Questionable",
+      "miss": 0.77,
       "pts": 0.1
      }
     ],
@@ -1419,8 +1056,8 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1558,
-    "away": 1489
+    "home": 1576,
+    "away": 1464
    },
    "line": 6.5,
    "tline": 40.5,
@@ -1469,8 +1106,8 @@
     "roster": -0.2
    },
    "elo": {
-    "home": 1419,
-    "away": 1517
+    "home": 1405,
+    "away": 1502
    },
    "line": -3.0,
    "tline": 48.5,
@@ -1520,7 +1157,7 @@
    },
    "elo": {
     "home": 1517,
-    "away": 1653
+    "away": 1669
    },
    "line": -1.5,
    "tline": 44.5,
@@ -1619,8 +1256,8 @@
     "roster": -0.6
    },
    "elo": {
-    "home": 1608,
-    "away": 1469
+    "home": 1621,
+    "away": 1450
    },
    "line": 8.5,
    "tline": 40.5,
@@ -1669,7 +1306,7 @@
     "roster": -0.7
    },
    "elo": {
-    "home": 1565,
+    "home": 1582,
     "away": 1413
    },
    "line": 7.0,
@@ -1719,8 +1356,8 @@
     "roster": -0.0
    },
    "elo": {
-    "home": 1315,
-    "away": 1365
+    "home": 1309,
+    "away": 1346
    },
    "line": 1.5,
    "tline": 39.5,
@@ -1769,8 +1406,8 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1566,
-    "away": 1476
+    "home": 1571,
+    "away": 1501
    },
    "line": 3.5,
    "tline": 50.5,
@@ -1820,7 +1457,7 @@
    },
    "elo": {
     "home": 1409,
-    "away": 1379
+    "away": 1400
    },
    "line": 8.5,
    "tline": 47.5,
@@ -1869,7 +1506,7 @@
     "roster": 0.7
    },
    "elo": {
-    "home": 1637,
+    "home": 1619,
     "away": 1540
    },
    "line": 1.5,
@@ -1919,7 +1556,7 @@
     "roster": 0.6
    },
    "elo": {
-    "home": 1401,
+    "home": 1420,
     "away": 1390
    },
    "line": 3.0,
@@ -2020,7 +1657,7 @@
    },
    "elo": {
     "home": 1464,
-    "away": 1471
+    "away": 1451
    },
    "line": -3.0,
    "tline": 47.5,
@@ -2119,8 +1756,8 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1653,
-    "away": 1565
+    "home": 1669,
+    "away": 1582
    },
    "line": 5.5,
    "tline": 54.5,
@@ -2169,7 +1806,7 @@
     "roster": -0.2
    },
    "elo": {
-    "home": 1489,
+    "home": 1464,
     "away": 1437
    },
    "line": -2.5,
@@ -2220,7 +1857,7 @@
    },
    "elo": {
     "home": 1517,
-    "away": 1566
+    "away": 1571
    },
    "line": 3.0,
    "tline": 45.5,
@@ -2269,8 +1906,8 @@
     "roster": -0.2
    },
    "elo": {
-    "home": 1476,
-    "away": 1469
+    "home": 1501,
+    "away": 1450
    },
    "line": 8.5,
    "tline": 41.5,
@@ -2319,7 +1956,7 @@
     "roster": 1.2
    },
    "elo": {
-    "home": 1365,
+    "home": 1346,
     "away": 1540
    },
    "line": -3.5,
@@ -2370,7 +2007,7 @@
    },
    "elo": {
     "home": 1580,
-    "away": 1637
+    "away": 1619
    },
    "line": 4.5,
    "tline": 46.5,
@@ -2419,7 +2056,7 @@
     "roster": -0.5
    },
    "elo": {
-    "home": 1517,
+    "home": 1502,
     "away": 1413
    },
    "line": 8.5,
@@ -2469,7 +2106,7 @@
     "roster": 0.8
    },
    "elo": {
-    "home": 1315,
+    "home": 1309,
     "away": 1447
    },
    "line": -7.0,
@@ -2520,7 +2157,7 @@
    },
    "elo": {
     "home": 1598,
-    "away": 1558
+    "away": 1576
    },
    "line": 4.5,
    "tline": 41.5,
@@ -2570,7 +2207,7 @@
    },
    "elo": {
     "home": 1627,
-    "away": 1608
+    "away": 1621
    },
    "line": 2.5,
    "tline": 45.5,
@@ -2620,7 +2257,7 @@
    },
    "elo": {
     "home": 1409,
-    "away": 1401
+    "away": 1420
    },
    "line": 6.5,
    "tline": 43.5,
@@ -2719,7 +2356,7 @@
     "roster": 0.6
    },
    "elo": {
-    "home": 1379,
+    "home": 1400,
     "away": 1671
    },
    "line": -3.5,
@@ -2769,7 +2406,7 @@
     "roster": -0.2
    },
    "elo": {
-    "home": 1471,
+    "home": 1451,
     "away": 1415
    },
    "line": 3.5,
@@ -2820,7 +2457,7 @@
    },
    "elo": {
     "home": 1565,
-    "away": 1419
+    "away": 1405
    },
    "line": 6.0,
    "tline": 46.5,
@@ -2920,7 +2557,7 @@
    },
    "elo": {
     "home": 1540,
-    "away": 1489
+    "away": 1464
    },
    "line": 4.5,
    "tline": 43.5,
@@ -2969,7 +2606,7 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1469,
+    "home": 1450,
     "away": 1437
    },
    "line": -2.5,
@@ -3019,8 +2656,8 @@
     "roster": -0.2
    },
    "elo": {
-    "home": 1558,
-    "away": 1566
+    "home": 1576,
+    "away": 1571
    },
    "line": -3.5,
    "tline": 42.5,
@@ -3069,7 +2706,7 @@
     "roster": -0.5
    },
    "elo": {
-    "home": 1419,
+    "home": 1405,
     "away": 1517
    },
    "line": -1.5,
@@ -3169,7 +2806,7 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1653,
+    "home": 1669,
     "away": 1409
    },
    "line": 7.0,
@@ -3219,7 +2856,7 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1608,
+    "home": 1621,
     "away": 1598
    },
    "line": 3.0,
@@ -3269,8 +2906,8 @@
     "roster": -0.9
    },
    "elo": {
-    "home": 1565,
-    "away": 1365
+    "home": 1582,
+    "away": 1346
    },
    "line": 7.0,
    "tline": 49.5,
@@ -3370,7 +3007,7 @@
    },
    "elo": {
     "home": 1464,
-    "away": 1315
+    "away": 1309
    },
    "line": 2.5,
    "tline": 37.5,
@@ -3420,7 +3057,7 @@
    },
    "elo": {
     "home": 1624,
-    "away": 1379
+    "away": 1400
    },
    "line": 7.5,
    "tline": 48.5,
@@ -3469,8 +3106,8 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1476,
-    "away": 1637
+    "home": 1501,
+    "away": 1619
    },
    "line": -1.5,
    "tline": 42.5,
@@ -3519,8 +3156,8 @@
     "roster": 0.5
    },
    "elo": {
-    "home": 1471,
-    "away": 1517
+    "home": 1451,
+    "away": 1502
    },
    "line": -3.0,
    "tline": 53.5,
@@ -3570,7 +3207,7 @@
    },
    "elo": {
     "home": 1413,
-    "away": 1401
+    "away": 1420
    },
    "line": 3.5,
    "tline": 43.5,
@@ -3719,8 +3356,8 @@
     "roster": 0.3
    },
    "elo": {
-    "home": 1469,
-    "away": 1558
+    "home": 1450,
+    "away": 1576
    },
    "line": -2.5,
    "tline": 38.5,
@@ -3770,7 +3407,7 @@
    },
    "elo": {
     "home": 1415,
-    "away": 1419
+    "away": 1405
    },
    "line": -4.5,
    "tline": 46.5,
@@ -3820,7 +3457,7 @@
    },
    "elo": {
     "home": 1464,
-    "away": 1379
+    "away": 1400
    },
    "line": -2.5,
    "tline": 44.5,
@@ -3870,7 +3507,7 @@
    },
    "elo": {
     "home": 1517,
-    "away": 1471
+    "away": 1451
    },
    "line": 3.0,
    "tline": 48.5,
@@ -3919,7 +3556,7 @@
     "roster": 0.6
    },
    "elo": {
-    "home": 1476,
+    "home": 1501,
     "away": 1540
    },
    "line": -3.0,
@@ -3969,8 +3606,8 @@
     "roster": 0.4
    },
    "elo": {
-    "home": 1566,
-    "away": 1608
+    "home": 1571,
+    "away": 1621
    },
    "line": 2.5,
    "tline": 51.5,
@@ -4069,7 +3706,7 @@
     "roster": 0.3
    },
    "elo": {
-    "home": 1653,
+    "home": 1669,
     "away": 1598
    },
    "line": 7.0,
@@ -4120,7 +3757,7 @@
    },
    "elo": {
     "home": 1580,
-    "away": 1365
+    "away": 1346
    },
    "line": 3.5,
    "tline": 43.5,
@@ -4169,8 +3806,8 @@
     "roster": -0.7
    },
    "elo": {
-    "home": 1517,
-    "away": 1315
+    "home": 1502,
+    "away": 1309
    },
    "line": 11.5,
    "tline": 42.5,
@@ -4219,7 +3856,7 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1637,
+    "home": 1619,
     "away": 1390
    },
    "line": 10.0,
@@ -4319,7 +3956,7 @@
     "roster": 0.6
    },
    "elo": {
-    "home": 1401,
+    "home": 1420,
     "away": 1565
    },
    "line": -4.5,
@@ -4420,7 +4057,7 @@
    },
    "elo": {
     "home": 1437,
-    "away": 1565
+    "away": 1582
    },
    "line": -4.5,
    "tline": 52.5,
@@ -4470,7 +4107,7 @@
    },
    "elo": {
     "home": 1413,
-    "away": 1489
+    "away": 1464
    },
    "line": 1.5,
    "tline": 47.5,
@@ -4519,8 +4156,8 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1471,
-    "away": 1476
+    "home": 1451,
+    "away": 1501
    },
    "line": 9.5,
    "tline": 49.5,
@@ -4569,7 +4206,7 @@
     "roster": -0.1
    },
    "elo": {
-    "home": 1608,
+    "home": 1621,
     "away": 1447
    },
    "line": 7.5,
@@ -4670,7 +4307,7 @@
    },
    "elo": {
     "home": 1390,
-    "away": 1566
+    "away": 1571
    },
    "line": -7.0,
    "tline": 44.5,
@@ -4719,8 +4356,8 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1365,
-    "away": 1469
+    "home": 1346,
+    "away": 1450
    },
    "line": 2.5,
    "tline": 38.5,
@@ -4769,7 +4406,7 @@
     "roster": 0.4
    },
    "elo": {
-    "home": 1315,
+    "home": 1309,
     "away": 1517
    },
    "line": -6.5,
@@ -4819,8 +4456,8 @@
     "roster": 0.3
    },
    "elo": {
-    "home": 1558,
-    "away": 1419
+    "home": 1576,
+    "away": 1405
    },
    "line": 3.0,
    "tline": 41.5,
@@ -4870,7 +4507,7 @@
    },
    "elo": {
     "home": 1598,
-    "away": 1401
+    "away": 1420
    },
    "line": 3.5,
    "tline": 45.5,
@@ -4920,7 +4557,7 @@
    },
    "elo": {
     "home": 1413,
-    "away": 1637
+    "away": 1619
    },
    "line": -2.5,
    "tline": 41.5,
@@ -5069,8 +4706,8 @@
     "roster": 0.4
    },
    "elo": {
-    "home": 1379,
-    "away": 1565
+    "home": 1400,
+    "away": 1582
    },
    "line": -5.5,
    "tline": 55.5,
@@ -5169,8 +4806,8 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1489,
-    "away": 1517
+    "home": 1464,
+    "away": 1502
    },
    "line": 3.5,
    "tline": 44.5,
@@ -5220,7 +4857,7 @@
    },
    "elo": {
     "home": 1579,
-    "away": 1653
+    "away": 1669
    },
    "line": 3.5,
    "tline": 55.5,
@@ -5319,7 +4956,7 @@
     "roster": -0.2
    },
    "elo": {
-    "home": 1608,
+    "home": 1621,
     "away": 1517
    },
    "line": 2.5,
@@ -5369,8 +5006,8 @@
     "roster": 0.4
    },
    "elo": {
-    "home": 1469,
-    "away": 1517
+    "home": 1450,
+    "away": 1502
    },
    "line": -3.0,
    "tline": 39.5,
@@ -5469,7 +5106,7 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1489,
+    "home": 1464,
     "away": 1580
    },
    "line": -1.5,
@@ -5570,7 +5207,7 @@
    },
    "elo": {
     "home": 1598,
-    "away": 1365
+    "away": 1346
    },
    "line": 7.5,
    "tline": 43.5,
@@ -5619,8 +5256,8 @@
     "roster": 0.1
    },
    "elo": {
-    "home": 1476,
-    "away": 1558
+    "home": 1501,
+    "away": 1576
    },
    "line": -2.5,
    "tline": 38.5,
@@ -5669,8 +5306,8 @@
     "roster": -0.7
    },
    "elo": {
-    "home": 1419,
-    "away": 1315
+    "home": 1405,
+    "away": 1309
    },
    "line": 6.5,
    "tline": 43.5,
@@ -5720,7 +5357,7 @@
    },
    "elo": {
     "home": 1579,
-    "away": 1379
+    "away": 1400
    },
    "line": 12.5,
    "tline": 51.5,
@@ -5769,8 +5406,8 @@
     "roster": 0.4
    },
    "elo": {
-    "home": 1401,
-    "away": 1653
+    "home": 1420,
+    "away": 1669
    },
    "line": -5.5,
    "tline": 53.5,
@@ -5870,7 +5507,7 @@
    },
    "elo": {
     "home": 1540,
-    "away": 1471
+    "away": 1451
    },
    "line": -1.5,
    "tline": 53.5,
@@ -6020,7 +5657,7 @@
    },
    "elo": {
     "home": 1413,
-    "away": 1558
+    "away": 1576
    },
    "line": -3.0,
    "tline": 43.5,
@@ -6069,8 +5706,8 @@
     "roster": -0.3
    },
    "elo": {
-    "home": 1517,
-    "away": 1566
+    "home": 1502,
+    "away": 1571
    },
    "line": -3.0,
    "tline": 46.5,
@@ -6119,8 +5756,8 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1315,
-    "away": 1469
+    "home": 1309,
+    "away": 1450
    },
    "line": -1.5,
    "tline": 36.5,
@@ -6169,8 +5806,8 @@
     "roster": 0.3
    },
    "elo": {
-    "home": 1637,
-    "away": 1419
+    "home": 1619,
+    "away": 1405
    },
    "line": 6.5,
    "tline": 41.5,
@@ -6219,7 +5856,7 @@
     "roster": 0.5
    },
    "elo": {
-    "home": 1365,
+    "home": 1346,
     "away": 1390
    },
    "line": 3.5,
@@ -6319,7 +5956,7 @@
     "roster": 0.0
    },
    "elo": {
-    "home": 1489,
+    "home": 1464,
     "away": 1624
    },
    "line": -2.5,
@@ -6370,7 +6007,7 @@
    },
    "elo": {
     "home": 1437,
-    "away": 1476
+    "away": 1501
    },
    "line": 3.0,
    "tline": 44.5,
@@ -6419,7 +6056,7 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1379,
+    "home": 1400,
     "away": 1627
    },
    "line": -4.5,
@@ -6469,7 +6106,7 @@
     "roster": 0.2
    },
    "elo": {
-    "home": 1565,
+    "home": 1582,
     "away": 1540
    },
    "line": 3.5,
@@ -6519,7 +6156,7 @@
     "roster": 0.4
    },
    "elo": {
-    "home": 1401,
+    "home": 1420,
     "away": 1579
    },
    "line": -3.5,
@@ -6620,7 +6257,7 @@
    },
    "elo": {
     "home": 1447,
-    "away": 1471
+    "away": 1451
    },
    "line": -4.5,
    "tline": 43.5,
@@ -6686,6 +6323,406 @@
     "home": 27,
     "away": 19
    }
+  },
+  {
+   "id": "2026_08_ARI_DAL",
+   "espn": "401873024",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "DAL",
+   "away": "ARI",
+   "neutral": false,
+   "stadium": "AT&T Stadium",
+   "roof": "closed",
+   "div": false,
+   "hqb": "Dak Prescott",
+   "aqb": "Jacoby Brissett",
+   "margin": 7.6,
+   "pHome": 0.723,
+   "total": 55.0,
+   "hs": 31.3,
+   "as": 23.7,
+   "parts": {
+    "elo": 2.0,
+    "qb": 0.3,
+    "rest": -0.1,
+    "home": 2.0,
+    "inj": -0.9,
+    "mkt": 4.6,
+    "ret": -0.4,
+    "roster": 0.1
+   },
+   "elo": {
+    "home": 1451,
+    "away": 1400
+   },
+   "line": 7.0,
+   "tline": 54.5,
+   "ml": {
+    "home": "-340",
+    "away": "270"
+   },
+   "edge": 0.6,
+   "cover": 0.502,
+   "side": "home",
+   "over": 0.5,
+   "final": {
+    "home": 30,
+    "away": 33
+   }
+  },
+  {
+   "id": "2026_08_ATL_TB",
+   "espn": "401873025",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "TB",
+   "away": "ATL",
+   "neutral": false,
+   "stadium": "Raymond James Stadium",
+   "roof": "outdoors",
+   "div": true,
+   "hqb": "Baker Mayfield",
+   "aqb": "Michael Penix Jr.",
+   "margin": 0.5,
+   "pHome": 0.514,
+   "total": 43.3,
+   "hs": 21.9,
+   "as": 21.4,
+   "parts": {
+    "elo": -0.3,
+    "qb": -0.6,
+    "rest": 0.0,
+    "home": 2.0,
+    "inj": -0.4,
+    "mkt": -0.9,
+    "ret": 0.6,
+    "roster": 0.1
+   },
+   "elo": {
+    "home": 1501,
+    "away": 1464
+   },
+   "line": 2.5,
+   "tline": 42.5,
+   "ml": {
+    "home": "-130",
+    "away": "110"
+   },
+   "edge": -2.0,
+   "cover": 0.505,
+   "side": "away",
+   "over": 0.5,
+   "final": {
+    "home": 16,
+    "away": 0
+   }
+  },
+  {
+   "id": "2026_08_BAL_BUF",
+   "espn": "401873026",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "BUF",
+   "away": "BAL",
+   "neutral": false,
+   "stadium": "Highmark Stadium",
+   "roof": "outdoors",
+   "div": false,
+   "hqb": "Josh Allen",
+   "aqb": "Lamar Jackson",
+   "margin": 7.2,
+   "pHome": 0.712,
+   "total": 52.6,
+   "hs": 29.9,
+   "as": 22.7,
+   "parts": {
+    "elo": 3.0,
+    "qb": -0.6,
+    "rest": 0.7,
+    "home": 2.0,
+    "inj": -0.5,
+    "mkt": 2.5,
+    "ret": 0.0,
+    "roster": 0.0
+   },
+   "elo": {
+    "home": 1669,
+    "away": 1502
+   },
+   "line": 3.0,
+   "tline": 54.5,
+   "ml": {
+    "home": "-162",
+    "away": "136"
+   },
+   "edge": 4.2,
+   "cover": 0.511,
+   "side": "home",
+   "over": 0.5,
+   "final": {
+    "home": 36,
+    "away": 10
+   }
+  },
+  {
+   "id": "2026_08_CLE_PIT",
+   "espn": "401873027",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "PIT",
+   "away": "CLE",
+   "neutral": false,
+   "stadium": "Acrisure Stadium",
+   "roof": "outdoors",
+   "div": true,
+   "hqb": "Aaron Rodgers",
+   "aqb": "Deshaun Watson",
+   "margin": 5.7,
+   "pHome": 0.67,
+   "total": 38.1,
+   "hs": 21.9,
+   "as": 16.2,
+   "parts": {
+    "elo": 2.0,
+    "qb": -0.3,
+    "rest": 0.0,
+    "home": 2.0,
+    "inj": 0.0,
+    "mkt": 2.7,
+    "ret": -0.5,
+    "roster": -0.2
+   },
+   "elo": {
+    "home": 1576,
+    "away": 1450
+   },
+   "line": 3.5,
+   "tline": 38.5,
+   "ml": {
+    "home": "-198",
+    "away": "164"
+   },
+   "edge": 2.2,
+   "cover": 0.505,
+   "side": "home",
+   "over": 0.5,
+   "final": {
+    "home": 27,
+    "away": 6
+   }
+  },
+  {
+   "id": "2026_08_IND_JAX",
+   "espn": "401873028",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "JAX",
+   "away": "IND",
+   "neutral": false,
+   "stadium": "EverBank Stadium",
+   "roof": "outdoors",
+   "div": true,
+   "hqb": "Trevor Lawrence",
+   "aqb": "Daniel Jones",
+   "margin": 7.7,
+   "pHome": 0.725,
+   "total": 47.1,
+   "hs": 27.4,
+   "as": 19.7,
+   "parts": {
+    "elo": 4.2,
+    "qb": -1.6,
+    "rest": 0.7,
+    "home": 2.0,
+    "inj": -0.5,
+    "mkt": 3.5,
+    "ret": -0.7,
+    "roster": 0.1
+   },
+   "elo": {
+    "home": 1621,
+    "away": 1405
+   },
+   "line": 10.0,
+   "tline": 45.5,
+   "ml": {
+    "home": "-485",
+    "away": "370"
+   },
+   "edge": -2.3,
+   "cover": 0.506,
+   "side": "away",
+   "over": 0.5,
+   "final": {
+    "home": 42,
+    "away": 7
+   }
+  },
+  {
+   "id": "2026_08_LV_NYJ",
+   "espn": "401873029",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "NYJ",
+   "away": "LV",
+   "neutral": false,
+   "stadium": "MetLife Stadium",
+   "roof": "outdoors",
+   "div": false,
+   "hqb": "Geno Smith",
+   "aqb": "Kirk Cousins",
+   "margin": -3.2,
+   "pHome": 0.401,
+   "total": 42.9,
+   "hs": 19.9,
+   "as": 23.1,
+   "parts": {
+    "elo": -0.8,
+    "qb": -1.0,
+    "rest": 0.0,
+    "home": 2.0,
+    "inj": -2.2,
+    "mkt": -1.1,
+    "ret": -0.3,
+    "roster": 0.1
+   },
+   "elo": {
+    "home": 1346,
+    "away": 1420
+   },
+   "line": 1.5,
+   "tline": 46.5,
+   "ml": {
+    "home": "-125",
+    "away": "105"
+   },
+   "edge": -4.7,
+   "cover": 0.512,
+   "side": "away",
+   "over": 0.5,
+   "final": {
+    "home": 33,
+    "away": 38
+   }
+  },
+  {
+   "id": "2026_08_MIN_DET",
+   "espn": "401873030",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "DET",
+   "away": "MIN",
+   "neutral": false,
+   "stadium": "Ford Field",
+   "roof": "dome",
+   "div": true,
+   "hqb": "Jared Goff",
+   "aqb": "Kyler Murray",
+   "margin": -2.8,
+   "pHome": 0.415,
+   "total": 47.6,
+   "hs": 22.4,
+   "as": 25.2,
+   "parts": {
+    "elo": -1.6,
+    "qb": -2.5,
+    "rest": 0.0,
+    "home": 2.0,
+    "inj": -0.6,
+    "mkt": 0.6,
+    "ret": -0.5,
+    "roster": -0.2
+   },
+   "elo": {
+    "home": 1582,
+    "away": 1619
+   },
+   "line": 3.0,
+   "tline": 46.5,
+   "ml": {
+    "home": "-170",
+    "away": "142"
+   },
+   "edge": -5.8,
+   "cover": 0.514,
+   "side": "away",
+   "over": 0.5,
+   "final": {
+    "home": 19,
+    "away": 15
+   }
+  },
+  {
+   "id": "2026_08_TEN_CIN",
+   "espn": "401873031",
+   "kick": "2026-11-01T18:00:00Z",
+   "week": 8,
+   "date": "2026-11-01",
+   "time": "13:00",
+   "day": "Sun",
+   "home": "CIN",
+   "away": "TEN",
+   "neutral": false,
+   "stadium": "Paycor Stadium",
+   "roof": "outdoors",
+   "div": false,
+   "hqb": "Joe Burrow",
+   "aqb": "Cam Ward",
+   "margin": 14.2,
+   "pHome": 0.865,
+   "total": 45.6,
+   "hs": 29.9,
+   "as": 15.7,
+   "parts": {
+    "elo": 5.6,
+    "qb": 0.5,
+    "rest": 0.0,
+    "home": 2.0,
+    "inj": 0.7,
+    "mkt": 5.9,
+    "ret": -0.2,
+    "roster": -0.2
+   },
+   "elo": {
+    "home": 1571,
+    "away": 1309
+   },
+   "line": 13.5,
+   "tline": 45.5,
+   "ml": {
+    "home": "-900",
+    "away": "600"
+   },
+   "edge": 0.7,
+   "cover": 0.502,
+   "side": "home",
+   "over": 0.5,
+   "final": {
+    "home": 43,
+    "away": 36
+   }
   }
  ],
  "rec": {
@@ -6695,70 +6732,70 @@
   "SF": "6-1",
   "CAR": "3-4",
   "CHI": "5-2",
-  "CIN": "4-2",
-  "TB": "2-5",
-  "DET": "4-2",
+  "CIN": "5-2",
+  "TB": "3-5",
+  "DET": "5-2",
   "NO": "2-5",
   "HOU": "2-5",
-  "BUF": "5-1",
-  "IND": "2-5",
-  "BAL": "4-3",
-  "JAX": "4-2",
-  "CLE": "5-2",
-  "PIT": "5-2",
-  "ATL": "3-4",
-  "TEN": "1-6",
-  "NYJ": "2-5",
+  "BUF": "6-1",
+  "IND": "2-6",
+  "BAL": "4-4",
+  "JAX": "5-2",
+  "CLE": "5-3",
+  "PIT": "6-2",
+  "ATL": "3-5",
+  "TEN": "1-7",
+  "NYJ": "2-6",
   "LAC": "0-6",
-  "ARI": "2-5",
-  "LV": "3-4",
+  "ARI": "3-5",
+  "LV": "4-4",
   "MIA": "1-5",
-  "MIN": "6-0",
+  "MIN": "6-1",
   "GB": "5-3",
   "PHI": "2-5",
   "WAS": "1-4-1",
   "NYG": "4-2-1",
-  "DAL": "3-4",
+  "DAL": "3-5",
   "KC": "5-1",
   "DEN": "5-2"
  },
  "elo": {
   "SEA": 1671,
-  "BUF": 1653,
-  "MIN": 1637,
+  "BUF": 1669,
   "DEN": 1627,
   "SF": 1624,
-  "JAX": 1608,
+  "JAX": 1621,
+  "MIN": 1619,
   "NE": 1598,
+  "DET": 1582,
   "CHI": 1580,
   "LA": 1579,
-  "CIN": 1566,
+  "PIT": 1576,
+  "CIN": 1571,
   "KC": 1565,
-  "DET": 1565,
-  "PIT": 1558,
   "GB": 1540,
-  "BAL": 1517,
   "HOU": 1517,
-  "ATL": 1489,
-  "TB": 1476,
-  "DAL": 1471,
-  "CLE": 1469,
+  "BAL": 1502,
+  "TB": 1501,
+  "ATL": 1464,
   "NYG": 1464,
+  "DAL": 1451,
+  "CLE": 1450,
   "PHI": 1447,
   "CAR": 1437,
-  "IND": 1419,
+  "LV": 1420,
   "WAS": 1415,
   "NO": 1413,
   "LAC": 1409,
-  "LV": 1401,
+  "IND": 1405,
+  "ARI": 1400,
   "MIA": 1390,
-  "ARI": 1379,
-  "NYJ": 1365,
-  "TEN": 1315
+  "NYJ": 1346,
+  "TEN": 1309
  },
  "ats": {
-  "w": 56,
-  "l": 42,
+  "w": 59,
+  "l": 47,
   "p": 6
  },
  "sd": 12.86,
@@ -6838,8 +6875,8 @@
  },
  "injSrc": {
   "espn": 799,
-  "rotoballer": 29,
-  "inactives": 22,
+  "rotoballer": 28,
+  "inactives": 4,
   "league": 320
  },
  "injTest": {
@@ -6874,8 +6911,8 @@
   {
    "t": "MIN",
    "dv": "NFC North",
-   "rating": 6.3,
-   "elo": 1637,
+   "rating": 6.0,
+   "elo": 1619,
    "off": -0.105,
    "dfn": -0.145,
    "qb": "Kyler Murray",
@@ -6883,7 +6920,7 @@
    "inj": null,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "6-0",
+   "rec": "6-1",
    "war": 2.8,
    "wars": {
     "LB": 0.6,
@@ -6894,20 +6931,20 @@
     "OL": 0.3,
     "RB": -0.1
    },
-   "wins": 13.3,
-   "playoff": 0.973,
-   "div": 0.732,
-   "seed1": 0.553,
-   "conf": 0.285,
-   "sb": 0.152,
-   "xSlot": 28.0,
+   "wins": 12.7,
+   "playoff": 0.959,
+   "div": 0.619,
+   "seed1": 0.433,
+   "conf": 0.252,
+   "sb": 0.129,
+   "xSlot": 27.36,
    "pTop5": 0.0,
    "rk": 1,
    "rkLo": 1,
-   "rkHi": 11,
-   "p1": 0.235,
-   "p4": 0.591,
-   "rsd": 3.74
+   "rkHi": 12,
+   "p1": 0.209,
+   "p4": 0.555,
+   "rsd": 3.72
   },
   {
    "t": "KC",
@@ -6933,19 +6970,19 @@
     "OL": 0.4
    },
    "wins": 11.8,
-   "playoff": 0.912,
-   "div": 0.587,
-   "seed1": 0.254,
-   "conf": 0.188,
-   "sb": 0.094,
+   "playoff": 0.915,
+   "div": 0.6,
+   "seed1": 0.242,
+   "conf": 0.18,
+   "sb": 0.096,
    "xSlot": 25.73,
    "pTop5": 0.0,
    "rk": 2,
    "rkLo": 1,
    "rkHi": 14,
-   "p1": 0.151,
-   "p4": 0.476,
-   "rsd": 3.74
+   "p1": 0.149,
+   "p4": 0.471,
+   "rsd": 3.72
   },
   {
    "t": "SF",
@@ -6970,20 +7007,20 @@
     "OL": 0.7,
     "DL": 0.3
    },
-   "wins": 12.0,
-   "playoff": 0.927,
-   "div": 0.7,
-   "seed1": 0.239,
-   "conf": 0.202,
-   "sb": 0.103,
-   "xSlot": 26.18,
+   "wins": 12.1,
+   "playoff": 0.925,
+   "div": 0.694,
+   "seed1": 0.284,
+   "conf": 0.209,
+   "sb": 0.111,
+   "xSlot": 26.28,
    "pTop5": 0.0,
    "rk": 3,
    "rkLo": 2,
    "rkHi": 16,
-   "p1": 0.094,
-   "p4": 0.367,
-   "rsd": 3.74
+   "p1": 0.092,
+   "p4": 0.359,
+   "rsd": 3.72
   },
   {
    "t": "SEA",
@@ -7009,25 +7046,25 @@
     "RB": -0.1
    },
    "wins": 10.6,
-   "playoff": 0.736,
-   "div": 0.236,
-   "seed1": 0.048,
-   "conf": 0.139,
-   "sb": 0.079,
-   "xSlot": 23.37,
+   "playoff": 0.731,
+   "div": 0.242,
+   "seed1": 0.063,
+   "conf": 0.158,
+   "sb": 0.087,
+   "xSlot": 23.51,
    "pTop5": 0.001,
    "rk": 4,
    "rkLo": 2,
    "rkHi": 17,
-   "p1": 0.081,
-   "p4": 0.308,
-   "rsd": 3.74
+   "p1": 0.08,
+   "p4": 0.303,
+   "rsd": 3.72
   },
   {
    "t": "CIN",
    "dv": "AFC North",
-   "rating": 3.5,
-   "elo": 1566,
+   "rating": 3.6,
+   "elo": 1571,
    "off": 0.072,
    "dfn": 0.036,
    "qb": "Joe Burrow",
@@ -7035,7 +7072,7 @@
    "inj": 0.4,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "4-2",
+   "rec": "5-2",
    "war": 3.0,
    "wars": {
     "QB": 0.5,
@@ -7046,20 +7083,58 @@
     "LB": 0.2,
     "RB": 0.0
    },
-   "wins": 11.3,
-   "playoff": 0.822,
-   "div": 0.447,
-   "seed1": 0.109,
-   "conf": 0.117,
-   "sb": 0.059,
-   "xSlot": 23.92,
-   "pTop5": 0.002,
+   "wins": 11.5,
+   "playoff": 0.856,
+   "div": 0.485,
+   "seed1": 0.118,
+   "conf": 0.118,
+   "sb": 0.058,
+   "xSlot": 24.43,
+   "pTop5": 0.0,
    "rk": 5,
    "rkLo": 2,
    "rkHi": 17,
-   "p1": 0.063,
-   "p4": 0.285,
-   "rsd": 3.74
+   "p1": 0.064,
+   "p4": 0.287,
+   "rsd": 3.72
+  },
+  {
+   "t": "BUF",
+   "dv": "AFC East",
+   "rating": 3.5,
+   "elo": 1669,
+   "off": 0.155,
+   "dfn": 0.039,
+   "qb": "Josh Allen",
+   "qbPts": 5.7,
+   "inj": 2.4,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "6-1",
+   "war": 2.6,
+   "wars": {
+    "QB": 0.7,
+    "RB": 0.4,
+    "DL": 0.4,
+    "OL": 0.8,
+    "WR/TE": 0.5,
+    "LB": -0.0,
+    "DB": -0.1
+   },
+   "wins": 12.3,
+   "playoff": 0.953,
+   "div": 0.803,
+   "seed1": 0.298,
+   "conf": 0.22,
+   "sb": 0.119,
+   "xSlot": 26.73,
+   "pTop5": 0.0,
+   "rk": 6,
+   "rkLo": 2,
+   "rkHi": 17,
+   "p1": 0.069,
+   "p4": 0.275,
+   "rsd": 3.72
   },
   {
    "t": "DEN",
@@ -7084,25 +7159,25 @@
     "RB": 0.1,
     "WR/TE": 0.1
    },
-   "wins": 11.4,
-   "playoff": 0.845,
-   "div": 0.392,
-   "seed1": 0.157,
-   "conf": 0.142,
-   "sb": 0.071,
-   "xSlot": 24.67,
+   "wins": 11.3,
+   "playoff": 0.836,
+   "div": 0.377,
+   "seed1": 0.142,
+   "conf": 0.139,
+   "sb": 0.072,
+   "xSlot": 24.63,
    "pTop5": 0.0,
-   "rk": 6,
+   "rk": 7,
    "rkLo": 2,
    "rkHi": 17,
-   "p1": 0.07,
-   "p4": 0.284,
-   "rsd": 3.74
+   "p1": 0.077,
+   "p4": 0.301,
+   "rsd": 3.72
   },
   {
    "t": "LA",
    "dv": "NFC West",
-   "rating": 3.2,
+   "rating": 3.3,
    "elo": 1579,
    "off": 0.067,
    "dfn": -0.034,
@@ -7123,57 +7198,19 @@
     "OL": 0.5
    },
    "wins": 8.8,
-   "playoff": 0.375,
-   "div": 0.063,
-   "seed1": 0.005,
-   "conf": 0.053,
-   "sb": 0.028,
-   "xSlot": 17.86,
-   "pTop5": 0.024,
-   "rk": 7,
-   "rkLo": 2,
-   "rkHi": 17,
-   "p1": 0.067,
-   "p4": 0.282,
-   "rsd": 3.74
-  },
-  {
-   "t": "BUF",
-   "dv": "AFC East",
-   "rating": 2.9,
-   "elo": 1653,
-   "off": 0.155,
-   "dfn": 0.039,
-   "qb": "Josh Allen",
-   "qbPts": 5.7,
-   "inj": 2.6,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "5-1",
-   "war": 2.6,
-   "wars": {
-    "QB": 0.7,
-    "RB": 0.4,
-    "DL": 0.4,
-    "OL": 0.8,
-    "WR/TE": 0.5,
-    "LB": -0.0,
-    "DB": -0.1
-   },
-   "wins": 12.0,
-   "playoff": 0.928,
-   "div": 0.777,
-   "seed1": 0.262,
-   "conf": 0.211,
-   "sb": 0.112,
-   "xSlot": 26.3,
-   "pTop5": 0.0,
+   "playoff": 0.367,
+   "div": 0.061,
+   "seed1": 0.008,
+   "conf": 0.052,
+   "sb": 0.024,
+   "xSlot": 18.0,
+   "pTop5": 0.019,
    "rk": 8,
    "rkLo": 2,
-   "rkHi": 18,
-   "p1": 0.056,
-   "p4": 0.256,
-   "rsd": 3.74
+   "rkHi": 17,
+   "p1": 0.069,
+   "p4": 0.284,
+   "rsd": 3.72
   },
   {
    "t": "CHI",
@@ -7199,33 +7236,33 @@
     "LB": 0.2
    },
    "wins": 10.6,
-   "playoff": 0.702,
-   "div": 0.107,
-   "seed1": 0.059,
-   "conf": 0.086,
-   "sb": 0.041,
-   "xSlot": 22.84,
+   "playoff": 0.684,
+   "div": 0.133,
+   "seed1": 0.074,
+   "conf": 0.087,
+   "sb": 0.042,
+   "xSlot": 22.78,
    "pTop5": 0.001,
    "rk": 9,
    "rkLo": 3,
    "rkHi": 19,
-   "p1": 0.042,
-   "p4": 0.212,
-   "rsd": 3.74
+   "p1": 0.043,
+   "p4": 0.206,
+   "rsd": 3.72
   },
   {
    "t": "DET",
    "dv": "NFC North",
-   "rating": 2.2,
-   "elo": 1565,
+   "rating": 2.5,
+   "elo": 1582,
    "off": 0.083,
    "dfn": 0.035,
    "qb": "Jared Goff",
    "qbPts": 4.5,
-   "inj": null,
+   "inj": 0.2,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "4-2",
+   "rec": "5-2",
    "war": 2.6,
    "wars": {
     "QB": 0.5,
@@ -7236,34 +7273,34 @@
     "DB": 0.3,
     "LB": -0.0
    },
-   "wins": 10.3,
-   "playoff": 0.676,
-   "div": 0.136,
-   "seed1": 0.076,
-   "conf": 0.077,
-   "sb": 0.034,
-   "xSlot": 21.73,
-   "pTop5": 0.003,
+   "wins": 11.0,
+   "playoff": 0.804,
+   "div": 0.213,
+   "seed1": 0.119,
+   "conf": 0.099,
+   "sb": 0.048,
+   "xSlot": 23.54,
+   "pTop5": 0.001,
    "rk": 10,
    "rkLo": 3,
-   "rkHi": 20,
-   "p1": 0.029,
-   "p4": 0.172,
-   "rsd": 3.74
+   "rkHi": 19,
+   "p1": 0.033,
+   "p4": 0.187,
+   "rsd": 3.72
   },
   {
    "t": "JAX",
    "dv": "AFC South",
-   "rating": 2.2,
-   "elo": 1608,
+   "rating": 2.3,
+   "elo": 1621,
    "off": 0.082,
    "dfn": -0.028,
    "qb": "Trevor Lawrence",
    "qbPts": 3.3,
-   "inj": 1.7,
+   "inj": 1.9,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "4-2",
+   "rec": "5-2",
    "war": 2.8,
    "wars": {
     "QB": 0.5,
@@ -7274,20 +7311,58 @@
     "DL": 0.4,
     "OL": 0.5
    },
-   "wins": 11.2,
-   "playoff": 0.882,
-   "div": 0.823,
-   "seed1": 0.096,
-   "conf": 0.132,
-   "sb": 0.064,
-   "xSlot": 24.5,
-   "pTop5": 0.002,
+   "wins": 11.4,
+   "playoff": 0.92,
+   "div": 0.874,
+   "seed1": 0.1,
+   "conf": 0.143,
+   "sb": 0.068,
+   "xSlot": 25.09,
+   "pTop5": 0.001,
    "rk": 11,
    "rkLo": 3,
    "rkHi": 20,
-   "p1": 0.034,
-   "p4": 0.179,
-   "rsd": 3.74
+   "p1": 0.036,
+   "p4": 0.181,
+   "rsd": 3.72
+  },
+  {
+   "t": "PIT",
+   "dv": "AFC North",
+   "rating": 1.5,
+   "elo": 1576,
+   "off": -0.022,
+   "dfn": 0.0,
+   "qb": "Aaron Rodgers",
+   "qbPts": 2.4,
+   "inj": 0.4,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "6-2",
+   "war": 2.5,
+   "wars": {
+    "RB": 0.3,
+    "LB": 0.3,
+    "DB": 0.6,
+    "DL": 0.6,
+    "OL": 0.5,
+    "QB": 0.1,
+    "WR/TE": 0.2
+   },
+   "wins": 11.0,
+   "playoff": 0.786,
+   "div": 0.364,
+   "seed1": 0.066,
+   "conf": 0.074,
+   "sb": 0.032,
+   "xSlot": 23.18,
+   "pTop5": 0.0,
+   "rk": 12,
+   "rkLo": 3,
+   "rkHi": 21,
+   "p1": 0.027,
+   "p4": 0.143,
+   "rsd": 3.72
   },
   {
    "t": "HOU",
@@ -7313,57 +7388,19 @@
     "RB": -0.1
    },
    "wins": 7.8,
-   "playoff": 0.25,
-   "div": 0.131,
-   "seed1": 0.001,
-   "conf": 0.023,
+   "playoff": 0.228,
+   "div": 0.109,
+   "seed1": 0.0,
+   "conf": 0.022,
    "sb": 0.011,
-   "xSlot": 13.98,
-   "pTop5": 0.099,
-   "rk": 12,
-   "rkLo": 4,
-   "rkHi": 22,
-   "p1": 0.022,
-   "p4": 0.127,
-   "rsd": 3.74
-  },
-  {
-   "t": "PIT",
-   "dv": "AFC North",
-   "rating": 1.1,
-   "elo": 1558,
-   "off": -0.022,
-   "dfn": 0.0,
-   "qb": "Aaron Rodgers",
-   "qbPts": 2.4,
-   "inj": 0.4,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "5-2",
-   "war": 2.5,
-   "wars": {
-    "RB": 0.3,
-    "LB": 0.3,
-    "DB": 0.6,
-    "DL": 0.6,
-    "OL": 0.5,
-    "QB": 0.1,
-    "WR/TE": 0.2
-   },
-   "wins": 10.7,
-   "playoff": 0.716,
-   "div": 0.312,
-   "seed1": 0.066,
-   "conf": 0.066,
-   "sb": 0.03,
-   "xSlot": 22.35,
-   "pTop5": 0.001,
+   "xSlot": 13.67,
+   "pTop5": 0.103,
    "rk": 13,
    "rkLo": 4,
    "rkHi": 22,
-   "p1": 0.019,
-   "p4": 0.121,
-   "rsd": 3.74
+   "p1": 0.018,
+   "p4": 0.116,
+   "rsd": 3.72
   },
   {
    "t": "NE",
@@ -7389,57 +7426,57 @@
     "RB": -0.0
    },
    "wins": 9.4,
-   "playoff": 0.591,
-   "div": 0.215,
-   "seed1": 0.027,
-   "conf": 0.059,
-   "sb": 0.027,
-   "xSlot": 20.5,
-   "pTop5": 0.003,
+   "playoff": 0.573,
+   "div": 0.193,
+   "seed1": 0.026,
+   "conf": 0.054,
+   "sb": 0.025,
+   "xSlot": 20.33,
+   "pTop5": 0.005,
    "rk": 14,
    "rkLo": 5,
    "rkHi": 23,
-   "p1": 0.011,
-   "p4": 0.08,
-   "rsd": 3.74
+   "p1": 0.01,
+   "p4": 0.075,
+   "rsd": 3.72
   },
   {
-   "t": "DAL",
-   "dv": "NFC East",
-   "rating": -0.4,
-   "elo": 1471,
-   "off": 0.069,
-   "dfn": 0.114,
-   "qb": "Dak Prescott",
-   "qbPts": 4.2,
-   "inj": 1.8,
+   "t": "BAL",
+   "dv": "AFC North",
+   "rating": -0.0,
+   "elo": 1502,
+   "off": 0.058,
+   "dfn": 0.02,
+   "qb": "Lamar Jackson",
+   "qbPts": 4.8,
+   "inj": 1.0,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "3-4",
-   "war": 2.5,
+   "rec": "4-4",
+   "war": 2.4,
    "wars": {
-    "QB": 0.6,
-    "WR/TE": 0.7,
-    "RB": 0.1,
-    "OL": 0.7,
+    "QB": 0.5,
+    "WR/TE": 0.4,
+    "DB": 0.3,
+    "LB": 0.3,
+    "OL": 0.5,
     "DL": 0.3,
-    "LB": 0.1,
-    "DB": 0.0
+    "RB": 0.1
    },
-   "wins": 8.8,
-   "playoff": 0.568,
-   "div": 0.538,
-   "seed1": 0.004,
-   "conf": 0.05,
-   "sb": 0.025,
-   "xSlot": 18.35,
-   "pTop5": 0.036,
+   "wins": 8.7,
+   "playoff": 0.281,
+   "div": 0.06,
+   "seed1": 0.002,
+   "conf": 0.021,
+   "sb": 0.009,
+   "xSlot": 16.43,
+   "pTop5": 0.02,
    "rk": 15,
    "rkLo": 6,
    "rkHi": 24,
-   "p1": 0.006,
-   "p4": 0.059,
-   "rsd": 3.74
+   "p1": 0.007,
+   "p4": 0.069,
+   "rsd": 3.72
   },
   {
    "t": "GB",
@@ -7465,109 +7502,33 @@
     "RB": -0.1
    },
    "wins": 9.2,
-   "playoff": 0.438,
-   "div": 0.024,
-   "seed1": 0.009,
-   "conf": 0.03,
+   "playoff": 0.414,
+   "div": 0.035,
+   "seed1": 0.012,
+   "conf": 0.033,
    "sb": 0.014,
-   "xSlot": 18.95,
+   "xSlot": 18.77,
    "pTop5": 0.003,
    "rk": 16,
    "rkLo": 7,
    "rkHi": 25,
-   "p1": 0.005,
-   "p4": 0.043,
-   "rsd": 3.74
-  },
-  {
-   "t": "ATL",
-   "dv": "NFC South",
-   "rating": -1.5,
-   "elo": 1489,
-   "off": -0.036,
-   "dfn": -0.006,
-   "qb": "Michael Penix Jr.",
-   "qbPts": 2.9,
-   "inj": 0.5,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-4",
-   "war": 2.2,
-   "wars": {
-    "WR/TE": 0.3,
-    "RB": 0.3,
-    "QB": 0.3,
-    "DB": 0.3,
-    "OL": 0.5,
-    "LB": 0.1,
-    "DL": 0.4
-   },
-   "wins": 7.6,
-   "playoff": 0.392,
-   "div": 0.37,
-   "seed1": 0.003,
-   "conf": 0.023,
-   "sb": 0.009,
-   "xSlot": 15.46,
-   "pTop5": 0.073,
-   "rk": 17,
-   "rkLo": 8,
-   "rkHi": 26,
-   "p1": 0.002,
-   "p4": 0.033,
-   "rsd": 3.74
-  },
-  {
-   "t": "CLE",
-   "dv": "AFC North",
-   "rating": -1.8,
-   "elo": 1469,
-   "off": -0.115,
-   "dfn": -0.046,
-   "qb": "Deshaun Watson",
-   "qbPts": 1.8,
-   "inj": 0.2,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "5-2",
-   "war": 2.0,
-   "wars": {
-    "DB": 0.6,
-    "LB": 0.3,
-    "QB": 0.2,
-    "DL": 0.4,
-    "OL": 0.3,
-    "WR/TE": 0.2,
-    "RB": -0.0
-   },
-   "wins": 9.8,
-   "playoff": 0.546,
-   "div": 0.191,
-   "seed1": 0.022,
-   "conf": 0.028,
-   "sb": 0.01,
-   "xSlot": 19.42,
-   "pTop5": 0.005,
-   "rk": 18,
-   "rkLo": 9,
-   "rkHi": 26,
-   "p1": 0.003,
-   "p4": 0.025,
-   "rsd": 3.74
+   "p1": 0.004,
+   "p4": 0.04,
+   "rsd": 3.72
   },
   {
    "t": "LV",
    "dv": "AFC West",
-   "rating": -2.1,
-   "elo": 1401,
+   "rating": -1.6,
+   "elo": 1420,
    "off": -0.093,
    "dfn": 0.013,
    "qb": "Kirk Cousins",
    "qbPts": 2.9,
-   "inj": 0.3,
+   "inj": 0.2,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "3-4",
+   "rec": "4-4",
    "war": 2.0,
    "wars": {
     "QB": 0.4,
@@ -7578,20 +7539,96 @@
     "DL": 0.3,
     "RB": -0.0
    },
-   "wins": 7.4,
-   "playoff": 0.139,
-   "div": 0.021,
+   "wins": 7.9,
+   "playoff": 0.18,
+   "div": 0.022,
    "seed1": 0.001,
-   "conf": 0.007,
-   "sb": 0.003,
-   "xSlot": 12.45,
-   "pTop5": 0.112,
-   "rk": 19,
+   "conf": 0.009,
+   "sb": 0.004,
+   "xSlot": 13.95,
+   "pTop5": 0.048,
+   "rk": 17,
+   "rkLo": 8,
+   "rkHi": 26,
+   "p1": 0.002,
+   "p4": 0.029,
+   "rsd": 3.72
+  },
+  {
+   "t": "DAL",
+   "dv": "NFC East",
+   "rating": -1.8,
+   "elo": 1451,
+   "off": 0.069,
+   "dfn": 0.114,
+   "qb": "Dak Prescott",
+   "qbPts": 4.2,
+   "inj": 2.7,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-5",
+   "war": 2.5,
+   "wars": {
+    "QB": 0.6,
+    "WR/TE": 0.7,
+    "RB": 0.1,
+    "OL": 0.7,
+    "DL": 0.3,
+    "LB": 0.1,
+    "DB": 0.0
+   },
+   "wins": 7.9,
+   "playoff": 0.392,
+   "div": 0.375,
+   "seed1": 0.001,
+   "conf": 0.034,
+   "sb": 0.015,
+   "xSlot": 15.27,
+   "pTop5": 0.077,
+   "rk": 18,
    "rkLo": 9,
    "rkHi": 27,
    "p1": 0.003,
-   "p4": 0.023,
-   "rsd": 3.74
+   "p4": 0.024,
+   "rsd": 3.72
+  },
+  {
+   "t": "TB",
+   "dv": "NFC South",
+   "rating": -2.3,
+   "elo": 1501,
+   "off": -0.032,
+   "dfn": -0.026,
+   "qb": "Baker Mayfield",
+   "qbPts": 2.9,
+   "inj": 1.3,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-5",
+   "war": 2.1,
+   "wars": {
+    "RB": 0.2,
+    "DB": 0.6,
+    "LB": 0.1,
+    "DL": 0.4,
+    "OL": 0.5,
+    "QB": 0.2,
+    "WR/TE": 0.1
+   },
+   "wins": 7.2,
+   "playoff": 0.378,
+   "div": 0.369,
+   "seed1": 0.001,
+   "conf": 0.023,
+   "sb": 0.009,
+   "xSlot": 14.1,
+   "pTop5": 0.131,
+   "rk": 19,
+   "rkLo": 9,
+   "rkHi": 28,
+   "p1": 0.002,
+   "p4": 0.018,
+   "rsd": 3.72
   },
   {
    "t": "WAS",
@@ -7616,20 +7653,58 @@
     "DL": 0.1,
     "RB": 0.0
    },
-   "wins": 6.8,
-   "playoff": 0.181,
-   "div": 0.158,
-   "seed1": 0.0,
-   "conf": 0.014,
+   "wins": 6.9,
+   "playoff": 0.234,
+   "div": 0.222,
+   "seed1": 0.001,
+   "conf": 0.015,
    "sb": 0.006,
-   "xSlot": 11.76,
-   "pTop5": 0.193,
+   "xSlot": 12.18,
+   "pTop5": 0.189,
    "rk": 20,
    "rkLo": 9,
    "rkHi": 27,
    "p1": 0.002,
+   "p4": 0.017,
+   "rsd": 3.72
+  },
+  {
+   "t": "CLE",
+   "dv": "AFC North",
+   "rating": -2.6,
+   "elo": 1450,
+   "off": -0.115,
+   "dfn": -0.046,
+   "qb": "Deshaun Watson",
+   "qbPts": 1.8,
+   "inj": 0.5,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "5-3",
+   "war": 2.0,
+   "wars": {
+    "DB": 0.6,
+    "LB": 0.3,
+    "QB": 0.2,
+    "DL": 0.4,
+    "OL": 0.3,
+    "WR/TE": 0.2,
+    "RB": -0.0
+   },
+   "wins": 9.3,
+   "playoff": 0.411,
+   "div": 0.091,
+   "seed1": 0.004,
+   "conf": 0.016,
+   "sb": 0.007,
+   "xSlot": 17.68,
+   "pTop5": 0.012,
+   "rk": 21,
+   "rkLo": 10,
+   "rkHi": 28,
+   "p1": 0.002,
    "p4": 0.018,
-   "rsd": 3.74
+   "rsd": 3.72
   },
   {
    "t": "LAC",
@@ -7655,57 +7730,19 @@
     "QB": -0.1
    },
    "wins": 4.8,
-   "playoff": 0.013,
-   "div": 0.0,
+   "playoff": 0.015,
+   "div": 0.001,
    "seed1": 0.0,
    "conf": 0.001,
-   "sb": 0.0,
-   "xSlot": 6.13,
-   "pTop5": 0.544,
-   "rk": 21,
-   "rkLo": 10,
-   "rkHi": 28,
-   "p1": 0.002,
-   "p4": 0.02,
-   "rsd": 3.74
-  },
-  {
-   "t": "TB",
-   "dv": "NFC South",
-   "rating": -2.6,
-   "elo": 1476,
-   "off": -0.032,
-   "dfn": -0.026,
-   "qb": "Baker Mayfield",
-   "qbPts": 2.9,
-   "inj": 1.0,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "2-5",
-   "war": 2.1,
-   "wars": {
-    "RB": 0.2,
-    "DB": 0.6,
-    "LB": 0.1,
-    "DL": 0.4,
-    "OL": 0.5,
-    "QB": 0.2,
-    "WR/TE": 0.1
-   },
-   "wins": 6.7,
-   "playoff": 0.268,
-   "div": 0.256,
-   "seed1": 0.0,
-   "conf": 0.015,
-   "sb": 0.006,
-   "xSlot": 12.18,
-   "pTop5": 0.201,
+   "sb": 0.001,
+   "xSlot": 6.12,
+   "pTop5": 0.555,
    "rk": 22,
    "rkLo": 10,
    "rkHi": 28,
    "p1": 0.001,
-   "p4": 0.02,
-   "rsd": 3.74
+   "p4": 0.019,
+   "rsd": 3.72
   },
   {
    "t": "CAR",
@@ -7731,24 +7768,24 @@
     "DL": 0.1
    },
    "wins": 6.9,
-   "playoff": 0.249,
-   "div": 0.236,
+   "playoff": 0.271,
+   "div": 0.263,
    "seed1": 0.001,
-   "conf": 0.011,
+   "conf": 0.012,
    "sb": 0.004,
-   "xSlot": 12.78,
-   "pTop5": 0.131,
+   "xSlot": 12.89,
+   "pTop5": 0.14,
    "rk": 23,
    "rkLo": 13,
    "rkHi": 29,
    "p1": 0.001,
-   "p4": 0.007,
-   "rsd": 3.74
+   "p4": 0.006,
+   "rsd": 3.72
   },
   {
    "t": "NO",
    "dv": "NFC South",
-   "rating": -4.3,
+   "rating": -4.2,
    "elo": 1413,
    "off": -0.045,
    "dfn": 0.026,
@@ -7769,33 +7806,71 @@
     "RB": 0.0
    },
    "wins": 6.2,
-   "playoff": 0.149,
-   "div": 0.138,
+   "playoff": 0.169,
+   "div": 0.163,
    "seed1": 0.0,
-   "conf": 0.006,
-   "sb": 0.003,
-   "xSlot": 9.85,
-   "pTop5": 0.296,
+   "conf": 0.005,
+   "sb": 0.002,
+   "xSlot": 10.02,
+   "pTop5": 0.287,
    "rk": 24,
    "rkLo": 13,
    "rkHi": 29,
    "p1": 0.001,
    "p4": 0.004,
-   "rsd": 3.74
+   "rsd": 3.72
+  },
+  {
+   "t": "ATL",
+   "dv": "NFC South",
+   "rating": -4.5,
+   "elo": 1464,
+   "off": -0.036,
+   "dfn": -0.006,
+   "qb": "Michael Penix Jr.",
+   "qbPts": 2.9,
+   "inj": 2.9,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-5",
+   "war": 2.2,
+   "wars": {
+    "WR/TE": 0.3,
+    "RB": 0.3,
+    "QB": 0.3,
+    "DB": 0.3,
+    "OL": 0.5,
+    "LB": 0.1,
+    "DL": 0.4
+   },
+   "wins": 6.7,
+   "playoff": 0.217,
+   "div": 0.205,
+   "seed1": 0.0,
+   "conf": 0.013,
+   "sb": 0.006,
+   "xSlot": 12.4,
+   "pTop5": 0.136,
+   "rk": 25,
+   "rkLo": 14,
+   "rkHi": 30,
+   "p1": 0.0,
+   "p4": 0.005,
+   "rsd": 3.72
   },
   {
    "t": "IND",
    "dv": "AFC South",
    "rating": -5.2,
-   "elo": 1419,
+   "elo": 1405,
    "off": -0.001,
    "dfn": 0.024,
    "qb": "Daniel Jones",
    "qbPts": 2.0,
-   "inj": 1.1,
+   "inj": 0.8,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "2-5",
+   "rec": "2-6",
    "war": 1.6,
    "wars": {
     "RB": 0.2,
@@ -7806,34 +7881,34 @@
     "WR/TE": 0.3,
     "LB": 0.0
    },
-   "wins": 6.4,
-   "playoff": 0.065,
-   "div": 0.044,
+   "wins": 6.1,
+   "playoff": 0.032,
+   "div": 0.016,
    "seed1": 0.0,
-   "conf": 0.003,
-   "sb": 0.001,
-   "xSlot": 9.31,
-   "pTop5": 0.283,
-   "rk": 25,
-   "rkLo": 15,
+   "conf": 0.002,
+   "sb": 0.0,
+   "xSlot": 8.37,
+   "pTop5": 0.324,
+   "rk": 26,
+   "rkLo": 16,
    "rkHi": 30,
    "p1": 0.0,
-   "p4": 0.003,
-   "rsd": 3.74
+   "p4": 0.002,
+   "rsd": 3.72
   },
   {
    "t": "ARI",
    "dv": "NFC West",
    "rating": -6.2,
-   "elo": 1379,
+   "elo": 1400,
    "off": -0.019,
    "dfn": 0.065,
    "qb": "Jacoby Brissett",
    "qbPts": 1.9,
-   "inj": 1.2,
+   "inj": 1.6,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "2-5",
+   "rec": "3-5",
    "war": 1.1,
    "wars": {
     "QB": 0.3,
@@ -7844,58 +7919,20 @@
     "LB": -0.0,
     "RB": -0.1
    },
-   "wins": 5.8,
-   "playoff": 0.02,
-   "div": 0.002,
+   "wins": 6.5,
+   "playoff": 0.033,
+   "div": 0.003,
    "seed1": 0.0,
    "conf": 0.002,
    "sb": 0.0,
-   "xSlot": 7.95,
-   "pTop5": 0.365,
-   "rk": 26,
-   "rkLo": 17,
-   "rkHi": 31,
-   "p1": 0.0,
-   "p4": 0.002,
-   "rsd": 3.74
-  },
-  {
-   "t": "BAL",
-   "dv": "AFC North",
-   "rating": -6.6,
-   "elo": 1517,
-   "off": 0.058,
-   "dfn": 0.02,
-   "qb": "Skylar Thompson",
-   "qbPts": -1.6,
-   "inj": 1.5,
-   "qb1": "Lamar Jackson",
-   "qb1Status": "Out",
-   "rec": "4-3",
-   "war": 2.4,
-   "wars": {
-    "QB": 0.5,
-    "WR/TE": 0.4,
-    "DB": 0.3,
-    "LB": 0.3,
-    "OL": 0.5,
-    "DL": 0.3,
-    "RB": 0.1
-   },
-   "wins": 8.4,
-   "playoff": 0.259,
-   "div": 0.05,
-   "seed1": 0.005,
-   "conf": 0.022,
-   "sb": 0.01,
-   "xSlot": 15.85,
-   "pTop5": 0.032,
+   "xSlot": 9.83,
+   "pTop5": 0.208,
    "rk": 27,
    "rkLo": 18,
    "rkHi": 31,
    "p1": 0.0,
    "p4": 0.001,
-   "rsd": 3.74
+   "rsd": 3.72
   },
   {
    "t": "MIA",
@@ -7906,7 +7943,7 @@
    "dfn": 0.087,
    "qb": "Malik Willis",
    "qbPts": 2.2,
-   "inj": null,
+   "inj": 0.1,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "1-5",
@@ -7921,19 +7958,57 @@
     "RB": -0.1
    },
    "wins": 4.3,
-   "playoff": 0.01,
-   "div": 0.004,
+   "playoff": 0.008,
+   "div": 0.003,
    "seed1": 0.0,
    "conf": 0.0,
    "sb": 0.0,
-   "xSlot": 5.38,
-   "pTop5": 0.625,
+   "xSlot": 5.32,
+   "pTop5": 0.633,
    "rk": 28,
    "rkLo": 19,
    "rkHi": 31,
    "p1": 0.0,
    "p4": 0.001,
-   "rsd": 3.74
+   "rsd": 3.72
+  },
+  {
+   "t": "NYJ",
+   "dv": "AFC East",
+   "rating": -7.0,
+   "elo": 1346,
+   "off": -0.072,
+   "dfn": 0.045,
+   "qb": "Geno Smith",
+   "qbPts": 1.8,
+   "inj": 2.1,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "2-6",
+   "war": 2.1,
+   "wars": {
+    "QB": 0.2,
+    "DL": 0.6,
+    "WR/TE": 0.3,
+    "LB": 0.2,
+    "DB": 0.4,
+    "OL": 0.3,
+    "RB": 0.1
+   },
+   "wins": 4.7,
+   "playoff": 0.006,
+   "div": 0.001,
+   "seed1": 0.0,
+   "conf": 0.0,
+   "sb": 0.0,
+   "xSlot": 5.36,
+   "pTop5": 0.626,
+   "rk": 29,
+   "rkLo": 19,
+   "rkHi": 31,
+   "p1": 0.0,
+   "p4": 0.0,
+   "rsd": 3.72
   },
   {
    "t": "NYG",
@@ -7959,57 +8034,19 @@
     "RB": -0.1
    },
    "wins": 7.8,
-   "playoff": 0.293,
-   "div": 0.255,
-   "seed1": 0.003,
+   "playoff": 0.358,
+   "div": 0.339,
+   "seed1": 0.004,
    "conf": 0.007,
    "sb": 0.002,
-   "xSlot": 14.35,
-   "pTop5": 0.055,
-   "rk": 29,
-   "rkLo": 19,
+   "xSlot": 14.85,
+   "pTop5": 0.05,
+   "rk": 30,
+   "rkLo": 20,
    "rkHi": 31,
    "p1": 0.0,
-   "p4": 0.001,
-   "rsd": 3.74
-  },
-  {
-   "t": "NYJ",
-   "dv": "AFC East",
-   "rating": -8.1,
-   "elo": 1365,
-   "off": -0.072,
-   "dfn": 0.045,
-   "qb": "Geno Smith",
-   "qbPts": 1.8,
-   "inj": 3.6,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "2-5",
-   "war": 2.1,
-   "wars": {
-    "QB": 0.2,
-    "DL": 0.6,
-    "WR/TE": 0.3,
-    "LB": 0.2,
-    "DB": 0.4,
-    "OL": 0.3,
-    "RB": 0.1
-   },
-   "wins": 5.2,
-   "playoff": 0.019,
-   "div": 0.004,
-   "seed1": 0.0,
-   "conf": 0.001,
-   "sb": 0.0,
-   "xSlot": 6.42,
-   "pTop5": 0.513,
-   "rk": 30,
-   "rkLo": 21,
-   "rkHi": 32,
-   "p1": 0.0,
    "p4": 0.0,
-   "rsd": 3.74
+   "rsd": 3.72
   },
   {
    "t": "PHI",
@@ -8035,33 +8072,33 @@
     "RB": -0.0
    },
    "wins": 5.6,
-   "playoff": 0.054,
-   "div": 0.049,
+   "playoff": 0.066,
+   "div": 0.064,
    "seed1": 0.0,
    "conf": 0.001,
-   "sb": 0.001,
-   "xSlot": 7.1,
-   "pTop5": 0.48,
+   "sb": 0.0,
+   "xSlot": 7.19,
+   "pTop5": 0.479,
    "rk": 31,
    "rkLo": 21,
    "rkHi": 32,
    "p1": 0.0,
    "p4": 0.0,
-   "rsd": 3.74
+   "rsd": 3.72
   },
   {
    "t": "TEN",
    "dv": "AFC South",
-   "rating": -10.7,
-   "elo": 1315,
+   "rating": -11.6,
+   "elo": 1309,
    "off": -0.099,
    "dfn": 0.076,
    "qb": "Cam Ward",
    "qbPts": -0.3,
-   "inj": 0.9,
+   "inj": 1.7,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "1-6",
+   "rec": "1-7",
    "war": 1.3,
    "wars": {
     "DL": 0.5,
@@ -8072,20 +8109,20 @@
     "LB": 0.1,
     "RB": -0.1
    },
-   "wins": 3.2,
-   "playoff": 0.002,
-   "div": 0.002,
+   "wins": 3.0,
+   "playoff": 0.001,
+   "div": 0.001,
    "seed1": 0.0,
    "conf": 0.0,
    "sb": 0.0,
-   "xSlot": 2.36,
-   "pTop5": 0.917,
+   "xSlot": 2.03,
+   "pTop5": 0.947,
    "rk": 32,
-   "rkLo": 25,
+   "rkLo": 27,
    "rkHi": 32,
    "p1": 0.0,
    "p4": 0.0,
-   "rsd": 3.74
+   "rsd": 3.72
   }
  ],
  "qbs": [
@@ -8132,9 +8169,9 @@
    "epa": 0.346,
    "val": 0.157,
    "pts": 4.8,
-   "starter": false,
+   "starter": true,
    "role": "starter",
-   "status": "Out",
+   "status": null,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/eno6s5qzl9grbfbfwhoa"
   },
   {
@@ -8556,422 +8593,411 @@
    "role": "starter",
    "status": null,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/l7iuimdeqgmmhdzdhl67"
-  },
-  {
-   "n": "Skylar Thompson",
-   "t": "BAL",
-   "plays": 0,
-   "epa": null,
-   "val": -0.209,
-   "pts": -1.6,
-   "starter": true,
-   "role": "fill-in",
-   "status": null
   }
  ],
  "sims": 10000,
- "ratingSd": 3.88,
- "left": 164,
+ "ratingSd": 3.79,
+ "left": 156,
  "draftOrders": [
-  "IND TEN NYJ ATL MIA HOU NO ARI LAC WAS CAR LA PHI LV NYG GB BAL PIT TB CLE DET DAL JAX BUF KC SEA SF DEN CHI NE CIN MIN",
-  "IND NYJ TEN PHI TB ATL LAC WAS PIT NO ARI NYG BAL CIN BUF CHI NE GB HOU DET MIA DEN SEA LA DAL CAR KC CLE LV SF JAX MIN",
-  "TEN MIA NYJ BAL TB LAC DAL PHI LV NO NYG ARI CAR NE CLE IND DET GB WAS SF HOU PIT CIN ATL LA CHI JAX DEN SEA BUF MIN KC",
-  "MIA TEN NYJ NO WAS CAR ARI HOU ATL PHI CLE BAL LAC LV IND SF SEA NYG LA KC TB GB PIT BUF DAL CHI CIN DEN NE DET JAX MIN",
-  "MIA TEN TB ARI PHI LV LAC IND NYJ NYG DAL CAR NO BAL LA GB CLE CIN DET WAS MIN PIT DEN NE JAX BUF CHI SF ATL HOU SEA KC",
-  "TEN LA MIA PHI NYJ NO LV IND LAC CAR TB ARI CIN HOU WAS NE DET CHI KC SF JAX NYG CLE GB SEA PIT BAL MIN ATL DEN DAL BUF",
-  "TEN HOU NO LAC ARI PHI TB LV NYJ NE MIA ATL DAL IND SEA GB DET DEN NYG BAL CLE CAR SF PIT LA BUF WAS JAX KC CHI CIN MIN",
-  "IND TEN MIA NO LAC WAS LV PHI ARI NYJ BAL CLE CHI DAL KC DET TB SEA HOU CIN PIT GB NYG SF JAX DEN CAR MIN ATL BUF NE LA",
-  "TEN IND PHI ARI MIA WAS NYJ ATL LV LAC LA NO BAL CAR CHI GB JAX KC NYG HOU DEN CLE SEA DAL PIT DET SF BUF NE MIN TB CIN",
-  "NYJ TEN ATL PHI BAL MIA HOU CAR LV DET ARI CLE DAL NO IND GB LAC NYG TB JAX WAS SF DEN NE LA CIN CHI PIT BUF MIN KC SEA",
-  "TEN ARI NO MIA PHI ATL NYJ IND LAC LA NYG WAS CAR BUF HOU CLE SEA LV TB KC DET PIT JAX SF NE GB DEN CHI DAL CIN BAL MIN",
-  "LAC TEN MIA ARI PHI NYJ CAR TB BUF PIT ATL NYG HOU LV IND GB CHI WAS DET CLE BAL CIN LA SF NO DAL KC JAX DEN MIN NE SEA",
-  "MIA WAS PHI NYJ CAR ARI LAC NO LV TEN HOU LA ATL NYG IND CLE GB BAL DEN JAX TB NE DAL SF CHI SEA KC PIT BUF MIN DET CIN",
-  "TEN NYJ TB IND NE PHI CAR ATL LAC ARI NYG CLE LV GB LA WAS MIA BAL NO DAL PIT BUF DEN SF CHI SEA JAX CIN DET HOU MIN KC",
-  "LAC MIA TEN PHI NO NYJ ARI CAR HOU IND TB WAS LV CLE LA DAL DEN CHI CIN BAL SEA SF DET KC GB NYG JAX BUF NE ATL PIT MIN",
-  "PHI ATL TEN NO LAC NYJ ARI MIA CAR IND DET BAL LA CLE LV CHI NE NYG HOU WAS DAL KC CIN GB TB BUF DEN SF JAX SEA MIN PIT",
-  "NYJ PHI MIA TEN CAR LAC DAL ARI BAL GB NYG NO TB LV PIT IND SEA DEN WAS DET CHI CLE BUF NE HOU KC LA SF ATL JAX MIN CIN",
-  "PHI TEN ARI LAC NYJ WAS NO TB IND ATL CLE LV LA MIA NYG BAL DET HOU CIN NE SF CAR GB DEN DAL PIT KC CHI JAX MIN BUF SEA",
-  "TEN HOU NYJ CAR NYG LAC TB MIA LV PHI GB CHI ATL JAX DAL BUF BAL MIN NE DEN PIT ARI SEA SF WAS IND LA CLE KC DET CIN NO",
-  "MIA TEN LAC WAS IND CAR NYG PHI CLE ATL NYJ TB BAL SF GB HOU LV LA KC SEA MIN DEN JAX CHI ARI DET CIN BUF NE DAL NO PIT",
-  "WAS LAC ARI TEN NO MIA PHI HOU LV DAL DET ATL NYJ TB NE SF IND BAL NYG BUF CHI CIN LA DEN CAR PIT MIN CLE GB KC SEA JAX",
-  "HOU MIA WAS TEN LAC NO ATL IND LV ARI CAR DAL NYJ PHI DEN NE LA CHI JAX GB BAL NYG SEA PIT SF KC DET CIN BUF TB CLE MIN",
-  "TEN NYJ LAC NO MIA NYG ARI DAL IND PHI CAR HOU DET LA ATL DEN BAL CIN WAS TB GB NE JAX KC PIT CHI CLE SEA LV MIN BUF SF",
-  "TEN PHI IND ARI NO NYJ LAC HOU LA TB MIA GB NE SF CAR NYG LV CLE WAS PIT BAL CHI CIN DET ATL KC DEN MIN DAL BUF JAX SEA",
-  "TEN LAC ARI TB MIA PHI IND NYJ WAS DAL CIN NO NE CAR BAL LV SEA LA HOU JAX BUF CHI GB DET ATL MIN KC PIT NYG CLE SF DEN",
-  "LAC MIA TEN WAS NO IND NYJ TB NYG ARI CLE BAL CAR DAL LV HOU SEA GB PHI LA KC NE CHI CIN MIN JAX SF PIT BUF DET DEN ATL",
-  "NYJ MIA WAS TEN CAR IND ARI LAC NO DAL HOU NYG ATL GB LV BAL NE DET PHI PIT MIN CLE LA CIN CHI SEA DEN JAX TB KC BUF SF",
-  "NYJ MIA TEN IND NO NYG PHI ATL WAS ARI LV DET LAC HOU CAR LA CLE BAL JAX TB KC SEA NE SF CHI DAL PIT BUF GB DEN MIN CIN",
-  "NYJ TEN DAL PHI TB CAR LAC MIA ATL JAX IND BAL ARI LV CLE NYG CHI SEA NO LA CIN MIN DEN PIT HOU NE WAS GB DET KC BUF SF",
-  "TEN PHI NYJ WAS NO LAC MIA LV ARI CAR IND CLE BAL TB GB DAL JAX CHI HOU PIT NYG LA ATL BUF KC DET SF DEN NE SEA CIN MIN",
-  "LAC TEN PHI IND ARI NO BAL NYJ LV MIA ATL HOU TB WAS KC DAL LA CHI PIT NE NYG CIN DET CAR GB JAX SEA CLE BUF SF DEN MIN",
-  "TEN PHI IND ARI NYJ LAC CAR ATL NO LV BAL MIA DET DAL HOU NYG GB NE TB CLE PIT SF SEA BUF JAX KC LA MIN WAS CIN DEN CHI",
-  "ARI TEN NYJ IND MIA WAS NO LAC ATL CAR BAL PHI SEA LV GB SF HOU NE TB NYG DET KC PIT CIN LA BUF DEN CHI JAX MIN DAL CLE",
-  "TEN NO LV LAC HOU IND MIA TB NYJ ARI PHI GB LA ATL NYG WAS BAL DEN DAL CAR CLE SF CIN KC NE MIN CHI JAX DET PIT SEA BUF",
-  "TEN PHI LAC ARI LV NYJ NO IND LA MIA ATL NYG WAS HOU DET CAR NE CIN BAL GB CHI SF PIT CLE TB DAL KC DEN SEA BUF JAX MIN",
-  "TEN LA MIA NO ARI CAR TB PHI NYJ IND LAC DET LV HOU WAS NYG PIT BUF ATL BAL SEA CHI NE CIN CLE GB MIN DEN DAL JAX SF KC",
-  "TEN MIA LAC CAR WAS PHI BAL NYG IND LV NO HOU NYJ LA ARI TB GB BUF DAL KC CLE CHI SEA PIT ATL JAX DEN MIN SF NE DET CIN",
-  "TEN MIA PHI TB NYJ WAS NYG HOU LAC ARI NO CAR BAL LV DEN IND GB SEA JAX CIN DET LA KC CHI DAL ATL PIT CLE BUF MIN SF NE",
-  "TEN NYJ MIA HOU NO LAC ARI ATL CAR PHI LA CLE IND LV DET BAL GB DAL TB NE KC CIN CHI SF WAS JAX NYG PIT SEA BUF MIN DEN",
-  "PHI TB LV LAC MIA TEN ATL NYJ WAS CAR NYG ARI SF BAL LA PIT JAX CLE NO DAL HOU KC SEA NE DET IND GB CIN CHI BUF MIN DEN",
-  "TEN NYJ MIA WAS IND LAC NYG PHI ARI LV NO CAR GB PIT TB SEA NE BAL DAL SF HOU DET CLE KC LA CIN MIN BUF JAX CHI DEN ATL",
-  "HOU TEN PHI IND ARI NYJ LAC MIA NYG WAS NO BAL LV TB LA ATL CHI CLE GB CIN PIT SF KC SEA DET CAR NE DEN JAX DAL BUF MIN",
-  "MIA TEN PHI NYJ LAC NO IND WAS ARI TB NYG ATL NE LV HOU KC CHI GB BAL LA DAL CLE DET PIT CIN CAR JAX MIN SEA BUF DEN SF",
-  "LAC TEN WAS NO MIA CIN HOU IND ARI CLE CAR NYG BAL PHI SF ATL DEN SEA TB NYJ CHI LV DET PIT KC LA NE MIN BUF GB DAL JAX",
-  "TEN MIA NYJ CAR NO ATL WAS PHI BAL DAL ARI LAC LA CLE IND HOU LV GB TB NE DEN SEA KC CHI NYG CIN JAX MIN SF BUF DET PIT",
-  "TEN NYJ PHI NO DAL BAL CAR MIA PIT TB IND LAC WAS ARI LV CHI HOU LA NE NYG DEN JAX GB SF DET SEA BUF KC ATL CLE CIN MIN",
-  "ARI LAC WAS MIA TEN NO CAR JAX BAL IND NYJ TB GB NYG CLE NE PHI SEA ATL DAL DEN DET BUF CIN HOU PIT CHI MIN LV LA KC SF",
-  "TEN LAC MIA CAR PHI NYJ IND NYG NE LV TB LA WAS ARI ATL HOU BAL CHI DAL SEA SF CIN JAX BUF PIT GB DET DEN NO CLE MIN KC",
-  "TEN NYJ TB ATL NYG PHI HOU NO IND ARI NE LV DAL CIN LA MIA BAL SEA WAS CLE LAC CHI DEN SF DET BUF GB KC CAR JAX PIT MIN",
-  "LAC ARI TEN MIA BAL WAS IND ATL NYG HOU LV CLE NE GB PHI NO CAR DET DAL CIN SF DEN JAX LA NYJ TB CHI KC PIT MIN BUF SEA",
-  "MIA TB LA LAC NYG PHI TEN LV NYJ WAS IND NO CAR PIT ARI KC GB JAX DAL DET CLE CHI BUF NE ATL BAL DEN MIN CIN SEA SF HOU",
-  "NO ATL MIA LAC PHI NYJ ARI TEN IND WAS PIT CHI LA CLE BAL NYG CAR DEN BUF JAX DET SEA MIN CIN GB TB NE KC HOU SF DAL LV",
-  "ARI TEN LAC PHI MIA NYJ NO GB WAS LA HOU JAX BAL PIT ATL CLE DET CAR IND KC SF NYG CIN CHI TB DAL NE DEN BUF SEA LV MIN",
-  "MIA TEN LV NYJ PHI PIT NYG LAC NO ATL WAS CLE ARI HOU LA TB IND SEA DAL GB CIN MIN JAX KC BAL NE CAR CHI DET BUF DEN SF",
-  "MIA LAC TEN NYJ NO NYG WAS ARI PHI LV IND DET TB CLE JAX SEA PIT CAR ATL HOU NE CHI BAL DAL LA GB DEN KC CIN MIN SF BUF",
-  "LAC ARI BAL TEN IND NYG NO LA TB NYJ BUF CAR WAS DAL CLE MIA LV SF PHI ATL DEN NE PIT GB MIN CHI JAX CIN KC DET SEA HOU",
-  "TEN LAC MIA IND NO NYJ ARI NYG ATL LV CIN CAR HOU CLE WAS PHI LA CHI JAX DEN BAL GB TB SF DAL DET BUF KC SEA PIT MIN NE",
-  "TEN PHI LAC ARI NYJ TB MIA WAS IND NO LV NE ATL NYG SEA JAX CHI BAL CAR GB CLE LA DEN CIN DAL PIT HOU MIN DET BUF KC SF",
-  "TEN PHI ARI NYJ MIA ATL WAS TB CAR LV HOU GB LA LAC IND CIN PIT NYG NO NE CHI MIN BAL KC JAX DET CLE SEA BUF SF DEN DAL",
-  "PHI TEN ARI LAC CAR NO IND MIA ATL WAS HOU LV GB NE NYG BAL BUF LA DAL NYJ PIT SEA CLE MIN TB DEN CIN SF JAX CHI DET KC",
-  "TEN NO PHI LV IND TB NYJ MIA LAC ARI BAL NYG WAS CLE ATL GB KC LA CAR NE HOU SF CHI CIN DAL DEN BUF MIN JAX DET PIT SEA",
-  "TEN LAC NYJ IND NO CAR DAL LV WAS PHI ARI ATL MIA CLE GB DET BAL PIT NYG TB CHI HOU KC CIN SEA MIN DEN BUF LA NE SF JAX",
-  "TEN NYJ WAS MIA NO LV ARI CAR DAL PHI IND JAX CHI LAC BAL ATL GB CIN TB HOU LA CLE BUF SF NYG SEA NE PIT DET KC DEN MIN",
-  "ARI NYJ LAC TEN HOU PHI IND NYG DET TB GB MIA NO CIN ATL WAS CLE LV LA PIT CAR JAX BAL CHI DAL SEA BUF KC NE MIN DEN SF",
-  "ARI TEN HOU TB LV NE NYG CAR MIA DAL NO IND BAL WAS LAC NYJ DET CHI ATL CLE PIT LA DEN GB PHI SEA JAX BUF CIN MIN KC SF",
-  "WAS TEN LAC MIA LV NYJ NO DAL BAL CLE PIT HOU PHI TB ARI LA SEA GB SF CHI BUF CIN DET DEN CAR JAX MIN KC IND ATL NE NYG",
-  "TEN PHI MIA ARI LAC LA LV TB IND BAL NYJ CAR ATL NYG DAL HOU PIT GB NO NE DET SEA CIN JAX CLE MIN KC SF WAS DEN CHI BUF",
-  "TEN MIA PHI NYJ NO WAS LAC TB BAL IND ARI GB LV CLE CAR NYG HOU LA KC DEN CHI DET NE SEA DAL SF JAX BUF ATL PIT MIN CIN",
-  "LAC ARI PHI TB DEN TEN WAS DAL PIT GB CHI HOU CLE CIN NYJ MIA CAR ATL NYG NO NE IND SF BUF LA LV BAL DET SEA KC JAX MIN",
-  "TEN MIA TB WAS NYJ CLE LV PHI LAC CAR GB ARI NYG IND NO BAL NE CHI DAL JAX BUF DEN LA SEA HOU KC MIN DET ATL CIN PIT SF",
-  "TEN IND LAC WAS NYJ LV NO TB MIA PHI ARI CAR NYG GB CLE PIT NE DET DAL ATL JAX BAL CHI KC LA CIN MIN DEN HOU SEA SF BUF",
-  "TEN LAC PHI ARI NO TB NYJ MIA NYG WAS IND BAL PIT LV DET SEA CHI CIN JAX LA NE GB DEN ATL SF CAR KC CLE DAL HOU BUF MIN",
-  "TEN MIA HOU NO ARI NYJ TB BAL LAC LV CAR NYG WAS DAL DET JAX SF PIT IND PHI CIN BUF LA GB ATL KC NE CHI CLE MIN SEA DEN",
-  "NYJ ARI LAC CAR PHI NO MIA TEN HOU DET IND NE NYG WAS LV BAL LA GB DEN PIT ATL CLE SF MIN TB JAX CIN CHI DAL KC BUF SEA",
-  "TEN PHI WAS IND ATL MIA HOU NO CAR NYJ ARI LV NE NYG BAL LAC CHI LA TB BUF DEN DET GB CLE PIT MIN KC SEA DAL CIN SF JAX",
-  "TEN LAC ARI MIA IND NYJ NYG ATL WAS TB PHI NO LV LA HOU CLE BAL CHI CAR CIN PIT SF GB BUF NE MIN JAX DET DAL DEN KC SEA",
-  "MIA LAC NYJ ATL TEN IND LA NYG WAS NO CAR SEA PHI DET LV HOU BAL PIT CHI ARI GB CLE NE BUF TB DEN SF CIN DAL JAX KC MIN",
-  "NYJ DAL PHI LAC NO TEN WAS HOU BAL MIA ARI CAR GB TB DEN NE SEA IND LV PIT ATL CLE SF MIN NYG JAX DET KC LA CIN CHI BUF",
-  "TEN LAC NO NYJ HOU IND TB NYG PHI CAR ARI DAL LV BAL MIA CHI GB DEN ATL KC MIN BUF PIT DET WAS CLE CIN SF LA NE JAX SEA",
-  "LAC TEN PHI ARI NO IND MIA BAL NYG NYJ CAR WAS DET BUF TB GB LV JAX SEA DAL LA CLE KC PIT HOU ATL NE SF DEN MIN CHI CIN",
-  "TEN PHI CAR ARI NYJ LAC WAS IND TB GB MIA HOU LA LV NYG CLE NO PIT KC ATL CIN JAX CHI MIN DET DAL BAL BUF NE SEA DEN SF",
-  "MIA PHI TEN ARI CAR LAC KC DET IND HOU NO LA LV NYJ CHI NYG WAS CIN CLE BAL GB SEA DEN SF TB DAL BUF PIT NE MIN ATL JAX",
-  "TEN MIA CLE LAC ARI GB BAL PHI LV NYG NYJ WAS HOU IND TB CAR ATL SEA DAL NO BUF JAX DET DEN PIT LA NE MIN SF KC CIN CHI",
-  "TEN LAC PHI MIA IND BAL NYJ ATL TB ARI GB JAX NO CHI DAL SF NE CIN NYG CLE DET PIT KC LA WAS LV DEN MIN CAR BUF SEA HOU",
-  "TEN ARI WAS PHI LA LAC ATL IND NYJ BAL MIA HOU LV DEN NO TB GB NYG DAL JAX CLE CAR DET BUF CHI MIN KC CIN PIT SEA NE SF",
-  "PHI LAC TB CAR WAS TEN LV NYJ MIA DAL NO ARI IND HOU LA CLE BUF GB ATL NYG JAX MIN NE KC BAL CHI DEN SEA DET PIT SF CIN",
-  "LAC TEN PHI NO MIA TB ARI HOU NYJ NE ATL GB WAS JAX NYG LV PIT SEA DAL BUF BAL KC SF DET CIN CLE LA CHI DEN MIN CAR IND",
-  "TB LAC ARI TEN IND PHI MIA NYJ WAS CAR GB HOU BAL ATL LV CIN DET DAL JAX NE CLE NYG CHI MIN SEA LA DEN BUF NO PIT SF KC",
-  "TEN PHI LAC NYJ IND ARI MIA CAR ATL NYG WAS LV TB GB NE HOU SEA BAL NO CHI JAX DEN LA BUF DAL KC DET PIT SF CLE MIN CIN",
-  "IND WAS TEN PHI NYJ LAC MIA BAL LV ARI TB CAR ATL DAL NE HOU LA CHI NYG SF JAX PIT MIN DEN NO CLE DET CIN BUF SEA KC GB",
-  "PHI ARI TEN MIA NYJ IND WAS LAC CAR TB LV DET HOU NO NYG SEA DEN NE ATL SF GB BAL PIT CIN CHI DAL JAX KC LA CLE MIN BUF",
-  "TEN NO MIA PHI HOU ARI TB LAC WAS IND DAL ATL LV SEA KC CIN BAL GB CLE CAR NYJ NYG PIT LA SF CHI NE DEN JAX MIN DET BUF",
-  "LAC PHI NO TEN LV TB NYJ MIA NYG CLE IND BAL ARI ATL NE WAS SEA LA CAR HOU KC PIT SF MIN JAX GB CHI BUF CIN DET DAL DEN",
-  "MIA NYJ TEN NYG WAS ARI NO LV LAC TB PHI CLE IND PIT LA ATL JAX SEA NE KC DAL BAL GB MIN CAR DEN CIN SF DET HOU CHI BUF",
-  "LAC NO PHI MIA ARI TB HOU IND LA TEN ATL NE WAS DEN BAL NYJ NYG SEA JAX DAL LV GB CIN CAR BUF DET CLE MIN KC SF PIT CHI",
-  "HOU IND MIA NO ARI NYJ TB TEN LAC WAS DAL BAL NYG CLE DET DEN CAR SEA PHI LV PIT NE CHI SF LA JAX KC GB BUF ATL MIN CIN",
-  "TEN PHI LAC ATL MIA WAS IND NO DAL PIT LV ARI TB NYJ DET GB BAL DEN CAR NE LA JAX CLE MIN HOU SEA BUF CHI NYG CIN KC SF",
-  "NYJ TEN NO TB HOU MIA PHI LV NYG DAL IND LAC ARI ATL LA NE CHI DEN PIT CIN BAL SF GB MIN WAS CLE JAX SEA DET KC BUF CAR",
-  "TEN LAC ARI NYJ PHI NO ATL MIA HOU NE CAR NYG WAS JAX LA CLE BAL GB TB IND PIT KC DET CHI DAL LV DEN MIN SEA CIN SF BUF",
-  "LAC HOU NO TEN PHI IND ATL DAL ARI NYJ MIA NYG LV LA CAR BUF CLE CHI TB DET BAL DEN PIT SF GB SEA CIN NE WAS JAX MIN KC",
-  "TEN NO PHI NYJ ARI LAC WAS IND MIA DAL CAR ATL NE BAL CIN HOU LA SEA TB BUF LV PIT GB CHI NYG CLE DET DEN SF KC JAX MIN",
-  "TEN LAC PHI MIA IND TB NYJ CAR NO WAS DAL CLE SF GB LV BAL DEN CHI HOU ARI JAX KC DET ATL PIT MIN BUF NYG LA NE SEA CIN",
-  "TEN NYJ LAC MIA ARI IND NO TB HOU PHI CAR WAS LA NYG LV DET PIT CLE DAL BUF SEA GB JAX DEN NE CHI CIN SF ATL KC BAL MIN",
-  "NO LV MIA ARI IND LAC NYJ NYG TB DET GB TEN CLE DAL CAR BAL WAS JAX HOU DEN PIT MIN SEA SF PHI LA NE CIN ATL BUF CHI KC",
-  "TEN ARI PHI IND NYJ LAC MIA TB ATL HOU DAL NO LA WAS LV GB CLE PIT CAR NYG NE SF CIN BUF DET BAL SEA JAX CHI DEN KC MIN",
-  "TEN MIA NYJ LAC ARI TB CAR WAS HOU LV IND NO LA NYG PHI BUF GB BAL ATL PIT DAL CLE DEN SF NE DET CHI CIN JAX SEA MIN KC",
-  "TEN TB PHI LV CAR HOU ARI NYJ IND WAS LAC LA GB NYG CIN DEN MIA CHI NO KC DET ATL BUF PIT DAL SEA BAL JAX CLE SF NE MIN",
-  "TEN ARI IND LAC NO WAS HOU LV CAR MIA PHI NYJ TB NYG GB CIN BAL CHI ATL CLE SF DEN NE DAL KC PIT MIN DET LA JAX BUF SEA",
-  "NYJ TEN PHI IND HOU MIA WAS TB CAR ATL LAC ARI LA DAL GB CLE PIT LV NO NYG BAL KC NE CHI DET JAX MIN BUF SEA CIN DEN SF",
-  "MIA TEN IND TB NYG NYJ LA WAS PHI LAC ARI NO LV NE CAR JAX BAL GB CLE CIN DEN ATL SF CHI HOU DAL KC MIN DET BUF PIT SEA",
-  "LV ATL DAL TEN NO MIA LAC CAR PHI HOU BAL IND LA NYG GB ARI NE BUF TB JAX NYJ PIT SF DET WAS SEA CLE DEN CHI KC CIN MIN",
-  "TEN MIA PHI LV ARI TB WAS NO HOU CAR NYJ LAC GB NYG CLE IND BAL SEA ATL CIN SF PIT CHI NE DET LA DEN JAX DAL KC MIN BUF",
-  "NYJ TEN LAC LV MIA DAL PHI HOU CAR ATL TB ARI BAL NE IND LA NYG CHI NO WAS CLE GB BUF PIT DEN SF CIN MIN SEA KC DET JAX",
-  "TEN MIA PHI LAC ATL WAS IND NYJ LV NE TB CAR NYG HOU BAL ARI LA GB DAL NO DEN PIT KC MIN JAX SEA CHI CIN CLE SF DET BUF",
-  "MIA TEN ATL LAC ARI NYG WAS PHI NYJ BAL CAR HOU IND LV GB TB PIT LA DET NO SEA NE DEN CIN CHI JAX BUF SF CLE MIN KC DAL",
-  "TEN LAC ARI TB NYJ LV NO ATL NE MIA NYG WAS SEA BAL PHI HOU IND GB CAR LA DET JAX BUF CLE DAL PIT DEN MIN CHI KC CIN SF",
-  "TEN WAS NYJ MIA NYG ARI HOU LAC TB LA CAR NO NE PHI CLE LV IND GB BAL KC MIN CHI SEA CIN PIT JAX DET SF DAL BUF ATL DEN",
-  "TEN NO MIA PHI TB LAC NYG WAS IND LV CAR ARI NYJ NE JAX LA CIN GB DAL HOU KC BAL DET SF ATL DEN BUF MIN CHI PIT CLE SEA",
-  "ARI LAC NO TEN CHI NYG PHI DEN TB CIN MIA NE CAR LA DET HOU NYJ BAL WAS GB IND SF KC JAX SEA LV PIT DAL ATL CLE MIN BUF",
-  "MIA NO TEN PHI LAC CAR LV NYG ATL NYJ ARI CIN IND WAS CLE BAL CHI GB TB DET HOU PIT JAX LA DAL NE BUF SF SEA DEN MIN KC",
-  "PHI NO IND LAC WAS TEN LV CAR GB DAL LA NYJ ARI BAL DEN ATL HOU MIA NYG DET CLE BUF PIT SF JAX KC SEA MIN CHI NE TB CIN",
-  "TEN NYJ MIA PHI IND LAC NO ARI CAR WAS ATL CHI NYG CLE BAL SF LV PIT HOU SEA GB NE MIN JAX DAL KC BUF DET TB CIN DEN LA",
-  "TEN MIA WAS TB NYJ NO IND ARI LAC DET PHI CLE CAR BAL GB NE HOU DAL LA CIN MIN PIT SEA JAX LV SF CHI BUF ATL DEN KC NYG",
-  "LAC TEN NO PHI NYJ IND LA MIA NE WAS CAR ATL LV HOU ARI DEN DAL GB CLE PIT BAL SF SEA CHI TB JAX DET BUF NYG CIN KC MIN",
-  "PHI NO NYJ MIA TEN IND LAC ATL NYG WAS LV TB LA PIT ARI BAL BUF DET CLE NE HOU GB SEA MIN CAR DAL JAX DEN CHI KC SF CIN",
-  "TEN MIA CAR TB ARI PHI HOU LAC LA NYJ NYG WAS IND LV NO CLE CHI NE DAL SEA KC BUF PIT GB ATL JAX BAL SF DEN MIN DET CIN",
-  "TEN MIA LA IND NYJ ATL WAS NYG LV BAL LAC NE ARI CHI TB CAR DAL PIT HOU NO PHI BUF CLE GB CIN JAX SF MIN KC SEA DEN DET",
-  "TEN PHI NYJ ARI LAC HOU IND MIA NO LV CAR ATL NYG DET LA WAS BAL PIT TB GB CLE BUF SEA DEN DAL JAX NE MIN KC CHI SF CIN",
-  "TEN LAC NYJ WAS PHI NO ATL MIA NYG HOU IND CAR LV CLE PIT GB LA ARI KC DET CHI BUF NE SEA DAL TB DEN BAL JAX SF CIN MIN",
-  "LAC TEN MIA NYJ PHI LV ARI ATL CIN PIT IND NYG BAL TB NO LA WAS CHI HOU GB CLE SEA BUF DET DAL NE DEN SF CAR KC MIN JAX",
-  "NYJ TEN LAC NO TB IND NYG WAS ARI CAR MIA DAL CLE LV BAL LA JAX CHI ATL PHI GB CIN PIT KC DET DEN HOU MIN SEA BUF NE SF",
-  "TEN NYJ PHI WAS IND LAC MIA TB LA ATL ARI CAR GB LV NYG NE PIT BAL DAL JAX CIN SEA MIN BUF NO CHI CLE KC HOU DET SF DEN",
-  "TEN LAC NYJ MIA CAR LA LV HOU PHI ARI NO ATL WAS CLE IND NYG BAL DET DAL TB GB PIT KC DEN CIN JAX SF MIN NE SEA CHI BUF",
-  "TEN PHI MIA LAC IND NYJ TB CAR ARI DAL LV NO BUF WAS CIN HOU GB CHI ATL PIT KC NYG NE SEA BAL JAX SF DET MIN DEN CLE LA",
-  "TEN NYJ IND MIA PHI LAC JAX CIN ARI WAS LV DET CHI CAR LA TB NYG BAL SEA NO GB HOU CLE DEN KC ATL DAL BUF NE SF PIT MIN",
-  "TEN PHI LAC MIA CAR TB NO NYJ HOU CLE GB ARI NYG JAX LA DAL LV NE ATL IND PIT BAL SF SEA DET DEN CIN MIN CHI BUF WAS KC",
-  "TEN NYJ ARI MIA ATL PHI NO TB HOU LV LAC IND GB BAL DET SEA WAS NE CAR SF CLE KC CIN LA NYG DAL PIT BUF DEN MIN JAX CHI",
-  "WAS LAC IND NYJ MIA TB CAR TEN HOU ARI ATL LA LV DET GB SEA CLE PIT PHI NO CIN BUF CHI JAX BAL DAL NYG KC SF DEN MIN NE",
-  "LAC TEN ARI WAS MIA CAR IND NYJ TB NO PHI DAL CLE DET HOU LA PIT BAL LV NE CIN SF ATL SEA NYG DEN KC MIN CHI JAX BUF GB",
-  "TEN LAC NYJ NO NYG ARI IND CAR WAS MIA NE PHI DEN ATL GB LV JAX DET DAL HOU SF CLE LA BAL TB PIT CIN CHI KC SEA MIN BUF",
-  "ATL TEN PHI CAR IND BAL LV WAS ARI NYJ MIA LA GB NE NO LAC DAL CIN TB JAX DEN NYG SF CLE PIT CHI SEA KC DET BUF HOU MIN",
-  "TEN IND LAC HOU ARI MIA CAR WAS PHI TB LA DAL BAL NO CHI LV BUF NE PIT DET DEN SEA CLE NYG ATL NYJ KC MIN SF CIN JAX GB",
-  "MIA PHI TEN CAR NYG WAS TB NYJ LAC ARI NO LV LA KC HOU BAL JAX GB CLE BUF IND DET DAL MIN PIT NE CHI SEA SF DEN CIN ATL",
-  "TEN PHI NO LA DAL NYJ MIA CAR LV BUF CLE DET ATL WAS IND JAX ARI LAC NE BAL NYG GB CHI KC CIN TB SF DEN PIT SEA HOU MIN",
-  "TEN NYJ MIA NO TB CAR PHI LV WAS CLE DET HOU IND ARI GB LAC NE LA ATL DAL JAX NYG DEN BUF PIT MIN SF KC BAL CHI CIN SEA",
-  "TEN IND NYJ LAC ARI NO ATL PHI TB NYG LV NE MIA GB WAS HOU BAL DET CLE CAR PIT CHI SEA DEN BUF DAL JAX SF MIN KC CIN LA",
-  "MIA TEN LAC LV NO PHI NYJ IND CAR ATL NYG WAS BUF ARI HOU CIN GB CHI DAL JAX LA SEA NE PIT TB KC CLE MIN DET DEN BAL SF",
-  "TEN LAC PHI MIA TB CAR WAS DAL LV ARI NE IND NYJ SEA CIN BAL LA GB HOU NYG PIT ATL BUF CHI NO MIN DEN CLE KC DET SF JAX",
-  "TEN PHI NYJ LAC MIA TB CAR NO CLE HOU DAL ARI NYG IND KC DEN SEA CHI WAS CIN LA BUF PIT SF GB LV DET BAL ATL NE JAX MIN",
-  "LAC TEN MIA NYJ PHI ARI WAS HOU CAR LV DAL KC TB CLE SEA BAL LA GB CIN NO IND NE DET CHI NYG PIT DEN MIN ATL BUF SF JAX",
-  "HOU MIA TEN NYJ ARI PHI NO BAL NYG IND LV TB DAL KC CAR DET GB NE WAS LA CHI BUF CIN JAX CLE ATL LAC MIN SF PIT DEN SEA",
-  "TEN CAR MIA NYG IND LV NYJ LAC HOU NO LA PHI ARI DAL TB DET BAL PIT WAS ATL GB CLE NE BUF CIN MIN SF DEN JAX SEA CHI KC",
-  "PHI NYJ NYG TEN NO BAL LA MIA CIN ATL LAC WAS CAR HOU LV GB DEN CHI TB CLE JAX SEA SF NE IND DAL BUF MIN DET PIT ARI KC",
-  "LAC TEN PHI NYJ MIA NO ATL WAS ARI IND NYG TB BAL LV PIT GB LA HOU CAR DAL SF CLE NE BUF DET JAX CIN MIN CHI KC SEA DEN",
-  "ARI TEN LAC MIA LV NO CAR WAS PHI IND NYJ HOU NE SEA BAL ATL GB CHI PIT DAL SF JAX LA CLE NYG CIN DET DEN KC MIN BUF TB",
-  "NO TEN LV MIA LAC NYJ PHI BAL IND BUF TB DAL ATL WAS CLE ARI DET SEA NE NYG CIN JAX MIN CHI HOU DEN GB LA CAR PIT KC SF",
-  "TEN IND NYJ MIA ATL ARI LAC CAR LV SEA NYG BAL DET TB WAS HOU CIN GB PHI JAX LA PIT BUF CHI NO NE CLE DAL DEN MIN SF KC",
-  "TEN NYJ NO LAC MIA PHI HOU ATL NYG WAS ARI CAR BAL LV CLE GB IND DET TB SEA NE CIN SF KC CHI LA JAX BUF DAL PIT DEN MIN",
-  "TEN MIA ARI LAC NYJ TB NO IND ATL WAS BAL DEN NYG PHI DET HOU LA LV CAR SF CHI JAX PIT BUF SEA CIN GB NE DAL CLE MIN KC",
-  "TEN IND LAC NYJ NO PHI BAL ATL NYG LV NE WAS BUF TB LA GB HOU ARI MIA DAL SF DEN KC SEA CAR PIT CIN MIN DET CLE CHI JAX",
-  "TEN ARI NO NYJ LV ATL HOU MIA NE DAL LAC CAR IND PHI LA BAL NYG GB TB DET DEN CHI CLE PIT WAS JAX BUF MIN SF CIN SEA KC",
-  "LAC MIA TB TEN WAS DET NYJ CAR ARI DAL PHI ATL IND CLE LV BAL GB HOU NO NYG PIT LA BUF DEN NE CIN SF MIN CHI JAX KC SEA",
-  "TEN MIA PHI NO NYJ ARI WAS IND TB ATL LV CIN HOU LAC DAL PIT LA DET CAR BAL NYG NE JAX SF KC MIN CLE CHI SEA DEN GB BUF",
-  "LAC TEN PHI NYJ MIA NYG ARI CAR WAS DET LA HOU TB BAL NO NE CIN DEN ATL CLE IND LV GB MIN CHI JAX PIT SF DAL KC BUF SEA",
-  "TEN ARI MIA PHI LAC TB WAS NO DET DAL LV HOU JAX DEN CLE LA BUF ATL NYG NYJ BAL PIT CAR GB CIN NE SEA CHI IND SF KC MIN",
-  "MIA TEN WAS TB LAC CAR PHI NYJ ARI IND ATL CLE LV PIT NYG LA GB KC HOU SEA NE CHI DET BUF SF MIN JAX DEN DAL BAL NO CIN",
-  "NYJ MIA WAS PHI TB TEN IND DAL CLE ARI LAC CAR BAL HOU NO NE SF DET LV KC NYG LA JAX ATL PIT SEA MIN CIN CHI DEN BUF GB",
-  "LAC TEN NYJ MIA CAR HOU PHI LV IND ARI DAL NO ATL NYG CIN GB KC LA CLE BAL SEA PIT DET SF TB JAX NE MIN WAS DEN BUF CHI",
-  "WAS PHI TEN NO LV MIA NE NYG HOU TB LAC IND NYJ BAL LA ATL ARI GB CLE CIN MIN CHI SEA DEN CAR DAL BUF KC PIT DET JAX SF",
-  "TEN NO NYJ PHI IND BAL WAS ARI DET LAC ATL MIA NYG LV SEA CHI DEN NE DAL SF CLE LA JAX PIT CIN TB MIN BUF KC GB HOU CAR",
-  "MIA PHI LV CAR LA TEN IND NYJ ATL DAL TB BAL LAC WAS NE CLE DET ARI NO PIT MIN SEA CIN KC HOU GB JAX SF CHI DEN NYG BUF",
-  "ARI IND NO LAC TEN NYJ HOU LA NYG WAS BUF DAL LV CIN TB ATL BAL SEA PHI MIA CAR NE JAX SF CLE CHI PIT GB DEN MIN DET KC",
-  "TEN MIA LAC NYJ PHI TB NO NYG WAS HOU ARI CAR DEN NE IND BAL LA CHI DAL ATL JAX LV CLE GB CIN SEA MIN PIT KC DET BUF SF",
-  "TEN NYJ MIA TB NYG ATL PHI IND LAC LA LV BAL WAS HOU NO CHI ARI CIN DAL SF DEN JAX DET BUF CAR CLE GB NE MIN PIT KC SEA",
-  "TEN PHI HOU TB CAR ARI MIA NYJ ATL DAL GB CLE CHI LA LAC IND CIN DEN WAS NYG BAL BUF PIT NO DET NE LV MIN KC SF SEA JAX",
-  "TEN ARI NO BAL LAC MIA NYG DAL PHI IND NYJ CHI HOU GB CAR ATL NE LV TB CIN SEA CLE KC SF WAS LA JAX DEN DET BUF PIT MIN",
-  "TEN LAC MIA NYG PHI IND NYJ TB ARI CAR WAS NO GB CHI HOU CLE KC BAL ATL LV LA DET JAX CIN BUF SEA SF PIT DAL NE MIN DEN",
-  "MIA TEN PHI TB ARI LAC NYJ NYG NO CAR GB WAS IND LV CIN BAL LA PIT DAL CLE KC ATL BUF SF SEA MIN NE DEN HOU DET CHI JAX",
-  "MIA LV TB PHI BAL NYJ ATL NYG TEN LAC IND ARI GB CHI DAL LA PIT CIN WAS SF CAR NE CLE JAX NO KC DET BUF SEA DEN HOU MIN",
-  "TEN PHI ATL MIA NO HOU TB LV ARI IND NYJ NE NYG CLE LAC LA DET WAS CAR DAL KC PIT GB DEN JAX MIN BUF SF BAL CHI SEA CIN",
-  "NYG TEN TB NYJ MIA PHI NO ARI IND LAC DAL CAR DET LV HOU BAL GB DEN LA CLE SEA MIN BUF NE WAS PIT SF JAX CIN CHI ATL KC",
-  "WAS TEN LAC IND TB CAR NYJ DAL ARI HOU NO DET NYG SEA MIA LV BAL CLE ATL DEN SF MIN PIT BUF PHI LA JAX NE GB CIN KC CHI",
-  "IND LAC NYJ ARI MIA PHI LV NO WAS HOU DAL CIN TB LA DET TEN BAL GB CAR DEN CLE JAX NYG MIN ATL NE PIT CHI BUF SF KC SEA",
-  "LAC ARI NO TEN MIA PHI NYJ ATL CAR HOU IND DAL BAL NE WAS LV SEA LA TB DEN PIT GB DET CIN NYG SF CLE JAX MIN KC CHI BUF",
-  "TEN PHI ARI IND NO BAL MIA HOU LAC ATL NYG LA CAR NE LV NYJ CHI GB TB WAS SEA PIT CLE CIN KC DAL BUF DET DEN SF JAX MIN",
-  "TEN NYJ HOU IND NO NYG PHI LAC BUF MIA CAR ARI ATL DAL LA LV DET CIN SF GB KC DEN NE CHI TB JAX CLE MIN WAS PIT SEA BAL",
-  "MIA TEN NO LAC DAL IND ARI NYJ NYG WAS LV BAL CAR ATL CIN LA DEN CHI TB HOU CLE DET PIT MIN PHI SEA KC NE GB BUF JAX SF",
-  "TEN PHI NO LV MIA LAC CAR NYG WAS HOU NYJ ARI LA IND GB ATL NE CLE TB CHI DAL DEN PIT BAL CIN DET BUF MIN JAX SF SEA KC",
-  "TEN LAC PHI CAR NO NYJ ARI MIA CLE WAS HOU TB LA NE GB DAL IND BAL SEA DET NYG BUF KC LV PIT ATL DEN CHI JAX SF CIN MIN",
-  "NYJ MIA LAC CLE PHI TEN NO ATL CAR ARI GB NYG HOU WAS LV JAX SF NE TB DAL PIT CHI KC CIN IND LA BAL MIN DET DEN SEA BUF",
-  "TEN MIA NO LAC IND NYJ NYG PHI TB LV ARI DET NE CAR KC SEA BAL LA ATL HOU JAX GB CIN DAL WAS PIT CHI DEN MIN BUF CLE SF",
-  "TEN WAS MIA LAC IND PHI LV NYJ BAL NO ATL DET CAR NYG HOU BUF LA GB ARI CLE SF KC JAX MIN TB SEA PIT CIN NE CHI DEN DAL",
-  "TEN LAC ARI MIA NYG TB BAL WAS IND CAR HOU PHI LV NO NYJ GB CLE SEA ATL NE DAL DEN DET PIT LA MIN KC JAX CHI BUF SF CIN",
-  "IND ATL TEN PHI LV LAC TB ARI NE NYG HOU NO NYJ MIA GB WAS CLE SEA CAR BUF DAL DEN DET CIN BAL PIT SF MIN JAX CHI LA KC",
-  "TB TEN NYJ ARI MIA PHI LAC DAL HOU CLE CAR IND LV GB WAS BAL LA NO JAX SEA DEN ATL BUF MIN NYG CIN NE DET PIT SF CHI KC",
-  "TEN PHI MIA LV LA ARI TB NYJ LAC ATL GB NO HOU CIN CLE IND WAS NYG CAR NE SEA MIN BUF DEN DAL PIT SF JAX BAL CHI DET KC",
-  "TEN MIA LAC ATL WAS NYJ NO CAR ARI PHI BAL IND NYG LV DEN GB NE SEA DAL PIT CHI CIN BUF SF TB CLE LA JAX KC MIN DET HOU",
-  "TEN LAC PHI CAR MIA WAS DAL LV ARI BAL NYJ CIN NO ATL HOU DEN LA GB CLE CHI DET NE SEA KC NYG JAX SF PIT TB BUF IND MIN",
-  "TEN NYJ MIA ARI TB WAS NO LAC BAL CLE IND PHI CAR KC SEA NYG LV GB HOU DET CIN SF PIT CHI ATL LA NE JAX MIN BUF DAL DEN",
-  "TEN IND TB LA ATL ARI NYJ MIA HOU PHI LV WAS NYG LAC NE PIT NO GB CIN KC BAL CHI CAR DAL SF CLE SEA BUF DEN MIN DET JAX",
-  "LAC PHI NO TEN NYJ LV MIA TB IND DAL BAL CLE ARI CAR JAX SEA LA CHI PIT NE NYG WAS HOU GB BUF KC SF MIN DET CIN ATL DEN",
-  "TEN MIA CAR PHI NYJ HOU LAC IND ARI LV LA TB NYG DAL SEA GB BAL BUF WAS SF CHI PIT DEN KC NO DET CLE JAX ATL CIN NE MIN",
-  "TEN MIA PHI IND LV NYJ NO CAR TB ARI LA SEA BAL NYG WAS LAC CLE DEN NE GB DAL ATL JAX PIT DET KC BUF CHI HOU MIN CIN SF",
-  "TEN NYJ WAS TB ARI MIA CAR NYG NO LV HOU IND GB NE PHI DET PIT BAL CIN CHI ATL DEN JAX SF DAL LA LAC CLE BUF MIN SEA KC",
-  "TEN HOU CAR NYG NYJ MIA LV LAC LA IND CIN TB PHI ARI NO NE WAS DET CLE DEN SF PIT MIN CHI DAL SEA KC BAL ATL BUF GB JAX",
-  "TEN NYJ PHI ARI IND MIA LAC DAL ATL WAS HOU LV CIN NO GB DEN DET CHI NE SF CLE LA NYG KC PIT CAR SEA JAX TB BUF MIN BAL",
-  "TEN MIA LAC PHI NO NYG WAS ARI NYJ IND CAR LV NE GB CIN BAL ATL DET DAL CLE SF CHI DEN BUF TB SEA PIT KC HOU MIN JAX LA",
-  "TEN NO MIA PHI NYJ IND DAL HOU LV BAL NYG LAC KC ATL ARI GB CAR LA WAS CLE TB DET NE PIT SEA JAX MIN DEN CIN SF CHI BUF",
-  "ARI LAC NYJ TEN NYG LA IND CIN MIA DAL TB NO ATL PHI HOU PIT LV SEA WAS NE SF BAL DEN MIN CAR BUF CHI CLE JAX GB DET KC",
-  "LAC NO NYJ TEN IND NYG DET ARI PHI MIA GB BAL CAR ATL WAS JAX NE CIN HOU SEA DAL BUF TB CLE LA LV SF PIT CHI KC MIN DEN",
-  "NYJ MIA TEN PHI HOU LAC NO NYG WAS PIT TB CAR JAX CLE LV ARI LA CHI DAL ATL DEN BAL GB CIN NE KC SF SEA IND MIN BUF DET",
-  "MIA TEN ARI IND NYJ LV ATL WAS LAC BAL TB NYG PHI HOU CAR LA SEA PIT DAL GB CIN NE CHI JAX KC MIN CLE SF DET BUF DEN NO",
-  "TEN NO LV LAC TB ATL WAS NYJ LA IND NYG PHI HOU MIA NE CHI ARI DEN DAL PIT CLE BAL SEA SF BUF KC DET MIN CAR JAX CIN GB",
-  "TEN LAC NYJ NO MIA PHI HOU IND ARI BAL CAR ATL WAS DEN LA CLE SEA CHI JAX LV NYG DET NE GB TB DAL BUF CIN PIT MIN SF KC",
-  "TEN TB MIA NYJ HOU ARI NYG SEA IND LA CAR NE PHI CIN NO LV GB DEN WAS JAX DET CHI BAL KC LAC ATL PIT DAL CLE SF BUF MIN",
-  "TEN ARI NO PHI LAC MIA DAL LV DET NYJ TB BAL GB WAS HOU BUF LA CLE IND NYG PIT CIN CHI MIN ATL DEN NE SEA SF KC CAR JAX",
-  "TEN PHI MIA NYJ LAC ARI LA LV TB HOU BAL NYG DAL BUF JAX NO ATL GB CLE CAR WAS IND PIT CHI CIN SF KC MIN DET NE SEA DEN",
-  "TEN NYJ ATL ARI WAS HOU TB MIA NYG NO PHI CLE GB LV LAC PIT BUF LA CAR DET IND CHI BAL CIN NE DEN MIN SF SEA KC JAX DAL",
-  "TEN NYJ LAC MIA WAS DAL ATL NO NYG HOU CAR BAL CLE IND ARI GB SEA BUF SF LV LA MIN KC DEN PHI CHI PIT NE TB CIN DET JAX",
-  "TEN HOU IND LAC NO LA NYJ MIA WAS ARI ATL DAL PIT DET NYG LV BAL CAR TB GB KC NE CLE CHI SF JAX BUF SEA PHI DEN MIN CIN",
-  "TEN NO ARI LA NYJ MIA NYG BAL PHI LAC IND LV TB ATL GB WAS CLE CIN DET DAL PIT KC CHI NE JAX CAR BUF MIN HOU SF DEN SEA",
-  "TEN NO ARI LAC MIA PHI LV ATL NYG WAS IND HOU CLE TB CHI BAL LA DEN DAL DET NYJ PIT BUF GB CAR SF KC CIN NE SEA JAX MIN",
-  "WAS PHI TEN LAC NYJ MIA NO ARI IND LV CAR TB NYG PIT NE BAL GB LA DAL DET CLE CIN JAX CHI ATL SF BUF DEN KC MIN HOU SEA",
-  "TEN TB CAR NYJ WAS PHI ARI LAC NO IND LV MIA NYG HOU GB LA CLE BAL DET CHI JAX NE SEA KC ATL MIN PIT DEN DAL CIN BUF SF",
-  "TB ARI TEN NYJ MIA PHI LA HOU IND CAR ATL DAL CLE LAC CHI NYG PIT LV NO GB BAL CIN JAX SF WAS DEN NE DET BUF SEA KC MIN",
-  "TEN LAC IND ARI HOU PHI NO NYJ MIA ATL DAL TB LV BAL LA GB NYG NE CLE SEA WAS PIT MIN KC SF CIN DET DEN CAR JAX CHI BUF",
-  "MIA TEN ATL PHI LAC WAS ARI IND PIT DAL CLE CAR BAL LV HOU NO GB CHI NYJ SEA LA DEN NE NYG TB CIN BUF SF MIN KC JAX DET",
-  "TEN LAC MIA LV ARI NYG TB CAR IND NO BAL WAS PHI CLE SEA NYJ CHI NE JAX HOU GB SF DET DEN ATL PIT MIN BUF CIN LA KC DAL",
-  "TEN IND LAC NO PIT ARI NYJ PHI SEA BAL MIA GB NYG LV TB ATL CIN WAS NE HOU LA DAL DET BUF CAR DEN KC CHI SF CLE MIN JAX",
-  "IND TEN LAC BAL NO MIA ARI WAS LV NYJ MIN PHI TB NE CAR NYG HOU GB LA ATL CLE BUF PIT SEA DAL KC DEN DET SF JAX CHI CIN",
-  "TEN MIA ARI CAR LV CLE NYG WAS PHI LAC TB HOU NO GB NYJ IND BUF DET DAL DEN KC LA SEA PIT ATL JAX CIN CHI BAL SF NE MIN",
-  "TEN MIA PHI LV ARI NYJ NO CAR IND LAC NYG HOU LA DET TB NE WAS BAL CLE CIN KC GB ATL CHI DAL JAX DEN MIN PIT SF SEA BUF",
-  "CAR WAS LAC PHI TEN LV NO NYJ MIA IND JAX ARI DAL LA BAL CHI SEA CLE HOU GB MIN PIT ATL NE NYG BUF SF CIN DET DEN TB KC",
-  "TEN NYJ WAS NYG LAC MIA PHI IND BAL NO ATL CAR CLE HOU ARI CHI LV SEA PIT NE LA SF BUF GB TB JAX CIN MIN DEN DET KC DAL",
-  "TEN NYJ LAC ARI IND TB CAR PHI ATL MIA BAL LA LV CLE DEN GB NYG WAS SEA CHI DET NE PIT BUF HOU DAL JAX MIN NO KC SF CIN",
-  "NYJ MIA TEN PHI CIN LV ATL WAS TB IND HOU DAL BAL PIT CAR ARI SEA GB LAC KC NYG NO NE SF JAX LA BUF MIN CHI CLE DEN DET",
-  "TEN LAC WAS NYJ MIA CAR HOU PHI GB NYG NO ATL LV LA BAL ARI NE CLE DAL TB SF IND CIN JAX PIT CHI BUF DET DEN SEA MIN KC",
-  "LAC TEN IND MIA PHI NYJ ARI NO NYG WAS HOU CAR TB PIT LV GB BAL LA CIN DET JAX DEN SEA SF DAL CHI KC NE ATL BUF CLE MIN",
-  "NYJ TEN HOU NO MIA LAC ATL IND CLE PHI BAL ARI TB DEN LA SF GB NYG LV CAR CIN SEA WAS BUF JAX DET MIN NE KC CHI PIT DAL",
-  "TEN MIA PHI HOU NO NYJ LAC ARI NYG LV CAR ATL WAS BAL DEN GB CHI NE TB SF IND CIN DET PIT DAL BUF CLE MIN SEA KC JAX LA",
-  "LAC TEN TB NO ARI MIA NYG LV BAL IND PHI BUF ATL WAS HOU NE DET GB DAL CLE DEN SEA PIT CAR NYJ KC SF MIN JAX CHI CIN LA",
-  "MIA TEN NYJ LV TB PHI BAL NO IND ARI LA NE GB NYG DAL LAC SEA CLE CAR WAS ATL CIN JAX PIT HOU KC DET SF BUF MIN DEN CHI",
-  "TEN PHI TB NYJ NO MIA IND HOU BAL GB NYG CLE LV LAC WAS ATL ARI SEA CAR DEN CIN LA DAL JAX KC CHI SF BUF DET PIT NE MIN",
-  "LAC WAS PHI NYJ TB MIA ARI CAR CLE BAL IND LV DAL TEN HOU NO DET LA NYG NE BUF JAX GB SF SEA CHI DEN KC PIT MIN CIN ATL",
-  "LAC TEN PHI CAR ARI NO NYJ IND MIA TB WAS CLE HOU LV PIT CHI NYG LA BAL CIN NE DAL GB SF KC DET DEN MIN ATL JAX BUF SEA",
-  "TEN LAC NYJ MIA WAS NYG IND CAR NO LA ATL PHI HOU ARI NE LV SEA BAL TB DAL CIN PIT CHI DEN JAX CLE DET MIN GB KC SF BUF",
-  "LAC CAR TEN NYJ NO TB DAL PHI IND LV MIA ARI LA BAL NE WAS JAX DET BUF GB CIN ATL DEN SEA CLE PIT MIN CHI HOU NYG KC SF",
-  "TEN LAC CAR PHI IND ARI NYJ TB LA MIA LV GB HOU DAL KC ATL PIT SEA BAL CHI MIN WAS CLE NE NO NYG DEN JAX DET CIN BUF SF",
-  "TEN LAC ARI IND ATL NYG HOU PHI NO MIA CAR NYJ LV NE DAL CHI CIN GB TB LA WAS BAL JAX CLE BUF DET SF KC DEN MIN SEA PIT",
-  "LAC IND TEN NO DAL NYJ MIA HOU ATL NYG LV CAR NE ARI BAL SEA WAS LA PHI GB CIN PIT CHI CLE TB DET KC JAX MIN DEN BUF SF",
-  "TEN ARI NYJ IND LV PHI TB MIA LAC DAL NO NE BAL PIT ATL NYG DET SF WAS HOU CIN CAR CHI CLE BUF MIN SEA KC GB JAX LA DEN",
-  "TEN ARI ATL MIA NYJ LAC PIT CAR NYG PHI TB LV WAS CLE HOU DET IND GB NO NE BAL DAL SEA CIN JAX KC CHI MIN BUF SF DEN LA",
-  "LAC WAS TEN MIA IND DAL TB NYJ NO CAR NYG HOU ARI BAL LV CLE SEA GB SF DET DEN NE MIN JAX PHI ATL CIN PIT LA BUF KC CHI",
-  "TEN HOU ATL NYJ MIA PHI LV WAS CAR TB BAL NYG IND ARI LAC SEA LA CIN GB JAX DET CHI KC NE NO DAL BUF PIT SF DEN CLE MIN",
-  "TEN NO LAC NE DAL CLE NYJ TB ARI MIA PHI IND ATL NYG HOU SEA DEN GB WAS CAR BAL PIT LA BUF CIN DET LV SF JAX MIN CHI KC",
-  "PHI NO IND LAC NYJ MIA TEN GB ARI ATL WAS LV SF CAR HOU LA BAL PIT TB DAL KC CLE DET DEN NYG MIN JAX BUF NE CHI SEA CIN",
-  "TEN MIA NO NYJ WAS PHI BAL ATL LAC DAL CAR LV IND ARI GB NE PIT DET NYG TB JAX CLE CHI DEN LA SEA KC BUF HOU MIN CIN SF",
-  "PHI LAC TB TEN ARI MIA HOU IND LV NYJ NO GB NYG CAR WAS LA CLE NE DAL DET CHI KC DEN PIT JAX BAL SF MIN ATL CIN BUF SEA",
-  "NYJ MIA TEN IND LAC ATL PHI NYG CAR LA NO LV ARI BAL SEA CLE DET PIT TB DAL NE WAS CIN JAX GB BUF CHI DEN HOU MIN KC SF",
-  "TEN CAR MIA NO LAC ARI DAL LV ATL NE HOU IND PHI PIT NYJ NYG LA GB TB WAS DEN CIN KC SF JAX BAL CHI MIN CLE DET BUF SEA",
-  "TEN MIA NO LAC NYG WAS PHI HOU IND NYJ ARI LV CAR ATL LA CHI CIN BAL SEA CLE DEN TB PIT MIN GB NE JAX SF DAL KC DET BUF",
-  "TEN NYJ PHI NO MIA NE WAS HOU LAC ARI NYG IND LV CAR ATL BAL CHI LA CLE DAL CIN DET DEN GB TB PIT SEA BUF KC MIN SF JAX",
-  "WAS IND MIA TEN PHI LAC ARI LV NO NYJ BAL CAR NYG DET TB HOU DEN GB DAL KC PIT NE SF SEA LA CHI BUF CLE CIN MIN ATL JAX",
-  "TEN NYJ LAC ARI WAS PHI IND CAR NYG NO TB MIA HOU CLE LV BAL LA GB NE DAL BUF JAX MIN ATL DET CHI CIN DEN SEA PIT KC SF",
-  "PHI CAR MIA TEN ARI NYJ LV TB WAS LAC DET DAL LA NO IND CLE HOU BAL GB NYG SF KC JAX DEN BUF ATL CIN MIN PIT CHI SEA NE",
-  "LAC WAS NYJ MIA TEN IND TB CLE ARI SEA HOU CAR PHI ATL NYG BAL DET NE DAL LV PIT DEN GB CHI NO MIN BUF JAX CIN LA SF KC",
-  "TEN PHI MIA NO IND ARI LAC CAR NYJ ATL GB NYG HOU LV PIT DEN LA WAS JAX BAL SEA DAL KC CHI SF DET CIN BUF TB NE MIN CLE",
-  "TEN HOU ARI NO PHI LAC NYJ MIA IND NE NYG TB CAR WAS LV LA BAL CHI CIN PIT KC SEA DET GB ATL JAX BUF MIN DAL CLE DEN SF",
-  "LAC TEN PHI MIA NYJ SEA DET NO ARI IND JAX BAL CAR TB LA LV CLE NYG HOU WAS NE MIN DEN CHI BUF KC DAL GB SF CIN PIT ATL",
-  "TEN BAL MIA NYJ CAR PHI IND NO HOU ATL LAC NE ARI WAS DAL GB LA CIN TB NYG CLE DET KC JAX LV BUF MIN SF SEA PIT DEN CHI",
-  "TEN NO NYJ ARI TB MIA IND LAC WAS PHI DET LV HOU SEA CAR NYG KC NE DAL CLE LA PIT BUF SF BAL GB CIN CHI ATL DEN JAX MIN",
-  "TEN PHI IND TB BAL MIA ARI LAC NYJ NYG WAS CAR NO HOU GB SEA CIN KC DET CLE CHI NE LA PIT DAL DEN MIN LV ATL JAX SF BUF",
-  "TEN PHI IND NYJ ARI TB WAS NO LV LAC CAR NYG HOU NE GB CLE LA MIA ATL DET KC BAL BUF SF DAL CHI DEN JAX PIT MIN CIN SEA",
-  "TEN IND PHI ARI NYJ MIA NO CLE BAL LAC HOU TB WAS CAR GB DAL LV SEA LA DET CHI PIT BUF NE NYG ATL KC JAX CIN SF MIN DEN",
-  "NO MIA TEN DAL PHI LV LAC HOU ARI NYJ CAR TB IND DET CIN LA WAS BUF ATL GB CLE PIT NE NYG SEA BAL SF KC CHI DEN JAX MIN",
-  "TEN NYJ MIA LAC PHI LV IND NO WAS HOU ATL LA KC TB BAL DET GB CHI CLE NYG DAL PIT DEN SEA CAR CIN BUF MIN ARI NE SF JAX",
-  "NYJ WAS LV PHI LAC CAR TEN HOU MIA IND NO TB LA NYG NE SF CHI KC ATL ARI CIN GB PIT BAL CLE JAX SEA MIN DAL BUF DEN DET",
-  "TEN LAC MIA CAR PHI NYJ TB LV LA NYG WAS ARI HOU NO BUF CLE IND GB JAX DET ATL PIT DEN CHI SEA BAL KC MIN DAL CIN SF NE",
-  "ARI TB MIA WAS TEN NYJ CAR PHI HOU IND SEA LAC CLE NYG LA DEN NE ATL LV NO BAL CHI MIN PIT DAL BUF CIN GB JAX SF DET KC",
-  "TEN LAC NO ARI MIA ATL NYG PHI CAR IND BAL NYJ LA DAL LV CIN CHI PIT WAS GB DEN HOU TB NE DET JAX SF CLE BUF MIN SEA KC",
-  "TEN ARI MIA NYJ IND LAC NO TB NYG WAS HOU PHI LA ATL CLE BUF SEA BAL DAL LV DET JAX CHI PIT NE CAR KC MIN GB DEN CIN SF",
-  "TEN LAC IND NO ARI CLE ATL WAS HOU SEA LA NYJ NE NYG PHI BAL CAR DEN DET MIA DAL JAX TB BUF GB CHI PIT CIN SF LV KC MIN",
-  "LAC TEN PHI NYJ MIA ATL WAS ARI IND DAL TB LV CAR BAL GB DET DEN CIN NYG LA SEA HOU JAX BUF NO CLE PIT CHI SF KC NE MIN",
-  "NO MIA WAS TEN PHI TB LA NYJ LAC IND CLE GB NYG ARI JAX LV ATL DEN HOU DAL CIN SF SEA BAL DET CHI PIT KC BUF MIN NE CAR",
-  "TEN MIA NYJ PHI ATL LAC GB CAR ARI IND NYG HOU DAL NO NE CLE CIN LA LV CHI DET BUF KC SF TB PIT DEN MIN WAS BAL JAX SEA",
-  "MIA LAC NYJ CAR PHI NO TEN NYG TB CLE DAL ARI HOU IND NE LV LA DET WAS ATL CIN PIT GB KC CHI JAX BUF MIN SF BAL DEN SEA",
-  "IND TEN LAC MIA PHI ARI WAS TB NE NO ATL LV NYJ JAX PIT SEA LA GB CIN BAL DET NYG DEN CHI CAR CLE DAL HOU SF KC MIN BUF",
-  "TEN LAC ARI IND MIA PHI NO ATL NYJ GB BAL DAL DET CAR WAS BUF LV CLE HOU CIN PIT NYG SF CHI LA TB KC NE SEA JAX DEN MIN",
-  "MIA NO PHI LAC NYJ LA IND LV TB WAS TEN ARI DEN CAR BAL NYG HOU CHI NE CIN GB SF PIT DET ATL DAL KC CLE BUF MIN SEA JAX",
-  "NYJ ARI TEN MIA WAS DAL IND TB HOU CLE NO LV PHI LAC DET LA GB DEN BUF PIT CAR SEA JAX MIN BAL ATL NYG CIN KC CHI SF NE",
-  "LAC TEN ARI MIA PHI CAR LV NYJ NO NYG BAL HOU LA ATL CLE IND CHI WAS TB DEN NE SEA SF CIN DET JAX KC GB PIT MIN DAL BUF",
-  "LAC TEN NO ARI IND NYG PHI NYJ ATL TB HOU DET BAL LV NE WAS BUF CHI LA MIA DAL SF JAX CIN CAR CLE GB PIT SEA KC DEN MIN",
-  "TEN PHI NO LAC WAS IND ARI TB CIN NYJ MIA GB LV ATL DAL HOU CLE LA NE NYG CAR BAL KC SEA PIT SF MIN BUF JAX DET CHI DEN",
-  "TEN WAS ARI MIA HOU NYJ LV TB PHI NO IND LAC CAR NYG BAL SEA CLE GB DAL PIT BUF LA DEN MIN CHI NE CIN DET ATL KC SF JAX",
-  "TEN MIA NO IND NYJ NYG LV PHI BAL HOU KC ARI CLE TB DAL SEA LA DET WAS SF NE ATL PIT CIN GB JAX MIN BUF LAC CHI CAR DEN",
-  "LAC TEN NYJ PHI TB NO LV IND MIA ATL WAS DAL HOU BAL NE SEA ARI SF NYG KC CAR CLE LA CIN BUF DET DEN CHI PIT GB MIN JAX",
-  "TEN MIA NYJ LAC NO CAR WAS PHI BAL DAL IND TB LA HOU DET GB CLE DEN NYG ARI LV ATL NE KC JAX CIN CHI SEA SF BUF MIN PIT",
-  "PHI MIA TEN LAC TB NYJ LA GB ARI WAS CAR CLE BAL CHI NO LV IND HOU DAL ATL NYG NE DEN JAX DET PIT SEA BUF CIN MIN SF KC",
-  "ARI ATL TEN MIA NYJ LAC BAL NO PHI PIT HOU IND NE NYG WAS GB DET CAR LV TB LA BUF SEA CLE DEN KC SF MIN DAL CIN CHI JAX",
-  "TEN LAC NYJ MIA DAL PHI HOU NO TB LA NYG ARI LV SEA CAR IND CLE BAL WAS ATL JAX KC DET BUF GB CIN MIN NE CHI PIT SF DEN",
-  "ARI MIA WAS IND TEN LAC NO LA PHI CIN NYJ LV BAL CAR NYG TB CHI PIT CLE BUF GB ATL DAL DEN DET NE SF KC SEA JAX HOU MIN",
-  "TEN PHI TB NYJ LAC CAR LA MIA WAS IND NO NYG CLE GB LV ARI DEN BAL DAL ATL CHI BUF PIT CIN HOU JAX DET MIN KC SEA SF NE",
-  "NYJ IND WAS PHI DAL HOU MIA NO TB BAL CAR PIT LV LAC ARI CIN SEA LA ATL NYG TEN CHI NE KC GB BUF SF JAX DEN MIN CLE DET",
-  "PHI ARI TB WAS TEN NO DAL LV LAC NYJ PIT IND CLE BAL DEN MIN GB CHI HOU NE CAR SEA DET BUF MIA NYG KC SF ATL CIN JAX LA",
-  "ARI LAC TEN IND HOU NYJ MIA NO NYG WAS BAL DET LV LA PHI CIN CAR CHI BUF DAL SEA CLE PIT SF TB KC NE MIN ATL DEN GB JAX",
-  "TEN MIA LAC ARI DAL NO CLE PHI NYJ CAR ATL BAL GB IND LA NYG HOU LV TB DET NE DEN PIT SF JAX SEA CHI CIN MIN KC BUF WAS",
-  "TEN LAC PHI NYJ MIA ARI IND CAR LV NO LA NE ATL PIT NYG DAL CHI CLE GB HOU SEA DET CIN JAX TB WAS BAL KC DEN MIN BUF SF",
-  "MIA NYJ TEN ARI LAC NYG WAS PHI NO GB CAR ATL HOU IND PIT BAL CLE DET LA LV SF DEN NE CHI TB DAL CIN BUF JAX SEA KC MIN",
-  "TEN PHI LAC CAR NYJ ATL NYG ARI LA MIA IND NO WAS HOU LV BAL GB CLE JAX DET DAL NE CHI CIN DEN SF PIT MIN TB KC SEA BUF",
-  "TEN PHI MIA NYJ TB LV LAC BAL NO WAS ARI HOU IND BUF CAR NYG GB CHI DAL CLE KC ATL SEA CIN JAX DET PIT MIN SF DEN NE LA",
-  "MIA PHI TEN NYJ CAR HOU ATL DAL NO CHI LAC ARI WAS IND KC GB CLE BAL TB SEA NE DEN PIT DET NYG LV LA JAX CIN MIN SF BUF",
-  "TEN ARI TB NYJ LAC NYG WAS PHI IND ATL MIA HOU DET PIT BAL LV GB CAR NE CIN LA SF DEN SEA DAL CLE KC MIN CHI JAX NO BUF",
-  "TEN LAC IND ARI MIA CAR LV TB ATL WAS PHI HOU LA NYJ NE SF PIT CHI NO CLE BAL NYG JAX SEA GB DAL KC DEN MIN BUF DET CIN",
-  "ARI LAC BAL MIA TEN PHI IND NYJ LV DAL CAR ATL WAS HOU NO CLE DET LA TB NYG CHI CIN PIT BUF DEN SEA GB NE JAX SF MIN KC",
-  "TEN PHI NYJ NO MIA TB CAR LAC WAS DAL IND CLE LV NE GB LA PIT ARI NYG CIN JAX ATL SEA DEN HOU BAL CHI DET KC MIN BUF SF",
-  "TEN LAC PHI MIA NYJ NO CAR HOU CIN TB ARI NYG IND DAL BAL LV SEA DET ATL PIT NE GB CLE CHI WAS JAX KC SF LA BUF MIN DEN",
-  "LAC TEN MIA WAS TB NO NYJ PHI IND LV CAR JAX LA DAL ARI BAL PIT CHI NYG CLE KC SEA NE MIN ATL HOU DEN SF GB CIN DET BUF",
-  "NO LAC MIA TEN ARI IND CAR PHI DAL WAS HOU NYJ TB CLE NE LA CHI KC NYG CIN GB BUF ATL DEN LV SEA PIT DET BAL MIN JAX SF",
-  "TEN NO PHI IND LV HOU NYJ MIA WAS GB BAL LA TB CAR NE ARI CHI LAC DET DAL SF DEN BUF PIT ATL NYG JAX KC CLE SEA MIN CIN",
-  "MIA NYJ TEN NO ARI LAC TB BAL PHI CLE HOU LA ATL WAS LV SEA DAL JAX IND CAR CIN GB MIN BUF NE DET SF PIT NYG KC DEN CHI",
-  "MIA WAS TEN LAC DAL PHI IND ARI NO LA HOU TB BAL ATL CLE LV NYJ DET NYG GB PIT CAR NE KC BUF CHI CIN MIN JAX SF DEN SEA",
-  "TEN ARI LAC PHI TB NYJ MIA SEA CAR CIN WAS HOU LA IND GB NE ATL LV PIT NO MIN DEN NYG BUF DAL SF BAL CLE CHI JAX KC DET",
-  "TEN LAC WAS PHI IND NO TB LV NE NYJ MIA ARI CAR DAL HOU SEA GB BAL ATL CIN CLE DET BUF CHI NYG JAX LA DEN PIT SF KC MIN",
-  "NYJ MIA IND TB ATL GB ARI TEN WAS CLE NO LV LAC NE PHI JAX NYG LA DET BAL MIN DEN SEA PIT SF DAL KC BUF HOU CHI CAR CIN",
-  "TEN PHI MIA IND NYJ HOU ARI NO LAC WAS DAL TB LV CLE DET LA ATL BAL PIT GB MIN NYG DEN JAX NE SEA CIN CHI CAR BUF KC SF",
-  "TEN PHI LAC TB MIA ARI NO NE WAS NYJ BAL ATL DAL IND HOU LV LA MIN NYG CLE KC BUF CAR CHI PIT GB CIN SF DET DEN JAX SEA",
-  "NO LAC PHI TEN MIA NYG ARI NE WAS LV TB JAX CIN CAR IND NYJ SEA MIN ATL HOU BUF CLE CHI SF BAL KC LA DET GB DEN DAL PIT",
-  "NYJ TEN NO MIA ARI PHI LAC WAS LV IND CAR ATL HOU LA BAL NYG SEA PIT TB DAL SF CLE JAX BUF GB MIN CIN DEN DET NE CHI KC",
-  "TEN IND LAC NYG LV MIA NO ARI CAR ATL NYJ WAS PHI LA BUF HOU PIT GB DAL BAL DEN CLE CHI MIN TB SEA NE KC DET JAX SF CIN",
-  "LAC TEN CAR MIA ARI NYJ PHI IND LV TB ATL NE GB NYG CLE LA DAL BAL HOU PIT CHI KC SEA MIN NO WAS BUF DEN CIN SF JAX DET",
-  "TB WAS PHI TEN ARI NYJ LAC NO LV CAR MIA NYG HOU IND CHI NE SEA PIT ATL DAL DET CIN DEN BAL JAX LA GB KC BUF SF CLE MIN",
-  "TEN LAC MIA ARI LV NO NYJ NE DET PHI BAL IND ATL DAL LA CAR WAS PIT TB SEA NYG CLE HOU JAX SF DEN MIN KC CIN CHI GB BUF",
-  "TEN LAC NYJ CAR DAL LV ATL NYG PHI TB ARI MIA BAL GB HOU IND CLE LA NO WAS JAX BUF SF NE CHI DET DEN CIN SEA KC MIN PIT",
-  "NYJ TEN MIA LV NO PHI IND TB ATL WAS LAC HOU BAL DEN NYG ARI DET SEA LA CLE KC PIT CHI SF DAL CIN BUF MIN CAR JAX NE GB",
-  "TEN IND ARI CAR MIA LV NYJ WAS LAC BAL NYG ATL NO PIT GB PHI DET CLE TB DAL HOU SF DEN JAX SEA NE CIN CHI MIN BUF KC LA",
-  "TEN NYJ MIA LAC TB WAS LV IND PHI BAL ATL NYG HOU KC LA SEA NO CHI GB JAX NE CAR DEN SF ARI CLE BUF MIN DET CIN DAL PIT",
-  "LAC TEN NYJ CAR PHI MIA DAL ARI CLE NO JAX CHI LA NYG TB LV IND NE GB DET BAL CIN WAS DEN HOU ATL SEA KC PIT MIN SF BUF",
-  "MIA PHI HOU CAR NYJ NO NYG DAL CLE ATL ARI LAC TEN IND DET LA BAL DEN JAX KC WAS CIN CHI SEA GB SF NE LV TB BUF MIN PIT",
-  "TEN PHI NO LV ARI IND NYJ CAR LAC CLE BAL DET MIA HOU WAS TB SEA CHI KC NYG DAL LA PIT BUF NE ATL CIN SF DEN GB MIN JAX",
-  "TEN ARI NYJ WAS LAC NO IND MIA CAR PHI HOU LA NYG NE ATL LV GB BAL DET KC TB BUF CHI PIT DEN CIN MIN SF SEA CLE JAX DAL",
-  "MIA HOU ARI PHI TEN NO TB IND BAL WAS DAL LV LA CAR PIT LAC NYJ GB KC CLE ATL CHI NYG CIN NE SF BUF SEA DET DEN JAX MIN",
-  "TEN PHI NYJ MIA DAL NO ARI CAR IND LAC BAL LV TB LA NYG CLE KC GB DEN NE MIN SF ATL JAX HOU WAS PIT SEA CIN CHI DET BUF",
-  "TEN NYJ NO ARI IND DET PHI PIT TB CAR NE MIA JAX GB LA NYG LV LAC WAS ATL CLE BAL CHI DEN CIN KC MIN SF SEA BUF HOU DAL",
-  "TEN NO NE PHI ARI NYJ LAC LA JAX TB ATL MIA IND NYG DAL LV BAL DET CAR WAS PIT CHI CLE KC SEA CIN DEN MIN SF BUF HOU GB",
-  "LAC MIA TEN BAL CAR NYG NO PHI ATL NE LA LV NYJ IND WAS ARI GB JAX HOU TB CLE CIN DAL SEA CHI BUF DET DEN SF KC PIT MIN",
-  "LAC ARI TEN PHI IND NYJ NO CAR GB NYG HOU DET MIA BAL ATL LA LV NE JAX KC WAS CHI PIT SF DAL CIN SEA BUF CLE MIN TB DEN",
-  "TEN NO IND PHI LAC ATL LV ARI CLE MIA WAS JAX DAL BAL NYJ LA CHI GB DEN TB DET NYG PIT BUF HOU CAR CIN MIN NE SF SEA KC",
-  "TEN NYJ MIA ATL IND CAR PHI BAL TB LAC LA WAS CLE NYG ARI HOU PIT DET NO CHI SEA DEN JAX KC DAL LV BUF MIN GB NE SF CIN",
-  "MIA TEN WAS NYJ LAC LV ARI ATL NYG DAL HOU IND BAL TB NE NO GB LA CAR PHI CHI CLE JAX KC CIN SEA PIT SF BUF MIN DEN DET",
-  "TEN MIA LA IND ARI HOU PIT NO LV NYJ LAC ATL WAS NE CAR NYG PHI GB TB SF CLE DET JAX BUF SEA DEN CHI KC BAL DAL CIN MIN",
-  "PHI NO NYJ TEN HOU WAS CAR LV MIA ARI TB DAL GB LAC IND MIN BAL CLE ATL NYG CIN DEN SF NE LA JAX CHI KC SEA BUF DET PIT",
-  "TEN LAC PHI ARI IND TB NYJ CAR MIA NYG WAS LV CLE NO LA GB BAL DEN PIT ATL JAX SEA HOU CHI DAL DET BUF CIN MIN NE KC SF",
-  "TEN MIA NYJ TB ARI LAC NO LV PHI BAL CAR NYG WAS IND CIN CHI GB NE JAX SF DAL DET KC BUF ATL CLE HOU LA PIT MIN DEN SEA",
-  "NYJ PHI TEN WAS LAC MIA TB IND DAL LA CAR GB ATL ARI LV NE BAL HOU NO NYG SEA KC PIT DEN CHI DET CLE CIN SF JAX BUF MIN",
-  "TEN CAR NYJ ARI LV LAC MIA NYG DAL HOU PHI NO TB CLE IND LA BUF GB JAX PIT SF SEA CIN CHI ATL KC DEN MIN WAS BAL DET NE",
-  "TEN PHI LAC NYJ IND ATL MIA HOU ARI NO GB LA SEA TB DEN NYG CLE PIT WAS LV DAL BAL NE DET CAR CHI BUF CIN SF JAX MIN KC",
-  "LAC TEN TB NO MIA PHI NYJ IND NYG LV ARI CAR WAS LA PIT BUF CLE CHI DAL HOU KC GB MIN DEN CIN ATL BAL SEA NE SF DET JAX",
-  "TEN MIA LAC IND CAR PHI TB SEA ARI LV NYJ ATL CLE HOU BAL NYG LA GB NO PIT DEN NE SF WAS DAL CHI CIN BUF MIN KC JAX DET",
-  "NYJ TEN TB PHI LAC HOU NO NYG LV ARI LA MIA ATL WAS JAX PIT KC DET DAL IND CLE GB BUF CAR NE CIN SEA CHI DEN SF BAL MIN",
-  "TEN LAC CAR PHI IND HOU GB NE DAL LV NYJ ATL NYG SEA LA NO MIA CIN ARI DET PIT CHI KC CLE WAS TB JAX BUF BAL MIN SF DEN",
-  "MIA PHI LAC WAS TEN IND NO CAR BAL LV CHI NYG NYJ ARI DET HOU PIT LA TB ATL NE DAL DEN JAX KC MIN GB CLE BUF SF CIN SEA",
-  "TEN PHI ARI NO BAL NYJ LAC DAL IND LA CAR GB CHI WAS LV MIA HOU KC TB ATL DET JAX CLE CIN NYG SEA PIT NE BUF SF DEN MIN",
-  "TEN PHI NO MIA HOU IND TB LV WAS CIN CAR BAL LAC NYJ GB LA ARI SF ATL KC BUF NYG NE SEA DAL CHI CLE PIT DET DEN JAX MIN",
-  "MIA PHI NYJ LAC ATL JAX NO BAL DAL CHI ARI WAS TEN IND NE LV GB LA TB KC CAR NYG CIN PIT CLE HOU SEA MIN DET DEN BUF SF",
-  "TEN HOU MIA NO ARI CAR NYG NYJ LAC PHI PIT LA DAL IND DET TB NE LV WAS CIN BAL GB CHI JAX CLE ATL BUF MIN SEA DEN SF KC",
-  "ARI TEN LAC PHI LV IND NYJ CAR HOU NO TB WAS LA CHI GB MIA NE CIN DAL DET NYG KC PIT BAL SEA JAX ATL CLE SF DEN BUF MIN",
-  "TEN PHI LAC TB ARI LV ATL NYG NYJ MIA WAS IND NE GB BAL PIT CAR CHI NO LA CLE SEA JAX KC BUF HOU SF DET DAL CIN DEN MIN",
-  "TEN MIA IND LAC NYJ NO ARI PHI TB ATL NYG WAS HOU CLE SEA LA BAL NE GB CHI DEN DET LV PIT CAR MIN JAX BUF DAL KC SF CIN",
-  "LAC TEN MIA NYG NO ARI LV NYJ WAS PHI CAR BAL ATL GB IND LA DEN PIT HOU NE DAL SEA CLE MIN CIN CHI SF BUF DET JAX KC TB",
-  "ARI TEN TB DET MIA NO NYJ LAC PHI LV GB IND BAL CLE HOU ATL NYG DAL CAR CHI WAS NE JAX BUF PIT LA DEN SF SEA CIN KC MIN",
-  "NYJ IND MIA TEN LAC ARI ATL WAS PHI BAL NO TB CHI GB LV DAL PIT NE SEA CAR JAX SF HOU CLE NYG KC DEN MIN LA BUF DET CIN",
-  "ARI MIA TEN LAC PHI IND NYJ NYG NO DET TB ATL JAX SF CLE LA BAL NE CAR WAS DAL LV CIN DEN HOU CHI GB PIT SEA BUF KC MIN",
-  "TEN ARI CAR IND LA NYG WAS NYJ BAL MIA PHI TB LAC NE NO HOU LV DET CHI SEA JAX CIN MIN DEN ATL CLE BUF SF PIT DAL GB KC",
-  "TEN ARI IND CAR ATL LAC PHI NO MIA NYJ NE NYG BAL GB WAS JAX LV SEA HOU TB PIT DEN DAL SF DET KC CHI BUF LA CLE MIN CIN",
-  "LAC MIA TEN ARI PHI NYJ NO IND SEA WAS LV HOU BAL TB ATL CIN DAL GB NE LA NYG CLE DEN CAR KC CHI DET BUF JAX MIN SF PIT",
-  "TEN LAC PHI LV IND ATL NYJ TB MIA NYG DET ARI WAS NO HOU BUF DEN GB DAL CLE BAL PIT CAR MIN LA JAX NE SF CHI CIN KC SEA",
-  "TB TEN IND MIA PHI ARI CAR LAC DAL NO LA NYJ GB NE NYG HOU BAL PIT WAS DET CLE LV BUF SEA SF CIN DEN MIN CHI JAX KC ATL",
-  "TEN MIA LAC ARI NYJ CAR LV IND SEA CHI HOU ATL WAS PHI CLE NO PIT LA KC DAL BAL NYG NE GB JAX MIN CIN SF DET DEN BUF TB",
-  "TEN PHI LAC NYG ARI NO NYJ CAR MIA IND GB ATL DAL BAL NE LV LA HOU WAS TB KC CHI CLE PIT SEA DET JAX CIN MIN BUF DEN SF",
-  "TEN PHI MIA LV IND NYJ LAC NYG ARI CAR BAL NO TB WAS HOU SEA LA NE DAL CHI ATL PIT CIN JAX CLE GB BUF MIN KC SF DET DEN",
-  "MIA TEN WAS ARI LAC LV HOU LA NO PHI IND ATL NYG NYJ CAR CHI BAL NE DAL KC CLE PIT DET MIN TB GB CIN DEN BUF SF SEA JAX",
-  "TB TEN LAC PHI HOU LV NO CAR ARI NYJ IND LA MIA NYG WAS CLE BAL MIN DET DEN DAL CIN KC SEA ATL NE GB PIT CHI BUF JAX SF",
-  "MIA TEN HOU PHI NYJ ARI NO CAR NYG DAL BAL IND CLE GB LV LAC MIN ATL LA NE DET CIN WAS KC JAX TB SEA DEN SF PIT CHI BUF",
-  "IND TEN CAR LAC PHI ATL MIA WAS NYG TB NYJ ARI LV NE CLE SF BAL GB NO DAL HOU CHI KC CIN JAX MIN DEN LA PIT DET SEA BUF",
-  "TEN LV TB MIA ARI NYJ BAL NYG NO HOU WAS LAC IND PHI LA DET PIT ATL BUF KC CAR DEN MIN SF CIN GB CLE CHI DAL NE JAX SEA",
-  "TEN PHI NYJ NO CAR IND ATL LAC LV ARI MIA BAL CHI NYG WAS JAX SEA NE TB LA HOU PIT DET BUF CIN KC GB SF DAL DEN CLE MIN",
-  "LAC TEN NYJ PHI NO CAR NYG WAS ARI MIA DET TB IND HOU GB BUF BAL CIN NE LV CLE LA CHI SEA ATL DEN KC MIN SF PIT DAL JAX",
-  "LAC TEN PHI IND MIA NYJ TB CAR ARI ATL LV BAL WAS HOU GB DAL CLE SEA NE PIT NO DEN NYG SF JAX LA CIN MIN CHI BUF DET KC",
-  "TEN NYJ MIA NO LV CAR NE LAC LA CLE TB PHI IND NYG WAS ARI SEA PIT ATL DAL HOU CHI JAX DEN CIN BAL MIN DET GB BUF SF KC",
-  "TEN IND MIA NYJ PHI LAC NO HOU CAR ATL LA WAS ARI NYG CHI PIT LV BAL TB CLE KC CIN DAL GB SF JAX DET BUF SEA NE DEN MIN",
-  "TEN LV MIA ARI NYG WAS NYJ CAR IND NO TB PHI LAC HOU CLE BAL CHI LA KC DEN JAX GB SF MIN DAL BUF DET PIT NE ATL SEA CIN",
-  "TEN MIA ARI NYJ LAC NYG NO CAR PHI DAL IND KC CHI HOU BAL TB PIT DET LV SF LA GB JAX BUF WAS SEA CLE NE CIN MIN ATL DEN",
-  "MIA TB NYJ IND WAS TEN ARI CIN LAC JAX ATL PHI BAL DET CAR NYG GB LV HOU NO NE LA DEN SF CHI CLE KC MIN DAL PIT BUF SEA",
-  "TEN LAC PHI CAR ATL NYJ ARI MIA NYG DAL BAL IND CLE LA NO NE LV GB WAS HOU JAX BUF SEA DET SF DEN CHI PIT TB CIN MIN KC",
-  "TEN IND NO CAR LAC NYJ TB PHI NYG HOU ARI MIA BAL GB BUF LA DAL CLE NE LV PIT CHI SEA SF ATL DET KC CIN WAS JAX MIN DEN",
-  "TEN LAC MIA WAS NO LV NYJ ATL CAR NYG ARI LA CIN PHI IND JAX BAL GB DET CHI KC SF BUF NE TB CLE HOU SEA DAL PIT DEN MIN",
-  "HOU TEN ARI MIA PHI NYJ IND LAC BAL GB NYG NO TB ATL SF LA CLE NE CAR DET LV SEA DEN PIT KC CHI BUF MIN DAL JAX WAS CIN",
-  "LAC TEN NYJ MIA WAS PHI HOU ARI TB BAL DAL LV ATL LA JAX SEA NE CAR NYG GB CHI CIN CLE PIT MIN KC NO DEN DET BUF IND SF",
-  "LAC TEN NYJ PHI ARI IND NO MIA GB DAL NE DET TB PIT NYG HOU LV SEA BUF KC LA CLE CAR CHI ATL BAL SF DEN WAS CIN MIN JAX",
-  "NYJ TEN LAC NO MIA IND BAL LV PHI NYG HOU PIT TB CAR ARI SEA LA GB NE ATL DAL CHI CLE BUF KC JAX SF MIN WAS CIN DEN DET"
+  "LAC NYJ CAR MIA TEN PHI NYG ATL NO CLE IND NE ARI WAS HOU LV DET GB DAL BAL PIT LA MIN DEN TB CIN JAX SF SEA BUF CHI KC",
+  "TEN WAS IND ARI NYJ LAC CLE CAR DAL LV TB NYG NO MIA GB CHI BAL PIT PHI KC HOU ATL DEN SEA DET LA JAX BUF SF CIN MIN NE",
+  "WAS TEN NO NYJ ARI IND MIA NYG DAL TB ATL LAC LA CHI HOU LV NE BAL CAR PHI CLE PIT SF JAX CIN SEA GB KC DET DEN MIN BUF",
+  "MIA IND TB TEN LAC ATL NYJ PHI CAR WAS LV LA CLE GB CHI NYG JAX DEN NO SF KC DET CIN NE ARI DAL BAL PIT HOU SEA MIN BUF",
+  "IND MIA TEN NO PHI LAC NYJ WAS ARI DET BAL ATL LV CAR NYG SEA HOU PIT TB CLE DEN MIN SF CIN CHI JAX LA BUF KC GB NE DAL",
+  "LAC ARI TEN MIA NO NYJ CLE LA CAR ATL LV DAL PHI IND NYG BAL DEN GB TB HOU SF PIT DET BUF WAS NE KC CHI JAX SEA CIN MIN",
+  "TEN TB ATL NYJ IND LAC MIA WAS PHI CAR LV NYG HOU CLE CIN LA CHI ARI BAL NE DEN SF GB DET NO DAL PIT JAX BUF MIN SEA KC",
+  "LAC TB PHI ATL MIA DAL TEN NYJ GB WAS CLE LV NE JAX NO ARI PIT LA NYG CIN IND CHI SEA KC DEN CAR HOU MIN BAL SF DET BUF",
+  "TEN NO NYJ ATL HOU ARI MIA WAS PHI IND NYG CAR BAL LV LA DEN GB LAC TB JAX CHI NE SF PIT DAL DET CLE BUF SEA KC MIN CIN",
+  "NYJ TEN PHI LAC MIA ARI ATL NYG HOU LA NO GB IND PIT CAR DAL CLE DEN WAS KC CIN TB JAX MIN SEA LV BAL DET NE SF CHI BUF",
+  "MIA TEN HOU NYJ ATL IND TB ARI NE DAL NO LV LAC LA NYG BAL PHI GB CLE PIT WAS KC SF DET CAR CHI JAX DEN CIN MIN SEA BUF",
+  "NYJ MIA TEN PHI IND WAS NO GB LAC DAL HOU ARI TB CLE LV BAL ATL CHI NYG CAR LA NE JAX CIN KC DET PIT SEA DEN MIN SF BUF",
+  "TEN PHI NYJ CAR MIA LAC LA DAL ARI CLE ATL HOU DET NO NYG IND BAL DEN LV SEA NE BUF CHI MIN TB JAX WAS CIN PIT GB KC SF",
+  "TEN LAC MIA PHI NYJ NO LA HOU ARI NE CAR LV CLE ATL WAS PIT DAL CHI TB IND CIN NYG GB BAL DEN JAX SF DET KC MIN SEA BUF",
+  "MIA NO NYJ TEN TB LAC DAL WAS IND HOU LA NYG LV ATL ARI GB CLE DEN PHI CAR CHI CIN KC BAL SF PIT BUF MIN JAX SEA DET NE",
+  "WAS IND TEN CAR MIA TB NO ARI NYJ LA NYG PHI LAC CLE DET BAL DEN NE DAL GB PIT LV ATL BUF HOU CHI CIN SF SEA KC JAX MIN",
+  "NYJ MIA PHI TEN HOU LA IND LAC NO ARI ATL WAS TB LV BAL DAL CLE MIN CAR DEN GB CHI PIT CIN NYG BUF KC SEA DET JAX NE SF",
+  "MIA PHI BAL ARI NO NYJ TB WAS TEN LAC LV CAR NYG HOU DET JAX SEA NE DAL ATL IND KC SF CIN LA GB PIT DEN CLE MIN BUF CHI",
+  "TB MIA TEN ARI IND DAL HOU LAC NYJ NYG CLE BAL NO ATL KC SEA DET PHI PIT LV WAS JAX LA SF MIN NE CIN CHI GB BUF DEN CAR",
+  "TEN NO LAC PHI ARI MIA NYJ CAR IND ATL NE NYG LV DAL HOU BAL LA GB CLE TB DEN WAS SF CIN JAX KC MIN DET CHI PIT BUF SEA",
+  "MIA PHI LAC TEN ATL NYJ IND CLE NYG WAS TB NO HOU LV ARI NE SEA GB CAR DAL BAL KC SF DEN JAX PIT LA CHI BUF MIN DET CIN",
+  "TEN LAC NO NYJ WAS IND ATL GB MIA CLE TB HOU LV LA NYG BAL PHI ARI CAR PIT JAX KC SF SEA DET CHI NE CIN DEN MIN DAL BUF",
+  "LAC IND ARI MIA TEN JAX TB CAR NO PHI LV NYG WAS CIN NYJ BAL DET GB DAL ATL BUF CLE MIN NE DEN HOU LA CHI KC SEA SF PIT",
+  "TEN MIA PHI NYJ LAC WAS TB LA IND HOU GB ATL NO NE NYG SEA CLE LV CAR ARI JAX BAL SF PIT KC DET CIN MIN CHI DEN DAL BUF",
+  "NYJ LAC TB MIA TEN WAS PHI IND ARI CAR ATL DAL JAX LV SEA CLE LA PIT NO CIN GB DEN BAL MIN NYG HOU BUF SF KC CHI NE DET",
+  "NYJ LAC HOU PHI TEN IND DAL ATL MIA TB CLE CAR LV NYG GB CHI MIN CIN LA PIT ARI NE SF BUF WAS DET KC JAX NO DEN BAL SEA",
+  "TEN NYJ NO MIA LAC NYG WAS HOU NE ATL DAL LA LV ARI PIT GB CAR IND PHI CLE CIN JAX TB DET BAL SF SEA BUF CHI DEN KC MIN",
+  "TEN LAC MIA WAS PHI IND NO CAR ATL NYJ LV CLE SEA HOU BAL LA GB DAL NE PIT TB ARI NYG KC JAX SF DEN DET CHI CIN MIN BUF",
+  "TEN PHI NO WAS MIA JAX NYJ IND ARI LA LAC DAL BAL CLE CAR CHI ATL BUF DEN NYG LV CIN GB SEA HOU DET PIT MIN TB KC NE SF",
+  "TEN NYJ NO MIA WAS ARI TB LAC CAR DAL PHI HOU LV LA BAL IND BUF DET ATL NYG CLE NE JAX SF PIT GB SEA KC CIN MIN DEN CHI",
+  "TEN NO LAC MIA PHI IND TB NYG LV PIT NYJ ATL ARI WAS BAL LA DEN CHI DAL CAR JAX CLE BUF MIN NE GB HOU DET SEA CIN KC SF",
+  "TEN IND MIA NO LAC ATL PHI HOU KC DAL ARI NYJ TB LV WAS CLE SEA GB BAL DEN CIN LA CAR CHI BUF SF NE DET NYG PIT JAX MIN",
+  "TEN PHI MIA NE TB WAS CAR HOU IND NYJ SEA LAC NYG DET BAL ARI GB LV PIT ATL DAL BUF NO CLE CIN JAX SF MIN LA KC CHI DEN",
+  "TEN LAC PHI NO CLE LA TB NYJ ARI NE WAS NYG HOU IND GB CHI MIA LV ATL MIN PIT JAX SEA BUF CAR DAL BAL KC DEN DET CIN SF",
+  "TEN NYJ MIA NO ATL HOU LAC ARI NYG PHI DAL IND CAR CLE LV LA CHI DEN TB WAS BAL JAX CIN SF SEA PIT GB BUF MIN KC DET NE",
+  "LAC TEN NO IND NYJ MIA TB PHI ATL SEA HOU CLE GB NYG BAL ARI LA LV CIN CAR PIT CHI SF DEN WAS DAL NE KC DET JAX MIN BUF",
+  "TEN MIA ARI NYJ CAR NO DAL IND ATL NYG LV HOU LAC WAS CLE LA CIN CHI NE PHI DET DEN SF JAX TB PIT GB KC BAL MIN SEA BUF",
+  "MIA TEN LAC DAL NO WAS NYJ LV NYG TB ATL IND CLE NE ARI JAX CHI MIN PHI HOU BAL CIN GB SEA CAR LA PIT KC DEN SF BUF DET",
+  "LAC ARI NYJ MIA PHI TEN HOU IND TB CAR NO NYG WAS CLE CHI SEA PIT DEN LA BAL NE BUF GB MIN DAL LV CIN DET ATL KC SF JAX",
+  "TEN PHI NYJ MIA NO CHI LV LAC WAS CAR IND NYG ARI SF LA BAL CLE DEN TB ATL GB CIN BUF JAX DAL HOU PIT SEA MIN KC NE DET",
+  "MIA TEN PHI ATL NO NYJ CLE ARI WAS CAR LV LAC DAL BAL IND GB LA PIT TB NYG NE DEN SF HOU DET BUF CIN MIN CHI KC SEA JAX",
+  "TEN WAS NYJ ATL PHI BAL MIA NYG HOU LAC LV LA IND ARI NO SEA PIT TB DAL GB DET DEN CLE CIN CAR BUF NE MIN KC SF JAX CHI",
+  "LAC PHI WAS TEN NO MIA CAR DAL IND NYJ ARI LA GB LV BAL DET PIT BUF NYG ATL TB JAX CLE KC NE CIN MIN SF DEN CHI HOU SEA",
+  "MIA TEN NYJ LAC ARI ATL CAR IND DAL PHI CIN HOU TB LV NYG CLE SF LA BAL NO GB DEN MIN KC NE WAS CHI PIT DET BUF JAX SEA",
+  "TEN NYJ CAR WAS PHI ATL LAC MIA HOU IND NO SF LV SEA GB NYG CIN BAL TB ARI DET CLE PIT DEN LA MIN NE KC BUF CHI JAX DAL",
+  "NYJ WAS TB MIA ATL TEN PHI LAC IND NO SEA NYG NE ARI LV BAL CLE DET CAR JAX PIT DEN GB MIN LA BUF CHI CIN DAL HOU SF KC",
+  "LAC MIA ARI NYJ TEN WAS CAR ATL HOU IND NO LV SEA BAL NYG PHI CLE CHI TB NE JAX MIN KC DET DAL LA PIT BUF GB DEN CIN SF",
+  "LAC TEN PHI ARI TB MIA IND CLE CAR NYG WAS NYJ HOU KC NO GB LA BAL DET DEN BUF MIN SF JAX LV ATL PIT CHI DAL CIN SEA NE",
+  "TEN NYJ NO DAL LAC NYG PHI IND CAR BAL ATL DEN ARI GB LA MIA HOU PIT WAS TB KC LV CLE MIN DET JAX CHI CIN SEA BUF NE SF",
+  "LV LAC TB CAR TEN NYJ MIA NO DAL PHI ARI NYG CLE BAL HOU GB SF IND ATL NE LA MIN KC JAX WAS CIN PIT DET SEA BUF CHI DEN",
+  "TEN IND NYJ PHI CAR ARI MIA LAC NO TB CHI LA JAX LV NYG WAS PIT CLE GB SF DET KC NE BAL DAL BUF MIN DEN HOU ATL CIN SEA",
+  "WAS TEN MIA NO NYJ TB PHI IND ARI CAR LAC NYG LV CLE SF NE DEN DET PIT BAL GB JAX LA CHI DAL ATL HOU CIN MIN KC BUF SEA",
+  "TEN IND ARI NYJ LAC NE SEA NO CAR LV MIA ATL WAS PHI HOU DAL LA CLE TB JAX BAL DET CIN MIN CHI NYG DEN BUF KC GB PIT SF",
+  "TEN LAC NYJ PHI MIA WAS NO GB DAL IND ARI ATL CLE LV BAL CAR DEN LA NYG JAX SF DET BUF CIN TB KC CHI NE PIT SEA HOU MIN",
+  "NYJ TEN PHI CLE CAR LAC TB NO IND LV MIA LA BAL PIT MIN GB SF WAS HOU DAL DET JAX NYG BUF CHI CIN SEA KC ARI DEN ATL NE",
+  "TEN MIA IND ATL HOU TB NYJ LV ARI NO PHI CLE LAC BAL WAS CHI LA NYG CAR NE BUF GB SF CIN DET DEN JAX MIN SEA PIT KC DAL",
+  "LAC MIA TEN PHI NO WAS BAL CIN TB NYJ LV DAL IND ARI ATL NE LA DET PIT CHI DEN NYG BUF GB CLE CAR HOU SF KC MIN SEA JAX",
+  "TEN MIA NYJ WAS PHI HOU LAC NO LV ARI TB CAR NYG JAX BAL LA GB NE ATL DAL SEA CLE CIN DEN IND CHI DET PIT KC MIN SF BUF",
+  "TEN PHI MIA NYJ CAR TB CLE IND NO GB LAC DAL LV LA ARI WAS BAL PIT KC NYG CIN HOU SEA CHI ATL BUF SF JAX DET NE DEN MIN",
+  "TEN WAS PHI LAC NYJ ATL MIA IND BAL NO GB HOU LV ARI DAL KC SEA CHI NYG CAR CIN CLE LA BUF JAX TB DEN MIN DET NE PIT SF",
+  "LAC MIA DAL TEN NYJ CAR ARI NYG WAS HOU CLE TB IND ATL BAL LV LA GB PHI NO CHI CIN KC DEN PIT NE SF DET MIN JAX SEA BUF",
+  "MIA LV NO PHI ATL TEN ARI NYJ LAC GB NYG WAS CAR LA IND PIT BAL CLE TB HOU NE DET KC MIN DAL JAX BUF SEA DEN CHI CIN SF",
+  "TEN PHI MIA NYJ ATL LAC HOU CLE NO WAS NYG CAR IND BAL GB CHI SEA NE DAL TB CIN LV BUF SF ARI DET KC JAX DEN LA PIT MIN",
+  "TEN NYJ NO LV LAC MIA IND NE NYG ARI TB ATL WAS DAL BAL CLE DET SF CAR PHI SEA CIN BUF JAX LA PIT MIN KC GB DEN CHI HOU",
+  "IND TEN TB LAC NYJ HOU ARI NO WAS DAL LV GB NYG ATL SF MIA CIN NE PHI JAX PIT CLE LA DET SEA DEN KC MIN CHI BUF CAR BAL",
+  "MIA TEN PHI NYJ LAC LV BAL NO NYG WAS HOU IND LA CAR ATL ARI NE GB JAX SF DET PIT CLE MIN TB DAL BUF KC DEN CHI CIN SEA",
+  "PHI NYJ TEN MIA CAR CLE TB GB DAL IND BAL ARI LAC CHI NYG SF PIT DEN NO WAS ATL HOU LV KC DET NE MIN JAX LA BUF CIN SEA",
+  "TEN NYJ IND TB LAC ATL WAS DAL HOU NO MIA NYG CLE GB SF LA NE BAL DET ARI LV DEN PIT CHI PHI CAR KC BUF JAX SEA CIN MIN",
+  "TEN NO NYJ IND LA CLE DAL LAC CAR NYG PHI ARI ATL MIA NE HOU BAL CHI CIN LV GB DEN MIN SF WAS PIT BUF DET TB JAX KC SEA",
+  "TEN NYJ CAR IND MIA HOU ARI LAC PHI LV CLE NO ATL WAS DAL GB LA NE KC NYG TB BAL PIT SEA SF CHI BUF DEN CIN MIN JAX DET",
+  "TEN LAC MIA WAS PHI ARI NYJ BAL NO ATL DAL HOU LV IND CLE CHI LA TB CIN CAR NE DET SEA DEN NYG JAX BUF SF GB PIT MIN KC",
+  "MIA TEN NYJ PHI NO IND ARI LAC NYG WAS TB LV HOU DET CLE NE GB CHI KC CIN CAR LA ATL PIT DAL SEA BAL DEN BUF SF JAX MIN",
+  "TEN PHI LAC NYJ WAS DAL CAR NO ATL MIA HOU CLE IND ARI PIT GB LV DET TB BAL SF SEA JAX CIN DEN NYG CHI BUF NE MIN KC LA",
+  "LAC MIA NO DAL ARI PHI IND LV NYJ GB NYG TB TEN ATL LA CLE PIT BAL SEA HOU CAR CHI DEN BUF WAS DET CIN JAX SF KC MIN NE",
+  "TEN PHI NYJ NO LAC DAL CLE LA MIA WAS ARI ATL IND CAR DET NE BAL LV NYG TB GB DEN CIN BUF JAX HOU SEA SF PIT CHI MIN KC",
+  "MIA TEN LAC ATL DAL IND CAR PHI NYG NO LV HOU NYJ ARI GB LA BAL PIT TB CLE DEN SEA SF KC DET MIN BUF CIN WAS JAX NE CHI",
+  "MIA TEN NYJ LAC NO PHI BAL HOU ARI ATL LV DAL IND CAR CHI WAS CLE LA TB NYG PIT NE CIN SEA SF JAX DET BUF KC MIN GB DEN",
+  "TEN NO LAC CAR PHI IND NYJ MIA DAL GB ARI ATL NYG LV LA BAL JAX CIN WAS CLE SEA NE CHI BUF TB HOU DET DEN KC SF MIN PIT",
+  "LAC TEN NYJ IND LV NO TB ARI CAR MIA NYG WAS PHI CLE LA HOU BAL DET DEN ATL GB BUF PIT CHI DAL KC SF NE SEA CIN MIN JAX",
+  "PHI NYJ TEN TB LAC NO ARI WAS DAL IND CAR GB LV KC MIA CLE LA NE JAX NYG DET BAL PIT SEA ATL CHI CIN BUF HOU MIN SF DEN",
+  "TEN NO LAC HOU ARI MIA WAS IND NYJ NE DAL CLE DET CAR CHI CIN SEA ATL PHI NYG LV PIT BUF GB BAL TB KC MIN LA JAX DEN SF",
+  "TEN CAR ARI PHI NYJ DAL TB LV NYG HOU ATL MIA GB PIT IND SEA LAC DEN NO LA NE BAL MIN KC WAS CHI JAX BUF DET CLE SF CIN",
+  "IND LAC NYJ MIA TEN PHI NO LV CAR GB DAL ATL WAS HOU CHI CLE ARI KC TB BAL PIT SF LA CIN NYG NE SEA DEN JAX MIN DET BUF",
+  "MIA TEN TB ARI IND NO CAR HOU CLE LAC LA NYG PHI NYJ PIT DAL NE CHI JAX KC DEN DET GB MIN WAS LV BAL SF ATL BUF CIN SEA",
+  "TEN ARI MIA NYJ LAC DAL IND HOU PHI BAL NO ATL NYG SEA LV LA CLE GB KC TB DET NE PIT MIN CAR WAS JAX CIN DEN CHI SF BUF",
+  "TEN NO TB NYJ PHI LAC MIA IND ATL ARI DAL CLE GB NYG JAX CHI DEN BAL LV CAR SF NE CIN DET WAS HOU LA PIT SEA BUF KC MIN",
+  "TEN WAS LAC ARI TB MIA PHI NYJ DAL HOU JAX SEA DEN CLE CAR NO BAL GB ATL NYG LV PIT DET NE SF BUF CHI CIN IND MIN LA KC",
+  "MIA PHI TEN IND HOU ARI LAC NO ATL WAS NYG NYJ NE BAL LA TB GB PIT DAL LV CIN CAR DEN SF JAX CLE MIN DET SEA BUF CHI KC",
+  "TEN NYJ PHI MIA ATL NYG DAL HOU NO BAL TB LAC LA IND ARI LV GB CIN WAS DET CLE JAX CHI PIT DEN CAR SF BUF MIN NE KC SEA",
+  "TEN NYJ MIA IND ATL WAS ARI NO DAL LV PHI LAC NE CAR LA CLE BAL GB HOU KC DEN NYG SEA DET PIT TB JAX MIN CHI CIN SF BUF",
+  "WAS TB ATL LAC TEN IND PHI LV MIA NYG HOU NO CLE NE PIT ARI GB LA CAR BAL CHI JAX DET CIN KC NYJ SF SEA DAL BUF MIN DEN",
+  "TEN PHI NYJ LAC MIA ATL HOU NO NYG ARI WAS CLE IND CIN TB LA GB BAL CAR CHI DEN DET NE PIT BUF SF JAX SEA LV DAL KC MIN",
+  "NYJ TEN PHI ATL LAC DAL IND NO CAR GB MIA WAS CLE ARI LA NE JAX LV NYG DEN PIT BAL SEA CHI SF DET CIN KC TB HOU MIN BUF",
+  "TEN MIA TB PHI CAR ARI LA HOU NYJ NYG IND ATL NE WAS DEN BAL LAC GB LV CHI CIN PIT DET SEA NO CLE JAX MIN SF KC BUF DAL",
+  "TEN PHI NYJ CAR HOU LA MIA NE WAS DAL TB LV LAC ATL GB ARI BAL CIN CLE PIT CHI JAX DET MIN NO IND BUF SEA NYG DEN SF KC",
+  "TEN WAS NYJ IND HOU ATL NO TB ARI MIA LV NYG PHI GB BAL LAC LA PIT DAL KC CAR NE CLE MIN DEN CIN CHI SF DET JAX SEA BUF",
+  "MIA PHI TEN ARI WAS CAR IND LAC TB LV DAL HOU NYJ CLE BAL DET ATL LA NO NYG DEN SEA KC BUF JAX CIN SF MIN CHI NE PIT GB",
+  "MIA TEN ARI ATL NYJ DAL LAC IND LV NYG HOU DET NO TB PIT WAS BUF GB JAX CAR CLE BAL SEA CHI PHI NE KC MIN LA DEN CIN SF",
+  "MIA LAC TB TEN ARI NYJ CLE CAR WAS LV IND NYG NO PHI NE BAL LA CHI ATL HOU CIN KC SEA SF DAL GB BUF PIT JAX MIN DET DEN",
+  "TEN IND LAC MIA NYJ HOU PHI NO WAS ARI TB LA CAR NE NYG LV SEA PIT ATL CLE DET CIN DEN GB DAL KC BUF CHI BAL MIN JAX SF",
+  "TEN NYJ PHI MIA DAL CAR LAC HOU TB ARI WAS CLE NO CHI IND LV GB PIT ATL BAL NYG KC NE SF JAX SEA LA BUF CIN MIN DET DEN",
+  "TEN NO MIA ATL LAC NE IND TB ARI LV NYJ DAL PHI HOU KC WAS SEA LA CAR NYG CLE BAL PIT SF DET JAX DEN GB CHI BUF CIN MIN",
+  "NYJ HOU TEN IND MIA LAC PHI BAL ARI CAR LA TB NO CHI WAS LV SF DEN JAX CIN MIN KC SEA DET ATL CLE PIT GB NYG BUF DAL NE",
+  "TEN ATL NYJ MIA ARI CAR IND SF WAS DAL HOU NO GB LAC PHI CLE BAL NE JAX SEA DET CHI LV KC PIT LA MIN DEN TB CIN BUF NYG",
+  "TEN LAC PHI TB ARI HOU NYJ NO MIA ATL NE IND NYG DAL LV SEA BAL SF CAR LA DET CLE PIT DEN KC CIN CHI MIN GB BUF WAS JAX",
+  "IND TEN PHI NE NYG NYJ NO HOU LV LAC ARI TB LA ATL WAS BAL MIA GB DEN CAR PIT CHI CLE DET DAL JAX SF BUF SEA CIN KC MIN",
+  "LAC TEN PHI NO NYJ MIA LV CAR ATL WAS HOU BAL DAL ARI IND LA PIT DET CLE TB KC BUF CHI SF NYG NE DEN MIN GB CIN SEA JAX",
+  "LAC TEN MIA TB CAR HOU DAL PHI NYJ ATL IND GB NYG SEA CLE ARI PIT LV NO WAS NE JAX CIN SF LA BAL DET BUF CHI KC MIN DEN",
+  "TEN LAC PHI ATL TB NYJ NO LA MIA LV ARI IND NE WAS HOU CLE DAL CHI CAR BAL SF GB PIT BUF DEN SEA CIN DET NYG KC JAX MIN",
+  "TEN LAC ARI TB IND NYJ CAR MIA PHI NYG HOU LV SEA ATL GB WAS CLE BAL NO DET LA JAX CIN PIT NE DAL BUF SF DEN MIN CHI KC",
+  "TEN NYJ MIA LA IND ARI LAC ATL CLE DAL NO CAR WAS HOU PHI BAL CHI DEN TB LV CIN GB JAX DET NYG NE KC SF PIT MIN SEA BUF",
+  "TEN PHI MIA ATL NO NYJ NYG IND CIN CAR LAC DAL NE HOU LV ARI DET SF TB BAL CHI WAS CLE KC DEN BUF GB LA PIT MIN SEA JAX",
+  "TEN NYJ NO ATL IND PHI TB MIA LAC GB WAS DAL ARI LV LA PIT CLE JAX CAR CHI HOU NYG CIN KC SEA DEN MIN BAL SF NE BUF DET",
+  "TEN MIA LAC ARI PHI LA DAL IND NO GB ATL NYG NYJ TB BAL DEN LV PIT WAS CAR HOU NE CHI JAX MIN KC SEA BUF CIN SF DET CLE",
+  "IND LAC TEN NYJ MIA ARI ATL HOU BAL NO GB CAR PHI LV DAL LA CHI CLE TB WAS NE NYG PIT DEN JAX BUF DET MIN SF KC CIN SEA",
+  "ARI IND PHI TEN NO CAR NYJ MIA LAC HOU GB ATL NE WAS DET LA BAL LV NYG DAL JAX CLE PIT CHI TB SEA BUF KC SF DEN MIN CIN",
+  "NYJ MIA WAS TEN LAC PHI ATL ARI LV GB NYG HOU IND SF TB CAR CLE BAL DAL NO CIN LA NE DEN JAX PIT DET SEA CHI KC BUF MIN",
+  "TEN LAC NO NYJ MIA PHI NYG CAR ATL ARI CLE CHI WAS HOU JAX SF BAL NE DAL DET IND DEN GB KC TB LV CIN MIN PIT LA SEA BUF",
+  "TEN NYJ MIA IND TB NO ATL LA NE NYG WAS DAL LV HOU ARI DET LAC BAL PHI CLE GB CIN PIT SEA CAR SF JAX DEN MIN KC BUF CHI",
+  "TEN NYJ MIA CAR ATL WAS DAL IND BAL NO PHI HOU LV ARI LAC CLE DET LA TB PIT GB DEN SEA JAX NYG MIN NE BUF SF CIN KC CHI",
+  "TEN MIA LAC BAL WAS IND NO ARI PHI NYJ DAL LV CAR ATL CLE PIT CHI MIN NYG TB NE HOU DET DEN GB CIN BUF SF LA KC JAX SEA",
+  "MIA IND NYJ PHI TEN ARI WAS TB CAR ATL LAC GB BAL DAL SEA HOU LV CLE NO LA CHI PIT DEN NE MIN NYG JAX CIN KC SF DET BUF",
+  "LAC TEN IND ARI MIA PHI ATL NYJ SEA NO GB HOU LV LA TB CLE NYG PIT DAL DET CAR BAL NE BUF SF CIN DEN CHI JAX MIN WAS KC",
+  "TEN LAC PHI LV NYJ NO MIA NE ATL IND DAL ARI BAL CAR LA WAS GB CLE HOU NYG PIT DEN SF CHI TB SEA JAX CIN KC MIN DET BUF",
+  "TEN LAC MIA PHI TB WAS CLE NYJ IND LV SEA CAR NYG HOU LA ARI BAL NO DAL CHI GB JAX KC CIN NE SF BUF MIN DET DEN PIT ATL",
+  "NYJ TEN CAR PHI NO IND ATL LAC HOU BAL WAS CLE ARI LV LA NYG DEN CHI TB SF JAX DET NE PIT DAL BUF KC MIN MIA GB CIN SEA",
+  "TEN MIA PHI LAC ATL IND LV NO NYJ HOU TB ARI MIN LA WAS NYG BAL PIT CAR DEN GB CHI CIN BUF DAL KC JAX DET SEA NE SF CLE",
+  "TEN NYJ MIA ATL PHI WAS IND NO BAL LAC NYG CLE CAR HOU LA ARI LV CHI DAL TB SEA NE BUF KC PIT MIN DEN DET GB JAX SF CIN",
+  "TEN MIA LAC NYJ CAR IND PHI HOU NO ATL NYG ARI DAL LV PIT NE SEA LA BAL KC GB JAX MIN CHI TB WAS CIN DEN CLE SF DET BUF",
+  "PHI TEN DAL CAR NYJ LAC HOU ARI ATL WAS NO IND GB DET MIA NE PIT CLE SF LV NYG BAL DEN SEA LA CHI JAX KC TB CIN BUF MIN",
+  "TEN NYJ PHI LAC NO MIA TB IND CAR WAS HOU DAL LV ARI GB CLE LA PIT ATL NYG BAL BUF SF KC CHI SEA NE JAX DEN DET CIN MIN",
+  "LAC DAL TB NYJ TEN MIA ARI CAR PHI WAS LV NO CLE IND CHI HOU CIN GB ATL LA PIT BUF BAL DET NYG NE KC MIN SEA DEN JAX SF",
+  "TEN PHI ARI IND NYJ LAC ATL DAL HOU NO CLE MIA WAS TB GB BAL CHI NE NYG LV CAR LA DEN KC SEA DET CIN JAX SF PIT MIN BUF",
+  "LAC TEN NYJ PHI ARI MIA NYG CLE NO GB DAL HOU TB CHI CAR IND LV PIT ATL BAL KC DET SF BUF WAS LA DEN CIN SEA NE JAX MIN",
+  "PHI TEN NYJ MIA TB LAC ATL DAL IND CAR GB LV ARI HOU NYG CLE LA DEN JAX CHI NO NE CIN WAS DET PIT MIN BAL SF KC BUF SEA",
+  "TEN NO NYJ NYG IND MIA ATL PHI HOU CAR LAC LV BAL NE WAS GB MIN LA TB DAL CLE ARI KC PIT DEN DET CIN SF SEA JAX CHI BUF",
+  "TEN NYJ MIA IND ATL CAR PHI DAL LAC NO HOU ARI LA KC WAS BAL LV GB CIN CLE NYG NE SF MIN TB CHI DEN BUF SEA PIT JAX DET",
+  "TEN PHI LAC NYJ MIA WAS ARI LA LV ATL CHI CAR NO BAL NYG HOU IND CLE TB SF GB NE PIT CIN KC BUF DET SEA DAL JAX MIN DEN",
+  "TEN NYJ LAC NO MIA PHI LA LV ARI CAR HOU IND BAL ATL NYG WAS CLE CHI TB JAX SF BUF CIN MIN PIT DET DEN GB DAL KC SEA NE",
+  "NYJ LAC TEN ARI ATL HOU IND CAR MIA NYG NO DAL PHI CIN LV BAL GB CHI JAX LA WAS NE CLE DET TB SF PIT KC SEA DEN MIN BUF",
+  "TEN WAS NYJ MIA CAR ARI LAC IND TB GB HOU PHI CLE NO BAL LA KC NYG ATL DAL JAX SEA LV CIN DET BUF NE SF MIN DEN PIT CHI",
+  "TEN LAC MIA NO PHI LV NYG WAS IND NYJ TB ARI CAR HOU CHI BAL GB PIT DAL SEA JAX KC ATL BUF DEN LA CLE SF DET CIN NE MIN",
+  "TEN MIA LAC CAR WAS IND NYG NO ATL ARI GB LV PHI KC BAL NYJ LA CLE TB DAL CIN HOU MIN PIT DEN SEA CHI NE SF BUF DET JAX",
+  "TEN MIA PHI IND CAR WAS LAC ARI ATL NYJ BAL GB DAL LV TB CLE CHI DEN NO SEA NYG NE KC CIN HOU DET PIT SF LA JAX BUF MIN",
+  "MIA IND LAC TEN TB NO GB NYJ HOU LV ARI CAR LA NYG WAS PHI CLE PIT DET ATL BAL SEA NE BUF DAL KC CHI DEN CIN SF JAX MIN",
+  "NYJ LAC TEN MIA PHI TB ARI WAS DAL HOU GB CAR NO BAL SEA CLE BUF IND ATL LV KC NYG SF PIT DET CHI JAX CIN NE MIN DEN LA",
+  "TEN IND WAS CAR HOU TB MIA DAL PHI ATL LAC BAL LV CHI NE LA KC ARI NYG NO GB NYJ CLE DEN DET MIN PIT CIN SF JAX BUF SEA",
+  "TEN TB MIA NYJ ARI NO IND DAL JAX PHI LAC NYG DET LV ATL BAL DEN LA KC CLE GB MIN CIN SEA HOU WAS SF PIT CAR NE BUF CHI",
+  "TEN NYJ PHI MIA WAS IND TB NO DAL ATL LV LAC CIN BAL GB NE MIN ARI CAR HOU KC PIT SEA NYG CLE DET CHI DEN LA JAX SF BUF",
+  "TEN PHI NYJ MIA GB DAL NO TB ATL CLE IND BAL ARI LAC NYG HOU LV SF CAR WAS CHI CIN DEN NE LA SEA JAX BUF PIT DET KC MIN",
+  "TEN NYJ MIA WAS NO PHI DAL ARI HOU LV ATL CAR LA CIN CLE LAC IND MIN TB NYG JAX BAL KC GB PIT DET DEN SF CHI NE SEA BUF",
+  "TEN TB ARI LAC PHI IND NYJ ATL NYG MIA NE DAL NO BAL LA SEA PIT CLE CHI WAS JAX DEN DET BUF LV HOU SF MIN GB CIN KC CAR",
+  "LAC TEN ARI IND NO HOU BAL ATL MIA PHI NE NYG SF LA NYJ CAR WAS LV TB GB CHI KC PIT DEN DAL CLE JAX MIN DET BUF SEA CIN",
+  "MIA LAC PHI TEN CLE PIT CAR ATL IND HOU NO MIN NYG DAL NYJ NE ARI LA TB GB WAS LV BAL KC SEA CIN DET DEN CHI BUF SF JAX",
+  "PHI TEN NO LAC ARI NYJ DAL IND ATL MIA NYG GB HOU CAR LV DET CLE PIT KC BAL WAS MIN NE SF LA DEN JAX CHI TB BUF SEA CIN",
+  "TEN NO WAS NYJ MIA IND BAL NE PHI ATL CAR LAC DAL LV ARI SEA CLE MIN JAX NYG GB PIT LA KC HOU CHI SF DEN DET BUF TB CIN",
+  "TEN MIA IND NYJ LAC PHI NO LV ARI LA ATL CLE BAL DAL TB DEN WAS GB CAR CIN JAX KC SF NYG HOU PIT CHI MIN NE SEA DET BUF",
+  "MIA PHI NYJ DAL IND ARI LV TEN HOU NO CAR ATL WAS GB LAC BAL LA CLE DET DEN SF CIN SEA NE JAX CHI NYG KC TB BUF MIN PIT",
+  "TEN LAC MIA NYJ CAR ATL HOU PHI NO NE LA NYG CLE ARI BAL IND DAL SF TB WAS PIT JAX CHI KC LV BUF GB DET CIN MIN DEN SEA",
+  "TEN WAS BAL PHI NYJ LAC NO CAR GB MIA IND CLE TB ARI LV LA NYG KC SEA PIT CHI BUF MIN DEN DAL NE JAX SF DET CIN ATL HOU",
+  "TEN IND LAC NO ARI PHI CAR ATL NYJ MIA WAS HOU GB NYG DET BAL CLE NE TB CHI LA PIT JAX CIN MIN KC SEA BUF DAL DEN LV SF",
+  "PHI NYJ TEN IND MIA ATL HOU CLE TB NO LAC ARI DAL BAL NYG LA SEA DEN CAR BUF PIT CHI CIN MIN WAS KC GB LV DET JAX NE SF",
+  "NYJ TEN LV LAC MIA CAR WAS PHI NE BAL DAL NO IND GB ATL LA CLE ARI NYG HOU KC SEA PIT CHI TB DET CIN BUF JAX SF DEN MIN",
+  "NYJ CAR MIA WAS TEN IND LV CLE PHI DAL HOU ATL GB LAC TB KC LA DET NO NYG BAL ARI NE BUF PIT CHI SEA JAX CIN MIN SF DEN",
+  "TEN PHI MIA LAC ARI CAR IND NO ATL NE NYJ DAL LV HOU LA WAS CLE GB TB BUF JAX CHI PIT SF CIN NYG BAL DET KC MIN SEA DEN",
+  "TEN NYJ WAS NO LAC IND MIA NYG DAL LV ARI TB CLE GB CAR KC NE CHI PHI ATL PIT BAL SEA DEN HOU SF LA CIN DET JAX BUF MIN",
+  "WAS LAC MIA TEN IND NO NYG HOU LV NYJ ARI NE ATL PHI TB SEA GB CLE CAR CIN BUF DEN CHI MIN PIT LA BAL DET JAX SF KC DAL",
+  "TEN MIA CAR LAC IND DAL PHI NO GB NYG LV DET NYJ ARI HOU BAL LA PIT WAS SEA CLE KC ATL JAX TB MIN CIN BUF DEN CHI NE SF",
+  "TEN PHI NYJ LV LAC WAS TB NE NO ARI MIA ATL NYG IND GB CLE CIN CHI CAR DAL HOU BAL JAX SEA DET PIT SF DEN MIN KC BUF LA",
+  "MIA TEN PHI WAS ARI LAC IND CAR SEA NYJ TB NO CLE HOU CHI KC BUF DAL DET GB LA PIT LV NE MIN JAX DEN NYG ATL CIN SF BAL",
+  "TEN WAS NYJ LAC CAR NO MIA ATL NE PHI HOU LV DAL GB ARI LA IND BAL NYG PIT TB CHI JAX DEN CLE DET KC SF CIN SEA BUF MIN",
+  "PHI TEN MIA CAR NYJ TB ATL LV ARI LAC DAL CLE WAS PIT CHI BAL IND GB NYG HOU NE DET SF BUF NO CIN JAX MIN LA KC DEN SEA",
+  "PHI IND MIA ATL WAS DAL TEN ARI NO LAC NYJ HOU LA CAR LV DEN GB BAL TB CHI NE DET PIT CLE NYG SEA CIN JAX BUF SF KC MIN",
+  "TEN IND LAC NYJ HOU PHI LV TB MIA WAS KC NO CAR CIN GB SEA ARI LA BAL ATL DAL NYG BUF PIT CHI NE DEN SF CLE DET JAX MIN",
+  "TEN LAC NO PHI ARI NYJ MIA ATL NYG SF BAL LV IND GB CLE CAR CHI NE LA DAL DET BUF PIT CIN JAX WAS DEN MIN TB KC SEA HOU",
+  "MIA NO LAC WAS TEN CLE PHI IND NYJ NYG PIT LV ATL CAR GB ARI DEN SEA DAL TB HOU DET CIN NE BAL SF KC MIN JAX CHI BUF LA",
+  "TEN CAR NO NYJ LAC WAS ARI PHI IND TB LV GB MIA NYG HOU CLE SF BAL ATL PIT LA BUF MIN DEN DET JAX DAL NE SEA KC CHI CIN",
+  "TEN MIA WAS PHI NYJ ARI LAC CAR CLE IND BAL LV TB HOU ATL NYG LA GB DAL SF CHI BUF JAX PIT CIN NO DET DEN NE SEA MIN KC",
+  "PHI LAC MIA TEN ARI LA CAR TB IND HOU NYJ DAL LV ATL DET WAS CLE KC NE NYG JAX DEN SEA MIN GB CIN CHI BUF PIT SF NO BAL",
+  "MIA TEN CLE CAR ARI ATL NYJ LAC LV DAL TB IND PHI PIT JAX CHI SEA LA NO BAL NYG DEN GB BUF WAS MIN HOU CIN DET KC SF NE",
+  "MIA TEN NYJ LAC NO PHI ARI NYG HOU IND LV ATL DAL LA CLE BAL GB SEA CIN NE CAR CHI MIN BUF WAS JAX SF KC DEN DET TB PIT",
+  "LAC NYJ NYG WAS TEN PHI NO TB CAR ARI GB MIA LV PIT IND CLE LA NE DAL CHI SEA HOU BUF JAX ATL DET CIN DEN KC SF BAL MIN",
+  "MIA WAS LV LAC LA NYJ IND TB NO TEN DAL HOU ARI PHI CLE CAR BAL CHI ATL NYG CIN SEA NE PIT JAX DET MIN KC DEN GB SF BUF",
+  "TEN NYJ MIA CAR LAC CLE DAL TB WAS HOU IND NO ARI PHI BAL SEA CHI PIT KC GB DEN LA NE MIN ATL NYG LV JAX CIN SF DET BUF",
+  "MIA TEN NYJ CAR PHI TB HOU LAC LV ARI BAL ATL NYG DAL IND CLE SEA GB WAS JAX KC SF DET DEN NO CIN LA NE MIN PIT BUF CHI",
+  "MIA TEN PHI LAC NYJ ARI TB IND CLE LV BAL GB NYG WAS HOU NO LA ATL NE SF SEA DEN DET JAX DAL PIT CHI KC CIN MIN CAR BUF",
+  "TEN PHI ARI NO ATL LAC MIA DAL WAS NYJ MIN IND LV SEA HOU CAR BAL CLE TB DET PIT JAX NYG BUF LA CIN GB NE SF KC DEN CHI",
+  "TEN NYJ MIA WAS IND PHI LV TB NYG HOU LAC ARI NO LA BAL GB CHI DEN CLE CAR NE DET MIN KC ATL SEA BUF PIT CIN DAL JAX SF",
+  "NYJ WAS NO TEN ARI CAR IND LV MIA DAL PHI ATL DET SEA CLE HOU LAC CIN TB GB CHI PIT NE DEN NYG LA BAL JAX MIN KC SF BUF",
+  "TEN NYJ PHI LAC NO ATL WAS DAL TB LV ARI MIA HOU BAL IND GB NE LA CAR CIN NYG JAX BUF SEA PIT SF DEN MIN CLE DET KC CHI",
+  "TEN ARI LAC MIA NYG HOU LA CIN DAL IND PHI LV NO NYJ CAR ATL BAL MIN DEN TB CLE BUF CHI DET GB SEA NE PIT KC SF JAX WAS",
+  "TEN PHI NYJ MIA NO TB ATL DAL HOU NYG LAC LV IND ARI BAL CHI GB NE WAS PIT DEN SEA DET CIN CAR LA KC JAX MIN BUF SF CLE",
+  "IND NYJ MIA LAC CAR WAS TEN DAL ATL LV HOU NO LA PHI ARI NE CLE CHI NYG TB BAL DET CIN DEN GB JAX SF BUF SEA KC PIT MIN",
+  "MIA TEN PHI NYJ ARI LAC ATL NYG DAL IND HOU TB CAR LV BAL GB LA NE WAS DET NO CIN CLE DEN SEA MIN PIT BUF SF KC JAX CHI",
+  "TEN PHI NO NYJ TB LAC NYG MIA CAR DAL IND CIN LV HOU DET SF NE ARI ATL WAS CLE PIT GB DEN JAX SEA CHI KC LA BUF BAL MIN",
+  "WAS PHI LAC TEN TB NYJ MIA ARI ATL IND HOU NO PIT LV NYG CLE GB DET CAR DAL JAX SEA BUF KC CHI BAL CIN SF LA DEN NE MIN",
+  "NYJ TEN LAC WAS PHI DAL TB ATL MIA CAR HOU IND LV GB NE CHI ARI KC NYG JAX CLE PIT LA SEA NO CIN BAL MIN DET DEN SF BUF",
+  "TEN ARI LAC ATL MIA NYG PHI NYJ SEA LA CHI DAL NO CLE LV IND CIN PIT CAR GB DET JAX BAL NE TB WAS DEN KC BUF MIN SF HOU",
+  "TEN PHI NYJ NO LAC CAR LA LV TB ARI IND MIA CHI NE WAS HOU BAL SF DAL GB CLE PIT BUF DET NYG DEN KC MIN ATL CIN JAX SEA",
+  "TEN LAC IND MIA NYJ NO LV PHI TB ATL DAL SEA NE WAS HOU ARI BAL GB CAR NYG SF CLE CIN DEN DET KC CHI PIT LA BUF JAX MIN",
+  "TEN IND LAC MIA CAR DAL PHI LV ARI NYG TB NYJ LA CLE BAL NO NE GB PIT HOU JAX SF CHI DET WAS ATL CIN KC BUF MIN SEA DEN",
+  "LAC TEN TB NYJ ATL WAS DAL LV HOU IND NO MIA DEN NYG ARI CIN GB CHI PHI SF BAL JAX CAR CLE DET LA PIT BUF KC MIN NE SEA",
+  "LAC IND NO TEN MIA ARI PIT NYJ NYG WAS PHI LV TB CAR CHI HOU DEN LA BAL SF CLE MIN GB JAX DAL ATL CIN BUF KC SEA NE DET",
+  "TEN LAC PHI ARI NYJ CAR HOU IND TB MIA NYG NO WAS CLE LA DEN LV SF ATL CHI NE SEA BAL CIN DAL GB JAX KC PIT DET BUF MIN",
+  "LAC PHI MIA TEN NYJ LV TB NO ARI HOU IND DAL GB CAR MIN BAL PIT LA ATL DET CLE CIN NE CHI NYG SEA BUF KC WAS JAX DEN SF",
+  "MIA DAL NYJ ATL TB TEN IND LAC LV BAL NYG CLE HOU CAR LA GB WAS SF NO PIT DEN NE SEA CHI ARI DET CIN KC PHI BUF MIN JAX",
+  "TEN NYJ WAS ARI LAC MIA HOU IND TB CAR PHI NO GB LA DAL CLE BAL CIN ATL LV NYG NE SF DEN SEA MIN BUF PIT CHI KC JAX DET",
+  "TEN MIA LAC TB NYG PHI NYJ LV ARI ATL DAL IND NO HOU BAL GB NE CHI CAR WAS JAX SEA KC DEN LA CIN DET PIT CLE MIN BUF SF",
+  "LAC MIA NYJ NO PHI TB TEN LV DAL ATL IND CLE JAX NE ARI WAS DET SEA HOU DEN PIT GB LA CHI BUF SF MIN KC CAR BAL NYG CIN",
+  "TEN MIA ARI LV PHI NO NYJ IND TB LAC LA ATL NYG WAS GB CLE BAL DEN CAR HOU DET PIT BUF SEA DAL CIN JAX SF CHI NE MIN KC",
+  "TEN LAC NYJ MIA HOU TB ARI ATL CAR NYG WAS PHI LV CLE BAL IND LA GB NO DEN NE JAX SEA CHI DAL PIT KC MIN SF BUF CIN DET",
+  "TEN NYJ LAC ARI MIA PHI IND NO CAR NYG LA GB WAS HOU LV BAL ATL KC TB DAL DET JAX CLE PIT MIN CIN CHI NE SF DEN BUF SEA",
+  "TEN PHI NO CAR ATL MIA ARI NYJ WAS LAC NE DAL LV IND SF GB PIT JAX TB HOU CLE LA CHI BUF NYG BAL CIN MIN SEA DEN DET KC",
+  "TEN PHI NO ATL LAC MIA CAR NYJ WAS DAL ARI CLE HOU IND GB LV KC SEA TB NYG DET DEN CIN PIT NE CHI LA BUF BAL SF MIN JAX",
+  "TEN PHI LAC MIA IND CAR TB NO LV ARI WAS NYJ DET DAL JAX LA BAL CLE ATL HOU BUF NYG GB CIN PIT SEA NE MIN KC SF DEN CHI",
+  "NYJ NO IND LAC TEN PHI ATL DAL MIA CLE LV PIT ARI WAS TB NE SEA LA JAX NYG CIN KC CAR MIN HOU DET GB BUF DEN SF BAL CHI",
+  "PHI TEN MIA NYJ CAR ARI LA IND CLE HOU NYG WAS NO TB LV LAC DET BAL DAL ATL CIN NE PIT SEA KC MIN JAX GB SF BUF CHI DEN",
+  "TEN NO MIA PHI DAL NYJ ATL HOU TB ARI WAS IND LAC BAL GB NE LA PIT NYG CAR BUF DEN SF CIN CLE LV SEA DET KC MIN CHI JAX",
+  "TEN ARI NO ATL NYJ MIA WAS IND TB LAC DAL HOU NE NYG CLE BAL SF DET CAR PHI LV SEA DEN CIN PIT CHI KC MIN JAX LA GB BUF",
+  "IND NYJ PHI TB DAL TEN NO LV LAC MIA HOU CAR ARI WAS GB CLE PIT SEA BAL MIN NYG DET JAX BUF ATL DEN CHI KC NE SF CIN LA",
+  "TEN MIA HOU LAC PHI DAL NYJ ARI ATL LV CAR TB NE NYG IND PIT LA SEA NO WAS CIN JAX KC MIN GB CLE DET BAL SF BUF CHI DEN",
+  "NO TEN NYJ MIA DAL ATL PHI CAR BAL NYG IND HOU SEA LA CLE ARI KC DEN LV LAC NE CHI GB MIN TB WAS BUF CIN JAX DET PIT SF",
+  "TEN NO ATL ARI MIA NYG IND LV BAL LAC DAL PHI NYJ HOU PIT CHI TB GB WAS SEA NE CLE KC CAR DEN JAX DET MIN BUF SF LA CIN",
+  "TEN NYJ LAC NYG HOU CLE ARI CAR WAS IND PHI TB NO MIA BAL LV GB LA DAL JAX BUF CHI PIT MIN DET NE SEA DEN ATL CIN KC SF",
+  "TEN LAC MIA ATL WAS NYJ PHI HOU IND NO NYG LV CAR CHI GB LA CLE CIN ARI TB SEA PIT JAX NE SF KC DET BUF DEN MIN DAL BAL",
+  "LAC TEN PHI DAL NYJ ATL MIA CAR LA ARI TB WAS HOU BAL LV CLE IND GB CHI NYG NE DEN KC SF PIT DET JAX MIN BUF SEA NO CIN",
+  "TEN PHI LAC MIA NO IND CAR NYJ ATL ARI CLE WAS HOU DAL BAL LV MIN LA TB NYG PIT NE CHI DEN DET SF BUF CIN GB JAX KC SEA",
+  "ARI TEN LAC PHI TB NYJ NO IND WAS CAR GB MIA HOU SF LV CLE BAL NYG ATL JAX DAL DET NE PIT LA DEN CHI KC SEA BUF CIN MIN",
+  "TEN NYJ MIA NYG DAL ARI CAR PHI NO LAC IND LA LV TB CLE BAL GB NE PIT SEA KC CHI DEN MIN ATL WAS HOU JAX CIN DET BUF SF",
+  "TEN LAC CAR ARI NYJ MIA DAL HOU IND NO PHI LV ATL NYG DEN DET BAL CHI SEA LA CLE GB NE JAX WAS SF KC PIT MIN CIN TB BUF",
+  "TEN MIA IND LAC ATL PHI BAL LV LA NYG NO CAR ARI NE WAS NYJ CLE CHI TB HOU JAX BUF GB SEA DAL MIN CIN DEN KC SF DET PIT",
+  "TEN NYJ NO WAS ATL PHI DAL MIA LAC NE TB HOU LV IND CHI DEN ARI LA NYG PIT BAL DET CLE SF GB SEA CIN JAX CAR KC MIN BUF",
+  "TEN PHI NYJ ARI IND LAC CAR HOU LV NO ATL MIA DAL WAS BAL LA GB CLE DET TB NYG NE JAX PIT SEA KC SF BUF CHI CIN DEN MIN",
+  "LAC TEN HOU TB NO ATL NYG IND MIA LV NYJ WAS BAL BUF ARI LA PHI SF NE CLE PIT DET CHI SEA CAR JAX MIN KC DAL CIN DEN GB",
+  "TEN IND NYJ GB LAC WAS PHI NO CAR DAL ARI ATL LA MIA KC HOU LV CLE TB NYG CIN BAL CHI NE DET MIN BUF PIT DEN SEA JAX SF",
+  "TEN ARI NYJ MIA WAS ATL CAR IND LAC PHI HOU NO GB NYG BAL LA CIN LV SEA CHI DET DEN PIT KC JAX TB NE DAL CLE MIN SF BUF",
+  "TEN CAR MIA PHI WAS IND ARI LA JAX NYJ NO LAC NE CLE SEA ATL DEN DAL TB HOU LV GB CHI PIT BAL NYG BUF SF CIN MIN DET KC",
+  "TEN LAC ARI CAR NYJ IND MIA WAS GB TB ATL NE NYG HOU LV BAL PHI LA NO PIT CHI CIN KC SF DAL MIN CLE JAX DEN DET SEA BUF",
+  "TEN LAC IND NYJ CAR ARI PHI ATL MIA DAL GB HOU NO PIT WAS KC LA CLE NYG TB DET NE LV DEN CHI SEA BAL CIN MIN BUF JAX SF",
+  "TEN NYJ ATL LAC NO IND PHI CAR MIA NYG WAS LV ARI LA CHI CLE BAL BUF DAL CIN DEN HOU GB SEA TB NE PIT MIN SF KC DET JAX",
+  "TEN NYJ MIA PHI ARI LA TB NO LAC LV ATL DET CLE IND BAL NYG DAL HOU CAR WAS DEN BUF SEA PIT GB CHI NE CIN JAX SF MIN KC",
+  "TEN NYJ ATL ARI NYG BAL MIA IND CAR GB DAL PHI LAC NO HOU PIT LV CHI WAS CIN SEA CLE DET NE TB BUF MIN KC SF DEN LA JAX",
+  "TEN MIA LAC CAR ARI NYJ PHI ATL CLE NYG IND GB WAS TB LV PIT CHI NE NO DAL SEA HOU BAL JAX MIN SF DEN BUF DET CIN LA KC",
+  "LAC ARI TEN IND WAS NYJ CAR HOU TB ATL PHI LV BAL GB CHI DEN DET MIA DAL CLE CIN LA NYG BUF NO SEA PIT NE SF JAX KC MIN",
+  "WAS NO LAC MIA PHI TEN JAX IND ATL NYJ ARI NE LA LV BAL CAR CHI GB HOU NYG PIT SEA MIN CIN CLE KC SF DET TB DEN DAL BUF",
+  "MIA TEN NYJ TB ARI CAR HOU DAL NO IND LV LAC NYG GB WAS DET PIT NE LA CLE SF DEN BUF CHI JAX PHI ATL CIN MIN KC SEA BAL",
+  "TEN CAR ARI PHI IND LAC MIA NYJ TB HOU BAL ATL NYG DAL LV CLE LA CHI NO DEN GB CIN PIT SF WAS BUF NE SEA KC MIN JAX DET",
+  "TEN NYJ ARI TB HOU IND NO MIA NYG DAL PHI LAC ATL GB NE DEN CHI BAL LA CLE LV CAR JAX DET WAS PIT BUF MIN CIN SF KC SEA",
+  "TEN MIA NYJ PHI NO TB CAR DET ARI LAC WAS IND HOU NE NYG CLE BAL MIN JAX LV LA PIT GB SEA DAL ATL CIN KC BUF SF DEN CHI",
+  "PHI TEN TB NYJ WAS MIA NO CLE CAR DAL IND ARI BAL GB LV LA NE HOU ATL MIN LAC NYG CIN JAX SF PIT DET DEN SEA BUF KC CHI",
+  "WAS MIA DAL NYJ LV ARI PHI TEN IND NO NE TB CAR JAX LAC SEA DEN CHI BAL CLE PIT LA DET GB NYG KC SF BUF ATL CIN MIN HOU",
+  "TEN LAC NYJ MIA WAS PHI IND NO NE BAL CAR LV HOU ARI SEA TB LA GB KC SF NYG JAX CLE DET ATL PIT CHI BUF DAL DEN CIN MIN",
+  "WAS PHI TEN ATL LAC MIA NO NYJ NYG CAR ARI LA HOU IND LV CHI BUF CLE GB SF JAX DEN CIN MIN DAL TB NE KC BAL DET SEA PIT",
+  "LAC NO TEN PHI NYJ CAR NYG LV BAL ARI ATL DAL MIA HOU IND NE GB LA WAS TB PIT KC CIN SF BUF CLE SEA DET CHI JAX DEN MIN",
+  "TEN LAC PHI ATL NYJ MIA DAL HOU BAL ARI LA JAX NO PIT TB CIN GB CHI IND CAR LV NYG CLE WAS NE DET MIN KC DEN SF BUF SEA",
+  "TEN PHI WAS DAL IND NYJ CAR ARI CHI CIN TB MIA LAC HOU CLE ATL LV GB BAL NO NYG NE DET DEN BUF MIN SF PIT KC SEA JAX LA",
+  "MIA WAS TEN LV CAR PHI ARI NYJ IND LAC HOU LA TB BAL NO NYG GB CLE ATL NE SF DET CIN DEN SEA CHI PIT JAX DAL BUF MIN KC",
+  "MIA PHI TEN LA DAL IND CAR GB ATL LAC NO LV NYJ NYG HOU BAL CIN ARI TB NE DEN CHI SF BUF WAS PIT KC DET CLE MIN SEA JAX",
+  "TEN LAC CAR IND MIA HOU NYJ NYG PHI DAL ARI NO NE CLE PIT TB DET SF WAS CIN BAL KC MIN LA BUF SEA GB DEN LV CHI JAX ATL",
+  "TEN PHI LAC ATL NYJ HOU TB ARI NE CAR MIA NYG DAL CLE IND BAL LA CHI NO LV WAS GB JAX DEN SEA CIN BUF MIN PIT SF DET KC",
+  "TEN ARI CAR NYJ LAC NYG PHI IND MIA HOU NO DAL BAL SEA DEN ATL LA CIN TB SF LV GB NE PIT CLE DET BUF MIN CHI KC JAX WAS",
+  "TEN LAC MIA ATL NYG NYJ WAS IND ARI CAR PHI HOU BAL LV NO PIT LA CHI NE CLE DAL DET SEA DEN TB CIN KC GB SF JAX MIN BUF",
+  "MIA TEN TB ARI PHI BAL NYG IND LAC NYJ LV CAR ATL WAS HOU LA DEN DET DAL CLE JAX PIT CHI MIN NO SF NE CIN BUF GB KC SEA",
+  "TEN IND ARI PHI ATL CAR MIA DAL TB CLE NYJ HOU GB LA LAC PIT LV CHI NO NE WAS BAL NYG BUF SF KC JAX MIN DET CIN SEA DEN",
+  "TEN PHI MIA NYJ TB CAR HOU ARI LAC NO IND WAS LV LA DAL CLE KC SEA ATL NYG PIT GB NE DEN JAX MIN CHI BUF BAL DET SF CIN",
+  "PHI MIA NO ATL LAC TEN WAS CAR NYJ NYG CLE BAL IND LV GB HOU ARI LA TB DET SEA NE CIN PIT DAL MIN BUF KC DEN CHI JAX SF",
+  "TEN IND LAC LA MIA NYJ NO DAL CLE BAL NE NYG WAS LV ARI TB CAR CHI PHI HOU SF JAX SEA PIT GB CIN DEN DET MIN BUF ATL KC",
+  "TEN LAC MIA WAS PHI HOU CAR NYJ ARI ATL NYG IND CIN BAL NO DEN MIN CHI TB DET LA KC JAX CLE LV DAL SF BUF PIT SEA NE GB",
+  "TEN NYJ NO LAC LV HOU ARI IND TB ATL MIA NE WAS DAL GB NYG BAL CHI PHI CAR SF JAX KC CIN SEA LA DEN CLE PIT DET MIN BUF",
+  "TEN NYJ LAC MIA PHI IND ARI TB LV LA NYG WAS JAX NO NE ATL CLE CHI CAR GB SEA KC DEN PIT CIN BAL DET SF HOU MIN DAL BUF",
+  "NYJ MIA ATL PHI TEN IND HOU CAR GB LAC WAS NYG BAL CHI ARI NO LV DEN DAL CIN PIT LA CLE SEA TB KC BUF DET MIN NE JAX SF",
+  "LAC TEN NYJ NYG NO PHI CAR ATL MIA DAL LV ARI IND PIT GB CLE BAL CHI WAS DEN HOU DET SF BUF TB KC MIN NE JAX SEA CIN LA",
+  "NO LAC TEN IND ARI MIA PHI NYJ BAL DAL TB CAR GB NE NYG LV CLE LA WAS HOU DET SEA PIT DEN JAX KC MIN SF CHI CIN ATL BUF",
+  "TEN NYJ LAC HOU ARI MIA NYG LV DAL TB CAR WAS NO CIN CLE IND DET LA BAL GB MIN CHI BUF JAX PHI PIT KC SEA DEN SF ATL NE",
+  "TEN IND NYJ LAC PHI BAL NO WAS GB DAL ARI MIA SF CAR NE LV ATL HOU CLE JAX SEA PIT MIN DET NYG DEN CIN CHI TB KC BUF LA",
+  "NYJ TEN MIA IND ATL LAC WAS NO ARI CLE PHI CAR CHI LV BAL DAL PIT SEA NYG HOU DET JAX MIN DEN GB LA BUF KC TB CIN SF NE",
+  "TEN NO PHI NYJ ARI LAC CAR MIA WAS IND ATL KC BAL NE NYG LV LA DET CLE TB BUF CHI GB CIN DAL HOU JAX SEA DEN SF PIT MIN",
+  "TEN MIA NYJ NO LAC WAS PHI BAL ARI ATL IND NYG HOU DET CLE CAR GB NE DAL CIN TB SEA LV BUF LA KC CHI JAX PIT MIN SF DEN",
+  "TEN PHI NYJ CAR NO LAC HOU DAL BAL CLE MIA ATL WAS BUF GB ARI IND LA TB NYG LV DEN PIT SF NE SEA CHI KC DET JAX MIN CIN",
+  "TEN LAC NO ARI NYJ MIA NYG ATL WAS IND PHI CIN LV CAR HOU BAL LA SEA DAL PIT NE GB DEN SF TB BUF JAX CHI CLE DET KC MIN",
+  "LAC MIA WAS TEN IND ATL NO CAR NYJ PHI ARI LA GB HOU NYG LV BAL CLE SEA PIT BUF CIN DET MIN JAX DAL KC CHI NE SF TB DEN",
+  "TEN NYJ TB PHI CAR NYG IND ARI LAC DAL NO LV NE GB BAL LA HOU PIT CHI DET MIA DEN CLE SEA ATL WAS JAX KC CIN SF MIN BUF",
+  "TEN NYJ MIA NO LV LAC LA NYG WAS IND HOU BAL ATL CAR PHI ARI DEN CHI KC JAX NE DAL SF DET TB PIT CIN SEA CLE MIN BUF GB",
+  "LAC NYJ TEN MIA IND NO WAS NYG HOU PHI CAR CIN ATL LA BAL ARI LV DET DAL TB CLE GB KC BUF JAX SEA SF NE MIN PIT CHI DEN",
+  "DAL PHI TEN NYJ ARI WAS TB LV LAC MIA ATL NE BAL IND CAR GB CHI CLE CIN LA JAX SEA DET KC NYG NO PIT HOU DEN SF BUF MIN",
+  "LAC TEN PHI ARI NO MIA JAX NYJ IND WAS ATL NYG LV BAL BUF CAR GB CHI TB DAL DEN LA KC CIN HOU DET NE SF CLE MIN PIT SEA",
+  "PHI TEN NYJ IND CAR ATL LAC CHI WAS DAL MIA ARI GB BAL NE NO LV CLE HOU LA KC MIN PIT SF TB SEA JAX CIN BUF NYG DET DEN",
+  "TEN IND NYJ PHI MIA DAL ATL LV GB TB CAR BAL HOU KC NE ARI LA DET NO LAC SF WAS CLE PIT MIN JAX BUF CHI NYG CIN SEA DEN",
+  "TEN MIA NYJ ARI WAS PHI IND TB CAR LAC ATL NYG HOU BAL LA CIN GB DEN NO DAL NE JAX PIT SF SEA CHI CLE BUF MIN KC LV DET",
+  "MIA LAC IND PHI LA TEN ATL NO TB LV ARI BAL DEN NYJ DET PIT NYG DAL CAR GB WAS CIN BUF JAX HOU CLE SF CHI KC SEA NE MIN",
+  "TEN LAC MIA NYJ IND NO PHI WAS DAL ARI ATL SEA HOU CLE CAR GB NE BAL TB PIT DET LV NYG DEN CIN CHI BUF MIN LA JAX KC SF",
+  "TEN IND PHI LV ARI TB NYJ MIA ATL LAC CAR WAS NYG NE CIN SEA DEN GB NO HOU JAX CLE SF DET PIT BAL CHI MIN DAL BUF LA KC",
+  "PHI NYJ TEN NO LAC JAX CHI ARI IND MIA ATL WAS CAR LV BAL CIN SEA LA TB GB NYG CLE BUF KC NE DEN SF MIN DAL PIT DET HOU",
+  "TEN CAR NYJ PHI MIA IND JAX ATL LA LAC TB CLE GB ARI DAL BAL LV WAS NO MIN NYG NE PIT BUF HOU SEA KC DET SF DEN CIN CHI",
+  "NYJ TEN MIA NYG WAS IND NO ATL HOU LV LAC LA PHI CIN PIT GB ARI SF DAL TB CLE SEA KC BUF JAX CAR DEN MIN NE CHI DET BAL",
+  "MIA TEN NYJ NO IND LV WAS PHI GB LAC NYG ATL CAR BAL HOU LA CHI NE DAL MIN CLE SF DEN BUF TB ARI CIN PIT JAX SEA KC DET",
+  "PHI TEN LAC MIA IND NO NYJ WAS NYG TB ARI ATL CLE BAL LV HOU LA GB CAR PIT MIN NE JAX SF DAL CHI CIN BUF DEN SEA DET KC",
+  "TEN MIA NYJ NYG PHI NO HOU ARI TB LAC IND CLE DAL LV ATL LA CHI PIT CAR SF NE DET BAL DEN GB KC WAS CIN SEA JAX MIN BUF",
+  "TEN NYJ MIA HOU TB LAC CAR WAS IND BAL PHI SF ATL ARI CHI CIN CLE DAL NO GB LV LA JAX BUF KC SEA NE DET PIT NYG MIN DEN",
+  "TEN IND LAC MIA WAS NO CAR ARI ATL NYJ GB PHI DAL BAL LV HOU CLE CHI TB LA JAX BUF SF KC NYG SEA PIT CIN MIN DEN DET NE",
+  "TEN LAC TB MIA NYG NO IND PHI DAL NYJ ATL GB ARI BAL CLE CHI HOU PIT CAR MIN WAS CIN DEN JAX SF LV LA BUF KC DET NE SEA",
+  "TEN NYJ DAL ARI TB HOU LV NO MIA PHI WAS IND LAC SEA ATL CLE DET PIT LA BAL NE JAX SF MIN GB CAR CIN KC NYG BUF DEN CHI",
+  "TEN NYJ IND PHI LAC LA TB ARI NO NYG HOU DAL GB ATL CLE CIN PIT MIA CAR KC WAS NE LV MIN JAX DET SEA BUF DEN SF BAL CHI",
+  "TEN NYJ LAC HOU MIA ARI CAR ATL PHI CLE IND LA NYG CHI NE WAS CIN NO DAL DET TB PIT LV DEN BAL BUF GB SEA SF KC MIN JAX",
+  "TEN LAC WAS NYJ NO HOU IND MIA DAL LV ARI CAR NYG TB BAL GB LA CLE PHI SEA DEN CIN BUF SF ATL CHI JAX KC DET NE PIT MIN",
+  "TEN PHI HOU NYJ TB IND NO LV ARI GB MIA ATL DAL LAC DEN NYG CIN CHI CAR BAL CLE DET BUF WAS JAX SF PIT MIN LA NE SEA KC",
+  "NYJ TEN PHI IND NO LAC PIT WAS LV BAL TB CAR DET NE LA NYG HOU GB ATL KC CLE DAL ARI JAX MIA BUF SF CHI SEA CIN MIN DEN",
+  "MIA TEN WAS NYJ PHI HOU NO NYG LV BAL IND CIN ARI LA ATL CAR NE CHI LAC PIT SEA GB CLE DET DAL KC JAX MIN TB BUF DEN SF",
+  "MIA TEN NO LAC CAR ATL PHI DAL LV SF ARI HOU CHI NYG BAL NYJ CLE IND WAS LA GB BUF PIT NE TB DET DEN CIN SEA JAX KC MIN",
+  "TEN MIA NO NYJ DAL ARI LV ATL LAC NYG PHI CAR HOU IND GB CLE LA CIN WAS CHI MIN DEN NE BUF JAX SF BAL SEA TB PIT DET KC",
+  "TEN NYJ IND MIA PHI DAL ARI LV TB NO LAC ATL WAS HOU LA CLE BAL CHI NYG JAX SF GB NE PIT CAR KC CIN MIN DET BUF DEN SEA",
+  "TEN NYJ LAC NYG ARI CIN NO CAR HOU IND LA MIA WAS PHI TB GB LV NE ATL BAL DAL PIT SF KC SEA CLE CHI JAX BUF MIN DET DEN",
+  "TEN LAC MIA NO PHI NYJ CAR GB IND LV LA NYG WAS TB CLE CIN SEA HOU ATL MIN NE CHI JAX PIT DET DAL BAL BUF ARI DEN SF KC",
+  "TEN MIA ATL NO WAS CAR LAC PHI HOU IND DAL SEA ARI NYJ NE CLE DEN CHI SF LV GB PIT KC DET TB NYG BAL JAX CIN MIN BUF LA",
+  "TEN NYJ HOU NO TB WAS DAL PHI IND CLE LAC MIA ARI ATL GB NE LV SF NYG CHI JAX LA KC CIN BAL SEA DET BUF CAR DEN PIT MIN",
+  "LAC TEN NYJ NO ARI MIA WAS BAL NYG DAL HOU IND CAR SEA ATL CHI CLE PIT PHI TB DET LV NE CIN GB MIN KC DEN JAX SF BUF LA",
+  "TEN ARI MIA IND LAC PHI HOU NO NYJ ATL DAL LV TB NYG CIN LA PIT SEA CLE BAL GB BUF SF MIN DET JAX CAR DEN WAS NE KC CHI",
+  "PHI LAC TEN NO NYJ BAL DAL LA NYG TB HOU CLE CAR LV GB IND CHI MIA ATL ARI DEN WAS JAX CIN DET NE PIT MIN SF BUF SEA KC",
+  "LAC DAL TEN WAS NYJ MIA NYG LV ARI ATL TB NO IND BAL GB CLE NE LA PHI CAR JAX CIN KC MIN SEA PIT CHI DEN BUF SF HOU DET",
+  "MIA TEN NYJ LAC HOU PHI TB NYG CAR IND CLE ATL ARI BAL CHI MIN SEA DEN GB WAS KC JAX PIT SF NO LV DET NE LA CIN DAL BUF",
+  "TEN LAC MIA NO TB LV PHI NYJ NYG HOU DAL JAX ARI ATL PIT SEA KC MIN IND CAR WAS CLE DET NE BUF BAL CHI SF GB CIN LA DEN",
+  "LAC HOU TEN PHI NO NYJ ARI CAR LA ATL DAL NYG PIT GB IND LV CLE BAL WAS JAX CIN SEA DEN SF DET BUF CHI MIA TB NE KC MIN",
+  "MIA ARI TEN ATL IND PHI TB CAR HOU LAC NYJ WAS DAL DET BAL LV LA DEN NO NYG CLE SF NE JAX GB PIT BUF CHI KC MIN CIN SEA",
+  "TEN NYJ LAC MIA IND PHI CAR ARI ATL HOU NO NYG KC LA LV DAL CLE CHI TB WAS JAX BAL NE SF GB BUF DET CIN DEN MIN PIT SEA",
+  "PHI TB CAR TEN NYJ LAC MIA LA LV ARI IND ATL JAX GB NYG BAL NE WAS DAL NO CIN DEN PIT SF CLE SEA BUF MIN HOU CHI DET KC",
+  "HOU TEN LAC NYJ NO NYG DAL TB CLE IND GB LA MIA NE BAL PHI ATL CHI ARI DEN CIN CAR SF LV SEA PIT KC MIN JAX DET BUF WAS",
+  "WAS TEN IND NYJ NO MIA NYG ARI LV BAL LAC DAL TB GB ATL LA HOU BUF CAR PHI DET CIN PIT DEN MIN KC CHI JAX NE SF SEA CLE",
+  "NO PHI MIA TEN WAS LAC DAL ARI LV TB NYJ IND ATL NE JAX BAL LA CHI CAR NYG CLE DEN DET BUF SF CIN SEA KC PIT GB HOU MIN",
+  "TEN LAC NYJ MIA CAR PHI HOU ATL NYG IND WAS TB ARI CHI LA NE BAL CLE KC CIN SEA DEN DET GB DAL NO JAX BUF MIN PIT SF LV",
+  "TEN LAC MIA NO ATL DAL LV IND PHI NYJ HOU TB BAL GB NE NYG ARI CHI WAS CAR SF DEN CIN PIT CLE LA SEA KC JAX MIN BUF DET",
+  "TEN MIA WAS HOU NYJ TB NYG LAC LV ATL CAR PHI IND ARI CHI CLE BAL SEA NO NE CIN SF JAX DET DAL DEN MIN BUF GB PIT KC LA",
+  "NYJ LAC HOU TEN CAR ATL NYG PHI ARI MIA DAL NO GB CLE BAL IND LA LV WAS SEA BUF PIT DEN MIN TB NE CIN SF CHI KC DET JAX",
+  "LAC TEN PHI NYJ ARI HOU NO MIA ATL NYG IND NE WAS LV CAR CIN CHI GB DAL TB DET JAX KC BUF PIT MIN CLE SEA BAL LA DEN SF",
+  "TEN LAC NYJ MIA NO LV HOU IND DAL PHI ATL NYG LA CAR CIN GB BAL ARI JAX BUF WAS CLE SF CHI DET SEA PIT NE TB DEN MIN KC",
+  "TEN MIA NYJ ARI CAR NYG PHI WAS CIN NE ATL LAC CLE TB LV IND CHI DET DAL HOU NO BAL LA JAX GB PIT MIN KC SEA DEN BUF SF",
+  "LAC TEN CAR MIA PHI NYJ ARI IND BAL TB NO NYG WAS HOU CLE LA DET NE ATL LV KC DEN MIN SF SEA GB PIT JAX DAL BUF CIN CHI",
+  "LAC IND ARI TB NYJ LV MIA TEN PHI ATL NYG DET CAR BAL DAL LA DEN JAX NO MIN HOU GB CLE PIT NE CHI KC SEA WAS BUF CIN SF",
+  "TEN LAC MIA PHI CAR NYJ NO HOU LV ATL NYG WAS JAX LA CLE PIT ARI CHI IND DEN DET SEA BUF GB TB NE DAL CIN BAL MIN SF KC",
+  "MIA TEN NYJ IND DAL PHI ARI NO WAS CLE BAL ATL LAC LA DET CAR HOU DEN NYG TB PIT CIN KC GB LV MIN SF NE BUF SEA JAX CHI",
+  "MIA LAC NYJ ATL TEN IND HOU NO CAR NYG WAS PHI LV ARI DET NE LA BAL DAL TB JAX KC CLE SF SEA PIT CIN MIN CHI DEN BUF GB",
+  "NYJ MIA PHI TEN WAS LAC IND ATL LV SEA TB NYG ARI KC CLE CAR HOU GB DAL NE PIT SF CHI BUF NO BAL JAX DET DEN LA CIN MIN",
+  "TEN ATL LAC ARI TB CAR WAS IND NYJ MIA DAL PHI BUF BAL JAX CLE GB CHI HOU NE NO LA NYG PIT LV DEN DET MIN SEA KC CIN SF",
+  "TEN MIA LAC NYJ ARI ATL NYG HOU IND CAR PHI NO LA WAS CIN NE BAL GB CLE LV DEN SF MIN DET TB PIT BUF SEA CHI JAX KC DAL",
+  "NYJ LAC TB MIA WAS TEN PHI NYG HOU CLE IND LV CAR PIT ARI GB DET SEA BAL NO ATL NE KC LA DAL CIN MIN DEN BUF CHI JAX SF",
+  "TEN MIA PHI NYJ ARI TB NYG NO LAC IND LV BAL ATL WAS CLE HOU DET CHI CAR JAX BUF LA NE GB DAL DEN CIN MIN SF PIT SEA KC",
+  "MIA NO TEN IND TB ATL ARI LAC WAS PHI CHI NYJ GB JAX LA DEN CIN BAL DAL CAR SF HOU PIT NE NYG CLE MIN KC LV SEA DET BUF",
+  "LAC IND MIA NYG HOU TEN CAR NYJ ATL WAS DAL BAL DEN ARI TB GB LV SEA PHI BUF LA DET CLE CIN NO JAX KC CHI SF NE MIN PIT",
+  "TEN MIA PHI LAC NO NYJ ATL WAS HOU BAL DEN NYG IND ARI TB CLE DET LA PIT KC SEA CAR LV GB DAL NE CIN CHI JAX SF BUF MIN",
+  "TEN WAS IND NO ARI NYJ ATL MIA NYG DAL HOU BAL CAR NE LV LA CLE CHI SEA GB DET JAX PIT BUF TB DEN KC SF PHI CIN MIN LAC",
+  "NO TEN LAC TB IND DAL MIA CAR NYJ ARI LA PHI CLE HOU MIN NE WAS LV PIT SEA KC GB CHI JAX ATL BAL DET BUF NYG DEN SF CIN",
+  "TEN LAC NYJ HOU NO MIA ATL NYG PHI TB IND LV ARI DAL NE LA BAL GB CAR JAX WAS SF CIN PIT DET MIN CLE BUF SEA KC CHI DEN",
+  "TEN WAS NYJ LAC ATL PHI CAR NYG HOU BAL LV NO IND MIA ARI BUF LA GB DAL PIT DEN CLE TB DET SF CHI CIN KC SEA JAX NE MIN",
+  "TEN NYJ MIA PHI LA ATL LAC NYG ARI CAR DAL TB GB BAL JAX DEN IND CLE WAS NO SEA KC NE PIT LV MIN CIN CHI HOU DET SF BUF",
+  "TEN MIA PHI NYJ ARI TB NYG CIN LAC CAR CLE WAS LV NO LA NE IND DET DAL ATL JAX SEA PIT BAL HOU DEN SF CHI BUF GB KC MIN",
+  "TEN ARI LAC PHI NO TB IND NYJ MIA DAL BAL ATL NYG SEA GB HOU LV CIN CAR CHI NE CLE LA DEN WAS JAX PIT MIN SF KC DET BUF",
+  "NYJ TEN DAL TB LAC PHI NO CAR MIA HOU IND GB LV WAS CLE ARI LA NE NYG CIN PIT BAL MIN DET ATL JAX CHI BUF DEN SF SEA KC",
+  "TEN ARI NYJ NO IND LAC ATL DAL PHI HOU LA NYG MIA GB CAR LV BAL DEN TB DET CHI BUF KC PIT NE WAS CLE MIN JAX SF SEA CIN",
+  "TEN NYJ IND HOU NYG WAS NO ARI LAC ATL TB DAL CLE KC SEA NE MIA GB CAR LV MIN CHI CIN PIT JAX BAL PHI SF DET BUF LA DEN",
+  "NYJ MIA TEN LAC IND NO NYG WAS LV ARI BAL CAR PHI DET LA ATL HOU CLE JAX KC NE GB SF MIN TB SEA DEN PIT DAL BUF CIN CHI",
+  "NYJ NO TEN MIA WAS PHI ATL LAC IND ARI CAR BAL GB HOU CLE PIT NYG LA DEN SF SEA CHI NE BUF DAL DET JAX CIN KC MIN TB LV",
+  "TEN NYJ MIA HOU CAR IND ATL PHI LAC SEA WAS CLE GB TB CHI ARI LV BAL NO LA NE JAX BUF SF DAL PIT DET KC NYG CIN DEN MIN",
+  "TEN NO MIA PHI LAC NYG HOU NYJ CAR DAL ATL IND CLE ARI CHI NE LV LA GB DEN DET PIT SF BUF WAS BAL SEA KC TB JAX MIN CIN",
+  "IND NO LAC PHI TB BAL TEN ARI MIA WAS DAL NE HOU LV ATL NYJ MIN CHI CAR NYG LA DEN PIT CLE KC GB CIN DET SEA BUF JAX SF",
+  "TEN MIA CAR PHI NYJ LAC IND TB NO NYG WAS ARI GB LA LV NE HOU PIT DAL ATL CIN DEN BAL SF CHI CLE SEA BUF KC MIN DET JAX",
+  "LAC TEN IND NYJ DAL PHI TB LA ARI CAR WAS BAL GB MIA NE HOU LV ATL PIT CIN DET NO MIN KC NYG DEN CHI BUF SEA CLE JAX SF",
+  "MIA LAC TEN IND PHI NYJ NO ATL WAS ARI TB NYG HOU BAL CLE PIT SEA GB LV LA BUF CAR DEN MIN DAL NE KC DET CIN CHI SF JAX",
+  "TEN NYJ MIA CAR ATL LAC WAS PHI BAL ARI CLE DAL IND LA CHI LV NO NE TB CIN KC SEA DET DEN NYG BUF PIT GB HOU SF MIN JAX",
+  "LAC MIA WAS DAL HOU TEN TB NO IND ARI CLE PHI NYJ ATL LV SEA GB BAL CAR PIT LA DEN JAX CHI SF BUF CIN DET NYG NE KC MIN",
+  "LAC MIA PHI TEN NYJ TB NO CAR NYG WAS IND BAL GB LV CLE NE ARI CHI DAL KC SEA LA JAX CIN PIT DET SF BUF DEN MIN ATL HOU",
+  "NYJ TEN IND MIA PHI LAC WAS NO HOU LV BAL CAR ATL ARI PIT DET GB SEA TB KC BUF LA DAL JAX NYG CLE CIN CHI DEN SF NE MIN",
+  "TEN ATL IND BAL CAR NYJ MIA DAL ARI PHI NYG HOU NO SF LAC KC NE CHI TB CIN LV LA GB CLE WAS DEN MIN BUF SEA PIT DET JAX",
+  "LAC TEN PHI IND BAL ARI DAL MIA NYG NYJ GB NE HOU TB NO LV CAR DET LA JAX CLE CHI SEA PIT ATL CIN SF DEN WAS KC MIN BUF",
+  "PHI MIA TEN NYJ HOU LV TB LAC WAS IND DAL CLE NO ARI NE GB ATL DET JAX CAR CIN NYG BAL CHI PIT LA BUF SF KC SEA MIN DEN",
+  "TEN WAS LAC LV PHI NYJ ATL CAR MIA BAL HOU ARI TB CIN DEN LA NYG SF JAX CLE DAL IND DET MIN NO GB KC PIT NE SEA CHI BUF",
+  "TEN PHI ARI CAR MIA NYJ TB LAC IND NYG DAL NO BAL KC DET CLE GB HOU WAS SEA NE CHI DEN JAX CIN BUF ATL SF LV LA PIT MIN",
+  "LAC IND MIA PHI TEN ARI CAR NYG ATL DAL CHI HOU NO LV LA NE CLE PIT NYJ GB MIN SEA KC BAL WAS TB JAX CIN DET BUF DEN SF",
+  "TEN LAC IND MIA ARI ATL NYG WAS PHI LV NO NYJ PIT TB HOU SEA CLE LA DAL BAL CAR NE GB CIN KC DET BUF MIN CHI JAX SF DEN",
+  "TEN LAC NYJ PHI MIA CLE NO ARI CAR WAS DAL SEA LV IND LA NE ATL HOU DET CIN PIT DEN CHI MIN BAL TB KC SF NYG BUF GB JAX",
+  "PHI LAC TEN DAL ARI HOU IND CAR NO DEN MIA ATL NYG LV NYJ BAL SEA GB WAS CIN JAX PIT CHI MIN TB DET BUF KC NE SF LA CLE",
+  "MIA TEN ARI TB LAC HOU PHI NYJ NYG CLE NO DAL ATL IND LV LA NE DET CIN BAL GB DEN SF MIN JAX CAR PIT SEA CHI BUF WAS KC",
+  "TEN LAC PHI TB CAR ATL MIA WAS NYG NYJ LV GB HOU ARI SEA PIT IND BAL NO NE LA CLE JAX CHI BUF DET MIN DEN DAL CIN SF KC",
+  "TEN MIA TB ARI NO NYJ IND LAC NYG DAL PHI CAR CLE CIN LV HOU MIN SEA ATL WAS BAL BUF DET DEN NE LA PIT SF CHI JAX GB KC",
+  "TEN NYJ LAC IND NO MIA ATL CAR WAS PHI LV HOU ARI NE LA DAL KC GB TB SEA BAL PIT NYG CLE CHI DEN SF CIN JAX DET BUF MIN",
+  "TEN MIA LAC NYG DAL PHI BAL CAR IND NYJ LV TB NO LA CLE ARI KC GB WAS ATL CIN SF DEN NE JAX SEA CHI BUF PIT DET HOU MIN",
+  "TEN LAC ARI NYG NYJ NO ATL HOU BAL LA IND MIA DAL PHI BUF CAR SEA DEN WAS MIN CLE PIT SF CIN TB NE DET KC CHI JAX LV GB",
+  "TEN NYJ LAC NO MIA ARI CLE HOU PHI ATL DAL TB WAS LV IND BAL GB LA NYG CAR CHI PIT CIN BUF SEA DET DEN JAX NE SF KC MIN",
+  "TEN PHI NYJ IND CLE CAR NYG NO TB LAC WAS HOU LV BAL ARI DEN GB CHI ATL MIN BUF SF CIN KC MIA DAL JAX LA DET PIT NE SEA",
+  "TEN MIA LAC CAR TB PHI ARI NYJ WAS DAL HOU DET ATL IND LV LA NE CIN NYG SEA BAL KC PIT CHI NO DEN BUF MIN JAX GB CLE SF",
+  "TEN NYJ PHI NO IND ARI LAC LV CAR DAL HOU TB WAS MIA NE DET LA BAL ATL NYG CHI PIT JAX CLE GB MIN KC BUF SF DEN CIN SEA",
+  "MIA LAC NYJ TEN NO IND PHI DAL ARI CAR CLE LV PIT ATL WAS BAL SEA CHI NYG HOU TB NE KC SF JAX BUF MIN DET LA DEN CIN GB",
+  "TEN MIA LAC IND ATL NYG WAS PHI NO NYJ TB DET BAL HOU BUF LV ARI SEA MIN GB LA NE PIT DEN CAR SF CLE JAX DAL KC CHI CIN",
+  "TEN TB CAR NYG LAC MIA PHI IND ARI ATL LV WAS HOU NYJ BAL PIT LA SEA NO JAX NE DAL CIN GB BUF SF CHI DEN CLE MIN DET KC",
+  "MIA TEN NYJ ARI NO LAC NYG LA IND PHI NE ATL JAX BAL LV DAL TB GB CIN WAS PIT SF CHI DEN HOU CAR CLE MIN BUF DET SEA KC",
+  "MIA TEN ATL TB LAC WAS DAL PHI IND ARI CAR NYJ NE CIN BAL GB CHI LV NYG DET JAX HOU CLE MIN PIT SEA LA DEN NO BUF KC SF",
+  "NYJ DAL TEN PHI MIA WAS GB CAR LV ATL LAC HOU TB ARI KC DET BAL CIN NYG IND LA NE CLE SEA NO JAX DEN MIN PIT CHI SF BUF",
+  "TEN LAC MIA NO CAR ARI NYJ ATL PHI GB IND NYG LA BAL NE LV SF CLE WAS DEN DAL CHI JAX CIN TB HOU MIN BUF DET PIT KC SEA",
+  "TEN NYJ NO MIA ATL DAL ARI WAS PHI CLE HOU PIT IND LAC LA BAL GB CHI NYG LV CAR SEA DEN CIN TB MIN BUF JAX NE DET KC SF",
+  "TEN LAC NYJ NO IND ATL ARI MIA WAS PHI CAR DAL HOU LV PIT CHI SEA BAL TB NYG GB KC NE BUF JAX CLE MIN SF CIN LA DEN DET",
+  "TEN PHI MIA TB WAS LV DAL HOU IND NYJ LAC CAR ARI NE ATL LA CIN CHI JAX CLE BAL DET GB NYG NO SEA DEN PIT KC MIN BUF SF",
+  "TEN MIA PHI NYJ IND ARI LA HOU CAR NYG LAC ATL CLE LV NO GB NE WAS MIN CIN PIT SEA BAL CHI DAL BUF JAX DET KC SF TB DEN"
  ]
 }
