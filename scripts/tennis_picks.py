@@ -192,8 +192,10 @@ def espn_results(log, now):
     priced before the start), by the pick's tour and UTC day: {id: result in tennis.json's shape}"""
     import urllib.request
     import tennis_data as TD
-    out, days = {}, {}
+    import names
+    out, days, who = {}, {}, {}
     for e in log:
+        who[str(e['id'])] = e.get('awayN')
         if e.get('res') is None and e.get('tour') in ('atp', 'wta') and e['kick'] <= (now - datetime.timedelta(hours=3)).strftime('%Y-%m-%dT%H:%M:%SZ'):
             days.setdefault((e['tour'], e['kick'][:10].replace('-', '')), set()).add(str(e['id']))
     for (lg_, day), ids in days.items():
@@ -206,6 +208,10 @@ def espn_results(log, now):
         for c in TD.espn_comps(sb, lg_):
             if c['id'] in ids and c['done']:
                 a, b = c['players']
+                if not names.same(who.get(c['id']) or '', a[1]):
+                    if not names.same(who.get(c['id']) or '', b[1]):
+                        continue
+                    a, b = b, a                      # 'away' is the pick's first player, whatever ESPN's order now
                 out[c['id']] = {'id': c['id'], 'detail': c.get('detail', ''), 'a': {'won': a[4]}, 'b': {'won': b[4]},
                                 'sc': ' '.join(f'{x}-{y}' for x, y in zip(a[5], b[5]))}
     return out
