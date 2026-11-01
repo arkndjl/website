@@ -127,3 +127,59 @@ def badges(rows, S, minpool=MIN_POOL):
     for p in out:
         out[p].sort(key=lambda b: -b[2])
     return dict(out)
+
+
+# ---------------------------------------------------------------- prospect board (scripts/soccer_prospects.py)
+# Shipped (data/soccer_badge_backtest.json 'prospects', Nov 1 2026): candidate -> (position groups, k in 90s). Senior
+# assists a 90 for defenders predicted outcome FV beyond the board's FV drivers (cohort-out, t 2.50 clustered, 7 of 10
+# cohorts; 2.23 with a full-back dummy). Goals a 90 (F t -.56, M .33), assists for F (1.37) and M (1.41), and a keeper's
+# goals conceded a 90 (1.91) failed.
+P_SHIP = {'cre': ('D', 25.1)}
+P_NAMES = {'cre': ('Chance Creator', 'assists a 90, senior, last season + this one'),
+           'fin': ('Finisher', 'goals a 90, senior, last season + this one')}
+
+
+def prospect_vals(X, cid, k):
+    """v' for a prospect row (0 for rows without senior minutes: at the mean): b_<cid> senior count over b_min
+    minutes, relative to his main league's mean at the position group (the group's mean where a league has under 300
+    90s in the pool)"""
+    import numpy as np
+    import pandas as pd
+    mn = 'b_gmin' if cid == 'gks' else 'b_min'
+    n90 = X[mn].values / 90
+    rate = np.where(n90 > 0, X['b_' + cid].values / np.maximum(n90, 1e-9), np.nan)
+    grp = X.grp.values
+    comp = X.comp_td.where(X.comp_td.notna(), X.comp1).fillna('none').values
+    df = pd.DataFrame({'g': grp, 'c': comp, 'v': rate, 'n': n90})
+    ok = (df.v.notna() & (df.n >= 3)).values
+    d = df[ok].assign(w=lambda d: d.v * d.n)
+    mu = d.groupby(['g', 'c']).agg(w=('w', 'sum'), n=('n', 'sum'))
+    mug = d.groupby('g').agg(w=('w', 'sum'), n=('n', 'sum'))
+    cm = (mu.w / mu.n).where(mu.n >= 300).to_dict()
+    gm = (mug.w / mug.n).to_dict()
+    mm = np.array([cm.get((g_, c_), np.nan) for g_, c_ in zip(grp, comp)])
+    mm = np.where(np.isnan(mm), [gm.get(g_, 0.0) for g_ in grp], mm)
+    return np.where(ok, (rate - mm) * n90 / (n90 + k), 0.0)
+
+
+def prospect_badges(X, minpool=MIN_POOL):
+    """prospect board rows (soccer_prospects.features) -> {row index: [[name, tier, pct, stat], ...]}: the shipped
+    badges, percentile among the position group's prospects with minpool+ senior minutes last season + this one"""
+    import numpy as np
+    z = lambda c: X[c].fillna(0).values.astype(float) if c in X else np.zeros(len(X))
+    X = X.assign(b_min=z('mins1') + z('mins_td'), b_cre=z('ast1') + z('ast_td'), b_fin=z('gl1') + z('gl_td'))
+    out = defaultdict(list)
+    for cid, (pos, k) in P_SHIP.items():
+        v = prospect_vals(X, cid, k)
+        for g in pos:
+            pool = (X.grp.values == g) & (X.b_min.values >= minpool)
+            L = np.sort(v[pool])
+            if len(L) < 20:
+                continue
+            for i in np.flatnonzero(pool):
+                t = tier(min(99, int(100 * np.searchsorted(L, v[i], 'left') / len(L))))
+                if t:
+                    out[X.index[i]].append([P_NAMES[cid][0], t, min(99, int(100 * np.searchsorted(L, v[i], 'left') / len(L))), P_NAMES[cid][1]])
+    for i in out:
+        out[i].sort(key=lambda b: -b[2])
+    return dict(out)

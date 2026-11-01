@@ -1,0 +1,16 @@
+{{- /* Predictive trait badges, one look on every board (the CFB board's medals, scripts/cfb_badges.mjs). Context: dict
+       "b" (the player's badges, best first: [[name, tier letter p|g|s|b, percentile, stat], ...]), "of" (what the badges
+       were tested against, e.g. "NBA value"), "chips" (true: the labelled chips for a scouting report instead of the
+       row's pixel medals). Each board lists only badges that predicted its own outcomes held out (see the board's
+       *_badges backtest). Tiers are percentiles at the position: bronze 75th, silver 90th, gold 97th, platinum 99th. */ -}}
+{{- $T := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" -}}
+{{- with .b -}}
+{{- $lines := slice -}}
+{{- range . }}{{ $n := index . 2 }}{{ $sfx := "th" }}{{ $m := mod $n 100 }}{{ if not (and (ge $m 11) (le $m 13)) }}{{ $d := mod $n 10 }}{{ if eq $d 1 }}{{ $sfx = "st" }}{{ else if eq $d 2 }}{{ $sfx = "nd" }}{{ else if eq $d 3 }}{{ $sfx = "rd" }}{{ end }}{{ end }}{{ $lines = $lines | append (printf "%s %s: %d%s pct at position, %s" (index $T (index . 1)) (index . 0) $n $sfx (index . 3)) }}{{ end -}}
+{{- $tip := printf "%s\npredictive of %s beyond the grade" (delimit $lines "\n") ($.of | default "pro value") -}}
+{{- if $.chips -}}
+<p class="cfb__badges">{{ range $i, $x := . }}<span class="cfb__bdg cfb__bdg--{{ index $x 1 }}" data-n="{{ index $x 0 }}" title="{{ index $lines $i }}">{{ index $T (index $x 1) }} {{ index $x 0 }}</span>{{ end }}</p>
+{{- else -}}
+<span class="cfb__medals" title="{{ $tip }}">{{ range first 4 . }}<i class="cfb__medal cfb__medal--{{ index . 1 }}"></i>{{ end }}</span>
+{{- end -}}
+{{- end -}}

@@ -19,9 +19,31 @@ are refit jointly; one that falls under t 2 there is dropped. FotMob season list
 defensive actions, line-breaking passes, dribbles, goals prevented; per 90, regulars only) are candidates too:
 cached in scripts/.cache/soccer/fmbdg.
 
-PROSPECT test: see prospects() below.
+PROSPECT test: the board's Oct 24 rows 2013-20 (53k player-seasons, as soccer_prospects.fit builds them). y = outcome
+FV. Base = the board's kept FV drivers; the candidate is added and the whole fit redone leaving one birth cohort out
+(the board's own FV scoring). Candidates from what the board has (Transfermarkt lineups: no xG, no tackles, no aerials):
+senior goals a 90 and assists a 90 over last season + this season to the snapshot, a keeper's goals conceded a 90 in
+full senior games; regressed by minutes against his main league's mean at the position group. Same gate.
 
-RESULTS (Nov 1 2026): see the JSON; summary in the report at the bottom of this header once run.
+RESULTS (Nov 1 2026; oosGain = held-out MSE cut x 1000, in the outcome's units)
+PRO, 2015-25 -> next season, 900+/900+ (F 2,510 rows / 933 players, M 4,172 / 1,550, D 4,207 / 1,409, GK 864 / 252):
+  y-to-y r: shots .75, key passes .76, xA .66, xGBuildup .69, xGChain-xGBuildup .67, FotMob tkl+int .67, defensive
+  actions .70, dribbles .79, line-breaking passes .54 (2 seasons only), goals - xG .07 (dropped), keeper goals saved vs
+  xG .11 (dropped), FotMob goals prevented vs xGOT .16.
+  F: key passes t 5.34 (8/11), shots 2.47, xA 2.02, dribbles 3.42 pass; chain -1.77 fails. Joint: key passes + shots
+     (t 6.16 / 4.14); xA (r .83 with key passes) and dribbles drop out.
+  M: key passes 6.59, xGBuildup 3.86 (9/11), shots 3.38, xA 3.28, dribbles 2.84 pass; chain 1.09, tkl+int -.91,
+     defensive actions -.71, line-breaking .71 (n 215) fail. Joint: key passes + xGBuildup + shots (6.98 / 7.57 / 4.01).
+  D: xGBuildup 7.10 (9/11), key passes 2.88 pass; xA .95, tkl+int .23, defensive actions -3.05 fail. Joint: both.
+  GK: goals prevented -.90 fails. SHIPPED: Chance Creator (key passes, F/M/D), Shot Volume (F/M), Progressor
+  (xGBuildup, M/D). No projection on the player board to hook them into (GAR is a description of the season).
+PROSPECTS, 53,680 rows (base cohort-out MSE 55.75, the board's 55.77; outcome var 96.3), r: goals a 90 .60 (k 13),
+  assists a 90 .45 (k 25), keeper goals conceded .36 (82 pairs only).
+  Finisher (goals a 90): F t -.56, M .33 fail. Chance Creator (assists a 90): F 1.37, M 1.41 fail; D t 2.50, 7/10
+  cohorts, held-out MSE -.036 PASS (2.23 with a full-back dummy in the base, so not just full-backs). Shot Stopper
+  (keeper goals conceded): t 1.91, 7/10, fails. No tackles, aerials or xG in the board's data (Transfermarkt lineups).
+  SHIPPED: Chance Creator for defenders, display only: the held-out gain (R2 +.0004) is too small to justify refitting
+  the five snapshot models it would have to enter.
 """
 import json
 import math
@@ -76,6 +98,11 @@ def loso(X, y, s):
 
 def test(Xb, xc, y, g, s):
     """candidate column xc on top of base Xb: coef, clustered t, LOSO MSE gain (x1000), seasons better"""
+    keep = []                                            # drop base columns a subset makes constant or collinear
+    for j in range(Xb.shape[1]):
+        if np.linalg.matrix_rank(Xb[:, keep + [j]]) == len(keep) + 1:
+            keep.append(j)
+    Xb = Xb[:, keep]
     X = np.column_stack([Xb, xc])
     b, se = ols_cluster(X, y, g)
     p0, p1 = loso(Xb, y, s), loso(X, y, s)
@@ -382,25 +409,10 @@ def prospect_rows():
     return Sx
 
 
-def prospect_vals(Sx, cid, k, pos):
-    """v' for candidate cid (0 for rows without senior minutes: at the mean), relative to the main league's mean at
-    the position group (the group's mean where a league has under 300 90s)"""
-    import pandas as pd
-    mn = 'b_gmin' if cid == 'gks' else 'b_min'
-    n90 = Sx[mn].values / 90
-    rate = np.where(n90 > 0, Sx['b_' + cid].values / np.maximum(n90, 1e-9), np.nan)
-    grp = Sx.grp.values
-    comp = Sx.comp_td.where(Sx.comp_td.notna(), Sx.comp1).fillna('none').values
-    df = pd.DataFrame({'g': grp, 'c': comp, 'v': rate, 'n': n90})
-    ok = (df.v.notna() & (df.n >= 3)).values
-    d = df[ok].assign(w=lambda d: d.v * d.n)
-    mu = d.groupby(['g', 'c']).agg(w=('w', 'sum'), n=('n', 'sum'))
-    mug = d.groupby('g').agg(w=('w', 'sum'), n=('n', 'sum'))
-    cm = (mu.w / mu.n).where(mu.n >= 300).to_dict()
-    gm = (mug.w / mug.n).to_dict()
-    mm = np.array([cm.get((g_, c_), np.nan) for g_, c_ in zip(grp, comp)])
-    mm = np.where(np.isnan(mm), [gm.get(g_, 0.0) for g_ in grp], mm)
-    return np.where(ok, (rate - mm) * n90 / (n90 + k), 0.0)
+def prospect_vals(Sx, cid, k, pos=None):
+    """v' for candidate cid: scripts/soccer_badges.py (the board computes it the same way)"""
+    import soccer_badges as B
+    return B.prospect_vals(Sx, cid, k)
 
 
 def prospects(cached=False):
@@ -413,6 +425,10 @@ def prospects(cached=False):
     kept = json.load(open(SP.FIT))['kept']
     y, co, pid, grp = Sx.fv_out.values.astype(float), Sx.s22.values, Sx.player_id.values, Sx.grp.values
     Xd = np.column_stack([np.ones(len(F)), F[kept].values])
+    p0 = loso(Xd, y, co)
+    base = {'mse': round(float(np.mean((y - p0) ** 2)), 2), 'var': round(float(np.var(y)), 2),
+            'boardMse10_24': json.load(open(SP.FIT))['models']['10-24']['mse']}
+    print('base (board drivers, cohort-out)', base, flush=True)
     meta, res, vals = {}, {}, {}
     for cid, (name, pos, lab) in P_CANDS.items():
         mn1 = 'b_gmin1' if cid == 'gks' else 'b_min1'
@@ -446,7 +462,7 @@ def prospects(cached=False):
                        'outcome': 'outcome FV (the FV his best three GAR seasons at 22-26 earned)',
                        'base': "the board's kept FV drivers, refit with the candidate: " + ', '.join(kept),
                        'folds': 'leave one birth cohort out (the board scores its FV that way); t clustered by player',
-                       'candidates': meta, 'tests': res})
+                       'baseFit': base, 'candidates': meta, 'tests': res})
 
 
 if __name__ == '__main__':

@@ -594,5 +594,124 @@
     }
    }
   }
+ },
+ "prospects": {
+  "asof": "2026-11-01",
+  "rows": 53680,
+  "outcome": "outcome FV (the FV his best three GAR seasons at 22-26 earned)",
+  "base": "the board's kept FV drivers, refit with the candidate: age, lmv, nomv, gar_td, ht, rclub_td, lmv2, res_parm, share_td, ymins, uyl_young, gar1, acad_ga, fwd, lmv_fwd, ga90_td, res_young, ht_gk, lmv_gk, gk, age2",
+  "folds": "leave one birth cohort out (the board scores its FV that way); t clustered by player",
+  "baseFit": {
+   "mse": 55.75,
+   "var": 96.26,
+   "boardMse10_24": 55.77
+  },
+  "candidates": {
+   "fin": {
+    "name": "Finisher",
+    "pos": "FM",
+    "stat": "goals a 90, senior",
+    "r": 0.597,
+    "k": 13.2,
+    "pairs": 1369,
+    "n90": 19.6
+   },
+   "cre": {
+    "name": "Chance Creator",
+    "pos": "FMD",
+    "stat": "assists a 90, senior",
+    "r": 0.445,
+    "k": 25.1,
+    "pairs": 2171,
+    "n90": 20.1
+   },
+   "gks": {
+    "name": "Shot Stopper",
+    "pos": "G",
+    "stat": "goals conceded a 90 in full senior games (fewer = better)",
+    "r": 0.355,
+    "k": 41.4,
+    "pairs": 82,
+    "n90": 22.8
+   }
+  },
+  "tests": {
+   "fin": {
+    "F": {
+     "coef": -0.0587,
+     "t": -0.56,
+     "oosGain": -7.153,
+     "oosR2Gain": -0.0001,
+     "wins": 5,
+     "of": 10,
+     "n": 14439,
+     "pass": false
+    },
+    "M": {
+     "coef": 0.0343,
+     "t": 0.33,
+     "oosGain": -41.9562,
+     "oosR2Gain": -0.0004,
+     "wins": 1,
+     "of": 10,
+     "n": 16837,
+     "pass": false
+    }
+   },
+   "cre": {
+    "F": {
+     "coef": 0.132,
+     "t": 1.37,
+     "oosGain": 3.2947,
+     "oosR2Gain": 0.0,
+     "wins": 6,
+     "of": 10,
+     "n": 14439,
+     "pass": false
+    },
+    "M": {
+     "coef": 0.141,
+     "t": 1.41,
+     "oosGain": 11.8139,
+     "oosR2Gain": 0.0001,
+     "wins": 7,
+     "of": 10,
+     "n": 16837,
+     "pass": false
+    },
+    "D": {
+     "coef": 0.2555,
+     "t": 2.5,
+     "oosGain": 35.7198,
+     "oosR2Gain": 0.0004,
+     "wins": 7,
+     "of": 10,
+     "n": 16269,
+     "pass": true
+    }
+   },
+   "gks": {
+    "G": {
+     "coef": 0.2992,
+     "t": 1.91,
+     "oosGain": 69.2521,
+     "oosR2Gain": 0.0008,
+     "wins": 7,
+     "of": 10,
+     "n": 6135,
+     "pass": false
+    }
+   }
+  },
+  "checks": {
+   "creD_withFullbackDummy": {
+    "coef": 0.2297,
+    "t": 2.23,
+    "oosGain": 26.577,
+    "wins": 7,
+    "of": 10,
+    "note": "full-back (left/right back) dummy added to the base: the badge is not just full-backs; the dummy alone t 2.18"
+   }
+  }
  }
 }
