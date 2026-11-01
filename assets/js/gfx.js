@@ -944,16 +944,22 @@
     return out.sort(function (a, b) { return rank[a[1]] - rank[b[1]]; });
   }
   // the row's dropdown: open it for the card when it is closed (the name button toggles it), and close it after
+  function isDet(el) { return !!el && /(^|\s)\w+__detail(\s|$)/.test(el.className); }
   async function pcDetail(row) {
-    var nx = row.nextElementSibling;
-    if (nx && nx.classList.contains('cfb__detail')) return { el: nx, opened: false };
-    var who = row.querySelector('button.cfb__who'); if (!who) return { el: null };
+    var nx = row.nextElementSibling, table = row.closest('table');
+    if (isDet(nx)) return { el: nx, opened: false };
+    if (!pdOwn(table)) { var el = pdOpen(row); return { el: el, opened: true, close: function () { el.remove(); } }; }
+    var who = row.querySelector('button.cfb__who');
+    if (!who && table.matches('.cfbm:not(.cbbm), .cfbrc')) who = row.cells[1];   // the mock and recruit tables open on a row click
+    if (!who) return { el: null };
     who.click();
-    for (var k = 0; k < 40; k++) { nx = row.nextElementSibling; if (nx && nx.classList.contains('cfb__detail')) break; await new Promise(function (r) { setTimeout(r, 50); }); }
-    return nx && nx.classList.contains('cfb__detail') ? { el: nx, opened: true, who: who } : { el: null };
+    for (var k = 0; k < 40; k++) { nx = row.nextElementSibling; if (isDet(nx)) break; await new Promise(function (r) { setTimeout(r, 50); }); }
+    return isDet(nx) ? { el: nx, opened: true, close: function () { if (row.nextElementSibling === nx) who.click(); } } : { el: null };
   }
   async function buildPCard(win, row) {
     var table = row.closest('table'); if (!table) return null;
+    var mainR = pcMain(row), extraL = mainR ? pdExtra(row) : '';
+    if (mainR) { row = mainR; table = row.closest('table'); }
     var hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
     var rows = pcRows(table), at = rows.indexOf(row), nameI = pcNameAt(heads);
     var det = await pcDetail(row), d = det.el;
@@ -1011,6 +1017,7 @@
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub.join(' · '), w - px), x + px, y); y += 80;
     // the dropdown's role / outlook lines, a few, under the name
     var roles = d ? [].slice.call(d.querySelectorAll('.cfb__role')).map(txt).filter(Boolean) : [];
+    if (extraL && roles.indexOf(extraL + '.') < 0) roles.unshift(extraL);
     g.font = '40px ' + FONT; g.fillStyle = C.lilac;
     var rl = []; roles.forEach(function (r) { wrap(g, r, w - px).forEach(function (l) { rl.push(l); }); });
     rl.slice(0, Math.max(0, Math.floor((top + 330 - y) / 56))).forEach(function (l) { g.fillText(l, x + px, y); y += 56; });
@@ -1035,8 +1042,10 @@
     }
     // the reserve at the bottom for the dropdown (badges, strengths and concerns, FV inputs)
     var plus = d ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
-    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
+    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts:not(.pd__pct) li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
     var badges = pcBadges([row, d]);
+    if (!badges.length) { var med = row.querySelector('.cfb__medals'), TT = { Platinum: 'p', Gold: 'g', Silver: 's', Bronze: 'b' };
+      if (med) (med.getAttribute('title') || '').split('\n').forEach(function (l) { var m = l.match(/^(Platinum|Gold|Silver|Bronze) (.+?):/); if (m) badges.push([m[2], TT[m[1]]]); }); }
     var partsH = parts.length ? 130 + Math.ceil(Math.min(parts.length, 10) / 2) * 60 : 0;
     var repH = plus.length || minus.length ? 140 + Math.min(6, Math.max(plus.length, minus.length, 1)) * 70 : 0, bdgH = badges.length ? 200 : 0;
     // tiles: four across, as many rows as the room leaves
@@ -1096,9 +1105,119 @@
         var lab = (v > 0 ? '+' : '') + v.toFixed(2); g.fillStyle = C.lilac; g.fillText(lab, cx + cw2 - g.measureText(lab).width, yy);
       });
     }
-    if (det.opened && det.who) det.who.click();
+    if (det.opened && det.close) det.close();
     return F.canvas;
   }
+  // ---- a dropdown for every player table that has none (pro boards, mocks, backup watch, ARKLIST ...): the CFB layout
+  // built from the row itself. Strengths and concerns are the columns where he sits in the top or bottom fifth of the
+  // rows in view (direction-aware: lower is better for ranks, usage and age columns are not judged), the role line carries
+  // his place in the view, the ranges a cell carries (80% range, raw value) and the FV chip's note, then the badges and a
+  // percentile breakdown of every number. Template text only.
+  var PD_NEUTRAL = /^(str|age|g|gp|mp|min|toi|snaps|plays|share|wt\. gp|ht|wt|ht \/ wt|class|yr|yrs|salary|contract|season|gap|xgap|starter|st .*|w-l|rec|range|tag|stage|last|form|roster|pick|rd|vs cons|nhl gp|peak|out|value|tm|xmv|sh|kp|g-xg)$/i;
+  var PD_LOWER = /^(rank|cons|xslot|vrs|ga|gaa)$/i;
+  function pdOwn(table) {   // a table that builds its own dropdown
+    return table.matches('.cfbm:not(.cbbm), .cfbrc, [data-pd-kind], [data-td-kind]') || !!table.closest('[data-cfb], [data-cbb], [data-esea]') ||
+      !!table.querySelector('tbody .cfb__who, tbody .cfbst__more');
+  }
+  function ord(n) { var m = n % 100, d = n % 10; return n + (m >= 11 && m <= 13 ? 'th' : d === 1 ? 'st' : d === 2 ? 'nd' : d === 3 ? 'rd' : 'th'); }
+  function esc2(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pdHtml(win, table, row, extra, span) {
+    var hc = pcHeads(table), heads = hc.map(txt), cells = [].slice.call(row.cells), rows = pcRows(table), N = rows.length, at = rows.indexOf(row);
+    var ni = pcNameAt(heads), name = pcName(row, ni), gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
+    var teamI = gi(TEAM_COL), posI = gi(POS_COL), lgI = gi(/^(league|lg|conf)$/i), fvI = gi(FV_COL), tm = row.querySelector('.nbaxpm__tm, .nflwar__tm');
+    var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) posC.querySelectorAll('span').forEach(function (e) { e.remove(); });
+    var team = teamI >= 0 ? pcCell(cells[teamI]).t : tm ? txt(tm).split('·')[0].trim() : '';
+    var head = [posC ? txt(posC) : '', team, lgI >= 0 ? pcCell(cells[lgI]).t : ''].filter(function (s) { return s && s !== '—'; });
+    var fvC = fvI >= 0 ? cells[fvI] : null, fvT = fvC ? pcCell(fvC).t : '', chip = fvC && fvC.querySelector('.fv-chip');
+    var sortI = sortedCol(table, hc), stats = [], lines = [], ranges = [];
+    heads.forEach(function (h, i) {
+      if (i === ni || i === fvI || i === teamI || i === posI || i === lgI || PC_SKIP.test(h) || !h || !cells[i] || cells[i].hidden || (hc[i] && hc[i].hidden)) return;
+      var c = pcCell(cells[i]); if (c.t === '—' && !c.sub) return;
+      if (c.t.length > 18) { lines.push(h.toLowerCase() + ': ' + c.t + (c.sub ? ' (' + c.sub + ')' : '')); return; }
+      if (c.sub && /\d\s*[–-]\s*[−-]?\d/.test(c.sub) && !/^(w-l|rec|range)$/i.test(h)) ranges.push(h + ' ' + c.t + ', range ' + c.sub);
+      else if (c.sub && /^raw /.test(c.sub)) ranges.push(h + ' ' + c.t + ' (' + c.sub + ')');
+      var n = PC_NOPCT.test(h) && !PD_LOWER.test(h) ? null : pcNum(cells[i], c.t), p = null;
+      if (n != null) {
+        var vals = rows.map(function (r) { var cc = r.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
+        if (vals.length >= 5) p = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
+      }
+      var judge = p == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - p : p;
+      stats.push({ h: h, t: c.t, sub: c.sub, p: p, good: judge, tip: hc[i] ? hc[i].getAttribute('title') || '' : '' });
+    });
+    var say = function (s) { return s.h + ' ' + s.t + ': ' + ord(s.p) + ' percentile of the ' + N + ' in view' + (PD_LOWER.test(s.h) ? ' (lower is better)' : ''); };
+    var plus = stats.filter(function (s) { return s.good != null && s.good >= 80; }).sort(function (a, b) { return b.good - a.good; }).slice(0, 4).map(say);
+    var minus = stats.filter(function (s) { return s.good != null && s.good <= 20; }).sort(function (a, b) { return a.good - b.good; }).slice(0, 4).map(say);
+    var sh = sortI >= 0 ? heads[sortI] : '';
+    var role = ['#' + (at + 1) + ' of ' + N + ' in view' + (sh && !/^rk$/i.test(sh) ? ' by ' + sh : '')];
+    if (fvT && fvT !== '—') role.push('FV ' + fvT + (chip && chip.title ? ' (' + chip.title + ')' : ''));
+    var role2 = ranges.concat(lines);
+    // badges: the row's medals, their names and percentiles from the medal strip's tooltip
+    var med = row.querySelector('.cfb__medals'), T = { Platinum: 'p', Gold: 'g', Silver: 's', Bronze: 'b' }, bdg = [];
+    if (med) (med.getAttribute('title') || '').split('\n').forEach(function (l) { var m = l.match(/^(Platinum|Gold|Silver|Bronze) (.+?): (.*)$/); if (m) bdg.push([m[2], T[m[1]], l]); });
+    var th0 = row.querySelector('.pxframe img'), big = pcBig(th0 && (th0.currentSrc || th0.src));
+    var li = function (xs, cls) { return xs.map(function (x) { return '<li class="' + cls + '">' + esc2(x) + '</li>'; }).join(''); };
+    var bars = stats.filter(function (s) { return s.p != null; }).map(function (s) {
+      return '<li title="' + esc2(s.tip) + '"><span class="cfb__bk" style="width:16ch">' + esc2(s.h) + ' <span class="cfb__dim">' + esc2(s.t) + '</span></span><span class="cfb__meter"><i style="left:0;width:' + s.p + '%"' + (s.good != null && s.good <= 20 ? ' class="is-neg"' : '') + '></i></span><span class="cfb__bv">p' + s.p + '</span></li>';
+    }).join('');
+    var sc = table.closest('.wintable__scroll') || table.parentElement;
+    if (extra) role2.unshift(extra);
+    return '<tr class="cfb__detail pd__auto"><td colspan="' + (span || cells.length) + '"><div class="cfb__dwrap" style="width:' + Math.max(260, sc.clientWidth - 30) + 'px">' +
+      (big ? '<span class="pxframe pxframe--card"><img src="' + esc2(big) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>' : '') +
+      '<p class="cfb__dhead"><b>' + esc2(name) + '</b>' + (head.length ? ' · ' + esc2(head.join(' · ')) : '') + (fvT && fvT !== '—' ? ' · FV ' + esc2(fvT) : '') +
+      ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="pcard" title="player card graphic (4:5)">GFX card</button></p>' +
+      '<p class="cfb__role">' + esc2(role.join(' · ')) + '.</p>' +
+      (role2.length ? '<p class="cfb__role">' + esc2(role2.join(' · ')) + '.</p>' : '') +
+      (bdg.length ? '<p class="cfb__badges">' + bdg.map(function (b) { return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" data-n="' + esc2(b[0]) + '" title="' + esc2(b[2]) + '">' + esc2(b[2].split(':')[0]) + '</span>'; }).join('') + '</p>' : '') +
+      '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
+      '<div><h4>− concerns</h4><ul>' + (li(minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
+      (bars ? '<details class="cfb__nums"><summary>percentiles in view</summary><ul class="cfb__parts pd__pct" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">' + bars + '</ul><p class="cfb__dim">pNN: share of the ' + N +
+        ' players in view (filters and season as set) below him on each column. Strengths and concerns: the top and bottom fifth; usage, age and contract columns are not judged.</p></details>' : '') +
+      '</div></td></tr>';
+  }
+  // a subset table (mock, backup watch, ARKLIST, rookies ...) borrows the player's row on the sport's main board, where
+  // his full line and the board's percentiles are; its own columns go in a line at the top
+  var PD_SUBSET = /mock|backup|arklist|rookie|first-year|freshm|projection|past|contract/i;
+  function pdNorm(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+  function pcMain(row) {
+    var table = row.closest('table'), win = table.closest('.win'), tab = (table.closest('[data-tab]') || win || {}).getAttribute && (table.closest('[data-tab]') || win).getAttribute('data-tab') || '';
+    if (!PD_SUBSET.test(tab)) return null;
+    var nm = pdNorm(pcName(row, pcNameAt(pcHeads(table).map(txt)))); if (!nm) return null;
+    var best = null, bs = -1;
+    document.querySelectorAll('.win table').forEach(function (t) {
+      if (t === table || !t.tHead || !t.tBodies[0] || t.closest('.win') === win) return;
+      var tt = (t.closest('[data-tab]') || {}).getAttribute ? t.closest('[data-tab]').getAttribute('data-tab') : '';
+      if (PD_SUBSET.test(tt || '')) return;
+      var hs = pcHeads(t).map(txt), k = pcNameAt(hs); if (k < 0) return;
+      var r = pcRows(t).find(function (x) { return pdNorm(pcName(x, k)) === nm; }); if (!r) return;
+      var sc = (hs.some(function (h) { return FV_COL.test(h); }) ? 1000 : 0) + hs.length;
+      if (sc > bs) { bs = sc; best = r; }
+    });
+    return best;
+  }
+  function pdExtra(row) {   // the subset table's own columns, one line
+    var table = row.closest('table'), hs = pcHeads(table).map(txt), ni = pcNameAt(hs), tab = (table.closest('[data-tab]') || {}).getAttribute ? table.closest('[data-tab]').getAttribute('data-tab') : '';
+    var bits = hs.map(function (h, i) { if (i === ni || !h || FV_COL.test(h) || /^rk$/i.test(h)) return ''; var c = pcCell(row.cells[i]); return c.t && c.t !== '—' ? h + ' ' + c.t : ''; }).filter(Boolean);
+    return (tab ? tab + ': ' : '') + bits.join(' · ');
+  }
+  function pdClose(table) { table.querySelectorAll('tr.pd__auto').forEach(function (d) { d.remove(); }); }
+  function pdOpen(row) {
+    var table = row.closest('table'), win = row.closest('.win'); pdClose(table);
+    var m = pcMain(row);
+    row.insertAdjacentHTML('afterend', m ? pdHtml(m.closest('.win'), m.closest('table'), m, pdExtra(row), row.cells.length) : pdHtml(win, table, row)); return row.nextElementSibling;
+  }
+  document.addEventListener('click', function (e) {
+    if (/1nt$/.test(SITE)) return;
+    var t = e.target; if (!t.closest) return;
+    var table = t.closest('table'); if (!table || !table.tHead || !table.tBodies[0]) return;
+    if (t.closest('thead')) { pdClose(table); return; }
+    if (t.closest('a, button, input, select, label, summary, details, tr.cfb__detail')) return;
+    var row = t.closest('tbody tr'); if (!row || row.cells.length < 3 || !table.closest('.win') || pdOwn(table)) return;
+    if (pcNameAt(pcHeads(table).map(txt)) < 0) return;
+    var was = row.nextElementSibling && row.nextElementSibling.classList.contains('pd__auto');
+    pdClose(table); if (!was) pdOpen(row);
+  });
+  document.addEventListener('input', function (e) { var w = e.target.closest && e.target.closest('.win'); if (w) w.querySelectorAll('table').forEach(pdClose); });
+
   // the card picker beside a player table's GFX button (the players in view, in the table's order), and a "GFX card"
   // button in every dropdown that has none (the CFB board draws its own card)
   function pcName(r, ni) { var c = r.cells[ni]; if (!c) return ''; c = (c.querySelector('button.cfb__who, b') || c).cloneNode(true); c.querySelectorAll('svg, .gfx-off, .cfb__dim').forEach(function (e) { e.remove(); }); return txt(c); }
@@ -1130,10 +1249,10 @@
   }
   function addCardButtons() {
     if (/1nt$/.test(SITE)) return;
-    document.querySelectorAll('tr.cfb__detail').forEach(function (d) {
+    document.querySelectorAll('tr.cfb__detail, tr.cfbm__detail, tr.cfbrc__detail').forEach(function (d) {
       if (d.querySelector('[data-gfx]') || d.closest('[data-cfb]')) return;
       var row = d.previousElementSibling, table = d.closest('table'); if (!row || !table || pcNameAt(pcHeads(table).map(txt)) < 0) return;
-      var host = d.querySelector('.cfb__dhead') || d.querySelector('.cfb__dwrap') || d.cells[0]; if (!host) return;
+      var host = d.querySelector('.cfb__dhead') || d.querySelector('.cfb__dwrap, [class$="__dwrap"]') || d.cells[0]; if (!host) return;
       var b = document.createElement('button'); b.type = 'button'; b.className = 'cfb__btn cfb__cardbtn'; b.textContent = 'GFX card'; b.title = 'player card graphic (4:5)';
       b.setAttribute('data-gfx', ''); b.setAttribute('data-gfx-mode', 'pcard');
       host.appendChild(document.createTextNode(' ')); host.appendChild(b);
@@ -1832,13 +1951,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr.cfb__detail').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr.cfb__detail').querySelector('.cfb__dhead b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }
