@@ -12,12 +12,13 @@ import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { _internals as I, phi, fitBeta, CAND } from './cfb_model.mjs';
+import { _internals as I, phi, fitBeta, CAND, HIST_FIT } from './cfb_model.mjs';
 import { paired } from './harness.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const mdPath = process.argv[2] || path.join(ROOT, 'scripts', '.cache', 'cfb', 'espn_md.json.gz');
 const data = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath)));
+for (const k of ["talent", "returning", "sp", "pfnRet", "weather"]) data[k] ||= {};
 const FIRST = 2015, LAST = 2026, TUNE = [2016, 2020], HOLD = [2021, 2026];
 const SEASONS = []; for (let S = FIRST; S <= LAST; S++) if (data.games[S]?.length) SEASONS.push(S);
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
@@ -183,6 +184,37 @@ fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtes
 // sections 2-5 are skipped with ONLYSHIP=1 (the ship comparison alone, at the grid's pick)
 const T2 = S => S >= 2021 && S <= 2022, H2 = S => S >= 2023;
 let bestP = { k: 20, eloHome: 55, lam: 1.5 }, bestLL;
+
+// SP+ history in the prior (SPDIR=dir of CFBD ratings/sp files sp<S>.json, pulled by cfb_game_history.mjs): last
+// season's final SP+ in place of last season's final Elo (sp falls back to Elo for teams SP+ doesn't rate), and next
+// to it, on the shipped setting (pooled weights, inputs p4, aggr, ret). Scored on the project split and on 2021-26.
+// Nov 1 2026 (SP+ 2015-25 from the cfb-research artifact, 1432 of 1438 team-seasons matched; RETWAR from
+// cfb_ret_war.mjs; data/cfb_sp_prior_test.json): log loss, the CFB gate, fails on tune for both forms (SP+ for Elo
+// t +0.53, held -0.63; SP+ next to Elo t -0.11, held -0.98). MAE: SP+ next to Elo t -1.97 tune, -1.50 held (13.07 ->
+// 13.02, 12.67 -> 12.64). Not shipped: the live prior stays on last season's Elo
+if (process.env.SPDIR) {
+  const X = (process.env.SHIPX || 'p4,aggr,ret').split(',');
+  I.setCtx({}, RW); I.setExtra(X);
+  PRI.rosterEloSp = f => [1, f.elo, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn];
+  const run = k => predict(walkAll(chain(k, 'pooled'), bestP), { fit: HIST_FIT.fit });
+  data.sp = {};
+  const base = run('roster');
+  let hit = 0, all = 0;
+  for (const S of SEASONS) {
+    const p = path.join(process.env.SPDIR, `sp${S}.json`);
+    if (!fs.existsSync(p)) continue;
+    data.sp[S] = JSON.parse(fs.readFileSync(p, 'utf8')).filter(x => x.team !== 'nationalAverages');
+    for (const x of data.sp[S]) { all++; if (nameId[x.team] && fbsBy[S].has(nameId[x.team])) hit++; }
+  }
+  const out = { extra: X, P: bestP, spSeasons: Object.keys(data.sp), matched: `${hit}/${all}`, base: { ...split(base), all: sumUp(base.filter(x => x.S >= 2021)) } };
+  for (const k of ['roster', 'rosterEloSp']) {
+    const o = run(k);
+    out[k === 'roster' ? 'spForElo' : 'spAndElo'] = { ...split(o), ll: cmp(o, base), mae: cmp(o, base, 'ae'), ll2: cmp(o, base, 'll', T2, H2), close: vsClose(o.filter(x => x.S >= 2021)) };
+  }
+  console.log('sp', JSON.stringify(out, null, 1));
+  fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_sp_prior_test.json'), JSON.stringify(out, null, 1));
+  process.exit(0);
+}
 if (!process.env.ONLYSHIP) {
 // 2. prior features (pooled scheme)
 report.prior = {};
