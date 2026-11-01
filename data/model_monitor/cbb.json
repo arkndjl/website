@@ -1,11 +1,37 @@
 {
- "asof": "2026-11-01T16:58:08Z",
+ "asof": "2026-11-01T21:14:20Z",
  "sport": "cbb",
  "season": 2027,
  "loss": "abs margin error",
- "n": 0,
+ "n": 1,
  "logged": 184,
  "expectFrom": "walk-forward 2022-2026, same calendar month",
+ "model": 9.0,
+ "expected": 9.5187,
+ "z": 0.07,
+ "line": 9.5,
+ "lineN": 1,
+ "byMonth": [
+  {
+   "month": "nov",
+   "n": 1,
+   "model": 9.0,
+   "expected": 9.5187
+  }
+ ],
+ "test": {
+  "n": 1,
+  "window": 1,
+  "mean": 0.0698,
+  "t": null,
+  "days": 1,
+  "sd": 1.0,
+  "cusum": 0.0,
+  "cusumMax": 0.0,
+  "h": 10.0,
+  "stop": false,
+  "why": ""
+ },
  "status": "collecting",
  "why": ""
 }
