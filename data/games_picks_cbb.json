@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-01T14:59:51Z",
+ "asof": "2026-11-01T15:05:50Z",
  "recenter": {
   "2026-11-02": -11.98,
   "2026-11-03": -10.2
@@ -227,8 +227,8 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": 117.0,
-    "ev": 0.091,
+    "price": 120.0,
+    "ev": 0.106,
     "units": 2.75
    }
   },
@@ -288,8 +288,8 @@
    "tmRaw": 133.5,
    "flagged": "2026-11-01T13:30:49Z",
    "close": 5.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401921423",
@@ -379,8 +379,8 @@
    "flagged": "2026-11-01T12:42:33Z",
    "betTo": 151.5,
    "close": 155.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401911707",
@@ -432,8 +432,8 @@
    "tmRaw": 148.5,
    "flagged": "2026-11-01T12:42:33Z",
    "close": 1.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401909738",
@@ -858,22 +858,6 @@
    "tm": 154.3
   },
   {
-   "id": "401920679",
-   "sport": "cbb",
-   "kick": "2026-11-02T23:30:00Z",
-   "home": "St. John's",
-   "away": "Monmouth",
-   "mk": "spread",
-   "side": "away",
-   "line": 27.5,
-   "price": -106.0,
-   "edge": 3.6,
-   "x": 2.5,
-   "why": "no edge at -106",
-   "m": 23.9,
-   "tm": 151.2
-  },
-  {
    "id": "401922020",
    "sport": "cbb",
    "kick": "2026-11-03T02:30:00Z",
@@ -984,6 +968,22 @@
    "why": "edge under 2.5",
    "m": 19.6,
    "tm": 150.3
+  },
+  {
+   "id": "401917913",
+   "sport": "cbb",
+   "kick": "2026-11-03T01:30:00Z",
+   "home": "Central Arkansas",
+   "away": "Oral Roberts",
+   "mk": "spread",
+   "side": "home",
+   "line": 8.5,
+   "price": -127.0,
+   "edge": 2.1,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 10.6,
+   "tm": 152.2
   }
  ],
  "games": {
@@ -1165,18 +1165,6 @@
    "units": 0.0,
    "home": "Oregon",
    "away": "Montana",
-   "state": "under"
-  },
-  "401920679": {
-   "mk": "spread",
-   "side": "away",
-   "line": 27.5,
-   "price": -106.0,
-   "edge": 3.6,
-   "ev": null,
-   "units": 0.0,
-   "home": "St. John's",
-   "away": "Monmouth",
    "state": "under"
   },
   "401911452": {
@@ -1435,8 +1423,8 @@
    "mk": "ml",
    "side": "home",
    "line": null,
-   "price": 117.0,
-   "ev": 0.091,
+   "price": 120.0,
+   "ev": 0.106,
    "edge": 7.1,
    "units": 2.75,
    "home": "Cornell",
@@ -1832,25 +1820,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 308,
+  "snapshots": 314,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 77,
-    "clvRet": 0.0124,
-    "clvT": 0.75,
-    "clv": 0.95,
-    "beat": 0.338,
-    "still": 0.597
+    "clvN": 79,
+    "clvRet": 0.0106,
+    "clvT": 0.66,
+    "clv": 0.92,
+    "beat": 0.329,
+    "still": 0.608
    },
    {
     "when": "6-24h",
-    "clvN": 9,
-    "clvRet": 0.1068,
-    "clvT": 1.4,
-    "clv": 2.33,
-    "beat": 0.333,
-    "still": 0.667
+    "clvN": 10,
+    "clvRet": 0.0916,
+    "clvT": 1.31,
+    "clv": 2.1,
+    "beat": 0.3,
+    "still": 0.7
    },
    {
     "when": "1-6h",
