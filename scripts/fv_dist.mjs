@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fvOf } from './fv_scale.mjs';
+import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 let FIT = null;
@@ -72,7 +73,7 @@ export const fvdOf = d => d ? [...d.tiers.map(x => Math.round(x * 1000) / 1000),
 // fields (after a refit, without a full board run; the recruiting record isn't in the file, so walk-ons read as
 // recruited until the next fetch_cfb.mjs run)
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]) && process.argv.includes('--annotate')) {
-  const f = path.join(ROOT, 'static', 'data', 'cfb-all.json'), A = JSON.parse(fs.readFileSync(f, 'utf8'));
+  const A = readCfbAll(ROOT);   // cfb-all + cfb-detail (where fvd lives) merged
   if (!A.cols.includes('fvd')) { A.cols.push('fvd'); for (const r of A.rows) r.push(null); }
   const ci = Object.fromEntries(A.cols.map((c, i) => [c, i]));
   let n = 0;
@@ -83,7 +84,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     if (ci.fvg != null && r[ci.fvg] != null) { const d = fvDist('cfb', fv, z); if (d) { r[ci.fvx] = Math.round(Math.max(20, Math.min(80, d.mean)) * 100) / 100; r[ci.fv] = fvOf('cfb', r[ci.fvx]); } }
     if (r[ci.fvd]) n++;
   }
-  fs.writeFileSync(f, JSON.stringify(A));
+  writeCfbAll(A, ROOT);
   console.log('fvd on', n, 'of', A.rows.length, 'rows');
 }
 // node scripts/fv_dist.mjs --past: put static/data/cfb-past.json's grades at their mean outcome once (a file written

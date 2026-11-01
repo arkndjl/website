@@ -774,6 +774,7 @@
     return list.length ? Math.ceil(list.length / 3) * 130 + 20 : 0;
   }
   async function buildCard(win, btn) {
+    if (window.__arkCfbDetail) await window.__arkCfbDetail();   // role, strengths, concerns and FV inputs (cfb-detail.json)
     var r = (window.__arkCfbRecs || [])[+btn.getAttribute('data-gfx-i')]; if (!r) return null;
     var head = txt(win.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
     var F = await frame(2160, 2700, head + ' :: ' + r.name, win.getAttribute('data-gfx-date'),

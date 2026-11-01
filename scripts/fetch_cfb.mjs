@@ -51,6 +51,7 @@ import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
+import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
 // the headline's stretched top (Oct 31 2026): fv in memory stays the mean (the builder, mocks, portal and team talent
 // read it); the files carry it on the stretched scale, via FVR (and val() for cfb-all)
@@ -2408,7 +2409,7 @@ const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', '
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
-const PREV_ALL = fs.existsSync(ALL_OUT) ? JSON.parse(fs.readFileSync(ALL_OUT, 'utf8')) : null;
+const PREV_ALL = readCfbAll(ROOT);   // cfb-all + cfb-detail merged (scripts/cfb_all.mjs)
 const carriedRows = now => {
   if (!PREV_ALL?.asof || PREV_ALL.asof < `${SEASON}-08-01`) return [];
   // the same player listed again under another spelling ("Roosevelt Andrews III" / "Roosevelt Andrews") or found by
@@ -2451,12 +2452,12 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
   const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : c === 'fv' && r.fv != null ? fvOf('cfb', r.fvx, r.fv) : r[c] ?? null;
-  const body = JSON.stringify({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) });
-  fs.writeFileSync(ALL_OUT, body);
+  // two files (scripts/cfb_all.mjs): the table's columns in cfb-all.json, the scouting report's in cfb-detail.json
+  const size = writeCfbAll({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) }, ROOT);
   writeComps(rows.filter(r => r._comp).map(r => ({ key: `${r.name}|${r.team}`, ...r._comp })), COMPS_OUT);
   // Cloudflare Pages refuses any one file over 25 MiB, and the whole deploy with it
-  const mib = Buffer.byteLength(body) / 2 ** 20;
-  if (mib > 23) console.log(`cfb-all: WARNING ${mib.toFixed(1)} MiB, Cloudflare's per-file limit is 25 MiB`); };
+  for (const [k, b] of Object.entries(size)) { const mib = b / 2 ** 20;
+    if (mib > 23) console.log(`cfb-${k}: WARNING ${mib.toFixed(1)} MiB, Cloudflare's per-file limit is 25 MiB`); } };
 // photo: 1 when it is ESPN's standard headshot for the player's ESPN id (espnl), which the readers rebuild
 // (layouts/partials/cfbjs.html, scripts/backup_watch_cfb.mjs); 24k copies of the URL were 1.9 MB of cfb-all.json
 const ESPN_HS = 'https://a.espncdn.com/i/headshots/college-football/players/full/';

@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { fetchGames } from './cfb_teams.mjs';
 import { seasonAv, teamSeasonAv, badgePoints, SAV_W, SAV_REPL, SAV_Q, SAV_PTS, CWAR_QB_OWN } from './cfb_av.mjs';
 import { NFLPOS } from './cfb_nflpos.mjs';   // the shared draft-position map (EDGEs listed as LB, Oct 21 2026)
+import { readCfbAll } from './cfb_all.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'av');
@@ -135,7 +136,7 @@ for (const zr of [-2, -1.5, -1, -0.5, 0]) for (const lam of [10, 50, 200]) {
 const [Xf, Yf] = XY(FIT, SAV_REPL), fit = fitW(Xf, Yf, 50);
 
 // ---- 2026: season AV against summed avOf(fv) -----------------------------------------------------------------
-const all = JSON.parse(fs.readFileSync(path.join(ROOT, 'static', 'data', 'cfb-all.json'), 'utf8'));
+const all = readCfbAll(ROOT);   // cfb-all + cfb-detail (parts) merged
 const board = all.rows.map(r => Object.fromEntries(all.cols.map((c, i) => [c, r[i]]))).filter(p => p.div === 'FBS')
   .map(p => ({ ...p, tid: /\/(\d+)\.png/.exec(p.logo || '')?.[1] || null }));
 seasonAv(board);

@@ -5,7 +5,9 @@
 
 - every .json under data/ and static/ parses as strict JSON: a bare NaN or Infinity (Python's json.dump default) fails
   Hugo's data loader and every build with it (Oct 21, PR #315)
-- no file under static/ over Cloudflare Pages' 25 MiB per-file limit (warning from 23 MiB: cfb-all.json lives near it)
+- no file under static/ over Cloudflare Pages' 25 MiB per-file limit (warning from 23 MiB)
+- static/data/cfb-all.json and cfb-detail.json carry the same dk (the board split in two, scripts/cfb_all.mjs): a
+  mismatched pair leaves every scouting report off the board
 Local hook: git config core.hooksPath .githooks (runs the fast checks on each commit). Stdlib only."""
 import json, os, shutil, subprocess, sys, tempfile
 
@@ -41,6 +43,15 @@ def check_sizes():
     return errs, warns
 
 
+def check_pairs():
+    import re
+    sd = os.path.join(ROOT, 'static', 'data')
+    dk = lambda f: (re.search(r'"dk":"(\w+)"', open(os.path.join(sd, f), encoding='utf-8').read(400)) or [None, None])[1]
+    if not os.path.exists(os.path.join(sd, 'cfb-detail.json')): return []
+    a, b = dk('cfb-all.json'), dk('cfb-detail.json')
+    return [] if a and a == b else [f'static/data/cfb-all.json dk {a} vs cfb-detail.json dk {b}: write both with scripts/cfb_all.mjs']
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -54,7 +65,7 @@ def check_hugo():
 
 if __name__ == '__main__':
     errs, n = check_json()
-    e2, warns = check_sizes(); errs += e2
+    e2, warns = check_sizes(); errs += e2 + check_pairs()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)
     for e in errs: print('FAIL:', e)
