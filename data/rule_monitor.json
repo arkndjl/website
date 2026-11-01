@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T17:18:46Z",
+ "asof": "2026-11-01T18:35:35Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -11,7 +11,18 @@
    "note": "S = max(0, S - z - k) per bet in kick order, z = clvRet / sd. k .25, h 10, picked on simulation (sd .12, 4 bets a game day, checked every game day, 600 bets) with the paper book's old window test (last 300, t < -1) kept beside it: a rule losing 1.5% a bet to the close stops by a median 60 bets, losing 3% by 52; one that turns from +3% to -3% after 200 bets stops ~104 bets after the turn (the window test alone: 200); one really at +1.5% stops 6% of the time, at +3% 3%, at the close about two in three (it loses the vig anyway)"
   },
   "weekDays": 7,
-  "zFlag": 2.0
+  "zFlag": 2.0,
+  "drift": {
+   "registered": "2026-11-01",
+   "A": 19,
+   "B": 19,
+   "minN": 30,
+   "note": "Overfit test for every pick rule from its clock (so every new or refit rule): Wald's SPRT, H1 the rule is worth its held-out backtest's clvRet x units.TIMING x units.LEAK (the edge its stakes assume), H0 it is worth 0. Game-day LLR with the slate rho from units. Pause at LLR <= -ln B (a stop, cleared only by a refit), confirm at >= ln A (test retires; the close switch keeps running). A 19 / B 19 picked on simulation (CFB totals X 2.5: expected .018, sd .123, 18 bets a week, 1000 bets, 400 runs): worth nothing pauses 96% (median 234 bets), -0.5x pauses 100% (144); at its backtest pauses 4%, confirms 94% (234); at 1.5x confirms 100% (144); at 0.75x pauses 17%; at 0.5x a coin flip (45/44), at 0.25x pauses 80%. B 9 paused 10% of real rules; A 39 left 18% open at 0.5x."
+  },
+  "timing": 0.5,
+  "leak": {
+   "nba": 0.5
+  }
  },
  "rules": [
   {
@@ -55,6 +66,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.018,
+    "n": 0,
+    "sd": 0.1227,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 275,
+    "path": []
    }
   },
   {
@@ -98,6 +125,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0226,
+    "n": 0,
+    "sd": 0.1687,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 327,
+    "path": []
    }
   },
   {
@@ -141,6 +184,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.014,
+    "n": 0,
+    "sd": 0.1616,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 785,
+    "path": []
    }
   },
   {
@@ -189,6 +248,28 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0189,
+    "n": 1,
+    "sd": 0.1283,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": -0.033,
+    "info": 0.02,
+    "real": -1.016,
+    "realSe": 6.79,
+    "need": 271,
+    "path": [
+     [
+      "2026-10-31",
+      1,
+      -0.033
+     ]
+    ]
    }
   },
   {
@@ -232,6 +313,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0439,
+    "n": 0,
+    "sd": 0.1622,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 80,
+    "path": []
    }
   },
   {
@@ -275,6 +372,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0447,
+    "n": 0,
+    "sd": 0.164,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 79,
+    "path": []
    }
   },
   {
@@ -318,6 +431,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0232,
+    "n": 0,
+    "sd": 0.1612,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 283,
+    "path": []
    }
   },
   {
@@ -366,6 +495,28 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0195,
+    "n": 1,
+    "sd": 0.1605,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.011,
+    "info": 0.01,
+    "real": 1.262,
+    "realSe": 8.233,
+    "need": 399,
+    "path": [
+     [
+      "2026-10-31",
+      1,
+      0.011
+     ]
+    ]
    }
   },
   {
@@ -409,6 +560,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0322,
+    "n": 0,
+    "sd": 0.1513,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 130,
+    "path": []
    }
   },
   {
@@ -452,6 +619,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0109,
+    "n": 0,
+    "sd": 0.1513,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 1145,
+    "path": []
    }
   },
   {
@@ -495,6 +678,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.03,
+    "n": 0,
+    "sd": 0.1581,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 163,
+    "path": []
    }
   },
   {
@@ -538,6 +737,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0148,
+    "n": 0,
+    "sd": 0.1119,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 337,
+    "path": []
    }
   },
   {
@@ -581,6 +796,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0478,
+    "n": 0,
+    "sd": 0.1257,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 41,
+    "path": []
    }
   },
   {
@@ -624,6 +855,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0167,
+    "n": 0,
+    "sd": 0.1256,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 333,
+    "path": []
    }
   },
   {
@@ -634,7 +881,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 12,
+   "n": 17,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -667,6 +914,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0181,
+    "n": 0,
+    "sd": 0.1136,
+    "rho": 0.002,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 232,
+    "path": []
    }
   },
   {
@@ -677,7 +940,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 8,
+   "n": 10,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -710,6 +973,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0246,
+    "n": 0,
+    "sd": 0.1114,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 120,
+    "path": []
    }
   },
   {
@@ -753,6 +1032,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0083,
+    "n": 0,
+    "sd": 0.0933,
+    "rho": 0.002,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 744,
+    "path": []
    }
   },
   {
@@ -796,6 +1091,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0132,
+    "n": 0,
+    "sd": 0.0823,
+    "rho": 0.002,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 231,
+    "path": []
    }
   },
   {
@@ -839,6 +1150,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0311,
+    "n": 0,
+    "sd": 0.1415,
+    "rho": 0.016,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 122,
+    "path": []
    }
   },
   {
@@ -882,6 +1209,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0321,
+    "n": 0,
+    "sd": 0.1378,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 108,
+    "path": []
    }
   },
   {
@@ -925,6 +1268,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0315,
+    "n": 0,
+    "sd": 0.1557,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 144,
+    "path": []
    }
   },
   {
@@ -968,6 +1327,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0251,
+    "n": 0,
+    "sd": 0.1516,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 214,
+    "path": []
    }
   },
   {
@@ -1011,6 +1386,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.029,
+    "n": 0,
+    "sd": 0.1481,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 154,
+    "path": []
    }
   },
   {
@@ -1054,6 +1445,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0374,
+    "n": 0,
+    "sd": 0.1561,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 103,
+    "path": []
    }
   },
   {
@@ -1097,6 +1504,22 @@
     "h": 10.0,
     "stop": false,
     "why": ""
+   },
+   "drift": {
+    "mu1": 0.0257,
+    "n": 0,
+    "sd": 0.1369,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 167,
+    "path": []
    }
   }
  ],
@@ -1207,5 +1630,36 @@
   }
  ],
  "stopped": [],
- "flags": []
+ "flags": [],
+ "drift": {
+  "watching": [
+   "pick:cfb:total",
+   "pick:cfb:spread | game: non-conference",
+   "pick:cfb:spread | line: 14+",
+   "pick:cfb:spread | line: 3-7",
+   "pick:cfb:spread | line: 7-14",
+   "pick:cfb:spread | role: favorite",
+   "pick:cfb:spread | season: early",
+   "pick:cfb:spread | season: late",
+   "pick:cfb:spread | tier: power",
+   "pick:cfb:spread | venue: away",
+   "pick:cfb:spread | venue: home",
+   "pick:cfb:total | conf: Sun Belt",
+   "pick:nfl:spread",
+   "pick:nfl:total",
+   "pick:cbb:spread",
+   "pick:cbb:total",
+   "pick:cbb:spread | conf: AE",
+   "pick:cbb:spread | conf: SWAC",
+   "pick:nba:total",
+   "pick:nba:spread | line: 4-9",
+   "pick:nba:spread | line: <4",
+   "pick:nba:spread | role: dog",
+   "pick:nba:spread | season: late",
+   "pick:nba:spread | venue: away",
+   "pick:nba:spread | venue: home"
+  ],
+  "confirmed": [],
+  "paused": []
+ }
 }

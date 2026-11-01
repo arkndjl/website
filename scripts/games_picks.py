@@ -1044,7 +1044,9 @@ def live(sport):
     mon, stopped = RM.pick_state(sport, {**RS, '_asof': RJ.get('asof')}, log, old.get('monitor'), stamp)
     for i in stopped:
         if ' | ' not in i and R.get(i):
-            R[i] = {**R[i], 'on': False, 'why': 'stopped by the live monitor: losing to the close'}
+            R[i] = {**R[i], 'on': False, 'why': 'stopped by the live monitor: ' + (
+                'live picks worth too little of the backtest edge (drift test)' if (mon['stopped'].get(i) or {}).get('test') == 'drift'
+                else 'losing to the close')}
     SEGS = [z for z in SEGS if f"{z['mk']} | {z['fam']}: {z['val']}" not in stopped]
     if stopped:
         print(f'{sport}: stopped by the live monitor:', ', '.join(sorted(stopped)))

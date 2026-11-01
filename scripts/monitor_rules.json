@@ -11,5 +11,12 @@
  },
  "sdDefault": 0.12,
  "weekDays": 7,
- "zFlag": 2.0
+ "zFlag": 2.0,
+ "drift": {
+  "registered": "2026-11-01",
+  "A": 19,
+  "B": 19,
+  "minN": 30,
+  "note": "Overfit test for every pick rule from its clock (so every new or refit rule): Wald's SPRT, H1 the rule is worth its held-out backtest's clvRet x units.TIMING x units.LEAK (the edge its stakes assume), H0 it is worth 0. Game-day LLR with the slate rho from units. Pause at LLR <= -ln B (a stop, cleared only by a refit), confirm at >= ln A (test retires; the close switch keeps running). A 19 / B 19 picked on simulation (CFB totals X 2.5: expected .018, sd .123, 18 bets a week, 1000 bets, 400 runs): worth nothing pauses 96% (median 234 bets), -0.5x pauses 100% (144); at its backtest pauses 4%, confirms 94% (234); at 1.5x confirms 100% (144); at 0.75x pauses 17%; at 0.5x a coin flip (45/44), at 0.25x pauses 80%. B 9 paused 10% of real rules; A 39 left 18% open at 0.5x."
+ }
 }
