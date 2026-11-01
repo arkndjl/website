@@ -1653,8 +1653,13 @@ def build(days_ahead=4):
                                   for r in rows if span[0] <= r['day'] <= span[1] and r.get('hs') is None])
     except Exception as e:
         print('novig:', e); NV = {}
+    hi = (today + dt.timedelta(days=days_ahead - 1)).isoformat()
+    last0 = dict(R.last)      # unplayed matches in the window count for later ones' rest bands
     for r in rows:
-        if r['lg'] not in leagues and r['lg'] not in UEFA or not (today.isoformat() <= r['day'] <= (today + dt.timedelta(days=days_ahead - 1)).isoformat()):
+        pend = r.get('hs') is None and today.isoformat() <= r['day'] <= hi
+        if r['lg'] not in leagues and r['lg'] not in UEFA or not (today.isoformat() <= r['day'] <= hi):
+            if pend:
+                R.last[r['h']] = R.last[r['a']] = r['day']
             continue
         e = dk.get(r['id'], {})
         if r['id'] in NV:
@@ -1662,6 +1667,8 @@ def build(days_ahead=4):
         if r.get('hs') is not None and r['day'] < today.isoformat():
             continue
         lh, la = L.lam(r)
+        if pend:
+            R.last[r['h']] = R.last[r['a']] = r['day']
         pw_, pd_, pl_ = wdl(lh, la, P['rho'])
         M = score_matrix(lh, la, P['rho'])
         tot = np.add.outer(np.arange(GMAX), np.arange(GMAX))
@@ -1687,6 +1694,7 @@ def build(days_ahead=4):
             if lgx in leagues and r[c] in leagues[lgx]:
                 g[c + 'rec'] = leagues[lgx][r[c]]['rec']
         games.append(g)
+    R.last = last0
     games.sort(key=lambda g: (g['tip'], g['id']))
     for t in list(clubs) + [t for lg in NOLINK & set(leagues) for t in leagues[lg]]:
         logo(t)
