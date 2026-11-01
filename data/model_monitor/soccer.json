@@ -1,14 +1,14 @@
 {
- "asof": "2026-11-01T16:06:10Z",
+ "asof": "2026-11-01T22:44:15Z",
  "sport": "soccer",
  "season": 2027,
  "loss": "1X2 log loss",
- "n": 151,
+ "n": 189,
  "logged": 235,
  "expectFrom": "walk-forward 2022-2026, same calendar month",
- "model": 0.9391,
- "expected": 0.9398,
- "z": -0.001,
+ "model": 0.9287,
+ "expected": 0.9404,
+ "z": 0.022,
  "line": null,
  "lineN": 0,
  "byMonth": [
@@ -20,16 +20,16 @@
   },
   {
    "month": "nov",
-   "n": 24,
-   "model": 0.8043,
+   "n": 62,
+   "model": 0.8553,
    "expected": 0.9428
   }
  ],
  "test": {
-  "n": 151,
-  "window": 151,
-  "mean": -0.0008,
-  "t": -0.01,
+  "n": 189,
+  "window": 189,
+  "mean": 0.0217,
+  "t": 0.25,
   "days": 8,
   "sd": 1.0,
   "cusum": 0.0,
@@ -38,6 +38,6 @@
   "stop": false,
   "why": ""
  },
- "status": "watch",
+ "status": "ok",
  "why": ""
 }
