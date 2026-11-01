@@ -902,6 +902,14 @@ def build():
             proj[g['game_id']][0]['roster'] = NR.points(moves, h, gp[h]) - NR.points(moves, a, gp[a]) if moves else 0.0
             if g['home_score'] not in ('', 'NA'):
                 gp[h] += 1; gp[a] += 1
+    # in-season moves (scripts/nfl_trades.py, Nov 1 2026): trades and claims since each club's last games, listed on
+    # the cards; in the margin only at nfl_trades.TRADES['c'] (0: the backtest found nothing to add)
+    try:
+        import nfl_trades as NT
+        tmv, tnames = NT.live(last, week, games)
+    except Exception as e:      # noqa: BLE001
+        print('nfl trades: failed', repr(e)); NT, tmv, tnames = None, {}, {}
+    tpts = {t: NT.TRADES['c'] * NT.points(v, NT.TRADES['hl']) for t, v in tmv.items()} if NT and NT.TRADES['c'] else {}
     # injuries: the league's reports for games played, this week's reports and news for this week's games; a
     # questionable or probable QB starts with his chance to play, his backup with the rest
     for gid, (x, _) in proj.items():
@@ -931,7 +939,11 @@ def build():
         x, tx = proj[g['game_id']]
         parts = {f: round(b.get(f, 0.0) * x[f], 1) for f in FEATS}
         parts['roster'] = round(x.get('roster', 0.0), 1)
-        mar = sum(b.get(f, 0.0) * x[f] for f in FEATS) + x.get('roster', 0.0)
+        nx = g['game_id'] in {q['game_id'] for q in nxt}
+        trade = tpts.get(team(g['home_team']), 0.0) - tpts.get(team(g['away_team']), 0.0) if nx else 0.0
+        if trade:
+            parts['trade'] = round(trade, 1)
+        mar = sum(b.get(f, 0.0) * x[f] for f in FEATS) + x.get('roster', 0.0) + trade
         tot = sum(tb[f] * tx[f] for f in TFEATS)
         line = num(g['spread_line'], None); tl = num(g['total_line'], None)
         r = {'id': g['game_id'], 'espn': g['espn'], 'kick': kick(g), 'week': int(g['week']), 'date': g['gameday'], 'time': g['gametime'], 'day': g['weekday'][:3],
@@ -942,8 +954,11 @@ def build():
              'hs': round((tot + mar) / 2, 1), 'as': round((tot - mar) / 2, 1), 'parts': parts,
              'elo': {'home': round(m.elo[team(g['home_team'])]), 'away': round(m.elo[team(g['away_team'])])},
              'line': line, 'tline': tl, 'ml': {'home': g['home_moneyline'], 'away': g['away_moneyline']}}
-        if g['game_id'] in {q['game_id'] for q in nxt}:
+        if nx:
             r['inj'] = {'home': iwho.get(team(g['home_team']), []), 'away': iwho.get(team(g['away_team']), [])}
+            mv = {s_: NT.card(tmv.get(team(g[f'{s_}_team']), []), tnames) for s_ in ('home', 'away')} if NT else {}
+            if any(mv.values()):
+                r['moves'] = mv
             for side in ('home', 'away'):
                 i = qbinfo.get(team(g[f'{side}_team']))
                 if i and i['pNow'] < 1 and i['alt'][0]:

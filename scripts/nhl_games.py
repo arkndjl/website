@@ -435,19 +435,39 @@ def _war(S):
 
 def lineup_value(S, gid, t):
     """goals a 60 the team's dressed skaters add at their projected rates and usual ice time; None without data"""
-    ids = _lineups(S).get(str(gid), {}).get(t)
+    return ids_value(S, _lineups(S).get(str(gid), {}).get(t))
+
+
+def skater_value(S, x):
+    """one skater's goals a 60 at his projected rate and usual ice time ('<player id><F|D>'); None without data"""
     w = _war(S)
-    if not ids or w is None:
+    if w is None:
         return None
     ps, repl, avg = w
-    v = 0.0
-    for x in ids:                                   # '<player id><F|D>'
-        p, g = ps.get(x[:-1]), x[-1]
-        if p:
-            v += p['hpm'] * min(p['toi'] * 60 / p['gp'] if p['gp'] else avg[g], 1800) / 3600
-        else:                                       # newcomer: replacement level at his position's usual ice time
-            v += repl.get(g, 0.0) * avg[g] / 3600
-    return v
+    p, g = ps.get(x[:-1]), x[-1]
+    if p:
+        return p['hpm'] * min(p['toi'] * 60 / p['gp'] if p['gp'] else avg[g], 1800) / 3600
+    return repl.get(g, 0.0) * avg[g] / 3600          # newcomer: replacement level at his position's usual ice time
+
+
+def ids_value(S, ids):
+    if not ids or _war(S) is None:
+        return None
+    return sum(skater_value(S, x) for x in ids)
+
+
+def moved_lineup(S, ids, dep, arr):
+    """the last lineup after moves (Nov 1 2026): skaters now with another club out, skaters acquired since in, the
+    same count of forwards and defencemen (the lowest-valued scratched for an arrival, a replacement-level call-up
+    for a departure without one)"""
+    keep = [x for x in ids if x[:-1] not in dep]
+    keep += [x for x in arr if x not in keep]
+    out = []
+    for g in ('F', 'D'):
+        n = sum(1 for x in ids if x[-1] == g)
+        mine = sorted([x for x in keep if x[-1] == g], key=lambda x: -(skater_value(S, x) or 0.0))[:n]
+        out += mine + [f'repl{i}{g}' for i in range(n - len(mine))]
+    return out
 
 
 # ---------------------------------------------------------------- the walk
@@ -468,13 +488,15 @@ class Model:
         self.day, self.S = None, None
         self.lastday = {}
         self.lv = {}                                             # team -> its last lineup's value, this season
+        self.ln = {}                                             # team -> its last lineup ('<id><F|D>'), this season
+        self.moves = None    # (S, team, game) -> (ids gone to another club, ids acquired since): trades, claims
         self.W = defaultdict(int); self.L = defaultdict(int); self.OTL = defaultdict(int)
 
     def advance(self, day, S):
         if self.S is not None and S != self.S:
             for e in (self.xg, self.gl, self.x5, self.st, self.mk, self.elo, self.gk):
                 e.season()
-            self.W.clear(); self.L.clear(); self.OTL.clear(); self.lv.clear()
+            self.W.clear(); self.L.clear(); self.OTL.clear(); self.lv.clear(); self.ln.clear()
         if self.day is not None and day > self.day:
             n = _days(self.day, day)
             for e in (self.xg, self.gl, self.x5, self.st, self.mk):
@@ -494,7 +516,7 @@ class Model:
         rgh = self.gk.rating(gh) if gh else self.gk.expected(h)
         rga = self.gk.rating(ga) if ga else self.gk.expected(a)
         rh, ra = self.rest(h, g['day']), self.rest(a, g['day'])
-        rv = self.lv[h] - self.lv[a] if h in self.lv and a in self.lv else 0.0
+        rv = self.lv_now(h, g) - self.lv_now(a, g) if h in self.lv and a in self.lv else 0.0
         f = {'elo': (self.elo.r[h] - self.elo.r[a]) / 100, 'xg': self.xg.net(h, a), 'g': self.gl.net(h, a),
              'x5': self.x5.net(h, a), 'st': self.st.net(h, a), 'mkt': self.mk.rating(h) - self.mk.rating(a),
              'gk': rgh - rga, 'gkd': (rgh - self.gk.expected(h)) - (rga - self.gk.expected(a)),
@@ -503,11 +525,21 @@ class Model:
              'gkT': -(rgh + rga), 'one': 1.0}
         return f
 
+    def lv_now(self, t, g=None):
+        """the team's last lineup's value, after any moves since (self.moves)"""
+        if self.moves is None or t not in self.ln:
+            return self.lv[t]
+        dep, arr = self.moves(self.S, t, g, self.ln[t])
+        if not dep and not arr:
+            return self.lv[t]
+        v = ids_value(self.S, moved_lineup(self.S, self.ln[t], dep, arr))
+        return self.lv[t] if v is None else v
+
     def lineup(self, t):
         """the team's last lineup value against the league's average one (0 before it has played)"""
         if t not in self.lv:
             return 0.0
-        return self.lv[t] - sum(self.lv.values()) / len(self.lv)
+        return self.lv_now(t) - sum(self.lv_now(u) for u in self.lv) / len(self.lv)
 
     def _backup(self, t, p):
         d = self.gk.depth(t)
@@ -540,6 +572,7 @@ class Model:
             v = lineup_value(g['S'], g['id'], t)
             if v is not None:
                 self.lv[t] = v
+                self.ln[t] = _lineups(g['S']).get(str(g['id']), {}).get(t)
         hw = g['hs'] > g['as']
         ot = (g.get('per') or 3) > 3
         if not g.get('po'):
@@ -548,9 +581,89 @@ class Model:
             (self.OTL if ot else self.L)[l] += 1
 
 
-def walk(games, P, upcoming=(), starters=None):
-    """every final game's pre-game inputs, in order; then upcoming games' inputs from the final state"""
+def hist_moves(games):
+    """the backtest's moves (Nov 1 2026): for club t's game, skaters in its last lineup who don't dress and next
+    dress for another club (gone), and skaters who dress for it whose previous game was for another club (acquired).
+    Built from the frozen lineups; the trade itself is known before the game, the dressed list a little later, so
+    this is a hair kinder than live, which reads the clubs' rosters"""
+    day = {str(g['id']): g['day'] for g in games}
+    seq = defaultdict(list)                    # (S, pid) -> [(day, gid, team)]
+    for S in sorted({g['S'] for g in games}):
+        for gid, by in _lineups(S).items():
+            if gid not in day:
+                continue
+            for t, ids in by.items():
+                for x in ids:
+                    seq[(S, x[:-1])].append((day[gid], gid, t, x))
+    for v in seq.values():
+        v.sort()
+    idx = {k: {gid: i for i, (_, gid, _, _) in enumerate(v)} for k, v in seq.items()}
+
+    def moves(S, t, g, last=None):
+        if g is None:
+            return set(), []
+        gid = str(g['id'])
+        now = set(x[:-1] for x in _lineups(S).get(gid, {}).get(t, []))
+        dep = set()
+        for x in (last or []):
+            p = x[:-1]
+            if p in now:
+                continue
+            v = seq.get((S, p), [])
+            nxt = [e for e in v if e[0] >= g['day'] and e[1] != gid]
+            if nxt and nxt[0][2] != t:
+                dep.add(p)
+        arr = []
+        for x in _lineups(S).get(gid, {}).get(t, []):
+            k = (S, x[:-1]); i = idx.get(k, {}).get(gid)
+            if i and seq[k][i - 1][2] != t:
+                arr.append(x)
+        return dep, arr
+    return moves
+
+
+def live_moves(S, games):
+    """this season's moves for the board: every club's NHL roster now (api-web), against the lineups dressed so far.
+    Gone: a skater in the club's last lineup who is on another club's roster now. Acquired: a skater on the club's
+    roster whose last game this season, in the last 30 days, was for another club"""
+    now = {}
+    for t in TEAMS:
+        j = D.get(f'{D.WEB}/roster/{t}/current') or {}
+        for grp, gc in (('forwards', 'F'), ('defensemen', 'D')):
+            for p in j.get(grp) or []:
+                now[str(p['id'])] = (t, gc)
+    if len(now) < 500:
+        raise RuntimeError(f'rosters: {len(now)} skaters')
+    day = {str(g['id']): g['day'] for g in games if g['S'] == S}
+    last = {}
+    for gid, by in _lineups(S).items():
+        d = day.get(gid)
+        if d is None:
+            continue
+        for t, ids in by.items():
+            for x in ids:
+                if x[:-1] not in last or d >= last[x[:-1]][0]:
+                    last[x[:-1]] = (d, t, x)
+    cut = (dt.date.today() - dt.timedelta(days=30)).isoformat()
+    arr = defaultdict(list)
+    for p, (d, t0, x) in last.items():
+        if p in now and now[p][0] != t0 and d >= cut:
+            arr[now[p][0]].append(p + now[p][1])
+    n = sum(len(v) for v in arr.values())
+    print('nhl moves: skaters on a new club since their last game', n, flush=True)
+
+    def moves(S_, t, g, ln=None):
+        dep = {x[:-1] for x in (ln or []) if x[:-1] in now and now[x[:-1]][0] != t}
+        return dep, arr.get(t, [])
+    return moves
+
+
+def walk(games, P, upcoming=(), starters=None, moves=None, up_moves=None):
+    """every final game's pre-game inputs, in order; then upcoming games' inputs from the final state. moves: the
+    backtest's hist_moves callable for every game; up_moves: live_moves, for the upcoming games only (None: the
+    last lineup as dressed)"""
     m = Model(P)
+    m.moves = moves
     rows = []
     for g in games:
         m.advance(g['day'], g['S'])
@@ -559,6 +672,8 @@ def walk(games, P, upcoming=(), starters=None):
             rows.append((g, f))
         m.update(g)
     up = []
+    if up_moves is not None:
+        m.moves = up_moves
     for g in upcoming:
         m.advance(g['day'], g['S'])
         st = (starters or {}).get(g['id'], {})
@@ -737,7 +852,7 @@ def fit():
     else:
         P, _ = tune(hist)
         P, _ = tune(hist, P)              # a second pass from the first pass's settings
-    m, rows, _ = walk(hist, P)
+    m, rows, _ = walk(hist, P, moves=hist_moves(hist))     # lineups after trades (Nov 1 2026)
     # non-market inputs on the long record (2017-23 tuning, every game); then the market rating on the lined seasons
     nm = [k for k in FEATS if k != 'mkt']
     ev = evidence(rows, nm, CANDS + EXTRA, lined_only=False, first=SCORE_FROM + 1, tune_s=(SCORE_FROM + 1, TUNE[1]))
@@ -1071,7 +1186,11 @@ def build():
             starters[g['id']] = {'h': gh, 'a': ga}
             gsrc[g['id']] = {'h': sh, 'a': sa}
     pending = [g for g in up if g['id'] not in done_ids]
-    m, _, ups = walk(hist + finals, P, pending, starters)
+    try:   # trades and claims since each club's last game (its NHL roster now)
+        mv = live_moves(S, finals)
+    except Exception as e:
+        print('nhl moves:', e, file=sys.stderr); mv = None
+    m, _, ups = walk(hist + finals, P, pending, starters, up_moves=mv)
     # market lines for the board (ESPN's current consensus)
     emap = D.espn_map([{'id': g['id'], 'day': g['day'], 'h': g['h'], 'a': g['a']} for g in up], fresh_after=today - dt.timedelta(days=1))
     try:
