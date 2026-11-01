@@ -9,7 +9,8 @@ key players from the committed leaderboards and writes the file:
     {asof, sport, pm: key players' metric, teams: {key: {parts: [[input, value]], pparts: [[term, value]],
      sch: [[date or week, opponent key, 'v' home | '@' away | 'n' neutral, score for, score against, win chance, margin
      (, draw chance: soccer)]],
-     pl: [[name, position, metric, note]]}}, nm: {opponent key: name} (opponents off the power table)}
+     pl: [[name, position, metric, note]], yg: [[name, position, metric, note]]}}, nm: {opponent key: name} (opponents off the power table),
+     ym: young talent's metric, yd: who counts as young (the team GFX card and the dropdown)}
 
 parts are each input's push on the rating against an average team, in the rating's units, so they sum to the rating
 (up to rounding). A played game has its score and no win chance; a game left has the win chance and margin the
@@ -100,18 +101,70 @@ def players(sport):
     return '', {}
 
 
+# elite young talent: per sport, who counts as young and the metric they are ordered by
+YOUNG = {'cbb': ('FV', 'Fr/So by FV'), 'cfb': ('FV', 'Fr/So by FV'), 'nfl': ('WAR', 'age 24 and under by WAR'),
+         'nba': ('XPM', 'age 23 and under by XPM'), 'nhl': ('FV', 'drafted prospects by FV'), 'soccer': ('FV', 'under-22 by FV')}
+
+
+def young(sport, n=3):
+    """{team key: [[name, pos, metric, note], ...]}: the team's best young players (YOUNG says who)"""
+    by = defaultdict(list)
+    if sport in ('cbb', 'cfb'):
+        for r in _board(os.path.join(SD, f'{sport}-all.json')):
+            m = re.search(r'/(\d+)\.png', r.get('logo') or '')
+            if m and r.get('fv') and re.search(r'(^|-)(Fr|So)$', r.get('cls') or ''):
+                note = ' · '.join(x for x in (r.get('cls'), f"age {r['age']:.1f}" if r.get('age') else None) if x)
+                by[m[1]].append((r['fv'] + (r.get('fvx') or 0) * 1e-3, [r['name'], r.get('pos') or '', r['fv'], note]))
+    elif sport == 'nfl':
+        for p in (_load(os.path.join(SD, 'nfl-war.json')) or {}).get('players', []):
+            if p.get('age') and p['age'] <= 24 and p.get('war') is not None:
+                by[p['t']].append((p['war'], [p['n'], p['pos'], round(p['war'], 2), f"age {p['age']}" + (' · rookie' if p.get('rook') else '')]))
+    elif sport == 'nba':
+        for p in (_latest('nba-xpm') or {}).get('players', []):
+            if p.get('age') and p['age'] <= 23 and (p.get('mp') or 0) >= 30:
+                x = p.get('sxpm', p['xpm'])
+                by[NBA_BR.get(p['tm'], p['tm'])].append((x, [p['n'], p['pos'], x, f"age {p['age']}, {p['mp']} min"]))
+    elif sport == 'nhl':
+        for p in (_load(os.path.join(ROOT, 'data', 'hockey.json')) or {}).get('pipe', []):
+            if p.get('team') and p.get('fv'):
+                note = ' · '.join(x for x in (f"{p['year']} #{p['pick']}" if p.get('pick') else None, p.get('league'), f"age {p['age']:.1f}" if p.get('age') else None) if x)
+                by[p['team']].append((p['fv'] + (p.get('fvx') or 0) * 1e-3, [p['name'], p.get('pos') or '', p['fv'], note]))
+    elif sport == 'soccer':
+        # prospects carry the Transfermarkt id and club name; the soccer WAR rows carry the id (photo) and the ESPN club
+        ids = (_load(os.path.join(ROOT, 'data', 'soccer_logos.json')) or {}).get('espn', {})
+        tm, club = {}, {}
+        for p in (_latest('soccer-war') or {}).get('players', []):
+            m = re.match(r'(\d+)-', p.get('ph') or '')
+            if m and ids.get(p['team']):
+                tm[m[1]] = ids[p['team']]
+        pros = (_load(os.path.join(ROOT, 'data', 'soccer_prospects.json')) or {}).get('board', [])
+        for p in pros:
+            t = tm.get(str(p.get('id')))
+            if t:
+                club.setdefault(p.get('club'), t)
+        for p in pros:
+            t = tm.get(str(p.get('id'))) or club.get(p.get('club'))
+            if t and p.get('fv') and not p.get('prov'):
+                note = ' · '.join(x for x in (f"age {p['age']:.1f}" if p.get('age') else None, f"{p['min']} min" if p.get('min') else None) if x)
+                by[t].append((p['fv'] + (p.get('fvx') or 0) * 1e-3, [p['name'], p.get('pos') or '', p['fv'], note]))
+    return _top(by, n)
+
+
 def save(sport, teams, names=None, asof=None):
     """teams: {key: {'parts': [...], 'pparts': [...], 'sch': [...]}} (any may be missing); names: {opponent key: name}"""
     pm, pl = players(sport)
+    yg = young(sport)
     out = {}
     for k, v in teams.items():
-        v = {a: b for a, b in v.items() if b}
+        v = {a: b for a, b in v.items() if b and a not in ('pl', 'yg')}
         if pl.get(k):
             v['pl'] = pl[k]
+        if yg.get(k):
+            v['yg'] = yg[k]
         out[k] = v
     for k in pl:
         out.setdefault(k, {'pl': pl[k]})
-    res = {'asof': asof or datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'sport': sport, 'pm': pm, 'teams': out,
+    res = {'asof': asof or datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'sport': sport, 'pm': pm, 'ym': YOUNG.get(sport, ('', ''))[0], 'yd': YOUNG.get(sport, ('', ''))[1], 'teams': out,
            'nm': {k: v for k, v in (names or {}).items()}}
     res = _finite(res)
     os.makedirs(OUT, exist_ok=True)
