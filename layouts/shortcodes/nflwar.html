@@ -8,7 +8,8 @@
        regular at the sub-position adds x share + share x quality, quality = the stat-line parts (EPA, CPOE, pressures,
        coverage allowed, ...) weighted by how much they move team margin, 2018-25. Views: season to date, or per 17 games (100+ snaps).
        Filters: position (and OFF / DEF), team, search. RK and the position rank count within the filters and the
-       view, in WAR order; headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace). */ -}}
+       view, in WAR order; headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace).
+       Medals in the name cell: bdg, the predictive badges (scripts/nfl_badges.py; data/nfl_badge_backtest.json). */ -}}
 {{- $d := site.Data.nfl_war -}}
 {{- $fit := site.Data.nfl_war_fit -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" -}}
@@ -44,7 +45,7 @@
     <table class="cfb__table nflwar__table">
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by WAR within the filters and view">RK</th>
-        <th data-sort="n">Player</th>
+        <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 300+ snaps a season): Target Magnet (WR / TE, targets a snap). It predicted next-season WAR beyond this season's WAR and age, held out (scripts/nfl_badge_backtest.py)">Player</th>
         <th data-sort="war" data-num title="WAR = .6 x AV WAR + .4 x XV, season to date. AV WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV; replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
         <th data-sort="pace" data-num title="WAR/17 = WAR x 17 / team games">WAR/17</th>
         <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
@@ -61,6 +62,7 @@
     </table>
     <p class="cfb__none" data-nw-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-nw-none hidden>no players match.</p>
+    <p class="cfb__dim cfb__bdgnote">medals: Target Magnet (WR, TE), the 1 of 21 trait badges that predicted next-season WAR beyond this season's WAR and age (2018-25, leave one season out, t clustered by player). hover for the stat and percentile.</p>
   </div>
   <div class="win__status"><span data-nw-count>{{ with $d }}{{ .n }} players{{ end }}</span>
     <span class="winpager" data-nw-pager hidden>
@@ -83,6 +85,10 @@
   // team logo (static/img/nfl/<abbr>.png), 16 px inline; a code with no file drops it
   function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  // predictive badges (scripts/nfl_badges.py, the CFB board's pixel medals): [name, tier, pct, stat], best first
+  var TIER = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
+  function nth(n) { var t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return n + t; }
+  function medals(p) { return p.bdg ? '<span class="cfb__medals" title="' + esc(p.bdg.map(function (b) { return TIER[b[1]] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct at position, ' + b[3]; }).join('\n') + '\npredictive of next-season NFL WAR beyond the WAR') + '">' + p.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
   function f2(x) { return x == null ? '' : x.toFixed(2); }
   function waa(x) { return x == null ? '' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(2) + '</span>'; }
   function readHash() {
@@ -128,7 +134,7 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>' +
         '<td class="cfb__num nflwar__war' + (pace ? '' : ' is-key') + '">' + f2(p.war) + '</td>' +
         '<td class="cfb__num nflwar__war' + (pace ? ' is-key' : '') + '">' + f2(p.pace) + '</td>' +
         '<td class="cfb__num">' + waa(pace ? p.waaP : p.waa) + '</td>' +

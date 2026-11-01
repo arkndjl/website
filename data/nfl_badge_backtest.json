@@ -1,0 +1,412 @@
+{
+ "asof": "2026-11-01",
+ "method": "see scripts/nfl_badge_backtest.py",
+ "years": [
+  2018,
+  2024
+ ],
+ "outcome": "next season's board WAR",
+ "control": "this season's WAR by position, age, age^2",
+ "badges": {
+  "deep": {
+   "name": "Deep Ball",
+   "pos": [
+    "QB"
+   ],
+   "stat": "EPA per pass 20+ air yards",
+   "pairs": 199,
+   "r": 0.262,
+   "nVol": 52.1,
+   "k": 147.1,
+   "n": 279,
+   "players": 88,
+   "coef": 0.012,
+   "t": 0.33,
+   "oosGain": -1.805,
+   "pass": false
+  },
+  "pocket": {
+   "name": "Pocket Presence",
+   "pos": [
+    "QB"
+   ],
+   "stat": "sacks per pressure (fewer)",
+   "pairs": 199,
+   "r": 0.342,
+   "nVol": 108.6,
+   "k": 209.3,
+   "n": 279,
+   "players": 88,
+   "coef": -0.02,
+   "t": -0.55,
+   "oosGain": -1.005,
+   "pass": false
+  },
+  "accurate": {
+   "name": "Accurate",
+   "pos": [
+    "QB"
+   ],
+   "stat": "completion % over expected",
+   "pairs": 199,
+   "r": 0.28,
+   "nVol": 448.3,
+   "k": 1150.1,
+   "n": 279,
+   "players": 88,
+   "coef": 0.001,
+   "t": 0.01,
+   "oosGain": -0.727,
+   "pass": false
+  },
+  "clean": {
+   "name": "Clean Thrower",
+   "pos": [
+    "QB"
+   ],
+   "stat": "bad-throw rate (lower)",
+   "pairs": 199,
+   "r": 0.42,
+   "nVol": 448.3,
+   "k": 618.2,
+   "n": 279,
+   "players": 88,
+   "coef": -0.037,
+   "t": -1.01,
+   "oosGain": -0.539,
+   "pass": false
+  },
+  "scramble": {
+   "name": "Scrambler",
+   "pos": [
+    "QB"
+   ],
+   "stat": "rushing first downs a play",
+   "pairs": 199,
+   "r": 0.836,
+   "nVol": 530.6,
+   "k": 104.4,
+   "n": 279,
+   "players": 88,
+   "coef": 0.032,
+   "t": 0.71,
+   "oosGain": -0.365,
+   "pass": false
+  },
+  "recv": {
+   "name": "Receiving Back",
+   "pos": [
+    "RB"
+   ],
+   "stat": "receiving yards a snap",
+   "pairs": 245,
+   "r": 0.615,
+   "nVol": 543.6,
+   "k": 340.1,
+   "n": 378,
+   "players": 146,
+   "coef": 0.001,
+   "t": 0.09,
+   "oosGain": -0.592,
+   "pass": false
+  },
+  "btk": {
+   "name": "Tackle Breaker",
+   "pos": [
+    "RB"
+   ],
+   "stat": "broken tackles a touch",
+   "pairs": 243,
+   "r": 0.404,
+   "nVol": 221.0,
+   "k": 326.6,
+   "n": 376,
+   "players": 146,
+   "coef": 0.006,
+   "t": 0.4,
+   "oosGain": -0.389,
+   "pass": false
+  },
+  "yco": {
+   "name": "After Contact",
+   "pos": [
+    "RB"
+   ],
+   "stat": "yards after contact a carry",
+   "pairs": 240,
+   "r": 0.209,
+   "nVol": 176.9,
+   "k": 671.1,
+   "n": 371,
+   "players": 144,
+   "coef": 0.012,
+   "t": 0.58,
+   "oosGain": -0.519,
+   "pass": false
+  },
+  "runeff": {
+   "name": "Efficient Runner",
+   "pos": [
+    "RB"
+   ],
+   "stat": "rushing EPA a carry",
+   "pairs": 238,
+   "r": 0.249,
+   "nVol": 176.6,
+   "k": 533.2,
+   "n": 369,
+   "players": 144,
+   "coef": -0.052,
+   "t": -3.59,
+   "oosGain": 1.498,
+   "pass": false
+  },
+  "yac": {
+   "name": "YAC",
+   "pos": [
+    "WR",
+    "TE"
+   ],
+   "stat": "yards after catch over expected",
+   "pairs": 909,
+   "r": 0.331,
+   "nVol": 46.9,
+   "k": 95.0,
+   "n": 1304,
+   "players": 470,
+   "coef": -0.002,
+   "t": -0.28,
+   "oosGain": -0.229,
+   "pass": false
+  },
+  "target": {
+   "name": "Target Magnet",
+   "pos": [
+    "WR",
+    "TE"
+   ],
+   "stat": "targets a snap",
+   "pairs": 911,
+   "r": 0.77,
+   "nVol": 662.7,
+   "k": 197.9,
+   "n": 1307,
+   "players": 472,
+   "coef": 0.029,
+   "t": 4.22,
+   "oosGain": 0.801,
+   "pass": true
+  },
+  "hands": {
+   "name": "Hands",
+   "pos": [
+    "WR",
+    "TE"
+   ],
+   "stat": "drop rate (lower)",
+   "pairs": 909,
+   "r": 0.029,
+   "nVol": 74.8,
+   "k": 2479.0,
+   "note": "year-to-year r < .15: noise",
+   "pass": false
+  },
+  "chains": {
+   "name": "Chain Mover",
+   "pos": [
+    "WR",
+    "TE"
+   ],
+   "stat": "receiving first downs a snap",
+   "pairs": 911,
+   "r": 0.712,
+   "nVol": 662.7,
+   "k": 268.4,
+   "n": 1307,
+   "players": 472,
+   "coef": 0.032,
+   "t": 3.14,
+   "oosGain": 0.432,
+   "note": "dropped in the joint fit (t -0.05)",
+   "pass": false
+  },
+  "tgteff": {
+   "name": "Efficient Target",
+   "pos": [
+    "WR",
+    "TE"
+   ],
+   "stat": "receiving EPA a target",
+   "pairs": 909,
+   "r": 0.166,
+   "nVol": 74.8,
+   "k": 375.5,
+   "n": 1304,
+   "players": 470,
+   "coef": -0.038,
+   "t": -6.06,
+   "oosGain": 1.301,
+   "pass": false
+  },
+  "rush": {
+   "name": "Pass Rusher",
+   "pos": [
+    "EDGE",
+    "DL",
+    "LB"
+   ],
+   "stat": "pressures a snap",
+   "pairs": 1355,
+   "r": 0.799,
+   "nVol": 657.4,
+   "k": 165.9,
+   "n": 2093,
+   "players": 677,
+   "coef": 0.005,
+   "t": 1.19,
+   "oosGain": -0.003,
+   "pass": false
+  },
+  "sack": {
+   "name": "Sack Artist",
+   "pos": [
+    "EDGE",
+    "DL"
+   ],
+   "stat": "sacks a snap",
+   "pairs": 964,
+   "r": 0.46,
+   "nVol": 606.6,
+   "k": 713.4,
+   "n": 1465,
+   "players": 474,
+   "coef": -0.002,
+   "t": -0.35,
+   "oosGain": -0.129,
+   "pass": false
+  },
+  "run": {
+   "name": "Run Stopper",
+   "pos": [
+    "EDGE",
+    "DL",
+    "LB",
+    "S"
+   ],
+   "stat": "run stops a snap",
+   "pairs": 1790,
+   "r": 0.723,
+   "nVol": 697.8,
+   "k": 267.1,
+   "n": 2710,
+   "players": 893,
+   "coef": -0.0,
+   "t": -0.14,
+   "oosGain": -0.05,
+   "pass": false
+  },
+  "tfl": {
+   "name": "Backfield",
+   "pos": [
+    "EDGE",
+    "DL"
+   ],
+   "stat": "run tackles for loss a snap",
+   "pairs": 964,
+   "r": 0.238,
+   "nVol": 606.6,
+   "k": 1943.2,
+   "n": 1465,
+   "players": 474,
+   "coef": -0.009,
+   "t": -2.19,
+   "oosGain": 0.183,
+   "pass": false
+  },
+  "tackle": {
+   "name": "Sure Tackler",
+   "pos": [
+    "LB",
+    "CB",
+    "S"
+   ],
+   "stat": "missed-tackle rate (lower)",
+   "pairs": 1407,
+   "r": 0.234,
+   "nVol": 78.3,
+   "k": 256.5,
+   "n": 2113,
+   "players": 760,
+   "coef": 0.005,
+   "t": 1.32,
+   "oosGain": 0.005,
+   "pass": false
+  },
+  "ballhawk": {
+   "name": "Ballhawk",
+   "pos": [
+    "LB",
+    "CB",
+    "S"
+   ],
+   "stat": "INTs + passes defended a snap",
+   "pairs": 1407,
+   "r": 0.398,
+   "nVol": 775.6,
+   "k": 1171.3,
+   "n": 2113,
+   "players": 760,
+   "coef": -0.009,
+   "t": -2.0,
+   "oosGain": 0.091,
+   "pass": false
+  },
+  "cover": {
+   "name": "Coverage",
+   "pos": [
+    "LB",
+    "CB",
+    "S"
+   ],
+   "stat": "yards allowed in coverage a snap (fewer)",
+   "pairs": 1407,
+   "r": 0.523,
+   "nVol": 775.6,
+   "k": 707.5,
+   "n": 2113,
+   "players": 760,
+   "coef": -0.006,
+   "t": -1.59,
+   "oosGain": 0.076,
+   "pass": false
+  },
+  "lockdown": {
+   "name": "Lockdown",
+   "pos": [
+    "CB",
+    "S"
+   ],
+   "stat": "catch rate allowed (lower)",
+   "pairs": 1016,
+   "r": 0.194,
+   "nVol": 56.1,
+   "k": 232.5,
+   "n": 1485,
+   "players": 516,
+   "coef": -0.01,
+   "t": -1.69,
+   "oosGain": 0.126,
+   "pass": false
+  }
+ },
+ "joint": {
+  "n": 1307,
+  "oosGain": 0.801,
+  "t": {
+   "target": 4.22
+  },
+  "coef": {
+   "target": 0.029
+  }
+ }
+}
