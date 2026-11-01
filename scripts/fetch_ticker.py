@@ -170,6 +170,7 @@ def main():
             prev = next((x for x in old.get('teams') or [] if x.get('key') == t[0]), None)
             if prev:
                 teams.append(prev)
+    teams.sort(key=lambda t: t['games'][0]['at'] if t.get('games') else '9999')   # soonest game first
     out = {'teams': teams, 'nt': nt_rows()}
     if {k: old.get(k) for k in out} == out:
         print('ticker: no change')
