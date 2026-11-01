@@ -3818,6 +3818,9 @@ table.trophycase__hist td.trophycase__post {
 .tb__need li { margin: 0 0 4px; }
 .tb__fcs { margin: 8px 0 0; }
 .tb__note { margin: 6px 0 0; font-size: 0.85em; }
+.nhlwar__note { margin: 6px 8px; font-size: 0.85em; }
+.nhlwar__mdt { display: none; }
+@media (max-width: 684px) { .nhlwar__mdn { display: none; } .nhlwar__mdt { display: inline; } }
 .tb__btick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #fff; }
 i.tb__seg--over { width: 2px !important; background: #fff; }
 .tb__dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 12px; }

@@ -1033,7 +1033,7 @@ def build():
     board += [p for p in prov if p['fv'] >= PROV_SHOW]
     board.sort(key=lambda r: (-r['fvx'], r['rk'] or 999))
     # 2. drafted, not yet NHL regulars: the newest five classes
-    pipe = []
+    pipe, pairs = [], []
     for r in rows:
         k = (cur - 1) - r['year']                      # completed seasons since the draft
         if k < 0 or k > 4 or r['year'] < cur - 6:
@@ -1072,6 +1072,13 @@ def build():
                      'wjc': int(bool(px.get('wjc'))) if k else 0, 'progp': px.get('progp') if k else None,
                      'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None, 'comps': comps,
                      'pre': round(pn, 2) if k and pn is not None else None})
+        pairs.append((pipe[-1], r))
+    # predictive badges (scripts/hockey_badges.py, display only): the CHL line of a stage he has a tested badge for
+    try:
+        import hockey_badges as HB
+        print('hockey badges:', HB.assign(pairs), 'pipeline players', flush=True)
+    except Exception as e:
+        print('hockey badges skipped:', e)
     pipe.sort(key=lambda r: -r['fvx'])
     pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
     # 3. past classes: the out-of-class draft grade and what each pick became
