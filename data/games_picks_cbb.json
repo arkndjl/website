@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-01T02:39:26Z",
+ "asof": "2026-11-01T05:42:55Z",
  "recenter": {
   "2026-11-01": -10.6,
   "2026-11-02": -11.44
@@ -124,9 +124,15 @@
    "tm": 143.7,
    "flagged": "2026-11-01T00:09:20Z",
    "betTo": 17.0,
-   "close": 12.5,
-   "pass": true,
-   "now": null
+   "close": 13.5,
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 13.5,
+    "price": 106.0,
+    "ev": 0.133,
+    "units": 5.0
+   }
   },
   {
    "id": "401921423",
@@ -157,6 +163,39 @@
     "price": 110.0,
     "ev": 0.011,
     "units": 1.0
+   }
+  },
+  {
+   "id": "401911707",
+   "espn": "401911707",
+   "sport": "cbb",
+   "kick": "2026-11-02T16:30:00Z",
+   "home": "Tennessee State",
+   "away": "Murray State",
+   "mk": "total",
+   "side": "over",
+   "line": 161.5,
+   "price": -105.0,
+   "p": 0.53,
+   "ev": 0.036,
+   "units": 0.5,
+   "edge": 3.3,
+   "x": 2.0,
+   "pDU": 0.5147,
+   "evDU": 0.0048,
+   "m": -8.5,
+   "tm": 164.8,
+   "tmRaw": 153.4,
+   "flagged": "2026-11-01T05:42:55Z",
+   "betTo": 162.5,
+   "close": 161.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 161.5,
+    "price": -105.0,
+    "ev": 0.036,
+    "units": 0.5
    }
   },
   {
@@ -261,21 +300,6 @@
    "withdrawn": "2026-11-01T00:50:25Z"
   },
   {
-   "id": "401911707",
-   "sport": "cbb",
-   "kick": "2026-11-02T16:30:00Z",
-   "home": "Tennessee State",
-   "away": "Murray State",
-   "mk": "total",
-   "side": "under",
-   "line": 160.5,
-   "price": -110.0,
-   "units": 0.25,
-   "edge": -4.3,
-   "x": 2.0,
-   "withdrawn": "2026-11-01T00:50:25Z"
-  },
-  {
    "id": "401921423",
    "sport": "cbb",
    "kick": "2026-11-02T14:00:00Z",
@@ -293,22 +317,6 @@
  ],
  "board": [
   {
-   "id": "401909771",
-   "sport": "cbb",
-   "kick": "2026-11-03T00:00:00Z",
-   "home": "Iowa State",
-   "away": "Memphis",
-   "mk": "spread",
-   "side": "home",
-   "line": 12.5,
-   "price": -122.0,
-   "edge": 7.2,
-   "x": 2.5,
-   "why": "no edge at -122",
-   "m": 19.7,
-   "tm": 155.1
-  },
-  {
    "id": "401911532",
    "sport": "cbb",
    "kick": "2026-11-02T19:00:00Z",
@@ -323,22 +331,6 @@
    "why": "no edge at -110",
    "m": 0.7,
    "tm": 153.5
-  },
-  {
-   "id": "401911707",
-   "sport": "cbb",
-   "kick": "2026-11-02T16:30:00Z",
-   "home": "Tennessee State",
-   "away": "Murray State",
-   "mk": "total",
-   "side": "over",
-   "line": 160.5,
-   "price": -110.0,
-   "edge": 4.3,
-   "x": 2.0,
-   "why": "no edge at -110",
-   "m": -8.5,
-   "tm": 164.8
   },
   {
    "id": "401919014",
@@ -405,6 +397,22 @@
    "tm": 154.4
   },
   {
+   "id": "401906769",
+   "sport": "cbb",
+   "kick": "2026-11-02T23:00:00Z",
+   "home": "Florida",
+   "away": "Miami",
+   "mk": "spread",
+   "side": "away",
+   "line": 5.5,
+   "price": -125.0,
+   "edge": 1.0,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 4.5,
+   "tm": 156.6
+  },
+  {
    "id": "401920982",
    "sport": "cbb",
    "kick": "2026-11-01T14:30:00Z",
@@ -419,22 +427,6 @@
    "why": "edge under 2.5",
    "m": 7.0,
    "tm": 147.5
-  },
-  {
-   "id": "401906769",
-   "sport": "cbb",
-   "kick": "2026-11-02T23:00:00Z",
-   "home": "Florida",
-   "away": "Miami",
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
-   "price": -102.0,
-   "edge": 0.0,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 4.5,
-   "tm": 156.6
   }
  ],
  "games": {
@@ -465,9 +457,9 @@
   "401906769": {
    "mk": "spread",
    "side": "away",
-   "line": 4.5,
-   "price": -102.0,
-   "edge": 0.0,
+   "line": 5.5,
+   "price": -125.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "Florida",
@@ -477,14 +469,14 @@
   "401909771": {
    "mk": "spread",
    "side": "home",
-   "line": 12.5,
-   "price": -122.0,
-   "edge": 7.2,
-   "ev": null,
-   "units": 0.0,
+   "line": 13.5,
+   "price": 106.0,
+   "ev": 0.133,
+   "edge": 6.2,
+   "units": 5.0,
    "home": "Iowa State",
    "away": "Memphis",
-   "state": "under"
+   "state": "pick"
   },
   "401919014": {
    "mk": "total",
@@ -525,14 +517,14 @@
   "401911707": {
    "mk": "total",
    "side": "over",
-   "line": 160.5,
-   "price": -110.0,
-   "edge": 4.3,
-   "ev": null,
-   "units": 0.0,
+   "line": 161.5,
+   "price": -105.0,
+   "ev": 0.036,
+   "edge": 3.3,
+   "units": 0.5,
    "home": "Tennessee State",
    "away": "Murray State",
-   "state": "under"
+   "state": "pick"
   },
   "401920912": {
    "mk": "spread",
@@ -599,16 +591,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 53,
+  "snapshots": 58,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 17,
-    "clvRet": -0.0592,
-    "clvT": -10.43,
-    "clv": -0.12,
-    "beat": 0.0,
-    "still": 0.882
+    "clvN": 18,
+    "clvRet": -0.0389,
+    "clvT": -5.37,
+    "clv": 0.17,
+    "beat": 0.167,
+    "still": 0.833
    },
    {
     "when": "6-24h",
@@ -663,8 +655,7 @@
    "tm": 143.7,
    "flagged": "2026-11-01T00:09:20Z",
    "betTo": 17.0,
-   "close": 12.5,
-   "pass": true
+   "close": 13.5
   },
   {
    "id": "401921422",
@@ -740,6 +731,31 @@
    "tm": 155.4,
    "flagged": "2026-11-01T00:09:20Z",
    "close": 1.5
+  },
+  {
+   "id": "401911707",
+   "espn": "401911707",
+   "sport": "cbb",
+   "kick": "2026-11-02T16:30:00Z",
+   "home": "Tennessee State",
+   "away": "Murray State",
+   "mk": "total",
+   "side": "over",
+   "line": 161.5,
+   "price": -105.0,
+   "p": 0.53,
+   "ev": 0.036,
+   "units": 0.5,
+   "edge": 3.3,
+   "x": 2.0,
+   "pDU": 0.5147,
+   "evDU": 0.0048,
+   "m": -8.5,
+   "tm": 164.8,
+   "tmRaw": 153.4,
+   "flagged": "2026-11-01T05:42:55Z",
+   "betTo": 162.5,
+   "close": 161.5
   }
  ]
 }
