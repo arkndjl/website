@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-01T16:28:27Z",
+ "asof": "2026-11-01T16:31:05Z",
  "recenter": {
-  "week": 0.85
+  "week": 0.83
  },
  "monitor": {
   "clocks": {
@@ -269,8 +269,8 @@
    "flagged": "2026-11-01T16:08:35Z",
    "betTo": 45.5,
    "close": 42.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401866457",
@@ -301,7 +301,7 @@
     "side": "over",
     "line": 51.5,
     "price": -100.0,
-    "ev": 0.047,
+    "ev": 0.048,
     "units": 2.75
    }
   },
@@ -355,9 +355,15 @@
    "tmRaw": 53.8,
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 50.0,
-   "close": 48.5,
-   "now": null,
-   "pass": true
+   "close": 49.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 49.5,
+    "price": -102.0,
+    "ev": 0.023,
+    "units": 1.25
+   }
   }
  ],
  "withdrawn": [],
@@ -377,6 +383,22 @@
    "why": "no edge at -120",
    "m": -8.5,
    "tm": 63.2
+  },
+  {
+   "id": "401858291",
+   "sport": "cfb",
+   "kick": "2026-11-08T00:30:00.000Z",
+   "home": "Notre Dame",
+   "away": "Miami",
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -111.0,
+   "edge": 8.3,
+   "x": 2.5,
+   "why": "no edge at -111",
+   "m": -0.1,
+   "tm": 49.2
   },
   {
    "id": "401864533",
@@ -443,22 +465,6 @@
    "tm": 52.9
   },
   {
-   "id": "401858291",
-   "sport": "cfb",
-   "kick": "2026-11-08T00:30:00.000Z",
-   "home": "Notre Dame",
-   "away": "Miami",
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
-   "price": -111.0,
-   "edge": 4.6,
-   "x": 5.0,
-   "why": "edge under 5 (line: 3-7)",
-   "m": -0.1,
-   "tm": 49.2
-  },
-  {
    "id": "401858514",
    "sport": "cfb",
    "kick": "2026-11-07T20:30:00.000Z",
@@ -467,7 +473,7 @@
    "mk": "spread",
    "side": "away",
    "line": 9.5,
-   "price": -108.0,
+   "price": -115.0,
    "edge": 4.5,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -531,7 +537,7 @@
    "mk": "spread",
    "side": "away",
    "line": -14.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 3.4,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -601,22 +607,6 @@
    "why": "edge under 2.5",
    "m": 8.3,
    "tm": 45.5
-  },
-  {
-   "id": "401866453",
-   "sport": "cfb",
-   "kick": "2026-11-04T00:00:00.000Z",
-   "home": "Akron",
-   "away": "Ohio",
-   "mk": "spread",
-   "side": "away",
-   "line": -12.5,
-   "price": -106.0,
-   "edge": 2.4,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": -14.9,
-   "tm": 53.0
   },
   {
    "id": "401858288",
@@ -717,11 +707,11 @@
  ],
  "games": {
   "401858291": {
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
    "price": -111.0,
-   "edge": 4.6,
+   "edge": 8.3,
    "ev": null,
    "units": 0.0,
    "home": "Notre Dame",
@@ -744,7 +734,7 @@
    "mk": "spread",
    "side": "away",
    "line": 9.5,
-   "price": -108.0,
+   "price": -115.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -912,7 +902,7 @@
    "mk": "spread",
    "side": "away",
    "line": -14.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -949,7 +939,7 @@
    "side": "over",
    "line": 51.5,
    "price": -100.0,
-   "ev": 0.047,
+   "ev": 0.048,
    "edge": 5.0,
    "units": 2.75,
    "home": "Sacramento State",
@@ -969,16 +959,16 @@
    "state": "under"
   },
   "401866453": {
-   "mk": "spread",
-   "side": "away",
-   "line": -12.5,
-   "price": -106.0,
-   "edge": 2.4,
-   "ev": null,
-   "units": 0.0,
+   "mk": "total",
+   "side": "over",
+   "line": 49.5,
+   "price": -102.0,
+   "ev": 0.023,
+   "edge": 3.5,
+   "units": 1.25,
    "home": "Akron",
    "away": "Ohio",
-   "state": "under"
+   "state": "pick"
   },
   "401866455": {
    "mk": "spread",
@@ -1045,16 +1035,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3646,
+  "snapshots": 3652,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 983,
-    "clvRet": -0.0412,
-    "clvT": -17.56,
+    "clvN": 986,
+    "clvRet": -0.0411,
+    "clvT": -17.58,
     "clv": 0.25,
-    "beat": 0.353,
-    "still": 0.4
+    "beat": 0.352,
+    "still": 0.402
    },
    {
     "when": "6-24h",
@@ -1310,8 +1300,7 @@
    "tmRaw": 53.8,
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 50.0,
-   "close": 48.5,
-   "pass": true
+   "close": 49.5
   },
   {
    "id": "401858512",
