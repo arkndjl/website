@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T18:58:14Z",
+ "asof": "2026-11-01T20:17:10Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 111.75,
+  "open": 121.25,
   "path": [
    101.5,
    101.6,
@@ -51,7 +51,7 @@
   ]
  },
  "record": {
-  "n": 150,
+  "n": 154,
   "clvN": 87,
   "clvRet": -0.0292,
   "clvT": -3.78,
@@ -130,7 +130,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 4,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -193,7 +193,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 5,
+   "n": 6,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -214,7 +214,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 6,
+   "n": 7,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -235,7 +235,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 7,
+   "n": 9,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -298,7 +298,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 41,
+   "n": 42,
    "clvN": 25,
    "clvRet": -0.0127,
    "clvT": -1.81,
@@ -319,7 +319,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 62,
+   "n": 63,
    "clvN": 46,
    "clvRet": -0.0351,
    "clvT": -2.78,
@@ -1757,7 +1757,7 @@
    "ev": 0.0293,
    "event": null,
    "pass": false,
-   "close": 40.5
+   "close": 41.5
   },
   {
    "rule": "nflprops-prop",
@@ -1897,7 +1897,7 @@
    "edge": 13.1,
    "ev": 0.0443,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -2220,7 +2220,7 @@
    "edge": 4.6,
    "ev": 0.0019,
    "event": "Rolex Paris Masters",
-   "pass": true
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -2697,6 +2697,27 @@
   {
    "rule": "cbb-spread",
    "sport": "cbb",
+   "id": "401909541",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Xavier",
+   "a": "Mount St. Mary's",
+   "mk": "spread",
+   "side": "away",
+   "line": 25.5,
+   "price": -104.0,
+   "bet": "Mount St. Mary's +25.5 -104",
+   "placed": "2026-11-01T20:17:06Z",
+   "stake": 0.25,
+   "edge": 3.1,
+   "ev": 0.0016,
+   "event": null,
+   "pass": false,
+   "close": 25.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
    "id": "401909705",
    "k": "2026-11-03T00:00:00Z",
    "slate": "cbb:2026-11-02",
@@ -2708,11 +2729,11 @@
    "price": -106.0,
    "bet": "Rider +26.5 -106",
    "placed": "2026-11-01T16:40:44Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 4.8,
    "ev": 0.0037,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 26.5
   },
   {
@@ -2818,7 +2839,7 @@
    "ev": 0.0108,
    "event": null,
    "pass": false,
-   "close": 159.5
+   "close": 160.5
   },
   {
    "rule": "cbb-total",
@@ -2880,7 +2901,7 @@
    "edge": 3.1,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 27.5
   },
   {
@@ -2901,8 +2922,8 @@
    "edge": 8.8,
    "ev": 0.0236,
    "event": null,
-   "pass": true,
-   "close": 140.5
+   "pass": false,
+   "close": 142.5
   },
   {
    "rule": "cbb-ml",
@@ -2944,7 +2965,7 @@
    "ev": 0.0692,
    "event": null,
    "pass": true,
-   "close": 17.5
+   "close": 18.5
   },
   {
    "rule": "cbb-spread",
@@ -2964,7 +2985,7 @@
    "edge": 4.5,
    "ev": 0.0017,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -2.5
   },
   {
@@ -2985,7 +3006,7 @@
    "edge": 5.3,
    "ev": 0.016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": -5.5
   },
   {
@@ -3002,7 +3023,7 @@
    "price": -102.0,
    "bet": "Wisconsin -22.5 -102",
    "placed": "2026-11-01T14:59:51Z",
-   "stake": 2.5,
+   "stake": 2.25,
    "edge": 5.0,
    "ev": 0.0241,
    "event": null,
@@ -3113,6 +3134,27 @@
    "close": 160.5
   },
   {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401925947",
+   "k": "2026-11-03T02:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Oregon State",
+   "a": "Weber State",
+   "mk": "total",
+   "side": "under",
+   "line": 155.5,
+   "price": -100.0,
+   "bet": "under 155.5 -100",
+   "placed": "2026-11-01T20:17:06Z",
+   "stake": 4.75,
+   "edge": 5.4,
+   "ev": 0.0475,
+   "event": null,
+   "pass": false,
+   "close": 155.5
+  },
+  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401909738",
@@ -3132,6 +3174,27 @@
    "event": null,
    "pass": false,
    "close": -4.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921731",
+   "k": "2026-11-03T03:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Arizona State",
+   "a": "East Tennessee State",
+   "mk": "spread",
+   "side": "away",
+   "line": 17.5,
+   "price": -100.0,
+   "bet": "East Tennessee State +17.5 -100",
+   "placed": "2026-11-01T20:17:06Z",
+   "stake": 1.25,
+   "edge": 2.6,
+   "ev": 0.0178,
+   "event": null,
+   "pass": false,
+   "close": 17.5
   },
   {
    "rule": "tennis-ml",
@@ -3213,7 +3276,7 @@
    "ev": 0.0292,
    "event": null,
    "pass": true,
-   "close": 51.5
+   "close": 53.5
   },
   {
    "rule": "cfb-total",
@@ -3275,7 +3338,7 @@
    "edge": 6.5,
    "ev": 0.0249,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 45.5
   },
   {
@@ -3297,7 +3360,7 @@
    "ev": 0.0046,
    "event": null,
    "pass": true,
-   "close": 47.5
+   "close": 48.5
   },
   {
    "rule": "cfb-total",
@@ -3317,7 +3380,7 @@
    "edge": 8.0,
    "ev": 0.0025,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 47.5
   },
   {
@@ -3338,8 +3401,29 @@
    "edge": 8.4,
    "ev": 0.0225,
    "event": null,
+   "pass": true,
+   "close": 58.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401860912",
+   "k": "2026-11-08T03:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Oregon State",
+   "a": "Texas State",
+   "mk": "total",
+   "side": "under",
+   "line": 67.5,
+   "price": 108.0,
+   "bet": "under 67.5 +108",
+   "placed": "2026-11-01T20:17:01Z",
+   "stake": 5.0,
+   "edge": 4.4,
+   "ev": 0.0679,
+   "event": null,
    "pass": false,
-   "close": 57.5
+   "close": 67.5
   }
  ],
  "recent": [
@@ -7873,7 +7957,7 @@
    "ev": 0.0293,
    "event": null,
    "pass": false,
-   "close": 40.5
+   "close": 41.5
   },
   {
    "rule": "nflprops-prop",
@@ -8013,7 +8097,7 @@
    "edge": 13.1,
    "ev": 0.0443,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -8336,7 +8420,7 @@
    "edge": 4.6,
    "ev": 0.0019,
    "event": "Rolex Paris Masters",
-   "pass": true
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -8813,6 +8897,27 @@
   {
    "rule": "cbb-spread",
    "sport": "cbb",
+   "id": "401909541",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Xavier",
+   "a": "Mount St. Mary's",
+   "mk": "spread",
+   "side": "away",
+   "line": 25.5,
+   "price": -104.0,
+   "bet": "Mount St. Mary's +25.5 -104",
+   "placed": "2026-11-01T20:17:06Z",
+   "stake": 0.25,
+   "edge": 3.1,
+   "ev": 0.0016,
+   "event": null,
+   "pass": false,
+   "close": 25.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
    "id": "401909705",
    "k": "2026-11-03T00:00:00Z",
    "slate": "cbb:2026-11-02",
@@ -8824,11 +8929,11 @@
    "price": -106.0,
    "bet": "Rider +26.5 -106",
    "placed": "2026-11-01T16:40:44Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 4.8,
    "ev": 0.0037,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 26.5
   },
   {
@@ -8934,7 +9039,7 @@
    "ev": 0.0108,
    "event": null,
    "pass": false,
-   "close": 159.5
+   "close": 160.5
   },
   {
    "rule": "cbb-total",
@@ -8996,7 +9101,7 @@
    "edge": 3.1,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 27.5
   },
   {
@@ -9017,8 +9122,8 @@
    "edge": 8.8,
    "ev": 0.0236,
    "event": null,
-   "pass": true,
-   "close": 140.5
+   "pass": false,
+   "close": 142.5
   },
   {
    "rule": "cbb-ml",
@@ -9060,7 +9165,7 @@
    "ev": 0.0692,
    "event": null,
    "pass": true,
-   "close": 17.5
+   "close": 18.5
   },
   {
    "rule": "cbb-spread",
@@ -9080,7 +9185,7 @@
    "edge": 4.5,
    "ev": 0.0017,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -2.5
   },
   {
@@ -9101,7 +9206,7 @@
    "edge": 5.3,
    "ev": 0.016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": -5.5
   },
   {
@@ -9118,7 +9223,7 @@
    "price": -102.0,
    "bet": "Wisconsin -22.5 -102",
    "placed": "2026-11-01T14:59:51Z",
-   "stake": 2.5,
+   "stake": 2.25,
    "edge": 5.0,
    "ev": 0.0241,
    "event": null,
@@ -9229,6 +9334,27 @@
    "close": 160.5
   },
   {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401925947",
+   "k": "2026-11-03T02:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Oregon State",
+   "a": "Weber State",
+   "mk": "total",
+   "side": "under",
+   "line": 155.5,
+   "price": -100.0,
+   "bet": "under 155.5 -100",
+   "placed": "2026-11-01T20:17:06Z",
+   "stake": 4.75,
+   "edge": 5.4,
+   "ev": 0.0475,
+   "event": null,
+   "pass": false,
+   "close": 155.5
+  },
+  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401909738",
@@ -9248,6 +9374,27 @@
    "event": null,
    "pass": false,
    "close": -4.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921731",
+   "k": "2026-11-03T03:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Arizona State",
+   "a": "East Tennessee State",
+   "mk": "spread",
+   "side": "away",
+   "line": 17.5,
+   "price": -100.0,
+   "bet": "East Tennessee State +17.5 -100",
+   "placed": "2026-11-01T20:17:06Z",
+   "stake": 1.25,
+   "edge": 2.6,
+   "ev": 0.0178,
+   "event": null,
+   "pass": false,
+   "close": 17.5
   },
   {
    "rule": "tennis-ml",
@@ -9329,7 +9476,7 @@
    "ev": 0.0292,
    "event": null,
    "pass": true,
-   "close": 51.5
+   "close": 53.5
   },
   {
    "rule": "cfb-total",
@@ -9391,7 +9538,7 @@
    "edge": 6.5,
    "ev": 0.0249,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 45.5
   },
   {
@@ -9413,7 +9560,7 @@
    "ev": 0.0046,
    "event": null,
    "pass": true,
-   "close": 47.5
+   "close": 48.5
   },
   {
    "rule": "cfb-total",
@@ -9433,7 +9580,7 @@
    "edge": 8.0,
    "ev": 0.0025,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 47.5
   },
   {
@@ -9454,8 +9601,29 @@
    "edge": 8.4,
    "ev": 0.0225,
    "event": null,
+   "pass": true,
+   "close": 58.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401860912",
+   "k": "2026-11-08T03:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Oregon State",
+   "a": "Texas State",
+   "mk": "total",
+   "side": "under",
+   "line": 67.5,
+   "price": 108.0,
+   "bet": "under 67.5 +108",
+   "placed": "2026-11-01T20:17:01Z",
+   "stake": 5.0,
+   "edge": 4.4,
+   "ev": 0.0679,
+   "event": null,
    "pass": false,
-   "close": 57.5
+   "close": 67.5
   }
  ]
 }
