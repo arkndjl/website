@@ -4319,3 +4319,73 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .cs__f { display: inline-block; width: 1.1em; text-align: center; font-style: normal; font-size: 0.8em; margin-right: 1px; }
 .cs__f--w { background: var(--accent); color: var(--win-dark); }
 .cs__f--l { color: var(--muted, inherit); opacity: 0.7; }
+
+/* ------------------------------------------------------------------
+   Homepage ticker (layouts/partials/ticker.html): a sunken well with one
+   bevelled cell per game. Next game of each team, then 1NT's matches.
+   ------------------------------------------------------------------ */
+.tick {
+  margin: 0 0 12px;
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  background: var(--win-well);
+  line-height: 1.35;
+}
+.tick__track {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tick__track::-webkit-scrollbar { display: none; }
+.tick--crawl .tick__track { scroll-behavior: auto; }
+.tick__run {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px 4px 4px 4px;
+}
+.tick__team { display: flex; flex: none; }
+.tick__team[hidden], .tick__g[hidden] { display: none; }
+.tick__tag {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--win-title);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.125em;
+  box-shadow: 2px 2px 0 var(--win-dark);
+}
+.tick__tag--nt { margin-left: 8px; background: var(--win-dark); color: var(--foreground); box-shadow: 2px 2px 0 #000; }
+.tick__g {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 3px 8px;
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  background: var(--win-face);
+  color: var(--foreground);
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.tick__g:hover, a.tick__g:focus-visible { background: var(--win-title); color: #fff; outline: none; }
+a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
+.tick__l1, .tick__l2 { display: flex; align-items: center; gap: 5px; }
+.tick__logo { width: 20px; height: 20px; object-fit: contain; border: 0; margin: 0; padding: 0; }
+.tick__me { color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+.tick__ha { color: var(--accent); }
+.tick__when { color: var(--accent); font-size: 0.875em; }
+.tick__note { color: var(--accent); font-size: 0.875em; opacity: 0.8; }
+.tick__p { color: var(--foreground); font-size: 0.875em; }
+.tick__live { padding: 0 4px; background: var(--foreground); color: var(--win-dark); font-size: 0.875em; text-transform: uppercase; }
+.tick__g--off { justify-content: center; }
+@media (max-width: 684px) {
+  .tick { margin: 0 -4px 10px; }
+  .tick__g { padding: 2px 6px; }
+}

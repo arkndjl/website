@@ -1,0 +1,105 @@
+{{- /* Homepage ticker (Noah, Nov 1 2026): the next game of each of his teams, then 1NT's next matches.
+       Data: data/ticker.json from scripts/fetch_ticker.py (ESPN schedules + the site's game models; 1NT from
+       data/esea.json), refreshed by the odds-snap and picks-refresh workflows. Times are ET. Each team carries up to
+       three games; the script below shows the first one not yet finished, so the strip stays right between refreshes.
+       Model win chance only, never a betting line (those stay on Predictions). */ -}}
+{{- with $.Site.Data.ticker }}
+{{- $links := dict "knicks" "/arkboard/nba/" "rangers" "/arkboard/nhl/" "ravens" "/arkboard/nfl/" "barcelona" "/arkboard/soccer/" }}
+<aside class="tick" aria-label="next games">
+  <div class="tick__track">
+    <div class="tick__run">
+      <span class="tick__tag">next</span>
+      {{- range .teams }}
+      {{- $t := . }}
+      <div class="tick__team" data-team="{{ .key }}">
+        {{- range $i, $g := .games }}
+        {{- $href := index $links $t.key }}
+        <a class="tick__g"{{ with $href }} href="{{ . }}"{{ end }} data-at="{{ $g.at }}" data-h="{{ $t.hours }}"{{ if $i }} hidden{{ end }}>
+          <span class="tick__l1">
+            {{- with $t.logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            <span class="tick__me">{{ $t.label }}</span>
+            <span class="tick__ha">{{ if $g.neutral }}vs{{ else if $g.home }}vs{{ else }}@{{ end }}</span>
+            {{- with $g.oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            <span class="tick__opp">{{ $g.opp }}</span>
+          </span>
+          <span class="tick__l2">
+            <span class="tick__when">{{ $g.day }}{{ with $g.time }} {{ . }} ET{{ end }}</span>
+            {{- with $g.note }}<span class="tick__note">{{ . }}</span>{{ end -}}
+            {{- with $g.p }}<span class="tick__p">win {{ . }}%</span>{{ end -}}
+          </span>
+        </a>
+        {{- end }}
+        {{- if not .games }}
+        <span class="tick__g tick__g--off">
+          <span class="tick__l1">{{ with .logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="tick__me">{{ .label }}</span></span>
+          <span class="tick__l2"><span class="tick__when">offseason</span></span>
+        </span>
+        {{- end }}
+      </div>
+      {{- end }}
+      {{- with .nt }}
+      <span class="tick__tag tick__tag--nt">1NT</span>
+      {{- if .games }}
+      {{- $h := .hours }}
+      {{- range .games }}
+      <a class="tick__g tick__g--nt" href="/laursen_111/#1nt" data-at="{{ .at }}" data-h="{{ $h }}">
+        <span class="tick__l1">
+          <span class="tick__ha">vs</span>
+          {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          <span class="tick__opp">{{ .opp }}</span>
+          {{- with .oppRank }}<span class="tick__note">#{{ . }}</span>{{ end -}}
+        </span>
+        <span class="tick__l2">
+          <span class="tick__when">{{ .day }}{{ with .time }} {{ . }} ET{{ end }}</span>
+          <span class="tick__note">bo{{ .bo }}</span>
+          {{- with .p }}<span class="tick__p">win {{ . }}%</span>{{ end -}}
+        </span>
+      </a>
+      {{- end }}
+      {{- else }}
+      <span class="tick__g tick__g--off"><span class="tick__l2"><span class="tick__when">no match scheduled</span></span></span>
+      {{- end }}
+      {{- end }}
+    </div>
+  </div>
+</aside>
+<script>
+(function () {
+  var box = document.querySelector('.tick'); if (!box) return;
+  var now = Date.now();
+  function done(a) { return now > Date.parse(a.dataset.at) + parseFloat(a.dataset.h || 3) * 3600e3; }
+  function mark(a) {
+    if (now >= Date.parse(a.dataset.at) && !a.querySelector('.tick__live')) {
+      var s = document.createElement('span'); s.className = 'tick__live'; s.textContent = 'now';
+      a.querySelector('.tick__l2').prepend(s); var w = a.querySelector('.tick__when'); if (w) w.hidden = true;
+    }
+  }
+  // each team: the first game not finished yet
+  box.querySelectorAll('.tick__team').forEach(function (t) {
+    var gs = t.querySelectorAll('a.tick__g'); if (!gs.length) return;
+    var shown = null;
+    gs.forEach(function (a) { a.hidden = true; if (!shown && !done(a)) shown = a; });
+    if (shown) { shown.hidden = false; mark(shown); } else t.hidden = true;
+  });
+  box.querySelectorAll('a.tick__g--nt').forEach(function (a) { if (done(a)) a.hidden = true; else mark(a); });
+  // a slow 1px crawl when the strip is wider than the screen; touch, hover or focus pauses it
+  var track = box.querySelector('.tick__track'), run = box.querySelector('.tick__run');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || run.scrollWidth <= track.clientWidth + 2) return;
+  var copy = run.cloneNode(true); copy.setAttribute('aria-hidden', 'true');
+  copy.querySelectorAll('a').forEach(function (a) { a.tabIndex = -1; });
+  track.appendChild(copy); box.classList.add('tick--crawl');
+  var paused = false, last = 0, pos = track.scrollLeft;
+  ['mouseenter', 'focusin', 'touchstart'].forEach(function (e) { box.addEventListener(e, function () { paused = true; }, { passive: true }); });
+  ['mouseleave', 'focusout'].forEach(function (e) { box.addEventListener(e, function () { paused = false; pos = track.scrollLeft; }); });
+  box.addEventListener('touchend', function () { setTimeout(function () { paused = false; pos = track.scrollLeft; }, 2500); }, { passive: true });
+  function step(ts) {
+    if (!paused && ts - last >= 40) {
+      last = ts; var w = run.offsetWidth;
+      pos = pos + 1 >= w ? pos + 1 - w : pos + 1; track.scrollLeft = pos;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+</script>
+{{- end }}
