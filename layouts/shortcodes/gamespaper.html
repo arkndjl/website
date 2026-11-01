@@ -91,3 +91,32 @@
 {{- partial "wintable-close.html" (dict "rows" (len .) "note" "last 60") -}}
 {{- end }}
 {{- end -}}
+{{- /* Novig Paper exchange (data/novig_paper.json, scripts/novig_paper.py, Nov 1 2026): every open pick sent once as an
+       IOC buy on Novig's play-money exchange; what filled, at what price against the posted one, and what the fill was
+       worth at the close. */ -}}
+{{- with site.Data.novig_paper }}{{ with .summary }}{{ if .sent -}}
+{{- $n := site.Data.novig_paper -}}
+{{- $s := . -}}
+{{- $bets := first 60 (sort (where $n.bets "order" "ne" nil) "kick" "desc") -}}
+{{- partial "wintable-open.html" (dict "title" "novig paper exchange :: fills" "icon" "arkboard" "filter" "Sport,Status" "tab" ($.Get "tab")) -}}
+<p class="cfb__dim" style="padding:0 8px">{{ $s.sent }} orders, {{ $s.filled }} filled{{ with $s.fillRate }} ({{ printf "%.0f%%" (mul . 100) }} of contracts){{ end }}{{ with $s.slip }} · fill minus posted price {{ printf "%+.1f" (mul . 100) }} pts{{ end }}{{ with $s.clvFill }} · fills worth {{ printf "%+.1f%%" (mul . 100) }} at the close{{ with $s.clvPick }} vs {{ printf "%+.1f%%" (mul . 100) }} posted{{ end }} (n {{ $s.clvN }}){{ end }}{{ if $s.graded }} · {{ printf "%+.2f" $s.pnl }} on {{ printf "%.2f" $s.risked }} risked{{ end }}{{ with $s.bank }} · bankroll ${{ printf "%.2f" . }}{{ end }}</p>
+<table class="cfb__table cfbm__t tstick">
+  <thead><tr><th>Pick</th><th>Status</th><th title="contracts filled of those sent">Filled</th><th title="average fill price (chance), and the IOC limit">Fill</th><th title="fill minus the posted price, chance points">Slip</th><th title="what the fill was worth at the close, and the posted pick">At close</th><th title="dollars">P/L</th><th>Sport</th><th title="ET">Start</th></tr></thead>
+  <tbody>
+  {{- range $bets }}{{ $k := time.In "America/New_York" (time .kick) }}{{ $f := .fill | default (dict) }}
+  <tr>
+    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .game }}</span></td>
+    <td>{{ if $f.qty }}filled{{ else }}{{ lower (.ostatus | default .status) }}{{ end }}</td>
+    <td class="cfb__num">{{ $f.qty | default 0 }} <span class="cfb__dim">/ {{ .qty }}</span></td>
+    <td class="cfb__num">{{ with $f.px }}{{ printf "%.3f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">≤ {{ .limit }}</span></td>
+    <td class="cfb__num">{{ with .slip }}{{ printf "%+.1f" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .clvFill }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvPick }} <span class="cfb__dim">{{ printf "%+.1f%%" (mul . 100) }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .pnl }}{{ printf "%+.2f" . }}{{ else }}{{ if .res }}0.00{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}</td>
+    <td>{{ .sport }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Jan 2 3:04 PM" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $bets) "note" "play money only" "about" "each open pick is sent once to Novig's Paper exchange as an immediate-or-cancel buy at the pick's line, sized at its Kelly % of this account, limit the lower of the model's chance and the quoted price plus 2 points. Paper's prices come from its own simulated market makers, so fills here measure execution against that book, not Novig's real depth.") -}}
+{{- end }}{{ end }}{{ end -}}
