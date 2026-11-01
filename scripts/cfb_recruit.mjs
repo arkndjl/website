@@ -362,7 +362,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
     { const x = klass[klass.length - 1]; x.ark = starsOf(r); whyQueue[whyQueue.length - 1][0] = x; }
   }
-  klass.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
+  // default order (and RK): ARK stars, then xFV, then ESPN grade
+  klass.sort((a, b) => (b.ark || 0) - (a.ark || 0) || b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
 
   // 2) on a roster now, no snaps: redshirts and buried freshmen of the last four classes
   const past = [];
@@ -444,7 +445,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       list[list.length - 1].ark = starsOf(r);
       whyQueue[whyQueue.length - 1][0] = list[list.length - 1];
     }
-    list.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
+    list.sort((a, b) => (b.ark || 0) - (a.ark || 0) || b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
     future.push({ year: y, lead: y - next + 1, n: list.length, committed: list.filter(x => x.tid).length, src, list,
       agree: (fit.agree || []).filter(a => a.class === y), agreeFinal: (fit.agree || []).filter(a => a.class <= season) });
   }
