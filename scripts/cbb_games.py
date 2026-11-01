@@ -151,7 +151,9 @@ ALT = {'2005', '38', '36', '2172', '2751', '254', '328', '252', '3084', '3101', 
 
 
 def et_date(iso):
-    return (datetime.fromisoformat(iso.replace('Z', '+00:00')) - timedelta(hours=5)).strftime('%Y-%m-%d')
+    """a tip's US game day, the date Barttorvik keys its logs by: UTC minus 8 h keeps 10 pm Pacific and 9 pm Hawaii
+    tips on their own day (UTC minus 5 moved them to the next one, so their inj, pinj and luck joins missed)"""
+    return (datetime.fromisoformat(iso.replace('Z', '+00:00')) - timedelta(hours=8)).strftime('%Y-%m-%d')
 
 
 def phi(z):
