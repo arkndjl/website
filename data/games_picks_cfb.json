@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-01T16:07:30Z",
+ "asof": "2026-11-01T16:08:35Z",
  "recenter": {
   "week": 0.83
  },
@@ -246,6 +246,39 @@
  },
  "picks": [
   {
+   "id": "401858512",
+   "espn": "401858512",
+   "sport": "cfb",
+   "kick": "2026-11-07T05:00:00.000Z",
+   "home": "Minnesota",
+   "away": "UCLA",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -102.0,
+   "p": 0.538,
+   "ev": 0.066,
+   "units": 3.0,
+   "edge": 7.7,
+   "x": 2.5,
+   "pDU": 0.5199,
+   "evDU": 0.0296,
+   "m": -8.9,
+   "tm": 48.2,
+   "tmRaw": 49,
+   "flagged": "2026-11-01T16:08:35Z",
+   "betTo": 45.5,
+   "close": 40.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 40.5,
+    "price": -102.0,
+    "ev": 0.065,
+    "units": 3.0
+   }
+  },
+  {
    "id": "401866457",
    "espn": "401866457",
    "sport": "cfb",
@@ -302,8 +335,8 @@
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 50.0,
    "close": 47.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401866453",
@@ -329,8 +362,8 @@
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 50.0,
    "close": 48.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   }
  ],
  "withdrawn": [],
@@ -368,22 +401,6 @@
    "tm": 49.5
   },
   {
-   "id": "401858512",
-   "sport": "cfb",
-   "kick": "2026-11-07T05:00:00.000Z",
-   "home": "Minnesota",
-   "away": "UCLA",
-   "mk": "total",
-   "side": "over",
-   "line": 42.5,
-   "price": -110,
-   "edge": 5.7,
-   "x": 2.5,
-   "why": "no edge at -110",
-   "m": -8.9,
-   "tm": 48.2
-  },
-  {
    "id": "401858513",
    "sport": "cfb",
    "kick": "2026-11-07T05:00:00.000Z",
@@ -392,7 +409,7 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 5.6,
    "x": 2.5,
    "why": "no edge at -110",
@@ -592,6 +609,22 @@
    "tm": 45.5
   },
   {
+   "id": "401858511",
+   "sport": "cfb",
+   "kick": "2026-11-07T05:00:00.000Z",
+   "home": "Michigan",
+   "away": "Michigan State",
+   "mk": "spread",
+   "side": "home",
+   "line": 13.5,
+   "price": -110.0,
+   "edge": 2.1,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": 15.6,
+   "tm": 41.1
+  },
+  {
    "id": "401858288",
    "sport": "cfb",
    "kick": "2026-11-07T00:00:00.000Z",
@@ -606,22 +639,6 @@
    "why": "edge under 5 (line: 3-7)",
    "m": 4.9,
    "tm": 56.0
-  },
-  {
-   "id": "401858511",
-   "sport": "cfb",
-   "kick": "2026-11-07T05:00:00.000Z",
-   "home": "Michigan",
-   "away": "Michigan State",
-   "mk": "spread",
-   "side": "home",
-   "line": 14.0,
-   "price": -110.0,
-   "edge": 1.6,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": 15.6,
-   "tm": 41.1
   },
   {
    "id": "401866455",
@@ -765,7 +782,7 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 5.6,
    "ev": null,
    "units": 0.0,
@@ -848,21 +865,21 @@
   "401858512": {
    "mk": "total",
    "side": "over",
-   "line": 42.5,
-   "price": -110,
-   "edge": 5.7,
-   "ev": null,
-   "units": 0.0,
+   "line": 40.5,
+   "price": -102.0,
+   "ev": 0.065,
+   "edge": 7.7,
+   "units": 3.0,
    "home": "Minnesota",
    "away": "UCLA",
-   "state": "under"
+   "state": "pick"
   },
   "401858511": {
    "mk": "spread",
    "side": "home",
-   "line": 14.0,
+   "line": 13.5,
    "price": -110.0,
-   "edge": 1.6,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
@@ -1018,16 +1035,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3608,
+  "snapshots": 3613,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 974,
+    "clvN": 975,
     "clvRet": -0.0414,
-    "clvT": -17.49,
+    "clvT": -17.51,
     "clv": 0.25,
     "beat": 0.356,
-    "still": 0.394
+    "still": 0.395
    },
    {
     "when": "6-24h",
@@ -1285,6 +1302,31 @@
    "betTo": 50.0,
    "close": 48.5,
    "pass": true
+  },
+  {
+   "id": "401858512",
+   "espn": "401858512",
+   "sport": "cfb",
+   "kick": "2026-11-07T05:00:00.000Z",
+   "home": "Minnesota",
+   "away": "UCLA",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -102.0,
+   "p": 0.538,
+   "ev": 0.066,
+   "units": 3.0,
+   "edge": 7.7,
+   "x": 2.5,
+   "pDU": 0.5199,
+   "evDU": 0.0296,
+   "m": -8.9,
+   "tm": 48.2,
+   "tmRaw": 49,
+   "flagged": "2026-11-01T16:08:35Z",
+   "betTo": 45.5,
+   "close": 40.5
   }
  ]
 }

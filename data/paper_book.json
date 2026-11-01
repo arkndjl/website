@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T16:07:40Z",
+ "asof": "2026-11-01T16:08:42Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 102.25,
+  "open": 107.75,
   "path": [
    101.5,
    101.6,
@@ -51,7 +51,7 @@
   ]
  },
  "record": {
-  "n": 127,
+  "n": 129,
   "clvN": 46,
   "clvRet": -0.018,
   "clvT": -2.3,
@@ -130,7 +130,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 1,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -152,6 +152,27 @@
    "sport": "nfl",
    "mk": "ml",
    "n": 2,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
+   "id": "nfl-spread",
+   "label": "NFL spread",
+   "sport": "nfl",
+   "mk": "spread",
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -235,7 +256,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 3,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -319,7 +340,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 51,
+   "n": 52,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -566,7 +587,7 @@
    "edge": 4.6,
    "ev": 0.0666,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 3.5
   },
   {
@@ -1112,7 +1133,7 @@
    "edge": 12.9,
    "ev": 0.0424,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1472,7 +1493,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1794,7 +1815,7 @@
    "edge": 13.1,
    "ev": 0.0443,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -2381,7 +2402,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 161.5
+   "close": 163.5
   },
   {
    "rule": "cbb-total",
@@ -2402,7 +2423,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": false,
-   "close": 148.5
+   "close": 147.5
   },
   {
    "rule": "cbb-ml",
@@ -2423,7 +2444,7 @@
    "ev": 0.0334,
    "event": null,
    "pass": false,
-   "close": -1.5
+   "close": -2.5
   },
   {
    "rule": "cbb-spread",
@@ -2569,7 +2590,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -2735,6 +2756,27 @@
    "event": null,
    "pass": false,
    "close": 51.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401858512",
+   "k": "2026-11-07T05:00:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Minnesota",
+   "a": "UCLA",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -102.0,
+   "bet": "over 40.5 -102",
+   "placed": "2026-11-01T16:08:35Z",
+   "stake": 3.0,
+   "edge": 7.7,
+   "ev": 0.0296,
+   "event": null,
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -6098,7 +6140,7 @@
    "edge": 4.6,
    "ev": 0.0666,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 3.5
   },
   {
@@ -6644,7 +6686,7 @@
    "edge": 12.9,
    "ev": 0.0424,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -7004,7 +7046,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -7326,7 +7368,7 @@
    "edge": 13.1,
    "ev": 0.0443,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -7913,7 +7955,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 161.5
+   "close": 163.5
   },
   {
    "rule": "cbb-total",
@@ -7934,7 +7976,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": false,
-   "close": 148.5
+   "close": 147.5
   },
   {
    "rule": "cbb-ml",
@@ -7955,7 +7997,7 @@
    "ev": 0.0334,
    "event": null,
    "pass": false,
-   "close": -1.5
+   "close": -2.5
   },
   {
    "rule": "cbb-spread",
@@ -8101,7 +8143,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -8267,6 +8309,27 @@
    "event": null,
    "pass": false,
    "close": 51.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401858512",
+   "k": "2026-11-07T05:00:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Minnesota",
+   "a": "UCLA",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -102.0,
+   "bet": "over 40.5 -102",
+   "placed": "2026-11-01T16:08:35Z",
+   "stake": 3.0,
+   "edge": 7.7,
+   "ev": 0.0296,
+   "event": null,
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
