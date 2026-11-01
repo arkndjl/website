@@ -1,0 +1,1934 @@
+{
+ "join": {
+  "listed": 15377,
+  "joined": 14422,
+  "leagueSeasons": 50
+ },
+ "base": {
+  "r2Held": 0.61,
+  "teamSeasons": 874,
+  "seasons": [
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025,
+   2026
+  ]
+ },
+ "cands": {
+  "ch": {
+   "r2Base": 0.61,
+   "r2": 0.6111,
+   "dMse": 0.00057,
+   "t": 1.4,
+   "wins": 7,
+   "of": 9,
+   "late": 0.00101,
+   "bySeason": {
+    "2018": 0.00022,
+    "2019": -0.00201,
+    "2020": 0.00187,
+    "2021": 0.0,
+    "2022": 0.00199,
+    "2023": 3e-05,
+    "2024": -8e-05,
+    "2025": 0.00093,
+    "2026": 0.00219
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1423,
+    "rel": 0.0323,
+    "npxg": 0.482,
+    "xas": 0.6373,
+    "bup": 0.4734,
+    "gk": 0.3859,
+    "ch": -0.2238
+   }
+  },
+  "kp": {
+   "r2Base": 0.61,
+   "r2": 0.6109,
+   "dMse": 0.00045,
+   "t": 0.46,
+   "wins": 4,
+   "of": 9,
+   "late": 0.00096,
+   "bySeason": {
+    "2018": 0.00011,
+    "2019": -0.00217,
+    "2020": -0.00167,
+    "2021": 0.00305,
+    "2022": -0.0,
+    "2023": 0.00518,
+    "2024": -0.00107,
+    "2025": -0.0021,
+    "2026": 0.00266
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1402,
+    "rel": 0.0349,
+    "npxg": 0.2888,
+    "xas": 0.2353,
+    "bup": 0.2497,
+    "gk": 0.3921,
+    "kp": 0.0524
+   }
+  },
+  "pas": {
+   "r2Base": 0.61,
+   "r2": 0.6124,
+   "dMse": 0.00116,
+   "t": 0.93,
+   "wins": 6,
+   "of": 9,
+   "late": 0.00345,
+   "bySeason": {
+    "2018": -0.00638,
+    "2019": -0.00579,
+    "2020": 0.00075,
+    "2021": 0.00483,
+    "2022": 0.00341,
+    "2023": 0.00578,
+    "2024": 0.00454,
+    "2025": -0.00534,
+    "2026": 0.00873
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1387,
+    "rel": 0.0366,
+    "npxg": 0.329,
+    "xas": 0.5465,
+    "bup": 0.1125,
+    "gk": 0.392,
+    "pas": 0.0021
+   }
+  },
+  "lb": {
+   "r2Base": 0.61,
+   "r2": 0.6124,
+   "dMse": 0.00121,
+   "t": 1.09,
+   "wins": 7,
+   "of": 9,
+   "late": 0.00228,
+   "bySeason": {
+    "2018": 0.00193,
+    "2019": -0.00497,
+    "2020": 0.00392,
+    "2021": -0.00134,
+    "2022": 0.00163,
+    "2023": 0.00044,
+    "2024": 0.00173,
+    "2025": 0.00329,
+    "2026": 0.00437
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.139,
+    "rel": 0.0365,
+    "npxg": 0.3394,
+    "xas": 0.5143,
+    "bup": 0.2138,
+    "gk": 0.3796,
+    "lb": 0.0182
+   }
+  },
+  "drb": {
+   "r2Base": 0.61,
+   "r2": 0.6086,
+   "dMse": -0.00069,
+   "t": -2.95,
+   "wins": 2,
+   "of": 9,
+   "late": -0.00034,
+   "bySeason": {
+    "2018": 1e-05,
+    "2019": -6e-05,
+    "2020": -1e-05,
+    "2021": -0.00441,
+    "2022": 2e-05,
+    "2023": -0.00035,
+    "2024": -0.00094,
+    "2025": -0.00024,
+    "2026": -0.00017
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1429,
+    "rel": 0.0328,
+    "npxg": 0.2928,
+    "xas": 0.515,
+    "bup": 0.2474,
+    "gk": 0.3892,
+    "drb": -0.0018
+   }
+  },
+  "rec": {
+   "r2Base": 0.61,
+   "r2": 0.6095,
+   "dMse": -0.00024,
+   "t": -0.41,
+   "wins": 5,
+   "of": 9,
+   "late": -0.0008,
+   "bySeason": {
+    "2018": -9e-05,
+    "2019": -0.00034,
+    "2020": 0.00154,
+    "2021": 0.00071,
+    "2022": -0.00288,
+    "2023": -0.00414,
+    "2024": 0.0019,
+    "2025": 0.00126,
+    "2026": 4e-05
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1399,
+    "rel": 0.0326,
+    "npxg": 0.3318,
+    "xas": 0.4956,
+    "bup": 0.2421,
+    "gk": 0.3753,
+    "rec": 0.0085
+   }
+  },
+  "int": {
+   "r2Base": 0.61,
+   "r2": 0.6088,
+   "dMse": -0.00056,
+   "t": -0.89,
+   "wins": 6,
+   "of": 9,
+   "late": -0.00043,
+   "bySeason": {
+    "2018": -0.00545,
+    "2019": 0.00097,
+    "2020": 0.00067,
+    "2021": 0.00094,
+    "2022": 0.00127,
+    "2023": 0.00147,
+    "2024": -0.0042,
+    "2025": -0.00215,
+    "2026": 0.00133
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1419,
+    "rel": 0.0324,
+    "npxg": 0.2702,
+    "xas": 0.5127,
+    "bup": 0.2446,
+    "gk": 0.3814,
+    "int": -0.0214
+   }
+  },
+  "tkl": {
+   "r2Base": 0.61,
+   "r2": 0.6104,
+   "dMse": 0.0002,
+   "t": 0.31,
+   "wins": 5,
+   "of": 9,
+   "late": -0.00051,
+   "bySeason": {
+    "2018": 0.00139,
+    "2019": 0.00115,
+    "2020": 0.0001,
+    "2021": 0.00167,
+    "2022": 0.00226,
+    "2023": -0.00039,
+    "2024": -0.00334,
+    "2025": -0.00037,
+    "2026": -0.0008
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1427,
+    "rel": 0.0313,
+    "npxg": 0.2722,
+    "xas": 0.5381,
+    "bup": 0.2384,
+    "gk": 0.384,
+    "tkl": -0.019
+   }
+  },
+  "pw3": {
+   "r2Base": 0.61,
+   "r2": 0.6118,
+   "dMse": 0.00091,
+   "t": 0.96,
+   "wins": 5,
+   "of": 9,
+   "late": -0.00048,
+   "bySeason": {
+    "2018": 0.00448,
+    "2019": -0.00127,
+    "2020": 0.0037,
+    "2021": 0.00352,
+    "2022": -0.00121,
+    "2023": -0.0017,
+    "2024": -0.00052,
+    "2025": 0.00094,
+    "2026": 0.00018
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1466,
+    "rel": 0.0318,
+    "npxg": 0.335,
+    "xas": 0.5851,
+    "bup": 0.2368,
+    "gk": 0.3825,
+    "pw3": -0.0826
+   }
+  },
+  "fotmob_all": {
+   "r2Base": 0.61,
+   "r2": 0.6126,
+   "dMse": 0.0013,
+   "t": 0.6,
+   "wins": 6,
+   "of": 9,
+   "late": 0.00239,
+   "bySeason": {
+    "2018": -0.00675,
+    "2019": -0.00823,
+    "2020": 0.01058,
+    "2021": 0.00422,
+    "2022": 0.00162,
+    "2023": 0.0008,
+    "2024": 0.00248,
+    "2025": -0.00414,
+    "2026": 0.01116
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1344,
+    "rel": 0.0348,
+    "npxg": 0.4333,
+    "xas": 0.6181,
+    "bup": 0.0905,
+    "gk": 0.3364,
+    "pas": 0.0016,
+    "lb": 0.0101,
+    "drb": 0.0039,
+    "rec": 0.0161,
+    "int": -0.0301,
+    "tkl": -0.0114,
+    "pw3": -0.1058
+   }
+  },
+  "progression": {
+   "r2Base": 0.61,
+   "r2": 0.6114,
+   "dMse": 0.00072,
+   "t": 0.48,
+   "wins": 5,
+   "of": 9,
+   "late": 0.004,
+   "bySeason": {
+    "2018": -0.00426,
+    "2019": -0.00972,
+    "2020": 0.00362,
+    "2021": -0.00293,
+    "2022": 0.00498,
+    "2023": 0.00421,
+    "2024": 0.00356,
+    "2025": -0.00334,
+    "2026": 0.0105
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1364,
+    "rel": 0.0378,
+    "npxg": 0.4722,
+    "xas": 0.6279,
+    "bup": 0.2617,
+    "gk": 0.3827,
+    "ch": -0.141,
+    "pas": 0.0016,
+    "lb": 0.0116,
+    "drb": -0.0027
+   }
+  },
+  "defending": {
+   "r2Base": 0.61,
+   "r2": 0.6122,
+   "dMse": 0.00111,
+   "t": 0.65,
+   "wins": 5,
+   "of": 9,
+   "late": -0.00132,
+   "bySeason": {
+    "2018": -0.00147,
+    "2019": 0.0,
+    "2020": 0.00913,
+    "2021": 0.0087,
+    "2022": -0.00256,
+    "2023": -0.00546,
+    "2024": -0.00113,
+    "2025": 0.00111,
+    "2026": 0.00158
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1396,
+    "rel": 0.0293,
+    "npxg": 0.388,
+    "xas": 0.6024,
+    "bup": 0.2139,
+    "gk": 0.3365,
+    "rec": 0.0175,
+    "int": -0.0286,
+    "tkl": -0.0136,
+    "pw3": -0.1113
+   }
+  },
+  "all": {
+   "r2Base": 0.61,
+   "r2": 0.6132,
+   "dMse": 0.00158,
+   "t": 0.66,
+   "wins": 6,
+   "of": 9,
+   "late": 0.00265,
+   "bySeason": {
+    "2018": -0.00594,
+    "2019": -0.01105,
+    "2020": 0.01063,
+    "2021": 0.00743,
+    "2022": 0.00111,
+    "2023": 0.00519,
+    "2024": 0.00038,
+    "2025": -0.00537,
+    "2026": 0.01183
+   },
+   "pass": false,
+   "coef": {
+    "ona": 0.1324,
+    "rel": 0.035,
+    "npxg": 0.5251,
+    "xas": 0.4198,
+    "bup": 0.2338,
+    "gk": 0.3344,
+    "ch": -0.1143,
+    "kp": 0.0529,
+    "pas": 0.0013,
+    "lb": 0.0073,
+    "drb": 0.0006,
+    "rec": 0.0172,
+    "int": -0.031,
+    "tkl": -0.0127,
+    "pw3": -0.1202
+   }
+  }
+ },
+ "bupOverRest": {
+  "r2Base": 0.5991,
+  "r2": 0.61,
+  "dMse": 0.00534,
+  "t": 2.41,
+  "wins": 8,
+  "of": 9,
+  "late": 0.007,
+  "bySeason": {
+   "2018": 0.00202,
+   "2019": -0.00254,
+   "2020": 0.00853,
+   "2021": 0.00517,
+   "2022": 0.00586,
+   "2023": 0.00409,
+   "2024": 0.01486,
+   "2025": 0.00125,
+   "2026": 0.00902
+  },
+  "pass": true
+ },
+ "weights": {
+  "base": {
+   "ona": 0.143,
+   "rel": 0.0328,
+   "npxg": 0.2922,
+   "xas": 0.5106,
+   "bup": 0.247,
+   "gk": 0.3894
+  },
+  "all": {
+   "ona": 0.1324,
+   "rel": 0.035,
+   "npxg": 0.5251,
+   "xas": 0.4198,
+   "bup": 0.2338,
+   "gk": 0.3344,
+   "ch": -0.1143,
+   "kp": 0.0529,
+   "pas": 0.0013,
+   "lb": 0.0073,
+   "drb": 0.0006,
+   "rec": 0.0172,
+   "int": -0.031,
+   "tkl": -0.0127,
+   "pw3": -0.1202
+  },
+  "noBuildup": {
+   "ona": 0.1589,
+   "rel": 0.0236,
+   "npxg": 0.4267,
+   "xas": 0.9976,
+   "gk": 0.4112
+  }
+ },
+ "deep": {
+  "dataDefined": {
+   "n": 316,
+   "pctBase": 43.6,
+   "pctAll": 46.6,
+   "pctNoBuildup": 60.0
+  },
+  "named": {
+   "n": 158,
+   "pctBase": 24.0,
+   "pctAll": 23.6,
+   "pctNoBuildup": 37.6
+  },
+  "allMidfielders": {
+   "n": 3959,
+   "pctBase": 46.2,
+   "pctAll": 46.6,
+   "pctNoBuildup": 45.7
+  },
+  "players": [
+   {
+    "n": "Aurelien Tchouameni",
+    "S": 2021,
+    "team": "Monaco",
+    "min": 3084,
+    "pctNoBuildup": 28.0,
+    "pctBase": 15.4,
+    "pctAll": 26.5
+   },
+   {
+    "n": "Aurelien Tchouameni",
+    "S": 2022,
+    "team": "Monaco",
+    "min": 2933,
+    "pctNoBuildup": 34.7,
+    "pctBase": 25.1,
+    "pctAll": 41.0
+   },
+   {
+    "n": "Aurelien Tchouameni",
+    "S": 2023,
+    "team": "Real Madrid",
+    "min": 2119,
+    "pctNoBuildup": 39.2,
+    "pctBase": 14.6,
+    "pctAll": 23.6
+   },
+   {
+    "n": "Aurelien Tchouameni",
+    "S": 2024,
+    "team": "Real Madrid",
+    "min": 1989,
+    "pctNoBuildup": 49.6,
+    "pctBase": 22.7,
+    "pctAll": 33.4
+   },
+   {
+    "n": "Aurelien Tchouameni",
+    "S": 2026,
+    "team": "Real Madrid",
+    "min": 2656,
+    "pctNoBuildup": 38.8,
+    "pctBase": 26.5,
+    "pctAll": 22.5
+   },
+   {
+    "n": "Casemiro",
+    "S": 2017,
+    "team": "Real Madrid",
+    "min": 1711,
+    "pctNoBuildup": 41.7,
+    "pctBase": 18.6,
+    "pctAll": 23.4
+   },
+   {
+    "n": "Casemiro",
+    "S": 2018,
+    "team": "Real Madrid",
+    "min": 2609,
+    "pctNoBuildup": 44.8,
+    "pctBase": 25.1,
+    "pctAll": 35.1
+   },
+   {
+    "n": "Casemiro",
+    "S": 2019,
+    "team": "Real Madrid",
+    "min": 2317,
+    "pctNoBuildup": 53.3,
+    "pctBase": 36.3,
+    "pctAll": 33.9
+   },
+   {
+    "n": "Casemiro",
+    "S": 2020,
+    "team": "Real Madrid",
+    "min": 3096,
+    "pctNoBuildup": 34.2,
+    "pctBase": 17.8,
+    "pctAll": 21.5
+   },
+   {
+    "n": "Casemiro",
+    "S": 2021,
+    "team": "Real Madrid",
+    "min": 2902,
+    "pctNoBuildup": 21.9,
+    "pctBase": 12.4,
+    "pctAll": 7.6
+   },
+   {
+    "n": "Casemiro",
+    "S": 2022,
+    "team": "Real Madrid",
+    "min": 2596,
+    "pctNoBuildup": 39.4,
+    "pctBase": 20.5,
+    "pctAll": 19.3
+   },
+   {
+    "n": "Casemiro",
+    "S": 2023,
+    "team": "Manchester United",
+    "min": 2127,
+    "pctNoBuildup": 19.0,
+    "pctBase": 7.1,
+    "pctAll": 9.4
+   },
+   {
+    "n": "Casemiro",
+    "S": 2024,
+    "team": "Manchester United",
+    "min": 2006,
+    "pctNoBuildup": 71.8,
+    "pctBase": 69.7,
+    "pctAll": 42.2
+   },
+   {
+    "n": "Casemiro",
+    "S": 2025,
+    "team": "Manchester United",
+    "min": 1519,
+    "pctNoBuildup": 44.8,
+    "pctBase": 47.8,
+    "pctAll": 45.1
+   },
+   {
+    "n": "Casemiro",
+    "S": 2026,
+    "team": "Manchester United",
+    "min": 2649,
+    "pctNoBuildup": 22.4,
+    "pctBase": 10.9,
+    "pctAll": 7.3
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2019,
+    "team": "West Ham",
+    "min": 3009,
+    "pctNoBuildup": 97.5,
+    "pctBase": 94.0,
+    "pctAll": 84.6
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2020,
+    "team": "West Ham",
+    "min": 3420,
+    "pctNoBuildup": 94.3,
+    "pctBase": 91.8,
+    "pctAll": 80.1
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2021,
+    "team": "West Ham",
+    "min": 2880,
+    "pctNoBuildup": 48.1,
+    "pctBase": 39.2,
+    "pctAll": 38.8
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2022,
+    "team": "West Ham",
+    "min": 3175,
+    "pctNoBuildup": 73.8,
+    "pctBase": 54.6,
+    "pctAll": 45.2
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2023,
+    "team": "West Ham",
+    "min": 3268,
+    "pctNoBuildup": 36.9,
+    "pctBase": 20.0,
+    "pctAll": 11.0
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2024,
+    "team": "Arsenal",
+    "min": 3256,
+    "pctNoBuildup": 19.5,
+    "pctBase": 11.9,
+    "pctAll": 18.7
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2025,
+    "team": "Arsenal",
+    "min": 2848,
+    "pctNoBuildup": 8.5,
+    "pctBase": 8.3,
+    "pctAll": 8.4
+   },
+   {
+    "n": "Declan Rice",
+    "S": 2026,
+    "team": "Arsenal",
+    "min": 3111,
+    "pctNoBuildup": 11.6,
+    "pctBase": 10.2,
+    "pctAll": 5.3
+   },
+   {
+    "n": "Fabinho",
+    "S": 2017,
+    "team": "Monaco",
+    "min": 3067,
+    "pctNoBuildup": 33.7,
+    "pctBase": 14.5,
+    "pctAll": 18.9
+   },
+   {
+    "n": "Fabinho",
+    "S": 2018,
+    "team": "Monaco",
+    "min": 3060,
+    "pctNoBuildup": 38.1,
+    "pctBase": 23.9,
+    "pctAll": 22.4
+   },
+   {
+    "n": "Fabinho",
+    "S": 2019,
+    "team": "Liverpool",
+    "min": 2006,
+    "pctNoBuildup": 40.1,
+    "pctBase": 23.1,
+    "pctAll": 23.3
+   },
+   {
+    "n": "Fabinho",
+    "S": 2020,
+    "team": "Liverpool",
+    "min": 2063,
+    "pctNoBuildup": 57.5,
+    "pctBase": 35.5,
+    "pctAll": 45.2
+   },
+   {
+    "n": "Fabinho",
+    "S": 2022,
+    "team": "Liverpool",
+    "min": 2320,
+    "pctNoBuildup": 41.3,
+    "pctBase": 27.7,
+    "pctAll": 25.4
+   },
+   {
+    "n": "Fabinho",
+    "S": 2023,
+    "team": "Liverpool",
+    "min": 2691,
+    "pctNoBuildup": 63.7,
+    "pctBase": 47.5,
+    "pctAll": 71.2
+   },
+   {
+    "n": "Fernandinho",
+    "S": 2017,
+    "team": "Manchester City",
+    "min": 2752,
+    "pctNoBuildup": 25.5,
+    "pctBase": 9.2,
+    "pctAll": 14.7
+   },
+   {
+    "n": "Fernandinho",
+    "S": 2018,
+    "team": "Manchester City",
+    "min": 2890,
+    "pctNoBuildup": 28.8,
+    "pctBase": 6.6,
+    "pctAll": 11.2
+   },
+   {
+    "n": "Fernandinho",
+    "S": 2019,
+    "team": "Manchester City",
+    "min": 2397,
+    "pctNoBuildup": 22.1,
+    "pctBase": 5.4,
+    "pctAll": 10.6
+   },
+   {
+    "n": "Frenkie de Jong",
+    "S": 2020,
+    "team": "Barcelona",
+    "min": 2126,
+    "pctNoBuildup": 32.9,
+    "pctBase": 19.9,
+    "pctAll": 18.9
+   },
+   {
+    "n": "Frenkie de Jong",
+    "S": 2021,
+    "team": "Barcelona",
+    "min": 3159,
+    "pctNoBuildup": 19.0,
+    "pctBase": 5.7,
+    "pctAll": 3.8
+   },
+   {
+    "n": "Frenkie de Jong",
+    "S": 2022,
+    "team": "Barcelona",
+    "min": 2496,
+    "pctNoBuildup": 26.1,
+    "pctBase": 15.5,
+    "pctAll": 12.1
+   },
+   {
+    "n": "Frenkie de Jong",
+    "S": 2023,
+    "team": "Barcelona",
+    "min": 2542,
+    "pctNoBuildup": 17.3,
+    "pctBase": 2.5,
+    "pctAll": 4.1
+   },
+   {
+    "n": "Frenkie de Jong",
+    "S": 2024,
+    "team": "Barcelona",
+    "min": 1641,
+    "pctNoBuildup": 38.5,
+    "pctBase": 11.8,
+    "pctAll": 10.6
+   },
+   {
+    "n": "Frenkie de Jong",
+    "S": 2026,
+    "team": "Barcelona",
+    "min": 1597,
+    "pctNoBuildup": 18.6,
+    "pctBase": 3.2,
+    "pctAll": 3.7
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2017,
+    "team": "Arsenal",
+    "min": 2492,
+    "pctNoBuildup": 49.1,
+    "pctBase": 31.1,
+    "pctAll": 17.2
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2018,
+    "team": "Arsenal",
+    "min": 3274,
+    "pctNoBuildup": 59.2,
+    "pctBase": 29.8,
+    "pctAll": 16.7
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2019,
+    "team": "Arsenal",
+    "min": 2511,
+    "pctNoBuildup": 40.2,
+    "pctBase": 23.4,
+    "pctAll": 9.4
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2020,
+    "team": "Arsenal",
+    "min": 2598,
+    "pctNoBuildup": 78.7,
+    "pctBase": 46.7,
+    "pctAll": 36.3
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2021,
+    "team": "Arsenal",
+    "min": 2537,
+    "pctNoBuildup": 51.5,
+    "pctBase": 27.3,
+    "pctAll": 19.6
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2022,
+    "team": "Arsenal",
+    "min": 2338,
+    "pctNoBuildup": 42.9,
+    "pctBase": 26.3,
+    "pctAll": 23.9
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2023,
+    "team": "Arsenal",
+    "min": 3039,
+    "pctNoBuildup": 24.0,
+    "pctBase": 17.3,
+    "pctAll": 15.1
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2024,
+    "team": "Bayer Leverkusen",
+    "min": 2842,
+    "pctNoBuildup": 39.9,
+    "pctBase": 11.6,
+    "pctAll": 9.0
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2025,
+    "team": "Bayer Leverkusen",
+    "min": 2905,
+    "pctNoBuildup": 32.1,
+    "pctBase": 14.3,
+    "pctAll": 9.0
+   },
+   {
+    "n": "Granit Xhaka",
+    "S": 2026,
+    "team": "Sunderland",
+    "min": 2896,
+    "pctNoBuildup": 61.9,
+    "pctBase": 64.6,
+    "pctAll": 41.0
+   },
+   {
+    "n": "Jorginho",
+    "S": 2017,
+    "team": "Napoli",
+    "min": 2158,
+    "pctNoBuildup": 20.0,
+    "pctBase": 5.3,
+    "pctAll": 4.7
+   },
+   {
+    "n": "Jorginho",
+    "S": 2018,
+    "team": "Napoli",
+    "min": 2677,
+    "pctNoBuildup": 21.6,
+    "pctBase": 6.8,
+    "pctAll": 6.4
+   },
+   {
+    "n": "Jorginho",
+    "S": 2019,
+    "team": "Chelsea",
+    "min": 3179,
+    "pctNoBuildup": 54.0,
+    "pctBase": 39.5,
+    "pctAll": 39.1
+   },
+   {
+    "n": "Jorginho",
+    "S": 2020,
+    "team": "Chelsea",
+    "min": 2391,
+    "pctNoBuildup": 36.2,
+    "pctBase": 15.3,
+    "pctAll": 18.0
+   },
+   {
+    "n": "Jorginho",
+    "S": 2021,
+    "team": "Chelsea",
+    "min": 2022,
+    "pctNoBuildup": 35.7,
+    "pctBase": 17.0,
+    "pctAll": 17.1
+   },
+   {
+    "n": "Jorginho",
+    "S": 2022,
+    "team": "Chelsea",
+    "min": 2285,
+    "pctNoBuildup": 23.5,
+    "pctBase": 6.2,
+    "pctAll": 4.9
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2017,
+    "team": "Bayern Munich",
+    "min": 1540,
+    "pctNoBuildup": 24.6,
+    "pctBase": 8.9,
+    "pctAll": 3.0
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2020,
+    "team": "Bayern Munich",
+    "min": 2827,
+    "pctNoBuildup": 8.8,
+    "pctBase": 1.6,
+    "pctAll": 1.0
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2021,
+    "team": "Bayern Munich",
+    "min": 2191,
+    "pctNoBuildup": 13.0,
+    "pctBase": 3.4,
+    "pctAll": 2.0
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2022,
+    "team": "Bayern Munich",
+    "min": 2480,
+    "pctNoBuildup": 6.8,
+    "pctBase": 1.9,
+    "pctAll": 1.4
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2023,
+    "team": "Bayern Munich",
+    "min": 2823,
+    "pctNoBuildup": 15.2,
+    "pctBase": 3.8,
+    "pctAll": 4.7
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2024,
+    "team": "Bayern Munich",
+    "min": 2225,
+    "pctNoBuildup": 8.9,
+    "pctBase": 2.1,
+    "pctAll": 0.5
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2025,
+    "team": "Bayern Munich",
+    "min": 2843,
+    "pctNoBuildup": 4.1,
+    "pctBase": 1.4,
+    "pctAll": 0.1
+   },
+   {
+    "n": "Joshua Kimmich",
+    "S": 2026,
+    "team": "Bayern Munich",
+    "min": 2268,
+    "pctNoBuildup": 7.5,
+    "pctBase": 1.1,
+    "pctAll": 0.4
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2017,
+    "team": "Schalke 04",
+    "min": 2570,
+    "pctNoBuildup": 35.4,
+    "pctBase": 46.6,
+    "pctAll": 35.4
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2018,
+    "team": "Schalke 04",
+    "min": 1984,
+    "pctNoBuildup": 38.4,
+    "pctBase": 41.7,
+    "pctAll": 32.3
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2019,
+    "team": "Bayern Munich",
+    "min": 2008,
+    "pctNoBuildup": 7.6,
+    "pctBase": 2.3,
+    "pctAll": 8.5
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2020,
+    "team": "Bayern Munich",
+    "min": 1521,
+    "pctNoBuildup": 8.9,
+    "pctBase": 2.3,
+    "pctAll": 6.1
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2021,
+    "team": "Bayern Munich",
+    "min": 1707,
+    "pctNoBuildup": 19.3,
+    "pctBase": 9.2,
+    "pctAll": 34.5
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2023,
+    "team": "Bayern Munich",
+    "min": 1754,
+    "pctNoBuildup": 16.3,
+    "pctBase": 4.5,
+    "pctAll": 11.7
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2024,
+    "team": "Bayern Munich",
+    "min": 2253,
+    "pctNoBuildup": 13.8,
+    "pctBase": 6.0,
+    "pctAll": 8.3
+   },
+   {
+    "n": "Leon Goretzka",
+    "S": 2026,
+    "team": "Bayern Munich",
+    "min": 2004,
+    "pctNoBuildup": 33.8,
+    "pctBase": 13.6,
+    "pctAll": 12.6
+   },
+   {
+    "n": "Manuel Ugarte",
+    "S": 2024,
+    "team": "Paris Saint Germain",
+    "min": 1938,
+    "pctNoBuildup": 68.7,
+    "pctBase": 39.2,
+    "pctAll": 87.2
+   },
+   {
+    "n": "Manuel Ugarte",
+    "S": 2025,
+    "team": "Manchester United",
+    "min": 1802,
+    "pctNoBuildup": 74.6,
+    "pctBase": 75.1,
+    "pctAll": 91.4
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2017,
+    "team": "Inter",
+    "min": 1743,
+    "pctNoBuildup": 20.5,
+    "pctBase": 12.7,
+    "pctAll": 6.2
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2018,
+    "team": "Inter",
+    "min": 1921,
+    "pctNoBuildup": 12.6,
+    "pctBase": 10.8,
+    "pctAll": 4.3
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2019,
+    "team": "Inter",
+    "min": 2662,
+    "pctNoBuildup": 33.5,
+    "pctBase": 19.4,
+    "pctAll": 11.1
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2020,
+    "team": "Inter",
+    "min": 2709,
+    "pctNoBuildup": 40.4,
+    "pctBase": 27.5,
+    "pctAll": 24.0
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2021,
+    "team": "Inter",
+    "min": 2592,
+    "pctNoBuildup": 26.0,
+    "pctBase": 12.5,
+    "pctAll": 10.2
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2022,
+    "team": "Inter",
+    "min": 2970,
+    "pctNoBuildup": 46.1,
+    "pctBase": 12.4,
+    "pctAll": 6.6
+   },
+   {
+    "n": "Marcelo Brozovic",
+    "S": 2023,
+    "team": "Inter",
+    "min": 1771,
+    "pctNoBuildup": 36.3,
+    "pctBase": 19.0,
+    "pctAll": 19.3
+   },
+   {
+    "n": "Marco Verratti",
+    "S": 2017,
+    "team": "Paris Saint Germain",
+    "min": 2162,
+    "pctNoBuildup": 7.4,
+    "pctBase": 1.8,
+    "pctAll": 3.2
+   },
+   {
+    "n": "Marco Verratti",
+    "S": 2018,
+    "team": "Paris Saint Germain",
+    "min": 1728,
+    "pctNoBuildup": 33.6,
+    "pctBase": 11.1,
+    "pctAll": 8.6
+   },
+   {
+    "n": "Marco Verratti",
+    "S": 2019,
+    "team": "Paris Saint Germain",
+    "min": 1887,
+    "pctNoBuildup": 22.7,
+    "pctBase": 4.3,
+    "pctAll": 7.1
+   },
+   {
+    "n": "Marco Verratti",
+    "S": 2022,
+    "team": "Paris Saint Germain",
+    "min": 1959,
+    "pctNoBuildup": 36.2,
+    "pctBase": 10.6,
+    "pctAll": 16.3
+   },
+   {
+    "n": "Marco Verratti",
+    "S": 2023,
+    "team": "Paris Saint Germain",
+    "min": 2231,
+    "pctNoBuildup": 42.3,
+    "pctBase": 9.0,
+    "pctAll": 11.9
+   },
+   {
+    "n": "Mart\u00edn Zubimendi",
+    "S": 2021,
+    "team": "Real Sociedad",
+    "min": 1861,
+    "pctNoBuildup": 80.8,
+    "pctBase": 79.8,
+    "pctAll": 82.0
+   },
+   {
+    "n": "Mart\u00edn Zubimendi",
+    "S": 2022,
+    "team": "Real Sociedad",
+    "min": 2562,
+    "pctNoBuildup": 70.3,
+    "pctBase": 70.7,
+    "pctAll": 75.2
+   },
+   {
+    "n": "Mart\u00edn Zubimendi",
+    "S": 2023,
+    "team": "Real Sociedad",
+    "min": 3111,
+    "pctNoBuildup": 48.6,
+    "pctBase": 43.9,
+    "pctAll": 47.8
+   },
+   {
+    "n": "Mart\u00edn Zubimendi",
+    "S": 2024,
+    "team": "Real Sociedad",
+    "min": 2647,
+    "pctNoBuildup": 54.8,
+    "pctBase": 51.9,
+    "pctAll": 44.7
+   },
+   {
+    "n": "Mart\u00edn Zubimendi",
+    "S": 2025,
+    "team": "Real Sociedad",
+    "min": 2966,
+    "pctNoBuildup": 46.3,
+    "pctBase": 34.0,
+    "pctAll": 34.3
+   },
+   {
+    "n": "Mart\u00edn Zubimendi",
+    "S": 2026,
+    "team": "Arsenal",
+    "min": 3040,
+    "pctNoBuildup": 55.8,
+    "pctBase": 47.8,
+    "pctAll": 52.9
+   },
+   {
+    "n": "Miralem Pjanic",
+    "S": 2017,
+    "team": "Juventus",
+    "min": 2179,
+    "pctNoBuildup": 3.0,
+    "pctBase": 2.8,
+    "pctAll": 0.9
+   },
+   {
+    "n": "Miralem Pjanic",
+    "S": 2018,
+    "team": "Juventus",
+    "min": 2502,
+    "pctNoBuildup": 13.4,
+    "pctBase": 9.7,
+    "pctAll": 6.3
+   },
+   {
+    "n": "Miralem Pjanic",
+    "S": 2019,
+    "team": "Juventus",
+    "min": 2297,
+    "pctNoBuildup": 13.1,
+    "pctBase": 5.7,
+    "pctAll": 2.3
+   },
+   {
+    "n": "Miralem Pjanic",
+    "S": 2020,
+    "team": "Juventus",
+    "min": 2312,
+    "pctNoBuildup": 29.0,
+    "pctBase": 15.6,
+    "pctAll": 8.6
+   },
+   {
+    "n": "Mois\u00e9s Caicedo",
+    "S": 2023,
+    "team": "Brighton",
+    "min": 3135,
+    "pctNoBuildup": 57.0,
+    "pctBase": 37.9,
+    "pctAll": 45.7
+   },
+   {
+    "n": "Mois\u00e9s Caicedo",
+    "S": 2024,
+    "team": "Chelsea",
+    "min": 2897,
+    "pctNoBuildup": 64.3,
+    "pctBase": 24.9,
+    "pctAll": 45.3
+   },
+   {
+    "n": "Mois\u00e9s Caicedo",
+    "S": 2025,
+    "team": "Chelsea",
+    "min": 3381,
+    "pctNoBuildup": 60.2,
+    "pctBase": 41.7,
+    "pctAll": 58.8
+   },
+   {
+    "n": "Mois\u00e9s Caicedo",
+    "S": 2026,
+    "team": "Chelsea",
+    "min": 2811,
+    "pctNoBuildup": 64.2,
+    "pctBase": 40.9,
+    "pctAll": 51.6
+   },
+   {
+    "n": "N&#039;Golo Kant\u00e9",
+    "S": 2017,
+    "team": "Chelsea",
+    "min": 3141,
+    "pctNoBuildup": 41.2,
+    "pctBase": 28.7,
+    "pctAll": 43.0
+   },
+   {
+    "n": "N&#039;Golo Kant\u00e9",
+    "S": 2018,
+    "team": "Chelsea",
+    "min": 3005,
+    "pctNoBuildup": 32.1,
+    "pctBase": 15.1,
+    "pctAll": 20.1
+   },
+   {
+    "n": "N&#039;Golo Kant\u00e9",
+    "S": 2019,
+    "team": "Chelsea",
+    "min": 3103,
+    "pctNoBuildup": 39.7,
+    "pctBase": 31.5,
+    "pctAll": 51.0
+   },
+   {
+    "n": "N&#039;Golo Kant\u00e9",
+    "S": 2020,
+    "team": "Chelsea",
+    "min": 1733,
+    "pctNoBuildup": 49.6,
+    "pctBase": 48.8,
+    "pctAll": 50.8
+   },
+   {
+    "n": "N&#039;Golo Kant\u00e9",
+    "S": 2021,
+    "team": "Chelsea",
+    "min": 2142,
+    "pctNoBuildup": 51.0,
+    "pctBase": 39.8,
+    "pctAll": 61.8
+   },
+   {
+    "n": "N&#039;Golo Kant\u00e9",
+    "S": 2022,
+    "team": "Chelsea",
+    "min": 1787,
+    "pctNoBuildup": 26.8,
+    "pctBase": 14.7,
+    "pctAll": 17.7
+   },
+   {
+    "n": "Rodri",
+    "S": 2018,
+    "team": "Villarreal",
+    "min": 3230,
+    "pctNoBuildup": 84.6,
+    "pctBase": 62.8,
+    "pctAll": 44.2
+   },
+   {
+    "n": "Rodri",
+    "S": 2019,
+    "team": "Atletico Madrid",
+    "min": 2750,
+    "pctNoBuildup": 49.9,
+    "pctBase": 35.0,
+    "pctAll": 25.4
+   },
+   {
+    "n": "Rodri",
+    "S": 2020,
+    "team": "Manchester City",
+    "min": 2488,
+    "pctNoBuildup": 34.8,
+    "pctBase": 8.5,
+    "pctAll": 5.2
+   },
+   {
+    "n": "Rodri",
+    "S": 2021,
+    "team": "Manchester City",
+    "min": 2751,
+    "pctNoBuildup": 32.1,
+    "pctBase": 9.4,
+    "pctAll": 5.6
+   },
+   {
+    "n": "Rodri",
+    "S": 2022,
+    "team": "Manchester City",
+    "min": 2901,
+    "pctNoBuildup": 34.5,
+    "pctBase": 5.9,
+    "pctAll": 4.5
+   },
+   {
+    "n": "Rodri",
+    "S": 2023,
+    "team": "Manchester City",
+    "min": 2938,
+    "pctNoBuildup": 17.0,
+    "pctBase": 3.4,
+    "pctAll": 1.5
+   },
+   {
+    "n": "Rodri",
+    "S": 2024,
+    "team": "Manchester City",
+    "min": 2967,
+    "pctNoBuildup": 16.6,
+    "pctBase": 2.7,
+    "pctAll": 1.2
+   },
+   {
+    "n": "Rodri",
+    "S": 2026,
+    "team": "Manchester City",
+    "min": 1500,
+    "pctNoBuildup": 41.6,
+    "pctBase": 20.2,
+    "pctAll": 8.5
+   },
+   {
+    "n": "R\u00faben Neves",
+    "S": 2019,
+    "team": "Wolverhampton Wanderers",
+    "min": 3014,
+    "pctNoBuildup": 51.5,
+    "pctBase": 45.0,
+    "pctAll": 30.2
+   },
+   {
+    "n": "R\u00faben Neves",
+    "S": 2020,
+    "team": "Wolverhampton Wanderers",
+    "min": 3081,
+    "pctNoBuildup": 39.0,
+    "pctBase": 26.5,
+    "pctAll": 15.4
+   },
+   {
+    "n": "R\u00faben Neves",
+    "S": 2021,
+    "team": "Wolverhampton Wanderers",
+    "min": 2681,
+    "pctNoBuildup": 61.9,
+    "pctBase": 74.0,
+    "pctAll": 47.5
+   },
+   {
+    "n": "R\u00faben Neves",
+    "S": 2022,
+    "team": "Wolverhampton Wanderers",
+    "min": 2674,
+    "pctNoBuildup": 69.6,
+    "pctBase": 72.3,
+    "pctAll": 45.1
+   },
+   {
+    "n": "R\u00faben Neves",
+    "S": 2023,
+    "team": "Wolverhampton Wanderers",
+    "min": 3022,
+    "pctNoBuildup": 67.0,
+    "pctBase": 62.5,
+    "pctAll": 45.2
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2017,
+    "team": "Lazio",
+    "min": 2733,
+    "pctNoBuildup": 23.3,
+    "pctBase": 23.1,
+    "pctAll": 24.9
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2018,
+    "team": "Lazio",
+    "min": 2856,
+    "pctNoBuildup": 13.3,
+    "pctBase": 11.2,
+    "pctAll": 9.4
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2019,
+    "team": "Lazio",
+    "min": 2416,
+    "pctNoBuildup": 11.3,
+    "pctBase": 8.7,
+    "pctAll": 5.1
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2020,
+    "team": "Lazio",
+    "min": 3038,
+    "pctNoBuildup": 28.2,
+    "pctBase": 27.2,
+    "pctAll": 33.0
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2021,
+    "team": "Lazio",
+    "min": 2768,
+    "pctNoBuildup": 14.3,
+    "pctBase": 12.7,
+    "pctAll": 16.0
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2022,
+    "team": "Lazio",
+    "min": 3121,
+    "pctNoBuildup": 12.7,
+    "pctBase": 11.0,
+    "pctAll": 8.5
+   },
+   {
+    "n": "Sergej Milinkovic-Savic",
+    "S": 2023,
+    "team": "Lazio",
+    "min": 3044,
+    "pctNoBuildup": 13.4,
+    "pctBase": 18.4,
+    "pctAll": 21.8
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2017,
+    "team": "Barcelona",
+    "min": 2696,
+    "pctNoBuildup": 59.7,
+    "pctBase": 16.5,
+    "pctAll": 30.7
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2018,
+    "team": "Barcelona",
+    "min": 2604,
+    "pctNoBuildup": 56.0,
+    "pctBase": 17.2,
+    "pctAll": 26.8
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2019,
+    "team": "Barcelona",
+    "min": 2726,
+    "pctNoBuildup": 57.5,
+    "pctBase": 17.6,
+    "pctAll": 29.4
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2020,
+    "team": "Barcelona",
+    "min": 2510,
+    "pctNoBuildup": 28.4,
+    "pctBase": 5.9,
+    "pctAll": 14.6
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2021,
+    "team": "Barcelona",
+    "min": 2557,
+    "pctNoBuildup": 40.5,
+    "pctBase": 15.5,
+    "pctAll": 26.3
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2022,
+    "team": "Barcelona",
+    "min": 3212,
+    "pctNoBuildup": 59.0,
+    "pctBase": 27.8,
+    "pctAll": 31.9
+   },
+   {
+    "n": "Sergio Busquets",
+    "S": 2023,
+    "team": "Barcelona",
+    "min": 2359,
+    "pctNoBuildup": 42.9,
+    "pctBase": 17.2,
+    "pctAll": 19.5
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2018,
+    "team": "Celta Vigo",
+    "min": 3062,
+    "pctNoBuildup": 95.8,
+    "pctBase": 81.7,
+    "pctAll": 66.9
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2019,
+    "team": "Celta Vigo",
+    "min": 2494,
+    "pctNoBuildup": 88.3,
+    "pctBase": 84.6,
+    "pctAll": 78.7
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2022,
+    "team": "Napoli",
+    "min": 1693,
+    "pctNoBuildup": 49.5,
+    "pctBase": 33.6,
+    "pctAll": 21.6
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2023,
+    "team": "Napoli",
+    "min": 3117,
+    "pctNoBuildup": 57.6,
+    "pctBase": 33.3,
+    "pctAll": 37.8
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2024,
+    "team": "Napoli",
+    "min": 3324,
+    "pctNoBuildup": 47.7,
+    "pctBase": 24.3,
+    "pctAll": 24.1
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2025,
+    "team": "Napoli",
+    "min": 2678,
+    "pctNoBuildup": 49.5,
+    "pctBase": 28.4,
+    "pctAll": 35.7
+   },
+   {
+    "n": "Stanislav Lobotka",
+    "S": 2026,
+    "team": "Napoli",
+    "min": 2442,
+    "pctNoBuildup": 55.7,
+    "pctBase": 40.7,
+    "pctAll": 31.4
+   },
+   {
+    "n": "Thiago Alc\u00e1ntara",
+    "S": 2017,
+    "team": "Bayern Munich",
+    "min": 2291,
+    "pctNoBuildup": 14.8,
+    "pctBase": 2.5,
+    "pctAll": 2.5
+   },
+   {
+    "n": "Thiago Alc\u00e1ntara",
+    "S": 2019,
+    "team": "Bayern Munich",
+    "min": 2412,
+    "pctNoBuildup": 15.0,
+    "pctBase": 1.7,
+    "pctAll": 1.2
+   },
+   {
+    "n": "Thiago Alc\u00e1ntara",
+    "S": 2020,
+    "team": "Bayern Munich",
+    "min": 1773,
+    "pctNoBuildup": 41.6,
+    "pctBase": 7.5,
+    "pctAll": 5.3
+   },
+   {
+    "n": "Thiago Alc\u00e1ntara",
+    "S": 2021,
+    "team": "Liverpool",
+    "min": 1865,
+    "pctNoBuildup": 35.3,
+    "pctBase": 21.5,
+    "pctAll": 15.6
+   },
+   {
+    "n": "Thiago Alc\u00e1ntara",
+    "S": 2022,
+    "team": "Liverpool",
+    "min": 1531,
+    "pctNoBuildup": 15.8,
+    "pctBase": 4.0,
+    "pctAll": 5.1
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2018,
+    "team": "Atletico Madrid",
+    "min": 2386,
+    "pctNoBuildup": 55.9,
+    "pctBase": 47.0,
+    "pctAll": 48.6
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2019,
+    "team": "Atletico Madrid",
+    "min": 2071,
+    "pctNoBuildup": 58.3,
+    "pctBase": 47.0,
+    "pctAll": 62.6
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2020,
+    "team": "Atletico Madrid",
+    "min": 2544,
+    "pctNoBuildup": 44.6,
+    "pctBase": 27.4,
+    "pctAll": 25.1
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2021,
+    "team": "Arsenal",
+    "min": 1543,
+    "pctNoBuildup": 44.9,
+    "pctBase": 35.9,
+    "pctAll": 31.1
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2022,
+    "team": "Arsenal",
+    "min": 2045,
+    "pctNoBuildup": 43.5,
+    "pctBase": 26.5,
+    "pctAll": 29.7
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2023,
+    "team": "Arsenal",
+    "min": 2484,
+    "pctNoBuildup": 47.1,
+    "pctBase": 18.3,
+    "pctAll": 16.1
+   },
+   {
+    "n": "Thomas Partey",
+    "S": 2025,
+    "team": "Arsenal",
+    "min": 2810,
+    "pctNoBuildup": 50.9,
+    "pctBase": 39.8,
+    "pctAll": 53.6
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2017,
+    "team": "Real Madrid",
+    "min": 2503,
+    "pctNoBuildup": 6.8,
+    "pctBase": 4.9,
+    "pctAll": 1.2
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2018,
+    "team": "Real Madrid",
+    "min": 2275,
+    "pctNoBuildup": 14.2,
+    "pctBase": 7.6,
+    "pctAll": 3.7
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2019,
+    "team": "Real Madrid",
+    "min": 2235,
+    "pctNoBuildup": 35.0,
+    "pctBase": 26.5,
+    "pctAll": 6.6
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2020,
+    "team": "Real Madrid",
+    "min": 2661,
+    "pctNoBuildup": 15.4,
+    "pctBase": 9.9,
+    "pctAll": 3.8
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2021,
+    "team": "Real Madrid",
+    "min": 2116,
+    "pctNoBuildup": 8.0,
+    "pctBase": 7.2,
+    "pctAll": 1.1
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2022,
+    "team": "Real Madrid",
+    "min": 2119,
+    "pctNoBuildup": 27.3,
+    "pctBase": 12.7,
+    "pctAll": 2.6
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2023,
+    "team": "Real Madrid",
+    "min": 2181,
+    "pctNoBuildup": 25.1,
+    "pctBase": 10.7,
+    "pctAll": 4.4
+   },
+   {
+    "n": "Toni Kroos",
+    "S": 2024,
+    "team": "Real Madrid",
+    "min": 2152,
+    "pctNoBuildup": 19.6,
+    "pctBase": 6.8,
+    "pctAll": 1.1
+   }
+  ]
+ },
+ "note": "pct = mean percentile among outfield players with 1500+ minutes that season, 0 = best"
+}
