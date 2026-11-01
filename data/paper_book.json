@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01T20:23:18Z",
+ "asof": "2026-11-01T20:23:48Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.69,
   "peak": 111.35,
   "drawdown": 0.0508,
-  "open": 122.0,
+  "open": 121.75,
   "path": [
    101.5,
    101.6,
@@ -51,12 +51,12 @@
   ]
  },
  "record": {
-  "n": 154,
-  "clvN": 87,
-  "clvRet": -0.0292,
-  "clvT": -3.78,
+  "n": 153,
+  "clvN": 86,
+  "clvRet": -0.0294,
+  "clvT": -3.76,
   "clv": -0.15,
-  "beat": 0.22,
+  "beat": 0.225,
   "settled": 39,
   "w": 26,
   "l": 13,
@@ -67,23 +67,23 @@
   "risked": 54.0,
   "yield": 0.1132
  },
- "tEff": -3.78,
+ "tEff": -3.76,
  "corr": {
   "rho": 0.0,
-  "n": 87,
+  "n": 86,
   "slates": 12,
-  "nEff": 87.0,
-  "avgSlate": 7.25
+  "nEff": 86.0,
+  "avgSlate": 7.17
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 87,
+   "value": 86,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.9% t -3.78",
+   "value": "-2.9% t -3.76",
    "pass": false
   },
   {
@@ -298,12 +298,12 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 42,
-   "clvN": 25,
-   "clvRet": -0.0127,
-   "clvT": -1.81,
-   "clv": 0.17,
-   "beat": 0.28,
+   "n": 41,
+   "clvN": 24,
+   "clvRet": -0.0126,
+   "clvT": -1.72,
+   "clv": 0.18,
+   "beat": 0.292,
    "settled": 18,
    "w": 15,
    "l": 3,
@@ -384,31 +384,6 @@
    "clv": 0.3,
    "beat": 0,
    "close": 0.275
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "185196",
-   "k": "2026-10-29T19:00:00Z",
-   "slate": "tennis:2026-10-29",
-   "h": "Cobolli",
-   "a": "Berrettini",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": -100,
-   "bet": "Cobolli ML -100",
-   "placed": "2026-10-29T03:00:50Z",
-   "stake": 0.25,
-   "edge": 6.4,
-   "ev": 0.0013,
-   "event": "Erste Bank Open",
-   "pass": false,
-   "clvRet": -0.015,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 0.4925,
-   "score": "5-2"
   },
   {
    "rule": "tennis-ml",
@@ -4334,6 +4309,32 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "185196",
+   "k": "2026-10-29T19:00:00Z",
+   "slate": "tennis:2026-10-29",
+   "h": "Cobolli",
+   "a": "Berrettini",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -100,
+   "bet": "Cobolli ML -100",
+   "placed": "2026-10-29T03:00:50Z",
+   "stake": 0.25,
+   "edge": 6.4,
+   "ev": 0.0013,
+   "event": "Erste Bank Open",
+   "pass": true,
+   "clvRet": -0.015,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.4925,
+   "score": "5-2",
+   "res": "void"
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "185149",
    "k": "2026-10-29T18:30:00Z",
    "slate": "tennis:2026-10-29",
@@ -5741,12 +5742,13 @@
    "edge": 6.4,
    "ev": 0.0013,
    "event": "Erste Bank Open",
-   "pass": false,
+   "pass": true,
    "clvRet": -0.015,
    "clv": 0.0,
    "beat": 0,
    "close": 0.4925,
-   "score": "5-2"
+   "score": "5-2",
+   "res": "void"
   },
   {
    "rule": "nba-total",
