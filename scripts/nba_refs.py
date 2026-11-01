@@ -16,6 +16,7 @@ crew, lean}, and {id, fin: {fta, pf}, crew} once ESPN has the box score. Grade w
 """
 import datetime as dt, gzip, json, os, sys, time, urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from zoneinfo import ZoneInfo
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nba_espn as E
@@ -196,7 +197,7 @@ def today(now=None):
     import names as NM
     now = now or dt.datetime.now(dt.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
-    et = (now - dt.timedelta(hours=4)).date()
+    et = now.astimezone(ZoneInfo('America/New_York')).date()      # a flat UTC-4 read 11 pm EST as tomorrow
     log = read_log()
     new = []
     # whistle of finished games we logged a crew for
