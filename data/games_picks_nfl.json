@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-01T01:29:59Z",
+ "asof": "2026-11-01T01:30:47Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -413,22 +413,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "2026_08_KC_DEN",
-   "sport": "nfl",
-   "kick": "2026-11-01T21:25:00Z",
-   "home": "DEN",
-   "away": "KC",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -108.0,
-   "edge": 2.0,
-   "x": 1.5,
-   "why": "no edge at -108",
-   "m": -1.3,
-   "tm": 42.5
-  },
-  {
    "id": "2026_08_CLE_PIT",
    "sport": "nfl",
    "kick": "2026-11-01T18:00:00Z",
@@ -459,6 +443,22 @@
    "why": "edge under 4",
    "m": 0.1,
    "tm": 43.3
+  },
+  {
+   "id": "2026_08_KC_DEN",
+   "sport": "nfl",
+   "kick": "2026-11-01T21:25:00Z",
+   "home": "DEN",
+   "away": "KC",
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -111.0,
+   "edge": 2.1,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": 0.6,
+   "tm": 42.5
   },
   {
    "id": "2026_08_LAC_LA",
@@ -619,11 +619,11 @@
    "state": "under"
   },
   "2026_08_KC_DEN": {
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -108.0,
-   "edge": 2.0,
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -111.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "DEN",
@@ -707,7 +707,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 936,
+  "snapshots": 937,
   "buckets": [
    {
     "when": "24h+",
