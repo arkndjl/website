@@ -166,7 +166,8 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   // 2. staff: does a coach's score explain what the model missed this season? The scores are built on this season's
   // results (a head coach's is mostly his team's Elo now and its Elo against its talent), and today's Elo already
   // contains the games being tested, so the naive fit is circular. The test that counts holds today's Elo and talent
-  // fixed: what's left of a coach's score is what he adds beyond them. It enters at t >= 2 with a positive sign.
+  // fixed: what's left of a coach's score is what he adds beyond them. It enters at t >= 2 with a positive sign and
+  // leaves below t 1.5.
   const hcZ = {}, coZ = {};
   for (const c of coaches || []) {
     if (c.score == null) continue;
@@ -183,7 +184,11 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
       const naive = coef(test.map(p => [d(z, p)]), res);
       const ctl = coef(test.map(p => [d(z, p), d(eloNow, p), d(t => talentZ[t] ?? 0, p)]), res);
       if (!naive) continue;
-      const used = !!ctl && ctl.b > 0 && ctl.t >= 2;
+      // hysteresis: a term already in keeps its place down to t 1.5, so a t that sits near 2 doesn't switch the
+      // term on and off between runs (coordinators went 2.07 -> 1.97 on Nov 1, 2026 and moved teams up to 2 points
+      // with no game played)
+      const was = (prev?.staffUsed || []).includes(key);
+      const used = !!ctl && ctl.b > 0 && ctl.t >= (was ? 1.5 : 2);
       if (used) staffIn[key] = { b: ctl.b, Z };
       ev.staff.push({ key, name, naive: { ptsPerSd: r2(naive.b), t: r2(naive.t) }, ptsPerSd: ctl ? r2(ctl.b) : null, t: ctl ? r2(ctl.t) : null, n: res.length, used });
     }
