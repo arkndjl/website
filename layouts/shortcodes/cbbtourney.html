@@ -25,7 +25,7 @@
     <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td>{{ .conf }}</td>
     {{- partial "inline/cbbt-pct.html" $n.bid }}
-    <td class="cfb__num" data-v="{{ $n.seed | default 99 }}">{{ with $n.seed }}{{ if ge (float $n.bid) 0.005 }}{{ printf "%.1f" (float .) }}{{ end }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with $n.seed }}{{ if ge (float $n.bid) 0.005 }}{{ . }}{{ end }}{{ end }}">{{ with $n.seed }}{{ if ge (float $n.bid) 0.005 }}{{ printf "%.1f" (float .) }}{{ end }}{{ end }}</td>
     {{- partial "inline/cbbt-pct.html" $n.s16 }}
     {{- partial "inline/cbbt-pct.html" $n.f4 }}
     {{- partial "inline/cbbt-pct.html" $n.champ }}

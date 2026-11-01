@@ -408,7 +408,7 @@ def injury_history(games, years, live=None):
     the loss; continuing: he missed it too. Each player's value is his WAR a game to that week (nfl_war.py's model,
     no look-ahead), costed at 1 - P(plays) by his status on the game status report."""
     import nfl_war as W
-    cp = os.path.join(CACHE, 'inj_hist_v2.json')      # v2: questionable by last practice (Nov 1 2026)
+    cp = os.path.join(CACHE, 'inj_hist_v3.json')      # v3: names.py roster join (Nov 1 2026)
     try:
         cache = json.load(open(cp))
     except (OSError, ValueError):

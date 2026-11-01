@@ -101,7 +101,7 @@
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rk }}">{{ .rk }}</td>
     <td class="cfb__num" data-v="{{ index .svc "247" | default 9999 }}">{{ index .svc "247" | default "—" }}</td>
-    <td class="cfb__num" data-v="{{ .svc.espn | default 9999 }}">{{ .svc.espn | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ with .svc.espn }}{{ . }}{{ end }}">{{ .svc.espn | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt | default 0 }}">{{ .ht | default "—" }}{{ with .wt }}, {{ . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
     <td>{{ .conf }}</td>

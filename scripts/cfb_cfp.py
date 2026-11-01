@@ -13,7 +13,8 @@ so on down to 25, with s = b . x. Sampling a ranking from it = sort s + Gumbel n
 (scripts/cfb_model.mjs) uses it. Inputs, as of each release (games before its date):
   L, W            losses and wins (FCS games count)
   rating          our game model's rating, read back from its walk-forward margins (scripts/data/games_wf: ridge on
-                  team and home terms over the regular-season games from 21 days before to 28 days after the release, bowls
+                  team and home terms over the season's regular-season games up to a week after the release (each margin made
+                  before its game), earlier games down-weighted exp(-days / 56), bowls
                   left out: their margins carry opt-out adjustments; the live sim
                   uses the rating itself)
   wab             strength of record: wins above a bubble team (the 12th-best rating) against the same schedule,

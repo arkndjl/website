@@ -135,7 +135,7 @@ def update_log():
         for g in log.values():
             if g.get('hs') is None or 'poss' in g:
                 continue
-            local = (datetime.fromisoformat(g['date'].replace('Z', '+00:00')) - timedelta(hours=6)).strftime('%Y-%m-%d')
+            local = C.et_date(g['date'])
             q = bt.get((local, tuple(sorted((g['hs'], g['as'])))))
             if q and len(q) == 1:
                 g['poss'] = round(q[0][0], 1)
@@ -368,7 +368,7 @@ def build():
     W.attm[SEASON - 1] = st.get('att', {})         # last season's home crowds ('hatt')
     av, missing = avail_live()
     now = now_utc()
-    today = (now - timedelta(hours=5)).strftime('%Y-%m-%d')
+    today = C.et_date(now.strftime('%Y-%m-%dT%H:%M:%SZ'))
     dates = sorted({C.et_date(g['date']) for g in rows if C.et_date(g['date']) >= today and g['state'] != 'post'})
     show = set(dates[:PICKS_LEFT])
     upto = dates[PICKS_LEFT - 1] if len(dates) >= PICKS_LEFT else (dates[-1] if dates else None)

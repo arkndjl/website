@@ -1,6 +1,6 @@
 {{- /* rank odds cells for one power-table row: .r = the row (rkLo, rkHi, p1, p4, p25, rsd), .tops as in rankodds-th */ -}}
 {{- $r := .r -}}
-<td class="cfb__num" data-v="{{ $r.rkHi | default 999 }}"{{ with $r.rsd }} title="rating sd {{ printf "%.1f" (float .) }} pts"{{ end }}>{{ with $r.rkLo }}{{ if eq . $r.rkHi }}{{ . }}{{ else }}{{ . }}–{{ $r.rkHi }}{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+<td class="cfb__num" data-v="{{ with $r.rkHi }}{{ . }}{{ end }}"{{ with $r.rsd }} title="rating sd {{ printf "%.1f" (float .) }} pts"{{ end }}>{{ with $r.rkLo }}{{ if eq . $r.rkHi }}{{ . }}{{ else }}{{ . }}–{{ $r.rkHi }}{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
 {{- range .tops }}{{ $p := index $r (printf "p%d" .) }}
 <td class="cfb__num" data-v="{{ $p | default 0 }}">{{ if eq $p nil }}<span class="cfb__dim">—</span>{{ else if lt $p 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if ge $p 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $p 100)) }}%{{ end }}</td>
 {{- end }}

@@ -34,10 +34,10 @@
     <td class="cfb__num">{{ printf "%+.2f" (float .def) }}</td>
     <td class="cfb__num" data-v="{{ .pW }}">{{ printf "%.0f" (mul .pW 100) }}% <span class="cfb__dim">/ {{ printf "%.0f" (mul .pD 100) }}%</span></td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4 10)) }}
-    <td class="cfb__num" data-v="{{ .pts | default -1 }}">{{ .rec | default "—" }}</td>
-    <td class="cfb__num" data-v="{{ .xpts | default -1 }}">{{ with .xpts }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne .pts nil }}{{ .pts }}{{ end }}">{{ .rec | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ if ne .xpts nil }}{{ .xpts }}{{ end }}">{{ with .xpts }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     {{- range $v := slice .title .top4 .rel }}
-    <td class="cfb__num" data-v="{{ $v | default -1 }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne $v nil }}{{ $v }}{{ end }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
     {{- end }}
     {{- $eu := "" }}{{ $ev := 0.0 }}{{ with .ucl }}{{ $eu = "UCL" }}{{ $ev = . }}{{ end }}{{ with .uel }}{{ $eu = "UEL" }}{{ $ev = . }}{{ end }}{{ with .uecl }}{{ $eu = "UECL" }}{{ $ev = . }}{{ end }}
     <td class="cfb__num" data-v="{{ $ev }}">{{ if $eu }}{{ if lt $ev 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul $ev 100)) }}%{{ end }} <span class="cfb__dim">{{ $eu }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

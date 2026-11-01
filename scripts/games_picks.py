@@ -259,7 +259,7 @@ def recenter_live(sport, games, arch, now):
     day = {}
     for g in games:
         if g.get('tm') is not None and g.get('T') is not None and g.get('kick') and iso(g['kick']) > now:
-            day.setdefault('week' if sport in ('cfb', 'nfl') else (iso(g['kick']) - datetime.timedelta(hours=4)).date(), []).append(g)
+            day.setdefault('week' if sport in ('cfb', 'nfl') else et_date(g['kick']), []).append(g)
     offs = {}
     for d, gs in day.items():
         vals = past + [g['tm'] - g['T'] for g in gs]
@@ -925,6 +925,12 @@ def iso(t):
     return datetime.datetime.fromisoformat(t.replace('Z', '+00:00'))
 
 
+def et_date(kick):
+    """the US Eastern date of a start (EDT or EST, not a fixed UTC offset)"""
+    from zoneinfo import ZoneInfo
+    return iso(kick).astimezone(ZoneInfo('America/New_York')).date()
+
+
 def archive_rows(sport):
     """every snapshot in the odds archive for a sport, oldest first"""
     rows = []
@@ -1105,7 +1111,7 @@ def live(sport):
     gtab = {}
     # every upcoming game's options first: picks on one slate (an ET day; the football board is one week) size together
     ahead = {g['id']: rule_options(sport, g, R, SEGS) for g in games if g['kick'] and iso(g['kick']) > now}
-    slate = lambda g: 'week' if sport in ('cfb', 'nfl') else (iso(g['kick']) - datetime.timedelta(hours=4)).date().isoformat()
+    slate = lambda g: 'week' if sport in ('cfb', 'nfl') else et_date(g['kick']).isoformat()
     n_slate = {}
     for g in games:
         n = len({fam(o['mk']) for o in ahead.get(g['id'], ([], []))[0]})

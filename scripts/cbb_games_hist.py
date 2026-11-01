@@ -144,7 +144,7 @@ def season_rows(season):
     for g, o in zip(games, odds):
         g.update(pick_line((o or {}).get('items', [])))
         # ESPN dates are UTC; Barttorvik's are local (US) dates
-        local = (datetime.fromisoformat(g['date'].replace('Z', '+00:00')) - td(hours=6)).strftime('%Y-%m-%d')
+        local = (datetime.fromisoformat(g['date'].replace('Z', '+00:00')) - td(hours=8)).strftime('%Y-%m-%d')   # cbb_games.et_date
         p = bt.get((local, tuple(sorted((g['hs'], g['as'])))))
         if p and len(p) == 1:
             g['poss'] = round(p[0][0], 1)
