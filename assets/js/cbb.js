@@ -23,6 +23,14 @@
   // a row with no photo (or one that fails) keeps the neutral frame so names line up; a card without one drops it
   function faceHtml(src, cls, w) { var u = face(src, w), row = cls === 'pxframe--row'; return u || row ? '<span class="pxframe ' + cls + '"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" onerror="' + (row ? 'this.onerror=null;this.src=\'/img/face.svg\'' : 'this.parentNode.remove()') + '"></span>' : ''; }
   function tierOf(v) { return Math.max(20, Math.floor(v / 5) * 5); }   // chip colour: the 5-point band the FV sits in
+  // badges (scripts/cbb_badges.py, the football board's medals): [name, tier letter, percentile, stat], best first, from
+  // last college season, percentiles within his role family (guards, wings, bigs); only badges that predicted NBA value
+  // beyond the FV model held out (scripts/cbb_badge_backtest.py)
+  var TIER = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }, FAM = { 'Pure PG': 'guards', 'Scoring PG': 'guards', 'Combo G': 'guards', 'Wing G': 'wings', 'Wing F': 'wings', 'Stretch 4': 'bigs', 'PF/C': 'bigs', 'C': 'bigs' };
+  function nth(n) { var t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return n + t; }
+  function badgeLine(b, r) { return TIER[b[1]] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct among ' + (FAM[r.role] || 'his role') + ', ' + b[3] + ' last season (regressed by volume)'; }
+  function medals(r) { return r.bdg && r.bdg.length ? '<span class="cfb__medals" title="' + esc(r.bdg.map(function (b) { return badgeLine(b, r); }).join('\n') + '\npredictive of NBA value beyond FV; not in FV') + '">' + r.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
+  function badgeChips(r) { return r.bdg && r.bdg.length ? '<p class="cfb__badges">' + r.bdg.map(function (b) { return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(badgeLine(b, r)) + '">' + TIER[b[1]] + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : ''; }
   function outcome(r) {
     if (r.outcome == null && !r.draft) return '<span class="cfb__dim" title="career not finished: no NBA role to score yet">open</span>';
     var pick = r.draft ? ' · #' + r.pick + " '" + String(r.draft).slice(2) : '';
@@ -35,7 +43,7 @@
     var fv = r.fv, tier = tierOf(r.fv);
     return '<tr data-i="' + r.i + '">' +
       '<td class="cfb__rk"' + (rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + rk + '</td>' +
-      '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
+      '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' + medals(r) +
       (r.src === 'bt' ? prov('not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in') : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
@@ -92,7 +100,7 @@
     var line = (r.now ? lineOf(r.now) + '. this season carries ' + Math.round(r.w * 100) + '% of his grade, by minutes played' + (L ? '.</p><p class="cfb__role">' + lineOf(L) : '') : L ? lineOf(L) : 'no D-I season yet');
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
-      ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' +
+      ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' + badgeChips(r) +
       '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
