@@ -1,0 +1,47 @@
+{{- /* The drift test on the pick rules (data/rule_monitor.json "drift", scripts/rule_monitor.py drift(); Nov 1 2026).
+       Each rule from its clock (switched on or refit) is tested against what its held-out backtest promised: Wald's
+       sequential test of "worth the backtest's edge, after the timing haircut the stakes take" against "worth nothing".
+       A pause stops the rule like the close switch does (scripts/games_picks.py), until a refit. */ -}}
+{{- with site.Data.rule_monitor -}}
+{{- $d := . -}}{{ $D := $d.pre.drift -}}
+{{- if $D -}}
+{{- $rows := slice -}}{{ range $d.rules }}{{ if and (eq .book "picks") .drift }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>new rules :: live vs backtest<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p class="pclv"><b>{{ len $d.drift.watching }} on probation</b> · {{ len $d.drift.confirmed }} confirmed · {{ with $d.drift.paused }}<b>{{ len . }} paused</b>{{ else }}none paused{{ end }}
+    <br><span class="cfb__dim">each rule's live picks against its backtest from the day it was switched on or refit; a rule that looks overfit is paused</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Rule</th><th title="the held-out backtest: close value, bets, flat ROI">Backtest</th><th title="the close value live picks should carry if the backtest holds: backtest x {{ $d.pre.timing }} (live picks are bet after part of the opening move; NBA also x {{ index $d.pre.leak "nba" }})">Expected</th><th title="live close value, bets judged by the close, record and flat ROI">Live</th><th title="live close value as a share of expected, with a 90% range; 1 = as the backtest said, 0 = no edge">Realized</th><th title="evidence: left edge pauses the rule (worth nothing is {{ $D.B }}x likelier), right edge confirms it (worth the backtest is {{ $D.A }}x likelier)">Evidence</th><th>Status</th></tr></thead>
+      <tbody>
+      {{- range $st := slice "paused" "watching" "confirmed" }}
+      {{- range sort (where $rows "drift.state" $st) "drift.n" "desc" }}
+      {{- $r := .drift -}}
+      <tr>
+        <td>{{ .label }} <span class="cfb__dim">since {{ lower ((time .since).Format "Jan 2") }}</span></td>
+        <td class="cfb__num">{{ with .exp }}{{ printf "%+.1f%%" (mul .clvRet 100) }} <span class="cfb__dim">{{ .n }}</span>{{ with .roi }}<br><span class="cfb__dim">ROI {{ printf "%+.1f%%" (mul . 100) }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ printf "%+.1f%%" (mul $r.mu1 100) }}</td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">{{ .clvN }}</span>{{ if .settled }}<br><span class="cfb__dim">{{ .w }}-{{ .l }}{{ with .roi }}, ROI {{ printf "%+.1f%%" (mul . 100) }}{{ end }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with $r.real }}<b>{{ printf "%.2f" . }}</b>{{ with $r.realSe }}<br><span class="cfb__dim">{{ printf "%.2f" (sub $r.real (mul 1.645 .)) }} to {{ printf "%.2f" (add $r.real (mul 1.645 .)) }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">
+          {{- $f := mul (div (sub ($r.llr | default 0) $r.lo) (sub $r.hi $r.lo)) 10.0 -}}
+          {{- $f = cond (lt $f 0.0) 0.0 (cond (gt $f 10.0) 10.0 $f) -}}
+          {{- $pos := int (add $f 0.5) -}}
+          <span class="rdrift__bar{{ if lt $pos 5 }} is-down{{ end }}" aria-label="evidence {{ printf "%.1f" ($r.llr | default 0) }} between {{ printf "%.1f" $r.lo }} and {{ printf "%.1f" $r.hi }}">{{ range $i := seq 0 10 }}<i class="{{ if or (and (ge $i 5) (le $i $pos)) (and (le $i 5) (ge $i $pos)) }}on{{ end }}{{ if eq $i 5 }} mid{{ end }}"></i>{{ end }}</span>
+        </td>
+        <td>{{ if eq $st "paused" }}<b>paused</b>{{ with $r.at }} <span class="cfb__dim">{{ lower ((time (index . 0)).Format "Jan 2") }}, {{ index . 1 }} bets</span>{{ end }}{{ else if eq $st "confirmed" }}<b>confirmed</b>{{ with $r.at }} <span class="cfb__dim">{{ lower ((time (index . 0)).Format "Jan 2") }}, {{ index . 1 }} bets</span>{{ end }}{{ else }}probation <span class="cfb__dim">~{{ $r.need }} bets to a verdict</span>{{ end }}</td>
+      </tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">how it works: a backtest picks its threshold from many tried, so its edge runs high. each pick rule is tested from its clock against two claims: it is worth what its held-out backtest says after the timing haircut the stakes already take (Expected), or it is worth nothing. every game day adds that day's log likelihood ratio, close value against both claims with the slate's correlation; the bar is the running total. at {{ $D.B }} to 1 for nothing (and {{ $D.minN }}+ bets) the rule is paused: it makes no picks and its open ones are withdrawn until it is refit. at {{ $D.A }} to 1 for the backtest it is confirmed and leaves probation; the close switch below keeps watching it. it is the same as asking whether the rule realizes more or less than half its expected edge. simulated on the CFB totals rule: a rule worth nothing is paused 96% of the time (median 234 bets), one worth its backtest is paused 4% and confirmed 94%, one worth half is a coin flip. registered {{ lower ((time $D.registered).Format "Jan 2 2006") }}, before these bets were judged.</p>
+  </div>
+  <div class="win__status"><span>judged by the close</span><span {{ partial "fresh-attrs.html" "rule_monitor" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
+{{- end -}}

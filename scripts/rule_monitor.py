@@ -109,6 +109,68 @@ def decide(bets, sd=None, P=None):
             'stop': bool(why), 'why': '; '.join(why)}
 
 
+# ---------------------------------------------------------------- the drift test: is a rule worth what its backtest said?
+
+def expected_live(sport, held):
+    """the close value a rule's live picks should be worth if its backtest holds: the held-out record's clvRet times the
+    haircuts the stakes already take (units.TIMING: live picks are bet after part of the open's move; units.LEAK: NBA
+    history saw news the open did not). None when the backtest has no positive record to test against"""
+    if not held or not (held.get('clvRet') or 0) > 0:
+        return None
+    import units as DU
+    return held['clvRet'] * DU.TIMING * DU.LEAK.get(sport, 1.0)
+
+
+def rho_for(sport, mk):
+    try:
+        import units as DU
+        return max(0.0, DU.params(sport, mk).get('rho') or 0.0)
+    except Exception:
+        return 0.0
+
+
+def drift(bets, mu1, sd=None, rho=0.0, P=None):
+    """Wald's sequential test of "the rule is worth its backtest" (mean close value mu1, the edge its stakes assume)
+    against "the rule is worth nothing" (0: the backtest was overfit). Each game day adds its log likelihood ratio
+    (s - n mu1 / 2) mu1 / (sd^2 (1 + (n - 1) rho)), s the day's summed clvRet over n bets, rho the within-slate
+    correlation. In game-day order, the first crossing decides: down past -ln(B) pauses the rule, up past ln(A)
+    confirms it and retires the test (the close switch in decide() still runs). Since LLR = (sum e^2 / sd^2) x
+    (r - 1/2) with r the realization rate (live close value over mu1, here r = mean / mu1), the test is the same as
+    asking whether the rule realises more or less than half its expected edge, with a margin that shrinks as bets come in."""
+    P = P or params()
+    D = P['drift']
+    sd = sd or P['sdDefault']
+    jc = sorted([b for b in bets if b.get('clvRet') is not None], key=lambda b: b.get('kick') or b.get('k'))
+    out = {'mu1': None if mu1 is None else round(mu1, 4), 'n': len(jc), 'sd': round(sd, 4), 'rho': round(rho, 3),
+           'lo': round(-math.log(D['B']), 3), 'hi': round(math.log(D['A']), 3)}
+    if not mu1 or mu1 <= 0:
+        return {**out, 'state': 'no test', 'llr': None, 'path': []}
+    days = {}
+    for b in jc:
+        days.setdefault(day(b.get('kick') or b.get('k')), []).append(b['clvRet'])
+    llr, path, state, at, n = 0.0, [], 'watching', None, 0
+    for d in sorted(days):
+        xs = days[d]
+        m = len(xs)
+        n += m
+        llr += (sum(xs) - m * mu1 / 2) * mu1 / (sd * sd * (1 + (m - 1) * rho))
+        path.append([d, n, round(llr, 3)])
+        if state == 'watching' and n >= D['minN']:
+            if llr <= out['lo']:
+                state, at = 'paused', [d, n]
+            elif llr >= out['hi']:
+                state, at = 'confirmed', [d, n]
+    m = sum(x for xs in days.values() for x in xs) / n if n else None
+    info = n * mu1 * mu1 / (sd * sd) if n else 0.0          # sum e^2 / sd^2: the evidence the bets carry, rho aside
+    r = None if m is None else m / mu1
+    rse = None if not n else sd * math.sqrt(1 + (n / max(1, len(days)) - 1) * rho) / math.sqrt(n) / mu1
+    # bets until a rule exactly at its backtest, or at nothing, would reach a boundary on average (Wald: ln bound / drift)
+    need = round(math.log(D['A']) / (mu1 * mu1 / (2 * sd * sd)))
+    return {**out, 'state': state, 'at': at, 'llr': round(llr, 3), 'info': round(info, 2),
+            'real': None if r is None else round(r, 3), 'realSe': None if rse is None else round(rse, 3),
+            'need': need, 'path': path[-60:]}
+
+
 # ---------------------------------------------------------------- the pick rules' state (kept in games_picks_<sport>.json)
 
 def pick_rules(R):
@@ -153,9 +215,16 @@ def pick_state(sport, RS, log, old, stamp, P=None):
             stops.pop(i)
         bs = [e for e in log if rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
         d = decide(bs, sd_of(held), P)
+        dr = drift(bs, expected_live(sport, held), sd_of(held), rho_for(sport, defn['mk']), P)
+        d = {**d, 'drift': {k: v for k, v in dr.items() if k != 'path'}}
+        if dr['state'] == 'paused':
+            w = (f"drift test: live worth {dr['real']:.2f} of the backtest's expected edge over {dr['n']} bets, "
+                 f"{P['drift']['B']}x likelier no edge than the backtest's")
+            d = {**d, 'stop': True, 'why': '; '.join(x for x in (d['why'], w) if x), 'test': 'drift'}
         checks[i] = d
         if d['stop'] and i not in stops:
-            stops[i] = {'at': stamp, 'n': d['n'], 't': d['t'], 'cusum': d['cusum'], 'why': d['why'], 'fit': fh}
+            stops[i] = {'at': stamp, 'n': d['n'], 't': d['t'], 'cusum': d['cusum'], 'why': d['why'], 'fit': fh,
+                        'test': d.get('test', 'close')}
     return {'clocks': clocks, 'stopped': stops, 'checks': checks}, set(stops)
 
 
@@ -216,9 +285,10 @@ def build(now=None):
             sd = sd_of(held)
             chk = (mon.get('checks') or {}).get(i) or decide(bs, sd, P)
             stop = (mon.get('stopped') or {}).get(i)
+            dr = drift(bs, expected_live(s, held), sd, rho_for(s, (defn or {}).get('mk') or i.split(' | ')[0]), P)
             rows.append({'id': f'pick:{s}:{i}', 'book': 'picks', 'sport': s, 'label': f"{s.upper()} {label}", 'since': since[:10],
                          'status': 'stopped' if stop else ('on' if i in rules else 'off'), 'stopped': stop,
-                         **summary(bs, now, P, sd, held), 'check': chk})
+                         **summary(bs, now, P, sd, held), 'check': chk, 'drift': dr})
         # Dengler Units on the same picks: close value weighted by stake against flat, and against the edge DU staked on
         for mk in ('spread', 'total'):
             bs = [e for e in log if ('spread' if e['mk'] == 'ml' else e['mk']) == mk and e.get('clvRet') is not None and e.get('units')]
@@ -255,10 +325,13 @@ def build(now=None):
         rows.append({'id': f'paper:{i}', 'book': 'paper', 'sport': r['sport'], 'label': r['label'], 'since': since[:10],
                      'status': r.get('status', 'on'), 'stopped': (pb.get('killed') or {}).get(i),
                      **summary(bs, now, P, sd, exp), 'check': decide(bs, sd, P)})
-    out = {'asof': stamp, 'pre': {k: P[k] for k in ('registered', 'window', 'minN', 't', 'cusum', 'weekDays', 'zFlag')},
+    import units as DU
+    out = {'asof': stamp, 'pre': {**{k: P[k] for k in ('registered', 'window', 'minN', 't', 'cusum', 'weekDays', 'zFlag', 'drift')},
+                                  'timing': DU.TIMING, 'leak': DU.LEAK},
            'rules': rows, 'du': du_rows,
            'stopped': [x['id'] for x in rows if x['status'] == 'stopped'],
-           'flags': [x['id'] for x in rows if (x.get('vsExp') or {}).get('read') == 'below the backtest']}
+           'flags': [x['id'] for x in rows if (x.get('vsExp') or {}).get('read') == 'below the backtest'],
+           'drift': {st: [x['id'] for x in rows if (x.get('drift') or {}).get('state') == st] for st in ('watching', 'confirmed', 'paused')}}
     old = {}
     try:
         old = json.load(open(OUT))
@@ -310,6 +383,21 @@ def test():
     RS3 = {**RS, 'markets': {'total': {**RS['markets']['total'], 'x': 6.0}}}
     st4, off4 = pick_state('nba', RS3, log, st2, '2026-12-03T00:00:00Z', P)
     assert not off4 and st4['clocks']['total']['since'] == '2026-12-03T00:00:00Z'
+    # the drift test: a rule worth nothing pauses, one worth its backtest confirms, and a pause stops the rule
+    def wk(mu, n, per=18):
+        return [{'kick': (k0 + datetime.timedelta(days=7 * (i // per))).strftime('%Y-%m-%dT%H:%M:%SZ'), 'clvRet': rnd.gauss(mu, 0.123)} for i in range(n)]
+    runs = [drift(wk(0.0, 1000), 0.018, 0.123, 0.0, P)['state'] for _ in range(100)]
+    assert runs.count('paused') >= 85, runs.count('paused')
+    runs = [drift(wk(0.018, 1000), 0.018, 0.123, 0.0, P)['state'] for _ in range(100)]
+    assert runs.count('paused') <= 12 and runs.count('confirmed') >= 80, (runs.count('paused'), runs.count('confirmed'))
+    assert drift(wk(-0.3, 20), 0.018, 0.123, 0.0, P)['state'] == 'watching'          # minN
+    assert drift(wk(0.0, 50), None, 0.123, 0.0, P)['state'] == 'no test'
+    d = drift([{'kick': '2026-11-07T20:00:00Z', 'clvRet': 0.02}, {'kick': '2026-11-07T21:00:00Z', 'clvRet': 0.0}], 0.02, 0.1, 0.5, P)
+    assert abs(d['llr'] - (0.02 - 0.02) * 0.02 / (0.01 * 1.5)) < 1e-9, d
+    RSd = {'markets': {'total': {'on': True, 'x': 2.5, 'k': 0.2, 'heldRec': {'clvRet': 0.036, 'clvT': 9.2, 'n': 983}}}, '_asof': '2026-11-01'}
+    logd = [{'mk': 'total', 'flagged': '2026-11-01T15:00:00Z', 'kick': b['kick'], 'clvRet': b['clvRet']} for b in wk(-0.005, 600)]
+    st5, off5 = pick_state('cfb', RSd, logd, {}, '2026-12-30T00:00:00Z', P)
+    assert off5 == {'total'} and st5['stopped']['total']['test'] == 'drift', st5['checks']['total']
     print('rule monitor: ok, false-alarm share at the close over 300 bets', fa)
 
 
