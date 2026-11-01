@@ -5,6 +5,17 @@ name: cfb game research
 
 on:
   workflow_dispatch:
+    inputs:
+      extra:
+        description: "also pull player history (PPA, usage, stats, WEPA, draft, portal, old recruits, coaches)"
+        type: boolean
+        default: false
+      sit_from:
+        description: "situational splits from CFBD plays back to this season (blank for none)"
+        default: ""
+      min_left:
+        description: "stop when fewer CFBD calls than this remain this month"
+        default: "500"
 
 jobs:
   pull:
@@ -29,6 +40,9 @@ jobs:
         run: node scripts/cfb_game_history.mjs 2015 2026
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          EXTRA: ${{ inputs.extra && '1' || '' }}
+          SIT_FROM: ${{ inputs.sit_from }}
+          MIN_LEFT: ${{ inputs.min_left || '500' }}
       - name: Model input
         run: node scripts/fetch_cfb.mjs --offline
         env:

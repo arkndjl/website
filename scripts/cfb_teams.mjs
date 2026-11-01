@@ -227,12 +227,16 @@ export async function fetchInjuries() {
 // when games finish, so a rerun within hours loses nothing.
 const COVER = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cover_fit.json'), 'utf8')).sports.cfb || {}; } catch { return {}; } })();
 const CFBD_MEMO = path.join(path.dirname(fileURLToPath(import.meta.url)), '.cache', 'cfb', 'cfbd');
+const cfbdUse = { calls: 0, left: null };
 export async function cfbd(pathq) {
   const key = process.env.CFBD_API_KEY;
   if (!key) throw new Error('CFBD_API_KEY not set');
   const memo = path.join(CFBD_MEMO, pathq.replace(/[^\w=&.-]+/g, '_') + '.json'), ttl = +(process.env.CFBD_TTL_H ?? 6) * 36e5;
   try { const m = JSON.parse(fs.readFileSync(memo, 'utf8')); if (Date.now() - m.at < ttl) return m.data; } catch {}
   const r = await fetch(`https://api.collegefootballdata.com/${pathq}`, { headers: { Authorization: `Bearer ${key}`, accept: 'application/json' } });
+  const h = r.headers.get('x-calllimit-remaining');
+  if (!cfbdUse.calls++) process.on('exit', () => console.log(`CFBD: ${cfbdUse.calls} calls this run, ${cfbdUse.left ?? '?'} left this month`));
+  if (h != null) cfbdUse.left = +h;
   if (!r.ok) throw new Error(`CFBD ${r.status} ${pathq}`);
   const data = await r.json();
   try { fs.mkdirSync(CFBD_MEMO, { recursive: true }); fs.writeFileSync(memo, JSON.stringify({ at: Date.now(), data })); } catch {}
