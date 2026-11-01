@@ -903,13 +903,15 @@ def build():
             if g['home_score'] not in ('', 'NA'):
                 gp[h] += 1; gp[a] += 1
     # in-season moves (scripts/nfl_trades.py, Nov 1 2026): trades and claims since each club's last games, listed on
-    # the cards; in the margin only at nfl_trades.TRADES['c'] (0: the backtest found nothing to add)
+    # the cards and, Noah's call (Nov 1 2026; the backtest is a coin flip), in the margin at the injury weight
     try:
         import nfl_trades as NT
         tmv, tnames = NT.live(last, week, games)
     except Exception as e:      # noqa: BLE001
         print('nfl trades: failed', repr(e)); NT, tmv, tnames = None, {}, {}
-    tpts = {t: NT.TRADES['c'] * NT.points(v, NT.TRADES['hl']) for t, v in tmv.items()} if NT and NT.TRADES['c'] else {}
+    tc = F['coef'].get('inj', 0.0)
+    tpts = ({t: tc * NT.points(v, NT.TRADES['hl'], direct=NT.TRADES['direct']) for t, v in tmv.items()}
+            if NT and NT.TRADES.get('on') else {})
     # injuries: the league's reports for games played, this week's reports and news for this week's games; a
     # questionable or probable QB starts with his chance to play, his backup with the rest
     for gid, (x, _) in proj.items():
@@ -956,7 +958,7 @@ def build():
              'line': line, 'tline': tl, 'ml': {'home': g['home_moneyline'], 'away': g['away_moneyline']}}
         if nx:
             r['inj'] = {'home': iwho.get(team(g['home_team']), []), 'away': iwho.get(team(g['away_team']), [])}
-            mv = {s_: NT.card(tmv.get(team(g[f'{s_}_team']), []), tnames) for s_ in ('home', 'away')} if NT else {}
+            mv = {s_: NT.card(tmv.get(team(g[f'{s_}_team']), []), tnames, c=tc if NT.TRADES.get('on') else 1.0) for s_ in ('home', 'away')} if NT else {}
             if any(mv.values()):
                 r['moves'] = mv
             for side in ('home', 'away'):
@@ -993,7 +995,8 @@ def build():
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef'], 'injSrc': isrc, 'injTest': F.get('injTest')}
     res.update(season_views(m, F, games, last, week, rec, qbinfo, {t: b.get('inj', 0.0) * c for t, c in icost.items()},
-                            {t: NR.points(moves, t, gp[t]) for t in moves} if moves else None,
+                            ({t: (NR.points(moves, t, gp[t]) if moves else 0.0) + tpts.get(t, 0.0) for t in set(moves) | set(tpts)}
+                             if moves or tpts else None),
                             {t: [(st, b.get('inj', 0.0) * v) for st, v in ps] for t, ps in icarry.items()}))
     # picks: the college board's upset and favorite rules on this model (scripts/nfl_picks.py); a failure never holds up
     # the projections
