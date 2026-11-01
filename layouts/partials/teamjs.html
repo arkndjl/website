@@ -12,6 +12,8 @@
   function pc(x) { return x == null ? '—' : x < 0.005 ? '&lt;1%' : x >= 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
   function sgn(x, d) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(d == null ? 1 : d); }
   function f1(x) { return x == null ? '—' : (+x).toFixed(1); }
+  var FULL = {{ site.Data.pro_team_names | default dict | jsonify | safeJS }};   // NFL/NBA/NHL abbreviation -> full name (the team GFX card)
+  function txt(h) { return String(h).replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'); }
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function day(d) { return typeof d === 'number' ? 'Wk ' + d : MON[+d.slice(5, 7) - 1] + ' ' + (+d.slice(8, 10)); }
   function odds(xs) { return xs.filter(function (x) { return x[1] != null; }).map(function (x) { return x[0] + ' <b>' + x[1] + '</b>'; }).join(' · '); }
@@ -47,7 +49,7 @@
         situ: ['situational stats (returning WAR, 4th-down aggressiveness, ...)', 'situational stats'], staff: ['staff scores', 'staff scores'] },
       odds: function (r) { var s = r.sim || {}; return [['proj wins', s.projW != null ? f1(s.projW) : null], ['conf title game', s.ccg != null ? pc(s.ccg) : null], ['conf title', s.title != null ? pc(s.title) : null],
         ['CFP', s.cfp != null ? pc(s.cfp) : null], ['bye', s.bye != null ? pc(s.bye) : null], ['national title', s.natl != null ? pc(s.natl) : null]]; } },
-    nfl: { key: 't', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 6, thr: 0.5, vs: 'an average team on a neutral field', logo: function () { return ''; },
+    nfl: { key: 't', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 6, thr: 0.5, vs: 'an average team on a neutral field', logo: function (k) { return '/img/nfl/' + k.toLowerCase() + '.png'; },
       head: function (r) { return [r.dv, r.rec, r.qb ? 'QB ' + r.qb + (r.qb1 ? ' (for ' + r.qb1 + ')' : '') : null, r.war != null ? 'team WAR ' + f1(r.war) : null]; },
       lab: { elo: 'Elo', eff: 'EPA/play', qb: 'QB', mkt: 'market', roster: 'roster prior', inj: 'injuries' },
       say: { elo: ['Elo: wins and margins', 'Elo: wins and margins'], eff: ['opponent-adjusted EPA per play', 'opponent-adjusted EPA per play'], qb: ['this week\'s QB over a replacement', 'this week\'s QB below the team\'s usual level'],
@@ -63,9 +65,10 @@
       odds: function (r) { return [['xW', f1(r.wins)], ['playoff', pc(r.playoff)], ['top 6', pc(r.top6)], ['conf title', pc(r.conf)], ['NBA title', pc(r.title)], ['#1 pick', r.pick1 ? pc(r.pick1) : null]]; } },
     nhl: { key: 't', name: function (r) { return r.t; }, unit: 'goals', d: 2, scale: 0.6, thr: 0.04, vs: 'an average team on neutral ice',
       logo: function (k) { return '/img/nhl/' + k.toLowerCase() + '.png'; }, head: function (r) { return [r.div, r.rec + ', ' + r.pts + ' pts', r.goalie ? 'G ' + r.goalie : null, 'win chance vs average ' + pc(r.pWin)]; },
-      lab: { elo: 'Elo', xg: 'expected goals', g: 'goals', x5: '5v5 xG', st: 'special teams', mkt: 'market', gk: 'goalie' },
+      lab: { elo: 'Elo', xg: 'expected goals', g: 'goals', x5: '5v5 xG', st: 'special teams', mkt: 'market', gk: 'goalie', rv: 'lineup value' },
       say: { elo: ['Elo: results', 'Elo: results'], xg: ['expected-goals share (MoneyPuck xG)', 'expected-goals share (MoneyPuck xG)'], g: ['actual goal differential', 'actual goal differential'], x5: ['5-on-5 xG', '5-on-5 xG'],
-        st: ['special teams', 'special teams'], mkt: ['priced well by earlier closing lines', 'priced low by earlier closing lines'], gk: ['the usual starter saves goals above expected', 'the usual starter allows goals above expected'] },
+        st: ['special teams', 'special teams'], mkt: ['priced well by earlier closing lines', 'priced low by earlier closing lines'], gk: ['the usual starter saves goals above expected', 'the usual starter allows goals above expected'],
+        rv: ['tonight\'s lineup above its usual one', 'tonight\'s lineup below its usual one'] },
       odds: function (r) { return [['xPts', f1(r.xpts)], ['playoff', pc(r.playoff)], ['division', pc(r.divw)], ['Presidents\' Trophy', pc(r.pres)], ['Cup final', pc(r.final)], ['Stanley Cup', pc(r.cup)]]; } },
     soccer: { key: 'id', name: function (r) { return r.n; }, unit: 'goals', d: 2, scale: 1.2, thr: 0.1, vs: 'an average big-five club at a neutral ground', draws: true,
       logo: function (k) { return '/img/soccer/' + k + '.png'; }, head: function (r) { return [r.lgName || r.lg, r.rec ? r.rec + ', ' + r.pts + ' pts' : null, 'W/D vs average ' + pc(r.pW) + ' / ' + pc(r.pD)]; },
@@ -88,7 +91,9 @@
     var key = r[c.key], rt = r[c.rating || 'rating'], nm = function (k) { var o = by[k]; return o ? c.name(o) : (F.nm || {})[k] || k; };
     var parts = (T.parts && T.parts.length ? T.parts : r.parts ? Object.keys(c.lab).filter(function (k) { return k in r.parts; }).map(function (k) { return [k, r.parts[k]]; }) : []).filter(function (p) { return Math.abs(p[1]) >= c.thr / 10; });
     var pp = (T.pparts || []).filter(function (p) { return Math.abs(p[1]) >= c.thr / 10; });
-    var out = '<p class="cfb__dhead"><b>' + esc(c.name(r)) + '</b> · ' + c.head(r).filter(Boolean).map(esc).join(' · ') + '</p>';
+    var gi = (window.__arkTeamGfx = window.__arkTeamGfx || []).length;
+    var out = '<p class="cfb__dhead"><b>' + esc(c.name(r)) + '</b> · ' + c.head(r).filter(Boolean).map(esc).join(' · ') +
+      ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="team" data-gfx-i="' + gi + '" data-gfx-name="' + esc(((FULL[Object.keys(K).filter(function (k_) { return K[k_] === c; })[0]] || {})[key]) || c.name(r)) + '" title="team card graphic (4:5)">GFX card</button></p>';
     // the line: where the rating puts it, and what it is made of
     var big = parts.slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
     out += '<p class="cfb__role">#' + r.rk + ' of ' + N + (r.rkLo ? ' (80% rank range #' + r.rkLo + (r.rkHi !== r.rkLo ? '–' + r.rkHi : '') + ')' : '') + ': ' + sgn(rt, c.d) + ' ' + c.unit + ' a game against ' + c.vs + '.' +
@@ -129,6 +134,19 @@
     // season odds
     var od = odds(c.odds(r));
     if (od) out += '<p class="tdx__h"><span class="cfb__pastk">season odds</span> ' + od + '</p>';
+    // the team GFX card (gfx.js buildTeamCard) reads the same numbers, as plain text
+    var kind = Object.keys(K).filter(function (k_) { return K[k_] === c; })[0];
+    var plain = function (xs) { return xs.map(function (p) { return (c.say[p[0]] || [c.lab[p[0]] || p[0], c.lab[p[0]] || p[0]])[p[1] > 0 ? 0 : 1] + ' (' + sgn(p[1], c.d) + ')'; }); };
+    var Sg = T.sch || [], gl = Sg.filter(function (g) { return g[3] == null; }), gp = Sg.filter(function (g) { return g[3] != null; });
+    var gres = function (g) { return g[3] > g[4] ? 'W' : g[3] < g[4] ? 'L' : c.draws ? 'D' : 'T'; };
+    window.__arkTeamGfx[gi] = { sport: kind, key: key, name: (FULL[kind] || {})[key] || c.name(r), short: c.name(r), logo: c.logo(key, r),
+      head: c.head(r).filter(Boolean).map(String), rec: r.rec || '', rk: r.rk, N: N, rkLo: r.rkLo, rkHi: r.rkHi, rating: sgn(rt, c.d), unit: c.unit, vs: c.vs,
+      parts: parts.map(function (p) { return [c.lab[p[0]] || p[0], p[1]]; }), scale: c.scale, d: c.d,
+      plus: plain(plus), minus: plain(minus), last: gp.slice(-5).map(gres).join(' '),
+      xw: gl.filter(function (g) { return g[5] != null; }).reduce(function (s_, g) { return s_ + (c.draws ? 3 * g[5] + (g[7] || 0) : g[5]); }, 0), left: gl.length, draws: !!c.draws,
+      next: gl.slice(0, 5).map(function (g) { var o = by[g[1]]; return { day: day(g[0]), at: g[2] === '@' ? '@' : g[2] === 'n' ? 'vs' : 'vs', n: txt(nm(g[1])), rk: o ? o.rk : null, logo: c.logo(g[1], o), p: g[5], m: g[6] }; }),
+      pl: (T.pl || []).slice(0, 6), pm: F.pm || '', group: c.group ? c.group(r) : '',
+      odds: c.odds(r).filter(function (x) { return x[1] != null; }).map(function (x) { return [x[0], txt(x[1])]; }) };
     // the inputs
     if (parts.length) {
       var sum = parts.reduce(function (s, p) { return s + p[1]; }, 0);

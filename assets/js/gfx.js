@@ -1142,6 +1142,139 @@
   document.addEventListener('click', function () { setTimeout(addCardButtons, 0); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(addCardPickers, 0); }); else setTimeout(addCardPickers, 0);
   document.addEventListener('ark:lazy', function () { setTimeout(addCardPickers, 0); });
+  // ---- team card: from a team breakdown on an ARK Ranking (teamjs.html stores window.__arkTeamGfx[data-gfx-i]) ----
+  // logo, rank and rating, season odds, next games, key players, strengths and concerns, the rating's inputs
+  async function buildTeamCard(win, btn) {
+    var d = (window.__arkTeamGfx || [])[+btn.getAttribute('data-gfx-i')]; if (!d) return null;
+    var LG = { cfb: 'CFB', cbb: 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'soccer' };
+    var F = await frame(2160, 2700, (LG[d.sport] || '') + ' :: ' + d.name, win.getAttribute('data-gfx-date'), SITE + '#ark-ranking');
+    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, dash = '—';
+    well(g, F.x, F.y, F.w, F.h);
+    // the logo in a raised frame at the left (full colour, smoothed), then name, line, rating sentence; the rank plaque at the right
+    var logo = await loadImg(d.logo), LS = 360, lx = x, ly = y - 60;
+    g.fillStyle = C.face; g.fillRect(lx, ly, LS, LS); bevel(g, lx, ly, LS, LS, true, 6);
+    g.fillStyle = C.dark; g.fillRect(lx + 12, ly + 12, LS - 24, LS - 24);
+    if (logo) { var lr = Math.min(272 / logo.width, 272 / logo.height), lw = logo.width * lr, lh = logo.height * lr; drawLogo(g, logo, lx + (LS - lw) / 2, ly + (LS - lh) / 2, lw, lh); }
+    else { g.font = '96px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center'; g.fillText(String(d.short).slice(0, 4).toUpperCase(), lx + LS / 2, ly + LS / 2); g.textAlign = 'left'; }
+    var tx = x + LS + 40, pw = 300, tw = w - LS - 40 - pw - 32;
+    // rank plaque: ARK RANK over #n, teal, raised
+    var py = ly;
+    g.fillStyle = C.teal; g.fillRect(x + w - pw, py, pw, 220); bevel(g, x + w - pw, py, pw, 220, true, 6);
+    g.fillStyle = C.dark; g.font = '36px ' + FONT; g.textAlign = 'center'; g.fillText('ARK RANK', x + w - pw / 2, py + 44);
+    g.font = '112px ' + FONT; g.fillText('#' + d.rk, x + w - pw / 2, py + 118);
+    g.font = '32px ' + FONT; g.fillText('of ' + d.N, x + w - pw / 2, py + 190); g.textAlign = 'left';
+    g.font = '96px ' + FONT; g.fillStyle = C.white;
+    var nl = wrap(g, d.name, tw); if (nl.length > 2) nl = [nl[0], fit(g, nl.slice(1).join(' '), tw)];
+    nl.forEach(function (l, i) { g.fillText(fit(g, l, tw), tx, y + i * 110); });
+    y += nl.length * 110;
+    g.font = '48px ' + FONT; g.fillStyle = C.teal;
+    wrap(g, d.head.join(' · '), tw).slice(0, 2).forEach(function (l) { g.fillText(l, tx, y); y += 64; });
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; y += 8;
+    wrap(g, d.rating + ' ' + d.unit + ' a game against ' + d.vs + '.', w - LS - 40).slice(0, 3).forEach(function (l) { g.fillText(l, tx, y); y += 54; });
+    y = Math.max(y, ly + LS) + 64;
+    // labelled bands of tiles, as on the player card
+    function rule(label) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(label, x, y);
+      var lw = g.measureText(label).width; g.fillStyle = C.dark; g.fillRect(x + lw + 24, y - 1, w - lw - 24, 3);
+      y += 44;
+    }
+    function band(label, tiles, cols, th) {
+      rule(label);
+      var gap = 24, tw2 = (w - (cols - 1) * gap) / cols;
+      th = th || 176;
+      tiles.forEach(function (t, i) {
+        var bx = x + (i % cols) * (tw2 + gap), by = y + Math.floor(i / cols) * (th + gap);
+        g.fillStyle = C.face; g.fillRect(bx, by, tw2, th); bevel(g, bx, by, tw2, th, true, 3);
+        g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[0].toUpperCase(), tw2 - 48), bx + 24, by + 42);
+        g.font = (th < 170 ? 64 : 72) + 'px ' + FONT; g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw2 - 48), bx + 24, by + (th < 170 ? th - 42 : 104));
+        if (t[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[3], tw2 - 48), bx + 24, by + 150); }
+      });
+      var rows = Math.ceil(tiles.length / cols); y += rows * th + (rows - 1) * gap + 40;
+    }
+    var neg = /^[−-]/.test(d.rating), nlast = d.last ? d.last.split(' ').length : 0;
+    band('ARK RANKING', [['rating', d.rating, neg ? C.down : C.teal, d.unit + ' vs average'],
+                         ['80% range', d.rkLo ? '#' + d.rkLo + (d.rkHi !== d.rkLo ? '–' + d.rkHi : '') : dash, null, 'rank range'],
+                         ['record', d.rec || dash, null, nlast ? 'last ' + nlast + ': ' + d.last : null]], 3);
+    if (d.odds.length) { var oc = d.odds.length > 4 ? Math.ceil(d.odds.length / 2) : d.odds.length; band('SEASON ODDS', d.odds.slice(0, 8).map(function (o) { return [o[0], o[1]]; }), Math.max(3, Math.min(4, oc)), 130); }
+    // what the rating is made of: each input's push, bars from the middle, pinned to the bottom
+    var parts = d.parts.slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); }).slice(0, 8), prow = Math.ceil(parts.length / 2);
+    var barsH = parts.length ? 100 + prow * 60 : 0, bottom = F.y + F.h - 40 - barsH;
+    // next games beside key players
+    var half = (w - 60) / 2, cy0 = y, ly2;
+    function colHead(cx, label, sub) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(label, cx, y);
+      var lw = g.measureText(label).width; g.fillStyle = C.dark; g.fillRect(cx + lw + 24, y - 1, half - lw - 24, 3);
+      if (sub) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, sub, half), cx, y + 46); }
+    }
+    var gy = y, py2 = y;
+    if (d.next.length || d.last) {
+      var pct = function (p) { return p == null ? dash : p < 0.005 ? '<1%' : p >= 0.995 ? '>99%' : Math.round(p * 100) + '%'; };
+      colHead(x, 'NEXT GAMES', d.left ? d.left + ' left · ' + d.xw.toFixed(1) + ' expected ' + (d.draws ? 'points' : 'wins') : 'season complete');
+      gy += 104;
+      var logos = await Promise.all(d.next.map(function (n) { return loadImg(n.logo); }));
+      d.next.forEach(function (n, i) {
+        if (gy + 40 > bottom - 120) return;
+        g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(n.day, x, gy);
+        var ox = x + 180; g.fillText(n.at, ox, gy); ox += 64;
+        if (logos[i]) { drawLogo(g, logos[i], ox, gy - 26, 52, 52); ox += 68; }
+        var pv = pct(n.p); g.font = '44px ' + FONT; var pvw = g.measureText(pv).width;
+        g.fillStyle = n.p == null ? C.lilac : n.p >= 0.5 ? C.teal : C.down; g.fillText(pv, x + half - pvw, gy);
+        var rk = n.rk ? ' #' + n.rk : ''; g.font = '40px ' + FONT; g.fillStyle = C.white;
+        var room = x + half - pvw - 24 - ox, nm = fit(g, n.n, room - (rk ? 90 : 0)); g.fillText(nm, ox, gy);
+        if (rk) { var nw = g.measureText(nm).width; g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(rk, ox + nw + 8, gy + 2); }
+        gy += 72;
+      });
+      if (d.next.length) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'win chance from the game model', half), x, gy); gy += 40; }
+    }
+    if (d.pl.length) {
+      var px = d.next.length || d.last ? x + half + 60 : x, pwid = d.next.length || d.last ? half : w;
+      var hh = half; half = pwid; colHead(px, 'KEY PLAYERS', 'by ' + d.pm); half = hh;
+      py2 += 104;
+      d.pl.forEach(function (p) {
+        if (py2 + 40 > bottom - 120) return;
+        var val = d.pm === 'FV' ? String(p[2]) : (p[2] > 0 ? '+' : p[2] < 0 ? '−' : '') + Math.abs(+p[2]).toFixed(2);
+        g.font = '44px ' + FONT; var vw = g.measureText(val).width; g.fillStyle = C.teal; g.fillText(val, px + pwid - vw, py2);
+        g.font = '30px ' + FONT; var pos = String(p[1] || ''), posw = pos ? g.measureText(pos).width + 16 : 0;
+        g.font = '40px ' + FONT; g.fillStyle = C.white; var pn = fit(g, p[0], pwid - vw - 32 - posw); g.fillText(pn, px, py2);
+        var pnw = g.measureText(pn).width;
+        if (pos) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(pos, px + pnw + 16, py2 + 2); }
+        if (p[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p[3], pwid), px, py2 + 42); py2 += 104; } else py2 += 72;
+      });
+    }
+    y = Math.max(gy, py2, cy0) + 24;
+    if (d.group && y + 60 < bottom) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.group, w), x, y); y += 72; }
+    // strengths and concerns, side by side, in the room left
+    if ((d.plus.length || d.minus.length) && y + 160 < bottom) {
+      y += 24;
+      [[ '+ strengths', d.plus, C.teal, x ], [ '− concerns', d.minus, C.down, x + half + 60 ]].forEach(function (L) {
+        var yy = y; g.font = '52px ' + FONT; g.fillStyle = L[2]; g.fillText(L[0], L[3], yy); yy += 72;
+        g.font = '38px ' + FONT;
+        if (!L[1].length) { g.fillStyle = C.lilac; g.fillText('none', L[3] + 52, yy); }
+        L[1].forEach(function (it) {
+          var lines = wrap(g, it, half - 52); if (yy + lines.length * 50 > bottom) return;
+          g.fillStyle = L[2]; g.fillText(L[0][0], L[3] + 4, yy);
+          g.fillStyle = C.lilac; lines.forEach(function (l) { g.fillText(l, L[3] + 52, yy); yy += 50; }); yy += 12;
+        });
+      });
+    }
+    if (parts.length) {
+      var by = F.y + F.h - barsH - 10, cw2 = (w - 80) / 2, sum = d.parts.reduce(function (s_, p) { return s_ + p[1]; }, 0);
+      g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
+      g.font = '44px ' + FONT; g.fillStyle = C.lilac;
+      g.fillText(fit(g, 'rating inputs: push on the rating, ' + d.unit + ' (sum ' + (sum > 0 ? '+' : sum < 0 ? '−' : '') + Math.abs(sum).toFixed(d.d) + ')', w), x, by + 30);
+      g.font = '36px ' + FONT;
+      parts.forEach(function (p, i) {
+        var cx = x + Math.floor(i / prow) * (cw2 + 80), yy = by + 100 + (i % prow) * 60, bx0 = cx + 300, bwid = cw2 - 300 - 130, mid = bx0 + bwid / 2, hb = bwid / 2;
+        var v = p[1], bw = Math.min(hb, Math.abs(v) / d.scale * hb);
+        g.fillStyle = C.lilac; g.fillText(fit(g, p[0], 280), cx, yy);
+        g.fillStyle = C.well; g.fillRect(bx0, yy - 18, bwid, 36);
+        g.fillStyle = C.dark; g.fillRect(mid - 1, yy - 24, 3, 48);
+        g.fillStyle = v < 0 ? C.down : C.teal; g.fillRect(v < 0 ? mid - bw : mid + 2, yy - 14, bw, 28);
+        var lab = (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d.d); g.fillStyle = C.lilac; g.fillText(lab, cx + cw2 - g.measureText(lab).width, yy);
+      });
+    }
+    return F.canvas;
+  }
 
   // ---- games: the matchups on screen (cards carry data-gfx-game) ----
   async function buildGames(win, btn) {
@@ -1676,13 +1809,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr.cfb__detail').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr.cfb__detail').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr.cfb__detail').querySelector('.cfb__dhead b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr.cfb__detail').querySelector('.cfb__dhead b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }
