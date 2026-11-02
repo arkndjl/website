@@ -26,7 +26,11 @@ pWAR (projected, what it is worth going forward): HPM = the weighted components 
     each team's goal differential a game (players weighted by their share of the team's ice time), every season held
     out in turn (ridge, the penalty, shrink and Marcel weights chosen by the same held-out error). Oct 25 2026: R2 .23 ->
     .38 over 524 team-seasons, paired t 4.95, 15 of 17 seasons (nested tuning: t 4.6, 14/17). Age curve, a usage-tier
-    target and a rookie prior from draft slot + NHLe all failed (t -.2, .1, 1.8).
+    target and a rookie prior from draft slot + NHLe all failed (t -.2, .1, 1.8). Nov 2 2026, goalies' small HPMs
+    (one penalty on raw columns; the Marcel-shrunk goalie columns have little spread): standardized ridge re-tuned
+    (R2 .384 -> .376, t -1.1, 8/17), goalie columns unpenalized or at .01-.1 of the penalty, KG 100-800 h (R2
+    .378-.385, best t .4) all fail; freed goalie weights over-predict held out (goalie-part slope .4-.8 vs 1.1-1.4
+    shipped), so past GSAx moves next season's team GD little and the shrink is earned.
     pWAR = (HPM - replacement) x TOI / 60 / goals a win, replacement as above on HPM; goals a win from team points
     against goal differential.
 """
