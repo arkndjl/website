@@ -16,6 +16,10 @@ on:
     - cron: "23 11 * 11,12,1,2,3,4,5,6 *"
     # 22:40 UTC (6:40 PM ET, 5:40 in winter): the injury report before the evening tips; games only
     - cron: "40 22 * 10,11,12,1,2,3,4,5,6 *"
+    # off-season (Nov 2 2026): Mondays July-September (free agency, trades, the projections) and Mondays and
+    # Thursdays October 1-17 (preseason rosters) before the daily runs start
+    - cron: "23 11 * 7,8,9 1"
+    - cron: "23 11 1-17 10 1,4"
   workflow_dispatch:
   workflow_run:
     workflows: ["esea season", "cfb board"]

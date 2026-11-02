@@ -11,6 +11,8 @@ on:
   schedule:
     - cron: "15 9 * 1,2,3,4,5,8,9,10,11,12 *"
     - cron: "45 22 * 1,2,3,4,5,8,9,10,11,12 *"
+    # off-season (Nov 2 2026): Mondays and Thursdays in June and July (the summer transfer window, market values)
+    - cron: "15 9 * 6,7 1,4"
   workflow_dispatch:
   workflow_run:
     workflows: ["esea season", "cfb board"]

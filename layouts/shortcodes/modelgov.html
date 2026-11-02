@@ -2,16 +2,37 @@
        view="live" (default): each game model's season so far against its own walk-forward record (data/model_monitor/<sport>.json,
        scripts/model_monitor.py), with rule_monitor.decide()'s window t and CUSUM;
        view="ledger": every shipped term in data/model_ledger.json (scripts/harness_rescore.py), one Benjamini-Hochberg family,
-       grouped by model with its re-validation date (365 days after its test; past it the row is flagged). */ -}}
+       grouped by model with its re-validation date (365 days after its test; past it the row is flagged);
+       view="pipeline" (Nov 2 2026): every feed in data/freshness.json with its stamp and limit (stale ones flagged by
+       assets/js/fresh.js, the same rule scripts/data_health.py alerts on), and the scheduled refits (data/refits.json). */ -}}
 {{- $view := .Get "view" | default "live" -}}
 {{- $lab := dict "nba" "NBA" "nfl" "NFL" "cbb" "CBB" "cfb" "CFB" "nhl" "NHL" "soccer" "soccer" -}}
 <div class="win cfbk"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ .Get "title" | default (cond (eq $view "ledger") "model ledger" "game models :: live vs walk-forward") }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ .Get "title" | default (cond (eq $view "ledger") "model ledger" (cond (eq $view "pipeline") "pipeline :: every feed and refit" "game models :: live vs walk-forward")) }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-  {{- if eq $view "ledger" }}{{ with site.Data.model_ledger }}{{ $L := . }}
+  {{- if eq $view "pipeline" }}{{ $F := site.Data.freshness }}
+    <p>Every product the site shows, with the time it last updated and how old it may get before it counts as stale (in season; out of season each gets at least the sport's off-season limit). A stale feed, a failed run or a site build that stops deploying opens an alert and re-runs the refresh.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Section</th><th>Feed</th><th>Updated</th><th title="hours before it counts as stale, in season">Limit</th><th>Workflow</th></tr></thead>
+      <tbody>
+      {{- range $k, $s := $F.sports }}{{ $fh := $s.feedHours | default dict }}{{ range $lab, $file := $s.feeds }}{{ $a := partial "fresh-asof.html" $file }}{{ $h := index $fh $lab | default $F.inHours }}
+      <tr><td>{{ $s.label }}</td><td>{{ $lab }}</td><td><span {{ partial "fresh-attrs.html" (dict "asof" $a "sport" $k "hours" $h "class" "") | safeHTMLAttr }}>{{ with $a }}{{ (time .).Format (cond (eq (len .) 10) "Jan 2" "Jan 2 15:04") | lower }}{{ else }}-{{ end }}</span></td><td class="cfb__num">{{ if ge $h 8000 }}frozen{{ else if ge $h 48 }}{{ div $h 24 }} d{{ else }}{{ $h }} h{{ end }}</td><td class="cfb__dim">{{ replace $s.workflow ".yml" "" }}</td></tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- with site.Data.refits }}
+    <p>Model refits: each model refits on the data to date in its season months (same inputs and selection rules, more games), kept only if the fit runs clean and writes valid files; the pick rules rerun on the new fits.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Model</th><th>Sport</th><th title="months it refits in">Months</th><th title="days between refits">Every</th><th>Last</th><th>Status</th></tr></thead>
+      <tbody>{{ range $n, $j := .jobs }}
+      <tr><td>{{ $n }}</td><td class="cfb__dim">{{ $j.sport }}</td><td class="cfb__dim">{{ if eq (len $j.months) 12 }}all{{ else }}{{ delimit $j.months "," }}{{ end }}</td><td class="cfb__num">{{ $j.every }} d</td><td class="cfb__num">{{ with $j.last }}{{ substr . 0 10 }}{{ else }}-{{ end }}</td><td{{ if eq $j.status "failed" }} class="ark-fresh is-stale" title="{{ $j.note }}"{{ end }}>{{ if eq $j.status "failed" }}<b class="ark-fresh__tag">failed</b>{{ else }}{{ $j.status | default "not run" }}{{ end }}</td></tr>
+      {{- end }}</tbody>
+    </table></div>
+    {{- end }}
+  {{- else if eq $view "ledger" }}{{ with site.Data.model_ledger }}{{ $L := . }}
     <p>Every input the models ship, scored the same way: each term is taken out of the full model and both splits re-scored (or read from its own backtest's stored t where the data can't be rebuilt here). Evidence is the Stouffer z of the tuning and held-out t, and the false-discovery control runs over all {{ .family }} terms at once. <b>keep</b> q ≤ {{ .qKeep }} · <b>watch</b> not proven but held out is worse without it · <b>drop</b> not proven and free to remove. Each model is re-tested within a year of its test.</p>
     <p class="cfb__dim">{{ .counts.keep }} keep · {{ .counts.watch }} watch · {{ .counts.drop }} drop{{ with .counts.core }} · {{ . }} core{{ end }} · scored {{ .asof }}</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
@@ -53,5 +74,5 @@
     <p class="cfb__dim">collecting = under 50 games scored · watch = CUSUM past half the alarm line or t below 0 · Line is the market's error at the line we logged, for scale (the close itself is on the picks backtest tab).</p>
   {{- end }}
   </div>
-  <div class="win__status"><span>{{ if eq $view "ledger" }}scripts/harness_rescore.py · one BH family{{ else }}scripts/model_monitor.py · decide() from the rule monitor{{ end }}</span>{{ if eq $view "live" }}{{ partial "fresh.html" (dict "feed" (slice "model_monitor.cfb" "model_monitor.nfl" "model_monitor.nba" "model_monitor.nhl" "model_monitor.soccer" "model_monitor.cbb") "sport" "predictions" ) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ if eq $view "ledger" }}scripts/harness_rescore.py · one BH family{{ else if eq $view "pipeline" }}scripts/data_health.py · scripts/refit.py{{ else }}scripts/model_monitor.py · decide() from the rule monitor{{ end }}</span>{{ if eq $view "live" }}{{ partial "fresh.html" (dict "feed" (slice "model_monitor.cfb" "model_monitor.nfl" "model_monitor.nba" "model_monitor.nhl" "model_monitor.soccer" "model_monitor.cbb") "sport" "predictions" ) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
