@@ -736,7 +736,7 @@ def injury_costs(last, week, games, coef):
         for gsis, p in ps.items():
             if p['pos'] == 'QB':
                 qbst[gsis] = p['status']              # by id: two QBs can share a name
-                qbst.setdefault(_norm(p['name']), p['status'])
+                qbst.setdefault((t, _norm(p['name'])), p['status'])     # a name only on his own team
                 continue
             if p['status'] in GONE or p['status'] == 'Active':
                 continue
@@ -1284,7 +1284,7 @@ def check_tiebreaks(games, seasons=range(2015, 2026)):
         print(y, {c: ' '.join(s) for c, s in seeds.items()})
     print('tiebreak check:', 'all match' if not bad else bad)
     return bad
-GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB'}
+GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB', 'K': 'K/P', 'P': 'K/P'}
 SIMS = 10000
 ORDERS_KEPT = 400   # simulated draft orders kept for the CFB mock's simulated drafts (P(#1 pick) moves with who picks first)
 RATING_SD = 5.0      # uncertainty in a team's true rating before week 1, points (drawn once a simulated season)
@@ -1359,7 +1359,9 @@ def resolve_qbs(games, last, week, status=None):
         if int(g['season']) == last and int(g['week']) == week and g['home_score'] in ('', 'NA'):
             for side in ('home', 'away'):
                 nxt[team(g[f'{side}_team'])] = (g[f'{side}_qb_id'], g[f'{side}_qb_name'])
-    st = lambda name, gsis=None: status.get(gsis) or status.get(_norm(name), 'Active')
+    # by id; the name only when there is no id, and only on this team (t: the loop's team below), never another
+    # club's QB of the same name
+    st = lambda name, gsis=None: status.get(gsis) or (status.get((t, _norm(name)), 'Active') if not gsis else 'Active')
     out = lambda name, gsis=None: st(name, gsis) in OUT_STATUS
     info = {}
     for t in DIV_OF:

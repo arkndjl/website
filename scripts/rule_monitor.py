@@ -196,6 +196,13 @@ def rule_of(e):
     return f"{mk} | {e['seg']}" if e.get('seg') else mk
 
 
+def bet(e):
+    """a logged pick that counts: one marked pass (no longer clearing at the current line before its start) was never a
+    bet, so it stays out of the stop tests, the drift test and the live record, as it is out of games_picks' record
+    (Nov 2 2026: the monitor counted pass picks)"""
+    return not e.get('pass')
+
+
 def pick_state(sport, RS, log, old, stamp, P=None):
     """clocks and stops for one sport's pick rules: (state, stopped ids). old: the state games_picks.py kept last run.
     A rule's clock restarts when its X or k changes; a stop clears when a refit changes the rule or re-tests it."""
@@ -214,7 +221,7 @@ def pick_state(sport, RS, log, old, stamp, P=None):
         elif i in stops and stops[i].get('fit') != fh:
             clocks[i] = {'hash': h, 'since': stamp}
             stops.pop(i)
-        bs = [e for e in log if rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
+        bs = [e for e in log if bet(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
         d = decide(bs, sd_of(held), P)
         dr = drift(bs, expected_live(sport, held), sd_of(held), rho_for(sport, defn['mk']), P)
         d = {**d, 'drift': {k: v for k, v in dr.items() if k != 'path'}}
@@ -282,7 +289,7 @@ def build(now=None):
         for i in ids:
             defn, full, held, label = rules.get(i, (None, None, None, i))
             since = ((mon.get('clocks') or {}).get(i) or {}).get('since') or (RJ.get('asof') or '')[:10]
-            bs = [e for e in log if rule_of(e) == i and (e.get('flagged') or '') >= since]
+            bs = [e for e in log if bet(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
             sd = sd_of(held)
             chk = (mon.get('checks') or {}).get(i) or decide(bs, sd, P)
             stop = (mon.get('stopped') or {}).get(i)
@@ -292,7 +299,7 @@ def build(now=None):
                          **summary(bs, now, P, sd, held), 'check': chk, 'drift': dr})
         # Dengler Units on the same picks: close value weighted by stake against flat, and against the edge DU staked on
         for mk in ('spread', 'total'):
-            bs = [e for e in log if ('spread' if e['mk'] == 'ml' else e['mk']) == mk and e.get('clvRet') is not None and e.get('units')]
+            bs = [e for e in log if bet(e) and ('spread' if e['mk'] == 'ml' else e['mk']) == mk and e.get('clvRet') is not None and e.get('units')]
             if not bs and mk not in {d['mk'] for d, *_ in rules.values()}:
                 continue
             days = [day(e['kick']) for e in bs]
@@ -399,6 +406,9 @@ def test():
     logd = [{'mk': 'total', 'flagged': '2026-11-01T15:00:00Z', 'kick': b['kick'], 'clvRet': b['clvRet']} for b in wk(-0.005, 600)]
     st5, off5 = pick_state('cfb', RSd, logd, {}, '2026-12-30T00:00:00Z', P)
     assert off5 == {'total'} and st5['stopped']['total']['test'] == 'drift', st5['checks']['total']
+    # pass picks were never bets: they don't count toward a stop
+    st6, off6 = pick_state('nba', RS, [{**e, 'pass': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
+    assert not off6 and st6['checks']['total']['n'] == 0, st6['checks']['total']
     print('rule monitor: ok, false-alarm share at the close over 300 bets', fa)
 
 

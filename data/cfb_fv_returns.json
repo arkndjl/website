@@ -1,0 +1,796 @@
+{
+ "method": "Return production as a CFB FV driver (Nov 2 2026): does it explain NFL outcomes beyond the shipped FV?\n    python3 scripts/research/st_value/cfb_fv_ret_test.py   (needs cfb_ret_hist.py's ret_yoe.json)\nRows: scripts/data/cfb_alltime_rows.json.gz, every FBS season 2014-25 at QB-LB graded under the shipped weights; the\nplayer's final college season, drafts 2015-23 (undrafted = 0 AV). Outcome: NFL AV a season. Join: ESPN athlete id\n(2014-18 rows carry it), else names.py Matcher on name + team (location name), cross-team none.\nCandidates (career to date, every season through the graded one):\n  krY / prY   kick / punt return yards over expected a return, shrunk (k = st_returners' KR 36 / PR 20)\n  retY        both together, a team game (shrunk rates x his returns / games)\n  retP        drive points over expected, both, a team game (shrunk)\n  isRet       10+ returns in a season (role flag)\n  retS        retY over the seasons he returned in (not every graded season: the 2019+ rows list only graded seasons,\n              the 2014-18 ones read back to 2011, so retY's denominator differs by era; the live board knows the former)\n  retT / retR career total (yards / 12), and the plain per-return rate (both, shrunk at 28)\n  retC        retS clipped to [-2, 4]: SHIPPED for RB and WR (fetch_cfb.mjs, after the mean-outcome step)\nTest: AV ~ isotonic(fvx) [+ b x on its residual], fit on 8 draft classes, scored on the 9th (and forward: earlier classes only); fold t on the squared-error gain, classes\nimproved, Spearman, and AV of each class's top 32 by the prediction. Pooled (QB-LB, x = 0 for non-returners) and RB/WR.",
+ "results": [
+  {
+   "cand": "krY",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 1.93,
+   "better": 7,
+   "coef": 0.215,
+   "spearman": [
+    0.3841,
+    0.3876
+   ],
+   "top32": [
+    3.48,
+    3.511
+   ],
+   "top32Better": 3,
+   "top32Worse": 1,
+   "fwdGain": 0.0049,
+   "fwdBetter": "5/6"
+  },
+  {
+   "cand": "krY",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 1.7,
+   "better": 7,
+   "coef": 0.199,
+   "spearman": [
+    0.4295,
+    0.4358
+   ],
+   "top32": [
+    2.199,
+    2.231
+   ],
+   "top32Better": 3,
+   "top32Worse": 3,
+   "fwdGain": 0.015,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "krY",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": -0.11,
+   "better": 6,
+   "coef": 0.084,
+   "spearman": [
+    0.3947,
+    0.3998
+   ],
+   "top32": [
+    1.501,
+    1.424
+   ],
+   "top32Better": 1,
+   "top32Worse": 8,
+   "fwdGain": 0.0005,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "krY",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.78,
+   "better": 5,
+   "coef": 0.344,
+   "spearman": [
+    0.4742,
+    0.4939
+   ],
+   "top32": [
+    1.365,
+    1.397
+   ],
+   "top32Better": 5,
+   "top32Worse": 4,
+   "fwdGain": 0.062,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "prY",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 1.49,
+   "better": 6,
+   "coef": 0.129,
+   "spearman": [
+    0.3841,
+    0.3857
+   ],
+   "top32": [
+    3.48,
+    3.475
+   ],
+   "top32Better": 2,
+   "top32Worse": 3,
+   "fwdGain": 0.0042,
+   "fwdBetter": "5/6"
+  },
+  {
+   "cand": "prY",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 1.63,
+   "better": 5,
+   "coef": 0.114,
+   "spearman": [
+    0.4295,
+    0.4355
+   ],
+   "top32": [
+    2.199,
+    2.233
+   ],
+   "top32Better": 4,
+   "top32Worse": 2,
+   "fwdGain": 0.013,
+   "fwdBetter": "5/6"
+  },
+  {
+   "cand": "prY",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 1.65,
+   "better": 6,
+   "coef": 0.101,
+   "spearman": [
+    0.3947,
+    0.4079
+   ],
+   "top32": [
+    1.501,
+    1.526
+   ],
+   "top32Better": 4,
+   "top32Worse": 5,
+   "fwdGain": 0.0196,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "prY",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.33,
+   "better": 6,
+   "coef": 0.327,
+   "spearman": [
+    0.4742,
+    0.4772
+   ],
+   "top32": [
+    1.365,
+    1.401
+   ],
+   "top32Better": 5,
+   "top32Worse": 0,
+   "fwdGain": -0.009,
+   "fwdBetter": "3/6"
+  },
+  {
+   "cand": "retY",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 2.69,
+   "better": 8,
+   "coef": 0.177,
+   "spearman": [
+    0.3841,
+    0.3885
+   ],
+   "top32": [
+    3.48,
+    3.477
+   ],
+   "top32Better": 4,
+   "top32Worse": 3,
+   "fwdGain": 0.0089,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retY",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 2.72,
+   "better": 8,
+   "coef": 0.17,
+   "spearman": [
+    0.4295,
+    0.4422
+   ],
+   "top32": [
+    2.199,
+    2.257
+   ],
+   "top32Better": 5,
+   "top32Worse": 3,
+   "fwdGain": 0.0303,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retY",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 1.23,
+   "better": 7,
+   "coef": 0.109,
+   "spearman": [
+    0.3947,
+    0.414
+   ],
+   "top32": [
+    1.501,
+    1.468
+   ],
+   "top32Better": 3,
+   "top32Worse": 6,
+   "fwdGain": 0.0176,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retY",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.9,
+   "better": 4,
+   "coef": 0.291,
+   "spearman": [
+    0.4742,
+    0.4933
+   ],
+   "top32": [
+    1.365,
+    1.416
+   ],
+   "top32Better": 5,
+   "top32Worse": 2,
+   "fwdGain": 0.0608,
+   "fwdBetter": "2/6"
+  },
+  {
+   "cand": "retS",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 2.76,
+   "better": 8,
+   "coef": 0.167,
+   "spearman": [
+    0.3841,
+    0.3894
+   ],
+   "top32": [
+    3.48,
+    3.477
+   ],
+   "top32Better": 4,
+   "top32Worse": 3,
+   "fwdGain": 0.0095,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retS",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 2.91,
+   "better": 8,
+   "coef": 0.159,
+   "spearman": [
+    0.4295,
+    0.4442
+   ],
+   "top32": [
+    2.199,
+    2.257
+   ],
+   "top32Better": 5,
+   "top32Worse": 3,
+   "fwdGain": 0.0314,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retS",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 1.32,
+   "better": 7,
+   "coef": 0.105,
+   "spearman": [
+    0.3947,
+    0.415
+   ],
+   "top32": [
+    1.501,
+    1.468
+   ],
+   "top32Better": 3,
+   "top32Worse": 6,
+   "fwdGain": 0.0197,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retS",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.68,
+   "better": 5,
+   "coef": 0.26,
+   "spearman": [
+    0.4742,
+    0.4932
+   ],
+   "top32": [
+    1.365,
+    1.416
+   ],
+   "top32Better": 5,
+   "top32Worse": 2,
+   "fwdGain": 0.0615,
+   "fwdBetter": "3/6"
+  },
+  {
+   "cand": "retT",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 1.74,
+   "better": 6,
+   "coef": 0.053,
+   "spearman": [
+    0.3841,
+    0.3879
+   ],
+   "top32": [
+    3.48,
+    3.477
+   ],
+   "top32Better": 4,
+   "top32Worse": 3,
+   "fwdGain": 0.007,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retT",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 1.78,
+   "better": 6,
+   "coef": 0.051,
+   "spearman": [
+    0.4295,
+    0.4405
+   ],
+   "top32": [
+    2.199,
+    2.241
+   ],
+   "top32Better": 3,
+   "top32Worse": 4,
+   "fwdGain": 0.0229,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retT",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 0.84,
+   "better": 7,
+   "coef": 0.036,
+   "spearman": [
+    0.3947,
+    0.4054
+   ],
+   "top32": [
+    1.501,
+    1.417
+   ],
+   "top32Better": 2,
+   "top32Worse": 7,
+   "fwdGain": 0.0129,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retT",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.65,
+   "better": 4,
+   "coef": 0.082,
+   "spearman": [
+    0.4742,
+    0.4967
+   ],
+   "top32": [
+    1.365,
+    1.425
+   ],
+   "top32Better": 8,
+   "top32Worse": 1,
+   "fwdGain": 0.0511,
+   "fwdBetter": "3/6"
+  },
+  {
+   "cand": "retR",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 2.52,
+   "better": 6,
+   "coef": 0.176,
+   "spearman": [
+    0.3841,
+    0.388
+   ],
+   "top32": [
+    3.48,
+    3.499
+   ],
+   "top32Better": 4,
+   "top32Worse": 3,
+   "fwdGain": 0.0092,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retR",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 2.65,
+   "better": 7,
+   "coef": 0.161,
+   "spearman": [
+    0.4295,
+    0.4392
+   ],
+   "top32": [
+    2.199,
+    2.22
+   ],
+   "top32Better": 4,
+   "top32Worse": 3,
+   "fwdGain": 0.0283,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retR",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 1.27,
+   "better": 6,
+   "coef": 0.095,
+   "spearman": [
+    0.3947,
+    0.411
+   ],
+   "top32": [
+    1.501,
+    1.431
+   ],
+   "top32Better": 4,
+   "top32Worse": 5,
+   "fwdGain": 0.0161,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retR",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.86,
+   "better": 5,
+   "coef": 0.307,
+   "spearman": [
+    0.4742,
+    0.4896
+   ],
+   "top32": [
+    1.365,
+    1.396
+   ],
+   "top32Better": 5,
+   "top32Worse": 4,
+   "fwdGain": 0.0653,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "retP",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 2.33,
+   "better": 7,
+   "coef": 3.097,
+   "spearman": [
+    0.3841,
+    0.3882
+   ],
+   "top32": [
+    3.48,
+    3.511
+   ],
+   "top32Better": 5,
+   "top32Worse": 2,
+   "fwdGain": 0.0083,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retP",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 2.32,
+   "better": 8,
+   "coef": 2.99,
+   "spearman": [
+    0.4295,
+    0.442
+   ],
+   "top32": [
+    2.199,
+    2.283
+   ],
+   "top32Better": 5,
+   "top32Worse": 3,
+   "fwdGain": 0.0276,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retP",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 1.48,
+   "better": 7,
+   "coef": 1.855,
+   "spearman": [
+    0.3947,
+    0.4162
+   ],
+   "top32": [
+    1.501,
+    1.48
+   ],
+   "top32Better": 4,
+   "top32Worse": 5,
+   "fwdGain": 0.0161,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retP",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.8,
+   "better": 4,
+   "coef": 5.298,
+   "spearman": [
+    0.4742,
+    0.4875
+   ],
+   "top32": [
+    1.365,
+    1.422
+   ],
+   "top32Better": 6,
+   "top32Worse": 1,
+   "fwdGain": 0.0457,
+   "fwdBetter": "2/6"
+  },
+  {
+   "cand": "isRet",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 0.24,
+   "better": 4,
+   "coef": 0.147,
+   "spearman": [
+    0.3841,
+    0.3852
+   ],
+   "top32": [
+    3.48,
+    3.441
+   ],
+   "top32Better": 0,
+   "top32Worse": 3,
+   "fwdGain": 0.0017,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "isRet",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 0.56,
+   "better": 5,
+   "coef": 0.177,
+   "spearman": [
+    0.4295,
+    0.4368
+   ],
+   "top32": [
+    2.199,
+    2.26
+   ],
+   "top32Better": 6,
+   "top32Worse": 1,
+   "fwdGain": 0.0068,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "isRet",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": -0.21,
+   "better": 5,
+   "coef": 0.108,
+   "spearman": [
+    0.3947,
+    0.406
+   ],
+   "top32": [
+    1.501,
+    1.473
+   ],
+   "top32Better": 3,
+   "top32Worse": 4,
+   "fwdGain": 0.0028,
+   "fwdBetter": "4/6"
+  },
+  {
+   "cand": "isRet",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.65,
+   "better": 4,
+   "coef": 0.342,
+   "spearman": [
+    0.4742,
+    0.4741
+   ],
+   "top32": [
+    1.365,
+    1.364
+   ],
+   "top32Better": 5,
+   "top32Worse": 2,
+   "fwdGain": 0.0226,
+   "fwdBetter": "3/6"
+  },
+  {
+   "cand": "retC",
+   "set": "QB-LB",
+   "n": 7214,
+   "folds": 9,
+   "gainT": 2.78,
+   "better": 7,
+   "coef": 0.197,
+   "spearman": [
+    0.3841,
+    0.3882
+   ],
+   "top32": [
+    3.48,
+    3.472
+   ],
+   "top32Better": 4,
+   "top32Worse": 3,
+   "fwdGain": 0.0091,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retC",
+   "set": "RB+WR",
+   "n": 2212,
+   "folds": 9,
+   "gainT": 3.37,
+   "better": 8,
+   "coef": 0.187,
+   "spearman": [
+    0.4295,
+    0.4419
+   ],
+   "top32": [
+    2.199,
+    2.258
+   ],
+   "top32Better": 5,
+   "top32Worse": 4,
+   "fwdGain": 0.0292,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retC",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 1.37,
+   "better": 7,
+   "coef": 0.133,
+   "spearman": [
+    0.3947,
+    0.414
+   ],
+   "top32": [
+    1.501,
+    1.439
+   ],
+   "top32Better": 4,
+   "top32Worse": 5,
+   "fwdGain": 0.0225,
+   "fwdBetter": "6/6"
+  },
+  {
+   "cand": "retC",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 0.74,
+   "better": 6,
+   "coef": 0.307,
+   "spearman": [
+    0.4742,
+    0.4915
+   ],
+   "top32": [
+    1.365,
+    1.416
+   ],
+   "top32Better": 5,
+   "top32Worse": 2,
+   "fwdGain": 0.0437,
+   "fwdBetter": "4/6"
+  }
+ ],
+ "ship": {
+  "pos": [
+   "RB",
+   "WR"
+  ],
+  "term": "retC",
+  "clip": [
+   -2,
+   4
+  ],
+  "beta": 0.185,
+  "k": {
+   "kr": 36,
+   "pr": 20
+  },
+  "gamesPerSeason": 12,
+  "avReal": [
+   [
+    20,
+    0.154
+   ],
+   [
+    22,
+    0.181
+   ],
+   [
+    25,
+    0.554
+   ],
+   [
+    30,
+    1.166
+   ]
+  ]
+ }
+}

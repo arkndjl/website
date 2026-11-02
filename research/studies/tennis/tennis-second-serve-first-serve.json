@@ -1,0 +1,262 @@
+{
+  "id": "tennis-second-serve-first-serve",
+  "sport": "tennis",
+  "question": "Should players hit a first serve on second serve?",
+  "answer": "No. 6 of 188 men and 4 of 112 women would gain. Median player loses 6.8 pts (men), 5.3 (women) per 100.",
+  "findings": [
+    "Men: 152 of 188 lose with 95% CI below zero; 1 gain with CI above zero.",
+    "Women: 80 of 112 lose with 95% CI below zero; 0 gain with CI above zero.",
+    "Pooled men: 1st serve wins 44.6% per attempt vs 2nd 51.0%.",
+    "Pooled women: 1st serve wins 40.0% per attempt vs 2nd 45.4%."
+  ],
+  "method": "Per server: P(1st in) x P(win | 1st in) minus P(2nd in) x P(win | 2nd in). Bootstrap 95% CI resampling matches. Assumes first-serve in-rate and win rate hold on second-serve points.",
+  "data": "Match Charting Project points, 1960-2026 (71% of matches 2015+), 11,785 matches; servers with 500+ second serves.",
+  "n": 300,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Gainers by era (250+ 2nd serves), pre-2015 / 2015+: men 4 of 104 / 14 of 193, women 3 of 42 / 7 of 169.",
+  "chart": {
+    "type": "bar",
+    "title": "Gain from a first serve on second serve, per player",
+    "x_label": "points won per 100 second-serve points",
+    "y_label": "share of players",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": {
+      "x": "0 to +2",
+      "label": "gain starts"
+    },
+    "series": [
+      {
+        "name": "men (188)",
+        "points": [
+          {
+            "x": "-16 to -14",
+            "y": 0.0106,
+            "n": 2
+          },
+          {
+            "x": "-14 to -12",
+            "y": 0.0319,
+            "n": 6
+          },
+          {
+            "x": "-12 to -10",
+            "y": 0.1383,
+            "n": 26
+          },
+          {
+            "x": "-10 to -8",
+            "y": 0.1755,
+            "n": 33
+          },
+          {
+            "x": "-8 to -6",
+            "y": 0.2447,
+            "n": 46
+          },
+          {
+            "x": "-6 to -4",
+            "y": 0.1596,
+            "n": 30
+          },
+          {
+            "x": "-4 to -2",
+            "y": 0.133,
+            "n": 25
+          },
+          {
+            "x": "-2 to 0",
+            "y": 0.0745,
+            "n": 14
+          },
+          {
+            "x": "0 to +2",
+            "y": 0.016,
+            "n": 3
+          },
+          {
+            "x": "+2 to +4",
+            "y": 0.016,
+            "n": 3
+          }
+        ]
+      },
+      {
+        "name": "women (112)",
+        "points": [
+          {
+            "x": "-16 to -14",
+            "y": 0.0,
+            "n": 0
+          },
+          {
+            "x": "-14 to -12",
+            "y": 0.0268,
+            "n": 3
+          },
+          {
+            "x": "-12 to -10",
+            "y": 0.0357,
+            "n": 4
+          },
+          {
+            "x": "-10 to -8",
+            "y": 0.1339,
+            "n": 15
+          },
+          {
+            "x": "-8 to -6",
+            "y": 0.1696,
+            "n": 19
+          },
+          {
+            "x": "-6 to -4",
+            "y": 0.2768,
+            "n": 31
+          },
+          {
+            "x": "-4 to -2",
+            "y": 0.2411,
+            "n": 27
+          },
+          {
+            "x": "-2 to 0",
+            "y": 0.0804,
+            "n": 9
+          },
+          {
+            "x": "0 to +2",
+            "y": 0.0268,
+            "n": 3
+          },
+          {
+            "x": "+2 to +4",
+            "y": 0.0089,
+            "n": 1
+          }
+        ]
+      }
+    ]
+  },
+  "_extra": {
+    "top_men": [
+      {
+        "player": "Jeremy Chardy",
+        "gain": 0.032,
+        "lo": -0.005,
+        "hi": 0.069,
+        "n2": 596,
+        "p1in": 0.646,
+        "w1": 0.72,
+        "p2in": 0.824,
+        "w2": 0.525
+      },
+      {
+        "player": "Kevin Anderson",
+        "gain": 0.028,
+        "lo": -0.002,
+        "hi": 0.06,
+        "n2": 829,
+        "p1in": 0.656,
+        "w1": 0.773,
+        "p2in": 0.917,
+        "w2": 0.522
+      },
+      {
+        "player": "Alexander Zverev",
+        "gain": 0.023,
+        "lo": 0.007,
+        "hi": 0.041,
+        "n2": 4789,
+        "p1in": 0.694,
+        "w1": 0.74,
+        "p2in": 0.864,
+        "w2": 0.567
+      },
+      {
+        "player": "Arthur Rinderknech",
+        "gain": 0.015,
+        "lo": -0.029,
+        "hi": 0.062,
+        "n2": 597,
+        "p1in": 0.649,
+        "w1": 0.74,
+        "p2in": 0.916,
+        "w2": 0.508
+      },
+      {
+        "player": "Ivo Karlovic",
+        "gain": 0.01,
+        "lo": -0.018,
+        "hi": 0.038,
+        "n2": 1325,
+        "p1in": 0.655,
+        "w1": 0.808,
+        "p2in": 0.86,
+        "w2": 0.605
+      }
+    ],
+    "top_women": [
+      {
+        "player": "Victoria Mboko",
+        "gain": 0.036,
+        "lo": -0.017,
+        "hi": 0.081,
+        "n2": 588,
+        "p1in": 0.649,
+        "w1": 0.674,
+        "p2in": 0.755,
+        "w2": 0.532
+      },
+      {
+        "player": "Daria Kasatkina",
+        "gain": 0.01,
+        "lo": -0.022,
+        "hi": 0.043,
+        "n2": 1604,
+        "p1in": 0.677,
+        "w1": 0.593,
+        "p2in": 0.792,
+        "w2": 0.494
+      },
+      {
+        "player": "Samantha Stosur",
+        "gain": 0.006,
+        "lo": -0.031,
+        "hi": 0.045,
+        "n2": 758,
+        "p1in": 0.621,
+        "w1": 0.655,
+        "p2in": 0.875,
+        "w2": 0.459
+      },
+      {
+        "player": "Linda Fruhvirtova",
+        "gain": 0.004,
+        "lo": -0.032,
+        "hi": 0.038,
+        "n2": 607,
+        "p1in": 0.619,
+        "w1": 0.658,
+        "p2in": 0.819,
+        "w2": 0.493
+      },
+      {
+        "player": "Laura Siegemund",
+        "gain": -0.006,
+        "lo": -0.066,
+        "hi": 0.052,
+        "n2": 512,
+        "p1in": 0.704,
+        "w1": 0.576,
+        "p2in": 0.801,
+        "w2": 0.515
+      }
+    ],
+    "min_second_serves": 500
+  },
+  "publish": true,
+  "order": 1
+}

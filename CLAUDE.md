@@ -16,3 +16,13 @@
   and `node scripts/names.mjs --test` after a change. Prefer a stable id (ESPN, Barttorvik pid, gsis) when both sides have one.
 - A spelling the rules miss (Neo / Neoklis Avdalas, a source's typo) goes in `data/name_aliases.json` "players"; a
   common nickname goes in its "nicknames". Matches still check team and position, so same-name players stay apart.
+
+## ARKBOARD Reference (was "Library")
+
+- The ARKBOARD section with Research, Glossary/Methodology and Data Sources tabs is **Reference**: page
+  `content/arkboard-reference.md`, URL `/arkboard/reference/`, short link `arkndjl.net/reference`, menu identifier
+  `arkboard-reference`. Never call it "Library" (that is ARKLIBRARY) or "Lab". `/library`, `/lab`, `/arkboard/library/`
+  and `/arkboard/lab/` redirect to it in `static/_redirects`. The page is written by `scripts/library_build.py`
+  (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it rather than hand-editing.
+- Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
+  source adds the source there (name, link, what the site takes from it).

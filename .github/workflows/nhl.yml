@@ -77,6 +77,22 @@ jobs:
           python3 scripts/player_pctl.py nhl || echo "nhl percentiles: not updated"   # p20/p50/p80 WAR and stats
       - name: Project games, power rankings and season odds
         run: python3 scripts/nhl_games.py
+      # offense, defense and unit tables for the teams group (scripts/team_units.py -> data/units_nhl.json), display only
+      - name: Team units
+        continue-on-error: true
+        timeout-minutes: 15
+        run: python3 scripts/team_units.py nhl
+      # lines tab (scripts/nhl_lines.py -> static/data/lines/nhl.json): 5v5 trios, pairs, on/off from the shift charts
+      # (HTML time-on-ice reports when the API has none) and MoneyPuck shot xG; display only
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/nhl/shifts
+          key: nhl-shifts-${{ github.run_id }}
+          restore-keys: nhl-shifts-
+      - name: Lines tab
+        continue-on-error: true
+        timeout-minutes: 10
+        run: python3 scripts/nhl_lines.py
       # goalies' projected saves for the saves paper test (scripts/nhl_props.py; props_snap.py joins them to DraftKings)
       - uses: actions/cache@v4
         with:
@@ -99,7 +115,7 @@ jobs:
         run: python3 scripts/model_monitor.py nhl
       - name: Commit if anything changed
         run: |
-          files="static/data/pctl-nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/hockey_logos.json static/img/hockey data/nhl_games.json data/nhl_props.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json data/depth_starters_nhl.json static/data/nhl-war data/hockey.json scripts/data/hockey_pre.json.gz scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json data/team_badges"
+          files="data/units_nhl.json static/data/pctl-nhl.json static/data/lines/nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/hockey_logos.json static/img/hockey data/nhl_games.json data/nhl_props.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json data/depth_starters_nhl.json static/data/nhl-war data/hockey.json scripts/data/hockey_pre.json.gz scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json data/team_badges"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

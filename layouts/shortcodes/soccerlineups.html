@@ -1,0 +1,92 @@
+{{- /* Soccer lineups tab (Nov 2 2026): each big-five club's formations, most-used XI on a pitch, rotation and the pairs
+       with the most league minutes together (team xG difference a 90 while both were on). static/data/lineups/soccer.json
+       from scripts/soccer_lineups.py (soccer workflow, after soccer_players.py: Understat match rosters, big five only),
+       fetched the first time the window is near the screen. Uses the depth chart's team picker and card styles. */ -}}
+<div class="win dc sl" data-tab="{{ .Get "tab" | default "lineups" }}" data-sl data-sl-src="/data/lineups/soccer.json?v={{ now.Unix }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ .Get "title" | default "lineups" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="dc__bar">
+    <label class="dc__pick"><span>team</span><select data-sl-team aria-label="team"><option>loading…</option></select></label>
+  </div>
+  <div class="dc__body" data-sl-body><p class="cfb__dim">loading…</p></div>
+  <div class="cfbm__body wintable__about"><p class="cfb__dim">League matches this season (Understat lineups, big five). Shape = the starting positions read back to front (D, then the midfield bands DM / M / AM, then forwards), so wing-backs listed in midfield read as 3-4-x or 5-x-x by where Understat puts them. The XI is the most-used player at each spot of the most-used shape (starts at that spot in that shape). Changes = starters changed from the previous league match, on average. Pairs = outfield players with the most league minutes on the pitch together; xGD/90 = team xG for minus against a 90 while both were on (shot minutes; stoppage time folded into 90, so small samples swing). Rotation and lineup stability were tested as a game-model input: it helps only once the XI is announced, and the closing line already has it.</p></div>
+  <div class="win__status"><span data-sl-count></span><span class="cfb__asof" data-sl-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.sl__shape { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.sl__shape li { padding: 2px 6px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); font-size: .85em; }
+.sl__shape li.is-top { color: #241a3a; background: #4fd8bc; }
+.sl__pitch { margin-top: 8px; padding: 8px 4px; background: repeating-linear-gradient(180deg, #1f5a52 0 24px, #24877f 24px 48px); border: 2px solid #b8ffe8; box-shadow: inset 0 0 0 2px #1e1733; }
+.sl__row { display: flex; justify-content: space-evenly; gap: 4px; padding: 6px 0; }
+.sl__p { flex: 0 1 8.5em; min-width: 0; padding: 3px 4px; text-align: center; background: #1e1733; color: #fff; border: 2px solid #c0b0ff; box-shadow: 2px 2px 0 rgba(0,0,0,.45); }
+.sl__p b { display: block; font-size: .78em; color: #4fd8bc; letter-spacing: 1px; }
+.sl__p span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85em; }
+.sl__p i { display: block; font-style: normal; font-size: .75em; color: #a89fd8; }
+.sl__two { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin-top: 8px; }
+.sl__two > * { min-width: 0; }
+.sl__pairs { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .9em; }
+.sl__pairs td { padding: 3px 4px; border-top: 1px dotted rgba(200, 199, 255, .2); white-space: normal; overflow-wrap: anywhere; }
+.sl__pairs td.n { width: 3.6em; text-align: right; white-space: nowrap; }
+@media (max-width: 420px) { .sl__p { flex-basis: 5.6em; } .sl__p span { font-size: .75em; } }
+</style>
+<script>
+(function () {
+  if (window.__arkSl) return; window.__arkSl = true;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var BAND = { GK: 0, DR: 1, DC: 1, DL: 1, DMR: 2, DMC: 2, DML: 2, MR: 3, MC: 3, ML: 3, AMR: 4, AMC: 4, AML: 4, FWR: 5, FW: 5, FWL: 5 };
+  function sgn(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2); }
+  function render(W, D, t) {
+    var T = D.teams.filter(function (x) { return x.t === t; })[0] || D.teams[0];
+    if (!T) return;
+    var top = T.fm[0];
+    var h = '<div class="dc__head">' + (T.logo ? '<img class="dc__logo" src="' + esc(T.logo) + '" alt="" width="48" height="48" onerror="this.remove()">' : '') +
+      '<div><h4 class="dc__name">' + esc(T.t) + '</h4><p class="cfb__dim">' + esc(T.grp) + ' · ' + T.m + ' league matches · ' +
+      (T.chg == null ? '' : T.chg.toFixed(1) + ' changes a match') + '</p></div></div>';
+    h += '<ul class="sl__shape" aria-label="formations used">' + T.fm.map(function (f, i) {
+      return '<li class="' + (i ? '' : 'is-top') + '">' + esc(f[0]) + ' · ' + f[1] + '</li>'; }).join('') + '</ul>';
+    var rows = {};
+    T.xi.forEach(function (p) { var b = BAND[p[0]] == null ? 3 : BAND[p[0]]; (rows[b] = rows[b] || []).push(p); });
+    h += '<div class="sl__pitch" role="img" aria-label="most-used XI in the ' + esc(top[0]) + '">';
+    [5, 4, 3, 2, 1, 0].forEach(function (b) {
+      if (!rows[b]) return;
+      h += '<div class="sl__row">' + rows[b].map(function (p) {
+        return '<div class="sl__p" title="' + esc(p[1]) + ': ' + p[2] + ' starts at ' + esc(p[0]) + ' in the ' + esc(top[0]) + '"><b>' + esc(p[0]) + '</b><span>' + esc(p[1]) + '</span><i>' + p[2] + ' st</i></div>';
+      }).join('') + '</div>';
+    });
+    h += '</div><div class="sl__two">';
+    h += '<div class="dc__slot"><h5>last league XI</h5><ol>' + T.last.map(function (p) {
+      return '<li><b class="dc__g dc__g--na">' + esc(p[0]) + '</b><span class="dc__who"><span class="dc__n">' + esc(p[1]) + '</span></span></li>'; }).join('') + '</ol></div>';
+    h += '<div class="dc__slot"><h5>most minutes together</h5><table class="sl__pairs"><tbody>' + T.pairs.map(function (p) {
+      return '<tr><td>' + esc(p[0]) + ' + ' + esc(p[1]) + '</td><td class="n">' + p[2] + "'</td><td class=\"n " + (p[3] >= 0 ? 'cfb__up' : 'cfb__down') + '" title="team xG difference a 90 while both were on">' + sgn(p[3]) + '</td></tr>'; }).join('') +
+      '</tbody></table><p class="cfb__dim">min · xGD/90 together</p></div></div>';
+    W.querySelector('[data-sl-body]').innerHTML = h;
+    try { localStorage.setItem('ark-sl', T.t); } catch (e) {}
+  }
+  function load(W) {
+    if (W.__sl) return; W.__sl = true;
+    fetch(W.getAttribute('data-sl-src')).then(function (r) { return r.json(); }).then(function (D) {
+      var sel = W.querySelector('[data-sl-team]'), groups = {}, order = [];
+      D.teams.forEach(function (T) { var g = T.grp || ''; if (!groups[g]) { groups[g] = []; order.push(g); } groups[g].push(T); });
+      order.sort();
+      sel.innerHTML = order.map(function (g) {
+        return '<optgroup label="' + esc(g) + '">' + groups[g].map(function (T) { return '<option value="' + esc(T.t) + '">' + esc(T.t) + '</option>'; }).join('') + '</optgroup>';
+      }).join('');
+      var keep = null; try { keep = localStorage.getItem('ark-sl') || localStorage.getItem('ark-dc-soccer'); } catch (e) {}
+      if (keep && D.teams.some(function (T) { return T.t === keep; })) sel.value = keep;
+      sel.addEventListener('change', function () { render(W, D, sel.value); });
+      render(W, D, sel.value);
+      W.querySelector('[data-sl-count]').textContent = D.teams.length + ' clubs';
+      W.querySelector('[data-sl-asof]').textContent = D.label + ' · updated ' + (D.asof || '').slice(0, 10);
+    }).catch(function () { W.querySelector('[data-sl-body]').innerHTML = '<p class="cfb__dim">lineups not available right now.</p>'; });
+  }
+  function init() {
+    var all = document.querySelectorAll('[data-sl]');
+    if (!('IntersectionObserver' in window)) { all.forEach(load); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); load(e.target); } }); }, { rootMargin: '3000px 0px' });
+    all.forEach(function (W) { io.observe(W); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>

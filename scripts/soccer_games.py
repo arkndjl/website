@@ -43,8 +43,10 @@ import os
 import random
 import re
 import sys
+import time
 import unicodedata
 from collections import defaultdict, Counter
+from zoneinfo import ZoneInfo
 
 import numpy as np
 
@@ -76,6 +78,23 @@ P0 = {'k': 0.02592, 'kl': 0.00346, 'ke': 2e-05, 'kh': 0.0012, 'car': 1.0, 'boost
 # the model, and the close overprices it (clubs on <= 3 days beat it, held t +3.3); r3 either sign fails
 MVF = os.path.join(HERE, 'data', 'soccer_squad_mv.json.gz')
 TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
+ET = ZoneInfo('America/New_York')
+FMX_BUDGET = 300          # seconds of new FotMob match pages a run may fetch, all leagues together
+
+
+def lday(r):
+    """a match's US Eastern date (the slate's days and the rest gaps). 'day' is ESPN's UTC date, where an MLS evening
+    kickoff (7:30 or 10:30 pm ET) falls on the next day (47% of MLS matches): the r45 band read off UTC dates was wrong
+    for 5.9% of MLS club-matches. European kickoffs fall on the same date either way."""
+    d = r.get('ld')
+    if d is None:
+        t = r.get('t') or ''
+        hm = t[11:16] if len(t) >= 16 else t[:5]
+        d = r['day']
+        if len(hm) == 5 and hm[2] == ':' and hm < '06:00':
+            d = dt.datetime.fromisoformat(f"{r['day']}T{hm}+00:00").astimezone(ET).date().isoformat()
+        r['ld'] = d
+    return d
 
 
 # ---------------------------------------------------------------- names and joins
@@ -228,6 +247,9 @@ def attach(rows, fresh=False):
         if r.get('hs') is not None:
             by[(r['lg'], D.season_of(r['day'], r['lg']))].append(r)
     n_fd = n_us = n_fx = 0
+    # one FotMob match-page budget for the whole run: 240 s for each of the 13 league seasons was up to 52 minutes,
+    # past the workflow's 30 (the rest come on the next run, as before)
+    fx_end = time.time() + FMX_BUDGET
     for (lg, S), es in sorted(by.items()):
         if lg in D.FD_DIV or lg in D.FD_NEW:
             fd = [o for o in D.fd_season(lg, S, fresh=fresh) if o['hs'] is not None]
@@ -256,14 +278,14 @@ def attach(rows, fresh=False):
                 em[mid]['us'] = o['id']
             n_us += len(j)
         if lg in D.FMX_LG and lg not in D.US_LG:
-            n_fx += fm_xg_join(es, lg, S, fresh=fresh)
+            n_fx += fm_xg_join(es, lg, S, fresh=fresh, budget=max(0.0, fx_end - time.time()))
     print('joined', n_fd, 'football-data rows,', n_us, 'Understat rows,', n_fx, 'FotMob xG rows', flush=True)
     return rows
 
 
-def fm_xg_join(es, lg, S, fresh=False):
+def fm_xg_join(es, lg, S, fresh=False, budget=240):
     """FotMob team xG onto ESPN rows (hx/ax, where Understat has none), joined on day and score"""
-    fx = D.fm_xg(lg, S, fresh=fresh, budget=240)
+    fx = D.fm_xg(lg, S, fresh=fresh, budget=budget)
     if not fx:
         return 0
     j, _ = join_side(es, fx, 'day', lambda o: (o['hs'], o['as']), ('hn', 'an'))
@@ -660,10 +682,10 @@ class Ratings:
         hm = self.comp_home(r)
         rs = 0.0
         if self.P.get('rest'):
-            rs = self.P['rest'] * (self.rest(h, r['day']) - self.rest(a, r['day']))
+            rs = self.P['rest'] * (self.rest(h, lday(r)) - self.rest(a, lday(r)))
         for k, lo, hi in (('r45', 4, 5), ('r3', 0, 3)):          # rest-day bands, home minus away (rest_research.py)
             if self.P.get(k):
-                rs += self.P[k] * (float(lo <= self.gap(h, r['day']) <= hi) - float(lo <= self.gap(a, r['day']) <= hi))
+                rs += self.P[k] * (float(lo <= self.gap(h, lday(r)) <= hi) - float(lo <= self.gap(a, lday(r)) <= hi))
         mv = self.P.get('mv', 0.0) * r.get('mvz', 0.0)     # squad market value edge (before kickoff, non-market)
         mv += self.P.get('av', 0.0) * r.get('avz', 0.0)    # injuries and suspensions (soccer_tm_injuries.add_avz)
         x = M0 + env + hm + sh + ah - sa - da + rs + mv
@@ -733,7 +755,7 @@ class Ratings:
                 e['env'][Lh] += P['ke'] * (xh + xa)
                 e['hfa'][Lh] += P['kh'] * (xh - xa)
         self.n[h] += 1; self.n[a] += 1
-        self.last[h] = self.last[a] = r['day']
+        self.last[h] = self.last[a] = lday(r)
 
 
 def run(rows, P, score=None, keep=None):
@@ -1513,6 +1535,25 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     return {'teams': out, 'left': len(fx), 'games': len(lp)}
 
 
+def tm_crest(tid):
+    """ESPN has no crest for some smaller-league clubs (Czech, Polish): look the club up by ESPN's name in the
+    Transfermarkt name map (data/soccer_logos.json 'tm', scripts/soccer_logos.py) and use Transfermarkt's crest"""
+    try:
+        import soccer_logos as SL
+        tm = json.load(open(os.path.join(ROOT, 'data', 'soccer_logos.json'))).get('tm') or {}
+    except Exception:
+        return None
+    t = (D.get(f'https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams/{tid}') or {}).get('team') or {}
+    want = {SL.norm(n) for n in (t.get('displayName'), t.get('shortDisplayName'), t.get('location')) if n}
+    want.discard('')
+    hit = [i for name, i in tm.items() if SL.norm(name) in want]
+    if not hit:     # "Banik Ostrava" inside "FC Banik Ostrava a.s.": every word of ESPN's name, one club only
+        hit = [i for name, i in tm.items() if any(w and set(w.split()) <= set(SL.norm(name).split()) for w in want)]
+    if len(set(hit)) != 1:
+        return None
+    return D.get(f'https://tmssl.akamaized.net/images/wappen/head/{hit[0]}.png', raw=True)
+
+
 def logo(tid):
     p = os.path.join(ROOT, 'static', 'img', 'soccer', f'{tid}.png')
     if os.path.exists(p):
@@ -1520,7 +1561,7 @@ def logo(tid):
     if tid.startswith('f'):
         b = D.get(f'https://images.fotmob.com/image_resources/logo/teamlogo/{tid[1:]}.png', raw=True)
     else:
-        b = D.get(f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png', raw=True)
+        b = D.get(f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png', raw=True) or tm_crest(tid)
     if not b:
         return
     try:
@@ -1550,7 +1591,7 @@ def build(days_ahead=4):
             print('injuries skipped:', e, flush=True)
     L = Live(P, rows)
     R = L.R
-    today = dt.date.today()
+    today = dt.datetime.now(ET).date()            # slate days are US Eastern (ESPN's ?dates= too)
     S = D.current_season(today)
     rng = np.random.default_rng(int(today.strftime('%Y%m%d')))
     leagues, left, size, seas = {}, {}, {}, {}
@@ -1650,30 +1691,30 @@ def build(days_ahead=4):
         import novig
         span = (today.isoformat(), (today + dt.timedelta(days=days_ahead - 1)).isoformat())
         NV = novig.soccer_prices([(r['id'], r['lg'], L.names.get(r['h'], ['?'])[0], L.names.get(r['a'], ['?'])[0], r['day'])
-                                  for r in rows if span[0] <= r['day'] <= span[1] and r.get('hs') is None])
+                                  for r in rows if span[0] <= lday(r) <= span[1] and r.get('hs') is None])
     except Exception as e:
         print('novig:', e); NV = {}
     hi = (today + dt.timedelta(days=days_ahead - 1)).isoformat()
     last0 = dict(R.last)      # unplayed matches in the window count for later ones' rest bands
     for r in rows:
-        pend = r.get('hs') is None and today.isoformat() <= r['day'] <= hi
-        if r['lg'] not in leagues and r['lg'] not in UEFA or not (today.isoformat() <= r['day'] <= hi):
+        pend = r.get('hs') is None and today.isoformat() <= lday(r) <= hi
+        if r['lg'] not in leagues and r['lg'] not in UEFA or not (today.isoformat() <= lday(r) <= hi):
             if pend:
-                R.last[r['h']] = R.last[r['a']] = r['day']
+                R.last[r['h']] = R.last[r['a']] = lday(r)
             continue
         e = dk.get(r['id'], {})
         if r['id'] in NV:
             e = {**e, 'dk': {**(e.get('dk') or {}), **NV[r['id']]}, 'book': 'Novig'}
-        if r.get('hs') is not None and r['day'] < today.isoformat():
+        if r.get('hs') is not None and lday(r) < today.isoformat():
             continue
         lh, la = L.lam(r)
         if pend:
-            R.last[r['h']] = R.last[r['a']] = r['day']
+            R.last[r['h']] = R.last[r['a']] = lday(r)
         pw_, pd_, pl_ = wdl(lh, la, P['rho'])
         M = score_matrix(lh, la, P['rho'])
         tot = np.add.outer(np.arange(GMAX), np.arange(GMAX))
         i0, j0 = np.unravel_index(np.argmax(M), M.shape)
-        g = {'id': r['id'], 'lg': r['lg'], 'day': r['day'], 'tip': f"{r['day']}T{r.get('t') or '12:00'}:00Z",
+        g = {'id': r['id'], 'lg': r['lg'], 'day': lday(r), 'tip': f"{r['day']}T{r.get('t') or '12:00'}:00Z",
              'h': r['h'], 'a': r['a'], 'hn': L.names.get(r['h'], ['?'])[0], 'an': L.names.get(r['a'], ['?'])[0],
              'hab': L.names.get(r['h'], ['?', '?'])[1], 'aab': L.names.get(r['a'], ['?', '?'])[1],
              'p': [round(pw_, 4), round(pd_, 4), round(pl_, 4)], 'fair': [american(pw_), american(pd_), american(pl_)],

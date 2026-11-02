@@ -1692,6 +1692,36 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   // of the FV distribution, the expected outcome (AV check: the mean averages .454 AV a season vs .469 realized, the
   // grade .529)
   for (const p of players) if (p.fvx != null) atMean(p, cfbZ({ pos: p.g, years: p.cls?.years ?? null, cls: p.cls?.label, noRec: !p.rec, cons: !!p.cons, fv: p.fvx }));
+  // return production (Noah, Nov 2 2026; scripts/research/st_value/cfb_fv_ret_test.py -> data/cfb_fv_returns.json): kick
+  // and punt return yards over expected from the catch spot, shrunk (KR 36, PR 20 returns), career to date, a team game
+  // in the seasons he returned (this one counted by the weeks played), held to [-2, 4]. RB and WR: realized NFL AV a
+  // season beyond FV rises beta (.185) per unit, held out by draft class 2015-23 (t 3.4, 8 of 9 classes, forward 6 of
+  // 6, top 32 AV 2.20 -> 2.26; raw return averages failed Oct 31, the catch spot is the difference). The lift is the FV that
+  // gain buys: on realized RB/WR AV at FV 20-30, on the board's AV map above. CB and S return too but have no graded
+  // history to test on
+  { let R = null, S = null;
+    try { R = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_ret_fv.json'), 'utf8')); S = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_fv_returns.json'), 'utf8')).ship; } catch { /* no file: no term */ }
+    if (R && S) {
+      // AV a season by FV: realized RB/WR at 20-30 (S.avReal), the board's map past the last knot
+      const K = S.avReal, kf = K.at(-1)[0], ka = K.at(-1)[1];
+      const avAt = f => { if (f >= kf) return ka + avOf(f) - avOf(kf); if (f <= K[0][0]) return K[0][1];
+        for (let i = 1; i < K.length; i++) if (f <= K[i][0]) return K[i - 1][1] + (K[i][1] - K[i - 1][1]) * (f - K[i - 1][0]) / (K[i][0] - K[i - 1][0]); };
+      const fvOfAv = a => { let lo = 20, hi = 80; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (avAt(m) < a) lo = m; else hi = m; } return (lo + hi) / 2; };
+      const frac = Math.min(1, (R.week || 12) / S.gamesPerSeason);
+      for (const p of players) {
+        if (!S.pos.includes(p.g) || p.fvx == null || !p.espn?.id) continue;
+        const x = R.p[p.espn.id]; if (!x) continue;
+        const [kr, kry, pr, pry, ns, cur] = x;
+        const seasons = Math.max(1, ns - (cur ? 1 - frac : 0));
+        const retY = (kry / (kr + S.k.kr) * kr + pry / (pr + S.k.pr) * pr) / (S.gamesPerSeason * seasons);
+        const c = Math.max(S.clip[0], Math.min(S.clip[1], retY));
+        const d = fvOfAv(avAt(p.fvx) + S.beta * c) - p.fvx;
+        if (!isFinite(d) || Math.abs(d) < 0.05) continue;
+        p.retFV = Math.round(d * 100) / 100; p.retY = Math.round(retY * 100) / 100; p.retN = kr + pr;
+        p.fvx = Math.max(20, Math.min(80, p.fvx + d)); p.fv = Math.round(p.fvx);
+      }
+    }
+  }
   // one row per graded player; the board is the subset that meets a board rule
   const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100;
   const rows = [];
@@ -1864,6 +1894,8 @@ function scoutReport(p) {
     const names = Object.keys(FV_BADGE.w[p.g] || {}).map(k => (p.badges || []).find(b => b.k === k)).filter(Boolean).map(b => `${b.tier[0].toUpperCase() + b.tier.slice(1)} ${b.name}`);
     (p.badgeFV > 0 ? plus : minus).push(`NFL-predictive badges: ${names.length ? names.join(', ') : p.badgeFV > 0 ? 'above avg' : 'below avg'} (${comp(p.badgeFV)})`);
   }
+  // return production (cfb_fv_returns.json)
+  if (p.retFV) (p.retFV > 0 ? plus : minus).push(`Returns ${p.retY > 0 ? '+' : ''}${p.retY.toFixed(2)} yds over exp a team game (${p.retN} KR + PR, ${p.retFV > 0 ? '+' : ''}${p.retFV.toFixed(1)} FV)`);
   // XV parts that predict NFL careers (FV_XV)
   if (p.xvFV && Math.abs(p.xvFV) >= 0.03) (p.xvFV > 0 ? plus : minus).push(`NFL-predictive ${Object.entries(p.xvZ || {}).map(([k, z]) => `${FV_XV[p.g][k][4]} ${z > 0 ? '+' : ''}${z.toFixed(2)} SD`).join(', ')} (${comp(p.xvFV)})`);
   // efficiency stats
@@ -2643,6 +2675,25 @@ const kp = (() => {
   const qk = K.filter(k => (k.FGA || 0) >= 3), qp = P.filter(p => p.NO >= 8);
   for (const k of K) k.score = z(qk.map(x => x.rate), k.rate) + 0.25 * z(qk.map(x => x.LONG), k.LONG) + 0.15 * z(qk.map(x => x.xp), k.xp);
   for (const p of P) p.score = 0.6 * z(qp.map(x => x.rate), p.rate) + 0.3 * z(qp.map(x => x.ypp), p.ypp) + 0.1 * z(qp.map(x => x.in20), p.in20);
+  // punter FV input (Noah, Nov 2 2026): career net yards over expected a punt (against punts from the same line, same
+  // season), shrunk: sum / (punts + 14), from scripts/st_kickers.py (data/st_kickers_cfb.json pcar, by ESPN id). Held out
+  // by class (final college seasons 2011-20, NFL seasons as the primary punter within 5 years): with the score log loss
+  // better in 8/10 classes, t 3.5, forward 2016-20 better; the kicker grade failed (t 1.5). Weight 1.45 score units a
+  // yard (logistic weight ratio), then rescaled to the old score's spread so the specialist FV scale holds.
+  try {
+    const pc = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'st_kickers_cfb.json'), 'utf8')).pcar || {};
+    for (const p of P) { const e = (espn.rosters[p.tid] || []).find(a => a.id === p.id) || (espn.rosters[p.tid] || []).find(a => norm(a.name) === norm(p.name)) || {};
+      p.netc = pc[e.id]?.[1] ?? null; }
+    const nv = qp.map(x => x.netc).filter(v => v != null), nm = nv.reduce((a, b) => a + b, 0) / Math.max(1, nv.length);
+    if (nv.length >= 20) {
+      const sdOf = xs => { const m = xs.reduce((a, b) => a + b, 0) / xs.length; return Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1; };
+      const s0 = sdOf(qp.map(x => x.score));
+      for (const p of P) p.score2 = p.score + 1.45 * ((p.netc ?? nm) - nm);
+      const k = s0 / sdOf(qp.map(x => x.score2));
+      for (const p of P) p.score = p.score2 * k;
+      console.log(`punters: career net yards over expected for ${nv.length} of ${qp.length}`);
+    }
+  } catch (e) { console.log(`punters: no st_kickers_cfb.json (${e.message})`); }
   const T = Object.fromEntries(teamList.map(t => [t.tid, t])), stars = new Set([...(manual.stars || []), ...(ARKLIST['college-football'] || [])]);
   const rows = [];
   for (const s of [...K, ...P]) {
@@ -2650,7 +2701,7 @@ const kp = (() => {
     const t = espn.teams[s.tid] || {}, years = e.years ?? null;
     const fvx = Math.max(25, Math.min(50, 37 + 4.5 * s.score)), fv = Math.round(fvx);
     const line = s.pos === 'K' ? `${s.FGM ?? 0}/${s.FGA ?? 0} FG (long ${s.LONG ?? '—'}), ${s.XPM ?? 0}/${s.XPA ?? 0} XP · ${s.poe >= 0 ? '+' : ''}${r1(s.poe)} pts over expected`
-      : `${s.NO} punts, ${r1(s.ypp)} avg, ${s['In 20'] ?? 0} inside the 20 · ${s.val >= 0 ? '+' : ''}${r1(s.val)} pts of field position`;
+      : `${s.NO} punts, ${r1(s.ypp)} avg, ${s['In 20'] ?? 0} inside the 20 · ${s.val >= 0 ? '+' : ''}${r1(s.val)} pts of field position${s.netc != null ? ` · career net ${s.netc >= 0 ? '+' : ''}${r1(s.netc)} yds over expected a punt` : ''}`;
     const age = e.dob ? (Date.now() - Date.parse(e.dob)) / 31557600000 : null;
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,

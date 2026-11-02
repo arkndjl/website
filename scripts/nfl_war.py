@@ -562,9 +562,10 @@ def build():
     publish(out, y, week, done, lines, alpha)
 
 
-def board(y, thru=None, fresh=False):
+def board(y, thru=None, fresh=False, st=True):
     """the board's rows for season y before week thru (whole season if None): (players, replacement lines, XV alpha);
-    scripts/player_pctl.py walks past seasons week by week through it"""
+    scripts/player_pctl.py walks past seasons week by week through it. st: special teams (nfl_st_war.py) in WAR, with
+    kicker and punter rows"""
     with open(FIT) as f:
         b = json.load(f)['coef']
     sd = season_data(y, fresh, thru)
@@ -575,6 +576,26 @@ def board(y, thru=None, fresh=False):
         if pfr not in ros and (NM.key(s_['name']), t) in by_name:
             ros[pfr] = by_name[(NM.key(s_['name']), t)]
     lines, value, spread = sub_lines()
+    # special teams (scripts/nfl_st_war.py, Nov 2 2026): kicking, punting and returns in points over an average
+    # specialist, shrunk to what carries to the next season. The points sat in the team's offense pool (points scored),
+    # so each team's credit comes out of it and team WAR still sums as before
+    stv, gs2pfr = {}, {}
+    if st:
+        try:
+            import nfl_st_war
+            stv = nfl_st_war.values(y, thru)
+        except Exception as e:   # the board still builds without it
+            print(f'nfl war: special teams skipped ({e!r})')
+            stv = {}
+    if stv:
+        gs2pfr = {r['gsis_id']: pfr for pfr, r in ros.items() if r.get('gsis_id')}
+        alias = {a_: b_ for a_, b_ in (('LV', 'OAK'), ('OAK', 'LV'), ('LA', 'LAR'), ('LAR', 'LA'), ('LAC', 'SD'), ('SD', 'LAC')) if a_ not in sd['team'] and b_ in sd['team']}
+        for gs, v in stv.items():
+            n = sum(v['t'].values())
+            for t, c in v['t'].items():
+                t = alias.get(t, t)
+                if t in sd['team']:
+                    sd['team'][t]['off'] -= 100 / 17 * v['pts'] * c / n / sd['lg']
     agg = {}
     for o in team_rows(sd, b, ros):
         pfr, t, g = o['pfr'], o['t'], o['g']
@@ -631,6 +652,11 @@ def board(y, thru=None, fresh=False):
         wav = a['war']
         xv = xvs.get(pfr, 0.0) if xvs else None
         war = wav if xv is None else alpha * xv + (1 - alpha) * wav
+        sv = stv.get(r.get('gsis_id', ''))
+        stw = sv['pts'] / ST_PTS_PER_WIN if sv else None
+        if stw is not None:
+            war += stw
+            sv['_on'] = True
         st = a['st']
         line = (f"{int(st['pass'])} pass yds, {int(st['ptd'])} TD, {int(st['pint'])} INT" if g == 'QB' else
                 f"{int(st['rush'])} rush yds, {int(st['rec'])} rec yds" if g == 'RB' else
@@ -639,7 +665,7 @@ def board(y, thru=None, fresh=False):
                 (f"{int(st['prss'])} prss, " if sd.get('adv') else '') + f"{st['sack']:g} sk, {int(st['tkl'])} tkl, {int(st['tfl'])} TFL, {int(st['ball'])} on ball")
         sub = a['sub'].most_common(1)[0][0]
         # waa: wins over an average regular at his sub-position for the same snaps
-        waa = war - a['avg'] if value else None
+        waa = war - a['avg'] if value else None    # special teams are over average already
         # two-way: each side's WAR (AV WAR and XV blended the same way) and snaps, and the other side's position
         two = None
         if min(a['ss']) >= TWO_WAY_MIN:
@@ -654,16 +680,66 @@ def board(y, thru=None, fresh=False):
                     'sp': {'SWR': 'slot', 'NCB': 'nickel', 'OT': 'OT', 'IOL': 'IOL'}.get(sub, ''),
                     'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
                     'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
+                    **({'stw': round(stw, 2), 'stl': st_line(sv)} if stw is not None and (abs(stw) >= 0.005 or st_line(sv)) else {}),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
                     '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {}), **({'two': two} if two else {})})
     out = [p for p in out if p['sn'] >= 1]
+    out += st_rows(stv, y, gs2pfr, teamg, fresh)
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
         ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))
         if ph:
             p['ph'] = ph
     out.sort(key=lambda p: -p['war'])
     return out, lines, alpha
+
+
+ST_PTS_PER_WIN = 35.5     # as nfl_xv.py
+
+
+def st_line(v):
+    """the special teams line: FG and XP made / tried, punts and gross average, kick and punt returns"""
+    L = v['line']; out = []
+    if L.get('fga'):
+        out.append(f"{int(L['fgm'])}/{int(L['fga'])} FG")
+    if L.get('xpa'):
+        out.append(f"{int(L['xpm'])}/{int(L['xpa'])} XP")
+    if L.get('pu'):
+        out.append(f"{int(L['pu'])} P, {L['puy'] / L['pu']:.1f} avg")
+    if L.get('kr'):
+        out.append(f"{int(L['kr'])} KR")
+    if L.get('pr'):
+        out.append(f"{int(L['pr'])} PR")
+    return ', '.join(out)
+
+
+def st_rows(stv, y, gs2pfr, teamg, fresh=False):
+    """kickers and punters (no offense or defense snaps): WAR = their special teams credit"""
+    if not stv:
+        return []
+    R = {r['gsis_id']: r for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh)) if r.get('gsis_id')}
+    out = []
+    for gs, v in stv.items():
+        if v.get('_on') or not (v['n'].get('kick') or v['n'].get('punt')):
+            continue
+        r = R.get(gs)
+        if not r:
+            continue
+        pos = 'P' if v['n'].get('punt', 0) > v['n'].get('kick', 0) else 'K'
+        team = v['t'].most_common(1)[0][0]
+        tg = max(1, teamg.get(team, 1))
+        war = v['pts'] / ST_PTS_PER_WIN
+        p = {'n': r['full_name'], 'id': gs2pfr.get(gs) or r.get('pfr_id') or gs, 't': team, 'tm': '/'.join(sorted(v['t'])), 'pos': pos, 'sp': '',
+             'g': v.get('g', 0), 'sn': int(v['n'].get('kick', 0) + v['n'].get('punt', 0)), 'av': 0.0, 'war': round(war, 2), 'wav': None, 'xv': None,
+             'waa': round(war, 2), 'pace': round(war * 17 / tg, 2), 'waaP': round(war * 17 / tg, 2), 'sh': 0.0, 'line': st_line(v),
+             'stw': round(war, 2), 'age': age(r.get('birth_date'), y), 'exp': r.get('years_exp', ''),
+             'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
+             '_st': {}, '_g': 'ST', '_war': war}
+        ph = faces.nfl_ph(r.get('headshot_url'))
+        if ph:
+            p['ph'] = ph
+        out.append(p)
+    return out
 
 
 def publish(out, y, week, done, lines, alpha):

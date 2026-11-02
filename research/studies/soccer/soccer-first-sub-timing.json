@@ -1,0 +1,202 @@
+{
+  "id": "soccer-first-sub-timing",
+  "sport": "soccer",
+  "question": "When do teams make their first sub by score state, and does an early first sub pay off?",
+  "answer": "Trailing teams sub first by 60', level and leading by 65'. A first sub before 60' adds +0.04 xG diff; no goal effect found.",
+  "findings": [
+    "First tactical sub at HT: trailing 34.4% (n=1606), level 16.0% (n=2206), leading 13.0% (n=1582).",
+    "Subbed by 60' if state held: trailing 60%, level 36%, leading 30%.",
+    "Sub before 60' vs none, 60' to end: xG diff +0.041 (CI +0.005 to +0.078), goal diff +0.045 (CI -0.02 to +0.11); n=4,853.",
+    "Trailing at 60': +0.070 xG diff (CI +0.004 to +0.136, n=1699). HT subs vs none: +0.052 (CI -0.002 to +0.105)."
+  ],
+  "method": "Timing: discrete hazard of first tactical sub per minute by current state. Effect: landmark at 60' (and HT), OLS with match-clustered SE on score state, strength, home, prior xG diff and xG diff in the 15 min before the landmark (the trigger window), opponent early sub. Injury subs and red cards before the landmark excluded.",
+  "data": "StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,659 matches, 4,853 team-matches at the 60' landmark.",
+  "n": 4853,
+  "robust": false,
+  "interest": 3,
+  "split_check": "xG-diff effect +0.028 in 2015/16 leagues, +0.048 elsewhere; same sign, neither CI excludes 0 alone.",
+  "chart": {
+    "type": "line",
+    "title": "Share of teams with first tactical sub made, state held",
+    "x_label": "minute",
+    "y_label": "teams subbed",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "half"
+    },
+    "mark": {
+      "x": 60,
+      "label": "60'"
+    },
+    "series": [
+      {
+        "name": "trailing",
+        "points": [
+          {
+            "x": 46,
+            "y": 0.3437,
+            "n": 1606
+          },
+          {
+            "x": 50,
+            "y": 0.3544,
+            "n": 1110
+          },
+          {
+            "x": 55,
+            "y": 0.423,
+            "n": 1082
+          },
+          {
+            "x": 60,
+            "y": 0.5993,
+            "n": 840
+          },
+          {
+            "x": 65,
+            "y": 0.7803,
+            "n": 504
+          },
+          {
+            "x": 70,
+            "y": 0.884,
+            "n": 293
+          },
+          {
+            "x": 75,
+            "y": 0.9375,
+            "n": 171
+          },
+          {
+            "x": 80,
+            "y": 0.962,
+            "n": 103
+          },
+          {
+            "x": 85,
+            "y": 0.9685,
+            "n": 85
+          },
+          {
+            "x": 90,
+            "y": 0.9715,
+            "n": 79
+          }
+        ]
+      },
+      {
+        "name": "level",
+        "points": [
+          {
+            "x": 46,
+            "y": 0.16,
+            "n": 2206
+          },
+          {
+            "x": 50,
+            "y": 0.1624,
+            "n": 1730
+          },
+          {
+            "x": 55,
+            "y": 0.2154,
+            "n": 1510
+          },
+          {
+            "x": 60,
+            "y": 0.3607,
+            "n": 1158
+          },
+          {
+            "x": 65,
+            "y": 0.5625,
+            "n": 745
+          },
+          {
+            "x": 70,
+            "y": 0.727,
+            "n": 447
+          },
+          {
+            "x": 75,
+            "y": 0.8712,
+            "n": 195
+          },
+          {
+            "x": 80,
+            "y": 0.9358,
+            "n": 87
+          },
+          {
+            "x": 85,
+            "y": 0.9596,
+            "n": 45
+          },
+          {
+            "x": 90,
+            "y": 0.9769,
+            "n": 23
+          }
+        ]
+      },
+      {
+        "name": "leading",
+        "points": [
+          {
+            "x": 46,
+            "y": 0.1296,
+            "n": 1582
+          },
+          {
+            "x": 50,
+            "y": 0.1333,
+            "n": 1418
+          },
+          {
+            "x": 55,
+            "y": 0.1692,
+            "n": 1419
+          },
+          {
+            "x": 60,
+            "y": 0.2955,
+            "n": 1281
+          },
+          {
+            "x": 65,
+            "y": 0.5177,
+            "n": 935
+          },
+          {
+            "x": 70,
+            "y": 0.7107,
+            "n": 565
+          },
+          {
+            "x": 75,
+            "y": 0.8531,
+            "n": 303
+          },
+          {
+            "x": 80,
+            "y": 0.9359,
+            "n": 142
+          },
+          {
+            "x": 85,
+            "y": 0.9728,
+            "n": 53
+          },
+          {
+            "x": 90,
+            "y": 0.9878,
+            "n": 25
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

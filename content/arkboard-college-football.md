@@ -11,14 +11,14 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,special teams,true freshmen,breakouts,ARKLIST|rosters:depth chart,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="WAR leaders :: college WAR, FBS + FCS" tab="WAR leaders" preset="war" >}}
-{{< lazytab tab="special teams" >}}
-{{< streturners sport="cfb" title="special teams :: returners, yards over expected" tab="special teams" >}}
+{{< lazytab tab="specialists" >}}
+{{< streturners sport="cfb" title="specialists :: returners, yards over expected" tab="specialists" >}}
 {{< /lazytab >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen :: FV, WAR and Stat+ against recruiting rank" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
@@ -42,6 +42,18 @@ cover = "/og/college-football.png"
 {{< /lazytab >}}
 {{< lazytab tab="season odds" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
+{{< /lazytab >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="cfb" view="offense" title="offense :: EPA a play, opponent-adjusted" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="cfb" view="defense" title="defense :: EPA a play allowed, opponent-adjusted" tab="defense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="formations" >}}
+{{< teamunits sport="cfb" view="formations" title="formations :: shotgun, no-huddle, tempo" tab="formations" >}}
+{{< /lazytab >}}
+{{< lazytab tab="special teams" >}}
+{{< stteams sport="cfb" title="special teams :: points over expected a game" tab="special teams" >}}
 {{< /lazytab >}}
 {{< lazytab tab="team talent" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
@@ -113,6 +125,7 @@ cover = "/og/college-football.png"
 | WAR | share × (line + weight × quality) × .227 | (AV − line × snap share) × .091 |
 | WAA | WAR − share × line: wins over an average starter at the position (WAR leaders tab); comparable across positions | wins over an average regular at the spot (NFL WAR leaders) |
 | XV | WAR with quality from the parts of the stat line that track winning, fit on 2024-25 team margin: PFN score plus QB completion %, yds an attempt, INT rate, rush yds; RB yds a carry, elusiveness; OL run block, pressure rate allowed; EDGE / DT sacks and splash plays a snap; LB passer rating allowed, pressures; CB rating and yds a target allowed; S plays on the ball. pts of margin per SD of quality: OL .46 (WAR .17), DT .75 (.23), LB 1.10 (.40), TE .45 (.28). held-out seasons (2024, 2025, 2026): team XV vs margin r .88 (WAR's quality .86), win% .73 (.68), defense vs points prevented .73 (.69); ahead in all 3, and in 6 of 6 seasons 2019-25 on the 7 positions graded then. next season from returning players: no better (R² .42 vs .39 in 2025, .39 vs .40 in 2026), so projections stay on WAR | — |
+| Special teams | returns (RB and WR FV): kick and punt return yards over expected from the catch spot, shrunk (KR 36, PR 20 returns), a team game in seasons returned. NFL AV beyond FV, held out by draft class 2015-23: better in 8 of 9 (t 3.4). Up to +6 FV at the 20s, about +1 at 70 | in WAR: kicking (FG + XP), punting, kick and punt returns, EPA over the kick or catch spot's expectation, shrunk to what carries to the next season (FG + XP 360, punts 170, KR 90, PR 130 plays), 35.5 pts a win, over an average specialist. kickoffs left out (no carry-over beyond the coverage unit) |
 | Replacement | replacement-starter lineup: .18 win% (2 of 12); average team's starters: 3.8 WAR | replacement team: 3 of 17 wins; team WAR = wins − 3 (5.5 at 8.5 wins) |
 | By FV | FBS tier median, this season: FV 50 .33, FV 60 .43 | WAR/yr = expected season at the FV, busts and backup years in: FV 80 .47, 60 .13, 50 .07, 40 .02. Prime WAR = season at the FV's outcome: All-Pro = top 4% of regulars' seasons (.67), Pro Bowl top 14% (.40), 4-year starter = median regular (.19), 2021-25 |
 {{< /wintable >}}
@@ -139,6 +152,9 @@ cover = "/og/college-football.png"
 {{< schooldev sport="cfb" title="development :: NFL FV over recruiting rating, by school" tab="development" >}}
 {{< /lazytab >}}
 {{< depthchart sport="cfb" title="depth chart :: every team" tab="depth chart" >}}
+{{< lazytab tab="returning" >}}
+{{< cfbreturning title="returning :: last season's production back, by unit" tab="returning" >}}
+{{< /lazytab >}}
 {{< lazytab tab="all-time FV" >}}
 {{< fvalltime sport="cfb" tab="all-time FV" >}}
 {{< /lazytab >}}

@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,true freshmen,ARKLIST|rosters:depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds,tournament odds,development|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,true freshmen,ARKLIST|rosters:depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds,tournament odds,development,offense,defense|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,all-time FV" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< rookies sport="cbb" icon="basketball" title="true freshmen :: FV and xBPM against recruiting rank" tab="true freshmen" >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
@@ -24,6 +24,12 @@ cover = "/og/college-basketball.png"
 {{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
 {{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="cbb" view="offense" title="offense :: adjusted efficiency, four factors" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="cbb" view="defense" title="defense :: adjusted efficiency allowed, four factors" tab="defense" >}}
+{{< /lazytab >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
 {{< cbbfv title="fv conversions :: basketball (peak XPM, measured)" >}}

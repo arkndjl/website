@@ -1,0 +1,100 @@
+{
+  "id": "tennis-serve-first-in-set",
+  "sport": "tennis",
+  "question": "Does the player who serves first in a set win it more often?",
+  "answer": "Set 1 raw: 52.3% men, 53.7% women. At equal strength: 50.7% and 51.4%, CIs include 50%.",
+  "findings": [
+    "Men set 1: 50.7% at equal strength (95% CI 49.5-51.9, n=7,090).",
+    "Women set 1: 51.4% at equal strength (95% CI 49.8-53.0, n=4,145).",
+    "Raw edge is mostly strength: stronger players are more often the first server in set 1.",
+    "All sets, adjusted: men 50.3% (49.6-51.1), women 51.5% (50.4-52.6)."
+  ],
+  "method": "Logistic model of set win on first-server flag plus strength (each player's point-win share in other charted matches); later sets add set score. Intercept = first-server win % at equal strength.",
+  "data": "Match Charting Project points, 11,235 charted matches with a complete first set.",
+  "n": 11235,
+  "robust": true,
+  "interest": 2,
+  "split_check": "Raw set 1, pre-2015 / 2015+: men 52.6% / 52.1%, women 55.3% / 53.4%.",
+  "chart": {
+    "type": "bar",
+    "title": "First server set win %, equal strength",
+    "x_label": "set",
+    "y_label": "sets won by first server",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "no edge"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "men",
+        "points": [
+          {
+            "x": "set 1",
+            "y": 0.5072,
+            "lo": 0.4949,
+            "hi": 0.5194,
+            "n": 7090
+          },
+          {
+            "x": "set 2",
+            "y": 0.4988,
+            "lo": 0.4853,
+            "hi": 0.5123,
+            "n": 7127
+          },
+          {
+            "x": "set 3",
+            "y": 0.5077,
+            "lo": 0.4893,
+            "hi": 0.526,
+            "n": 3721
+          },
+          {
+            "x": "set 4",
+            "y": 0.4755,
+            "lo": 0.4445,
+            "hi": 0.5068,
+            "n": 1135
+          },
+          {
+            "x": "set 5",
+            "y": 0.5206,
+            "lo": 0.4736,
+            "hi": 0.5671,
+            "n": 509
+          }
+        ]
+      },
+      {
+        "name": "women",
+        "points": [
+          {
+            "x": "set 1",
+            "y": 0.5142,
+            "lo": 0.4982,
+            "hi": 0.5303,
+            "n": 4145
+          },
+          {
+            "x": "set 2",
+            "y": 0.5171,
+            "lo": 0.4996,
+            "hi": 0.5346,
+            "n": 4140
+          },
+          {
+            "x": "set 3",
+            "y": 0.5064,
+            "lo": 0.4773,
+            "hi": 0.5354,
+            "n": 1216
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

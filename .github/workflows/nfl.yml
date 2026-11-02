@@ -117,15 +117,27 @@ jobs:
         if: env.REFRESH != 'true'
         continue-on-error: true
         run: python3 scripts/st_returners.py nfl
+      # special teams tab, kickers and punters: points over expected by kick, shrunk for sample (scripts/st_kickers.py), display only
+      - name: Special teams tab, kickers and punters
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        run: python3 scripts/st_kickers.py nfl
       # game projections, season sims (odds and expected draft slots for the mock draft's order), this week's injury
       # statuses and the picks (scripts/nfl_picks.py)
-      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/nfl.json and the team file
+      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/nfl.json and the team file;
+      # first the special teams teams view and its Special Teams badge (scripts/st_teams.py -> data/st_teams_nfl.json)
       - name: Team badges
         continue-on-error: true
         timeout-minutes: 10
         run: |
           python3 -m venv /tmp/tbv && /tmp/tbv/bin/pip install -q numpy
+          /tmp/tbv/bin/python scripts/st_teams.py build nfl || echo "special teams teams not updated"
           /tmp/tbv/bin/python scripts/team_badges.py build nfl
+      # offense, defense and unit tables for the teams group (scripts/team_units.py -> data/units_nfl.json), display only
+      - name: Team units
+        continue-on-error: true
+        timeout-minutes: 15
+        run: /tmp/tbv/bin/python scripts/team_units.py nfl
       - name: NFL games
         run: python3 scripts/nfl_games.py
       - name: Predictions picks, NFL
@@ -139,13 +151,19 @@ jobs:
         run: python3 scripts/nfl_fantasy.py || echo "nfl fantasy not updated"
       - name: Backup watch, NFL
         run: python3 scripts/backup_watch.py nfl || echo "nfl backup watch not updated"
+      # personnel tab (scripts/nfl_personnel.py -> static/data/personnel/nfl.json): groupings from the latest nflverse
+      # participation season, this season's FTN charting and snap counts; display only
+      - name: Personnel tab
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        run: python3 scripts/nfl_personnel.py
       # the NFL game model's season so far against its own walk-forward record (scripts/model_monitor.py)
       - name: Model monitor
         continue-on-error: true
         run: python3 scripts/model_monitor.py nfl
       - name: Commit if anything changed
         run: |
-          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json data/depth_starters_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json data/nfl_breakouts.json data/st_returners_nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
+          files="data/units_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json static/data/personnel/nfl.json data/depth_starters_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json data/nfl_breakouts.json data/st_returners_nfl.json data/st_teams_nfl.json data/st_kickers_nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
           add() { for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done; }
           add; git add data/rule_monitor.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi

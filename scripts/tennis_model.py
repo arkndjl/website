@@ -38,6 +38,11 @@ SURFS = ('H', 'C', 'G')
 TOUR_LV = ('G', 'M', 'A', 'F', 'O')          # scored: tour-level main draws (team events left out)
 RDAY = {'Q1': -3, 'Q2': -2, 'Q3': -1, 'Q4': -1, 'R128': 0, 'R64': 1, 'R32': 2, 'R16': 4, 'RR': 3, 'QF': 5, 'SF': 6,
         'BR': 6, 'F': 7}
+# a Grand Slam's main draw runs two weeks: days after the archive's start date (the Monday) by round, from ESPN's
+# 2025-26 Slam order of play (median R1 0, R2 3, R3 4.5, R4 6.5-7, SF 10-11, F 12-13). The one-week RDAY put the
+# second week 3-6 days early in history while the live chances read the real date (rest, matches in 30 days and the
+# points filter's drift all saw a different week 2 live than in the fit)
+RDAY_G = {'R128': 1, 'R64': 3, 'R32': 5, 'R16': 7, 'QF': 9, 'SF': 11, 'F': 13}
 
 DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET': 0.5,
            'V0': 0.10, 'Q': 0.00010, 'PHI': 0.35, 'MU_LR': 0.002,
@@ -70,8 +75,15 @@ def ymd(d):
 DAY0 = dt.date(2000, 1, 1)
 
 
-def dnum(d, rd=''):
-    return (ymd(d) - DAY0).days + RDAY.get(rd, 2)
+def rday(rd, lv=''):
+    """the round's day offset from the event's start date (lv 'G': a Grand Slam main draw)"""
+    if lv == 'G' and rd in RDAY_G:
+        return RDAY_G[rd]
+    return RDAY.get(rd, 2)
+
+
+def dnum(d, rd='', lv=''):
+    return (ymd(d) - DAY0).days + rday(rd, lv)
 
 
 # ---------------------------------------------------------------- Markov chain: serve-point chances -> match chance
@@ -332,7 +344,7 @@ class Model:
 
     def update(self, r):
         d, tour, lv, sf, rd, bo, tid, w, l, score, ws, ls = r[:12]
-        day = dnum(d, rd)
+        day = dnum(d, rd, lv)
         gw, gl, ret = games(score)
         if len(r) > 14 and r[14] and 0 < r[14] < 1:
             # market memory: the close against the ratings alone (no context terms), before this match's update
@@ -370,7 +382,7 @@ def run(rows, P=None, score=None, until=None):
     for r in rows:
         if until and r[0] > until: break
         if score and score(r):
-            day = dnum(r[0], r[4])
+            day = dnum(r[0], r[4], r[2])
             # randomise the side so the blend's intercept means nothing (A = winner on even ids)
             pb, pe, pp, gx, cx = m.predict(r[7], r[8], r[1], r[3], day, r[5])
             out.append((r, pe, pp, gx, cx))
@@ -715,7 +727,7 @@ def build(rows, players, tn):
         if old is None and r[0] > snap_day:
             old = {k: v[0] for k, v in m.elo.items()}          # overall Elo 13 weeks ago
         if r[0] >= recent_from and r[2] != 'S':
-            day = dnum(r[0], r[4])
+            day = dnum(r[0], r[4], r[2])
             recent.append((r, m.predict(r[7], r[8], r[1], r[3], day, r[5])[0]))
         m.update(r)
     old = old or {}

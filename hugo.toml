@@ -96,6 +96,7 @@ copyright = 'arkndjl'
   [params.links]
     eephus = "https://eephus.io"
     twitter = "https://x.com/ARKNDJL"
+    instagram = "https://www.instagram.com/arkndjl/"
     substack = "https://substack.com/@arkndjl"
     github = "https://github.com/arkndjl"
     youtube = "https://www.youtube.com/@arkndjl"
@@ -141,7 +142,7 @@ copyright = 'arkndjl'
       [languages.en.menu]
         [[languages.en.menu.main]]
           identifier = "about"
-          name = "about"
+          name = "about/contact"
           url = "/about/"
           weight = 10
         [[languages.en.menu.main]]
@@ -171,32 +172,22 @@ copyright = 'arkndjl'
           [languages.en.menu.main.params]
             icon = "img/icons/brush.svg"
             group = "art"
-            gname = "gallery"
+            gname = "art"
         [[languages.en.menu.main]]
-          identifier = "arkndjl-uniforms"
+          identifier = "arkndjl-style"
           parent = "arkndjl"
-          name = "ARKNDJL uniforms"
-          url = "/arkndjl/uniforms/"
-          weight = 23
-          [languages.en.menu.main.params]
-            icon = "img/icons/kit.svg"
-            group = "art"
-            gname = "uniforms"
-        [[languages.en.menu.main]]
-          identifier = "arkndjl-brand"
-          parent = "arkndjl"
-          name = "brand guide"
-          url = "/arkndjl/brand/"
+          name = "style guide"
+          url = "/arkndjl/style/"
           weight = 25
           [languages.en.menu.main.params]
             icon = "img/icons/sulfur.svg"
             group = "art"
-            gname = "brand guide"
+            gname = "style guide"
         [[languages.en.menu.main]]
           identifier = "ARKBOARD"
           name = "ARKBOARD"
           url = "/arkboard/"
-          weight = 30
+          weight = 70
           [languages.en.menu.main.params]
             icon = "img/icons/arkboard.svg"
         # ARKBOARD children, grouped by params.group (menu.html, mobile-menu.html, arknav.html draw one labelled row
@@ -222,6 +213,26 @@ copyright = 'arkndjl'
             icon = "img/icons/standings.svg"
             group = "all sports"
             gname = "ARKRANKING"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-standings"
+          parent = "ARKBOARD"
+          name = "Standings"
+          url = "/arkboard/standings/"
+          weight = 31
+          [languages.en.menu.main.params]
+            icon = "img/icons/standings.svg"
+            group = "all sports"
+            gname = "Standings"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-reference"
+          parent = "ARKBOARD"
+          name = "Reference"
+          url = "/arkboard/reference/"
+          weight = 33
+          [languages.en.menu.main.params]
+            icon = "img/icons/reference.svg"
+            group = "all sports"
+            gname = "Reference"
         [[languages.en.menu.main]]
           identifier = "arkboard-arklist"
           parent = "ARKBOARD"
@@ -356,25 +367,20 @@ copyright = 'arkndjl'
           identifier = "arklibrary"
           name = "ARKLIBRARY"
           url = "/arklibrary/"
-          weight = 40
+          weight = 26
           [languages.en.menu.main.params]
             icon = "img/icons/arklibrary.svg"
         [[languages.en.menu.main]]
           identifier = "laursen"
           name = "1NT/LAURSEN_111"
           url = "/laursen_111/"
-          weight = 45
+          weight = 24
           [languages.en.menu.main.params]
             icon = "img/icons/1nt.png"
         [[languages.en.menu.main]]
           identifier = "eephus"
           name = "eephus.io"
           url = "/eephus/"
-          weight = 50
+          weight = 22
           [languages.en.menu.main.params]
             icon = "img/eephus-favicon.png"
-        [[languages.en.menu.main]]
-          identifier = "contact"
-          name = "contact"
-          url = "/contact/"
-          weight = 60

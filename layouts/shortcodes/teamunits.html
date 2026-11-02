@@ -1,0 +1,97 @@
+{{- /* Team unit tables in each sport's teams group (Noah, Nov 2 2026): offense, defense and the sport's own units
+       (NFL/CFB formations, NHL power play and penalty kill, soccer set pieces). data/units_<sport>.json from
+       scripts/team_units.py; every row is a team, every column is described by the file (k, header h, tooltip t,
+       format f, x = hidden on phones, lo = lower is better, key = the rank column).
+       {{< teamunits sport="nfl" view="offense" title="offense :: ..." tab="offense" >}}; view="formations,fronts" puts
+       the views on chips, one shown at a time. */ -}}
+{{- $sport := .Get "sport" }}{{ $views := split (.Get "view") "," }}{{ $tab := .Get "tab" }}
+{{- $feed := printf "units_%s" $sport }}
+{{- $lbl := dict "formations" "offense" "fronts" "defense" }}
+{{- $icon := index (dict "nfl" "football" "cfb" "football" "nba" "basketball" "cbb" "basketball" "nhl" "hockey" "soccer" "soccer") $sport | default "football" }}
+{{- $cfh := index (dict "cfb" "Conf" "cbb" "Conf" "soccer" "League") $sport | default "" }}
+{{- with index site.Data $feed -}}
+{{- $d := . }}
+{{- $date := lower ((time .asof).Format "Jan 2") }}
+{{- $when := cond (isset . "week") (printf "%v · through week %v" .season .week) (printf "%v" (.label | default .season)) }}
+<div class="brk" data-units{{ with $tab }} data-tab="{{ . }}"{{ end }}{{ with $d.leagues }} data-units-lg="Premier League"{{ end }}>
+  {{- if gt (len $views) 1 }}
+  <div class="cfb__bar brk__weeks" role="group" aria-label="view">
+    <span class="brk__lbl">view</span>
+    {{- range $i, $v := $views }}
+    <button type="button" class="cfb__chip{{ if eq $i 0 }} is-on{{ end }}" data-brk-w="{{ $v }}" aria-pressed="{{ if eq $i 0 }}true{{ else }}false{{ end }}">{{ index $lbl $v | default $v }}</button>
+    {{- end }}
+  </div>
+  {{- end }}
+  {{- range $i, $v := $views }}
+  {{- with index $d.views $v }}
+  {{- $V := . }}{{ $cols := .cols }}{{ $rows := .rows }}
+  {{- $keyc := index $cols 0 }}{{ range $cols }}{{ if isset . "key" }}{{ $keyc = . }}{{ end }}{{ end }}
+  {{- $gfx := slice "RK" "Team" }}{{ range $cols }}{{ if not (isset . "x") }}{{ $gfx = $gfx | append .h }}{{ end }}{{ end }}
+  {{- $filter := "Team" }}{{ with $cfh }}{{ $filter = printf "%s,Team" . }}{{ end }}
+  <div data-brk-pane="{{ $v }}"{{ if gt $i 0 }} style="display:none"{{ end }}>
+  {{- partial "wintable-open.html" (dict "title" (cond (gt (len $views) 1) (printf "%s · %s" ($.Get "title") (index $lbl $v | default $v)) ($.Get "title")) "icon" $icon "filter" $filter "rerank" true "gfxCols" (delimit $gfx ",") "gfxDate" (printf "%s · %v" $v ($d.label | default $d.season)) "gfxMax" "25") }}
+<table class="cfb__table bw brk__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    {{- with $cfh }}<th class="bw__x">{{ . }}</th>{{ end }}
+    {{- range $cols }}<th{{ if isset . "x" }} class="bw__x"{{ end }} title="{{ .t }}">{{ .h }}</th>{{ end }}
+  </tr></thead>
+  <tbody>
+  {{- range $j, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $j 1 }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="{{ with $r.lg }}{{ . }}{{ else }}/img/{{ $sport }}/{{ lower $r.ab }}.png{{ end }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ $r.t }}</span></td>
+    {{- with $cfh }}<td class="bw__x">{{ $r.cf }}</td>{{ end }}
+    {{- range $c := $cols }}{{ $x := index $r $c.k }}
+    {{- if eq $x nil }}<td class="cfb__num{{ if isset $c "x" }} bw__x{{ end }}{{ if isset $c "key" }} is-key{{ end }}">–</td>
+    {{- else if isset $c "key" }}{{ $good := eq (int ($r.up | default 0)) 1 }}<td class="cfb__num is-key" data-v="{{ $x }}"><span{{ if not (isset $V "plain") }} class="{{ if $good }}cfb__up{{ else }}cfb__down{{ end }}"{{ end }}>{{ printf (printf "%%%s" $c.f) (float $x) }}</span></td>
+    {{- else }}<td class="cfb__num{{ if isset $c "x" }} bw__x{{ end }}" data-v="{{ $x }}">{{ printf (printf "%%%s" $c.f) (float $x) }}</td>
+    {{- end }}{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+  {{- $about := printf "%s. Ranked by %s. Adj columns are opponent-adjusted and shrunk: one ridge fit a metric on game-level rates (offense, defense, home edge), each team held toward the league by the sample at which a season-to-date rate is half signal. Other columns are this season's raw rates. Hover a header for its definition. Display only; not a game model input." (index (dict "nfl" "nflverse play-by-play (EPA, success), formations and fronts from FTN charting" "cfb" "ESPN play-by-play; EPA from an expected points model by down, distance and field position (net drive points), garbage time left out; shotgun and no-huddle from the play text" "nba" "ESPN box scores; possessions by the Basketball-Reference estimate" "cbb" "Barttorvik (adjusted efficiency, four factors; preseason projection blended in early); ARK O / D from the ARK Ranking" "nhl" "MoneyPuck (5-on-5 score and venue adjusted xG, 5-on-4, 4-on-5); PP% and PK% from the NHL" "soccer" "FotMob match xG, opponent adjustment within each league") $sport) $keyc.h }}
+  {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" $feed "note" (printf "%s · ranked by %s · updated %s" $when $keyc.h $date) "about" $about) }}
+  </div>
+  {{- end }}
+  {{- end }}
+</div>
+<script>
+(function () {
+  if (window.__arkUnits) return; window.__arkUnits = true;
+  // chips; runs again when a lazy tab is filled (ark:lazy, layouts/shortcodes/lazytab.html)
+  function chipsInit() {
+  document.querySelectorAll('[data-units]').forEach(function (b) {
+    if (b.dataset.ready) return; b.dataset.ready = 1;
+    var chips = b.querySelectorAll('[data-brk-w]'), panes = b.querySelectorAll('[data-brk-pane]');
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        var w = c.getAttribute('data-brk-w');
+        chips.forEach(function (x) { var on = x === c; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        panes.forEach(function (p) { p.style.display = p.getAttribute('data-brk-pane') === w ? '' : 'none'; });
+      });
+    });
+  });
+  }
+  // soccer: ratings are within a league, so the table opens on one league (Premier League) unless the link names one
+  function lg() {
+    document.querySelectorAll('[data-units-lg]').forEach(function (b) {
+      if (b.dataset.lgDone) return;
+      var sels = b.querySelectorAll('[data-tf-bar] select'); if (!sels.length) return;
+      b.dataset.lgDone = 1;
+      if (/league=/.test(location.hash)) return;
+      sels.forEach(function (s) {
+        var lab = (s.previousElementSibling && s.previousElementSibling.textContent || '').toLowerCase();
+        if (lab !== 'league' || s.value) return;
+        s.value = b.getAttribute('data-units-lg'); s.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+  }
+  function all() { chipsInit(); setTimeout(lg, 0); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', all); else all();
+  window.addEventListener('load', lg);
+  document.addEventListener('ark:lazy', function () { setTimeout(all, 0); });
+})();
+</script>
+{{- end -}}

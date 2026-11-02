@@ -43,7 +43,13 @@ def summary(gid, fresh=False):
     if j is None or 'boxscore' not in j:
         return None
     refs = [o.get('displayName') or o.get('fullName') for o in (j.get('gameInfo') or {}).get('officials') or []]
-    out = {'r': [r for r in refs if r], 't': {}, 'p': {}}
+    try:
+        done = bool(j['header']['competitions'][0]['status']['type']['completed'])
+    except (KeyError, IndexError, TypeError):
+        done = False
+    # done: the final box score. A game in progress has one too (its fouls and free throws so far), so only a final
+    # one is cached or logged as the game's whistle
+    out = {'r': [r for r in refs if r], 't': {}, 'p': {}, 'done': done}
     for t in j['boxscore'].get('teams', []):
         ab = E.team(t['team']['abbreviation'])
         s = {x['name']: x.get('displayValue') for x in t.get('statistics', [])}
@@ -65,7 +71,8 @@ def summary(gid, fresh=False):
                 if mn:
                     rows.append([(p.get('athlete') or {}).get('id'), mn, _n(d.get('fouls'))])
         out['p'][ab] = rows
-    E.save(fn, out)
+    if done:
+        E.save(fn, out)
     return out
 
 
@@ -143,8 +150,14 @@ def whistle_rows(log):
         if gid in tip and len(r['r']) >= 3 and len(f) == 2 and None not in f:
             out.append((tip[gid], [NM.key(x) for x in r['r'][:3]], sum(f)))
     posted = {r['id']: r for r in log if 'crew' in r and 'fin' not in r}
+    # one whistle row a game: a final one (flagged 'final') over an unflagged one, which may be a game in progress
+    # (rows logged before Nov 2 2026); the redo appends the final row later in the log
+    fin = {}
     for r in log:
-        if 'fin' in r and r['fin'].get('fta') is not None and len(r.get('crew') or []) >= 3 and r['id'] not in hist:
+        if 'fin' in r and (r['fin'].get('final') or not fin.get(r['id'], {}).get('fin', {}).get('final')):
+            fin[r['id']] = r
+    for r in fin.values():
+        if r['fin'].get('fta') is not None and len(r.get('crew') or []) >= 3 and r['id'] not in hist:
             d = (posted.get(r['id']) or {}).get('d') or r.get('d')
             if d:
                 out.append((d, [NM.key(x) for x in r['crew'][:3]], r['fin']['fta']))
@@ -201,13 +214,16 @@ def today(now=None):
     log = read_log()
     new = []
     # whistle of finished games we logged a crew for
-    done = {r['id'] for r in log if 'fin' in r}
+    # (only a final box score: an unflagged row logged before Nov 2 2026 may be a game in progress, so it is redone)
+    done = {r['id'] for r in log if 'fin' in r and r['fin'].get('final')}
     for gid in sorted({r['id'] for r in log if 'crew' in r and 'fin' not in r} - done):
         s = summary(gid)
-        if s and len(s.get('t', {})) == 2 and len(s.get('r', [])) >= 3:
+        if s and not s.get('done'):
+            s = summary(gid, fresh=True)
+        if s and s.get('done') and len(s.get('t', {})) == 2 and len(s.get('r', [])) >= 3:
             v = list(s['t'].values())
             if all(x.get('fta') is not None for x in v):
-                new.append({'id': gid, 'crew': s['r'][:3], 'fin': {'fta': sum(x['fta'] for x in v), 'pf': sum((x['pf'] or 0) for x in v)}})
+                new.append({'id': gid, 'crew': s['r'][:3], 'fin': {'fta': sum(x['fta'] for x in v), 'pf': sum((x['pf'] or 0) for x in v), 'final': True}})
     posted = official(et)
     if posted:
         sched = {(g['h'], g['a']): g for g in E.day(et, fresh=True)}

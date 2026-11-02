@@ -1,0 +1,120 @@
+{
+  "id": "soccer-protecting-lead",
+  "sport": "soccer",
+  "question": "Does a team leading by one goal lose the xG battle late, and does it cost points?",
+  "answer": "Yes after 75': xG share 46% vs 53% expected. Costs 0.05 xPts from 75', but actual points held.",
+  "findings": [
+    "Leading by 1, 75-90+: xG share 45.9% (CI 43.2%-48.4%), expected 52.7%, 1434 matches.",
+    "Leader xG/90 75-90+: 1.16 for, 1.38 against. 15-45': share 57% and 55%, expected 54%.",
+    "Up 1 at 75' (n=1041): xPts 2.55 from realized xG vs 2.60 at strength rates; gap -0.05 (CI -0.08 to -0.03).",
+    "Actual points 2.60 (CI 2.55-2.65), vs 2.60 baseline (gap 0.00). Late xG lost does not show up in results."
+  ],
+  "method": "11v11 minutes only, split by score state and 15-min band. Expected share from leave-one-out season xG for/against of both teams, home factor, and league xG volume by band. xPts from Poisson on remaining xG; CIs bootstrap by match.",
+  "data": "StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,856 matches with clean event data.",
+  "n": 2856,
+  "robust": true,
+  "interest": 4,
+  "split_check": "From-75' xPts gap: 2015/16 men's leagues -0.08 (n=401), other comps -0.04 (n=640); both CIs exclude 0.",
+  "chart": {
+    "type": "line",
+    "title": "xG share of team leading by 1, by minute band",
+    "x_label": "minute (band midpoint)",
+    "y_label": "xG share",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "even"
+    },
+    "mark": {
+      "x": 75,
+      "label": "75'"
+    },
+    "series": [
+      {
+        "name": "leading by 1, actual",
+        "points": [
+          {
+            "x": 7.5,
+            "y": 0.5222,
+            "lo": 0.4594,
+            "hi": 0.5774,
+            "n": 898
+          },
+          {
+            "x": 22.5,
+            "y": 0.5693,
+            "lo": 0.5359,
+            "hi": 0.6022,
+            "n": 1401
+          },
+          {
+            "x": 37.5,
+            "y": 0.5545,
+            "lo": 0.5283,
+            "hi": 0.584,
+            "n": 1601
+          },
+          {
+            "x": 52.5,
+            "y": 0.5397,
+            "lo": 0.5126,
+            "hi": 0.5662,
+            "n": 1562
+          },
+          {
+            "x": 67.5,
+            "y": 0.5069,
+            "lo": 0.4789,
+            "hi": 0.5362,
+            "n": 1477
+          },
+          {
+            "x": 85,
+            "y": 0.4585,
+            "lo": 0.4321,
+            "hi": 0.4845,
+            "n": 1434
+          }
+        ]
+      },
+      {
+        "name": "same teams, expected",
+        "points": [
+          {
+            "x": 7.5,
+            "y": 0.5416,
+            "n": 898
+          },
+          {
+            "x": 22.5,
+            "y": 0.538,
+            "n": 1401
+          },
+          {
+            "x": 37.5,
+            "y": 0.5359,
+            "n": 1601
+          },
+          {
+            "x": 52.5,
+            "y": 0.5338,
+            "n": 1562
+          },
+          {
+            "x": 67.5,
+            "y": 0.5318,
+            "n": 1477
+          },
+          {
+            "x": 85,
+            "y": 0.5267,
+            "n": 1434
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true,
+  "order": 1
+}

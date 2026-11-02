@@ -1,0 +1,112 @@
+{
+  "id": "nba-two-for-one",
+  "sport": "NBA",
+  "question": "With 25-40 seconds left in a quarter, does a quick shot for a 2-for-1 pay?",
+  "answer": "Yes: quick shot nets +0.33 pts per quarter-end vs a full possession (CI +0.26 to +0.39).",
+  "findings": [
+    "Quick (<=10 s): net +0.61 pts to quarter end (CI +0.56 to +0.66), n=6896.",
+    "Full (>10 s): net +0.35 pts (CI +0.32 to +0.38), n=13048.",
+    "Points for/against: quick 1.85/1.24, full 1.25/0.90.",
+    "All start types (incl. transition): quick minus full +0.34 pts (CI +0.31 to +0.37), n=53737."
+  ],
+  "method": "Q1-Q3, first possession starting 25-40 s left. Outcome = own minus opponent points to quarter end. Main sample = inbound after opponent score (no transition); quick vs full compared within 5 s start-time bins, game-clustered bootstrap.",
+  "data": "ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, 19,166 games, 19,944 inbound possessions.",
+  "n": 19944,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Quick minus full: +0.32 pts in 2012-19 (CI +0.24 to +0.41), +0.34 in 2020-26 (CI +0.24 to +0.43).",
+  "chart": {
+    "type": "line",
+    "title": "Net points to quarter end by seconds used, inbound possessions 25-40 s left",
+    "x_label": "seconds used before first shot",
+    "y_label": "net points (own minus opponent)",
+    "y_fmt": "signed",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "even"
+    },
+    "mark": {
+      "x": 10.0,
+      "label": "10 s"
+    },
+    "series": [
+      {
+        "name": "inbound after opponent score",
+        "points": [
+          {
+            "x": 2.0,
+            "y": 0.897,
+            "lo": 0.722,
+            "hi": 1.065,
+            "n": 658
+          },
+          {
+            "x": 5.0,
+            "y": 0.749,
+            "lo": 0.644,
+            "hi": 0.852,
+            "n": 1694
+          },
+          {
+            "x": 7.0,
+            "y": 0.595,
+            "lo": 0.511,
+            "hi": 0.682,
+            "n": 2314
+          },
+          {
+            "x": 9.0,
+            "y": 0.442,
+            "lo": 0.359,
+            "hi": 0.522,
+            "n": 2230
+          },
+          {
+            "x": 11.0,
+            "y": 0.35,
+            "lo": 0.266,
+            "hi": 0.438,
+            "n": 1832
+          },
+          {
+            "x": 13.0,
+            "y": 0.347,
+            "lo": 0.26,
+            "hi": 0.435,
+            "n": 1626
+          },
+          {
+            "x": 15.0,
+            "y": 0.323,
+            "lo": 0.239,
+            "hi": 0.406,
+            "n": 1581
+          },
+          {
+            "x": 17.0,
+            "y": 0.339,
+            "lo": 0.261,
+            "hi": 0.42,
+            "n": 1702
+          },
+          {
+            "x": 19.0,
+            "y": 0.413,
+            "lo": 0.338,
+            "hi": 0.488,
+            "n": 2062
+          },
+          {
+            "x": 22.0,
+            "y": 0.327,
+            "lo": 0.277,
+            "hi": 0.375,
+            "n": 4245
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}
