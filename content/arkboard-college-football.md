@@ -11,14 +11,14 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,special teams,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="WAR leaders :: college WAR, FBS + FCS" tab="WAR leaders" preset="war" >}}
-{{< lazytab tab="special teams" >}}
-{{< streturners sport="cfb" title="special teams :: returners, yards over expected" tab="special teams" >}}
+{{< lazytab tab="specialists" >}}
+{{< streturners sport="cfb" title="specialists :: returners, yards over expected" tab="specialists" >}}
 {{< /lazytab >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen :: FV, WAR and Stat+ against recruiting rank" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
@@ -42,6 +42,18 @@ cover = "/og/college-football.png"
 {{< /lazytab >}}
 {{< lazytab tab="season odds" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
+{{< /lazytab >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="cfb" view="offense" title="offense :: EPA a play, opponent-adjusted" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="cfb" view="defense" title="defense :: EPA a play allowed, opponent-adjusted" tab="defense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="formations" >}}
+{{< teamunits sport="cfb" view="formations" title="formations :: shotgun, no-huddle, tempo" tab="formations" >}}
+{{< /lazytab >}}
+{{< lazytab tab="special teams" >}}
+{{< stteams sport="cfb" title="special teams :: points over expected a game" tab="special teams" >}}
 {{< /lazytab >}}
 {{< lazytab tab="team talent" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
