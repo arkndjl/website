@@ -182,16 +182,10 @@ def season_to_date(prior):
     if not OFFLINE:
         D.fetch(f'https://barttorvik.com/getadvstats.php?year={SEASON}&csv=1', adv, 1)
         # Barttorvik sometimes answers GitHub's runners with an HTML page instead of the file: a good pull replaces the
-        # cached file (kept between runs by the workflow's cache), a page never does, so a blocked run blends the last
-        # logs it had and the next run catches up
-        for i in range(2):
-            D.fetch(f'https://barttorvik.com/{SEASON}_all_advgames.json.gz', gz + '.new', 1)
-            with open(gz + '.new', 'rb') as fh:
-                good = fh.read(2) == b'\x1f\x8b'
-            if good:
-                os.replace(gz + '.new', gz); break
-            print('barttorvik game logs: got a page, not the file' + (', keeping the cached logs' if os.path.exists(gz) else ''))
-            time.sleep(30)
+        # cached file (kept between runs by the workflow's cache); a page never does, and then the games it lacks are
+        # filled from ESPN's box scores in his row shape (scripts/cbb_espn_logs.py), so the board still moves
+        import cbb_espn_logs as EL
+        EL.pull(SEASON, gz, ua=D.UA, tries=2)
     try:
         import gzip
         games = json.load(gzip.open(gz))
@@ -199,7 +193,7 @@ def season_to_date(prior):
         # a missing file before the opener is expected; once games are on, a failed pull (Barttorvik's browser check,
         # an outage) fails the run so it shows in the Actions tab instead of leaving the board quietly stale
         if time.strftime('%Y-%m-%d') >= '2026-11-04':
-            sys.exit(f'no 2026-27 game logs from Barttorvik ({e})')
+            sys.exit(f'no 2026-27 game logs from Barttorvik or ESPN ({e})')
         print('no game logs for this season yet:', e)
         return {}, {}, {}, None
     by_p, team_dates = defaultdict(list), defaultdict(set)

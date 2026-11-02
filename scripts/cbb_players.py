@@ -16,6 +16,7 @@ the opponent's rates allowed, and the season's first games. College has no injur
 reads availability from the logs alone (who sat the last games).
 """
 import datetime as dt
+import time
 import gzip
 import json
 import math
@@ -42,10 +43,20 @@ TUNE, HOLD = (2021, 2022, 2023), (2024, 2025, 2026)
 SIT_STREAK = {0: 0.06, 1: 0.518, 2: 0.678, 3: 0.765, 4: 0.863}      # P(sits) by games missed in a row (0: measured below)
 
 
+_PULLED = set()
+
+
 def logs(season):
     """[(date, team, opp, home, pid, name, min, pts, reb, ast, fg3, poss, bpm)] from Barttorvik's game logs"""
     p = os.path.join(BTLOG, f'{season}.json.gz')
-    if not os.path.exists(p) or os.path.getsize(p) < 10000:
+    if season >= 2027 and season not in _PULLED:
+        # the season in progress: cbb_games.py pulls it first in the workflow; on its own, Barttorvik's file or, when
+        # he answers with a page, ESPN's box scores in his row shape (scripts/cbb_espn_logs.py)
+        import cbb_espn_logs as EL
+        if not os.path.exists(p) or os.path.getmtime(p) < time.time() - 3 * 3600:
+            EL.pull(season, p, ua=UA)
+        _PULLED.add(season)
+    elif not os.path.exists(p) or os.path.getsize(p) < 10000:
         os.makedirs(BTLOG, exist_ok=True)
         subprocess.run(['curl', '-s', '-m', '300', '-A', UA, f'https://barttorvik.com/{season}_all_advgames.json.gz', '-o', p], check=False)
     try:

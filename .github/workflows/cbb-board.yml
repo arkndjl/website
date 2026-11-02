@@ -36,13 +36,15 @@ jobs:
           python-version: "3.12"
       - run: pip install numpy
       # Barttorvik's game logs (this season's and last season's) from the last run that got them: his site sometimes
-      # answers GitHub's runners with a page instead of the file, and a blocked pull then keeps these
+      # answers GitHub's runners with a page instead of the file, and a blocked pull then keeps these and fills the
+      # games they lack from ESPN box scores (scripts/cbb_espn_logs.py; the summaries are cached in espn_box)
       - name: Restore Barttorvik game logs
         uses: actions/cache/restore@v4
         with:
           path: |
             scripts/.cache/cbb/games_bt
             scripts/.cache/cbb/games/*.json.gz
+            scripts/.cache/cbb/espn_box
           key: cbb-bt-${{ github.run_id }}
           restore-keys: cbb-bt-
       - name: Blend this season into the board
@@ -136,6 +138,7 @@ jobs:
           path: |
             scripts/.cache/cbb/games_bt
             scripts/.cache/cbb/games/*.json.gz
+            scripts/.cache/cbb/espn_box
           key: cbb-bt-${{ github.run_id }}
       - name: Fail the run if a core step failed
         if: always()
