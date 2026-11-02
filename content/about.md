@@ -1,16 +1,10 @@
 +++
-title = "about me"
-description = "about arkndjl (Noah Dengler): Baseball Operations Analyst at Driveline, Data Science Consultant at Agentiq Sports, NYU mathematics & economics student, builder of eephus.io / MLB PROSPX and ARKBOARD."
+title = "about/contact"
+description = "about and contact for arkndjl (Noah Dengler), New York City: Baseball Operations Analyst at Driveline, Data Science Consultant at Agentiq Sports, NYU mathematics & economics student, builder of eephus.io / MLB PROSPX and ARKBOARD. Email, Instagram, X, LinkedIn and other links."
 draft = false
 +++
 
-{{< winpane title="noah_dengler.txt" icon="note" status="arkndjl" >}}
-**Baseball Operations Analyst** at **Driveline** :: **Data Science Consultant** at **Agentiq Sports** :: mathematics & economics student at **NYU**.
-
-i work across quantitative, qualitative and creative fields: sabermetrics, prospect evaluation, economics, art and music. this website is both portfolio and blog for my analysis.
-
-[contact](/contact/) :: [linkedin](https://www.linkedin.com/in/noahdengler/) :: [twitter](https://x.com/ARKNDJL) :: [ARKNDJL@gmail.com](mailto:ARKNDJL@gmail.com)
-{{< /winpane >}}
+{{< aboutcontact >}}
 
 {{< desk >}}
 
