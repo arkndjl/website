@@ -1,6 +1,6 @@
 {{- /* NHL power rankings (data/nhl_games.json power, scripts/nhl_games.py): each team's rating in goals against an
-       average team on neutral ice (the game model's Elo, xG and goals ratings, market rating and its usual goalie, at
-       the margin weights), its win chance against an average team, the xG attack and defence it's built on, the
+       average team on neutral ice (the game model's Elo, xG rating and lineup value, at the margin weights in
+       data/nhl_games_fit.json mcoef), its win chance against an average team, the xG attack and defence it's built on, the
        goalie it starts most, and the season-odds headline numbers. */ -}}
 {{- with site.Data.nhl_games -}}
 {{- $proj := partial "projsum.html" (dict "sport" "nhl" "k" "war") -}}
@@ -8,7 +8,7 @@
 <table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>
-    <th title="rating = expected goal margin vs an average team, neutral ice, usual goalie: Elo + xG rating + goals rating + market rating + goalie, at the model's weights">Rating</th>
+    <th title="rating = expected goal margin vs an average team, neutral ice: Elo + xG rating + lineup value, at the model's weights">Rating</th>
     <th title="win chance against an average team, neutral ice">Win%</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="wins-losses-overtime losses">Rec</th>
