@@ -16,3 +16,9 @@
   and `node scripts/names.mjs --test` after a change. Prefer a stable id (ESPN, Barttorvik pid, gsis) when both sides have one.
 - A spelling the rules miss (Neo / Neoklis Avdalas, a source's typo) goes in `data/name_aliases.json` "players"; a
   common nickname goes in its "nicknames". Matches still check team and position, so same-name players stay apart.
+
+## ARKBOARD Lab (was "Library")
+
+- The ARKBOARD research section (Research + Glossary/Methodology tabs) is **Lab**: page `content/arkboard-lab.md`,
+  URL `/arkboard/lab/`, short link `arkndjl.net/lab`, menu identifier `arkboard-lab`. Never call it "Library"
+  (that is ARKLIBRARY). `/library` and `/arkboard/library/` redirect to it in `static/_redirects`.

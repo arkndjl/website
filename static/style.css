@@ -4233,6 +4233,8 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .menu-sub:hover > .menu-sub__list, .menu-sub:focus-within > .menu-sub__list, .menu-sub.is-open > .menu-sub__list { display: grid; }
 .menu-sub__list > li:first-child { grid-column: 1 / -1; }
 .menu-sub__list .menu-grp, .menu-sub__list .menu-grp__links { display: contents; }
+/* ARKBOARD is the last menu entry (Nov 2 2026): its dropdown opens leftward so it stays on screen */
+.menu--desktop > .menu-sub:last-child > .menu-sub__list { left: auto; right: 0; }
 .menu-sub__list .menu-grp__label { grid-column: 1; align-self: stretch; display: flex; align-items: center; border-top: 1px solid var(--win-well); }
 .menu--mobile .menu-grp { display: block; border-bottom: 1px solid var(--win-well); }
 .menu--mobile .menu-grp__label { display: block; padding: 4px 10px 0 22px; font-size: 0.8em; line-height: 1.2; }
