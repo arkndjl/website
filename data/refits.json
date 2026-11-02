@@ -1,0 +1,369 @@
+{
+ "asof": "2026-11-02T22:30:05Z",
+ "jobs": {
+  "close_model": {
+   "last": "2026-11-02T22:15:44Z",
+   "status": "ok",
+   "secs": 156,
+   "note": "",
+   "changed": [
+    "data/close_fit.json"
+   ],
+   "lastOk": "2026-11-02T22:15:44Z",
+   "cmd": "python3 scripts/close_model.py --fit",
+   "months": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "every": 28,
+   "sport": "predictions"
+  },
+  "clv": {
+   "last": "2026-11-02T22:17:06Z",
+   "status": "ok",
+   "secs": 23,
+   "note": "",
+   "changed": [
+    "data/clv_fit.json"
+   ],
+   "lastOk": "2026-11-02T22:17:06Z",
+   "cmd": "python3 scripts/clv.py --fit",
+   "months": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "every": 28,
+   "sport": "predictions"
+  },
+  "cover": {
+   "last": "2026-11-02T22:18:05Z",
+   "status": "ok",
+   "secs": 1,
+   "note": "",
+   "changed": [
+    "data/cover_fit.json"
+   ],
+   "lastOk": "2026-11-02T22:18:05Z",
+   "cmd": "python3 scripts/cover.py --fit",
+   "months": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "every": 28,
+   "sport": "predictions"
+  },
+  "cs2_model": {
+   "last": "2026-11-02T22:15:49Z",
+   "status": "ok",
+   "secs": 51,
+   "note": "",
+   "changed": [
+    "data/cs2_fit.json"
+   ],
+   "lastOk": "2026-11-02T22:15:49Z",
+   "cmd": "python3 scripts/cs2_model.py --fit",
+   "months": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "every": 42,
+   "sport": "cs2"
+  },
+  "nba_games": {
+   "last": "2026-11-02T22:15:43Z",
+   "status": "ok",
+   "secs": 837,
+   "note": "",
+   "changed": [
+    "data/nba_games_fit.json"
+   ],
+   "lastOk": "2026-11-02T22:15:43Z",
+   "cmd": "python3 scripts/nba_games.py --fit",
+   "months": [
+    11,
+    12,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "every": 28,
+   "sport": "nba"
+  },
+  "nfl_games": {
+   "last": "2026-11-02T22:15:47Z",
+   "status": "ok",
+   "secs": 178,
+   "note": "",
+   "changed": [
+    "data/nfl_games_fit.json"
+   ],
+   "lastOk": "2026-11-02T22:15:47Z",
+   "cmd": "python3 scripts/nfl_games.py --fit",
+   "months": [
+    10,
+    11,
+    12,
+    1
+   ],
+   "every": 28,
+   "sport": "nfl"
+  },
+  "nhl_games": {
+   "last": "2026-11-02T22:15:44Z",
+   "status": "ok",
+   "secs": 576,
+   "note": "",
+   "changed": [
+    "data/nhl_games_fit.json",
+    "scripts/data/games_wf/nhl.json.gz"
+   ],
+   "lastOk": "2026-11-02T22:15:44Z",
+   "cmd": "python3 scripts/nhl_games.py --fit",
+   "months": [
+    11,
+    12,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "every": 28,
+   "sport": "nhl"
+  },
+  "rank_odds": {
+   "last": "2026-11-02T22:18:31Z",
+   "status": "ok",
+   "secs": 5,
+   "note": "",
+   "changed": [
+    "data/rank_sd.json"
+   ],
+   "lastOk": "2026-11-02T22:18:31Z",
+   "cmd": "python3 scripts/rank_odds.py --fit",
+   "months": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "every": 56,
+   "sport": "predictions"
+  },
+  "soccer_games": {
+   "last": "2026-11-02T22:15:48Z",
+   "status": "ok",
+   "secs": 242,
+   "note": "",
+   "changed": [
+    "data/soccer_games_fit.json",
+    "scripts/data/games_wf/soccer.json.gz",
+    "scripts/data/soccer_team_ratings.json.gz"
+   ],
+   "lastOk": "2026-11-02T22:15:48Z",
+   "cmd": "python3 scripts/soccer_games.py --fit",
+   "months": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "every": 28,
+   "sport": "soccer"
+  },
+  "cbb_games": {
+   "cmd": "python3 scripts/cbb_games.py --fit",
+   "months": [
+    12,
+    1,
+    2,
+    3
+   ],
+   "every": 28,
+   "sport": "cbb"
+  },
+  "tennis_model": {
+   "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit",
+   "months": [
+    2,
+    4,
+    6,
+    8,
+    10
+   ],
+   "every": 56,
+   "sport": "tennis"
+  },
+  "nba_players": {
+   "cmd": "python3 scripts/nba_players.py --fit",
+   "months": [
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "every": 28,
+   "sport": "nba"
+  },
+  "cbb_players": {
+   "cmd": "python3 scripts/cbb_players.py --fit",
+   "months": [
+    12,
+    1,
+    2,
+    3
+   ],
+   "every": 28,
+   "sport": "cbb"
+  },
+  "cbb_espn_logs": {
+   "cmd": "python3 scripts/cbb_espn_logs.py --fit && python3 scripts/cbb_espn_logs.py --check",
+   "months": [
+    12,
+    2
+   ],
+   "every": 56,
+   "sport": "cbb"
+  },
+  "tennis_picks": {
+   "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_picks.py --fit",
+   "months": [
+    2,
+    4,
+    6,
+    8,
+    10
+   ],
+   "every": 56,
+   "sport": "tennis"
+  },
+  "nba_proj": {
+   "cmd": "python3 scripts/nba_proj.py --fit",
+   "months": [
+    7
+   ],
+   "every": 300,
+   "sport": "nba"
+  },
+  "nfl_fantasy": {
+   "cmd": "python3 scripts/nfl_fantasy.py --fit",
+   "months": [
+    3
+   ],
+   "every": 300,
+   "sport": "nfl"
+  },
+  "nfl_war": {
+   "cmd": "python3 scripts/nfl_war.py --fit",
+   "months": [
+    3
+   ],
+   "every": 300,
+   "sport": "nfl"
+  },
+  "nhl_players": {
+   "cmd": "python3 scripts/nhl_players.py --fit",
+   "months": [
+    7
+   ],
+   "every": 300,
+   "sport": "nhl"
+  },
+  "pctl_nba": {
+   "cmd": "python3 scripts/player_pctl.py --fit nba",
+   "months": [
+    7
+   ],
+   "every": 300,
+   "sport": "nba"
+  },
+  "pctl_nhl": {
+   "cmd": "python3 scripts/player_pctl.py --fit nhl",
+   "months": [
+    7
+   ],
+   "every": 300,
+   "sport": "nhl"
+  },
+  "pctl_nfl": {
+   "cmd": "python3 scripts/player_pctl.py --fit nfl",
+   "months": [
+    3
+   ],
+   "every": 300,
+   "sport": "nfl"
+  },
+  "cbb_tourney": {
+   "cmd": "python3 scripts/cbb_tourney.py --fit",
+   "months": [
+    5
+   ],
+   "every": 300,
+   "sport": "cbb"
+  },
+  "cbb_boards": {
+   "cmd": "python3 scripts/cbb_boards.py --fit",
+   "months": [
+    7
+   ],
+   "every": 300,
+   "sport": "cbb"
+  }
+ },
+ "about": "Scheduled model refits (scripts/refit.py, .github/workflows/model-refits.yml, Mondays): each job refits its model on the data to date in its season months every `every` days, kept only if it exits clean, writes strict JSON and passes its check; lastOk is the last kept (or unchanged) refit."
+}
