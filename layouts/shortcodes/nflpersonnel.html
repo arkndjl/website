@@ -1,0 +1,118 @@
+{{- /* NFL personnel (Nov 2 2026): offense groupings and defensive packages by team, one tab in the rosters group:
+       {{< nflpersonnel tab="personnel" >}}. Data static/data/personnel/nfl.json (scripts/nfl_personnel.py in
+       nfl.yml), fetched the first time the window is on screen. Groupings come from nflverse participation, which
+       lags a season (2026 not published yet), so that part is labelled with its season; this season's part is FTN
+       charting (motion, play action, shotgun, box, blitz) and PFR snap counts (average backs / TEs / WRs a play). */ -}}
+<div class="win dc nflp" data-tab="{{ .Get "tab" | default "personnel" }}" data-nflp-src="/data/personnel/nfl.json?v={{ now.Unix }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "personnel" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="dc__bar">
+    <label class="dc__pick"><span>team</span><select data-nflp-team aria-label="team"><option>loading…</option></select></label>
+    <label class="dc__pick"><span>view</span><select data-nflp-view aria-label="view">
+      <option value="team">team</option><option value="league">league table</option><option value="now">this season: tendencies</option>
+    </select></label>
+  </div>
+  <div class="dc__body" data-nflp-body><p class="cfb__dim">loading…</p></div>
+  <div class="cfbm__body wintable__about"><p class="cfb__dim">Offense personnel is backs then tight ends: 11 = 1 RB, 1 TE, 3 WR; 12 = 1 RB, 2 TE; 21 = 2 backs (fullbacks count), 1 TE; jumbo = six or more linemen; heavy = 12, 13, 21, 22 and jumbo. Defense: base = 4 or fewer defensive backs, nickel = 5, dime = 6+. Runs and dropbacks, regular season, no kneels or spikes. EPA a play and success rate (nflverse); ranks 1-32, best first (most used for usage, lowest for EPA allowed); numbers on fewer than 20 plays are left out. Groupings come from nflverse participation data, published after the season, so they cover the last full season; this season's tendencies are FTN charting (via nflverse) and PFR snap counts.</p></div>
+  <div class="win__status"><span data-nflp-count></span><span class="cfb__asof" data-nflp-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.nflp__sub { margin: 10px 0 4px; font-size: 1em; }
+.nflp__r { color: var(--foreground); opacity: .75; font-size: .8em; margin-left: 3px; }
+.nflp__hi { color: #7dffb0; }
+.nflp__lo { color: #ff9ec7; }
+@media (max-width: 600px) { .nflp .nflp__w { display: none; } }
+</style>
+<script>
+(function () {
+  if (window.__arkNflp) return; window.__arkNflp = true;
+  var GN = { '11': '11 · 1RB 1TE 3WR', '12': '12 · 1RB 2TE 2WR', '13': '13 · 1RB 3TE', '21': '21 · 2RB 1TE', '22': '22 · 2RB 2TE', '10': '10 · 1RB 4WR', jumbo: 'jumbo · 6+ OL', other: 'other' };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function rk(r) { if (r == null) return ''; var c = r <= 8 ? 'nflp__hi' : r >= 25 ? 'nflp__lo' : ''; return '<span class="nflp__r ' + c + '">' + r + '</span>'; }
+  function pc(v) { return v == null ? '<span class="cfb__dim">—</span>' : (100 * v).toFixed(1) + '%'; }
+  function ep(v) { return v == null ? '<span class="cfb__dim">—</span>' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(3); }
+  function tbl(head, rows) {
+    return '<div class="wintable__scroll"><table class="cfb__table"><thead><tr>' + head.map(function (h) { return '<th' + (h[1] ? ' class="' + h[1] + '"' : '') + (h[2] ? ' title="' + esc(h[2]) + '"' : '') + '>' + h[0] + '</th>'; }).join('') +
+      '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  function td(v, cls) { return '<td class="cfb__num' + (cls ? ' ' + cls : '') + '">' + v + '</td>'; }
+  function team(D, T) {
+    var P = D.personnel, h = '<h4 class="nflp__sub">offense by grouping · ' + P.season + '</h4>';
+    h += tbl([['grouping'], ['usage', '', 'share of plays (rank: most used = 1)'], ['league', 'nflp__w', 'league usage'], ['EPA/play', '', 'rank: best = 1'], ['success', 'nflp__w'], ['pass', 'nflp__w', 'dropback rate in the grouping']],
+      D.groups.filter(function (g) { return T.off[g].n; }).map(function (g) {
+        var o = T.off[g];
+        return '<tr><td><b>' + esc(GN[g] || g) + '</b></td>' + td(pc(o.pct) + rk(o.pctR)) + td(pc(D.personnel.league[g].pct), 'nflp__w') + td(ep(o.epa) + rk(o.epaR)) + td(pc(o.sr), 'nflp__w') + td(pc(o.pass), 'nflp__w') + '</tr>';
+      }));
+    h += '<h4 class="nflp__sub">defense by package · ' + P.season + '</h4>';
+    h += tbl([['package'], ['usage', '', 'share of snaps (rank: most used = 1)'], ['league', 'nflp__w'], ['EPA allowed', '', 'rank: lowest = 1'], ['success allowed', 'nflp__w']],
+      D.defs.map(function (g) {
+        var o = T.def[g];
+        return '<tr><td><b>' + g + '</b></td>' + td(pc(o.pct) + rk(o.pctR)) + td(pc(D.personnel.leagueDef[g].pct), 'nflp__w') + td(ep(o.epa) + rk(o.epaR)) + td(pc(o.sr), 'nflp__w') + '</tr>';
+      }));
+    h += '<h4 class="nflp__sub">defense against each offense grouping · ' + P.season + '</h4>';
+    h += tbl([['offense faced'], ['plays', 'nflp__w'], ['EPA allowed', '', 'rank: lowest = 1'], ['league EPA', 'nflp__w', 'league EPA a play in that grouping'], ['success allowed', 'nflp__w']],
+      D.groups.filter(function (g) { return T.vs[g].n >= 20; }).map(function (g) {
+        var o = T.vs[g];
+        return '<tr><td><b>' + esc(GN[g] || g) + '</b></td>' + td(o.n, 'nflp__w') + td(ep(o.epa) + rk(o.epaR)) + td(ep(D.personnel.league[g].epa), 'nflp__w') + td(pc(o.sr), 'nflp__w') + '</tr>';
+      }));
+    return h;
+  }
+  function league(D) {
+    var T = D.personnel.teams.slice().sort(function (a, b) { return b.heavy - a.heavy; });
+    return '<h4 class="nflp__sub">every team · ' + D.personnel.season + ' · most heavy personnel first</h4>' +
+      tbl([['Team'], ['11', '', '11 personnel share'], ['12', 'nflp__w'], ['heavy', '', '12, 13, 21, 22, jumbo'], ['EPA', '', 'offense EPA a play'], ['base', 'nflp__w', '4 or fewer DBs'], ['nickel', 'nflp__w'], ['dime', ''], ['EPA allowed', '']],
+        T.map(function (t) {
+          return '<tr><td><img class="cfb__logo cfb__logo--in" src="' + esc(t.logo) + '" alt="" width="16" height="16" loading="lazy"> <b>' + esc(t.t) + '</b></td>' + td(pc(t.p11) + rk(t.p11R)) + td(pc(t.off['12'].pct), 'nflp__w') + td(pc(t.heavy) + rk(t.heavyR)) +
+            td(ep(t.epa) + rk(t.epaR)) + td(pc(t.base), 'nflp__w') + td(pc(t.nickel), 'nflp__w') + td(pc(t.dime) + rk(t.dimeR)) + td(ep(t.depa) + rk(t.depaR)) + '</tr>';
+        }));
+  }
+  function now(D) {
+    var F = D.ftn, S = (D.snaps || {}).teams || {};
+    if (!F) return '<p class="cfb__dim">no charting for this season yet.</p>';
+    var T = F.teams.slice().sort(function (a, b) { return a.t < b.t ? -1 : 1; });
+    return '<h4 class="nflp__sub">' + F.season + ' through week ' + F.weeks + ' · FTN charting and snap counts</h4>' +
+      tbl([['Team'], ['RB/TE/WR', '', 'backs, tight ends and receivers on the field a play (PFR snap counts)'], ['motion', '', 'plays with pre-snap motion'], ['EPA motion', 'nflp__w', 'EPA a play with motion / without'], ['play action', '', 'share of dropbacks'], ['shotgun', 'nflp__w', 'shotgun or pistol'], ['no huddle', 'nflp__w'],
+           ['box', '', 'defenders in the box (defense)'], ['blitz', '', 'dropbacks with a blitz (defense)'], ['rushers', 'nflp__w', 'pass rushers a dropback (defense)'], ['EPA blitz', 'nflp__w', 'EPA allowed a dropback blitzing / not']],
+        T.map(function (t) {
+          var s = S[t.t];
+          return '<tr><td><img class="cfb__logo cfb__logo--in" src="' + esc(t.logo) + '" alt="" width="16" height="16" loading="lazy"> <b>' + esc(t.t) + '</b></td>' +
+            td(s ? s.b.toFixed(1) + ' / ' + s.te.toFixed(1) + ' / ' + s.wr.toFixed(1) : '—') + td(pc(t.mo) + rk(t.moR)) + td(ep(t.moE) + ' / ' + ep(t.nomoE), 'nflp__w') + td(pc(t.pa) + rk(t.paR)) + td(pc(t.sg), 'nflp__w') + td(pc(t.nh), 'nflp__w') +
+            td(t.box == null ? '—' : t.box.toFixed(2)) + td(pc(t.blitz) + rk(t.blitzR)) + td(t.rush == null ? '—' : t.rush.toFixed(2), 'nflp__w') + td(ep(t.blE) + ' / ' + ep(t.nbE), 'nflp__w') + '</tr>';
+        }));
+  }
+  function render(W, D, t, view) {
+    var T = D.personnel.teams.filter(function (x) { return x.t === t; })[0] || D.personnel.teams[0];
+    W.querySelector('[data-nflp-team]').disabled = view !== 'team';
+    var h = '';
+    if (view === 'league') h = league(D);
+    else if (view === 'now') h = now(D);
+    else h = '<div class="dc__head"><img class="dc__logo" src="' + esc(T.logo) + '" alt="" width="48" height="48"><div><h4 class="dc__name">' + esc(T.n) + '</h4><p class="cfb__dim">' +
+      esc(D.personnelNote + ' · ' + T.plays + ' plays · offense EPA ' + (T.epa > 0 ? '+' : '') + T.epa.toFixed(3) + ' (rank ' + T.epaR + ') · allowed ' + (T.depa > 0 ? '+' : '') + T.depa.toFixed(3) + ' (rank ' + T.depaR + ')') + '</p></div></div>' + team(D, T);
+    W.querySelector('[data-nflp-body]').innerHTML = h;
+    try { localStorage.setItem('ark-dc-nfl', T.t); } catch (e) {}
+  }
+  function load(W) {
+    if (W.__nflp) return; W.__nflp = true;
+    fetch(W.getAttribute('data-nflp-src')).then(function (r) { return r.json(); }).then(function (D) {
+      var sel = W.querySelector('[data-nflp-team]'), vw = W.querySelector('[data-nflp-view]');
+      var T = D.personnel.teams.slice().sort(function (a, b) { return a.n < b.n ? -1 : 1; });
+      sel.innerHTML = T.map(function (t) { return '<option value="' + esc(t.t) + '">' + esc(t.n) + '</option>'; }).join('');
+      var keep = null; try { keep = localStorage.getItem('ark-dc-nfl'); } catch (e) {}
+      if (keep && T.some(function (t) { return t.t === keep; })) sel.value = keep;
+      function go() { render(W, D, sel.value, vw.value); }
+      sel.addEventListener('change', go); vw.addEventListener('change', go); go();
+      W.querySelector('[data-nflp-count]').textContent = 'groupings ' + D.personnel.season + (D.ftn ? ' · tendencies ' + D.ftn.season + ' wk ' + D.ftn.weeks : '');
+      W.querySelector('[data-nflp-asof]').textContent = 'updated ' + (D.asof || '').slice(0, 10);
+    }).catch(function () { W.querySelector('[data-nflp-body]').innerHTML = '<p class="cfb__dim">personnel not available right now.</p>'; });
+  }
+  function init() {
+    var all = document.querySelectorAll('[data-nflp-src]');
+    if (!('IntersectionObserver' in window)) { all.forEach(load); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); load(e.target); } }); }, { rootMargin: '3000px 0px' });
+    all.forEach(function (W) { io.observe(W); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
