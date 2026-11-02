@@ -19,6 +19,7 @@ ARKBOARD = draft prospect big boards, graded on the 20–80 Future Value (FV) sc
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< winlist title="arkboard.exe :: reading" icon="arkboard" >}}
+- [How the ARKBOARD Works](/posts/arkboard-every-feature/) | every sport | Nov 2
 - [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | football | Oct 14
 - [ARKBOARD NBA 2026 v3](/posts/arkboard-nba-2026-v3/) | basketball | Feb 15
 - [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/) | the 20–80 scale | Jan 31
