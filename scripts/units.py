@@ -44,7 +44,7 @@ the whole book (every market at once).
 The NBA history is an upper bound (the walk-forward model saw tip-time injury news the open did not have), so its
 picks' close value is halved before anything is fit (the close's chances moved to match in the draws): the
 calibration, lam, the cap and the ruin odds all come from that halved world. Live picks pool in at full weight. NFL has no
-opening lines in the history and gets the default (half Kelly on the raw expectation, 3u cap) until it has live picks.
+opening lines in the history and gets the default (half Kelly on the raw expectation, the book-wide 5u cap) until it has live picks.
 """
 import datetime
 import json
@@ -92,7 +92,9 @@ HOLD[('cbb', 'spread')] = 5.0
 HOLD[('cfb', 'total')] = 5.0
 # the system before DU (PR #281): Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
 OLD_FRAC = {('cfb', 'total'): 1.0, ('cbb', 'spread'): 0.25, ('nba', 'spread'): 0.1, ('nba', 'total'): 0.25}
-DEFAULT = {'a': 0.0, 'b': 0.5, 'evbar': 0.0, 'V': [[0.0, 0.0], [0.0, 0.0]], 'lam': 1.0, 'cap': 3.0, 'rho': 0.0, 'nbar': 1.0,
+# a market with no fit (NFL: no opening lines in the history) gets the book-wide cap too (Nov 2 2026: was 3, the one
+# market left off the Oct 27 one-cap rule)
+DEFAULT = {'a': 0.0, 'b': 0.5, 'evbar': 0.0, 'V': [[0.0, 0.0], [0.0, 0.0]], 'lam': 1.0, 'cap': BOOK_CAP, 'rho': 0.0, 'nbar': 1.0,
            'basis': 'default: half Kelly on the expected return'}
 _FIT = {}
 
