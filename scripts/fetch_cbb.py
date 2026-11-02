@@ -164,11 +164,8 @@ def main():
             return ps[0], F.FLOOR + 10 * (ps[0] + ps[1] + ps[2]) + (m['topMean'] - 50) * ps[3]
         p, e = ev(z)
         r['nbaP'], r['e'] = p, e
-        parts = []
-        for j, k in enumerate(m['kept']):
-            z0 = z.copy(); z0[j] = 0
-            parts.append((k, e - ev(z0)[1], x[j]))
-        r['parts'] = parts
+        sh = F.ladder_parts(W, m['topMean'], z)   # shares that add up to E[FV] - E[FV](average player)
+        r['parts'] = [(k, float(sh[j]), x[j]) for j, k in enumerate(m['kept'])]
         xb = fit['xbpm'][grp]
         xx = np.array([r['f'].get(k) if r['f'].get(k) is not None else np.nan for k in xb['cols']], float)
         zz = np.clip(np.nan_to_num((xx - np.array(xb['mean'])) / np.array(xb['sd'])), -4, 4)
@@ -201,7 +198,7 @@ def main():
     today = time.gmtime()
 
     cols = ['name', 'team', 'logo', 'conf', 'pos', 'role', 'ovr', 'posRank', 'fv', 'plus', 'fvx', 'nbaP', 'xbpm', 'cls', 'elig', 'age', 'ageEst',
-            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'fvd', 'fvg']
+            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'fvd', 'fvg', 'e']
     out = []
     for k, r in enumerate(rows, 1):
         p, t, c, f = r['p'], r['t'], r['c'], r['f']
@@ -230,7 +227,7 @@ def main():
         out.append([p['name'], t['name'], local_logo(t['logo']), t['conf'], p['pos'], L['role'] if L else None, k, posrk[p['pos']], r['fv'], r['plus'], r['fvx'],
                     round(r['nbaP'], 4), round(r['xbpm'], 1), p['cls'], ELIG.get(p['cls'], 1), round(age, 1) if age else None,
                     None if age else age_est.get(p['cls']), p['ht'], int(p['wt']) if p['wt'] else None, p['photo'], 0 if c else 1,
-                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvg'], cbb_z(p['cls'], not c, p['pos'], r['fvg']))), r['fvg']])
+                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvg'], cbb_z(p['cls'], not c, p['pos'], r['fvg']))), r['fvg'], round(float(r['e']), 2)])
     os.makedirs(os.path.join(D.ROOT, 'static', 'data'), exist_ok=True)
     json.dump({'cols': cols, 'rows': out}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json'), 'w'), separators=(',', ':'))
     # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend

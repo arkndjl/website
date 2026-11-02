@@ -50,7 +50,8 @@
       '<p class="cfb__role">college: ' + r.path.map(function (x, k) { return 'year ' + (k + 1) + ' plays D-I ' + pct(x.on) + ', ' + Math.round(x.min) + '% of minutes, BPM ' + sgn(x.bpm) + ' if he plays'; }).join(' · ') + '.</p>' +
       '<p class="cfb__role">xNIL year 1 ' + money(r.xnil) + ': college value ' + r.path[0].v.toFixed(1) + ' (minutes share x BPM above −3) at ' + (r.team ? esc(r.team) + '\'s' : 'the expected school\'s') + ' price.</p>' +
       '<details class="cfb__nums" open><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">start: the average 2009-16 ranked recruit, FV ' + w.fv0.toFixed(1) +
-      '. each row moves FV as that input takes his value, in turn; rows sum to his FV ' + r.fvx.toFixed(1) + ' less the start.</p></details></div>';
+      '. each row moves FV as that input takes his value, in turn; rows sum to his mean outcome ' + r.fvx.toFixed(1) + ' less the start' +
+      (r.fv - r.fvx > 0.6 ? ' (FV ' + r.fv + ' is that mean with the top of the scale stretched)' : '') + '.</p></details></div>';
     tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + tr.cells.length + '">' + html + '</td></tr>');
     var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
   });
