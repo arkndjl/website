@@ -22,12 +22,12 @@ Tests (walk-forward: an input for a game uses only games before its date, or the
 
 Result (Nov 2 2026, seasons 2025 (50% of games have subs) and 2026 (98%); tune 2025, held 2026): nothing passes.
   validate   stint minutes within 2 of Barttorvik's: 99.7% (2025), 99.2% (2026) of player-games; NCAA box 99.5 / 99.0%
-  onoff_inj  w .25 / .5 / 1: tune t -0.5, held 2026 t +1.4 / +1.4 / +1.6 (worse). FAILED
-  cont       2026 only (needs last season's pairs): coef fit on the first half of dates, held second half t -0.4. FAILED
-  garbage    fit on 2025 t -1.5 (in sample), held 2026 t +0.3. FAILED
+  onoff_inj  w .25 / .5 / 1: tune t -0.5, held 2026 t +1.3 / +1.3 / +1.55 (worse). FAILED
+  cont       2026 only (needs last season pairs): coef fit on the first half of dates, held second half t -0.3. FAILED
+  garbage    fit on 2025 t -1.5 (in sample), held 2026 t +0.2. FAILED
   pri_oo     2026 only: residual corr .09, 5-fold-by-team MAE -.034 on 4.47 (every split better). One season, no
              held-out season: a lead, retest when 2026-27 ends (2027 prior from 2026 on/off)
-  player     next-season BPM, 1,504 players 2025 -> 2026: MAE 2.016 -> 2.015, t -0.4, R2 .5167 -> .5168. FAILED
+  player     next-season BPM, 1,505 players 2025 -> 2026: MAE 2.018 -> 2.017, t -0.5, R2 .516 -> .516. FAILED
 """
 import os
 os.environ.setdefault('OMP_NUM_THREADS', '1')

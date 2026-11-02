@@ -26,7 +26,12 @@
 .lu__season { flex: 0 1 180px; }
 .lu__tbl td.lu__units { white-space: normal; min-width: 14em; }
 .lu__tbl .fv-chip { margin-right: 4px; }
-@media (max-width: 600px) { .lu__tbl .lu__x { display: none; } .lu__tbl td.lu__units { min-width: 11em; } }
+@media (max-width: 600px) {
+  .lu__tbl .lu__x { display: none; }
+  .lu__tbl td.lu__units { min-width: 11em; }
+  .lu__tbl th, .lu__tbl td { padding: 4px 5px; }
+  .lu__tbl td:nth-child(2), .lu__tbl td:nth-child(2) .cfb__name { white-space: normal; }
+}
 </style>
 <script>
 (function () {
@@ -61,7 +66,7 @@
       all.sort(function (a, b) { return b[0][5] - a[0][5]; });
       all = all.slice(0, 100);
       if (!all.length) { body.innerHTML = '<p class="cfb__dim">no player has 200 minutes yet.</p>'; return; }
-      body.innerHTML = table(W, [{ h: 'Player' }, { h: 'Team', x: 1 }, { h: 'MIN', n: 1 }, { h: 'On', n: 1, x: 1, t: 'net per 100 possessions with him on' }, { h: 'Off', n: 1, x: 1, t: 'net per 100 with him off' }, { h: 'On-Off', n: 1 }, { h: 'Shrunk', n: 1, t: 'on-off shrunk toward 0 by its noise (the rank)' }],
+      body.innerHTML = table(W, [{ h: 'Player' }, { h: 'Team', x: 1 }, { h: 'MIN', n: 1 }, { h: 'On', n: 1, x: 1, t: 'net per 100 possessions with him on' }, { h: 'Off', n: 1, x: 1, t: 'net per 100 with him off' }, { h: 'On-Off', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'on-off shrunk toward 0 by its noise (the rank)' }],
         all.map(function (x) { var p = x[0], T = x[1]; return { v: [null, null, p[1], p[2], p[3], p[4], p[5]], c: ['<span class="cfb__name">' + chip(p[6]) + '<b>' + esc(p[0]) + '</b></span>', '<span class="cfb__team">' + logo(T.logo) + '<span>' + esc(T.name) + '</span></span>', Math.round(p[1]), sg(p[2]), sg(p[3]), '<span class="' + cl(p[4]) + '">' + sg(p[4]) + '</span>', '<b class="' + cl(p[5]) + '">' + sg(p[5]) + '</b>'] }; }), 'all' + S);
       return;
     }
@@ -78,7 +83,7 @@
       h += table(W, [{ h: 'Unit' , cls: 'lu__units' }, { h: 'G', n: 1, x: 1, t: 'games it played' }, { h: 'MIN', n: 1 }, { h: 'Poss', n: 1, x: 1 }, { h: 'ORtg', n: 1, x: 1 }, { h: 'DRtg', n: 1, x: 1 }, { h: 'Net', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'net shrunk toward the team net with 150 possessions' }],
         T.units.map(function (u) { return { v: [null, u[7], u[1], u[2], u[3], u[4], u[5], u[6]], c: [u[0].map(function (i) { var n = T.players[i][0]; return '<span title="' + esc(n) + '">' + esc(sh[i]) + '</span>'; }).join(' · '), u[7], u[1].toFixed(1), Math.round(u[2]), u[3].toFixed(1), u[4].toFixed(1), '<span class="' + cl(u[5]) + '">' + sg(u[5]) + '</span>', '<b class="' + cl(u[6]) + '">' + sg(u[6]) + '</b>'] }; }), t + S);
     } else {
-      h += table(W, [{ h: 'Player' }, { h: 'MIN', n: 1 }, { h: 'On', n: 1 }, { h: 'Off', n: 1, x: 1 }, { h: 'On-Off', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'on-off shrunk toward 0 by its noise (the rank)' }],
+      h += table(W, [{ h: 'Player' }, { h: 'MIN', n: 1 }, { h: 'On', n: 1, x: 1 }, { h: 'Off', n: 1, x: 1 }, { h: 'On-Off', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'on-off shrunk toward 0 by its noise (the rank)' }],
         T.players.map(function (p) { return { v: [null, p[1], p[2], p[3], p[4], p[5]], c: ['<span class="cfb__name">' + chip(p[6]) + '<b>' + esc(p[0]) + '</b></span>', Math.round(p[1]), sg(p[2]), sg(p[3]), '<span class="' + cl(p[4]) + '">' + sg(p[4]) + '</span>', '<b class="' + cl(p[5]) + '">' + sg(p[5]) + '</b>'] }; }), t + S);
     }
     body.innerHTML = h;

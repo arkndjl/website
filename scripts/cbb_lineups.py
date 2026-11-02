@@ -134,6 +134,7 @@ def parse(pbp, box=None):
     tkeys = {N.key(y) for pf in prefixes.values() for x in pf for y in (x, re.sub(r'\s*\(.*?\)', '', x))} | {'team', 'tm', 'tv'}
 
     def nm(raw, tid=None):
+        raw = fix_text(raw)
         k = N.key(raw)
         if k in tkeys:
             return None
@@ -399,11 +400,45 @@ def cache_path(season):
     return os.path.join(CACHE, f'{season}.json.gz')
 
 
+def fix_text(s):
+    """the feed sometimes double-encodes UTF-8 ('BukumiroviÄ‡' for 'Bukumirović')"""
+    if s and any(c in s for c in 'ÃÄÅÐÑÂ'):
+        for enc in ('cp1252', 'latin-1'):
+            try:
+                return s.encode(enc).decode('utf-8')
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                pass
+    return s
+
+
+def _mend_names(g):
+    """repair double-encoded names in a cached game; two spellings of one player in a game become one"""
+    if 'stints' not in g:
+        return g
+    for si, t in ((1, g['home']), (2, g['away'])):
+        names_ = g['players'][t]
+        fixed = [fix_text(n) if n else n for n in names_]
+        if fixed == names_:
+            continue
+        uniq, ix = [], {}
+        for n in fixed:
+            if n not in ix:
+                ix[n] = len(uniq); uniq.append(n)
+        remap = [ix[n] for n in fixed]
+        g['players'][t] = uniq
+        for s in g['stints']:
+            s[si] = sorted(set(remap[i] for i in s[si]))
+    return g
+
+
 def load(season):
     try:
-        return json.load(gzip.open(cache_path(season)))
+        games = json.load(gzip.open(cache_path(season)))
     except Exception:
         return {}
+    for g in games.values():
+        _mend_names(g)
+    return games
 
 
 def save(season, games):
