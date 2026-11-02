@@ -18,12 +18,23 @@ is withdrawn before its start is listed once under "Skip if not placed yet" (and
 """
 import argparse
 import json
+import math
+import os
+import sys
 import subprocess
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 SPORTS = [("nba", "NBA"), ("cbb", "CBB"), ("tennis", "Tennis"), ("nfl", "NFL"), ("nflprops", "NFL prop"), ("cfb", "CFB")]
 ET = ZoneInfo("America/New_York")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import night_cap as NC  # noqa: E402
+
+
+def night_of(k):
+    """ET date of a start (datetime or ledger stamp)"""
+    k = ts(k.replace("Z", ":00Z") if len(k) == 17 else k) if isinstance(k, str) else k
+    return k.astimezone(ET).date().isoformat()
 
 
 def load(sport, ref, path=None):
@@ -125,7 +136,7 @@ def main():
     rs = rows(a.ref, now, a.new, a.days)
     bank = a.bankroll or ((load(None, a.ref, "data/paper_book.json") or {}).get("bankroll") or {}).get("now")
     sent = {}
-    held, skip, back = [], [], []
+    held, skip, back, full, capped = [], [], [], [], {}
     stamp = now.strftime("%Y-%m-%dT%H:%MZ")
     if a.sent:
         try:
@@ -145,6 +156,27 @@ def main():
         sent.update({r["key"]: {"held": stamp, "kick": r["k"].strftime("%Y-%m-%dT%H:%MZ"), "bet": f"{r['bet']} {r['price']}",
                                 "kelly": 0.0, "game": r["game"]} for r, _ in held})
         rs = [r for r in rs if fam(r["key"]) not in opn]
+        # the nightly cap (scripts/night_cap.py, Noah Nov 1 2026: 40% a night): bets already sent for an ET night count
+        # first; new picks share what is left, scaled down together, and none go out once the night is full
+        out_n = {}
+        for k, v in sent.items():
+            if v.get("kick", "") > stamp and not v.get("held"):
+                out_n[night_of(v["kick"])] = out_n.get(night_of(v["kick"]), 0.0) + float(v.get("kelly") or 0)
+        new_n = {}
+        for r in rs:
+            new_n[night_of(r["k"])] = new_n.get(night_of(r["k"]), 0.0) + r["kelly"]
+        full = []
+        for r in rs:
+            n = night_of(r["k"])
+            room = NC.CAP - out_n.get(n, 0.0)
+            if room < 0.25:
+                full.append(r)
+            elif new_n[n] > room:
+                r["kelly"] = max(0.25, math.floor(r["kelly"] * room / new_n[n] * 4 + 1e-9) / 4)
+        sent.update({r["key"]: {"held": stamp, "kick": r["k"].strftime("%Y-%m-%dT%H:%MZ"), "bet": f"{r['bet']} {r['price']}",
+                                "kelly": 0.0, "game": r["game"], "why": "night cap"} for r in full})
+        rs = [r for r in rs if r not in full]
+        capped = {n: round(out_n.get(n, 0.0), 2) for n in {night_of(r["k"]) for r in full}}
         st, names = states(a.ref)
         for k, v in sent.items():
             v.setdefault("game", names.get(":".join(k.split(":")[:2])) or "")
@@ -159,7 +191,10 @@ def main():
             elif now_st == "live" and v.get("skip"):
                 v.pop("skip")
                 back.append((k, v))
-    if a.sent and (skip or back or held):
+    if a.sent and (skip or back or held or full):
+        if full:
+            print("**Not sent, night full** (" + "; ".join(f"{n}: {num(v)}% already sent" for n, v in sorted(capped.items()))
+                  + f", cap {num(NC.CAP)}%): " + ", ".join(f"{r['game']} {r['bet']}" for r in full))
         if skip:
             print("**Skip if not placed yet** (no longer clears its cut; keep it if already placed):")
             for k, v, why in skip:
@@ -174,7 +209,7 @@ def main():
                 print(f"- {r['sport']} {r['game']}: {r['bet']} {r['price']}; already sent {', '.join(v['bet'] for v in vs)}")
     if not rs:
         print("No new picks." if a.sent else "No open picks right now.")
-        if a.sent and (skip or back or held):
+        if a.sent and (skip or back or held or full):
             save(a.sent, sent, now)
         return
     day = None

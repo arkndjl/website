@@ -1167,6 +1167,8 @@ def live(sport):
         c = calib(sport, e['mk'], e['side'], e['line'], szd(e), k_)
         if c is not None:
             e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, szd(e)))
+            e.pop('unitsRaw', None)     # a fresh stake: the night cap (scripts/night_cap.py) rescales it after the write
+            e.pop('unitsCap', None)
             e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], szd(e))
             e['p'], e['ev'] = round(c[0], 3), round(c[0] * (dec(e['price']) - 1) - c[2], 3)
             # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
@@ -1253,6 +1255,9 @@ def live(sport):
     with open(fn, 'w') as f:
         json.dump(out, f, indent=1)
     print(f'{sport} picks: {len(picks)} open, {len(done)} graded')
+    # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night; scripts/night_cap.py)
+    import night_cap
+    night_cap.apply([sport])
 
 
 if __name__ == '__main__':

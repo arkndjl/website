@@ -345,7 +345,10 @@ def live():
     out = {'sport': 'tennis', 'name': 'Tennis', 'asof': stamp, 'rule': {'on': bool(on), 'x': F['x'], 'k': F['k'], 'leak': LEAK, 'cap': CAP,
            'held': F.get('heldAtX')}, 'picks': picks, 'withdrawn': [], 'board': sorted(board, key=lambda r: -r['edge'])[:12],
            'games': games, 'record': rec, 'recent': recent, 'log': L[-400:]}
-    json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
+    with open(OUT, 'w') as f:
+        json.dump(out, f, separators=(',', ':'), allow_nan=False)
+    import night_cap      # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night)
+    night_cap.apply(['tennis'])
     print(f"tennis picks: {len(picks)} open, {len(games)} priced at Novig, rule {'on X ' + str(X) if on else 'off'}, record {rec}")
 
 
