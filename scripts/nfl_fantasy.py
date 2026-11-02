@@ -531,6 +531,14 @@ def implied(last, fresh=False, walkforward=False, snaps_at=()):
         m.update(g, box, qbs)
     for ps, pw in pending:      # checkpoints past the last listed game (the build's coming week)
         snap(ps, pw)
+    # the injury term (Nov 2 2026: it was left at 0 here, against the fit's weight on it): each played game's own
+    # league reports, as nfl_games.py fit and build give it. Snapshot games stay at 0 (their reports came later)
+    live = last if any(int(g['season']) == last and g['home_score'] in ('', 'NA') for g in allg) else None
+    ih = G.injury_history(allg, range(G.INJ_FIRST, last + 1), live=live)
+    for gid, (x, _) in feats.items():
+        r = ih.get(gid)
+        if r:
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
     seas = {g['game_id']: int(g['season']) for g in allg}
     cf = defaultdict(lambda: (F['coef'], F['tcoef']))
     if walkforward:
@@ -1434,6 +1442,18 @@ def build():
     live_statuses(inj, status, last, week)
     model, snapv = implied(last, fresh=False, snaps_at=[(last, week)])
     imp_model = snapv[(last, week)]
+    # this week's injury reports: the game board's injury term (nfl_games.py runs first; its margin points, split
+    # evenly so the total holds), for a game without a market line
+    try:
+        B = json.load(open(os.path.join(ROOT, 'data', 'nfl_games.json')))
+        if B.get('season') == last and B.get('week') == week:
+            for r in B['games']:
+                d = (r.get('parts') or {}).get('inj') or 0.0
+                if r['id'] in imp_model and d and 'final' not in r:
+                    h, a = imp_model[r['id']]
+                    imp_model[r['id']] = (h + d / 2, a - d / 2)
+    except (OSError, ValueError, KeyError) as e:
+        print('nfl fantasy: game board injuries unavailable:', e)
     wars = war_now(last, week)
     W = Walk(info=info, **F['params'])
     for g in games:
