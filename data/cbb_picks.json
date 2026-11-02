@@ -1,55 +1,29 @@
 {
- "asof": "2026-11-01T16:57:14Z",
+ "asof": "2026-11-02T18:46:39Z",
  "picks": [
   {
-   "id": "401920912",
+   "id": "401911532",
    "type": "upset",
    "side": "home",
-   "team": "Northern Illinois",
-   "teamId": "2459",
-   "opp": "Grambling",
+   "team": "Northern Kentucky",
+   "teamId": "94",
+   "opp": "UTEP",
    "neutral": true,
-   "kick": "2026-11-02T08:00:00Z",
-   "line": 5.5,
-   "ml": 195.0,
-   "model": 1.3,
-   "edge": 6.8,
-   "p": 0.545,
-   "units": 1.0,
-   "flagged": "2026-11-01T16:57:14Z",
-   "won": null,
-   "profit": null,
-   "clv": null,
-   "clvRet": null,
-   "now": {
-    "line": 5.5,
-    "ml": 195.0
-   },
-   "started": false
-  },
-  {
-   "id": "401921423",
-   "type": "upset",
-   "side": "away",
-   "team": "Winthrop",
-   "teamId": "2737",
-   "opp": "Queens University",
-   "neutral": true,
-   "kick": "2026-11-02T14:00:00Z",
-   "line": 1.5,
-   "ml": 110.0,
-   "model": -3.0,
-   "edge": 4.5,
-   "p": 0.602,
+   "kick": "2026-11-02T19:00:00Z",
+   "line": 3.5,
+   "ml": 145.0,
+   "model": 0.7,
+   "edge": 4.2,
+   "p": 0.526,
    "units": 0.75,
-   "flagged": "2026-11-01T00:08:18Z",
+   "flagged": "2026-11-02T18:46:39Z",
    "won": null,
    "profit": null,
    "clv": null,
    "clvRet": null,
    "now": {
-    "line": 1.5,
-    "ml": 110.0
+    "line": 3.5,
+    "ml": 145.0
    },
    "started": false
   },
@@ -74,8 +48,34 @@
    "clv": null,
    "clvRet": null,
    "now": {
-    "line": 2.5,
-    "ml": 120.0
+    "line": 3.5,
+    "ml": 130.0
+   },
+   "started": false
+  },
+  {
+   "id": "401920690",
+   "type": "upset",
+   "side": "home",
+   "team": "Iona",
+   "teamId": "314",
+   "opp": "Vermont",
+   "neutral": false,
+   "kick": "2026-11-03T00:00:00Z",
+   "line": 1.5,
+   "ml": -105.0,
+   "model": 3.8,
+   "edge": 5.3,
+   "p": 0.629,
+   "units": 0.75,
+   "flagged": "2026-11-02T18:46:39Z",
+   "won": null,
+   "profit": null,
+   "clv": null,
+   "clvRet": null,
+   "now": {
+    "line": 1.5,
+    "ml": -105.0
    },
    "started": false
   },
@@ -100,8 +100,8 @@
    "clv": null,
    "clvRet": null,
    "now": {
-    "line": 4.5,
-    "ml": 142.0
+    "line": 5.5,
+    "ml": 180.0
    },
    "started": false
   },
@@ -126,8 +126,8 @@
    "clv": null,
    "clvRet": null,
    "now": {
-    "line": 3.5,
-    "ml": 120.0
+    "line": 2.5,
+    "ml": 130.0
    },
    "started": false
   },
@@ -153,6 +153,78 @@
    "clvRet": null,
    "now": null,
    "started": false
+  },
+  {
+   "id": "401923269",
+   "type": "upset",
+   "side": "home",
+   "team": "Bryant",
+   "teamId": "2803",
+   "opp": "Siena",
+   "neutral": false,
+   "kick": "2026-11-03T01:00:00Z",
+   "line": 4.5,
+   "ml": 170.0,
+   "model": 1.2,
+   "edge": 5.7,
+   "p": 0.541,
+   "units": 1.0,
+   "flagged": "2026-11-02T18:46:39Z",
+   "won": null,
+   "profit": null,
+   "clv": null,
+   "clvRet": null,
+   "now": {
+    "line": 4.5,
+    "ml": 170.0
+   },
+   "started": false
+  },
+  {
+   "id": "401920912",
+   "type": "upset",
+   "side": "home",
+   "team": "Northern Illinois",
+   "teamId": "2459",
+   "opp": "Grambling",
+   "neutral": true,
+   "kick": "2026-11-02T08:00:00Z",
+   "line": 5.5,
+   "ml": 195.0,
+   "model": 1.3,
+   "edge": 6.8,
+   "p": 0.545,
+   "units": 1.0,
+   "flagged": "2026-11-01T16:57:14Z",
+   "won": true,
+   "profit": 1.95,
+   "clv": -3.0,
+   "clvRet": -0.2837,
+   "now": null,
+   "started": true
+  },
+  {
+   "id": "401921423",
+   "type": "upset",
+   "side": "away",
+   "team": "Winthrop",
+   "teamId": "2737",
+   "opp": "Queens University",
+   "neutral": true,
+   "kick": "2026-11-02T14:00:00Z",
+   "line": 1.5,
+   "ml": 110.0,
+   "model": -3.0,
+   "edge": 4.5,
+   "p": 0.602,
+   "units": 0.75,
+   "flagged": "2026-11-01T00:08:18Z",
+   "won": false,
+   "profit": -1.0,
+   "clv": -2.0,
+   "clvRet": -0.1679,
+   "now": null,
+   "started": true
   }
  ],
  "upsetBt": {
@@ -1097,24 +1169,24 @@
  },
  "record": {
   "upset": {
-   "n": 0,
-   "won": 0,
-   "w": 0,
-   "l": 0,
-   "units": 0,
-   "roi": null,
+   "n": 2,
+   "won": 1,
+   "w": 1,
+   "l": 1,
+   "units": 0.9,
+   "roi": 0.475,
    "sized": {
-    "units": 0,
-    "risked": 0,
-    "roi": null
+    "units": 1.2,
+    "risked": 1.8,
+    "roi": 0.686
    },
-   "clv": null,
-   "clvPos": null,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "beat": null,
-   "still": null
+   "clv": -2.5,
+   "clvPos": 0.0,
+   "clvN": 2,
+   "clvRet": -0.2258,
+   "clvT": -3.9,
+   "beat": 0.0,
+   "still": 0.0
   },
   "fav": {
    "n": 0,
@@ -1156,7 +1228,14 @@
    "edge": 4.5,
    "p": 0.602,
    "units": 0.75,
-   "flagged": "2026-11-01T00:08:18Z"
+   "flagged": "2026-11-01T00:08:18Z",
+   "res": 5,
+   "close": 3.5,
+   "won": false,
+   "profit": -1.0,
+   "clvRet": -0.1679,
+   "clv": -2.0,
+   "beat": -1
   },
   {
    "id": "401924717",
@@ -1256,7 +1335,74 @@
    "edge": 6.8,
    "p": 0.545,
    "units": 1.0,
-   "flagged": "2026-11-01T16:57:14Z"
+   "flagged": "2026-11-01T16:57:14Z",
+   "res": 2,
+   "close": -8.5,
+   "won": true,
+   "profit": 1.95,
+   "clvRet": -0.2837,
+   "clv": -3.0,
+   "beat": -1
+  },
+  {
+   "id": "401911532",
+   "season": 2027,
+   "date": "2026-11-02",
+   "type": "upset",
+   "side": "home",
+   "team": "Northern Kentucky",
+   "teamId": "94",
+   "opp": "UTEP",
+   "neutral": true,
+   "kick": "2026-11-02T19:00:00Z",
+   "L": -3.5,
+   "line": 3.5,
+   "ml": 145.0,
+   "model": 0.7,
+   "edge": 4.2,
+   "p": 0.526,
+   "units": 0.75,
+   "flagged": "2026-11-02T18:46:39Z"
+  },
+  {
+   "id": "401920690",
+   "season": 2027,
+   "date": "2026-11-03",
+   "type": "upset",
+   "side": "home",
+   "team": "Iona",
+   "teamId": "314",
+   "opp": "Vermont",
+   "neutral": false,
+   "kick": "2026-11-03T00:00:00Z",
+   "L": -1.5,
+   "line": 1.5,
+   "ml": -105.0,
+   "model": 3.8,
+   "edge": 5.3,
+   "p": 0.629,
+   "units": 0.75,
+   "flagged": "2026-11-02T18:46:39Z"
+  },
+  {
+   "id": "401923269",
+   "season": 2027,
+   "date": "2026-11-03",
+   "type": "upset",
+   "side": "home",
+   "team": "Bryant",
+   "teamId": "2803",
+   "opp": "Siena",
+   "neutral": false,
+   "kick": "2026-11-03T01:00:00Z",
+   "L": -4.5,
+   "line": 4.5,
+   "ml": 170.0,
+   "model": 1.2,
+   "edge": 5.7,
+   "p": 0.541,
+   "units": 1.0,
+   "flagged": "2026-11-02T18:46:39Z"
   }
  ]
 }
