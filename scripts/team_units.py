@@ -156,7 +156,111 @@ def pct_rank(vals, hi=True):
     return out
 
 
+# unit badges (Nov 2 2026, scripts/unit_badges.py): view -> (cut key in data/unit_badges.json, what the line says)
+UNIT_BADGE = {
+    'nfl': {'offense': ('epa_oA', 'EPA a play'), 'defense': ('epa_dA', 'EPA a play allowed')},
+    'cfb': {'offense': ('epa_oA', 'EPA a play'), 'defense': ('epa_dA', 'EPA a play allowed')},
+    'nba': {'offense': ('rtg_oA', 'points a 100 possessions'), 'defense': ('rtg_dA', 'points allowed a 100 possessions')},
+    'cbb': {'offense': ('rtg_oA', 'points a 100 possessions'), 'defense': ('rtg_dA', 'points allowed a 100 possessions')},
+    'nhl': {'offense': ('x5_oA', '5v5 xG a 60'), 'defense': ('x5_dA', '5v5 xG against a 60'),
+            'power play': ('pp_oA', 'power-play xG a 60'), 'penalty kill': ('pp_dA', 'penalty-kill xG against a 60')},
+    'soccer': {'attack': ('xg_oA', 'non-penalty xG a match'), 'defence': ('xg_dA', 'non-penalty xG allowed a match')},
+}
+UNIT_MIN_G = {'nba': 8, 'cbb': 6, 'nfl': 3, 'cfb': 3, 'nhl': 10, 'soccer': 5}
+SOC_ESPN_LG = {'Premier League': 'eng.1', 'La Liga': 'esp.1', 'Serie A': 'ita.1', 'Bundesliga': 'ger.1', 'Ligue 1': 'fra.1',
+               'Eredivisie': 'ned.1', 'Pro League': 'bel.1', 'Super Lig': 'tur.1', 'Primeira Liga': 'por.1', 'Eliteserien': 'nor.1',
+               'Allsvenskan': 'swe.1', 'Scottish Prem': 'sco.1', 'Austria': 'aut.1', 'Superliga': 'den.1', 'Swiss SL': 'sui.1'}
+SOC_ALIAS = {'Rennes': 'Stade Rennais', 'Deportivo Alavés': 'Alavés', 'Deportivo A Coruña': 'Deportivo', '1. FC Köln': 'FC Cologne',
+             'OB': 'Odense Boldklub'}
+
+
+def soc_key(s):
+    import unicodedata
+    s = s.lower()
+    for a, b in (('ø', 'o'), ('æ', 'ae'), ('ß', 'ss'), ('ı', 'i'), ('vienna', 'wien'), ('munich', 'munchen'), ('internazionale', 'inter')):
+        s = s.replace(a, b)
+    s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode()
+    s = re.sub(r'\b(fc|cf|sc|afc|ac|as|club|calcio|if|ik|bk|fk|sk|ff|aif|is|sv|tsg|kv|kvc|kaa|aj|ksv|sports|fodbold|1)\b', ' ', s)
+    return re.sub(r'[^a-z0-9]', '', s)
+
+
+def soc_espn(rows):
+    """FotMob team -> the ESPN id of the team pages (data/soccer_games.json power), matched by name within the league"""
+    import difflib
+    try:
+        P = json.load(open(os.path.join(ROOT, 'data', 'soccer_games.json')))['power']
+    except (OSError, ValueError, KeyError):
+        return {}
+    by = collections.defaultdict(dict)
+    for p in P:
+        by[p['lg']][soc_key(p['n'])] = str(p['id'])
+    out = {}
+    for r in rows:
+        cand = by.get(SOC_ESPN_LG.get(r.get('cf')), {})
+        n = soc_key(SOC_ALIAS.get(r['t'], r['t']))
+        m = cand.get(n)
+        if not m:
+            c = [k for k in cand if k and (k in n or n in k)]
+            m = cand[c[0]] if len(c) == 1 else None
+        if not m:
+            c = difflib.get_close_matches(n, list(cand), 1, .75)
+            m = cand[c[0]] if c else None
+        if m:
+            out[r['id']] = m
+    return out
+
+
+def unit_tiers(sport, obj):
+    """tier each team's Adj in the views that carry a unit badge: z within the league (soccer: within each league),
+    cut at the pooled within-season z percentiles of past team-seasons (75 bronze, 90 silver, 97 gold, 99 platinum)"""
+    try:
+        cfg = json.load(open(os.path.join(ROOT, 'data', 'unit_badges.json')))['sports'][sport]
+    except (OSError, ValueError, KeyError):
+        return
+    esp = soc_espn(next(iter(obj['views'].values()))['rows']) if sport == 'soccer' else {}
+    for view, (ck, what) in UNIT_BADGE.get(sport, {}).items():
+        V = obj['views'].get(view)
+        if not V or ck not in cfg['cuts']:
+            continue
+        cut, (nm, ori, _) = cfg['cuts'][ck], cfg['names'][ck]
+        grp = collections.defaultdict(list)
+        for r in V['rows']:
+            r.pop('tier', None); r.pop('pct', None)
+            if r.get('adj') is not None and (r.get('g') or 0) >= UNIT_MIN_G[sport]:
+                grp[r.get('cf') if sport == 'soccer' else 0].append(r)
+        for rs in grp.values():
+            if len(rs) < 8:
+                continue
+            xs = [r['adj'] for r in rs]
+            m = sum(xs) / len(xs)
+            sd = (sum((x - m) ** 2 for x in xs) / len(xs)) ** 0.5 or 1.0
+            for r in rs:
+                z = ori * (r['adj'] - m) / sd
+                t = next((tr for tr in ('p', 'g', 's', 'b') if z >= cut[tr]), None)
+                if t:
+                    r['tier'], r['pct'] = t, sum(1 for q in cut['q'] if z >= q)
+        V['badge'] = {'n': nm, 'what': what}
+        for r in V['rows']:
+            if sport == 'soccer' and r['id'] in esp:
+                r['esp'] = esp[r['id']]
+
+
+def unit_badges_merge(sport):
+    """carry the unit badges into the team pages (team_badges_build.write merges them by name)"""
+    try:
+        import team_badges_build as TBB
+        TBB.write(sport, TBB.saved(sport))
+    except Exception as e:  # noqa: BLE001
+        print('unit badges merge failed:', repr(e), file=sys.stderr)
+
+
 def save(sport, obj):
+    unit_tiers(sport, obj)
+    _save(sport, obj)
+    unit_badges_merge(sport)
+
+
+def _save(sport, obj):
     p = os.path.join(ROOT, 'data', f'units_{sport}.json')
     old = None
     if os.path.exists(p):
