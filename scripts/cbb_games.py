@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """College basketball game projections for the College Basketball ARKBOARD (data/cbb_games.json), the model behind them
-(data/cbb_games_fit.json) and its picks (data/cbb_picks.json, scripts/cbb_picks.py).
+(data/cbb_games_fit.json).
 
     python3 scripts/cbb_games.py --fit     # walk-forward backtest 2016-2026 against the closing line, tune, select inputs
     python3 scripts/cbb_games.py           # today's and tomorrow's games, power ratings, season odds (run by cbb-board)
@@ -1483,12 +1483,6 @@ def report():
           'att': {t: round(sum(v) / len(v), 4) for t, v in W.att.items() if v}}
     with open(STATE, 'w') as f:
         json.dump(st, f, separators=(',', ':'))
-    # walk-forward predictions for the picks backtest (scripts/cbb_picks.py --backtest)
-    bt = [{'id': g['id'], 'S': int(s), 'm': round(float(m), 2), 'L': (None if np.isnan(l) else float(l)), 'res': int(r),
-           'mlH': g.get('mlh'), 'mlA': g.get('mla'), 'open': (-g['open'] if g.get('open') is not None else None)}
-          for (g, _, _), m, s, l, r, kk in zip(D, pred, S, line, y, ok) if kk]
-    with gzip.open(os.path.join(CACHE, 'walk_pred.json.gz'), 'wt') as f:
-        json.dump(bt, f)
     print(json.dumps({k: v for k, v in out.items() if k not in ('grid', 'select', 'bySeason')}, indent=1))
 
 

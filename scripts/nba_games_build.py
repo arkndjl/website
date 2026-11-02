@@ -1,5 +1,5 @@
 """The NBA game model's daily build (python3 scripts/nba_games.py; stdlib): the next two slates' projections, power
-rankings, a simulated rest of the season, and the picks. Writes data/nba_games.json and data/nba_picks.json.
+rankings and a simulated rest of the season. Writes data/nba_games.json.
 
 Tonight's lineups come from ESPN's rosters and the NBA's latest official injury report (pdftotext), with ESPN's
 injury list for anyone the report doesn't cover (day-to-day read as questionable). Lines are the median of ESPN's
@@ -295,11 +295,6 @@ def build():
                 st_[p] = s_
         tstat[t] = st_
     res.update(season_views(m, F, cur, rec, proj, S, slate, tstat))
-    try:
-        import nba_picks
-        nba_picks.live([r for r in rows if not r.get('final')], cur, sd, S, min(slate).isoformat() if slate else None)
-    except Exception as e:      # noqa: BLE001
-        print('nba picks: failed', repr(e))
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
         return print('nba games: no change')
     with open(N.OUT, 'w') as f:
