@@ -185,6 +185,35 @@ def moneypuck_teams(fresh=False, max_age_h=10):
     return out
 
 
+def moneypuck_goalie_games(pids, recent=(), workers=8, max_age_h=10):
+    """MoneyPuck's game logs for each goalie in pids, all situations: {gameId: {playerId: [xG faced, goals allowed]}}.
+    The xG a goalie faced is only shots with him in net (empty-net shots are not his), unlike his team's xG against.
+    Regular season and playoffs; a career file is cached once, re-fetched after max_age_h for goalies in recent"""
+    recent = set(recent)
+
+    def one(a):
+        pid, kind = a
+        fn = os.path.join(CACHE, 'mpg', kind, f'{pid}.json')
+        if os.path.exists(fn) and (pid not in recent or time.time() - os.path.getmtime(fn) < max_age_h * 3600):
+            return load(fn)
+        b = get(f'{MP}/careers/gameByGame/{kind}/goalies/{pid}.csv', raw=True)
+        if b is None:
+            return load(fn) if os.path.exists(fn) else {}
+        out = {}
+        for r in csv.DictReader(io.StringIO(b.decode('utf-8', 'replace'))):
+            if r.get('situation') == 'all':
+                out[r['gameId']] = [round(float(r['xGoals'] or 0), 3), float(r['goals'] or 0)]
+        save(fn, out)
+        return out
+    todo = [(p, k) for p in sorted(set(pids)) for k in ('regular', 'playoffs')]
+    out = {}
+    with ThreadPoolExecutor(workers) as ex:
+        for (pid, _), g in zip(todo, ex.map(one, todo)):
+            for gid, v in g.items():
+                out.setdefault(int(gid), {})[pid] = v
+    return out
+
+
 def _num(s):
     try:
         return float(str(s).replace('EVEN', '100').replace('PK', '0'))

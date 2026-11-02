@@ -61,7 +61,8 @@ def walk(P, tag, cuts=False):
                     cd = f'{s - 1 if c >= "08" else s}-{c}'
                     if d >= cd and (s, c) not in snaps:
                         snaps[(s, c)] = {'date': cd, 'net': {t: float(R.net(t)) for t in teams}, 'T': {t: float(R.T[R.i(t)]) for t in teams},
-                                         'tau': float(R.tau), 'mkt': {t: W.mkt[t] for t in teams}, 'ng': {t: R.ng[t] for t in teams}}
+                                         'tau': float(R.tau), 'mkt': {t: W.mkt[t] for t in teams}, 'ng': {t: R.ng[t] for t in teams},
+                                         'elo': {t: float(W.elo[t]) for t in teams}}
             if g.get('hs') is None:
                 return
             H, A = R.i(g['home']), R.i(g['away'])
@@ -316,6 +317,13 @@ def conferences(games, teams):
     return {t: f(t) for t in teams}
 
 
+def team_sum(v, idx, nt):
+    """per-sim team totals of game columns v (n x games) credited to team idx (games): v @ one-hot, by bincount"""
+    n = v.shape[0]
+    k = (np.arange(n)[:, None] * nt + idx[None, :]).ravel()
+    return np.bincount(k, weights=v.ravel(), minlength=n * nt).reshape(n, nt)
+
+
 def crps_int(samples, actual, kmax):
     """CRPS of integer sample columns (n x m) against actual (m), by the step CDFs"""
     out = np.zeros(samples.shape[1])
@@ -326,8 +334,9 @@ def crps_int(samples, actual, kmax):
 
 
 def sims():
+    import cbb_tourney as CT
     F = json.load(open(C.FIT))
-    rows, snaps, d1s = walk(F['params'], 'sims', cuts=True)
+    rows, snaps, d1s = walk(F['params'], 'sims2', cuts=True)
     D, S, d1 = arrays(rows)
     feats = F['feats']
     Xm = np.array([[x[f] for f in feats] for _, x, _, _ in D])
@@ -337,9 +346,12 @@ def sims():
     for g in games:
         by_s[g['season']].append(g)
     sd = F['sd']
+    # the long-memory margin rating ('gm') the morning of each cut, for the power rating (cbb_tourney.team_rating)
+    gms = CT.gm_snaps(games, {k: v['date'] for k, v in snaps.items()}, d1s)
     # shock configs: sd of each team's strength over the rest of the season, a x sqrt(k / (k + games played)) and a
-    # drift b x sqrt(share of its season left); live: a 3, k 8, b 0
-    configs = [('live a3 k8', 3, 8, 0)]
+    # drift b x sqrt(share of its season left); live: a 2, k 8, b 4 (the base every config is paired against)
+    LIVE = 'live a2 k8 b4'
+    configs = [(LIVE, 2, 8, 4)]
     for a in (0, 1, 2, 3, 4, 5):
         configs.append((f'fixed {a}', a, None, 0))
     for a in (2, 4, 6, 8):
@@ -351,6 +363,11 @@ def sims():
     for a in (1, 2, 3):
         for b in (2, 3, 4, 5, 6):
             configs.append((f'fixed {a} b{b}', a, None, b))
+    for a in (1, 1.5, 2.5, 3, 4, 5):
+        for kk in (4, 8, 16):
+            for b in (2, 3, 4, 5):
+                configs.append((f'a{a} k{kk} b{b}', a, kk, b))
+    configs = list({c[0]: c for c in configs}.values())
     rec = defaultdict(lambda: defaultdict(list))        # config -> metric -> per team-cut values
     meta = []
     home_mode = {'liveHome': False, 'confHome': True}
@@ -372,9 +389,10 @@ def sims():
             done = [g for g in gs if C.et_date(g['date']) < sn['date']]
             if len(left) < 50:
                 continue
-            P0 = sn['tau'] + 2 * float(np.mean([sn['T'][t] for t in teams]))
-            mn = float(np.mean([sn['net'][t] for t in teams])); mk = float(np.mean([sn['mkt'][t] for t in teams]))
-            rating = np.array([coef['eff'] * (sn['net'][t] - mn) * P0 / 100 + coef.get('mkt', 0) * (sn['mkt'][t] - mk) for t in teams])
+            # the power rating as the daily build makes it (cbb_tourney.team_rating: efficiency at eff + bpi, Elo,
+            # long-memory margin), the home edge with BPI's home term
+            rt = CT.team_rating(sn['net'], sn['T'], sn['tau'], sn['elo'], gms.get((s, c), {}), teams, coef)
+            rating = np.array([rt[t] for t in teams])
             hi = np.array([ti[g['home']] for g in left]); ai = np.array([ti[g['away']] for g in left])
             hm = np.array([0.0 if g['neutral'] else 1.0 for g in left]); cf = np.array([1.0 if g.get('conf') else 0.0 for g in left])
             alt = np.array([1.0 if g['home'] in C.ALT else 0.0 for g in left]) * hm
@@ -412,7 +430,7 @@ def sims():
             Zs = rng.normal(0, 1, (NSIM, nt)).astype(np.float32); Zg = rng.normal(0, 1, (NSIM, ng_)).astype(np.float32)
             meta.append({'season': s, 'cut': sn['date'], 'games': ng_, 'teams': int(has.sum())})
             for mode, ch in home_mode.items():
-                mm = rating[hi] - rating[ai] + hm * coef['home']
+                mm = rating[hi] - rating[ai] + hm * (coef['home'] + coef.get('bpi', 0) * C.BPI_HOME)
                 if ch:
                     mm = mm + hm * cf * coef.get('confh', 0) + alt * coef.get('alt', 0)
                 for name, a, kk, b in (configs if mode == 'confHome' else configs[:1]):
@@ -420,8 +438,8 @@ def sims():
                     sh = Zs * tsd.astype(np.float32)
                     m = mm[None, :] + sh[:, hi] - sh[:, ai] + sd * Zg
                     hw = (m > 0).astype(np.float32)
-                    w = hw @ Ih + (1 - hw) @ Ia
-                    cw = hw @ Ihc + (1 - hw) @ Iac
+                    w = team_sum(hw, hi, nt) + team_sum(1 - hw, ai, nt)
+                    cw = team_sum(hw * cf, hi, nt) + team_sum((1 - hw) * cf, ai, nt)
                     pct = cw0 + cw - (cl0 + (ncl - cw))
                     title = np.zeros(nt)
                     for k in groups.values():
@@ -437,7 +455,7 @@ def sims():
                     R['llTitle'] += list(ll_vec(pt, act_title[inconf]))
                     R['seasonT'] += [s] * int(inconf.sum())
             print(s, c, ng_, flush=True)
-    base = rec['live a3 k8']
+    base = rec[LIVE]
     st = np.array(base['season']); stt = np.array(base['seasonT'])
     out = {}
     for name, R in rec.items():
@@ -455,8 +473,10 @@ def sims():
                   'each team\'s strength drawn once with sd sqrt(a^2 k/(k+games played) + b^2 x share of its season left) '
                   '(a 0 or k none: fixed a). Scored per team and cut: CRPS of rest-of-season wins and conference wins, MAE of '
                   'expected wins, log loss of a share of the conference title. t paired per team-cut against the live shock '
-                  '(a 3, k 8, b 0, with confh/alt home terms); "(home only)" is the live build\'s margin, home court in every '
-                  'game without the conference-home and altitude terms.' % NSIM, 'cuts': meta, 'configs': out, 'bestTune': best})
+                  '(a 2, k 8, b 4, with confh/alt home terms); "(home only)": home court in every game without the '
+                  'conference-home and altitude terms. Rating: cbb_tourney.team_rating (efficiency at the eff + bpi weight, '
+                  'Elo, long-memory margin) with BPI\'s home term in the home edge, the rating the daily build uses since '
+                  'Nov 2 2026 (before: efficiency and Elo only, ~half the game model\'s scale).' % NSIM, 'cuts': meta, 'configs': out, 'bestTune': best})
 
 
 # ---------------------------------------------------------------- 4. blend

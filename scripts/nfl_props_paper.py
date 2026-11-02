@@ -71,7 +71,7 @@ def load_fit():
 def rule_of(F):
     import units as U
     return {'name': 'nfl-prop-60', 'stats': sorted(F['stats']), 'pstar': F['pstar'], 'c': F['c'], 'rho': F.get('rho', 0.0),
-            'timing': U.TIMING, 'budget': BUDGET, 'cap': U.BOOK_CAP, 'kelly': 1.0, 'onePerPlayer': ONE_A_PLAYER, 'withMean': True,
+            'timing': U.TIMING, 'timingOn': 'coin', 'budget': BUDGET, 'cap': U.BOOK_CAP, 'kelly': 1.0, 'onePerPlayer': ONE_A_PLAYER, 'withMean': True,
             'registered': F['registered']}
 
 
@@ -79,10 +79,13 @@ def kelly(R, ch, o, nw=1):
     """% of bankroll before the week's budget: full Kelly on the calibrated edge x TIMING at American price o, for one of
     nw props this week (the week's slate scale); 0 with no edge at that price"""
     b = dec(o) - 1
+    # TIMING scales the edge over a fair coin, as the game picks do (units.adj); Nov 2 2026 audit: it scaled the return
+    # at the price, so ch .554 at -113 was staked 2.5% where the games' rule sees no edge
+    ch = .5 + R['timing'] * (ch - .5)
     e = ch * b - (1 - ch)
     if e <= 0:
         return 0.0
-    return R['kelly'] * R['timing'] * e / b * 100 / (1 + (nw - 1) * R['rho'])
+    return R['kelly'] * e / b * 100 / (1 + (nw - 1) * R['rho'])
 
 
 def units(R, f, scale):

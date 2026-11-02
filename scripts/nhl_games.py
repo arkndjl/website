@@ -166,7 +166,19 @@ def season_rows(S, mp, fresh=False, odds=True):
             if o and o.get('p') is not None:
                 r['o'] = o
         out.append(r)
+    attach_gx(out, recent=S >= D.current_season())
     return out
+
+
+def attach_gx(rows, recent=False):
+    """each goalie's own xG faced, from MoneyPuck's goalie logs: r['gx'] = {'h': {playerId: xG}, 'a': ...}"""
+    pids = {l[0] for r in rows for s in ('h', 'a') for l in (r.get('gl') or {}).get(s, [])}
+    mg = D.moneypuck_goalie_games(pids, recent=pids if recent else ())
+    for r in rows:
+        x = mg.get(r['id'])
+        if x and 'gl' in r:
+            r['gx'] = {s: {str(l[0]): x[l[0]][0] for l in r['gl'][s] if l[0] in x} for s in ('h', 'a')}
+    return rows
 
 
 def make_hist():
@@ -308,13 +320,17 @@ class Goalies:
     def rating(self, p):
         return (self.n[p] + self.k * self.g0) / (self.d[p] + self.k)
 
-    def add(self, t, lines, xga, day):
+    def add(self, t, lines, xga, day, gx=None):
+        """gx: {playerId: xG he faced} (MoneyPuck goalie logs: shots with him in net). Without it, his share of the
+        team's xG against, which counts empty-net shots the goals-against line doesn't (+.15 a team-game, Nov 2 2026)"""
         tot = sum(l[3] for l in lines) or 1
+        gx = gx or {}
         for pid, nm, st, toi, sa, ga in lines:
             sh = toi / tot
             if sh <= 0:
                 continue
-            self.n[pid] += sh * xga - ga; self.d[pid] += sh
+            x = gx.get(str(pid))
+            self.n[pid] += (sh * xga if x is None else x) - ga; self.d[pid] += sh
             self.name[pid] = nm; self.team[pid] = t; self.last[pid] = day
             if st:
                 for q in self.starts[t]:
@@ -562,8 +578,9 @@ class Model:
             if pph is not None and ppa is not None:
                 self.st.add(h, a, pph, ppa)
             if 'gl' in g:
-                self.gk.add(h, g['gl']['h'], xa[1], g['day'])
-                self.gk.add(a, g['gl']['a'], xh[1], g['day'])
+                gx = g.get('gx') or {}
+                self.gk.add(h, g['gl']['h'], xa[1], g['day'], gx.get('h'))
+                self.gk.add(a, g['gl']['a'], xh[1], g['day'], gx.get('a'))
         c = g.get('c')
         if c:
             self.mk.add(h, a, c.get('p'), c.get('t'))
@@ -918,6 +935,11 @@ def fit():
     c2h = logit_fit(Zf[Lt], (mg[Lt] >= 2).astype(float)); c2a = logit_fit(Zf[Lt], (mg[Lt] <= -2).astype(float))
     Zof = np.column_stack([np.ones(len(y)), (X @ mw) ** 2, TX @ tw])
     cot = logit_fit(Zof[Lt], per[Lt])
+    # the season sims' winner given overtime: regular-season OT games, home win on the walk-forward model logit
+    po_ = np.array([g['po'] for g, f in rows], bool)
+    om = (per == 1) & ~po_ & ~np.isnan(p)
+    zo = np.log(p[om] / (1 - p[om]))
+    cow = logit_fit(np.column_stack([np.ones(om.sum()), zo]), y[om])
     sd0 = season_sd(rows, cw, feats)
     held = S >= HOLD_FROM
     fitd = {'updated': dt.date.today().isoformat(), 'params': P, 'feats': feats, 'tfeats': TFEATS,
@@ -925,7 +947,7 @@ def fit():
             'mcoef': {k: round(float(v), 4) for k, v in zip(feats, mw)},
             'tcoef': {k: round(float(v), 4) for k, v in zip(TFEATS, tw)},
             'pl': {'home2': [round(float(v), 4) for v in c2h], 'away2': [round(float(v), 4) for v in c2a]},
-            'ot': [round(float(v), 4) for v in cot],
+            'ot': [round(float(v), 4) for v in cot], 'otWin': [round(float(v), 4) for v in cow], 'otWinGames': int(om.sum()),
             'sdMargin': round(float(np.nanstd(mg - mhat)), 3), 'sdTotal': round(float(np.nanstd(tot - That)), 3),
             'seasonSd': round(sd0, 3), 'evidence': ev, 'test': test,
             'calib': calib_bins(p[held & ~np.isnan(p)], y[held & ~np.isnan(p)]),
@@ -1027,6 +1049,20 @@ def sim_knobs(fit):
         return 0.0, fit['seasonSd']
 
 
+def win_given_ot(ph, z, pot, ot, ow):
+    """the home side's chance given whether the game goes to overtime: overtime and shootouts are nearer a coin flip
+    (fit['otWin']: logit P(home wins | OT) = a + b x model logit, b ~ .36), regulation takes the rest so the chance
+    over both stays ph. Without it, the same chance either way (favourites then won 59% of sim OTs, 53% real).
+    Works on floats or numpy arrays"""
+    if not ow:
+        return ph
+    if isinstance(ot, np.ndarray):
+        po = 1 / (1 + np.exp(-(ow[0] + ow[1] * z)))
+        return np.where(ot, po, np.clip((ph - pot * po) / np.maximum(1 - pot, 1e-6), 0.005, 0.995))
+    po = 1 / (1 + math.exp(-(ow[0] + ow[1] * z)))
+    return po if ot else min(0.995, max(0.005, (ph - pot * po) / max(1 - pot, 1e-6)))
+
+
 def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
     """rest of the regular season, then the playoffs (division top three + two wild cards a conference; 2-2-1-1-1)"""
     rng = random.Random(seed)
@@ -1051,10 +1087,10 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
         for g in remaining:
             z = R[g['h']] - R[g['a']] + hc * (0.0 if g.get('neutral') else 1.0)
             ph = 1 / (1 + math.exp(-z))
-            hw = rng.random() < ph
             mm = z * 1.6
             pot = 1 / (1 + math.exp(-(otc[0] + otc[1] * mm * mm + otc[2] * 6.0)))
             ot = rng.random() < pot
+            hw = rng.random() < win_given_ot(ph, z, pot, ot, fit.get('otWin'))
             w, l = (g['h'], g['a']) if hw else (g['a'], g['h'])
             P[w] += 2
             if ot:
@@ -1334,7 +1370,9 @@ def goalie_table(m, S):
 
 
 if __name__ == '__main__':
-    if '--hist' in sys.argv:
+    if '--hist-goalies' in sys.argv:      # add the goalies' own xG faced to the frozen seasons (no other refetch)
+        D.save(HIST, attach_gx(load_hist()))
+    elif '--hist' in sys.argv:
         make_hist()
         make_lineups()
     elif '--lineups' in sys.argv:

@@ -312,9 +312,15 @@ SIT_AGAIN = 0.644
 # the absent player's value is over his own team's bench, shrunk to the flat -3 by this many bench minutes (Oct 21 2026,
 # scripts/cbb_inj_research.py: 400 min t -1.77 on 2016-20, -1.86 on 2021-26; 150 min -1.28 / -1.20)
 BENCH = 400.0
+# the share of a player's absence the ratings already hold: each sitter's value x (1 - ABSORB x games he has missed /
+# (team games + ABSORB_LAM)), the efficiency solve's weight on the games without him (hl 0: every game alike, lam
+# prior games with him). Off (0): scripts/cbb_inj_research.py absorb (Nov 2 2026): ABSORB 1 passes 2016-20 (MAE t -2.48)
+# but not held out (2021-26 MAE 9.5756 both, t -0.3; edge shrunk to the close 8.9631 both, t 0.0; further from the
+# close on both spans, t +5.6 / +1.7); ABSORB .5 t -0.87 / -0.44
+ABSORB, ABSORB_LAM = 0.0, 4.0
 
 
-def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, prior=None, pk=0.0):
+def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, prior=None, pk=0.0, absorb=None, alam=None):
     """value of the rotation players who sat out the team's last game, per 100 possessions against a replacement:
     (BPM to date, shrunk to -1 by n0 minutes, minus repl) x his minutes a team game / 40. Rotation: 12+ minutes when he
     plays and in 60% of the team's games, 3+ games in. Keyed (team, date of the game it applies to); 'next' = after the last.
@@ -324,7 +330,10 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, pri
     replacement level is the team's own bench (its non-rotation players' minutes-weighted BPM to date, shrunk to repl
     by `bench` minutes) in place of the flat repl: the value lost is the absent player's over who takes his minutes.
     prior / pk (in-season values, team idea 4): a player with a line last season (prior: pid -> his BPM then, shrunk)
-    is shrunk to that with pk minutes in place of the flat -1 with n0 (scripts/cbb_inseason_research.py)"""
+    is shrunk to that with pk minutes in place of the flat -1 with n0 (scripts/cbb_inseason_research.py).
+    absorb / alam: the ratings' share of his absence taken off (ABSORB above)"""
+    absorb = ABSORB if absorb is None else absorb
+    alam = ABSORB_LAM if alam is None else alam
     out = {}
     for t, gl in logs.items():
         st = {}            # pid -> [games, minutes, gbpm x minutes]
@@ -351,6 +360,8 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, pri
                         bpm = (bm + prior[pid] * pk) / (mn + pk)
                     else:
                         bpm = (bm + -1.0 * n0) / (mn + n0)
+                    if absorb:
+                        f *= max(0.0, 1 - absorb * (k - g) / (k + alam))
                     v += f * max(0.0, bpm - rp) * (mn / k) / 40
             out[(t, gl[k][0] if k < len(gl) else 'next')] = round(v, 3)
             if k < len(gl):

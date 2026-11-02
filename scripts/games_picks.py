@@ -432,9 +432,14 @@ def calib(sport, mk, side, line, edge, k, ml=False):
     return C.chances(sport, 'ml' if ml else mk, side, line, close)
 
 
-def du_view(sport, mk, c, o, gap=None):
+def du_view(sport, mk, c, o, gap=None, cal=None):
     """(win chance, expected return) the Dengler Units stake is sized on, rounded"""
     import units as DU
+    if mk == 'ml':
+        if not cal:
+            return None, None
+        w, _, l = cal[0]
+        return round(w, 4), round(w * (dec(o) - 1) - l, 4)
     w, e = DU.view(sport, mk, c, o, gap)
     return round(w, 4), round(e, 4)
 
@@ -456,10 +461,31 @@ def early_scale(sport, kick, u):
     return max(0.25, round(u * f[1] * 4) / 4)
 
 
-def stake_du(sport, mk, c, o, n=None, gap=None):
-    """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate"""
+def stake_du(sport, mk, c, o, n=None, gap=None, cal=None):
+    """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate;
+    cal: a moneyline's calibrated (chances, u) from ml_cal"""
     import units as DU
+    if mk == 'ml':
+        return DU.stake_cal(sport, cal[0], cal[1], o, n) if cal else 0.0
     return DU.stake(sport, mk, c, o, n, gap=gap)
+
+
+def ml_cal(sport, side, line, gap, k):
+    """the moneyline's calibrated chances and shrink: priced at the close the spread's calibrated edge implies"""
+    import units as DU
+    return DU.ml_cal(sport, side, line, gap, k, lambda mk, close: C.chances(sport, mk, side, line, close))
+
+
+def growth(o):
+    """expected log growth of an option at its stake, on its calibrated chances (picks the spread or its moneyline:
+    Nov 2 2026 audit, the raw model ev grows with the payout and chose underdog moneylines, which then got the smallest
+    stake)"""
+    c = o['_cal'][0] if o.get('_cal') else o.get('_cw')
+    f = (o.get('units') or 0) / 100
+    if not c or f <= 0 or f >= 1:
+        return 0.0
+    w, pu, l = c
+    return w * math.log(1 + f * (dec(o['price']) - 1)) + l * math.log(1 - f)
 
 
 def rule_bets(sport, rows, mk, x, at_open, cap=None, outer=1.0):
@@ -1012,14 +1038,15 @@ def rule_options(sport, g, R, segs=()):
             ev = w * (dec(o) - 1) - l
             if ev <= 0:
                 continue
-            u = stake_du(sport, imk, c, o, gap=sized(edge, cap))
+            cal = ml_cal(sport, side, line, sized(edge, cap), rule['k']) if ml else None
+            u = stake_du(sport, imk, c, o, gap=sized(edge, cap), cal=cal)
             if u <= 0:
                 # no calibrated edge at this price (Oct 27 2026): a DraftKings fallback at -110 needs more than Novig
                 if imk == mk:
                     near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': u, '_c': c, **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
+                         'units': u, '_c': c, '_cal': cal, **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
     return opts, near
 
 
@@ -1123,15 +1150,19 @@ def live(sport):
         opts, near = ahead[g['id']]
         # every option that clears now, so an open pick's Now cell reads its own market even when another is best
         for o in opts:
-            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], szd(o)))
+            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], szd(o), o.get('_cal')))
+            if o['mk'] != 'ml':
+                o['_cw'] = DU.priced(DU.params(sport, o['mk']), o['_c'], o['price'], szd(o))[0]
+                o['_cw'] = (o['_cw'], o['_c'][1], 1 - o['_c'][1] - o['_cw'])
             cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
         best = {}
         for o in opts:
-            if fam(o['mk']) not in best or o['ev'] > best[fam(o['mk'])]['ev']:
+            if fam(o['mk']) not in best or (growth(o), o['ev']) > (growth(best[fam(o['mk'])]), best[fam(o['mk'])]['ev']):
                 best[fam(o['mk'])] = o
         for pick in sorted(best.values(), key=lambda o: o['ev']):
-            c_ = pick.pop('_c')
-            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], szd(pick))
+            c_, cal_ = pick.pop('_c'), pick.pop('_cal', None)
+            pick.pop('_cw', None)
+            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], szd(pick), cal_)
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if (g['id'], fam(pick['mk'])) not in seen:
                 seen.add((g['id'], fam(pick['mk'])))

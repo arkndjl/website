@@ -29,10 +29,20 @@ export function fvOf(board, x, fv) {
 
 // JSON.stringify replacer for files written from the raw board in memory: a player's fv (from his fvx when the row has
 // one), fv0 and fvNow go out on the stretched scale; everything computed in memory (team builder, mocks, portal AV,
-// team talent) stays on the mean. Only on objects with a name, so tier tables and counts are untouched.
-const KEYS = new Set(['fv', 'fv0', 'fvNow']);
+// team talent) stays on the mean. Only on objects with a name, so tier tables and counts are untouched. Each row also
+// carries the exact mean it was stretched from (fvx / fv0x / fvNowx: the row's own when it has one, else the value it
+// held in memory), so scripts/fv_scale.py --restate restates from the mean and never stretches a shown value twice.
+const KEYS = ['fv', 'fv0', 'fvNow'];
 export const fvReplacer = board => function (k, v) {
-  if (!KEYS.has(k) || typeof v !== 'number' || !this || (this.name == null && this.n == null)) return v;
-  const x = k === 'fv' && typeof this.fvx === 'number' ? this.fvx : v;
-  return Number.isInteger(v) ? fvOf(board, x, v) : Math.round(fvShow(board, x) * 10) / 10;
+  if (!v || typeof v !== 'object' || Array.isArray(v) || (v.name == null && v.n == null)) return v;
+  let o = null;
+  for (const key of KEYS) {
+    const val = v[key];
+    if (typeof val !== 'number') continue;
+    const xk = key + 'x', x = typeof v[xk] === 'number' ? v[xk] : val;
+    o ??= { ...v };
+    o[xk] = x;
+    o[key] = Number.isInteger(val) ? fvOf(board, x, val) : Math.round(fvShow(board, x) * 10) / 10;
+  }
+  return o ?? v;
 };

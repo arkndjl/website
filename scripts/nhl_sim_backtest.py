@@ -33,6 +33,22 @@ CPS = [0, 10, 20, 41, 61]
 A_GRID = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
 SD_GRID = [0.0, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
 NSIM = 2000
+OTW = {}          # season -> the winner-given-overtime fit on the seasons before it (ot_fits); empty: off
+
+
+def ot_fits(rows, coefs):
+    """for each scored season, logit P(home wins | regular-season OT) = a + b x model logit, on the seasons before it"""
+    Ss = np.array([g['S'] for g, f in rows])
+    ot = np.array([(g.get('per') or 3) > 3 and not g['po'] for g, f in rows])
+    y = np.array([g['hs'] > g['as'] for g, f in rows], float)
+    out = {}
+    for S, c in coefs.items():
+        m = ot & (Ss < S)
+        if m.sum() < 200:
+            continue
+        z = np.array([sum(c[k] * f[k] for k in c) for (g, f), k_ in zip(rows, m) if k_])
+        out[S] = [float(v) for v in G.logit_fit(np.column_stack([np.ones(len(z)), z]), y[m])]
+    return out
 
 
 def divisions(S):
@@ -111,9 +127,11 @@ def sim(S, base, pts0, left_games, hc, otc, a, sd, left, rng):
     if left_games:
         hi = np.array([ix[g['h']] for g in left_games]); ai = np.array([ix[g['a']] for g in left_games])
         z = R[hi] - R[ai] + hc
-        hw = rng.random(z.shape) < 1 / (1 + np.exp(-z))
         mm = z * 1.6
-        ot = rng.random(z.shape) < 1 / (1 + np.exp(-(otc[0] + otc[1] * mm * mm + otc[2] * 6.0)))
+        pot = 1 / (1 + np.exp(-(otc[0] + otc[1] * mm * mm + otc[2] * 6.0)))
+        ot = rng.random(z.shape) < pot
+        # overtime first, then the winner at the OT or regulation chance (G.win_given_ot; OTW: walk-forward fits)
+        hw = rng.random(z.shape) < G.win_given_ot(1 / (1 + np.exp(-z)), z, pot, ot, OTW.get(S))
         Mh = np.zeros((n, len(hi))); Mh[hi, np.arange(len(hi))] = 1
         Ma = np.zeros((n, len(ai))); Ma[ai, np.arange(len(ai))] = 1
         P += Mh @ (2 * hw + (ot & ~hw)) + Ma @ (2 * ~hw + (ot & hw))
@@ -250,6 +268,7 @@ def main():
     print('snapshots', len(snaps), 'rows', len(rows), flush=True)
     rep = {'checkpoints': CPS, 'seasons': SCORED, 'sims': NSIM, 'feats': feats}
     coefs = bases(snaps, rows, feats)
+    OTW.update(ot_fits(rows, coefs))
     res = grid_scores(snaps, hist, coefs, otc)
     base_cfg = (0.0, min(SD_GRID, key=lambda s: abs(s - fit['seasonSd'])))
     chosen, wrows = walkforward(res, base_cfg)
@@ -265,6 +284,20 @@ def main():
     rep['pooledBest'] = list(best)
     rep['surface'] = {f'{a},{sd}': round(sum(objective(res[(s, k, a, sd)]) for s in SCORED for k in CPS) / (len(SCORED) * len(CPS)), 5)
                       for a in A_GRID for sd in SD_GRID}
+    # the winner given overtime (Nov 2 2026): the same walk-forward settings with the winner drawn independent of
+    # overtime, common random numbers; new minus old
+    outs = {S: outcomes(hist, S) for S in SCORED}
+    saved = dict(OTW)
+    OTW.clear()
+    pair = []
+    for S, k, r, _ in wrows:
+        sn = next(s for s in snaps if s['S'] == S and s['k'] == k)
+        old = score_cp(sn, hist, coefs, otc, *chosen[S], outs[S], np.random.default_rng(1000 * S + k))
+        pair.append((S, k, r, old))
+    OTW.update(saved)
+    rep['otWinner'] = {'note': 'OT drawn first, winner at the OT / regulation chance, vs winner independent of OT',
+                       'fits': {str(S): [round(v, 4) for v in c] for S, c in OTW.items()},
+                       **summarize(pair, 'ot winner vs independent')}
     if '--no-elo' in sys.argv:
         old = json.load(open(OUT)) if os.path.exists(OUT) else {}
         rep['eloRetest'] = old.get('eloRetest')

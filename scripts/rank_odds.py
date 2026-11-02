@@ -17,7 +17,9 @@ team and home terms; scripts/data/games_wf), then its mean residual over the res
 variance = sigma^2 x T/(T-1) + game noise / games left, and sigma^2 = a + b x share of the season left is fit by
 likelihood, each season from the seasons before it (half-life 3 seasons), the live a, b through the last season,
 floored at the smallest sd measured at any checkpoint (CBB's fit puts a at 0, which would claim near-certain ranks in
-March; its 80%-of-season checkpoint measures 1.4).
+March; its 80%-of-season checkpoint measures 1.4). The game noise is the result's variance around the model's own
+pre-game margin less that margin's rating gap error (2 sigma^2, solved with sigma^2), where that scores better on the
+held-out seasons than the raw variance (which double-removes the gap error and shrinks late-season sds; fit_sport).
 The NBA keeps its own measurement from the season-sim rating (data/nba_season_sd.json), which this method lands near
 (3.1 open / 2.4 end against 3.7 / 2.9; the ridge read-back smooths the rating a little).
 
@@ -163,50 +165,79 @@ def checkpoints(sport):
     return np.array(rows)
 
 
-def fit_sport(sport):
+def fit_sport(sport, R=None, noise='pure'):
+    """noise: the game noise in the residual mean's variance (sigma^2 x T/(T-1) + noise / games left). 'own' is the
+    variance of the result around the model's own pre-game margin, which also holds the model's rating gap error, so
+    subtracting it over-removed and left late-season sds too small (Nov 2 2026 audit: NFL's 80% checkpoint 2.08).
+    'pure' takes that gap error back out at the fit's own rating sd (2 sigma^2 x T/(T-1), sigma^2 at mid-season, the
+    average game's), solved to a fixed point with sigma^2 (six passes), floored at 30% of the own variance."""
     import numpy as np
-    R = checkpoints(sport)
+    R = checkpoints(sport) if R is None else R
     Sx, ck, A, n, sh, gn, T = (R[:, i] for i in range(7))
 
-    def nll_rows(s2):
-        v = np.maximum(s2, 0.05) * T / (T - 1) + gn / n
+    def nll_rows(s2, gnoise):
+        v = np.maximum(s2, 0.05) * T / (T - 1) + gnoise / n
         return 0.5 * (np.log(2 * np.pi * v) + A ** 2 / v)
 
+    def noise_of(a, b):
+        return gn if noise == 'own' else np.maximum(0.3 * gn, gn - 2 * (a + b * 0.5) * T / (T - 1))
+
     grid = [(a, b) for a in np.arange(0, 30.01, 0.5) for b in np.arange(0, 60.01, 0.5)]
-    L = np.array([nll_rows(a + b * sh) for a, b in grid])          # grid x rows
+    L0 = np.array([nll_rows(a + b * sh, gn) for a, b in grid]) if noise == 'own' else None   # grid x rows
 
     def wfit(s_, hl=3):
         w = np.where(Sx < s_, 0.5 ** ((s_ - 1 - Sx) / hl), 0.0)
-        return grid[int(np.argmin(L @ w))]
+        if noise == 'own':
+            return grid[int(np.argmin(L0 @ w))]
+        a, b = 11.0, 5.0
+        for _ in range(6):
+            g_ = noise_of(a, b)
+            a, b = grid[int(np.argmin([nll_rows(a_ + b_ * sh, g_) @ w for a_, b_ in grid]))]
+        return a, b
     seasons = sorted(set(Sx.astype(int).tolist()))
-    walk, base, nn, ab = 0.0, 0.0, 0, {}
+    walk, base, nn, ab, rows = 0.0, 0.0, 0, {}, []
     for s_ in seasons[1:]:
         k = Sx == s_
         a, b = wfit(s_)
         ab[s_] = [float(a), float(b)]
         prev = Sx < s_
-        c = float(np.mean((A ** 2 - gn / n)[prev]))                  # one sd for the whole season, same past seasons
-        walk += float(nll_rows(a + b * sh)[k].sum())
-        base += float(nll_rows(np.full(len(A), c))[k].sum())
+        g_ = noise_of(a, b)
+        c = float(np.mean((A ** 2 - g_ / n)[prev]))                  # one sd for the whole season, same past seasons
+        r_ = nll_rows(a + b * sh, g_)[k]
+        walk += float(r_.sum()); rows.append(r_)
+        base += float(nll_rows(np.full(len(A), c), g_)[k].sum())
         nn += int(k.sum())
     a, b = wfit(seasons[-1] + 1)
-    msd = {str(c_): round(float(math.sqrt(max(0.0, np.mean((A ** 2 - gn / n)[ck == c_]) * (T[0] - 1) / T[0]))), 2)
+    g_ = noise_of(a, b)
+    msd = {str(c_): round(float(math.sqrt(max(0.0, np.mean((A ** 2 - g_ / n)[ck == c_]) * (T[0] - 1) / T[0]))), 2)
            for c_ in (0, .2, .4, .6, .8)}
     return {'a': float(a), 'b': float(b), 'halfLife': 3, 'seasons': [seasons[0], seasons[-1]], 'n': int(len(A)),
+            'noise': noise, 'gameSd': round(float(np.sqrt(np.mean(g_))), 2), 'ownSd': round(float(np.sqrt(np.mean(gn))), 2),
             'sdOpen': round(math.sqrt(a + b), 2), 'sdEnd': round(math.sqrt(max(a, 0.05)), 2), 'byCheckpoint': msd,
             'floor': min(msd.values()),
-            'walk': {'seasons': seasons[1:], 'nll': round(walk / max(nn, 1), 4), 'nllFlat': round(base / max(nn, 1), 4), 'ab': ab}}
+            'walk': {'seasons': seasons[1:], 'nll': round(walk / max(nn, 1), 4), 'nllFlat': round(base / max(nn, 1), 4), 'ab': ab},
+            '_rows': np.concatenate(rows)}
 
 
 def fit():
+    import numpy as np
     out = {}
     for s in ('nfl', 'cbb', 'cfb', 'nba'):
-        out[s] = fit_sport(s)
-        print(s, {k: out[s][k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'n')}, out[s]['walk']['nll'], out[s]['walk']['nllFlat'], flush=True)
+        R = checkpoints(s)
+        own, pure = fit_sport(s, R, 'own'), fit_sport(s, R, 'pure')
+        d = pure.pop('_rows') - own.pop('_rows')
+        t = float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d))))
+        # the pure noise only where it scores better on the held-out seasons (walk-forward, per team and checkpoint)
+        out[s] = pure if d.mean() < 0 else own
+        out[s]['noiseTest'] = {'nllOwn': own['walk']['nll'], 'nllPure': pure['walk']['nll'], 't': round(t, 2),
+                               'own': {k: own[k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'floor', 'byCheckpoint')},
+                               'pure': {k: pure[k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'floor', 'byCheckpoint', 'gameSd')}}
+        print(s, out[s]['noise'], {k: out[s][k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'floor', 'n')}, out[s]['noiseTest'], flush=True)
     nba = json.load(open(os.path.join(ROOT, 'data', 'nba_season_sd.json')))
     out['nba'] = {'a': nba['a'], 'b': nba['b'], 'sdOpen': nba['sdOpen'], 'sdEnd': nba['sdEnd'], 'floor': out['nba']['floor'], 'src': 'data/nba_season_sd.json',
-                  'readBack': {k: out['nba'][k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'byCheckpoint', 'walk')}}
-    out['note'] = 'rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit)'
+                  'readBack': {k: out['nba'][k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'byCheckpoint', 'walk', 'noise', 'noiseTest')}}
+    out['note'] = ('rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit); noise: the game noise '
+                   'the fit nets out (own: around the model margin; pure: that less the gap error, used where it scores better)')
     for sp in ('nhl', 'soccer'):               # measured by scripts/nhl_games.py, scripts/soccer_games.py: kept as written
         try:
             out[sp] = json.load(open(SD))[sp]

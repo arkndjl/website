@@ -61,7 +61,7 @@ export function atMean(r, z) {
   if (r.fvg != null || r.fvx == null) return r;
   const d = fvDist('cfb', r.fvx, z);
   r.fvg = Math.round(r.fvx * 100) / 100;
-  if (d) { r.fvx = Math.round(Math.max(20, Math.min(80, d.mean)) * 100) / 100; r.fv = Math.round(r.fvx); }
+  if (d) { const m = Math.max(20, Math.min(80, d.mean)); r.fvx = Math.round(m * 100) / 100; r.fv = Math.round(m); }
   return r;
 }
 // a past season's grade at its mean outcome (static/data/cfb-past.json): position and years on campus that season
@@ -81,7 +81,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     const pos = r[ci.pos], fv = ci.fvg != null && r[ci.fvg] != null ? r[ci.fvg] : r[ci.fvx];   // the odds come off the grade
     const z = cfbZ({ pos, cls: r[ci.cls], cons: r[ci.consRk] != null, fv });
     r[ci.fvd] = fv != null && pos !== 'K' && pos !== 'P' ? fvdOf(fvDist('cfb', fv, z)) : null;
-    if (ci.fvg != null && r[ci.fvg] != null) { const d = fvDist('cfb', fv, z); if (d) { r[ci.fvx] = Math.round(Math.max(20, Math.min(80, d.mean)) * 100) / 100; r[ci.fv] = fvOf('cfb', r[ci.fvx]); } }
+    if (ci.fvg != null && r[ci.fvg] != null) { const d = fvDist('cfb', fv, z); if (d) { const m = Math.max(20, Math.min(80, d.mean)); r[ci.fvx] = Math.round(m * 100) / 100; r[ci.fv] = fvOf('cfb', m); } }   // stretched from the unrounded mean
     if (r[ci.fvd]) n++;
   }
   writeCfbAll(A, ROOT);
