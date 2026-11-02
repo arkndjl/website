@@ -942,11 +942,33 @@ def grade(X, s, kept, B=None):
     p, mu = hpred(F, kept, bl, bo)
     mean, odds, lo, hi = dist(p, mu, s['edges'], s['q'])
     odds = {t: platt_apply(odds[t], s['cal'][str(t)]) for t in odds}
-    # each input's push on the mean against the average prospect of the fit: d mean = (mu - 20) dp + p dmu
+    # each input group's push on the mean grade against the average prospect of the fit (every input at its fit mean):
+    # exact Shapley values over the dropdown's groups (PART), through the hurdle and the outcome mixture, so the pushes
+    # add up to the grade (before the fv_scale top stretch) minus the average prospect's grade. A first-order slope at
+    # the player's own p and mu (the old split) missed by 2-58 FV on the live board.
+    from itertools import combinations
+    from math import factorial
+    groups = list(dict.fromkeys(PART.get(c, c) for c in kept))
+    g = len(groups)
+
+    def val(S):
+        G = F.copy()
+        for c in kept:
+            if PART.get(c, c) not in S:
+                G[c] = s['means'][c]
+        pp, mm = hpred(G, kept, bl, bo)
+        return dist(pp, mm, s['edges'], s['q'])[0]
+    V = {S: val(set(S)) for k in range(g + 1) for S in combinations(groups, k)}
     parts = {}
-    for c in kept:
-        dx = F[c].values - s['means'][c]
-        parts[c] = ((mu - 20) * p * (1 - p) * s['coefL'][c] + p * s['coefO'][c]) * dx
+    for j, a in enumerate(groups):
+        rest = [x for x in groups if x != a]
+        tot = np.zeros(len(F))
+        for k in range(g):
+            w = factorial(k) * factorial(g - k - 1) / factorial(g)
+            for S in combinations(rest, k):
+                Sa = tuple(x for x in groups if x in S or x == a)
+                tot += w * (V[Sa] - V[S])
+        parts[a] = tot
     return mean, odds, lo, hi, parts, p, mu
 
 
@@ -1062,9 +1084,7 @@ def build():
         for i, (pid, r) in enumerate(X.iterrows()):
             v = sp.get(pid) or {}
             nm = v.get('n') or f"{P.at[pid, 'first']} {P.at[pid, 'last']}"
-            pr = {}
-            for c in kept:
-                pr[PART.get(c, c)] = pr.get(PART.get(c, c), 0) + float(parts[c][i])
+            pr = {k: float(v[i]) for k, v in parts.items()}
             elo = None if pd.isna(r.elo) else round(float(r.elo))
             rows.append(dict(id=pid, name=nm, nat=v.get('nat'), espn=v.get('espn'), wd=P.at[pid, 'wd'] if isinstance(P.at[pid, 'wd'], str) and P.at[pid, 'wd'] else None,
                              dob=None if pd.isna(P.at[pid, 'dob']) else int(P.at[pid, 'dob']),
@@ -1077,6 +1097,7 @@ def build():
                              p30=round(float(odds[30][i]), 3), p40=round(float(odds[40][i]), 3), p50=round(float(odds[50][i]), 3),
                              p60=round(float(odds[60][i]), 3), pv=round(float(p[i]), 3), prov=bool(pd.isna(r['rank'])),
                              parts=sorted([[k, round(x, 2)] for k, x in pr.items()], key=lambda t: -abs(t[1])),
+                             b0=round(float(mean[i]) - sum(pr.values()), 2),   # the average prospect's grade (exact split)
                              **({'bdg': bdg[i]} if bdg[i] else {})))
         rows.sort(key=lambda r: (-r['fvx'], r['rank'] or 9999))
         rows = rows[:SHOW]
