@@ -100,7 +100,7 @@ jobs:
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -q -m "Odds snapshot, paper book and picks ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
           for i in 1 2 3 4; do
-            git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push && exit 0
+            git pull --rebase --autostash -X theirs -q origin "${GITHUB_REF_NAME}" && git push && exit 0
             git rebase --abort 2>/dev/null || true
             sleep $((i * 5))
           done
