@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,true freshmen,ARKLIST|rosters:lineups,on/off,depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds,tournament odds,development,offense,defense|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,true freshmen,ARKLIST|rosters:depth chart,lineups,on/off,backup watch|games:games,game table|teams:ARK Ranking,season odds,tournament odds,development,offense,defense|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,all-time FV" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< rookies sport="cbb" icon="basketball" title="true freshmen :: FV and xBPM against recruiting rank" tab="true freshmen" >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
