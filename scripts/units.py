@@ -361,13 +361,26 @@ def rho_of(sport, mk):
     return _icc(groups)
 
 
+def et_day(kick):
+    """the US Eastern date of a start ('' if none): a night's games settle together, and a 7:30 pm ET tip is the next
+    day in UTC (Nov 2 2026: live_pairs clustered by the UTC date, splitting one ET night's late games into the next)"""
+    from zoneinfo import ZoneInfo
+    try:
+        t = datetime.datetime.fromisoformat(str(kick).replace('Z', '+00:00'))
+    except ValueError:
+        return str(kick or '')[:10]
+    if t.tzinfo is None:
+        return t.date().isoformat()
+    return t.astimezone(ZoneInfo('America/New_York')).date().isoformat()
+
+
 def live_pairs(sport, mk):
-    """(gap, clvRet, slate) of graded live picks: the games_picks log and the paper book"""
+    """(gap, clvRet, slate) of graded live picks: the games_picks log and the paper book; slate is the ET date"""
     out = []
     try:
         for e in json.load(open(os.path.join(ROOT, 'data', f'games_picks_{sport}.json'))).get('log', []):
             if e.get('clvRet') is not None and e.get('edge') is not None and ('spread' if e['mk'] == 'ml' else e['mk']) == mk:
-                out.append((e.get('sz') or e['edge'], e['clvRet'], 'g' + str(e.get('kick', ''))[:10]))
+                out.append((e.get('sz') or e['edge'], e['clvRet'], 'g' + et_day(e.get('kick'))))
     except (OSError, ValueError):
         pass
     try:
@@ -377,7 +390,7 @@ def live_pairs(sport, mk):
             # book's totals gap is the raw model minus the line (Oct 21 2026 audit)
             if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None \
                     and (b.get('stake') or 0) > 0 and not (mk == 'total' and sport in ('nba', 'cfb')):
-                out.append((b['gap'], b['clvRet'], 'p' + str(b.get('k', ''))[:10]))
+                out.append((b['gap'], b['clvRet'], 'p' + et_day(b.get('k'))))
     except (OSError, ValueError):
         pass
     return out
