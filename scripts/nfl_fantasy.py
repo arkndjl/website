@@ -593,9 +593,9 @@ def extras(W, info, wars, gsis, t, s, cls):
 
 def war_now(s, w, maps=None, fresh=False):
     """{gsis: WAR a game} before week w of season s: last season at half weight plus this one to date, shrunk with
-    three replacement games (the game model's injury value)."""
-    prev = NW.war_ledger(s - 1, maps=NW.gsis_map(s - 1, fresh))
-    cur = NW.war_ledger(s, thru=w, maps=maps or NW.gsis_map(s, fresh), fresh=fresh)
+    three replacement games (the game model's injury value); offense only, so a two-way player's defense doesn't lift his catches."""
+    prev = NW.war_ledger(s - 1, maps=NW.gsis_map(s - 1, fresh), sides=(0,))
+    cur = NW.war_ledger(s, thru=w, maps=maps or NW.gsis_map(s, fresh), fresh=fresh, sides=(0,))
     return {g: G.player_value(prev.get(g, (0.0, 0)), cur.get(g, (0.0, 0))) for g in set(prev) | set(cur)}
 
 
@@ -609,10 +609,10 @@ def war_history(first, last):
     out = {}
     for y in range(first, last + 1):
         if str(y) not in cache:
-            maps, prev = NW.gsis_map(y), NW.war_ledger(y - 1, maps=NW.gsis_map(y - 1))
+            maps, prev = NW.gsis_map(y), NW.war_ledger(y - 1, maps=NW.gsis_map(y - 1), sides=(0,))
             wk = {}
             for w in range(1, 19):
-                cur = NW.war_ledger(y, thru=w, maps=maps)
+                cur = NW.war_ledger(y, thru=w, maps=maps, sides=(0,))
                 wk[str(w)] = {g: round(G.player_value(prev.get(g, (0.0, 0)), cur.get(g, (0.0, 0))), 5) for g in set(prev) | set(cur)}
             cache[str(y)] = wk
             json.dump(cache, open(cp, 'w'))

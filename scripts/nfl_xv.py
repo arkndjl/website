@@ -535,10 +535,11 @@ def backtest(lams=(5, 20, 50, 150, 400)):
 ALPHAS = (0, 0.25, 0.4, 0.5, 0.6, 0.75, 1)
 
 
-def board_xv(y, sd, ros, b, fresh=False, rows_out=None):
+def board_xv(y, sd, ros, b, fresh=False, rows_out=None, sides=None):
     """{pfr id: XV} for this season (nfl_war.py build), on the weights in data/nfl_xv.json; None without the file.
     z pools are this season's regulars (40%+ of the snaps so far), so mid-season rates shrink more (smaller samples).
-    rows_out: a list that gets the season's player-team rows (the badges read their counts, scripts/nfl_badges.py)."""
+    rows_out: a list that gets the season's player-team rows (the badges read their counts, scripts/nfl_badges.py).
+    sides: a dict that gets {(pfr id, 0 offense / 1 defense): XV}, a two-way player's split."""
     try:
         with open(OUT) as f:
             M = json.load(f)['model']
@@ -552,6 +553,9 @@ def board_xv(y, sd, ros, b, fresh=False, rows_out=None):
     out = defaultdict(float)
     for p, v in zip(S[y]['players'], xv_of(S, y, M['weights'], value, M['qMean'])):
         out[p['pfr']] += v
+        if sides is not None:
+            k = (p['pfr'], 0 if GROUP_OF[p['sub']] in W.OFFENSE else 1)
+            sides[k] = sides.get(k, 0.0) + v
     return out, M['alpha']
 
 
