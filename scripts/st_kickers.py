@@ -266,6 +266,12 @@ def write(sport, pl, season, info, note):
             if r['p'] in cur:
                 C[r['p']][0] += 1; C[r['p']][1] += r['noe']
         out['pcar'] = {p: [n, round(v / (n + FV_NET_K), 2)] for p, (n, v) in C.items()}
+        # Big Leg badge (scripts/fetch_cfb.mjs): this season's gross yards over expected a punt, shrunk, every punter
+        G = defaultdict(lambda: [0, 0.0])
+        for r in P['pu']:
+            if r['s'] == season:
+                G[r['p']][0] += 1; G[r['p']][1] += r['goe']
+        out['pleg'] = {p: [n, round(v / (n + H['gross']['k']), 2)] for p, (n, v) in G.items()}
     p = os.path.join(ROOT, 'data', f'st_kickers_{sport}.json')
     with open(p, 'w', encoding='utf-8') as fh:
         json.dump(out, fh, ensure_ascii=False, allow_nan=False, separators=(',', ':'))
