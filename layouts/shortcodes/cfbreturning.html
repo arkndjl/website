@@ -1,0 +1,39 @@
+{{- /* Returning production tab (Nov 2 2026): every FBS team's share of last season back by unit, ranked by the points
+       the live game model's preseason prior gives those shares. data/cfb_returning.json from
+       `python3 scripts/cfb_defret_research.py --display` (ESPN box scores + play text in scripts/.cache/cfb; rerun with the
+       roster prior each season after week 2). Phones keep RK, Team, Pts, QB, Skill and Def. */ -}}
+{{- with site.Data.cfb_returning -}}
+{{- $d := . }}{{ $rows := .teams }}
+{{- $date := lower ((time .asof).Format "Jan 2") }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "returning production") "icon" "football" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Pts,QB,Skill,Def" "gfxDate" (printf "returning · %v" $d.season) "gfxMax" "25") }}
+<table class="cfb__table bw">
+  <thead><tr>
+    <th>RK</th><th>Team</th><th class="bw__x">Conf</th>
+    <th title="points of preseason rating from these shares, the live prior's weights (skill yards back {{ $d.w.offRet }}, QB yards back {{ $d.w.qbRet }}, transfers in {{ $d.w.offIn }} a full share), against the FBS mean">Pts</th>
+    <th title="share of last season's passing yards thrown by players back">QB</th>
+    <th title="share of last season's rushing + receiving yards by players back">Skill</th>
+    <th title="share of last season's sacks, passes defended and interceptions by players back (box scores)">Def</th>
+    <th class="bw__x" title="skill yards brought in by transfers from other FBS teams, over the team's own last-season total">In</th>
+    <th class="bw__x" title="biggest producers from last season not back (yards: passing + rushing + receiving; plays: sacks + passes defended + interceptions)">Lost</th>
+    <th class="bw__x" title="biggest producers from last season back">Back</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .n }}</span></td>
+    <td class="bw__x">{{ .grp }}</td>
+    <td class="cfb__num is-key" data-v="{{ .pts }}"><span class="{{ if ge (float .pts) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f" (float .pts) }}</span></td>
+    {{- range $k := slice "qb" "off" "def" }}{{ $v := index $r $k }}
+    <td class="cfb__num"{{ with $v }} data-v="{{ . }}"{{ end }}>{{ if ne $v nil }}{{ $v }}%{{ else }}—{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num bw__x" data-v="{{ .in }}">{{ .in }}%</td>
+    <td class="bw__x cfb__dim">{{ range $j, $p := .lostO }}{{ if $j }}, {{ end }}{{ index $p 0 }} {{ index $p 1 }}{{ end }}{{ if and .lostO .lostD }}; {{ end }}{{ range $j, $p := .lostD }}{{ if $j }}, {{ end }}{{ index $p 0 }} {{ index $p 1 }}{{ end }}</td>
+    <td class="bw__x cfb__dim">{{ range $j, $p := .backO }}{{ if $j }}, {{ end }}{{ index $p 0 }} {{ index $p 1 }}{{ end }}{{ if and .backO .backD }}; {{ end }}{{ range $j, $p := .backD }}{{ if $j }}, {{ end }}{{ index $p 0 }} {{ index $p 1 }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "%v · last season's production back · ranked by Pts · updated %s" $d.season $date)
+      "about" (printf "Back = played for the team this season (ESPN box score or play-by-play). QB = share of last season's passing yards, Skill = rushing + receiving yards, Def = sacks + passes defended + interceptions (box scores; FBS means %v%%, %v%%, %v%%). In = skill yards brought in by FBS transfers over the team's own total. Pts = points of preseason rating the game model's prior gives the QB, skill and transfer shares against the FBS mean. Defence is not in the prior: as a prior input, returning defensive plays fell short of the gate on the game model (log loss t -1.25 on 2016-20, -1.0 held out 2021-25), so it is shown, not used." $d.mean.qb $d.mean.off $d.mean.def)) }}
+{{- end -}}

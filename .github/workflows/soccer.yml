@@ -74,6 +74,10 @@ jobs:
         run: python3 scripts/team_units.py soccer
       - name: Player values, stats and backup watch (Understat)
         run: python3 scripts/soccer_players.py
+      # lineups tab (formations, most-used XI, pairs; static/data/lineups/soccer.json) from the warm Understat cache
+      - name: Lineups tab
+        continue-on-error: true
+        run: python3 scripts/soccer_lineups.py
       - name: Estimated market values next to Transfermarkt's (a Transfermarkt outage keeps yesterday's)
         run: python3 scripts/soccer_mv.py || echo "market values skipped"
       # the other 13 leagues' player stats (FotMob), then flags, headshots and prospect FV on the player files
@@ -94,7 +98,7 @@ jobs:
         run: python3 scripts/model_monitor.py soccer
       - name: Commit if anything changed
         run: |
-          files="data/units_soccer.json static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"
+          files="data/units_soccer.json static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/lineups/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
