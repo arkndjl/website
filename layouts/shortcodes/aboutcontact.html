@@ -36,7 +36,6 @@
 @keyframes ac-blink{0%,60%{fill:var(--ac-aq)}61%,100%{fill:#120c20}}
 @media (prefers-reduced-motion:reduce){.ac-sky .k{animation:none}}
 .ac-id{display:grid;gap:12px;padding:16px;border-top:2px solid var(--ac-lil)}
-.ac-kick{margin:0;color:var(--ac-aq);letter-spacing:.25em;text-transform:uppercase}
 .ac-name{margin:0;font-size:48px;line-height:1;font-weight:normal;letter-spacing:.06em;color:var(--ac-lil);text-shadow:3px 3px 0 var(--ac-title)}
 .ac-name::before,.ac-name::after{content:none}
 .ac-loc{display:inline-flex;align-items:center;gap:8px;margin:0;color:var(--ac-aq)}
@@ -46,7 +45,6 @@
 .ac-roles li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;padding:6px 0;border-bottom:1px solid var(--ac-well)}
 .ac-roles b{color:var(--ac-lil);font-weight:normal}
 .ac-roles span{color:var(--ac-aq);text-align:right}
-.ac-blurb{margin:0;line-height:1.5}
 .ac-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:2px 6px;background:var(--ac-title);color:#fff;letter-spacing:.05em;line-height:1.5}
 .ac-head small{font-size:inherit;color:var(--ac-lil)}
 .ac .ac-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;background:var(--ac-well)}
@@ -73,7 +71,6 @@
   <section class="ac-card" aria-labelledby="ac-name">
     {{ partial "px/skyline.html" . }}
     <div class="ac-id">
-      <p class="ac-kick">ARKNDJL :: about / contact</p>
       <h1 class="ac-name" id="ac-name">Noah Dengler</h1>
       <p class="ac-loc"><svg aria-hidden="true"><use href="#icon-pin"/></svg>New York City</p>
       <ul class="ac-roles">
@@ -81,7 +78,6 @@
         <li><b>Data Science Consultant</b><span>Agentiq Sports</span></li>
         <li><b>Mathematics &amp; economics</b><span>NYU</span></li>
       </ul>
-      <p class="ac-blurb">Quantitative, qualitative and creative work: sabermetrics, prospect evaluation, economics, art and music. This site is portfolio and blog for that work.</p>
     </div>
   </section>
   <section class="ac-card" id="contact" aria-labelledby="ac-contact">

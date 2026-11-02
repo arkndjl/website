@@ -9,7 +9,7 @@ cover = "/og/soccer-prospects.png"
 
 {{< arknav >}}
 
-{{< winpane title="soccer_prospects.exe :: under-22 big board" icon="soccer" sprite="px/hero-soccer" status="Transfermarkt lineups and values · 33 leagues" class="winpane--art" />}}
+{{< winpane title="soccer_prospects.exe :: under 22" icon="soccer" sprite="px/hero-soccer" status="Transfermarkt lineups and values · 33 leagues" class="winpane--art" />}}
 
 {{< wintabs groups="players:big board,first-year,ARKLIST|model:fv model,past prospects,all-time FV" side="true" label="Soccer prospects views" >}}
 {{< soccerboard view="board" tab="big board" >}}

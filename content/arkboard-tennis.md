@@ -8,7 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="tennis.exe :: the ATP and WTA tours" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
+{{< winpane title="tennis.exe :: ATP + WTA" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
 
 {{< wintabs groups="players:ATP ARK Ranking,WTA ARK Ranking,ATP serve + return,WTA serve + return|games:matches,results|model:model" side="true" label="Tennis views" >}}
 {{< tennismatches title="matches :: ATP + WTA singles" tab="matches" >}}

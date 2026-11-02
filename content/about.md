@@ -43,7 +43,7 @@ draft = false
 - **[writing](/posts/)**: sabermetrics, prospects, the Mets and economics, including [aWOBA](/posts/awoba-intro/), [an NBA Future Value grading system](/posts/nba-future-value-grading-system/), [The State Of Analytics Across Team Sports](/posts/state-of-analytics-across-team-sports/) and [Sabermetrics As A Microcosm](/posts/sabermetrics-microcosm/).
 {{< /winpane >}}
 
-{{< winpane title="skills.exe" icon="note" status="toolkit" >}}
+{{< winpane title="skills.exe" icon="note" status="" >}}
 - player evaluation: 20-80 scouting scale, Future Value modeling, prospect and farm system grading
 - statistical modeling: regression, calibration, out-of-sample backtesting, simulation
 - programming: Python, JavaScript / Node, Hugo; data pipelines from public sports APIs

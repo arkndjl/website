@@ -22,8 +22,7 @@
     <label class="dc__pick"><span>team</span><select data-dc-team aria-label="team"><option>loading…</option></select></label>
   </div>
   <div class="dc__body" data-dc-body><p class="cfb__dim">loading…</p></div>
-  <div class="cfbm__body wintable__about"><p class="cfb__dim">{{ index $about $sport }}</p></div>
-  <div class="win__status"><span data-dc-count></span><span class="cfb__asof" data-dc-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="{{ index $about $sport | plainify }}"><span data-dc-count></span><span class="cfb__asof" data-dc-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

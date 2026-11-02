@@ -205,7 +205,6 @@
 {{- $cal := dict }}{{ range $d.calibration }}{{ $cal = merge $cal (dict .id .) }}{{ end -}}
 <div class="win n1-sc{{ with $cls }} {{ . }}{{ end }}">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>scouting_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
-  <p class="n1-lead">Every opponent this season, upcoming first. Power, elo, ARK and talent are the same inputs the match preview uses; "vs 1NT" is every official map between the teams.</p>
   <div class="wintable__scroll">
   <table class="esea-box n1-tbl">
     <thead><tr><th>Date</th><th class="is-l">Opponent</th><th>W–L</th><th title="standings rank">Std</th><th title="ARK power rank">Pwr</th><th title="mean FACEIT elo, top five">Elo</th><th title="team ARK rating">ARK</th><th title="team talent, stars">Tal</th><th title="round diff per map">RD/m</th><th class="n1-gap" title="all official maps vs 1NT">vs 1NT</th><th>1NT win %</th><th>Result</th></tr></thead>
@@ -236,7 +235,6 @@
 {{- range $pool }}{{ $m := . }}{{ if not (where $rows "map" $m) }}{{ $rows = $rows | append (dict "map" $m "inPool" true "n" 0) }}{{ end }}{{ end -}}
 <div class="win n1-mb{{ with $cls }} {{ . }}{{ end }}">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>map_book.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
-  <p class="n1-lead">1NT's official maps since S53. "Shrunk" pulls each record toward 50% by 20 maps' worth, so short records do not read as strong. The right block is the next match: each five's FACEIT win rate on the map and the veto model's edge.</p>
   <div class="wintable__scroll">
   <table class="esea-box n1-tbl">
     <thead><tr><th>Map</th><th>W–L</th><th>Win %</th><th title="(W + 10) / (maps + 20)">Shrunk</th><th title="round diff per map">RD/m</th><th>Last 90d</th><th title="average rounds won in the first half, of 12">1st half</th><th title="overtime maps W-L">OT</th><th>S{{ $season }}</th>{{ with $pv.opp }}<th class="n1-gap" title="1NT five's FACEIT win rate on the map">1NT five</th><th title="{{ .name }} five's FACEIT win rate">{{ .name }}</th><th title="veto model edge on the match win chance, points">Edge</th><th>Veto</th>{{ end }}</tr></thead>
@@ -316,9 +314,8 @@
       <li><b>{{ $n }}</b><span class="n1-k">demos parsed</span></li>
       <li><b>15</b><span class="n1-k">needed to start</span></li>
     </ul>
-    <p>Round-by-round buys only exist in match demos; FACEIT's API has none. Once about 15 maps are parsed this window shows 1NT's and each opponent's record on pistol, eco (under $5k), force ($5–20k) and full buy rounds by map, and a force-or-save call for the next match.</p>
   </div>
-  <div class="win__status"><span>demos are added after each match</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>ready</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "method" }}
