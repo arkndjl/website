@@ -51,11 +51,11 @@
 .ac-head small{font-size:inherit;color:var(--ac-lil)}
 .ac .ac-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;background:var(--ac-well)}
 .ac-tile a{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:2px 12px;align-items:center;height:100%;padding:10px 12px;background:var(--ac-ink);border:2px solid;border-color:var(--ac-lil) #120c20 #120c20 var(--ac-lil);color:var(--ac-aq);text-decoration:none}
-.ac-tile svg{grid-row:1/3;width:32px;height:32px;color:var(--ac-lil)}
+.ac-tile svg{grid-row:1/3;width:32px;height:32px}
 .ac-tile__label{color:var(--ac-lil);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase}
 .ac-tile__handle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
 .ac-tile a:hover,.ac-tile a:focus-visible{background:var(--ac-title);outline:0}
-.ac-tile a:hover svg,.ac-tile a:focus-visible svg{color:var(--ac-aq)}
+.ac-tile a:hover svg,.ac-tile a:focus-visible svg{--ic-face:#241a3a;--ic-hi:var(--ac-aq)}
 .ac-tile--wide{grid-column:span 2}
 .ac-tile a:active{border-color:#120c20 var(--ac-lil) var(--ac-lil) #120c20}
 @media (max-width:900px){.ac .ac-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ac-tile:last-child{grid-column:span 2}}
@@ -67,7 +67,6 @@
   .ac-roles span{text-align:left}
   .ac .ac-grid{padding:8px}
   .ac-tile a{gap:2px 8px;padding:8px}
-  .ac-tile svg{width:24px;height:24px}
 }
 </style>
 <div class="ac">
@@ -89,7 +88,7 @@
     <h2 class="ac-head" id="ac-contact">contact.exe <small>{{ len $rows }} links</small></h2>
     <ul class="ac-grid">
       {{- range $rows }}
-      <li class="ac-tile {{ .cls }}"><a href="{{ .href }}"{{ if not (hasPrefix .href "mailto:") }} target="_blank" rel="noopener me"{{ end }}><svg aria-hidden="true"><use href="#icon-{{ .icon }}"/></svg><span class="ac-tile__label">{{ .label }}</span><span class="ac-tile__handle">{{ .handle }}</span></a></li>
+      <li class="ac-tile {{ .cls }}"><a href="{{ .href }}"{{ if not (hasPrefix .href "mailto:") }} target="_blank" rel="noopener me"{{ end }}><svg aria-hidden="true"><use href="#icon-s-{{ .icon }}"/></svg><span class="ac-tile__label">{{ .label }}</span><span class="ac-tile__handle">{{ .handle }}</span></a></li>
       {{- end }}
     </ul>
   </section>

@@ -290,21 +290,44 @@ th {
 .social-icons {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   margin-left: 16px;
 }
 
+/* each link is a 16 x 16 pixel tile drawn at 2x (brand/make-social.py); hover darkens the face */
 .social-icons a {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   color: var(--accent);
   line-height: 0;
 }
 
 .social-icons a:hover,
 .social-icons a:focus-visible {
-  color: var(--foreground);
+  --ic-face: #241a3a;
+  --ic-hi: var(--foreground);
+  outline-offset: 2px;
+}
+
+.social-icons a:active svg { transform: translate(2px, 2px); }
+
+/* image icons (eephus.io favicon) in the same bevelled tile */
+.social-icons .si-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  background: var(--ic-face, #57068c);
+  border: 2px solid;
+  border-color: var(--ic-hi, #c8c7ff) #241a3a #241a3a var(--ic-hi, #c8c7ff);
+}
+
+.social-icons .si-tile img {
+  width: 20px;
+  height: 20px;
 }
 
 .social-icons svg {
@@ -318,8 +341,9 @@ th {
   .social-icons {
     order: 3;
     width: 100%;
+    flex-wrap: wrap;
     margin: 10px 0 0;
-    gap: 14px;
+    gap: 4px;
   }
 }
 
