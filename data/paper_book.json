@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T11:09:05Z",
+ "asof": "2026-11-02T11:23:23Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 99.89,
   "peak": 114.8,
   "drawdown": 0.1299,
-  "open": 64.75,
+  "open": 67.25,
   "path": [
    101.5,
    101.6,
@@ -124,7 +124,7 @@
   ]
  },
  "record": {
-  "n": 208,
+  "n": 212,
   "clvN": 121,
   "clvRet": -0.0243,
   "clvT": -3.4,
@@ -224,7 +224,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 15,
+   "n": 17,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -287,7 +287,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 8,
+   "n": 9,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -308,7 +308,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 9,
+   "n": 10,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -828,7 +828,7 @@
    "edge": 4.5,
    "ev": 0.0111,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 1.5
   },
   {
@@ -910,7 +910,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 165.5
+   "close": 163.5
   },
   {
    "rule": "tennis-ml",
@@ -950,8 +950,8 @@
    "edge": 5.6,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
-   "close": 148.5
+   "pass": false,
+   "close": 147.5
   },
   {
    "rule": "tennis-ml",
@@ -1285,7 +1285,7 @@
    "edge": 2.1,
    "ev": 0.0189,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -1747,8 +1747,8 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
-   "close": 154.5
+   "pass": false,
+   "close": 155.5
   },
   {
    "rule": "nba-spread",
@@ -1790,7 +1790,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": false,
-   "close": 2.5
+   "close": 1.5
   },
   {
    "rule": "cbb-total",
@@ -1812,6 +1812,27 @@
    "event": null,
    "pass": false,
    "close": 144.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909784",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Kansas",
+   "a": "Fordham",
+   "mk": "spread",
+   "side": "away",
+   "line": 23.5,
+   "price": -104.0,
+   "bet": "Fordham +23.5 -104",
+   "placed": "2026-11-02T11:23:17Z",
+   "stake": 0.25,
+   "edge": 2.9,
+   "ev": 0.0002,
+   "event": null,
+   "pass": false,
+   "close": 23.5
   },
   {
    "rule": "cbb-ml",
@@ -2186,7 +2207,7 @@
    "edge": 3.2,
    "ev": 0.0087,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 148.5
   },
   {
@@ -2250,7 +2271,7 @@
    "ev": 0.0134,
    "event": null,
    "pass": false,
-   "close": 230.5
+   "close": 231.5
   },
   {
    "rule": "cbb-total",
@@ -2829,8 +2850,8 @@
    "edge": 3.4,
    "ev": 0.0228,
    "event": null,
-   "pass": true,
-   "close": 43.5
+   "pass": false,
+   "close": 44.5
   },
   {
    "rule": "cfb-total",
@@ -2955,7 +2976,7 @@
    "edge": 5.4,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 44.5
   },
   {
@@ -9183,7 +9204,7 @@
    "edge": 4.5,
    "ev": 0.0111,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 1.5
   },
   {
@@ -9265,7 +9286,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 165.5
+   "close": 163.5
   },
   {
    "rule": "tennis-ml",
@@ -9305,8 +9326,8 @@
    "edge": 5.6,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
-   "close": 148.5
+   "pass": false,
+   "close": 147.5
   },
   {
    "rule": "tennis-ml",
@@ -9640,7 +9661,7 @@
    "edge": 2.1,
    "ev": 0.0189,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -10102,8 +10123,8 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
-   "close": 154.5
+   "pass": false,
+   "close": 155.5
   },
   {
    "rule": "nba-spread",
@@ -10145,7 +10166,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": false,
-   "close": 2.5
+   "close": 1.5
   },
   {
    "rule": "cbb-total",
@@ -10167,6 +10188,27 @@
    "event": null,
    "pass": false,
    "close": 144.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909784",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Kansas",
+   "a": "Fordham",
+   "mk": "spread",
+   "side": "away",
+   "line": 23.5,
+   "price": -104.0,
+   "bet": "Fordham +23.5 -104",
+   "placed": "2026-11-02T11:23:17Z",
+   "stake": 0.25,
+   "edge": 2.9,
+   "ev": 0.0002,
+   "event": null,
+   "pass": false,
+   "close": 23.5
   },
   {
    "rule": "cbb-ml",
@@ -10541,7 +10583,7 @@
    "edge": 3.2,
    "ev": 0.0087,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 148.5
   },
   {
@@ -10605,7 +10647,7 @@
    "ev": 0.0134,
    "event": null,
    "pass": false,
-   "close": 230.5
+   "close": 231.5
   },
   {
    "rule": "cbb-total",
@@ -11184,8 +11226,8 @@
    "edge": 3.4,
    "ev": 0.0228,
    "event": null,
-   "pass": true,
-   "close": 43.5
+   "pass": false,
+   "close": 44.5
   },
   {
    "rule": "cfb-total",
@@ -11310,7 +11352,7 @@
    "edge": 5.4,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 44.5
   },
   {
