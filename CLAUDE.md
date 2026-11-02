@@ -34,5 +34,6 @@
   let the page speak for itself. When unsure, cut.
 - A note on how a table is built goes in the `about` of `wintable-close.html`, which is only the status bar's hover
   title, never a visible paragraph. Column meanings go in `<th title>` tooltips.
-- Kept: the Reference page's Research and Glossary/Methodology text, model/backtest windows, article bodies, source
-  attributions in status bars, and résumé content on about/contact.
+- Method prose lives only in Reference (Glossary/Methodology). Model and backtest tabs on sport pages show tables,
+  formulas and numbers, no explanatory paragraphs or "how it works" windows (Noah, Nov 2). Kept: Reference text,
+  article bodies, source attributions in status bars, résumé content on about/contact.

@@ -100,7 +100,6 @@
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
     </div>
     <div class="cfbm__body">
-      <p>score = expected margin vs an average FBS team, neutral field. weights: walk-forward backtest, {{ $ev.trainSeason }}{{ with $ev.testSeason }} and {{ . }}{{ end }}; each week predicted from earlier weeks only; final margin regressed on the predictions.</p>
       {{- with $ev.inputs }}
       <p class="cfbm__h">Inputs, fit {{ $ev.trainSeason }}, scored {{ $ev.testSeason }} <span class="cfb__dim">(n = {{ $ev.nTest }} FBS games; log loss on the winner, lower = better)</span></p>
       <table class="cfb__table cfbm__t">
@@ -127,7 +126,6 @@
         {{- end }}
         </tbody>
       </table>
-      <p class="cfb__dim">head coach score ≈ team's current Elo + Elo vs talent; current Elo includes the tested games, so the naive fit is circular. Elo and talent fixed: remainder = staff effect beyond them.</p>
       {{- end }}
       {{- with $ev.vsPolls }}
       <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with 1+ ranked team; poll pick = better-ranked team, ARK pick = higher score; latest poll before kickoff)</span></p>
