@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-02T23:55:56Z",
+ "asof": "2026-11-02T23:59:11Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 103.74,
+  "now": 104.09,
   "peak": 118.08,
-  "drawdown": 0.1214,
-  "open": 74.5,
+  "drawdown": 0.1185,
+  "open": 73.25,
   "path": [
    101.5,
    101.6,
@@ -95,29 +95,30 @@
    104.64,
    104.38,
    104.57,
-   104.31,
-   104.05,
-   103.78,
-   103.52,
-   103.74
+   104.92,
+   104.66,
+   104.4,
+   104.13,
+   103.87,
+   104.09
   ]
  },
  "record": {
-  "n": 213,
+  "n": 210,
   "clvN": 100,
   "clvRet": -0.0215,
   "clvT": -3.33,
   "clv": -0.17,
   "beat": 0.209,
-  "settled": 91,
-  "w": 51,
+  "settled": 92,
+  "w": 52,
   "l": 40,
   "p": 0,
-  "roi": 0.1641,
-  "roiT": 1.43,
-  "profit": 4.18,
-  "risked": 113.5,
-  "yield": 0.0368
+  "roi": 0.1768,
+  "roiT": 1.54,
+  "profit": 4.51,
+  "risked": 113.75,
+  "yield": 0.0397
  },
  "tEff": -3.33,
  "corr": {
@@ -150,7 +151,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +16.4% vs -2.1% (SE 11.5)",
+   "value": "ROI +17.7% vs -2.1% (SE 11.4)",
    "pass": true
   }
  ],
@@ -266,7 +267,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 6,
+   "n": 5,
    "clvN": 1,
    "clvRet": 0.0527,
    "clvT": null,
@@ -287,7 +288,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 32,
+   "n": 29,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -392,21 +393,21 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 48,
+   "n": 49,
    "clvN": 42,
    "clvRet": -0.018,
    "clvT": -2.96,
    "clv": 0.09,
    "beat": 0.238,
-   "settled": 33,
-   "w": 21,
+   "settled": 34,
+   "w": 22,
    "l": 12,
    "p": 0,
-   "roi": 0.3827,
-   "roiT": 1.82,
-   "profit": 6.11,
-   "risked": 22.75,
-   "yield": 0.2687
+   "roi": 0.4105,
+   "roiT": 1.99,
+   "profit": 6.44,
+   "risked": 23.0,
+   "yield": 0.2802
   },
   {
    "id": "nflprops-prop",
@@ -431,54 +432,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186568",
-   "k": "2026-11-02T10:30:00Z",
-   "slate": "tennis:2026-11-02",
-   "h": "Yamaguchi",
-   "a": "Kulambayeva",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 163,
-   "bet": "Kulambayeva ML +163",
-   "placed": "2026-11-02T06:55:27Z",
-   "stake": 0.25,
-   "edge": 7.4,
-   "ev": 0.0036,
-   "event": "Chennai Open",
-   "pass": false,
-   "clvRet": -0.0203,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 0.3725
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186444",
-   "k": "2026-11-02T13:00:00Z",
-   "slate": "tennis:2026-11-02",
-   "h": "Aguilar",
-   "a": "Blockx",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 133,
-   "bet": "Aguilar ML +133",
-   "placed": "2026-10-31T16:14:05Z",
-   "stake": 0.25,
-   "edge": 10.7,
-   "ev": 0.0214,
-   "event": "Rolex Paris Masters",
-   "pass": false,
-   "clvRet": -0.0389,
-   "clv": -1.3,
-   "beat": -1,
-   "close": 0.4125
-  },
   {
    "rule": "cbb-spread",
    "sport": "cbb",
@@ -855,7 +808,7 @@
    "ev": 0.0037,
    "event": null,
    "pass": false,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "rule": "cbb-total",
@@ -896,7 +849,7 @@
    "edge": 4.3,
    "ev": 0.0097,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 26.5
   },
   {
@@ -938,7 +891,7 @@
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 15.5
   },
   {
@@ -1002,7 +955,7 @@
    "ev": 0.0284,
    "event": null,
    "pass": true,
-   "close": 155.5
+   "close": 154.5
   },
   {
    "rule": "cbb-total",
@@ -1022,8 +975,8 @@
    "edge": 2.3,
    "ev": 0.0106,
    "event": null,
-   "pass": true,
-   "close": 142.5
+   "pass": false,
+   "close": 143.5
   },
   {
    "rule": "cbb-ml",
@@ -1086,7 +1039,7 @@
    "ev": 0.0191,
    "event": null,
    "pass": false,
-   "close": 161.5
+   "close": 163.5
   },
   {
    "rule": "cbb-spread",
@@ -1148,7 +1101,7 @@
    "edge": 3.0,
    "ev": 0.0009,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 10.5
   },
   {
@@ -1190,7 +1143,7 @@
    "edge": 3.4,
    "ev": 0.0302,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -1233,7 +1186,7 @@
    "ev": 0.0108,
    "event": null,
    "pass": false,
-   "close": 163.5
+   "close": 162.5
   },
   {
    "rule": "cbb-total",
@@ -1254,7 +1207,7 @@
    "ev": 0.0389,
    "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 159.5
   },
   {
    "rule": "cbb-total",
@@ -1358,7 +1311,7 @@
    "edge": 3.2,
    "ev": 0.0023,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 22.5
   },
   {
@@ -1380,7 +1333,7 @@
    "ev": 0.0006,
    "event": null,
    "pass": false,
-   "close": 16.5
+   "close": 15.5
   },
   {
    "rule": "cbb-spread",
@@ -1568,7 +1521,7 @@
    "edge": 2.6,
    "ev": 0.0078,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 22.5
   },
   {
@@ -1590,7 +1543,7 @@
    "ev": 0.0029,
    "event": null,
    "pass": false,
-   "close": 153.5
+   "close": 154.5
   },
   {
    "rule": "cbb-spread",
@@ -1652,8 +1605,8 @@
    "edge": 2.5,
    "ev": 0.0171,
    "event": null,
-   "pass": false,
-   "close": 7.5
+   "pass": true,
+   "close": 8.5
   },
   {
    "rule": "cbb-ml",
@@ -1673,7 +1626,7 @@
    "edge": 5.8,
    "ev": 0.0103,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -5.5
   },
   {
@@ -1905,7 +1858,7 @@
    "ev": 0.0322,
    "event": null,
    "pass": false,
-   "close": 19.5
+   "close": 18.5
   },
   {
    "rule": "cbb-spread",
@@ -1967,8 +1920,8 @@
    "edge": 3.3,
    "ev": 0.0029,
    "event": null,
-   "pass": false,
-   "close": 22.5
+   "pass": true,
+   "close": 23.5
   },
   {
    "rule": "cbb-total",
@@ -2388,7 +2341,7 @@
    "ev": 0.0865,
    "event": null,
    "pass": false,
-   "close": 156.5
+   "close": 157.5
   },
   {
    "rule": "cbb-ml",
@@ -2472,7 +2425,7 @@
    "ev": 0.048,
    "event": null,
    "pass": false,
-   "close": 20.5
+   "close": 19.5
   },
   {
    "rule": "cbb-spread",
@@ -2869,7 +2822,7 @@
    "ev": 0.0865,
    "event": null,
    "pass": false,
-   "close": 144.5
+   "close": 143.5
   },
   {
    "rule": "cbb-spread",
@@ -2889,7 +2842,7 @@
    "edge": 3.9,
    "ev": 0.0267,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 26.5
   },
   {
@@ -2931,7 +2884,7 @@
    "edge": 2.5,
    "ev": 0.0171,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 3.5
   },
   {
@@ -3441,166 +3394,6 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
-   "id": "186446",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Rinderknech",
-   "a": "Cerundolo",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 203,
-   "bet": "Rinderknech ML +203",
-   "placed": "2026-10-31T16:14:05Z",
-   "stake": 0.25,
-   "edge": 9.0,
-   "ev": 0.0026,
-   "event": "Rolex Paris Masters",
-   "pass": true
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186451",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Michelsen",
-   "a": "Lehecka",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -141,
-   "bet": "Lehecka ML -141",
-   "placed": "2026-11-01T17:12:52Z",
-   "stake": 0.5,
-   "edge": 7.2,
-   "ev": 0.0031,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186454",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Rublev",
-   "a": "Etcheverry",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 239,
-   "bet": "Etcheverry ML +239",
-   "placed": "2026-10-31T15:24:03Z",
-   "stake": 0.25,
-   "edge": 4.4,
-   "ev": 0.0015,
-   "event": "Rolex Paris Masters",
-   "pass": true
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186458",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Djokovic",
-   "a": "Vacherot",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 199,
-   "bet": "Vacherot ML +199",
-   "placed": "2026-11-02T13:53:33Z",
-   "stake": 0.75,
-   "edge": 8.4,
-   "ev": 0.0171,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186467",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Fokina",
-   "a": "Kouame",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": -292,
-   "bet": "Fokina ML -292",
-   "placed": "2026-11-01T12:04:16Z",
-   "stake": 2.0,
-   "edge": 14.2,
-   "ev": 0.0206,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186470",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Struff",
-   "a": "Gea",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -115,
-   "bet": "Gea ML -115",
-   "placed": "2026-11-02T11:04:11Z",
-   "stake": 0.25,
-   "edge": 7.0,
-   "ev": 0.003,
-   "event": "Rolex Paris Masters",
-   "pass": true
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186474",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Halys",
-   "a": "Fery",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 133,
-   "bet": "Fery ML +133",
-   "placed": "2026-10-31T18:36:17Z",
-   "stake": 0.25,
-   "edge": 7.9,
-   "ev": 0.0016,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186616",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Ruzic",
-   "a": "Charaeva",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -125,
-   "bet": "Charaeva ML -125",
-   "placed": "2026-11-01T12:38:52Z",
-   "stake": 0.25,
-   "edge": 8.2,
-   "ev": 0.0001,
-   "event": "Prudential Hong Kong Tennis Open",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
    "id": "186627",
    "k": "2026-11-03T05:00:00Z",
    "slate": "tennis:2026-11-03",
@@ -3765,6 +3558,66 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186446",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Rinderknech",
+   "a": "Cerundolo",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 203,
+   "bet": "Rinderknech ML +203",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 0.25,
+   "edge": 9.0,
+   "ev": 0.0026,
+   "event": "Rolex Paris Masters",
+   "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186454",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Rublev",
+   "a": "Etcheverry",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 239,
+   "bet": "Etcheverry ML +239",
+   "placed": "2026-10-31T15:24:03Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0015,
+   "event": "Rolex Paris Masters",
+   "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186474",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Halys",
+   "a": "Fery",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 133,
+   "bet": "Fery ML +133",
+   "placed": "2026-10-31T18:36:17Z",
+   "stake": 0.25,
+   "edge": 7.9,
+   "ev": 0.0016,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186587",
    "k": "2026-11-03T10:00:00Z",
    "slate": "tennis:2026-11-03",
@@ -3787,6 +3640,130 @@
    "close": 0.3425
   },
   {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186467",
+   "k": "2026-11-03T11:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Fokina",
+   "a": "Kouame",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -292,
+   "bet": "Fokina ML -292",
+   "placed": "2026-11-01T12:04:16Z",
+   "stake": 2.0,
+   "edge": 14.2,
+   "ev": 0.0206,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186568",
+   "k": "2026-11-03T11:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Yamaguchi",
+   "a": "Kulambayeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 163,
+   "bet": "Kulambayeva ML +163",
+   "placed": "2026-11-02T06:55:27Z",
+   "stake": 0.25,
+   "edge": 7.4,
+   "ev": 0.0036,
+   "event": "Chennai Open",
+   "pass": false,
+   "clvRet": -0.0203,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.3725
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186458",
+   "k": "2026-11-03T13:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Djokovic",
+   "a": "Vacherot",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 199,
+   "bet": "Vacherot ML +199",
+   "placed": "2026-11-02T13:53:33Z",
+   "stake": 0.75,
+   "edge": 8.4,
+   "ev": 0.0171,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186451",
+   "k": "2026-11-03T14:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Michelsen",
+   "a": "Lehecka",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -141,
+   "bet": "Lehecka ML -141",
+   "placed": "2026-11-01T17:12:52Z",
+   "stake": 0.5,
+   "edge": 7.2,
+   "ev": 0.0031,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186470",
+   "k": "2026-11-03T16:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Struff",
+   "a": "Gea",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -115,
+   "bet": "Gea ML -115",
+   "placed": "2026-11-02T11:04:11Z",
+   "stake": 0.25,
+   "edge": 7.0,
+   "ev": 0.003,
+   "event": "Rolex Paris Masters",
+   "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186477",
+   "k": "2026-11-03T18:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Shelton",
+   "a": "Norrie",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 245,
+   "bet": "Norrie ML +245",
+   "placed": "2026-11-02T23:59:11Z",
+   "stake": 0.25,
+   "edge": 7.3,
+   "ev": 0.0046,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
    "rule": "cfb-total",
    "sport": "cfb",
    "id": "401866453",
@@ -3806,6 +3783,26 @@
    "event": null,
    "pass": true,
    "close": 51.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186616",
+   "k": "2026-11-04T05:00:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Ruzic",
+   "a": "Charaeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -125,
+   "bet": "Charaeva ML -125",
+   "placed": "2026-11-01T12:38:52Z",
+   "stake": 0.25,
+   "edge": 8.2,
+   "ev": 0.0001,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
   },
   {
    "rule": "cfb-total",
@@ -4584,6 +4581,34 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186444",
+   "k": "2026-11-02T13:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Aguilar",
+   "a": "Blockx",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 133,
+   "bet": "Aguilar ML +133",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 0.25,
+   "edge": 10.7,
+   "ev": 0.0214,
+   "event": "Rolex Paris Masters",
+   "pass": false,
+   "clvRet": -0.0389,
+   "clv": -1.3,
+   "beat": -1,
+   "close": 0.4125,
+   "score": "4-6 2-6",
+   "res": "w",
+   "ret": 1.33,
+   "profit": 0.3325
   },
   {
    "rule": "tennis-ml",
@@ -6004,32 +6029,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -1.0
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873029-4685247-rc",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "NYJ",
-   "a": "LV",
-   "mk": "prop",
-   "side": "under",
-   "line": 2.5,
-   "price": 120.0,
-   "bet": "Braelon Allen under 2.5 rec +120",
-   "placed": "2026-11-01T14:59:00Z",
-   "stake": 2.5,
-   "edge": 10.6,
-   "ev": 0.1968,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0847,
-   "close": 2.5,
-   "score": 2.0,
-   "res": "w",
-   "ret": 1.2,
-   "profit": 3.0
   }
  ],
  "ledger": [
@@ -9154,30 +9153,6 @@
    "profit": -0.25
   },
   {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186568",
-   "k": "2026-11-02T10:30:00Z",
-   "slate": "tennis:2026-11-02",
-   "h": "Yamaguchi",
-   "a": "Kulambayeva",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 163,
-   "bet": "Kulambayeva ML +163",
-   "placed": "2026-11-02T06:55:27Z",
-   "stake": 0.25,
-   "edge": 7.4,
-   "ev": 0.0036,
-   "event": "Chennai Open",
-   "pass": false,
-   "clvRet": -0.0203,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 0.3725
-  },
-  {
    "rule": "cbb-ml",
    "sport": "cbb",
    "id": "401921422",
@@ -9316,7 +9291,11 @@
    "clvRet": -0.0389,
    "clv": -1.3,
    "beat": -1,
-   "close": 0.4125
+   "close": 0.4125,
+   "score": "4-6 2-6",
+   "res": "w",
+   "ret": 1.33,
+   "profit": 0.3325
   },
   {
    "rule": "tennis-ml",
@@ -9980,7 +9959,7 @@
    "ev": 0.0037,
    "event": null,
    "pass": false,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "rule": "cbb-total",
@@ -10021,7 +10000,7 @@
    "edge": 4.3,
    "ev": 0.0097,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 26.5
   },
   {
@@ -10063,7 +10042,7 @@
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 15.5
   },
   {
@@ -10127,7 +10106,7 @@
    "ev": 0.0284,
    "event": null,
    "pass": true,
-   "close": 155.5
+   "close": 154.5
   },
   {
    "rule": "cbb-total",
@@ -10147,8 +10126,8 @@
    "edge": 2.3,
    "ev": 0.0106,
    "event": null,
-   "pass": true,
-   "close": 142.5
+   "pass": false,
+   "close": 143.5
   },
   {
    "rule": "cbb-ml",
@@ -10211,7 +10190,7 @@
    "ev": 0.0191,
    "event": null,
    "pass": false,
-   "close": 161.5
+   "close": 163.5
   },
   {
    "rule": "cbb-spread",
@@ -10273,7 +10252,7 @@
    "edge": 3.0,
    "ev": 0.0009,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 10.5
   },
   {
@@ -10315,7 +10294,7 @@
    "edge": 3.4,
    "ev": 0.0302,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -10358,7 +10337,7 @@
    "ev": 0.0108,
    "event": null,
    "pass": false,
-   "close": 163.5
+   "close": 162.5
   },
   {
    "rule": "cbb-total",
@@ -10379,7 +10358,7 @@
    "ev": 0.0389,
    "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 159.5
   },
   {
    "rule": "cbb-total",
@@ -10483,7 +10462,7 @@
    "edge": 3.2,
    "ev": 0.0023,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 22.5
   },
   {
@@ -10505,7 +10484,7 @@
    "ev": 0.0006,
    "event": null,
    "pass": false,
-   "close": 16.5
+   "close": 15.5
   },
   {
    "rule": "cbb-spread",
@@ -10693,7 +10672,7 @@
    "edge": 2.6,
    "ev": 0.0078,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 22.5
   },
   {
@@ -10715,7 +10694,7 @@
    "ev": 0.0029,
    "event": null,
    "pass": false,
-   "close": 153.5
+   "close": 154.5
   },
   {
    "rule": "cbb-spread",
@@ -10777,8 +10756,8 @@
    "edge": 2.5,
    "ev": 0.0171,
    "event": null,
-   "pass": false,
-   "close": 7.5
+   "pass": true,
+   "close": 8.5
   },
   {
    "rule": "cbb-ml",
@@ -10798,7 +10777,7 @@
    "edge": 5.8,
    "ev": 0.0103,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -5.5
   },
   {
@@ -11030,7 +11009,7 @@
    "ev": 0.0322,
    "event": null,
    "pass": false,
-   "close": 19.5
+   "close": 18.5
   },
   {
    "rule": "cbb-spread",
@@ -11092,8 +11071,8 @@
    "edge": 3.3,
    "ev": 0.0029,
    "event": null,
-   "pass": false,
-   "close": 22.5
+   "pass": true,
+   "close": 23.5
   },
   {
    "rule": "cbb-total",
@@ -11513,7 +11492,7 @@
    "ev": 0.0865,
    "event": null,
    "pass": false,
-   "close": 156.5
+   "close": 157.5
   },
   {
    "rule": "cbb-ml",
@@ -11597,7 +11576,7 @@
    "ev": 0.048,
    "event": null,
    "pass": false,
-   "close": 20.5
+   "close": 19.5
   },
   {
    "rule": "cbb-spread",
@@ -11994,7 +11973,7 @@
    "ev": 0.0865,
    "event": null,
    "pass": false,
-   "close": 144.5
+   "close": 143.5
   },
   {
    "rule": "cbb-spread",
@@ -12014,7 +11993,7 @@
    "edge": 3.9,
    "ev": 0.0267,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 26.5
   },
   {
@@ -12056,7 +12035,7 @@
    "edge": 2.5,
    "ev": 0.0171,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 3.5
   },
   {
@@ -12566,166 +12545,6 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
-   "id": "186446",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Rinderknech",
-   "a": "Cerundolo",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 203,
-   "bet": "Rinderknech ML +203",
-   "placed": "2026-10-31T16:14:05Z",
-   "stake": 0.25,
-   "edge": 9.0,
-   "ev": 0.0026,
-   "event": "Rolex Paris Masters",
-   "pass": true
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186451",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Michelsen",
-   "a": "Lehecka",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -141,
-   "bet": "Lehecka ML -141",
-   "placed": "2026-11-01T17:12:52Z",
-   "stake": 0.5,
-   "edge": 7.2,
-   "ev": 0.0031,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186454",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Rublev",
-   "a": "Etcheverry",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 239,
-   "bet": "Etcheverry ML +239",
-   "placed": "2026-10-31T15:24:03Z",
-   "stake": 0.25,
-   "edge": 4.4,
-   "ev": 0.0015,
-   "event": "Rolex Paris Masters",
-   "pass": true
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186458",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Djokovic",
-   "a": "Vacherot",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 199,
-   "bet": "Vacherot ML +199",
-   "placed": "2026-11-02T13:53:33Z",
-   "stake": 0.75,
-   "edge": 8.4,
-   "ev": 0.0171,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186467",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Fokina",
-   "a": "Kouame",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": -292,
-   "bet": "Fokina ML -292",
-   "placed": "2026-11-01T12:04:16Z",
-   "stake": 2.0,
-   "edge": 14.2,
-   "ev": 0.0206,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186470",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Struff",
-   "a": "Gea",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -115,
-   "bet": "Gea ML -115",
-   "placed": "2026-11-02T11:04:11Z",
-   "stake": 0.25,
-   "edge": 7.0,
-   "ev": 0.003,
-   "event": "Rolex Paris Masters",
-   "pass": true
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186474",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Halys",
-   "a": "Fery",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 133,
-   "bet": "Fery ML +133",
-   "placed": "2026-10-31T18:36:17Z",
-   "stake": 0.25,
-   "edge": 7.9,
-   "ev": 0.0016,
-   "event": "Rolex Paris Masters",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186616",
-   "k": "2026-11-03T05:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Ruzic",
-   "a": "Charaeva",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -125,
-   "bet": "Charaeva ML -125",
-   "placed": "2026-11-01T12:38:52Z",
-   "stake": 0.25,
-   "edge": 8.2,
-   "ev": 0.0001,
-   "event": "Prudential Hong Kong Tennis Open",
-   "pass": false
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
    "id": "186627",
    "k": "2026-11-03T05:00:00Z",
    "slate": "tennis:2026-11-03",
@@ -12890,6 +12709,66 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186446",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Rinderknech",
+   "a": "Cerundolo",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 203,
+   "bet": "Rinderknech ML +203",
+   "placed": "2026-10-31T16:14:05Z",
+   "stake": 0.25,
+   "edge": 9.0,
+   "ev": 0.0026,
+   "event": "Rolex Paris Masters",
+   "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186454",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Rublev",
+   "a": "Etcheverry",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 239,
+   "bet": "Etcheverry ML +239",
+   "placed": "2026-10-31T15:24:03Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0015,
+   "event": "Rolex Paris Masters",
+   "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186474",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Halys",
+   "a": "Fery",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 133,
+   "bet": "Fery ML +133",
+   "placed": "2026-10-31T18:36:17Z",
+   "stake": 0.25,
+   "edge": 7.9,
+   "ev": 0.0016,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186587",
    "k": "2026-11-03T10:00:00Z",
    "slate": "tennis:2026-11-03",
@@ -12912,6 +12791,130 @@
    "close": 0.3425
   },
   {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186467",
+   "k": "2026-11-03T11:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Fokina",
+   "a": "Kouame",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -292,
+   "bet": "Fokina ML -292",
+   "placed": "2026-11-01T12:04:16Z",
+   "stake": 2.0,
+   "edge": 14.2,
+   "ev": 0.0206,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186568",
+   "k": "2026-11-03T11:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Yamaguchi",
+   "a": "Kulambayeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 163,
+   "bet": "Kulambayeva ML +163",
+   "placed": "2026-11-02T06:55:27Z",
+   "stake": 0.25,
+   "edge": 7.4,
+   "ev": 0.0036,
+   "event": "Chennai Open",
+   "pass": false,
+   "clvRet": -0.0203,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.3725
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186458",
+   "k": "2026-11-03T13:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Djokovic",
+   "a": "Vacherot",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 199,
+   "bet": "Vacherot ML +199",
+   "placed": "2026-11-02T13:53:33Z",
+   "stake": 0.75,
+   "edge": 8.4,
+   "ev": 0.0171,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186451",
+   "k": "2026-11-03T14:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Michelsen",
+   "a": "Lehecka",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -141,
+   "bet": "Lehecka ML -141",
+   "placed": "2026-11-01T17:12:52Z",
+   "stake": 0.5,
+   "edge": 7.2,
+   "ev": 0.0031,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186470",
+   "k": "2026-11-03T16:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Struff",
+   "a": "Gea",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -115,
+   "bet": "Gea ML -115",
+   "placed": "2026-11-02T11:04:11Z",
+   "stake": 0.25,
+   "edge": 7.0,
+   "ev": 0.003,
+   "event": "Rolex Paris Masters",
+   "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186477",
+   "k": "2026-11-03T18:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Shelton",
+   "a": "Norrie",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 245,
+   "bet": "Norrie ML +245",
+   "placed": "2026-11-02T23:59:11Z",
+   "stake": 0.25,
+   "edge": 7.3,
+   "ev": 0.0046,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
    "rule": "cfb-total",
    "sport": "cfb",
    "id": "401866453",
@@ -12931,6 +12934,26 @@
    "event": null,
    "pass": true,
    "close": 51.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186616",
+   "k": "2026-11-04T05:00:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Ruzic",
+   "a": "Charaeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -125,
+   "bet": "Charaeva ML -125",
+   "placed": "2026-11-01T12:38:52Z",
+   "stake": 0.25,
+   "edge": 8.2,
+   "ev": 0.0001,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
   },
   {
    "rule": "cfb-total",
