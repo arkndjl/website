@@ -493,14 +493,14 @@ def study_pistol_value(maps):
     return obj
 
 
-# ---------- study 3b: CT-first vs T-first per map ----------
+# ---------- study 3b: CT-first vs T-first per map (shown from the T-first team) ----------
 def study_side_first(maps):
     bym = defaultdict(list)
     for m in maps:
         R = m["rounds"]
         ctf = next(t for t, s in m["first"].items() if s == "CT")
         p = m["elo"].get(ctf)
-        bym[m["map"]].append((int(m["winner"] == ctf), p, m["begin"]))
+        bym[m["map"]].append((int(m["winner"] != ctf), None if p is None else 1 - p, m["begin"]))
     pts, rows = [], []
     allr = [r for v in bym.values() for r in v]
     for mp, rs in sorted(bym.items(), key=lambda kv: -len(kv[1])):
@@ -526,24 +526,24 @@ def study_side_first(maps):
     obj = {
         "id": "cs2-side-first", "sport": "CS2",
         "question": "Which side should a team start on, map by map?",
-        "answer": (f"Start T. T-first teams win {pct(1 - eall[0])} of maps; {pct(1 - worst[1][0])} on {worst[0][3:]}, "
-                   f"{pct(1 - best[1][0])} on {best[0][3:]}."),
+        "answer": (f"Start T. T-first teams win {pct(eall[0])} of maps; {pct(best[1][0])} on {best[0][3:]}, "
+                   f"{pct(worst[1][0])} on {worst[0][3:]}."),
         "findings": [
-            f"All maps: CT-first team wins {pct(eall[0])} ({pct(eall[1])}-{pct(eall[2])}, n={len(allr):,}).",
-            f"{best[0][3:]}: CT-first {pct(best[1][0])} ({pct(best[1][1])}-{pct(best[1][2])}, n={best[2]:,}).",
-            f"{worst[0][3:]}: CT-first {pct(worst[1][0])} ({pct(worst[1][1])}-{pct(worst[1][2])}, n={worst[2]:,}).",
-            f"CI excludes 50% on {', '.join(r[0][3:] for r in sig) or 'none'}. Elo-adjusted CT-first: "
+            f"All maps: T-first team wins {pct(eall[0])} ({pct(eall[1])}-{pct(eall[2])}, n={len(allr):,}).",
+            f"{best[0][3:]}: T-first {pct(best[1][0])} ({pct(best[1][1])}-{pct(best[1][2])}, n={best[2]:,}).",
+            f"{worst[0][3:]}: T-first {pct(worst[1][0])} ({pct(worst[1][1])}-{pct(worst[1][2])}, n={worst[2]:,}).",
+            f"CI excludes 50% on {', '.join(r[0][3:] for r in sig) or 'none'}. Elo-adjusted T-first: "
             f"{pp(sum(r[3] * r[2] for r in rows) / sum(r[2] for r in rows))}.",
         ],
-        "method": ("Map win % of the team that started CT, Wilson CIs. Side choice is not random (pick/veto), so "
+        "method": ("Map win % of the team that started T, Wilson CIs. Side choice is not random (pick/veto), so "
                    "Elo-expected wins are subtracted as a check on team strength."),
         "data": data_line(maps),
         "n": len(allr), "robust": bool(sig), "interest": 3,
-        "split_check": (f"CT-first win %: early {pct(sp[0][0][0])} (n={sp[0][1]:,}), late {pct(sp[1][0][0])} "
+        "split_check": (f"T-first win %: early {pct(sp[0][0][0])} (n={sp[0][1]:,}), late {pct(sp[1][0][0])} "
                         f"(n={sp[1][1]:,})."),
-        "chart": {"type": "bar", "title": "Map win % for the team starting CT", "x_label": "map",
+        "chart": {"type": "bar", "title": "Map win % for the team starting T", "x_label": "map",
                   "y_label": "map win %", "y_fmt": "pct", "x_reverse": False, "ref": {"y": 0.5, "label": "50%"},
-                  "mark": None, "series": [{"name": "CT first", "points": pts}]},
+                  "mark": None, "series": [{"name": "T first", "points": pts}]},
     }
     obj["_detail"] = {"elo_excess": {r[0]: r3(r[3]) for r in rows}}
     return obj
