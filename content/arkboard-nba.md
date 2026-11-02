@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: NBA XPM and games" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:XPM leaders,projections,contract value,rookies,ARKLIST|rosters:depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds" side="true" label="NBA views" >}}
+{{< wintabs groups="players:XPM leaders,projections,contract value,rookies,ARKLIST|rosters:depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds,offense,defense" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM :: leaderboard" tab="XPM leaders" >}}
 {{< pctl sport="nba" icon="hoop" title="projections :: VORX and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< nbasurplus title="contract value :: surplus over salary" tab="contract value" >}}
@@ -22,5 +22,11 @@ cover = "/og/nba.png"
 {{< nbagametable title="game table" tab="game table" >}}
 {{< nbapower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nbasim title="season odds" tab="season odds" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="nba" view="offense" title="offense :: points a 100 possessions, four factors" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="nba" view="defense" title="defense :: points allowed a 100 possessions, four factors" tab="defense" >}}
+{{< /lazytab >}}
 {{< depthchart sport="nba" title="depth chart :: every team" tab="depth chart" >}}
 {{< /wintabs >}}

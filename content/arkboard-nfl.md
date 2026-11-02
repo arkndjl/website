@@ -11,12 +11,12 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: NFL WAR and games" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,projections,QB value,special teams,rookies,breakouts,ARKLIST|rosters:depth chart,personnel,backup watch|games:games,game table|teams:ARK Ranking,season odds,team WAR" side="true" label="NFL views" >}}
+{{< wintabs groups="players:WAR leaders,projections,QB value,specialists,rookies,breakouts,ARKLIST|rosters:depth chart,personnel,backup watch|games:games,game table|teams:ARK Ranking,season odds,team WAR,offense,defense,formations,special teams" side="true" label="NFL views" >}}
 {{< nflwar title="NFL WAR :: leaderboards" tab="WAR leaders" >}}
 {{< pctl sport="nfl" icon="football" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< nflteamwar title="team WAR :: by position group" tab="team WAR" >}}
 {{< nflqb title="QB value :: points a game over replacement QB" tab="QB value" >}}
-{{< streturners sport="nfl" title="special teams :: returners, yards over expected" tab="special teams" >}}
+{{< streturners sport="nfl" title="specialists :: returners, yards over expected" tab="specialists" >}}
 {{< rookies sport="nfl" icon="football" title="rookies :: WAR and XV against draft slot" tab="rookies" >}}
 {{< nflbreakouts title="breakouts :: young players, WAR over expected" tab="breakouts" >}}
 {{< backupwatch sport="nfl" title="backup watch :: 2nd/3rd string producing above the starter" tab="backup watch" >}}
@@ -25,6 +25,18 @@ cover = "/og/nfl.png"
 {{< nflgametable title="game table" tab="game table" >}}
 {{< nflpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nflsim title="season odds" tab="season odds" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="nfl" view="offense" title="offense :: EPA a play, opponent-adjusted" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="nfl" view="defense" title="defense :: EPA a play allowed, opponent-adjusted" tab="defense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="formations" >}}
+{{< teamunits sport="nfl" view="formations,fronts" title="formations" tab="formations" >}}
+{{< /lazytab >}}
+{{< lazytab tab="special teams" >}}
+{{< stteams sport="nfl" title="special teams :: points over expected a game" tab="special teams" >}}
+{{< /lazytab >}}
 {{< depthchart sport="nfl" title="depth chart :: every team" tab="depth chart" >}}
 {{< nflpersonnel title="personnel :: groupings, EPA and defensive packages" tab="personnel" >}}
 {{< /wintabs >}}
