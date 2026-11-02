@@ -384,6 +384,7 @@ def fit():
                          'mlH': g.get('mlH'), 'mlA': g.get('mlA'), 'oH': g.get('oH'), 'oA': g.get('oA'),
                          'tip': g['tip'], 'h': g['h'], 'a': g['a'], 'po': 1 if g['t'] == 3 else 0,
                          'tm': None if np.isnan(tm) else round(float(tm), 2), 'T': g.get('T'), 'tot': g['hs'] + g['as']})
+    os.makedirs(os.path.join(N.ROOT, 'scripts', '.cache', 'nba'), exist_ok=True)   # a fresh checkout (scheduled refit) has no cache
     with open(os.path.join(N.ROOT, 'scripts', '.cache', 'nba', 'wf_preds.json'), 'w') as f:
         json.dump(rows, f)
     return out

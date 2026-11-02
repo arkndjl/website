@@ -73,6 +73,17 @@ jobs:
             scripts/.cache/cbb/espn_box
           key: cbb-bt-none
           restore-keys: cbb-bt-
+      - if: contains(matrix.cache, 'tennis-')
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/tennis/sack
+          key: tennis-sack-v1
+      - if: contains(matrix.cache, 'tennis-')
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/tennis/espn
+          key: tennis-espn-none
+          restore-keys: tennis-espn-
       - name: Refit ${{ matrix.job }}
         run: python3 scripts/refit.py run ${{ matrix.job }}
       - name: Pack the kept files
@@ -149,7 +160,7 @@ jobs:
           python3 scripts/games_picks.py --fit && python3 scripts/games_picks.py --rules && python3 scripts/units.py --fit
       - name: Commit
         run: |
-          git add -A data
+          git add data/games_picks_fit.json data/games_picks_rules.json data/units_fit.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1
