@@ -1,0 +1,86 @@
+{{- /* Special teams tab (Noah, Nov 2 2026): kick and punt returners, ranked by return yards over expected a return,
+       shrunk for sample. data/st_returners_<sport>.json from scripts/st_returners.py (NFL job: nfl.yml; CFB: cfb-board.yml).
+       sport="nfl"|"cfb". Two views (KR, PR) on chips, one shown at a time. Phones keep rank, player, Ret, Avg and Adj. */ -}}
+{{- $sport := .Get "sport" | default "nfl" }}
+{{- $feed := printf "st_returners_%s" $sport }}
+{{- with index site.Data $feed -}}
+{{- $d := . }}{{ $col := eq $sport "cfb" }}
+{{- $date := lower ((time .asof).Format "Jan 2") }}
+<div class="brk" data-brk{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="cfb__bar brk__weeks" role="group" aria-label="return type">
+    <span class="brk__lbl">view</span>
+    <button type="button" class="cfb__chip is-on" data-brk-w="kr" aria-pressed="true">kick returns</button>
+    <button type="button" class="cfb__chip" data-brk-w="pr" aria-pressed="false">punt returns</button>
+  </div>
+  {{- range $kind := slice "kr" "pr" }}
+  {{- $v := index $d $kind }}{{ $rows := $v.rows | default slice }}{{ $h := $v.h }}
+  {{- $lbl := cond (eq $kind "kr") "kick returns" "punt returns" }}
+  <div data-brk-pane="{{ $kind }}"{{ if ne $kind "kr" }} style="display:none"{{ end }}>
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · %s" ($.Get "title" | default "special teams") $lbl) "icon" "football" "filter" (cond $col "Pos,Team,Yr" "Pos,Team") "rerank" true "gfxCols" "RK,Player,Pos,Team,Ret,Avg,Adj" "gfxDate" (printf "%s · %v" $lbl $d.season) "gfxMax" "25") }}
+<table class="cfb__table bw brk__table">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
+    {{- if $col }}<th class="bw__x" title="class">Yr</th><th class="bw__x" title="future value, 20-80">FV</th>{{ end }}
+    <th title="returns: fielded and run back, or muffed; fair catches, touchbacks and plays with a penalty left out">Ret</th>
+    <th class="bw__x" title="return yards">Yds</th>
+    <th title="yards a return">Avg</th>
+    <th class="bw__x" title="longest return">Lng</th>
+    <th class="bw__x" title="return touchdowns">TD</th>
+    <th class="bw__x" title="fumbles lost">Fum</th>
+    <th class="bw__x" title="yards over expected a return: return yards minus the mean return from the same spot (5-yard bins, this season)">YOE</th>
+    <th title="YOE shrunk for sample: total yards over expected / (returns + {{ $h.k }}); the rank">Adj</th>
+    <th class="bw__x" title="Adj x returns: yards over expected, shrunk">Yds+</th>
+    <th class="bw__x" title="{{ if $col }}points over expected, total: drive points by field position at the end of the return (a TD 7, a lost fumble the other side's drive), minus the mean from the same spot{{ else }}EPA over expected, total: EPA from the receiving side minus the mean EPA of returns from the same spot{{ end }}">Pts</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    {{- if $col }}
+    <td class="cfb__name"><b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
+    <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
+    <td class="bw__x">{{ .cls }}</td>
+    <td class="cfb__num bw__x">{{ .fv }}</td>
+    {{- else }}
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
+    <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
+    {{- end }}
+    <td class="cfb__num">{{ .ret }}</td>
+    <td class="cfb__num bw__x">{{ .yds }}</td>
+    <td class="cfb__num" data-v="{{ .avg }}">{{ printf "%.1f" (float .avg) }}</td>
+    <td class="cfb__num bw__x">{{ .lng }}</td>
+    <td class="cfb__num bw__x">{{ .td }}</td>
+    <td class="cfb__num bw__x">{{ .fum }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .ryoe }}">{{ printf "%+.1f" (float .ryoe) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .sry }}"><span class="{{ if ge (float .sry) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.2f" (float .sry) }}</span></td>
+    <td class="cfb__num bw__x" data-v="{{ .val }}">{{ printf "%+.1f" (float .val) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .poe }}">{{ printf "%+.2f" (float .poe) }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+  {{- $rr := "" }}{{ with $h.r }}{{ $rr = printf " Year-to-year r of YOE a return: %.2f (%v returners with 8+ returns in both seasons)." (float .) $h.pairs }}{{ end }}
+  {{- $pr := "" }}{{ with $v.hp.r }}{{ $pr = printf " Points over expected a return: r %.2f." (float .) }}{{ end }}
+  {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" $feed "note" (printf "%v · through week %v · %v returns · ranked by Adj · updated %s" $d.season $d.note.week $v.ret $date)
+        "about" (printf "A return is a kick fielded and run back, or muffed; fair catches, touchbacks and plays with a penalty are left out. Expected = the mean return from the same spot (5-yard bins by season and kick type), so kick distance and hang are not credited to the returner. YOE = yards over expected a return. Adj = total YOE / (returns + %v): %v returns keep half the observed rate (k = noise variance / returner variance, fit on %v returner-seasons, this season and the two before; per-return SD %.1f yds, returner SD %.1f).%s%s Pts = %s. %v+ returns to be listed%s." $h.k $h.k $h.ps (float $h.sd) (float $h.tau) $rr $pr (cond $col (printf "drive points over expected, total (drive points: mean points on drives from that spot, own 25 %.1f, midfield %.1f; a TD 7)" (float $d.note.d25) (float $d.note.d50)) "nflverse EPA over expected, total, from the receiving side") (index $d.min $kind) (cond $col ", FBS players" ""))) }}
+  </div>
+  {{- end }}
+</div>
+<script>
+(function () {
+  document.querySelectorAll('[data-brk]').forEach(function (b) {
+    if (b.dataset.ready) return; b.dataset.ready = 1;
+    var chips = b.querySelectorAll('[data-brk-w]'), panes = b.querySelectorAll('[data-brk-pane]');
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        var w = c.getAttribute('data-brk-w');
+        chips.forEach(function (x) { var on = x === c; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        panes.forEach(function (p) { p.style.display = p.getAttribute('data-brk-pane') === w ? '' : 'none'; });
+      });
+    });
+  });
+})();
+</script>
+{{- end -}}
