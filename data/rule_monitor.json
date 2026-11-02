@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T18:54:33Z",
+ "asof": "2026-11-02T20:33:33Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1102,7 +1102,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 52,
+   "n": 54,
    "clvN": 3,
    "clvRet": 0.3246,
    "clvT": null,
@@ -1187,19 +1187,19 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 64,
-   "clvN": 0,
-   "clvRet": null,
+   "n": 66,
+   "clvN": 1,
+   "clvRet": 0.0715,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
+   "days": 1,
+   "beat": 1.0,
+   "settled": 1,
    "w": 0,
-   "l": 0,
-   "roi": null,
+   "l": 1,
+   "roi": -1.0,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 1,
+    "clvRet": 0.0715,
     "clvT": null
    },
    "exp": {
@@ -1208,12 +1208,17 @@
     "roi": 0.064,
     "n": 7154
    },
+   "vsExp": {
+    "gap": 0.0222,
+    "z": 0.2,
+    "read": "in line"
+   },
    "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": 0.0715,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1114,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1222,35 +1227,41 @@
     "why": "",
     "drift": {
      "mu1": 0.0246,
-     "n": 0,
+     "n": 1,
      "sd": 0.1114,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": 0.118,
+     "info": 0.05,
+     "real": 2.901,
+     "realSe": 4.519,
      "need": 120
     }
    },
    "drift": {
     "mu1": 0.0246,
-    "n": 0,
+    "n": 1,
     "sd": 0.1114,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
+    "llr": 0.118,
+    "info": 0.05,
+    "real": 2.901,
+    "realSe": 4.519,
     "need": 120,
-    "path": []
+    "path": [
+     [
+      "2026-11-02",
+      1,
+      0.118
+     ]
+    ]
    }
   },
   {
@@ -2138,13 +2149,13 @@
    "sport": "cbb",
    "mk": "total",
    "label": "CBB total",
-   "n": 0,
-   "du": 0,
-   "clvRet": null,
+   "n": 1,
+   "du": 0.25,
+   "clvRet": 0.0715,
    "clvT": null,
-   "flat": null,
-   "adds": null,
-   "expEdge": null,
+   "flat": 0.0715,
+   "adds": 0.0,
+   "expEdge": 0.0143,
    "basis": "backtest"
   },
   {
