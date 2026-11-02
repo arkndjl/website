@@ -41,6 +41,8 @@ Result (Nov 1 2026; size = raw effect with team-season FE, priced = the close's 
          Nothing vs the close (B2B tune +0.3, held -0.5).
   CBB    played yesterday -1.4 (close -1.3); vs the wf model -1.2 / -2.2, but in the model (cbb_games candidate b2bd)
          2016-20 t -0.03, 2021-26 t -2.2: held-out only, not shipped. Vs close tune t -1.0, held t -2.3: re-score.
+         Nov 2 re-score on et_date UTC-8 (rest_dates_research.py): b2bd vs the refit wf model tune t -0.24, held
+         -2.62 (walk 2/4, 5/6 seasons): still fails tune. No other model reads rest off UTC dates.
   NHL    B2B -0.30 goals (close prices -3.3 pts of win chance); held 2022-26 B2B teams under the close 4.3 pts
          (t -3.3, held SE t -2.6), tune (closes 2020-21 only) -1.8 (t -0.6): fails tune, re-score after 2026-27.
   soccer 4-5 days off -0.085 goals (close ~0): passes vs close and model; SHIPPED soccer_games r45 -.02 (both
