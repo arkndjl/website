@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-02T00:47:07Z",
+ "asof": "2026-11-02T01:04:03Z",
  "recenter": {
   "2026-11-01": 0.3,
   "2026-11-02": 0.24
@@ -348,33 +348,6 @@
    "close": 220.5,
    "pass": true,
    "now": null
-  },
-  {
-   "id": "401909904",
-   "espn": "401909904",
-   "sport": "nba",
-   "kick": "2026-11-01T22:00:00Z",
-   "home": "IND",
-   "away": "BKN",
-   "mk": "total",
-   "side": "over",
-   "line": 229.5,
-   "price": -104.0,
-   "p": 0.543,
-   "ev": 0.065,
-   "units": 0.25,
-   "edge": 3.0,
-   "x": 3.0,
-   "pDU": 0.5113,
-   "evDU": 0.0029,
-   "m": 3.7,
-   "tm": 232.5,
-   "tmRaw": 232.8,
-   "flagged": "2026-11-01T16:28:36Z",
-   "betTo": 229.0,
-   "close": 229.5,
-   "pass": true,
-   "now": null
   }
  ],
  "withdrawn": [],
@@ -388,7 +361,7 @@
    "mk": "total",
    "side": "over",
    "line": 220.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 2.8,
    "x": 3.0,
    "why": "edge under 3",
@@ -404,7 +377,7 @@
    "mk": "total",
    "side": "over",
    "line": 223.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 1.9,
    "x": 3.0,
    "why": "edge under 3",
@@ -420,7 +393,7 @@
    "mk": "spread",
    "side": "away",
    "line": 11.5,
-   "price": -104.0,
+   "price": 102.0,
    "edge": 0.9,
    "x": 3.0,
    "why": "edge under 3 (line: 9-15)",
@@ -433,7 +406,7 @@
    "mk": "total",
    "side": "over",
    "line": 220.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -445,7 +418,7 @@
    "mk": "total",
    "side": "over",
    "line": 223.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -457,7 +430,7 @@
    "mk": "spread",
    "side": "away",
    "line": 11.5,
-   "price": -104.0,
+   "price": 102.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -518,7 +491,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1177,
+  "snapshots": 1180,
   "buckets": [
    {
     "when": "24h+",
@@ -3236,19 +3209,28 @@
    "flagged": "2026-11-01T16:28:36Z",
    "betTo": 229.0,
    "close": 229.5,
-   "pass": true
+   "pass": true,
+   "score": [
+    98.0,
+    90.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": -0.0192,
+   "clv": 0.0,
+   "beat": 0
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-01": {
-    "raw": 7.25,
+    "raw": 6.75,
     "scale": 1.0
    },
    "2026-11-02": {
-    "raw": 122.0,
-    "scale": 0.3279
+    "raw": 123.25,
+    "scale": 0.3245
    },
    "2026-11-03": {
     "raw": 6.25,
@@ -3259,11 +3241,11 @@
     "scale": 1.0
    },
    "2026-11-06": {
-    "raw": 4.5,
+    "raw": 5.0,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 10.25,
+    "raw": 11.0,
     "scale": 1.0
    }
   }
