@@ -131,7 +131,7 @@ def parse(pbp, box=None):
     # who is who: sub lines carry the team; action lines vote
     vote = defaultdict(Counter)
     disp = {}
-    tkeys = {N.key(x) for pf in prefixes.values() for x in pf} | {'team', 'tm', 'tv'}
+    tkeys = {N.key(y) for pf in prefixes.values() for x in pf for y in (x, re.sub(r'\s*\(.*?\)', '', x))} | {'team', 'tm', 'tv'}
 
     def nm(raw, tid=None):
         k = N.key(raw)
@@ -211,6 +211,12 @@ def parse(pbp, box=None):
             for k in on[tid]:
                 if (tid, k) not in first and len(s) < 5:
                     s.add(k)
+            if len(s) != 5 and p > 1 and len(on[tid]) == 5:
+                # the five who ended the last period, changed by the subs logged at this period's opening clock
+                s = set(on[tid])
+                for e in ev:
+                    if e['p'] == p and 'sub' in e and e['sub'][1] == tid and e['t'] == period_start(p):
+                        (s.add if e['sub'][0] == 'in' else s.discard)(e['sub'][2])
             if len(s) != 5:
                 return f'start{p}:{len(s)}'
             st[tid] = s
@@ -253,9 +259,47 @@ def parse(pbp, box=None):
             bad += max(0.0, secs)
         acc = None
 
+    # each player's entries in order, to mend a missed substitution line
+    occ = defaultdict(list)
+    for i, e in enumerate(ev):
+        if 'sub' in e:
+            occ[(e['sub'][1], e['sub'][2])].append((i, e['sub'][0]))
+        elif 'act' in e and e['act'][0]:
+            occ[e['act']].append((i, 'act'))
+
+    def nxt(tid, k, i):
+        for j, kind in occ.get((tid, k), ()):
+            if j > i:
+                return j, kind
+        return None, None
+
+    def mend(tid, i, group):
+        """after the subs at one clock a team has 4 or 6 on the floor: a line was missed. Six: take off the one whose
+        next entry is a sub in (else the one seen latest again, or never). Four: put on the one whose next entry is
+        an action or a sub out, soonest"""
+        s = cur[tid]
+        while len(s) > 5:
+            cand = [k for k in s if k not in group]
+            if not cand:
+                break
+            def score(k):
+                j, kind = nxt(tid, k, i)
+                return (0 if kind == 'in' else 1, -(j if j is not None else 10 ** 9))
+            s.discard(min(cand, key=score))
+        if len(s) < 5:
+            pool = [k for (t, k) in occ if t == tid and k not in s and k not in group]
+            opts = []
+            for k in pool:
+                j, kind = nxt(tid, k, i)
+                if kind in ('act', 'out') and ev[j]['p'] == ev[i]['p']:
+                    opts.append((j, k))
+            for _, k in sorted(opts)[:5 - len(s)]:
+                s.add(k)
+
     hs = vs = 0
     lastp = None
-    for e in ev:
+    group = defaultdict(set)
+    for i, e in enumerate(ev):
         if e['p'] != lastp:
             if acc is not None:
                 close(period_start(lastp) + period_len(lastp), hs, vs)
@@ -274,8 +318,16 @@ def parse(pbp, box=None):
             if acc is not None and (e['t'] > acc['t0'] or hs != acc['hs'] or vs != acc['vs']):
                 close(e['t'], hs, vs)
             (cur[tid].add if io == 'in' else cur[tid].discard)(k)
+            if io == 'in':
+                group[tid].add(k)
             if acc is None:
                 acc = dict(t0=e['t'], hs=hs, vs=vs)
+            last_of_group = i + 1 >= len(ev) or 'sub' not in ev[i + 1] or ev[i + 1]['t'] != e['t']
+            if last_of_group:
+                for t in (home, away):
+                    if len(cur[t]) != 5:
+                        mend(t, i, group[t])
+                group = defaultdict(set)
     if acc is not None and lastp:
         close(period_start(lastp) + period_len(lastp), hs, vs)
     total = sum(s[0] for s in stints)
@@ -361,7 +413,7 @@ def save(season, games):
     os.replace(tmp, cache_path(season))
 
 
-def pull(season, upto=None, workers=3, log=True, budget=None):
+def pull(season, upto=None, workers=3, log=True, budget=None, retry=False):
     """fetch the season's final games not yet read. Scoreboards older than 3 days are kept (CACHE/<season>_sb.json),
     so a daily run asks for the last few days only. budget: seconds to spend fetching games (the rest wait for the
     next run)"""
@@ -388,9 +440,9 @@ def pull(season, upto=None, workers=3, log=True, budget=None):
                 sbc[ds] = day
         for gid, h, a in day:
             old = games.get(gid)
-            if old and 'stints' in old:
+            if old and 'stints' in old and not (retry and old.get('bad', 0) > 30):
                 continue
-            if old and old.get('err') and d < today - dt.timedelta(days=3):
+            if old and old.get('err') and d < today - dt.timedelta(days=3) and not (retry and old['err'].startswith('start')):
                 continue                    # an old miss stays a miss
             todo.append((gid, dict(date=ds, h=h, a=a)))
     os.makedirs(CACHE, exist_ok=True)
@@ -568,7 +620,7 @@ def main():
     a = sys.argv[1:]
     if '--pull' in a:
         S = int(a[a.index('--pull') + 1])
-        pull(S)
+        pull(S, retry='--retry' in a)
     elif '--daily' in a:
         today = dt.date.today()
         if today >= dt.date(LIVE_SEASON - 1, 11, 1):
