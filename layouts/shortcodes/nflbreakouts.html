@@ -5,6 +5,8 @@
 {{- with site.Data.nfl_breakouts -}}
 {{- $d := . }}{{ $last := int .week }}
 {{- $date := lower ((time .asof).Format "Jan 2") }}
+{{- $rk := "a rookie starts at his group's newcomer rate" }}
+{{- with site.Data.nfl_rookie_prior }}{{ if .ship }}{{ $rk = printf "a rookie starts on his draft slot's rate: a + b x ln(pick) by position group, undrafted at pick %v, fit on %v rookie seasons %v-%v; held out by season it cut the rookie-season error %.1f%% against the group mean (t %v)" .udfa .n (index .years 0) (index .years 1) (mul 100 (sub 1 (float .test.err_ratio))) .test.t }}{{ end }}{{ end }}
 <div class="brk" data-brk{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="cfb__bar brk__weeks" role="group" aria-label="week">
     <span class="brk__lbl">week</span>
@@ -19,7 +21,7 @@
 <table class="cfb__table bw brk__table">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
-    <th class="bw__x" title="NFL season: R = rookie">Yr</th>
+    <th class="bw__x" title="NFL season: R = rookie, with his draft pick (U = undrafted)">Yr</th>
     <th class="bw__x" title="opponent">Opp</th>
     <th class="bw__x" title="snaps in the game">Snaps</th>
     <th class="brk__war" title="the board's WAR for the game: WAR through the week minus WAR before it">WAR</th>
@@ -36,7 +38,7 @@
     <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b>{{ with .age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}<span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }} · {{ .ha }} {{ .op }}</span></td>
     <td class="brk__pt">{{ .pos }}</td>
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
-    <td class="bw__x">{{ .yr }}</td>
+    <td class="bw__x">{{ .yr }}{{ if ne .pk nil }} <span class="cfb__dim">{{ cond (gt (int .pk) 0) (printf "#%v" .pk) "U" }}</span>{{ end }}</td>
     <td class="bw__x">{{ .ha }} {{ .op }}</td>
     <td class="cfb__num bw__x">{{ .sn }}</td>
     <td class="cfb__num brk__war" data-v="{{ .war }}">{{ printf "%+.3f" (float .war) }}</td>
@@ -50,7 +52,7 @@
   </tbody>
 </table>
   {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "nfl_breakouts" "note" (printf "week %v · ranked by WAR over expected · updated %s" $w $date)
-        "about" (printf "Young: a rookie, a player in his first three seasons, or %v and under. A game's WAR is the board's (WAR through the week minus WAR before it). xWAR = his WAR rate a snap before the week (the projections' rate: last three seasons at 1 / .7 / .5, shrunk toward his position group, then updated with the season so far; a rookie starts at his group's newcomer rate) x his snaps in the game. +WAR = WAR - xWAR, the rank. z = +WAR over the spread of a game's WAR over expected at his snaps, fit on every player-week this season; z is large on few snaps. Top %v a week with %v+ snaps." $d.age $d.top $d.min)) }}
+        "about" (printf "Young: a rookie, a player in his first three seasons, or %v and under. A game's WAR is the board's (WAR through the week minus WAR before it). xWAR = his WAR rate a snap before the week (the projections' rate: last three seasons at 1 / .7 / .5, shrunk toward his position group, then updated with the season so far; %s) x his snaps in the game. +WAR = WAR - xWAR, the rank. z = +WAR over the spread of a game's WAR over expected at his snaps, fit on every player-week this season; z is large on few snaps. Top %v a week with %v+ snaps." $d.age $rk $d.top $d.min)) }}
   </div>
   {{- end }}
 </div>

@@ -10,7 +10,8 @@ board's AV + XV blend and replacement accrues with the snaps he played that week
 
 Expected WAR for the week = his rate before the week x his snaps that week. The rate is the percentile projections' WAR rate
 (scripts/player_pctl.py, data/pctl_fit_nfl.json): his last three seasons (Marcel 1 / .7 / .5) shrunk toward his group's rate,
-then updated with the season before the week (normal-normal). A rookie with no NFL snaps starts at his group's newcomer rate.
+then updated with the season before the week (normal-normal). A rookie starts on his draft slot's line (scripts/nfl_rookie_prior.py:
+rate = a[group] + b[group] x ln(pick), undrafted at pick 300), or at his group's newcomer rate if that line fails its test.
 SD = sqrt(noise a snap x snaps + rate variance x snaps^2), so z = (WAR - expected) / SD.
 
 Ranked by WAR over expected (wins). z is shown beside it: a high z on few snaps is a small sample.
@@ -80,6 +81,18 @@ def build():
     Rp = fit['rates']['war']
     R = P.Rate('value', Rp['K'], Rp['mu'], Rp['var'])
     H = P._load_hist('nfl')
+    # rookies: the draft-slot line (scripts/nfl_rookie_prior.py) in place of the group's newcomer mean, when it passed
+    RP = {}
+    try:
+        RP = json.load(open(os.path.join(ROOT, 'data', 'nfl_rookie_prior.json')))
+        RP = RP if RP.get('ship') else {}
+    except (OSError, ValueError):
+        pass
+    picks = {}
+    if RP:
+        for r in W.rows(W.get('draft_picks.csv', W.REL + '/draft_picks/draft_picks.csv')):
+            if r['season'] == str(y) and r['pfr_player_id'] and r['pick'].isdigit():
+                picks[r['pfr_player_id']] = int(r['pick'])
     boards = {1: {}}
     for w in range(2, week + 2):
         out, _, _ = W.board(y, thru=w)
@@ -109,6 +122,10 @@ def build():
             best[pid] = war if prev_best is None else max(prev_best, war)
             grp = p['_g']
             m0, vet = R.prior(P.hist_of(H, y, pid, 'war'), grp)
+            rookie = p.get('rook') or str(p.get('exp')) == '0'
+            if RP and rookie and not vet and grp in RP['coef']:
+                a_, b_ = RP['coef'][grp]
+                m0 = a_ + b_ * math.log(picks.get(pid, RP['udfa']))
             frac = max(0, tl - teams_before.get(p['t'], 0)) / tl
             loc, _ = P._cal(fit, 'war', frac)
             m1, _, _ = R.post(m0 + loc, grp, vet, b.get('_war', 0.0), b.get('sn', 0))
@@ -128,7 +145,7 @@ def build():
             elif b.get('g', 0) and b['sn'] / b['g'] < 0.6 * sn:
                 notes.append(f"snaps up from {b['sn'] / b['g']:.0f} a game")
             exp = str(p.get('exp', ''))
-            rows_w.append({'n': p['n'], 'id': pid, 't': p['t'], 'ha': ha, 'op': op, 'pos': p['pos'], 'age': p.get('age'),
+            rows_w.append({'n': p['n'], 'id': pid, **({'pk': picks.get(pid, 0)} if rookie and RP else {}), 't': p['t'], 'ha': ha, 'op': op, 'pos': p['pos'], 'age': p.get('age'),
                            'yr': 'R' if p.get('rook') or exp == '0' else (int(exp) + 1 if exp.isdigit() else None),
                            'col': p.get('col', ''), 'sn': int(sn), 'war': round(war, 3), 'x': round(x, 3), 'ov': round(war - x, 3),
                            'rk': rank_all[pid], 'line': line(grp, st), 'note': '; '.join(notes), **({'ph': p['ph']} if p.get('ph') else {})})
