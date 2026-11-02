@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-02T00:39:59Z",
+ "asof": "2026-11-02T00:47:07Z",
  "recenter": {
-  "2026-11-01": 0.28,
+  "2026-11-01": 0.3,
   "2026-11-02": 0.24
  },
  "monitor": {
@@ -388,7 +388,7 @@
    "mk": "total",
    "side": "over",
    "line": 220.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 2.8,
    "x": 3.0,
    "why": "edge under 3",
@@ -401,13 +401,13 @@
    "kick": "2026-11-02T02:00:00Z",
    "home": "LAL",
    "away": "TOR",
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
-   "price": -104.0,
-   "edge": 1.2,
-   "x": 4.0,
-   "why": "edge under 4 (line: <4)",
+   "mk": "total",
+   "side": "over",
+   "line": 223.5,
+   "price": -102.0,
+   "edge": 1.9,
+   "x": 3.0,
+   "why": "edge under 3",
    "m": 2.3,
    "tm": 225.4
   },
@@ -433,7 +433,7 @@
    "mk": "total",
    "side": "over",
    "line": 220.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -442,11 +442,11 @@
    "state": "under"
   },
   "401909906": {
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
-   "price": -104.0,
-   "edge": 1.2,
+   "mk": "total",
+   "side": "over",
+   "line": 223.5,
+   "price": -102.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "LAL",
@@ -518,7 +518,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1174,
+  "snapshots": 1177,
   "buckets": [
    {
     "when": "24h+",
@@ -3247,8 +3247,8 @@
     "scale": 1.0
    },
    "2026-11-02": {
-    "raw": 112.25,
-    "scale": 0.3563
+    "raw": 122.0,
+    "scale": 0.3279
    },
    "2026-11-03": {
     "raw": 6.25,
@@ -3263,7 +3263,7 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 10.75,
+    "raw": 10.25,
     "scale": 1.0
    }
   }
