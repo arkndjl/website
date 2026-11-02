@@ -95,7 +95,41 @@ def espn_depth(league):
                 out.append((t['abbreviation'], u.get('name') or '', slot,
                             [(a.get('displayName'), a.get('id'), espn_inj(a)) for a in v.get('athletes') or []]))
         time.sleep(0.15)
-    return out
+    return hold_starters(league, out)
+
+
+# ---------------------------------------------------------------- injured starters (Noah, Nov 2 2026)
+# ESPN drops an injured starter down his slot (Lamar Jackson, out, listed 3rd behind Tyler Huntley). The chart keeps
+# him first with his injury tag, and the healthy player ESPN moved up is tagged a fill-in. data/depth_starters_<sport>.json
+# remembers each chart slot's starter, the first name the last time ESPN listed someone first without an out-type status;
+# a remembered starter listed lower with any injury status goes back to the top. A healthy starter listed lower was
+# demoted by the team and is replaced.
+HURT = {'O', 'IR', 'D', 'SUSP', 'PUP', 'NFI', 'OUT'}         # a status ESPN demotes for; Q/P/DTD starters stay first
+FILL = set()                                                    # (ESPN abbreviation, slot, name) of each fill-in
+
+
+def hold_starters(league, charts):
+    path = os.path.join(ROOT, 'data', f"depth_starters_{league.split('/')[-1]}.json")
+    try:
+        M = json.load(open(path))
+    except Exception:
+        M = {}
+    for tm, chart, slot, ath in charts:
+        if not ath:
+            continue
+        k = f'{tm}|{chart}|{slot}'
+        st = M.get(k)
+        i = next((j for j, a in enumerate(ath) if st and NM.key(a[0]) == NM.key(st)), None)
+        if i and ath[i][2]:
+            FILL.add((tm, slot, ath[0][0]))
+            ath.insert(0, ath.pop(i))
+        elif ath[0][2] not in HURT:
+            M[k] = ath[0][0]
+    try:
+        json.dump(M, open(path, 'w'), indent=0, sort_keys=True)
+    except Exception as e:
+        print('depth starters not saved:', e)
+    return charts
 
 
 def r1(x): return None if x is None else round(x, 1)
@@ -196,7 +230,7 @@ def espn_depth_teams(charts, grade, team_of, layout, deep, group_of, need, logo,
                 for nm, _, inj in ath[:deep(slot)]:
                     gr = grade(nm, t, slot)
                     g, n = (gr['g'], gr['n']) if gr else (None, 0)
-                    row = [nm, g, n or None, inj, None, None]
+                    row = [nm, g, n or None, inj, 'fill-in' if (tm, slot, nm) in FILL else None, None]
                     pl.append(row)
                     pcts.append((group_of(slot), (t, NM.key(nm)), g, n or 0, row))
                 ss.append([lab, pl])
