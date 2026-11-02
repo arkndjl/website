@@ -19,6 +19,15 @@ Tests (walk-forward: an input for a game uses only games before its date, or the
   c. player     last-season shrunk on-off next to last-season BPM for next-season BPM (players with 300+ min both)
   d. garbage    margin term: a team's net to date with garbage time (2nd half or OT, margin 20+ when the stint began)
                 taken out, minus its full net to date
+
+Result (Nov 2 2026, seasons 2025 (50% of games have subs) and 2026 (98%); tune 2025, held 2026): nothing passes.
+  validate   stint minutes within 2 of Barttorvik's: 99.7% (2025), 99.2% (2026) of player-games; NCAA box 99.5 / 99.0%
+  onoff_inj  w .25 / .5 / 1: tune t -0.5, held 2026 t +1.4 / +1.4 / +1.6 (worse). FAILED
+  cont       2026 only (needs last season's pairs): coef fit on the first half of dates, held second half t -0.4. FAILED
+  garbage    fit on 2025 t -1.5 (in sample), held 2026 t +0.3. FAILED
+  pri_oo     2026 only: residual corr .09, 5-fold-by-team MAE -.034 on 4.47 (every split better). One season, no
+             held-out season: a lead, retest when 2026-27 ends (2027 prior from 2026 on/off)
+  player     next-season BPM, 1,504 players 2025 -> 2026: MAE 2.016 -> 2.015, t -0.4, R2 .5167 -> .5168. FAILED
 """
 import os
 os.environ.setdefault('OMP_NUM_THREADS', '1')
@@ -363,7 +372,7 @@ def main():
         if s - 1 in LG:
             pp = defaultdict(float)
             for g in LG[s - 1].values():
-                if 'stints' not in g:
+                if 'stints' not in g or None in g['players'][g['home']] + g['players'][g['away']]:
                     continue
                 for t, si in ((g['home'], 1), (g['away'], 2)):
                     nm_ = g['players'][t]
@@ -451,7 +460,7 @@ def main():
         # last season's minutes per (tid, name)
         mins_prev = defaultdict(float); team_min = defaultdict(float)
         for g in LG[s - 1].values():
-            if 'stints' not in g:
+            if 'stints' not in g or None in g['players'][g['home']] + g['players'][g['away']]:
                 continue
             for t, si in ((g['home'], 1), (g['away'], 2)):
                 for st in g['stints']:
@@ -478,6 +487,20 @@ def main():
         for s in sorted(set(Sx.tolist())):
             m = Sx == s
             res['pri_oo'][f'corr{s}'] = round(float(np.corrcoef(x[m], r[m])[0, 1]), 3)
+        # one season only: 5-fold by team (coef fit on 4/5 of the teams, the residual of the rest), 20 random splits
+        rng = np.random.default_rng(11)
+        dd = []
+        for rep in range(20):
+            fid = rng.integers(0, 5, len(r))
+            e0 = e1 = 0.0
+            for f in range(5):
+                tr, te = fid != f, fid == f
+                bb = float(x[tr] @ r[tr] / (x[tr] @ x[tr]))
+                e0 += np.abs(r[te]).sum(); e1 += np.abs(r[te] - bb * x[te]).sum()
+            dd.append((e1 - e0) / len(r))
+        res['pri_oo']['cvMaeD'] = round(float(np.mean(dd)), 4)
+        res['pri_oo']['cvShareBetter'] = round(float(np.mean(np.array(dd) < 0)), 2)
+        res['pri_oo']['residMae'] = round(float(np.abs(r).mean()), 3)
     print('pri_oo', res['pri_oo'], flush=True)
 
     # c. player: next-season BPM from last-season BPM (+ on/off)
@@ -519,6 +542,12 @@ def main():
                              t=round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2), coefOO=round(float(beta[2]), 4),
                              r2Bpm=round(1 - float(((p1 - yv) ** 2).mean() / yv.var()), 4), r2BpmOO=round(1 - float(((p2 - yv) ** 2).mean() / yv.var()), 4))
     print('player', res['player'], flush=True)
+    # Nov 2 2026 sample (30 random games a season: Dec 14, Jan 18, Feb 15) of games whose play-by-play has 20+ sub
+    # lines; the full pulls above give 2025 and 2026 exactly. ESPN / hoopR men's play-by-play has none in any season
+    res['coverage'] = {'source': 'ncaa.com game centre play-by-play via ncaa-api.henrygd.me',
+                       'sample': {2026: '30/30', 2025: '18/30', 2024: '0/30 (502)', 2023: '1/30', 2022: '1/30', 2021: '1/30',
+                                  2020: '0/30', 2019: '0/26', 2016: '0/1'},
+                       'full': {s: round(v['read'] / v['games'], 3) for s, v in res['seasons'].items()}}
     json.dump(res, open(OUT, 'w'), indent=1, default=lambda o: o.item() if hasattr(o, 'item') else str(o))
     print('wrote', OUT)
 

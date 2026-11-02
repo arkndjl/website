@@ -1,0 +1,153 @@
+{
+ "seasons": {
+  "2025": {
+   "games": 6347,
+   "read": 3191,
+   "errors": {
+    "nosubs": 3112,
+    "ok": 3191,
+    "start1:6": 12,
+    "nopbp": 21,
+    "start2:4": 5,
+    "start1:4": 5,
+    "start3:4": 1
+   },
+   "teamsMatched": 364,
+   "playersMatched": 4683,
+   "btMinutesWithin2": 0.9965,
+   "btN": 60208,
+   "boxMinutesWithin2": 0.9954,
+   "boxN": 56086
+  },
+  "2026": {
+   "games": 6320,
+   "read": 6218,
+   "errors": {
+    "ok": 6218,
+    "start1:8": 1,
+    "start1:6": 45,
+    "nopbp": 30,
+    "start1:3": 2,
+    "start1:4": 17,
+    "start1:7": 3,
+    "start2:6": 1,
+    "start2:4": 1,
+    "nosubs": 2
+   },
+   "teamsMatched": 366,
+   "playersMatched": 5024,
+   "btMinutesWithin2": 0.9922,
+   "btN": 109859,
+   "boxMinutesWithin2": 0.9901,
+   "boxN": 121305
+  }
+ },
+ "validate": {},
+ "availCopyMismatch": 0,
+ "split": {
+  "tune": [
+   2025
+  ],
+  "held": [
+   2026
+  ]
+ },
+ "onoff_inj": [
+  {
+   "w": 0.25,
+   "tuneD": -0.0004,
+   "tuneT": -0.53,
+   "tuneLinedT": -0.54,
+   "heldD": 0.0019,
+   "heldT": 1.32,
+   "heldLinedT": 1.34
+  },
+  {
+   "w": 0.5,
+   "tuneD": -0.0008,
+   "tuneT": -0.5,
+   "tuneLinedT": -0.51,
+   "heldD": 0.0036,
+   "heldT": 1.31,
+   "heldLinedT": 1.33
+  },
+  {
+   "w": 1.0,
+   "tuneD": -0.0014,
+   "tuneT": -0.47,
+   "tuneLinedT": -0.48,
+   "heldD": 0.0075,
+   "heldT": 1.55,
+   "heldLinedT": 1.57
+  }
+ ],
+ "cont": {
+  "seasons": [
+   2026
+  ],
+  "n": 4752,
+  "coef": 3.974,
+  "coefT": 2.13,
+  "tuneD": 0.0011,
+  "tuneT": 0.13,
+  "tuneN": 2389,
+  "heldD": -0.0037,
+  "heldT": -0.34,
+  "heldN": 2363,
+  "note": "one season with last season data: tune = its first half of dates, held = second half"
+ },
+ "garbage": {
+  "n": 7065,
+  "coef": 0.1794,
+  "coefT": 3.04,
+  "tuneD": -0.0199,
+  "tuneT": -1.54,
+  "tuneN": 2399,
+  "heldD": 0.0026,
+  "heldT": 0.22,
+  "heldN": 4666
+ },
+ "pri_oo": {
+  "n": 363,
+  "seasons": [
+   2026
+  ],
+  "coef": 0.071,
+  "coefT": 3.46,
+  "corr": 0.092,
+  "corr2026": 0.092,
+  "cvMaeD": -0.0336,
+  "cvShareBetter": 1.0,
+  "residMae": 4.472
+ },
+ "player": {
+  "n": 1504,
+  "pairs": [
+   2025.0
+  ],
+  "maeBpm": 2.0157,
+  "maeBpmOO": 2.015,
+  "t": -0.4,
+  "coefOO": 0.0203,
+  "r2Bpm": 0.5167,
+  "r2BpmOO": 0.5168
+ },
+ "coverage": {
+  "source": "ncaa.com game centre play-by-play via ncaa-api.henrygd.me",
+  "sample": {
+   "2026": "30/30",
+   "2025": "18/30",
+   "2024": "0/30 (502)",
+   "2023": "1/30",
+   "2022": "1/30",
+   "2021": "1/30",
+   "2020": "0/30",
+   "2019": "0/26",
+   "2016": "0/1"
+  },
+  "full": {
+   "2025": 0.503,
+   "2026": 0.984
+  }
+ }
+}
