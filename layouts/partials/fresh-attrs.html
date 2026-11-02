@@ -7,5 +7,8 @@
 {{- $sport := $o.sport | default $pick.sport -}}
 {{- $cls := $o.class | default "cfb__asof" -}}
 {{- $out := printf `class="%s"` $cls -}}
-{{- with $asof }}{{ $out = printf `class="%s ark-fresh" data-asof="%s"` $cls . }}{{ with $sport }}{{ $out = printf `%s data-sport="%s"` $out . }}{{ end }}{{ end -}}
+{{- /* a feed with its own limit (freshness.json feedHours, keyed by the feed's label) carries it as data-hours */ -}}
+{{- $hours := $o.hours | default 0 -}}
+{{- with and $pick.feed $sport }}{{ with index site.Data.freshness.sports $sport }}{{ $fs := . }}{{ range $lab, $file := .feeds }}{{ if eq $file $pick.feed }}{{ with index ($fs.feedHours | default dict) $lab }}{{ $hours = . }}{{ end }}{{ end }}{{ end }}{{ end }}{{ end -}}
+{{- with $asof }}{{ $out = printf `class="%s ark-fresh" data-asof="%s"` $cls . }}{{ with $sport }}{{ $out = printf `%s data-sport="%s"` $out . }}{{ end }}{{ with $hours }}{{ $out = printf `%s data-hours="%v"` $out . }}{{ end }}{{ end -}}
 {{- return $out -}}

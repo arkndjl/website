@@ -24,6 +24,9 @@ on:
     - cron: "41 16 * 9-12,1,2 0"
     - cron: "3 20 * 9-12,1,2 0"
     - cron: "57 23 * 9-12,1,2 0,1"
+    # off-season (Nov 2 2026, "every model auto-updates"): Mondays March-August, a full run for free agency, trades,
+    # the draft (late April), win totals and fantasy projections; data health (data-health.yml) flags a red run
+    - cron: "27 11 * 3-8 1"
   workflow_dispatch:
     inputs:
       refresh:
