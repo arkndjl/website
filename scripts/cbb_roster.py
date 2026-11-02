@@ -57,10 +57,7 @@ def f(x, d=None):
 
 
 def load_seasons():
-    by = defaultdict(dict)
-    for r in csv.DictReader(open(SRC)):
-        by[int(r['year'])][r['pid']] = r
-    return by
+    return C.research_seasons()
 
 
 def team_strength(by):

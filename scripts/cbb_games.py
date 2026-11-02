@@ -373,7 +373,7 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, pri
     return out
 
 
-def pre_out(logs, prev, repl=-3.0, n0=150.0, minmin=200.0, bench=BENCH, listed=None):
+def pre_out(logs, prev, repl=-3.0, n0=150.0, minmin=200.0, bench=BENCH, listed=None, absent=None):
     """value of players with a line last season (minmin+ minutes, any team) who haven't played for the team yet this
     season, per 100 possessions against a replacement: (last season's minute-weighted game BPM, shrunk to -1 by n0
     minutes, minus the bench) x his minutes a team game then / 40. History: the team's players who play later in the
@@ -399,6 +399,8 @@ def pre_out(logs, prev, repl=-3.0, n0=150.0, minmin=200.0, bench=BENCH, listed=N
             pre = {pid: f for pid, f in (listed.get(t) or {}).items() if pid in val}
         else:
             pre = {pid: 1.0 for _, d in gl for pid in d if pid in val}
+            # history with ABSENT: the team's lost-season players too (no game this season; back the season after)
+            pre.update({pid: 1.0 for pid in (absent or {}).get(t, ()) if pid in val})
         seen, st = set(), {}
         for k in range(len(gl) + 1):
             rp = repl
@@ -430,14 +432,81 @@ def last_bpm(season, n0=150.0):
     return {pid: (b - n0) / (m + n0) for pid, (m, b) in tot.items() if m > 0}
 
 
+# ABSENT (research toggle, scripts/cbb_prior_lookahead_research.py): history rosters hold only the players who logged
+# minutes that season; live rosters hold everyone. With ABSENT, a player with minutes for a team the season before and a
+# line for the same team the season after but none in between (a lost season: injury, redshirt) is put back on that
+# season's roster with no line of his own, as the preseason roster had him, and the pinj history counts him out all
+# season, as the injury report would
+ABSENT = False
+RESEARCH = '/mnt/project-files/cbb/backtest/research_seasons.csv'
+
+
+def season_after():
+    """pid -> Barttorvik team for the season after the research seasons (the frozen live prior's rosters)"""
+    d = json.load(gzip.open(os.path.join(HERE, 'cbb_prior.json.gz')))
+    return {str(c['pid']): c['bt'] for c in d['careers'] if c.get('pid') and c.get('bt')}
+
+
+def season_after_logs(season):
+    """season_after() in game-log ids: the players with no line in season (the last finished one) whose line the
+    season before is for the team the live rosters have them on, matched by name (names.py) within that team's logs"""
+    import names as NM
+    d = json.load(gzip.open(os.path.join(HERE, 'cbb_prior.json.gz')))
+    K = {k: i for i, k in enumerate(d['keep'])}
+    ci = {k: i for i, k in enumerate(d['cols'])}
+    pn = defaultdict(dict)
+    try:
+        for r in json.load(gzip.open(os.path.join(BTLOG, f'{season - 1}.json.gz'))):
+            pn[r[47]][r[51]] = r[48]
+    except Exception:
+        return {}
+    out = {}
+    for row, c in zip(d['rows'], d['careers']):
+        yrs = {x[K['year']]: x[K['team']] for x in c['seasons']}
+        t = c.get('bt')
+        if t and season not in yrs and yrs.get(season - 1) == t and pn.get(t):
+            hit, _ = NM.Matcher([{'pid': p, 'name': n} for p, n in pn[t].items()], team=None, pos=None, sport='basketball').find(row[ci['name']])
+            if hit:
+                out[hit['pid']] = t
+    return out
+
+
+def absent_players(lines, after=None):
+    """lines: year -> pid -> team (seasons with a line), after: pid -> team the season after the last. Returns
+    year -> {pid: team} for players with a line for a team in y - 1 and for the same team in y + 1, none in y"""
+    ys = sorted(lines)
+    out = {}
+    for y in ys[1:]:
+        nxt = lines.get(y + 1) if y + 1 in lines else (after if y == ys[-1] else None)
+        if nxt is None:
+            continue
+        out[y] = {pid: t for pid, t in lines[y - 1].items() if pid not in lines[y] and nxt.get(pid) == t}
+    return out
+
+
+def research_seasons():
+    """year -> pid -> research row; with ABSENT, lost-season players added back with an empty line (see ABSENT)"""
+    import csv
+    by = defaultdict(dict)                     # year -> pid -> row
+    for r in csv.DictReader(open(RESEARCH)):
+        by[int(r['year'])][r['pid']] = r
+    if ABSENT:
+        lines = {y: {pid: r['team'] for pid, r in v.items() if r['min_per'] not in ('', '0', '0.0')} for y, v in by.items()}
+        lines_any = {y: {pid: r['team'] for pid, r in v.items()} for y, v in by.items()}
+        for y, A in absent_players(lines, season_after()).items():
+            for pid, t in A.items():
+                if pid in lines_any[y]:
+                    continue
+                r = dict(by[y - 1][pid])
+                r.update({'team': t, 'year': str(y), 'min_per': '', 'bpm': '', 'gp': '0'})
+                by[y][pid] = r
+    return by
+
+
 def team_prior_hist():
     """scripts/data/cbb_team_prior.json from the board's Barttorvik research seasons (one row per player season):
     season -> Barttorvik team -> roster features (see PRIOR_F)"""
-    import csv
-    src = '/mnt/project-files/cbb/backtest/research_seasons.csv'
-    by = defaultdict(dict)                     # year -> pid -> row
-    for r in csv.DictReader(open(src)):
-        by[int(r['year'])][r['pid']] = r
+    by = research_seasons()
     out = {}
     for y in range(FIRST, LAST + 1):
         T = defaultdict(lambda: {'ret': 0.0, 'retmin': 0.0, 'tr': 0.0, 'trmin': 0.0, 'fr': 0.0})
@@ -1204,12 +1273,20 @@ def load_all():
         os.makedirs(CACHE, exist_ok=True)
         with gzip.open(avc, 'wt') as f:
             json.dump({s: {'|'.join(k): v for k, v in d.items()} for s, d in avs.items()}, f)
-    pc = os.path.join(CACHE, f'pinj_b{int(BENCH)}.json.gz')
+    pc = os.path.join(CACHE, f'pinj_b{int(BENCH)}' + ('_abs' if ABSENT else '') + '.json.gz')
     if os.path.exists(pc):
         PINJ.update({tuple(k.split('|')): v for k, v in json.load(gzip.open(pc)).items()})
     else:
+        ab = {}
+        if ABSENT:
+            # the season after the last finished one comes from the frozen live rosters, not the season in progress
+            lines = {s: {pid: t for t, gl in bt_logs(s).items() for _, d in gl for pid in d} for s in range(min(by) - 1, max(by) + 1)}
+            lines = {s: v for s, v in lines.items() if v}
+            for s, A in absent_players(lines, season_after_logs(max(lines))).items():
+                for pid, t in A.items():
+                    ab.setdefault(s, {}).setdefault(t, set()).add(pid)
         for s in sorted(by):
-            PINJ.update(pre_out(bt_logs(s), bt_logs(s - 1)))
+            PINJ.update(pre_out(bt_logs(s), bt_logs(s - 1), absent=ab.get(s)))
         with gzip.open(pc, 'wt') as f:
             json.dump({'|'.join(k): v for k, v in PINJ.items()}, f)
     return games, btname, d1s, tprior, avs
