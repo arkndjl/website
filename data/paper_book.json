@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T18:48:42Z",
+ "asof": "2026-11-02T18:55:51Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 98.95,
   "peak": 114.8,
   "drawdown": 0.138,
-  "open": 72.25,
+  "open": 71.25,
   "path": [
    101.5,
    101.6,
@@ -132,7 +132,7 @@
   ]
  },
  "record": {
-  "n": 240,
+  "n": 242,
   "clvN": 131,
   "clvRet": -0.0246,
   "clvT": -3.65,
@@ -316,7 +316,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 27,
+   "n": 29,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -337,7 +337,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 48,
+   "n": 47,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -400,7 +400,7 @@
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 15,
+   "n": 16,
    "clvN": 12,
    "clvRet": -0.0475,
    "clvT": -2.05,
@@ -595,8 +595,8 @@
    "edge": 5.6,
    "ev": 0.0016,
    "event": null,
-   "pass": false,
-   "close": 151.5
+   "pass": true,
+   "close": 150.5
   },
   {
    "rule": "tennis-ml",
@@ -758,7 +758,7 @@
    "price": 104.0,
    "bet": "Michigan -26.5 +104",
    "placed": "2026-11-01T16:40:44Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.7,
    "ev": 0.0389,
    "event": null,
@@ -890,6 +890,27 @@
    "event": null,
    "pass": false,
    "close": 149.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909531",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Providence",
+   "a": "Maine",
+   "mk": "spread",
+   "side": "away",
+   "line": 31.5,
+   "price": -106.0,
+   "bet": "Maine +31.5 -106",
+   "placed": "2026-11-02T18:54:31Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0017,
+   "event": null,
+   "pass": false,
+   "close": 31.5
   },
   {
    "rule": "cbb-spread",
@@ -1052,7 +1073,7 @@
    "price": -100.0,
    "bet": "under 157.5 -100",
    "placed": "2026-11-02T02:51:20Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 3.2,
    "ev": 0.0284,
    "event": null,
@@ -1325,7 +1346,7 @@
    "price": 102.0,
    "bet": "under 157.5 +102",
    "placed": "2026-11-02T13:57:03Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
@@ -1392,7 +1413,7 @@
    "edge": 3.2,
    "ev": 0.0023,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 22.5
   },
   {
@@ -1771,7 +1792,7 @@
    "ev": 0.0201,
    "event": null,
    "pass": false,
-   "close": 30.5
+   "close": 31.5
   },
   {
    "rule": "cbb-spread",
@@ -1871,7 +1892,7 @@
    "price": -100.0,
    "bet": "Navy +18.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 4.7,
    "ev": 0.0322,
    "event": null,
@@ -1913,7 +1934,7 @@
    "price": -102.0,
    "bet": "under 152.5 -102",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 5.8,
    "ev": 0.0407,
    "event": null,
@@ -1934,7 +1955,7 @@
    "price": 102.0,
    "bet": "over 136.5 +102",
    "placed": "2026-11-02T02:51:20Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
@@ -2165,7 +2186,7 @@
    "price": -102.0,
    "bet": "Maryland Eastern Shore +31.5 -102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 6.1,
    "ev": 0.0316,
    "event": null,
@@ -2191,7 +2212,7 @@
    "ev": 0.0002,
    "event": null,
    "pass": true,
-   "close": 22.5
+   "close": 23.5
   },
   {
    "rule": "cbb-ml",
@@ -2425,6 +2446,27 @@
    "close": 157.5
   },
   {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401928995",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Valparaiso",
+   "a": "Western Illinois",
+   "mk": "spread",
+   "side": "home",
+   "line": 18.5,
+   "price": -104.0,
+   "bet": "Valparaiso -18.5 -104",
+   "placed": "2026-11-02T18:54:31Z",
+   "stake": 0.25,
+   "edge": 4.2,
+   "ev": 0.009,
+   "event": null,
+   "pass": false,
+   "close": 18.5
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401928995",
@@ -2464,7 +2506,7 @@
    "ev": 0.0131,
    "event": null,
    "pass": true,
-   "close": 9.5
+   "close": 8.5
   },
   {
    "rule": "nba-total",
@@ -2484,7 +2526,7 @@
    "edge": 3.4,
    "ev": 0.015,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 231.5
   },
   {
@@ -2588,7 +2630,7 @@
    "ev": 0.0218,
    "event": null,
    "pass": false,
-   "close": 157.5
+   "close": 158.5
   },
   {
    "rule": "cbb-total",
@@ -2772,7 +2814,7 @@
    "price": -100.0,
    "bet": "under 160.5 -100",
    "placed": "2026-11-01T18:58:08Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 3.1,
    "ev": 0.0276,
    "event": null,
@@ -3066,7 +3108,7 @@
    "price": -285.0,
    "bet": "Saint Mary's ML -285",
    "placed": "2026-11-01T21:14:15Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 3.6,
    "ev": 0.0097,
    "event": null,
@@ -3114,6 +3156,27 @@
    "event": null,
    "pass": false,
    "close": 14.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921060",
+   "k": "2026-11-03T03:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "San Francisco",
+   "a": "Radford",
+   "mk": "spread",
+   "side": "away",
+   "line": 13.5,
+   "price": -106.0,
+   "bet": "Radford +13.5 -106",
+   "placed": "2026-11-02T18:54:31Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0017,
+   "event": null,
+   "pass": false,
+   "close": 13.5
   },
   {
    "rule": "cbb-spread",
@@ -3171,7 +3234,7 @@
    "price": 102.0,
    "bet": "under 152.5 +102",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
@@ -10163,8 +10226,8 @@
    "edge": 5.6,
    "ev": 0.0016,
    "event": null,
-   "pass": false,
-   "close": 151.5
+   "pass": true,
+   "close": 150.5
   },
   {
    "rule": "tennis-ml",
@@ -10326,7 +10389,7 @@
    "price": 104.0,
    "bet": "Michigan -26.5 +104",
    "placed": "2026-11-01T16:40:44Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.7,
    "ev": 0.0389,
    "event": null,
@@ -10458,6 +10521,27 @@
    "event": null,
    "pass": false,
    "close": 149.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909531",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Providence",
+   "a": "Maine",
+   "mk": "spread",
+   "side": "away",
+   "line": 31.5,
+   "price": -106.0,
+   "bet": "Maine +31.5 -106",
+   "placed": "2026-11-02T18:54:31Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0017,
+   "event": null,
+   "pass": false,
+   "close": 31.5
   },
   {
    "rule": "cbb-spread",
@@ -10620,7 +10704,7 @@
    "price": -100.0,
    "bet": "under 157.5 -100",
    "placed": "2026-11-02T02:51:20Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 3.2,
    "ev": 0.0284,
    "event": null,
@@ -10893,7 +10977,7 @@
    "price": 102.0,
    "bet": "under 157.5 +102",
    "placed": "2026-11-02T13:57:03Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
@@ -10960,7 +11044,7 @@
    "edge": 3.2,
    "ev": 0.0023,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 22.5
   },
   {
@@ -11339,7 +11423,7 @@
    "ev": 0.0201,
    "event": null,
    "pass": false,
-   "close": 30.5
+   "close": 31.5
   },
   {
    "rule": "cbb-spread",
@@ -11439,7 +11523,7 @@
    "price": -100.0,
    "bet": "Navy +18.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 4.7,
    "ev": 0.0322,
    "event": null,
@@ -11481,7 +11565,7 @@
    "price": -102.0,
    "bet": "under 152.5 -102",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 5.8,
    "ev": 0.0407,
    "event": null,
@@ -11502,7 +11586,7 @@
    "price": 102.0,
    "bet": "over 136.5 +102",
    "placed": "2026-11-02T02:51:20Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
@@ -11733,7 +11817,7 @@
    "price": -102.0,
    "bet": "Maryland Eastern Shore +31.5 -102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 6.1,
    "ev": 0.0316,
    "event": null,
@@ -11759,7 +11843,7 @@
    "ev": 0.0002,
    "event": null,
    "pass": true,
-   "close": 22.5
+   "close": 23.5
   },
   {
    "rule": "cbb-ml",
@@ -11993,6 +12077,27 @@
    "close": 157.5
   },
   {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401928995",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Valparaiso",
+   "a": "Western Illinois",
+   "mk": "spread",
+   "side": "home",
+   "line": 18.5,
+   "price": -104.0,
+   "bet": "Valparaiso -18.5 -104",
+   "placed": "2026-11-02T18:54:31Z",
+   "stake": 0.25,
+   "edge": 4.2,
+   "ev": 0.009,
+   "event": null,
+   "pass": false,
+   "close": 18.5
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401928995",
@@ -12032,7 +12137,7 @@
    "ev": 0.0131,
    "event": null,
    "pass": true,
-   "close": 9.5
+   "close": 8.5
   },
   {
    "rule": "nba-total",
@@ -12052,7 +12157,7 @@
    "edge": 3.4,
    "ev": 0.015,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 231.5
   },
   {
@@ -12156,7 +12261,7 @@
    "ev": 0.0218,
    "event": null,
    "pass": false,
-   "close": 157.5
+   "close": 158.5
   },
   {
    "rule": "cbb-total",
@@ -12340,7 +12445,7 @@
    "price": -100.0,
    "bet": "under 160.5 -100",
    "placed": "2026-11-01T18:58:08Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 3.1,
    "ev": 0.0276,
    "event": null,
@@ -12634,7 +12739,7 @@
    "price": -285.0,
    "bet": "Saint Mary's ML -285",
    "placed": "2026-11-01T21:14:15Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 3.6,
    "ev": 0.0097,
    "event": null,
@@ -12682,6 +12787,27 @@
    "event": null,
    "pass": false,
    "close": 14.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921060",
+   "k": "2026-11-03T03:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "San Francisco",
+   "a": "Radford",
+   "mk": "spread",
+   "side": "away",
+   "line": 13.5,
+   "price": -106.0,
+   "bet": "Radford +13.5 -106",
+   "placed": "2026-11-02T18:54:31Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0017,
+   "event": null,
+   "pass": false,
+   "close": 13.5
   },
   {
    "rule": "cbb-spread",
@@ -12739,7 +12865,7 @@
    "price": 102.0,
    "bet": "under 152.5 +102",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
