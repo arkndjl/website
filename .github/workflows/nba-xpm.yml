@@ -1,7 +1,7 @@
 # Rebuilds the NBA ARKBOARD's XPM leaderboard for the season in progress (static/data/nba-xpm/<season>.json,
 # data/nba_xpm.json): databallr DPM read from its stats page (scripts/cbb_dpm.mjs, headless Chromium) and
 # Basketball-Reference's advanced table, blended 50/50 by scripts/nba_xpm.py; then the game model's projections,
-# power rankings, season odds and picks (scripts/nba_games.py: data/nba_games.json, data/nba_picks.json), and
+# power rankings, season odds and picks (scripts/nba_games.py: data/nba_games.json), and
 # commits them; the push triggers the Cloudflare build. Daily from mid-October through the Finals in June, plus a
 # late-afternoon run (games only) for the evening injury report, or by hand from the Actions tab. GitHub fires this
 # schedule late or not at all on this repo, so a games-only run also follows each esea season / cfb board run (which
@@ -152,7 +152,7 @@ jobs:
         run: python3 scripts/model_monitor.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="data/units_nba.json scripts/data/faces_nba.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
+          files="data/units_nba.json scripts/data/faces_nba.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
