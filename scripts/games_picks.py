@@ -74,7 +74,7 @@ MARKETS = ('spread', 'ml', 'total')
 CUTS = [round(0.01 * i, 2) for i in range(0, 16)]
 MIN_N, MIN_T = 40, 1.0
 ML_CAP = 300                      # moneylines past +-300 are left out (the calibration is thin in the tails)
-KELLY_MIN, KELLY_CAP = 0.25, 3.0
+KELLY_MIN, KELLY_CAP = 0.25, 5.0   # old fit-file units only (nothing displays them); the live cap is units.BOOK_CAP
 ESPN = {'cfb': 'football/college-football', 'nfl': 'football/nfl', 'cbb': 'basketball/mens-college-basketball', 'nba': 'basketball/nba'}
 UA = 'Mozilla/5.0 (arkndjl.net arkboard)'
 ODDS = os.path.join(HERE, 'data', 'odds')
@@ -1251,9 +1251,13 @@ def live(sport):
     if done:
         # DU compounds: each pick is a % of the bankroll when it was flagged, so the record's bankroll multiplies through
         # the graded picks in kick order (1 DU = 1% of the bankroll then; every win is reinvested)
-        bank = 1.0
-        for e in sorted(done, key=lambda e: e['kick']):
-            bank *= 1 + e['units'] / 100 * e['profit']
+        # per ET night, as the nightly cap sizes: a night's bets all stand on its opening bankroll
+        import night_cap
+        bank, nights = 1.0, {}
+        for e in done:
+            nights.setdefault(night_cap.night(e['kick']), []).append(e)
+        for n in sorted(nights):
+            bank *= 1 + sum(e['units'] / 100 * e['profit'] for e in nights[n])
         rec['sized']['bank'] = round(bank, 4)
     rec.update(C.summary(done))
     rec['byMarket'] = {mk: {**C.summary([e for e in done if e['mk'] == mk]), 'n': sum(1 for e in done if e['mk'] == mk)} for mk in MARKETS}

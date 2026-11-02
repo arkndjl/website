@@ -179,8 +179,14 @@ def build(now=None):
     ledger.sort(key=lambda b: (b['k'], b['sport'], b['id'], b['mk']))
     bets = [b for b in ledger if not b['pass']]
     bank, peak, path = P['bankroll'], P['bankroll'], []
+    # compounds per ET night: every bet of one night is sized off that night's opening bankroll (night_cap.py), so a
+    # night's returns add on its opening bank and the bank only rolls forward when the night ends
+    night, open_bank, acc = None, bank, 0.0
     for b in [b for b in bets if b.get('res') is not None]:
-        bank *= 1 + b['stake'] / 100 * b['ret']
+        if b['slate'].split(':', 1)[1] != night:
+            night, open_bank, acc = b['slate'].split(':', 1)[1], bank, 0.0
+        acc += b['stake'] / 100 * b['ret']
+        bank = open_bank * (1 + acc)
         peak = max(peak, bank)
         path.append(round(bank, 2))
     gate_rows, cor, tEff = gates(bets, P['gates'])
