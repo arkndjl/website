@@ -11,11 +11,13 @@ cover = "/og/baseball.png"
 
 {{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="winpane--art" />}}
 
-{{< wintabs groups="players:draft hitters,U19 MiLB,White Sox org|model:fv scale,reading" side="true" label="Baseball views" >}}
+{{< wintabs groups="players:draft hitters,U19 MiLB,White Sox org|model:fv model" side="true" label="Baseball views" >}}
 {{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" tab="draft hitters" >}}
 {{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 10)" icon="baseball" filter="FV,TEAM,POS" tab="U19 MiLB" >}}
 {{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" icon="baseball" filter="FV,Org/Lvl,H-Pos" tab="White Sox org" >}}
-{{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" tab="fv scale" >}}
+{{< desk tab="fv model" >}}
+{{< deskcol >}}
+{{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" >}}
 | FV | Hitter | Starting pitcher | Reliever | WAR / season |
 | :---: | ----- | ----- | ----- | :---: |
 | 80 | top 5 overall | #1 (top 1–3 arm) | — | 7.0+ |
@@ -31,10 +33,14 @@ cover = "/og/baseball.png"
 | 30 | up and down | up and down | up and down | < -0.1 |
 | 20 | organizational | organizational | organizational | — |
 {{< /wintable >}}
-{{< winlist title="mlb.exe" icon="baseball" tab="reading" >}}
+{{< /deskcol >}}
+{{< deskcol >}}
+{{< winlist title="mlb.exe" icon="baseball" >}}
 - [Evaluating Every U19 Prospect In MiLB](/posts/u19-milb-evaluations-may26/) | 13 ranked + profiles | May 10
 - [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/) | 2026 draft, 35 hitters graded | May 7
 - [2026 Prospect Grades: Chicago White Sox](/posts/prospect-grades-chicago-white-sox/) | top 64 | Jan 19
 - [MLB PROSPX](https://eephus.io) | post-draft MiLB prospects on eephus.io |
 {{< /winlist >}}
+{{< /deskcol >}}
+{{< /desk >}}
 {{< /wintabs >}}

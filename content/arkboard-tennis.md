@@ -17,5 +17,5 @@ draft = false
 {{< lazytab tab="ATP serve + return" >}}{{< tennisstats tour="atp" title="ATP :: serve + return" tab="ATP serve + return" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA ARK Ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ARK Ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA serve + return" >}}{{< tennisstats tour="wta" title="WTA :: serve + return" tab="WTA serve + return" >}}{{< /lazytab >}}
-{{< tennismodel title="model :: how the ratings are built and how they score" tab="model" >}}
+{{< tennismodel title="model :: inputs, weights, held-out test" tab="model" >}}
 {{< /wintabs >}}

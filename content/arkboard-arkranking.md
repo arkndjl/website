@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
-{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
+{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
 {{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB :: ARK Ranking, with the AP and Coaches Top 25" tab="CFB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CFB odds" >}}{{< cfbsim title="CFB season odds :: 10,000 simulated seasons" tab="CFB odds" >}}{{< /lazytab >}}
@@ -42,6 +42,7 @@ draft = false
 {{< lazytab tab="Austria" >}}{{< soccerleague lg="aut.1" title="Austrian Bundesliga" tab="Austria" >}}{{< /lazytab >}}
 {{< lazytab tab="Scottish Prem" >}}{{< soccerleague lg="sco.1" title="Scottish Premiership" tab="Scottish Prem" >}}{{< /lazytab >}}
 {{< lazytab tab="Allsvenskan" >}}{{< soccerleague lg="swe.1" title="Allsvenskan" tab="Allsvenskan" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS" >}}{{< soccermls tab="MLS" >}}{{< /lazytab >}}
 {{< lazytab tab="Champions League" >}}{{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}{{< /lazytab >}}
 {{< lazytab tab="Europa League" >}}{{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}{{< /lazytab >}}
 {{< lazytab tab="Conference League" >}}{{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}{{< /lazytab >}}
