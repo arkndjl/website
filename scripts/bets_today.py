@@ -189,7 +189,16 @@ def main():
                 v["skip"] = stamp
                 skip.append((k, v, now_st))
             elif now_st == "live" and v.get("skip"):
+                # back on only while its night has room: the bets sent for that night and not skipped count first
+                # (Nov 2 2026: a full night listed back-on picks with their old stakes)
+                n = night_of(v["kick"])
+                used = sum(float(w.get("kelly") or 0) for w in sent.values() if not w.get("held") and not w.get("skip")
+                           and w.get("kick", "") > stamp and night_of(w["kick"]) == n)
+                room = NC.CAP - used
+                if room < 0.25:
+                    continue                # stays skipped: the night is full
                 v.pop("skip")
+                v["kelly"] = min(float(v.get("kelly") or 0), math.floor(room * 4 + 1e-9) / 4)
                 back.append((k, v))
     if a.sent and (skip or back or held or full):
         if full:
@@ -200,7 +209,7 @@ def main():
             for k, v, why in skip:
                 print(f"- {label.get(k.split(':')[0], k.split(':')[0])} {kick_et(v['kick'])}, {v['game'] or k.split(':')[1]}: {v['bet']} ({why})")
         if back:
-            print("**Back on** (clears again; place if skipped):")
+            print("**Back on** (clears again and its night has room under the cap; place if skipped):")
             for k, v in back:
                 print(f"- {label.get(k.split(':')[0], k.split(':')[0])} {kick_et(v['kick'])}, {v['game']}: {v['bet']}, {num(v['kelly'])}% Kelly")
         if held:
