@@ -213,6 +213,16 @@ copyright = 'arkndjl'
             group = "all sports"
             gname = "ARKRANKING"
         [[languages.en.menu.main]]
+          identifier = "arkboard-standings"
+          parent = "ARKBOARD"
+          name = "Standings"
+          url = "/arkboard/standings/"
+          weight = 31
+          [languages.en.menu.main.params]
+            icon = "img/icons/standings.svg"
+            group = "all sports"
+            gname = "Standings"
+        [[languages.en.menu.main]]
           identifier = "arkboard-arklist"
           parent = "ARKBOARD"
           name = "ARKLIST"

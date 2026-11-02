@@ -4438,3 +4438,38 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .rq__bar a.cfb__btn { text-decoration: none; }
 .rq__note { opacity: 0.75; font-size: 0.85em; }
 .rq:target { outline: 2px solid #7fffd4; outline-offset: 2px; }
+
+/* Standings page (layouts/shortcodes/standings.html): group header rows, qualification stripes, playoff picture, leader grids */
+.st-table .st-grp th { text-align: left; background: var(--win-well); color: var(--accent); padding-top: 6px; }
+.st-table tbody tr { cursor: default; }
+.st-team { white-space: nowrap; }
+.st-table tr[class^="st-z"] td:first-child { box-shadow: inset 4px 0 0 var(--stz); }
+.st-z1 { --stz: #4fd1c5; } .st-z2 { --stz: #c8a2ff; } .st-z3 { --stz: #8a6fd1; } .st-z4 { --stz: #2f9e94; } .st-z5 { --stz: #e0d0ff; } .st-z6 { --stz: #6b5a8c; }
+.st-zones { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 6px 10px; font-size: .85em; }
+.st-zones i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; background: var(--stz); vertical-align: -1px; }
+.st-w { font-weight: bold; color: var(--accent); }
+.st-live td { background: color-mix(in srgb, var(--win-title) 35%, transparent); }
+.st-form { font-family: inherit; letter-spacing: 1px; }
+.st-body { padding: 8px 10px; }
+.st-note { margin: 0 0 8px; }
+.st-confs { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.st-h { margin: 0 0 6px; font-size: 1em; color: var(--accent); }
+.st-m, .st-out { border: 2px solid var(--win-dark); background: var(--win-well); padding: 4px 6px; margin-bottom: 6px; }
+.st-out { background: transparent; border-style: dashed; }
+.st-m--pin { border-color: var(--win-title); }
+.st-lab { display: block; font-size: .75em; text-transform: uppercase; opacity: .7; }
+.st-t { display: flex; align-items: center; gap: 6px; padding: 1px 0; white-space: nowrap; }
+.st-s { min-width: 2.6em; color: var(--accent); }
+.st-tn { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.st-tr { font-size: .85em; }
+.st-grid { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+.st-grid > .st-mini { flex: 1 1 260px; width: auto; }
+.st-grid--wide > .st-mini { flex-basis: 340px; }
+.st-mini thead th { text-align: left; }
+.st-mini td.st-team { white-space: nowrap; }
+@media (max-width: 684px) {
+  .st-confs { grid-template-columns: 1fr; }
+  .st-grid > .st-mini { flex-basis: 100%; }
+}
+.post-content .st-team img.cfb__logo { display: inline-block; vertical-align: -4px; margin-right: 2px; }
+.post-content .st-mini img.cfb__logo { width: 16px; height: 16px; vertical-align: -3px; }
