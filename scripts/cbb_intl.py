@@ -477,11 +477,14 @@ def ev_model(m, f, att=None):
     g = dict(f)
     if att: g['lr'] = att['a'] + att['b'] * f['lr_board']; g['top'] = max(0.0, g['lr'] + math.log(10))
     _, e_mid, x, z = at(g)
-    parts = []
-    for j, k in enumerate(m['kept']):
-        h = dict(g); h[k] = mu[j]
-        if k == 'lr': h['top'] = max(0.0, mu[j] + math.log(10))
-        parts.append((k, e_mid - at(h)[1], x[j]))
+    # shares over the average international that add up to E[FV] (cbb_fit.ladder_parts) at the June rank his board
+    # rank predicts; averaging over that rank's spread (e - e_mid) goes to the draft-board terms
+    sh = F.ladder_parts(W, m['topMean'], z)
+    rk = [j for j, k in enumerate(m['kept']) if k in ('lr', 'top')]
+    if rk:
+        a = np.abs(sh[rk]).sum()
+        for j in rk: sh[j] += (e - e_mid) * (abs(sh[j]) / a if a > 0 else 1 / len(rk))
+    parts = [(k, float(sh[j]), x[j]) for j, k in enumerate(m['kept'])]
     return e, p, parts
 
 

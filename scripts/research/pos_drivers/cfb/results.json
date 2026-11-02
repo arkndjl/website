@@ -1,0 +1,309 @@
+{
+ "method": "Position-purpose FV drivers for CFB (Nov 2 2026): does a number built from what each position is FOR explain NFL\noutcomes beyond the shipped FV?\n    python3 scripts/cfb_espn_pbp.py 2011 2022          # ESPN slim play-by-play (one summary call per FBS game)\n    python3 scripts/research/pos_drivers/cfb/pos_drivers.py --parse   # credits per player-season -> .cache\n    python3 scripts/research/pos_drivers/cfb/pos_drivers.py           # tests -> data/cfb_fv_posdrivers.json\n\nPRE-REGISTERED (written before any outcome was looked at; 11 primaries, Holm across all of them):\n  role purpose -> driver (career to date through the graded season; plays with |margin| > 28 in the 2nd half dropped)\n  QB  move the chains when the defense knows a pass is coming\n      qbMD  3rd/4th down & 4+ dropbacks (passes, sacks, INTs): conversions over the season's expected rate by distance,\n            per dropback, shrunk (k 40)\n  RB  get the yards the down asks for\n      rbSR  rush success (40% of the distance on 1st, 60% on 2nd, all of it on 3rd/4th) over expected by down x distance,\n            per carry, shrunk (k 100)\n      rbSY  short yardage: 3rd/4th & 1-2 carries converted over expected, per carry, shrunk (k 15)\n  WR  win on the money downs: the catch that moves the chains on 3rd/4th\n      wrMD  3rd/4th-down targets: conversions over expected (by distance), a team game in seasons targeted\n      wrMDr same, per target, shrunk (k 20)\n  TE  chain mover + red-zone target (blocking: no data)\n      teMD  as wrMD\n      teRZ  red-zone (inside the 20) targets: TDs over the season's expected TD rate, a team game in seasons targeted\n  EDGE finish the QB when the offense must pass\n      edPD  sacks on passing downs (2nd & 8+, 3rd/4th & 5+; shared sacks split) per opponent passing-down dropback in\n            games he made any defensive credit, shrunk to the EDGE mean (k 150 dropbacks)\n  DL  stop the run at the line\n      dlStuff  carries ended at or behind the line with him in the tackle (shared split) per opponent carry in games\n            he appeared, shrunk to the DL mean (k 200)\n  LB  fill the gap, make the stop short of the sticks\n      lbStop  carries that failed the success standard with him in the tackle, per opponent carry, shrunk (k 200)\n      lbCov   3rd/4th-down completions he tackled short of the sticks, per opponent 3rd/4th completion, shrunk (k 30)\n  OL / CB / S  no graded rows in the all-time history (the board grades QB-LB only before PFN 2019) -> untestable.\nGate: draft classes held out one at a time (2015-23), fold t on the squared-error gain, most folds better, forward\n(fit earlier classes only) not worse, top 10 per class at the position by prediction not worse; positive coefficient\nexpected (one-sided p from t with folds-1 df), Holm over the 11.\nOutcome: NFL AV a season (undrafted 0), the board's target. Draft pick shown as a diagnostic.",
+ "registered": 12,
+ "tested": 9,
+ "coverage": {
+  "QB": [
+   579,
+   588
+  ],
+  "RB": [
+   755,
+   763
+  ],
+  "WR": [
+   1419,
+   1449
+  ],
+  "TE": [
+   748,
+   760
+  ],
+  "EDGE": [
+   1351,
+   1519
+  ],
+  "DL": [
+   812,
+   1154
+  ],
+  "LB": [
+   728,
+   981
+  ]
+ },
+ "untestable": [
+  {
+   "cand": "dlStuff",
+   "set": "DL",
+   "n": 8,
+   "why": "ESPN names tacklers only 2011-13; too few graded rows"
+  },
+  {
+   "cand": "lbStop",
+   "set": "LB",
+   "n": 11,
+   "why": "ESPN names tacklers only 2011-13; too few graded rows"
+  },
+  {
+   "cand": "lbCov",
+   "set": "LB",
+   "n": 11,
+   "why": "ESPN names tacklers only 2011-13; too few graded rows"
+  }
+ ],
+ "results": [
+  {
+   "cand": "qbMD",
+   "set": "QB",
+   "n": 588,
+   "folds": 9,
+   "gainT": -0.31,
+   "p1": 0.6194,
+   "better": 5,
+   "coef": 0.983,
+   "sd": 0.0397,
+   "coefSD": 0.039,
+   "rawR": 0.268,
+   "spearman": [
+    0.3638,
+    0.3882
+   ],
+   "top10": [
+    2.269,
+    2.264
+   ],
+   "top10Better": 3,
+   "top10Worse": 2,
+   "fwdGain": 0.0043,
+   "fwdBetter": "4/6",
+   "holmAlpha": 0.0125,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "rbSR",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": 1.07,
+   "p1": 0.159,
+   "better": 4,
+   "coef": 3.859,
+   "sd": 0.0336,
+   "coefSD": 0.13,
+   "rawR": 0.252,
+   "spearman": [
+    0.4742,
+    0.4849
+   ],
+   "top10": [
+    2.922,
+    2.834
+   ],
+   "top10Better": 4,
+   "top10Worse": 4,
+   "fwdGain": 0.0308,
+   "fwdBetter": "4/6",
+   "holmAlpha": 0.0063,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "rbSY",
+   "set": "RB",
+   "n": 763,
+   "folds": 9,
+   "gainT": -0.95,
+   "p1": 0.8156,
+   "better": 5,
+   "coef": 0.751,
+   "sd": 0.06,
+   "coefSD": 0.045,
+   "rawR": 0.061,
+   "spearman": [
+    0.4742,
+    0.4738
+   ],
+   "top10": [
+    2.922,
+    2.827
+   ],
+   "top10Better": 2,
+   "top10Worse": 4,
+   "fwdGain": -0.0083,
+   "fwdBetter": "3/6",
+   "holmAlpha": 0.0167,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "wrMD",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 0.09,
+   "p1": 0.4649,
+   "better": 4,
+   "coef": 0.541,
+   "sd": 0.1193,
+   "coefSD": 0.065,
+   "rawR": 0.194,
+   "spearman": [
+    0.3947,
+    0.4072
+   ],
+   "top10": [
+    2.928,
+    2.924
+   ],
+   "top10Better": 0,
+   "top10Worse": 1,
+   "fwdGain": 0.0087,
+   "fwdBetter": "4/6",
+   "holmAlpha": 0.01,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "wrMDr",
+   "set": "WR",
+   "n": 1449,
+   "folds": 9,
+   "gainT": 0.7,
+   "p1": 0.2518,
+   "better": 6,
+   "coef": 1.386,
+   "sd": 0.0593,
+   "coefSD": 0.082,
+   "rawR": 0.164,
+   "spearman": [
+    0.3947,
+    0.4083
+   ],
+   "top10": [
+    2.928,
+    2.959
+   ],
+   "top10Better": 1,
+   "top10Worse": 1,
+   "fwdGain": 0.0129,
+   "fwdBetter": "4/6",
+   "holmAlpha": 0.0071,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "teMD",
+   "set": "TE",
+   "n": 760,
+   "folds": 9,
+   "gainT": -1.45,
+   "p1": 0.9081,
+   "better": 3,
+   "coef": -0.026,
+   "sd": 0.08,
+   "coefSD": -0.002,
+   "rawR": 0.252,
+   "spearman": [
+    0.3615,
+    0.3662
+   ],
+   "top10": [
+    1.218,
+    1.175
+   ],
+   "top10Better": 0,
+   "top10Worse": 5,
+   "fwdGain": -0.0049,
+   "fwdBetter": "2/6",
+   "holmAlpha": 0.025,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "teRZ",
+   "set": "TE",
+   "n": 760,
+   "folds": 9,
+   "gainT": -2.2,
+   "p1": 0.9704,
+   "better": 2,
+   "coef": -0.12,
+   "sd": 0.0455,
+   "coefSD": -0.005,
+   "rawR": 0.013,
+   "spearman": [
+    0.3615,
+    0.3702
+   ],
+   "top10": [
+    1.218,
+    1.194
+   ],
+   "top10Better": 1,
+   "top10Worse": 3,
+   "fwdGain": -0.0031,
+   "fwdBetter": "1/6",
+   "holmAlpha": 0.05,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "edPD",
+   "set": "EDGE",
+   "n": 1519,
+   "folds": 9,
+   "gainT": 0.34,
+   "p1": 0.3709,
+   "better": 4,
+   "coef": 11.725,
+   "sd": 0.007,
+   "coefSD": 0.082,
+   "rawR": 0.153,
+   "spearman": [
+    0.3997,
+    0.4146
+   ],
+   "top10": [
+    2.847,
+    2.635
+   ],
+   "top10Better": 1,
+   "top10Worse": 6,
+   "fwdGain": 0.0034,
+   "fwdBetter": "4/6",
+   "holmAlpha": 0.0083,
+   "holmPass": false,
+   "ship": false
+  },
+  {
+   "cand": "edPD2",
+   "set": "EDGE",
+   "n": 1519,
+   "folds": 9,
+   "gainT": 1.7,
+   "p1": 0.0636,
+   "better": 5,
+   "coef": 32.214,
+   "sd": 0.0054,
+   "coefSD": 0.175,
+   "rawR": 0.311,
+   "spearman": [
+    0.3997,
+    0.4579
+   ],
+   "top10": [
+    2.847,
+    2.676
+   ],
+   "top10Better": 2,
+   "top10Worse": 6,
+   "fwdGain": 0.0428,
+   "fwdBetter": "4/6",
+   "holmAlpha": 0.0056,
+   "holmPass": false,
+   "ship": false
+  }
+ ]
+}

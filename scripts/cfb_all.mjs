@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const DETAIL_COLS = ['report', 'parts', 'fvd', 'mk'];
+export const DETAIL_COLS = ['report', 'parts', 'fvd', 'mk', 'fvs'];
 export const cfbAllPath = (root = ROOT) => path.join(root, 'static', 'data', 'cfb-all.json');
 export const cfbDetailPath = (root = ROOT) => path.join(root, 'static', 'data', 'cfb-detail.json');
 
