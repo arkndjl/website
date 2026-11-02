@@ -1,0 +1,577 @@
+{
+ "sims": 4000,
+ "seasons": [
+  2017,
+  2018,
+  2019,
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "matchdays": [
+  0,
+  9,
+  19,
+  28
+ ],
+ "knobs": "walk-forward chosen per season (soccer_sim_backtest.json)",
+ "variants": {
+  "dc-0.04": {
+   "gate": {
+    "new": 0.12828,
+    "base": 0.12836,
+    "t": -2.11,
+    "seasonsWon": "6/8",
+    "seasonsLost": 2
+   },
+   "brier_title": {
+    "new": 0.01697,
+    "base": 0.01694,
+    "t": 1.4,
+    "seasonsWon": "2/8",
+    "seasonsLost": 6
+   },
+   "brier_top4": {
+    "new": 0.0525,
+    "base": 0.05258,
+    "t": -2.02,
+    "seasonsWon": "6/8",
+    "seasonsLost": 2
+   },
+   "brier_rel": {
+    "new": 0.0588,
+    "base": 0.05884,
+    "t": -1.7,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_title": {
+    "new": 0.05538,
+    "base": 0.0553,
+    "t": 1.25,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "ll_top4": {
+    "new": 0.17085,
+    "base": 0.1709,
+    "t": -0.33,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_rel": {
+    "new": 0.18705,
+    "base": 0.1871,
+    "t": -0.55,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "mae_pts": {
+    "new": 5.41027,
+    "base": 5.40963,
+    "t": 0.28,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   }
+  },
+  "dc-0.08": {
+   "gate": {
+    "new": 0.12832,
+    "base": 0.12836,
+    "t": -0.96,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_title": {
+    "new": 0.01696,
+    "base": 0.01694,
+    "t": 0.4,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_top4": {
+    "new": 0.05254,
+    "base": 0.05258,
+    "t": -0.72,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_rel": {
+    "new": 0.05882,
+    "base": 0.05884,
+    "t": -0.61,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_title": {
+    "new": 0.0553,
+    "base": 0.0553,
+    "t": -0.04,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_top4": {
+    "new": 0.17087,
+    "base": 0.1709,
+    "t": -0.13,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_rel": {
+    "new": 0.18697,
+    "base": 0.1871,
+    "t": -1.13,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "mae_pts": {
+    "new": 5.41149,
+    "base": 5.40963,
+    "t": 0.4,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   }
+  },
+  "dc-0.12": {
+   "gate": {
+    "new": 0.12844,
+    "base": 0.12836,
+    "t": 0.86,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "brier_title": {
+    "new": 0.01701,
+    "base": 0.01694,
+    "t": 1.18,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_top4": {
+    "new": 0.05258,
+    "base": 0.05258,
+    "t": 0.08,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_rel": {
+    "new": 0.05885,
+    "base": 0.05884,
+    "t": 0.16,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "ll_title": {
+    "new": 0.05542,
+    "base": 0.0553,
+    "t": 0.59,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_top4": {
+    "new": 0.17136,
+    "base": 0.1709,
+    "t": 1.07,
+    "seasonsWon": "2/8",
+    "seasonsLost": 6
+   },
+   "ll_rel": {
+    "new": 0.18709,
+    "base": 0.1871,
+    "t": -0.07,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "mae_pts": {
+    "new": 5.41156,
+    "base": 5.40963,
+    "t": 0.28,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   }
+  },
+  "dc-0.16": {
+   "gate": {
+    "new": 0.12834,
+    "base": 0.12836,
+    "t": -0.19,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "brier_title": {
+    "new": 0.01699,
+    "base": 0.01694,
+    "t": 0.74,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "brier_top4": {
+    "new": 0.05253,
+    "base": 0.05258,
+    "t": -0.47,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_rel": {
+    "new": 0.05883,
+    "base": 0.05884,
+    "t": -0.23,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_title": {
+    "new": 0.05536,
+    "base": 0.0553,
+    "t": 0.23,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_top4": {
+    "new": 0.17089,
+    "base": 0.1709,
+    "t": -0.03,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "ll_rel": {
+    "new": 0.18698,
+    "base": 0.1871,
+    "t": -0.37,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "mae_pts": {
+    "new": 5.41757,
+    "base": 5.40963,
+    "t": 0.87,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   }
+  },
+  "bp0.05": {
+   "gate": {
+    "new": 0.12876,
+    "base": 0.12836,
+    "t": 4.0,
+    "seasonsWon": "1/8",
+    "seasonsLost": 7
+   },
+   "brier_title": {
+    "new": 0.01701,
+    "base": 0.01694,
+    "t": 0.73,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "brier_top4": {
+    "new": 0.05263,
+    "base": 0.05258,
+    "t": 0.42,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_rel": {
+    "new": 0.05912,
+    "base": 0.05884,
+    "t": 3.69,
+    "seasonsWon": "0/8",
+    "seasonsLost": 8
+   },
+   "ll_title": {
+    "new": 0.05564,
+    "base": 0.0553,
+    "t": 1.27,
+    "seasonsWon": "2/8",
+    "seasonsLost": 6
+   },
+   "ll_top4": {
+    "new": 0.17112,
+    "base": 0.1709,
+    "t": 0.47,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "ll_rel": {
+    "new": 0.18786,
+    "base": 0.1871,
+    "t": 2.47,
+    "seasonsWon": "2/8",
+    "seasonsLost": 6
+   },
+   "mae_pts": {
+    "new": 5.40395,
+    "base": 5.40963,
+    "t": -1.14,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   }
+  },
+  "bp0.1": {
+   "gate": {
+    "new": 0.12842,
+    "base": 0.12836,
+    "t": 0.28,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_title": {
+    "new": 0.017,
+    "base": 0.01694,
+    "t": 0.46,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_top4": {
+    "new": 0.05244,
+    "base": 0.05258,
+    "t": -1.16,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_rel": {
+    "new": 0.05898,
+    "base": 0.05884,
+    "t": 0.92,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_title": {
+    "new": 0.05562,
+    "base": 0.0553,
+    "t": 0.75,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_top4": {
+    "new": 0.17046,
+    "base": 0.1709,
+    "t": -0.91,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_rel": {
+    "new": 0.18721,
+    "base": 0.1871,
+    "t": 0.24,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "mae_pts": {
+    "new": 5.40124,
+    "base": 5.40963,
+    "t": -0.99,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   }
+  },
+  "bp0.15": {
+   "gate": {
+    "new": 0.12831,
+    "base": 0.12836,
+    "t": -0.3,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_title": {
+    "new": 0.01692,
+    "base": 0.01694,
+    "t": -0.12,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_top4": {
+    "new": 0.05252,
+    "base": 0.05258,
+    "t": -0.38,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_rel": {
+    "new": 0.05887,
+    "base": 0.05884,
+    "t": 0.17,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_title": {
+    "new": 0.05529,
+    "base": 0.0553,
+    "t": -0.02,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_top4": {
+    "new": 0.17058,
+    "base": 0.1709,
+    "t": -0.66,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_rel": {
+    "new": 0.18705,
+    "base": 0.1871,
+    "t": -0.12,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "mae_pts": {
+    "new": 5.3962,
+    "base": 5.40963,
+    "t": -1.01,
+    "seasonsWon": "6/8",
+    "seasonsLost": 2
+   }
+  },
+  "dc-wf": {
+   "gate": {
+    "new": 0.12828,
+    "base": 0.12836,
+    "t": -2.11,
+    "seasonsWon": "6/8",
+    "seasonsLost": 2
+   },
+   "brier_title": {
+    "new": 0.01697,
+    "base": 0.01694,
+    "t": 1.4,
+    "seasonsWon": "2/8",
+    "seasonsLost": 6
+   },
+   "brier_top4": {
+    "new": 0.0525,
+    "base": 0.05258,
+    "t": -2.02,
+    "seasonsWon": "6/8",
+    "seasonsLost": 2
+   },
+   "brier_rel": {
+    "new": 0.0588,
+    "base": 0.05884,
+    "t": -1.7,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_title": {
+    "new": 0.05538,
+    "base": 0.0553,
+    "t": 1.25,
+    "seasonsWon": "3/8",
+    "seasonsLost": 5
+   },
+   "ll_top4": {
+    "new": 0.17085,
+    "base": 0.1709,
+    "t": -0.33,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_rel": {
+    "new": 0.18705,
+    "base": 0.1871,
+    "t": -0.55,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "mae_pts": {
+    "new": 5.41027,
+    "base": 5.40963,
+    "t": 0.28,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "chosen": {
+    "2017": "dc-0.04",
+    "2018": "dc-0.04",
+    "2019": "dc-0.04",
+    "2022": "dc-0.04",
+    "2023": "dc-0.04",
+    "2024": "dc-0.04",
+    "2025": "dc-0.04",
+    "2026": "dc-0.04"
+   }
+  },
+  "bp-wf": {
+   "gate": {
+    "new": 0.12831,
+    "base": 0.12836,
+    "t": -0.3,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "brier_title": {
+    "new": 0.01692,
+    "base": 0.01694,
+    "t": -0.12,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_top4": {
+    "new": 0.05252,
+    "base": 0.05258,
+    "t": -0.38,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "brier_rel": {
+    "new": 0.05887,
+    "base": 0.05884,
+    "t": 0.17,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_title": {
+    "new": 0.05529,
+    "base": 0.0553,
+    "t": -0.02,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "ll_top4": {
+    "new": 0.17058,
+    "base": 0.1709,
+    "t": -0.66,
+    "seasonsWon": "4/8",
+    "seasonsLost": 4
+   },
+   "ll_rel": {
+    "new": 0.18705,
+    "base": 0.1871,
+    "t": -0.12,
+    "seasonsWon": "5/8",
+    "seasonsLost": 3
+   },
+   "mae_pts": {
+    "new": 5.3962,
+    "base": 5.40963,
+    "t": -1.01,
+    "seasonsWon": "6/8",
+    "seasonsLost": 2
+   },
+   "chosen": {
+    "2017": "bp0.15",
+    "2018": "bp0.15",
+    "2019": "bp0.15",
+    "2022": "bp0.15",
+    "2023": "bp0.15",
+    "2024": "bp0.15",
+    "2025": "bp0.15",
+    "2026": "bp0.15"
+   }
+  }
+ },
+ "drawRate": {
+  "actual": 0.2501,
+  "sims": {
+   "poisson": 0.244,
+   "dc-0.04": 0.253,
+   "dc-0.08": 0.2621,
+   "dc-0.12": 0.2711,
+   "dc-0.16": 0.2801,
+   "bp0.05": 0.2495,
+   "bp0.1": 0.2554,
+   "bp0.15": 0.2618
+  }
+ }
+}
