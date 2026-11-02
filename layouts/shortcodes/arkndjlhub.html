@@ -9,8 +9,7 @@
 {{- $nTracks := len ($music.Params.tracks | default slice) -}}
 {{- $look := dict
   "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks · player, soundcloud, youtube" $nTracks))
-  "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces))
-  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, four kits each")
+  "arkndjl-art" (dict "img" "img/px/rose-window.png" "sub" (cond (gt $nPieces 0) (printf "%d pieces" $nPieces) ""))
   "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx") -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
@@ -39,8 +38,6 @@
 .ah-idx .t{order:2}
 .ah-portals{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1rem}
 .ah-p{grid-column:span 2}
-.ah-p--music,.ah-p--art{grid-column:span 3}
-.ah-p--music .ah-p__art,.ah-p--art .ah-p__art{aspect-ratio:16/8}
 .ah-p{position:relative;display:grid;grid-template-rows:auto 1fr;background:var(--ah-ink);color:var(--ah-lil);text-decoration:none;border:2px solid;border-color:var(--ah-lil) var(--ah-coal) var(--ah-coal) var(--ah-lil);transition:transform .12s steps(2),box-shadow .12s steps(2)}
 .ah-p:hover,.ah-p:focus-visible{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--ah-aq);color:var(--ah-lil)}
 .ah-p:focus-visible{outline:2px solid var(--ah-aq);outline-offset:2px}
@@ -62,7 +59,7 @@
 .ah-low{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:1rem;align-items:start;max-width:40rem}
 .ah-low .winlist{margin:0;max-width:none;--win-dark:#0e0e12;--win-face:#131316;--win-well:#0e0e12;--win-title:#2e2e35;--background:#131316}
 @media (prefers-reduced-motion:reduce){.ah-p{transition:none}}
-@media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--music,.ah-p--art{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
+@media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--brand{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
 @media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .px--glyph{width:48px;height:48px;margin:-24px 0 0 -24px}.ah-title{font-size:48px;letter-spacing:.08em}}
 </style>
 <div class="ah">
