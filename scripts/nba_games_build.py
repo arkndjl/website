@@ -75,7 +75,8 @@ def current_season(today=None):
 
 # ---------------------------------------------------------------- tonight's lineups
 def official_report(now):
-    """the latest official report today (ET): {(away, home): {name key: status}}, its time, or ({}, None)"""
+    """the latest official report (ET, last 14 hours) with games dated today: {(away, home): {name key: status}} for
+    today's games only, its time, or ({}, None)"""
     try:
         import nba_inj_hist as I
     except Exception:          # noqa: BLE001
@@ -92,7 +93,7 @@ def official_report(now):
                 pdf = urllib.request.urlopen(req, timeout=20).read()
                 txt = subprocess.run(['pdftotext', '-layout', '-', '-'], input=pdf, capture_output=True, timeout=60).stdout.decode('utf-8', 'replace')
                 rep = {(E.team(I.ABBR.get(a, a)), E.team(I.ABBR.get(h, h))): {N.norm(k): v for k, v in d.items()}
-                       for (a, h), d in I.parse(txt).items()}
+                       for (a, h), d in I.parse(txt, now.date()).items()}
                 if rep:
                     return rep, t.isoformat(timespec='seconds')     # with its ET offset (Hugo needs seconds)
             except Exception:  # noqa: BLE001

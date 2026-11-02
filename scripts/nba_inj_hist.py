@@ -18,6 +18,7 @@ URL = 'https://ak-static.cms.nba.com/referee/injury/Injury-Report_{d}_{t}.pdf'
 STATUS = ('Out', 'Doubtful', 'Questionable', 'Probable', 'Available')
 LINE = re.compile(r'([A-Z][^,\d]{1,40}?, [^\s].{0,40}?)\s{2,}(' + '|'.join(STATUS) + r')\b')
 MATCH = re.compile(r'\b([A-Z]{2,3})@([A-Z]{2,3})\b')
+GDATE = re.compile(r'\s*(\d{2})/(\d{2})/(\d{4})\s')
 
 
 def fetch(d, hour):
@@ -46,13 +47,18 @@ def fetch(d, hour):
     return ''
 
 
-def parse(txt):
-    """{(away, home): {name: status}}; names come as 'Last, First' and go out as 'First Last'"""
-    out, cur = {}, None
+def parse(txt, day=None):
+    """{(away, home): {name: status}}; names come as 'Last, First' and go out as 'First Last'. With day (a date), only
+    the games the report dates that day: a report also lists the next day's games, and one from late the night before
+    lists today's under its own date"""
+    out, cur, gd = {}, None, None
     for ln in txt.splitlines():
+        d = GDATE.match(ln)
+        if d:
+            gd = dt.date(int(d.group(3)), int(d.group(1)), int(d.group(2)))
         m = MATCH.search(ln)
         if m:
-            cur = (E.team(m.group(1)), E.team(m.group(2)))
+            cur = (E.team(m.group(1)), E.team(m.group(2))) if day is None or gd == day else None
         if not cur:
             continue
         for nm, st in LINE.findall(ln):
