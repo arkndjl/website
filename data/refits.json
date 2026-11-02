@@ -1,15 +1,15 @@
 {
- "asof": "2026-11-02T22:30:05Z",
+ "asof": "2026-11-02T22:45:18Z",
  "jobs": {
   "close_model": {
-   "last": "2026-11-02T22:15:44Z",
+   "last": "2026-11-02T22:35:03Z",
    "status": "ok",
-   "secs": 156,
+   "secs": 158,
    "note": "",
    "changed": [
     "data/close_fit.json"
    ],
-   "lastOk": "2026-11-02T22:15:44Z",
+   "lastOk": "2026-11-02T22:35:03Z",
    "cmd": "python3 scripts/close_model.py --fit",
    "months": [
     1,
@@ -29,14 +29,14 @@
    "sport": "predictions"
   },
   "clv": {
-   "last": "2026-11-02T22:17:06Z",
+   "last": "2026-11-02T22:36:14Z",
    "status": "ok",
-   "secs": 23,
+   "secs": 11,
    "note": "",
    "changed": [
     "data/clv_fit.json"
    ],
-   "lastOk": "2026-11-02T22:17:06Z",
+   "lastOk": "2026-11-02T22:36:14Z",
    "cmd": "python3 scripts/clv.py --fit",
    "months": [
     1,
@@ -56,14 +56,14 @@
    "sport": "predictions"
   },
   "cover": {
-   "last": "2026-11-02T22:18:05Z",
+   "last": "2026-11-02T22:36:51Z",
    "status": "ok",
    "secs": 1,
    "note": "",
    "changed": [
     "data/cover_fit.json"
    ],
-   "lastOk": "2026-11-02T22:18:05Z",
+   "lastOk": "2026-11-02T22:36:51Z",
    "cmd": "python3 scripts/cover.py --fit",
    "months": [
     1,
@@ -83,14 +83,14 @@
    "sport": "predictions"
   },
   "cs2_model": {
-   "last": "2026-11-02T22:15:49Z",
+   "last": "2026-11-02T22:35:08Z",
    "status": "ok",
-   "secs": 51,
+   "secs": 45,
    "note": "",
    "changed": [
     "data/cs2_fit.json"
    ],
-   "lastOk": "2026-11-02T22:15:49Z",
+   "lastOk": "2026-11-02T22:35:08Z",
    "cmd": "python3 scripts/cs2_model.py --fit",
    "months": [
     1,
@@ -110,14 +110,14 @@
    "sport": "cs2"
   },
   "nba_games": {
-   "last": "2026-11-02T22:15:43Z",
+   "last": "2026-11-02T22:35:08Z",
    "status": "ok",
-   "secs": 837,
+   "secs": 596,
    "note": "",
    "changed": [
     "data/nba_games_fit.json"
    ],
-   "lastOk": "2026-11-02T22:15:43Z",
+   "lastOk": "2026-11-02T22:35:08Z",
    "cmd": "python3 scripts/nba_games.py --fit",
    "months": [
     11,
@@ -132,14 +132,14 @@
    "sport": "nba"
   },
   "nfl_games": {
-   "last": "2026-11-02T22:15:47Z",
+   "last": "2026-11-02T22:35:04Z",
    "status": "ok",
-   "secs": 178,
+   "secs": 131,
    "note": "",
    "changed": [
     "data/nfl_games_fit.json"
    ],
-   "lastOk": "2026-11-02T22:15:47Z",
+   "lastOk": "2026-11-02T22:35:04Z",
    "cmd": "python3 scripts/nfl_games.py --fit",
    "months": [
     10,
@@ -151,15 +151,15 @@
    "sport": "nfl"
   },
   "nhl_games": {
-   "last": "2026-11-02T22:15:44Z",
+   "last": "2026-11-02T22:35:03Z",
    "status": "ok",
-   "secs": 576,
+   "secs": 574,
    "note": "",
    "changed": [
     "data/nhl_games_fit.json",
     "scripts/data/games_wf/nhl.json.gz"
    ],
-   "lastOk": "2026-11-02T22:15:44Z",
+   "lastOk": "2026-11-02T22:35:03Z",
    "cmd": "python3 scripts/nhl_games.py --fit",
    "months": [
     11,
@@ -174,14 +174,14 @@
    "sport": "nhl"
   },
   "rank_odds": {
-   "last": "2026-11-02T22:18:31Z",
+   "last": "2026-11-02T22:37:16Z",
    "status": "ok",
-   "secs": 5,
+   "secs": 4,
    "note": "",
    "changed": [
     "data/rank_sd.json"
    ],
-   "lastOk": "2026-11-02T22:18:31Z",
+   "lastOk": "2026-11-02T22:37:16Z",
    "cmd": "python3 scripts/rank_odds.py --fit",
    "months": [
     1,
@@ -201,16 +201,16 @@
    "sport": "predictions"
   },
   "soccer_games": {
-   "last": "2026-11-02T22:15:48Z",
+   "last": "2026-11-02T22:35:03Z",
    "status": "ok",
-   "secs": 242,
+   "secs": 164,
    "note": "",
    "changed": [
     "data/soccer_games_fit.json",
     "scripts/data/games_wf/soccer.json.gz",
     "scripts/data/soccer_team_ratings.json.gz"
    ],
-   "lastOk": "2026-11-02T22:15:48Z",
+   "lastOk": "2026-11-02T22:35:03Z",
    "cmd": "python3 scripts/soccer_games.py --fit",
    "months": [
     10,
