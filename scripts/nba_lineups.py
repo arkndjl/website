@@ -26,9 +26,9 @@ import nba_espn as E
 CACHE = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'lineups')
 OUT = os.path.join(E.ROOT, 'static', 'data', 'nba-lineups.json')
 # shrinkage (possessions) for the display's sNet and sOn-Off: noise variance over true variance from odd/even game
-# splits (--split; 2026: 751 and 1,462): Net of a five (20+ possessions in both halves) and a player's on-off
+# splits (--split; 2024-26: units 447 / 671 / 751, on-off 1,408 / 2,610 / 1,462): Net of a five (20+ possessions in both halves) and a player's on-off
 # (effective possessions 1 / (1/on + 1/off))
-K_UNIT, K_ONOFF = 750, 1500
+K_UNIT, K_ONOFF = 600, 1800
 NOT_ON_FLOOR = ('Technical', 'Ejection', 'Delay', 'Timeout', 'Coach', 'Ref-Initiated', 'Review', 'Defensive 3-Seconds')
 
 
@@ -212,7 +212,7 @@ def season(S, workers=8):
 def check(S):
     gs, res = season(S)
     n = len(gs); have = sum(1 for v in res.values() if v)
-    lens, diffs, bad = [], [], 0
+    lens, diffs, bad, nobox = [], [], 0, 0
     for g in gs:
         r = res.get(g['id'])
         if not r:
@@ -225,6 +225,9 @@ def check(S):
                 on[p] += sec / 60
             if len(h5) != 5 or len(a5) != 5:
                 bad += 1
+        if sum(r['bx'].values()) < 400:
+            nobox += 1                                  # ESPN lost the box minutes of some older games
+            continue
         for pid, m in r['bx'].items():
             if m > 0 or on.get(pid):
                 diffs.append(abs(on.get(pid, 0) - m))
@@ -232,7 +235,7 @@ def check(S):
     within = lambda t: sum(1 for d in diffs if d <= t) / max(1, len(diffs))
     out = {'season': S, 'games': n, 'parsed': have, 'mean_game_min': round(sum(reg) / max(1, len(reg)), 2),
            'games_240_or_ot': round(sum(1 for x in reg if any(abs(x - (48 + 5 * k)) < 0.6 for k in range(5))) / max(1, len(reg)), 4),
-           'player_games': len(diffs), 'within_1min': round(within(1.0), 4), 'within_2min': round(within(2.0), 4),
+           'no_box_minutes': nobox, 'player_games': len(diffs), 'within_1min': round(within(1.0), 4), 'within_2min': round(within(2.0), 4),
            'mean_abs_min': round(sum(diffs) / max(1, len(diffs)), 3), 'stints_not_5': bad}
     print(json.dumps(out), flush=True)
     return out

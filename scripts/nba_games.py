@@ -1315,7 +1315,9 @@ class Model:
             e = (hs - as_) - (self.pelo[h] - self.pelo[a] + (0 if g['n'] else self.hca))
             self.pelo[h] += self.pk * e; self.pelo[a] -= self.pk * e
         self.ngp[h] += 1; self.ngp[a] += 1
-        poss = g.get('poss')
+        # the efficiency ratings can read a trimmed result (research: garbage time out, scripts/nba_lineups_research.py)
+        hs, as_ = g.get('ehs', hs), g.get('eas', as_)
+        poss = g.get('eposs', g.get('poss'))
         L = self.lg[0] / self.lg[1]
         if poss and poss > 60:
             hc = 0 if g['n'] else self.hca / 2

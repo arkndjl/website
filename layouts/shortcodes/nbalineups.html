@@ -33,9 +33,9 @@
   </div>
   <div class="cfbm__body wintable__about"><p class="cfb__dim">
   {{- if eq $view "onoff" -}}
-  On/off from ESPN play-by-play this season, every game a player's team played. On: the team's net points per 100 possessions with him on the floor; Off: with him off it; On-Off the difference, which also carries who plays beside and behind him, so it is not a rating of the player alone. sOn-Off is shrunk toward 0 with <span data-ln-ko>1,500</span> possessions (on and off combined: 1 / (1/on + 1/off)) (the noise level measured by splitting seasons into odd and even games), the fairer number for a small sample. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). A traded player shows once per team. Garbage time counts.
+  On/off from ESPN play-by-play this season, every game a player's team played. On: the team's net points per 100 possessions with him on the floor; Off: with him off it; On-Off the difference, which also carries who plays beside and behind him, so it is not a rating of the player alone. sOn-Off is shrunk toward 0 with <span data-ln-ko>1,800</span> possessions (on and off combined: 1 / (1/on + 1/off)) (the noise level measured by splitting seasons into odd and even games), the fairer number for a small sample. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). A traded player shows once per team. Garbage time counts.
   {{- else -}}
-  Five-man units and two-man pairs from ESPN play-by-play this season: minutes together, possessions, points scored (ORtg) and allowed (DRtg) per 100 possessions, and Net. sNet shrinks Net toward 0 with <span data-ln-k>750</span> possessions (the noise level measured by splitting seasons into odd and even games); a unit needs several hundred possessions before its Net says much. Lineups come from substitutions; each quarter's five are the players seen before they are subbed in. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). Garbage time counts.
+  Five-man units and two-man pairs from ESPN play-by-play this season: minutes together, possessions, points scored (ORtg) and allowed (DRtg) per 100 possessions, and Net. sNet shrinks Net toward 0 with <span data-ln-k>600</span> possessions (the noise level measured by splitting seasons into odd and even games); a unit needs several hundred possessions before its Net says much. Lineups come from substitutions; each quarter's five are the players seen before they are subbed in. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). Garbage time counts.
   {{- end -}}
   </p></div>
   <div class="win__status"><span data-ln-count></span><span class="cfb__asof" data-ln-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -46,7 +46,8 @@
 .nbaln__table .nbaln__tm img { width: 18px; height: 18px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; }
 @media (max-width: 600px) {
   .nbaln__table .nbaln__x { display: none; }
-  .nbaln__table td.nbaln__who { min-width: 9em; }
+  .nbaln__table td.nbaln__who { min-width: 8em; }
+  .nbaln__table .nbaln__ab { display: none; }
 }
 </style>
 <script>
@@ -61,8 +62,8 @@
   function cls(v) { return v == null ? '' : v < 0 ? ' cfb__down' : ' cfb__up'; }
   function logo(t) { return '<img src="/img/nba/' + String(t).toLowerCase() + '.png" alt="" width="18" height="18" loading="lazy">'; }
   function cols(view, all) {
-    if (view === 'onoff') return [['rk', 'RK', 1], ['n', 'Player'], all ? ['t', 'Team'] : null, ['min', 'MIN', 1], ['on', 'On', 1, 'nbaln__x', 'team net per 100 with him on the floor'], ['off', 'Off', 1, 'nbaln__x', 'team net per 100 with him off the floor'], ['oo', 'On-Off', 1, '', 'on minus off'], ['soo', 'sOn-Off', 1, '', 'on-off shrunk toward 0 by possessions']].filter(Boolean);
-    return [['rk', 'RK', 1], ['n', 'Lineup'], ['min', 'MIN', 1], ['poss', 'Poss', 1, 'nbaln__x'], ['or', 'ORtg', 1, 'nbaln__x', 'points scored per 100 possessions'], ['dr', 'DRtg', 1, 'nbaln__x', 'points allowed per 100 possessions'], ['net', 'Net', 1, '', 'ORtg - DRtg'], ['sn', 'sNet', 1, '', 'Net shrunk toward 0 by possessions']];
+    if (view === 'onoff') return [['rk', 'RK', 1], ['n', 'Player'], all ? ['t', 'Team'] : null, ['min', 'MIN', 1], ['on', 'On', 1, 'nbaln__x', 'team net per 100 with him on the floor'], ['off', 'Off', 1, 'nbaln__x', 'team net per 100 with him off the floor'], ['oo', 'On-Off', 1, 'nbaln__x', 'on minus off'], ['soo', 'sOn-Off', 1, '', 'on-off shrunk toward 0 by possessions']].filter(Boolean);
+    return [['rk', 'RK', 1], ['n', 'Lineup'], ['min', 'MIN', 1], ['poss', 'Poss', 1, 'nbaln__x'], ['or', 'ORtg', 1, 'nbaln__x', 'points scored per 100 possessions'], ['dr', 'DRtg', 1, 'nbaln__x', 'points allowed per 100 possessions'], ['net', 'Net', 1, 'nbaln__x', 'ORtg - DRtg'], ['sn', 'sNet', 1, '', 'Net shrunk toward 0 by possessions']];
   }
   function init(W) {
     if (W.__ln) return; W.__ln = true;
@@ -116,7 +117,7 @@
           var v = r[c[0]], x = c[3] ? ' ' + c[3] : '';
           if (c[0] === 'rk') return '<td class="cfb__rk">' + (i + 1) + '</td>';
           if (c[0] === 'n') return '<td class="nbaln__who"' + (r.full ? ' title="' + esc(r.full) + '"' : '') + '><b>' + esc(v) + '</b></td>';
-          if (c[0] === 't') return '<td><span class="nbaln__tm">' + logo(v) + esc(v) + '</span></td>';
+          if (c[0] === 't') return '<td><span class="nbaln__tm">' + logo(v) + '<span class="nbaln__ab">' + esc(v) + '</span></span></td>';
           if (c[0] === 'min' || c[0] === 'poss') return '<td class="cfb__num' + x + '">' + Math.round(v).toLocaleString('en-US') + '</td>';
           if (c[0] === 'or' || c[0] === 'dr') return '<td class="cfb__num' + x + '">' + (v == null ? '—' : v.toFixed(1)) + '</td>';
           return '<td class="cfb__num' + x + (c[0] === 'sn' || c[0] === 'soo' ? ' is-key' : '') + '"><span class="' + cls(v).trim() + '">' + sg(v) + '</span></td>';
