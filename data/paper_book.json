@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T22:43:42Z",
+ "asof": "2026-11-02T23:36:16Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 99.59,
   "peak": 114.88,
   "drawdown": 0.1331,
-  "open": 73.0,
+  "open": 73.25,
   "path": [
    101.5,
    101.6,
@@ -133,10 +133,10 @@
   ]
  },
  "record": {
-  "n": 243,
+  "n": 245,
   "clvN": 130,
-  "clvRet": -0.0246,
-  "clvT": -3.63,
+  "clvRet": -0.0248,
+  "clvT": -3.67,
   "clv": -0.17,
   "beat": 0.209,
   "settled": 121,
@@ -149,7 +149,7 @@
   "risked": 114.5,
   "yield": 0.0014
  },
- "tEff": -3.63,
+ "tEff": -3.66,
  "corr": {
   "rho": 0.0,
   "n": 130,
@@ -165,7 +165,7 @@
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.5% t -3.63",
+   "value": "-2.5% t -3.66",
    "pass": false
   },
   {
@@ -180,7 +180,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +10.4% vs -2.4% (SE 9.6)",
+   "value": "ROI +10.4% vs -2.5% (SE 9.6)",
    "pass": true
   }
  ],
@@ -191,7 +191,7 @@
    "label": "CFB moneyline",
    "sport": "cfb",
    "mk": "ml",
-   "n": 2,
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -212,9 +212,9 @@
    "label": "CFB spread",
    "sport": "cfb",
    "mk": "spread",
-   "n": 1,
+   "n": 2,
    "clvN": 1,
-   "clvRet": 0.0246,
+   "clvRet": -0.006,
    "clvT": null,
    "clv": 0.0,
    "beat": 0.0,
@@ -275,7 +275,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 7,
+   "n": 6,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": -2.35,
@@ -296,7 +296,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 9,
+   "n": 6,
    "clvN": 1,
    "clvRet": 0.0527,
    "clvT": null,
@@ -317,7 +317,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 28,
+   "n": 32,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -338,7 +338,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 46,
+   "n": 48,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -825,7 +825,7 @@
    "ev": 0.0017,
    "event": null,
    "pass": false,
-   "close": 31.5
+   "close": 32.5
   },
   {
    "rule": "cbb-total",
@@ -868,6 +868,27 @@
    "event": null,
    "pass": false,
    "close": 26.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401909541",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Xavier",
+   "a": "Mount St. Mary's",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": 102.0,
+   "bet": "under 158.5 +102",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 2.2,
+   "ev": 0.03,
+   "event": null,
+   "pass": false,
+   "close": 158.5
   },
   {
    "rule": "cbb-spread",
@@ -946,12 +967,12 @@
    "price": -102.0,
    "bet": "over 132.5 -102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 11.5,
    "ev": 0.0759,
    "event": null,
    "pass": false,
-   "close": 132.5
+   "close": 131.5
   },
   {
    "rule": "cbb-spread",
@@ -967,7 +988,7 @@
    "price": 104.0,
    "bet": "Iowa State -13.5 +104",
    "placed": "2026-11-01T00:09:20Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
@@ -1014,7 +1035,7 @@
    "ev": 0.0387,
    "event": null,
    "pass": false,
-   "close": 157.5
+   "close": 154.5
   },
   {
    "rule": "cbb-total",
@@ -1055,8 +1076,8 @@
    "edge": 2.3,
    "ev": 0.0106,
    "event": null,
-   "pass": false,
-   "close": 143.5
+   "pass": true,
+   "close": 142.5
   },
   {
    "rule": "cbb-ml",
@@ -1119,7 +1140,7 @@
    "ev": 0.0191,
    "event": null,
    "pass": false,
-   "close": 160.5
+   "close": 161.5
   },
   {
    "rule": "cbb-spread",
@@ -1223,7 +1244,7 @@
    "edge": 3.4,
    "ev": 0.0302,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 144.5
   },
   {
@@ -1244,8 +1265,8 @@
    "edge": 5.8,
    "ev": 0.0012,
    "event": null,
-   "pass": true,
-   "close": 12.5
+   "pass": false,
+   "close": 13.5
   },
   {
    "rule": "cbb-total",
@@ -1303,7 +1324,7 @@
    "price": 102.0,
    "bet": "under 153.5 +102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 8.1,
    "ev": 0.0816,
    "event": null,
@@ -1397,6 +1418,27 @@
   {
    "rule": "cbb-spread",
    "sport": "cbb",
+   "id": "401918976",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "East Carolina",
+   "a": "South Carolina Upstate",
+   "mk": "spread",
+   "side": "away",
+   "line": 16.5,
+   "price": -111.0,
+   "bet": "South Carolina Upstate +16.5 -111",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 7.7,
+   "ev": 0.0006,
+   "event": null,
+   "pass": false,
+   "close": 16.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
    "id": "401919803",
    "k": "2026-11-03T00:00:00Z",
    "slate": "cbb:2026-11-02",
@@ -1434,7 +1476,7 @@
    "ev": 0.0464,
    "event": null,
    "pass": false,
-   "close": 155.5
+   "close": 156.5
   },
   {
    "rule": "cbb-total",
@@ -1455,7 +1497,7 @@
    "ev": 0.0154,
    "event": null,
    "pass": false,
-   "close": 137.5
+   "close": 136.5
   },
   {
    "rule": "cbb-total",
@@ -1475,7 +1517,7 @@
    "edge": 2.6,
    "ev": 0.0036,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 147.5
   },
   {
@@ -1513,7 +1555,7 @@
    "price": -102.0,
    "bet": "under 157.5 -102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 6.6,
    "ev": 0.0475,
    "event": null,
@@ -1538,8 +1580,8 @@
    "edge": 5.0,
    "ev": 0.005,
    "event": null,
-   "pass": true,
-   "close": 34.5
+   "pass": false,
+   "close": 36.5
   },
   {
    "rule": "cbb-total",
@@ -1561,6 +1603,27 @@
    "event": null,
    "pass": false,
    "close": 159.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921753",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "UCF",
+   "a": "Florida Gulf Coast",
+   "mk": "spread",
+   "side": "away",
+   "line": 22.5,
+   "price": -102.0,
+   "bet": "Florida Gulf Coast +22.5 -102",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 2.6,
+   "ev": 0.0078,
+   "event": null,
+   "pass": false,
+   "close": 22.5
   },
   {
    "rule": "cbb-total",
@@ -1601,7 +1664,7 @@
    "edge": 3.1,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 28.5
   },
   {
@@ -1744,12 +1807,12 @@
    "price": 108.0,
    "bet": "Mississippi State -18.5 +108",
    "placed": "2026-11-01T13:30:49Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 4.1,
    "ev": 0.0692,
    "event": null,
-   "pass": true,
-   "close": 17.5
+   "pass": false,
+   "close": 18.5
   },
   {
    "rule": "cbb-total",
@@ -1853,7 +1916,7 @@
    "edge": 5.3,
    "ev": 0.016,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -5.5
   },
   {
@@ -1916,8 +1979,8 @@
    "edge": 2.9,
    "ev": 0.0002,
    "event": null,
-   "pass": false,
-   "close": 23.5
+   "pass": true,
+   "close": 24.5
   },
   {
    "rule": "cbb-total",
@@ -1960,6 +2023,27 @@
    "event": null,
    "pass": false,
    "close": 22.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401918955",
+   "k": "2026-11-03T00:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "NC State",
+   "a": "Campbell",
+   "mk": "total",
+   "side": "over",
+   "line": 158.5,
+   "price": -104.0,
+   "bet": "over 158.5 -104",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 2.2,
+   "ev": 0.0002,
+   "event": null,
+   "pass": false,
+   "close": 158.5
   },
   {
    "rule": "cbb-total",
@@ -2105,8 +2189,8 @@
    "edge": 3.8,
    "ev": 0.0079,
    "event": null,
-   "pass": true,
-   "close": 229.5
+   "pass": false,
+   "close": 227.5
   },
   {
    "rule": "nba-spread",
@@ -2124,7 +2208,7 @@
    "placed": "2026-11-02T01:48:20Z",
    "stake": 0.25,
    "edge": 2.8,
-   "ev": 0.0006,
+   "ev": 0.0005,
    "event": null,
    "pass": false,
    "close": 14.5
@@ -2148,7 +2232,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": true,
-   "close": 3.5
+   "close": 2.5
   },
   {
    "rule": "nba-total",
@@ -2170,6 +2254,27 @@
    "event": null,
    "pass": true,
    "close": 225.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401906801",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Oklahoma",
+   "a": "East Texas A&M",
+   "mk": "total",
+   "side": "over",
+   "line": 148.5,
+   "price": -108.0,
+   "bet": "over 148.5 -108",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 5.3,
+   "ev": 0.0079,
+   "event": null,
+   "pass": false,
+   "close": 148.5
   },
   {
    "rule": "cbb-total",
@@ -2332,7 +2437,7 @@
    "price": -100.0,
    "bet": "under 156.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 11.5,
    "ev": 0.0865,
    "event": null,
@@ -2357,8 +2462,8 @@
    "edge": 2.7,
    "ev": 0.0023,
    "event": null,
-   "pass": false,
-   "close": 5.5
+   "pass": true,
+   "close": 6.5
   },
   {
    "rule": "cbb-total",
@@ -2441,8 +2546,8 @@
    "edge": 5.7,
    "ev": 0.0289,
    "event": null,
-   "pass": true,
-   "close": -5.5
+   "pass": false,
+   "close": -4.5
   },
   {
    "rule": "cbb-total",
@@ -2458,12 +2563,12 @@
    "price": -100.0,
    "bet": "under 157.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 16.0,
    "ev": 0.0865,
    "event": null,
-   "pass": true,
-   "close": 158.5
+   "pass": false,
+   "close": 157.5
   },
   {
    "rule": "cbb-spread",
@@ -2483,7 +2588,7 @@
    "edge": 4.2,
    "ev": 0.009,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 18.5
   },
   {
@@ -2547,7 +2652,7 @@
    "ev": 0.0147,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 230.5
   },
   {
    "rule": "nfl-total",
@@ -2563,11 +2668,11 @@
    "price": -100.0,
    "bet": "under 46.5 -100",
    "placed": "2026-10-28T02:43:45Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.0,
-   "ev": 0.0362,
+   "ev": 0.0178,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 46.5
   },
   {
@@ -2629,7 +2734,7 @@
    "ev": 0.0078,
    "event": null,
    "pass": false,
-   "close": 28.5
+   "close": 29.5
   },
   {
    "rule": "cbb-total",
@@ -2754,7 +2859,7 @@
    "edge": 3.6,
    "ev": 0.0161,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 228.5
   },
   {
@@ -2813,12 +2918,12 @@
    "price": -100.0,
    "bet": "over 143.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 10.7,
    "ev": 0.0865,
    "event": null,
    "pass": false,
-   "close": 142.5
+   "close": 144.5
   },
   {
    "rule": "cbb-spread",
@@ -3067,7 +3172,7 @@
    "placed": "2026-11-02T01:48:20Z",
    "stake": 0.25,
    "edge": 7.2,
-   "ev": 0.014,
+   "ev": 0.0142,
    "event": null,
    "pass": false,
    "close": 231.5
@@ -3132,7 +3237,7 @@
    "edge": 3.7,
    "ev": 0.0056,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 17.5
   },
   {
@@ -3149,12 +3254,12 @@
    "price": -100.0,
    "bet": "under 155.5 -100",
    "placed": "2026-11-01T20:17:06Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 5.4,
    "ev": 0.0475,
    "event": null,
    "pass": false,
-   "close": 159.5
+   "close": 160.5
   },
   {
    "rule": "cbb-ml",
@@ -3174,7 +3279,7 @@
    "edge": 2.5,
    "ev": 0.0023,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -4.5
   },
   {
@@ -3195,7 +3300,7 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -3238,7 +3343,7 @@
    "ev": 0.0011,
    "event": null,
    "pass": false,
-   "close": 147.5
+   "close": 148.5
   },
   {
    "rule": "cbb-spread",
@@ -3749,9 +3854,9 @@
    "price": -104.0,
    "bet": "over 49.5 -104",
    "placed": "2026-11-01T15:21:05Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 3.5,
-   "ev": 0.0075,
+   "ev": 0.006,
    "event": null,
    "pass": true,
    "close": 51.5
@@ -3772,7 +3877,7 @@
    "placed": "2026-11-01T14:59:46Z",
    "stake": 3.0,
    "edge": 5.0,
-   "ev": 0.0314,
+   "ev": 0.03,
    "event": null,
    "pass": true,
    "close": 52.5
@@ -3791,9 +3896,9 @@
    "price": -100.0,
    "bet": "under 73.5 -100",
    "placed": "2026-11-01T20:26:56Z",
-   "stake": 3.75,
+   "stake": 3.5,
    "edge": 7.2,
-   "ev": 0.0374,
+   "ev": 0.0361,
    "event": null,
    "pass": false,
    "close": 72.5
@@ -3814,7 +3919,7 @@
    "placed": "2026-11-01T20:36:45Z",
    "stake": 1.25,
    "edge": 9.1,
-   "ev": 0.0131,
+   "ev": 0.012,
    "event": null,
    "pass": false,
    "close": 39.5
@@ -3833,9 +3938,9 @@
    "price": -102.0,
    "bet": "over 39.5 -102",
    "placed": "2026-11-01T20:52:18Z",
-   "stake": 2.75,
+   "stake": 2.5,
    "edge": 7.0,
-   "ev": 0.0267,
+   "ev": 0.0254,
    "event": null,
    "pass": false,
    "close": 38.5
@@ -3856,7 +3961,7 @@
    "placed": "2026-11-01T17:18:42Z",
    "stake": 0.75,
    "edge": 3.8,
-   "ev": 0.0084,
+   "ev": 0.0069,
    "event": null,
    "pass": false,
    "close": 43.5
@@ -3877,7 +3982,7 @@
    "placed": "2026-11-01T16:08:35Z",
    "stake": 2.75,
    "edge": 7.7,
-   "ev": 0.0286,
+   "ev": 0.0274,
    "event": null,
    "pass": false,
    "close": 39.5
@@ -3896,9 +4001,9 @@
    "price": -100.0,
    "bet": "over 44.5 -100",
    "placed": "2026-11-01T21:15:08Z",
-   "stake": 2.5,
+   "stake": 2.25,
    "edge": 3.4,
-   "ev": 0.027,
+   "ev": 0.0255,
    "event": null,
    "pass": true,
    "close": 43.5
@@ -3919,7 +4024,7 @@
    "placed": "2026-11-01T17:00:54Z",
    "stake": 2.5,
    "edge": 6.5,
-   "ev": 0.0254,
+   "ev": 0.024,
    "event": null,
    "pass": true,
    "close": 48.5
@@ -3938,12 +4043,12 @@
    "price": 102.0,
    "bet": "under 54.5 +102",
    "placed": "2026-11-02T22:17:12Z",
-   "stake": 3.75,
+   "stake": 3.5,
    "edge": 4.2,
-   "ev": 0.0395,
+   "ev": 0.038,
    "event": null,
-   "pass": false,
-   "close": 54.5
+   "pass": true,
+   "close": 55.5
   },
   {
    "rule": "cfb-ml",
@@ -3982,7 +4087,7 @@
    "placed": "2026-11-01T15:21:05Z",
    "stake": 0.5,
    "edge": 6.2,
-   "ev": 0.0054,
+   "ev": 0.0041,
    "event": null,
    "pass": true,
    "close": 45.5
@@ -4003,10 +4108,31 @@
    "placed": "2026-11-02T10:59:09Z",
    "stake": 0.25,
    "edge": 5.4,
-   "ev": 0.0033,
+   "ev": 0.0019,
    "event": null,
    "pass": false,
    "close": 44.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401862819",
+   "k": "2026-11-07T20:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "UAB",
+   "a": "Charlotte",
+   "mk": "total",
+   "side": "over",
+   "line": 47.5,
+   "price": -100.0,
+   "bet": "over 47.5 -100",
+   "placed": "2026-11-02T23:36:02Z",
+   "stake": 2.75,
+   "edge": 4.8,
+   "ev": 0.0294,
+   "event": null,
+   "pass": false,
+   "close": 47.5
   },
   {
    "rule": "cfb-total",
@@ -4024,7 +4150,7 @@
    "placed": "2026-11-01T20:38:27Z",
    "stake": 0.25,
    "edge": 5.1,
-   "ev": 0.0025,
+   "ev": 0.0011,
    "event": null,
    "pass": true,
    "close": 55.5
@@ -4045,7 +4171,7 @@
    "placed": "2026-11-02T01:48:24Z",
    "stake": 5.0,
    "edge": 3.6,
-   "ev": 0.0687,
+   "ev": 0.0671,
    "event": null,
    "pass": false,
    "close": 48.5
@@ -4066,7 +4192,7 @@
    "placed": "2026-11-01T21:25:38Z",
    "stake": 1.75,
    "edge": 4.2,
-   "ev": 0.0191,
+   "ev": 0.0177,
    "event": null,
    "pass": true,
    "close": 63.5
@@ -4085,9 +4211,9 @@
    "price": -102.0,
    "bet": "under 51.5 -102",
    "placed": "2026-11-01T21:15:08Z",
-   "stake": 1.5,
+   "stake": 1.25,
    "edge": 3.2,
-   "ev": 0.0164,
+   "ev": 0.0149,
    "event": null,
    "pass": true,
    "close": 51.5
@@ -4108,9 +4234,9 @@
    "placed": "2026-11-01T21:25:38Z",
    "stake": 1.5,
    "edge": 3.6,
-   "ev": 0.0175,
+   "ev": 0.016,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 49.5
   },
   {
@@ -4127,9 +4253,9 @@
    "price": -108.0,
    "bet": "over 47.5 -108",
    "placed": "2026-11-01T17:18:42Z",
-   "stake": 0.25,
+   "stake": 0.0,
    "edge": 8.0,
-   "ev": 0.0011,
+   "ev": -0.0001,
    "event": null,
    "pass": false,
    "close": 48.5
@@ -4150,28 +4276,28 @@
    "placed": "2026-11-01T21:15:08Z",
    "stake": 0.25,
    "edge": 5.0,
-   "ev": 0.0022,
+   "ev": 0.0008,
    "event": null,
    "pass": false,
    "close": 68.5
   },
   {
-   "rule": "cfb-ml",
+   "rule": "cfb-spread",
    "sport": "cfb",
    "id": "401858291",
    "k": "2026-11-08T00:30:00.000Z",
    "slate": "cfb:2026-11-07",
    "h": "Notre Dame",
    "a": "Miami",
-   "mk": "ml",
+   "mk": "spread",
    "side": "away",
-   "line": null,
-   "price": 190.0,
-   "bet": "Miami ML +190",
-   "placed": "2026-11-02T01:03:55Z",
-   "stake": 0.75,
+   "line": 5.5,
+   "price": -100.0,
+   "bet": "Miami +5.5 -100",
+   "placed": "2026-11-02T23:36:02Z",
+   "stake": 3.25,
    "edge": 5.6,
-   "ev": 0.0188,
+   "ev": 0.037,
    "event": null,
    "pass": false,
    "close": 5.5
@@ -4192,9 +4318,9 @@
    "placed": "2026-11-01T17:00:54Z",
    "stake": 2.0,
    "edge": 8.4,
-   "ev": 0.0207,
+   "ev": 0.0195,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 57.5
   },
   {
@@ -4213,7 +4339,7 @@
    "placed": "2026-11-01T20:52:18Z",
    "stake": 0.5,
    "edge": 3.2,
-   "ev": 0.0067,
+   "ev": 0.0052,
    "event": null,
    "pass": false,
    "close": 46.5
@@ -4232,9 +4358,9 @@
    "price": -106.0,
    "bet": "over 45.5 -106",
    "placed": "2026-11-02T01:52:55Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 5.8,
-   "ev": 0.0044,
+   "ev": 0.003,
    "event": null,
    "pass": true,
    "close": 45.5
@@ -4255,7 +4381,7 @@
    "placed": "2026-11-02T02:51:13Z",
    "stake": 2.75,
    "edge": 4.3,
-   "ev": 0.0295,
+   "ev": 0.028,
    "event": null,
    "pass": false,
    "close": 64.5
@@ -4276,7 +4402,7 @@
    "placed": "2026-11-01T20:17:01Z",
    "stake": 5.0,
    "edge": 4.4,
-   "ev": 0.071,
+   "ev": 0.0694,
    "event": null,
    "pass": true,
    "close": 72.5
@@ -5582,7 +5708,7 @@
    "ev": 0.0666,
    "event": null,
    "pass": true,
-   "clvRet": -0.0196,
+   "clvRet": -0.0193,
    "clv": 0.0,
    "beat": 0,
    "close": 3.5,
@@ -7429,7 +7555,7 @@
    "ev": 0.0353,
    "event": null,
    "pass": false,
-   "clvRet": 0.0246,
+   "clvRet": -0.006,
    "clv": 0.0,
    "beat": 0,
    "close": -13.5,
@@ -7789,7 +7915,7 @@
    "ev": 0.0666,
    "event": null,
    "pass": true,
-   "clvRet": -0.0196,
+   "clvRet": -0.0193,
    "clv": 0.0,
    "beat": 0,
    "close": 3.5,
@@ -10624,7 +10750,7 @@
    "ev": 0.0017,
    "event": null,
    "pass": false,
-   "close": 31.5
+   "close": 32.5
   },
   {
    "rule": "cbb-total",
@@ -10667,6 +10793,27 @@
    "event": null,
    "pass": false,
    "close": 26.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401909541",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Xavier",
+   "a": "Mount St. Mary's",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": 102.0,
+   "bet": "under 158.5 +102",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 2.2,
+   "ev": 0.03,
+   "event": null,
+   "pass": false,
+   "close": 158.5
   },
   {
    "rule": "cbb-spread",
@@ -10745,12 +10892,12 @@
    "price": -102.0,
    "bet": "over 132.5 -102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 11.5,
    "ev": 0.0759,
    "event": null,
    "pass": false,
-   "close": 132.5
+   "close": 131.5
   },
   {
    "rule": "cbb-spread",
@@ -10766,7 +10913,7 @@
    "price": 104.0,
    "bet": "Iowa State -13.5 +104",
    "placed": "2026-11-01T00:09:20Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
@@ -10813,7 +10960,7 @@
    "ev": 0.0387,
    "event": null,
    "pass": false,
-   "close": 157.5
+   "close": 154.5
   },
   {
    "rule": "cbb-total",
@@ -10854,8 +11001,8 @@
    "edge": 2.3,
    "ev": 0.0106,
    "event": null,
-   "pass": false,
-   "close": 143.5
+   "pass": true,
+   "close": 142.5
   },
   {
    "rule": "cbb-ml",
@@ -10918,7 +11065,7 @@
    "ev": 0.0191,
    "event": null,
    "pass": false,
-   "close": 160.5
+   "close": 161.5
   },
   {
    "rule": "cbb-spread",
@@ -11022,7 +11169,7 @@
    "edge": 3.4,
    "ev": 0.0302,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 144.5
   },
   {
@@ -11043,8 +11190,8 @@
    "edge": 5.8,
    "ev": 0.0012,
    "event": null,
-   "pass": true,
-   "close": 12.5
+   "pass": false,
+   "close": 13.5
   },
   {
    "rule": "cbb-total",
@@ -11102,7 +11249,7 @@
    "price": 102.0,
    "bet": "under 153.5 +102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 8.1,
    "ev": 0.0816,
    "event": null,
@@ -11196,6 +11343,27 @@
   {
    "rule": "cbb-spread",
    "sport": "cbb",
+   "id": "401918976",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "East Carolina",
+   "a": "South Carolina Upstate",
+   "mk": "spread",
+   "side": "away",
+   "line": 16.5,
+   "price": -111.0,
+   "bet": "South Carolina Upstate +16.5 -111",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 7.7,
+   "ev": 0.0006,
+   "event": null,
+   "pass": false,
+   "close": 16.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
    "id": "401919803",
    "k": "2026-11-03T00:00:00Z",
    "slate": "cbb:2026-11-02",
@@ -11233,7 +11401,7 @@
    "ev": 0.0464,
    "event": null,
    "pass": false,
-   "close": 155.5
+   "close": 156.5
   },
   {
    "rule": "cbb-total",
@@ -11254,7 +11422,7 @@
    "ev": 0.0154,
    "event": null,
    "pass": false,
-   "close": 137.5
+   "close": 136.5
   },
   {
    "rule": "cbb-total",
@@ -11274,7 +11442,7 @@
    "edge": 2.6,
    "ev": 0.0036,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 147.5
   },
   {
@@ -11312,7 +11480,7 @@
    "price": -102.0,
    "bet": "under 157.5 -102",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 6.6,
    "ev": 0.0475,
    "event": null,
@@ -11337,8 +11505,8 @@
    "edge": 5.0,
    "ev": 0.005,
    "event": null,
-   "pass": true,
-   "close": 34.5
+   "pass": false,
+   "close": 36.5
   },
   {
    "rule": "cbb-total",
@@ -11360,6 +11528,27 @@
    "event": null,
    "pass": false,
    "close": 159.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921753",
+   "k": "2026-11-03T00:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "UCF",
+   "a": "Florida Gulf Coast",
+   "mk": "spread",
+   "side": "away",
+   "line": 22.5,
+   "price": -102.0,
+   "bet": "Florida Gulf Coast +22.5 -102",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 2.6,
+   "ev": 0.0078,
+   "event": null,
+   "pass": false,
+   "close": 22.5
   },
   {
    "rule": "cbb-total",
@@ -11400,7 +11589,7 @@
    "edge": 3.1,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 28.5
   },
   {
@@ -11543,12 +11732,12 @@
    "price": 108.0,
    "bet": "Mississippi State -18.5 +108",
    "placed": "2026-11-01T13:30:49Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 4.1,
    "ev": 0.0692,
    "event": null,
-   "pass": true,
-   "close": 17.5
+   "pass": false,
+   "close": 18.5
   },
   {
    "rule": "cbb-total",
@@ -11652,7 +11841,7 @@
    "edge": 5.3,
    "ev": 0.016,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -5.5
   },
   {
@@ -11715,8 +11904,8 @@
    "edge": 2.9,
    "ev": 0.0002,
    "event": null,
-   "pass": false,
-   "close": 23.5
+   "pass": true,
+   "close": 24.5
   },
   {
    "rule": "cbb-total",
@@ -11759,6 +11948,27 @@
    "event": null,
    "pass": false,
    "close": 22.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401918955",
+   "k": "2026-11-03T00:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "NC State",
+   "a": "Campbell",
+   "mk": "total",
+   "side": "over",
+   "line": 158.5,
+   "price": -104.0,
+   "bet": "over 158.5 -104",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 2.2,
+   "ev": 0.0002,
+   "event": null,
+   "pass": false,
+   "close": 158.5
   },
   {
    "rule": "cbb-total",
@@ -11904,8 +12114,8 @@
    "edge": 3.8,
    "ev": 0.0079,
    "event": null,
-   "pass": true,
-   "close": 229.5
+   "pass": false,
+   "close": 227.5
   },
   {
    "rule": "nba-spread",
@@ -11923,7 +12133,7 @@
    "placed": "2026-11-02T01:48:20Z",
    "stake": 0.25,
    "edge": 2.8,
-   "ev": 0.0006,
+   "ev": 0.0005,
    "event": null,
    "pass": false,
    "close": 14.5
@@ -11947,7 +12157,7 @@
    "ev": 0.0016,
    "event": null,
    "pass": true,
-   "close": 3.5
+   "close": 2.5
   },
   {
    "rule": "nba-total",
@@ -11969,6 +12179,27 @@
    "event": null,
    "pass": true,
    "close": 225.5
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401906801",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Oklahoma",
+   "a": "East Texas A&M",
+   "mk": "total",
+   "side": "over",
+   "line": 148.5,
+   "price": -108.0,
+   "bet": "over 148.5 -108",
+   "placed": "2026-11-02T23:36:09Z",
+   "stake": 0.25,
+   "edge": 5.3,
+   "ev": 0.0079,
+   "event": null,
+   "pass": false,
+   "close": 148.5
   },
   {
    "rule": "cbb-total",
@@ -12131,7 +12362,7 @@
    "price": -100.0,
    "bet": "under 156.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 11.5,
    "ev": 0.0865,
    "event": null,
@@ -12156,8 +12387,8 @@
    "edge": 2.7,
    "ev": 0.0023,
    "event": null,
-   "pass": false,
-   "close": 5.5
+   "pass": true,
+   "close": 6.5
   },
   {
    "rule": "cbb-total",
@@ -12240,8 +12471,8 @@
    "edge": 5.7,
    "ev": 0.0289,
    "event": null,
-   "pass": true,
-   "close": -5.5
+   "pass": false,
+   "close": -4.5
   },
   {
    "rule": "cbb-total",
@@ -12257,12 +12488,12 @@
    "price": -100.0,
    "bet": "under 157.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 16.0,
    "ev": 0.0865,
    "event": null,
-   "pass": true,
-   "close": 158.5
+   "pass": false,
+   "close": 157.5
   },
   {
    "rule": "cbb-spread",
@@ -12282,7 +12513,7 @@
    "edge": 4.2,
    "ev": 0.009,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 18.5
   },
   {
@@ -12346,7 +12577,7 @@
    "ev": 0.0147,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 230.5
   },
   {
    "rule": "nfl-total",
@@ -12362,11 +12593,11 @@
    "price": -100.0,
    "bet": "under 46.5 -100",
    "placed": "2026-10-28T02:43:45Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 2.0,
-   "ev": 0.0362,
+   "ev": 0.0178,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 46.5
   },
   {
@@ -12428,7 +12659,7 @@
    "ev": 0.0078,
    "event": null,
    "pass": false,
-   "close": 28.5
+   "close": 29.5
   },
   {
    "rule": "cbb-total",
@@ -12553,7 +12784,7 @@
    "edge": 3.6,
    "ev": 0.0161,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 228.5
   },
   {
@@ -12612,12 +12843,12 @@
    "price": -100.0,
    "bet": "over 143.5 -100",
    "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 10.7,
    "ev": 0.0865,
    "event": null,
    "pass": false,
-   "close": 142.5
+   "close": 144.5
   },
   {
    "rule": "cbb-spread",
@@ -12866,7 +13097,7 @@
    "placed": "2026-11-02T01:48:20Z",
    "stake": 0.25,
    "edge": 7.2,
-   "ev": 0.014,
+   "ev": 0.0142,
    "event": null,
    "pass": false,
    "close": 231.5
@@ -12931,7 +13162,7 @@
    "edge": 3.7,
    "ev": 0.0056,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 17.5
   },
   {
@@ -12948,12 +13179,12 @@
    "price": -100.0,
    "bet": "under 155.5 -100",
    "placed": "2026-11-01T20:17:06Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 5.4,
    "ev": 0.0475,
    "event": null,
    "pass": false,
-   "close": 159.5
+   "close": 160.5
   },
   {
    "rule": "cbb-ml",
@@ -12973,7 +13204,7 @@
    "edge": 2.5,
    "ev": 0.0023,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -4.5
   },
   {
@@ -12994,7 +13225,7 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -13037,7 +13268,7 @@
    "ev": 0.0011,
    "event": null,
    "pass": false,
-   "close": 147.5
+   "close": 148.5
   },
   {
    "rule": "cbb-spread",
@@ -13548,9 +13779,9 @@
    "price": -104.0,
    "bet": "over 49.5 -104",
    "placed": "2026-11-01T15:21:05Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 3.5,
-   "ev": 0.0075,
+   "ev": 0.006,
    "event": null,
    "pass": true,
    "close": 51.5
@@ -13571,7 +13802,7 @@
    "placed": "2026-11-01T14:59:46Z",
    "stake": 3.0,
    "edge": 5.0,
-   "ev": 0.0314,
+   "ev": 0.03,
    "event": null,
    "pass": true,
    "close": 52.5
@@ -13590,9 +13821,9 @@
    "price": -100.0,
    "bet": "under 73.5 -100",
    "placed": "2026-11-01T20:26:56Z",
-   "stake": 3.75,
+   "stake": 3.5,
    "edge": 7.2,
-   "ev": 0.0374,
+   "ev": 0.0361,
    "event": null,
    "pass": false,
    "close": 72.5
@@ -13613,7 +13844,7 @@
    "placed": "2026-11-01T20:36:45Z",
    "stake": 1.25,
    "edge": 9.1,
-   "ev": 0.0131,
+   "ev": 0.012,
    "event": null,
    "pass": false,
    "close": 39.5
@@ -13632,9 +13863,9 @@
    "price": -102.0,
    "bet": "over 39.5 -102",
    "placed": "2026-11-01T20:52:18Z",
-   "stake": 2.75,
+   "stake": 2.5,
    "edge": 7.0,
-   "ev": 0.0267,
+   "ev": 0.0254,
    "event": null,
    "pass": false,
    "close": 38.5
@@ -13655,7 +13886,7 @@
    "placed": "2026-11-01T17:18:42Z",
    "stake": 0.75,
    "edge": 3.8,
-   "ev": 0.0084,
+   "ev": 0.0069,
    "event": null,
    "pass": false,
    "close": 43.5
@@ -13676,7 +13907,7 @@
    "placed": "2026-11-01T16:08:35Z",
    "stake": 2.75,
    "edge": 7.7,
-   "ev": 0.0286,
+   "ev": 0.0274,
    "event": null,
    "pass": false,
    "close": 39.5
@@ -13695,9 +13926,9 @@
    "price": -100.0,
    "bet": "over 44.5 -100",
    "placed": "2026-11-01T21:15:08Z",
-   "stake": 2.5,
+   "stake": 2.25,
    "edge": 3.4,
-   "ev": 0.027,
+   "ev": 0.0255,
    "event": null,
    "pass": true,
    "close": 43.5
@@ -13718,7 +13949,7 @@
    "placed": "2026-11-01T17:00:54Z",
    "stake": 2.5,
    "edge": 6.5,
-   "ev": 0.0254,
+   "ev": 0.024,
    "event": null,
    "pass": true,
    "close": 48.5
@@ -13737,12 +13968,12 @@
    "price": 102.0,
    "bet": "under 54.5 +102",
    "placed": "2026-11-02T22:17:12Z",
-   "stake": 3.75,
+   "stake": 3.5,
    "edge": 4.2,
-   "ev": 0.0395,
+   "ev": 0.038,
    "event": null,
-   "pass": false,
-   "close": 54.5
+   "pass": true,
+   "close": 55.5
   },
   {
    "rule": "cfb-ml",
@@ -13781,7 +14012,7 @@
    "placed": "2026-11-01T15:21:05Z",
    "stake": 0.5,
    "edge": 6.2,
-   "ev": 0.0054,
+   "ev": 0.0041,
    "event": null,
    "pass": true,
    "close": 45.5
@@ -13802,10 +14033,31 @@
    "placed": "2026-11-02T10:59:09Z",
    "stake": 0.25,
    "edge": 5.4,
-   "ev": 0.0033,
+   "ev": 0.0019,
    "event": null,
    "pass": false,
    "close": 44.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401862819",
+   "k": "2026-11-07T20:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "UAB",
+   "a": "Charlotte",
+   "mk": "total",
+   "side": "over",
+   "line": 47.5,
+   "price": -100.0,
+   "bet": "over 47.5 -100",
+   "placed": "2026-11-02T23:36:02Z",
+   "stake": 2.75,
+   "edge": 4.8,
+   "ev": 0.0294,
+   "event": null,
+   "pass": false,
+   "close": 47.5
   },
   {
    "rule": "cfb-total",
@@ -13823,7 +14075,7 @@
    "placed": "2026-11-01T20:38:27Z",
    "stake": 0.25,
    "edge": 5.1,
-   "ev": 0.0025,
+   "ev": 0.0011,
    "event": null,
    "pass": true,
    "close": 55.5
@@ -13844,7 +14096,7 @@
    "placed": "2026-11-02T01:48:24Z",
    "stake": 5.0,
    "edge": 3.6,
-   "ev": 0.0687,
+   "ev": 0.0671,
    "event": null,
    "pass": false,
    "close": 48.5
@@ -13865,7 +14117,7 @@
    "placed": "2026-11-01T21:25:38Z",
    "stake": 1.75,
    "edge": 4.2,
-   "ev": 0.0191,
+   "ev": 0.0177,
    "event": null,
    "pass": true,
    "close": 63.5
@@ -13884,9 +14136,9 @@
    "price": -102.0,
    "bet": "under 51.5 -102",
    "placed": "2026-11-01T21:15:08Z",
-   "stake": 1.5,
+   "stake": 1.25,
    "edge": 3.2,
-   "ev": 0.0164,
+   "ev": 0.0149,
    "event": null,
    "pass": true,
    "close": 51.5
@@ -13907,9 +14159,9 @@
    "placed": "2026-11-01T21:25:38Z",
    "stake": 1.5,
    "edge": 3.6,
-   "ev": 0.0175,
+   "ev": 0.016,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 49.5
   },
   {
@@ -13926,9 +14178,9 @@
    "price": -108.0,
    "bet": "over 47.5 -108",
    "placed": "2026-11-01T17:18:42Z",
-   "stake": 0.25,
+   "stake": 0.0,
    "edge": 8.0,
-   "ev": 0.0011,
+   "ev": -0.0001,
    "event": null,
    "pass": false,
    "close": 48.5
@@ -13949,28 +14201,28 @@
    "placed": "2026-11-01T21:15:08Z",
    "stake": 0.25,
    "edge": 5.0,
-   "ev": 0.0022,
+   "ev": 0.0008,
    "event": null,
    "pass": false,
    "close": 68.5
   },
   {
-   "rule": "cfb-ml",
+   "rule": "cfb-spread",
    "sport": "cfb",
    "id": "401858291",
    "k": "2026-11-08T00:30:00.000Z",
    "slate": "cfb:2026-11-07",
    "h": "Notre Dame",
    "a": "Miami",
-   "mk": "ml",
+   "mk": "spread",
    "side": "away",
-   "line": null,
-   "price": 190.0,
-   "bet": "Miami ML +190",
-   "placed": "2026-11-02T01:03:55Z",
-   "stake": 0.75,
+   "line": 5.5,
+   "price": -100.0,
+   "bet": "Miami +5.5 -100",
+   "placed": "2026-11-02T23:36:02Z",
+   "stake": 3.25,
    "edge": 5.6,
-   "ev": 0.0188,
+   "ev": 0.037,
    "event": null,
    "pass": false,
    "close": 5.5
@@ -13991,9 +14243,9 @@
    "placed": "2026-11-01T17:00:54Z",
    "stake": 2.0,
    "edge": 8.4,
-   "ev": 0.0207,
+   "ev": 0.0195,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 57.5
   },
   {
@@ -14012,7 +14264,7 @@
    "placed": "2026-11-01T20:52:18Z",
    "stake": 0.5,
    "edge": 3.2,
-   "ev": 0.0067,
+   "ev": 0.0052,
    "event": null,
    "pass": false,
    "close": 46.5
@@ -14031,9 +14283,9 @@
    "price": -106.0,
    "bet": "over 45.5 -106",
    "placed": "2026-11-02T01:52:55Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 5.8,
-   "ev": 0.0044,
+   "ev": 0.003,
    "event": null,
    "pass": true,
    "close": 45.5
@@ -14054,7 +14306,7 @@
    "placed": "2026-11-02T02:51:13Z",
    "stake": 2.75,
    "edge": 4.3,
-   "ev": 0.0295,
+   "ev": 0.028,
    "event": null,
    "pass": false,
    "close": 64.5
@@ -14075,7 +14327,7 @@
    "placed": "2026-11-01T20:17:01Z",
    "stake": 5.0,
    "edge": 4.4,
-   "ev": 0.071,
+   "ev": 0.0694,
    "event": null,
    "pass": true,
    "close": 72.5
