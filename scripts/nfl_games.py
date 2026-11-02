@@ -1298,7 +1298,10 @@ def rating_sd(left):
     2.802 a team and checkpoint, t -2.4 over team-seasons) and on 2021-25 (3.065 vs 3.115, t -2.8). With weeks 15 and
     17 added, no steeper decay (sd0 4-6 x left^p, p .5-1.5, floors 0-1) beat it on 2015-20 (best 5.5 x left^.75:
     2.2198 vs 2.2197, t +0.1; 2021-25 2.606 vs 2.600, t +2.7); a fixed 4.5 did better on 2021-25 (2.580, t -2.9)
-    but not on 2015-20 (2.222, t +0.8)"""
+    but not on 2015-20 (2.222, t +0.8). The game draws keep the margin model's whole error sd although it holds the
+    rating error the shock adds again (a game's variance sd^2 + 2 rsd^2): netting it out (sd^2 - 2 rsd^2) and
+    retuning scored worse on 2021-25 (gameTest, Nov 2 2026: 2.6096 vs 2.5995, t +2.0), so the 5 x sqrt(left) is tuned
+    to the full noise as it is"""
     return RATING_SD * math.sqrt(max(0.0, left))
 
 
