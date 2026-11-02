@@ -437,7 +437,7 @@ def cbb_board():
     for grp, m in F['models'].items():
         for r in m.get('ledger', []):
             rows.append({k: v for k, v in r.items() if k not in ('z', 'p', 'q', 'verdict')})
-    return {'desc': 'College basketball board FV drivers (scripts/cbb_fit.py)', 'loss': 'rung deviance / null (x100)',
+    return {'desc': 'College basketball board FV drivers (scripts/cbb_fit.py)', 'loss': 'rung deviance vs no-driver model (x100)',
             'split': 'tune 2009-16 boards (class folds), held 2017-19 boards (forward, 6-season outcome)', 'cluster': 'college class',
             'source': 'cbb_fit.py', 'rows': rows,
             'note': 'Removing every "drop" driver at once (on3, dbpm, min_per, ftr, rim, dporpag, power, guard; newcomer top5) '
