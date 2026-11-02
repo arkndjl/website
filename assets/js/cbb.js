@@ -78,6 +78,23 @@
     });
   }
 
+  // what the FV inputs add up to, and the steps from there to the headline (FV inputs audit, Nov 2 2026)
+  function n2(x) { return (+x).toFixed(2); }
+  function toFv(r) {
+    return (r.fvg != null ? 'grade ' + (+r.fvg).toFixed(1) + ' → ' : '') + 'FV ' + r.fv + ', the mean of that grade\'s outcome odds (' + n2(r.fvx) + ')' + (r.fv - r.fvx > 0.6 ? ' with the top of the scale stretched' : '');
+  }
+  function fvNote(r, sum) {
+    var s = (sum >= 0 ? '+ ' : '− ') + n2(Math.abs(sum));
+    if (r.src === 'bt') return 'provisional grade (not on the preseason board): each bar is its move in the grade above the 20 floor, so 20 ' + s + ' = ' + toFv(r) +
+      '. The drivers are a ridge fit of the board\'s grades on its low-information players; this season\'s line, graded by the board\'s model, takes over as his minutes come in.';
+    var who = r.intl ? 'an average international' : 'an average D-I ' + (r.new ? 'newcomer' : 'returner');
+    var add = r.e != null ? ' (' + n2(r.e - sum) + ') ' + s + ' = E[FV] ' + n2(r.e) : ' (inputs sum ' + s + ')';
+    if (r.intl) return 'each bar: its share of E[FV] over ' + who + add + '; the board rank enters as the June rank it predicts, averaged over its spread. ' +
+      'E[FV] goes to the D-I grade whose college players went on to what it expects (his model\'s out-of-fold calibration): ' + toFv(r) + '.';
+    return 'each bar: its share of E[FV] over ' + who + add + (r.w > 0 ? '; in season each input blends its preseason and this-season shares by minutes' : '') +
+      '. Draft-board consensus and combine testing are stages on top of the model. E[FV] = 20 + 10 x P(30+) + 10 x P(40+) + 10 x P(50+) + (mean FV of 60+ careers - 50) x P(60+), each rung a logistic fit on 2009-16 preseason boards against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50). ' +
+      'One fixed calibration map (2009-16 boards simulated with preseason information), not the rank on this board, takes E[FV] to ' + toFv(r) + '.';
+  }
   // the scouting report: this season's line to date (in season), last season's line, recruiting grades, + strengths and − concerns, and the FV inputs
   function detailHtml(r, cols, width) {
     var L = r.last, g = r.rec || {}, rep = r.report || {};
@@ -104,8 +121,7 @@
       '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + (r.src === 'bt' ? 'provisional grade (not on the preseason board): each input is its move in FV above the 20 floor (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '), the drivers a ridge fit of board FV on the board\'s low-information players; this season\'s line, graded by the board\'s model, takes over as his minutes come in.</p></details></div></td></tr>' : 'each input: its move in E[FV] against an average D-I ' + (r.new ? 'newcomer' : 'returner') +
-      ' (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '). E[FV] = 20 + 10 x P(FV 30+) + 10 x P(40+) + 10 x P(50+) + (mean FV of 60+ careers - 50) x P(60+), each rung a logistic fit on 2009-16 preseason boards against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50); FV ranks E[FV] on that scale\'s scarcity.</p></details></div></td></tr>');
+      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + fvNote(r, sum) + '</p></details></div></td></tr>';
   }
   // before D-I: his last overseas line (scripts/cbb_intl.py), shown only; too few players have taken this path to test it as an FV input
   function overseasLine(o) {
@@ -132,7 +148,7 @@
       '<p class="cfb__role">' + line + '.</p><p class="cfb__role">draft boards: consensus No. ' + r.cons + ', on ' + r.boards + ' of 7 boards.</p>' +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">vs an average international, E[FV]; sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '</p></details></div></td></tr>';
+      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + fvNote(r, sum) + '</p></details></div></td></tr>';
   }
   function pastDetail(r, cols) {
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap"><p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.team) + ' · ' + esc(r.cls) +

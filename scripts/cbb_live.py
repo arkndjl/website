@@ -121,10 +121,9 @@ def score(f, fit):
         ps = list(np.cumprod(cs))
         return ps[0], F.FLOOR + 10 * (ps[0] + ps[1] + ps[2]) + (top - 50) * ps[3]
     p, e = ev(z)
-    parts = []
-    for j, k in enumerate(m['kept']):
-        z0 = z.copy(); z0[j] = 0
-        parts.append((k, e - ev(z0)[1], x[j]))
+    # each driver's share over the average player, adding up to E[FV] - E[FV](average) (cbb_fit.ladder_parts)
+    sh = F.ladder_parts(W, top, z)
+    parts = [(k, float(sh[j]), x[j]) for j, k in enumerate(m['kept'])]
     return e, p, parts
 
 
@@ -351,6 +350,8 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         nan = float('nan')
         parts = [('typical low-information player', float(pf['w'][0]), nan)]
         parts += [(PROV_LABEL[k], float(c), pf['raw'](d)[j]) for j, (k, c) in enumerate(zip(PROV, contrib)) if abs(c) >= 0.005]
+        lift = pre - (F.FLOOR + float(pf['w'][0] + contrib.sum()))   # held at the 20 floor: the bars still add up to the grade
+        if lift >= 0.005: parts += [('20 floor', lift, nan)]
         parts += [('this season', w * (emap(e1) - pre), nan)]
         kb = lf['kb'][grp]['k']
         xb0 = xbpm_of(F.features(cc, 0), fit)
@@ -443,7 +444,8 @@ def main():
         r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), FS.fv_of('cbb', m), False
     recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
-    add = [c for c in ('fvd', 'fvg', 'bdg') if c not in ci]   # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges
+    # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges; e: E[FV] after the stages (the FV inputs add up to it)
+    add = [c for c in ('fvd', 'fvg', 'bdg', 'e') if c not in ci]
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
     for k, r in enumerate(recs, 1):
@@ -457,7 +459,7 @@ def main():
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
         fvd = fvd_of(fv_dist('cbb', r['fvg'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvg'])))
-        new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg')}
+        new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2)}
         for c in new:
             if c in ci: row[ci[c]] = new[c]
         out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + [new[c] for c in add])
