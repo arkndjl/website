@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-02T06:58:31Z",
+ "asof": "2026-11-02T06:59:39Z",
  "recenter": {
-  "week": 0.69
+  "week": 0.68
  },
  "monitor": {
   "clocks": {
@@ -994,9 +994,9 @@
     "mk": "total",
     "side": "under",
     "line": 51.5,
-    "price": -100.0,
-    "ev": 0.03,
-    "units": 1.75
+    "price": -102.0,
+    "ev": 0.02,
+    "units": 1.0
    }
   },
   {
@@ -1202,9 +1202,15 @@
    "tmRaw": 52.4,
    "flagged": "2026-11-01T20:52:18Z",
    "betTo": 49.0,
-   "close": 46.5,
-   "now": null,
-   "pass": true
+   "close": 47.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 47.5,
+    "price": -102.0,
+    "ev": 0.031,
+    "units": 1.5
+   }
   },
   {
    "id": "401862820",
@@ -1268,7 +1274,7 @@
     "side": "under",
     "line": 68.5,
     "price": -100.0,
-    "ev": 0.048,
+    "ev": 0.047,
     "units": 2.75
    }
   }
@@ -1434,6 +1440,22 @@
    "why": "edge under 2.5",
    "m": 5.5,
    "tm": 55.4
+  },
+  {
+   "id": "401858292",
+   "sport": "cfb",
+   "kick": "2026-11-07T17:00:00.000Z",
+   "home": "UConn",
+   "away": "North Carolina",
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": 104.0,
+   "edge": 4.6,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -12.1,
+   "tm": 50.3
   },
   {
    "id": "401870795",
@@ -1658,22 +1680,6 @@
    "why": "edge under 6 (season: late)",
    "m": 5.8,
    "tm": 46.1
-  },
-  {
-   "id": "401869968",
-   "sport": "cfb",
-   "kick": "2026-11-07T22:00:00.000Z",
-   "home": "Louisiana",
-   "away": "South Alabama",
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": -111.0,
-   "edge": 2.6,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": 6.9,
-   "tm": 55.2
   }
  ],
  "games": {
@@ -1957,7 +1963,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2014,16 +2020,16 @@
    "state": "under"
   },
   "401862823": {
-   "mk": "spread",
-   "side": "home",
-   "line": 3.5,
-   "price": 108.0,
-   "edge": 0.8,
-   "ev": null,
-   "units": 0.0,
+   "mk": "total",
+   "side": "over",
+   "line": 47.5,
+   "price": -102.0,
+   "ev": 0.031,
+   "edge": 4.2,
+   "units": 1.5,
    "home": "Army",
    "away": "Air Force",
-   "state": "under"
+   "state": "pick"
   },
   "401856850": {
    "mk": "total",
@@ -2071,6 +2077,18 @@
    "units": 0.0,
    "home": "Arizona State",
    "away": "Colorado",
+   "state": "under"
+  },
+  "401858292": {
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": 104.0,
+   "edge": 4.6,
+   "ev": null,
+   "units": 0.0,
+   "home": "UConn",
+   "away": "North Carolina",
    "state": "under"
   },
   "401862822": {
@@ -2186,7 +2204,7 @@
    "side": "under",
    "line": 68.5,
    "price": -100.0,
-   "ev": 0.048,
+   "ev": 0.047,
    "edge": 5.0,
    "units": 2.75,
    "home": "Colorado State",
@@ -2197,7 +2215,7 @@
    "mk": "spread",
    "side": "home",
    "line": 16.5,
-   "price": -120.0,
+   "price": -113.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2401,10 +2419,10 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -100.0,
-   "ev": 0.03,
+   "price": -102.0,
+   "ev": 0.02,
    "edge": 3.2,
-   "units": 1.75,
+   "units": 1.0,
    "home": "San Jos\u00e9 State",
    "away": "Northern Illinois",
    "state": "pick"
@@ -2462,16 +2480,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 5063,
+  "snapshots": 5074,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1261,
-    "clvRet": -0.0356,
-    "clvT": -17.44,
-    "clv": 0.27,
-    "beat": 0.348,
-    "still": 0.412
+    "clvN": 1263,
+    "clvRet": -0.035,
+    "clvT": -17.3,
+    "clv": 0.28,
+    "beat": 0.354,
+    "still": 0.413
    },
    {
     "when": "6-24h",
@@ -3006,8 +3024,7 @@
    "tmRaw": 52.4,
    "flagged": "2026-11-01T20:52:18Z",
    "betTo": 49.0,
-   "close": 46.5,
-   "pass": true
+   "close": 47.5
   },
   {
    "id": "401864533",
@@ -3372,8 +3389,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-02": {
-    "raw": 133.0,
-    "scale": 0.3008
+    "raw": 135.25,
+    "scale": 0.2957
    },
    "2026-11-03": {
     "raw": 7.0,
@@ -3388,7 +3405,7 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 22.0,
+    "raw": 22.75,
     "scale": 1.0
    }
   }
