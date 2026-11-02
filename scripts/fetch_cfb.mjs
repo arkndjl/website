@@ -881,7 +881,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       if (o) usedOn3.add(o);
       players.push({ name: r.name, g: p.g, label: p.label, pfnId: r.id, pfnPos: r.pos || null,
         team: r.team, tid, conf: r.conf, div: r.division, pfn: r.score, snaps: volume(r, true), gp: r.gp ?? r.gamesQ ?? null,
-        sos: typeof r.sos === 'number' ? r.sos : null, row: r, on3: o });
+        sos: typeof r.sos === 'number' ? r.sos : null, row: r, on3: o,
+        // playing time for snap share, season AV/WAR and xNIL: PFN's WR and RB rows carry games, not snaps, so games
+        // x SNAPS_PER_GAME there (as returning production does); real snaps wherever PFN has them
+        playSnaps: volume(r, true) ?? ((p.g === 'WR' || p.g === 'RB') && (r.gp ?? r.gamesQ) != null ? volume(r, false, p.g) : null) });
     }
   }
   // a player PFN lists at two positions (EDGE and LB, S and CB) is one player: keep the line with
@@ -1107,7 +1110,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   // snap share, and the snap term in the composite
   for (const p of players) {
     const tp = teamPlays[p.tid], side = OFF_G.has(p.g) ? tp?.off : tp?.def;
-    p.snapShare = p.g === 'RB' && p.row?.share != null ? Math.min(1, p.row.share / 100) : side && p.snaps ? Math.min(1, p.snaps / side) : null;
+    p.snapShare = p.g === 'RB' && p.row?.share != null ? Math.min(1, p.row.share / 100) : side && p.playSnaps ? Math.min(1, p.playSnaps / side) : null;
   }
   for (const g of Object.keys(STARTERS)) {
     const grp = players.filter(p => p.g === g && p.snapShare != null && (p.snaps ?? 0) >= 60), xs = grp.map(p => p.snapShare);
@@ -1559,7 +1562,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   //   zNIL = xNIL - yNIL: value gained (or lost) since the season's pay was set. Summed by team it measures
   //     development: how much a staff grew its roster's market value
   {
-    const P4 = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC', 'IND (FBS)']);
+    // Power 4 and Notre Dame (ESPN 87), not the other FBS independents (UConn), as cfb_model.mjs isP4 and the coach tier
+    const P4C = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']), P4 = { has: (conf, tid) => P4C.has(conf) || String(tid) === '87' };
     const posList = Object.keys(STARTERS), dummies = p => posList.slice(1).map(g => (p.g === g ? 1 : 0));
     // ridge on log(On3 NIL); returns the coefficient vector
     const ridge = (X, y, lam = 0.5) => {
@@ -1575,10 +1579,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     };
     const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
     // preseason features (yNIL)
-    const preF = p => { const z = p.zPre ?? 0; return [1, z, z * z, P4.has(p.conf) ? 1 : 0, ...dummies(p), p.g === 'QB' ? z : 0,
+    const preF = p => { const z = p.zPre ?? 0; return [1, z, z * z, P4.has(p.conf, p.tid) ? 1 : 0, ...dummies(p), p.g === 'QB' ? z : 0,
       Math.min(1, (p.marcelPreW ?? 0) / 1500), ((p.on3?.grade ?? 85) - 90) / 5, p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1]; };
     // worth-now features (xNIL); slot 3 is the Power 4 control, zeroed when pricing
-    const nowF = (p, p4 = P4.has(p.conf) ? 1 : 0) => { const f = (p.fv - 50) / 10; return [1, f, f * f, p4, ...dummies(p), p.g === 'QB' ? f : 0, Math.min(1, (p.snaps ?? 0) / 250)]; };
+    const nowF = (p, p4 = P4.has(p.conf, p.tid) ? 1 : 0) => { const f = (p.fv - 50) / 10; return [1, f, f * f, p4, ...dummies(p), p.g === 'QB' ? f : 0, Math.min(1, (p.playSnaps ?? 0) / 250)]; };
     const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
     if (!FCS && train.length > 50) {
       const y = train.map(p => Math.log(p.on3.nil));
@@ -1594,14 +1598,14 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const tv = Object.values(tal), tm = tv.reduce((a, b) => a + b, 0) / tv.length, tsd = Math.sqrt(tv.reduce((a, b) => a + (b - tm) ** 2, 0) / tv.length) || 1;
       let pool = 0;
       for (const [tid, ps] of Object.entries(byTeam)) {
-        const budget = (P4.has(ps[0].conf) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
+        const budget = (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
         const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
         ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
       }
       // two markets, each sharing its own programs' total pay (yNIL) by worth: Power 4 and Group of Five. A G5
       // player good enough to start at P4 (FV at or above the median P4 projected starter at his position) is
       // priced on the P4 curve, as the portal would
-      const all = Object.values(byTeam).flat(), isP4 = p => P4.has(p.conf);
+      const all = Object.values(byTeam).flat(), isP4 = p => P4.has(p.conf, p.tid);
       const fvP4 = {};                         // per position: the median FV of P4 projected starters
       for (const [g, n] of Object.entries(STARTERS)) {
         const st = [];
@@ -1619,16 +1623,18 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       //   sav:     this season's college AV (p.sav, scripts/cfb_av.mjs) rescaled to the avOf units, falling back to
       //            avOf(FV) without one, x playing time
       //   savRaw:  the same without the playing-time factor (season AV already counts the snaps)
-      const play = p => 0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250);
+      const play = p => 0.5 + 0.5 * Math.min(1, (p.playSnaps ?? 0) / 250);
       const withSav = all.filter(p => p.sav != null && p.sav > 0);
       const savK = withSav.length > 50 ? withSav.reduce((a, p) => a + avOf(p.fv), 0) / withSav.reduce((a, p) => a + p.sav, 0) : null;
       const avNow = p => (savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
       //   ev:      expected NFL AV a season over the FV distribution's tiers (p.eav) x playing time
       const VALUE = { fv: p => (avOf(p.fv) + avOf(30)) * play(p), sav: p => (avNow(p) + avOf(30)) * play(p), savRaw: p => avNow(p) + avOf(30),
         ev: p => ((p.eav ?? avOf(p.fv)) + avOf(30)) * play(p) };
+      // each pool is its programs' pay (by program); its normaliser sums the players priced in that market (mkt: a G5
+      // player at P4 starter level is paid from the P4 pool), so each pool is spent exactly
       const pools = { p4: 0, g5: 0 }; for (const p of all) pools[isP4(p) ? 'p4' : 'g5'] += p.ynil;
       const curveOf = (vf, a = 1) => { const z = { p4: 0, g5: 0 }, w = p => Math.exp(posTerm(p)) * vf(p) ** a;
-        for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += w(p); return p => pools[mkt(p)] * w(p) / z[mkt(p)]; };
+        for (const p of all) z[mkt(p)] += w(p); return p => pools[mkt(p)] * w(p) / z[mkt(p)]; };
       const fitSet = train.filter(p => p.ynil != null);
       const sse = pr => fitSet.reduce((e, p) => e + (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2, 0);
       const valueTest = Object.fromEntries(Object.entries(VALUE).map(([k, vf]) => [k, Math.round(Math.sqrt(sse(curveOf(vf)) / fitSet.length) * 1000) / 1000]));
@@ -1647,7 +1653,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         for (const ps of Object.values(byTeam)) if (!isP4(ps[0])) st.push(...ps.filter(p => p.g === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(p => p.fv));
         st.sort((a, b) => a - b); fvG5[g] = st[Math.floor(st.length / 2)] ?? 40;
       }
-      const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[isP4(p) ? 'p4' : 'g5'] += Math.exp(x.pos) * x.v; }
+      const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[mkt(p)] += Math.exp(x.pos) * x.v; }
       nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, valueKey, savK, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
       // perWar: the market's price of one college WAR a season (a position-average player), P4 and G5
       nilFit = { n: train.length, value: valueKey, perWar: { p4: Math.round(pools.p4 / zs.p4 / CWAR_PER_AV / 1000) * 1000, g5: Math.round(pools.g5 / zs.g5 / CWAR_PER_AV / 1000) * 1000 }, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
@@ -1668,7 +1674,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const posTerm = p => dot(dummies(p), bNow.slice(4, 4 + nd)) + (p.g === 'QB' ? bNow[4 + nd] * (p.fv - 50) / 10 : 0);
     // the same on-field value the FBS fit kept (nilFit.value)
     const avNow = p => (valueKey === 'ev' ? p.eav ?? avOf(p.fv) : valueKey !== 'fv' && savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
-    const worth = p => Math.exp(posTerm(p)) * (avNow(p) + avOf(30)) * (valueKey === 'savRaw' ? 1 : 0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250));
+    const worth = p => Math.exp(posTerm(p)) * (avNow(p) + avOf(30)) * (valueKey === 'savRaw' ? 1 : 0.5 + 0.5 * Math.min(1, (p.playSnaps ?? 0) / 250));
     const byTeam = {};
     for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
     let pool = 0;
@@ -1678,10 +1684,19 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
     }
     const all = Object.values(byTeam).flat(), mkt = p => p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : p.fv >= (fvG5[p.g] ?? 99) ? 'g5' : 'fcs';
-    const zf = all.filter(p => mkt(p) === 'fcs').reduce((a, p) => a + worth(p), 0) || 1;
+    // a move-up's price is only collected if he transfers up, so it's discounted (XNIL.fcsMove), never below his FCS
+    // price. Both prices are per unit of worth, so a whole move-up market is paid from the FCS pool when its price is
+    // the lower: zf sums everyone paid from that pool (fixed point; adding a market only lowers the FCS price)
+    const upPrice = m => XNIL.fcsMove * pools[m] / zs[m], fromFcs = new Set(['fcs']);
+    let zf;
+    for (;;) {
+      zf = all.filter(p => fromFcs.has(mkt(p))).reduce((a, p) => a + worth(p), 0) || 1;
+      const add = ['g5', 'p4'].filter(m => !fromFcs.has(m) && upPrice(m) <= pool / zf);
+      if (!add.length) break;
+      add.forEach(m => fromFcs.add(m));
+    }
     for (const p of all) {
-      // a move-up's price is only collected if he transfers up, so it's discounted (XNIL.fcsMove), never below his FCS price
-      const m = mkt(p), xf = pool * worth(p) / zf, x = m === 'fcs' ? xf : Math.max(xf, XNIL.fcsMove * pools[m] * worth(p) / zs[m]);
+      const m = mkt(p), xf = pool * worth(p) / zf, x = fromFcs.has(m) ? xf : Math.max(xf, upPrice(m) * worth(p));
       p.xnil = Math.round(x / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = m;
     }
     nilMarket.price.fcs = pool / zf;    // $ per unit of worth in the FCS pool (the team builder reprices move-ups)

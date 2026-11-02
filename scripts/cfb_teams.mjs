@@ -591,8 +591,8 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const edge = mkt == null ? null : { pts: r1(Math.abs(mkt - line)), side: mkt - line > 0 ? 'home' : mkt - line < 0 ? 'away' : null };
     // cover: the chance the model's side of the market line covers; total: over/under the market total
     // as the line leaves them (scripts/cover.py: the result over the close regressed on the model's gap), not the
-    // model as the truth; the old sigmas only without that fit
-    if (proj && mkt != null) { const c = COVER.spread, pc = phiN(c ? c.b * (proj.margin + mkt) / c.sd : (proj.margin + mkt) / (pred.sigma || M.sigma)); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
+    // model as the truth; without that fit, the margins' sd (the win-loss sigma is narrower: it fits who won, not by how much)
+    if (proj && mkt != null) { const c = COVER.spread, pc = phiN(c ? c.b * (proj.margin + mkt) / c.sd : (proj.margin + mkt) / (M.report?.params?.sigmaMargin || pred.sigma || M.sigma)); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
     if (proj && g.total != null) { const c = COVER.total, po = phiN(c ? c.b * (proj.total - g.total) / c.sd : (proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
     // a game with an FCS side: the FBS opponent-defense z means nothing across divisions (an FCS offense's per-game line
     // came off FCS defenses), so each side's line scales by its projected points in this game over its points a game
