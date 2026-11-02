@@ -119,3 +119,7 @@ if __name__ == '__main__':
     main(sys.argv[1:])
     if not [a for a in sys.argv[1:] if a in SPORTS] or 'tennis' in sys.argv[1:]:
         tennis('--dry' in sys.argv[1:])
+    if '--dry' not in sys.argv[1:]:
+        # the nightly exposure cap (scripts/night_cap.py) over every sport's file, after every refresh
+        import night_cap
+        night_cap.apply()

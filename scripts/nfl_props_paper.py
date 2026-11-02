@@ -369,6 +369,8 @@ def write_picks(R, bets, now, rec):
         pass
     with open(PICKS, 'w') as f:
         json.dump(out, f, separators=(',', ':'), allow_nan=False)
+    import night_cap      # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night)
+    night_cap.apply(['nflprops'])
 
 
 if __name__ == '__main__':
