@@ -1535,6 +1535,25 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     return {'teams': out, 'left': len(fx), 'games': len(lp)}
 
 
+def tm_crest(tid):
+    """ESPN has no crest for some smaller-league clubs (Czech, Polish): look the club up by ESPN's name in the
+    Transfermarkt name map (data/soccer_logos.json 'tm', scripts/soccer_logos.py) and use Transfermarkt's crest"""
+    try:
+        import soccer_logos as SL
+        tm = json.load(open(os.path.join(ROOT, 'data', 'soccer_logos.json'))).get('tm') or {}
+    except Exception:
+        return None
+    t = (D.get(f'https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams/{tid}') or {}).get('team') or {}
+    want = {SL.norm(n) for n in (t.get('displayName'), t.get('shortDisplayName'), t.get('location')) if n}
+    want.discard('')
+    hit = [i for name, i in tm.items() if SL.norm(name) in want]
+    if not hit:     # "Banik Ostrava" inside "FC Banik Ostrava a.s.": every word of ESPN's name, one club only
+        hit = [i for name, i in tm.items() if any(w and set(w.split()) <= set(SL.norm(name).split()) for w in want)]
+    if len(set(hit)) != 1:
+        return None
+    return D.get(f'https://tmssl.akamaized.net/images/wappen/head/{hit[0]}.png', raw=True)
+
+
 def logo(tid):
     p = os.path.join(ROOT, 'static', 'img', 'soccer', f'{tid}.png')
     if os.path.exists(p):
@@ -1542,7 +1561,7 @@ def logo(tid):
     if tid.startswith('f'):
         b = D.get(f'https://images.fotmob.com/image_resources/logo/teamlogo/{tid[1:]}.png', raw=True)
     else:
-        b = D.get(f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png', raw=True)
+        b = D.get(f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png', raw=True) or tm_crest(tid)
     if not b:
         return
     try:

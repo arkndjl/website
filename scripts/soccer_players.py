@@ -615,6 +615,11 @@ def depth(squads, grade, S):
     teams = defaultdict(dict)
     for (team, pos), rs in squads.items():
         teams[team][pos] = rs
+    # tid is Understat's team id; crests are saved under ESPN ids (data/soccer_logos.json, scripts/soccer_logos.py)
+    try:
+        esp = json.load(open(os.path.join(ROOT, 'data', 'soccer_logos.json')))['espn']
+    except (OSError, ValueError, KeyError):
+        esp = {}
     out = []
     for team in sorted(teams):
         T = teams[team]
@@ -624,7 +629,7 @@ def depth(squads, grade, S):
             rs = [r for r in T.get(pos, []) if r['min'] > 0][:2 * BW_START[pos]]
             if rs:
                 ss.append([pos, [[r['n'], round(grade[r['p']], 2), r['min'], None, f"{r.get('start') or 0} st", pct(pos, round(grade[r['p']], 2), r['min'])] for r in rs]])
-        out.append({'t': team, 'n': team, 'logo': f"/img/soccer/{any_['tid']}.png", 'grp': D.NAME.get(any_['lg'], any_['lg']),
+        out.append({'t': team, 'n': team, 'logo': f"/img/soccer/{esp[team]}.png" if esp.get(team) else None, 'grp': D.NAME.get(any_['lg'], any_['lg']),
                     'units': [{'u': '', 's': ss}]})
     os.makedirs(os.path.dirname(DEPTH), exist_ok=True)
     json.dump({'sport': 'soccer', 'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.date.today().isoformat(),

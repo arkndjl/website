@@ -355,6 +355,20 @@ def cfb():
 
 
 # ---------------------------------------------------------------- CBB true freshmen
+def cbb_line(ln):
+    """cbb-all 'now' is the live season line (a dict from cbb_live.show_line); the tab shows it as one short string"""
+    if not isinstance(ln, dict):
+        return ln or ''
+    gp = ln.get('gp') or 0
+    if not gp:
+        return ''
+    f = lambda x: '0' if not x else f"{x:.1f}".rstrip('0').rstrip('.')
+    s = f"{gp} g · {f(ln.get('mpg'))} min · {f(ln.get('ppg'))}/{f(ln.get('rpg'))}/{f(ln.get('apg'))}"
+    if ln.get('bpm') is not None:
+        s += f" · BPM {ln['bpm']:+.1f}"
+    return s
+
+
 def cbb():
     d = json.load(open(os.path.join(SD, 'cbb-all.json')))
     c = d['cols']
@@ -369,7 +383,7 @@ def cbb():
         rows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'],
                      'xbpm': r.get('xbpm'), 'nbaP': r['nbaP'] * 100 if r.get('nbaP') is not None else None, 'w': r.get('w'),
                      'pre': rec.get('on3rk'), 'preL': f"#{rec['on3rk']}" if rec.get('on3rk') else '', 'pfv': None,
-                     'sub': r.get('conf') or '', 'line': r.get('now') or '', 'ph': r.get('photo'), 'lo': r.get('logo')})
+                     'sub': r.get('conf') or '', 'line': cbb_line(r.get('now')), 'ph': r.get('photo'), 'lo': r.get('logo')})
     write('cbb', {
         'title': 'true freshmen', 'key': 'fv',
         'def': 'true freshmen: Fr, first year of eligibility. pre = On3 national recruiting rank. season lines join once games start.',

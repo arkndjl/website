@@ -67,7 +67,7 @@
         {{- if or $rows .extra }}
         <ul class="hub__views">
           {{- range $rows }}
-          <li><span class="hub__vlabel">{{ .label }}</span>{{ range first $max .tabs }}{{ $t := trim . " " }}<a href="{{ $c.url }}#{{ strings.Trim (replaceRE `[^a-z0-9]+` "-" (lower $t)) "-" }}">{{ $t }}</a>{{ end }}{{ with sub (len .tabs) $max }}{{ if gt . 0 }}<span class="hub__more">+{{ . }}</span>{{ end }}{{ end }}</li>
+          <li><span class="hub__vlabel">{{ .label }}</span>{{ range first $max .tabs }}{{ $t := trim . " " }}<a href="{{ $c.url }}#{{ strings.Trim (replaceRE `[^a-z0-9]+` "-" (lower $t)) "-" }}">{{ $t }}</a>{{ end }}{{ with sub (len .tabs) $max }}{{ if gt . 0 }}<a class="hub__more" href="{{ $c.url }}" title="{{ . }} more {{ $c.label }} views">+{{ . }}</a>{{ end }}{{ end }}</li>
           {{- end }}
           {{- with .extra }}<li><span class="hub__vlabel">more</span>{{ range . }}<a href="{{ index . 1 }}">{{ index . 0 }}</a>{{ end }}</li>{{ end }}
         </ul>

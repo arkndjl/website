@@ -4435,7 +4435,7 @@
   },
   "cbb_board": {
    "desc": "College basketball board FV drivers (scripts/cbb_fit.py)",
-   "loss": "rung deviance / null (x100)",
+   "loss": "rung deviance vs no-driver model (x100)",
    "split": "tune 2009-16 boards (class folds), held 2017-19 boards (forward, 6-season outcome)",
    "cluster": "college class",
    "source": "cbb_fit.py",
