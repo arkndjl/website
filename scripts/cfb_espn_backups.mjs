@@ -73,7 +73,10 @@ function report(g, x, w, { ht, wt, bmi, fr, years, rc }) {
   }
   const r2 = v => Math.round(v * 100) / 100;
   return { report: { role: 'ESPN roster backup', line: 'graded from the 20 floor on size, NFL frame and BMI, class, age for class, division and recruiting', plus, minus },
-    parts: [0, 0, r2((cls + age) / 10), 0, 0, r2(rec / 10), 0, r2((fr + size) / 10)] };
+    parts: [0, 0, r2((cls + age) / 10), 0, 0, r2(rec / 10), 0, r2((fr + size) / 10)],
+    // the FV inputs dropdown's steps (fetch_cfb.mjs fvSteps): b = the fit's base for the position and division, then
+    // class + age, pedigree, frame; the 20 floor and the mean outcome are added at write
+    steps: g === 'K' || g === 'P' ? [] : [['ac', r2(cls + age)], ['pd', r2(rec)], ['fr', r2(fr + size)]] };
 }
 
 // rows: the board's cfb-all rows (objects); rosters: [{ div, teams, rosters }] from ESPN; stars: ARKLIST set
@@ -155,7 +158,7 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
         ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, bmi: bmi ? Math.round(bmi * 10) / 10 : null, age: a.dob && age != null ? Math.round(age * 10) / 10 : null, ageEst: !a.dob && age != null ? Math.round(age * 10) / 10 : null,
         photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
-        report: rep.report, parts: rep.parts, frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', noRec: !rc, years, star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
+        report: rep.report, parts: rep.parts, fvs: g === 'K' || g === 'P' ? [['b', FLOOR]] : [['b', Math.round((x.reduce((s, v, k) => s + v * w[k], 0) + fr - rep.steps.reduce((s, z) => s + z[1], 0)) * 100) / 100], ...rep.steps], frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', noRec: !rc, years, star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
     }
   }
   const lifted = out.filter(r => r.fv > FLOOR).length;

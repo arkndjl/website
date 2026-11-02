@@ -8,7 +8,7 @@ import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DETAIL_COLS = ['report', 'parts', 'fvd', 'mk']
+DETAIL_COLS = ['report', 'parts', 'fvd', 'mk', 'fvs']
 
 
 def all_path(root=ROOT): return os.path.join(root, 'static', 'data', 'cfb-all.json')
