@@ -203,21 +203,21 @@ def nfl():
 
 
 # ------------------------------------------------------------------ CFB
-def cfb():
-    import urllib.request
+def cfb_returns(seasons, pull=True):
+    """Every FBS return in these seasons from the ESPN play-by-play cache: (returns, drive-point curve D, unmatched names).
+    pull=False reads only cached box-score returner ids (scripts/research/st_value: the 2011-22 history for the FV test)."""
     import cfb_espn_hist as EH
-    import cfb_all
     PBP = os.path.join(EH.DIR, '..', 'espn_pbp')
     RET = os.path.join(EH.DIR, '..', 'espn_ret')
     os.makedirs(RET, exist_ok=True)
-    y = season_now()
-    seasons = (y - 2, y - 1, y)
 
     def box_ret(gid):
         """Kick / punt returners in the box score, by team: ESPN athlete id and full name (one summary call, cached)."""
         p = os.path.join(RET, f'{gid}.json')
         if os.path.exists(p):
             return json.load(open(p))
+        if not pull:
+            return None
         d = EH.get(f'{EH.BASE}/summary?event={gid}')
         if d is None:
             return None
@@ -242,10 +242,9 @@ def cfb():
                 games.append((s, g))
     # drive points by start (yards to goal), for the value curve
     dp = defaultdict(lambda: [0, 0.0])
-    loaded = {}
+    load = lambda gid: json.load(gzip.open(os.path.join(PBP, f"{gid}.json.gz"), 'rt'))   # read twice, not held (10k games)
     for s, g in games:
-        d = json.load(gzip.open(os.path.join(PBP, f"{g['id']}.json.gz"), 'rt'))
-        loaded[g['id']] = d
+        d = load(g['id'])
         for dr in d['drives']:
             pl = [p for p in dr['plays'] if (p.get('t') or '') not in ('Kickoff', 'Kickoff Return (Offense)', 'Punt', 'Punt Return')]
             if not pl or pl[0].get('dn') != 1 or not pl[0].get('yl') or str(pl[0].get('st')) != str(dr.get('tm')):
@@ -279,7 +278,9 @@ def cfb():
     NAME = r"(#\d+\s+)?([A-Z][A-Za-z'\-]*\.?(?:\s?[A-Z][A-Za-z'\-]*\.?)*?(?:\s(?:Jr\.?|Sr\.?|II|III|IV))?)"
     RX = [re.compile(NAME + r"\s+returns?\s+(?:for\s+)?(-?\d+)\s+(?:yards?|yds?)"),
           re.compile(NAME + r"\s+(-?\d+)\s+Yd\s+(?:Kickoff|Punt)\s+Return"),
-          re.compile(r"muffed by\s+" + NAME)]
+          re.compile(r"muffed by\s+" + NAME),
+          # ESPN's 2011-17 text: "kickoff for 50 yards returned by Jeremy Gallon for 12 yards to the Mich 27"
+          re.compile(r"returned by\s+" + NAME + r"\s+for\s+(-?\d+|no gain)\s*(?:yards?|yds?)?")]
     KD = re.compile(r"(?:kickoff|punt)\s+(?:for\s+)?(\d+)\s+(?:yards?|yds?)", re.I)
     rets, miss = [], 0
     pend = [g for s, g in games]
@@ -287,7 +288,7 @@ def cfb():
     with ThreadPoolExecutor(12) as ex:
         boxes = dict(zip([g['id'] for g in pend], ex.map(box_ret, [g['id'] for g in pend])))
     for s, g in games:
-        d = loaded[g['id']]; bx = boxes.get(g['id']) or {}
+        d = load(g['id']); bx = boxes.get(g['id']) or {}
         tids = [t['id'] for t in d['teams']]
         keys = {tid: {name_key(nm): aid for aid, nm in (bx.get(tid) or {}).items()} for tid in tids}
         for dr in d['drives']:
@@ -304,7 +305,7 @@ def cfb():
                         break
                 if not m:
                     continue
-                ry = 0 if muff else int(m.group(3))
+                ry = 0 if muff or m.group(3) == 'no gain' else int(m.group(3))
                 td = 1 if (p.get('sc') and not muff and ('TOUCHDOWN' in x.upper() or 'for a TD' in x or 'Return (' in x or 'Return Touchdown' in t)) else 0
                 kick = str(p.get('st') or '')
                 recv = [tid for tid in tids if tid != kick]
@@ -340,6 +341,13 @@ def cfb():
                 rets.append({'s': s, 'k': 'kr' if ko else 'pr', 'p': aid, 't': tm, 'catch': catch, 'y': ry, 'v': v, 'td': td, 'fum': fum,
                              'w': g.get('w', 0), 'd': g.get('date', '')})
     print('returns', len(rets), 'unmatched names', miss, flush=True)
+    return rets, D, miss
+
+
+def cfb():
+    import cfb_all
+    y = season_now()
+    rets, D, miss = cfb_returns((y - 2, y - 1, y))
     A = cfb_all.read_cfb_all(); c = {k: i for i, k in enumerate(A['cols'])}
     board = {}
     for r in A['rows']:
@@ -355,8 +363,42 @@ def cfb():
         info[aid] = {'n': r[c['name']], 'pos': r[c['pos']], 't': r[c['team']], 'lg': r[c['logo']], 'fv': r[c['fv']],
                      'cls': r[c['cls']], 'dv': r[c['div']]}
     wk = max((r['w'] for r in rets if r['s'] == y), default=0)
-    return write('cfb', rets, y, info, {'week': wk, 'value': 'drive points', 'd25': round(D[75], 2), 'd50': round(D[50], 2),
-                                        'unmatched': miss})
+    out = write('cfb', rets, y, info, {'week': wk, 'value': 'drive points', 'd25': round(D[75], 2), 'd50': round(D[50], 2),
+                                       'unmatched': miss})
+    fv_file(rets, y, wk)
+    return out
+
+
+def fv_file(rets, y, wk):
+    """scripts/data/cfb_ret_fv.json for the FV return term (fetch_cfb.mjs, data/cfb_fv_returns.json): every returner's
+    career KR / PR count and yards over expected, from the frozen history (scripts/data/cfb_ret_hist.json.gz, 2019-25)
+    for the seasons this run did not pull, and the seasons he returned in. {p: {ESPN id: [KR, KR yoe, PR, PR yoe,
+    seasons, returned this season]}}"""
+    H = {}
+    try:
+        with gzip.open(os.path.join(HERE, 'data', 'cfb_ret_hist.json.gz'), 'rt') as f:
+            H = json.load(f)
+    except (OSError, ValueError):
+        pass
+    live = {r['s'] for r in rets}
+    acc = defaultdict(lambda: {'v': [0, 0.0, 0, 0.0], 's': set()})
+    for s, d in H.items():
+        if int(s) in live or int(s) > y:
+            continue
+        for aid, x in d.items():
+            a = acc[aid]
+            for i in range(4):
+                a['v'][i] += x[i]
+            a['s'].add(int(s))
+    for r in rets:
+        a = acc[r['p']]
+        i = 0 if r['k'] == 'kr' else 2
+        a['v'][i] += 1; a['v'][i + 1] += r['ryoe']; a['s'].add(r['s'])
+    P = {aid: [a['v'][0], round(a['v'][1], 1), a['v'][2], round(a['v'][3], 1), len(a['s']), int(y in a['s'])]
+         for aid, a in acc.items() if y in a['s'] or y - 1 in a['s'] or y - 2 in a['s'] or y - 3 in a['s']}
+    with open(os.path.join(HERE, 'data', 'cfb_ret_fv.json'), 'w') as f:
+        json.dump({'season': y, 'week': wk, 'p': P}, f, separators=(',', ':'))
+    print('cfb_ret_fv:', len(P), 'returners', flush=True)
 
 
 if __name__ == '__main__':

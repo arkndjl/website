@@ -1,0 +1,234 @@
+{
+ "years": [
+  2016,
+  2025
+ ],
+ "plays": 67002,
+ "kinds": {
+  "kick": {
+   "sdPlay": 1.05,
+   "k": 360,
+   "forward": {
+    "slope": 1.002,
+    "t": 2.25,
+    "pairs": 305
+   },
+   "moved": {
+    "slope": 0.832,
+    "t": 0.87,
+    "pairs": 97
+   },
+   "stayed": {
+    "slope": 0.735,
+    "t": 1.35,
+    "pairs": 208
+   },
+   "newOnOldUnit": {
+    "slope": 0.246,
+    "t": 0.27,
+    "pairs": 66
+   }
+  },
+  "punt": {
+   "sdPlay": 0.441,
+   "k": 170,
+   "forward": {
+    "slope": 1.017,
+    "t": 4.36,
+    "pairs": 269
+   },
+   "moved": {
+    "slope": -0.209,
+    "t": -0.26,
+    "pairs": 57
+   },
+   "stayed": {
+    "slope": 1.181,
+    "t": 4.95,
+    "pairs": 212
+   },
+   "newOnOldUnit": {
+    "slope": -0.147,
+    "t": -0.3,
+    "pairs": 56
+   }
+  },
+  "kr": {
+   "sdPlay": 0.877,
+   "k": 90,
+   "forward": {
+    "slope": 0.997,
+    "t": 2.69,
+    "pairs": 497
+   },
+   "moved": {
+    "slope": 0.693,
+    "t": 0.86,
+    "pairs": 154
+   },
+   "stayed": {
+    "slope": 1.187,
+    "t": 2.82,
+    "pairs": 343
+   },
+   "newOnOldUnit": {
+    "slope": -0.211,
+    "t": -0.53,
+    "pairs": 139
+   }
+  },
+  "pr": {
+   "sdPlay": 1.159,
+   "k": 130,
+   "forward": {
+    "slope": 1.007,
+    "t": 1.6,
+    "pairs": 366
+   },
+   "moved": {
+    "slope": 2.111,
+    "t": 2.13,
+    "pairs": 110
+   },
+   "stayed": {
+    "slope": 0.472,
+    "t": 0.6,
+    "pairs": 256
+   },
+   "newOnOldUnit": {
+    "slope": 0.572,
+    "t": 0.71,
+    "pairs": 106
+   }
+  },
+  "ko": {
+   "sdPlay": 0.148,
+   "k": 470,
+   "forward": {
+    "slope": 0.999,
+    "t": 2.46,
+    "pairs": 351
+   },
+   "moved": {
+    "slope": -0.502,
+    "t": -0.77,
+    "pairs": 97
+   },
+   "stayed": {
+    "slope": 1.393,
+    "t": 3.05,
+    "pairs": 254
+   },
+   "newOnOldUnit": {
+    "slope": 0.095,
+    "t": 0.09,
+    "pairs": 84
+   }
+  }
+ },
+ "team": {
+  "shipped": {
+   "teamSeasons": 288,
+   "sdPtsGame": 0.89,
+   "players": {
+    "slope": 1.575,
+    "t": 3.67
+   },
+   "withTeamLast": {
+    "players": {
+     "slope": 1.425,
+     "t": 2.49
+    },
+    "teamLast": {
+     "slope": 0.03,
+     "t": 0.4
+    }
+   }
+  },
+  "withKickoffs": {
+   "teamSeasons": 288,
+   "sdPtsGame": 0.894,
+   "players": {
+    "slope": 1.516,
+    "t": 3.53
+   },
+   "withTeamLast": {
+    "players": {
+     "slope": 1.358,
+     "t": 2.39
+    },
+    "teamLast": {
+     "slope": 0.032,
+     "t": 0.42
+    }
+   }
+  },
+  "kick": {
+   "teamSeasons": 288,
+   "sdPtsGame": 0.606,
+   "players": {
+    "slope": 1.249,
+    "t": 2.79
+   },
+   "withTeamLast": {
+    "players": {
+     "slope": 0.945,
+     "t": 1.44
+    },
+    "teamLast": {
+     "slope": 0.053,
+     "t": 0.63
+    }
+   }
+  },
+  "punt": {
+   "teamSeasons": 288,
+   "sdPtsGame": 0.278,
+   "players": {
+    "slope": 1.094,
+    "t": 4.37
+   },
+   "withTeamLast": {
+    "players": {
+     "slope": 0.973,
+     "t": 2.45
+    },
+    "teamLast": {
+     "slope": 0.034,
+     "t": 0.39
+    }
+   }
+  },
+  "returns": {
+   "teamSeasons": 288,
+   "sdPtsGame": 0.524,
+   "players": {
+    "slope": 1.404,
+    "t": 2.41
+   },
+   "withTeamLast": {
+    "players": {
+     "slope": 1.075,
+     "t": 1.65
+    },
+    "teamLast": {
+     "slope": 0.073,
+     "t": 1.13
+    }
+   }
+  }
+ },
+ "k": {
+  "kick": 360,
+  "punt": 170,
+  "kr": 90,
+  "pr": 130
+ },
+ "shipped": [
+  "kick",
+  "punt",
+  "kr",
+  "pr"
+ ],
+ "note": "kicking (FG + XP), punting, KR and PR credit predicts next season one for one and beats the team's own last season on team points; kickoffs left out (no carry-over beyond the coverage unit)"
+}

@@ -95,7 +95,7 @@ def build():
                 picks[r['pfr_player_id']] = int(r['pick'])
     boards = {1: {}}
     for w in range(2, week + 2):
-        out, _, _ = W.board(y, thru=w)
+        out, _, _ = W.board(y, thru=w, st=False)
         boards[w] = {p['id']: p for p in out}
     tl = 17
     pw = []                  # (WAR over expected, snaps) for every player-week: the z spread

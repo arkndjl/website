@@ -34,7 +34,7 @@ def seasons():
         return {int(k): v for k, v in json.load(open(fn)).items()}
     H = {}
     for y in range(YEARS[0] - 3, YEARS[-1] + 1):
-        out, _, _ = W.board(y)
+        out, _, _ = W.board(y, st=False)
         H[y] = {p['id']: {'e': p['sn'], 'grp': p['_g'], 'x': {'war': p['_war']}} for p in out}
         print('season', y, len(H[y]), flush=True)
     os.makedirs(os.path.dirname(fn), exist_ok=True)
@@ -129,7 +129,7 @@ def checkpoints():
         for cp in CPS:
             if str(cp) in C.get(str(y), {}):
                 continue
-            out, _, _ = W.board(y, thru=cp)
+            out, _, _ = W.board(y, thru=cp, st=False)
             C.setdefault(str(y), {})[str(cp)] = {p['id']: [p['_war'], p['sn'], p['t']] for p in out}
             print('cp', y, cp, len(out), flush=True)
             os.makedirs(os.path.dirname(fn), exist_ok=True)
