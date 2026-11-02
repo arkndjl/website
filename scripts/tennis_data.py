@@ -436,6 +436,7 @@ def espn_score(c):
 
 RDAY = {'Q1': -3, 'Q2': -2, 'Q3': -1, 'Q4': -1, 'R128': 0, 'R64': 1, 'R32': 2, 'R16': 4, 'RR': 3, 'QF': 5, 'SF': 6,
         'BR': 6, 'F': 7}      # tennis_model.RDAY
+RDAY_G = {'R128': 1, 'R64': 3, 'R32': 5, 'R16': 7, 'QF': 9, 'SF': 11, 'F': 13}      # tennis_model.RDAY_G (Grand Slams)
 
 
 def espn_rows(comps, eid, kind, hist):
@@ -462,7 +463,8 @@ def espn_rows(comps, eid, kind, hist):
         rd = espn_round(c['rd'])
         # history rows carry the tournament's start date and the model adds the round's day (tennis_model.RDAY):
         # back the match date off by that offset so the model's day is the day it was played
-        d = int((d0 - dt.timedelta(days=RDAY.get(rd, 2))).strftime('%Y%m%d'))
+        off = RDAY_G[rd] if lv == 'G' and rd in RDAY_G else RDAY.get(rd, 2)      # tennis_model.rday
+        d = int((d0 - dt.timedelta(days=off)).strftime('%Y%m%d'))
         if rd.startswith('Q'): lv = 'Q'
         out.append([d, c['tour'], lv, sf, rd, 5 if (lv == 'G' and c['tour'] == 'atp' and not rd.startswith('Q')) else 3,
                     f"{c['tour'][0]}e{c['eid']}", w, l, sc, None, None, None, None, None, None, c['tn']])
