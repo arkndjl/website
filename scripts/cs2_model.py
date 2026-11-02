@@ -21,6 +21,9 @@ The rating (scored against Valve's VRS points and a team-name Elo, out of sample
     vs .579). The Thunderpick archive's chances (tp) stay model-only: that picks test was pre-registered on them.
 FAILED (weight 0, numbers in data/cs2_fit.json): team-name Elo beside player Elo, roster continuity, inactivity decay,
 Bo1/Bo3/Bo5 slopes (tested on the 2022-23 sample, the only history with maps), Kalman player ratings.
+Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
+flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
+the blend weight absorbs the scale. Kept as is.
 """
 import bisect
 import datetime as dt
