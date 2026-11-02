@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-02T00:03:56Z",
+ "asof": "2026-11-02T00:06:49Z",
  "recenter": {
   "2026-11-01": -10.55,
   "2026-11-02": -11.93
@@ -464,6 +464,8 @@
    "tmRaw": 155.8,
    "flagged": "2026-11-01T12:42:33Z",
    "close": -3.5,
+   "unitsRaw": 3.0,
+   "unitsCap": 1.0,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -473,9 +475,7 @@
     "units": 1.0,
     "unitsRaw": 3.0,
     "unitsCap": 1.0
-   },
-   "unitsRaw": 3.0,
-   "unitsCap": 1.0
+   }
   },
   {
    "id": "401917913",
@@ -973,6 +973,8 @@
    "tmRaw": 138.4,
    "flagged": "2026-11-01T17:12:49Z",
    "close": -5.5,
+   "unitsRaw": 0.75,
+   "unitsCap": 0.25,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -982,9 +984,7 @@
     "units": 0.25,
     "unitsRaw": 0.75,
     "unitsCap": 0.25
-   },
-   "unitsRaw": 0.75,
-   "unitsCap": 0.25
+   }
   },
   {
    "id": "401925818",
@@ -1121,9 +1121,9 @@
    "flagged": "2026-11-01T13:30:49Z",
    "close": -5.5,
    "pass": true,
-   "now": null,
    "unitsRaw": 0.75,
-   "unitsCap": 0.25
+   "unitsCap": 0.25,
+   "now": null
   },
   {
    "id": "401916286",
@@ -1219,6 +1219,8 @@
    "tm": 155.4,
    "flagged": "2026-11-01T00:09:20Z",
    "close": 1.5,
+   "unitsRaw": 1.0,
+   "unitsCap": 0.25,
    "now": {
     "mk": "ml",
     "side": "away",
@@ -1228,9 +1230,7 @@
     "units": 0.25,
     "unitsRaw": 1.0,
     "unitsCap": 0.25
-   },
-   "unitsRaw": 1.0,
-   "unitsCap": 0.25
+   }
   },
   {
    "id": "401911333",
@@ -1329,6 +1329,8 @@
    "tmRaw": 136.5,
    "flagged": "2026-11-01T16:40:44Z",
    "close": -3.5,
+   "unitsRaw": 0.75,
+   "unitsCap": 0.25,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -1338,9 +1340,7 @@
     "units": 0.5,
     "unitsRaw": 1.5,
     "unitsCap": 0.5
-   },
-   "unitsRaw": 0.75,
-   "unitsCap": 0.25
+   }
   },
   {
    "id": "401911452",
@@ -1402,6 +1402,8 @@
    "tmRaw": 128.3,
    "flagged": "2026-11-01T21:14:15Z",
    "close": 6.5,
+   "unitsRaw": 2.75,
+   "unitsCap": 0.75,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -1411,9 +1413,7 @@
     "units": 0.75,
     "unitsRaw": 2.5,
     "unitsCap": 0.75
-   },
-   "unitsRaw": 2.75,
-   "unitsCap": 0.75
+   }
   },
   {
    "id": "401922020",
@@ -1550,9 +1550,9 @@
    "flagged": "2026-11-01T21:14:15Z",
    "close": -5.5,
    "pass": true,
-   "now": null,
    "unitsRaw": 2.0,
-   "unitsCap": 0.5
+   "unitsCap": 0.5,
+   "now": null
   },
   {
    "id": "401921704",
@@ -1786,6 +1786,8 @@
    "tmRaw": 148.5,
    "flagged": "2026-11-01T12:42:33Z",
    "close": 1.5,
+   "unitsRaw": 0.5,
+   "unitsCap": 0.25,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -1795,9 +1797,7 @@
     "units": 0.25,
     "unitsRaw": 0.5,
     "unitsCap": 0.25
-   },
-   "unitsRaw": 0.5,
-   "unitsCap": 0.25
+   }
   },
   {
    "id": "401909705",
@@ -1823,8 +1823,8 @@
    "flagged": "2026-11-01T16:40:44Z",
    "betTo": 24.5,
    "close": 27.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401924894",
@@ -3112,10 +3112,10 @@
   },
   "401925771": {
    "mk": "spread",
-   "side": "away",
-   "line": 3.5,
-   "price": -117.0,
-   "edge": 0.4,
+   "side": "home",
+   "line": 2.5,
+   "price": -115.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Washington State",
@@ -3679,25 +3679,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1359,
+  "snapshots": 1371,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 350,
-    "clvRet": -0.0267,
-    "clvT": -4.31,
+    "clvN": 352,
+    "clvRet": -0.0268,
+    "clvT": -4.35,
     "clv": 0.33,
-    "beat": 0.209,
-    "still": 0.606
+    "beat": 0.207,
+    "still": 0.608
    },
    {
     "when": "6-24h",
-    "clvN": 54,
-    "clvRet": 0.064,
-    "clvT": 1.98,
-    "clv": 1.91,
-    "beat": 0.278,
-    "still": 0.722
+    "clvN": 55,
+    "clvRet": 0.062,
+    "clvT": 1.95,
+    "clv": 1.87,
+    "beat": 0.273,
+    "still": 0.727
    },
    {
     "when": "1-6h",
@@ -5349,7 +5349,7 @@
     "scale": 0.3486
    },
    "2026-11-03": {
-    "raw": 6.25,
+    "raw": 7.0,
     "scale": 1.0
    },
    "2026-11-05": {
@@ -5361,7 +5361,7 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 13.75,
+    "raw": 16.0,
     "scale": 1.0
    }
   }
