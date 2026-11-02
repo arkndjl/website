@@ -4401,3 +4401,15 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .rdrift__bar i.mid { box-shadow: inset 0 0 0 1px var(--accent); }
 .rdrift__bar i.on { background: var(--foreground); }
 .rdrift__bar.is-down i.on { background: var(--accent); }
+
+/* NFL breakouts tab (layouts/shortcodes/nflbreakouts.html): week chips over one window a week */
+.brk__weeks { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 0 0 8px; }
+.brk__lbl { margin-right: 4px; }
+.brk__table td.cfb__dim { white-space: nowrap; }
+.brk__meta { display: none; }
+@media (max-width: 640px) {
+  .brk__table .brk__war, .brk__table .brk__pt { display: none; }
+  .brk__table .brk__meta { display: block; font-size: 0.85em; }
+  .brk__table td.cfb__name { white-space: normal; min-width: 0; }
+  .brk__table th, .brk__table td { padding-left: 4px; padding-right: 4px; }
+}

@@ -607,7 +607,7 @@ def board(y, thru=None, fresh=False):
                     'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
-                    '_st': dict(st), '_g': g, **({'bdg': bdg[pfr]} if pfr in bdg else {})})
+                    '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {})})
     out = [p for p in out if p['sn'] >= 1]
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
         ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))

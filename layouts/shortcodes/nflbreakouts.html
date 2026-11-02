@@ -1,0 +1,72 @@
+{{- /* NFL breakouts (Noah, Nov 2 2026): each week's best games by young players (rookies, seasons 1-3, or 24 and under),
+       ranked by the week's WAR over what we expected of him. data/nfl_breakouts.json from scripts/nfl_breakouts.py
+       (refreshed by the NFL job). One window a week; the week chips show one at a time (latest first). Phones keep rank,
+       player, position, team, +WAR and z. */ -}}
+{{- with site.Data.nfl_breakouts -}}
+{{- $d := . }}{{ $last := int .week }}
+{{- $date := lower ((time .asof).Format "Jan 2") }}
+<div class="brk" data-brk{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="cfb__bar brk__weeks" role="group" aria-label="week">
+    <span class="brk__lbl">week</span>
+    {{- range $w := seq $last 1 }}
+    <button type="button" class="cfb__chip{{ if eq $w $last }} is-on{{ end }}" data-brk-w="{{ $w }}" aria-pressed="{{ if eq $w $last }}true{{ else }}false{{ end }}">{{ $w }}</button>
+    {{- end }}
+  </div>
+  {{- range $w := seq $last 1 }}
+  {{- $rows := index $d.weeks (string $w) | default slice }}
+  <div data-brk-pane="{{ $w }}"{{ if ne $w $last }} style="display:none"{{ end }}>
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · week %v" ($.Get "title" | default "breakouts") $w) "icon" "football" "filter" "Pos,Team,Yr" "rerank" true "gfxCols" "RK,Player,Pos,Team,Opp,+WAR,z" "gfxDate" (printf "week %v · %v" $w $d.season) "gfxMax" "25") }}
+<table class="cfb__table bw brk__table">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
+    <th class="bw__x" title="NFL season: R = rookie">Yr</th>
+    <th class="bw__x" title="opponent">Opp</th>
+    <th class="bw__x" title="snaps in the game">Snaps</th>
+    <th class="brk__war" title="the board's WAR for the game: WAR through the week minus WAR before it">WAR</th>
+    <th class="bw__x" title="expected WAR: his WAR rate a snap before the week (last three seasons shrunk to his group, updated with the season so far) x his snaps in the game">xWAR</th>
+    <th title="WAR - xWAR; the rank">+WAR</th>
+    <th title="+WAR in SDs of a game's WAR over expected at his snaps (fit on every player-week this season)">z</th>
+    <th class="bw__x" title="his stat line in the game">Line</th>
+    <th class="bw__x">Note</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b>{{ with .age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}<span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }} · {{ .ha }} {{ .op }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
+    <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
+    <td class="bw__x">{{ .yr }}</td>
+    <td class="bw__x">{{ .ha }} {{ .op }}</td>
+    <td class="cfb__num bw__x">{{ .sn }}</td>
+    <td class="cfb__num brk__war" data-v="{{ .war }}">{{ printf "%+.3f" (float .war) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .x }}">{{ printf "%+.3f" (float .x) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .ov }}"><span class="{{ if ge (float .ov) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.3f" (float .ov) }}</span></td>
+    <td class="cfb__num">{{ with .z }}{{ printf "%+.1f" (float .) }}{{ end }}</td>
+    <td class="bw__x cfb__dim">{{ .line }}</td>
+    <td class="bw__x cfb__dim">{{ .note }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+  {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "nfl_breakouts" "note" (printf "week %v · ranked by WAR over expected · updated %s" $w $date)
+        "about" (printf "Young: a rookie, a player in his first three seasons, or %v and under. A game's WAR is the board's (WAR through the week minus WAR before it). xWAR = his WAR rate a snap before the week (the projections' rate: last three seasons at 1 / .7 / .5, shrunk toward his position group, then updated with the season so far; a rookie starts at his group's newcomer rate) x his snaps in the game. +WAR = WAR - xWAR, the rank. z = +WAR over the spread of a game's WAR over expected at his snaps, fit on every player-week this season; z is large on few snaps. Top %v a week with %v+ snaps." $d.age $d.top $d.min)) }}
+  </div>
+  {{- end }}
+</div>
+<script>
+(function () {
+  document.querySelectorAll('[data-brk]').forEach(function (b) {
+    if (b.dataset.ready) return; b.dataset.ready = 1;
+    var chips = b.querySelectorAll('[data-brk-w]'), panes = b.querySelectorAll('[data-brk-pane]');
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        var w = c.getAttribute('data-brk-w');
+        chips.forEach(function (x) { var on = x === c; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        panes.forEach(function (p) { p.style.display = p.getAttribute('data-brk-pane') === w ? '' : 'none'; });
+      });
+    });
+  });
+})();
+</script>
+{{- end -}}
