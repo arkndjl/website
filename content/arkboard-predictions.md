@@ -10,7 +10,7 @@ cover = "/og/predictions.png"
 
 {{< arknav >}}
 
-{{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-predictions" status="CFB · NFL · CBB · NBA · NHL · SOCCER" class="winpane--art" />}}
+{{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-predictions" status="" class="winpane--art" />}}
 
 {{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,game models,paper book" side="true" label="Predictions views" >}}
 {{< gamesfilter tab="games" >}}

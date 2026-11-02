@@ -8,7 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="tennis_prospects.exe :: under-22 big boards" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · Tennis Abstract · every pro level" class="winpane--art" />}}
+{{< winpane title="tennis_prospects.exe :: under 22" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · Tennis Abstract" class="winpane--art" />}}
 
 {{< wintabs groups="players:ATP board,WTA board|model:fv model,ATP past,WTA past,all-time FV" side="true" label="Tennis prospects views" >}}
 {{< tennisprospects view="board" tour="atp" tab="ATP board" >}}

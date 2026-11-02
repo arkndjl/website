@@ -9,7 +9,7 @@ cover = "/og/nba.png"
 
 {{< arknav >}}
 
-{{< winpane title="nba.exe :: NBA XPM and games" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
+{{< winpane title="nba.exe :: 2026-27" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
 {{< wintabs groups="players:XPM leaders,projections,contract value,rookies,ARKLIST|rosters:depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds,offense,defense" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM :: leaderboard" tab="XPM leaders" >}}

@@ -26,3 +26,13 @@
   (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it rather than hand-editing.
 - Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
   source adds the source there (name, link, what the site takes from it).
+
+## Copy: no intros or descriptive blurbs
+
+- No intro, lede, kicker, subtitle or descriptive blurb on any page, tab, card or window ("how arkndjl.net looks and
+  reads", "every sport's X in one table", "where they will go"). Titles, labels, column headers, data and numbers only;
+  let the page speak for itself. When unsure, cut.
+- A note on how a table is built goes in the `about` of `wintable-close.html`, which is only the status bar's hover
+  title, never a visible paragraph. Column meanings go in `<th title>` tooltips.
+- Kept: the Reference page's Research and Glossary/Methodology text, model/backtest windows, article bodies, source
+  attributions in status bars, and résumé content on about/contact.

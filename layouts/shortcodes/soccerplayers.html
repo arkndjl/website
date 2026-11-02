@@ -80,9 +80,6 @@
     <p class="cfb__none" data-sp-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-sp-none hidden>no players match.</p>
   </div>
-  {{- if ne $view "stats" }}
-  <p class="cfb__dim soccerpl__about">Medals: traits that predicted next season's GAR a 90 beyond this season's GAR, last season's, minutes and age (2015-26, t >= 2 clustered by player, leave-one-season-out gain): Chance Creator (key passes a 90), Shot Volume (shots, F and M), Progressor (xGBuildup, M and D). Each stat is regressed by minutes; tier = percentile at the position, bronze 75th, silver 90th, gold 97th, platinum 99th. Finishing and keeper shot stopping are too noisy year to year; FotMob ball winning and dribbles failed.</p>
-  {{- end }}
   <div class="win__status"><span data-sp-count></span>
     <span class="winpager" data-sp-pager hidden>
       <button type="button" class="winpager__btn" data-sp-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
