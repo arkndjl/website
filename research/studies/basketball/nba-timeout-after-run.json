@@ -1,0 +1,100 @@
+{
+  "id": "nba-timeout-after-run",
+  "sport": "NBA",
+  "question": "Does a timeout stop an opponent run?",
+  "answer": "No: after an 8+ pt run, a timeout nets -0.31 pts over the next 2:00 vs playing on (CI -0.40 to -0.23).",
+  "findings": [
+    "Timeout: next 2:00 net +0.51 pts (CI +0.44 to +0.58), n=9313.",
+    "No timeout: next 2:00 net +0.83 pts (CI +0.79 to +0.87), n=23790.",
+    "Both groups outscore the opponent after the run (mean reversion plus the ball); same-state gap -0.31.",
+    "Q4 only: timeout minus none -0.26 pts (CI -0.42 to -0.10), n=6980."
+  ],
+  "method": "Trigger = score making an unanswered run 8+ pts, >= 2:30 left in quarter, margin within 20. Timeout in that dead ball vs no timeout in next 60 s; net points next 120 s; matched on run size and quarter.",
+  "data": "ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, 16,242 games, 33,103 runs.",
+  "n": 33103,
+  "robust": true,
+  "interest": 4,
+  "split_check": "Timeout minus none: -0.32 pts in 2012-19 (CI -0.44 to -0.22), -0.31 in 2020-26 (CI -0.42 to -0.19).",
+  "chart": {
+    "type": "bar",
+    "title": "Net points in next 2:00 after an opponent 8+ pt run, by quarter",
+    "x_label": "quarter",
+    "y_label": "net points, next 2:00",
+    "y_fmt": "signed",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "even"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "timeout",
+        "points": [
+          {
+            "x": "Q1",
+            "y": 0.461,
+            "lo": 0.328,
+            "hi": 0.594,
+            "n": 2499
+          },
+          {
+            "x": "Q2",
+            "y": 0.595,
+            "lo": 0.456,
+            "hi": 0.734,
+            "n": 2325
+          },
+          {
+            "x": "Q3",
+            "y": 0.386,
+            "lo": 0.253,
+            "hi": 0.528,
+            "n": 2410
+          },
+          {
+            "x": "Q4",
+            "y": 0.614,
+            "lo": 0.474,
+            "hi": 0.756,
+            "n": 2079
+          }
+        ]
+      },
+      {
+        "name": "no timeout",
+        "points": [
+          {
+            "x": "Q1",
+            "y": 0.903,
+            "lo": 0.817,
+            "hi": 0.986,
+            "n": 6976
+          },
+          {
+            "x": "Q2",
+            "y": 0.799,
+            "lo": 0.714,
+            "hi": 0.886,
+            "n": 6251
+          },
+          {
+            "x": "Q3",
+            "y": 0.723,
+            "lo": 0.635,
+            "hi": 0.811,
+            "n": 5662
+          },
+          {
+            "x": "Q4",
+            "y": 0.871,
+            "lo": 0.78,
+            "hi": 0.961,
+            "n": 4901
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

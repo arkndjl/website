@@ -1,0 +1,78 @@
+{
+  "id": "nfl-down-14-go-for-two",
+  "sport": "NFL",
+  "question": "Down 14 in the 4th, should a team go for two after the first touchdown?",
+  "answer": "Yes. With two TDs and a stop, going for 2 first wins 59% vs 47% kicking. Teams went for 2 54% of the time in 2025-26.",
+  "findings": [
+    "Win chance gain given two TDs: +12.1 pts (+9.7 to +14.4).",
+    "Down 8 at a Q4 PAT: went for 2 in 2 of 72 in 2015-18, 13 of 24 in 2025-26.",
+    "Inputs: 2-pt 48.1% (n=1,458), XP 94.4% (n=14,618), overtime 50/50.",
+    "The early 2-pt result also tells the team whether it needs a TD or a TD and 2 on the next drive."
+  ],
+  "method": "Closed-form win chance given two TDs and no opponent score, with pooled 2-pt and XP rates; CI from Beta draws of both rates. Go-for-2 share counts Q4 tries at down 8, Wilson CIs.",
+  "data": "nflverse play-by-play, 2015 to 2026 wk 8; 193 Q4 PATs at down 8; 1,458 2-pt tries.",
+  "n": 193,
+  "robust": true,
+  "interest": 4,
+  "split_check": "Gain holds with 2015-20 rates (+11.7 pts) and 2021-26 rates (+12.3 pts).",
+  "chart": {
+    "type": "bar",
+    "title": "Share going for 2 when down 8 at a 4th-quarter PAT",
+    "x_label": "seasons",
+    "y_label": "go-for-2 %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "went for 2",
+        "points": [
+          {
+            "x": "2015-16",
+            "y": 0.0,
+            "lo": 0.0,
+            "hi": 0.0989,
+            "n": 35
+          },
+          {
+            "x": "2017-18",
+            "y": 0.0541,
+            "lo": 0.015,
+            "hi": 0.177,
+            "n": 37
+          },
+          {
+            "x": "2019-20",
+            "y": 0.2778,
+            "lo": 0.1585,
+            "hi": 0.4399,
+            "n": 36
+          },
+          {
+            "x": "2021-22",
+            "y": 0.28,
+            "lo": 0.1428,
+            "hi": 0.4758,
+            "n": 25
+          },
+          {
+            "x": "2023-24",
+            "y": 0.3611,
+            "lo": 0.2248,
+            "hi": 0.5243,
+            "n": 36
+          },
+          {
+            "x": "2025-26",
+            "y": 0.5417,
+            "lo": 0.3507,
+            "hi": 0.7211,
+            "n": 24
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

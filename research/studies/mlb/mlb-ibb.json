@@ -1,0 +1,128 @@
+{
+  "id": "mlb-ibb",
+  "sport": "MLB",
+  "question": "Do intentional walks gain win probability for the defense?",
+  "answer": "Mostly no. Runner on 2nd, 1 out: IBB costs the defense 2.0 win-prob pts. Other states: no gain distinguishable from 0.",
+  "findings": [
+    "Runner on 2nd, 1 out: -2.0 pts (CI -3.3 to -0.7), n=545 IBB; late and close -4.1 pts (CI -7.1 to -1.2).",
+    "2nd and 3rd, 1 out: +1.3 pts (CI +0.9 to +1.8) over the PA but +0.3 (CI -0.8 to +1.4) to end of inning.",
+    "IBB batters: +15 pts of season wOBA over other batters in these states; in the model.",
+    "IBB per season: 826 in 2016, 393 in 2025 (non-pitcher batters, innings 1-9)."
+  ],
+  "method": "Defense-view change in empirical WE, from the PA start to the end of the half-inning (main) and over the PA. OLS with batter and on-deck season wOBA, inning x score x season cells; SE clustered by game. Compared with pitching to the batter in the same state.",
+  "data": "Retrosheet play-by-play, 2015-2025 regular season, 6,129 intentional walks to non-pitchers in innings 1-9. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).",
+  "n": 6129,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Runner on 2nd, 1 out: -2.0 pts 2015-19, -1.9 2020-25 (SE 0.8, 1.2).",
+  "chart": {
+    "type": "bar",
+    "title": "IBB minus pitching to the batter, defense view",
+    "x_label": "runners, outs",
+    "y_label": "win-prob pts",
+    "y_fmt": "signed",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "no effect"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "to end of inning",
+        "points": [
+          {
+            "x": "2nd, 1 out",
+            "y": -1.97,
+            "lo": -3.28,
+            "hi": -0.66,
+            "n": 43321
+          },
+          {
+            "x": "2nd, 2 out",
+            "y": -0.15,
+            "lo": -0.67,
+            "hi": 0.37,
+            "n": 56085
+          },
+          {
+            "x": "3rd, 1 out",
+            "y": 0.37,
+            "lo": -1.35,
+            "hi": 2.09,
+            "n": 13133
+          },
+          {
+            "x": "3rd, 2 out",
+            "y": 0.01,
+            "lo": -0.86,
+            "hi": 0.88,
+            "n": 22881
+          },
+          {
+            "x": "2nd+3rd, 1 out",
+            "y": 0.29,
+            "lo": -0.81,
+            "hi": 1.4,
+            "n": 12481
+          },
+          {
+            "x": "2nd+3rd, 2 out",
+            "y": -0.33,
+            "lo": -1.27,
+            "hi": 0.61,
+            "n": 13733
+          }
+        ]
+      },
+      {
+        "name": "over the PA",
+        "points": [
+          {
+            "x": "2nd, 1 out",
+            "y": -1.4,
+            "lo": -1.72,
+            "hi": -1.07,
+            "n": 43321
+          },
+          {
+            "x": "2nd, 2 out",
+            "y": -0.65,
+            "lo": -0.82,
+            "hi": -0.48,
+            "n": 56085
+          },
+          {
+            "x": "3rd, 1 out",
+            "y": 0.85,
+            "lo": 0.23,
+            "hi": 1.46,
+            "n": 13133
+          },
+          {
+            "x": "3rd, 2 out",
+            "y": -0.5,
+            "lo": -0.85,
+            "hi": -0.16,
+            "n": 22881
+          },
+          {
+            "x": "2nd+3rd, 1 out",
+            "y": 1.32,
+            "lo": 0.87,
+            "hi": 1.76,
+            "n": 12481
+          },
+          {
+            "x": "2nd+3rd, 2 out",
+            "y": -0.43,
+            "lo": -0.87,
+            "hi": 0.0,
+            "n": 13733
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

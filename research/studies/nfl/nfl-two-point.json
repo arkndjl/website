@@ -1,0 +1,209 @@
+{
+  "id": "nfl-two-point",
+  "sport": "NFL",
+  "question": "Is a two-point try worth more than an extra point on average?",
+  "answer": "No clear edge. 2-pt tries score 0.96 points per try, XPs 0.94; difference +0.02 (-0.03 to +0.07).",
+  "findings": [
+    "2-pt success 48.1% (45.5-50.6, n=1,458); break-even vs XP is 47.2%.",
+    "XP rate 93.9% in 2015-17 (n=3,695), 95.8% in 2023-25 (n=3,860).",
+    "2-pt rate by season ranges 41% to 55%; every season CI includes 48%.",
+    "2-pt runs 55% (50-60, n=388), passes 45% (42-48, n=1,041)."
+  ],
+  "method": "Wilson 95% CIs on success rates; expected points = 2 x 2-pt rate vs XP rate. Tries in Q1-Q4, all game states; selection is small since 2-pt tries are mostly score-driven.",
+  "data": "nflverse play-by-play, 2015 to 2026 wk 8, 1,458 two-point tries and 14,618 extra points.",
+  "n": 16076,
+  "robust": false,
+  "interest": 2,
+  "split_check": "2-pt rate 47.6% in 2015-20 (n=706), 48.5% in 2021-26 (n=752); XP edge within noise in both.",
+  "chart": {
+    "type": "line",
+    "title": "Expected points per try",
+    "x_label": "season",
+    "y_label": "points per try",
+    "y_fmt": "num",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "two-point try",
+        "points": [
+          {
+            "x": 2015,
+            "y": 0.9804,
+            "lo": 0.7906,
+            "hi": 1.1716,
+            "n": 102
+          },
+          {
+            "x": 2016,
+            "y": 0.9912,
+            "lo": 0.8101,
+            "hi": 1.1728,
+            "n": 113
+          },
+          {
+            "x": 2017,
+            "y": 0.8132,
+            "lo": 0.6229,
+            "hi": 1.0186,
+            "n": 91
+          },
+          {
+            "x": 2018,
+            "y": 1.029,
+            "lo": 0.8637,
+            "hi": 1.1927,
+            "n": 138
+          },
+          {
+            "x": 2019,
+            "y": 0.9412,
+            "lo": 0.7665,
+            "hi": 1.1196,
+            "n": 119
+          },
+          {
+            "x": 2020,
+            "y": 0.9231,
+            "lo": 0.7638,
+            "hi": 1.0864,
+            "n": 143
+          },
+          {
+            "x": 2021,
+            "y": 0.9875,
+            "lo": 0.8347,
+            "hi": 1.1409,
+            "n": 160
+          },
+          {
+            "x": 2022,
+            "y": 0.9688,
+            "lo": 0.799,
+            "hi": 1.1403,
+            "n": 128
+          },
+          {
+            "x": 2023,
+            "y": 1.1061,
+            "lo": 0.9358,
+            "hi": 1.2703,
+            "n": 132
+          },
+          {
+            "x": 2024,
+            "y": 0.8108,
+            "lo": 0.6593,
+            "hi": 0.9719,
+            "n": 148
+          },
+          {
+            "x": 2025,
+            "y": 0.9291,
+            "lo": 0.7603,
+            "hi": 1.1021,
+            "n": 127
+          },
+          {
+            "x": 2026,
+            "y": 1.1228,
+            "lo": 0.8656,
+            "hi": 1.3646,
+            "n": 57
+          }
+        ]
+      },
+      {
+        "name": "extra point",
+        "points": [
+          {
+            "x": 2015,
+            "y": 0.9418,
+            "lo": 0.9275,
+            "hi": 0.9535,
+            "n": 1255
+          },
+          {
+            "x": 2016,
+            "y": 0.9343,
+            "lo": 0.9192,
+            "hi": 0.9468,
+            "n": 1248
+          },
+          {
+            "x": 2017,
+            "y": 0.9404,
+            "lo": 0.9255,
+            "hi": 0.9525,
+            "n": 1192
+          },
+          {
+            "x": 2018,
+            "y": 0.9437,
+            "lo": 0.9297,
+            "hi": 0.9551,
+            "n": 1280
+          },
+          {
+            "x": 2019,
+            "y": 0.9407,
+            "lo": 0.9263,
+            "hi": 0.9524,
+            "n": 1265
+          },
+          {
+            "x": 2020,
+            "y": 0.9305,
+            "lo": 0.9159,
+            "hi": 0.9427,
+            "n": 1395
+          },
+          {
+            "x": 2021,
+            "y": 0.9349,
+            "lo": 0.9203,
+            "hi": 0.947,
+            "n": 1321
+          },
+          {
+            "x": 2022,
+            "y": 0.9441,
+            "lo": 0.93,
+            "hi": 0.9555,
+            "n": 1253
+          },
+          {
+            "x": 2023,
+            "y": 0.9588,
+            "lo": 0.9462,
+            "hi": 0.9685,
+            "n": 1238
+          },
+          {
+            "x": 2024,
+            "y": 0.9562,
+            "lo": 0.9437,
+            "hi": 0.9661,
+            "n": 1302
+          },
+          {
+            "x": 2025,
+            "y": 0.9576,
+            "lo": 0.9453,
+            "hi": 0.9672,
+            "n": 1320
+          },
+          {
+            "x": 2026,
+            "y": 0.9454,
+            "lo": 0.9231,
+            "hi": 0.9615,
+            "n": 549
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

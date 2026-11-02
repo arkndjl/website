@@ -1,0 +1,161 @@
+{
+  "id": "mlb-stolen-bases",
+  "sport": "MLB",
+  "question": "After the 2023 base and pickoff rules, do runners still steal too little?",
+  "answer": "Slightly. Steals of 2nd succeed 75.9% vs 71.7% break-even, +2.6 runs per team-season. At 1 out, no edge.",
+  "findings": [
+    "Steal of 2nd: 72.3% success 2021-22 (n=4,425) to 75.9% 2023-25 (n=9,265, CI 75.0%-76.7%).",
+    "Attempts per PA with runner on 1st only: 6.0% to 8.3%. Success fell each year: 77.2%, 75.8%, 74.8%.",
+    "Run value per attempt 2023-25: +0.022 (CI +0.017 to +0.027); 2021-22: +0.003 (CI -0.005 to +0.010).",
+    "1 out: 73.5% vs 72.9% break-even (n=3,383). 0 out: 77.1% vs 71.1% (n=2,306)."
+  ],
+  "method": "Steal attempts from clean states (runner on 1st only, or 2nd only), incl. pickoff-CS and K+CS. Break-even from era RE24 (innings 1-8). Run value uses the steal outcome only. Average success above break-even does not prove the marginal try pays.",
+  "data": "Retrosheet play-by-play, 2021-2025 regular season, 15,011 steal attempts in clean states. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).",
+  "n": 15011,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Success above break-even in each season 2023, 2024, 2025 for steals of 2nd; gap shrinks from +4.1% to +3.3%.",
+  "chart": {
+    "type": "bar",
+    "title": "Steal success vs break-even by base and outs",
+    "x_label": "base stolen, outs",
+    "y_label": "success %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "2021-22",
+        "points": [
+          {
+            "x": "2nd, 0 out",
+            "y": 0.732,
+            "lo": 0.704,
+            "hi": 0.758,
+            "n": 1040
+          },
+          {
+            "x": "2nd, 1 out",
+            "y": 0.7,
+            "lo": 0.677,
+            "hi": 0.722,
+            "n": 1611
+          },
+          {
+            "x": "2nd, 2 out",
+            "y": 0.74,
+            "lo": 0.719,
+            "hi": 0.759,
+            "n": 1774
+          },
+          {
+            "x": "3rd, 0 out",
+            "y": 0.868,
+            "lo": 0.727,
+            "hi": 0.942,
+            "n": 38
+          },
+          {
+            "x": "3rd, 1 out",
+            "y": 0.71,
+            "lo": 0.651,
+            "hi": 0.763,
+            "n": 252
+          },
+          {
+            "x": "3rd, 2 out",
+            "y": 0.846,
+            "lo": 0.77,
+            "hi": 0.9,
+            "n": 117
+          }
+        ]
+      },
+      {
+        "name": "2023-25",
+        "points": [
+          {
+            "x": "2nd, 0 out",
+            "y": 0.771,
+            "lo": 0.753,
+            "hi": 0.787,
+            "n": 2306
+          },
+          {
+            "x": "2nd, 1 out",
+            "y": 0.735,
+            "lo": 0.719,
+            "hi": 0.749,
+            "n": 3383
+          },
+          {
+            "x": "2nd, 2 out",
+            "y": 0.774,
+            "lo": 0.76,
+            "hi": 0.788,
+            "n": 3576
+          },
+          {
+            "x": "3rd, 0 out",
+            "y": 0.784,
+            "lo": 0.701,
+            "hi": 0.85,
+            "n": 116
+          },
+          {
+            "x": "3rd, 1 out",
+            "y": 0.778,
+            "lo": 0.739,
+            "hi": 0.812,
+            "n": 499
+          },
+          {
+            "x": "3rd, 2 out",
+            "y": 0.87,
+            "lo": 0.827,
+            "hi": 0.903,
+            "n": 299
+          }
+        ]
+      },
+      {
+        "name": "break-even 2023-25",
+        "points": [
+          {
+            "x": "2nd, 0 out",
+            "y": 0.711,
+            "n": 2306
+          },
+          {
+            "x": "2nd, 1 out",
+            "y": 0.729,
+            "n": 3383
+          },
+          {
+            "x": "2nd, 2 out",
+            "y": 0.71,
+            "n": 3576
+          },
+          {
+            "x": "3rd, 0 out",
+            "y": 0.795,
+            "n": 116
+          },
+          {
+            "x": "3rd, 1 out",
+            "y": 0.69,
+            "n": 499
+          },
+          {
+            "x": "3rd, 2 out",
+            "y": 0.927,
+            "n": 299
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true,
+  "order": 1
+}

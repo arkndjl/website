@@ -1,0 +1,68 @@
+{
+  "id": "tennis-hold-after-break",
+  "sport": "tennis",
+  "question": "Do players drop serve more often right after breaking?",
+  "answer": "No. Same player and match: hold rate after breaking is +0.7 pts (men), +0.5 (women) vs after opponent holds.",
+  "findings": [
+    "Men: +0.7 pts (95% CI +0.2 to +1.2), 11,796 player-matches.",
+    "Women: +0.5 pts (95% CI -0.2 to +1.2), 7,616 player-matches.",
+    "Raw hold after breaking: men 82.0%, women 69.1%; mostly stronger servers breaking."
+  ],
+  "method": "Hold (non-tiebreak games) by whether the server broke in the previous game. Within player-match difference, weighted; bootstrap CI resampling matches. Form swings within a match bias this upward.",
+  "data": "Match Charting Project points, 11,270 matches, 249,107 service games.",
+  "n": 249107,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Pre-2015 / 2015+: men +1.0 / +0.6 pts, women +0.2 / +0.6 pts.",
+  "chart": {
+    "type": "bar",
+    "title": "Hold rate by previous game",
+    "x_label": "previous game",
+    "y_label": "hold %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "men",
+        "points": [
+          {
+            "x": "after opponent held",
+            "y": 0.7942,
+            "lo": 0.792,
+            "hi": 0.7963,
+            "n": 137568
+          },
+          {
+            "x": "after breaking",
+            "y": 0.8198,
+            "lo": 0.8157,
+            "hi": 0.8239,
+            "n": 33612
+          }
+        ]
+      },
+      {
+        "name": "women",
+        "points": [
+          {
+            "x": "after opponent held",
+            "y": 0.6469,
+            "lo": 0.6428,
+            "hi": 0.6511,
+            "n": 51851
+          },
+          {
+            "x": "after breaking",
+            "y": 0.6907,
+            "lo": 0.6851,
+            "hi": 0.6963,
+            "n": 26076
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

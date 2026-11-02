@@ -8,7 +8,7 @@
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
   var SITE = 'arkndjl.net/' + ([[/^\/laursen_111/i, '1nt'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
     [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'],
-    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/library/, 'library'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
+    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/reference/, 'reference'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/1nt$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
@@ -1918,7 +1918,7 @@
     if (!d.q || !d.a) return null;
     var bars = (d.bars || []).map(function (b) { return Array.isArray(b) ? b : b && [b.l, b.v]; }).filter(function (b) { return b && b.length >= 2 && isFinite(+b[1]); }).slice(0, 8);
     var F = await frame(2400, 1350, 'ARKBOARD RESEARCH' + (d.sport ? ' :: ' + String(d.sport).toUpperCase() : ''), d.date || '',
-      'arkndjl.net/library' + (d.id ? '#rq-' + d.id : ''));
+      'arkndjl.net/reference' + (d.id ? '#rq-' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 36;
     // the question: the largest of 80/64/48 px that fits three lines
     var qs = 80, ql;
