@@ -1,0 +1,20 @@
+{{- /* Data attribution: one window per sport group, each source linked with what the site takes from it
+       (data/data_sources.json; add a source there when a fetcher starts using it).
+       {{< datasources tab="data sources" >}} makes it a panel of {{< wintabs >}}. */ -}}
+<div class="desk desk--3 datasrc"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+{{- range site.Data.data_sources.groups }}
+<div class="win winpane">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-reference"/></svg>{{ .name }} :: sources<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="winpane__body">
+    <ul class="datasrc__list">
+      {{- range .sources }}
+      <li><a href="{{ .u }}" rel="noopener" target="_blank">{{ .n }}</a> <span class="datasrc__use">{{ .w }}</span></li>
+      {{- end }}
+    </ul>
+  </div>
+</div>
+{{- end }}
+</div>

@@ -156,8 +156,9 @@ GROUP_ORDER = ['football', 'basketball', 'hockey', 'baseball', 'soccer', 'tennis
 
 
 def write_page(studies, sections, fv_tables):
-    """content/arkboard-library.md: hero + the two tab groups, built from what data/library.json holds."""
-    page = ROOT / 'content/arkboard-library.md'
+    """content/arkboard-reference.md (the Reference page, was Library): hero + the research and glossary tab groups
+    built from data/library.json, then the Data Sources tab (layouts/shortcodes/datasources.html)."""
+    page = ROOT / 'content/arkboard-reference.md'
     head = page.read_text().split('{{< wintabs', 1)[0]
     groups = [g for g in GROUP_ORDER if any(s['group'] == g for s in studies)]
     rtabs = ['all studies'] + groups
@@ -166,13 +167,14 @@ def write_page(studies, sections, fv_tables):
         at = next((i + 1 for i, (sid, _) in enumerate(gtabs) if sid == 'fv'), 0)
         gtabs.insert(at, ('fv-scales', 'FV scales'))
     gl = ('|Glossary/Methodology:' + ','.join(t for _, t in gtabs)) if gtabs else ''
-    lines = ['{{< wintabs groups="Research:' + ','.join(rtabs) + gl + '" side="true" class="libtabs" label="Library views" >}}',
+    lines = ['{{< wintabs groups="Research:' + ','.join(rtabs) + gl + '|Data Sources:data sources" side="true" class="libtabs" label="Reference views" >}}',
              '{{< libresearch tab="all studies" group="all" >}}']
     lazy = lambda tab, sc: f'{{{{< lazytab tab="{tab}" >}}}}{sc}{{{{< /lazytab >}}}}'   # later tabs load on first open
     lines += [lazy(g, f'{{{{< libresearch tab="{g}" group="{g}" >}}}}') for g in groups]
     for sid, tab in gtabs:
         lines.append(lazy(tab, f'{{{{< libglossary tab="{tab}" fv="true" >}}}}' if sid == 'fv-scales'
                           else f'{{{{< libglossary tab="{tab}" section="{sid}" >}}}}'))
+    lines.append(lazy('data sources', '{{< datasources tab="data sources" >}}'))
     lines.append('{{< /wintabs >}}')
     page.write_text(head + '\n'.join(lines) + '\n')
 

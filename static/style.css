@@ -4173,10 +4173,14 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .menu-grp__label { padding: 4px 8px; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 60%, transparent); white-space: nowrap; }
 .menu-grp__links { display: flex; flex-wrap: wrap; min-width: 0; }
 /* desktop dropdown: one grid (label + up to three pages a row), so each sport's pages line up in columns */
-.menu-sub__list { width: max-content; grid-template-columns: repeat(4, auto); align-items: center; }
+.menu-sub__list { width: max-content; grid-template-columns: repeat(5, auto); align-items: center; }
 .menu-sub:hover > .menu-sub__list, .menu-sub:focus-within > .menu-sub__list, .menu-sub.is-open > .menu-sub__list { display: grid; }
 .menu-sub__list > li:first-child { grid-column: 1 / -1; }
 .menu-sub__list .menu-grp, .menu-sub__list .menu-grp__links { display: contents; }
+/* a group with more pages than columns wraps under its own pages, not into the label column */
+.menu--desktop .menu-sub__list .menu-grp__links > a:nth-child(4n+1):not(:first-child) { grid-column-start: 2; }
+/* ARKBOARD is the last menu entry (Nov 2 2026): its dropdown opens leftward so it stays on screen */
+.menu--desktop > .menu-sub:last-child > .menu-sub__list { left: auto; right: 0; }
 .menu-sub__list .menu-grp__label { grid-column: 1; align-self: stretch; display: flex; align-items: center; border-top: 1px solid var(--win-well); }
 .menu--mobile .menu-grp { display: block; border-bottom: 1px solid var(--win-well); }
 .menu--mobile .menu-grp__label { display: block; padding: 4px 10px 0 22px; font-size: 0.8em; line-height: 1.2; }
@@ -4382,6 +4386,11 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .rq__bar a.cfb__btn { text-decoration: none; }
 .rq__note { opacity: 0.75; font-size: 0.85em; }
 .rq:target { outline: 2px solid #7fffd4; outline-offset: 2px; }
+/* Reference :: data sources (shortcodes/datasources.html) */
+.datasrc__list { margin: 0; padding: 0; list-style: none; }
+.datasrc__list li { margin: 0 0 6px; padding: 0; }
+.datasrc__list li::before { content: none !important; }
+.datasrc__use { display: block; opacity: .75; font-size: .9em; }
 
 /* Standings page (layouts/shortcodes/standings.html): group header rows, qualification stripes, playoff picture, leader grids */
 .st-table .st-grp th { text-align: left; background: var(--win-well); color: var(--accent); padding-top: 6px; }

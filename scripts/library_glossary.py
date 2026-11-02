@@ -1,4 +1,4 @@
-"""Build research/library.json (then run scripts/library_build.py): ARKBOARD Library tab content (glossary + FV conversion charts)."""
+"""Build research/library.json (then run scripts/library_build.py): ARKBOARD Reference tab content (glossary + FV conversion charts)."""
 import json, re, sys
 
 import pathlib
@@ -720,7 +720,7 @@ fv_tables.append({'board': 'MLB prospects (hand-graded)',
                   'rows': [list(r) for r in mlb]})
 
 lib = {'asof': '2026-11-02',
-       'about': 'ARKBOARD Research Library: definitions and methods for every metric and model, plus FV conversion charts per board.',
+       'about': 'ARKBOARD Reference: definitions and methods for every metric and model, plus FV conversion charts per board.',
        'sections': sections, 'fv_tables': fv_tables}
 
 # ---------------------------------------------------------------- copy checks
