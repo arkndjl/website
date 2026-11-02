@@ -4424,3 +4424,17 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
   .brk__table td.cfb__name { white-space: normal; min-width: 0; }
   .brk__table th, .brk__table td { padding-left: 4px; padding-right: 4px; }
 }
+
+/* research question window (layouts/shortcodes/rq.html; card drawn by gfx.js buildRQ) */
+.rq__body { padding: 10px 14px; }
+.rq__q { margin: 0 0 8px; color: var(--accent); }
+.rq__row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-start; }
+.rq__a { flex: 1 1 260px; margin: 0; }
+.rq__n { flex: none; margin: 0; padding: 4px 10px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); text-align: center; }
+.rq__n b { display: block; color: #7fffd4; font-size: 2em; line-height: 1.1; font-weight: normal; }
+.rq__n span { display: block; font-size: 0.85em; opacity: 0.85; }
+.rq__more { margin-top: 8px; }
+.rq__bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 0; }
+.rq__bar a.cfb__btn { text-decoration: none; }
+.rq__note { opacity: 0.75; font-size: 0.85em; }
+.rq:target { outline: 2px solid #7fffd4; outline-offset: 2px; }
