@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T10:59:14Z",
+ "asof": "2026-11-02T11:00:40Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 99.89,
   "peak": 114.8,
   "drawdown": 0.1299,
-  "open": 62.0,
+  "open": 64.5,
   "path": [
    101.5,
    101.6,
@@ -124,12 +124,12 @@
   ]
  },
  "record": {
-  "n": 205,
-  "clvN": 119,
+  "n": 208,
+  "clvN": 121,
   "clvRet": -0.0243,
-  "clvT": -3.34,
-  "clv": -0.05,
-  "beat": 0.214,
+  "clvT": -3.4,
+  "clv": -0.06,
+  "beat": 0.207,
   "settled": 112,
   "w": 63,
   "l": 49,
@@ -140,23 +140,23 @@
   "risked": 112.0,
   "yield": 0.008
  },
- "tEff": -3.34,
+ "tEff": -3.4,
  "corr": {
   "rho": 0.0,
-  "n": 119,
+  "n": 121,
   "slates": 14,
-  "nEff": 119.0,
-  "avgSlate": 8.5
+  "nEff": 121.0,
+  "avgSlate": 8.64
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 119,
+   "value": 121,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.4% t -3.34",
+   "value": "-2.4% t -3.4",
    "pass": false
   },
   {
@@ -224,7 +224,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 14,
+   "n": 15,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -287,7 +287,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 8,
+   "n": 9,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -329,7 +329,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 28,
+   "n": 29,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -414,11 +414,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 50,
-   "clvN": 32,
-   "clvRet": -0.0123,
-   "clvT": -1.99,
-   "clv": 0.36,
-   "beat": 0.281,
+   "clvN": 34,
+   "clvRet": -0.013,
+   "clvT": -2.22,
+   "clv": 0.32,
+   "beat": 0.265,
    "settled": 25,
    "w": 19,
    "l": 6,
@@ -523,48 +523,6 @@
    "clv": -1.2,
    "beat": -1,
    "close": 0.2425
-  },
-  {
-   "rule": "cbb-ml",
-   "sport": "cbb",
-   "id": "401920912",
-   "k": "2026-11-02T08:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Northern Illinois",
-   "a": "Grambling",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 203.0,
-   "bet": "Grambling ML +203",
-   "placed": "2026-11-01T13:30:49Z",
-   "stake": 0.25,
-   "edge": 4.3,
-   "ev": 0.0145,
-   "event": null,
-   "pass": true,
-   "close": -5.5
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401920912",
-   "k": "2026-11-02T08:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Northern Illinois",
-   "a": "Grambling",
-   "mk": "total",
-   "side": "under",
-   "line": 147.5,
-   "price": -110.0,
-   "bet": "under 147.5 -110",
-   "placed": "2026-11-01T00:09:20Z",
-   "stake": 0.0,
-   "edge": 2.6,
-   "ev": -0.0233,
-   "event": null,
-   "pass": true,
-   "close": 147.5
   },
   {
    "rule": "tennis-ml",
@@ -722,7 +680,11 @@
    "edge": 11.8,
    "ev": 0.0135,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0117,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.6475
   },
   {
    "rule": "tennis-ml",
@@ -742,7 +704,11 @@
    "edge": 20.2,
    "ev": 0.0362,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0361,
+   "clv": -0.5,
+   "beat": 0,
+   "close": 0.405
   },
   {
    "rule": "tennis-ml",
@@ -862,7 +828,7 @@
    "edge": 4.5,
    "ev": 0.0111,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 1.5
   },
   {
@@ -944,7 +910,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 165.5
+   "close": 163.5
   },
   {
    "rule": "tennis-ml",
@@ -984,8 +950,8 @@
    "edge": 5.6,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
-   "close": 148.5
+   "pass": false,
+   "close": 147.5
   },
   {
    "rule": "tennis-ml",
@@ -1319,7 +1285,7 @@
    "edge": 2.1,
    "ev": 0.0189,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -1781,8 +1747,8 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
-   "close": 154.5
+   "pass": false,
+   "close": 155.5
   },
   {
    "rule": "nba-spread",
@@ -2759,7 +2725,7 @@
    "edge": 9.1,
    "ev": 0.0158,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 40.5
   },
   {
@@ -2781,7 +2747,7 @@
    "ev": 0.0269,
    "event": null,
    "pass": false,
-   "close": 38.5
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -2843,8 +2809,8 @@
    "edge": 3.4,
    "ev": 0.0228,
    "event": null,
-   "pass": true,
-   "close": 43.5
+   "pass": false,
+   "close": 44.5
   },
   {
    "rule": "cfb-total",
@@ -2954,6 +2920,27 @@
   {
    "rule": "cfb-total",
    "sport": "cfb",
+   "id": "401858516",
+   "k": "2026-11-07T20:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Washington",
+   "a": "Penn State",
+   "mk": "total",
+   "side": "over",
+   "line": 44.5,
+   "price": -106.0,
+   "bet": "over 44.5 -106",
+   "placed": "2026-11-02T10:59:09Z",
+   "stake": 0.25,
+   "edge": 5.4,
+   "ev": 0.0016,
+   "event": null,
+   "pass": false,
+   "close": 44.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
    "id": "401862820",
    "k": "2026-11-07T20:30:00.000Z",
    "slate": "cfb:2026-11-07",
@@ -2969,7 +2956,7 @@
    "edge": 5.1,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 53.5
   },
   {
@@ -3179,7 +3166,7 @@
    "edge": 3.2,
    "ev": 0.0024,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 47.5
   },
   {
@@ -3200,7 +3187,7 @@
    "edge": 5.8,
    "ev": 0.0031,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 45.5
   },
   {
@@ -3263,11 +3250,72 @@
    "edge": 2.9,
    "ev": 0.0209,
    "event": null,
-   "pass": false,
-   "close": 47.5
+   "pass": true,
+   "close": 48.5
   }
  ],
  "recent": [
+  {
+   "rule": "cbb-ml",
+   "sport": "cbb",
+   "id": "401920912",
+   "k": "2026-11-02T08:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Northern Illinois",
+   "a": "Grambling",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 203.0,
+   "bet": "Grambling ML +203",
+   "placed": "2026-11-01T13:30:49Z",
+   "stake": 0.25,
+   "edge": 4.3,
+   "ev": 0.0145,
+   "event": null,
+   "pass": true,
+   "clvRet": 1.0453,
+   "beat": 1,
+   "close": -5.5,
+   "score": [
+    87.0,
+    89.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401920912",
+   "k": "2026-11-02T08:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Northern Illinois",
+   "a": "Grambling",
+   "mk": "total",
+   "side": "under",
+   "line": 147.5,
+   "price": -110.0,
+   "bet": "under 147.5 -110",
+   "placed": "2026-11-01T00:09:20Z",
+   "stake": 0.0,
+   "edge": 2.6,
+   "ev": -0.0233,
+   "event": null,
+   "pass": true,
+   "clvRet": -0.0455,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 147.5,
+   "score": [
+    87.0,
+    89.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.0
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -4841,58 +4889,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.5
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873027-8439-py",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "PIT",
-   "a": "CLE",
-   "mk": "prop",
-   "side": "over",
-   "line": 219.5,
-   "price": -113.0,
-   "bet": "Aaron Rodgers over 219.5 pass yds -113",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.25,
-   "edge": 12.9,
-   "ev": 0.0424,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0862,
-   "close": 214.5,
-   "score": 172.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873028-4242335-rc",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "JAX",
-   "a": "IND",
-   "mk": "prop",
-   "side": "under",
-   "line": 2.5,
-   "price": -108.0,
-   "bet": "Jonathan Taylor under 2.5 rec -108",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.25,
-   "edge": 10.7,
-   "ev": 0.0477,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0669,
-   "close": 2.5,
-   "score": 4.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -8821,7 +8817,16 @@
    "ev": 0.0145,
    "event": null,
    "pass": true,
-   "close": -5.5
+   "clvRet": 1.0453,
+   "beat": 1,
+   "close": -5.5,
+   "score": [
+    87.0,
+    89.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "cbb-total",
@@ -8842,7 +8847,17 @@
    "ev": -0.0233,
    "event": null,
    "pass": true,
-   "close": 147.5
+   "clvRet": -0.0455,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 147.5,
+   "score": [
+    87.0,
+    89.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.0
   },
   {
    "rule": "tennis-ml",
@@ -9000,7 +9015,11 @@
    "edge": 11.8,
    "ev": 0.0135,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0117,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.6475
   },
   {
    "rule": "tennis-ml",
@@ -9020,7 +9039,11 @@
    "edge": 20.2,
    "ev": 0.0362,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0361,
+   "clv": -0.5,
+   "beat": 0,
+   "close": 0.405
   },
   {
    "rule": "tennis-ml",
@@ -9140,7 +9163,7 @@
    "edge": 4.5,
    "ev": 0.0111,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 1.5
   },
   {
@@ -9222,7 +9245,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": true,
-   "close": 165.5
+   "close": 163.5
   },
   {
    "rule": "tennis-ml",
@@ -9262,8 +9285,8 @@
    "edge": 5.6,
    "ev": 0.0016,
    "event": null,
-   "pass": true,
-   "close": 148.5
+   "pass": false,
+   "close": 147.5
   },
   {
    "rule": "tennis-ml",
@@ -9597,7 +9620,7 @@
    "edge": 2.1,
    "ev": 0.0189,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -10059,8 +10082,8 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
-   "close": 154.5
+   "pass": false,
+   "close": 155.5
   },
   {
    "rule": "nba-spread",
@@ -11037,7 +11060,7 @@
    "edge": 9.1,
    "ev": 0.0158,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 40.5
   },
   {
@@ -11059,7 +11082,7 @@
    "ev": 0.0269,
    "event": null,
    "pass": false,
-   "close": 38.5
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -11121,8 +11144,8 @@
    "edge": 3.4,
    "ev": 0.0228,
    "event": null,
-   "pass": true,
-   "close": 43.5
+   "pass": false,
+   "close": 44.5
   },
   {
    "rule": "cfb-total",
@@ -11232,6 +11255,27 @@
   {
    "rule": "cfb-total",
    "sport": "cfb",
+   "id": "401858516",
+   "k": "2026-11-07T20:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Washington",
+   "a": "Penn State",
+   "mk": "total",
+   "side": "over",
+   "line": 44.5,
+   "price": -106.0,
+   "bet": "over 44.5 -106",
+   "placed": "2026-11-02T10:59:09Z",
+   "stake": 0.25,
+   "edge": 5.4,
+   "ev": 0.0016,
+   "event": null,
+   "pass": false,
+   "close": 44.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
    "id": "401862820",
    "k": "2026-11-07T20:30:00.000Z",
    "slate": "cfb:2026-11-07",
@@ -11247,7 +11291,7 @@
    "edge": 5.1,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 53.5
   },
   {
@@ -11457,7 +11501,7 @@
    "edge": 3.2,
    "ev": 0.0024,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 47.5
   },
   {
@@ -11478,7 +11522,7 @@
    "edge": 5.8,
    "ev": 0.0031,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 45.5
   },
   {
@@ -11541,8 +11585,8 @@
    "edge": 2.9,
    "ev": 0.0209,
    "event": null,
-   "pass": false,
-   "close": 47.5
+   "pass": true,
+   "close": 48.5
   }
  ]
 }
