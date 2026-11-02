@@ -13,7 +13,7 @@
   </div>
   <div class="cfbm__body">
     <p class="pclv"><b>{{ len $d.drift.watching }} on probation</b> · {{ len $d.drift.confirmed }} confirmed · {{ with $d.drift.paused }}<b>{{ len . }} paused</b>{{ else }}none paused{{ end }}
-    <br><span class="cfb__dim">each rule's live picks against its backtest from the day it was switched on or refit; a rule that looks overfit is paused</span></p>
+    </p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Rule</th><th title="the held-out backtest: close value, bets, flat ROI">Backtest</th><th title="the close value live picks should carry if the backtest holds: backtest x {{ $d.pre.timing }} (live picks are bet after part of the opening move; NBA also x {{ index $d.pre.leak "nba" }})">Expected</th><th title="live close value, bets judged by the close, record and flat ROI">Live</th><th title="live close value as a share of expected, with a 90% range; 1 = as the backtest said, 0 = no edge">Realized</th><th title="evidence: left edge pauses the rule (worth nothing is {{ $D.B }}x likelier), right edge confirms it (worth the backtest is {{ $D.A }}x likelier)">Evidence</th><th>Status</th></tr></thead>
@@ -39,7 +39,6 @@
       </tbody>
     </table>
     </div>
-    <p class="cfb__dim">how it works: a backtest picks its threshold from many tried, so its edge runs high. each pick rule is tested from its clock against two claims: it is worth what its held-out backtest says after the timing haircut the stakes already take (Expected), or it is worth nothing. every game day adds that day's log likelihood ratio, close value against both claims with the slate's correlation; the bar is the running total. at {{ $D.B }} to 1 for nothing (and {{ $D.minN }}+ bets) the rule is paused: it makes no picks and its open ones are withdrawn until it is refit. at {{ $D.A }} to 1 for the backtest it is confirmed and leaves probation; the close switch below keeps watching it. it is the same as asking whether the rule realizes more or less than half its expected edge. simulated on the CFB totals rule: a rule worth nothing is paused 96% of the time (median 234 bets), one worth its backtest is paused 4% and confirmed 94%, one worth half is a coin flip. registered {{ lower ((time $D.registered).Format "Jan 2 2006") }}, before these bets were judged.</p>
   </div>
   <div class="win__status"><span>judged by the close</span><span {{ partial "fresh-attrs.html" "rule_monitor" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

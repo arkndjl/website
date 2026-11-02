@@ -13,7 +13,6 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p class="cfb__dim">the target is the closing line. b is the share of the model's disagreement with the open that the close later took: 0 means the open already knew it, a higher b means a softer open. the predictor: close - open = b by cell x the gap, bent past a knot, plus the open's size, site and part of the season. a bet is the side the predicted close moves toward, taken at the open, when it is worth the cut or more at -110 if the close lands where predicted. held-out seasons are predicted walk-forward.</p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Market</th><th title="pooled share of the gap the close took, every season; t">b</th><th title="the gap where a -110 bet at the open breaks even at the predicted close, for a typical game">Break-even</th><th title="held-out share of the open-to-close move explained: this model / a straight b">Move R²</th><th title="held-out bets the predictor picked: count, worth at the close, t">Predictor bets</th><th title="held-out bets of the plain gap rule (X set on tuning): X, count, worth at the close">Gap rule</th><th>Status</th></tr></thead>
@@ -57,7 +56,6 @@
       </tbody>
     </table>
     </div>
-    <p class="cfb__dim">cells were fixed before any held-out season was scored. CFB tiers: both teams power four, any group of five, any FCS; CBB tier: the higher-profile team's league (high: ACC, Big Ten, Big 12, SEC, Big East; mid: A-10, American, MWC, WCC, MVC, Pac-12); size: |open| for spreads, each season's terciles of the open for totals. each cell shifts b from the pooled b, shrunk toward it by a ridge chosen on tuning, so a thin cell has to earn its own slope.</p>
 
     {{- with $d.weather }}{{ if .move }}{{ $w := . }}
     <p><b>CFB totals and the weather</b> <span class="cfb__dim">(research only; {{ .n }} outdoor games, {{ delimit .seasons " " }}, weather at the nearest airport station over kickoff to 3.5 hours after)</span></p>

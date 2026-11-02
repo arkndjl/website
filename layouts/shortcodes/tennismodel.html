@@ -9,7 +9,6 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Three ratings, each updated after every match at every level (Grand Slams, tour, Challengers, qualifying, ITF), blended in log-odds with five match-context terms. Rating settings are tuned on 2012-22; blend weights are fit on the three seasons before each season scored, so every score below is out of sample.</p>
     <ul>
       <li><b>Elo on wins</b> (x{{ printf "%.2f" (float $p.A) }}): everyone starts at {{ printf "%.0f" (float $p.START) }}; K = {{ $p.KC }} / (matches + {{ $p.KO }})^{{ $p.KS }}, so a newcomer moves fast and a veteran slowly. One overall rating and one per surface, blended {{ printf "%.0f" (mul (sub 1 $p.SW) 100) }} / {{ printf "%.0f" (mul $p.SW 100) }}; retirements count x{{ $p.RET }}.</li>
       <li><b>Games won</b> (x{{ printf "%.2f" (float $p.G) }}): a rating in log-odds of winning a game, moved by the share of games won against the opponent's rating ({{ printf "%.0f" (mul $p.GSW 100) }}% surface-specific). It reads a 6-1 6-1 win as more than a 7-6 7-6 one.</li>
