@@ -1284,7 +1284,7 @@ def check_tiebreaks(games, seasons=range(2015, 2026)):
         print(y, {c: ' '.join(s) for c, s in seeds.items()})
     print('tiebreak check:', 'all match' if not bad else bad)
     return bad
-GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB'}
+GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB', 'K': 'K/P', 'P': 'K/P'}
 SIMS = 10000
 ORDERS_KEPT = 400   # simulated draft orders kept for the CFB mock's simulated drafts (P(#1 pick) moves with who picks first)
 RATING_SD = 5.0      # uncertainty in a team's true rating before week 1, points (drawn once a simulated season)
