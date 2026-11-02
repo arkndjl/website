@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T00:05:22Z",
+ "asof": "2026-11-02T01:02:55Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1018,18 +1018,18 @@
    "status": "on",
    "stopped": null,
    "n": 10,
-   "clvN": 6,
-   "clvRet": -0.0061,
+   "clvN": 8,
+   "clvRet": -0.0071,
    "clvT": null,
    "days": 1,
-   "beat": 0.333,
-   "settled": 6,
-   "w": 3,
-   "l": 3,
-   "roi": -0.0282,
+   "beat": 0.375,
+   "settled": 8,
+   "w": 4,
+   "l": 4,
+   "roi": -0.0259,
    "week": {
-    "n": 6,
-    "clvRet": -0.0061,
+    "n": 8,
+    "clvRet": -0.0071,
     "clvT": null
    },
    "exp": {
@@ -1039,57 +1039,57 @@
     "n": 414
    },
    "vsExp": {
-    "gap": -0.0395,
-    "z": -0.77,
+    "gap": -0.0405,
+    "z": -0.91,
     "read": "in line"
    },
    "check": {
-    "n": 6,
-    "window": 6,
-    "mean": -0.0061,
+    "n": 8,
+    "window": 8,
+    "mean": -0.0071,
     "t": null,
     "days": 1,
     "sd": 0.1256,
-    "cusum": 0.34,
-    "cusumMax": 0.44,
+    "cusum": 0.7,
+    "cusumMax": 0.7,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0167,
-     "n": 6,
+     "n": 8,
      "sd": 0.1256,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.092,
-     "info": 0.11,
-     "real": -0.365,
-     "realSe": 3.071,
+     "llr": -0.131,
+     "info": 0.14,
+     "real": -0.426,
+     "realSe": 2.659,
      "need": 333
     }
    },
    "drift": {
     "mu1": 0.0167,
-    "n": 6,
+    "n": 8,
     "sd": 0.1256,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.092,
-    "info": 0.11,
-    "real": -0.365,
-    "realSe": 3.071,
+    "llr": -0.131,
+    "info": 0.14,
+    "real": -0.426,
+    "realSe": 2.659,
     "need": 333,
     "path": [
      [
       "2026-11-01",
-      6,
-      -0.092
+      8,
+      -0.131
      ]
     ]
    }
@@ -2101,13 +2101,13 @@
    "sport": "nfl",
    "mk": "total",
    "label": "NFL total",
-   "n": 6,
-   "du": 6.75,
-   "clvRet": -0.0182,
+   "n": 8,
+   "du": 11.5,
+   "clvRet": -0.0268,
    "clvT": null,
-   "flat": -0.0061,
-   "adds": -0.0121,
-   "expEdge": 0.0181,
+   "flat": -0.0071,
+   "adds": -0.0197,
+   "expEdge": 0.0192,
    "basis": "default: half Kelly on the expected return"
   },
   {
