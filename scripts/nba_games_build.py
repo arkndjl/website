@@ -304,7 +304,7 @@ def build():
         return print('nba games: no change')
     with open(N.OUT, 'w') as f:
         json.dump(res, f, separators=(',', ':'))
-    print(f'nba games: {S}, {len(rows)} games on {", ".join(res["days"])}; report {rep_at}; model ATS {w}-{l}-{p}')
+    print(f'nba games: {S}, {len(rows)} games on {", ".join(res["days"])}; report {rep_at}; model ATS {res["ats"]["w"]}-{res["ats"]["l"]}-{res["ats"]["p"]}')
 
 
 # ---------------------------------------------------------------- standings
