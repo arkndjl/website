@@ -11,6 +11,9 @@
     <span class="brk__lbl">view</span>
     <button type="button" class="cfb__chip is-on" data-brk-w="kr" aria-pressed="true">kick returns</button>
     <button type="button" class="cfb__chip" data-brk-w="pr" aria-pressed="false">punt returns</button>
+    {{- if index site.Data (printf "st_teams_%s" $sport) }}
+    <button type="button" class="cfb__chip" data-brk-w="teams" aria-pressed="false">teams</button>
+    {{- end }}
   </div>
   {{- range $kind := slice "kr" "pr" }}
   {{- $v := index $d $kind }}{{ $rows := $v.rows | default slice }}{{ $h := $v.h }}
@@ -66,6 +69,9 @@
   {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" $feed "note" (printf "%v · through week %v · %v returns · ranked by Adj · updated %s" $d.season $d.note.week $v.ret $date)
         "about" (printf "A return is a kick fielded and run back, or muffed; fair catches, touchbacks and plays with a penalty are left out. Expected = the mean return from the same spot (5-yard bins by season and kick type), so kick distance and hang are not credited to the returner. YOE = yards over expected a return. Adj = total YOE / (returns + %v): %v returns keep half the observed rate (k = noise variance / returner variance, fit on %v returner-seasons, this season and the two before; per-return SD %.1f yds, returner SD %.1f).%s%s Pts = %s. %v+ returns to be listed%s." $h.k $h.k $h.ps (float $h.sd) (float $h.tau) $rr $pr (cond $col (printf "drive points over expected, total (drive points: mean points on drives from that spot, own 25 %.1f, midfield %.1f; a TD 7)" (float $d.note.d25) (float $d.note.d50)) "nflverse EPA over expected, total, from the receiving side") (index $d.min $kind) (cond $col ", FBS players" ""))) }}
   </div>
+  {{- end }}
+  {{- if index site.Data (printf "st_teams_%s" $sport) }}
+  <div data-brk-pane="teams" style="display:none">{{ partial "st-teams.html" (dict "sport" $sport "title" "special teams :: teams, points over expected a game") }}</div>
   {{- end }}
 </div>
 <script>
