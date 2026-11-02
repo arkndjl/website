@@ -734,9 +734,11 @@ export function fitBeta(preds, opt = {}) {
 }
 
 // ---- weather (Open-Meteo) ------------------------------------------------------------------------------
-// historical (archive) for played games, forecast for the coming week; kickoff hour at the venue
+// historical (archive) for played games, forecast for the coming week; kickoff hour at the venue. A forecast (f: 1)
+// is pulled again every run until kickoff and replaced by the archive once that has the game (Nov 2 2026: the cache
+// kept the first forecast, up to 15 days out, for good)
 export async function weather(rows, cache = {}, forecast = false) {
-  const need = rows.filter(r => !r.dome && r.lat != null && cache[r.id] == null && (forecast ? !r.done : r.done) &&
+  const need = rows.filter(r => !r.dome && r.lat != null && (forecast ? !r.done : r.done && (cache[r.id] == null || cache[r.id].f)) &&
     (forecast ? new Date(r.date) - Date.now() < 15 * 864e5 : Date.now() - new Date(r.date) > 6 * 864e5));
   const byDay = {};
   for (const r of need) (byDay[r.date.slice(0, 10)] ||= []).push(r);
@@ -753,7 +755,8 @@ export async function weather(rows, cache = {}, forecast = false) {
         const h = d[j]?.hourly; if (!h) return;
         const k = h.time.indexOf(r.date.slice(0, 13) + ':00'); if (k < 0) return;
         const win = [k, k + 1, k + 2].filter(x => x < h.time.length);
-        cache[r.id] = { t: r1(mean(win.map(x => h.temperature_2m[x]))), w: r1(mean(win.map(x => h.wind_speed_10m[x]))), p: r1(win.reduce((a, x) => a + (h.precipitation[x] || 0), 0)) };
+        const v = { t: r1(mean(win.map(x => h.temperature_2m[x]))), w: r1(mean(win.map(x => h.wind_speed_10m[x]))), p: r1(win.reduce((a, x) => a + (h.precipitation[x] || 0), 0)) };
+        cache[r.id] = forecast ? { ...v, f: 1 } : v;
       });
     } catch {}
   }
