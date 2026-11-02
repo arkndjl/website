@@ -4,11 +4,20 @@
   // the cfb-detail.json state (detail(), below), declared up here: Hugo's minifier folded a later declaration into
   // load()'s callback as a local, so the dk never reached detail()
   var DETAIL_URL = null, DK = null, DETAIL = null, DETAIL_ON = false;
-  // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
-  var PARTS = [['talent', 'On3 order at the position (unranked: production + recruiting)'], ['production', 'Stat+ (PFN position score), 3 seasons, regressed; weight by position = fit to NFL careers'],
-               ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus scaled by position rarity of young contributors'], ['breakout', 'class year of first top-15% production season'],
-               ['stats', 'badge stats predictive of NFL careers beyond production (QB Deep Ball, Accurate; RB, TE Pass Catcher; DT Run Stopper; LB Tackler), QBR, play-by-play rates stable season to season'], ['pedigree', '247 composite recruiting rating'],
-               ['context', 'SOS (QB); supporting cast (QB, RB, WR, TE: teammate talent, refit each run); actual vs expected (play-by-play: targets, QB, down and distance, opponent)'], ['frame', 'height, weight vs drafted NFL players at the position (combine norms)']];
+  // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts` (the 8th, frame,
+  // is not in the composite: it is added to the grade in FV and shows with the steps below)
+  var PARTS = [['talent', 'On3 order at the position as a normal score (unranked: ordered by production and recruiting, spread through their band)'], ['production', 'Stat+ (PFN position score), 3 seasons, regressed; weight by position fit to NFL careers; counts 25% less for non-blue-chips'],
+               ['age + class', 'age on a curve (youth bonus gated by production or talent), class runway, first-year bonus, young for the class'], ['breakout', 'class year of first top-15% production season'],
+               ['stats', 'badge stats predictive of NFL careers beyond production, XV stat parts (FV_XV), QBR, play-by-play rates stable season to season, snap share'], ['pedigree', '247 composite recruiting rating'],
+               ['context', 'schedule strength; team strength (SRS); supporting cast (QB, RB, WR, TE: teammate talent); actual vs expected (play-by-play: targets, QB, down and distance, opponent)']];
+  // the steps from the composite to the headline (fetch_cfb.mjs fvSteps), in FV
+  var STEPS = { g: ['scarcity grade', 'the composite as a z within the position (fixed reference pool) x its reliability, read as an expected NFL rank per class, graded on the position\'s NFL outcome tiers'],
+    fr: ['NFL frame', 'height and weight vs drafted NFL players at the position (combine norms)'], yr: ['years in college', 'per year past three on campus (twice at QB and S)'],
+    cs: ['consensus boards', 'pull toward the grade the industry board rank implies, by the share of boards that rank him'], hl: ['injury', 'out for the season (ACL, Achilles: more)'],
+    kp: ['specialist grade', 'K: field goal points over expected, long, XP%. P: punt value, gross average, inside the 20, career net yards over expected a punt. On the specialist scale (25-50)'],
+    b: ['base', 'the backup fit\'s grade for the position and division before the parts below'], ac: ['class + age', 'years in college and age for the class'], pd: ['pedigree', '247 composite recruiting rating'],
+    cl: ['20-80 limits', 'the grade is held to 20-80'], mn: ['mean outcome', 'from the grade to the mean of its FV outcome distribution (position, years, recruiting, consensus)'],
+    rt: ['returns', 'kick and punt return yards over expected a team game, career (RB, WR)'], sc: ['headline scale', 'the stretched top of the FV scale, and rounding'] };
   // a player's stable key for links (#<board>:p=<key>): his ESPN id, else name and team
   function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   function pid(r) { var m = /\/id\/(\d+)/.exec(r.espnl || ''); return m ? 'e' + m[1] : slug(r.name + ' ' + r.team); }
@@ -165,15 +174,47 @@
       '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td></tr>';
   }
 
+  // FV inputs: the composite's weighted feeders (graded players), then each step from the composite to the headline in
+  // FV (fvs, fetch_cfb.mjs fvSteps), which sum to the FV shown. A file written before the steps existed shows the grade,
+  // the mean-outcome step and the headline scale, which still sum to the FV shown
+  function bar(label, tip, v, scale, digits) {
+    var w = Math.round(Math.min(50, Math.abs(v) / scale * 50) * 10) / 10;
+    return '<li title="' + esc(tip) + '"><span class="cfb__bk">' + esc(label) + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
+      (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(digits) + '</span></li>';
+  }
+  function fvSteps(r) {
+    if (r.fvx == null || r.fv == null) return null;
+    var st = r.fvs ? r.fvs.slice() : r.fvg != null ? [['g0', r.fvg], ['mn', r.fvx - r.fvg]] : [['g0', r.fvx]];
+    var sc = r.fv - r.fvx;
+    if (Math.abs(sc) >= 0.005) st.push(['sc', sc]);
+    return st;
+  }
+  window.__arkCfbSteps = fvSteps;
+  function fvInputs(r) {
+    var comp = r.parts && r.src !== 'espn' && r.pos !== 'K' && r.pos !== 'P', sum = 0, html = '';
+    if (comp) {
+      html += '<ul class="cfb__parts">' + PARTS.map(function (p, i) {
+        if (i === 0 && r.div === 'FCS') p = ['level', 'FCS: team and conference strength (SRS, this season, FBS + FCS games); replaces the On3 grade'];
+        var v = r.parts[i] || 0; sum += v; return bar(p[0], p[1], v, 2, 2);
+      }).join('') + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(2) + ': the sum of the bars above, in composite units.</p>';
+    }
+    var st = fvSteps(r);
+    if (st) {
+      html += '<ul class="cfb__parts">' + st.map(function (x, i) {
+        var k = x[0], d = STEPS[k] || (k === 'g0' ? ['grade', 'the scarcity grade with frame, years in college, consensus and injury (steps listed from the next board build)'] : [k, '']);
+        if (k === 'g' && /^(QB|RB|LB)$/.test(r.pos)) d = [d[0], d[1] + '; QB, RB and LB tiers are floored at the measured Pro Bowl and All-Pro counts'];
+        if (k === 'g' && r.div === 'FCS') d = [d[0], d[1] + '; FCS: translated to the FBS scale, one NFL scarcity scale for both divisions'];
+        // the first step is a level (FV), the rest are pushes on it
+        return i === 0 ? '<li title="' + esc(d[1]) + '"><span class="cfb__bk">' + esc(d[0]) + '</span><span class="cfb__meter"></span><span class="cfb__bv">' + (+x[1]).toFixed(1) + '</span></li>' : bar(d[0], d[1], +x[1], 5, 1);
+      }).join('') + '</ul><p class="cfb__dim">' + (comp ? 'grade steps in FV, from the composite to the headline: ' : r.src === 'espn' ? 'ESPN roster backup, graded from the 20 floor; steps in FV: ' : r.pos === 'K' || r.pos === 'P' ? 'specialist; steps in FV: ' : 'steps in FV: ') +
+        'they sum to FV ' + esc(r.fv) + '.</p>';
+    }
+    return html ? '<details class="cfb__nums"><summary>FV inputs</summary>' + html + '</details>' : '';
+  }
+
   // the scouting report: role, + strengths and − concerns, links, and the feeder bars underneath
   function detailHtml(r, cols, width) {
-    var z = r.parts || [], sum = 0;
-    var bars = PARTS.map(function (p, i) {
-      if (i === 0 && r.div === 'FCS') p = ['level', 'FCS: team and conference strength (SRS, this season, FBS + FCS games); replaces On3 grade'];
-      var v = z[i] || 0, w = Math.min(50, Math.abs(v) / 2 * 50); sum += v;
-      return '<li title="' + p[1] + '"><span class="cfb__bk">' + p[0] + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
-        (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + (v > 0 ? '+' : '') + v.toFixed(2) + '</span></li>';
-    }).join('');
+    var inputs = fvInputs(r);
     var rep = r.report || {}, links = [['On3', r.on3l], ['ESPN', r.espnl]].filter(function (l) { return l[1]; })
       .map(function (l) { return '<a href="' + esc(l[1]) + '" rel="noopener">' + l[0] + ' profile ↗</a>'; }).join(' · ');
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
@@ -196,9 +237,7 @@
       pastHtml(r) + window.arkFvo(r.fvd, 'cfb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
-      '. FV: composite ranked within position, regressed toward the mean by reliability, graded by NFL scarcity' +
-      (r.div === 'FCS' ? ' (FCS: ranked among FCS players, translated to the FBS scale; one NFL scarcity scale for both divisions)' : '') + '.</p></details></div></td></tr>';
+      inputs + '</div></td></tr>';
   }
 
   // sort keys: the record field (or derived value) behind each header's data-sort
