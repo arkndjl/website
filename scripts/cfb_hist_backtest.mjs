@@ -77,6 +77,7 @@ const PRI = {
   rosterJump: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.jump ?? 0],
   // CFBD SP+ (last season's final, SPX map) alongside last final Elo: Nov 1 2026, scripts/cfb_nearmiss_nov01.mjs
   rosterSpx: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.spx ?? f.sp],
+  rosterDef: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.defPlay ?? 0],
 };
 // SP+ by season and team id, set by a caller (setSpx) for rosterSpx; absent, spx falls back to the Elo anchor
 let SPX = {};
@@ -213,6 +214,22 @@ if (process.env.SPDIR) {
   }
   console.log('sp', JSON.stringify(out, null, 1));
   fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_sp_prior_test.json'), JSON.stringify(out, null, 1));
+  process.exit(0);
+}
+// Returning defensive playmakers (DEFRET=1, Nov 2 2026; feats from scripts/cfb_defret_research.py --feats, passed as
+// ROSTER=...): defPlay = share of last season's sacks / PBUs / INTs / forced fumbles (play text; box scores from 2024)
+// made by players back, in the prior beside the live roster inputs. Shipped setting (pooled, HIST_FIT.fit, grid P),
+// extras SHIPX (default p4,aggr: ret needs the PFN statplus cache), project split tune 2016-20 / held 2021-26.
+if (process.env.DEFRET) {
+  const X = (process.env.SHIPX || 'p4,aggr').split(',');
+  I.setCtx({}, RW); I.setExtra(X);
+  const run = k => { const ch = chain(k, 'pooled'); return [predict(walkAll(ch, bestP), { fit: HIST_FIT.fit }), ch]; };
+  const [base] = run('roster'), [o, ch] = run('rosterDef');
+  const out = { extra: X, P: bestP, base: split(base), def: split(o), ll: cmp(o, base), mae: cmp(o, base, 'ae'),
+    wk1to4: { ll: cmp(o.filter(x => x.w <= 4), base.filter(x => x.w <= 4)), mae: cmp(o.filter(x => x.w <= 4), base.filter(x => x.w <= 4), 'ae') },
+    priorWeights2026: ch.W[2026]?.pts.map(r3), close: vsClose(o.filter(x => inHold(x.S))), closeBase: vsClose(base.filter(x => inHold(x.S))) };
+  console.log('defret', JSON.stringify(out));
+  fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_defret_backtest.json'), JSON.stringify(out, null, 1));
   process.exit(0);
 }
 if (!process.env.ONLYSHIP) {
