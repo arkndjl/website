@@ -2675,6 +2675,25 @@ const kp = (() => {
   const qk = K.filter(k => (k.FGA || 0) >= 3), qp = P.filter(p => p.NO >= 8);
   for (const k of K) k.score = z(qk.map(x => x.rate), k.rate) + 0.25 * z(qk.map(x => x.LONG), k.LONG) + 0.15 * z(qk.map(x => x.xp), k.xp);
   for (const p of P) p.score = 0.6 * z(qp.map(x => x.rate), p.rate) + 0.3 * z(qp.map(x => x.ypp), p.ypp) + 0.1 * z(qp.map(x => x.in20), p.in20);
+  // punter FV input (Noah, Nov 2 2026): career net yards over expected a punt (against punts from the same line, same
+  // season), shrunk: sum / (punts + 14), from scripts/st_kickers.py (data/st_kickers_cfb.json pcar, by ESPN id). Held out
+  // by class (final college seasons 2011-20, NFL seasons as the primary punter within 5 years): with the score log loss
+  // better in 8/10 classes, t 3.5, forward 2016-20 better; the kicker grade failed (t 1.5). Weight 1.45 score units a
+  // yard (logistic weight ratio), then rescaled to the old score's spread so the specialist FV scale holds.
+  try {
+    const pc = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'st_kickers_cfb.json'), 'utf8')).pcar || {};
+    for (const p of P) { const e = (espn.rosters[p.tid] || []).find(a => a.id === p.id) || (espn.rosters[p.tid] || []).find(a => norm(a.name) === norm(p.name)) || {};
+      p.netc = pc[e.id]?.[1] ?? null; }
+    const nv = qp.map(x => x.netc).filter(v => v != null), nm = nv.reduce((a, b) => a + b, 0) / Math.max(1, nv.length);
+    if (nv.length >= 20) {
+      const sdOf = xs => { const m = xs.reduce((a, b) => a + b, 0) / xs.length; return Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1; };
+      const s0 = sdOf(qp.map(x => x.score));
+      for (const p of P) p.score2 = p.score + 1.45 * ((p.netc ?? nm) - nm);
+      const k = s0 / sdOf(qp.map(x => x.score2));
+      for (const p of P) p.score = p.score2 * k;
+      console.log(`punters: career net yards over expected for ${nv.length} of ${qp.length}`);
+    }
+  } catch (e) { console.log(`punters: no st_kickers_cfb.json (${e.message})`); }
   const T = Object.fromEntries(teamList.map(t => [t.tid, t])), stars = new Set([...(manual.stars || []), ...(ARKLIST['college-football'] || [])]);
   const rows = [];
   for (const s of [...K, ...P]) {
@@ -2682,7 +2701,7 @@ const kp = (() => {
     const t = espn.teams[s.tid] || {}, years = e.years ?? null;
     const fvx = Math.max(25, Math.min(50, 37 + 4.5 * s.score)), fv = Math.round(fvx);
     const line = s.pos === 'K' ? `${s.FGM ?? 0}/${s.FGA ?? 0} FG (long ${s.LONG ?? '—'}), ${s.XPM ?? 0}/${s.XPA ?? 0} XP · ${s.poe >= 0 ? '+' : ''}${r1(s.poe)} pts over expected`
-      : `${s.NO} punts, ${r1(s.ypp)} avg, ${s['In 20'] ?? 0} inside the 20 · ${s.val >= 0 ? '+' : ''}${r1(s.val)} pts of field position`;
+      : `${s.NO} punts, ${r1(s.ypp)} avg, ${s['In 20'] ?? 0} inside the 20 · ${s.val >= 0 ? '+' : ''}${r1(s.val)} pts of field position${s.netc != null ? ` · career net ${s.netc >= 0 ? '+' : ''}${r1(s.netc)} yds over expected a punt` : ''}`;
     const age = e.dob ? (Date.now() - Date.parse(e.dob)) / 31557600000 : null;
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
