@@ -1,0 +1,130 @@
+{{- /* The Standings page (content/arkboard-standings.md): what has happened, no model numbers. data/standings.json
+       (scripts/fetch_standings.py, ESPN, refreshed by the odds-snap workflow) + data/cs2.json (Valve's ranking).
+       {{< standings part="table|picture|leaders|polls|rank|scores|vrs" k="nfl" title="..." tab="..." icon="football" >}}
+       table: the league's groups (divisions/conferences) one after another, zone stripe on qualification places;
+       picture: seeds and first-round pairs as the table stands; leaders: top 10 a category; polls: AP/Coaches/CFP;
+       rank: ATP/WTA; scores: recent finals and the next games; vrs: Valve Regional Standings. */ -}}
+{{- $p := .Get "part" }}{{ $k := .Get "k" }}{{ $tab := .Get "tab" }}{{ $icon := .Get "icon" | default "standings" -}}
+{{- $D := site.Data.standings | default dict -}}
+{{- $asof := "" }}{{ with $D.asof }}{{ $asof = lower ((time .).Format "Jan 2, 3:04 PM MST") }}{{ end -}}
+{{- $note := printf "ESPN · updated %s" $asof -}}
+
+{{- if eq $p "table" }}{{ with index ($D.tables | default dict) $k -}}
+{{- $T := . }}{{ $n := 0 }}{{ range .groups }}{{ $n = add $n (len .rows) }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" $icon "tab" $tab) -}}
+<table class="cfb__table st-table">
+  <thead><tr><th>{{ if .rankcol }}#{{ end }}</th><th>Team</th>{{ range $i, $c := .cols }}{{ if or (ne $i 0) (not $T.rankcol) }}<th>{{ $c }}</th>{{ end }}{{ end }}</tr></thead>
+  <tbody>
+  {{- range .groups }}
+    {{- with .name }}<tr class="st-grp"><th colspan="{{ add (len $T.cols) 2 }}">{{ . }}</th></tr>{{ end }}
+    {{- range $i, $r := .rows }}
+    <tr{{ with $r.z }} class="st-z{{ . }}"{{ end }}>
+      <td class="cfb__rk">{{ if $T.rankcol }}{{ index $r.v 0 }}{{ else }}{{ add $i 1 }}{{ end }}</td>
+      <td class="st-team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}<span title="{{ $r.full }}">{{ $r.n }}</span></td>
+      {{- range $j, $v := $r.v }}{{ if or (ne $j 0) (not $T.rankcol) }}<td class="cfb__num">{{ with $v }}{{ . }}{{ else }}<span class="cfb__dim">-</span>{{ end }}</td>{{ end }}{{ end }}
+    </tr>
+    {{- end }}
+  {{- end }}
+  </tbody>
+</table>
+{{- with .zones }}<div class="st-zones">{{ range . }}<span class="st-z{{ .z }}"><i></i>{{ .d }}</span>{{ end }}</div>{{ end -}}
+{{- partial "wintable-close.html" (dict "rows" $n "note" (cond (eq .src "results") (printf "from the match results · updated %s" $asof) $note)) -}}
+{{- end }}{{ end -}}
+
+{{- if eq $p "picture" }}{{ with index ($D.picture | default dict) $k -}}
+<div class="win st-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default .title }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="st-body">
+    <p class="cfb__dim st-note">if the season ended today · {{ .note }}</p>
+    <div class="st-confs">
+    {{- range .confs }}
+      <div class="st-conf">
+        <h3 class="st-h">{{ .name }}</h3>
+        {{- with .bye }}<div class="st-m"><span class="st-lab">bye</span>{{ range . }}{{ partial "inline/st-seed.html" . }}{{ end }}</div>{{ end }}
+        {{- range .pairs }}<div class="st-m"><span class="st-lab">first round</span>{{ range . }}{{ partial "inline/st-seed.html" . }}{{ end }}</div>{{ end }}
+        {{- with .pin }}{{ range . }}<div class="st-m st-m--pin"><span class="st-lab">play-in</span>{{ range . }}{{ partial "inline/st-seed.html" . }}{{ end }}</div>{{ end }}{{ end }}
+        {{- with .out }}<div class="st-out"><span class="st-lab">next out</span>{{ range . }}{{ partial "inline/st-seed.html" . }}{{ end }}</div>{{ end }}
+      </div>
+    {{- end }}
+    </div>
+  </div>
+  <div class="win__status"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}{{ end -}}
+{{- define "partials/inline/st-seed.html" -}}
+<div class="st-t"><b class="st-s">{{ with .wc }}WC{{ . }}{{ else }}{{ with .dpos }}{{ substr ($.div | default "") 0 3 }}{{ . }}{{ else }}{{ $.s }}{{ end }}{{ end }}</b>{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'">{{ end }}<span class="st-tn">{{ .n }}</span><span class="cfb__dim st-tr">{{ index .v 0 }}{{ with index .v 1 }} · {{ . }} pts{{ end }}</span></div>
+{{- end -}}
+
+{{- if eq $p "leaders" }}{{ with index ($D.leaders | default dict) $k -}}
+<div class="win st-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default "stat leaders" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="st-body">
+    {{- with .season }}<p class="cfb__dim st-note">{{ . }} · official stats</p>{{ end }}
+    <div class="st-grid">
+    {{- range .cats }}
+      <table class="cfb__table st-mini">
+        <thead><tr><th colspan="3">{{ .name }}</th></tr></thead>
+        <tbody>{{ range $i, $r := .rows }}<tr><td class="cfb__rk">{{ add $i 1 }}</td><td class="st-team">{{ with $r.tl }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ $r.n }}{{ with $r.pos }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with $r.t }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td><td class="cfb__num">{{ $r.v }}{{ with $r.gp }} <span class="cfb__dim">({{ . }} GP)</span>{{ end }}</td></tr>{{ end }}</tbody>
+      </table>
+    {{- end }}
+    </div>
+  </div>
+  <div class="win__status"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}{{ end -}}
+
+{{- if eq $p "polls" }}{{ with index ($D.polls | default dict) $k -}}
+<div class="win st-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default "polls" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="st-body"><div class="st-grid st-grid--wide">
+  {{- range . }}
+    <table class="cfb__table st-mini">
+      <thead><tr><th colspan="5">{{ .name }}{{ with .date }} <span class="cfb__dim">{{ replaceRE `^.*Poll ` "" . }}</span>{{ end }}</th></tr>
+      <tr><th>RK</th><th>Team</th><th>Rec</th><th>Pts</th><th title="last week">Prev</th></tr></thead>
+      <tbody>{{ range .rows }}<tr><td class="cfb__rk">{{ .rk }}</td><td class="st-team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ .n }}{{ with .fpv }} <span class="cfb__dim">({{ . }})</span>{{ end }}</td><td class="cfb__num">{{ .rec }}</td><td class="cfb__num">{{ with .pts }}{{ . }}{{ end }}</td><td class="cfb__num cfb__dim">{{ with .prev }}{{ if gt (int .) 25 }}NR{{ else }}{{ . }}{{ end }}{{ else }}NR{{ end }}</td></tr>{{ end }}</tbody>
+    </table>
+  {{- end }}
+  </div></div>
+  <div class="win__status"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}{{ end -}}
+
+{{- if eq $p "rank" }}{{ with index ($D.rankings | default dict) $k -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" $icon "tab" $tab "filter" "Country") -}}
+<table class="cfb__table st-table">
+  <thead><tr><th>RK</th><th>Player</th><th>Country</th><th>Pts</th><th title="last week's rank">Prev</th></tr></thead>
+  <tbody>{{ range .rows }}<tr><td class="cfb__rk">{{ .rk }}</td><td>{{ .n }}</td><td>{{ .c }}</td><td class="cfb__num">{{ .pts }}</td><td class="cfb__num cfb__dim">{{ .prev }}</td></tr>{{ end }}</tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" (printf "official ranking %s · %s" .date $note)) -}}
+{{- end }}{{ end -}}
+
+{{- if eq $p "vrs" }}{{ with site.Data.cs2 -}}
+{{- $rows := sort (where .teams "vrk" "gt" 0) "vrk" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Valve Regional Standings") "icon" "cs" "tab" $tab "filter" "Region") -}}
+<table class="cfb__table st-table">
+  <thead><tr><th>RK</th><th>Team</th><th>Region</th><th title="Valve Regional Standings points">Pts</th><th title="series won-lost, last 90 days">90d</th><th title="last 10 series, newest first">Form</th></tr></thead>
+  <tbody>{{ range $rows }}<tr><td class="cfb__rk">{{ .vrk }}</td><td class="st-team">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .n }}</td><td>{{ .rg }}</td><td class="cfb__num">{{ .vpts }}</td><td class="cfb__num">{{ .w90 }}-{{ .l90 }}</td><td class="st-form">{{ .form }}</td></tr>{{ end }}</tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "Valve ranking %s" .vrsDate) "fresh" "cs2") -}}
+{{- end }}{{ end -}}
+
+{{- if eq $p "scores" }}{{ with index ($D.scores | default dict) $k -}}
+{{- $n := 0 }}{{ range . }}{{ $n = add $n (len .games) }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "scores") "icon" $icon "tab" $tab) -}}
+<table class="cfb__table st-table st-scores">
+  <thead><tr><th>Away</th><th></th><th>Home</th><th></th><th>Status</th></tr></thead>
+  <tbody>
+  {{- range . }}
+    <tr class="st-grp"><th colspan="5">{{ .d }}</th></tr>
+    {{- range .games }}{{ $g := . }}{{ $post := eq .st "post" }}
+    <tr{{ if eq .st "in" }} class="st-live"{{ end }}>
+      {{- with .a }}<td class="st-team{{ if and $post .w }} st-w{{ end }}">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ with .rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ .n }}</td><td class="cfb__num{{ if and $post .w }} st-w{{ end }}">{{ .s }}</td>{{ else }}<td></td><td></td>{{ end }}
+      {{- with .h }}<td class="st-team{{ if and $post .w }} st-w{{ end }}">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ with .rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ .n }}</td><td class="cfb__num{{ if and $post .w }} st-w{{ end }}">{{ .s }}</td>{{ else }}<td></td><td></td>{{ end }}
+      <td class="cfb__dim">{{ if eq .st "pre" }}{{ .time }} ET{{ else }}{{ .det }}{{ end }}{{ with .note }} · {{ . }}{{ end }}</td>
+    </tr>
+    {{- end }}
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" $n "note" $note) -}}
+{{- end }}{{ end -}}
