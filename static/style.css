@@ -4229,7 +4229,7 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .menu-grp__label { padding: 4px 8px; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 60%, transparent); white-space: nowrap; }
 .menu-grp__links { display: flex; flex-wrap: wrap; min-width: 0; }
 /* desktop dropdown: one grid (label + up to three pages a row), so each sport's pages line up in columns */
-.menu-sub__list { width: max-content; grid-template-columns: repeat(4, auto); align-items: center; }
+.menu-sub__list { width: max-content; grid-template-columns: repeat(5, auto); align-items: center; }
 .menu-sub:hover > .menu-sub__list, .menu-sub:focus-within > .menu-sub__list, .menu-sub.is-open > .menu-sub__list { display: grid; }
 .menu-sub__list > li:first-child { grid-column: 1 / -1; }
 .menu-sub__list .menu-grp, .menu-sub__list .menu-grp__links { display: contents; }
