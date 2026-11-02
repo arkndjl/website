@@ -67,6 +67,7 @@
 .ab-logos{display:flex;flex-wrap:wrap;gap:.6rem}
 .ab-logos svg{width:48px;height:48px;background:var(--ab-deep);padding:6px;border:1px solid rgba(200,199,255,.2)}
 .ab-medals{display:flex;flex-wrap:wrap;gap:.75rem}
+.ab-units{display:flex;flex-wrap:wrap;margin:0}
 .ab-social{display:flex;flex-wrap:wrap;gap:.5rem}.ab-social svg{width:32px;height:32px}
 .ab-medals figure{display:grid;place-items:center;padding:.6rem;background:var(--ab-dark);border:1px solid rgba(200,199,255,.2);font-size:.75rem;color:var(--ab-lil)}
 .ab-medals svg{width:44px;height:48px}
@@ -184,6 +185,16 @@
     {{- end }}
   </div>
   <div class="ab-row">{{ range (slice "p" "g" "s" "b") }}<i class="cfb__medal cfb__medal--{{ . }}" style="width:16px;height:16px;-webkit-mask-size:16px 16px;mask-size:16px 16px"></i>{{ end }}</div>
+  {{- $units := slice }}{{ with site.Data.unit_badges }}{{ range $sp, $v := .sports }}{{ range $k, $n := $v.names }}{{ $units = $units | append (index $n 0) }}{{ end }}{{ end }}{{ end }}
+  {{- $units = $units | append "Return Game" "Special Teams" | uniq | sort }}
+  {{- $tl := slice "p" "g" "s" "b" }}{{ $TN := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" }}
+  <p class="cfb__badges ab-units">{{ range $i, $n := $units }}{{ $t := index $tl (mod $i 4) }}<span class="cfb__bdg cfb__bdg--{{ $t }}">{{ index $TN $t }} {{ $n }}</span>{{ end }}</p>
+  <div class="win"><div class="win__title"><span class="win__title-text">offense</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>rk</th><th>team</th><th>adj</th></tr></thead><tbody>
+      {{- range $i, $r := (slice (slice "buf" "p" "+.21") (slice "bal" "g" "+.17") (slice "det" "s" "+.12") (slice "kc" "b" "+.08")) }}
+      <tr><td>{{ add $i 1 }}</td><td class="cfb__team"><img class="cfb__logo" src="{{ printf "img/nfl/%s.png" (index $r 0) | relURL }}" alt="{{ upper (index $r 0) }}" width="20" height="20" loading="lazy"> <span class="cfb__medals"><i class="cfb__medal cfb__medal--{{ index $r 1 }}"></i></span></td><td style="color:var(--ab-aq)">{{ index $r 2 }}</td></tr>
+      {{- end }}
+    </tbody></table></div></div>
 </section>
 
 <section class="ab-sec" id="mark">
