@@ -857,21 +857,31 @@ def fit():
     print('wrote', FIT)
 
 
-def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000):
+def live_gm(rows, season):
+    """each team's long-memory margin rating (the game model's 'gm' input) after this season's finished games
+    (last season's final, carried, before any). The whole schedule goes in, as control_ratings.cbb_feat_live's does:
+    the fit pools teams with fewer than minn games into one rating, so with the finished games alone every team
+    shared it until its tenth game (Nov 2 2026: the power table and tournament odds then had no margin term)"""
+    import control_ratings as CR
+    H = json.load(gzip.open(CR.CBB_HIST, 'rt'))
+    done = [g for g in rows if g.get('hs') is not None]
+    fin = CR.ratings(CR.cbb_gl([dict(g, season=season) for g in rows]) if rows else [], CR.margin_control(done),
+                     prev=H['final']['gm'].get(str(season - 1), {}), **CR.CBB_FIT)[1]
+    return fin.get(season) or {t: CR.CBB_FIT['carry'] * v for t, v in H['final']['gm'].get(str(season - 1), {}).items()}
+
+
+def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=None):
     """today's tournament odds for cbb_games_live: rows (this season's ESPN games), d1 (rated teams), confs (team ->
-    board conference), the efficiency solve's net/T/tau, Elo, games played. Returns {team: odds} or {} with no fit"""
+    board conference), the efficiency solve's net/T/tau, Elo, games played (gm: live_gm's, when the caller has it).
+    Returns {team: odds} or {} with no fit"""
     if not os.path.exists(FIT):
         return {}
-    import control_ratings as CR
     Fit = json.load(open(FIT))
     mdl = Fit['committee']
     teams = sorted(d1)
     ts = set(teams)
-    H = json.load(gzip.open(CR.CBB_HIST, 'rt'))
-    done = [g for g in rows if g.get('hs') is not None]
-    fin = CR.ratings(CR.cbb_gl([dict(g, season=season) for g in done]) if done else [], CR.margin_control(done),
-                     prev=H['final']['gm'].get(str(season - 1), {}), **CR.CBB_FIT)[1]
-    gm = fin.get(season) or {t: CR.CBB_FIT['carry'] * v for t, v in H['final']['gm'].get(str(season - 1), {}).items()}
+    if gm is None:
+        gm = live_gm(rows, season)
     rating = team_rating(net, T, tau, elo, gm, teams, coef)
     rank = {t: i + 1 for i, t in enumerate(sorted(teams, key=lambda t: -rating[t]))}
     hist = C.load_hist()

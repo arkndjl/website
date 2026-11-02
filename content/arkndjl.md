@@ -11,6 +11,6 @@ draft = false
 {{< winlist title="links.exe" icon="note" >}}
 - [soundcloud](https://soundcloud.com/arkndjl) | @arkndjl |
 - [youtube](https://www.youtube.com/@arkndjl) | @arkndjl |
-- [events](/arklibrary/#events) | concerts and games, in ARKLIBRARY |
+- [events](/arklibrary/#events) | ARKLIBRARY |
 {{< /winlist >}}
 {{< /arkndjlhub >}}

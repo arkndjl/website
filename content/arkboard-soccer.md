@@ -9,7 +9,7 @@ cover = "/og/soccer.png"
 
 {{< arknav >}}
 
-{{< winpane title="soccer.exe :: Europe's top leagues, MLS and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
+{{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
 {{< wintabs groups="players:player value,player stats,rookies,ARKLIST|rosters:depth chart,lineups,backup watch|games:games,game table|teams:ARK Ranking,attack,defence,set pieces|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan,MLS|UEFA cups:Champions League,Europa League,Conference League" side="true" label="Soccer views" >}}
 {{< soccergames title="matches" tab="games" >}}

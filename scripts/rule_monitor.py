@@ -119,7 +119,28 @@ def expected_live(sport, held):
     if not held or not (held.get('clvRet') or 0) > 0:
         return None
     import units as DU
-    return held['clvRet'] * DU.TIMING * DU.LEAK.get(sport, 1.0)
+    # the haircut is on the edge over a fair coin at BASE, as units.adj stakes it (Nov 2 2026 audit: scaling the return
+    # itself tested CBB spreads against .0181 where the stakes assume .0108, and paused a rule earning exactly its
+    # stakes' edge 22-34% of the time in simulation, against 3-6% this way)
+    return max(0.0, DU.adj(held['clvRet'], 0.0, DU.TIMING * DU.LEAK.get(sport, 1.0)))
+
+
+def at_base(b):
+    """a live pick's close value judged at units.BASE, the price mu1 is at (a DraftKings -110 fallback reads ~3 points
+    lower than the same pick at -103). Moneylines are left out of the test: their return is on another scale (one +203
+    pick showed clvRet 1.045). None when it cannot be judged."""
+    if b.get('clvRet') is None or b.get('mk') == 'ml':
+        return None
+    if b.get('mk') in ('spread', 'total') and b.get('line') is not None and b.get('close') is not None and b.get('sport'):
+        try:
+            import clv as C
+            import units as DU
+            r = C.ret(b['sport'], b['mk'], b['side'], b['line'], DU.BASE, b['close'])
+            if r is not None:
+                return r
+        except Exception:
+            pass
+    return b['clvRet']
 
 
 def rho_for(sport, mk):
@@ -141,7 +162,7 @@ def drift(bets, mu1, sd=None, rho=0.0, P=None):
     P = P or params()
     D = P['drift']
     sd = sd or P['sdDefault']
-    jc = sorted([b for b in bets if b.get('clvRet') is not None], key=lambda b: b.get('kick') or b.get('k'))
+    jc = sorted([{**b, 'clvRet': at_base(b)} for b in bets if at_base(b) is not None], key=lambda b: b.get('kick') or b.get('k'))
     out = {'mu1': None if mu1 is None else round(mu1, 4), 'n': len(jc), 'sd': round(sd, 4), 'rho': round(rho, 3),
            'lo': round(-math.log(D['B']), 3), 'hi': round(math.log(D['A']), 3)}
     if not mu1 or mu1 <= 0:

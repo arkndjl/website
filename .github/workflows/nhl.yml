@@ -10,6 +10,8 @@ on:
   schedule:
     - cron: "40 11 * 10,11,12,1,2,3,4,5,6 *"
     - cron: "10 21 * 10,11,12,1,2,3,4,5,6 *"
+    # off-season (Nov 2 2026): Mondays July-September (free agency July 1, prospects after the late-June draft)
+    - cron: "40 11 * 7,8,9 1"
   workflow_dispatch:
   workflow_run:
     workflows: ["esea season", "cfb board"]

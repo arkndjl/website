@@ -1,13 +1,13 @@
 {{- /* NFL power rankings (data/nfl_games.json power, scripts/nfl_games.py): each team's rating in points against an
        average team on a neutral field with this week's starting QB and injury reports (the game model's Elo,
-       opponent-adjusted EPA, QB and injury terms), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
+       QB, market rating, return game, offseason roster prior and injury terms; EPA/play is shown, not in the rating), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
 {{- with site.Data.nfl_games -}}
 {{- $proj := partial "projsum.html" (dict "sport" "nfl" "k" "war") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table" data-td-kind="nfl" data-td-src="/data/teams/nfl.json" data-td-rows="{{ (resources.FromString "data/nfl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>
-    <th title="rating = expected margin vs average team, neutral field, this week's starting QB and injuries; Elo + opponent-adjusted EPA/play + QB - injuries">Rating</th>
+    <th title="rating = expected margin vs average team, neutral field, this week's starting QB and injuries; Elo + QB + market rating + return game + roster prior - injuries">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="this week's injury reports: non-QBs at their chance to miss x WAR a game, points (a QB out shows in the QB column)">Inj</th>
     <th title="rating with nobody on the injury report">Full</th>

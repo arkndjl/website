@@ -8,7 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="standings.exe :: every sport" icon="standings" sprite="px/hero-standings" status="results only · no model numbers" class="winpane--art" />}}
+{{< winpane title="standings.exe :: every sport" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
 {{< wintabs groups="football:NFL standings,NFL playoffs,NFL leaders,NFL scores,CFB standings,CFB polls,CFB leaders,CFB scores|basketball:NBA standings,NBA playoffs,NBA leaders,NBA scores,CBB standings,CBB polls,CBB leaders,CBB scores|hockey:NHL standings,NHL playoffs,NHL leaders,NHL scores|soccer:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="Standings views" >}}
 {{< lazytab tab="NFL standings" >}}{{< standings part="table" k="nfl" title="NFL standings" tab="NFL standings" icon="football" >}}{{< /lazytab >}}

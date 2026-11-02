@@ -8,7 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="reference.exe :: research + methodology + sources" icon="reference" sprite="px/hero-library" status="RESEARCH · GLOSSARY · METHODOLOGY · DATA SOURCES" class="winpane--art" />}}
+{{< winpane title="reference.exe" icon="reference" sprite="px/hero-library" status="" class="winpane--art" />}}
 
 {{< wintabs groups="Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Glossary/Methodology:FV,FV scales,player value,player odds,team ratings,game models,drafts and mocks,data and names|Data Sources:data sources" side="true" class="libtabs" label="Reference views" >}}
 {{< libresearch tab="all studies" group="all" >}}

@@ -9,7 +9,7 @@ cover = "/og/hockey-prospects.png"
 
 {{< arknav >}}
 
-{{< winpane title="hockey_prospects.exe :: 2027 NHL draft and prospects" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · HockeyTech · MoneyPuck" class="winpane--art" />}}
+{{< winpane title="hockey_prospects.exe :: 2027 draft" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · HockeyTech · MoneyPuck" class="winpane--art" />}}
 
 {{< wintabs groups="players:big board,drafted prospects,first-year,ARKLIST|mock draft:predictive mock,blended mock,conviction mock,lottery|model:fv model,past classes,all-time FV" side="true" label="Hockey prospects views" >}}
 {{< hockeyboard view="board" tab="big board" >}}

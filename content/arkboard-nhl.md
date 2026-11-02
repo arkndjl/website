@@ -9,7 +9,7 @@ cover = "/og/nhl.png"
 
 {{< arknav >}}
 
-{{< winpane title="nhl.exe :: NHL games and teams" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
+{{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
 {{< wintabs groups="players:WAR leaders,goalies,projections,rookies,ARKLIST|rosters:depth chart,lines,backup watch|games:games,game table|teams:ARK Ranking,season odds,offense,defense,power play,penalty kill" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}

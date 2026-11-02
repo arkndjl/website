@@ -87,7 +87,7 @@ def coefs(data):
 # ---------------------------------------------------------------- season odds
 def sim_checkpoint(job):
     """One checkpoint: for every sd in SDS, each team's P(playoffs), P(division), and its simulated win counts."""
-    s, wk, R, b, sched, res0, mus_ix = job
+    s, wk, R, b, sched, res0, mus_ix, gmode = job
     lg = N.League(sched, 3 if s >= 2020 else 2)
     left = [k for k, r in enumerate(res0) if r is None]
     mu = np.array([mus_ix[k] for k in left])
@@ -98,7 +98,7 @@ def sim_checkpoint(job):
     T = lg.T
     tix = {t: i for i, t in enumerate(T)}
     for rsd in SDS:
-        win = (mu[None, :] + rsd * (z[:, hi] - z[:, ai]) + b['sd'] * e) > 0
+        win = (mu[None, :] + rsd * (z[:, hi] - z[:, ai]) + game_sd(b['sd'], rsd, gmode) * e) > 0
         rng = random.Random(s * 100 + wk)
         po, dv = np.zeros(32), np.zeros(32)
         W = np.zeros((NS, 32))
@@ -116,6 +116,13 @@ def sim_checkpoint(job):
             W[n] = [w[t] for t in T]
         out[rsd] = (po / NS, dv / NS, W)
     return s, wk, out
+
+
+def game_sd(sd, rsd, gmode):
+    """the game noise a simulated game draws on top of the two rating shocks. full: the margin model's whole
+    prediction-error sd (which already holds its rating error: a game's variance was sd^2 + 2 rsd^2); net: that error
+    taken out at the checkpoint's rating sd, so a game's variance is sd^2 (floor 8 points)"""
+    return sd if gmode == 'full' else math.sqrt(max(64.0, sd * sd - 2 * rsd * rsd))
 
 
 def score(p, y, clip):
@@ -137,7 +144,7 @@ def wins_scores(W, act):
     return ll, crps
 
 
-def sim_test(games, data, snaps, B, sd):
+def sim_test(games, data, snaps, B, sd, gmode='full'):
     jobs, facts = [], {}
     for s in SEASONS:
         sg, res_all = N.season_results(games, s)
@@ -157,7 +164,7 @@ def sim_test(games, data, snaps, B, sd):
             mus = {k: R[N.team(g['home_team'])] - R[N.team(g['away_team'])] + (b['home'] if g['location'] != 'Neutral' else 0)
                    + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest'])) for k, g in enumerate(sg) if res0[k] is None}
             # a cancelled game (2022 BUF-CIN) is simulated from week 1 to 13 but has no result
-            jobs.append((s, wk, R, b, sched, res0, mus))
+            jobs.append((s, wk, R, b, sched, res0, mus, gmode))
             facts[(s, wk)] = sum(1 for r in res0 if r is None) / len(sg)
     with Pool(int(os.environ.get('PROCS', 4))) as pool:
         got = pool.map(sim_checkpoint, jobs, chunksize=1)
@@ -410,6 +417,29 @@ def order_test(G, snaps, B, sd):
     return out
 
 
+def game_test(sc_full, sc_net, facts):
+    """the season sims' game noise (Nov 2 2026 audit: N(mu + shock_h - shock_a, sd) with sd the margin model's full
+    error counts the rating error twice). Every rating-sd config is tuned on 2015-20 under each game noise; the best of
+    each is reported on 2021-25 against the shipped (full noise, 5 x sqrt(left)); paired t over team-seasons."""
+    cfgs = [('fixed', v) for v in FIXED] + [('shrink', s0, p, fl) for s0, p, fl in SHRINK]
+    base = ('shrink', 5, 0.5, 0)
+    tune, held = range(2015, 2021), range(2021, 2026)
+    name = lambda c: f'fixed {c[1]}' if c[0] == 'fixed' else f'{c[1]} x left^{c[2]}, floor {c[3]}'
+    bt, bh = table(sc_full, facts, base, tune), table(sc_full, facts, base, held)
+    out = {'base': {'cfg': 'full noise, ' + name(base), 'tune': bt[0], 'held': bh[0]}, 'grid': []}
+    for gm, sc in (('full', sc_full), ('net', sc_net)):
+        rows = []
+        for c in cfgs:
+            mt, ut = table(sc, facts, c, tune); mh, uh = table(sc, facts, c, held)
+            rows.append({'cfg': f'{gm} noise, ' + name(c), 'tune': mt, 'held': mh, 'tTune': rnd(tstat(ut - bt[1])),
+                         'tHeld': rnd(tstat(uh - bh[1]))})
+        rows.sort(key=lambda r: r['tune']['llAll'])
+        out['grid'] += rows[:6]
+        out['best' + gm.title()] = rows[0]
+        out[gm + 'Shipped'] = next(r for r in rows if r['cfg'] == f'{gm} noise, ' + name(base))
+    return out
+
+
 def main():
     games = list(N.rows(N.get('games.csv', N.GAMES)))
     bad = N.check_tiebreaks(games, range(2002, 2026))
@@ -441,12 +471,21 @@ def main():
     res['blendTest'] = blend_test(D, y, S, line, pred, F['sd'])
     print(json.dumps({k: v for k, v in res['blendTest'].items() if k != 'grid'}, indent=1))
     import pickle
-    cp = os.path.join(N.CACHE, f'season_sims_{NS}_{"-".join(map(str, WEEKS))}.pkl')
-    if os.path.exists(cp):
-        sc, facts = pickle.load(open(cp, 'rb'))
-    else:
-        sc, facts = sim_test(G, data, snaps, B, F['sd'])
-        pickle.dump((sc, facts), open(cp, 'wb'))
+    def sims(gmode):
+        cp = os.path.join(N.CACHE, f'season_sims_{NS}_{"-".join(map(str, WEEKS))}{"" if gmode == "full" else "_" + gmode}.pkl')
+        if os.path.exists(cp):
+            return pickle.load(open(cp, 'rb'))
+        out = sim_test(G, data, snaps, B, F['sd'], gmode)
+        pickle.dump(out, open(cp, 'wb'))
+        return out
+    sc, facts = sims('full')
+    if '--game' in sys.argv:          # gameTest: the game noise net of the rating error, rating sd retuned on 2015-20
+        res = json.load(open(OUT)) if os.path.exists(OUT) else res
+        res['gameTest'] = game_test(sc, sims('net')[0], facts)
+        with open(OUT, 'w') as f:
+            json.dump(res, f, indent=1)
+        print(json.dumps({k: v for k, v in res['gameTest'].items() if k != 'grid'}, indent=1))
+        return
     cfgs = [('fixed', v) for v in FIXED] + [('shrink', s0, p, fl) for s0, p, fl in SHRINK]
     base = ('shrink', 5, 0.5, 0)              # shipped Oct 19 (before: a fixed 2.5)
     tune, held = range(2015, 2021), range(2021, 2026)

@@ -1,0 +1,178 @@
+# Scheduled model refits (scripts/refit.py, Nov 2 2026). Every Monday: plan the due refits (each model in its season
+# months, every `every` days), run each in its own job with its gate (exit 0, strict JSON, only its fit file kept),
+# commit the kept fits with data/refits.json, then rerun the picks layer on them (games_picks.py --fit, --rules,
+# units.py --fit). A failed leg keeps the committed fit and turns the run red, which data-health.yml files as an issue.
+# By hand: Actions > model refits > Run workflow, with job names (or "all") to force them.
+name: model refits
+
+on:
+  schedule:
+    - cron: "5 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      jobs:
+        description: "refit these now (space-separated names from scripts/refit.py, or all); empty = the due ones"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: model-refits
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.p.outputs.matrix }}
+      any: ${{ steps.p.outputs.any }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/refit.py
+            data/refits.json
+          sparse-checkout-cone-mode: false
+      - id: p
+        env:
+          JOBS: ${{ inputs.jobs }}
+        run: |
+          if [ "$JOBS" = "all" ]; then python3 scripts/refit.py plan --all; else python3 scripts/refit.py plan $JOBS; fi
+
+  fit:
+    needs: plan
+    if: needs.plan.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.timeout }}
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy pandas
+      # the daily workflow's download cache for this model, when it has one (restore only; the daily runs own it).
+      # A cache restores only with the same path list it was saved with, so one step per cache.
+      - if: contains(matrix.cache, 'cs2-vrs')
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/cs
+          key: cs2-vrs-v1
+      - if: contains(matrix.cache, 'cbb-bt-')
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            scripts/.cache/cbb/games_bt
+            scripts/.cache/cbb/games/*.json.gz
+            scripts/.cache/cbb/espn_box
+          key: cbb-bt-none
+          restore-keys: cbb-bt-
+      - if: contains(matrix.cache, 'tennis-')
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/tennis/sack
+          key: tennis-sack-v1
+      - if: contains(matrix.cache, 'tennis-')
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/tennis/espn
+          key: tennis-espn-none
+          restore-keys: tennis-espn-
+      - name: Refit ${{ matrix.job }}
+        run: python3 scripts/refit.py run ${{ matrix.job }}
+      - name: Pack the kept files
+        run: |
+          mkdir -p /tmp/out
+          python3 - <<'PY'
+          import json, shutil, os
+          r = json.load(open('scripts/.refit/${{ matrix.job }}.json'))
+          for p in r['changed']:
+              os.makedirs(os.path.dirname('/tmp/out/files/' + p), exist_ok=True)
+              shutil.copy(p, '/tmp/out/files/' + p)
+          shutil.copy('scripts/.refit/${{ matrix.job }}.json', '/tmp/out/${{ matrix.job }}.json')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: refit-${{ matrix.job }}
+          path: /tmp/out
+          retention-days: 14
+
+  commit:
+    needs: [plan, fit]
+    if: always() && needs.plan.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: refit-*
+          path: /tmp/legs
+      - name: Apply the kept fits, record every result
+        run: |
+          for d in /tmp/legs/*/; do if [ -d "$d/files" ]; then cp -r "$d/files/." .; fi; done
+          python3 scripts/refit.py collect /tmp/legs || echo "some refits failed" >> /tmp/refit_failed
+          python3 scripts/refit.py status
+      - name: Commit
+        run: |
+          git add -A data scripts/data
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
+          git commit -m "Refit models ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d HEAD~1 HEAD)
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            git checkout "$data" -- $changed
+            git add $changed
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Refit models ($(date -u +%Y-%m-%d))"
+          done
+          exit 1
+      - name: Fail the run if a refit failed
+        run: |
+          if [ -s /tmp/refit_failed ]; then echo "::error::a refit failed, see data/refits.json"; exit 1; fi
+
+  picks:
+    needs: commit
+    if: always() && needs.commit.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy pandas
+      # the pick rules on the refit models (games_picks.py --fit then --rules), then the stake fit that reads them
+      - name: Pick rules
+        run: |
+          python3 scripts/games_picks.py --fit && python3 scripts/games_picks.py --rules && python3 scripts/units.py --fit
+      - name: Commit
+        run: |
+          git add data/games_picks_fit.json data/games_picks_rules.json data/units_fit.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1
+          git commit -m "Refit pick rules ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d HEAD~1 HEAD)
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            git checkout "$data" -- $changed
+            git add $changed
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Refit pick rules ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

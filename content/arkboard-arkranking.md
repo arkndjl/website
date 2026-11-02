@@ -8,7 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="CFB · NFL · CBB · NBA · NHL · SOCCER · TENNIS · CS2" class="winpane--art" />}}
+{{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
 {{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
@@ -49,15 +49,3 @@ draft = false
 {{< lazytab tab="WTA ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CS2 ranking" >}}{{< cs2rank title="Counter-Strike :: ARK Ranking" tab="CS2 ranking" >}}{{< /lazytab >}}
 {{< /wintabs >}}
-
-{{< winlist title="arkranking.exe :: the same tables on each sport page" icon="standings" per="0" >}}
-- [college football](/arkboard/college-football/#ark-ranking) | ARK Ranking, season odds, team talent, staff
-- [NFL](/arkboard/nfl/#ark-ranking) | ARK Ranking, season odds, team WAR
-- [college basketball](/arkboard/college-basketball/#ark-ranking) | ARK Ranking, season odds, NCAA tournament odds
-- [NBA](/arkboard/nba/#ark-ranking) | ARK Ranking, season odds
-- [NHL](/arkboard/nhl/#ark-ranking) | ARK Ranking, season odds, goalies
-- [soccer](/arkboard/soccer/#ark-ranking) | ARK Ranking, 18 leagues, UEFA cups
-- [tennis](/arkboard/tennis/#atp-ark-ranking) | ATP and WTA ARK Ranking, serve and return
-- [Counter-Strike](/arkboard/counter-strike/) | ARK Ranking of pro CS2 teams, series chances, model
-- [Predictions](/arkboard/predictions/) | picks, lines, futures and win totals against the market
-{{< /winlist >}}

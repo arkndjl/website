@@ -74,7 +74,7 @@ def run_mock(order, board, key):
             break
         best = min(left, key=key)
         left.remove(best)
-        picks.append(dict(o, name=best['name'], pos=best['pos'], club=best['club'], league=best['league'], fv=best['fv'],
+        picks.append(dict(o, name=best['name'], pos=best['pos'], club=best['club'], league=best['league'], fv=best['fv'], fvx=best['fvx'],
                           rk=best['rk'], frk=best['frk'], age=best['age']))
     return picks
 

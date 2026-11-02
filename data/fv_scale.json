@@ -1,14 +1,14 @@
 {
- "asof": "2026-11-01",
+ "asof": "2026-11-02",
  "method": "scripts/fv_scale.py --fit",
  "rule": "FV = mean up to K (3 a season); linear above to 80 at T (one a season x 0.2), capped at the board's reach",
  "boards": {
   "cfb": {
    "K": 67.85,
-   "T": 76.8,
+   "T": 74.88,
    "tail": 6.2,
    "tailT": 84.64,
-   "reach": 76.8,
+   "reach": 74.88,
    "seasons": 4,
    "src": "held-out FBS player-seasons 2019-22 (data/fv_dist.json cfb scorecard)"
   },
@@ -22,10 +22,10 @@
    "src": "held-out top 300 of the 2009-10 to 2015-16 preseason boards (data/fv_dist.json cbb scorecard)"
   },
   "hockey": {
-   "K": 54,
-   "T": 72.73,
-   "tail": 6.92,
-   "tailT": 72.73,
+   "K": 53.75,
+   "T": 73.86,
+   "tail": 7.42,
+   "tailT": 73.86,
    "reach": 80.0,
    "seasons": 12,
    "src": "the 2008-19 draft classes as graded on the board (data/hockey.json past)"

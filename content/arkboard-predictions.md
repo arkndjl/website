@@ -10,7 +10,7 @@ cover = "/og/predictions.png"
 
 {{< arknav >}}
 
-{{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-predictions" status="CFB · NFL · CBB · NBA · NHL · SOCCER" class="winpane--art" />}}
+{{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-predictions" status="" class="winpane--art" />}}
 
 {{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,game models,paper book" side="true" label="Predictions views" >}}
 {{< gamesfilter tab="games" >}}
@@ -66,6 +66,7 @@ cover = "/og/predictions.png"
 {{< cbbgamemodel title="college basketball game model :: inputs, weights, held-out test vs the close" tab="game models" >}}
 {{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
 {{< modelgov view="ledger" title="model ledger :: every shipped input, one test" tab="game models" >}}
+{{< modelgov view="pipeline" title="pipeline :: every feed and refit" tab="game models" >}}
 {{< /lazytab >}}
 {{< lazytab tab="paper book" >}}
 {{< gamespaper tab="paper book" >}}

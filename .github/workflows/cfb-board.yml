@@ -27,6 +27,11 @@ on:
     # for the late ones). The 16:17 full run covers the early games when it isn't delayed; 18:57 catches the late
     # window's inactives, and the early games' if the 16:17 run slipped. Same refresh as the daily ones.
     - cron: "57 18 * 8-12,1 0"
+    # off-season (Nov 2 2026, "every model auto-updates"): Mondays February-July (signing day, coaching hires, the
+    # spring portal window, the NFL draft in late April, On3 class rankings), plus Thursdays in February and April
+    # (signing period, portal window and draft week). About 15 CFBD calls a run against the 1,000 a month.
+    - cron: "17 11 * 2-7 1"
+    - cron: "17 11 * 2,4 4"
   workflow_dispatch:
     inputs:
       refresh:
@@ -102,6 +107,13 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: node scripts/cfb_avail_reports.mjs
+      # head coaches from ESPN (firings, interims, hires) into data/cfb_staff.json before the staff board and the
+      # coaching market read it (scripts/cfb_staff_sync.py; a failed pull changes nothing)
+      - name: Head coaches, college football
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 scripts/cfb_staff_sync.py
       # special teams tab: kick and punt returners from the ESPN play-by-play cache (scripts/st_returners.py; ESPN box
       # scores for returner ids, one call a new game; no CFBD quota). Before the grade: it also writes
       # scripts/data/cfb_ret_fv.json, the career return lines behind the RB/WR FV return term (fetch_cfb.mjs)
