@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Rookie WAR-rate prior from draft slot (breakouts tab, Noah Nov 2 2026) -> data/nfl_rookie_prior.json.
 
-    python3 scripts/nfl_rookie_prior.py      # fit + leave-one-season-out test (stdlib)
+    python3 scripts/nfl_rookie_prior.py         # fit + leave-one-season-out test (stdlib)
+    python3 scripts/nfl_rookie_prior.py --pctl  # projections test: rest-of-season WAR from weeks 5/9/13 (after a fit)
 
 A rookie has no NFL history, so the projections' WAR rate prior (scripts/player_pctl.py) puts him at his group's
 newcomer mean. Here: rate a snap = a[g] + b[g] x ln(pick), undrafted at pick UDFA, one line per group (QB RB WR TE OL DL
@@ -67,7 +68,7 @@ def data():
             V0, phi = fit['var'].get(g + ':n') or fit['var']['all:n']
             if phi <= 0:
                 phi = fit['var']['all:n'][1]
-            rows.append({'y': y, 'g': g, 'pk': pk, 'r': war / e, 'w': 1 / (V0 + phi / e), 'mu': fit['mu'].get(g + ':n', 0.0)})
+            rows.append({'y': y, 'pid': pid, 'g': g, 'pk': pk, 'r': war / e, 'w': 1 / (V0 + phi / e), 'mu': fit['mu'].get(g + ':n', 0.0)})
     return rows
 
 
@@ -111,5 +112,83 @@ def main():
     print(json.dumps({k: out[k] for k in ('n', 'coef', 'ship')}), json.dumps(out['test']['groups']), 't', out['test']['t'], 'ratio', out['test']['err_ratio'])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and '--pctl' not in sys.argv:
     main()
+
+
+# ---------------------------------------------------------------- projections test (python3 scripts/nfl_rookie_prior.py --pctl)
+CPS = (5, 9, 13)
+
+
+def checkpoints():
+    """{season: {cp: {pfr id: [war, snaps]}}} the board before week cp, 2016-25 (cached)"""
+    import nfl_war as W
+    fn = os.path.join(HERE, '.cache', 'nfl', 'rookie_prior_cps.json')
+    C = json.load(open(fn)) if os.path.exists(fn) else {}
+    for y in YEARS:
+        for cp in CPS:
+            if str(cp) in C.get(str(y), {}):
+                continue
+            out, _, _ = W.board(y, thru=cp)
+            C.setdefault(str(y), {})[str(cp)] = {p['id']: [p['_war'], p['sn'], p['t']] for p in out}
+            print('cp', y, cp, len(out), flush=True)
+            os.makedirs(os.path.dirname(fn), exist_ok=True)
+            json.dump(C, open(fn, 'w'))
+    return C
+
+
+def pctl_test():
+    """Rest-of-season WAR for rookies from each checkpoint (weeks 5, 9, 13), the projections' posterior (scripts/player_pctl.py
+    Rate.post) from the draft line (fit with the season held out) against the current prior (group newcomer mean + loc).
+    Scored on rest-of-season WAR: weighted squared error (weight 1 / predictive variance), plain squared error, and how
+    often the outcome lands inside the 20-80 band (normal, variance V1 x snaps^2 + phi x snaps)."""
+    import player_pctl as P
+    fit = json.load(open(P.FIT.format('nfl')))
+    Rp = fit['rates']['war']
+    R = P.Rate('value', Rp['K'], Rp['mu'], Rp['var'])
+    H, C, rows = seasons(), checkpoints(), data()
+    Z = 0.8416
+    per, cov = [], {'draft': [0, 0], 'mean': [0, 0]}
+    for y in YEARS:
+        co = {g: wls([r for r in rows if r['y'] != y and r['g'] == g]) for g in GROUPS}
+        acc = {'draft': [0.0, 0.0], 'mean': [0.0, 0.0]}
+        n = 0
+        for r in (r for r in rows if r['y'] == y):
+            pid = r['pid']
+            end = H[y][pid]
+            for cp in CPS:
+                td = C[str(y)][str(cp)].get(pid, [0.0, 0, None])
+                e_ros = end['e'] - td[1]
+                if e_ros < 50:
+                    continue
+                war_ros = end['x']['war'] - td[0]
+                frac = max(0.0, (18 - cp) / 17)
+                loc, _ = P._cal(fit, 'war', frac)
+                a, b = co[r['g']]
+                for k, m0 in (('draft', a + b * math.log(r['pk'])), ('mean', r['mu'] + loc)):
+                    m1, V1, phi = R.post(m0, r['g'], False, td[0], td[1])
+                    if phi <= 0:
+                        phi = Rp['var']['all:n'][1]
+                    mu_, var = m1 * e_ros, V1 * e_ros ** 2 + phi * e_ros
+                    err = war_ros - mu_
+                    acc[k][0] += err * err / var; acc[k][1] += err * err
+                    cov[k][0] += abs(err) <= Z * math.sqrt(var); cov[k][1] += 1
+                n += 1
+        per.append((y, acc, n))
+    out = {}
+    for j, name in ((0, 'weighted'), (1, 'plain')):
+        d = [(a['draft'][j] - a['mean'][j]) / n for _, a, n in per if n]
+        m = sum(d) / len(d); s = math.sqrt(sum((x - m) ** 2 for x in d) / (len(d) - 1))
+        tot = sum(a['draft'][j] for _, a, _ in per) / sum(a['mean'][j] for _, a, _ in per)
+        out[name] = {'ratio': round(tot, 4), 't': round(m / (s / math.sqrt(len(d))), 2)}
+    out['band20_80'] = {k: round(v[0] / v[1], 3) for k, v in cov.items()}
+    out['n'] = sum(n for _, _, n in per)
+    out['ship'] = out['plain']['t'] <= -2 and out['weighted']['t'] <= -2
+    return out
+
+
+if __name__ == '__main__' and '--pctl' in sys.argv:
+    res = pctl_test()
+    d = json.load(open(OUT)); d['pctl_test'] = res
+    json.dump(d, open(OUT, 'w'), indent=1)
+    print(json.dumps(res))
