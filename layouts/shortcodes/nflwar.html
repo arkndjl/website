@@ -9,7 +9,10 @@
        coverage allowed, ...) weighted by how much they move team margin, 2018-25. Views: season to date, or per 17 games (100+ snaps).
        Filters: position (and OFF / DEF), team, search. RK and the position rank count within the filters and the
        view, in WAR order; headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace).
-       Medals in the name cell: bdg, the predictive badges (scripts/nfl_badges.py; data/nfl_badge_backtest.json). */ -}}
+       Medals in the name cell: bdg, the predictive badges (scripts/nfl_badges.py; data/nfl_badge_backtest.json).
+       Two-way players (20+ snaps each side, row's two: {o, d WAR, so, sd snaps, p2 other position}): WAR sums both
+       sides, each against its own side's replacement line; the position cell reads CB/WR, either chip finds him, and
+       the stat line opens with the split. */ -}}
 {{- $d := site.Data.nfl_war -}}
 {{- $fit := site.Data.nfl_war_fit -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" -}}
@@ -111,7 +114,7 @@
     if (bar.elements.age.value && ag[0] === '') { amin = -Infinity; amax = +ag[1]; }
     // who's in: position, team, age, rookies, view; ranks count among them in WAR order
     var list = all.filter(function (p) {
-      if (pos === 'OFF' ? !OFF[p.pos] : pos === 'DEF' ? OFF[p.pos] : pos && p.pos !== pos) return false;
+      if (pos === 'OFF' ? !OFF[p.pos] && !(p.two && OFF[p.two.p2]) : pos === 'DEF' ? OFF[p.pos] && !(p.two && !OFF[p.two.p2]) : pos && p.pos !== pos && !(p.two && p.two.p2 === pos)) return false;
       if (team && p.tm.split('/').indexOf(team) < 0) return false;
       if (pace && p.sn < PACE_MIN) return false;
       if (rook && !p.rook) return false;
@@ -138,14 +141,14 @@
         '<td class="cfb__num nflwar__war' + (pace ? '' : ' is-key') + '">' + f2(p.war) + '</td>' +
         '<td class="cfb__num nflwar__war' + (pace ? ' is-key' : '') + '">' + f2(p.pace) + '</td>' +
         '<td class="cfb__num">' + waa(pace ? p.waaP : p.waa) + '</td>' +
-        '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
+        '<td class="cfb__g"' + (p.two ? ' title="two-way: ' + p.two.so + ' offense, ' + p.two.sd + ' defense snaps"' : '') + '>' + p.pos + (p.two ? '/' + p.two.p2 : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
         '<td class="nflwar__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
         '<td class="cfb__num">' + (p.xv == null ? '' : f2(p.xv)) + '</td>' +
         '<td class="cfb__num">' + p.av.toFixed(1) + '</td>' +
         '<td class="cfb__num cfb__g">' + p.g + '</td>' +
         '<td class="cfb__num">' + p.sn + '</td>' +
         '<td class="cfb__num">' + (p.age == null ? '' : p.age) + '</td>' +
-        '<td class="cfb__dim">' + esc(p.line) + '</td></tr>';
+        '<td class="cfb__dim">' + (p.two ? 'off ' + f2(p.two.o) + ' (' + p.two.so + ' sn) / def ' + f2(p.two.d) + ' (' + p.two.sd + ' sn) WAR; ' : '') + esc(p.line) + '</td></tr>';
     }).join('');
     none.hidden = list.length > 0;
     count.textContent = (list.length === all.length ? all.length : list.length + ' of ' + all.length) + ' players';
