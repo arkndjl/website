@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T01:04:05Z",
+ "asof": "2026-11-02T01:46:42Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.29,
   "peak": 114.8,
   "drawdown": 0.0828,
-  "open": 55.25,
+  "open": 58.0,
   "path": [
    101.5,
    101.6,
@@ -117,9 +117,9 @@
  },
  "record": {
   "n": 194,
-  "clvN": 104,
-  "clvRet": -0.0231,
-  "clvT": -2.86,
+  "clvN": 109,
+  "clvRet": -0.0248,
+  "clvT": -3.17,
   "clv": -0.07,
   "beat": 0.217,
   "settled": 104,
@@ -132,23 +132,23 @@
   "risked": 104.0,
   "yield": 0.0586
  },
- "tEff": -2.86,
+ "tEff": -3.17,
  "corr": {
   "rho": 0.0,
-  "n": 104,
+  "n": 109,
   "slates": 13,
-  "nEff": 104.0,
-  "avgSlate": 8.0
+  "nEff": 109.0,
+  "avgSlate": 8.38
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 104,
+   "value": 109,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.3% t -2.86",
+   "value": "-2.5% t -3.17",
    "pass": false
   },
   {
@@ -158,7 +158,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without cfb-spread: -2.4%",
+   "value": "without cfb-spread: -2.5%",
    "pass": false
   },
   {
@@ -321,7 +321,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 31,
+   "n": 30,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -405,10 +405,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 64,
-   "clvN": 58,
-   "clvRet": -0.0217,
-   "clvT": -1.65,
+   "n": 65,
+   "clvN": 63,
+   "clvRet": -0.0248,
+   "clvT": -2.0,
    "clv": null,
    "beat": null,
    "settled": 58,
@@ -462,7 +462,9 @@
    "edge": 32.8,
    "ev": 0.189,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0371,
+   "close": 19.5
   },
   {
    "rule": "nflprops-prop",
@@ -482,7 +484,9 @@
    "edge": 26.3,
    "ev": 0.1082,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0818,
+   "close": 12.5
   },
   {
    "rule": "nflprops-prop",
@@ -502,7 +506,9 @@
    "edge": 29.8,
    "ev": 0.1337,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1032,
+   "close": 28.5
   },
   {
    "rule": "nflprops-prop",
@@ -522,7 +528,9 @@
    "edge": 18.4,
    "ev": 0.0949,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0254,
+   "close": 43.5
   },
   {
    "rule": "nflprops-prop",
@@ -542,7 +550,9 @@
    "edge": 10.6,
    "ev": 0.009,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.1311,
+   "close": 4.5
   },
   {
    "rule": "nba-total",
@@ -767,7 +777,7 @@
    "ev": -0.0365,
    "event": null,
    "pass": true,
-   "close": 134.5
+   "close": 133.5
   },
   {
    "rule": "tennis-ml",
@@ -823,7 +833,7 @@
    "price": 133,
    "bet": "Aguilar ML +133",
    "placed": "2026-10-31T16:14:05Z",
-   "stake": 0.25,
+   "stake": 0.5,
    "edge": 10.7,
    "ev": 0.0214,
    "event": "Rolex Paris Masters",
@@ -1026,7 +1036,7 @@
    "price": -100.0,
    "bet": "under 160.5 -100",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 3.3,
    "ev": 0.0293,
    "event": null,
@@ -1052,7 +1062,7 @@
    "ev": 0.0196,
    "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 157.5
   },
   {
    "rule": "cbb-ml",
@@ -1068,7 +1078,7 @@
    "price": 108.0,
    "bet": "Cornell ML +108",
    "placed": "2026-11-01T12:42:33Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 7.1,
    "ev": 0.0334,
    "event": null,
@@ -1115,7 +1125,7 @@
    "ev": 0.0389,
    "event": null,
    "pass": true,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "rule": "cbb-total",
@@ -1131,7 +1141,7 @@
    "price": -108.0,
    "bet": "over 156.5 -108",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.5,
+   "stake": 0.75,
    "edge": 6.8,
    "ev": 0.0204,
    "event": null,
@@ -1299,7 +1309,7 @@
    "price": -113.0,
    "bet": "under 158.5 -113",
    "placed": "2026-11-01T16:28:33Z",
-   "stake": 0.5,
+   "stake": 0.75,
    "edge": 9.3,
    "ev": 0.0191,
    "event": null,
@@ -1425,7 +1435,7 @@
    "price": 104.0,
    "bet": "under 153.5 +104",
    "placed": "2026-11-01T12:42:33Z",
-   "stake": 1.25,
+   "stake": 1.5,
    "edge": 2.9,
    "ev": 0.0464,
    "event": null,
@@ -1530,7 +1540,7 @@
    "price": -104.0,
    "bet": "under 152.5 -104",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
+   "stake": 0.5,
    "edge": 4.0,
    "ev": 0.0155,
    "event": null,
@@ -1656,7 +1666,7 @@
    "price": -102.0,
    "bet": "Wisconsin -22.5 -102",
    "placed": "2026-11-01T14:59:51Z",
-   "stake": 0.5,
+   "stake": 0.75,
    "edge": 5.0,
    "ev": 0.0241,
    "event": null,
@@ -1719,7 +1729,7 @@
    "price": -100.0,
    "bet": "over 144.5 -100",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 1.25,
+   "stake": 1.5,
    "edge": 5.0,
    "ev": 0.044,
    "event": null,
@@ -1782,7 +1792,7 @@
    "price": -100.0,
    "bet": "under 46.5 -100",
    "placed": "2026-10-28T02:43:45Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 2.0,
    "ev": 0.0362,
    "event": null,
@@ -1803,7 +1813,7 @@
    "price": 133.0,
    "bet": "Tory Horton under 1.5 rec +133",
    "placed": "2026-10-31T11:16:00Z",
-   "stake": 0.25,
+   "stake": 0.5,
    "edge": 15.3,
    "ev": 0.3118,
    "event": null,
@@ -1843,7 +1853,7 @@
    "price": 102.0,
    "bet": "under 154.5 +102",
    "placed": "2026-11-01T23:26:23Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 2.4,
    "ev": 0.0317,
    "event": null,
@@ -2015,7 +2025,7 @@
    "edge": 3.7,
    "ev": 0.0036,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {
@@ -8107,7 +8117,9 @@
    "edge": 32.8,
    "ev": 0.189,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0371,
+   "close": 19.5
   },
   {
    "rule": "nflprops-prop",
@@ -8127,7 +8139,9 @@
    "edge": 26.3,
    "ev": 0.1082,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0818,
+   "close": 12.5
   },
   {
    "rule": "nflprops-prop",
@@ -8147,7 +8161,9 @@
    "edge": 29.8,
    "ev": 0.1337,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1032,
+   "close": 28.5
   },
   {
    "rule": "nflprops-prop",
@@ -8167,7 +8183,9 @@
    "edge": 18.4,
    "ev": 0.0949,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0254,
+   "close": 43.5
   },
   {
    "rule": "nflprops-prop",
@@ -8187,7 +8205,9 @@
    "edge": 10.6,
    "ev": 0.009,
    "event": null,
-   "pass": true
+   "pass": false,
+   "clvRet": -0.1311,
+   "close": 4.5
   },
   {
    "rule": "nba-total",
@@ -8412,7 +8432,7 @@
    "ev": -0.0365,
    "event": null,
    "pass": true,
-   "close": 134.5
+   "close": 133.5
   },
   {
    "rule": "tennis-ml",
@@ -8468,7 +8488,7 @@
    "price": 133,
    "bet": "Aguilar ML +133",
    "placed": "2026-10-31T16:14:05Z",
-   "stake": 0.25,
+   "stake": 0.5,
    "edge": 10.7,
    "ev": 0.0214,
    "event": "Rolex Paris Masters",
@@ -8671,7 +8691,7 @@
    "price": -100.0,
    "bet": "under 160.5 -100",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 3.3,
    "ev": 0.0293,
    "event": null,
@@ -8697,7 +8717,7 @@
    "ev": 0.0196,
    "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 157.5
   },
   {
    "rule": "cbb-ml",
@@ -8713,7 +8733,7 @@
    "price": 108.0,
    "bet": "Cornell ML +108",
    "placed": "2026-11-01T12:42:33Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 7.1,
    "ev": 0.0334,
    "event": null,
@@ -8760,7 +8780,7 @@
    "ev": 0.0389,
    "event": null,
    "pass": true,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "rule": "cbb-total",
@@ -8776,7 +8796,7 @@
    "price": -108.0,
    "bet": "over 156.5 -108",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.5,
+   "stake": 0.75,
    "edge": 6.8,
    "ev": 0.0204,
    "event": null,
@@ -8944,7 +8964,7 @@
    "price": -113.0,
    "bet": "under 158.5 -113",
    "placed": "2026-11-01T16:28:33Z",
-   "stake": 0.5,
+   "stake": 0.75,
    "edge": 9.3,
    "ev": 0.0191,
    "event": null,
@@ -9070,7 +9090,7 @@
    "price": 104.0,
    "bet": "under 153.5 +104",
    "placed": "2026-11-01T12:42:33Z",
-   "stake": 1.25,
+   "stake": 1.5,
    "edge": 2.9,
    "ev": 0.0464,
    "event": null,
@@ -9175,7 +9195,7 @@
    "price": -104.0,
    "bet": "under 152.5 -104",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
+   "stake": 0.5,
    "edge": 4.0,
    "ev": 0.0155,
    "event": null,
@@ -9301,7 +9321,7 @@
    "price": -102.0,
    "bet": "Wisconsin -22.5 -102",
    "placed": "2026-11-01T14:59:51Z",
-   "stake": 0.5,
+   "stake": 0.75,
    "edge": 5.0,
    "ev": 0.0241,
    "event": null,
@@ -9364,7 +9384,7 @@
    "price": -100.0,
    "bet": "over 144.5 -100",
    "placed": "2026-11-01T22:39:07Z",
-   "stake": 1.25,
+   "stake": 1.5,
    "edge": 5.0,
    "ev": 0.044,
    "event": null,
@@ -9427,7 +9447,7 @@
    "price": -100.0,
    "bet": "under 46.5 -100",
    "placed": "2026-10-28T02:43:45Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 2.0,
    "ev": 0.0362,
    "event": null,
@@ -9448,7 +9468,7 @@
    "price": 133.0,
    "bet": "Tory Horton under 1.5 rec +133",
    "placed": "2026-10-31T11:16:00Z",
-   "stake": 0.25,
+   "stake": 0.5,
    "edge": 15.3,
    "ev": 0.3118,
    "event": null,
@@ -9488,7 +9508,7 @@
    "price": 102.0,
    "bet": "under 154.5 +102",
    "placed": "2026-11-01T23:26:23Z",
-   "stake": 0.75,
+   "stake": 1.0,
    "edge": 2.4,
    "ev": 0.0317,
    "event": null,
@@ -9660,7 +9680,7 @@
    "edge": 3.7,
    "ev": 0.0036,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 155.5
   },
   {

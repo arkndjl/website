@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-02T01:03:58Z",
+ "asof": "2026-11-02T01:46:35Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -98,14 +98,7 @@
    "flagged": "2026-10-28T14:33:19Z",
    "betTo": 41.0,
    "close": 40.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 40.5,
-    "price": -102.0,
-    "ev": 0.051,
-    "units": 2.75
-   }
+   "now": null
   },
   {
    "id": "2026_08_CHI_SEA",
@@ -120,7 +113,7 @@
    "price": -100.0,
    "p": 0.529,
    "ev": 0.058,
-   "units": 0.75,
+   "units": 1.0,
    "edge": 2.0,
    "x": 1.5,
    "pDU": 0.5181,
@@ -141,24 +134,12 @@
     "unitsCap": 0.5
    },
    "unitsRaw": 3.0,
-   "unitsCap": 0.75
+   "unitsCap": 1.0
   }
  ],
  "withdrawn": [],
  "board": [],
  "games": {
-  "2026_08_PHI_WAS": {
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -102.0,
-   "ev": 0.051,
-   "edge": 2.1,
-   "units": 2.75,
-   "home": "WAS",
-   "away": "PHI",
-   "state": "pick"
-  },
   "2026_08_CHI_SEA": {
    "mk": "total",
    "side": "under",
@@ -224,7 +205,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1165,
+  "snapshots": 1166,
   "buckets": [
    {
     "when": "24h+",
@@ -721,7 +702,7 @@
    "price": -100.0,
    "p": 0.529,
    "ev": 0.058,
-   "units": 0.75,
+   "units": 1.0,
    "edge": 2.0,
    "x": 1.5,
    "pDU": 0.5181,
@@ -732,7 +713,7 @@
    "betTo": 46.0,
    "close": 46.5,
    "unitsRaw": 3.0,
-   "unitsCap": 0.75
+   "unitsCap": 1.0
   },
   {
    "id": "2026_08_PHI_WAS",
@@ -931,16 +912,12 @@
  "nightCap": {
   "cap": 40.0,
   "nights": {
-   "2026-11-01": {
-    "raw": 6.75,
-    "scale": 1.0
-   },
    "2026-11-02": {
-    "raw": 123.25,
-    "scale": 0.3245
+    "raw": 119.5,
+    "scale": 0.3347
    },
    "2026-11-03": {
-    "raw": 6.25,
+    "raw": 6.5,
     "scale": 1.0
    },
    "2026-11-05": {
