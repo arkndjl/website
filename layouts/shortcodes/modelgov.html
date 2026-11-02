@@ -14,7 +14,6 @@
   </div>
   <div class="cfbm__body">
   {{- if eq $view "pipeline" }}{{ $F := site.Data.freshness }}
-    <p>Every product the site shows, with the time it last updated and how old it may get before it counts as stale (in season; out of season each gets at least the sport's off-season limit). A stale feed, a failed run or a site build that stops deploying opens an alert and re-runs the refresh.</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Section</th><th>Feed</th><th>Updated</th><th title="hours before it counts as stale, in season">Limit</th><th>Workflow</th></tr></thead>
       <tbody>
@@ -24,7 +23,6 @@
       </tbody>
     </table></div>
     {{- with site.Data.refits }}
-    <p>Model refits: each model refits on the data to date in its season months (same inputs and selection rules, more games), kept only if the fit runs clean and writes valid files; the pick rules rerun on the new fits.</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Model</th><th>Sport</th><th title="months it refits in">Months</th><th title="days between refits">Every</th><th>Last</th><th>Status</th></tr></thead>
       <tbody>{{ range $n, $j := .jobs }}
@@ -33,7 +31,6 @@
     </table></div>
     {{- end }}
   {{- else if eq $view "ledger" }}{{ with site.Data.model_ledger }}{{ $L := . }}
-    <p>Every input the models ship, scored the same way: each term is taken out of the full model and both splits re-scored (or read from its own backtest's stored t where the data can't be rebuilt here). Evidence is the Stouffer z of the tuning and held-out t, and the false-discovery control runs over all {{ .family }} terms at once. <b>keep</b> q ≤ {{ .qKeep }} · <b>watch</b> not proven but held out is worse without it · <b>drop</b> not proven and free to remove. Each model is re-tested within a year of its test.</p>
     <p class="cfb__dim">{{ .counts.keep }} keep · {{ .counts.watch }} watch · {{ .counts.drop }} drop{{ with .counts.core }} · {{ . }} core{{ end }} · scored {{ .asof }}</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Model</th><th title="keep / watch / drop">Terms</th><th>Loss</th><th>Split</th><th title="tested, and re-test by (a year later)">Tested</th></tr></thead>
@@ -57,7 +54,6 @@
     {{- end }}
   {{- end }}
   {{- else }}{{ $M := site.Data.model_monitor }}
-    <p>Each game model's season so far, scored game by game against what its own walk-forward backtest lost in the same calendar month over its last five seasons (abs margin error; log loss for NHL and soccer). The test is the one the pick rules use: once 50 games are scored, an alarm when the last 300 are worth clustered t below -1 or the CUSUM on z = (expected - loss) / sd passes 10. An alarm means look at the model; nothing switches off.</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Model</th><th>Games</th><th title="the model's mean loss this season">Loss</th><th title="what the walk-forward lost on the same months">Expected</th><th title="mean |result - line| at our logged line (margin models)">Line</th><th title="last 300 games, clustered by game day (negative = worse than the backtest)">t</th><th title="CUSUM now / alarm at">CUSUM</th><th>Status</th></tr></thead>
       <tbody>

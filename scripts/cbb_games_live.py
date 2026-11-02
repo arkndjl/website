@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The daily build of the college basketball game model (python3 scripts/cbb_games.py, run by .github/workflows/cbb-board.yml):
-data/cbb_games.json (the next two slates, power ratings, season odds) and data/cbb_picks.json.
+data/cbb_games.json (the next two slates, power ratings, season odds).
 
 This season's games and lines are kept in scripts/data/cbb_games_<season>.json.gz (committed): each run re-reads ESPN's
 scoreboard for every date of the season (schedule, scores), refreshes the lines of games in the next two days (ESPN's
@@ -634,5 +634,3 @@ def build():
         with open(C.OUT, 'w') as f:
             json.dump(res, f, separators=(',', ':'))
         print(f'cbb games: {len(out_games)} games on {sorted(show)}, {len(power)} teams rated, {len(left)} games simulated')
-    import cbb_picks
-    cbb_picks.live(rows, proj, sd)

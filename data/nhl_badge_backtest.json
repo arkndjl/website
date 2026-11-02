@@ -169,6 +169,101 @@
      "oosGain": 0.062,
      "pass": false,
      "why": "negative sign"
+    },
+    "pkill": {
+     "name": "Penalty Killer",
+     "pairs": 6663,
+     "r": 0.784,
+     "volN": 64.653,
+     "k": 17.775,
+     "n": 7561,
+     "players": 1394,
+     "coef": -0.093,
+     "t": -6.21,
+     "oosGain": 0.332,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "pkstop": {
+     "name": "PK Stopper",
+     "pairs": 2385,
+     "r": 0.237,
+     "volN": 119.872,
+     "k": 386.87,
+     "n": 3108,
+     "players": 732,
+     "coef": -0.057,
+     "t": -2.81,
+     "oosGain": 0.113,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "ppunit": {
+     "name": "Power Play Unit",
+     "pairs": 6663,
+     "r": 0.875,
+     "volN": 64.653,
+     "k": 9.218,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.272,
+     "t": 10.58,
+     "oosGain": 1.38,
+     "pass": true
+    },
+    "drawer": {
+     "name": "Penalty Drawer",
+     "pairs": 6663,
+     "r": 0.44,
+     "volN": 1009.82,
+     "k": 1284.51,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.137,
+     "t": 8.54,
+     "oosGain": 0.741,
+     "pass": true
+    },
+    "netfront": {
+     "name": "Net Front",
+     "pairs": 6663,
+     "r": 0.492,
+     "volN": 1009.82,
+     "k": 1042.578,
+     "n": 7561,
+     "players": 1394,
+     "coef": 0.098,
+     "t": 5.74,
+     "oosGain": 0.335,
+     "pass": true
+    },
+    "shutdown": {
+     "name": "Shutdown",
+     "pairs": 6150,
+     "r": 0.8,
+     "volN": 387.379,
+     "k": 96.695,
+     "n": 6984,
+     "players": 1267,
+     "coef": -0.151,
+     "t": -8.74,
+     "oosGain": 0.734,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "faceoffsp": {
+     "name": "Faceoff Specialist",
+     "pairs": 6663,
+     "r": 0.744,
+     "volN": 64.653,
+     "k": 22.273,
+     "n": 7561,
+     "players": 1394,
+     "coef": -0.02,
+     "t": -0.97,
+     "oosGain": -0.023,
+     "pass": false,
+     "why": "t under 2"
     }
    },
    "joint": {
@@ -176,127 +271,227 @@
     "rounds": [
      {
       "scorer": {
-       "coef": 0.078,
-       "t": 2.38,
-       "oosGain": 0.047,
-       "ship": true
+       "coef": 0.028,
+       "t": 0.81,
+       "oosGain": -0.007,
+       "ship": false
       },
       "shooter": {
-       "coef": 0.135,
-       "t": 5.07,
-       "oosGain": 0.3,
+       "coef": 0.06,
+       "t": 2.03,
+       "oosGain": 0.029,
        "ship": true
       },
       "chances": {
-       "coef": 0.055,
-       "t": 1.6,
-       "oosGain": 0.015,
-       "ship": false
+       "coef": 0.194,
+       "t": 3.65,
+       "oosGain": 0.113,
+       "ship": true
       },
       "playmaker": {
-       "coef": 0.086,
-       "t": 3.45,
-       "oosGain": 0.08,
+       "coef": 0.059,
+       "t": 2.36,
+       "oosGain": 0.021,
        "ship": true
       },
       "driver": {
-       "coef": 0.075,
-       "t": 2.7,
-       "oosGain": 0.053,
+       "coef": 0.07,
+       "t": 2.46,
+       "oosGain": 0.039,
        "ship": true
       },
       "pp": {
-       "coef": 0.042,
-       "t": 1.71,
-       "oosGain": 0.029,
-       "ship": false
+       "coef": 0.064,
+       "t": 2.6,
+       "oosGain": 0.084,
+       "ship": true
       },
       "takeaway": {
-       "coef": 0.143,
-       "t": 9.1,
-       "oosGain": 0.811,
+       "coef": 0.142,
+       "t": 9.17,
+       "oosGain": 0.786,
        "ship": true
+      },
+      "ppunit": {
+       "coef": 0.182,
+       "t": 6.04,
+       "oosGain": 0.441,
+       "ship": true
+      },
+      "drawer": {
+       "coef": 0.106,
+       "t": 6.51,
+       "oosGain": 0.414,
+       "ship": true
+      },
+      "netfront": {
+       "coef": -0.128,
+       "t": -3.89,
+       "oosGain": 0.119,
+       "ship": false
       }
      },
      {
       "scorer": {
+       "coef": 0.037,
+       "t": 1.06,
+       "oosGain": -0.002,
+       "ship": false
+      },
+      "shooter": {
+       "coef": 0.113,
+       "t": 4.31,
+       "oosGain": 0.205,
+       "ship": true
+      },
+      "chances": {
+       "coef": 0.036,
+       "t": 1.02,
+       "oosGain": 0.001,
+       "ship": false
+      },
+      "playmaker": {
+       "coef": 0.061,
+       "t": 2.42,
+       "oosGain": 0.024,
+       "ship": true
+      },
+      "driver": {
+       "coef": 0.069,
+       "t": 2.44,
+       "oosGain": 0.039,
+       "ship": true
+      },
+      "pp": {
+       "coef": 0.064,
+       "t": 2.6,
+       "oosGain": 0.085,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.14,
+       "t": 9.05,
+       "oosGain": 0.762,
+       "ship": true
+      },
+      "ppunit": {
+       "coef": 0.184,
+       "t": 6.11,
+       "oosGain": 0.453,
+       "ship": true
+      },
+      "drawer": {
        "coef": 0.11,
-       "t": 3.96,
-       "oosGain": 0.166,
-       "ship": true
-      },
-      "shooter": {
-       "coef": 0.153,
-       "t": 6.88,
-       "oosGain": 0.501,
-       "ship": true
-      },
-      "playmaker": {
-       "coef": 0.076,
-       "t": 3.06,
-       "oosGain": 0.059,
-       "ship": true
-      },
-      "driver": {
-       "coef": 0.098,
-       "t": 3.96,
-       "oosGain": 0.132,
-       "ship": true
-      },
-      "pp": {
-       "coef": 0.045,
-       "t": 1.81,
-       "oosGain": 0.034,
-       "ship": false
-      },
-      "takeaway": {
-       "coef": 0.144,
-       "t": 9.14,
-       "oosGain": 0.821,
+       "t": 6.74,
+       "oosGain": 0.445,
        "ship": true
       }
      },
      {
       "scorer": {
-       "coef": 0.118,
-       "t": 4.25,
-       "oosGain": 0.199,
-       "ship": true
+       "coef": 0.059,
+       "t": 1.95,
+       "oosGain": 0.025,
+       "ship": false
       },
       "shooter": {
-       "coef": 0.153,
-       "t": 6.85,
-       "oosGain": 0.5,
+       "coef": 0.124,
+       "t": 5.7,
+       "oosGain": 0.319,
        "ship": true
       },
       "playmaker": {
-       "coef": 0.094,
-       "t": 3.7,
-       "oosGain": 0.127,
+       "coef": 0.054,
+       "t": 2.15,
+       "oosGain": 0.014,
        "ship": true
       },
       "driver": {
-       "coef": 0.087,
-       "t": 3.77,
-       "oosGain": 0.102,
+       "coef": 0.085,
+       "t": 3.32,
+       "oosGain": 0.085,
+       "ship": true
+      },
+      "pp": {
+       "coef": 0.066,
+       "t": 2.67,
+       "oosGain": 0.09,
        "ship": true
       },
       "takeaway": {
-       "coef": 0.144,
-       "t": 9.1,
-       "oosGain": 0.819,
+       "coef": 0.14,
+       "t": 9.06,
+       "oosGain": 0.765,
+       "ship": true
+      },
+      "ppunit": {
+       "coef": 0.183,
+       "t": 6.1,
+       "oosGain": 0.45,
+       "ship": true
+      },
+      "drawer": {
+       "coef": 0.112,
+       "t": 6.88,
+       "oosGain": 0.465,
+       "ship": true
+      }
+     },
+     {
+      "shooter": {
+       "coef": 0.145,
+       "t": 7.38,
+       "oosGain": 0.567,
+       "ship": true
+      },
+      "playmaker": {
+       "coef": 0.058,
+       "t": 2.31,
+       "oosGain": 0.022,
+       "ship": true
+      },
+      "driver": {
+       "coef": 0.074,
+       "t": 2.96,
+       "oosGain": 0.062,
+       "ship": true
+      },
+      "pp": {
+       "coef": 0.073,
+       "t": 2.98,
+       "oosGain": 0.118,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.141,
+       "t": 9.07,
+       "oosGain": 0.766,
+       "ship": true
+      },
+      "ppunit": {
+       "coef": 0.205,
+       "t": 7.52,
+       "oosGain": 0.668,
+       "ship": true
+      },
+      "drawer": {
+       "coef": 0.107,
+       "t": 6.55,
+       "oosGain": 0.436,
        "ship": true
       }
      }
     ],
     "ship": [
-     "scorer",
      "shooter",
      "playmaker",
      "driver",
-     "takeaway"
+     "pp",
+     "takeaway",
+     "ppunit",
+     "drawer"
     ],
-    "oosGainAll": 3.037
+    "oosGainAll": 4.028
    }
   },
   "D": {
@@ -443,6 +638,87 @@
      "oosGain": 0.148,
      "pass": false,
      "why": "negative sign"
+    },
+    "pkill": {
+     "name": "Penalty Killer",
+     "pairs": 3660,
+     "r": 0.725,
+     "volN": 61.227,
+     "k": 23.208,
+     "n": 4172,
+     "players": 782,
+     "coef": -0.078,
+     "t": -3.87,
+     "oosGain": 0.32,
+     "pass": false,
+     "why": "negative sign"
+    },
+    "pkstop": {
+     "name": "PK Stopper",
+     "pairs": 2252,
+     "r": 0.188,
+     "volN": 147.72,
+     "k": 639.364,
+     "n": 2679,
+     "players": 532,
+     "coef": 0.011,
+     "t": 0.47,
+     "oosGain": -0.086,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "ppunit": {
+     "name": "Power Play Unit",
+     "pairs": 3660,
+     "r": 0.887,
+     "volN": 61.227,
+     "k": 7.806,
+     "n": 4172,
+     "players": 782,
+     "coef": 0.162,
+     "t": 5.81,
+     "oosGain": 0.882,
+     "pass": true
+    },
+    "drawer": {
+     "name": "Penalty Drawer",
+     "pairs": 3661,
+     "r": 0.416,
+     "volN": 1228.799,
+     "k": 1724.143,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.073,
+     "t": 4.14,
+     "oosGain": 0.325,
+     "pass": true
+    },
+    "netfront": {
+     "name": "Net Front",
+     "pairs": 3661,
+     "r": 0.4,
+     "volN": 1228.799,
+     "k": 1841.443,
+     "n": 4173,
+     "players": 783,
+     "coef": 0.136,
+     "t": 6.96,
+     "oosGain": 1.02,
+     "pass": true
+    },
+    "shutdown": {
+     "name": "Shutdown",
+     "pairs": 3333,
+     "r": 0.734,
+     "volN": 410.194,
+     "k": 148.437,
+     "n": 3822,
+     "players": 718,
+     "coef": -0.105,
+     "t": -4.99,
+     "oosGain": 0.565,
+     "pass": false,
+     "why": "negative sign"
     }
    },
    "joint": {
@@ -450,127 +726,233 @@
     "rounds": [
      {
       "scorer": {
-       "coef": -0.036,
-       "t": -1.19,
-       "oosGain": -0.006,
+       "coef": -0.04,
+       "t": -1.33,
+       "oosGain": 0.003,
        "ship": false
       },
       "shooter": {
-       "coef": -0.027,
-       "t": -0.78,
-       "oosGain": -0.012,
+       "coef": -0.003,
+       "t": -0.08,
+       "oosGain": -0.025,
        "ship": false
       },
       "chances": {
-       "coef": 0.191,
-       "t": 4.89,
-       "oosGain": 0.549,
-       "ship": true
+       "coef": 0.1,
+       "t": 1.71,
+       "oosGain": 0.035,
+       "ship": false
       },
       "playmaker": {
-       "coef": 0.008,
-       "t": 0.33,
-       "oosGain": -0.047,
+       "coef": -0.012,
+       "t": -0.44,
+       "oosGain": -0.048,
        "ship": false
       },
       "suppress": {
        "coef": 0.125,
-       "t": 6.08,
-       "oosGain": 0.658,
+       "t": 5.88,
+       "oosGain": 0.645,
        "ship": true
       },
       "takeaway": {
-       "coef": 0.109,
-       "t": 4.52,
-       "oosGain": 0.714,
+       "coef": 0.107,
+       "t": 4.38,
+       "oosGain": 0.667,
        "ship": true
+      },
+      "ppunit": {
+       "coef": 0.074,
+       "t": 2.11,
+       "oosGain": 0.067,
+       "ship": true
+      },
+      "drawer": {
+       "coef": 0.055,
+       "t": 3.13,
+       "oosGain": 0.158,
+       "ship": true
+      },
+      "netfront": {
+       "coef": 0.055,
+       "t": 1.57,
+       "oosGain": 0.016,
+       "ship": false
       }
      },
      {
       "shooter": {
-       "coef": -0.029,
-       "t": -0.84,
-       "oosGain": -0.01,
+       "coef": -0.004,
+       "t": -0.1,
+       "oosGain": -0.025,
        "ship": false
       },
       "chances": {
-       "coef": 0.168,
-       "t": 5.13,
-       "oosGain": 0.547,
-       "ship": true
+       "coef": 0.076,
+       "t": 1.37,
+       "oosGain": 0.009,
+       "ship": false
       },
       "playmaker": {
-       "coef": 0.006,
-       "t": 0.22,
-       "oosGain": -0.046,
+       "coef": -0.013,
+       "t": -0.51,
+       "oosGain": -0.045,
+       "ship": false
+      },
+      "suppress": {
+       "coef": 0.132,
+       "t": 6.4,
+       "oosGain": 0.754,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.106,
+       "t": 4.34,
+       "oosGain": 0.657,
+       "ship": true
+      },
+      "ppunit": {
+       "coef": 0.066,
+       "t": 1.92,
+       "oosGain": 0.044,
+       "ship": false
+      },
+      "drawer": {
+       "coef": 0.058,
+       "t": 3.31,
+       "oosGain": 0.177,
+       "ship": true
+      },
+      "netfront": {
+       "coef": 0.056,
+       "t": 1.6,
+       "oosGain": 0.019,
+       "ship": false
+      }
+     },
+     {
+      "shooter": {
+       "coef": -0.006,
+       "t": -0.15,
+       "oosGain": -0.025,
+       "ship": false
+      },
+      "chances": {
+       "coef": 0.075,
+       "t": 1.37,
+       "oosGain": 0.008,
        "ship": false
       },
       "suppress": {
        "coef": 0.131,
-       "t": 6.45,
+       "t": 6.36,
+       "oosGain": 0.747,
+       "ship": true
+      },
+      "takeaway": {
+       "coef": 0.106,
+       "t": 4.32,
+       "oosGain": 0.654,
+       "ship": true
+      },
+      "ppunit": {
+       "coef": 0.063,
+       "t": 1.88,
+       "oosGain": 0.042,
+       "ship": false
+      },
+      "drawer": {
+       "coef": 0.057,
+       "t": 3.29,
+       "oosGain": 0.175,
+       "ship": true
+      },
+      "netfront": {
+       "coef": 0.055,
+       "t": 1.6,
+       "oosGain": 0.019,
+       "ship": false
+      }
+     },
+     {
+      "chances": {
+       "coef": 0.069,
+       "t": 1.73,
+       "oosGain": 0.033,
+       "ship": false
+      },
+      "suppress": {
+       "coef": 0.131,
+       "t": 6.36,
        "oosGain": 0.749,
        "ship": true
       },
       "takeaway": {
-       "coef": 0.109,
-       "t": 4.5,
-       "oosGain": 0.712,
-       "ship": true
-      }
-     },
-     {
-      "chances": {
-       "coef": 0.147,
-       "t": 5.78,
-       "oosGain": 0.881,
+       "coef": 0.106,
+       "t": 4.32,
+       "oosGain": 0.651,
        "ship": true
       },
-      "playmaker": {
-       "coef": 0.002,
-       "t": 0.07,
-       "oosGain": -0.049,
+      "ppunit": {
+       "coef": 0.062,
+       "t": 1.88,
+       "oosGain": 0.04,
        "ship": false
       },
-      "suppress": {
-       "coef": 0.131,
-       "t": 6.45,
-       "oosGain": 0.751,
+      "drawer": {
+       "coef": 0.058,
+       "t": 3.24,
+       "oosGain": 0.179,
        "ship": true
       },
-      "takeaway": {
-       "coef": 0.109,
-       "t": 4.5,
-       "oosGain": 0.707,
-       "ship": true
+      "netfront": {
+       "coef": 0.058,
+       "t": 1.92,
+       "oosGain": 0.035,
+       "ship": false
       }
      },
      {
-      "chances": {
-       "coef": 0.147,
-       "t": 6.21,
-       "oosGain": 1.008,
-       "ship": true
-      },
       "suppress": {
-       "coef": 0.131,
-       "t": 6.45,
-       "oosGain": 0.748,
+       "coef": 0.129,
+       "t": 6.21,
+       "oosGain": 0.718,
        "ship": true
       },
       "takeaway": {
-       "coef": 0.109,
-       "t": 4.49,
-       "oosGain": 0.712,
+       "coef": 0.112,
+       "t": 4.77,
+       "oosGain": 0.767,
+       "ship": true
+      },
+      "ppunit": {
+       "coef": 0.086,
+       "t": 2.95,
+       "oosGain": 0.185,
+       "ship": true
+      },
+      "drawer": {
+       "coef": 0.056,
+       "t": 3.09,
+       "oosGain": 0.162,
+       "ship": true
+      },
+      "netfront": {
+       "coef": 0.1,
+       "t": 4.56,
+       "oosGain": 0.422,
        "ship": true
       }
      }
     ],
     "ship": [
-     "chances",
      "suppress",
-     "takeaway"
+     "takeaway",
+     "ppunit",
+     "drawer",
+     "netfront"
     ],
-    "oosGainAll": 2.977
+    "oosGainAll": 3.234
    }
   },
   "G": {
@@ -623,6 +1005,20 @@
      "coef": 0.07,
      "t": 0.9,
      "oosGain": -0.048,
+     "pass": false,
+     "why": "t under 2"
+    },
+    "workhorse": {
+     "name": "Workhorse",
+     "pairs": 968,
+     "r": 0.5,
+     "volN": 82.0,
+     "k": 81.84,
+     "n": 1118,
+     "players": 206,
+     "coef": 0.126,
+     "t": 0.97,
+     "oosGain": -0.042,
      "pass": false,
      "why": "t under 2"
     }

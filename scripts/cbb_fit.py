@@ -232,6 +232,32 @@ def expected(P):
     return FLOOR + 10 * P[:, 0] + 10 * P[:, 1] + 10 * P[:, 2] + (TOP_MEAN - 50) * P[:, 3]
 
 
+def ladder_parts(W, top, z, steps=32):
+    """each driver's share of E[FV] over the average player (every z at 0), adding up exactly to E[FV](z) - E[FV](0):
+    integrated gradients on the straight path 0 -> z (midpoint rule, exact gradient of the ladder), the tiny remainder
+    spread by size. Drop-one shares (E minus E with that driver at its mean) don't add up: at the top of the board they
+    summed to about twice the move (FV inputs audit, Nov 2 2026). W: the rung weight vectors [bias, w...]."""
+    z = np.asarray(z, float)
+    Wm = np.array([np.asarray(w, float) for w in W])               # rungs x (1 + drivers)
+    t = (np.arange(steps) + 0.5) / steps
+    Z = t[:, None] * z[None, :]
+    A = np.clip(Wm[:, 0][None, :] + Z @ Wm[:, 1:].T, -30, 30)       # steps x rungs
+    c = 1 / (1 + np.exp(-A)); P = np.cumprod(c, axis=1)
+    coef = np.array([10.0, 10.0, 10.0, top - 50.0])
+    # dE/dz = sum_k coef_k dP_k/dz, dP_k/dz = P_k sum_{j<=k} (1 - c_j) w_j
+    S = np.cumsum((1 - c)[:, :, None] * Wm[None, :, 1:], axis=1)    # steps x rungs x drivers
+    g = ((coef[None, :] * P)[:, :, None] * S).sum(1).mean(0)
+    parts = g * z
+
+    def ev(zz):
+        cs = 1 / (1 + np.exp(-np.clip(Wm[:, 0] + Wm[:, 1:] @ zz, -30, 30))); ps = np.cumprod(cs)
+        return FLOOR + coef @ ps
+    rem = ev(z) - ev(np.zeros_like(z)) - parts.sum()
+    a = np.abs(parts)
+    if a.sum() > 0: parts = parts + rem * a / a.sum()
+    return parts
+
+
 def predict(model, X):
     """P(NBA) = P(FV >= 30), the cumulative rung probabilities, and E[FV]."""
     Z = model['std'](X[:, model['idx']])

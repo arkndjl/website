@@ -38,7 +38,7 @@ import { runModel, slimDrives, sitByGame, fitBeta, HIST_FIT } from './cfb_model.
 import { liveInput, espnPlays, espnQbPpa } from './cfb_espn_md.mjs';
 import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
 import { writeComps } from './cfb_comps.mjs';
-import { assignBadges, archetypeOf, regressedZ, badgeSnaps } from './cfb_badges.mjs';
+import { assignBadges, archetypeOf, regressedZ, badgeSnaps, TIERS as BADGE_TIERS } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
 import { writeRecruits } from './cfb_recruit.mjs';
@@ -1484,6 +1484,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // fvx: the unrounded grade, carried through every adjustment below; it breaks ties within a displayed FV
       p.fvx = Math.max(20, Math.min(80, p.fvBase + p.frameFV + p.yearsFV));
       p.fv = Math.round(p.fvx);
+      // the grade's steps for the FV inputs dropdown (fvSteps at write: + the 20-80 limits, mean outcome, returns)
+      p.fvs = [['g', p.fvBase], ['fr', p.frameFV], ['yr', p.yearsFV]];
       p.posRank = i + 1;
     });
   }
@@ -1500,7 +1502,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const n = Object.keys(c.ranks || {}).length, w = CONS_W * Math.sqrt(Math.min(n, CONS_BOARDS) / CONS_BOARDS), cf = consFV(c.avg);
     p.cons = { rank: c.rank, avg: c.avg, med: c.med ?? null, n, fv: Math.round(cf) };
     p.fvModel = p.fv; p.consAdj = Math.round((cf - p.fv) * w * 10) / 10;
+    const fv0 = p.fvx;
     p.fvx = Math.max(20, Math.min(80, p.fvx + (cf - p.fvx) * w));
+    p.fvs?.push(['cs', Math.round((p.fvx - fv0) * 100) / 100]);
     p.fv = Math.round(p.fvx);       // from the exact grade, not the rounded one (55.46 showed 56, 54.32 showed 55)
   }
   // health (data/cfb_injuries.json): out for the season costs FV_HEALTH
@@ -1509,7 +1513,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.inj = i?.status || null; p.healthFV = 0;
     if (p.fv != null && i && /season/i.test(i.status)) {
       p.healthFV = /acl|achilles|reconstruct|torn/i.test(i.detail || '') ? FV_HEALTH.major : FV_HEALTH.season;
+      const fv0 = p.fvx;
       p.fv = Math.max(20, p.fv + p.healthFV); p.fvx = Math.max(20, p.fvx + p.healthFV);
+      p.fvs?.push(['hl', Math.round((p.fvx - fv0) * 100) / 100]);
     }
   }
   // riser: a draft-eligible prospect the model grades well above the consensus boards (RISER.gap FV over
@@ -1731,9 +1737,21 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         const retY = (kry / (kr + S.k.kr) * kr + pry / (pr + S.k.pr) * pr) / (S.gamesPerSeason * seasons);
         const c = Math.max(S.clip[0], Math.min(S.clip[1], retY));
         const d = fvOfAv(avAt(p.fvx) + S.beta * c) - p.fvx;
+        p.retY = Math.round(retY * 100) / 100; p.retN = kr + pr;
         if (!isFinite(d) || Math.abs(d) < 0.05) continue;
-        p.retFV = Math.round(d * 100) / 100; p.retY = Math.round(retY * 100) / 100; p.retN = kr + pr;
+        p.retFV = Math.round(d * 100) / 100;
         p.fvx = Math.max(20, Math.min(80, p.fvx + d)); p.fv = Math.round(p.fvx);
+      }
+      // Returner badge (Nov 2 2026): the tier of the same career return yards over expected that feeds FV above
+      // (RB / WR, 10+ returns), so the badge shows the tested driver, not a second term
+      const pool = players.filter(p => S.pos.includes(p.g) && p.retY != null && p.retN >= 10);
+      const srt = pool.map(p => p.retY).sort((a, b) => a - b);
+      if (srt.length >= 20) for (const p of pool) {
+        const pc = (srt.filter(v => v < p.retY).length + 0.5 * srt.filter(v => v === p.retY).length) / srt.length;
+        const t = BADGE_TIERS.find(([, q]) => pc >= q);
+        if (!t) continue;
+        p.badges = (p.badges || []).concat([{ k: 'ret', name: 'Returner', tier: t[0], pct: Math.round(100 * pc), v: p.retY, stat: 'career return yards over expected a team game' }]);
+        p.badges.sort((a, b) => ({ platinum: 4, gold: 3, silver: 2, bronze: 1 })[b.tier] - ({ platinum: 4, gold: 3, silver: 2, bronze: 1 })[a.tier] || b.pct - a.pct);
       }
     }
   }
@@ -1777,7 +1795,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
       parts: [p.talentTerm, p.prodW * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj + p.oeZ, p.frameFV / 10].map(r2),
-      fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV,
+      fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV, fvs: p.fvs ?? null, retFV: p.retFV ?? null,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
       bmi: p.bmi ? r1(p.bmi) : null,
@@ -2452,7 +2470,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk', 'fvs'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
@@ -2498,13 +2516,29 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
-  const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : c === 'fv' && r.fv != null ? fvOf('cfb', r.fvx, r.fv) : r[c] ?? null;
+  const val = (r, c) => c === 'fvs' ? fvSteps(r) : c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : c === 'fv' && r.fv != null ? fvOf('cfb', r.fvx, r.fv) : r[c] ?? null;
   // two files (scripts/cfb_all.mjs): the table's columns in cfb-all.json, the scouting report's in cfb-detail.json
   const size = writeCfbAll({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) }, ROOT);
   writeComps(rows.filter(r => r._comp).map(r => ({ key: `${r.name}|${r.team}`, ...r._comp })), COMPS_OUT);
   // Cloudflare Pages refuses any one file over 25 MiB, and the whole deploy with it
   for (const [k, b] of Object.entries(size)) { const mib = b / 2 ** 20;
     if (mib > 23) console.log(`cfb-${k}: WARNING ${mib.toFixed(1)} MiB, Cloudflare's per-file limit is 25 MiB`); } };
+// the FV inputs dropdown's steps (assets/js/cfb.js): [key, FV] from the first grade to the unrounded headline fvx, in
+// the order the build applies them: g scarcity grade of the composite, fr NFL frame, yr years in college, cs consensus
+// boards, hl out for the season, kp specialist grade (K/P), b/ac/pd ESPN-backup parts, cl the 20-80 limits (whatever
+// the steps above don't account for), mn mean outcome (grade fvg -> mean of its FV distribution), rt return production
+// (after the mean). They sum to fvx; the page adds the headline scale (fvOf stretch + rounding). A carried row keeps
+// the steps it was written with
+function fvSteps(r) {
+  const s = r.fvs; if (!s || r.fvx == null) return null;
+  if (s.some(x => x[0] === 'mn' || x[0] === 'rt' || x[0] === 'cl')) return s;
+  const r2 = x => Math.round(x * 100) / 100, out = s.filter(x => x[1]).map(x => [x[0], r2(x[1])]);
+  const pre = r.fvg ?? r.fvx - (r.retFV || 0), sum = out.reduce((a, x) => a + x[1], 0);
+  if (Math.abs(pre - sum) >= 0.01) out.push(['cl', r2(pre - sum)]);
+  if (r.fvg != null && Math.abs(r.fvx - (r.retFV || 0) - r.fvg) >= 0.01) out.push(['mn', r2(r.fvx - (r.retFV || 0) - r.fvg)]);
+  if (r.retFV) out.push(['rt', r.retFV]);
+  return out;
+}
 // photo: 1 when it is ESPN's standard headshot for the player's ESPN id (espnl), which the readers rebuild
 // (layouts/partials/cfbjs.html, scripts/backup_watch_cfb.mjs); 24k copies of the URL were 1.9 MB of cfb-all.json
 const ESPN_HS = 'https://a.espncdn.com/i/headshots/college-football/players/full/';
@@ -2709,6 +2743,22 @@ const kp = (() => {
       console.log(`punters: career net yards over expected for ${nv.length} of ${qp.length}`);
     }
   } catch (e) { console.log(`punters: no st_kickers_cfb.json (${e.message})`); }
+  // punter badges (Nov 2 2026): Field Flipper = career net yards over expected (the FV input above, t 3.5 held out);
+  // Big Leg = this season's gross yards over expected, shrunk (st_kickers_cfb.json p rows 'leg', year to year r .46).
+  // No kicker badge: no kicker stat repeats in college (FG over expected r .10, kickoffs .12) and the kicker grade
+  // failed as an FV input (t 1.5)
+  { const tierOf = (pool, v) => { const srt = pool.slice().sort((a, b) => a - b); const pc = (srt.filter(x => x < v).length + 0.5 * srt.filter(x => x === v).length) / srt.length;
+      const t = BADGE_TIERS.find(([, q]) => pc >= q); return t ? [t[0][0], Math.round(100 * pc)] : null; };
+    let legs = {}; try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'st_kickers_cfb.json'), 'utf8'));
+      if (d.pleg) for (const [id, [, v]] of Object.entries(d.pleg)) legs[id] = v; else for (const r of d.p.rows) legs[r.id] = r.leg; } catch { /* no file */ }
+    const nf = qp.filter(x => x.netc != null).map(x => x.netc), lg = qp.map(x => legs[x.id]).filter(v => v != null);
+    for (const p of P) {
+      const b = [];
+      if (p.netc != null && nf.length >= 20 && p.NO >= 8) { const t = tierOf(nf, p.netc); if (t) b.push(['Field Flipper', t[0], t[1], 'career net yards over expected a punt']); }
+      if (legs[p.id] != null && lg.length >= 20 && p.NO >= 8) { const t = tierOf(lg, legs[p.id]); if (t) b.push(['Big Leg', t[0], t[1], 'gross yards over expected a punt, shrunk']); }
+      if (b.length) p.badges = b.sort((x, y) => 'pgsb'.indexOf(x[1]) - 'pgsb'.indexOf(y[1]) || y[2] - x[2]);
+    }
+  }
   const T = Object.fromEntries(teamList.map(t => [t.tid, t])), stars = new Set([...(manual.stars || []), ...(ARKLIST['college-football'] || [])]);
   const rows = [];
   for (const s of [...K, ...P]) {
@@ -2721,7 +2771,8 @@ const kp = (() => {
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, bmi: bmiOf(inchesOf(e.ht), e.wt) ? r1(bmiOf(inchesOf(e.ht), e.wt)) : null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
-      ...atMean({ fv, fvx: Math.round(fvx * 100) / 100 }, cfbZ({ pos: s.pos, years, fv: fvx })), plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
+      ...atMean({ fv, fvx: Math.round(fvx * 100) / 100 }, cfbZ({ pos: s.pos, years, fv: fvx })), fvs: [['kp', Math.round(fvx * 100) / 100]], plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
+      badges: s.badges || null,
       report: { role: s.pos === 'K' ? 'kicker' : 'punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score,
       war: specialistWar(s.pos === 'K' ? s.poe : s.val, model.units[s.team]?.games) });

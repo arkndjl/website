@@ -132,7 +132,40 @@ def load_prior(sport, S):
         return None
 
 
+def unit_badges(sport, bdg):
+    """the unit badges (Nov 2 2026): Top Offense / Top Defense (NHL: Play Drivers, Shot Suppression, Power Play,
+    Penalty Kill, which they replace; soccer: Top Attack / Top Defence), the tier of each team's opponent-adjusted unit
+    rating in data/units_<sport>.json (scripts/team_units.py; cuts and the display test in scripts/unit_badges.py).
+    Badges of the same name from the trait build are dropped, then the unit badges merged by tier."""
+    try:
+        d = json.load(open(os.path.join(ROOT, 'data', f'units_{sport}.json')))
+    except (OSError, ValueError):
+        return bdg
+    add = collections.defaultdict(list)
+    names = set()
+    for V in d.get('views', {}).values():
+        b = V.get('badge')
+        if not b:
+            continue
+        names.add(b['n'])
+        f = next((c['f'] for c in V['cols'] if c.get('key')), '.2f')
+        for r in V['rows']:
+            if not r.get('tier'):
+                continue
+            k = r.get('esp') if sport == 'soccer' else str(r['id']) if sport in ('cfb', 'cbb') else r['ab']
+            if k:
+                add[k].append([b['n'], r['tier'], max(r.get('pct') or 0, PCT[r['tier']]), f"{b['what']} {format(r['adj'], f)}, opponent-adjusted"])
+    if not names:
+        return bdg
+    out = {t: [x for x in v if x[0] not in names] for t, v in bdg.items()}
+    for t, bs in add.items():
+        out[t] = out.get(t, []) + bs
+    rank = lambda x: (-'bsgp'.index(x[1]) if x[1] in 'bsgp' else 0, -x[2])
+    return {t: sorted(v, key=rank) for t, v in out.items() if v}
+
+
 def write(sport, bdg):
+    bdg = unit_badges(sport, bdg)
     os.makedirs(OUTD, exist_ok=True)
     res = {'sport': sport, 'teams': {t: bdg[t] for t in sorted(bdg)}}
     p = os.path.join(OUTD, f'{sport}.json')

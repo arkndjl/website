@@ -1,0 +1,92 @@
+{
+ "about": "Rest days on UTC dates in the game models other than NBA (Nov 2 2026 follow-up to rest_research.py, where nba_games\nread rest off UTC dates and missed 38% of its back-to-backs). Research script; results in data/rest_dates_research.json.",
+ "cbb_b2bd_et8": {
+  "games": 50448,
+  "b2bShare": 0.0725,
+  "b2bTeamGames": {
+   "tune": 2216,
+   "held": 3983
+  },
+  "fixed": {
+   "bTune": -0.978,
+   "bHeld": -1.949,
+   "tuneMAE": {
+    "d": -0.00022,
+    "t": -0.24
+   },
+   "heldMAE": {
+    "d": -0.00255,
+    "t": -2.62
+   }
+  },
+  "walk": {
+   "tune": {
+    "d": -0.00029,
+    "t": -0.22,
+    "seasonsWon": "2/4"
+   },
+   "held": {
+    "d": -0.00383,
+    "t": -2.41,
+    "seasonsWon": "5/6"
+   },
+   "b2bdCoef": {
+    "2017": -1.717,
+    "2018": -1.585,
+    "2019": -1.262,
+    "2020": -1.314,
+    "2021": -1.206,
+    "2022": -1.334,
+    "2023": -1.61,
+    "2024": -1.767,
+    "2025": -1.744,
+    "2026": -1.972
+   }
+  }
+ },
+ "cbb_b2bd_et5_old": {
+  "games": 50448,
+  "b2bShare": 0.073,
+  "b2bTeamGames": {
+   "tune": 2232,
+   "held": 3987
+  },
+  "fixed": {
+   "bTune": -0.988,
+   "bHeld": -1.927,
+   "tuneMAE": {
+    "d": -2e-05,
+    "t": -0.02
+   },
+   "heldMAE": {
+    "d": -0.00236,
+    "t": -2.36
+   }
+  },
+  "walk": {
+   "tune": {
+    "d": 0.00027,
+    "t": 0.18,
+    "seasonsWon": "1/4"
+   },
+   "held": {
+    "d": -0.00347,
+    "t": -2.16,
+    "seasonsWon": "5/6"
+   },
+   "b2bdCoef": {
+    "2017": -1.824,
+    "2018": -1.651,
+    "2019": -1.243,
+    "2020": -1.321,
+    "2021": -1.194,
+    "2022": -1.319,
+    "2023": -1.619,
+    "2024": -1.767,
+    "2025": -1.715,
+    "2026": -1.934
+   }
+  }
+ },
+ "verdict": "FAIL"
+}

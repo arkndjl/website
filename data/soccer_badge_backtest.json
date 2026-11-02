@@ -1,6 +1,6 @@
 {
  "pro": {
-  "asof": "2026-11-01",
+  "asof": "2026-11-02",
   "outcome": "next season's GAR a 90 (900+ minutes both seasons)",
   "base": [
    "GAR a 90 this season",
@@ -9,10 +9,7 @@
    "age",
    "age^2"
   ],
-  "fotmobJoin": {
-   "listed": 17010,
-   "joined": 14421
-  },
+  "fotmobJoin": "skipped (--nofm)",
   "candidates": {
    "fin": {
     "name": "Finisher",
@@ -33,7 +30,7 @@
     "n90": 23.0
    },
    "cre": {
-    "name": "Chance Creator",
+    "name": "xA Creator",
     "pos": "FMD",
     "stat": "xA a 90",
     "r": 0.662,
@@ -42,7 +39,7 @@
     "n90": 23.4
    },
    "kp": {
-    "name": "Key Passer",
+    "name": "Chance Creator",
     "pos": "FMD",
     "stat": "key passes a 90",
     "r": 0.761,
@@ -76,6 +73,33 @@
     "k": 234.0,
     "pairs": 864,
     "n90": 30.2
+   },
+   "pk": {
+    "name": "Penalty Taker",
+    "pos": "FM",
+    "stat": "penalty xG a 90",
+    "r": 0.483,
+    "k": 24.6,
+    "pairs": 5698,
+    "n90": 23.0
+   },
+   "npx": {
+    "name": "Box Threat",
+    "pos": "FM",
+    "stat": "non-penalty xG a 90",
+    "r": 0.681,
+    "k": 10.8,
+    "pairs": 5698,
+    "n90": 23.0
+   },
+   "spd": {
+    "name": "Set-Piece Threat",
+    "pos": "D",
+    "stat": "non-penalty xG a 90 (defenders)",
+    "r": 0.392,
+    "k": 37.2,
+    "pairs": 3983,
+    "n90": 24.0
    },
    "bw": {
     "name": "Ball Winner",
@@ -218,22 +242,31 @@
      "n": 2510,
      "pass": false
     },
-    "drb": {
-     "coef": 0.0065,
-     "t": 3.42,
-     "oosGain": 0.0301,
-     "oosR2Gain": 0.0036,
-     "wins": 6,
-     "of": 9,
-     "n": 1833,
-     "pass": true
+    "pk": {
+     "coef": 0.0018,
+     "t": 1.39,
+     "oosGain": -0.0012,
+     "oosR2Gain": -0.0001,
+     "wins": 7,
+     "of": 11,
+     "n": 2510,
+     "pass": false
+    },
+    "npx": {
+     "coef": -0.0041,
+     "t": -2.41,
+     "oosGain": 0.0094,
+     "oosR2Gain": 0.0011,
+     "wins": 7,
+     "of": 11,
+     "n": 2510,
+     "pass": false
     },
     "joint": {
      "passers": [
       "vol",
       "cre",
-      "kp",
-      "drb"
+      "kp"
      ],
      "kept": [
       "kp",
@@ -267,28 +300,29 @@
       [
        1.0,
        0.24,
-       0.12,
-       0.05
+       0.12
       ],
       [
        0.24,
        1.0,
-       0.83,
-       0.37
+       0.83
       ],
       [
        0.12,
        0.83,
-       1.0,
-       0.39
-      ],
-      [
-       0.05,
-       0.37,
-       0.39,
        1.0
       ]
      ]
+    },
+    "drb": {
+     "coef": 0.0065,
+     "t": 3.42,
+     "oosGain": 0.0301,
+     "oosR2Gain": 0.0036,
+     "wins": 6,
+     "of": 9,
+     "n": 1833,
+     "pass": true
     }
    },
    "M": {
@@ -345,53 +379,32 @@
      "n": 4172,
      "pass": false
     },
-    "bw": {
-     "coef": -0.0009,
-     "t": -0.91,
-     "oosGain": -0.0007,
-     "oosR2Gain": -0.0001,
-     "wins": 4,
-     "of": 9,
-     "n": 3093,
-     "pass": false
-    },
-    "dc": {
-     "coef": -0.0008,
-     "t": -0.71,
+    "pk": {
+     "coef": 0.0,
+     "t": 0.03,
      "oosGain": -0.0014,
      "oosR2Gain": -0.0002,
-     "wins": 4,
-     "of": 9,
-     "n": 3093,
-     "pass": false
-    },
-    "lbp": {
-     "coef": 0.0028,
-     "t": 0.71,
-     "oosGain": 0.0,
-     "oosR2Gain": 0.0,
      "wins": 0,
-     "of": 1,
-     "n": 215,
+     "of": 11,
+     "n": 4172,
      "pass": false
     },
-    "drb": {
-     "coef": 0.0031,
-     "t": 2.84,
-     "oosGain": 0.0053,
-     "oosR2Gain": 0.0008,
+    "npx": {
+     "coef": 0.0006,
+     "t": 0.52,
+     "oosGain": -0.0009,
+     "oosR2Gain": -0.0001,
      "wins": 6,
-     "of": 9,
-     "n": 3088,
-     "pass": true
+     "of": 11,
+     "n": 4172,
+     "pass": false
     },
     "joint": {
      "passers": [
       "vol",
       "cre",
       "kp",
-      "prg",
-      "drb"
+      "prg"
      ],
      "kept": [
       "kp",
@@ -441,38 +454,67 @@
        1.0,
        0.54,
        0.53,
-       0.05,
-       0.35
+       0.05
       ],
       [
        0.54,
        1.0,
        0.88,
-       0.27,
-       0.3
+       0.27
       ],
       [
        0.53,
        0.88,
        1.0,
-       0.25,
-       0.28
+       0.25
       ],
       [
        0.05,
        0.27,
        0.25,
-       1.0,
-       0.03
-      ],
-      [
-       0.35,
-       0.3,
-       0.28,
-       0.03,
        1.0
       ]
      ]
+    },
+    "bw": {
+     "coef": -0.0009,
+     "t": -0.91,
+     "oosGain": -0.0007,
+     "oosR2Gain": -0.0001,
+     "wins": 4,
+     "of": 9,
+     "n": 3093,
+     "pass": false
+    },
+    "dc": {
+     "coef": -0.0008,
+     "t": -0.71,
+     "oosGain": -0.0014,
+     "oosR2Gain": -0.0002,
+     "wins": 4,
+     "of": 9,
+     "n": 3093,
+     "pass": false
+    },
+    "lbp": {
+     "coef": 0.0028,
+     "t": 0.71,
+     "oosGain": 0.0,
+     "oosR2Gain": 0.0,
+     "wins": 0,
+     "of": 1,
+     "n": 215,
+     "pass": false
+    },
+    "drb": {
+     "coef": 0.0031,
+     "t": 2.84,
+     "oosGain": 0.0053,
+     "oosR2Gain": 0.0008,
+     "wins": 6,
+     "of": 9,
+     "n": 3088,
+     "pass": true
     }
    },
    "D": {
@@ -509,29 +551,15 @@
      "n": 4207,
      "pass": true
     },
-    "bw": {
-     "coef": 0.0002,
-     "t": 0.23,
-     "oosGain": -0.0023,
-     "oosR2Gain": -0.0005,
-     "wins": 1,
-     "of": 9,
-     "n": 2797,
+    "spd": {
+     "coef": 0.0005,
+     "t": 0.64,
+     "oosGain": -0.0015,
+     "oosR2Gain": -0.0003,
+     "wins": 2,
+     "of": 11,
+     "n": 4207,
      "pass": false
-    },
-    "dc": {
-     "coef": -0.003,
-     "t": -3.05,
-     "oosGain": 0.0062,
-     "oosR2Gain": 0.0013,
-     "wins": 5,
-     "of": 9,
-     "n": 2797,
-     "pass": false
-    },
-    "lbp": {
-     "note": "too few rows",
-     "n": 181
     },
     "joint": {
      "passers": [
@@ -576,6 +604,30 @@
        1.0
       ]
      ]
+    },
+    "bw": {
+     "coef": 0.0002,
+     "t": 0.23,
+     "oosGain": -0.0023,
+     "oosR2Gain": -0.0005,
+     "wins": 1,
+     "of": 9,
+     "n": 2797,
+     "pass": false
+    },
+    "dc": {
+     "coef": -0.003,
+     "t": -3.05,
+     "oosGain": 0.0062,
+     "oosR2Gain": 0.0013,
+     "wins": 5,
+     "of": 9,
+     "n": 2797,
+     "pass": false
+    },
+    "lbp": {
+     "note": "too few rows",
+     "n": 181
     }
    },
    "G": {

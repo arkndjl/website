@@ -10,7 +10,6 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>The rating is built from players, not team names. A team's strength is the mean of its five players' ratings, so players who move take their ratings with them and a rebuilt roster starts from what its players have done.</p>
     <ul>
       <li><b>Player Elo, map by map.</b> A series found on bo3.gg ({{ $f.nJoined }} of {{ $f.nSeriesFit }}) updates once per map on round share, so 13-3 moves a rating more than 13-11 (x{{ $p.kmap }} of the series K per map). Other series update on the series result. K is {{ $p.K }} for a new player, falling toward {{ $p.Kmin }} over about {{ $p.n0 }} series. Players new after March 2024 start {{ sub 0 $p.mu_new }} points below average. Everyone starts from Valve's 2022-23 sample season played forward with the same rules.</li>
       <li><b>Region offsets</b> for Europe, the Americas and Asia, moved only by inter-region series (K {{ $p.Kr }}). Now: {{ range $k, $v := .roff }}{{ $k }} {{ printf "%+d" (int $v) }} · {{ end }}Elo points.</li>
@@ -34,7 +33,6 @@
     </table></div>
     {{- end }}
     <p class="cfb__dim">Tried and left out: {{ range $i, $x := $f.failed }}{{ if $i }}; {{ end }}{{ $x.term }} ({{ $x.note }}){{ end }}.</p>
-    <p class="cfb__dim">No Counter-Strike picks yet. The Predictions rules switch a market on only when held-out picks beat the closing line. Thunderpick's prices (shown on bo3.gg) are archived from Oct 28, 2026, before each series starts, with the model's chance beside them; picks turn on when 150+ held-out picks beat the close.</p>
     <p class="cfb__dim">Data: Valve's Counter-Strike Regional Standings (github.com/ValveSoftware/counter-strike_regional_standings), bo3.gg for map results, Liquipedia (CC BY-SA 3.0) for the schedule, results since Valve's latest snapshot, and team icons. HLTV blocks automated access.</p>
   </div>
   <div class="win__status"><span>walk-forward since {{ (time .first).Format "Jan 2006" }} · {{ .nSeries }} series</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

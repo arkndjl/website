@@ -17,7 +17,11 @@ Results (Nov 1 2026, 4,912 rows): four of 12 ship. Shot Creator (usage %, t +6.1
 Drawer (FTA a shot, t +3.9), Disruptor (steal %, t +3.1); jointly t 3.7 / 4.1 / 2.9 / 3.3, OOS +.47 R^2 points.
 Rebounder (DRB %) passed alone (t +2.4) and dropped in the joint fit (t < 2). Shooter (3P%, t -7.6), Efficient Scorer
 (TS%, t -6.8) and Ball Security (t -6.3) are negative: XPM already pays for efficiency and it regresses. Rim Protector,
-Touch, Offensive Rebounder flat. No hook into XPM (proj): its prior also feeds the game model (nba_games), so a change
+Touch, Offensive Rebounder flat.
+Nov 2 2026 rerun with role candidates: Workhorse (minutes a game, r .75, t +5.3), Starter (games started share, t +4.1)
+and Two-Way Disruptor (steal % + block %, t +2.0) pass alone. Joint (oos +.58, was +.47): Playmaker 4.8, Two-Way
+Disruptor 4.1, Workhorse 3.4, Foul Drawer 2.5, Shot Creator 2.4 ship; Disruptor (steal % alone) and Starter drop out
+next to them (the same traits). Minutes a game carries the coaches' read beyond the season's total minutes. No hook into XPM (proj): its prior also feeds the game model (nba_games), so a change
 there needs that model's own backtest; the badges are display only.
 """
 import datetime

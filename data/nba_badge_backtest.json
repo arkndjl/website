@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-01",
+ "asof": "2026-11-02",
  "method": "see scripts/nba_badge_backtest.py",
  "years": [
   2010,
@@ -146,7 +146,8 @@
    "coef": 0.059,
    "t": 3.09,
    "oosGain": 0.05,
-   "pass": true
+   "note": "dropped in the joint fit (t 1.44)",
+   "pass": false
   },
   "board": {
    "name": "Rebounder",
@@ -160,7 +161,7 @@
    "coef": 0.053,
    "t": 2.38,
    "oosGain": 0.042,
-   "note": "dropped in the joint fit (t 1.53)",
+   "note": "dropped in the joint fit (t 1.18)",
    "pass": false
   },
   "oboard": {
@@ -176,22 +177,67 @@
    "t": 0.01,
    "oosGain": -0.012,
    "pass": false
+  },
+  "starter": {
+   "name": "Starter",
+   "stat": "games started share",
+   "pairs": 4143,
+   "r": 0.648,
+   "nVol": 64.3,
+   "k": 34.9,
+   "n": 4912,
+   "players": 1034,
+   "coef": 0.1,
+   "t": 4.1,
+   "oosGain": 0.092,
+   "note": "dropped in the joint fit (t 0.46)",
+   "pass": false
+  },
+  "workhorse": {
+   "name": "Workhorse",
+   "stat": "minutes a game",
+   "pairs": 4143,
+   "r": 0.75,
+   "nVol": 64.3,
+   "k": 21.4,
+   "n": 4912,
+   "players": 1034,
+   "coef": 0.21,
+   "t": 5.33,
+   "oosGain": 0.209,
+   "pass": true
+  },
+  "stocks": {
+   "name": "Two-Way Disruptor",
+   "stat": "steal % + block %",
+   "pairs": 4143,
+   "r": 0.856,
+   "nVol": 1656.1,
+   "k": 278.9,
+   "n": 4912,
+   "players": 1034,
+   "coef": 0.04,
+   "t": 2.02,
+   "oosGain": 0.02,
+   "pass": true
   }
  },
  "joint": {
   "n": 4912,
-  "oosGain": 0.471,
+  "oosGain": 0.576,
   "t": {
-   "creator": 3.69,
-   "foul": 2.89,
-   "playmaker": 4.07,
-   "thief": 3.32
+   "creator": 2.39,
+   "foul": 2.46,
+   "playmaker": 4.75,
+   "workhorse": 3.39,
+   "stocks": 4.1
   },
   "coef": {
-   "creator": 0.081,
-   "foul": 0.061,
-   "playmaker": 0.1,
-   "thief": 0.067
+   "creator": 0.053,
+   "foul": 0.052,
+   "playmaker": 0.119,
+   "workhorse": 0.141,
+   "stocks": 0.083
   }
  }
 }

@@ -12,8 +12,8 @@
 {{- if not $d.games }}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
-  <div class="cfbm__body"><p>No games in the next two slates yet. {{ if not $nba }}College projections start once a team has played its first game of the season (rotations come from this season's box scores).{{ end }}</p>
-  <p class="cfb__dim">held out {{ with $d.test.pra.hold }}PRA MAE {{ printf "%.2f" .mae }} vs {{ printf "%.2f" .naive }} for the season average{{ end }} · see the player backtest tab</p></div>
+  <div class="cfbm__body"><p>No games in the next two slates.</p>
+  <p class="cfb__dim">held out {{ with $d.test.pra.hold }}PRA MAE {{ printf "%.2f" .mae }} vs {{ printf "%.2f" .naive }} for the season average{{ end }}</p></div>
 </div>
 {{- else }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA players") "icon" "hoop" "filter" "Day,Team,Pos" "tab" ($.Get "tab") "gfxCols" "RK,Player,Team!,Opp,PRA,PTS,REB,AST" "gfxDate" (printf "updated %s" (lower ((time $d.asof).Format "Jan 2, 2006"))) "gfxMax" "26") -}}

@@ -39,6 +39,10 @@ Results (Nov 1 2026; every number in data/tennis_badge_backtest.json):
           and a held-out gain at all four snapshots, Jan / Apr / Jul / Oct). Big Server 1.1, Returner -.8, Giant
           Killer 1.4: fail; Dominator, tiebreaks noise.
   Shipped as badges only (no FV or ARK change): ATP rows Big Server + Grass Court, WTA prospects Server.
+Nov 2 2026 specialist candidates (pro): Holder (service games held, ATP t 2.9 alone, joint .9 beside Big Server: the
+same serve trait), Breaker (return games broken: ATP t -2.4, WTA -3.0, negative), Safe Second (fewer double faults,
+1.6 / 1.8), First Serve In (1.2 / -1.0): none ship. Prospects: lefty, clay share and height are already offered to
+the FV driver selection (scripts/tennis_prospects.py) and not kept, so not retested as badges.
 """
 import json
 import math
@@ -257,6 +261,11 @@ def pro_cands(R):
                    np.array([r['tbw'] + r['tbl'] for r in R], float), 5),
             'clay': ('Clay Court', 'clay Elo over hard-court Elo', np.array([r['eC'] - r['eH'] for r in R]), np.array([r['nC'] for r in R], float), 10),
             'grass': ('Grass Court', 'grass Elo over hard-court Elo', np.array([r['eG'] - r['eH'] for r in R]), np.array([r['nG'] for r in R], float), 5),
+            # specialists (Nov 2 2026 candidates)
+            'hold': ('Holder', 'service games held', 1 - (st[:, 6] - st[:, 5]) / st[:, 4], st[:, 4], 80),
+            'brk': ('Breaker', 'return games broken', (rt[:, 6] - rt[:, 5]) / rt[:, 4], rt[:, 4], 80),
+            'safe': ('Safe Second', 'double faults a serve point (fewer)', -st[:, 8] / st[:, 0], st[:, 0], 500),
+            'firstin': ('First Serve In', 'first serves in', st[:, 1] / st[:, 0], st[:, 0], 500),
         }
     return c
 

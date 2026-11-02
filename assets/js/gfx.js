@@ -869,15 +869,19 @@
       if (!(items || []).length) { g.fillStyle = C.lilac; g.fillText('none', lx + 56, ly); }
     }
     // what drives the grade: each feeder's weighted pull on the composite, pinned to the bottom
-    var parts = r.parts || [], labels = ['talent', 'production', 'age', 'breakout', 'stats', 'pedigree', 'schedule+team', 'frame'];
-    // two columns of four bars
+    // the composite's seven feeders, as in the dropdown (the 8th part, frame, is a step in FV, not in the composite);
+    // ESPN backups and K/P have no composite
+    var comp = r.parts && r.src !== 'espn' && r.pos !== 'K' && r.pos !== 'P';
+    var parts = comp ? r.parts.slice(0, 7) : [], labels = [r.div === 'FCS' ? 'level' : 'talent', 'production', 'age + class', 'breakout', 'stats', 'pedigree', 'context'];
+    var steps = window.__arkCfbSteps ? window.__arkCfbSteps(r) : null;
+    // two columns of four cells: seven bars and the grade -> FV line
     var barsH = parts.length ? 110 + 4 * 60 : 0, bottom = F.y + F.h - 40 - barsH, half2 = (w - 60) / 2;
     list('+ strengths', rep.plus, C.teal, x, half2, bottom);
     list('− concerns', rep.minus, C.down, x + half2 + 60, half2, bottom);
     if (parts.length) {
       var by = F.y + F.h - barsH - 10, cw2 = (w - 80) / 2;
       g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
-      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('grade components: weighted pull on composite', x, by + 30);
+      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('FV inputs: weighted pull on the composite', x, by + 30);
       g.font = '36px ' + FONT;
       labels.forEach(function (l, i) {
         var cx = x + Math.floor(i / 4) * (cw2 + 80), yy = by + 110 + (i % 4) * 60, bx0 = cx + 270, bwid = cw2 - 270 - 120, mid = bx0 + bwid / 2, half = bwid / 2;
@@ -888,6 +892,9 @@
         g.fillStyle = v < 0 ? C.down : C.teal; g.fillRect(v < 0 ? mid - bw : mid + 2, yy - 14, bw, 28);
         var lab = (v > 0 ? '+' : '') + v.toFixed(2); g.fillStyle = C.lilac; g.fillText(lab, cx + cw2 - g.measureText(lab).width, yy);
       });
+      // 8th cell: the grade the composite gives, and the headline after the steps (frame, years, consensus, injury,
+      // mean outcome, returns, scale)
+      if (steps && steps.length) { g.fillStyle = C.lilac; g.fillText('grade ' + (+steps[0][1]).toFixed(0) + ' → FV ' + r.fv, x + cw2 + 80, by + 110 + 3 * 60); }
     }
     return F.canvas;
   }

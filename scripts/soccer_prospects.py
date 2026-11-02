@@ -1033,7 +1033,7 @@ def fit(scorecard=False):
 
 CLUBS = {}
 PART = {'age': 'age', 'age2': 'age', 'lmv': 'mv', 'lmv2': 'mv', 'nomv': 'mv', 'gk': 'pos', 'fwd': 'pos', 'mid': 'pos',
-        'lmv_fwd': 'pos', 'lmv_gk': 'pos'}
+        'lmv_fwd': 'pos', 'lmv_gk': 'pos', 'ht_gk': 'ht'}
 
 
 def club_name(c):
@@ -1189,9 +1189,16 @@ def build():
     F = design(X)
     m = fitj['models'][key]
     cols = [c for c in m['coef'] if c != 'const']
-    fvx = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
+    raw = m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols])
+    fvx = calibrate(raw, m['iso']).clip(20, 80)
     # provisional players: academy-only on their own line + youth level, youth-international-only on theirs (fit)
-    fvx = np.where(X.old.values, fvx, prov_grade(F, fvx, X, yi_feats(Y, ydob, X.index, today), fitj))
+    YE = yi_feats(Y, ydob, X.index, today)
+    fvx = np.where(X.old.values, fvx, prov_grade(F, fvx, X, YE, fitj))
+    # which line graded him (FV inputs dropdown): club model, academy-only line, youth-international-only line
+    yo = X.yionly.astype(bool).values
+    path = np.where(X.old.values, 'club', np.where(yo, 'yi', 'acad'))
+    gline = {'acad': (fitj.get('provLine2') or {}).get('g', 1.0), 'yi': (fitj.get('yiLine') or {}).get('g', 1.0), 'club': 1.0}
+    yterm = {'acad': ('yi_lvl', (fitj.get('provLine2') or {}).get('yi_lvl', 0.0)), 'yi': ('yi_wc', (fitj.get('yiLine') or {}).get('yi_wc', 0.0))}
     X['fvx'] = fvx
     X['plus'] = plus_flag(fvx, X.age.values, fitj.get('plus')) & X.old.values & (fvx < 80)
     # predictive badges (scripts/soccer_badges.py; backtest scripts/soccer_badge_backtest.py prospects): display only
@@ -1204,6 +1211,8 @@ def build():
     # the pool, inputs that move together summed
     push = (F[cols] - F[cols].mean()) * np.array([m['coef'][c] for c in cols])
     push = push.T.groupby(lambda c: PART.get(c, c)).sum().T
+    rawmean = float(raw.mean())
+    X['raw'], X['path'] = raw, path
     rows = []
     for n, (i, r) in enumerate(X.sort_values('fvx', ascending=False).iterrows()):
         club = r.club_td if pd.notna(r.club_td) else r.club1 if pd.notna(r.club1) else r.aclub
@@ -1224,16 +1233,25 @@ def build():
         if i in bdg:
             rows[-1]['bdg'] = bdg[i]
         if n < 500:
-            pp = push.loc[i]
+            pp = push.loc[i].copy()
+            if r.path != 'club':
+                # a provisional line takes the club model's calibrated grade at slope g, plus its youth-level term
+                pp = pp * gline[r.path]
+                yk, yc = yterm[r.path]
+                pp['yi'] = yc * float(YE[yk].get(i, 0.0))
             rows[-1].update({'parts': [[k, round(float(v), 2)] for k, v in pp[pp.abs() >= .05].sort_values(key=abs, ascending=False).items()],
                              'ht': None if pd.isna(r.ht) else int(r.ht), 'rc': None if pd.isna(r.rclub_td) else round(float(r.rclub_td), 2),
-                             'ym': int(r.ymins1 if pd.notna(r.ymins1) else 0) + int(r.ymins_td if pd.notna(r.ymins_td) else 0)})
+                             'ym': int(r.ymins1 if pd.notna(r.ymins1) else 0) + int(r.ymins_td if pd.notna(r.ymins_td) else 0),
+                             'raw': round(float(r.raw), 2)})
+            if r.path != 'club':
+                rows[-1]['path'] = r.path
     past = json.load(gzip.open(PAST, 'rt'))
     FS.restate_obj(past, 'soccer', keep=True)   # fvx the grade, fv on the stretched top
     out = {'asof': dt.date.today().isoformat(), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
-           'snap': key, 'pool': len(rows), 'mvLevel': [round(lvl, 3), fitj['mvRef'][key]], 'board': rows[:2000], 'past': past[:400],
+           'snap': key, 'pool': len(rows), 'rawMean': round(rawmean, 2), 'mvLevel': [round(lvl, 3), fitj['mvRef'][key]], 'board': rows[:2000], 'past': past[:400],
            'fit': {k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',
-                                        'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues')},
+                                        'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues') if k in fitj},
+           'lines': {k: fitj[k] for k in ('provLine2', 'yiLine') if k in fitj},
            'model': {'key': key, **m}}
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print('board', len(rows), 'snapshot', key)

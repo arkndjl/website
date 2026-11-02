@@ -60,7 +60,8 @@
   var HK_LAB = { slot: 'draft slot', pos: 'position', nhle: 'draft-year NHLe', chl: 'CHL league', fv0: 'draft grade', nh: 'latest-season NHLe',
     pro: 'played pro', gp: 'NHL games', war: 'NHL WAR', wjc: 'World Juniors spot', progp: 'pro games', nhgrow: 'NHLe growth since the draft',
     ahls: 'AHL shot rate', chl1: 'CHL priority selection', age: 'age', agenh: 'NHLe for his age', over: 'second or third year eligible', nhle_na: 'under 10 games', wt: 'weight', D: 'defenseman',
-    pmpg: 'plus-minus a game', pimpg: 'penalty minutes a game', nhm_na: 'no CHL line the year before', nany: 'NHL debut', comp: 'comps', pnS: 'NHL preseason games', dur: 'games played (share of schedule)' };
+    pmpg: 'plus-minus a game', pimpg: 'penalty minutes a game', nhm_na: 'no CHL line the year before', nany: 'NHL debut', comp: 'comps', pnS: 'NHL preseason games', dur: 'games played (share of schedule)',
+    cs: 'draft class strength', gsvc: 'save% over league average' };
   var HK_TIP = 'Outcome tiers on the FV scale by peak NHL WAR in his first seven seasons (30 = some NHL games, 40 = top 45 of a class, 50 = top 20, a regular, 60 = top 5, a first-liner). Odds from the 2008-19 picks: what players graded like him became, out of class. Players graded on a stage model after the draft use the same odds by grade.';
   var HK_TIERS = ['no NHL', 'cup of coffee', 'depth NHLer', 'regular', 'first-liner'];
   var POSN = { D: 'defenseman', G: 'goalie', C: 'centre', LW: 'left wing', RW: 'right wing', F: 'forward' };
@@ -68,11 +69,11 @@
     return function (k, up) {
       switch (k) {
         case 'slot': return r.rk ? 'Tankathon No. ' + r.rk + ': a board rank that points to pick ' + r.xslot : 'picked No. ' + r.pick;
-        case 'nhle': return r.nhle != null ? f1(r.nhle) + ' NHLe this season (' + r.pts + ' pts in ' + r.gp + ' GP, ' + r.league + ')' : r.nh0 != null ? f1(r.nh0) + ' NHLe in his draft year' : 'no scoring line yet';
+        case 'nhle': return r.nhle != null ? f1(r.nhle) + ' NHLe ' + (r.k === 0 ? 'in his draft year' : 'this season') + ' (' + (r.pts != null ? r.pts + ' pts in ' : '') + r.gp + ' GP, ' + r.league + ')' : r.nh0 != null ? f1(r.nh0) + ' NHLe in his draft year' : r.pos === 'G' ? 'a goalie: no skater scoring line (the goalie term carries his position)' : 'no scoring line yet';
         case 'chl': return up ? 'outside the CHL: no CHL scoring discount' : 'CHL scoring, which translates worse than its NHLe says';
         case 'pos': return 'a ' + (POSN[r.pos] || r.pos) + ' (position effect)';
         case 'fv0': return 'draft grade ' + r.fv0 + ' (pick ' + r.pick + ')';
-        case 'nh': return r.nhle != null ? f1(r.nhle) + ' NHLe last season (' + (r.league || '-') + ')' : 'no scoring line last season';
+        case 'nh': return r.nhle != null ? f1(r.nhle) + ' NHLe last season (' + (r.league || '-') + ')' : r.pos === 'G' ? 'a goalie: no skater scoring line (the goalie term carries his position)' : 'no scoring line last season';
         case 'pro': return up ? 'already playing pro (' + r.league + ')' : 'not yet in a pro league';
         case 'gp': return r.nhlgp + ' NHL games so far';
         case 'nany': return up ? 'has played in the NHL' : 'no NHL games yet';
@@ -91,16 +92,26 @@
         case 'pimpg': return (r.pim != null ? r.pim + ' penalty minutes in ' + r.gp + ' GP' : 'penalty minutes not listed');
         case 'nhm_na': return up ? 'no CHL line the year before (new to the league)' : 'a CHL line the year before';
         case 'D': return up ? 'a defenseman' : 'a forward';
+        case 'cs': return 'his draft class\'s top picks graded ' + (up ? 'stronger' : 'weaker') + ' than an average 2008-19 class on draft-day lines';
+        case 'gsvc': return 'career save% ' + (up ? 'above' : 'below') + ' his leagues\' average since the draft (games-weighted, shrunk until about 20 games)';
+        case 'dur': return up ? 'played nearly all of his team\'s games last season' : 'missed a share of his team\'s games last season';
         case 'chl1': return up ? 'not a first-round CHL priority pick' : 'first round of the CHL priority selection (past ones fell short of their slot)';
       }
       return HK_LAB[k] || k;
     };
   }
+  // the bars' sum on top of the average comparison player's grade is the raw grade (fvx); FV is that grade on the
+  // hockey scale (top stretched, scripts/fv_scale.py)
+  function hkSum(r, b) {
+    return 'sum ' + sgn(b.sum, 2) + (r.fvx != null ? ': that average player\'s ' + f1(r.fvx - b.sum) + (b.sum < 0 ? ' − ' : ' + ') + Math.abs(b.sum).toFixed(2) + ' = raw grade ' + f1(r.fvx) + ', FV ' + r.fv + ' on the hockey scale' : '');
+  }
   function hkKnots(r) { return [[30, r.p30], [40, r.p40], [50, r.p50], [60, r.p60]]; }
 
   var SP_LAB = { age: 'age', mv: 'market value', pos: 'position (and how the market prices it)', gar_td: 'value this season (GAR)', gar1: 'value last season (GAR)',
     share_td: 'minutes share', rclub_td: 'club strength', lg_share: 'minutes share x league strength', ga90_td: 'goals + assists a 90', ymins: 'Premier League 2 minutes',
-    ht: 'height', age_lmv: 'age x market value' };
+    ht: 'height (keepers on their own slope)', age_lmv: 'age x market value', res_parm: 'B-team / feeder minutes x first-team strength',
+    res_young: 'feeder-league minutes, young for the level', uyl_young: 'UEFA Youth League minutes, young for the level', acad_ga: 'U18/U19 league goals + assists a 90',
+    yi: 'youth international level (provisional line)' };
   var SP_TIP = 'Outcome tiers on the FV scale by peak value (best three seasons of goals above replacement at ages 22-26), by rarity within a birth year and position group: 40 = top 250 (a regular in a covered top flight), 50 = top 90 (big-five regular level), 60 = top 20. Odds from the 2013-20 prospects: what players graded like him became, held out by birth cohort.';
   var SP_TIERS = ['below a top flight', 'top-flight regular', 'big-five regular', 'star'];
   var SPOS = { GK: 'keeper', CB: 'centre-back', LB: 'left-back', RB: 'right-back', DM: 'defensive midfielder', CM: 'central midfielder', AM: 'attacking midfielder',
@@ -120,6 +131,11 @@
         case 'ymins': return r.ym + ' Premier League 2 minutes';
         case 'ht': return r.ht ? r.ht + ' cm' : 'no listed height';
         case 'age_lmv': return eur(r.mv) + ' at ' + f1(r.age);
+        case 'res_parm': return 'B-team / feeder-league minutes, weighted by his first team\'s strength';
+        case 'res_young': return 'feeder-league minutes young for the level';
+        case 'uyl_young': return 'UEFA Youth League minutes young for the level';
+        case 'acad_ga': return 'U18/U19 league goals + assists a 90';
+        case 'yi': return r.path === 'yi' ? 'U17/U20 World Cup games' : 'highest youth international level played';
       }
       return SP_LAB[k] || k;
     };
@@ -153,13 +169,13 @@
   var KIND = {
     'hk-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
-      var note = r.prov ? 'each input: its push on the grade against an average off-board CHL draft-eligible of 2008-19 (sum ' + sgn(b.sum, 2) + '). A provisional grade: an OLS fit on what off-board draft-eligibles became, so it is the mean outcome, most of them 20 (no NHL games); NHLe is shrunk toward that group\'s typical NHLe until he has about 20 games.'
+      var note = r.prov ? 'each input: its push on the grade against an average off-board CHL draft-eligible of 2008-19 (' + hkSum(r, b) + '). A provisional grade: an OLS fit on what off-board draft-eligibles became, so it is the mean outcome, most of them 20 (no NHL games); NHLe is shrunk toward that group\'s typical NHLe until he has about 20 games.'
         : null;
       return '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.posFull || r.pos) + ' · ' + esc(r.club) + ' (' + esc(r.league) + ') · FV ' + r.fv + ' · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + '</p>' +
         '<p class="cfb__role">this season: ' + (r.gp ? r.gp + ' GP, ' + r.pts + ' pts' + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') : 'no games yet') +
         (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + f1(r.age) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
-        '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (sum ' + sgn(b.sum, 2) +
+        '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (' + hkSum(r, b) +
         '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
     },
     'hk-pipe': function (r, B) {
@@ -173,7 +189,7 @@
         '<p class="cfb__role">drafted ' + r.year + ', pick ' + r.pick + ' by ' + esc(r.team) + (r.age ? ' · age ' + f1(r.age) : '') + ' · NHL so far: ' + r.nhlgp + ' GP' + (r.war != null ? ', ' + sgn(r.war, 2) + ' WAR' : '') + '.</p>' +
         '<p class="cfb__role">' + line + '.</p>' + bdgChips(r) + outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.k ? 'the stage model ' + r.k + ' season' + (r.k > 1 ? 's' : '') + ' after the draft: each input\'s push against the average 2008-19 pick at that stage, the draft grade carrying what was known on draft day' : 'the draft model with his real slot: each input\'s push against an average 2008-19 pick') +
-        ' (sum ' + sgn(b.sum, 2) + ').</p></details>';
+        ' (' + hkSum(r, b) + ').</p></details>';
     },
     'tn-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], TN_LAB[x[0]] || x[0]]; }), b = bars(p), he = r.id.charAt(0) === 'w' ? 'she' : 'he';
@@ -183,15 +199,16 @@
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · FV ' + r.fv +
         ' · T100 ' + pc(r.p40) + ' · T50 ' + pc(r.p50) + ' · T12 ' + pc(r.p60) + '</p>' +
         '<p class="cfb__role">' + (r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'unranked this week') + ' · age ' + f1(r.age) + (r.elo ? ' · Elo ' + r.elo + (r.ep ? ' (' + r.ep + ' Elo+)' : '') : '') +
-        (r.prov ? ' · provisional: graded up from the 20 floor' : '') + '.</p>' +
+        (r.prov ? ' · provisional: unranked, graded by the same model with no ranking' : '') + '.</p>' +
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (b) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[b[1]]; return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(T + ' ' + b[0] + ': ' + b[2] + ' pct among prospects, ' + b[3] + ', last 52 weeks (regressed by volume); predictive of peak value beyond the FV') + '">' + T + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
         '<p class="cfb__role">last 52 weeks: ' + wl(r.w, r.n) + ' · tour ' + wl(r.wT, r.nT) + ' · qualifying ' + wl(r.wQ, r.nQ) + ' · Challenger / 125 ' + wl(r.wC, r.nC) + ' · Futures / ITF ' + wl(r.wS, r.nS) +
         (r.deb ? ' · pro since ' + f1(r.deb) + ', ' + r.car + ' matches' : '') + '.</p>' +
         outlook([[30, r.p30], [40, r.p40], [50, r.p50], [60, r.p60]], B, TN_TIERS, [0, 1, 2, 3, 4], TN_TIP, [r.lo, r.hi]) + report(p, tnSay(r)) +
-        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the grade against the average October prospect of 1993-2019 (sum ' + sgn(b.sum, 2) +
-        '), through both halves of the model, the chance of any peak value and the outcome given some. The grade is the mean outcome, so the sum and the FV differ by the average prospect\'s grade.</p></details>' : '');
+        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its share of the gap between his grade and the average prospect\'s (every input at the mean of the 1979-97-born prospects at this point of the season), split exactly through both halves of the model, the chance of any peak value and the outcome given some. ' +
+        (r.b0 != null ? 'Average prospect ' + f1(r.b0) + ' ' + sgn(b.sum, 1) + ' = ' + f1(r.fvx) + ', the mean outcome; ' : 'The pushes sum to ' + sgn(b.sum, 1) + ' over the average prospect; ') + 'FV ' + r.fv + ' is that grade on the board\'s scale (the top is stretched).</p></details>' : '');
     },
     'sp-board': function (r, B) {
+      var rmEl = document.querySelector('table.sp[data-sp-raw]'), SP_RAWMEAN = rmEl ? +rmEl.getAttribute('data-sp-raw') : null;
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], SP_LAB[x[0]] || x[0]]; }), b = bars(p);
       var link = ' · <a href="https://www.transfermarkt.com/-/profil/spieler/' + esc(r.id) + '" rel="noopener">Transfermarkt ↗</a>';
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
@@ -203,8 +220,10 @@
         // predictive badges (scripts/soccer_badges.py), the chips of layouts/partials/badges.html
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (x) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[x[1]]; return '<span class="cfb__bdg cfb__bdg--' + esc(x[1]) + '" title="' + esc(T + ' ' + x[0] + ': ' + x[2] + ' pct at position, ' + x[3] + '; predictive of outcome FV beyond the grade') + '">' + esc(T + ' ' + x[0]) + '</span>'; }).join('') + '</p>' : '') +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +
-        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) +
-        '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
+        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.path ?
+        'graded on the provisional ' + (r.path === 'yi' ? 'youth-international-only' : 'academy-only') + ' line: the club inputs count at the line\'s slope (each push shown already scaled), plus the youth level term; then 20 + the line\'s intercept (sum ' + sgn(b.sum, 2) + ').' :
+        'each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) + (r.raw != null && SP_RAWMEAN != null ? '; pool average ' + f1(SP_RAWMEAN) + ' + inputs = raw grade ' + f1(r.raw) : '') +
+        '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top); above the board\'s top few a season the FV scale stretches, so the FV and the sum differ.') + '</p></details>' : '');
     }
   };
 

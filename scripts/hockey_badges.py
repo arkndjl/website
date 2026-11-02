@@ -54,6 +54,11 @@ CANDS = [
     ['twoway', 'Two-Way', _pg('pm'), '+/- a game'],
     ['pk', 'Penalty Kill', _pg('shp'), 'short-handed points a game'],
     ['physical', 'Physical', _pg('pim'), 'penalty minutes a game'],
+    # specialists and roles (Nov 2 2026 candidates)
+    ['shootout', 'Shootout Specialist', lambda p: p['sog_so'] / p['soa'] if p.get('soa', 0) >= 3 else None, 'shootout goals an attempt'],
+    ['clutch', 'Clutch', lambda p: (p.get('gwg', 0) + p.get('otg', 0)) / p['gp'], 'game-winning + overtime goals a game'],
+    ['opener', 'Opener', lambda p: p.get('fgl', 0) / p['gp'], 'first goals of the game a game'],
+    ['disc', 'Disciplined', lambda p: -p.get('minors', 0) / p['gp'], 'minor penalties a game (fewer)'],
 ]
 BY = {c[0]: c for c in CANDS}
 # shipped (stage -> key -> k). Nov 1 2026, data/hockey_badge_backtest.json: stage 1 (the first season after the draft,
@@ -62,6 +67,10 @@ BY = {c[0]: c for c in CANDS}
 # feeds carry shots from about 2013). It did not hold at the draft (t .78) or stage 2 (t .68): the weakest of the
 # shipped badges across boards. Every other candidate failed at every stage (draft model: none over t 1.6; negative:
 # Sniper t -3.8, Physical t -3.0).
+# Nov 2 2026 specialist/role candidates, all failed: Shootout Specialist (SO goals an attempt, year-to-year r .07: noise),
+# Clutch (GWG + OT goals, draft t .9), Opener (first goals, t .2), Disciplined (fewer minors: draft t 2.65, forward MSE
+# better, but class-out t 1.19 and 7 of 12 classes, under the 8 the gate needs; stages t .6 / .8). Retest Disciplined
+# when the 2020-21 classes' seven-season outcomes mature.
 SHIP = {1: {'shooter': 10.7}}
 
 
@@ -86,7 +95,9 @@ def parse(d):
                     'g': _n(p.get('goals')), 'a': _n(p.get('assists')), 'pts': _n(p.get('points')),
                     'ppp': _n(p.get('power_play_goals')) + _n(p.get('power_play_assists')),
                     'shp': _n(p.get('short_handed_goals')) + _n(p.get('short_handed_assists')),
-                    'pm': _n(p.get('plus_minus')), 'pim': _n(p.get('penalty_minutes')), 'sog': _n(p.get('shots'))})
+                    'pm': _n(p.get('plus_minus')), 'pim': _n(p.get('penalty_minutes')), 'sog': _n(p.get('shots')),
+                    'gwg': _n(p.get('game_winning_goals')), 'otg': _n(p.get('overtime_goals')), 'fgl': _n(p.get('first_goals')),
+                    'minors': _n(p.get('minor_penalties')), 'soa': _n(p.get('shootout_attempts')), 'sog_so': _n(p.get('shootout_goals'))})
     return out
 
 
