@@ -1,0 +1,108 @@
+{{- /* Special teams tab, kicker and punter panes (Noah, Nov 2 2026), inside streturners' chip group. data/st_kickers_<sport>.json
+       from scripts/st_kickers.py. Every kick is valued in expected points of the next possession's start against the mean
+       kick from the same spot; Adj = points over expected shrunk for sample, the rank. Phones keep rank, player, two
+       volume/rate columns and Adj. Args: sport, title. */ -}}
+{{- $sport := .sport }}{{ $col := eq $sport "cfb" }}
+{{- with index site.Data (printf "st_kickers_%s" $sport) -}}
+{{- $d := . }}{{ $h := .h }}
+{{- $date := lower ((time .asof).Format "Jan 2") }}
+{{- $ep := cond $col (printf "drive points by field position (mean points on drives from that spot: own 20 %.1f, midfield %.1f)" (float $d.note.d20) (float $d.note.d50)) "nflverse expected points on 1st-and-10" }}
+<div data-brk-pane="k" style="display:none">
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · kickers" $.title) "icon" "football" "filter" (cond $col "Team,Yr" "Team") "rerank" true "gfxCols" "RK,Player,Team,FG,Pct,Adj" "gfxDate" (printf "kickers · %v" $d.season) "gfxMax" "25") }}
+<table class="cfb__table bw brk__table">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="brk__pt">Team</th>
+    {{- if $col }}<th class="bw__x" title="class">Yr</th><th class="bw__x" title="future value, 20-80">FV</th>{{ end }}
+    <th title="field goals made / attempted">FG</th>
+    <th title="field goal %">Pct</th>
+    <th title="points over expected, shrunk for sample: FG {{ $h.fg.k }} attempts, XP {{ $h.xp.k }}, kickoffs {{ $h.ko.k }} keep half the observed rate; the rank">Adj</th>
+    <th class="bw__x" title="expected field goal % for these kicks (distance{{ if not $col }}, roof, wind and cold{{ end }})">xPct</th>
+    <th class="bw__x" title="longest make">Lng</th>
+    <th class="bw__x" title="50+ yard field goals made / attempted">50+</th>
+    <th class="bw__x" title="extra points made / attempted">XP</th>
+    <th class="bw__x" title="kickoffs (onside kicks left out){{ if $col }}; only kickoffs by a player in the box score as a kicker or punter{{ end }}">KO</th>
+    <th class="bw__x" title="kickoff touchback %">TB%</th>
+    <th class="bw__x" title="field goal points over expected, total: 3 x (made - expected make)">FG+</th>
+    <th class="bw__x" title="kickoff points over expected, total: {{ $ep }} of the receiver's start against the mean kickoff from the same spot this season">KO+</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $d.k.rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    {{- if $col }}
+    <td class="cfb__name"><b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
+    <td class="bw__x">{{ .cls }}</td>
+    <td class="cfb__num bw__x">{{ .fv }}</td>
+    {{- else }}
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ .fgm }}">{{ .fgm }}/{{ .fga }}</td>
+    <td class="cfb__num" data-v="{{ .pct | default -1 }}">{{ with .pct }}{{ printf "%.0f" (float .) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f" (float .adj) }}</span></td>
+    <td class="cfb__num bw__x" data-v="{{ .xpct | default -1 }}">{{ with .xpct }}{{ printf "%.0f" (float .) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num bw__x">{{ .lng }}</td>
+    <td class="cfb__num bw__x">{{ .f50 }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .xpm }}">{{ .xpm }}/{{ .xpa }}</td>
+    <td class="cfb__num bw__x">{{ .ko }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .tb | default -1 }}">{{ with .tb }}{{ . }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .fgp }}">{{ printf "%+.1f" (float .fgp) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .kop | default 0 }}">{{ with .kop }}{{ printf "%+.1f" (float .) }}{{ else }}–{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+  {{- partial "wintable-close.html" (dict "rows" (len $d.k.rows) "fresh" (printf "st_kickers_%s" $sport) "note" (printf "%v · through week %v · %v field goals · ranked by Adj · updated %s" $d.season $d.note.week $d.k.fg $date)
+        "about" (printf "Points over expected by kick. FG: 3 x (made - expected make), expected from a fit on distance%s over the last five seasons. XP: made - season rate. Kickoffs: %s of the receiver's start, against the mean kickoff from the same spot that season (so 2024+ NFL rules have their own baseline). Adj adds each part shrunk for sample: total / (attempts + k), k = noise variance / kicker variance; FG k %v attempts (field goal accuracy over expected barely repeats: year-to-year r %v), XP k %v, kickoffs k %v. %v+ field goals and kickoffs / 3 to be listed%s." (cond $col "" ", roof, wind and cold") $ep $h.fg.k $h.fg.r $h.xp.k $h.ko.k (index $d.min "k") (cond $col ", FBS players on the board" ""))) }}
+</div>
+<div data-brk-pane="p" style="display:none">
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · punters" $.title) "icon" "football" "filter" (cond $col "Team,Yr" "Team") "rerank" true "gfxCols" "RK,Player,Team,Punts,Net,Adj" "gfxDate" (printf "punters · %v" $d.season) "gfxMax" "25") }}
+<table class="cfb__table bw brk__table">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="brk__pt">Team</th>
+    {{- if $col }}<th class="bw__x" title="class">Yr</th><th class="bw__x" title="future value, 20-80">FV</th>{{ end }}
+    <th title="punts (blocked punts and fakes left out)">Punts</th>
+    <th class="bw__x" title="gross yards a punt, capped at the goal line">Gross</th>
+    <th title="net yards a punt: line of scrimmage to the receiver's start (a touchback ends at the 20)">Net</th>
+    <th title="points over expected, shrunk for sample: {{ $h.cv }} x (Pin + Dist) + {{ $h.cg }} x Leg x punts, the mix that best predicts next season's points over expected; the rank">Adj</th>
+    <th class="bw__x" title="punts downed, fair caught or returned to inside the receiver's 20">In20</th>
+    <th class="bw__x" title="touchbacks">TB</th>
+    <th class="bw__x" title="% of punts not returned (fair catch, downed, out of bounds, touchback)">NoRet</th>
+    <th class="bw__x" title="yards a return allowed">RetY</th>
+    <th class="bw__x" title="points over expected on punts from the opponent's 50 and in (pinning: inside-20s against touchbacks), shrunk for sample">Pin</th>
+    <th class="bw__x" title="points over expected on punts from beyond the 50 (distance, hang and coverage), shrunk for sample">Dist</th>
+    <th class="bw__x" title="gross yards over expected a punt (against punts from the same line), shrunk: total / (punts + {{ $h.gross.k }})">Leg</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $d.p.rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    {{- if $col }}
+    <td class="cfb__name"><b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
+    <td class="bw__x">{{ .cls }}</td>
+    <td class="cfb__num bw__x">{{ .fv }}</td>
+    {{- else }}
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
+    {{- end }}
+    <td class="cfb__num">{{ .pu }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .gross }}">{{ printf "%.1f" (float .gross) }}</td>
+    <td class="cfb__num" data-v="{{ .net }}">{{ printf "%.1f" (float .net) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f" (float .adj) }}</span></td>
+    <td class="cfb__num bw__x">{{ .i20 }}</td>
+    <td class="cfb__num bw__x">{{ .tb }}</td>
+    <td class="cfb__num bw__x">{{ .nr }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .ryr | default -1 }}">{{ with .ryr }}{{ printf "%.1f" (float .) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .spin }}">{{ printf "%+.1f" (float .spin) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .sfar }}">{{ printf "%+.1f" (float .sfar) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .leg }}">{{ printf "%+.1f" (float .leg) }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+  {{- partial "wintable-close.html" (dict "rows" (len $d.p.rows) "fresh" (printf "st_kickers_%s" $sport) "note" (printf "%v · through week %v · %v punts · ranked by Adj · updated %s" $d.season $d.note.week $d.p.pu $date)
+        "about" (printf "Each punt is valued at %s of the receiver's start (a return TD -7, a muff the punting side recovers counts for it), against the mean punt from the same line of scrimmage (3-yard bins, same season). Pin = punts from the opponent's 50 and in, where the job is inside the 20 without a touchback; Dist = punts from beyond the 50, where distance, hang and coverage decide. Each is shrunk for sample: total / (punts + k), Pin k %v, Dist k %v (pinning results barely repeat year to year, r %v; long-field results do, r %v). Leg = gross yards over expected, the most stable punting number (r %v). Adj = %v x (Pin + Dist) + %v x Leg x punts: the weights that best predict next season's points over expected a punt. %v+ punts to be listed%s." $ep $h.pin.k $h.far.k $h.pin.r $h.far.r $h.gross.r $h.cv $h.cg (index $d.min "p") (cond $col ", FBS players on the board" ""))) }}
+</div>
+{{- end -}}

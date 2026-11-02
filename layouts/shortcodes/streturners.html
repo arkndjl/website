@@ -14,6 +14,10 @@
     {{- if index site.Data (printf "st_teams_%s" $sport) }}
     <button type="button" class="cfb__chip" data-brk-w="teams" aria-pressed="false">teams</button>
     {{- end }}
+    {{- if index site.Data (printf "st_kickers_%s" $sport) }}
+    <button type="button" class="cfb__chip" data-brk-w="k" aria-pressed="false">kickers</button>
+    <button type="button" class="cfb__chip" data-brk-w="p" aria-pressed="false">punters</button>
+    {{- end }}
   </div>
   {{- range $kind := slice "kr" "pr" }}
   {{- $v := index $d $kind }}{{ $rows := $v.rows | default slice }}{{ $h := $v.h }}
@@ -73,19 +77,19 @@
   {{- if index site.Data (printf "st_teams_%s" $sport) }}
   <div data-brk-pane="teams" style="display:none">{{ partial "st-teams.html" (dict "sport" $sport "title" "special teams :: teams, points over expected a game") }}</div>
   {{- end }}
+  {{- partial "stkickers.html" (dict "sport" $sport "title" (replace ($.Get "title" | default "special teams") ":: returners, yards over expected" ":: kicking, points over expected")) }}
 </div>
 <script>
 (function () {
-  document.querySelectorAll('[data-brk]').forEach(function (b) {
-    if (b.dataset.ready) return; b.dataset.ready = 1;
-    var chips = b.querySelectorAll('[data-brk-w]'), panes = b.querySelectorAll('[data-brk-pane]');
-    chips.forEach(function (c) {
-      c.addEventListener('click', function () {
-        var w = c.getAttribute('data-brk-w');
-        chips.forEach(function (x) { var on = x === c; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-        panes.forEach(function (p) { p.style.display = p.getAttribute('data-brk-pane') === w ? '' : 'none'; });
-      });
-    });
+  // click delegation: the CFB tab is a lazytab (windows inserted after this runs). Containers another script bound
+  // directly (data-ready, the NFL breakouts tab) are left to it
+  if (window.__stChips) return; window.__stChips = 1;
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest && e.target.closest('[data-brk-w]'); if (!c) return;
+    var b = c.closest('[data-brk]'); if (!b || b.dataset.ready) return;
+    var w = c.getAttribute('data-brk-w');
+    b.querySelectorAll('[data-brk-w]').forEach(function (x) { var on = x === c; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    b.querySelectorAll('[data-brk-pane]').forEach(function (p) { p.style.display = p.getAttribute('data-brk-pane') === w ? '' : 'none'; });
   });
 })();
 </script>
