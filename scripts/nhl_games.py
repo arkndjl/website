@@ -569,7 +569,9 @@ class Model:
         x = g.get('x')
         if x:
             xh, xa = x['h'], x['a']
-            self.xg.add(h, a, xh[0], xa[0])
+            # the xG rating: all situations, power-play xG weighted by ppw (1 = as counted; scripts/nhl_ppw_research.py)
+            w = 1.0 - self.P.get('ppw', 1.0)
+            self.xg.add(h, a, xh[0] - w * xh[5], xa[0] - w * xa[5])
             self.gl.add(h, a, xh[2], xa[2])
             self.x5.add(h, a, xh[3], xa[3])
             # special teams: power-play xG for and penalty-kill xG against, per 60 of each
