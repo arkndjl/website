@@ -17,8 +17,12 @@
 - A spelling the rules miss (Neo / Neoklis Avdalas, a source's typo) goes in `data/name_aliases.json` "players"; a
   common nickname goes in its "nicknames". Matches still check team and position, so same-name players stay apart.
 
-## ARKBOARD Lab (was "Library")
+## ARKBOARD Reference (was "Library")
 
-- The ARKBOARD research section (Research + Glossary/Methodology tabs) is **Lab**: page `content/arkboard-lab.md`,
-  URL `/arkboard/lab/`, short link `arkndjl.net/lab`, menu identifier `arkboard-lab`. Never call it "Library"
-  (that is ARKLIBRARY). `/library` and `/arkboard/library/` redirect to it in `static/_redirects`.
+- The ARKBOARD section with Research, Glossary/Methodology and Data Sources tabs is **Reference**: page
+  `content/arkboard-reference.md`, URL `/arkboard/reference/`, short link `arkndjl.net/reference`, menu identifier
+  `arkboard-reference`. Never call it "Library" (that is ARKLIBRARY) or "Lab". `/library`, `/lab`, `/arkboard/library/`
+  and `/arkboard/lab/` redirect to it in `static/_redirects`. Add the Research and Glossary/Methodology tabs to that
+  page's `wintabs` ahead of "data sources".
+- Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
+  source adds the source there (name, link, what the site takes from it).

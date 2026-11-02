@@ -4440,3 +4440,8 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .rq__bar a.cfb__btn { text-decoration: none; }
 .rq__note { opacity: 0.75; font-size: 0.85em; }
 .rq:target { outline: 2px solid #7fffd4; outline-offset: 2px; }
+/* Reference :: data sources (shortcodes/datasources.html) */
+.datasrc__list { margin: 0; padding: 0; list-style: none; }
+.datasrc__list li { margin: 0 0 6px; padding: 0; }
+.datasrc__list li::before { content: none !important; }
+.datasrc__use { display: block; opacity: .75; font-size: .9em; }
