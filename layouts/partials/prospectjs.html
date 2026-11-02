@@ -109,7 +109,9 @@
 
   var SP_LAB = { age: 'age', mv: 'market value', pos: 'position (and how the market prices it)', gar_td: 'value this season (GAR)', gar1: 'value last season (GAR)',
     share_td: 'minutes share', rclub_td: 'club strength', lg_share: 'minutes share x league strength', ga90_td: 'goals + assists a 90', ymins: 'Premier League 2 minutes',
-    ht: 'height', age_lmv: 'age x market value' };
+    ht: 'height (keepers on their own slope)', age_lmv: 'age x market value', res_parm: 'B-team / feeder minutes x first-team strength',
+    res_young: 'feeder-league minutes, young for the level', uyl_young: 'UEFA Youth League minutes, young for the level', acad_ga: 'U18/U19 league goals + assists a 90',
+    yi: 'youth international level (provisional line)' };
   var SP_TIP = 'Outcome tiers on the FV scale by peak value (best three seasons of goals above replacement at ages 22-26), by rarity within a birth year and position group: 40 = top 250 (a regular in a covered top flight), 50 = top 90 (big-five regular level), 60 = top 20. Odds from the 2013-20 prospects: what players graded like him became, held out by birth cohort.';
   var SP_TIERS = ['below a top flight', 'top-flight regular', 'big-five regular', 'star'];
   var SPOS = { GK: 'keeper', CB: 'centre-back', LB: 'left-back', RB: 'right-back', DM: 'defensive midfielder', CM: 'central midfielder', AM: 'attacking midfielder',
@@ -129,6 +131,11 @@
         case 'ymins': return r.ym + ' Premier League 2 minutes';
         case 'ht': return r.ht ? r.ht + ' cm' : 'no listed height';
         case 'age_lmv': return eur(r.mv) + ' at ' + f1(r.age);
+        case 'res_parm': return 'B-team / feeder-league minutes, weighted by his first team\'s strength';
+        case 'res_young': return 'feeder-league minutes young for the level';
+        case 'uyl_young': return 'UEFA Youth League minutes young for the level';
+        case 'acad_ga': return 'U18/U19 league goals + assists a 90';
+        case 'yi': return r.path === 'yi' ? 'U17/U20 World Cup games' : 'highest youth international level played';
       }
       return SP_LAB[k] || k;
     };
@@ -201,6 +208,7 @@
         (r.b0 != null ? 'Average prospect ' + f1(r.b0) + ' ' + sgn(b.sum, 1) + ' = ' + f1(r.fvx) + ', the mean outcome; ' : 'The pushes sum to ' + sgn(b.sum, 1) + ' over the average prospect; ') + 'FV ' + r.fv + ' is that grade on the board\'s scale (the top is stretched).</p></details>' : '');
     },
     'sp-board': function (r, B) {
+      var rmEl = document.querySelector('table.sp[data-sp-raw]'), SP_RAWMEAN = rmEl ? +rmEl.getAttribute('data-sp-raw') : null;
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], SP_LAB[x[0]] || x[0]]; }), b = bars(p);
       var link = ' · <a href="https://www.transfermarkt.com/-/profil/spieler/' + esc(r.id) + '" rel="noopener">Transfermarkt ↗</a>';
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
@@ -212,8 +220,10 @@
         // predictive badges (scripts/soccer_badges.py), the chips of layouts/partials/badges.html
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (x) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[x[1]]; return '<span class="cfb__bdg cfb__bdg--' + esc(x[1]) + '" title="' + esc(T + ' ' + x[0] + ': ' + x[2] + ' pct at position, ' + x[3] + '; predictive of outcome FV beyond the grade') + '">' + esc(T + ' ' + x[0]) + '</span>'; }).join('') + '</p>' : '') +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +
-        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) +
-        '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
+        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.path ?
+        'graded on the provisional ' + (r.path === 'yi' ? 'youth-international-only' : 'academy-only') + ' line: the club inputs count at the line\'s slope (each push shown already scaled), plus the youth level term; then 20 + the line\'s intercept (sum ' + sgn(b.sum, 2) + ').' :
+        'each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) + (r.raw != null && SP_RAWMEAN != null ? '; pool average ' + f1(SP_RAWMEAN) + ' + inputs = raw grade ' + f1(r.raw) : '') +
+        '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top); above the board\'s top few a season the FV scale stretches, so the FV and the sum differ.') + '</p></details>' : '');
     }
   };
 
