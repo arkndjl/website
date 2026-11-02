@@ -4300,6 +4300,13 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .cs__f { display: inline-block; width: 1.1em; text-align: center; font-style: normal; font-size: 0.8em; margin-right: 1px; }
 .cs__f--w { background: var(--accent); color: var(--win-dark); }
 .cs__f--l { color: var(--muted, inherit); opacity: 0.7; }
+.cs__tier { white-space: nowrap; }
+.cs__t { display: inline-block; min-width: 1.9em; padding: 0 3px; text-align: center; font-size: 0.85em; border: 1px solid var(--win-dark); }   /* event-access tier chip: T1 solid accent, then fading */
+.cs__t--1 { background: var(--accent); color: var(--win-dark); }
+.cs__t--2 { background: #9eeadf; color: var(--win-dark); }
+.cs__t--3 { background: var(--win-well); color: #fff; }
+.cs__t--4 { background: transparent; color: inherit; opacity: 0.75; }
+.cs__up { color: var(--accent); }
 
 /* ------------------------------------------------------------------
    Homepage ticker (layouts/partials/ticker.html): a sunken well with one
