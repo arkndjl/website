@@ -116,7 +116,7 @@ def poss_of(g):
 def team_games(games):
     by = defaultdict(list)
     for g in games.values():
-        if 'stints' in g and g['secs'] > 1800:
+        if 'stints' in g and g['secs'] > 1800 and None not in g['players'][g['home']] + g['players'][g['away']]:
             by[g['home']].append(g); by[g['away']].append(g)
     for t in by:
         by[t].sort(key=lambda g: (g['date'], g['id']))

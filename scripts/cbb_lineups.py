@@ -158,8 +158,9 @@ def parse(pbp, box=None):
                 name = rest.split('-', 1)[1]
             if name and tid:
                 k = nm(name)
-                e['sub'] = (m.group(1), tid, k)
-                vote[k][tid] += 10
+                if k:
+                    e["sub"] = (m.group(1), tid, k)
+                    vote[k][tid] += 10
             continue
         # 2021-22 style: "Jumper by Kent St.'s VonCameron Davis" (the team is in the line)
         m = OLDACT.match(e['d'])
@@ -478,7 +479,7 @@ def season_tables(games, upto=None, k_lineup=150.0, k_onoff=600.0):
     tot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0, 0])
     tname = {}
     for g in games.values():
-        if 'stints' not in g or (upto and g['date'] >= upto):
+        if 'stints' not in g or (upto and g['date'] >= upto) or None in g['players'][g['home']] + g['players'][g['away']]:
             continue
         secs = g['secs'] or 1
         poss = g.get('poss') or 68.0 * secs / 2400
@@ -607,8 +608,16 @@ def build(seasons=None):
                 ps.append([n, round(r['min'], 1), round(r['on'], 1), None if r['off'] is None else round(r['off'], 1),
                            None if r['oo'] is None else round(r['oo'], 1), None if r['oos'] is None else round(r['oos'], 1), fv.get(n)])
             ps.sort(key=lambda x: -x[1])
+            us = us[:12]
+            # unit members as positions in the players list (top 15 by minutes, plus anyone in a listed unit)
+            need = {n for u in us for n in u[0]}
+            ps = [p for i, p in enumerate(ps) if i < 15 or p[0] in need]
+            pos = {p[0]: i for i, p in enumerate(ps)}
+            for u in us:
+                u[0] = [pos[n] for n in u[0]]
+                u[2] = round(u[2])
             teams[t] = dict(name=cand[0]['team'], conf=conf, logo=logo, g=T[4], min=round(T[0] / 60), poss=round(T[1]), ortg=round(100 * T[2] / T[1], 1),
-                            drtg=round(100 * T[3] / T[1], 1), units=us[:15], players=ps[:15])
+                            drtg=round(100 * T[3] / T[1], 1), units=us, players=ps)
         out['seasons'][str(S)] = dict(games=len(ok), teams=teams)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     s = json.dumps(out, separators=(',', ':'), allow_nan=False)
