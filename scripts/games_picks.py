@@ -228,7 +228,7 @@ def recenter_wf(sport, rows):
     hist, day = {}, {}
     for r in rows:
         if r.get('tm') is not None and r.get('T') is not None:
-            day.setdefault((r['S'], str(r.get('date'))[:10]), []).append(r)
+            day.setdefault((r['S'], DU.et_day(r.get('date'))), []).append(r)   # ET slate, not UTC date
     for (S, d), rs in sorted(day.items()):
         past = hist.setdefault(S, [])[-RC_N:]
         vals = past + [r['tm'] - (r['To'] if r.get('To') is not None else r['T']) for r in rs]
@@ -822,7 +822,7 @@ def fit_segments(res):
             add.setdefault(c['sport'], {})[(e['g']['id'], c['mk'])] = e
     for sport, d in add.items():
         es = list(d.values())
-        wk = lambda e: datetime.date.fromisoformat(str(e['g']['date'])[:10]).isocalendar()[:2]
+        wk = lambda e: datetime.date.fromisoformat(DU.et_day(e['g']['date'])).isocalendar()[:2]
         # weeks with games in the held-out seasons (any game of the sport, not only picks)
         allw = {wk({'g': r}) for r in load_wf(sport) if r['S'] in {e['S'] for e in es}}
         res['sports'][sport]['segAdds'] = {**rule_stats(es), 'seasons': sorted({e['S'] for e in es}), 'weeks': len(allw),

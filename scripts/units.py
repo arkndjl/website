@@ -284,7 +284,7 @@ def _icc(groups):
 def slate_of(sport, g):
     if sport in ('cfb', 'nfl') and g.get('wk') is not None:
         return f"{g['S']}-w{int(g['wk']):02d}"
-    return str(g.get('date') or '')[:10]
+    return et_day(g.get('date'))   # NBA/CFB history dates are UTC times: a 10 pm ET tip is the next UTC day (Nov 2)
 
 
 def bad_open(sport, mk, g):
