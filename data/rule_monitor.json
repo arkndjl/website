@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T20:59:45Z",
+ "asof": "2026-11-02T23:56:37Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -29,11 +29,11 @@
    "id": "pick:cfb:total",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB total 2.5+",
-   "since": "2026-11-01",
+   "label": "CFB total 3+",
+   "since": "2026-11-02",
    "status": "on",
    "stopped": null,
-   "n": 12,
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -49,10 +49,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0359,
-    "beat": 0.587,
-    "roi": 0.1448,
-    "n": 983
+    "clvRet": 0.0393,
+    "beat": 0.605,
+    "roi": 0.1574,
+    "n": 785
    },
    "check": {
     "n": 0,
@@ -60,16 +60,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1227,
+    "sd": 0.1158,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.018,
+     "mu1": 0.0124,
      "n": 0,
-     "sd": 0.1227,
+     "sd": 0.1158,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -79,13 +79,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 275
+     "need": 516
     }
    },
    "drift": {
-    "mu1": 0.018,
+    "mu1": 0.0124,
     "n": 0,
-    "sd": 0.1227,
+    "sd": 0.1158,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -95,7 +95,81 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 275,
+    "need": 516,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cfb:spread | conf: Sun Belt",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 4+ (conf: Sun Belt)",
+   "since": "2026-11-02",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0452,
+    "beat": 0.593,
+    "roi": 0.2409,
+    "n": 27
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.103,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0153,
+     "n": 0,
+     "sd": 0.103,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 266
+    }
+   },
+   "drift": {
+    "mu1": 0.0153,
+    "n": 0,
+    "sd": 0.103,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 266,
     "path": []
    }
   },
@@ -123,7 +197,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0453,
+    "clvRet": 0.0393,
     "beat": 0.537,
     "roi": 0.1132,
     "n": 108
@@ -134,16 +208,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1687,
+    "sd": 0.1627,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0226,
+     "mu1": 0.0124,
      "n": 0,
-     "sd": 0.1687,
+     "sd": 0.1627,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -153,13 +227,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 327
+     "need": 1019
     }
    },
    "drift": {
-    "mu1": 0.0226,
+    "mu1": 0.0124,
     "n": 0,
-    "sd": 0.1687,
+    "sd": 0.1627,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -169,16 +243,16 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 327,
+    "need": 1019,
     "path": []
    }
   },
   {
-   "id": "pick:cfb:spread | line: 14+",
+   "id": "pick:cfb:spread | line: 3-7",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB spread 8+ (line: 14+)",
-   "since": "2026-10-29",
+   "label": "CFB spread 7.5+ (line: 3-7)",
+   "since": "2026-11-02",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -197,10 +271,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.028,
-    "beat": 0.493,
-    "roi": 0.1339,
-    "n": 73
+    "clvRet": 0.06,
+    "beat": 0.481,
+    "roi": 0.0949,
+    "n": 27
    },
    "check": {
     "n": 0,
@@ -208,16 +282,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1616,
+    "sd": 0.1575,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.014,
+     "mu1": 0.0227,
      "n": 0,
-     "sd": 0.1616,
+     "sd": 0.1575,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -227,13 +301,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 785
+     "need": 283
     }
    },
    "drift": {
-    "mu1": 0.014,
+    "mu1": 0.0227,
     "n": 0,
-    "sd": 0.1616,
+    "sd": 0.1575,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -243,81 +317,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 785,
-    "path": []
-   }
-  },
-  {
-   "id": "pick:cfb:spread | line: 3-7",
-   "book": "picks",
-   "sport": "cfb",
-   "label": "CFB spread 5+ (line: 3-7)",
-   "since": "2026-10-29",
-   "status": "on",
-   "stopped": null,
-   "n": 1,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0378,
-    "beat": 0.495,
-    "roi": -0.0357,
-    "n": 91
-   },
-   "check": {
-    "n": 1,
-    "window": 1,
-    "mean": -0.0192,
-    "t": null,
-    "days": 1,
-    "sd": 0.1283,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0189,
-     "n": 1,
-     "sd": 0.1283,
-     "rho": 0.0,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": -0.033,
-     "info": 0.02,
-     "real": -1.016,
-     "realSe": 6.79,
-     "need": 271
-    }
-   },
-   "drift": {
-    "mu1": 0.0189,
-    "n": 0,
-    "sd": 0.1283,
-    "rho": 0.0,
-    "lo": -2.944,
-    "hi": 2.944,
-    "state": "watching",
-    "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
-    "need": 271,
+    "need": 283,
     "path": []
    }
   },
@@ -345,7 +345,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0878,
+    "clvRet": 0.0794,
     "beat": 0.667,
     "roi": 0.1347,
     "n": 33
@@ -356,16 +356,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1622,
+    "sd": 0.1578,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0439,
+     "mu1": 0.0324,
      "n": 0,
-     "sd": 0.1622,
+     "sd": 0.1578,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -375,13 +375,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 80
+     "need": 140
     }
    },
    "drift": {
-    "mu1": 0.0439,
+    "mu1": 0.0324,
     "n": 0,
-    "sd": 0.1622,
+    "sd": 0.1578,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -391,7 +391,81 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 80,
+    "need": 140,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cfb:spread | role: dog",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 8+ (role: dog)",
+   "since": "2026-11-02",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0244,
+    "beat": 0.432,
+    "roi": 0.092,
+    "n": 74
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1543,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0049,
+     "n": 0,
+     "sd": 0.1543,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 5798
+    }
+   },
+   "drift": {
+    "mu1": 0.0049,
+    "n": 0,
+    "sd": 0.1543,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 5798,
     "path": []
    }
   },
@@ -419,7 +493,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0893,
+    "clvRet": 0.07,
     "beat": 0.667,
     "roi": 0.2448,
     "n": 57
@@ -430,16 +504,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.164,
+    "sd": 0.1616,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0447,
+     "mu1": 0.0277,
      "n": 0,
-     "sd": 0.164,
+     "sd": 0.1616,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -449,13 +523,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 79
+     "need": 200
     }
    },
    "drift": {
-    "mu1": 0.0447,
+    "mu1": 0.0277,
     "n": 0,
-    "sd": 0.164,
+    "sd": 0.1616,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -465,7 +539,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 79,
+    "need": 200,
     "path": []
    }
   },
@@ -493,7 +567,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0465,
+    "clvRet": 0.0393,
     "beat": 0.541,
     "roi": 0.1362,
     "n": 85
@@ -504,16 +578,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1612,
+    "sd": 0.1562,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0232,
+     "mu1": 0.0124,
      "n": 0,
-     "sd": 0.1612,
+     "sd": 0.1562,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -523,13 +597,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 283
+     "need": 939
     }
    },
    "drift": {
-    "mu1": 0.0232,
+    "mu1": 0.0124,
     "n": 0,
-    "sd": 0.1612,
+    "sd": 0.1562,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -539,7 +613,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 283,
+    "need": 939,
     "path": []
    }
   },
@@ -553,7 +627,7 @@
    "stopped": null,
    "n": 2,
    "clvN": 1,
-   "clvRet": 0.0246,
+   "clvRet": -0.006,
    "clvT": null,
    "days": 1,
    "beat": 0.0,
@@ -563,69 +637,143 @@
    "roi": -1.0,
    "week": {
     "n": 1,
-    "clvRet": 0.0246,
+    "clvRet": -0.006,
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.039,
+    "clvRet": 0.0368,
     "beat": 0.538,
     "roi": 0.1181,
     "n": 119
    },
    "vsExp": {
-    "gap": -0.0144,
-    "z": -0.09,
+    "gap": -0.0428,
+    "z": -0.27,
     "read": "in line"
    },
    "check": {
     "n": 1,
     "window": 1,
-    "mean": 0.0246,
+    "mean": -0.006,
     "t": null,
     "days": 1,
-    "sd": 0.1605,
+    "sd": 0.1587,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0195,
+     "mu1": 0.0111,
      "n": 1,
-     "sd": 0.1605,
+     "sd": 0.1587,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.011,
-     "info": 0.01,
-     "real": 1.262,
-     "realSe": 8.233,
-     "need": 399
+     "llr": -0.011,
+     "info": 0.0,
+     "real": -1.839,
+     "realSe": 14.271,
+     "need": 1199
     }
    },
    "drift": {
-    "mu1": 0.0195,
+    "mu1": 0.0111,
     "n": 1,
-    "sd": 0.1605,
+    "sd": 0.1587,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.011,
-    "info": 0.01,
-    "real": 1.262,
-    "realSe": 8.233,
-    "need": 399,
+    "llr": -0.011,
+    "info": 0.0,
+    "real": -1.839,
+    "realSe": 14.271,
+    "need": 1199,
     "path": [
      [
       "2026-10-31",
       1,
-      0.011
+      -0.011
      ]
     ]
+   }
+  },
+  {
+   "id": "pick:cfb:spread | tier: mixed",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 4.5+ (tier: mixed)",
+   "since": "2026-11-02",
+   "status": "on",
+   "stopped": null,
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0336,
+    "beat": 0.508,
+    "roi": 0.0572,
+    "n": 179
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.155,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0095,
+     "n": 0,
+     "sd": 0.155,
+     "rho": 0.0,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 1562
+    }
+   },
+   "drift": {
+    "mu1": 0.0095,
+    "n": 0,
+    "sd": 0.155,
+    "rho": 0.0,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 1562,
+    "path": []
    }
   },
   {
@@ -652,7 +800,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0644,
+    "clvRet": 0.0609,
     "beat": 0.575,
     "roi": 0.0421,
     "n": 87
@@ -663,16 +811,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1513,
+    "sd": 0.1503,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0322,
+     "mu1": 0.0232,
      "n": 0,
-     "sd": 0.1513,
+     "sd": 0.1503,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -682,13 +830,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 130
+     "need": 248
     }
    },
    "drift": {
-    "mu1": 0.0322,
+    "mu1": 0.0232,
     "n": 0,
-    "sd": 0.1513,
+    "sd": 0.1503,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -698,7 +846,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 130,
+    "need": 248,
     "path": []
    }
   },
@@ -726,7 +874,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0217,
+    "clvRet": 0.0229,
     "beat": 0.459,
     "roi": 0.1308,
     "n": 61
@@ -737,16 +885,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1513,
+    "sd": 0.1478,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0109,
+     "mu1": 0.0042,
      "n": 0,
-     "sd": 0.1513,
+     "sd": 0.1478,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -756,13 +904,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 1145
+     "need": 7405
     }
    },
    "drift": {
-    "mu1": 0.0109,
+    "mu1": 0.0042,
     "n": 0,
-    "sd": 0.1513,
+    "sd": 0.1478,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -772,7 +920,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 1145,
+    "need": 7405,
     "path": []
    }
   },
@@ -800,7 +948,7 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.06,
+    "clvRet": 0.0462,
     "beat": 0.562,
     "roi": 0.2729,
     "n": 48
@@ -811,16 +959,16 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1581,
+    "sd": 0.1531,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.03,
+     "mu1": 0.0158,
      "n": 0,
-     "sd": 0.1581,
+     "sd": 0.1531,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
@@ -830,13 +978,13 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 163
+     "need": 552
     }
    },
    "drift": {
-    "mu1": 0.03,
+    "mu1": 0.0158,
     "n": 0,
-    "sd": 0.1581,
+    "sd": 0.1531,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
@@ -846,81 +994,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 163,
-    "path": []
-   }
-  },
-  {
-   "id": "pick:cfb:total | conf: Sun Belt",
-   "book": "picks",
-   "sport": "cfb",
-   "label": "CFB total 2+ (conf: Sun Belt)",
-   "since": "2026-11-01",
-   "status": "on",
-   "stopped": null,
-   "n": 0,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0296,
-    "beat": 0.534,
-    "roi": 0.2419,
-    "n": 73
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1119,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0148,
-     "n": 0,
-     "sd": 0.1119,
-     "rho": 0.0,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 337
-    }
-   },
-   "drift": {
-    "mu1": 0.0148,
-    "n": 0,
-    "sd": 0.1119,
-    "rho": 0.0,
-    "lo": -2.944,
-    "hi": 2.944,
-    "state": "watching",
-    "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
-    "need": 337,
+    "need": 552,
     "path": []
    }
   },
@@ -966,10 +1040,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0478,
+     "mu1": 0.0406,
      "n": 0,
      "sd": 0.1257,
-     "rho": 0.0,
+     "rho": 0.007,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -978,14 +1052,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 41
+     "need": 56
     }
    },
    "drift": {
-    "mu1": 0.0478,
+    "mu1": 0.0406,
     "n": 0,
     "sd": 0.1257,
-    "rho": 0.0,
+    "rho": 0.007,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -994,7 +1068,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 41,
+    "need": 56,
     "path": []
    }
   },
@@ -1006,7 +1080,7 @@
    "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 7,
+   "n": 6,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": null,
@@ -1033,35 +1107,35 @@
     "read": "in line"
    },
    "check": {
-    "n": 9,
-    "window": 9,
-    "mean": -0.004,
+    "n": 6,
+    "window": 6,
+    "mean": -0.0518,
     "t": null,
     "days": 1,
     "sd": 0.1256,
-    "cusum": 0.29,
-    "cusumMax": 0.7,
+    "cusum": 1.07,
+    "cusumMax": 1.49,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0167,
-     "n": 9,
+     "mu1": 0.0094,
+     "n": 6,
      "sd": 0.1256,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.118,
-     "info": 0.16,
-     "real": -0.239,
-     "realSe": 2.507,
-     "need": 333
+     "llr": -0.21,
+     "info": 0.03,
+     "real": -5.721,
+     "realSe": 5.445,
+     "need": 1048
     }
    },
    "drift": {
-    "mu1": 0.0167,
+    "mu1": 0.0094,
     "n": 6,
     "sd": 0.1256,
     "rho": 0.0,
@@ -1069,16 +1143,16 @@
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.382,
-    "info": 0.11,
-    "real": -3.103,
-    "realSe": 3.071,
-    "need": 333,
+    "llr": -0.21,
+    "info": 0.03,
+    "real": -5.721,
+    "realSe": 5.445,
+    "need": 1048,
     "path": [
      [
       "2026-11-01",
       6,
-      -0.382
+      -0.21
      ]
     ]
    }
@@ -1091,7 +1165,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 37,
+   "n": 38,
    "clvN": 1,
    "clvRet": 0.0527,
    "clvT": null,
@@ -1118,54 +1192,48 @@
     "read": "in line"
    },
    "check": {
-    "n": 3,
-    "window": 3,
-    "mean": 0.3246,
+    "n": 1,
+    "window": 1,
+    "mean": 0.0527,
     "t": null,
     "days": 1,
     "sd": 0.1136,
-    "cusum": 0.84,
-    "cusumMax": 0.84,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0181,
-     "n": 3,
+     "mu1": 0.0108,
+     "n": 0,
      "sd": 0.1136,
      "rho": 0.002,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 1.322,
-     "info": 0.08,
-     "real": 17.932,
-     "realSe": 3.631,
-     "need": 232
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 649
     }
    },
    "drift": {
-    "mu1": 0.0181,
-    "n": 1,
+    "mu1": 0.0108,
+    "n": 0,
     "sd": 0.1136,
     "rho": 0.002,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.061,
-    "info": 0.03,
-    "real": 2.912,
-    "realSe": 6.276,
-    "need": 232,
-    "path": [
-     [
-      "2026-11-02",
-      1,
-      0.061
-     ]
-    ]
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 649,
+    "path": []
    }
   },
   {
@@ -1176,7 +1244,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 45,
+   "n": 48,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -1198,11 +1266,11 @@
     "n": 7154
    },
    "check": {
-    "n": 1,
-    "window": 1,
-    "mean": 0.0715,
+    "n": 0,
+    "window": 0,
+    "mean": null,
     "t": null,
-    "days": 1,
+    "days": 0,
     "sd": 0.1114,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1210,23 +1278,23 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0246,
-     "n": 1,
+     "mu1": 0.0174,
+     "n": 0,
      "sd": 0.1114,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.118,
-     "info": 0.05,
-     "real": 2.901,
-     "realSe": 4.519,
-     "need": 120
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 242
     }
    },
    "drift": {
-    "mu1": 0.0246,
+    "mu1": 0.0174,
     "n": 0,
     "sd": 0.1114,
     "rho": 0.0,
@@ -1238,7 +1306,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 120,
+    "need": 242,
     "path": []
    }
   },
@@ -1284,7 +1352,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0083,
+     "mu1": 0.001,
      "n": 0,
      "sd": 0.0933,
      "rho": 0.002,
@@ -1296,11 +1364,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 744
+     "need": 49443
     }
    },
    "drift": {
-    "mu1": 0.0083,
+    "mu1": 0.001,
     "n": 0,
     "sd": 0.0933,
     "rho": 0.002,
@@ -1312,7 +1380,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 744,
+    "need": 49443,
     "path": []
    }
   },
@@ -1358,7 +1426,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0132,
+     "mu1": 0.0059,
      "n": 0,
      "sd": 0.0823,
      "rho": 0.002,
@@ -1370,11 +1438,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 231
+     "need": 1158
     }
    },
    "drift": {
-    "mu1": 0.0132,
+    "mu1": 0.0059,
     "n": 0,
     "sd": 0.0823,
     "rho": 0.002,
@@ -1386,7 +1454,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 231,
+    "need": 1158,
     "path": []
    }
   },
@@ -1395,10 +1463,10 @@
    "book": "picks",
    "sport": "nba",
    "label": "NBA total 3+",
-   "since": "2026-11-01",
+   "since": "2026-11-02",
    "status": "on",
    "stopped": null,
-   "n": 2,
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -1414,10 +1482,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1202,
-    "beat": 0.781,
-    "roi": 0.0928,
-    "n": 734
+    "clvRet": 0.1198,
+    "beat": 0.779,
+    "roi": 0.091,
+    "n": 728
    },
    "check": {
     "n": 0,
@@ -1425,17 +1493,17 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1424,
+    "sd": 0.1425,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0301,
+     "mu1": 0.019,
      "n": 0,
-     "sd": 0.1424,
-     "rho": 0.011,
+     "sd": 0.1425,
+     "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -1444,14 +1512,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 132
+     "need": 330
     }
    },
    "drift": {
-    "mu1": 0.0301,
+    "mu1": 0.019,
     "n": 0,
-    "sd": 0.1424,
-    "rho": 0.011,
+    "sd": 0.1425,
+    "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -1460,7 +1528,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 132,
+    "need": 330,
     "path": []
    }
   },
@@ -1506,7 +1574,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0137,
+     "mu1": 0.0028,
      "n": 0,
      "sd": 0.1293,
      "rho": 0.0,
@@ -1518,11 +1586,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 522
+     "need": 12525
     }
    },
    "drift": {
-    "mu1": 0.0137,
+    "mu1": 0.0028,
     "n": 0,
     "sd": 0.1293,
     "rho": 0.0,
@@ -1534,7 +1602,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 522,
+    "need": 12525,
     "path": []
    }
   },
@@ -1580,7 +1648,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0281,
+     "mu1": 0.0172,
      "n": 0,
      "sd": 0.1342,
      "rho": 0.0,
@@ -1592,11 +1660,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 134
+     "need": 359
     }
    },
    "drift": {
-    "mu1": 0.0281,
+    "mu1": 0.0172,
     "n": 0,
     "sd": 0.1342,
     "rho": 0.0,
@@ -1608,7 +1676,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 134,
+    "need": 359,
     "path": []
    }
   },
@@ -1654,7 +1722,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0192,
+     "mu1": 0.0083,
      "n": 0,
      "sd": 0.1369,
      "rho": 0.0,
@@ -1666,11 +1734,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 299
+     "need": 1601
     }
    },
    "drift": {
-    "mu1": 0.0192,
+    "mu1": 0.0083,
     "n": 0,
     "sd": 0.1369,
     "rho": 0.0,
@@ -1682,7 +1750,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 299,
+    "need": 1601,
     "path": []
    }
   },
@@ -1728,7 +1796,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0316,
+     "mu1": 0.0207,
      "n": 0,
      "sd": 0.142,
      "rho": 0.0,
@@ -1740,11 +1808,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 119
+     "need": 278
     }
    },
    "drift": {
-    "mu1": 0.0316,
+    "mu1": 0.0207,
     "n": 0,
     "sd": 0.142,
     "rho": 0.0,
@@ -1756,7 +1824,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 119,
+    "need": 278,
     "path": []
    }
   },
@@ -1802,7 +1870,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0271,
+     "mu1": 0.0162,
      "n": 0,
      "sd": 0.1549,
      "rho": 0.0,
@@ -1814,11 +1882,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 193
+     "need": 541
     }
    },
    "drift": {
-    "mu1": 0.0271,
+    "mu1": 0.0162,
     "n": 0,
     "sd": 0.1549,
     "rho": 0.0,
@@ -1830,7 +1898,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 193,
+    "need": 541,
     "path": []
    }
   },
@@ -1876,7 +1944,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0241,
+     "mu1": 0.0132,
      "n": 0,
      "sd": 0.118,
      "rho": 0.0,
@@ -1888,11 +1956,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 141
+     "need": 472
     }
    },
    "drift": {
-    "mu1": 0.0241,
+    "mu1": 0.0132,
     "n": 0,
     "sd": 0.118,
     "rho": 0.0,
@@ -1904,7 +1972,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 141,
+    "need": 472,
     "path": []
    }
   },
@@ -1950,7 +2018,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0339,
+     "mu1": 0.023,
      "n": 0,
      "sd": 0.16,
      "rho": 0.0,
@@ -1962,11 +2030,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 131
+     "need": 285
     }
    },
    "drift": {
-    "mu1": 0.0339,
+    "mu1": 0.023,
     "n": 0,
     "sd": 0.16,
     "rho": 0.0,
@@ -1978,7 +2046,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 131,
+    "need": 285,
     "path": []
    }
   },
@@ -2024,7 +2092,7 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0212,
+     "mu1": 0.0103,
      "n": 0,
      "sd": 0.1235,
      "rho": 0.0,
@@ -2036,11 +2104,11 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 200
+     "need": 851
     }
    },
    "drift": {
-    "mu1": 0.0212,
+    "mu1": 0.0103,
     "n": 0,
     "sd": 0.1235,
     "rho": 0.0,
@@ -2052,7 +2120,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 200,
+    "need": 851,
     "path": []
    }
   }
@@ -2064,11 +2132,11 @@
    "label": "CFB spread",
    "n": 1,
    "du": 2.75,
-   "clvRet": 0.0246,
+   "clvRet": -0.006,
    "clvT": null,
-   "flat": 0.0246,
+   "flat": -0.006,
    "adds": 0.0,
-   "expEdge": 0.0188,
+   "expEdge": 0.0219,
    "basis": "backtest"
   },
   {
@@ -2094,8 +2162,8 @@
    "clvT": null,
    "flat": -0.007,
    "adds": -0.0,
-   "expEdge": 0.0685,
-   "basis": "default: half Kelly on the expected return"
+   "expEdge": 0.0453,
+   "basis": "backtest"
   },
   {
    "sport": "nfl",
@@ -2107,8 +2175,8 @@
    "clvT": null,
    "flat": -0.0518,
    "adds": 0.0032,
-   "expEdge": 0.0255,
-   "basis": "default: half Kelly on the expected return"
+   "expEdge": 0.0023,
+   "basis": "backtest"
   },
   {
    "sport": "cbb",
@@ -2146,7 +2214,7 @@
    "clvT": -2.88,
    "flat": -0.0286,
    "adds": -0.0023,
-   "expEdge": 0.0197,
+   "expEdge": 0.0204,
    "basis": "backtest + live picks"
   },
   {
@@ -2159,7 +2227,7 @@
    "clvT": -2.93,
    "flat": -0.049,
    "adds": 0.0115,
-   "expEdge": 0.0266,
+   "expEdge": 0.027,
    "basis": "backtest + live picks"
   }
  ],
@@ -2168,17 +2236,18 @@
  "drift": {
   "watching": [
    "pick:cfb:total",
+   "pick:cfb:spread | conf: Sun Belt",
    "pick:cfb:spread | game: non-conference",
-   "pick:cfb:spread | line: 14+",
    "pick:cfb:spread | line: 3-7",
    "pick:cfb:spread | line: 7-14",
+   "pick:cfb:spread | role: dog",
    "pick:cfb:spread | role: favorite",
    "pick:cfb:spread | season: early",
    "pick:cfb:spread | season: late",
+   "pick:cfb:spread | tier: mixed",
    "pick:cfb:spread | tier: power",
    "pick:cfb:spread | venue: away",
    "pick:cfb:spread | venue: home",
-   "pick:cfb:total | conf: Sun Belt",
    "pick:nfl:spread",
    "pick:nfl:total",
    "pick:cbb:spread",
