@@ -43,8 +43,9 @@ the whole book (every market at once).
 
 The NBA history is an upper bound (the walk-forward model saw tip-time injury news the open did not have), so its
 picks' close value is halved before anything is fit (the close's chances moved to match in the draws): the
-calibration, lam, the cap and the ruin odds all come from that halved world. Live picks pool in at full weight. NFL has no
-opening lines in the history and gets the default (half Kelly on the raw expectation, 3u cap) until it has live picks.
+calibration, lam, the cap and the ruin odds all come from that halved world. Live picks pool in at full weight. NFL is
+fit like the others since Nov 2 2026 (audit: its history now has SBR/ESPN opens; the old default, half Kelly on the raw
+expectation with a 3u cap, skipped TIMING and the gap calibration).
 """
 import datetime
 import json
@@ -155,6 +156,42 @@ def priced(p, c, o, gap=None, ml=False):
     e0, u = edge(p, ev0, gap)
     ws = (e0 + 1 - pu) / (B0 + 1)
     return ws, ws * (dec(o) - 1) - (1 - pu - ws), u
+
+
+def ml_cal(sport, side, line, gap, k, chances):
+    """(calibrated moneyline chances, uncertainty shrink u) for the moneyline on a spread pick (Nov 2 2026 audit).
+    The calibration is the SPREAD market's return at BASE; before, a moneyline took that number as its own return at
+    its own price, so favourites were overstaked (NBA -7 home, gap 4: 3.3% vs 0) and underdogs understaked (+258:
+    0.46% vs 0.95%). Now the calibrated spread edge becomes the close move t (points) that would give it, and the
+    moneyline is priced at that same close. k: the rule's close-move share. chances(mk, close) -> (win, push, loss) for the pick's side at `line`.
+    None when the spread has no calibrated edge."""
+    p = params(sport, 'spread')
+    B0 = dec(BASE) - 1
+    sgn = 1 if side == 'home' else -1
+    r = lambda t: (lambda c: c[0] * B0 - c[2])(chances('spread', line + sgn * t))
+    ev0 = r(k * gap)                   # the model's own spread return: the close moves k x gap toward the pick
+    if ev0 <= 0:
+        return None
+    e0, u = edge(p, ev0, gap)
+    if e0 <= 0 or u <= 0:
+        return None
+    lo, hi = 0.0, k * gap
+    for _ in range(40):
+        t = (lo + hi) / 2
+        lo, hi = (t, hi) if r(t) < e0 else (lo, t)
+    return chances('ml', line + sgn * (lo + hi) / 2), u
+
+
+def stake_cal(sport, c, u, o, n=None):
+    """stake_ like stake(), on chances that are already calibrated (ml_cal) with their shrink u"""
+    p = params(sport, 'spread')
+    w, pu, l = c
+    B = dec(o) - 1
+    ev = w * B - l
+    if ev <= 0 or u <= 0:
+        return 0.0
+    f = p['lam'] * u * ev / (B * (1 - pu)) * 100 * (slate_scale(p, n) if n else 1.0)
+    return min(p['cap'], max(UNIT_MIN, round(f * 4) / 4)) if f > 0 else 0.0
 
 
 def view(sport, mk, c, o, gap=None):
@@ -361,13 +398,23 @@ def rho_of(sport, mk):
     return _icc(groups)
 
 
+def GP_RC_SPORTS():
+    import games_picks as GP
+    return GP.RC_SPORTS
+
+
 def live_pairs(sport, mk):
     """(gap, clvRet, slate) of graded live picks: the games_picks log and the paper book"""
     out = []
     try:
+        import clv as C
         for e in json.load(open(os.path.join(ROOT, 'data', f'games_picks_{sport}.json'))).get('log', []):
-            if e.get('clvRet') is not None and e.get('edge') is not None and ('spread' if e['mk'] == 'ml' else e['mk']) == mk:
-                out.append((e.get('sz') or e['edge'], e['clvRet'], 'g' + str(e.get('kick', ''))[:10]))
+            # judged at BASE, the price the calibration's level is read at, and no moneylines (Nov 2 2026 audit: a -110
+            # pick reads ~3 points lower than at -103, and a plus-money moneyline's return is on another scale)
+            if e.get('clvRet') is None or e.get('edge') is None or e['mk'] != mk:
+                continue
+            r = C.ret(sport, mk, e['side'], e.get('line'), BASE, e.get('close')) if e.get('line') is not None else None
+            out.append((e.get('sz') or e['edge'], e['clvRet'] if r is None else r, 'g' + str(e.get('kick', ''))[:10]))
     except (OSError, ValueError):
         pass
     try:
@@ -376,7 +423,7 @@ def live_pairs(sport, mk):
             # staked bets only, and no totals where DU's gap is the recentred one (games_picks.RC_SPORTS): the paper
             # book's totals gap is the raw model minus the line (Oct 21 2026 audit)
             if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None \
-                    and (b.get('stake') or 0) > 0 and not (mk == 'total' and sport in ('nba', 'cfb')):
+                    and (b.get('stake') or 0) > 0 and not (mk == 'total' and sport in GP_RC_SPORTS()):
                 out.append((b['gap'], b['clvRet'], 'p' + str(b.get('k', ''))[:10]))
     except (OSError, ValueError):
         pass
@@ -518,7 +565,7 @@ def fit():
     res = json.load(open(GP.RULES))
     units = {}
     for sport in GP.SPORTS:
-        picks, rules = picks_history(sport, res) if sport != 'nfl' else ([], [])
+        picks, rules = picks_history(sport, res)
         if not picks:
             continue
         chosen = crossfit(sport, picks)

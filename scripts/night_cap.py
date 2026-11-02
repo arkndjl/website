@@ -84,6 +84,39 @@ def exposure(D, now):
     return out
 
 
+def fixed(D, now):
+    """ET date -> stake already down: picks of that night that have started (or settled) keep the capped stake they
+    were bet at, and it counts against the night's CAP. Read from each file's log (a superset of picks), so a started
+    pick that has left the picks list still counts. Without this the late games of a night were rescaled against a
+    smaller total once the early games started (16 picks x 5 = 80 raw: 40% at 6 pm, 60% after the 7 pm starts)."""
+    out = {}
+    for d in D.values():
+        rows = d.get('log') or d.get('picks', [])
+        if isinstance(rows, dict):
+            rows = list(rows.values())
+        seen = set()
+        for p in rows:
+            if not isinstance(p, dict) or p.get('pass') or not p.get('kick') or live(p, now):
+                continue
+            k = (p.get('id'), p.get('mk'), p.get('side'), p.get('player'), p.get('stat'))
+            if k in seen:
+                continue
+            seen.add(k)
+            u = p.get('units')
+            if u:
+                out[night(p['kick'])] = out.get(night(p['kick']), 0.0) + float(u)
+    return out
+
+
+def scales(ex, fx):
+    """night -> scale on the open picks' raw stakes so started + open stay within CAP"""
+    K = {}
+    for n, t in ex.items():
+        room = max(0.0, CAP - fx.get(n, 0.0))
+        K[n] = min(1.0, room / t) if t > 0 else 1.0
+    return K
+
+
 def apply(only=None, now=None):
     now = now or datetime.now(timezone.utc)
     D = {}
@@ -94,7 +127,8 @@ def apply(only=None, now=None):
         except (OSError, json.JSONDecodeError):
             pass
     ex = exposure(D, now)
-    K = {n: min(1.0, CAP / t) if t > 0 else 1.0 for n, t in ex.items()}
+    fx = fixed(D, now)
+    K = scales(ex, fx)
     for s in (only or list(D)):
         d = D.get(s)
         if not d:
@@ -111,7 +145,8 @@ def apply(only=None, now=None):
                 set_units(p, raw(p), k)
                 if isinstance(p.get('now'), dict):
                     set_units(p['now'], raw(p['now']), k)
-        d['nightCap'] = {'cap': CAP, 'nights': {n: {'raw': round(ex[n], 2), 'scale': round(K[n], 4)} for n in sorted(ex)}}
+        d['nightCap'] = {'cap': CAP, 'nights': {n: {'raw': round(ex[n], 2), 'started': round(fx.get(n, 0.0), 2),
+                                                    'scale': round(K[n], 4)} for n in sorted(ex)}}
         if json.dumps(d, sort_keys=True) != before:
             with open(fn(s), 'w') as f:
                 if s in ('tennis', 'nflprops'):
@@ -120,7 +155,7 @@ def apply(only=None, now=None):
                     json.dump(d, f, indent=1, allow_nan=False)
     for n in sorted(ex):
         if K[n] < 1:
-            print(f'night cap {n}: {ex[n]:.2f}% uncapped -> x{K[n]:.3f}')
+            print(f'night cap {n}: {fx.get(n, 0.0):.2f}% started + {ex[n]:.2f}% open uncapped -> x{K[n]:.3f}')
     return K
 
 
@@ -142,6 +177,14 @@ def test():
                            {'kick': '2026-11-03T00:00:00Z', 'units': 30.0, 'pass': True}]},
          'nba': {'picks': [{'kick': '2026-11-03T01:00:00Z', 'units': 30.0}]}}
     assert exposure(D, now) == {'2026-11-02': 80.0}
+    # 16 picks at 5 on one night: 8 start at 7 pm ET (capped 2.5 each = 20), the 8 late ones may only take the other 20
+    late = [{'kick': '2026-11-03T02:00:00Z', 'units': 5.0} for _ in range(8)]
+    early = [{'kick': '2026-11-03T00:00:00Z', 'units': 2.5, 'id': str(i), 'mk': 'total'} for i in range(8)]
+    D2 = {'cbb': {'picks': late, 'log': early + late}}
+    t8 = datetime(2026, 11, 3, 1, tzinfo=timezone.utc)
+    assert fixed(D2, t8) == {'2026-11-02': 20.0}
+    K2 = scales(exposure(D2, t8), fixed(D2, t8))
+    assert abs(K2['2026-11-02'] - 0.5) < 1e-9
     print('night_cap tests pass')
 
 
