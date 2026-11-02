@@ -237,7 +237,7 @@ const favSide = (m, L, mlH, mlA, edge = FAV_EDGE) => {
 // chance on the moneyline, cover chance on the points; normal around the model margin, sigma from the fit), scaled so
 // the backtest's average pick is 1 unit, from KELLY_MIN to KELLY_CAP. Literal quarter Kelly on a 100-unit bankroll
 // puts the cap on nearly every pick: the model's raw chance on these games runs ~62% where the dogs won ~44%
-export const KELLY_MIN = 0.25, KELLY_CAP = 3;
+export const KELLY_MIN = 0.25, KELLY_CAP = 5;
 export const kelly = (p, odds) => { const b = decOdds(odds) - 1; return (p * b - (1 - p)) / b; };
 // the model's chance for the pick's side: winning outright (ml) or covering `pts` points
 const dogChance = (side, m, sigma, pts = 0) => phi(((side === 'home' ? m : -m) + pts) / sigma);

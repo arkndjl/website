@@ -31,7 +31,7 @@ BT = os.path.join(ROOT, 'data', 'nfl_picks_fit.json')
 OUT = os.path.join(ROOT, 'data', 'nfl_picks.json')
 UPSET_EDGE = 4.0
 FAV_EDGE, FAV_ML = 4.0, (-200, -105)
-KELLY_MIN, KELLY_CAP = 0.25, 3.0
+KELLY_MIN, KELLY_CAP = 0.25, 5.0
 
 
 def odds(x):
