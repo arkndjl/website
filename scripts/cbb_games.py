@@ -150,6 +150,62 @@ NOFEAT = True                             # roster-less teams take the mean fina
 ALT = {'2005', '38', '36', '2172', '2751', '254', '328', '252', '3084', '3101', '253', '2692', '167', '2464', '147', '304', '2440', '2458'}
 
 
+def poss_secs(plays, home, away):
+    """ESPN summary play-by-play -> (home, away) seconds with the ball, or None when the log is partial (under 60 shots).
+    The same reading as cbb_edge_research.pbp_secs on hoopR: running clock only, time between two events goes to the
+    side that had the ball after the first; a made shot or free throw or a turnover hands it over, a rebound, steal or
+    jump ball goes to its team, a miss keeps it until the rebound."""
+    home, away = str(home), str(away)
+    opp = {home: away, away: home}
+    sec = {home: 0.0, away: 0.0}
+    own = prev = per = None
+    nshot = 0
+    # game order = period, then the clock running down, then ESPN's sequence (its sequence numbers alone are out of
+    # order on some games: plays inserted late carry later numbers)
+    rows = []
+    for r in plays:
+        c = str((r.get('clock') or {}).get('displayValue') or '')
+        try:
+            m, s = c.split(':') if ':' in c else ('0', c)
+            rows.append((int((r.get('period') or {}).get('number')), -(float(m) * 60 + float(s)),
+                         float(r.get('sequenceNumber') or 0), r))
+        except (TypeError, ValueError):
+            continue
+    rows.sort(key=lambda x: x[:3])
+    for pn, nclk, _, r in rows:
+        clk = -nclk
+        if pn != per:
+            per, prev, own = pn, clk, None
+        T = str((r.get('team') or {}).get('id') or '') or None
+        if T not in opp:
+            T = None
+        ty = str((r.get('type') or {}).get('text') or '')
+        tx = f" {str(r.get('text') or '').lower()} "
+        shoot, score = bool(r.get('shootingPlay')), bool(r.get('scoringPlay'))
+        dt = prev - clk
+        if dt > 0:
+            o = own
+            if o is None and T is not None and (shoot or 'Turnover' in ty):
+                o = T
+            if o is not None:
+                sec[o] += dt
+        prev = clk
+        if T is None:
+            continue
+        if 'FreeThrow' in ty or 'Free Throw' in ty:
+            own = opp[T] if ' made ' in tx else T
+        elif shoot:
+            nshot += 1
+            own = opp[T] if score else T
+        elif 'Rebound' in ty or 'Jumpball' in ty or 'Steal' in ty:
+            own = T
+        elif 'Turnover' in ty:
+            own = opp[T]
+    if nshot < 60:
+        return None
+    return [round(sec[home], 1), round(sec[away], 1)]
+
+
 def et_date(iso):
     """a tip's US game day, the date Barttorvik keys its logs by: UTC minus 8 h keeps 10 pm Pacific and 9 pm Hawaii
     tips on their own day (UTC minus 5 moved them to the next one, so their inj, pinj and luck joins missed)"""

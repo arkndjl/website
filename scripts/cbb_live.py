@@ -181,7 +181,13 @@ def season_to_date(prior):
     gz = os.path.join(D.CACHE, 'games', f'{SEASON}.json.gz')
     if not OFFLINE:
         D.fetch(f'https://barttorvik.com/getadvstats.php?year={SEASON}&csv=1', adv, 1)
-        D.fetch(f'https://barttorvik.com/{SEASON}_all_advgames.json.gz', gz, 1)
+        # Barttorvik sometimes answers with an HTML page (its browser check, or the file mid-rewrite): try again twice
+        for i in range(3):
+            D.fetch(f'https://barttorvik.com/{SEASON}_all_advgames.json.gz', gz, 1)
+            with open(gz, 'rb') as fh:
+                if fh.read(2) == b'\x1f\x8b':
+                    break
+            time.sleep(20 * (i + 1))
     try:
         import gzip
         games = json.load(gzip.open(gz))
@@ -209,8 +215,9 @@ def season_to_date(prior):
         if a['mp'] * a['gp'] <= 0: continue
         o = official.get(pid)
         # Barttorvik's own line when it covers the same games (his two files update at their own times); else the
-        # line rebuilt from the games (scripts/cbb_live_backtest.py's regression for BPM, PORPAG and ORtg)
-        if o and o['gp'] and abs(o['gp'] - a['gp']) <= 1 and o['team'] == team:
+        # line rebuilt from the games (scripts/cbb_live_backtest.py's regression for BPM, PORPAG and ORtg); early in the
+        # season his file leaves BPM blank, so the rebuilt line stands in until it fills
+        if o and o['gp'] and abs(o['gp'] - a['gp']) <= 1 and o['team'] == team and o.get('bpm') is not None:
             ln = {k: o.get(k) for k in KEEP}
         else:
             ln = line(a, recon, {'team': team, 'conf': o['conf'] if o else None, 'role': o['role'] if o else None})
@@ -479,8 +486,9 @@ def main():
                'now': lf['now'], 'byDate': lf['byDate'], 'careers': lf['careers'], 'seasons': lf['seasons']},
               open(os.path.join(D.ROOT, 'data', 'cbb_live.json'), 'w'), indent=1)
     print(f'{played} of {len(recs)} players have played; games through {last}')
+    wi = out_cols.index('w')
     for o in out[:20]:
-        print(f"{o[ci['ovr']]:3d} {o[ci['name']]:24s} {o[ci['team']]:18s} FV {o[ci['fv']]} w {o[-1]:.2f} NBA {o[ci['nbaP']]:.2f} xBPM {o[ci['xbpm']]}")
+        print(f"{o[ci['ovr']]:3d} {o[ci['name']]:24s} {o[ci['team']]:18s} FV {o[ci['fv']]} w {o[wi]:.2f} NBA {o[ci['nbaP']]:.2f} xBPM {o[ci['xbpm']]}")
 
 
 if __name__ == '__main__':

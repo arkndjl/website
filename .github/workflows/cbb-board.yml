@@ -43,16 +43,16 @@ jobs:
         run: python3 scripts/rookies.py cbb
       - name: Re-grade the internationals on this season's league lines
         # Basketball-Reference's international league pages (scripts/cbb_intl.py --daily, the committed fit); a failed pull keeps yesterday's grades
-        run: python3 scripts/cbb_intl.py --daily || echo "internationals not updated"
+        run: python3 scripts/cbb_intl.py --daily || { echo "internationals not updated"; echo internationals >> /tmp/cbb_failed; }
       - name: Re-draft the three mocks from today's board
         # the committed fit, boards and careers (scripts/data/cbb_mock_fit.json, scripts/data/cbb_boards/) plus Tankathon's live order;
         # a failed mock keeps yesterday's file rather than holding back the board
-        run: python3 scripts/cbb_mock.py --daily || echo "mock draft not updated"
+        run: python3 scripts/cbb_mock.py --daily || { echo "mock draft not updated"; echo mocks >> /tmp/cbb_failed; }
       - name: AP and Coaches polls
         # the current releases for the ARK Ranking tab (scripts/cbb_polls_live.py -> data/cbb_polls.json, display only) and
         # this season's releases with points into the poll history (scripts/rank_polls.py; rank_odds.py --record, poll_research.py)
         run: |
-          python3 scripts/cbb_polls_live.py || echo "polls not updated"
+          python3 scripts/cbb_polls_live.py || { echo "polls not updated"; echo polls >> /tmp/cbb_failed; }
           python3 scripts/rank_polls.py cbb $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") || echo "poll history not updated"
       # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/cbb.json and the team file
       - name: Team badges
@@ -63,16 +63,16 @@ jobs:
           /tmp/tbv/bin/python scripts/team_badges.py build cbb
       - name: Project games, re-rate teams, log picks
         # a failed game build keeps yesterday's files rather than holding back the board
-        run: python3 scripts/cbb_games.py || echo "games not updated"
+        run: python3 scripts/cbb_games.py || { echo "games not updated"; echo "game model" >> /tmp/cbb_failed; }
       - name: Player projections
         # points, rebounds and assists for every rotation player in the next two slates (scripts/cbb_players.py)
-        run: python3 scripts/cbb_players.py || echo "player projections not updated"
+        run: python3 scripts/cbb_players.py || { echo "player projections not updated"; echo "player projections" >> /tmp/cbb_failed; }
       - name: Refit Dengler Units on the graded live picks
         # scripts/units.py --fit (the same fit games_picks.py --rules runs): live picks and paper bets pool into each
         # market's calibration as they grade; a failed fit keeps yesterday's units
         run: python3 scripts/units.py --fit || echo "units not refit"
       - name: Games page picks
-        run: python3 scripts/games_picks.py cbb || echo "games page picks not updated"
+        run: python3 scripts/games_picks.py cbb || { echo "games page picks not updated"; echo "games page picks" >> /tmp/cbb_failed; }
       # the live rule monitor (scripts/rule_monitor.py -> data/rule_monitor.json): every pick and paper rule against the close
       - name: Rule monitor
         continue-on-error: true
@@ -117,3 +117,9 @@ jobs:
             git commit -q -m "Update the College Basketball ARKBOARD ($(date -u +%Y-%m-%d))"
           done
           exit 1
+      # the steps above keep yesterday's file on a failure so one broken step can't hold back the rest; the run still
+      # goes red here so a broken step shows in the Actions tab (the game model failed quietly on Nov 2: a missing cbb_games.poss_secs)
+      - name: Fail the run if a core step failed
+        if: always()
+        run: |
+          if [ -s /tmp/cbb_failed ]; then echo "::error::not updated: $(paste -sd, /tmp/cbb_failed)"; exit 1; fi
