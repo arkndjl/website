@@ -28,7 +28,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -45,6 +45,7 @@ jobs:
             scripts/.cache/cbb/games_bt
             scripts/.cache/cbb/games/*.json.gz
             scripts/.cache/cbb/espn_box
+            scripts/.cache/cbb/lineups
           key: cbb-bt-${{ github.run_id }}
           restore-keys: cbb-bt-
       - name: Blend this season into the board
@@ -98,6 +99,12 @@ jobs:
       # preseason prior can only be backtested from this archive (scripts/futures_archive.py)
       - name: Futures archive
         run: python3 scripts/futures_archive.py cbb $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") || echo "futures not archived"
+      # lineups and on/off tabs (scripts/cbb_lineups.py -> static/data/cbb-lineups.json): NCAA play-by-play substitutions
+      # through the ncaa-api proxy, at most ~6 minutes of pulls a run (the stints stay in the Actions cache)
+      - name: Lineups and on/off
+        continue-on-error: true
+        timeout-minutes: 10
+        run: python3 scripts/cbb_lineups.py --daily || echo "lineups not updated"
       - name: Backup watch (minutes order)
         run: python3 scripts/backup_watch.py cbb || echo "backup watch not updated"
       # pre-registered 2027 draft ledger (scripts/draft_ledger.py) and the injury SIT refit on the logged listings
@@ -113,7 +120,7 @@ jobs:
         run: python3 scripts/model_monitor.py cbb
       - name: Commit if the board changed
         run: |
-          files="data/units_cbb.json static/data/cbb-all.json static/data/rookies/cbb.json data/backup_cbb.json static/data/depth/cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_polls.json scripts/data/polls/cbb.json data/cbb_players.json data/cbb_injuries.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json static/data/teams/cbb.json data/team_badges"
+          files="data/units_cbb.json static/data/cbb-all.json static/data/cbb-lineups.json static/data/rookies/cbb.json data/backup_cbb.json static/data/depth/cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_polls.json scripts/data/polls/cbb.json data/cbb_players.json data/cbb_injuries.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json static/data/teams/cbb.json data/team_badges"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
@@ -144,6 +151,7 @@ jobs:
             scripts/.cache/cbb/games_bt
             scripts/.cache/cbb/games/*.json.gz
             scripts/.cache/cbb/espn_box
+            scripts/.cache/cbb/lineups
           key: cbb-bt-${{ github.run_id }}
       - name: Fail the run if a core step failed
         if: always()
