@@ -616,15 +616,18 @@ def depth(squads, grade, S):
     for (team, pos), rs in squads.items():
         teams[team][pos] = rs
     out = []
+    import soccer_lineups as SL          # Understat club id -> ESPN id: the logos are ESPN's (Understat ids drew other clubs' crests)
+    ids, by_name = SL.espn_ids()
     for team in sorted(teams):
         T = teams[team]
         any_ = next(iter(T.values()))[0]
+        eid = ids.get(str(any_['tid'])) or by_name(team, any_['lg'])
         ss = []
         for pos in ('GK', 'D', 'M', 'F'):
             rs = [r for r in T.get(pos, []) if r['min'] > 0][:2 * BW_START[pos]]
             if rs:
                 ss.append([pos, [[r['n'], round(grade[r['p']], 2), r['min'], None, f"{r.get('start') or 0} st", pct(pos, round(grade[r['p']], 2), r['min'])] for r in rs]])
-        out.append({'t': team, 'n': team, 'logo': f"/img/soccer/{any_['tid']}.png", 'grp': D.NAME.get(any_['lg'], any_['lg']),
+        out.append({'t': team, 'n': team, 'logo': f"/img/soccer/{eid}.png" if eid else None, 'grp': D.NAME.get(any_['lg'], any_['lg']),
                     'units': [{'u': '', 's': ss}]})
     os.makedirs(os.path.dirname(DEPTH), exist_ok=True)
     json.dump({'sport': 'soccer', 'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.date.today().isoformat(),
