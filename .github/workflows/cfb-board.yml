@@ -109,6 +109,15 @@ jobs:
         continue-on-error: true
         timeout-minutes: 10
         run: python3 scripts/st_returners.py cfb
+      # special teams tab, kickers and punters (scripts/st_kickers.py): points over expected by kick from the ESPN
+      # play-by-play cache plus ESPN kicking/punting box scores (one call a game not yet cached; no CFBD quota). Its
+      # pcar (career net yards over expected) is the punter FV input fetch_cfb.mjs reads
+      - name: Special teams tab, kickers and punters
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          python3 scripts/st_kickers.py --current
+          python3 scripts/st_kickers.py cfb
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs
@@ -163,7 +172,7 @@ jobs:
         run: python3 scripts/team_detail.py cfb
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+          git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -181,7 +190,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+            git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done

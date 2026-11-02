@@ -1,0 +1,87 @@
+# Refreshes the College Basketball ARKBOARD recruit tabs (2027-29 classes, class rankings: data/cbb_recruits.json):
+# On3's industry rankings for the live classes (scripts/cbb_on3.mjs, headless Chromium) and the recruit grades from the
+# frozen history and fit (scripts/cbb_recruit_fit.py --offline: scripts/data/cbb_recruit_hist.json.gz), then commits;
+# the push triggers the Cloudflare build. Once a day, and after each cbb board run (GitHub drops or delays scheduled
+# runs on this repo) when the file is from an earlier day, or by hand. A failed On3 pull keeps the last file.
+name: cbb recruits
+
+on:
+  schedule:
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["cbb board", "cfb board"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cbb-recruits
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/cbb_recruits.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          try:
+              asof = dt.date.fromisoformat(json.load(open('data/cbb_recruits.json'))['asof'][:10])
+          except Exception:
+              asof = dt.date.today() - dt.timedelta(days=2)
+          print('go=' + str(dt.datetime.now(dt.timezone.utc).date() > asof).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -q numpy
+      - name: Pull On3's live classes
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          # the classes the fit grades (scripts/cbb_recruit_fit.py NOW_CLASS + LIVE)
+          node scripts/cbb_on3.mjs $(python3 -c "import sys; sys.path.insert(0, 'scripts'); import cbb_recruit_fit as F; print(*([F.NOW_CLASS] + F.LIVE))")
+      - name: Grade the classes
+        run: python3 scripts/cbb_recruit_fit.py --offline
+      - name: Commit if anything changed
+        run: |
+          files="data/cbb_recruits.json"
+          git add $files
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
+          git commit -m "Update the CBB recruit classes ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            git add $files
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the CBB recruit classes ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

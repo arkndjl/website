@@ -8,7 +8,7 @@ draft = false
 {{< arknav >}}
 
 {{< winpane title="arkboard.exe :: readme" icon="arkboard" status="20–80 FV" >}}
-ARKBOARD = draft prospect big boards, graded on the 20–80 Future Value (FV) scale. FV = the expected (mean) outcome: the average of what past prospects with the same profile became, busts and stars included, so it sits below the best case. 50 average regular, 60 plus, 70 star, 80 generational; tiers every 5 points, grades in steps of 1. each player's dropdown shows the range: the odds of each outcome and the ceiling. one page per sport; each with its own boards, models and FV conversions. scale and baseball -> basketball conversion: [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). MiLB prospects (post-draft): MLB PROSPX on [eephus.io](https://eephus.io).
+ARKBOARD = player boards, team rankings and game models for every sport here: college football, college basketball, hockey, soccer, tennis and baseball prospects; NFL, NBA, NHL, soccer, tennis and Counter-Strike players, teams and games; every pick on the Predictions page. Prospects are graded on the 20–80 Future Value (FV) scale. FV = the expected (mean) outcome: the average of what past prospects with the same profile became, busts and stars included, so it sits below the best case. 50 average regular, 60 plus, 70 star, 80 generational; tiers every 5 points, grades in steps of 1. each player's dropdown shows the range: the odds of each outcome and the ceiling. each board has its own model and FV conversion. scale and baseball -> basketball conversion: [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). MiLB prospects (post-draft): MLB PROSPX on [eephus.io](https://eephus.io).
 {{< /winpane >}}
 
 {{< arkhub >}}
