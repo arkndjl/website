@@ -19,6 +19,7 @@ ARKBOARD = player boards, team rankings and game models for every sport here: co
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< winlist title="arkboard.exe :: reading" icon="arkboard" >}}
+- [27 Strategy Questions, Answered](/posts/arkboard-research-27-questions/) | research | Nov 2
 - [How the ARKBOARD Works](/posts/arkboard-every-feature/) | every sport | Nov 2
 - [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | football | Oct 14
 - [ARKBOARD NBA 2026 v3](/posts/arkboard-nba-2026-v3/) | basketball | Feb 15
