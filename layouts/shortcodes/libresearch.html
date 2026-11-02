@@ -4,7 +4,7 @@
 {{- $g := .Get "group" | default "all" -}}
 <div class="desk libgrid" data-tab="{{ .Get "tab" }}">
 {{- range site.Data.library.studies }}{{ if or (eq $g "all") (eq .group $g) }}
-<div class="win libstudy" id="r-{{ .id }}">
+<div class="win libstudy" id="rq-{{ .id }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>{{ .sport | lower }} :: {{ .id }}.txt<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -23,7 +23,12 @@
       {{- with .split_check }}<dt>check</dt><dd>{{ . }}</dd>{{ end }}
     </dl>
   </div>
+  <p class="rq__bar libstudy__bar">
+    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="rq" data-gfx-rq="{{ jsonify .rq }}" title="research card PNG, 16:9 for X">GFX card</button>
+    <a class="cfb__btn rq__link" href="#rq-{{ .id }}" title="link to this question">link</a>
+  </p>
   <div class="win__status"><span>n {{ lang.FormatNumber 0 .n }}</span><span class="libstudy__tag{{ if .robust }} is-robust{{ end }}">{{ if .robust }}holds in split check{{ else }}weak evidence{{ end }}</span></div>
 </div>
 {{- end }}{{ end }}
 </div>
+{{- partial "js.html" "gfx" -}}

@@ -178,6 +178,23 @@ def write_page(studies, sections, fv_tables):
     lines.append('{{< /wintabs >}}')
     page.write_text(head + '\n'.join(lines) + '\n')
 
+def rq_card(s):
+    """data-gfx-rq for the study's X card (assets/js/gfx.js buildRQ, same card as layouts/shortcodes/rq.html):
+    question, answer, sample note, and up to 8 bars from the first chart series (evenly thinned)."""
+    c = s.get('chart') or {}
+    ser = (c.get('series') or [{}])[0].get('points') or []
+    if len(ser) > 8:
+        step = (len(ser) - 1) / 7
+        ser = [ser[round(i * step)] for i in range(8)]
+    pct = c.get('y_fmt') == 'pct'
+    w0 = (c.get('x_label') or '').split(' ')[0].lower()
+    unit_x = {'minutes': ' min', 'minute': "'", 'seconds': ' s', 'yards': ' yd', 'yds': ' yd'}.get(w0, '')
+    bars = [[fmt(p['x'], 'num') + unit_x if not isinstance(p['x'], str) else p['x'], round(p['y'] * 100, 1) if pct else round(p['y'], 3)] for p in ser]
+    name = (c.get('series') or [{}])[0].get('name', '')
+    return {'id': s['id'], 'q': s['question'], 'a': s['answer'], 'sport': s['sport'], 'date': s.get('date', '2026-11-02'),
+            'n': '', 'nl': '', 'bars': bars, 'unit': '%' if pct else '',
+            'note': f"n = {s['n']:,}" + (f" · {c.get('y_label', '')} by {c.get('x_label', '')}" if bars else '') + (f" ({name})" if name and len(c.get('series') or []) > 1 else '')}
+
 
 def main():
     studies = []
@@ -187,6 +204,7 @@ def main():
             continue
         s['group'] = GROUP.get(s['sport'], 'other')
         s['svg'] = chart_svg(s.get('chart') or {})
+        s['rq'] = rq_card(s)
         s['legend'] = [x['name'] for x in (s.get('chart') or {}).get('series', [])] if len((s.get('chart') or {}).get('series', [])) > 1 else []
         s.pop('chart', None)
         studies.append(s)
