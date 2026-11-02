@@ -181,13 +181,17 @@ def season_to_date(prior):
     gz = os.path.join(D.CACHE, 'games', f'{SEASON}.json.gz')
     if not OFFLINE:
         D.fetch(f'https://barttorvik.com/getadvstats.php?year={SEASON}&csv=1', adv, 1)
-        # Barttorvik sometimes answers with an HTML page (its browser check, or the file mid-rewrite): try again twice
-        for i in range(3):
-            D.fetch(f'https://barttorvik.com/{SEASON}_all_advgames.json.gz', gz, 1)
-            with open(gz, 'rb') as fh:
-                if fh.read(2) == b'\x1f\x8b':
-                    break
-            time.sleep(20 * (i + 1))
+        # Barttorvik sometimes answers GitHub's runners with an HTML page instead of the file: a good pull replaces the
+        # cached file (kept between runs by the workflow's cache), a page never does, so a blocked run blends the last
+        # logs it had and the next run catches up
+        for i in range(2):
+            D.fetch(f'https://barttorvik.com/{SEASON}_all_advgames.json.gz', gz + '.new', 1)
+            with open(gz + '.new', 'rb') as fh:
+                good = fh.read(2) == b'\x1f\x8b'
+            if good:
+                os.replace(gz + '.new', gz); break
+            print('barttorvik game logs: got a page, not the file' + (', keeping the cached logs' if os.path.exists(gz) else ''))
+            time.sleep(30)
     try:
         import gzip
         games = json.load(gzip.open(gz))

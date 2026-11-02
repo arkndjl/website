@@ -240,12 +240,29 @@ def d1_set(games):
     return {t for t, n in c.items() if n >= 3}
 
 
+BT_LIVE_SEASON = 2027   # the season in progress: its logs are re-pulled each run
+_BT_PULLED = set()
+
+
 def bt_logs(season):
     """Barttorvik per-game player rows: team -> [(date, {pid: (min, gbpm)})] in date order"""
     p = os.path.join(BTLOG, f'{season}.json.gz')
-    if not os.path.exists(p) or os.path.getsize(p) < 10000:
+    # a past season's file once; the season in progress once a run (the cached copy stays when Barttorvik answers
+    # with a page instead of the file, so a blocked pull keeps the last logs rather than none)
+    live = season >= BT_LIVE_SEASON and season not in _BT_PULLED
+    if live or not os.path.exists(p) or os.path.getsize(p) < 2000:
         os.makedirs(BTLOG, exist_ok=True)
-        subprocess.run(['curl', '-s', '-m', '300', '-A', UA, f'https://barttorvik.com/{season}_all_advgames.json.gz', '-o', p], check=False)
+        subprocess.run(['curl', '-s', '-m', '300', '-A', UA, f'https://barttorvik.com/{season}_all_advgames.json.gz', '-o', p + '.new'], check=False)
+        try:
+            with open(p + '.new', 'rb') as fh:
+                good = fh.read(2) == b'\x1f\x8b'
+        except OSError:
+            good = False
+        if good:
+            os.replace(p + '.new', p)
+        else:
+            print(f'barttorvik {season} game logs: got a page, not the file' + (', keeping the cached logs' if os.path.exists(p) else ''))
+        _BT_PULLED.add(season)
     try:
         rows = json.load(gzip.open(p))
     except Exception:

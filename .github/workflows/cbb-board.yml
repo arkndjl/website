@@ -35,6 +35,16 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install numpy
+      # Barttorvik's game logs (this season's and last season's) from the last run that got them: his site sometimes
+      # answers GitHub's runners with a page instead of the file, and a blocked pull then keeps these
+      - name: Restore Barttorvik game logs
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            scripts/.cache/cbb/games_bt
+            scripts/.cache/cbb/games/*.json.gz
+          key: cbb-bt-${{ github.run_id }}
+          restore-keys: cbb-bt-
       - name: Blend this season into the board
         run: python3 scripts/cbb_live.py
       # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/cbb.json), display only
@@ -119,6 +129,14 @@ jobs:
           exit 1
       # the steps above keep yesterday's file on a failure so one broken step can't hold back the rest; the run still
       # goes red here so a broken step shows in the Actions tab (the game model failed quietly on Nov 2: a missing cbb_games.poss_secs)
+      - name: Save Barttorvik game logs
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            scripts/.cache/cbb/games_bt
+            scripts/.cache/cbb/games/*.json.gz
+          key: cbb-bt-${{ github.run_id }}
       - name: Fail the run if a core step failed
         if: always()
         run: |
