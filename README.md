@@ -120,6 +120,21 @@ ARK Rating 2 fits its weights on round outcomes instead of hand-setting them: ov
 
 It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a repository secret for `.github/workflows/esea.yml`, which runs every 20 minutes and commits only when something changed. `ESEA_SEASON` moves it to the next season (it otherwise follows `season` in the data file, starting at 59).
 
+## Automation (no manual steps)
+
+Every product refreshes on a schedule (the workflows in `.github/workflows/`, sized to each sport's season, with weekly
+off-season runs). Three things keep it honest without anyone watching:
+- `data health` (`scripts/data_health.py`, every 3 hours and after every data workflow) opens a GitHub issue labelled
+  `data-alert` for a red run, a feed past its limit in `data/freshness.json` (and dispatches that sport's workflow),
+  a live site that stops serving `main`, or a season constant the calendar has passed. Each issue closes itself once
+  fixed. `python3 scripts/data_health.py report` prints every feed's age.
+- `model refits` (`scripts/refit.py`, Mondays) refits each model on the data to date in its season months, keeps a
+  fit only if it runs clean and writes strict JSON, then reruns `games_picks.py --fit` / `--rules` and `units.py --fit`.
+  `python3 scripts/refit.py status` lists the jobs; Run workflow with `all` forces every refit.
+- The Predictions page, game models tab, shows the pipeline table: every feed, its stamp and limit, and each refit.
+New product: add its data file to `data/freshness.json` (and `feedHours` if it refreshes weekly); new model fit: add a
+job to `JOBS` in `scripts/refit.py`.
+
 ## Deploying
 
 Cloudflare builds `main` with Hugo and serves `public/`. Each build writes `/build.json` (commit, branch, build time).

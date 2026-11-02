@@ -1,0 +1,199 @@
+{{- /* Site style guide (content/arkndjl-style.md, /arkndjl/style/; was the brand guide at /arkndjl/brand/): how the
+       site looks and reads. Designed as a spec sheet on the site's own ground:
+       purple, the 48 px lilac grid, an inset frame with "+" corners and a giant deep-purple glyph bleeding off the
+       cover. Everything shown is the live asset: icons come from layouts/partials/icons.html (every symbol, found by
+       name), sprites from layouts/partials/px, medals from the MEDAL map in assets/js/gfx.js (copied below), the
+       provisional chip from partials/prov.html. brand/README.md is the file-level reference; keep the two in step.
+       Styles are scoped under .ab. Component demos use the live site classes (.win, .wintabs__tab, .fv-chip, .winpager__btn, plain tables), so
+       they change when style.css does. Usage: {{< arkndjlstyle >}} */ -}}
+{{- $icons := findRE `icon-[a-z0-9-]+` (partial "icons.html" .) | uniq -}}
+{{- $social := findRE `icon-s-[a-z0-9-]+` (partial "icons-social.html" .) | uniq -}}
+{{- $icons = complement $social $icons -}}
+{{- $sprites := slice "glyph" "star" "notes" "eq" "disc" "calendar" "cassette" "easel" "hero-football" "hero-basketball" "hero-baseball" "hero-hockey" "hero-soccer" "hero-tennis" "hero-cs" "hero-predictions" "hero-standings" "hero-builder" -}}
+{{- $medal := slice "rrt.....trr" ".rrt...trr." "..rrt.trr.." "...rrtrr..." "...ooooo..." "..ohhmmmo.." ".ohhmmmmso." ".ohmmmmmso." ".ommmmmmso." ".ommmmmsso." "..omsssso.." "...ooooo..." -}}
+{{- $tiers := slice (slice "bronze" "#f0b27a" "#cd7f32" "#8a5222" "top 25%") (slice "silver" "#ffffff" "#c9d1d9" "#8b93a6" "top 10%") (slice "gold" "#fff1a8" "#ffd34d" "#c99a1c" "top 3%") (slice "platinum" "#ffffff" "#b9f2ff" "#5fb8d6" "top 1%") -}}
+{{- $glyph := "M52 0V45.9H98.8L243.6 263H42.8L352 750.3L661.2 263H460.4L604.2 45.9H652V0H491V45.9H523.6L376 269L388 272.8V45.9H429V0H275V45.9H316V272.8L328 269L179.4 45.9H213V0ZM191.3 342.2H512.7L352 596.3Z" -}}
+<style>
+.post:has(.ab)>.post-title{display:none}
+.ab{--ab-bg:#4a3b6b;--ab-deep:#3a2d56;--ab-dark:#241a3a;--ab-lil:#c8c7ff;--ab-aq:#7fffd4;position:relative;display:grid;gap:2rem;margin:0 0 2rem;padding:2rem 1.5rem;color:var(--ab-aq);background-color:var(--ab-bg);background-image:linear-gradient(rgba(200,199,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.07) 1px,transparent 1px);background-size:48px 48px;outline:1px solid rgba(200,199,255,.35);outline-offset:-10px;overflow:hidden}
+.ab *{box-sizing:border-box}
+.ab::before,.ab::after{content:"+";position:absolute;color:var(--ab-lil);font-size:1.2rem;line-height:1}
+.ab::before{left:4px;top:2px}.ab::after{right:4px;bottom:2px}
+.ab img{border:0;margin:0;border-radius:0}
+.ab ul,.ab ol,.ab figure,.ab table,.ab pre{margin:0}
+.ab li::before{content:none!important}
+.ab a{color:var(--ab-lil)}
+.ab-cover{position:relative;min-height:15rem;display:grid;align-content:end;gap:.6rem;padding:1rem 0 .5rem}
+.ab-cover__glyph{position:absolute;right:-6%;top:-30%;width:min(80vw,30rem);height:auto;transform:scaleX(-1);pointer-events:none}
+.ab-kick{position:relative;margin:0;color:var(--ab-lil);font-size:.75rem;letter-spacing:.25em;text-transform:uppercase}
+.ab-title{position:relative;margin:0;font-size:64px;line-height:1;font-weight:normal;color:var(--ab-aq)}
+.ab-title::before,.ab-title::after{content:none}
+.ab-toc{position:relative;display:flex;flex-wrap:wrap;gap:.2rem .4rem;padding:0;list-style:none;font-size:.8rem}
+.ab-toc a{display:inline-flex;min-height:32px;align-items:center}
+.ab-toc li+li::before{content:"::"!important;color:var(--ab-lil);opacity:.6;margin-right:.4rem;align-self:center}
+.ab-toc li{display:flex}
+.ab-sec{position:relative;display:grid;gap:1rem;padding-top:1rem;border-top:2px solid var(--ab-lil)}
+.ab-sec::before{content:"";position:absolute;left:0;right:0;top:4px;height:8px;background:repeating-linear-gradient(0deg,var(--ab-lil) 0 2px,transparent 2px 4px);opacity:.25}
+.ab-h{display:flex;align-items:baseline;gap:.8rem;margin:.6rem 0 0;font-size:1.5rem;font-weight:normal;color:var(--ab-aq)}
+.ab-h::before,.ab-h::after{content:none}
+.ab-h span{font-size:.8rem;color:var(--ab-lil);letter-spacing:.2em}
+.ab p,.ab li{line-height:1.5}
+.ab-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(11rem,1fr))}
+.ab-card{display:grid;gap:.4rem;padding:.75rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.25);font-size:.8rem;color:var(--ab-lil)}
+.ab-card b{font-weight:normal;color:var(--ab-aq)}
+.ab-tile{display:grid;place-items:center;aspect-ratio:1;border:1px solid rgba(200,199,255,.2)}
+.ab-tile svg{width:55%;height:55%}
+.ab-sizes{display:flex;align-items:end;gap:1.25rem;flex-wrap:wrap;color:var(--ab-lil);font-size:.75rem}
+.ab-sizes figure{display:grid;gap:.4rem;justify-items:center}
+.ab-sizes img{image-rendering:pixelated;background:transparent}
+.ab-sw{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr))}
+.ab-sw>div{background:var(--ab-dark);border:1px solid rgba(200,199,255,.25);font-size:.75rem;line-height:1.4;color:var(--ab-lil)}
+.ab-sw i{display:block;height:3.25rem;border-bottom:1px solid rgba(200,199,255,.25)}
+.ab-sw span{display:block;padding:.35rem .5rem}
+.ab-sw b{font-weight:normal;color:var(--ab-aq)}
+.ab-sub{margin:.4rem 0 0;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ab-lil);font-weight:normal}
+.ab-sub::before,.ab-sub::after{content:none}
+.ab-type{display:grid;gap:.9rem}
+.ab-type>div{display:grid;grid-template-columns:7rem minmax(0,1fr);gap:1rem;align-items:baseline;padding-bottom:.8rem;border-bottom:1px dashed rgba(200,199,255,.3)}
+.ab-type small{color:var(--ab-lil);font-size:.72rem;letter-spacing:.12em;line-height:1.4}
+.ab-type .s{color:var(--ab-aq);overflow-wrap:anywhere;line-height:1.1}
+.ab-icons{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))}
+.ab-icons figure{display:grid;gap:.35rem;justify-items:center;padding:.6rem .2rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.2);font-size:.7rem;color:var(--ab-lil)}
+.ab-icons svg{width:32px;height:32px;fill:var(--ab-aq)}
+.ab-spr{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(10rem,1fr))}
+.ab-spr figure{display:grid;gap:.4rem;justify-items:center;align-content:space-between;padding:.75rem .4rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.2);font-size:.7rem;color:var(--ab-lil);min-height:8rem}
+.ab-spr .px{max-width:100%;height:auto}
+.ab-spr .px--cassette,.ab-spr .px--easel{width:128px;height:auto}
+.ab-spr [class*="px--hero"]{width:128px;height:80px}
+.ab-logos{display:flex;flex-wrap:wrap;gap:.6rem}
+.ab-logos svg{width:48px;height:48px;background:var(--ab-deep);padding:6px;border:1px solid rgba(200,199,255,.2)}
+.ab-medals{display:flex;flex-wrap:wrap;gap:.75rem}
+.ab-social{display:flex;flex-wrap:wrap;gap:.5rem}.ab-social svg{width:32px;height:32px}
+.ab-medals figure{display:grid;place-items:center;padding:.6rem;background:var(--ab-dark);border:1px solid rgba(200,199,255,.2);font-size:.75rem;color:var(--ab-lil)}
+.ab-medals svg{width:44px;height:48px}
+.ab-medals b{display:block;font-weight:normal;letter-spacing:.12em;text-transform:uppercase}
+.ab-chips{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;color:var(--ab-lil);font-size:.8rem}
+.ab-win{max-width:22rem;margin:0}
+.ab-cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
+.ab-cards figure{display:grid;gap:.4rem;font-size:.75rem;color:var(--ab-lil)}
+.ab-cards img{width:100%;height:auto;border:1px solid rgba(200,199,255,.3)}
+@media (max-width:684px){.ab{padding:1.5rem .9rem;background-size:24px 24px}.ab-title{font-size:48px}.ab-type>div{grid-template-columns:minmax(0,1fr);gap:.3rem}.ab-icons{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.ab-demo{display:grid;gap:1rem}
+.ab-demo .win{margin:0;max-width:30rem}
+.ab-demo table{font-size:.85rem}
+.ab-strip{display:flex;align-items:flex-end;gap:2px;padding:0 4px;border-bottom:2px solid var(--ab-lil);max-width:30rem}
+.ab-strip .wintabs__tab{cursor:default}
+.ab-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;color:var(--ab-lil);font-size:.8rem}
+.ab-shadow{display:inline-block;width:4rem;height:2rem;background:var(--ab-deep);color:var(--ab-aq);box-shadow:3px 3px 0 #241a3a;border:1px solid var(--ab-lil)}
+</style>
+<div class="ab">
+
+<section class="ab-cover" aria-label="style guide">
+  <svg class="ab-cover__glyph" viewBox="-68.2 -795.4 840.4 840.4" aria-hidden="true"><path transform="scale(1,-1)" fill="#3a2d56" d="{{ $glyph }}"/></svg>
+  <h1 class="ab-title">style</h1>
+</section>
+
+<section class="ab-sec" id="palette">
+  <h2 class="ab-h"><span>01</span>palette</h2>
+  <div class="ab-sw">
+    <div><i style="background:#4a3b6b"></i><span><b>#4a3b6b</b></span></div>
+    <div><i style="background:#7fffd4"></i><span><b>#7fffd4</b></span></div>
+    <div><i style="background:#c8c7ff"></i><span><b>#c8c7ff</b></span></div>
+    <div><i style="background:#3a2d56"></i><span><b>#3a2d56</b></span></div>
+    <div><i style="background:#241a3a"></i><span><b>#241a3a</b></span></div>
+    <div><i style="background:#57068c"></i><span><b>#57068c</b></span></div>
+    <div><i style="background:#ffffff"></i><span><b>#ffffff</b></span></div>
+    <div><i style="background:#ff9ec7"></i><span><b>#ff9ec7</b></span></div>
+  </div>
+  <div class="ab-sw">
+    <div><i style="background:linear-gradient(90deg,#3a2d56 0 12%,#57068c 12% 25%,#785ccc 25% 37%,#c8c7ff 37% 50%,#9eeadf 50% 62%,#7fffd4 62% 75%,#d9fff0 75% 87%,#fff 87%)"></i></div>
+    <div><i style="background:#7dffb0"></i><span><b>#7dffb0</b></span></div>
+    <div><i style="background:#f2c230"></i><span><b>#f2c230</b></span></div>
+    <div><i style="background:linear-gradient(90deg,#cd7f32 0 25%,#c9d1d9 25% 50%,#ffd34d 50% 75%,#b9f2ff 75%)"></i></div>
+  </div>
+  <div class="ab-sw">
+    <div><i style="background:#131316"></i><span><b>#131316</b></span></div>
+    <div><i style="background:#2e2e35"></i><span><b>#2e2e35</b></span></div>
+    <div><i style="background:#8d8d96"></i><span><b>#8d8d96</b></span></div>
+    <div><i style="background:linear-gradient(90deg,#c8c7ff 50%,#7fffd4 50%)"></i><span><b>#c8c7ff #7fffd4</b></span></div>
+  </div>
+</section>
+
+<section class="ab-sec" id="type">
+  <h2 class="ab-h"><span>02</span>type</h2>
+  <div class="ab-type">
+    <div><small>16</small><span class="s" style="font-size:16px">abcdefghijklmnopqrstuvwxyz 0123456789</span></div>
+    <div><small>32</small><span class="s" style="font-size:32px">ARKBOARD :: arkndjl</span></div>
+    <div><small>64</small><span class="s" style="font-size:64px">ARKNDJL</span></div>
+  </div>
+</section>
+
+<section class="ab-sec" id="pixel">
+  <h2 class="ab-h"><span>03</span>pixel art</h2>
+  <div class="ab-spr">
+    {{- range $sprites }}{{ $f := printf "partials/px/%s.html" . }}{{ if templates.Exists $f }}<figure>{{ partial (printf "px/%s.html" .) $ }}</figure>{{ end }}{{ end }}
+  </div>
+  <div class="ab-logos">
+    {{- range (slice "px-1nt" "px-knicks" "px-mets" "px-rays" "px-ravens" "px-rangers" "px-barcelona" "px-cleveland" "px-nintendo" "px-valve" "px-tr-ucl" "px-tr-superbowl") }}<svg role="img" aria-label="{{ replace . "px-" "" }}"><use href="#{{ . }}"/></svg>{{ end }}
+  </div>
+</section>
+
+<section class="ab-sec" id="components">
+  <h2 class="ab-h"><span>04</span>components</h2>
+  <div class="ab-demo">
+    <div class="win"><div class="win__title"><span class="win__title-text">board.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div><div style="height:4rem"></div></div>
+    <div class="ab-strip" aria-hidden="true"><span class="wintabs__tab is-active">players</span><span class="wintabs__tab">rosters</span><span class="wintabs__tab">games</span><span class="wintabs__tab">teams</span></div>
+    <div class="win"><div class="win__title"><span class="win__title-text">top 3</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>rk</th><th>player</th><th>pos</th><th>fv</th><th>chg</th></tr></thead><tbody>
+        <tr><td>1</td><td>player one</td><td>QB</td><td><span class="fv-chip" data-fv="65">65</span></td><td style="color:var(--ab-aq)">+2</td></tr>
+        <tr><td>2</td><td>player two</td><td>EDGE</td><td><span class="fv-chip" data-fv="60">60</span></td><td>—</td></tr>
+        <tr><td>3</td><td>player three</td><td>WR</td><td><span class="fv-chip" data-fv="55">55</span></td><td style="color:#ff9ec7">−1</td></tr>
+      </tbody></table></div></div>
+    <div class="ab-row">
+      {{- range (slice "80" "70" "60" "50" "40" "30" "20") }}<span class="fv-chip" data-fv="{{ . }}">{{ . }}</span>{{ end }}
+      {{ partial "prov.html" (dict "why" "graded from the 20 floor without the board's main source") }}
+    </div>
+    <div class="ab-row">
+      <button type="button" class="winpager__btn" aria-label="previous"><svg viewBox="0 0 5 7" aria-hidden="true"><path d="M4 0h1v7h-1zM3 1h1v5h-1zM2 2h1v3h-1zM1 3h1v1h-1z"/></svg></button>
+      <button type="button" class="winpager__btn" aria-label="next"><svg viewBox="0 0 5 7" aria-hidden="true"><path d="M0 0h1v7h-1zM1 1h1v5h-1zM2 2h1v3h-1zM3 3h1v1h-1z"/></svg></button>
+    </div>
+    <div class="ab-row"><span class="ab-shadow" aria-hidden="true">&nbsp;</span></div>
+    <div class="ab-cards">
+      <figure><img src="{{ "og-image.png" | relURL }}" width="1200" height="627" alt="arkndjl.net share card" loading="lazy"></figure>
+      <figure><img src="{{ "og/college-football.png" | relURL }}" width="1200" height="627" alt="ARKBOARD college football share card" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="ab-sec" id="icons">
+  <h2 class="ab-h"><span>05</span>icons</h2>
+  <div class="ab-icons">
+    {{- range $icons }}<figure><svg role="img" aria-label="{{ replace . "icon-" "" }}"><use href="#{{ . }}"/></svg></figure>{{ end }}
+  </div>
+  <div class="ab-social">
+    {{- range $social }}<svg role="img" aria-label="{{ replace . "icon-s-" "" }}"><use href="#{{ . }}"/></svg>{{ end }}
+  </div>
+</section>
+
+<section class="ab-sec" id="badges">
+  <h2 class="ab-h"><span>06</span>badges</h2>
+  <div class="ab-medals">
+    {{- range $tiers }}{{ $t := . }}
+    <figure><svg viewBox="0 0 11 12" shape-rendering="crispEdges" role="img" aria-label="{{ index $t 0 }}">
+      {{- range $y, $row := $medal }}{{ range $x := seq 0 10 }}{{ $c := substr $row $x 1 }}{{ $fill := index (dict "o" "#241a3a" "h" (index $t 1) "m" (index $t 2) "s" (index $t 3) "r" "#57068c" "t" "#7fffd4") $c }}{{ with $fill }}<rect x="{{ $x }}" y="{{ $y }}" width="1" height="1" fill="{{ . }}"/>{{ end }}{{ end }}{{ end -}}
+    </svg></figure>
+    {{- end }}
+  </div>
+  <div class="ab-row">{{ range (slice "p" "g" "s" "b") }}<i class="cfb__medal cfb__medal--{{ . }}" style="width:16px;height:16px;-webkit-mask-size:16px 16px;mask-size:16px 16px"></i>{{ end }}</div>
+</section>
+
+<section class="ab-sec" id="mark">
+  <h2 class="ab-h"><span>07</span>mark</h2>
+  <div class="ab-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+    {{- range (slice (slice "#4a3b6b" "#c8c7ff" "lilac on purple") (slice "#c8c7ff" "#4a3b6b" "purple on lilac") (slice "#131316" "#c8c7ff" "lilac on black")) }}
+    <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><svg viewBox="-68.2 -795.4 840.4 840.4" aria-label="glyph, {{ index . 2 }}"><path transform="scale(1,-1)" fill="{{ index . 1 }}" d="{{ $glyph }}"/></svg></span></figure>
+    {{- end }}
+  </div>
+</section>
+
+</div>

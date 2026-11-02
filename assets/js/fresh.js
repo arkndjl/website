@@ -13,11 +13,17 @@
   }
   // a date-only asof counts from the end of that day (UTC), a timestamp as is
   function at(a) { return /^\d{4}-\d{2}-\d{2}$/.test(a) ? Date.parse(a + 'T23:59:59Z') : Date.parse(a); }
-  function limit(sport, now) { var s = R.sports[sport]; return !s ? R.inHours : inSeason(s, now) ? R.inHours : (s.offHours || R.inHours); }
+  // fh: the feed's own in-season limit (freshness.json feedHours, data-hours) for a product that refreshes weekly;
+  // out of season every feed gets at least the sport's offHours (scripts/data_health.py uses the same rule)
+  function limit(sport, now, fh) {
+    var s = R.sports[sport];
+    if (!s) return fh || R.inHours;
+    return inSeason(s, now) ? (fh || R.inHours) : Math.max(fh || 0, s.offHours || R.inHours);
+  }
   function ago(h) { return h < 1 ? 'under an hour ago' : h < 48 ? Math.round(h) + ' h ago' : Math.round(h / 24) + ' days ago'; }
   function mark(el) {
     var a = el.getAttribute('data-asof'), t = a && at(a); if (!t) return;
-    var now = new Date(), h = (now - t) / 3.6e6, lim = limit(el.getAttribute('data-sport'), now);
+    var now = new Date(), h = (now - t) / 3.6e6, lim = limit(el.getAttribute('data-sport'), now, +el.getAttribute('data-hours') || 0);
     el.title = 'updated ' + ago(Math.max(h, 0)) + ' · stale past ' + lim + ' h';
     var stale = h > lim;
     el.classList.toggle('is-stale', stale);

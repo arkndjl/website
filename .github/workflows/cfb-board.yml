@@ -27,6 +27,11 @@ on:
     # for the late ones). The 16:17 full run covers the early games when it isn't delayed; 18:57 catches the late
     # window's inactives, and the early games' if the 16:17 run slipped. Same refresh as the daily ones.
     - cron: "57 18 * 8-12,1 0"
+    # off-season (Nov 2 2026, "every model auto-updates"): Mondays February-July (signing day, coaching hires, the
+    # spring portal window, the NFL draft in late April, On3 class rankings), plus Thursdays in February and April
+    # (signing period, portal window and draft week). About 15 CFBD calls a run against the 1,000 a month.
+    - cron: "17 11 * 2-7 1"
+    - cron: "17 11 * 2,4 4"
   workflow_dispatch:
     inputs:
       refresh:
@@ -102,6 +107,29 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: node scripts/cfb_avail_reports.mjs
+      # head coaches from ESPN (firings, interims, hires) into data/cfb_staff.json before the staff board and the
+      # coaching market read it (scripts/cfb_staff_sync.py; a failed pull changes nothing)
+      - name: Head coaches, college football
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 scripts/cfb_staff_sync.py
+      # special teams tab: kick and punt returners from the ESPN play-by-play cache (scripts/st_returners.py; ESPN box
+      # scores for returner ids, one call a new game; no CFBD quota). Before the grade: it also writes
+      # scripts/data/cfb_ret_fv.json, the career return lines behind the RB/WR FV return term (fetch_cfb.mjs)
+      - name: Special teams tab
+        continue-on-error: true
+        timeout-minutes: 10
+        run: python3 scripts/st_returners.py cfb
+      # special teams tab, kickers and punters (scripts/st_kickers.py): points over expected by kick from the ESPN
+      # play-by-play cache plus ESPN kicking/punting box scores (one call a game not yet cached; no CFBD quota). Its
+      # pcar (career net yards over expected) is the punter FV input fetch_cfb.mjs reads
+      - name: Special teams tab, kickers and punters
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          python3 scripts/st_kickers.py --current
+          python3 scripts/st_kickers.py cfb
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs
@@ -134,12 +162,6 @@ jobs:
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py cfb
-      # special teams tab: kick and punt returners from the ESPN play-by-play cache (scripts/st_returners.py; ESPN box
-      # scores for returner ids, one call a new game; no CFBD quota), display only
-      - name: Special teams tab
-        continue-on-error: true
-        timeout-minutes: 10
-        run: python3 scripts/st_returners.py cfb
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor
@@ -147,20 +169,27 @@ jobs:
         run: python3 scripts/model_monitor.py cfb
       # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py cfb -> static/data/teams/cfb.json):
       # each FBS team's schedule from ESPN at the ranking's scores, and key players from the board; display only
-      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/cfb.json and the team file
+      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/cfb.json and the team file;
+      # first the special teams teams view and its Special Teams badge (scripts/st_teams.py -> data/st_teams_cfb.json)
       - name: Team badges
         continue-on-error: true
         timeout-minutes: 10
         run: |
           python3 -m venv /tmp/tbv && /tmp/tbv/bin/pip install -q numpy
+          /tmp/tbv/bin/python scripts/st_teams.py build cfb || echo "special teams teams not updated"
           /tmp/tbv/bin/python scripts/team_badges.py build cfb
+      # offense, defense and unit tables for the teams group (scripts/team_units.py -> data/units_cfb.json), display only
+      - name: Team units
+        continue-on-error: true
+        timeout-minutes: 15
+        run: /tmp/tbv/bin/python scripts/team_units.py cfb
       - name: Team breakdowns
         continue-on-error: true
         timeout-minutes: 5
         run: python3 scripts/team_detail.py cfb
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+          git add data/cfb*.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -178,7 +207,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+            git add data/cfb*.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done

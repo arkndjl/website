@@ -1,0 +1,83 @@
+{
+  "note": "Every outside source the ARKBOARD pulls from (scripts/, .github/workflows/). Add a source here when a fetcher starts using it.",
+  "groups": [
+    { "name": "college football", "sources": [
+      { "n": "CollegeFootballData (CFBD)", "u": "https://collegefootballdata.com/", "w": "games, drives, plays, rosters, recruiting, returning production" },
+      { "n": "cfbfastR data (SportsDataverse)", "u": "https://github.com/sportsdataverse/cfbfastR-data", "w": "historical play-by-play" },
+      { "n": "ESPN", "u": "https://www.espn.com/college-football/", "w": "scores, schedules, box scores, injuries, FPI, depth, headshots" },
+      { "n": "247Sports", "u": "https://247sports.com/", "w": "recruiting ratings, transfer portal" },
+      { "n": "On3", "u": "https://www.on3.com/", "w": "college player grades, recruiting, NIL valuations" },
+      { "n": "PFF", "u": "https://www.pff.com/", "w": "draft big board" },
+      { "n": "Pro Football Network", "u": "https://www.profootballnetwork.com/", "w": "draft big board" },
+      { "n": "DraftTek", "u": "https://www.drafttek.com/", "w": "draft big board history" },
+      { "n": "Tankathon", "u": "https://www.tankathon.com/", "w": "draft order and big boards" },
+      { "n": "RotoBaller", "u": "https://www.rotoballer.com/", "w": "injury news" },
+      { "n": "HD Intelligence", "u": "https://app.hdintelligence.com/", "w": "availability reports" },
+      { "n": "MaxPreps", "u": "https://www.maxpreps.com/", "w": "high school teams" },
+      { "n": "USA Today coach salaries", "u": "https://sportsdata.usatoday.com/ncaa/salaries", "w": "coach salaries" },
+      { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "coaches by team-season" }
+    ]},
+    { "name": "NFL", "sources": [
+      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks" },
+      { "n": "nfldata (Lee Sharpe)", "u": "https://github.com/nflverse/nfldata", "w": "games and closing lines" },
+      { "n": "ESPN", "u": "https://www.espn.com/nfl/", "w": "scores, injuries, depth charts, headshots" },
+      { "n": "NFL.com", "u": "https://www.nfl.com/", "w": "headshots" }
+    ]},
+    { "name": "college basketball", "sources": [
+      { "n": "Barttorvik (T-Rank)", "u": "https://barttorvik.com/", "w": "player and team efficiency, game logs" },
+      { "n": "ESPN", "u": "https://www.espn.com/mens-college-basketball/", "w": "scores, box scores, rosters, headshots" },
+      { "n": "SportsDataverse (hoopR)", "u": "https://github.com/sportsdataverse/sportsdataverse-data", "w": "historical play-by-play" },
+      { "n": "On3", "u": "https://www.on3.com/", "w": "recruiting ratings" },
+      { "n": "Covers", "u": "https://www.covers.com/sport/basketball/ncaab/injuries", "w": "injuries" },
+      { "n": "KenPom (via Kaggle March Machine Learning Mania)", "u": "https://kenpom.com/", "w": "research backtests only" },
+      { "n": "ESPN, The Ringer, CBS, No Ceilings, NBADraft.net, Tankathon", "u": "https://www.noceilingsnba.com/", "w": "draft big boards and mocks" }
+    ]},
+    { "name": "NBA", "sources": [
+      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history" },
+      { "n": "NBA.com", "u": "https://www.nba.com/", "w": "officials, headshots" },
+      { "n": "ESPN", "u": "https://www.espn.com/nba/", "w": "scores, injuries, depth" },
+      { "n": "databallr", "u": "https://databallr.com/", "w": "DPM" },
+      { "n": "nbarapm.com", "u": "https://www.nbarapm.com/", "w": "LEBRON, RAPM" },
+      { "n": "LUMA Hoops", "u": "https://github.com/lumahoops/NBA", "w": "ARC" },
+      { "n": "PBP Stats", "u": "https://www.pbpstats.com/", "w": "research backtests" }
+    ]},
+    { "name": "hockey", "sources": [
+      { "n": "NHL API", "u": "https://www.nhl.com/", "w": "games, rosters, stats, headshots" },
+      { "n": "MoneyPuck", "u": "https://moneypuck.com/", "w": "expected goals, skater and goalie data" },
+      { "n": "Daily Faceoff", "u": "https://www.dailyfaceoff.com/", "w": "starting goalies, lines" },
+      { "n": "HockeyTech / LeagueStat", "u": "https://lscluster.hockeytech.com/", "w": "CHL, AHL, USHL stats and headshots" },
+      { "n": "Liiga", "u": "https://liiga.fi/", "w": "Finnish league stats" },
+      { "n": "SHL", "u": "https://www.shl.se/", "w": "Swedish league stats" }
+    ]},
+    { "name": "soccer", "sources": [
+      { "n": "Understat", "u": "https://understat.com/", "w": "expected goals, player and match data" },
+      { "n": "FotMob", "u": "https://www.fotmob.com/", "w": "fixtures, lineups, player stats, academy leagues" },
+      { "n": "Transfermarkt", "u": "https://www.transfermarkt.com/", "w": "market values, transfers, headshots" },
+      { "n": "Football-Data.co.uk", "u": "https://www.football-data.co.uk/", "w": "historical results and closing odds" }
+    ]},
+    { "name": "tennis", "sources": [
+      { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches, rankings, Elo, player data" }
+    ]},
+    { "name": "Counter-Strike", "sources": [
+      { "n": "bo3.gg", "u": "https://bo3.gg/", "w": "matches, maps, player stats, odds" },
+      { "n": "FACEIT", "u": "https://www.faceit.com/", "w": "ESEA matches and player stats" },
+      { "n": "HLTV", "u": "https://www.hltv.org/", "w": "Rating 1.0 formula" },
+      { "n": "Liquipedia", "u": "https://liquipedia.net/counterstrike/", "w": "teams and events" },
+      { "n": "Valve regional standings", "u": "https://github.com/ValveSoftware/counter-strike_regional_standings", "w": "VRS rankings" }
+    ]},
+    { "name": "baseball", "sources": [
+      { "n": "MLB", "u": "https://www.mlb.com/", "w": "headshots" }
+    ]},
+    { "name": "odds and markets", "sources": [
+      { "n": "Novig", "u": "https://novig.com/", "w": "lines and props (primary)" },
+      { "n": "DraftKings (via ESPN)", "u": "https://www.espn.com/", "w": "fallback lines" },
+      { "n": "Polymarket", "u": "https://polymarket.com/", "w": "market prices as a data signal" },
+      { "n": "Sportsbook Reviews Online", "u": "https://www.sportsbookreviewsonline.com/", "w": "historical opening and closing lines" }
+    ]},
+    { "name": "weather and places", "sources": [
+      { "n": "Open-Meteo", "u": "https://open-meteo.com/", "w": "game-time weather, geocoding" },
+      { "n": "Iowa Environmental Mesonet", "u": "https://mesonet.agron.iastate.edu/", "w": "historical weather observations" },
+      { "n": "OpenStreetMap Nominatim", "u": "https://nominatim.openstreetmap.org/", "w": "geocoding" }
+    ]}
+  ]
+}

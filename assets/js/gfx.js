@@ -8,7 +8,7 @@
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
   var SITE = 'arkndjl.net/' + ([[/^\/laursen_111/i, '1nt'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
     [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'],
-    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
+    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/reference/, 'reference'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/1nt$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
@@ -1912,6 +1912,91 @@
     return F.canvas;
   }
 
+  // ---- research card (layouts/shortcodes/rq.html): question, one-line answer, key number and/or bars, 16:9 for X ----
+  async function buildRQ(win, btn) {
+    var d; try { d = JSON.parse(btn.getAttribute('data-gfx-rq') || '{}'); } catch (e) { return null; }
+    if (!d.q || !d.a) return null;
+    var bars = (d.bars || []).map(function (b) { return Array.isArray(b) ? b : b && [b.l, b.v]; }).filter(function (b) { return b && b.length >= 2 && isFinite(+b[1]); }).slice(0, 8);
+    var F = await frame(2400, 1350, 'ARKBOARD RESEARCH' + (d.sport ? ' :: ' + String(d.sport).toUpperCase() : ''), d.date || '',
+      'arkndjl.net/reference' + (d.id ? '#rq-' + d.id : ''));
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 36;
+    // the question: the largest of 80/64/48 px that fits three lines
+    var qs = 80, ql;
+    for (; qs >= 48; qs -= 16) { g.font = qs + 'px ' + FONT; ql = wrap(g, d.q, w - 2 * pad - qs); if (ql.length <= 3) break; }
+    if (qs < 48) { qs = 48; g.font = qs + 'px ' + FONT; ql = wrap(g, d.q, w - 2 * pad - qs).slice(0, 3); }
+    var qh = 2 * pad + ql.length * qs * 1.3;
+    well(g, x, y, w, qh);
+    g.fillStyle = C.lilac; g.font = qs + 'px ' + FONT; g.fillText('Q', x + pad, y + pad + qs * 0.65);
+    g.fillStyle = C.white;
+    ql.forEach(function (t, i) { g.fillText(t, x + pad + qs * 1.1, y + pad + qs * 0.65 + i * qs * 1.3); });
+    var top = y + qh + 24, bh = y + h - top;
+    // right panel: the key number, the bars, or both
+    var side = d.n || bars.length, sw = side ? Math.round(w * (bars.length ? 0.46 : 0.36)) : 0, lw = w - sw - (side ? 24 : 0);
+    // answer: the largest of 96/80/64/48 px that fits the left panel (note line kept free at the bottom)
+    var noteH = d.note ? 64 : 0, as = 96, al;
+    for (; as >= 48; as -= 16) { g.font = as + 'px ' + FONT; al = wrap(g, d.a, lw - 2 * pad); if (al.length * as * 1.3 <= bh - 2 * pad - noteH) break; }
+    if (as < 48) { as = 48; g.font = as + 'px ' + FONT; al = wrap(g, d.a, lw - 2 * pad); }
+    g.fillStyle = C.lilac; g.font = '48px ' + FONT; g.fillText('A', x + pad, top + 40);
+    g.font = as + 'px ' + FONT; g.fillStyle = C.teal;
+    var ay = top + 40 + 48 + as * 0.65;
+    al.forEach(function (t, i) { g.fillText(fit(g, t, lw - 2 * pad), x + pad, ay + i * as * 1.3); });
+    if (d.note) { g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.note, lw - 2 * pad), x + pad, top + bh - 28); }
+    if (!side) return F.canvas;
+    var sx = x + lw + 24, sy = top;
+    well(g, sx, sy, sw, bh);
+    var cy = sy + pad;
+    if (d.n) {
+      var ns = bars.length ? 128 : 192; g.font = ns + 'px ' + FONT;
+      while (ns > 64 && g.measureText(String(d.n)).width > sw - 2 * pad) { ns -= 16; g.font = ns + 'px ' + FONT; }
+      var nl = d.nl ? (g.font = '40px ' + FONT, wrap(g, d.nl, sw - 2 * pad).slice(0, bars.length ? 1 : 3)) : [];
+      var block = ns + nl.length * 52;
+      if (!bars.length) cy = sy + (bh - block) / 2;
+      g.textAlign = 'center'; g.font = ns + 'px ' + FONT; g.fillStyle = C.teal;
+      g.fillText(String(d.n), sx + sw / 2, cy + ns * 0.5);
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac;
+      nl.forEach(function (t, i) { g.fillText(t, sx + sw / 2, cy + ns + 26 + i * 52); });
+      g.textAlign = 'left';
+      cy += block + 32;
+    }
+    if (bars.length) {
+      var avail = sy + bh - pad - cy, rh = Math.min(96, avail / bars.length), fs = rh >= 80 ? 48 : 40;
+      g.font = fs + 'px ' + FONT;
+      var unit = d.unit ? ' ' + d.unit : '', neg = bars.some(function (b) { return +b[1] < 0; });
+      var lw0 = function () { return Math.max.apply(null, bars.map(function (b) { return g.measureText(String(b[0])).width; })) + 16; };
+      while (fs > 32 && lw0() > sw * 0.48) { fs -= 8; g.font = fs + 'px ' + FONT; }
+      var lab = Math.min(sw * 0.48, lw0());
+      cy += Math.max(0, (avail - rh * bars.length) / 2);   // the chart sits in the middle of the space left
+      var vals = bars.map(function (b) { var v = +b[1], s = (Math.abs(v) >= 100 ? Math.round(v) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2).replace(/0$/, '')); return (neg && v > 0 ? '+' : '') + s + unit; });
+      var vw = Math.max.apply(null, vals.map(function (t) { return g.measureText(t).width; })) + 16;
+      var bx = sx + pad + lab, bw = sw - 2 * pad - lab - vw;
+      var mx = Math.max.apply(null, bars.map(function (b) { return Math.abs(+b[1]); })) || 1;
+      var lo = neg ? Math.min.apply(null, bars.map(function (b) { return Math.min(0, +b[1]); })) : 0, hi = Math.max.apply(null, bars.map(function (b) { return Math.max(0, +b[1]); }));
+      var span = (hi - lo) || mx, zx = bx + bw * (-lo / span);
+      bars.forEach(function (b, i) {
+        var v = +b[1], ry = cy + i * rh, mid = ry + rh / 2, bhh = Math.max(16, Math.round(rh * 0.5 / 8) * 8);
+        g.fillStyle = C.white; g.fillText(fit(g, String(b[0]), lab - 16), sx + pad, mid);
+        var len = Math.max(8, Math.round(bw * Math.abs(v) / span / 8) * 8), x0 = v < 0 ? zx - len : zx;
+        g.fillStyle = v < 0 ? C.down : C.teal; g.fillRect(Math.round(x0), Math.round(mid - bhh / 2), len, bhh);
+        g.fillStyle = C.dark; g.fillRect(Math.round(x0), Math.round(mid + bhh / 2) - 4, len, 4);
+        g.fillStyle = v < 0 ? C.down : C.teal; g.fillText(vals[i], bx + bw + 16, mid);
+      });
+      if (neg) { g.fillStyle = C.lilac; g.fillRect(Math.round(zx) - 2, cy, 4, rh * bars.length); }
+    }
+    return F.canvas;
+  }
+  // a #rq-<id> link: open the tabs around that question, then scroll to it
+  function rqFromHash() {
+    var h = decodeURIComponent(location.hash.slice(1)); if (!/^rq-/.test(h)) return;
+    var el = document.getElementById(h); if (!el) return;
+    var slug = function (s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); };
+    var p = [], n = el;
+    while (n && n !== document.body) { if (n.hasAttribute && n.hasAttribute('data-tab')) p.unshift(n.getAttribute('data-tab')); n = n.parentElement; }
+    p.forEach(function (t) { var b = [].filter.call(document.querySelectorAll('[data-wintab]'), function (x) { return slug(x.getAttribute('data-wintab')) === slug(t); })[0]; if (b && b.getAttribute('aria-selected') !== 'true') b.click(); });
+    if (location.hash !== '#' + h) history.replaceState(null, '', '#' + h);
+    setTimeout(function () { el.scrollIntoView({ block: 'start' }); }, 30);
+  }
+  setTimeout(rqFromHash, 60); window.addEventListener('hashchange', rqFromHash);
+
   function preview(canvas, name) {
     var url = canvas.toDataURL('image/png');
     var box = document.createElement('div'); box.className = 'gfx'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'graphic preview');
@@ -1955,12 +2040,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
         var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }

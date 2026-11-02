@@ -36,17 +36,16 @@ def team_ledger(y):
     out = {}
     for (pfr, t), s in sd['snaps'].items():
         gsis = by_pfr.get(pfr) or by_name.get((W.NM.key(s['name']), t))
-        g, _ = W.group_of(s['pos'], '')
-        if not gsis or not g:
+        if not gsis:
             continue
-        x = W.features(sd, pfr, gsis, t, g)
-        if x is None:
-            continue
-        P = sd['plays'][t]
-        share = ((s['off'] / P[0]) if g in W.OFFENSE else (s['def'] / P[1])) * sd['team'][t]['g'] / 17 if P[0] and P[1] else 0.0
-        a = out.setdefault((gsis, tm(t)), [0.0, 0, g])
-        a[0] += (W.predict(b, g, x) - W.NFL_REPL[g] * share) * W.NWAR_PER_AV
-        a[1] += s['g']
+        for g, _, _, cross in W.side_groups(s):   # a two-way player's sides add up
+            w = W.side_war(sd, b, pfr, gsis, t, s, g)
+            if w is None:
+                continue
+            a = out.setdefault((gsis, tm(t)), [0.0, 0, g])
+            a[0] += w
+            if not cross:
+                a[1] += s['g']
     return out
 
 

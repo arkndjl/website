@@ -160,7 +160,7 @@ def ppr(st):
 
 def nfl_board(y, thru=None):
     import nfl_war as W
-    out, _, _ = W.board(y, thru=thru)
+    out, _, _ = W.board(y, thru=thru, st=False)   # the percentile frames keep the pre-special-teams board
     return {p['id']: {'n': p['n'], 'tm': p['t'], 'grp': p['_g'], 'g': p['g'], 'sn': p['sn'], 'war': p['war'],
                       'x': dict({k: p['_st'].get(k, 0) for k in NFL_KEEP}, ppr=ppr(p['_st']))} for p in out}
 

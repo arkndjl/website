@@ -318,8 +318,25 @@ def soccer(rows):
     return out
 
 
+def st_badges(sport, bdg):
+    """the Special Teams badge (Nov 2 2026): the team special teams rating's tier from data/st_teams_<sport>.json
+    (scripts/st_teams.py; shown only because it passed its own display test there), merged by z"""
+    try:
+        d = json.load(open(os.path.join(ROOT, 'data', f'st_teams_{sport}.json')))
+    except (OSError, ValueError):
+        return bdg
+    out = {t: list(v) for t, v in bdg.items()}
+    for r in d.get('rows', []):
+        if r.get('tier'):
+            b = ['Special Teams', r['tier'], max(r['pct'], PCT[r['tier']]), f"points over expected a game {r['adj']:+.2f}"]
+            out[r['id']] = sorted(out.get(r['id'], []) + [b], key=lambda x: (-'bsgp'.index(x[1]) if x[1] in 'bsgp' else 0, -x[2]))
+    return out
+
+
 def build(sport):
     bdg = {'nfl': nfl, 'nba': nba, 'cbb': cbb, 'cfb': cfb}[sport]()
+    if sport in ('nfl', 'cfb'):
+        bdg = st_badges(sport, bdg)
     write(sport, bdg)
 
 

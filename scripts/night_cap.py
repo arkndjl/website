@@ -84,37 +84,31 @@ def exposure(D, now):
     return out
 
 
-def fixed(D, now):
-    """ET date -> stake already down: picks of that night that have started (or settled) keep the capped stake they
-    were bet at, and it counts against the night's CAP. Read from each file's log (a superset of picks), so a started
-    pick that has left the picks list still counts. Without this the late games of a night were rescaled against a
-    smaller total once the early games started (16 picks x 5 = 80 raw: 40% at 6 pm, 60% after the 7 pm starts)."""
+def locked(D, now):
+    """ET date -> stake already down on that night: picks whose start has passed (graded or not), at the stake they
+    went off at. They count toward the night's cap (Nov 2 2026: only open picks counted, so as a night's early games
+    started their stakes left the total and the late picks were scaled back up; the Nov 2 slate run every 30 minutes
+    ended at 91% of the bankroll on a 40% cap). The log holds every pick (the open ones are copies of its rows)."""
     out = {}
     for d in D.values():
-        rows = d.get('log') or d.get('picks', [])
+        rows = d.get('log') or d.get('picks') or []
         if isinstance(rows, dict):
             rows = list(rows.values())
-        seen = set()
         for p in rows:
-            if not isinstance(p, dict) or p.get('pass') or not p.get('kick') or live(p, now):
+            if not isinstance(p, dict) or not p.get('kick') or p.get('pass') or p.get('res') == 'void' or live(p, now):
                 continue
-            k = (p.get('id'), p.get('mk'), p.get('side'), p.get('player'), p.get('stat'))
-            if k in seen:
+            k = ts(p['kick'])
+            if k is None or k > now:
                 continue
-            seen.add(k)
-            u = p.get('units')
-            if u:
-                out[night(p['kick'])] = out.get(night(p['kick']), 0.0) + float(u)
+            o = p['now'] if isinstance(p.get('now'), dict) and p['now'].get('units') is not None else p
+            out[night(p['kick'])] = out.get(night(p['kick']), 0.0) + float(o.get('units') or 0.0)
     return out
 
 
-def scales(ex, fx):
-    """night -> scale on the open picks' raw stakes so started + open stay within CAP"""
-    K = {}
-    for n, t in ex.items():
-        room = max(0.0, CAP - fx.get(n, 0.0))
-        K[n] = min(1.0, room / t) if t > 0 else 1.0
-    return K
+def scales(D, now):
+    """ET date -> the scale on its open picks: what is left of CAP after the stakes already down, over their total"""
+    ex, lk = exposure(D, now), locked(D, now)
+    return ex, {n: (min(1.0, max(0.0, CAP - lk.get(n, 0.0)) / t) if t > 0 else 1.0) for n, t in ex.items()}, lk
 
 
 def apply(only=None, now=None):
@@ -126,9 +120,7 @@ def apply(only=None, now=None):
                 D[s] = json.load(f)
         except (OSError, json.JSONDecodeError):
             pass
-    ex = exposure(D, now)
-    fx = fixed(D, now)
-    K = scales(ex, fx)
+    ex, K, lk = scales(D, now)
     for s in (only or list(D)):
         d = D.get(s)
         if not d:
@@ -145,8 +137,8 @@ def apply(only=None, now=None):
                 set_units(p, raw(p), k)
                 if isinstance(p.get('now'), dict):
                     set_units(p['now'], raw(p['now']), k)
-        d['nightCap'] = {'cap': CAP, 'nights': {n: {'raw': round(ex[n], 2), 'started': round(fx.get(n, 0.0), 2),
-                                                    'scale': round(K[n], 4)} for n in sorted(ex)}}
+        d['nightCap'] = {'cap': CAP, 'nights': {n: {'raw': round(ex[n], 2), 'scale': round(K[n], 4),
+                                                    **({'down': round(lk[n], 2)} if lk.get(n) else {})} for n in sorted(ex)}}
         if json.dumps(d, sort_keys=True) != before:
             with open(fn(s), 'w') as f:
                 if s in ('tennis', 'nflprops'):
@@ -155,7 +147,7 @@ def apply(only=None, now=None):
                     json.dump(d, f, indent=1, allow_nan=False)
     for n in sorted(ex):
         if K[n] < 1:
-            print(f'night cap {n}: {fx.get(n, 0.0):.2f}% started + {ex[n]:.2f}% open uncapped -> x{K[n]:.3f}')
+            print(f'night cap {n}: {ex[n]:.2f}% uncapped' + (f' ({lk[n]:.2f}% already down)' if lk.get(n) else '') + f' -> x{K[n]:.3f}')
     return K
 
 
@@ -177,14 +169,14 @@ def test():
                            {'kick': '2026-11-03T00:00:00Z', 'units': 30.0, 'pass': True}]},
          'nba': {'picks': [{'kick': '2026-11-03T01:00:00Z', 'units': 30.0}]}}
     assert exposure(D, now) == {'2026-11-02': 80.0}
-    # 16 picks at 5 on one night: 8 start at 7 pm ET (capped 2.5 each = 20), the 8 late ones may only take the other 20
-    late = [{'kick': '2026-11-03T02:00:00Z', 'units': 5.0} for _ in range(8)]
-    early = [{'kick': '2026-11-03T00:00:00Z', 'units': 2.5, 'id': str(i), 'mk': 'total'} for i in range(8)]
-    D2 = {'cbb': {'picks': late, 'log': early + late}}
-    t8 = datetime(2026, 11, 3, 1, tzinfo=timezone.utc)
-    assert fixed(D2, t8) == {'2026-11-02': 20.0}
-    K2 = scales(exposure(D2, t8), fixed(D2, t8))
-    assert abs(K2['2026-11-02'] - 0.5) < 1e-9
+    # a night's started picks stay in its total at the stake they went off at
+    D['nba']['log'] = [{'kick': '2026-11-01T22:00:00Z', 'units': 30.0}, {'kick': '2026-11-01T22:00:00Z', 'units': 9.0, 'pass': True},
+                       {'kick': '2026-11-03T01:00:00Z', 'units': 30.0}]
+    ex, K, lk = scales(D, now)
+    assert lk == {'2026-11-01': 30.0} and ex == {'2026-11-02': 80.0} and abs(K['2026-11-02'] - 0.5) < 1e-9
+    D['nba']['log'].append({'kick': '2026-11-02T23:00:00Z', 'units': 10.0, 'res': 'w'})
+    ex, K, lk = scales(D, datetime(2026, 11, 2, 23, 30, tzinfo=timezone.utc))
+    assert lk['2026-11-02'] == 10.0 and abs(K['2026-11-02'] - 30 / 80) < 1e-9, (lk, K)
     print('night_cap tests pass')
 
 

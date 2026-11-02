@@ -1,0 +1,39 @@
+{{- /* One answered research question, as a window with a GFX card button (gfx.js buildRQ: a 2400x1350
+       16:9 PNG for X/Twitter: question, one-line answer, key number or bar chart, ARKBOARD mark, permalink).
+       {{< rq id="bye-weeks" sport="NFL" date="2026-11-01"
+              q="Do NFL teams cover more often off a bye?"
+              a="No. The edge is priced into the closing line."
+              n="+0.4" nl="pts vs close, held-out seasons"
+              bars="bye:1.08|mini-bye:1.16|short week:-1.33" unit="pts"
+              note="n = 3,136 games, 2015-25" >}}
+         optional markdown: method, caveats (page only, not on the card)
+       {{< /rq >}}
+       id: permalink slug (#rq-<id>, short link arkndjl.net/reference#rq-<id>). q and a required.
+       n/nl: the key number and its label. bars: "label:value|..." (a chart in place of, or beside, n;
+       up to 8, negatives draw left of zero). note: sample/source line printed small on the card.
+       Any other page can draw the same card: a button inside a .win with
+       data-gfx data-gfx-mode="rq" data-gfx-rq='{"id","q","a","n","nl","bars":[[label,value]] or [{"l","v"}],"unit","note","sport","date"}'. */ -}}
+{{- $id := .Get "id" | default (anchorize (.Get "q")) -}}
+{{- $bars := slice -}}
+{{- with .Get "bars" }}{{ range split . "|" }}{{ $kv := split . ":" }}{{ if ge (len $kv) 2 }}{{ $bars = $bars | append (dict "l" (trim (index $kv 0) " ") "v" (float (trim (index $kv 1) " "))) }}{{ end }}{{ end }}{{ end -}}
+{{- $d := dict "id" $id "q" (.Get "q") "a" (.Get "a") "n" (.Get "n" | default "") "nl" (.Get "nl" | default "") "bars" $bars "unit" (.Get "unit" | default "") "note" (.Get "note" | default "") "sport" (.Get "sport" | default "") "date" (.Get "date" | default "") -}}
+<div class="win rq" id="rq-{{ $id }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ with .Get "sport" }}{{ lower . }} :: {{ end }}research<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="rq__body">
+    <p class="rq__q">{{ .Get "q" }}</p>
+    <div class="rq__row">
+      <p class="rq__a">{{ .Get "a" }}</p>
+      {{- with .Get "n" }}<p class="rq__n"><b>{{ . }}</b>{{ with $.Get "nl" }}<span>{{ . }}</span>{{ end }}</p>{{ end }}
+    </div>
+    {{- with .Inner }}<div class="rq__more">{{ . | $.Page.RenderString (dict "display" "block") }}</div>{{ end }}
+    <p class="rq__bar">
+      <button type="button" class="cfb__btn" data-gfx data-gfx-mode="rq" data-gfx-rq="{{ jsonify $d }}" title="research card PNG, 16:9 for X">GFX card</button>
+      <a class="cfb__btn rq__link" href="#rq-{{ $id }}" title="link to this question">link</a>
+      {{- with .Get "note" }}<span class="rq__note">{{ . }}</span>{{ end }}
+    </p>
+  </div>
+</div>
+{{- partial "js.html" "gfx" -}}

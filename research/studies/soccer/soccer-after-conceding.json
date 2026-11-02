@@ -1,0 +1,114 @@
+{
+  "id": "soccer-after-conceding",
+  "sport": "soccer",
+  "question": "Do teams score more or less in the minutes after a goal?",
+  "answer": "No momentum swing. Team that just conceded scores 0.95x baseline in the next 10 min; scorer 1.06x. Restart dips the first 3 min.",
+  "findings": [
+    "Team that conceded, 0-10 min: xG 0.92x baseline (CI 0.88-0.96), goals 0.95x (CI 0.88-1.02).",
+    "Team that scored, 0-10 min: xG 0.99x (CI 0.95-1.03), goals 1.06x (CI 0.99-1.12).",
+    "First 3 min after a goal both teams sit below baseline (xG 0.74x and 0.87x): restart time.",
+    "No sign a team is most vulnerable just after scoring: its opponent's goals 0-10 min are 0.95x baseline."
+  ],
+  "method": "Team-minutes (11v11) by time since last goal. Baseline: league rate for the same 15-min band and score state, scaled by pre-match strength (leave-one-out season xG). Observed/expected; CIs bootstrap by match.",
+  "data": "StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,856 matches, 527,256 team-minutes.",
+  "n": 2856,
+  "robust": false,
+  "interest": 3,
+  "split_check": "Conceding team 0-10 min goals: 1.09x in 2015/16 leagues, 0.88x elsewhere; direction flips, so no stable effect.",
+  "chart": {
+    "type": "line",
+    "title": "xG rate after a goal vs matched baseline",
+    "x_label": "minutes since goal",
+    "y_label": "observed / expected xG",
+    "y_fmt": "num",
+    "x_reverse": false,
+    "ref": {
+      "y": 1.0,
+      "label": "baseline"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "team that conceded",
+        "points": [
+          {
+            "x": 1.5,
+            "y": 0.743,
+            "lo": 0.675,
+            "hi": 0.793,
+            "n": 21960
+          },
+          {
+            "x": 4.5,
+            "y": 0.965,
+            "lo": 0.897,
+            "hi": 1.026,
+            "n": 19343
+          },
+          {
+            "x": 8,
+            "y": 1.068,
+            "lo": 1.002,
+            "hi": 1.153,
+            "n": 21984
+          },
+          {
+            "x": 12.5,
+            "y": 1.04,
+            "lo": 0.974,
+            "hi": 1.115,
+            "n": 22532
+          },
+          {
+            "x": 17.5,
+            "y": 1.049,
+            "lo": 0.979,
+            "hi": 1.128,
+            "n": 18097
+          }
+        ]
+      },
+      {
+        "name": "team that scored",
+        "points": [
+          {
+            "x": 1.5,
+            "y": 0.872,
+            "lo": 0.81,
+            "hi": 0.933,
+            "n": 21434
+          },
+          {
+            "x": 4.5,
+            "y": 1.108,
+            "lo": 1.041,
+            "hi": 1.184,
+            "n": 18871
+          },
+          {
+            "x": 8,
+            "y": 1.006,
+            "lo": 0.941,
+            "hi": 1.057,
+            "n": 21444
+          },
+          {
+            "x": 12.5,
+            "y": 1.008,
+            "lo": 0.95,
+            "hi": 1.062,
+            "n": 21972
+          },
+          {
+            "x": 17.5,
+            "y": 0.961,
+            "lo": 0.898,
+            "hi": 1.029,
+            "n": 17669
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

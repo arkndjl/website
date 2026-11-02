@@ -54,6 +54,12 @@ PFR posts AV only after a season (2026 rookies all read 0 in October), so this s
 the board shows DE and pass-rushing OLBs (sacks + QB hits a snap) as EDGE, DT/NT as DL, ILB/MLB and 4-3 OLBs as LB,
 by the roster's depth-chart spot.
 Kickers, punters and long snappers aren't graded (PFR gives them little AV too).
+
+Two-way players (side_groups): snaps on the side opposite a player's listing (Travis Hunter's CB snaps, listed WR) earn AV
+from that side's pool under that side's group (CROSS) and count against that side's sub-position line, so his WAR is
+offense WAR + defense WAR. The board row carries two {o, d, so, sd, p2} once he has 20+ snaps on each side; war_ledger
+(game model injury costs) and nfl_roster.py's projections add both sides; fantasy reads offense only. The fits
+(--fit, --calibrate, --positions) still read each listing's side alone (a handful of two-way seasons since 2016).
 """
 import csv
 import json
@@ -118,6 +124,27 @@ FEATS = {'QB': ['snap', 'pass', 'ptd', 'rush'], 'RB': ['snap', 'rush', 'rec'], '
          'TE': ['snap', 'rec'], 'OL': ['snap'],
          'DL': ['snap', 'prod'], 'LB': ['snap', 'prod'], 'DB': ['snap', 'prod']}
 OFFENSE = {'QB', 'RB', 'WR', 'TE', 'OL'}
+# two-way players (Travis Hunter WR/CB): snaps on the side opposite his listing count at this group's AV split and line,
+# with this listed spot for the board position (FBs who play defense are converted D-linemen, Scott Matlock)
+CROSS = {'QB': 'DB', 'RB': 'DL', 'WR': 'DB', 'TE': 'LB', 'OL': 'DL', 'DL': 'RB', 'LB': 'RB', 'DB': 'WR'}
+CROSS_POS = {'DB': 'CB', 'DL': 'DT', 'RB': 'FB', 'WR': 'WR', 'LB': 'ILB'}
+TWO_WAY_MIN = 20   # snaps on each side before the board shows a player's offense/defense split
+
+
+def side_groups(s):
+    """[(group, listed position, snaps, cross)] for one player-team season's snap record: his listed group on its side
+    and, when he also played the other side, that side's group (CROSS). Each side earns AV from its own pool against its
+    own replacement line, so a two-way player's WAR is the sum of both, and his team's pools keep every snap (before,
+    the cross-side snaps and stops were in the pool's split but credited to nobody)."""
+    g, pos = group_of(s['pos'], '')
+    if not g:
+        return []
+    out = [(g, pos, s['off'] if g in OFFENSE else s['def'], False)]
+    cg = CROSS[g]
+    n = s['def'] if g in OFFENSE else s['off']
+    if n > 0:
+        out.append((cg, CROSS_POS.get(cg, cg), n, True))
+    return out
 # defense before --defense: PFR AV's split (shares of the team's sacks, tackles, TFLs and plays on the ball), kept to
 # compare against and as the fallback without data/nfl_war_def.json
 PFR_DEF_FEATS = ['snap', 'sack', 'tkl', 'tfl', 'ball']
@@ -382,20 +409,20 @@ def team_rows(sd, b, ros):
     """Every player-team season: group, board position, sub-position, AV, snaps and share of the team's plays on his side."""
     out = []
     for (pfr, t), s in sd['snaps'].items():
-        g, pos = group_of(s['pos'], '')
-        if not g or t not in sd['team']:
+        if t not in sd['team']:
             continue
         r = ros.get(pfr, {})
         gsis = r.get('gsis_id', '')
-        x = features(sd, pfr, gsis, t, g)
-        if x is None:
-            continue
         st = sd['stat'].get((gsis, t), {})
-        snaps = s['off'] if g in OFFENSE else s['def']
         P = sd['plays'][t]
-        plays = P[0] if g in OFFENSE else P[1]
-        out.append({'pfr': pfr, 't': t, 'g': g, 'pos': pos, 'disp': display_pos(g, pos, r.get('depth_chart_position', ''), st, snaps),
-                    'av': predict(b, g, x), 'snaps': snaps, 'share': snaps / plays if plays else 0.0, 'st': st, 'name': s['name'], 'games': s['g'], 'rk': 0})
+        for g, pos, snaps, cross in side_groups(s):
+            x = features(sd, pfr, gsis, t, g)
+            if x is None:
+                continue
+            plays = P[0] if g in OFFENSE else P[1]
+            out.append({'pfr': pfr, 't': t, 'g': g, 'pos': pos, 'disp': display_pos(g, pos, '' if cross else r.get('depth_chart_position', ''), st, snaps),
+                        'av': predict(b, g, x), 'snaps': snaps, 'share': snaps / plays if plays else 0.0, 'st': st, 'name': s['name'],
+                        'games': s['g'], 'rk': 0, 'cross': cross, 'side': 0 if g in OFFENSE else 1})
     rank = defaultdict(list)
     for o in out:
         if o['disp'] in ('WR', 'CB'):
@@ -535,9 +562,10 @@ def build():
     publish(out, y, week, done, lines, alpha)
 
 
-def board(y, thru=None, fresh=False):
+def board(y, thru=None, fresh=False, st=True):
     """the board's rows for season y before week thru (whole season if None): (players, replacement lines, XV alpha);
-    scripts/player_pctl.py walks past seasons week by week through it"""
+    scripts/player_pctl.py walks past seasons week by week through it. st: special teams (nfl_st_war.py) in WAR, with
+    kicker and punter rows"""
     with open(FIT) as f:
         b = json.load(f)['coef']
     sd = season_data(y, fresh, thru)
@@ -548,16 +576,42 @@ def board(y, thru=None, fresh=False):
         if pfr not in ros and (NM.key(s_['name']), t) in by_name:
             ros[pfr] = by_name[(NM.key(s_['name']), t)]
     lines, value, spread = sub_lines()
+    # special teams (scripts/nfl_st_war.py, Nov 2 2026): kicking, punting and returns in points over an average
+    # specialist, shrunk to what carries to the next season. The points sat in the team's offense pool (points scored),
+    # so each team's credit comes out of it and team WAR still sums as before
+    stv, gs2pfr = {}, {}
+    if st:
+        try:
+            import nfl_st_war
+            stv = nfl_st_war.values(y, thru)
+        except Exception as e:   # the board still builds without it
+            print(f'nfl war: special teams skipped ({e!r})')
+            stv = {}
+    if stv:
+        gs2pfr = {r['gsis_id']: pfr for pfr, r in ros.items() if r.get('gsis_id')}
+        alias = {a_: b_ for a_, b_ in (('LV', 'OAK'), ('OAK', 'LV'), ('LA', 'LAR'), ('LAR', 'LA'), ('LAC', 'SD'), ('SD', 'LAC')) if a_ not in sd['team'] and b_ in sd['team']}
+        for gs, v in stv.items():
+            n = sum(v['t'].values())
+            for t, c in v['t'].items():
+                t = alias.get(t, t)
+                if t in sd['team']:
+                    sd['team'][t]['off'] -= 100 / 17 * v['pts'] * c / n / sd['lg']
     agg = {}
     for o in team_rows(sd, b, ros):
         pfr, t, g = o['pfr'], o['t'], o['g']
         share = o['share'] * sd['team'][t]['g'] / 17
-        a = agg.setdefault(pfr, {'name': o['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'war': 0.0, 'avg': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter(), 'sub': Counter()})
-        a['teams'].append((o['snaps'], t)); a['g'] += o['games']; a['snaps'] += o['snaps']; a['av'] += o['av']; a['sh'] += share
+        a = agg.setdefault(pfr, {'name': o['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'war': 0.0, 'avg': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter(), 'sub': Counter(),
+                                 'ws': [0.0, 0.0], 'ss': [0, 0], 'gs': [Counter(), Counter()]})
+        a['teams'].append((o['snaps'], t)); a['snaps'] += o['snaps']; a['av'] += o['av']; a['sh'] += share
         # WAR over replacement by sub-position, accruing with the snaps played; avg: what an average regular there adds at the same snaps
-        a['war'] += war_of(o['av'], share, o['sub'], lines, value, spread)
+        w = war_of(o['av'], share, o['sub'], lines, value, spread)
+        a['war'] += w
+        a['ws'][o['side']] += w; a['ss'][o['side']] += o['snaps']; a['gs'][o['side']][(g, o['pos'])] += o['snaps'] + 0.01
         a['avg'] += (value or {}).get(o['sub'], 0.0) * share
         a['grp'][g] += o['snaps'] + 0.01; a['pos'][o['pos']] += o['snaps'] + 0.01; a['sub'][o['sub']] += o['snaps'] + 0.01
+        if o['cross']:   # games and the stat line are the player-team season's, once
+            continue
+        a['g'] += o['games']
         for k, v in o['st'].items():
             a['st'][k] += v
         if sd.get('adv'):
@@ -567,10 +621,11 @@ def board(y, thru=None, fresh=False):
     try:
         import nfl_xv
         prow = []
-        xvs, alpha = nfl_xv.board_xv(y, sd, ros, b, rows_out=prow)
+        xside = {}
+        xvs, alpha = nfl_xv.board_xv(y, sd, ros, b, rows_out=prow, sides=xside)
     except Exception as e:   # the board still builds on AV alone
         print(f'nfl war: XV skipped ({e!r})')
-        xvs, alpha, prow = None, None, []
+        xvs, alpha, prow, xside = None, None, [], {}
     # predictive badges (scripts/nfl_badges.py: only those that beat this season's WAR on next season's, held out)
     try:
         import nfl_badges
@@ -585,13 +640,23 @@ def board(y, thru=None, fresh=False):
         g = a['grp'].most_common(1)[0][0]
         team = max(a['teams'])[1]
         r = ros.get(pfr, {})
-        pos = display_pos(g, a['pos'].most_common(1)[0][0], r.get('depth_chart_position', ''), a['st'], a['snaps'])
+        # the roster's depth-chart spot only places him on its own side (a WR listing says nothing about his CB snaps)
+        dc = r.get('depth_chart_position', '')
+        if GROUP.get(dc) and (GROUP[dc] in OFFENSE) != (g in OFFENSE):
+            dc = ''
+        side = 0 if g in OFFENSE else 1
+        pos = display_pos(g, a['pos'].most_common(1)[0][0], dc, a['st'], a['ss'][side])
         tg = max(1, teamg.get(team, 1))
         av = a['av']
         # replacement accrues with the snaps played (share of a 17-game season's plays); below replacement is negative
         wav = a['war']
         xv = xvs.get(pfr, 0.0) if xvs else None
         war = wav if xv is None else alpha * xv + (1 - alpha) * wav
+        sv = stv.get(r.get('gsis_id', ''))
+        stw = sv['pts'] / ST_PTS_PER_WIN if sv else None
+        if stw is not None:
+            war += stw
+            sv['_on'] = True
         st = a['st']
         line = (f"{int(st['pass'])} pass yds, {int(st['ptd'])} TD, {int(st['pint'])} INT" if g == 'QB' else
                 f"{int(st['rush'])} rush yds, {int(st['rec'])} rec yds" if g == 'RB' else
@@ -600,21 +665,81 @@ def board(y, thru=None, fresh=False):
                 (f"{int(st['prss'])} prss, " if sd.get('adv') else '') + f"{st['sack']:g} sk, {int(st['tkl'])} tkl, {int(st['tfl'])} TFL, {int(st['ball'])} on ball")
         sub = a['sub'].most_common(1)[0][0]
         # waa: wins over an average regular at his sub-position for the same snaps
-        waa = war - a['avg'] if value else None
+        waa = war - a['avg'] if value else None    # special teams are over average already
+        # two-way: each side's WAR (AV WAR and XV blended the same way) and snaps, and the other side's position
+        two = None
+        if min(a['ss']) >= TWO_WAY_MIN:
+            ws = [a['ws'][i] if xv is None else alpha * xside.get((pfr, i), 0.0) + (1 - alpha) * a['ws'][i] for i in (0, 1)]
+            og, op = a['gs'][1 - side].most_common(1)[0][0]
+            o_st = sd['stat'].get((r.get('gsis_id', ''), team), {})
+            two = {'o': round(ws[0], 2), 'd': round(ws[1], 2), 'so': int(a['ss'][0]), 'sd': int(a['ss'][1]),
+                   'p2': display_pos(og, op, '', o_st, a['ss'][1 - side])}
+            line = (f"{int(st['rec'])} rec yds, {int(st['retd'])} TD; " + (f"{int(st['prss'])} prss, " if sd.get('adv') and st['prss'] else '') +
+                    f"{int(st['tkl'])} tkl, {int(st['int'])} INT, {int(st['pd'])} PD") if 'WR' in (g, og) or 'DB' in (g, og) else line
         out.append({'n': a['name'], 'id': pfr, 't': team, 'tm': '/'.join(sorted({t for _, t in a['teams']})), 'pos': pos,
                     'sp': {'SWR': 'slot', 'NCB': 'nickel', 'OT': 'OT', 'IOL': 'IOL'}.get(sub, ''),
                     'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
                     'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
+                    **({'stw': round(stw, 2), 'stl': st_line(sv)} if stw is not None and (abs(stw) >= 0.005 or st_line(sv)) else {}),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
-                    '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {})})
+                    '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {}), **({'two': two} if two else {})})
     out = [p for p in out if p['sn'] >= 1]
+    out += st_rows(stv, y, gs2pfr, teamg, fresh)
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
         ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))
         if ph:
             p['ph'] = ph
     out.sort(key=lambda p: -p['war'])
     return out, lines, alpha
+
+
+ST_PTS_PER_WIN = 35.5     # as nfl_xv.py
+
+
+def st_line(v):
+    """the special teams line: FG and XP made / tried, punts and gross average, kick and punt returns"""
+    L = v['line']; out = []
+    if L.get('fga'):
+        out.append(f"{int(L['fgm'])}/{int(L['fga'])} FG")
+    if L.get('xpa'):
+        out.append(f"{int(L['xpm'])}/{int(L['xpa'])} XP")
+    if L.get('pu'):
+        out.append(f"{int(L['pu'])} P, {L['puy'] / L['pu']:.1f} avg")
+    if L.get('kr'):
+        out.append(f"{int(L['kr'])} KR")
+    if L.get('pr'):
+        out.append(f"{int(L['pr'])} PR")
+    return ', '.join(out)
+
+
+def st_rows(stv, y, gs2pfr, teamg, fresh=False):
+    """kickers and punters (no offense or defense snaps): WAR = their special teams credit"""
+    if not stv:
+        return []
+    R = {r['gsis_id']: r for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh)) if r.get('gsis_id')}
+    out = []
+    for gs, v in stv.items():
+        if v.get('_on') or not (v['n'].get('kick') or v['n'].get('punt')):
+            continue
+        r = R.get(gs)
+        if not r:
+            continue
+        pos = 'P' if v['n'].get('punt', 0) > v['n'].get('kick', 0) else 'K'
+        team = v['t'].most_common(1)[0][0]
+        tg = max(1, teamg.get(team, 1))
+        war = v['pts'] / ST_PTS_PER_WIN
+        p = {'n': r['full_name'], 'id': gs2pfr.get(gs) or r.get('pfr_id') or gs, 't': team, 'tm': '/'.join(sorted(v['t'])), 'pos': pos, 'sp': '',
+             'g': v.get('g', 0), 'sn': int(v['n'].get('kick', 0) + v['n'].get('punt', 0)), 'av': 0.0, 'war': round(war, 2), 'wav': None, 'xv': None,
+             'waa': round(war, 2), 'pace': round(war * 17 / tg, 2), 'waaP': round(war * 17 / tg, 2), 'sh': 0.0, 'line': st_line(v),
+             'stw': round(war, 2), 'age': age(r.get('birth_date'), y), 'exp': r.get('years_exp', ''),
+             'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
+             '_st': {}, '_g': 'ST', '_war': war}
+        ph = faces.nfl_ph(r.get('headshot_url'))
+        if ph:
+            p['ph'] = ph
+        out.append(p)
+    return out
 
 
 def publish(out, y, week, done, lines, alpha):
@@ -659,8 +784,9 @@ def gsis_map(y, fresh=False):
     return by_pfr, by_name
 
 
-def war_ledger(y, thru=None, maps=None, fresh=False):
-    """{gsis: [WAR, games]} for season y before week thru (whole season if None), on the board's formula."""
+def war_ledger(y, thru=None, maps=None, fresh=False, sides=None):
+    """{gsis: [WAR, games]} for season y before week thru (whole season if None), on the board's formula; both sides of a
+    two-way player add up. sides: (0,) offense only, (1,) defense only (fantasy reads offense only)."""
     with open(FIT) as f:
         b = json.load(f)['coef']
     by_pfr, by_name = maps or gsis_map(y, fresh)
@@ -668,18 +794,29 @@ def war_ledger(y, thru=None, maps=None, fresh=False):
     out = {}
     for (pfr, t), s in sd['snaps'].items():
         gsis = by_pfr.get(pfr) or by_name.get((NM.key(s['name']), t))
-        g, _ = group_of(s['pos'], '')
-        if not gsis or not g:
+        if not gsis:
             continue
-        x = features(sd, pfr, gsis, t, g)
-        if x is None:
-            continue
-        P = sd['plays'][t]
-        share = ((s['off'] / P[0]) if g in OFFENSE else (s['def'] / P[1])) * sd['team'][t]['g'] / 17 if P[0] and P[1] else 0.0
-        a = out.setdefault(gsis, [0.0, 0])
-        a[0] += (predict(b, g, x) - NFL_REPL[g] * share) * NWAR_PER_AV
-        a[1] += s['g']
+        for g, _, _, cross in side_groups(s):
+            if sides is not None and int(g not in OFFENSE) not in sides:
+                continue
+            w = side_war(sd, b, pfr, gsis, t, s, g)
+            if w is None:
+                continue
+            a = out.setdefault(gsis, [0.0, 0])
+            a[0] += w
+            if not cross:
+                a[1] += s['g']
     return out
+
+
+def side_war(sd, b, pfr, gsis, t, s, g):
+    """AV WAR on group g's side for one player-team season (war_ledger's formula), None when the team is missing."""
+    x = features(sd, pfr, gsis, t, g)
+    if x is None:
+        return None
+    P = sd['plays'][t]
+    share = ((s['off'] / P[0]) if g in OFFENSE else (s['def'] / P[1])) * sd['team'][t]['g'] / 17 if P[0] and P[1] else 0.0
+    return (predict(b, g, x) - NFL_REPL[g] * share) * NWAR_PER_AV
 
 
 # ---------------------------------------------------------------- WAR scale

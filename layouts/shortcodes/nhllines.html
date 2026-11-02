@@ -1,0 +1,95 @@
+{{- /* NHL lines (Nov 2 2026): each team's forward lines and defence pairs at 5-on-5 from the NHL's shift charts, one
+       tab in the rosters group: {{< nhllines tab="lines" >}}. Data static/data/lines/nhl.json (scripts/nhl_lines.py in
+       nhl.yml), fetched the first time the window is on screen. Views: current lines (the last game's trios and
+       pairs by 5v5 time, with their season numbers together), most-used units this season, and each skater's 5v5
+       on/off with his most common linemate (with or without you). */ -}}
+<div class="win dc nhll" data-tab="{{ .Get "tab" | default "lines" }}" data-nhll-src="/data/lines/nhl.json?v={{ now.Unix }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ .Get "title" | default "lines" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="dc__bar">
+    <label class="dc__pick"><span>team</span><select data-nhll-team aria-label="team"><option>loading…</option></select></label>
+    <label class="dc__pick nhll__view"><span>view</span><select data-nhll-view aria-label="view">
+      <option value="lines">current lines</option><option value="units">most-used units</option><option value="onoff">on/off + linemates</option>
+    </select></label>
+  </div>
+  <div class="dc__body" data-nhll-body><p class="cfb__dim">loading…</p></div>
+  <div class="cfbm__body wintable__about"><p class="cfb__dim">5-on-5 only (five skaters and a goalie each side), from the NHL's shift charts (its HTML time-on-ice reports when the API has none) and MoneyPuck's shot expected goals. Current lines are the last game's forward trios and defence pairs ordered by 5v5 time together in that game; the numbers beside them are the unit's season so far. GF% and xGF% are the unit's share of goals and expected goals while together. On/off: the team's xGF% with the skater on the ice and in his games with him off it; rel is the gap. Linemate: the skater he played the most 5v5 time with, their xGF% together, his without that linemate and the linemate's without him (60+ minutes apart). Small samples: under ~100 minutes these swing a lot.</p></div>
+  <div class="win__status"><span data-nhll-count></span><span class="cfb__asof" data-nhll-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.nhll__sub { margin: 10px 0 4px; font-size: 1em; }
+.nhll .cfb__table td.nhll__who { white-space: normal; min-width: 150px; }
+.nhll__hi { color: #7dffb0; }
+.nhll__lo { color: #ff9ec7; }
+@media (max-width: 600px) { .nhll .nhll__w { display: none; } .nhll .cfb__table td.nhll__who { min-width: 120px; } }
+</style>
+<script>
+(function () {
+  if (window.__arkNhll) return; window.__arkNhll = true;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pct(v) { if (v == null) return '<span class="cfb__dim">—</span>'; var c = v >= 55 ? 'nhll__hi' : v <= 45 ? 'nhll__lo' : ''; return '<span class="' + c + '">' + v.toFixed(1) + '</span>'; }
+  function mins(v) { return v == null ? '—' : v.toFixed(1); }
+  function rel(v) { if (v == null) return '<span class="cfb__dim">—</span>'; return '<span class="' + (v >= 3 ? 'nhll__hi' : v <= -3 ? 'nhll__lo' : '') + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1) + '</span>'; }
+  function unitTable(rows, kind, withLast) {
+    if (!rows.length) return '<p class="cfb__dim">no units with enough time yet.</p>';
+    var h = '<div class="wintable__scroll"><table class="cfb__table"><thead><tr><th>#</th><th>' + kind + '</th>' +
+      (withLast ? '<th title="5v5 minutes together in the last game">last</th>' : '') +
+      '<th title="5v5 minutes together this season">min</th><th class="nhll__w" title="goals for-against while together">GF-GA</th><th class="nhll__w" title="share of goals while together">GF%</th>' +
+      '<th class="nhll__w" title="expected goals for-against while together">xGF-xGA</th><th title="share of expected goals while together">xGF%</th></tr></thead><tbody>';
+    rows.forEach(function (u, i) {
+      h += '<tr><td class="cfb__num">' + (i + 1) + '</td><td class="nhll__who"><b>' + u.p.map(esc).join(' – ') + '</b></td>' +
+        (withLast ? '<td class="cfb__num">' + mins(u.last) + '</td>' : '') +
+        '<td class="cfb__num">' + mins(u.min) + '</td><td class="cfb__num nhll__w">' + u.gf + '-' + u.ga + '</td><td class="cfb__num">' + pct(u.gfp) + '</td>' +
+        '<td class="cfb__num nhll__w">' + u.xgf.toFixed(1) + '-' + u.xga.toFixed(1) + '</td><td class="cfb__num">' + pct(u.xgfp) + '</td></tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+  function onoff(T) {
+    var h = '<div class="wintable__scroll"><table class="cfb__table"><thead><tr><th>Player</th><th>Pos</th><th class="nhll__w">GP</th><th title="5v5 minutes">min</th>' +
+      '<th class="nhll__w" title="share of goals with him on">GF%</th><th title="share of expected goals with him on">xGF%</th><th class="nhll__w" title="team xGF% in his games with him off">off</th><th title="on minus off, xGF%">rel</th>' +
+      '<th>linemate</th><th class="nhll__w" title="5v5 minutes together">min</th><th title="xGF% together">with</th><th class="nhll__w" title="his xGF% without that linemate">him w/o</th><th class="nhll__w" title="the linemate\'s xGF% without him">mate w/o</th></tr></thead><tbody>';
+    T.skaters.forEach(function (s) {
+      var m = s.mate || {};
+      h += '<tr><td title="' + esc(s.n) + '"><b>' + esc(s.p) + '</b></td><td>' + esc(s.pos) + '</td><td class="cfb__num nhll__w">' + s.gp + '</td><td class="cfb__num">' + mins(s.min) + '</td>' +
+        '<td class="cfb__num nhll__w">' + pct(s.gfp) + '</td><td class="cfb__num">' + pct(s.xgfp) + '</td><td class="cfb__num nhll__w">' + pct(s.offx) + '</td><td class="cfb__num">' + rel(s.rel) + '</td>' +
+        '<td>' + esc(m.p || '—') + '</td><td class="cfb__num nhll__w">' + mins(m.min) + '</td><td class="cfb__num">' + pct(m.xgfp) + '</td><td class="cfb__num nhll__w">' + pct(m.apart) + '</td><td class="cfb__num nhll__w">' + pct(m.mateApart) + '</td></tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+  function render(W, D, t, view) {
+    var T = D.teams.filter(function (x) { return x.t === t; })[0] || D.teams[0];
+    if (!T) return;
+    var L = T.last, sub = 'last game ' + L.day + (L.home ? ' vs ' : ' at ') + L.opp + ' · ' + T.gp + ' games' +
+      (T.kept != null ? ' · ' + T.kept + ' of 4 lines as the game before' : '') + (T.xgGames < T.gp ? ' · xG through ' + T.xgGames + ' games' : '');
+    var h = '<div class="dc__head"><img class="dc__logo" src="' + esc(T.logo) + '" alt="" width="48" height="48"><div><h4 class="dc__name">' + esc(T.n || T.t) + '</h4><p class="cfb__dim">' + esc(sub) + '</p></div></div>';
+    if (view === 'units') h += '<h4 class="nhll__sub">forward trios, most 5v5 time</h4>' + unitTable(T.topF, 'line', false) + '<h4 class="nhll__sub">defence pairs, most 5v5 time</h4>' + unitTable(T.topD, 'pair', false);
+    else if (view === 'onoff') h += '<h4 class="nhll__sub">skaters, 60+ 5v5 minutes</h4>' + onoff(T);
+    else h += '<h4 class="nhll__sub">forward lines</h4>' + unitTable(T.lines, 'line', true) + '<h4 class="nhll__sub">defence pairs</h4>' + unitTable(T.pairs, 'pair', true);
+    W.querySelector('[data-nhll-body]').innerHTML = h;
+    try { localStorage.setItem('ark-dc-nhl', T.t); } catch (e) {}
+  }
+  function load(W) {
+    if (W.__nhll) return; W.__nhll = true;
+    fetch(W.getAttribute('data-nhll-src')).then(function (r) { return r.json(); }).then(function (D) {
+      var sel = W.querySelector('[data-nhll-team]'), vw = W.querySelector('[data-nhll-view]');
+      D.teams.sort(function (a, b) { return (a.n || a.t) < (b.n || b.t) ? -1 : 1; });
+      sel.innerHTML = D.teams.map(function (T) { return '<option value="' + esc(T.t) + '">' + esc(T.n || T.t) + '</option>'; }).join('');
+      var keep = null; try { keep = localStorage.getItem('ark-dc-nhl'); } catch (e) {}
+      if (keep && D.teams.some(function (T) { return T.t === keep; })) sel.value = keep;
+      function go() { render(W, D, sel.value, vw.value); }
+      sel.addEventListener('change', go); vw.addEventListener('change', go); go();
+      W.querySelector('[data-nhll-count]').textContent = D.games + ' games · ' + D.label;
+      W.querySelector('[data-nhll-asof]').textContent = 'updated ' + (D.asof || '').slice(0, 10);
+    }).catch(function () { W.querySelector('[data-nhll-body]').innerHTML = '<p class="cfb__dim">lines not available right now.</p>'; });
+  }
+  function init() {
+    var all = document.querySelectorAll('[data-nhll-src]');
+    if (!('IntersectionObserver' in window)) { all.forEach(load); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); load(e.target); } }); }, { rootMargin: '3000px 0px' });
+    all.forEach(function (W) { io.observe(W); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>

@@ -16,6 +16,10 @@ on:
     - cron: "23 11 * 11,12,1,2,3,4,5,6 *"
     # 22:40 UTC (6:40 PM ET, 5:40 in winter): the injury report before the evening tips; games only
     - cron: "40 22 * 10,11,12,1,2,3,4,5,6 *"
+    # off-season (Nov 2 2026): Mondays July-September (free agency, trades, the projections) and Mondays and
+    # Thursdays October 1-17 (preseason rosters) before the daily runs start
+    - cron: "23 11 * 7,8,9 1"
+    - cron: "23 11 1-17 10 1,4"
   workflow_dispatch:
   workflow_run:
     workflows: ["esea season", "cfb board"]
@@ -105,6 +109,11 @@ jobs:
         run: |
           sudo apt-get install -y -qq poppler-utils >/dev/null || true
           python3 scripts/nba_games.py
+      # offense, defense and unit tables for the teams group (scripts/team_units.py -> data/units_nba.json), display only
+      - name: Team units
+        continue-on-error: true
+        timeout-minutes: 15
+        run: /tmp/tbv/bin/python scripts/team_units.py nba
       # points, rebounds and assists for every rotation player (scripts/nba_players.py: data/nba_players.json)
       - name: Player projections
         continue-on-error: true
@@ -137,7 +146,7 @@ jobs:
         run: python3 scripts/model_monitor.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="scripts/data/faces_nba.json static/data/nba-xpm static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
+          files="data/units_nba.json scripts/data/faces_nba.json static/data/nba-xpm static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

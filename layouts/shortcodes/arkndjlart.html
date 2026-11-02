@@ -1,13 +1,8 @@
 {{- /* ARKNDJL art (content/arkndjl-art.md): a neo-gothic nave. A pixel rose window (static/img/px/rose-window.png, 96 px drawn at 3x) over the title (site pixel font only);
-       then one chapel per guide page (the "art" group of the ARKNDJL children in hugo.toml, art set in $chapel below),
-       then the pieces in arched windows, one aisle per series (front matter series: pixel / ps1), opening in a
-       lightbox. A new series needs an entry in $aisles and its own page. Styles are scoped under .aa.
+       then the pieces (front matter gallery, group "mine") in arched windows, opening in a lightbox; nothing shows
+       below the title until a piece is added. Styles are scoped under .aa.
        Usage: {{< arkndjlart >}} */ -}}
 {{- $items := where (.Page.Params.gallery | default slice) "group" "mine" -}}
-{{- $chapel := dict
-  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "px" true "line" "five sports, four kits each")
-  "arkndjl-brand" (dict "img" "" "px" false "line" "mark, palette, type, icons, gfx") -}}
-{{- $aisles := slice (dict "key" "pixel" "name" "uniforms, pixel" "page" "/arkndjl/uniforms/") (dict "key" "ps1" "name" "uniforms, low-poly" "page" "/arkndjl/uniforms/") -}}
 {{- $portal := "polygon(0.0% 100.0%,0.0% 36.0%,0.0% 31.7%,0.5% 31.7%,0.5% 27.4%,2.2% 27.4%,2.2% 23.2%,4.9% 23.2%,4.9% 19.1%,8.6% 19.1%,8.6% 15.2%,13.4% 15.2%,13.4% 11.6%,19.1% 11.6%,19.1% 8.2%,25.7% 8.2%,25.7% 5.1%,33.1% 5.1%,33.1% 2.4%,41.2% 2.4%,41.2% 0.0%,50.0% 0.0%,58.8% 0.0%,58.8% 2.4%,66.9% 2.4%,66.9% 5.1%,74.3% 5.1%,74.3% 8.2%,80.9% 8.2%,80.9% 11.6%,86.6% 11.6%,86.6% 15.2%,91.4% 15.2%,91.4% 19.1%,95.1% 19.1%,95.1% 23.2%,97.8% 23.2%,97.8% 27.4%,99.5% 27.4%,99.5% 31.7%,100.0% 31.7%,100.0% 36.0%,100.0% 100.0%)" -}}
 <style>
 .post:has(.aa)>.post-title{display:none}
@@ -29,27 +24,6 @@
 .aa-h{display:flex;align-items:baseline;gap:.9rem;margin:0 0 1rem;font-size:32px;line-height:1;color:var(--aa-aq);font-weight:normal}
 .aa-h::before,.aa-h::after{content:none}
 .aa-h small{font-family:"MS PGothic Pixel","MS PGothic",monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--aa-grey);font-weight:normal}
-.aa-chapels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
-.aa-ch{display:grid;gap:0;color:var(--aa-lil);text-decoration:none}
-.aa-ch__arch{position:relative;aspect-ratio:4/5;clip-path:var(--aa-portal);background:var(--aa-lil);padding:4px}
-.aa-ch__glass{position:absolute;inset:4px;clip-path:var(--aa-portal);background:var(--aa-ink);display:grid;place-items:end center;overflow:hidden}
-.aa-ch__glass img{width:100%;height:100%;object-fit:cover}
-.aa-ch__glass img.is-px{image-rendering:pixelated}
-.aa-ch__glass::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 32.5%,var(--aa-ink) 32.5% 33.5%,transparent 33.5% 66.5%,var(--aa-ink) 66.5% 67.5%,transparent 67.5%),linear-gradient(0deg,transparent 60%,var(--aa-ink) 60% 61%,transparent 61%);opacity:.85}
-.aa-ch__brand{position:absolute;inset:0;display:grid;place-items:center;background:#4a3b6b;background-image:linear-gradient(rgba(200,199,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.14) 1px,transparent 1px);background-size:20px 20px}
-.aa-ch__brand img{width:44%;height:auto;object-fit:contain}
-.aa-ch__plaque{display:grid;gap:.25rem;padding:.7rem .8rem .8rem;background:var(--aa-stone);border:1px solid var(--aa-coal);border-top:3px solid var(--aa-lil)}
-.aa-ch__name{font-size:32px;line-height:1;color:#ffffff}
-.aa-ch__line{font-size:.8rem;line-height:1.4;color:var(--aa-grey)}
-.aa-ch:hover .aa-ch__arch,.aa-ch:focus-visible .aa-ch__arch{background:var(--aa-aq)}
-.aa-ch:hover .aa-ch__plaque,.aa-ch:focus-visible .aa-ch__plaque{border-top-color:var(--aa-aq)}
-.aa-ch:hover .aa-ch__name,.aa-ch:focus-visible .aa-ch__name{color:var(--aa-aq)}
-.aa-ch:focus-visible{outline:2px solid var(--aa-aq);outline-offset:4px}
-.aa-aisle+.aa-aisle{margin-top:1.75rem}
-.aa-aisle__h{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin:0 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid var(--aa-coal)}
-.aa-aisle__h h3{margin:0;font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;font-weight:normal}
-.aa-aisle__h h3::before{content:none}
-.aa-aisle__h a{font-size:.8rem;color:var(--aa-lil)}
 .aa-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr));gap:1rem}
 .aa-w{all:unset;cursor:pointer;display:grid;gap:.45rem;color:var(--aa-lil)}
 .aa-w__frame{position:relative;aspect-ratio:4/5;clip-path:var(--aa-portal);background:var(--aa-coal);padding:3px}
@@ -71,7 +45,7 @@
 .aa-lb__cap{display:grid;gap:.2rem;padding:.7rem .9rem .9rem;font-size:.85rem;line-height:1.45}
 .aa-lb__cap b{font-size:32px;font-weight:normal;color:#ffffff}
 .aa-lb__cap a{color:var(--aa-aq)}
-@media (max-width:760px){.aa-rose{width:192px;height:192px}.aa-chapels{grid-template-columns:minmax(0,1fr)}.aa-ch{grid-template-columns:7rem minmax(0,1fr);align-items:stretch}.aa-ch__arch{aspect-ratio:auto;min-height:9rem}.aa-ch__plaque{border-top:1px solid var(--aa-coal);border-left:3px solid var(--aa-lil);align-content:center}.aa-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}}
+@media (max-width:760px){.aa-rose{width:192px;height:192px}.aa-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}}
 </style>
 <div class="aa">
 <section class="aa-west" aria-label="ARKNDJL art">
@@ -80,43 +54,24 @@
   <h1 class="aa-title aa-goth">Art</h1>
 </section>
 
-<section aria-label="guides">
-  <h2 class="aa-h aa-goth">Chapels <small>one page each</small></h2>
-  <div class="aa-chapels">
-  {{- range site.Menus.main }}{{ if eq .Identifier "arkndjl" }}{{ range .Children }}{{ if and (eq .Params.group "art") (ne .Identifier "arkndjl-art") }}
-  {{- $c := index $chapel .Identifier | default dict }}
-    <a class="aa-ch" href="{{ .URL }}">
-      <span class="aa-ch__arch" aria-hidden="true"><span class="aa-ch__glass">
-        {{- if $c.img }}<img{{ if $c.px }} class="is-px"{{ end }} src="{{ $c.img | relURL }}" alt="" loading="lazy">{{ else }}<span class="aa-ch__brand"><img src="{{ "img/logo-glyph-lilac.svg" | relURL }}" alt=""></span>{{ end -}}
-      </span></span>
-      <span class="aa-ch__plaque"><span class="aa-ch__name aa-goth">{{ .Params.gname | default .Name }}</span><span class="aa-ch__line">{{ $c.line }}</span></span>
-    </a>
-  {{- end }}{{ end }}{{ end }}{{ end }}
-  </div>
-</section>
-
+{{- with $items }}
 <section aria-label="pieces">
-  <h2 class="aa-h aa-goth">Nave <small>{{ len $items }} pieces</small></h2>
-  {{- $n := 0 }}
-  {{- range $aisles }}{{ $a := . }}{{ $in := where $items "series" $a.key }}{{ with $in }}
-  <div class="aa-aisle">
-    <div class="aa-aisle__h"><h3 class="aa-goth">{{ $a.name }}</h3><a href="{{ $a.page }}">guide →</a></div>
-    <div class="aa-row">
-    {{- range . }}{{ $photo := strings.HasSuffix .src ".webp" }}
-      <a class="aa-w" href="{{ .src | relURL }}" target="_blank" rel="noopener" data-aa-piece data-title="{{ .title }}" data-year="{{ .year }}" data-note="{{ .note }}" data-link="{{ .link }}" data-photo="{{ $photo }}">
-        <span class="aa-w__frame" aria-hidden="true"><span class="aa-w__glass"><img{{ if $photo }} class="is-photo"{{ end }} src="{{ .src | relURL }}" alt="{{ .alt | default .title }}" loading="lazy"></span></span>
-        <span class="aa-w__cap"><b>{{ .title }}</b><span>{{ .year }}</span></span>
-      </a>
-    {{- end }}
-    </div>
+  <h2 class="aa-h aa-goth">Nave <small>{{ len . }} pieces</small></h2>
+  <div class="aa-row">
+  {{- range . }}{{ $photo := strings.HasSuffix .src ".webp" }}
+    <a class="aa-w" href="{{ .src | relURL }}" target="_blank" rel="noopener" data-aa-piece data-title="{{ .title }}" data-year="{{ .year }}" data-note="{{ .note }}" data-link="{{ .link }}" data-photo="{{ $photo }}">
+      <span class="aa-w__frame" aria-hidden="true"><span class="aa-w__glass"><img{{ if $photo }} class="is-photo"{{ end }} src="{{ .src | relURL }}" alt="{{ .alt | default .title }}" loading="lazy"></span></span>
+      <span class="aa-w__cap"><b>{{ .title }}</b><span>{{ .year }}</span></span>
+    </a>
+  {{- end }}
   </div>
-  {{- end }}{{ end }}
 </section>
+{{- end }}
 
 <dialog class="aa-lb" data-aa-lb aria-label="piece viewer">
   <div class="aa-lb__bar"><span data-aa-count>01 / 01</span><span><button type="button" data-aa-prev aria-label="previous piece">←</button> <button type="button" data-aa-next aria-label="next piece">→</button> <button type="button" data-aa-close aria-label="close">×</button></span></div>
   <img class="aa-lb__img" data-aa-img src="data:," alt="">
-  <div class="aa-lb__cap"><b data-aa-title></b><span data-aa-note></span><a data-aa-link href="#">guide →</a></div>
+  <div class="aa-lb__cap"><b data-aa-title></b><span data-aa-note></span><a data-aa-link href="#">page →</a></div>
 </dialog>
 </div>
 <script>

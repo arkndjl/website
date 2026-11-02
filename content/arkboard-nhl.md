@@ -11,11 +11,23 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: NHL games and teams" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,goalies,projections,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,depth chart" side="true" label="NHL views" >}}
+{{< wintabs groups="players:WAR leaders,goalies,projections,rookies,ARKLIST|rosters:depth chart,lines,backup watch|games:games,game table|teams:ARK Ranking,season odds,offense,defense,power play,penalty kill" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nhlsim title="season odds" tab="season odds" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="nhl" view="offense" title="offense :: 5-on-5 expected goals for" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="nhl" view="defense" title="defense :: 5-on-5 expected goals against" tab="defense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="power play" >}}
+{{< teamunits sport="nhl" view="power play" title="power play :: 5-on-4" tab="power play" >}}
+{{< /lazytab >}}
+{{< lazytab tab="penalty kill" >}}
+{{< teamunits sport="nhl" view="penalty kill" title="penalty kill :: 4-on-5" tab="penalty kill" >}}
+{{< /lazytab >}}
 {{< nhlgoalies title="goalies :: goals saved above expected" tab="goalies" >}}
 {{< nhlwar title="NHL WAR :: leaderboard" tab="WAR leaders" >}}
 {{< pctl sport="nhl" icon="hockey" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
@@ -23,4 +35,5 @@ cover = "/og/nhl.png"
 {{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
 {{< arklist sport="nhl" title="ARKLIST :: NHL" tab="ARKLIST" >}}
 {{< depthchart sport="nhl" title="depth chart :: every team" tab="depth chart" >}}
+{{< nhllines title="lines :: 5-on-5 trios, pairs and on/off" tab="lines" >}}
 {{< /wintabs >}}

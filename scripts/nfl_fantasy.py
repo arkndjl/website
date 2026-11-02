@@ -531,6 +531,14 @@ def implied(last, fresh=False, walkforward=False, snaps_at=()):
         m.update(g, box, qbs)
     for ps, pw in pending:      # checkpoints past the last listed game (the build's coming week)
         snap(ps, pw)
+    # the injury term (Nov 2 2026: it was left at 0 here, against the fit's weight on it): each played game's own
+    # league reports, as nfl_games.py fit and build give it. Snapshot games stay at 0 (their reports came later)
+    live = last if any(int(g['season']) == last and g['home_score'] in ('', 'NA') for g in allg) else None
+    ih = G.injury_history(allg, range(G.INJ_FIRST, last + 1), live=live)
+    for gid, (x, _) in feats.items():
+        r = ih.get(gid)
+        if r:
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
     seas = {g['game_id']: int(g['season']) for g in allg}
     cf = defaultdict(lambda: (F['coef'], F['tcoef']))
     if walkforward:
@@ -593,9 +601,9 @@ def extras(W, info, wars, gsis, t, s, cls):
 
 def war_now(s, w, maps=None, fresh=False):
     """{gsis: WAR a game} before week w of season s: last season at half weight plus this one to date, shrunk with
-    three replacement games (the game model's injury value)."""
-    prev = NW.war_ledger(s - 1, maps=NW.gsis_map(s - 1, fresh))
-    cur = NW.war_ledger(s, thru=w, maps=maps or NW.gsis_map(s, fresh), fresh=fresh)
+    three replacement games (the game model's injury value); offense only, so a two-way player's defense doesn't lift his catches."""
+    prev = NW.war_ledger(s - 1, maps=NW.gsis_map(s - 1, fresh), sides=(0,))
+    cur = NW.war_ledger(s, thru=w, maps=maps or NW.gsis_map(s, fresh), fresh=fresh, sides=(0,))
     return {g: G.player_value(prev.get(g, (0.0, 0)), cur.get(g, (0.0, 0))) for g in set(prev) | set(cur)}
 
 
@@ -609,10 +617,10 @@ def war_history(first, last):
     out = {}
     for y in range(first, last + 1):
         if str(y) not in cache:
-            maps, prev = NW.gsis_map(y), NW.war_ledger(y - 1, maps=NW.gsis_map(y - 1))
+            maps, prev = NW.gsis_map(y), NW.war_ledger(y - 1, maps=NW.gsis_map(y - 1), sides=(0,))
             wk = {}
             for w in range(1, 19):
-                cur = NW.war_ledger(y, thru=w, maps=maps)
+                cur = NW.war_ledger(y, thru=w, maps=maps, sides=(0,))
                 wk[str(w)] = {g: round(G.player_value(prev.get(g, (0.0, 0)), cur.get(g, (0.0, 0))), 5) for g in set(prev) | set(cur)}
             cache[str(y)] = wk
             json.dump(cache, open(cp, 'w'))
@@ -1434,6 +1442,18 @@ def build():
     live_statuses(inj, status, last, week)
     model, snapv = implied(last, fresh=False, snaps_at=[(last, week)])
     imp_model = snapv[(last, week)]
+    # this week's injury reports: the game board's injury term (nfl_games.py runs first; its margin points, split
+    # evenly so the total holds), for a game without a market line
+    try:
+        B = json.load(open(os.path.join(ROOT, 'data', 'nfl_games.json')))
+        if B.get('season') == last and B.get('week') == week:
+            for r in B['games']:
+                d = (r.get('parts') or {}).get('inj') or 0.0
+                if r['id'] in imp_model and d and 'final' not in r:
+                    h, a = imp_model[r['id']]
+                    imp_model[r['id']] = (h + d / 2, a - d / 2)
+    except (OSError, ValueError, KeyError) as e:
+        print('nfl fantasy: game board injuries unavailable:', e)
     wars = war_now(last, week)
     W = Walk(info=info, **F['params'])
     for g in games:

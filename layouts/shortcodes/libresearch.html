@@ -1,0 +1,34 @@
+{{- /* Library > Research: study cards from data/library.json (scripts/library_build.py).
+       {{< libresearch tab="hockey" group="hockey" >}}   one sport group; group="all" lists every study.
+       Each card: question (title bar), answer, chart (pixel SVG built by the script), findings, data/method/sample. */ -}}
+{{- $g := .Get "group" | default "all" -}}
+<div class="desk libgrid" data-tab="{{ .Get "tab" }}">
+{{- range site.Data.library.studies }}{{ if or (eq $g "all") (eq .group $g) }}
+<div class="win libstudy" id="rq-{{ .id }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>{{ .sport | lower }} :: {{ .id }}.txt<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="libstudy__body">
+    <h3 class="libstudy__q">{{ .question }}</h3>
+    <p class="libstudy__answer">{{ .answer }}</p>
+    <div class="libstudy__chart">
+      {{- with .svg }}{{ . | safeHTML }}{{ end }}
+      {{- with .legend }}<p class="libstudy__legend">{{ range $i, $n := . }}<span class="lc-key lc-k{{ $i }}">{{ $n }}</span>{{ end }}</p>{{ end }}
+    </div>
+    {{- with .findings }}<ul class="libstudy__find">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+    <dl class="libstudy__meta">
+      <dt>data</dt><dd>{{ .data }}</dd>
+      <dt>method</dt><dd>{{ .method }}</dd>
+      {{- with .split_check }}<dt>check</dt><dd>{{ . }}</dd>{{ end }}
+    </dl>
+  </div>
+  <p class="rq__bar libstudy__bar">
+    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="rq" data-gfx-rq="{{ jsonify .rq }}" title="research card PNG, 16:9 for X">GFX card</button>
+    <a class="cfb__btn rq__link" href="#rq-{{ .id }}" title="link to this question">link</a>
+  </p>
+  <div class="win__status"><span>n {{ lang.FormatNumber 0 .n }}</span><span class="libstudy__tag{{ if .robust }} is-robust{{ end }}">{{ if .robust }}holds in split check{{ else }}weak evidence{{ end }}</span></div>
+</div>
+{{- end }}{{ end }}
+</div>
+{{- partial "js.html" "gfx" -}}

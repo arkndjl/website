@@ -1,0 +1,98 @@
+{
+  "id": "nba-foul-up-3",
+  "sport": "NBA",
+  "question": "Up 3 in the last 12 seconds, should the leader foul or defend?",
+  "answer": "No clear edge: leader wins 92.7% fouling, 91.4% defending; +2.3 pp at equal time (CI -2.4 to +6.4).",
+  "findings": [
+    "Leader win: foul 92.7% (CI 88.5%-95.5%, n=219), defend 91.4% (CI 89.9%-92.6%, n=1585).",
+    "Same-time difference (foul minus defend): +2.3 pp (95% CI -2.4 to +6.4).",
+    "Reached OT: foul 9.6%, defend 14.3%. Lost in regulation: foul 1.8%, defend 1.6%.",
+    "Leader win rate once in OT: foul 42.9% (n=21), defend 50.4% (n=226)."
+  ],
+  "method": "First trailer possession per game that is live with 12 s or less, final regulation period, down 3. Foul = leader's non-shooting foul sending trailer to the line before any shot. Compared within possession-start bins (4-8, 8-12, 12+ s); outcome = game win incl. OT.",
+  "data": "ESPN play-by-play via sportsdataverse, NBA, 2011-12 to 2025-26, 1,804 games.",
+  "n": 1804,
+  "robust": false,
+  "interest": 4,
+  "split_check": "Foul minus defend: -0.4 pp in 2012-19 (CI -10.0 to +7.4), +2.8 in 2020-26 (CI -2.9 to +7.7).",
+  "chart": {
+    "type": "line",
+    "title": "NBA: leader win % up 3, by seconds left at trailer possession start",
+    "x_label": "seconds left at possession start (bin middle; 14 = started earlier, live at 12)",
+    "y_label": "leader win %",
+    "y_fmt": "pct",
+    "x_reverse": true,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "foul",
+        "points": [
+          {
+            "x": 2,
+            "y": 1.0,
+            "lo": 0.772,
+            "hi": 1.0,
+            "n": 13
+          },
+          {
+            "x": 6,
+            "y": 0.94,
+            "lo": 0.867,
+            "hi": 0.974,
+            "n": 83
+          },
+          {
+            "x": 10,
+            "y": 0.899,
+            "lo": 0.813,
+            "hi": 0.948,
+            "n": 79
+          },
+          {
+            "x": 14,
+            "y": 0.932,
+            "lo": 0.818,
+            "hi": 0.977,
+            "n": 44
+          }
+        ]
+      },
+      {
+        "name": "defend",
+        "points": [
+          {
+            "x": 2,
+            "y": 0.96,
+            "lo": 0.935,
+            "hi": 0.975,
+            "n": 372
+          },
+          {
+            "x": 6,
+            "y": 0.932,
+            "lo": 0.894,
+            "hi": 0.957,
+            "n": 250
+          },
+          {
+            "x": 10,
+            "y": 0.902,
+            "lo": 0.866,
+            "hi": 0.93,
+            "n": 338
+          },
+          {
+            "x": 14,
+            "y": 0.885,
+            "lo": 0.857,
+            "hi": 0.908,
+            "n": 625
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true,
+  "order": 1
+}

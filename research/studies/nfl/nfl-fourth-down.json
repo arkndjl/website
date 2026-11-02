@@ -1,0 +1,210 @@
+{
+  "id": "nfl-fourth-down",
+  "sport": "NFL",
+  "question": "When going for it on 4th down gains win probability, how often do NFL teams go?",
+  "answer": "In states where going gains 1+ WP point, teams went 25% of the time in 2015-16 and 45% in 2024-25.",
+  "findings": [
+    "Clear-kick states: teams go about 4% of the time every season (n=15,129).",
+    "WP lost to clear errors: 4.6 WP pts per team-game in 2015-16 (4.3-4.9), 3.4 in 2024-25 (3.2-3.7).",
+    "2023-26 go states: go rate 76% at 4th-and-1 (n=1,195), 39% at 2-3 yds (n=1,420), 24% at 4+ (n=1,719).",
+    "Conversion: 4th-and-1 67% (65-69, n=3,064), 4th-and-2 58% (55-61, n=1,086)."
+  ],
+  "method": "Per play, expected WPA of go (pooled conversion rate x WPA if converted/failed) vs best of punt/FG, each from boosted models of nflverse WPA on the same pre-snap state, cross-fit by game. Teams' own choice does not set the rate. WP-lost CIs exclude model error.",
+  "data": "nflverse play-by-play, 2015 to 2026 wk 8, Q1-Q4 4th downs (no penalties/kneels), 44,765 plays, 3,148 games.",
+  "n": 44765,
+  "robust": true,
+  "interest": 4,
+  "split_check": "Model checks out of sample: realized WPA in go states, goers +1.3 vs kickers -1.3 pts (n=4,866/8,682); rise in go rate holds every season.",
+  "chart": {
+    "type": "line",
+    "title": "Go rate on 4th down, by what the model recommends",
+    "x_label": "season",
+    "y_label": "go %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "going gains 1+ WP pt",
+        "points": [
+          {
+            "x": 2015,
+            "y": 0.247,
+            "lo": 0.223,
+            "hi": 0.2726,
+            "n": 1158
+          },
+          {
+            "x": 2016,
+            "y": 0.2498,
+            "lo": 0.2257,
+            "hi": 0.2756,
+            "n": 1153
+          },
+          {
+            "x": 2017,
+            "y": 0.2473,
+            "lo": 0.2236,
+            "hi": 0.2726,
+            "n": 1189
+          },
+          {
+            "x": 2018,
+            "y": 0.3089,
+            "lo": 0.2822,
+            "hi": 0.3369,
+            "n": 1091
+          },
+          {
+            "x": 2019,
+            "y": 0.3371,
+            "lo": 0.3093,
+            "hi": 0.3661,
+            "n": 1062
+          },
+          {
+            "x": 2020,
+            "y": 0.4028,
+            "lo": 0.3738,
+            "hi": 0.4325,
+            "n": 1070
+          },
+          {
+            "x": 2021,
+            "y": 0.4108,
+            "lo": 0.3835,
+            "hi": 0.4387,
+            "n": 1217
+          },
+          {
+            "x": 2022,
+            "y": 0.3956,
+            "lo": 0.3691,
+            "hi": 0.4227,
+            "n": 1274
+          },
+          {
+            "x": 2023,
+            "y": 0.3989,
+            "lo": 0.3723,
+            "hi": 0.4261,
+            "n": 1266
+          },
+          {
+            "x": 2024,
+            "y": 0.4185,
+            "lo": 0.3915,
+            "hi": 0.4461,
+            "n": 1252
+          },
+          {
+            "x": 2025,
+            "y": 0.4758,
+            "lo": 0.4485,
+            "hi": 0.5032,
+            "n": 1280
+          },
+          {
+            "x": 2026,
+            "y": 0.4291,
+            "lo": 0.3879,
+            "hi": 0.4714,
+            "n": 536
+          }
+        ]
+      },
+      {
+        "name": "kicking gains 1+ WP pt",
+        "points": [
+          {
+            "x": 2015,
+            "y": 0.0385,
+            "lo": 0.0294,
+            "hi": 0.0503,
+            "n": 1323
+          },
+          {
+            "x": 2016,
+            "y": 0.039,
+            "lo": 0.0297,
+            "hi": 0.0511,
+            "n": 1282
+          },
+          {
+            "x": 2017,
+            "y": 0.042,
+            "lo": 0.0328,
+            "hi": 0.0537,
+            "n": 1427
+          },
+          {
+            "x": 2018,
+            "y": 0.0355,
+            "lo": 0.0267,
+            "hi": 0.0471,
+            "n": 1295
+          },
+          {
+            "x": 2019,
+            "y": 0.0456,
+            "lo": 0.0356,
+            "hi": 0.0583,
+            "n": 1315
+          },
+          {
+            "x": 2020,
+            "y": 0.0469,
+            "lo": 0.0361,
+            "hi": 0.0607,
+            "n": 1152
+          },
+          {
+            "x": 2021,
+            "y": 0.045,
+            "lo": 0.0349,
+            "hi": 0.0577,
+            "n": 1290
+          },
+          {
+            "x": 2022,
+            "y": 0.0437,
+            "lo": 0.0341,
+            "hi": 0.0558,
+            "n": 1374
+          },
+          {
+            "x": 2023,
+            "y": 0.0447,
+            "lo": 0.0352,
+            "hi": 0.0565,
+            "n": 1455
+          },
+          {
+            "x": 2024,
+            "y": 0.0454,
+            "lo": 0.0354,
+            "hi": 0.0579,
+            "n": 1323
+          },
+          {
+            "x": 2025,
+            "y": 0.0451,
+            "lo": 0.0351,
+            "hi": 0.0577,
+            "n": 1309
+          },
+          {
+            "x": 2026,
+            "y": 0.0325,
+            "lo": 0.0209,
+            "hi": 0.0503,
+            "n": 584
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true,
+  "order": 1
+}

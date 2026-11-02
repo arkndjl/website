@@ -1,0 +1,44 @@
+{{- /* Special teams tab, teams view (Noah, Nov 2 2026): every team's special teams in points over expected a game,
+       by unit, ranked by the shrunk rating. data/st_teams_<sport>.json from scripts/st_teams.py (events, research,
+       build). Context: dict "sport" "nfl"|"cfb", "title". Phones keep rank, team, G, Adj and Pts/G. */ -}}
+{{- $sport := .sport -}}
+{{- $feed := printf "st_teams_%s" $sport -}}
+{{- with index site.Data $feed -}}
+{{- $d := . }}{{ $col := eq $sport "cfb" }}{{ $rows := .rows | default slice }}
+{{- $date := lower ((time .asof).Format "Jan 2") }}
+{{- $T := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" }}
+  {{- partial "wintable-open.html" (dict "title" ($.title | default "special teams :: teams, points over expected a game") "icon" "football" "filter" "Team" "rerank" true "gfxCols" "RK,Team,G,Adj,Pts/G" "gfxDate" (printf "special teams · %v" $d.season) "gfxMax" "25") }}
+<table class="cfb__table bw brk__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th title="games this season">G</th>
+    <th title="special teams points over expected a game against the league, shrunk: this season's per-game rate held toward a prior (half last season's team, half the league) worth {{ $d.n0 }} games; the rank">Adj</th>
+    <th title="special teams points over expected a game this season, raw">Pts/G</th>
+    <th class="bw__x" title="kick returns: return value over the mean return fielded at the same spot, a game">KR</th>
+    <th class="bw__x" title="punt returns: the same, a game">PR</th>
+    <th class="bw__x" title="coverage: minus the opponent's return over expected on this team's kickoffs and punts, a game">Cov</th>
+    <th class="bw__x" title="kickoffs: the kick before the return (touchbacks, fair catches, distance, out of bounds) against the league's average kickoff, a game">KO</th>
+    <th class="bw__x" title="punting: the punt before the return against the league's average punt from the same line of scrimmage, a game">Punt</th>
+    <th class="bw__x" title="field goals and extra points over the make rate from that distance, a game">FG</th>
+    <th class="bw__x" title="blocks: punts, field goals and extra points blocked, minus this team's own kicks blocked, each at the swing against an average kick, a game">Blk</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="{{ if $col }}{{ .lg }}{{ else }}/img/nfl/{{ lower .ab }}.png{{ end }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span>{{ with .tier }} <span class="cfb__medals" title="{{ index $T . }} Special Teams"><i class="cfb__medal cfb__medal--{{ . }}"></i></span>{{ end }}</td>
+    <td class="cfb__num">{{ .g }}</td>
+    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.2f" (float .adj) }}</span></td>
+    <td class="cfb__num" data-v="{{ .pg }}">{{ printf "%+.2f" (float .pg) }}</td>
+    {{- range $u := slice "kr" "pr" "cov" "ko" "punt" "fg" "blk" }}
+    <td class="cfb__num bw__x" data-v="{{ index $r $u }}">{{ printf "%+.2f" (float (index $r $u)) }}</td>
+    {{- end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+  {{- $own := $d.own }}
+  {{- $gm := "" }}{{ with $d.game_model }}{{ $gm = printf " %s" . }}{{ end }}
+  {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" $feed "note" (printf "%v · through week %v · ranked by Adj · updated %s" $d.season $d.week $date)
+        "about" (printf "Every special teams snap valued in points (%s), each unit credited only with what it controls: returns over the mean return from the same spot; coverage as minus the opponent's return over expected; kickoffs and punts before the return against the league's average (punts from the same line of scrimmage); field goals and extra points over the make rate at that distance; blocks for and against at the swing against an average kick. Plays with an accepted penalty and onside kicks are left out. Units are this season's points a game against the league. Adj = the per-game total held toward a prior (half last season's team, half the league) worth %v games, the games at which a season-to-date rate is half signal (season split-half reliability %.2f). Medal (75th/90th/97th/99th pct): the rating predicts the rest of the season's special teams (midpoint r %.2f in %v-%v team-seasons, %.2f held).%s" (cond $col "drive points by field position, a TD 7; field goals 3 x made over the make rate" "nflverse EPA") $d.n0 (float $d.rel) (float (index $own.tune 0)) (cond $col "2017" "2015") (cond $col "2022" "2021") (float (index $own.held 0)) $gm)) }}
+{{- end -}}

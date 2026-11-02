@@ -10,3 +10,11 @@ scripts/data/odds_novig_ladder/*.jsonl merge=union
 scripts/data/props/*.jsonl merge=union
 scripts/data/odds_tp/*.jsonl merge=union
 scripts/data/odds_dense/*.jsonl merge=union
+scripts/data/odds/*.jsonl merge=union
+# Picks/paper outputs are rebuilt on every snap: a rebase conflict keeps the snap's whole file ("-X theirs"),
+# the next snap recomputes from both sides' inputs (Nov 2: snaps lost to games_picks_nba.json conflicts).
+data/games_picks_*.json -merge -diff
+data/paper_book.json -merge -diff
+data/ticker.json -merge -diff
+data/novig_paper.json -merge -diff
+data/props_paper*.json -merge -diff
