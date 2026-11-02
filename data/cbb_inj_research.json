@@ -1,8 +1,12 @@
 {
  "live": {
-  "coef": 0.4527,
-  "tuneMae": 9.377,
-  "heldMae": 9.7221
+  "coef": 0.4762,
+  "tuneMae": 9.4017,
+  "heldMae": 9.5756,
+  "tuneClose": 2.2814,
+  "heldClose": 2.0052,
+  "edgeSlope": 0.3322,
+  "heldEdgeMae": 8.9631
  },
  "streak": {
   "coef": 0.4367,
@@ -36,5 +40,36 @@
   "t": -1.77,
   "heldT": -1.86,
   "kept": true
- }
+ },
+ "absorb1": {
+  "coef": 0.537,
+  "tuneMae": 9.3985,
+  "heldMae": 9.5756,
+  "t": -2.48,
+  "heldT": -0.3,
+  "tuneClose": 2.2872,
+  "heldClose": 2.0057,
+  "closeT": 5.55,
+  "heldCloseT": 1.65,
+  "kept": false,
+  "edgeSlope": 0.3339,
+  "heldEdgeMae": 8.9631,
+  "heldEdgeT": 0.0
+ },
+ "absorb.5": {
+  "coef": 0.5057,
+  "tuneMae": 9.4008,
+  "heldMae": 9.5756,
+  "t": -0.87,
+  "heldT": -0.44,
+  "tuneClose": 2.2802,
+  "heldClose": 2.0054,
+  "closeT": -1.44,
+  "heldCloseT": 1.45,
+  "kept": false,
+  "edgeSlope": 0.3336,
+  "heldEdgeMae": 8.9631,
+  "heldEdgeT": 0.03
+ },
+ "absorbBase": "live = the shipped term (bench 400) for the absorb variants"
 }

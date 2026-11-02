@@ -32,6 +32,9 @@ PICKS_LEFT = 2                    # slates shown: today's and the next date with
 SIMS = 5000
 # the season sims' strength shock, tuned on 2016-20 rest-of-season wins (CRPS t -5.6 against the old 3 x sqrt(8 / (8 +
 # games)), 2021-26 t -9.8; conference wins -5.5 / -10.6; conference title log loss -0.8 / -4.7)
+# Retuned Nov 2 2026 on the full-scale power rating (cbb_tourney.team_rating): the 2016-20 best, a 0 k 8 b 4 (wins
+# CRPS t -2.2), ties 2021-26 (1.0788 both, t -0.1) and loses there on conference wins (t +1.0) and title (t +1.2), so
+# these stay (data/cbb_games_research.json sims)
 SHOCK_A, SHOCK_K, SHOCK_B = 2.0, 8.0, 4.0
 POSTSEASON = re.compile(r'tournament|championship|playoff', re.I)     # conference games with these notes: the tournaments
 
