@@ -17,6 +17,6 @@ draft = false
 {{< cs2matches title="matches :: upcoming pro series" tab="matches" >}}
 {{< cs2matches view="results" title="results :: against the model" tab="results" >}}
 {{< cs2players view="values" title="transfer values :: estimated buyouts" tab="transfer values" >}}
-{{< cs2model title="model :: how the rating is built and how it scores" tab="model" >}}
+{{< cs2model title="model :: inputs, weights, held-out test" tab="model" >}}
 {{< cs2players view="model" title="player model :: ratings, prospects, values" tab="player model" >}}
 {{< /wintabs >}}
