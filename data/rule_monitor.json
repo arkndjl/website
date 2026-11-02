@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T11:01:33Z",
+ "asof": "2026-11-02T13:57:05Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1102,19 +1102,19 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 28,
-   "clvN": 0,
-   "clvRet": null,
+   "n": 30,
+   "clvN": 1,
+   "clvRet": 1.0453,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
+   "days": 1,
+   "beat": 1.0,
+   "settled": 1,
    "w": 0,
-   "l": 0,
-   "roi": null,
+   "l": 1,
+   "roi": -1.0,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 1,
+    "clvRet": 1.0453,
     "clvT": null
    },
    "exp": {
@@ -1123,12 +1123,17 @@
     "roi": 0.0839,
     "n": 4167
    },
+   "vsExp": {
+    "gap": 1.0091,
+    "z": 8.88,
+    "read": "above the backtest"
+   },
    "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": 1.0453,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1136,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1137,35 +1142,41 @@
     "why": "",
     "drift": {
      "mu1": 0.0181,
-     "n": 0,
+     "n": 1,
      "sd": 0.1136,
      "rho": 0.002,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": 1.453,
+     "info": 0.03,
+     "real": 57.751,
+     "realSe": 6.276,
      "need": 232
     }
    },
    "drift": {
     "mu1": 0.0181,
-    "n": 0,
+    "n": 1,
     "sd": 0.1136,
     "rho": 0.002,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
+    "llr": 1.453,
+    "info": 0.03,
+    "real": 57.751,
+    "realSe": 6.276,
     "need": 232,
-    "path": []
+    "path": [
+     [
+      "2026-11-02",
+      1,
+      1.453
+     ]
+    ]
    }
   },
   {
@@ -1176,7 +1187,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 39,
+   "n": 40,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -2114,13 +2125,13 @@
    "sport": "cbb",
    "mk": "spread",
    "label": "CBB spread",
-   "n": 0,
-   "du": 0,
-   "clvRet": null,
+   "n": 1,
+   "du": 0.25,
+   "clvRet": 1.0453,
    "clvT": null,
-   "flat": null,
-   "adds": null,
-   "expEdge": null,
+   "flat": 1.0453,
+   "adds": 0.0,
+   "expEdge": 0.0145,
    "basis": "backtest"
   },
   {
