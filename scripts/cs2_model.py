@@ -39,7 +39,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from cs2_data import CACHE, UA, VRS, key  # noqa: E402
+from cs2_data import CACHE, LP_RES, UA, VRS, key  # noqa: E402
 import cs2_bo3  # noqa: E402
 import cs2_poly  # noqa: E402
 
@@ -369,6 +369,17 @@ def build():
         v = vt.get(k)
         return x / 400, (v[1] if v else 400) / 400, v
 
+    # the five's player rating (scripts/cs2_players.py) as a fourth logit term, on when its held-out test passed
+    import cs2_players
+    live = cs2_players.Live(bo3)
+    if live.w:
+        W = {k: np.array(v) for k, v in live.w.items()}
+
+    def pz(ka, kb, ra=None, rb=None, d="now"):
+        if not live.w:
+            return 0.0
+        return live.z(ra or st["lastros"].get(ka), ka, rb or st["lastros"].get(kb), kb, d)
+
     def tmap(ka, kb, bo):
         """bo3 team map rating, series logit through the veto (0 when either team has no bo3 id)."""
         ta, tb = bo3.team_of(ka), bo3.team_of(kb)
@@ -379,7 +390,7 @@ def build():
         xb, vb, rb = strength(kb)
         if w is None:
             w = W["top"] if (ra and rb and ra[0] <= TOP and rb[0] <= TOP) else W["rest"]
-        return w[0] * (xa - xb) + w[1] * (va - vb) + w[2] * tmap(ka, kb, bo)
+        return w[0] * (xa - xb) + w[1] * (va - vb) + w[2] * tmap(ka, kb, bo) + (w[3] * pz(ka, kb) if len(w) > 3 else 0)
 
     def chance(ka, kb, bo=3):
         return float(1 / (1 + math.exp(-logit_ab(ka, kb, bo))))
@@ -434,6 +445,8 @@ def build():
                       "form": "".join("W" if w else "L" for _, w in form[k][-10:]), "last": lastd[k],
                       "logo": (LOGOS / f"{k}.png").exists()})
     fetch_logos([t["k"] for t in teams], H.get("logos", {}))
+    # event-access tiers (Tier 1-4) on the ranked teams' Elo
+    tier_fit = cs2_players.tiers(teams, bo3)
     for t in teams:
         t["logo"] = (LOGOS / f"{t['k']}.png").exists()
     rank = {t["k"]: t["rk"] for t in teams}
@@ -492,24 +505,38 @@ def build():
         nv = novig.h2h_price(nvg, m["a"], m["b"], team=True) if nvg else None
         if nv:
             m["nv"] = nv
-    # results: Liquipedia's finished series with the chance the model gave before each
-    res = []
+    # results: Liquipedia's finished series (the archive, last 30 days) with the chance the model gave before each.
+    # The pre-series row is found by date (+-1 day) and team keys whichever source it came from: once Valve's next
+    # snapshot lists a series, its row is tagged "vrs" and the Liquipedia copy is dropped from the series list
+    pre = {}
     for r in rows:
-        if r["r"][6] != "lp":
+        pre.setdefault((r["d"], frozenset((r["a"], r["b"]))), r)
+    lpd = json.load(gzip.open(LP_RES)) if LP_RES.exists() else {"results": {}}
+    since = time.time() - 30 * 86400
+    res = []
+    for ts, a, b, sa, sb, fmt, ev in lpd["results"].values():
+        if ts < since:
+            continue
+        ka, kb = key(a), key(b)
+        d0 = dt.datetime.fromtimestamp(ts, dt.timezone.utc).date()
+        r = next((pre[k] for k in ((str(d0 + dt.timedelta(days=j)), frozenset((ka, kb))) for j in (0, -1, 1))
+                  if k in pre), None)
+        if r is None:
             continue
         w = W["top"] if r["top"] else W["rest"]
-        pa = 1 / (1 + math.exp(-(w[0] * r["x"] + w[1] * r["v"] + w[2] * r["t"])))
-        rr = r["r"]
-        res.append({"ts": rr[8], "a": names.get(r["a"], rr[1]), "b": names.get(r["b"], rr[2]), "ka": r["a"], "kb": r["b"], "sa": rr[9], "sb": rr[10],
-                    "fmt": rr[7], "event": rr[11], "pa": round(float(pa), 4), "fair": [fair(pa), fair(1 - pa)], "rka": rank.get(r["a"]),
-                    "rkb": rank.get(r["b"]), "la": (LOGOS / f"{r['a']}.png").exists(),
-                    "lb": (LOGOS / f"{r['b']}.png").exists()})
+        zz = pz(r["a"], r["b"], r["r"][4], r["r"][5], r["d"]) if len(w) > 3 else 0
+        p0 = 1 / (1 + math.exp(-(w[0] * r["x"] + w[1] * r["v"] + w[2] * r["t"] + (w[3] * zz if len(w) > 3 else 0))))
+        pa = p0 if r["a"] == ka else 1 - p0
+        res.append({"ts": ts, "a": names.get(ka, a), "b": names.get(kb, b), "ka": ka, "kb": kb, "sa": sa, "sb": sb,
+                    "fmt": fmt, "event": ev, "pa": round(float(pa), 4), "fair": [fair(pa), fair(1 - pa)],
+                    "rka": rank.get(ka), "rkb": rank.get(kb), "la": (LOGOS / f"{ka}.png").exists(),
+                    "lb": (LOGOS / f"{kb}.png").exists()})
     res = sorted(res, key=lambda x: -x["ts"])[:60]
-    nlp = sum(1 for r in rows if r["r"][6] == "lp")
+    nlp = len(res)
     out = {"asof": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "vrsDate": last, "lastVrs": H["lastVrs"],
            "nSeries": len(rows), "nLp": nlp, "first": rows[0]["d"], "teams": teams,
            "matches": sorted(matches, key=lambda m: m["ts"]), "results": res,
-           "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp,
+           "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tiers": tier_fit,
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
     OUT.write_text(json.dumps(out, separators=(",", ":")))
