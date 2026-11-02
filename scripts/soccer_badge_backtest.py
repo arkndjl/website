@@ -199,7 +199,9 @@ def pro():
         r['gar90'] = v - F['repl'][r['pos']]
     import pickle
     jc = os.path.join(D.CACHE, 'fmbdg', 'joined.pkl')       # the name join is slow: cached once per run of the pull
-    if os.path.exists(jc) and '--rejoin' not in sys.argv:
+    if '--nofm' in sys.argv:                               # Understat candidates only (FotMob results kept from the last run)
+        fmj = 'skipped (--nofm)'
+    elif os.path.exists(jc) and '--rejoin' not in sys.argv:
         fmj, fmr = pickle.load(open(jc, 'rb'))
         for r in rows:
             q = fmr.get((r['lg'], r['S'], r['tid'], r['p']))
@@ -331,6 +333,14 @@ def pro():
             out['joint'] = {'passers': ps, 'kept': sel, 'steps': steps, 'corr': np.round(np.atleast_2d(C), 2).tolist()}
             print(P, 'joint', out['joint'], flush=True)
         res[P] = out
+    if '--nofm' in sys.argv and os.path.exists(OUT):
+        old = json.load(open(OUT)).get('pro') or {}
+        for c in FM_CANDS:
+            if c in (old.get('candidates') or {}):
+                meta[c] = old['candidates'][c]
+            for P in res:
+                if c in ((old.get('tests') or {}).get(P) or {}):
+                    res[P][c] = old['tests'][P][c]
     save('pro', {'asof': dt.date.today().isoformat(), 'outcome': "next season's GAR a 90 (900+ minutes both seasons)",
                  'base': ['GAR a 90 this season', 'last season (flag if none)', 'log minutes', 'age', 'age^2'],
                  'fotmobJoin': fmj, 'candidates': meta, 'tests': res})

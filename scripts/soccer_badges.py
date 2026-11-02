@@ -29,6 +29,10 @@ CANDS = {
     'prg': ('Progressor', 'MD', 'xGBuildup a 90', lambda a: a['bu']),
     'chn': ('Final Third', 'FM', 'xGChain minus xGBuildup a 90', lambda a: a['ch'] - a['bu']),
     'gks': ('Shot Stopper', 'G', 'goals saved vs xG faced a 90', lambda a: a['gks']),
+    # specialists and roles (Nov 2 2026 candidates)
+    'pk': ('Penalty Taker', 'FM', 'penalty xG a 90', lambda a: a['pen']),
+    'npx': ('Box Threat', 'FM', 'non-penalty xG a 90', lambda a: a['x'] - a['pen']),
+    'spd': ('Set-Piece Threat', 'D', 'non-penalty xG a 90 (defenders)', lambda a: a['x'] - a['pen']),
 }
 
 # shipped (data/soccer_badge_backtest.json 'pro', Nov 1 2026): candidate -> (positions it passed at, k in 90s). Each

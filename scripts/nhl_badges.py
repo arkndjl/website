@@ -65,6 +65,20 @@ CANDS = [
     ['blocker', 'Shot Blocker', 'FD', lambda a, s: _per60(_f(a, 'shotsBlockedByPlayer'), _f(a, 'icetime')), lambda a, s: _f(a, 'icetime') / 60, 'shots blocked a 60'],
     ['faceoff', 'Faceoffs', 'F', lambda a, s: (_f(a, 'faceoffsWon') / (_f(a, 'faceoffsWon') + _f(a, 'faceoffsLost'))) if _f(a, 'faceoffsWon') + _f(a, 'faceoffsLost') >= 200 else None,
      lambda a, s: _f(a, 'faceoffsWon') + _f(a, 'faceoffsLost'), 'faceoff win %'],
+    # specialists and roles (Nov 2 2026 candidates)
+    ['pkill', 'Penalty Killer', 'FD', lambda a, s: (_f(s.get('4on5'), 'icetime') / 60 / _f(a, 'games_played')) if _f(a, 'games_played') >= 10 else None,
+     lambda a, s: _f(a, 'games_played'), '4-on-5 minutes a game'],
+    ['pkstop', 'PK Stopper', 'FD', lambda a, s: _neg(_per60(_f(s.get('4on5'), 'OnIce_A_xGoals'), _f(s.get('4on5'), 'icetime'))) if _f(s.get('4on5'), 'icetime') >= 3000 else None,
+     lambda a, s: _f(s.get('4on5'), 'icetime') / 60, '4-on-5 on-ice xG against a 60 (lower)'],
+    ['ppunit', 'Power Play Unit', 'FD', lambda a, s: (_f(s.get('5on4'), 'icetime') / 60 / _f(a, 'games_played')) if _f(a, 'games_played') >= 10 else None,
+     lambda a, s: _f(a, 'games_played'), '5-on-4 minutes a game'],
+    ['drawer', 'Penalty Drawer', 'FD', lambda a, s: _per60(_f(a, 'penaltiesDrawn') - _f(a, 'penalties'), _f(a, 'icetime')), lambda a, s: _f(a, 'icetime') / 60,
+     'penalties drawn less taken a 60'],
+    ['netfront', 'Net Front', 'FD', lambda a, s: _per60(_f(a, 'I_F_highDangerShots'), _f(a, 'icetime')), lambda a, s: _f(a, 'icetime') / 60, 'high-danger shots a 60'],
+    ['shutdown', 'Shutdown', 'FD', lambda a, s: (_f(a, 'I_F_dZoneShiftStarts') / (_f(a, 'I_F_dZoneShiftStarts') + _f(a, 'I_F_oZoneShiftStarts'))) if _f(a, 'I_F_dZoneShiftStarts') + _f(a, 'I_F_oZoneShiftStarts') >= 100 else None,
+     lambda a, s: _f(a, 'I_F_dZoneShiftStarts') + _f(a, 'I_F_oZoneShiftStarts'), 'defensive-zone share of zone starts'],
+    ['faceoffsp', 'Faceoff Specialist', 'F', lambda a, s: ((_f(a, 'faceoffsWon') - _f(a, 'faceoffsLost')) / _f(a, 'games_played')) if _f(a, 'games_played') >= 10 else None,
+     lambda a, s: _f(a, 'games_played'), 'faceoffs won less lost a game'],
     # goalies
     ['stopper', 'Shot Stopper', 'G', lambda a, s: ((_f(a, 'xGoals') - _f(a, 'goals')) / _f(a, 'unblocked_shot_attempts')) if _f(a, 'unblocked_shot_attempts') > 0 else None,
      lambda a, s: _f(a, 'unblocked_shot_attempts'), 'goals saved above expected a shot'],
@@ -74,22 +88,24 @@ CANDS = [
      lambda a, s: _f(a, 'unblocked_shot_attempts'), 'rebounds under expected a shot'],
     ['freeze', 'Puck Control', 'G', lambda a, s: ((_f(a, 'freeze') - _f(a, 'xFreeze')) / _f(a, 'unblocked_shot_attempts')) if _f(a, 'unblocked_shot_attempts') > 0 else None,
      lambda a, s: _f(a, 'unblocked_shot_attempts'), 'freezes over expected a shot'],
+    ['workhorse', 'Workhorse', 'G', lambda a, s: _f(a, 'games_played'), lambda a, s: 82.0, 'games started share (games played)'],
 ]
 BY = {c[0]: c for c in CANDS}
 # shipped: passed the backtest alone AND next to the other passers (group -> key -> k, the volume at which the stat is
-# half signal). Nov 1 2026, next-season WAR per 82 games on WAR + pWAR + HPM, t clustered by player, 17 seasons held out
-# one at a time (oos = R^2 gain x100; joint = with the group's other shipped badges in):
-#   F  Scorer       r .57  t  9.7  oos 1.07  joint t 4.3    Shooter          r .76  t 12.5  oos 1.73  joint t 6.9
-#      Playmaker    r .57  t  6.1  oos  .41  joint t 3.7    Play Driver      r .55  t  7.1  oos  .44  joint t 3.8
-#      Takeaways    r .55  t  9.4  oos  .87  joint t 9.1
-#   D  Chance Getter r .70 t  7.6  oos 1.34  joint t 6.2    Shot Suppressor  r .40  t  6.7  oos  .86  joint t 6.5
-#      Takeaways    r .56  t  6.3  oos 1.31  joint t 4.5
-# Failed (data/nhl_badge_backtest.json): F Sniper (t .1), Shot Suppressor (.5), Chance Getter and Power Play (pass alone,
-# t 1.6 / 1.8 next to the rest), Physical, Shot Blocker, Faceoffs (negative: t -7.6, -5.4, -2.1); D Scorer, Shooter,
-# Playmaker (pass alone, not next to Chance Getter), Play Driver (-1.5), Power Play (1.4), Physical (-4.9), Shot Blocker
-# (-2.9); G Shot Stopper (year-to-year r .12, noise), High Danger (t 1.0), Rebound Control (.6), Puck Control (.9).
-SHIP = {'F': {'shooter': 320, 'takeaway': 829, 'scorer': 778, 'driver': 663, 'playmaker': 750},
-        'D': {'suppress': 1488, 'chances': 516, 'takeaway': 960}}
+# half signal). Nov 2 2026 rerun with role/specialist candidates, next-season WAR per 82 games on WAR + pWAR + HPM, t
+# clustered by player, 17 seasons held out one at a time (oos = R^2 gain x100; joint = next to the group's other ships):
+#   F  Shooter r .76 t 12.5 joint 7.4   Takeaways r .55 t 9.4 joint 9.1   Power Play Unit (5v4 min a game) r .88 t 10.6
+#      joint 7.5   Penalty Drawer (drawn - taken a 60) r .44 t 8.5 joint 6.6   Power Play r .30 t 4.2 joint 3.0
+#      Play Driver r .55 t 7.1 joint 3.0   Playmaker r .57 t 6.1 joint 2.3; joint oos 4.03 (was 3.0)
+#   D  Shot Suppressor r .40 t 6.7 joint 6.2   Takeaways r .56 t 6.3 joint 4.8   Net Front (HD shots a 60) r .40 t 7.0
+#      joint 4.6   Penalty Drawer r .42 t 4.1 joint 3.1   Power Play Unit r .89 t 5.8 joint 3.0; joint oos 3.23 (was 3.0)
+# Dropped in the joint fit: F Scorer (t 1.95 next to Shooter + PP), Chance Getter, Net Front; D Chance Getter (1.7),
+# Scorer, Shooter, Playmaker. Failed: Penalty Killer (4v5 min a game; F t -6.2, D -3.9), PK Stopper (F -2.8, D .5),
+# Shutdown (d-zone start share; F -8.7, D -5.0), Faceoff Specialist (net wins a game, -1.0), Faceoffs (win %), Sniper,
+# Physical, Shot Blocker; G Workhorse (games, t 1.0), Shot Stopper (r .12), High Danger, Rebound Control, Puck Control.
+# Defensive roles (PK, d-zone starts) run negative: coaches give them to players whose WAR already overstates them.
+SHIP = {'F': {'shooter': 320, 'takeaway': 829, 'ppunit': 9, 'drawer': 1285, 'pp': 333, 'driver': 663, 'playmaker': 750},
+        'D': {'suppress': 1488, 'takeaway': 960, 'netfront': 1841, 'drawer': 1724, 'ppunit': 8}}
 
 
 def lines(S):
