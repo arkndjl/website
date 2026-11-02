@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-02T00:37:50Z",
+ "asof": "2026-11-02T00:38:54Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -45,30 +45,30 @@
     }
    },
    "total": {
-    "n": 6,
-    "window": 6,
-    "mean": -0.0061,
+    "n": 7,
+    "window": 7,
+    "mean": -0.0223,
     "t": null,
     "days": 1,
     "sd": 0.1256,
-    "cusum": 0.34,
-    "cusumMax": 0.44,
+    "cusum": 1.05,
+    "cusumMax": 1.05,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0167,
-     "n": 6,
+     "n": 7,
      "sd": 0.1256,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.092,
-     "info": 0.11,
-     "real": -0.365,
-     "realSe": 3.071,
+     "llr": -0.227,
+     "info": 0.12,
+     "real": -1.337,
+     "realSe": 2.843,
      "need": 333
     }
    }
@@ -142,32 +142,6 @@
    },
    "unitsRaw": 3.0,
    "unitsCap": 1.0
-  },
-  {
-   "id": "2026_08_KC_DEN",
-   "espn": "401873033",
-   "sport": "nfl",
-   "kick": "2026-11-01T21:25:00Z",
-   "home": "DEN",
-   "away": "KC",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -104.0,
-   "p": 0.529,
-   "ev": 0.038,
-   "units": 1.75,
-   "edge": 2.0,
-   "x": 1.5,
-   "pDU": 0.5183,
-   "evDU": 0.0168,
-   "m": 1.1,
-   "tm": 42.5,
-   "flagged": "2026-10-28T02:43:45Z",
-   "betTo": 41.0,
-   "close": 42.5,
-   "pass": true,
-   "now": null
   }
  ],
  "withdrawn": [],
@@ -723,7 +697,16 @@
    "flagged": "2026-10-28T02:43:45Z",
    "betTo": 41.0,
    "close": 42.5,
-   "pass": true
+   "pass": true,
+   "score": [
+    24.0,
+    28.0
+   ],
+   "res": "w",
+   "profit": 0.962,
+   "clvRet": 0.0994,
+   "clv": 2.0,
+   "beat": 1
   },
   {
    "id": "2026_08_CHI_SEA",
@@ -953,8 +936,8 @@
     "scale": 1.0
    },
    "2026-11-02": {
-    "raw": 113.0,
-    "scale": 0.354
+    "raw": 110.75,
+    "scale": 0.3612
    },
    "2026-11-03": {
     "raw": 6.25,
@@ -969,7 +952,7 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 13.75,
+    "raw": 14.25,
     "scale": 1.0
    }
   }
