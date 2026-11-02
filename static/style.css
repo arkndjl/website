@@ -3605,6 +3605,17 @@ table.trophycase__hist td.trophycase__post {
 .hub__links a:hover { color: var(--win-dark); background: var(--accent); }
 .hub__open { display: inline-block; margin-top: 10px; padding: 3px 12px; color: var(--win-dark) !important; background: var(--foreground); text-decoration: none; }
 @media (max-width: 1000px) { .hub__grid { grid-template-columns: minmax(0, 1fr); } }
+.hub__sec { margin: 18px 0 0; }
+.post-content .hub__sh, .hub__sh { margin: 0 0 -4px; padding: 0 2px; font-size: 0.8em; font-weight: normal; letter-spacing: 0.12em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent); border-bottom: 2px solid var(--win-dark); }
+.hub__views { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.post .hub__views li::before, .post-content .hub__views li::before { content: none !important; display: none !important; }
+.hub__views li { margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.hub__vlabel { min-width: 74px; font-size: 0.75em; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+.hub__views a { display: inline-block; padding: 1px 6px; border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); background: var(--win-face); text-decoration: none; font-size: 0.9em; }
+.hub__views a:hover, .hub__views a:focus-visible { color: var(--win-dark); background: var(--accent); }
+.hub__more { font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+@media (max-width: 640px) { .hub__views a { padding: 4px 8px; } .hub__vlabel { flex-basis: 100%; } }
 
 /* ---- nav: ARKBOARD dropdown ---- */
 .menu-sub { position: relative; }

@@ -11,7 +11,7 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: NFL WAR and games" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,projections,team WAR,QB value,special teams,rookies,breakouts,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,depth chart" side="true" label="NFL views" >}}
+{{< wintabs groups="players:WAR leaders,projections,QB value,special teams,rookies,breakouts,ARKLIST|rosters:depth chart,backup watch|games:games,game table|teams:ARK Ranking,season odds,team WAR" side="true" label="NFL views" >}}
 {{< nflwar title="NFL WAR :: leaderboards" tab="WAR leaders" >}}
 {{< pctl sport="nfl" icon="football" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< nflteamwar title="team WAR :: by position group" tab="team WAR" >}}
