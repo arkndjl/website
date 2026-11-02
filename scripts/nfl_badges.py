@@ -172,3 +172,33 @@ def board_badges(y, players, fresh=False, thru=None, frac=1.0):
     for L in out.values():
         L.sort(key=lambda b: (order[b[1]], -b[2]))
     return dict(out)
+
+
+# ---------------------------------------------------------------- specialists (Noah, Nov 2 2026)
+# One badge per special teams job, on the credit scripts/nfl_st_war.py puts into WAR: each kick's EPA split between
+# kicker / punter / returner, shrunk to what carries to the next season (k plays: kick 360, punt 170, KR 90). That
+# credit was tested season to next season (data/nfl_st_war.json 'kinds', 2016-25, forward slope ~1): kicking t 2.25,
+# punting 4.36, kick returns 2.69 pass; punt returns t 1.6 fail (no badge), kickoffs left out of WAR. Long snappers:
+# no play-by-play field names the snapper, so no badge. Tier = percentile of the season's credit among the players
+# with the volume floor in that job (pro-rated in season), as the other badges.
+ST_BADGES = [  # (kind, name, plays floor a 17-game season, label)
+    ('kick', 'Kicker', 25, 'FG + XP points over expected, shrunk'),
+    ('punt', 'Field Flipper', 40, 'punt points over expected, shrunk'),
+    ('kr', 'Kick Returner', 15, 'kick return points over expected, shrunk'),
+]
+
+
+def st_badges(stv, frac=1.0):
+    """{gsis: [[name, tier, pct, label], ...]} from nfl_st_war.values(y)"""
+    out = defaultdict(list)
+    for kind, name, floor, label in ST_BADGES:
+        L = [(g, v[kind]) for g, v in stv.items() if v.get('n', {}).get(kind, 0) >= floor * frac and kind in v]
+        if len(L) < 12:
+            continue
+        srt = sorted(x for _, x in L)
+        for g, x in L:
+            pct = (sum(1 for y_ in srt if y_ < x) + 0.5 * sum(1 for y_ in srt if y_ == x)) / len(srt)
+            tier = next((t for t, q in TIERS if pct >= q), None)
+            if tier:
+                out[g].append([name, tier, int(pct * 100), label])
+    return dict(out)

@@ -633,6 +633,15 @@ def board(y, thru=None, fresh=False, st=True):
     except Exception as e:
         print(f'nfl war: badges skipped ({e!r})')
         bdg = {}
+    try:   # specialist badges on the special teams credit (kicker, punter, kick returner)
+        stb = nfl_badges.st_badges(stv, frac=max(teamg.values() or [17]) / 17) if stv else {}
+    except Exception as e:
+        print(f'nfl war: specialist badges skipped ({e!r})')
+        stb = {}
+    for pfr, r_ in ros.items():
+        b_ = stb.get(r_.get('gsis_id', ''))
+        if b_:
+            bdg[pfr] = sorted(bdg.get(pfr, []) + b_, key=lambda x: ('pgsb'.index(x[1]), -x[2]))
     out = []
     for pfr, a in agg.items():
         if a['snaps'] <= 0:
@@ -685,7 +694,7 @@ def board(y, thru=None, fresh=False, st=True):
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
                     '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {}), **({'two': two} if two else {})})
     out = [p for p in out if p['sn'] >= 1]
-    out += st_rows(stv, y, gs2pfr, teamg, fresh)
+    out += st_rows(stv, y, gs2pfr, teamg, fresh, stb)
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
         ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))
         if ph:
@@ -713,7 +722,7 @@ def st_line(v):
     return ', '.join(out)
 
 
-def st_rows(stv, y, gs2pfr, teamg, fresh=False):
+def st_rows(stv, y, gs2pfr, teamg, fresh=False, stb=None):
     """kickers and punters (no offense or defense snaps): WAR = their special teams credit"""
     if not stv:
         return []
@@ -735,6 +744,8 @@ def st_rows(stv, y, gs2pfr, teamg, fresh=False):
              'stw': round(war, 2), 'age': age(r.get('birth_date'), y), 'exp': r.get('years_exp', ''),
              'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
              '_st': {}, '_g': 'ST', '_war': war}
+        if stb and gs in stb:
+            p['bdg'] = sorted(stb[gs], key=lambda x: ('pgsb'.index(x[1]), -x[2]))
         ph = faces.nfl_ph(r.get('headshot_url'))
         if ph:
             p['ph'] = ph

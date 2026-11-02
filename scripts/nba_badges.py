@@ -34,6 +34,15 @@ def _g(s, k):
     return v if isinstance(v, (int, float)) else None
 
 
+def _gp(s):
+    return _g(s, 'games') or _g(s, 'g')
+
+
+def _gs(s):
+    v = _g(s, 'games_started')
+    return v if v is not None else _g(s, 'gs')
+
+
 # [key, name, groups, rate fn(stats) -> (value up = good, volume), label]
 BADGES = [
     ('shooter', 'Shooter', ('G', 'F', 'C'), lambda s: _per(_g(s, 'fg3'), _g(s, 'fg3a')), '3-point %'),
@@ -48,10 +57,14 @@ BADGES = [
     ('thief', 'Disruptor', ('G', 'F', 'C'), lambda s: (_g(s, 'stl_pct'), _g(s, 'mp') or 0), 'steal %'),
     ('board', 'Rebounder', ('G', 'F', 'C'), lambda s: (_g(s, 'drb_pct'), _g(s, 'mp') or 0), 'defensive rebound %'),
     ('oboard', 'Offensive Rebounder', ('G', 'F', 'C'), lambda s: (_g(s, 'orb_pct'), _g(s, 'mp') or 0), 'offensive rebound %'),
+    # roles (Nov 2 2026 candidates)
+    ('starter', 'Starter', ('G', 'F', 'C'), lambda s: _per(_gs(s), _gp(s)), 'games started share'),
+    ('workhorse', 'Workhorse', ('G', 'F', 'C'), lambda s: _per(_g(s, 'mp'), _gp(s)), 'minutes a game'),
+    ('stocks', 'Two-Way Disruptor', ('G', 'F', 'C'), lambda s: (None if _g(s, 'stl_pct') is None or _g(s, 'blk_pct') is None else s['stl_pct'] + s['blk_pct'], _g(s, 'mp') or 0), 'steal % + block %'),
 ]
 BY_KEY = {b[0]: b for b in BADGES}
 ADV = ['ts_pct', 'orb_pct', 'drb_pct', 'ast_pct', 'stl_pct', 'blk_pct', 'tov_pct', 'usg_pct']
-TOT = ['fg3', 'fg3a', 'ft', 'fta', 'fga']
+TOT = ['fg3', 'fg3a', 'ft', 'fta', 'fga', 'games', 'g', 'games_started', 'gs']
 
 
 def _cell(s):
