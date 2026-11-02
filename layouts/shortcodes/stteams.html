@@ -1,0 +1,3 @@
+{{- /* Team special teams rating as its own tab in the teams group (moved from a chip on the returners tab, Nov 2 2026):
+       {{< stteams sport="nfl" title="special teams :: ..." tab="special teams" >}}. The table is partials/st-teams.html. */ -}}
+<div data-tab="{{ .Get "tab" }}">{{ partial "st-teams.html" (dict "sport" (.Get "sport") "title" (.Get "title")) }}</div>
