@@ -1,0 +1,177 @@
+{
+  "id": "tennis-serve-direction-mix",
+  "sport": "tennis",
+  "question": "Do first serves wide, body and T win at equal rates, as mixed-strategy theory predicts?",
+  "answer": "Wide and T: yes, within 1 pt for the same server. Body: no, 4.2 pts lower (men), 4.1 (women).",
+  "findings": [
+    "Within-player T minus wide: men -0.1 pts (SE 0.1, 498 player-sides), women -0.4 (SE 0.2, 311).",
+    "Wide vs T differ at p<.05 for 8% of men's and 7% of women's player-sides; 5% expected by chance.",
+    "Body minus wide/T, same server: men -4.2 pts (SE 0.2), women -4.1 (SE 0.2).",
+    "Body is 10% of men's and 20% of women's first serves; charters may log missed targets as body."
+  ],
+  "method": "Outcome: server wins the point, given the first serve was aimed at that target (faults count). Within-player test compares wide and T for each server and court side (150+ serves each).",
+  "data": "Match Charting Project points, 11,785 charted matches, 1,857,004 first serves with a direction.",
+  "n": 1857004,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Wide vs T within 0.4 pts in both eras (pre-2015, 2015+), men and women.",
+  "chart": {
+    "type": "bar",
+    "title": "Points won by first-serve target",
+    "x_label": "court side and target",
+    "y_label": "server points won",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "men",
+        "points": [
+          {
+            "x": "Deuce wide",
+            "y": 0.6523,
+            "lo": 0.6505,
+            "hi": 0.654,
+            "n": 292099
+          },
+          {
+            "x": "Deuce body",
+            "y": 0.5991,
+            "lo": 0.5954,
+            "hi": 0.6029,
+            "n": 65397
+          },
+          {
+            "x": "Deuce T",
+            "y": 0.6486,
+            "lo": 0.6469,
+            "hi": 0.6502,
+            "n": 305283
+          },
+          {
+            "x": "Ad wide",
+            "y": 0.6396,
+            "lo": 0.6379,
+            "hi": 0.6413,
+            "n": 308251
+          },
+          {
+            "x": "Ad body",
+            "y": 0.5933,
+            "lo": 0.5892,
+            "hi": 0.5974,
+            "n": 55384
+          },
+          {
+            "x": "Ad T",
+            "y": 0.6405,
+            "lo": 0.6386,
+            "hi": 0.6424,
+            "n": 241185
+          }
+        ]
+      },
+      {
+        "name": "women",
+        "points": [
+          {
+            "x": "Deuce wide",
+            "y": 0.5866,
+            "lo": 0.5839,
+            "hi": 0.5893,
+            "n": 127963
+          },
+          {
+            "x": "Deuce body",
+            "y": 0.5382,
+            "lo": 0.5343,
+            "hi": 0.5421,
+            "n": 63638
+          },
+          {
+            "x": "Deuce T",
+            "y": 0.5811,
+            "lo": 0.5783,
+            "hi": 0.584,
+            "n": 114954
+          },
+          {
+            "x": "Ad wide",
+            "y": 0.5751,
+            "lo": 0.5723,
+            "hi": 0.5779,
+            "n": 119209
+          },
+          {
+            "x": "Ad body",
+            "y": 0.5263,
+            "lo": 0.5221,
+            "hi": 0.5305,
+            "n": 54084
+          },
+          {
+            "x": "Ad T",
+            "y": 0.5725,
+            "lo": 0.5696,
+            "hi": 0.5754,
+            "n": 109557
+          }
+        ]
+      }
+    ]
+  },
+  "_extra": {
+    "M": {
+      "bfe": -0.042,
+      "bfese": 0.0016,
+      "k": 498,
+      "sig2": 0.0823,
+      "k3": 398,
+      "sig3": 0.2312,
+      "fe": -0.0007,
+      "fese": 0.001,
+      "Q": 583.8604,
+      "side_fe": {
+        "Deuce": [
+          -0.002377134793113352,
+          0.0013027403770640236,
+          259
+        ],
+        "Ad": [
+          0.0012175376352119975,
+          0.0013903620408428304,
+          239
+        ]
+      },
+      "sd_obs": 0.0362,
+      "sd_noise": 0.0331
+    },
+    "W": {
+      "bfe": -0.0408,
+      "bfese": 0.0019,
+      "k": 311,
+      "sig2": 0.0707,
+      "k3": 302,
+      "sig3": 0.2053,
+      "fe": -0.0041,
+      "fese": 0.0016,
+      "Q": 336.8367,
+      "side_fe": {
+        "Deuce": [
+          -0.004071498615584044,
+          0.0022358637936724427,
+          160
+        ],
+        "Ad": [
+          -0.004151356470960005,
+          0.002352042387831705,
+          151
+        ]
+      },
+      "sd_obs": 0.0372,
+      "sd_noise": 0.0366
+    }
+  },
+  "publish": true
+}

@@ -1,0 +1,96 @@
+{{- /* about/contact page head (content/about.md): pixel New York skyline (partials/px/skyline.html, from
+       brand/make-skyline.py) over a name card, then the contact tiles. Links come from [params.links] in hugo.toml;
+       handles are derived from the URLs. Styles are scoped under .ac. The resume windows follow in the markdown.
+       Usage: {{< aboutcontact >}} */ -}}
+{{- $l := site.Params.links | default dict -}}
+{{- $rows := slice -}}
+{{- with $l.email }}{{ $rows = $rows | append (dict "icon" "mail" "label" "email" "handle" (replace . "arkndjl" "ARKNDJL") "href" (printf "mailto:%s" .) "cls" "ac-tile--wide") }}{{ end -}}
+{{- range $it := slice
+  (dict "key" "instagram" "label" "instagram" "at" true)
+  (dict "key" "twitter" "label" "x / twitter" "at" true)
+  (dict "key" "linkedin" "label" "linkedin" "at" false)
+  (dict "key" "substack" "label" "substack" "at" true)
+  (dict "key" "youtube" "label" "youtube" "at" true)
+  (dict "key" "soundcloud" "label" "soundcloud" "at" false)
+  (dict "key" "github" "label" "github" "at" false) }}
+  {{- with index $l $it.key }}
+    {{- $h := path.Base (strings.TrimSuffix "/" .) -}}
+    {{- if and $it.at (not (hasPrefix $h "@")) }}{{ $h = printf "@%s" $h }}{{ end -}}
+    {{- if eq $it.key "instagram" "twitter" }}{{ $h = upper $h }}{{ end -}}
+    {{- $rows = $rows | append (dict "icon" $it.key "label" $it.label "handle" $h "href" . "cls" "") -}}
+  {{- end }}
+{{- end }}
+<style>
+.post:has(.ac)>.post-title{display:none}
+.ac{--ac-ink:#241a3a;--ac-well:#3a2d56;--ac-lil:#c8c7ff;--ac-aq:#7fffd4;--ac-title:#57068c;display:grid;gap:16px;margin:0 0 25px}
+.ac *{box-sizing:border-box}
+.ac ul{margin:0;padding:0;list-style:none}
+.ac li{margin:0}
+.ac li::before{content:none!important}
+.ac-card{position:relative;margin:0;border:2px solid;border-color:var(--ac-lil) var(--ac-ink) var(--ac-ink) var(--ac-lil);background:var(--ac-ink)}
+.ac-sky{display:block;width:100%;height:144px;image-rendering:pixelated}
+.ac-sky .s1{fill:#1b1330}.ac-sky .s2{fill:#21173a}.ac-sky .s3{fill:#281c45}.ac-sky .s4{fill:#2f2150}
+.ac-sky .t{fill:var(--ac-lil)}.ac-sky .b{fill:#120c20}.ac-sky .e{fill:#3a2d56}
+.ac-sky .w{fill:var(--ac-aq)}.ac-sky .v{fill:var(--ac-lil)}.ac-sky .k{fill:var(--ac-aq);animation:ac-blink 3.2s steps(1) infinite}
+.ac-sky .k:nth-of-type(3n){animation-delay:-1.1s}.ac-sky .k:nth-of-type(3n+1){animation-delay:-2.3s}
+@keyframes ac-blink{0%,60%{fill:var(--ac-aq)}61%,100%{fill:#120c20}}
+@media (prefers-reduced-motion:reduce){.ac-sky .k{animation:none}}
+.ac-id{display:grid;gap:12px;padding:16px;border-top:2px solid var(--ac-lil)}
+.ac-kick{margin:0;color:var(--ac-aq);letter-spacing:.25em;text-transform:uppercase}
+.ac-name{margin:0;font-size:48px;line-height:1;font-weight:normal;letter-spacing:.06em;color:var(--ac-lil);text-shadow:3px 3px 0 var(--ac-title)}
+.ac-name::before,.ac-name::after{content:none}
+.ac-loc{display:inline-flex;align-items:center;gap:8px;margin:0;color:var(--ac-aq)}
+.ac-loc svg,.ac-tile svg{fill:currentColor;shape-rendering:crispEdges;flex:none}
+.ac-loc svg{width:16px;height:16px}
+.ac-roles{display:grid;border-top:1px solid var(--ac-well)}
+.ac-roles li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;padding:6px 0;border-bottom:1px solid var(--ac-well)}
+.ac-roles b{color:var(--ac-lil);font-weight:normal}
+.ac-roles span{color:var(--ac-aq);text-align:right}
+.ac-blurb{margin:0;line-height:1.5}
+.ac-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:2px 6px;background:var(--ac-title);color:#fff;letter-spacing:.05em;line-height:1.5}
+.ac-head small{font-size:inherit;color:var(--ac-lil)}
+.ac .ac-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;background:var(--ac-well)}
+.ac-tile a{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:2px 12px;align-items:center;height:100%;padding:10px 12px;background:var(--ac-ink);border:2px solid;border-color:var(--ac-lil) #120c20 #120c20 var(--ac-lil);color:var(--ac-aq);text-decoration:none}
+.ac-tile svg{grid-row:1/3;width:32px;height:32px;color:var(--ac-lil)}
+.ac-tile__label{color:var(--ac-lil);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase}
+.ac-tile__handle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.ac-tile a:hover,.ac-tile a:focus-visible{background:var(--ac-title);outline:0}
+.ac-tile a:hover svg,.ac-tile a:focus-visible svg{color:var(--ac-aq)}
+.ac-tile--wide{grid-column:span 2}
+.ac-tile a:active{border-color:#120c20 var(--ac-lil) var(--ac-lil) #120c20}
+@media (max-width:900px){.ac .ac-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ac-tile:last-child{grid-column:span 2}}
+@media (max-width:684px){
+  .ac-sky{height:96px}
+  .ac-name{font-size:32px}
+  .ac-id{padding:12px}
+  .ac-roles li{grid-template-columns:minmax(0,1fr)}
+  .ac-roles span{text-align:left}
+  .ac .ac-grid{padding:8px}
+  .ac-tile a{gap:2px 8px;padding:8px}
+  .ac-tile svg{width:24px;height:24px}
+}
+</style>
+<div class="ac">
+  <section class="ac-card" aria-labelledby="ac-name">
+    {{ partial "px/skyline.html" . }}
+    <div class="ac-id">
+      <p class="ac-kick">ARKNDJL :: about / contact</p>
+      <h1 class="ac-name" id="ac-name">Noah Dengler</h1>
+      <p class="ac-loc"><svg aria-hidden="true"><use href="#icon-pin"/></svg>New York City</p>
+      <ul class="ac-roles">
+        <li><b>Baseball Operations Analyst</b><span>Driveline</span></li>
+        <li><b>Data Science Consultant</b><span>Agentiq Sports</span></li>
+        <li><b>Mathematics &amp; economics</b><span>NYU</span></li>
+      </ul>
+      <p class="ac-blurb">Quantitative, qualitative and creative work: sabermetrics, prospect evaluation, economics, art and music. This site is portfolio and blog for that work.</p>
+    </div>
+  </section>
+  <section class="ac-card" id="contact" aria-labelledby="ac-contact">
+    <h2 class="ac-head" id="ac-contact">contact.exe <small>{{ len $rows }} links</small></h2>
+    <ul class="ac-grid">
+      {{- range $rows }}
+      <li class="ac-tile {{ .cls }}"><a href="{{ .href }}"{{ if not (hasPrefix .href "mailto:") }} target="_blank" rel="noopener me"{{ end }}><svg aria-hidden="true"><use href="#icon-{{ .icon }}"/></svg><span class="ac-tile__label">{{ .label }}</span><span class="ac-tile__handle">{{ .handle }}</span></a></li>
+      {{- end }}
+    </ul>
+  </section>
+</div>

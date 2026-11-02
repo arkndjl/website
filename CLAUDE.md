@@ -22,7 +22,7 @@
 - The ARKBOARD section with Research, Glossary/Methodology and Data Sources tabs is **Reference**: page
   `content/arkboard-reference.md`, URL `/arkboard/reference/`, short link `arkndjl.net/reference`, menu identifier
   `arkboard-reference`. Never call it "Library" (that is ARKLIBRARY) or "Lab". `/library`, `/lab`, `/arkboard/library/`
-  and `/arkboard/lab/` redirect to it in `static/_redirects`. Add the Research and Glossary/Methodology tabs to that
-  page's `wintabs` ahead of "data sources".
+  and `/arkboard/lab/` redirect to it in `static/_redirects`. The page is written by `scripts/library_build.py`
+  (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it rather than hand-editing.
 - Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
   source adds the source there (name, link, what the site takes from it).

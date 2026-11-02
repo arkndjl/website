@@ -1,0 +1,125 @@
+{
+  "id": "cs2-pistol-loser-buy",
+  "sport": "CS2",
+  "question": "After losing the pistol round, should the team save or buy on round 2?",
+  "answer": "Buying on round 2: +26.8 pp in round 2, -16.5 pp in round 3, map win -0.8 pp (not different from 0).",
+  "findings": [
+    "CT buy vs save, adjusted: R2 +25.0 pp (+24.0 to +25.9 pp), R3 -17.0 pp (-18.6 to -15.5 pp). 66% of CT losers buy.",
+    "T buy vs save, adjusted: R2 +28.3 pp (+27.3 to +29.4 pp), R3 -16.0 pp (-17.6 to -14.5 pp). 50% of T losers buy.",
+    "Map win, buy vs save: CT -1.1 pp (-2.6 to +0.3 pp), T -0.8 pp (-2.2 to +0.7 pp).",
+    "First-half rounds won (of 12), buy vs save: CT +0.30 (+0.20 to +0.40), T +0.27 (+0.17 to +0.37)."
+  ],
+  "method": "Pistol loser's round-2 buy class from bo3.gg equipment value (save = eco, buy = half/force). Logistic models adjust for side, team Elo, winner's round-2 equipment, loser's pistol kills and half; cluster-robust CIs by map.",
+  "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 34,640 pistol-loss halves (16,992 CT)",
+  "n": 34640,
+  "robust": false,
+  "interest": 4,
+  "split_check": "Map effect early/late: CT -1.1 pp / -1.1 pp, T +0.9 pp / -2.6 pp.",
+  "chart": {
+    "type": "bar",
+    "title": "Pistol loser win %, save vs buy on round 2",
+    "x_label": "side and outcome",
+    "y_label": "win %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "save round 2",
+        "points": [
+          {
+            "x": "CT R2",
+            "y": 0.0261,
+            "lo": 0.022,
+            "hi": 0.0302,
+            "n": 5788
+          },
+          {
+            "x": "CT R3",
+            "y": 0.5003,
+            "lo": 0.4875,
+            "hi": 0.5132,
+            "n": 5788
+          },
+          {
+            "x": "CT map",
+            "y": 0.3981,
+            "lo": 0.3869,
+            "hi": 0.4093,
+            "n": 5788
+          },
+          {
+            "x": "T R2",
+            "y": 0.0308,
+            "lo": 0.0272,
+            "hi": 0.0344,
+            "n": 8866
+          },
+          {
+            "x": "T R3",
+            "y": 0.5039,
+            "lo": 0.4936,
+            "hi": 0.5143,
+            "n": 8866
+          },
+          {
+            "x": "T map",
+            "y": 0.3953,
+            "lo": 0.3866,
+            "hi": 0.4041,
+            "n": 8866
+          }
+        ]
+      },
+      {
+        "name": "buy round 2",
+        "points": [
+          {
+            "x": "CT R2",
+            "y": 0.2789,
+            "lo": 0.2706,
+            "hi": 0.2872,
+            "n": 11204
+          },
+          {
+            "x": "CT R3",
+            "y": 0.3377,
+            "lo": 0.329,
+            "hi": 0.3465,
+            "n": 11204
+          },
+          {
+            "x": "CT map",
+            "y": 0.4093,
+            "lo": 0.4019,
+            "hi": 0.4168,
+            "n": 11204
+          },
+          {
+            "x": "T R2",
+            "y": 0.3297,
+            "lo": 0.3198,
+            "hi": 0.3395,
+            "n": 8782
+          },
+          {
+            "x": "T R3",
+            "y": 0.354,
+            "lo": 0.344,
+            "hi": 0.364,
+            "n": 8782
+          },
+          {
+            "x": "T map",
+            "y": 0.4194,
+            "lo": 0.4104,
+            "hi": 0.4284,
+            "n": 8782
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

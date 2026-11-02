@@ -508,62 +508,6 @@ th {
   color: color-mix(in srgb, var(--foreground) 60%, transparent);
 }
 
-/* Contact list ({{< contact >}} shortcode) */
-.post ul.contact {
-  list-style: none;
-  margin: 25px 0;
-  padding: 0;
-}
-
-.post ul.contact li {
-  margin: 0 0 14px;
-}
-
-.post ul.contact li::before {
-  content: none;
-}
-
-.contact a {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  text-decoration: none;
-  color: var(--foreground);
-}
-
-.contact svg {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 auto;
-  fill: currentColor;
-  color: var(--accent);
-  shape-rendering: crispEdges;
-}
-
-.contact__label {
-  min-width: 12.5ch;
-  white-space: nowrap;
-  color: var(--accent);
-  letter-spacing: 0.125em;
-  text-transform: uppercase;
-}
-
-.contact__handle {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-}
-
-.contact a:hover .contact__handle,
-.contact a:focus-visible .contact__handle {
-  color: var(--accent);
-}
-
-@media (max-width: 684px) {
-  .contact a { gap: 12px; }
-  .contact__label { min-width: 0; }
-}
-
 /* Icons inside the menu and link-card titles (e.g. the eephus.io favicon) */
 .menu__icon,
 .link-card__icon {
@@ -4482,3 +4426,68 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 }
 .post-content .st-team img.cfb__logo { display: inline-block; vertical-align: -4px; margin-right: 2px; }
 .post-content .st-mini img.cfb__logo { width: 16px; height: 16px; vertical-align: -3px; }
+/* ------------------------------------------------------------------
+   Library (/arkboard/library/): research study cards + glossary windows
+   (layouts/shortcodes/libresearch.html, libglossary.html; data from scripts/library_build.py)
+   ------------------------------------------------------------------ */
+.libgrid { align-items: start; }
+.libgrid--one { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1100px) { .libtabs .wintabs__glabel { letter-spacing: 0.02em; text-align: center; } }
+.libstudy, .libterm { margin: 0; }
+.libstudy__body, .libterm__body { margin: 10px 12px; }
+.libstudy__q { margin: 0 0 8px; font-size: 1.05em; font-weight: 400; color: #fff; }
+.libstudy__answer {
+  margin: 0 0 10px;
+  padding: 6px 8px;
+  background: var(--win-well);
+  border-left: 4px solid var(--foreground);
+  color: var(--foreground);
+}
+.libstudy__chart {
+  margin: 0 0 10px;
+  padding: 6px;
+  background: var(--win-dark);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+.libchart { display: block; width: 100%; height: auto; font-size: 10px; }
+.libchart text { fill: var(--accent); font-family: inherit; }
+.libchart .lc-tick { font-size: 10px; }
+.libchart .lc-label, .libchart .lc-reftext, .libchart .lc-marktext { font-size: 10px; fill: color-mix(in srgb, var(--accent) 75%, transparent); }
+.libchart .lc-marktext { fill: #fff; }
+.libchart .lc-grid { fill: color-mix(in srgb, var(--accent) 14%, transparent); }
+.libchart .lc-axis { fill: var(--accent); }
+.libchart .lc-ref { fill: #fff; opacity: .7; }
+.libchart .lc-mark { fill: #fff; }
+.libchart .lc-ci { fill: color-mix(in srgb, var(--accent) 55%, transparent); }
+.libchart .lc-s0 { fill: var(--foreground); }
+.libchart .lc-s1 { fill: var(--accent); }
+.libchart .lc-s2 { fill: #b46cff; }
+.libchart .lc-bar.lc-s0 { fill: color-mix(in srgb, var(--foreground) 80%, transparent); }
+.libstudy__legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 0; font-size: .85em; }
+.lc-key::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+.lc-k0::before { background: var(--foreground); }
+.lc-k1::before { background: var(--accent); }
+.lc-k2::before { background: #b46cff; }
+.libstudy__find, .libterm__lines { margin: 0 0 10px; padding-left: 0; list-style: none; }
+.libstudy__find li, .libterm__lines li { position: relative; padding-left: 14px; margin: 0 0 4px; }
+.post ul.libstudy__find li::before, .post ul.libterm__lines li::before,
+.libstudy__find li::before, .libterm__lines li::before {
+  content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; background: var(--accent); color: transparent;
+}
+.libstudy__meta { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; font-size: .85em; }
+.libstudy__meta dt { color: var(--accent); }
+.libstudy__meta dd { margin: 0; color: color-mix(in srgb, var(--foreground) 80%, transparent); }
+.libstudy__tag { padding: 0 6px; background: var(--win-well); color: var(--accent); }
+.libstudy__tag.is-robust { background: var(--foreground); color: var(--win-dark); }
+.libterm__short { margin: 0 0 8px; color: var(--foreground); }
+.libfv__wrap { overflow-x: auto; }
+.libfv { width: 100%; border-collapse: collapse; font-size: .9em; }
+.libfv th, .libfv td { padding: 3px 8px; border-bottom: 1px solid var(--win-well); text-align: left; vertical-align: top; }
+.libfv thead th { background: var(--win-title); color: #fff; }
+.libfv tbody th { color: var(--foreground); white-space: nowrap; }
+@media (max-width: 684px) {
+  .libstudy__body, .libterm__body { margin: 8px; }
+  .libstudy__meta { grid-template-columns: 1fr; }
+  .libstudy__meta dt { margin-top: 4px; }
+}

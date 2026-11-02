@@ -1,0 +1,33 @@
+{{- /* Library > Glossary/Methodology: one section of data/library.json (research/library.json via scripts/library_build.py).
+       {{< libglossary tab="FV" section="fv" >}}   entries of that section as term windows.
+       {{< libglossary tab="FV scales" fv="true" >}} the FV conversion tables, one window per board. */ -}}
+{{- $sec := .Get "section" -}}
+<div class="desk libgrid{{ if eq (.Get "fv") "true" }} libgrid--one{{ end }}" data-tab="{{ .Get "tab" }}">
+{{- if eq (.Get "fv") "true" }}
+{{- range site.Data.library.fv_tables }}
+<div class="win libterm">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>FV scale :: {{ .board }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libterm__body">
+    {{- with .note }}<p class="libterm__short">{{ . }}</p>{{ end }}
+    <div class="libfv__wrap"><table class="libfv">
+      <thead><tr>{{ range .cols }}<th>{{ . }}</th>{{ end }}</tr></thead>
+      <tbody>{{ range .rows }}<tr>{{ range $i, $c := . }}{{ if eq $i 0 }}<th>{{ $c }}</th>{{ else }}<td>{{ $c }}</td>{{ end }}{{ end }}</tr>{{ end }}</tbody>
+    </table></div>
+  </div>
+</div>
+{{- end }}
+{{- else }}
+{{- range site.Data.library.sections }}{{ if eq .id $sec }}
+{{- range .entries }}
+<div class="win libterm" id="g-{{ .term | urlize }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>{{ .term }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libterm__body">
+    <p class="libterm__short">{{ .short }}</p>
+    {{- with .body }}<ul class="libterm__lines">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+  </div>
+  <div class="win__status"><span>{{ with .sports }}{{ delimit . " · " }}{{ end }}</span><span>{{ .where }}</span></div>
+</div>
+{{- end }}
+{{- end }}{{ end }}
+{{- end }}
+</div>

@@ -1,0 +1,141 @@
+{
+  "id": "nhl-score-effects",
+  "sport": "NHL",
+  "question": "How much do score effects tilt 5v5 shots, and do goals follow?",
+  "answer": "Trailing teams take 52.3% of unblocked attempts down 1, 53.9% down 3+. Goal share: 50.3% and 47.6%.",
+  "findings": [
+    "Down 1: 52.3% attempt share (51.9-52.6), 50.3% goal share (49.1-51.5).",
+    "Down 1 shooting: 5.93% (5.72-6.16) for vs 6.41% against.",
+    "Down 3+: 53.9% of attempts, 47.6% of goals (45.8-49.4); n=44,721 attempts."
+  ],
+  "method": "Unblocked 5v5 attempts (shots, misses, goals), periods 1-3, by score before the attempt. Game-cluster bootstrap CIs.",
+  "data": "NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games; 356,473 attempts.",
+  "n": 5248,
+  "robust": true,
+  "interest": 2,
+  "split_check": "Down-1 attempt share 51.8% in 2021-23, 52.7% in 2023-25.",
+  "chart": {
+    "type": "bar",
+    "title": "5v5 share by score state",
+    "x_label": "score state",
+    "y_label": "share %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "even"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "unblocked attempts",
+        "points": [
+          {
+            "x": "down 3+",
+            "y": 0.5393,
+            "lo": 0.5334,
+            "hi": 0.5454,
+            "n": 44721
+          },
+          {
+            "x": "down 2",
+            "y": 0.5349,
+            "lo": 0.5296,
+            "hi": 0.5403,
+            "n": 59173
+          },
+          {
+            "x": "down 1",
+            "y": 0.5225,
+            "lo": 0.5188,
+            "hi": 0.5262,
+            "n": 125957
+          },
+          {
+            "x": "tied",
+            "y": 0.5,
+            "lo": 0.5,
+            "hi": 0.5,
+            "n": 253244
+          },
+          {
+            "x": "up 1",
+            "y": 0.4775,
+            "lo": 0.4738,
+            "hi": 0.4812,
+            "n": 125957
+          },
+          {
+            "x": "up 2",
+            "y": 0.4651,
+            "lo": 0.4597,
+            "hi": 0.4704,
+            "n": 59173
+          },
+          {
+            "x": "up 3+",
+            "y": 0.4607,
+            "lo": 0.4546,
+            "hi": 0.4666,
+            "n": 44721
+          }
+        ]
+      },
+      {
+        "name": "goals",
+        "points": [
+          {
+            "x": "down 3+",
+            "y": 0.4756,
+            "lo": 0.4584,
+            "hi": 0.4938,
+            "n": 2689
+          },
+          {
+            "x": "down 2",
+            "y": 0.5037,
+            "lo": 0.4879,
+            "hi": 0.5198,
+            "n": 3641
+          },
+          {
+            "x": "down 1",
+            "y": 0.5031,
+            "lo": 0.4908,
+            "hi": 0.5155,
+            "n": 7760
+          },
+          {
+            "x": "tied",
+            "y": 0.5,
+            "lo": 0.5,
+            "hi": 0.5,
+            "n": 14772
+          },
+          {
+            "x": "up 1",
+            "y": 0.4969,
+            "lo": 0.4845,
+            "hi": 0.5092,
+            "n": 7760
+          },
+          {
+            "x": "up 2",
+            "y": 0.4963,
+            "lo": 0.4802,
+            "hi": 0.5121,
+            "n": 3641
+          },
+          {
+            "x": "up 3+",
+            "y": 0.5244,
+            "lo": 0.5062,
+            "hi": 0.5416,
+            "n": 2689
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

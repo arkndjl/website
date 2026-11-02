@@ -1,0 +1,82 @@
+{
+  "id": "cs2-pistol-value",
+  "sport": "CS2",
+  "question": "How much is the first pistol round worth, and does the side matter?",
+  "answer": "First pistol winner takes the map 59.5%: 57.1% on CT, 61.9% on T.",
+  "findings": [
+    "Pistol 1 won on CT: map win 57.1% (56.1%-58.2%, n=8,809).",
+    "Pistol 1 won on T: map win 61.9% (60.9%-63.0%, n=8,716).",
+    "Both pistols: 69.3% map win (n=8,912). Split pistols, P1 winner: 49.4%.",
+    "Above Elo expectation: P1 on T +11.3 pp, on CT +6.0 pp. Win vs lose P1, Elo-adjusted: +17.2 pp (+16.0 to +18.6 pp)."
+  ],
+  "method": "Map win % for pistol round winners (rounds 1 and 13), Wilson CIs. Team strength: logistic model with pre-map Elo; pistol effects as average marginal change, map-clustered CIs.",
+  "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps",
+  "n": 17525,
+  "robust": true,
+  "interest": 4,
+  "split_check": "P1 winner map win: early 59.3% (n=8,762), late 59.7% (n=8,763).",
+  "chart": {
+    "type": "bar",
+    "title": "Map win % after winning a pistol round",
+    "x_label": "pistol result",
+    "y_label": "map win %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "50%"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "pistol winner",
+        "points": [
+          {
+            "x": "P1 won on CT",
+            "y": 0.5712,
+            "lo": 0.5609,
+            "hi": 0.5815,
+            "n": 8809
+          },
+          {
+            "x": "P1 won on T",
+            "y": 0.6194,
+            "lo": 0.6092,
+            "hi": 0.6296,
+            "n": 8716
+          },
+          {
+            "x": "P2 won on CT",
+            "y": 0.6207,
+            "lo": 0.6106,
+            "hi": 0.6306,
+            "n": 9021
+          },
+          {
+            "x": "P2 won on T",
+            "y": 0.5794,
+            "lo": 0.5688,
+            "hi": 0.5898,
+            "n": 8504
+          },
+          {
+            "x": "both pistols",
+            "y": 0.6925,
+            "lo": 0.6829,
+            "hi": 0.702,
+            "n": 8912
+          },
+          {
+            "x": "split, won P1",
+            "y": 0.4945,
+            "lo": 0.4839,
+            "hi": 0.505,
+            "n": 8613
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true,
+  "order": 1
+}
