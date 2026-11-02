@@ -1,0 +1,128 @@
+{
+  "id": "tennis-tiebreak-serve-strength",
+  "sport": "tennis",
+  "question": "Do bigger servers win tiebreaks more often than their point-level edge predicts?",
+  "answer": "No. Bigger server wins 60.4% of tiebreaks; an iid point model predicts 61.0%.",
+  "findings": [
+    "Actual minus model: -0.5 pts (95% CI -2.0 to +0.9), n=4,409 tiebreaks.",
+    "Men -1.2 pts (n=3,481); women +1.9 pts (n=928).",
+    "Bigger server at 72%+ serve pts won: -2.9 pts vs model (SE 1.3, n=1,349); partly regression to mean.",
+    "First server in the tiebreak: +0.9 pts vs model (SE 0.7)."
+  ],
+  "method": "Model: each player's serve-point win rate in the same match outside tiebreaks, points iid, 7-point serve order. Edges measured in-match regress to the mean, so the model overstates large edges. SE by match.",
+  "data": "Match Charting Project points, 3,609 matches, 4,409 tiebreaks at 6-6 (10-point tiebreaks excluded).",
+  "n": 4409,
+  "robust": true,
+  "interest": 2,
+  "split_check": "Actual minus model, pre-2015 +1.0 pts, 2015+ -1.2 pts.",
+  "chart": {
+    "type": "bar",
+    "title": "Tiebreak win rate of the bigger server",
+    "x_label": "serve-point win rate edge, pts",
+    "y_label": "tiebreaks won",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "even"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "actual",
+        "points": [
+          {
+            "x": "0-2",
+            "y": 0.5442,
+            "lo": 0.5096,
+            "hi": 0.5784,
+            "n": 803
+          },
+          {
+            "x": "2-4",
+            "y": 0.5601,
+            "lo": 0.5251,
+            "hi": 0.5945,
+            "n": 782
+          },
+          {
+            "x": "4-6",
+            "y": 0.5976,
+            "lo": 0.5623,
+            "hi": 0.632,
+            "n": 758
+          },
+          {
+            "x": "6-8",
+            "y": 0.6066,
+            "lo": 0.5672,
+            "hi": 0.6445,
+            "n": 610
+          },
+          {
+            "x": "8-10",
+            "y": 0.6568,
+            "lo": 0.6128,
+            "hi": 0.6982,
+            "n": 472
+          },
+          {
+            "x": "10-14",
+            "y": 0.6573,
+            "lo": 0.6174,
+            "hi": 0.6951,
+            "n": 569
+          },
+          {
+            "x": "14+",
+            "y": 0.6819,
+            "lo": 0.6356,
+            "hi": 0.7249,
+            "n": 415
+          }
+        ]
+      },
+      {
+        "name": "iid model",
+        "points": [
+          {
+            "x": "0-2",
+            "y": 0.5171,
+            "n": 803
+          },
+          {
+            "x": "2-4",
+            "y": 0.5496,
+            "n": 782
+          },
+          {
+            "x": "4-6",
+            "y": 0.5835,
+            "n": 758
+          },
+          {
+            "x": "6-8",
+            "y": 0.6168,
+            "n": 610
+          },
+          {
+            "x": "8-10",
+            "y": 0.6502,
+            "n": 472
+          },
+          {
+            "x": "10-14",
+            "y": 0.6945,
+            "n": 569
+          },
+          {
+            "x": "14+",
+            "y": 0.7768,
+            "n": 415
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

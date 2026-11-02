@@ -1,0 +1,96 @@
+{
+  "id": "nba-ft-icing",
+  "sport": "NBA",
+  "question": "Does a timeout before a late free throw make the shooter miss?",
+  "answer": "No measurable effect: iced shooters +0.6 pp vs un-iced, relative to own FT% (CI -5.2 to +5.8).",
+  "findings": [
+    "Iced: 77.3% made (CI 71.5-82.2), shooters' usual 79.6%, n=233.",
+    "Not iced: 76.5% made (CI 75.7-77.2), shooters' usual 79.4%, n=11642.",
+    "Iced minus not iced, vs own FT%: +0.6 pp (95% CI -5.2 to +5.8)."
+  ],
+  "method": "First FT of a trip, last 2:00 of regulation or OT, margin within 3. Iced = defense timeout between foul and FT. Outcome = made minus shooter's leave-one-out FT% (min 20 other FTs); game-clustered bootstrap.",
+  "data": "ESPN play-by-play via sportsdataverse, NBA, 2011-12 to 2025-26, 11,875 first free throws.",
+  "n": 11875,
+  "robust": false,
+  "interest": 3,
+  "split_check": "Iced minus not iced: -9.7 pp in 2012-19 (CI -27.5 to +7.5), +1.8 in 2020-26 (CI -4.0 to +7.2).",
+  "chart": {
+    "type": "bar",
+    "title": "NBA: first FT make % late and close, by shooter's usual FT%",
+    "x_label": "shooter FT% (other attempts)",
+    "y_label": "made %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "iced",
+        "points": [
+          {
+            "x": "<65%",
+            "y": 0.889,
+            "lo": 0.565,
+            "hi": 0.98,
+            "n": 9
+          },
+          {
+            "x": "65-75%",
+            "y": 0.612,
+            "lo": 0.472,
+            "hi": 0.736,
+            "n": 49
+          },
+          {
+            "x": "75-85%",
+            "y": 0.811,
+            "lo": 0.733,
+            "hi": 0.871,
+            "n": 122
+          },
+          {
+            "x": "85%+",
+            "y": 0.811,
+            "lo": 0.686,
+            "hi": 0.894,
+            "n": 53
+          }
+        ]
+      },
+      {
+        "name": "not iced",
+        "points": [
+          {
+            "x": "<65%",
+            "y": 0.543,
+            "lo": 0.502,
+            "hi": 0.583,
+            "n": 582
+          },
+          {
+            "x": "65-75%",
+            "y": 0.673,
+            "lo": 0.652,
+            "hi": 0.693,
+            "n": 2054
+          },
+          {
+            "x": "75-85%",
+            "y": 0.778,
+            "lo": 0.768,
+            "hi": 0.788,
+            "n": 6421
+          },
+          {
+            "x": "85%+",
+            "y": 0.854,
+            "lo": 0.84,
+            "hi": 0.867,
+            "n": 2585
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

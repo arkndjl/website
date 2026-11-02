@@ -1,0 +1,105 @@
+{
+  "id": "mlb-tto",
+  "sport": "MLB",
+  "question": "Does the times-through-the-order penalty justify pulling starters before the 3rd time?",
+  "answer": "For an average starter, yes. 3rd time: +.022 wOBA vs 1st (same pitcher), .339 vs relievers .323.",
+  "findings": [
+    "Within pitcher-season: 2nd time +.013 (CI +.011 to +.016), 3rd time +.022 (CI +.020 to +.025) wOBA vs 1st.",
+    "Pitch count adds nothing: -.004 (CI -.012 to +.004) per 100 pitches; 3rd time stays +.025.",
+    "Jump at batter 19: +.017 (SE .003) in 2015-19, +.000 (SE .003) in 2020-25, a smooth rise instead.",
+    "Batter-adjusted wOBA: starters 1st time .321, 3rd time .339; relievers inn. 6+ .323 (n=664,061)."
+  ],
+  "method": "OLS on PA wOBA with pitcher-season fixed effects, batter-season wOBA, platoon and home; SE clustered by game. Survivors to the 3rd time are pitchers having better days, so the penalty is if anything understated.",
+  "data": "Retrosheet play-by-play, 2015-2025 regular season, 1,109,963 starter PAs (1st-3rd time), 24,958 games. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).",
+  "n": 1109963,
+  "robust": true,
+  "interest": 3,
+  "split_check": "3rd-time penalty +.024 in 2015-19 and +.020 in 2020-25; discrete jumps only in 2015-19.",
+  "chart": {
+    "type": "line",
+    "title": "Starter wOBA allowed by batters faced, within pitcher",
+    "x_label": "batters faced (3-batter bins)",
+    "y_label": "wOBA allowed",
+    "y_fmt": "num",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.323,
+      "label": "relievers, inn. 6+"
+    },
+    "mark": {
+      "x": 18.5,
+      "label": "3rd time through"
+    },
+    "series": [
+      {
+        "name": "starters",
+        "points": [
+          {
+            "x": 2,
+            "y": 0.319,
+            "lo": 0.319,
+            "hi": 0.319,
+            "n": 149659
+          },
+          {
+            "x": 5,
+            "y": 0.3238,
+            "lo": 0.3199,
+            "hi": 0.3277,
+            "n": 148582
+          },
+          {
+            "x": 8,
+            "y": 0.3197,
+            "lo": 0.3157,
+            "hi": 0.3236,
+            "n": 146697
+          },
+          {
+            "x": 11,
+            "y": 0.3287,
+            "lo": 0.3248,
+            "hi": 0.3326,
+            "n": 144578
+          },
+          {
+            "x": 14,
+            "y": 0.3381,
+            "lo": 0.3341,
+            "hi": 0.3421,
+            "n": 141686
+          },
+          {
+            "x": 17,
+            "y": 0.3329,
+            "lo": 0.3288,
+            "hi": 0.337,
+            "n": 136136
+          },
+          {
+            "x": 20,
+            "y": 0.3377,
+            "lo": 0.3335,
+            "hi": 0.3418,
+            "n": 120438
+          },
+          {
+            "x": 23,
+            "y": 0.3483,
+            "lo": 0.3436,
+            "hi": 0.353,
+            "n": 84681
+          },
+          {
+            "x": 26,
+            "y": 0.3421,
+            "lo": 0.3361,
+            "hi": 0.3481,
+            "n": 37130
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

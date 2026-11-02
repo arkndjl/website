@@ -1,0 +1,97 @@
+{
+  "id": "mlb-ghost-runner",
+  "sport": "MLB",
+  "question": "With the extra-inning runner on 2nd, does bunting the runner to 3rd pay, and has the home edge changed?",
+  "answer": "No measurable edge either way; visitors' bunts -0.16 runs (CI -0.35 to +0.02). Home teams win 50.0% of extra games.",
+  "findings": [
+    "Visitors, tied, leadoff bunt try vs swing: runs -0.16 (CI -0.35 to +0.02), win -1.2 pts (CI -9.3 to +6.5).",
+    "Home, tied, bunt try vs swing: scored -0.3 pts (CI -9.1 to +8.4), win +1.0 pts (CI -6.1 to +7.8).",
+    "Home win % in extra-inning games: 51.4% 2015-19 (n=1,003), 50.0% 2020-25 (n=1,125).",
+    "Leadoff bunt attempt rate in extras: 13.9% of 3,132 halves; bunters hit -15 pts of wOBA vs swingers +4."
+  ],
+  "method": "Leadoff PA of each extra half-inning (runner on 2nd, 0 out), non-pitchers. Bunt try = bunt in play or a foul/missed bunt. Linear model with batter-season wOBA and season; game bootstrap CIs. Intent beyond the batter is not observed.",
+  "data": "Retrosheet play-by-play, 2020-2025 regular season (7-inning games removed), 2,232 tied extra half-innings; 2015-19 extras for home win %. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).",
+  "n": 2232,
+  "robust": false,
+  "interest": 2,
+  "split_check": "Win diff, bunt minus swing: visitors -9.8 pts 2020-22, +1.9 2023-25; home +8.8, +0.4 (raw).",
+  "chart": {
+    "type": "bar",
+    "title": "Leadoff with runner on 2nd, tied extra innings",
+    "x_label": "half-inning: outcome",
+    "y_label": "batting team %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "swing away",
+        "points": [
+          {
+            "x": "top: scored",
+            "y": 0.58,
+            "lo": 0.554,
+            "hi": 0.606,
+            "n": 1386
+          },
+          {
+            "x": "top: won",
+            "y": 0.504,
+            "lo": 0.477,
+            "hi": 0.53,
+            "n": 1386
+          },
+          {
+            "x": "bottom: scored",
+            "y": 0.585,
+            "lo": 0.54,
+            "hi": 0.628,
+            "n": 472
+          },
+          {
+            "x": "bottom: won",
+            "y": 0.786,
+            "lo": 0.747,
+            "hi": 0.821,
+            "n": 472
+          }
+        ]
+      },
+      {
+        "name": "bunt try",
+        "points": [
+          {
+            "x": "top: scored",
+            "y": 0.544,
+            "lo": 0.471,
+            "hi": 0.615,
+            "n": 182
+          },
+          {
+            "x": "top: won",
+            "y": 0.473,
+            "lo": 0.401,
+            "hi": 0.545,
+            "n": 182
+          },
+          {
+            "x": "bottom: scored",
+            "y": 0.604,
+            "lo": 0.534,
+            "hi": 0.671,
+            "n": 192
+          },
+          {
+            "x": "bottom: won",
+            "y": 0.823,
+            "lo": 0.763,
+            "hi": 0.87,
+            "n": 192
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

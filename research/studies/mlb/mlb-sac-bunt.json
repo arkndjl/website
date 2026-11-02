@@ -1,0 +1,128 @@
+{
+  "id": "mlb-sac-bunt",
+  "sport": "MLB",
+  "question": "Do sacrifice-bunt tries with nobody out gain win probability?",
+  "answer": "No. Bunt tries cost 0.3 to 0.9 win-prob pts per try vs swinging; late and close, up to 1.9.",
+  "findings": [
+    "Runner on 1st, 0 out: -0.3 pts (CI -0.4 to -0.1), n=5,068 tries of 107,555 PAs.",
+    "Runner on 2nd: -0.7 pts (CI -1.0 to -0.4). 1st and 2nd: -0.9 pts (CI -1.1 to -0.6).",
+    "1st and 2nd, 7th inning on, within 1 run: -1.9 pts (CI -2.8 to -1.0), n=700 tries.",
+    "Realized WE to end of inning: no CI excludes 0 (1st: -0.2 pts). Try rate 9.1% 2015, 6.5% 2025."
+  ],
+  "method": "Non-pitcher PAs, 0 out, innings 1-9. Bunt try = bunt in play or foul/missed bunt. Outcome: change in empirical WE over the PA. OLS with batter and on-deck season wOBA, inning x score x season cells; SE clustered by game.",
+  "data": "Retrosheet play-by-play, 2015-2025 regular season, 158,989 PAs with runners on and 0 out, 9,669 bunt tries. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).",
+  "n": 158989,
+  "robust": true,
+  "interest": 2,
+  "split_check": "PA-level loss in both eras for 2nd and 1st+2nd; runner on 1st: -0.5 pts 2015-19, -0.0 2020-25 (n.s.).",
+  "chart": {
+    "type": "bar",
+    "title": "Bunt try minus swing away, 0 out",
+    "x_label": "runners, game state",
+    "y_label": "win-prob pts",
+    "y_fmt": "signed",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "no effect"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "over the PA",
+        "points": [
+          {
+            "x": "1st, all",
+            "y": -0.26,
+            "lo": -0.42,
+            "hi": -0.1,
+            "n": 107555
+          },
+          {
+            "x": "1st, late",
+            "y": -0.72,
+            "lo": -1.15,
+            "hi": -0.29,
+            "n": 11158
+          },
+          {
+            "x": "2nd, all",
+            "y": -0.7,
+            "lo": -0.96,
+            "hi": -0.43,
+            "n": 25333
+          },
+          {
+            "x": "2nd, late",
+            "y": -0.85,
+            "lo": -1.8,
+            "hi": 0.1,
+            "n": 2177
+          },
+          {
+            "x": "1st+2nd, all",
+            "y": -0.85,
+            "lo": -1.15,
+            "hi": -0.56,
+            "n": 26101
+          },
+          {
+            "x": "1st+2nd, late",
+            "y": -1.88,
+            "lo": -2.76,
+            "hi": -1.01,
+            "n": 2538
+          }
+        ]
+      },
+      {
+        "name": "to end of inning",
+        "points": [
+          {
+            "x": "1st, all",
+            "y": -0.17,
+            "lo": -0.64,
+            "hi": 0.3,
+            "n": 107555
+          },
+          {
+            "x": "1st, late",
+            "y": -0.77,
+            "lo": -2.04,
+            "hi": 0.5,
+            "n": 11158
+          },
+          {
+            "x": "2nd, all",
+            "y": 0.07,
+            "lo": -0.61,
+            "hi": 0.76,
+            "n": 25333
+          },
+          {
+            "x": "2nd, late",
+            "y": 1.35,
+            "lo": -1.05,
+            "hi": 3.75,
+            "n": 2177
+          },
+          {
+            "x": "1st+2nd, all",
+            "y": -0.25,
+            "lo": -1.02,
+            "hi": 0.52,
+            "n": 26101
+          },
+          {
+            "x": "1st+2nd, late",
+            "y": -0.02,
+            "lo": -2.39,
+            "hi": 2.34,
+            "n": 2538
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}
