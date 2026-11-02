@@ -252,16 +252,22 @@ def bt_logs(season):
     live = season >= BT_LIVE_SEASON and season not in _BT_PULLED
     if live or not os.path.exists(p) or os.path.getsize(p) < 2000:
         os.makedirs(BTLOG, exist_ok=True)
-        subprocess.run(['curl', '-s', '-m', '300', '-A', UA, f'https://barttorvik.com/{season}_all_advgames.json.gz', '-o', p + '.new'], check=False)
-        try:
-            with open(p + '.new', 'rb') as fh:
-                good = fh.read(2) == b'\x1f\x8b'
-        except OSError:
-            good = False
-        if good:
-            os.replace(p + '.new', p)
+        if live:
+            # a page in place of the file: the games the cached logs lack come from ESPN's box scores in Barttorvik's
+            # row shape (scripts/cbb_espn_logs.py: box counts exact, game BPM by a held-out regression)
+            import cbb_espn_logs as EL
+            EL.pull(season, p, ua=UA)
         else:
-            print(f'barttorvik {season} game logs: got a page, not the file' + (', keeping the cached logs' if os.path.exists(p) else ''))
+            subprocess.run(['curl', '-s', '-m', '300', '-A', UA, f'https://barttorvik.com/{season}_all_advgames.json.gz', '-o', p + '.new'], check=False)
+            try:
+                with open(p + '.new', 'rb') as fh:
+                    good = fh.read(2) == b'\x1f\x8b'
+            except OSError:
+                good = False
+            if good:
+                os.replace(p + '.new', p)
+            else:
+                print(f'barttorvik {season} game logs: got a page, not the file' + (', keeping the cached logs' if os.path.exists(p) else ''))
         _BT_PULLED.add(season)
     try:
         rows = json.load(gzip.open(p))
