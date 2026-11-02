@@ -1,0 +1,74 @@
+{
+  "id": "soccer-penalty-placement",
+  "sport": "soccer",
+  "question": "Where should a penalty taker aim?",
+  "answer": "Placement barely matters: high 75%, low 72%, centre 76%; CIs overlap. Shootout kicks 66% vs 75% in play.",
+  "findings": [
+    "Upper half of goal: 74.7% scored (CI 70.5%-78.4%, n=462); lower half 71.5% (n=685). Misses over the bar included.",
+    "Centre third: 75.9% (CI 67.2%-82.9%, n=112); chosen on 10% of kicks.",
+    "Kicking foot's natural side 73.1% (n=617) vs open side 71.4% (n=419).",
+    "Shootout 66.1% (CI 60.9%-70.9%, n=336) vs in-game 75.5% (CI 72.4%-78.3%, n=812)."
+  ],
+  "method": "Every penalty with an end location. Thirds of the goal mouth (posts at y 36 and 44), high = end height 1 m or more. Outcome = scored; Wilson 95% CIs. Keeper dive direction is not in the open data.",
+  "data": "StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 1,148 penalties incl. 336 shootout kicks.",
+  "n": 1148,
+  "robust": false,
+  "interest": 2,
+  "split_check": "High vs low: men 76% vs 70%, women 73% vs 74%; edge not consistent. Shootout gap holds (CIs apart).",
+  "chart": {
+    "type": "bar",
+    "title": "Penalty conversion by placement",
+    "x_label": "placement (taker's view)",
+    "y_label": "scored",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.728,
+      "label": "all"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "conversion",
+        "points": [
+          {
+            "x": "left low",
+            "y": 0.7048,
+            "lo": 0.6568,
+            "hi": 0.7486,
+            "n": 376
+          },
+          {
+            "x": "left high",
+            "y": 0.7291,
+            "lo": 0.6641,
+            "hi": 0.7855,
+            "n": 203
+          },
+          {
+            "x": "centre",
+            "y": 0.7589,
+            "lo": 0.672,
+            "hi": 0.8287,
+            "n": 112
+          },
+          {
+            "x": "right low",
+            "y": 0.718,
+            "lo": 0.6612,
+            "hi": 0.7687,
+            "n": 266
+          },
+          {
+            "x": "right high",
+            "y": 0.7684,
+            "lo": 0.7035,
+            "hi": 0.8227,
+            "n": 190
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

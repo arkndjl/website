@@ -1,0 +1,2461 @@
+{
+ "asof": "2026-11-02",
+ "about": "ARKBOARD Research Library: definitions and methods for every metric and model, plus FV conversion charts per board.",
+ "sections": [
+  {
+   "id": "fv",
+   "title": "FV and grades",
+   "entries": [
+    {
+     "term": "FV (future value)",
+     "short": "Grade on the 20-80 scale of what a prospect becomes at peak: the mean outcome of past players with that profile.",
+     "body": [
+      "50 average regular, 60 plus, 70 star, 80 generational. Tiers every 5 points, grades in steps of 1.",
+      "Each board has its own outcome and rarity ladder. There is no shared cross-sport FV scale.",
+      "Headline = mean of the tier odds (busts and stars included), so it sits below the best case.",
+      "Graded on absolute talent from a fixed map fit on pooled history, not on rank within a class or board.",
+      "Strong classes get more high grades. Age and validated drivers adjust the grade."
+     ],
+     "where": "Every prospect board: CFB, CBB, hockey prospects, soccer prospects, tennis prospects; recruit tabs; MLB boards",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis",
+      "MLB"
+     ]
+    },
+    {
+     "term": "Outcome ladder",
+     "short": "The realized outcome each FV tier stands for, set by rarity on each board.",
+     "body": [
+      "CFB: NFL career (All-Pro, Pro Bowl, seasons as a starter), 2012-18 drafts.",
+      "CBB: peak NBA XPM, as rare as the matching NBA role (7+ All-NBA = 80), careers ending 2008-16.",
+      "Hockey: peak NHL WAR (best 3 of first 7 seasons), rarity in a draft class, 2008-19 classes.",
+      "Soccer: peak GAR at ages 22-26, rarity in a birth year and position group, players 22 in 2013-21.",
+      "Tennis: peak ranking points above No. 200 at ages 22-28, rarity in a birth year per tour, births 1979-97."
+     ],
+     "where": "fv model tab on each prospect page; FV conversion charts below",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Stretched top",
+     "short": "Above each board's knot K the headline runs linear to 80 at T, so an 80 comes about once every 5 seasons.",
+     "body": [
+      "Mean of a capped outcome cannot reach 80; the stretch makes 80 reachable but rare (Oct 31 2026).",
+      "K = mean that about 3 players a season reach; T = one player per about 5 seasons (exponential tail, held out).",
+      "K / T: CFB 67.8 / 76.8, CBB 46.6 / 54.7, hockey 54.0 / 72.7, soccer 64.1 / 72.4, ATP 63.4 / 76.4, WTA 60.2 / 75.0.",
+      "Order is unchanged. The exact mean (fvx) stays in tooltips; above K the headline reads hotter than realized means."
+     ],
+     "where": "Headline FV on every prospect board (data/fv_scale.json)",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "fvx / fvg",
+     "short": "fvx = exact mean outcome; fvg = the pre-outcome grade the tier odds are computed from.",
+     "body": [
+      "Headline FV = round(fvx), stretched above K. fvg feeds fits built on the grade (mock value, recruit stars).",
+      "The raw grade is not shown on the site; the outcome step stays (owner decision, Nov 1 2026)."
+     ],
+     "where": "Data fields on CFB and CBB boards; tooltips",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "FV range and tier odds",
+     "short": "Each player's odds of every outcome tier and their 10th-90th percentile outcome.",
+     "body": [
+      "CFB and CBB: location-scale ordered probit of realized outcome on the grade; cut points at 30, 35 ... 70.",
+      "Spread terms kept only if held-out RPS improves (CFB: early season x2.1, walk-on, consensus, underclassman).",
+      "Held out: CFB RPS .0398 vs .0408 one spread; CBB .0767. Hockey, soccer, tennis: logistic odds per tier.",
+      "Shown in the player dropdown only; main boards show the single headline."
+     ],
+     "where": "Player dropdowns (outlook), fvd column",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)",
+     "short": "Chance of reaching a set outcome tier.",
+     "body": [
+      "CBB NBA% = P(plays in the NBA), first rung of the FV model.",
+      "Hockey NHL% = 40+ (top 45 of a class); Reg% = 50+ (NHL regular, top 20 of a class).",
+      "Soccer Top% = 40+ (top-flight regular, top 250 of a birth year at position); Reg% = 50+ (top 90); Star% = 60+ (top 20)."
+     ],
+     "where": "Board columns: CBB, hockey prospects, soccer prospects",
+     "sports": [
+      "CBB",
+      "Hockey",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "+ (young for the grade)",
+     "short": "A + marks a player whose star odds beat the next 2.5 FV, from age.",
+     "body": [
+      "Rule: + when P(60+ | FV, age) >= P(60+ | FV + 2.5). Only age passed held out as an upside signal.",
+      "Soccer held out t 5.0 / 4.1 at 55+ / 60+; tennis ATP t 4.3 / 3.3, WTA 3.9 / 3.1. Shares: tennis ~6%, soccer ~30% of top 2000.",
+      "CFB + rule failed held out (t -.71 / -.34) and was removed. CBB and hockey signals: none pass."
+     ],
+     "where": "Soccer prospects and tennis prospects boards",
+     "sports": [
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Provisional grade",
+     "short": "A grade for a player off the source board: starts at the 20 floor and takes every available driver.",
+     "body": [
+      "Ranked in FV order with a prov tag. CBB: ridge on height, weight, class, age, recruit rank, team top-8 FV (R2 .77).",
+      "Hockey: OHL, WHL, QMJHL, AHL and Liiga draft-eligibles off Tankathon, graded on NHLe, age, weight, position.",
+      "Soccer: academy-only and youth-international players get their own provisional line.",
+      "CFB: ESPN roster backups and carried-over players graded from the 20 floor."
+     ],
+     "where": "Boards (prov tag)",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "FV scorecard",
+     "short": "Held-out check of each board: graded FV band vs what the players became.",
+     "body": [
+      "Per band: mean FV given vs reached (90% CI), predicted 40+/50+/60+ odds vs realized share.",
+      "Slopes: CFB .99, CBB .97, soccer 1.00, tennis ATP .99 / WTA .97; hockey calibrated.",
+      "Known heat: WTA 45-64 runs 2.5-4.8 hot; CFB 40+ odds 6-8 pts hot at FV 40-49."
+     ],
+     "where": "fv model tab, fv scorecard window",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Driver gate (FV)",
+     "short": "An input enters an FV model only if it cuts held-out error.",
+     "body": [
+      "Hockey, soccer, tennis: t >= 2 across held-out classes/seasons/birth years and wins two thirds of them.",
+      "CBB: dropping the driver must raise out-of-sample deviance in 4 of 5 folds (whole players held out).",
+      "CFB: multipliers refit leaving one draft class out; kept only if within-position r with NFL AV improves."
+     ],
+     "where": "fv model tabs (drivers kept, out-of-sample evidence)",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "CFB FV model",
+     "short": "NFL outcome grade for every FBS and FCS player.",
+     "body": [
+      "Composite: production (Stat+, Marcel 5/4/3, regressed), On3 talent, age, frame, combine, badges, XV parts.",
+      "Composite rank per class maps to FV by measured NFL outcome counts per position (drafts 2012-18).",
+      "Scouting consensus (9 boards + Kiper top 25) blended at weight .5 at full coverage.",
+      "Then the outcome step (ordered probit), mean headline, stretched top. Positional value scales elite RB, LB, DL, TE, S."
+     ],
+     "where": "CFB board, draft board, fv model tab",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "CBB FV model",
+     "short": "NBA outcome grade for every D-I player and listed internationals.",
+     "body": [
+      "E[FV] = 20 + 10 P(30+) + 10 P(40+) + 10 P(50+) + (mean 60+ career - 50) P(60+); one ridge logistic per rung.",
+      "Newcomers: recruit rank (On3, 247, Barttorvik), class. Returners: 3-season BPM, conference power, age, size, rates.",
+      "Board stage adds June draft-board rank and guard combine testing. E maps to a grade on pooled 2009-16 boards.",
+      "In season: E = (1 - w) preseason + w now, w = minutes / (minutes + k); k 63 newcomers, 128 returners."
+     ],
+     "where": "CBB board, fv model tab, in season window",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Hockey FV model",
+     "short": "OLS on outcome FV for the draft class and drafted players short of 100 NHL games.",
+     "body": [
+      "Draft model kept: log slot (board rank as slot), draft-year NHLe, defense, goalie, CHL first-round pick, class strength.",
+      "Leave-one-class-out error 89.86 vs 95.14 for slot alone (2008-19 classes, 2,541 picks).",
+      "After the draft: stage models add latest NHLe, pro games, World Juniors spot, NHL games and WAR so far."
+     ],
+     "where": "Hockey prospects board, drafted prospects, fv model tab",
+     "sports": [
+      "Hockey"
+     ]
+    },
+    {
+     "term": "Soccer FV model",
+     "short": "OLS on outcome FV for every under-22 in 33 leagues plus academy and feeder leagues.",
+     "body": [
+      "Inputs kept include age, market value (deflated to the fit seasons' level), GAR this and last season,",
+      "minutes share, club strength, scoring rate, height, position, PL2 minutes. 53,680 rows, 2013-20.",
+      "Held out by birth cohort: error 55.65 vs 64.42 for age and market value alone (R2 .42)."
+     ],
+     "where": "Soccer prospects board, fv model tab",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Tennis FV model",
+     "short": "Hurdle model for every ATP and WTA player under 22 with a ranking or a pro match in the last year.",
+     "body": [
+      "Logistic for any peak value, OLS on outcome FV given value: FV = (1 - p) x 20 + p x mean given value.",
+      "ATP kept: age, rank, unranked, Elo, 52-week win rate, years since pro debut, Futures volume.",
+      "WTA kept: age, rank, unranked, Elo, rank x age, tour-qualifying volume. Held out by birth year; OOS R2 .50 / .46.",
+      "Height is never an input (the archive fills height for players who made it: a leak)."
+     ],
+     "where": "Tennis prospects ATP and WTA boards, fv model tab",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "MLB FV (hand-graded)",
+     "short": "Baseball boards are graded by hand on the FanGraphs 20-80 tiers.",
+     "body": [
+      "No model. Tiers: 80 top 5 overall (7+ WAR a season), 60 All-Star (3.4-4.9), 50 average regular (1.6-2.4).",
+      "Boards: 2026 draft hitters v1 (May 7), U19 MiLB prospects, White Sox org top 64."
+     ],
+     "where": "Baseball page (draft hitters, U19 MiLB, White Sox org, fv scale)",
+     "sports": [
+      "MLB"
+     ]
+    },
+    {
+     "term": "Recruit FV / xFV",
+     "short": "Projected FV for high school recruits.",
+     "body": [
+      "CFB xFV = P(on board) x FV if on + (1 - P(on)) x 20, year 1; hurdle fit on ESPN 2023-26 classes.",
+      "CFB recruit profile weighed on NFL outcomes of 2011-19 classes; the board sets the level.",
+      "CBB: hurdle on consensus rank and old-for-class; P(reach NBA) then log(FV - 20) given NBA; trained 2009-16."
+     ],
+     "where": "Recruits tabs: 2027-2029 classes, class rankings, recruit model",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "ARK stars",
+     "short": "Recruit star rating cut from the projected FV, not the industry stars.",
+     "body": [
+      "CFB: 5-star+ top 6 a class, 5 top 3% of board FV, 4 top 10%, 3 above median, 2 on board, 1 off board (year-3 xFV).",
+      "CBB: 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.",
+      "Arrow = ARK stars minus industry stars."
+     ],
+     "where": "Recruits tabs",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "Badges (players)",
+     "short": "Bronze to platinum trait medals by the name: one stat each, regressed by volume.",
+     "body": [
+      "Tiers at the 75/90/97/99th percentile of the position. CFB badges build archetypes.",
+      "On other boards a badge shows only if it predicts the sport's own outcome held out beyond the value metric.",
+      "Display only: no badge feeds FV or projections. Volume and usage traits pass; efficiency rates mostly fail."
+     ],
+     "where": "Every board (medals by the name), player cards",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "All-time FV",
+     "short": "Each player's grade at their best season, listed by position.",
+     "body": [
+      "CFB rebuilds every FBS season 2014-25; box-score era (2014-18) means recalibrated to NFL outcomes.",
+      "Other boards read their past lists; only grade-complete rows are used."
+     ],
+     "where": "all-time FV tab on CFB, CBB, hockey, soccer and tennis prospect pages",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "value",
+   "title": "Player value metrics",
+   "entries": [
+    {
+     "term": "College WAR",
+     "short": "Wins over a replacement starter in a 12-game season.",
+     "body": [
+      "WAR = snap share x (line + weight x quality) x .227; 1 pt of margin a game = .0189 win% (928 FBS team seasons).",
+      "Line = margin lost when an average starter sits: QB 2.7, RB 1.7, EDGE 1.4, WR 1.35, CB 1.3, S 1.1, DT 1.0, LB 1.0.",
+      "Quality from Stat+, badges and FV. QB keeps 1.25 pts per SD; the rest goes to offensive teammates by snaps.",
+      "Replacement lineup wins .18 (2 of 12); an average team's starters total 3.8 WAR."
+     ],
+     "where": "CFB board, WAR leaders tab, team talent",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "WAA",
+     "short": "WAR minus snap share x line: wins over an average starter at the position.",
+     "body": [
+      "Comparable across positions; below average < 0."
+     ],
+     "where": "CFB WAR leaders tab",
+     "sports": [
+      "CFB",
+      "NFL"
+     ]
+    },
+    {
+     "term": "XV",
+     "short": "WAR with quality from the stat-line parts that track winning.",
+     "body": [
+      "CFB: PFN score plus position parts (QB cmp %, yds/att, INT rate; OL pressure rate; DT splash; CB yds/target).",
+      "Fit on 2024-25 team margin. Held out team r .88 vs .86 for WAR quality; win% r .73 vs .68.",
+      "NFL: same idea fit to team margin per game; on missed games t 4.9 vs 2.1 for AV WAR.",
+      "Next-season forecasts tie with WAR, so projections and game models stay on WAR."
+     ],
+     "where": "CFB and NFL WAR leaders tabs (XV column)",
+     "sports": [
+      "CFB",
+      "NFL"
+     ]
+    },
+    {
+     "term": "NFL WAR",
+     "short": "Wins over replacement: .6 x AV WAR + .4 x XV, season to date.",
+     "body": [
+      "AV WAR = (AV - replacement AV at the sub-position x snap share) x .091 wins per AV.",
+      ".091 from team wins on team AV (160 team seasons 2021-25, r .86). Replacement team wins 3 of 17.",
+      "Defensive AV rebuilt from pressures, stops and plays on the ball. Two-way players earn WAR on each side."
+     ],
+     "where": "NFL WAR leaders, team WAR, rookies, breakouts",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "Stat+",
+     "short": "Production index: 100 + 25 x z of the position all-in-one score this season.",
+     "body": [
+      "Source score: PFN QB+, RB+, WR+, TE+, OLi, EDGE+, DT+, LB+, CB+, SAF+; K and P by percentile.",
+      "z against the snap-weighted position mean, FBS or FCS. 125 = 1 SD above average.",
+      "FV production driver; validity vs NFL AV: TE .52, WR .50, QB .48, RB .48, EDGE .40, LB .40, DT .37."
+     ],
+     "where": "CFB board, WAR leaders, true freshmen",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "xNIL / yNIL / zNIL",
+     "short": "xNIL = NIL market worth now; yNIL = estimated pay entering the season; zNIL = xNIL - yNIL.",
+     "body": [
+      "xNIL = position price x on-field value (AV at FV, x playing time), shared within P4 and G5 pools.",
+      "yNIL = program budget split by a preseason index (P4 ~$20M, G5 ~$3M, FCS ~$0.4M a program).",
+      "Not fit to On3 valuations (they move only +18% per 10 FV). zNIL growth is 20% of each coach score.",
+      "FCS players at FBS-starter FV priced at 40% of the FBS rate. CBB xNIL: minutes share x (BPM + 3) at school price."
+     ],
+     "where": "CFB board, team talent, team builder, fv to xNIL charts; CBB recruits",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "Season AV (college)",
+     "short": "College on-field value a season: snap share x position weight x quality.",
+     "body": [
+      "Quality = Stat+ z + .5 badge z + .25 FV z. Team R2 vs 2026 SRS .63 vs .44 for summed FV value.",
+      "Used for college injury cost and team value; NFL value stays on AV at FV."
+     ],
+     "where": "CFB team talent (Season AV), fv to war chart",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "XPM",
+     "short": "NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average.",
+     "body": [
+      "Shown shrunk by minutes: raw x MP / (MP + 300) + role mean x 300 / (MP + 300).",
+      "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26 (RMSE 1.26 vs 1.59 raw).",
+      "Raw XPM feeds game models, VORX and the CBB board target. BPM only where no DPM row (*)."
+     ],
+     "where": "NBA XPM leaders, rookies, contract value, depth chart",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "VORX",
+     "short": "NBA wins over replacement: .030 x (XPM + 1.4) x MP / 48.",
+     "body": [
+      "Replacement XPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM board."
+     ],
+     "where": "NBA XPM leaders, projections, contract value",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "XPM (proj)",
+     "short": "Season-to-date XPM blended with a preseason prior by minutes.",
+     "body": [
+      "prior + (XPM - prior) x MP / (k + MP); k 509 veterans, 809 newcomers (7,269 player seasons 2012-26).",
+      "80% range covers .806 / .799 held out. Display only."
+     ],
+     "where": "NBA contract value, XPM chip",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "Contract value (surplus)",
+     "short": "Projected VORX x market $ per win, minus salary, every year left.",
+     "body": [
+      "$ per win = payroll above the minimum / league projected VORX = $12.65M (2026-27); +7% a year (assumption).",
+      "Player option counted only when it pays the player; team option only when it pays the team."
+     ],
+     "where": "NBA contract value tab",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "xBPM",
+     "short": "Projected Barttorvik BPM this season.",
+     "body": [
+      "Ridge on last season, recruiting, age, size (r .74 returners, .47 newcomers); in season blends to-date BPM."
+     ],
+     "where": "CBB board, true freshmen",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Peak XPM (CBB scale)",
+     "short": "CBB FV target: mean of a career's best three NBA XPM seasons, each shrunk toward -2 by 500 minutes.",
+     "body": [
+      "FV bands start at the XPM as many careers reached as reached the matching NBA role. See the CBB chart."
+     ],
+     "where": "CBB fv model tab (fv conversions)",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "NHL WAR",
+     "short": "Descriptive wins over replacement at goal value.",
+     "body": [
+      "5v5 on-ice xG vs teammates, PP xG /5, PK /4, finishing (goals - ixG), penalties, share of team leftover xG.",
+      "Goalies: GSAx at full credit. Sums to team goal differential (R2 .975).",
+      "Replacement = players outside each team's top 13 F / 7 D / 2 G."
+     ],
+     "where": "NHL WAR leaders, rookies; hockey prospect outcome",
+     "sports": [
+      "NHL",
+      "Hockey"
+     ]
+    },
+    {
+     "term": "pWAR / HPM",
+     "short": "Projected WAR and projected goals per 60 over an average player.",
+     "body": [
+      "HPM = Marcel-weighted (1 / .7 / .5) shrunk rates, components weighted by how well they carry to next season.",
+      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .38 vs .23 before (t 4.95, 15/17 seasons).",
+      "Goalie GSAx barely repeats (weight .07), so goalie pWAR ~0.4 while goalie WAR runs ~7."
+     ],
+     "where": "NHL WAR leaders, backup watch, rookies",
+     "sports": [
+      "NHL"
+     ]
+    },
+    {
+     "term": "GSAx",
+     "short": "Goals saved above expected (MoneyPuck xG).",
+     "body": [
+      "Goalie tab shows GSAx a game shrunk toward a new goalie's level; feeds the NHL totals model."
+     ],
+     "where": "NHL goalies tab, NHL WAR",
+     "sports": [
+      "NHL"
+     ]
+    },
+    {
+     "term": "NHLe",
+     "short": "NHL points a full season at a league's translation factor.",
+     "body": [
+      "Factors fit on every pick's career since 2008 from league pairs, a year of age development removed.",
+      "Shrunk toward the published factor by link count. CHL leagues ~.10-.12, NCAA ~.21."
+     ],
+     "where": "Hockey prospects board, first-year tab",
+     "sports": [
+      "Hockey"
+     ]
+    },
+    {
+     "term": "GAR (soccer, senior)",
+     "short": "Goals above replacement on one scale across leagues.",
+     "body": [
+      "Shrunk per-90 rates (on-ice, npxG, xA, xGBuildup, keeper saves) weighted to next-season team goal difference.",
+      "Replacement per position from players under 900 minutes. League strength counts. Held out R2 .61.",
+      "PAR = GAR x points per goal of difference (.626)."
+     ],
+     "where": "Soccer player value, rookies, backup watch",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "GAR (soccer prospects)",
+     "short": "Team-share value: minutes / 90 x (club rating - replacement) / 11.",
+     "body": [
+      "Club rating = goals a match vs an average big-five club; replacement -2.5 (a bottom Scotland/Greece/Denmark side).",
+      "Outcome = mean of the best three GAR seasons at ages 22-26. Differs from the senior GAR above."
+     ],
+     "where": "Soccer prospects board, first-year tab",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "xMV",
+     "short": "Estimated market value in EUR millions with no market input.",
+     "body": [
+      "Ridge on log Transfermarkt value: GAR now and past two seasons, minutes, age, position, league, club.",
+      "Held out R2 .68 (Oct) to .78 (Jul). Gap to TM forecasts TM's next move (slope .23, 12/12 seasons)."
+     ],
+     "where": "Soccer player value, rookies",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Elo / Elo+ (tennis)",
+     "short": "Elo on every pro match since 1991 at every level; Elo+ against players the same age.",
+     "body": [
+      "K = 250 / (matches + 5)^0.4, Slams x1.1, start 1500. Elo+ = 100 + 25 per SD vs same-age players with 20+ matches."
+     ],
+     "where": "Tennis prospects board, tennis ARK Ranking",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "SPW+ / RPW+ / xHold / xBreak",
+     "short": "Serve and return points won over the average top-100 player, opponent-adjusted.",
+     "body": [
+      "Percentage points, hard court. xHold / xBreak = games held or broken vs an average top-100 opponent via the game chain."
+     ],
+     "where": "Tennis serve + return tabs",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "QB value (NFL)",
+     "short": "Points a game over a replacement QB from the game model's QB term.",
+     "body": [
+      "Rating = weighted career EPA/play shrunk toward replacement (-0.12) with 250 pseudo-plays."
+     ],
+     "where": "NFL QB value tab",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "Yds+ / YOE (returners)",
+     "short": "Kick and punt return yards over expected, shrunk.",
+     "body": [
+      "YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat)."
+     ],
+     "where": "special teams tab on NFL and CFB pages",
+     "sports": [
+      "NFL",
+      "CFB"
+     ]
+    },
+    {
+     "term": "Development (school / coach)",
+     "short": "Outcome per recruit over what their recruiting rating predicted, shrunk by sample.",
+     "body": [
+      "CFB: NFL FV per signee, school tau .42 FV, rolling t 5.3 (6/6). CBB NBA FV is null; college BPM delta passes.",
+      "CBB head coach BPM over expected: split t 5.1. Shown with +/- 1 SD."
+     ],
+     "where": "development tab on CFB and CBB pages",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "players",
+   "title": "Player odds and projections",
+   "entries": [
+    {
+     "term": "Draft%",
+     "short": "P(declares) x P(picked in the 2027 draft).",
+     "body": [
+      "Declare: logit on ln xPick and age on draft day; ranked underclassmen ~94%, seniors ~69%, RS seniors 100%.",
+      "Picked: log-normal around the mock xPick; the SD narrows toward the draft (PFF dated boards, 2020-26)."
+     ],
+     "where": "CFB board, draft board",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Transfer% (Xfer%)",
+     "short": "P(on another FBS or FCS roster next season).",
+     "body": [
+      "Ridge logit on the 2024-25 and 2025-26 cycles: class, production, role, recruit rank, record, P(HC change), distance from home.",
+      "Out-of-time AUC .738. Transfer% + stay + exit = 100%. NIL-era data only (July 2021 on)."
+     ],
+     "where": "CFB board, portal, team builder",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "FBS%",
+     "short": "P(on an FBS roster next season) for FCS players.",
+     "body": [
+      "Logit on 2023-26 FCS-to-FBS moves: production, team strength, year in school, position. Capped at 1 - Draft%."
+     ],
+     "where": "CFB FCS board",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Dec%",
+     "short": "Chance a college player leaves school for this NBA draft.",
+     "body": [
+      "Recruit rank, minutes-shrunk BPM, class, era; plus the midseason board rank. Seniors and internationals 100%."
+     ],
+     "where": "CBB mocks",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "P20 / P50 / P80 projections",
+     "short": "20th, 50th and 80th percentile of WAR, VORX and stats, full season and rest of season.",
+     "body": [
+      "Rest of season = rate x exposure (minutes, TOI, snaps); rate = Marcel 1 / .7 / .5 with fitted shrink.",
+      "Recalibrated per season-left bin; checked by PIT on held-out seasons (+/- .03 overall)."
+     ],
+     "where": "projections tab on NFL, NBA, NHL pages",
+     "sports": [
+      "NFL",
+      "NBA",
+      "NHL"
+     ]
+    },
+    {
+     "term": "Player game projections",
+     "short": "Per-game points, rebounds, assists (NBA, CBB) and fantasy lines (NFL, CFB).",
+     "body": [
+      "NBA walks the game model's minutes and P(play), plus pace, opponent, minutes freed by teammates out.",
+      "Held out 2024-26 PRA MAE 6.20 vs 6.46 for season average; CBB 5.42 vs 5.58."
+     ],
+     "where": "Predictions players group",
+     "sports": [
+      "NBA",
+      "CBB",
+      "NFL",
+      "CFB"
+     ]
+    },
+    {
+     "term": "NFL fantasy VOR",
+     "short": "Projection minus the replacement projection at the position, 12-team league.",
+     "body": [
+      "Replacement = first non-starter: QB13, RB30, WR31, TE13, K13, DST13. Overall rank by VOR."
+     ],
+     "where": "Predictions NFL rankings",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "Breakouts (NFL)",
+     "short": "Young players' weekly WAR over expected.",
+     "body": [
+      "xWAR = WAR rate a snap before the week (three seasons shrunk to the group, updated in season) x snaps."
+     ],
+     "where": "NFL breakouts tab",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "Breakout watch (CFB)",
+     "short": "1st-2nd year QB/RB/WR/TE whose touches and targets are rising.",
+     "body": [
+      "Lists usage growth; it is a watch list, not a model grade."
+     ],
+     "where": "CFB breakouts tab",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Backup watch / xGap",
+     "short": "Second and third-string players graded above a starter.",
+     "body": [
+      "Gap = backup value - starter value (FV in college; WAR, XPM, HPM or GAR in the pros). College listed at gap >= 3.",
+      "Rank by xGap = the gap projected over two seasons, adding the age (or class) gap; held out t -3.0 to -15.6."
+     ],
+     "where": "backup watch tab on every sport page",
+     "sports": [
+      "CFB",
+      "CBB",
+      "NFL",
+      "NBA",
+      "NHL",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Comps",
+     "short": "Nearest historical profiles shown in the player dropdown.",
+     "body": [
+      "CFB: nearest 2014-22 profiles. Hockey stage 3-4 comps also feed FV (held-out pass); elsewhere display only."
+     ],
+     "where": "Player dropdowns",
+     "sports": [
+      "CFB",
+      "Hockey"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "teams",
+   "title": "Team ratings",
+   "entries": [
+    {
+     "term": "ARK Ranking",
+     "short": "Each sport's power ranking: the game model's neutral-site rating, ranked.",
+     "body": [
+      "Same number the game model uses, so picks already read it. Split into parts (Elo, efficiency, talent ...).",
+      "Rank range = 80% range of true rank from 4,000 draws at the rating sd measured on past seasons.",
+      "CBB 2016-26: ARK picks the winner 77.3% vs AP 76.8%, Coaches 77.1% vs 76.7%."
+     ],
+     "where": "ARK Ranking tab on every sport page; ARKRANKING page",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
+     "term": "CFB rating",
+     "short": "Points vs an average FBS team, neutral field.",
+     "body": [
+      "Elo (preseason prior: last season, SP+, 247 talent, returning production, transfers) + opponent-adjusted EPA/play.",
+      "Plus home, rest, travel, altitude, FCS, special teams, P4 tier, 4th-down aggressiveness, returning production,",
+      "game control. Sim win sd 14.2. Current injuries charged (Inj); Full = at full strength."
+     ],
+     "where": "CFB ARK Ranking, games, season odds",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "NFL rating",
+     "short": "Expected margin vs an average team, neutral field, with this week's QB and injuries.",
+     "body": [
+      "Fitted terms: Elo, starting QB, rest, home, injuries, market rating from earlier closes, return game.",
+      "Injury cost = WAR a game x 36 pts a win x P(miss); questionable .25, doubtful .98."
+     ],
+     "where": "NFL ARK Ranking, games, season odds",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "CBB rating",
+     "short": "Expected margin vs an average D-I team on a neutral floor.",
+     "body": [
+      "Fitted terms: adjusted efficiency x possessions, Elo, home, game control, conference home game, injuries,",
+      "home x attendance, ESPN BPI, form, preseason injury report. Preseason prior from returning minutes, transfers, top-5 FV.",
+      "Luck-stripped: 50% of three-point luck removed."
+     ],
+     "where": "CBB ARK Ranking, games, season odds, tournament odds",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "NBA rating",
+     "short": "Expected margin vs an average team, neutral floor, current roster and today's injury report.",
+     "body": [
+      "Fitted terms: Elo, net rating, market rating, home, lineup value (XPM x minutes x chance to play), playoff Elo, rest.",
+      "25% of three-point luck removed. Proj column (rest-of-season VORX) is display only."
+     ],
+     "where": "NBA ARK Ranking, games, season odds",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "NHL rating",
+     "short": "Win chance from a logistic on Elo, expected-goals rating, back-to-back, home and lineup value.",
+     "body": [
+      "xG rating: opponent-adjusted ridge, half-life 120 days, .7 carried over a season. Lineup value follows trades.",
+      "Totals use xG, goals, market total and the starting goalie."
+     ],
+     "where": "NHL ARK Ranking, games, season odds",
+     "sports": [
+      "NHL"
+     ]
+    },
+    {
+     "term": "Soccer rating",
+     "short": "Goals a match vs an average big-five club, neutral ground; one scale for every league.",
+     "body": [
+      "Online Poisson attack and defence within each league; league strength from cross-league matches only.",
+      "Inputs blended walk-forward: market-implied goals from earlier closes, xG (Understat, FotMob), squad value.",
+      "Dixon-Coles rho -.04. Big five vs close, held out: log loss .972 vs .967."
+     ],
+     "where": "Soccer ARK Ranking, league tabs, UEFA cups, MLS",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Tennis ARK",
+     "short": "Win chance vs the average top-50 player, best of three, over the tour's 52-week surface mix.",
+     "body": [
+      "Surface Elo blended with a games-won rating and opponent-adjusted serve and return point ratings (Markov chain).",
+      "Fit on 2012-22 tour main draws; held 2023-26 log loss ~.596 vs Elo .603."
+     ],
+     "where": "Tennis ATP / WTA ARK Ranking",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "CS2 ARK",
+     "short": "Series win chance vs the average top-20 team.",
+     "body": [
+      "Player Elo that follows players between rosters (per map, on round share), bo3.gg team map rating with veto,",
+      "region offsets and Valve VRS points. Held out log loss .559 vs VRS .667. No picks: no free closing odds history."
+     ],
+     "where": "Counter-Strike ARK Ranking, matches, model",
+     "sports": [
+      "CS2"
+     ]
+    },
+    {
+     "term": "Elo",
+     "short": "Results-and-margin rating; 1500 = average.",
+     "body": [
+      "CFB Elo starts from a preseason prior. CS2 Elo: +400 = 10 to 1 odds. Tennis Elo on wins, every level."
+     ],
+     "where": "Ranking tabs",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
+     "term": "Game control",
+     "short": "How much of each game a team spent with the win in hand.",
+     "body": [
+      "Time-weighted win chance from score and clock only, opponent-adjusted, carried across seasons.",
+      "Shipped in CFB (held out MAE t -4.1) and CBB (t -2.0). NBA failed."
+     ],
+     "where": "CFB and CBB ARK Ranking (Control)",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "Talent / TvE",
+     "short": "Talent = projected starters' value by FV; TvE = Elo vs the Elo talent predicts, in SD.",
+     "body": [
+      "CFB Talent = sum over the projected starting 22 of expected college WAR a season at FV. TvE > 0 = above talent."
+     ],
+     "where": "CFB team talent, ARK Ranking",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Season odds",
+     "short": "10,000 simulated seasons from the game model.",
+     "body": [
+      "Rating error sd shrinks with the season left (sd^2 = a + b x share left, measured on past seasons).",
+      "xW = wins so far + simulated rest. Outputs: conference, playoff, title odds; full NFL tiebreakers."
+     ],
+     "where": "season odds tab on every team sport; ARKRANKING",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "CFP odds",
+     "short": "Committee model plus bracket for the 12-team playoff.",
+     "body": [
+      "Plackett-Luce fit on CFP releases 2017-25: losses, wins, rating, wins above bubble, P4. Held out field log loss .029 vs .090.",
+      "2026 rules: P4 champions in, best G6 champion, Notre Dame if top 12; top 4 byes."
+     ],
+     "where": "CFB season odds (Bye, Semis, Natl title)",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "NCAA tournament odds",
+     "short": "Committee and bracket sims for bids, seeds and rounds.",
+     "body": [
+      "Committee fit on 2015-26 fields from rating and wins above bubble (45th team): 91% of at-large picks.",
+      "Conference tournaments and the bracket played with the game model."
+     ],
+     "where": "CBB tournament odds tab",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Futures",
+     "short": "Our title, conference and division sims vs DraftKings futures (vig removed).",
+     "body": [
+      "Display only; win-total backtests found no proven edge (NBA b .22 t 3.0 in sample, held out t 1.5)."
+     ],
+     "where": "Predictions futures tab; title odds on ARKRANKING",
+     "sports": [
+      "NFL",
+      "NBA"
+     ]
+    },
+    {
+     "term": "Team badges",
+     "short": "Team trait medals, one stat each, shrunk by games to reliability .5.",
+     "body": [
+      "59 of 72 pass the repeat test. NFL Return Game also passed vs the close and is in the NFL model."
+     ],
+     "where": "ARK Ranking team dropdowns, team GFX cards",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Staff score / coach pay",
+     "short": "Head coach and coordinator scores; coach market value vs public pay.",
+     "body": [
+      "Pay is program plus wins (USA Today data); Surplus = Value - Pay. Staff score includes zNIL growth (20%).",
+      "Coach value-added does not carry to a new job (failed test); staff weights are set by hand."
+     ],
+     "where": "CFB staff, coach pay, coaching jobs tabs",
+     "sports": [
+      "CFB"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "games",
+   "title": "Game models and predictions",
+   "entries": [
+    {
+     "term": "Game projection",
+     "short": "Model line, win chance and projected score for every game.",
+     "body": [
+      "Margin from the sport's rating (see Team ratings); win chance = normal (or logistic) on the margin.",
+      "Win sd fit walk-forward: NBA ~12, CBB 11.9, CFB 14.2. Totals: separate model per sport.",
+      "Predictions is the only page with picks, lines and props; sport pages show projections only."
+     ],
+     "where": "games and game table tabs; Predictions",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
+     "term": "Walk-forward test",
+     "short": "Each game is predicted with a model fit only on games before it.",
+     "body": [
+      "Seasons split into tuning (terms enter) and held out (report and veto). Errors clustered by game day.",
+      "Game models tab compares live loss to the walk-forward expectation for the same month."
+     ],
+     "where": "Predictions game models tab",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Model ledger",
+     "short": "Shared rule for every model term.",
+     "body": [
+      "Evidence = Stouffer z of tuning and held-out t (drop-one). One Benjamini-Hochberg family over all terms.",
+      "Keep at q <= .10; drop at q > .10 when held-out loss is no worse without it; otherwise watch.",
+      "Terms past 365 days are flagged for re-test."
+     ],
+     "where": "Predictions game models tab (ledger view)",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Edge / gap",
+     "short": "Model minus the market, in points (spread, total) or chance (moneyline, tennis).",
+     "body": [
+      "Edge % on the full table = raw model chance minus the no-vig market chance.",
+      "Gaps past 5 sd are treated as bad lines; picks between 3 and 5 sd are staked at the cap."
+     ],
+     "where": "Predictions picks, game table",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Pick rule (X)",
+     "short": "A pick is the model's side when |model - line| >= X for that sport and market.",
+     "body": [
+      "X = smallest gap whose calibrated return at -103 is > 0 on tuning seasons.",
+      "A market or segment is on only if held-out picks beat the close (clvRet > 0, t >= 1.65, n >= 30).",
+      "One pick a game per market family. Bet to = worst line that still clears X."
+     ],
+     "where": "Predictions picks, picks backtest",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Calibrated edge",
+     "short": "Expected return at the price, from held-out picks judged by the close.",
+     "body": [
+      "Edge = min(EV, a + b (gap - mean gap)); a blends close value and ROI; b = the market's own slope, shrunk.",
+      "History priced at Novig -103. TIMING .5 halves every backtest edge (live bets come after part of the move).",
+      "NBA backtest edge also x.5 (history saw tip-time injury news the open did not)."
+     ],
+     "where": "Predictions picks backtest",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Kelly %",
+     "short": "Stake as % of bankroll: full Kelly on the calibrated edge, compounding.",
+     "body": [
+      "Formerly Dengler Units (DU); 1 DU = 1% of bankroll. Picks qualify where the edge at the price > 0.",
+      "Cap 5% a bet (tennis 2%). Joint slate Kelly gave the same growth as per-pick (rho ~0).",
+      "Walk-forward: 1x Kelly most log growth at the backtest edge and at half of it."
+     ],
+     "where": "Predictions picks, game table, paper book",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Nightly cap",
+     "short": "Open picks on one ET date, all sports, scaled to at most 40% of bankroll.",
+     "body": [
+      "Stake x min(1, 40 / total). Walk-forward: P(50% drawdown) .12 vs .27 uncapped at 1x edge."
+     ],
+     "where": "Predictions picks (capped stake)",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Close / CLV / Worth at close",
+     "short": "Every pick is judged first by the closing line, ROI second.",
+     "body": [
+      "Close = last snapshot before the start. CLV = points the line moved our way.",
+      "Worth at close (clvRet) = return the pick was worth at the closing price, with t.",
+      "CLV needs far fewer bets than results for t 2 (CBB 5+ pts: ~228 vs ~402)."
+     ],
+     "where": "Predictions picks, paper book, picks backtest",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Bad open filter",
+     "short": "Opening lines that mirror the close or move more than 6 sd (median-based) are dropped from history.",
+     "body": [
+      "Mirrored opens were home/away swaps (mostly 2025-26 CBB neutral sites) that inflated backtests."
+     ],
+     "where": "All backtests",
+     "sports": [
+      "CFB",
+      "CBB",
+      "NBA"
+     ]
+    },
+    {
+     "term": "Close predictor",
+     "short": "Predicts the close from the open and the model gap (market softness b).",
+     "body": [
+      "close - open = b x (model - open) + controls. b: CFB spread .10, CFB total .22, CBB .10, NBA spread .24, total .42.",
+      "Break-even gap = where a -110 bet at the open breaks even at the predicted close."
+     ],
+     "where": "Predictions picks backtest (close predictor)",
+     "sports": [
+      "CFB",
+      "CBB",
+      "NBA"
+     ]
+    },
+    {
+     "term": "Totals recentring",
+     "short": "Model total minus the mean model-line gap over the slate and the season's last 100 games.",
+     "body": [
+      "Keeps totals picks from being a bet on league scoring level. CFB, NBA and (since Nov 1) CBB."
+     ],
+     "where": "Predictions picks",
+     "sports": [
+      "CFB",
+      "CBB",
+      "NBA"
+     ]
+    },
+    {
+     "term": "Paper book",
+     "short": "The posted picks graded at posted line, price and Kelly %, compounding.",
+     "body": [
+      "Identical to the picks tab since Oct 28 2026; reset Oct 28 15:35Z. No real money."
+     ],
+     "where": "Predictions paper book tab",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Rule monitor (CUSUM)",
+     "short": "Live switch that stops a losing pick rule until a refit.",
+     "body": [
+      "Judged after 50+ picks: stop if last 300 clustered t < -1 or CUSUM S = max(0, S - clvRet / sd - .25) >= 10."
+     ],
+     "where": "Predictions picks backtest (rule monitor), game models tab",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Rule drift test (SPRT)",
+     "short": "Sequential test of each rule's live close value vs its backtest.",
+     "body": [
+      "H1 = backtest edge x TIMING; H0 = 0. Pause at 19:1 for no edge; confirm at 19:1 for the edge.",
+      "About 120 (NBA/CBB totals) to 275 (CFB totals) bets to a verdict."
+     ],
+     "where": "Predictions picks backtest (new rules)",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Growth / DD 25/50",
+     "short": "Held-out log growth a season at the close, and chance of a 25% / 50% fall from peak.",
+     "body": [
+      "Resampled from walk-forward picks. Full Kelly accepts high drawdown risk over long seasons."
+     ],
+     "where": "Predictions picks backtest",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA"
+     ]
+    },
+    {
+     "term": "NFL props",
+     "short": "One prop per player per game, full Kelly at Novig prices, week scaled to a budget.",
+     "body": [
+      "P(over) from projection shape by decile, shrunk .414. Held out 2025-26: 3,732 bets 55.3%, t 3.1 at -110.",
+      "Weekly budget 50% of bankroll until ~300 props are graded."
+     ],
+     "where": "Predictions NFL fantasy (props), picks",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "Tennis picks",
+     "short": "Model side when it differs from the Novig no-vig price by 4+ points of win chance.",
+     "body": [
+      "Calibrated chance = no-vig + .5 x k toward the model (k .25 logits). Cap 2% a bet.",
+      "Tour-level main draws; tuned 2025, held out 2026: 1,935 picks, +4.5% worth at close (t 19)."
+     ],
+     "where": "Predictions picks, game table",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Moneyline board / flip",
+     "short": "Every game whose model winner is -200 to +200, or the market underdog (flip).",
+     "body": [
+      "Display only, not a pick rule. Held-out flip record: all +1.2% t .6."
+     ],
+     "where": "Predictions picks tab",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL"
+     ]
+    },
+    {
+     "term": "Not picked",
+     "short": "Markets tested and off because they did not beat the close.",
+     "body": [
+      "NHL (ML and totals), soccer (1X2, O/U 2.5, MLS, props), CS2 (no free closing odds), NBA/NHL props.",
+      "Their game projections still show; Kelly % reads off."
+     ],
+     "where": "Predictions game table",
+     "sports": [
+      "NHL",
+      "Soccer",
+      "CS2",
+      "NBA"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "drafts",
+   "title": "Drafts and mocks",
+   "entries": [
+    {
+     "term": "Three mocks",
+     "short": "Predictive, blended and conviction mock drafts for the NFL, NBA and NHL drafts.",
+     "body": [
+      "Predictive = projection of the real draft: consensus boards plus model (CFB board weight .75-.85 backtested).",
+      "Conviction = the model board (FV before the consensus blend) plus team fit.",
+      "Blended = each slot at the geometric mean of the two xPicks. Predictive and conviction grade each other."
+     ],
+     "where": "mock draft group on CFB, CBB, hockey prospects pages",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey"
+     ]
+    },
+    {
+     "term": "xPick",
+     "short": "Expected pick: geometric blend of consensus average rank and rank by our draft value.",
+     "body": [
+      "Market weight .55 + .3 x sqrt(boards / 9); unranked prospects .65 at 1.3x the boards' depth.",
+      "Past the last pick = projected undrafted (UDFA signings tab)."
+     ],
+     "where": "CFB mocks, udfa signings",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Team needs and pick rule",
+     "short": "Teams pick on -ln(xPick) + need weight x need.",
+     "body": [
+      "Need from the whole NFL position room: rookie-deal draft capital or salary, cut for age and expiring deals.",
+      "Penalties for doubling up, a set QB and position runs. QB top-pick premium decays by pick."
+     ],
+     "where": "CFB mocks (pick reports)",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Trades",
+     "short": "Projected trades on Massey-Thaler pick values; real traded picks from Wikipedia.",
+     "body": [
+      "Trades in every round (5, 7, 6, 5, 5, 2, 1 a round); next-year picks at .48 of a mid-round pick.",
+      "Solid tag = traded pick; dashed tag = projected trade."
+     ],
+     "where": "CFB mocks",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Reach / value",
+     "short": "A pick the other mock takes 2.5x+ and 16+ picks later (reach) or earlier (value).",
+     "body": [
+      "Site table only; the GFX drops the chips."
+     ],
+     "where": "Mock tables",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
+     "term": "Mock sims",
+     "short": "Simulated drafts give each prospect's pick range.",
+     "body": [
+      "CFB: Gumbel pick noise by round (.40 / .525 / .625), 200 sims. CBB: June board shock sd 1.05 / .90 / .40 by days left.",
+      "NBA lottery and NHL order: simulated standings x lottery odds; P(#1)."
+     ],
+     "where": "Mocks (Range, Sims), lottery tab",
+     "sports": [
+      "CFB",
+      "CBB",
+      "NBA",
+      "Hockey"
+     ]
+    },
+    {
+     "term": "Draft order",
+     "short": "Order from projected standings (NFL tiebreakers in full) and current pick owners.",
+     "body": [
+      "NFL order uses the sim's expected slot; NHL from projected points and Tankathon owners; NBA from lottery sims."
+     ],
+     "where": "Mock drafts",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey"
+     ]
+    },
+    {
+     "term": "CBB mock inputs",
+     "short": "Consensus of 2027 boards (.5 median rank + .5 mean) and conviction on slot plus college line.",
+     "body": [
+      "xXPM = expected NBA peak XPM vs the average drafted player, given slot and college line.",
+      "Entrants: Dec% draws; FV 40+ rule for the pool."
+     ],
+     "where": "CBB mocks",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "xSlot (hockey)",
+     "short": "The draft slot a board rank points to.",
+     "body": [
+      "An October board regresses toward the middle by June (Central Scouting January ranks vs June slot)."
+     ],
+     "where": "Hockey prospects board",
+     "sports": [
+      "Hockey"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "data",
+   "title": "Data and names",
+   "entries": [
+    {
+     "term": "Sources: football",
+     "short": "Free public sources for CFB and NFL.",
+     "body": [
+      "CFB: PFN impact rankings, On3, ESPN rosters and play-by-play (2015-26), CFBD (1,000 calls/month), 247, Rotoballer.",
+      "Consensus boards: PFN industry (7 analysts), Tankathon, PFF, Kiper. Conference availability reports.",
+      "NFL: nflverse (play-by-play, rosters, injuries, draft picks), PFR AV, ESPN."
+     ],
+     "where": "CFB, NFL pages",
+     "sports": [
+      "CFB",
+      "NFL"
+     ]
+    },
+    {
+     "term": "Sources: basketball",
+     "short": "Free public sources for CBB and NBA.",
+     "body": [
+      "CBB: Barttorvik (ESPN fallback when blocked), On3, 247, ESPN, Covers injuries, ESPN BPI, NBA draft boards.",
+      "NBA: Basketball-Reference BPM and contracts, databallr DPM, LUMA ARC (CC BY 4.0), ESPN, official injury report."
+     ],
+     "where": "CBB, NBA pages",
+     "sports": [
+      "CBB",
+      "NBA"
+     ]
+    },
+    {
+     "term": "Sources: hockey, soccer, tennis, CS2",
+     "short": "Free public sources for the other sports.",
+     "body": [
+      "Hockey: NHL API, MoneyPuck xG, Daily Faceoff goalies, Tankathon, Central Scouting, HockeyTech.",
+      "Soccer: ESPN, football-data.co.uk closes, Understat and FotMob xG, Transfermarkt values and lineups.",
+      "Tennis: Sackmann archive (mirror), weekly tour feed, Tennis Abstract, ESPN. CS2: Valve VRS, Liquipedia, bo3.gg."
+     ],
+     "where": "Hockey, soccer, tennis, Counter-Strike pages",
+     "sports": [
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
+     "term": "Odds",
+     "short": "Novig (free, no key) is the price source; DraftKings via ESPN is the fallback.",
+     "body": [
+      "Polymarket prices are a data signal only. Odds snapshots every 30 min, 13-04 UTC, plus 08 and 11 UTC."
+     ],
+     "where": "Predictions; game cards",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Refresh cadence",
+     "short": "Scheduled builds by sport, in season.",
+     "body": [
+      "CFB board ~3x daily (Aug-Jan); NFL ~3x daily plus Sunday game windows (Sep-Feb); CBB 3x daily (Nov-Apr).",
+      "NBA and NHL 2x daily; soccer 2x daily; tennis 2x daily; CS2 every 4 h; soccer and tennis prospects daily.",
+      "Picks refresh every 2 h and on every odds snapshot."
+     ],
+     "where": "Window status bars (updated date)",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
+     "term": "Freshness / stale tag",
+     "short": "Each window shows its data date; a feed past its limit is tagged stale.",
+     "body": [
+      "In season a feed is stale past 36 h; off season past 10-14 days."
+     ],
+     "where": "Every window status bar, ARKBOARD hub",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
+     "term": "Name matching",
+     "short": "One shared matcher joins sources by player name in Python, Node and the browser.",
+     "body": [
+      "Prefer a stable id (ESPN, Barttorvik pid, gsis) when both sides have one.",
+      "Alias file for spellings the rules miss and common nicknames; matches still check team and position."
+     ],
+     "where": "Every board that joins sources",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Held out / LOSO / LOCO",
+     "short": "Out-of-sample checks used across the site.",
+     "body": [
+      "Held out = seasons never used to choose terms. LOSO = leave one season out; LOCO = leave one class out.",
+      "Prospect fits hold out whole players, classes, birth cohorts or birth years so a player's rows stay together."
+     ],
+     "where": "Model tabs",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Portal era rule",
+     "short": "Transfer and roster models train only on NIL-era data (July 2021 on).",
+     "body": [],
+     "where": "CFB Transfer%, team builder, CBB roster terms",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "ARKLIST",
+     "short": "The owner's hand-picked players, one list per sport.",
+     "body": [
+      "Not a model output."
+     ],
+     "where": "ARKLIST tab on each page; ARKLIST page",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Hockey",
+      "Soccer",
+      "Tennis"
+     ]
+    }
+   ]
+  }
+ ],
+ "fv_tables": [
+  {
+   "board": "All boards: the 20-80 scale",
+   "note": "Tier labels per sport, as on the ARKBOARD hub (fv at a glance). Each board keeps its own ladder.",
+   "cols": [
+    "FV",
+    "tier",
+    "football",
+    "basketball",
+    "hockey",
+    "soccer",
+    "baseball"
+   ],
+   "rows": [
+    [
+     "80",
+     "generational",
+     "5+ time All-Pro",
+     "7+ All-NBA teams",
+     "1 in 4 classes, 6.45+ peak WAR",
+     "#1 / 2 birth years",
+     "top 5 overall"
+    ],
+    [
+     "70",
+     "star",
+     "2-time All-Pro",
+     "3+ All-NBA teams",
+     "#1 / class, 4.62+ peak WAR",
+     "top 3 / birth year",
+     "top 10 overall"
+    ],
+    [
+     "60",
+     "plus",
+     "Pro Bowler",
+     "2+ All-Star",
+     "top 5 / class, 3.16+ peak WAR",
+     "top 20 / birth year",
+     "All-Star / #3 SP"
+    ],
+    [
+     "55",
+     "above average",
+     "6+ seasons starting",
+     "above-avg starter",
+     "top 10 / class, 2.33+ peak WAR",
+     "top 45 / birth year",
+     "above-average regular"
+    ],
+    [
+     "50",
+     "average",
+     "4+ seasons starting",
+     "average starter",
+     "top 20 / class, 1.48+ peak WAR",
+     "top 90 / birth year (big-five regular)",
+     "average regular"
+    ],
+    [
+     "45",
+     "below average",
+     "2+ seasons starting",
+     "low-end starter",
+     "top 30 / class, 0.86+ peak WAR",
+     "top 150 / birth year",
+     "low-end regular / platoon"
+    ],
+    [
+     "40",
+     "bench",
+     "rotational",
+     "end of rotation",
+     "top 45 / class, 0.38+ peak WAR",
+     "top 250 / birth year (top-flight regular)",
+     "bench"
+    ],
+    [
+     "30",
+     "organizational",
+     "camp body",
+     "two-way / fringe",
+     "some NHL games",
+     "some senior value",
+     "up and down"
+    ],
+    [
+     "20",
+     "non-pro",
+     "non-NFL",
+     "G-League",
+     "no NHL games",
+     "no senior value",
+     "organizational"
+    ]
+   ]
+  },
+  {
+   "board": "CFB / NFL prospects",
+   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,974 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 76.8 (80 about once per 5 seasons).",
+   "cols": [
+    "FV",
+    "meaning",
+    "per class",
+    "pct",
+    "NFL WAR prime / a year",
+    "draft value",
+    "held out: graded -> reached"
+   ],
+   "rows": [
+    [
+     "80",
+     "5+ time All-Pro (generational)",
+     "~1",
+     "none live",
+     "1.04 / 0.47",
+     "No. 1 pick",
+     "-"
+    ],
+    [
+     "75",
+     "3+ time All-Pro",
+     "~1",
+     "1 of 4,974 (0.02%)",
+     "0.89 / 0.29",
+     "top 2 pick",
+     "-"
+    ],
+    [
+     "70",
+     "2-time All-Pro",
+     "~3",
+     "3 of 4,974 (0.06%)",
+     "0.67 / 0.23",
+     "top 5 pick",
+     "-"
+    ],
+    [
+     "65",
+     "All-Pro or 3+ Pro Bowls",
+     "~7",
+     "5 of 4,974 (0.10%)",
+     "0.49 / 0.17",
+     "top 10 pick",
+     "65+: 71.2 -> 74.9 (n 19, 50+ 100%)"
+    ],
+    [
+     "60",
+     "Pro Bowler",
+     "~16",
+     "10 of 4,974 (0.20%)",
+     "0.40 / 0.13",
+     "1st round",
+     "60-64: 62.8 -> 60.6 (n 10, 50+ 70%)"
+    ],
+    [
+     "55",
+     "6+ seasons as a starter",
+     "~25",
+     "15 of 4,974 (0.30%)",
+     "0.31 / 0.10",
+     "late 1st / 2nd round",
+     "55-59: 57.3 -> 59.5 (n 17, 50+ 65%)"
+    ],
+    [
+     "50",
+     "4+ seasons as a starter",
+     "~32",
+     "61 of 4,974 (1.2%)",
+     "0.19 / 0.07",
+     "rounds 2-3",
+     "50-54: 51.8 -> 48.5 (n 64, 50+ 38%)"
+    ],
+    [
+     "45",
+     "2+ seasons as a starter",
+     "~43",
+     "189 of 4,974 (3.8%)",
+     "0.09 / 0.05",
+     "rounds 3-4",
+     "45-49: 47.2 -> 46.1 (n 167, 50+ 37%)"
+    ],
+    [
+     "40",
+     "rotation, 48+ games",
+     "~64",
+     "257 of 4,974 (5.2%)",
+     "0 / 0.02",
+     "rounds 4-6",
+     "40-44: 42.4 -> 42.3 (n 80, 50+ 32%)"
+    ],
+    [
+     "35",
+     "backup, 16+ games",
+     "~98",
+     "340 of 4,974 (6.8%)",
+     "0 / 0.01",
+     "late round",
+     "35-39: 37.3 -> 36.2 (n 107, 50+ 21%)"
+    ],
+    [
+     "30",
+     "drafted / camp roster",
+     "~150",
+     "502 of 4,974 (10.1%)",
+     "0 / 0",
+     "late round / UDFA",
+     "30-34: 32.3 -> 32.6 (n 165, 50+ 17%)"
+    ],
+    [
+     "20",
+     "non-NFL",
+     "-",
+     "all",
+     "- / 0",
+     "-",
+     "20-24: 21.3 -> 21.3 (n 4717, 50+ 1%)"
+    ]
+   ]
+  },
+  {
+   "board": "CBB / NBA prospects",
+   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,492). Stretch: headline = mean up to 46.6, linear above to 80 at 54.7 (80 about once per 5 seasons).",
+   "cols": [
+    "FV",
+    "meaning (rarity anchor; most common role in band)",
+    "per class",
+    "pct",
+    "peak XPM",
+    "per board",
+    "draft slot",
+    "held out: graded -> reached"
+   ],
+   "rows": [
+    [
+     "80",
+     "7+ All-NBA; most common: 7+ All-NBA (80%)",
+     "0.56",
+     "none live",
+     "+6.0 and up",
+     "0.6",
+     "median pick 4, 100% drafted",
+     "-"
+    ],
+    [
+     "75",
+     "5+ All-NBA; most common: 5+ All-NBA (60%)",
+     "0.56",
+     "none live",
+     "+3.7 to +6.0",
+     "2.0",
+     "median pick 6, 100% drafted",
+     "-"
+    ],
+    [
+     "70",
+     "3+ All-NBA; most common: All-NBA (50%)",
+     "0.44",
+     "1 of 5,492 (0.02%)",
+     "+3.2 to +3.7",
+     "2.9",
+     "median pick 5, 100% drafted",
+     "-"
+    ],
+    [
+     "65",
+     "All-NBA; most common: All-NBA (53%)",
+     "2.11",
+     "1 of 5,492 (0.02%)",
+     "+2.0 to +3.2",
+     "7.0",
+     "median pick 11, 95% drafted",
+     "-"
+    ],
+    [
+     "60",
+     "2+ All-Star; most common: All-NBA (80%)",
+     "0.56",
+     "1 of 5,492 (0.02%)",
+     "+1.7 to +2.0",
+     "8.0",
+     "median pick 7, 100% drafted",
+     "-"
+    ],
+    [
+     "55",
+     "All-Star or 6+ seasons as a starter; most common: All-Star or 6+ seasons as a starter (45%)",
+     "4.67",
+     "3 of 5,492 (0.05%)",
+     "+0.6 to +1.7",
+     "19",
+     "median pick 18, 90% drafted",
+     "55-59: 57.0 -> 55.0 (n 1, 50+ 100%)"
+    ],
+    [
+     "50",
+     "4+ seasons as a starter; most common: 4+ seasons as a starter (31%)",
+     "3.56",
+     "3 of 5,492 (0.05%)",
+     "+0.0 to +0.6",
+     "28",
+     "median pick 17, 84% drafted",
+     "50-54: 51.7 -> 49.1 (n 7, 50+ 43%)"
+    ],
+    [
+     "45",
+     "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
+     "5.89",
+     "7 of 5,492 (0.13%)",
+     "-0.6 to +0.0",
+     "43",
+     "median pick 23, 85% drafted",
+     "45-49: 47.4 -> 44.4 (n 25, 50+ 32%)"
+    ],
+    [
+     "40",
+     "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
+     "7.33",
+     "17 of 5,492 (0.31%)",
+     "-1.4 to -0.6",
+     "64",
+     "median pick 19, 83% drafted",
+     "40-44: 42.5 -> 44.9 (n 55, 50+ 40%)"
+    ],
+    [
+     "35",
+     "bench, 100+ games; most common: bench, 100+ games (52%)",
+     "12",
+     "42 of 5,492 (0.76%)",
+     "-2.1 to -1.4",
+     "104",
+     "median pick 29, 66% drafted",
+     "35-39: 37.3 -> 35.7 (n 147, 50+ 16%)"
+    ],
+    [
+     "30",
+     "reached the NBA; most common: reached the NBA (83%)",
+     "23",
+     "80 of 5,492 (1.5%)",
+     "-3.5 to -2.1",
+     "191",
+     "median pick 38, 57% drafted",
+     "30-34: 32.2 -> 31.8 (n 148, 50+ 11%)"
+    ],
+    [
+     "20",
+     "non-NBA; most common: non-NBA (100%)",
+     "1635",
+     "all",
+     "below -3.5",
+     "-",
+     "median pick 53, 0% drafted",
+     "20-24: 24.7 -> 24.4 (n 540, 50+ 4%)"
+    ]
+   ]
+  },
+  {
+   "board": "Hockey prospects (NHL)",
+   "note": "Outcome = mean of best three WAR seasons in the first 7 after the draft; goalies by the same rarity among goalies. pct = share of a draft class (~212 picks, 2008-19). live = 2027 board / drafted prospects at FV or higher. Stretch: headline = mean up to 54.0, linear above to 80 at 72.7 (80 about once per 5 seasons).",
+   "cols": [
+    "FV",
+    "meaning",
+    "per class",
+    "pct",
+    "live",
+    "held out: graded band -> reached"
+   ],
+   "rows": [
+    [
+     "80",
+     "6.45+ peak WAR a season",
+     "one in four classes",
+     "top 0.1% of picks",
+     "0 / 1",
+     "-"
+    ],
+    [
+     "75",
+     "5.31+ peak WAR a season",
+     "one in two classes",
+     "top 0.2% of picks",
+     "0 / 2",
+     "-"
+    ],
+    [
+     "70",
+     "4.62+ peak WAR a season",
+     "the best of a class",
+     "top 0.5% of picks",
+     "0 / 3",
+     "-"
+    ],
+    [
+     "65",
+     "4.01+ peak WAR a season",
+     "top 2 of a class",
+     "top 0.9% of picks",
+     "0 / 4",
+     "-"
+    ],
+    [
+     "60",
+     "3.16+ peak WAR a season",
+     "top 5 of a class",
+     "top 2.4% of picks",
+     "1 / 11",
+     "60-64: 62.2 -> 58.7 (n 12, NHL 100%)"
+    ],
+    [
+     "55",
+     "2.33+ peak WAR a season",
+     "top 10",
+     "top 4.7% of picks",
+     "1 / 14",
+     "55-59: 57.3 -> 60.0 (n 16, NHL 100%)"
+    ],
+    [
+     "50",
+     "1.48+ peak WAR a season",
+     "top 20 (NHL regular)",
+     "top 9.4% of picks",
+     "4 / 31",
+     "50-54: 51.8 -> 50.4 (n 33, NHL 97%)"
+    ],
+    [
+     "45",
+     "0.86+ peak WAR a season",
+     "top 30",
+     "top 14.2% of picks",
+     "7 / 76",
+     "45-49: 47.4 -> 49.1 (n 63, NHL 98%)"
+    ],
+    [
+     "40",
+     "0.38+ peak WAR a season",
+     "top 45 (NHL career)",
+     "top 21.3% of picks",
+     "20 / 125",
+     "40-44: 42.4 -> 43.9 (n 129, NHL 98%)"
+    ],
+    [
+     "30",
+     "some NHL games",
+     "-",
+     "-",
+     "86 / 300",
+     "30-34: 32.1 -> 31.4 (n 477, NHL 64%)"
+    ],
+    [
+     "20",
+     "no NHL games",
+     "-",
+     "-",
+     "192 / 300",
+     "20-24: 22.8 -> 23.6 (n 807, NHL 24%)"
+    ]
+   ]
+  },
+  {
+   "board": "Soccer prospects",
+   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,645 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
+   "cols": [
+    "FV",
+    "meaning",
+    "per class",
+    "pct",
+    "held out: graded band -> reached"
+   ],
+   "rows": [
+    [
+     "80",
+     "peak GAR a season GK 20.0 / D 16.3 / M 16.6 / F 15.7",
+     "one in two birth years at the position",
+     "none live",
+     "-"
+    ],
+    [
+     "75",
+     "peak GAR a season GK 20.0 / D 14.9 / M 15.9 / F 15.0",
+     "the best of a birth year at the position",
+     "1 of 30,645 (<0.01%)",
+     "-"
+    ],
+    [
+     "70",
+     "peak GAR a season GK 15.2 / D 13.0 / M 14.0 / F 13.4",
+     "top 3 of a birth year at the position",
+     "1 of 30,645 (<0.01%)",
+     "70-74: 71.8 -> 66.1 (n 6, 50+ 100%)"
+    ],
+    [
+     "65",
+     "peak GAR a season GK 11.4 / D 11.8 / M 11.6 / F 10.6",
+     "top 8 at the position",
+     "1 of 30,645 (<0.01%)",
+     "65-69: 67.4 -> 66.6 (n 12, 50+ 100%)"
+    ],
+    [
+     "60",
+     "peak GAR a season GK 10.0 / D 10.2 / M 9.3 / F 8.8",
+     "top 20 at the position",
+     "14 of 30,645 (0.05%)",
+     "60-64: 61.8 -> 62.2 (n 64, 50+ 94%)"
+    ],
+    [
+     "55",
+     "peak GAR a season GK 6.9 / D 8.4 / M 7.4 / F 7.2",
+     "top 45 at the position",
+     "29 of 30,645 (0.09%)",
+     "55-59: 57.7 -> 57.9 (n 143, 50+ 85%)"
+    ],
+    [
+     "50",
+     "peak GAR a season GK 5.4 / D 6.7 / M 5.6 / F 5.6",
+     "top 90 (big-five regular) at the position",
+     "80 of 30,645 (0.26%)",
+     "50-54: 51.9 -> 51.7 (n 273, 50+ 61%)"
+    ],
+    [
+     "45",
+     "peak GAR a season GK 4.0 / D 5.4 / M 4.4 / F 4.5",
+     "top 150 at the position",
+     "185 of 30,645 (0.60%)",
+     "45-49: 47.8 -> 47.9 (n 730, 50+ 46%)"
+    ],
+    [
+     "40",
+     "peak GAR a season GK 2.9 / D 4.3 / M 3.4 / F 3.4",
+     "top 250 (top-flight regular) at the position",
+     "459 of 30,645 (1.5%)",
+     "40-44: 41.9 -> 41.7 (n 1480, 50+ 26%)"
+    ],
+    [
+     "30",
+     "some senior value",
+     "-",
+     "1,774 of 30,645 (5.8%)",
+     "30-34: 32.2 -> 32.2 (n 5208, 50+ 7%)"
+    ],
+    [
+     "20",
+     "no senior value",
+     "-",
+     "all",
+     "20-24: 22.4 -> 22.2 (n 33215, 50+ 1%)"
+    ]
+   ]
+  },
+  {
+   "board": "Tennis prospects (ATP)",
+   "note": "Outcome = best three seasons at ages 22-28 of year-end points above No. 200, as a share of the top 100's mean; births 1979-97. pct = live pool of 925 under-22s. Stretch: headline = mean up to 63.4, linear above to 80 at 76.4 (80 about once per 5 seasons).",
+   "cols": [
+    "FV",
+    "meaning",
+    "per class",
+    "pct",
+    "held out: graded -> reached"
+   ],
+   "rows": [
+    [
+     "80",
+     "peak like year-end No. 1",
+     "one in eight birth years",
+     "none live",
+     "-"
+    ],
+    [
+     "75",
+     "peak like year-end No. 3",
+     "one in four birth years",
+     "1 of 925 (0.11%)",
+     "-"
+    ],
+    [
+     "70",
+     "peak like year-end No. 6",
+     "one in two birth years",
+     "3 of 925 (0.32%)",
+     "-"
+    ],
+    [
+     "65",
+     "peak like year-end No. 7",
+     "the best of a birth year",
+     "4 of 925 (0.43%)",
+     "65+: 69.6 -> 68.3 (n 45, 50+ 98%)"
+    ],
+    [
+     "60",
+     "peak like year-end No. 12",
+     "top 2 of a birth year",
+     "7 of 925 (0.76%)",
+     "60-64: 62.3 -> 61.8 (n 49, 50+ 88%)"
+    ],
+    [
+     "55",
+     "peak like year-end No. 29",
+     "top 4",
+     "15 of 925 (1.6%)",
+     "55-59: 57.6 -> 56.7 (n 70, 50+ 81%)"
+    ],
+    [
+     "50",
+     "peak like year-end No. 52",
+     "top 7",
+     "22 of 925 (2.4%)",
+     "50-54: 52.3 -> 52.1 (n 124, 50+ 70%)"
+    ],
+    [
+     "45",
+     "peak like year-end No. 76",
+     "top 10",
+     "29 of 925 (3.1%)",
+     "45-49: 47.5 -> 46.9 (n 124, 50+ 54%)"
+    ],
+    [
+     "40",
+     "peak like year-end No. 101",
+     "top 13 (top-100 regular)",
+     "43 of 925 (4.6%)",
+     "40-44: 42.2 -> 42.7 (n 244, 50+ 38%)"
+    ],
+    [
+     "30",
+     "some value: peak between No. 200 and No. 100",
+     "-",
+     "77 of 925 (8.3%)",
+     "30-34: 32.3 -> 32.0 (n 490, 50+ 15%)"
+    ],
+    [
+     "20",
+     "never above No. 200 at ages 22-28",
+     "-",
+     "all",
+     "20-24: 20.6 -> 20.6 (n 29734, 50+ 1%)"
+    ]
+   ]
+  },
+  {
+   "board": "Tennis prospects (WTA)",
+   "note": "Outcome = best three seasons at ages 22-28 of year-end points above No. 200, as a share of the top 100's mean; births 1979-97. pct = live pool of 772 under-22s. Stretch: headline = mean up to 60.2, linear above to 80 at 75.0 (80 about once per 5 seasons).",
+   "cols": [
+    "FV",
+    "meaning",
+    "per class",
+    "pct",
+    "held out: graded -> reached"
+   ],
+   "rows": [
+    [
+     "80",
+     "peak like year-end No. 2",
+     "one in eight birth years",
+     "none live",
+     "-"
+    ],
+    [
+     "75",
+     "peak like year-end No. 2",
+     "one in four birth years",
+     "none live",
+     "-"
+    ],
+    [
+     "70",
+     "peak like year-end No. 3",
+     "one in two birth years",
+     "1 of 772 (0.13%)",
+     "-"
+    ],
+    [
+     "65",
+     "peak like year-end No. 5",
+     "the best of a birth year",
+     "2 of 772 (0.26%)",
+     "65+: 68.7 -> 67.9 (n 29, 50+ 100%)"
+    ],
+    [
+     "60",
+     "peak like year-end No. 11",
+     "top 2 of a birth year",
+     "4 of 772 (0.52%)",
+     "60-64: 62.3 -> 59.0 (n 30, 50+ 77%)"
+    ],
+    [
+     "55",
+     "peak like year-end No. 25",
+     "top 4",
+     "9 of 772 (1.2%)",
+     "55-59: 57.1 -> 54.3 (n 70, 50+ 71%)"
+    ],
+    [
+     "50",
+     "peak like year-end No. 49",
+     "top 7",
+     "14 of 772 (1.8%)",
+     "50-54: 52.0 -> 47.2 (n 127, 50+ 51%)"
+    ],
+    [
+     "45",
+     "peak like year-end No. 76",
+     "top 10",
+     "28 of 772 (3.6%)",
+     "45-49: 47.5 -> 45.0 (n 215, 50+ 50%)"
+    ],
+    [
+     "40",
+     "peak like year-end No. 102",
+     "top 13 (top-100 regular)",
+     "46 of 772 (6.0%)",
+     "40-44: 42.3 -> 41.8 (n 465, 50+ 37%)"
+    ],
+    [
+     "30",
+     "some value: peak between No. 200 and No. 100",
+     "-",
+     "81 of 772 (10.5%)",
+     "30-34: 32.3 -> 33.8 (n 600, 50+ 20%)"
+    ],
+    [
+     "20",
+     "never above No. 200 at ages 22-28",
+     "-",
+     "all",
+     "20-24: 20.6 -> 20.6 (n 29728, 50+ 1%)"
+    ]
+   ]
+  },
+  {
+   "board": "MLB prospects (hand-graded)",
+   "note": "FanGraphs primer tiers; hand grades, no model, no live rarity or held-out check. WAR = per season at peak.",
+   "cols": [
+    "FV",
+    "hitter",
+    "starting pitcher",
+    "reliever",
+    "WAR / season"
+   ],
+   "rows": [
+    [
+     "80",
+     "top 5 overall",
+     "#1 (top 1-3 arm)",
+     "-",
+     "7.0+"
+    ],
+    [
+     "75",
+     "top 5-10",
+     "#1/2",
+     "-",
+     "6.0"
+    ],
+    [
+     "70",
+     "top 10 overall",
+     "#2",
+     "-",
+     "5.0-7.0"
+    ],
+    [
+     "65",
+     "perennial All-Star",
+     "#2/3",
+     "-",
+     "4.2"
+    ],
+    [
+     "60",
+     "All-Star",
+     "#3",
+     "high closer",
+     "3.4-4.9"
+    ],
+    [
+     "55",
+     "above-average regular",
+     "#3/4",
+     "mid closer",
+     "2.5-3.3"
+    ],
+    [
+     "50",
+     "average everyday player",
+     "#4",
+     "low closer / high setup",
+     "1.6-2.4"
+    ],
+    [
+     "45",
+     "low-end regular / platoon",
+     "#4/5",
+     "low setup",
+     "0.8-1.5"
+    ],
+    [
+     "40",
+     "bench",
+     "back-end / spot starter",
+     "middle relief",
+     "0.0-0.7"
+    ],
+    [
+     "35",
+     "emergency call-up",
+     "emergency call-up",
+     "emergency call-up",
+     "~0"
+    ],
+    [
+     "30",
+     "up and down",
+     "up and down",
+     "up and down",
+     "below -0.1"
+    ],
+    [
+     "20",
+     "organizational",
+     "organizational",
+     "organizational",
+     "-"
+    ]
+   ]
+  }
+ ]
+}

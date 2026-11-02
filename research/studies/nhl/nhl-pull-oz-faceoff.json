@@ -1,0 +1,89 @@
+{
+  "id": "nhl-pull-oz-faceoff",
+  "sport": "NHL",
+  "question": "Does pulling the goalie at an offensive-zone faceoff tie more games?",
+  "answer": "No clear effect. After model adjustment, OZ-draw pulls tie +1.0 pts vs other pulls (CI -2.8 to 4.7).",
+  "findings": [
+    "Down 1, OZ draw: 16.1% level at 60:00 vs 14.5% expected (n=435, median 2:16 left).",
+    "Down 1, on the fly: 12.7% vs 12.2% expected (n=1,320, median 1:46 left).",
+    "Goal for before the goalie returns: 13% after OZ draw, 12% on the fly.",
+    "Down 1 and 2 pooled: +0.1 pts (-2.0 to 2.3), n=3,258."
+  ],
+  "method": "Outcome: level or ahead at 60:00, minus Markov-model expectation for the pull time (stay pulled). First even-strength pull per team-game; zone from a faceoff within 2 s of the goalie leaving. Bootstrap CIs.",
+  "data": "NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games; 1,801 pulls down 1.",
+  "n": 1801,
+  "robust": false,
+  "interest": 2,
+  "split_check": "OZ-draw residual down 1: +3.7 pts in 2021-23, -0.5 pts in 2023-25.",
+  "chart": {
+    "type": "bar",
+    "title": "Level at 60:00 after a pull, by how it started",
+    "x_label": "pull start",
+    "y_label": "level at 60:00 %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "observed",
+        "points": [
+          {
+            "x": "OZ draw, down 1",
+            "y": 0.1609,
+            "lo": 0.1294,
+            "hi": 0.1984,
+            "n": 435
+          },
+          {
+            "x": "on the fly, down 1",
+            "y": 0.1273,
+            "lo": 0.1104,
+            "hi": 0.1463,
+            "n": 1320
+          },
+          {
+            "x": "OZ draw, down 2",
+            "y": 0.0175,
+            "lo": 0.0085,
+            "hi": 0.0356,
+            "n": 401
+          },
+          {
+            "x": "on the fly, down 2",
+            "y": 0.0172,
+            "lo": 0.0109,
+            "hi": 0.027,
+            "n": 1047
+          }
+        ]
+      },
+      {
+        "name": "model expected",
+        "points": [
+          {
+            "x": "OZ draw, down 1",
+            "y": 0.1449,
+            "n": 435
+          },
+          {
+            "x": "on the fly, down 1",
+            "y": 0.1215,
+            "n": 1320
+          },
+          {
+            "x": "OZ draw, down 2",
+            "y": 0.0229,
+            "n": 401
+          },
+          {
+            "x": "on the fly, down 2",
+            "y": 0.0156,
+            "n": 1047
+          }
+        ]
+      }
+    ]
+  },
+  "publish": false
+}

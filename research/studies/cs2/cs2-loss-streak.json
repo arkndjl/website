@@ -1,0 +1,81 @@
+{
+  "id": "cs2-loss-streak",
+  "sport": "CS2",
+  "question": "Does a losing streak hurt the next round beyond economy (the no-timeout baseline)?",
+  "answer": "No tilt. After 3+ straight losses a team wins +0.9 pp vs an economy and score model.",
+  "findings": [
+    "After 1 loss in a row: wins 35.8%, model 36.3%, gap -0.4 pp (-0.7 to -0.2 pp, n=136,681).",
+    "After 3 losses in a row: wins 39.5%, model 38.5%, gap +1.1 pp (+0.7 to +1.5 pp, n=51,700).",
+    "After 5 losses in a row: wins 40.8%, model 40.0%, gap +0.8 pp (+0.1 to +1.6 pp, n=15,367).",
+    "bo3.gg round data has no timeout calls, so the timeout effect itself is not measured."
+  ],
+  "method": "Logistic baseline on buy-class matchup by side, equipment values, score gap, Elo and round in half; actual minus predicted win rate by current losing streak in the half, map-clustered CIs.",
+  "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 327,073 rounds",
+  "n": 327073,
+  "robust": true,
+  "interest": 3,
+  "split_check": "3+ streak gap: early +0.9 pp (n=55,017), late +0.9 pp (n=55,026).",
+  "chart": {
+    "type": "line",
+    "title": "Next-round win vs economy model, by losing streak",
+    "x_label": "rounds lost in a row",
+    "y_label": "actual minus expected",
+    "y_fmt": "signed",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "model"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "losing team",
+        "points": [
+          {
+            "x": 1,
+            "y": -0.0041,
+            "lo": -0.0065,
+            "hi": -0.0017,
+            "n": 136681
+          },
+          {
+            "x": 2,
+            "y": -0.001,
+            "lo": -0.0039,
+            "hi": 0.0019,
+            "n": 80349
+          },
+          {
+            "x": 3,
+            "y": 0.0107,
+            "lo": 0.0066,
+            "hi": 0.0148,
+            "n": 51700
+          },
+          {
+            "x": 4,
+            "y": 0.0078,
+            "lo": 0.0024,
+            "hi": 0.0133,
+            "n": 27680
+          },
+          {
+            "x": 5,
+            "y": 0.0084,
+            "lo": 0.0008,
+            "hi": 0.016,
+            "n": 15367
+          },
+          {
+            "x": 6,
+            "y": 0.0057,
+            "lo": -0.002,
+            "hi": 0.0133,
+            "n": 15296
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}

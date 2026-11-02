@@ -234,6 +234,16 @@ copyright = 'arkndjl'
             group = "all sports"
             gname = "ARKLIST"
         [[languages.en.menu.main]]
+          identifier = "arkboard-library"
+          parent = "ARKBOARD"
+          name = "Library"
+          url = "/arkboard/library/"
+          weight = 32
+          [languages.en.menu.main.params]
+            icon = "img/icons/library.svg"
+            group = "all sports"
+            gname = "Library"
+        [[languages.en.menu.main]]
           identifier = "arkboard-cfb"
           parent = "ARKBOARD"
           name = "Football Prospects / CFB"

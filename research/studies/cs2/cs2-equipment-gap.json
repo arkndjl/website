@@ -1,0 +1,226 @@
+{
+  "id": "cs2-equipment-gap",
+  "sport": "CS2",
+  "question": "How much does an equipment gap change round win chances on CT and T?",
+  "answer": "Full buy vs full buy: CT wins 51.7%. At equal dollar value CT wins 48.5%; an eco beats a full buy 5.6%.",
+  "findings": [
+    "Full buy vs full buy: CT wins 51.7% (51.4%-52.0%, n=154,499).",
+    "Force vs full: CT forcing wins 36.0% (35.4%-36.5%, n=28,386); T forcing wins 36.0% (n=40,093).",
+    "Eco vs full: CT eco wins 5.9% (5.5%-6.4%, n=11,243); T eco wins 5.4% (n=17,966).",
+    "CT needs about $1.3k more equipment value than T for a 50% round (CT rifles and kits cost more)."
+  ],
+  "method": "Non-pistol regulation rounds; equipment value at round start per team from bo3.gg, binned by CT minus T in $4k steps (ends capped at $24k). Round win rate with map-clustered CIs.",
+  "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 327,073 rounds",
+  "n": 327073,
+  "robust": true,
+  "interest": 3,
+  "split_check": "Full vs full CT win %: early 51.7% (n=76,815), late 51.7% (n=77,684).",
+  "chart": {
+    "type": "line",
+    "title": "Round win % by equipment gap",
+    "x_label": "own minus opponent equipment ($k)",
+    "y_label": "round win %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0.5,
+      "label": "even"
+    },
+    "mark": null,
+    "series": [
+      {
+        "name": "CT",
+        "points": [
+          {
+            "x": -24.0,
+            "y": 0.0541,
+            "lo": 0.0485,
+            "hi": 0.0597,
+            "n": 6731
+          },
+          {
+            "x": -20.0,
+            "y": 0.1095,
+            "lo": 0.1043,
+            "hi": 0.1148,
+            "n": 13784
+          },
+          {
+            "x": -16.0,
+            "y": 0.1828,
+            "lo": 0.177,
+            "hi": 0.1887,
+            "n": 16689
+          },
+          {
+            "x": -12.0,
+            "y": 0.2839,
+            "lo": 0.2759,
+            "hi": 0.2918,
+            "n": 12277
+          },
+          {
+            "x": -8.0,
+            "y": 0.3341,
+            "lo": 0.3277,
+            "hi": 0.3405,
+            "n": 20350
+          },
+          {
+            "x": -4.0,
+            "y": 0.4373,
+            "lo": 0.4307,
+            "hi": 0.4439,
+            "n": 21327
+          },
+          {
+            "x": 0.0,
+            "y": 0.4852,
+            "lo": 0.4809,
+            "hi": 0.4896,
+            "n": 51728
+          },
+          {
+            "x": 4.0,
+            "y": 0.5325,
+            "lo": 0.5286,
+            "hi": 0.5364,
+            "n": 64817
+          },
+          {
+            "x": 8.0,
+            "y": 0.587,
+            "lo": 0.5822,
+            "hi": 0.5918,
+            "n": 41023
+          },
+          {
+            "x": 12.0,
+            "y": 0.6497,
+            "lo": 0.6427,
+            "hi": 0.6568,
+            "n": 18027
+          },
+          {
+            "x": 16.0,
+            "y": 0.7514,
+            "lo": 0.7445,
+            "hi": 0.7584,
+            "n": 14701
+          },
+          {
+            "x": 20.0,
+            "y": 0.8445,
+            "lo": 0.8401,
+            "hi": 0.849,
+            "n": 24405
+          },
+          {
+            "x": 24.0,
+            "y": 0.9097,
+            "lo": 0.9058,
+            "hi": 0.9135,
+            "n": 21214
+          }
+        ]
+      },
+      {
+        "name": "T",
+        "points": [
+          {
+            "x": -24.0,
+            "y": 0.0903,
+            "lo": 0.0865,
+            "hi": 0.0942,
+            "n": 21214
+          },
+          {
+            "x": -20.0,
+            "y": 0.1555,
+            "lo": 0.151,
+            "hi": 0.1599,
+            "n": 24405
+          },
+          {
+            "x": -16.0,
+            "y": 0.2486,
+            "lo": 0.2416,
+            "hi": 0.2555,
+            "n": 14701
+          },
+          {
+            "x": -12.0,
+            "y": 0.3503,
+            "lo": 0.3432,
+            "hi": 0.3573,
+            "n": 18027
+          },
+          {
+            "x": -8.0,
+            "y": 0.413,
+            "lo": 0.4082,
+            "hi": 0.4178,
+            "n": 41023
+          },
+          {
+            "x": -4.0,
+            "y": 0.4675,
+            "lo": 0.4636,
+            "hi": 0.4714,
+            "n": 64817
+          },
+          {
+            "x": 0.0,
+            "y": 0.5148,
+            "lo": 0.5104,
+            "hi": 0.5191,
+            "n": 51728
+          },
+          {
+            "x": 4.0,
+            "y": 0.5627,
+            "lo": 0.5561,
+            "hi": 0.5693,
+            "n": 21327
+          },
+          {
+            "x": 8.0,
+            "y": 0.6659,
+            "lo": 0.6595,
+            "hi": 0.6723,
+            "n": 20350
+          },
+          {
+            "x": 12.0,
+            "y": 0.7161,
+            "lo": 0.7082,
+            "hi": 0.7241,
+            "n": 12277
+          },
+          {
+            "x": 16.0,
+            "y": 0.8172,
+            "lo": 0.8113,
+            "hi": 0.823,
+            "n": 16689
+          },
+          {
+            "x": 20.0,
+            "y": 0.8905,
+            "lo": 0.8852,
+            "hi": 0.8957,
+            "n": 13784
+          },
+          {
+            "x": 24.0,
+            "y": 0.9459,
+            "lo": 0.9403,
+            "hi": 0.9515,
+            "n": 6731
+          }
+        ]
+      }
+    ]
+  },
+  "publish": true
+}
