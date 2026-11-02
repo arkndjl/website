@@ -298,7 +298,10 @@ def avail_live():
         log_injuries(logged)
     # 'pinj': the report's players who haven't played for the team yet this season, valued off last season's line
     # (matched among last season's Barttorvik players: at this school, else at the school his board career lists)
-    C.PINJ.update(C.pre_out(logs, C.bt_logs(SEASON - 1), listed=pre_listed(report, logs)))
+    pl = pre_listed(report, logs)
+    if report:
+        print(f'cbb injuries: {sum(len(v) for v in pl.values())} of the report not yet played this season, valued off last season (pinj)')
+    C.PINJ.update(C.pre_out(logs, C.bt_logs(SEASON - 1), listed=pl))
     if not logs:
         return {}, {}
     av = C.avail(logs, listed=listed)

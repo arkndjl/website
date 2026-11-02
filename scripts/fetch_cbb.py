@@ -287,7 +287,10 @@ def report(r, f, L):
             rk = g.get('on3rk') or g.get('rk247')
             line = f"recruiting pedigree: {'No. ' + str(rk) + ' in the class' if rk else 'unranked'}" + (f", On3 {g['on3']:.1f}" if g.get('on3') else '')
         elif k == 'age' or k == 'young':
-            line = f"age: {f['age']:.1f} entering the season"
+            # in season a newcomer's blend carries the returner model's age part while f is still his newcomer row
+            a = f.get('age') if f.get('age') is not None else f.get('age_new')
+            if a is None: continue
+            line = f"age: {a:.1f} entering the season"
         elif k in ('ht', 'ht_g'):
             line = f"size: {r['p']['ht'] or '?'} for a {('guard' if f.get('guard') else 'big' if f.get('big') else 'wing') if not f['newcomer'] else r['p']['pos']}"
         elif k == 'yr':
