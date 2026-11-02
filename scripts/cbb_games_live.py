@@ -417,16 +417,25 @@ def build():
                 best[m[1]] = {'name': r[bc['name']], 'pos': r[bc['pos']], 'fv': r[bc['fv']]}
     logo = lambda t: logos.get(t) or f'https://a.espncdn.com/i/teamlogos/ncaa/500/{t}.png'
 
-    # power ratings: points against an average D-I team on a neutral floor, from the game model's weights
+    # power ratings: points against an average D-I team on a neutral floor, from the game model's weights: the
+    # efficiency (its own weight plus BPI's, whose fallback with no ESPN forecast is the efficiency), Elo and the
+    # long-memory margin rating (scripts/cbb_tourney.py team_rating, the tournament odds' rating), so a rating gap plus
+    # the home edge is the game model's margin (slope ~1 on today's games)
+    import cbb_tourney
     teams = sorted(t for t in d1 if t in R.ix)
     elo_avg = sum(W.elo[t] for t in teams) / len(teams)
     mkt_avg = sum(W.mkt[t] for t in teams) / len(teams)
     P0 = R.tau + float(np.mean([R.T[R.ix[t]] for t in teams])) * 2
-    rating = {}
-    for t in teams:
-        x = {'eff': (R.net(t) - float(np.mean([R.net(u) for u in teams]))) * P0 / 100, 'elo': (W.elo[t] - elo_avg) / 25,
-             'mkt': W.mkt[t] - mkt_avg, 'home': 0.0}
-        rating[t] = sum(coef.get(f, 0.0) * x.get(f, 0.0) for f in feats)
+    net_ = {t: float(R.net(t)) for t in teams}
+    T_ = {t: float(R.T[R.ix[t]]) for t in teams}
+    try:
+        gm_t = cbb_tourney.live_gm(rows, SEASON) if 'gm' in feats else {}
+    except Exception as e:            # history file missing: the margin rating sits at average for the day
+        print('margin rating failed:', repr(e), flush=True)
+        gm_t = {}
+    gm_avg = float(np.mean([gm_t.get(t, 0.0) for t in teams]))
+    rating = cbb_tourney.team_rating(net_, T_, float(R.tau), W.elo, gm_t, teams, coef)
+    edge = lambda g: 0.0 if g['neutral'] else cbb_tourney.home_edge(coef, 1.0 if g.get('conf') else 0.0, g['home'])
     order = sorted(teams, key=lambda t: -rating[t])
     rk = {t: i + 1 for i, t in enumerate(order)}
     prior_rk = {t: i + 1 for i, t in enumerate(sorted(teams, key=lambda t: -pri.get(t, {}).get('net', -99)))}
@@ -443,7 +452,7 @@ def build():
     recs = lambda t: f'{rec[t][0]}-{rec[t][1]}'
 
     # season odds: the rest of the regular season simulated (conference tournaments and March left out); each team's
-    # true strength drawn once a season around its rating, each game around its margin (the model's home court,
+    # true strength drawn once a season around its rating, each game around its margin (the model's home court with BPI's,
     # conference-home and altitude terms). The strength sd: sqrt(SHOCK_A^2 x SHOCK_K / (SHOCK_K + games played) +
     # SHOCK_B^2 x share of its regular season left), the rating's error plus its drift over the games left
     # (scripts/cbb_games_research.py sims: past seasons from Dec 1, Jan 15 and Feb 15)
@@ -459,8 +468,7 @@ def build():
         ti = {t: i for i, t in enumerate(teams)}
         hi = np.array([ti[g['home']] for g in left]); ai = np.array([ti[g['away']] for g in left])
         cf = np.array([1.0 if g.get('conf') else 0.0 for g in left])
-        mm = np.array([rating[g['home']] - rating[g['away']] + (0 if g['neutral'] else coef.get('home', 3.0) + coef.get('confh', 0.0) * c
-                       + coef.get('alt', 0.0) * (g['home'] in C.ALT)) for g, c in zip(left, cf)])
+        mm = np.array([rating[g['home']] - rating[g['away']] + edge(g) for g in left])
         nleft = defaultdict(int)
         for g in left:
             nleft[g['home']] += 1; nleft[g['away']] += 1
@@ -504,9 +512,8 @@ def build():
     # NCAA tournament odds (scripts/cbb_tourney.py): conference tournaments, the committee, the bracket
     tmeta = None
     try:
-        import cbb_tourney
-        nc, tmeta = cbb_tourney.live(rows, set(teams), confs, {t: float(R.net(t)) for t in teams}, {t: float(R.T[R.ix[t]]) for t in teams},
-                                     float(R.tau), W.elo, R.ng, coef, sd, SEASON)
+        nc, tmeta = cbb_tourney.live(rows, set(teams), confs, net_, T_, float(R.tau), W.elo, R.ng, coef, sd, SEASON,
+                                     gm=gm_t if 'gm' in feats else None)
         for r in power:
             if r['id'] in nc:
                 r['nc'] = nc[r['id']]
@@ -521,7 +528,7 @@ def build():
     try:
         import team_detail
         pc = W.prior_coef(SEASON)
-        ce, sc = coef.get('eff', 0.0), P0 / 100
+        ce, sc = coef.get('eff', 0.0) + coef.get('bpi', 0.0), P0 / 100
         pn = {t: pri.get(t, {}).get('net', 0.0) for t in teams}
         pf = [k for k in C.PRIOR_F if k not in ('one', 'nohist')]
         fm = {k: float(np.mean([pfeats[t].get(k, 0.0) for t in teams if t in pfeats])) for k in pf} if pfeats else {}
@@ -536,6 +543,8 @@ def build():
                 pp.append(['other', round(rest_, 2)])
             parts = [['prior', round(ce * sc * (pn[t] - pn_m), 2)], ['results', round(ce * sc * (R.net(t) - pn[t] - res_m), 2)],
                      ['elo', round(coef.get('elo', 0.0) * (W.elo[t] - elo_avg) / 25, 2)]]
+            if coef.get('gm'):
+                parts.append(['gm', round(coef['gm'] * (gm_t.get(t, 0.0) - gm_avg), 2)])
             TD[t] = {'parts': parts, 'pparts': pp}
         sg = []
         for g in rows:
@@ -548,7 +557,7 @@ def build():
             if g['id'] in proj:
                 m = proj[g['id']][0]
             elif g['home'] in rk and g['away'] in rk:
-                m = rating[g['home']] - rating[g['away']] + (0 if g['neutral'] else coef.get('home', 3.0) + coef.get('confh', 0.0) * bool(g.get('conf')))
+                m = rating[g['home']] - rating[g['away']] + edge(g)
             else:
                 m = None
             sg.append({'d': d, 'h': g['home'], 'a': g['away'], 'n': g['neutral'], 'm': m, 'p': None if m is None else float(C.phi(m / sd))})
