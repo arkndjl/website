@@ -1,0 +1,610 @@
+{
+ "asof": "2026-11-02",
+ "script": "scripts/nba_lineups_research.py (stints: scripts/nba_lineups.py)",
+ "gate": "2015-21 paired t <= -1.5 (MAE, clustered by date and home team-season) and 2022-26 same sign; walk-forward refit of the shipped margin feats",
+ "verdict": "nothing passes; nothing wired; no refit",
+ "validation": [
+  {
+   "season": 2013,
+   "games": 1314,
+   "parsed": 1314,
+   "mean_game_min": 48.39,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 178,
+   "player_games": 23852,
+   "within_1min": 0.9861,
+   "within_2min": 0.9888,
+   "mean_abs_min": 0.306,
+   "stints_not_5": 136
+  },
+  {
+   "season": 2014,
+   "games": 1319,
+   "parsed": 1319,
+   "mean_game_min": 48.38,
+   "games_240_or_ot": 0.9992,
+   "no_box_minutes": 168,
+   "player_games": 24065,
+   "within_1min": 0.9985,
+   "within_2min": 0.9986,
+   "mean_abs_min": 0.262,
+   "stints_not_5": 21
+  },
+  {
+   "season": 2015,
+   "games": 1311,
+   "parsed": 1311,
+   "mean_game_min": 48.5,
+   "games_240_or_ot": 0.9992,
+   "no_box_minutes": 178,
+   "player_games": 23990,
+   "within_1min": 0.9987,
+   "within_2min": 0.999,
+   "mean_abs_min": 0.305,
+   "stints_not_5": 7
+  },
+  {
+   "season": 2016,
+   "games": 1316,
+   "parsed": 1314,
+   "mean_game_min": 48.36,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 160,
+   "player_games": 24628,
+   "within_1min": 0.998,
+   "within_2min": 0.9981,
+   "mean_abs_min": 0.267,
+   "stints_not_5": 14
+  },
+  {
+   "season": 2017,
+   "games": 1309,
+   "parsed": 1309,
+   "mean_game_min": 48.32,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 168,
+   "player_games": 24357,
+   "within_1min": 0.9992,
+   "within_2min": 0.9994,
+   "mean_abs_min": 0.251,
+   "stints_not_5": 26
+  },
+  {
+   "season": 2018,
+   "games": 1312,
+   "parsed": 1311,
+   "mean_game_min": 48.27,
+   "games_240_or_ot": 0.9992,
+   "no_box_minutes": 172,
+   "player_games": 24222,
+   "within_1min": 0.9735,
+   "within_2min": 0.9771,
+   "mean_abs_min": 0.372,
+   "stints_not_5": 315
+  },
+  {
+   "season": 2019,
+   "games": 1312,
+   "parsed": 1293,
+   "mean_game_min": 48.34,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 27460,
+   "within_1min": 0.9683,
+   "within_2min": 0.9711,
+   "mean_abs_min": 0.408,
+   "stints_not_5": 410
+  },
+  {
+   "season": 2020,
+   "games": 1143,
+   "parsed": 1143,
+   "mean_game_min": 48.36,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 24117,
+   "within_1min": 0.9734,
+   "within_2min": 0.9766,
+   "mean_abs_min": 0.38,
+   "stints_not_5": 343
+  },
+  {
+   "season": 2021,
+   "games": 1171,
+   "parsed": 1171,
+   "mean_game_min": 48.29,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 6,
+   "player_games": 24917,
+   "within_1min": 0.9994,
+   "within_2min": 0.9996,
+   "mean_abs_min": 0.252,
+   "stints_not_5": 3
+  },
+  {
+   "season": 2022,
+   "games": 1323,
+   "parsed": 1323,
+   "mean_game_min": 48.26,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 28048,
+   "within_1min": 0.9998,
+   "within_2min": 1.0,
+   "mean_abs_min": 0.25,
+   "stints_not_5": 1
+  },
+  {
+   "season": 2023,
+   "games": 1320,
+   "parsed": 1320,
+   "mean_game_min": 48.35,
+   "games_240_or_ot": 0.9992,
+   "no_box_minutes": 0,
+   "player_games": 27737,
+   "within_1min": 0.9964,
+   "within_2min": 0.9983,
+   "mean_abs_min": 0.261,
+   "stints_not_5": 4
+  },
+  {
+   "season": 2024,
+   "games": 1319,
+   "parsed": 1319,
+   "mean_game_min": 48.27,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 28226,
+   "within_1min": 0.9995,
+   "within_2min": 0.9996,
+   "mean_abs_min": 0.25,
+   "stints_not_5": 3
+  },
+  {
+   "season": 2025,
+   "games": 1321,
+   "parsed": 1321,
+   "mean_game_min": 48.26,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 28260,
+   "within_1min": 0.999,
+   "within_2min": 0.9998,
+   "mean_abs_min": 0.252,
+   "stints_not_5": 7
+  },
+  {
+   "season": 2026,
+   "games": 1322,
+   "parsed": 1318,
+   "mean_game_min": 48.26,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 28620,
+   "within_1min": 0.9984,
+   "within_2min": 0.9986,
+   "mean_abs_min": 0.26,
+   "stints_not_5": 54
+  },
+  {
+   "season": 2027,
+   "games": 92,
+   "parsed": 92,
+   "mean_game_min": 48.22,
+   "games_240_or_ot": 1.0,
+   "no_box_minutes": 0,
+   "player_games": 2079,
+   "within_1min": 0.9942,
+   "within_2min": 0.9986,
+   "mean_abs_min": 0.266,
+   "stints_not_5": 9
+  }
+ ],
+ "shrink_split": {
+  "2024": {
+   "units_k": 447,
+   "onoff_k": 1408
+  },
+  "2025": {
+   "units_k": 671,
+   "onoff_k": 2610
+  },
+  "2026": {
+   "units_k": 751,
+   "onoff_k": 1462
+  },
+  "display": {
+   "k": 600,
+   "ko": 1800
+  }
+ },
+ "team_season": {
+  "n": 353,
+  "base": {
+   "r": 0.7517,
+   "rmse": 3.393
+  },
+  "xpm1 alone": {
+   "r": 0.7663,
+   "rmse": 3.3172,
+   "2015_21": {
+    "dMSE": -0.8785,
+    "t": -2.1
+   },
+   "2022_26": {
+    "dMSE": -0.0071,
+    "t": -0.01
+   }
+  },
+  "oow .1": {
+   "r": 0.7541,
+   "rmse": 3.3792,
+   "2015_21": {
+    "dMSE": -0.05,
+    "t": -0.29
+   },
+   "2022_26": {
+    "dMSE": -0.1521,
+    "t": -2.78
+   }
+  },
+  "oow .25": {
+   "r": 0.7527,
+   "rmse": 3.3886,
+   "2015_21": {
+    "dMSE": 0.0617,
+    "t": 0.14
+   },
+   "2022_26": {
+    "dMSE": -0.1541,
+    "t": -0.95
+   }
+  },
+  "oow .4": {
+   "r": 0.7433,
+   "rmse": 3.4438,
+   "2015_21": {
+    "dMSE": 0.4471,
+    "t": 0.62
+   },
+   "2022_26": {
+    "dMSE": 0.213,
+    "t": 0.67
+   }
+  },
+  "oow .25 n0 1500": {
+   "r": 0.7542,
+   "rmse": 3.3798,
+   "2015_21": {
+    "dMSE": 0.0285,
+    "t": 0.06
+   },
+   "2022_26": {
+    "dMSE": -0.2494,
+    "t": -1.58
+   }
+  },
+  "oow .25 n0 6000": {
+   "r": 0.7512,
+   "rmse": 3.3975,
+   "2015_21": {
+    "dMSE": 0.1066,
+    "t": 0.24
+   },
+   "2022_26": {
+    "dMSE": -0.0719,
+    "t": -0.43
+   }
+  },
+  "oow .5": {
+   "r": 0.7317,
+   "rmse": 3.5096,
+   "2015_21": {
+    "dMSE": 0.8762,
+    "t": 0.97
+   },
+   "2022_26": {
+    "dMSE": 0.7092,
+    "t": 1.56
+   }
+  },
+  "on/off alone": {
+   "r": 0.6002,
+   "rmse": 4.114,
+   "2015_21": {
+    "dMSE": 4.9201,
+    "t": 3.38
+   },
+   "2022_26": {
+    "dMSE": 6.0799,
+    "t": 3.9
+   }
+  }
+ },
+ "games": {
+  "base_mae": {
+   "2015_21": 9.8965,
+   "2022_26": 10.7149
+  },
+  "variants": [
+   {
+    "label": "(a) oow .1",
+    "params": {
+     "oow": 0.1
+    },
+    "2015_21": {
+     "mae": 9.8965,
+     "d": -0.0,
+     "t": -0.05
+    },
+    "2022_26": {
+     "mae": 10.7135,
+     "d": -0.0014,
+     "t": -0.91
+    },
+    "kept": false
+   },
+   {
+    "label": "(a) oow .25",
+    "params": {
+     "oow": 0.25
+    },
+    "2015_21": {
+     "mae": 9.8972,
+     "d": 0.0007,
+     "t": 0.38
+    },
+    "2022_26": {
+     "mae": 10.7134,
+     "d": -0.0015,
+     "t": -0.38
+    },
+    "kept": false
+   },
+   {
+    "label": "(a) oow .25 n0 6000",
+    "params": {
+     "oow": 0.25,
+     "oon0": 6000.0
+    },
+    "2015_21": {
+     "mae": 9.8972,
+     "d": 0.0007,
+     "t": 0.35
+    },
+    "2022_26": {
+     "mae": 10.7135,
+     "d": -0.0013,
+     "t": -0.34
+    },
+    "kept": false
+   },
+   {
+    "label": "(b) iok 20000",
+    "params": {
+     "iok": 20000.0
+    },
+    "2015_21": {
+     "mae": 9.8968,
+     "d": 0.0003,
+     "t": 0.21
+    },
+    "2022_26": {
+     "mae": 10.71,
+     "d": -0.0049,
+     "t": -2.08
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": -0.0003,
+     "t": -0.08
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": -0.0056,
+     "t": -1.31
+    },
+    "kept": false
+   },
+   {
+    "label": "(b) iok 20000 ib",
+    "params": {
+     "iok": 20000.0,
+     "ib": 1
+    },
+    "2015_21": {
+     "mae": 9.8982,
+     "d": 0.0017,
+     "t": 0.56
+    },
+    "2022_26": {
+     "mae": 10.7133,
+     "d": -0.0016,
+     "t": -0.33
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": 0.0129,
+     "t": 1.81
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": 0.0001,
+     "t": 0.01
+    },
+    "kept": false
+   },
+   {
+    "label": "(b) iok 60000",
+    "params": {
+     "iok": 60000.0
+    },
+    "2015_21": {
+     "mae": 9.8964,
+     "d": -0.0001,
+     "t": -0.21
+    },
+    "2022_26": {
+     "mae": 10.7129,
+     "d": -0.002,
+     "t": -2.35
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": -0.0005,
+     "t": -0.39
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": -0.0025,
+     "t": -1.62
+    },
+    "kept": false
+   },
+   {
+    "label": "(b) iok 60000 ib",
+    "params": {
+     "iok": 60000.0,
+     "ib": 1
+    },
+    "2015_21": {
+     "mae": 9.8977,
+     "d": 0.0012,
+     "t": 0.45
+    },
+    "2022_26": {
+     "mae": 10.7165,
+     "d": 0.0016,
+     "t": 0.35
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": 0.0112,
+     "t": 1.62
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": 0.0048,
+     "t": 0.51
+    },
+    "kept": false
+   },
+   {
+    "label": "(b) iok 8000",
+    "params": {
+     "iok": 8000.0
+    },
+    "2015_21": {
+     "mae": 9.8989,
+     "d": 0.0024,
+     "t": 0.76
+    },
+    "2022_26": {
+     "mae": 10.7071,
+     "d": -0.0078,
+     "t": -1.57
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": 0.0032,
+     "t": 0.43
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": -0.0071,
+     "t": -0.76
+    },
+    "kept": false
+   },
+   {
+    "label": "(c) newrot margin term",
+    "2015_21": {
+     "mae": 9.8972,
+     "d": 0.0006,
+     "t": 0.13
+    },
+    "2022_26": {
+     "mae": 10.714,
+     "d": -0.0009,
+     "t": -0.65
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": -0.0105,
+     "t": -0.93
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": -0.0035,
+     "t": -1.27
+    },
+    "kept": false
+   },
+   {
+    "label": "(c) newrotL margin term",
+    "2015_21": {
+     "mae": 9.8959,
+     "d": -0.0006,
+     "t": -0.13
+    },
+    "2022_26": {
+     "mae": 10.7148,
+     "d": -0.0001,
+     "t": -0.09
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": -0.0178,
+     "t": -1.71
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": -0.0021,
+     "t": -0.78
+    },
+    "kept": false
+   },
+   {
+    "label": "(c) pairc margin term",
+    "2015_21": {
+     "mae": 9.8977,
+     "d": 0.0012,
+     "t": 0.34
+    },
+    "2022_26": {
+     "mae": 10.7149,
+     "d": 0.0,
+     "t": 0.03
+    },
+    "2015_21 big lin": {
+     "n": 2391,
+     "d": -0.0001,
+     "t": -0.01
+    },
+    "2022_26 big lin": {
+     "n": 2421,
+     "d": -0.0002,
+     "t": -0.11
+    },
+    "kept": false
+   },
+   {
+    "label": "(d) garbage time out of eff",
+    "params": {
+     "gto": 1.0
+    },
+    "2015_21": {
+     "mae": 9.896,
+     "d": -0.0005,
+     "t": -0.24
+    },
+    "2022_26": {
+     "mae": 10.7175,
+     "d": 0.0026,
+     "t": 0.96
+    },
+    "kept": false
+   }
+  ]
+ }
+}

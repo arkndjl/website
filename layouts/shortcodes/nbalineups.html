@@ -1,0 +1,151 @@
+{{- /* NBA lineups and on/off (Noah, Nov 2 2026): 5-man units, 2-man pairs and player on/off for the season in progress,
+       from ESPN play-by-play stints (scripts/nba_lineups.py -> static/data/nba-lineups.json, daily in nba-xpm.yml),
+       fetched the first time the window is on screen.
+       {{< nbalineups tab="lineups" >}}               team picker; views 5-man / pairs
+       {{< nbalineups tab="on/off" view="onoff" >}}   every player (or one team): on-court, off-court and on-off net
+       Unit and pair rows: [ids, MIN, poss, PF, PA]; on/off rows: [id, MIN, on poss, on PF, on PA, off poss, off PF, off PA].
+       sNet / sOn-Off: shrunk toward 0 with the file's k / ko possessions (split-half fits, scripts/nba_lineups.py).
+       Ranks follow the current sort and recount within the filters; headers sort. */ -}}
+{{- $view := .Get "view" | default "units" -}}
+<div class="win cfb nbaln" data-tab="{{ .Get "tab" | default "lineups" }}" data-nbaln="{{ $view }}" data-src="{{ "data/nba-lineups.json" | relURL }}?v={{ now.Unix }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "lineups" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar" data-ln-bar onsubmit="return false" aria-label="filter lineups">
+    <label class="cfb__field cfb__field--grow"><span>team</span><select name="team" aria-label="team"><option>loading…</option></select></label>
+    <label class="cfb__field"><span>minutes</span><select name="min">
+      {{- if eq $view "onoff" }}<option value="0">any</option><option value="100" selected>100+</option><option value="250">250+</option><option value="500">500+</option>
+      {{- else }}<option value="0">any</option><option value="10" selected>10+</option><option value="25">25+</option><option value="50">50+</option><option value="100">100+</option>{{ end -}}
+    </select></label>
+    {{- if ne $view "onoff" }}
+    <fieldset class="cfb__pos"><legend class="visually-hidden">units</legend>
+      <button type="button" class="cfb__chip is-on" data-unit="5" aria-pressed="true" title="five-man units">5-man</button>
+      <button type="button" class="cfb__chip" data-unit="2" aria-pressed="false" title="two-man pairs: every five they shared, summed (pairs with 10+ minutes)">pairs</button>
+    </fieldset>
+    {{- end }}
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaln__table">
+      <thead><tr data-ln-head></tr></thead>
+      <tbody data-ln-body><tr><td class="cfb__dim">loading…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="cfbm__body wintable__about"><p class="cfb__dim">
+  {{- if eq $view "onoff" -}}
+  On/off from ESPN play-by-play this season, every game a player's team played. On: the team's net points per 100 possessions with him on the floor; Off: with him off it; On-Off the difference, which also carries who plays beside and behind him, so it is not a rating of the player alone. sOn-Off is shrunk toward 0 with <span data-ln-ko>1,800</span> possessions (on and off combined: 1 / (1/on + 1/off)) (the noise level measured by splitting seasons into odd and even games), the fairer number for a small sample. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). A traded player shows once per team. Garbage time counts.
+  {{- else -}}
+  Five-man units and two-man pairs from ESPN play-by-play this season: minutes together, possessions, points scored (ORtg) and allowed (DRtg) per 100 possessions, and Net. sNet shrinks Net toward 0 with <span data-ln-k>600</span> possessions (the noise level measured by splitting seasons into odd and even games); a unit needs several hundred possessions before its Net says much. Lineups come from substitutions; each quarter's five are the players seen before they are subbed in. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). Garbage time counts.
+  {{- end -}}
+  </p></div>
+  <div class="win__status"><span data-ln-count></span><span class="cfb__asof" data-ln-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.nbaln__table td.nbaln__who { white-space: normal; min-width: 12em; line-height: 1.3; }
+.nbaln__table .nbaln__tm { display: inline-flex; gap: 4px; align-items: center; }
+.nbaln__table .nbaln__tm img { width: 18px; height: 18px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; }
+@media (max-width: 600px) {
+  .nbaln__table .nbaln__x { display: none; }
+  .nbaln__table td.nbaln__who { min-width: 8em; }
+  .nbaln__table .nbaln__ab { display: none; }
+}
+</style>
+<script>
+(function () {
+  if (window.__arkLn) return; window.__arkLn = true;
+  var TEAMS = { ATL: 'Atlanta Hawks', BOS: 'Boston Celtics', BKN: 'Brooklyn Nets', CHA: 'Charlotte Hornets', CHI: 'Chicago Bulls', CLE: 'Cleveland Cavaliers', DAL: 'Dallas Mavericks', DEN: 'Denver Nuggets', DET: 'Detroit Pistons', GS: 'Golden State Warriors', HOU: 'Houston Rockets', IND: 'Indiana Pacers', LAC: 'LA Clippers', LAL: 'Los Angeles Lakers', MEM: 'Memphis Grizzlies', MIA: 'Miami Heat', MIL: 'Milwaukee Bucks', MIN: 'Minnesota Timberwolves', NO: 'New Orleans Pelicans', NY: 'New York Knicks', OKC: 'Oklahoma City Thunder', ORL: 'Orlando Magic', PHI: 'Philadelphia 76ers', PHX: 'Phoenix Suns', POR: 'Portland Trail Blazers', SAC: 'Sacramento Kings', SA: 'San Antonio Spurs', TOR: 'Toronto Raptors', UTAH: 'Utah Jazz', WSH: 'Washington Wizards' };
+  var SUF = /^(jr\.?|sr\.?|ii|iii|iv|v)$/i;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function last(n) { var w = String(n || '').split(' '); while (w.length > 1 && SUF.test(w[w.length - 1])) w.pop(); return w.length > 1 ? w.slice(1).join(' ') : w[0]; }
+  function sg(v, d) { if (v == null || isNaN(v)) return '—'; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d == null ? 1 : d); }
+  function per(p, x) { return x > 0 ? 100 * p / x : null; }
+  function cls(v) { return v == null ? '' : v < 0 ? ' cfb__down' : ' cfb__up'; }
+  function logo(t) { return '<img src="/img/nba/' + String(t).toLowerCase() + '.png" alt="" width="18" height="18" loading="lazy">'; }
+  function cols(view, all) {
+    if (view === 'onoff') return [['rk', 'RK', 1], ['n', 'Player'], all ? ['t', 'Team'] : null, ['min', 'MIN', 1], ['on', 'On', 1, 'nbaln__x', 'team net per 100 with him on the floor'], ['off', 'Off', 1, 'nbaln__x', 'team net per 100 with him off the floor'], ['oo', 'On-Off', 1, 'nbaln__x', 'on minus off'], ['soo', 'sOn-Off', 1, '', 'on-off shrunk toward 0 by possessions']].filter(Boolean);
+    return [['rk', 'RK', 1], ['n', 'Lineup'], ['min', 'MIN', 1], ['poss', 'Poss', 1, 'nbaln__x'], ['or', 'ORtg', 1, 'nbaln__x', 'points scored per 100 possessions'], ['dr', 'DRtg', 1, 'nbaln__x', 'points allowed per 100 possessions'], ['net', 'Net', 1, 'nbaln__x', 'ORtg - DRtg'], ['sn', 'sNet', 1, '', 'Net shrunk toward 0 by possessions']];
+  }
+  function init(W) {
+    if (W.__ln) return; W.__ln = true;
+    var view = W.getAttribute('data-nbaln'), bar = W.querySelector('[data-ln-bar]'), unit = '5', key = view === 'onoff' ? 'soo' : 'min', dir = -1, D = null;
+    fetch(W.getAttribute('data-src')).then(function (r) { return r.json(); }).then(function (d) {
+      D = d;
+      var ts = Object.keys(D.teams).sort(function (a, b) { return (TEAMS[a] || a).localeCompare(TEAMS[b] || b); });
+      bar.elements.team.innerHTML = (view === 'onoff' ? '<option value="">all teams</option>' : '') + ts.map(function (t) { return '<option value="' + esc(t) + '">' + esc(TEAMS[t] || t) + '</option>'; }).join('');
+      var keep = null; try { keep = localStorage.getItem('ark-ln-' + view); } catch (e) {}
+      if (keep !== null && (keep === '' ? view === 'onoff' : D.teams[keep])) bar.elements.team.value = keep;
+      var k = W.querySelector('[data-ln-k]'), ko = W.querySelector('[data-ln-ko]');
+      if (k) k.textContent = Number(D.k).toLocaleString('en-US'); if (ko) ko.textContent = Number(D.ko).toLocaleString('en-US');
+      W.querySelector('[data-ln-asof]').textContent = D.label + ' · updated ' + String(D.asof || '').slice(0, 10);
+      render();
+    }).catch(function () { W.querySelector('[data-ln-body]').innerHTML = '<tr><td class="cfb__dim">lineups not available right now.</td></tr>'; });
+    function rows() {
+      var t = bar.elements.team.value, mn = +bar.elements.min.value || 0, out = [];
+      if (view === 'onoff') {
+        (t ? [t] : Object.keys(D.teams)).forEach(function (tm) {
+          D.teams[tm].onoff.forEach(function (r) {
+            if (r[1] < mn) return;
+            var on = per(r[3] - r[4], r[2]), off = per(r[6] - r[7], r[5]), oo = on != null && off != null ? on - off : null;
+            out.push({ n: D.names[r[0]] || r[0], t: tm, min: r[1], on: on, off: off, oo: oo, soo: oo == null ? null : oo * (1 / (1 / r[2] + 1 / r[5])) / (1 / (1 / r[2] + 1 / r[5]) + D.ko) });
+          });
+        });
+        return out;
+      }
+      ((D.teams[t] || {})[unit === '5' ? 'units' : 'pairs'] || []).forEach(function (u) {
+        if (u[1] < mn) return;
+        var o = per(u[3], u[2]), d = per(u[4], u[2]), net = o != null ? o - d : null;
+        out.push({ n: u[0].map(function (p) { return last(D.names[p] || p); }).join(' · '), full: u[0].map(function (p) { return D.names[p] || p; }).join(', '), min: u[1], poss: u[2], or: o, dr: d, net: net, sn: net == null ? null : net * u[2] / (u[2] + D.k) });
+      });
+      return out;
+    }
+    function render() {
+      if (!D) return;
+      var all = view === 'onoff' && !bar.elements.team.value, C = cols(view, all), list = rows();
+      var k = key === 'rk' ? 'min' : key;
+      list.sort(function (a, b) {
+        var x = a[k], y = b[k];
+        if (typeof x === 'string' || typeof y === 'string') return dir * String(x).localeCompare(String(y));
+        return dir * ((x == null ? -1e9 : x) - (y == null ? -1e9 : y)) || b.min - a.min;
+      });
+      W.querySelector('[data-ln-head]').innerHTML = C.map(function (c) {
+        return '<th data-k="' + c[0] + '"' + (c[2] ? ' data-num class="cfb__num' + (c[3] ? ' ' + c[3] : '') + '"' : '') + (c[4] ? ' title="' + esc(c[4]) + '"' : '') +
+          (c[0] === key ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' data-sort>' + c[1] + '</th>';
+      }).join('');
+      var shown = list.slice(0, 200);
+      W.querySelector('[data-ln-body]').innerHTML = shown.length ? shown.map(function (r, i) {
+        return '<tr>' + C.map(function (c) {
+          var v = r[c[0]], x = c[3] ? ' ' + c[3] : '';
+          if (c[0] === 'rk') return '<td class="cfb__rk">' + (i + 1) + '</td>';
+          if (c[0] === 'n') return '<td class="nbaln__who"' + (r.full ? ' title="' + esc(r.full) + '"' : '') + '><b>' + esc(v) + '</b></td>';
+          if (c[0] === 't') return '<td><span class="nbaln__tm">' + logo(v) + '<span class="nbaln__ab">' + esc(v) + '</span></span></td>';
+          if (c[0] === 'min' || c[0] === 'poss') return '<td class="cfb__num' + x + '">' + Math.round(v).toLocaleString('en-US') + '</td>';
+          if (c[0] === 'or' || c[0] === 'dr') return '<td class="cfb__num' + x + '">' + (v == null ? '—' : v.toFixed(1)) + '</td>';
+          return '<td class="cfb__num' + x + (c[0] === 'sn' || c[0] === 'soo' ? ' is-key' : '') + '"><span class="' + cls(v).trim() + '">' + sg(v) + '</span></td>';
+        }).join('') + '</tr>';
+      }).join('') : '<tr><td colspan="' + C.length + '" class="cfb__dim">no ' + (view === 'onoff' ? 'players' : 'units') + ' at this many minutes yet.</td></tr>';
+      W.querySelector('[data-ln-count]').textContent = list.length + (view === 'onoff' ? ' players' : unit === '5' ? ' units' : ' pairs') + (list.length > shown.length ? ' (top ' + shown.length + ' shown)' : '');
+    }
+    bar.addEventListener('change', function () { try { localStorage.setItem('ark-ln-' + view, bar.elements.team.value); } catch (e) {} render(); });
+    [].forEach.call(bar.querySelectorAll('[data-unit]'), function (c) {
+      c.addEventListener('click', function () {
+        unit = c.dataset.unit;
+        [].forEach.call(bar.querySelectorAll('[data-unit]'), function (b) { var on = b === c; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); });
+        render();
+      });
+    });
+    W.querySelector('[data-ln-head]').addEventListener('click', function (e) {
+      var th = e.target.closest('th[data-k]'); if (!th) return;
+      var k = th.dataset.k;
+      if (k === 'rk') { key = 'min'; dir = -1; } else { dir = k === key ? -dir : (th.hasAttribute('data-num') ? -1 : 1); key = k; }
+      render();
+    });
+  }
+  function start() {
+    var all = document.querySelectorAll('[data-nbaln]');
+    if (!('IntersectionObserver' in window)) { all.forEach(init); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); init(e.target); } }); }, { rootMargin: '3000px 0px' });
+    all.forEach(function (W) { io.observe(W); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
