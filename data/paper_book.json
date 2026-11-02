@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T05:41:00Z",
+ "asof": "2026-11-02T06:31:46Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 100.65,
   "peak": 114.8,
   "drawdown": 0.1233,
-  "open": 54.5,
+  "open": 55.25,
   "path": [
    101.5,
    101.6,
@@ -122,12 +122,12 @@
   ]
  },
  "record": {
-  "n": 205,
-  "clvN": 113,
-  "clvRet": -0.0248,
-  "clvT": -3.27,
-  "clv": -0.08,
-  "beat": 0.22,
+  "n": 199,
+  "clvN": 114,
+  "clvRet": -0.0239,
+  "clvT": -3.16,
+  "clv": 0.03,
+  "beat": 0.235,
   "settled": 110,
   "w": 63,
   "l": 47,
@@ -138,33 +138,33 @@
   "risked": 111.25,
   "yield": 0.0148
  },
- "tEff": -3.27,
+ "tEff": -3.16,
  "corr": {
   "rho": 0.0,
-  "n": 113,
+  "n": 114,
   "slates": 14,
-  "nEff": 113.0,
-  "avgSlate": 8.07
+  "nEff": 114.0,
+  "avgSlate": 8.14
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 113,
+   "value": 114,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.5% t -3.27",
+   "value": "-2.4% t -3.16",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "22%",
+   "value": "24%",
    "pass": false
   },
   {
    "gate": "no single market carrying it",
-   "value": "without cfb-spread: -2.5%",
+   "value": "without cfb-spread: -2.4%",
    "pass": false
   },
   {
@@ -222,7 +222,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 11,
+   "n": 8,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -306,7 +306,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 13,
+   "n": 11,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -327,7 +327,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 29,
+   "n": 26,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -348,7 +348,7 @@
    "label": "NBA moneyline",
    "sport": "nba",
    "mk": "ml",
-   "n": 5,
+   "n": 6,
    "clvN": 3,
    "clvRet": -0.0208,
    "clvT": -2.24,
@@ -411,12 +411,12 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 48,
-   "clvN": 26,
-   "clvRet": -0.0117,
-   "clvT": -1.87,
-   "clv": 0.41,
-   "beat": 0.308,
+   "n": 49,
+   "clvN": 27,
+   "clvRet": -0.0085,
+   "clvT": -1.24,
+   "clv": 0.58,
+   "beat": 0.333,
    "settled": 23,
    "w": 19,
    "l": 4,
@@ -540,7 +540,11 @@
    "edge": 21.9,
    "ev": 0.0385,
    "event": "Prudential Hong Kong Tennis Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.075,
+   "clv": 5.0,
+   "beat": 1,
+   "close": 0.575
   },
   {
    "rule": "tennis-ml",
@@ -890,6 +894,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186665",
+   "k": "2026-11-02T15:30:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Martynov",
+   "a": "Samir",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 156,
+   "bet": "Samir ML +156",
+   "placed": "2026-11-02T06:31:45Z",
+   "stake": 0.25,
+   "edge": 6.3,
+   "ev": 0.0058,
+   "event": "Angola Ladies Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186459",
    "k": "2026-11-02T16:00:00Z",
    "slate": "tennis:2026-11-02",
@@ -1029,7 +1053,7 @@
    "ev": 0.0196,
    "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 157.5
   },
   {
    "rule": "cbb-ml",
@@ -1070,7 +1094,7 @@
    "edge": 4.4,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 163.5
   },
   {
@@ -1196,7 +1220,7 @@
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 14.5
   },
   {
@@ -1238,7 +1262,7 @@
    "edge": 3.2,
    "ev": 0.0284,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 157.5
   },
   {
@@ -1637,7 +1661,7 @@
    "edge": 6.0,
    "ev": 0.0006,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -1679,8 +1703,8 @@
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
-   "pass": false,
-   "close": 136.5
+   "pass": true,
+   "close": 135.5
   },
   {
    "rule": "cbb-spread",
@@ -1701,7 +1725,7 @@
    "ev": 0.0241,
    "event": null,
    "pass": true,
-   "close": 23.5
+   "close": 24.5
   },
   {
    "rule": "cbb-total",
@@ -1721,7 +1745,7 @@
    "edge": 3.0,
    "ev": 0.007,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 159.5
   },
   {
@@ -2185,6 +2209,27 @@
    "close": 156.5
   },
   {
+   "rule": "nba-ml",
+   "sport": "nba",
+   "id": "401909918",
+   "k": "2026-11-03T02:00:00Z",
+   "slate": "nba:2026-11-02",
+   "h": "DEN",
+   "a": "POR",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -156.0,
+   "bet": "DEN ML -156",
+   "placed": "2026-11-02T06:31:43Z",
+   "stake": 0.25,
+   "edge": 2.9,
+   "ev": 0.006,
+   "event": null,
+   "pass": false,
+   "close": 3.5
+  },
+  {
    "rule": "nba-total",
    "sport": "nba",
    "id": "401909918",
@@ -2244,7 +2289,7 @@
    "edge": 3.7,
    "ev": 0.0056,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 17.5
   },
   {
@@ -2825,8 +2870,8 @@
    "edge": 2.8,
    "ev": 0.0105,
    "event": null,
-   "pass": false,
-   "close": 55.5
+   "pass": true,
+   "close": 56.5
   },
   {
    "rule": "cfb-total",
@@ -2867,7 +2912,7 @@
    "edge": 5.1,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 53.5
   },
   {
@@ -2888,7 +2933,7 @@
    "edge": 3.6,
    "ev": 0.0646,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 48.5
   },
   {
@@ -2930,8 +2975,8 @@
    "edge": 3.2,
    "ev": 0.012,
    "event": null,
-   "pass": false,
-   "close": 51.5
+   "pass": true,
+   "close": 52.5
   },
   {
    "rule": "cfb-total",
@@ -3077,8 +3122,8 @@
    "edge": 3.2,
    "ev": 0.0024,
    "event": null,
-   "pass": false,
-   "close": 48.5
+   "pass": true,
+   "close": 46.5
   },
   {
    "rule": "cfb-total",
@@ -8658,7 +8703,11 @@
    "edge": 21.9,
    "ev": 0.0385,
    "event": "Prudential Hong Kong Tennis Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.075,
+   "clv": 5.0,
+   "beat": 1,
+   "close": 0.575
   },
   {
    "rule": "tennis-ml",
@@ -9008,6 +9057,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186665",
+   "k": "2026-11-02T15:30:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Martynov",
+   "a": "Samir",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 156,
+   "bet": "Samir ML +156",
+   "placed": "2026-11-02T06:31:45Z",
+   "stake": 0.25,
+   "edge": 6.3,
+   "ev": 0.0058,
+   "event": "Angola Ladies Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186459",
    "k": "2026-11-02T16:00:00Z",
    "slate": "tennis:2026-11-02",
@@ -9147,7 +9216,7 @@
    "ev": 0.0196,
    "event": null,
    "pass": false,
-   "close": 158.5
+   "close": 157.5
   },
   {
    "rule": "cbb-ml",
@@ -9188,7 +9257,7 @@
    "edge": 4.4,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 163.5
   },
   {
@@ -9314,7 +9383,7 @@
    "edge": 6.2,
    "ev": 0.0634,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 14.5
   },
   {
@@ -9356,7 +9425,7 @@
    "edge": 3.2,
    "ev": 0.0284,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 157.5
   },
   {
@@ -9755,7 +9824,7 @@
    "edge": 6.0,
    "ev": 0.0006,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -9797,8 +9866,8 @@
    "edge": 2.2,
    "ev": 0.03,
    "event": null,
-   "pass": false,
-   "close": 136.5
+   "pass": true,
+   "close": 135.5
   },
   {
    "rule": "cbb-spread",
@@ -9819,7 +9888,7 @@
    "ev": 0.0241,
    "event": null,
    "pass": true,
-   "close": 23.5
+   "close": 24.5
   },
   {
    "rule": "cbb-total",
@@ -9839,7 +9908,7 @@
    "edge": 3.0,
    "ev": 0.007,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 159.5
   },
   {
@@ -10303,6 +10372,27 @@
    "close": 156.5
   },
   {
+   "rule": "nba-ml",
+   "sport": "nba",
+   "id": "401909918",
+   "k": "2026-11-03T02:00:00Z",
+   "slate": "nba:2026-11-02",
+   "h": "DEN",
+   "a": "POR",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -156.0,
+   "bet": "DEN ML -156",
+   "placed": "2026-11-02T06:31:43Z",
+   "stake": 0.25,
+   "edge": 2.9,
+   "ev": 0.006,
+   "event": null,
+   "pass": false,
+   "close": 3.5
+  },
+  {
    "rule": "nba-total",
    "sport": "nba",
    "id": "401909918",
@@ -10362,7 +10452,7 @@
    "edge": 3.7,
    "ev": 0.0056,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 17.5
   },
   {
@@ -10943,8 +11033,8 @@
    "edge": 2.8,
    "ev": 0.0105,
    "event": null,
-   "pass": false,
-   "close": 55.5
+   "pass": true,
+   "close": 56.5
   },
   {
    "rule": "cfb-total",
@@ -10985,7 +11075,7 @@
    "edge": 5.1,
    "ev": 0.0004,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 53.5
   },
   {
@@ -11006,7 +11096,7 @@
    "edge": 3.6,
    "ev": 0.0646,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 48.5
   },
   {
@@ -11048,8 +11138,8 @@
    "edge": 3.2,
    "ev": 0.012,
    "event": null,
-   "pass": false,
-   "close": 51.5
+   "pass": true,
+   "close": 52.5
   },
   {
    "rule": "cfb-total",
@@ -11195,8 +11285,8 @@
    "edge": 3.2,
    "ev": 0.0024,
    "event": null,
-   "pass": false,
-   "close": 48.5
+   "pass": true,
+   "close": 46.5
   },
   {
    "rule": "cfb-total",
