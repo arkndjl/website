@@ -947,7 +947,7 @@ def fit():
             'mcoef': {k: round(float(v), 4) for k, v in zip(feats, mw)},
             'tcoef': {k: round(float(v), 4) for k, v in zip(TFEATS, tw)},
             'pl': {'home2': [round(float(v), 4) for v in c2h], 'away2': [round(float(v), 4) for v in c2a]},
-            'ot': [round(float(v), 4) for v in cot], 'otWinCand': [round(float(v), 4) for v in cow], 'otWinGames': int(om.sum()),
+            'ot': [round(float(v), 4) for v in cot], 'otWin': [round(float(v), 4) for v in cow], 'otWinGames': int(om.sum()),
             'sdMargin': round(float(np.nanstd(mg - mhat)), 3), 'sdTotal': round(float(np.nanstd(tot - That)), 3),
             'seasonSd': round(sd0, 3), 'evidence': ev, 'test': test,
             'calib': calib_bins(p[held & ~np.isnan(p)], y[held & ~np.isnan(p)]),
