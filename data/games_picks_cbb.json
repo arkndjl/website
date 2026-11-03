@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T13:43:38Z",
+ "asof": "2026-11-03T13:45:10Z",
  "recenter": {
   "2026-11-03": -12.91
  },
@@ -232,8 +232,8 @@
    "flagged": "2026-11-03T10:49:52Z",
    "betTo": 20.0,
    "close": 21.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401920422",
@@ -325,8 +325,8 @@
    "flagged": "2026-11-03T13:02:58Z",
    "betTo": 39.5,
    "close": 41.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401921801",
@@ -418,8 +418,8 @@
    "flagged": "2026-11-03T02:01:42Z",
    "betTo": 14.5,
    "close": 15.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   }
  ],
  "withdrawn": [
@@ -503,6 +503,22 @@
    "tm": 152.6
   },
   {
+   "id": "401920806",
+   "sport": "cbb",
+   "kick": "2026-11-04T01:00:00Z",
+   "home": "Texas A&M",
+   "away": "Alabama State",
+   "mk": "spread",
+   "side": "away",
+   "line": 31.5,
+   "price": -106.0,
+   "edge": 2.6,
+   "x": 2.5,
+   "why": "no edge at -106",
+   "m": 28.9,
+   "tm": 160.3
+  },
+  {
    "id": "401920376",
    "sport": "cbb",
    "kick": "2026-11-04T00:00:00Z",
@@ -511,7 +527,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -108.0,
+   "price": -104.0,
    "edge": 1.2,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -597,22 +613,6 @@
    "why": "total market off",
    "m": 16.5,
    "tm": 146.0
-  },
-  {
-   "id": "401920806",
-   "sport": "cbb",
-   "kick": "2026-11-04T01:00:00Z",
-   "home": "Texas A&M",
-   "away": "Alabama State",
-   "mk": "total",
-   "side": "under",
-   "line": 162.5,
-   "price": -117.0,
-   "edge": 2.2,
-   "x": null,
-   "why": "total market off",
-   "m": 28.9,
-   "tm": 160.3
   },
   {
    "id": "401925779",
@@ -817,16 +817,16 @@
    "state": "off"
   },
   "401920806": {
-   "mk": "total",
-   "side": "under",
-   "line": 162.5,
-   "price": -117.0,
-   "edge": 2.2,
+   "mk": "spread",
+   "side": "away",
+   "line": 31.5,
+   "price": -106.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Texas A&M",
    "away": "Alabama State",
-   "state": "off"
+   "state": "under"
   },
   "401920155": {
    "mk": "total",
@@ -868,7 +868,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -108.0,
+   "price": -104.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -977,7 +977,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3874,
+  "snapshots": 3880,
   "buckets": [
    {
     "when": "24h+",
@@ -990,12 +990,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 489,
+    "clvN": 492,
     "clvRet": -0.0406,
-    "clvT": -7.87,
+    "clvT": -7.92,
     "clv": 0.12,
-    "beat": 0.213,
-    "still": 0.501
+    "beat": 0.211,
+    "still": 0.504
    },
    {
     "when": "1-6h",
@@ -7545,16 +7545,16 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 24.5,
+    "raw": 22.5,
     "scale": 1.0,
-    "down": 12.75
+    "down": 14.75
    },
    "2026-11-04": {
-    "raw": 11.75,
+    "raw": 14.75,
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 15.75,
+    "raw": 15.5,
     "scale": 1.0
    },
    "2026-11-06": {
