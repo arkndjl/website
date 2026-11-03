@@ -14,6 +14,7 @@ the live board's season-end map (end_map -> data/cbb_end_map.json, read by cbb_l
 
     python3 scripts/cbb_careers_kit.py   # once per container: scripts/.cache/cbb/careers.json
     python3 scripts/cbb_draftday.py      # -> scripts/data/cbb_draftday.json.gz, data/cbb_end_map.json; then fv_alltime.py
+    python3 scripts/cbb_draftday.py --intl   # first re-grade the internationals (needs scripts/cbb_intl_pull.sh's cache)
 
 Out of sample (Nov 3 2026), players whose college ended 2009-16 (6+ NBA seasons), every grade from fits that held out
 the player's college class (5 class folds), players graded 30+ or reaching 30+ by either list (681):
@@ -27,7 +28,7 @@ Tested and not used: athletic testing on top of the boards (guard composite t -0
 the boards price it), the combine invite on top of the boards (t +2.9, worse 5/5), the returner model refit on
 season-end rows with leavers (MSE +1.4, t 0.9: the shipped model is kept), position recalibration.
 """
-import gzip, json, math, os, sys
+import gzip, html, json, math, os, sys
 from collections import defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +39,7 @@ import fv_scale as FS
 
 OUT = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_draftday.json.gz')
 END = os.path.join(D.ROOT, 'data', 'cbb_end_map.json')   # the live board's season-end map (cbb_live)
+INTL = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_intl_draftday.json.gz')   # internationals at their draft (--intl)
 NEXT = {'Fr': 'So', 'So': 'Jr', 'Jr': 'Sr', 'Sr': 'Sr'}
 TRAIN = range(2009, 2017)   # season-end boards whose players all left college by 2020 (as cbb_fit's training boards)
 LAST = 2026                 # the latest season played
@@ -186,9 +188,48 @@ def main():
                         'role': ((('peak XPM %+.1f, ' % n['peakXpm']) if r['y'] > 20 and n.get('peakXpm') is not None else '') + n['role']) if mature else None,
                         'pick': n.get('pick') or None, 'draft': n.get('draft') or None, 'status': None if r['final'] else 'college',
                         'june': round(math.exp(-r['f']['lr'])) if r['f']['on'] else None})
+    out += intl_rows()
     with gzip.open(OUT, 'wt') as f: json.dump({'asof': __import__('datetime').date.today().isoformat(), 'rows': out}, f, separators=(',', ':'))
     print('wrote', OUT, len(out), 'rows')
 
 
+def intl_snapshot():
+    """the internationals on the 2009-26 final boards at their draft (cbb_intl.draft_history; needs the
+    Basketball-Reference cache, scripts/cbb_intl_pull.sh) -> INTL, so the list rebuilds without it"""
+    import cbb_intl as I
+    R = I.draft_history(LAST)
+    keep = [{'pid': r['pid'], 'name': html.unescape(r['name']), 'year': r['year'], 'club': html.unescape(r['club'] or ''), 'pos': r['pos'], 'e': round(r['e'], 3),
+             'oof': r['oof'], 'y': r['y'], 'xpm': r['xpm'], 'june': round(math.exp(-r['f']['lr']), 1)} for r in R]
+    with gzip.open(INTL, 'wt') as f: json.dump({'asof': __import__('datetime').date.today().isoformat(), 'rows': keep}, f, separators=(',', ':'))
+    print('wrote', INTL, len(keep), 'rows')
+
+
+def intl_rows():
+    """internationals on the list (Noah, Nov 3 2026: Doncic, Wembanyama), at the mean outcome their draft-day E[FV]
+    predicts: the international model's out-of-fold line (realized - 20 = b (E - 20), as cbb_intl.fv_of), b refit with
+    each player's fold held out for the 2009-20 classes, the full fit after. Held out (277 internationals 2009-20) the
+    line beats a PAV map (dMSE +6.1, t +1.3), the D-I June-rank curve (t +1.1; it graded the top 15 54.2, they became
+    48.6) and that curve plus the model's production news (t +1.5); the top 15 by rank graded 47.0 and became 48.6"""
+    if not os.path.exists(INTL): return []
+    R = json.load(gzip.open(INTL))['rows']
+    tr = [r for r in R if r['oof']]
+    e = np.array([r['e'] for r in tr]); y = np.array([r['y'] for r in tr], float); fo = np.array([F.fold_of(r['pid']) for r in tr])
+    b_of = lambda m: float(((e[m] - F.FLOOR) * (y[m] - F.FLOOR)).sum() / ((e[m] - F.FLOOR) ** 2).sum())
+    bk = {k: b_of(fo != k) for k in range(F.FOLDS)}; b = b_of(np.ones(len(tr), bool))
+    pick = {}
+    for r in R:
+        if r['pid'] not in pick or r['year'] > pick[r['pid']]['year']: pick[r['pid']] = r
+    out = []
+    for r in sorted(pick.values(), key=lambda r: (r['year'], -r['e'])):
+        fvx = float(np.clip(F.FLOOR + (bk[F.fold_of(r['pid'])] if r['oof'] else b) * (r['e'] - F.FLOOR), F.FLOOR, 80.0))
+        mature = r['year'] <= 2020
+        out.append({'name': r['name'], 'season': r['year'], 'team': r['club'], 'pos': r['pos'], 'cls': 'Intl', 'fvx': round(fvx, 2), 'fv': FS.fv_of('cbbx', fvx),
+                    'out': int(r['y']) if mature else None, 'role': (('peak XPM %+.1f' % r['xpm']) if r['xpm'] is not None and r['y'] > 20 else 'non-NBA') if mature else None,
+                    'pick': None, 'draft': r['year'], 'status': None, 'june': round(r['june']) if r['june'] < 150 else None})
+    print('internationals', len(out), 'line b', round(b, 3))
+    return out
+
+
 if __name__ == '__main__':
+    if '--intl' in sys.argv: intl_snapshot()
     main()
