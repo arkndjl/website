@@ -10,6 +10,7 @@ The board's WAR is .6 x this AV WAR + .4 x XV (scripts/nfl_xv.py, data/nfl_xv.js
 parts that track team margin, and the blend is where a point of value lost to an absence costs a point of margin
 (missed games 2018-25, held-out seasons; AV WAR alone explains less than half as much, next season and contracts tie).
 war_ledger (the game model's injury costs) stays on AV WAR. Rows carry wav (AV WAR) and xv.
+Rows also carry p1 / p3, projected WAR next season and over the next three (scripts/nfl_war_proj.py, display only).
 
 The board's lines are by sub-position (data/nfl_war_pos.json, see positions()): AV sets the spread inside a spot, and
 what an average regular there is worth over replacement blends missed games, veteran contracts and AV. NFL_REPL below
@@ -560,6 +561,15 @@ def build():
     y = max(int(g['season']) for g in done)
     week = max(int(g['week']) for g in done if int(g['season']) == y)
     out, lines, alpha = board(y, fresh=True)
+    try:   # next-season and three-season WAR (scripts/nfl_war_proj.py, display only)
+        import nfl_war_proj
+        teamg = Counter()
+        for g in done:
+            if int(g['season']) == y:
+                teamg[g['home_team']] += 1; teamg[g['away_team']] += 1
+        nfl_war_proj.attach(out, y, teamg)
+    except Exception as e:
+        print(f'nfl war: projections skipped ({e!r})')
     publish(out, y, week, done, lines, alpha)
 
 

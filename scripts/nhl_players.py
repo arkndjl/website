@@ -40,6 +40,9 @@ pWAR (projected, what it is worth going forward): HPM = the weighted components 
     (nested t -.83, 5/17) and goalie GSAx per expected goal faced (next-season GSAx t -.77; team GD t -1.15) fail.
     pWAR = (HPM - replacement) x TOI / 60 / goals a win, replacement as above on HPM; goals a win from team points
     against goal differential.
+3Y (p3, display only): projected WAR over the next three seasons, proj3() with data/nhl_proj_fit.json
+    (scripts/nhl_proj_research.py: pWAR + the percentile tab's Marcel WAR + age by F / D / G + TOI82, coefficients per
+    share of the season; held out by season RMSE 2.455 vs 2.617 for pWAR + Marcel, t -14.2, 14/14 seasons, skaters).
 """
 import csv
 import datetime as dt
@@ -534,6 +537,55 @@ def season_table(S, fitd, bio):
     return out, repl
 
 
+PROJ = os.path.join(ROOT, 'data', 'nhl_proj_fit.json')
+PM_K, PM_W = 1600.0, (1.0, 0.7, 0.5)             # the percentile tab's Marcel WAR a minute (scripts/player_pctl.py)
+
+
+def proj3(S, rows, repl, f, gS):
+    """p3: projected WAR over the next three seasons (82-game pace), data/nhl_proj_fit.json (scripts/nhl_proj_research.py):
+    c . [1, pw, pm, age terms by group, pw x (age - 27), HPM - replacement, ln(1 + TOI82 / 100)], pw = pWAR at an 82-game
+    pace, pm = Marcel WAR a minute (S, S-1, S-2 at 1/.7/.5, 1,600 minutes toward the group mean) x TOI82, TOI82 = TOI x
+    82 / gS (team games); coefficients at season share f, linear between the grid's shares"""
+    try:
+        pf = json.load(open(PROJ))
+    except (OSError, ValueError):
+        return
+    past = []
+    for j in (1, 2):
+        try:
+            past.append({p['id']: p for p in json.load(open(os.path.join(OUTD, f'{S - j}.json')))['players']})
+        except (OSError, ValueError):
+            past.append({})
+    for r in rows:
+        part = pf['goalies' if r['grp'] == 'G' else 'skaters']
+        g = part['grid']
+        ff = min(max(f, g[0]['f']), 1.0)
+        c = g[-1]['c']
+        for a, b in zip(g, g[1:]):
+            if ff <= b['f']:
+                w = (ff - a['f']) / (b['f'] - a['f'])
+                c = [u + (v - u) * w for u, v in zip(a['c'], b['c'])]
+                break
+        if r['age'] is None or r['toi'] < 100 * f:
+            r['p3'] = None
+            continue
+        toi82 = r['toi'] * 82 / gS
+        num, den = PM_W[0] * r['war'], PM_W[0] * r['toi']
+        for w, ix in zip(PM_W[1:], past):
+            q = ix.get(r['id'])
+            if q:
+                num += w * q['war']; den += w * q['toi']
+        pm = (num + PM_K * pf['mu'][r['grp']]) / (den + PM_K) * toi82
+        pw = r['pwar'] * 82 / gS
+        A = r['age'] - pf['A0']
+        x = [1.0, pw, pm]
+        for grp in part['grps']:
+            m = float(r['grp'] == grp)
+            x += [m * A, m * A * A] + ([m] if grp != part['grps'][0] else [])
+        x += [pw * A, r['hpm'] - repl[r['grp']], math.log1p(toi82 / 100)]
+        r['p3'] = round(sum(a * b for a, b in zip(c, x)), 1)
+
+
 def build(seasons=None):
     fitd = json.load(open(FIT))
     bio = bios()
@@ -551,6 +603,8 @@ def build(seasons=None):
             continue
         asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
         gmax = max(r['gp'] for r in rows)
+        f = min(1.0, gmax / 82) if S == cur else 1.0             # only the season in progress is partial
+        proj3(S, rows, repl, f, gmax if S == cur else {2013: 48, 2020: 70, 2021: 56}.get(S, 82))
         # predictive badges (scripts/nhl_badges.py; tested against next season's WAR in scripts/nhl_badge_backtest.py)
         nhl_badges.assign(S, rows, gmax)
         try:   # headshots: ESPN ids by NHL id (scripts/faces.py); the board writes without them

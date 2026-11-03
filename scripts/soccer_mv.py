@@ -546,7 +546,7 @@ def current():
             row = c2[0] if len(c2) == 1 else None
         if row:
             link[o['p']] = row['id']; new[o['p']] = row['id']
-    rows = []
+    rows, dobs = [], {}
     for o in J['players']:
         i = link.get(o['p'])
         d = prof.get(str(i)) if i else None
@@ -562,11 +562,14 @@ def current():
              'min2': prev[2][o['p']][1] if o['p'] in prev[2] else 0, 'tgd': gd / n, 'txgd': xgd / n,
              'tgd1': gd1 / n1 if n1 else None, 'txgd1': None, 'mv': mv_now(d), 'tm': i}
         rows.append(r)
+        dobs[o['p']] = dob[:10]
     levels(rows)
     key = predict(rows, F, day)
     cur = {r['p']: [round(r['xmv'] / 1e5) / 10, round(r['mv'] / 1e5) / 10 if r['mv'] else None, int(r['tm'])] for r in rows}
-    D.save(CUR, {'season': S, 'asof': day, 'model': key, 'link': {**(old.get('link') or {}), **new}, 'v': cur})
+    D.save(CUR, {'season': S, 'asof': day, 'model': key, 'link': {**(old.get('link') or {}), **new}, 'v': cur,
+                 'dob': {p: b for p, b in dobs.items() if p not in L['p']}})        # birth dates of new links (projections)
     attach(S, J['players'])
+    SP.proj_attach(S, J['players'], SP.league_share(S, J['players']))                               # now with the new links' ages
     J['mv'] = mv_meta(F, key)
     open(fn, 'w').write(json.dumps(J, separators=(',', ':'), allow_nan=False))
     print(S, key, len(rows), 'valued of', len(J['players']), '| new links', len(new), flush=True)

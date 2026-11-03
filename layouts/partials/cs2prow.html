@@ -9,6 +9,7 @@
   {{- if eq $v "board" }}
   <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.rwa }}"><b>{{ printf "%+.2f" (float $r.rwa) }}</b></td>
+  <td class="cfb__num" data-v="{{ $r.p6 | default 0 }}">{{ with $r.p6 }}{{ printf "%+.2f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.d90 }}">{{ printf "%+.2f" (float $r.d90) }}</td>
   <td class="cfb__num" data-v="{{ $r.rar }}">{{ printf "%.0f" (float $r.rar) }}</td>
   <td class="cfb__num">{{ $r.maps }}</td>

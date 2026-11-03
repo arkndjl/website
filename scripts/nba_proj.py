@@ -19,6 +19,10 @@ Contract surplus: projected VORX x $ per win minus salary (Basketball-Reference 
                 than he is worth (team surplus min(0, value - salary)); a team option one the team takes only when he
                 is worth more (max(0, value - salary)).
 
+1Y / 3Y (p1, p3): next season's and the next three seasons' minutes-weighted XPM (a season off the board counts as -2),
+  from XPM (proj), age and the minutes above (data/nba_proj3y_fit.json, scripts/nba_proj3y_research.py). Display only;
+  the contract years below still age XPM (proj) on the curve (the 3Y form did not beat that on VORX early in a season).
+
   python3 scripts/nba_proj.py --fit     # refit tau / sigma (data/nba_proj_fit.json) with the held-out coverage check
   python3 scripts/nba_proj.py           # this season's projections and surplus (refetches the contracts page)
 Stdlib only."""
@@ -34,6 +38,22 @@ Z80 = 1.2816
 VET_MP = 500                       # minutes over the two seasons before that make a veteran
 G0 = 15                            # games of last season's minutes per game the current pace is blended with
 CAP_G = 0.07                       # yearly growth of $ per win in later contract years (the cap's recent growth)
+FIT3 = os.path.join(ROOT, 'data', 'nba_proj3y_fit.json')
+
+
+def proj3(fit3, f):
+    """the 1Y / 3Y projection (scripts/nba_proj3y_research.py, form F4): (proj, age, M) -> (next season, next three),
+    coefficients at season share f, linear between the grid's points"""
+    g = fit3['grid']; f = min(max(f, g[0]['f']), 1.0)
+    i = max(j for j in range(len(g)) if g[j]['f'] <= f); i = min(i, len(g) - 2)
+    t = (f - g[i]['f']) / (g[i + 1]['f'] - g[i]['f'])
+    C = {k: [a + (b - a) * t for a, b in zip(g[i]['c'][k], g[i + 1]['c'][k])] for k in ('y1', 'y3y')}
+    A0 = fit3['A0']
+    def go(pj, age, m):
+        a, lm = age - A0, math.log1p(max(m, 0))
+        x = [1, pj, a, a * a, lm, pj * a, pj * (lm - 7)]
+        return tuple(sum(c * v for c, v in zip(C[k], x)) for k in ('y1', 'y3y'))
+    return go
 
 
 def load(s):
@@ -123,6 +143,7 @@ def project(fresh=True):
         for p in last['players']: lastn[p['id']] = p
     ids = set(curp) | {i for i in con if i in lastp}
     aging = __import__('nba_games').aging_curve(season)
+    p3 = proj3(json.load(open(FIT3)), (gp or 0) / 82) if os.path.exists(FIT3) else None
     rows = []
     for pid in ids:
         c, l = curp.get(pid), lastp.get(pid)
@@ -149,6 +170,8 @@ def project(fresh=True):
              'lo': round(pv[0] - Z80 * sd, 1), 'hi': round(pv[0] + Z80 * sd, 1), 'w': round(w, 2),
              'pmp': round(mp + mpg * share * left), 'pvorx': round(vorx0 + vrest, 2),
              'mpg82': mpg * share * 82}
+        if p3 and r['age']:
+            r['p1'], r['p3'] = (round(v, 1) for v in p3(pv[0], r['age'], mpg * share * 82))
         if pid in con: r['sal'] = con[pid]['yrs']
         rows.append(r)
     # the market's $ per win this season: payroll above the minimum over the projected wins it buys
