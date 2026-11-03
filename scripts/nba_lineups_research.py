@@ -200,6 +200,10 @@ class LModel(N.Model):
         self.ion = {}                                   # pid -> [on poss, on margin, team off poss, off margin]
         self.tot = defaultdict(lambda: [0.0, 0.0])
         self.map = (0.0, 0.0)
+        # (e) lineup sNet (PR #732, Nov 3 2026): on-court margin and possessions per pair / five (sorted ids), this
+        # season + last at half, garbage time out; team totals the same way (the shrink target)
+        self.u2 = defaultdict(lambda: [0.0, 0.0]); self.u5 = defaultdict(lambda: [0.0, 0.0])
+        self.ut = defaultdict(lambda: [0.0, 0.0])
 
     def new_season(self, S):
         super().new_season(S)
@@ -208,6 +212,9 @@ class LModel(N.Model):
             self.val = onoff_blend(S, self.names, self.val, self.oow, self.oon0, skip=skip)
         for k in list(self.pair):
             self.pair[k] *= 0.5
+        for D in (self.u2, self.u5, self.ut):
+            for k in D:
+                D[k][0] *= 0.5; D[k][1] *= 0.5
         self.tg.clear()
         if self.iok:
             self.val0 = dict(self.val)
@@ -258,6 +265,28 @@ class LModel(N.Model):
             x['newrot'] = f[h][1] - f[a][1]
             early = max(0.0, 1 - self.gp(h, a) / 20)
             x['newrotL'] = x['newrot'] * (1 - early)       # after the first 20 games: trades and returns, not the summer
+            # (e) tonight's expected rotation, its pairs' sNet (shrunk to the team's net per 100, k 1600) minus the
+            # team's net, weighted by the pair's expected shared minutes; and the expected top-five's 5-man sNet minus
+            # the team's net (k 800). Home minus away
+            sn = {}
+            for t in (g['h'], g['a']):
+                e = self.expected(t, g)
+                T = self.ut[t]
+                tn = 100 * T[1] / T[0] if T[0] > 0 else 0.0
+                ps = sorted(e)
+                num = den = 0.0
+                for i in range(len(ps)):
+                    for j in range(i + 1, len(ps)):
+                        w = e[ps[i]] * e[ps[j]]
+                        u = self.u2.get((ps[i], ps[j]))
+                        if u and u[0] > 0:
+                            num += w * 100 * (u[1] - u[0] * tn / 100) / (u[0] + 1600)
+                        den += w
+                top = tuple(sorted(sorted(e, key=lambda p: -e[p])[:5]))
+                u = self.u5.get(top)
+                sn[t] = (num / den if den else 0.0, 100 * (u[1] - u[0] * tn / 100) / (u[0] + 800) if u and u[0] > 0 else 0.0)
+            x['pairnet'] = sn[h][0] - sn[a][0]
+            x['unit5'] = sn[h][1] - sn[a][1]
         return x, tx
 
     def update(self, g):
@@ -277,11 +306,18 @@ class LModel(N.Model):
         if not r:
             return
         for h5, a5, sec, hp, ap, ph, pa, gt in r['st']:
-            for t, f in ((r['h'], h5), (r['a'], a5)):
+            poss = (ph + pa) / 2
+            for t, f, d in ((r['h'], h5, hp - ap), (r['a'], a5, ap - hp)):
                 fs = sorted(f)
+                if not gt and poss > 0:
+                    T = self.ut[t]; T[0] += poss; T[1] += d
+                    if len(fs) == 5:
+                        U = self.u5[tuple(fs)]; U[0] += poss; U[1] += d
                 for i in range(len(fs)):
                     for j in range(i + 1, len(fs)):
                         self.pair[(fs[i], fs[j])] += sec / 60
+                        if not gt and poss > 0:
+                            U = self.u2[(fs[i], fs[j])]; U[0] += poss; U[1] += d
         for t in (g['h'], g['a']):
             for pid, m in (g.get('pl') or {}).get(t, []):
                 if m > 0:
@@ -356,13 +392,13 @@ def games_test(only=None):
         return r
     res = []
     # (c) familiarity terms from the base walk (computed in every walk; no parameter change)
-    for col in ('pairc', 'newrot', 'newrotL'):
+    for col in (['pairnet', 'unit5'] if os.environ.get('SNET_ONLY') else ['pairc', 'newrot', 'newrotL', 'pairnet', 'unit5']):
         res.append(score(Fit.wf(Fit.mat(X0, feats + [col]), y, S), f'(c) {col} margin term'))
     V = [('(a) oow .1', {'oow': 0.1}), ('(a) oow .25', {'oow': 0.25}), ('(a) oow .25 n0 6000', {'oow': 0.25, 'oon0': 6000.0}),
          ('(b) iok 20000', {'iok': 20000.0}), ('(b) iok 60000', {'iok': 60000.0}),
          ('(d) garbage time out of eff', {'gto': 1.0}),
          ('(b) iok 8000', {'iok': 8000.0}), ('(b) iok 20000 ib', {'iok': 20000.0, 'ib': 1}), ('(b) iok 60000 ib', {'iok': 60000.0, 'ib': 1})]
-    if only:
+    if only is not None:
         V = [V[i] for i in only]
     for lab, extra in V:
         X, _ = design({**base, **extra})
@@ -386,5 +422,5 @@ if __name__ == '__main__':
     if '--team' in a:
         save('team_season', team_test())
     if '--games' in a:
-        only = [int(i) for i in a[a.index('--only') + 1].split(',')] if '--only' in a else None
-        save('games' + ('_' + '_'.join(map(str, only)) if only else ''), games_test(only))
+        only = [int(i) for i in a[a.index('--only') + 1].split(',') if i] if '--only' in a else None
+        save('games' + ('_' + '_'.join(map(str, only)) if only else '_snet' if only == [] else ''), games_test(only))
