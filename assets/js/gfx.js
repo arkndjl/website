@@ -1915,7 +1915,10 @@
     var cx = x + w * 0.74;
     if (p.stars != null) cx += drawStars(g, cx, cy, p.stars, Math.round(size * 0.6)) + 18;
     g.font = Math.round(size * 0.62) + 'px ' + FONT;
-    if (p.form != null) { g.fillStyle = p.form >= 1 ? C.teal : C.down; g.fillText(p.form.toFixed(2), cx, cy); } else if (p.stars != null) { g.fillStyle = C.lilac; g.fillText('—', cx, cy); }
+    if (p.rwa != null) {   // RWA headlines (round win % added per round; beat ARK Rating held out), form ARK after it, smaller
+      var rv = (p.rwa > 0 ? '+' : '') + Number(p.rwa).toFixed(1); g.fillStyle = p.rwa >= 0 ? C.teal : C.down; g.fillText(rv, cx, cy); cx += g.measureText(rv).width + 18;
+      if (p.form != null) { g.font = Math.round(size * 0.46) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(p.form.toFixed(2), cx, cy); }
+    } else if (p.form != null) { g.fillStyle = p.form >= 1 ? C.teal : C.down; g.fillText(p.form.toFixed(2), cx, cy); } else if (p.stars != null) { g.fillStyle = C.lilac; g.fillText('—', cx, cy); }
   }
   async function buildFan(win, btn) {
     var d = pvData(btn); if (!d) return null;
@@ -1959,7 +1962,7 @@
     for (var k = 0; k < 2; k++) {
       var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
       g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText('TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText(L.some(function (q) { return q.rwa != null; }) ? 'TALENT · RWA · ARK' : 'TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
       ly += 90;
       for (var i = 0; i < L.length; i++) { if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, ly - RH / 2 + 2, bw, RH - 4); } await teamRow(g, bx + 12, ly, bw - 24, L[i], RS); ly += RH; }
       if (!k && d.lineupNote) { g.font = '34px ' + FONT; g.fillStyle = '#ffd166'; g.fillText(fit(g, 'SUB · ' + d.lineupNote, bw - 24), bx + 12, ly - 14); ly += 30; }
