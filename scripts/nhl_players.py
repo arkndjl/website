@@ -18,7 +18,9 @@ WAR (descriptive, what happened): goals over replacement at goal value, / goals 
     player's own on-ice xG effect against his teammates'), power-play / penalty-kill on-ice xG split among the 5 or 4
     skaters, finishing (goals - xG) at 1, penalties drawn - taken at the league's net power-play goals a penalty, and an
     even share a minute of the team's xG for and against not credited to anyone. Goalies: GSAx at 1. It adds up to each
-    team's goal differential the same season (R2 .975, slope 1.00 over 554 team-seasons). Replacement: the descriptive
+    team's goal differential the same season (R2 .991, slope .99 over 554 team-seasons; .975 before Nov 3 2026, when a
+    traded player's whole season sat on his last team: MoneyPuck's summary is one row a player under his last team, so
+    every season is now split over his teams by stats-API game-log ice time). Replacement: the descriptive
     rate of the players outside each team's top 13 forwards / 7 defencemen / 2 goalies by ice time, pooled over seasons.
 pWAR (projected, what it is worth going forward): HPM = the weighted components over this season and the two before
     (Marcel weights, tuned), shrunk by ice time toward a learned target (newcomers and short histories sit below
@@ -31,6 +33,11 @@ pWAR (projected, what it is worth going forward): HPM = the weighted components 
     (R2 .384 -> .376, t -1.1, 8/17), goalie columns unpenalized or at .01-.1 of the penalty, KG 100-800 h (R2
     .378-.385, best t .4) all fail; freed goalie weights over-predict held out (goalie-part slope .4-.8 vs 1.1-1.4
     shipped), so past GSAx moves next season's team GD little and the shrink is earned.
+    Nov 3 2026 (scripts/nhl_war_research_nov03.py): the tuning saw the held-out season (fully nested R2 .365 vs .384
+    reported, t -3.9, 0/17); and crediting a mover's season to his last team leaked within-season results into the
+    fit (the gap to the split predicts the split's residual, slope 1.13). With the split the fit picks 1/.5/.25,
+    K 5 h, KG 200 h, lam 1, a1 + ixg: R2 .371, fully nested .347. Separate K for on-ice vs individual components
+    (nested t -.83, 5/17) and goalie GSAx per expected goal faced (next-season GSAx t -.77; team GD t -1.15) fail.
     pWAR = (HPM - replacement) x TOI / 60 / goals a win, replacement as above on HPM; goals a win from team points
     against goal differential.
 """
@@ -201,6 +208,47 @@ def describe(S, sk, gk, pv):
         r['dr'] = r['dd']
 
 
+def team_split(S):
+    """{player id: {team: ice time s}} for skaters and for goalies from the stats-API regular-season game logs.
+    MoneyPuck's season summary is one row a player under his last team; this spreads a mover's season over his teams"""
+    out = []
+    for kind in ('skater', 'goalie'):
+        sp = defaultdict(lambda: defaultdict(float))
+        try:
+            for row in D._logs(kind, S, 2, False):
+                sp[str(row[1])][row[3]] += float(row[5] or 0)
+        except Exception as e:
+            print('team split skipped:', kind, S, e)
+        out.append(sp)
+    return out
+
+
+def pieces(r, sp):
+    """(team, ice time) parts of a season row, by game-log ice time when he played for 2+ teams"""
+    s = sp.get(r['id'])
+    tot = sum(s.values()) if s else 0
+    if not s or len(s) < 2 or tot <= 0:
+        return [(r['tm'], r['toi'])]
+    return [(t, r['toi'] * v / tot) for t, v in s.items() if v > 0]
+
+
+def describe_split(S, sk, gk, pv, split=None):
+    """describe() with each mover's season on the teams he played for (each part takes that team's leftover xG
+    share), then his rates back as the ice-time weighted mean of the parts"""
+    ss, gs = split if split is not None else team_split(S)
+    a = [dict(r, tm=t, toi=s, _r=r) for r in sk for t, s in pieces(r, ss)]
+    g = [dict(r, tm=t, toi=s, _r=r) for r in gk for t, s in pieces(r, gs)]
+    describe(S, a, g, pv)
+    acc = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
+    for x in a + g:
+        v = acc[id(x['_r'])]
+        v[0] += x['toi']; v[1] += x['do'] * x['toi']; v[2] += x['dd'] * x['toi']; v[3] += x['dr'] * x['toi']
+    for r in sk + gk:
+        t, o, d_, dr = acc[id(r)]
+        r['do'], r['dd'], r['dr'] = o / t, d_ / t, dr / t
+    return a + g
+
+
 def depth_rest(rows, pos, top):
     """the players outside each team's top `top` at a position by ice time"""
     by = defaultdict(list)
@@ -219,11 +267,12 @@ def fit_desc():
     for S in seasons:
         sk, gk, res = skaters(S), goalies(S), team_results(S)
         pv[S] = round(pen_value(S), 4)
-        describe(S, sk, gk, pv[S])
+        parts = describe_split(S, sk, gk, pv[S])
         tot = defaultdict(float)
         for r in sk + gk:
             r['S'] = S
-            tot[r['tm']] += r['dr'] * r['toi'] / 3600
+        for x in parts:
+            tot[x['tm']] += x['dr'] * x['toi'] / 3600
         for t, (gd, ppg, gp) in res.items():
             if t in tot:
                 ys.append(gd); ps.append(tot[t] / gp)
@@ -293,6 +342,7 @@ def fit():
     six = {S: {r['id']: r for r in sk[S]} for S in seasons}
     gix = {S: {r['id']: r for r in gk[S]} for S in seasons}
     res = {S: team_results(S) for S in seasons}
+    spl = {S: team_split(S) for S in range(FIRST + 1, D.current_season())}   # movers' ice time by team
     names = COMPS + ['gsax'] + PRIORS
     print('seasons', len(seasons), flush=True)
 
@@ -303,28 +353,33 @@ def fit():
         pulled (trailing teams) doesn't leak this season's result into the inputs"""
         X, y, keys = [], [], []
         for S in range(FIRST + 1, D.current_season()):
+            ss, gs = spl[S]
+            sp = [(r, pieces(r, ss)) for r in sk[S]]
+            gp_ = [(r, pieces(r, gs)) for r in gk[S]]
             tt, tg = defaultdict(float), defaultdict(float)
-            for r in sk[S]:
-                tt[r['tm']] += r['toi']
-            for r in gk[S]:
-                tg[r['tm']] += r['toi']
+            for r, pc in sp:
+                for t, s in pc:
+                    tt[t] += s
+            for r, pc in gp_:
+                for t, s in pc:
+                    tg[t] += s
             agg = defaultdict(lambda: np.zeros(len(names)))
-            for r in sk[S]:
-                if r['tm'] not in res[S]:
-                    continue
+            for r, pc in sp:
                 m, sh = marcel(history(r['id'], six, S, wts), K, COMPS)
                 v = np.array([m[c] for c in COMPS] + [0.0] + ([sh, sh * (r['pos'] == 'D'), 0.0] if prior else [0.0] * 3))
-                h = r['toi'] / tt[r['tm']] * 5 * res[S][r['tm']][2] if norm else r['toi'] / 3600
-                agg[r['tm']] += v * h
-            for r in gk[S]:
-                if r['tm'] not in res[S]:
-                    continue
+                for t, s in pc:
+                    if t in res[S]:
+                        agg[t] += v * (s / tt[t] * 5 * res[S][t][2] if norm else s / 3600)
+            for r, pc in gp_:
                 m, sh = marcel(history(r['id'], gix, S, wts), KG, ['gsax60'])
-                h = r['toi'] / tg[r['tm']] * res[S][r['tm']][2] if norm else r['toi'] / 3600
-                agg[r['tm']][len(COMPS)] += m['gsax60'] * h
-                if prior:
-                    agg[r['tm']][-1] += sh * h
-            for t, v in agg.items():
+                for t, s in pc:
+                    if t not in res[S]:
+                        continue
+                    h = s / tg[t] * res[S][t][2] if norm else s / 3600
+                    agg[t][len(COMPS)] += m['gsax60'] * h
+                    if prior:
+                        agg[t][-1] += sh * h
+            for t, v in sorted(agg.items()):
                 gdpg, ppg, gp = res[S][t]
                 X.append(v / gp); y.append(gdpg); keys.append((S, t))
         return np.array(X), np.array(y), keys
@@ -444,7 +499,7 @@ def season_table(S, fitd, bio):
             r['hpm'] -= m
     de = fitd['desc']
     pv = de['penValue'].get(str(S)) or de['penValue'][max(de['penValue'], key=int)]
-    describe(S, sk, gk, pv)
+    describe_split(S, sk, gk, pv)
     # pWAR's replacement (repl, HPM): skaters outside each team's top 13 forwards / 7 defencemen by ice time; goalies
     # outside the top 2. WAR's replacement: the same players' descriptive rate, pooled over every season
     repl = {}

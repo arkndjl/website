@@ -172,7 +172,7 @@ Back-to-backs (rest days already cover it), travel, time zones, altitude and in-
 
 ### NHL WAR and goalies
 
-NHL WAR is descriptive: what a player did this season, in goals, converted to wins. The parts: 5v5 on-ice xG for and against relative to teammates, power play and penalty kill xG, finishing (goals − xG), penalties drawn and taken, a share of the team's leftover xG, and for goalies, goals saved above expected. Added up by team, it explains team goal differential with R² .975 and a slope of 1.00. Replacement is the rate of players outside each team's top 13 forwards, 7 defensemen and 2 goalies.
+NHL WAR is descriptive: what a player did this season, in goals, converted to wins. The parts: 5v5 on-ice xG for and against relative to teammates, power play and penalty kill xG, finishing (goals − xG), penalties drawn and taken, a share of the team's leftover xG, and for goalies, goals saved above expected. Added up by team, it explains team goal differential with R² .991 and a slope of .99. Replacement is the rate of players outside each team's top 13 forwards, 7 defensemen and 2 goalies.
 
 **pWAR** is the projection: Marcel weights (1/.7/.5), shrunk toward a learned target that sits below average for short histories, with ice time as a share of the team's. Out of sample, R² for next season goes from .23 to .38. Goalie GSAx barely repeats (weight .07), so a goalie with 7 WAR this season projects to about 0.4.
 
