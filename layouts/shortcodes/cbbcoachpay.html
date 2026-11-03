@@ -31,5 +31,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "cbb_market" "note" (printf "Value: leave-one-school-out R² %.2f, %d school-years" $v.looR2 $v.n)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "cbb_market" "note" (printf "Value: leave-one-school-out R² %.2f, %d school-years" $v.looR2 (int $v.n))) -}}
 {{- end -}}
