@@ -10,7 +10,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function pc(x) { return x < 0.005 ? '&lt;1%' : x >= 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
   function f1(x) { return (+x).toFixed(1); }
-  function fa(r) { return r.ageEst ? "~" + f1(r.age) : (+r.age).toFixed(2); }
+  function fa(r) { return r.ageEst ? "~" + f1(r.age) : (+r.age).toFixed(1); }
   function sgn(x, d) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(d == null ? 1 : d); }
   function eur(v) { return !v ? '-' : v >= 1e6 ? '€' + (v / 1e6).toFixed(1) + 'm' : '€' + Math.round(v / 1e3) + 'k'; }
   function htIn(h) { return h ? Math.floor(h / 12) + "'" + (h % 12) + '"' : ''; }

@@ -149,7 +149,7 @@
         '<td class="cfb__num">' + p.av.toFixed(1) + '</td>' +
         '<td class="cfb__num cfb__g">' + p.g + '</td>' +
         '<td class="cfb__num">' + p.sn + '</td>' +
-        '<td class="cfb__num">' + (p.ax != null ? p.ax.toFixed(2) : p.age == null ? '' : p.age) + '</td>' +
+        '<td class="cfb__num">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__dim">' + (p.two ? 'off ' + f2(p.two.o) + ' (' + p.two.so + ' sn) / def ' + f2(p.two.d) + ' (' + p.two.sd + ' sn) WAR; ' : '') + esc(p.line) + '</td></tr>';
     }).join('');
     none.hidden = list.length > 0;

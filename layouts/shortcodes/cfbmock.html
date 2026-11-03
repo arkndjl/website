@@ -39,7 +39,7 @@
     <td class="fv"><span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span></td>
     {{- if $conv }}<td class="cfb__num">{{ .fvM }}</td>{{ end }}
     <td>{{ .cls }}</td>
-    <td class="cfb__num" data-v="{{ .age }}">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.2f" .age }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .age }}">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.1f" .age }}{{ end }}</td>
     <td>{{ with .need }}<span class="cfb__new">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     <td class="cfb__num">{{ .bb }}</td>
