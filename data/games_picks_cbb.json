@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T20:42:36Z",
+ "asof": "2026-11-03T20:46:18Z",
  "recenter": {
   "2026-11-03": -12.85
  },
@@ -273,8 +273,8 @@
    "flagged": "2026-11-03T16:09:16Z",
    "betTo": 16.5,
    "close": 14.5,
-   "now": null,
    "pass": true,
+   "now": null,
    "unitsRaw": 1.5,
    "unitsCap": 1.25
   },
@@ -411,9 +411,9 @@
     "line": 19.5,
     "price": 102.0,
     "ev": 0.053,
-    "units": 1.75,
-    "unitsRaw": 2.0,
-    "unitsCap": 1.75
+    "units": 1.5,
+    "unitsRaw": 1.75,
+    "unitsCap": 1.5
    },
    "unitsRaw": 0.5,
    "unitsCap": 0.25
@@ -525,6 +525,39 @@
     "units": 1.0,
     "unitsRaw": 1.25,
     "unitsCap": 1.0
+   }
+  },
+  {
+   "id": "401920702",
+   "espn": "401920702",
+   "sport": "cbb",
+   "kick": "2026-11-04T01:00:00Z",
+   "home": "Iowa",
+   "away": "Lipscomb",
+   "mk": "spread",
+   "side": "away",
+   "line": 23.5,
+   "price": -104.0,
+   "p": 0.526,
+   "ev": 0.032,
+   "units": 0.25,
+   "edge": 3.2,
+   "x": 2.5,
+   "pDU": 0.5108,
+   "evDU": 0.0019,
+   "m": 20.3,
+   "tm": 146.8,
+   "tmRaw": 134.0,
+   "flagged": "2026-11-03T20:46:18Z",
+   "betTo": 23.0,
+   "close": 23.5,
+   "now": {
+    "mk": "spread",
+    "side": "away",
+    "line": 23.5,
+    "price": -104.0,
+    "ev": 0.032,
+    "units": 0.25
    }
   },
   {
@@ -653,22 +686,6 @@
    "why": "no edge at -111",
    "m": 17.2,
    "tm": 152.5
-  },
-  {
-   "id": "401920702",
-   "sport": "cbb",
-   "kick": "2026-11-04T01:00:00Z",
-   "home": "Iowa",
-   "away": "Lipscomb",
-   "mk": "spread",
-   "side": "away",
-   "line": 23.5,
-   "price": -106.0,
-   "edge": 3.2,
-   "x": 2.5,
-   "why": "no edge at -106",
-   "m": 20.3,
-   "tm": 146.8
   },
   {
    "id": "401920343",
@@ -816,13 +833,13 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -106.0,
+   "price": -104.0,
+   "ev": 0.032,
    "edge": 3.2,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "Iowa",
    "away": "Lipscomb",
-   "state": "under"
+   "state": "pick"
   },
   "401920422": {
    "mk": "spread",
@@ -999,7 +1016,7 @@
    "price": 102.0,
    "ev": 0.053,
    "edge": 2.6,
-   "units": 2.0,
+   "units": 1.75,
    "home": "Boston College",
    "away": "Wagner",
    "state": "pick"
@@ -1081,7 +1098,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4173,
+  "snapshots": 4182,
   "buckets": [
    {
     "when": "24h+",
@@ -1103,12 +1120,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 363,
-    "clvRet": -0.0525,
-    "clvT": -19.49,
+    "clvN": 366,
+    "clvRet": -0.0524,
+    "clvT": -19.63,
     "clv": -0.1,
-    "beat": 0.132,
-    "still": 0.664
+    "beat": 0.131,
+    "still": 0.667
    },
    {
     "when": "<1h",
@@ -7761,6 +7778,31 @@
    "close": 19.5,
    "unitsRaw": 0.5,
    "unitsCap": 0.25
+  },
+  {
+   "id": "401920702",
+   "espn": "401920702",
+   "sport": "cbb",
+   "kick": "2026-11-04T01:00:00Z",
+   "home": "Iowa",
+   "away": "Lipscomb",
+   "mk": "spread",
+   "side": "away",
+   "line": 23.5,
+   "price": -104.0,
+   "p": 0.526,
+   "ev": 0.032,
+   "units": 0.25,
+   "edge": 3.2,
+   "x": 2.5,
+   "pDU": 0.5108,
+   "evDU": 0.0019,
+   "m": 20.3,
+   "tm": 146.8,
+   "tmRaw": 134.0,
+   "flagged": "2026-11-03T20:46:18Z",
+   "betTo": 23.0,
+   "close": 23.5
   }
  ],
  "nightCap": {
@@ -7772,15 +7814,15 @@
     "down": 17.25
    },
    "2026-11-04": {
-    "raw": 13.5,
+    "raw": 17.0,
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 22.25,
+    "raw": 21.25,
     "scale": 1.0
    },
    "2026-11-06": {
-    "raw": 8.75,
+    "raw": 9.75,
     "scale": 1.0
    },
    "2026-11-07": {
