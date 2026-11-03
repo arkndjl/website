@@ -82,6 +82,8 @@ def box_from_espn(summ, names):
         teams = summ['boxscore']['players']
     except (KeyError, IndexError, TypeError):
         return None
+    if ((comp.get('status') or {}).get('type') or {}).get('state', 'post') != 'post':
+        return None                                              # still on: no partial boxes
     if len(teams) != 2 or any(t['team']['id'] not in names for t in teams):
         return None
     shots = defaultdict(lambda: [0, 0, 0, 0])                    # athlete -> rim made, rim att, dunk made, dunk att
@@ -550,8 +552,11 @@ def fill(season, path, games_file=None, limit=None):
     rows, n, skip = [], 0, 0
     now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
     d1 = d1_ids(names)
-    todo = [g for g in games if g.get('season') == season and g.get('state') == 'post' and g['date'] < now
-            and g.get('home') in d1 and g.get('away') in d1]
+    # the games file is the last run's (cbb_games.py refreshes it later in the workflow), so a game it still has as
+    # 'in' or 'pre' may be over by now: any game that tipped 2 h ago goes to ESPN, whose summary says if it's final
+    soon = (datetime.now(timezone.utc) - timedelta(hours=2)).strftime('%Y-%m-%dT%H:%MZ')
+    todo = [g for g in games if g.get('season') == season and g.get('home') in d1 and g.get('away') in d1
+            and (g.get('state') == 'post' and g['date'] < now or g.get('state') in ('in', 'pre') and g['date'] < soon)]
     for g in sorted(todo, key=lambda g: g['date'])[:limit]:
         d = et_date(g['date'])
         if (names[g['home']], d) in have or (names[g['away']], d) in have:
