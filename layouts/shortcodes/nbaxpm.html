@@ -7,6 +7,7 @@
        Views: VORX (the default), XPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
        per 82 team games), position, team, search. RK and the position rank count within the filters and the view;
        headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM).
+       3Y / 1Y (proj view, this season): p3 / p1 from scripts/nba_proj.py (data/nba_proj3y_fit.json).
        Medals in the name cell: bdg, the predictive badges (scripts/nba_badges.py; data/nba_badge_backtest.json). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
@@ -34,6 +35,7 @@
     <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
       <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="VORX: wins over replacement on XPM, .030 x (XPM + 1.4) x MP / 48">VORX</button>
       <button type="button" class="cfb__chip" data-side="p" aria-pressed="false" hidden title="XPM (proj): XPM to date blended with his preseason prior by minutes (k = 509 minutes for veterans, 809 for newcomers), with an 80% range for his true level; this season only, display only">proj</button>
+      <button type="button" class="cfb__chip" data-side="3" aria-pressed="false" hidden title="3Y: projected XPM over the next three seasons (next season below); this season only, display only">3Y</button>
       <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="XPM: points per 100 possessions over an average player, shrunk by minutes">XPM</button>
       <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="O-XPM: offense, .5 ODPM + .5 OBPM">offense</button>
       <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="D-XPM: defense, .5 DDPM + .5 DBPM">defense</button>
@@ -48,6 +50,7 @@
         <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 500+ MP): Shot Creator (usage %), Playmaker (assist %), Two-Way Disruptor (steal % + block %), Foul Drawer (free throws a shot), Workhorse (minutes a game). Each predicted next-season XPM beyond this season's XPM, minutes and age, held out (scripts/nba_badge_backtest.py)">Player</th>
         <th data-sort="sxpm" data-num title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player, shrunk by minutes: raw x MP / (MP + 300) + role mean x 300 / (MP + 300), role mean -1 + .5 ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26. Below: raw. * = BPM only (no DPM row)">XPM</th>
         <th data-sort="pxpm" data-num class="c-pxpm" title="XPM (proj): XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only"><span class="nbaxpm__ph">XPM </span>(proj)</th>
+        <th data-sort="p3" data-num class="c-p3" title="3Y: projected XPM over the next three seasons, minutes-weighted, a season off the board counting as -2 over 1,000 minutes: c0 + c1 proj + c2 (age - 27) + c3 (age - 27)^2 + c4 ln(1 + M) + c5 proj (age - 27) + c6 proj (ln(1 + M) - 7), proj = XPM (proj), M = his projected minutes for a full season, coefficients by share of the season played. Below: next season (1Y). Held out 2012-23: RMSE .84 vs .90 for XPM (proj) on the aging curve, calibrated (1.03 uncalibrated, 1.16 held flat). Display only">3Y</th>
         <th data-sort="soxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM, shrunk by minutes">O-XPM</th>
         <th data-sort="sdxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM, shrunk by minutes">D-XPM</th>
         <th data-sort="vorx" data-num class="c-vorx" title="VORX = .030 x (XPM + 1.4) x MP / 48: wins over a replacement player (XPM -1.4, what freely available players produce), 2.46 wins per point of XPM over a full season's minutes; both fit to NBA team wins 2011-26">VORX</th>
@@ -78,7 +81,7 @@
   var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
       asof = win.querySelector('[data-nx-asof]'), pager = win.querySelector('[data-nx-pager]'), pageEl = win.querySelector('[data-nx-page]'), pagesEl = win.querySelector('[data-nx-pages]');
-  var PER = 50, KEY = { '': 'vorx', p: 'pxpm', x: 'sxpm', o: 'soxpm', d: 'sdxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var PER = 50, KEY = { '': 'vorx', p: 'pxpm', 3: 'p3', x: 'sxpm', o: 'soxpm', d: 'sdxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // predictive badges (scripts/nba_badges.py, the CFB board's pixel medals): [name, tier, pct, stat], best first
@@ -111,7 +114,7 @@
   }
   function render() {
     if (!data) return;
-    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[side === 'p' && !data.proj ? 'x' : side],
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[(side === 'p' || side === '3') && !data.proj ? 'x' : side],
         qual = Math.round(1000 * data.games / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
         ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
     var list = data.players.filter(function (p) {
@@ -138,13 +141,14 @@
     table.dataset.key = key;
     // the board shows only columns every player has: before a season's first BPM/DPM posts (XPM is the prior) those columns go
     table.classList.toggle('no-dpm', !data.players.some(function (p) { return p.dpm != null; }));
-    table.classList.toggle('no-proj', !data.proj); bar.querySelector('[data-side="p"]').hidden = !data.proj;
+    table.classList.toggle('no-proj', !data.proj); bar.querySelector('[data-side="p"]').hidden = bar.querySelector('[data-side="3"]').hidden = !data.proj;
     table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP' + medals(p) + '</span></td>' +
         '<td class="cfb__num nbaxpm__v' + k('sxpm') + '">' + sg(p.sxpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + (p.bpm == null && p.dpm == null ? '' : '<span class="cfb__dim nbaxpm__od" title="raw XPM">raw ' + (p.xpm > 0 ? '+' : '') + p.xpm.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>' +
+        '<td class="cfb__num c-p3 nbaxpm__v' + k('p3') + '">' + (p.p3 == null ? '' : sg(p.p3) + '<span class="cfb__dim nbaxpm__od" title="next season (1Y)">1Y ' + (p.p1 > 0 ? '+' : '') + p.p1.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('soxpm') + '">' + sg(p.soxpm) + '</td>' +
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('sdxpm') + '">' + sg(p.sdxpm) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('vorx') + '">' + p.vorx.toFixed(1) + '</td>' +
@@ -180,7 +184,7 @@
       // XPM (proj) for the season in progress (scripts/nba_proj.py), joined on the bbref id
       if (pr && pr.season === d.season) {
         var by = {}; pr.players.forEach(function (p) { by[p.id] = p; });
-        d.players.forEach(function (p) { var x = by[p.id]; if (x) { p.pxpm = x.pxpm; p.lo = x.lo; p.hi = x.hi; } });
+        d.players.forEach(function (p) { var x = by[p.id]; if (x) { p.pxpm = x.pxpm; p.lo = x.lo; p.hi = x.hi; p.p1 = x.p1; p.p3 = x.p3; } });
         d.proj = 1;
       }
       cache[s] = d; if (bar.elements.season.value !== s) return;
