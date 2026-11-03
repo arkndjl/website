@@ -309,7 +309,7 @@
 
 {{- else if eq $part "players" }}
 {{- if and $d $d.players }}
-{{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" "Player,Maps,Rating,Swing,K/D,ADR,HS%,Entry ±,Clutch,MVP" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
+{{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" (cond (and site.Data.esea_rwa (eq site.Data.esea_rwa.head "rwa")) "Player,Maps,RWA,Rating,K/D,ADR,HS%,Entry ±,Clutch,MVP" "Player,Maps,Rating,Swing,K/D,ADR,HS%,Entry ±,Clutch,MVP") "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
 <table class="cfb__table esea-season">
   {{- $rw := site.Data.esea_rwa }}{{ $rwHead := and $rw (eq $rw.head "rwa") }}{{ $nid := dict }}{{ with $rw }}{{ range $id, $n := .names }}{{ $nid = merge $nid (dict $n $id) }}{{ end }}{{ end }}{{ range $d.members }}{{ $nid = merge $nid (dict .nick .id) }}{{ end }}
   <thead><tr><th>Player</th><th>Maps</th>{{ if $rwHead }}<th title="RWA: round win % added per round, career ESEA league maps, opponent- and division-adjusted; 0 = average Main player">RWA</th>{{ end }}<th title="ARK Rating (HLTV 3.0 structure) over the season's totals">Rating</th>{{ if and $rw (not $rwHead) }}<th title="RWA: round win % added per round, career ESEA league maps, opponent- and division-adjusted; 0 = average Main player">RWA</th>{{ end }}<th title="swing = est. win probability added per round vs average, % of a round">Swing</th><th title="HLTV Rating 1.0 formula">1.0</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="opening duels: success (shrunk) and net value per round; 100 = average">Entry+</th><th title="clutches won">Clutch</th><th title="clutch conversion (shrunk) and value per round; 100 = average">Clutch+</th><th title="3k+ rounds">Multi</th><th>Aces</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th><th title="map MVPs: best ARK Rating on 1NT for the map">MVP</th><th title="FACEIT round MVPs">Rd MVP</th></tr></thead>
@@ -521,7 +521,8 @@
     {{- /* fanGFX / teamGFX: the preview as a graphic (layouts/partials/gfx.html) */}}
     {{- $soc := site.Data.cs.socials | default dict }}{{ $watch := slice }}
     {{- range $pv.matchups }}{{ with .us }}{{ with index $soc .name }}{{ with .twitch }}{{ $watch = $watch | append . }}{{ end }}{{ end }}{{ end }}{{ end }}
-    {{- $five := slice }}{{ $tf := slice }}{{ range $pv.matchups }}{{ with .us }}{{ $five = $five | append . }}{{ end }}{{ with .them }}{{ $tf = $tf | append . }}{{ end }}{{ end }}
+    {{- $rwn := dict }}{{ with $pv.rwa }}{{ range .five | append .theirFive }}{{ if index . 1 }}{{ $rwn = merge $rwn (dict (index . 0) (index . 1)) }}{{ end }}{{ end }}{{ end }}
+    {{- $five := slice }}{{ $tf := slice }}{{ range $pv.matchups }}{{ with .us }}{{ $five = $five | append (merge . (dict "rwa" (index $rwn .name))) }}{{ end }}{{ with .them }}{{ $tf = $tf | append (merge . (dict "rwa" (index $rwn .name))) }}{{ end }}{{ end }}
     {{- $ln := "" }}{{ with $pv.spread }}{{ $ln = printf "%s −%.1f" (cond (ge (float .line) 0) "1NT" $o.name) (math.Abs (float .line)) }}{{ end }}
     {{- $oLogo := "" }}{{ with $o.avatar }}{{ $f := path.Base . }}{{ if fileExists (printf "static/img/1nt/opp/%s" $f) }}{{ $oLogo = printf "img/1nt/opp/%s" $f | relURL }}{{ end }}{{ end }}
     {{- $st := $d.standing | default dict }}
