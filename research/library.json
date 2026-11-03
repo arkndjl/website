@@ -682,6 +682,21 @@
      ]
     },
     {
+     "term": "RWA (ESEA)",
+     "short": "Round win % an ESEA league player adds per round, opponent- and division-adjusted; 0 = average Main player.",
+     "body": [
+      "Map line = ARK 2 stat weights + the team-result credit, in round win % per round over the average line.",
+      "Each line is credited with the opposing five's mean RWA, solved iteratively; career league maps since S53, no decay.",
+      "Shrunk 15 rounds toward a division prior (4 per level, Open -2 to Advanced +1).",
+      "Held S58-S59 matches: log loss 0.5972 vs ARK Rating 0.6532 (t -12.94) and player Elo 0.6205 (t -5.98), 2/2 seasons. OLS stat weights instead: 0.6153.",
+      "1NT match preview: .316 x elo/talent log-odds + 14.2 x RWA gap / 100; S59 leave-one-day-out 0.5162 vs 0.5581 with player Elo (t -1.68)."
+     ],
+     "where": "1NTERLYTICS: match preview, season stats, player rankings",
+     "sports": [
+      "CS2"
+     ]
+    },
+    {
      "term": "SPW+ / RPW+ / xHold / xBreak",
      "short": "Serve and return points won over the average top-100 player, opponent-adjusted.",
      "body": [

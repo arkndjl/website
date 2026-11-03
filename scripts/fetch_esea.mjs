@@ -1057,6 +1057,19 @@ function fiveElo(ids) {
   return { elo: Math.round(v.reduce((a, x) => a + x, 0) / v.length), each: Object.fromEntries(ids.map((q, i) => [q, { elo: Math.round(v[i]), maps: P.n.get(q) || 0 }])) };
 }
 const PREVIEW_W = { elo: 0.80, rating: 0.20, map: 0, matchup: 0 };
+// RWA (round win % added per round, scripts/esea_rwa_research.py, Nov 3 2026): ARK 2 weights + outcome credit,
+// opponent-credited, division prior, career league maps; data/esea_rwa.json from the previous run's build step.
+// Held S58-S59 match log loss .5972 vs player Elo .6205 (t -6.0) and ARK Rating .6532 (t -12.9), 2/2 seasons; on
+// the page's S59 inputs (n 154, leave-one-day-out) elo/talent + RWA .516 vs elo/talent + player Elo .558
+// (t -1.7). Player Elo adds nothing beside it there (coef < 0), so RWA replaces it in the blend.
+const RWA_W = { a: 0.316, b: 14.2 };
+const RWA = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea_rwa.json'), 'utf8')); } catch { return null; } })();
+function fiveRwa(ids) {
+  if (!RWA?.p || !ids.length) return null;
+  const dflt = RWA.new ?? -3;   // no league maps: the division prior
+  const v = ids.map(q => (RWA.p[q] ? RWA.p[q][0] : dflt));
+  return { sum: v.reduce((a, x) => a + x, 0) / v.length * 5, each: Object.fromEntries(ids.map((q, i) => [q, { rwa: v[i], rounds: RWA.p[q]?.[1] ?? 0 }])) };
+}
 async function preview(nx) {
   if (!nx?.opp?.id) return null;
   const oid = nx.opp.id;
@@ -1157,7 +1170,13 @@ async function preview(nx) {
   try { peUs = fiveElo(five.map(r => r.id).filter(Boolean)); peThem = fiveElo(theirFive.map(r => r.id).filter(Boolean)); } catch (e) { console.log('player elo:', e.message); }
   const peGap = peUs && peThem && five.length >= 4 && theirFive.length >= 4 ? peUs.elo - peThem.elo : null;
   const pPelo = peGap != null ? ex(PELO.b * peGap / 400) : null;
-  const pAll = pPelo != null ? ex(PELO.a * lg(Math.min(0.97, Math.max(0.03, pFace))) + PELO.b * peGap / 400) : pFace;
+  let rwUs = null, rwThem = null;
+  try { rwUs = fiveRwa(five.map(r => r.id).filter(Boolean)); rwThem = fiveRwa(theirFive.map(r => r.id).filter(Boolean)); } catch (e) { console.log('rwa:', e.message); }
+  const rwGap = rwUs && rwThem && five.length >= 4 && theirFive.length >= 4 ? (rwUs.sum - rwThem.sum) / 100 : null;
+  const pRwa = rwGap != null ? ex(RWA_W.b * rwGap) : null;
+  const lf = lg(Math.min(0.97, Math.max(0.03, pFace)));
+  const pAll = pRwa != null ? ex(RWA_W.a * lf + RWA_W.b * rwGap) : pPelo != null ? ex(PELO.a * lf + PELO.b * peGap / 400) : pFace;
+  const wA = pRwa != null ? RWA_W.a : pPelo != null ? PELO.a : 1;
   // ---- maps: each five's lifetime map deviations (see mapDevs), the map win chance around pAll
   const devsOf = async rs => Promise.all(rs.map(r => mapDevs(r.id)));
   const [dUs, dThem] = await Promise.all([devsOf(five), devsOf(theirFive)]);
@@ -1197,8 +1216,10 @@ async function preview(nx) {
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
-    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
-    w: { ...Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100 * (pPelo != null ? PELO.a : 1))])), pelo: pPelo != null ? 100 : 0 },
+    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rwa: pRwa != null ? Math.round(pRwa * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
+    w: { ...Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100 * wA)])), pelo: pRwa == null && pPelo != null ? 100 : 0, rwa: pRwa != null ? 100 : 0 },
+    rwa: rwGap != null ? { us: Math.round(rwUs.sum * 10) / 10, them: Math.round(rwThem.sum * 10) / 10, five: five.map(r => [r.nickname, rwUs.each[r.id]?.rwa ?? null, rwUs.each[r.id]?.rounds ?? 0]),
+      theirFive: theirFive.map(r => [r.nickname, rwThem.each[r.id]?.rwa ?? null, rwThem.each[r.id]?.rounds ?? 0]) } : null,
     pelo: peGap != null ? { us: peUs.elo, them: peThem.elo, gap: peGap, five: five.map(r => [r.nickname, peUs.each[r.id]?.elo ?? null, peUs.each[r.id]?.maps ?? 0]),
       theirFive: theirFive.map(r => [r.nickname, peThem.each[r.id]?.elo ?? null, peThem.each[r.id]?.maps ?? 0]) } : null,
     lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, mapK: MAP_K, mapCoef: MAP_COEF };
