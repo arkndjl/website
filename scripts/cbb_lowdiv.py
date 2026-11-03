@@ -22,9 +22,15 @@ whole teams) in 4 of 5 folds. Tested out of time on 2025-26 -> 2026-27 (log loss
 live coefficients are refit on all three. Writes data/cbb_lowdiv.json (fit + backtest) and static/data/cbb-lowdiv.json.
 
 Live: the players on this season's D-II and D-III rosters (ESPN: class, height, weight) with a line this season or
-last (this season's minutes pooled with last season's at half weight), not on a D-I roster now. FV: 20 + D-1% x (mean
-realized FV of D-I arrivals from below D-I - 20), the mean outcome; NBA% = D-1% x their NBA rate (careers kit: players
-whose first D-I season was not as a freshman and who had no recruiting rank, first seasons 2009-16).
+last (this season's minutes pooled with last season's at half weight), not on a D-I roster now. E[FV] = 20 + D-1% x V,
+V = what his first D-I season would be worth: the translation (his line -> first D-I season BPM shrunk by minutes, a
+ridge on the 318 movers of the first two cycles, chosen on the first and tested out of time both ways), spread by its
+out-of-time misses, through the arrival value (FV above 20 from a first D-I season and class: a Poisson index and a
+monotone map, chosen and checked out of fold on the careers kit's 2009-16 arrivals from below D-I, first D-I season not
+as a freshman, no recruiting rank). NBA% the same with the NBA rate. The headline is the D-I board's own E[FV] -> FV
+map, from (20, 20). The translation's end-to-end check (its V against what the movers' first seasons were worth) is
+right-signed both ways but not significant (t .98 / .54), so V is not applied to D-I newcomers, who keep the board's
+own newcomer grade.
 """
 import concurrent.futures as cf
 import csv
@@ -41,6 +47,7 @@ from collections import Counter, defaultdict
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fv_scale as FS
 import names as N
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -325,10 +332,11 @@ def fit():
     Fa, ya = F + Ft, np.concatenate([y, yt])
     Xa, sca = mat(Fa, keep); ba = logit_fit(Xa, ya)
     nba = arrivals()
+    A = arrive_fit(); T = translate_fit(D1, A)
     out = {'asof': time.strftime('%Y-%m-%d'), 'train': '2023-24 to 2025-26', 'n': int(len(ya)), 'moved': int(ya.sum()),
            'kept': keep, 'keptLabels': [LABEL[k] for k in keep], 'evidence': [dict(e, label=LABEL[e['driver']]) for e in ev],
            'beta': [round(float(v), 5) for v in ba], 'mu': [round(float(v), 5) for v in sca[0]], 'sd': [round(float(v), 5) for v in sca[1]],
-           'test': test, 'arrivals': nba, 'kMin': K_MIN, 'priorW': PRIOR_W}
+           'test': test, 'arrivals': nba, 'kMin': K_MIN, 'priorW': PRIOR_W, 'arrive': A, 'translate': T}
     json.dump(out, open(FIT, 'w'), indent=1)
     print('wrote', FIT)
     return out
@@ -347,6 +355,200 @@ def arrivals():
     nba = [1 if float(r['nba_games'] or 0) > 0 else 0 for r in rs]
     return {'n': len(rs), 'nba': round(float(np.mean(nba)), 4), 'fv': round(float(np.mean(fv)), 3)}
 
+
+
+# ---------------------------------------------------------------- FV: translation and arrival value
+POWER = {'ACC', 'B10', 'B12', 'SEC', 'P12', 'BE'}
+BS_K, BS_0 = 300, -6.0       # a D-I season's BPM shrunk to -6 by 300 minutes (the arrival value's input)
+T_CANDS = ['prod', 'prod2', 'msh', 'stsh', 'gsh', 'srs', 'd3', 'pts', 'reb', 'ast', 'stl', 'blk', 'tov', 'ts', 'tpr', 'big', 'guard', 'ht']
+A_CANDS = ['bs', 'bs2', 'bs4', 'cls', 'ht']      # what a projection below D-I can fill
+
+
+def num(v, d=float('nan')):
+    try: return float(v)
+    except (TypeError, ValueError): return d
+
+
+def bs_of(r):
+    """a Barttorvik season's BPM, shrunk by minutes (mp is per game)"""
+    mp = num(r['mp'], 0) * num(r['gp'], 0); b = num(r['bpm'], BS_0)
+    return (b * mp + BS_0 * BS_K) / (mp + BS_K)
+
+
+def ht_of(h):
+    m = re.match(r"\s*(\d)\D+(\d+)", h or '')
+    return int(m.group(1)) * 12 + int(m.group(2)) if m else None
+
+
+def ridge(X, y, lam=3.0):
+    mu, sd = X.mean(0), X.std(0) + 1e-9
+    Z = np.column_stack([np.ones(len(X)), (X - mu) / sd]); P = np.eye(Z.shape[1]) * lam; P[0, 0] = 0
+    return np.linalg.solve(Z.T @ Z + P, Z.T @ y), mu, sd
+
+
+def rpred(m, X): b, mu, sd = m; return np.column_stack([np.ones(len(X)), (X - mu) / sd]) @ b
+
+
+def poisson(Z, y, lam=1.0):
+    A = np.column_stack([np.ones(len(Z)), Z]); b = np.zeros(A.shape[1]); b[0] = math.log(y.mean() + 1e-6)
+    P = np.eye(A.shape[1]) * lam; P[0, 0] = 0
+    for _ in range(100):
+        m = np.exp(np.clip(A @ b, -20, 8)); step = np.linalg.solve((A * m[:, None]).T @ A + P, A.T @ (m - y) + P @ b); b -= step
+        if np.abs(step).max() < 1e-9: break
+    return b
+
+
+def pav(x, y):
+    """non-decreasing fit of y on sorted x, as (x, y) knots"""
+    vals, wts, xs = [], [], []
+    for xi, yi in zip(x, y):
+        vals.append(yi); wts.append(1.0); xs.append(xi)
+        while len(vals) > 1 and vals[-2] > vals[-1]:
+            w = wts[-2] + wts[-1]
+            xs[-2:] = [(xs[-2] * wts[-2] + xs[-1] * wts[-1]) / w]; vals[-2:] = [(vals[-2] * wts[-2] + vals[-1] * wts[-1]) / w]; wts[-2:] = [w]
+    return np.array(xs), np.array(vals)
+
+
+def arrive_map(X, y, nba):
+    """FV above 20 (and NBA odds) from a first D-I season: a Poisson index, then the non-decreasing map of the outcome
+    on it (bounded by what such players became, where the exponential alone ran the top 10 at 2.7x their outcome)"""
+    mu, sd = X.mean(0), X.std(0) + 1e-9; b = poisson((X - mu) / sd, y)
+    idx = np.column_stack([np.ones(len(X)), (X - mu) / sd]) @ b; o = np.argsort(idx)
+    kx, ky = pav(idx[o], y[o]); nx, ny = pav(idx[o], nba[o])
+    return {'b': b.tolist(), 'mu': mu.tolist(), 'sd': sd.tolist(), 'kx': kx.tolist(), 'ky': ky.tolist(), 'nx': nx.tolist(), 'ny': ny.tolist()}
+
+
+def arrive_x(M, bs, ht, cls):
+    """the arrival value's inputs from a first-season BPM (array), height and class at arrival (2 So .. 4 Sr)"""
+    bs = np.asarray(bs, float); one = np.ones(len(bs))
+    v = {'bs': bs, 'bs2': np.maximum(0, bs - 2), 'bs4': np.maximum(0, bs - 4), 'ht': one * ht, 'cls': one * cls}
+    return np.column_stack([v[k] for k in M['keep']])
+
+
+def arrive_val(M, X, nba=False):
+    idx = np.column_stack([np.ones(len(X)), (X - np.array(M['mu'])) / np.array(M['sd'])]) @ np.array(M['b'])
+    return np.interp(idx, M['nx'], M['ny']) if nba else np.interp(idx, M['kx'], M['ky'])
+
+
+def arrival_frame():
+    """D-I arrivals from below D-I in the careers kit (first D-I season not as a freshman, no recruiting rank, first
+    seasons 2009-16): their first D-I season and what their careers became (FV above 20, any NBA game)."""
+    first = {}
+    with open(KIT, newline='') as f:
+        for r in csv.DictReader(f):
+            pid = r['pid'] or r['name'] + r['team']; y = int(num(r['year'], 0))
+            if pid not in first or y < first[pid][0]: first[pid] = (y, r)
+    F, y, nba = [], [], []
+    for yr, r in first.values():
+        if not (2009 <= yr <= 2016 and (r['yr'] or '') in ('So', 'Jr', 'Sr')) or r['on3rk'] or r['rk247'] or num(r['rec'], 0) > 0: continue
+        b = bs_of(r)
+        F.append({'bs': b, 'bs2': max(0.0, b - 2), 'bs4': max(0.0, b - 4), 'mpct': num(r['min_per'], 0) / 100, 'cls': {'So': 2, 'Jr': 3, 'Sr': 4}[r['yr']],
+                  'ht': num(r['hti'], 78), 'power': 1.0 if r['conf'] in POWER else 0.0, 'obpm': num(r['obpm'], -3), 'usg': num(r['usg'], 20)})
+        y.append(num(r['realized_fv'], 20) - 20); nba.append(1.0 if num(r['nba_games'], 0) > 0 else 0.0)
+    return F, np.array(y), np.array(nba)
+
+
+def fwd(cands, loss, base):
+    """forward selection on 5 fold losses: the candidate that cuts mean loss most while it helps in 4 of 5 folds"""
+    keep, ev, tested = [], [], 0
+    while True:
+        best = None
+        for c in cands:
+            if c in keep: continue
+            tested += 1; l = loss(keep + [c]); g = base - l
+            if (g > 0).sum() >= 4 and g.mean() > 0 and (best is None or g.mean() > best[1].mean()): best = (c, g, l)
+        if not best: return keep, ev, tested
+        keep.append(best[0]); base = best[2]
+        ev.append({'driver': best[0], 'gain': round(float(best[1].mean()), 4), 'folds': int((best[1] > 0).sum())})
+        print(f'  + {best[0]:6s} gain {best[1].mean():.4f} ({int((best[1] > 0).sum())}/5)')
+
+
+def pdev(y, m):
+    """Poisson deviance per player (the FV above 20 is a count-like, mostly-zero outcome)"""
+    m = np.maximum(m, 1e-6); return 2 * (np.where(y > 0, y * np.log(np.maximum(y, 1e-12) / m), 0) - (y - m))
+
+
+def tstat(d): return float(d.mean() / (d.std() / math.sqrt(len(d)))) if len(d) > 1 and d.std() > 0 else 0.0
+
+
+def arrive_fit():
+    """the arrival value: FV above 20 from a first D-I season, selected and checked out of fold on 2009-16 arrivals"""
+    F, y, nba = arrival_frame()
+    fo = np.random.RandomState(3).randint(0, 5, len(y))
+    M = lambda keys: np.array([[x[k] for k in keys] for x in F], float)
+    def oof(keys):
+        out = np.zeros(len(y))
+        for k in range(5):
+            tr = fo != k
+            out[~tr] = arrive_val(arrive_map(M(keys)[tr], y[tr], nba[tr]), M(keys)[~tr]) if keys else y[tr].mean()
+        return out
+    mse = lambda p: np.array([((y[fo == k] - p[fo == k]) ** 2).mean() for k in range(5)])
+    print(f'arrival value: {len(y)} D-I arrivals from below D-I, 2009-16')
+    keep, ev, tested = fwd(A_CANDS, lambda ks: mse(oof(ks)), mse(oof([])))
+    p, p0 = oof(keep), np.full(len(y), y.mean())
+    o = np.argsort(-p)
+    test = {'n': int(len(y)), 'mse': round(float(((y - p) ** 2).mean()), 4), 'mseFlat': round(float(((y - y.mean()) ** 2).mean()), 4),
+            't': round(tstat((y - p0) ** 2 - (y - p) ** 2), 2), 'tDev': round(tstat(pdev(y, p0) - pdev(y, p)), 2), 'candidates': tested,
+            'top': {str(n): [round(float(p[o[:n]].mean()), 2), round(float(y[o[:n]].mean()), 2)] for n in (25, 50, 100, 200)}}
+    print('  ', test)
+    return dict(arrive_map(M(keep), y, nba), keep=keep, evidence=ev, test=test, mean=round(float(y.mean()), 4))
+
+
+def mover_frame(D1):
+    """D-II / D-III players on a D-I roster the next season (not as a freshman), with that first D-I season"""
+    kit, dupk = defaultdict(dict), Counter()
+    with open(KIT, newline='') as f:
+        for r in csv.DictReader(f):
+            y = int(num(r['year'], 0))
+            if y in {c[1] for c in TRAIN}: k = N.key(r['name']); dupk[(y, k)] += 1; kit[y][k] = r
+    rows = []
+    for s, s1 in TRAIN:
+        lines, _ = season_lines(s); nm = norms(lines); dup = Counter(k for (_, _, k) in lines)
+        for (d, tid, key), r in lines.items():
+            k1 = kit[s1].get(key)
+            if dup[key] > 1 or key in D1[s] or dupk[(s1, key)] != 1 or not k1 or k1['yr'] == 'Fr': continue
+            x = features(r, nm); x['ht'] = num(k1['hti'], 78)
+            rows.append({'s': s, 'x': x, 'bs': bs_of(k1), 'cls': {'So': 2, 'Jr': 3, 'Sr': 4}.get(k1['yr'], 3), 'team': f'{s}:{tid}', 'name': r['name']})
+    return rows
+
+
+def translate_fit(D1, A):
+    """a line below D-I -> his first D-I season (shrunk BPM), fit on the movers; chosen on the first cycle's movers (5
+    team folds) and tested out of time both ways, on the BPM and on the arrival value it implies"""
+    rows = mover_frame(D1)
+    S = np.array([r['s'] for r in rows]); Y = np.array([r['bs'] for r in rows]); H = np.array([r['x']['ht'] for r in rows])
+    C = np.array([r['cls'] for r in rows], float)
+    X = lambda keys, idx: np.array([[rows[i]['x'][k] for k in keys] for i in idx], float)
+    s0, s1 = TRAIN[0][0], TRAIN[1][0]
+    tr = np.where(S == s0)[0]
+    teams = sorted({rows[i]['team'] for i in tr}); perm = np.random.RandomState(5).permutation(len(teams))
+    fo = np.array([perm[teams.index(rows[i]['team'])] % 5 for i in tr])
+    def loss(keys):
+        out = []
+        for k in range(5):
+            a, b = tr[fo != k], tr[fo == k]
+            p = rpred(ridge(X(keys, a), Y[a]), X(keys, b)) if keys else np.full(len(b), Y[a].mean())
+            out.append(((Y[b] - p) ** 2).mean())
+        return np.array(out)
+    print(f'translation: {len(rows)} movers ({(S == s0).sum()} after {s0 - 1}-{str(s0)[2:]}, {(S == s1).sum()} after {s1 - 1}-{str(s1)[2:]})')
+    keep, ev, tested = fwd(T_CANDS, loss, loss([]))
+    G = lambda bs, ht, cl: arrive_val(A, arrive_x(A, bs, ht, cl))
+    act = G(Y, H, C); tests, res_all, dd = [], [], []
+    for a, b in ((S == s0, S == s1), (S == s1, S == s0)):
+        m = ridge(X(keep, np.where(a)[0]), Y[a]); mu = rpred(m, X(keep, np.where(b)[0]))
+        res = Y[a] - rpred(m, X(keep, np.where(a)[0])); res_all += list(Y[b] - mu)
+        V = np.array([G(u + res, np.full(len(res), h), np.full(len(res), c)).mean() for u, h, c in zip(mu, H[b], C[b])])
+        d = (act[b] - act[a].mean()) ** 2 - (act[b] - V) ** 2; dd += list(d)
+        tests.append({'fit': f'{int(S[a][0]) - 1}-{str(int(S[a][0]))[2:]}', 'n': int(b.sum()),
+                      'rmse': round(float(np.sqrt(((Y[b] - mu) ** 2).mean())), 3), 'rmseFlat': round(float(np.sqrt(((Y[b] - Y[a].mean()) ** 2).mean())), 3),
+                      'r': round(float(np.corrcoef(mu, Y[b])[0, 1]), 3), 'tBpm': round(tstat((Y[b] - Y[a].mean()) ** 2 - (Y[b] - mu) ** 2), 2),
+                      'value': round(float(V.mean()), 3), 'valueActual': round(float(act[b].mean()), 3), 'tValue': round(tstat(d), 2)})
+        print('  ', tests[-1])
+    m = ridge(X(keep, range(len(rows))), Y)
+    # the spread around a projection: the out-of-time misses of both directions (in-sample residuals run narrow)
+    q = np.quantile(np.array(res_all), np.linspace(0.01, 0.99, 49))
+    return {'keep': keep, 'evidence': ev, 'candidates': tested, 'b': m[0].tolist(), 'mu': m[1].tolist(), 'sd': m[2].tolist(),
+            'res': [round(float(v), 3) for v in q], 'n': len(rows), 'test': tests, 'tValue': round(tstat(np.array(dd)), 2)}
 
 # ---------------------------------------------------------------- live
 def espn_get(url):
@@ -413,6 +615,11 @@ def grade():
     ros = espn_rosters('--rosters' in sys.argv)
     a = json.load(open(ALL)); ci = {c: j for j, c in enumerate(a['cols'])}
     d1 = {N.key(r[ci['name']]) for r in a['rows']}
+    # the D-I board's E[FV] -> headline FV (as the D-I players it doesn't list are placed, cbb_live.unboarded), from
+    # (20, 20): an E of 20, no NBA career, is a 20
+    eb = sorted((r[ci['e']], r[ci['fvx']]) for r in a['rows'] if r[ci['e']] is not None)
+    ex, fx = np.array([20.0] + [e for e, _ in eb]), np.maximum.accumulate(np.array([20.0] + [x for _, x in eb]))
+    AV, TR = fit.get('arrive'), fit.get('translate')
     # ncaa.com teams (name, division) of the two seasons, matched to ESPN's by name
     teams = {}
     for T in (tprev, tnow):
@@ -446,20 +653,32 @@ def grade():
             lns = [line_of(x_, teams.get(x_['team'], {}).get('name') or x_['tname'], s_) for x_, s_ in ((ra, LIVE), (rb, LIVE - 1)) if x_]
             rep = {'plus': [l for l, v in sorted(parts, key=lambda t: -t[1]) if v >= 0.15][:4], 'minus': [l for l, v in sorted(parts, key=lambda t: t[1]) if v <= -0.15][:4]}
             arr = fit['arrivals']
-            fvx = 20 + p * (arr['fv'] - 20)
             c = CLS.get(cls, ('', 0))
+            hti = ht_of(ht) or 78
+            if AV and TR:
+                # his first D-I season if he moves up (the translation, over its out-of-time spread), then what such a
+                # first season has been worth (the arrival value): E[FV] = 20 + D-1% x that value
+                f['ht'] = hti
+                bs = float(rpred((np.array(TR['b']), np.array(TR['mu']), np.array(TR['sd'])), np.array([[f[k] for k in TR['keep']]]))[0])
+                Xg = arrive_x(AV, bs + np.array(TR['res']), float(hti), float(min(4, c[1] + 1) if c[1] else 3))
+                val, pn = float(arrive_val(AV, Xg).mean()), float(arrive_val(AV, Xg, True).mean())
+            else:
+                bs, val, pn = None, arr['fv'] - 20, arr['nba']
+            e_ = 20 + p * val
+            fvx = float(np.interp(e_, ex, fx))
             rows.append([name, e['loc'] or t['name'], e.get('logo'), DIVS[t['div']], pos_of(pos, r['pos']), None, 0, 0,
-                         20, False, round(fvx, 3), round(p * arr['nba'], 5), None, c[0] or None, c[1] or 0, None,
+                         FS.fv_of('cbb', fvx), False, round(fvx, 3), round(p * pn, 5), None, c[0] or None, c[1] or 0, None,
                          round(17.6 + c[1], 1) if c[1] else None, ht, int(wt) if wt else None, photo, 0, lns, None, parts, rep,
                          {'espn': f'https://www.espn.com/mens-college-basketball/player/_/id/{aid}'}, DIVS[t['div']], round(p, 4),
-                         round(1 / (1 + math.exp(-beta[0])), 4)])
-    rows.sort(key=lambda r: -r[27])
+                         round(1 / (1 + math.exp(-beta[0])), 4), None if bs is None else round(bs, 2), round(e_, 4), round(val, 3)])
+    rows.sort(key=lambda r: (-r[10], -r[27]))
+    # pbpm: his projected first D-I season (BPM shrunk by minutes); e: E[FV]; val: E[FV] - 20 if he moves up
     cols = ['name', 'team', 'logo', 'conf', 'pos', 'role', 'ovr', 'posRank', 'fv', 'plus', 'fvx', 'nbaP', 'xbpm', 'cls', 'elig', 'age', 'ageEst',
-            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'div', 'd1P', 'base']
+            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'div', 'd1P', 'base', 'pbpm', 'e', 'val']
     for k, r in enumerate(rows): r[6] = k + 1
     json.dump({'cols': cols, 'rows': rows, 'asof': time.strftime('%Y-%m-%d'), 'teams': len(espn_of)}, open(OUT, 'w'), separators=(',', ':'))
     print(f'{len(rows)} D-II / D-III players on {len(espn_of)} matched rosters ({len(ros)} ESPN non-D-I rosters); top:')
-    for r in rows[:12]: print(f'  {r[0]:24s} {r[1]:22s} {r[3]:5s} {r[13] or "":3s} D-1% {r[27]:.1%}')
+    for r in rows[:15]: print(f'  {r[0]:24s} {r[1]:22s} {r[3]:5s} {r[13] or "":3s} {r[17] or "":7s} D-1% {r[27]:5.1%}  D-I BPM {r[29]}  FV {r[10]:.2f}  NBA {r[11]:.2%}')
     print('wrote', OUT)
 
 

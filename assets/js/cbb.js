@@ -63,7 +63,7 @@
       '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' + medals(r) +
       (r.src === 'bt' ? prov('not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in') : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') +
-      (r.low ? '<span class="cfb__divtag" title="' + esc(LOWTAG[r.div] || r.div) + ': D-1% ' + pct(r.d1P) + '">' + esc(r.div) + '</span>' + prov('below D-I: no D-I line to grade, so FV starts at the 20 floor') : '') + '</td>' +
+      (r.low ? '<span class="cfb__divtag" title="' + esc(LOWTAG[r.div] || r.div) + ': D-1% ' + pct(r.d1P) + '">' + esc(r.div) + '</span>' + prov('below D-I: graded on his projected first D-I season, its class and D-1%') : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
         moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
@@ -184,13 +184,13 @@
         (x.ts != null ? ' · TS ' + x.ts + '%' : '') + (x.tpa ? ' · 3P ' + x.tp + '% on ' + x.tpa : '') + (x.ft != null ? ' · FT ' + x.ft + '%' : '');
     });
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
-      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' (' + esc(r.div) + ') · FV ' + r.fv + ' · D-1% ' + pct(r.d1P) + ' · NBA ' + pct(r.nbaP) +
+      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' (' + esc(r.div) + ') · FV ' + r.fv + ' · D-1% ' + pct(r.d1P) + (r.pbpm != null ? ' · <span title="projected first D-I season: BPM shrunk by minutes (D-I arrivals from below D-I average about −4)">D-I BPM ' + sgn(r.pbpm) + '</span>' : '') + ' · NBA ' + pct(r.nbaP) +
       (r.links && r.links.espn ? ' · <a href="' + esc(r.links.espn) + '" rel="noopener">ESPN ↗</a>' : '') + '</p>' +
       (lines.length ? lines.map(function (x) { return '<p class="cfb__role">' + x + '.</p>'; }).join('') : '<p class="cfb__role">no line yet.</p>') +
       '<div class="cfb__report"><div><h4>+ D-1%</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− D-1%</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>D-1% inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">each bar: its move in the log-odds of D-1% against an average ' + esc(r.div) +
-      ' player (' + pct(r.base) + '). NBA% = D-1% x the NBA rate of unranked D-I newcomers. FV stays at the 20 floor until he has a D-I line.</p></details></div></td></tr>';
+      '<details class="cfb__nums"><summary title="each bar: its move in the log-odds of D-1% against an average ' + esc(r.div) + ' player (' + pct(r.base) +
+      '). FV = 20 + D-1% x what D-I arrivals with his projected first season and class became">D-1% inputs</summary><ul class="cfb__parts">' + bars + '</ul></details></div></td></tr>';
   }
   function pastDetail(r, cols) {
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap"><p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.team) + ' · ' + esc(r.cls) +
