@@ -167,5 +167,5 @@ if __name__ == '__main__':
               'qbSlope', r['missedQB']['slope'], r['missedQB']['se'], 'fwd', r['forwardR2'], r['forwardWithLastR2'], 'mkt', r['marketRankR'],
               'qb25', r['ranks2025']['qbTop25'], 'below', r['ranks2025']['belowAvgQbTop25'], flush=True)
     with open(OUT, 'w') as f:
-        json.dump(res, f, indent=1)
+        f.write(json.dumps(res, indent=1).replace('NaN', 'null'))
         f.write('\n')
