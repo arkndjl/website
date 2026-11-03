@@ -10,13 +10,14 @@ draft = false
 
 {{< winpane title="counter_strike.exe :: pro CS2" icon="cs" sprite="px/hero-cs" status="Valve VRS · Liquipedia" class="winpane--art" />}}
 
-{{< wintabs groups="players:players,prospects,ARKLIST|games:matches,results|teams:ARK Ranking,map pool,event odds|market:transfer values|model:model,player model" side="true" label="Counter-Strike views" >}}
+{{< wintabs groups="players:players,prospects,ARKLIST|games:matches,results|teams:ARK Ranking,map pool,event odds,pick'em|market:transfer values|model:model,player model" side="true" label="Counter-Strike views" >}}
 {{< cs2players title="Counter-Strike :: players" tab="players" >}}
 {{< cs2players view="prospects" title="prospects :: not yet tier 1" tab="prospects" >}}
 {{< arklist sport="cs2" title="ARKLIST :: CS2" tab="ARKLIST" >}}
 {{< cs2rank title="Counter-Strike :: ARK Ranking" tab="ARK Ranking" >}}
 {{< cs2mappool title="map pool :: map win % vs the top 20" tab="map pool" >}}
 {{< cs2events tab="event odds" >}}
+{{< cs2pickem title="pick'em" tab="pick'em" >}}
 {{< cs2matches title="matches :: upcoming pro series" tab="matches" >}}
 {{< cs2matches view="results" title="results :: against the model" tab="results" >}}
 {{< cs2players view="values" title="transfer values :: estimated buyouts" tab="transfer values" >}}

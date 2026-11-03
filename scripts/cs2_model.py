@@ -585,6 +585,13 @@ def build():
             cs2_events.OUT.write_text(json.dumps(ev, separators=(",", ":")))
     except Exception as ex:  # noqa: BLE001
         print("cs2 event odds skipped:", ex)
+    # Major Pick'Em picks for that stage (scripts/cs2_pickem.py), same series chance
+    try:
+        import cs2_pickem
+        if ev and ev.get("next"):
+            cs2_pickem.live(cs2_events.memo(lambda a, b, bo: logit_ab(a, b, bo)), ev["next"])
+    except Exception as ex:  # noqa: BLE001
+        print("cs2 pick'em skipped:", ex)
     print(f"{len(teams)} teams, {len(matches)} matches, {len(res)} results; #1 {teams[0]['n']} {teams[0]['ark']}")
 
 

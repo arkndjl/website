@@ -478,6 +478,17 @@ sections.append({'id': 'games', 'title': 'Game models and predictions', 'entries
       ['NHL (ML and totals), soccer (1X2, O/U 2.5, MLS, props), CS2 (no free closing odds), NBA/NHL props.',
        'Their game projections still show; Kelly % reads off.'],
       'Predictions game table', ['NHL', 'Soccer', 'CS2', 'NBA']),
+    E("Major Pick'Em (CS2)", "Valve Major Pick'Em picks with the best chance of each coin tier.",
+      ['Coin: 11 challenges (Silver 4, Gold 8, Diamond 11); 5 free, 6 skill: 5+ of 10 per Swiss stage, bracket 2 QF / 1 SF / final.',
+       'Stage picks: two 3-0, two 0-3, six 3-1 or 3-2 (exact record). Picked once the stage field and round 1 are known.',
+       "A stage's picks move only that stage's chance, so every tier wants max P(5+ correct), not max expected correct.",
+       'P(5+) from joint stage sims (Valve pairing, Buchholz, Bo1 / Bo3; team strength drawn once per sim, sd .45 logit).',
+       'Search: exact max-expected set, then hill-climb on P(5+), scored on a second set of sims. Bracket: max P(all 3).',
+       'Held out since Jul 2025, 15 Swiss stages: predicted pass 47%, actual 47% (seed chalk 40%, VRS 47%).',
+       'Mean correct 4.00 vs chalk 4.33 (t -0.96): no reliable edge over chalk in Swiss stages.',
+       'Max P(5+) and max expected correct pick the same set in 21 of 25 stages; where they differ, < 1 pt of pass chance.',
+       '12 held-out brackets: 1.92 of 3 bracket challenges vs chalk 1.42, VRS 1.50.'],
+      "Counter-Strike page, pick'em tab", ['CS2']),
 ]})
 
 # ---------------------------------------------------------------- drafts & mocks
