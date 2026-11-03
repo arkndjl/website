@@ -469,6 +469,19 @@
      ]
     },
     {
+     "term": "aXPM",
+     "short": "NBA rookie XPM adjusted for age.",
+     "body": [
+      "aXPM = XPM - .20 x (age - 21). Rookie XPM as shown (shrunk by minutes), bbref season age.",
+      "k = c / b from next three seasons' XPM (minutes-weighted, shrunk to -2 with 1,000 MP) ~ a + b XPM + c age, 1,222 rookies 2010-23; k -.19 to -.21 leaving out each class.",
+      "Held out by class: RMSE .942 vs .977 raw (paired t -4.7), Spearman .413 vs .382 (11 of 14 classes); next three seasons' VORX RMSE 3.47 vs 3.58. Display only."
+     ],
+     "where": "NBA rookies",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
      "term": "Contract value (surplus)",
      "short": "Projected VORX x market $ per win, minus salary, every year left.",
      "body": [
