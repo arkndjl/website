@@ -366,7 +366,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
             if c in ci: row[ci[c]] = v
         out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
                     'xbpm': (ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
-                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt', 'seas': cn['seasons']})
+                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt', 'seas': next_career(cc, ln)['seasons']})
     print(f"{len(out)} players in this season's box scores are not on the preseason board: graded from the 20 floor "
           f"(drivers fit on {pf['n']} low-information board players, 5-fold R2 {pf['r2']:.3f}), then on their lines")
     return out
@@ -420,7 +420,7 @@ def main():
             kb = lf['kb'][grp]['k']
             rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
             n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
-            rec['seas'] = cn['seasons']
+            rec['seas'] = next_career(cc, ln)['seasons']   # npos reads minutes played, not the full-season projection
             rec.update(e=(1 - w) * e0 + w * e1, p=(1 - w) * p0 + w * p1, parts=[(k, v, x) for k, (v, x) in mix.items()],
                        xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
