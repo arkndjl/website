@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T03:46:58Z",
+ "asof": "2026-11-03T03:49:08Z",
  "recenter": {
   "2026-11-02": -12.93,
   "2026-11-03": -12.9
@@ -1293,8 +1293,14 @@
    "flagged": "2026-11-03T00:53:54Z",
    "betTo": 152.0,
    "close": 154.5,
-   "now": null,
-   "pass": true
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 154.5,
+    "price": -108.0,
+    "ev": 0.043,
+    "units": 0.25
+   }
   },
   {
    "id": "401919047",
@@ -1954,6 +1960,18 @@
    "away": "Drexel",
    "state": "under"
   },
+  "401906848": {
+   "mk": "total",
+   "side": "under",
+   "line": 154.5,
+   "price": -108.0,
+   "ev": 0.043,
+   "edge": 4.5,
+   "units": 0.25,
+   "home": "Tennessee",
+   "away": "Wofford",
+   "state": "pick"
+  },
   "401921801": {
    "mk": "spread",
    "side": "away",
@@ -2079,7 +2097,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3714,
+  "snapshots": 3717,
   "buckets": [
    {
     "when": "24h+",
@@ -2092,12 +2110,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 423,
+    "clvN": 424,
     "clvRet": -0.0379,
-    "clvT": -6.38,
+    "clvT": -6.4,
     "clv": 0.17,
     "beat": 0.248,
-    "still": 0.447
+    "still": 0.448
    },
    {
     "when": "1-6h",
@@ -8000,8 +8018,7 @@
    "tmRaw": 137.3,
    "flagged": "2026-11-03T00:53:54Z",
    "betTo": 152.0,
-   "close": 154.5,
-   "pass": true
+   "close": 154.5
   },
   {
    "id": "401920422",
@@ -8142,7 +8159,7 @@
     "down": 39.5
    },
    "2026-11-03": {
-    "raw": 22.0,
+    "raw": 21.0,
     "scale": 1.0
    },
    "2026-11-04": {

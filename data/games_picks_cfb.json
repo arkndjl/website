@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-03T03:46:52Z",
+ "asof": "2026-11-03T03:49:01Z",
  "recenter": {
-  "week": 0.79
+  "week": 0.78
  },
  "monitor": {
   "clocks": {
@@ -1433,22 +1433,6 @@
    "tm": 52.6
   },
   {
-   "id": "401856854",
-   "sport": "cfb",
-   "kick": "2026-11-07T18:00:00.000Z",
-   "home": "Kansas State",
-   "away": "Oklahoma State",
-   "mk": "total",
-   "side": "under",
-   "line": 61.5,
-   "price": -104.0,
-   "edge": 2.7,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -6.7,
-   "tm": 58.8
-  },
-  {
    "id": "401864532",
    "sport": "cfb",
    "kick": "2026-11-08T02:30:00.000Z",
@@ -1783,6 +1767,22 @@
    "why": "edge under 6 (season: late)",
    "m": 3.7,
    "tm": 65.2
+  },
+  {
+   "id": "401864535",
+   "sport": "cfb",
+   "kick": "2026-11-08T03:30:00.000Z",
+   "home": "UNLV",
+   "away": "Wyoming",
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": 102.0,
+   "edge": 2.8,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": 9.3,
+   "tm": 44.5
   }
  ],
  "games": {
@@ -2111,11 +2111,11 @@
    "state": "pick"
   },
   "401856854": {
-   "mk": "total",
-   "side": "under",
-   "line": 61.5,
+   "mk": "spread",
+   "side": "away",
+   "line": -4.5,
    "price": -104.0,
-   "edge": 2.7,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -2330,7 +2330,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -122.0,
+   "price": -120.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -2583,16 +2583,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 6217,
+  "snapshots": 6269,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1491,
+    "clvN": 1500,
     "clvRet": -0.0416,
-    "clvT": -21.33,
+    "clvT": -21.47,
     "clv": 0.26,
-    "beat": 0.324,
-    "still": 0.471
+    "beat": 0.322,
+    "still": 0.474
    },
    {
     "when": "6-24h",
@@ -3524,7 +3524,7 @@
     "down": 39.5
    },
    "2026-11-03": {
-    "raw": 22.0,
+    "raw": 21.0,
     "scale": 1.0
    },
    "2026-11-04": {
