@@ -654,7 +654,7 @@ def fee_fit(M, c, p, pdir, ag, scale_a, bo3):
         repl = float(np.median(th[act]))
         age = ages(M, pdir, T)[pi]
         pts.append({"nick": f["nick"], "usd": f["usd"], "date": dt.date.fromordinal(T).isoformat(),
-                    "th": round(float(th[pi]), 3), "age": None if age != age else round(float(age), 1),
+                    "th": round(float(th[pi]), 3), "age": None if age != age else round(float(age), 2),
                     "repl": round(repl, 3), "rounds": int(rr[pi])})
     best = None
     for b in np.arange(0.01, 3.01, 0.01):
@@ -725,7 +725,7 @@ def build():
         tk = bo3.k(tid)
         ti = tinfo.get(tk, {})
         return {"id": pid, "n": M.nick.get(pid) or d[1], "slug": d[0], "nat": (d[3] or "").lower() or None,
-                "ph": d[5], "age": None if age[i] != age[i] else round(float(age[i]), 1),
+                "ph": d[5], "age": None if age[i] != age[i] else round(float(age[i]), 2),
                 "tm": ti.get("n") or tname.get(tid) or "", "tk": tk if ti else None, "trk": ti.get("rk"),
                 "tier": ti.get("tier", 4), "logo": bool(ti.get("logo")),
                 "rwa": round(float(a / 2 * (th[i] - mu1)), 2), "d90": round(float(a / 2 * (th[i] - th90[i])), 2),

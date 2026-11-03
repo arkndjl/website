@@ -30,3 +30,22 @@ export function frameFV(p, size) {
 export const bmiOf = (htIn, wtLb) => (htIn && wtLb ? 703 * wtLb / htIn ** 2 : null);
 // "6' 2\"", "6-2" or "6-2.5" to inches
 export const inchesOf = h => { const m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? +m[1] * 12 + +m[2] : null; };
+
+// In-position height (Nov 3 2026, Noah: size as an FV driver, positionally adjusted): measured height
+// (scripts/cfb_measure.mjs, combine-equivalent) as z against drafted players' combine norms at the spot he projects to
+// (the board's move when it names one of these spots, else his own), centred on the graded pool's mean at his position
+// (2014-22, HT_CENTER) so the term reorders within a position without moving its level; FV_HT_W FV a SD, capped at 3 SD.
+// Test (scripts/cfb_measure_fv.py on the harness's 2014-22 grades, its gates; data/cfb_measure_fv_ship.json): weight
+// picked per held-out class 2 (t 2.53, 9 of 10 classes); at 1.5, t 3.83, 10 of 10, within-position Spearman .435 ->
+// .448, top 32 a class AV +.04 (7 of 10) and draft capital +.05 (7 of 10), forward (picked on 2014-18, graded 2019-23)
+// r +.011, top 32 4.17 -> 4.17. Shipped at 1.5, under the pick, as 1 of 29 size variants tried (Holm not cleared; the
+// same z on the raw listing passes as well, so height carries it, not the measurement). QB-LB only (OL, CB and S have no
+// graded history). frameFV on the measured size instead of the listing: t 0.15, 4 of 10, not shipped
+export const FV_HT_W = 1.5;
+export const HT_CENTER = { QB: -0.442, RB: -0.297, WR: -0.158, TE: -0.432, EDGE: -0.538, DL: -0.565, LB: -0.474 };
+export function heightFV(g, pg, ht, size) {
+  if (!(g in HT_CENTER) || !ht) return 0;
+  const n = size[pg in HT_CENTER ? pg : g]?.ht;
+  if (!n) return 0;
+  return FV_HT_W * Math.max(-3, Math.min(3, (ht - n.mean) / n.sd - HT_CENTER[g]));
+}

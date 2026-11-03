@@ -708,7 +708,7 @@ def main():
         pos = o.get('pos') or pos_of(p['pos'])
         return dict(pk, name=o.get('name') or p['name'], pos=pos, role=o.get('role'), school=o.get('team') or p['school'],
                     logo=o.get('logo'), conf=o.get('conf'), fv=o.get('fv'), plus=o.get('plus'), fvx=o.get('fvx'),
-                    cls=o.get('cls') or ('Intl' if not o else None), age=round(o['age'] + 0.7, 1) if o.get('age') else (round(o['ageEst'] + 0.7, 1) if o.get('ageEst') else None),
+                    cls=o.get('cls') or ('Intl' if not o else None), age=round(o['age'] + 0.7, 2) if o.get('age') else (round(o['ageEst'] + 0.7, 1) if o.get('ageEst') else None),
                     ageEst=bool(o and not o.get('age')), ht=o.get('ht'), cons=p['cons'] if p['nboards'] else None, boards=p['nboards'],
                     xxpm=round(p['xxpm'], 2), declare=round(p['declare'], 3), slots={m: eff[m][i] for m in S if m != mode}, grades=grades, why=why,
                     sim=sims[i], own=own[pk['pick'] - 1])

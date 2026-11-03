@@ -822,7 +822,7 @@
       });
       y += th + 40;
     }
-    var dash = '—', age = r.age != null ? r.age.toFixed(1) : r.ageEst != null ? '~' + r.ageEst.toFixed(1) : dash;
+    var dash = '—', age = r.age != null ? r.age.toFixed(2) : r.ageEst != null ? '~' + r.ageEst.toFixed(1) : dash;
     var zm = function (n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }, d = r.delta;
     var moved = d === 'new' ? 'new this week' : typeof d === 'number' && d ? (d > 0 ? '▲' + d : '▼' + (-d)) + ' this week' : null;
     band('PROFILE', [['AGE', age, null, [r.cls, r.draft27 ? '2027 draft eligible' : null].filter(Boolean).join(' · ')],

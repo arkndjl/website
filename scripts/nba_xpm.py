@@ -208,7 +208,7 @@ def build(season, fresh=False):
     players.sort(key=lambda p: -p['vorx'])
     try:                                                # headshots (ESPN ids, scripts/faces.py); the board builds without them
         import faces
-        faces.nba_attach(players, fresh=fresh)
+        faces.nba_attach(players, fresh=fresh, season=season)
     except Exception as e:
         print(season, 'faces skipped', e)
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82

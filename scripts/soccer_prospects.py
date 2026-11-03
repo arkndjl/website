@@ -1002,7 +1002,7 @@ def fit(scorecard=False):
     first = first[(first.fv >= 50) | (first.fv_out >= 55)]
     past = []
     for r in first.itertuples():
-        past.append({'id': int(r.player_id), 'name': P.name.get(r.player_id), 'season': int(r.t), 'age': round(float(r.age), 1),
+        past.append({'id': int(r.player_id), 'name': P.name.get(r.player_id), 'season': int(r.t), 'age': round(float(r.age), 2),
                      'pos': r.grp, 'club': club_name(r.club_td if pd.notna(r.club_td) else r.club1),
                      'mv': None if pd.isna(r.mv) else int(r.mv), 'fv': int(r.fv), 'out': int(round(r.fv_out)), 'peak': round(float(r.peak), 1)})
     past.sort(key=lambda r: (-r['fv'], -r['out']))
@@ -1133,6 +1133,7 @@ def build():
     cand = seen[((pd.Timestamp(f'{t}-07-01') - dob).dt.days / 365.25 < AGE_CUT + .5) | dob.isna()]
     prof = refresh_profiles(cand)
     live_mv = {}
+    exact = set()       # birth date from his Transfermarkt profile (else a lineup-age estimate: shown ~, one decimal)
     for i in cand:
         d = prof.get(str(i))
         if not d:
@@ -1144,6 +1145,8 @@ def build():
                CATS.get(pos.get('category')),
                pos.get('name'), (at.get('height') or 0) * 100 or np.nan, None]
         row[5] = GRP.get(row[2], 'M')
+        if pd.notna(row[1]):
+            exact.add(i)
         old = P.loc[i].tolist() if i in P.index else [None] * 6
         P.loc[i] = [n if (n is not None and not (isinstance(n, float) and math.isnan(n)) and not (isinstance(n, type(pd.NaT)) and pd.isna(n))) else o
                     for n, o in zip(row, old)]
@@ -1169,6 +1172,7 @@ def build():
         dob = pd.to_datetime(ld.get('dateOfBirth'), errors='coerce')
         if pd.notna(dob):
             ydob.loc[i] = dob
+            exact.add(i)
         cur = ((d.get('marketValueDetails') or {}).get('current') or {}).get('value')
         if cur:
             ymv[i] = cur
@@ -1222,7 +1226,8 @@ def build():
             'id': int(i), 'name': P.name.get(i) or str(i), 'pos': POSS.get(sp, {'G': 'GK', 'D': 'D', 'M': 'M', 'F': 'F'}[r.grp]),
             'grp': r.grp, 'club': names.get(int(club)) if pd.notna(club) else None,
             'lg': SHORT.get(comp) if isinstance(comp, str) else None, 'league': LEAGUE.get(comp) if isinstance(comp, str) else None,
-            'age': round(float(r.age), 1), 'fv': FS.fv_of('soccer', float(r.fvx)), 'fvx': round(float(r.fvx), 2), 'plus': bool(r.plus),
+            'age': round(float(r.age), 2 if i in exact else 1), **({} if i in exact else {'ageEst': 1}),
+            'fv': FS.fv_of('soccer', float(r.fvx)), 'fvx': round(float(r.fvx), 2), 'plus': bool(r.plus),
             'mv': None if pd.isna(r.mv) else int(r.mv),
             'min': int(r.mins_td) if pd.notna(r.mins_td) else 0, 'min1': int(r.mins1) if pd.notna(r.mins1) else 0,
             'gar': round(float(F.gar_td[i]), 2), 'gar1': round(float(F.gar1[i]), 2),

@@ -15,6 +15,14 @@
   function prov(why) { return PROV.replace('@@', esc(why)); }
   function sgn(x) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(1); }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
+  // measured height (barefoot, quarter inches) and weight with the listing and source mix on hover (scripts/measure.py)
+  function ftin(x) { var q = Math.round(x * 4) / 4, ft = Math.floor(q / 12), i = q - 12 * ft; return ft + "' " + (+i.toFixed(2)) + '"'; }
+  function mixTxt(m) { return Object.keys(m || {}).map(function (k) { return k + ' ' + Math.round(m[k] * 100) + '%'; }).join(', '); }
+  function size(r, past) {
+    if (r.mht == null || past) return esc(r.ht || '—') + (past ? '' : ' / ' + esc(r.wt || '—'));
+    var m = r.msrc || {}, t = 'listed ' + (r.ht || '—') + ' / ' + (r.wt || '—') + '; height: ' + mixTxt(m.ht || m) + (m.wt ? '; weight: ' + mixTxt(m.wt) : '');
+    return '<span title="' + esc(t) + '">' + esc(ftin(r.mht)) + ' / ' + (r.mwt != null ? Math.round(r.mwt) : '—') + '</span>';
+  }
   function pct(x) { return x == null ? '' : x < 0.005 ? '&lt;1%' : Math.min(99, Math.round(x * 100)) + '%'; }
   var dim = '<span class="cfb__dim">—</span>';
   var CLS = { 1: 'Fr', 2: 'So', 3: 'Jr', 4: 'Sr', 5: 'Gr' };
@@ -60,8 +68,8 @@
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
       (past ? '<td>' + outcome(r) + '</td>' : '<td class="cfb__num">' + (r.xbpm == null ? dim : '<span class="' + (r.xbpm >= 0 ? '' : 'cfb__down') + '">' + sgn(r.xbpm) + '</span>') + '</td>') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
-      (past ? '' : '<td class="cfb__num">' + (r.age != null ? f1(r.age) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year (no birth date yet)">~' + f1(r.ageEst) + '</span>' : '—') + '</td>') +
-      '<td class="cfb__num">' + esc(r.ht || '—') + (past ? '' : ' / ' + esc(r.wt || '—')) + '</td></tr>';
+      (past ? '' : '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(2) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year (no birth date yet)">~' + f1(r.ageEst) + '</span>' : '—') + '</td>') +
+      '<td class="cfb__num">' + size(r, past) + '</td></tr>';
   }
 
   // historical comps (static/data/cbb-comps.json, scripts/cbb_comps.py): his nearest preseason profiles on the 2009-19
@@ -168,7 +176,7 @@
   var KEY = {
     rk: function (r) { return r.ovr; }, name: function (r) { return r.name; }, team: function (r) { return r.team; },
     fv: function (r) { return r.fvx; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
-    cls: function (r) { return r.elig; }, age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
+    cls: function (r) { return r.elig; }, age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return r.mht != null ? r.mht + 1.17 : inches(r.ht) || null; },
     nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : r.outcome + (r.pick ? (61 - r.pick) / 100 : 0); }
   };
 

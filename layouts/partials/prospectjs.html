@@ -10,6 +10,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function pc(x) { return x < 0.005 ? '&lt;1%' : x >= 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
   function f1(x) { return (+x).toFixed(1); }
+  function fa(r) { return r.ageEst ? "~" + f1(r.age) : (+r.age).toFixed(2); }
   function sgn(x, d) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(d == null ? 1 : d); }
   function eur(v) { return !v ? '-' : v >= 1e6 ? '€' + (v / 1e6).toFixed(1) + 'm' : '€' + Math.round(v / 1e3) + 'k'; }
   function htIn(h) { return h ? Math.floor(h / 12) + "'" + (h % 12) + '"' : ''; }
@@ -85,8 +86,8 @@
         case 'progp': return (r.progp || 0) + ' pro games last season';
         case 'nhgrow': return 'NHLe ' + (r.nh0 != null ? f1(r.nh0) : '-') + ' in his draft year to ' + (r.nhle != null ? f1(r.nhle) : '-') + ' last season';
         case 'ahls': return 'AHL shots a game ' + (up ? 'above' : 'below') + ' the league rate' + (r.ahls != null ? ' (' + sgn(r.ahls, 2) + ')' : '');
-        case 'age': return 'age ' + f1(r.age);
-        case 'agenh': return (r.age ? 'age ' + f1(r.age) : 'age unknown') + (up ? ': the production comes young' : ': older for the production');
+        case 'age': return 'age ' + fa(r);
+        case 'agenh': return (r.age ? 'age ' + fa(r) : 'age unknown') + (up ? ': the production comes young' : ': older for the production');
         case 'wt': return r.wt ? r.wt + ' lb' : 'weight unknown';
         case 'pmpg': return 'plus-minus ' + (r.pm != null ? sgn(r.pm, 0) + ' in ' + r.gp + ' GP' : 'not listed');
         case 'pimpg': return (r.pim != null ? r.pim + ' penalty minutes in ' + r.gp + ' GP' : 'penalty minutes not listed');
@@ -119,7 +120,7 @@
   function spSay(r) {
     return function (k, up) {
       switch (k) {
-        case 'age': return 'age ' + f1(r.age) + ' at the season start';
+        case 'age': return 'age ' + fa(r) + ' at the season start';
         case 'mv': return 'market value ' + eur(r.mv);
         case 'pos': return 'a ' + (SPOS[r.pos] || r.pos) + (r.grp === 'F' ? ': the market overprices forwards' : r.grp === 'G' ? ': the market underprices keepers' : '');
         case 'gar_td': return f1(r.gar) + ' GAR this season in ' + r.min + ' minutes';
@@ -130,7 +131,7 @@
         case 'ga90_td': return r.ga + ' goals + assists in ' + r.min + ' minutes';
         case 'ymins': return r.ym + ' Premier League 2 minutes';
         case 'ht': return r.ht ? r.ht + ' cm' : 'no listed height';
-        case 'age_lmv': return eur(r.mv) + ' at ' + f1(r.age);
+        case 'age_lmv': return eur(r.mv) + ' at ' + fa(r);
         case 'res_parm': return 'B-team / feeder-league minutes, weighted by his first team\'s strength';
         case 'res_young': return 'feeder-league minutes young for the level';
         case 'uyl_young': return 'UEFA Youth League minutes young for the level';
@@ -148,7 +149,7 @@
   function tnSay(r) {
     return function (k, up) {
       switch (k) {
-        case 'age': return 'age ' + f1(r.age) + (up ? ': young for his level' : ': older for his level');
+        case 'age': return 'age ' + fa(r) + (up ? ': young for his level' : ': older for his level');
         case 'rank': return r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'no ranking this week';
         case 'elo': return r.elo ? 'Elo ' + r.elo + (r.ep ? ', ' + r.ep + ' Elo+ for his age' : '') : 'no Elo yet';
         case 'form': return 'went ' + wl(r.w, r.n) + ' over the last 52 weeks';
@@ -173,7 +174,7 @@
         : null;
       return '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.posFull || r.pos) + ' · ' + esc(r.club) + ' (' + esc(r.league) + ') · FV ' + r.fv + ' · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + '</p>' +
         '<p class="cfb__role">this season: ' + (r.gp ? r.gp + ' GP, ' + r.pts + ' pts' + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') : 'no games yet') +
-        (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + f1(r.age) : '') + '.</p>' +
+        (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + fa(r) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (' + hkSum(r, b) +
         '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
@@ -186,7 +187,7 @@
         : 'draft year: ' + esc(r.league || '-') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '');
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + ' (draft ' + r.fv0 + ') · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + link + '</p>' +
-        '<p class="cfb__role">drafted ' + r.year + ', pick ' + r.pick + ' by ' + esc(r.team) + (r.age ? ' · age ' + f1(r.age) : '') + ' · NHL so far: ' + r.nhlgp + ' GP' + (r.war != null ? ', ' + sgn(r.war, 2) + ' WAR' : '') + '.</p>' +
+        '<p class="cfb__role">drafted ' + r.year + ', pick ' + r.pick + ' by ' + esc(r.team) + (r.age ? ' · age ' + fa(r) : '') + ' · NHL so far: ' + r.nhlgp + ' GP' + (r.war != null ? ', ' + sgn(r.war, 2) + ' WAR' : '') + '.</p>' +
         '<p class="cfb__role">' + line + '.</p>' + bdgChips(r) + outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.k ? 'the stage model ' + r.k + ' season' + (r.k > 1 ? 's' : '') + ' after the draft: each input\'s push against the average 2008-19 pick at that stage, the draft grade carrying what was known on draft day' : 'the draft model with his real slot: each input\'s push against an average 2008-19 pick') +
         ' (' + hkSum(r, b) + ').</p></details>';
@@ -198,7 +199,7 @@
         : r.tph ? '<span class="pxframe pxframe--card"><img src="https://www.tennisabstract.com/photos/' + esc(r.tph) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>' : '';
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · FV ' + r.fv +
         ' · T100 ' + pc(r.p40) + ' · T50 ' + pc(r.p50) + ' · T12 ' + pc(r.p60) + '</p>' +
-        '<p class="cfb__role">' + (r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'unranked this week') + ' · age ' + f1(r.age) + (r.elo ? ' · Elo ' + r.elo + (r.ep ? ' (' + r.ep + ' Elo+)' : '') : '') +
+        '<p class="cfb__role">' + (r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'unranked this week') + ' · age ' + fa(r) + (r.elo ? ' · Elo ' + r.elo + (r.ep ? ' (' + r.ep + ' Elo+)' : '') : '') +
         (r.prov ? ' · provisional: unranked, graded by the same model with no ranking' : '') + '.</p>' +
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (b) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[b[1]]; return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(T + ' ' + b[0] + ': ' + b[2] + ' pct among prospects, ' + b[3] + ', last 52 weeks (regressed by volume); predictive of peak value beyond the FV') + '">' + T + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
         '<p class="cfb__role">last 52 weeks: ' + wl(r.w, r.n) + ' · tour ' + wl(r.wT, r.nT) + ' · qualifying ' + wl(r.wQ, r.nQ) + ' · Challenger / 125 ' + wl(r.wC, r.nC) + ' · Futures / ITF ' + wl(r.wS, r.nS) +
@@ -216,7 +217,7 @@
         ' · Top ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + ' · Star ' + pc(r.p60) + link + '</p>' +
         '<p class="cfb__role">this season: ' + r.min + ' min' + (r.sh ? ' (' + Math.round(r.sh * 100) + '% of league minutes)' : '') + ', ' + r.ga + ' goals + assists, ' + f1(r.gar) + ' GAR' +
         (r.rc != null ? ' · club rating ' + sgn(r.rc, 2) : '') + ' · last season: ' + r.min1 + ' min, ' + f1(r.gar1) + ' GAR' + (r.ym ? ' · ' + r.ym + ' PL2 min' : '') + '.</p>' +
-        '<p class="cfb__role">market value ' + eur(r.mv) + (r.ht ? ' · ' + r.ht + ' cm' : '') + ' · age ' + f1(r.age) + (r.prov ? ' · provisional: no senior minutes yet' : '') + '.</p>' +
+        '<p class="cfb__role">market value ' + eur(r.mv) + (r.ht ? ' · ' + r.ht + ' cm' : '') + ' · age ' + fa(r) + (r.prov ? ' · provisional: no senior minutes yet' : '') + '.</p>' +
         // predictive badges (scripts/soccer_badges.py), the chips of layouts/partials/badges.html
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (x) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[x[1]]; return '<span class="cfb__bdg cfb__bdg--' + esc(x[1]) + '" title="' + esc(T + ' ' + x[0] + ': ' + x[2] + ' pct at position, ' + x[3] + '; predictive of outcome FV beyond the grade') + '">' + esc(T + ' ' + x[0]) + '</span>'; }).join('') + '</p>' : '') +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +

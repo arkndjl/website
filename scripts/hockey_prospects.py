@@ -1029,6 +1029,14 @@ def build():
     # the floor (22+), the rest are counted
     import hockey_provisional as HP
     prov = HP.live(year or cur, board, rows) if tk else []
+    # exact ages (Noah, Nov 3 2026): Tankathon gives the birth month only; the CHL, AHL, USHL and Liiga feeds give the
+    # date (same name, born that month). Display only: the grade keeps the mid-month age (cs moves < .01 FV)
+    for (t, *_), b in zip(live, board):
+        eb = HP.exact_birth(t['name'], t['birth'])
+        if eb:
+            b['age'] = round(age_at(eb, year or cur), 2)
+        elif b['age'] is not None:
+            b['ageEst'] = 1
     nprov = len(prov)
     board += [p for p in prov if p['fv'] >= PROV_SHOW]
     board.sort(key=lambda r: (-r['fvx'], r['rk'] or 999))
@@ -1063,7 +1071,7 @@ def build():
         etoi, esog = euro_line(r, r['year'] + k, (q or {}).get('lg'))
         pipe.append({'name': r['name'], 'id': r['id'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
                      'nat': nat(r.get('country')),
-                     'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
+                     'age': round(age_at(r['birth'], cur - 1), 2) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
                      'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
                      'nhlgp': gp_all, 'fv0': FS.fv_of('hockey', x0), 'fv0x': round(x0, 2), 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), 'p40': round(p40, 3), 'p50': round(p50, 3),

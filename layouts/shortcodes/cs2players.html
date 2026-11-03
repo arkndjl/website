@@ -104,7 +104,7 @@
     {{- with $f.value }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Reported fee</th><th>Date</th><th>Age</th><th>Reported</th><th>xTV then</th></tr></thead>
-      <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ printf "%.2f" (div (float .usd) 1e6) }}M</td><td class="cfb__num">${{ printf "%.2f" (div (float .xtv) 1e6) }}M</td></tr>{{ end }}</tbody>
+      <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ printf "%.2f" (float .) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ printf "%.2f" (div (float .usd) 1e6) }}M</td><td class="cfb__num">${{ printf "%.2f" (div (float .xtv) 1e6) }}M</td></tr>{{ end }}</tbody>
     </table></div>
     <p class="cfb__dim">fee fit error x{{ .fx }} · aging fit {{ $f.aging.n }} player-years</p>
     {{- end }}
