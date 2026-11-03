@@ -32,11 +32,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import names as N  # noqa: E402
+import lineup_leaders as LL  # noqa: E402
 
 API = 'https://ncaa-api.henrygd.me'
 UA = 'arkndjl.net cbb lineups'
 CACHE = os.path.join(HERE, '.cache', 'cbb', 'lineups')
 OUT = os.path.join(ROOT, 'static', 'data', 'cbb-lineups.json')
+LEAD_OUT = os.path.join(ROOT, 'static', 'data', 'cbb-lineup-leaders.json')
+# lineup leaders (scripts/lineup_leaders.py): sNet toward the team's net, k by unit size from odd/even game splits
+# of 2025-26 (team prior beat a 0 prior out of sample for every size)
+K_LEAD = {5: 800, 3: 1600, 2: 1600}
 LIVE_SEASON = 2027
 RATE = float(os.environ.get('CBB_LINEUP_RATE', 3.0))   # requests a second, all threads (the proxy allows 5)
 
@@ -603,16 +608,29 @@ def build(seasons=None):
         prev = json.load(open(OUT)).get('seasons', {})
     except Exception:
         prev = {}
+    try:
+        lprev = json.load(open(LEAD_OUT)).get('seasons', {})
+    except Exception:
+        lprev = {}
+    lead = dict(asof=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), seasons={})
     for S in seasons:
         games = load(S)
         ok = [g for g in games.values() if 'stints' in g]
         if not ok and str(S) in prev and S < LIVE_SEASON:
             out['seasons'][str(S)] = prev[str(S)]       # a past season's tables stay when its cache isn't here (CI)
+            if str(S) in lprev:
+                lead['seasons'][str(S)] = lprev[str(S)]
             continue
         unit, on, tot, tname = season_tables(games)
         oo = onoff_rows(on, tot)
         teams = {}
         bt = board_teams(board, tname, on)
+        U = defaultdict(dict)
+        for (tt, ns), v in unit.items():
+            if tt in bt:
+                U[tt][ns] = v[:4]
+        meta = {t: [board[bt[t]][0]['team'], board[bt[t]][0]['logo'], board[bt[t]][0]['conf']] for t in U}
+        lead['seasons'][str(S)] = LL.season_block(U, K_LEAD, lambda t, n: n, meta, f'{S - 1}-{S % 100:02d}', len(ok))
         for t, T in tot.items():
             if T[1] < 1 or t not in bt:          # D-I only: the board's teams
                 continue
@@ -658,6 +676,9 @@ def build(seasons=None):
     s = json.dumps(out, separators=(',', ':'), allow_nan=False)
     open(OUT, 'w').write(s)
     print(f'wrote {OUT} ({len(s) // 1024} KB): ' + ', '.join(f"{k} {v['games']} games {len(v['teams'])} teams" for k, v in out['seasons'].items()))
+    s = json.dumps(lead, separators=(',', ':'), allow_nan=False)
+    open(LEAD_OUT, 'w').write(s)
+    print(f'wrote {LEAD_OUT} ({len(s) // 1024} KB): ' + ', '.join(f"{k} " + '/'.join(str(len(v['rows'][z])) for z in '532') for k, v in lead['seasons'].items()))
 
 
 def main():

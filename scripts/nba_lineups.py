@@ -22,13 +22,19 @@ from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nba_espn as E
+import lineup_leaders as LL
 
 CACHE = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'lineups')
 OUT = os.path.join(E.ROOT, 'static', 'data', 'nba-lineups.json')
+LEAD_OUT = os.path.join(E.ROOT, 'static', 'data', 'nba-lineup-leaders.json')
 # shrinkage (possessions) for the display's sNet and sOn-Off: noise variance over true variance from odd/even game
 # splits (--split; 2024-26: units 447 / 671 / 751, on-off 1,408 / 2,610 / 1,462): Net of a five (20+ possessions in both halves) and a player's on-off
 # (effective possessions 1 / (1/on + 1/off))
 K_UNIT, K_ONOFF = 600, 1800
+# lineup leaders (scripts/lineup_leaders.py): sNet toward the team's net, k by unit size = the out-of-sample best
+# (odd games predict even and back, 2024-26 pooled; a team prior beat a prior of 0 in every season and size:
+# MSE 5-man 820 vs 841, trios 330 vs 348, pairs 215 vs 226; raw Net 1558 / 613 / 385)
+K_LEAD = {5: 800, 3: 1600, 2: 1600}
 NOT_ON_FLOOR = ('Technical', 'Ejection', 'Delay', 'Timeout', 'Coach', 'Ref-Initiated', 'Review', 'Defensive 3-Seconds')
 
 
@@ -351,6 +357,33 @@ def build(S=None):
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'), allow_nan=False)
     print('lineups', S, len(gs), 'games', sum(1 for v in res.values() if v), 'parsed', '->', OUT)
+    leaders(S, (gs, res, U, names))
+
+
+def leaders(S, cur=None):
+    """static/data/nba-lineup-leaders.json: league-wide 5-man / trio / pair leaders, this season and last (last
+    season's block is kept from the old file once written; delete the file to rebuild it from the cache)"""
+    try:
+        prev = json.load(open(LEAD_OUT)).get('seasons', {})
+    except Exception:
+        prev = {}
+    out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'seasons': {}}
+    for s in (S, S - 1):
+        if s == S and cur:
+            gs, res, U, names = cur
+        elif str(s) in prev:
+            out['seasons'][str(s)] = prev[str(s)]      # a finished season never changes
+            continue
+        else:
+            gs, res = season(s)
+            names = player_names(res)
+            U = agg_season(gs, res)[0]
+        n = sum(1 for g in gs if res.get(g['id']))
+        teams = {t: [t, f'/img/nba/{t.lower()}.png', ''] for t in U}
+        out['seasons'][str(s)] = LL.season_block(U, K_LEAD, lambda t, p: names.get(p, p), teams, f'{s - 1}-{s % 100:02d}', n)
+    with open(LEAD_OUT, 'w') as f:
+        json.dump(out, f, separators=(',', ':'), allow_nan=False)
+    print('leaders', ', '.join(f"{k} {len(v['rows']['5'])}/{len(v['rows']['3'])}/{len(v['rows']['2'])}" for k, v in out['seasons'].items()), '->', LEAD_OUT)
 
 
 def player_names(res):
