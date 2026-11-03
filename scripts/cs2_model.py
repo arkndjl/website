@@ -116,10 +116,11 @@ class Vrs:
         return m[max(ds)] if ds else m[min(m)]
 
 
-def replay(series, vrs, p, ignore_warm=False, bo3=None):
+def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     """Play every series forward. -> (rows: one per series with the pre-series gap, state at the end).
     With bo3 (cs2_bo3.Bo3): a series that joins a bo3.gg match updates the players once per map on round share (K x
-    kmap each), and each row carries t, the bo3 team map rating's series logit through the veto (0 if not joined)."""
+    kmap each), and each row carries t, the bo3 team map rating's series logit through the veto (0 if not joined).
+    snaps: ISO dates; the state before the first series on or after each is kept in state["snaps"] (cs2_events)."""
     warm = {} if ignore_warm else warm_start(p)
     tview, tm = {}, None
     if bo3 is not None:
@@ -132,8 +133,11 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None):
     pl, pn, lastros, roff, team = {}, defaultdict(int), {}, defaultdict(float), {}
     hist = defaultdict(list)  # team key -> [(date, rating after)]
     rows = []
+    want, kept = sorted(snaps or []), {}
     for i, r in enumerate(series):
         d, a, b, y, ra, rb = r[:6]
+        while want and d >= want[0]:
+            kept[want.pop(0)] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
         ka, kb = key(a), key(b)
         ra = ra or lastros.get(ka)
         rb = rb or lastros.get(kb)
@@ -184,7 +188,10 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None):
                 pn[q] += 1
         for k, ros, rg in ((ka, ra, rga), (kb, rb, rgb)):
             hist[k].append((d, tr(ros, k) + (roff[rg] if rg else 0)))
-    return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm}
+    for w in want:
+        kept[w] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
+    return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm,
+                  "snaps": kept}
 
 
 def fitlog(X, s, l2=1e-3):

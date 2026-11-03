@@ -285,12 +285,15 @@ class TeamMaps:
               for played in veto(da, pool, bo)]
         return logit(sum(pv) / len(pv))
 
-    def play(self, upto=None, ask=None):
+    def play(self, upto=None, ask=None, snaps=None):
         """Play every bo3 match forward (to `upto`, exclusive). ask: {match id: [series index]} -> {index: logit for
-        the bo3 team listed first}."""
+        the bo3 team listed first}. snaps: ISO dates -> self.snaps[date], a TeamMaps as it stood before that day."""
         out = {}
         p = self.p
+        want, self.snaps = sorted(snaps or []), {}
         for m in sorted(self.b.mt.values(), key=lambda r: r[1]):
+            while want and m[1][:10] >= want[0]:
+                self.snaps[want.pop(0)] = self.copy()
             if upto and m[1] >= upto:
                 break
             a, b = m[2], m[3]
@@ -315,7 +318,16 @@ class TeamMaps:
                     self.nm[(t, mp)] += 1
             if len(self.recent) > 20000:
                 self.recent = self.recent[-12000:]
+        for w in want:
+            self.snaps[w] = self.copy()
         return out
+
+    def copy(self):
+        c = TeamMaps(self.b, self.p)
+        c.R, c.Mo = dict(self.R), defaultdict(float, self.Mo)
+        c.n, c.nm = defaultdict(int, self.n), defaultdict(int, self.nm)
+        c.recent = list(self.recent)
+        return c
 
 
 ODDS = ROOT / "scripts" / "data" / "odds_tp"
