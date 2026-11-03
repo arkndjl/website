@@ -170,7 +170,7 @@
         '<td class="cfb__num cfb__now">' + (r.ynil != null ? money(r.ynil) : dim) + '</td>' +
         '<td class="cfb__num cfb__now">' + (r.znil != null ? '<span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : dim) + '</td>' : '') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
-      '<td class="cfb__num">' + (r.age != null ? f1(r.age) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—') + '</td>' +
+      '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(2) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—') + '</td>' +
       '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td></tr>';
   }
 

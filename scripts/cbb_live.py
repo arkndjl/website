@@ -33,6 +33,76 @@ SEASON = 2027
 OFFLINE = '--offline' in sys.argv
 PRIOR = os.path.join(D.HERE, 'cbb_prior.json.gz')   # outside data/: Hugo would load it on every build
 LIVE_FIT = os.path.join(D.ROOT, 'data', 'cbb_live_fit.json')
+DOB_FILE = os.path.join(D.ROOT, 'data', 'cbb_dob.json')
+
+
+def dob_lookup():
+    """birth dates for players the frozen preseason careers lack (freshmen, mostly): Barttorvik's 2026-27 file (it
+    adds a freshman's date once his games count), then data/cbb_dob.json (scripts/cbb_dob.py: Tankathon draft age,
+    Wikidata). Returns f(pid, name, team) -> 'YYYY-MM-DD' or None."""
+    adv = os.path.join(D.CACHE, 'bt', f'adv{SEASON}.csv')
+    by_pid, by_key = {}, {}
+    if os.path.exists(adv):
+        for r in D.load_bt(SEASON):
+            d = r.get('dob')
+            if d and re.match(r'\d{4}-\d\d-\d\d$', d):
+                by_pid[str(r['pid']).split('.')[0]] = d; by_key[(r['key'], r['team'])] = d
+    try: store = json.load(open(DOB_FILE))
+    except (OSError, ValueError): store = {}
+    by_store = {k: v['dob'] for k, v in store.items() if v.get('dob')}
+    def f(pid, name, team, bt_team=None):
+        if pid is not None and str(pid).split('.')[0] in by_pid: return by_pid[str(pid).split('.')[0]]
+        k = D.norm(name)
+        return by_key.get((k, bt_team or team)) or by_store.get(f'{k}|{team}')
+    return f
+
+
+def measurer():
+    """measured height (barefoot) and weight per board row (scripts/measure.py): NBA combine (scripts/data/cbb_combine/
+    anthro.csv), the roster listing (ESPN + Barttorvik), Tankathon, On3's high school listing. f(name, team, row ht,
+    row wt, Barttorvik inches) -> (ht, wt, source mix) or (None, None, None)"""
+    import csv, gzip
+    import measure as M
+    import names as NM
+    import tankathon_bio as TB
+    comb = {}
+    try:
+        for r in csv.DictReader(open(os.path.join(D.HERE, 'data', 'cbb_combine', 'anthro.csv'))):
+            comb[NM.key(r['name'])] = r
+    except OSError: pass
+    tk = {}
+    for v in TB.load('nba').values():
+        if not v.get('miss'): tk.setdefault(NM.key(v['name']), []).append(v)
+    hs = {}
+    try:
+        for r in json.load(gzip.open(os.path.join(D.HERE, 'data', 'cbb_recruit_hist.json.gz')))['recruits']:
+            hs.setdefault(NM.key(r['name']), []).append(r)
+    except (OSError, ValueError): pass
+    num = lambda x: float(x) if x not in (None, '', 'NA') else None
+    def f(name, team, ht, wt, bt_hti):
+        k = NM.key(name)
+        c = comb.get(k)
+        t = [v for v in tk.get(k, []) if NM.same_team(v.get('school') or '', team or '')]
+        t = t[0] if len(t) == 1 else None
+        h = hs.get(k, [])
+        h = h[0] if len(h) == 1 and h[0]['cls'] >= SEASON - 6 else None
+        e_ht = D.inches(str(ht).replace("' ", '-').replace('"', '')) if ht else None
+        H, W = M.cbb(espn_ht=e_ht, bt_ht=bt_hti, tk_ht=t.get('ht') if t else None, hs_ht=h.get('ht') if h else None,
+                     comb_ht=num(c['HGT']) if c else None, espn_wt=float(wt) if wt else None, tk_wt=t.get('wt') if t else None,
+                     hs_wt=h.get('wt') if h else None, comb_wt=num(c['WGT']) if c else None,
+                     comb_years=max(0.0, SEASON - 0.6 - int(c['year'])) if c else 0.0)
+        if not H: return None, None, None
+        mix = {k2: round(v, 2) for k2, v in sorted(H['mix'].items(), key=lambda kv: -kv[1])}
+        if W: mix = {'ht': mix, 'wt': {k2: round(v, 2) for k2, v in sorted(W['mix'].items(), key=lambda kv: -kv[1])}}
+        return round(H['v'], 2), round(W['v'], 1) if W else None, mix
+    return f
+
+
+def age_now(dob):
+    """decimal age today, two places (17.43)"""
+    t = time.gmtime()
+    a = D.age_on(dob, t.tm_year, t.tm_mon, t.tm_mday) if dob else None
+    return round(a, 2) if a else None
 NEXT_YR = {'Fr': 'So', 'So': 'Jr', 'Jr': 'Sr', 'Sr': 'Sr'}
 # the Barttorvik columns the FV model reads from a season (cbb_fit.py features and season_line), plus a few more it
 # could take up (A/TO, the per-game lines); the prior keeps only these
@@ -321,6 +391,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
     if not todo:
         return []
     pf = prov_fit(prior, ci)
+    dob_of = dob_lookup()
     tid = lambda logo: (re.search(r'/(\d+)\.png', logo or '') or [None, None])[1]
     sizes = espn_sizes({tid(teams[ln['team']][1]) for _, ln in todo} - {None})
     out = []
@@ -330,6 +401,8 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         elig = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 1)
         hti = int(ln.get('hti') or 77)
         wt, age = sizes.get((tid(logo), D.norm(ln['name'])), (None, None))
+        dob = dob_of(pid, ln['name'], tname, ln['team'])
+        if dob: age = age_now(dob)
         bt = ln.get('rec')
         d = {'ht': hti, 'wt': wt, 'elig': elig, 'age': age, 'rg_lrk': -math.log(min(round((100 - bt) / 0.2) + 1, 500)) if bt else -math.log(600),
              'power': 1.0 if conf in POWER else 0.0, 'team8': pf['team8'].get(tname, 20.0), 'newcomer': 1.0}
@@ -338,7 +411,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         pre = max(float(F.FLOOR), F.FLOOR + float(pf['w'][0] + contrib.sum()))
         # this season's line, graded by the board's model as next preseason's board would see it
         srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': bt, 'role': None}
-        cc = {'pid': pid, 'name': ln['name'], 'dob': None, 'rec': None, 'seasons': [srow]}
+        cc = {'pid': pid, 'name': ln['name'], 'dob': dob, 'rec': None, 'seasons': [srow]}
         grp = 'newcomer'
         proj = lf['now'][grp] == 'projected'
         gp_full = ln['gp'] * full_games / max(1, ln['team_g']) if proj and ln['team_g'] < full_games else None
@@ -392,8 +465,12 @@ def main():
     recs, used = [], set()
     # badges (scripts/cbb_badges.py): from last college season, the line the preseason grade reads; shown, not in FV
     bdg = CBADGE.prior_badges(prior)
+    dob_of = dob_lookup()
     for row, m, bd in zip(prior['rows'], prior['careers'], bdg):
-        cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': m['dob'], 'rec': m['rec'], 'seasons': [dict(zip(keep, s)) for s in m['seasons']]}
+        # a birth date the preseason careers lacked feeds the same age terms a returner's has (the "now" grade's age)
+        dob = m['dob'] or dob_of(m['pid'], row[ci['name']], row[ci['team']], m.get('bt'))
+        cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': dob, 'rec': m['rec'], 'seasons': [dict(zip(keep, s)) for s in m['seasons']]}
+        if dob: row[ci['age']], row[ci['ageEst']] = age_now(dob), None
         i = len(cc['seasons']) - 1
         f_pre = F.features(cc, i)
         e0, p0, parts0 = score(f_pre, fit)
@@ -457,7 +534,8 @@ def main():
     posrk = Counter()
     # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges; e: E[FV] after the stages (the FV inputs add up to it)
     # xb0: preseason xBPM under today's model (the breakouts tab's baseline, scripts/cbb_tabs.py)
-    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0') if c not in ci]
+    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0', 'mht', 'mwt', 'msrc') if c not in ci]
+    meas = measurer()
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
     for k, r in enumerate(recs, 1):
@@ -471,7 +549,10 @@ def main():
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
         fvd = fvd_of(fv_dist('cbb', r['fvg'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvg'])))
-        new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
+        sz = r['cc']['seasons']
+        bt_hti = next((q.get('hti') for q in reversed(sz) if q.get('year', SEASON) < SEASON and q.get('hti')), None)
+        mht, mwt, msrc = meas(row[ci['name']], row[ci['team']], row[ci['ht']], row[ci['wt']], bt_hti)
+        new = {'mht': mht, 'mwt': mwt, 'msrc': msrc, 'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
                'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None}
         for c in new:
             if c in ci: row[ci[c]] = new[c]

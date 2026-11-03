@@ -731,8 +731,8 @@ function classFrom(classYear, redshirt) {
   return { years, elig, label: (redshirt ? 'RS-' : '') + CLASS_NAMES[Math.min(elig, 5) - 1] };
 }
 
-function ageOn(dob, when) {
-  return Math.round(((when - new Date(dob)) / (365.2425 * 864e5)) * 10) / 10;
+function ageOn(dob, when) {   // decimal age, two places (17.43)
+  return Math.round(((when - new Date(dob)) / (365.2425 * 864e5)) * 100) / 100;
 }
 
 // FV from an expected rank, per position, against measured outcome counts: CAL.tiers[g] holds the mean
@@ -2769,7 +2769,7 @@ const kp = (() => {
       : `${s.NO} punts, ${r1(s.ypp)} avg, ${s['In 20'] ?? 0} inside the 20 · ${s.val >= 0 ? '+' : ''}${r1(s.val)} pts of field position${s.netc != null ? ` · career net ${s.netc >= 0 ? '+' : ''}${r1(s.netc)} yds over expected a punt` : ''}`;
     const age = e.dob ? (Date.now() - Date.parse(e.dob)) / 31557600000 : null;
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
-      conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
+      conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? Math.round(age * 100) / 100 : null, ageEst: !age && years ? r1(18.4 + years) : null,
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, bmi: bmiOf(inchesOf(e.ht), e.wt) ? r1(bmiOf(inchesOf(e.ht), e.wt)) : null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
       ...atMean({ fv, fvx: Math.round(fvx * 100) / 100 }, cfbZ({ pos: s.pos, years, fv: fvx })), fvs: [['kp', Math.round(fvx * 100) / 100]], plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
       badges: s.badges || null,
