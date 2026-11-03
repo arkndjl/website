@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T06:36:20Z",
+ "asof": "2026-11-03T06:37:31Z",
  "recenter": {
   "2026-11-03": -12.8
  },
@@ -57,30 +57,30 @@
   },
   "checks": {
    "spread": {
-    "n": 39,
-    "window": 39,
-    "mean": -0.0362,
+    "n": 40,
+    "window": 40,
+    "mean": -0.0358,
     "t": null,
     "days": 1,
     "sd": 0.1136,
-    "cusum": 4.16,
+    "cusum": 4.08,
     "cusumMax": 4.19,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0108,
-     "n": 33,
+     "n": 34,
      "sd": 0.1136,
      "rho": 0.002,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -1.07,
-     "info": 0.3,
-     "real": -3.303,
-     "realSe": 1.886,
+     "llr": -1.083,
+     "info": 0.31,
+     "real": -3.244,
+     "realSe": 1.859,
      "need": 649
     }
    },
@@ -285,8 +285,14 @@
    "flagged": "2026-11-03T01:35:55Z",
    "betTo": 13.0,
    "close": 11.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 11.5,
+    "price": -106.0,
+    "ev": 0.039,
+    "units": 0.25
+   }
   },
   {
    "id": "401920304",
@@ -364,22 +370,6 @@
   }
  ],
  "board": [
-  {
-   "id": "401909796",
-   "sport": "cbb",
-   "kick": "2026-11-04T01:00:00Z",
-   "home": "Kansas State",
-   "away": "South Dakota State",
-   "mk": "spread",
-   "side": "home",
-   "line": 11.5,
-   "price": -108.0,
-   "edge": 4.3,
-   "x": 2.5,
-   "why": "no edge at -108",
-   "m": 15.8,
-   "tm": 159.3
-  },
   {
    "id": "401924911",
    "sport": "cbb",
@@ -562,13 +552,13 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": -108.0,
+   "price": -106.0,
+   "ev": 0.039,
    "edge": 4.3,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "Kansas State",
    "away": "South Dakota State",
-   "state": "under"
+   "state": "pick"
   },
   "401921165": {
    "mk": "total",
@@ -683,7 +673,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3751,
+  "snapshots": 3752,
   "buckets": [
    {
     "when": "24h+",
@@ -696,12 +686,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 441,
+    "clvN": 442,
     "clvRet": -0.0414,
-    "clvT": -7.17,
+    "clvT": -7.19,
     "clv": 0.12,
     "beat": 0.231,
-    "still": 0.454
+    "still": 0.455
    },
    {
     "when": "1-6h",
@@ -7048,8 +7038,7 @@
    "tmRaw": 146.5,
    "flagged": "2026-11-03T01:35:55Z",
    "betTo": 13.0,
-   "close": 11.5,
-   "pass": true
+   "close": 11.5
   },
   {
    "id": "401906848",
@@ -7142,7 +7131,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 19.5,
+    "raw": 19.75,
     "scale": 1.0,
     "down": 4.25
    },
