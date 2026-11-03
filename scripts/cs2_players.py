@@ -717,6 +717,17 @@ def build():
     v = fitj.get("value")
     t1 = [i for i in np.where(act)[0] if tinfo.get(bo3.k(int(M.team[lastrow[i]])), {}).get("tier") == 1]
     mu1, sd1 = float(np.mean(th[t1])), float(np.std(th[t1]) or 1)
+    # team RWA: the five's RWA summed (5 x the mean of those with stats, 3+ needed) = round win % above 50 against a
+    # five of average Tier-1 players. The same five-mean is the model's player term (Live), so this is display only.
+    nk, nkt = nick_index(M, bo3)
+    for t in cs["teams"]:
+        ix = [nkt.get((names.key(q), t["k"]), nk.get(names.key(q))) for q in t.get("ros") or []]
+        tv = [th[i] for i in ix if i is not None]
+        t["rwa"] = round(float(a / 2 * 5 * (np.mean(tv) - mu1)), 1) if len(tv) >= 3 else None
+    by_rwa = sorted((t for t in cs["teams"] if t["rwa"] is not None), key=lambda t: -t["rwa"])
+    for j, t in enumerate(by_rwa):
+        t["rwaRk"] = j + 1
+    (ROOT / "data" / "cs2.json").write_text(json.dumps(cs, separators=(",", ":")))
 
     def row(i):
         pid = int(M.pids[i])

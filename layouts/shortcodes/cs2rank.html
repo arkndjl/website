@@ -5,13 +5,14 @@
        all 100). */ -}}
 {{- with site.Data.cs2 -}}
 {{- $top := int ($.Get "top" | default 100) -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: ARK Ranking") "icon" "cs" "filter" "Tier,Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Tier,ARK,Elo,VRS" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: ARK Ranking") "icon" "cs" "filter" "Tier,Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Tier,ARK,Elo,RWA,VRS" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2 cs__table">
   <thead><tr>
     <th>RK</th><th>Team</th>
     <th title="event-access tier: the bo3.gg event tier a team of this Elo mostly plays (Tier 1 = S-tier events{{ with .tiers }}, Elo {{ index .cuts 0 }}+; Tier 2 = S or A, {{ index .cuts 1 }}+; Tier 3 = B or better, {{ index .cuts 2 }}+{{ end }}), fit on the last 180 days">Tier</th>
     <th title="ARK: series win chance against the average top-20 team">ARK</th>
     <th title="the same strength on the Elo scale: 1500 = the average top-20 team, +400 = 10 to 1">Elo</th>
+    <th title="team RWA: the five players' round win % added per round, summed = round win % above 50 against a five of average Tier-1 players">RWA</th>
     <th title="rating change over the last 30 days against the top 20 teams' own change (Elo points)">30d</th>
     <th title="Valve Regional Standings: global rank and points ({{ .vrsDate }})">VRS</th>
     <th title="series won-lost, last 90 days">W-L</th>
@@ -28,6 +29,8 @@
     <td class="cs__tier" data-v="{{ .tier | default 4 }}" data-filter="Tier {{ .tier | default 4 }}"><span class="cs__t cs__t--{{ .tier | default 4 }}">T{{ .tier | default 4 }}</span>{{ with .ev }} <span class="cfb__dim" title="share of series at S-tier events, last 180 days">{{ printf "%.0f" (mul (index . 0) 100) }}%</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
     <td class="cfb__num" data-v="{{ .elo }}">{{ .elo }}</td>
+    {{- $rwa := .rwa }}
+    <td class="cfb__num" data-v="{{ if ne $rwa nil }}{{ $rwa }}{{ else }}-99{{ end }}">{{ if ne $rwa nil }}{{ printf "%+.1f" $rwa }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .d30 | default 0 }}">{{ with .d30 }}{{ printf "%+d" (int .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .vrk }}{{ . }}{{ end }}">{{ with .vrk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .vpts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .w90 }}">{{ .w90 }}-{{ .l90 }}</td>
@@ -39,5 +42,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len (first $top .teams)) "note" "ARK = series win % vs the average top-20 team · Tier = event access by Elo" "about" (printf "Ratings over %d pro series since %s (Valve's Regional Standings through %s, Liquipedia since): player Elo that follows players between teams and moves map by map on round share, a bo3.gg team map rating with a veto, region offsets, and Valve's VRS points, the blend fit on Aug 2024 - Jun 2025 and scored on the series since. Tiers follow event access: over the last 180 days, a logistic of the event's bo3.gg tier on team Elo gives the Elo where a team mostly plays S-tier events (Tier 1), S or A-tier (Tier 2) and B-tier or better (Tier 3); the grey figure is the team's own share of series at S-tier events." (int .nSeries) ((time .first).Format "Jan 2006") ((time .lastVrs).Format "Jan 2"))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len (first $top .teams)) "note" "ARK = series win % vs the average top-20 team · RWA = the five's round win % added · Tier = event access by Elo" "about" (printf "Ratings over %d pro series since %s (Valve's Regional Standings through %s, Liquipedia since): player Elo that follows players between teams and moves map by map on round share, a bo3.gg team map rating with a veto, region offsets, and Valve's VRS points, the blend fit on Aug 2024 - Jun 2025 and scored on the series since. Tiers follow event access: over the last 180 days, a logistic of the event's bo3.gg tier on team Elo gives the Elo where a team mostly plays S-tier events (Tier 1), S or A-tier (Tier 2) and B-tier or better (Tier 3); the grey figure is the team's own share of series at S-tier events." (int .nSeries) ((time .first).Format "Jan 2006") ((time .lastVrs).Format "Jan 2"))) -}}
 {{- end -}}
