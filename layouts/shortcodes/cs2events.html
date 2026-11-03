@@ -1,0 +1,48 @@
+{{- /* Counter-Strike event odds (data/cs2_events.json, scripts/cs2_events.py): the next Major simulated from the series
+       model, Valve's Swiss pairing rules, Stage 1 -> 2 -> 3 -> playoffs. Chances are cumulative from today: a team
+       invited to Stage 2 shows "in" for Stage 2. */ -}}
+{{- with site.Data.cs2_events -}}
+{{- $e := . -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "event odds :: %s" .name)) "icon" "cs" "filter" "Start" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Start,Playoffs,Final,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "16") -}}
+<table class="cfb__table tstick2 cs__table cs__ev">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th title="stage the team is invited to (Valve invitation standings, {{ .inviteDate }})">Start</th>
+    <th title="pre-event seed: Valve global standing">Seed</th>
+    <th title="ARK Ranking">ARK</th>
+    <th title="won-lost in the current stage">W-L</th>
+    <th title="chance to reach Stage 2">S2</th>
+    <th title="chance to reach Stage 3">S3</th>
+    <th title="chance to reach the playoffs (top 8 of Stage 3)">Playoffs</th>
+    <th title="chance to reach the semifinals">Semis</th>
+    <th title="chance to reach the grand final">Final</th>
+    <th title="chance to win the Major">Title</th>
+    <th title="title chance as American odds without the vig">Fair</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $t := .teams }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if index $e.logos .k }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td data-v="{{ .st }}" data-filter="Stage {{ .st }}">S{{ .st }}</td>
+    <td class="cfb__num" data-v="{{ .seed | default 999 }}">{{ with .seed }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .rk | default 999 }}">{{ with .rk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .rec }}{{ index . 0 }}-{{ index . 1 }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- range $j, $p := .p }}
+    {{- if or (and (eq $j 0) (gt $t.st 1)) (and (eq $j 1) (gt $t.st 2)) }}
+    <td class="cfb__num" data-v="1"><span class="cfb__dim">in</span></td>
+    {{- else }}
+    <td class="cfb__num{{ if eq $j 5 }} cs__ev-title{{ end }}" data-v="{{ $p }}">{{ if eq $p 0.0 }}<span class="cfb__dim">—</span>{{ else if lt $p 0.001 }}<span class="cfb__dim">&lt;0.1</span>{{ else if eq $j 5 }}<b>{{ printf "%.1f" (mul $p 100) }}</b>{{ else }}{{ printf "%.1f" (mul $p 100) }}{{ end }}</td>
+    {{- end }}
+    {{- end }}
+    <td class="cfb__num" data-v="{{ index .p 5 }}">{{ if ge (index .p 5) 0.001 }}{{ printf "%+d" (int .fair) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $bt := "" -}}
+{{- with site.Data.cs2_events_fit }}{{ with .score }}{{ $f := site.Data.cs2_events_fit }}{{ $a := printf "ARK %v" $f.sd }}{{ $v := printf "VRS %v" $f.sdVrs }}{{ $s := index . "held/swiss/all" }}{{ $b := index . "held/se/all" }}
+{{- $bt = printf " Backtest, held out (Jul 2025 on): %d S-tier Swiss stages, advancement log loss %.2f per stage vs %.2f on VRS points alone (won %d of %d); %d brackets, title log loss %.2f vs %.2f (won %d of %d)." (int $s.n) (index $s.ll $a) (index $s.ll $v) (int (index $s.won 0)) (int (index $s.won 1)) (int $b.n) (index $b.ll $a) (index $b.ll $v) (int (index $b.won 0)) (int (index $b.won 1)) }}
+{{- end }}{{ end -}}
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len .teams) "note" (printf "%s · %s - %s · %d sims" .short ((time (index .dates 0)).Format "Jan 2") ((time .end).Format "Jan 2") (int .nsim)) "about" (printf "%d simulations of the Major from the series model (the matches tab's chances: player Elo, team map rating through the veto, the five's player rating, VRS points). Valve's rules: three 16-team Swiss stages (3 wins advance, 3 losses out; elimination and advancement matches Bo3, the rest Bo1; Stage 3 all Bo3), round 1 seed i v i+8, then highest v lowest seed without a rematch, rounds 4-5 by the rulebook's priority table, seeds by record, Difficulty Score (Buchholz) and initial seed; the top 8 seeded 9-16 into the next stage beside 8 invites; playoffs 1v8, 4v5 | 2v7, 3v6, Bo3, grand final Bo5. Each simulation draws every team's strength once (sd %.2f logit), so a rating that is off stays off all event. Invites from Valve's invitation standings (%s); bo3.gg's drawn pairings and results replace the simulated ones as the event runs.%s" (int .nsim) .sd .inviteDate $bt)) -}}
+{{- end -}}

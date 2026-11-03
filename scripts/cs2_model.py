@@ -116,10 +116,11 @@ class Vrs:
         return m[max(ds)] if ds else m[min(m)]
 
 
-def replay(series, vrs, p, ignore_warm=False, bo3=None):
+def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     """Play every series forward. -> (rows: one per series with the pre-series gap, state at the end).
     With bo3 (cs2_bo3.Bo3): a series that joins a bo3.gg match updates the players once per map on round share (K x
-    kmap each), and each row carries t, the bo3 team map rating's series logit through the veto (0 if not joined)."""
+    kmap each), and each row carries t, the bo3 team map rating's series logit through the veto (0 if not joined).
+    snaps: ISO dates; the state before the first series on or after each is kept in state["snaps"] (cs2_events)."""
     warm = {} if ignore_warm else warm_start(p)
     tview, tm = {}, None
     if bo3 is not None:
@@ -132,8 +133,11 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None):
     pl, pn, lastros, roff, team = {}, defaultdict(int), {}, defaultdict(float), {}
     hist = defaultdict(list)  # team key -> [(date, rating after)]
     rows = []
+    want, kept = sorted(snaps or []), {}
     for i, r in enumerate(series):
         d, a, b, y, ra, rb = r[:6]
+        while want and d >= want[0]:
+            kept[want.pop(0)] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
         ka, kb = key(a), key(b)
         ra = ra or lastros.get(ka)
         rb = rb or lastros.get(kb)
@@ -184,7 +188,10 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None):
                 pn[q] += 1
         for k, ros, rg in ((ka, ra, rga), (kb, rb, rgb)):
             hist[k].append((d, tr(ros, k) + (roff[rg] if rg else 0)))
-    return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm}
+    for w in want:
+        kept[w] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
+    return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm,
+                  "snaps": kept}
 
 
 def fitlog(X, s, l2=1e-3):
@@ -485,6 +492,33 @@ def build():
             m = dict(m, pm=round(pm, 4))
         matches.append(dict(m, a=names.get(ka, m["a"].replace(" (page does not exist)", "")), b=names.get(kb, m["b"].replace(" (page does not exist)", "")), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
                             la=(LOGOS / f"{ka}.png").exists(), lb=(LOGOS / f"{kb}.png").exists()))
+    # map pool (display only): each ranked team's map win chance against the top 20's average on that map, on the
+    # map-win scale (TeamMaps' round-share logit x c, scripts/cs2_scale_research.py), and each upcoming series' veto
+    pool = tm.pool(today)
+    sc = json.loads((ROOT / "data" / "cs2_scale_research.json").read_text()).get("cFinal", 1.0) \
+        if (ROOT / "data" / "cs2_scale_research.json").exists() else 1.0
+
+    def mr(t, mp):
+        return tm.R.get(t, 0.0) + tm.Mo[(t, mp)]
+    tids = {t["k"]: bo3.team_of(t["k"]) for t in teams}
+    ref20 = [tids[t["k"]] for t in teams[:20] if tids.get(t["k"])]
+    avg = {mp: float(np.mean([mr(t, mp) for t in ref20])) for mp in pool}
+    for t in teams:
+        tid = tids.get(t["k"])
+        if tid and tm.n.get(tid, 0) >= 10:
+            t["maps"] = [round(1 / (1 + math.exp(-sc * (mr(tid, mp) - avg[mp]))), 3) for mp in pool]
+            t["mapsN"] = [tm.nm[(tid, mp)] for mp in pool]
+    for m in matches:
+        ta, tb = bo3.team_of(m["ka"]), bo3.team_of(m["kb"])
+        if not (ta and tb and ta != tb and pool):
+            continue
+        bo = int(m["fmt"][2:]) if (m.get("fmt") or "").startswith("Bo") and m["fmt"][2:].isdigit() else 3
+        da = {mp: tm.Mo[(ta, mp)] - tm.Mo[(tb, mp)] for mp in pool}
+        x = tm.R.get(ta, 0.0) - tm.R.get(tb, 0.0)
+        # the higher-ranked side starts the veto (Valve: the higher seed picks Team A, who removes first)
+        first = 0 if (m.get("rka") or 999) <= (m.get("rkb") or 999) else 1
+        played = cs2_bo3.veto(da, pool, bo)[first]
+        m["veto"] = [[mp, round(1 / (1 + math.exp(-sc * (x + da[mp]))), 3)] for mp in played]
     # every upcoming series Thunderpick prices on bo3.gg (scripts/data/odds_tp): the model's chance for the first-listed
     # team, read by cs2_bo3.odds_snap so each archived price carries the model beside it (picks are off until CLV passes)
     tp = {}
@@ -539,7 +573,18 @@ def build():
            "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tiers": tier_fit,
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
+    out["pool"] = pool
     OUT.write_text(json.dumps(out, separators=(",", ":")))
+    # the next Major's odds (scripts/cs2_events.py) from the same series chance
+    try:
+        import cs2_events
+        ev = cs2_events.live(lambda a, b, bo: logit_ab(a, b, bo), dict(names), rank, bo3)
+        if ev:
+            ev["asof"] = out["asof"]
+            ev["logos"] = {t["k"]: (LOGOS / f"{t['k']}.png").exists() for t in ev["teams"]}
+            cs2_events.OUT.write_text(json.dumps(ev, separators=(",", ":")))
+    except Exception as ex:  # noqa: BLE001
+        print("cs2 event odds skipped:", ex)
     print(f"{len(teams)} teams, {len(matches)} matches, {len(res)} results; #1 {teams[0]['n']} {teams[0]['ark']}")
 
 
