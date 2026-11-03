@@ -162,7 +162,7 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-cons="' + esc(r.cons) + '" data-xnil="' + esc(r.xnil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk"' + (opt.rankBy === 'war' ? ' title="WAR rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
+      '<td class="cfb__rk"' + (opt.rankBy === 'war' ? ' title="WAA rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
       '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
       (opt.rankBy === 'war' && r.war != null ? '<b class="cfb__warin">' + (+r.war).toFixed(2) + '</b>' : '') + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.carried ? ' <span class="cfb__carried" title="PFN stopped listing him after ' + esc(r.carried) + ': his last grade is kept">carried</span>' : '') + (r.src === 'espn' ? ' ' + prov('on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting') : '') +
       (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
@@ -172,7 +172,7 @@
       (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '') + '</td>' +
       (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war">' + warCell(r) + '</td><td class="cfb__num">' + waaCell(r) + '</td><td class="cfb__num">' + xvCell(r) + '</td>' : '') +
       (yx ? '<td class="cfb__pos-cell" title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '">' + yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : '') + '</td>' :
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>') +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAA' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>') +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span></td>' +
       (yx ? '<td class="fv cfb__g">' + chipOf(yx[1], opt.yr + ' FV ' + yx[1] + ' (backtest model: production, pedigree, age, team; no On3 or consensus) · FV now ' + (r.fv == null ? '—' : fv)) + '</td>' :
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="mean outcome ' + (+r.fvx).toFixed(2) + '"' : '') + '>' + fv + '</span>' : dim) + '</td>') +
@@ -282,8 +282,11 @@
     var opt = { up: w.hasAttribute('data-cfb-up'), draft: w.hasAttribute('data-cfb-draft'), nil: true, div: preset !== 'fbs' && preset !== 'fcs', rankBy: preset === 'war' ? 'war' : 'fv',
       yr: 0 };
     var gfxCols = w.getAttribute('data-gfx-cols') || '';
-    // the WAR leaderboard: ranks (and the default order) by college WAR, highest first, FV breaking ties
-    var byWar = function (a, b) { return (b.war == null ? -99 : b.war) - (a.war == null ? -99 : a.war) || a.ovr - b.ovr; };
+    // the WAR leaderboard: ranks (and the default order) by WAA, wins over an average starter at the position, so the
+    // ranking is position-neutral (WAR's QB line is real value, but an average QB's 0.6 wins over replacement filled the top
+    // with average QBs); WAR, then FV, break ties; a row with WAR and no WAA ranks on WAR
+    var wa = function (r) { return r.waa != null ? r.waa : r.war != null ? r.war : -99; };
+    var byWar = function (a, b) { return wa(b) - wa(a) || (b.war == null ? -99 : b.war) - (a.war == null ? -99 : a.war) || a.ovr - b.ovr; };
     if (opt.rankBy === 'war') recs.sort(byWar);
     // archetype list for the "type" filter, from the players on this board
     var archSel = bar.querySelector('[data-cfb-arch]');
@@ -402,11 +405,11 @@
       }
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
-    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'war' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1, sort0 = [cur, dir];
+    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'waa' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1, sort0 = [cur, dir];
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {
-        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|age|cls|cons)$/.test(k), get = k === 'rk' && opt.rankBy === 'war' ? function (r) { return r.war == null ? 99 : -r.war; } : k === 'fv' && opt.yr ? function (r) { return pastAt(r, opt.yr); } : KEY[k] || function (r) { return r[k]; };
+        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|age|cls|cons)$/.test(k), get = k === 'rk' && opt.rankBy === 'war' ? function (r) { return -wa(r); } : k === 'fv' && opt.yr ? function (r) { return pastAt(r, opt.yr); } : KEY[k] || function (r) { return r[k]; };
         dir = k === cur ? -dir : (asc ? 1 : -1); cur = k;
         recs.sort(function (a, b) {
           var x = get(a), y = get(b);

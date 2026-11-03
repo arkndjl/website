@@ -9,7 +9,7 @@
        coverage allowed, ...) weighted by how much they move team margin, 2018-25. ST (scripts/nfl_st_war.py, Nov 2 2026):
        kicking, punting and returns over an average specialist, shrunk, added to WAR; K and P rows are ST alone. Views: season to date, or per 17 games (100+ snaps).
        Filters: position (and OFF / DEF), team, search. RK and the position rank count within the filters and the
-       view, in WAR order; headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace).
+       view, in WAA order (wins over an average regular at the sub-position: position-neutral, so average QBs don't fill the top); headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace).
        Medals in the name cell: bdg, the predictive badges (scripts/nfl_badges.py; data/nfl_badge_backtest.json).
        Two-way players (20+ snaps each side, row's two: {o, d WAR, so, sd snaps, p2 other position}): WAR sums both
        sides, each against its own side's replacement line; the position cell reads CB/WR, either chip finds him, and
@@ -48,12 +48,12 @@
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nflwar__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank by WAR within the filters and view">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank by WAA within the filters and view">RK</th>
         <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 300+ snaps a season): Target Magnet (WR / TE, targets a snap), predicted next-season WAR beyond this season's WAR and age, held out (scripts/nfl_badge_backtest.py). Specialists: Kicker, Field Flipper (punter), Kick Returner, on the special teams credit in WAR, which carried to the next season (scripts/nfl_st_war.py)">Player</th>
         <th data-sort="war" data-num title="WAR = .6 x AV WAR + .4 x XV + ST, season to date. AV WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV; replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
         <th data-sort="pace" data-num title="WAR/17 = WAR x 17 / team games">WAR/17</th>
         <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
-        <th data-sort="pos" class="cfb__g" title="position, rank at position by WAR within the filters (QB3 = 3rd QB)">Pos</th>
+        <th data-sort="pos" class="cfb__g" title="position, rank at position by WAA within the filters (QB3 = 3rd QB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
         <th data-sort="xv" data-num title="XV = WAR from the parts of the stat line that track team margin (EPA, CPOE, sacks taken, first downs, yards after contact, pressures, stops, missed tackles, coverage allowed, penalties), z within the sub-position, weights fit on 2018-25 team margin. 40% of WAR">XV</th>
         <th data-sort="stw" data-num title="ST = special teams wins: kicking (FG + XP), punting, kick and punt returns, in points over an average specialist (EPA over the expectation from the kick spot, or the catch spot for returns), shrunk to the part that carries to the next season, over 35.5 points a win. In WAR. kickers and punters: WAR = ST">ST</th>
@@ -110,10 +110,10 @@
   }
   function render() {
     var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, pace = bar.elements.view.value === 'pace',
-        key = pace ? 'pace' : 'war', rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
+        key = pace ? 'waaP' : 'waa', rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
         amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 ? (ag[1] ? +ag[1] : Infinity) : NaN;
     if (bar.elements.age.value && ag[0] === '') { amin = -Infinity; amax = +ag[1]; }
-    // who's in: position, team, age, rookies, view; ranks count among them in WAR order
+    // who's in: position, team, age, rookies, view; ranks count among them in WAA order (WAR, then AV, break ties)
     var list = all.filter(function (p) {
       if (pos === 'OFF' ? !OFF[p.pos] && !(p.two && OFF[p.two.p2]) : pos === 'DEF' ? (OFF[p.pos] || ST[p.pos]) && !(p.two && !OFF[p.two.p2]) : pos && p.pos !== pos && !(p.two && p.two.p2 === pos)) return false;
       if (team && p.tm.split('/').indexOf(team) < 0) return false;
@@ -121,7 +121,7 @@
       if (rook && !p.rook) return false;
       if (bar.elements.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
       return true;
-    }).sort(function (a, b) { return b[key] - a[key] || b.av - a.av; });
+    }).sort(function (a, b) { return (b[key] == null ? b.war : b[key]) - (a[key] == null ? a.war : a[key]) || b.war - a.war || b.av - a.av; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
     // search narrows what's shown, not the ranks
@@ -139,9 +139,9 @@
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>' +
-        '<td class="cfb__num nflwar__war' + (pace ? '' : ' is-key') + '">' + f2(p.war) + '</td>' +
-        '<td class="cfb__num nflwar__war' + (pace ? ' is-key' : '') + '">' + f2(p.pace) + '</td>' +
-        '<td class="cfb__num">' + waa(pace ? p.waaP : p.waa) + '</td>' +
+        '<td class="cfb__num nflwar__war">' + f2(p.war) + '</td>' +
+        '<td class="cfb__num nflwar__war">' + f2(p.pace) + '</td>' +
+        '<td class="cfb__num nflwar__war is-key">' + waa(pace ? p.waaP : p.waa) + '</td>' +
         '<td class="cfb__g"' + (p.two ? ' title="two-way: ' + p.two.so + ' offense, ' + p.two.sd + ' defense snaps"' : '') + '>' + p.pos + (p.two ? '/' + p.two.p2 : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
         '<td class="nflwar__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
         '<td class="cfb__num">' + (p.xv == null ? '' : f2(p.xv)) + '</td>' +
