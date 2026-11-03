@@ -87,6 +87,7 @@ def main():
     fit = json.load(open(F.OUT))
     careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
     F.horizon_fv(careers)     # the realized outcome the board is fit on (cbb_fit.horizon_fv)
+    F.set_context(careers)    # team context for the xBPM ridge (cbb_fit.set_context)
     by_pid = {str(c['pid']): c for c in careers}
     print('rebuilding season-level numbers from games (fit on full seasons)...')
     recon = fit_recon(list(SEASONS))

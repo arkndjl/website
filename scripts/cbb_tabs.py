@@ -52,8 +52,8 @@ GCOLS = ['date', 'dtext', 'opstyle', 'quality', 'win1', 'opp', 'muid', 'win2', '
          'bpm_net', 'pts', 'orb_n', 'drb_n', 'ast_n', 'tov', 'stl_n', 'blk_n', 'stl', 'blk', 'pf', 'poss', 'gbpm', 'sbpm', 'loc', 'team',
          'name', 'inches', 'cls', 'pid', 'year']
 GC = {k: i for i, k in enumerate(GCOLS)}
-SOPT = [[0, 'any'], [40, '40'], [100, '100'], [200, '200'], [400, '400'], [600, '600']]
-BOPT = [[0, 'any'], [40, '40'], [100, '100'], [200, '200'], [400, '400']]
+SOPT = [[0, 'any'], [20, '20'], [40, '40'], [100, '100'], [200, '200'], [400, '400'], [600, '600']]
+BOPT = [[0, 'any'], [20, '20'], [40, '40'], [100, '100'], [200, '200'], [400, '400']]
 MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split()
 
 
@@ -295,7 +295,7 @@ def main():
                   ['blk', 'BLK%', 'block rate'], ['ortg', 'ORtg', 'offensive rating']],
         'cols': stat_cols, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': SOPT},
-        'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': now_rows, 'mdef': mdef(SOPT, 12 * gnow)},
+        'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': now_rows, 'mdef': mdef(SOPT, 20 * gnow)},
                     {'s': LAST, 'l': label(LAST), 'rows': last_rows, 'mdef': 400}]})
 
     # ---- WAR leaders
@@ -318,7 +318,7 @@ def main():
         if r.get('cls') not in ('Fr', 'So'): continue
         P = pre.get((r['name'], r['team'])) or {}
         last = r.get('last') if r.get('cls') == 'So' else None
-        xb0 = P.get('xbpm')
+        xb0 = r.get('xb0') if r.get('xb0') is not None else P.get('xbpm')   # preseason xBPM under today's model
         brk.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'sub': r['cls'], 'ph': r.get('photo'), 'lo': r.get('logo'),
                     'xup': r1(r['xbpm'] - xb0) if xb0 is not None and r.get('xbpm') is not None else None,
                     'over': r1(L['bpm'] - xb0) if xb0 is not None else None, 'bpm': L['bpm'], 'xb0': xb0,
@@ -349,7 +349,7 @@ def main():
                  col('fv', 'FV', 'FV now', 'i'), col('mp', 'Min', 'minutes played', 'i')],
         'pre': {'l': 'Pre', 't': 'preseason board rank (FV)'}, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': BOPT},
-        'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': brk, 'mdef': mdef(BOPT, 8 * gnow)},
+        'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': brk, 'mdef': mdef(BOPT, 20 * gnow)},
                     {'s': LAST, 'l': label(LAST) + ' (2nd-years)', 'rows': brk_last, 'mdef': 200}]})
 
     # ---- top performers: best single games by Game Score, a week at a time

@@ -39,7 +39,8 @@ LABEL = {   # driver names for the scouting report
     'nprev': 'seasons played', 'transfer': 'transfer', 'bpm_rel': 'BPM vs role', 'obpm_rel': 'offensive BPM vs role',
     'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age', 'rg_lrk': 'recruiting rank (On3, 247, Barttorvik)',
     'unranked2': 'unranked', 'boards': 'draft boards (consensus)', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role',
-    'combine': 'combine testing'}
+    'combine': 'combine testing', 'splus': 'Stat+ (BPM vs position)', 'waa': 'WAA', 'mates_war': "returning teammates' WAR", 'tal_team': "teammates' recruiting",
+    'tr_up': 'transfer up', 'tr_down': 'transfer down'}
 
 
 def local_logo(url):
@@ -144,8 +145,10 @@ def main():
                     hit, _ = m_rec.find(p['name'])
                     g = {k: v for k, v in hit.items() if k != 'name'} if hit else None
                 cc = {'pid': None, 'name': p['name'], 'dob': None, 'rec': g, 'seasons': [srow]}
-            f = F.features(cc, len(cc['seasons']) - 1)
-            rows.append({'p': p, 't': t, 'c': c, 'cc': cc, 'f': f, 'how': how})
+            rows.append({'p': p, 't': t, 'c': c, 'cc': cc, 'f': None, 'how': how})
+    # features after every roster is in: the xBPM ridge reads each player's team context (cbb_fit.set_context)
+    F.set_context([r['cc'] for r in rows])
+    for r in rows: r['f'] = F.features(r['cc'], len(r['cc']['seasons']) - 1)
     print(f'{len(rows)} rostered players; {sum(1 for r in rows if r["c"])} returners matched to Barttorvik '
           f'({sum(1 for r in rows if r["how"] == "name")} by name only), {sum(1 for r in rows if not r["c"] and r["cc"]["rec"])} newcomers with recruiting grades')
 
