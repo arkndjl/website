@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-03T18:37:49Z",
+ "asof": "2026-11-03T18:40:51Z",
  "recenter": {
   "2026-11-04": 0.74
  },
@@ -415,8 +415,8 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": -113.0,
-    "ev": 0.262,
+    "price": -111.0,
+    "ev": 0.268,
     "units": 5.0
    }
   }
@@ -429,15 +429,15 @@
    "kick": "2026-11-05T02:30:00Z",
    "home": "SA",
    "away": "DAL",
-   "mk": "total",
-   "side": "under",
-   "line": 229.5,
-   "price": -117.0,
-   "edge": 2.9,
-   "x": 3.0,
-   "why": "edge under 3",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -102.0,
+   "edge": 1.4,
+   "x": 2.0,
+   "why": "edge under 2 (role: favorite)",
    "m": 13.9,
-   "tm": 226.6
+   "tm": 226.5
   },
   {
    "id": "401909930",
@@ -461,9 +461,9 @@
    "mk": "ml",
    "side": "home",
    "line": null,
-   "price": -113.0,
-   "ev": 0.262,
-   "edge": 5.6,
+   "price": -111.0,
+   "ev": 0.268,
+   "edge": 5.5,
    "units": 5.0,
    "home": "DET",
    "away": "PHI",
@@ -506,11 +506,11 @@
    "state": "under"
   },
   "401909933": {
-   "mk": "total",
-   "side": "under",
-   "line": 229.5,
-   "price": -117.0,
-   "edge": 2.9,
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -102.0,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "SA",
@@ -570,16 +570,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1671,
+  "snapshots": 1678,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 147,
-    "clvRet": 0.0065,
-    "clvT": 0.68,
-    "clv": 0.8,
-    "beat": 0.415,
-    "still": 0.435
+    "clvN": 152,
+    "clvRet": 0.0051,
+    "clvT": 0.56,
+    "clv": 0.77,
+    "beat": 0.401,
+    "still": 0.454
    },
    {
     "when": "6-24h",
@@ -4310,7 +4310,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 19.5,
+    "raw": 19.75,
     "scale": 1.0,
     "down": 16.5
    },
@@ -4319,7 +4319,7 @@
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 21.75,
+    "raw": 15.75,
     "scale": 1.0
    },
    "2026-11-06": {

@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T18:37:46Z",
+ "asof": "2026-11-03T18:40:46Z",
  "recenter": {
   "2026-11-03": -12.85
  },
@@ -478,8 +478,14 @@
    "flagged": "2026-11-03T13:43:38Z",
    "betTo": 33.0,
    "close": 33.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "spread",
+    "side": "away",
+    "line": 33.5,
+    "price": -104.0,
+    "ev": 0.034,
+    "units": 0.25
+   }
   },
   {
    "id": "401909796",
@@ -623,38 +629,6 @@
    "tm": 145.9
   },
   {
-   "id": "401921801",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:00:00Z",
-   "home": "Kentucky",
-   "away": "Manhattan",
-   "mk": "spread",
-   "side": "away",
-   "line": 33.5,
-   "price": -106.0,
-   "edge": 3.3,
-   "x": 2.5,
-   "why": "no edge at -106",
-   "m": 30.2,
-   "tm": 158.4
-  },
-  {
-   "id": "401920702",
-   "sport": "cbb",
-   "kick": "2026-11-04T01:00:00Z",
-   "home": "Iowa",
-   "away": "Lipscomb",
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": 104.0,
-   "edge": 2.2,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 20.3,
-   "tm": 146.8
-  },
-  {
    "id": "401920343",
    "sport": "cbb",
    "kick": "2026-11-04T03:00:00Z",
@@ -781,6 +755,22 @@
    "why": "total market off",
    "m": 10.8,
    "tm": 155.6
+  },
+  {
+   "id": "401920702",
+   "sport": "cbb",
+   "kick": "2026-11-04T01:00:00Z",
+   "home": "Iowa",
+   "away": "Lipscomb",
+   "mk": "total",
+   "side": "over",
+   "line": 146.5,
+   "price": -106.0,
+   "edge": 0.3,
+   "x": null,
+   "why": "total market off",
+   "m": 20.3,
+   "tm": 146.8
   }
  ],
  "games": {
@@ -797,16 +787,16 @@
    "state": "under"
   },
   "401920702": {
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": 104.0,
-   "edge": 2.2,
+   "mk": "total",
+   "side": "over",
+   "line": 146.5,
+   "price": -106.0,
+   "edge": 0.3,
    "ev": null,
    "units": 0.0,
    "home": "Iowa",
    "away": "Lipscomb",
-   "state": "under"
+   "state": "off"
   },
   "401920422": {
    "mk": "spread",
@@ -836,13 +826,13 @@
    "mk": "spread",
    "side": "away",
    "line": 33.5,
-   "price": -106.0,
+   "price": -104.0,
+   "ev": 0.034,
    "edge": 3.3,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "Kentucky",
    "away": "Manhattan",
-   "state": "under"
+   "state": "pick"
   },
   "401921819": {
    "mk": "spread",
@@ -1065,7 +1055,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4035,
+  "snapshots": 4041,
   "buckets": [
    {
     "when": "24h+",
@@ -1078,12 +1068,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 559,
-    "clvRet": -0.0397,
-    "clvT": -8.2,
-    "clv": 0.13,
-    "beat": 0.275,
-    "still": 0.408
+    "clvN": 562,
+    "clvRet": -0.0398,
+    "clvT": -8.27,
+    "clv": 0.12,
+    "beat": 0.272,
+    "still": 0.413
    },
    {
     "when": "1-6h",
@@ -7600,8 +7590,7 @@
    "tmRaw": 145.6,
    "flagged": "2026-11-03T13:43:38Z",
    "betTo": 33.0,
-   "close": 33.5,
-   "pass": true
+   "close": 33.5
   },
   {
    "id": "401921808",
@@ -7735,7 +7724,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 19.5,
+    "raw": 19.75,
     "scale": 1.0,
     "down": 16.5
    },
@@ -7744,7 +7733,7 @@
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 21.75,
+    "raw": 15.75,
     "scale": 1.0
    },
    "2026-11-06": {
