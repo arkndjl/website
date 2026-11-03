@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-03T18:47:15Z",
+ "asof": "2026-11-03T18:59:11Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 98.73,
+  "now": 99.13,
   "peak": 118.08,
-  "drawdown": 0.1639,
-  "open": 84.5,
+  "drawdown": 0.1605,
+  "open": 80.5,
   "path": [
    101.5,
    101.6,
@@ -213,25 +213,26 @@
    99.68,
    101.46,
    99.47,
-   98.73
+   98.73,
+   99.13
   ]
  },
  "record": {
-  "n": 256,
+  "n": 255,
   "clvN": 208,
   "clvRet": -0.0345,
   "clvT": -6.98,
   "clv": -0.41,
   "beat": 0.172,
-  "settled": 205,
-  "w": 105,
+  "settled": 206,
+  "w": 106,
   "l": 100,
   "p": 0,
-  "roi": 0.0308,
-  "roiT": 0.42,
-  "profit": -0.62,
-  "risked": 168.5,
-  "yield": -0.0037
+  "roi": 0.0386,
+  "roiT": 0.53,
+  "profit": -0.21,
+  "risked": 168.75,
+  "yield": -0.0013
  },
  "tEff": -6.98,
  "corr": {
@@ -264,7 +265,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +3.1% vs -3.5% (SE 7.3)",
+   "value": "ROI +3.9% vs -3.5% (SE 7.3)",
    "pass": true
   }
  ],
@@ -317,7 +318,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 17,
+   "n": 16,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -533,15 +534,15 @@
    "clvT": -3.45,
    "clv": 0.08,
    "beat": 0.255,
-   "settled": 48,
-   "w": 28,
+   "settled": 49,
+   "w": 29,
    "l": 20,
    "p": 0,
-   "roi": 0.2473,
-   "roiT": 1.45,
-   "profit": 5.79,
-   "risked": 42.5,
-   "yield": 0.1362
+   "roi": 0.2755,
+   "roiT": 1.63,
+   "profit": 6.19,
+   "risked": 42.75,
+   "yield": 0.1449
   },
   {
    "id": "nflprops-prop",
@@ -566,30 +567,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186568",
-   "k": "2026-11-03T15:15:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Yamaguchi",
-   "a": "Kulambayeva",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 163,
-   "bet": "Kulambayeva ML +163",
-   "placed": "2026-11-02T06:55:27Z",
-   "stake": 0.25,
-   "edge": 7.4,
-   "ev": 0.0036,
-   "event": "Chennai Open",
-   "pass": false,
-   "clvRet": -0.0203,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 0.3725
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -866,7 +843,7 @@
    "ev": 0.0442,
    "event": null,
    "pass": false,
-   "close": 26.5
+   "close": 27.5
   },
   {
    "rule": "cbb-spread",
@@ -886,8 +863,8 @@
    "edge": 3.7,
    "ev": 0.0053,
    "event": null,
-   "pass": true,
-   "close": 42.5
+   "pass": false,
+   "close": 41.5
   },
   {
    "rule": "cbb-spread",
@@ -928,7 +905,7 @@
    "edge": 4.1,
    "ev": 0.0177,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 20.5
   },
   {
@@ -1220,7 +1197,7 @@
    "ev": 0.0565,
    "event": null,
    "pass": false,
-   "close": 41.5
+   "close": 40.5
   },
   {
    "rule": "nflprops-prop",
@@ -1321,8 +1298,8 @@
    "edge": 7.0,
    "ev": 0.0254,
    "event": null,
-   "pass": false,
-   "close": 38.5
+   "pass": true,
+   "close": 37.5
   },
   {
    "rule": "cfb-total",
@@ -2121,6 +2098,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186568",
+   "k": "2026-11-03T15:15:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Yamaguchi",
+   "a": "Kulambayeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 163,
+   "bet": "Kulambayeva ML +163",
+   "placed": "2026-11-02T06:55:27Z",
+   "stake": 0.25,
+   "edge": 7.4,
+   "ev": 0.0036,
+   "event": "Chennai Open",
+   "pass": false,
+   "clvRet": -0.0203,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.3725,
+   "score": "6-4 7-5",
+   "res": "w",
+   "ret": 1.63,
+   "profit": 0.4075
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3888,32 +3893,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873036-4597703-rc",
-   "k": "2026-11-03T01:15:00Z",
-   "slate": "nflprops:2026-11-02",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 1.5,
-   "price": 133.0,
-   "bet": "Tory Horton under 1.5 rec +133",
-   "placed": "2026-10-31T11:16:00Z",
-   "stake": 3.75,
-   "edge": 15.3,
-   "ev": 0.3118,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0724,
-   "close": 1.5,
-   "score": 3.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -3.75
   }
  ],
  "ledger": [
@@ -12553,7 +12532,11 @@
    "clvRet": -0.0203,
    "clv": 0.0,
    "beat": 0,
-   "close": 0.3725
+   "close": 0.3725,
+   "score": "6-4 7-5",
+   "res": "w",
+   "ret": 1.63,
+   "profit": 0.4075
   },
   {
    "rule": "tennis-ml",
@@ -12831,7 +12814,7 @@
    "ev": 0.0442,
    "event": null,
    "pass": false,
-   "close": 26.5
+   "close": 27.5
   },
   {
    "rule": "cbb-spread",
@@ -12851,8 +12834,8 @@
    "edge": 3.7,
    "ev": 0.0053,
    "event": null,
-   "pass": true,
-   "close": 42.5
+   "pass": false,
+   "close": 41.5
   },
   {
    "rule": "cbb-spread",
@@ -12893,7 +12876,7 @@
    "edge": 4.1,
    "ev": 0.0177,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 20.5
   },
   {
@@ -13185,7 +13168,7 @@
    "ev": 0.0565,
    "event": null,
    "pass": false,
-   "close": 41.5
+   "close": 40.5
   },
   {
    "rule": "nflprops-prop",
@@ -13286,8 +13269,8 @@
    "edge": 7.0,
    "ev": 0.0254,
    "event": null,
-   "pass": false,
-   "close": 38.5
+   "pass": true,
+   "close": 37.5
   },
   {
    "rule": "cfb-total",
