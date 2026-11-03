@@ -247,7 +247,7 @@
      "short": "Projected RWA over the next year against tier-1 starters, 20-80 (50 = average tier-1 starter).",
      "body": [
       "Prospect = under 20 maps at S-tier events. Projection: rating, age, share of last year's rounds at S/A-tier events.",
-      "S/A share is negative: the same rating against weaker fields holds up better (held t -4.7). Rise and every stat line failed.",
+      "S/A share is negative on top of the rating's tier lift (held t -4.9). Rise and every stat line failed.",
       "Quarterly cutoffs, fit 2024-25, held out from Jul 2025; a term ships only past the Bonferroni cut of its batch.",
       "Badges (top 25% on a stat) tested on prospects and the main board: none passed, so CS2 shows none."
      ],
@@ -606,7 +606,8 @@
      "body": [
       "Box: team round share on its five per-round stat lines (kills, deaths, assists, ADR, KAST, openings, trades,",
       "multi-kills, clutches, headshots). Plus-minus: half the round share the box misses, split across the five.",
-      "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink. Held out R2 .125 vs .120 Nov 2, .104 K-D."
+      "Tier lift: +0.5 x share of last year's rounds at S/A-tier events (low-tier pools link to the top through few maps).",
+      "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink. Held out R2 .131 vs .120 Nov 2, .108 K-D."
      ],
      "where": "Counter-Strike players, prospects, player model",
      "sports": [
@@ -2119,7 +2120,7 @@
   },
   {
    "board": "Soccer prospects",
-   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,692 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
+   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,650 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -2139,63 +2140,63 @@
      "75",
      "peak GAR a season GK 20.0 / D 14.9 / M 15.9 / F 15.0",
      "the best of a birth year at the position",
-     "1 of 30,692 (<0.01%)",
+     "1 of 30,650 (<0.01%)",
      "-"
     ],
     [
      "70",
      "peak GAR a season GK 15.2 / D 13.0 / M 14.0 / F 13.4",
      "top 3 of a birth year at the position",
-     "1 of 30,692 (<0.01%)",
+     "1 of 30,650 (<0.01%)",
      "70-74: 71.8 -> 66.1 (n 6, 50+ 100%)"
     ],
     [
      "65",
      "peak GAR a season GK 11.4 / D 11.8 / M 11.6 / F 10.6",
      "top 8 at the position",
-     "1 of 30,692 (<0.01%)",
+     "1 of 30,650 (<0.01%)",
      "65-69: 67.4 -> 66.6 (n 12, 50+ 100%)"
     ],
     [
      "60",
      "peak GAR a season GK 10.0 / D 10.2 / M 9.3 / F 8.8",
      "top 20 at the position",
-     "14 of 30,692 (0.05%)",
+     "14 of 30,650 (0.05%)",
      "60-64: 61.8 -> 62.2 (n 64, 50+ 94%)"
     ],
     [
      "55",
      "peak GAR a season GK 6.9 / D 8.4 / M 7.4 / F 7.2",
      "top 45 at the position",
-     "30 of 30,692 (0.10%)",
+     "29 of 30,650 (0.09%)",
      "55-59: 57.7 -> 57.9 (n 143, 50+ 85%)"
     ],
     [
      "50",
      "peak GAR a season GK 5.4 / D 6.7 / M 5.6 / F 5.6",
      "top 90 (big-five regular) at the position",
-     "80 of 30,692 (0.26%)",
+     "80 of 30,650 (0.26%)",
      "50-54: 51.9 -> 51.7 (n 273, 50+ 61%)"
     ],
     [
      "45",
      "peak GAR a season GK 4.0 / D 5.4 / M 4.4 / F 4.5",
      "top 150 at the position",
-     "186 of 30,692 (0.61%)",
+     "185 of 30,650 (0.60%)",
      "45-49: 47.8 -> 47.9 (n 730, 50+ 46%)"
     ],
     [
      "40",
      "peak GAR a season GK 2.9 / D 4.3 / M 3.4 / F 3.4",
      "top 250 (top-flight regular) at the position",
-     "459 of 30,692 (1.5%)",
+     "458 of 30,650 (1.5%)",
      "40-44: 41.9 -> 41.7 (n 1480, 50+ 26%)"
     ],
     [
      "30",
      "some senior value",
      "-",
-     "1,775 of 30,692 (5.8%)",
+     "1,776 of 30,650 (5.8%)",
      "30-34: 32.2 -> 32.2 (n 5208, 50+ 7%)"
     ],
     [
