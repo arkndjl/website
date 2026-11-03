@@ -1,12 +1,13 @@
 {{- /* Rookie / first-year leaderboard, one per section: {{< rookies sport="nba" title="rookies :: ..." tab="rookies" >}}.
-       Data: static/data/rookies/<sport>.json (scripts/rookies.py), fetched the first time the tab is on screen. The file
+       Data: static/data/rookies/<sport>.json (scripts/rookies.py), or src="data/..." for another table in the same
+       shape (the CBB stats, WAR, breakouts, top performers, draft board and portal tabs, scripts/cbb_tabs.py), fetched the first time the tab is on screen. The file
        names the columns, the views (the number the board ranks by), the pre-draft (or pre-arrival) grade and who counts
        as a rookie, so one renderer serves NFL, NBA, NHL, soccer, CFB, CBB, hockey prospects and soccer prospects.
        Pre / Δ: Δ = rank by the pre-draft order (pick, recruiting rank, expected slot) minus rank by the view's number,
        both among the rows shown that have one: + = playing above where he was picked. Rows carry a photo (ph) and team logo (lo) where the section has one. Phones keep rank, player,
        the ranked number, the pre-draft grade and Δ. */ -}}
 {{- $sport := .Get "sport" -}}
-<div class="win cfb nbaxpm rookies"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rookies {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ printf "data/rookies/%s.json" $sport | relURL }}" data-sport="{{ $sport }}" data-gfx-cols="RK,Player">
+<div class="win cfb nbaxpm rookies"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rookies {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ .Get "src" | default (printf "data/rookies/%s.json" $sport) | relURL }}" data-sport="{{ $sport }}" data-gfx-cols="RK,Player">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "trophy" }}"/></svg>{{ .Get "title" | default "rookies.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -39,6 +40,9 @@
 </div>
 <script>
 (function () {
+  // one copy runs per page; it sets up every rookies-shaped window now and again when a lazy tab is filled (ark:lazy)
+  if (window.__arkRookies) return; window.__arkRookies = true;
+  function init() {
   [].forEach.call(document.querySelectorAll('[data-rookies]'), function (win) {
     if (win.dataset.ready) return; win.dataset.ready = 1;
     var $ = function (s) { return win.querySelector(s); };
@@ -93,14 +97,15 @@
     function render() {
       if (!D) return;
       var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, S = season(),
-          mk = D.min && D.min.k, mv = D.min ? +(e.min.value || 0) : 0, C = cols(), key = view;
+          mk = D.min && D.min.k, mv = D.min ? +(e.min.value || 0) : 0, C = cols(), key = view,
+          lo = D.cols.some(function (c) { return c.k === key && c.lo; });   // lo: lower is better (a mock slot, a rank)
       var list = S.rows.filter(function (r) {
         if (mk && (r[mk] || 0) < mv) return false;
         if (pos && r.pos !== pos) return false;
         if (grp && (r.lg || r.div) !== grp) return false;
         if (team && r.tm !== team) return false;
         return true;
-      }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return y - x; });
+      }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return lo ? x - y : y - x; });
       var pr = {};
       list.forEach(function (r, i) { r.rk = i + 1; r.pr = (pr[r.pos] = (pr[r.pos] || 0) + 1); r.dl = null; });
       // Δ: the pre-draft order against the view's order, both among the shown rows that have a pre-draft rank
@@ -145,7 +150,7 @@
     function reset() {
       view = D.key; pos = ''; grp = ''; sortKey = 'rk'; dir = 1; page = 0;
       bar.elements.season.value = String(D.seasons[0].s);
-      if (D.min) bar.elements.min.value = String(D.min.def || 0);
+      minDef();
       teams(); chips();
     }
     function setup() {
@@ -163,7 +168,9 @@
       fetch(win.dataset.src).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { D = d; setup(); })
         .catch(function () { loading.textContent = 'load failed.'; started = false; });
     }
-    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { teams(); chips(); } render(); }
+    // the minutes floor: a season can carry its own default (mdef: low early in a season, higher for a full one)
+    function minDef() { if (D.min) { var m = season().mdef; bar.elements.min.value = String(m != null ? m : (D.min.def || 0)); } }
+    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { teams(); chips(); minDef(); } render(); }
     bar.addEventListener('input', update); bar.addEventListener('change', update);
     bar.addEventListener('reset', function () { setTimeout(function () { if (D) { reset(); render(); } }); });
     chipsEl.addEventListener('click', function (e) {
@@ -186,6 +193,10 @@
       io.observe(win);   // the huge margin: any displayed window counts, only display:none (a closed tab) waits
     } else load();
   });
+  }
+  init();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);   // windows further down the page
+  document.addEventListener('ark:lazy', function () { setTimeout(init, 0); });
 })();
 </script>
 {{- partial "gfx.html" . -}}

@@ -11,9 +11,21 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,true freshmen,ARKLIST|rosters:depth chart,lineups,on/off,backup watch|games:games,game table|teams:ARK Ranking,season odds,tournament odds,development,offense,defense|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,draft board,WAR leaders,stats,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,lineups,on/off,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
+{{< lazytab tab="draft board" >}}
+{{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board :: 2027 draft, predictive mock order" tab="draft board" >}}
+{{< /lazytab >}}
+{{< lazytab tab="WAR leaders" >}}
+{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders :: wins over replacement" tab="WAR leaders" >}}
+{{< /lazytab >}}
+{{< lazytab tab="stats" >}}
+{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats :: season lines, Stat+" tab="stats" >}}
+{{< /lazytab >}}
 {{< rookies sport="cbb" icon="basketball" title="true freshmen :: FV and xBPM against recruiting rank" tab="true freshmen" >}}
+{{< lazytab tab="breakouts" >}}
+{{< rookies sport="cbb" src="data/cbb/breakouts.json" icon="basketball" title="breakout watch :: 1st-2nd yr, over the preseason projection" tab="breakouts" >}}
+{{< /lazytab >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
 {{< backupwatch sport="cbb" title="backup watch :: 2nd/3rd string graded above a starter (FV)" tab="backup watch" >}}
 {{< cbbmock mode="pred" title="predictive mock :: where they go, 2 rounds" tab="predictive mock" >}}
@@ -21,6 +33,9 @@ cover = "/og/college-basketball.png"
 {{< cbbmock mode="conv" title="conviction mock :: slot + what the market misprices, 2 rounds" tab="conviction mock" >}}
 {{< cbbgames title="games" tab="games" >}}
 {{< cbbgametable title="game table" tab="game table" >}}
+{{< lazytab tab="top performers" >}}
+{{< rookies sport="cbb" src="data/cbb/top.json" icon="basketball" title="top performers :: best single games, Game Score" tab="top performers" >}}
+{{< /lazytab >}}
 {{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
 {{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
@@ -42,6 +57,15 @@ cover = "/og/college-basketball.png"
 {{< cbblive title="in season :: this season vs the preseason grade" >}}
 {{< /deskcol >}}
 {{< /desk >}}
+{{< lazytab tab="team talent" >}}
+{{< teamunits sport="cbb" feed="cbb_teamtabs" view="talent" title="team talent :: roster FV against the ARK rating" tab="team talent" >}}
+{{< /lazytab >}}
+{{< lazytab tab="returning" >}}
+{{< teamunits sport="cbb" feed="cbb_teamtabs" view="returning" title="returning :: last season's minutes and WAR back" tab="returning" >}}
+{{< /lazytab >}}
+{{< lazytab tab="portal" >}}
+{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal :: 2026 moves, last season's WAR" tab="portal" >}}
+{{< /lazytab >}}
 {{< lazytab tab="development" >}}
 {{< schooldev sport="cbb" title="development :: college BPM over On3 rank, by school and coach" tab="development" >}}
 {{< /lazytab >}}
