@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T14:48:25Z",
+ "asof": "2026-11-03T15:26:59Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 101.28,
   "peak": 118.08,
   "drawdown": 0.1422,
-  "open": 97.75,
+  "open": 95.0,
   "path": [
    101.5,
    101.6,
@@ -212,7 +212,7 @@
   ]
  },
  "record": {
-  "n": 252,
+  "n": 254,
   "clvN": 207,
   "clvRet": -0.0347,
   "clvT": -6.98,
@@ -312,7 +312,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 19,
+   "n": 18,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -417,7 +417,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 39,
+   "n": 40,
    "clvN": 34,
    "clvRet": -0.0363,
    "clvT": -3.41,
@@ -522,7 +522,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 57,
+   "n": 58,
    "clvN": 50,
    "clvRet": -0.0178,
    "clvT": -3.46,
@@ -543,7 +543,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 37,
+   "n": 38,
    "clvN": 34,
    "clvRet": -0.0163,
    "clvT": -1.11,
@@ -808,7 +808,7 @@
    "ev": 0.0133,
    "event": null,
    "pass": false,
-   "close": 26.5
+   "close": 25.5
   },
   {
    "rule": "cfb-total",
@@ -954,7 +954,7 @@
    "edge": 6.5,
    "ev": 0.0442,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 26.5
   },
   {
@@ -975,8 +975,8 @@
    "edge": 3.7,
    "ev": 0.0053,
    "event": null,
-   "pass": true,
-   "close": 41.5
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cbb-spread",
@@ -996,7 +996,7 @@
    "edge": 4.1,
    "ev": 0.0177,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 21.5
   },
   {
@@ -1120,6 +1120,26 @@
    "stake": 0.25,
    "edge": 6.1,
    "ev": 0.0008,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186632",
+   "k": "2026-11-04T10:30:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Joint",
+   "a": "Sakkari",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 199,
+   "bet": "Joint ML +199",
+   "placed": "2026-11-03T15:26:59Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0033,
    "event": "Prudential Hong Kong Tennis Open",
    "pass": false
   },
@@ -1369,7 +1389,7 @@
    "edge": 7.0,
    "ev": 0.0254,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 38.5
   },
   {
@@ -1495,8 +1515,8 @@
    "edge": 4.2,
    "ev": 0.038,
    "event": null,
-   "pass": false,
-   "close": 54.5
+   "pass": true,
+   "close": 55.5
   },
   {
    "rule": "cfb-ml",
@@ -1831,7 +1851,7 @@
    "edge": 3.2,
    "ev": 0.0052,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 45.5
   },
   {
@@ -1980,6 +2000,26 @@
    "event": null,
    "pass": false,
    "close": -3.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873041-4431280-wy",
+   "k": "2026-11-08T18:00:00Z",
+   "slate": "nflprops:2026-11-08",
+   "h": "CAR",
+   "a": "DEN",
+   "mk": "prop",
+   "side": "over",
+   "line": 9.5,
+   "price": -113.0,
+   "bet": "Troy Franklin over 9.5 rec yds -113",
+   "placed": "2026-11-03T15:26:00Z",
+   "stake": 0.75,
+   "edge": 16.5,
+   "ev": 0.0707,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nfl-total",
@@ -12544,7 +12584,7 @@
    "ev": 0.0133,
    "event": null,
    "pass": false,
-   "close": 26.5
+   "close": 25.5
   },
   {
    "rule": "cfb-total",
@@ -12690,7 +12730,7 @@
    "edge": 6.5,
    "ev": 0.0442,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 26.5
   },
   {
@@ -12711,8 +12751,8 @@
    "edge": 3.7,
    "ev": 0.0053,
    "event": null,
-   "pass": true,
-   "close": 41.5
+   "pass": false,
+   "close": 40.5
   },
   {
    "rule": "cbb-spread",
@@ -12732,7 +12772,7 @@
    "edge": 4.1,
    "ev": 0.0177,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 21.5
   },
   {
@@ -12856,6 +12896,26 @@
    "stake": 0.25,
    "edge": 6.1,
    "ev": 0.0008,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186632",
+   "k": "2026-11-04T10:30:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Joint",
+   "a": "Sakkari",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 199,
+   "bet": "Joint ML +199",
+   "placed": "2026-11-03T15:26:59Z",
+   "stake": 0.25,
+   "edge": 4.5,
+   "ev": 0.0033,
    "event": "Prudential Hong Kong Tennis Open",
    "pass": false
   },
@@ -13105,7 +13165,7 @@
    "edge": 7.0,
    "ev": 0.0254,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 38.5
   },
   {
@@ -13231,8 +13291,8 @@
    "edge": 4.2,
    "ev": 0.038,
    "event": null,
-   "pass": false,
-   "close": 54.5
+   "pass": true,
+   "close": 55.5
   },
   {
    "rule": "cfb-ml",
@@ -13567,7 +13627,7 @@
    "edge": 3.2,
    "ev": 0.0052,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 45.5
   },
   {
@@ -13716,6 +13776,26 @@
    "event": null,
    "pass": false,
    "close": -3.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873041-4431280-wy",
+   "k": "2026-11-08T18:00:00Z",
+   "slate": "nflprops:2026-11-08",
+   "h": "CAR",
+   "a": "DEN",
+   "mk": "prop",
+   "side": "over",
+   "line": 9.5,
+   "price": -113.0,
+   "bet": "Troy Franklin over 9.5 rec yds -113",
+   "placed": "2026-11-03T15:26:00Z",
+   "stake": 0.75,
+   "edge": 16.5,
+   "ev": 0.0707,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nfl-total",
