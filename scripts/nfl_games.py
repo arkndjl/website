@@ -108,6 +108,8 @@ FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt', 'ret']
 RET_N0 = 10
 LK_QB, LK_INJ = 0.45, 1.36           # the qb and inj terms' points a unit (fit Oct 2026), for the lineup gap      # epa out Oct 21 2026 (harness re-score)
 TFEATS = ['pts', 'dome', 'one', 'epa', 'tmkt']
+# Nov 3 2026 re-score (harness_rescore.py, totals now in the ledger): total epa held 2021-25 t -1.67 (MAE 10.495 vs
+# 10.538 without), q .048 keep; margin rest tune t +.26, held t -.34 (10.031 vs 10.032 without), 'watch': both stay
 # team renames: one franchise, one rating
 FRANCHISE = {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA'}
 

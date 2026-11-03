@@ -36,6 +36,8 @@ def joint(full, red, y, tune, held, cl, without):
     if not without:
         return {}
     a, b = H.ae(red, y), H.ae(full, y)
+    if np.array_equal(np.nan_to_num(a, nan=-1), np.nan_to_num(b, nan=-1)):     # already out of the shipped model
+        return {'dropped': list(without)}
     side = lambda m: {k: (round(v, 5) if isinstance(v, float) else v) for k, v in H.paired(a[m], b[m], [c[m] for c in cl]).items()}
     return {'dropped': list(without), 'joint': {'tune': side(tune), 'held': side(held),
             'tuneMae': [round(float(b[tune].mean()), 4), round(float(a[tune].mean()), 4)], 'heldMae': [round(float(b[held].mean()), 4), round(float(a[held].mean()), 4)]}}
@@ -88,6 +90,7 @@ def nfl(without=()):
         if r:
             x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
     Dd = [(g, x) for g, x, _ in data if g['home_score'] not in ('', 'NA') and int(g['season']) >= 2012]
+    TXd = [tx for g, _, tx in data if g['home_score'] not in ('', 'NA') and int(g['season']) >= 2012]
     feats = list(G.FEATS)
     X = {f: np.array([x[f] for _, x in Dd], float) for f in feats}
     y = np.array([G.num(g['result']) for g, _ in Dd], float)
@@ -102,6 +105,13 @@ def nfl(without=()):
     keep = [f for f in feats if f not in without]
     red = pr(keep)
     rows = H.drop_one(pr, keep, y, tune, held, cluster=[wk, team], core=('home',), base=red)
+    # the totals model (TFEATS, its own walk-forward OLS on the game total): each input left out the same way
+    TX = {f: np.array([tx[f] for tx in TXd], float) for f in G.TFEATS}
+    ty = np.array([G.num(g['total']) for g, _ in Dd], float)
+    tpr = lambda fs: H.walk_ols(np.column_stack([TX[f] for f in fs]), ty, S, 2015)
+    for r in H.drop_one(tpr, list(G.TFEATS), ty, tune, held, cluster=[wk, team], core=('pts',)):
+        r['term'] = 'total:' + r['term']
+        rows.append(r)
     return {'desc': 'NFL game margin (scripts/nfl_games.py --fit)', 'loss': 'abs margin error', 'split': 'tune 2015-20, held 2021-25',
             'cluster': 'week x home team-season', 'source': 'rebuilt', 'rows': rows, 'check': check,
             **joint(full, red, y, tune, held, [wk, team], without)}
@@ -445,6 +455,80 @@ def cbb_board():
                     'held out (.8890 -> .8904; top-300 corr .518 -> .526): kept together (scripts/cbb_fv_core.py reduce).'}
 
 
+# ---------------------------------------------------------------- tennis match model (scripts/tennis_model.py)
+def tennis():
+    """tennis win chance: the shipped blend (Elo A, points filter B, games rating G, match context CR CA CH CN CM),
+    walk-forward weights on the 3 seasons before each match's season, each input left out of the blend refits"""
+    import tennis_data as T
+    import tennis_model as M
+    F = jload('tennis_fit.json')
+    P = dict(M.DEFAULT, **F['params'])
+    rows, _, _ = T.load()
+    _, rec = M.run(rows, P, score=lambda r: M.scored(r, 2012 - M.WIN, 2100))
+
+    def wf(use):
+        W, out = {}, []
+        for x in rec:
+            y = x[0][0] // 10000
+            if y not in W:
+                win = M.window(rec, y * 10000)
+                W[y] = dict(P, **M.fit_blend(win, use)) if len(win) > 1000 else P
+            out.append(M.blend_p(W[y], x))
+        return np.array(out)
+    S = np.array([x[0][0] // 10000 for x in rec])
+    tid = np.array([f'{x[0][6]}|{x[0][0] // 10000}' for x in rec])
+    one = np.ones(len(rec))
+    tune, held = H.season_masks(S, (2012, 2022), 2023, np.ones(len(rec), bool))
+    terms = list(M.NAMES)
+    pr = lambda fs: wf(tuple(i for i, k in enumerate(M.NAMES) if k in fs))
+    rows_ = H.drop_one(pr, terms, one, tune, held, loss=H.logloss, cluster=[tid], core=('A',))
+    return {'desc': 'Tennis match win chance (scripts/tennis_model.py)', 'loss': 'win log loss', 'split': 'tune 2012-22, held 2023-26',
+            'cluster': 'tournament-season', 'source': 'rebuilt', 'tested': F.get('fit_at'), 'rows': rows_}
+
+
+# ---------------------------------------------------------------- CS2 pro series model (scripts/cs2_model.py, cs2_players.py)
+def cs2():
+    """CS2 series win chance: stored walk-forward paired t (Jul 2024 on, every series scored out of sample; t < 0 helps)
+    from data/cs2_fit.json, cs2_players_fit.json, cs2_gd_series_research.json and cs2_poly.json. All-series t goes in
+    the held slot (it is out of sample); the top-50 t is in the note."""
+    F, PL, GD, PO = jload('cs2_fit.json'), jload('cs2_players_fit.json'), jload('cs2_gd_series_research.json'), jload('cs2_poly.json')
+    sc = {m['name']: m for m in F['score']['all']['models']}
+    sc50 = {m['name']: m for m in F['score']['top50']['models']}
+    n = F['score']['all']['n']
+    g, v = PL['game'], GD['variants']
+    rows = [H.from_t('ark rating', None, sc['ARK rating']['tVrs'], n_held=n, core=True, note='team rating (player Elo + team map Elo) vs VRS alone'),
+            H.from_t('vrs', None, -sc['ARK rating']['tArk'], n_held=n, d_held=sc['ARK rating']['ll'] - sc['ARK + VRS']['ll'],
+                     note=f"Valve points beside the ARK rating; top 50 t {-sc50['ARK rating']['tArk']}"),
+            H.from_t('team map term', None, -sc['ARK + VRS without the team map term']['tArk'], n_held=n,
+                     d_held=sc['ARK + VRS without the team map term']['ll'] - sc['ARK + VRS']['ll'],
+                     note=f"bo3 map Elo with map offsets; top 50 t {-sc50['ARK + VRS without the team map term']['tArk']}"),
+            H.from_t('player term', None, g['all']['t'], n_held=g['all']['n'], d_held=round(g['all']['ll0'] - g['all']['ll1'], 5),
+                     note=f"RWA player rating in the series logit (PR #721); top 50 t {g['top50']['t']}")]
+    for lab, term in (('no headshots', 'headshots'), ('no plus-minus', 'plus-minus'), ('no tier lift', 'tier lift'), ('no damage taken', 'damage taken')):
+        r = v[lab]
+        rows.append(H.from_t(term, None, r['t'], n_held=GD['n'], d_held=round(r['ll'] - v['shipped']['ll'], 5),
+                             note=f"player rating input (PR #724), series log loss without it; top 50 t {r['tTop50']}"))
+    t = PO['tiers']['rest']
+    rows.append(H.from_t('polymarket blend', None, t['t'], n_held=t['nHeld'], d_held=round(t['llModel'] - t['llBlend'], 5),
+                         note=f"blend with the Polymarket price 1 h before, outside the top 50 (top 50 t {PO['tiers']['top']['t']}, not used there)"))
+    return {'desc': 'CS2 series win chance (scripts/cs2_model.py)', 'loss': 'series log loss', 'split': 'walk forward Jul 2024 on (stored t)',
+            'cluster': 'none (stored t)', 'source': 'stored', 'tested': F.get('asof') or PL.get('held', [None, None])[1], 'rows': rows}
+
+
+# ---------------------------------------------------------------- ESEA match preview (scripts/fetch_esea.mjs)
+def esea():
+    """ESEA league preview (1NT): stored held-out t from PR #428 (S59 leave-one-day-out, 149 matches) and
+    scripts/esea_ark_research.py (S53-S59 league maps, held after the cut); t < 0 helps"""
+    R = jload('esea_research.json')['live_s59']
+    rows = [H.from_t('faceit elo', None, R['elo']['vs_power_t'], n_held=R['n'], core=True,
+                     note=f"top-five FACEIT elo, log loss {R['elo']['logloss']} vs old power {R['power']['logloss']}"),
+            H.from_t('talent', None, -1.81, n_held=R['n'], note='elo .80 + talent .20 vs the old four-part blend, .575 vs .595 (fetch_esea.mjs PREVIEW_W)'),
+            H.from_t('map veto', None, -3.96, note='players\' lifetime FACEIT map split, shrunk n/(n+50), coef 1.18 (map win log loss vs map-blind)'),
+            H.from_t('ark stability', -2.06, -2.58, note='ARK totals regressed by split-half stability (ARK_STAB), next-map log loss .638 vs .654')]
+    return {'desc': 'ESEA match preview and ARK (scripts/fetch_esea.mjs)', 'loss': 'match / map log loss', 'split': 'S59 leave-one-day-out; maps after the S58 cut',
+            'cluster': 'none (stored t)', 'source': 'stored', 'tested': '2026-10-26', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
@@ -452,9 +536,10 @@ DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'pri
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
             'lineup_adj': lineup_adj, 'control': control, 'luck': luck, 'nhl_games': nhl_games, 'soccer_games': soccer_games,
             'hockey_fv': hockey_fv, 'soccer_fv': soccer_fv, 'nhl_war': nhl_war, 'soccer_gar': soccer_gar, 'cfb_recruit_nfl': cfb_recruit_nfl,
-            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer, 'cfb_landing': cfb_landing, 'cbb_board': cbb_board}
+            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer, 'cfb_landing': cfb_landing, 'cbb_board': cbb_board,
+            'tennis': tennis, 'cs2': cs2, 'esea': esea}
 STORED = ('cfb_roster', 'cfb_recruit', 'nfl_roster', 'cfb_games', 'lineup_adj', 'control', 'luck', 'nhl_games', 'soccer_games', 'hockey_fv',
-          'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp', 'cfb_landing')
+          'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp', 'cfb_landing', 'cs2', 'esea')
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
 PENDING = {'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)',
