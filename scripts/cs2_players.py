@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FIT = ROOT / "data" / "cs2_players_fit.json"
 OUT = ROOT / "data" / "cs2_players.json"
 FEES = ROOT / "data" / "cs2_fees.json"
-STATS = ["k", "d", "a", "adr", "kast", "fk", "fd", "tk", "td", "mk", "cl", "hs"]  # hs added Nov 3 (held t -10.4)
+STATS = ["k", "d", "a", "adr", "kast", "fk", "fd", "tk", "td", "mk", "cl", "hs", "gd"]  # Nov 3: hs (t -10.4), damage taken (t -6.8)
 TIER = {"s": 1, "a": 2, "b": 3, "c": 4, "d": 5}
 T1_MAPS = 20
 
@@ -89,7 +89,8 @@ class Maps:
                     G.append(gi), P.append(r[1]), S.append(side), D.append(ordd(gg[2]))
                     TM.append(tid)
                     X.append([r[3] / R, r[4] / R, r[5] / R, r[12] / 1000,
-                              r[11] / 1000, r[7] / R, r[8] / R, r[9] / R, r[10] / R, r[15] / R, r[14] / R, r[6] / R])
+                              r[11] / 1000, r[7] / R, r[8] / R, r[9] / R, r[10] / R, r[15] / R, r[14] / R, r[6] / R,
+                              (r[17] if len(r) > 17 else 0) / 100 / R])
                     TR.append(tier)
                     NICK[r[1]] = r[16]
         self.games = games
@@ -297,14 +298,18 @@ def fit():
     out = {"beta": dict(zip(STATS, [round(float(b), 4) for b in beta])), "mline": [round(float(x), 5) for x in ml],
            "r2": round(r2, 3), "params": best, "tune": list(TUNE), "held": [HELD[0], last.isoformat()]}
     # held out: ours vs alternatives (each with its own a fit on tune), paired t on per-map squared error
-    j11 = [STATS.index(x) for x in STATS if x != "hs"]
+    j11 = [STATS.index(x) for x in STATS if x not in ("hs", "gd")]
     X0 = M.X
     M.X = X0[:, j11]
     b11, m11, _ = stat_weights(M, tune_g)
     c_old = contributions(M, b11, m11)
+    M.X = X0[:, :-1]
+    b12, m12, _ = stat_weights(M, tune_g)
+    c_nogd = contributions(M, b12, m12, best["pm"])
     M.X = X0
     alts = {"ARK player rating": (c, best),
-            "Nov 2 rating (no headshots, no plus-minus)": (c_old, dict(DEF, h=180, k=50, opp=1.0)),
+            "Nov 2 rating (no headshots, damage taken, plus-minus or tier lift)": (c_old, dict(DEF, h=180, k=50, opp=1.0)),
+            "no damage taken": (c_nogd, best),
             "no plus-minus": (cs[0.0], dict(best, pm=0.0)),
             "no tier lift": (c, dict(best, ssg=0.0)),
             "no opponent credit": (c, dict(best, opp=0.0)),

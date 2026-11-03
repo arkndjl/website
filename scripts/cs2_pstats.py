@@ -29,8 +29,9 @@ DIR = ROOT / "scripts" / "data" / "cs2_pstats"
 PDIR = ROOT / "scripts" / "data" / "cs2_pdir.json.gz"
 START = "2024-01-01"
 # one row per player per map: game, player id, team id, kills, deaths, assists, headshots, first kills, first deaths,
-# trade kills, traded deaths, KAST x1000, ADR x10, bo3 rating x100, clutches, 3k+ rounds, nickname
-COLS = ["g", "p", "t", "k", "d", "a", "hs", "fk", "fd", "tk", "td", "kast", "adr", "rt", "cl", "mk", "nick"]
+# trade kills, traded deaths, KAST x1000, ADR x10, bo3 rating x100, clutches, 3k+ rounds, nickname, damage taken (Nov 3),
+# utility $ bought (Nov 3)
+COLS = ["g", "p", "t", "k", "d", "a", "hs", "fk", "fd", "tk", "td", "kast", "adr", "rt", "cl", "mk", "nick", "gd", "ut"]
 
 
 def get(path):
@@ -58,7 +59,8 @@ def row(x):
             x.get("headshots") or 0, x.get("first_kills") or 0, x.get("first_death") or 0, x.get("trade_kills") or 0,
             x.get("trade_death") or 0, round((x.get("kast") or 0) * 1000), round((x.get("adr") or 0) * 10),
             round((x.get("player_rating") or 0) * 100), x.get("clutches") or 0,
-            sum(int(v or 0) for k, v in mk.items() if k in ("3", "4", "5")), pl.get("nickname") or sp.get("nickname")]
+            sum(int(v or 0) for k, v in mk.items() if k in ("3", "4", "5")), pl.get("nickname") or sp.get("nickname"),
+            x.get("got_damage") or 0, x.get("utility_value") or 0]
 
 
 def shard(month):

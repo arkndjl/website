@@ -416,7 +416,7 @@ LABEL = {"k": "kills", "d": "deaths", "a": "assists", "adr": "damage", "kast": "
          "cl": "clutches", "hsk": "headshot %", "okd": "opening kills - deaths", "s_share": "S/A-tier share",
          "tier": "mean event tier", "mates": "teammates' rating", "logr": "rounds played", "joint": "forward-selected set",
          "grid": "half-life / shrink grid", "hs": "headshots", "pm": "plus-minus", "tierw": "event-tier weights",
-         "daily": "rating as of the series day", "star": "best player - mean", "rest": "days of rest"}
+         "daily": "rating as of the series day", "star": "best player - mean", "rest": "days of rest", "all three": "utility $ + damage taken + accuracy"}
 
 
 def label(k):
@@ -431,6 +431,48 @@ def label(k):
     return pre + LABEL.get(nm.removeprefix("z_"), nm.removeprefix("z_"))
 
 
+def utility(M):
+    """Utility and other bo3.gg fields not in the stat lines (pulled to scripts/.cache/cs2_util.json.gz): utility $
+    bought per round, damage taken per round, accuracy (hits / shots). Each added to the stat lines on its own and all
+    three together; shipped rating settings; held-out paired t on per-map squared error."""
+    U = json.load(gzip.open(ROOT / "scripts" / ".cache" / "cs2_util.json.gz", "rt"))
+    look = {}
+    for g, rows in U.items():
+        for r in rows:
+            if r[0] is not None:
+                look[(int(g), int(r[0]))] = r[1:]
+    gids = np.array([g[0] for g in M.games])[M.g]
+    V = np.array([look.get((int(g), int(p)), [None] * 6) for g, p in zip(gids, M.p_raw)], dtype=object)
+    have = np.array([v[0] is not None for v in V])
+    f = lambda j: np.array([float(v[j] or 0) for v in V])  # noqa: E731
+    cols = {"utility $ per round": f(0) / 1000 / M.R, "damage taken per round": f(1) / 100 / M.R,
+            "accuracy": f(2) / np.maximum(f(3), 1)}
+    print("utility coverage", round(float(have.mean()), 3), file=sys.stderr)
+    fj = json.loads(P.FIT.read_text())
+    p = fj["params"]
+    last = dt.date.fromordinal(int(M.gd.max()))
+    tm, hm = P.months(*P.TUNE, last), P.months(*P.HELD, last)
+    tune_g = M.gd < P.ordd(P.TUNE[1])
+    X0 = M.X
+
+    def run(extra):
+        M.X = np.column_stack([X0] + extra) if extra else X0
+        b, ml, _ = P.stat_weights(M, tune_g)
+        c = P.contributions(M, b, ml, p["pm"])
+        q = dict(p)
+        q["a"] = P.fit_scale(M, c, q, tm[::2])
+        e = P.map_sq(M, c, q, hm)
+        M.X = X0
+        return e, [round(float(x), 4) for x in b[len(P.STATS):]]
+    e0, _ = run([])
+    out = {"coverage": round(float(have.mean()), 3)}
+    for nm, v in list(cols.items()) + [("all three", None)]:
+        e, b = run(list(cols.values()) if v is None else [v])
+        out[nm] = {"t": tstat(e - e0), "beta": b, "dr2": round(float((e0.mean() - e.mean()) / (e0.mean() + 1e-12)), 4)}
+        print(nm, out[nm], file=sys.stderr)
+    RES["utility"] = out
+
+
 def bonferroni():
     tests = []
     for nm, v in (RES.get("rating") or {}).items():
@@ -442,6 +484,9 @@ def bonferroni():
     for nm, v in (RES.get("badges") or {}).items():
         if nm != "base":
             tests.append(("board badge " + nm, v["t"]))
+    for nm, v in (RES.get("utility") or {}).items():
+        if nm != "coverage":
+            tests.append(("rating " + nm, v["t"]))
     for nm, v in (RES.get("confirm") or {}).items():
         tests.append((nm, v))
     for nm, v in (RES.get("game") or {}).items():
@@ -467,8 +512,8 @@ if __name__ == "__main__":
     RES = json.loads(OUT.read_text())
     # the shipped versions, re-scored by scripts/cs2_players.py --fit (data/cs2_players_fit.json)
     fj = json.loads(P.FIT.read_text())
-    RES["confirm"] = {"rating: headshots + plus-minus vs Nov 2": -next(x["t"] for x in fj["score"] if x["name"].startswith("Nov 2")),
+    RES.setdefault("confirm", {}).update({"rating: headshots + plus-minus vs Nov 2": -next(x["t"] for x in fj["score"] if x["name"].startswith("Nov 2")),
                       "prospects: S/A share on the new rating": fj["prospects"]["models"]["rating + age + S/A share"]["tTerm"],
-                      "T1%: S/A share": fj["prospects"]["reach"]["tShare"]}
+                      "T1%: S/A share": fj["prospects"]["reach"]["tShare"]})
     bonferroni()
     OUT.write_text(json.dumps(RES, indent=1, default=float))
