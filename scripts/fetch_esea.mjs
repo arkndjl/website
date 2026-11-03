@@ -8,6 +8,7 @@
 //   FACEIT_API_KEY=... node scripts/fetch_esea.mjs            # season from data/esea.json or ESEA_SEASON (59)
 //   FACEIT_API_KEY=... ESEA_SEASON=60 node scripts/fetch_esea.mjs
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -996,6 +997,65 @@ function pairUp(ours, theirs) {
     return { us: side(u), them: side(t), edge: u?.talent && t?.talent ? Math.round((u.talent.exact - t.talent.exact) * 100) / 100 : null,
       stat: k ? k.replace('Plus', '+').replace('awp', 'AWP').replace(/^./, c => c.toUpperCase()) : null, statUs: a ?? null, statThem: b ?? null, statEdge: a != null && b != null ? a - b : null }; });
 }
+// ESEA player Elo on round share (scripts/esea_standin_research.py, Nov 3 2026; the pro method of
+// scripts/cs2_model.py ported to league maps): a team is the mean of the five who play, every map moves each
+// player by K x (score - expected), score = .5 + (round share - .5) / span / 2, K = Kmin + (K - Kmin) e^(-maps/n0),
+// new players start at their division's level - 100. Played forward over research/esea_matches.json.gz
+// (S53-S59) and this season's cached maps. Held S58-S59 with FACEIT level of the five: log loss .6485 ->
+// .6105 (t -9.3, n 1,860); S59 holdout t -4.3; on the page's own S59 inputs (n 154, leave-one-day-out)
+// .588 -> .558. Blend: .75 x the elo/talent log-odds + 4.8 x the player Elo gap / 400.
+// Stand-in term (C1) failed out of sample: the stand-in's own rating carries his cost.
+const PELO = { K: 128, Kmin: 26, n0: 50, span: 0.5, muNew: -100, gap: 100, a: 0.75, b: 4.8 };
+const PELO_DIV = { 'open9-10': -2, 'open1-8': -2, open: -2, intermediate: -1, main: 0, advanced: 1 };
+let peloMemo = null;
+function playerElo() {
+  if (peloMemo) return peloMemo;
+  const r = new Map(), n = new Map(), games = [];
+  let arch = null; try { arch = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, 'research', 'esea_matches.json.gz')))); } catch { arch = null; }
+  const seen = new Set();
+  for (const m of arch?.matches || []) {
+    if (!m.at || !['faction1', 'faction2'].includes(m.winner)) continue;
+    const maps = (m.maps || []).filter(mp => mp.s1 != null && mp.s2 != null && mp.p1?.length && mp.p2?.length);
+    if (!maps.length) continue;
+    seen.add(m.id);
+    games.push({ at: m.at, dr: PELO_DIV[String(m.div).toLowerCase()] ?? 0, maps: maps.map(mp => ({ a: mp.p1.map(x => x[0]), b: mp.p2.map(x => x[0]), s1: mp.s1, s2: mp.s2 })) });
+  }
+  // this season's finished league maps from the run's cache (per-map player lines: [.., rf, ra, nick, id])
+  const dr = PELO_DIV[String(myDiv || '').split(/\s+/)[0]] ?? 0;
+  for (const m of allM) {
+    if (m.status !== 'FINISHED' || seen.has(m.match_id)) continue;
+    const L = rcache.P?.[m.match_id], A = m.teams?.faction1?.faction_id, B = m.teams?.faction2?.faction_id;
+    if (!L || !L[A] || !L[B]) continue;
+    const maps = [];
+    for (let i = 0; i < Math.min(L[A].length, L[B].length); i++) {
+      const la = L[A][i] || [], lb = L[B][i] || [];
+      if (!la.length || !lb.length) continue;
+      maps.push({ a: la.map(x => x[20]).filter(Boolean), b: lb.map(x => x[20]).filter(Boolean), s1: la[0][17], s2: la[0][18] });
+    }
+    if (maps.length) { seen.add(m.match_id); games.push({ at: m.started_at || m.finished_at || 0, dr, maps }); }
+  }
+  games.sort((x, y) => x.at - y.at);
+  const get = (q, g) => { if (!r.has(q)) r.set(q, PELO.gap * g.dr + PELO.muNew); return r.get(q); };
+  const team = (ids, g) => ids.reduce((s, q) => s + get(q, g), 0) / (ids.length || 1);
+  for (const g of games) for (const mp of g.maps) {
+    if (!mp.a.length || !mp.b.length) continue;
+    const e = 1 / (1 + 10 ** (-(team(mp.a, g) - team(mp.b, g)) / 400));
+    const rs = mp.s1 / ((mp.s1 + mp.s2) || 24), sc = Math.min(1, Math.max(0, (rs - 0.5) / PELO.span * 0.5 + 0.5));
+    for (const [ids, sg] of [[mp.a, 1], [mp.b, -1]]) for (const q of ids) {
+      const k = PELO.Kmin + (PELO.K - PELO.Kmin) * Math.exp(-(n.get(q) || 0) / PELO.n0);
+      r.set(q, get(q, g) + sg * k * (sc - e));
+    }
+    for (const q of [...mp.a, ...mp.b]) n.set(q, (n.get(q) || 0) + 1);
+  }
+  peloMemo = { r, n, maps: games.reduce((s, g) => s + g.maps.length, 0), dr };
+  return peloMemo;
+}
+// a five's player Elo (players with no league maps start at the division level - 100)
+function fiveElo(ids) {
+  const P = playerElo(); if (!P.maps || !ids.length) return null;
+  const v = ids.map(q => (P.r.has(q) ? P.r.get(q) : PELO.gap * P.dr + PELO.muNew));
+  return { elo: Math.round(v.reduce((a, x) => a + x, 0) / v.length), each: Object.fromEntries(ids.map((q, i) => [q, { elo: Math.round(v[i]), maps: P.n.get(q) || 0 }])) };
+}
 const PREVIEW_W = { elo: 0.80, rating: 0.20, map: 0, matchup: 0 };
 async function preview(nx) {
   if (!nx?.opp?.id) return null;
@@ -1091,7 +1151,13 @@ async function preview(nx) {
   const parts = [{ k: 'elo', w: PREVIEW_W.elo, p: pElo }];
   if (ourT != null && theirT != null) parts.push({ k: 'rating', w: PREVIEW_W.rating, p: ex((ourT - theirT) * 0.48) });
   if (muZ != null) parts.push({ k: 'matchup', w: PREVIEW_W.matchup, p: ex(muZ * 0.3) });
-  const W = parts.reduce((a, x) => a + x.w, 0) || 1, pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
+  const W = parts.reduce((a, x) => a + x.w, 0) || 1, pFace = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
+  // ESEA player Elo of the two fives (ours: the match lineup or starters; theirs: who plays their maps)
+  let peUs = null, peThem = null;
+  try { peUs = fiveElo(five.map(r => r.id).filter(Boolean)); peThem = fiveElo(theirFive.map(r => r.id).filter(Boolean)); } catch (e) { console.log('player elo:', e.message); }
+  const peGap = peUs && peThem && five.length >= 4 && theirFive.length >= 4 ? peUs.elo - peThem.elo : null;
+  const pPelo = peGap != null ? ex(PELO.b * peGap / 400) : null;
+  const pAll = pPelo != null ? ex(PELO.a * lg(Math.min(0.97, Math.max(0.03, pFace))) + PELO.b * peGap / 400) : pFace;
   // ---- maps: each five's lifetime map deviations (see mapDevs), the map win chance around pAll
   const devsOf = async rs => Promise.all(rs.map(r => mapDevs(r.id)));
   const [dUs, dThem] = await Promise.all([devsOf(five), devsOf(theirFive)]);
@@ -1131,8 +1197,10 @@ async function preview(nx) {
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
-    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
-    w: Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100)])),
+    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
+    w: { ...Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100 * (pPelo != null ? PELO.a : 1))])), pelo: pPelo != null ? 100 : 0 },
+    pelo: peGap != null ? { us: peUs.elo, them: peThem.elo, gap: peGap, five: five.map(r => [r.nickname, peUs.each[r.id]?.elo ?? null, peUs.each[r.id]?.maps ?? 0]),
+      theirFive: theirFive.map(r => [r.nickname, peThem.each[r.id]?.elo ?? null, peThem.each[r.id]?.maps ?? 0]) } : null,
     lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, mapK: MAP_K, mapCoef: MAP_COEF };
 }
 
