@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T19:05:25Z",
+ "asof": "2026-11-03T19:20:36Z",
  "recenter": {
-  "2026-11-03": -12.84
+  "2026-11-03": -12.83
  },
  "monitor": {
   "clocks": {
@@ -203,9 +203,9 @@
     "mk": "spread",
     "side": "away",
     "line": 27.5,
-    "price": -106.0,
-    "ev": 0.105,
-    "units": 3.0
+    "price": -108.0,
+    "ev": 0.095,
+    "units": 2.0
    }
   },
   {
@@ -286,8 +286,14 @@
    "flagged": "2026-11-03T10:49:52Z",
    "betTo": 20.0,
    "close": 20.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "spread",
+    "side": "away",
+    "line": 20.5,
+    "price": -100.0,
+    "ev": 0.054,
+    "units": 2.25
+   }
   },
   {
    "id": "401920422",
@@ -317,9 +323,9 @@
     "mk": "spread",
     "side": "away",
     "line": 31.5,
-    "price": -111.0,
-    "ev": 0.075,
-    "units": 0.25
+    "price": -104.0,
+    "ev": 0.11,
+    "units": 3.5
    }
   },
   {
@@ -412,8 +418,8 @@
    "flagged": "2026-11-03T13:02:58Z",
    "betTo": 39.5,
    "close": 42.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401920806",
@@ -443,9 +449,9 @@
     "mk": "spread",
     "side": "away",
     "line": 31.5,
-    "price": 102.0,
-    "ev": 0.053,
-    "units": 2.0
+    "price": -102.0,
+    "ev": 0.033,
+    "units": 0.5
    }
   },
   {
@@ -599,10 +605,10 @@
    "mk": "spread",
    "side": "away",
    "line": 42.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 5.7,
    "x": 2.5,
-   "why": "no edge at -111",
+   "why": "no edge at -113",
    "m": 36.8,
    "tm": 168.7
   },
@@ -623,20 +629,20 @@
    "tm": 145.9
   },
   {
-   "id": "401924911",
+   "id": "401920376",
    "sport": "cbb",
-   "kick": "2026-11-04T03:00:00Z",
-   "home": "UNLV",
-   "away": "Northern Arizona",
+   "kick": "2026-11-04T00:00:00Z",
+   "home": "Virginia Tech",
+   "away": "Coppin State",
    "mk": "spread",
    "side": "away",
-   "line": 20.5,
-   "price": -106.0,
-   "edge": 3.3,
+   "line": 31.5,
+   "price": -113.0,
+   "edge": 2.2,
    "x": 2.5,
-   "why": "no edge at -106",
-   "m": 17.2,
-   "tm": 152.5
+   "why": "edge under 2.5",
+   "m": 29.3,
+   "tm": 150.5
   },
   {
    "id": "401920343",
@@ -653,54 +659,6 @@
    "why": "edge under 2.5",
    "m": 9.6,
    "tm": 156.8
-  },
-  {
-   "id": "401921819",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:00:00Z",
-   "home": "South Carolina",
-   "away": "Stetson",
-   "mk": "spread",
-   "side": "away",
-   "line": 19.5,
-   "price": -108.0,
-   "edge": 1.5,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 18.0,
-   "tm": 151.0
-  },
-  {
-   "id": "401920376",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:00:00Z",
-   "home": "Virginia Tech",
-   "away": "Coppin State",
-   "mk": "spread",
-   "side": "away",
-   "line": 30.5,
-   "price": 104.0,
-   "edge": 1.2,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 29.3,
-   "tm": 150.5
-  },
-  {
-   "id": "401906757",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:30:00Z",
-   "home": "Alabama",
-   "away": "Sam Houston",
-   "mk": "spread",
-   "side": "away",
-   "line": 26.5,
-   "price": 106.0,
-   "edge": 0.7,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 25.8,
-   "tm": 172.5
   },
   {
    "id": "401920155",
@@ -727,7 +685,7 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 4.0,
    "x": null,
    "why": "total market off",
@@ -767,6 +725,38 @@
    "tm": 155.6
   },
   {
+   "id": "401921819",
+   "sport": "cbb",
+   "kick": "2026-11-04T00:00:00Z",
+   "home": "South Carolina",
+   "away": "Stetson",
+   "mk": "total",
+   "side": "over",
+   "line": 149.5,
+   "price": -102.0,
+   "edge": 1.5,
+   "x": null,
+   "why": "total market off",
+   "m": 18.0,
+   "tm": 151.0
+  },
+  {
+   "id": "401906757",
+   "sport": "cbb",
+   "kick": "2026-11-04T00:30:00Z",
+   "home": "Alabama",
+   "away": "Sam Houston",
+   "mk": "total",
+   "side": "over",
+   "line": 171.5,
+   "price": -111.0,
+   "edge": 1.0,
+   "x": null,
+   "why": "total market off",
+   "m": 25.8,
+   "tm": 172.5
+  },
+  {
    "id": "401920702",
    "sport": "cbb",
    "kick": "2026-11-04T01:00:00Z",
@@ -785,16 +775,16 @@
  ],
  "games": {
   "401906757": {
-   "mk": "spread",
-   "side": "away",
-   "line": 26.5,
-   "price": 106.0,
-   "edge": 0.7,
+   "mk": "total",
+   "side": "over",
+   "line": 171.5,
+   "price": -111.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "Alabama",
    "away": "Sam Houston",
-   "state": "under"
+   "state": "off"
   },
   "401920702": {
    "mk": "total",
@@ -812,10 +802,10 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": -111.0,
-   "ev": 0.075,
+   "price": -104.0,
+   "ev": 0.11,
    "edge": 8.1,
-   "units": 0.25,
+   "units": 3.5,
    "home": "Virginia",
    "away": "Drexel",
    "state": "pick"
@@ -845,16 +835,16 @@
    "state": "pick"
   },
   "401921819": {
-   "mk": "spread",
-   "side": "away",
-   "line": 19.5,
-   "price": -108.0,
+   "mk": "total",
+   "side": "over",
+   "line": 149.5,
+   "price": -102.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
    "home": "South Carolina",
    "away": "Stetson",
-   "state": "under"
+   "state": "off"
   },
   "401921165": {
    "mk": "total",
@@ -884,10 +874,10 @@
    "mk": "spread",
    "side": "away",
    "line": 27.5,
-   "price": -106.0,
-   "ev": 0.105,
+   "price": -108.0,
+   "ev": 0.095,
    "edge": 8.5,
-   "units": 3.0,
+   "units": 2.0,
    "home": "LSU",
    "away": "LSU New Orleans",
    "state": "pick"
@@ -896,7 +886,7 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -908,10 +898,10 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": 102.0,
-   "ev": 0.053,
+   "price": -102.0,
+   "ev": 0.033,
    "edge": 2.6,
-   "units": 2.0,
+   "units": 0.5,
    "home": "Texas A&M",
    "away": "Alabama State",
    "state": "pick"
@@ -932,19 +922,19 @@
    "mk": "spread",
    "side": "away",
    "line": 20.5,
-   "price": -106.0,
+   "price": -100.0,
+   "ev": 0.054,
    "edge": 3.3,
-   "ev": null,
-   "units": 0.0,
+   "units": 2.25,
    "home": "UNLV",
    "away": "Northern Arizona",
-   "state": "under"
+   "state": "pick"
   },
   "401929372": {
    "mk": "spread",
    "side": "away",
    "line": 42.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 5.7,
    "ev": null,
    "units": 0.0,
@@ -955,9 +945,9 @@
   "401920376": {
    "mk": "spread",
    "side": "away",
-   "line": 30.5,
-   "price": 104.0,
-   "edge": 1.2,
+   "line": 31.5,
+   "price": -113.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Virginia Tech",
@@ -1065,7 +1055,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4071,
+  "snapshots": 4084,
   "buckets": [
    {
     "when": "24h+",
@@ -1078,21 +1068,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 575,
+    "clvN": 578,
     "clvRet": -0.0418,
-    "clvT": -8.82,
+    "clvT": -8.87,
     "clv": 0.09,
-    "beat": 0.261,
-    "still": 0.416
+    "beat": 0.26,
+    "still": 0.419
    },
    {
     "when": "1-6h",
-    "clvN": 324,
-    "clvRet": -0.0554,
-    "clvT": -18.99,
+    "clvN": 328,
+    "clvRet": -0.0553,
+    "clvT": -19.17,
     "clv": -0.14,
-    "beat": 0.12,
-    "still": 0.651
+    "beat": 0.119,
+    "still": 0.655
    },
    {
     "when": "<1h",
@@ -7549,8 +7539,7 @@
    "tmRaw": 140.0,
    "flagged": "2026-11-03T10:49:52Z",
    "betTo": 20.0,
-   "close": 20.5,
-   "pass": true
+   "close": 20.5
   },
   {
    "id": "401929372",
@@ -7735,7 +7724,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 17.5,
+    "raw": 20.25,
     "scale": 1.0,
     "down": 16.5
    },
@@ -7744,7 +7733,7 @@
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 20.75,
+    "raw": 13.25,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -7752,11 +7741,11 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 39.75,
-    "scale": 1.0
+    "raw": 40.75,
+    "scale": 0.9816
    },
    "2026-11-08": {
-    "raw": 10.0,
+    "raw": 9.25,
     "scale": 1.0
    },
    "2026-11-09": {
