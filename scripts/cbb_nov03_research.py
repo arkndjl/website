@@ -277,7 +277,7 @@ def main():
     # without ESPN's BPI history (scripts/.cache/cbb/bpi; public_ratings.py --cbb-bpi) 'bpi' falls back to eff + home and
     # is exactly collinear with them: walk_pred's unridged solve then turns on rounding (one season 0.7 MAE off).
     # cbb_games --fit drops it in that case; so does this
-    if not C.BPI:
+    if not C.BPI or os.environ.get('NO_BPI'):
         feats = [k for k in feats if k != 'bpi']
     print('feats', feats, flush=True)
     _A['args'] = (games, btname, d1s, tprior, avs, F['params'], feats)

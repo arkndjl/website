@@ -554,10 +554,14 @@ def player_fv(feats, grp):
     return 20 + 10 * (ps[0] + ps[1] + ps[2]) + (m['topMean'] - 50) * ps[3]
 
 
-def research_feats(p, team):
-    """a player's preseason FV inputs for the season after research row p (Barttorvik line, cbb/backtest columns)"""
+def research_feats(p, team, full=False):
+    """a player's preseason FV inputs for the season after research row p (Barttorvik line, cbb/backtest columns);
+    full: also porpag, ht_g and Stat+ (returner drivers since PR #734; scripts/cbb_nov03_research.py)"""
     n = lambda k: float(p[k]) if p.get(k) not in (None, '', 'nan') else None
     age = n('age')
+    if full:
+        return {**research_feats(p, team), **fv_extra(p['bpm'], p.get('porpag'), p.get('hti'), p.get('role'),
+                                                      p.get('min_per'), p.get('gp'))}
     # as the board's model (cbb_fit.features) reads them: age on Nov 1 entering the season (the research age is on Feb 1
     # of the season before, so + .75), guard = point and combo guards only (the research flag also counts wings), and
     # the old Pac-12 a power conference through its last season (Oct 30 2026: history had age +1 and the research
@@ -569,6 +573,21 @@ def research_feats(p, team):
 
 
 GUARDS = {'Pure PG', 'Scoring PG', 'Combo G'}
+ROLE3 = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'W', 'Wing F': 'W', 'Stretch 4': 'B', 'PF/C': 'B', 'C': 'B'}
+POS3 = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C'}
+SPLUS = {'G': (0.10, 3.85), 'F': (0.50, 4.05), 'C': (0.52, 4.31)}     # cbb_fit.SPLUS
+
+
+def fv_extra(bpm, porpag, hti, role, min_per=None, gp=None):
+    """porpag (shrunk as cbb_fit.season_line, on minutes from Min% x 40 x games), ht_g (height against his role) and
+    splus (BPM against his position, cbb_fit.features) for one past line"""
+    n = lambda v: float(v) if v not in (None, '', 'nan') else None
+    b, pp, ht, mp, g = n(bpm), n(porpag), n(hti), n(min_per), n(gp)
+    mpt = (mp or 0) / 100 * 40 * (g or 0)
+    mu, sd = SPLUS.get(POS3.get(role, 'F'), SPLUS['F'])
+    return {'porpag': (pp * mpt) / (mpt + 300) if pp is not None else 0.0,
+            'ht_g': (ht or 77.0) - {'G': 75, 'W': 78, 'B': 81}.get(ROLE3.get(role, 'W'), 78),
+            'splus': 100 + 25 * ((b or 0) - mu) / sd}
 
 
 def power(conf, year):
@@ -1163,7 +1182,10 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
             tph = P.get('tphl', 80.0)
             tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10),
                   # last season's closing totals, team by team, fading as each team plays
-                  'tpri': sum(W.tm0.get(t, 0.0) * tph / (tph + R.ng[t]) for t in (h, a))}
+                  'tpri': sum(W.tm0.get(t, 0.0) * tph / (tph + R.ng[t]) for t in (h, a)),
+                  # tempo clash (Nov 3 2026, scripts/cbb_tclash_research.py): the product of the two sides' tempo
+                  # deviations (total's tempo solve) and of their market total ratings
+                  'tclash': R.T2[R.i(h)] * R.T2[R.i(a)], 'mclash': W.tm[h] * W.tm[a] / 10}
             collect(g, x, tx, R)
         for g in by_day[d]:
             W.market(g)
