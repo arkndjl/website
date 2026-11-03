@@ -1914,7 +1914,8 @@
     g.font = Math.round(size * 0.62) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.role || '', w * 0.22), x + w * 0.5, cy);
     var cx = x + w * 0.74;
     if (p.stars != null) cx += drawStars(g, cx, cy, p.stars, Math.round(size * 0.6)) + 18;
-    if (p.form != null) { g.font = Math.round(size * 0.62) + 'px ' + FONT; g.fillStyle = p.form >= 1 ? C.teal : C.down; g.fillText(p.form.toFixed(2), cx, cy); }
+    g.font = Math.round(size * 0.62) + 'px ' + FONT;
+    if (p.form != null) { g.fillStyle = p.form >= 1 ? C.teal : C.down; g.fillText(p.form.toFixed(2), cx, cy); } else if (p.stars != null) { g.fillStyle = C.lilac; g.fillText('—', cx, cy); }
   }
   async function buildFan(win, btn) {
     var d = pvData(btn); if (!d) return null;
@@ -1949,16 +1950,18 @@
     tiles.forEach(function (t, i) {
       var tx = bx + i * (tw + 24); g.fillStyle = C.face; g.fillRect(tx, ty - 60, tw, 170); bevel(g, tx, ty - 60, tw, 170, true, 3);
       g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, ty - 10);
-      g.font = '72px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 62);
+      var tf = 72; g.font = tf + 'px ' + FONT; while (tf > 44 && g.measureText(t[1]).width > tw - 48) { tf -= 4; g.font = tf + 'px ' + FONT; }
+      g.fillStyle = C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 62);
     });
     // lineups
-    var ly = ty + 220;
+    var ly = ty + 220, nL = (d.five || []).length + (d.theirFive || []).length, room = (F.y + F.h - 200) - ly - 2 * 160 - (d.lineupNote ? 30 : 0);
+    var RH = Math.max(88, Math.min(128, Math.floor(room / Math.max(1, nL)))), RS = Math.min(60, Math.round(RH * 0.59));
     for (var k = 0; k < 2; k++) {
       var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
       g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText('TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
       ly += 90;
-      for (var i = 0; i < L.length; i++) { if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, ly - 42, bw, 84); } await teamRow(g, bx + 12, ly, bw - 24, L[i], 52); ly += 88; }
+      for (var i = 0; i < L.length; i++) { if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, ly - RH / 2 + 2, bw, RH - 4); } await teamRow(g, bx + 12, ly, bw - 24, L[i], RS); ly += RH; }
       if (!k && d.lineupNote) { g.font = '34px ' + FONT; g.fillStyle = '#ffd166'; g.fillText(fit(g, 'SUB · ' + d.lineupNote, bw - 24), bx + 12, ly - 14); ly += 30; }
       ly += 70;
     }
@@ -1969,64 +1972,164 @@
     }
     return F.canvas;
   }
+  // ---- teamGFX: pick/ban tree. 1NT's move = best expected map win (expectimax); at each opponent move two branches:
+  // HABIT (ban the map they have played least in 90 days, pick the one they play most: held-out decider log loss -1.61
+  // vs -1.95 uniform on ESEA S53-S59 Bo1s) and EDGE (minimax on the player map edges). Expected line = habit.
+  // Knife side: map win % of the team starting T on that map (ARKBOARD Research cs2-side-first, bo3.gg pro maps).
+  function vetoTree(d, weStart) {
+    var bo = +d.bon === 3 ? 3 : 1, P = {}, E = {}, N = {};
+    (d.maps || []).forEach(function (m) { P[m.map] = m.p / 100; E[m.map] = m.edge; });
+    (d.oppMaps || []).forEach(function (m) { N[m.map] = (m.w || 0) + (m.l || 0); });
+    var pool = (d.pool && d.pool.length ? d.pool : Object.keys(P)).filter(function (m) { return m in P; });
+    var A = weStart ? 'us' : 'them', B = weStart ? 'them' : 'us';
+    var S = bo === 3 ? [[A, 'ban'], [B, 'ban'], [A, 'pick'], [B, 'pick'], [A, 'ban'], [B, 'ban']] : [[A, 'ban'], [B, 'ban'], [A, 'ban'], [B, 'ban'], [A, 'ban'], [B, 'ban']];
+    S = S.slice(0, pool.length - 1);
+    function val(pk, dec) {
+      if (bo !== 3) return P[dec];
+      var a = P[pk[0]], b = P[pk[1]], c = P[dec];
+      return a * b + a * (1 - b) * c + (1 - a) * b * c;
+    }
+    function nxt(left, pk, t, m) { return [left.filter(function (x) { return x !== m; }), S[t][1] === 'pick' ? pk.concat(m) : pk]; }
+    function mm(left, pk, t) {
+      if (t === S.length) return val(pk, left[0]);
+      var us = S[t][0] === 'us', best = null;
+      left.forEach(function (m) { var n = nxt(left, pk, t, m), v = mm(n[0], n[1], t + 1); if (best == null || (us ? v > best : v < best)) best = v; });
+      return best;
+    }
+    function oppMoves(left, pk, t) {
+      var act = S[t][1], h = left.slice().sort(function (a, b) { return act === 'ban' ? ((N[a] || 0) - (N[b] || 0) || E[b] - E[a]) : ((N[b] || 0) - (N[a] || 0) || E[a] - E[b]); })[0];
+      var em = null, ev = null;
+      left.forEach(function (m) { var n = nxt(left, pk, t, m), v = mm(n[0], n[1], t + 1); if (ev == null || v < ev) { ev = v; em = m; } });
+      return h === em ? [[h, 1, '']] : [[h, 0.5, 'HABIT'], [em, 0.5, 'EDGE']];
+    }
+    var memo = {};
+    function ex(left, pk, t) {
+      if (t === S.length) return val(pk, left[0]);
+      var k = left.join() + '|' + pk.join() + '|' + t; if (k in memo) return memo[k];
+      var v;
+      if (S[t][0] === 'us') v = Math.max.apply(null, left.map(function (m) { var n = nxt(left, pk, t, m); return ex(n[0], n[1], t + 1); }));
+      else v = oppMoves(left, pk, t).reduce(function (a, o) { var n = nxt(left, pk, t, o[0]); return a + o[1] * ex(n[0], n[1], t + 1); }, 0);
+      return (memo[k] = v);
+    }
+    function build(left, pk, t, hab) {
+      if (t === S.length) return { leaf: true, map: left[0], p: val(pk, left[0]), hab: hab };
+      if (S[t][0] === 'us') {
+        var bm = null, bv = -1;
+        left.forEach(function (m) { var n = nxt(left, pk, t, m), v = ex(n[0], n[1], t + 1); if (v > bv + 1e-12) { bv = v; bm = m; } });
+        var n = nxt(left, pk, t, bm);
+        return { who: 'us', act: S[t][1], map: bm, kid: build(n[0], n[1], t + 1, hab) };
+      }
+      return { who: 'them', act: S[t][1], opts: oppMoves(left, pk, t).map(function (o) { var n = nxt(left, pk, t, o[0]);
+        return { map: o[0], tag: o[2], kid: build(n[0], n[1], t + 1, hab && o[2] !== 'EDGE') }; }) };
+    }
+    return { bo: bo, ev: ex(pool, [], 0), root: build(pool, [], 0, true) };
+  }
+  // flatten a tree into rows: one row per opponent move, carrying 1NT's reply and, at the end, the decider
+  function treeRows(node, depth, out) {
+    out = out || [];
+    function tail(r, n) {   // 1NT's reply and the decider, if they follow this move directly
+      if (n && !n.leaf && n.who === 'us') { r.reply = n.map; r.act2 = n.act; n = n.kid; }
+      if (n && n.leaf) { r.leaf = n; return null; }
+      return n;
+    }
+    if (node && !node.leaf && node.who === 'us') { var r0 = { d: depth, who: 'us', act: node.act, map: node.map }; out.push(r0); node = node.kid; }
+    if (!node || node.leaf) return out;
+    node.opts.forEach(function (o, i) {
+      var br = node.opts.length > 1, r = { d: depth, who: 'them', act: node.act, map: o.map, tag: o.tag, br: br, last: i === node.opts.length - 1 };
+      out.push(r);
+      var rest = tail(r, o.kid);
+      if (rest) treeRows(rest, depth + (br ? 1 : 0), out);
+    });
+    return out;
+  }
+  // knife side: pro T-first map win %, each map shrunk toward the all-map rate (empirical Bayes on the map-to-map spread)
+  function knife(d, map) {
+    var S = d.sides || {}, ks = Object.keys(S).filter(function (k) { return S[k] && S[k].n > 0; }), s = S[map];
+    if (!s || !ks.length) return null;
+    var nT = 0, kT = 0; ks.forEach(function (k) { nT += S[k].n; kT += S[k].t * S[k].n; });
+    var mu = kT / nT, v = function (k) { return S[k].t * (1 - S[k].t) / S[k].n; };
+    var tau2 = Math.max(1e-6, ks.reduce(function (a, k) { return a + Math.pow(S[k].t - mu, 2) - v(k); }, 0) / ks.length);
+    var w = tau2 / (tau2 + v(map)), est = mu + w * (s.t - mu), se = Math.sqrt(1 / (1 / tau2 + 1 / v(map)));
+    var t = est >= 0.5;
+    return { side: t ? 'T' : 'CT', pct: Math.round((t ? est : 1 - est) * 1000) / 10, sure: est - 1.96 * se > 0.5 || est + 1.96 * se < 0.5 };
+  }
   async function buildTeam(win, btn) {
     var d = pvData(btn); if (!d) return null;
-    var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: game plan', btn.getAttribute('data-gfx-date'));
-    var g = F.g, x = F.x + 48, y = F.y + 70, w = F.w - 96;
+    var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: pick/ban', btn.getAttribute('data-gfx-date'));
+    var g = F.g, x = F.x + 48, y = F.y + 60, w = F.w - 96, bottom = F.y + F.h - 40;
     well(g, F.x, F.y, F.w, F.h);
-    if (d.us.logo || d.them.logo) {   // the two teams, logo + name
-      var LS = 150, ly = y - 30, lx = x;
-      for (var k = 0; k < 2; k++) {
-        var t = k ? d.them : d.us;
-        if (teamLogo(g, t.logo ? await loadImg(t.logo) : null, lx, ly, LS)) lx += LS + 28;
-        g.font = '80px ' + FONT; g.fillStyle = k ? C.down : C.teal; var nm = fit(g, t.name, w / 2 - LS - 160); g.fillText(nm, lx, ly + LS / 2); lx += g.measureText(nm).width + 50;
-        if (!k) { g.fillStyle = C.lilac; g.font = '56px ' + FONT; g.fillText('VS', lx, ly + LS / 2); lx += g.measureText('VS').width + 50; }
-      }
-      y += LS + 40;
+    // header: logos, names, format and win chance
+    var LS = 150, lx = x;
+    for (var k = 0; k < 2; k++) {
+      var t = k ? d.them : d.us;
+      if (teamLogo(g, t.logo ? await loadImg(t.logo) : null, lx, y - 20, LS)) lx += LS + 28;
+      g.font = '76px ' + FONT; g.fillStyle = k ? C.down : C.teal; var nm = fit(g, t.name, w / 2 - LS - 160); g.fillText(nm, lx, y - 20 + LS / 2); lx += g.measureText(nm).width + 44;
+      if (!k) { g.fillStyle = C.lilac; g.font = '52px ' + FONT; g.fillText('VS', lx, y - 20 + LS / 2); lx += g.measureText('VS').width + 44; }
     }
-    g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, d.line + ' · ' + d.win + '% · proj. ' + d.score + ' · talent ' + d.talentUs + ' v ' + d.talentThem + ' stars', w), x, y); y += 100;
-    // veto, both orders
-    var cw = (w - 40) / 2;
-    d.vetoes.forEach(function (v, k) {
-      var vx = x + k * (cw + 40), vy = y;
-      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(('BO1 VETO · ' + (v.weStart ? '1NT' : d.opp) + ' BANS FIRST').toUpperCase(), vx, vy); vy += 64;
-      v.bans.forEach(function (b, i) {
-        g.font = '40px ' + FONT; g.fillStyle = b.by === 'us' ? C.teal : C.down; g.fillText((i + 1) + '. ' + (b.by === 'us' ? '1NT' : d.opp) + ' ban', vx, vy);
-        g.fillStyle = C.white; g.fillText(b.map, vx + cw * 0.6, vy); vy += 56;
+    y += LS + 30;
+    var trees = [vetoTree(d, true), vetoTree(d, false)], bo = trees[0].bo;
+    g.font = '48px ' + FONT; g.fillStyle = C.lilac;
+    g.fillText(fit(g, 'BO' + bo + ' · 1NT ' + d.win + '% · ' + d.when, w), x, y); y += 70;
+    var rows = trees.map(function (T) { return treeRows(T.root, 0); });
+    // expected map (habit line, 1NT bans first) and its knife side, at the bottom
+    var expLeaf = null;   // the habit line's decider, 1NT banning first (set while drawing)
+    var BOXH = 300, boxY = bottom - BOXH, avail = boxY - 40 - y;
+    var nrows = rows[0].length + rows[1].length, rh = Math.max(56, Math.min(100, Math.floor((avail - 2 * 150) / nrows))), fs = Math.min(52, Math.round(rh * 0.56));
+    var ind = 64, cTag = x + w * 0.37, cRep = x + w * 0.47, cDec = x + w * 0.68;
+    rows.forEach(function (R, ti) {
+      g.font = '48px ' + FONT; g.fillStyle = C.white; g.fillText((ti ? d.opp.toUpperCase() : '1NT') + ' BANS FIRST', x, y + 24);
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'right';
+      g.fillText('EXP. ' + (bo === 3 ? 'SERIES ' : 'MAP ') + Math.round(trees[ti].ev * 100) + '%', x + w, y + 24); g.textAlign = 'left';
+      y += 74;
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+      g.fillText('1NT REPLY', cRep, y); g.fillText('DECIDER', cDec, y); g.textAlign = 'right'; g.fillText('KNIFE', x + w - 8, y); g.textAlign = 'left';
+      y += 30;
+      var bars = {};
+      R.forEach(function (r, i) {
+        var cy = y + rh / 2, rx = x + 16 + r.d * ind;
+        if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(x, y + 2, w, rh - 4); }
+        if (r.br) {   // branch connector: a pixel elbow down from the parent row
+          var bx = x + 24 + r.d * ind;
+          if (bars[r.d] == null) bars[r.d] = y - 6;
+          g.fillStyle = C.light; g.fillRect(bx, bars[r.d], 4, cy - bars[r.d] + 2); g.fillRect(bx, cy, 30, 4);
+          bars[r.d] = cy; rx = bx + 44;
+          if (r.last) delete bars[r.d];
+        }
+        var us = r.who === 'us';
+        g.font = fs + 'px ' + FONT; g.fillStyle = us ? C.teal : C.down; var lab = (us ? '1NT ' : 'OPP ') + r.act.toUpperCase() + ' ';
+        g.fillText(lab, rx, cy); g.fillStyle = C.white; g.fillText(fit(g, r.map, cTag - rx - g.measureText(lab).width - 12), rx + g.measureText(lab).width, cy);
+        if (r.tag) {   // the branch chip
+          var cs = Math.round(fs * 0.6); g.font = cs + 'px ' + FONT; var cw = g.measureText(r.tag).width + 20;
+          g.fillStyle = r.tag === 'HABIT' ? C.lilac : C.down; g.fillRect(cTag, cy - cs * 0.8, cw, cs * 1.6);
+          g.fillStyle = C.dark; g.fillText(r.tag, cTag + 10, cy);
+        }
+        g.font = fs + 'px ' + FONT;
+        if (r.reply) { g.fillStyle = C.teal; g.fillText((r.act2 === 'pick' ? 'PICK ' : 'BAN ') + r.reply, cRep, cy); }
+        if (r.leaf) {
+          var L = r.leaf, kn = knife(d, L.map), on = L.hab;
+          if (on) { g.fillStyle = C.teal; g.fillRect(cDec - 20, y + 6, 8, rh - 12); }
+          g.fillStyle = on ? C.white : C.lilac; g.fillText(L.map, cDec, cy);
+          g.fillStyle = L.p >= 0.5 ? C.teal : C.down; g.fillText(Math.round(L.p * 100) + '%', cDec + fs * 4.4, cy);
+          if (kn) { g.fillStyle = kn.sure ? C.teal : C.lilac; g.textAlign = 'right'; g.fillText(kn.side, x + w - 8, cy); g.textAlign = 'left'; }
+          if (on) expLeaf = expLeaf || L;
+        }
+        y += rh;
       });
-      g.fillStyle = C.white; g.font = '44px ' + FONT; g.fillText('7. decider ' + v.decider + ' (' + (v.edge >= 0 ? '+' : '') + v.edge + ')', vx, vy);
+      y += 40;
     });
-    y += 64 + 56 * 6 + 90;
-    // map edges
-    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('MAP · 1NT · ' + d.opp.toUpperCase() + ' · EDGE · 1NT WIN', x, y); y += 60;
-    d.maps.forEach(function (m, i) {
-      if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(x - 12, y - 30, w + 24, 60); }
-      g.font = '40px ' + FONT; g.fillStyle = m.map === d.vetoes[0].decider ? C.white : C.lilac; g.fillText(m.map, x, y);
-      g.fillStyle = C.teal; g.fillText((m.us.wr != null ? m.us.wr + '%' : '—') + ' (' + m.us.n + ')', x + w * 0.22, y);
-      g.fillStyle = C.down; g.fillText((m.them.wr != null ? m.them.wr + '%' : '—') + ' (' + m.them.n + ')', x + w * 0.44, y);
-      g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(1), x + w * 0.66, y);
-      g.fillStyle = C.white; g.fillText(m.p + '%', x + w * 0.84, y); y += 60;
-    });
-    y += 50;
-    // matchups
-    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('MATCHUPS · TALENT (STARS) · EDGE', x, y); y += 66;
-    for (var i = 0; i < (d.matchups || []).length; i++) {
-      var m = d.matchups[i];
-      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, (m.us && m.us.role) || '', w * 0.2), x, y);
-      g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + (m.us.sub ? ' (sub)' : '') + ' ' + (m.us.stars ?? '—') : '—', w * 0.3), x + w * 0.2, y);
-      g.fillStyle = C.down; g.fillText(fit(g, m.them ? 'v ' + m.them.name + ' ' + (m.them.stars ?? '—') : '', w * 0.32), x + w * 0.52, y);
-      if (m.edge != null) { g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(2), x + w * 0.88, y); }
-      if (m.stat && m.statUs != null && m.statThem != null) { y += 46; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(m.stat + ' ' + m.statUs + ' v ' + m.statThem, x + w * 0.2, y); g.fillStyle = m.statEdge >= 0 ? C.teal : C.down; g.fillText((m.statEdge >= 0 ? '+' : '') + m.statEdge, x + w * 0.88, y); }
-      y += 60;
+    // the expected map box
+    if (expLeaf) {
+      var kn = knife(d, expLeaf.map), bx = x, bw = w;
+      g.fillStyle = C.face; g.fillRect(bx, boxY, bw, BOXH); bevel(g, bx, boxY, bw, BOXH, true, 4);
+      var cw = (bw - 48) / 3, tiles = [['EXPECTED MAP', expLeaf.map, C.white], [bo === 3 ? '1NT SERIES' : '1NT WIN', Math.round(expLeaf.p * 100) + '%', expLeaf.p >= 0.5 ? C.teal : C.down],
+        ['WIN KNIFE: START', kn ? kn.side : '—', kn && kn.sure ? C.teal : C.lilac]];
+      tiles.forEach(function (t, i) {
+        var tx = bx + 24 + i * cw;
+        g.font = '38px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 12, boxY + 70);
+        g.font = '104px ' + FONT; g.fillStyle = t[2]; g.fillText(fit(g, t[1], cw - 24), tx + 12, boxY + 170);
+      });
+      if (kn) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, kn.side + '-first ' + kn.pct + '% · pro maps', cw - 24), bx + 36 + 2 * cw, boxY + 250); }
     }
-    y += 40;
-    // game plan
-    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('GAME PLAN', x, y); y += 64;
-    g.font = '38px ' + FONT;
-    (d.plan || []).forEach(function (p) {
-      wrap(g, p, w - 50).forEach(function (l, j) { if (y > F.y + F.h - 40) return; g.fillStyle = j ? C.lilac : C.white; if (!j) g.fillText('›', x, y); g.fillText(l, x + 40, y); y += 52; });
-      y += 10;
-    });
     return F.canvas;
   }
 
@@ -2168,6 +2271,8 @@
         var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
-    } finally { btn.disabled = false; btn.textContent = label; }
+    } catch (err) {
+      console.error('gfx', mode, err); btn.disabled = false; btn.textContent = 'GFX failed'; setTimeout(function () { btn.textContent = label; }, 2500); return;
+    } finally { if (btn.textContent === '…') { btn.disabled = false; btn.textContent = label; } }
   });
 })();
