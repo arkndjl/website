@@ -442,7 +442,7 @@ def grade():
             f = features(r, nm if ra else nm_prev)
             x = (np.array([f[k] for k in keep]) - mu) / sd
             lo = float(beta[0] + x @ beta[1:]); p = 1 / (1 + math.exp(-lo))
-            parts = [[LABEL[k], round(float(beta[j + 1] * x[j]), 3)] for j, k in enumerate(keep)]
+            parts = [['Division II' if k == 'd3' and not f[k] else LABEL[k], round(float(beta[j + 1] * x[j]), 3)] for j, k in enumerate(keep)]
             lns = [line_of(x_, teams.get(x_['team'], {}).get('name') or x_['tname'], s_) for x_, s_ in ((ra, LIVE), (rb, LIVE - 1)) if x_]
             rep = {'plus': [l for l, v in sorted(parts, key=lambda t: -t[1]) if v >= 0.15][:4], 'minus': [l for l, v in sorted(parts, key=lambda t: t[1]) if v <= -0.15][:4]}
             arr = fit['arrivals']
