@@ -84,7 +84,8 @@ def players(sport):
     if sport == 'nba':
         for p in (_latest('nba-xpm') or {}).get('players', []):
             if (p.get('mp') or 0) >= 30:
-                by[NBA_BR.get(p['tm'], p['tm'])].append((p.get('vorx') or 0, [p['n'], p['pos'], p.get('sxpm', p['xpm']), f"{p['g']} G, {p['mp']} min"]))
+                tm = p['tm'].split('/')[-1]                 # a traded player's teams in order ("LAC/POR"): list him on his current one
+                by[NBA_BR.get(tm, tm)].append((p.get('vorx') or 0, [p['n'], p['pos'], p.get('sxpm', p['xpm']), f"{p['g']} G, {p['mp']} min"]))
         return 'XPM', _top(by)
     if sport == 'nhl':
         for p in (_latest('nhl-war') or {}).get('players', []):
@@ -122,8 +123,8 @@ def young(sport, n=3):
     elif sport == 'nba':
         for p in (_latest('nba-xpm') or {}).get('players', []):
             if p.get('age') and p['age'] <= 23 and (p.get('mp') or 0) >= 30:
-                x = p.get('sxpm', p['xpm'])
-                by[NBA_BR.get(p['tm'], p['tm'])].append((x, [p['n'], p['pos'], x, f"age {p['age']}, {p['mp']} min"]))
+                x, tm = p.get('sxpm', p['xpm']), p['tm'].split('/')[-1]
+                by[NBA_BR.get(tm, tm)].append((x, [p['n'], p['pos'], x, f"age {p['age']}, {p['mp']} min"]))
     elif sport == 'nhl':
         for p in (_load(os.path.join(ROOT, 'data', 'hockey.json')) or {}).get('pipe', []):
             if p.get('team') and p.get('fv'):
