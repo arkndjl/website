@@ -1,0 +1,642 @@
+{
+ "prospects": {
+  "base": {
+   "cols": [
+    "th",
+    "age"
+   ],
+   "mse": 1.0157,
+   "n": 1659,
+   "nTune": 2534
+  },
+  "z_k": {
+   "coef": -0.1062,
+   "dmse": 0.0068,
+   "t": 1.79,
+   "tuneN": 2534
+  },
+  "z_d": {
+   "coef": -0.0631,
+   "dmse": -0.004,
+   "t": -1.42,
+   "tuneN": 2534
+  },
+  "z_a": {
+   "coef": -0.2322,
+   "dmse": -0.0379,
+   "t": -3.02,
+   "tuneN": 2534
+  },
+  "z_adr": {
+   "coef": -0.1818,
+   "dmse": 0.0019,
+   "t": 0.23,
+   "tuneN": 2534
+  },
+  "z_kast": {
+   "coef": 0.0493,
+   "dmse": 0.0007,
+   "t": 0.26,
+   "tuneN": 2534
+  },
+  "z_fk": {
+   "coef": 0.0078,
+   "dmse": -0.0003,
+   "t": -0.99,
+   "tuneN": 2534
+  },
+  "z_fd": {
+   "coef": -0.0888,
+   "dmse": -0.0074,
+   "t": -1.57,
+   "tuneN": 2534
+  },
+  "z_tk": {
+   "coef": -0.0873,
+   "dmse": 0.0034,
+   "t": 0.84,
+   "tuneN": 2534
+  },
+  "z_td": {
+   "coef": -0.1619,
+   "dmse": -0.0096,
+   "t": -1.17,
+   "tuneN": 2534
+  },
+  "z_mk": {
+   "coef": -0.1191,
+   "dmse": 0.0033,
+   "t": 0.65,
+   "tuneN": 2534
+  },
+  "z_cl": {
+   "coef": -0.0005,
+   "dmse": 0.0,
+   "t": 0.6,
+   "tuneN": 2534
+  },
+  "z_hsk": {
+   "coef": -0.1201,
+   "dmse": -0.0129,
+   "t": -1.96,
+   "tuneN": 2534
+  },
+  "z_okd": {
+   "coef": 0.18,
+   "dmse": -0.0215,
+   "t": -2.69,
+   "tuneN": 2534
+  },
+  "z_s_share": {
+   "coef": -0.1592,
+   "dmse": -0.0135,
+   "t": -5.91,
+   "tuneN": 2534
+  },
+  "z_tier": {
+   "coef": -0.3183,
+   "dmse": 0.0253,
+   "t": 3.62,
+   "tuneN": 2534
+  },
+  "mates": {
+   "coef": -0.0742,
+   "dmse": -0.005,
+   "t": -1.79,
+   "tuneN": 2534
+  },
+  "logr": {
+   "coef": 0.3392,
+   "dmse": 0.0165,
+   "t": 1.35,
+   "tuneN": 2534
+  },
+  "b_Entry": {
+   "coef": -0.0765,
+   "dmse": 0.003,
+   "t": 1.84,
+   "tuneN": 2534
+  },
+  "b_Opener": {
+   "coef": 0.3159,
+   "dmse": -0.0164,
+   "t": -2.45,
+   "tuneN": 2534
+  },
+  "b_Clutch": {
+   "coef": 0.0319,
+   "dmse": -0.0002,
+   "t": -0.28,
+   "tuneN": 2534
+  },
+  "b_Trader": {
+   "coef": -0.1222,
+   "dmse": 0.0001,
+   "t": 0.04,
+   "tuneN": 2534
+  },
+  "b_Support": {
+   "coef": -0.3688,
+   "dmse": -0.01,
+   "t": -1.21,
+   "tuneN": 2534
+  },
+  "b_Survivor": {
+   "coef": 0.1483,
+   "dmse": -0.0045,
+   "t": -1.57,
+   "tuneN": 2534
+  },
+  "b_Multi-Kill": {
+   "coef": -0.1864,
+   "dmse": -0.003,
+   "t": -0.75,
+   "tuneN": 2534
+  },
+  "b_Damage": {
+   "coef": -0.328,
+   "dmse": -0.0014,
+   "t": -0.2,
+   "tuneN": 2534
+  },
+  "b_Consistent": {
+   "coef": -0.1382,
+   "dmse": -0.0009,
+   "t": -0.35,
+   "tuneN": 2534
+  },
+  "b_Headshot": {
+   "coef": -0.0416,
+   "dmse": 0.0001,
+   "t": 0.15,
+   "tuneN": 2534
+  },
+  "b_Big Stage": {
+   "coef": -0.1701,
+   "dmse": -0.0177,
+   "t": -5.95,
+   "tuneN": 2534
+  },
+  "joint": {
+   "cols": [
+    "logr",
+    "z_a",
+    "z_tier",
+    "z_s_share",
+    "z_kast",
+    "b_Opener",
+    "z_fk",
+    "z_td",
+    "b_Entry"
+   ],
+   "b": [
+    -2.402,
+    0.6587,
+    -0.058,
+    0.3151,
+    -0.1659,
+    -0.7349,
+    -0.6752,
+    -0.1492,
+    0.1752,
+    0.1388,
+    -0.0717,
+    -0.131
+   ],
+   "dmse": -0.0219,
+   "t": -0.95
+  }
+ },
+ "multiple": {
+  "n": 51,
+  "cut": 3.3,
+  "pass": [
+   "rating hs",
+   "rating pm",
+   "prospects z_s_share",
+   "prospects b_Big Stage",
+   "rating: headshots + plus-minus vs Nov 2",
+   "prospects: S/A share on the new rating"
+  ],
+  "tests": [
+   [
+    "rating: headshots + plus-minus vs Nov 2",
+    -10.9
+   ],
+   [
+    "rating: headshots",
+    -10.37
+   ],
+   [
+    "rating: plus-minus",
+    -8.42
+   ],
+   [
+    "prospect FV: Big Stage badge",
+    -5.95
+   ],
+   [
+    "prospect FV: S/A-tier share",
+    -5.91
+   ],
+   [
+    "prospects: S/A share on the new rating",
+    -4.65
+   ],
+   [
+    "prospect FV: assists",
+    -3.02
+   ],
+   [
+    "prospect FV: opening kills - deaths",
+    -2.69
+   ],
+   [
+    "prospect FV: Opener badge",
+    -2.45
+   ],
+   [
+    "prospect FV: headshot %",
+    -1.96
+   ],
+   [
+    "board: Multi-Kill badge",
+    -1.82
+   ],
+   [
+    "prospect FV: teammates' rating",
+    -1.79
+   ],
+   [
+    "T1%: S/A share",
+    -1.69
+   ],
+   [
+    "prospect FV: opening deaths",
+    -1.57
+   ],
+   [
+    "prospect FV: Survivor badge",
+    -1.57
+   ],
+   [
+    "board: Headshot badge",
+    -1.48
+   ],
+   [
+    "prospect FV: deaths",
+    -1.42
+   ],
+   [
+    "board: Opener badge",
+    -1.23
+   ],
+   [
+    "series model: rating as of the series day",
+    -1.22
+   ],
+   [
+    "prospect FV: Support badge",
+    -1.21
+   ],
+   [
+    "prospect FV: traded deaths",
+    -1.17
+   ],
+   [
+    "board: Support badge",
+    -1.04
+   ],
+   [
+    "prospect FV: opening kills",
+    -0.99
+   ],
+   [
+    "prospect FV: forward-selected set",
+    -0.95
+   ],
+   [
+    "board: Damage badge",
+    -0.76
+   ],
+   [
+    "prospect FV: Multi-Kill badge",
+    -0.75
+   ],
+   [
+    "series model: best player - mean",
+    -0.75
+   ],
+   [
+    "board: Clutch badge",
+    -0.74
+   ],
+   [
+    "prospect FV: Consistent badge",
+    -0.35
+   ],
+   [
+    "board: Survivor badge",
+    -0.35
+   ],
+   [
+    "prospect FV: Clutch badge",
+    -0.28
+   ],
+   [
+    "prospect FV: Damage badge",
+    -0.2
+   ],
+   [
+    "rating: half-life / shrink grid",
+    -0.16
+   ],
+   [
+    "prospect FV: Trader badge",
+    0.04
+   ],
+   [
+    "prospect FV: Headshot badge",
+    0.15
+   ],
+   [
+    "prospect FV: damage",
+    0.23
+   ],
+   [
+    "board: Entry badge",
+    0.24
+   ],
+   [
+    "prospect FV: KAST",
+    0.26
+   ],
+   [
+    "prospect FV: clutches",
+    0.6
+   ],
+   [
+    "prospect FV: multi-kill rounds",
+    0.65
+   ],
+   [
+    "prospect FV: trade kills",
+    0.84
+   ],
+   [
+    "board: Trader badge",
+    1.0
+   ],
+   [
+    "board: Consistent badge",
+    1.2
+   ],
+   [
+    "series model: days of rest",
+    1.24
+   ],
+   [
+    "prospect FV: rounds played",
+    1.35
+   ],
+   [
+    "prospect FV: kills",
+    1.79
+   ],
+   [
+    "prospect FV: Entry badge",
+    1.84
+   ],
+   [
+    "board: Big Stage badge",
+    3.13
+   ],
+   [
+    "prospect FV: mean event tier",
+    3.62
+   ],
+   [
+    "rating: event-tier weights",
+    16.2
+   ],
+   [
+    "rating: teammates' rating",
+    20.87
+   ]
+  ]
+ },
+ "rating": {
+  "shipped": {
+   "params": {
+    "h": 180,
+    "k": 50,
+    "opp": 1.0,
+    "prior": 0.0,
+    "a": 2.1914199555721607
+   },
+   "r2": 0.1195,
+   "n": 31318
+  },
+  "grid": {
+   "r2": 0.1196,
+   "dr2": 0.0001,
+   "t": -0.16,
+   "h": 120,
+   "k": 25,
+   "tuneTop": [
+    [
+     0.0279297818425938,
+     120,
+     25
+    ],
+    [
+     0.02793127044962079,
+     180,
+     25
+    ],
+    [
+     0.027936716677348823,
+     180,
+     50
+    ],
+    [
+     0.027949344813469466,
+     120,
+     10
+    ]
+   ]
+  },
+  "hs": {
+   "r2": 0.1207,
+   "dr2": 0.0012,
+   "t": -10.37,
+   "beta_hs": 0.0151
+  },
+  "pm": {
+   "r2": 0.1225,
+   "dr2": 0.003,
+   "t": -8.42,
+   "lam": 0.5
+  },
+  "mates": {
+   "r2": 0.1067,
+   "dr2": -0.0128,
+   "t": 20.87,
+   "m": 0.25
+  },
+  "tierw": {
+   "r2": 0.1156,
+   "dr2": -0.004,
+   "t": 16.2,
+   "f": 0.85
+  }
+ },
+ "badges": {
+  "base": {
+   "n": 1708,
+   "nTune": 3040
+  },
+  "b_Entry": {
+   "coef": -0.0592,
+   "dmse": 0.0002,
+   "t": 0.24
+  },
+  "b_Opener": {
+   "coef": 0.2407,
+   "dmse": -0.0053,
+   "t": -1.23
+  },
+  "b_Clutch": {
+   "coef": 0.0142,
+   "dmse": -0.0002,
+   "t": -0.74
+  },
+  "b_Trader": {
+   "coef": -0.0298,
+   "dmse": 0.0005,
+   "t": 1.0
+  },
+  "b_Support": {
+   "coef": -0.2512,
+   "dmse": -0.0045,
+   "t": -1.04
+  },
+  "b_Survivor": {
+   "coef": 0.1156,
+   "dmse": -0.0007,
+   "t": -0.35
+  },
+  "b_Multi-Kill": {
+   "coef": -0.0806,
+   "dmse": -0.0025,
+   "t": -1.82
+  },
+  "b_Damage": {
+   "coef": -0.2235,
+   "dmse": -0.0028,
+   "t": -0.76
+  },
+  "b_Consistent": {
+   "coef": 0.0674,
+   "dmse": 0.0013,
+   "t": 1.2
+  },
+  "b_Headshot": {
+   "coef": -0.0749,
+   "dmse": -0.0018,
+   "t": -1.48
+  },
+  "b_Big Stage": {
+   "coef": 0.126,
+   "dmse": 0.007,
+   "t": 3.13
+  }
+ },
+ "game": {
+  "shipped": {
+   "n": 21056,
+   "ll": 0.5542,
+   "top50": 0.637
+  },
+  "daily": {
+   "ll": 0.5539,
+   "d": -0.00029,
+   "t": -1.22,
+   "top50": {
+    "ll": 0.6375,
+    "t": 1.94
+   },
+   "w": {
+    "top": [
+     1.0992,
+     0.3629,
+     0.8161,
+     2.8655
+    ],
+    "rest": [
+     1.5926,
+     0.1276,
+     0.7048,
+     3.5962
+    ]
+   }
+  },
+  "star": {
+   "ll": 0.5539,
+   "d": -4e-05,
+   "t": -0.75,
+   "top50": {
+    "ll": 0.6375,
+    "t": 0.18
+   },
+   "w": {
+    "top": [
+     1.099,
+     0.3637,
+     0.8162,
+     2.871,
+     -0.0462
+    ],
+    "rest": [
+     1.5925,
+     0.1261,
+     0.7064,
+     3.5934,
+     -0.2439
+    ]
+   }
+  },
+  "rest": {
+   "ll": 0.554,
+   "d": 0.00011,
+   "t": 1.24,
+   "top50": {
+    "ll": 0.6389,
+    "t": 1.65
+   },
+   "w": {
+    "top": [
+     1.116,
+     0.3549,
+     0.7893,
+     2.8582,
+     0.0959,
+     -0.1345
+    ],
+    "rest": [
+     1.5931,
+     0.1293,
+     0.7055,
+     3.5999,
+     0.0047,
+     -0.024
+    ]
+   }
+  }
+ },
+ "confirm": {
+  "rating: headshots + plus-minus vs Nov 2": -10.9,
+  "prospects: S/A share on the new rating": -4.65,
+  "T1%: S/A share": -1.69
+ }
+}
