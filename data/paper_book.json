@@ -1,12 +1,12 @@
 {
- "asof": "2026-11-03T06:22:27Z",
+ "asof": "2026-11-03T06:36:25Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 97.8,
+  "now": 97.54,
   "peak": 118.08,
-  "drawdown": 0.1717,
+  "drawdown": 0.1739,
   "open": 56.5,
   "path": [
    101.5,
@@ -197,43 +197,44 @@
    98.06,
    98.33,
    98.06,
-   97.8
+   97.8,
+   97.54
   ]
  },
  "record": {
-  "n": 227,
-  "clvN": 197,
-  "clvRet": -0.0346,
-  "clvT": -6.67,
+  "n": 228,
+  "clvN": 198,
+  "clvRet": -0.0345,
+  "clvT": -6.69,
   "clv": -0.4,
-  "beat": 0.172,
-  "settled": 189,
+  "beat": 0.171,
+  "settled": 190,
   "w": 98,
-  "l": 91,
+  "l": 92,
   "p": 0,
-  "roi": 0.0445,
-  "roiT": 0.59,
-  "profit": -1.46,
-  "risked": 147.0,
-  "yield": -0.0099
+  "roi": 0.039,
+  "roiT": 0.52,
+  "profit": -1.71,
+  "risked": 147.25,
+  "yield": -0.0116
  },
- "tEff": -6.68,
+ "tEff": -6.69,
  "corr": {
   "rho": 0.0,
-  "n": 197,
+  "n": 198,
   "slates": 18,
-  "nEff": 197.0,
-  "avgSlate": 10.94
+  "nEff": 198.0,
+  "avgSlate": 11.0
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 197,
+   "value": 198,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-3.5% t -6.68",
+   "value": "-3.5% t -6.69",
    "pass": false
   },
   {
@@ -248,7 +249,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +4.5% vs -3.5% (SE 7.6)",
+   "value": "ROI +3.9% vs -3.5% (SE 7.6)",
    "pass": true
   }
  ],
@@ -301,7 +302,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 14,
+   "n": 15,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -386,20 +387,20 @@
    "sport": "cbb",
    "mk": "spread",
    "n": 35,
-   "clvN": 33,
-   "clvRet": -0.0369,
-   "clvT": -3.36,
-   "clv": -0.3,
-   "beat": 0.091,
-   "settled": 33,
+   "clvN": 34,
+   "clvRet": -0.0363,
+   "clvT": -3.41,
+   "clv": -0.29,
+   "beat": 0.088,
+   "settled": 34,
    "w": 15,
-   "l": 18,
+   "l": 19,
    "p": 0,
-   "roi": -0.1084,
-   "roiT": -0.63,
-   "profit": -0.87,
-   "risked": 9.75,
-   "yield": -0.0897
+   "roi": -0.1346,
+   "roiT": -0.79,
+   "profit": -1.12,
+   "risked": 10.0,
+   "yield": -0.1124
   },
   {
    "id": "cbb-total",
@@ -529,27 +530,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "cbb-spread",
-   "sport": "cbb",
-   "id": "401926771",
-   "k": "2026-11-03T03:30:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "USC",
-   "a": "Milwaukee",
-   "mk": "spread",
-   "side": "away",
-   "line": 26.5,
-   "price": -104.0,
-   "bet": "Milwaukee +26.5 -104",
-   "placed": "2026-11-03T02:59:25Z",
-   "stake": 0.25,
-   "edge": 3.3,
-   "ev": 0.0029,
-   "event": null,
-   "pass": false,
-   "close": 26.5
-  },
   {
    "rule": "cbb-total",
    "sport": "cbb",
@@ -1610,7 +1590,7 @@
    "edge": 5.0,
    "ev": 0.0008,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 68.5
   },
   {
@@ -1783,6 +1763,37 @@
   }
  ],
  "recent": [
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401926771",
+   "k": "2026-11-03T03:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "USC",
+   "a": "Milwaukee",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -104.0,
+   "bet": "Milwaukee +26.5 -104",
+   "placed": "2026-11-03T02:59:25Z",
+   "stake": 0.25,
+   "edge": 3.3,
+   "ev": 0.0029,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.019,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 26.5,
+   "score": [
+    63.0,
+    95.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
   {
    "rule": "cbb-ml",
    "sport": "cbb",
@@ -3591,37 +3602,6 @@
    "res": "w",
    "ret": 0.9615,
    "profit": 0.2404
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401928995",
-   "k": "2026-11-03T01:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Valparaiso",
-   "a": "Western Illinois",
-   "mk": "total",
-   "side": "over",
-   "line": 142.5,
-   "price": -104.0,
-   "bet": "over 142.5 -104",
-   "placed": "2026-11-02T00:03:56Z",
-   "stake": 0.25,
-   "edge": 2.8,
-   "ev": 0.0053,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.1624,
-   "clv": -3.0,
-   "beat": -1,
-   "close": 139.5,
-   "score": [
-    58.0,
-    80.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -11694,7 +11674,17 @@
    "ev": 0.0029,
    "event": null,
    "pass": false,
-   "close": 26.5
+   "clvRet": -0.019,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 26.5,
+   "score": [
+    63.0,
+    95.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "cbb-total",
@@ -12756,7 +12746,7 @@
    "edge": 5.0,
    "ev": 0.0008,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 68.5
   },
   {

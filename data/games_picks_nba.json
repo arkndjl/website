@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-03T06:22:24Z",
+ "asof": "2026-11-03T06:36:23Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -65,9 +65,9 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 1,
-    "window": 1,
-    "mean": -0.0192,
+    "n": 2,
+    "window": 2,
+    "mean": -0.0145,
     "t": null,
     "days": 1,
     "sd": 0.1425,
@@ -78,26 +78,26 @@
     "why": "",
     "drift": {
      "mu1": 0.019,
-     "n": 1,
+     "n": 2,
      "sd": 0.1425,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.023,
-     "info": 0.02,
+     "llr": -0.045,
+     "info": 0.04,
      "real": -0.765,
-     "realSe": 7.49,
+     "realSe": 5.296,
      "need": 330
     }
    },
    "spread | line: 15+": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0002,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1293,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -106,17 +106,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0028,
-     "n": 0,
+     "n": 1,
      "sd": 0.1293,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
+     "llr": -0.003,
      "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "real": -5.278,
+     "realSe": 46.118,
      "need": 12525
     }
    },
@@ -289,11 +289,11 @@
     }
    },
    "spread | venue: home": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0192,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1235,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -302,17 +302,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0103,
-     "n": 0,
+     "n": 1,
      "sd": 0.1235,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": -0.013,
+     "info": 0.01,
+     "real": -1.413,
+     "realSe": 12.019,
      "need": 851
     }
    }
@@ -4039,7 +4039,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 18.25,
+    "raw": 19.5,
     "scale": 1.0,
     "down": 4.25
    },
@@ -4056,7 +4056,7 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 31.25,
+    "raw": 31.5,
     "scale": 1.0
    }
   }
