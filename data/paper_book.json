@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-03T16:13:53Z",
+ "asof": "2026-11-03T16:19:19Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 101.28,
+  "now": 101.67,
   "peak": 118.08,
-  "drawdown": 0.1422,
-  "open": 95.0,
+  "drawdown": 0.1389,
+  "open": 87.5,
   "path": [
    101.5,
    101.6,
@@ -208,25 +208,26 @@
    102.34,
    102.09,
    100.6,
-   101.28
+   101.28,
+   101.67
   ]
  },
  "record": {
-  "n": 254,
+  "n": 251,
   "clvN": 207,
   "clvRet": -0.0347,
   "clvT": -6.98,
   "clv": -0.42,
   "beat": 0.168,
-  "settled": 200,
-  "w": 103,
+  "settled": 201,
+  "w": 104,
   "l": 97,
   "p": 0,
-  "roi": 0.0337,
-  "roiT": 0.46,
-  "profit": 1.96,
-  "risked": 161.75,
-  "yield": 0.0121
+  "roi": 0.0413,
+  "roiT": 0.56,
+  "profit": 2.35,
+  "risked": 162.0,
+  "yield": 0.0145
  },
  "tEff": -6.99,
  "corr": {
@@ -259,7 +260,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +3.4% vs -3.5% (SE 7.4)",
+   "value": "ROI +4.1% vs -3.5% (SE 7.4)",
    "pass": true
   }
  ],
@@ -375,7 +376,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 8,
+   "n": 7,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": -2.35,
@@ -417,7 +418,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 41,
+   "n": 40,
    "clvN": 34,
    "clvRet": -0.0363,
    "clvT": -3.41,
@@ -459,7 +460,7 @@
    "label": "NBA moneyline",
    "sport": "nba",
    "mk": "ml",
-   "n": 6,
+   "n": 5,
    "clvN": 3,
    "clvRet": -0.0208,
    "clvT": -2.24,
@@ -528,15 +529,15 @@
    "clvT": -3.46,
    "clv": 0.06,
    "beat": 0.24,
-   "settled": 43,
-   "w": 26,
+   "settled": 44,
+   "w": 27,
    "l": 17,
    "p": 0,
-   "roi": 0.2859,
-   "roiT": 1.59,
-   "profit": 8.36,
-   "risked": 35.75,
-   "yield": 0.2339
+   "roi": 0.3148,
+   "roiT": 1.77,
+   "profit": 8.75,
+   "risked": 36.0,
+   "yield": 0.2431
   },
   {
    "id": "nflprops-prop",
@@ -584,30 +585,6 @@
    "clv": 0.7,
    "beat": 1,
    "close": 0.75
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186455",
-   "k": "2026-11-03T13:15:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Nakashima",
-   "a": "Berrettini",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 156,
-   "bet": "Berrettini ML +156",
-   "placed": "2026-11-03T13:03:02Z",
-   "stake": 0.25,
-   "edge": 5.1,
-   "ev": 0.0019,
-   "event": "Rolex Paris Masters",
-   "pass": false,
-   "clvRet": -0.0144,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 0.385
   },
   {
    "rule": "tennis-ml",
@@ -811,8 +788,8 @@
    "edge": 6.3,
    "ev": 0.0133,
    "event": null,
-   "pass": false,
-   "close": 25.5
+   "pass": true,
+   "close": 24.5
   },
   {
    "rule": "cfb-total",
@@ -1022,7 +999,7 @@
    "ev": 0.0053,
    "event": null,
    "pass": false,
-   "close": 41.5
+   "close": 40.5
   },
   {
    "rule": "cbb-spread",
@@ -1270,7 +1247,7 @@
    "edge": 2.2,
    "ev": 0.0197,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -2.5
   },
   {
@@ -1354,8 +1331,8 @@
    "edge": 3.9,
    "ev": 0.0565,
    "event": null,
-   "pass": false,
-   "close": 42.5
+   "pass": true,
+   "close": 41.5
   },
   {
    "rule": "nflprops-prop",
@@ -2152,6 +2129,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186455",
+   "k": "2026-11-03T13:15:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Nakashima",
+   "a": "Berrettini",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 156,
+   "bet": "Berrettini ML +156",
+   "placed": "2026-11-03T13:03:02Z",
+   "stake": 0.25,
+   "edge": 5.1,
+   "ev": 0.0019,
+   "event": "Rolex Paris Masters",
+   "pass": false,
+   "clvRet": -0.0144,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.385,
+   "score": "6-4 3-6 7-6",
+   "res": "w",
+   "ret": 1.56,
+   "profit": 0.39
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3924,37 +3929,6 @@
    "res": "w",
    "ret": 0.9804,
    "profit": 0.4902
-  },
-  {
-   "rule": "cbb-spread",
-   "sport": "cbb",
-   "id": "401909784",
-   "k": "2026-11-03T01:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Kansas",
-   "a": "Fordham",
-   "mk": "spread",
-   "side": "away",
-   "line": 23.5,
-   "price": -104.0,
-   "bet": "Fordham +23.5 -104",
-   "placed": "2026-11-02T11:23:17Z",
-   "stake": 0.25,
-   "edge": 2.9,
-   "ev": 0.0002,
-   "event": null,
-   "pass": true,
-   "clvRet": 0.1241,
-   "clv": 2.0,
-   "beat": 1,
-   "close": 21.5,
-   "score": [
-    65.0,
-    95.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -12450,7 +12424,11 @@
    "clvRet": -0.0144,
    "clv": 0.0,
    "beat": 0,
-   "close": 0.385
+   "close": 0.385,
+   "score": "6-4 3-6 7-6",
+   "res": "w",
+   "ret": 1.56,
+   "profit": 0.39
   },
   {
    "rule": "tennis-ml",
@@ -12654,8 +12632,8 @@
    "edge": 6.3,
    "ev": 0.0133,
    "event": null,
-   "pass": false,
-   "close": 25.5
+   "pass": true,
+   "close": 24.5
   },
   {
    "rule": "cfb-total",
@@ -12865,7 +12843,7 @@
    "ev": 0.0053,
    "event": null,
    "pass": false,
-   "close": 41.5
+   "close": 40.5
   },
   {
    "rule": "cbb-spread",
@@ -13113,7 +13091,7 @@
    "edge": 2.2,
    "ev": 0.0197,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -2.5
   },
   {
@@ -13197,8 +13175,8 @@
    "edge": 3.9,
    "ev": 0.0565,
    "event": null,
-   "pass": false,
-   "close": 42.5
+   "pass": true,
+   "close": 41.5
   },
   {
    "rule": "nflprops-prop",
