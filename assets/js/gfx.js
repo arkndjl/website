@@ -530,6 +530,113 @@
     }
     return F.canvas;
   }
+  // ---- team builder plan, college basketball (cbbbuilder.html sets window.__arkCbbBuilder): the program's offseason on a
+  // 4:5 card: header, team rating now / returning / after the plan, the NIL budget bar, next season's rotation by BPM
+  // (FR class, NEW signing, KEEP tags), the signings with where they come from, and who leaves and why
+  async function buildCbbPlan(win) {
+    var B = window.__arkCbbBuilder, T = B && B.current, D = B && B.data; if (!T) return null;
+    var nxt = D.season + '-' + String(D.season + 1).slice(2);
+    var F = await frame(2160, 2700, 'team builder :: ' + T.t + ' ' + nxt, B.stamp || '', SITE + '#builder:' + encodeURIComponent(T.t));
+    var g = F.g, x = F.x + 32, y = F.y + 40, w = F.w - 64, i;
+    well(g, F.x, F.y, F.w, F.h);
+    var lg = await loadImg(T.logo);
+    if (lg) drawLogo(g, lg, x, y, 160, 160);
+    g.font = '96px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, T.t, w - 200), x + 192, y + 56);
+    g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [T.conf, T.coach, 'ARK #' + T.rk].filter(Boolean).join(' · '), w - 200), x + 192, y + 136);
+    y += 208;
+    // three rating tiles: now, returning (no adds), after the plan
+    var tiles = [['RATING NOW', T.now, ''], ['RETURNING', T.ret, ''], ['AFTER PLAN', T.after, (T.after - T.ret >= 0 ? '+' : '−') + Math.abs(T.after - T.ret).toFixed(1) + ' signed']];
+    var tw = Math.floor((w - 2 * 24) / 3), th = 184;
+    tiles.forEach(function (t, k) {
+      var tx = x + k * (tw + 24);
+      g.fillStyle = C.face; g.fillRect(tx, y, tw, th); bevel(g, tx, y, tw, th, true, 4);
+      if (k === 2) { g.fillStyle = C.teal; g.fillRect(tx, y, tw, 6); }
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, y + 40);
+      g.font = '88px ' + FONT; g.fillStyle = k === 2 ? C.teal : C.white; var v = (t[1] >= 0 ? '+' : '−') + Math.abs(t[1]).toFixed(1); g.fillText(v, tx + 24, y + 116);
+      if (t[2]) { var vw = g.measureText(v).width; g.font = '36px ' + FONT; g.fillStyle = C.teal; g.fillText(t[2], tx + 24 + vw + 24, y + 124); }
+    });
+    y += th + 56;
+    // budget bar: spend against the budget
+    g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText('NIL BUDGET ' + money(T.budget), x, y);
+    g.font = '36px ' + FONT; g.fillStyle = C.lilac; var sp = 'spend ' + money(T.spend) + ' · ' + Math.round(100 * T.spend / Math.max(1, T.budget)) + '%'; g.fillText(sp, x + w - g.measureText(sp).width, y);
+    y += 40;
+    var bh = 56, fr = Math.max(0, Math.min(1, T.spend / Math.max(1, T.budget)));
+    g.fillStyle = C.dark; g.fillRect(x, y, w, bh);
+    g.fillStyle = C.teal; g.fillRect(x, y, Math.round(w * fr), bh);
+    g.fillStyle = 'rgba(0,0,0,0.3)'; for (var q = x + 14; q < x + w * fr; q += 16) g.fillRect(q, y, 2, bh);
+    bevel(g, x, y, w, bh, false, 4);
+    y += bh + 64;
+    function head(t, hx, hy, hw) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(t, hx, hy);
+      var lw = g.measureText(t).width + 20; g.fillStyle = C.dark; g.fillRect(hx + lw, hy - 2, Math.max(0, hw - lw), 3);
+    }
+    function sg(v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1); }
+    function tag(t, tx, cy, col) {
+      g.font = '26px ' + FONT; var ww = g.measureText(t).width + 16;
+      g.fillStyle = col; g.fillRect(tx, cy - 17, ww, 34); g.fillStyle = C.dark; g.fillText(t, tx + 8, cy + 1); return ww;
+    }
+    var colW = Math.floor((w - 48) / 2), lx = x, rx = x + colW + 48, top = y, bottom = F.y + F.h - 32;
+    // rows as tall as the space allows (62-88 px), so a short plan still fills the card
+    var nRot = T.back.length + (T.commits || []).length + T.plan.length, nRight = Math.max(1, T.plan.length) + Math.max(1, T.leave.length);
+    var RH = Math.max(62, Math.min(88, Math.floor(Math.min((bottom - top - 96) / Math.max(1, nRot), (bottom - top - 152) / nRight))));
+    // left: next season's rotation, best BPM first
+    var rot = T.back.map(function (p) { return { n: p.name, pos: p.pos, fv: p.fv, bpm: p.bpm, k: '' }; })
+      .concat((T.commits || []).map(function (c) { return { n: c.name, pos: c.pos, fv: c.fv, bpm: c.bpm, k: 'FR' }; }))
+      .concat(T.plan.map(function (s) { return { n: s.name, pos: s.pos, fv: s.fv, bpm: s.bpm, k: s.kind === 'keep' ? 'KEEP' : 'NEW' }; }))
+      .sort(function (a, b) { return b.bpm - a.bpm; });
+    head('NEXT SEASON · ' + rot.length + ' OF ' + D.roster, lx, y, colW);
+    y += 56;
+    g.font = '28px ' + FONT; g.fillStyle = C.lilac;
+    [['POS', 470], ['FV', 580], ['BPM', 690]].forEach(function (h) { g.fillText(h[0], lx + h[1], y); }); y += 40;
+    var maxRot = Math.min(rot.length, Math.floor((bottom - y) / RH));
+    for (i = 0; i < maxRot; i++) {
+      var o = rot[i], cy = y + RH / 2;
+      if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(lx, y, colW, RH); }
+      if (i === 5) { g.fillStyle = C.teal; g.fillRect(lx, y - 1, colW, 3); }   // the five above the line start
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(i + 1), lx + 8, cy);
+      g.fillStyle = C.white; g.fillText(fit(g, o.n, 390), lx + 64, cy);
+      g.fillStyle = C.lilac; g.fillText(o.pos || '', lx + 470, cy);
+      if (o.fv != null) chip(g, lx + 580, cy, String(Math.round(o.fv)), 32, o.fv);
+      g.font = '36px ' + FONT; g.fillStyle = o.bpm >= 0 ? C.teal : C.down; g.fillText(sg(o.bpm), lx + 690, cy);
+      if (o.k) tag(o.k, lx + 820, cy, o.k === 'NEW' ? C.teal : o.k === 'FR' ? C.lilac : '#ffd34d');
+      y += RH;
+    }
+    // right: the plan, then who leaves
+    y = top;
+    var nk = T.plan.filter(function (s) { return s.kind === 'keep'; }).length, ns = T.plan.length - nk;
+    head('THE PLAN · ' + ns + ' SIGNING' + (ns === 1 ? '' : 'S') + (nk ? ' · ' + nk + ' KEPT' : ''), rx, y, colW);
+    y += 56;
+    if (!T.plan.length) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText('no signings', rx, y + RH / 2); y += RH; }
+    var logos = await Promise.all(T.plan.map(function (s) { return s.kind === 'keep' ? null : loadImg(s.logo); }));
+    var maxPlan = Math.min(T.plan.length, Math.max(1, Math.floor((bottom - y - 56 - 2 * RH) / RH)));
+    for (i = 0; i < maxPlan; i++) {
+      var s = T.plan[i], cy2 = y + RH / 2, nx = rx;
+      if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(rx, y, colW, RH); }
+      if (logos[i]) drawLogo(g, logos[i], rx + 4, cy2 - 22, 44, 44); else tag('KEEP', rx, cy2, '#ffd34d');
+      nx = rx + 96;
+      g.font = '36px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, s.name, colW - 96 - 330), nx, cy2);
+      g.fillStyle = C.lilac; g.fillText(s.pos || '', rx + colW - 320, cy2);
+      g.fillStyle = C.teal; var gn = '+' + s.gain.toFixed(1); g.fillText(gn, rx + colW - 230, cy2);
+      g.font = '30px ' + FONT; g.fillStyle = C.lilac; var cs = money(s.cost); g.fillText(cs, rx + colW - g.measureText(cs).width - 8, cy2);
+      y += RH;
+    }
+    y += 40;
+    head('LEAVING · ' + T.leave.length, rx, y, colW);
+    y += 56;
+    var WHYC = { draft: C.teal, eligibility: C.lilac, transfer: C.down, 'leaves D-I': '#ffd34d' };
+    var maxL = Math.min(T.leave.length, Math.floor((bottom - y) / RH));
+    for (i = 0; i < maxL; i++) {
+      var p = T.leave[i], cy3 = y + RH / 2;
+      if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(rx, y, colW, RH); }
+      g.font = '36px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.name, colW - 330), rx + 8, cy3);
+      if (p.fv != null) chip(g, rx + colW - 300, cy3, String(Math.round(p.fv)), 32, p.fv);
+      g.font = '26px ' + FONT; var wt = String(p.why).toUpperCase(), ww2 = g.measureText(wt).width + 16;
+      tag(wt, rx + colW - ww2 - 8, cy3, WHYC[p.why] || C.lilac);
+      y += RH;
+    }
+    if (!T.leave.length) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText('no departures', rx, y + RH / 2); }
+    return F.canvas;
+  }
   // ---- team builder plan (cfbbuilder.html): the selected program's whole offseason on one 4:5 card ----
   // header and mode, the budget bar, next season's 22 on a pixel field (returning, signing, open), the
   // signings, who's leaving and why, and value now / with no adds / with the plan
@@ -2051,14 +2158,14 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }

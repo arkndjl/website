@@ -17,7 +17,7 @@
 {{- $lists = $lists | append (dict "key" "ark" "title" "ARK Ranking" "sub" "Top 25 · model" "ranks" $ours) }}
 {{- with $P.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (lower .week) "ranks" .ranks) }}{{ end }}
 {{- with $P.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (lower .week) "ranks" .ranks) }}{{ end }}
-<div class="win cfbr__polls"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+<div class="win cfbr__polls"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="{{ lower ((time .asof).Format "Jan 2, 2006") }}" data-gfx-rank="{{ $rank | jsonify }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>ARK Top 25 and the polls<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -25,7 +25,7 @@
   <div class="cfbr__grid" style="--cols: {{ len $lists }}">
     {{- range $l := $lists }}
     <section class="cfbr__col cfbr__col--{{ $l.key }}">
-      <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span></h4>
+      <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span>{{ if eq $l.key "ark" }}<button type="button" class="cfb__btn cfb__gfx cfbr__gfx" data-gfx data-gfx-mode="rank" title="graphic of the ARK Ranking Top 25 (4:5)">GFX</button>{{ end }}</h4>
       <ol class="cfbr__list">
         {{- range $l.ranks }}{{ $wk := cond (eq $l.key "ark") (cond (eq site.Data.cbb_games.prevFrom "preseason") "preseason" "last week") "last poll" }}
         <li>

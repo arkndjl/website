@@ -17,6 +17,7 @@
       <label class="cfb__field"><span>conf</span><select name="conf" data-tb-conf><option value="">any</option></select></label>
       <button type="button" class="cfb__btn" data-tb-step="-1" title="previous team" aria-label="previous team">◀</button>
       <button type="button" class="cfb__btn" data-tb-step="1" title="next team" aria-label="next team">▶</button>
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="cbbplan" title="offseason plan graphic (4:5)">GFX plan</button>
     </form>
   </div>
   <div class="tb__body" data-tb-body><p class="cfb__none">loading offseason plans…<noscript> (needs JavaScript)</noscript></p></div>
@@ -76,6 +77,7 @@
     function show(name) {
       var T = byT[name] || byT[sel.value] || teams[0]; if (!T) return;
       sel.value = T.t; render(T, D, body);
+      window.__arkCbbBuilder = { current: T, data: D, stamp: (w.querySelector('[data-tb-asof]') || {}).textContent || '' };
       w.querySelector('[data-tb-status]').textContent = T.t + ' · ' + T.plan.length + ' move' + (T.plan.length === 1 ? '' : 's') + ' · ' + T.coach;
       try { history.replaceState(null, '', '#builder:' + encodeURIComponent(T.t)); } catch (e) {}
     }
@@ -96,3 +98,4 @@
   });
 })();
 </script>
+{{- partial "gfx.html" . -}}
