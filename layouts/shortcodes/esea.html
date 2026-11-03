@@ -524,21 +524,24 @@
     {{- $ln := "" }}{{ with $pv.spread }}{{ $ln = printf "%s −%.1f" (cond (ge (float .line) 0) "1NT" $o.name) (math.Abs (float .line)) }}{{ end }}
     {{- $oLogo := "" }}{{ with $o.avatar }}{{ $f := path.Base . }}{{ if fileExists (printf "static/img/1nt/opp/%s" $f) }}{{ $oLogo = printf "img/1nt/opp/%s" $f | relURL }}{{ end }}{{ end }}
     {{- $st := $d.standing | default dict }}
+    {{- /* knife side: map win % of the team starting T, by map (ARKBOARD Research cs2-side-first, bo3.gg pro maps) */}}
+    {{- $sides := dict }}{{ $sf := "research/studies/cs2/cs2-side-first.json" }}{{ if fileExists $sf }}{{ range (index ((os.ReadFile $sf | transform.Unmarshal).chart.series) 0).points }}{{ $sides = merge $sides (dict .x (dict "t" .y "lo" .lo "hi" .hi "n" .n)) }}{{ end }}{{ end }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
         "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.webp" | relURL) "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us)
         "them" (dict "name" $o.name "logo" $oLogo "rank" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))  "rec" $o.rec "talent" $pv.talent.them)
+        "pool" $pv.pool "oppMaps" ($pv.oppMaps | default slice) "bon" ($pv.bestOf | default 1) "sides" $sides
         "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">
       <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-fan" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-fan" data-gfx-date="ESEA S{{ $season }}" title="fan graphic: teams, odds, lineups, streams (4:5)">fanGFX</button>
-      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-team" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-team" data-gfx-date="ESEA S{{ $season }}" title="team graphic: veto, map edges, matchups, game plan (4:5)">teamGFX</button>
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-team" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-team" data-gfx-date="ESEA S{{ $season }}" title="pick/ban tree and knife side (4:5)">teamGFX</button>
     </p>
     {{- with $pv.url }}<p class="esea-m__link"><a href="{{ . }}" rel="noopener">match room on FACEIT ↗</a></p>{{ end }}
   </div>
   {{- else }}
   <p class="esea__empty-line">no match scheduled.</p>
   {{- end }}
-  <div class="win__status"><span>map edge = each five's lifetime FACEIT map win rate vs their own overall rate (log-odds, shrunk by n/(n+{{ with $pv }}{{ .mapK | default 50 }}{{ else }}50{{ end }})), x{{ with $pv }}{{ .mapCoef | default 1.18 }}{{ else }}1.18{{ end }} on the match win chance; fit on ESEA S53-S59 league maps · regular season Bo1: six bans, last map played · veto = minimax on the edge{{ with $pv }}{{ with .fixedBans }}; standing bans {{ delimit . " + " }}{{ end }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>map edge = each five's lifetime FACEIT map win rate vs their own overall rate (log-odds, shrunk by n/(n+{{ with $pv }}{{ .mapK | default 50 }}{{ else }}50{{ end }})), x{{ with $pv }}{{ .mapCoef | default 1.18 }}{{ else }}1.18{{ end }} on the match win chance; fit on ESEA S53-S59 league maps · regular season Bo1: six bans, last map played · veto = minimax on the edge{{ with $pv }}{{ with .fixedBans }}; standing bans {{ delimit . " + " }}{{ end }}{{ end }} · teamGFX tree: opp HABIT bans maps it played least in 90 days (decider log loss −1.61 vs −1.95 uniform, ESEA S58-S59 held out), EDGE = minimax; knife = pro T-first map win %, shrunk to the all-map rate</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "alltime" }}
