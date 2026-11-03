@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T18:10:23Z",
+ "asof": "2026-11-03T18:37:50Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 98.73,
   "peak": 118.08,
   "drawdown": 0.1639,
-  "open": 87.5,
+  "open": 92.0,
   "path": [
    101.5,
    101.6,
@@ -217,7 +217,7 @@
   ]
  },
  "record": {
-  "n": 255,
+  "n": 256,
   "clvN": 208,
   "clvRet": -0.0345,
   "clvT": -6.98,
@@ -338,7 +338,7 @@
    "label": "NFL moneyline",
    "sport": "nfl",
    "mk": "ml",
-   "n": 5,
+   "n": 4,
    "clvN": 2,
    "clvRet": -0.007,
    "clvT": -0.59,
@@ -380,7 +380,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 10,
+   "n": 11,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": -2.35,
@@ -548,7 +548,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 38,
+   "n": 39,
    "clvN": 34,
    "clvRet": -0.0163,
    "clvT": -1.11,
@@ -566,30 +566,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186451",
-   "k": "2026-11-03T14:30:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Michelsen",
-   "a": "Lehecka",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -141,
-   "bet": "Lehecka ML -141",
-   "placed": "2026-11-01T17:12:52Z",
-   "stake": 0.5,
-   "edge": 7.2,
-   "ev": 0.0031,
-   "event": "Rolex Paris Masters",
-   "pass": true,
-   "clvRet": 0.017,
-   "clv": 1.7,
-   "beat": 1,
-   "close": 0.595
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -785,7 +761,7 @@
    "ev": -0.0001,
    "event": null,
    "pass": true,
-   "close": 14.5
+   "close": 13.5
   },
   {
    "rule": "cbb-spread",
@@ -890,7 +866,7 @@
    "ev": 0.0442,
    "event": null,
    "pass": false,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "rule": "cbb-spread",
@@ -1933,8 +1909,8 @@
    "edge": 4.1,
    "ev": 0.048,
    "event": null,
-   "pass": true,
-   "close": 52.5
+   "pass": false,
+   "close": 51.5
   },
   {
    "rule": "nfl-ml",
@@ -2037,8 +2013,8 @@
    "edge": 4.0,
    "ev": 0.0146,
    "event": null,
-   "pass": false,
-   "close": -5.5
+   "pass": true,
+   "close": -4.5
   },
   {
    "rule": "nfl-total",
@@ -2060,6 +2036,26 @@
    "event": null,
    "pass": false,
    "close": 51.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873046-4612826-rc",
+   "k": "2026-11-08T21:05:00Z",
+   "slate": "nflprops:2026-11-08",
+   "h": "LAC",
+   "a": "HOU",
+   "mk": "prop",
+   "side": "under",
+   "line": 3.5,
+   "price": -108.0,
+   "bet": "Ladd McConkey under 3.5 rec -108",
+   "placed": "2026-11-03T18:37:00Z",
+   "stake": 0.75,
+   "edge": 11.4,
+   "ev": 0.0535,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nfl-total",
@@ -2125,6 +2121,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186451",
+   "k": "2026-11-03T14:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Michelsen",
+   "a": "Lehecka",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -141,
+   "bet": "Lehecka ML -141",
+   "placed": "2026-11-01T17:12:52Z",
+   "stake": 0.5,
+   "edge": 7.2,
+   "ev": 0.0031,
+   "event": "Rolex Paris Masters",
+   "pass": true,
+   "clvRet": 0.017,
+   "clv": 1.7,
+   "beat": 1,
+   "close": 0.595,
+   "score": "7-6 2-6 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.5
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3890,29 +3914,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -3.75
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873036-4887558-ry",
-   "k": "2026-11-03T01:15:00Z",
-   "slate": "nflprops:2026-11-02",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "over",
-   "line": 19.5,
-   "price": -113.0,
-   "bet": "Emanuel Wilson over 19.5 rush yds -113",
-   "placed": "2026-10-31T21:25:00Z",
-   "stake": 2.25,
-   "edge": 37.9,
-   "ev": 0.2384,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.0296,
-   "close": 19.5,
-   "res": "void"
   }
  ],
  "ledger": [
@@ -12524,7 +12525,11 @@
    "clvRet": 0.017,
    "clv": 1.7,
    "beat": 1,
-   "close": 0.595
+   "close": 0.595,
+   "score": "7-6 2-6 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.5
   },
   {
    "rule": "tennis-ml",
@@ -12721,7 +12726,7 @@
    "ev": -0.0001,
    "event": null,
    "pass": true,
-   "close": 14.5
+   "close": 13.5
   },
   {
    "rule": "cbb-spread",
@@ -12826,7 +12831,7 @@
    "ev": 0.0442,
    "event": null,
    "pass": false,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "rule": "cbb-spread",
@@ -13869,8 +13874,8 @@
    "edge": 4.1,
    "ev": 0.048,
    "event": null,
-   "pass": true,
-   "close": 52.5
+   "pass": false,
+   "close": 51.5
   },
   {
    "rule": "nfl-ml",
@@ -13973,8 +13978,8 @@
    "edge": 4.0,
    "ev": 0.0146,
    "event": null,
-   "pass": false,
-   "close": -5.5
+   "pass": true,
+   "close": -4.5
   },
   {
    "rule": "nfl-total",
@@ -13996,6 +14001,26 @@
    "event": null,
    "pass": false,
    "close": 51.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873046-4612826-rc",
+   "k": "2026-11-08T21:05:00Z",
+   "slate": "nflprops:2026-11-08",
+   "h": "LAC",
+   "a": "HOU",
+   "mk": "prop",
+   "side": "under",
+   "line": 3.5,
+   "price": -108.0,
+   "bet": "Ladd McConkey under 3.5 rec -108",
+   "placed": "2026-11-03T18:37:00Z",
+   "stake": 0.75,
+   "edge": 11.4,
+   "ev": 0.0535,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nfl-total",

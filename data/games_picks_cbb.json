@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T18:10:19Z",
+ "asof": "2026-11-03T18:37:46Z",
  "recenter": {
-  "2026-11-03": -12.84
+  "2026-11-03": -12.85
  },
  "monitor": {
   "clocks": {
@@ -198,14 +198,14 @@
    "tmRaw": 147.1,
    "flagged": "2026-11-03T13:43:38Z",
    "betTo": 21.5,
-   "close": 27.5,
+   "close": 26.5,
    "now": {
     "mk": "spread",
     "side": "away",
-    "line": 27.5,
-    "price": -111.0,
-    "ev": 0.081,
-    "units": 0.5
+    "line": 26.5,
+    "price": 102.0,
+    "ev": 0.133,
+    "units": 5.0
    }
   },
   {
@@ -356,8 +356,8 @@
     "mk": "spread",
     "side": "home",
     "line": 25.5,
-    "price": 104.0,
-    "ev": 0.127,
+    "price": 108.0,
+    "ev": 0.149,
     "units": 5.0
    }
   },
@@ -449,9 +449,9 @@
     "mk": "spread",
     "side": "away",
     "line": 31.5,
-    "price": 104.0,
-    "ev": 0.064,
-    "units": 2.5
+    "price": 102.0,
+    "ev": 0.053,
+    "units": 2.0
    }
   },
   {
@@ -537,7 +537,7 @@
    "tmRaw": 141.2,
    "flagged": "2026-11-03T02:01:42Z",
    "betTo": 14.5,
-   "close": 14.5,
+   "close": 13.5,
    "pass": true,
    "now": null
   }
@@ -615,10 +615,10 @@
    "mk": "spread",
    "side": "away",
    "line": 20.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 4.0,
    "x": 2.5,
-   "why": "no edge at -108",
+   "why": "no edge at -111",
    "m": 16.5,
    "tm": 145.9
   },
@@ -646,29 +646,13 @@
    "away": "Lipscomb",
    "mk": "spread",
    "side": "away",
-   "line": 23.5,
-   "price": -106.0,
-   "edge": 3.2,
-   "x": 2.5,
-   "why": "no edge at -106",
-   "m": 20.3,
-   "tm": 146.8
-  },
-  {
-   "id": "401920376",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:00:00Z",
-   "home": "Virginia Tech",
-   "away": "Coppin State",
-   "mk": "spread",
-   "side": "away",
-   "line": 31.5,
-   "price": -108.0,
+   "line": 22.5,
+   "price": 104.0,
    "edge": 2.2,
    "x": 2.5,
    "why": "edge under 2.5",
-   "m": 29.3,
-   "tm": 150.5
+   "m": 20.3,
+   "tm": 146.8
   },
   {
    "id": "401920343",
@@ -695,12 +679,44 @@
    "mk": "spread",
    "side": "away",
    "line": 19.5,
-   "price": -104.0,
+   "price": -113.0,
    "edge": 1.5,
    "x": 2.5,
    "why": "edge under 2.5",
    "m": 18.0,
    "tm": 151.0
+  },
+  {
+   "id": "401920376",
+   "sport": "cbb",
+   "kick": "2026-11-04T00:00:00Z",
+   "home": "Virginia Tech",
+   "away": "Coppin State",
+   "mk": "spread",
+   "side": "away",
+   "line": 30.5,
+   "price": 104.0,
+   "edge": 1.2,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 29.3,
+   "tm": 150.5
+  },
+  {
+   "id": "401906757",
+   "sport": "cbb",
+   "kick": "2026-11-04T00:30:00Z",
+   "home": "Alabama",
+   "away": "Sam Houston",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -100.0,
+   "edge": 0.7,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 25.8,
+   "tm": 172.5
   },
   {
    "id": "401920155",
@@ -759,49 +775,33 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -113.0,
+   "price": -115.0,
    "edge": 2.1,
    "x": null,
    "why": "total market off",
    "m": 10.8,
    "tm": 155.6
-  },
-  {
-   "id": "401906757",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:30:00Z",
-   "home": "Alabama",
-   "away": "Sam Houston",
-   "mk": "total",
-   "side": "over",
-   "line": 171.5,
-   "price": -113.0,
-   "edge": 1.0,
-   "x": null,
-   "why": "total market off",
-   "m": 25.8,
-   "tm": 172.5
   }
  ],
  "games": {
   "401906757": {
-   "mk": "total",
-   "side": "over",
-   "line": 171.5,
-   "price": -113.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -100.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Alabama",
    "away": "Sam Houston",
-   "state": "off"
+   "state": "under"
   },
   "401920702": {
    "mk": "spread",
    "side": "away",
-   "line": 23.5,
-   "price": -106.0,
-   "edge": 3.2,
+   "line": 22.5,
+   "price": 104.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Iowa",
@@ -824,8 +824,8 @@
    "mk": "spread",
    "side": "home",
    "line": 25.5,
-   "price": 104.0,
-   "ev": 0.127,
+   "price": 108.0,
+   "ev": 0.149,
    "edge": 6.5,
    "units": 5.0,
    "home": "Tennessee",
@@ -848,7 +848,7 @@
    "mk": "spread",
    "side": "away",
    "line": 19.5,
-   "price": -104.0,
+   "price": -113.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -883,11 +883,11 @@
   "401921808": {
    "mk": "spread",
    "side": "away",
-   "line": 27.5,
-   "price": -111.0,
-   "ev": 0.081,
-   "edge": 8.5,
-   "units": 0.5,
+   "line": 26.5,
+   "price": 102.0,
+   "ev": 0.133,
+   "edge": 7.5,
+   "units": 5.0,
    "home": "LSU",
    "away": "LSU New Orleans",
    "state": "pick"
@@ -908,10 +908,10 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": 104.0,
-   "ev": 0.064,
+   "price": 102.0,
+   "ev": 0.053,
    "edge": 2.6,
-   "units": 2.5,
+   "units": 2.0,
    "home": "Texas A&M",
    "away": "Alabama State",
    "state": "pick"
@@ -955,9 +955,9 @@
   "401920376": {
    "mk": "spread",
    "side": "away",
-   "line": 31.5,
-   "price": -108.0,
-   "edge": 2.2,
+   "line": 30.5,
+   "price": 104.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "Virginia Tech",
@@ -968,7 +968,7 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -113.0,
+   "price": -115.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -992,7 +992,7 @@
    "mk": "spread",
    "side": "away",
    "line": 20.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -1065,7 +1065,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4018,
+  "snapshots": 4035,
   "buckets": [
    {
     "when": "24h+",
@@ -1078,21 +1078,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 552,
-    "clvRet": -0.0429,
-    "clvT": -8.81,
-    "clv": 0.08,
-    "beat": 0.272,
-    "still": 0.4
+    "clvN": 559,
+    "clvRet": -0.0397,
+    "clvT": -8.2,
+    "clv": 0.13,
+    "beat": 0.275,
+    "still": 0.408
    },
    {
     "when": "1-6h",
-    "clvN": 317,
-    "clvRet": -0.0557,
-    "clvT": -18.66,
-    "clv": -0.15,
-    "beat": 0.123,
-    "still": 0.644
+    "clvN": 319,
+    "clvRet": -0.0556,
+    "clvT": -18.76,
+    "clv": -0.14,
+    "beat": 0.122,
+    "still": 0.646
    },
    {
     "when": "<1h",
@@ -7489,7 +7489,7 @@
    "tmRaw": 141.2,
    "flagged": "2026-11-03T02:01:42Z",
    "betTo": 14.5,
-   "close": 14.5,
+   "close": 13.5,
    "pass": true
   },
   {
@@ -7626,7 +7626,7 @@
    "tmRaw": 147.1,
    "flagged": "2026-11-03T13:43:38Z",
    "betTo": 21.5,
-   "close": 27.5
+   "close": 26.5
   },
   {
    "id": "401920061",
@@ -7735,7 +7735,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 14.5,
+    "raw": 19.5,
     "scale": 1.0,
     "down": 16.5
    },
@@ -7744,7 +7744,7 @@
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 19.75,
+    "raw": 21.75,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -7756,7 +7756,7 @@
     "scale": 1.0
    },
    "2026-11-08": {
-    "raw": 7.0,
+    "raw": 12.0,
     "scale": 1.0
    },
    "2026-11-09": {
