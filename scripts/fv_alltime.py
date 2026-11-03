@@ -93,6 +93,10 @@ def check(rows, peaks, groups, grp, complete=lambda r: True):
     return {'n': len(R), 'bias': r1((y - x).mean()), 'slope': None if slope is None else round(slope, 2), 'bands': bands, 'top': top}
 
 
+# the list shows a player only once he has left college, drafted or not (Noah, Nov 3 2026); grades are untouched
+GONE = lambda r: r.get('status') != 'college'
+
+
 def listed(peaks, groups, grp, complete=lambda r: True):
     out = []
     for g in groups:
@@ -232,7 +236,7 @@ def cfb(path):
             'outcome': 'NFL AV a season through 2025 on the FV scale, drafts 2015-23',
             'boxfit': {('last' if k else 'earlier'): [round(float(v), 3) for v in b] for k, b in boxfit.items()},
             'draftfit': [round(float(v), 3) for v in draftfit], 'basis': 'draft',
-            'rows': [{k: v for k, v in r.items() if k not in ('id',)} for r in listed(peaks, groups, lambda r: r['pos'])],
+            'rows': [{k: v for k, v in r.items() if k not in ('id',)} for r in listed(peaks, groups, lambda r: r['pos'], GONE)],
             'check': check(peaks, peaks, groups, lambda r: r['pos'])}
 
 
@@ -244,7 +248,7 @@ def cbb():
     peaks = best_per_player(R, lambda r: r['name'] + '|' + r['pos'] + '|' + str(r['season']))
     groups = ['G', 'F', 'C']
     return {'label': 'CBB', 'seasons': [min(r['season'] for r in R), max(r['season'] for r in R)], 'groups': groups, 'n': len(R), 'players': len(peaks),
-            'outcome': 'peak NBA value (XPM and role) on the FV scale', 'rows': listed(peaks, groups, lambda r: r['pos']),
+            'outcome': 'peak NBA value (XPM and role) on the FV scale', 'rows': listed(peaks, groups, lambda r: r['pos'], GONE),
             'check': check(R, peaks, groups, lambda r: r['pos']), 'basis': 'draft'}
 
 
