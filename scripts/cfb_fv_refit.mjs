@@ -606,7 +606,9 @@ const finals = [], early = [];
 const NT = process.argv.includes('--target') ? JSON.parse(fs.readFileSync(path.join(C, 'nfl_targets.json'), 'utf8')) : null;
 if (PAST) for (const p of rows) Object.assign(p, { av: 0, ath: null, dt: null });     // graded, never scored
 // --alltime matches draftees within the position family (a college DT drafted as an edge or linebacker, Rashan Gary)
-const FAMPOS = (() => { const F = [['QB'], ['RB', 'WR', 'TE'], ['EDGE', 'DL', 'LB']], o = {}; for (const f of F) { const u = [...new Set(f.flatMap(g => NFLPOS[g] || []))]; for (const g of f) o[g] = u; } return o; })();
+// an offensive lineman's pick only for a tight end (a back sharing a lineman's name took his career: UAB RB Spencer Brown)
+const OLPOS = new Set(['OL', 'T', 'G', 'C', 'OT', 'OG']);
+const FAMPOS = (() => { const F = [['QB'], ['RB', 'WR', 'TE'], ['EDGE', 'DL', 'LB']], o = {}; for (const f of F) { const u = [...new Set(f.flatMap(g => NFLPOS[g] || []))]; for (const g of f) o[g] = g === 'RB' || g === 'WR' ? u.filter(x => !OLPOS.has(x)) : u; } return o; })();
 if (ALLTIME) for (const p of rows) Object.assign(p, { av: 0, cap: 0, pick: null, pfr: null, ap: 0, pb: 0, ath: null, dt: null, open: true });
 for (const p of PAST ? [] : rows) {
   if (p.last > (ALLTIME ? 2025 : 2023)) continue;
