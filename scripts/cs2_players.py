@@ -729,6 +729,23 @@ def build():
         t["rwaRk"] = j + 1
     (ROOT / "data" / "cs2.json").write_text(json.dumps(cs, separators=(",", ":")))
 
+    # 6-month projection (scripts/cs2_proj_research.py -> data/cs2_proj_fit.json): rating over the pool mean, age
+    pj = {}
+    try:
+        pj = json.loads((ROOT / "data" / "cs2_proj_fit.json").read_text())
+    except (OSError, ValueError):
+        pass
+    pc = pj.get("cLive") if pj.get("keep") == "age" else None
+    mact = float(th[act].mean())
+
+    def p6(i):
+        if not pc:
+            return None
+        g = age[i] == age[i]
+        u = (age[i] - 24) if g else 0.0
+        x = pc[0] + pc[1] * (th[i] - mact) + pc[2] * u + pc[3] * u * u + pc[4] * (0.0 if g else 1.0)
+        return round(float(a / 2 * (x + mact - mu1)), 2)
+
     def row(i):
         pid = int(M.pids[i])
         d = pdir.get(str(pid)) or [None] * 6
@@ -739,7 +756,7 @@ def build():
                 "ph": d[5], "age": None if age[i] != age[i] else round(float(age[i]), 2),
                 "tm": ti.get("n") or tname.get(tid) or "", "tk": tk if ti else None, "trk": ti.get("rk"),
                 "tier": ti.get("tier", 4), "logo": bool(ti.get("logo")),
-                "rwa": round(float(a / 2 * (th[i] - mu1)), 2), "d90": round(float(a / 2 * (th[i] - th90[i])), 2),
+                "rwa": round(float(a / 2 * (th[i] - mu1)), 2), "p6": p6(i), "d90": round(float(a / 2 * (th[i] - th90[i])), 2),
                 "rar": round(float(r12[i] * a * (th[i] - repl) / 200), 1), "maps": int(m12[i]), "sm": int(sm[i]),
                 "kpr": round(float(agg["k"][i]), 3), "dpr": round(float(agg["d"][i]), 3),
                 "adr": round(float(agg["adr"][i] * 100), 1), "kast": round(float(agg["kast"][i] * 100), 1),

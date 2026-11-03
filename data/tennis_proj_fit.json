@@ -1,0 +1,1459 @@
+{
+ "snapshots": "quarter ends 2006-2025",
+ "n": 226670,
+ "CA": -0.0988,
+ "note": "Research + fit (Nov 3 2026): a forward projection for the tennis ARK Ranking (scripts/tennis_model.py): each\nplayer's Elo and ARK 12 / 24 / 36 months ahead.\n\n    python3 scripts/tennis_proj_research.py [--refresh]    # numpy; writes data/tennis_proj_fit.json\n\nNeeds scripts/.cache/tennis/hist.json.gz + players.json.gz (python3 scripts/tennis_data.py, or rebuilt from the\n/mnt/project-files/tennis export). The snapshots are cached in scripts/.cache/tennis/proj_snaps.pkl.\n\nSnapshots: the end of every quarter 2006-25 (Mar / Jun / Sep / Dec), one pass with the live parameters\n(data/tennis_fit.json), each tour's board universe (15+ matches, one in the last 183 days), each row read the way\nbuild() reads it: overall Elo, ARK (the blend's win chance against the average top-50 player by Elo over the last-52-week\ntour-level surface mix; games rating against 0, like the live build), age from the bios, career matches (every level),\nmatches in the last 52 weeks, the official rank on the player's last match before the snapshot (unranked = none).\nTarget: the same player's logit ARK (and Elo over the tour's top-50 mean, since the Elo pool's level drifts) h = 12 / 24\n/ 36 months later; rows = the top 300 by ARK at the snapshot (the page shows 200) still on the board h months on\n(survivors only). Nothing after the snapshot enters a row.",
+ "round1": {
+  "universe": "every active player",
+  "atp": {
+   "ark12": {
+    "rmse": {
+     "flat": 0.5611,
+     "flatCA": 0.5501,
+     "proj": 0.5395
+    },
+    "tProjVsFlatCA": -11.51,
+    "years": "18/19"
+   },
+   "elo12": {
+    "rmse": {
+     "flat": 98.83,
+     "flatCA": 95.31,
+     "proj": 93.05
+    },
+    "tProjVsFlatCA": 5.22,
+    "years": "19/19"
+   }
+  },
+  "wta": {
+   "ark12": {
+    "rmse": {
+     "flat": 0.5162,
+     "flatCA": 0.5173,
+     "proj": 0.5115
+    },
+    "tProjVsFlat": 3.12,
+    "years": "16/19"
+   },
+   "elo12": {
+    "rmse": {
+     "flat": 99.17,
+     "flatCA": 96.14,
+     "proj": 95.3
+    },
+    "tProjVsFlatCA": 7.99,
+    "years": "18/19"
+   }
+  }
+ },
+ "tours": {
+  "atp": {
+   "logitArkPerElo": 0.00527,
+   "h": {
+    "12": {
+     "n": 21253,
+     "players": 1281,
+     "years": [
+      2006,
+      2024
+     ],
+     "elo": {
+      "rmse": {
+       "flat": 92.4589,
+       "flatCA": 90.6008,
+       "elo": 90.2526,
+       "age": 88.8993,
+       "proj": 84.9263,
+       "projX": 84.8775
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -13.3,
+        "yearsWon": [
+         5,
+         19
+        ],
+        "players": 1281
+       },
+       "age-flatCA": {
+        "t": -22.29,
+        "yearsWon": [
+         13,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-flatCA": {
+        "t": -15.75,
+        "yearsWon": [
+         14,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-flatCA": {
+        "t": -15.51,
+        "yearsWon": [
+         14,
+         19
+        ],
+        "players": 1281
+       },
+       "age-elo": {
+        "t": 0.86,
+        "yearsWon": [
+         18,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-age": {
+        "t": -12.83,
+        "yearsWon": [
+         14,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-proj": {
+        "t": 4.74,
+        "yearsWon": [
+         11,
+         19
+        ],
+        "players": 1281
+       }
+      },
+      "slope": {
+       "flat": 0.94,
+       "flatCA": 0.952,
+       "elo": 0.998,
+       "age": 0.996,
+       "proj": 0.997,
+       "projX": 0.997
+      },
+      "c": {
+       "elo": [
+        -34.52547,
+        0.93951
+       ],
+       "age": [
+        -33.43233,
+        0.95262,
+        -21.77693,
+        6.00202
+       ],
+       "proj": [
+        194.76222,
+        0.69745,
+        -36.93981,
+        8.97522,
+        -37.7303,
+        12.91668,
+        -45.51096,
+        -3.05255
+       ],
+       "projX": [
+        190.38266,
+        0.69685,
+        -31.31265,
+        8.46895,
+        -37.52014,
+        13.14918,
+        -45.08167,
+        -2.63636,
+        0.02148
+       ]
+      }
+     },
+     "ark": {
+      "rmse": {
+       "flat": 0.4881,
+       "flatCA": 0.4772,
+       "elo": 0.482,
+       "age": 0.4718,
+       "proj": 0.4616,
+       "projX": 0.4617
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -13.56,
+        "yearsWon": [
+         3,
+         19
+        ],
+        "players": 1281
+       },
+       "age-flatCA": {
+        "t": -22.75,
+        "yearsWon": [
+         14,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-flatCA": {
+        "t": -18.8,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-flatCA": {
+        "t": -18.85,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "age-elo": {
+        "t": -0.1,
+        "yearsWon": [
+         18,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-age": {
+        "t": -11.18,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-proj": {
+        "t": -6.67,
+        "yearsWon": [
+         10,
+         19
+        ],
+        "players": 1281
+       }
+      },
+      "slope": {
+       "flat": 0.997,
+       "flatCA": 1.019,
+       "elo": 0.999,
+       "age": 0.999,
+       "proj": 0.999,
+       "projX": 0.999
+      },
+      "c": {
+       "elo": [
+        -0.07864,
+        0.99715
+       ],
+       "age": [
+        -0.09327,
+        1.0201,
+        -0.13203,
+        0.02654
+       ],
+       "proj": [
+        1.16224,
+        0.78955,
+        -0.20103,
+        0.04314,
+        -0.18712,
+        0.08196,
+        -0.18925,
+        -0.0448
+       ],
+       "projX": [
+        1.16065,
+        0.79067,
+        -0.19983,
+        0.04382,
+        -0.18704,
+        0.08191,
+        -0.18899,
+        -0.04602,
+        -0.00401
+       ]
+      }
+     }
+    },
+    "24": {
+     "n": 18694,
+     "players": 1173,
+     "years": [
+      2006,
+      2023
+     ],
+     "elo": {
+      "rmse": {
+       "flat": 119.7469,
+       "flatCA": 116.1489,
+       "elo": 115.7756,
+       "age": 110.9358,
+       "proj": 105.0152,
+       "projX": 104.985
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -12.81,
+        "yearsWon": [
+         5,
+         18
+        ],
+        "players": 1173
+       },
+       "age-flatCA": {
+        "t": -16.26,
+        "yearsWon": [
+         15,
+         18
+        ],
+        "players": 1173
+       },
+       "proj-flatCA": {
+        "t": -15.91,
+        "yearsWon": [
+         16,
+         18
+        ],
+        "players": 1173
+       },
+       "projX-flatCA": {
+        "t": -15.69,
+        "yearsWon": [
+         16,
+         18
+        ],
+        "players": 1173
+       },
+       "age-elo": {
+        "t": -0.87,
+        "yearsWon": [
+         17,
+         18
+        ],
+        "players": 1173
+       },
+       "proj-age": {
+        "t": -12.68,
+        "yearsWon": [
+         12,
+         18
+        ],
+        "players": 1173
+       },
+       "projX-proj": {
+        "t": 4.24,
+        "yearsWon": [
+         10,
+         18
+        ],
+        "players": 1173
+       }
+      },
+      "slope": {
+       "flat": 0.904,
+       "flatCA": 0.93,
+       "elo": 0.996,
+       "age": 0.993,
+       "proj": 0.994,
+       "projX": 0.994
+      },
+      "c": {
+       "elo": [
+        -52.44987,
+        0.90432
+       ],
+       "age": [
+        -50.72321,
+        0.9379,
+        -45.28385,
+        12.43726
+       ],
+       "proj": [
+        257.59124,
+        0.59101,
+        -66.48728,
+        16.68425,
+        -51.1671,
+        17.57043,
+        -61.66951,
+        7.85
+       ],
+       "projX": [
+        253.32666,
+        0.59197,
+        -60.90527,
+        15.97632,
+        -50.92781,
+        17.76209,
+        -61.14791,
+        7.56053,
+        0.02186
+       ]
+      }
+     },
+     "ark": {
+      "rmse": {
+       "flat": 0.6198,
+       "flatCA": 0.5984,
+       "elo": 0.6136,
+       "age": 0.5788,
+       "proj": 0.5674,
+       "projX": 0.5675
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -8.71,
+        "yearsWon": [
+         1,
+         18
+        ],
+        "players": 1173
+       },
+       "age-flatCA": {
+        "t": -11.92,
+        "yearsWon": [
+         16,
+         18
+        ],
+        "players": 1173
+       },
+       "proj-flatCA": {
+        "t": -14.43,
+        "yearsWon": [
+         18,
+         18
+        ],
+        "players": 1173
+       },
+       "projX-flatCA": {
+        "t": -14.68,
+        "yearsWon": [
+         18,
+         18
+        ],
+        "players": 1173
+       },
+       "age-elo": {
+        "t": -2.18,
+        "yearsWon": [
+         17,
+         18
+        ],
+        "players": 1173
+       },
+       "proj-age": {
+        "t": -9.03,
+        "yearsWon": [
+         11,
+         18
+        ],
+        "players": 1173
+       },
+       "projX-proj": {
+        "t": -6.64,
+        "yearsWon": [
+         9,
+         18
+        ],
+        "players": 1173
+       }
+      },
+      "slope": {
+       "flat": 0.973,
+       "flatCA": 1.012,
+       "elo": 0.998,
+       "age": 0.998,
+       "proj": 0.997,
+       "projX": 0.997
+      },
+      "c": {
+       "elo": [
+        -0.08106,
+        0.97342
+       ],
+       "age": [
+        -0.12583,
+        1.02925,
+        -0.27279,
+        0.05116
+       ],
+       "proj": [
+        1.63346,
+        0.73452,
+        -0.34335,
+        0.07278,
+        -0.22849,
+        0.07268,
+        -0.24555,
+        0.01634
+       ],
+       "projX": [
+        1.63011,
+        0.7368,
+        -0.33985,
+        0.07511,
+        -0.22844,
+        0.07268,
+        -0.24506,
+        0.01448,
+        -0.01071
+       ]
+      }
+     }
+    },
+    "36": {
+     "n": 16190,
+     "players": 1071,
+     "years": [
+      2006,
+      2022
+     ],
+     "elo": {
+      "rmse": {
+       "flat": 139.0507,
+       "flatCA": 134.7988,
+       "elo": 133.5785,
+       "age": 125.1006,
+       "proj": 118.1148,
+       "projX": 118.0648
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -12.33,
+        "yearsWon": [
+         5,
+         17
+        ],
+        "players": 1071
+       },
+       "age-flatCA": {
+        "t": -14.14,
+        "yearsWon": [
+         15,
+         17
+        ],
+        "players": 1071
+       },
+       "proj-flatCA": {
+        "t": -16.22,
+        "yearsWon": [
+         17,
+         17
+        ],
+        "players": 1071
+       },
+       "projX-flatCA": {
+        "t": -16.02,
+        "yearsWon": [
+         17,
+         17
+        ],
+        "players": 1071
+       },
+       "age-elo": {
+        "t": -1.96,
+        "yearsWon": [
+         16,
+         17
+        ],
+        "players": 1071
+       },
+       "proj-age": {
+        "t": -12.72,
+        "yearsWon": [
+         12,
+         17
+        ],
+        "players": 1071
+       },
+       "projX-proj": {
+        "t": 3.26,
+        "yearsWon": [
+         8,
+         17
+        ],
+        "players": 1071
+       }
+      },
+      "slope": {
+       "flat": 0.877,
+       "flatCA": 0.913,
+       "elo": 0.994,
+       "age": 0.989,
+       "proj": 0.99,
+       "projX": 0.99
+      },
+      "c": {
+       "elo": [
+        -65.82237,
+        0.87747
+       ],
+       "age": [
+        -65.1628,
+        0.93273,
+        -64.0404,
+        17.95173
+       ],
+       "proj": [
+        316.07184,
+        0.52664,
+        -88.89474,
+        22.71558,
+        -61.8139,
+        18.30225,
+        -72.18507,
+        2.4638
+       ],
+       "projX": [
+        310.20485,
+        0.53016,
+        -81.55208,
+        21.56971,
+        -61.36011,
+        18.50699,
+        -71.38626,
+        1.32439,
+        0.02965
+       ]
+      }
+     },
+     "ark": {
+      "rmse": {
+       "flat": 0.7258,
+       "flatCA": 0.6995,
+       "elo": 0.7196,
+       "age": 0.6587,
+       "proj": 0.6449,
+       "projX": 0.6451
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -5.14,
+        "yearsWon": [
+         1,
+         17
+        ],
+        "players": 1071
+       },
+       "age-flatCA": {
+        "t": -8.15,
+        "yearsWon": [
+         14,
+         17
+        ],
+        "players": 1071
+       },
+       "proj-flatCA": {
+        "t": -11.69,
+        "yearsWon": [
+         17,
+         17
+        ],
+        "players": 1071
+       },
+       "projX-flatCA": {
+        "t": -11.74,
+        "yearsWon": [
+         17,
+         17
+        ],
+        "players": 1071
+       },
+       "age-elo": {
+        "t": -3.69,
+        "yearsWon": [
+         17,
+         17
+        ],
+        "players": 1071
+       },
+       "proj-age": {
+        "t": -8.55,
+        "yearsWon": [
+         12,
+         17
+        ],
+        "players": 1071
+       },
+       "projX-proj": {
+        "t": -0.87,
+        "yearsWon": [
+         9,
+         17
+        ],
+        "players": 1071
+       }
+      },
+      "slope": {
+       "flat": 0.944,
+       "flatCA": 0.995,
+       "elo": 0.997,
+       "age": 0.996,
+       "proj": 0.995,
+       "projX": 0.995
+      },
+      "c": {
+       "elo": [
+        -0.07494,
+        0.94442
+       ],
+       "age": [
+        -0.16412,
+        1.0353,
+        -0.39419,
+        0.07103
+       ],
+       "proj": [
+        2.16105,
+        0.68208,
+        -0.46056,
+        0.09432,
+        -0.26981,
+        0.04997,
+        -0.29922,
+        0.06039
+       ],
+       "projX": [
+        2.1601,
+        0.68275,
+        -0.45887,
+        0.0955,
+        -0.26986,
+        0.05,
+        -0.29907,
+        0.06012,
+        -0.00466
+       ]
+      }
+     }
+    }
+   }
+  },
+  "wta": {
+   "logitArkPerElo": 0.00504,
+   "h": {
+    "12": {
+     "n": 20763,
+     "players": 1281,
+     "years": [
+      2006,
+      2024
+     ],
+     "elo": {
+      "rmse": {
+       "flat": 98.2017,
+       "flatCA": 99.6215,
+       "elo": 96.8082,
+       "age": 96.7895,
+       "proj": 94.5512,
+       "projX": 94.4727
+      },
+      "baseline": "flat",
+      "vs": {
+       "elo-flat": {
+        "t": -18.57,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "age-flat": {
+        "t": -13.22,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-flat": {
+        "t": -13.63,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-flat": {
+        "t": -13.0,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "age-elo": {
+        "t": 7.23,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-age": {
+        "t": -12.08,
+        "yearsWon": [
+         14,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-proj": {
+        "t": 4.37,
+        "yearsWon": [
+         12,
+         19
+        ],
+        "players": 1281
+       }
+      },
+      "slope": {
+       "flat": 0.938,
+       "flatCA": 0.949,
+       "elo": 0.998,
+       "age": 0.997,
+       "proj": 0.995,
+       "projX": 0.995
+      },
+      "c": {
+       "elo": [
+        -31.04824,
+        0.93836
+       ],
+       "age": [
+        -31.7377,
+        0.94508,
+        -7.43442,
+        -0.23571
+       ],
+       "proj": [
+        62.11705,
+        0.75042,
+        -25.40507,
+        7.12755,
+        -31.80721,
+        23.66717,
+        -34.48506,
+        28.37372
+       ],
+       "projX": [
+        54.20987,
+        0.75969,
+        -18.94438,
+        6.61547,
+        -31.04113,
+        24.30626,
+        -33.74001,
+        28.90593,
+        0.02656
+       ]
+      }
+     },
+     "ark": {
+      "rmse": {
+       "flat": 0.5093,
+       "flatCA": 0.5091,
+       "elo": 0.5084,
+       "age": 0.5042,
+       "proj": 0.4996,
+       "projX": 0.4996
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -14.56,
+        "yearsWon": [
+         9,
+         19
+        ],
+        "players": 1281
+       },
+       "age-flatCA": {
+        "t": -19.58,
+        "yearsWon": [
+         11,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-flatCA": {
+        "t": -15.95,
+        "yearsWon": [
+         11,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-flatCA": {
+        "t": -15.98,
+        "yearsWon": [
+         11,
+         19
+        ],
+        "players": 1281
+       },
+       "age-elo": {
+        "t": 3.35,
+        "yearsWon": [
+         15,
+         19
+        ],
+        "players": 1281
+       },
+       "proj-age": {
+        "t": -5.29,
+        "yearsWon": [
+         11,
+         19
+        ],
+        "players": 1281
+       },
+       "projX-proj": {
+        "t": -4.8,
+        "yearsWon": [
+         10,
+         19
+        ],
+        "players": 1281
+       }
+      },
+      "slope": {
+       "flat": 0.982,
+       "flatCA": 1.002,
+       "elo": 0.999,
+       "age": 0.998,
+       "proj": 0.998,
+       "projX": 0.998
+      },
+      "c": {
+       "elo": [
+        -0.029,
+        0.982
+       ],
+       "age": [
+        -0.08079,
+        1.00071,
+        -0.07642,
+        0.01262
+       ],
+       "proj": [
+        1.03589,
+        0.85026,
+        -0.10128,
+        0.02528,
+        -0.11844,
+        0.02014,
+        -0.14304,
+        0.15249
+       ],
+       "projX": [
+        1.0392,
+        0.85007,
+        -0.0987,
+        0.02565,
+        -0.11869,
+        0.01969,
+        -0.14294,
+        0.1516,
+        -0.00311
+       ]
+      }
+     }
+    },
+    "24": {
+     "n": 18120,
+     "players": 1165,
+     "years": [
+      2006,
+      2023
+     ],
+     "elo": {
+      "rmse": {
+       "flat": 123.3185,
+       "flatCA": 123.2082,
+       "elo": 121.3766,
+       "age": 120.4787,
+       "proj": 117.2582,
+       "projX": 117.1576
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -14.89,
+        "yearsWon": [
+         7,
+         18
+        ],
+        "players": 1165
+       },
+       "age-flatCA": {
+        "t": -20.11,
+        "yearsWon": [
+         14,
+         18
+        ],
+        "players": 1165
+       },
+       "proj-flatCA": {
+        "t": -15.89,
+        "yearsWon": [
+         14,
+         18
+        ],
+        "players": 1165
+       },
+       "projX-flatCA": {
+        "t": -15.39,
+        "yearsWon": [
+         14,
+         18
+        ],
+        "players": 1165
+       },
+       "age-elo": {
+        "t": 5.03,
+        "yearsWon": [
+         14,
+         18
+        ],
+        "players": 1165
+       },
+       "proj-age": {
+        "t": -11.64,
+        "yearsWon": [
+         15,
+         18
+        ],
+        "players": 1165
+       },
+       "projX-proj": {
+        "t": 3.51,
+        "yearsWon": [
+         10,
+         18
+        ],
+        "players": 1165
+       }
+      },
+      "slope": {
+       "flat": 0.9,
+       "flatCA": 0.919,
+       "elo": 0.997,
+       "age": 0.994,
+       "proj": 0.991,
+       "projX": 0.991
+      },
+      "c": {
+       "elo": [
+        -43.19642,
+        0.90019
+       ],
+       "age": [
+        -48.49569,
+        0.92075,
+        -19.99715,
+        2.55754
+       ],
+       "proj": [
+        148.85113,
+        0.6637,
+        -41.5014,
+        11.2312,
+        -52.80161,
+        27.03203,
+        -47.07639,
+        16.23925
+       ],
+       "projX": [
+        137.84349,
+        0.67825,
+        -33.22062,
+        10.38456,
+        -51.70999,
+        27.95016,
+        -46.00725,
+        16.62865,
+        0.03542
+       ]
+      }
+     },
+     "ark": {
+      "rmse": {
+       "flat": 0.6544,
+       "flatCA": 0.645,
+       "elo": 0.6544,
+       "age": 0.6402,
+       "proj": 0.6293,
+       "projX": 0.6294
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -7.81,
+        "yearsWon": [
+         5,
+         18
+        ],
+        "players": 1165
+       },
+       "age-flatCA": {
+        "t": -8.66,
+        "yearsWon": [
+         8,
+         18
+        ],
+        "players": 1165
+       },
+       "proj-flatCA": {
+        "t": -7.28,
+        "yearsWon": [
+         12,
+         18
+        ],
+        "players": 1165
+       },
+       "projX-flatCA": {
+        "t": -7.37,
+        "yearsWon": [
+         12,
+         18
+        ],
+        "players": 1165
+       },
+       "age-elo": {
+        "t": 1.36,
+        "yearsWon": [
+         16,
+         18
+        ],
+        "players": 1165
+       },
+       "proj-age": {
+        "t": -3.61,
+        "yearsWon": [
+         14,
+         18
+        ],
+        "players": 1165
+       },
+       "projX-proj": {
+        "t": -3.45,
+        "yearsWon": [
+         7,
+         18
+        ],
+        "players": 1165
+       }
+      },
+      "slope": {
+       "flat": 0.955,
+       "flatCA": 0.986,
+       "elo": 0.997,
+       "age": 0.996,
+       "proj": 0.996,
+       "projX": 0.995
+      },
+      "c": {
+       "elo": [
+        0.00261,
+        0.95523
+       ],
+       "age": [
+        -0.11656,
+        0.99604,
+        -0.15763,
+        0.02695
+       ],
+       "proj": [
+        2.0714,
+        0.773,
+        -0.1655,
+        0.03315,
+        -0.21388,
+        -0.02625,
+        -0.22468,
+        0.13108
+       ],
+       "projX": [
+        2.07971,
+        0.77224,
+        -0.15971,
+        0.03409,
+        -0.21451,
+        -0.02727,
+        -0.22452,
+        0.12948,
+        -0.00665
+       ]
+      }
+     }
+    },
+    "36": {
+     "n": 15680,
+     "players": 1035,
+     "years": [
+      2006,
+      2022
+     ],
+     "elo": {
+      "rmse": {
+       "flat": 138.7774,
+       "flatCA": 137.682,
+       "elo": 136.4087,
+       "age": 134.2412,
+       "proj": 130.8067,
+       "projX": 130.6015
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -10.64,
+        "yearsWon": [
+         6,
+         17
+        ],
+        "players": 1035
+       },
+       "age-flatCA": {
+        "t": -11.63,
+        "yearsWon": [
+         15,
+         17
+        ],
+        "players": 1035
+       },
+       "proj-flatCA": {
+        "t": -13.69,
+        "yearsWon": [
+         14,
+         17
+        ],
+        "players": 1035
+       },
+       "projX-flatCA": {
+        "t": -12.88,
+        "yearsWon": [
+         14,
+         17
+        ],
+        "players": 1035
+       },
+       "age-elo": {
+        "t": 2.99,
+        "yearsWon": [
+         13,
+         17
+        ],
+        "players": 1035
+       },
+       "proj-age": {
+        "t": -11.87,
+        "yearsWon": [
+         13,
+         17
+        ],
+        "players": 1035
+       },
+       "projX-proj": {
+        "t": 1.75,
+        "yearsWon": [
+         11,
+         17
+        ],
+        "players": 1035
+       }
+      },
+      "slope": {
+       "flat": 0.864,
+       "flatCA": 0.889,
+       "elo": 0.997,
+       "age": 0.991,
+       "proj": 0.988,
+       "projX": 0.988
+      },
+      "c": {
+       "elo": [
+        -51.65974,
+        0.86449
+       ],
+       "age": [
+        -60.93151,
+        0.89682,
+        -32.27226,
+        2.35383
+       ],
+       "proj": [
+        168.84051,
+        0.6195,
+        -55.02844,
+        12.2184,
+        -58.98311,
+        28.11843,
+        -51.71631,
+        10.87924
+       ],
+       "projX": [
+        153.54455,
+        0.64407,
+        -43.19665,
+        10.70462,
+        -57.48972,
+        29.4939,
+        -50.09038,
+        11.75002,
+        0.05237
+       ]
+      }
+     },
+     "ark": {
+      "rmse": {
+       "flat": 0.7558,
+       "flatCA": 0.7411,
+       "elo": 0.7564,
+       "age": 0.7323,
+       "proj": 0.7169,
+       "projX": 0.717
+      },
+      "baseline": "flatCA",
+      "vs": {
+       "elo-flatCA": {
+        "t": -0.75,
+        "yearsWon": [
+         2,
+         17
+        ],
+        "players": 1035
+       },
+       "age-flatCA": {
+        "t": -0.39,
+        "yearsWon": [
+         12,
+         17
+        ],
+        "players": 1035
+       },
+       "proj-flatCA": {
+        "t": -3.61,
+        "yearsWon": [
+         15,
+         17
+        ],
+        "players": 1035
+       },
+       "projX-flatCA": {
+        "t": -3.52,
+        "yearsWon": [
+         15,
+         17
+        ],
+        "players": 1035
+       },
+       "age-elo": {
+        "t": 0.14,
+        "yearsWon": [
+         16,
+         17
+        ],
+        "players": 1035
+       },
+       "proj-age": {
+        "t": -4.09,
+        "yearsWon": [
+         15,
+         17
+        ],
+        "players": 1035
+       },
+       "projX-proj": {
+        "t": 5.85,
+        "yearsWon": [
+         5,
+         17
+        ],
+        "players": 1035
+       }
+      },
+      "slope": {
+       "flat": 0.929,
+       "flatCA": 0.967,
+       "elo": 0.994,
+       "age": 0.992,
+       "proj": 0.993,
+       "projX": 0.992
+      },
+      "c": {
+       "elo": [
+        0.0396,
+        0.92931
+       ],
+       "age": [
+        -0.13493,
+        0.98775,
+        -0.23133,
+        0.02404
+       ],
+       "proj": [
+        2.71616,
+        0.72131,
+        -0.22321,
+        0.02436,
+        -0.25338,
+        -0.06898,
+        -0.27548,
+        0.19652
+       ],
+       "projX": [
+        2.71239,
+        0.72181,
+        -0.22576,
+        0.02389,
+        -0.25309,
+        -0.06856,
+        -0.27553,
+        0.19727,
+        0.00282
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "keep": {
+  "atp": {
+   "12": {
+    "ark": "proj",
+    "elo": "proj"
+   },
+   "24": {
+    "ark": "proj",
+    "elo": "proj"
+   },
+   "36": {
+    "ark": "proj",
+    "elo": "proj"
+   }
+  },
+  "wta": {
+   "12": {
+    "ark": "proj",
+    "elo": "proj"
+   },
+   "24": {
+    "ark": "proj",
+    "elo": "proj"
+   },
+   "36": {
+    "ark": "proj",
+    "elo": "proj"
+   }
+  }
+ }
+}
