@@ -103,7 +103,9 @@
         if (sc.charAt(0) === 't' && sc.slice(2) !== u[1]) return;
         if (sc.charAt(0) === 'c' && sc.slice(2) !== T[2]) return;
         var nm = u[0].map(function (i) { return Z.players[i]; });
-        out.push({ n: nm.map(last).join(' · '), full: nm.join(', '), t: u[1], min: u[2], poss: u[3], or: u[4], dr: u[5], net: u[4] - u[5], sn: u[6] });
+        var ls = nm.map(last);
+        ls = ls.map(function (x, j) { return ls.indexOf(x) !== ls.lastIndexOf(x) ? String(nm[j]).slice(0, 3) + ' ' + x : x; });
+        out.push({ n: ls.join(' · '), full: nm.join(', '), t: u[1], min: u[2], poss: u[3], or: u[4], dr: u[5], net: u[4] - u[5], sn: u[6] });
       });
       return out;
     }

@@ -39,9 +39,10 @@ UA = 'arkndjl.net cbb lineups'
 CACHE = os.path.join(HERE, '.cache', 'cbb', 'lineups')
 OUT = os.path.join(ROOT, 'static', 'data', 'cbb-lineups.json')
 LEAD_OUT = os.path.join(ROOT, 'static', 'data', 'cbb-lineup-leaders.json')
-# lineup leaders (scripts/lineup_leaders.py): sNet toward the team's net, k by unit size from odd/even game splits
-# of 2025-26 (team prior beat a 0 prior out of sample for every size)
-K_LEAD = {5: 800, 3: 1600, 2: 1600}
+# lineup leaders (scripts/lineup_leaders.py): sNet toward the team's net, k by unit size = the out-of-sample best
+# (odd games predict even and back, 2025-26, 6,259 games; team prior beat a prior of 0 for every size: MSE 5-man
+# 1022 vs 1054, trios 460 vs 479, pairs 345 vs 383; raw Net 1978 / 809 / 570)
+K_LEAD = {5: 2400, 3: 1600, 2: 2400}
 LIVE_SEASON = 2027
 RATE = float(os.environ.get('CBB_LINEUP_RATE', 3.0))   # requests a second, all threads (the proxy allows 5)
 
