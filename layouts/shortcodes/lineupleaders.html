@@ -1,0 +1,157 @@
+{{- /* Lineup leaders (Noah, Nov 3 2026): league-wide 5-man units, trios and pairs, one shortcode for NBA and CBB.
+       {{< lineupleaders sport="nba" tab="lineup leaders" >}}   static/data/nba-lineup-leaders.json (scripts/nba_lineups.py)
+       {{< lineupleaders sport="cbb" tab="lineup leaders" >}}   static/data/cbb-lineup-leaders.json (scripts/cbb_lineups.py)
+       File format and sNet (shrunk toward the team's net, k by unit size): scripts/lineup_leaders.py.
+       Ranks follow the current sort and recount within the filters; headers sort. Fetched when the window is on screen. */ -}}
+{{- $sport := .Get "sport" | default "nba" -}}
+{{- $about := "Net = points scored minus allowed per 100 possessions with the group on the floor together. sNet pulls Net toward the team's own net by k possessions (k from odd/even game splits, per unit size), the rank. Trios and pairs sum every five that holds them. No opponent adjustment; garbage time counts." -}}
+<div class="win cfb lld" data-tab="{{ .Get "tab" | default "lineup leaders" }}" data-lld="{{ $sport }}" data-src="{{ printf "data/%s-lineup-leaders.json" $sport | relURL }}?v={{ now.Unix }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ if eq $sport "nba" }}hoop{{ else }}basketball{{ end }}"/></svg>{{ .Get "title" | default "lineup leaders" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar" data-lld-bar onsubmit="return false" aria-label="filter lineup leaders">
+    <label class="cfb__field lld__season" hidden><span>season</span><select name="season" aria-label="season"></select></label>
+    <label class="cfb__field cfb__field--grow"><span>{{ if eq $sport "cbb" }}conference{{ else }}team{{ end }}</span><select name="scope" aria-label="{{ if eq $sport "cbb" }}conference{{ else }}team{{ end }}"><option>loading…</option></select></label>
+    <label class="cfb__field"><span>poss</span><select name="poss" aria-label="minimum possessions"></select></label>
+    <fieldset class="cfb__pos"><legend class="visually-hidden">group size</legend>
+      <button type="button" class="cfb__chip is-on" data-size="5" aria-pressed="true" title="five-man units">5-man</button>
+      <button type="button" class="cfb__chip" data-size="3" aria-pressed="false" title="three-man groups">trios</button>
+      <button type="button" class="cfb__chip" data-size="2" aria-pressed="false" title="two-man pairs">pairs</button>
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table lld__table">
+      <thead><tr data-lld-head></tr></thead>
+      <tbody data-lld-body><tr><td class="cfb__dim">loading…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="win__status" title="{{ $about }}"><span data-lld-count></span><span class="cfb__asof" data-lld-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.lld__table td.lld__who { white-space: normal; min-width: 12em; line-height: 1.3; }
+.lld__table .lld__tm { display: inline-flex; gap: 4px; align-items: center; white-space: nowrap; }
+.lld__table .lld__ml { display: none; }
+.lld__table .lld__tm img { width: 18px; height: 18px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; }
+@media (max-width: 600px) {
+  .lld__table .lld__x { display: none; }
+  .lld__table td.lld__who { min-width: 6em; overflow-wrap: anywhere; }
+  .lld__table th { letter-spacing: 0; }
+  .lld__table .lld__ml { display: inline; width: 16px; height: 16px; margin: 0 4px 0 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; vertical-align: -3px; }
+  .lld__table .lld__ab { display: none; }
+  .lld__table th, .lld__table td { padding: 4px 4px; }
+}
+</style>
+<script>
+(function () {
+  if (window.__arkLld) return; window.__arkLld = true;
+  var NBA = { ATL: 'Atlanta Hawks', BOS: 'Boston Celtics', BKN: 'Brooklyn Nets', CHA: 'Charlotte Hornets', CHI: 'Chicago Bulls', CLE: 'Cleveland Cavaliers', DAL: 'Dallas Mavericks', DEN: 'Denver Nuggets', DET: 'Detroit Pistons', GS: 'Golden State Warriors', HOU: 'Houston Rockets', IND: 'Indiana Pacers', LAC: 'LA Clippers', LAL: 'Los Angeles Lakers', MEM: 'Memphis Grizzlies', MIA: 'Miami Heat', MIL: 'Milwaukee Bucks', MIN: 'Minnesota Timberwolves', NO: 'New Orleans Pelicans', NY: 'New York Knicks', OKC: 'Oklahoma City Thunder', ORL: 'Orlando Magic', PHI: 'Philadelphia 76ers', PHX: 'Phoenix Suns', POR: 'Portland Trail Blazers', SAC: 'Sacramento Kings', SA: 'San Antonio Spurs', TOR: 'Toronto Raptors', UTAH: 'Utah Jazz', WSH: 'Washington Wizards' };
+  var SUF = /^(jr\.?|sr\.?|ii|iii|iv|v)$/i;
+  var COLS = [['rk', 'RK', 1], ['n', 'Lineup'], ['t', 'Team', 0, 'lld__x'], ['min', 'MIN', 1, 'lld__x'], ['poss', 'Poss', 1, '', 'possessions together'],
+    ['or', 'ORtg', 1, 'lld__x', 'points scored per 100 possessions'], ['dr', 'DRtg', 1, 'lld__x', 'points allowed per 100 possessions'],
+    ['net', 'Net', 1, '', 'ORtg - DRtg'], ['sn', 'sNet', 1, '', 'Net pulled toward the team net by sample (the rank)']];
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function last(n) { var w = String(n || '').split(' '); while (w.length > 1 && SUF.test(w[w.length - 1])) w.pop(); return w.length > 1 ? w.slice(1).join(' ') : w[0]; }
+  function sg(v) { if (v == null || isNaN(v)) return '—'; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1); }
+  function cls(v) { return v == null ? '' : v < 0 ? 'cfb__down' : v > 0 ? 'cfb__up' : ''; }
+  function init(W) {
+    if (W.__lld) return; W.__lld = true;
+    var sport = W.getAttribute('data-lld'), bar = W.querySelector('[data-lld-bar]'), size = '5', key = 'sn', dir = -1, D = null, Z = null;
+    var store = 'ark-lld-' + sport, PS = {}, STEPS = [25, 50, 100, 200, 400, 800];
+    function possOpts() {
+      var f = +(Z.floor || {})[size] || 25, sel = bar.elements.poss, want = PS[size] || Math.max(f, size === '5' ? 50 : 100);
+      var ok = STEPS.filter(function (x) { return x >= f; });
+      if (ok.indexOf(+want) < 0) want = ok.filter(function (x) { return x <= want; }).pop() || ok[0];
+      sel.innerHTML = ok.map(function (x) { return '<option value="' + x + '">' + x + '+</option>'; }).join('');
+      sel.value = want;
+    }
+    function tname(t) { var T = Z.teams[t]; return sport === 'nba' ? (NBA[t] || t) : (T && T[0]) || t; }
+    function scopes() {
+      var ts = Object.keys(Z.teams), h = '<option value="">' + (sport === 'nba' ? 'all teams' : 'all D-I') + '</option>';
+      if (sport === 'cbb') {
+        var cs = {}; ts.forEach(function (t) { var c = Z.teams[t][2]; if (c) cs[c] = 1; });
+        h += Object.keys(cs).sort().map(function (c) { return '<option value="c:' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+      }
+      h += '<optgroup label="teams">' + ts.sort(function (a, b) { return tname(a).localeCompare(tname(b)); }).map(function (t) { return '<option value="t:' + esc(t) + '">' + esc(tname(t)) + '</option>'; }).join('') + '</optgroup>';
+      var keep = bar.elements.scope.value;
+      bar.elements.scope.innerHTML = h;
+      if (keep && bar.elements.scope.querySelector('option[value="' + keep.replace(/"/g, '') + '"]')) bar.elements.scope.value = keep;
+    }
+    function pick() {
+      Z = D.seasons[bar.elements.season.value];
+      scopes(); possOpts();
+      W.querySelector('[data-lld-asof]').textContent = Z.label + ' · updated ' + String(D.asof || '').slice(0, 10);
+    }
+    fetch(W.getAttribute('data-src')).then(function (r) { return r.json(); }).then(function (d) {
+      D = d;
+      var ks = Object.keys(D.seasons).sort().reverse(), min = sport === 'nba' ? 50 : 300;
+      bar.elements.season.innerHTML = ks.map(function (S) { return '<option value="' + S + '">' + esc(D.seasons[S].label) + '</option>'; }).join('');
+      bar.elements.season.value = ks.filter(function (S) { return D.seasons[S].games >= min; })[0] || ks[0];
+      if (ks.length > 1) bar.querySelector('.lld__season').hidden = false;
+      var keep = null; try { keep = JSON.parse(localStorage.getItem(store) || 'null'); } catch (e) {}
+      if (keep) { if (keep.size) size = keep.size; if (keep.ps) PS = keep.ps; }
+      chips();
+      pick();
+      if (keep && keep.scope && bar.elements.scope.querySelector('option[value="' + String(keep.scope).replace(/"/g, '') + '"]')) bar.elements.scope.value = keep.scope;
+      render();
+    }).catch(function () { W.querySelector('[data-lld-body]').innerHTML = '<tr><td class="cfb__dim">lineups not available right now.</td></tr>'; });
+    function rows() {
+      var sc = bar.elements.scope.value, mp = +bar.elements.poss.value || 0, out = [];
+      (Z.rows[size] || []).forEach(function (u) {
+        if (u[3] < mp) return;
+        var T = Z.teams[u[1]] || [];
+        if (sc.charAt(0) === 't' && sc.slice(2) !== u[1]) return;
+        if (sc.charAt(0) === 'c' && sc.slice(2) !== T[2]) return;
+        var nm = u[0].map(function (i) { return Z.players[i]; });
+        out.push({ n: nm.map(last).join(' · '), full: nm.join(', '), t: u[1], min: u[2], poss: u[3], or: u[4], dr: u[5], net: u[4] - u[5], sn: u[6] });
+      });
+      return out;
+    }
+    function render() {
+      if (!Z) return;
+      var list = rows(), k = key === 'rk' ? 'sn' : key;
+      list.sort(function (a, b) {
+        var x = a[k], y = b[k];
+        if (typeof x === 'string' || typeof y === 'string') return dir * String(x).localeCompare(String(y));
+        return dir * ((x == null ? -1e9 : x) - (y == null ? -1e9 : y)) || b.poss - a.poss;
+      });
+      W.querySelector('[data-lld-head]').innerHTML = COLS.map(function (c) {
+        return '<th data-k="' + c[0] + '"' + (c[2] ? ' data-num class="cfb__num' + (c[3] ? ' ' + c[3] : '') + '"' : c[3] ? ' class="' + c[3] + '"' : '') + (c[4] ? ' title="' + esc(c[4]) + '"' : '') +
+          (c[0] === key ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' data-sort>' + c[1] + '</th>';
+      }).join('');
+      var shown = list.slice(0, 200);
+      W.querySelector('[data-lld-body]').innerHTML = shown.length ? shown.map(function (r, i) {
+        return '<tr>' + COLS.map(function (c) {
+          var v = r[c[0]], x = c[3] ? ' ' + c[3] : '';
+          if (c[0] === 'rk') return '<td class="cfb__rk">' + (i + 1) + '</td>';
+          if (c[0] === 'n') { var L = (Z.teams[r.t] || [])[1]; return '<td class="lld__who" title="' + esc(r.full) + '">' + (L ? '<img class="lld__ml" src="' + esc(L) + '" alt="" width="16" height="16" loading="lazy">' : '') + '<b>' + esc(v) + '</b></td>'; }
+          if (c[0] === 't') { var T = Z.teams[v] || []; return '<td class="lld__x"><span class="lld__tm" title="' + esc(tname(v)) + '">' + (T[1] ? '<img src="' + esc(T[1]) + '" alt="" width="18" height="18" loading="lazy">' : '') + '<span class="lld__ab">' + esc(sport === 'nba' ? v : T[0] || v) + '</span></span></td>'; }
+          if (c[0] === 'min' || c[0] === 'poss') return '<td class="cfb__num' + x + '">' + Math.round(v).toLocaleString('en-US') + '</td>';
+          if (c[0] === 'or' || c[0] === 'dr') return '<td class="cfb__num' + x + '">' + v.toFixed(1) + '</td>';
+          if (c[0] === 'sn') return '<td class="cfb__num is-key"><b class="' + cls(v) + '">' + sg(v) + '</b></td>';
+          return '<td class="cfb__num' + x + '"><span class="' + cls(v) + '">' + sg(v) + '</span></td>';
+        }).join('') + '</tr>';
+      }).join('') : '<tr><td colspan="' + COLS.length + '" class="cfb__dim">none at this many possessions yet.</td></tr>';
+      var unit = size === '5' ? ' units' : size === '3' ? ' trios' : ' pairs';
+      W.querySelector('[data-lld-count]').textContent = list.length.toLocaleString('en-US') + unit + (list.length > shown.length ? ' (top ' + shown.length + ' shown)' : '') + ' · k ' + Number(Z.k[size]).toLocaleString('en-US');
+      try { localStorage.setItem(store, JSON.stringify({ size: size, ps: PS, scope: bar.elements.scope.value })); } catch (e) {}
+    }
+    function chips() { [].forEach.call(bar.querySelectorAll('[data-size]'), function (b) { var on = b.dataset.size === size; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); }); }
+    bar.addEventListener('change', function (e) { if (!D) return; if (e.target.name === 'season') pick(); if (e.target.name === 'poss') PS[size] = +e.target.value; render(); });
+    [].forEach.call(bar.querySelectorAll('[data-size]'), function (c) { c.addEventListener('click', function () { size = c.dataset.size; chips(); if (Z) possOpts(); render(); }); });
+    W.querySelector('[data-lld-head]').addEventListener('click', function (e) {
+      var th = e.target.closest('th[data-k]'); if (!th) return;
+      var k = th.dataset.k;
+      if (k === 'rk') { key = 'sn'; dir = -1; } else { dir = k === key ? -dir : (th.hasAttribute('data-num') ? -1 : 1); key = k; }
+      render();
+    });
+  }
+  function start() {
+    var all = document.querySelectorAll('[data-lld]');
+    if (!('IntersectionObserver' in window)) { all.forEach(init); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); init(e.target); } }); }, { rootMargin: '3000px 0px' });
+    all.forEach(function (W) { io.observe(W); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>

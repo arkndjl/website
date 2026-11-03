@@ -31,14 +31,8 @@
       <tbody data-ln-body><tr><td class="cfb__dim">loading…</td></tr></tbody>
     </table>
   </div>
-  <div class="cfbm__body wintable__about"><p class="cfb__dim">
-  {{- if eq $view "onoff" -}}
-  On/off from ESPN play-by-play this season, every game a player's team played. On: the team's net points per 100 possessions with him on the floor; Off: with him off it; On-Off the difference, which also carries who plays beside and behind him, so it is not a rating of the player alone. sOn-Off is shrunk toward 0 with <span data-ln-ko>1,800</span> possessions (on and off combined: 1 / (1/on + 1/off)) (the noise level measured by splitting seasons into odd and even games), the fairer number for a small sample. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). A traded player shows once per team. Garbage time counts.
-  {{- else -}}
-  Five-man units and two-man pairs from ESPN play-by-play this season: minutes together, possessions, points scored (ORtg) and allowed (DRtg) per 100 possessions, and Net. sNet shrinks Net toward 0 with <span data-ln-k>600</span> possessions (the noise level measured by splitting seasons into odd and even games); a unit needs several hundred possessions before its Net says much. Lineups come from substitutions; each quarter's five are the players seen before they are subbed in. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). Garbage time counts.
-  {{- end -}}
-  </p></div>
-  <div class="win__status"><span data-ln-count></span><span class="cfb__asof" data-ln-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  {{- $about := `Five-man units and two-man pairs from ESPN play-by-play this season: minutes together, possessions, points scored (ORtg) and allowed (DRtg) per 100 possessions, and Net. sNet shrinks Net toward 0 with 600 possessions (the noise level measured by splitting seasons into odd and even games); a unit needs several hundred possessions before its Net says much. Lineups come from substitutions; each quarter's five are the players seen before they are subbed in. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). Garbage time counts.` }}{{ if (eq $view "onoff") }}{{ $about = `On/off from ESPN play-by-play this season, every game a player's team played. On: the team's net points per 100 possessions with him on the floor; Off: with him off it; On-Off the difference, which also carries who plays beside and behind him, so it is not a rating of the player alone. sOn-Off is shrunk toward 0 with 1,800 possessions (on and off combined: 1 / (1/on + 1/off)) (the noise level measured by splitting seasons into odd and even games), the fairer number for a small sample. Possessions are estimated per stint (FGA - OREB + TOV + .44 FTA). A traded player shows once per team. Garbage time counts.` }}{{ end }}
+  <div class="win__status" title="{{ $about }}"><span data-ln-count></span><span class="cfb__asof" data-ln-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <style>
 .nbaln__table td.nbaln__who { white-space: normal; min-width: 12em; line-height: 1.3; }
