@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-03T01:36:01Z",
+ "asof": "2026-11-03T02:01:48Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 104.08,
+  "now": 104.59,
   "peak": 118.08,
-  "drawdown": 0.1185,
-  "open": 85.25,
+  "drawdown": 0.1142,
+  "open": 83.25,
   "path": [
    101.5,
    101.6,
@@ -102,58 +102,62 @@
    103.87,
    104.09,
    103.83,
-   104.08
+   104.08,
+   104.32,
+   104.61,
+   104.85,
+   104.59
   ]
  },
  "record": {
-  "n": 226,
-  "clvN": 104,
-  "clvRet": -0.022,
-  "clvT": -3.54,
-  "clv": -0.16,
-  "beat": 0.203,
-  "settled": 94,
-  "w": 53,
-  "l": 41,
+  "n": 221,
+  "clvN": 108,
+  "clvRet": -0.0239,
+  "clvT": -3.73,
+  "clv": -0.17,
+  "beat": 0.219,
+  "settled": 98,
+  "w": 56,
+  "l": 42,
   "p": 0,
-  "roi": 0.1726,
-  "roiT": 1.53,
-  "profit": 4.5,
-  "risked": 114.25,
-  "yield": 0.0394
+  "roi": 0.1853,
+  "roiT": 1.68,
+  "profit": 4.98,
+  "risked": 115.25,
+  "yield": 0.0432
  },
- "tEff": -3.54,
+ "tEff": -3.73,
  "corr": {
   "rho": 0.0,
-  "n": 104,
+  "n": 108,
   "slates": 17,
-  "nEff": 104.0,
-  "avgSlate": 6.12
+  "nEff": 108.0,
+  "avgSlate": 6.35
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 104,
+   "value": 108,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.2% t -3.54",
+   "value": "-2.4% t -3.73",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "20%",
+   "value": "22%",
    "pass": false
   },
   {
    "gate": "no single market carrying it",
-   "value": "without cbb-ml: -2.3%",
+   "value": "without cfb-spread: -2.4%",
    "pass": false
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +17.3% vs -2.1% (SE 11.3)",
+   "value": "ROI +18.5% vs -2.3% (SE 11.0)",
    "pass": true
   }
  ],
@@ -206,7 +210,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 11,
+   "n": 9,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -270,20 +274,20 @@
    "sport": "cbb",
    "mk": "ml",
    "n": 5,
-   "clvN": 1,
-   "clvRet": 0.0527,
-   "clvT": null,
+   "clvN": 2,
+   "clvRet": -0.0412,
+   "clvT": -0.44,
    "clv": null,
-   "beat": 1.0,
-   "settled": 1,
-   "w": 1,
+   "beat": 0.5,
+   "settled": 2,
+   "w": 2,
    "l": 0,
    "p": 0,
-   "roi": 1.5,
-   "roiT": null,
-   "profit": 0.38,
-   "risked": 0.25,
-   "yield": 1.5
+   "roi": 1.29,
+   "roiT": 6.14,
+   "profit": 0.65,
+   "risked": 0.5,
+   "yield": 1.29
   },
   {
    "id": "cbb-spread",
@@ -311,21 +315,21 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 56,
-   "clvN": 1,
-   "clvRet": -0.0192,
-   "clvT": null,
-   "clv": 0.0,
-   "beat": 0.0,
-   "settled": 1,
-   "w": 1,
-   "l": 0,
+   "n": 52,
+   "clvN": 4,
+   "clvRet": -0.0439,
+   "clvT": -0.71,
+   "clv": -0.25,
+   "beat": 0.5,
+   "settled": 4,
+   "w": 3,
+   "l": 1,
    "p": 0,
-   "roi": 0.9615,
-   "roiT": null,
-   "profit": 0.24,
-   "risked": 0.25,
-   "yield": 0.9616
+   "roi": 0.4533,
+   "roiT": 0.94,
+   "profit": 0.45,
+   "risked": 1.0,
+   "yield": 0.4534
   },
   {
    "id": "nba-ml",
@@ -395,7 +399,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 50,
+   "n": 51,
    "clvN": 42,
    "clvRet": -0.018,
    "clvT": -2.96,
@@ -434,132 +438,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401906769",
-   "k": "2026-11-02T23:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Florida",
-   "a": "Miami",
-   "mk": "total",
-   "side": "under",
-   "line": 160.5,
-   "price": -100.0,
-   "bet": "under 160.5 -100",
-   "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
-   "edge": 3.3,
-   "ev": 0.0293,
-   "event": null,
-   "pass": true,
-   "close": 159.5
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401910994",
-   "k": "2026-11-02T23:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Georgia State",
-   "a": "Bowling Green",
-   "mk": "total",
-   "side": "under",
-   "line": 158.5,
-   "price": -108.0,
-   "bet": "under 158.5 -108",
-   "placed": "2026-11-01T18:23:55Z",
-   "stake": 0.25,
-   "edge": 6.7,
-   "ev": 0.0196,
-   "event": null,
-   "pass": false,
-   "close": 162.5
-  },
-  {
-   "rule": "cbb-ml",
-   "sport": "cbb",
-   "id": "401924717",
-   "k": "2026-11-02T23:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Cornell",
-   "a": "Pepperdine",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 108.0,
-   "bet": "Cornell ML +108",
-   "placed": "2026-11-01T12:42:33Z",
-   "stake": 0.25,
-   "edge": 7.1,
-   "ev": 0.0334,
-   "event": null,
-   "pass": false,
-   "close": -3.5
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401924717",
-   "k": "2026-11-02T23:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Cornell",
-   "a": "Pepperdine",
-   "mk": "total",
-   "side": "over",
-   "line": 163.5,
-   "price": -108.0,
-   "bet": "over 163.5 -108",
-   "placed": "2026-11-01T16:40:44Z",
-   "stake": 0.25,
-   "edge": 4.4,
-   "ev": 0.0004,
-   "event": null,
-   "pass": false,
-   "close": 165.5
-  },
-  {
-   "rule": "cbb-spread",
-   "sport": "cbb",
-   "id": "401925733",
-   "k": "2026-11-02T23:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Michigan",
-   "a": "Oakland",
-   "mk": "spread",
-   "side": "home",
-   "line": 26.5,
-   "price": 104.0,
-   "bet": "Michigan -26.5 +104",
-   "placed": "2026-11-01T16:40:44Z",
-   "stake": 0.25,
-   "edge": 2.7,
-   "ev": 0.0389,
-   "event": null,
-   "pass": true,
-   "close": 26.5
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401925733",
-   "k": "2026-11-02T23:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Michigan",
-   "a": "Oakland",
-   "mk": "total",
-   "side": "over",
-   "line": 156.5,
-   "price": -108.0,
-   "bet": "over 156.5 -108",
-   "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
-   "edge": 6.8,
-   "ev": 0.0204,
-   "event": null,
-   "pass": false,
-   "close": 157.5
-  },
   {
    "rule": "cbb-total",
    "sport": "cbb",
@@ -3142,8 +3020,8 @@
    "edge": 3.6,
    "ev": 0.0218,
    "event": null,
-   "pass": false,
-   "close": 151.5
+   "pass": true,
+   "close": 152.5
   },
   {
    "rule": "cbb-total",
@@ -3184,7 +3062,7 @@
    "edge": 3.7,
    "ev": 0.0056,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 18.5
   },
   {
@@ -3206,7 +3084,7 @@
    "ev": 0.0475,
    "event": null,
    "pass": false,
-   "close": 160.5
+   "close": 161.5
   },
   {
    "rule": "cbb-ml",
@@ -3247,7 +3125,7 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 144.5
   },
   {
@@ -3268,8 +3146,8 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": false,
-   "close": 151.5
+   "pass": true,
+   "close": 150.5
   },
   {
    "rule": "cbb-ml",
@@ -3311,7 +3189,7 @@
    "ev": 0.0011,
    "event": null,
    "pass": false,
-   "close": 148.5
+   "close": 147.5
   },
   {
    "rule": "cbb-spread",
@@ -3687,6 +3565,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186571",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Revathi",
+   "a": "Kawa",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -308,
+   "bet": "Kawa ML -308",
+   "placed": "2026-11-03T02:01:48Z",
+   "stake": 2.0,
+   "edge": 19.0,
+   "ev": 0.0311,
+   "event": "Chennai Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186587",
    "k": "2026-11-03T10:00:00Z",
    "slate": "tennis:2026-11-03",
@@ -3870,8 +3768,8 @@
    "edge": 6.3,
    "ev": 0.0137,
    "event": null,
-   "pass": false,
-   "close": 26.5
+   "pass": true,
+   "close": 27.5
   },
   {
    "rule": "cbb-total",
@@ -3891,8 +3789,8 @@
    "edge": 4.1,
    "ev": 0.0069,
    "event": null,
-   "pass": false,
-   "close": 154.5
+   "pass": true,
+   "close": 153.5
   },
   {
    "rule": "cfb-total",
@@ -3916,6 +3814,27 @@
    "close": 51.5
   },
   {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401920304",
+   "k": "2026-11-04T00:00:00Z",
+   "slate": "cbb:2026-11-03",
+   "h": "Georgia Tech",
+   "a": "Hampton",
+   "mk": "spread",
+   "side": "away",
+   "line": 15.5,
+   "price": -104.0,
+   "bet": "Hampton +15.5 -104",
+   "placed": "2026-11-03T02:01:42Z",
+   "stake": 0.25,
+   "edge": 2.9,
+   "ev": 0.0002,
+   "event": null,
+   "pass": false,
+   "close": 15.5
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401920304",
@@ -3933,7 +3852,7 @@
    "edge": 5.7,
    "ev": 0.0024,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 149.5
   },
   {
@@ -3975,8 +3894,8 @@
    "edge": 4.3,
    "ev": 0.0003,
    "event": null,
-   "pass": false,
-   "close": 11.5
+   "pass": true,
+   "close": 10.5
   },
   {
    "rule": "cbb-total",
@@ -3996,8 +3915,8 @@
    "edge": 6.0,
    "ev": 0.0049,
    "event": null,
-   "pass": false,
-   "close": 154.5
+   "pass": true,
+   "close": 155.5
   },
   {
    "rule": "tennis-ml",
@@ -4100,7 +4019,7 @@
    "edge": 7.0,
    "ev": 0.0254,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 38.5
   },
   {
@@ -4121,7 +4040,7 @@
    "edge": 3.8,
    "ev": 0.0069,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 43.5
   },
   {
@@ -4205,8 +4124,8 @@
    "edge": 4.2,
    "ev": 0.038,
    "event": null,
-   "pass": true,
-   "close": 55.5
+   "pass": false,
+   "close": 54.5
   },
   {
    "rule": "cfb-ml",
@@ -4353,7 +4272,7 @@
    "ev": 0.0177,
    "event": null,
    "pass": true,
-   "close": 63.5
+   "close": 64.5
   },
   {
    "rule": "cfb-total",
@@ -4541,7 +4460,7 @@
    "edge": 5.8,
    "ev": 0.003,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 45.5
   },
   {
@@ -4609,6 +4528,191 @@
   }
  ],
  "recent": [
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401906769",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Florida",
+   "a": "Miami",
+   "mk": "total",
+   "side": "under",
+   "line": 160.5,
+   "price": -100.0,
+   "bet": "under 160.5 -100",
+   "placed": "2026-11-01T22:39:07Z",
+   "stake": 0.25,
+   "edge": 3.3,
+   "ev": 0.0293,
+   "event": null,
+   "pass": true,
+   "clvRet": 0.0489,
+   "clv": 1.0,
+   "beat": 1,
+   "close": 159.5,
+   "score": [
+    67.0,
+    77.0
+   ],
+   "res": "w",
+   "ret": 1.0,
+   "profit": 0.25
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401910994",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Georgia State",
+   "a": "Bowling Green",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": -108.0,
+   "bet": "under 158.5 -108",
+   "placed": "2026-11-01T18:23:55Z",
+   "stake": 0.25,
+   "edge": 6.7,
+   "ev": 0.0196,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.2236,
+   "clv": -4.0,
+   "beat": -1,
+   "close": 162.5,
+   "score": [
+    76.0,
+    73.0
+   ],
+   "res": "w",
+   "ret": 0.9259,
+   "profit": 0.2315
+  },
+  {
+   "rule": "cbb-ml",
+   "sport": "cbb",
+   "id": "401924717",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Cornell",
+   "a": "Pepperdine",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 108.0,
+   "bet": "Cornell ML +108",
+   "placed": "2026-11-01T12:42:33Z",
+   "stake": 0.25,
+   "edge": 7.1,
+   "ev": 0.0334,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.135,
+   "beat": -1,
+   "close": -3.5,
+   "score": [
+    85.0,
+    86.0
+   ],
+   "res": "w",
+   "ret": 1.08,
+   "profit": 0.27
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401924717",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Cornell",
+   "a": "Pepperdine",
+   "mk": "total",
+   "side": "over",
+   "line": 163.5,
+   "price": -108.0,
+   "bet": "over 163.5 -108",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0004,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.057,
+   "clv": 2.0,
+   "beat": 1,
+   "close": 165.5,
+   "score": [
+    85.0,
+    86.0
+   ],
+   "res": "w",
+   "ret": 0.9259,
+   "profit": 0.2315
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401925733",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Michigan",
+   "a": "Oakland",
+   "mk": "spread",
+   "side": "home",
+   "line": 26.5,
+   "price": 104.0,
+   "bet": "Michigan -26.5 +104",
+   "placed": "2026-11-01T16:40:44Z",
+   "stake": 0.25,
+   "edge": 2.7,
+   "ev": 0.0389,
+   "event": null,
+   "pass": true,
+   "clvRet": 0.0197,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 26.5,
+   "score": [
+    68.0,
+    84.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401925733",
+   "k": "2026-11-02T23:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Michigan",
+   "a": "Oakland",
+   "mk": "total",
+   "side": "over",
+   "line": 156.5,
+   "price": -108.0,
+   "bet": "over 156.5 -108",
+   "placed": "2026-11-01T22:39:07Z",
+   "stake": 0.25,
+   "edge": 6.8,
+   "ev": 0.0204,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.0101,
+   "clv": 1.0,
+   "beat": 1,
+   "close": 157.5,
+   "score": [
+    68.0,
+    84.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
   {
    "rule": "cbb-spread",
    "sport": "cbb",
@@ -6143,162 +6247,6 @@
    "res": "w",
    "ret": 0.9434,
    "profit": 0.4717
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873026-4635008-rc",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "BUF",
-   "a": "BAL",
-   "mk": "prop",
-   "side": "over",
-   "line": 2.5,
-   "price": 138.0,
-   "bet": "Keon Coleman over 2.5 rec +138",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 4.0,
-   "edge": 16.3,
-   "ev": 0.3518,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0021,
-   "close": 2.5,
-   "score": 1.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -4.0
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873027-4038815-rc",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "PIT",
-   "a": "CLE",
-   "mk": "prop",
-   "side": "under",
-   "line": 2.5,
-   "price": 113.0,
-   "bet": "Rico Dowdle under 2.5 rec +113",
-   "placed": "2026-10-29T22:01:00Z",
-   "stake": 2.0,
-   "edge": 10.7,
-   "ev": 0.1587,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.1293,
-   "close": 2.5,
-   "score": 0.0,
-   "res": "w",
-   "ret": 1.13,
-   "profit": 2.26
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873028-4242335-rc",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "JAX",
-   "a": "IND",
-   "mk": "prop",
-   "side": "under",
-   "line": 2.5,
-   "price": -108.0,
-   "bet": "Jonathan Taylor under 2.5 rec -108",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.25,
-   "edge": 10.7,
-   "ev": 0.0477,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0669,
-   "close": 2.5,
-   "score": 4.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873028-4432773-wy",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "JAX",
-   "a": "IND",
-   "mk": "prop",
-   "side": "over",
-   "line": 8.5,
-   "price": -113.0,
-   "bet": "Brian Thomas Jr. over 8.5 rec yds -113",
-   "placed": "2026-10-30T18:33:00Z",
-   "stake": 1.25,
-   "edge": 29.5,
-   "ev": 0.1724,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0239,
-   "close": 10.5,
-   "score": 12.0,
-   "res": "w",
-   "ret": 0.885,
-   "profit": 1.1062
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873029-14880-py",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "NYJ",
-   "a": "LV",
-   "mk": "prop",
-   "side": "over",
-   "line": 236.5,
-   "price": -108.0,
-   "bet": "Kirk Cousins over 236.5 pass yds -108",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.25,
-   "edge": 11.8,
-   "ev": 0.0573,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0645,
-   "close": 231.5,
-   "score": 247.0,
-   "res": "w",
-   "ret": 0.9259,
-   "profit": 0.2315
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873029-15864-ry",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "NYJ",
-   "a": "LV",
-   "mk": "prop",
-   "side": "under",
-   "line": 7.5,
-   "price": -120.0,
-   "bet": "Geno Smith under 7.5 rush yds -120",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.25,
-   "edge": 23.0,
-   "ev": 0.0908,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0403,
-   "close": 6.5,
-   "score": 4.0,
-   "res": "w",
-   "ret": 0.8333,
-   "profit": 0.2083
   }
  ],
  "ledger": [
@@ -9934,7 +9882,17 @@
    "ev": 0.0293,
    "event": null,
    "pass": true,
-   "close": 159.5
+   "clvRet": 0.0489,
+   "clv": 1.0,
+   "beat": 1,
+   "close": 159.5,
+   "score": [
+    67.0,
+    77.0
+   ],
+   "res": "w",
+   "ret": 1.0,
+   "profit": 0.25
   },
   {
    "rule": "cbb-total",
@@ -9955,7 +9913,17 @@
    "ev": 0.0196,
    "event": null,
    "pass": false,
-   "close": 162.5
+   "clvRet": -0.2236,
+   "clv": -4.0,
+   "beat": -1,
+   "close": 162.5,
+   "score": [
+    76.0,
+    73.0
+   ],
+   "res": "w",
+   "ret": 0.9259,
+   "profit": 0.2315
   },
   {
    "rule": "cbb-ml",
@@ -9976,7 +9944,16 @@
    "ev": 0.0334,
    "event": null,
    "pass": false,
-   "close": -3.5
+   "clvRet": -0.135,
+   "beat": -1,
+   "close": -3.5,
+   "score": [
+    85.0,
+    86.0
+   ],
+   "res": "w",
+   "ret": 1.08,
+   "profit": 0.27
   },
   {
    "rule": "cbb-total",
@@ -9997,7 +9974,17 @@
    "ev": 0.0004,
    "event": null,
    "pass": false,
-   "close": 165.5
+   "clvRet": 0.057,
+   "clv": 2.0,
+   "beat": 1,
+   "close": 165.5,
+   "score": [
+    85.0,
+    86.0
+   ],
+   "res": "w",
+   "ret": 0.9259,
+   "profit": 0.2315
   },
   {
    "rule": "cbb-spread",
@@ -10018,7 +10005,17 @@
    "ev": 0.0389,
    "event": null,
    "pass": true,
-   "close": 26.5
+   "clvRet": 0.0197,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 26.5,
+   "score": [
+    68.0,
+    84.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "cbb-total",
@@ -10039,7 +10036,17 @@
    "ev": 0.0204,
    "event": null,
    "pass": false,
-   "close": 157.5
+   "clvRet": 0.0101,
+   "clv": 1.0,
+   "beat": 1,
+   "close": 157.5,
+   "score": [
+    68.0,
+    84.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "cbb-total",
@@ -12623,8 +12630,8 @@
    "edge": 3.6,
    "ev": 0.0218,
    "event": null,
-   "pass": false,
-   "close": 151.5
+   "pass": true,
+   "close": 152.5
   },
   {
    "rule": "cbb-total",
@@ -12665,7 +12672,7 @@
    "edge": 3.7,
    "ev": 0.0056,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 18.5
   },
   {
@@ -12687,7 +12694,7 @@
    "ev": 0.0475,
    "event": null,
    "pass": false,
-   "close": 160.5
+   "close": 161.5
   },
   {
    "rule": "cbb-ml",
@@ -12728,7 +12735,7 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 144.5
   },
   {
@@ -12749,8 +12756,8 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": false,
-   "close": 151.5
+   "pass": true,
+   "close": 150.5
   },
   {
    "rule": "cbb-ml",
@@ -12792,7 +12799,7 @@
    "ev": 0.0011,
    "event": null,
    "pass": false,
-   "close": 148.5
+   "close": 147.5
   },
   {
    "rule": "cbb-spread",
@@ -13168,6 +13175,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186571",
+   "k": "2026-11-03T10:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Revathi",
+   "a": "Kawa",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -308,
+   "bet": "Kawa ML -308",
+   "placed": "2026-11-03T02:01:48Z",
+   "stake": 2.0,
+   "edge": 19.0,
+   "ev": 0.0311,
+   "event": "Chennai Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "186587",
    "k": "2026-11-03T10:00:00Z",
    "slate": "tennis:2026-11-03",
@@ -13351,8 +13378,8 @@
    "edge": 6.3,
    "ev": 0.0137,
    "event": null,
-   "pass": false,
-   "close": 26.5
+   "pass": true,
+   "close": 27.5
   },
   {
    "rule": "cbb-total",
@@ -13372,8 +13399,8 @@
    "edge": 4.1,
    "ev": 0.0069,
    "event": null,
-   "pass": false,
-   "close": 154.5
+   "pass": true,
+   "close": 153.5
   },
   {
    "rule": "cfb-total",
@@ -13397,6 +13424,27 @@
    "close": 51.5
   },
   {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401920304",
+   "k": "2026-11-04T00:00:00Z",
+   "slate": "cbb:2026-11-03",
+   "h": "Georgia Tech",
+   "a": "Hampton",
+   "mk": "spread",
+   "side": "away",
+   "line": 15.5,
+   "price": -104.0,
+   "bet": "Hampton +15.5 -104",
+   "placed": "2026-11-03T02:01:42Z",
+   "stake": 0.25,
+   "edge": 2.9,
+   "ev": 0.0002,
+   "event": null,
+   "pass": false,
+   "close": 15.5
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401920304",
@@ -13414,7 +13462,7 @@
    "edge": 5.7,
    "ev": 0.0024,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 149.5
   },
   {
@@ -13456,8 +13504,8 @@
    "edge": 4.3,
    "ev": 0.0003,
    "event": null,
-   "pass": false,
-   "close": 11.5
+   "pass": true,
+   "close": 10.5
   },
   {
    "rule": "cbb-total",
@@ -13477,8 +13525,8 @@
    "edge": 6.0,
    "ev": 0.0049,
    "event": null,
-   "pass": false,
-   "close": 154.5
+   "pass": true,
+   "close": 155.5
   },
   {
    "rule": "tennis-ml",
@@ -13581,7 +13629,7 @@
    "edge": 7.0,
    "ev": 0.0254,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 38.5
   },
   {
@@ -13602,7 +13650,7 @@
    "edge": 3.8,
    "ev": 0.0069,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 43.5
   },
   {
@@ -13686,8 +13734,8 @@
    "edge": 4.2,
    "ev": 0.038,
    "event": null,
-   "pass": true,
-   "close": 55.5
+   "pass": false,
+   "close": 54.5
   },
   {
    "rule": "cfb-ml",
@@ -13834,7 +13882,7 @@
    "ev": 0.0177,
    "event": null,
    "pass": true,
-   "close": 63.5
+   "close": 64.5
   },
   {
    "rule": "cfb-total",
@@ -14022,7 +14070,7 @@
    "edge": 5.8,
    "ev": 0.003,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 45.5
   },
   {
