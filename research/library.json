@@ -482,6 +482,19 @@
      ]
     },
     {
+     "term": "3Y (rookie projection)",
+     "short": "NBA rookie's projected XPM over his next three seasons.",
+     "body": [
+      "3Y = c0 + c1 XPM + c2 (age - 21) + c3 ln(1 + MP82); MP82 = MP x 82 / team games. Full season: c = -1.73, .646, -.078, .216.",
+      "Target and rookies as aXPM (1,222, 2010-23). Held out by class: RMSE .876 vs .942 aXPM, .977 raw (t -7.4 vs aXPM); Spearman .481, beats aXPM in 12 of 14 classes; calibration slope .99.",
+      "Season in progress: coefficients fit on simulated partial seasons (minutes thinned to the season share, XPM noise 797 / MP, log-minutes noise .25 x sqrt((1 - f) / f)), linear between f = .1, .2, .35, .5, .75, 1. Beats aXPM at every share (t -3.7 at f .1). Display only."
+     ],
+     "where": "NBA rookies",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
      "term": "Contract value (surplus)",
      "short": "Projected VORX x market $ per win, minus salary, every year left.",
      "body": [

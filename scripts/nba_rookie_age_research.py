@@ -38,7 +38,8 @@ A0 = 21
 
 def load():
     files = sorted(int(f[:-5]) for f in os.listdir(XPM) if f.endswith('.json'))
-    F = {S: {p['id']: p for p in json.load(open(os.path.join(XPM, f'{S}.json')))['players']} for S in files}
+    D = {S: json.load(open(os.path.join(XPM, f'{S}.json'))) for S in files}
+    F = {S: {p['id']: p for p in D[S]['players']} for S in files}
     draft = {}
     for yr, lst in json.load(open(os.path.join(HERE, 'nba_draft.json'))).items():
         for pk, bid, n, tm in lst:
@@ -64,7 +65,7 @@ def load():
             num = sum(f['xpm'] * f['mp'] for f in fut if f and f.get('xpm') is not None)
             fx = (num - 2.0 * 1000) / (mp + 1000)
             fv = sum(f['vorx'] for f in fut if f and f.get('vorx') is not None)
-            rows.append((S, p['sxpm'], p['age'], p['mp'], fx, fv, pid))
+            rows.append((S, p['sxpm'], p['age'], p['mp'], fx, fv, pid, p['xpm'], D[S]['games']))
     return rows
 
 
