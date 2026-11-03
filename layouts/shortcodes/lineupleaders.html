@@ -5,20 +5,22 @@
        Ranks follow the current sort and recount within the filters; headers sort. Fetched when the window is on screen. */ -}}
 {{- $sport := .Get "sport" | default "nba" -}}
 {{- $about := "Net = points scored minus allowed per 100 possessions with the group on the floor together. sNet pulls Net toward the team's own net by k possessions (k from odd/even game splits, per unit size), the rank. Trios and pairs sum every five that holds them. No opponent adjustment; garbage time counts." -}}
-<div class="win cfb lld" data-tab="{{ .Get "tab" | default "lineup leaders" }}" data-lld="{{ $sport }}" data-src="{{ printf "data/%s-lineup-leaders.json" $sport | relURL }}?v={{ now.Unix }}">
+<div class="win cfb lld" data-tab="{{ .Get "tab" | default "lineup leaders" }}" data-lld="{{ $sport }}"{{ if eq $sport "nba" }} data-gfx-logo="/img/nba/{}.png"{{ end }} data-gfx-cols="RK,Lineup,Team,Poss,Net,sNet" data-src="{{ printf "data/%s-lineup-leaders.json" $sport | relURL }}?v={{ now.Unix }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ if eq $sport "nba" }}hoop{{ else }}basketball{{ end }}"/></svg>{{ .Get "title" | default "lineup leaders" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar" data-lld-bar onsubmit="return false" aria-label="filter lineup leaders">
-    <label class="cfb__field lld__season" hidden><span>season</span><select name="season" aria-label="season"></select></label>
+    <label class="cfb__field lld__season" hidden><span>season</span><select name="season" aria-label="season" data-gfx-season></select></label>
     <label class="cfb__field cfb__field--grow"><span>{{ if eq $sport "cbb" }}conference{{ else }}team{{ end }}</span><select name="scope" aria-label="{{ if eq $sport "cbb" }}conference{{ else }}team{{ end }}"><option>loading…</option></select></label>
     <label class="cfb__field"><span>poss</span><select name="poss" aria-label="minimum possessions"></select></label>
     <fieldset class="cfb__pos"><legend class="visually-hidden">group size</legend>
-      <button type="button" class="cfb__chip is-on" data-size="5" aria-pressed="true" title="five-man units">5-man</button>
-      <button type="button" class="cfb__chip" data-size="3" aria-pressed="false" title="three-man groups">trios</button>
-      <button type="button" class="cfb__chip" data-size="2" aria-pressed="false" title="two-man pairs">pairs</button>
+      <button type="button" class="cfb__chip is-on" data-size="5" data-gfx-chip aria-pressed="true" title="five-man units">5-man</button>
+      <button type="button" class="cfb__chip" data-size="3" data-gfx-chip aria-pressed="false" title="three-man groups">trios</button>
+      <button type="button" class="cfb__chip" data-size="2" data-gfx-chip aria-pressed="false" title="two-man pairs">pairs</button>
+      <button type="button" class="cfb__chip" data-size="all" data-gfx-chip="5-man, trios, pairs" aria-pressed="false" title="every 5-man unit, trio and pair together">all</button>
     </fieldset>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: rows on screen">GFX</button>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table lld__table">
@@ -26,7 +28,7 @@
       <tbody data-lld-body><tr><td class="cfb__dim">loading…</td></tr></tbody>
     </table>
   </div>
-  <div class="win__status" title="{{ $about }}"><span data-lld-count></span><span class="cfb__asof" data-lld-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="{{ $about }}"><span data-lld-count data-gfx-count></span><span class="cfb__asof" data-lld-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <style>
 .lld__table td.lld__who { white-space: normal; min-width: 12em; line-height: 1.3; }
@@ -57,9 +59,10 @@
   function init(W) {
     if (W.__lld) return; W.__lld = true;
     var sport = W.getAttribute('data-lld'), bar = W.querySelector('[data-lld-bar]'), size = '5', key = 'sn', dir = -1, D = null, Z = null;
-    var store = 'ark-lld-' + sport, PS = {}, STEPS = [25, 50, 100, 200, 400, 800];
+    var store = 'ark-lld-' + sport, PS = {}, STEPS = [25, 50, 100, 200, 400, 800], SIZES = ['5', '3', '2'];
     function possOpts() {
-      var f = +(Z.floor || {})[size] || 25, sel = bar.elements.poss, want = PS[size] || Math.max(f, size === '5' ? 50 : 100);
+      var f = size === 'all' ? Math.min.apply(null, SIZES.map(function (z) { return +(Z.floor || {})[z] || 25; })) : +(Z.floor || {})[size] || 25;
+      var sel = bar.elements.poss, want = PS[size] || Math.max(f, size === '5' ? 50 : 100);
       var ok = STEPS.filter(function (x) { return x >= f; });
       if (ok.indexOf(+want) < 0) want = ok.filter(function (x) { return x <= want; }).pop() || ok[0];
       sel.innerHTML = ok.map(function (x) { return '<option value="' + x + '">' + x + '+</option>'; }).join('');
@@ -81,6 +84,8 @@
       Z = D.seasons[bar.elements.season.value];
       scopes(); possOpts();
       W.querySelector('[data-lld-asof]').textContent = Z.label + ' · updated ' + String(D.asof || '').slice(0, 10);
+      var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(D.asof || ''));
+      if (m) W.setAttribute('data-gfx-date', 'updated ' + ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][+m[2] - 1] + ' ' + (+m[3]) + ', ' + m[1]);
     }
     fetch(W.getAttribute('data-src')).then(function (r) { return r.json(); }).then(function (d) {
       D = d;
@@ -97,7 +102,7 @@
     }).catch(function () { W.querySelector('[data-lld-body]').innerHTML = '<tr><td class="cfb__dim">lineups not available right now.</td></tr>'; });
     function rows() {
       var sc = bar.elements.scope.value, mp = +bar.elements.poss.value || 0, out = [];
-      (Z.rows[size] || []).forEach(function (u) {
+      (size === 'all' ? SIZES : [size]).forEach(function (z) { (Z.rows[z] || []).forEach(function (u) {
         if (u[3] < mp) return;
         var T = Z.teams[u[1]] || [];
         if (sc.charAt(0) === 't' && sc.slice(2) !== u[1]) return;
@@ -106,7 +111,7 @@
         var ls = nm.map(last);
         ls = ls.map(function (x, j) { return ls.indexOf(x) !== ls.lastIndexOf(x) ? String(nm[j]).slice(0, 3) + ' ' + x : x; });
         out.push({ n: ls.join(' · '), full: nm.join(', '), t: u[1], min: u[2], poss: u[3], or: u[4], dr: u[5], net: u[4] - u[5], sn: u[6] });
-      });
+      }); });
       return out;
     }
     function render() {
@@ -126,7 +131,7 @@
         return '<tr>' + COLS.map(function (c) {
           var v = r[c[0]], x = c[3] ? ' ' + c[3] : '';
           if (c[0] === 'rk') return '<td class="cfb__rk">' + (i + 1) + '</td>';
-          if (c[0] === 'n') { var L = (Z.teams[r.t] || [])[1]; return '<td class="lld__who" title="' + esc(r.full) + '">' + (L ? '<img class="lld__ml" src="' + esc(L) + '" alt="" width="16" height="16" loading="lazy">' : '') + '<b>' + esc(v) + '</b></td>'; }
+          if (c[0] === 'n') { var L = (Z.teams[r.t] || [])[1]; return '<td class="lld__who" title="' + esc(r.full) + '">' + (L ? '<img class="lld__ml gfx-off" src="' + esc(L) + '" alt="" width="16" height="16" loading="lazy">' : '') + '<b>' + esc(v) + '</b></td>'; }
           if (c[0] === 't') { var T = Z.teams[v] || []; return '<td class="lld__x"><span class="lld__tm" title="' + esc(tname(v)) + '">' + (T[1] ? '<img src="' + esc(T[1]) + '" alt="" width="18" height="18" loading="lazy">' : '') + '<span class="lld__ab">' + esc(sport === 'nba' ? v : T[0] || v) + '</span></span></td>'; }
           if (c[0] === 'min' || c[0] === 'poss') return '<td class="cfb__num' + x + '">' + Math.round(v).toLocaleString('en-US') + '</td>';
           if (c[0] === 'or' || c[0] === 'dr') return '<td class="cfb__num' + x + '">' + v.toFixed(1) + '</td>';
@@ -134,12 +139,14 @@
           return '<td class="cfb__num' + x + '"><span class="' + cls(v) + '">' + sg(v) + '</span></td>';
         }).join('') + '</tr>';
       }).join('') : '<tr><td colspan="' + COLS.length + '" class="cfb__dim">none at this many possessions yet.</td></tr>';
-      var unit = size === '5' ? ' units' : size === '3' ? ' trios' : ' pairs';
-      W.querySelector('[data-lld-count]').textContent = list.length.toLocaleString('en-US') + unit + (list.length > shown.length ? ' (top ' + shown.length + ' shown)' : '') + ' · k ' + Number(Z.k[size]).toLocaleString('en-US');
+      var unit = size === '5' ? ' units' : size === '3' ? ' trios' : size === '2' ? ' pairs' : ' groups';
+      W.querySelector('[data-lld-count]').textContent = list.length.toLocaleString('en-US') + unit + (list.length > shown.length ? ' (top ' + shown.length + ' shown)' : '') +
+        ' · k ' + (size === 'all' ? SIZES.map(function (z) { return Number(Z.k[z]).toLocaleString('en-US'); }).join('/') : Number(Z.k[size]).toLocaleString('en-US'));
+      if (window.__arkGfxScan) window.__arkGfxScan();
       try { localStorage.setItem(store, JSON.stringify({ size: size, ps: PS, scope: bar.elements.scope.value })); } catch (e) {}
     }
     function chips() { [].forEach.call(bar.querySelectorAll('[data-size]'), function (b) { var on = b.dataset.size === size; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); }); }
-    bar.addEventListener('change', function (e) { if (!D) return; if (e.target.name === 'season') pick(); if (e.target.name === 'poss') PS[size] = +e.target.value; render(); });
+    bar.addEventListener('change', function (e) { if (!D || !e.target.name) return; if (e.target.name === 'season') pick(); if (e.target.name === 'poss') PS[size] = +e.target.value; render(); });
     [].forEach.call(bar.querySelectorAll('[data-size]'), function (c) { c.addEventListener('click', function () { size = c.dataset.size; chips(); if (Z) possOpts(); render(); }); });
     W.querySelector('[data-lld-head]').addEventListener('click', function (e) {
       var th = e.target.closest('th[data-k]'); if (!th) return;
@@ -157,3 +164,4 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 </script>
+{{- partial "gfx.html" . -}}

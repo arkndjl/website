@@ -110,7 +110,7 @@
     return +(sel && sel.value) || ROWS_DEFAULT;
   }
   // name, position, class, team, FV and the sorted column stay on every graphic: when columns have to go for width, these go last
-  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet)$/i, POS_COL = /^(pos|position)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i, FV_COL = /^x?fv$/i;
+  var NAME_COL = /^(player|recruit|goalie|coach|qb|team|club|matchup|match|game|bet|lineup|unit)$/i, POS_COL = /^(pos|position)$/i, CLASS_COL = /^(class|yr|year)$/i, TEAM_COL = /^(team|school|club|org)$/i, FV_COL = /^x?fv$/i;
   function isTeamTable(heads) {
     var key = heads.filter(function (h) { return !/^(rk|#|spot|lg)$/i.test(h.replace(/!$/, '')); })[0] || '';
     return /^(team|club)$/i.test(key);
@@ -119,6 +119,8 @@
     var bits = [], bar = win.querySelector('form');
     if (bar) {
       var chip = bar.querySelector('.cfb__chip.is-on[data-pos]'); if (chip && chip.dataset.pos) bits.push(chip.dataset.pos);
+      // a view chip that changes what the rows are (lineups: 5-man, trios, pairs) names itself on the subtitle
+      [].slice.call(bar.querySelectorAll('.cfb__chip.is-on[data-gfx-chip]')).forEach(function (c) { bits.push(c.getAttribute('data-gfx-chip') || txt(c)); });
       [].slice.call(bar.elements).forEach(function (el) {
         if (!el.name || el.type === 'button' || el.type === 'reset') return;
         if (el.type === 'checkbox') { if (el.checked) { var l = el.closest('label'); bits.push(l ? txt(l) : el.name); } return; }
@@ -198,7 +200,7 @@
     if (!rows.length) return null;
     var data = await Promise.all(rows.map(async function (r) {
       return Promise.all(idx.map(async function (i) {
-        var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img):not(.flag)');
+        var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo:not(.gfx-off), img:not(.pxframe img):not(.flag):not(.gfx-off)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
         var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, .nbaxpm__od').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
@@ -245,7 +247,7 @@
     if (rdCol >= 0) { var rds = rows.map(function (r) { return txt(r.cells[rdCol]); }).filter(function (v, i, a) { return a.indexOf(v) === i; });
       title = base + ' :: round' + (rds.length > 1 ? 's ' + rds[0] + '-' + rds[rds.length - 1] : ' ' + rds[0]); }
     var fs = rdWant ? { filters: [], sort: '' } : filterSummary(win);
-    var cnt = win.querySelector('[data-cfb-count], [data-cbb-count], [data-tf-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
+    var cnt = win.querySelector('[data-cfb-count], [data-cbb-count], [data-tf-count], [data-gfx-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
     var tot = total[2] || total[1], noun = win.hasAttribute('data-gfx-noun') ? ' ' + win.getAttribute('data-gfx-noun') : cnt && /players/.test(txt(cnt)) ? ' players' : '';
     var sub = [rows.length + (tot && +String(tot).replace(/,/g, '') > rows.length ? ' of ' + tot + noun : noun)].concat(fs.filters).concat(fs.sort ? [fs.sort] : []).join(' · ');
 
@@ -313,7 +315,7 @@
     };
     var squeezes = [
       function () {   // "Connor McDavid" -> "C. McDavid"
-        var k = cols.findIndex(function (ci) { return NAME_COL.test(heads[ci]) && !/^(team|club|matchup|match|game|bet)$/i.test(heads[ci]); });
+        var k = cols.findIndex(function (ci) { return NAME_COL.test(heads[ci]) && !/^(team|club|matchup|match|game|bet|lineup|unit)$/i.test(heads[ci]); });
         if (k >= 0) cdata.forEach(function (r) { r[k].t = r[k].t.replace(/^([A-Z])[\w'’.-]*\s+(?=\S)/, '$1. '); });
       },
       function () { cdata.forEach(function (r) { r.forEach(function (c, k) { if (c.img && TEAM_COL.test(heads[cols[k]])) c.t = ''; }); }); },
@@ -1269,6 +1271,8 @@
   document.addEventListener('click', function () { setTimeout(addCardButtons, 0); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(addCardPickers, 0); }); else setTimeout(addCardPickers, 0);
   document.addEventListener('ark:lazy', function () { setTimeout(addCardPickers, 0); });
+  // a board that builds its table after load (lineups, on/off) calls this once its rows are in, for the rows and card pickers
+  window.__arkGfxScan = function () { addPickers(); addCardPickers(); };
   // ---- team card: from a team breakdown on an ARK Ranking (teamjs.html stores window.__arkTeamGfx[data-gfx-i]) ----
   // logo, rank and rating, season odds, next games, key players, strengths and concerns, the rating's inputs
   async function buildTeamCard(win, btn) {

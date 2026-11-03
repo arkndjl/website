@@ -5,15 +5,16 @@
        open ncaa-api proxy), refreshed by the cbb-board workflow; fetched the first time the window is on screen. */ -}}
 {{- $view := .Get "view" | default "units" -}}
 {{- $tab := .Get "tab" | default (cond (eq $view "units") "lineups" "on/off") -}}
-<div class="win lu" data-tab="{{ $tab }}" data-lu="{{ $view }}" data-lu-src="/data/cbb-lineups.json?v={{ now.Unix }}">
+<div class="win lu" data-tab="{{ $tab }}" data-lu="{{ $view }}" data-gfx-cols="{{ if eq $view "units" }}RK,Unit,MIN,Poss,Net,Shrunk{{ else }}RK,Player,Team,MIN,On,Off,On-Off,Shrunk{{ end }}" data-lu-src="/data/cbb-lineups.json?v={{ now.Unix }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default $tab }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  <div class="dc__bar">
-    <label class="dc__pick lu__season"><span>season</span><select data-lu-season aria-label="season"><option>loading…</option></select></label>
-    <label class="dc__pick"><span>team</span><select data-lu-team aria-label="team"><option>loading…</option></select></label>
-  </div>
+  <form class="dc__bar" onsubmit="return false" aria-label="pick a team">
+    <label class="dc__pick lu__season"><span>season</span><select data-lu-season data-gfx-season aria-label="season"><option>loading…</option></select></label>
+    <label class="dc__pick"><span>team</span><select name="team" data-lu-team aria-label="team"><option>loading…</option></select></label>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: rows on screen">GFX</button>
+  </form>
   <div class="dc__body" data-lu-body><p class="cfb__dim">loading…</p></div>
   {{- $about := `Five-man units from NCAA play-by-play substitutions: who was on the floor between subs, the points each side scored, and the game's possessions (box-score count) shared by time on the floor. ORtg / DRtg = points scored / allowed per 100 possessions; Net = ORtg - DRtg. Shrunk pulls Net toward the team's own net with 150 possessions, so a unit with a few minutes reads close to the team. Units with 2+ minutes, most-used first. Source: NCAA play-by-play; a game without substitution lines is left out (the count shows how many were read).` }}{{ if (ne $view "units") }}{{ $about = `On = the team's net rating (points per 100 possessions, scored minus allowed) with the player on the floor; Off = with him on the bench; On-Off = the gap. Shrunk pulls the gap toward 0 by its noise (600 harmonic possessions on/off), so a bench player with a hot 80 minutes doesn't top the list. On/off measures the lineups a player shares, not the player alone: a starter who plays with the other starters inherits their gap. FV is the board's grade. All D-I lists players with 200+ minutes, by Shrunk. Source: NCAA play-by-play; a game without substitution lines is left out (the count shows how many were read).` }}{{ end }}
   <div class="win__status" title="{{ $about }}"><span data-lu-count></span><span class="cfb__asof" data-lu-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -39,6 +40,8 @@
   function label(S) { var y = +S; return (y - 1) + '-' + String(y).slice(2); }
   function chip(fv) { return fv == null ? '' : '<span class="fv-chip" data-fv="' + (Math.floor(fv / 5) * 5) + '">' + fv + '</span>'; }
   function logo(u) { return u ? '<img class="cfb__logo" src="' + esc(u) + '" alt="" width="20" height="20" loading="lazy">' : ''; }
+  // one team on screen: its logo rides hidden in the name cell, for the GFX
+  function glogo(u) { return u ? '<img class="cfb__logo" src="' + esc(u) + '" alt="" width="20" height="20" loading="lazy" style="display:none">' : ''; }
   // a table whose numeric headers sort (first click: high first)
   function table(W, cols, rows, key) {
     var st = W.__luSort && W.__luSort.v === W.getAttribute('data-lu') + key ? W.__luSort : { v: W.getAttribute('data-lu') + key, k: -1, asc: false };
@@ -77,13 +80,14 @@
       sh.forEach(function (x) { cnt[x] = (cnt[x] || 0) + 1; });
       sh = sh.map(function (x, i) { return cnt[x] > 1 ? String(T.players[i][0]).slice(0, 3) + ' ' + x : x; });
       h += table(W, [{ h: 'Unit' , cls: 'lu__units' }, { h: 'G', n: 1, x: 1, t: 'games it played' }, { h: 'MIN', n: 1 }, { h: 'Poss', n: 1, x: 1 }, { h: 'ORtg', n: 1, x: 1 }, { h: 'DRtg', n: 1, x: 1 }, { h: 'Net', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'net shrunk toward the team net with 150 possessions' }],
-        T.units.map(function (u) { return { v: [null, u[7], u[1], u[2], u[3], u[4], u[5], u[6]], c: [u[0].map(function (i) { var n = T.players[i][0]; return '<span title="' + esc(n) + '">' + esc(sh[i]) + '</span>'; }).join(' · '), u[7], u[1].toFixed(1), Math.round(u[2]), u[3].toFixed(1), u[4].toFixed(1), '<span class="' + cl(u[5]) + '">' + sg(u[5]) + '</span>', '<b class="' + cl(u[6]) + '">' + sg(u[6]) + '</b>'] }; }), t + S);
+        T.units.map(function (u) { return { v: [null, u[7], u[1], u[2], u[3], u[4], u[5], u[6]], c: [glogo(T.logo) + u[0].map(function (i) { var n = T.players[i][0]; return '<span title="' + esc(n) + '">' + esc(sh[i]) + '</span>'; }).join(' · '), u[7], u[1].toFixed(1), Math.round(u[2]), u[3].toFixed(1), u[4].toFixed(1), '<span class="' + cl(u[5]) + '">' + sg(u[5]) + '</span>', '<b class="' + cl(u[6]) + '">' + sg(u[6]) + '</b>'] }; }), t + S);
     } else {
       h += table(W, [{ h: 'Player' }, { h: 'MIN', n: 1 }, { h: 'On', n: 1, x: 1 }, { h: 'Off', n: 1, x: 1 }, { h: 'On-Off', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'on-off shrunk toward 0 by its noise (the rank)' }],
-        T.players.map(function (p) { return { v: [null, p[1], p[2], p[3], p[4], p[5]], c: ['<span class="cfb__name">' + chip(p[6]) + '<b>' + esc(p[0]) + '</b></span>', Math.round(p[1]), sg(p[2]), sg(p[3]), '<span class="' + cl(p[4]) + '">' + sg(p[4]) + '</span>', '<b class="' + cl(p[5]) + '">' + sg(p[5]) + '</b>'] }; }), t + S);
+        T.players.map(function (p) { return { v: [null, p[1], p[2], p[3], p[4], p[5]], c: ['<span class="cfb__name">' + glogo(T.logo) + chip(p[6]) + '<b>' + esc(p[0]) + '</b></span>', Math.round(p[1]), sg(p[2]), sg(p[3]), '<span class="' + cl(p[4]) + '">' + sg(p[4]) + '</span>', '<b class="' + cl(p[5]) + '">' + sg(p[5]) + '</b>'] }; }), t + S);
     }
     body.innerHTML = h;
   }
+  function done(W) { if (window.__arkGfxScan) window.__arkGfxScan(); }
   function teams(W, D) {
     var S = W.querySelector('[data-lu-season]').value, Z = D.seasons[S] || { teams: {} }, sel = W.querySelector('[data-lu-team]'), view = W.getAttribute('data-lu');
     var keep = sel.value || null; try { keep = keep || localStorage.getItem('ark-lu-team'); } catch (e) {}
@@ -107,14 +111,16 @@
       // the season in progress until it has a slate of games, last season before that
       ss.value = keys.filter(function (S) { return D.seasons[S].games >= 300; })[0] || keys[0];
       teams(W, D);
-      ss.addEventListener('change', function () { teams(W, D); render(W, D); });
-      sel.addEventListener('change', function () { if (sel.value !== '*') { try { localStorage.setItem('ark-lu-team', sel.value); } catch (e) {} } render(W, D); });
+      ss.addEventListener('change', function () { teams(W, D); render(W, D); done(W); });
+      sel.addEventListener('change', function () { if (sel.value !== '*') { try { localStorage.setItem('ark-lu-team', sel.value); } catch (e) {} } render(W, D); done(W); });
       W.querySelector('[data-lu-body]').addEventListener('click', function (e) {
         var th = e.target.closest('th[data-sort]'); if (!th) return;
         var k = +th.getAttribute('data-k'), st = W.__luSort; st.asc = st.k === k ? !st.asc : false; st.k = k; render(W, D);
       });
-      render(W, D);
+      render(W, D); done(W);
       W.querySelector('[data-lu-asof]').textContent = 'updated ' + (D.updated || '').slice(0, 10);
+      var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(D.updated || ''));
+      if (m) W.setAttribute('data-gfx-date', 'updated ' + ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][+m[2] - 1] + ' ' + (+m[3]) + ', ' + m[1]);
     }).catch(function () { W.querySelector('[data-lu-body]').innerHTML = '<p class="cfb__dim">lineups not available right now.</p>'; });
   }
   function init() {
@@ -126,3 +132,4 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
+{{- partial "gfx.html" . -}}
