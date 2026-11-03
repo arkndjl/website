@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T19:45:37Z",
+ "asof": "2026-11-03T20:05:51Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 99.13,
   "peak": 118.08,
   "drawdown": 0.1605,
-  "open": 81.75,
+  "open": 83.75,
   "path": [
    101.5,
    101.6,
@@ -218,7 +218,7 @@
   ]
  },
  "record": {
-  "n": 254,
+  "n": 256,
   "clvN": 209,
   "clvRet": -0.0343,
   "clvT": -6.97,
@@ -423,7 +423,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 40,
+   "n": 42,
    "clvN": 34,
    "clvRet": -0.0363,
    "clvT": -3.41,
@@ -567,30 +567,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186470",
-   "k": "2026-11-03T16:00:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Struff",
-   "a": "Gea",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -115,
-   "bet": "Gea ML -115",
-   "placed": "2026-11-02T11:04:11Z",
-   "stake": 0.25,
-   "edge": 7.0,
-   "ev": 0.003,
-   "event": "Rolex Paris Masters",
-   "pass": true,
-   "clvRet": -0.0185,
-   "clv": -0.2,
-   "beat": 0,
-   "close": 0.525
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -762,7 +738,7 @@
    "edge": 3.3,
    "ev": 0.0026,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 33.5
   },
   {
@@ -783,7 +759,7 @@
    "edge": 3.9,
    "ev": 0.0163,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 31.5
   },
   {
@@ -1096,7 +1072,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": false,
-   "close": 1.5
+   "close": 2.5
   },
   {
    "rule": "nba-ml",
@@ -1403,7 +1379,7 @@
    "price": 104.0,
    "bet": "under 51.5 +104",
    "placed": "2026-11-03T10:50:48Z",
-   "stake": 3.5,
+   "stake": 3.75,
    "edge": 3.6,
    "ev": 0.0466,
    "event": null,
@@ -1424,7 +1400,7 @@
    "price": 102.0,
    "bet": "under 54.5 +102",
    "placed": "2026-11-02T22:17:12Z",
-   "stake": 3.0,
+   "stake": 3.25,
    "edge": 4.2,
    "ev": 0.038,
    "event": null,
@@ -2102,6 +2078,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186470",
+   "k": "2026-11-03T16:00:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Struff",
+   "a": "Gea",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -115,
+   "bet": "Gea ML -115",
+   "placed": "2026-11-02T11:04:11Z",
+   "stake": 0.25,
+   "edge": 7.0,
+   "ev": 0.003,
+   "event": "Rolex Paris Masters",
+   "pass": true,
+   "clvRet": -0.0185,
+   "clv": -0.2,
+   "beat": 0,
+   "close": 0.525,
+   "score": "6-7 3-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3862,37 +3866,6 @@
    "score": [
     97.0,
     119.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
-  },
-  {
-   "rule": "nfl-total",
-   "sport": "nfl",
-   "id": "2026_08_CHI_SEA",
-   "k": "2026-11-03T01:15:00Z",
-   "slate": "nfl:2026-11-02",
-   "h": "SEA",
-   "a": "CHI",
-   "mk": "total",
-   "side": "under",
-   "line": 46.5,
-   "price": -100.0,
-   "bet": "under 46.5 -100",
-   "placed": "2026-10-28T02:43:45Z",
-   "stake": 0.25,
-   "edge": 2.0,
-   "ev": 0.0178,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.0002,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 46.5,
-   "score": [
-    34.0,
-    17.0
    ],
    "res": "l",
    "ret": -1.0,
@@ -12564,7 +12537,11 @@
    "clvRet": -0.0185,
    "clv": -0.2,
    "beat": 0,
-   "close": 0.525
+   "close": 0.525,
+   "score": "6-7 3-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "tennis-ml",
@@ -12737,7 +12714,7 @@
    "edge": 3.3,
    "ev": 0.0026,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 33.5
   },
   {
@@ -12758,7 +12735,7 @@
    "edge": 3.9,
    "ev": 0.0163,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 31.5
   },
   {
@@ -13071,7 +13048,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": false,
-   "close": 1.5
+   "close": 2.5
   },
   {
    "rule": "nba-ml",
@@ -13378,7 +13355,7 @@
    "price": 104.0,
    "bet": "under 51.5 +104",
    "placed": "2026-11-03T10:50:48Z",
-   "stake": 3.5,
+   "stake": 3.75,
    "edge": 3.6,
    "ev": 0.0466,
    "event": null,
@@ -13399,7 +13376,7 @@
    "price": 102.0,
    "bet": "under 54.5 +102",
    "placed": "2026-11-02T22:17:12Z",
-   "stake": 3.0,
+   "stake": 3.25,
    "edge": 4.2,
    "ev": 0.038,
    "event": null,
