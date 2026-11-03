@@ -629,6 +629,38 @@ def full():
     grade_live(fit, L)
 
 
+def draft_history(last=SEASON - 1):
+    """every international on the 2009-<last> final boards, graded at his draft with the shipped model (the all-time
+    list, scripts/cbb_draftday.py): E[FV] out of fold for the training classes (the kept drivers refit with each
+    player's fold held out, as topOof), the committed fit for the classes after it (a forward test). Needs the
+    Basketball-Reference cache (scripts/cbb_intl_pull.sh)."""
+    fit = json.load(open(FIT)); m = fit['model']
+    L = load_leagues(); LF = fit['factors']   # the committed league offsets and prospect growth
+    coll, teams = college_names()
+    pop = board_population(range(TRAIN[0], last + 1), coll, teams)
+    fit_cbb = json.load(open(F.OUT))
+    F.TOP_MEAN = 67.0
+    nba = nba_outcomes(fit_cbb['xpmCuts'])
+    F.TOP_MEAN = m['topMean']
+    names = defaultdict(lambda: defaultdict(set))
+    for (lg, y), d in L.items():
+        for slug, r in d['players'].items(): names[D.norm(r['name'])][slug].add(y)
+    rows = []
+    for (y, k), p in sorted(pop.items()):
+        slug = link_slug(p['name'], y, names)
+        o = outcome_of(p, nba)
+        rows.append({'pid': D.norm(p['name']), 'name': p['name'], 'year': y, 'slug': slug, 'p': p, 'info': player_page(slug) if slug else {},
+                     'y': o['fv'] if o else float(F.FLOOR), 'xpm': o['peakXpm'] if o else None, 'club': p['school'], 'pos': pos_of(p['pos'])})
+    lines = season_lines(L, LF)
+    for r in rows: r['f'] = features(r['p'], lines.get(r['slug']) if r['slug'] else None, LF, fit['k'], r['info'])
+    tr = [r for r in rows if r['year'] in TRAIN]
+    _, e = oos(tr, m['kept'])
+    for r, v in zip(tr, e): r['e'] = float(v); r['oof'] = True
+    for r in rows:
+        if r['year'] not in TRAIN: r['e'] = float(ev_model(m, r['f'])[0]); r['oof'] = False
+    return rows
+
+
 def overseas_lines(L, LF, names_now):
     """the overseas line of each D-I player who came over in the last two seasons (a newcomer, or a returner with one
     D-I season), matched by name and an age that fits (17-23 at the line): shown in his scouting report only. Too few
