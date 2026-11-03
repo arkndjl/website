@@ -208,27 +208,28 @@
   }
  },
  "multiple": {
-  "n": 54,
-  "cut": 3.31,
+  "n": 58,
+  "cut": 3.33,
   "pass": [
    "rating hs",
    "rating pm",
    "prospects z_s_share",
    "prospects b_Big Stage",
-   "rating: headshots + plus-minus vs Nov 2",
+   "rating damage taken per round",
    "prospects: S/A share on the new rating",
+   "rating: all Nov 3 changes vs Nov 2",
    "rating: tier lift (S/A share x.5)",
-   "inflation check: S/A-share gap on round-share residual (no lift)",
-   "prospects: S/A share on the lifted rating"
+   "rating: damage taken, final fit",
+   "inflation check: S/A-share gap on round-share residual (no lift)"
   ],
   "tests": [
    [
-    "inflation check: S/A-share gap on round-share residual (no lift)",
-    -13.7
+    "rating: all Nov 3 changes vs Nov 2",
+    -14.35
    ],
    [
-    "rating: headshots + plus-minus vs Nov 2",
-    -10.9
+    "inflation check: S/A-share gap on round-share residual (no lift)",
+    -13.7
    ],
    [
     "rating: headshots",
@@ -240,7 +241,15 @@
    ],
    [
     "rating: tier lift (S/A share x.5)",
-    -8.12
+    -8.27
+   ],
+   [
+    "rating: damage taken per round",
+    -6.79
+   ],
+   [
+    "rating: damage taken, final fit",
+    -6.79
    ],
    [
     "prospect FV: Big Stage badge",
@@ -251,12 +260,8 @@
     -5.91
    ],
    [
-    "prospects: S/A share on the lifted rating",
-    -4.94
-   ],
-   [
     "prospects: S/A share on the new rating",
-    -4.65
+    -4.95
    ],
    [
     "prospect FV: assists",
@@ -267,8 +272,16 @@
     -2.69
    ],
    [
+    "rating: utility $ per round",
+    -2.49
+   ],
+   [
     "prospect FV: Opener badge",
     -2.45
+   ],
+   [
+    "rating: utility $ + damage taken + accuracy",
+    -2.03
    ],
    [
     "prospect FV: headshot %",
@@ -281,10 +294,6 @@
    [
     "prospect FV: teammates' rating",
     -1.79
-   ],
-   [
-    "T1%: S/A share",
-    -1.69
    ],
    [
     "prospect FV: opening deaths",
@@ -301,6 +310,10 @@
    [
     "prospect FV: deaths",
     -1.42
+   ],
+   [
+    "T1%: S/A share",
+    -1.26
    ],
    [
     "board: Opener badge",
@@ -429,6 +442,10 @@
    [
     "prospect FV: mean event tier",
     3.62
+   ],
+   [
+    "rating: accuracy",
+    7.79
    ],
    [
     "rating: event-tier weights",
@@ -650,11 +667,44 @@
   }
  },
  "confirm": {
-  "rating: headshots + plus-minus vs Nov 2": -10.9,
-  "prospects: S/A share on the new rating": -4.65,
-  "T1%: S/A share": -1.69,
-  "rating: tier lift (S/A share x.5)": -8.12,
-  "inflation check: S/A-share gap on round-share residual (no lift)": -13.7,
-  "prospects: S/A share on the lifted rating": -4.94
+  "prospects: S/A share on the new rating": -4.95,
+  "T1%: S/A share": -1.26,
+  "rating: all Nov 3 changes vs Nov 2": -14.35,
+  "rating: tier lift (S/A share x.5)": -8.27,
+  "rating: damage taken, final fit": -6.79,
+  "inflation check: S/A-share gap on round-share residual (no lift)": -13.7
+ },
+ "utility": {
+  "coverage": 1.0,
+  "utility $ per round": {
+   "t": -2.49,
+   "beta": [
+    -0.0002
+   ],
+   "dr2": 0.0
+  },
+  "damage taken per round": {
+   "t": -6.79,
+   "beta": [
+    0.0191
+   ],
+   "dr2": 0.0007
+  },
+  "accuracy": {
+   "t": 7.79,
+   "beta": [
+    -0.0002
+   ],
+   "dr2": -0.0005
+  },
+  "all three": {
+   "t": -2.03,
+   "beta": [
+    0.0006,
+    0.0161,
+    -0.0001
+   ],
+   "dr2": 0.0002
+  }
  }
 }
