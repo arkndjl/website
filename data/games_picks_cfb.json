@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-03T10:52:14Z",
+ "asof": "2026-11-03T10:53:17Z",
  "recenter": {
   "week": 0.77
  },
@@ -975,6 +975,8 @@
    "tmRaw": 52.6,
    "flagged": "2026-11-01T20:36:45Z",
    "close": 7.5,
+   "unitsRaw": 0.75,
+   "unitsCap": 0.5,
    "now": {
     "mk": "ml",
     "side": "away",
@@ -984,9 +986,7 @@
     "units": 3.5,
     "unitsRaw": 3.75,
     "unitsCap": 3.5
-   },
-   "unitsRaw": 0.75,
-   "unitsCap": 0.5
+   }
   },
   {
    "id": "401862821",
@@ -1611,6 +1611,22 @@
    "tm": 52.6
   },
   {
+   "id": "401862822",
+   "sport": "cfb",
+   "kick": "2026-11-07T17:00:00.000Z",
+   "home": "Tulane",
+   "away": "Tulsa",
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -113.0,
+   "edge": 2.8,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 0.4,
+   "tm": 47.7
+  },
+  {
    "id": "401856854",
    "sport": "cfb",
    "kick": "2026-11-07T18:00:00.000Z",
@@ -1913,22 +1929,6 @@
    "why": "edge under 6 (season: late)",
    "m": -1.2,
    "tm": 45.5
-  },
-  {
-   "id": "401869945",
-   "sport": "cfb",
-   "kick": "2026-11-07T18:00:00.000Z",
-   "home": "Coastal Carolina",
-   "away": "Old Dominion",
-   "mk": "spread",
-   "side": "away",
-   "line": 7.5,
-   "price": -117.0,
-   "edge": 1.7,
-   "x": 4.0,
-   "why": "edge under 4 (conf: Sun Belt)",
-   "m": 5.8,
-   "tm": 46.0
   }
  ],
  "games": {
@@ -2329,11 +2329,11 @@
    "state": "under"
   },
   "401862822": {
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -104.0,
-   "edge": 1.9,
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -113.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "Tulane",
@@ -2416,7 +2416,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -2717,7 +2717,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 6493,
+  "snapshots": 6496,
   "buckets": [
    {
     "when": "24h+",
