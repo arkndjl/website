@@ -24,7 +24,6 @@ import gzip
 import json
 import math
 import random
-import re
 import sys
 import time
 from collections import defaultdict
@@ -34,6 +33,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import cs2_bo3  # noqa: E402
+from cs2_swiss import bracket, major_tree, noisy, swiss  # noqa: E402
 from cs2_data import VRS, key  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -104,102 +104,6 @@ def load():
             return json.load(f)
     except (FileNotFoundError, OSError, ValueError):
         return {"events": {}}
-
-
-
-
-# ---------------------------------------------------------------------------------------------------- simulator
-PRIORITY = [((1, 6), (2, 5), (3, 4)), ((1, 6), (2, 4), (3, 5)), ((1, 5), (2, 6), (3, 4)), ((1, 5), (2, 4), (3, 6)),
-            ((1, 4), (2, 6), (3, 5)), ((1, 4), (2, 5), (3, 6)), ((1, 6), (2, 3), (4, 5)), ((1, 5), (2, 3), (4, 6)),
-            ((1, 3), (2, 6), (4, 5)), ((1, 3), (2, 5), (4, 6)), ((1, 4), (2, 3), (5, 6)), ((1, 3), (2, 4), (5, 6)),
-            ((1, 2), (3, 6), (4, 5)), ((1, 2), (3, 5), (4, 6)), ((1, 2), (3, 4), (5, 6))]
-
-
-def high_low(pool, met):
-    """Highest seed v the lowest available without a rematch (backtracking so the rest can still pair)."""
-    if not pool:
-        return []
-    a = pool[0]
-    for j in range(len(pool) - 1, 0, -1):
-        b = pool[j]
-        if b in met[a]:
-            continue
-        rest = high_low(pool[1:j] + pool[j + 1:], met)
-        if rest is not None:
-            return [(a, b)] + rest
-    return None
-
-
-def pair_pool(pool, met, rnd):
-    if rnd >= 3 and len(pool) == 6:
-        for row in PRIORITY:
-            ps = [(pool[i - 1], pool[j - 1]) for i, j in row]
-            if all(b not in met[a] for a, b in ps):
-                return ps
-        return [(pool[i - 1], pool[j - 1]) for i, j in PRIORITY[0]]
-    ps = high_low(pool, met)
-    return ps if ps is not None else [(pool[i], pool[-1 - i]) for i in range(len(pool) // 2)]
-
-
-def swiss(seeds, win, rng, known=(), allbo3=False):
-    """One 16-team Swiss stage. seeds: teams in seed order. win(a, b, bo) -> chance a beats b. known: per round, a
-    list of (a, b, winner or None) already drawn (and played). -> (W, L, final seed order of all 16)."""
-    W = {t: 0 for t in seeds}
-    L = {t: 0 for t in seeds}
-    met = {t: set() for t in seeds}
-    sd = {t: i for i, t in enumerate(seeds)}
-
-    def buch(t):
-        return sum(W[o] - L[o] for o in met[t])
-
-    for rnd in range(5):
-        if rnd < len(known) and known[rnd]:
-            ps = [(a, b) for a, b, _ in known[rnd]]
-            res = {frozenset((a, b)): w for a, b, w in known[rnd]}
-        else:
-            res = {}
-            if rnd == 0:
-                ps = [(seeds[i], seeds[i + 8]) for i in range(8)]
-            else:
-                pools = defaultdict(list)
-                for t in seeds:
-                    if W[t] < 3 and L[t] < 3:
-                        pools[(W[t], L[t])].append(t)
-                ps = []
-                for rec in sorted(pools, key=lambda r: (-r[0], r[1])):
-                    pool = sorted(pools[rec], key=lambda t: (-buch(t), sd[t]))
-                    ps += pair_pool(pool, met, rnd)
-        for a, b in ps:
-            bo = 3 if allbo3 or W[a] == 2 or L[a] == 2 else 1
-            w = res.get(frozenset((a, b)))
-            if w is None:
-                w = a if rng.random() < win(a, b, bo) else b
-            lo = b if w == a else a
-            W[w] += 1
-            L[lo] += 1
-            met[a].add(b)
-            met[b].add(a)
-    order = sorted(seeds, key=lambda t: (-W[t], L[t], -buch(t), sd[t]))
-    return W, L, order
-
-
-def bracket(tree, win, rng):
-    """Single elimination. tree: [(slot a, slot b, bo)], a slot is ("t", team) or ("w", match index). -> champion,
-    and each match's winner."""
-    won = []
-    for sa, sb, bo, *res in tree:
-        a = sa[1] if sa[0] == "t" else won[sa[1]]
-        b = sb[1] if sb[0] == "t" else won[sb[1]]
-        w = res[0] if res and res[0] in (a, b) else (a if rng.random() < win(a, b, bo) else b)
-        won.append(w)
-    return won[-1], won
-
-
-def major_tree(order8):
-    """Valve's playoff: 1v8, 4v5 | 2v7, 3v6 (Bo3), semis, grand final Bo5."""
-    s = order8
-    return [(("t", s[0]), ("t", s[7]), 3), (("t", s[3]), ("t", s[4]), 3), (("t", s[1]), ("t", s[6]), 3),
-            (("t", s[2]), ("t", s[5]), 3), (("w", 0), ("w", 1), 3), (("w", 2), ("w", 3), 3), (("w", 4), ("w", 5), 5)]
 
 
 # ---------------------------------------------------------------------------------------------------- past events
@@ -285,13 +189,6 @@ class Model:
 def ll(q, y):
     q = min(max(q, 1e-4), 1 - 1e-4)
     return -(y * math.log(q) + (1 - y) * math.log(1 - q))
-
-
-def noisy(logit, teams, sd, rng):
-    """win(a, b, bo) for one simulated event: each team's strength drawn once around its rating (sd on the logit
-    scale), so a rating that is off stays off for the whole event."""
-    e = {t: rng.gauss(0, sd) if sd else 0.0 for t in teams}
-    return lambda a, b, bo: 1 / (1 + math.exp(-(logit(a, b, bo) + e[a] - e[b])))
 
 
 def sim_stage(s, logit, n, rng, sd=0.0):
@@ -415,6 +312,10 @@ def fit(nsim=3000):
     ok = bool(hs and he and hs["vsVrs"] < 0 and he["vsVrs"] < 0)
     out = {"asof": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "nsim": nsim, "split": SPLIT, "sd": pick["ARK"],
            "sdVrs": pick["VRS"], "pass": ok, "score": score, "grid": grid, "calibration": cal, "stages": res}
+    try:
+        out["poly"] = poly_compare(out)
+    except Exception as e:  # noqa: BLE001
+        print("polymarket compare skipped:", e)
     FIT.write_text(json.dumps(out, indent=1))
     for k, v in score.items():
         print(k, v)
@@ -423,8 +324,262 @@ def fit(nsim=3000):
     return out
 
 
+POLY = {"Perfect World Shanghai Major 2024": "15148", "StarLadder Budapest Major 2025": "59199",
+        "Intel Extreme Masters Cologne Major 2026": "350795"}
+
+
+def poly_compare(fj):
+    """Data only (never a venue): Polymarket's Major winner prices at the playoff start (last hourly price before
+    00:00 UTC that day, normalised over the eight teams left) against the backtest's title chances."""
+    import cs2_poly
+    out = []
+    for r in fj["stages"]:
+        if r["kind"] != "se" or r["event"] not in POLY:
+            continue
+        ev = cs2_poly.get(f"{cs2_poly.GAMMA}/{POLY[r['event']]}")
+        if not ev:
+            continue
+        t0 = int(dt.datetime.fromisoformat(r["date"] + "T00:00:00+00:00").timestamp())
+        ours = r["m"][f"ARK {fj['sd']}"]["P"]
+        px = {}
+        for m in ev.get("markets", []):
+            nm = m.get("groupItemTitle") or ""
+            k = next((t for t in ours if key(t) == key(nm) or key(t) in key(nm) or key(nm) in key(t)), None)
+            if not k:
+                continue
+            tok = json.loads(m["clobTokenIds"])[0]
+            h = cs2_poly.get(f"{cs2_poly.CLOB}?market={tok}&startTs={t0 - 3 * 86400}&endTs={t0}&fidelity=60") or {}
+            hs = [x for x in h.get("history", []) if x["t"] <= t0]
+            if hs:
+                px[k] = hs[-1]["p"]
+        if len(px) < len(ours):
+            continue
+        tot = sum(px.values())
+        pm = {k: v / tot for k, v in px.items()}
+        out.append({"event": r["event"], "champ": r["champ"], "ark": ours[r["champ"]], "poly": round(pm[r["champ"]], 3),
+                    "llArk": round(-math.log(max(ours[r["champ"]], 1e-4)), 3),
+                    "llPoly": round(-math.log(max(pm[r["champ"]], 1e-4)), 3),
+                    "teams": {k: [ours[k], round(pm[k], 3)] for k in ours}})
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------- the Major
+MAJOR = {"name": "PGL Major Singapore 2026", "short": "Singapore Major", "invite": ("2026", "2026_11_02"),
+         # bo3.gg tournaments: Stage 1, Stage 2, Stage 3 + playoffs
+         "bo3": (6269, 6268, 4226), "dates": ("2026-11-24", "2026-11-28", "2026-12-02", "2026-12-10"), "end": "2026-12-13",
+         # invites per stage and region, in regional standing order (Liquipedia PGL/2026/Singapore)
+         "slots": {3: {"europe": (0, 6), "americas": (0, 2)}, 2: {"europe": (6, 12), "americas": (2, 3), "asia": (0, 1)},
+                   1: {"europe": (12, 18), "americas": (3, 9), "asia": (1, 5)}}}
+POS = ("s2", "s3", "po", "sf", "f", "win")
+
+
+def invitation(yr, date):
+    """Valve's invitation standings: {region: [(name, roster)]} in regional order, and {key: global standing}."""
+    out, glob = {}, {}
+    for rg in ("europe", "americas", "asia", "global"):
+        f = VRS / "invitation" / yr / f"standings_{rg}_{date}.md"
+        rows = []
+        for line in f.read_text().splitlines():
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) >= 4 and c[0].isdigit():
+                rows.append((int(c[0]), c[2], [q.strip() for q in c[3].split(",")]))
+        if rg == "global":
+            glob = {key(n): r for r, n, _ in rows}
+        else:
+            out[rg] = [(n, ros) for _, n, ros in rows]
+    return out, glob
+
+
+def chain(fields, logit, n, rng, sd, known=None, po_known=None):
+    """Simulate the three Swiss stages and the playoff n times. fields: {1: Stage 1 teams in seed order, 2: Stage 2
+    invites, 3: Stage 3 invites}. known: {stage: rounds for swiss()}, po_known: {frozenset(a, b): winner}.
+    -> {team: [P(Stage 2), P(Stage 3), P(playoffs), P(semis), P(final), P(title)]}."""
+    known, po_known = known or {}, po_known or {}
+    teams = fields[1] + fields[2] + fields[3]
+    cnt = {t: [0] * 6 for t in teams}
+    for _ in range(n):
+        w0 = noisy(logit, teams, sd, rng)
+
+        def win(a, b, bo):
+            k = po_known.get(frozenset((a, b)))
+            return w0(a, b, bo) if k is None else float(k == a)
+        _, _, o1 = swiss(fields[1], win, rng, known.get(1, ()))
+        for t in o1[:8]:
+            cnt[t][0] += 1
+        _, _, o2 = swiss(fields[2] + o1[:8], win, rng, known.get(2, ()))
+        for t in o2[:8]:
+            cnt[t][1] += 1
+        _, _, o3 = swiss(fields[3] + o2[:8], win, rng, known.get(3, ()), allbo3=True)
+        for t in o3[:8]:
+            cnt[t][2] += 1
+        champ, won = bracket(major_tree(o3[:8]), win, rng)
+        for t in won[:4]:
+            cnt[t][3] += 1
+        for t in won[4:6]:
+            cnt[t][4] += 1
+        cnt[champ][5] += 1
+    return {t: [c / n for c in v] for t, v in cnt.items()}
+
+
+def known_rounds(ms, tk):
+    """bo3.gg matches of one Swiss stage -> rounds for swiss() (round order by first start), team keys via tk."""
+    rounds = defaultdict(list)
+    for m in ms:
+        rounds[m[3]].append(m)
+    out = []
+    for rr in sorted(rounds.values(), key=lambda v: min(x[1] for x in v)):
+        out.append([(tk(m[4], m[6]), tk(m[5], m[7]),
+                     (tk(m[4], m[6]) if m[8] == m[4] else tk(m[5], m[7])) if m[12] == "finished" and m[8] else None)
+                    for m in rr])
+    return out
+
+
+def memo(logit):
+    cache = {}
+
+    def f(a, b, bo):
+        k = (a, b, bo)
+        if k not in cache:
+            cache[k] = logit(a, b, bo)
+            cache[(b, a, bo)] = -cache[k]
+        return cache[k]
+    return f
+
+
+def live(logit, names, rank, bo3, n=20000, sd=None):
+    """The Major's odds from the live series model (cs2_model.build passes logit(a, b, bo) on team keys)."""
+    fj = json.loads(FIT.read_text()) if FIT.exists() else {}
+    sd = fj.get("sd", 0.45) if sd is None else sd
+    logit = memo(logit)
+    ev = MAJOR
+    try:
+        inv, glob = invitation(*ev["invite"])
+    except OSError as e:
+        print("cs2 events: no invitation standings", e)
+        return None
+    fields, home = {}, {}
+    for st, slots in ev["slots"].items():
+        ts = []
+        for rg, (a, b) in slots.items():
+            for nm, _ in inv[rg][a:b]:
+                ts.append(key(nm))
+                names.setdefault(key(nm), nm)
+                home[key(nm)] = rg
+        fields[st] = sorted(ts, key=lambda k: glob.get(k, 999))
+    # bo3.gg pairings and results once listed (they replace the invites: late replacements, drawn rounds)
+    tk = lambda t, nm: bo3.k(t) or key(nm)  # noqa: E731
+    known, po_known, rec = {}, {}, {}
+    try:
+        ms = {i: tournament_matches(i) for i in ev["bo3"]}
+    except Exception as e:  # noqa: BLE001
+        print("cs2 events: bo3.gg pull failed", e)
+        ms = {}
+    # bo3.gg files stages under any of the event's tournaments: Swiss stages (8 matches in their first round) in date
+    # order are Stages 1-3, a stage opening with 4 matches is the playoff
+    st = defaultdict(list)
+    for i in ev["bo3"]:
+        for m in ms.get(i, []):
+            if m[4] and m[5]:
+                st[m[2]].append(m)
+    sw, po = [], []
+    for v in sorted(st.values(), key=lambda v: min(x[1] for x in v)):
+        first = [x for x in v if x[3] == min(v, key=lambda y: y[1])[3]]
+        (sw if len(first) >= 8 else po).append(v)
+    by_stage = sw[:3] + [[] for _ in range(3 - len(sw[:3]))] + po[:1]
+    for si, sm in enumerate(by_stage[:4]):
+        if not sm:
+            continue
+        if si < 3:
+            kr = known_rounds(sm, tk)
+            known[si + 1] = kr
+            r1 = {t for a, b, _ in kr[0] for t in (a, b)} if kr else set()
+            if si == 0 and len(r1) == 16 and set(fields[1]) != r1:  # the field as bo3.gg lists it
+                fields[1] = sorted(r1, key=lambda k: glob.get(k, 999))
+            for rr in kr:
+                for a, b, w in rr:
+                    if w:
+                        lo = b if w == a else a
+                        rec.setdefault(si + 1, {}).setdefault(w, [0, 0])[0] += 1
+                        rec[si + 1].setdefault(lo, [0, 0])[1] += 1
+        else:
+            for m in sm:
+                if m[12] == "finished" and m[8]:
+                    po_known[frozenset((tk(m[4], m[6]), tk(m[5], m[7])))] = tk(m[4], m[6]) if m[8] == m[4] else tk(m[5], m[7])
+    for k, nm in ((k, nm) for st in by_stage for m in st for k, nm in ((tk(m[4], m[6]), m[6]), (tk(m[5], m[7]), m[7]))):
+        names.setdefault(k, nm)
+    P = chain(fields, logit, n, random.Random(11), sd, known, po_known)
+    nxt = next_stage(fields, known, po_known, names, by_stage, logit)
+    start = {t: st for st, ts in fields.items() for t in ts}
+    teams = []
+    for t, pr in P.items():
+        r = {"k": t, "n": names.get(t, t), "st": start[t], "seed": glob.get(t), "rk": rank.get(t), "rg": home.get(t),
+             "p": [round(x, 4) for x in pr], "fair": fair(pr[5])}
+        cur = next((rec[s][t] for s in (3, 2, 1) if t in rec.get(s, {})), None)
+        if cur:
+            r["rec"] = cur
+        teams.append(r)
+    teams.sort(key=lambda r: (-r["p"][5], -r["p"][2], r["seed"] or 999))
+    print(f"{ev['name']}: {len(teams)} teams, favourite {teams[0]['n']} {teams[0]['p'][5]:.3f}")
+    return {"name": ev["name"], "short": ev["short"], "dates": ev["dates"], "end": ev["end"], "nsim": n, "sd": sd, "teams": teams,
+            "live": any(by_stage), "inviteDate": ev["invite"][1].replace("_", "-"), "next": nxt}
+
+
+def done(kr):
+    return len(kr) == 5 and all(w for rr in kr for _, _, w in rr)
+
+
+def next_stage(fields, known, po_known, names, by_stage, logit):
+    """The stage being played or next to be played: {event, stage, start, seeds, names, r1, known, allbo3,
+    projected}. Earlier stages must be complete (their final seeds carry into this one)."""
+    rng = random.Random(0)
+    carry = []
+    for st in (1, 2, 3):
+        seeds = fields[st] + carry if st > 1 else fields[1]
+        kr = known.get(st, [])
+        if not done(kr):
+            sm = by_stage[st - 1] if len(by_stage) >= st else []
+            return {"event": MAJOR["name"], "stage": f"Stage {st}",
+                    "start": min(m[1] for m in sm) if sm else MAJOR["dates"][st - 1] + "T00:00:00Z",
+                    "seeds": seeds, "names": {t: names.get(t, t) for t in seeds},
+                    "r1": [(a, b) for a, b, _ in kr[0]] if kr else [(seeds[i], seeds[i + 8]) for i in range(8)],
+                    "known": kr, "allbo3": st == 3, "projected": not kr}
+        _, _, order = swiss(seeds, lambda a, b, bo: 0.5, rng, kr, st == 3)
+        carry = order[:8]
+    sm = by_stage[3] if len(by_stage) >= 4 else []
+    return {"event": MAJOR["name"], "stage": "Playoffs",
+            "start": min(m[1] for m in sm) if sm else MAJOR["dates"][3] + "T00:00:00Z", "seeds": carry,
+            "names": {t: names.get(t, t) for t in carry}, "r1": [(carry[i], carry[7 - i]) for i in (0, 3, 1, 2)],
+            "known": [[(a, b, po_known.get(frozenset((a, b)))) for a, b in
+                       [(carry[i], carry[7 - i]) for i in (0, 3, 1, 2)]]], "allbo3": True, "projected": False}
+
+
+def stage_sims(nxt, logit, n, sd=0.45, seed=5):
+    """Raw joint simulations of one Swiss stage (the "next" block): -> (seeds, W, L) with W, L int arrays [n, 16]
+    (one row per simulated stage, columns in seed order). Rating uncertainty drawn once per simulation."""
+    seeds = nxt["seeds"]
+    rng = random.Random(seed)
+    W = np.zeros((n, len(seeds)), dtype=np.int8)
+    L = np.zeros((n, len(seeds)), dtype=np.int8)
+    known = [[tuple(x) for x in rr] for rr in nxt.get("known") or []] or [[(a, b, None) for a, b in nxt["r1"]]]
+    for i in range(n):
+        w, lo, _ = swiss(seeds, noisy(logit, seeds, sd, rng), rng, known, nxt.get("allbo3", False))
+        W[i] = [w[t] for t in seeds]
+        L[i] = [lo[t] for t in seeds]
+    return seeds, W, L
+
+
+def fair(q):
+    q = min(max(q, 0.0005), 0.9995)
+    return round(-100 * q / (1 - q)) if q >= 0.5 else round(100 * (1 - q) / q)
+
+
 if __name__ == "__main__":
     if "--pull" in sys.argv:
         pull()
     elif "--fit" in sys.argv:
         fit()
+    elif "--poly" in sys.argv:
+        f = json.loads(FIT.read_text())
+        f["poly"] = poly_compare(f)
+        FIT.write_text(json.dumps(f, indent=1))
+        print(json.dumps(f["poly"], indent=1))

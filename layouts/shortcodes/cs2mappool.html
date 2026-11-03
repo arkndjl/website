@@ -1,0 +1,32 @@
+{{- /* Counter-Strike map pool (data/cs2.json teams[].maps, scripts/cs2_model.py): each ranked team's map win chance
+       against the average top-20 team on that map, from the bo3.gg team map rating (team Elo + team x map offset, both
+       moved on round share; offsets start at 0 and move slowly, so thin maps stay near the team's level), on the
+       map-win scale. Best map teal, worst dim. Display only. top= rows (default 50). */ -}}
+{{- with site.Data.cs2 -}}{{ with .pool }}
+{{- $d := site.Data.cs2 -}}
+{{- $top := int ($.Get "top" | default 50) -}}
+{{- $rows := slice -}}{{ range $d.teams }}{{ if .maps }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
+{{- $rows = first $top $rows -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: map pool") "icon" "cs" "filter" "Region" "rerank" true "tab" ($.Get "tab") "gfxCols" (printf "RK,Team,%s" (delimit (apply . "replace" "." "de_" "") ",")) "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick2 cs__table cs__pool">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    {{- range . }}{{ $m := replace . "de_" "" }}<th title="map win % against the average top-20 team on {{ $m }}">{{ if eq $m "dust2" }}Dust2{{ else }}{{ title $m }}{{ end }}</th>{{ end }}
+    <th>Region</th>
+  </tr></thead>
+  <tbody>
+  {{- range $rows }}{{ $t := . }}
+  {{- $mx := 0.0 }}{{ $mn := 1.0 }}{{ range .maps }}{{ if gt . $mx }}{{ $mx = . }}{{ end }}{{ if lt . $mn }}{{ $mn = . }}{{ end }}{{ end }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    {{- range $i, $p := .maps }}
+    <td class="cfb__num{{ if eq $p $mx }} cs__m--best{{ else if eq $p $mn }} cs__m--worst{{ end }}" data-v="{{ $p }}" title="{{ index $t.mapsN $i }} maps">{{ printf "%.0f" (mul $p 100) }}</td>
+    {{- end }}
+    <td data-filter="{{ .rg | default "—" }}">{{ .rg | default "—" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len $rows) "note" "map win % vs the average top-20 team · source: bo3.gg" "about" "Team map rating from every bo3.gg map since Jun 2020: a team Elo plus a team x map offset, both moved on round share; an offset starts at 0 and moves slowly, so a map a team rarely plays stays near its overall level. Shown as the chance to win that map against the average top-20 team (the rating's logit x 2.43, the map-win scale fit on 124k maps). Pool = maps above 3% of pro maps in the last 90 days. Hover a cell for maps played.") -}}
+{{- end }}{{ end -}}

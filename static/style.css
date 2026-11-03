@@ -4331,6 +4331,12 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .cs__t--3 { background: var(--win-well); color: #fff; }
 .cs__t--4 { background: transparent; color: inherit; opacity: 0.75; }
 .cs__up { color: var(--accent); }
+.cs__m--best { background: var(--accent); color: var(--win-dark); }   /* map pool: the team's best map */
+.cs__m--worst { opacity: 0.6; }
+.cs__ev-title { background: var(--win-well); color: #fff; }
+.cs__veto { margin: 4px 0 0; font-size: 0.85em; white-space: nowrap; overflow-x: auto; }
+.cs__veto i { font-style: normal; display: inline-block; padding: 0 4px; margin-right: 2px; border: 1px solid var(--win-dark); }
+.cs__veto i.cs__veto--fav { background: var(--accent); color: var(--win-dark); }
 
 /* ------------------------------------------------------------------
    Homepage ticker (layouts/partials/ticker.html): a sunken well with one

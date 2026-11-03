@@ -1011,6 +1011,33 @@
      ]
     },
     {
+     "term": "Map pool (CS2)",
+     "short": "Map win chance vs the average top-20 team on each map in the pool.",
+     "body": [
+      "bo3.gg team map rating: team Elo plus a team x map offset, both moved per map on round share; offsets start at 0, so thin maps stay near the team's level.",
+      "Shown on the map-win scale (round-share logit x 2.43, fit on 124k maps). Match cards show the projected veto: each side bans its worst and picks its best, higher-ranked side first.",
+      "Display only: the series model already uses the veto as a term."
+     ],
+     "where": "Counter-Strike map pool, matches",
+     "sports": [
+      "CS2"
+     ]
+    },
+    {
+     "term": "Event odds (CS2)",
+     "short": "Chance to reach each stage and win the next Major, from simulated events.",
+     "body": [
+      "20,000 simulations of Valve's Major format from the series model: three 16-team Swiss stages (Bo1, Bo3 for elimination and advancement; Stage 3 all Bo3), then an 8-team single-elimination playoff.",
+      "Pairing per the Major rulebook: round 1 seed i v i+8, highest v lowest seed without a rematch, priority table in rounds 4-5, seeds by record, Buchholz, initial seed. Invites from Valve's invitation standings; drawn pairings and results replace simulated ones.",
+      "Each simulation draws every team's strength once (sd 0.45 logit, picked on stages before Jul 2025), so rating error carries through the event.",
+      "Backtest, S-tier events held out from Jul 2025: Swiss advancement log loss 9.63 per stage vs 9.92 on VRS points alone (11 of 15 stages, t -0.75); bracket titles 1.63 vs 1.72 (15 of 26, t -0.94). Better on both, not significant at this sample."
+     ],
+     "where": "Counter-Strike event odds, ARKRANKING title odds",
+     "sports": [
+      "CS2"
+     ]
+    },
+    {
      "term": "Elo",
      "short": "Results-and-margin rating; 1500 = average.",
      "body": [

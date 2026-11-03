@@ -32,6 +32,9 @@
         <span style="width: {{ mul .pa 100 }}%">{{ printf "%.0f" (mul .pa 100) }}%</span><span style="width: {{ sub 100 (mul .pa 100) }}%">{{ printf "%.0f" (sub 100 (mul .pa 100)) }}%</span>
       </div>
       <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}</p>
+      {{- with .veto }}{{ $n := len . }}
+      <p class="cs__veto" title="projected veto (each side bans its worst map and picks its best, higher-ranked side first) · {{ $g.a }} map win % · * decider">{{ range $i, $v := . }}<i{{ if ge (index $v 1) 0.5 }} class="cs__veto--fav"{{ end }}>{{ $m := replace (index $v 0) "de_" "" }}{{ if eq $m "dust2" }}Dust2{{ else }}{{ title $m }}{{ end }}{{ if and (gt $n 1) (eq (add $i 1) $n) }}*{{ end }} {{ printf "%.0f" (mul (index $v 1) 100) }}</i>{{ end }}</p>
+      {{- end }}
     </div>
   </article>
   {{- end }}
