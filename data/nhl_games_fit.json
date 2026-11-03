@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-02",
+ "updated": "2026-11-03",
  "params": {
   "K": 4,
   "reg": 0.2,
@@ -11,7 +11,7 @@
   "mcar": 0.2,
   "gk_car": 0.4,
   "gk_k": 50,
-  "gk_0": 0.0,
+  "gk_0": -0.1,
   "pen": 1.0
  },
  "feats": [
@@ -29,182 +29,187 @@
   "one"
  ],
  "coef": {
-  "elo": 0.3152,
-  "xg": 0.3535,
-  "b2b": -0.2892,
-  "home": 0.1308,
-  "rv": 0.3344
+  "elo": 0.3113,
+  "xg": 0.329,
+  "b2b": -0.2897,
+  "home": 0.1307,
+  "rv": 0.2906
  },
  "mcoef": {
-  "elo": 0.3593,
-  "xg": 0.5309,
-  "b2b": -0.3204,
-  "home": 0.2119,
-  "rv": 0.5067
+  "elo": 0.3569,
+  "xg": 0.4979,
+  "b2b": -0.3209,
+  "home": 0.2118,
+  "rv": 0.4273
  },
  "tcoef": {
-  "xgT": 0.3487,
-  "gT": 0.0967,
-  "mtot": 0.1971,
-  "gkT": 0.5819,
-  "one": 2.3797
+  "xgT": 0.338,
+  "gT": 0.0972,
+  "mtot": 0.1989,
+  "gkT": 0.5926,
+  "one": 2.2837
  },
  "pl": {
   "home2": [
-   -1.3094,
-   0.669,
-   0.0624
+   -1.3,
+   0.6635,
+   0.0612
   ],
   "away2": [
-   -2.3125,
-   -0.7139,
-   0.2314
+   -2.3406,
+   -0.7099,
+   0.2359
   ]
  },
  "ot": [
-  -0.1839,
-  -0.0974,
-  -0.1637
+  -0.1902,
+  -0.0942,
+  -0.1629
  ],
+ "otWin": [
+  0.0008,
+  0.3673
+ ],
+ "otWinGames": 2760,
  "sdMargin": 2.481,
- "sdTotal": 2.298,
- "seasonSd": 0.105,
+ "sdTotal": 2.299,
+ "seasonSd": 0.113,
  "evidence": {
   "elo": {
    "kept": true,
-   "tTune": 1.84,
-   "tHeld": -0.82,
-   "dTune": 2.248,
-   "dHeld": -0.756,
+   "tTune": 1.6,
+   "tHeld": -0.57,
+   "dTune": 1.999,
+   "dHeld": -0.539,
    "split": "2021-23 / 2024-26 lined"
   },
   "xg": {
    "kept": true,
-   "tTune": 2.25,
-   "tHeld": 1.92,
-   "dTune": 2.537,
-   "dHeld": 1.552,
+   "tTune": 2.15,
+   "tHeld": 1.43,
+   "dTune": 2.348,
+   "dHeld": 1.055,
    "split": "2021-23 / 2024-26 lined"
   },
   "g": {
    "kept": true,
-   "tTune": -0.98,
-   "tHeld": -1.17,
-   "dTune": -0.127,
-   "dHeld": -0.114,
+   "tTune": -1.0,
+   "tHeld": -1.1,
+   "dTune": -0.119,
+   "dHeld": -0.092,
    "split": "2017-23 / 2024-26"
   },
   "gk": {
    "kept": true,
-   "tTune": 0.98,
-   "tHeld": -0.3,
-   "dTune": 0.533,
-   "dHeld": -0.172,
+   "tTune": 0.77,
+   "tHeld": -0.27,
+   "dTune": 0.357,
+   "dHeld": -0.121,
    "split": "2017-23 / 2024-26"
   },
   "rest": {
    "kept": true,
-   "tTune": -0.98,
-   "tHeld": -1.63,
-   "dTune": -0.14,
-   "dHeld": -0.116,
+   "tTune": -0.99,
+   "tHeld": -1.65,
+   "dTune": -0.145,
+   "dHeld": -0.118,
    "split": "2017-23 / 2024-26"
   },
   "b2b": {
    "kept": true,
-   "tTune": 3.38,
-   "tHeld": 1.89,
-   "dTune": 2.761,
-   "dHeld": 2.211,
+   "tTune": 3.39,
+   "tHeld": 1.86,
+   "dTune": 2.776,
+   "dHeld": 2.18,
    "split": "2021-23 / 2024-26 lined"
   },
   "home": {
    "kept": true,
    "tTune": 1.18,
    "tHeld": 2.48,
-   "dTune": 0.969,
-   "dHeld": 2.009,
+   "dTune": 0.97,
+   "dHeld": 2.0,
    "split": "2021-23 / 2024-26 lined"
   },
   "x5": {
    "kept": false,
-   "tTune": -0.39,
-   "tHeld": 1.16,
-   "dTune": -0.123,
+   "tTune": -0.29,
+   "tHeld": 1.1,
+   "dTune": -0.095,
    "dHeld": 0.347,
    "split": "2017-23 / 2024-26"
   },
   "st": {
    "kept": false,
-   "tTune": -0.78,
-   "tHeld": 1.74,
-   "dTune": -0.098,
-   "dHeld": 0.302,
+   "tTune": -0.87,
+   "tHeld": 1.73,
+   "dTune": -0.103,
+   "dHeld": 0.288,
    "split": "2017-23 / 2024-26"
   },
   "rv": {
    "kept": true,
-   "tTune": 2.68,
-   "tHeld": 2.59,
-   "dTune": 1.805,
-   "dHeld": 2.511,
+   "tTune": 2.77,
+   "tHeld": 2.06,
+   "dTune": 1.627,
+   "dHeld": 1.879,
    "split": "2021-23 / 2024-26 lined"
   },
   "bk": {
    "kept": false,
-   "tTune": -1.9,
-   "tHeld": 0.17,
-   "dTune": -0.097,
-   "dHeld": 0.005,
+   "tTune": -1.75,
+   "tHeld": 0.52,
+   "dTune": -0.1,
+   "dHeld": 0.025,
    "split": "2017-23 / 2024-26"
   },
   "gkd": {
    "kept": false,
-   "tTune": -0.77,
-   "tHeld": -1.49,
-   "dTune": -0.044,
-   "dHeld": -0.067,
+   "tTune": -0.69,
+   "tHeld": -1.87,
+   "dTune": -0.037,
+   "dHeld": -0.071,
    "split": "2017-23 / 2024-26"
   },
   "mkt": {
    "kept": false,
-   "tTune": 0.14,
-   "tHeld": 0.15,
-   "dTune": 0.065,
-   "dHeld": 0.044,
+   "tTune": -0.22,
+   "tHeld": 0.26,
+   "dTune": -0.115,
+   "dHeld": 0.073,
    "split": "2021-23 / 2024-26 lined"
   }
  },
  "test": {
   "2021-23 (tuning)": {
    "games": 3753,
-   "logLossModel": 0.6516,
+   "logLossModel": 0.6515,
    "brierModel": 0.2298,
    "lined": 3752,
-   "logLossLinedModel": 0.6517,
+   "logLossLinedModel": 0.6516,
    "logLossMarket": 0.6516,
-   "tVsMarket": 0.05,
+   "tVsMarket": -0.01,
    "rModelVsMarket": 0.946,
    "hitModel": 0.62,
    "hitMarket": 0.628,
    "totalGames": 3752,
-   "totalMaeModel": 1.837,
+   "totalMaeModel": 1.838,
    "totalMaeLine": 1.834,
    "maeMargin": 2.081
   },
   "2024-26 (held out)": {
    "games": 4192,
-   "logLossModel": 0.6674,
-   "brierModel": 0.2376,
+   "logLossModel": 0.6678,
+   "brierModel": 0.2378,
    "lined": 4190,
-   "logLossLinedModel": 0.6675,
+   "logLossLinedModel": 0.6679,
    "logLossMarket": 0.6645,
-   "tVsMarket": 1.98,
+   "tVsMarket": 2.18,
    "rModelVsMarket": 0.936,
-   "hitModel": 0.58,
+   "hitModel": 0.585,
    "hitMarket": 0.593,
    "totalGames": 4190,
-   "totalMaeModel": 1.856,
+   "totalMaeModel": 1.857,
    "totalMaeLine": 1.862,
    "maeMargin": 2.115
   }
@@ -212,53 +217,53 @@
  "calib": [
   {
    "bin": 0.5,
-   "n": 1161,
+   "n": 1126,
    "model": 0.525,
-   "won": 0.494
+   "won": 0.506
   },
   {
    "bin": 0.55,
-   "n": 1080,
+   "n": 1097,
    "model": 0.574,
-   "won": 0.537
+   "won": 0.544
   },
   {
    "bin": 0.6,
-   "n": 837,
+   "n": 813,
    "model": 0.624,
-   "won": 0.601
+   "won": 0.603
   },
   {
    "bin": 0.65,
-   "n": 541,
+   "n": 557,
    "model": 0.674,
-   "won": 0.673
+   "won": 0.655
   },
   {
    "bin": 0.7,
-   "n": 323,
+   "n": 349,
    "model": 0.724,
-   "won": 0.669
+   "won": 0.668
   },
   {
    "bin": 0.75,
-   "n": 178,
-   "model": 0.772,
-   "won": 0.747
+   "n": 174,
+   "model": 0.773,
+   "won": 0.741
   },
   {
    "bin": 0.8,
-   "n": 64,
+   "n": 66,
    "model": 0.821,
-   "won": 0.859
+   "won": 0.894
   }
  ],
  "plCheck": {
-  "home2Model": 0.328,
+  "home2Model": 0.329,
   "home2": 0.329,
   "away2Model": 0.27,
   "away2": 0.271,
-  "otModel": 0.222,
+  "otModel": 0.221,
   "ot": 0.221
  }
 }

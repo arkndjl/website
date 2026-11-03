@@ -590,7 +590,7 @@
      "short": "Descriptive wins over replacement at goal value.",
      "body": [
       "5v5 on-ice xG vs teammates, PP xG /5, PK /4, finishing (goals - ixG), penalties, share of team leftover xG.",
-      "Goalies: GSAx at full credit. Sums to team goal differential (R2 .975).",
+      "Goalies: GSAx at full credit. Traded players split over teams by game-log TOI. Sums to team goal differential (R2 .991).",
       "Replacement = players outside each team's top 13 F / 7 D / 2 G."
      ],
      "where": "NHL WAR leaders, rookies; hockey prospect outcome",
@@ -603,9 +603,9 @@
      "term": "pWAR / HPM",
      "short": "Projected WAR and projected goals per 60 over an average player.",
      "body": [
-      "HPM = Marcel-weighted (1 / .7 / .5) shrunk rates, components weighted by how well they carry to next season.",
-      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .38 vs .23 before (t 4.95, 15/17 seasons).",
-      "Goalie GSAx barely repeats (weight .07), so goalie pWAR ~0.4 while goalie WAR runs ~7."
+      "HPM = Marcel-weighted (1 / .5 / .25) shrunk rates, components weighted by how well they carry to next season.",
+      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .37 (fully nested .35) vs .26 before (t 4.24, 15/17 seasons).",
+      "Goalie GSAx repeats weakly (weight .21), so top goalie pWAR ~1.5 while goalie WAR runs ~7."
      ],
      "where": "NHL WAR leaders, backup watch, rookies",
      "sports": [

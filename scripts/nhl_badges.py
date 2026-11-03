@@ -104,8 +104,10 @@ BY = {c[0]: c for c in CANDS}
 # Shutdown (d-zone start share; F -8.7, D -5.0), Faceoff Specialist (net wins a game, -1.0), Faceoffs (win %), Sniper,
 # Physical, Shot Blocker; G Workhorse (games, t 1.0), Shot Stopper (r .12), High Danger, Rebound Control, Puck Control.
 # Defensive roles (PK, d-zone starts) run negative: coaches give them to players whose WAR already overstates them.
-SHIP = {'F': {'shooter': 320, 'takeaway': 829, 'ppunit': 9, 'drawer': 1285, 'pp': 333, 'driver': 663, 'playmaker': 750},
-        'D': {'suppress': 1488, 'takeaway': 960, 'netfront': 1841, 'drawer': 1724, 'ppunit': 8}}
+# Nov 3 2026 rerun on the traded-player split WAR files: F Playmaker drops (alone t 1.93), Sniper joins; D PK Stopper
+# joins (alone t 2.52, joint 2.85).
+SHIP = {'F': {'shooter': 320, 'takeaway': 829, 'ppunit': 9, 'drawer': 1285, 'pp': 333, 'driver': 663, 'sniper': 844},
+        'D': {'suppress': 1488, 'takeaway': 960, 'netfront': 1841, 'drawer': 1724, 'ppunit': 8, 'pkstop': 639}}
 
 
 def lines(S):
