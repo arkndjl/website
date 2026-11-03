@@ -349,7 +349,9 @@ def load_rows(live=True, fresh=False):
         return rows
     have = {r['id'] for r in rows}
     y = dt.date.today().year
+    t0 = time.time()
     new = [r for r in all_espn(y - 1, y + 1, fresh=fresh) if r['id'] not in have]
+    print(f'espn + fotmob fixtures: {len(new)} new rows, {time.time() - t0:.0f}s', flush=True)
     keys = {(r['day'], r['h'], r['a']) for r in rows}
     new = [r for r in new if (r['day'], r['h'], r['a']) not in keys]
     attach([r for r in new if r.get('hs') is not None], fresh=fresh)
@@ -1768,4 +1770,8 @@ if __name__ == '__main__':
         rows = add_mv(add_market(D.load(HIST)))
         print(evaluate(rows, params()), evaluate(rows, params(), lo=HOLD_FROM, hi=2100))
     else:
+        # Nov 2 2026: four CI runs in a row hit the 30-minute limit with no output; print the stack every 8 minutes
+        # so a stuck fetch names itself in the log
+        import faulthandler
+        faulthandler.dump_traceback_later(480, repeat=True)
         build()
