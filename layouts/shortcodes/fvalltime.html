@@ -5,7 +5,7 @@
        the careers became). */ -}}
 {{- $sport := $.Get "sport" -}}
 {{- $cfg := dict
-    "cfb" (dict "icon" "football" "unit" "player-seasons" "what" "FBS seasons" "out" "NFL AV a season through 2025, read on the FV scale; drafts 2015-23 (later picks show as pending, players still in college as college)")
+    "cfb" (dict "icon" "football" "unit" "player-seasons" "what" "FBS seasons" "out" "NFL AV a season through 2025, read on the FV scale; drafts 2015-23 (later picks show as pending)")
     "cbb" (dict "icon" "basketball" "unit" "players" "what" "seasons (top 300 each)" "out" "peak NBA value (XPM and role) on the FV scale, college exits through 2020; the grade reads his last season and the June draft boards; internationals on the boards from the international model, at their draft")
     "hockey" (dict "icon" "hockey" "unit" "picks" "what" "draft classes" "out" "peak NHL WAR (goalies GSAx) on the FV scale")
     "soccer" (dict "icon" "soccer" "unit" "player-seasons" "what" "seasons" "out" "peak market value on the FV scale")
@@ -19,7 +19,7 @@
 <table class="cfb__table fvat">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Pos</th><th>Season</th><th>{{ if eq $sport "tennis" }}Nat{{ else }}Team{{ end }}</th>
-    <th class="cfb__g" title="{{ if $draft }}the grade at the draft after his last season (still in college: his latest season){{ else }}the grade at his best season{{ end }}: the mean outcome, stretched above the board's top few a season">FV</th>
+    <th class="cfb__g" title="{{ if $draft }}the grade at the draft after his last season{{ else }}the grade at his best season{{ end }}: the mean outcome, stretched above the board's top few a season">FV</th>
     <th class="cfb__num" title="the exact mean outcome behind the FV">Mean</th>
     <th title="what his career became, on the same scale">Out</th>
     {{- if in (slice "cfb" "cbb" "hockey") $sport }}<th class="cfb__num" title="draft year and overall pick">Draft</th>{{ end }}
@@ -52,7 +52,7 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .rows) "note" (printf "%v-%v %s · %s %s" $s0 $s1 $c.what (lang.FormatNumber 0 .n) $c.unit)
-    "about" (printf "%v-%v %s, graded the way the board grades today, each player once %s. FV is the mean outcome (Mean, exact), stretched above the board's top few a season. Out: %s. The top %d at each position are listed; pick a position to rank within it.%s%s" $s0 $s1 $c.what (cond $draft "at the draft after his last college season (still in college: at the end of his latest season)" "at his best grade") $c.out 50 (cond (eq $sport "cfb") " Seasons 2014-18 grade on box-score stand-ins for PFN's line, 2019 onward on PFN's (box-era grades ran hot against the NFL, so their means are put on what such grades became, fit with each draft class held out); the last season then takes the combine (invited, athletic testing), fit with each draft class held out; no consensus. OL, CB and S have PFN lines only from 2024, so they are not listed." "") (cond (isset $d "complete") (printf " Listed: %s." (index $d "complete")) ""))) -}}
+    "about" (printf "%v-%v %s, graded the way the board grades today, each player once %s. FV is the mean outcome (Mean, exact), stretched above the board's top few a season. Out: %s. The top %d at each position are listed; pick a position to rank within it.%s%s" $s0 $s1 $c.what (cond $draft "after he has left college, at the draft after his last college season" "at his best grade") $c.out 50 (cond (eq $sport "cfb") " Seasons 2014-18 grade on box-score stand-ins for PFN's line, 2019 onward on PFN's (box-era grades ran hot against the NFL, so their means are put on what such grades became, fit with each draft class held out); the last season then takes the combine (invited, athletic testing), fit with each draft class held out; no consensus. OL, CB and S have PFN lines only from 2024, so they are not listed." "") (cond (isset $d "complete") (printf " Listed: %s." (index $d "complete")) ""))) -}}
 
 {{- with .check -}}
 {{- partial "wintable-open.html" (dict "title" "all-time FV :: how the grades turned out" "icon" $c.icon) -}}
