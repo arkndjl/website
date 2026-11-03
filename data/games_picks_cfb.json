@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-03T20:28:28Z",
+ "asof": "2026-11-03T20:36:15Z",
  "recenter": {
   "week": 0.77
  },
@@ -520,9 +520,9 @@
     "line": 71.5,
     "price": -102.0,
     "ev": 0.057,
-    "units": 2.5,
+    "units": 2.75,
     "unitsRaw": 3.0,
-    "unitsCap": 2.5
+    "unitsCap": 2.75
    },
    "unitsRaw": 5.0,
    "unitsCap": 4.5
@@ -651,11 +651,11 @@
     "mk": "spread",
     "side": "away",
     "line": 5.5,
-    "price": 106.0,
-    "ev": 0.091,
-    "units": 4.5,
-    "unitsRaw": 5.0,
-    "unitsCap": 4.5
+    "price": 104.0,
+    "ev": 0.081,
+    "units": 4.25,
+    "unitsRaw": 4.75,
+    "unitsCap": 4.25
    },
    "unitsRaw": 3.25,
    "unitsCap": 2.75
@@ -688,9 +688,9 @@
     "mk": "total",
     "side": "under",
     "line": 72.5,
-    "price": -102.0,
-    "ev": 0.039,
-    "units": 2.25
+    "price": -104.0,
+    "ev": 0.029,
+    "units": 1.25
    }
   },
   {
@@ -1076,9 +1076,9 @@
     "line": 51.5,
     "price": 102.0,
     "ev": 0.036,
-    "units": 2.5,
+    "units": 2.75,
     "unitsRaw": 3.0,
-    "unitsCap": 2.5
+    "unitsCap": 2.75
    },
    "unitsRaw": 1.25,
    "unitsCap": 1.0
@@ -1199,7 +1199,7 @@
    "price": -104.0,
    "p": 0.515,
    "ev": 0.009,
-   "units": 0.5,
+   "units": 0.25,
    "edge": 3.5,
    "x": 3.0,
    "pDU": 0.5129,
@@ -1211,7 +1211,9 @@
    "betTo": 47.0,
    "close": 51.5,
    "pass": true,
-   "now": null
+   "now": null,
+   "unitsRaw": 0.5,
+   "unitsCap": 0.25
   },
   {
    "id": "401869968",
@@ -1958,10 +1960,10 @@
    "mk": "spread",
    "side": "away",
    "line": 5.5,
-   "price": 106.0,
-   "ev": 0.091,
+   "price": 104.0,
+   "ev": 0.081,
    "edge": 5.6,
-   "units": 5.0,
+   "units": 4.75,
    "home": "Notre Dame",
    "away": "Miami",
    "state": "pick"
@@ -2125,9 +2127,9 @@
   "401858288": {
    "mk": "spread",
    "side": "away",
-   "line": 6.5,
-   "price": -113.0,
-   "edge": 1.6,
+   "line": 5.5,
+   "price": 108.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "SMU",
@@ -2270,10 +2272,10 @@
    "mk": "total",
    "side": "under",
    "line": 72.5,
-   "price": -102.0,
-   "ev": 0.039,
+   "price": -104.0,
+   "ev": 0.029,
    "edge": 6.2,
-   "units": 2.25,
+   "units": 1.25,
    "home": "Florida Atlantic",
    "away": "UTSA",
    "state": "pick"
@@ -2690,7 +2692,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 111.0,
+   "price": 113.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -2763,16 +2765,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7104,
+  "snapshots": 7113,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1684,
+    "clvN": 1688,
     "clvRet": -0.0446,
-    "clvT": -24.62,
+    "clvT": -24.67,
     "clv": 0.2,
-    "beat": 0.283,
-    "still": 0.5
+    "beat": 0.282,
+    "still": 0.501
    },
    {
     "when": "6-24h",
@@ -3020,7 +3022,7 @@
    "price": -104.0,
    "p": 0.515,
    "ev": 0.009,
-   "units": 0.5,
+   "units": 0.25,
    "edge": 3.5,
    "x": 3.0,
    "pDU": 0.5129,
@@ -3031,7 +3033,9 @@
    "flagged": "2026-11-01T15:21:05Z",
    "betTo": 47.0,
    "close": 51.5,
-   "pass": true
+   "pass": true,
+   "unitsRaw": 0.5,
+   "unitsCap": 0.25
   },
   {
    "id": "401858512",
@@ -3814,16 +3818,16 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 18.75,
-    "scale": 1.0,
+    "raw": 26.5,
+    "scale": 0.8585,
     "down": 17.25
    },
    "2026-11-04": {
-    "raw": 17.0,
+    "raw": 16.25,
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 21.75,
+    "raw": 20.75,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -3831,11 +3835,11 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 43.75,
-    "scale": 0.9143
+    "raw": 43.5,
+    "scale": 0.9195
    },
    "2026-11-08": {
-    "raw": 12.25,
+    "raw": 12.75,
     "scale": 1.0
    },
    "2026-11-09": {
