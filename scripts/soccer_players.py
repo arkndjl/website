@@ -6,6 +6,7 @@ data/soccer_war_fit.json).
     python3 scripts/soccer_players.py --fit       # every big-five season since 2014-15: parse, fit, write all seasons
     python3 scripts/soccer_players.py             # this season only (the live refresh), at the fitted weights
     python3 scripts/soccer_players.py --backup    # backup watch only, from the cached rows
+    python3 scripts/soccer_players.py --proj      # GAR projections (pj, p3) in every season file
 
 Data: Understat's match pages (scripts/soccer_data.py usm): who played, when they came on and off, every shot with its
 minute and expected goals (xG), and each player's xA (expected assists), xGChain and xGBuildup. From them, for each
@@ -27,6 +28,9 @@ league-season, so a Ligue 1 regular and a Premier League regular are put on one 
 who changed league, this season's value on last season's and the gap); replacement = the minutes-weighted value of
 players with under 900 minutes in a season (the fringe of the squads, every league); GAR = (value - replacement) x
 matches of minutes; PAR = GAR x league points per goal of difference (a team-season regression).
+Projections (pj = GAR next season, p3 = GAR over the next three, 0 for a season out of the big five): OLS on the season
+so far at full-season pace, the two seasons before pooled per 90, minutes, age and position, per share of the season
+played (scripts/soccer_proj_research.py -> data/soccer_proj_fit.json).
 """
 import datetime as dt
 import gzip
@@ -520,6 +524,7 @@ def write(rows, F, ts, all_seasons=False):
                 o['bdg'] = bd[o['p']]
         import soccer_mv as MV                           # estimated market value next to GAR (scripts/soccer_mv.py)
         MV.attach(S, out)
+        proj_attach(S, out, league_share(S, out) if S == cur else None)   # pj / p3: data/soccer_proj_fit.json
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
                           'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
                           'mv': MV.meta(S)}, separators=(',', ':'), allow_nan=False)
@@ -532,6 +537,110 @@ def write(rows, F, ts, all_seasons=False):
             json.dump(top, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
             backup(rows, F, S)
     json.dump(F, open(FIT, 'w'), indent=1, allow_nan=False)
+
+
+# ---------------------------------------------------------------- projection (scripts/soccer_proj_research.py)
+PROJ_FIT = os.path.join(ROOT, 'data', 'soccer_proj_fit.json')
+PROJ_K, PROJ_A0 = 900, 26
+PROJ_COLS = ['one', 'g0', 'p1', 'lm0', 'a', 'a2', 'am', 'd', 'm', 'fw', 'ad', 'am_', 'af']
+
+
+def age_on(S, dob):
+    """age on Sep 1 of the season's first year"""
+    return (dt.date(S - 1, 9, 1) - dt.date.fromisoformat(dob[:10])).days / 365.25
+
+
+def proj_dobs():
+    """Understat id -> Transfermarkt birth date (the soccer_mv link; this season's new links from scripts/soccer_mv.py)"""
+    try:
+        L = D.load(MV_LINK)
+    except OSError:
+        return {}
+    out = {u: L['dob'].get(str(t)) for u, t in L['p'].items() if L['dob'].get(str(t))}
+    try:
+        C = D.load(os.path.join(HERE, 'data', 'soccer_mv_cur.json.gz'))
+        out.update({u: d for u, d in (C.get('dob') or {}).items() if d and u not in out})
+    except (OSError, ValueError):
+        pass
+    return out
+
+
+def proj_x(mn, g, pos, age, prior, f):
+    """projection inputs: minutes and GAR so far in the season, position, age, prior = [min, GAR] of S-1 then S-2,
+    f = share of the league's season played"""
+    m0, g0 = mn / f, g / f
+    P = (prior[1] + prior[3]) / (prior[0] + prior[2] + PROJ_K) * 90
+    a = age - PROJ_A0
+    d, m, fw = pos == 'D', pos == 'M', pos == 'F'
+    return [1.0, g0, P * m0 / 90, math.log1p(m0), a, a * a / 10, a * m0 / 900, d, m, fw, a * d, a * m, a * fw]
+
+
+def proj_attach(S, out, cur_f=None):
+    """pj (GAR next season) and p3 (GAR over the next three) on a season file's players, from the season so far, the
+    two season files before it, age and minutes. cur_f: {league: share of the season played} (None = a full season)"""
+    try:
+        P = json.load(open(PROJ_FIT))
+    except OSError:
+        return
+    for o in out:
+        o.pop('pj', None); o.pop('p3', None)
+    if not os.path.exists(os.path.join(SDIR, f'{S - 2}.json')):    # fit on seasons with two before them on file
+        return
+    dob = proj_dobs()
+    prev = []
+    for k in (1, 2):
+        m = defaultdict(lambda: [0, 0.0])
+        try:
+            for o in json.load(open(os.path.join(SDIR, f'{S - k}.json')))['players']:
+                m[o['p']][0] += o['min']; m[o['p']][1] += o['gar']
+        except OSError:
+            pass
+        prev.append(m)
+    tot = defaultdict(lambda: [0, 0.0])
+    for o in out:
+        tot[o['p']][0] += o['min']; tot[o['p']][1] += o['gar']
+    longest = {}
+    for o in out:
+        if o['min'] > longest.get(o['p'], (0, None))[0]:
+            longest[o['p']] = (o['min'], o)
+
+    def coef(grid, f):
+        f = min(max(f, grid[0]['f']), 1.0)
+        for a, b in zip(grid, grid[1:]):
+            if f <= b['f']:
+                w = (f - a['f']) / (b['f'] - a['f'])
+                return [u + (v - u) * w for u, v in zip(a['live'], b['live'])]
+        return grid[-1]['live']
+    for o in out:
+        if o['p'] not in dob:
+            continue
+        mn, g = tot[o['p']]
+        lo = longest[o['p']][1]
+        f = max((cur_f or {}).get(lo['lg'], 1.0), 0.05)
+        pr = prev[0].get(o['p'], [0, 0.0]) + prev[1].get(o['p'], [0, 0.0])
+        x = proj_x(mn, g, lo['pos'], age_on(S, dob[o['p']]), pr, f)
+        for key, tgt in (('pj', '1y'), ('p3', '3y')):
+            c = coef(P[tgt]['grid'], f)
+            o[key] = round(sum(u * v for u, v in zip(c, x)), 1)
+
+
+def league_share(S, out):
+    """{league: share of the season played}: matches played / scheduled in Understat's league file (cached by the
+    rows build), or clubs' matches so far (a club's most-used player's) over matches per club if that is more"""
+    res = {}
+    for lg in D.BIG5:
+        d = D.us_league(lg, S)
+        if d and d['matches']:
+            res[lg] = sum(m['res'] for m in d['matches']) / len(d['matches'])
+    tm = defaultdict(int)
+    for o in out:
+        tm[(o['lg'], o['team'])] = max(tm[(o['lg'], o['team'])], o['mp'])
+    by = defaultdict(list)
+    for (lg, _), n in tm.items():
+        by[lg].append(n)
+    for lg, v in by.items():                         # the larger: a stale league file trails the players' own matches
+        res[lg] = max(res.get(lg, 0.0), min(1.0, sum(v) / len(v) / (34 if lg == 'ger.1' or (lg == 'fra.1' and S >= 2024) else 38)))
+    return res
 
 
 # ---------------------------------------------------------------- backup watch
@@ -667,9 +776,23 @@ def inject_badges():
         print(S, sum(1 for o in d['players'] if o.get('bdg')), 'players with badges', flush=True)
 
 
+def inject_proj():
+    """--proj: recompute pj / p3 in every written season file, oldest first (each reads the two before it)"""
+    cur = D.current_season()
+    for fn in sorted(os.listdir(SDIR)):
+        S = int(fn[:4])
+        path = os.path.join(SDIR, fn)
+        d = json.load(open(path))
+        proj_attach(S, d['players'], league_share(S, d['players']) if S == cur else None)
+        open(path, 'w').write(json.dumps(d, separators=(',', ':'), allow_nan=False))
+        print(S, sum(1 for o in d['players'] if o.get('pj') is not None), 'projected of', len(d['players']), flush=True)
+
+
 if __name__ == '__main__':
     if '--badges' in sys.argv:
         inject_badges()
+    elif '--proj' in sys.argv:
+        inject_proj()
     elif '--fit' in sys.argv:
         fit()
     elif '--backup' in sys.argv:                      # from the cached rows, no pull
