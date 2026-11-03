@@ -381,6 +381,9 @@ def main():
     lines, keys, tg, last = season_to_date(prior)
     cols = prior['cols']
     ci = {c: j for j, c in enumerate(cols)}
+    # the team context the xBPM ridge reads (cbb_fit.set_context): this season's rosters are the board's rows
+    F.set_context([{'pid': m['pid'], 'name': row[ci['name']], 'rec': m['rec'], 'seasons': [dict(zip(keep, q)) for q in m['seasons']]}
+                   for row, m in zip(prior['rows'], prior['careers'])])
     if not lines and not (fit.get('boards') or {}).get('keep'):
         print('no games yet this season: the board stays the preseason board')
         return
@@ -398,7 +401,7 @@ def main():
         pid = m['pid'] if m['pid'] in lines else keys.get((m['key'], m['bt']))
         if pid in used: pid = None          # two board rows can't share one Barttorvik player
         ln = lines.get(pid) if pid else None
-        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd}
+        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd}
         if ln:
             used.add(pid)
             grp = 'newcomer' if f_pre['newcomer'] else 'returner'
@@ -445,7 +448,8 @@ def main():
     recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
     # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges; e: E[FV] after the stages (the FV inputs add up to it)
-    add = [c for c in ('fvd', 'fvg', 'bdg', 'e') if c not in ci]
+    # xb0: preseason xBPM under today's model (the breakouts tab's baseline, scripts/cbb_tabs.py)
+    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0') if c not in ci]
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
     for k, r in enumerate(recs, 1):
@@ -459,7 +463,8 @@ def main():
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
         fvd = fvd_of(fv_dist('cbb', r['fvg'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvg'])))
-        new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2)}
+        new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
+               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None}
         for c in new:
             if c in ci: row[ci[c]] = new[c]
         out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + [new[c] for c in add])

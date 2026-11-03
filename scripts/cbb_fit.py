@@ -100,6 +100,46 @@ def season_line(r):
     }
 
 
+# Nov 3 2026 production-tab metrics (scripts/cbb_fv_sweep3.py): Stat+ passed the FV gate (three fold rules, held 2017-19,
+# forward 2020-23) and is an FV candidate; WAA, transfer up/down and the coming team's context (returning teammates' WAR,
+# teammates' recruiting) passed for projected college BPM only (xBPM RMSE returners 2.558 -> 2.462, newcomers 3.439 ->
+# 3.229, forward 2020-26) and feed the xBPM ridge, not FV (each failed the FV gate)
+SPLUS = {'G': (0.10, 3.85), 'F': (0.50, 4.05), 'C': (0.52, 4.31)}   # BPM mean / sd by position, 10%+ minute seasons 2008-16
+POS3 = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C'}
+WPP = 0.01243          # wins a point of margin (scripts/cbb_tabs.py, 2025-26 team-seasons)
+CTX = {}
+
+
+def set_context(careers):
+    """the team context features() reads: per (team, season) the players listed (history: who played; the live board:
+    the roster) with their minutes, each player-season's WAR and recruiting -ln rank (On3 / 247). Call it with every
+    career the features will be built for; without it the team terms are missing (the mean)."""
+    R, W, RL = defaultdict(dict), {}, {}
+    for c in careers:
+        pid = c.get('pid') or c.get('name')
+        g = c.get('rec') or {}
+        lr = [-math.log(min(x, 500)) for x in (g.get('on3rk'), g.get('rk247')) if x]
+        rl = sum(lr) / len(lr) if lr else -math.log(600)
+        for s in c['seasons']:
+            m = (s.get('mp') or 0) * (s.get('gp') or 0)
+            R[(s['team'], s['year'])][pid] = m
+            if s.get('bpm') is not None: W[(pid, s['year'])] = (s['bpm'] + 2) * m / 40 * 0.68 * WPP
+            RL[(pid, s['year'])] = rl
+    CTX.clear(); CTX.update(R=R, W=W, RL=RL)
+
+
+def team_terms(c, s, f):
+    now = CTX['R'].get((s['team'], s['year'])) if CTX else None
+    if not now:
+        f['mates_war'] = f['tal_team'] = None
+        return
+    pid = c.get('pid') or c.get('name')
+    last = CTX['R'].get((s['team'], s['year'] - 1), {})
+    f['mates_war'] = sum(CTX['W'].get((q, s['year'] - 1), 0.0) for q in now if q != pid and q in last)
+    rl = sorted((CTX['RL'].get((q, s['year']), -math.log(600)) for q in now if q != pid), reverse=True)[:8]
+    f['tal_team'] = sum(rl) / len(rl) if rl else None
+
+
 def features(c, i):
     """the preseason feature dict for career c's i-th season (its board season)."""
     s = c['seasons'][i]
@@ -113,6 +153,7 @@ def features(c, i):
     f['top'] = max(0.0, f['lrank'] + math.log(25))   # hinge: inside the top 25
     f['top5'] = max(0.0, f['lrank'] + math.log(5))
     f['newcomer'] = not prev
+    team_terms(c, s, f)
     if not prev:
         # age entering his first season (Nov 1), from his date of birth; a freshman's median is 18.9. Unknown on the live
         # board until Barttorvik lists him (games start), so it sits at the mean (z 0) until then
@@ -142,6 +183,13 @@ def features(c, i):
         f['guard'] = 1.0 if ROLES.get(prev[-1]['role']) == 'G' else 0.0
         f['big'] = 1.0 if ROLES.get(prev[-1]['role']) == 'B' else 0.0
         f['transfer'] = 1.0 if prev[-1]['team'] != s['team'] else 0.0
+        p = prev[-1]
+        mu, sd = SPLUS.get(POS3.get(p['role'], 'F'), SPLUS['F'])
+        f['splus'] = 100 + 25 * ((p['bpm'] or 0) - mu) / sd
+        f['waa'] = (p['bpm'] or 0) * (p['mp'] or 0) * (p['gp'] or 0) / 40 * 0.68 * WPP
+        pc, nc = p['conf'] in POWER, s.get('conf') in POWER
+        f['tr_up'] = 1.0 if f['transfer'] and nc and not pc else 0.0
+        f['tr_down'] = 1.0 if f['transfer'] and pc and not nc else 0.0
         # Barttorvik BPM by role (500+ minute seasons, 2008-26): guards +0.2 (O +0.8, D -0.7), wings +0.5, bigs +1.7
         # (O 0, D +1.6): a big's rebounds and blocks lift his BPM, so production is also tested against his role
         g = ROLES.get(prev[-1]['role'], 'W')
@@ -162,7 +210,10 @@ NEW_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'top', 'top5', 'rated', 'grade', 'o
 # hurting in every form (t -3 to -5); two harnesses that disagree are not evidence for it
 RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
              'orb', 'drb', 'ft', 'tp', 'tpa100', 'ftr', 'rim', 'ortg', 'porpag', 'dporpag', 'power', 'age', 'young',
-             'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer']
+             'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer', 'splus']
+# the xBPM ridge's inputs: the FV candidates (less Stat+, which failed the xBPM forward test) plus the terms that passed it
+XB_RET = [k for k in RET_CANDS if k != 'splus'] + ['waa', 'mates_war', 'tal_team', 'tr_up', 'tr_down']
+XB_NEW = NEW_CANDS + ['mates_war', 'tal_team']
 
 
 def fold_of(pid): return int(hashlib.md5(str(pid).encode()).hexdigest(), 16) % FOLDS
@@ -973,6 +1024,7 @@ def main():
     for c in careers: c['nba']['fvx'] = xpm_fv(c, thr)
     hsc = horizon_fv(careers)
     print(f'peak XPM where each FV starts, first {HORIZON} NBA seasons:', hsc[HORIZON])
+    set_context(careers)
     rows = []
     for c in careers:
         for i, s in enumerate(c['seasons']):
@@ -1060,7 +1112,7 @@ def main():
 
     # projected college BPM
     xb = {grp: xbpm_fit([r for r in rows if r['year'] in range(2010, 2027) and r['f']['newcomer'] == (grp == 'newcomer')], cands)
-          for grp, cands in (('newcomer', NEW_CANDS), ('returner', RET_CANDS))}
+          for grp, cands in (('newcomer', XB_NEW), ('returner', XB_RET))}
     print('xBPM r:', {g: v['r'] for g, v in xb.items()})
 
     # the absolute grade (emap_fit): one map for the model's E (past boards, calibration) and one for E after the board

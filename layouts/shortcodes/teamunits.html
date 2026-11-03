@@ -5,7 +5,7 @@
        {{< teamunits sport="nfl" view="offense" title="offense :: ..." tab="offense" >}}; view="formations,fronts" puts
        the views on chips, one shown at a time. */ -}}
 {{- $sport := .Get "sport" }}{{ $views := split (.Get "view") "," }}{{ $tab := .Get "tab" }}
-{{- $feed := printf "units_%s" $sport }}
+{{- $feed := .Get "feed" | default (printf "units_%s" $sport) }}
 {{- $lbl := dict "formations" "offense" "fronts" "defense" }}
 {{- $T := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" }}
 {{- $icon := index (dict "nfl" "football" "cfb" "football" "nba" "basketball" "cbb" "basketball" "nhl" "hockey" "soccer" "soccer") $sport | default "football" }}
@@ -52,7 +52,7 @@
   {{- end }}
   </tbody>
 </table>
-  {{- $about := printf "%s. Ranked by %s. Adj columns are opponent-adjusted and shrunk: one ridge fit a metric on game-level rates (offense, defense, home edge), each team held toward the league by the sample at which a season-to-date rate is half signal. Other columns are this season's raw rates. Hover a header for its definition. Medals: the unit badge, Adj against past team-seasons (bronze top 25%%, silver 10%%, gold 3%%, platinum 1%%). Display only; not a game model input." (index (dict "nfl" "nflverse play-by-play (EPA, success), formations and fronts from FTN charting" "cfb" "ESPN play-by-play; EPA from an expected points model by down, distance and field position (net drive points), garbage time left out; shotgun and no-huddle from the play text" "nba" "ESPN box scores; possessions by the Basketball-Reference estimate" "cbb" "Barttorvik (adjusted efficiency, four factors; preseason projection blended in early); ARK O / D from the ARK Ranking" "nhl" "MoneyPuck (5-on-5 score and venue adjusted xG, 5-on-4, 4-on-5); PP% and PK% from the NHL" "soccer" "FotMob match xG, opponent adjustment within each league") $sport) $keyc.h }}
+  {{- $about := $V.about | default (printf "%s. Ranked by %s. Adj columns are opponent-adjusted and shrunk: one ridge fit a metric on game-level rates (offense, defense, home edge), each team held toward the league by the sample at which a season-to-date rate is half signal. Other columns are this season's raw rates. Hover a header for its definition. Medals: the unit badge, Adj against past team-seasons (bronze top 25%%, silver 10%%, gold 3%%, platinum 1%%). Display only; not a game model input." (index (dict "nfl" "nflverse play-by-play (EPA, success), formations and fronts from FTN charting" "cfb" "ESPN play-by-play; EPA from an expected points model by down, distance and field position (net drive points), garbage time left out; shotgun and no-huddle from the play text" "nba" "ESPN box scores; possessions by the Basketball-Reference estimate" "cbb" "Barttorvik (adjusted efficiency, four factors; preseason projection blended in early); ARK O / D from the ARK Ranking" "nhl" "MoneyPuck (5-on-5 score and venue adjusted xG, 5-on-4, 4-on-5); PP% and PK% from the NHL" "soccer" "FotMob match xG, opponent adjustment within each league") $sport) $keyc.h) }}
   {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" $feed "note" (printf "%s · ranked by %s · updated %s" $when $keyc.h $date) "about" $about) }}
   </div>
   {{- end }}
