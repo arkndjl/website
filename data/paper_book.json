@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-03T13:45:16Z",
+ "asof": "2026-11-03T14:21:23Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 102.84,
+  "now": 101.35,
   "peak": 118.08,
-  "drawdown": 0.129,
-  "open": 91.75,
+  "drawdown": 0.1417,
+  "open": 91.25,
   "path": [
    101.5,
    101.6,
@@ -205,43 +205,44 @@
    99.63,
    100.35,
    103.09,
-   102.84
+   102.84,
+   101.35
   ]
  },
  "record": {
-  "n": 249,
-  "clvN": 206,
+  "n": 247,
+  "clvN": 207,
   "clvRet": -0.0347,
-  "clvT": -6.95,
+  "clvT": -6.98,
   "clv": -0.42,
-  "beat": 0.169,
-  "settled": 197,
+  "beat": 0.168,
+  "settled": 198,
   "w": 102,
-  "l": 95,
+  "l": 96,
   "p": 0,
-  "roi": 0.0426,
-  "roiT": 0.57,
-  "profit": 3.52,
-  "risked": 157.5,
-  "yield": 0.0224
+  "roi": 0.0374,
+  "roiT": 0.5,
+  "profit": 2.02,
+  "risked": 159.0,
+  "yield": 0.0127
  },
- "tEff": -6.95,
+ "tEff": -6.99,
  "corr": {
   "rho": 0.0,
-  "n": 206,
+  "n": 207,
   "slates": 19,
-  "nEff": 206.0,
-  "avgSlate": 10.84
+  "nEff": 207.0,
+  "avgSlate": 10.89
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 206,
+   "value": 207,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-3.5% t -6.95",
+   "value": "-3.5% t -6.99",
    "pass": false
   },
   {
@@ -256,7 +257,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +4.3% vs -3.5% (SE 7.4)",
+   "value": "ROI +3.7% vs -3.5% (SE 7.4)",
    "pass": true
   }
  ],
@@ -309,7 +310,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 16,
+   "n": 17,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -414,7 +415,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 39,
+   "n": 36,
    "clvN": 34,
    "clvRet": -0.0363,
    "clvT": -3.41,
@@ -519,28 +520,28 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 58,
-   "clvN": 49,
-   "clvRet": -0.0174,
-   "clvT": -3.33,
-   "clv": 0.08,
-   "beat": 0.245,
-   "settled": 40,
+   "n": 57,
+   "clvN": 50,
+   "clvRet": -0.0178,
+   "clvT": -3.46,
+   "clv": 0.06,
+   "beat": 0.24,
+   "settled": 41,
    "w": 25,
-   "l": 15,
+   "l": 16,
    "p": 0,
-   "roi": 0.3487,
-   "roiT": 1.86,
-   "profit": 9.93,
-   "risked": 31.5,
-   "yield": 0.3151
+   "roi": 0.3158,
+   "roiT": 1.7,
+   "profit": 8.43,
+   "risked": 33.0,
+   "yield": 0.2554
   },
   {
    "id": "nflprops-prop",
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 36,
+   "n": 37,
    "clvN": 34,
    "clvRet": -0.0163,
    "clvT": -1.11,
@@ -629,30 +630,6 @@
    "clv": 0.7,
    "beat": 1,
    "close": 0.75
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186674",
-   "k": "2026-11-03T10:30:00Z",
-   "slate": "tennis:2026-11-03",
-   "h": "Feistel",
-   "a": "Klimovicova",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -208,
-   "bet": "Klimovicova ML -208",
-   "placed": "2026-11-03T03:10:13Z",
-   "stake": 1.5,
-   "edge": 7.8,
-   "ev": 0.0078,
-   "event": "Angola Ladies Open",
-   "pass": false,
-   "clvRet": -0.0005,
-   "clv": 0.5,
-   "beat": 0,
-   "close": 0.675
   },
   {
    "rule": "tennis-ml",
@@ -768,7 +745,11 @@
    "edge": 8.4,
    "ev": 0.0171,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0357,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.3225
   },
   {
    "rule": "tennis-ml",
@@ -788,7 +769,7 @@
    "edge": 7.2,
    "ev": 0.0031,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": true
   },
   {
    "rule": "tennis-ml",
@@ -892,8 +873,8 @@
    "edge": 6.3,
    "ev": 0.0133,
    "event": null,
-   "pass": false,
-   "close": 26.5
+   "pass": true,
+   "close": 25.5
   },
   {
    "rule": "cfb-total",
@@ -934,8 +915,8 @@
    "edge": 2.9,
    "ev": -0.0001,
    "event": null,
-   "pass": true,
-   "close": 15.5
+   "pass": false,
+   "close": 14.5
   },
   {
    "rule": "cbb-spread",
@@ -955,7 +936,7 @@
    "edge": 3.3,
    "ev": 0.0026,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 33.5
   },
   {
@@ -977,7 +958,7 @@
    "ev": 0.0163,
    "event": null,
    "pass": false,
-   "close": 30.5
+   "close": 31.5
   },
   {
    "rule": "cbb-spread",
@@ -997,8 +978,8 @@
    "edge": 4.3,
    "ev": -0.0,
    "event": null,
-   "pass": false,
-   "close": 11.5
+   "pass": true,
+   "close": 10.5
   },
   {
    "rule": "cbb-spread",
@@ -1018,8 +999,8 @@
    "edge": 6.5,
    "ev": 0.0442,
    "event": null,
-   "pass": false,
-   "close": 25.5
+   "pass": true,
+   "close": 26.5
   },
   {
    "rule": "cbb-spread",
@@ -1372,7 +1353,7 @@
    "edge": 10.7,
    "ev": 0.311,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1475,8 +1456,8 @@
    "edge": 7.7,
    "ev": 0.0274,
    "event": null,
-   "pass": true,
-   "close": 38.5
+   "pass": false,
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -2109,6 +2090,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186674",
+   "k": "2026-11-03T10:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Feistel",
+   "a": "Klimovicova",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -208,
+   "bet": "Klimovicova ML -208",
+   "placed": "2026-11-03T03:10:13Z",
+   "stake": 1.5,
+   "edge": 7.8,
+   "ev": 0.0078,
+   "event": "Angola Ladies Open",
+   "pass": false,
+   "clvRet": -0.0005,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.675,
+   "score": "6-7 7-5 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.5
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3892,37 +3901,6 @@
    "res": "w",
    "ret": 0.9615,
    "profit": 0.2404
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401911003",
-   "k": "2026-11-03T01:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "South Alabama",
-   "a": "Ohio",
-   "mk": "total",
-   "side": "under",
-   "line": 154.5,
-   "price": -100.0,
-   "bet": "under 154.5 -100",
-   "placed": "2026-11-02T15:59:20Z",
-   "stake": 0.25,
-   "edge": 2.9,
-   "ev": 0.0258,
-   "event": null,
-   "pass": true,
-   "clvRet": 0.0,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 154.5,
-   "score": [
-    86.0,
-    77.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -12354,7 +12332,11 @@
    "clvRet": -0.0005,
    "clv": 0.5,
    "beat": 0,
-   "close": 0.675
+   "close": 0.675,
+   "score": "6-7 7-5 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.5
   },
   {
    "rule": "tennis-ml",
@@ -12470,7 +12452,11 @@
    "edge": 8.4,
    "ev": 0.0171,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0357,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.3225
   },
   {
    "rule": "tennis-ml",
@@ -12490,7 +12476,7 @@
    "edge": 7.2,
    "ev": 0.0031,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": true
   },
   {
    "rule": "tennis-ml",
@@ -12594,8 +12580,8 @@
    "edge": 6.3,
    "ev": 0.0133,
    "event": null,
-   "pass": false,
-   "close": 26.5
+   "pass": true,
+   "close": 25.5
   },
   {
    "rule": "cfb-total",
@@ -12636,8 +12622,8 @@
    "edge": 2.9,
    "ev": -0.0001,
    "event": null,
-   "pass": true,
-   "close": 15.5
+   "pass": false,
+   "close": 14.5
   },
   {
    "rule": "cbb-spread",
@@ -12657,7 +12643,7 @@
    "edge": 3.3,
    "ev": 0.0026,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 33.5
   },
   {
@@ -12679,7 +12665,7 @@
    "ev": 0.0163,
    "event": null,
    "pass": false,
-   "close": 30.5
+   "close": 31.5
   },
   {
    "rule": "cbb-spread",
@@ -12699,8 +12685,8 @@
    "edge": 4.3,
    "ev": -0.0,
    "event": null,
-   "pass": false,
-   "close": 11.5
+   "pass": true,
+   "close": 10.5
   },
   {
    "rule": "cbb-spread",
@@ -12720,8 +12706,8 @@
    "edge": 6.5,
    "ev": 0.0442,
    "event": null,
-   "pass": false,
-   "close": 25.5
+   "pass": true,
+   "close": 26.5
   },
   {
    "rule": "cbb-spread",
@@ -13074,7 +13060,7 @@
    "edge": 10.7,
    "ev": 0.311,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -13177,8 +13163,8 @@
    "edge": 7.7,
    "ev": 0.0274,
    "event": null,
-   "pass": true,
-   "close": 38.5
+   "pass": false,
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
