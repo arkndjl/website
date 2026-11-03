@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T10:53:28Z",
+ "asof": "2026-11-03T11:56:39Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1165,7 +1165,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 44,
+   "n": 43,
    "clvN": 40,
    "clvRet": -0.0358,
    "clvT": null,
@@ -1285,20 +1285,20 @@
     "read": "below the backtest"
    },
    "check": {
-    "n": 50,
-    "window": 50,
-    "mean": -0.0603,
+    "n": 51,
+    "window": 51,
+    "mean": -0.062,
     "t": null,
     "days": 1,
     "sd": 0.1114,
-    "cusum": 15.41,
-    "cusumMax": 16.17,
+    "cusum": 16.47,
+    "cusumMax": 16.47,
     "h": 10.0,
     "stop": true,
-    "why": "CUSUM 15.4 past 10; drift test: live worth -3.20 of the backtest's expected edge over 50 bets, 19x likelier no edge than the backtest's",
+    "why": "CUSUM 16.5 past 10; drift test: live worth -3.31 of the backtest's expected edge over 51 bets, 19x likelier no edge than the backtest's",
     "drift": {
      "mu1": 0.0174,
-     "n": 50,
+     "n": 51,
      "sd": 0.1114,
      "rho": 0.0,
      "lo": -2.944,
@@ -1306,12 +1306,12 @@
      "state": "paused",
      "at": [
       "2026-11-02",
-      50
+      51
      ],
-     "llr": -4.494,
-     "info": 1.22,
-     "real": -3.198,
-     "realSe": 0.907,
+     "llr": -4.728,
+     "info": 1.24,
+     "real": -3.314,
+     "realSe": 0.898,
      "need": 242
     },
     "test": "drift"
@@ -2264,8 +2264,8 @@
    "clvT": null,
    "flat": -0.0358,
    "adds": 0.0028,
-   "expEdge": 0.0162,
-   "basis": "backtest"
+   "expEdge": 0.0158,
+   "basis": "backtest + live picks"
   },
   {
    "sport": "cbb",
@@ -2277,8 +2277,8 @@
    "clvT": null,
    "flat": -0.062,
    "adds": -0.0073,
-   "expEdge": 0.0356,
-   "basis": "backtest"
+   "expEdge": 0.0347,
+   "basis": "backtest + live picks"
   },
   {
    "sport": "nba",
@@ -2303,7 +2303,7 @@
    "clvT": -3.03,
    "flat": -0.0438,
    "adds": 0.0065,
-   "expEdge": 0.0267,
+   "expEdge": 0.0266,
    "basis": "backtest + live picks"
   }
  ],
