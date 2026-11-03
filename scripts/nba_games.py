@@ -62,6 +62,8 @@ INJ_HIST = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'inj_hist.json')
 FIRST = 2013                      # 2012-13: XPM from 2010-11 on; ratings warm up two seasons before scoring
 SCORE_FROM, HOLD_FROM = 2015, 2022
 FEATS = ['elo', 'eff', 'mkt', 'lin', 'rest', 'b2b', 'home']
+# elo re-scored Nov 3 2026 (harness_rescore.py): tune t +1.15, held 2022-26 t -1.12 (held MAE 10.8742 vs 10.8763
+# without): 'watch', held out is worse without it, so it stays
 TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri', 'tlin']
 NOT_BOOKS = ('Live',)             # in-game prices
 REPL = -1.4                       # replacement-level XPM (VORX's, fit to NBA wins)
