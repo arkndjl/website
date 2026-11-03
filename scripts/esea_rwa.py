@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import time
+from collections import defaultdict
 
 import numpy as np
 
@@ -58,8 +59,73 @@ def live_matches(seen, div, now):
                     nick[q[20]] = q[19]
         if maps:
             # the cache keeps no match time: this season's maps count as of the build (no decay at the fit's h)
-            out.append({'id': mid, 'at': now, 'season': 99, 'div_r': div, 'maps': maps})
+            out.append({'id': mid, 'at': now, 'season': 99, 'div_r': div, 'maps': maps, 'f1': {'id': ta}, 'f2': {'id': tb}})
     return out, nick
+
+
+ARK_STAB = {'kpr': 145, 'dpr': 279, 'adr': 118, 'mks': 171, 'entry': 535, 'clutch': 916, 'apr': 371, 'fpr': 57, 'udr': 196,
+            'fsr': 46, 'usr': 113}   # fetch_esea.mjs ARK_STAB (rounds at which each stat is half signal)
+ARK_STAB_TEAM = 486
+
+
+def season_lines(M, c, th, p, es, center, cn):
+    """1NT members' league seasons: season RWA (that season's lines, opponents at their current RWA, shrunk k rounds
+    toward the division prior) and season ARK Rating (the page's stabilised ARK on the season's totals)
+    -> {nick: {season: [rwa, ark, rounds]}}"""
+    import re
+    cur = int((re.search(r'S(\d{2})', cn) or [0, 0])[1] or 0)
+    seas = np.where(M.gseason[M.g] == 99, cur, M.gseason[M.g])
+    th_row = th[M.p]
+    opp = np.bincount(M.oa, th_row[M.ob], len(M.p)) / np.maximum(M.opp_cnt, 1)
+    adj = c + p['opp'] * opp
+    am = es.get('arkModel') or {}
+    beta = np.array([(am.get('beta') or {}).get(f, 0.0) for f in R.ARK.FEATS])
+    F, cred = M.A[:, :-1], M.A[:, -1]
+    main_rows = M.dv == 0
+    mu = (F[main_rows] * M.R[main_rows, None]).sum(0) / M.R[main_rows].sum()
+    stab = np.array([ARK_STAB[f] for f in R.ARK.FEATS])
+    out = {}
+    for x in es.get('members') or []:
+        i = M.pid.get(x.get('id'))
+        if i is None:
+            continue
+        rows = np.where(M.p == i)[0]
+        by = {}
+        for sn in sorted(set(seas[rows].tolist())):
+            r = rows[seas[rows] == sn]
+            Rr = M.R[r]
+            Rt = float(Rr.sum())
+            dv = float((Rr * M.dv[r]).sum() / Rt)
+            prior = p['g'] * dv + p['nu']
+            rwa = (float((Rr * adj[r]).sum()) + p['k'] * prior) / (Rt + p['k']) - center
+            f = (F[r] * Rr[:, None]).sum(0) / Rt
+            v = float((beta * Rt / (Rt + stab) * (f - mu)).sum()) + float((Rr * cred[r]).sum() / Rt) * Rt / (Rt + ARK_STAB_TEAM)
+            ark = 1 + float(am.get('stretch', 5.56)) * (v - float(am.get('centre', 0)))
+            by[str(int(sn))] = [round(rwa, 1), round(ark, 2), int(Rt)]
+        out[x['nick']] = by
+    return out
+
+
+def team_rwa(ms, th, M, center, cn, new_v):
+    """team RWA this season: the sum of its five most-used players' RWA (most rounds for the team this season), the
+    number the match preview compares -> {team id: [sum, players with league maps]}"""
+    import re
+    cur = int((re.search(r'S(\d{2})', cn) or [0, 0])[1] or 0)
+    rounds = defaultdict(lambda: defaultdict(int))
+    for m in ms:
+        if m.get('season') not in (cur, 99):
+            continue
+        for mp in m['maps']:
+            rr = (mp['s1'] or 0) + (mp['s2'] or 0)
+            for f, side in (('f1', 'p1'), ('f2', 'p2')):
+                for x in mp.get(side) or []:
+                    rounds[m[f]['id']][x[0]] += rr
+    out = {}
+    for tid, pl in rounds.items():
+        five = sorted(pl, key=lambda q: -pl[q])[:5]
+        v = [float(th[M.pid[q]] - center) if q in M.pid else new_v for q in five]
+        out[tid] = [round(sum(v) / len(v) * 5, 1), sum(1 for q in five if q in M.pid)]
+    return out
 
 
 def main():
@@ -105,11 +171,13 @@ def main():
     for i in np.where(keep)[0]:
         pl[inv[i]] = [round(float(th[i] - center), 2), int(rounds[i])]
     rk = sorted(pl.items(), key=lambda kv: -kv[1][0])
+    seasons = season_lines(M, c, th, p, es, center, cn)
+    teams = team_rwa(ms + live, th, M, center, cn, new_v)
     t = fit['tests']
     out = {'asof': time.strftime('%Y-%m-%dT%H:%MZ', time.gmtime(now)), 'head': fit.get('head', 'ark'),
            'test': {k: t[k] for k in ('rwa_vs_ark', 'pelo+lv+rwa_vs_pelo+lv') if k in t},
            'params': p, 'center': round(center, 3), 'new': round(new_v, 2), 'n': len(pl), 'live_maps': sum(len(m['maps']) for m in live),
-           'names': {q: nick[q] for q, _ in rk if nick.get(q)}, 'p': {q: v for q, v in rk}}
+           'names': {q: nick[q] for q, _ in rk if nick.get(q)}, 'p': {q: v for q, v in rk}, 'seasons': seasons, 'teams': teams}
     s = json.dumps(out, separators=(',', ':'))
     open(OUT, 'w').write(s)
     print(f'wrote {OUT}: {len(pl)} players, {out["live_maps"]} live maps, {len(s) // 1024} KB', file=sys.stderr)

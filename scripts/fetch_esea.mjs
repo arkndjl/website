@@ -803,12 +803,22 @@ const countries = { ...(prev.countries || {}) };
 for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) for (const p of x[side] || []) {
   if (p.pid && !(p.pid in countries)) countries[p.pid] = (await api(`/players/${p.pid}`).catch(() => null))?.country?.toLowerCase() || null;
 }
-for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) if (x[side]) {
-  x[side] = x[side].map(({ pid, ...p }) => ({ ...p, country: countries[pid] || null, ...ark(p) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
-}
-// map MVP: the best ARK Rating on 1NT's side of the map (ties: more kills)
+// RWA ratings from the previous run's build step (scripts/esea_rwa.py)
+const RWA = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea_rwa.json'), 'utf8')); } catch { return null; } })();
+// map RWA: the line's round win % added (ARK swing) + the opposing five's mean RWA (opponent credit, data/esea_rwa.json)
+const rwaOf = q => (RWA?.p?.[q] ? RWA.p[q][0] : (RWA?.new ?? 0));
 for (const m of matches) for (const x of m.maps) {
-  const all = [...(x.players || [])].filter(p => p.rating != null).sort((a, b) => b.rating - a.rating || (b.k ?? 0) - (a.k ?? 0));
+  const oppMean = {};
+  for (const [side, other] of [['players', 'opp'], ['opp', 'players']]) { const o = (x[other] || []).map(p => p.pid).filter(Boolean); oppMean[side] = RWA?.p && o.length ? o.reduce((a, q) => a + rwaOf(q), 0) / o.length : null; }
+  for (const side of ['players', 'opp']) if (x[side]) {
+    x[side] = x[side].map(({ pid, ...p }) => { const a = ark(p) || {}; return { ...p, country: countries[pid] || null, ...a, rwa: a.swing != null && oppMean[side] != null ? Math.round((a.swing + oppMean[side]) * 10) / 10 : null }; })
+      .sort((a, b) => (b.rwa ?? b.rating ?? 0) - (a.rwa ?? a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
+  }
+}
+// map MVP: the best map RWA on 1NT's side (the opponent credit is the same for all five, so this is the best swing;
+// ARK Rating when RWA is missing; ties: more kills)
+for (const m of matches) for (const x of m.maps) {
+  const all = [...(x.players || [])].filter(p => (p.rwa ?? p.rating) != null).sort((a, b) => (b.rwa ?? b.rating) - (a.rwa ?? a.rating) || (b.k ?? 0) - (a.k ?? 0));
   if (all[0]) { all[0].mapMvp = true; x.mvp = all[0].name; }
 }
 
@@ -1063,7 +1073,6 @@ const PREVIEW_W = { elo: 0.80, rating: 0.20, map: 0, matchup: 0 };
 // the page's S59 inputs (n 154, leave-one-day-out) elo/talent + RWA .516 vs elo/talent + player Elo .558
 // (t -1.7). Player Elo adds nothing beside it there (coef < 0), so RWA replaces it in the blend.
 const RWA_W = { a: 0.316, b: 14.2 };
-const RWA = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea_rwa.json'), 'utf8')); } catch { return null; } })();
 function fiveRwa(ids) {
   if (!RWA?.p || !ids.length) return null;
   const dflt = RWA.new ?? -3;   // no league maps: the division prior
