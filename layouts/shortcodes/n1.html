@@ -207,13 +207,13 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>scouting_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
   <div class="wintable__scroll">
   <table class="esea-box n1-tbl">
-    <thead><tr><th>Date</th><th class="is-l">Opponent</th><th>W–L</th><th title="standings rank">Std</th><th title="ARK power rank">Pwr</th><th title="mean FACEIT elo, top five">Elo</th><th title="team ARK rating">ARK</th><th title="team talent, stars">Tal</th><th title="round diff per map">RD/m</th><th class="n1-gap" title="their official maps vs 1NT, their W–L">vs 1NT</th><th>1NT win %</th><th>Result</th></tr></thead>
+    <thead><tr><th>Date</th><th class="is-l">Opponent</th><th>W–L</th><th title="standings rank">Std</th><th title="ARK power rank">Pwr</th><th title="mean FACEIT elo, top five">Elo</th><th title="team RWA: sum of its five most-used players' RWA this season">RWA</th><th title="team ARK rating">ARK</th><th title="team talent, stars">Tal</th><th title="round diff per map">RD/m</th><th class="n1-gap" title="their official maps vs 1NT, their W–L">vs 1NT</th><th>1NT win %</th><th>Result</th></tr></thead>
     <tbody>
     {{- $up := slice }}{{ $done := slice }}{{ range sort $d.matches "at" }}{{ if eq .status "FINISHED" }}{{ $done = $done | append . }}{{ else }}{{ $up = $up | append . }}{{ end }}{{ end }}
     {{- range $up | append ($done | collections.Reverse) }}{{ $m := . }}
       {{- $t := dict }}{{ range where $d.rankings.teams "id" .opp.id }}{{ $t = . }}{{ end }}
       {{- $h := index $l.h2h .opp.id }}{{ $p := index $cal .id }}
-      <tr class="{{ if eq .status "FINISHED" }}n1-row-off{{ end }}"><td>{{ (time.In $et (time (int (div .at 1000)))).Format "Jan 2" }}</td><td class="is-l">{{ .opp.name }}</td><td>{{ with $t.w }}{{ . }}{{ else }}0{{ end }}–{{ $t.l | default 0 }}</td><td>{{ with $t.rank }}{{ . }}{{ end }}</td><td>{{ with $t.powerRank }}{{ . }}{{ end }}</td><td>{{ with $t.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td><td>{{ with $t.ark }}{{ printf "%.2f" (float .) }}{{ end }}</td><td>{{ with $t.talent }}{{ printf "%.2f" (float .exact) }}{{ end }}</td><td>{{ with $t.rdpm }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}{{ end }}</td>
+      <tr class="{{ if eq .status "FINISHED" }}n1-row-off{{ end }}"><td>{{ (time.In $et (time (int (div .at 1000)))).Format "Jan 2" }}</td><td class="is-l">{{ .opp.name }}</td><td>{{ with $t.w }}{{ . }}{{ else }}0{{ end }}–{{ $t.l | default 0 }}</td><td>{{ with $t.rank }}{{ . }}{{ end }}</td><td>{{ with $t.powerRank }}{{ . }}{{ end }}</td><td>{{ with $t.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td><td>{{ with site.Data.esea_rwa }}{{ with index .teams $m.opp.id }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ printf "%+.1f" (float (index . 0)) }}</b>{{ end }}{{ end }}</td><td>{{ with $t.ark }}{{ printf "%.2f" (float .) }}{{ end }}</td><td>{{ with $t.talent }}{{ printf "%.2f" (float .exact) }}{{ end }}</td><td>{{ with $t.rdpm }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}{{ end }}</td>
         <td class="n1-gap">{{ with $h }}{{ .l }}–{{ .w }}{{ else }}<span class="n1-dim">new</span>{{ end }}</td>
         <td>{{ with $p }}{{ .win }}%{{ if .retro }}<span class="n1-dim" title="logged after the match; not scored"> †</span>{{ end }}{{ end }}</td>
         <td>{{ with .result }}<b class="{{ if eq . "W" }}n1-up{{ else }}n1-down{{ end }}">{{ . }}</b>{{ if gt (len $m.maps) 1 }}{{ with $m.score }} {{ index . 0 }}–{{ index . 1 }}{{ end }}{{ range $m.maps }} <span class="n1-dim">{{ .map }} {{ .rf }}–{{ .ra }}</span>{{ end }}{{ else }}{{ with $m.maps }}{{ with index . 0 }} {{ .rf }}–{{ .ra }} <span class="n1-dim">{{ .map }}</span>{{ end }}{{ end }}{{ end }}{{ else }}<span class="n1-dim">upcoming</span>{{ end }}</td></tr>
@@ -289,11 +289,12 @@
     <h3 class="n1-h">players by season</h3>
     {{- range $l.players }}{{ $p := . }}
     <details class="n1-pl"{{ if eq .name "LAURSEN_111" }} open{{ end }}>
+      {{- $ps := dict }}{{ with site.Data.esea_rwa }}{{ with index .seasons $p.name }}{{ $ps = . }}{{ end }}{{ end }}
       <summary><b>{{ .name }}</b><span>{{ .maps }} maps</span><span>{{ .kd }} K/D</span><span>{{ .adr }} ADR</span><span class="n1-dim">entry {{ .entry }}% · clutch {{ .clutch }}%</span></summary>
       <div class="wintable__scroll">
       <table class="esea-box n1-tbl">
-        <thead><tr><th>Season</th><th>Maps</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
-        <tbody>{{ range .seasons }}{{ $r := . }}<tr><td>S{{ .s }}</td><td>{{ .maps }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
+        <thead><tr><th>Season</th><th>Maps</th><th title="season RWA: round win % added per round over the season's league maps, opponent-credited, shrunk toward the division; 0 = average Main player">RWA</th><th title="season ARK Rating on the season's league totals, each stat regressed by its stability; 1.00 = league average">ARK</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
+        <tbody>{{ range .seasons }}{{ $r := . }}{{ $x := index $ps (string .s) }}<tr><td>S{{ .s }}</td><td>{{ .maps }}</td><td>{{ with $x }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ printf "%+.1f" (float (index . 0)) }}</b>{{ else }}–{{ end }}</td><td>{{ with $x }}{{ printf "%.2f" (float (index . 1)) }}{{ else }}–{{ end }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
       </table>
       </div>
     </details>
