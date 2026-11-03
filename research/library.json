@@ -497,10 +497,12 @@
      "term": "CBB WAR / WAA",
      "short": "Wins over a replacement / average D-I player.",
      "body": [
-      "WAR = (BPM + 2) x minutes / 40 x team possessions a 40 / 100 x .0124 wins a point; WAA uses BPM.",
-      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 365 team seasons:",
-      "wins = .41 x games + team WAR (r .85). The textbook slope (.0347 at margin sd 11.5) overstates: schedules",
-      "pair strong with strong and win odds flatten at the ends. FV test: WAR, WAA, career and 5/4/3 WAR fail."
+      "WAR = (BPM + 2) x minutes / 40 x .68 x .0143 wins a point; WAA uses BPM.",
+      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 3,485 team seasons 2016-17 to 2025-26:",
+      "wins = .40 x games + team WAR (r .86). Held out: beats the 2025-26-only .0124 in 7 of 9 seasons (t 3.4).",
+      "Flat 68 possessions beats team pace on held-out wins, 9 of 10 seasons (t 2.9). Textbook slope .0347 overstates.",
+      "Replacement -4 fits next-season wins better (9/9) but equals newcomer BPM -1.3 less returner gain +1.1: kept -2.",
+      "FV test: WAR, WAA, career and 5/4/3 WAR fail."
      ],
      "where": "CBB WAR leaders, stats, portal, returning",
      "sports": [
@@ -512,7 +514,9 @@
      "short": "BPM against the position: 100 + 25 x z.",
      "body": [
       "z = (BPM - position mean) / position sd; G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (10%+ minute seasons 2008-16).",
-      "FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26)."
+      "FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26).",
+      "Tabs: each season's own norms (2025-26: G -.23 / 3.84, F .57 / 4.13, C 1.71 / 4.56). Through 8 games sd 4.4-5.5;",
+      "own norms cut error vs full-season Stat+ by a third, 10 of 10 seasons."
      ],
      "where": "CBB stats, WAR leaders, portal; FV inputs",
      "sports": [
