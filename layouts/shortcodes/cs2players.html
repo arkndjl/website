@@ -16,6 +16,7 @@
     <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
     <th>Age</th>
     <th class="cfb__g" title="RWA: round win % added per round, opponent-adjusted, 0 = the average tier-1 starter; recent maps count more (half-life {{ $f.params.h }} days)">RWA</th>
+    <th title="projected RWA in six months if still active: RWA and age, fit on the monthly boards since Jul 2024">6M</th>
     <th title="RWA change over the last 90 days">90d</th>
     <th title="rounds above replacement over the last year: extra rounds won against a median active pro in the same seat">RAR</th>
     <th title="maps in the last year">Maps</th>
@@ -29,7 +30,7 @@
   {{- range .board }}{{ partial "cs2prow.html" (dict "r" . "ctry" $ctry "view" "board") }}{{ end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "cs2" "note" (printf "bo3.gg per-map stats · updated %s" $date) "about" (printf "1,000+ rounds in the last year, a map in the last 120 days (%d players). Stat lines weighted by their effect on round share, opponent-adjusted, recency-weighted, small samples regressed. Replacement %.1f. Photos: bo3.gg." (int .nPool) .repl)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "cs2" "note" (printf "bo3.gg per-map stats · updated %s" $date) "about" (printf "1,000+ rounds in the last year, a map in the last 120 days (%d players). Stat lines weighted by their effect on round share, opponent-adjusted, recency-weighted, small samples regressed. Replacement %.1f. 6M: RWA 182 days on for players still in the pool, from RWA and age (age squared, unknown age flagged); held out Jul 2025 on, RMSE .507 held flat to .485 (t -2.4 by player, 9 of 11 months; scripts/cs2_proj_research.py). Photos: bo3.gg." (int .nPool) .repl)) -}}
 {{- else if eq $view "prospects" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: prospects") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,Proj,T1%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk sp cs__table">
