@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T11:58:34Z",
+ "asof": "2026-11-03T12:09:23Z",
  "recenter": {
-  "2026-11-03": -12.85
+  "2026-11-03": -12.84
  },
  "monitor": {
   "clocks": {
@@ -296,9 +296,9 @@
     "mk": "spread",
     "side": "home",
     "line": 11.5,
-    "price": -100.0,
-    "ev": 0.076,
-    "units": 3.25
+    "price": 102.0,
+    "ev": 0.087,
+    "units": 4.25
    }
   },
   {
@@ -408,22 +408,6 @@
    "why": "no edge at -111",
    "m": 19.3,
    "tm": 159.9
-  },
-  {
-   "id": "401921801",
-   "sport": "cbb",
-   "kick": "2026-11-04T00:00:00Z",
-   "home": "Kentucky",
-   "away": "Manhattan",
-   "mk": "spread",
-   "side": "away",
-   "line": 33.5,
-   "price": -108.0,
-   "edge": 2.5,
-   "x": 2.5,
-   "why": "no edge at -108",
-   "m": 31.0,
-   "tm": 158.4
   },
   {
    "id": "401921819",
@@ -632,6 +616,22 @@
    "why": "total market off",
    "m": 29.9,
    "tm": 150.5
+  },
+  {
+   "id": "401921801",
+   "sport": "cbb",
+   "kick": "2026-11-04T00:00:00Z",
+   "home": "Kentucky",
+   "away": "Manhattan",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": -102.0,
+   "edge": 0.1,
+   "x": null,
+   "why": "total market off",
+   "m": 31.0,
+   "tm": 158.4
   }
  ],
  "games": {
@@ -684,16 +684,16 @@
    "state": "under"
   },
   "401921801": {
-   "mk": "spread",
-   "side": "away",
-   "line": 33.5,
-   "price": -108.0,
-   "edge": 2.5,
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": -102.0,
+   "edge": 0.1,
    "ev": null,
    "units": 0.0,
    "home": "Kentucky",
    "away": "Manhattan",
-   "state": "under"
+   "state": "off"
   },
   "401921819": {
    "mk": "spread",
@@ -723,10 +723,10 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": -100.0,
-   "ev": 0.076,
+   "price": 102.0,
+   "ev": 0.087,
    "edge": 4.7,
-   "units": 3.25,
+   "units": 4.25,
    "home": "Kansas State",
    "away": "South Dakota State",
    "state": "pick"
@@ -916,7 +916,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 3801,
+  "snapshots": 3813,
   "buckets": [
    {
     "when": "24h+",
@@ -929,12 +929,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 464,
+    "clvN": 468,
     "clvRet": -0.0398,
-    "clvT": -7.32,
-    "clv": 0.14,
-    "beat": 0.224,
-    "still": 0.483
+    "clvT": -7.39,
+    "clv": 0.13,
+    "beat": 0.222,
+    "still": 0.487
    },
    {
     "when": "1-6h",
@@ -7408,7 +7408,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 12.25,
+    "raw": 13.75,
     "scale": 1.0,
     "down": 14.75
    },
@@ -7417,7 +7417,7 @@
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 19.0,
+    "raw": 15.75,
     "scale": 1.0
    },
    "2026-11-06": {
