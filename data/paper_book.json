@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T02:31:19Z",
+ "asof": "2026-11-03T02:59:30Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 105.34,
   "peak": 118.08,
   "drawdown": 0.1079,
-  "open": 80.0,
+  "open": 83.0,
   "path": [
    101.5,
    101.6,
@@ -112,7 +112,7 @@
   ]
  },
  "record": {
-  "n": 223,
+  "n": 227,
   "clvN": 110,
   "clvRet": -0.0245,
   "clvT": -3.88,
@@ -212,7 +212,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 12,
+   "n": 13,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -296,7 +296,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 34,
+   "n": 36,
    "clvN": 2,
    "clvRet": -0.055,
    "clvT": -1.54,
@@ -317,7 +317,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 52,
+   "n": 51,
    "clvN": 5,
    "clvRet": -0.0408,
    "clvT": -0.85,
@@ -359,7 +359,7 @@
    "label": "NBA spread",
    "sport": "nba",
    "mk": "spread",
-   "n": 2,
+   "n": 3,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -401,7 +401,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 51,
+   "n": 52,
    "clvN": 42,
    "clvRet": -0.018,
    "clvT": -2.96,
@@ -3043,7 +3043,7 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -3086,7 +3086,7 @@
    "ev": 0.0097,
    "event": null,
    "pass": false,
-   "close": 7.5
+   "close": 6.5
   },
   {
    "rule": "cbb-total",
@@ -3107,7 +3107,7 @@
    "ev": 0.0011,
    "event": null,
    "pass": false,
-   "close": 147.5
+   "close": 148.5
   },
   {
    "rule": "cbb-spread",
@@ -3148,8 +3148,8 @@
    "edge": 4.5,
    "ev": 0.0017,
    "event": null,
-   "pass": false,
-   "close": 13.5
+   "pass": true,
+   "close": 14.5
   },
   {
    "rule": "cbb-spread",
@@ -3234,6 +3234,48 @@
    "event": null,
    "pass": true,
    "close": 2.5
+  },
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909920",
+   "k": "2026-11-03T03:00:00Z",
+   "slate": "nba:2026-11-02",
+   "h": "LAC",
+   "a": "TOR",
+   "mk": "spread",
+   "side": "home",
+   "line": -6.5,
+   "price": -104.0,
+   "bet": "LAC +6.5 -104",
+   "placed": "2026-11-03T02:59:28Z",
+   "stake": 0.25,
+   "edge": 3.3,
+   "ev": 0.0034,
+   "event": null,
+   "pass": false,
+   "close": -6.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401926771",
+   "k": "2026-11-03T03:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "USC",
+   "a": "Milwaukee",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -104.0,
+   "bet": "Milwaukee +26.5 -104",
+   "placed": "2026-11-03T02:59:25Z",
+   "stake": 0.25,
+   "edge": 3.3,
+   "ev": 0.0029,
+   "event": null,
+   "pass": false,
+   "close": 26.5
   },
   {
    "rule": "cbb-total",
@@ -3371,6 +3413,26 @@
    "clv": 0.0,
    "beat": 0,
    "close": 0.73
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186578",
+   "k": "2026-11-03T08:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Zolotareva",
+   "a": "Stefanini",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 277,
+   "bet": "Zolotareva ML +277",
+   "placed": "2026-11-03T02:59:30Z",
+   "stake": 0.75,
+   "edge": 14.2,
+   "ev": 0.0219,
+   "event": "Chennai Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -3791,7 +3853,7 @@
    "edge": 3.9,
    "ev": 0.0167,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 28.5
   },
   {
@@ -3812,7 +3874,7 @@
    "edge": 4.3,
    "ev": 0.0003,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 11.5
   },
   {
@@ -4378,7 +4440,7 @@
    "edge": 5.8,
    "ev": 0.003,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 45.5
   },
   {
@@ -12713,7 +12775,7 @@
    "edge": 2.2,
    "ev": 0.0098,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 144.5
   },
   {
@@ -12756,7 +12818,7 @@
    "ev": 0.0097,
    "event": null,
    "pass": false,
-   "close": 7.5
+   "close": 6.5
   },
   {
    "rule": "cbb-total",
@@ -12777,7 +12839,7 @@
    "ev": 0.0011,
    "event": null,
    "pass": false,
-   "close": 147.5
+   "close": 148.5
   },
   {
    "rule": "cbb-spread",
@@ -12818,8 +12880,8 @@
    "edge": 4.5,
    "ev": 0.0017,
    "event": null,
-   "pass": false,
-   "close": 13.5
+   "pass": true,
+   "close": 14.5
   },
   {
    "rule": "cbb-spread",
@@ -12904,6 +12966,48 @@
    "event": null,
    "pass": true,
    "close": 2.5
+  },
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909920",
+   "k": "2026-11-03T03:00:00Z",
+   "slate": "nba:2026-11-02",
+   "h": "LAC",
+   "a": "TOR",
+   "mk": "spread",
+   "side": "home",
+   "line": -6.5,
+   "price": -104.0,
+   "bet": "LAC +6.5 -104",
+   "placed": "2026-11-03T02:59:28Z",
+   "stake": 0.25,
+   "edge": 3.3,
+   "ev": 0.0034,
+   "event": null,
+   "pass": false,
+   "close": -6.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401926771",
+   "k": "2026-11-03T03:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "USC",
+   "a": "Milwaukee",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -104.0,
+   "bet": "Milwaukee +26.5 -104",
+   "placed": "2026-11-03T02:59:25Z",
+   "stake": 0.25,
+   "edge": 3.3,
+   "ev": 0.0029,
+   "event": null,
+   "pass": false,
+   "close": 26.5
   },
   {
    "rule": "cbb-total",
@@ -13041,6 +13145,26 @@
    "clv": 0.0,
    "beat": 0,
    "close": 0.73
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186578",
+   "k": "2026-11-03T08:30:00Z",
+   "slate": "tennis:2026-11-03",
+   "h": "Zolotareva",
+   "a": "Stefanini",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 277,
+   "bet": "Zolotareva ML +277",
+   "placed": "2026-11-03T02:59:30Z",
+   "stake": 0.75,
+   "edge": 14.2,
+   "ev": 0.0219,
+   "event": "Chennai Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -13461,7 +13585,7 @@
    "edge": 3.9,
    "ev": 0.0167,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 28.5
   },
   {
@@ -13482,7 +13606,7 @@
    "edge": 4.3,
    "ev": 0.0003,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 11.5
   },
   {
@@ -14048,7 +14172,7 @@
    "edge": 5.8,
    "ev": 0.003,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 45.5
   },
   {
