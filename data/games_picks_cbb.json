@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-03T10:49:52Z",
+ "asof": "2026-11-03T10:52:18Z",
  "recenter": {
   "2026-11-03": -12.77
  },
@@ -85,20 +85,20 @@
     }
    },
    "total": {
-    "n": 50,
-    "window": 50,
-    "mean": -0.0603,
+    "n": 51,
+    "window": 51,
+    "mean": -0.062,
     "t": null,
     "days": 1,
     "sd": 0.1114,
-    "cusum": 15.41,
-    "cusumMax": 16.17,
+    "cusum": 16.47,
+    "cusumMax": 16.47,
     "h": 10.0,
     "stop": true,
-    "why": "CUSUM 15.4 past 10; drift test: live worth -3.20 of the backtest's expected edge over 50 bets, 19x likelier no edge than the backtest's",
+    "why": "CUSUM 16.5 past 10; drift test: live worth -3.31 of the backtest's expected edge over 51 bets, 19x likelier no edge than the backtest's",
     "drift": {
      "mu1": 0.0174,
-     "n": 50,
+     "n": 51,
      "sd": 0.1114,
      "rho": 0.0,
      "lo": -2.944,
@@ -106,12 +106,12 @@
      "state": "paused",
      "at": [
       "2026-11-02",
-      50
+      51
      ],
-     "llr": -4.494,
-     "info": 1.22,
-     "real": -3.198,
-     "realSe": 0.907,
+     "llr": -4.728,
+     "info": 1.24,
+     "real": -3.314,
+     "realSe": 0.898,
      "need": 242
     },
     "test": "drift"
@@ -7145,7 +7145,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 15.0,
+    "raw": 14.75,
     "scale": 1.0,
     "down": 12.5
    },
@@ -7154,16 +7154,16 @@
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 26.25,
+    "raw": 25.5,
     "scale": 1.0
    },
    "2026-11-06": {
-    "raw": 4.0,
+    "raw": 5.5,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 31.5,
-    "scale": 1.0
+    "raw": 40.25,
+    "scale": 0.9938
    },
    "2026-11-08": {
     "raw": 9.75,
