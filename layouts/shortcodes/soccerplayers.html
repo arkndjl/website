@@ -6,7 +6,8 @@
        season's team goal difference (data/soccer_war_fit.json), plus his league's strength x a scale measured on
        players who changed league, so every big-five league sits on one scale; PAR = GAR x league points per goal. xMV = estimated
        market value from GAR, minutes, age, position, league and club (scripts/soccer_mv.py, data/soccer_mv_fit.json),
-       next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions.
+       next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions. Proj / 3Y = projected GAR next season and
+       over the next three (pj, p3: scripts/soccer_proj_research.py, data/soccer_proj_fit.json).
        view="stats": Understat's counting stats and per-90 rates (goals, assists, xG, npxG, xA, npxG+xA a 90, xGChain,
        xGBuildup, shots, key passes); the league picker also reaches the 13 other leagues on the page, from FotMob's
        season stats (static/data/soccer-more/<season>.json, scripts/soccer_more.py: xG with penalties in, chances
@@ -62,6 +63,8 @@
         <th data-sort="gar" data-num title="goals above replacement (the fringe of the squads at his position), on one scale across the big five: his league's strength counts">GAR</th>
         <th data-sort="par" data-num title="league points above replacement: GAR x points per goal of difference">PAR</th>
         <th data-sort="gar90" data-num title="goals above replacement a 90 minutes">/90</th>
+        <th data-sort="pj" data-num title="projected GAR next season, if he plays in the big five: this season at full-season pace, the two seasons before, minutes, age and position">Proj</th>
+        <th data-sort="p3" data-num title="projected GAR over the next three seasons (a season out of the big five counts 0)">3Y</th>
         <th data-sort="off" data-num title="attack part of GAR before replacement: his npxG, xA and xGBuildup at their weights">Off</th>
         <th data-sort="def" data-num title="defence part before replacement: team xG against with him on (keepers: goals saved vs xG faced)">Def</th>
         <th data-sort="onxgd" data-num class="nbaxpm__ph" title="team xG difference a 90 with him on the pitch (penalties out)">On xGD</th>
@@ -190,7 +193,7 @@
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'
-          : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
+          : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.pj) + '</td><td class="cfb__num">' + sg(p.p3) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
             '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
         var fv = '<td class="cfb__num">' + (p.fv ? '<b>' + p.fv + '</b>' + (p.prov ? '<span class="cfb__dim" title="provisional grade">*</span>' : '') : '<span class="cfb__dim">–</span>') + '</td>';
         return head + mid + fv + '<td class="cfb__g">' + (p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
