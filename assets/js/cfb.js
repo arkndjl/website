@@ -12,7 +12,8 @@
                ['context', 'schedule strength; team strength (SRS); supporting cast (QB, RB, WR, TE: teammate talent); actual vs expected (play-by-play: targets, QB, down and distance, opponent)']];
   // the steps from the composite to the headline (fetch_cfb.mjs fvSteps), in FV
   var STEPS = { g: ['scarcity grade', 'the composite as a z within the position (fixed reference pool) x its reliability, read as an expected NFL rank per class, graded on the position\'s NFL outcome tiers'],
-    fr: ['NFL frame', 'height and weight vs drafted NFL players at the position (combine norms)'], yr: ['years in college', 'per year past three on campus (twice at QB and S)'],
+    fr: ['NFL frame', 'height and weight vs drafted NFL players at the position (combine norms)'],
+    ht: ['height at his spot', 'measured height vs drafted NFL players at the position he projects to (QB to LB)'], yr: ['years in college', 'per year past three on campus (twice at QB and S)'],
     cs: ['consensus boards', 'pull toward the grade the industry board rank implies, by the share of boards that rank him'], hl: ['injury', 'out for the season (ACL, Achilles: more)'],
     kp: ['specialist grade', 'K: field goal points over expected, long, XP%. P: punt value, gross average, inside the 20, career net yards over expected a punt. On the specialist scale (25-50)'],
     b: ['base', 'the backup fit\'s grade for the position and division before the parts below'], ac: ['class + age', 'years in college and age for the class'], pd: ['pedigree', '247 composite recruiting rating'],
@@ -132,6 +133,22 @@
       return m.pos + (m.how === 'played' ? ' (played ' + yrs(m.seasons) + ', ' + m.snaps + ' snaps' + (m.odds != null ? '; ' + Math.round(m.odds * 100) + '% NFL fit' : '') + ')' : ' (' + Math.round(m.odds * 100) + '% NFL fit)');
     }).join(' · ');
   }
+  // measured size (scripts/cfb_measure.mjs): r.mz = [ht, wt, BMI, group, ESPN ht, ESPN wt, 247 class, 247 ht, 247 wt, On3 ht,
+  // On3 wt]; the hover names each source with its weight (MEASURE, from cfb-all.json) and the fit's error
+  var MEASURE = null;
+  function ftq(h) { return h == null ? '—' : Math.floor(h / 12) + '-' + +(h % 12).toFixed(2); }
+  function measCell(r) {
+    var z = r.mz;
+    if (!z) return '<td class="cfb__num">' + dim + '</td>';
+    var pat = z[4] != null && z[7] != null ? 'rh' : z[4] != null ? 'r' : 'h', w = MEASURE && MEASURE[z[3]] && MEASURE[z[3]][pat], t = [];
+    var pw = function (k, i) { return w ? ' (ht ' + w.ht[i] + '%, wt ' + w.wt[i] + '%)' : ''; };
+    if (z[4] != null || z[5] != null) t.push('ESPN ' + ftq(z[4]) + ', ' + (z[5] || '—') + pw('r', 0));
+    if (z[7] != null || z[8] != null) t.push('247 ' + (z[6] || '') + ' ' + ftq(z[7]) + ', ' + (z[8] || '—') + pw('hs', 1));
+    if (w) t.push(z[3] + ' combine mean ' + ftq(w.mean[0]) + ', ' + w.mean[1] + pw('prior', 2));
+    if (z[9] != null || z[10] != null) t.push('On3 ' + ftq(z[9]) + ', ' + (z[10] || '—') + ' (not used)');
+    var tip = 'measured ' + ftq(z[0]) + ' (' + z[0] + ' in), ' + z[1] + ' lb, BMI ' + f1(z[2]) + (w ? ' · ±' + w.sd[0] + ' in, ±' + w.sd[1] + ' lb' : '') + ' = ' + t.join(' · ');
+    return '<td class="cfb__num"><span title="' + esc(tip) + '">' + z[0] + ' / ' + z[1] + ' <span class="cfb__dim">· ' + f1(z[2]) + '</span></span></td>';
+  }
   function rowHtml(r, rk, opt, prk) {
     prk = prk || r.posRank;
     opt = opt || {};
@@ -171,7 +188,7 @@
         '<td class="cfb__num cfb__now">' + (r.znil != null ? '<span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : dim) + '</td>' : '') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
       '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(2) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—') + '</td>' +
-      '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td></tr>';
+      '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td>' + measCell(r) + '</tr>';
   }
 
   // FV inputs: the composite's weighted feeders (graded players), then each step from the composite to the headline in
@@ -248,7 +265,7 @@
     fv: function (r) { return r.fv == null ? null : r.fv * 1000 + (r.plus ? 500 : 0) + (r.fvx != null ? r.fvx : r.fv); },
     delta: function (r) { return typeof r.delta === 'number' ? r.delta : null; }, pos: function (r) { return r.pos + String(r.ovr || 999999).padStart(6, '0'); },   // position, then FV order in it (the rank shown counts FBS and FCS together)
     team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
-    age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
+    age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; }, mht: function (r) { return r.mz ? r.mz[0] : null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
     up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, xfer: function (r) { return r.transferP; },
     war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, xv: function (r) { return r.xv; },
@@ -423,6 +440,7 @@
     if (!DATA) DATA = Promise.all([json(src), json(src.replace(/cfb-all\.json$/, 'cfb-past.json')).catch(function () { return null; })]).then(function (res) {
       var d = res[0], past = res[1];
       DK = d.dk || null;
+      MEASURE = d.measure || null;
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
       // photo 1 = ESPN's standard headshot for his ESPN id (scripts/fetch_cfb.mjs photoCode)
       recs.forEach(function (r) { if (r.photo === 1) { var m = /\/id\/(\d+)/.exec(r.espnl || ''); r.photo = m ? 'https://a.espncdn.com/i/headshots/college-football/players/full/' + m[1] + '.png' : null; } });

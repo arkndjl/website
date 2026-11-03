@@ -25,6 +25,9 @@
 //   combine testing x1.6 (last seasons). Together: AV r .513 -> .520 pooled, .507 -> .525 within position; draft slot
 //   .577 -> .590 and .586 -> .610. Production by position, pedigree, team, class, SOS, breakout, badges, frame and years
 //   past three all refit within noise of today's weights (reverting them costs nothing).
+// Nov 3 2026: the in-position height term (scripts/cfb_frame.mjs heightFV, key height, FV points like frame) is in
+// grade() at the live weight (multiplier 1), on the measured height (scripts/cfb_measure.mjs: cfbfastR listing + the 247
+// listing parsed below); its test is scripts/cfb_measure_fv.py on the --alltime grades
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,6 +37,8 @@ import { pastAtMean } from './fv_dist.mjs';
 import { fvOf } from './fv_scale.mjs';
 import { NFLPOS, famOf } from './cfb_nflpos.mjs';
 import { Matcher, teamKey } from './names.mjs';
+import { heightFV } from './cfb_frame.mjs';
+import { measureOf } from './cfb_measure.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SP = path.join(ROOT, 'scripts', '.cache', 'statplus'), SRC = path.join(ROOT, 'scripts', '.cache', 'sources');
@@ -180,7 +185,9 @@ for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST || ALLTIME ? 2025 : 2021); y
   for (const x of items) {
     const g = p => (x.match(p) || [])[1], sc = g(/class="score">([\d.]+)/), name = g(/name-link"[^>]*>([^<]*)/); if (!sc || !name) continue;
     const stars = (x.match(/icon-starsolid yellow/g) || []).length, sch = g(/class="img-link"[^>]*>\s*<img alt="([^"]*)"/) || '';
-    (rec[nm(name.replace(/&#39;/g, "'"))] ||= []).push({ y, rating: +sc, stars, school: school(sch), sraw: sch, rank: ++rk });
+    // the listing (6-4.5 / 215) for the measured height (scripts/cfb_measure.mjs)
+    const mt = (x.match(/class="metrics">\s*(\d)-(\d+(?:\.\d+)?)\s*\/\s*(\d+)/) || []);
+    (rec[nm(name.replace(/&#39;/g, "'"))] ||= []).push({ y, rating: +sc, stars, school: school(sch), sraw: sch, rank: ++rk, ht: mt[1] ? +mt[1] * 12 + +mt[2] : null, wt: mt[3] ? +mt[3] : null });
   }
 }
 // rosters (height, weight, ESPN class) and team schedules (games, start-of-season Elo)
@@ -550,6 +557,8 @@ for (const g of GP) {
         g, s, id: r.id, name: r.name, final: last === s, last, lastRow: by[last], row: r, marcel: a / (d + CUR.K), hist, snapsN: r._v,
         share: g === 'RB' && num(r.share) != null ? Math.min(1, r.share / 100) : r._v ? Math.min(1, r._v / side) : null,
         rating: rc?.rating ?? null, stars: rc?.stars ?? 0, walkOn: !rc, years, ht: rl?.ht ?? null, wt: rl?.wt ?? null,
+        // measured height (ESPN listing + 247 listing) for the in-position height term (cfb_frame.mjs heightFV)
+        mht: measureOf({ g, espnHt: rl?.ht ?? null, espnWt: rl?.wt ?? null, recHt: rc?.ht ?? null, recWt: rc?.wt ?? null, recYear: rc?.y ?? null }, s)?.ht ?? null,
         team: elo[s][sch] ?? null, sos: num(r.sos), breakYear: visible && brk ? brk - rc.y + 1 : null, breakKnown: !!visible,
         badge: Object.fromEntries(Object.keys(bz).map(k => [k, bz[k].get(r) ?? null])),
         cr: candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg),
@@ -650,14 +659,14 @@ if (process.argv.includes('--xcov')) for (const k of [...X_KEYS, ...N1_KEYS]) {
 // ---- grading under a set of multipliers ---------------------------------------------------------------------
 // M: multiplier per driver (1 = today). prod_<g> scales FV_PROD_POS, the rest scale one constant each
 const KEYS = ['prod_QB', 'prod_RB', 'prod_WR', 'prod_TE', 'prod_EDGE', 'prod_DL', 'prod_LB', 'nonBlue', 'hs', 'team', 'age', 'ageY', 'ageO', 'cls', 'snap', 'sos', 'brk',
-  'b_QB_accurate', 'b_QB_deep', 'b_RB_catcher', 'b_TE_catcher', 'b_DL_runstop', 'b_LB_tackler', 'ath', 'athCap', 'frame', 'years', ...(WIDE ? ['prodBox', 'hsBox'] : [])];
+  'b_QB_accurate', 'b_QB_deep', 'b_RB_catcher', 'b_TE_catcher', 'b_DL_runstop', 'b_LB_tackler', 'ath', 'athCap', 'frame', 'height', 'years', ...(WIDE ? ['prodBox', 'hsBox'] : [])];
 const ONE = Object.fromEntries(KEYS.map(k => [k, 1]));
 // these change the FV scale's absolute level, not just the order within a position, so they can't be pinned by
 // re-normalizing: frame and years are FV points after the scarcity grade
 // prodBox, hsBox (--wide): production's and pedigree's weights in the 2014-18 seasons, on box-score stand-ins, relative
 // to the PFN seasons. Nuisances every fit gets, so the other drivers aren't asked to make up for a noisier production
 // read, and pedigree (which stands in for production when production is noisy) is fit on PFN seasons. Never shipped
-const PROD = G7.map(g => 'prod_' + g), FVPTS = new Set(['frame', 'years', 'prodBox', 'hsBox']);
+const PROD = G7.map(g => 'prod_' + g), FVPTS = new Set(['frame', 'height', 'years', 'prodBox', 'hsBox']);
 // the composite is standardized within each position, so scaling every composite term by one factor changes nothing:
 // composite multipliers count relative to the mean production multiplier (frame and years are FV points, not scaled)
 function effective(M) { const s = mean(PROD.map(k => M[k])); return Object.fromEntries(KEYS.map(k => [k, FVPTS.has(k) ? M[k] : M[k] / s])); }
@@ -701,7 +710,7 @@ function grade(M0, set = rows, posM = null, only = null) {
         T.ageY = a > 0 ? M.age * ageZ : 0; T.ageO = a > 0 ? 0 : M.age * ageZ; T.cls = M.cls * cls; T.snap = M.snap * clamp(CUR.snap.w * p.shareZ, CUR.snap.cap);
         T.sos = g === 'QB' ? M.sos * clamp(CUR.sos.perSd * p.sosZ, CUR.sos.cap) : 0; T.brk = M.brk * brk; T.ath = athT;
         for (const [k, w] of Object.entries(CUR.badge[g] || {})) T[`b_${g}_${k}`] = p.badge[k] != null ? w * M[`b_${g}_${k}`] * p.badge[k] : 0;
-        T.frame = M.frame * frameFV(g, p.ht, p.wt); T.years = -M.years * Math.max(0, p.years - 3) * (g === 'QB' ? 2 : 1);
+        T.frame = M.frame * frameFV(g, p.ht, p.wt); T.height = M.height * heightFV(g, g, p.mht, CAL.size); T.years = -M.years * Math.max(0, p.years - 3) * (g === 'QB' ? 2 : 1);
       }
     }
     const m = mean(P.map(p => p._comp)), sd = sdv(P.map(p => p._comp)), r = RELI[g], N = N26[g];
@@ -709,7 +718,8 @@ function grade(M0, set = rows, posM = null, only = null) {
       if (p.av == null) continue;
       const t = r * ((p._comp - m) / sd + (POS_SHIFT[g] ?? 0) * FV_POS_STRENGTH);
       const base = fvFromRank(Math.max(0.5, N * (1 - phi(t))) / 4, g, N / 4);
-      const fm = Math.max(20, Math.min(80, base + M.frame * frameFV(g, p.ht, p.wt) - M.years * Math.max(0, p.years - 3) * (g === 'QB' ? 2 : 1)));
+      // height: the in-position height term (Nov 3 2026, scripts/cfb_measure_fv.py), live weight at 1
+      const fm = Math.max(20, Math.min(80, base + M.frame * frameFV(g, p.ht, p.wt) + M.height * heightFV(g, g, p.mht, CAL.size) - M.years * Math.max(0, p.years - 3) * (g === 'QB' ? 2 : 1)));
       const fc = p.dt ? fm + (consFV(p.dt) - fm) * CUR.cons : fm;
       out.set(p, { fm, fc });
     }

@@ -57,7 +57,8 @@ import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
 // read it); the files carry it on the stretched scale, via FVR (and val() for cfb-all)
 import { fvOf, fvReplacer } from './fv_scale.mjs';
 const FVR = fvReplacer('cfb');
-import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
+import { frameFV as frameFVOf, heightFV, bmiOf, inchesOf } from './cfb_frame.mjs';
+import { measureOf, measureWeights } from './cfb_measure.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -1051,8 +1052,15 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   };
   const clamp = (x, c) => Math.max(-c, Math.min(c, x));
   for (const p of players) {
-    p.htIn = inches(p.on3?.ht) ?? inches(p.espn?.ht) ?? (p.rec?.ht || null);
-    p.wtLb = p.on3?.wt || p.espn?.wt || p.rec?.wt || null;
+    // the ESPN listing first (Nov 3 2026): it is the listing frameFV, the move model and the FV harness were fit on.
+    // On3's, read first until now, is a recruiting-era listing on most of the board's On3 rows (90% differ from ESPN,
+    // 15.6 lb lighter on average), and frame on a recruiting listing scores worse held out (scripts/cfb_measure_fv.py
+    // hs247: t -3.1, 1 of 10 classes)
+    p.htIn = inches(p.espn?.ht) ?? inches(p.on3?.ht) ?? (p.rec?.ht || null);
+    p.wtLb = p.espn?.wt || p.on3?.wt || p.rec?.wt || null;
+    // measured (combine-equivalent) size from the ESPN and 247 listings (scripts/cfb_measure.mjs)
+    p.meas = measureOf({ g: p.g, espnPos: p.espn?.pos, espnHt: inches(p.espn?.ht), espnWt: p.espn?.wt || null, recHt: p.rec?.ht || null,
+      recWt: p.rec?.wt || null, recYear: p.rec?.year || null, on3Ht: inches(p.on3?.ht), on3Wt: p.on3?.wt || null }, SEASON);
   }
   for (const p of players) p.bmi = bmiOf(p.htIn, p.wtLb);
   const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
@@ -1479,13 +1487,15 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // dropping it entirely ranks as well but over-grades 6th-year players, half keeps every years-on-campus band
       // calibrated (5th years were under-graded: .115 promised vs .192 AV a season realized; now .151)
       p.frameFV = Math.round(frameFV(p) * 10) / 10;
+      // in-position height (scripts/cfb_frame.mjs heightFV): measured height at the spot he projects to
+      p.htFV = Math.round(heightFV(g, p.move?.to || g, p.meas?.ht, CAL.size) * 10) / 10;
       const extra = Math.max(0, (p.cls?.years ?? 3) - 3);
       p.yearsFV = -FV_YEARS_W * extra * (g === 'QB' || g === 'S' ? 2 : 1);
       // fvx: the unrounded grade, carried through every adjustment below; it breaks ties within a displayed FV
-      p.fvx = Math.max(20, Math.min(80, p.fvBase + p.frameFV + p.yearsFV));
+      p.fvx = Math.max(20, Math.min(80, p.fvBase + p.frameFV + p.htFV + p.yearsFV));
       p.fv = Math.round(p.fvx);
       // the grade's steps for the FV inputs dropdown (fvSteps at write: + the 20-80 limits, mean outcome, returns)
-      p.fvs = [['g', p.fvBase], ['fr', p.frameFV], ['yr', p.yearsFV]];
+      p.fvs = [['g', p.fvBase], ['fr', p.frameFV], ['ht', p.htFV], ['yr', p.yearsFV]];
       p.posRank = i + 1;
     });
   }
@@ -1774,7 +1784,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       team: p.team, tid: p.tid || null, logo: p.logo, color: p.color, conf: p.conf, div: p.div,
       cls: p.cls?.label ?? null, elig: p.cls?.elig ?? null, rs: !!p.cls?.label?.startsWith('RS'),
       age: p.age, ageEst: p.age == null && p.ageEst != null ? r1(p.ageEst) : null, dob: p.dob,
-      ht: p.on3?.ht || p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: p.on3?.wt || p.espn?.wt || null,
+      ht: p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || p.on3?.ht || null, wt: p.espn?.wt || p.on3?.wt || null,
+      // measured (scripts/cfb_measure.mjs mz): [ht to a quarter inch, wt, BMI, group, ESPN ht, wt, 247 class, ht, wt, On3 ht, wt]
+      mz: p.meas?.mz ?? null,
       pfn: p.pfn, pfnLabel: p.label, snaps: p.snaps, gp: p.gp,
       on3: on3g, on3Rank: p.on3?.overallRank ?? null, on3PosRank: p.on3?.posRank ?? null,
       hsStars: p.on3?.hsStars ?? null, hsGrade: p.on3?.hsGrade ?? null, transfer: p.on3?.transfer ?? null,
@@ -1794,8 +1806,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
-      parts: [p.talentTerm, p.prodW * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj + p.oeZ, p.frameFV / 10].map(r2),
-      fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV, fvs: p.fvs ?? null, retFV: p.retFV ?? null,
+      parts: [p.talentTerm, p.prodW * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj + p.oeZ, (p.frameFV + (p.htFV || 0)) / 10].map(r2),
+      fvBase: p.fvBase, frameFV: p.frameFV, htFV: p.htFV ?? null, yearsFV: p.yearsFV, fvs: p.fvs ?? null, retFV: p.retFV ?? null,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
       bmi: p.bmi ? r1(p.bmi) : null,
@@ -1948,10 +1960,11 @@ function scoutReport(p) {
   }
   // schedule and frame
   if (Math.abs(p.sosZ) >= 0.12) (p.sosZ > 0 ? plus : minus).push(`SOS ${comp(p.sosZ)}`);   // QBs only (see sosZ)
-  const frame = [p.on3?.ht || p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, ''), p.wtLb ? `${p.wtLb} lb` : null,
+  const frame = [p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || p.on3?.ht, p.wtLb ? `${p.wtLb} lb` : null,
     p.bmi ? `BMI ${p.bmi.toFixed(1)}` : null].filter(Boolean).join(', ');
   // the frame FV counts is frameFV (size against drafted NFL players at the position); sizeZ isn't in the composite
   if (Math.abs(p.frameFV ?? 0) >= 0.5) (p.frameFV > 0 ? plus : minus).push(`NFL frame ${frame} (${sg(p.frameFV, 1)} FV)`);
+  if (Math.abs(p.htFV ?? 0) >= 0.5) (p.htFV > 0 ? plus : minus).push(`height ${Math.floor(p.meas.ht / 12)}-${p.meas.ht % 12} measured, at ${p.move?.to || p.g} (${sg(p.htFV, 1)} FV)`);
   // playing time, QBR, class, availability, consensus
   if (p.snapShare != null && (p.snaps ?? 0) >= 100) {
     const pc = Math.round(p.snapShare * 100);
@@ -2470,7 +2483,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk', 'fvs'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk', 'fvs', 'mz'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
@@ -2518,7 +2531,7 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
   const val = (r, c) => c === 'fvs' ? fvSteps(r) : c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : c === 'fv' && r.fv != null ? fvOf('cfb', r.fvx, r.fv) : r[c] ?? null;
   // two files (scripts/cfb_all.mjs): the table's columns in cfb-all.json, the scouting report's in cfb-detail.json
-  const size = writeCfbAll({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) }, ROOT);
+  const size = writeCfbAll({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))), measure: measureWeights() }, ROOT);
   writeComps(rows.filter(r => r._comp).map(r => ({ key: `${r.name}|${r.team}`, ...r._comp })), COMPS_OUT);
   // Cloudflare Pages refuses any one file over 25 MiB, and the whole deploy with it
   for (const [k, b] of Object.entries(size)) { const mib = b / 2 ** 20;
