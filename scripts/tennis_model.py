@@ -708,6 +708,34 @@ def fair(p):
     return int(round(-100 * p / (1 - p))) if p >= 0.5 else int(round(100 * (1 - p) / p))
 
 
+PROJ_FIT = os.path.join(ROOT, 'data', 'tennis_proj_fit.json')
+
+
+def proj_inputs(rows, today):
+    """(the kept projection coefficients {tour: {months: {ark | elo: c}}}, matches per player in 52 weeks). The 52 weeks
+    end at the last Challenger / ITF match on file: since the Sackmann archive froze (Jun 2026) only tour-level
+    matches come in, so a live count would miss lower-level volume the fit's counts had"""
+    try:
+        f = json.load(open(PROJ_FIT))
+    except (OSError, ValueError):
+        return {}, {}
+    out = {}
+    for tour, tv in f.get('tours', {}).items():
+        for h, o in tv.get('h', {}).items():
+            for tgt in ('ark', 'elo'):
+                if (f.get('keep', {}).get(tour, {}).get(h) or {}).get(tgt) == 'proj':
+                    out.setdefault(tour, {}).setdefault(h, {})[tgt] = o[tgt]['c']['proj']
+    low = max((r[0] for r in rows if r[2] in ('C', 'S')), default=0)
+    end = min(int(today.strftime('%Y%m%d')), int((ymd(low) + dt.timedelta(days=7)).strftime('%Y%m%d')) if low else 99999999)
+    lo = end - 10000
+    n52 = {}
+    for r in rows:
+        if lo < r[0] <= end:
+            for p in (r[7], r[8]):
+                n52[p] = n52.get(p, 0) + 1
+    return out, n52
+
+
 def build(rows, players, tn):
     import tennis_data as T
     fitp = {}
@@ -733,6 +761,7 @@ def build(rows, players, tn):
     old = old or {}
     raw = raw52(rows, since)
     export_ratings(m, players, tday, raw)
+    proj_fit, n52 = proj_inputs(rows, today)
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'tours': {}}
     shown = set()
     allrk = {}
@@ -792,6 +821,19 @@ def build(rows, players, tn):
                 '_b': (st[7], st[0], e[2]['G'][0] - e[2]['H'][0], rw.get('sG', 0))})
         rowsout.sort(key=lambda r: -r['ark'])
         for i, r in enumerate(rowsout): r['rk'] = i + 1
+        # forward projection (scripts/tennis_proj_research.py -> data/tennis_proj_fit.json): ARK and Elo 12 / 24 / 36
+        # months on from logit ARK (Elo over the top-50 mean), age, matches in 52 weeks, career matches and rank
+        for r in rowsout:
+            for h, o in (proj_fit.get(tour) or {}).items():
+                if r['age'] is None: continue
+                a = (r['age'] - 26) / 5
+                v = [a, a * a, math.log1p(n52.get(r['id'], 0)), math.log1p(r['nm']),
+                     math.log(r['rank']) if r['rank'] else math.log(1500), 0.0 if r['rank'] else 1.0]
+                for tgt, x in (('ark', logit(min(max(r['ark'], 1e-4), 1 - 1e-4))), ('elo', r['elo'] - m.elo[ref][0])):
+                    c = o.get(tgt)
+                    if not c: continue
+                    z = c[0] + c[1] * x + sum(b * u for b, u in zip(c[2:], v))
+                    r[('pj' if tgt == 'ark' else 'pe') + h] = round(sig(z), 4) if tgt == 'ark' else round(m.elo[ref][0] + z)
         # predictive badges (scripts/tennis_badges.py): only those that beat next season's Elo change held out with
         # Elo, ARK and age fixed (scripts/tennis_badge_backtest.py); pool = the tour's top 300 by ARK
         import numpy as np

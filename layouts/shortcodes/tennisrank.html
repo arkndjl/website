@@ -13,6 +13,7 @@
   <thead><tr>
     <th>RK</th><th>Player</th>
     <th title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ printf "%.0f" (mul (index $t.mix $s) 100) }}%{{ end }})">ARK</th>
+    <th title="projected ARK in 12 months if still active: from ARK, age, matches in the last 52 weeks, career matches and official rank, fit on {{ $tl }} top-300 boards each quarter end 2006-25 (cell: 24 and 36 months, projected Elo)">Proj</th>
     <th title="win chance against the average top-50 player on hard courts (best of three)">Hard</th>
     <th title="win chance against the average top-50 player on clay">Clay</th>
     <th title="win chance against the average top-50 player on grass">Grass</th>
@@ -32,6 +33,7 @@
     <td class="cfb__rk">{{ .rk }}</td>
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ partial "badges.html" (dict "b" .bdg "of" "next season's Elo") }}</td>
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
+    <td class="cfb__num" data-v="{{ .pj12 | default 0 }}"{{ with .pj24 }} title="24 mo {{ printf "%.1f" (mul . 100) }} · 36 mo {{ printf "%.1f" (mul ($r.pj36 | default 0) 100) }} · Elo {{ $r.pe12 }} (12 mo)"{{ end }}>{{ with .pj12 }}{{ printf "%.1f" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .pH }}">{{ printf "%.0f" (mul .pH 100) }}% <span class="cfb__dim">#{{ .rkH }}</span></td>
     <td class="cfb__num" data-v="{{ .pC }}">{{ printf "%.0f" (mul .pC 100) }}% <span class="cfb__dim">#{{ .rkC }}</span></td>
     <td class="cfb__num" data-v="{{ .pG }}">{{ printf "%.0f" (mul .pG 100) }}% <span class="cfb__dim">#{{ .rkG }}</span></td>
@@ -48,5 +50,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. Badges (medals by the name): traits that predicted next season's Elo change with Elo, ARK and age held fixed, 2006-24 year-ends, t clustered by player, each season held out; ATP Big Server (aces a serve point) and Grass Court (grass Elo over hard-court Elo) pass; return points, first and second serve, break points saved and converted, tiebreaks and clay are noise or add nothing, and no WTA trait passes (scripts/tennis_badge_backtest.py). %d active players, top %d shown." $tl (int $t.active) (len $t.players))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. Badges (medals by the name): traits that predicted next season's Elo change with Elo, ARK and age held fixed, 2006-24 year-ends, t clustered by player, each season held out; ATP Big Server (aces a serve point) and Grass Court (grass Elo over hard-court Elo) pass; return points, first and second serve, break points saved and converted, tiebreaks and clay are noise or add nothing, and no WTA trait passes (scripts/tennis_badge_backtest.py). Proj: ARK 12 months on (24 and 36 in the cell hover) for players still active, from logit ARK, age, age squared, matches in the last 52 weeks, career matches and rank; fit on the top 300 at every quarter end 2006-25, each year held out: ATP RMSE in logit ARK .477 to .462 against the rating held flat with the age term (t -18.8 by player, 15 of 19 years), WTA .509 to .500 (t -16.0, 11 of 19) (scripts/tennis_proj_research.py). %d active players, top %d shown." $tl (int $t.active) (len $t.players))) -}}
 {{- end -}}
