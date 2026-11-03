@@ -5,7 +5,7 @@
        {{< cfbboard title="..." tab="all FCS" preset="fcs" >}}       FCS players only (move-up odds column)
        {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
        {{< cfbboard title="..." tab="ARKLIST" preset="star" >}}       only starred players (cfb_manual.json stars)
-       {{< cfbboard title="..." tab="WAR leaders" preset="war" >}}   everyone, ranked by WAA (RK and position rank by WAA; WAR column beside it)
+       {{< cfbboard title="..." tab="WAA/WAR" preset="war" >}}   everyone, ranked by WAA (RK and position rank by WAA; WAR column beside it)
        Filters (year, position, team, class, age, FV, conference; year: a past season's grades from
        static/data/cfb-past.json, ranked within that season, on the all / FBS / FCS boards), click-to-sort headers, a scouting report
        when a name is clicked, GFX export, and the filters kept in the address (#all:pos=QB). */ -}}
@@ -22,7 +22,7 @@
 {{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" }}{{ $yrOn := in (slice "" "fbs" "fcs") $preset -}}
 {{- $s := 2026 }}{{ with $d }}{{ $s = int .season }}{{ end -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}" data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,WAA,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -44,7 +44,7 @@
       {{- range $groups }}<button type="button" class="cfb__chip cfb__chip--grp" data-pos="{{ index . 0 }}" aria-pressed="false" title="{{ index . 1 }}">{{ index . 0 }}</button>{{ end -}}
     </fieldset>
     {{- if or (eq $preset "") (eq $preset "war") }}
-    {{- /* WAR leaders open on FBS: FCS WAR is counted against FCS starters, so the two don't rank on one scale */}}
+    {{- /* WAA/WAR opens on FBS: FCS WAR is counted against FCS starters, so the two don't rank on one scale */}}
     <label class="cfb__field"><span>division</span><select name="div">
       <option value="">FBS + FCS</option><option{{ if eq $preset "war" }} selected{{ end }}>FBS</option><option>FCS</option>
     </select></label>
@@ -98,8 +98,8 @@
         <th data-sort="rk" data-num{{ if ne $preset "war" }} aria-sort="ascending"{{ end }}{{ if eq $preset "war" }} title="rank by WAA among the players in view"{{ end }}>RK</th>
         <th data-sort="name">Player</th>
         {{- if eq $preset "war" }}
-        <th data-sort="war" data-num class="cfb__war" title="college WAR = wins a 12-game season over a replacement starter = snap share x (line + weight x quality) x .227; quality from Stat+, badges, FV. line = margin lost when an average starter at the spot sits (OT / IOL, slot WR, nickel CB): QB 2.7 pts a game (regular seasons 2019-25), others .8-1.7; blend of missed games, NFL spot values, position grade. QB production partly credited to offensive teammates. 4.4 pts of margin a game = 1 win. K, P: points over an average K / P. FCS: vs FCS starters. no snaps = 0">WAR</th>
-        <th data-sort="waa" data-num aria-sort="descending" title="WAA = WAR - snap share x line: wins over an average starter at the position, same snaps; comparable across positions; below average &lt; 0">WAA</th>
+        <th data-sort="waa" data-num class="cfb__war" aria-sort="descending" title="WAA = WAR - snap share x line: wins over an average starter at the position, same snaps; comparable across positions; below average &lt; 0">WAA</th>
+        <th data-sort="war" data-num title="college WAR = wins a 12-game season over a replacement starter = snap share x (line + weight x quality) x .227; quality from Stat+, badges, FV. line = margin lost when an average starter at the spot sits (OT / IOL, slot WR, nickel CB): QB 2.7 pts a game (regular seasons 2019-25), others .8-1.7; blend of missed games, NFL spot values, position grade. QB production partly credited to offensive teammates. 4.4 pts of margin a game = 1 win. K, P: points over an average K / P. FCS: vs FCS starters. no snaps = 0">WAR</th>
         <th data-sort="xv" data-num title="XV = WAR with quality measured by the parts of the stat line that track winning (same lines, 12-game pace): PFN score plus QB completion %, yds an attempt, INT rate, rush yds; RB yds a carry, elusiveness; OL run block, pressure rate allowed; EDGE / DT sacks and splash plays a snap; LB passer rating allowed, pressures; CB rating and yds a target allowed; S plays on the ball. Fit on 2024-25 team margin. Held-out seasons: team XV tracks margin r .88 vs .86 for WAR's quality, win% .73 vs .68, defense .73 vs .69">XV</th>
         {{- end }}
         <th data-sort="pos" title="position + rank at position by FV (QB3 = 3rd QB); sorts by position, then rank">Pos</th>

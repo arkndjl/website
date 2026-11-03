@@ -11,12 +11,12 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAA/WAR,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
-{{< cfbboard title="WAR leaders :: college WAR, FBS + FCS" tab="WAR leaders" preset="war" >}}
+{{< cfbboard title="WAA/WAR :: college, FBS + FCS" tab="WAA/WAR" preset="war" >}}
 {{< lazytab tab="specialists" >}}
 {{< streturners sport="cfb" title="specialists :: returners, yards over expected" tab="specialists" >}}
 {{< /lazytab >}}
