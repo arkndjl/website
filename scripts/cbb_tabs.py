@@ -29,6 +29,8 @@ Definitions
            norms (same pool, LIVE_MIN players a position or the 2025-26 norms): early-season BPM spreads wider (sd
            4.4-5.5 through 8 games against 3.5-4.4 a full season), and its own norms cut the error against the
            full-season Stat+ by about a third (10 of 10 seasons, scripts/cbb_war_research_nov03.py).
+    Next   next season's WAR at 31 games (scripts/cbb_next.py; fit by scripts/cbb_next_research.py): 2025-26 rows from
+           the 2025-26 line (scripts/data/cbb_next_2027.json), this season's from the line to date on the in-season grid.
     Game Score   Hollinger: PTS + .4 FGM - .7 FGA - .4 (FTA - FTM) + .7 ORB + .3 DRB + STL + .7 AST + .7 BLK - .4 PF - TOV.
 """
 import datetime as dt
@@ -43,6 +45,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import cbb_data as D
+import cbb_next as NXT
 
 SEASON, LAST = 2027, 2026
 SD = os.path.join(ROOT, 'static', 'data')
@@ -252,6 +255,9 @@ def main():
     tg = defaultdict(set)
     for g in games: tg[g[GC['team']]].add(g[GC['muid']])
     gnow = statistics.median([len(v) for v in tg.values()]) if tg else 0     # median team games so far
+    # next season's WAR (scripts/cbb_next.py): last season's rows from the 2025-26 line, this season's from the line to date
+    nx_last = json.load(open(os.path.join(HERE, 'data', f'cbb_next_{SEASON}.json')))['war']
+    nx_now = NXT.live(games, json.load(gzip.open(PRIOR)), SEASON, GC)
     t2e = {k: v[0] for k, v in bt.items()}
     e2t = {v[0]: k for k, v in bt.items()}
     asof = now()
@@ -291,13 +297,14 @@ def main():
         s = {'gp': L['gp'], 'mp': round(mins), 'mpg': L['mpg'], 'pts': L.get('ppg'), 'reb': L.get('rpg'), 'ast_g': L.get('apg'), 'bpm': L['bpm'],
              'obpm': L['obpm'], 'dbpm': L['dbpm'], 'ortg': L['ortg'], 'usg': L['usg'], 'ts': L.get('ts'), 'tp': L['tp'] if L.get('tpa') else None,
              'tpa': L.get('tpa'), 'ft': L.get('ft'), 'astp': L.get('ast'), 'to': L.get('to'), 'stl': L.get('stl'), 'blk': L.get('blk'),
-             'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(L['bpm'], mins), 2), 'waa': r1(war(L['bpm'], mins, 0), 2)}
+             'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(L['bpm'], mins), 2), 'waa': r1(war(L['bpm'], mins, 0), 2),
+             'nx': r1(nx_now.get((r['name'], r['team'])), 2)}
         now_rows.append(srow(r['name'], r['team'], r['pos'], age(r), r['conf'], r.get('photo'), r.get('logo'), s, r['fv'], norms_now))
     last_rows = []
     for l in F['lines']:
         r = by_pid.get(l['pid'])
         tm, lo, cf = esp(l['bt'])
-        last_rows.append(srow(l['n'], tm, r['pos'] if r else l['pos'], None, l['conf'], r.get('photo') if r else None, lo, l['s'], r['fv'] if r else None))
+        last_rows.append(srow(l['n'], tm, r['pos'] if r else l['pos'], None, l['conf'], r.get('photo') if r else None, lo, {**l['s'], 'nx': nx_last.get(l['pid'])}, r['fv'] if r else None))
     stat_cols = [col('splus', 'Stat+', 'Stat+ = 100 + 25 z; z = BPM against his position\'s (G, F, C) minutes-weighted mean and sd that season (2025-26 until this season has 40 a position), players with 10%+ of team minutes', '0'),
                  col('pts', 'PTS', 'points a game'), col('reb', 'REB', 'rebounds a game'), col('ast_g', 'AST', 'assists a game'),
                  col('bpm', 'BPM', 'Barttorvik box plus-minus: points a 100 possessions over an average D-I player', 's1'),
@@ -323,12 +330,13 @@ def main():
     wcols = [col('war', 'WAR', f"wins over a replacement player: (BPM + {-REPL:.0f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); replacement = the 9th man's BPM", 's2'),
              col('waa', 'WAA', 'wins over an average D-I player: BPM x the same minutes and pace', 's2'),
              col('bpm', 'BPM', 'Barttorvik box plus-minus', 's1'), col('splus', 'Stat+', 'BPM against his position, 100 + 25 z', '0'),
+             col('nx', 'Next', "next season's WAR at 31 games, if he plays D-I: from this line (to date: by share of games played), the 3-year BPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
              col('mpg', 'MPG', 'minutes a game'), col('gp', 'G', 'games', 'i'), col('fv', 'FV', 'FV now', 'i')]
-    WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'bpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
+    WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'nx', 'bpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
     slim = lambda rows: [{k: r.get(k) for k in WK} for r in rows]
     write('war', {
         'title': 'WAR leaders', 'key': 'war', 'def': '',
-        'views': [['war', 'WAR', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['bpm', 'BPM', 'box plus-minus']],
+        'views': [['war', 'WAR', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['nx', 'Next', "next season's WAR"], ['bpm', 'BPM', 'box plus-minus']],
         'cols': wcols, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': [[0, 'any'], [100, '100'], [300, '300'], [600, '600']]},
         'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': slim(now_rows)}, {'s': LAST, 'l': label(LAST), 'rows': slim(last_rows), 'mdef': 100}]})
