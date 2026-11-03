@@ -208,17 +208,24 @@
   }
  },
  "multiple": {
-  "n": 51,
-  "cut": 3.3,
+  "n": 54,
+  "cut": 3.31,
   "pass": [
    "rating hs",
    "rating pm",
    "prospects z_s_share",
    "prospects b_Big Stage",
    "rating: headshots + plus-minus vs Nov 2",
-   "prospects: S/A share on the new rating"
+   "prospects: S/A share on the new rating",
+   "rating: tier lift (S/A share x.5)",
+   "inflation check: S/A-share gap on round-share residual (no lift)",
+   "prospects: S/A share on the lifted rating"
   ],
   "tests": [
+   [
+    "inflation check: S/A-share gap on round-share residual (no lift)",
+    -13.7
+   ],
    [
     "rating: headshots + plus-minus vs Nov 2",
     -10.9
@@ -232,12 +239,20 @@
     -8.42
    ],
    [
+    "rating: tier lift (S/A share x.5)",
+    -8.12
+   ],
+   [
     "prospect FV: Big Stage badge",
     -5.95
    ],
    [
     "prospect FV: S/A-tier share",
     -5.91
+   ],
+   [
+    "prospects: S/A share on the lifted rating",
+    -4.94
    ],
    [
     "prospects: S/A share on the new rating",
@@ -637,6 +652,9 @@
  "confirm": {
   "rating: headshots + plus-minus vs Nov 2": -10.9,
   "prospects: S/A share on the new rating": -4.65,
-  "T1%: S/A share": -1.69
+  "T1%: S/A share": -1.69,
+  "rating: tier lift (S/A share x.5)": -8.12,
+  "inflation check: S/A-share gap on round-share residual (no lift)": -13.7,
+  "prospects: S/A share on the lifted rating": -4.94
  }
 }

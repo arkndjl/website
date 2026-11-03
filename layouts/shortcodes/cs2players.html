@@ -77,7 +77,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p class="cfb__dim">{{ $d.nMaps }} maps since {{ (time $d.first).Format "Jan 2006" }} · stat-weight R² {{ $f.r2 }} · half-life {{ $f.params.h }}d · regress {{ $f.params.k }} rounds · opponent credit x{{ $f.params.opp }}{{ with $f.params.pm }} · plus-minus x{{ . }}{{ end }}{{ with site.Data.cs2.tiers }} · tier cuts Elo {{ index .cuts 0 }} / {{ index .cuts 1 }} / {{ index .cuts 2 }}{{ end }}</p>
+    <p class="cfb__dim">{{ $d.nMaps }} maps since {{ (time $d.first).Format "Jan 2006" }} · stat-weight R² {{ $f.r2 }} · half-life {{ $f.params.h }}d · regress {{ $f.params.k }} rounds · opponent credit x{{ $f.params.opp }}{{ with $f.params.pm }} · plus-minus x{{ . }}{{ end }}{{ with $f.params.ssg }} · tier lift x{{ . }}{{ end }}{{ with site.Data.cs2.tiers }} · tier cuts Elo {{ index .cuts 0 }} / {{ index .cuts 1 }} / {{ index .cuts 2 }}{{ end }}</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Predicting later maps' round share, held out {{ index $f.held 0 }} to {{ index $f.held 1 }}</th><th>Maps</th><th title="share of the variance in round share explained (walk forward, ratings from each month's first day)">R²</th><th title="paired t on per-map squared error vs the live rating (positive = worse)">t</th></tr></thead>
       <tbody>{{ range $f.score }}<tr><td>{{ if eq .name "ARK player rating" }}<b>{{ .name }} (live)</b>{{ else }}{{ .name }}{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.3f" (float .r2) }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" (float .) }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>

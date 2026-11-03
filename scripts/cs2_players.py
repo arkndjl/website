@@ -153,12 +153,16 @@ def ratings(M, c, T, p):
     theta = np.zeros(n)
     wsum = np.bincount(M.p, w, n)
     prior = p.get("prior", 0.0)
+    # tier lift (Nov 3): + ssg x share of the last year's rounds at S/A-tier events. Low-tier pools connect to the top
+    # through few maps, so opponent credit alone left their ratings high (S/A-exposed fives beat the rating prediction
+    # by .037 round share per unit of share gap, t 13.7)
+    lift = p.get("ssg", 0.0) * sa_share(M, T) if p.get("ssg") else 0.0
     for _ in range(6):
-        th_row = theta[M.p]
+        th_row = (theta + lift)[M.p]
         opp = th_row[M.five[M.g, 1 - M.side]].mean(1)
         adj = c + p["opp"] * opp
         theta = (np.bincount(M.p, w * adj, n) + p["k"] * prior) / (wsum + p["k"])
-    return theta, wsum
+    return theta + lift, wsum
 
 
 def predict_score(M, c, p, months):
@@ -282,6 +286,14 @@ def fit():
     grid.sort(key=lambda x: x[0])
     best = grid[0][1]
     c = cs[best["pm"]]
+    # tier lift, tuned on the same tune months after the grid
+    lifts = []
+    for g in (0.0, 0.25, 0.5, 0.75, 1.0, 1.5):
+        q = dict(best, ssg=g)
+        q["a"] = fit_scale(M, c, q, tm[::2])
+        lifts.append((predict_score(M, c, q, tm[1::2])[0], g, q))
+        print(f"lift {g} mse {lifts[-1][0]:.6f}", file=sys.stderr)
+    best = min(lifts, key=lambda x: x[0])[2]
     out = {"beta": dict(zip(STATS, [round(float(b), 4) for b in beta])), "mline": [round(float(x), 5) for x in ml],
            "r2": round(r2, 3), "params": best, "tune": list(TUNE), "held": [HELD[0], last.isoformat()]}
     # held out: ours vs alternatives (each with its own a fit on tune), paired t on per-map squared error
@@ -294,6 +306,7 @@ def fit():
     alts = {"ARK player rating": (c, best),
             "Nov 2 rating (no headshots, no plus-minus)": (c_old, dict(DEF, h=180, k=50, opp=1.0)),
             "no plus-minus": (cs[0.0], dict(best, pm=0.0)),
+            "no tier lift": (c, dict(best, ssg=0.0)),
             "no opponent credit": (c, dict(best, opp=0.0)),
             "kills minus deaths per round": ((M.X[:, 0] - M.X[:, 1]) * 100 / 2, best)}
     score, e_ours = [], None
