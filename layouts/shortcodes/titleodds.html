@@ -55,7 +55,7 @@
   {{- end }}{{ end -}}
 {{- end -}}
 {{- partial "wintable-open.html" (dict "title" (.Get "title" | default "title odds :: every competition") "icon" "standings" "filter" "Sport" "tab" (.Get "tab") "gfxCols" "Competition,Favourite,Title,2nd,ARK #1,Contenders" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "30") -}}
-<table class="cfb__table">
+<table class="cfb__table" data-pin="1">
   <thead><tr>
     <th>Competition</th><th>Sport</th>
     <th>Favourite</th>
