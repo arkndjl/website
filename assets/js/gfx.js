@@ -115,6 +115,15 @@
     var key = heads.filter(function (h) { return !/^(rk|#|spot|lg)$/i.test(h.replace(/!$/, '')); })[0] || '';
     return /^(team|club)$/i.test(key);
   }
+  // rookie and prospect boards (college, prospects pages, mocks, draft, rookie and recruit tabs): age sits beside the
+  // name and position and is never dropped
+  var AGE_COL = /^age$/i;
+  function isYouth(win) {
+    if (win.closest('[data-rookies], .cfbm, [data-cfb], [data-cbb], .rookies') || win.matches('[data-rookies], .cfbm, [data-cfb], [data-cbb], .rookies')) return true;
+    if (/college-|prospects/.test(location.pathname)) return true;
+    var t = txt(win.querySelector('.win__title-text')), tab = win.getAttribute('data-tab') || '';
+    return /rookie|fresh|first-year|mock|draft|prospect|recruit|redshirt|young|under-2\d|class/i.test(t + ' ' + tab);
+  }
   function filterSummary(win) {
     var bits = [], bar = win.querySelector('form');
     if (bar) {
@@ -171,13 +180,24 @@
         if (body.length && filled * 2 >= body.length) idx.splice(++nameAt, 0, j);
       });
     }
+    var youth = isYouth(win), ageI = youth ? heads.findIndex(function (h) { return AGE_COL.test(h); }) : -1;
+    if (ageI >= 0 && nameAt >= 0) {
+      var ageBody = [].slice.call(table.tBodies[0].rows).filter(function (r) { return r.cells.length > ageI && !r.classList.contains('cfb__detail'); }).slice(0, 30);
+      var ageFilled = ageBody.filter(function (r) { return /\d/.test(txt(r.cells[ageI])); }).length;
+      if (ageBody.length && ageFilled * 2 >= ageBody.length) {
+        var ak = idx.indexOf(ageI); if (ak >= 0) { idx.splice(ak, 1); if (ak < nameAt) nameAt--; }
+        var aAt = nameAt + 1;
+        while (aAt < idx.length && (FV_COL.test(heads[idx[aAt]]) || POS_COL.test(heads[idx[aAt]]))) aAt++;
+        idx.splice(aAt, 0, ageI);
+      } else ageI = -1;
+    } else ageI = -1;
     // the column the table is sorted by (a header click, or the "rank by" view when the order is RK) is on every graphic and
     // never auto-dropped, like FV: added after the name's columns when the preset leaves it out
     var sortI = sortedCol(table, hcells);
     if (sortI >= 0 && idx.indexOf(sortI) < 0) {
       var fvAt = idx.findIndex(function (i) { return FV_COL.test(heads[i]); });
       var at0 = fvAt >= 0 ? fvAt + 1 : nameAt >= 0 ? nameAt + 1 : idx.length;
-      while (at0 < idx.length && [POS_COL, CLASS_COL, TEAM_COL, FV_COL].some(function (re) { return re.test(heads[idx[at0]]); })) at0++;
+      while (at0 < idx.length && ([POS_COL, CLASS_COL, TEAM_COL, FV_COL].some(function (re) { return re.test(heads[idx[at0]]); }) || idx[at0] === ageI)) at0++;
       idx.splice(at0, 0, sortI);
     }
     var teamK = idx.findIndex(function (i) { return TEAM_COL.test(heads[i]); });
@@ -307,7 +327,7 @@
     // the largest size (64 down to 32 px, steps of 8) that fits the row height and the width. When none fits, the rightmost
     // column goes, but never the rank, name, position, class, team or FV (or any column with logos). With nothing left to
     // drop: first names to initials, then the team as its logo alone, then 24 px; text is cut short only past all of that.
-    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || cols[k] === sortI || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
+    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || cols[k] === sortI || (ageI >= 0 && cols[k] === ageI) || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
     var size, colW, SIZES = [64, 56, 48, 40, 32];
     var fits = function (sizes) {
       for (var si = 0; si < sizes.length; si++) { size = sizes[si]; if (rowH < size * 1.3) continue; colW = widths(size); if (sum(colW) <= gw) return true; }
@@ -901,7 +921,8 @@
     if (r.fv != null) chip(g, x + w - 260, y, String(r.fv) + (r.plus ? '+' : ''), 112, r.fv);
     y += 110;
     g.font = '48px ' + FONT; g.fillStyle = C.teal;
-    g.fillText(fit(g, [r.pos + (r.spot ? ' · ' + r.spot : ''), r.team, r.conf, r.cls].filter(Boolean).join(' · '), w - px), x + px, y);
+    var ageS = r.age != null ? 'age ' + r.age.toFixed(1) : r.ageEst != null ? 'age ~' + r.ageEst.toFixed(1) : null;
+    g.fillText(fit(g, [r.pos + (r.spot ? ' · ' + r.spot : ''), ageS, r.team, r.conf, r.cls].filter(Boolean).join(' · '), w - px), x + px, y);
     y += 80;
     if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'role: ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
     // flags: RB role, ARKLIST, riser, availability, position change, FCS move-up, as outlined pills
@@ -1087,7 +1108,9 @@
     var tm = row.querySelector('.nbaxpm__tm, .nflwar__tm');
     var team = teamI >= 0 ? pcCell(cells[teamI]).t : tm ? txt(tm).split('·')[0].trim() : '';
     var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) posC.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); });
-    var sub = [posC ? txt(posC) : '', team, lgI >= 0 ? pcCell(cells[lgI]).t : tm ? (txt(tm).split('·')[1] || '').trim() : '', clsI >= 0 ? pcCell(cells[clsI]).t : ''].filter(function (s) { return s && s !== '—'; });
+    var ageI = isYouth(win) ? gi(AGE_COL) : -1, ageT = ageI >= 0 && cells[ageI] ? pcCell(cells[ageI]).t : '';
+    if (!/\d/.test(ageT)) { ageI = -1; ageT = ''; }
+    var sub = [posC ? txt(posC) : '', ageT ? 'age ' + ageT : '', team, lgI >= 0 ? pcCell(cells[lgI]).t : tm ? (txt(tm).split('·')[1] || '').trim() : '', clsI >= 0 ? pcCell(cells[clsI]).t : ''].filter(function (s) { return s && s !== '—'; });
     var fvChip = fvI >= 0 && cells[fvI] && cells[fvI].querySelector('.fv-chip'), fvT = fvI >= 0 ? pcCell(cells[fvI]).t : '';
     var fvN = fvChip ? parseFloat(fvChip.getAttribute('data-fv')) : parseFloat(fvT);
     // photo: the dropdown's card photo, else the row thumbnail upsized; logo: the row's team logo or the window's path
@@ -1103,7 +1126,7 @@
     var sortI = sortedCol(table, hcells), desc = (hcells[sortI] || { getAttribute: function () {} }).getAttribute('aria-sort') !== 'ascending';
     var tiles = [], lines = [];
     heads.forEach(function (h, i) {
-      if (i === nameI || i === fvI || PC_SKIP.test(h) || PC_SUB.test(h) || !h || (hcells[i] && hcells[i].hidden) || !cells[i] || cells[i].hidden) return;
+      if (i === nameI || i === fvI || i === ageI || PC_SKIP.test(h) || PC_SUB.test(h) || !h || (hcells[i] && hcells[i].hidden) || !cells[i] || cells[i].hidden) return;
       var c = pcCell(cells[i]); if (c.t === '—' && !c.sub) return;
       if (c.t.length > 18) { lines.push([h, c.t + (c.sub ? ' · ' + c.sub : '')]); return; }
       var n = PC_NOPCT.test(h) ? null : pcNum(cells[i], c.t), pct = null;
