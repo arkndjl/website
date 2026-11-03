@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-03T00:08:19Z",
+ "asof": "2026-11-03T00:14:02Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -98,41 +98,30 @@
    "flagged": "2026-10-28T02:43:45Z",
    "betTo": 46.5,
    "close": 46.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 46.5,
+    "price": -102.0,
+    "ev": 0.044,
+    "units": 0.25
+   }
   }
  ],
  "withdrawn": [],
- "board": [
-  {
-   "id": "2026_08_CHI_SEA",
-   "sport": "nfl",
-   "kick": "2026-11-03T01:15:00Z",
-   "home": "SEA",
-   "away": "CHI",
-   "mk": "total",
-   "side": "under",
-   "line": 46.5,
-   "price": -104.0,
-   "edge": 1.9,
-   "x": 1.5,
-   "why": "no edge at -104",
-   "m": 3.6,
-   "tm": 44.6
-  }
- ],
+ "board": [],
  "games": {
   "2026_08_CHI_SEA": {
    "mk": "total",
    "side": "under",
    "line": 46.5,
-   "price": -104.0,
+   "price": -102.0,
+   "ev": 0.044,
    "edge": 1.9,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "SEA",
    "away": "CHI",
-   "state": "under"
+   "state": "pick"
   }
  },
  "record": {
@@ -726,8 +715,7 @@
    "tm": 44.5,
    "flagged": "2026-10-28T02:43:45Z",
    "betTo": 46.5,
-   "close": 46.5,
-   "pass": true
+   "close": 46.5
   },
   {
    "id": "2026_08_PHI_WAS",
@@ -936,8 +924,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-02": {
-    "raw": 147.0,
-    "scale": 0.1616,
+    "raw": 156.0,
+    "scale": 0.1522,
     "down": 16.25
    },
    "2026-11-03": {
