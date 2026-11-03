@@ -1,0 +1,79 @@
+{
+ "id": "esea-stand-in",
+ "sport": "CS2",
+ "question": "What does a stand-in cost an ESEA team?",
+ "answer": "About 2 pp beyond the five's own ratings, too small to beat held-out matches. Rate the five who play.",
+ "findings": [
+  "Win %: core five 51.3% (n=7,717), 1 stand-in 48.6% (n=4,633), 2+ 49.3% (n=988).",
+  "After player Elo + FACEIT level of the five: first stand-in -0.09 log-odds (SE 0.04), second +0.16.",
+  "Held S58-S59 log loss: t -1.5, leave-one-day-out t -0.3. Not shipped.",
+  "Stand-in's FACEIT level counts like a core player's: .59 vs .54 log-odds per level (SE .08/.04)."
+ ],
+ "method": "Core = 5 most-used players in the team's prior 20 maps that season (no lookahead). Logistic on the five's round-share player Elo and FACEIT level plus stand-in count, walk-forward ratings.",
+ "data": "FACEIT ESEA NA league, S53-S59, 18,217 matches; 6,078 with both cores defined",
+ "n": 6078,
+ "robust": false,
+ "interest": 4,
+ "split_check": "First stand-in negative in 4 of 5 seasons; a whole-season core (lookahead) inflates the raw gap to 54.9% vs 50.1%.",
+ "chart": {
+  "type": "bar",
+  "title": "Match win % by stand-ins in the five",
+  "x_label": "lineup",
+  "y_label": "win %",
+  "y_fmt": "pct",
+  "x_reverse": false,
+  "ref": {
+   "y": 0.5,
+   "label": "50%"
+  },
+  "mark": null,
+  "series": [
+   {
+    "name": "actual",
+    "points": [
+     {
+      "x": "core five",
+      "y": 0.513,
+      "lo": 0.5019,
+      "hi": 0.5242,
+      "n": 7717
+     },
+     {
+      "x": "1 stand-in",
+      "y": 0.4863,
+      "lo": 0.4719,
+      "hi": 0.5007,
+      "n": 4633
+     },
+     {
+      "x": "2+ stand-ins",
+      "y": 0.4929,
+      "lo": 0.4618,
+      "hi": 0.5241,
+      "n": 988
+     }
+    ]
+   },
+   {
+    "name": "player Elo expected",
+    "points": [
+     {
+      "x": "core five",
+      "y": 0.5048,
+      "n": 7717
+     },
+     {
+      "x": "1 stand-in",
+      "y": 0.498,
+      "n": 4633
+     },
+     {
+      "x": "2+ stand-ins",
+      "y": 0.4925,
+      "n": 988
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -12,7 +12,7 @@
  ],
  "min": 100,
  "repl": {
-  "F": -0.248,
+  "F": -0.25,
   "D": -0.369,
   "G": -0.022
  },
@@ -22,7 +22,7 @@
    "team": "DET",
    "pos": "RW",
    "str": 2,
-   "g": 0.21,
+   "g": 0.209,
    "use": 3348,
    "pos2": "L",
    "age": 24,
@@ -42,13 +42,13 @@
    "team": "CAR",
    "pos": "LW",
    "str": 2,
-   "g": 0.234,
+   "g": 0.233,
    "use": 2708,
    "pos2": "L",
    "age": 30,
    "starter": {
     "name": "William Carrier",
-    "g": -0.102,
+    "g": -0.103,
     "use": 1466,
     "age": 31
    },
@@ -62,13 +62,13 @@
    "team": "TOR",
    "pos": "RW",
    "str": 2,
-   "g": 0.222,
+   "g": 0.221,
    "use": 3184,
    "pos2": "R",
    "age": 30,
    "starter": {
     "name": "Jack Roslovic",
-    "g": -0.125,
+    "g": -0.126,
     "use": 2476,
     "age": 29
    },
@@ -82,13 +82,13 @@
    "team": "ANA",
    "pos": "RW",
    "str": 2,
-   "g": -0.022,
+   "g": -0.023,
    "use": 1718,
    "pos2": "R",
    "age": 20,
    "starter": {
     "name": "Judd Caulfield",
-    "g": -0.263,
+    "g": -0.264,
     "use": 154,
     "age": 25
    },
@@ -108,7 +108,7 @@
    "age": 28,
    "starter": {
     "name": "Anthony Beauvillier",
-    "g": -0.163,
+    "g": -0.164,
     "use": 2484,
     "age": 29
    },
@@ -122,13 +122,13 @@
    "team": "VAN",
    "pos": "C",
    "str": 2,
-   "g": -0.005,
+   "g": -0.006,
    "use": 2592,
    "pos2": "C",
    "age": 24,
    "starter": {
     "name": "Elias Pettersson",
-    "g": -0.248,
+    "g": -0.25,
     "use": 0,
     "age": 27
    },
@@ -142,7 +142,7 @@
    "team": "DAL",
    "pos": "LW",
    "str": 2,
-   "g": 0.164,
+   "g": 0.163,
    "use": 3398,
    "pos2": "L",
    "age": 27,
@@ -162,7 +162,7 @@
    "team": "WSH",
    "pos": "LW",
    "str": 3,
-   "g": 0.08,
+   "g": 0.079,
    "use": 2850,
    "pos2": "L",
    "age": 25,
@@ -182,7 +182,7 @@
    "team": "SEA",
    "pos": "LW",
    "str": 3,
-   "g": 0.006,
+   "g": 0.005,
    "use": 2361,
    "pos2": "R",
    "age": 25,
@@ -196,6 +196,26 @@
    "logo": "/img/nhl/sea.png",
    "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4565223.png&w=96&h=70&scale=crop",
    "xgap": 0.188
+  },
+  {
+   "name": "Dylan Strome",
+   "team": "WSH",
+   "pos": "C",
+   "str": 2,
+   "g": 0.14,
+   "use": 3092,
+   "pos2": "C",
+   "age": 29,
+   "starter": {
+    "name": "Justin Sourdif",
+    "g": -0.125,
+    "use": 1309,
+    "age": 24
+   },
+   "gap": 0.27,
+   "logo": "/img/nhl/wsh.png",
+   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/3899933.png&w=96&h=70&scale=crop",
+   "xgap": 0.148
   },
   {
    "name": "Noah Hanifin",
@@ -218,46 +238,6 @@
    "xgap": 0.142
   },
   {
-   "name": "Dylan Strome",
-   "team": "WSH",
-   "pos": "C",
-   "str": 2,
-   "g": 0.14,
-   "use": 3092,
-   "pos2": "C",
-   "age": 29,
-   "starter": {
-    "name": "Justin Sourdif",
-    "g": -0.124,
-    "use": 1309,
-    "age": 24
-   },
-   "gap": 0.26,
-   "logo": "/img/nhl/wsh.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/3899933.png&w=96&h=70&scale=crop",
-   "xgap": 0.14
-  },
-  {
-   "name": "Brandon Hagel",
-   "team": "TBL",
-   "pos": "LW",
-   "str": 2,
-   "g": 0.302,
-   "use": 3383,
-   "pos2": "L",
-   "age": 28,
-   "starter": {
-    "name": "Jake Guentzel",
-    "g": 0.156,
-    "use": 3509,
-    "age": 31
-   },
-   "gap": 0.15,
-   "logo": "/img/nhl/tbl.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4065019.png&w=96&h=70&scale=crop",
-   "xgap": 0.14
-  },
-  {
    "name": "Jack Hughes",
    "team": "NJD",
    "pos": "C",
@@ -278,17 +258,37 @@
    "xgap": 0.137
   },
   {
+   "name": "Brandon Hagel",
+   "team": "TBL",
+   "pos": "LW",
+   "str": 2,
+   "g": 0.301,
+   "use": 3383,
+   "pos2": "L",
+   "age": 28,
+   "starter": {
+    "name": "Jake Guentzel",
+    "g": 0.156,
+    "use": 3509,
+    "age": 31
+   },
+   "gap": 0.14,
+   "logo": "/img/nhl/tbl.png",
+   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4065019.png&w=96&h=70&scale=crop",
+   "xgap": 0.132
+  },
+  {
    "name": "Mitch Marner",
    "team": "VGK",
    "pos": "RW",
    "str": 2,
-   "g": 0.394,
+   "g": 0.393,
    "use": 3625,
    "pos2": "R",
    "age": 29,
    "starter": {
     "name": "Mark Stone",
-    "g": 0.287,
+    "g": 0.286,
     "use": 2719,
     "age": 34
    },
@@ -302,13 +302,13 @@
    "team": "CHI",
    "pos": "LW",
    "str": 2,
-   "g": -0.01,
+   "g": -0.011,
    "use": 3011,
    "pos2": "L",
    "age": 31,
    "starter": {
     "name": "Roman Kantserov",
-    "g": -0.314,
+    "g": -0.315,
     "use": 276,
     "age": 22
    },
@@ -322,13 +322,13 @@
    "team": "NSH",
    "pos": "LW",
    "str": 2,
-   "g": 0.104,
+   "g": 0.103,
    "use": 3366,
    "pos2": "L",
    "age": 32,
    "starter": {
     "name": "Steven Stamkos",
-    "g": -0.009,
+    "g": -0.01,
     "use": 3202,
     "age": 36
    },
@@ -342,13 +342,13 @@
    "team": "CHI",
    "pos": "LW",
    "str": 3,
-   "g": -0.178,
+   "g": -0.179,
    "use": 932,
    "pos2": "C",
    "age": 21,
    "starter": {
     "name": "Roman Kantserov",
-    "g": -0.314,
+    "g": -0.315,
     "use": 276,
     "age": 22
    },
@@ -416,6 +416,26 @@
    "logo": "/img/nhl/dal.png",
    "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4565239.png&w=96&h=70&scale=crop",
    "xgap": 0.104
+  },
+  {
+   "name": "John Carlson",
+   "team": "TBL",
+   "pos": "RD",
+   "str": 2,
+   "g": -0.004,
+   "use": 3756,
+   "pos2": "D",
+   "age": 36,
+   "starter": {
+    "name": "Erik Cernak",
+    "g": -0.249,
+    "use": 2691,
+    "age": 29
+   },
+   "gap": 0.24,
+   "logo": "/img/nhl/tbl.png",
+   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/5118.png&w=96&h=70&scale=crop",
+   "xgap": 0.101
   },
   {
    "name": "Alex Tuch",
@@ -502,13 +522,13 @@
    "team": "MTL",
    "pos": "C",
    "str": 3,
-   "g": 0.063,
+   "g": 0.062,
    "use": 2820,
    "pos2": "C",
    "age": 33,
    "starter": {
     "name": "Alex Newhook",
-    "g": -0.178,
+    "g": -0.179,
     "use": 2081,
     "age": 25
    },
@@ -528,7 +548,7 @@
    "age": 32,
    "starter": {
     "name": "Anthony Beauvillier",
-    "g": -0.163,
+    "g": -0.164,
     "use": 2484,
     "age": 29
    },
@@ -562,7 +582,7 @@
    "team": "NJD",
    "pos": "RW",
    "str": 2,
-   "g": 0.303,
+   "g": 0.302,
    "use": 3314,
    "pos2": "L",
    "age": 28,
@@ -622,13 +642,13 @@
    "team": "WSH",
    "pos": "C",
    "str": 3,
-   "g": 0.044,
+   "g": 0.043,
    "use": 2041,
    "pos2": "C",
    "age": 28,
    "starter": {
     "name": "Justin Sourdif",
-    "g": -0.124,
+    "g": -0.125,
     "use": 1309,
     "age": 24
    },
@@ -662,39 +682,19 @@
    "team": "FLA",
    "pos": "C",
    "str": 2,
-   "g": 0.112,
+   "g": 0.111,
    "use": 3285,
    "pos2": "C",
    "age": 30,
    "starter": {
     "name": "Sam Bennett",
-    "g": 0.015,
+    "g": 0.014,
     "use": 2998,
     "age": 30
    },
    "gap": 0.1,
    "logo": "/img/nhl/fla.png",
    "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/3114722.png&w=96&h=70&scale=crop",
-   "xgap": 0.066
-  },
-  {
-   "name": "Dylan Holloway",
-   "team": "STL",
-   "pos": "LW",
-   "str": 3,
-   "g": 0.02,
-   "use": 2620,
-   "pos2": "L",
-   "age": 24,
-   "starter": {
-    "name": "Jake Neighbours",
-    "g": -0.075,
-    "use": 2565,
-    "age": 24
-   },
-   "gap": 0.1,
-   "logo": "/img/nhl/stl.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4697397.png&w=96&h=70&scale=crop",
    "xgap": 0.066
   },
   {
@@ -758,26 +758,6 @@
    "xgap": 0.059
   },
   {
-   "name": "John Carlson",
-   "team": "TBL",
-   "pos": "RD",
-   "str": 2,
-   "g": -0.005,
-   "use": 3756,
-   "pos2": "D",
-   "age": 36,
-   "starter": {
-    "name": "JJ Moser",
-    "g": -0.236,
-    "use": 2960,
-    "age": 26
-   },
-   "gap": 0.23,
-   "logo": "/img/nhl/tbl.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/5118.png&w=96&h=70&scale=crop",
-   "xgap": 0.058
-  },
-  {
    "name": "Sean Walker",
    "team": "CAR",
    "pos": "RD",
@@ -802,13 +782,13 @@
    "team": "CAR",
    "pos": "RW",
    "str": 3,
-   "g": 0.086,
+   "g": 0.085,
    "use": 2834,
    "pos2": "R",
    "age": 24,
    "starter": {
     "name": "Andrei Svechnikov",
-    "g": 0.037,
+    "g": 0.036,
     "use": 2856,
     "age": 26
    },
@@ -822,13 +802,13 @@
    "team": "LAK",
    "pos": "C",
    "str": 2,
-   "g": 0.004,
+   "g": 0.003,
    "use": 3299,
    "pos2": "R",
    "age": 24,
    "starter": {
     "name": "Alex Laferriere",
-    "g": -0.071,
+    "g": -0.072,
     "use": 3030,
     "age": 24
    },
@@ -868,7 +848,7 @@
    "age": 28,
    "starter": {
     "name": "Dylan Cozens",
-    "g": 0.033,
+    "g": 0.032,
     "use": 3080,
     "age": 25
    },
@@ -878,64 +858,24 @@
    "xgap": 0.032
   },
   {
-   "name": "Gabriel Vilardi",
-   "team": "WPG",
-   "pos": "RW",
-   "str": 2,
-   "g": 0.022,
-   "use": 3087,
-   "pos2": "C",
-   "age": 27,
-   "starter": {
-    "name": "Dawson Mercer",
-    "g": -0.074,
-    "use": 3192,
-    "age": 24
-   },
-   "gap": 0.1,
-   "logo": "/img/nhl/wpg.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4233583.png&w=96&h=70&scale=crop",
-   "xgap": 0.032
-  },
-  {
-   "name": "Mason Marchment",
-   "team": "SJS",
-   "pos": "LW",
-   "str": 2,
-   "g": 0.006,
-   "use": 2370,
-   "pos2": "L",
-   "age": 31,
-   "starter": {
-    "name": "Tyler Toffoli",
-    "g": 0.005,
-    "use": 2698,
-    "age": 34
-   },
-   "gap": 0.0,
-   "logo": "/img/nhl/sjs.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4272192.png&w=96&h=70&scale=crop",
-   "xgap": 0.018
-  },
-  {
-   "name": "Connor McMichael",
-   "team": "STL",
-   "pos": "RW",
+   "name": "JJ Moser",
+   "team": "TBL",
+   "pos": "RD",
    "str": 3,
-   "g": -0.024,
-   "use": 2920,
-   "pos2": "L",
-   "age": 25,
+   "g": -0.236,
+   "use": 2960,
+   "pos2": "D",
+   "age": 26,
    "starter": {
-    "name": "Jimmy Snuggerud",
-    "g": -0.1,
-    "use": 1523,
-    "age": 22
+    "name": "Erik Cernak",
+    "g": -0.249,
+    "use": 2691,
+    "age": 29
    },
-   "gap": 0.08,
-   "logo": "/img/nhl/stl.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4565246.png&w=96&h=70&scale=crop",
-   "xgap": 0.016
+   "gap": 0.01,
+   "logo": "/img/nhl/tbl.png",
+   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/4874929.png&w=96&h=70&scale=crop",
+   "xgap": 0.026
   },
   {
    "name": "Seth Jones",
@@ -958,37 +898,17 @@
    "xgap": 0.014
   },
   {
-   "name": "Chandler Stephenson",
-   "team": "SEA",
-   "pos": "LW",
-   "str": 2,
-   "g": -0.122,
-   "use": 3315,
-   "pos2": "C",
-   "age": 32,
-   "starter": {
-    "name": "Bobby McMann",
-    "g": -0.179,
-    "use": 2553,
-    "age": 30
-   },
-   "gap": 0.06,
-   "logo": "/img/nhl/sea.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/3067858.png&w=96&h=70&scale=crop",
-   "xgap": 0.011
-  },
-  {
    "name": "Jake Evans",
    "team": "MTL",
    "pos": "C",
    "str": 2,
-   "g": -0.078,
+   "g": -0.079,
    "use": 2526,
    "pos2": "C",
    "age": 30,
    "starter": {
     "name": "Alex Newhook",
-    "g": -0.178,
+    "g": -0.179,
     "use": 2081,
     "age": 25
    },
@@ -1002,13 +922,13 @@
    "team": "CAR",
    "pos": "LW",
    "str": 3,
-   "g": -0.033,
+   "g": -0.034,
    "use": 2585,
    "pos2": "L",
    "age": 34,
    "starter": {
     "name": "William Carrier",
-    "g": -0.102,
+    "g": -0.103,
     "use": 1466,
     "age": 31
    },
@@ -1016,6 +936,26 @@
    "logo": "/img/nhl/car.png",
    "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/2989376.png&w=96&h=70&scale=crop",
    "xgap": 0.007
+  },
+  {
+   "name": "Pavel Buchnevich",
+   "team": "STL",
+   "pos": "RW",
+   "str": 3,
+   "g": 0.045,
+   "use": 3128,
+   "pos2": "L",
+   "age": 31,
+   "starter": {
+    "name": "Jimmy Snuggerud",
+    "g": -0.101,
+    "use": 1523,
+    "age": 22
+   },
+   "gap": 0.15,
+   "logo": "/img/nhl/stl.png",
+   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/3042081.png&w=96&h=70&scale=crop",
+   "xgap": 0.005
   },
   {
    "name": "Jayden Struble",
@@ -1038,46 +978,6 @@
    "xgap": 0.004
   },
   {
-   "name": "Pavel Buchnevich",
-   "team": "STL",
-   "pos": "LW",
-   "str": 2,
-   "g": 0.045,
-   "use": 3128,
-   "pos2": "L",
-   "age": 31,
-   "starter": {
-    "name": "Jake Neighbours",
-    "g": -0.075,
-    "use": 2565,
-    "age": 24
-   },
-   "gap": 0.12,
-   "logo": "/img/nhl/stl.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/3042081.png&w=96&h=70&scale=crop",
-   "xgap": 0.003
-  },
-  {
-   "name": "Joel Armia",
-   "team": "LAK",
-   "pos": "RW",
-   "str": 3,
-   "g": -0.111,
-   "use": 2277,
-   "pos2": "R",
-   "age": 33,
-   "starter": {
-    "name": "Martin Chromiak",
-    "g": -0.255,
-    "use": 18,
-    "age": 24
-   },
-   "gap": 0.14,
-   "logo": "/img/nhl/lak.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/2562596.png&w=96&h=70&scale=crop",
-   "xgap": -0.004
-  },
-  {
    "name": "Teuvo Teravainen",
    "team": "CHI",
    "pos": "RW",
@@ -1088,7 +988,7 @@
    "age": 32,
    "starter": {
     "name": "Ryan Donato",
-    "g": 0.019,
+    "g": 0.018,
     "use": 2678,
     "age": 30
    },
@@ -1122,7 +1022,7 @@
    "team": "BOS",
    "pos": "LW",
    "str": 3,
-   "g": -0.01,
+   "g": -0.011,
    "use": 2688,
    "pos2": "C",
    "age": 27,
@@ -1202,13 +1102,13 @@
    "team": "OTT",
    "pos": "LW",
    "str": 3,
-   "g": -0.038,
+   "g": -0.039,
    "use": 2576,
    "pos2": "R",
    "age": 30,
    "starter": {
     "name": "Fabian Zetterlund",
-    "g": -0.055,
+    "g": -0.056,
     "use": 2651,
     "age": 27
    },
@@ -1223,13 +1123,13 @@
    "pos": "LD",
    "str": 2,
    "g": -0.24,
-   "use": 3032,
+   "use": 3053,
    "pos2": "D",
    "age": 30,
    "starter": {
     "name": "Kevin Bahl",
-    "g": -0.269,
-    "use": 3540,
+    "g": -0.27,
+    "use": 3559,
     "age": 26
    },
    "gap": 0.03,
@@ -1242,13 +1142,13 @@
    "team": "DET",
    "pos": "C",
    "str": 2,
-   "g": -0.046,
+   "g": -0.047,
    "use": 2407,
    "pos2": "C",
    "age": 32,
    "starter": {
     "name": "Emmitt Finnie",
-    "g": -0.162,
+    "g": -0.163,
     "use": 1542,
     "age": 21
    },
@@ -1282,14 +1182,14 @@
    "team": "SJS",
    "pos": "RD",
    "str": 3,
-   "g": -0.102,
-   "use": 3530,
+   "g": -0.101,
+   "use": 3543,
    "pos2": "D",
    "age": 35,
    "starter": {
     "name": "Michael Kesselring",
-    "g": -0.186,
-    "use": 2193,
+    "g": -0.183,
+    "use": 2212,
     "age": 26
    },
    "gap": 0.08,
@@ -1341,13 +1241,13 @@
    "team": "DAL",
    "pos": "C",
    "str": 2,
-   "g": 0.124,
+   "g": 0.123,
    "use": 2438,
    "pos2": "C",
    "age": 29,
    "starter": {
     "name": "Wyatt Johnston",
-    "g": 0.098,
+    "g": 0.097,
     "use": 3445,
     "age": 23
    },
@@ -1387,8 +1287,8 @@
    "age": 30,
    "starter": {
     "name": "Yaroslav Askarov",
-    "g": -0.018,
-    "use": 3851,
+    "g": -0.017,
+    "use": 3910,
     "age": 24
    },
    "gap": 0.01,
@@ -1420,14 +1320,14 @@
    "team": "SJS",
    "pos": "RD",
    "str": 2,
-   "g": -0.179,
-   "use": 3766,
+   "g": -0.175,
+   "use": 3791,
    "pos2": "D",
    "age": 32,
    "starter": {
     "name": "Michael Kesselring",
-    "g": -0.186,
-    "use": 2193,
+    "g": -0.183,
+    "use": 2212,
     "age": 26
    },
    "gap": 0.01,
@@ -1506,7 +1406,7 @@
    "age": 31,
    "starter": {
     "name": "Emmitt Finnie",
-    "g": -0.162,
+    "g": -0.163,
     "use": 1542,
     "age": 21
    },
@@ -1539,13 +1439,13 @@
    "team": "CBJ",
    "pos": "C",
    "str": 3,
-   "g": 0.006,
+   "g": 0.005,
    "use": 3130,
    "pos2": "C",
    "age": 34,
    "starter": {
     "name": "Adam Fantilli",
-    "g": -0.071,
+    "g": -0.072,
     "use": 3235,
     "age": 21
    },
@@ -1598,13 +1498,13 @@
    "team": "TOR",
    "pos": "LW",
    "str": 2,
-   "g": -0.156,
+   "g": -0.157,
    "use": 1424,
    "pos2": "C",
    "age": 30,
    "starter": {
     "name": "Easton Cowan",
-    "g": -0.168,
+    "g": -0.169,
     "use": 1216,
     "age": 21
    },
@@ -1614,38 +1514,18 @@
    "xgap": -0.109
   },
   {
-   "name": "Corey Perry",
-   "team": "LAK",
-   "pos": "RW",
-   "str": 2,
-   "g": -0.133,
-   "use": 2092,
-   "pos2": "R",
-   "age": 41,
-   "starter": {
-    "name": "Martin Chromiak",
-    "g": -0.255,
-    "use": 18,
-    "age": 24
-   },
-   "gap": 0.12,
-   "logo": "/img/nhl/lak.png",
-   "photo": "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/2273.png&w=96&h=70&scale=crop",
-   "xgap": -0.11
-  },
-  {
    "name": "Ryan Strome",
    "team": "CGY",
    "pos": "RW",
    "str": 3,
    "g": -0.046,
-   "use": 2258,
+   "use": 2271,
    "pos2": "C",
    "age": 33,
    "starter": {
     "name": "Matt Coronato",
     "g": -0.065,
-    "use": 2927,
+    "use": 2945,
     "age": 23
    },
    "gap": 0.02,
@@ -1664,7 +1544,7 @@
    "age": 38,
    "starter": {
     "name": "Dylan Cozens",
-    "g": 0.033,
+    "g": 0.032,
     "use": 3080,
     "age": 25
    },
