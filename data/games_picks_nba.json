@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-03T03:42:58Z",
+ "asof": "2026-11-03T03:44:26Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -65,11 +65,11 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0192,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1425,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -78,17 +78,17 @@
     "why": "",
     "drift": {
      "mu1": 0.019,
-     "n": 0,
+     "n": 1,
      "sd": 0.1425,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": -0.023,
+     "info": 0.02,
+     "real": -0.765,
+     "realSe": 7.49,
      "need": 330
     }
    },
@@ -233,11 +233,11 @@
     }
    },
    "spread | role: favorite": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0194,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.118,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -246,17 +246,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0132,
-     "n": 0,
+     "n": 1,
      "sd": 0.118,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": -0.02,
+     "info": 0.01,
+     "real": -1.118,
+     "realSe": 8.957,
      "need": 472
     }
    },
@@ -4045,12 +4045,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-02": {
-    "raw": 3.5,
-    "scale": 0.1429,
+    "raw": 0.0,
+    "scale": 1.0,
     "down": 39.5
    },
    "2026-11-03": {
-    "raw": 21.75,
+    "raw": 27.0,
     "scale": 1.0
    },
    "2026-11-04": {
