@@ -1121,7 +1121,9 @@ th {
 }
 
 @media (max-width: 684px) {
-  .wintable__scroll { margin: 8px 8px 0; }
+  /* windows inside a tab group run edge to edge with the strip and tables sit close to their frame: more room for columns */
+  .wintabs__panels > .win { margin-left: 0; margin-right: 0; }
+  .wintable__scroll { margin: 6px 4px 0; }
   table th, table td { padding: 4px 8px; }
 }
 
@@ -3221,6 +3223,17 @@ table.trophycase__hist td.trophycase__post {
   .cfb__table thead th, .cfbt thead th, .cfbm thead th, .cfbs thead th { z-index: 3; }
   .cfb__table thead th:nth-child(2), .cfbt thead th:nth-child(2), .cfbm thead th:nth-child(4), .cfbs thead th:nth-child(2) { z-index: 4; background: var(--background); }
   .cfb__dwrap { left: 8px; }
+  /* the pinned player cell wraps inside 40vw (photo floated beside the name) so the stats keep most of the screen;
+     hockey prospects and breakouts set their own widths further down */
+  .cfb__table td.cfb__name { white-space: normal; min-width: 40vw; width: 40vw; max-width: 40vw; }
+  .cfb__table td.cfb__name .pxframe--row { float: left; margin: 1px 6px 0 0; }
+  .cfb__table td.cfb__name .cfb__who { white-space: normal; max-width: calc(100% - 32px); }
+  .cfb__table td.cfb__name .cfb__dim { white-space: nowrap; }
+  .cfb__table td.cfb__rk, .cfb__table thead th:first-child { padding-left: 4px; padding-right: 6px; }
+  /* a table that pins its first column instead (data-pin="1" in the markup) leaves the name cell in the flow */
+  table.cfb__table[data-pin="1"] td.cfb__name:not(:first-child) { position: static; box-shadow: none; min-width: 0; width: auto; max-width: none; white-space: nowrap; }
+  /* tables scroll sideways inside their window with momentum; the gesture never drags the page or the browser back */
+  .wintable__scroll { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x pan-y; }
   .cfb__report { gap: 10px; }
   .winpane__stats { gap: 4px 12px; }
 
