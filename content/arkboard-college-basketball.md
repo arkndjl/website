@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,draft board,WAR leaders,stats,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,lineups,on/off,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,draft board,WAR leaders,stats,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,lineups,on/off,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< lazytab tab="draft board" >}}
 {{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board :: 2027 draft, predictive mock order" tab="draft board" >}}
@@ -68,6 +68,22 @@ cover = "/og/college-basketball.png"
 {{< /lazytab >}}
 {{< lazytab tab="development" >}}
 {{< schooldev sport="cbb" title="development :: college BPM over On3 rank, by school and coach" tab="development" >}}
+{{< /lazytab >}}
+{{< lazytab tab="NIL" >}}
+{{< cbbnil title="NIL :: xNIL, yNIL, zNIL, top 400" tab="NIL" >}}
+{{< /lazytab >}}
+{{< lazytab tab="team NIL" >}}
+{{< cbbnil view="teams" title="team NIL :: every D-I roster" tab="team NIL" >}}
+{{< /lazytab >}}
+{{< cbbbuilder title="team builder :: offseason plan per team, NIL budget" tab="team builder" >}}
+{{< lazytab tab="staff" >}}
+{{< cbbstaff title="staff :: head coaches" tab="staff" >}}
+{{< /lazytab >}}
+{{< lazytab tab="coaching jobs" >}}
+{{< cbbjobs title="coaching jobs :: projected openings and hires" tab="coaching jobs" >}}
+{{< /lazytab >}}
+{{< lazytab tab="coach pay" >}}
+{{< cbbcoachpay title="coach pay :: market value vs public pay" tab="coach pay" >}}
 {{< /lazytab >}}
 {{< cbblineups view="units" title="lineups :: 5-man units, per 100 possessions" tab="lineups" >}}
 {{< cbblineups view="onoff" title="on/off :: team net with each player on and off" tab="on/off" >}}

@@ -1,0 +1,35 @@
+{{- /* Coach pay, college basketball: market value against public pay for every head coach whose pay USA Today lists
+       (public schools; private schools don't report). Value = predicted pay for the profile: ridge on log pay, inputs kept
+       only if they lower leave-one-school-out error. Surplus = Value - Pay. scripts/cbb_market_fit.py, scripts/cbb_market.py. */ -}}
+{{- with site.Data.cbb_market -}}
+{{- $rows := slice }}{{ range .staff }}{{ if and .pay .value }}{{ $rows = $rows | append . }}{{ end }}{{ end }}
+{{- $rows = sort $rows "surplus" "desc" }}
+{{- $v := .value -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coach pay") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Coach,Team,Value,Pay,Surplus" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
+<table class="cfb__table cfbp">
+  <thead><tr><th>RK</th><th>Coach</th><th>Team</th><th>Conf</th>
+    <th title="Value = predicted pay for this profile; ridge on log pay (USA Today 2015-26), kept inputs: {{ delimit $v.feats ", " }}">Value</th>
+    <th title="USA Today, latest year">Pay</th>
+    <th title="Surplus = Value - Pay; > 0 = paid below Value">Surplus</th>
+    <th title="buyout as listed by USA Today">Buyout</th>
+    <th title="staff Score, 100 = average">Score</th>
+    <th title="Leave% = P(not in this job next season)">Leave%</th></tr></thead>
+  <tbody>
+  {{- range $i, $c := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfbp__name"><b>{{ .name }}</b></td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num" data-l="Value" data-v="{{ .value }}">{{ partial "nil.html" .value }}</td>
+    <td class="cfb__num" data-l="Pay" data-v="{{ .pay }}">{{ partial "nil.html" .pay }} <span class="cfb__dim">{{ .payYr }}</span></td>
+    <td class="cfb__num is-key" data-l="Surplus" data-v="{{ .surplus }}"><b>{{ partial "znil.html" .surplus }}</b></td>
+    <td class="cfb__num" data-l="Buyout" data-v="{{ .buyout }}">{{ with .buyout }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="Score" data-v="{{ .score }}">{{ .score }}</td>
+    <td class="cfb__num" data-l="Leave" data-v="{{ .leave }}">{{ printf "%.0f" (mul .leave 100) }}%</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "cbb_market" "note" (printf "Value: leave-one-school-out R² %.2f, %d school-years" $v.looR2 $v.n)) -}}
+{{- end -}}

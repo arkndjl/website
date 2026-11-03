@@ -1,0 +1,38 @@
+{{- /* Staff, college basketball head coaches. Score = 100 + 10 z: .8 x (.4 ARK rating z + .4 Over z + .2 Dev z) + .2 zNIL
+       growth z (within level). Over = the coach's record against the preseason roster projection, every season and school
+       since 2015 (scripts/cbb_coach_prior.py); Dev = his recruits' BPM over what their rank predicted (data/school_dev.json);
+       zNIL growth = log((xNIL + 250K) / (yNIL + 250K)) of the roster. Value = what the pay market pays the profile;
+       Leave% = P(not in the job next season). scripts/cbb_market.py, data/cbb_market.json. */ -}}
+{{- with site.Data.cbb_market -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Coach,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
+<table class="cfb__table cfbst">
+  <thead><tr><th>RK</th><th>Coach</th><th>Team</th><th>Conf</th>
+    <th title="Score = 100 + 10 z; raw = .8 (.4 rating z + .4 Over z + .2 Dev z) + .2 zNIL z">Score</th>
+    <th title="ARK rating (rank)">Rating</th>
+    <th title="Over = net rating over the preseason projection a season, his career since 2015, shrunk (sum / (seasons + 2))">Over</th>
+    <th title="Dev = BPM a recruit over what his recruiting rank predicted, his recruits since 2014, shrunk">Dev</th>
+    <th title="zNIL = roster xNIL - yNIL; rank = growth z within level">zNIL</th>
+    <th title="Value = predicted pay for the profile (ridge on log USA Today pay)">Value</th>
+    <th title="Leave% = P(not in this job next season)">Leave%</th>
+    <th title="seasons in job, incl. current">Yr</th></tr></thead>
+  <tbody>
+  {{- range .staff }}
+  <tr>
+    <td class="cfb__rk">{{ .srk }}</td>
+    <td><b>{{ .name }}</b>{{ if ge .score 110 }} <span class="cfb__up" title="Score >= 110">★</span>{{ end }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num is-key cfbst__score" data-l="Score" data-v="{{ .score }}"><span class="{{ if ge .score 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ .score }}</span></td>
+    <td class="cfb__num" data-l="Rating" data-v="{{ .rating }}">{{ printf "%.1f" .rating }} <span class="cfb__dim">#{{ .rk }}</span></td>
+    <td class="cfb__num" data-l="Over" data-v="{{ .over }}">{{ if ge .over 0.0 }}+{{ end }}{{ printf "%.1f" .over }}</td>
+    <td class="cfb__num" data-l="Dev" data-v="{{ .dev }}">{{ if ne .dev nil }}{{ if ge .dev 0.0 }}+{{ end }}{{ printf "%.2f" .dev }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="zNIL" data-v="{{ .znilG }}">{{ if ne .znil nil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">#{{ .znilRk }}</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="Value" data-v="{{ .value }}">{{ with .value }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="Leave" data-v="{{ .leave }}">{{ printf "%.0f" (mul .leave 100) }}%</td>
+    <td class="cfb__num" data-l="Yr" data-v="{{ .ten }}">{{ .ten }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .staff) "fresh" "cbb_market" "note" "100 = average; 10 = 1 SD") -}}
+{{- end -}}
