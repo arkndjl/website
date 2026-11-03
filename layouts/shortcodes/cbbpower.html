@@ -8,12 +8,12 @@
 {{- range ($P.coaches.ranks | default slice) }}{{ $cok = merge $cok (dict .tid .rk) }}{{ end }}
 {{- range .power }}{{ $ark = merge $ark (dict .id .rk) }}{{ end }}
 {{- /* the ARK Top 25 graphic (gfx.js buildRank, the CFB one's layout): model order, unfiltered; next ten in the spare slot */ -}}
-{{- $gfx := slice }}{{ range first 25 .power }}{{ $gfx = $gfx | append (dict "rk" .rk "n" .t "l" (.logo | default "") "rec" (cond (gt .g 0) .rec "") "s" .rating "ap" (index $apk .id) "c" (index $cok .id)) }}{{ end }}
+{{- $gfx := slice }}{{ range first 25 .power }}{{ $gfx = $gfx | append (dict "rk" .rk "prev" .prev "n" .t "l" (.logo | default "") "rec" (cond (gt .g 0) .rec "") "s" .rating "ap" (index $apk .id) "c" (index $cok .id)) }}{{ end }}
 {{- $more := slice }}{{ range first 10 (after 25 .power) }}{{ $more = $more | append (dict "rk" .rk "n" .t "s" .rating) }}{{ end }}
 {{- $played := 0 }}{{ range .power }}{{ $played = add $played .g }}{{ end }}
 {{- $rank := dict "title" (printf "CBB ARK Top 25 :: %s" (cond (gt $played 0) .season "preseason")) "name" "arkboard-cbb-ark-top-25" "teams" $gfx "more" $more "foot" (slice "rating = margin vs avg D-I team, neutral floor" "rating = expected margin vs average D-I team, neutral floor · bar vs #1") }}
 {{- if $P }}
-{{- $lists := slice }}{{ $ours := slice }}{{ range first 25 .power }}{{ $ours = $ours | append (dict "rk" .rk "team" .t "logo" .logo "rec" (cond (gt .g 0) .rec "") "score" .rating "ap" (index $apk .id)) }}{{ end }}
+{{- $lists := slice }}{{ $ours := slice }}{{ range first 25 .power }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "team" .t "logo" .logo "rec" (cond (gt .g 0) .rec "") "score" .rating "ap" (index $apk .id)) }}{{ end }}
 {{- $lists = $lists | append (dict "key" "ark" "title" "ARK Ranking" "sub" "Top 25 · model" "ranks" $ours) }}
 {{- with $P.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (lower .week) "ranks" .ranks) }}{{ end }}
 {{- with $P.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (lower .week) "ranks" .ranks) }}{{ end }}
@@ -27,10 +27,10 @@
     <section class="cfbr__col cfbr__col--{{ $l.key }}">
       <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span></h4>
       <ol class="cfbr__list">
-        {{- range $l.ranks }}
+        {{- range $l.ranks }}{{ $wk := cond (eq $l.key "ark") (cond (eq site.Data.cbb_games.prevFrom "preseason") "preseason" "last week") "last poll" }}
         <li>
           <span class="cfb__rk">{{ .rk }}</span>
-          {{- if .prev }}{{ $d := sub .prev .rk }}<span class="cfbr__mv {{ if gt $d 0 }}cfb__up{{ else if lt $d 0 }}cfb__down{{ else }}cfb__dim{{ end }}" title="last poll #{{ .prev }}">{{ if gt $d 0 }}▲{{ $d }}{{ else if lt $d 0 }}▼{{ sub 0 $d }}{{ else }}–{{ end }}</span>{{ else }}<span class="cfbr__mv cfb__dim">·</span>{{ end }}
+          {{- if .prev }}{{ $d := sub .prev .rk }}<span class="cfbr__mv {{ if gt $d 0 }}cfb__up{{ else if lt $d 0 }}cfb__down{{ else }}cfb__dim{{ end }}" title="{{ $wk }} #{{ .prev }}">{{ if gt $d 0 }}▲{{ $d }}{{ else if lt $d 0 }}▼{{ sub 0 $d }}{{ else }}–{{ end }}</span>{{ else }}<span class="cfbr__mv cfb__dim">·</span>{{ end }}
           <span class="cfbr__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}{{ .team }}</span>
           <span class="cfb__dim cfbr__rec">{{ if ne .rec "0-0" }}{{ .rec }}{{ end }}</span>
           {{- if eq $l.key "ark" }}
@@ -50,7 +50,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,AP,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25" "gfxRank" ($rank | jsonify)) -}}
 <table class="cfb__table tstick2" data-td-kind="cbb" data-td-src="/data/teams/cbb.json" data-td-rows="{{ (resources.FromString "data/cbb-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Team</th><th>Conf</th>
+    <th>RK</th><th title="change since {{ if eq .prevFrom "preseason" }}the preseason prior{{ else }}last week{{ end }}">±</th><th>Team</th><th>Conf</th>
     <th title="rating = expected margin vs an average D-I team on a neutral floor: adjusted efficiency x possessions, Elo and market rating at the game model's weights">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
     <th>Rec</th>
@@ -66,6 +66,7 @@
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__num" data-v="{{ if .prev }}{{ sub .prev .rk }}{{ end }}">{{ if .prev }}{{ $d := sub .prev .rk }}{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}{{ else }}<span class="cfb__dim">·</span>{{ end }}</td>
     <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>

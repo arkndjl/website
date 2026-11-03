@@ -628,6 +628,22 @@ def build():
         old = json.load(open(C.OUT))
     except (OSError, ValueError):
         pass
+    # rank movement, the CFB board's window (a week): the ARK ranking kept on each change; the move is against the
+    # ranking as of 7 days ago, or the preseason prior rank before the season is a week old
+    import datetime as _dt
+    day = now.date()
+    hist = {k: v for k, v in ((old or {}).get('rkHist') or {}).items() if k >= f'{SEASON - 1}-08-01'}
+    cur = {r['id']: r['rk'] for r in power}
+    if not hist or hist[max(hist)] != cur:          # stored only on change, so a quiet day writes nothing
+        hist[day.isoformat()] = cur
+    cut = (day - _dt.timedelta(days=7)).isoformat()
+    back = [k for k in sorted(hist) if k <= cut]
+    hist = {k: hist[k] for k in sorted(hist) if k > cut or (back and k == back[-1])}
+    snap = hist[back[-1]] if back else None
+    for r in power:
+        r['prev'] = snap.get(r['id']) if snap else r.get('priorRk')
+    res['prevFrom'] = back[-1] if back else 'preseason'
+    res['rkHist'] = hist
     if old and {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
         print('cbb games: no change')
     else:
