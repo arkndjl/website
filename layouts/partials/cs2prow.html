@@ -24,6 +24,7 @@
   <td class="cfb__num" data-v="{{ $r.t1p | default 0 }}">{{ with $r.t1p }}{{ printf "%.0f" (mul . 100) }}%{{ else }}-{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num">{{ $r.sm }}</td>
+  <td class="cfb__num" data-v="{{ $r.ss | default 0 }}">{{ with $r.ss }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}0%{{ end }}</td>
   <td class="cfb__num hk__x" data-v="{{ $r.rwa }}">{{ printf "%+.2f" (float $r.rwa) }}</td>
   <td class="cfb__num hk__x">{{ $r.maps }}</td>
   <td class="cfb__num hk__x" data-v="{{ $r.xtv | default 0 }}">{{ with $r.xtv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>

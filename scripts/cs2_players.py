@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FIT = ROOT / "data" / "cs2_players_fit.json"
 OUT = ROOT / "data" / "cs2_players.json"
 FEES = ROOT / "data" / "cs2_fees.json"
-STATS = ["k", "d", "a", "adr", "kast", "fk", "fd", "tk", "td", "mk", "cl"]
+STATS = ["k", "d", "a", "adr", "kast", "fk", "fd", "tk", "td", "mk", "cl", "hs"]  # hs added Nov 3 (held t -10.4)
 TIER = {"s": 1, "a": 2, "b": 3, "c": 4, "d": 5}
 T1_MAPS = 20
 
@@ -89,7 +89,7 @@ class Maps:
                     G.append(gi), P.append(r[1]), S.append(side), D.append(ordd(gg[2]))
                     TM.append(tid)
                     X.append([r[3] / R, r[4] / R, r[5] / R, r[12] / 1000,
-                              r[11] / 1000, r[7] / R, r[8] / R, r[9] / R, r[10] / R, r[15] / R, r[14] / R])
+                              r[11] / 1000, r[7] / R, r[8] / R, r[9] / R, r[10] / R, r[15] / R, r[14] / R, r[6] / R])
                     TR.append(tier)
                     NICK[r[1]] = r[16]
         self.games = games
@@ -133,9 +133,15 @@ def stat_weights(M, mask_games=None, l2=1e-4):
     return beta, mu / 5, float(r2)
 
 
-def contributions(M, beta, mline):
-    """Each player-map's share of his team's round share above .5 (x100: round win % added)."""
-    return (M.X - mline) @ beta * 100
+def contributions(M, beta, mline, pm=0.0):
+    """Each player-map's share of his team's round share above .5 (x100: round win % added). pm: share of the team's
+    residual (round share its five box lines miss) credited to each of the five equally, x pm (box + plus-minus)."""
+    c = (M.X - mline) @ beta * 100
+    if pm:
+        tot = np.zeros((len(M.games), 2))
+        np.add.at(tot, (M.g, M.side), c)
+        c = c + pm * (100 * (M.y - 0.5) - tot[M.g, M.side]) / 5
+    return c
 
 
 def ratings(M, c, T, p):
@@ -242,38 +248,66 @@ def fit_scale(M, c, p, mos):
     return num / den if den else 1.0
 
 
+def map_sq(M, c, p, months):
+    """Per-map squared errors of the walk-forward round-share prediction (as predict_score)."""
+    out = []
+    for mo in months:
+        T = ordd(mo + "-01")
+        T2 = ordd((dt.date.fromordinal(T) + dt.timedelta(days=32)).replace(day=1).isoformat())
+        theta, _ = ratings(M, c, T, p)
+        gi = np.where((M.gd >= T) & (M.gd < T2))[0]
+        x = (theta[M.p[M.five[gi, 0]]].sum(1) - theta[M.p[M.five[gi, 1]]].sum(1)) / 200
+        out.append((M.y[M.five[gi, 0, 0]] - 0.5 - p.get("a", 1.0) * x) ** 2)
+    return np.concatenate(out)
+
+
 def fit():
     M = Maps()
     last = dt.date.fromordinal(int(M.gd.max()))
     tune_g = (M.gd < ordd(TUNE[1]))
     beta, ml, r2 = stat_weights(M, tune_g)
-    c = contributions(M, beta, ml)
+    cs = {pm: contributions(M, beta, ml, pm) for pm in (0.0, 0.25, 0.5, 1.0)}
     tm, hm = months(*TUNE, last), months(*HELD, last)
-    # scoring months are thinned to every second month in the grid (speed); held months are all scored
+    # scoring months are thinned to every second month in the grid (speed); held months are all scored.
+    # opp > 1 over-credits (fed back through the iteration; top-50 game test worse at 2), 0.5 lost on Nov 2: kept 1.0
     grid = []
-    for h in (180, 365, 730):
-        for k in (50, 100, 300):
-            for opp in (0.5, 1.0):  # >1 over-credits (fed back through the iteration); top-50 game test worse at 2
-                p = dict(DEF, h=h, k=k, opp=opp)
-                p["a"] = fit_scale(M, c, p, tm[::2])
-                e, b0, n = predict_score(M, c, p, tm[1::2])
+    for h in (120, 180, 365):
+        for k in (25, 50, 100):
+            for pm, cc in cs.items():
+                p = dict(DEF, h=h, k=k, opp=1.0, pm=pm)
+                p["a"] = fit_scale(M, cc, p, tm[::2])
+                e, b0, n = predict_score(M, cc, p, tm[1::2])
                 grid.append((e, p))
-                print(f"h {h} k {k} opp {opp} a {p['a']:.2f} mse {e:.5f} flat {b0:.5f}", file=sys.stderr)
+                print(f"h {h} k {k} pm {pm} a {p['a']:.2f} mse {e:.5f} flat {b0:.5f}", file=sys.stderr)
     grid.sort(key=lambda x: x[0])
     best = grid[0][1]
+    c = cs[best["pm"]]
     out = {"beta": dict(zip(STATS, [round(float(b), 4) for b in beta])), "mline": [round(float(x), 5) for x in ml],
            "r2": round(r2, 3), "params": best, "tune": list(TUNE), "held": [HELD[0], last.isoformat()]}
-    # held out: ours vs alternatives (each with its own a fit on tune)
-    alts = {"ARK player rating": (c, best)}
-    alts["no opponent credit"] = (c, dict(best, opp=0.0))
-    alts["kills minus deaths per round"] = ((M.X[:, 0] - M.X[:, 1]) * 100 / 2, best)
-    score = []
+    # held out: ours vs alternatives (each with its own a fit on tune), paired t on per-map squared error
+    j11 = [STATS.index(x) for x in STATS if x != "hs"]
+    X0 = M.X
+    M.X = X0[:, j11]
+    b11, m11, _ = stat_weights(M, tune_g)
+    c_old = contributions(M, b11, m11)
+    M.X = X0
+    alts = {"ARK player rating": (c, best),
+            "Nov 2 rating (no headshots, no plus-minus)": (c_old, dict(DEF, h=180, k=50, opp=1.0)),
+            "no plus-minus": (cs[0.0], dict(best, pm=0.0)),
+            "no opponent credit": (c, dict(best, opp=0.0)),
+            "kills minus deaths per round": ((M.X[:, 0] - M.X[:, 1]) * 100 / 2, best)}
+    score, e_ours = [], None
     for nm, (cc, pp) in alts.items():
         pp = dict(pp)
         pp["a"] = fit_scale(M, cc, pp, tm[::2])
-        e, b0, n = predict_score(M, cc, pp, hm)
-        score.append({"name": nm, "mse": round(e, 6), "flat": round(b0, 6), "n": n,
-                      "r2": round(1 - e / b0, 4)})
+        e = map_sq(M, cc, pp, hm)
+        b0 = map_sq(M, cc, dict(pp, a=0.0), hm).mean()
+        if e_ours is None:
+            e_ours = e
+        dl = e - e_ours
+        score.append({"name": nm, "mse": round(float(e.mean()), 6), "flat": round(float(b0), 6), "n": len(e),
+                      "r2": round(float(1 - e.mean() / b0), 4),
+                      "t": round(float(dl.mean() / (dl.std() + 1e-12) * math.sqrt(len(dl))), 2)})
         print(nm, score[-1], file=sys.stderr)
     out["score"] = score
     pdir = load_pdir()
@@ -325,7 +359,15 @@ def prospect_rows(M, c, p, T, pdir, min_r=600):
     _, r12 = window_stats(M, c, th, T - 365, T, p)
     sm = s_maps(M, T)
     ok = (sm < T1_MAPS) & (r12 >= min_r)
-    return {"i": np.where(ok)[0], "th": th, "rise": th - th6, "r12": r12, "age": ages(M, pdir, T), "sm": sm}
+    return {"i": np.where(ok)[0], "th": th, "rise": th - th6, "r12": r12, "age": ages(M, pdir, T), "sm": sm,
+            "ss": sa_share(M, T)}
+
+
+def sa_share(M, T):
+    """Share of each player's rounds over the last year played at S- or A-tier events (bo3.gg tiers)."""
+    m = (M.d >= T - 365) & (M.d < T)
+    n = len(M.pids)
+    return np.bincount(M.p, M.R * m * (M.tier <= 2), n) / np.maximum(np.bincount(M.p, M.R * m, n), 1)
 
 
 def ols(X, y, w=None):
@@ -352,8 +394,8 @@ def prospect_fit(M, c, p, pdir):
         # reached T1: 20+ S-tier maps within the next year
         reach = (s_maps(M, T + 365) - pr["sm"])[pr["i"]] >= T1_MAPS
         data.append({"T": T, "i": i, "th": pr["th"][i], "rise": pr["rise"][i], "age": pr["age"][i], "y": fut[i],
-                     "w": np.minimum(rf[i], 3000), "reach_all": reach, "th_all": pr["th"][pr["i"]],
-                     "rise_all": pr["rise"][pr["i"]]})
+                     "ss": pr["ss"][i], "w": np.minimum(rf[i], 3000), "reach_all": reach, "th_all": pr["th"][pr["i"]],
+                     "rise_all": pr["rise"][pr["i"]], "ss_all": pr["ss"][pr["i"]]})
     tune = [x for x in data if dt.date.fromordinal(x["T"]).isoformat() < HELD[0]]
     held = [x for x in data if dt.date.fromordinal(x["T"]).isoformat() >= HELD[0]]
     if not tune or not held:
@@ -365,7 +407,9 @@ def prospect_fit(M, c, p, pdir):
         return X, np.concatenate([x["y"] for x in xs]), np.concatenate([x["w"] for x in xs])
     res = {}
     for nm, cols in (("rating now", ["th"]), ("rating + rise", ["th", "rise"]), ("rating + age", ["th", "age"]),
-                     ("rating + rise + age", ["th", "rise", "age"])):
+                     ("rating + rise + age", ["th", "rise", "age"]),
+                     # Nov 3: share of last year's rounds at S/A-tier events (scripts/cs2_nov03_research.py, t -5.9)
+                     ("rating + age + S/A share", ["th", "age", "ss"])):
         X, y, w = stack(tune, cols)
         b = ols(X, y, w)
         Xh, yh, wh = stack(held, cols)
@@ -378,24 +422,39 @@ def prospect_fit(M, c, p, pdir):
         r["t"] = round(float(dlt.mean() / (dlt.std() + 1e-12) * math.sqrt(len(dlt))), 2)
         r["dmse"] = round(r["mse"] - bmse, 4)
         r["mse"] = round(r["mse"], 4)
+    # the S/A share term on its own: against rating + age
+    ra_, rs_ = res["rating + age"], res["rating + age + S/A share"]
+    dl = rs_["w"] * (rs_["e"] ** 2 - ra_["e"] ** 2)
+    rs_["tTerm"] = round(float(dl.mean() / (dl.std() + 1e-12) * math.sqrt(len(dl))), 2)
     for r in res.values():
         del r["e"], r["w"]
     # reach model: logistic of reaching T1 within a year on rating and rise (all prospects, not only 600+ later)
-    Xr = np.concatenate([np.column_stack([np.ones(len(x["th_all"])), x["th_all"], x["rise_all"]]) for x in tune])
-    yr = np.concatenate([x["reach_all"] for x in tune]).astype(float)
-    wr = np.zeros(3)
-    for _ in range(50):
-        q = 1 / (1 + np.exp(-Xr @ wr))
-        wr -= np.linalg.solve((Xr * (q * (1 - q))[:, None]).T @ Xr + 1e-6 * np.eye(3), Xr.T @ (q - yr))
-    Xrh = np.concatenate([np.column_stack([np.ones(len(x["th_all"])), x["th_all"], x["rise_all"]]) for x in held])
-    yrh = np.concatenate([x["reach_all"] for x in held]).astype(float)
-    qh = np.clip(1 / (1 + np.exp(-Xrh @ wr)), 1e-6, 1 - 1e-6)
-    llh = float(-(yrh * np.log(qh) + (1 - yrh) * np.log(1 - qh)).mean())
+    def reach_fit(cols):
+        Xr = np.concatenate([np.column_stack([np.ones(len(x["th_all"]))] + [x[k] for k in cols]) for x in tune])
+        yr = np.concatenate([x["reach_all"] for x in tune]).astype(float)
+        wr = np.zeros(Xr.shape[1])
+        for _ in range(50):
+            q = 1 / (1 + np.exp(-Xr @ wr))
+            wr -= np.linalg.solve((Xr * (q * (1 - q))[:, None]).T @ Xr + 1e-6 * np.eye(len(wr)), Xr.T @ (q - yr))
+        Xrh = np.concatenate([np.column_stack([np.ones(len(x["th_all"]))] + [x[k] for k in cols]) for x in held])
+        yrh = np.concatenate([x["reach_all"] for x in held]).astype(float)
+        qh = np.clip(1 / (1 + np.exp(-Xrh @ wr)), 1e-6, 1 - 1e-6)
+        return wr, -(yrh * np.log(qh) + (1 - yrh) * np.log(1 - qh)), yr, yrh
+    wr, lh, yr, yrh = reach_fit(["th_all", "rise_all"])
+    wr2, lh2, _, _ = reach_fit(["th_all", "rise_all", "ss_all"])
+    dl = lh2 - lh
+    t_ss = round(float(dl.mean() / (dl.std() + 1e-12) * math.sqrt(len(dl))), 2)
+    if t_ss < -3.3:  # Bonferroni cut of the Nov 3 test batch
+        wr, lh = wr2, lh2
+    llh = float(lh.mean())
     pb = yr.mean()
     llb = float(-(yrh * np.log(pb) + (1 - yrh) * np.log(1 - pb)).mean())
     # passing terms (held t < -2 and lower mse) are kept
     keep = "rating now"
-    for nm in ("rating + rise + age", "rating + rise", "rating + age"):
+    rs_ = res["rating + age + S/A share"]
+    if rs_["t"] < -2 and res["rating + age"]["t"] < -2 and rs_["tTerm"] < -3.3:  # term clears the Bonferroni cut
+        keep = "rating + age + S/A share"
+    for nm in ("rating + rise + age", "rating + rise", "rating + age") if keep == "rating now" else ():
         r = res[nm]
         if r["t"] < -2 and all(res[x]["t"] < -2 for x in (["rating + " + c for c in ("rise", "age") if c in r["cols"]]
                                                           if nm.count("+") == 2 else [nm])):
@@ -403,7 +462,7 @@ def prospect_fit(M, c, p, pdir):
             break
     return {"models": res, "keep": keep, "cuts": [dt.date.fromordinal(x["T"]).isoformat() for x in data],
             "nTune": int(sum(len(x["y"]) for x in tune)),
-            "reach": {"w": [round(float(v), 4) for v in wr], "ll": round(llh, 4), "llBase": round(llb, 4),
+            "reach": {"w": [round(float(v), 4) for v in wr], "tShare": t_ss, "ll": round(llh, 4), "llBase": round(llb, 4),
                       "rate": round(float(yrh.mean()), 3), "n": int(len(yrh))}}
 
 
@@ -480,7 +539,8 @@ class Live:
             return
         self.p = fj["params"]
         self.M = Maps()
-        self.c = contributions(self.M, np.array([fj["beta"][k] for k in STATS]), np.array(fj["mline"]))
+        self.c = contributions(self.M, np.array([fj["beta"][k] for k in STATS]), np.array(fj["mline"]),
+                               self.p.get("pm", 0.0))
         self.nk, self.nkt = nick_index(self.M, bo3)
         self.snaps = {}
 
@@ -607,7 +667,7 @@ def build():
     p = fitj["params"]
     M = Maps()
     beta = np.array([fitj["beta"][k] for k in STATS])
-    c = contributions(M, beta, np.array(fitj["mline"]))
+    c = contributions(M, beta, np.array(fitj["mline"]), p.get("pm", 0.0))
     today = dt.date.today()
     T = today.toordinal() + 1
     th, _ = ratings(M, c, T, p)
@@ -666,17 +726,20 @@ def build():
     keep = (pf.get("models") or {}).get(pf.get("keep"), {"cols": ["th"], "b": [0, 1]})
     rw = (pf.get("reach") or {}).get("w")
     pros = []
+    ss = sa_share(M, T)
     for i in pool:
         if sm[i] >= T1_MAPS:
             continue
-        x = {"th": th[i], "rise": th[i] - th6[i], "age": (age[i] - 22) if age[i] == age[i] else 0.0}
+        x = {"th": th[i], "rise": th[i] - th6[i], "age": (age[i] - 22) if age[i] == age[i] else 0.0, "ss": ss[i]}
         proj = keep["b"][0] + sum(b * x[k] for b, k in zip(keep["b"][1:], keep["cols"]))
         r = row(i)
         r["proj"] = round(float(a / 2 * (proj - mu1)), 2)
         r["fv"] = fv_of(proj, mu1, sd1)
         r["rise"] = round(float(a / 2 * (th[i] - th6[i])), 2)
+        r["ss"] = round(float(ss[i]), 2)
         if rw:
-            r["t1p"] = round(float(1 / (1 + math.exp(-(rw[0] + rw[1] * th[i] + rw[2] * (th[i] - th6[i]))))), 3)
+            z = rw[0] + rw[1] * th[i] + rw[2] * (th[i] - th6[i]) + (rw[3] * ss[i] if len(rw) > 3 else 0.0)
+            r["t1p"] = round(float(1 / (1 + math.exp(-z))), 3)
         pros.append(r)
     pros.sort(key=lambda r: (-r["proj"], -r.get("t1p", 0)))
     pros = pros[:200]
