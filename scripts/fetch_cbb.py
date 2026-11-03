@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
 import cbb_combine as CB
+import cbb_nbapos as NPOS   # projected NBA position, display only
 import names as N
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
@@ -201,7 +202,7 @@ def main():
     today = time.gmtime()
 
     cols = ['name', 'team', 'logo', 'conf', 'pos', 'role', 'ovr', 'posRank', 'fv', 'plus', 'fvx', 'nbaP', 'xbpm', 'cls', 'elig', 'age', 'ageEst',
-            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'fvd', 'fvg', 'e']
+            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'fvd', 'fvg', 'e', 'npos']
     out = []
     for k, r in enumerate(rows, 1):
         p, t, c, f = r['p'], r['t'], r['c'], r['f']
@@ -230,7 +231,8 @@ def main():
         out.append([p['name'], t['name'], local_logo(t['logo']), t['conf'], p['pos'], L['role'] if L else None, k, posrk[p['pos']], r['fv'], r['plus'], r['fvx'],
                     round(r['nbaP'], 4), round(r['xbpm'], 1), p['cls'], ELIG.get(p['cls'], 1), round(age, 1) if age else None,
                     None if age else age_est.get(p['cls']), p['ht'], int(p['wt']) if p['wt'] else None, p['photo'], 0 if c else 1,
-                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvg'], cbb_z(p['cls'], not c, p['pos'], r['fvg']))), r['fvg'], round(float(r['e']), 2)])
+                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvg'], cbb_z(p['cls'], not c, p['pos'], r['fvg']))), r['fvg'], round(float(r['e']), 2),
+                    NPOS.describe(r['cc']['seasons'], p['pos'])])
     os.makedirs(os.path.join(D.ROOT, 'static', 'data'), exist_ok=True)
     json.dump({'cols': cols, 'rows': out}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json'), 'w'), separators=(',', ':'))
     # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend

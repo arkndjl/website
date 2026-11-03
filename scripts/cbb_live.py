@@ -26,6 +26,7 @@ import cbb_data as D
 import cbb_fit as F
 import cbb_combine as CB
 import cbb_badges as CBADGE
+import cbb_nbapos as NPOS
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 
@@ -342,7 +343,8 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         grp = 'newcomer'
         proj = lf['now'][grp] == 'projected'
         gp_full = ln['gp'] * full_games / max(1, ln['team_g']) if proj and ln['team_g'] < full_games else None
-        f_now = F.features(next_career(cc, ln, gp_full), 1)
+        cn = next_career(cc, ln, gp_full)
+        f_now = F.features(cn, 1)
         e1, p1, parts1 = score(f_now, fit)
         w = weight(ln['n'], lf['k'][grp])
         fvx = (1 - w) * pre + w * emap(e1)
@@ -364,7 +366,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
             if c in ci: row[ci[c]] = v
         out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
                     'xbpm': (ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
-                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt'})
+                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt', 'seas': cn['seasons']})
     print(f"{len(out)} players in this season's box scores are not on the preseason board: graded from the 20 floor "
           f"(drivers fit on {pf['n']} low-information board players, 5-fold R2 {pf['r2']:.3f}), then on their lines")
     return out
@@ -401,7 +403,8 @@ def main():
         pid = m['pid'] if m['pid'] in lines else keys.get((m['key'], m['bt']))
         if pid in used: pid = None          # two board rows can't share one Barttorvik player
         ln = lines.get(pid) if pid else None
-        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd}
+        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd,
+               'seas': cc['seasons']}
         if ln:
             used.add(pid)
             grp = 'newcomer' if f_pre['newcomer'] else 'returner'
@@ -417,6 +420,7 @@ def main():
             kb = lf['kb'][grp]['k']
             rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
             n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
+            rec['seas'] = cn['seasons']
             rec.update(e=(1 - w) * e0 + w * e1, p=(1 - w) * p0 + w * p1, parts=[(k, v, x) for k, (v, x) in mix.items()],
                        xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
@@ -457,7 +461,8 @@ def main():
     posrk = Counter()
     # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges; e: E[FV] after the stages (the FV inputs add up to it)
     # xb0: preseason xBPM under today's model (the breakouts tab's baseline, scripts/cbb_tabs.py)
-    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0') if c not in ci]
+    # npos: projected NBA position (scripts/cbb_nbapos.py, display only): odds at PG..C, expected position, change flag
+    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0', 'npos') if c not in ci]
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
     for k, r in enumerate(recs, 1):
@@ -472,7 +477,7 @@ def main():
         row[ci['report']] = rep
         fvd = fvd_of(fv_dist('cbb', r['fvg'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvg'])))
         new = {'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
-               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None}
+               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos)}
         for c in new:
             if c in ci: row[ci[c]] = new[c]
         out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + [new[c] for c in add])

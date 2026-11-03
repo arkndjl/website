@@ -19,6 +19,13 @@
   var dim = '<span class="cfb__dim">—</span>';
   var CLS = { 1: 'Fr', 2: 'So', 3: 'Jr', 4: 'Sr', 5: 'Gr' };
   var ROLEPOS = { 'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C' };
+  // projected NBA position (scripts/cbb_nbapos.py, display only): npos = [odds at PG..C, expected position, change group, its odds]
+  var NPOS = ['PG', 'SG', 'SF', 'PF', 'C'];
+  function nposLine(r) {
+    return r.npos ? r.npos[0].map(function (v, k) { return [v, NPOS[k]]; }).filter(function (x) { return x[0] >= 0.05; })
+      .sort(function (a, b) { return b[0] - a[0]; }).map(function (x) { return x[1] + ' ' + Math.round(x[0] * 100) + '%'; }).join(' · ') : '';
+  }
+  function moveChip(r) { return r.npos && r.npos[2] ? '<span class="cfb__movechip" title="NBA position: ' + esc(nposLine(r)) + '. ' + esc(r.npos[2]) + ' ' + Math.round(r.npos[3] * 100) + '%">⇄' + esc(r.npos[2]) + '</span>' : ''; }
   function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
   // a row with no photo (or one that fails) keeps the neutral frame so names line up; a card without one drops it
   function faceHtml(src, cls, w) { var u = face(src, w), row = cls === 'pxframe--row'; return u || row ? '<span class="pxframe ' + cls + '"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" onerror="' + (row ? 'this.onerror=null;this.src=\'/img/face.svg\'' : 'this.parentNode.remove()') + '"></span>' : ''; }
@@ -47,7 +54,7 @@
       (r.src === 'bt' ? prov('not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in') : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
-        (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
+        moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
       '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="mean outcome ' + (+r.fvx).toFixed(2) + '">' + fv + '</span></td>' +
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
@@ -118,7 +125,8 @@
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
       ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' + badgeChips(r) +
-      '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
+      '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' +
+      (r.npos ? '<p class="cfb__role">' + moveChip(r) + 'NBA position: ' + esc(nposLine(r)) + '.</p>' : '') + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + fvNote(r, sum) + '</p></details></div></td></tr>';
@@ -183,11 +191,11 @@
     }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
-          conf = val('conf'), team = val('team'), role = val('role'), nw = val('nw'), intl = val('intl'), uc = val('uc');
+          conf = val('conf'), team = val('team'), role = val('role'), nw = val('nw'), intl = val('intl'), uc = val('uc'), mv = val('mv');
       var view = recs.filter(function (r) {
         var a = r.age != null ? r.age : r.ageEst;
         return (!pos || r.pos === pos) && (!cls || String(r.elig) === cls) && (!uc || r.elig <= 2) && (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || r.fv >= fv) &&
-          (!conf || r.conf === conf) && (!team || r.team === team) && (!role || r.role === role) && (!nw || r.new) && (!intl || r.intl);
+          (!conf || r.conf === conf) && (!team || r.team === team) && (!role || r.role === role) && (!nw || r.new) && (!intl || r.intl) && (!mv || (r.npos && r.npos[2]));
       });
       // RK and the position rank count only the players in view (this tab plus its filters), in FV order whatever the sort
       RK = {}; PRK = {}; var seen = {};
@@ -196,14 +204,14 @@
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
-      var k = (pos ? 1 : 0) + ['cls', 'uc', 'age', 'fv', 'conf', 'team', 'role', 'nw', 'intl'].filter(function (x) { return val(x); }).length;
+      var k = (pos ? 1 : 0) + ['cls', 'uc', 'age', 'fv', 'conf', 'team', 'role', 'nw', 'intl', 'mv'].filter(function (x) { return val(x); }).length;
       bar.querySelector('[data-cbb-active]').textContent = k ? '(' + k + ')' : '';
       show(); writeHash();
     }
     function writeHash() {
       var s = [];
       if (pos) s.push('pos=' + pos);
-      ['q', 'season', 'team', 'cls', 'uc', 'age', 'fv', 'conf', 'role', 'nw', 'intl'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
+      ['q', 'season', 'team', 'cls', 'uc', 'age', 'fv', 'conf', 'role', 'nw', 'intl', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
       if (cur !== 'rk' || dir !== 1) s.push('s=' + cur, 'd=' + dir);
       if (openP) s.push('p=' + openP);
       var h = s.length ? '#' + id + ':' + s.join('&') : '', at = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
