@@ -484,9 +484,75 @@
      "term": "xBPM",
      "short": "Projected Barttorvik BPM this season.",
      "body": [
-      "Ridge on last season, recruiting, age, size (r .74 returners, .47 newcomers); in season blends to-date BPM."
+      "Ridge on last season, recruiting, age, size; in season blends to-date BPM.",
+      "Team context (Nov 3 2026): returning teammates' WAR, teammates' recruiting (top 8 -ln rank), WAA, transfer up/down.",
+      "Forward 2020-26 RMSE: returners 2.558 -> 2.462 (t 18), newcomers 3.439 -> 3.229 (t 14). Not an FV input."
      ],
-     "where": "CBB board, true freshmen",
+     "where": "CBB board, true freshmen, breakouts",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "CBB WAR / WAA",
+     "short": "Wins over a replacement / average D-I player.",
+     "body": [
+      "WAR = (BPM + 2) x minutes / 40 x team possessions a 40 / 100 x .0124 wins a point; WAA uses BPM.",
+      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 365 team seasons:",
+      "wins = .41 x games + team WAR (r .85). The textbook slope (.0347 at margin sd 11.5) overstates: schedules",
+      "pair strong with strong and win odds flatten at the ends. FV test: WAR, WAA, career and 5/4/3 WAR fail."
+     ],
+     "where": "CBB WAR leaders, stats, portal, returning",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Stat+ (CBB)",
+     "short": "BPM against the position: 100 + 25 x z.",
+     "body": [
+      "z = (BPM - position mean) / position sd; G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (10%+ minute seasons 2008-16).",
+      "FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26)."
+     ],
+     "where": "CBB stats, WAR leaders, portal; FV inputs",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Game Score",
+     "short": "Hollinger single-game value.",
+     "body": [
+      "PTS + .4 FGM - .7 FGA - .4 (FTA - FTM) + .7 ORB + .3 DRB + STL + .7 AST + .7 BLK - .4 PF - TOV.",
+      "FV and xBPM tests (a game, a 40, best game, 20+ games): all fail."
+     ],
+     "where": "CBB top performers",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Breakout watch (CBB)",
+     "short": "1st-2nd year players above their preseason projection.",
+     "body": [
+      "xBPM up = live xBPM - preseason xBPM (minutes-blended). Also BPM over x, minutes, usage and FV gains.",
+      "Last season view: 2nd-years against their freshman line (WAR, BPM, minutes, usage gains).",
+      "FV tests: WAR gain, minutes gain, usage gain, BPM x (1 - minutes share) all fail (low-minute BPM passes the folds, not the top of the board)."
+     ],
+     "where": "CBB breakouts tab",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "Returning / talent (CBB)",
+     "short": "Team tables: last season's minutes and WAR back; roster grades.",
+     "body": [
+      "Ret Min% = last season's minutes still on the roster (Barttorvik ids). In WAR = incoming transfers' WAR.",
+      "Talent = mean FV of the top 8. xNBA = sum of NBA%. TvE = talent rank - ARK rank.",
+      "FV tests: vacated minutes (opportunity), returning teammates' WAR, teammates' recruiting fail; the last two pass for xBPM."
+     ],
+     "where": "CBB returning, team talent",
      "sports": [
       "CBB"
      ]
@@ -2066,7 +2132,7 @@
      "3.16+ peak WAR a season",
      "top 5 of a class",
      "top 2.4% of picks",
-     "1 / 11",
+     "1 / 10",
      "60-64: 62.2 -> 58.7 (n 12, NHL 100%)"
     ],
     [
@@ -2074,7 +2140,7 @@
      "2.33+ peak WAR a season",
      "top 10",
      "top 4.7% of picks",
-     "1 / 14",
+     "1 / 13",
      "55-59: 57.3 -> 60.0 (n 16, NHL 100%)"
     ],
     [
@@ -2082,7 +2148,7 @@
      "1.48+ peak WAR a season",
      "top 20 (NHL regular)",
      "top 9.4% of picks",
-     "4 / 31",
+     "4 / 30",
      "50-54: 51.8 -> 50.4 (n 33, NHL 97%)"
     ],
     [
@@ -2090,7 +2156,7 @@
      "0.86+ peak WAR a season",
      "top 30",
      "top 14.2% of picks",
-     "7 / 76",
+     "7 / 75",
      "45-49: 47.4 -> 49.1 (n 63, NHL 98%)"
     ],
     [
@@ -2098,7 +2164,7 @@
      "0.38+ peak WAR a season",
      "top 45 (NHL career)",
      "top 21.3% of picks",
-     "20 / 125",
+     "20 / 124",
      "40-44: 42.4 -> 43.9 (n 129, NHL 98%)"
     ],
     [
