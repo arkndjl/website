@@ -495,6 +495,91 @@
      ]
     },
     {
+     "term": "3Y (NBA)",
+     "short": "Projected XPM over the next three seasons, every player.",
+     "body": [
+      "3Y = c0 + c1 proj + c2 (age - 27) + c3 (age - 27)^2 + c4 ln(1 + M) + c5 proj (age - 27) + c6 proj (ln(1 + M) - 7); proj = XPM (proj), M = projected full-season minutes. Target: next three seasons' minutes-weighted XPM, shrunk to -2 with 1,000 MP (a season off the board counts -2). 1Y = same form, next season.",
+      "Held out by season 2012-23: RMSE .843 vs .897 recalibrated aging curve, 1.031 contract-tab aging, 1.160 flat (t -8.2 vs recalibrated, 12/12 seasons, slope 1.00). 1Y .856 vs .890 (t -8.4, 14/14). Coefficients by season share f on simulated partial seasons (f .1: .969 vs 1.013).",
+      "Top end still low: proj 4+ players project 3.80 vs 4.44 actual. Contract value keeps the aging curve (3Y did not beat it at every season share). Display only."
+     ],
+     "where": "NBA XPM",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "3Y (NHL)",
+     "short": "Projected WAR over the next three seasons.",
+     "body": [
+      "3Y = c . [1, pWAR82, Marcel WAR, (age - 27) and its square by F/D/G, pWAR82 x (age - 27), HPM over replacement, ln(1 + TOI82 / 100)]. A season out of the league counts 0.",
+      "Held out by season 2010-23: skaters RMSE 2.455 vs 2.617 pWAR + Marcel, 2.844 flat pWAR (t -14.2, 14/14 seasons, slope 1.00; time split t -10.7). Goalies 4.07 vs 4.37 (t -5.6, 13/14). Season in progress: coefficients by season share on simulated partial seasons. Display only."
+     ],
+     "where": "NHL WAR leaders",
+     "sports": [
+      "NHL"
+     ]
+    },
+    {
+     "term": "1Y / 3Y (NFL)",
+     "short": "Projected WAR next season and over the next three.",
+     "body": [
+      "Regression on WAR pace this season and the two before, played flags, log snaps, and an age curve per position group (hinge at 27, WAR x years past 27; WR declines steepest, QB slowest). Off the board counts 0. Special teams not projected.",
+      "Held out by season: 3Y (2015-22) RMSE .326 vs .342 calibrated Marcel rate x snaps (t -5.9, 8/8 seasons); 1Y (2015-24) .140 vs .143 (t -4.2, 9/10); slope .99. Position age curves beat one pooled curve (t -3.8 3Y). Coefficients by share of season played. Display only."
+     ],
+     "where": "NFL WAR",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "Proj / 3Y (soccer)",
+     "short": "Projected GAR next season and over the next three.",
+     "body": [
+      "OLS on this season's GAR at full-season pace, the two prior seasons' GAR per 90 pooled (shrunk with 900 minutes) x minutes, ln minutes, and age by position. A season out of the big five counts 0. Coefficients by share of season played.",
+      "Held out by season 2017-25: Proj RMSE 1.22 vs 1.28 current GAR regressed to the mean (t -12, 9/9); 3Y (2017-23) 2.82 vs 2.99 (t -12, 7/7); slope ~1.00. Display only."
+     ],
+     "where": "soccer player value",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Proj (tennis)",
+     "short": "ARK and Elo 12, 24 and 36 months on.",
+     "body": [
+      "logit ARK(t+12) = c0 + c1 logit ARK + age + age^2 + ln(1 + matches in 52 weeks) + ln(1 + career matches) + ln(rank) + unranked flag; same form for 24/36 months and Elo. Players still active at the horizon.",
+      "Quarter-end top-300 boards 2006-25, each year held out, vs rating held flat + the live age term: ATP 12 mo RMSE .477 -> .462 (t -18.8, 15/19), WTA .509 -> .500 (t -16.0, 11/19); 36 mo ATP t -11.7, WTA t -3.6. Volume and rank carry the gain; age alone fails. Display only."
+     ],
+     "where": "tennis ARK Ranking",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "6M (CS2)",
+     "short": "Player RWA projected 182 days on.",
+     "body": [
+      "6M = c0 + c1 RWA + age + age^2 + unknown-age flag (peak in the low 20s). Maps played and S/A-tier share failed.",
+      "Fit on monthly cuts before Jul 2025, held Jul 2025-May 2026: RMSE .507 -> .485 vs flat (t -2.4, 9/11 months, slope 1.02). Refit monthly; blank if it stops passing. Display only."
+     ],
+     "where": "CS2 players",
+     "sports": [
+      "CS2"
+     ]
+    },
+    {
+     "term": "Next (CBB)",
+     "short": "Next season's WAR at 31 games, playing D-I.",
+     "body": [
+      "OLS on last season's BPM, 3-year BPM, minutes share, BPM x minutes, WAR, class, recruit rank, transfer and team strength, age, seasons played, BPM over position, OBPM, usage and height. In season: line to date, coefficients by share of team games played.",
+      "Walk-forward 2016-26 (31,633 returners + transfers): RMSE .432 vs .443 roster prior's projection, .470 flat (t -10.1, 11/11 seasons, slope .97). Display only."
+     ],
+     "where": "CBB WAR",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
      "term": "Contract value (surplus)",
      "short": "Projected VORX x market $ per win, minus salary, every year left.",
      "body": [
