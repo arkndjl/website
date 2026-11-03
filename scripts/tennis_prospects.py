@@ -758,7 +758,7 @@ def fit(scorecard_only=False):
                 Xp = Xp[(Xp['head'] >= 45) | (Xp.out >= 55)].sort_values('head', ascending=False)
                 Pn = B[tour]['P']
                 T_['past'] = [dict(pid=int(r.pid), name=f"{Pn.at[r.pid, 'first']} {Pn.at[r.pid, 'last']}", season=int(r.season),
-                                   age=round(float(r.age), 1), rank=int(r.rank), fv=FS.fv_of(tour, float(r.head)), fvx=round(float(r.head), 2), out=int(round(r.out)),
+                                   age=round(float(r.age), 2), rank=int(r.rank), fv=FS.fv_of(tour, float(r.head)), fvx=round(float(r.head), 2), out=int(round(r.out)),
                                    peak=round(float(r.pk) * 20, 2), pkr=None if r.pk <= 0 or np.isnan(xrank([r.pk], T_['rank'])[0]) else int(round(float(xrank([r.pk], T_['rank'])[0]))),
                                    nat=tennis_data.iso2(r.ioc) or None)
                               for r in Xp.itertuples()]
@@ -1088,7 +1088,7 @@ def build():
             elo = None if pd.isna(r.elo) else round(float(r.elo))
             rows.append(dict(id=pid, name=nm, nat=v.get('nat'), espn=v.get('espn'), wd=P.at[pid, 'wd'] if isinstance(P.at[pid, 'wd'], str) and P.at[pid, 'wd'] else None,
                              dob=None if pd.isna(P.at[pid, 'dob']) else int(P.at[pid, 'dob']),
-                             age=round(float(r.agesnap), 1), rank=None if pd.isna(r['rank']) else int(r['rank']),
+                             age=round(float(r.agesnap), 2), rank=None if pd.isna(r['rank']) else int(r['rank']),
                              best=None if pd.isna(r.best) else int(r.best), elo=elo,
                              ep=None if elo is None or r.elon < 10 else int(round(100 + 25 * (r.elo - (a * r.age + b0)) / sd)),
                              n=int(r.n), w=int(r.w), nT=int(r.nT), wT=int(r.wT), nC=int(r.nC), wC=int(r.wC), nS=int(r.nS), wS=int(r.wS),

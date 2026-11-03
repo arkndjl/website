@@ -134,7 +134,7 @@
           if (c.k === 'pre') return '<td class="cfb__num ' + c.cls + '">' + (r.preL ? esc(r.preL) : DASH) + '</td>';
           if (c.k === 'pfv') return '<td class="cfb__num ' + c.cls + '">' + (r.pfv == null ? DASH : r.pfv) + '</td>';
           if (c.k === 'dl') return '<td class="cfb__num">' + (r.dl == null ? DASH : fmt(r.dl, 's0')) + '</td>';
-          if (c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r.age == null ? '' : (r.age % 1 ? r.age.toFixed(1) : r.age)) + '</td>';
+          if (c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r.age == null ? '' : r.ageEst ? '~' + r.age.toFixed(1) : r.age) + '</td>';
           return '<td class="cfb__num ' + c.cls + '">' + fmt(r[c.k], c.f) + '</td>';
         }).join('') + '</tr>';
       }).join('');

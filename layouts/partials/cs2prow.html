@@ -7,7 +7,7 @@
   <td style="white-space: nowrap">{{ if and $r.tk $r.logo }}<img class="cs__logo" src="/img/cs2/{{ $r.tk }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ $r.tm }}{{ with $r.trk }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
   <td class="cs__tier" data-v="{{ $r.tier }}" data-filter="Tier {{ $r.tier }}"><span class="cs__t cs__t--{{ $r.tier }}">T{{ $r.tier }}</span></td>
   {{- if eq $v "board" }}
-  <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td>
+  <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.2f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.rwa }}"><b>{{ printf "%+.2f" (float $r.rwa) }}</b></td>
   <td class="cfb__num" data-v="{{ $r.d90 }}">{{ printf "%+.2f" (float $r.d90) }}</td>
   <td class="cfb__num" data-v="{{ $r.rar }}">{{ printf "%.0f" (float $r.rar) }}</td>
@@ -22,7 +22,7 @@
   <td class="cfb__num" data-v="{{ $r.proj }}"><b>{{ printf "%+.2f" (float $r.proj) }}</b></td>
   <td class="cfb__num" data-v="{{ $r.rise }}">{{ if gt (float $r.rise) 0.5 }}<span class="cs__up">{{ printf "%+.2f" (float $r.rise) }}</span>{{ else }}{{ printf "%+.2f" (float $r.rise) }}{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.t1p | default 0 }}">{{ with $r.t1p }}{{ printf "%.0f" (mul . 100) }}%{{ else }}-{{ end }}</td>
-  <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td>
+  <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.2f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num">{{ $r.sm }}</td>
   <td class="cfb__num" data-v="{{ $r.ss | default 0 }}">{{ with $r.ss }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}0%{{ end }}</td>
   <td class="cfb__num hk__x" data-v="{{ $r.rwa }}">{{ printf "%+.2f" (float $r.rwa) }}</td>
@@ -30,7 +30,7 @@
   <td class="cfb__num hk__x" data-v="{{ $r.xtv | default 0 }}">{{ with $r.xtv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
   {{- else }}
   <td class="cfb__num" data-v="{{ $r.xtv | default 0 }}"><b>{{ with $r.xtv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</b></td>
-  <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td>
+  <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.2f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.rwa }}">{{ printf "%+.2f" (float $r.rwa) }}</td>
   <td class="cfb__num" data-v="{{ $r.rar }}">{{ printf "%.0f" (float $r.rar) }}</td>
   <td class="cfb__num hk__x">{{ $r.maps }}</td>

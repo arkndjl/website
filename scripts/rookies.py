@@ -125,7 +125,7 @@ def nfl():
         d = picks.get(p['id'])
         m, _ = M.find(p['n'], team=p.get('col') or None)
         pre = int(d['pick']) if d and d['pick'] else None
-        rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'war': p['war'], 'xv': p.get('xv'),
+        rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'war': p['war'], 'xv': p.get('xv'),
                      'wav': p.get('wav'), 'pace': p.get('pace'), 'g': p['g'], 'sn': p.get('sn'),
                      'pre': pre, 'preL': f"R{d['round']} #{d['pick']}" if pre else 'UDFA', 'pfv': m['fv'] if m else None,
                      'sub': p.get('col') or '', 'line': p.get('line') or '',
@@ -179,7 +179,7 @@ def nba():
             c = cbb.get((dr[0], dr[1])) if dr else None
             if c and not NM.same(c['name'], p['n']):
                 c = None
-            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'vorx': p['vorx'], 'xpm': p.get('sxpm', p['xpm']),
+            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'vorx': p['vorx'], 'xpm': p.get('sxpm', p['xpm']),
                    'oxpm': p.get('soxpm', p['oxpm']), 'dxpm': p.get('sdxpm', p['dxpm']), 'rxpm': p['xpm'], 'mp': p['mp'], 'g': p['g'],
                    'pre': dr[1] if dr else None, 'preL': (f'{dr[0]} #{dr[1]}' if dr[0] != S - 1 else f'#{dr[1]}') if dr else 'UDFA',
                    'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '',
@@ -232,7 +232,7 @@ def nhl():
                     fv = q['fv0'] if q else (past.get((r['year'], r['pick'])) or {}).get('fv')
                     if fv is not None and q is None and not NM.same(past[(r['year'], r['pick'])]['name'], p['n']):
                         fv = None
-                rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'war': p['war'], 'pwar': p.get('pwar'),
+                rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'war': p['war'], 'pwar': p.get('pwar'),
                              'hpm': p.get('hpm'), 'toi': p['toi'], 'gp': p['gp'], 'pts': p.get('pts'), 'gsax': p.get('gsax'),
                              'pre': r['pick'] if r else None, 'preL': f"{r['year']} #{r['pick']}" if r else 'undrafted',
                              'pfv': fv, 'sub': '', 'ph': ESPN_FACE.format('nhl', p['ph']) if p.get('ph') else None,
@@ -282,7 +282,7 @@ def soccer():
             b = dob.get(str(t)) if t else None
             age = None
             if b:
-                age = int((dt.date(S - 1, 9, 1) - dt.date.fromisoformat(b)).days / 365.25)
+                age = round((dt.date(S - 1, 9, 1) - dt.date.fromisoformat(b)).days / 365.25, 2)
             fv = None
             if t and S == cur and t in board:
                 fv = board[t]['fv']
@@ -426,7 +426,7 @@ def hockey():
                 continue        # an older AHL first-year with no draft grade: not a prospect
             age = H.age_at(birth, S - 1) if birth else None
             g = P._num(p.get('goals'))
-            rows.append({'n': name, 'tm': P._flip(p.get('team_name')), 'pos': p.get('position') or '', 'age': r1(age), 'lg': lg,
+            rows.append({'n': name, 'tm': P._flip(p.get('team_name')), 'pos': p.get('position') or '', 'age': None if age is None else round(age, 2), 'lg': lg,
                          'nhle': r1(82 * H.nhle_of(lg) * pts / gpn) if p.get('position') != 'G' else None,
                          'ppg': round(pts / gpn, 2), 'gp': int(gpn), 'g': int(g), 'pts': int(pts),
                          'fv': (b or q or {}).get('fv'), 'pre': q['pick'] if q else (b.get('xslot') if b else None),
@@ -453,7 +453,7 @@ def hockey():
 # ---------------------------------------------------------------- soccer prospects: first senior season
 def soccerp():
     d = J('data', 'soccer_prospects.json')
-    rows = [{'n': p['name'], 'tm': p['club'], 'pos': p['grp'], 'age': p.get('age'), 'fv': p['fv'], 'gar': p.get('gar'),
+    rows = [{'n': p['name'], 'tm': p['club'], 'pos': p['grp'], 'age': p.get('age'), 'ageEst': p.get('ageEst'), 'fv': p['fv'], 'gar': p.get('gar'),
              'min': p.get('min'), 'mv': p['mv'] / 1e6 if p.get('mv') else None, 'p50': p['p50'] * 100 if p.get('p50') is not None else None,
              'pre': None, 'preL': '', 'pfv': None, 'sub': p.get('league') or p.get('lg') or '', 'prov': p.get('prov'),
              'ph': TM_FACE.format(p['ph']) if p.get('ph') else None, 'lo': soccer_logo(p['club'])}

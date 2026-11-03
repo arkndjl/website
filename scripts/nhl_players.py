@@ -456,18 +456,19 @@ def season_table(S, fitd, bio):
     out = []
     for r in rows:
         b = bio.get(r['id'], {})
-        age = None
+        age = ax = None
         if b.get('birthDate'):
             try:
                 bd = dt.date.fromisoformat(b['birthDate'][:10])
                 ref = dt.date(S - 1, 9, 15)
                 age = ref.year - bd.year - ((ref.month, ref.day) < (bd.month, bd.day))
+                ax = round((ref - bd).days / 365.25, 2)      # exact, display only ('age' stays whole for the models)
             except ValueError:
                 pass
         h = r['toi'] / 3600
         war = (r['dr'] - de['repl'][r['pos']]) * h / gpw
         pwar = (r['hpm'] - repl[r['pos']]) * h / gpw
-        out.append({'id': r['id'], 'n': r['n'], 'tm': r['tm'], 'pos': r['p'], 'grp': r['pos'], 'age': age, 'gp': r['gp'],
+        out.append({'id': r['id'], 'n': r['n'], 'tm': r['tm'], 'pos': r['p'], 'grp': r['pos'], 'age': age, 'ax': ax, 'gp': r['gp'],
                     'toi': round(r['toi'] / 60), 'war': round(war, 2), 'gar': round((r['dr'] - de['repl'][r['pos']]) * h, 1),
                     'go': round(r['do'] * h, 1), 'gd': round(r['dd'] * h, 1),
                     'pwar': round(pwar, 2), 'hpm': round(r['hpm'], 3), 'o': round(r['o'], 3), 'd': round(r['d'], 3),

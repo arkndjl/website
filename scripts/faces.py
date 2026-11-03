@@ -83,13 +83,26 @@ def espn_rosters(base):
         for a in ath:
             if a.get('headshot'):
                 out.append({'name': a.get('displayName') or a.get('fullName'), 'team': t['abbreviation'], 'id': a['id'],
-                            'pos': (a.get('position') or {}).get('abbreviation')})
+                            'pos': (a.get('position') or {}).get('abbreviation'), 'dob': (a.get('dateOfBirth') or '')[:10] or None})
     return out
 
 
-def nba_attach(players, fresh=True):
-    """set p['ph'] (ESPN id) on bbref-keyed rows [{id, n, tm}]; returns how many have one"""
-    m = load(NBA_MAP)
+NBA_DOB = os.path.join(HERE, 'data', 'nba_dob.json')     # bbref id -> birth date (ESPN rosters): exact ages on the XPM board
+
+
+def nba_ax(dob, season):
+    """exact age on Feb 1 of the season (Basketball-Reference's age date), two decimals"""
+    import datetime as dt
+    try:
+        return round((dt.date(season, 2, 1) - dt.date.fromisoformat(dob)).days / 365.25, 2)
+    except (TypeError, ValueError):
+        return None
+
+
+def nba_attach(players, fresh=True, season=None):
+    """set p['ph'] (ESPN id) on bbref-keyed rows [{id, n, tm}], and p['ax'] (exact age, season given) where an ESPN
+    roster gave his birth date and it agrees with bbref's whole age; returns how many have a photo"""
+    m, b = load(NBA_MAP), load(NBA_DOB)
     if fresh:
         ros = espn_rosters(ESPN_NBA)
         if ros:
@@ -99,10 +112,16 @@ def nba_attach(players, fresh=True):
                 r, _ = M.find(p['n'], team=None if tm == 'TOT' else tm)
                 if r:
                     m[p['id']] = r['id']
+                    if r.get('dob'):
+                        b[p['id']] = r['dob']
             save(NBA_MAP, m)
+            save(NBA_DOB, b)
     for p in players:
         if m.get(p['id']):
             p['ph'] = m[p['id']]
+        ax = nba_ax(b.get(p['id']), season) if season else None
+        if ax is not None and (p.get('age') is None or int(ax) == p['age']):
+            p['ax'] = ax
     return sum(1 for p in players if p.get('ph'))
 
 
@@ -210,7 +229,7 @@ def patch_nba(test=False):
     d = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
     fn = os.path.join(d, max(f for f in os.listdir(d) if f[:4].isdigit()))
     x = json.load(open(fn))
-    n = nba_attach(x['players'])
+    n = nba_attach(x['players'], season=x.get('season'))
     print(f"NBA {os.path.basename(fn)}: {n}/{len(x['players'])} with a photo")
     if not test:
         json.dump(x, open(fn, 'w'), separators=(',', ':'))

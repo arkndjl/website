@@ -76,9 +76,10 @@ def _birth(s):
 
 
 def _ht(s):
-    """HockeyTech height '6.02' = 6 ft 2 in"""
-    m = re.match(r'^(\d)\.(\d{1,2})$', str(s or '').strip())
-    return int(m.group(1)) * 12 + int(m.group(2)) if m else None
+    """HockeyTech height = 6 ft 2 in: OHL/AHL '6.02', WHL 6'2, QMJHL 6'02" (Nov 3 2026: only the first was read, so WHL and
+    QMJHL players had no height)"""
+    m = re.match(r'^(\d)[.\'](\d{1,2})"?$', str(s or '').strip())
+    return int(m.group(1)) * 12 + int(m.group(2)) if m and int(m.group(2)) < 12 else None
 
 
 def _flip(s):
@@ -364,6 +365,30 @@ def fit():
 
 
 # -- live ---------------------------------------------------------------------------------------------------------
+_BIRTHS = []      # (name, birth date) of every skater in the live feeds, filled by live(): exact ages for the board
+USHL = ('ushl', 'e828f89b243dc43f')
+
+
+def ushl_births(season_end):
+    """(name, birth date) of the USHL's skaters this season (HockeyTech; display only: exact ages on the board)"""
+    code, key = USHL
+    for s in ((_get(HT % (key, code) + '&view=seasons') or {}).get('SiteKit') or {}).get('Seasons') or []:
+        m = re.match(r'(\d{4}) ?- ?(\d{2,4})$', s['season_name'].strip())
+        if m and int(m.group(1)) + 1 == season_end:
+            d = _get(HT % (key, code) + f"&view=statviewtype&type=topscorers&season_id={s['season_id']}&first=0&limit=3000&stat=all&order_direction=")
+            return [(q['name'], q['birth']) for q in ht_players(((d or {}).get('SiteKit') or {}).get('Statviewtype'), 'USHL') if q['birth']]
+    return []
+
+
+def exact_birth(name, birth):
+    """the feeds' birth date for a board player whose source gives only the month (birth = YYYY-MM-15): the same name
+    (shared matcher) born that month, when exactly one date fits; else None"""
+    if not birth or not _BIRTHS:
+        return None
+    c = {b for n, b in _BIRTHS if b[:7] == birth[:7] and NM.same(n, name)}
+    return c.pop() if len(c) == 1 else None
+
+
 def _get(u):
     try:
         return D.get(u)
@@ -428,6 +453,7 @@ def live(year, board, rows):
                     prev.setdefault(q['birth'], []).append(q)
     pool += liiga_current(season_end)
     pool = [neutral_off_chl(p) for p in pool]
+    _BIRTHS[:] = [(p['name'], p['birth']) for p in pool if p.get('birth')] + ushl_births(season_end)
     drafted = {}
     for r in rows:
         drafted.setdefault(NM.tokens(r['name'])[-1] if NM.tokens(r['name']) else '', []).append(r)
@@ -457,7 +483,7 @@ def live(year, board, rows):
         out.append({'rk': None, 'name': p['name'], 'pos': p['pos'], 'posFull': p['pos'], 'club': p['club'], 'league': p['lg'],
                     'nat': H.nat(p.get('nat')),
                     'grp': H.group_of(p['lg']), 'ht': p.get('ht'), 'wt': int(p['wt']) if p.get('wt') else None,
-                    'age': round(age, 1) if age else None, 'gp': int(p['gp']), 'pts': int(p['pts']),
+                    'age': round(age, 2) if age else None, 'gp': int(p['gp']), 'pts': int(p['pts']),
                     'pm': int(p['pm']) if p.get('pm') is not None else None, 'pim': int(p['pim']) if p.get('pim') is not None else None,
                     'prevLine': int(q['prev'] is not None),
                     'nhle': round(82 * H.nhle_of(p['lg']) * p['pts'] / p['gp'], 1) if p['gp'] else None,

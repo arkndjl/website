@@ -62,6 +62,7 @@ offense WAR + defense WAR. The board row carries two {o, d, so, sd, p2} once he 
 (--fit, --calibrate, --positions) still read each listing's side alone (a handful of two-way seasons since 2016).
 """
 import csv
+import datetime as dt
 import json
 import math
 import os
@@ -690,7 +691,7 @@ def board(y, thru=None, fresh=False, st=True):
                     'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
                     'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
                     **({'stw': round(stw, 2), 'stl': st_line(sv)} if stw is not None and (abs(stw) >= 0.005 or st_line(sv)) else {}),
-                    'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
+                    'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y), 'ax': age_x(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
                     '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {}), **({'two': two} if two else {})})
     out = [p for p in out if p['sn'] >= 1]
@@ -741,7 +742,7 @@ def st_rows(stv, y, gs2pfr, teamg, fresh=False, stb=None):
         p = {'n': r['full_name'], 'id': gs2pfr.get(gs) or r.get('pfr_id') or gs, 't': team, 'tm': '/'.join(sorted(v['t'])), 'pos': pos, 'sp': '',
              'g': v.get('g', 0), 'sn': int(v['n'].get('kick', 0) + v['n'].get('punt', 0)), 'av': 0.0, 'war': round(war, 2), 'wav': None, 'xv': None,
              'waa': round(war, 2), 'pace': round(war * 17 / tg, 2), 'waaP': round(war * 17 / tg, 2), 'sh': 0.0, 'line': st_line(v),
-             'stw': round(war, 2), 'age': age(r.get('birth_date'), y), 'exp': r.get('years_exp', ''),
+             'stw': round(war, 2), 'age': age(r.get('birth_date'), y), 'ax': age_x(r.get('birth_date'), y), 'exp': r.get('years_exp', ''),
              'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
              '_st': {}, '_g': 'ST', '_war': war}
         if stb and gs in stb:
@@ -781,6 +782,14 @@ def age(bd, y):
     except (AttributeError, ValueError):
         return None
     return y - by - ((9, 1) < (bm, bdd))   # age on Sept 1 of the season
+
+
+def age_x(bd, y):
+    """exact age on Sept 1 of the season, two decimals (display; 'age' stays whole for the models that read it)"""
+    try:
+        return round((dt.date(y, 9, 1) - dt.date.fromisoformat(bd[:10])).days / 365.25, 2)
+    except (TypeError, ValueError):
+        return None
 
 
 # ---------------------------------------------------------------- WAR by gsis id (game projections' injury costs)
