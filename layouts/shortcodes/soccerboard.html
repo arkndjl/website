@@ -32,7 +32,7 @@
     <td data-v="{{ .grp }}">{{ .pos }}</td>
     <td style="white-space: nowrap">{{ with index site.Data.soccer_logos.tm (.club | default "") }}<img class="cfb__logo cfb__logo--in" src="/img/soccer/tm/{{ . }}.png" alt="" width="16" height="16" loading="lazy"> {{ end }}{{ .club | default "-" }}</td>
     <td title="{{ .league }}">{{ .lg | default "-" }}</td>
-    <td class="cfb__num">{{ if .ageEst }}~{{ printf "%.1f" (float .age) }}{{ else }}{{ printf "%.2f" (float .age) }}{{ end }}</td>
+    <td class="cfb__num">{{ if .ageEst }}~{{ printf "%.1f" (float .age) }}{{ else }}{{ printf "%.1f" (float .age) }}{{ end }}</td>
     <td class="cfb__num hk__x" data-v="{{ .mv | default 0 }}">{{ with .mv }}{{ if ge . 1000000 }}{{ printf "%.1fm" (div (float .) 1000000) }}{{ else }}{{ printf "%.0fk" (div (float .) 1000) }}{{ end }}{{ else }}-{{ end }}</td>
     <td class="cfb__num hk__x" title="last season {{ .min1 }}">{{ .min }}</td>
     <td class="cfb__num hk__x" title="last season {{ printf "%.1f" (float .gar1) }}">{{ printf "%.1f" (float .gar) }}</td>
@@ -61,7 +61,7 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ $u := "" }}{{ with .ph }}{{ $u = printf "https://img.a.transfermarkt.technology/portrait/medium/%v" . }}{{ end }}{{ partial "face.html" (dict "u" $u) }}<b>{{ .name }}</b></td>
     <td>{{ .season }}</td>
-    <td class="cfb__num">{{ if .ageEst }}~{{ printf "%.1f" (float .age) }}{{ else }}{{ printf "%.2f" (float .age) }}{{ end }}</td>
+    <td class="cfb__num">{{ if .ageEst }}~{{ printf "%.1f" (float .age) }}{{ else }}{{ printf "%.1f" (float .age) }}{{ end }}</td>
     <td>{{ index (dict "G" "GK" "D" "D" "M" "M" "F" "F") .pos }}</td>
     <td class="hk__x" style="white-space: nowrap">{{ with index site.Data.soccer_logos.tm (.club | default "") }}<img class="cfb__logo cfb__logo--in" src="/img/soccer/tm/{{ . }}.png" alt="" width="16" height="16" loading="lazy"> {{ end }}{{ .club | default "-" }}</td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>

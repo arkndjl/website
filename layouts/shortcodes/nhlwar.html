@@ -150,7 +150,7 @@
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('d') + '">' + (p.grp === 'G' ? '<span class="cfb__dim">–</span>' : sg2(p.d)) + '</td>' +
         '<td class="cfb__g">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
         '<td class="nbaxpm__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
-        '<td class="cfb__num nbaxpm__ph">' + (p.ax != null ? p.ax.toFixed(2) : p.age == null ? '' : p.age) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__num cfb__g nbaxpm__ph">' + p.gp + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.toi + '</td>' +
         '<td class="cfb__num cfb__g nbaxpm__src">' + (p.grp === 'G' ? sg(p.gsax) : p.pts) + '</td></tr>';

@@ -68,7 +68,7 @@
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
       (past ? '<td>' + outcome(r) + '</td>' : '<td class="cfb__num">' + (r.xbpm == null ? dim : '<span class="' + (r.xbpm >= 0 ? '' : 'cfb__down') + '">' + sgn(r.xbpm) + '</span>') + '</td>') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
-      (past ? '' : '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(2) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year (no birth date yet)">~' + f1(r.ageEst) + '</span>' : '—') + '</td>') +
+      (past ? '' : '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(1) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year (no birth date yet)">~' + f1(r.ageEst) + '</span>' : '—') + '</td>') +
       '<td class="cfb__num">' + size(r, past) + '</td></tr>';
   }
 
