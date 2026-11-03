@@ -26,7 +26,7 @@
 //   .577 -> .590 and .586 -> .610. Production by position, pedigree, team, class, SOS, breakout, badges, frame and years
 //   past three all refit within noise of today's weights (reverting them costs nothing).
 // Nov 3 2026: the in-position height term (scripts/cfb_frame.mjs heightFV, key height, FV points like frame) is in
-// grade() at the live weight (multiplier 1), on the measured height (scripts/cfb_measure.mjs: cfbfastR listing + the 247
+// grade() at the live weight (multiplier 1; cfb_frame.mjs FV_HT_W, 0 since it was pulled Nov 3), on the measured height (scripts/cfb_measure.mjs: cfbfastR listing + the 247
 // listing parsed below); its test is scripts/cfb_measure_fv.py on the --alltime grades
 import fs from 'node:fs';
 import path from 'node:path';

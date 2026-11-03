@@ -1495,7 +1495,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       p.fvx = Math.max(20, Math.min(80, p.fvBase + p.frameFV + p.htFV + p.yearsFV));
       p.fv = Math.round(p.fvx);
       // the grade's steps for the FV inputs dropdown (fvSteps at write: + the 20-80 limits, mean outcome, returns)
-      p.fvs = [['g', p.fvBase], ['fr', p.frameFV], ['ht', p.htFV], ['yr', p.yearsFV]];
+      p.fvs = [['g', p.fvBase], ['fr', p.frameFV], ...(p.htFV ? [['ht', p.htFV]] : []), ['yr', p.yearsFV]];
       p.posRank = i + 1;
     });
   }
