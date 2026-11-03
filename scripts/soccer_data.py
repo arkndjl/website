@@ -78,13 +78,26 @@ US_LG = {'eng.1': 'EPL', 'esp.1': 'La_liga', 'ger.1': 'Bundesliga', 'ita.1': 'Se
 CAL = {'nor.1', 'swe.1', 'usa.1'}
 
 
-def get(url, tries=4, raw=False, headers=None):
+def _read(r, limit):
+    """the body, or TimeoutError past `limit` seconds of wall clock (a server can trickle bytes past any socket
+    timeout: Understat held GitHub runners for 30+ minutes a call from Nov 2 2026)"""
+    end, out = time.time() + limit, []
+    while True:
+        c = r.read(65536)
+        if not c:
+            return b''.join(out)
+        out.append(c)
+        if time.time() > end:
+            raise TimeoutError('slow body')
+
+
+def get(url, tries=4, raw=False, headers=None, limit=600):
     for i in range(tries):
         try:
             h = {'User-Agent': UA, 'Accept-Encoding': 'gzip'}
             h.update(headers or {})
             r = urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=90)
-            b = r.read()
+            b = _read(r, limit)
             if b[:2] == b'\x1f\x8b':
                 b = gzip.decompress(b)
             return b if raw else json.loads(b)
@@ -463,6 +476,21 @@ def fm_xg(lg, S, fresh=False, budget=None):
 
 # ---------------------------------------------------------------- Understat
 XHR = {'X-Requested-With': 'XMLHttpRequest'}
+# circuit breaker: once an Understat call fails or runs past US_SLOW seconds, the rest of the run uses the cache
+# (Nov 2 2026: Understat stalled GitHub runners and four soccer runs hit the 30-minute limit)
+US_SLOW = 60
+_us_down = [False]
+
+
+def us_get(url):
+    if _us_down[0]:
+        return None
+    t0 = time.time()
+    d = get(url, tries=2, headers=XHR, limit=US_SLOW)
+    if time.time() - t0 > US_SLOW or (d is None and time.time() - t0 > 1.5):   # a 404 returns at once
+        _us_down[0] = True
+        print(f'understat down or slow ({time.time() - t0:.0f}s): cached Understat data for the rest of the run', flush=True)
+    return d
 
 
 def us_league(lg, S, fresh=False):
@@ -473,7 +501,7 @@ def us_league(lg, S, fresh=False):
     p = os.path.join(CACHE, 'us', f'{name}_{S}.json.gz')
     if os.path.exists(p) and not fresh and (S < current_season() or time.time() - os.path.getmtime(p) < 6 * 3600):
         return load(p)
-    d = get(f'{US}/getLeagueData/{name}/{S - 1}', headers=XHR)
+    d = us_get(f'{US}/getLeagueData/{name}/{S - 1}')
     if not d:
         return load(p) if os.path.exists(p) else None
     out = {'matches': [], 'players': d.get('players') or [], 'teams': {}}
@@ -495,7 +523,7 @@ def us_match(mid, fresh=False):
     p = os.path.join(CACHE, 'usm', str(mid)[-2:], f'{mid}.json.gz')
     if os.path.exists(p) and not fresh:
         return load(p)
-    d = get(f'{US}/getMatchData/{mid}', headers=XHR)
+    d = us_get(f'{US}/getMatchData/{mid}')
     if not d or 'rosters' not in d:
         return None
     ro = {s: [{k: v.get(k) for k in ('id', 'player_id', 'player', 'position', 'positionOrder', 'time', 'roster_in',
