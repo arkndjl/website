@@ -1928,10 +1928,10 @@
     for (var k = 0; k < 2; k++) teamLogo(g, logos[k], k ? x + w - 60 - LS : x + 60, hy - 60, LS);
     [[d.us, 'left'], [d.them, 'right']].forEach(function (t, k) {
       var tx = k ? x + w - 60 - (logos[k] ? LS + 36 : 0) : x + 60 + (logos[k] ? LS + 36 : 0), al = k ? 'right' : 'left';
-      var nw = half - 130 - (logos[k] ? LS + 36 : 0), fs = 120;   // a long name steps the size down before it's cut
-      g.textAlign = al; g.font = fs + 'px ' + FONT; while (fs > 72 && g.measureText(t[0].name).width > nw) { fs -= 8; g.font = fs + 'px ' + FONT; }
-      g.fillStyle = C.white; g.fillText(fit(g, t[0].name, nw), tx, hy);
-      g.font = '52px ' + FONT; g.fillStyle = C.teal; g.fillText((t[0].rank || '') + (t[0].rec ? ' · ' + t[0].rec : ''), tx, hy + 110);
+      var nw = half - 90 - (logos[k] ? LS + 36 : 0), fs = 120, tn = (t[0].ark ? t[0].ark + ' ' : '') + t[0].name;   // a long name steps the size down before it's cut
+      g.textAlign = al; g.font = fs + 'px ' + FONT; while (fs > 56 && g.measureText(tn).width > nw) { fs -= 8; g.font = fs + 'px ' + FONT; }
+      g.fillStyle = C.white; g.fillText(fit(g, tn, nw), tx, hy);
+      g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText([t[0].std ? 'STANDINGS ' + t[0].std : '', t[0].rec].filter(Boolean).join(' · '), tx, hy + 110);
       if (t[0].talent != null) {   // team talent: the five's mean, drawn as stars (half steps)
         var st = Math.round(t[0].talent * 2) / 2, sw = 5 * (40 + 6) - 6, sx = k ? tx - sw : tx;
         drawStars(g, sx, hy + 180, st, 40);
@@ -2063,7 +2063,9 @@
     for (var k = 0; k < 2; k++) {
       var t = k ? d.them : d.us;
       if (teamLogo(g, t.logo ? await loadImg(t.logo) : null, lx, y - 20, LS)) lx += LS + 28;
-      g.font = '76px ' + FONT; g.fillStyle = k ? C.down : C.teal; var nm = fit(g, t.name, w / 2 - LS - 160); g.fillText(nm, lx, y - 20 + LS / 2); lx += g.measureText(nm).width + 44;
+      g.font = '76px ' + FONT; g.fillStyle = k ? C.down : C.teal; var nm = fit(g, (t.ark ? t.ark + ' ' : '') + t.name, w / 2 - LS - 160), nx0 = lx, sw0 = 0; g.fillText(nm, lx, y - 20 + LS / 2 - 18);
+      if (t.std || t.rec) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; var sl = [t.std ? 'STANDINGS ' + t.std : '', t.rec].filter(Boolean).join(' · '); g.fillText(sl, nx0, y - 20 + LS / 2 + 44); sw0 = g.measureText(sl).width; g.font = '76px ' + FONT; }
+      lx += Math.max(g.measureText(nm).width, sw0 || 0) + 44;
       if (!k) { g.fillStyle = C.lilac; g.font = '52px ' + FONT; g.fillText('VS', lx, y - 20 + LS / 2); lx += g.measureText('VS').width + 44; }
     }
     y += LS + 30;
