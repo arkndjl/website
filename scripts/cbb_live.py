@@ -431,6 +431,13 @@ def main():
     sc = np.array([r['e'] for r in recs])
     # one fixed map from E[FV] to FV (cbb_fit.emap_fit, Oct 26 2026): no longer the rank on this board
     fv, plus, fvx = F.live_grade(sc, fit)
+    # the season-end map (scripts/cbb_draftday.py end_map, Nov 3 2026): the preseason map left draft week's top 10 a
+    # season 3.6 FV under what they became; each player's grade moves to it by his weight on this season
+    try: endm = json.load(open(os.path.join(D.ROOT, 'data', 'cbb_end_map.json')))
+    except (OSError, ValueError): endm = None
+    if endm and fit.get('emap'):
+        ws = np.array([r['w'] for r in recs])
+        fvx = (1 - ws) * fvx + ws * F.grade_abs(sc, endm)[2]; fv = np.floor(fvx + 1e-9)
     for r, a, b, c in zip(recs, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
     # the board's E[FV] -> FV, for players graded against it without joining it
     es = np.array([r['e'] for r in recs]); o = np.argsort(es)

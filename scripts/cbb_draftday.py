@@ -9,17 +9,20 @@ of several noisy grades ran hot (each position's all-time top 25 graded 46-50, b
 This grades every player once, the way the live board grades him in draft week: his career with the season just
 played (cbb_live's season-end "now": the board's returner model on next preseason's row), then the June draft boards
 (the board stage's inputs: -ln consensus rank of ESPN's and NBADraft.net's final boards, and whether either lists him),
-then the mean outcome at that score. A player still in college shows at the end of his latest season.
+then the mean outcome at that score. A player still in college shows at the end of his latest season. It also writes
+the live board's season-end map (end_map -> data/cbb_end_map.json, read by cbb_live).
 
     python3 scripts/cbb_careers_kit.py   # once per container: scripts/.cache/cbb/careers.json
-    python3 scripts/cbb_draftday.py      # -> scripts/data/cbb_draftday.json.gz, then python3 scripts/fv_alltime.py
+    python3 scripts/cbb_draftday.py      # -> scripts/data/cbb_draftday.json.gz, data/cbb_end_map.json; then fv_alltime.py
 
 Out of sample (Nov 3 2026), players whose college ended 2009-16 (6+ NBA seasons), every grade from fits that held out
 the player's college class (5 class folds), players graded 30+ or reaching 30+ by either list (681):
   best preseason grade (old list)         MSE 212.0   rank corr .12   stars (60+) graded under 40: 19 of 33
   draft-day, model only                   MSE 165.8   t -6.6, 5/5 folds
   + combine invite/testing                MSE 152.2   t -5.7 on the model, 5/5
-  + June boards (shipped)                 MSE 130.3   t -9.9 on the old list, 5/5; stars under 40: 7 of 33
+  + June boards, stage refit on these     MSE 130.3   t -9.9 on the old list, 5/5; stars under 40: 7 of 33
+  + June boards, the live board's stage   final seasons graded 30+ or reaching it (550): MSE 150.9 -> 143.8 against
+    (shipped, Nov 3)                      the refit stage (t -5.7, 5/5)
 Tested and not used: athletic testing on top of the boards (guard composite t -0.1, 2/5; every group's composite worse;
 the boards price it), the combine invite on top of the boards (t +2.9, worse 5/5), the returner model refit on
 season-end rows with leavers (MSE +1.4, t 0.9: the shipped model is kept), position recalibration.
@@ -34,12 +37,11 @@ import names as N
 import fv_scale as FS
 
 OUT = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_draftday.json.gz')
+END = os.path.join(D.ROOT, 'data', 'cbb_end_map.json')   # the live board's season-end map (cbb_live)
 NEXT = {'Fr': 'So', 'So': 'Jr', 'Jr': 'Sr', 'Sr': 'Sr'}
 TRAIN = range(2009, 2017)   # season-end boards whose players all left college by 2020 (as cbb_fit's training boards)
 LAST = 2026                 # the latest season played
 PER_SEASON = 300            # rows kept per season (by grade), as the past boards
-STAGE = ['e', 'lr', 'on']
-GRID = (1, 3, 10, 30, 100, 300)
 
 
 def exit_features(c, i):
@@ -67,7 +69,8 @@ def apply_map(M, e):
     return np.clip(np.interp(e, kx, ky) + sl * np.maximum(0, e - kx[-1]), F.FLOOR, 80.0)
 
 
-def main():
+def build():
+    """season-end rows with E[FV], the June boards and the stage score s (out of fold for the training rows)"""
     fit = json.load(open(F.OUT))
     mod = fit['models']['returner']
     F.TOP_MEAN = mod['topMean']
@@ -115,22 +118,34 @@ def main():
         if v is not None and seen[k] > 1 and not any(N.same_team(r['team'], x) for x in sch.get(k, ())): v = None
         r['f']['lr'] = v if v is not None else F.CONS_FILL; r['f']['on'] = float(v is not None)
 
-    # the stage (a ladder on E and the boards), penalties by class-fold CV, out of fold for the training rows
-    y = np.array([r['y'] for r in tr], float); X = F.matrix(tr, STAGE); j2 = list(range(len(STAGE)))
+    # the board stage as the live board applies it in draft week (cbb_fit.board_stage, fit on preseason E and the June
+    # boards; the late preseason -> June map at 3 days out, cbb_boards.att_at). A stage refit on season-end rows ranked
+    # worse (Nov 3 2026: final seasons MSE +7.6, t +2.3, worse in 5/5 class folds): the shipped one is kept
+    import cbb_boards as CBd
+    att = CBd.att_at(json.load(open(CBd.ATT))['fit'], 3)
+    for r in ex: r['s'] = F.board_e(r['f']['e'], r['f']['lr'] if r['f']['on'] else None, fit['boards'], att)[0]
+    y = np.array([r['y'] for r in tr], float); fin = np.array([r['final'] for r in tr])
+    return ex, tr, fwd, ft, fin, y, fit
 
-    def oof(lam):
-        P = np.zeros((len(tr), len(F.LADDER)))
-        for k in range(F.FOLDS):
-            m = F.fit([r for r, t in zip(tr, ft != k) if t], X[ft != k], j2, lam, None); P[ft == k] = F.predict(m, X[ft == k])[1]
-        return P
-    devs = [F.rung_dev(oof(g), y) for g in GRID]
-    lam = [GRID[int(np.argmin([d[j] for d in devs]))] for j in range(len(F.LADDER))]
-    P = oof(lam)
-    for r, e in zip(tr, F.expected(P)): r['s'] = float(e)
-    sm = F.fit(tr, X, j2, lam, None)
-    for r, e in zip(fwd, F.predict(sm, F.matrix(fwd, STAGE))[2]): r['s'] = float(e)
-    fin = np.array([r['final'] for r in tr])
-    print(f'stage {STAGE}: penalties {lam}; final-season pseudo-R2 {1 - F.deviance(P[fin], y[fin]):.4f}')
+
+def end_map(tr, fit):
+    """the live board's E[FV] -> grade at season's end (cbb_live blends it in by each player's weight on this season):
+    the grade whose headline (fv_dist.at_mean) is the mean outcome at that E on every 2009-16 season-end row (who
+    leaves isn't known yet), as cbb_fit.emap_cal. The preseason map (emap.stage, fit on simulated preseason boards)
+    left draft week's top 10 a season 3.6 FV under what they became (48.6 given, 52.2 became; top 25 44.9 / 47.7).
+    Class held out: top 10 52.2 / 51.3, top 25 48.5 / 47.7 (bias smaller in 6 of 8 seasons), MSE 208.0 -> 206.9
+    (t -0.8, better in 4 of 5 folds)."""
+    RR = [dict(r, yr=NEXT.get(r['yr'], 'Sr'), f=dict(r['f'], newcomer=False)) for r in tr]
+    M = F.emap_cal(RR, np.array([r['s'] for r in tr])[None, :])
+    M['kind'] = 'calibration (season-end rows 2009-16, the board stage at draft week; scripts/cbb_draftday.py)'
+    return M
+
+
+def main():
+    ex, tr, fwd, ft, fin, y, fit = build()
+    M = end_map(tr, fit)
+    json.dump(M, open(END, 'w'), indent=1)
+    print('season-end map ->', END, list(zip(M['e'][-4:], M['g'][-4:])))
 
     # the mean outcome at each stage score: one map for finals (he left), one for season-ends he came back from;
     # cross-fitted for the training rows
@@ -171,7 +186,7 @@ def main():
                         'role': ((('peak XPM %+.1f, ' % n['peakXpm']) if r['y'] > 20 and n.get('peakXpm') is not None else '') + n['role']) if mature else None,
                         'pick': n.get('pick') or None, 'draft': n.get('draft') or None, 'status': None if r['final'] else 'college',
                         'june': round(math.exp(-r['f']['lr'])) if r['f']['on'] else None})
-    with gzip.open(OUT, 'wt') as f: json.dump({'asof': __import__('datetime').date.today().isoformat(), 'stage': STAGE, 'lam': lam, 'rows': out}, f, separators=(',', ':'))
+    with gzip.open(OUT, 'wt') as f: json.dump({'asof': __import__('datetime').date.today().isoformat(), 'rows': out}, f, separators=(',', ':'))
     print('wrote', OUT, len(out), 'rows')
 
 
