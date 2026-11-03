@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-03T02:01:48Z",
+ "asof": "2026-11-03T02:31:19Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 104.59,
+  "now": 105.34,
   "peak": 118.08,
-  "drawdown": 0.1142,
-  "open": 83.25,
+  "drawdown": 0.1079,
+  "open": 80.0,
   "path": [
    101.5,
    101.6,
@@ -106,59 +106,61 @@
    104.32,
    104.61,
    104.85,
-   104.59
+   104.59,
+   105.08,
+   105.34
   ]
  },
  "record": {
-  "n": 221,
-  "clvN": 108,
-  "clvRet": -0.0239,
-  "clvT": -3.73,
-  "clv": -0.17,
-  "beat": 0.219,
-  "settled": 98,
-  "w": 56,
+  "n": 223,
+  "clvN": 110,
+  "clvRet": -0.0245,
+  "clvT": -3.88,
+  "clv": -0.18,
+  "beat": 0.213,
+  "settled": 100,
+  "w": 58,
   "l": 42,
   "p": 0,
-  "roi": 0.1853,
-  "roiT": 1.68,
-  "profit": 4.98,
-  "risked": 115.25,
-  "yield": 0.0432
+  "roi": 0.2007,
+  "roiT": 1.85,
+  "profit": 5.7,
+  "risked": 116.0,
+  "yield": 0.0491
  },
- "tEff": -3.73,
+ "tEff": -3.87,
  "corr": {
   "rho": 0.0,
-  "n": 108,
+  "n": 110,
   "slates": 17,
-  "nEff": 108.0,
-  "avgSlate": 6.35
+  "nEff": 110.0,
+  "avgSlate": 6.47
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 108,
+   "value": 110,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-2.4% t -3.73",
+   "value": "-2.5% t -3.87",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "22%",
+   "value": "21%",
    "pass": false
   },
   {
    "gate": "no single market carrying it",
-   "value": "without cfb-spread: -2.4%",
+   "value": "without cfb-spread: -2.5%",
    "pass": false
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +18.5% vs -2.3% (SE 11.0)",
-   "pass": true
+   "value": "ROI +20.1% vs -2.4% (SE 10.8)",
+   "pass": false
   }
  ],
  "gatesPass": false,
@@ -210,7 +212,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 9,
+   "n": 12,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -273,7 +275,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 5,
+   "n": 6,
    "clvN": 2,
    "clvRet": -0.0412,
    "clvT": -0.44,
@@ -294,21 +296,21 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 36,
-   "clvN": 1,
-   "clvRet": -0.0192,
-   "clvT": null,
-   "clv": 0.0,
+   "n": 34,
+   "clvN": 2,
+   "clvRet": -0.055,
+   "clvT": -1.54,
+   "clv": -0.5,
    "beat": 0.0,
-   "settled": 1,
-   "w": 0,
+   "settled": 2,
+   "w": 1,
    "l": 1,
    "p": 0,
-   "roi": -1.0,
-   "roiT": null,
-   "profit": -0.25,
-   "risked": 0.25,
-   "yield": -1.0
+   "roi": -0.0192,
+   "roiT": -0.02,
+   "profit": -0.01,
+   "risked": 0.5,
+   "yield": -0.0192
   },
   {
    "id": "cbb-total",
@@ -316,20 +318,20 @@
    "sport": "cbb",
    "mk": "total",
    "n": 52,
-   "clvN": 4,
-   "clvRet": -0.0439,
-   "clvT": -0.71,
-   "clv": -0.25,
-   "beat": 0.5,
-   "settled": 4,
-   "w": 3,
+   "clvN": 5,
+   "clvRet": -0.0408,
+   "clvT": -0.85,
+   "clv": -0.2,
+   "beat": 0.4,
+   "settled": 5,
+   "w": 4,
    "l": 1,
    "p": 0,
-   "roi": 0.4533,
-   "roiT": 0.94,
-   "profit": 0.45,
-   "risked": 1.0,
-   "yield": 0.4534
+   "roi": 0.5513,
+   "roiT": 1.42,
+   "profit": 0.93,
+   "risked": 1.5,
+   "yield": 0.6167
   },
   {
    "id": "nba-ml",
@@ -438,90 +440,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401909562",
-   "k": "2026-11-02T23:30:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Duke",
-   "a": "Army",
-   "mk": "total",
-   "side": "under",
-   "line": 157.5,
-   "price": -106.0,
-   "bet": "under 157.5 -106",
-   "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.5,
-   "edge": 8.4,
-   "ev": 0.0431,
-   "event": null,
-   "pass": false,
-   "close": 157.5
-  },
-  {
-   "rule": "cbb-spread",
-   "sport": "cbb",
-   "id": "401920679",
-   "k": "2026-11-02T23:30:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "St. John's",
-   "a": "Monmouth",
-   "mk": "spread",
-   "side": "away",
-   "line": 27.5,
-   "price": -104.0,
-   "bet": "Monmouth +27.5 -104",
-   "placed": "2026-11-01T17:12:49Z",
-   "stake": 0.25,
-   "edge": 3.6,
-   "ev": 0.005,
-   "event": null,
-   "pass": true,
-   "close": 28.5
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401920679",
-   "k": "2026-11-02T23:30:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "St. John's",
-   "a": "Monmouth",
-   "mk": "total",
-   "side": "under",
-   "line": 155.5,
-   "price": -106.0,
-   "bet": "under 155.5 -106",
-   "placed": "2026-11-02T15:59:20Z",
-   "stake": 0.25,
-   "edge": 4.0,
-   "ev": 0.0061,
-   "event": null,
-   "pass": true,
-   "close": 155.5
-  },
-  {
-   "rule": "cbb-spread",
-   "sport": "cbb",
-   "id": "401921264",
-   "k": "2026-11-02T23:30:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Georgetown",
-   "a": "Loyola Maryland",
-   "mk": "spread",
-   "side": "away",
-   "line": 26.5,
-   "price": -104.0,
-   "bet": "Loyola Maryland +26.5 -104",
-   "placed": "2026-11-02T18:47:19Z",
-   "stake": 0.25,
-   "edge": 4.6,
-   "ev": 0.0117,
-   "event": null,
-   "pass": false,
-   "close": 27.5
-  },
   {
    "rule": "cbb-total",
    "sport": "cbb",
@@ -3167,8 +3085,8 @@
    "edge": 3.6,
    "ev": 0.0097,
    "event": null,
-   "pass": true,
-   "close": 6.5
+   "pass": false,
+   "close": 7.5
   },
   {
    "rule": "cbb-total",
@@ -3831,7 +3749,7 @@
    "edge": 2.9,
    "ev": 0.0002,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 15.5
   },
   {
@@ -3873,7 +3791,7 @@
    "edge": 3.9,
    "ev": 0.0167,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 28.5
   },
   {
@@ -3895,7 +3813,7 @@
    "ev": 0.0003,
    "event": null,
    "pass": true,
-   "close": 10.5
+   "close": 11.5
   },
   {
    "rule": "cbb-total",
@@ -4040,7 +3958,7 @@
    "edge": 3.8,
    "ev": 0.0069,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 43.5
   },
   {
@@ -4187,7 +4105,7 @@
    "edge": 5.4,
    "ev": 0.0019,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 44.5
   },
   {
@@ -4439,7 +4357,7 @@
    "edge": 3.2,
    "ev": 0.0052,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 46.5
   },
   {
@@ -4481,7 +4399,7 @@
    "edge": 4.3,
    "ev": 0.028,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 64.5
   },
   {
@@ -4502,8 +4420,8 @@
    "edge": 4.4,
    "ev": 0.0694,
    "event": null,
-   "pass": false,
-   "close": 71.5
+   "pass": true,
+   "close": 72.5
   },
   {
    "rule": "cfb-total",
@@ -4528,6 +4446,130 @@
   }
  ],
  "recent": [
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401909562",
+   "k": "2026-11-02T23:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Duke",
+   "a": "Army",
+   "mk": "total",
+   "side": "under",
+   "line": 157.5,
+   "price": -106.0,
+   "bet": "under 157.5 -106",
+   "placed": "2026-11-02T18:47:19Z",
+   "stake": 0.5,
+   "edge": 8.4,
+   "ev": 0.0431,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0283,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 157.5,
+   "score": [
+    50.0,
+    84.0
+   ],
+   "res": "w",
+   "ret": 0.9434,
+   "profit": 0.4717
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401920679",
+   "k": "2026-11-02T23:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "St. John's",
+   "a": "Monmouth",
+   "mk": "spread",
+   "side": "away",
+   "line": 27.5,
+   "price": -104.0,
+   "bet": "Monmouth +27.5 -104",
+   "placed": "2026-11-01T17:12:49Z",
+   "stake": 0.25,
+   "edge": 3.6,
+   "ev": 0.005,
+   "event": null,
+   "pass": true,
+   "clvRet": -0.0908,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 28.5,
+   "score": [
+    63.0,
+    78.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.2404
+  },
+  {
+   "rule": "cbb-total",
+   "sport": "cbb",
+   "id": "401920679",
+   "k": "2026-11-02T23:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "St. John's",
+   "a": "Monmouth",
+   "mk": "total",
+   "side": "under",
+   "line": 155.5,
+   "price": -106.0,
+   "bet": "under 155.5 -106",
+   "placed": "2026-11-02T15:59:20Z",
+   "stake": 0.25,
+   "edge": 4.0,
+   "ev": 0.0061,
+   "event": null,
+   "pass": true,
+   "clvRet": -0.0283,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 155.5,
+   "score": [
+    63.0,
+    78.0
+   ],
+   "res": "w",
+   "ret": 0.9434,
+   "profit": 0.2359
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401921264",
+   "k": "2026-11-02T23:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Georgetown",
+   "a": "Loyola Maryland",
+   "mk": "spread",
+   "side": "away",
+   "line": 26.5,
+   "price": -104.0,
+   "bet": "Loyola Maryland +26.5 -104",
+   "placed": "2026-11-02T18:47:19Z",
+   "stake": 0.25,
+   "edge": 4.6,
+   "ev": 0.0117,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0909,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 27.5,
+   "score": [
+    58.0,
+    80.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.2404
+  },
   {
    "rule": "cbb-total",
    "sport": "cbb",
@@ -6143,110 +6185,6 @@
    "res": "w",
    "ret": 0.885,
    "profit": 0.4425
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873025-4596448-rc",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "TB",
-   "a": "ATL",
-   "mk": "prop",
-   "side": "under",
-   "line": 2.5,
-   "price": -106.0,
-   "bet": "Bucky Irving under 2.5 rec -106",
-   "placed": "2026-10-29T11:46:00Z",
-   "stake": 0.25,
-   "edge": 10.6,
-   "ev": 0.0572,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.1428,
-   "close": 2.5,
-   "score": 0.0,
-   "res": "w",
-   "ret": 0.9434,
-   "profit": 0.2359
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873026-3915416-wy",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "BUF",
-   "a": "BAL",
-   "mk": "prop",
-   "side": "under",
-   "line": 55.5,
-   "price": -122.0,
-   "bet": "DJ Moore under 55.5 rec yds -122",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.5,
-   "edge": 28.1,
-   "ev": 0.1209,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0665,
-   "close": 54.5,
-   "score": 82.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.5
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873026-3916387-py",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "BUF",
-   "a": "BAL",
-   "mk": "prop",
-   "side": "under",
-   "line": 237.5,
-   "price": -113.0,
-   "bet": "Lamar Jackson under 237.5 pass yds -113",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 1.5,
-   "edge": 30.8,
-   "ev": 0.1819,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.055,
-   "close": 236.5,
-   "score": 0.0,
-   "res": "w",
-   "ret": 0.885,
-   "profit": 1.3275
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873026-3918298-ry",
-   "k": "2026-11-01T18:00:00Z",
-   "slate": "nflprops:2026-11-01",
-   "h": "BUF",
-   "a": "BAL",
-   "mk": "prop",
-   "side": "under",
-   "line": 35.5,
-   "price": -106.0,
-   "bet": "Josh Allen under 35.5 rush yds -106",
-   "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.5,
-   "edge": 12.6,
-   "ev": 0.0728,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0349,
-   "close": 36.5,
-   "score": 30.0,
-   "res": "w",
-   "ret": 0.9434,
-   "profit": 0.4717
   }
  ],
  "ledger": [
@@ -10067,7 +10005,17 @@
    "ev": 0.0431,
    "event": null,
    "pass": false,
-   "close": 157.5
+   "clvRet": -0.0283,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 157.5,
+   "score": [
+    50.0,
+    84.0
+   ],
+   "res": "w",
+   "ret": 0.9434,
+   "profit": 0.4717
   },
   {
    "rule": "cbb-spread",
@@ -10088,7 +10036,17 @@
    "ev": 0.005,
    "event": null,
    "pass": true,
-   "close": 28.5
+   "clvRet": -0.0908,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 28.5,
+   "score": [
+    63.0,
+    78.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.2404
   },
   {
    "rule": "cbb-total",
@@ -10109,7 +10067,17 @@
    "ev": 0.0061,
    "event": null,
    "pass": true,
-   "close": 155.5
+   "clvRet": -0.0283,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 155.5,
+   "score": [
+    63.0,
+    78.0
+   ],
+   "res": "w",
+   "ret": 0.9434,
+   "profit": 0.2359
   },
   {
    "rule": "cbb-spread",
@@ -10130,7 +10098,17 @@
    "ev": 0.0117,
    "event": null,
    "pass": false,
-   "close": 27.5
+   "clvRet": -0.0909,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 27.5,
+   "score": [
+    58.0,
+    80.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.2404
   },
   {
    "rule": "cbb-total",
@@ -12777,8 +12755,8 @@
    "edge": 3.6,
    "ev": 0.0097,
    "event": null,
-   "pass": true,
-   "close": 6.5
+   "pass": false,
+   "close": 7.5
   },
   {
    "rule": "cbb-total",
@@ -13441,7 +13419,7 @@
    "edge": 2.9,
    "ev": 0.0002,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 15.5
   },
   {
@@ -13483,7 +13461,7 @@
    "edge": 3.9,
    "ev": 0.0167,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 28.5
   },
   {
@@ -13505,7 +13483,7 @@
    "ev": 0.0003,
    "event": null,
    "pass": true,
-   "close": 10.5
+   "close": 11.5
   },
   {
    "rule": "cbb-total",
@@ -13650,7 +13628,7 @@
    "edge": 3.8,
    "ev": 0.0069,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 43.5
   },
   {
@@ -13797,7 +13775,7 @@
    "edge": 5.4,
    "ev": 0.0019,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 44.5
   },
   {
@@ -14049,7 +14027,7 @@
    "edge": 3.2,
    "ev": 0.0052,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 46.5
   },
   {
@@ -14091,7 +14069,7 @@
    "edge": 4.3,
    "ev": 0.028,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 64.5
   },
   {
@@ -14112,8 +14090,8 @@
    "edge": 4.4,
    "ev": 0.0694,
    "event": null,
-   "pass": false,
-   "close": 71.5
+   "pass": true,
+   "close": 72.5
   },
   {
    "rule": "cfb-total",
