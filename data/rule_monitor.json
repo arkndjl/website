@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T10:50:50Z",
+ "asof": "2026-11-03T10:53:28Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1006,7 +1006,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 0,
+   "n": 4,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -1080,7 +1080,7 @@
    "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 6,
+   "n": 9,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": null,
@@ -1165,7 +1165,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 42,
+   "n": 44,
    "clvN": 40,
    "clvRet": -0.0358,
    "clvT": null,
@@ -1259,18 +1259,18 @@
     "test": "drift"
    },
    "n": 51,
-   "clvN": 50,
-   "clvRet": -0.0603,
+   "clvN": 51,
+   "clvRet": -0.062,
    "clvT": null,
    "days": 1,
-   "beat": 0.18,
-   "settled": 50,
-   "w": 25,
+   "beat": 0.176,
+   "settled": 51,
+   "w": 26,
    "l": 25,
-   "roi": -0.0212,
+   "roi": -0.0012,
    "week": {
-    "n": 50,
-    "clvRet": -0.0603,
+    "n": 51,
+    "clvRet": -0.062,
     "clvT": null
    },
    "exp": {
@@ -1280,8 +1280,8 @@
     "n": 7154
    },
    "vsExp": {
-    "gap": -0.1096,
-    "z": -6.96,
+    "gap": -0.1113,
+    "z": -7.14,
     "read": "below the backtest"
    },
    "check": {
@@ -1318,7 +1318,7 @@
    },
    "drift": {
     "mu1": 0.0174,
-    "n": 50,
+    "n": 51,
     "sd": 0.1114,
     "rho": 0.0,
     "lo": -2.944,
@@ -1326,18 +1326,18 @@
     "state": "paused",
     "at": [
      "2026-11-02",
-     50
+     51
     ],
-    "llr": -4.494,
-    "info": 1.22,
-    "real": -3.198,
-    "realSe": 0.907,
+    "llr": -4.728,
+    "info": 1.24,
+    "real": -3.314,
+    "realSe": 0.898,
     "need": 242,
     "path": [
      [
       "2026-11-02",
-      50,
-      -4.494
+      51,
+      -4.728
      ]
     ]
    }
@@ -1964,7 +1964,7 @@
    "since": "2026-11-01",
    "status": "on",
    "stopped": null,
-   "n": 1,
+   "n": 4,
    "clvN": 1,
    "clvRet": -0.0194,
    "clvT": null,
@@ -2271,13 +2271,13 @@
    "sport": "cbb",
    "mk": "total",
    "label": "CBB total",
-   "n": 50,
-   "du": 16.5,
-   "clvRet": -0.0611,
+   "n": 51,
+   "du": 18.25,
+   "clvRet": -0.0693,
    "clvT": null,
-   "flat": -0.0603,
-   "adds": -0.0008,
-   "expEdge": 0.0389,
+   "flat": -0.062,
+   "adds": -0.0073,
+   "expEdge": 0.0356,
    "basis": "backtest"
   },
   {
