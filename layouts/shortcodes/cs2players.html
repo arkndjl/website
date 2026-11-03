@@ -29,7 +29,7 @@
   {{- range .board }}{{ partial "cs2prow.html" (dict "r" . "ctry" $ctry "view" "board") }}{{ end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "cs2" "note" (printf "bo3.gg per-map stats · updated %s" $date) "about" (printf "1,000+ rounds in the last year, a map in the last 120 days (%d players). Stat lines weighted by their effect on round share, opponent-adjusted, recency-weighted, small samples regressed. Replacement %.1f. Photos: bo3.gg." .nPool .repl)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "cs2" "note" (printf "bo3.gg per-map stats · updated %s" $date) "about" (printf "1,000+ rounds in the last year, a map in the last 120 days (%d players). Stat lines weighted by their effect on round share, opponent-adjusted, recency-weighted, small samples regressed. Replacement %.1f. Photos: bo3.gg." (int .nPool) .repl)) -}}
 {{- else if eq $view "prospects" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: prospects") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,Proj,T1%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk sp cs__table">
@@ -68,7 +68,7 @@
   </tbody>
 </table>
 {{- with $f.value }}
-{{- partial "wintable-close.html" (dict "rows" 200 "fresh" "cs2" "note" "USD, estimate" "about" (printf "Round wins added over replacement, two seasons ahead with aging, 15%% a year discount, scaled to %d reported buyouts (unconfirmed). Order of magnitude." .n)) -}}
+{{- partial "wintable-close.html" (dict "rows" 200 "fresh" "cs2" "note" "USD, estimate" "about" (printf "Round wins added over replacement, two seasons ahead with aging, 15%% a year discount, scaled to %d reported buyouts (unconfirmed). Order of magnitude." (int .n))) -}}
 {{- end }}
 {{- else if eq $view "model" -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>

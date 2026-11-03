@@ -1,0 +1,98 @@
+{{- /* Team builder, college basketball: each D-I program's offseason plan (static/data/cbb-builder.json, written by
+       scripts/cbb_market.py, fetched when the tab is opened). Pick a team: next season's rotation (returners with
+       P(back) >= .5 at their next-season BPM, the 2027 class, signings), the NIL budget (the roster's yNIL, +4%, a soft
+       target up to +25%), who leaves and why (draft, eligibility, transfer), and the signing plan from likely movers for
+       whom the school is a real destination, chosen to add the most team rating within the budget and the 15-man roster.
+       {{< cbbbuilder title="..." tab="team builder" >}} */ -}}
+{{- $fit := site.Data.cbb_market_fit -}}
+<div class="win tb" data-cbbtb data-tb-src="{{ "data/cbb-builder.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "team_builder.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="tb__top">
+    <div class="tb__sprite" aria-hidden="true">{{ partial "px/hero-builder.html" . }}</div>
+    <form class="cfb__bar tb__bar" onsubmit="return false" aria-label="pick a team">
+      <label class="cfb__field cfb__field--grow"><span>team</span><select name="team" data-tb-team><option value="">loading…</option></select></label>
+      <label class="cfb__field"><span>conf</span><select name="conf" data-tb-conf><option value="">any</option></select></label>
+      <button type="button" class="cfb__btn" data-tb-step="-1" title="previous team" aria-label="previous team">◀</button>
+      <button type="button" class="cfb__btn" data-tb-step="1" title="next team" aria-label="next team">▶</button>
+    </form>
+  </div>
+  <div class="tb__body" data-tb-body><p class="cfb__none">loading offseason plans…<noscript> (needs JavaScript)</noscript></p></div>
+  <div class="win__status" title="Transfer% test (2025->26, fit 2022-24): AUC {{ index $fit.move.test.auc 1 }}, top decile moved {{ printf "%.0f" (mul $fit.move.test.top10_1 100) }}% vs {{ printf "%.0f" (mul (index $fit.move.test.rate 1) 100) }}% base. Landing test: actual school in the top 10 of {{ $fit.land.test.teams }} for {{ printf "%.0f" (mul $fit.land.test.top10 100) }}% of moves (median rank {{ $fit.land.test.medianRank }}). Next-season BPM = projected BPM + NIL-era change by class; minutes by rank within a team, NIL-era means; empty spots at BPM -3."><span data-tb-status>team builder</span><span class="cfb__asof" data-tb-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+<script>
+(function () {
+  if (window.__arkCbbTb) return; window.__arkCbbTb = true;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function money(n) { n = n || 0; var a = Math.abs(n), s = n < 0 ? '−' : ''; return s + (a >= 1e6 ? '$' + (a / 1e6).toFixed(a >= 1e7 ? 1 : 2).replace(/0$/, '') + 'M' : '$' + Math.round(a / 1e3) + 'K'); }
+  function pct(x) { return x == null ? '—' : x < 0.005 ? '&lt;1%' : Math.min(99, Math.round(x * 100)) + '%'; }
+  function odds(x) { return x == null ? '—' : (x * 100 < 1 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%'; }
+  function fvc(fv) { return fv == null ? '<span class="cfb__dim">—</span>' : '<span class="fv-chip" data-fv="' + Math.floor(fv / 5) * 5 + '">' + Math.round(fv) + '</span>'; }
+  function sgn(x, d) { return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d == null ? 1 : d); }
+  function logo(src) { return src ? '<img class="cfb__logo" src="' + esc(src) + '" alt="" width="20" height="20" loading="lazy">' : ''; }
+  var WHY = { draft: 'draft', eligibility: 'eligibility', transfer: 'transfer', 'leaves D-I': 'leaves D-I' };
+  function tbl(title, head, rows, empty) {
+    return '<section class="tb__panel"><h4>' + title + '</h4>' + (rows.length ? '<div class="wintable__scroll"><table class="cfb__table tb__t"><thead><tr>' +
+      head.map(function (h) { return '<th' + (h[1] ? ' title="' + esc(h[1]) + '"' : '') + '>' + h[0] + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.join('') +
+      '</tbody></table></div>' : '<p class="cfb__dim">' + empty + '</p>') + '</section>';
+  }
+  function render(T, D, body) {
+    var sum = '<section class="tb__panel"><div class="tb__kpis">' +
+      [['rating now', T.now.toFixed(1), 'ARK rating, #' + T.rk], ['returning', T.ret.toFixed(1), 'next season, returners + class only'], ['after plan', T.after.toFixed(1), sgn(T.after - T.ret) + ' from signings'],
+       ['budget', money(T.budget), 'roster yNIL +4%'], ['spend', money(T.spend), Math.round(100 * T.spend / Math.max(1, T.budget)) + '% of budget']].map(function (k) {
+        return '<div class="tb__kpi"><span class="cfb__dim">' + k[0] + '</span><b>' + k[1] + '</b><span class="cfb__dim">' + esc(k[2]) + '</span></div>'; }).join('') + '</div></section>';
+    var rot = T.back.map(function (p) { return { name: p.name, pos: p.pos, fv: p.fv, bpm: p.bpm, kind: 'back', p: p.p, x: p.x }; })
+      .concat((T.commits || []).map(function (c) { return { name: c.name, pos: c.pos, fv: c.fv, bpm: c.bpm, kind: 'class', rk: c.rk, x: c.x }; }))
+      .concat(T.plan.map(function (s) { return { name: s.name, pos: s.pos, fv: s.fv, bpm: s.bpm, kind: s.kind === 'keep' ? 'keep' : 'new', from: s.kind === 'keep' ? '' : s.team, x: s.cost }; }))
+      .sort(function (a, b) { return b.bpm - a.bpm; });
+    var TAG = { back: '', 'class': '<span class="tb__dtag tb__dtag--recruit" title="' + D.season + ' class">FR</span>', 'new': '<span class="tb__dtag tb__dtag--new" title="signing">NEW</span>', keep: '<span class="tb__dtag" title="kept at market price (likely transfer)">KEEP</span>' };
+    var rotation = tbl('next season · ' + rot.length + ' of ' + D.roster, [['#'], ['Player'], ['Pos'], ['FV'], ['BPM', 'next-season BPM'], ['', ''], ['Back', 'P(on this roster next season)'], ['$', 'xNIL (signings: cost)']],
+      rot.map(function (o, i) { return '<tr' + (i === 4 ? ' class="tb__dlast"' : '') + '><td class="cfb__rk">' + (i + 1) + '</td><td><b>' + esc(o.name) + '</b>' + (o.from ? ' <span class="cfb__dim">' + esc(o.from) + '</span>' : o.rk ? ' <span class="cfb__dim">No. ' + o.rk + '</span>' : '') + '</td><td>' + esc(o.pos || '') + '</td><td>' + fvc(o.fv) + '</td><td class="cfb__num">' + sgn(o.bpm) + '</td><td>' + TAG[o.kind] + '</td><td class="cfb__num">' + (o.kind === 'back' ? pct(o.p) : '—') + '</td><td class="cfb__num">' + (o.x ? money(o.x) : '—') + '</td></tr>'; }),
+      'no one projected back.');
+    var nk = T.plan.filter(function (s) { return s.kind === 'keep'; }).length, ns = T.plan.length - nk;
+    var plan = tbl('the plan · ' + (nk ? nk + ' kept · ' : '') + ns + ' signing' + (ns === 1 ? '' : 's') + ' · ' + money(T.plan.reduce(function (a, s) { return a + s.cost; }, 0)),
+      [['Player'], ['', ''], ['From'], ['Pos'], ['Cls'], ['FV'], ['BPM', 'next-season BPM'], ['Cost', 'xNIL'], ['+Rating', 'team rating added'], ['Xfer%', 'P(on another D-I roster next season)'], ['Odds', 'signings: Xfer% x P(picks this school | moves) · kept: P(stays in D-I)']],
+      T.plan.map(function (s) { return '<tr><td><b>' + esc(s.name) + '</b></td><td>' + (s.kind === 'keep' ? '<span class="tb__dtag" title="kept at market price">KEEP</span>' : '<span class="tb__dtag tb__dtag--new">NEW</span>') + '</td><td class="cfb__team">' + logo(s.logo) + '<span>' + esc(s.team) + '</span></td><td>' + esc(s.pos) + '</td><td>' + esc(s.cls || '') + '</td><td>' + fvc(s.fv) + '</td><td class="cfb__num">' + sgn(s.bpm) + '</td><td class="cfb__num">' + money(s.cost) + '</td><td class="cfb__num tb__teal">+' + s.gain.toFixed(1) + '</td><td class="cfb__num">' + pct(s.tp) + '</td><td class="cfb__num tb__teal">' + odds(s.odds) + '</td></tr>'; }),
+      'none: no realistic mover adds 0.25+ within the budget.');
+    var leaving = tbl('leaving · ' + T.leave.length, [['Player'], ['Pos'], ['Cls'], ['FV'], ['Why'], ['Back', 'P(on this roster next season)'], ['Xfer%'], ['xNIL']],
+      T.leave.map(function (p) { return '<tr><td>' + esc(p.name) + '</td><td>' + esc(p.pos) + '</td><td>' + esc(p.cls || '') + '</td><td>' + fvc(p.fv) + '</td><td><span class="tb__why tb__why--' + p.why.replace(/[^a-z]/g, '') + '">' + WHY[p.why] + '</span></td><td class="cfb__num">' + pct(p.back) + '</td><td class="cfb__num">' + pct(p.tp) + '</td><td class="cfb__num">' + money(p.x) + '</td></tr>'; }),
+      'no departures projected.');
+    body.innerHTML = sum + rotation + plan + leaving;
+  }
+  function setup(w, D) {
+    var sel = w.querySelector('[data-tb-team]'), conf = w.querySelector('[data-tb-conf]'), body = w.querySelector('[data-tb-body]');
+    var teams = D.teams, byT = {};
+    teams.forEach(function (t) { byT[t.t] = t; });
+    var confs = {}; teams.forEach(function (t) { if (t.conf) confs[t.conf] = 1; });
+    Object.keys(confs).sort().forEach(function (c) { var o = document.createElement('option'); o.textContent = c; conf.appendChild(o); });
+    function fill() {
+      var c = conf.value, cur = sel.value; sel.innerHTML = '';
+      teams.filter(function (t) { return !c || t.conf === c; }).forEach(function (t) { var o = document.createElement('option'); o.value = t.t; o.textContent = t.t; sel.appendChild(o); });
+      if (byT[cur] && (!c || byT[cur].conf === c)) sel.value = cur;
+    }
+    function show(name) {
+      var T = byT[name] || byT[sel.value] || teams[0]; if (!T) return;
+      sel.value = T.t; render(T, D, body);
+      w.querySelector('[data-tb-status]').textContent = T.t + ' · ' + T.plan.length + ' move' + (T.plan.length === 1 ? '' : 's') + ' · ' + T.coach;
+      try { history.replaceState(null, '', '#builder:' + encodeURIComponent(T.t)); } catch (e) {}
+    }
+    fill();
+    conf.addEventListener('change', function () { fill(); show(sel.value); });
+    sel.addEventListener('change', function () { show(sel.value); });
+    w.querySelectorAll('[data-tb-step]').forEach(function (b) { b.addEventListener('click', function () {
+      var i = sel.selectedIndex + +b.getAttribute('data-tb-step'), n = sel.options.length; sel.selectedIndex = (i + n) % n; show(sel.value); }); });
+    var m = /#builder:(.+)$/.exec(location.hash), pick = m ? decodeURIComponent(m[1]) : null;
+    w.querySelector('[data-tb-asof]').textContent = 'plans for ' + D.season + '-' + String(D.season + 1).slice(2) + ' · updated ' + new Date(String(D.asof).slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toLowerCase();
+    show(pick && byT[pick] ? pick : teams[0].t);
+  }
+  document.querySelectorAll('[data-cbbtb]').forEach(function (w) {
+    var go = function () { if (w.__tbLoading) return; w.__tbLoading = true;
+      fetch(w.getAttribute('data-tb-src')).then(function (r) { return r.json(); }).then(function (D) { setup(w, D); })
+        .catch(function () { w.querySelector('[data-tb-body]').innerHTML = '<p class="cfb__none">plans failed to load.</p>'; }); };
+    if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); go(); } }); io.observe(w); } else go();
+  });
+})();
+</script>

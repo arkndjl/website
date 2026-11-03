@@ -1,0 +1,35 @@
+{{- /* Coaching jobs, college basketball: the chance each D-I head job opens after the season, split into out (fired,
+       retired, the NBA) and hired away (multinomial logit on 2016-25 school-seasons: projected win%, against the
+       program's 5-year norm, first or second year, a mid-major winner's pull upward, NCAA tournament odds, the coach's
+       record against preseason projections), and who fills it if it opens from the sitting D-I head coaches (conditional
+       logit on 2016-25 hires: step up in program level, results, record over projection, distance). The rest of the
+       hires come from off the board (assistants, the NBA, lower levels). scripts/cbb_market.py, data/cbb_market.json. */ -}}
+{{- with site.Data.cbb_market -}}
+{{- $t := .tests -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coaching jobs") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Head coach,Open,Out,Hired away" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
+<table class="cfb__table cfbj">
+  <thead><tr><th>RK</th><th>Team</th><th>Conf</th><th>Head coach</th>
+    <th title="Open = P(job opens after season) = Out + Hired away">Open</th>
+    <th title="Out = fired, retired or to the NBA">Out</th><th title="Hired away = hired by another D-I program">Hired away</th>
+    <th title="projected win% (season simulation) · vs the program's 5-year norm">Win% · vs norm</th>
+    <th title="seasons in job, incl. current">Yr</th>
+    <th title="top 3 sitting D-I head coaches, P(hire | opens); conditional logit, 2016-25 hires. {{ printf "%.0f" (mul site.Data.cbb_market_fit.hires.fromHC 100) }}% of hires come from sitting D-I head coaches">If it opens</th></tr></thead>
+  <tbody>
+  {{- range $i, $j := .jobs }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td>{{ .hc }}</td>
+    <td class="cfb__num is-key" data-l="Open" data-v="{{ .open }}"><b class="{{ if ge .open 0.35 }}cfb__down{{ else }}cfb__up{{ end }}">{{ printf "%.0f" (mul .open 100) }}%</b></td>
+    <td class="cfb__num" data-l="Out" data-v="{{ .out }}">{{ printf "%.0f" (mul .out 100) }}%</td>
+    <td class="cfb__num" data-l="Hired away" data-v="{{ .moved }}">{{ printf "%.0f" (mul .moved 100) }}%</td>
+    <td class="cfb__num" data-l="Win%" data-v="{{ .wp }}">{{ printf "%.0f" (mul .wp 100) }}% <span class="{{ if ge .vsNorm 0.0 }}cfb__up{{ else }}cfb__down{{ end }} cfb__dim">{{ if ge .vsNorm 0.0 }}+{{ end }}{{ printf "%.0f" (mul .vsNorm 100) }}</span></td>
+    <td class="cfb__num" data-l="Yr" data-v="{{ .ten }}">{{ .ten }}</td>
+    <td class="cfbj__hires" data-l="If it opens">{{ range $k, $h := .hires }}{{ if $k }}, {{ end }}{{ $h.name }} <span class="cfb__dim">{{ $h.from }} {{ if lt $h.p 0.01 }}&lt;1{{ else }}{{ printf "%.0f" (mul $h.p 100) }}{{ end }}%</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .jobs) "fresh" "cbb_market" "note" (printf "E[openings] = %.0f · test 2022-25: log loss %.0f%% below base rate, AUC %.2f" .eOpen (mul $t.vacancy.skill 100) $t.vacancy.aucChange)) -}}
+{{- end -}}

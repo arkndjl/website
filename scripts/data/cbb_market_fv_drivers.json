@@ -1,0 +1,120 @@
+{
+ "asof": "2026-11-03",
+ "bar": "gain in both splits, >= 4/5 folds each, clustered t >= 2",
+ "results": {
+  "returner": [
+   {
+    "driver": "prog_lvl",
+    "md5_gain": 0.527,
+    "md5_folds": 4,
+    "md5_t": 1.11,
+    "md5_rungs": [
+     0.446,
+     -0.012,
+     0.007,
+     0.086
+    ],
+    "salt_gain": 0.514,
+    "salt_folds": 3,
+    "salt_t": 1.13,
+    "salt_rungs": [
+     0.464,
+     -0.0,
+     0.034,
+     0.016
+    ],
+    "pass": false
+   },
+   {
+    "driver": "tp_move",
+    "md5_gain": 0.157,
+    "md5_folds": 3,
+    "md5_t": 0.46,
+    "md5_rungs": [
+     0.185,
+     -0.006,
+     0.06,
+     -0.081
+    ],
+    "salt_gain": 0.427,
+    "salt_folds": 4,
+    "salt_t": 1.48,
+    "salt_rungs": [
+     0.182,
+     0.009,
+     0.102,
+     0.133
+    ],
+    "pass": false
+   },
+   {
+    "driver": "xnil_rel",
+    "md5_gain": 0.113,
+    "md5_folds": 3,
+    "md5_t": 0.27,
+    "md5_rungs": [
+     0.004,
+     0.116,
+     -0.032,
+     0.025
+    ],
+    "salt_gain": 0.38,
+    "salt_folds": 4,
+    "salt_t": 1.04,
+    "salt_rungs": [
+     -0.01,
+     0.134,
+     -0.024,
+     0.28
+    ],
+    "pass": false
+   },
+   {
+    "driver": "col_value",
+    "md5_gain": 0.011,
+    "md5_folds": 3,
+    "md5_t": 0.17,
+    "md5_rungs": [
+     -0.018,
+     0.054,
+     0.016,
+     -0.041
+    ],
+    "salt_gain": 0.042,
+    "salt_folds": 3,
+    "salt_t": 0.56,
+    "salt_rungs": [
+     -0.017,
+     0.079,
+     0.015,
+     -0.035
+    ],
+    "pass": false
+   }
+  ],
+  "newcomer": [
+   {
+    "driver": "prog_lvl",
+    "md5_gain": 0.305,
+    "md5_folds": 5,
+    "md5_t": 2.02,
+    "md5_rungs": [
+     0.468,
+     -0.096,
+     -0.097,
+     0.029
+    ],
+    "salt_gain": 0.26,
+    "salt_folds": 4,
+    "salt_t": 1.73,
+    "salt_rungs": [
+     0.467,
+     -0.075,
+     -0.095,
+     -0.036
+    ],
+    "pass": false
+   }
+  ]
+ }
+}
