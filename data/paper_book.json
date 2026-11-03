@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03T00:14:09Z",
+ "asof": "2026-11-03T00:23:53Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 104.08,
   "peak": 118.08,
   "drawdown": 0.1185,
-  "open": 82.5,
+  "open": 83.25,
   "path": [
    101.5,
    101.6,
@@ -106,7 +106,7 @@
   ]
  },
  "record": {
-  "n": 218,
+  "n": 222,
   "clvN": 102,
   "clvRet": -0.0214,
   "clvT": -3.39,
@@ -248,7 +248,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 7,
+   "n": 6,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": -2.35,
@@ -269,7 +269,7 @@
    "label": "CBB moneyline",
    "sport": "cbb",
    "mk": "ml",
-   "n": 4,
+   "n": 6,
    "clvN": 1,
    "clvRet": 0.0527,
    "clvT": null,
@@ -311,7 +311,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 50,
+   "n": 53,
    "clvN": 1,
    "clvRet": -0.0192,
    "clvT": null,
@@ -1818,7 +1818,7 @@
    "ev": 0.0322,
    "event": null,
    "pass": false,
-   "close": 18.5
+   "close": 19.5
   },
   {
    "rule": "cbb-spread",
@@ -1880,7 +1880,7 @@
    "edge": 3.3,
    "ev": 0.0029,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 22.5
   },
   {
@@ -1968,6 +1968,27 @@
    "close": 162.5
   },
   {
+   "rule": "cbb-ml",
+   "sport": "cbb",
+   "id": "401921704",
+   "k": "2026-11-03T00:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Purdue",
+   "a": "Gonzaga",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 217.0,
+   "bet": "Gonzaga ML +217",
+   "placed": "2026-11-03T00:23:47Z",
+   "stake": 0.25,
+   "edge": 8.5,
+   "ev": 0.0555,
+   "event": null,
+   "pass": false,
+   "close": 5.5
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401921704",
@@ -1985,7 +2006,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 153.5
   },
   {
@@ -2028,7 +2049,7 @@
    "ev": 0.0143,
    "event": null,
    "pass": true,
-   "close": -9.5
+   "close": -10.5
   },
   {
    "rule": "nba-total",
@@ -2153,8 +2174,29 @@
    "edge": 5.3,
    "ev": 0.0079,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 148.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909500",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "DePaul",
+   "a": "West Georgia",
+   "mk": "spread",
+   "side": "away",
+   "line": 25.5,
+   "price": 104.0,
+   "bet": "West Georgia +25.5 +104",
+   "placed": "2026-11-03T00:23:47Z",
+   "stake": 0.25,
+   "edge": 2.6,
+   "ev": 0.0382,
+   "event": null,
+   "pass": false,
+   "close": 25.5
   },
   {
    "rule": "cbb-total",
@@ -2237,7 +2279,7 @@
    "edge": 3.4,
    "ev": 0.0084,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": -4.5
   },
   {
@@ -2321,8 +2363,8 @@
    "edge": 4.6,
    "ev": 0.0418,
    "event": null,
-   "pass": false,
-   "close": 39.5
+   "pass": true,
+   "close": 40.5
   },
   {
    "rule": "cbb-total",
@@ -2489,7 +2531,7 @@
    "edge": 4.2,
    "ev": 0.009,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 18.5
   },
   {
@@ -2573,7 +2615,7 @@
    "edge": 2.0,
    "ev": 0.0178,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 46.5
   },
   {
@@ -3117,8 +3159,8 @@
    "edge": 5.5,
    "ev": 0.0096,
    "event": null,
-   "pass": true,
-   "close": 151.5
+   "pass": false,
+   "close": 149.5
   },
   {
    "rule": "cbb-spread",
@@ -11128,7 +11170,7 @@
    "ev": 0.0322,
    "event": null,
    "pass": false,
-   "close": 18.5
+   "close": 19.5
   },
   {
    "rule": "cbb-spread",
@@ -11190,7 +11232,7 @@
    "edge": 3.3,
    "ev": 0.0029,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 22.5
   },
   {
@@ -11278,6 +11320,27 @@
    "close": 162.5
   },
   {
+   "rule": "cbb-ml",
+   "sport": "cbb",
+   "id": "401921704",
+   "k": "2026-11-03T00:30:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "Purdue",
+   "a": "Gonzaga",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 217.0,
+   "bet": "Gonzaga ML +217",
+   "placed": "2026-11-03T00:23:47Z",
+   "stake": 0.25,
+   "edge": 8.5,
+   "ev": 0.0555,
+   "event": null,
+   "pass": false,
+   "close": 5.5
+  },
+  {
    "rule": "cbb-total",
    "sport": "cbb",
    "id": "401921704",
@@ -11295,7 +11358,7 @@
    "edge": 6.3,
    "ev": 0.0073,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 153.5
   },
   {
@@ -11338,7 +11401,7 @@
    "ev": 0.0143,
    "event": null,
    "pass": true,
-   "close": -9.5
+   "close": -10.5
   },
   {
    "rule": "nba-total",
@@ -11463,8 +11526,29 @@
    "edge": 5.3,
    "ev": 0.0079,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 148.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401909500",
+   "k": "2026-11-03T01:00:00Z",
+   "slate": "cbb:2026-11-02",
+   "h": "DePaul",
+   "a": "West Georgia",
+   "mk": "spread",
+   "side": "away",
+   "line": 25.5,
+   "price": 104.0,
+   "bet": "West Georgia +25.5 +104",
+   "placed": "2026-11-03T00:23:47Z",
+   "stake": 0.25,
+   "edge": 2.6,
+   "ev": 0.0382,
+   "event": null,
+   "pass": false,
+   "close": 25.5
   },
   {
    "rule": "cbb-total",
@@ -11547,7 +11631,7 @@
    "edge": 3.4,
    "ev": 0.0084,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": -4.5
   },
   {
@@ -11631,8 +11715,8 @@
    "edge": 4.6,
    "ev": 0.0418,
    "event": null,
-   "pass": false,
-   "close": 39.5
+   "pass": true,
+   "close": 40.5
   },
   {
    "rule": "cbb-total",
@@ -11799,7 +11883,7 @@
    "edge": 4.2,
    "ev": 0.009,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 18.5
   },
   {
@@ -11883,7 +11967,7 @@
    "edge": 2.0,
    "ev": 0.0178,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 46.5
   },
   {
@@ -12427,8 +12511,8 @@
    "edge": 5.5,
    "ev": 0.0096,
    "event": null,
-   "pass": true,
-   "close": 151.5
+   "pass": false,
+   "close": 149.5
   },
   {
    "rule": "cbb-spread",
