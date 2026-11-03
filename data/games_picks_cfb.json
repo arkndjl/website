@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-03T13:02:52Z",
+ "asof": "2026-11-03T13:04:05Z",
  "recenter": {
   "week": 0.79
  },
@@ -584,8 +584,8 @@
    "flagged": "2026-11-03T10:50:48Z",
    "betTo": 51.0,
    "close": 51.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401858292",
@@ -798,8 +798,8 @@
    "flagged": "2026-11-01T16:08:35Z",
    "betTo": 43.0,
    "close": 38.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401856743",
@@ -852,8 +852,8 @@
    "flagged": "2026-11-01T20:52:18Z",
    "betTo": 43.0,
    "close": 38.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401856849",
@@ -1212,8 +1212,14 @@
    "flagged": "2026-11-03T00:08:15Z",
    "betTo": 50.5,
    "close": 50.5,
-   "now": null,
-   "pass": true
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 50.5,
+    "price": -102.0,
+    "ev": 0.016,
+    "units": 1.25
+   }
   },
   {
    "id": "401858514",
@@ -1563,22 +1569,6 @@
    "tm": 58.8
   },
   {
-   "id": "401871076",
-   "sport": "cfb",
-   "kick": "2026-11-07T20:30:00.000Z",
-   "home": "Middle Tennessee",
-   "away": "Western Kentucky",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -113.0,
-   "edge": 2.7,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -2.1,
-   "tm": 55.2
-  },
-  {
    "id": "401864532",
    "sport": "cfb",
    "kick": "2026-11-08T02:30:00.000Z",
@@ -1587,7 +1577,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -111.0,
+   "price": -104.0,
    "edge": 2.7,
    "x": 3.0,
    "why": "edge under 3",
@@ -1619,7 +1609,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -115.0,
+   "price": -106.0,
    "edge": 2.6,
    "x": 3.0,
    "why": "edge under 3",
@@ -1737,6 +1727,22 @@
    "why": "edge under 4 (conf: Sun Belt)",
    "m": 2.9,
    "tm": 56.4
+  },
+  {
+   "id": "401871076",
+   "sport": "cfb",
+   "kick": "2026-11-07T20:30:00.000Z",
+   "home": "Middle Tennessee",
+   "away": "Western Kentucky",
+   "mk": "spread",
+   "side": "away",
+   "line": 1.5,
+   "price": -111.0,
+   "edge": 3.6,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -2.1,
+   "tm": 55.2
   },
   {
    "id": "401858512",
@@ -1925,16 +1931,16 @@
    "state": "under"
   },
   "401856745": {
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -113.0,
-   "edge": 0.3,
-   "ev": null,
-   "units": 0.0,
+   "mk": "total",
+   "side": "over",
+   "line": 50.5,
+   "price": -102.0,
+   "ev": 0.016,
+   "edge": 3.2,
+   "units": 1.25,
    "home": "Tennessee",
    "away": "Kentucky",
-   "state": "under"
+   "state": "pick"
   },
   "401858513": {
    "mk": "total",
@@ -2120,7 +2126,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -115.0,
+   "price": -106.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -2384,7 +2390,7 @@
    "mk": "spread",
    "side": "home",
    "line": 17.5,
-   "price": -100.0,
+   "price": 104.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
@@ -2429,11 +2435,11 @@
    "state": "under"
   },
   "401871076": {
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -113.0,
-   "edge": 2.7,
+   "mk": "spread",
+   "side": "away",
+   "line": 1.5,
+   "price": -111.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "Middle Tennessee",
@@ -2528,7 +2534,7 @@
    "mk": "total",
    "side": "over",
    "line": 47.5,
-   "price": -120.0,
+   "price": -115.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -2540,7 +2546,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -111.0,
+   "price": -104.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2649,16 +2655,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 6630,
+  "snapshots": 6640,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1571,
-    "clvRet": -0.0445,
-    "clvT": -23.19,
-    "clv": 0.2,
-    "beat": 0.292,
-    "still": 0.479
+    "clvN": 1574,
+    "clvRet": -0.0464,
+    "clvT": -24.66,
+    "clv": 0.16,
+    "beat": 0.28,
+    "still": 0.492
    },
    {
     "when": "6-24h",
@@ -3551,8 +3557,7 @@
    "tmRaw": 54.5,
    "flagged": "2026-11-03T00:08:15Z",
    "betTo": 50.5,
-   "close": 50.5,
-   "pass": true
+   "close": 50.5
   },
   {
    "id": "401864535",
@@ -3635,7 +3640,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 20.0,
+    "raw": 19.25,
     "scale": 1.0,
     "down": 11.0
    },
@@ -3652,7 +3657,7 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 35.25,
+    "raw": 36.5,
     "scale": 1.0
    },
    "2026-11-08": {
