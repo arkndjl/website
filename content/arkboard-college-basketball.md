@@ -1,7 +1,7 @@
 +++
 title = "Basketball Prospects / CBB :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "Basketball Prospects (CBB) ARKBOARD: game projections (model line, win probability, projected score), ARK Ranking (power rankings), season odds and NCAA tournament odds (bids, seeds, Final Four, title) for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); HS recruit boards for the 2027-2029 classes on the FV value scale, with class rankings; FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
+description = "Basketball Prospects (CBB) ARKBOARD: game projections (model line, win probability, projected score), ARK Ranking (power rankings), season odds and NCAA tournament odds (bids, seeds, Final Four, title) for every D-I team; every 2026-27 D-I player, the international prospects and NCAA D-II and D-III players (with D-1%, the chance of a D-I roster next season) graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); HS recruit boards for the 2027-2029 classes on the FV value scale, with class rankings; FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
 keywords = ["arkboard", "ark ranking", "college basketball", "college basketball model", "ARK Ranking", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
 draft = false
 cover = "/og/college-basketball.png"
@@ -11,8 +11,8 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,draft board,WAR leaders,stats,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,lineups,on/off,lineup leaders,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
-{{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
+{{< wintabs groups="players:all,draft board,WAR leaders,stats,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,lineups,on/off,lineup leaders,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< cbbboard title="CBB 2026-27 :: all players" tab="all" >}}
 {{< lazytab tab="draft board" >}}
 {{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board :: 2027 draft, predictive mock order" tab="draft board" >}}
 {{< /lazytab >}}

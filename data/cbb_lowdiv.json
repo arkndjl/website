@@ -1,0 +1,185 @@
+{
+ "asof": "2026-11-03",
+ "train": "2023-24 to 2025-26",
+ "n": 24546,
+ "moved": 575,
+ "kept": [
+  "prod",
+  "d3",
+  "stsh",
+  "srs",
+  "pts",
+  "msh",
+  "ast"
+ ],
+ "keptLabels": [
+  "production (Game Score per 100, vs his division)",
+  "Division III",
+  "starts",
+  "team strength",
+  "scoring rate",
+  "share of team minutes",
+  "assist rate"
+ ],
+ "evidence": [
+  {
+   "driver": "prod",
+   "gain": 0.01402,
+   "folds": 5,
+   "label": "production (Game Score per 100, vs his division)"
+  },
+  {
+   "driver": "d3",
+   "gain": 0.01203,
+   "folds": 5,
+   "label": "Division III"
+  },
+  {
+   "driver": "stsh",
+   "gain": 0.00478,
+   "folds": 5,
+   "label": "starts"
+  },
+  {
+   "driver": "srs",
+   "gain": 0.00025,
+   "folds": 5,
+   "label": "team strength"
+  },
+  {
+   "driver": "pts",
+   "gain": 0.00031,
+   "folds": 4,
+   "label": "scoring rate"
+  },
+  {
+   "driver": "msh",
+   "gain": 0.00025,
+   "folds": 4,
+   "label": "share of team minutes"
+  },
+  {
+   "driver": "ast",
+   "gain": -1e-05,
+   "folds": 4,
+   "label": "assist rate"
+  }
+ ],
+ "beta": [
+  -5.29362,
+  0.3445,
+  -1.16726,
+  0.56309,
+  0.2268,
+  0.30833,
+  0.3172,
+  0.01773
+ ],
+ "mu": [
+  -0.11356,
+  0.59606,
+  0.34822,
+  0.00201,
+  -0.08969,
+  0.31524,
+  -0.05153
+ ],
+ "sd": [
+  0.56991,
+  0.49068,
+  0.40778,
+  0.99964,
+  0.56716,
+  0.28098,
+  0.56332
+ ],
+ "test": {
+  "cycle": "2025-26 to 2026-27",
+  "n": 10756,
+  "moved": 252,
+  "auc": 0.8993,
+  "ll": 0.07685,
+  "llBase": 0.1111,
+  "mean": 0.0207,
+  "rate": 0.0234,
+  "calib": [
+   [
+    0.0005,
+    0.0019,
+    1076
+   ],
+   [
+    0.0007,
+    0.0037,
+    1076
+   ],
+   [
+    0.0009,
+    0.0028,
+    1076
+   ],
+   [
+    0.0013,
+    0.0019,
+    1076
+   ],
+   [
+    0.0029,
+    0.0009,
+    1076
+   ],
+   [
+    0.0064,
+    0.0046,
+    1076
+   ],
+   [
+    0.0098,
+    0.0084,
+    1075
+   ],
+   [
+    0.0143,
+    0.014,
+    1075
+   ],
+   [
+    0.0307,
+    0.0233,
+    1075
+   ],
+   [
+    0.1396,
+    0.173,
+    1075
+   ]
+  ],
+  "byDiv": {
+   "D-II": {
+    "pred": 0.0473,
+    "rate": 0.0524
+   },
+   "D-III": {
+    "pred": 0.0041,
+    "rate": 0.0053
+   }
+  },
+  "top": {
+   "25": 0.52,
+   "100": 0.46,
+   "250": 0.352
+  },
+  "topPred": {
+   "25": 0.51,
+   "100": 0.368,
+   "250": 0.276
+  }
+ },
+ "arrivals": {
+  "n": 3739,
+  "nba": 0.0072,
+  "fv": 20.115
+ },
+ "kMin": 200,
+ "priorW": 0.5
+}

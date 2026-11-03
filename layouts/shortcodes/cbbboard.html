@@ -1,13 +1,15 @@
 {{- /* The College Basketball board: every player on a 2026-27 D-I roster (static/data/cbb-all.json, built by
-       scripts/fetch_cbb.py), graded on the 20-80 FV scale, fetched and rendered by the browser 50 to a page.
-       {{< cbbboard title="..." tab="all D-I" >}}
+       scripts/fetch_cbb.py), the international prospects (static/data/cbb-intl.json, scripts/cbb_intl.py) and the
+       NCAA D-II and D-III players (static/data/cbb-lowdiv.json, scripts/cbb_lowdiv.py, with D-1%), graded on the 20-80
+       FV scale, fetched and rendered by the browser 50 to a page.
+       {{< cbbboard title="..." tab="all" >}}
        A season select swaps in a past preseason board as the model graded it (static/data/cbb-past.json, written by
        scripts/cbb_fit.py: out of fold for 2009-10 to 2015-16, forward for later boards), with what became of each player.
        Filters (position, type, team, conference, class, age, FV, newcomers), click-to-sort headers, a scouting
        report when a name is clicked, GFX export, and the filters kept in the address (#cbb:pos=G). */ -}}
 {{- $d := site.Data.cbb -}}
 {{- $id := .Get "id" | default "cbb" -}}
-<div class="win cfb cbb" data-cbb="{{ $id }}" data-cbb-src="{{ "data/cbb-all.json" | relURL }}" data-cbb-past="{{ "data/cbb-past.json" | relURL }}" data-cbb-intl="{{ "data/cbb-intl.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
+<div class="win cfb cbb" data-cbb="{{ $id }}" data-cbb-src="{{ "data/cbb-all.json" | relURL }}" data-cbb-past="{{ "data/cbb-past.json" | relURL }}" data-cbb-intl="{{ "data/cbb-intl.json" | relURL }}" data-cbb-low="{{ "data/cbb-lowdiv.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
      data-gfx-cols="RK,Player,FV,Pos,School,Class,Age,NBA%"{{ with site.Data.cbb_live | default $d }} data-gfx-date="updated {{ (time .asof).Format "Jan 2, 2006" | lower }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "cbb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -28,6 +30,9 @@
     <label class="cfb__field" title="Barttorvik role from last season (returners)"><span>type</span><select name="role">
       <option value="">any</option>{{ range slice "Pure PG" "Scoring PG" "Combo G" "Wing G" "Wing F" "Stretch 4" "PF/C" "C" }}<option>{{ . }}</option>{{ end }}
     </select></label>
+    <label class="cfb__field" title="D-I; international prospects on the 2027 draft boards; NCAA D-II and D-III (with D-1%)"><span>level</span><select name="lvl">
+      <option value="">all</option><option value="d1">D-I</option><option value="intl">international</option><option value="low">D-II + D-III</option><option value="d2">D-II</option><option value="d3">D-III</option>
+    </select></label>
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ with $d }}{{ range .teams }}<option>{{ . }}</option>{{ end }}{{ end }}
     </select></label>
@@ -45,7 +50,6 @@
     </select></label>
     <label class="cfb__check" title="freshmen and sophomores"><input type="checkbox" name="uc"><span>underclassmen</span></label>
     <label class="cfb__check" title="no D-I season yet: freshmen, international and JUCO arrivals at D-I schools"><input type="checkbox" name="nw"><span>newcomers</span></label>
-    <label class="cfb__check" title="international prospects on the 2027 draft boards, graded on the same FV scale"><input type="checkbox" name="intl"><span>international</span></label>
     <label class="cfb__check" title="projected NBA position group (G, F, C) at 50%+ differs from his position"><input type="checkbox" name="mv"><span>position change</span></label>
     <button type="reset" class="cfb__btn">reset</button>
     </div>
@@ -61,7 +65,8 @@
         <th data-sort="team">School</th>
         <th data-sort="fv" data-num class="cfb__g">FV</th>
         <th data-sort="nbaP" data-num title="NBA% = P(he plays in the NBA): the first rung of the FV model (fit on 2009-16 preseason boards against NBA careers)">NBA%</th>
-        <th data-sort="xbpm" data-num data-cbb-now title="xBPM = projected Barttorvik BPM this season: ridge fit on last season, recruiting, age, size (r .74 returners, .47 newcomers)">xBPM</th>
+        <th data-sort="d1P" data-num data-cbb-up hidden title="{{ with site.Data.cbb_lowdiv }}D-1% = P(on a D-I roster next season), D-II and D-III players. logit fit on {{ .train }} moves: {{ delimit .keptLabels ", " }}. held out {{ .test.cycle }}: AUC {{ printf "%.3f" .test.auc }}, log loss {{ printf "%.3f" .test.ll }} vs {{ printf "%.3f" .test.llBase }} base rate{{ else }}D-1% = P(on a D-I roster next season){{ end }}">D-1%</th>
+        <th data-sort="xbpm" data-num data-cbb-now data-cbb-d1 title="xBPM = projected Barttorvik BPM this season: ridge fit on last season, recruiting, age, size (r .74 returners, .47 newcomers)">xBPM</th>
         <th data-sort="out" data-cbb-then hidden title="what became of him: NBA role reached (the realized FV) and draft slot">Outcome</th>
         <th data-sort="cls" data-num class="cfb__g">Class</th>
         <th data-sort="age" data-num data-cbb-now>Age</th>
@@ -69,7 +74,7 @@
       </tr></thead>
       <tbody></tbody>
     </table>
-    <p class="cfb__none" data-cbb-loading>loading every D-I player…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-cbb-loading>loading every player…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-cbb-none hidden>0 players match.</p>
   </div>
   <div class="win__status"><span data-cbb-count>{{ with $d }}{{ .population }} graded{{ end }}</span>

@@ -54,19 +54,22 @@
       (r.outcome != null ? '<span class="fv-chip" data-fv="' + tierOf(r.outcome) + '">' + r.outcome + '</span> ' : '') + '<span class="cfb__dim">' +
       (r.outcome == null ? 'in NBA' : xp ? 'XPM ' + xp[1] : r.outcome > 20 ? 'NBA' : 'non-NBA') + pick + '</span></span>';
   }
-  function rowHtml(r, rk, prk, past) {
+  // a D-II / D-III player (static/data/cbb-lowdiv.json): the 20 floor until he reaches D-I, D-1% in place of xBPM
+  var LOWTAG = { 'D-II': 'NCAA Division II', 'D-III': 'NCAA Division III' };
+  function rowHtml(r, rk, prk, past, up) {
     var fv = r.fv, tier = tierOf(r.fv);
     return '<tr data-i="' + r.i + '">' +
       '<td class="cfb__rk"' + (rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + rk + '</td>' +
       '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' + medals(r) +
       (r.src === 'bt' ? prov('not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in') : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
-      (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') + '</td>' +
+      (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') +
+      (r.low ? '<span class="cfb__divtag" title="' + esc(LOWTAG[r.div] || r.div) + ': D-1% ' + pct(r.d1P) + '">' + esc(r.div) + '</span>' + prov('below D-I: no D-I line to grade, so FV starts at the 20 floor') : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
         moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
       '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="mean outcome ' + (+r.fvx).toFixed(2) + '">' + fv + '</span></td>' +
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
-      (past ? '<td>' + outcome(r) + '</td>' : '<td class="cfb__num">' + (r.xbpm == null ? dim : '<span class="' + (r.xbpm >= 0 ? '' : 'cfb__down') + '">' + sgn(r.xbpm) + '</span>') + '</td>') +
+      (past ? '<td>' + outcome(r) + '</td>' : up ? '<td class="cfb__num">' + (r.d1P == null ? dim : pct(r.d1P)) + '</td>' : '<td class="cfb__num">' + (r.xbpm == null ? dim : '<span class="' + (r.xbpm >= 0 ? '' : 'cfb__down') + '">' + sgn(r.xbpm) + '</span>') + '</td>') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
       (past ? '' : '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(1) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year (no birth date yet)">~' + f1(r.ageEst) + '</span>' : '—') + '</td>') +
       '<td class="cfb__num">' + size(r, past) + '</td></tr>';
@@ -77,7 +80,7 @@
   // class, FV, NBA role, pick, draft year]
   var COMPS_URL = null, COMPS = null;
   var COMP_TIP = 'comps: the nearest preseason profiles on the 2009-19 boards (players out of college by 2020), each player once. Returners by last-season production (BPM, PORPAG), age and seasons played, recruiting rank, height and conference; newcomers by recruiting rank and grades, height and class (weights picked by how well the comps\' NBA outcomes predict, classes held out). The shares are his 100 nearest; the three shown are his nearest who reached the NBA. Descriptive: the comp mix did not improve FV held out, so it does not move FV.';
-  function compsHtml(r) { return r.src === 'bt' || r.intl ? '' : '<div class="cfb__comps" data-comps="' + esc(r.name + '|' + r.team) + '"></div>'; }
+  function compsHtml(r) { return r.src === 'bt' || r.intl || r.low ? '' : '<div class="cfb__comps" data-comps="' + esc(r.name + '|' + r.team) + '"></div>'; }
   function compRow(c) {
     var pick = c[6] ? '#' + c[6] + " '" + String(c[7]).slice(2) : 'undrafted';
     return '<li><b>' + esc(c[0]) + '</b> <span class="cfb__dim">' + esc(c[1]) + ' ' + (c[2] - 1) + '-' + String(c[2]).slice(2) + ' ' + esc(c[3]) + '</span> · <span class="fv-chip" data-fv="' + tierOf(c[4]) + '">' + Math.round(c[4]) + '</span> ' + esc(c[5]) + ' · ' + pick + '</li>';
@@ -166,6 +169,29 @@
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + fvNote(r, sum) + '</p></details></div></td></tr>';
   }
+  // a D-II / D-III player's report: his line at that level and what moves his D-1%
+  function lowDetail(r, cols, width) {
+    var L = r.last, rep = r.report || {};
+    var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
+    var parts = (r.parts || []).slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
+    var bars = parts.map(function (p) {
+      var v = p[1], w = Math.min(50, Math.abs(v) / 1.5 * 50);
+      return '<li><span class="cfb__bk">' + esc(p[0]) + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
+        (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + (v > 0 ? '+' : '') + v.toFixed(2) + '</span></li>';
+    }).join('');
+    var lines = (L || []).map(function (x) {
+      return x.season + ' at ' + esc(x.team) + ' (' + esc(x.div) + '): ' + x.gp + ' G, ' + x.mpg + ' mpg, ' + x.ppg + ' pts, ' + x.rpg + ' reb, ' + x.apg + ' ast · Game Score per 40 ' + f1(x.gs40) +
+        (x.ts != null ? ' · TS ' + x.ts + '%' : '') + (x.tpa ? ' · 3P ' + x.tp + '% on ' + x.tpa : '') + (x.ft != null ? ' · FT ' + x.ft + '%' : '');
+    });
+    return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
+      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' (' + esc(r.div) + ') · FV ' + r.fv + ' · D-1% ' + pct(r.d1P) + ' · NBA ' + pct(r.nbaP) +
+      (r.links && r.links.espn ? ' · <a href="' + esc(r.links.espn) + '" rel="noopener">ESPN ↗</a>' : '') + '</p>' +
+      (lines.length ? lines.map(function (x) { return '<p class="cfb__role">' + x + '.</p>'; }).join('') : '<p class="cfb__role">no line yet.</p>') +
+      '<div class="cfb__report"><div><h4>+ D-1%</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
+      '<div><h4>− D-1%</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
+      '<details class="cfb__nums"><summary>D-1% inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">each bar: its move in the log-odds of D-1% against an average ' + esc(r.div) +
+      ' player (' + pct(r.base) + '). NBA% = D-1% x the NBA rate of unranked D-I newcomers. FV stays at the 20 floor until he has a D-I line.</p></details></div></td></tr>';
+  }
   function pastDetail(r, cols) {
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap"><p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.team) + ' · ' + esc(r.cls) +
       ' · graded FV ' + r.fv + ' before the ' + (r.season - 1) + '-' + String(r.season).slice(2) + ' season · NBA ' + pct(r.nbaP) + '</p><p class="cfb__role">outcome: ' +
@@ -177,7 +203,7 @@
     rk: function (r) { return r.ovr; }, name: function (r) { return r.name; }, team: function (r) { return r.team; },
     fv: function (r) { return r.fvx; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
     cls: function (r) { return r.elig; }, age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return r.mht != null ? r.mht + 1.17 : inches(r.ht) || null; },
-    nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : r.outcome + (r.pick ? (61 - r.pick) / 100 : 0); }
+    nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, d1P: function (r) { return r.d1P; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : r.outcome + (r.pick ? (61 - r.pick) / 100 : 0); }
   };
 
   function setup(w) {
@@ -185,25 +211,33 @@
         count = w.querySelector('[data-cbb-count]'), none = w.querySelector('[data-cbb-none]'), loading = w.querySelector('[data-cbb-loading]'),
         pager = w.querySelector('[data-cbb-pager]'), atEl = w.querySelector('[data-cbb-page]'), ofEl = w.querySelector('[data-cbb-pages]'),
         asof = w.querySelector('[data-cbb-asof]'), asof0 = asof ? asof.textContent : '',
-        open = null, openP = '', pos = '', page = 0, match = [], recs = [], byI = {}, RK = {}, PRK = {}, past = false;
+        open = null, openP = '', pos = '', page = 0, match = [], recs = [], byI = {}, RK = {}, PRK = {}, past = false, up = false;
     var chips = [].slice.call(bar.querySelectorAll('[data-pos]'));
     function cols() { return [].slice.call(w.querySelectorAll('thead th')).filter(function (t) { return !t.hidden; }).length; }
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
     function setPos(p) { pos = p; chips.forEach(function (c) { var on = c.dataset.pos === p; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+    // the level select: D-I, international, D-II / D-III. Below D-I, D-1% takes xBPM's place (no D-I line to project)
+    function lvlOk(r, l) { return !l || (l === 'd1' ? !r.intl && !r.low : l === 'intl' ? r.intl : l === 'low' ? r.low : l === 'd2' ? r.div === 'D-II' : l === 'd3' ? r.div === 'D-III' : true); }
+    function useCols(l) {
+      up = !past && /^(low|d2|d3)$/.test(l || '');
+      w.querySelectorAll('[data-cbb-up]').forEach(function (t) { t.hidden = !up; });
+      w.querySelectorAll('[data-cbb-d1]').forEach(function (t) { t.hidden = past || up; });
+    }
     function show() {
       open = null; openP = '';
       var pages = Math.max(1, Math.ceil(match.length / PER));
       page = Math.min(Math.max(page, 0), pages - 1);
-      body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], PRK[r.i], past); }).join('');
+      body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], PRK[r.i], past, up); }).join('');
       atEl.textContent = page + 1; ofEl.textContent = pages; pager.hidden = pages < 2;
     }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
-          conf = val('conf'), team = val('team'), role = val('role'), nw = val('nw'), intl = val('intl'), uc = val('uc'), mv = val('mv');
+          conf = val('conf'), team = val('team'), role = val('role'), nw = val('nw'), lvl = past ? '' : val('lvl'), uc = val('uc'), mv = val('mv');
+      useCols(lvl);
       var view = recs.filter(function (r) {
         var a = r.age != null ? r.age : r.ageEst;
         return (!pos || r.pos === pos) && (!cls || String(r.elig) === cls) && (!uc || r.elig <= 2) && (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || r.fv >= fv) &&
-          (!conf || r.conf === conf) && (!team || r.team === team) && (!role || r.role === role) && (!nw || r.new) && (!intl || r.intl) && (!mv || (r.npos && r.npos[2]));
+          (!conf || r.conf === conf) && (!team || r.team === team) && (!role || r.role === role) && (!nw || r.new) && lvlOk(r, lvl) && (!mv || (r.npos && r.npos[2]));
       });
       // RK and the position rank count only the players in view (this tab plus its filters), in FV order whatever the sort
       RK = {}; PRK = {}; var seen = {};
@@ -212,14 +246,14 @@
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
-      var k = (pos ? 1 : 0) + ['cls', 'uc', 'age', 'fv', 'conf', 'team', 'role', 'nw', 'intl', 'mv'].filter(function (x) { return val(x); }).length;
+      var k = (pos ? 1 : 0) + ['cls', 'uc', 'age', 'fv', 'conf', 'team', 'role', 'nw', 'lvl', 'mv'].filter(function (x) { return val(x); }).length;
       bar.querySelector('[data-cbb-active]').textContent = k ? '(' + k + ')' : '';
       show(); writeHash();
     }
     function writeHash() {
       var s = [];
       if (pos) s.push('pos=' + pos);
-      ['q', 'season', 'team', 'cls', 'uc', 'age', 'fv', 'conf', 'role', 'nw', 'intl', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
+      ['q', 'season', 'team', 'cls', 'uc', 'age', 'fv', 'conf', 'role', 'nw', 'lvl', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
       if (cur !== 'rk' || dir !== 1) s.push('s=' + cur, 'd=' + dir);
       if (openP) s.push('p=' + openP);
       var h = s.length ? '#' + id + ':' + s.join('&') : '', at = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
@@ -230,6 +264,7 @@
       if (location.hash.indexOf('#' + id + ':') !== 0) return false;
       location.hash.slice(id.length + 2).split('&').forEach(function (kv) {
         var i = kv.indexOf('='), k = kv.slice(0, i), v = decodeURIComponent(kv.slice(i + 1)), el = bar.elements[k];
+        if (k === 'intl' && v === '1') { k = 'lvl'; v = 'intl'; el = bar.elements.lvl; }   // links from before the level select
         if (k === 's' || k === 'd' || k === 'p') want[k] = v;
         else if (k === 'pos') setPos(v); else if (el) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
       });
@@ -252,7 +287,7 @@
       w.querySelectorAll('[data-cbb-now]').forEach(function (t) { t.hidden = past; });
       w.querySelectorAll('[data-cbb-then]').forEach(function (t) { t.hidden = !past; });
       loading.hidden = false;
-      return (past ? loadPast(w.getAttribute('data-cbb-past')) : loadNow(w.getAttribute('data-cbb-src'), w.getAttribute('data-cbb-intl'))).then(function (all) {
+      return (past ? loadPast(w.getAttribute('data-cbb-past')) : loadNow(w.getAttribute('data-cbb-src'), w.getAttribute('data-cbb-intl'), w.getAttribute('data-cbb-low'))).then(function (all) {
         // international leagues join the conf select once (the D-I conferences come from the page build)
         var cs = bar.elements.conf;
         if (!past && cs && !cs.querySelector('[data-intl]')) all.filter(function (r) { return r.intl; }).map(function (r) { return r.conf; })
@@ -304,7 +339,7 @@
       openP = ''; if (was) return writeHash();
       var sc = w.querySelector('.cfb__scroll'), r = byI[tr.dataset.i];
       openP = pid(r); writeHash();
-      tr.insertAdjacentHTML('afterend', past ? pastDetail(r, cols()) : (r.intl ? intlDetail : detailHtml)(r, cols(), Math.max(260, sc.clientWidth - 30)));
+      tr.insertAdjacentHTML('afterend', past ? pastDetail(r, cols()) : (r.intl ? intlDetail : r.low ? lowDetail : detailHtml)(r, cols(), Math.max(260, sc.clientWidth - 30)));
       open = tr.nextElementSibling; if (!past) fillComps(open);
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
@@ -319,18 +354,26 @@
   }
 
   function rows(d) { return d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); r._q = (r.name + ' ' + r.team).toLowerCase(); return r; }); }
-  // the D-I board plus the internationals (static/data/cbb-intl.json, scripts/cbb_intl.py), one board in FV order;
-  // the board still shows if the international file fails to load
-  function loadNow(src, intl) {
+  // the D-I board plus the internationals (static/data/cbb-intl.json, scripts/cbb_intl.py) and the D-II / D-III players
+  // (static/data/cbb-lowdiv.json, scripts/cbb_lowdiv.py), one board in FV order (below D-I: after the D-I players at the
+  // same FV, by D-1%); the board still shows if either extra file fails to load
+  function loadNow(src, intl, low) {
     COMPS_URL = src.replace(/cbb-all\.json$/, 'cbb-comps.json');
     if (!NOW) NOW = Promise.all([window.__arkJson(src),
-                                 intl ? window.__arkJson(intl).catch(function () { return null; }) : null]).then(function (ds) {
+                                 intl ? window.__arkJson(intl).catch(function () { return null; }) : null,
+                                 low ? window.__arkJson(low).catch(function () { return null; }) : null]).then(function (ds) {
       var rs = rows(ds[0]);
       if (ds[1]) {
         var n = rs.length;
         OVERSEAS = ds[1].overseas || {};
         rows(ds[1]).forEach(function (r) { r.i += n; r._q += ' ' + String(r.conf || '').toLowerCase() + ' international'; rs.push(r); });
-        rs.sort(function (a, b) { return b.fvx - a.fvx || (a.intl ? 1 : 0) - (b.intl ? 1 : 0) || a.ovr - b.ovr; });
+      }
+      if (ds[2]) {
+        var m = rs.length;
+        rows(ds[2]).forEach(function (r) { r.i += m; r.low = 1; r._q += ' ' + String(r.div || '').toLowerCase(); rs.push(r); });
+      }
+      if (ds[1] || ds[2]) {
+        rs.sort(function (a, b) { return b.fvx - a.fvx || (a.low ? 1 : 0) - (b.low ? 1 : 0) || (a.low ? b.d1P - a.d1P : 0) || (a.intl ? 1 : 0) - (b.intl ? 1 : 0) || a.ovr - b.ovr; });
         rs.forEach(function (r, k) { r.ovr = k + 1; });
       }
       window.__arkCbbRecs = rs; return rs;
