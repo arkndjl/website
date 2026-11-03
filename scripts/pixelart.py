@@ -9,7 +9,7 @@ Every sprite is drawn on a small grid with the helpers below and emitted as an S
 renders as currentColor so they follow the theme like layouts/partials/icons.html; everything
 else carries its own fill. Use a sprite with  <svg><use href="#px-mets"/></svg>.
 
-  icon-anime, icon-manga, icon-book, icon-trophy   list-row type icons and the sports window icon
+  icon-anime, icon-manga, icon-book, icon-trophy, icon-coin   list-row type icons and the sports window icon
   icon-football, icon-basketball, icon-baseball   ARKBOARD sport window icons (and icon-hockey, icon-soccer)
   px-<team>                                       team logos (24 x 24)
   px-tr-<type>                                    trophies (16 x 20), one per title type
@@ -833,6 +833,10 @@ def icons():
         "................", "..############..", "##.##########.##", "#..##########..#", "#..##########..#",
         ".#.##########.#.", "..#.########.#..", "....########....", ".....######.....", "......####......",
         ".......##.......", ".......##.......", "......####......", ".....######.....", "....########....", "................"])
+    I["icon-coin"] = ascii_icon([  # a Major challenge coin: thick rim, a star struck in the middle
+        "................", ".....######.....", "...##......##...", "..#..######..#..", ".#..#......#..#.",
+        ".#.#...##...#.#.", "#..#...##...#..#", "#.#.########.#.#", "#.#..######..#.#", "#..#..####..#..#",
+        ".#.#.##..##.#.#.", ".#..#......#..#.", "..#..######..#..", "...##......##...", ".....######.....", "................"])
     I["icon-entity"] = ascii_icon([  # an office block: windows in a grid, a door
         "................", ".....######.....", ".....#....#.....", "..####.##.####..", "..#..........#..",
         "..#.##.##.##.#..", "..#..........#..", "..#.##.##.##.#..", "..#..........#..", "..#.##.##.##.#..",
