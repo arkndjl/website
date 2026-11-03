@@ -1011,33 +1011,6 @@
      ]
     },
     {
-     "term": "Map pool (CS2)",
-     "short": "Map win chance vs the average top-20 team on each map in the pool.",
-     "body": [
-      "bo3.gg team map rating: team Elo plus a team x map offset, both moved per map on round share; offsets start at 0, so thin maps stay near the team's level.",
-      "Shown on the map-win scale (round-share logit x 2.43, fit on 124k maps). Match cards show the projected veto: each side bans its worst and picks its best, higher-ranked side first.",
-      "Display only: the series model already uses the veto as a term."
-     ],
-     "where": "Counter-Strike map pool, matches",
-     "sports": [
-      "CS2"
-     ]
-    },
-    {
-     "term": "Event odds (CS2)",
-     "short": "Chance to reach each stage and win the next Major, from simulated events.",
-     "body": [
-      "20,000 simulations of Valve's Major format from the series model: three 16-team Swiss stages (Bo1, Bo3 for elimination and advancement; Stage 3 all Bo3), then an 8-team single-elimination playoff.",
-      "Pairing per the Major rulebook: round 1 seed i v i+8, highest v lowest seed without a rematch, priority table in rounds 4-5, seeds by record, Buchholz, initial seed. Invites from Valve's invitation standings; drawn pairings and results replace simulated ones.",
-      "Each simulation draws every team's strength once (sd 0.45 logit, picked on stages before Jul 2025), so rating error carries through the event.",
-      "Backtest, S-tier events held out from Jul 2025: Swiss advancement log loss 9.63 per stage vs 9.92 on VRS points alone (11 of 15 stages, t -0.75); bracket titles 1.63 vs 1.72 (15 of 26, t -0.94). Better on both, not significant at this sample."
-     ],
-     "where": "Counter-Strike event odds, ARKRANKING title odds",
-     "sports": [
-      "CS2"
-     ]
-    },
-    {
      "term": "Elo",
      "short": "Results-and-margin rating; 1500 = average.",
      "body": [
@@ -1472,6 +1445,25 @@
       "CS2",
       "NBA"
      ]
+    },
+    {
+     "term": "Major Pick'Em (CS2)",
+     "short": "Valve Major Pick'Em picks with the best chance of each coin tier.",
+     "body": [
+      "Coin: 11 challenges (Silver 4, Gold 8, Diamond 11); 5 free, 6 skill: 5+ of 10 per Swiss stage, bracket 2 QF / 1 SF / final.",
+      "Stage picks: two 3-0, two 0-3, six 3-1 or 3-2 (exact record). Picked once the stage field and round 1 are known.",
+      "A stage's picks move only that stage's chance, so every tier wants max P(5+ correct), not max expected correct.",
+      "P(5+) from joint stage sims (Valve pairing, Buchholz, Bo1 / Bo3; team strength drawn once per sim, sd .45 logit).",
+      "Search: exact max-expected set, then hill-climb on P(5+), scored on a second set of sims. Bracket: max P(all 3).",
+      "Held out since Jul 2025, 15 Swiss stages: predicted pass 47%, actual 47% (seed chalk 40%, VRS 47%).",
+      "Mean correct 4.00 vs chalk 4.33 (t -0.96): no reliable edge over chalk in Swiss stages.",
+      "Max P(5+) and max expected correct pick the same set in 21 of 25 stages; where they differ, < 1 pt of pass chance.",
+      "12 held-out brackets: 1.92 of 3 bracket challenges vs chalk 1.42, VRS 1.50."
+     ],
+     "where": "Counter-Strike page, pick'em tab",
+     "sports": [
+      "CS2"
+     ]
     }
    ]
   },
@@ -1867,7 +1859,7 @@
   },
   {
    "board": "CFB / NFL prospects",
-   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,975 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 74.9 (80 about once per 5 seasons).",
+   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,976 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 74.9 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -1891,7 +1883,7 @@
      "75",
      "3+ time All-Pro",
      "~1",
-     "1 of 4,975 (0.02%)",
+     "1 of 4,976 (0.02%)",
      "0.89 / 0.29",
      "top 2 pick",
      "-"
@@ -1900,7 +1892,7 @@
      "70",
      "2-time All-Pro",
      "~3",
-     "3 of 4,975 (0.06%)",
+     "3 of 4,976 (0.06%)",
      "0.67 / 0.23",
      "top 5 pick",
      "-"
@@ -1909,7 +1901,7 @@
      "65",
      "All-Pro or 3+ Pro Bowls",
      "~7",
-     "5 of 4,975 (0.10%)",
+     "5 of 4,976 (0.10%)",
      "0.49 / 0.17",
      "top 10 pick",
      "65+: 71.2 -> 74.9 (n 19, 50+ 100%)"
@@ -1918,7 +1910,7 @@
      "60",
      "Pro Bowler",
      "~16",
-     "10 of 4,975 (0.20%)",
+     "11 of 4,976 (0.22%)",
      "0.40 / 0.13",
      "1st round",
      "60-64: 62.8 -> 60.6 (n 10, 50+ 70%)"
@@ -1927,7 +1919,7 @@
      "55",
      "6+ seasons as a starter",
      "~25",
-     "14 of 4,975 (0.28%)",
+     "16 of 4,976 (0.32%)",
      "0.31 / 0.10",
      "late 1st / 2nd round",
      "55-59: 57.3 -> 59.5 (n 17, 50+ 65%)"
@@ -1936,7 +1928,7 @@
      "50",
      "4+ seasons as a starter",
      "~32",
-     "65 of 4,975 (1.3%)",
+     "73 of 4,976 (1.5%)",
      "0.19 / 0.07",
      "rounds 2-3",
      "50-54: 51.8 -> 48.5 (n 64, 50+ 38%)"
@@ -1945,7 +1937,7 @@
      "45",
      "2+ seasons as a starter",
      "~43",
-     "197 of 4,975 (4.0%)",
+     "212 of 4,976 (4.3%)",
      "0.09 / 0.05",
      "rounds 3-4",
      "45-49: 47.2 -> 46.1 (n 167, 50+ 37%)"
@@ -1954,7 +1946,7 @@
      "40",
      "rotation, 48+ games",
      "~64",
-     "262 of 4,975 (5.3%)",
+     "280 of 4,976 (5.6%)",
      "0 / 0.02",
      "rounds 4-6",
      "40-44: 42.4 -> 42.3 (n 80, 50+ 32%)"
@@ -1963,7 +1955,7 @@
      "35",
      "backup, 16+ games",
      "~98",
-     "353 of 4,975 (7.1%)",
+     "372 of 4,976 (7.5%)",
      "0 / 0.01",
      "late round",
      "35-39: 37.3 -> 36.2 (n 107, 50+ 21%)"
@@ -1972,7 +1964,7 @@
      "30",
      "drafted / camp roster",
      "~150",
-     "502 of 4,975 (10.1%)",
+     "540 of 4,976 (10.9%)",
      "0 / 0",
      "late round / UDFA",
      "30-34: 32.3 -> 32.6 (n 165, 50+ 17%)"

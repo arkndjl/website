@@ -4338,6 +4338,37 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .cs__veto i { font-style: normal; display: inline-block; padding: 0 4px; margin-right: 2px; border: 1px solid var(--win-dark); }
 .cs__veto i.cs__veto--fav { background: var(--accent); color: var(--win-dark); }
 
+/* Counter-Strike Major Pick'Em (layouts/shortcodes/cs2pickem.html): coin chances, the stage line, pick cards by slot */
+.pickem__body { padding: 8px; }
+.pickem__coins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+.pickem__coin { display: flex; align-items: center; gap: 6px; padding: 4px 6px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.pickem__coin svg { width: 24px; height: 24px; flex: none; fill: currentColor; }
+.pickem__coin b { font-size: 0.85em; }
+.pickem__coin span { margin-left: auto; font-size: 1.15em; }
+.pickem__coin--silver { color: #b9b8d8; }
+.pickem__coin--gold { color: #eec35e; }
+.pickem__coin--diamond { color: #9eeadf; }
+.pickem__stage { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 8px; }
+.pickem__tag { padding: 0 4px; font-size: 0.8em; background: var(--accent); color: var(--win-dark); }
+.pickem__tag--dim { background: transparent; color: inherit; border: 1px solid currentColor; opacity: 0.75; }
+.pickem__grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 6px; }
+.pickem__grid--br { grid-template-columns: 2fr 1fr 1fr; }
+.pickem__grid--br .pickem__stage { grid-column: 1 / -1; margin: 4px 0 0; }
+.pickem__slot { min-width: 0; padding: 4px; border: 1px solid var(--win-dark); background: var(--win-well); }
+.pickem__slot h4 { margin: 0 0 4px; font-size: 0.9em; text-align: center; }
+.pickem__slot--30 h4 { color: #9eeadf; }
+.pickem__slot--03 h4 { color: #ff9ec7; }
+.pickem__slot--adv .pickem__pick { display: inline-flex; width: calc(50% - 4px); }
+.pickem__pick { display: flex; align-items: center; gap: 4px; margin: 2px 0; padding: 2px 4px; background: var(--win-face); border: 1px solid var(--win-dark); }
+.pickem__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9em; }
+.pickem__pick b { font-size: 0.85em; }
+.pickem__table { margin: 0 8px 8px; width: calc(100% - 16px); }
+@media (max-width: 640px) {
+  .pickem__coins { grid-template-columns: 1fr; }
+  .pickem__grid, .pickem__grid--br { grid-template-columns: 1fr; }
+  .pickem__slot--adv .pickem__pick { width: 100%; }
+}
+
 /* ------------------------------------------------------------------
    Homepage ticker (layouts/partials/ticker.html): a sunken well with one
    bevelled cell per game. Next game of each team, then 1NT's matches.
