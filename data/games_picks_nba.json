@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-03T11:09:33Z",
+ "asof": "2026-11-03T11:58:37Z",
  "recenter": {
   "2026-11-04": 0.72
  },
@@ -424,6 +424,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401909930",
+   "sport": "nba",
+   "kick": "2026-11-05T01:30:00Z",
+   "home": "HOU",
+   "away": "MIN",
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": -110,
+   "edge": 3.9,
+   "x": 3.0,
+   "why": "no edge at -110",
+   "m": 5.6,
+   "tm": 221.3
+  },
+  {
    "id": "401909933",
    "sport": "nba",
    "kick": "2026-11-05T02:30:00Z",
@@ -432,28 +448,12 @@
    "mk": "total",
    "side": "under",
    "line": 229.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 2.9,
    "x": 3.0,
    "why": "edge under 3",
    "m": 13.9,
    "tm": 226.6
-  },
-  {
-   "id": "401909930",
-   "sport": "nba",
-   "kick": "2026-11-05T01:30:00Z",
-   "home": "HOU",
-   "away": "MIN",
-   "mk": "total",
-   "side": "under",
-   "line": 222.5,
-   "price": -110.0,
-   "edge": 1.2,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 5.6,
-   "tm": 221.3
   }
  ],
  "games": {
@@ -494,11 +494,11 @@
    "state": "pick"
   },
   "401909930": {
-   "mk": "total",
-   "side": "under",
-   "line": 222.5,
-   "price": -110.0,
-   "edge": 1.2,
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": -110,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "HOU",
@@ -509,7 +509,7 @@
    "mk": "total",
    "side": "under",
    "line": 229.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -570,16 +570,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1613,
+  "snapshots": 1618,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 101,
-    "clvRet": 0.0253,
-    "clvT": 1.88,
-    "clv": 1.16,
-    "beat": 0.604,
-    "still": 0.178
+    "clvN": 105,
+    "clvRet": 0.023,
+    "clvT": 1.77,
+    "clv": 1.11,
+    "beat": 0.581,
+    "still": 0.21
    },
    {
     "when": "6-24h",
@@ -4310,16 +4310,16 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 16.25,
+    "raw": 12.25,
     "scale": 1.0,
-    "down": 12.5
+    "down": 14.75
    },
    "2026-11-04": {
     "raw": 5.5,
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 25.5,
+    "raw": 19.0,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -4327,11 +4327,11 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 40.25,
-    "scale": 0.9938
+    "raw": 38.5,
+    "scale": 1.0
    },
    "2026-11-08": {
-    "raw": 9.75,
+    "raw": 9.0,
     "scale": 1.0
    },
    "2026-11-09": {

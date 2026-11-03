@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-03T11:09:27Z",
+ "asof": "2026-11-03T11:58:32Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -254,15 +254,9 @@
    "m": -2.0,
    "tm": 51.4,
    "flagged": "2026-11-03T10:48:02Z",
-   "close": -6.5,
-   "now": {
-    "mk": "ml",
-    "side": "home",
-    "line": null,
-    "price": 228.0,
-    "ev": 0.158,
-    "units": 0.75
-   }
+   "close": -5.5,
+   "now": null,
+   "pass": true
   },
   {
    "id": "2026_09_LV_SF",
@@ -316,6 +310,22 @@
    "tm": 45.0
   },
   {
+   "id": "2026_09_DAL_IND",
+   "sport": "nfl",
+   "kick": "2026-11-08T18:00:00Z",
+   "home": "IND",
+   "away": "DAL",
+   "mk": "spread",
+   "side": "home",
+   "line": -5.5,
+   "price": 102.0,
+   "edge": 3.5,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": -2.0,
+   "tm": 51.4
+  },
+  {
    "id": "2026_09_LA_WAS",
    "sport": "nfl",
    "kick": "2026-11-08T18:00:00Z",
@@ -324,7 +334,7 @@
    "mk": "spread",
    "side": "home",
    "line": -5.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 3.2,
    "x": 4.0,
    "why": "edge under 4",
@@ -482,16 +492,16 @@
    "state": "under"
   },
   "2026_09_DAL_IND": {
-   "mk": "ml",
+   "mk": "spread",
    "side": "home",
-   "line": null,
-   "price": 228.0,
-   "ev": 0.158,
-   "edge": 4.5,
-   "units": 0.75,
+   "line": -5.5,
+   "price": 102.0,
+   "edge": 3.5,
+   "ev": null,
+   "units": 0.0,
    "home": "IND",
    "away": "DAL",
-   "state": "pick"
+   "state": "under"
   },
   "2026_09_DEN_CAR": {
    "mk": "spread",
@@ -521,7 +531,7 @@
    "mk": "spread",
    "side": "home",
    "line": -5.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -678,16 +688,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1208,
+  "snapshots": 1214,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 386,
-    "clvRet": -0.044,
-    "clvT": -12.52,
+    "clvN": 392,
+    "clvRet": -0.0428,
+    "clvT": -12.23,
     "clv": 0.53,
-    "beat": 0.251,
-    "still": 0.718
+    "beat": 0.255,
+    "still": 0.717
    },
    {
     "when": "6-24h",
@@ -1524,7 +1534,8 @@
    "m": -2.0,
    "tm": 51.4,
    "flagged": "2026-11-03T10:48:02Z",
-   "close": -6.5
+   "close": -5.5,
+   "pass": true
   },
   {
    "id": "2026_09_NYG_PHI",
@@ -1601,16 +1612,16 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 16.25,
+    "raw": 12.25,
     "scale": 1.0,
-    "down": 12.5
+    "down": 14.75
    },
    "2026-11-04": {
     "raw": 5.5,
     "scale": 1.0
    },
    "2026-11-05": {
-    "raw": 25.5,
+    "raw": 19.0,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -1618,11 +1629,11 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 40.25,
-    "scale": 0.9938
+    "raw": 38.5,
+    "scale": 1.0
    },
    "2026-11-08": {
-    "raw": 9.75,
+    "raw": 9.0,
     "scale": 1.0
    },
    "2026-11-09": {
