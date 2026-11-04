@@ -218,10 +218,18 @@ def rule_of(e):
 
 
 def bet(e):
-    """a logged pick that counts: one marked pass (no longer clearing at the current line before its start) was never a
-    bet, so it stays out of the stop tests, the drift test and the live record, as it is out of games_picks' record
-    (Nov 2 2026: the monitor counted pass picks)"""
+    """a logged pick that was staked: one marked pass (no longer clearing at the current line before its start) is out
+    of games_picks' record and bankroll, so it is out of the stake-weighted table too"""
     return not e.get('pass')
+
+
+def judged(e):
+    """a logged pick that counts toward its rule's tests (stop, drift) and live record: every pick the rule flagged, at
+    the line it was flagged at, pass or not (a void never played). Nov 4 2026 audit: pass is decided by the line at the
+    last build before the start, so leaving pass picks out kept the picks the close did NOT move toward (the line
+    moving our way past X is what turns a pick pass): pass picks +3.3% (CBB, n 49) / +5.5% (NBA, n 31) at the close,
+    the rest -5.1% / -3.6%. The backtest a rule is tested against bets every flag at the open, whatever the close did."""
+    return not (e.get('void') or e.get('res') == 'void')
 
 
 def pick_state(sport, RS, log, old, stamp, P=None):
@@ -242,7 +250,7 @@ def pick_state(sport, RS, log, old, stamp, P=None):
         elif i in stops and stops[i].get('fit') != fh:
             clocks[i] = {'hash': h, 'since': stamp}
             stops.pop(i)
-        bs = [e for e in log if bet(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
+        bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
         d = decide(bs, sd_of(held), P)
         dr = drift(bs, expected_live(sport, held), sd_of(held), rho_for(sport, defn['mk']), P)
         d = {**d, 'drift': {k: v for k, v in dr.items() if k != 'path'}}
@@ -310,7 +318,7 @@ def build(now=None):
         for i in ids:
             defn, full, held, label = rules.get(i, (None, None, None, i))
             since = ((mon.get('clocks') or {}).get(i) or {}).get('since') or (RJ.get('asof') or '')[:10]
-            bs = [e for e in log if bet(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
+            bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
             sd = sd_of(held)
             chk = (mon.get('checks') or {}).get(i) or decide(bs, sd, P)
             stop = (mon.get('stopped') or {}).get(i)
@@ -427,9 +435,12 @@ def test():
     logd = [{'mk': 'total', 'flagged': '2026-11-01T15:00:00Z', 'kick': b['kick'], 'clvRet': b['clvRet']} for b in wk(-0.005, 600)]
     st5, off5 = pick_state('cfb', RSd, logd, {}, '2026-12-30T00:00:00Z', P)
     assert off5 == {'total'} and st5['stopped']['total']['test'] == 'drift', st5['checks']['total']
-    # pass picks were never bets: they don't count toward a stop
+    # pass picks still judge their rule (pass is decided by where the line went: leaving them out keeps the losers to
+    # the close); voids don't
     st6, off6 = pick_state('nba', RS, [{**e, 'pass': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
-    assert not off6 and st6['checks']['total']['n'] == 0, st6['checks']['total']
+    assert st6['checks']['total']['n'] == len(log), st6['checks']['total']
+    st7, _ = pick_state('nba', RS, [{**e, 'void': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
+    assert st7['checks']['total']['n'] == 0, st7['checks']['total']
     print('rule monitor: ok, false-alarm share at the close over 300 bets', fa)
 
 
