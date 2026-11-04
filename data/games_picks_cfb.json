@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T01:01:34Z",
+ "asof": "2026-11-04T01:07:02Z",
  "recenter": {
   "week": 0.82
  },
@@ -1753,6 +1753,22 @@
    "tm": 46.0
   },
   {
+   "id": "401869968",
+   "sport": "cfb",
+   "kick": "2026-11-07T22:00:00.000Z",
+   "home": "Louisiana",
+   "away": "South Alabama",
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -104.0,
+   "edge": 2.4,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 6.9,
+   "tm": 55.1
+  },
+  {
    "id": "401858285",
    "sport": "cfb",
    "kick": "2026-11-07T17:00:00.000Z",
@@ -1761,7 +1777,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 4.7,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1831,22 +1847,6 @@
    "why": "edge under 3",
    "m": -9,
    "tm": 49.5
-  },
-  {
-   "id": "401869968",
-   "sport": "cfb",
-   "kick": "2026-11-07T22:00:00.000Z",
-   "home": "Louisiana",
-   "away": "South Alabama",
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": -108.0,
-   "edge": 2.6,
-   "x": 4.0,
-   "why": "edge under 4 (conf: Sun Belt)",
-   "m": 6.9,
-   "tm": 55.1
   },
   {
    "id": "401869927",
@@ -2266,7 +2266,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -2527,11 +2527,11 @@
    "state": "pick"
   },
   "401869968": {
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": -108.0,
-   "edge": 2.6,
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -104.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana",
@@ -2747,16 +2747,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7279,
+  "snapshots": 7293,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1730,
+    "clvN": 1733,
     "clvRet": -0.0455,
-    "clvT": -25.59,
+    "clvT": -25.65,
     "clv": 0.18,
-    "beat": 0.268,
-    "still": 0.516
+    "beat": 0.267,
+    "still": 0.517
    },
    {
     "when": "6-24h",
@@ -3827,12 +3827,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 5.0,
+    "raw": 3.25,
     "scale": 1.0,
     "down": 30.75
    },
    "2026-11-04": {
-    "raw": 35.0,
+    "raw": 36.75,
     "scale": 1.0
    },
    "2026-11-05": {
@@ -3852,7 +3852,7 @@
     "scale": 1.0
    },
    "2026-11-09": {
-    "raw": 2.5,
+    "raw": 2.75,
     "scale": 1.0
    }
   }

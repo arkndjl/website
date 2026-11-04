@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T01:01:42Z",
+ "asof": "2026-11-04T01:07:09Z",
  "recenter": {
   "2026-11-03": -12.38,
-  "2026-11-04": -12.41
+  "2026-11-04": -12.42
  },
  "monitor": {
   "clocks": {
@@ -217,6 +217,39 @@
    "now": null
   },
   {
+   "id": "401928811",
+   "espn": "401928811",
+   "sport": "cbb",
+   "kick": "2026-11-05T01:00:00Z",
+   "home": "South Dakota",
+   "away": "Northern Kentucky",
+   "mk": "total",
+   "side": "over",
+   "line": 158.5,
+   "price": -106.0,
+   "p": 0.555,
+   "ev": 0.079,
+   "units": 2.25,
+   "edge": 6.0,
+   "x": 2.0,
+   "pDU": 0.5259,
+   "evDU": 0.022,
+   "m": 0.5,
+   "tm": 164.5,
+   "tmRaw": 152.1,
+   "flagged": "2026-11-04T01:07:09Z",
+   "betTo": 162.5,
+   "close": 158.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 158.5,
+    "price": -106.0,
+    "ev": 0.08,
+    "units": 2.25
+   }
+  },
+  {
    "id": "401920806",
    "espn": "401920806",
    "sport": "cbb",
@@ -414,14 +447,8 @@
    "flagged": "2026-11-04T00:46:47Z",
    "betTo": 157.5,
    "close": 155.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 155.5,
-    "price": -104.0,
-    "ev": 0.058,
-    "units": 1.75
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "401909551",
@@ -676,22 +703,6 @@
  ],
  "board": [
   {
-   "id": "401928811",
-   "sport": "cbb",
-   "kick": "2026-11-05T01:00:00Z",
-   "home": "South Dakota",
-   "away": "Northern Kentucky",
-   "mk": "total",
-   "side": "over",
-   "line": 157.5,
-   "price": -127.0,
-   "edge": 7.0,
-   "x": 2.0,
-   "why": "no edge at -127",
-   "m": 0.5,
-   "tm": 164.5
-  },
-  {
    "id": "401917512",
    "sport": "cbb",
    "kick": "2026-11-05T03:00:00Z",
@@ -746,10 +757,10 @@
    "home": "Wichita State",
    "away": "Cal State Northridge",
    "mk": "spread",
-   "side": "home",
-   "line": 14.5,
-   "price": -120.0,
-   "edge": 0.6,
+   "side": "away",
+   "line": 15.5,
+   "price": -122.0,
+   "edge": 0.4,
    "x": 2.5,
    "why": "edge under 2.5",
    "m": 15.1,
@@ -819,10 +830,10 @@
   },
   "401919028": {
    "mk": "spread",
-   "side": "home",
-   "line": 14.5,
-   "price": -120.0,
-   "edge": 0.6,
+   "side": "away",
+   "line": 15.5,
+   "price": -122.0,
+   "edge": 0.4,
    "ev": null,
    "units": 0.0,
    "home": "Wichita State",
@@ -832,14 +843,14 @@
   "401928811": {
    "mk": "total",
    "side": "over",
-   "line": 157.5,
-   "price": -127.0,
-   "edge": 7.0,
-   "ev": null,
-   "units": 0.0,
+   "line": 158.5,
+   "price": -106.0,
+   "ev": 0.08,
+   "edge": 6.0,
+   "units": 2.25,
    "home": "South Dakota",
    "away": "Northern Kentucky",
-   "state": "under"
+   "state": "pick"
   }
  },
  "record": {
@@ -894,16 +905,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4317,
+  "snapshots": 4323,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 404,
-    "clvRet": -0.0291,
-    "clvT": -4.28,
+    "clvN": 405,
+    "clvRet": -0.0292,
+    "clvT": -4.3,
     "clv": 0.29,
-    "beat": 0.275,
-    "still": 0.304
+    "beat": 0.274,
+    "still": 0.306
    },
    {
     "when": "6-24h",
@@ -916,12 +927,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 427,
-    "clvRet": -0.0546,
-    "clvT": -23.12,
+    "clvN": 429,
+    "clvRet": -0.0545,
+    "clvT": -23.21,
     "clv": -0.13,
     "beat": 0.11,
-    "still": 0.672
+    "still": 0.674
    },
    {
     "when": "<1h",
@@ -7666,7 +7677,8 @@
    "tmRaw": 147.4,
    "flagged": "2026-11-04T00:46:47Z",
    "betTo": 157.5,
-   "close": 155.5
+   "close": 155.5,
+   "pass": true
   },
   {
    "id": "401920806",
@@ -7694,18 +7706,43 @@
    "close": 163.5,
    "unitsRaw": 2.25,
    "unitsCap": 1.75
+  },
+  {
+   "id": "401928811",
+   "espn": "401928811",
+   "sport": "cbb",
+   "kick": "2026-11-05T01:00:00Z",
+   "home": "South Dakota",
+   "away": "Northern Kentucky",
+   "mk": "total",
+   "side": "over",
+   "line": 158.5,
+   "price": -106.0,
+   "p": 0.555,
+   "ev": 0.079,
+   "units": 2.25,
+   "edge": 6.0,
+   "x": 2.0,
+   "pDU": 0.5259,
+   "evDU": 0.022,
+   "m": 0.5,
+   "tm": 164.5,
+   "tmRaw": 152.1,
+   "flagged": "2026-11-04T01:07:09Z",
+   "betTo": 162.5,
+   "close": 158.5
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 5.0,
+    "raw": 3.25,
     "scale": 1.0,
     "down": 30.75
    },
    "2026-11-04": {
-    "raw": 35.0,
+    "raw": 36.75,
     "scale": 1.0
    },
    "2026-11-05": {
@@ -7725,7 +7762,7 @@
     "scale": 1.0
    },
    "2026-11-09": {
-    "raw": 2.5,
+    "raw": 2.75,
     "scale": 1.0
    }
   }
