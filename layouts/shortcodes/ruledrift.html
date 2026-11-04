@@ -31,7 +31,7 @@
           {{- $f := mul (div (sub ($r.llr | default 0) $r.lo) (sub $r.hi $r.lo)) 10.0 -}}
           {{- $f = cond (lt $f 0.0) 0.0 (cond (gt $f 10.0) 10.0 $f) -}}
           {{- $pos := int (add $f 0.5) -}}
-          <span class="rdrift__bar{{ if lt $pos 5 }} is-down{{ end }}" aria-label="evidence {{ printf "%.1f" ($r.llr | default 0) }} between {{ printf "%.1f" $r.lo }} and {{ printf "%.1f" $r.hi }}">{{ range $i := seq 0 10 }}<i class="{{ if or (and (ge $i 5) (le $i $pos)) (and (le $i 5) (ge $i $pos)) }}on{{ end }}{{ if eq $i 5 }} mid{{ end }}"></i>{{ end }}</span>
+          <span class="rdrift__bar{{ if lt $pos 5 }} is-down{{ end }}" aria-label="evidence {{ printf "%.1f" (float ($r.llr | default 0)) }} between {{ printf "%.1f" $r.lo }} and {{ printf "%.1f" $r.hi }}">{{ range $i := seq 0 10 }}<i class="{{ if or (and (ge $i 5) (le $i $pos)) (and (le $i 5) (ge $i $pos)) }}on{{ end }}{{ if eq $i 5 }} mid{{ end }}"></i>{{ end }}</span>
         </td>
         <td>{{ if eq $st "paused" }}<b>paused</b>{{ with $r.at }} <span class="cfb__dim">{{ lower ((time (index . 0)).Format "Jan 2") }}, {{ index . 1 }} bets</span>{{ end }}{{ else if eq $st "confirmed" }}<b>confirmed</b>{{ with $r.at }} <span class="cfb__dim">{{ lower ((time (index . 0)).Format "Jan 2") }}, {{ index . 1 }} bets</span>{{ end }}{{ else }}probation <span class="cfb__dim">~{{ $r.need }} bets to a verdict</span>{{ end }}</td>
       </tr>

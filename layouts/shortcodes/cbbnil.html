@@ -3,7 +3,7 @@
        view="players" (top 400 by xNIL) or view="teams" (every D-I roster). scripts/cbb_market.py, data/cbb_market.json. */ -}}
 {{- with site.Data.cbb_market -}}
 {{- $f := .nilFit -}}
-{{- $about := printf "Budgets (assumed, per season): high major %s, mid-major %s, low major %s, x e^(%.1f z) by program strength. Value = minutes share x (BPM + 3); NBA-value weight a = %.1f chosen by fit to On3 (log error SD %.2f, %d players). On3's top %d valuations run %.1fx this xNIL (On3 includes endorsements); yNIL frozen at the season's first run." (partial "nil.html" $f.budget.HM | plainify) (partial "nil.html" $f.budget.MM | plainify) (partial "nil.html" $f.budget.LM | plainify) $f.tilt $f.a (index $f.valueTest (printf "%.1f" $f.a) | default 0.0) $f.n $f.nTail $f.on3Tail -}}
+{{- $about := printf "Budgets (assumed, per season): high major %s, mid-major %s, low major %s, x e^(%.1f z) by program strength. Value = minutes share x (BPM + 3); NBA-value weight a = %.1f chosen by fit to On3 (log error SD %.2f, %d players). On3's top %d valuations run %.1fx this xNIL (On3 includes endorsements); yNIL frozen at the season's first run." (partial "nil.html" $f.budget.HM | plainify) (partial "nil.html" $f.budget.MM | plainify) (partial "nil.html" $f.budget.LM | plainify) $f.tilt $f.a (index $f.valueTest (printf "%.1f" $f.a) | default 0.0) (int $f.n) (int $f.nTail) $f.on3Tail -}}
 {{- if eq ($.Get "view") "teams" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team NIL") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,yNIL,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cbbnil">
