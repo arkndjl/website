@@ -602,6 +602,9 @@ class Model:
             (self.OTL if ot else self.L)[l] += 1
 
 
+DEP_DAYS = 3
+
+
 def hist_moves(games):
     """the backtest's moves (Nov 1 2026): for club t's game, skaters in its last lineup who don't dress and next
     dress for another club (gone), and skaters who dress for it whose previous game was for another club (acquired).
@@ -632,7 +635,10 @@ def hist_moves(games):
                 continue
             v = seq.get((S, p), [])
             nxt = [e for e in v if e[0] >= g['day'] and e[1] != gid]
-            if nxt and nxt[0][2] != t:
+            # gone only if he dresses for the new club within DEP_DAYS: a scratched or injured skater traded weeks
+            # later was still on the roster on game day (Nov 4 2026 audit: 370 of 1,150 cases were 10+ days early;
+            # walk-forward log loss held 2024-26 .66784 -> .66781, tune 2021-23 .65150 -> .65147)
+            if nxt and nxt[0][2] != t and _days(g['day'], nxt[0][0]) <= DEP_DAYS:
                 dep.add(p)
         arr = []
         for x in _lineups(S).get(gid, {}).get(t, []):
