@@ -5,7 +5,8 @@ graded as the picks are graded. Paper only, no real money.
 Since Oct 28 2026 (Noah: "Paper book picks and picks we display under picks should be identical") the book reads the
 picks logs (data/games_picks_<sport>.json from scripts/games_picks.py and scripts/tennis_picks.py) and nothing else:
 one source, so the two can't differ. A pick withdrawn before its start (its rule switched off) leaves the log and the
-book with it. A pick marked pass before its start (no longer clearing at the current price) was never a bet: listed,
+book with it. A pick marked pass before its start (the model moved: no longer clearing its cut at its flagged line; Nov 4 2026, a
+market move alone never passes a pick) was never a bet: listed,
 but out of the record and the bankroll, as on the picks tab.
 
     python3 scripts/paper_book.py            # data/paper_book.json; the odds-snap and picks-refresh workflows run it

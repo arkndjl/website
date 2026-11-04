@@ -218,18 +218,17 @@ def rule_of(e):
 
 
 def bet(e):
-    """a logged pick that was staked: one marked pass (no longer clearing at the current line before its start) is out
-    of games_picks' record and bankroll, so it is out of the stake-weighted table too"""
-    return not e.get('pass')
+    """a logged pick that was a bet: not pass (since Nov 4 2026, Noah: pass only when the model moved, so the model no
+    longer clears the cut at the flagged line) and not a void (never played)"""
+    return not e.get('pass') and not (e.get('void') or e.get('res') == 'void')
 
 
 def judged(e):
-    """a logged pick that counts toward its rule's tests (stop, drift) and live record: every pick the rule flagged, at
-    the line it was flagged at, pass or not (a void never played). Nov 4 2026 audit: pass is decided by the line at the
-    last build before the start, so leaving pass picks out kept the picks the close did NOT move toward (the line
-    moving our way past X is what turns a pick pass): pass picks +3.3% (CBB, n 49) / +5.5% (NBA, n 31) at the close,
-    the rest -5.1% / -3.6%. The backtest a rule is tested against bets every flag at the open, whatever the close did."""
-    return not (e.get('void') or e.get('res') == 'void')
+    """a logged pick that counts toward its rule's tests (stop, drift) and live record: the record's own bets. Pass
+    used to be set by the current line, which selected on the close (Nov 4 2026 audit: pass picks +3.3% CBB / +5.5% NBA
+    at the close, the rest -5.1% / -3.6%); now it is set by the model alone, before the start, so the tests and the
+    record count the same picks"""
+    return bet(e)
 
 
 def pick_state(sport, RS, log, old, stamp, P=None):
@@ -435,10 +434,9 @@ def test():
     logd = [{'mk': 'total', 'flagged': '2026-11-01T15:00:00Z', 'kick': b['kick'], 'clvRet': b['clvRet']} for b in wk(-0.005, 600)]
     st5, off5 = pick_state('cfb', RSd, logd, {}, '2026-12-30T00:00:00Z', P)
     assert off5 == {'total'} and st5['stopped']['total']['test'] == 'drift', st5['checks']['total']
-    # pass picks still judge their rule (pass is decided by where the line went: leaving them out keeps the losers to
-    # the close); voids don't
+    # pass picks (the model moved before the start) and voids were never bets: they don't count toward a stop
     st6, off6 = pick_state('nba', RS, [{**e, 'pass': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
-    assert st6['checks']['total']['n'] == len(log), st6['checks']['total']
+    assert not off6 and st6['checks']['total']['n'] == 0, st6['checks']['total']
     st7, _ = pick_state('nba', RS, [{**e, 'void': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
     assert st7['checks']['total']['n'] == 0, st7['checks']['total']
     print('rule monitor: ok, false-alarm share at the close over 300 bets', fa)

@@ -104,6 +104,8 @@ def rows(ref, now, new_h, days):
             k = ts(p.get("kick"))
             if p.get("pass") or not k or k <= now or k > now + timedelta(days=days):
                 continue
+            if "now" in p and p["now"] is None:
+                continue        # the market moved past its cut: still a pick in the record, but no line left to send
             cur = p.get("now") or {}
             line = cur.get("line", p.get("line")) if cur.get("mk", p["mk"]) == p["mk"] else p.get("line")
             pr = cur.get("price", p["price"])

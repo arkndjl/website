@@ -1060,6 +1060,32 @@ def rule_options(sport, g, R, segs=()):
     return opts, near
 
 
+def flag_line(e):
+    """the line a pick was flagged at, as the market's own number (home margin or total): a moneyline's is the spread
+    line beside it (lineL; older picks rebuilt from the model and the gap they were flagged with)"""
+    if e['mk'] != 'ml':
+        return e.get('line')
+    if e.get('lineL') is not None:
+        return e['lineL']
+    if e.get('m') is None or e.get('edge') is None:
+        return None
+    return e['m'] - e['edge'] if e['side'] == 'home' else e['m'] + e['edge']
+
+
+def model_moved(e, g, mm=None):
+    """True when the model (g's, or mm) no longer clears the pick's cut x at its flagged line, False when it does,
+    None when there is no model or line to judge by"""
+    if mm is None:
+        if not g:
+            return None
+        mm = g.get('tm') if e['mk'] == 'total' else g.get('m')
+    line, x = flag_line(e), e.get('x')
+    if mm is None or line is None or x is None:
+        return None
+    gap = (mm - line) * (1 if e['side'] in ('home', 'over') else -1)
+    return gap < x - 1e-9
+
+
 def live(sport):
     F = json.load(open(FIT))['sports'].get(sport)
     fn = OUT.format(sport)
@@ -1187,7 +1213,8 @@ def live(sport):
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
                             **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
-                            **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}), 'flagged': stamp})
+                            **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}),
+                            **({'lineL': g['L']} if pick['mk'] == 'ml' else {}), 'flagged': stamp})
         if not best and near:
             n = max(near, key=lambda o: o['edge'])
             gtab[str(g['id'])] = {**{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge')}, 'ev': None, 'units': 0.0,
@@ -1270,7 +1297,8 @@ def live(sport):
             continue
         cml = tuple(e['closeML']) if e.get('closeML') and None not in e['closeML'] else None
         C.judge(e, sport, e['mk'], e['side'], e['line'], e['price'], e['close'], cml)
-    # a pick marked pass before its start was never a bet: graded and shown, but out of the record and the bankroll
+    # a pick marked pass before its start (the model moved off it: no longer clears its cut at its flagged line) was never
+    # a bet: graded and shown, but out of the record and the bankroll; a market move alone keeps it in
     done = [e for e in log if e.get('res') in ('w', 'l', 'p') and not e.get('pass')]
     rec = summ([{'profit': e['profit'], 'units': e['units'], 'ev': e['ev']} for e in done]) if done else {'n': 0}
     if done:
@@ -1291,12 +1319,15 @@ def live(sport):
         if e.get('res') is None and iso(e['kick']) > now - datetime.timedelta(hours=4):
             p = dict(e)
             p['now'] = cur.get(e['id'], {}).get((e['mk'], e['side']))
-            # flagged earlier but no longer clearing at DK's current line or price: kept in the record, shown as a pass
-            # (the last call before the start stands once the game is on)
+            # pass only when the model moved (Noah, Nov 4 2026): the model as it stands no longer clears the pick's cut
+            # at its FLAGGED line. A market move alone never passes a pick (it stays in the record, the bankroll and the
+            # paper book at its flagged line and stake); before, passing on the current line dropped the picks the close
+            # moved toward. The last call before the start stands once the game is on; off the board, it stays as was.
             if iso(e['kick']) > now:
-                if p['now'] is None:
+                mv = model_moved(e, G.get(e['id']))
+                if mv:
                     e['pass'] = p['pass'] = True
-                else:
+                elif mv is not None:
                     e.pop('pass', None)
                     p.pop('pass', None)
             picks.append(p)
@@ -1320,9 +1351,71 @@ def live(sport):
     night_cap.apply([sport])
 
 
+def book_stats(log):
+    """the record's numbers on a log: n, mean clvRet, flat ROI and the bankroll compounded per ET night"""
+    import night_cap
+    done = [e for e in log if e.get('res') in ('w', 'l', 'p') and not e.get('pass')]
+    cv = [e['clvRet'] for e in done if e.get('clvRet') is not None]
+    bank, nights = 1.0, {}
+    for e in done:
+        nights.setdefault(night_cap.night(e['kick']), []).append(e)
+    for n in sorted(nights):
+        bank *= 1 + sum((e.get('units') or 0) / 100 * e['profit'] for e in nights[n])
+    return {'n': len(done), 'clvN': len(cv), 'clvRet': round(sum(cv) / len(cv), 4) if cv else None,
+            'roi': round(sum(e['profit'] for e in done) / len(done), 4) if done else None, 'bank': round(bank, 4)}
+
+
+def repass(sport, write=False):
+    """re-judge the pass flag of every started pick under the model-moved rule (Nov 4 2026): the model at the last
+    archived snapshot before the start (the build that last set the flag) against the pick's flagged line. A recentred
+    total keeps the offset it was flagged with (the archive keeps the raw model). Picks with no snapshot keep their flag.
+    Returns (before, after, changes)."""
+    fn = OUT.format(sport)
+    d = json.load(open(fn))
+    log = d.get('log', [])
+    before = book_stats(log)
+    last = {}
+    for r in archive_rows(sport):
+        if r['t'] < r['k']:
+            last[r['id']] = r
+    now = datetime.datetime.now(datetime.timezone.utc)
+    ch = {'unpassed': 0, 'passed': 0, 'noSnap': 0}
+    for e in log:
+        if e.get('void') or e.get('res') == 'void' or iso(e['kick']) > now:
+            continue
+        r = last.get(str(e['id']))
+        mm = None
+        if r:
+            if e['mk'] == 'total':
+                mm = r.get('tm')
+                if mm is not None and e.get('tmRaw') is not None and e.get('tm') is not None:
+                    mm -= e['tmRaw'] - e['tm']
+            else:
+                mm = r.get('m')
+        mv = model_moved(e, None, mm) if mm is not None else None
+        if mv is None:
+            ch['noSnap'] += 1
+            continue
+        if mv and not e.get('pass'):
+            ch['passed'] += 1
+            e['pass'] = True
+        elif not mv and e.get('pass'):
+            ch['unpassed'] += 1
+            e.pop('pass', None)
+    after = book_stats(log)
+    if write:
+        with open(fn, 'w') as f:
+            json.dump(d, f, indent=1, allow_nan=False)
+    return before, after, ch
+
+
 if __name__ == '__main__':
     a = sys.argv[1:]
-    if a and a[0] == '--fit':
+    if a and a[0] == '--repass':
+        # python3 scripts/games_picks.py --repass [--write] [sports]: then the next build rewrites each file's record
+        for sp in [x for x in a[1:] if x in SPORTS] or SPORTS:
+            print(sp, *repass(sp, '--write' in a))
+    elif a and a[0] == '--fit':
         fit()
     elif a and a[0] == '--rules':
         fit_rules()

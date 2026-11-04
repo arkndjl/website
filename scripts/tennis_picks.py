@@ -285,17 +285,21 @@ def live():
         prev = log.get(str(g['id']))
         if prev is not None and prev.get('res') is None:
             prev['kick'] = g['tip']                        # ESPN moves order-of-play times as the draw fills
+            # pass only when the model moved (Noah, Nov 4 2026): the model's chance for the pick's side no longer
+            # clears X over the market chance it was flagged at; a market move alone never passes it
+            if X and prev.get('mkt') is not None:
+                if (pm if prev['side'] == 'away' else 1 - pm) - prev['mkt'] < X:
+                    prev['pass'] = True
+                else:
+                    prev.pop('pass', None)
         if state == 'pick':
             if prev is None:
                 log[str(g['id'])] = {**row, 'units': u, 'flagged': stamp}
             else:
                 prev['now'] = {'mk': 'ml', 'side': side, 'line': None, 'price': o, 'units': u} if side == prev['side'] else None
-                prev.pop('pass', None)
         else:
             if prev is not None and prev.get('res') is None:
-                same = side == prev['side']
                 prev['now'] = None
-                prev['pass'] = True if not (same and abs(e) >= (X or 1)) else prev.get('pass')
             elif tour_lv and on and abs(e) >= X / 2:
                 board.append({**row, 'why': why})
     # grade from tennis.json's results, judge at Novig's last pregame price
