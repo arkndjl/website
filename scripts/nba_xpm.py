@@ -32,7 +32,11 @@ VORX_K, VORX_REP = 0.030, -1.4                   # win% per point of team net; r
 # XPM 2011-26 (players with 250+ MP next season, weighted by those minutes), the same values picked in all 15
 # leave-one-season-out folds: held-out RMSE 1.26 vs 1.59 raw (under 100 MP 1.7 vs 7.3). An odd/even-game split of
 # box XPM 2014-26 agrees (k 200-300, mean near -1). Display only: game models and the CBB board read raw xpm.
-SHRINK_K = 300
+# Nov 4 2026 (scripts/nba_xpm_wave2_research.py): the mean moves toward the player's Marcel prior (prior_xpm) by
+# r = H / (H + SHRINK_H0), H = MP the season before + .5 x MP two before; k 600. Every fold picks (1000, 600): held-out
+# RMSE 1.235 vs 1.259 (t -4.6, 12/15 seasons), better at every minutes band and on the top 25.
+SHRINK_K = 600
+SHRINK_H0 = 1000
 SHRINK_MU = {'o': (-0.75, 0.375), 'd': (-0.25, 0.125)}
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 
@@ -161,12 +165,41 @@ def prior_xpm(season, n0=600.0, rook=-2.0, w2=0.5):
     return get
 
 
-def shrink(p, games):
-    """adds sxpm / soxpm / sdxpm (shrunk) to a player row; a row on the prior keeps the prior"""
+def shrink_prior(season):
+    """pid -> (r, prior o, prior d): the Marcel prior (prior_xpm) and its weight r = H / (H + SHRINK_H0) in the shrink's
+    mean, H = his minutes in the season before + .5 x the one before that (0 for a newcomer: the role mean alone)"""
+    prior, H = prior_xpm(season), {}
+    for k, wt in ((1, 1.0), (2, 0.5)):
+        fn = os.path.join(OUT, f'{season - k}.json')
+        if not os.path.exists(fn): continue
+        for p in json.load(open(fn))['players']:
+            if p.get('xpm') is None or p.get('pr'): continue
+            H[p['id']] = H.get(p['id'], 0) + wt * p['mp']
+    def get(pid):
+        h = H.get(pid, 0)
+        if not h: return None
+        q = prior(pid)
+        return h / (h + SHRINK_H0), q[1], q[2]
+    return get
+
+
+def role_sxpm(p, games, k=300):
+    """the Oct 31 shrink (role mean, k 300): what the rookie 3Y / aXPM and xAAV fits were trained on"""
+    if p.get('pr') or p.get('xpm') is None or p.get('oxpm') is None: return p.get('xpm')
+    m = p['mp']; lm = math.log(1 + m * 82 / max(games, 1) / 100)
+    so, sd = ((a + b * lm) + (p[s] - (a + b * lm)) * m / (m + k) for s, (a, b) in (('oxpm', SHRINK_MU['o']), ('dxpm', SHRINK_MU['d'])))
+    return r1(so + sd)
+
+
+def shrink(p, games, pri=None):
+    """adds sxpm / soxpm / sdxpm (shrunk) to a player row; a row on the prior keeps the prior. pri: shrink_prior(season)"""
     if p.get('pr') or p.get('xpm') is None or p.get('oxpm') is None:
         p['sxpm'], p['soxpm'], p['sdxpm'] = p.get('xpm'), p.get('oxpm'), p.get('dxpm'); return p
     m = p['mp']; w = m / (m + SHRINK_K); lm = math.log(1 + m * 82 / max(games, 1) / 100)
-    so, sd = ((a + b * lm) + (p[k] - (a + b * lm)) * w for k, (a, b) in (('oxpm', SHRINK_MU['o']), ('dxpm', SHRINK_MU['d'])))
+    q = pri(p['id']) if pri else None
+    mu = [a + b * lm for a, b in (SHRINK_MU['o'], SHRINK_MU['d'])]
+    if q: mu = [u + q[0] * (v - u) for u, v in zip(mu, q[1:])]
+    so, sd = (u + (p[k] - u) * w for k, u in zip(('oxpm', 'dxpm'), mu))
     p['soxpm'], p['sdxpm'] = r1(so), r1(sd); p['sxpm'] = r1(so + sd)
     return p
 
@@ -175,8 +208,8 @@ def reshrink():
     """recompute the shrunk columns in every published season file (no refetch)"""
     for f in sorted(os.listdir(OUT)):
         if not f.endswith('.json'): continue
-        fn = os.path.join(OUT, f); d = json.load(open(fn))
-        for p in d['players']: shrink(p, d['games'])
+        fn = os.path.join(OUT, f); d = json.load(open(fn)); pri = shrink_prior(d['season'])
+        for p in d['players']: shrink(p, d['games'], pri)
         json.dump(d, open(fn, 'w'), separators=(',', ':'))
         print(f, len(d['players']))
 
@@ -212,7 +245,8 @@ def build(season, fresh=False):
     except Exception as e:
         print(season, 'faces skipped', e)
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82
-    for p in players: shrink(p, gmax)
+    pri = shrink_prior(season)
+    for p in players: shrink(p, gmax, pri)
     badges(players, h, fetch(season, fresh, 'totals'), gmax)
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'n': len(players), 'games': gmax, 'dpmSrc': src, 'dpmShare': round(hitmp / allmp, 3) if allmp else 0,

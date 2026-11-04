@@ -400,10 +400,18 @@ def nba_files():
     return files
 
 
-def nba_feats(p, p2, pg, svc):
+def _role_sxpm(p, games):
+    """the board XPM as the fit was trained on it (Oct 31 shrink: role mean, k 300; nba_xpm.role_sxpm)"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import nba_xpm
+    v = nba_xpm.role_sxpm(p, games) if p.get('mp') else None
+    return v if v is not None else p.get('xpm') or 0.0
+
+
+def nba_feats(p, p2, pg, svc, games=82):
     g, mpg, ppg = pg or (p.get('g') or 0, (p.get('mp') or 0) / max(1, p.get('g') or 1), 0.0)
     return {'grp': nba_grp(p.get('pos')), 'age': (p.get('age') or 26) + 1, 'xpm1': p.get('xpm') or 0.0,
-            'sxpm1': p.get('sxpm') if p.get('sxpm') is not None else p.get('xpm') or 0.0, 'vorx1': p.get('vorx') or 0.0,
+            'sxpm1': _role_sxpm(p, games), 'vorx1': p.get('vorx') or 0.0,
             'mp1': p.get('mp') or 0, 'xpm2': (p2 or {}).get('xpm') or 0.0, 'mp2': (p2 or {}).get('mp') or 0,
             'has2': 1.0 if p2 else 0.0, 'g': g, 'mpg': mpg, 'ppg': ppg, 'svc': svc, 'hi': nba_max(svc)}
 
@@ -430,7 +438,7 @@ def nba_rows():
                 miss['nosalary'] += 1; continue
             if not p or (p.get('mp') or 0) < 200:
                 miss['mp<200'] += 1; continue
-            r = nba_feats(p, files.get(y - 2, (None, {}))[1].get(pid), pg.get(pid), nba_service(files, pid, y))
+            r = nba_feats(p, files.get(y - 2, (None, {}))[1].get(pid), pg.get(pid), nba_service(files, pid, y), files[y - 1][0].get('games') or 82)
             r.update(y=y, t=s_ / cap, n=p['n'], id=pid)
             rows.append(r)
     print('nba signings matched', len(rows), dict(miss))
@@ -700,7 +708,7 @@ def nba_live():
         if (p.get('mp') or 0) < 200:
             continue
         svc = nba_service(files, pid, y)
-        r = nba_feats(p, prev.get(pid), pg.get(pid), svc)
+        r = nba_feats(p, prev.get(pid), pg.get(pid), svc, files[y - 1][0].get('games') or 82)
         out[pid] = round(price(f, forms, r, NBA_MIN_SHARE, r['hi']) * cap, 2)
     write('nba', {'season': y, 'basis': files[y - 1][0]['label'], 'cap': cap,
                   'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'test': f['forms'][f['best']],
