@@ -208,6 +208,15 @@ def main():
         posted = {(b['id'], b['a'], b['s']): b['u'] for b in old.get('bets', [])} if old.get('ruleId') == rid else {}
     except (OSError, ValueError):
         old, done, posted = None, {}, {}
+    # the stake a started prop went off at is the one the nightly cap (scripts/night_cap.py) left in the picks log, not
+    # the budget stake posted here (Nov 4 2026 audit: every run rewrote started props at their uncapped stake, so a
+    # capped night's props graded, and counted toward the night, at their pre-cap size)
+    try:
+        went = {e['id']: e['units'] for e in json.load(open(PICKS)).get('log', [])
+                if e.get('units') is not None and e.get('kick') and e['kick'] <= now}
+        posted.update({k: went[f'{k[0]}-{k[1]}-{k[2]}'] for k in posted if f'{k[0]}-{k[1]}-{k[2]}' in went})
+    except (OSError, ValueError):
+        pass
     bets = []
     for (gid, a, s), lst in load().items():
         if s not in F['stats']:
