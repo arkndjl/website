@@ -206,8 +206,18 @@ def main():
         old = json.load(open(OUT))
         done = {(b['id'], b['a'], b['s']): b for b in old.get('bets', []) if b.get('res')} if old.get('ruleId') == rid else {}
         posted = {(b['id'], b['a'], b['s']): b['u'] for b in old.get('bets', [])} if old.get('ruleId') == rid else {}
+        was_pass = {(b['id'], b['a'], b['s']) for b in old.get('bets', []) if b.get('pass')} if old.get('ruleId') == rid else set()
     except (OSError, ValueError):
-        old, done, posted = None, {}, {}
+        old, done, posted, was_pass = None, {}, {}, set()
+    # the stake a started prop went off at is the one the nightly cap (scripts/night_cap.py) left in the picks log, not
+    # the budget stake posted here (Nov 4 2026 audit: every run rewrote started props at their uncapped stake, so a
+    # capped night's props graded, and counted toward the night, at their pre-cap size)
+    try:
+        went = {e['id']: e['units'] for e in json.load(open(PICKS)).get('log', [])
+                if e.get('units') is not None and e.get('kick') and e['kick'] <= now}
+        posted.update({k: went[f'{k[0]}-{k[1]}-{k[2]}'] for k in posted if f'{k[0]}-{k[1]}-{k[2]}' in went})
+    except (OSError, ValueError):
+        pass
     bets = []
     for (gid, a, s), lst in load().items():
         if s not in F['stats']:
@@ -227,6 +237,15 @@ def main():
             o = c['oO'] if b['side'] == 'o' else c['oU']
             un = kelly(R, .5 + R['c'] * (ps - .5), o) if pn is not None and ps >= R['pstar'] and with_mean(b['side'], c['L'], c['m'] if c.get('m') is not None else b['m']) else 0.0
             b['now'] = {'L': c['L'], 'o': o, 'u': un, 'p': None if pn is None else round(ps, 4)}
+            # pass only when the model moved (Noah, Nov 4 2026): the projection as it stands no longer clears the rule
+            # at the FLAGGED line; a market move alone never passes a prop. Frozen at the start.
+            mn = c['m'] if c.get('m') is not None else b['m']
+            pf = p_over(F, s, mn, b['L'])
+            if pf is not None:
+                psf = pf if b['side'] == 'o' else 1 - pf
+                b['pass'] = not (psf >= R['pstar'] and with_mean(b['side'], b['L'], mn))
+        elif b['k'] <= now and (gid, a, s) in was_pass:
+            b['pass'] = True
         if pre and b['k'] <= now:
             c = pre[-1]
             q = nv(c['oO'], c['oU'])
@@ -288,8 +307,8 @@ def main():
             win = x > b['L'] if b['side'] == 'o' else x < b['L']
             b['res'], b['ret'] = ('w' if win else 'l'), round(dec(b['o']) - 1 if win else -1.0, 4)
     bets.sort(key=lambda b: (b['k'], b['id'], -b['p']))
-    graded = [b for b in bets if b.get('res') in ('w', 'l', 'push')]
-    cl = [b for b in bets if 'clv' in b]
+    graded = [b for b in bets if b.get('res') in ('w', 'l', 'push') and not b.get('pass')]
+    cl = [b for b in bets if 'clv' in b and not b.get('pass')]
 
     def clustered(xs):
         if len(xs) < 2:
@@ -350,13 +369,13 @@ def write_picks(R, bets, now, rec):
             e['res'] = 'p'
         elif b.get('res') == 'void':
             e['pass'], e['void'] = True, True          # he didn't play: no bet, out of the record
+        if b.get('pass'):
+            e['pass'] = True                           # the model moved off it before the start: no bet
         if b.get('x') is not None:
             e['score'] = b['x']
         nw = b.get('now')
         if nw and b['k'] > now:
             e['now'] = {'mk': 'prop', 'side': e['side'], 'line': nw['L'], 'price': nw['o'], 'units': nw['u']}
-            if not nw['u']:
-                e['pass'] = True
         log.append(e)
     picks = [e for e in log if e['kick'] > now or (e['kick'] > (datetime.datetime.fromisoformat(now.replace('Z', '+00:00')) - datetime.timedelta(hours=12)).strftime('%Y-%m-%dT%H:%M:%SZ'))]
     out = {'sport': 'nflprops', 'name': 'NFL props', 'asof': now, 'rule': R, 'picks': picks, 'withdrawn': [], 'board': [],

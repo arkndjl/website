@@ -308,17 +308,21 @@ def live():
         prev = log.get(str(g['id']))
         if prev is not None and prev.get('res') is None:
             prev['kick'] = g['tip']                        # ESPN moves order-of-play times as the draw fills
+            # pass only when the model moved (Noah, Nov 4 2026): the model's chance for the pick's side no longer
+            # clears X over the market chance it was flagged at; a market move alone never passes it
+            if X and prev.get('mkt') is not None:
+                if (pm if prev['side'] == 'away' else 1 - pm) - prev['mkt'] < X:
+                    prev['pass'] = True
+                else:
+                    prev.pop('pass', None)
         if state == 'pick':
             if prev is None:
                 log[str(g['id'])] = {**row, 'units': u, 'flagged': stamp}
             else:
                 prev['now'] = {'mk': 'ml', 'side': side, 'line': None, 'price': o, 'units': u} if side == prev['side'] else None
-                prev.pop('pass', None)
         else:
             if prev is not None and prev.get('res') is None:
-                same = side == prev['side']
                 prev['now'] = None
-                prev['pass'] = True if not (same and abs(e) >= (X or 1)) else prev.get('pass')
             elif tour_lv and on and abs(e) >= X / 2:
                 board.append({**row, 'why': why})
     # grade from tennis.json's results, judge at Novig's last pregame price
@@ -354,9 +358,13 @@ def live():
         pr = [e['profit'] for e in done]
         risked = sum(e['units'] for e in done)
         su = sum(e['units'] * e['profit'] for e in done)
-        bank = 1.0
+        # per ET night, as games_picks.py and the paper book compound: a night's bets all stand on its opening bankroll
+        import night_cap
+        bank, nights = 1.0, {}
         for e in done:
-            bank *= 1 + e['units'] / 100 * e['profit']
+            nights.setdefault(night_cap.night(e['kick']), []).append(e)
+        for n in sorted(nights):
+            bank *= 1 + sum(e['units'] / 100 * e['profit'] for e in nights[n])
         rec = {'n': len(done), 'w': sum(1 for x in pr if x > 0), 'l': sum(1 for x in pr if x < 0), 'units': round(sum(pr), 1),
                'roi': round(sum(pr) / len(pr), 3), 't': tstat(pr),
                'sized': {'units': round(su, 1), 'risked': round(risked, 1), 'roi': round(su / risked, 3) if risked else None, 'bank': round(bank, 4)}}
