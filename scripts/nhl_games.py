@@ -5,6 +5,7 @@
     python3 scripts/nhl_games.py --hist    # freeze past seasons into scripts/nhl_games_hist.json.gz (from the caches)
     python3 scripts/nhl_games.py --fit     # tune, walk-forward backtest 2016-2026 against the closing line, refit
     python3 scripts/nhl_games.py --lineups # freeze past seasons' dressed skaters into scripts/data/nhl_lineups.json.gz
+    python3 scripts/nhl_games.py --goalies # tonight's starting goalies from Daily Faceoff into the board (no rebuild)
 
 Data: the NHL's stats API (scores, last period, goalie and skater game logs), MoneyPuck (each team's expected goals a game, all
 situations and by strength, score- and venue-adjusted), ESPN (every listed book's moneyline and total, 2019-20 on),
@@ -989,18 +990,37 @@ def starters_df(day):
     return out
 
 
-def pick_starter(m, t, df, day):
-    """tonight's goalie: Daily Faceoff's (confirmed or likely) matched to the team's goalies, else the team's usual
-    starter, or his partner on the second night of a back-to-back if the partner has started a share of games"""
-    depth = m.gk.depth(t)
+def roster_goalies(t, _c={}):
+    """the club's goalies on its NHL roster now (api-web roster): [{'name', 'pid', 'team'}]; a call-up the model has
+    never seen in net is found here"""
+    if t not in _c:
+        r = D.get(f'https://api-web.nhle.com/v1/roster/{t}/current') or {}
+        _c[t] = [{'name': f"{(g.get('firstName') or {}).get('default', '')} {(g.get('lastName') or {}).get('default', '')}".strip(),
+                  'pid': g.get('id'), 'team': t} for g in r.get('goalies') or [] if g.get('id')]
+    return _c[t]
+
+
+def out_names(inj, t):
+    """name keys of the team's goalies on ESPN's injury list (any status but day-to-day)"""
+    return {NM.key(i['name']) for i in (inj or {}).get(t, []) if 'day' not in (i.get('status') or '').lower()}
+
+
+def pick_starter(m, t, df, day, inj=None):
+    """tonight's goalie: Daily Faceoff's (confirmed or likely) matched to the goalies the model has rated, else to the
+    club's NHL roster (a call-up with no NHL games rates as a new goalie, not as the usual starter); with no Daily
+    Faceoff name, the team's usual healthy starter, or his partner on the second night of a back-to-back"""
     if df and df[0]:
         pool = [{'name': nm, 'pid': p, 'team': m.gk.team.get(p)} for p, nm in m.gk.name.items()]
         hit, _ = NM.Matcher(pool, pos=None).find(df[0], team=t, cross_team='variant')
+        if hit is None:
+            hit, _ = NM.Matcher(roster_goalies(t), pos=None).find(df[0], team=t, cross_team='none')
+            if hit is not None:
+                m.gk.name.setdefault(hit['pid'], hit['name'])
         if hit is not None:
             return hit['pid'], (df[1] or 'listed').lower()
-        if hit is not None:
-            return hit['id'], (df[1] or 'listed').lower()
-        return None, 'new'
+        print(f'nhl goalie: no match for {df[0]} ({t})', file=sys.stderr)
+    out = out_names(inj, t)
+    depth = [p for p in m.gk.depth(t) if NM.key(m.gk.name.get(p) or '') not in out]
     if not depth:
         return None, 'unknown'
     if m.rest(t, day) == 0 and len(depth) > 1:
@@ -1216,6 +1236,10 @@ def build():
     up = [dict(g, S=S, po=int(g['type'] == 3)) for g in sched if g['day'] in days]
     done_ids = {g['id'] for g in finals}
     m0, _, _ = walk(hist + finals, P)
+    try:
+        inj = injuries()
+    except Exception as e:
+        print('injuries:', e, file=sys.stderr); inj = {}
     starters, gsrc = {}, {}
     for d in days:
         df = starters_df(d)
@@ -1223,8 +1247,8 @@ def build():
             if g['day'] != d:
                 continue
             s = df.get((g['h'], g['a']), {})
-            gh, sh = pick_starter(m0, g['h'], s.get('h'), d)
-            ga, sa = pick_starter(m0, g['a'], s.get('a'), d)
+            gh, sh = pick_starter(m0, g['h'], s.get('h'), d, inj)
+            ga, sa = pick_starter(m0, g['a'], s.get('a'), d, inj)
             starters[g['id']] = {'h': gh, 'a': ga}
             gsrc[g['id']] = {'h': sh, 'a': sa}
         for g in up:          # the second date's back-to-backs: tonight's games aren't final yet
@@ -1238,10 +1262,6 @@ def build():
     m, _, ups = walk(hist + finals, P, pending, starters, up_moves=mv)
     # market lines for the board (ESPN's current consensus)
     emap = D.espn_map([{'id': g['id'], 'day': g['day'], 'h': g['h'], 'a': g['a']} for g in up], fresh_after=today - dt.timedelta(days=1))
-    try:
-        inj = injuries()
-    except Exception as e:
-        print('injuries:', e, file=sys.stderr); inj = {}
     # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
     try:
         import novig
@@ -1262,13 +1282,15 @@ def build():
         row = {'id': g['id'], 'espn': eid, 'tip': g['start'], 'day': g['day'], 'home': g['h'], 'away': g['a'],
                'neutral': g.get('neutral', False), 'po': bool(g.get('po')), 'pHome': round(p, 3),
                'margin': round(mm, 2), 'total': round(T, 2), 'hs': round(max(lh, 0.3), 1), 'as': round(max(la, 0.3), 1),
-               'pl': {'home2': round(p2h, 3), 'away2': round(p2a, 3)}, 'pOT': round(pot, 3),
+               'pl': {'home2': round(p2h, 3), 'away2': round(p2a, 3)}, 'pOT': round(pot, 3), 'x': [round(mm, 4), round(T, 4)],
                'fair': {'home': american(p), 'away': american(1 - p)},
                'parts': {k: round(fit['coef'][k] * f[k], 3) for k in fit['feats']},
                'elo': {'home': round(m.elo.r[g['h']]), 'away': round(m.elo.r[g['a']])},
                'rest': g['rest'],
-               'goalie': {s: {'name': m.gk.name.get(st.get(s[0])) if st.get(s[0]) else None,
+               'goalie': {s: {'name': (m.gk.name.get(st.get(s[0])) or m0.gk.name.get(st.get(s[0]))) if st.get(s[0]) else None,
+                              'id': st.get(s[0]),
                               'gsax': round(m.gk.rating(st.get(s[0])), 2) if st.get(s[0]) else None,
+                              'r': round(m.gk.rating(st[s[0]]) if st.get(s[0]) else m.gk.expected(g['h' if s == 'home' else 'a']), 4),
                               'src': gsrc.get(g['id'], {}).get(s[0])} for s in ('home', 'away')},
                'inj': {'home': inj.get(g['h'], [])[:5], 'away': inj.get(g['a'], [])[:5]},
                'line': None, 'tline': None, 'ml': None}
@@ -1347,7 +1369,11 @@ def build():
            'days': days, 'games': games, 'rec': rec, 'coef': fit['coef'], 'test': fit['test'], 'calib': fit['calib'],
            'power': power, 'sims': 10000, 'left': len(left), 'seasonSd': fit['seasonSd'],
            'simKnobs': dict(zip(('shrink', 'sd'), sim_knobs(fit))),
-           'goalies': goalie_table(m, S)}
+           'goalies': goalie_table(m, S),
+           # every goalie in net for a current club in the last 400 days: id -> [name, team, rating], for --goalies
+           'gkAll': {str(p): [m.gk.name.get(p), m.gk.team.get(p), round(m.gk.rating(p), 4)] for p, d in m.gk.last.items()
+                     if m.gk.team.get(p) in TEAMS and _days(d, today.isoformat()) <= 400},
+           'gk0': P['gk_0']}
     json.dump(out, open(OUT, 'w'), indent=None, separators=(',', ':'))
     print('wrote', OUT, len(games), 'games', len(left), 'left')
 
@@ -1371,6 +1397,63 @@ def goalie_table(m, S):
     return rows
 
 
+def refresh_goalies():
+    """re-read Daily Faceoff for the board's games that haven't started and swap in tonight's goalies without the full
+    build (python3 scripts/nhl_games.py --goalies, run every 30 minutes on game days by .github/workflows/nhl-goalies.yml).
+    The goalies enter only the total (gkT): T moves by the gkT weight times the change in -(home + away rating), and
+    the puck-line and overtime chances follow from the new total; the win chance and margin don't use the goalie."""
+    fit = json.load(open(FIT))
+    out = json.load(open(OUT))
+    tw = fit['tcoef'].get('gkT', 0.0)
+    gk0 = out.get('gk0', fit['params']['gk_0'])
+    pool = [{'name': v[0], 'pid': int(k), 'team': v[1], 'r': v[2]} for k, v in (out.get('gkAll') or {}).items() if v[0]]
+    M = NM.Matcher(pool, pos=None)
+    now = dt.datetime.now(dt.timezone.utc)
+    dfs, changed = {}, []
+    for g in out['games']:
+        if g.get('final') or 'x' not in g or dt.datetime.fromisoformat(g['tip'].replace('Z', '+00:00')) <= now:
+            continue
+        if g['day'] not in dfs:
+            dfs[g['day']] = starters_df(g['day'])
+        s = dfs[g['day']].get((g['home'], g['away']), {})
+        dr = 0.0
+        for side, k, t in (('home', 'h', g['home']), ('away', 'a', g['away'])):
+            df, cur = s.get(k), g['goalie'][side]
+            if not df or not df[0]:
+                continue
+            src = (df[1] or 'listed').lower()
+            hit, _ = M.find(df[0], team=t, cross_team='variant')
+            if hit is None:
+                hit, _ = NM.Matcher(roster_goalies(t), pos=None).find(df[0], team=t, cross_team='none')
+                if hit is not None:
+                    hit = dict(hit, r=gk0)
+            if hit is None:
+                print(f'nhl goalie: no match for {df[0]} ({t})', file=sys.stderr)
+                continue
+            if hit['pid'] == cur.get('id') and src == cur.get('src'):
+                continue
+            r0 = cur.get('r')
+            if r0 is None:
+                continue
+            dr += hit['r'] - r0
+            changed.append(f"{g['day']} {g['away']}@{g['home']} {side}: {cur.get('name')} ({cur.get('src')}) -> {hit['name']} ({src})")
+            g['goalie'][side] = {'name': hit['name'], 'id': hit['pid'], 'gsax': round(hit['r'], 2), 'r': round(hit['r'], 4), 'src': src}
+        if dr:
+            mm, T = g['x'][0], g['x'][1] - tw * dr
+            c2h, c2a = fit['pl']['home2'], fit['pl']['away2']
+            p2h = float(sig(c2h[0] + c2h[1] * mm + c2h[2] * T)); p2a = float(sig(c2a[0] + c2a[1] * mm + c2a[2] * T))
+            pot = float(sig(fit['ot'][0] + fit['ot'][1] * mm * mm + fit['ot'][2] * T))
+            lh = (T + mm) / 2; la = (T - mm) / 2
+            g.update(x=[mm, round(T, 4)], total=round(T, 2), hs=round(max(lh, 0.3), 1), **{'as': round(max(la, 0.3), 1)},
+                     pl={'home2': round(p2h, 3), 'away2': round(p2a, 3)}, pOT=round(pot, 3))
+    for c in changed:
+        print(c)
+    if changed:
+        out['gasof'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+        json.dump(out, open(OUT, 'w'), indent=None, separators=(',', ':'))
+    print('nhl goalies:', len(changed), 'changed')
+
+
 if __name__ == '__main__':
     if '--hist-goalies' in sys.argv:      # add the goalies' own xG faced to the frozen seasons (no other refetch)
         D.save(HIST, attach_gx(load_hist()))
@@ -1381,5 +1464,7 @@ if __name__ == '__main__':
         make_lineups()
     elif '--fit' in sys.argv:
         fit()
+    elif '--goalies' in sys.argv:
+        refresh_goalies()
     else:
         build()

@@ -1,0 +1,53 @@
+# Tonight's NHL starting goalies between full NHL builds (Noah, Nov 4 2026: "make sure we have the right starting
+# goalies"). scripts/nhl_games.py --goalies re-reads Daily Faceoff for the board's games that haven't started, swaps in
+# confirmed/likely goalies (call-ups from the club's NHL roster rate as new goalies) and moves each game's total, puck
+# line and overtime chance by the goalie term; no full rebuild. The full build (nhl.yml) runs only twice a day and
+# GitHub delays or drops many scheduled runs (Nov 3: the 11:40 run fired at 18:38, the 21:10 run never), so this also
+# runs after each odds snap and picks refresh. Commits only when a goalie or his status changed. About 1 minute a run.
+name: nhl goalies
+
+on:
+  schedule:
+    - cron: "15,45 15-23 * 1-6,10-12 *"
+    - cron: "15,45 0-3 * 1-6,10-12 *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["odds snap", "picks refresh"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nhl-goalies
+  cancel-in-progress: false
+
+jobs:
+  goalies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Game day window (15:00-04:00 UTC, October-June)
+        id: g
+        run: |
+          h=$(date -u +%-H); mo=$(date -u +%-m)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || { [ "$mo" -le 6 -o "$mo" -ge 10 ] && [ "$h" -ge 15 -o "$h" -lt 4 ]; }; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; else echo "go=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Refresh starting goalies and commit if they changed
+        if: steps.g.outputs.go == 'true'
+        run: |
+          pip install -q numpy
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          for i in 1 2 3 4; do
+            python3 scripts/nhl_games.py --goalies
+            git add data/nhl_games.json
+            if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+            python3 scripts/check_build.py || exit 1
+            git commit -q -m "Update the NHL starting goalies ($(date -u +%Y-%m-%dT%H:%MZ))"
+            git push && exit 0
+            # a full NHL build pushed meanwhile: redo the refresh on its file, never overwrite it
+            sleep $((i * 5))
+            git fetch -q origin main && git reset -q --hard origin/main
+          done
+          exit 1
