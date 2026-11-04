@@ -1,10 +1,15 @@
-"""The NBA's official injury reports, 2019-20 on, as status history for the game model's play chances
-(scripts/nba_games.py --fit). One report per game day at 5 PM ET, plus noon on days with an earlier tip; each game
-takes the last report before it. Needs pdftotext (poppler-utils). Research only: the daily build reads ESPN's report.
+"""The NBA's official injury reports, 2019-20 on, as status history for the game model's play chances. Each game
+takes the latest report out at least half an hour before its tip: 5 PM ET for evening games, an earlier one (11 AM to
+2 PM) for matinees. Needs pdftotext (poppler-utils).
 
-    python3 scripts/nba_inj_hist.py 2020 2026     # seasons from..to; writes scripts/.cache/nba/inj_hist.json
+    python3 scripts/nba_inj_hist.py 2020 2026     # seasons from..to; writes scripts/data/nba_inj_hist.json.gz
+
+The finished seasons are committed (scripts/data/nba_inj_hist.json.gz), so the fit (nba_games.py --fit, also the
+scheduled refit) and the daily build walk the same statuses; the daily build reads the season in progress with
+reports() (its PDFs cached in scripts/.cache/nba/injrep). Until Nov 4 2026 the history sat in a local cache only: a fit
+run without it had no statuses at all, and the daily build walked every past game with none.
 """
-import datetime as dt, json, os, re, subprocess, sys, time, urllib.request
+import datetime as dt, gzip, json, os, re, subprocess, sys, time, urllib.request
 from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor
 
@@ -12,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nba_espn as E
 
 CACHE = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'injrep')
-OUT = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'inj_hist.json')
+OUT = os.path.join(E.ROOT, 'scripts', 'data', 'nba_inj_hist.json.gz')
 ET = ZoneInfo('America/New_York')
 URL = 'https://ak-static.cms.nba.com/referee/injury/Injury-Report_{d}_{t}.pdf'
 STATUS = ('Out', 'Doubtful', 'Questionable', 'Probable', 'Available')
@@ -29,6 +34,7 @@ def fetch(d, hour):
         return open(fn).read()
     h12 = hour - 12 if hour > 12 else hour
     ap = 'PM' if hour >= 12 else 'AM'
+    missing = True
     for t in (f'{h12:02d}{ap}', f'{h12:02d}_00{ap}'):
         for i in range(3):
             try:
@@ -40,10 +46,13 @@ def fetch(d, hour):
             except urllib.error.HTTPError as e:
                 if e.code in (403, 404):
                     break
+                missing = False
                 time.sleep(2 * (i + 1))
             except Exception:
+                missing = False
                 time.sleep(2 * (i + 1))
-    open(fn, 'w').write('')
+    if missing:                 # no report at that hour; a failed pull is tried again next time
+        open(fn, 'w').write('')
     return ''
 
 
@@ -71,33 +80,67 @@ def parse(txt, day=None):
 ABBR = {'NOP': 'NO', 'NYK': 'NY', 'GSW': 'GS', 'SAS': 'SA', 'UTA': 'UTAH', 'WAS': 'WSH', 'PHO': 'PHX', 'BRK': 'BKN'}
 
 
+# early tips (before 5:30 pm ET) take the latest of these reports out by the tip. 2019-20 and 2020-21 had no noon
+# report (1, 5 and 8 PM; the bubble 11 AM, 2 and 5 PM): falling back to the 5 PM report gave ~180 matinee games
+# statuses published after their tip
+EARLY = (11, 12, 13, 14)
+
+
+def before(reps, hr):
+    """the latest report out at least half an hour before a tip at hr (ET hours; 5 PM for tips from 5:30 pm, as
+    before); {} when none was"""
+    ok = [h for h in sorted(reps) if reps[h] and h + 0.5 <= hr]
+    return reps[ok[-1]] if ok else {}
+
+
+def reports(gs):
+    """{game id: {name: status}} for finished games (rows with id, tip (UTC), a, h), each from the latest report out
+    before its tip (before())"""
+    byday = {}
+    for g in gs:
+        # ET with DST: a flat UTC-4 put winter tips an hour late, so 4:30-5:30 pm tips took the 5 PM report
+        tip = dt.datetime.fromisoformat(g['tip'].replace('Z', '+00:00')).astimezone(ET)
+        byday.setdefault(tip.date().isoformat(), []).append((g, tip.hour + tip.minute / 60))
+    jobs = []
+    for d, lst in byday.items():
+        jobs.append((d, 17))
+        if any(h < 17.5 for _, h in lst):
+            jobs += [(d, h) for h in EARLY]
+    with ThreadPoolExecutor(6) as ex:
+        texts = dict(zip(jobs, ex.map(lambda j: fetch(*j), jobs)))
+    out = {}
+    for d, lst in byday.items():
+        # the day's games only: a report also lists tomorrow's, and 2020-21's two-game series met on back-to-back days
+        reps = {h: parse(texts.get((d, h), ''), dt.date.fromisoformat(d)) for h in (17,) + EARLY}
+        for g, hr in lst:
+            rep = before(reps, hr)
+            key = (g['a'], g['h'])
+            found = {k: v for (a, h), v in ((tuple(ABBR.get(x, x) for x in k2), v2) for k2, v2 in rep.items()) for k in [(a, h)] if (E.team(a), E.team(h)) == key}
+            if found:
+                out[g['id']] = list(found.values())[0]
+    return out
+
+
+def load():
+    """the committed history: {game id: {name: status}}"""
+    try:
+        with gzip.open(OUT, 'rt') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
 def build(lo, hi):
-    hist = {}
+    hist = load()
     for S in range(lo, hi + 1):
         gs = [g for g in E.games(S) if g['final']]
-        byday = {}
-        for g in gs:
-            # ET with DST: a flat UTC-4 put winter tips an hour late, so 4:30-5:30 pm tips took the 5 PM report
-            tip = dt.datetime.fromisoformat(g['tip'].replace('Z', '+00:00')).astimezone(ET)
-            byday.setdefault(tip.date().isoformat(), []).append((g, tip.hour + tip.minute / 60))
-        jobs = []
-        for d, lst in byday.items():
-            jobs.append((d, 17))
-            if any(h < 17.5 for _, h in lst):
-                jobs.append((d, 12))
-        with ThreadPoolExecutor(6) as ex:
-            texts = dict(zip(jobs, ex.map(lambda j: fetch(*j), jobs)))
-        n = 0
-        for d, lst in byday.items():
-            reps = {h: parse(texts.get((d, h), '')) for h in (12, 17)}
-            for g, hr in lst:
-                rep = reps[12] if hr < 17.5 and reps[12] else reps[17]
-                key = (g['a'], g['h'])
-                found = {k: v for (a, h), v in ((tuple(ABBR.get(x, x) for x in k2), v2) for k2, v2 in rep.items()) for k in [(a, h)] if (E.team(a), E.team(h)) == key}
-                if found:
-                    hist[g['id']] = list(found.values())[0]; n += 1
-        print(S, len(gs), 'games', n, 'with a report', flush=True)
-    E.save(OUT, hist)
+        ids = {g['id'] for g in gs}
+        hist = {k: v for k, v in hist.items() if k not in ids}
+        rep = reports(gs)
+        hist.update(rep)
+        print(S, len(gs), 'games', len(rep), 'with a report', flush=True)
+    with gzip.open(OUT, 'wt') as f:
+        json.dump(dict(sorted(hist.items())), f, separators=(',', ':'))
 
 
 if __name__ == '__main__':

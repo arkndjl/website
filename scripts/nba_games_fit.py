@@ -25,11 +25,7 @@ CANDS = ['lin', 'rest', 'b2b', 'roster', 'trav', 'tz', 'alt', 'n4', 'b2bRoad', '
 
 
 def load_inj():
-    try:
-        raw = json.load(open(N.INJ_HIST))
-    except (OSError, ValueError):
-        return {}
-    return {gid: {N.norm(k): v for k, v in rep.items()} for gid, rep in raw.items()}
+    return N.load_inj()
 
 
 def measure_P(games, names, inj, params):
@@ -145,6 +141,10 @@ def paired_t(a, b):
 def fit():
     games, names = N.load_hist()
     inj = load_inj()
+    if len(inj) < 5000:
+        # without the reports P holds only the no-report rates and live reads every listed player at .9 to play
+        # (data/nba_games_fit.json shipped that way until Nov 4 2026)
+        sys.exit(f'nba fit: {len(inj)} games with an injury report; run scripts/nba_inj_hist.py 2020 2026')
     # rk: last summer's draftees join their team's lineup at their slot's rookie XPM and minutes until they play
     # (scripts/nba_roster_research.py, Oct 2026: 2015-21 t -3.2, 2022-26 t -3.0); rkc: a college draftee's value from
     # his slot and final college BPM (nba_roster_research.py --priors: t -1.5, held out -.001; player level t -3.1/-3.1).

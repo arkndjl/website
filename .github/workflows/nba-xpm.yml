@@ -93,7 +93,8 @@ jobs:
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py nba
-      # ESPN box scores and lines already pulled this season (final games never change)
+      # ESPN box scores and lines already pulled this season (final games never change), and the official injury reports
+      # the walk reads for this season's past games (scripts/nba_inj_hist.py reports())
       - uses: actions/cache@v4
         with:
           path: |
@@ -101,6 +102,7 @@ jobs:
             scripts/.cache/nba/pbox2
             scripts/.cache/teambadges/nba
             scripts/.cache/nba/lineups
+            scripts/.cache/nba/injrep
           key: nba-espn-${{ github.run_id }}
           restore-keys: nba-espn-
       # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/nba.json and the team file
