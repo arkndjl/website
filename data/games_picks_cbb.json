@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T02:48:14Z",
+ "asof": "2026-11-04T02:50:54Z",
  "recenter": {
   "2026-11-03": -12.39,
   "2026-11-04": -12.36
@@ -339,9 +339,9 @@
     "line": 13.5,
     "price": -102.0,
     "ev": 0.086,
-    "units": 2.5,
+    "units": 3.0,
     "unitsRaw": 3.25,
-    "unitsCap": 2.5
+    "unitsCap": 3.0
    },
    "unitsRaw": 1.5,
    "unitsCap": 1.25
@@ -359,7 +359,7 @@
    "price": -102.0,
    "p": 0.533,
    "ev": 0.056,
-   "units": 1.25,
+   "units": 1.5,
    "edge": 4.1,
    "x": 2.5,
    "pDU": 0.5139,
@@ -376,12 +376,12 @@
     "line": 20.5,
     "price": 104.0,
     "ev": 0.071,
-    "units": 3.0,
+    "units": 3.5,
     "unitsRaw": 3.75,
-    "unitsCap": 3.0
+    "unitsCap": 3.5
    },
    "unitsRaw": 1.75,
-   "unitsCap": 1.25
+   "unitsCap": 1.5
   },
   {
    "id": "401920422",
@@ -474,11 +474,11 @@
     "mk": "total",
     "side": "over",
     "line": 155.5,
-    "price": -100.0,
-    "ev": 0.079,
-    "units": 3.0,
-    "unitsRaw": 3.75,
-    "unitsCap": 3.0
+    "price": -102.0,
+    "ev": 0.069,
+    "units": 2.5,
+    "unitsRaw": 2.75,
+    "unitsCap": 2.5
    },
    "unitsRaw": 1.0,
    "unitsCap": 0.75
@@ -646,14 +646,8 @@
    "flagged": "2026-11-04T02:48:14Z",
    "betTo": 154.5,
    "close": 154.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 154.5,
-    "price": -104.0,
-    "ev": 0.024,
-    "units": 0.25
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "401920702",
@@ -898,22 +892,6 @@
    "tm": 158.0
   },
   {
-   "id": "401920343",
-   "sport": "cbb",
-   "kick": "2026-11-04T03:00:00Z",
-   "home": "California Baptist",
-   "away": "North Florida",
-   "mk": "spread",
-   "side": "away",
-   "line": 11.5,
-   "price": -113.0,
-   "edge": 1.6,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 9.9,
-   "tm": 156.4
-  },
-  {
    "id": "401919028",
    "sport": "cbb",
    "kick": "2026-11-05T00:30:00Z",
@@ -930,6 +908,22 @@
    "tm": 162.0
   },
   {
+   "id": "401920343",
+   "sport": "cbb",
+   "kick": "2026-11-04T03:00:00Z",
+   "home": "California Baptist",
+   "away": "North Florida",
+   "mk": "total",
+   "side": "over",
+   "line": 155.5,
+   "price": -104.0,
+   "edge": 0.9,
+   "x": 2.0,
+   "why": "edge under 2",
+   "m": 9.9,
+   "tm": 156.4
+  },
+  {
    "id": "401920798",
    "sport": "cbb",
    "kick": "2026-11-05T01:00:00Z",
@@ -938,7 +932,7 @@
    "mk": "spread",
    "side": "away",
    "line": 26.5,
-   "price": -110,
+   "price": -112.0,
    "edge": 0.3,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -972,11 +966,11 @@
    "state": "pick"
   },
   "401920343": {
-   "mk": "spread",
-   "side": "away",
-   "line": 11.5,
-   "price": -113.0,
-   "edge": 1.6,
+   "mk": "total",
+   "side": "over",
+   "line": 155.5,
+   "price": -104.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "California Baptist",
@@ -1011,7 +1005,7 @@
    "mk": "spread",
    "side": "away",
    "line": 26.5,
-   "price": -110,
+   "price": -112.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
@@ -1156,7 +1150,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4382,
+  "snapshots": 4387,
   "buckets": [
    {
     "when": "24h+",
@@ -1187,12 +1181,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 116,
+    "clvN": 118,
     "clvRet": -0.0475,
-    "clvT": -13.37,
+    "clvT": -13.59,
     "clv": -0.03,
-    "beat": 0.086,
-    "still": 0.784
+    "beat": 0.085,
+    "still": 0.788
    }
   ]
  },
@@ -7639,7 +7633,7 @@
    "price": -102.0,
    "p": 0.533,
    "ev": 0.056,
-   "units": 1.25,
+   "units": 1.5,
    "edge": 4.1,
    "x": 2.5,
    "pDU": 0.5139,
@@ -7651,7 +7645,7 @@
    "betTo": 20.0,
    "close": 20.5,
    "unitsRaw": 1.75,
-   "unitsCap": 1.25
+   "unitsCap": 1.5
   },
   {
    "id": "401929372",
@@ -8074,15 +8068,16 @@
    "tmRaw": 139.7,
    "flagged": "2026-11-04T02:48:14Z",
    "betTo": 154.5,
-   "close": 154.5
+   "close": 154.5,
+   "pass": true
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 11.0,
-    "scale": 0.8409,
+    "raw": 9.75,
+    "scale": 0.9487,
     "down": 30.75
    },
    "2026-11-04": {
@@ -8098,8 +8093,8 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 49.5,
-    "scale": 0.8081
+    "raw": 48.5,
+    "scale": 0.8247
    },
    "2026-11-08": {
     "raw": 19.75,

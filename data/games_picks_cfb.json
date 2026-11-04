@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T02:48:26Z",
+ "asof": "2026-11-04T02:50:48Z",
  "recenter": {
   "week": 0.79
  },
@@ -689,7 +689,7 @@
     "side": "under",
     "line": 72.5,
     "price": -102.0,
-    "ev": 0.039,
+    "ev": 0.04,
     "units": 2.25
    }
   },
@@ -1633,6 +1633,22 @@
    "tm": 51.4
   },
   {
+   "id": "401858290",
+   "sport": "cfb",
+   "kick": "2026-11-07T20:30:00.000Z",
+   "home": "Wake Forest",
+   "away": "Merrimack",
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -106.0,
+   "edge": 2.9,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 52.9,
+   "tm": 56.6
+  },
+  {
    "id": "401858516",
    "sport": "cfb",
    "kick": "2026-11-07T20:30:00.000Z",
@@ -1951,22 +1967,6 @@
    "why": "edge under 6 (season: late)",
    "m": -1.2,
    "tm": 45.5
-  },
-  {
-   "id": "401856740",
-   "sport": "cfb",
-   "kick": "2026-11-07T20:30:00.000Z",
-   "home": "LSU",
-   "away": "Alabama",
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -100.0,
-   "edge": 2.5,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": 3,
-   "tm": 53.5
   }
  ],
  "games": {
@@ -2287,7 +2287,7 @@
    "side": "under",
    "line": 72.5,
    "price": -102.0,
-   "ev": 0.039,
+   "ev": 0.04,
    "edge": 6.2,
    "units": 2.25,
    "home": "Florida Atlantic",
@@ -2400,6 +2400,18 @@
    "units": 0.0,
    "home": "Southern Miss",
    "away": "James Madison",
+   "state": "under"
+  },
+  "401858290": {
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -106.0,
+   "edge": 2.9,
+   "ev": null,
+   "units": 0.0,
+   "home": "Wake Forest",
+   "away": "Merrimack",
    "state": "under"
   },
   "401858517": {
@@ -2743,13 +2755,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7354,
+  "snapshots": 7360,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1748,
+    "clvN": 1749,
     "clvRet": -0.0456,
-    "clvT": -25.88,
+    "clvT": -25.91,
     "clv": 0.18,
     "beat": 0.265,
     "still": 0.521
@@ -3824,13 +3836,13 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 5.0,
-    "scale": 1.0,
+    "raw": 9.75,
+    "scale": 0.9487,
     "down": 30.75
    },
    "2026-11-04": {
-    "raw": 41.0,
-    "scale": 0.9756
+    "raw": 42.0,
+    "scale": 0.9524
    },
    "2026-11-05": {
     "raw": 20.0,
@@ -3845,7 +3857,7 @@
     "scale": 0.8247
    },
    "2026-11-08": {
-    "raw": 17.5,
+    "raw": 19.75,
     "scale": 1.0
    },
    "2026-11-09": {
