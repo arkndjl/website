@@ -10,7 +10,8 @@ Every prospect board's history, graded the way that board grades today, ranked w
           (college exits through 2020, six NBA seasons or more)
   hockey  every 2008-19 pick's draft-day grade, fit without his class (data/hockey.json past), outcome = peak NHL WAR FV
   soccer  past seasons 2013-20, listed players (data/soccer_prospects.json past), outcome = peak market value FV
-  tennis  past seasons, listed players, ATP and WTA (data/tennis_prospects_fit.json past), outcome = peak ranking FV
+  tennis  each player once, at his last October as a prospect (data/tennis_prospects_fit.json alltime, held out by birth
+          year), ATP and WTA, outcome = peak ranking FV
 A player shows once: CFB and CBB at the draft that followed his last season (Nov 3 2026: a best season ran hot and
 missed the final season and the combine), the other boards at his best season's grade. The headline is the mean outcome (stretched above each board's knot,
 data/fv_scale.json); fvx is the exact mean, and the check compares it with what the careers became.
@@ -278,14 +279,14 @@ def tennis():
     T = json.load(open(P('data', 'tennis_prospects_fit.json')))
     R = []
     for tour in ('atp', 'wta'):
-        for r in T[tour]['past']:
+        for r in T[tour].get('alltime') or T[tour]['past']:
             R.append({'name': r['name'], 'season': r['season'], 'team': r.get('nat', ''), 'pos': tour.upper(), 'fvx': r.get('fvx', r['fv']), 'fv': r['fv'], 'out': r.get('out'),
                       'age': r.get('age'), 'rank': r.get('rank'), 'pkr': r.get('pkr')})
     peaks = best_per_player(R, lambda r: r['pos'] + '|' + r['name'])
     groups = ['ATP', 'WTA']
     return {'label': 'Tennis', 'seasons': [min(r['season'] for r in R), max(r['season'] for r in R)], 'groups': groups, 'n': len(R), 'players': len(peaks),
             'outcome': 'peak ranking on the FV scale', 'rows': listed(peaks, groups, lambda r: r['pos'], TN_ALL), 'check': check(R, peaks, groups, lambda r: r['pos'], TN_ALL),
-            'complete': 'every ranked player graded 45+ at his youngest season (the past list also carries lower grades who reached 55+, left out here)'}
+            'complete': 'every ranked player graded 45+ in his last October as a prospect (the past list also carries lower grades who reached 55+, left out here)'}
 
 
 def main():
