@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T00:46:40Z",
+ "asof": "2026-11-04T00:56:50Z",
  "recenter": {
   "week": 0.8
  },
@@ -520,9 +520,9 @@
     "line": 71.5,
     "price": -100.0,
     "ev": 0.068,
-    "units": 3.0,
+    "units": 3.25,
     "unitsRaw": 4.0,
-    "unitsCap": 3.0
+    "unitsCap": 3.25
    },
    "unitsRaw": 5.0,
    "unitsCap": 4.0
@@ -577,7 +577,7 @@
    "price": 104.0,
    "p": 0.514,
    "ev": 0.049,
-   "units": 3.0,
+   "units": 3.25,
    "edge": 3.6,
    "x": 3.0,
    "pDU": 0.513,
@@ -591,7 +591,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 4.0,
-   "unitsCap": 3.0
+   "unitsCap": 3.25
   },
   {
    "id": "401858292",
@@ -785,11 +785,11 @@
     "mk": "total",
     "side": "under",
     "line": 64.5,
-    "price": -102.0,
-    "ev": 0.025,
-    "units": 1.25,
-    "unitsRaw": 1.75,
-    "unitsCap": 1.25
+    "price": -104.0,
+    "ev": 0.015,
+    "units": 0.5,
+    "unitsRaw": 0.75,
+    "unitsCap": 0.5
    },
    "unitsRaw": 2.75,
    "unitsCap": 2.0
@@ -1420,9 +1420,9 @@
     "line": 45.5,
     "price": 102.0,
     "ev": 0.058,
-    "units": 3.0,
+    "units": 3.25,
     "unitsRaw": 4.0,
-    "unitsCap": 3.0
+    "unitsCap": 3.25
    }
   },
   {
@@ -1625,22 +1625,6 @@
    "tm": 58.8
   },
   {
-   "id": "401858290",
-   "sport": "cfb",
-   "kick": "2026-11-07T20:30:00.000Z",
-   "home": "Wake Forest",
-   "away": "Merrimack",
-   "mk": "spread",
-   "side": "home",
-   "line": 48.5,
-   "price": 106.0,
-   "edge": 4.4,
-   "x": 4.5,
-   "why": "edge under 4.5 (tier: mixed)",
-   "m": 52.9,
-   "tm": 57.3
-  },
-  {
    "id": "401856852",
    "sport": "cfb",
    "kick": "2026-11-08T00:30:00.000Z",
@@ -1777,7 +1761,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 4.7,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1793,12 +1777,28 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.3,
    "x": 3.0,
    "why": "edge under 3",
    "m": 6.1,
    "tm": 50.8
+  },
+  {
+   "id": "401858290",
+   "sport": "cfb",
+   "kick": "2026-11-07T20:30:00.000Z",
+   "home": "Wake Forest",
+   "away": "Merrimack",
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -110,
+   "edge": 2.2,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 52.9,
+   "tm": 57.3
   },
   {
    "id": "401860913",
@@ -1978,7 +1978,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -2002,7 +2002,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -2110,10 +2110,10 @@
    "mk": "total",
    "side": "under",
    "line": 64.5,
-   "price": -102.0,
-   "ev": 0.025,
+   "price": -104.0,
+   "ev": 0.015,
    "edge": 4.4,
-   "units": 1.75,
+   "units": 0.75,
    "home": "Texas Tech",
    "away": "West Virginia",
    "state": "pick"
@@ -2266,7 +2266,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -2395,11 +2395,11 @@
    "state": "under"
   },
   "401858290": {
-   "mk": "spread",
-   "side": "home",
-   "line": 48.5,
-   "price": 106.0,
-   "edge": 4.4,
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -110,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Wake Forest",
@@ -2470,7 +2470,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -2578,7 +2578,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2759,16 +2759,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7261,
+  "snapshots": 7272,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1724,
-    "clvRet": -0.0452,
-    "clvT": -25.43,
-    "clv": 0.19,
-    "beat": 0.27,
-    "still": 0.517
+    "clvN": 1726,
+    "clvRet": -0.0454,
+    "clvT": -25.54,
+    "clv": 0.18,
+    "beat": 0.268,
+    "still": 0.515
    },
    {
     "when": "6-24h",
@@ -3764,7 +3764,7 @@
    "price": 104.0,
    "p": 0.514,
    "ev": 0.049,
-   "units": 3.0,
+   "units": 3.25,
    "edge": 3.6,
    "x": 3.0,
    "pDU": 0.513,
@@ -3777,7 +3777,7 @@
    "close": 51.5,
    "pass": true,
    "unitsRaw": 4.0,
-   "unitsCap": 3.0
+   "unitsCap": 3.25
   },
   {
    "id": "401869968",
@@ -3839,12 +3839,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 16.5,
-    "scale": 1.0,
+    "raw": 23.0,
+    "scale": 0.7174,
     "down": 23.5
    },
    "2026-11-04": {
-    "raw": 21.75,
+    "raw": 22.0,
     "scale": 1.0
    },
    "2026-11-05": {
@@ -3856,8 +3856,8 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 50.0,
-    "scale": 0.8
+    "raw": 49.0,
+    "scale": 0.8163
    },
    "2026-11-08": {
     "raw": 19.25,
