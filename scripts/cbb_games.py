@@ -692,6 +692,7 @@ def team_fv_live(d, bt, season):
     """fvtop, agew and fvfrm (team_fv) for the coming season from the frozen prior's careers, the same inputs team_fv reads
     from the research seasons"""
     import re
+    from cbb_roster import bpm3_research
     K = {k: i for i, k in enumerate(d['keep'])}
     ci = {k: i for i, k in enumerate(d['cols'])}
     T = defaultdict(lambda: {'agen': 0.0, 'aged': 0.0, 'es': [], 'fvfrm': 0.0})
@@ -704,12 +705,8 @@ def team_fv_live(d, bt, season):
         prev = [dict(zip(d['keep'], s)) for s in c['seasons'] if s[K['year']] < season]
         if prev and prev[-1]['min_per']:
             p = prev[-1]
-            num = den = 0.0
-            for w, r in zip((5, 4, 3), reversed(prev[-3:])):
-                mm = (r['mp'] or 0) * (r['gp'] or 0)
-                if r['bpm'] is not None:
-                    num += w * mm * r['bpm']; den += w * mm
-            bpm3 = ((num / den) * den / 5 + -4.0 * 300) / (den / 5 + 300) if den else -4.0
+            # the research column team_fv reads in history, not the board's shrunk 5/4/3 (cbb_roster.bpm3_research)
+            bpm3 = bpm3_research(prev[-3:])
             age = None
             if c.get('dob'):
                 try:
