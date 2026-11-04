@@ -1094,6 +1094,8 @@
     for (var k = 0; k < 40; k++) { nx = row.nextElementSibling; if (isDet(nx)) break; await new Promise(function (r) { setTimeout(r, 50); }); }
     return isDet(nx) ? { el: nx, opened: true, close: function () { if (row.nextElementSibling === nx) who.click(); } } : { el: null };
   }
+  var NBAX = null;
+  function nbaXpm(w) { return NBAX || (NBAX = fetch(w.getAttribute('data-src') + w.getAttribute('data-cur') + '.json').then(function (r) { return r.json(); }).catch(function () { NBAX = null; return null; })); }
   async function buildPCard(win, row) {
     var table = row.closest('table'); if (!table) return null;
     var mainR = pcMain(row), extraL = mainR ? pdExtra(row) : '';
@@ -1136,6 +1138,17 @@
       }
       tiles.push({ i: i, h: h, t: c.t, sub: c.sub, color: c.color, pct: pct, tip: hcells[i] ? hcells[i].getAttribute('title') : '' });
     });
+    // NBA: every player card carries VORX; tables without the column borrow it from the XPM board's current season
+    var xw = document.querySelector('[data-nbaxpm][data-src][data-cur]');
+    if (xw && !heads.some(function (h) { return /^vorx$/i.test(h); })) {
+      var xd = await nbaXpm(xw), nm = pdNorm(name), tmU = (team.split('/').pop() || '').trim().toUpperCase();
+      var hits = xd ? xd.players.filter(function (p) { return pdNorm(p.n) === nm; }) : [];
+      var xp = hits.length > 1 && tmU ? hits.find(function (p) { return p.tm === tmU; }) || hits[0] : hits[0];
+      if (xp && xp.vorx != null) {
+        var vs = xd.players.filter(function (p) { return p.mp >= 100 && p.vorx != null; }).map(function (p) { return p.vorx; });
+        tiles.unshift({ i: -1, h: 'VORX', t: xp.vorx.toFixed(1), pct: vs.length >= 5 ? Math.round(100 * vs.filter(function (v) { return v < xp.vorx; }).length / Math.max(1, vs.length - 1)) : null, tip: 'wins over replacement on XPM, ' + xd.label });
+      }
+    }
     var feat = tiles.find(function (t) { return t.i === sortI; }) || (fvI < 0 ? tiles.find(function (t) { return t.pct != null; }) : null);
     if (feat) tiles.splice(tiles.indexOf(feat), 1);
     var wt = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
