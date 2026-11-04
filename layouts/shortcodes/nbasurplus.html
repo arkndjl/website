@@ -6,7 +6,7 @@
        same minutes, $ per win grown with the cap; a player option counts only when it costs the team (he opts in when
        paid over his value), a team option only when it pays. Views: contract (the default) or this season. Filters ride
        in the address with a c prefix, apart from the XPM tab's (#cteam=OKC&cview=s). */ -}}
-<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,Value,Surplus,Contract">
+<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-xaav="{{ "data/xaav-nba.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,xAAV,Value,Surplus,Contract">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_contracts.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -33,6 +33,7 @@
         <th data-sort="pxpm" data-num class="nbaxpm__ph" title="XPM (proj): XPM to date blended with his preseason prior by minutes; below, the 80% range for his true level">XPM (proj)</th>
         <th data-sort="pvorx" data-num class="nbaxpm__ph" title="projected VORX this season: VORX to date plus the rest of the season at XPM (proj), his minutes per game and his share of games last season">VORX</th>
         <th data-sort="sal" data-num class="nbaxpm__ph" title="salary this season, $M (Basketball-Reference)">Salary</th>
+        <th data-sort="xa" data-num class="nbaxpm__ph" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age, years in the league and last full season's XPM, VORX, minutes and points, at this season's cap (25/30/35% max by years in the league)">xAAV</th>
         <th data-sort="val" data-num class="nbaxpm__ph" title="value this season, $M: projected VORX x $ per win">Value</th>
         <th data-sort="sur" data-num class="c-sur" title="surplus this season, $M: value minus salary">Surplus</th>
         <th data-sort="ny" data-num class="nbaxpm__ph" title="years left including this one; P = player option, T = team option">Yrs</th>
@@ -108,6 +109,7 @@
         '<td class="cfb__num nbaxpm__ph">' + sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span></td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.pvorx.toFixed(1) + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + m(p.sal) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph"' + (p.xa == null ? '>' : ' title="xAAV minus salary: ' + (p.xa - p.sal > 0 ? '+' : '') + (p.xa - p.sal).toFixed(1) + '">') + (p.xa == null ? '<span class="cfb__dim">–</span>' : m(p.xa)) + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + m(p.val) + '</td>' +
         '<td class="cfb__num c-sur nbaxpm__v' + k('sur') + '">' + sg(p.sur) + '</td>' +
         '<td class="cfb__num nbaxpm__ph" title="' + esc(yrs) + '">' + p.ny + '<span class="cfb__dim">' + p.yrs.map(function (y) { return y[2]; }).join('') + '</span></td>' +
@@ -143,8 +145,10 @@
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
   win.querySelectorAll('[data-ns-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.nsStep; if (page < 0) page = 0; render(); }); });
-  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
-    d.players.forEach(function (p) { if (p.yrs) p.ny = p.yrs.length; });
+  var xa = fetch(win.dataset.xaav).then(function (r) { return r.json(); }).catch(function () { return null; });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) { return xa.then(function (x) { return [d, x]; }); }).then(function (dx) {
+    var d = dx[0], x = dx[1] && dx[1].players || {};
+    d.players.forEach(function (p) { if (p.yrs) p.ny = p.yrs.length; if (x[p.id] != null) p.xa = x[p.id]; });
     data = d; readHash(); teams(); readHash(); loading.hidden = true; bar.hidden = false; render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();

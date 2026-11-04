@@ -469,117 +469,6 @@
      ]
     },
     {
-     "term": "aXPM",
-     "short": "NBA rookie XPM adjusted for age.",
-     "body": [
-      "aXPM = XPM - .20 x (age - 21). Rookie XPM as shown (shrunk by minutes), bbref season age.",
-      "k = c / b from next three seasons' XPM (minutes-weighted, shrunk to -2 with 1,000 MP) ~ a + b XPM + c age, 1,222 rookies 2010-23; k -.19 to -.21 leaving out each class.",
-      "Held out by class: RMSE .942 vs .977 raw (paired t -4.7), Spearman .413 vs .382 (11 of 14 classes); next three seasons' VORX RMSE 3.47 vs 3.58. Display only."
-     ],
-     "where": "NBA rookies",
-     "sports": [
-      "NBA"
-     ]
-    },
-    {
-     "term": "3Y (rookie projection)",
-     "short": "NBA rookie's projected XPM over his next three seasons.",
-     "body": [
-      "3Y = c0 + c1 XPM + c2 (age - 21) + c3 ln(1 + MP82); MP82 = MP x 82 / team games. Full season: c = -1.73, .646, -.078, .216.",
-      "Target and rookies as aXPM (1,222, 2010-23). Held out by class: RMSE .876 vs .942 aXPM, .977 raw (t -7.4 vs aXPM); Spearman .481, beats aXPM in 12 of 14 classes; calibration slope .99.",
-      "Season in progress: coefficients fit on simulated partial seasons (minutes thinned to the season share, XPM noise 797 / MP, log-minutes noise .25 x sqrt((1 - f) / f)), linear between f = .1, .2, .35, .5, .75, 1. Beats aXPM at every share (t -3.7 at f .1). Display only."
-     ],
-     "where": "NBA rookies",
-     "sports": [
-      "NBA"
-     ]
-    },
-    {
-     "term": "3Y (NBA)",
-     "short": "Projected XPM over the next three seasons, every player.",
-     "body": [
-      "3Y = c0 + c1 proj + c2 (age - 27) + c3 (age - 27)^2 + c4 ln(1 + M) + c5 proj (age - 27) + c6 proj (ln(1 + M) - 7); proj = XPM (proj), M = projected full-season minutes. Target: next three seasons' minutes-weighted XPM, shrunk to -2 with 1,000 MP (a season off the board counts -2). 1Y = same form, next season.",
-      "Held out by season 2012-23: RMSE .843 vs .897 recalibrated aging curve, 1.031 contract-tab aging, 1.160 flat (t -8.2 vs recalibrated, 12/12 seasons, slope 1.00). 1Y .856 vs .890 (t -8.4, 14/14). Coefficients by season share f on simulated partial seasons (f .1: .969 vs 1.013).",
-      "Top end still low: proj 4+ players project 3.80 vs 4.44 actual. Contract value keeps the aging curve (3Y did not beat it at every season share). Display only."
-     ],
-     "where": "NBA XPM",
-     "sports": [
-      "NBA"
-     ]
-    },
-    {
-     "term": "3Y (NHL)",
-     "short": "Projected WAR over the next three seasons.",
-     "body": [
-      "3Y = c . [1, pWAR82, Marcel WAR, (age - 27) and its square by F/D/G, pWAR82 x (age - 27), HPM over replacement, ln(1 + TOI82 / 100)]. A season out of the league counts 0.",
-      "Held out by season 2010-23: skaters RMSE 2.455 vs 2.617 pWAR + Marcel, 2.844 flat pWAR (t -14.2, 14/14 seasons, slope 1.00; time split t -10.7). Goalies 4.07 vs 4.37 (t -5.6, 13/14). Season in progress: coefficients by season share on simulated partial seasons. Display only."
-     ],
-     "where": "NHL WAR leaders",
-     "sports": [
-      "NHL"
-     ]
-    },
-    {
-     "term": "1Y / 3Y (NFL)",
-     "short": "Projected WAR next season and over the next three.",
-     "body": [
-      "Regression on WAR pace this season and the two before, played flags, log snaps, and an age curve per position group (hinge at 27, WAR x years past 27; WR declines steepest, QB slowest). Off the board counts 0. Special teams not projected.",
-      "Held out by season: 3Y (2015-22) RMSE .326 vs .342 calibrated Marcel rate x snaps (t -5.9, 8/8 seasons); 1Y (2015-24) .140 vs .143 (t -4.2, 9/10); slope .99. Position age curves beat one pooled curve (t -3.8 3Y). Coefficients by share of season played. Display only."
-     ],
-     "where": "NFL WAR",
-     "sports": [
-      "NFL"
-     ]
-    },
-    {
-     "term": "Proj / 3Y (soccer)",
-     "short": "Projected GAR next season and over the next three.",
-     "body": [
-      "OLS on this season's GAR at full-season pace, the two prior seasons' GAR per 90 pooled (shrunk with 900 minutes) x minutes, ln minutes, and age by position. A season out of the big five counts 0. Coefficients by share of season played.",
-      "Held out by season 2017-25: Proj RMSE 1.22 vs 1.28 current GAR regressed to the mean (t -12, 9/9); 3Y (2017-23) 2.82 vs 2.99 (t -12, 7/7); slope ~1.00. Display only."
-     ],
-     "where": "soccer player value",
-     "sports": [
-      "Soccer"
-     ]
-    },
-    {
-     "term": "Proj (tennis)",
-     "short": "ARK and Elo 12, 24 and 36 months on.",
-     "body": [
-      "logit ARK(t+12) = c0 + c1 logit ARK + age + age^2 + ln(1 + matches in 52 weeks) + ln(1 + career matches) + ln(rank) + unranked flag; same form for 24/36 months and Elo. Players still active at the horizon.",
-      "Quarter-end top-300 boards 2006-25, each year held out, vs rating held flat + the live age term: ATP 12 mo RMSE .477 -> .462 (t -18.8, 15/19), WTA .509 -> .500 (t -16.0, 11/19); 36 mo ATP t -11.7, WTA t -3.6. Volume and rank carry the gain; age alone fails. Display only."
-     ],
-     "where": "tennis ARK Ranking",
-     "sports": [
-      "Tennis"
-     ]
-    },
-    {
-     "term": "6M (CS2)",
-     "short": "Player RWA projected 182 days on.",
-     "body": [
-      "6M = c0 + c1 RWA + age + age^2 + unknown-age flag (peak in the low 20s). Maps played and S/A-tier share failed.",
-      "Fit on monthly cuts before Jul 2025, held Jul 2025-May 2026: RMSE .507 -> .485 vs flat (t -2.4, 9/11 months, slope 1.02). Refit monthly; blank if it stops passing. Display only."
-     ],
-     "where": "CS2 players",
-     "sports": [
-      "CS2"
-     ]
-    },
-    {
-     "term": "Next (CBB)",
-     "short": "Next season's WAR at 31 games, playing D-I.",
-     "body": [
-      "OLS on last season's BPM, 3-year BPM, minutes share, BPM x minutes, WAR, class, recruit rank, transfer and team strength, age, seasons played, BPM over position, OBPM, usage and height. In season: line to date, coefficients by share of team games played.",
-      "Walk-forward 2016-26 (31,633 returners + transfers): RMSE .432 vs .443 roster prior's projection, .470 flat (t -10.1, 11/11 seasons, slope .97). Display only."
-     ],
-     "where": "CBB WAR",
-     "sports": [
-      "CBB"
-     ]
-    },
-    {
      "term": "Contract value (surplus)",
      "short": "Projected VORX x market $ per win, minus salary, every year left.",
      "body": [
@@ -589,6 +478,23 @@
      "where": "NBA contract value tab",
      "sports": [
       "NBA"
+     ]
+    },
+    {
+     "term": "xAAV",
+     "short": "The AAV a player would sign for as a free agent now: a share of the cap from position, age and last full season.",
+     "body": [
+      "Fit on real signings, held out a signing year at a time against the mean by position x age. Forms pre-registered; live form = lowest held-out MAE whose top end is calibrated (priced 7%+ of the cap -> signed for 85-115% of it). Square root of the cap share, smeared back; clipped to the league minimum and maximum.",
+      "NHL: 3,241 CapWages deals 2010-26 (standard, 35+, two-way; no ELCs or extensions). WAR, pWAR, 3Y, points and TOI a game, games, age by F/D/G. MAE .83% of the cap vs 1.70 (t -40, 17/17 seasons; forward 11/11). Points and TOI alone tie it (t -1.4): the market pays for points.",
+      "NFL: 12,192 OverTheCap veteran contracts 2014-26 (3+ years after the draft). WAR last two seasons, snaps, games, age by position. MAE .86% vs 1.50 (t -52, 13/13; forward 9/9). WAR adds over snaps alone (t -18). Ceiling = record 24.5% (Burrow 2023).",
+      "NBA: 1,334 Basketball-Reference offseason signings 2011-26 (free agent, multi-year or plain contracts; next season salary on the signing team). XPM last two seasons, VORX, minutes, points and minutes a game, games, age, years in the league. MAE 2.60% vs 5.04 (t -19, 16/16; forward 11/11). XPM/VORX add over points and minutes alone (t -6, 14/16). Max 25/30/35% by years in the league; 2026-27 cap $165M (projected).",
+      "Soccer: not built. No public wage data reachable (Capology blocks); xMV is the transfer-market equivalent."
+     ],
+     "where": "NBA, NFL, NHL contract value tabs",
+     "sports": [
+      "NBA",
+      "NFL",
+      "NHL"
      ]
     },
     {
@@ -608,12 +514,10 @@
      "term": "CBB WAR / WAA",
      "short": "Wins over a replacement / average D-I player.",
      "body": [
-      "WAR = (BPM + 2) x minutes / 40 x .68 x .0143 wins a point; WAA uses BPM.",
-      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 3,485 team seasons 2016-17 to 2025-26:",
-      "wins = .40 x games + team WAR (r .86). Held out: beats the 2025-26-only .0124 in 7 of 9 seasons (t 3.4).",
-      "Flat 68 possessions beats team pace on held-out wins, 9 of 10 seasons (t 2.9). Textbook slope .0347 overstates.",
-      "Replacement -4 fits next-season wins better (9/9) but equals newcomer BPM -1.3 less returner gain +1.1: kept -2.",
-      "FV test: WAR, WAA, career and 5/4/3 WAR fail."
+      "WAR = (BPM + 2) x minutes / 40 x team possessions a 40 / 100 x .0124 wins a point; WAA uses BPM.",
+      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 365 team seasons:",
+      "wins = .41 x games + team WAR (r .85). The textbook slope (.0347 at margin sd 11.5) overstates: schedules",
+      "pair strong with strong and win odds flatten at the ends. FV test: WAR, WAA, career and 5/4/3 WAR fail."
      ],
      "where": "CBB WAR leaders, stats, portal, returning",
      "sports": [
@@ -625,9 +529,7 @@
      "short": "BPM against the position: 100 + 25 x z.",
      "body": [
       "z = (BPM - position mean) / position sd; G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (10%+ minute seasons 2008-16).",
-      "FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26).",
-      "Tabs: each season's own norms (2025-26: G -.23 / 3.84, F .57 / 4.13, C 1.71 / 4.56). Through 8 games sd 4.4-5.5;",
-      "own norms cut error vs full-season Stat+ by a third, 10 of 10 seasons."
+      "FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26)."
      ],
      "where": "CBB stats, WAR leaders, portal; FV inputs",
      "sports": [
@@ -688,7 +590,7 @@
      "short": "Descriptive wins over replacement at goal value.",
      "body": [
       "5v5 on-ice xG vs teammates, PP xG /5, PK /4, finishing (goals - ixG), penalties, share of team leftover xG.",
-      "Goalies: GSAx at full credit. Traded players split over teams by game-log TOI. Sums to team goal differential (R2 .991).",
+      "Goalies: GSAx at full credit. Sums to team goal differential (R2 .975).",
       "Replacement = players outside each team's top 13 F / 7 D / 2 G."
      ],
      "where": "NHL WAR leaders, rookies; hockey prospect outcome",
@@ -701,9 +603,9 @@
      "term": "pWAR / HPM",
      "short": "Projected WAR and projected goals per 60 over an average player.",
      "body": [
-      "HPM = Marcel-weighted (1 / .5 / .25) shrunk rates, components weighted by how well they carry to next season.",
-      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .37 (fully nested .35) vs .26 before (t 4.24, 15/17 seasons).",
-      "Goalie GSAx repeats weakly (weight .21), so top goalie pWAR ~1.5 while goalie WAR runs ~7."
+      "HPM = Marcel-weighted (1 / .7 / .5) shrunk rates, components weighted by how well they carry to next season.",
+      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .38 vs .23 before (t 4.95, 15/17 seasons).",
+      "Goalie GSAx barely repeats (weight .07), so goalie pWAR ~0.4 while goalie WAR runs ~7."
      ],
      "where": "NHL WAR leaders, backup watch, rookies",
      "sports": [
@@ -792,35 +694,6 @@
       "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink. Held out R2 .131 vs .120 Nov 2, .108 K-D."
      ],
      "where": "Counter-Strike players, prospects, player model",
-     "sports": [
-      "CS2"
-     ]
-    },
-    {
-     "term": "Team RWA (CS2)",
-     "short": "The current five's RWA summed: round win % above 50 against a five of average tier-1 players.",
-     "body": [
-      "5 x the mean RWA of the latest roster's players with bo3.gg stats (3+ needed). The same five-mean is already a term in the series model and ARK.",
-      "Held Jul 2025 on (21,056 series, base log loss .5530; Bonferroni cut 2.39 for 3 tests), none shipped:",
-      "lineup as a unit (round share 4+ of the five won together beyond their RWA) t +0.27, top 50 +3.20; roster sum with unknowns at 0 t -0.96, top 50 +0.70;",
-      "team RWA in place of player Elo .6193 (t +27.6)."
-     ],
-     "where": "Counter-Strike ARK Ranking (RWA column)",
-     "sports": [
-      "CS2"
-     ]
-    },
-    {
-     "term": "RWA (ESEA)",
-     "short": "Round win % an ESEA league player adds per round, opponent- and division-adjusted; 0 = average Main player.",
-     "body": [
-      "Map line = ARK 2 stat weights + the team-result credit, in round win % per round over the average line.",
-      "Each line is credited with the opposing five's mean RWA, solved iteratively; career league maps since S53, no decay.",
-      "Shrunk 15 rounds toward a division prior (4 per level, Open -2 to Advanced +1).",
-      "Held S58-S59 matches: log loss 0.5972 vs ARK Rating 0.6532 (t -12.94) and player Elo 0.6205 (t -5.98), 2/2 seasons. OLS stat weights instead: 0.6153.",
-      "1NT match preview: .316 x elo/talent log-odds + 14.2 x RWA gap / 100; S59 leave-one-day-out 0.5162 vs 0.5581 with player Elo (t -1.68)."
-     ],
-     "where": "1NTERLYTICS: match preview, season stats, player rankings",
      "sports": [
       "CS2"
      ]
@@ -1923,7 +1796,7 @@
      "generational",
      "5+ time All-Pro",
      "7+ All-NBA teams",
-     "1 in 4 classes, 6.45+ peak WAR",
+     "1 in 4 classes, 6.48+ peak WAR",
      "#1 / 2 birth years",
      "top 5 overall"
     ],
@@ -1932,7 +1805,7 @@
      "star",
      "2-time All-Pro",
      "3+ All-NBA teams",
-     "#1 / class, 4.62+ peak WAR",
+     "#1 / class, 4.59+ peak WAR",
      "top 3 / birth year",
      "top 10 overall"
     ],
@@ -1941,7 +1814,7 @@
      "plus",
      "Pro Bowler",
      "2+ All-Star",
-     "top 5 / class, 3.16+ peak WAR",
+     "top 5 / class, 3.18+ peak WAR",
      "top 20 / birth year",
      "All-Star / #3 SP"
     ],
@@ -1959,7 +1832,7 @@
      "average",
      "4+ seasons starting",
      "average starter",
-     "top 20 / class, 1.48+ peak WAR",
+     "top 20 / class, 1.49+ peak WAR",
      "top 90 / birth year (big-five regular)",
      "average regular"
     ],
@@ -1968,7 +1841,7 @@
      "below average",
      "2+ seasons starting",
      "low-end starter",
-     "top 30 / class, 0.86+ peak WAR",
+     "top 30 / class, 0.87+ peak WAR",
      "top 150 / birth year",
      "low-end regular / platoon"
     ],
@@ -1977,7 +1850,7 @@
      "bench",
      "rotational",
      "end of rotation",
-     "top 45 / class, 0.38+ peak WAR",
+     "top 45 / class, 0.39+ peak WAR",
      "top 250 / birth year (top-flight regular)",
      "bench"
     ],
@@ -2274,7 +2147,7 @@
    "rows": [
     [
      "80",
-     "6.45+ peak WAR a season",
+     "6.48+ peak WAR a season",
      "one in four classes",
      "top 0.1% of picks",
      "0 / 0",
@@ -2282,7 +2155,7 @@
     ],
     [
      "75",
-     "5.31+ peak WAR a season",
+     "5.35+ peak WAR a season",
      "one in two classes",
      "top 0.2% of picks",
      "0 / 2",
@@ -2290,7 +2163,7 @@
     ],
     [
      "70",
-     "4.62+ peak WAR a season",
+     "4.59+ peak WAR a season",
      "the best of a class",
      "top 0.5% of picks",
      "0 / 3",
@@ -2298,7 +2171,7 @@
     ],
     [
      "65",
-     "4.01+ peak WAR a season",
+     "4.04+ peak WAR a season",
      "top 2 of a class",
      "top 0.9% of picks",
      "0 / 4",
@@ -2306,11 +2179,11 @@
     ],
     [
      "60",
-     "3.16+ peak WAR a season",
+     "3.18+ peak WAR a season",
      "top 5 of a class",
      "top 2.4% of picks",
      "1 / 10",
-     "60-64: 62.2 -> 58.7 (n 12, NHL 100%)"
+     "60-64: 62.2 -> 58.6 (n 12, NHL 100%)"
     ],
     [
      "55",
@@ -2322,27 +2195,27 @@
     ],
     [
      "50",
-     "1.48+ peak WAR a season",
+     "1.49+ peak WAR a season",
      "top 20 (NHL regular)",
      "top 9.4% of picks",
      "4 / 30",
-     "50-54: 51.8 -> 50.4 (n 33, NHL 97%)"
+     "50-54: 51.7 -> 50.4 (n 33, NHL 97%)"
     ],
     [
      "45",
-     "0.86+ peak WAR a season",
+     "0.87+ peak WAR a season",
      "top 30",
      "top 14.2% of picks",
      "7 / 75",
-     "45-49: 47.4 -> 49.1 (n 63, NHL 98%)"
+     "45-49: 47.3 -> 49.1 (n 63, NHL 98%)"
     ],
     [
      "40",
-     "0.38+ peak WAR a season",
+     "0.39+ peak WAR a season",
      "top 45 (NHL career)",
      "top 21.3% of picks",
      "20 / 124",
-     "40-44: 42.4 -> 43.9 (n 129, NHL 98%)"
+     "40-44: 42.4 -> 44.0 (n 128, NHL 98%)"
     ],
     [
      "30",
@@ -2350,7 +2223,7 @@
      "-",
      "-",
      "86 / 300",
-     "30-34: 32.1 -> 31.4 (n 477, NHL 64%)"
+     "30-34: 32.1 -> 31.4 (n 474, NHL 64%)"
     ],
     [
      "20",
@@ -2358,7 +2231,7 @@
      "-",
      "-",
      "192 / 300",
-     "20-24: 22.8 -> 23.6 (n 807, NHL 24%)"
+     "20-24: 22.8 -> 23.6 (n 811, NHL 24%)"
     ]
    ]
   },

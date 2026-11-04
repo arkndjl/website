@@ -84,6 +84,11 @@ jobs:
         if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
         continue-on-error: true
         run: python3 scripts/nba_proj.py
+      # xAAV column on the contract value tab (scripts/xaav.py: static/data/xaav-nba.json, Basketball-Reference per game)
+      - name: xAAV
+        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        continue-on-error: true
+        run: python3 scripts/xaav.py nba
       # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/nba.json), display only
       - name: Rookies tab
         continue-on-error: true
@@ -152,7 +157,7 @@ jobs:
         run: python3 scripts/model_monitor.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="data/units_nba.json scripts/data/faces_nba.json scripts/data/nba_dob.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-lineup-leaders.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
+          files="static/data/xaav-nba.json data/units_nba.json scripts/data/faces_nba.json scripts/data/nba_dob.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-lineup-leaders.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
