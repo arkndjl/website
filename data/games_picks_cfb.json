@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T16:16:27Z",
+ "asof": "2026-11-04T16:18:14Z",
  "recenter": {
   "week": 0.85
  },
@@ -706,7 +706,7 @@
    "price": -100.0,
    "p": 0.52,
    "ev": 0.041,
-   "units": 2.5,
+   "units": 2.75,
    "edge": 5.0,
    "x": 3.0,
    "pDU": 0.515,
@@ -720,7 +720,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 3.0,
-   "unitsCap": 2.5
+   "unitsCap": 2.75
   },
   {
    "id": "401862819",
@@ -1600,6 +1600,22 @@
    "tm": 58.6
   },
   {
+   "id": "401858511",
+   "sport": "cfb",
+   "kick": "2026-11-08T00:30:00.000Z",
+   "home": "Michigan",
+   "away": "Michigan State",
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -106.0,
+   "edge": 3.2,
+   "x": 3.0,
+   "why": "no edge at -106",
+   "m": 13.3,
+   "tm": 42.7
+  },
+  {
    "id": "401856852",
    "sport": "cfb",
    "kick": "2026-11-08T00:30:00.000Z",
@@ -1934,22 +1950,6 @@
    "why": "edge under 3",
    "m": -5.3,
    "tm": 52.8
-  },
-  {
-   "id": "401866457",
-   "sport": "cfb",
-   "kick": "2026-11-05T00:00:00.000Z",
-   "home": "Sacramento State",
-   "away": "Toledo",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -104.0,
-   "edge": 1.3,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -25.1,
-   "tm": 53.8
   }
  ],
  "games": {
@@ -2230,11 +2230,11 @@
    "state": "under"
   },
   "401858511": {
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -104.0,
-   "edge": 0.2,
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -106.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
@@ -2726,13 +2726,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7660,
+  "snapshots": 7663,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1838,
+    "clvN": 1839,
     "clvRet": -0.0444,
-    "clvT": -26.46,
+    "clvT": -26.49,
     "clv": 0.2,
     "beat": 0.271,
     "still": 0.528
@@ -2930,7 +2930,7 @@
    "price": -100.0,
    "p": 0.52,
    "ev": 0.041,
-   "units": 2.5,
+   "units": 2.75,
    "edge": 5.0,
    "x": 3.0,
    "pDU": 0.515,
@@ -2943,7 +2943,7 @@
    "close": 52.5,
    "pass": true,
    "unitsRaw": 3.0,
-   "unitsCap": 2.5
+   "unitsCap": 2.75
   },
   {
    "id": "401858514",
@@ -3815,8 +3815,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 30.25,
-    "scale": 0.9091,
+    "raw": 29.5,
+    "scale": 0.9322,
     "down": 12.5
    },
    "2026-11-05": {
@@ -3832,7 +3832,7 @@
     "scale": 0.8163
    },
    "2026-11-08": {
-    "raw": 30.5,
+    "raw": 30.25,
     "scale": 1.0
    },
    "2026-11-09": {
