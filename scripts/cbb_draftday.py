@@ -27,6 +27,10 @@ the player's college class (5 class folds), players graded 30+ or reaching 30+ b
 Tested and not used: athletic testing on top of the boards (guard composite t -0.1, 2/5; every group's composite worse;
 the boards price it), the combine invite on top of the boards (t +2.9, worse 5/5), the returner model refit on
 season-end rows with leavers (MSE +1.4, t 0.9: the shipped model is kept), position recalibration.
+Held-out residual audit, Nov 4 2026 (/mnt/project-files/fv/sweep-nov04/cbb/; finals 2009-16 class folds, forward 2017-20,
+Holm k 3, none passed): June-rank disagreement term on the map (t -1.1, 4/5, forward and forward top 25 worse), age at
+draft x grade (t +1.2, 3/5; forward better t -3.1: retest when the 2021-22 exits have six NBA seasons), a row-level
+line for the map's top quarter in place of the last PAV bin and its slope (t +0.4, 1/5).
 """
 import gzip, html, json, math, os, sys
 from collections import defaultdict
@@ -136,7 +140,9 @@ def end_map(tr, fit):
     leaves isn't known yet), as cbb_fit.emap_cal. The preseason map (emap.stage, fit on simulated preseason boards)
     left draft week's top 10 a season 3.6 FV under what they became (48.6 given, 52.2 became; top 25 44.9 / 47.7).
     Class held out: top 10 52.2 / 51.3, top 25 48.5 / 47.7 (bias smaller in 6 of 8 seasons), MSE 208.0 -> 206.9
-    (t -0.8, better in 4 of 5 folds)."""
+    (t -0.8, better in 4 of 5 folds). Nov 4 2026, class held out (all 2009-16 season-end rows, Holm k 3, none passed;
+    the map's own 30+ slope is .97, centers 30+ -0.5): headline top-slope term (t -0.2, 3/5), centers' slope term
+    (t +0.6, 2/5; forward better t -2.7), coarser top bins (tail 2e-2: t +5.2, 0/5)."""
     RR = [dict(r, yr=NEXT.get(r['yr'], 'Sr'), f=dict(r['f'], newcomer=False)) for r in tr]
     M = F.emap_cal(RR, np.array([r['s'] for r in tr])[None, :])
     M['kind'] = 'calibration (season-end rows 2009-16, the board stage at draft week; scripts/cbb_draftday.py)'

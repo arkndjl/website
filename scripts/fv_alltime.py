@@ -208,6 +208,8 @@ def cfb(path):
     # each class's top 32 realized 45.9 -> 48.8. On the list (one row per player, graded or reaching 35+), against
     # each player's best season: MSE 461 -> 310 (t -15.2, 9/9). Tested and not used: athletic z by position, speed
     # score, measured height and weight (+.3 MSE), a position hinge at the top (t -0.0), invited x grade
+    # Nov 4 2026, TE top (25 given 51 became 43): a TE own line (t -1.7), TE slope (t -2.0), TE+RB lines (t -1.2), Holm k 3:
+    # none pass. Part of the gap is AV (TE Pro Bowlers map to 58 vs 63-75 elsewhere); the rest is a flat TE grade slope (.72)
     Z = lambda r, q: X(r['fvx']) + [float(q.get('inv') or 0), float(q.get('ath') or 0)]
     fin = [(r, q) for r, q in zip(rows, src) if q['final'] and r['last'] < 2026]
     fits = {}
