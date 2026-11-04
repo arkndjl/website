@@ -11,7 +11,7 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,goalies,projections,rookies,ARKLIST|rosters:depth chart,lines,backup watch|games:games,game table|teams:ARK Ranking,season odds,offense,defense,power play,penalty kill" side="true" label="NHL views" >}}
+{{< wintabs groups="players:WAR leaders,goalies,projections,contract value,rookies,ARKLIST|rosters:depth chart,lines,backup watch|games:games,game table|teams:ARK Ranking,season odds,offense,defense,power play,penalty kill" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
@@ -31,6 +31,7 @@ cover = "/og/nhl.png"
 {{< nhlgoalies title="goalies :: goals saved above expected" tab="goalies" >}}
 {{< nhlwar title="NHL WAR :: leaderboard" tab="WAR leaders" >}}
 {{< pctl sport="nhl" icon="hockey" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
+{{< xaav sport="nhl" title="contract value :: xAAV" tab="contract value" >}}
 {{< rookies sport="nhl" icon="hockey" title="rookies :: WAR and pWAR against draft slot and FV" tab="rookies" >}}
 {{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
 {{< arklist sport="nhl" title="ARKLIST :: NHL" tab="ARKLIST" >}}

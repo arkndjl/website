@@ -1,0 +1,166 @@
+{{- /* xAAV contract value for the NHL and NFL boards: every player of the last full season (static/data/xaav-<sport>.json,
+       built by scripts/xaav.py), the AAV he would sign for as a free agent now against his current cap hit / APY.
+       {{< xaav sport="nhl|nfl" title="..." tab="..." >}}
+       Views: xAAV (default), underpaid (xAAV over his deal), overpaid. Filters ride in the address with an x prefix. */ -}}
+{{- $s := .Get "sport" -}}
+{{- $nhl := eq $s "nhl" -}}
+<div class="win cfb nbaxpm xaav"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-xaav="{{ $s }}" data-gfx-logo="/img/{{ $s }}/{}.png" data-src="{{ printf "data/xaav-%s.json" $s | relURL }}" data-gfx-cols="{{ if $nhl }}RK,Player,WAR,pWAR,3Y,Cap hit,xAAV,Gap{{ else }}RK,Player,WAR,WAA,Snaps,APY,xAAV,Gap{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ if $nhl }}hockey{{ else }}football{{ end }}"/></svg>{{ .Get "title" | default (printf "%s_contracts.exe" $s) }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nbaxpm__bar" data-xa-bar hidden onsubmit="return false" aria-label="filter contracts">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <label class="cfb__field"><span>pos</span><select name="pos"><option value="">any</option></select></label>
+    <label class="cfb__field"><span>age</span><select name="age">
+      <option value="">any</option><option value="-24">24 and under</option><option value="25-29">25 to 29</option><option value="30-">30 and over</option>
+    </select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
+    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
+      <button type="button" class="cfb__chip is-on" data-view="" aria-pressed="true" title="xAAV, highest first">xAAV</button>
+      <button type="button" class="cfb__chip" data-view="u" aria-pressed="false" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, most underpaid first">underpaid</button>
+      <button type="button" class="cfb__chip" data-view="o" aria-pressed="false" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, most overpaid first">overpaid</button>
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaxpm__table">
+      <thead><tr>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
+        <th data-sort="n">Player</th>
+        {{- if $nhl }}
+        <th data-sort="war" data-num class="nbaxpm__ph" title="WAR, last full season">WAR</th>
+        <th data-sort="pwar" data-num class="nbaxpm__ph" title="pWAR: projected WAR a season, at the end of the last full season">pWAR</th>
+        <th data-sort="p3" data-num class="nbaxpm__ph" title="3Y: projected WAR over the next three seasons, at the end of the last full season">3Y</th>
+        <th data-sort="cap" data-num class="nbaxpm__ph" title="cap hit this season, $M (CapWages); ELC = entry-level">Cap hit</th>
+        {{- else }}
+        <th data-sort="war" data-num class="nbaxpm__ph" title="WAR, last full season (special teams in)">WAR</th>
+        <th data-sort="waa" data-num class="nbaxpm__ph" title="WAA: wins above an average regular at his position, last full season">WAA</th>
+        <th data-sort="sn" data-num class="nbaxpm__ph" title="snaps, last full season">Snaps</th>
+        <th data-sort="apy" data-num class="nbaxpm__ph" title="APY of his current contract, $M (OverTheCap via nflverse); year signed and years below">APY</th>
+        {{- end }}
+        <th data-sort="x" data-num class="c-x" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's {{ if $nhl }}WAR, pWAR, 3Y, points and ice time{{ else }}WAR and snaps{{ end }}, priced at this season's cap">xAAV</th>
+        <th data-sort="gap" data-num class="c-gap" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, $M: over 0 = paid under what he would get now">Gap</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-xa-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-xa-none hidden>no players match.</p>
+  </div>
+  <div class="win__status" data-xa-about><span data-xa-count></span>
+    <span class="winpager" data-xa-pager hidden>
+      <button type="button" class="winpager__btn" data-xa-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-xa-page>1</span>/<span data-xa-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-xa-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-xa-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var win = document.querySelector('[data-xaav="{{ $s }}"]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var NHL = win.dataset.xaav === 'nhl', LG = win.dataset.xaav;
+  var bar = win.querySelector('[data-xa-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
+      count = win.querySelector('[data-xa-count]'), none = win.querySelector('[data-xa-none]'), loading = win.querySelector('[data-xa-loading]'),
+      asof = win.querySelector('[data-xa-asof]'), pager = win.querySelector('[data-xa-pager]'), pageEl = win.querySelector('[data-xa-page]'), pagesEl = win.querySelector('[data-xa-pages]');
+  var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var data = null, view = '', sortKey = 'rk', dir = 1, page = 0;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function face(p) {
+    var u = !p.ph ? '/img/face.svg' : NHL ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph;
+    return '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
+  }
+  function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + LG + '/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
+  function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
+  function f(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(d == null ? 1 : d); }
+  function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+  function readHash() {
+    var h = new URLSearchParams(location.hash.slice(1)), e = bar.elements;
+    view = h.get('xview') || ''; if (['', 'u', 'o'].indexOf(view) < 0) view = '';
+    e.team.value = h.get('xteam') || ''; e.pos.value = h.get('xpos') || ''; e.q.value = h.get('xq') || ''; e.age.value = h.get('xage') || ''; chips();
+  }
+  function writeHash() {
+    var h = new URLSearchParams(location.hash.slice(1)), e = bar.elements;
+    ['xview', 'xteam', 'xpos', 'xage', 'xq'].forEach(function (k) { h.delete(k); });
+    if (view) h.set('xview', view); if (e.team.value) h.set('xteam', e.team.value); if (e.pos.value) h.set('xpos', e.pos.value);
+    if (e.age.value) h.set('xage', e.age.value); if (e.q.value.trim()) h.set('xq', e.q.value.trim());
+    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+  }
+  function deal(p) { return NHL ? p.cap : p.apy; }
+  function render() {
+    if (!data) return;
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, pos = e.pos.value,
+        ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
+    var list = data.players.filter(function (p) {
+      if (view && p.gap == null) return false;
+      if (team && p.tm !== team) return false;
+      if (pos && p.pos !== pos && p.grp !== pos) return false;
+      if (e.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
+      return true;
+    }).sort(function (a, b) { return view === 'u' ? b.gap - a.gap : view === 'o' ? a.gap - b.gap : b.x - a.x || (b.war || 0) - (a.war || 0); });
+    list.forEach(function (p, i) { p.rk = i + 1; });
+    var shown = list.length;
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
+    if (sortKey !== 'rk') {
+      var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
+      list = list.slice().sort(function (a, b) {
+        var x = a[sortKey], y = b[sortKey];
+        if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
+        return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
+      });
+    } else if (dir < 0) list = list.slice().reverse();
+    var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+      var d = deal(p), sub = esc(p.tm) + ' · ' + esc(p.pos) + (p.age == null ? '' : ' · ' + p.age) + (d == null ? '' : ' · $' + d.toFixed(1) + 'M');
+      var cells = NHL
+        ? '<td class="cfb__num nbaxpm__ph">' + f(p.war) + '</td><td class="cfb__num nbaxpm__ph">' + f(p.pwar) + '</td><td class="cfb__num nbaxpm__ph">' + f(p.p3) + '</td>' +
+          '<td class="cfb__num nbaxpm__ph"' + (p.yl ? ' title="' + p.yl + ' season' + (p.yl > 1 ? 's' : '') + ' left' + (p.st ? ', then ' + esc(p.st) : '') + '"' : '') + '>' + f(p.cap, 2) + (p.ct ? '<span class="cfb__dim"> ' + esc(p.ct) + '</span>' : '') + '</td>'
+        : '<td class="cfb__num nbaxpm__ph">' + f(p.war, 2) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.waa, 2) + '</td><td class="cfb__num nbaxpm__ph">' + (p.sn || 0) + '</td>' +
+          '<td class="cfb__num nbaxpm__ph"' + (p.ys ? ' title="signed ' + p.ys + (p.yrs ? ', ' + p.yrs + ' years' : '') + '"' : '') + '>' + f(p.apy, 2) + '</td>';
+      return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + sub + '</span></td>' + cells +
+        '<td class="cfb__num c-x nbaxpm__v' + (view ? '' : ' is-key') + '">' + p.x.toFixed(1) + '</td>' +
+        '<td class="cfb__num c-gap nbaxpm__v' + (view ? ' is-key' : '') + '">' + sg(p.gap) + '</td></tr>';
+    }).join('');
+    none.hidden = list.length > 0;
+    count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
+    pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+    var t = new Date(data.asof);
+    asof.textContent = (data.label || data.season) + ' · cap $' + data.cap.toFixed(1) + 'M · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+  }
+  function opts(sel, vals) {
+    var want = sel.value;
+    sel.innerHTML = '<option value="">any</option>' + vals.map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
+    sel.value = vals.indexOf(want) >= 0 ? want : '';
+  }
+  function update() { page = 0; writeHash(); render(); }
+  bar.addEventListener('input', update); bar.addEventListener('change', update);
+  bar.addEventListener('reset', function () { view = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
+  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
+  });
+  ths.forEach(function (th) {
+    th.tabIndex = 0;
+    function go() {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  win.querySelectorAll('[data-xa-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.xaStep; if (page < 0) page = 0; render(); }); });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+    data = d;
+    var tms = {}, ps = {};
+    d.players.forEach(function (p) { if (p.tm) tms[p.tm] = 1; ps[NHL ? p.grp : p.pos] = 1; });
+    var order = NHL ? ['F', 'D', 'G'] : ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K', 'P'];
+    opts(bar.elements.team, Object.keys(tms).sort()); opts(bar.elements.pos, order.filter(function (k) { return ps[k]; }));
+    readHash();
+    if (d.test) win.querySelector('[data-xa-about]').title = 'xAAV fit on ' + d.test.n + ' signings, held out a signing year at a time: ' + d.test.maeA.toFixed(2) + ' points of the cap mean miss vs ' + d.test.maeB.toFixed(2) + ' by position and age alone. Inputs: last full season (' + d.basis + ').';
+    loading.hidden = true; bar.hidden = false; render();
+  }).catch(function () { loading.textContent = 'load failed.'; });
+})();
+</script>
+{{- partial "gfx.html" . -}}
