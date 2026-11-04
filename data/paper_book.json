@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-04T01:07:16Z",
+ "asof": "2026-11-04T01:21:51Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 97.64,
   "peak": 118.08,
   "drawdown": 0.1731,
-  "open": 111.75,
+  "open": 104.75,
   "path": [
    101.5,
    101.6,
@@ -220,7 +220,7 @@
   ]
  },
  "record": {
-  "n": 272,
+  "n": 273,
   "clvN": 209,
   "clvRet": -0.0343,
   "clvT": -6.97,
@@ -383,7 +383,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 10,
+   "n": 11,
    "clvN": 6,
    "clvRet": -0.0518,
    "clvT": -2.35,
@@ -425,7 +425,7 @@
    "label": "CBB spread",
    "sport": "cbb",
    "mk": "spread",
-   "n": 44,
+   "n": 45,
    "clvN": 34,
    "clvRet": -0.0363,
    "clvT": -3.41,
@@ -446,7 +446,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 54,
+   "n": 55,
    "clvN": 51,
    "clvRet": -0.062,
    "clvT": -4.81,
@@ -488,7 +488,7 @@
    "label": "NBA spread",
    "sport": "nba",
    "mk": "spread",
-   "n": 7,
+   "n": 6,
    "clvN": 3,
    "clvRet": -0.0129,
    "clvT": -2.03,
@@ -551,7 +551,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 40,
+   "n": 39,
    "clvN": 34,
    "clvRet": -0.0163,
    "clvT": -1.11,
@@ -923,8 +923,8 @@
    "edge": 4.4,
    "ev": 0.009,
    "event": null,
-   "pass": true,
-   "close": 155.5
+   "pass": false,
+   "close": 156.5
   },
   {
    "rule": "cbb-spread",
@@ -1315,8 +1315,8 @@
    "edge": 2.9,
    "ev": 0.0412,
    "event": null,
-   "pass": false,
-   "close": 12.5
+   "pass": true,
+   "close": 11.5
   },
   {
    "rule": "nba-total",
@@ -1338,6 +1338,27 @@
    "event": null,
    "pass": false,
    "close": 233.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401928811",
+   "k": "2026-11-05T01:00:00Z",
+   "slate": "cbb:2026-11-04",
+   "h": "South Dakota",
+   "a": "Northern Kentucky",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -104.0,
+   "bet": "South Dakota +2.5 -104",
+   "placed": "2026-11-04T01:21:46Z",
+   "stake": 0.25,
+   "edge": 3.0,
+   "ev": 0.0006,
+   "event": null,
+   "pass": false,
+   "close": -2.5
   },
   {
    "rule": "cbb-total",
@@ -2401,7 +2422,7 @@
    "edge": 11.2,
    "ev": 0.163,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -2422,6 +2443,27 @@
    "ev": 0.0895,
    "event": null,
    "pass": false
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_09_TB_CHI",
+   "k": "2026-11-09T01:20:00Z",
+   "slate": "nfl:2026-11-08",
+   "h": "CHI",
+   "a": "TB",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -104.0,
+   "bet": "under 47.5 -104",
+   "placed": "2026-11-04T01:21:44Z",
+   "stake": 0.25,
+   "edge": 2.5,
+   "ev": 0.0029,
+   "event": null,
+   "pass": false,
+   "close": 47.5
   },
   {
    "rule": "nfl-ml",
@@ -13336,8 +13378,8 @@
    "edge": 4.4,
    "ev": 0.009,
    "event": null,
-   "pass": true,
-   "close": 155.5
+   "pass": false,
+   "close": 156.5
   },
   {
    "rule": "cbb-spread",
@@ -13728,8 +13770,8 @@
    "edge": 2.9,
    "ev": 0.0412,
    "event": null,
-   "pass": false,
-   "close": 12.5
+   "pass": true,
+   "close": 11.5
   },
   {
    "rule": "nba-total",
@@ -13751,6 +13793,27 @@
    "event": null,
    "pass": false,
    "close": 233.5
+  },
+  {
+   "rule": "cbb-spread",
+   "sport": "cbb",
+   "id": "401928811",
+   "k": "2026-11-05T01:00:00Z",
+   "slate": "cbb:2026-11-04",
+   "h": "South Dakota",
+   "a": "Northern Kentucky",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -104.0,
+   "bet": "South Dakota +2.5 -104",
+   "placed": "2026-11-04T01:21:46Z",
+   "stake": 0.25,
+   "edge": 3.0,
+   "ev": 0.0006,
+   "event": null,
+   "pass": false,
+   "close": -2.5
   },
   {
    "rule": "cbb-total",
@@ -14814,7 +14877,7 @@
    "edge": 11.2,
    "ev": 0.163,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -14835,6 +14898,27 @@
    "ev": 0.0895,
    "event": null,
    "pass": false
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_09_TB_CHI",
+   "k": "2026-11-09T01:20:00Z",
+   "slate": "nfl:2026-11-08",
+   "h": "CHI",
+   "a": "TB",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -104.0,
+   "bet": "under 47.5 -104",
+   "placed": "2026-11-04T01:21:44Z",
+   "stake": 0.25,
+   "edge": 2.5,
+   "ev": 0.0029,
+   "event": null,
+   "pass": false,
+   "close": 47.5
   },
   {
    "rule": "nfl-ml",

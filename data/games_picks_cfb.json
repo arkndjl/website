@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T01:07:02Z",
+ "asof": "2026-11-04T01:21:41Z",
  "recenter": {
   "week": 0.82
  },
@@ -1149,7 +1149,7 @@
     "side": "over",
     "line": 39.5,
     "price": -102.0,
-    "ev": 0.075,
+    "ev": 0.076,
     "units": 3.5
    }
   },
@@ -1215,7 +1215,7 @@
     "side": "over",
     "line": 45.5,
     "price": 104.0,
-    "ev": 0.059,
+    "ev": 0.06,
     "units": 3.5,
     "unitsRaw": 4.5,
     "unitsCap": 3.5
@@ -1801,22 +1801,6 @@
    "tm": 50.8
   },
   {
-   "id": "401858290",
-   "sport": "cfb",
-   "kick": "2026-11-07T20:30:00.000Z",
-   "home": "Wake Forest",
-   "away": "Merrimack",
-   "mk": "total",
-   "side": "under",
-   "line": 59.5,
-   "price": -110,
-   "edge": 2.2,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 52.9,
-   "tm": 57.3
-  },
-  {
    "id": "401860913",
    "sport": "cfb",
    "kick": "2026-11-08T02:30:00.000Z",
@@ -1959,6 +1943,22 @@
    "why": "edge under 3",
    "m": -25,
    "tm": 53.9
+  },
+  {
+   "id": "401866456",
+   "sport": "cfb",
+   "kick": "2026-11-05T00:30:00.000Z",
+   "home": "Eastern Michigan",
+   "away": "Central Michigan",
+   "mk": "spread",
+   "side": "away",
+   "line": 1.5,
+   "price": -111.0,
+   "edge": 2.7,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -1.2,
+   "tm": 45.5
   }
  ],
  "games": {
@@ -2014,7 +2014,7 @@
    "mk": "spread",
    "side": "away",
    "line": 5.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -2183,7 +2183,7 @@
    "side": "over",
    "line": 39.5,
    "price": -102.0,
-   "ev": 0.075,
+   "ev": 0.076,
    "edge": 10.1,
    "units": 3.5,
    "home": "East Carolina",
@@ -2394,24 +2394,12 @@
    "away": "James Madison",
    "state": "under"
   },
-  "401858290": {
-   "mk": "total",
-   "side": "under",
-   "line": 59.5,
-   "price": -110,
-   "edge": 2.2,
-   "ev": null,
-   "units": 0.0,
-   "home": "Wake Forest",
-   "away": "Merrimack",
-   "state": "under"
-  },
   "401858517": {
    "mk": "total",
    "side": "over",
    "line": 45.5,
    "price": 104.0,
-   "ev": 0.059,
+   "ev": 0.06,
    "edge": 4.6,
    "units": 4.5,
    "home": "Wisconsin",
@@ -2747,16 +2735,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7293,
+  "snapshots": 7305,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1733,
+    "clvN": 1736,
     "clvRet": -0.0455,
-    "clvT": -25.65,
+    "clvT": -25.7,
     "clv": 0.18,
     "beat": 0.267,
-    "still": 0.517
+    "still": 0.518
    },
    {
     "when": "6-24h",
@@ -3827,12 +3815,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 3.25,
+    "raw": 6.25,
     "scale": 1.0,
     "down": 30.75
    },
    "2026-11-04": {
-    "raw": 36.75,
+    "raw": 34.25,
     "scale": 1.0
    },
    "2026-11-05": {
@@ -3848,7 +3836,7 @@
     "scale": 0.8
    },
    "2026-11-08": {
-    "raw": 20.0,
+    "raw": 14.75,
     "scale": 1.0
    },
    "2026-11-09": {

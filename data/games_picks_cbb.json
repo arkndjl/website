@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T01:07:09Z",
+ "asof": "2026-11-04T01:21:46Z",
  "recenter": {
-  "2026-11-03": -12.38,
+  "2026-11-03": -12.39,
   "2026-11-04": -12.42
  },
  "monitor": {
@@ -244,9 +244,9 @@
     "mk": "total",
     "side": "over",
     "line": 158.5,
-    "price": -106.0,
-    "ev": 0.08,
-    "units": 2.25
+    "price": -104.0,
+    "ev": 0.09,
+    "units": 3.25
    }
   },
   {
@@ -446,9 +446,15 @@
    "tmRaw": 147.4,
    "flagged": "2026-11-04T00:46:47Z",
    "betTo": 157.5,
-   "close": 155.5,
-   "now": null,
-   "pass": true
+   "close": 156.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 156.5,
+    "price": -100.0,
+    "ev": 0.061,
+    "units": 3.0
+   }
   },
   {
    "id": "401909551",
@@ -616,6 +622,39 @@
    "now": null
   },
   {
+   "id": "401928811",
+   "espn": "401928811",
+   "sport": "cbb",
+   "kick": "2026-11-05T01:00:00Z",
+   "home": "South Dakota",
+   "away": "Northern Kentucky",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -104.0,
+   "p": 0.518,
+   "ev": 0.017,
+   "units": 0.25,
+   "edge": 3.0,
+   "x": 2.5,
+   "pDU": 0.5101,
+   "evDU": 0.0006,
+   "m": 0.5,
+   "tm": 164.5,
+   "tmRaw": 152.1,
+   "flagged": "2026-11-04T01:21:46Z",
+   "betTo": -2.0,
+   "close": -2.5,
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": -2.5,
+    "price": -104.0,
+    "ev": 0.017,
+    "units": 0.25
+   }
+  },
+  {
    "id": "401909796",
    "espn": "401909796",
    "sport": "cbb",
@@ -743,7 +782,7 @@
    "mk": "spread",
    "side": "away",
    "line": 10.5,
-   "price": 102.0,
+   "price": 104.0,
    "edge": 0.9,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -796,7 +835,7 @@
    "mk": "spread",
    "side": "away",
    "line": 10.5,
-   "price": 102.0,
+   "price": 104.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -844,10 +883,10 @@
    "mk": "total",
    "side": "over",
    "line": 158.5,
-   "price": -106.0,
-   "ev": 0.08,
+   "price": -104.0,
+   "ev": 0.09,
    "edge": 6.0,
-   "units": 2.25,
+   "units": 3.25,
    "home": "South Dakota",
    "away": "Northern Kentucky",
    "state": "pick"
@@ -905,7 +944,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4323,
+  "snapshots": 4329,
   "buckets": [
    {
     "when": "24h+",
@@ -918,21 +957,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 591,
-    "clvRet": -0.0433,
-    "clvT": -9.34,
+    "clvN": 592,
+    "clvRet": -0.0434,
+    "clvT": -9.36,
     "clv": 0.07,
     "beat": 0.262,
-    "still": 0.399
+    "still": 0.4
    },
    {
     "when": "1-6h",
-    "clvN": 429,
+    "clvN": 431,
     "clvRet": -0.0545,
-    "clvT": -23.21,
+    "clvT": -23.29,
     "clv": -0.13,
-    "beat": 0.11,
-    "still": 0.674
+    "beat": 0.109,
+    "still": 0.675
    },
    {
     "when": "<1h",
@@ -7677,8 +7716,7 @@
    "tmRaw": 147.4,
    "flagged": "2026-11-04T00:46:47Z",
    "betTo": 157.5,
-   "close": 155.5,
-   "pass": true
+   "close": 156.5
   },
   {
    "id": "401920806",
@@ -7731,18 +7769,43 @@
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
    "close": 158.5
+  },
+  {
+   "id": "401928811",
+   "espn": "401928811",
+   "sport": "cbb",
+   "kick": "2026-11-05T01:00:00Z",
+   "home": "South Dakota",
+   "away": "Northern Kentucky",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -104.0,
+   "p": 0.518,
+   "ev": 0.017,
+   "units": 0.25,
+   "edge": 3.0,
+   "x": 2.5,
+   "pDU": 0.5101,
+   "evDU": 0.0006,
+   "m": 0.5,
+   "tm": 164.5,
+   "tmRaw": 152.1,
+   "flagged": "2026-11-04T01:21:46Z",
+   "betTo": -2.0,
+   "close": -2.5
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 3.25,
+    "raw": 6.25,
     "scale": 1.0,
     "down": 30.75
    },
    "2026-11-04": {
-    "raw": 36.75,
+    "raw": 34.25,
     "scale": 1.0
    },
    "2026-11-05": {
@@ -7758,7 +7821,7 @@
     "scale": 0.8
    },
    "2026-11-08": {
-    "raw": 20.0,
+    "raw": 14.75,
     "scale": 1.0
    },
    "2026-11-09": {
