@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T07:31:40Z",
+ "asof": "2026-11-04T07:32:58Z",
  "recenter": {
   "week": 0.79
  },
@@ -520,9 +520,9 @@
     "line": 71.5,
     "price": -100.0,
     "ev": 0.075,
-    "units": 3.0,
+    "units": 3.25,
     "unitsRaw": 4.25,
-    "unitsCap": 3.0
+    "unitsCap": 3.25
    },
    "unitsRaw": 5.0,
    "unitsCap": 3.75
@@ -689,7 +689,7 @@
     "side": "under",
     "line": 72.5,
     "price": -102.0,
-    "ev": 0.039,
+    "ev": 0.04,
     "units": 2.25
    }
   },
@@ -1054,7 +1054,7 @@
     "side": "under",
     "line": 63.5,
     "price": -100.0,
-    "ev": 0.034,
+    "ev": 0.035,
     "units": 2.0,
     "unitsRaw": 2.75,
     "unitsCap": 2.0
@@ -1190,7 +1190,7 @@
     "side": "over",
     "line": 44.5,
     "price": 102.0,
-    "ev": 0.043,
+    "ev": 0.042,
     "units": 3.25
    }
   },
@@ -1222,11 +1222,11 @@
     "mk": "total",
     "side": "over",
     "line": 45.5,
-    "price": 104.0,
-    "ev": 0.06,
-    "units": 3.25,
-    "unitsRaw": 4.5,
-    "unitsCap": 3.25
+    "price": 102.0,
+    "ev": 0.049,
+    "units": 2.75,
+    "unitsRaw": 3.75,
+    "unitsCap": 2.75
    },
    "unitsRaw": 0.5,
    "unitsCap": 0.25
@@ -1289,7 +1289,7 @@
     "side": "over",
     "line": 45.5,
     "price": 106.0,
-    "ev": 0.083,
+    "ev": 0.082,
     "units": 3.75,
     "unitsRaw": 5.0,
     "unitsCap": 3.75
@@ -1326,7 +1326,7 @@
     "side": "over",
     "line": 50.5,
     "price": -100.0,
-    "ev": 0.027,
+    "ev": 0.026,
     "units": 1.5,
     "unitsRaw": 2.25,
     "unitsCap": 1.5
@@ -1708,22 +1708,6 @@
    "tm": 46.0
   },
   {
-   "id": "401869968",
-   "sport": "cfb",
-   "kick": "2026-11-07T22:00:00.000Z",
-   "home": "Louisiana",
-   "away": "South Alabama",
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -104.0,
-   "edge": 2.4,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 6.9,
-   "tm": 55.1
-  },
-  {
    "id": "401858285",
    "sport": "cfb",
    "kick": "2026-11-07T17:00:00.000Z",
@@ -1786,6 +1770,22 @@
    "why": "edge under 3",
    "m": -9,
    "tm": 49.5
+  },
+  {
+   "id": "401869968",
+   "sport": "cfb",
+   "kick": "2026-11-07T22:00:00.000Z",
+   "home": "Louisiana",
+   "away": "South Alabama",
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": -108.0,
+   "edge": 2.6,
+   "x": 4.0,
+   "why": "edge under 4 (conf: Sun Belt)",
+   "m": 6.9,
+   "tm": 55.1
   },
   {
    "id": "401869927",
@@ -2026,7 +2026,7 @@
    "side": "over",
    "line": 50.5,
    "price": -100.0,
-   "ev": 0.027,
+   "ev": 0.026,
    "edge": 3.2,
    "units": 2.25,
    "home": "Tennessee",
@@ -2086,7 +2086,7 @@
    "side": "over",
    "line": 44.5,
    "price": 102.0,
-   "ev": 0.043,
+   "ev": 0.042,
    "edge": 3.7,
    "units": 3.25,
    "home": "Arizona",
@@ -2266,7 +2266,7 @@
    "side": "under",
    "line": 72.5,
    "price": -102.0,
-   "ev": 0.039,
+   "ev": 0.04,
    "edge": 6.2,
    "units": 2.25,
    "home": "Florida Atlantic",
@@ -2314,7 +2314,7 @@
    "side": "over",
    "line": 45.5,
    "price": 106.0,
-   "ev": 0.083,
+   "ev": 0.082,
    "edge": 6.1,
    "units": 5.0,
    "home": "Army",
@@ -2385,10 +2385,10 @@
    "mk": "total",
    "side": "over",
    "line": 45.5,
-   "price": 104.0,
-   "ev": 0.06,
+   "price": 102.0,
+   "ev": 0.049,
    "edge": 4.6,
-   "units": 4.5,
+   "units": 3.75,
    "home": "Wisconsin",
    "away": "Rutgers",
    "state": "pick"
@@ -2470,7 +2470,7 @@
    "side": "under",
    "line": 63.5,
    "price": -100.0,
-   "ev": 0.034,
+   "ev": 0.035,
    "edge": 4.3,
    "units": 2.75,
    "home": "North Texas",
@@ -2502,11 +2502,11 @@
    "state": "pick"
   },
   "401869968": {
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -104.0,
-   "edge": 2.4,
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": -108.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana",
@@ -2722,15 +2722,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7439,
+  "snapshots": 7444,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1771,
-    "clvRet": -0.0436,
-    "clvT": -24.41,
+    "clvN": 1773,
+    "clvRet": -0.0437,
+    "clvT": -24.46,
     "clv": 0.22,
-    "beat": 0.299,
+    "beat": 0.298,
     "still": 0.499
    },
    {
@@ -3809,7 +3809,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 34.5,
+    "raw": 35.25,
     "scale": 1.0,
     "down": 4.25
    },
@@ -3822,11 +3822,11 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 53.0,
-    "scale": 0.7547
+    "raw": 52.25,
+    "scale": 0.7656
    },
    "2026-11-08": {
-    "raw": 20.5,
+    "raw": 15.25,
     "scale": 1.0
    },
    "2026-11-09": {
