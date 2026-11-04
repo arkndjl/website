@@ -934,11 +934,19 @@ def dk_prices(sport, games, now):
     print(f'{sport}: lines and prices on {n} games ({m} Novig, {n - m} DraftKings)')
 
 
+VOID_STATUS = {'STATUS_POSTPONED', 'STATUS_CANCELED', 'STATUS_CANCELLED', 'STATUS_FORFEIT', 'STATUS_ABANDONED'}
+VOID_DAYS = 3                     # no final this long after the start: the game was not played as scheduled (void)
+
+
 def espn_final(sport, eid):
+    """(home score, away score) once final; 'void' when ESPN marks the game postponed or cancelled (a pick whose
+    game moved to a new date follows the board's kick instead and never gets here); None while it isn't settled"""
     try:
         req = urllib.request.Request(f'https://site.api.espn.com/apis/site/v2/sports/{ESPN[sport]}/summary?event={eid}', headers={'User-Agent': UA})
         j = json.load(urllib.request.urlopen(req, timeout=20))
         c = j['header']['competitions'][0]
+        if (c['status']['type'].get('name') or '').upper() in VOID_STATUS:
+            return 'void'
         if not c['status']['type'].get('completed'):
             return None
         sc = {x['homeAway']: float(x['score']) for x in c['competitors']}
@@ -1224,6 +1232,13 @@ def live(sport):
         if e.get('res') is not None or iso(e['kick']) > now - datetime.timedelta(hours=3):
             continue
         fin = espn_final(sport, e['espn'])
+        if fin is None and iso(e['kick']) < now - datetime.timedelta(days=VOID_DAYS):
+            fin = 'void'
+        if fin == 'void':
+            # postponed, cancelled or never played: settled as no bet (as the books void it; the paper book and tennis
+            # treat res 'void' the same way), out of the record, the close value and the night's locked stake
+            e['res'], e['profit'], e['void'] = 'void', 0.0, True
+            continue
         if not fin:
             continue
         hs, as_ = fin
@@ -1242,7 +1257,7 @@ def live(sport):
     # closing line value: the pick's line and price against the close (the last line archived before the start, else
     # the last this build saw), as points and as the return the bet was worth if the close is the true price
     for e in log:
-        if e.get('res') is None:
+        if e.get('res') in (None, 'void'):
             continue
         c = closes.get(str(e['id']))
         if c:
@@ -1254,7 +1269,7 @@ def live(sport):
         cml = tuple(e['closeML']) if e.get('closeML') and None not in e['closeML'] else None
         C.judge(e, sport, e['mk'], e['side'], e['line'], e['price'], e['close'], cml)
     # a pick marked pass before its start was never a bet: graded and shown, but out of the record and the bankroll
-    done = [e for e in log if e.get('res') is not None and not e.get('pass')]
+    done = [e for e in log if e.get('res') in ('w', 'l', 'p') and not e.get('pass')]
     rec = summ([{'profit': e['profit'], 'units': e['units'], 'ev': e['ev']} for e in done]) if done else {'n': 0}
     if done:
         # DU compounds: each pick is a % of the bankroll when it was flagged, so the record's bankroll multiplies through
