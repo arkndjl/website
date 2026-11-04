@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-04T11:01:45Z",
+ "asof": "2026-11-04T12:13:31Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 96.32,
+  "now": 96.08,
   "peak": 118.08,
-  "drawdown": 0.1843,
-  "open": 106.25,
+  "drawdown": 0.1863,
+  "open": 104.0,
   "path": [
    101.5,
    101.6,
@@ -232,43 +232,44 @@
    96.16,
    95.92,
    96.56,
-   96.32
+   96.32,
+   96.08
   ]
  },
  "record": {
-  "n": 284,
-  "clvN": 228,
-  "clvRet": -0.0357,
-  "clvT": -7.5,
-  "clv": -0.44,
-  "beat": 0.17,
-  "settled": 224,
+  "n": 283,
+  "clvN": 231,
+  "clvRet": -0.0355,
+  "clvT": -7.57,
+  "clv": -0.45,
+  "beat": 0.168,
+  "settled": 225,
   "w": 115,
-  "l": 109,
+  "l": 110,
   "p": 0,
-  "roi": 0.0315,
-  "roiT": 0.45,
-  "profit": -3.04,
-  "risked": 190.25,
-  "yield": -0.016
+  "roi": 0.027,
+  "roiT": 0.39,
+  "profit": -3.29,
+  "risked": 190.5,
+  "yield": -0.0173
  },
- "tEff": -7.5,
+ "tEff": -7.56,
  "corr": {
   "rho": 0.0,
-  "n": 228,
+  "n": 231,
   "slates": 20,
-  "nEff": 228.0,
-  "avgSlate": 11.4
+  "nEff": 231.0,
+  "avgSlate": 11.55
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 228,
+   "value": 231,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-3.6% t -7.5",
+   "value": "-3.5% t -7.56",
    "pass": false
   },
   {
@@ -283,7 +284,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +3.1% vs -3.6% (SE 6.9)",
+   "value": "ROI +2.7% vs -3.6% (SE 6.9)",
    "pass": true
   }
  ],
@@ -336,7 +337,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 19,
+   "n": 18,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -525,7 +526,7 @@
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 20,
+   "n": 18,
    "clvN": 17,
    "clvRet": -0.0418,
    "clvT": -2.36,
@@ -546,21 +547,21 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 63,
-   "clvN": 58,
-   "clvRet": -0.0189,
-   "clvT": -4.04,
-   "clv": -0.04,
-   "beat": 0.241,
-   "settled": 54,
+   "n": 65,
+   "clvN": 61,
+   "clvRet": -0.0191,
+   "clvT": -4.3,
+   "clv": -0.07,
+   "beat": 0.23,
+   "settled": 55,
    "w": 30,
-   "l": 24,
+   "l": 25,
    "p": 0,
-   "roi": 0.183,
-   "roiT": 1.14,
-   "profit": 4.86,
-   "risked": 46.5,
-   "yield": 0.1045
+   "roi": 0.1615,
+   "roiT": 1.02,
+   "profit": 4.61,
+   "risked": 46.75,
+   "yield": 0.0985
   },
   {
    "id": "nflprops-prop",
@@ -585,30 +586,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186633",
-   "k": "2026-11-04T07:30:00Z",
-   "slate": "tennis:2026-11-04",
-   "h": "Gibson",
-   "a": "Sasnovich",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 174,
-   "bet": "Gibson ML +174",
-   "placed": "2026-11-04T00:35:34Z",
-   "stake": 0.25,
-   "edge": 4.4,
-   "ev": 0.0081,
-   "event": "Prudential Hong Kong Tennis Open",
-   "pass": false,
-   "clvRet": -0.041,
-   "clv": -1.3,
-   "beat": -1,
-   "close": 0.35
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -723,7 +700,11 @@
    "edge": 9.6,
    "ev": 0.0082,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.027,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 0.6375
   },
   {
    "rule": "tennis-ml",
@@ -743,7 +724,11 @@
    "edge": 9.6,
    "ev": 0.0078,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0327,
+   "clv": -1.3,
+   "beat": -1,
+   "close": 0.605
   },
   {
    "rule": "tennis-ml",
@@ -763,7 +748,11 @@
    "edge": 6.4,
    "ev": 0.0016,
    "event": "Angola Ladies Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0112,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.6525
   },
   {
    "rule": "tennis-ml",
@@ -845,7 +834,7 @@
    "edge": 4.7,
    "ev": 0.0114,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 149.5
   },
   {
@@ -908,8 +897,8 @@
    "edge": 3.9,
    "ev": 0.0284,
    "event": null,
-   "pass": false,
-   "close": 232.5
+   "pass": true,
+   "close": 233.5
   },
   {
    "rule": "nba-spread",
@@ -971,7 +960,7 @@
    "edge": 3.4,
    "ev": 0.0049,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 214.5
   },
   {
@@ -1034,7 +1023,7 @@
    "edge": 6.0,
    "ev": 0.022,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 161.5
   },
   {
@@ -1056,7 +1045,7 @@
    "ev": 0.0071,
    "event": null,
    "pass": true,
-   "close": 229.5
+   "close": 228.5
   },
   {
    "rule": "nba-ml",
@@ -1162,6 +1151,46 @@
    "event": null,
    "pass": false,
    "close": 234.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186585",
+   "k": "2026-11-05T05:00:00Z",
+   "slate": "tennis:2026-11-05",
+   "h": "Waltert",
+   "a": "Stefanini",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 174,
+   "bet": "Waltert ML +174",
+   "placed": "2026-11-04T12:13:31Z",
+   "stake": 1.75,
+   "edge": 17.6,
+   "ev": 0.0307,
+   "event": "Chennai Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186630",
+   "k": "2026-11-05T05:00:00Z",
+   "slate": "tennis:2026-11-05",
+   "h": "Valentova",
+   "a": "Eala",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -174,
+   "bet": "Eala ML -174",
+   "placed": "2026-11-04T12:13:31Z",
+   "stake": 0.75,
+   "edge": 4.4,
+   "ev": 0.0049,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -1617,7 +1646,7 @@
    "edge": 5.1,
    "ev": 0.0011,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 54.5
   },
   {
@@ -1697,7 +1726,7 @@
    "price": -102.0,
    "bet": "under 49.5 -102",
    "placed": "2026-11-01T21:25:38Z",
-   "stake": 1.25,
+   "stake": 1.0,
    "edge": 3.6,
    "ev": 0.016,
    "event": null,
@@ -2348,6 +2377,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186633",
+   "k": "2026-11-04T07:30:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Gibson",
+   "a": "Sasnovich",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 174,
+   "bet": "Gibson ML +174",
+   "placed": "2026-11-04T00:35:34Z",
+   "stake": 0.25,
+   "edge": 4.4,
+   "ev": 0.0081,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false,
+   "clvRet": -0.041,
+   "clv": -1.3,
+   "beat": -1,
+   "close": 0.35,
+   "score": "6-1 5-7 7-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -4096,37 +4153,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401922020",
-   "k": "2026-11-03T02:30:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Utah State",
-   "a": "Idaho State",
-   "mk": "total",
-   "side": "over",
-   "line": 146.5,
-   "price": -108.0,
-   "bet": "over 146.5 -108",
-   "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
-   "edge": 5.5,
-   "ev": 0.0096,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.1495,
-   "clv": 4.0,
-   "beat": 1,
-   "close": 150.5,
-   "score": [
-    58.0,
-    94.0
-   ],
-   "res": "w",
-   "ret": 0.9259,
-   "profit": 0.2315
   }
  ],
  "ledger": [
@@ -13523,7 +13549,11 @@
    "clvRet": -0.041,
    "clv": -1.3,
    "beat": -1,
-   "close": 0.35
+   "close": 0.35,
+   "score": "6-1 5-7 7-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "tennis-ml",
@@ -13667,7 +13697,11 @@
    "edge": 9.6,
    "ev": 0.0082,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.027,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 0.6375
   },
   {
    "rule": "tennis-ml",
@@ -13687,7 +13721,11 @@
    "edge": 9.6,
    "ev": 0.0078,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0327,
+   "clv": -1.3,
+   "beat": -1,
+   "close": 0.605
   },
   {
    "rule": "tennis-ml",
@@ -13707,7 +13745,11 @@
    "edge": 6.4,
    "ev": 0.0016,
    "event": "Angola Ladies Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0112,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.6525
   },
   {
    "rule": "tennis-ml",
@@ -13789,7 +13831,7 @@
    "edge": 4.7,
    "ev": 0.0114,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 149.5
   },
   {
@@ -13852,8 +13894,8 @@
    "edge": 3.9,
    "ev": 0.0284,
    "event": null,
-   "pass": false,
-   "close": 232.5
+   "pass": true,
+   "close": 233.5
   },
   {
    "rule": "nba-spread",
@@ -13915,7 +13957,7 @@
    "edge": 3.4,
    "ev": 0.0049,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 214.5
   },
   {
@@ -13978,7 +14020,7 @@
    "edge": 6.0,
    "ev": 0.022,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 161.5
   },
   {
@@ -14000,7 +14042,7 @@
    "ev": 0.0071,
    "event": null,
    "pass": true,
-   "close": 229.5
+   "close": 228.5
   },
   {
    "rule": "nba-ml",
@@ -14106,6 +14148,46 @@
    "event": null,
    "pass": false,
    "close": 234.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186585",
+   "k": "2026-11-05T05:00:00Z",
+   "slate": "tennis:2026-11-05",
+   "h": "Waltert",
+   "a": "Stefanini",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 174,
+   "bet": "Waltert ML +174",
+   "placed": "2026-11-04T12:13:31Z",
+   "stake": 1.75,
+   "edge": 17.6,
+   "ev": 0.0307,
+   "event": "Chennai Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186630",
+   "k": "2026-11-05T05:00:00Z",
+   "slate": "tennis:2026-11-05",
+   "h": "Valentova",
+   "a": "Eala",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -174,
+   "bet": "Eala ML -174",
+   "placed": "2026-11-04T12:13:31Z",
+   "stake": 0.75,
+   "edge": 4.4,
+   "ev": 0.0049,
+   "event": "Prudential Hong Kong Tennis Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -14561,7 +14643,7 @@
    "edge": 5.1,
    "ev": 0.0011,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 54.5
   },
   {
@@ -14641,7 +14723,7 @@
    "price": -102.0,
    "bet": "under 49.5 -102",
    "placed": "2026-11-01T21:25:38Z",
-   "stake": 1.25,
+   "stake": 1.0,
    "edge": 3.6,
    "ev": 0.016,
    "event": null,

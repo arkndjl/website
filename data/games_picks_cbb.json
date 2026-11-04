@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T11:01:41Z",
+ "asof": "2026-11-04T12:13:25Z",
  "recenter": {
-  "2026-11-04": -12.33
+  "2026-11-04": -12.32
  },
  "monitor": {
   "clocks": {
@@ -195,14 +195,8 @@
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
    "close": 161.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 161.5,
-    "price": -104.0,
-    "ev": 0.036,
-    "units": 0.75
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "401902276",
@@ -255,8 +249,14 @@
    "flagged": "2026-11-04T01:43:49Z",
    "betTo": 152.0,
    "close": 149.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 149.5,
+    "price": -106.0,
+    "ev": 0.056,
+    "units": 1.25
+   }
   },
   {
    "id": "401917513",
@@ -286,9 +286,9 @@
     "mk": "total",
     "side": "under",
     "line": 159.5,
-    "price": -100.0,
-    "ev": 0.04,
-    "units": 1.75
+    "price": -104.0,
+    "ev": 0.02,
+    "units": 0.25
    }
   }
  ],
@@ -325,22 +325,6 @@
   }
  ],
  "board": [
-  {
-   "id": "401920191",
-   "sport": "cbb",
-   "kick": "2026-11-05T00:00:00Z",
-   "home": "Saint Joseph's",
-   "away": "Longwood",
-   "mk": "total",
-   "side": "over",
-   "line": 149.5,
-   "price": -113.0,
-   "edge": 4.7,
-   "x": 2.0,
-   "why": "no edge at -113",
-   "m": 8.2,
-   "tm": 154.2
-  },
   {
    "id": "401917512",
    "sport": "cbb",
@@ -382,12 +366,28 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -117.0,
+   "price": -108.0,
    "edge": 3.6,
    "x": null,
    "why": "spread market off",
    "m": 11.9,
    "tm": 159.2
+  },
+  {
+   "id": "401928811",
+   "sport": "cbb",
+   "kick": "2026-11-05T01:00:00Z",
+   "home": "South Dakota",
+   "away": "Northern Kentucky",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": 106.0,
+   "edge": 3.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 0.6,
+   "tm": 164.5
   },
   {
    "id": "401917514",
@@ -398,7 +398,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -108.0,
+   "price": -117.0,
    "edge": 2.7,
    "x": null,
    "why": "spread market off",
@@ -414,7 +414,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -117.0,
+   "price": -111.0,
    "edge": 2.4,
    "x": null,
    "why": "spread market off",
@@ -430,7 +430,7 @@
    "mk": "spread",
    "side": "home",
    "line": 24.5,
-   "price": -102.0,
+   "price": -115.0,
    "edge": 2.2,
    "x": null,
    "why": "spread market off",
@@ -471,10 +471,10 @@
    "mk": "total",
    "side": "under",
    "line": 159.5,
-   "price": -100.0,
-   "ev": 0.04,
+   "price": -104.0,
+   "ev": 0.02,
    "edge": 2.2,
-   "units": 1.75,
+   "units": 0.25,
    "home": "Santa Clara",
    "away": "Milwaukee",
    "state": "pick"
@@ -507,19 +507,19 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -113.0,
+   "price": -106.0,
+   "ev": 0.056,
    "edge": 4.7,
-   "ev": null,
-   "units": 0.0,
+   "units": 1.25,
    "home": "Saint Joseph's",
    "away": "Longwood",
-   "state": "under"
+   "state": "pick"
   },
   "401917514": {
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -108.0,
+   "price": -117.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -531,7 +531,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -117.0,
+   "price": -111.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -543,7 +543,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -117.0,
+   "price": -108.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -555,7 +555,7 @@
    "mk": "spread",
    "side": "home",
    "line": 24.5,
-   "price": -102.0,
+   "price": -115.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -564,16 +564,16 @@
    "state": "off"
   },
   "401928811": {
-   "mk": "total",
-   "side": "over",
-   "line": 161.5,
-   "price": -104.0,
-   "ev": 0.036,
-   "edge": 3.0,
-   "units": 0.75,
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": 106.0,
+   "edge": 3.1,
+   "ev": null,
+   "units": 0.0,
    "home": "South Dakota",
    "away": "Northern Kentucky",
-   "state": "pick"
+   "state": "off"
   }
  },
  "record": {
@@ -628,7 +628,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4425,
+  "snapshots": 4434,
   "buckets": [
    {
     "when": "24h+",
@@ -641,12 +641,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 607,
+    "clvN": 609,
     "clvRet": -0.0434,
-    "clvT": -9.61,
+    "clvT": -9.64,
     "clv": 0.07,
-    "beat": 0.257,
-    "still": 0.414
+    "beat": 0.256,
+    "still": 0.415
    },
    {
     "when": "1-6h",
@@ -7590,7 +7590,8 @@
    "tmRaw": 152.1,
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
-   "close": 161.5
+   "close": 161.5,
+   "pass": true
   },
   {
    "id": "401920191",
@@ -7615,8 +7616,7 @@
    "tmRaw": 141.9,
    "flagged": "2026-11-04T01:43:49Z",
    "betTo": 152.0,
-   "close": 149.5,
-   "pass": true
+   "close": 149.5
   },
   {
    "id": "401924911",
@@ -7709,12 +7709,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 26.75,
+    "raw": 19.0,
     "scale": 1.0,
-    "down": 8.25
+    "down": 12.5
    },
    "2026-11-05": {
-    "raw": 22.0,
+    "raw": 24.0,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -7722,8 +7722,8 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 47.5,
-    "scale": 0.8421
+    "raw": 48.5,
+    "scale": 0.8247
    },
    "2026-11-08": {
     "raw": 23.5,
