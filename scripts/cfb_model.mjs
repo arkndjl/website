@@ -312,12 +312,20 @@ export const CAND = {
   // multi-season memory; control edges margin and was the idea, so it is the one kept
   gc: { name: 'game-control rating (long memory)', ctx: r => GC?.feat[String(r.id)] ?? 0, team: (S, t) => (S === GC?.season ? GC?.team[t] : 0) ?? 0, x: 1 },
 };
-// league rates by situation bin for one season's rows, then each row's expected goes and passes
-function decisions(rows) {
+// league rates by situation bin, then each row's expected goes and passes. The rates for a game are the league's in
+// the weeks before it (plus last season's, passed as prev), not the whole season's (Nov 4 2026 audit: the whole
+// season's rates put later weeks' league behaviour into earlier games' inputs). A bin with no history expects the
+// row's own rate (no excess). Returns the season's full rates, the next season's prev
+const DEC_KEYS = ['fb', 'pb', 'cb', 'kb'];
+function decisions(rows, prev = null) {
   const L = { fb: {}, pb: {}, cb: {}, kb: {} };
-  for (const r of rows) for (const k of ['fb', 'pb', 'cb', 'kb']) for (const [b, [n, y]] of Object.entries(r[k] || {})) { const v = (L[k][b] ||= [0, 0]); v[0] += n; v[1] += y; }
-  const exp = (k, bins) => Object.entries(bins || {}).reduce((a, [b, [n, y]]) => { const l = L[k][b]; a.n += n; a.y += y; a.x += n * (l[1] / l[0]); return a; }, { n: 0, y: 0, x: 0 });
-  for (const r of rows) {
+  if (prev) for (const k of DEC_KEYS) for (const [b, v] of Object.entries(prev[k] || {})) L[k][b] = [v[0], v[1]];
+  const add = list => { for (const r of list) for (const k of DEC_KEYS) for (const [b, [n, y]] of Object.entries(r[k] || {})) { const v = (L[k][b] ||= [0, 0]); v[0] += n; v[1] += y; } };
+  const exp = (k, bins) => Object.entries(bins || {}).reduce((a, [b, [n, y]]) => { const l = L[k][b]; a.n += n; a.y += y; a.x += l && l[0] > 0 ? n * (l[1] / l[0]) : y; return a; }, { n: 0, y: 0, x: 0 });
+  const weeks = [...new Set(rows.map(r => r.w))].sort((a, b) => a - b);
+  for (const w of weeks) { const now = rows.filter(r => r.w === w); for (const r of now) one(r); add(now); }
+  return L;
+  function one(r) {
     const f = exp('fb', r.fb), q = exp('pb', r.pb);
     r.f4n = f.n; r.f4go = f.y; r.f4x = f.x; r.pn = q.n; r.pass = q.y; r.passX = q.x;
     // conversions against the league's rate from the same down and distance: 3rd downs (and short 1-3, medium 4-6,
@@ -1069,13 +1077,17 @@ export async function runModel(data, SEASON, opts = {}) {
   // the candidate inputs (CAND) are chosen below, after the hyperparameters; until then the base model only
   EXTRA = []; FEATS = BASE_FEATS;
   const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]), data.sit?.[S])]));
-  for (const S of seasons) decisions(effBy[S]);
+  { let dp = null; for (const S of seasons) dp = decisions(effBy[S], dp); }
   // special teams by season, each season's prior half of the last one's full-season rating
   const allDrives = seasons.flatMap(S => data.drives?.[S] || []);
   const stC = allDrives.length ? stCurves(allDrives) : null;
   const stBy = {}, stPrior = {};
   for (const S of seasons) {
-    stBy[S] = stC ? stObs(data.drives?.[S], nameId, gameById, fbsBy[S], stC) : [];
+    // each season's curves from the seasons before it (the first season: its own), as scripts/cfb_hist_backtest.mjs;
+    // pooled over every season they carried later seasons' kicking into history mode's earlier ones (Nov 4 2026 audit)
+    const pre = seasons.filter(s => s < S).flatMap(s => data.drives?.[s] || []);
+    const C = pre.length >= 20000 ? stCurves(pre) : stC;
+    stBy[S] = C ? stObs(data.drives?.[S], nameId, gameById, fbsBy[S], C) : [];
     const last = stBy[S - 1] ? stAt(stBy[S - 1], 99) : {};
     stPrior[S] = Object.fromEntries(Object.entries(last).map(([t, v]) => [t, ST.carry * v]));
   }
