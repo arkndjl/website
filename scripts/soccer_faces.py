@@ -231,6 +231,11 @@ def main(which):
         ids = {link.get(o['p']) for o in json.load(open(fn))['players']} if os.path.exists(fn) else set()
         F = refresh(sorted(str(i) for i in ids if i))
         codes |= attach_war(F, C, link, S)
+        try:   # the backup watch: soccer_players attached its photos before this run put them on the WAR file (all null)
+            import photos
+            photos.backup(('soccer',))
+        except Exception as e:  # noqa: BLE001
+            print('backup watch photos:', e)
         for fm in (os.path.join(MORE, f) for f in (os.listdir(MORE) if os.path.isdir(MORE) else [])):
             codes |= {o.get('nat') for o in json.load(open(fm))['players']}
     else:
