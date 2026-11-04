@@ -1101,13 +1101,45 @@ def bt_get(url):
     return None
 
 
+ADJ_O = {'Barttorvik': "Barttorvik adjusted offensive efficiency: points a 100 possessions against an average D-I defense (blends in a preseason projection early in the season); the rank",
+         'ESPN box scores': "adjusted offensive efficiency from ESPN box scores: points a 100 possessions, less the opponent's ARK defense and the venue, blended with ARK O early in the season (Barttorvik blocked this run); the rank"}
+ADJ_D = {'Barttorvik': "Barttorvik adjusted defensive efficiency: points allowed a 100 possessions against an average D-I offense; lower is better; the rank",
+         'ESPN box scores': "adjusted defensive efficiency from ESPN box scores: points allowed a 100 possessions, less the opponent's ARK offense and the venue, blended with ARK D early in the season; lower is better; the rank"}
+TEMPO = {'Barttorvik': 'adjusted possessions a 40 minutes', 'ESPN box scores': 'possessions a game'}
+
+
+def cbb_cols(src):
+    oc_ = [col('g', 'G', 'games played', '.0f', x=True),
+           col('adj', 'AdjO', ADJ_O[src], '.1f', key=True),
+           col('ark', 'ARK O', 'the ARK Ranking offense rating (points a 100 possessions)', '.1f'),
+           col('efg', 'eFG%', 'effective field goal %', '.1f'),
+           col('tov', 'TOV%', 'turnover rate', '.1f', lo=True),
+           col('orb', 'ORB%', 'offensive rebound rate', '.1f'),
+           col('ftr', 'FTR', 'free throw rate (FTA a FGA)', '.1f'),
+           col('p2', '2P%', 'two-point %', '.1f', x=True), col('p3', '3P%', 'three-point %', '.1f', x=True),
+           col('tpr', '3PA%', 'share of attempts from three', '.1f', x=True), col('ast', 'Ast%', 'assisted field goals', '.1f', x=True),
+           col('tempo', 'Tempo', TEMPO[src], '.1f', x=True)]
+    dc_ = [col('g', 'G', 'games played', '.0f', x=True),
+           col('adj', 'AdjD', ADJ_D[src], '.1f', lo=True, key=True),
+           col('ark', 'ARK D', 'the ARK Ranking defense rating (points allowed a 100 possessions)', '.1f', lo=True),
+           col('efg', 'eFG%', 'effective field goal % allowed', '.1f', lo=True),
+           col('tov', 'TOV%', 'turnover rate forced', '.1f'),
+           col('orb', 'ORB%', 'offensive rebound rate allowed', '.1f', lo=True),
+           col('ftr', 'FTR', 'free throw rate allowed', '.1f', lo=True),
+           col('p2', '2P%', 'two-point % allowed', '.1f', x=True, lo=True), col('p3', '3P%', 'three-point % allowed', '.1f', x=True, lo=True),
+           col('tpr', '3PA%', 'share of opponent attempts from three', '.1f', x=True), col('blk', 'Blk%', 'block rate', '.1f', x=True),
+           col('tempo', 'Tempo', TEMPO[src], '.1f', x=True)]
+    return oc_, dc_
+
+
 def cbb():
     today = datetime.date.today()
     S = today.year + 1 if today.month >= 9 else today.year
     res = bt_get(f'https://barttorvik.com/{S}_team_results.json') or []
     sl = bt_get(f'https://barttorvik.com/teamslicejson.php?year={S}&json=1&type=R') or []
     if not res:
-        print('no Barttorvik team results'); return
+        print('no Barttorvik team results: building from ESPN box scores')
+        return cbb_espn(S)
     norm = lambda s: re.sub(r'[^a-z0-9]', '', s.lower().replace('state', 'st').replace('saint', 'st'))
     TR = {norm(r[1]): r for r in res}
     SL = {norm(r[0]): r for r in sl}
@@ -1126,28 +1158,114 @@ def cbb():
                     'ftr': f_(9), 'p2': f_(16), 'p3': f_(18), 'tpr': f_(24), 'ast': f_(22), 'tempo': rnd(fl(r[44]), 1)})
         dfn.append({**base, 'adj': rnd(fl(r[6]), 1), 'ark': p.get('def'), 'efg': f_(8), 'tov': f_(12), 'orb': f_(14),
                     'ftr': f_(10), 'p2': f_(17), 'p3': f_(19), 'tpr': f_(25), 'blk': f_(20), 'tempo': rnd(fl(r[44]), 1)})
-    oc_ = [col('g', 'G', 'games played', '.0f', x=True),
-           col('adj', 'AdjO', "Barttorvik adjusted offensive efficiency: points a 100 possessions against an average D-I defense (blends in a preseason projection early in the season); the rank", '.1f', key=True),
-           col('ark', 'ARK O', 'the ARK Ranking offense rating (points a 100 possessions)', '.1f'),
-           col('efg', 'eFG%', 'effective field goal %', '.1f'),
-           col('tov', 'TOV%', 'turnover rate', '.1f', lo=True),
-           col('orb', 'ORB%', 'offensive rebound rate', '.1f'),
-           col('ftr', 'FTR', 'free throw rate (FTA a FGA)', '.1f'),
-           col('p2', '2P%', 'two-point %', '.1f', x=True), col('p3', '3P%', 'three-point %', '.1f', x=True),
-           col('tpr', '3PA%', 'share of attempts from three', '.1f', x=True), col('ast', 'Ast%', 'assisted field goals', '.1f', x=True),
-           col('tempo', 'Tempo', 'adjusted possessions a 40 minutes', '.1f', x=True)]
-    dc_ = [col('g', 'G', 'games played', '.0f', x=True),
-           col('adj', 'AdjD', "Barttorvik adjusted defensive efficiency: points allowed a 100 possessions against an average D-I offense; lower is better; the rank", '.1f', lo=True, key=True),
-           col('ark', 'ARK D', 'the ARK Ranking defense rating (points allowed a 100 possessions)', '.1f', lo=True),
-           col('efg', 'eFG%', 'effective field goal % allowed', '.1f', lo=True),
-           col('tov', 'TOV%', 'turnover rate forced', '.1f'),
-           col('orb', 'ORB%', 'offensive rebound rate allowed', '.1f', lo=True),
-           col('ftr', 'FTR', 'free throw rate allowed', '.1f', lo=True),
-           col('p2', '2P%', 'two-point % allowed', '.1f', x=True, lo=True), col('p3', '3P%', 'three-point % allowed', '.1f', x=True, lo=True),
-           col('tpr', '3PA%', 'share of opponent attempts from three', '.1f', x=True), col('blk', 'Blk%', 'block rate', '.1f', x=True),
-           col('tempo', 'Tempo', 'adjusted possessions a 40 minutes', '.1f', x=True)]
+    if not sl:              # results but no slice: the box-score columns from ESPN, Barttorvik's AdjO / AdjD kept
+        print('no Barttorvik team slice: box-score columns from ESPN')
+        es = cbb_espn(S, rows_only=True)
+        if es:
+            for rows, er in zip((off, dfn), es):
+                E = {r['id']: r for r in er}
+                for r in rows:
+                    r.update({k: v for k, v in E.get(r['id'], {}).items() if k not in ('adj', 'ark', 'tempo')})
+    oc_, dc_ = cbb_cols('Barttorvik')
     out = {'asof': now(), 'sport': 'cbb', 'season': S, 'label': f'{S - 1}-{str(S)[2:]}', 'src': 'Barttorvik',
            'views': {'offense': finish_view(off, oc_, 'adj'), 'defense': finish_view(dfn, dc_, 'adj', lo=True)}}
+    save('cbb', out)
+
+
+def espn_team_box(S):
+    """season box totals for every D-I team from ESPN summaries of D-I vs D-I finals (the ones Barttorvik counts);
+    summaries come from scripts/cbb_espn_logs.py's cache, so a run after the live board fetches almost nothing.
+    -> ({espn id: {stat: total, 'g': games}}, [(team, opp, home/away/neutral, points, possessions)])"""
+    import cbb_espn_logs as L
+    games = json.load(gzip.open(os.path.join(HERE, 'data', f'cbb_games_{S}.json.gz')))
+    d1 = {p['id'] for p in json.load(open(os.path.join(ROOT, 'data', 'cbb_games.json')))['power']}
+    keys = ('fgm', 'fga', 'tpm', 'tpa', 'ftm', 'fta', 'orb', 'drb', 'ast', 'tov', 'blk', 'pts')
+    tot = collections.defaultdict(lambda: collections.Counter())
+    gl = []
+    for g in games:
+        if g.get('season') != S or g.get('state') != 'post' or g.get('home') not in d1 or g.get('away') not in d1:
+            continue
+        sm = L.espn_summary(g['id'])
+        try:
+            bx = {t['team']['id']: t['statistics'][0] for t in sm['boxscore']['players']}
+        except (KeyError, IndexError, TypeError):
+            continue
+        side = {}
+        for tid, st in bx.items():
+            v = dict(zip(st['keys'], st.get('totals') or []))
+            try:
+                fg, tp, ft = (list(map(int, (v[k] or '0-0').split('-'))) for k in (
+                    'fieldGoalsMade-fieldGoalsAttempted', 'threePointFieldGoalsMade-threePointFieldGoalsAttempted',
+                    'freeThrowsMade-freeThrowsAttempted'))
+                side[tid] = dict(zip(keys, (*fg, *tp, *ft, *(int(v[k] or 0) for k in (
+                    'offensiveRebounds', 'defensiveRebounds', 'assists', 'turnovers', 'blocks', 'points')))))
+            except (KeyError, ValueError):
+                side = {}; break
+        if len(side) != 2 or set(side) != {g['home'], g['away']}:
+            continue
+        poss = sum(x['fga'] - x['orb'] + x['tov'] + .475 * x['fta'] for x in side.values()) / 2
+        for tid, x in side.items():
+            oid = g['away'] if tid == g['home'] else g['home']
+            o = side[oid]
+            T = tot[tid]
+            T.update(x); T['g'] += 1; T['poss'] += poss
+            T.update({'o_' + k: o[k] for k in keys})
+            loc = 0 if g.get('neutral') else (1 if tid == g['home'] else -1)
+            gl.append((tid, oid, loc, x['pts'], poss))
+    return tot, gl
+
+
+PRIOR_POSS = 560
+
+
+def cbb_espn(S, rows_only=False):
+    """the CBB unit tables from ESPN box scores, for days Barttorvik blocks the runner. AdjO / AdjD: each game's
+    points a 100 possessions, less the opponent's ARK Ranking defense (offense) above average and the venue,
+    averaged by possessions, then blended with the ARK rating over the first PRIOR_POSS possessions the way Barttorvik
+    blends his preseason projection (Nov 4 2026, one game in: K 560 r .92 with his AdjO / AdjD vs .64 unblended;
+    the box-score columns match his at r .99+)"""
+    tot, gl = espn_team_box(S)
+    if not tot:
+        print('no ESPN box scores either: keeping the last unit tables'); return None
+    power = json.load(open(os.path.join(ROOT, 'data', 'cbb_games.json')))['power']
+    P = {p['id']: p for p in power}
+    mo = np.mean([p['off'] for p in power if p.get('off') is not None])
+    md = np.mean([p['def'] for p in power if p.get('def') is not None])
+    HCA = 1.4                                                      # points a 100 possessions, each way
+    K = PRIOR_POSS
+    ao, ad = collections.defaultdict(float), collections.defaultdict(float)
+    for tid, oid, loc, pts, poss in gl:
+        r = 100 * pts / poss if poss else 0
+        op = P.get(oid, {})
+        ao[tid] += poss * (r - ((op.get('def') or md) - md) - loc * HCA)
+        ad[oid] += poss * (r - ((P.get(tid, {}).get('off') or mo) - mo) - loc * HCA)
+    pc = lambda a, b: rnd(100 * a / b, 1) if b else None
+    off, dfn = [], []
+    for p in power:
+        T = tot.get(p['id'])
+        base = {'id': p['id'], 't': p['t'], 'ab': p['t'], 'lg': p.get('logo'), 'cf': p.get('conf'), 'g': T['g'] if T else 0}
+        if not T:
+            off.append({**base, 'adj': None, 'ark': p.get('off')}); dfn.append({**base, 'adj': None, 'ark': p.get('def')})
+            continue
+        ps = T['poss']
+        tempo = rnd(ps / T['g'], 1)
+        bl = lambda a, r: rnd((a + K * r) / (ps + K), 1) if r is not None else rnd(a / ps, 1)
+        off.append({**base, 'adj': bl(ao[p['id']], p.get('off')), 'ark': p.get('off'),
+                    'efg': pc(T['fgm'] + .5 * T['tpm'], T['fga']), 'tov': pc(T['tov'], ps),
+                    'orb': pc(T['orb'], T['orb'] + T['o_drb']), 'ftr': pc(T['fta'], T['fga']),
+                    'p2': pc(T['fgm'] - T['tpm'], T['fga'] - T['tpa']), 'p3': pc(T['tpm'], T['tpa']),
+                    'tpr': pc(T['tpa'], T['fga']), 'ast': pc(T['ast'], T['fgm']), 'tempo': tempo})
+        dfn.append({**base, 'adj': bl(ad[p['id']], p.get('def')), 'ark': p.get('def'),
+                    'efg': pc(T['o_fgm'] + .5 * T['o_tpm'], T['o_fga']), 'tov': pc(T['o_tov'], ps),
+                    'orb': pc(T['o_orb'], T['o_orb'] + T['drb']), 'ftr': pc(T['o_fta'], T['o_fga']),
+                    'p2': pc(T['o_fgm'] - T['o_tpm'], T['o_fga'] - T['o_tpa']), 'p3': pc(T['o_tpm'], T['o_tpa']),
+                    'tpr': pc(T['o_tpa'], T['o_fga']), 'blk': pc(T['blk'], T['o_fga'] - T['o_tpa']), 'tempo': tempo})
+    if rows_only:
+        return off, dfn
+    oc_, dc_ = cbb_cols('ESPN box scores')
+    out = {'asof': now(), 'sport': 'cbb', 'season': S, 'label': f'{S - 1}-{str(S)[2:]}', 'src': 'ESPN box scores',
+           'views': {'offense': finish_view(off, oc_, 'adj'), 'defense': finish_view(dfn, dc_, 'adj', lo=True)}}
+    print(f'cbb units from ESPN: {len(gl) // 2} games, {len(tot)} teams')
     save('cbb', out)
 
 
