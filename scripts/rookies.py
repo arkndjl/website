@@ -36,6 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import names as NM
+import nba_xpm as XP         # role_sxpm: the shrink the rookie 3Y / aXPM fits were trained on
 
 OUT = os.path.join(ROOT, 'static', 'data', 'rookies')
 SD = os.path.join(ROOT, 'static', 'data')
@@ -197,9 +198,9 @@ def nba():
                 c = None
             row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'vorx': p['vorx'], 'xpm': p.get('sxpm', p['xpm']),
                    'oxpm': p.get('soxpm', p['oxpm']), 'dxpm': p.get('sdxpm', p['dxpm']), 'rxpm': p['xpm'], 'mp': p['mp'], 'g': p['g'],
-                   'r3': round(cf[0] + cf[1] * p.get('sxpm', p['xpm']) + cf[2] * (p['age'] - a0) + cf[3] * math.log1p(p['mp'] * 82 / gms), 1)
+                   'r3': round(cf[0] + cf[1] * XP.role_sxpm(p, gms) + cf[2] * (p['age'] - a0) + cf[3] * math.log1p(p['mp'] * 82 / gms), 1)
                    if p.get('age') and p.get('xpm') is not None else None,
-                   'axpm': round(p.get('sxpm', p['xpm']) + ak * (p['age'] - a0), 1) if p.get('age') and p.get('xpm') is not None else None,
+                   'axpm': round(XP.role_sxpm(p, gms) + ak * (p['age'] - a0), 1) if p.get('age') and p.get('xpm') is not None else None,
                    'pre': dr[1] if dr else None, 'preL': (f'{dr[0]} #{dr[1]}' if dr[0] != S - 1 else f'#{dr[1]}') if dr else 'UDFA',
                    'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '',
                    'ph': ESPN_FACE.format('nba', p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nba/{p['tm'].lower()}.png")}
