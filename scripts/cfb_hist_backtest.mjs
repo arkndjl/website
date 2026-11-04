@@ -43,7 +43,7 @@ const rows = I.prepare(SEASONS, data, geo);
 const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
 I.setExtra([]);
 const effBy = Object.fromEntries(SEASONS.map(S => [S, I.effObs(data.adv[S], nameId, gameById, fbsBy[S], I.rzByGame(data.drives?.[S]), data.sit?.[S])]));
-for (const S of SEASONS) I.decisions(effBy[S]);
+{ let dp = null; for (const S of SEASONS) dp = I.decisions(effBy[S], dp); }
 const stBy = {}, stPrior = {};
 for (const S of SEASONS) {
   // special-teams curves from the seasons up to this one (no peeking at later kicking)
