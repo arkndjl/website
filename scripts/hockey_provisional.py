@@ -143,9 +143,13 @@ def with_team(players):
 def chl_seasons():
     """{season end year: [players]} for the three CHL leagues, from the cached topscorers"""
     T = {}
-    for fn in os.listdir(CHLD):
+    for fn in sorted(os.listdir(CHLD)):
         c, yr = fn[:-5].split('_')
         T.setdefault(int(yr), []).extend(with_team(ht_players(json.load(open(os.path.join(CHLD, fn))), HTLG[c])))
+    # most games first: population() keeps a player's first line, so a cross-league stub (another league's feed listing
+    # a few games against it) never stands in for his main line; before, the order was os.listdir's (Nov 4 2026)
+    for v in T.values():
+        v.sort(key=lambda p: -(p['gp'] or 0))
     return T
 
 
