@@ -231,8 +231,10 @@ def recenter_wf(sport, rows):
             day.setdefault((r['S'], DU.et_day(r.get('date'))), []).append(r)   # ET slate, not UTC date
     for (S, d), rs in sorted(day.items()):
         past = hist.setdefault(S, [])[-RC_N:]
-        vals = past + [r['tm'] - (r['To'] if r.get('To') is not None else r['T']) for r in rs]
-        off = sum(vals) / len(vals)
+        # the slate at its opens only (Nov 4 2026 audit: a game with no open came in at its close, which the bets at
+        # the open could not have known); its own total is still recentred on the slate's offset
+        vals = past + [r['tm'] - r['To'] for r in rs if r.get('To') is not None]
+        off = sum(vals) / len(vals) if vals else 0.0
         hist[S] += [r['tm'] - r['T'] for r in rs]
         for r in rs:
             r['tmRaw'], r['tm'] = r['tm'], r['tm'] - off
