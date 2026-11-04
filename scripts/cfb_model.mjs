@@ -1236,8 +1236,11 @@ export async function runModel(data, SEASON, opts = {}) {
     const beta = [0, ...FEATS.map(() => 0)]; beta[1] = b[0]; beta[3] = b[1]; beta[8] = b[2]; const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])); return { beta, sigma: sd(res) }; };
   const eTr = eloOnly(train);
 
-  // weather and totals
-  const totTr = fitTotals(train, wx), totAll = fitTotals(all, wx);
+  // weather and totals. History mode fits the live totals weights on every season, as the margin weights and the
+  // walk-forward file (wf, which the totals picks rules are fit on) do. They were fit on last season and this one alone
+  // (Nov 4 2026 audit, walk-forward 2018-25 on the ESPN history: last season + this season to date vs every earlier season,
+  // MAE held 2021-25 12.717 vs 12.678, t +1.85; 2018-20 12.44 vs 12.46, t -0.7)
+  const totTr = fitTotals(train, wx), totAll = fitTotals(HI ? [...hist, ...all] : all, wx);
   // history mode, opts.hist.wf: every season's finished FBS games predicted walk-forward on margin and totals weights
   // fit on the seasons before it (the cross-sport picks file, scripts/games_wf/cfb_wf.mjs)
   // FPI stack (HI.fpi with data.fpi): the model's walk-forward margins from HI.fpi.from on fit the stack weights
