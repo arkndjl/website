@@ -439,13 +439,17 @@ RDAY = {'Q1': -3, 'Q2': -2, 'Q3': -1, 'Q4': -1, 'R128': 0, 'R64': 1, 'R32': 2, '
 RDAY_G = {'R128': 1, 'R64': 3, 'R32': 5, 'R16': 7, 'QF': 9, 'SF': 11, 'F': 13}      # tennis_model.RDAY_G (Grand Slams)
 
 
+def ymd8(d):
+    return dt.date(d // 10000, d // 100 % 100, d % 100)
+
+
 def espn_rows(comps, eid, kind, hist):
     """finished ESPN singles matches the history doesn't hold yet (the days since the weekly feed's last update)"""
     last = {}
-    have = set()
-    for r in hist:
+    have = {}               # (tour, the pair) -> [event start dates]: a rematch at a later event is a new match (Nov 4 2026:
+    for r in hist:          # any meeting since Aug 1 used to hide every later one until the weekly feed caught up)
         last[r[1]] = max(last.get(r[1], 0), r[0])
-        if r[0] >= 20260801: have.add((r[1], frozenset((r[7], r[8]))))
+        if r[0] >= 20260801: have.setdefault((r[1], frozenset((r[7], r[8]))), []).append(ymd8(r[0]))
     out = []
     for c in comps:
         if not c['done'] or not c['date']: continue
@@ -456,15 +460,16 @@ def espn_rows(comps, eid, kind, hist):
         if sc is None: continue
         w, l = eid.get(c['players'][wi][0]), eid.get(c['players'][1 - wi][0])
         if not w or not l: continue
-        key = (c['tour'], frozenset((w, l)))
-        if key in have: continue
-        have.add(key)
         lv, sf = kind.get(c['tid'], ('A', 'H'))
         rd = espn_round(c['rd'])
         # history rows carry the tournament's start date and the model adds the round's day (tennis_model.RDAY):
         # back the match date off by that offset so the model's day is the day it was played
         off = RDAY_G[rd] if lv == 'G' and rd in RDAY_G else RDAY.get(rd, 2)      # tennis_model.rday
-        d = int((d0 - dt.timedelta(days=off)).strftime('%Y%m%d'))
+        d0s = d0 - dt.timedelta(days=off)
+        key = (c['tour'], frozenset((w, l)))
+        if any(abs((d0s - x).days) <= 10 for x in have.get(key, ())): continue     # the same event's meeting
+        have.setdefault(key, []).append(d0s)
+        d = int(d0s.strftime('%Y%m%d'))
         if rd.startswith('Q'): lv = 'Q'
         out.append([d, c['tour'], lv, sf, rd, 5 if (lv == 'G' and c['tour'] == 'atp' and not rd.startswith('Q')) else 3,
                     f"{c['tour'][0]}e{c['eid']}", w, l, sc, None, None, None, None, None, None, c['tn']])

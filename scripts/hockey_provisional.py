@@ -143,9 +143,13 @@ def with_team(players):
 def chl_seasons():
     """{season end year: [players]} for the three CHL leagues, from the cached topscorers"""
     T = {}
-    for fn in os.listdir(CHLD):
+    for fn in sorted(os.listdir(CHLD)):
         c, yr = fn[:-5].split('_')
         T.setdefault(int(yr), []).extend(with_team(ht_players(json.load(open(os.path.join(CHLD, fn))), HTLG[c])))
+    # most games first: population() keeps a player's first line, so a cross-league stub (another league's feed listing
+    # a few games against it) never stands in for his main line; before, the order was os.listdir's (Nov 4 2026)
+    for v in T.values():
+        v.sort(key=lambda p: -(p['gp'] or 0))
     return T
 
 
@@ -459,15 +463,18 @@ def live(year, board, rows):
         drafted.setdefault(NM.tokens(r['name'])[-1] if NM.tokens(r['name']) else '', []).append(r)
     on_board = [b['name'] for b in board]
     out, seen = [], set()
-    for p in pool:
+    # most games first, one row a player: a CHL player's cross-league games show up in the other league's feed too
+    # (Nov 4 2026: OHL D Oskar Konobelj also on the board as QMJHL 'Batallion (OHL) - - North Bay', 1 GP)
+    for p in sorted(pool, key=lambda p: -(p['gp'] or 0)):
         if p['birth'] and not eligible(p['birth'], year):
             continue
         if not p['birth'] and p['lg'] != 'Liiga':
             continue
         tk = NM.tokens(p['name'])
-        if not tk or (p['name'], p['lg']) in seen:
+        key = (p['birth'], ' '.join(tk)) if p['birth'] else (p['name'], p['lg'])
+        if not tk or key in seen:
             continue
-        seen.add((p['name'], p['lg']))
+        seen.add(key)
         if any(NM.same(n, p['name']) for n in on_board):
             continue
         if any(NM.same(r['name'], p['name']) and (not p['birth'] or r.get('birth') == p['birth']) for r in drafted.get(tk[-1], [])):
