@@ -459,15 +459,18 @@ def live(year, board, rows):
         drafted.setdefault(NM.tokens(r['name'])[-1] if NM.tokens(r['name']) else '', []).append(r)
     on_board = [b['name'] for b in board]
     out, seen = [], set()
-    for p in pool:
+    # most games first, one row a player: a CHL player's cross-league games show up in the other league's feed too
+    # (Nov 4 2026: OHL D Oskar Konobelj also on the board as QMJHL 'Batallion (OHL) - - North Bay', 1 GP)
+    for p in sorted(pool, key=lambda p: -(p['gp'] or 0)):
         if p['birth'] and not eligible(p['birth'], year):
             continue
         if not p['birth'] and p['lg'] != 'Liiga':
             continue
         tk = NM.tokens(p['name'])
-        if not tk or (p['name'], p['lg']) in seen:
+        key = (p['birth'], ' '.join(tk)) if p['birth'] else (p['name'], p['lg'])
+        if not tk or key in seen:
             continue
-        seen.add((p['name'], p['lg']))
+        seen.add(key)
         if any(NM.same(n, p['name']) for n in on_board):
             continue
         if any(NM.same(r['name'], p['name']) and (not p['birth'] or r.get('birth') == p['birth']) for r in drafted.get(tk[-1], [])):
