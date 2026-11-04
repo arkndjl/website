@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-04T18:45:57Z",
+ "asof": "2026-11-04T18:47:31Z",
  "recenter": {
   "2026-11-04": 0.79
  },
@@ -334,7 +334,7 @@
    "price": 104.0,
    "p": 0.545,
    "ev": 0.112,
-   "units": 3.5,
+   "units": 3.25,
    "edge": 3.2,
    "x": 3.0,
    "pDU": 0.5116,
@@ -351,12 +351,12 @@
     "line": 232.5,
     "price": 104.0,
     "ev": 0.113,
-    "units": 3.5,
+    "units": 3.25,
     "unitsRaw": 4.0,
-    "unitsCap": 3.5
+    "unitsCap": 3.25
    },
    "unitsRaw": 4.0,
-   "unitsCap": 3.5
+   "unitsCap": 3.25
   },
   {
    "id": "401909926",
@@ -371,7 +371,7 @@
    "price": 104.0,
    "p": 0.564,
    "ev": 0.15,
-   "units": 3.0,
+   "units": 2.75,
    "edge": 2.9,
    "x": 2.0,
    "pDU": 0.5104,
@@ -386,7 +386,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 3.5,
-   "unitsCap": 3.0
+   "unitsCap": 2.75
   },
   {
    "id": "401909923",
@@ -428,7 +428,7 @@
    "price": -100.0,
    "p": 0.607,
    "ev": 0.214,
-   "units": 2.75,
+   "units": 2.5,
    "edge": 4.9,
    "x": 2.0,
    "pDU": 0.5163,
@@ -446,12 +446,12 @@
     "line": 11.5,
     "price": -100.0,
     "ev": 0.214,
-    "units": 2.75,
+    "units": 2.5,
     "unitsRaw": 3.25,
-    "unitsCap": 2.75
+    "unitsCap": 2.5
    },
    "unitsRaw": 3.25,
-   "unitsCap": 2.75
+   "unitsCap": 2.5
   },
   {
    "id": "401909923",
@@ -466,7 +466,7 @@
    "price": -100.0,
    "p": 0.555,
    "ev": 0.11,
-   "units": 2.25,
+   "units": 2.0,
    "edge": 3.9,
    "x": 3.0,
    "pDU": 0.5142,
@@ -480,7 +480,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 2.75,
-   "unitsCap": 2.25
+   "unitsCap": 2.0
   },
   {
    "id": "401909931",
@@ -495,7 +495,7 @@
    "price": -102.0,
    "p": 0.586,
    "ev": 0.161,
-   "units": 2.25,
+   "units": 2.0,
    "edge": 5.7,
    "x": 4.0,
    "pDU": 0.5187,
@@ -513,12 +513,12 @@
     "line": 4.5,
     "price": -100.0,
     "ev": 0.173,
-    "units": 3.25,
+    "units": 3.0,
     "unitsRaw": 3.75,
-    "unitsCap": 3.25
+    "unitsCap": 3.0
    },
    "unitsRaw": 2.75,
-   "unitsCap": 2.25
+   "unitsCap": 2.0
   },
   {
    "id": "401909925",
@@ -545,9 +545,9 @@
    "flagged": "2026-11-03T10:53:27Z",
    "close": -3.5,
    "pass": true,
-   "now": null,
    "unitsRaw": 0.75,
-   "unitsCap": 0.5
+   "unitsCap": 0.5,
+   "now": null
   },
   {
    "id": "401909933",
@@ -592,7 +592,7 @@
    "price": -106.0,
    "p": 0.581,
    "ev": 0.13,
-   "units": 1.25,
+   "units": 1.0,
    "edge": 5.8,
    "x": 3.0,
    "pDU": 0.5213,
@@ -614,7 +614,7 @@
     "unitsCap": 0.75
    },
    "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "unitsCap": 1.0
   },
   {
    "id": "401909929",
@@ -704,18 +704,18 @@
    "tmRaw": 219.0,
    "flagged": "2026-11-03T10:53:27Z",
    "close": 2.5,
+   "unitsRaw": 0.5,
+   "unitsCap": 0.25,
    "now": {
     "mk": "ml",
     "side": "home",
     "line": null,
     "price": -127.0,
     "ev": 0.212,
-    "units": 4.25,
+    "units": 4.0,
     "unitsRaw": 5.0,
-    "unitsCap": 4.25
-   },
-   "unitsRaw": 0.5,
-   "unitsCap": 0.25
+    "unitsCap": 4.0
+   }
   },
   {
    "id": "401909925",
@@ -841,7 +841,7 @@
    "mk": "total",
    "side": "under",
    "line": 230.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 1.9,
    "x": 3.0,
    "why": "edge under 3",
@@ -914,7 +914,7 @@
    "mk": "total",
    "side": "under",
    "line": 230.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -1119,7 +1119,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2018,
+  "snapshots": 2019,
   "buckets": [
    {
     "when": "24h+",
@@ -1141,12 +1141,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 136,
+    "clvN": 137,
     "clvRet": -0.0445,
-    "clvT": -14.17,
+    "clvT": -14.25,
     "clv": 0.05,
-    "beat": 0.162,
-    "still": 0.735
+    "beat": 0.161,
+    "still": 0.737
    },
    {
     "when": "<1h",
@@ -4902,7 +4902,7 @@
    "price": -100.0,
    "p": 0.555,
    "ev": 0.11,
-   "units": 2.25,
+   "units": 2.0,
    "edge": 3.9,
    "x": 3.0,
    "pDU": 0.5142,
@@ -4915,7 +4915,7 @@
    "close": 230.5,
    "pass": true,
    "unitsRaw": 2.75,
-   "unitsCap": 2.25
+   "unitsCap": 2.0
   },
   {
    "id": "401909923",
@@ -4956,7 +4956,7 @@
    "price": -100.0,
    "p": 0.607,
    "ev": 0.214,
-   "units": 2.75,
+   "units": 2.5,
    "edge": 4.9,
    "x": 2.0,
    "pDU": 0.5163,
@@ -4969,7 +4969,7 @@
    "betTo": 14.0,
    "close": 11.5,
    "unitsRaw": 3.25,
-   "unitsCap": 2.75
+   "unitsCap": 2.5
   },
   {
    "id": "401909926",
@@ -5011,7 +5011,7 @@
    "price": 104.0,
    "p": 0.564,
    "ev": 0.15,
-   "units": 3.0,
+   "units": 2.75,
    "edge": 2.9,
    "x": 2.0,
    "pDU": 0.5104,
@@ -5025,7 +5025,7 @@
    "close": 11.5,
    "pass": true,
    "unitsRaw": 3.5,
-   "unitsCap": 3.0
+   "unitsCap": 2.75
   },
   {
    "id": "401909931",
@@ -5040,7 +5040,7 @@
    "price": -102.0,
    "p": 0.586,
    "ev": 0.161,
-   "units": 2.25,
+   "units": 2.0,
    "edge": 5.7,
    "x": 4.0,
    "pDU": 0.5187,
@@ -5053,7 +5053,7 @@
    "betTo": 3.0,
    "close": 4.5,
    "unitsRaw": 2.75,
-   "unitsCap": 2.25
+   "unitsCap": 2.0
   },
   {
    "id": "401909934",
@@ -5068,7 +5068,7 @@
    "price": -106.0,
    "p": 0.581,
    "ev": 0.13,
-   "units": 1.25,
+   "units": 1.0,
    "edge": 5.8,
    "x": 3.0,
    "pDU": 0.5213,
@@ -5080,7 +5080,7 @@
    "betTo": 233.0,
    "close": 233.5,
    "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "unitsCap": 1.0
   },
   {
    "id": "401909927",
@@ -5150,7 +5150,7 @@
    "price": 104.0,
    "p": 0.545,
    "ev": 0.112,
-   "units": 3.5,
+   "units": 3.25,
    "edge": 3.2,
    "x": 3.0,
    "pDU": 0.5116,
@@ -5162,19 +5162,19 @@
    "betTo": 232.5,
    "close": 232.5,
    "unitsRaw": 4.0,
-   "unitsCap": 3.5
+   "unitsCap": 3.25
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 30.75,
-    "scale": 0.8943,
+    "raw": 33.75,
+    "scale": 0.8148,
     "down": 12.5
    },
    "2026-11-05": {
-    "raw": 26.25,
+    "raw": 27.5,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -5186,7 +5186,7 @@
     "scale": 0.9249
    },
    "2026-11-08": {
-    "raw": 30.5,
+    "raw": 31.5,
     "scale": 1.0
    },
    "2026-11-09": {
