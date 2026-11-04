@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-04T07:30:06Z",
+ "asof": "2026-11-04T07:31:44Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -483,6 +483,22 @@
    "tm": 43.7
   },
   {
+   "id": "2026_09_HOU_LAC",
+   "sport": "nfl",
+   "kick": "2026-11-08T21:05:00Z",
+   "home": "LAC",
+   "away": "HOU",
+   "mk": "spread",
+   "side": "home",
+   "line": -4.5,
+   "price": 104.0,
+   "edge": 3.1,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": -1.4,
+   "tm": 41.3
+  },
+  {
    "id": "2026_09_DEN_CAR",
    "sport": "nfl",
    "kick": "2026-11-08T18:00:00Z",
@@ -497,22 +513,6 @@
    "why": "edge under 4",
    "m": -5.5,
    "tm": 43.7
-  },
-  {
-   "id": "2026_09_HOU_LAC",
-   "sport": "nfl",
-   "kick": "2026-11-08T21:05:00Z",
-   "home": "LAC",
-   "away": "HOU",
-   "mk": "spread",
-   "side": "home",
-   "line": -4.5,
-   "price": 104.0,
-   "edge": 3.0,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": -1.5,
-   "tm": 41.3
   },
   {
    "id": "2026_09_LA_WAS",
@@ -693,7 +693,7 @@
    "side": "home",
    "line": -4.5,
    "price": 104.0,
-   "edge": 3.0,
+   "edge": 3.1,
    "ev": null,
    "units": 0.0,
    "home": "LAC",
@@ -813,13 +813,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1488,
+  "snapshots": 1487,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 573,
-    "clvRet": -0.0327,
-    "clvT": -12.22,
+    "clvN": 572,
+    "clvRet": -0.0328,
+    "clvT": -12.23,
     "clv": 0.43,
     "beat": 0.22,
     "still": 0.757
@@ -1859,12 +1859,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 40.0,
-    "scale": 0.8938,
+    "raw": 34.5,
+    "scale": 1.0,
     "down": 4.25
    },
    "2026-11-05": {
-    "raw": 20.75,
+    "raw": 22.75,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -1872,11 +1872,11 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 48.75,
-    "scale": 0.8205
+    "raw": 53.0,
+    "scale": 0.7547
    },
    "2026-11-08": {
-    "raw": 19.5,
+    "raw": 20.5,
     "scale": 1.0
    },
    "2026-11-09": {

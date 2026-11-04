@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T07:30:03Z",
+ "asof": "2026-11-04T07:31:47Z",
  "recenter": {
   "2026-11-04": -12.34
  },
@@ -44,40 +44,50 @@
     "since": "2026-10-31"
    }
   },
-  "stopped": {},
+  "stopped": {
+   "spread": {
+    "at": "2026-11-04T07:31:47Z",
+    "n": 50,
+    "t": -3.83,
+    "cusum": 7.8,
+    "why": "last 50 worth t -3.83 at the close",
+    "fit": "a5a7ef9ac6",
+    "test": "close"
+   }
+  },
   "checks": {
    "spread": {
-    "n": 48,
-    "window": 48,
-    "mean": -0.0413,
-    "t": -4.48,
+    "n": 50,
+    "window": 50,
+    "mean": -0.0428,
+    "t": -3.83,
     "days": 2,
     "sd": 0.1136,
-    "cusum": 6.94,
-    "cusumMax": 6.94,
+    "cusum": 7.8,
+    "cusumMax": 7.8,
     "h": 10.0,
-    "stop": false,
-    "why": "",
+    "stop": true,
+    "why": "last 50 worth t -3.83 at the close",
     "drift": {
      "mu1": 0.0108,
-     "n": 42,
+     "n": 44,
      "sd": 0.1136,
      "rho": 0.002,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -1.568,
-     "info": 0.38,
-     "real": -3.823,
-     "realSe": 1.652,
+     "llr": -1.716,
+     "info": 0.4,
+     "real": -4.009,
+     "realSe": 1.616,
      "need": 649
     }
    },
    "total": {
-    "n": 2,
-    "window": 2,
-    "mean": -0.0098,
+    "n": 3,
+    "window": 3,
+    "mean": -0.016,
     "t": null,
     "days": 1,
     "sd": 0.1114,
@@ -88,17 +98,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0174,
-     "n": 2,
+     "n": 3,
      "sd": 0.1114,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.065,
-     "info": 0.05,
+     "llr": -0.098,
+     "info": 0.07,
      "real": -0.838,
-     "realSe": 4.536,
+     "realSe": 3.703,
      "need": 242
     }
    },
@@ -162,35 +172,6 @@
  },
  "picks": [
   {
-   "id": "401918052",
-   "espn": "401918052",
-   "sport": "cbb",
-   "kick": "2026-11-05T02:00:00Z",
-   "home": "California",
-   "away": "Radford",
-   "mk": "spread",
-   "side": "away",
-   "line": 15.5,
-   "price": 102.0,
-   "p": 0.529,
-   "ev": 0.069,
-   "units": 2.75,
-   "edge": 3.6,
-   "x": 2.5,
-   "pDU": 0.5121,
-   "evDU": 0.0345,
-   "m": 11.9,
-   "tm": 159.2,
-   "tmRaw": 146.9,
-   "flagged": "2026-11-04T05:56:41Z",
-   "betTo": 14.5,
-   "close": 15.5,
-   "now": null,
-   "pass": true,
-   "unitsRaw": 3.25,
-   "unitsCap": 2.75
-  },
-  {
    "id": "401928811",
    "espn": "401928811",
    "sport": "cbb",
@@ -203,7 +184,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.079,
-   "units": 2.0,
+   "units": 2.25,
    "edge": 6.0,
    "x": 2.0,
    "pDU": 0.5259,
@@ -220,12 +201,8 @@
     "line": 161.5,
     "price": -104.0,
     "ev": 0.036,
-    "units": 0.5,
-    "unitsRaw": 0.75,
-    "unitsCap": 0.5
-   },
-   "unitsRaw": 2.25,
-   "unitsCap": 2.0
+    "units": 0.75
+   }
   },
   {
    "id": "401902276",
@@ -240,7 +217,7 @@
    "price": -100.0,
    "p": 0.521,
    "ev": 0.043,
-   "units": 1.75,
+   "units": 2.0,
    "edge": 2.3,
    "x": 2.0,
    "pDU": 0.5104,
@@ -257,12 +234,8 @@
     "line": 153.5,
     "price": -100.0,
     "ev": 0.042,
-    "units": 1.75,
-    "unitsRaw": 2.0,
-    "unitsCap": 1.75
-   },
-   "unitsRaw": 2.0,
-   "unitsCap": 1.75
+    "units": 2.0
+   }
   },
   {
    "id": "401920191",
@@ -277,7 +250,7 @@
    "price": -106.0,
    "p": 0.543,
    "ev": 0.056,
-   "units": 1.0,
+   "units": 1.25,
    "edge": 4.7,
    "x": 2.0,
    "pDU": 0.5204,
@@ -294,46 +267,7 @@
     "line": 149.5,
     "price": -106.0,
     "ev": 0.057,
-    "units": 1.0,
-    "unitsRaw": 1.25,
-    "unitsCap": 1.0
-   },
-   "unitsRaw": 1.25,
-   "unitsCap": 1.0
-  },
-  {
-   "id": "401928811",
-   "espn": "401928811",
-   "sport": "cbb",
-   "kick": "2026-11-05T01:00:00Z",
-   "home": "South Dakota",
-   "away": "Northern Kentucky",
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -104.0,
-   "p": 0.518,
-   "ev": 0.017,
-   "units": 0.25,
-   "edge": 3.0,
-   "x": 2.5,
-   "pDU": 0.5101,
-   "evDU": 0.0006,
-   "m": 0.5,
-   "tm": 164.5,
-   "tmRaw": 152.1,
-   "flagged": "2026-11-04T01:21:46Z",
-   "betTo": -2.0,
-   "close": -2.5,
-   "now": {
-    "mk": "spread",
-    "side": "home",
-    "line": -2.5,
-    "price": 108.0,
-    "ev": 0.08,
-    "units": 4.5,
-    "unitsRaw": 5.0,
-    "unitsCap": 4.5
+    "units": 1.25
    }
   },
   {
@@ -366,13 +300,42 @@
     "line": 159.5,
     "price": -102.0,
     "ev": 0.03,
-    "units": 0.75,
-    "unitsRaw": 1.0,
-    "unitsCap": 0.75
+    "units": 1.0
    }
   }
  ],
- "withdrawn": [],
+ "withdrawn": [
+  {
+   "id": "401928811",
+   "sport": "cbb",
+   "kick": "2026-11-05T01:00:00Z",
+   "home": "South Dakota",
+   "away": "Northern Kentucky",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -104.0,
+   "units": 0.25,
+   "edge": 3.0,
+   "x": 2.5,
+   "withdrawn": "2026-11-04T07:31:47Z"
+  },
+  {
+   "id": "401918052",
+   "sport": "cbb",
+   "kick": "2026-11-05T02:00:00Z",
+   "home": "California",
+   "away": "Radford",
+   "mk": "spread",
+   "side": "away",
+   "line": 15.5,
+   "price": 102.0,
+   "units": 2.75,
+   "edge": 3.6,
+   "x": 2.5,
+   "withdrawn": "2026-11-04T07:31:47Z"
+  }
+ ],
  "board": [
   {
    "id": "401917512",
@@ -391,38 +354,6 @@
    "tm": 144.8
   },
   {
-   "id": "401918052",
-   "sport": "cbb",
-   "kick": "2026-11-05T02:00:00Z",
-   "home": "California",
-   "away": "Radford",
-   "mk": "spread",
-   "side": "away",
-   "line": 15.5,
-   "price": -106.0,
-   "edge": 3.6,
-   "x": 2.5,
-   "why": "no edge at -106",
-   "m": 11.9,
-   "tm": 159.2
-  },
-  {
-   "id": "401920410",
-   "sport": "cbb",
-   "kick": "2026-11-05T00:00:00Z",
-   "home": "High Point",
-   "away": "Maryland Eastern Shore",
-   "mk": "spread",
-   "side": "away",
-   "line": 30.5,
-   "price": -117.0,
-   "edge": 2.4,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 28.1,
-   "tm": 152.4
-  },
-  {
    "id": "401919028",
    "sport": "cbb",
    "kick": "2026-11-05T00:30:00Z",
@@ -439,20 +370,52 @@
    "tm": 161.9
   },
   {
+   "id": "401918052",
+   "sport": "cbb",
+   "kick": "2026-11-05T02:00:00Z",
+   "home": "California",
+   "away": "Radford",
+   "mk": "spread",
+   "side": "away",
+   "line": 15.5,
+   "price": -106.0,
+   "edge": 3.6,
+   "x": null,
+   "why": "spread market off",
+   "m": 11.9,
+   "tm": 159.2
+  },
+  {
    "id": "401917514",
    "sport": "cbb",
    "kick": "2026-11-05T03:00:00Z",
    "home": "Loyola Marymount",
    "away": "Queens University",
-   "mk": "total",
-   "side": "over",
-   "line": 157.5,
-   "price": -127.0,
-   "edge": 0.4,
-   "x": 2.0,
-   "why": "edge under 2",
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -120.0,
+   "edge": 2.7,
+   "x": null,
+   "why": "spread market off",
    "m": 9.2,
    "tm": 157.9
+  },
+  {
+   "id": "401920410",
+   "sport": "cbb",
+   "kick": "2026-11-05T00:00:00Z",
+   "home": "High Point",
+   "away": "Maryland Eastern Shore",
+   "mk": "spread",
+   "side": "away",
+   "line": 30.5,
+   "price": -117.0,
+   "edge": 2.4,
+   "x": null,
+   "why": "spread market off",
+   "m": 28.1,
+   "tm": 152.4
   },
   {
    "id": "401920798",
@@ -463,10 +426,10 @@
    "mk": "spread",
    "side": "away",
    "line": 26.5,
-   "price": -110,
+   "price": -112.0,
    "edge": 0.3,
-   "x": 2.5,
-   "why": "edge under 2.5",
+   "x": null,
+   "why": "spread market off",
    "m": 26.2,
    "tm": 149.2
   }
@@ -500,13 +463,13 @@
    "mk": "spread",
    "side": "away",
    "line": 26.5,
-   "price": -110,
+   "price": -112.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
    "home": "Auburn",
    "away": "SE Louisiana",
-   "state": "under"
+   "state": "off"
   },
   "401919028": {
    "mk": "total",
@@ -533,16 +496,16 @@
    "state": "pick"
   },
   "401917514": {
-   "mk": "total",
-   "side": "over",
-   "line": 157.5,
-   "price": -127.0,
-   "edge": 0.4,
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -120.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "Loyola Marymount",
    "away": "Queens University",
-   "state": "under"
+   "state": "off"
   },
   "401920410": {
    "mk": "spread",
@@ -554,7 +517,7 @@
    "units": 0.0,
    "home": "High Point",
    "away": "Maryland Eastern Shore",
-   "state": "under"
+   "state": "off"
   },
   "401918052": {
    "mk": "spread",
@@ -566,7 +529,7 @@
    "units": 0.0,
    "home": "California",
    "away": "Radford",
-   "state": "under"
+   "state": "off"
   },
   "401902276": {
    "mk": "total",
@@ -581,13 +544,13 @@
    "state": "pick"
   },
   "401928811": {
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": 108.0,
-   "ev": 0.08,
-   "edge": 3.1,
-   "units": 5.0,
+   "mk": "total",
+   "side": "over",
+   "line": 161.5,
+   "price": -104.0,
+   "ev": 0.036,
+   "edge": 3.0,
+   "units": 0.75,
    "home": "South Dakota",
    "away": "Northern Kentucky",
    "state": "pick"
@@ -645,7 +608,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4409,
+  "snapshots": 4410,
   "buckets": [
    {
     "when": "24h+",
@@ -7597,7 +7560,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.079,
-   "units": 2.0,
+   "units": 2.25,
    "edge": 6.0,
    "x": 2.0,
    "pDU": 0.5259,
@@ -7607,34 +7570,7 @@
    "tmRaw": 152.1,
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
-   "close": 161.5,
-   "unitsRaw": 2.25,
-   "unitsCap": 2.0
-  },
-  {
-   "id": "401928811",
-   "espn": "401928811",
-   "sport": "cbb",
-   "kick": "2026-11-05T01:00:00Z",
-   "home": "South Dakota",
-   "away": "Northern Kentucky",
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -104.0,
-   "p": 0.518,
-   "ev": 0.017,
-   "units": 0.25,
-   "edge": 3.0,
-   "x": 2.5,
-   "pDU": 0.5101,
-   "evDU": 0.0006,
-   "m": 0.5,
-   "tm": 164.5,
-   "tmRaw": 152.1,
-   "flagged": "2026-11-04T01:21:46Z",
-   "betTo": -2.0,
-   "close": -2.5
+   "close": 161.5
   },
   {
    "id": "401920191",
@@ -7649,7 +7585,7 @@
    "price": -106.0,
    "p": 0.543,
    "ev": 0.056,
-   "units": 1.0,
+   "units": 1.25,
    "edge": 4.7,
    "x": 2.0,
    "pDU": 0.5204,
@@ -7659,9 +7595,7 @@
    "tmRaw": 141.9,
    "flagged": "2026-11-04T01:43:49Z",
    "betTo": 152.0,
-   "close": 149.5,
-   "unitsRaw": 1.25,
-   "unitsCap": 1.0
+   "close": 149.5
   },
   {
    "id": "401924911",
@@ -7724,34 +7658,6 @@
    "close": 159.5
   },
   {
-   "id": "401918052",
-   "espn": "401918052",
-   "sport": "cbb",
-   "kick": "2026-11-05T02:00:00Z",
-   "home": "California",
-   "away": "Radford",
-   "mk": "spread",
-   "side": "away",
-   "line": 15.5,
-   "price": 102.0,
-   "p": 0.529,
-   "ev": 0.069,
-   "units": 2.75,
-   "edge": 3.6,
-   "x": 2.5,
-   "pDU": 0.5121,
-   "evDU": 0.0345,
-   "m": 11.9,
-   "tm": 159.2,
-   "tmRaw": 146.9,
-   "flagged": "2026-11-04T05:56:41Z",
-   "betTo": 14.5,
-   "close": 15.5,
-   "pass": true,
-   "unitsRaw": 3.25,
-   "unitsCap": 2.75
-  },
-  {
    "id": "401902276",
    "espn": "401902276",
    "sport": "cbb",
@@ -7764,7 +7670,7 @@
    "price": -100.0,
    "p": 0.521,
    "ev": 0.043,
-   "units": 1.75,
+   "units": 2.0,
    "edge": 2.3,
    "x": 2.0,
    "pDU": 0.5104,
@@ -7774,17 +7680,15 @@
    "tmRaw": 138.9,
    "flagged": "2026-11-04T05:56:41Z",
    "betTo": 153.5,
-   "close": 153.5,
-   "unitsRaw": 2.0,
-   "unitsCap": 1.75
+   "close": 153.5
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 39.5,
-    "scale": 0.9051,
+    "raw": 34.5,
+    "scale": 1.0,
     "down": 4.25
    },
    "2026-11-05": {
@@ -7796,15 +7700,15 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 50.25,
-    "scale": 0.796
+    "raw": 53.0,
+    "scale": 0.7547
    },
    "2026-11-08": {
-    "raw": 19.75,
+    "raw": 20.5,
     "scale": 1.0
    },
    "2026-11-09": {
-    "raw": 13.0,
+    "raw": 13.25,
     "scale": 1.0
    }
   }
