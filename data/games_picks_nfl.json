@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-04T18:22:09Z",
+ "asof": "2026-11-04T18:46:18Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -103,7 +103,7 @@
     "side": "home",
     "line": -9.5,
     "price": 106.0,
-    "ev": 0.192,
+    "ev": 0.194,
     "units": 5.0
    }
   },
@@ -349,9 +349,9 @@
     "mk": "total",
     "side": "over",
     "line": 41.5,
-    "price": 102.0,
-    "ev": 0.092,
-    "units": 3.0
+    "price": 104.0,
+    "ev": 0.103,
+    "units": 3.75
    }
   },
   {
@@ -408,8 +408,14 @@
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
    "close": 48.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 48.5,
+    "price": -106.0,
+    "ev": 0.07,
+    "units": 0.25
+   }
   },
   {
    "id": "2026_09_LV_SF",
@@ -447,20 +453,20 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "2026_09_TB_CHI",
+   "id": "2026_09_DAL_IND",
    "sport": "nfl",
-   "kick": "2026-11-09T01:20:00Z",
-   "home": "CHI",
-   "away": "TB",
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -108.0,
-   "edge": 3.5,
-   "x": 1.5,
-   "why": "no edge at -108",
-   "m": 8.0,
-   "tm": 45.0
+   "kick": "2026-11-08T18:00:00Z",
+   "home": "IND",
+   "away": "DAL",
+   "mk": "spread",
+   "side": "home",
+   "line": -5.5,
+   "price": -100.0,
+   "edge": 3.4,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": -2.1,
+   "tm": 51.4
   },
   {
    "id": "2026_09_DEN_CAR",
@@ -471,7 +477,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 3.0,
    "x": 4.0,
    "why": "edge under 4",
@@ -495,22 +501,6 @@
    "tm": 48.6
   },
   {
-   "id": "2026_09_DAL_IND",
-   "sport": "nfl",
-   "kick": "2026-11-08T18:00:00Z",
-   "home": "IND",
-   "away": "DAL",
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -100.0,
-   "edge": 2.4,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": -3.1,
-   "tm": 51.4
-  },
-  {
    "id": "2026_09_CLE_NO",
    "sport": "nfl",
    "kick": "2026-11-08T18:00:00Z",
@@ -518,12 +508,12 @@
    "away": "CLE",
    "mk": "spread",
    "side": "away",
-   "line": 2.5,
-   "price": 117.0,
-   "edge": 1.6,
+   "line": 3.5,
+   "price": -122.0,
+   "edge": 2.7,
    "x": 4.0,
    "why": "edge under 4",
-   "m": 0.9,
+   "m": 0.8,
    "tm": 43.6
   },
   {
@@ -565,8 +555,8 @@
    "side": "home",
    "line": -9.5,
    "price": 106.0,
-   "ev": 0.192,
-   "edge": 4.0,
+   "ev": 0.194,
+   "edge": 4.1,
    "units": 5.0,
    "home": "BAL",
    "away": "JAX",
@@ -587,9 +577,9 @@
   "2026_09_CLE_NO": {
    "mk": "spread",
    "side": "away",
-   "line": 2.5,
-   "price": 117.0,
-   "edge": 1.6,
+   "line": 3.5,
+   "price": -122.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "NO",
@@ -601,7 +591,7 @@
    "side": "home",
    "line": -5.5,
    "price": -100.0,
-   "edge": 2.4,
+   "edge": 3.4,
    "ev": null,
    "units": 0.0,
    "home": "IND",
@@ -612,7 +602,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -696,10 +686,10 @@
    "mk": "total",
    "side": "over",
    "line": 41.5,
-   "price": 102.0,
-   "ev": 0.092,
+   "price": 104.0,
+   "ev": 0.103,
    "edge": 2.8,
-   "units": 3.0,
+   "units": 3.75,
    "home": "SEA",
    "away": "ARI",
    "state": "pick"
@@ -720,13 +710,13 @@
    "mk": "total",
    "side": "under",
    "line": 48.5,
-   "price": -108.0,
+   "price": -106.0,
+   "ev": 0.07,
    "edge": 3.5,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "CHI",
    "away": "TB",
-   "state": "under"
+   "state": "pick"
   },
   "2026_09_BUF_MIN": {
    "mk": "ml",
@@ -793,16 +783,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1584,
+  "snapshots": 1590,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 628,
-    "clvRet": -0.0329,
-    "clvT": -13.09,
-    "clv": 0.35,
-    "beat": 0.186,
-    "still": 0.771
+    "clvN": 632,
+    "clvRet": -0.0337,
+    "clvT": -13.22,
+    "clv": 0.33,
+    "beat": 0.185,
+    "still": 0.756
    },
    {
     "when": "6-24h",
@@ -1829,8 +1819,7 @@
    "tm": 45.0,
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
-   "close": 48.5,
-   "pass": true
+   "close": 48.5
   }
  ],
  "nightCap": {
@@ -1854,7 +1843,7 @@
     "scale": 0.9249
    },
    "2026-11-08": {
-    "raw": 30.5,
+    "raw": 31.5,
     "scale": 1.0
    },
    "2026-11-09": {
