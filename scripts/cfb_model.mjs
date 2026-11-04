@@ -1330,7 +1330,14 @@ export async function runModel(data, SEASON, opts = {}) {
   const qb = qbTable(data.ppaqb, nameId);
   const names = {}; for (const r of cur) { names[r.h] = r.hn; names[r.a] = r.an; }
 
-  const parts = r => { const x = features(r, st, fbs); return Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])])); };
+  // the margin by input, summing to predict()'s margin: with the FPI stack each input carries the stack's model weight
+  // and the FPI gap (and the stack's home term) shows as fpi; the early-season factor scales both; the letdown spot is ld
+  // (Nov 4 2026 audit: the parts were the unstacked model's, ~1.5x the margin they claimed to split)
+  const parts = r => { const x = features(r, st, fbs), g = stackNow ? FP.gap(r) : null, ek = earlyK(r), a = g != null ? stackNow.a : 1;
+    const out = Object.fromEntries(FEATS.map((f, i) => [f, r1(ek * a * beta[i + 1] * x[i])]));
+    if (g != null) out.fpi = r1(ek * (stackNow.b * g + (stackNow.c || 0) * (r.n ? 0 : 1)));
+    const ld = ldOf(LD, r); if (ld) out.ld = r1(ld);
+    return out; };
   const report = {
     seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
