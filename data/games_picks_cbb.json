@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T16:24:45Z",
+ "asof": "2026-11-04T16:30:12Z",
  "recenter": {
   "2026-11-04": -12.41
  },
@@ -184,7 +184,7 @@
    "price": 104.0,
    "p": 0.528,
    "ev": 0.077,
-   "units": 3.75,
+   "units": 4.0,
    "edge": 3.0,
    "x": 2.0,
    "pDU": 0.5133,
@@ -198,7 +198,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 4.5,
-   "unitsCap": 3.75
+   "unitsCap": 4.0
   },
   {
    "id": "401928811",
@@ -213,7 +213,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.079,
-   "units": 1.75,
+   "units": 2.0,
    "edge": 6.0,
    "x": 2.0,
    "pDU": 0.5258,
@@ -235,7 +235,7 @@
     "unitsCap": 1.25
    },
    "unitsRaw": 2.25,
-   "unitsCap": 1.75
+   "unitsCap": 2.0
   },
   {
    "id": "401902276",
@@ -250,7 +250,7 @@
    "price": -100.0,
    "p": 0.521,
    "ev": 0.043,
-   "units": 1.5,
+   "units": 1.75,
    "edge": 2.3,
    "x": 2.0,
    "pDU": 0.5104,
@@ -272,7 +272,7 @@
     "unitsCap": 3.25
    },
    "unitsRaw": 2.0,
-   "unitsCap": 1.5
+   "unitsCap": 1.75
   },
   {
    "id": "401920191",
@@ -335,16 +335,8 @@
    "flagged": "2026-11-04T14:41:52Z",
    "betTo": 160.5,
    "close": 161.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 161.5,
-    "price": -100.0,
-    "ev": 0.061,
-    "units": 2.5,
-    "unitsRaw": 3.0,
-    "unitsCap": 2.5
-   },
+   "now": null,
+   "pass": true,
    "unitsRaw": 1.0,
    "unitsCap": 0.75
   },
@@ -434,6 +426,22 @@
    "tm": 144.9
   },
   {
+   "id": "401917514",
+   "sport": "cbb",
+   "kick": "2026-11-05T03:00:00Z",
+   "home": "Loyola Marymount",
+   "away": "Queens University",
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -106.0,
+   "edge": 3.3,
+   "x": 2.0,
+   "why": "no edge at -106",
+   "m": 9.3,
+   "tm": 158.2
+  },
+  {
    "id": "401919028",
    "sport": "cbb",
    "kick": "2026-11-05T00:30:00Z",
@@ -442,7 +450,7 @@
    "mk": "total",
    "side": "over",
    "line": 160.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 1.7,
    "x": 2.0,
    "why": "edge under 2",
@@ -458,7 +466,7 @@
    "mk": "spread",
    "side": "away",
    "line": 34.5,
-   "price": -102.0,
+   "price": -106.0,
    "edge": 6.5,
    "x": null,
    "why": "spread market off",
@@ -474,7 +482,7 @@
    "mk": "spread",
    "side": "away",
    "line": 16.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 4.7,
    "x": null,
    "why": "spread market off",
@@ -539,7 +547,7 @@
    "mk": "total",
    "side": "over",
    "line": 160.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -563,19 +571,19 @@
    "mk": "total",
    "side": "under",
    "line": 161.5,
-   "price": -100.0,
-   "ev": 0.061,
+   "price": -106.0,
    "edge": 3.3,
-   "units": 3.0,
+   "ev": null,
+   "units": 0.0,
    "home": "Loyola Marymount",
    "away": "Queens University",
-   "state": "pick"
+   "state": "under"
   },
   "401918052": {
    "mk": "spread",
    "side": "away",
    "line": 16.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -587,7 +595,7 @@
    "mk": "spread",
    "side": "away",
    "line": 34.5,
-   "price": -102.0,
+   "price": -106.0,
    "edge": 6.5,
    "ev": null,
    "units": 0.0,
@@ -672,7 +680,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4499,
+  "snapshots": 4505,
   "buckets": [
    {
     "when": "24h+",
@@ -685,12 +693,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 628,
+    "clvN": 630,
     "clvRet": -0.0448,
-    "clvT": -10.15,
+    "clvT": -10.18,
     "clv": 0.05,
-    "beat": 0.252,
-    "still": 0.406
+    "beat": 0.251,
+    "still": 0.408
    },
    {
     "when": "1-6h",
@@ -7624,7 +7632,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.079,
-   "units": 1.75,
+   "units": 2.0,
    "edge": 6.0,
    "x": 2.0,
    "pDU": 0.5258,
@@ -7636,7 +7644,7 @@
    "betTo": 162.5,
    "close": 162.5,
    "unitsRaw": 2.25,
-   "unitsCap": 1.75
+   "unitsCap": 2.0
   },
   {
    "id": "401920191",
@@ -7738,7 +7746,7 @@
    "price": -100.0,
    "p": 0.521,
    "ev": 0.043,
-   "units": 1.5,
+   "units": 1.75,
    "edge": 2.3,
    "x": 2.0,
    "pDU": 0.5104,
@@ -7750,7 +7758,7 @@
    "betTo": 153.5,
    "close": 155.5,
    "unitsRaw": 2.0,
-   "unitsCap": 1.5
+   "unitsCap": 1.75
   },
   {
    "id": "401917514",
@@ -7776,6 +7784,7 @@
    "flagged": "2026-11-04T14:41:52Z",
    "betTo": 160.5,
    "close": 161.5,
+   "pass": true,
    "unitsRaw": 1.0,
    "unitsCap": 0.75
   },
@@ -7792,7 +7801,7 @@
    "price": 104.0,
    "p": 0.528,
    "ev": 0.077,
-   "units": 3.75,
+   "units": 4.0,
    "edge": 3.0,
    "x": 2.0,
    "pDU": 0.5133,
@@ -7805,15 +7814,15 @@
    "close": 147.5,
    "pass": true,
    "unitsRaw": 4.5,
-   "unitsCap": 3.75
+   "unitsCap": 4.0
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 31.5,
-    "scale": 0.873,
+    "raw": 30.0,
+    "scale": 0.9167,
     "down": 12.5
    },
    "2026-11-05": {
@@ -7829,7 +7838,7 @@
     "scale": 0.8696
    },
    "2026-11-08": {
-    "raw": 29.75,
+    "raw": 30.25,
     "scale": 1.0
    },
    "2026-11-09": {

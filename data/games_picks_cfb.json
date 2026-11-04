@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T16:24:39Z",
+ "asof": "2026-11-04T16:30:06Z",
  "recenter": {
-  "week": 0.85
+  "week": 0.83
  },
  "monitor": {
   "clocks": {
@@ -514,8 +514,8 @@
    "flagged": "2026-11-01T20:17:01Z",
    "betTo": 68.5,
    "close": 72.5,
-   "now": null,
    "pass": true,
+   "now": null,
    "unitsRaw": 5.0,
    "unitsCap": 4.25
   },
@@ -698,7 +698,7 @@
    "price": -100.0,
    "p": 0.52,
    "ev": 0.041,
-   "units": 2.5,
+   "units": 2.75,
    "edge": 5.0,
    "x": 3.0,
    "pDU": 0.515,
@@ -712,7 +712,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 3.0,
-   "unitsCap": 2.5
+   "unitsCap": 2.75
   },
   {
    "id": "401862819",
@@ -743,7 +743,7 @@
     "side": "over",
     "line": 47.5,
     "price": -100.0,
-    "ev": 0.039,
+    "ev": 0.04,
     "units": 2.25,
     "unitsRaw": 2.75,
     "unitsCap": 2.25
@@ -780,7 +780,7 @@
     "side": "under",
     "line": 64.5,
     "price": -102.0,
-    "ev": 0.026,
+    "ev": 0.025,
     "units": 1.5,
     "unitsRaw": 1.75,
     "unitsCap": 1.5
@@ -1608,6 +1608,22 @@
    "tm": 58.7
   },
   {
+   "id": "401858511",
+   "sport": "cfb",
+   "kick": "2026-11-08T00:30:00.000Z",
+   "home": "Michigan",
+   "away": "Michigan State",
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -106.0,
+   "edge": 3.3,
+   "x": 3.0,
+   "why": "no edge at -106",
+   "m": 13.3,
+   "tm": 42.8
+  },
+  {
    "id": "401856852",
    "sport": "cfb",
    "kick": "2026-11-08T00:30:00.000Z",
@@ -1638,6 +1654,22 @@
    "why": "edge under 6 (season: late)",
    "m": -3.2,
    "tm": 49.7
+  },
+  {
+   "id": "401858290",
+   "sport": "cfb",
+   "kick": "2026-11-07T20:30:00.000Z",
+   "home": "Wake Forest",
+   "away": "Merrimack",
+   "mk": "total",
+   "side": "under",
+   "line": 60.5,
+   "price": -102.0,
+   "edge": 2.8,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 52.8,
+   "tm": 57.7
   },
   {
    "id": "401856854",
@@ -1744,7 +1776,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 4.7,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1760,7 +1792,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.3,
    "x": 3.0,
    "why": "edge under 3",
@@ -1776,7 +1808,7 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.1,
    "x": 3.0,
    "why": "edge under 3",
@@ -1910,38 +1942,6 @@
    "why": "edge under 3",
    "m": -5.3,
    "tm": 52.9
-  },
-  {
-   "id": "401866457",
-   "sport": "cfb",
-   "kick": "2026-11-05T00:00:00.000Z",
-   "home": "Sacramento State",
-   "away": "Toledo",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -102.0,
-   "edge": 1.4,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -25.1,
-   "tm": 53.9
-  },
-  {
-   "id": "401866456",
-   "sport": "cfb",
-   "kick": "2026-11-05T00:30:00.000Z",
-   "home": "Eastern Michigan",
-   "away": "Central Michigan",
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -111.0,
-   "edge": 2.7,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": -1.2,
-   "tm": 45.5
   }
  ],
  "games": {
@@ -1985,7 +1985,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -2094,7 +2094,7 @@
    "side": "under",
    "line": 64.5,
    "price": -102.0,
-   "ev": 0.026,
+   "ev": 0.025,
    "edge": 4.4,
    "units": 1.75,
    "home": "Texas Tech",
@@ -2222,11 +2222,11 @@
    "state": "under"
   },
   "401858511": {
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -104.0,
-   "edge": 0.2,
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -106.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
@@ -2249,7 +2249,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -2321,7 +2321,7 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2363,6 +2363,18 @@
    "units": 0.0,
    "home": "Southern Miss",
    "away": "James Madison",
+   "state": "under"
+  },
+  "401858290": {
+   "mk": "total",
+   "side": "under",
+   "line": 60.5,
+   "price": -102.0,
+   "edge": 2.8,
+   "ev": null,
+   "units": 0.0,
+   "home": "Wake Forest",
+   "away": "Merrimack",
    "state": "under"
   },
   "401858517": {
@@ -2549,7 +2561,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2610,7 +2622,7 @@
    "side": "over",
    "line": 47.5,
    "price": -100.0,
-   "ev": 0.039,
+   "ev": 0.04,
    "edge": 4.8,
    "units": 2.75,
    "home": "UAB",
@@ -2706,16 +2718,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7678,
+  "snapshots": 7687,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1841,
+    "clvN": 1845,
     "clvRet": -0.0436,
-    "clvT": -25.06,
+    "clvT": -25.11,
     "clv": 0.22,
-    "beat": 0.29,
-    "still": 0.508
+    "beat": 0.289,
+    "still": 0.509
    },
    {
     "when": "6-24h",
@@ -2910,7 +2922,7 @@
    "price": -100.0,
    "p": 0.52,
    "ev": 0.041,
-   "units": 2.5,
+   "units": 2.75,
    "edge": 5.0,
    "x": 3.0,
    "pDU": 0.515,
@@ -2923,7 +2935,7 @@
    "close": 52.5,
    "pass": true,
    "unitsRaw": 3.0,
-   "unitsCap": 2.5
+   "unitsCap": 2.75
   },
   {
    "id": "401858514",
@@ -3796,8 +3808,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 31.5,
-    "scale": 0.873,
+    "raw": 30.0,
+    "scale": 0.9167,
     "down": 12.5
    },
    "2026-11-05": {
@@ -3813,7 +3825,7 @@
     "scale": 0.8696
    },
    "2026-11-08": {
-    "raw": 29.75,
+    "raw": 30.25,
     "scale": 1.0
    },
    "2026-11-09": {
