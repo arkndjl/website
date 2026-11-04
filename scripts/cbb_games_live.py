@@ -371,6 +371,8 @@ def build():
     for t, v in st.get('tm', {}).items():          # last season's market totals, part carried in (P['tcar'])
         W.tm[t] = v
     W.final[SEASON - 1] = st['final']
+    if st.get('xfinal'):
+        W.xfinal[SEASON - 1] = st['xfinal']       # last season's pooled non-D-I rating (P['xcar'])
     W.attm[SEASON - 1] = st.get('att', {})         # last season's home crowds ('hatt')
     av, missing = avail_live()
     now = now_utc()

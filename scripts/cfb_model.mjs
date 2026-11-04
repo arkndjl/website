@@ -1029,17 +1029,23 @@ export function fpiGap(snaps, from = 2023, lagH = 6) {
   };
 }
 // stack weights for season S from rows {r, m (walk-forward model margin)} of seasons [from, S): { a, b, sigma } or null
-export function fpiStack(rows, gap, S, from = 2023) {
-  const tr = rows.filter(q => q.r.S >= from && q.r.S < S && q.r.done && q.r.fbsGame).map(q => ({ q, g: gap(q.r) })).filter(z => z.g != null);
+// home: FPI is a neutral-field rating, so a x model alone scaled the model's home edge down by a (~.55): 2024-26 home
+// sides beat the stacked margin by 1.6-1.9 pts a season. A home column (1 unless neutral) gives it back (STACK_HOME)
+export const STACK_HOME = process.env.CFB_STACK_HOME !== '0';
+export function fpiStack(rows, gap, S, from = 2023, home = STACK_HOME) {
+  const tr = rows.filter(q => q.r.S >= from && q.r.S < S && q.r.done && q.r.fbsGame).map(q => ({ q, g: gap(q.r), h: home && !q.r.n ? 1 : 0 })).filter(z => z.g != null);
   if (tr.length < 200) return null;
   const clip = v => Math.max(-45, Math.min(45, v));
-  const [a, b] = ols(tr.map(z => [z.q.m, z.g]), tr.map(z => clip(z.q.r.m)), 1e-9, 0);
-  const res = tr.map(z => z.q.r.m - a * z.q.m - b * z.g), sM = sd(res);
-  const lw = s => tr.reduce((acc, z) => { const p = Math.min(1 - 1e-9, Math.max(1e-9, phi((a * z.q.m + b * z.g) / s))), y = z.q.r.m > 0 ? 1 : z.q.r.m < 0 ? 0 : 0.5;
+  const [a, b, c = 0] = ols(tr.map(z => home ? [z.q.m, z.g, z.h] : [z.q.m, z.g]), tr.map(z => clip(z.q.r.m)), 1e-9, 0);
+  const st = { a, b, c, home };
+  const res = tr.map(z => z.q.r.m - stackM(st, z.q.m, z.g, z.q.r)), sM = sd(res);
+  const lw = s => tr.reduce((acc, z) => { const p = Math.min(1 - 1e-9, Math.max(1e-9, phi(stackM(st, z.q.m, z.g, z.q.r) / s))), y = z.q.r.m > 0 ? 1 : z.q.r.m < 0 ? 0 : 0.5;
     return acc - y * Math.log(p) - (1 - y) * Math.log(1 - p); }, 0);
   let sigma = sM; for (let f = 0.5; f <= 1.2001; f += 0.02) if (lw(sM * f) < lw(sigma)) sigma = sM * f;
-  return { a, b, sigma, n: tr.length };
+  return { ...st, sigma, n: tr.length };
 }
+// the stacked margin for game r: model margin m0, FPI gap g (home minus away)
+export const stackM = (st, m0, g, r) => st.a * m0 + st.b * g + (st.c || 0) * (r.n ? 0 : 1);
 export async function runModel(data, SEASON, opts = {}) {
   // history mode (opts.hist: { first, P, extra }): every season in data (ESPN-built, scripts/cfb_espn_md.mjs), preseason
   // prior weights pooled over every earlier season, margin weights pooled over every season from first, hyperparameters
@@ -1249,7 +1255,7 @@ export async function runModel(data, SEASON, opts = {}) {
       for (const p of byS[S]) if (p.r.done && p.r.fbsGame) {
         const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null, ek = earlyK(p.r);
         const ld = ldOf(LD, p.r);
-        out.push({ r: p.r, m: (g != null ? stk.a * m0 + stk.b * g : m0) * ek + ld, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, ld, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
+        out.push({ r: p.r, m: (g != null ? stackM(stk, m0, g, p.r) : m0) * ek + ld, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, ld, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
           tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0, p.t.tot)]) : null });
       }
       wf.push(...earlyTotals(out));
@@ -1269,7 +1275,7 @@ export async function runModel(data, SEASON, opts = {}) {
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
   // the model's margin before the early-season stretch (predict applies it) and with the letdown spot
-  const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return (g != null ? stackNow.a * m0 + stackNow.b * g : m0) + ldOf(LD, r); };
+  const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return (g != null ? stackM(stackNow, m0, g, r) : m0) + ldOf(LD, r); };
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a), t.tot)]); };
   // the mean model total of a week's FBS games (the early-season totals shrink toward it)
   const wkTot = {}, weekTot = w => wkTot[w] ??= (xs => xs.length ? mean(xs) : NaN)(cur.filter(r => r.w === w && r.fbsGame).map(tOf).filter(isFinite));
@@ -1321,7 +1327,7 @@ export async function runModel(data, SEASON, opts = {}) {
       b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side', 'market-rating total minus projection'] },
     st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
     weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest, fit: HI?.fit || null,
-    fpiStack: stackNow ? { from: FP.from, model: r3(stackNow.a), fpi: r3(stackNow.b), sigma: r1(stackNow.sigma), games: stackNow.n } : null,
+    fpiStack: stackNow ? { from: FP.from, model: r3(stackNow.a), fpi: r3(stackNow.b), home: r3(stackNow.c || 0), sigma: r1(stackNow.sigma), games: stackNow.n } : null,
     grid: grid.length,
   };
   return {

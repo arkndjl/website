@@ -869,11 +869,11 @@ class Ratings:
         m = 2 * n + 2
         pri = np.concatenate([self.pO, self.pD, [P['mu0'], P['h0']]])
         prec = np.concatenate([lam * self.lm, lam * self.lm, [0.01, 0.5]])
-        prec[self.ix[X]] = prec[n + self.ix[X]] = 0.5
+        prec[self.ix[X]] = prec[n + self.ix[X]] = P.get('xprec', 0.5)
         if self.PM is not None:
             Pm = np.diag(prec)
             Pm[:n, :n] = Pm[n:2 * n, n:2 * n] = lam * self.PM
-            Pm[self.ix[X], self.ix[X]] = Pm[n + self.ix[X], n + self.ix[X]] = 0.5
+            Pm[self.ix[X], self.ix[X]] = Pm[n + self.ix[X], n + self.ix[X]] = P.get('xprec', 0.5)
             M, rhs = self.A + Pm, self.b + Pm @ pri
         else:
             M, rhs = self.A + np.diag(prec), self.b + prec * pri
@@ -930,6 +930,7 @@ class Walk:
         self.tm0 = {}                   # last season's final market total gaps ('tpri')
         self.tlg = 140.0
         self.final = {}                 # season -> team -> {O, D, T, net}
+        self.xfinal = {}                # season -> the pooled non-D-I rating X at season end {O, D, T} ('xcar')
         self.pcoef = coefs or {}        # season -> prior coefficients
         self.prior_rows = []            # (season, team, features, target) for the prior regression
         self.nofeat = []                # (season, final net) of teams with no roster rows
@@ -1006,6 +1007,11 @@ class Walk:
                           'ao': L.get('ao', 0.0), 'ad': L.get('ad', 0.0)}
             else:
                 out[t] = {'O': pn / 2, 'D': pn / 2, 'T': 0.0, 'net': pn}
+        # the pooled non-D-I opponent X starts from last season's final X instead of a flat -10 / -10 (xcar: share of
+        # its gap to -10 carried). Flat, every opener's non-D-I games ran ~12 pts under the result (2016-26, days 0-1)
+        xl, xc = self.xfinal.get(s - 1), self.P.get('xcar', 0.0)
+        if xl and xc:
+            out[X] = {'O': -10.0 + xc * (xl['O'] + 10.0), 'D': -10.0 + xc * (xl['D'] + 10.0), 'T': xc * xl['T']}
         return out, feats
 
     def new_season(self, s):
@@ -1205,6 +1211,7 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
         R.solve((datetime(s, 4, 10) - day0).days)
         W.final[s] = {t: {'O': float(R.O[R.ix[t]]), 'D': float(R.D[R.ix[t]]), 'T': float(R.T[R.ix[t]]),
                           'net': float(R.O[R.ix[t]] + R.D[R.ix[t]]), 'ao': float(R.ao[R.ix[t]]), 'ad': float(R.ad[R.ix[t]])} for t in teams}
+        W.xfinal[s] = {'O': float(R.O[R.ix[X]]), 'D': float(R.D[R.ix[X]]), 'T': float(R.T[R.ix[X]])}
         for t in teams:
             if t in pfeats and R.ng[t] >= 15:
                 W.prior_rows.append((s, t, pfeats[t], W.final[s][t]['net']))
@@ -1243,8 +1250,14 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
 # all three: margin vs close t 4.4 / 5.2 (SE t -4.1), MAE -.016 / -.008; totals t 3.9 / 5.7 (SE t -3.1), MAE -.058 /
 # -.041. A new head coach's own tempo as the tempo prior fails (4 variants: movers' old-school tempo at full or half
 # weight, other new coaches' carried tempo halved; none beats the close)
+# xcar (Nov 4 2026, ARK/game-model sweep): every non-D-I opponent shares one rating X, which started each season at a
+# flat -10 / -10, so on the opening days the D-I side's margin ran 12.1 pts under the result (2016-26, every season
+# +6.7 to +16.4) and those blowouts inflated the D-I sides' own ratings. X now starts from last season's final X.
+# Walk-forward, shipped inputs: non-D-I games MAE -0.50 (t -2.06) 2016-20 / -0.40 (t -2.22) 2021-26; D-I games -0.031
+# (t -2.43) / -0.038 (t -3.12); lined D-I -0.0078 (t -4.9) / -0.0065 (t -2.8); first 14 days -0.16 / -0.17. Half carry
+# (.5) gains less on 2016-20; X's prior precision (xprec 4, 30) flat
 APLK = 1.0107
-DEFAULT = {'ldft': 0.5, 'aplmix': 0.5, 'aplo': 1.0, 'apld': 4.0, 'thl': 20.0, 'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
+DEFAULT = {'xcar': 1.0, 'ldft': 0.5, 'aplmix': 0.5, 'aplo': 1.0, 'apld': 4.0, 'thl': 20.0, 'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
            'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 
 
@@ -1366,6 +1379,7 @@ def fit():
         P = json.load(open(FIT))['params']
         P.setdefault('cv', DEFAULT['cv'])
         P.setdefault('lw3', DEFAULT['lw3'])
+        P.setdefault('xcar', DEFAULT['xcar'])
         for k in ('thl', 'ldft', 'aplmix', 'aplo', 'apld'):
             P.setdefault(k, DEFAULT[k])
         log = json.load(open(FIT))['grid']
@@ -1576,7 +1590,8 @@ def report():
     st = {'elo': {t: round(v, 1) for t, v in W.elo.items()}, 'mkt': {t: round(v, 2) for t, v in W.mkt.items()}, 'tlg': round(W.tlg, 2),
           'tm': {t: round(v, 2) for t, v in W.tm.items()},
           'final': {t: {k: round(v, 3) for k, v in r.items()} for t, r in W.final[LAST].items()}, 'season': LAST,
-          'att': {t: round(sum(v) / len(v), 4) for t, v in W.att.items() if v}}
+          'att': {t: round(sum(v) / len(v), 4) for t, v in W.att.items() if v},
+          'xfinal': {k: round(v, 3) for k, v in W.xfinal.get(LAST, {}).items()}}
     with open(STATE, 'w') as f:
         json.dump(st, f, separators=(',', ':'))
     print(json.dumps({k: v for k, v in out.items() if k not in ('grid', 'select', 'bySeason')}, indent=1))
