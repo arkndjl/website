@@ -20,7 +20,7 @@
 {{- $fit := site.Data.nfl_war_fit -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" "K" "P" -}}
 {{- $teams := slice "ARI" "ATL" "BAL" "BUF" "CAR" "CHI" "CIN" "CLE" "DAL" "DEN" "DET" "GB" "HOU" "IND" "JAX" "KC" "LA" "LAC" "LV" "MIA" "MIN" "NE" "NO" "NYG" "NYJ" "PHI" "PIT" "SEA" "SF" "TB" "TEN" "WAS" -}}
-<div class="win cfb nflwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflwar data-gfx-logo="/img/nfl/{}.png" data-src="{{ "data/nfl-war.json" | relURL }}" data-gfx-cols="RK,Player,WAA,WAR,WAR/17,Pos,Team,AV"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+<div class="win cfb nflwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflwar data-gfx-logo="/img/nfl/{}.png" data-src="{{ "data/nfl-war.json" | relURL }}" data-gfx-cols="RK,Player,WAA,WAR,WAR/17,Pos,Team,Age,AV"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "nfl_war.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -59,12 +59,12 @@
         <th data-sort="p3" data-num title="3Y = projected WAR over the next three seasons, same inputs. held out 2015-22: RMSE .326 vs .342 for the Marcel WAR rate x snaps (calibrated), t -5.9, 8/8 seasons">3Y</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position by WAA within the filters (QB3 = 3rd QB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
+        <th data-sort="age" data-num title="age on Sept 1">Age</th>
         <th data-sort="xv" data-num title="XV = WAR from the parts of the stat line that track team margin (EPA, CPOE, sacks taken, first downs, yards after contact, pressures, stops, missed tackles, coverage allowed, penalties), z within the sub-position, weights fit on 2018-25 team margin. 40% of WAR">XV</th>
         <th data-sort="stw" data-num title="ST = special teams wins: kicking (FG + XP), punting, kick and punt returns, in points over an average specialist (EPA over the expectation from the kick spot, or the catch spot for returns), shrunk to the part that carries to the next season, over 35.5 points a win. In WAR. kickers and punters: WAR = ST">ST</th>
         <th data-sort="av" data-num title="AV = Approximate Value, season to date, rebuilt from nflverse play stats + snaps on PFR's method. offense: fit to PFR AV. defense: pool split by EPA credit for pressures, stops, plays on the ball">AV</th>
         <th data-sort="g" data-num class="cfb__g">G</th>
         <th data-sort="sn" data-num title="snaps, own side of the ball">Snaps</th>
-        <th data-sort="age" data-num title="age on Sept 1">Age</th>
         <th data-sort="line">Season line</th>
       </tr></thead>
       <tbody></tbody>
@@ -150,12 +150,12 @@
         '<td class="cfb__num">' + f2(p.p3) + '</td>' +
         '<td class="cfb__g"' + (p.two ? ' title="two-way: ' + p.two.so + ' offense, ' + p.two.sd + ' defense snaps"' : '') + '>' + p.pos + (p.two ? '/' + p.two.p2 : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
         '<td class="nflwar__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
+        '<td class="cfb__num">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__num">' + (p.xv == null ? '' : f2(p.xv)) + '</td>' +
         '<td class="cfb__num"' + (p.stl ? ' title="' + esc(p.stl) + '"' : '') + '>' + (p.stw == null ? '' : f2(p.stw)) + '</td>' +
         '<td class="cfb__num">' + p.av.toFixed(1) + '</td>' +
         '<td class="cfb__num cfb__g">' + p.g + '</td>' +
         '<td class="cfb__num">' + p.sn + '</td>' +
-        '<td class="cfb__num">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__dim">' + (p.two ? 'off ' + f2(p.two.o) + ' (' + p.two.so + ' sn) / def ' + f2(p.two.d) + ' (' + p.two.sd + ' sn) WAR; ' : '') + esc(p.line) + '</td></tr>';
     }).join('');
     none.hidden = list.length > 0;

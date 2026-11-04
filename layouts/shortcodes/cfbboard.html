@@ -22,7 +22,7 @@
 {{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" }}{{ $yrOn := in (slice "" "fbs" "fcs") $preset -}}
 {{- $s := 2026 }}{{ with $d }}{{ $s = int .season }}{{ end -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}" data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,WAA,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,Age,WAA,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -101,6 +101,7 @@
         <th data-sort="waa" data-num class="cfb__war" aria-sort="descending" title="WAA = WAR - snap share x line: wins over an average starter at the position, same snaps; comparable across positions; below average &lt; 0">WAA</th>
         <th data-sort="war" data-num title="college WAR = wins a 12-game season over a replacement starter = snap share x (line + weight x quality) x .227; quality from Stat+, badges, FV. line = margin lost when an average starter at the spot sits (OT / IOL, slot WR, nickel CB): QB 2.7 pts a game (regular seasons 2019-25), others .8-1.7; blend of missed games, NFL spot values, position grade. QB production partly credited to offensive teammates. 4.4 pts of margin a game = 1 win. K, P: points over an average K / P. FCS: vs FCS starters. no snaps = 0">WAR</th>
         <th data-sort="xv" data-num title="XV = WAR with quality measured by the parts of the stat line that track winning (same lines, 12-game pace): PFN score plus QB completion %, yds an attempt, INT rate, rush yds; RB yds a carry, elusiveness; OL run block, pressure rate allowed; EDGE / DT sacks and splash plays a snap; LB passer rating allowed, pressures; CB rating and yds a target allowed; S plays on the ball. Fit on 2024-25 team margin. Held-out seasons: team XV tracks margin r .88 vs .86 for WAR's quality, win% .73 vs .68, defense .73 vs .69">XV</th>
+        <th data-sort="age" data-num>Age</th>
         {{- end }}
         <th data-sort="pos" title="position + rank at position by FV (QB3 = 3rd QB); sorts by position, then rank">Pos</th>
         <th data-sort="team">School</th>
@@ -122,7 +123,9 @@
         <th data-sort="ynil" data-num class="cfb__now" title="yNIL = estimated NIL pay entering the season: program budget split by preseason index; FCS programs ~$0.4M">yNIL</th>
         <th data-sort="znil" data-num class="cfb__now" title="zNIL = xNIL - yNIL: value change vs estimated pay">zNIL</th>
         <th data-sort="cls" data-num class="cfb__g">Class</th>
+        {{- if ne $preset "war" }}
         <th data-sort="age" data-num>Age</th>
+        {{- end }}
         <th data-sort="ht" data-num title="height / weight, BMI; sorts by height">Ht / Wt · BMI</th>
         <th data-sort="mht" data-num title="measured: combine-equivalent height (in, quarter inch) / weight, BMI. Each listing (ESPN, 247) weighted by its error against NFL combine and pro day measurements (2013-25 classes), shrunk toward the position's combine mean; roster heights run +0.5 in. hover: sources and weights; sorts by height">Meas · BMI</th>
       </tr></thead>

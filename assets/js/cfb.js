@@ -66,6 +66,7 @@
     return '<span title="' + esc(t) + '"' + (r.war < 0 ? ' class="cfb__down"' : r.war === 0 ? ' class="cfb__dim"' : '') + '>' + (+r.war).toFixed(2) + '</span>';
   }
   // WAA: wins over an average starter at his position (the position-adjusted view of WAR)
+  function ageCell(r) { return r.age != null ? (+r.age).toFixed(1) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—'; }
   function waaCell(r) {
     if (r.waa == null) return dim;
     return '<span title="wins over an average ' + (r.pos === 'K' ? 'kicker' : r.pos === 'P' ? 'punter' : r.pos + ' starter') + ', same snaps"' + (r.waa < 0 ? ' class="cfb__down"' : r.waa === 0 ? ' class="cfb__dim"' : '') + '>' + (r.waa > 0 ? '+' : '') + (+r.waa).toFixed(2) + '</span>';
@@ -170,7 +171,7 @@
       (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season)">▲FBS</span>' : '') +
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') +
       (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '') + '</td>' +
-      (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war is-key">' + waaCell(r) + '</td><td class="cfb__num">' + warCell(r) + '</td><td class="cfb__num">' + xvCell(r) + '</td>' : '') +
+      (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war is-key">' + waaCell(r) + '</td><td class="cfb__num">' + warCell(r) + '</td><td class="cfb__num">' + xvCell(r) + '</td><td class="cfb__num">' + ageCell(r) + '</td>' : '') +
       (yx ? '<td class="cfb__pos-cell" title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '">' + yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : '') + '</td>' :
       '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAA' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>') +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span></td>' +
@@ -187,7 +188,7 @@
         '<td class="cfb__num cfb__now">' + (r.ynil != null ? money(r.ynil) : dim) + '</td>' +
         '<td class="cfb__num cfb__now">' + (r.znil != null ? '<span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : dim) + '</td>' : '') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
-      '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(1) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—') + '</td>' +
+      (opt.rankBy === 'war' ? '' : '<td class="cfb__num">' + ageCell(r) + '</td>') +
       '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td>' + measCell(r) + '</tr>';
   }
 
