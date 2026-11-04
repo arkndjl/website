@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-04T02:23:33Z",
+ "asof": "2026-11-04T02:44:12Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -396,14 +396,8 @@
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
    "close": 47.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 47.5,
-    "price": -104.0,
-    "ev": 0.051,
-    "units": 0.25
-   }
+   "now": null,
+   "pass": true
   },
   {
    "id": "2026_09_LV_SF",
@@ -449,6 +443,22 @@
    "why": "no edge at -117",
    "m": 8.5,
    "tm": 49.3
+  },
+  {
+   "id": "2026_09_TB_CHI",
+   "sport": "nfl",
+   "kick": "2026-11-09T01:20:00Z",
+   "home": "CHI",
+   "away": "TB",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -106.0,
+   "edge": 2.5,
+   "x": 1.5,
+   "why": "no edge at -106",
+   "m": 6.5,
+   "tm": 45.0
   },
   {
    "id": "2026_09_CLE_NO",
@@ -724,13 +734,13 @@
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": -104.0,
-   "ev": 0.051,
+   "price": -106.0,
    "edge": 2.5,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "CHI",
    "away": "TB",
-   "state": "pick"
+   "state": "under"
   },
   "2026_09_BUF_MIN": {
    "mk": "ml",
@@ -797,16 +807,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1462,
+  "snapshots": 1465,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 558,
-    "clvRet": -0.0346,
-    "clvT": -12.74,
+    "clvN": 560,
+    "clvRet": -0.0345,
+    "clvT": -12.71,
     "clv": 0.42,
-    "beat": 0.226,
-    "still": 0.751
+    "beat": 0.225,
+    "still": 0.752
    },
    {
     "when": "6-24h",
@@ -1836,20 +1846,21 @@
    "tm": 45.0,
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
-   "close": 47.5
+   "close": 47.5,
+   "pass": true
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 5.0,
-    "scale": 1.0,
+    "raw": 10.25,
+    "scale": 0.9024,
     "down": 30.75
    },
    "2026-11-04": {
-    "raw": 41.0,
-    "scale": 0.9756
+    "raw": 42.0,
+    "scale": 0.9524
    },
    "2026-11-05": {
     "raw": 20.0,
@@ -1864,7 +1875,7 @@
     "scale": 0.8081
    },
    "2026-11-08": {
-    "raw": 17.5,
+    "raw": 19.5,
     "scale": 1.0
    },
    "2026-11-09": {
