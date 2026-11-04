@@ -20,7 +20,9 @@ Contract surplus: projected VORX x $ per win minus salary (Basketball-Reference 
                 is worth more (max(0, value - salary)).
 
 1Y / 3Y (p1, p3): next season's and the next three seasons' minutes-weighted XPM (a season off the board counts as -2),
-  from XPM (proj), age and the minutes above (data/nba_proj3y_fit.json, scripts/nba_proj3y_research.py). Display only;
+  from XPM (proj), age and the minutes above, plus (form H4, Nov 4: stars ran ~.6 low) a hinge max(0, proj - 3), the
+  two seasons before reliability-weighted, and proj x ln(minutes over three seasons) (data/nba_proj3y_fit.json,
+  scripts/nba_proj3y_research.py, scripts/nba_proj3y_star_research.py). Display only;
   the contract years below still age XPM (proj) on the curve (the 3Y form did not beat that on VORX early in a season).
 
   python3 scripts/nba_proj.py --fit     # refit tau / sigma (data/nba_proj_fit.json) with the held-out coverage check
@@ -42,16 +44,21 @@ FIT3 = os.path.join(ROOT, 'data', 'nba_proj3y_fit.json')
 
 
 def proj3(fit3, f):
-    """the 1Y / 3Y projection (scripts/nba_proj3y_research.py, form F4): (proj, age, M) -> (next season, next three),
+    """the 1Y / 3Y projection (scripts/nba_proj3y_research.py F4, + H4 terms from nba_proj3y_star_research.py):
+    (proj, age, M, ...) -> (next season, next three),
     coefficients at season share f, linear between the grid's points"""
     g = fit3['grid']; f = min(max(f, g[0]['f']), 1.0)
     i = max(j for j in range(len(g)) if g[j]['f'] <= f); i = min(i, len(g) - 2)
     t = (f - g[i]['f']) / (g[i + 1]['f'] - g[i]['f'])
     C = {k: [a + (b - a) * t for a, b in zip(g[i]['c'][k], g[i + 1]['c'][k])] for k in ('y1', 'y3y')}
-    A0 = fit3['A0']
-    def go(pj, age, m):
+    A0, form, hc = fit3['A0'], fit3.get('form', 'F4'), fit3.get('HC', 3.0)
+    def go(pj, age, m, d1=0.0, d2=0.0, c3=0.0):
+        """d1, d2: (XPM + 2) x MP / (MP + 1000) in the two seasons before (0 off the board); c3: minutes this season and
+        the two before (form H4, scripts/nba_proj3y_star_research.py)"""
         a, lm = age - A0, math.log1p(max(m, 0))
         x = [1, pj, a, a * a, lm, pj * a, pj * (lm - 7)]
+        if form == 'H4':
+            x += [max(0.0, pj - hc), d1, d2, pj * (math.log1p(c3) - 8)]
         return tuple(sum(c * v for c, v in zip(C[k], x)) for k in ('y1', 'y3y'))
     return go
 
@@ -144,6 +151,8 @@ def project(fresh=True):
     ids = set(curp) | {i for i in con if i in lastp}
     aging = __import__('nba_games').aging_curve(season)
     p3 = proj3(json.load(open(FIT3)), (gp or 0) / 82) if os.path.exists(FIT3) else None
+    hist = [{p['id']: p for p in (d['players'] if d else []) if p.get('xpm') is not None and not p.get('pr')}
+            for d in (last, load(season - 2))]
     rows = []
     for pid in ids:
         c, l = curp.get(pid), lastp.get(pid)
@@ -171,7 +180,10 @@ def project(fresh=True):
              'pmp': round(mp + mpg * share * left), 'pvorx': round(vorx0 + vrest, 2),
              'mpg82': mpg * share * 82}
         if p3 and r['age']:
-            r['p1'], r['p3'] = (round(v, 1) for v in p3(pv[0], r['age'], mpg * share * 82))
+            h1, h2 = hist[0].get(pid), hist[1].get(pid)
+            d = [(h['xpm'] + 2) * h['mp'] / (h['mp'] + 1000) if h else 0.0 for h in (h1, h2)]
+            c3 = mp + sum(h['mp'] for h in (h1, h2) if h)
+            r['p1'], r['p3'] = (round(v, 1) for v in p3(pv[0], r['age'], mpg * share * 82, d[0], d[1], c3))
         if pid in con: r['sal'] = con[pid]['yrs']
         rows.append(r)
     # the market's $ per win this season: payroll above the minimum over the projected wins it buys

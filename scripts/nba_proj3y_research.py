@@ -35,6 +35,8 @@ VORX (minutes M held flat) with t <= -2 at every f.
 Result (Nov 3 2026): F4 ships (3Y held out at season end RMSE .843 vs cal .897 / aged 1.031 / flat 1.160, t -8.2 vs
 cal, 12/12 seasons). Contract switch fails: shrunk forms lose on VORX late in a season, F3c loses early (f .1 t +7).
 Stars still run low (proj 4+: 3.80 vs actual 4.44 over three seasons; aged 5.43).
+Nov 4 2026: superseded live by H4 (F4 + hinge max(0, proj - 3) + the two seasons before + proj x ln(3-season minutes),
+scripts/nba_proj3y_star_research.py): rerun that with --write after this script, or the live form falls back to F4.
 
 Live guard (a partial season): coefficients per season share f, fit on simulated partial seasons like the rookie 3Y:
 games g_f = max(1, round(g f)), minutes MP g_f / g x exp(N(0, .25 sqrt((1 - f) / f))) (role noise, an assumption),
