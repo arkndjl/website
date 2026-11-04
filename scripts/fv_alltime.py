@@ -10,7 +10,8 @@ Every prospect board's history, graded the way that board grades today, ranked w
           (college exits through 2020, six NBA seasons or more)
   hockey  every 2008-19 pick's draft-day grade, fit without his class (data/hockey.json past), outcome = peak NHL WAR FV
   soccer  past seasons 2013-20, listed players (data/soccer_prospects.json past), outcome = peak market value FV
-  tennis  past seasons, listed players, ATP and WTA (data/tennis_prospects_fit.json past), outcome = peak ranking FV
+  tennis  each player once, at his last October as a prospect (data/tennis_prospects_fit.json alltime, held out by birth
+          year), ATP and WTA, outcome = peak ranking FV
 A player shows once: CFB and CBB at the draft that followed his last season (Nov 3 2026: a best season ran hot and
 missed the final season and the combine), the other boards at his best season's grade. The headline is the mean outcome (stretched above each board's knot,
 data/fv_scale.json); fvx is the exact mean, and the check compares it with what the careers became.
@@ -207,6 +208,8 @@ def cfb(path):
     # each class's top 32 realized 45.9 -> 48.8. On the list (one row per player, graded or reaching 35+), against
     # each player's best season: MSE 461 -> 310 (t -15.2, 9/9). Tested and not used: athletic z by position, speed
     # score, measured height and weight (+.3 MSE), a position hinge at the top (t -0.0), invited x grade
+    # Nov 4 2026, TE top (25 given 51 became 43): a TE own line (t -1.7), TE slope (t -2.0), TE+RB lines (t -1.2), Holm k 3:
+    # none pass. Part of the gap is AV (TE Pro Bowlers map to 58 vs 63-75 elsewhere); the rest is a flat TE grade slope (.72)
     Z = lambda r, q: X(r['fvx']) + [float(q.get('inv') or 0), float(q.get('ath') or 0)]
     fin = [(r, q) for r, q in zip(rows, src) if q['final'] and r['last'] < 2026]
     fits = {}
@@ -278,14 +281,14 @@ def tennis():
     T = json.load(open(P('data', 'tennis_prospects_fit.json')))
     R = []
     for tour in ('atp', 'wta'):
-        for r in T[tour]['past']:
+        for r in T[tour].get('alltime') or T[tour]['past']:
             R.append({'name': r['name'], 'season': r['season'], 'team': r.get('nat', ''), 'pos': tour.upper(), 'fvx': r.get('fvx', r['fv']), 'fv': r['fv'], 'out': r.get('out'),
                       'age': r.get('age'), 'rank': r.get('rank'), 'pkr': r.get('pkr')})
     peaks = best_per_player(R, lambda r: r['pos'] + '|' + r['name'])
     groups = ['ATP', 'WTA']
     return {'label': 'Tennis', 'seasons': [min(r['season'] for r in R), max(r['season'] for r in R)], 'groups': groups, 'n': len(R), 'players': len(peaks),
             'outcome': 'peak ranking on the FV scale', 'rows': listed(peaks, groups, lambda r: r['pos'], TN_ALL), 'check': check(R, peaks, groups, lambda r: r['pos'], TN_ALL),
-            'complete': 'every ranked player graded 45+ at his youngest season (the past list also carries lower grades who reached 55+, left out here)'}
+            'complete': 'every ranked player graded 45+ in his last October as a prospect (the past list also carries lower grades who reached 55+, left out here)'}
 
 
 def main():

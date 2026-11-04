@@ -762,6 +762,19 @@ def fit(scorecard_only=False):
                                    peak=round(float(r.pk) * 20, 2), pkr=None if r.pk <= 0 or np.isnan(xrank([r.pk], T_['rank'])[0]) else int(round(float(xrank([r.pk], T_['rank'])[0]))),
                                    nat=tennis_data.iso2(r.ioc) or None)
                               for r in Xp.itertuples()]
+                # all-time list (scripts/fv_alltime.py): each player once, at his LAST October as a prospect (the
+                # draft-day grade of the CBB/CFB lists). Nov 4 2026: the youngest row put 15-17-year-olds on the list,
+                # and WTA 45+ grades under 20 run hot on the full held-out history (45+ at <17: -9.0, se 2.6; ATP
+                # cold there), while grades at 20-21 are on target (all-time 45+ check, last row: ATP 54.9 -> 55.1,
+                # n 108; WTA 53.6 -> 55.1, n 81; youngest row: 47.9 -> 54.8 / 50.4 -> 38.6, n 13 / 14)
+                Xl = X.assign(head=head, out=y)
+                Xl = Xl[Xl['rank'].notna()].sort_values('age').drop_duplicates('pid', keep='last')
+                Xl = Xl[(Xl['head'] >= 45) | (Xl.out >= 55)].sort_values('head', ascending=False)
+                T_['alltime'] = [dict(pid=int(r.pid), name=f"{Pn.at[r.pid, 'first']} {Pn.at[r.pid, 'last']}", season=int(r.season),
+                                      age=round(float(r.age), 2), rank=int(r.rank), fv=FS.fv_of(tour, float(r.head)), fvx=round(float(r.head), 2), out=int(round(r.out)),
+                                      peak=round(float(r.pk) * 20, 2), pkr=None if r.pk <= 0 or np.isnan(xrank([r.pk], T_['rank'])[0]) else int(round(float(xrank([r.pk], T_['rank'])[0]))),
+                                      nat=tennis_data.iso2(r.ioc) or None)
+                                 for r in Xl.itertuples()]
         F_[tour] = T_
     if scorecard_only and old:
         for t in TOURS:
