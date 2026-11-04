@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T12:13:25Z",
+ "asof": "2026-11-04T12:23:19Z",
  "recenter": {
-  "2026-11-04": -12.32
+  "2026-11-04": -12.33
  },
  "monitor": {
   "clocks": {
@@ -195,8 +195,8 @@
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
    "close": 161.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401902276",
@@ -281,15 +281,9 @@
    "tmRaw": 145.0,
    "flagged": "2026-11-04T05:56:41Z",
    "betTo": 159.5,
-   "close": 159.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 159.5,
-    "price": -104.0,
-    "ev": 0.02,
-    "units": 0.25
-   }
+   "close": 160.5,
+   "now": null,
+   "pass": true
   }
  ],
  "withdrawn": [
@@ -340,6 +334,22 @@
    "why": "no edge at -108",
    "m": 14.5,
    "tm": 144.8
+  },
+  {
+   "id": "401917513",
+   "sport": "cbb",
+   "kick": "2026-11-05T03:00:00Z",
+   "home": "Santa Clara",
+   "away": "Milwaukee",
+   "mk": "total",
+   "side": "under",
+   "line": 160.5,
+   "price": -111.0,
+   "edge": 3.2,
+   "x": 2.0,
+   "why": "no edge at -111",
+   "m": 18.4,
+   "tm": 157.3
   },
   {
    "id": "401919028",
@@ -414,7 +424,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 2.4,
    "x": null,
    "why": "spread market off",
@@ -470,14 +480,14 @@
   "401917513": {
    "mk": "total",
    "side": "under",
-   "line": 159.5,
-   "price": -104.0,
-   "ev": 0.02,
-   "edge": 2.2,
-   "units": 0.25,
+   "line": 160.5,
+   "price": -111.0,
+   "edge": 3.2,
+   "ev": null,
+   "units": 0.0,
    "home": "Santa Clara",
    "away": "Milwaukee",
-   "state": "pick"
+   "state": "under"
   },
   "401920798": {
    "mk": "spread",
@@ -531,7 +541,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -628,7 +638,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4434,
+  "snapshots": 4440,
   "buckets": [
    {
     "when": "24h+",
@@ -641,12 +651,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 609,
-    "clvRet": -0.0434,
-    "clvT": -9.64,
+    "clvN": 611,
+    "clvRet": -0.0435,
+    "clvT": -9.68,
     "clv": 0.07,
-    "beat": 0.256,
-    "still": 0.415
+    "beat": 0.255,
+    "still": 0.417
    },
    {
     "when": "1-6h",
@@ -7676,7 +7686,8 @@
    "tmRaw": 145.0,
    "flagged": "2026-11-04T05:56:41Z",
    "betTo": 159.5,
-   "close": 159.5
+   "close": 160.5,
+   "pass": true
   },
   {
    "id": "401902276",
@@ -7709,12 +7720,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 19.0,
+    "raw": 18.75,
     "scale": 1.0,
     "down": 12.5
    },
    "2026-11-05": {
-    "raw": 24.0,
+    "raw": 23.5,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -7726,11 +7737,11 @@
     "scale": 0.8247
    },
    "2026-11-08": {
-    "raw": 23.5,
+    "raw": 25.5,
     "scale": 1.0
    },
    "2026-11-09": {
-    "raw": 14.25,
+    "raw": 11.5,
     "scale": 1.0
    }
   }
