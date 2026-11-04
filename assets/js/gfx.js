@@ -24,6 +24,11 @@
     if (img) {
       var iw = w - 30, ih = h - 30, s = Math.max(iw / img.width, ih / img.height), sw = iw / s, sh = ih / s;
       g.drawImage(img, (img.width - sw) / 2, 0, sw, sh, x + 15, y + 15, iw, ih);
+    } else {   // the site's face.svg silhouette, drawn as its 16x16 pixel grid
+      var u = Math.floor(Math.min(w - 30, h - 30) / 16), ox = x + (w - 16 * u) / 2, oy = y + h - 15 - 16 * u;
+      g.fillStyle = 'rgba(154,140,196,0.55)';
+      [[3, 6, 9], [4, 5, 10], [5, 5, 10], [6, 5, 10], [7, 5, 10], [8, 6, 9], [9, 7, 8], [10, 6, 9], [11, 4, 11], [12, 3, 12], [13, 3, 12], [14, 3, 12], [15, 3, 12]]
+        .forEach(function (r) { g.fillRect(ox + r[1] * u, oy + r[0] * u, (r[2] - r[1] + 1) * u, u); });
     }
     // pixel corner studs
     g.fillStyle = C.teal; [[x + 4, y + 4], [x + w - 10, y + 4], [x + 4, y + h - 10], [x + w - 10, y + h - 10]].forEach(function (p) { g.fillRect(p[0], p[1], 6, 6); });
@@ -193,7 +198,7 @@
     } else ageI = -1;
     // the column the table is sorted by (a header click, or the "rank by" view when the order is RK) is on every graphic and
     // never auto-dropped, like FV: added after the name's columns when the preset leaves it out
-    var sortI = sortedCol(table, hcells);
+    var sortI = sortedCol(table, hcells), sortDir = sortI >= 0 && hcells[sortI] ? hcells[sortI].getAttribute('aria-sort') : null;
     if (sortI >= 0 && idx.indexOf(sortI) < 0) {
       var fvAt = idx.findIndex(function (i) { return FV_COL.test(heads[i]); });
       var at0 = fvAt >= 0 ? fvAt + 1 : nameAt >= 0 ? nameAt + 1 : idx.length;
@@ -253,6 +258,9 @@
         return cells;
       });
     }));
+    // one logo per row: when the team column carries it, the name goes without
+    var nameK = idx.findIndex(function (i) { return NAME_COL.test(heads[i]) && !TEAM_COL.test(heads[i]); });
+    if (teamK >= 0 && nameK >= 0 && nameK !== teamK) data.forEach(function (r) { if (r[teamK].img && r[nameK].img) delete r[nameK].img; });
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim(), base = title.split('::')[0].trim();
@@ -360,7 +368,14 @@
       g.fillStyle = C.face; g.fillRect(x0, y0, gw, rowH - 6); bevel(g, x0, y0, gw, rowH - 6, true, 3);
       var cx = x0;
       g.font = Math.max(24, size - 8) + 'px ' + FONT;
-      cols.forEach(function (ci, k) { g.fillStyle = C.lilac; g.fillText(capHead(heads[ci]), cx + size * 0.45, y0 + (rowH - 6) / 2); cx += colW[k]; });
+      var sk = cols.indexOf(sortI), sx = x0 + sum(colW.slice(0, Math.max(0, sk)));
+      cols.forEach(function (ci, k) {
+        var hy = y0 + (rowH - 6) / 2, hx = cx + size * 0.45;
+        g.fillStyle = k === sk && k > 0 ? C.teal : C.lilac; g.fillText(capHead(heads[ci]), hx, hy);
+        if (k === sk && k > 0) { var ax = hx + g.measureText(capHead(heads[ci])).width + 10, u = Math.max(3, Math.round(size / 16)), up = sortDir === 'ascending';
+          for (var ar = 0; ar < 3; ar++) g.fillRect(ax + ar * u, hy + (up ? 1 - ar : ar - 1) * u - u / 2, (5 - 2 * ar) * u, u); }   // pixel arrow: the sort's direction
+        cx += colW[k]; });
+      if (sk > 0) { g.fillStyle = 'rgba(127,255,212,0.06)'; g.fillRect(sx, y0 + rowH - 6, colW[sk], rowH * Math.min(per, cdata.length - gi * per) + 6); }
       g.font = size + 'px ' + FONT;
       cdata.slice(gi * per, gi * per + per).forEach(function (row, r) {
         var y = y0 + rowH * (r + 1);
@@ -377,7 +392,8 @@
           } else {
             if (c.img) { var s = size * 0.95; drawLogo(g, c.img, tx, cy - s / 2, s, s); tx += s + 10; }
             if (c.flag) { var fh = Math.round(size * 0.69); g.save(); g.imageSmoothingEnabled = false; g.drawImage(c.flag, tx, Math.round(cy - fh / 2), size, fh); g.restore(); tx += size + 10; }
-            g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 ? C.white : C.teal);
+            // the sorted column in white, a value below zero in pink
+            g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 || k === sk ? C.white : /^[−-]\d/.test(c.t) && !c.img ? C.down : C.teal);
             var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
             if (c.glow) {   // 5-star+: white pixel outline, teal glow, teal stars on top
               g.save(); g.fillStyle = C.white; [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(function (d) { g.fillText(ft, tx + d[0], cy + d[1]); });
@@ -1033,6 +1049,13 @@
   // and, where the board has one, its dropdown (photo, role lines, strengths and concerns, FV inputs, badges). The header
   // carries photo, logo, flag, name, position, team, class and FV; the sorted column is the featured tile with the player's
   // place in the view; every other column is a tile with where the value sits among the rows in view (pNN, 0 = lowest).
+  // context columns a card shows as a fact strip under the name (no percentile tile)
+  var PC_INFO = /^(age|g|gp|gs|mp|min|toi|snaps|ht|wt|ht \/ wt|yrs|salary|contract|nhl gp|wt\. gp|starts)$/i;
+  // a percentile bar in pixel blocks: 20 cells of 5 points, lit to the value
+  function pxBar(g, x, y, w, h, pct, col) {
+    var n = 20, gap = Math.max(3, Math.round(h / 4)), cw = (w - (n - 1) * gap) / n, lit = Math.round(pct / 5);
+    for (var k = 0; k < n; k++) { g.fillStyle = k < lit ? col : C.dark; g.fillRect(Math.round(x + k * (cw + gap)), y, Math.ceil(cw), h); }
+  }
   var PC_SKIP = /^(rk|#|pick|spot|tm)$/i, PC_SUB = /^(pos|position|team|school|club|org|league|lg|conf|class|yr|year|season|plays|tag|stage)$/i;
   var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;
   var PC_MARKS = '.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, svg, img';
@@ -1126,7 +1149,7 @@
     var flag = fl ? await flagImg((fl.getAttribute('aria-label') || '').toLowerCase()) : fi ? await loadImg(fi.currentSrc || fi.src) : null;
     // the featured stat: the sorted column (or the rank-by view's key column), else the first number after the name
     var sortI = sortedCol(table, hcells), desc = (hcells[sortI] || { getAttribute: function () {} }).getAttribute('aria-sort') !== 'ascending';
-    var tiles = [], lines = [];
+    var tiles = [], lines = [], info = [];
     heads.forEach(function (h, i) {
       if (i === nameI || i === fvI || i === ageI || PC_SKIP.test(h) || PC_SUB.test(h) || !h || (hcells[i] && hcells[i].hidden) || !cells[i] || cells[i].hidden) return;
       var c = pcCell(cells[i]); if (c.t === '—' && !c.sub) return;
@@ -1136,7 +1159,10 @@
         var vals = rows.map(function (r) { var cc = r.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
         if (vals.length >= 5) pct = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
       }
-      tiles.push({ i: i, h: h, t: c.t, sub: c.sub, color: c.color, pct: pct, tip: hcells[i] ? hcells[i].getAttribute('title') : '' });
+      // context columns (age, games, minutes, size, contract) are facts, not grades: a strip under the name, no percentile
+      if (PC_INFO.test(h)) { info.push([capHead(h), c.t]); return; }
+      var good = pct == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - pct : pct;
+      tiles.push({ i: i, h: h, t: c.t, sub: c.sub, color: c.color, pct: pct, good: good, tip: hcells[i] ? hcells[i].getAttribute('title') : '' });
     });
     // NBA: every player card carries VORX; tables without the column borrow it from the XPM board's current season
     var xw = document.querySelector('[data-nbaxpm][data-src][data-cur]');
@@ -1146,7 +1172,8 @@
       var xp = hits.length > 1 && tmU ? hits.find(function (p) { return p.tm === tmU; }) || hits[0] : hits[0];
       if (xp && xp.vorx != null) {
         var vs = xd.players.filter(function (p) { return p.mp >= 100 && p.vorx != null; }).map(function (p) { return p.vorx; });
-        tiles.unshift({ i: -1, h: 'VORX', t: xp.vorx.toFixed(1), pct: vs.length >= 5 ? Math.round(100 * vs.filter(function (v) { return v < xp.vorx; }).length / Math.max(1, vs.length - 1)) : null, tip: 'wins over replacement on XPM, ' + xd.label });
+        var vp = vs.length >= 5 ? Math.round(100 * vs.filter(function (v) { return v < xp.vorx; }).length / Math.max(1, vs.length - 1)) : null;
+        tiles.unshift({ i: -1, h: 'VORX', t: xp.vorx.toFixed(1), pct: vp, good: vp, tip: 'wins over replacement on XPM, ' + xd.label });
       }
     }
     var feat = tiles.find(function (t) { return t.i === sortI; }) || (fvI < 0 ? tiles.find(function (t) { return t.pct != null; }) : null);
@@ -1159,8 +1186,8 @@
     var F = await frame(2160, 2700, base + ' :: ' + name, win.getAttribute('data-gfx-date'), link);
     var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, bottom = F.y + F.h - 30;
     well(g, F.x, F.y, F.w, F.h);
-    var px = photo ? 400 : 0;
-    if (photo) photoFrame(g, photo, x, y - 60, 370, 400);
+    var px = 400;
+    photoFrame(g, photo, x, y - 60, 370, 400);   // no headshot: the frame keeps its place with the pixel silhouette
     if (logo) drawLogo(g, logo, x + px, y - 48, 96, 96);
     var nx = x + px + (logo ? 120 : 0);
     if (flag) { g.imageSmoothingEnabled = false; g.drawImage(flag, nx, y - 33, 96, 66); nx += 120; }
@@ -1169,11 +1196,22 @@
     y += 110;
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub.join(' · '), w - px), x + px, y); y += 80;
     // the dropdown's role / outlook lines, a few, under the name
-    var roles = d ? [].slice.call(d.querySelectorAll('.cfb__role')).map(txt).filter(Boolean) : [];
+    // a built dropdown's lines (place in view, ranges, season line) repeat the tiles below: only the subset table's own line
+    var auto = !!(d && d.classList.contains('pd__auto'));
+    var roles = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__role')).map(txt).filter(Boolean) : [];
     if (extraL && roles.indexOf(extraL + '.') < 0) roles.unshift(extraL);
+    info = info.filter(function (f) { return !new RegExp('(^|[ ·])' + f[1].replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + ' ').test(sub.join(' · ') + ' '); });   // "250 MP", "415 min" already in the line above
+    if (info.length) {   // AGE 27.9  G 7  MP 250: label lilac, value white
+      g.font = '44px ' + FONT; var ix0 = x + px;
+      info.forEach(function (f) {
+        var lw = g.measureText(f[0] + ' ').width, vw = g.measureText(f[1]).width; if (ix0 + lw + vw > x + w) return;
+        g.fillStyle = C.lilac; g.fillText(f[0], ix0, y); g.fillStyle = C.white; g.fillText(f[1], ix0 + lw, y); ix0 += lw + vw + 56;
+      });
+      y += 72;
+    }
     g.font = '40px ' + FONT; g.fillStyle = C.lilac;
     var rl = []; roles.forEach(function (r) { wrap(g, r, w - px).forEach(function (l) { rl.push(l); }); });
-    rl.slice(0, Math.max(0, Math.floor((top + 330 - y) / 56))).forEach(function (l) { g.fillText(l, x + px, y); y += 56; });
+    rl.slice(0, Math.max(0, Math.floor((top + (info.length ? 460 : 330) - y) / 56))).forEach(function (l) { g.fillText(l, x + px, y); y += 56; });
     y = Math.max(y, top + 360) + 30;
     function rule(label) {
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(label, x, y);
@@ -1189,12 +1227,12 @@
       var vx = x + 80 + g.measureText(feat.t).width;
       g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText('#' + (at + 1) + ' of ' + rows.length + ' in view', vx, y + 78);
       g.font = '36px ' + FONT; g.fillStyle = C.lilac;
-      g.fillText(fit(g, [feat.sub, sortI === feat.i ? (desc ? 'sorted high to low' : 'sorted low to high') : 'board order'].filter(Boolean).join(' · '), x + w - vx - 40), vx, y + 140);
-      if (feat.pct != null) { var bw0 = x + w - vx - 40; g.fillStyle = C.dark; g.fillRect(vx, y + 176, bw0, 24); g.fillStyle = C.teal; g.fillRect(vx, y + 176, bw0 * feat.pct / 100, 24); }
+      if (feat.sub) g.fillText(fit(g, feat.sub, x + w - vx - 40), vx, y + 140);
+      if (feat.pct != null) pxBar(g, vx, y + 172, x + w - vx - 40, 28, feat.pct, feat.good != null && feat.good <= 20 ? C.down : C.teal);
       y += fh + 40;
     }
     // the reserve at the bottom for the dropdown (badges, strengths and concerns, FV inputs)
-    var plus = d ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
+    var plus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
     var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts:not(.pd__pct) li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
     var badges = pcBadges([row, d]);
     if (!badges.length) { var med = row.querySelector('.cfb__medals'), TT = { Platinum: 'p', Gold: 'g', Silver: 's', Bronze: 'b' };
@@ -1207,19 +1245,23 @@
     var maxRows = Math.max(1, Math.floor((room + 40) / (th + 24)));
     // fewer tiles than room: taller tiles and bigger type, so the card fills
     var nRows = Math.ceil(Math.min(tiles.length, maxRows * cols) / cols);
-    if (nRows) th = Math.max(200, Math.min(340, Math.floor((room + 24) / nRows) - 24));
+    if (nRows) th = Math.max(200, Math.min(nRows <= 2 ? 520 : nRows === 3 ? 420 : 340, Math.floor((room + 24) / nRows) - 24));
     var ts = th / 200;
     if (tiles.length) {
-      rule('NUMBERS · pNN = place among the ' + rows.length + ' in view');
+      rule(auto ? 'PERCENTILE IN VIEW' : 'NUMBERS');
       tiles.slice(0, maxRows * cols).forEach(function (t, k) {
         var tx = x + (k % cols) * (tw + gap), ty = y + Math.floor(k / cols) * (th + 24);
+        var hot = t.good != null && t.good >= 80, cold = t.good != null && t.good <= 20, acc = hot ? C.teal : cold ? C.down : null;
         g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
-        g.font = Math.round(34 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, capHead(t.h), tw - 48), tx + 24, ty + 40 * ts);
-        g.font = Math.round(72 * Math.min(ts, 1.6)) + 'px ' + FONT; g.fillStyle = t.color || C.white; g.fillText(fit(g, t.t, tw - 48), tx + 24, ty + 102 * ts);
+        if (acc) { var u = 8; g.fillStyle = acc; g.fillRect(tx + tw - 5 * u, ty + u, 4 * u, u); g.fillRect(tx + tw - 2 * u, ty + u, u, 4 * u); g.fillRect(tx + tw - 3 * u, ty + 2 * u, u, u); }   // pixel corner: top or bottom fifth
+        g.font = Math.round(34 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = acc || C.lilac; g.fillText(fit(g, capHead(t.h), tw - 96), tx + 24, ty + 40 * ts);
+        var vsz = Math.round(72 * Math.min(ts, 1.6)); g.font = vsz + 'px ' + FONT;
+        while (vsz > 40 && g.measureText(t.t).width > tw - 48) { vsz -= 4; g.font = vsz + 'px ' + FONT; }   // long values step down before they clip
+        g.fillStyle = t.color || C.white; g.fillText(fit(g, t.t, tw - 48), tx + 24, ty + 102 * ts);
         g.font = Math.round(30 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = C.lilac;
         var foot = [t.sub, t.pct != null ? 'p' + t.pct : ''].filter(Boolean).join(' · ');
         if (foot) g.fillText(fit(g, foot, tw - 48), tx + 24, ty + 150 * ts);
-        if (t.pct != null) { var bh = Math.round(10 * ts); g.fillStyle = C.dark; g.fillRect(tx + 24, ty + th - 28 - bh, tw - 48, bh); g.fillStyle = C.teal; g.fillRect(tx + 24, ty + th - 28 - bh, (tw - 48) * t.pct / 100, bh); }
+        if (t.pct != null) { var bh = Math.round(14 * ts); pxBar(g, tx + 24, ty + th - 28 - bh, tw - 48, bh, t.pct, cold ? C.down : C.teal); }
       });
       y += Math.ceil(Math.min(tiles.length, maxRows * cols) / cols) * (th + 24) + 20;
     }
@@ -1246,7 +1288,7 @@
     if (parts.length) {
       var ps = parts.slice(0, 10), by = bottom - partsH + 20, cw2 = (w - 80) / 2, mx = Math.max(1, Math.max.apply(null, ps.map(function (p) { return Math.abs(p[1]); })));
       g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
-      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('FV inputs: each one\'s push on the grade', x, by + 30);
+      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('FV INPUTS', x, by + 30);
       g.font = '36px ' + FONT;
       var perCol = Math.ceil(ps.length / 2);
       ps.forEach(function (p, i) {
@@ -1657,32 +1699,35 @@
     y += 64;
     // win probability: away share left (lilac), home right (teal)
     // soccer cards carry a draw chance (pD) and the away win (pA): the draw sits between the two in violet
-    var bh = 96, pd = d.pD || 0, pa = d.pA != null ? d.pA : 1 - d.p;
-    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(pd ? 'WIN / DRAW / WIN' : 'WIN PROBABILITY', x, y + 8);
-    y += 44;
-    g.fillStyle = C.dark; g.fillRect(x, y, w, bh);
-    g.fillStyle = C.lilac; g.fillRect(x, y, w * pa, bh);
-    if (pd) { g.fillStyle = C.title; g.fillRect(x + w * pa, y, w * pd, bh); }
-    g.fillStyle = C.teal; g.fillRect(x + w * (pa + pd), y, w * d.p, bh);
-    g.font = '52px ' + FONT; g.fillStyle = C.dark;
-    var la = d.a.n + ' ' + Math.round(pa * 100) + '%', lh = Math.round(d.p * 100) + '% ' + d.h.n;
-    if (pa > 0.12) g.fillText(fit(g, la, w * pa - 40), x + 20, y + bh / 2);
-    if (d.p > 0.12) { var lt = fit(g, lh, w * d.p - 40); g.fillText(lt, x + w - 20 - g.measureText(lt).width, y + bh / 2); }
-    if (pd > 0.1) { g.fillStyle = C.white; var ld = fit(g, 'draw ' + Math.round(pd * 100) + '%', w * pd - 30); g.fillText(ld, x + w * pa + (w * pd - g.measureText(ld).width) / 2, y + bh / 2); }
-    y += bh + 40;
+    // the two chances big over the bar, the favourite's in teal; the bar in 50 pixel blocks of 2 points each
+    var bh = 72, pd = d.pD || 0, pa = d.pA != null ? d.pA : 1 - d.p;
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; var wl = pd ? 'WIN / DRAW / WIN' : 'WIN PROBABILITY'; g.fillText(wl, x + (w - g.measureText(wl).width) / 2, y + 8);
+    y += 100;
+    var fav = d.p >= pa ? 'h' : 'a', ta = Math.round(pa * 100) + '%', th2 = Math.round(d.p * 100) + '%';
+    g.font = '140px ' + FONT;
+    g.fillStyle = fav === 'a' ? C.teal : C.lilac; g.fillText(ta, x, y);
+    g.fillStyle = fav === 'h' ? C.teal : C.lilac; g.fillText(th2, x + w - g.measureText(th2).width, y);
+    if (pd) { g.font = '64px ' + FONT; g.fillStyle = C.white; var dr = 'draw ' + Math.round(pd * 100) + '%'; g.fillText(dr, x + (w - g.measureText(dr).width) / 2, y + 10); }
+    g.font = '48px ' + FONT; g.fillStyle = C.lilac;
+    var an = d.a.n, hn = d.h.n; g.fillText(fit(g, an, w / 3), x, y + 96); g.fillText(fit(g, hn, w / 3), x + w - g.measureText(fit(g, hn, w / 3)).width, y + 96);
+    y += 150;
+    var NB = 50, bg = 6, bw1 = (w - (NB - 1) * bg) / NB, na = Math.round(pa * NB), nd = Math.round(pd * NB);
+    for (var bi = 0; bi < NB; bi++) { g.fillStyle = bi < na ? (fav === 'a' ? C.teal : C.lilac) : bi < na + nd ? C.title : (fav === 'h' ? C.teal : C.lilac); g.fillRect(Math.round(x + bi * (bw1 + bg)), y, Math.ceil(bw1), bh); }
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(x, y + bh - 6, w, 6);
+    y += bh + 56;
     // the pick tag (upset or favorite), when the game is one
     var tagH = d.pick ? 120 : 0, bottom = F.y + F.h - (tagH ? tagH + gap : 0);
     // tiles, two to a row, filling what's left
-    var tiles = d.tiles || [], rowsN = Math.ceil(tiles.length / 2) || 1, tw = (w - gap) / 2, tH = Math.min(380, (bottom - y - (rowsN - 1) * gap) / rowsN);
+    var tiles = d.tiles || [], rowsN = Math.ceil(tiles.length / 2) || 1, tw = (w - gap) / 2, tH = Math.min(600, (bottom - y - (rowsN - 1) * gap) / rowsN), tk = Math.max(1, Math.min(1.4, tH / 380));
     y += (bottom - y - rowsN * tH - (rowsN - 1) * gap) / 2;   // spare height splits above and below the tiles
     tiles.forEach(function (t, i) {
       var tx = x + (i % 2) * (tw + gap), ty = y + Math.floor(i / 2) * (tH + gap);
       var tw2 = tiles.length % 2 && i === tiles.length - 1 ? w : tw;   // an odd last tile spans the row
       well(g, tx, ty, tw2, tH);
-      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(t.l, tx + pad, ty + tH * 0.22);
-      var vs = 68; do { g.font = vs + 'px ' + FONT; } while (g.measureText(t.v).width > tw2 - 2 * pad && (vs -= 4) >= 40);   // long values step down before they clip
+      g.font = Math.round(40 * tk) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(t.l, tx + pad, ty + tH * 0.22);
+      var vs = Math.round(68 * tk); do { g.font = vs + 'px ' + FONT; } while (g.measureText(t.v).width > tw2 - 2 * pad && (vs -= 4) >= 40);   // long values step down before they clip
       g.fillStyle = C.white; g.fillText(fit(g, t.v, tw2 - 2 * pad), tx + pad, ty + tH * 0.52);
-      g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, t.s || '', tw2 - 2 * pad), tx + pad, ty + tH * 0.8);
+      g.font = Math.round(44 * tk) + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, t.s || '', tw2 - 2 * pad), tx + pad, ty + tH * 0.8);
     });
     if (d.pick) {
       var py = bottom + gap;
