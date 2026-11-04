@@ -91,7 +91,7 @@
       if (hasPre) c.push({ k: 'pre', l: D.pre.l, t: D.pre.t, num: 1, cls: 'rookies__pre' });
       if (hasPfv) c.push({ k: 'pfv', l: D.pfv.l, t: D.pfv.t, num: 1, cls: 'nbaxpm__ph' });
       if (hasPre) c.push({ k: 'dl', l: 'Δ', t: 'rank by ' + D.pre.l.toLowerCase() + ' minus rank by the view, among the rows shown that have one: + = playing above where he was picked', num: 1, cls: '' });
-      c.push({ k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' });
+      if (season().rows.some(function (r) { return r.age != null; })) c.push({ k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' });   // a view with no ages (CBB top performers) drops the column
       return c;
     }
     function render() {
