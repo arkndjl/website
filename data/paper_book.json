@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-04T13:19:31Z",
+ "asof": "2026-11-04T14:38:35Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 96.71,
+  "now": 95.39,
   "peak": 118.08,
-  "drawdown": 0.181,
-  "open": 104.0,
+  "drawdown": 0.1921,
+  "open": 101.25,
   "path": [
    101.5,
    101.6,
@@ -235,25 +235,27 @@
    96.32,
    96.08,
    94.87,
-   96.71
+   96.71,
+   95.26,
+   95.39
   ]
  },
  "record": {
-  "n": 287,
+  "n": 284,
   "clvN": 231,
   "clvRet": -0.0355,
   "clvT": -7.57,
   "clv": -0.45,
   "beat": 0.168,
-  "settled": 227,
-  "w": 116,
-  "l": 111,
+  "settled": 229,
+  "w": 117,
+  "l": 112,
   "p": 0,
-  "roi": 0.0279,
-  "roiT": 0.4,
-  "profit": -2.63,
-  "risked": 193.25,
-  "yield": -0.0136
+  "roi": 0.0255,
+  "roiT": 0.37,
+  "profit": -4.0,
+  "risked": 195.0,
+  "yield": -0.0205
  },
  "tEff": -7.56,
  "corr": {
@@ -286,7 +288,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +2.8% vs -3.6% (SE 6.9)",
+   "value": "ROI +2.5% vs -3.6% (SE 6.9)",
    "pass": true
   }
  ],
@@ -486,7 +488,7 @@
    "label": "NBA moneyline",
    "sport": "nba",
    "mk": "ml",
-   "n": 6,
+   "n": 5,
    "clvN": 3,
    "clvRet": -0.0208,
    "clvT": -2.24,
@@ -507,7 +509,7 @@
    "label": "NBA spread",
    "sport": "nba",
    "mk": "spread",
-   "n": 6,
+   "n": 5,
    "clvN": 3,
    "clvRet": -0.0129,
    "clvT": -2.03,
@@ -555,22 +557,22 @@
    "clvT": -4.3,
    "clv": -0.07,
    "beat": 0.23,
-   "settled": 57,
-   "w": 31,
-   "l": 26,
+   "settled": 59,
+   "w": 32,
+   "l": 27,
    "p": 0,
-   "roi": 0.1605,
-   "roiT": 1.03,
-   "profit": 5.26,
-   "risked": 49.5,
-   "yield": 0.1063
+   "roi": 0.1469,
+   "roiT": 0.97,
+   "profit": 3.89,
+   "risked": 51.25,
+   "yield": 0.0759
   },
   {
    "id": "nflprops-prop",
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 46,
+   "n": 45,
    "clvN": 34,
    "clvRet": -0.0163,
    "clvT": -1.11,
@@ -611,54 +613,6 @@
    "clv": 0.5,
    "beat": 0,
    "close": 0.3125
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186479",
-   "k": "2026-11-04T11:30:00Z",
-   "slate": "tennis:2026-11-04",
-   "h": "Assche",
-   "a": "Tien",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -190,
-   "bet": "Tien ML -190",
-   "placed": "2026-11-03T22:33:20Z",
-   "stake": 1.5,
-   "edge": 9.6,
-   "ev": 0.0082,
-   "event": "Rolex Paris Masters",
-   "pass": false,
-   "clvRet": -0.027,
-   "clv": -1.0,
-   "beat": -1,
-   "close": 0.6375
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186680",
-   "k": "2026-11-04T11:30:00Z",
-   "slate": "tennis:2026-11-04",
-   "h": "Shinikova",
-   "a": "Feistel",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -194,
-   "bet": "Feistel ML -194",
-   "placed": "2026-11-04T00:35:34Z",
-   "stake": 0.25,
-   "edge": 6.4,
-   "ev": 0.0016,
-   "event": "Angola Ladies Open",
-   "pass": false,
-   "clvRet": -0.0112,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 0.6525
   },
   {
    "rule": "tennis-ml",
@@ -848,7 +802,7 @@
    "ev": 0.0284,
    "event": null,
    "pass": true,
-   "close": 233.5
+   "close": 232.5
   },
   {
    "rule": "nba-spread",
@@ -952,8 +906,8 @@
    "edge": 3.3,
    "ev": 0.0042,
    "event": null,
-   "pass": true,
-   "close": 234.5
+   "pass": false,
+   "close": 233.5
   },
   {
    "rule": "cbb-total",
@@ -994,8 +948,8 @@
    "edge": 3.7,
    "ev": 0.0071,
    "event": null,
-   "pass": false,
-   "close": 228.5
+   "pass": true,
+   "close": 229.5
   },
   {
    "rule": "nba-ml",
@@ -1015,8 +969,8 @@
    "edge": 2.0,
    "ev": 0.0125,
    "event": null,
-   "pass": false,
-   "close": 2.5
+   "pass": true,
+   "close": 3.5
   },
   {
    "rule": "nba-spread",
@@ -1057,7 +1011,7 @@
    "edge": 2.4,
    "ev": 0.0178,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 11.5
   },
   {
@@ -1492,7 +1446,7 @@
    "ev": 0.0188,
    "event": null,
    "pass": false,
-   "close": 6.5
+   "close": 7.5
   },
   {
    "rule": "cfb-total",
@@ -1613,7 +1567,7 @@
    "price": 108.0,
    "bet": "over 48.5 +108",
    "placed": "2026-11-02T01:48:24Z",
-   "stake": 4.0,
+   "stake": 4.25,
    "edge": 3.6,
    "ev": 0.0671,
    "event": null,
@@ -1676,7 +1630,7 @@
    "price": -102.0,
    "bet": "under 49.5 -102",
    "placed": "2026-11-01T21:25:38Z",
-   "stake": 1.0,
+   "stake": 1.25,
    "edge": 3.6,
    "ev": 0.016,
    "event": null,
@@ -1802,7 +1756,7 @@
    "price": -100.0,
    "bet": "Miami +5.5 -100",
    "placed": "2026-11-02T23:36:02Z",
-   "stake": 2.5,
+   "stake": 2.75,
    "edge": 5.6,
    "ev": 0.037,
    "event": null,
@@ -1907,7 +1861,7 @@
    "price": 108.0,
    "bet": "under 67.5 +108",
    "placed": "2026-11-01T20:17:01Z",
-   "stake": 4.0,
+   "stake": 4.25,
    "edge": 4.4,
    "ev": 0.0694,
    "event": null,
@@ -1928,7 +1882,7 @@
    "price": 113.0,
    "bet": "under 47.5 +113",
    "placed": "2026-11-03T00:08:15Z",
-   "stake": 4.0,
+   "stake": 4.25,
    "edge": 3.0,
    "ev": 0.0891,
    "event": null,
@@ -2057,7 +2011,7 @@
    "edge": 16.5,
    "ev": 0.0707,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -2367,6 +2321,62 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186479",
+   "k": "2026-11-04T11:30:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Assche",
+   "a": "Tien",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -190,
+   "bet": "Tien ML -190",
+   "placed": "2026-11-03T22:33:20Z",
+   "stake": 1.5,
+   "edge": 9.6,
+   "ev": 0.0082,
+   "event": "Rolex Paris Masters",
+   "pass": false,
+   "clvRet": -0.027,
+   "clv": -1.0,
+   "beat": -1,
+   "close": 0.6375,
+   "score": "6-7 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186680",
+   "k": "2026-11-04T11:30:00Z",
+   "slate": "tennis:2026-11-04",
+   "h": "Shinikova",
+   "a": "Feistel",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -194,
+   "bet": "Feistel ML -194",
+   "placed": "2026-11-04T00:35:34Z",
+   "stake": 0.25,
+   "edge": 6.4,
+   "ev": 0.0016,
+   "event": "Angola Ladies Open",
+   "pass": false,
+   "clvRet": -0.0112,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.6525,
+   "score": "6-2 6-3",
+   "res": "w",
+   "ret": 0.5155,
+   "profit": 0.1289
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -4073,68 +4083,6 @@
    "res": "w",
    "ret": 1.0,
    "profit": 0.25
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401921731",
-   "k": "2026-11-03T03:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Arizona State",
-   "a": "East Tennessee State",
-   "mk": "total",
-   "side": "over",
-   "line": 145.5,
-   "price": -108.0,
-   "bet": "over 145.5 -108",
-   "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
-   "edge": 6.2,
-   "ev": 0.0154,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0841,
-   "clv": -1.0,
-   "beat": -1,
-   "close": 144.5,
-   "score": [
-    65.0,
-    75.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
-  },
-  {
-   "rule": "cbb-total",
-   "sport": "cbb",
-   "id": "401922029",
-   "k": "2026-11-03T03:00:00Z",
-   "slate": "cbb:2026-11-02",
-   "h": "Oregon",
-   "a": "Montana",
-   "mk": "total",
-   "side": "under",
-   "line": 152.5,
-   "price": 102.0,
-   "bet": "under 152.5 +102",
-   "placed": "2026-11-01T22:39:07Z",
-   "stake": 0.25,
-   "edge": 2.2,
-   "ev": 0.03,
-   "event": null,
-   "pass": true,
-   "clvRet": 0.0594,
-   "clv": 1.0,
-   "beat": 1,
-   "close": 151.5,
-   "score": [
-    69.0,
-    87.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -13695,7 +13643,11 @@
    "clvRet": -0.027,
    "clv": -1.0,
    "beat": -1,
-   "close": 0.6375
+   "close": 0.6375,
+   "score": "6-7 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.5
   },
   {
    "rule": "tennis-ml",
@@ -13719,7 +13671,11 @@
    "clvRet": -0.0112,
    "clv": 0.0,
    "beat": 0,
-   "close": 0.6525
+   "close": 0.6525,
+   "score": "6-2 6-3",
+   "res": "w",
+   "ret": 0.5155,
+   "profit": 0.1289
   },
   {
    "rule": "tennis-ml",
@@ -13909,7 +13865,7 @@
    "ev": 0.0284,
    "event": null,
    "pass": true,
-   "close": 233.5
+   "close": 232.5
   },
   {
    "rule": "nba-spread",
@@ -14013,8 +13969,8 @@
    "edge": 3.3,
    "ev": 0.0042,
    "event": null,
-   "pass": true,
-   "close": 234.5
+   "pass": false,
+   "close": 233.5
   },
   {
    "rule": "cbb-total",
@@ -14055,8 +14011,8 @@
    "edge": 3.7,
    "ev": 0.0071,
    "event": null,
-   "pass": false,
-   "close": 228.5
+   "pass": true,
+   "close": 229.5
   },
   {
    "rule": "nba-ml",
@@ -14076,8 +14032,8 @@
    "edge": 2.0,
    "ev": 0.0125,
    "event": null,
-   "pass": false,
-   "close": 2.5
+   "pass": true,
+   "close": 3.5
   },
   {
    "rule": "nba-spread",
@@ -14118,7 +14074,7 @@
    "edge": 2.4,
    "ev": 0.0178,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 11.5
   },
   {
@@ -14553,7 +14509,7 @@
    "ev": 0.0188,
    "event": null,
    "pass": false,
-   "close": 6.5
+   "close": 7.5
   },
   {
    "rule": "cfb-total",
@@ -14674,7 +14630,7 @@
    "price": 108.0,
    "bet": "over 48.5 +108",
    "placed": "2026-11-02T01:48:24Z",
-   "stake": 4.0,
+   "stake": 4.25,
    "edge": 3.6,
    "ev": 0.0671,
    "event": null,
@@ -14737,7 +14693,7 @@
    "price": -102.0,
    "bet": "under 49.5 -102",
    "placed": "2026-11-01T21:25:38Z",
-   "stake": 1.0,
+   "stake": 1.25,
    "edge": 3.6,
    "ev": 0.016,
    "event": null,
@@ -14863,7 +14819,7 @@
    "price": -100.0,
    "bet": "Miami +5.5 -100",
    "placed": "2026-11-02T23:36:02Z",
-   "stake": 2.5,
+   "stake": 2.75,
    "edge": 5.6,
    "ev": 0.037,
    "event": null,
@@ -14968,7 +14924,7 @@
    "price": 108.0,
    "bet": "under 67.5 +108",
    "placed": "2026-11-01T20:17:01Z",
-   "stake": 4.0,
+   "stake": 4.25,
    "edge": 4.4,
    "ev": 0.0694,
    "event": null,
@@ -14989,7 +14945,7 @@
    "price": 113.0,
    "bet": "under 47.5 +113",
    "placed": "2026-11-03T00:08:15Z",
-   "stake": 4.0,
+   "stake": 4.25,
    "edge": 3.0,
    "ev": 0.0891,
    "event": null,
@@ -15118,7 +15074,7 @@
    "edge": 16.5,
    "ev": 0.0707,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
