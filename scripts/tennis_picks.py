@@ -44,6 +44,8 @@ XS = (0.04, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18)
 LEAK = 0.5               # the share of the open-to-close edge still there at the live price
 CAP = 2.0                # DU a pick, held until live picks grade
 TUNE, HELD = 2025, 2026
+CM_LAG = int(os.environ.get('TENNIS_CM_LAG', 7))  # tennis_model.CM_LAG   # market memory sees closes from events started 7+ days earlier, as live
+                                                  # (the weekly feed; this week's ESPN rows carry no prices). Nov 4 2026
 
 
 def sig(z):
@@ -128,7 +130,7 @@ def fit():
     P = dict(M.DEFAULT, **json.load(open(M.FIT))['params'])
     # walk-forward model chances (each season's blend weights from the M.WIN seasons before it), so 2025 and 2026 are
     # both out of sample for the model; then the matches with an open and a close
-    _, rec = M.run(rows, P, score=lambda r: M.scored(r, TUNE - M.WIN, 2100))
+    _, rec = M.run(rows, P, score=lambda r: M.scored(r, TUNE - M.WIN, 2100), cm_lag=CM_LAG)
     pw = M.wf_probs(rec, P)
     D = {}
     i = 0
