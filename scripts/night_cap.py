@@ -50,8 +50,11 @@ def raw(o):
 
 
 def capped(r, k):
+    """a stake scaled by k: quarter units, rounded down, 0.25 floor; 0 once the night is full (k 0)"""
     if r <= 0 or k >= 1:
         return r
+    if k <= 0:
+        return 0.0
     return max(0.25, math.floor(r * k * 4 + EPS) / 4)
 
 
@@ -72,16 +75,33 @@ def live(p, now):
     return k is not None and k > now and p.get('res') is None
 
 
-def exposure(D, now):
-    """ET date -> total uncapped stake of the open picks that would be bet (the current quote's, else the pick's)"""
+def stakes(D, now):
+    """ET date -> the uncapped stakes of the open picks that would be bet (the current quote's, else the pick's)"""
     out = {}
     for d in D.values():
         for p in d.get('picks', []):
             if not live(p, now) or p.get('pass'):
                 continue
-            r = raw(p['now']) if p.get('now') else raw(p)
-            out[night(p['kick'])] = out.get(night(p['kick']), 0.0) + r
+            out.setdefault(night(p['kick']), []).append(raw(p['now']) if p.get('now') else raw(p))
     return out
+
+
+def exposure(D, now):
+    """ET date -> total uncapped stake of the open picks that would be bet"""
+    return {n: sum(rs) for n, rs in stakes(D, now).items()}
+
+
+def fit_scale(rs, room):
+    """the scale on a night's open stakes rs so that, after quarter-unit rounding and the 0.25 floor, they stay within
+    room (Nov 4 2026 audit: the floor alone let a full night take 0.25 a pick past the cap); 0 when even the floors
+    don't fit"""
+    t = sum(rs)
+    if t <= 0:
+        return 1.0
+    k = min(1.0, max(0.0, room) / t)
+    while k > 0 and sum(capped(r, k) for r in rs) > room + EPS:
+        k = k * 0.98 if k > 0.01 else 0.0
+    return k
 
 
 def locked(D, now):
@@ -107,8 +127,9 @@ def locked(D, now):
 
 def scales(D, now):
     """ET date -> the scale on its open picks: what is left of CAP after the stakes already down, over their total"""
-    ex, lk = exposure(D, now), locked(D, now)
-    return ex, {n: (min(1.0, max(0.0, CAP - lk.get(n, 0.0)) / t) if t > 0 else 1.0) for n, t in ex.items()}, lk
+    st, lk = stakes(D, now), locked(D, now)
+    ex = {n: sum(rs) for n, rs in st.items()}
+    return ex, {n: fit_scale(rs, CAP - lk.get(n, 0.0)) for n, rs in st.items()}, lk
 
 
 def apply(only=None, now=None):
@@ -164,6 +185,14 @@ def test():
     q = {'units': 0.25}
     set_units(q, raw(q), 0.1)
     assert q['units'] == 0.25
+    # a full night stakes nothing more, and floors never carry a night past the cap
+    q = {'units': 2.0}
+    set_units(q, raw(q), 0.0)
+    assert q['units'] == 0.0 and q['unitsRaw'] == 2.0 and raw(q) == 2.0
+    assert fit_scale([1.0] * 10, 0.0) == 0.0
+    k = fit_scale([1.0] * 10, 1.0)
+    assert sum(capped(1.0, k) for _ in range(10)) <= 1.0 + EPS, k
+    assert fit_scale([5.0, 5.0], 40.0) == 1.0 and abs(fit_scale([30.0, 50.0], 40.0) - 0.5) < 1e-9
     assert night('2026-11-03T03:00:00Z') == '2026-11-02'
     D = {'cbb': {'picks': [{'kick': '2026-11-03T00:00:00Z', 'units': 30.0, 'now': {'units': 50.0}},
                            {'kick': '2026-11-03T00:00:00Z', 'units': 30.0, 'pass': True}]},
