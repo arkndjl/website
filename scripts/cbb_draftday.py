@@ -27,6 +27,10 @@ the player's college class (5 class folds), players graded 30+ or reaching 30+ b
 Tested and not used: athletic testing on top of the boards (guard composite t -0.1, 2/5; every group's composite worse;
 the boards price it), the combine invite on top of the boards (t +2.9, worse 5/5), the returner model refit on
 season-end rows with leavers (MSE +1.4, t 0.9: the shipped model is kept), position recalibration.
+Held-out residual audit, Nov 4 2026 (/mnt/project-files/fv/sweep-nov04/cbb/; finals 2009-16 class folds, forward 2017-20,
+Holm k 3, none passed): June-rank disagreement term on the map (t -1.1, 4/5, forward and forward top 25 worse), age at
+draft x grade (t +1.2, 3/5; forward better t -3.1: retest when the 2021-22 exits have six NBA seasons), a row-level
+line for the map's top quarter in place of the last PAV bin and its slope (t +0.4, 1/5).
 """
 import gzip, html, json, math, os, sys
 from collections import defaultdict
