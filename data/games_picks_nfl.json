@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-04T02:44:12Z",
+ "asof": "2026-11-04T02:46:10Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -396,8 +396,14 @@
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
    "close": 47.5,
-   "now": null,
-   "pass": true
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 47.5,
+    "price": -104.0,
+    "ev": 0.051,
+    "units": 0.25
+   }
   },
   {
    "id": "2026_09_LV_SF",
@@ -443,22 +449,6 @@
    "why": "no edge at -117",
    "m": 8.5,
    "tm": 49.3
-  },
-  {
-   "id": "2026_09_TB_CHI",
-   "sport": "nfl",
-   "kick": "2026-11-09T01:20:00Z",
-   "home": "CHI",
-   "away": "TB",
-   "mk": "total",
-   "side": "under",
-   "line": 47.5,
-   "price": -106.0,
-   "edge": 2.5,
-   "x": 1.5,
-   "why": "no edge at -106",
-   "m": 6.5,
-   "tm": 45.0
   },
   {
    "id": "2026_09_CLE_NO",
@@ -734,13 +724,13 @@
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": -106.0,
+   "price": -104.0,
+   "ev": 0.051,
    "edge": 2.5,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "CHI",
    "away": "TB",
-   "state": "under"
+   "state": "pick"
   },
   "2026_09_BUF_MIN": {
    "mk": "ml",
@@ -807,13 +797,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1465,
+  "snapshots": 1466,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 560,
-    "clvRet": -0.0345,
-    "clvT": -12.71,
+    "clvN": 561,
+    "clvRet": -0.0344,
+    "clvT": -12.69,
     "clv": 0.42,
     "beat": 0.225,
     "still": 0.752
@@ -1846,16 +1836,15 @@
    "tm": 45.0,
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
-   "close": 47.5,
-   "pass": true
+   "close": 47.5
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-03": {
-    "raw": 11.25,
-    "scale": 0.8222,
+    "raw": 10.25,
+    "scale": 0.9024,
     "down": 30.75
    },
    "2026-11-04": {
@@ -1875,7 +1864,7 @@
     "scale": 0.8081
    },
    "2026-11-08": {
-    "raw": 19.5,
+    "raw": 19.75,
     "scale": 1.0
    },
    "2026-11-09": {
