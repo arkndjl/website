@@ -50,6 +50,7 @@ import re
 import sys
 import urllib.request
 from collections import defaultdict
+from zoneinfo import ZoneInfo
 
 import numpy as np
 
@@ -1228,7 +1229,7 @@ def build():
         set_lineups(S, lineups_from_logs(D.skater_logs(S, fresh=True)))
     except Exception as e:
         print('lineups:', e, file=sys.stderr)
-    today = dt.datetime.now(dt.timezone(dt.timedelta(hours=-5))).date()
+    today = dt.datetime.now(ZoneInfo('America/New_York')).date()      # the NHL's slate day (was fixed UTC-5: an hour behind in EDT)
     finals = [g for g in cur if g['final'] and g['hs'] is not None]
     # the next two dates with games, from the NHL's schedule (start times, neutral sites, live state)
     sched = D.schedule(today.isoformat())
