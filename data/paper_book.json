@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-04T10:57:10Z",
+ "asof": "2026-11-04T11:01:45Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 96.32,
   "peak": 118.08,
   "drawdown": 0.1843,
-  "open": 104.0,
+  "open": 106.25,
   "path": [
    101.5,
    101.6,
@@ -236,12 +236,12 @@
   ]
  },
  "record": {
-  "n": 283,
-  "clvN": 227,
-  "clvRet": -0.0359,
-  "clvT": -7.52,
-  "clv": -0.45,
-  "beat": 0.171,
+  "n": 284,
+  "clvN": 228,
+  "clvRet": -0.0357,
+  "clvT": -7.5,
+  "clv": -0.44,
+  "beat": 0.17,
   "settled": 224,
   "w": 115,
   "l": 109,
@@ -252,23 +252,23 @@
   "risked": 190.25,
   "yield": -0.016
  },
- "tEff": -7.52,
+ "tEff": -7.5,
  "corr": {
   "rho": 0.0,
-  "n": 227,
+  "n": 228,
   "slates": 20,
-  "nEff": 227.0,
-  "avgSlate": 11.35
+  "nEff": 228.0,
+  "avgSlate": 11.4
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 227,
+   "value": 228,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-3.6% t -7.52",
+   "value": "-3.6% t -7.5",
    "pass": false
   },
   {
@@ -462,7 +462,7 @@
    "label": "CBB total",
    "sport": "cbb",
    "mk": "total",
-   "n": 55,
+   "n": 56,
    "clvN": 54,
    "clvRet": -0.0594,
    "clvT": -4.85,
@@ -547,11 +547,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 63,
-   "clvN": 57,
-   "clvRet": -0.0194,
-   "clvT": -4.1,
-   "clv": -0.05,
-   "beat": 0.246,
+   "clvN": 58,
+   "clvRet": -0.0189,
+   "clvT": -4.04,
+   "clv": -0.04,
+   "beat": 0.241,
    "settled": 54,
    "w": 30,
    "l": 24,
@@ -699,7 +699,11 @@
    "edge": 4.3,
    "ev": 0.0104,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0094,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.3125
   },
   {
    "rule": "tennis-ml",
@@ -1030,7 +1034,7 @@
    "edge": 6.0,
    "ev": 0.022,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 161.5
   },
   {
@@ -13639,7 +13643,11 @@
    "edge": 4.3,
    "ev": 0.0104,
    "event": "Chennai Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0094,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.3125
   },
   {
    "rule": "tennis-ml",
@@ -13970,7 +13978,7 @@
    "edge": 6.0,
    "ev": 0.022,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 161.5
   },
   {

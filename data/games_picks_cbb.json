@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T10:58:56Z",
+ "asof": "2026-11-04T11:01:41Z",
  "recenter": {
   "2026-11-04": -12.33
  },
@@ -195,8 +195,14 @@
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
    "close": 161.5,
-   "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 161.5,
+    "price": -104.0,
+    "ev": 0.036,
+    "units": 0.75
+   }
   },
   {
    "id": "401902276",
@@ -360,7 +366,7 @@
    "mk": "total",
    "side": "over",
    "line": 160.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 1.4,
    "x": 2.0,
    "why": "edge under 2",
@@ -382,22 +388,6 @@
    "why": "spread market off",
    "m": 11.9,
    "tm": 159.2
-  },
-  {
-   "id": "401928811",
-   "sport": "cbb",
-   "kick": "2026-11-05T01:00:00Z",
-   "home": "South Dakota",
-   "away": "Northern Kentucky",
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": 106.0,
-   "edge": 3.1,
-   "x": null,
-   "why": "spread market off",
-   "m": 0.6,
-   "tm": 164.5
   },
   {
    "id": "401917514",
@@ -505,7 +495,7 @@
    "mk": "total",
    "side": "over",
    "line": 160.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -574,16 +564,16 @@
    "state": "off"
   },
   "401928811": {
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": 106.0,
-   "edge": 3.1,
-   "ev": null,
-   "units": 0.0,
+   "mk": "total",
+   "side": "over",
+   "line": 161.5,
+   "price": -104.0,
+   "ev": 0.036,
+   "edge": 3.0,
+   "units": 0.75,
    "home": "South Dakota",
    "away": "Northern Kentucky",
-   "state": "off"
+   "state": "pick"
   }
  },
  "record": {
@@ -638,7 +628,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4424,
+  "snapshots": 4425,
   "buckets": [
    {
     "when": "24h+",
@@ -651,12 +641,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 606,
+    "clvN": 607,
     "clvRet": -0.0434,
-    "clvT": -9.59,
+    "clvT": -9.61,
     "clv": 0.07,
     "beat": 0.257,
-    "still": 0.413
+    "still": 0.414
    },
    {
     "when": "1-6h",
@@ -7600,8 +7590,7 @@
    "tmRaw": 152.1,
    "flagged": "2026-11-04T01:07:09Z",
    "betTo": 162.5,
-   "close": 161.5,
-   "pass": true
+   "close": 161.5
   },
   {
    "id": "401920191",
@@ -7720,9 +7709,9 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 26.5,
+    "raw": 26.75,
     "scale": 1.0,
-    "down": 7.75
+    "down": 8.25
    },
    "2026-11-05": {
     "raw": 22.0,
