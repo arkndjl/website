@@ -176,9 +176,25 @@ def terms(players, M):
     return out
 
 
+def bpm3_research(lines):
+    """3-season BPM as the research column (cbb/backtest prep.py): the last three lines' BPM weighted by Min% x games,
+    equal weights, no shrink; None with no minutes (xrow then reads last season's BPM). The live path used the board's
+    5/4/3 BPM shrunk to -4 by 300 minutes (cbb_fit.features), a different scale from the one the player projection and
+    the game prior were fit on (corr .68; under 20% of minutes the gap's sd is 7 BPM). Served that way to history (rret
+    and fvtop), the walk's margin error rose: 2016-20 MAE 9.2321 -> 9.2386 (t +5.2), held out 2021-26 9.5716 -> 9.5885
+    (t +13.8, lined +7.0), worse in every season. Refitting history on the shrunk value instead fails (tune t -0.7, held
+    +0.7); clipping BPM inputs at 15/25/40 fails too (tune t -0.8/-0.3/+0.6). Nov 4 2026"""
+    num = den = 0.0
+    for z in lines:
+        w = (z.get('min_per') or 0) * (z.get('gp') or 0)
+        if z.get('bpm') is not None and w:
+            num += w * z['bpm']; den += w
+    return num / den if den else None
+
+
 def live_players(season, ts, names=False):
     """the coming season's rosters from the board's frozen prior (scripts/cbb_prior.json.gz), as build() inputs: the
-    same research columns rebuilt from each career's Barttorvik lines (3-season BPM as team_fv_live builds it);
+    same research columns rebuilt from each career's Barttorvik lines (3-season BPM: bpm3_research);
     names: each tuple also carries the board row's name and team (scripts/backup_watch.py)"""
     import gzip
     d = json.load(gzip.open(os.path.join(C.HERE, 'cbb_prior.json.gz')))
@@ -200,14 +216,9 @@ def live_players(season, ts, names=False):
         prev = [dict(zip(d['keep'], x)) for x in c['seasons'] if x[K['year']] < season]
 
         def line(i):
-            # season i of prev with the 3-season BPM through it (the research column)
+            # season i of prev with the 3-season BPM through it, as the research column the models are fit on
             q = dict(prev[i])
-            num = den = 0.0
-            for w, z in zip((5, 4, 3), reversed(prev[max(0, i - 2):i + 1])):
-                mm = (z['mp'] or 0) * (z['gp'] or 0)
-                if z['bpm'] is not None:
-                    num += w * mm * z['bpm']; den += w * mm
-            q['bpm3'] = ((num / den) * den / 5 + -4.0 * 300) / (den / 5 + 300) if den else -4.0
+            q['bpm3'] = bpm3_research(prev[max(0, i - 2):i + 1])
             return q
         p = line(len(prev) - 1) if prev and prev[-1]['year'] == season - 1 and prev[-1]['min_per'] else None
         h = healthy({q['year']: line(i) for i, q in enumerate(prev)}, season) if prev else None
