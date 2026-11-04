@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-04T19:58:29Z",
+ "asof": "2026-11-04T20:24:41Z",
  "recenter": {
   "2026-11-04": -12.41
  },
@@ -184,7 +184,7 @@
    "price": 104.0,
    "p": 0.528,
    "ev": 0.077,
-   "units": 3.25,
+   "units": 3.75,
    "edge": 3.0,
    "x": 2.0,
    "pDU": 0.5133,
@@ -194,19 +194,11 @@
    "tmRaw": 140.1,
    "flagged": "2026-11-04T14:41:52Z",
    "betTo": 150.5,
-   "close": 147.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 147.5,
-    "price": 106.0,
-    "ev": 0.125,
-    "units": 3.75,
-    "unitsRaw": 5.0,
-    "unitsCap": 3.75
-   },
+   "close": 146.5,
+   "now": null,
+   "pass": true,
    "unitsRaw": 4.5,
-   "unitsCap": 3.25
+   "unitsCap": 3.75
   },
   {
    "id": "401917512",
@@ -221,7 +213,7 @@
    "price": -100.0,
    "p": 0.524,
    "ev": 0.048,
-   "units": 1.5,
+   "units": 1.75,
    "edge": 2.6,
    "x": 2.0,
    "pDU": 0.5116,
@@ -238,12 +230,12 @@
     "line": 147.5,
     "price": -100.0,
     "ev": 0.048,
-    "units": 1.5,
+    "units": 1.75,
     "unitsRaw": 2.25,
-    "unitsCap": 1.5
+    "unitsCap": 1.75
    },
    "unitsRaw": 2.25,
-   "unitsCap": 1.5
+   "unitsCap": 1.75
   },
   {
    "id": "401928811",
@@ -258,7 +250,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.079,
-   "units": 1.5,
+   "units": 1.75,
    "edge": 6.0,
    "x": 2.0,
    "pDU": 0.5258,
@@ -272,7 +264,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 2.25,
-   "unitsCap": 1.5
+   "unitsCap": 1.75
   },
   {
    "id": "401902276",
@@ -298,8 +290,16 @@
    "flagged": "2026-11-04T05:56:41Z",
    "betTo": 153.5,
    "close": 156.5,
-   "now": null,
-   "pass": true,
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 156.5,
+    "price": -108.0,
+    "ev": 0.055,
+    "units": 0.5,
+    "unitsRaw": 0.75,
+    "unitsCap": 0.5
+   },
    "unitsRaw": 2.0,
    "unitsCap": 1.5
   },
@@ -316,7 +316,7 @@
    "price": -106.0,
    "p": 0.543,
    "ev": 0.056,
-   "units": 0.75,
+   "units": 1.0,
    "edge": 4.7,
    "x": 2.0,
    "pDU": 0.5204,
@@ -330,7 +330,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 1.25,
-   "unitsCap": 0.75
+   "unitsCap": 1.0
   },
   {
    "id": "401917514",
@@ -399,9 +399,9 @@
     "line": 161.5,
     "price": 102.0,
     "ev": 0.088,
-    "units": 3.25,
+    "units": 3.75,
     "unitsRaw": 4.5,
-    "unitsCap": 3.25
+    "unitsCap": 3.75
    }
   }
  ],
@@ -439,22 +439,6 @@
  ],
  "board": [
   {
-   "id": "401902276",
-   "sport": "cbb",
-   "kick": "2026-11-05T00:00:00Z",
-   "home": "Butler",
-   "away": "Fairleigh Dickinson",
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -111.0,
-   "edge": 5.2,
-   "x": 2.0,
-   "why": "no edge at -111",
-   "m": 26.5,
-   "tm": 151.3
-  },
-  {
    "id": "401920191",
    "sport": "cbb",
    "kick": "2026-11-05T00:00:00Z",
@@ -479,12 +463,28 @@
    "mk": "total",
    "side": "over",
    "line": 161.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 0.7,
    "x": 2.0,
    "why": "edge under 2",
    "m": 15.9,
    "tm": 162.2
+  },
+  {
+   "id": "401920410",
+   "sport": "cbb",
+   "kick": "2026-11-05T00:00:00Z",
+   "home": "High Point",
+   "away": "Maryland Eastern Shore",
+   "mk": "spread",
+   "side": "away",
+   "line": 34.5,
+   "price": -106.0,
+   "edge": 6.5,
+   "x": null,
+   "why": "spread market off",
+   "m": 28.0,
+   "tm": 152.5
   },
   {
    "id": "401918052",
@@ -495,7 +495,7 @@
    "mk": "spread",
    "side": "away",
    "line": 16.5,
-   "price": -102.0,
+   "price": -106.0,
    "edge": 4.7,
    "x": null,
    "why": "spread market off",
@@ -576,7 +576,7 @@
    "mk": "total",
    "side": "over",
    "line": 161.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 0.7,
    "ev": null,
    "units": 0.0,
@@ -612,7 +612,7 @@
    "mk": "spread",
    "side": "away",
    "line": 16.5,
-   "price": -102.0,
+   "price": -106.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -621,28 +621,28 @@
    "state": "off"
   },
   "401920410": {
-   "mk": "total",
-   "side": "over",
-   "line": 147.5,
-   "price": 106.0,
-   "ev": 0.125,
-   "edge": 5.0,
-   "units": 5.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 34.5,
+   "price": -106.0,
+   "edge": 6.5,
+   "ev": null,
+   "units": 0.0,
    "home": "High Point",
    "away": "Maryland Eastern Shore",
-   "state": "pick"
+   "state": "off"
   },
   "401902276": {
    "mk": "total",
    "side": "under",
    "line": 156.5,
-   "price": -111.0,
+   "price": -108.0,
+   "ev": 0.055,
    "edge": 5.2,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.75,
    "home": "Butler",
    "away": "Fairleigh Dickinson",
-   "state": "under"
+   "state": "pick"
   },
   "401928811": {
    "mk": "spread",
@@ -709,7 +709,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4557,
+  "snapshots": 4563,
   "buckets": [
    {
     "when": "24h+",
@@ -722,18 +722,18 @@
    },
    {
     "when": "6-24h",
-    "clvN": 647,
+    "clvN": 648,
     "clvRet": -0.0451,
-    "clvT": -10.54,
+    "clvT": -10.55,
     "clv": 0.04,
     "beat": 0.241,
     "still": 0.427
    },
    {
     "when": "1-6h",
-    "clvN": 442,
-    "clvRet": -0.054,
-    "clvT": -23.51,
+    "clvN": 443,
+    "clvRet": -0.0539,
+    "clvT": -23.55,
     "clv": -0.12,
     "beat": 0.111,
     "still": 0.679
@@ -7661,7 +7661,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.079,
-   "units": 1.5,
+   "units": 1.75,
    "edge": 6.0,
    "x": 2.0,
    "pDU": 0.5258,
@@ -7674,7 +7674,7 @@
    "close": 163.5,
    "pass": true,
    "unitsRaw": 2.25,
-   "unitsCap": 1.5
+   "unitsCap": 1.75
   },
   {
    "id": "401920191",
@@ -7689,7 +7689,7 @@
    "price": -106.0,
    "p": 0.543,
    "ev": 0.056,
-   "units": 0.75,
+   "units": 1.0,
    "edge": 4.7,
    "x": 2.0,
    "pDU": 0.5204,
@@ -7702,7 +7702,7 @@
    "close": 150.5,
    "pass": true,
    "unitsRaw": 1.25,
-   "unitsCap": 0.75
+   "unitsCap": 1.0
   },
   {
    "id": "401924911",
@@ -7788,7 +7788,6 @@
    "flagged": "2026-11-04T05:56:41Z",
    "betTo": 153.5,
    "close": 156.5,
-   "pass": true,
    "unitsRaw": 2.0,
    "unitsCap": 1.5
   },
@@ -7832,7 +7831,7 @@
    "price": 104.0,
    "p": 0.528,
    "ev": 0.077,
-   "units": 3.25,
+   "units": 3.75,
    "edge": 3.0,
    "x": 2.0,
    "pDU": 0.5133,
@@ -7842,9 +7841,10 @@
    "tmRaw": 140.1,
    "flagged": "2026-11-04T14:41:52Z",
    "betTo": 150.5,
-   "close": 147.5,
+   "close": 146.5,
+   "pass": true,
    "unitsRaw": 4.5,
-   "unitsCap": 3.25
+   "unitsCap": 3.75
   },
   {
    "id": "401917512",
@@ -7859,7 +7859,7 @@
    "price": -100.0,
    "p": 0.524,
    "ev": 0.048,
-   "units": 1.5,
+   "units": 1.75,
    "edge": 2.6,
    "x": 2.0,
    "pDU": 0.5116,
@@ -7871,19 +7871,19 @@
    "betTo": 147.0,
    "close": 147.5,
    "unitsRaw": 2.25,
-   "unitsCap": 1.5
+   "unitsCap": 1.75
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 34.0,
-    "scale": 0.7574,
+    "raw": 29.5,
+    "scale": 0.8729,
     "down": 14.25
    },
    "2026-11-05": {
-    "raw": 28.25,
+    "raw": 28.0,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -7891,15 +7891,15 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 46.75,
-    "scale": 0.8556
+    "raw": 43.0,
+    "scale": 0.9302
    },
    "2026-11-08": {
-    "raw": 25.25,
+    "raw": 25.5,
     "scale": 1.0
    },
    "2026-11-09": {
-    "raw": 13.25,
+    "raw": 10.5,
     "scale": 1.0
    }
   }
