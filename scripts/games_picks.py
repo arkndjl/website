@@ -1107,6 +1107,14 @@ def live(sport):
         x = segl.get((rmk, e.get('seg')))
         return x is not None and e['edge'] >= x
     Gb = {g['id']: g for g in games}
+    # an ungraded pick's start follows the board's (Nov 4 2026 audit: a pick flagged while its game had ESPN's no-time
+    # placeholder, 00:00 ET of game day, kept it after the time was set, so it froze as started half a day early:
+    # restake, pass, the night cap's locked stakes and the alerts all read the placeholder; Minnesota at UCLA, 05:00Z
+    # vs a 17:00Z kick). The odds archive's close already uses each snapshot's own start.
+    for e in log:
+        g = Gb.get(e['id'])
+        if g and e.get('res') is None and g.get('kick') and iso(g['kick']) != iso(e['kick']):
+            e['kick'] = g['kick']
     for e in log:
         g = Gb.get(e['id'])
         if (e.get('res') is None and iso(e['kick']) > now and e['mk'] == 'total' and g and g.get('tmRaw') is not None
