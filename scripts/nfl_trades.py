@@ -224,31 +224,46 @@ def espn_rosters():
     return out
 
 
-def live(y, week, games):
-    """({team: [moves_for rows]}, {gsis: (name, position)}) before this week's games; ({}, {}) if a source is missing. The club each player is on
-    now: ESPN's rosters, joined to gsis by ESPN id (nflverse roster file) or name on position; players ESPN doesn't
-    list keep their last weekly-roster club."""
+_ESPN = None
+
+
+def current_teams(y, ros=None):
+    """{gsis: club} today from ESPN's 32 team rosters (current to the day; nflverse's roster file lags trades by days
+    and the WAR board's snap-weighted club stays on the old one), joined by ESPN id (nflverse roster file) and then the
+    shared name matcher on position. Players ESPN doesn't list are left out. Raises if ESPN can't be read."""
+    global _ESPN
     import names as NM
-    try:
-        tw, pos = _weekly(y, fresh=True)
-        snaps = _snaps(y, tw)
+    if ros is None:
         ros = list(N.rows(N.get(f'roster_{y}.csv', f'{N.REL}/rosters/roster_{y}.csv')))
-        es = espn_rosters()
-    except Exception as e:      # noqa: BLE001
-        print('nfl trades: skipped', repr(e))
-        return {}, {}
+    if _ESPN is None:
+        _ESPN = espn_rosters()
     by_espn = {r['espn_id']: r['gsis_id'] for r in ros if r.get('espn_id') and r['gsis_id']}
-    for r in ros:
-        pos.setdefault(r['gsis_id'], r['position'])
     M = NM.Matcher([r for r in ros if r['gsis_id']], name='full_name', team=None, pos='position')
     now = {}
-    for eid, (t, nm, ps) in es.items():
+    for eid, (t, nm, ps) in _ESPN.items():
         g = by_espn.get(eid)
         if not g:
             hit, _ = M.find(nm, pos=ps)
             g = hit['gsis_id'] if hit else None
         if g:
             now[g] = t
+    return now
+
+
+def live(y, week, games):
+    """({team: [moves_for rows]}, {gsis: (name, position)}) before this week's games; ({}, {}) if a source is missing. The club each player is on
+    now: ESPN's rosters, joined to gsis by ESPN id (nflverse roster file) or name on position; players ESPN doesn't
+    list keep their last weekly-roster club."""
+    try:
+        tw, pos = _weekly(y, fresh=True)
+        snaps = _snaps(y, tw)
+        ros = list(N.rows(N.get(f'roster_{y}.csv', f'{N.REL}/rosters/roster_{y}.csv')))
+        now = current_teams(y, ros)
+    except Exception as e:      # noqa: BLE001
+        print('nfl trades: skipped', repr(e))
+        return {}, {}
+    for r in ros:
+        pos.setdefault(r['gsis_id'], r['position'])
     lastwk = {}
     for (p, k), (t, st) in tw.items():
         if st in ON and k >= lastwk.get(p, (0, None))[0]:

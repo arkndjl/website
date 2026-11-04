@@ -543,6 +543,26 @@ def fresh(sport):
         return False
 
 
+def nfl_retag():
+    """between daily rebuilds, keep each row's club on the WAR board's (today's club, so a trade shows the same day)"""
+    fn = os.path.join(ROOT, 'static', 'data', 'xaav-nfl.json')
+    try:
+        X = json.load(open(fn))
+        cur = {p['id']: p['t'] for p in json.load(open(os.path.join(ROOT, 'static', 'data', 'nfl-war.json')))['players']}
+    except (OSError, ValueError, KeyError):
+        return
+    n = 0
+    for r in X.get('players', []):
+        t = cur.get(r['id'])
+        if t and t != r.get('tm'):
+            r['tm'] = t
+            n += 1
+    if n:
+        with open(fn, 'w') as f:
+            json.dump(X, f, separators=(',', ':'))
+        print(f'xaav nfl: {n} players moved to their current club')
+
+
 def write(sport, payload):
     fn = os.path.join(ROOT, 'static', 'data', f'xaav-{sport}.json')
     with open(fn, 'w') as fh:
@@ -711,6 +731,8 @@ def main():
     for sport in [x for x in a if not x.startswith('--')] or ['nhl', 'nfl', 'nba']:
         if '--force' not in a and fresh(sport):
             print(f'xaav {sport}: built under {FRESH_H}h ago, skipped (--force to rebuild)')
+            if sport == 'nfl':
+                nfl_retag()
             continue
         {'nhl': nhl_live, 'nfl': nfl_live, 'nba': nba_live}[sport]()
 

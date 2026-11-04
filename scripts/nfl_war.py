@@ -561,6 +561,7 @@ def build():
     y = max(int(g['season']) for g in done)
     week = max(int(g['week']) for g in done if int(g['season']) == y)
     out, lines, alpha = board(y, fresh=True)
+    current_clubs(out, y)
     try:   # next-season and three-season WAR (scripts/nfl_war_proj.py, display only)
         import nfl_war_proj
         teamg = Counter()
@@ -762,6 +763,33 @@ def st_rows(stv, y, gs2pfr, teamg, fresh=False, stb=None):
             p['ph'] = ph
         out.append(p)
     return out
+
+
+def current_clubs(out, y):
+    """Put each player on the club he is on today (Nov 4 2026: Simmons, traded TEN -> CHI Oct 29, still showed TEN;
+    Harrison Jr., ARI -> HOU Oct 12, still ARI). board() names the club he took the most snaps for; today's club comes
+    from ESPN's team rosters (scripts/nfl_trades.py current_teams). 't' becomes today's club and 'tm' lists his clubs
+    oldest first, today's last (the page's logo is the last). Everything that reads the board by club follows: xAAV,
+    percentiles, team breakdowns, power rankings' team WAR, the search. Live board only; past seasons keep snaps."""
+    try:
+        import nfl_trades
+        now = nfl_trades.current_teams(y)
+    except Exception as e:   # noqa: BLE001  (ESPN down: keep the snap-weighted club)
+        return print(f'nfl war: current clubs skipped ({e!r})')
+    by_pfr, by_name = gsis_map(y)
+    n = 0
+    for p in out:
+        k = NM.key(p['n'])
+        gs = by_pfr.get(p['id']) or next((by_name[(k, x)] for x in [p['t']] + p['tm'].split('/') if (k, x) in by_name), p['id'])
+        t = now.get(gs)
+        if not t:
+            continue
+        old = [x for x in p['tm'].split('/') if x and x != t]
+        if t != p['t'] or old:
+            p['tm'] = '/'.join(old + [t])
+            n += t != p['t']
+            p['t'] = t
+    print(f'nfl war: {n} players on a new club since their snaps')
 
 
 def publish(out, y, week, done, lines, alpha):

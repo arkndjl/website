@@ -1093,6 +1093,8 @@ def build_nfl():
         q = site.get(r['id'], {})
         if q.get('ph'):
             r['ph'] = q['ph']
+        if q.get('t'):           # today's club (nfl_war.current_clubs: a traded player shows his new team)
+            r['tm'] = q['t']
         tag(r, q.get('age'), q.get('rook'))
     write('nfl', y, rows, targets, {'week': week})
 
