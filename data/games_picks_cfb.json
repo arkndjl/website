@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-04T18:52:43Z",
+ "asof": "2026-11-04T18:54:35Z",
  "recenter": {
-  "week": 0.81
+  "week": 0.82
  },
  "monitor": {
   "clocks": {
@@ -714,7 +714,7 @@
    "price": -100.0,
    "p": 0.52,
    "ev": 0.041,
-   "units": 3.0,
+   "units": 2.5,
    "edge": 5.0,
    "x": 3.0,
    "pDU": 0.515,
@@ -726,7 +726,9 @@
    "betTo": 50.5,
    "close": 52.5,
    "pass": true,
-   "now": null
+   "now": null,
+   "unitsRaw": 3.0,
+   "unitsCap": 2.5
   },
   {
    "id": "401862819",
@@ -1636,6 +1638,22 @@
    "tm": 51.5
   },
   {
+   "id": "401858290",
+   "sport": "cfb",
+   "kick": "2026-11-07T20:30:00.000Z",
+   "home": "Wake Forest",
+   "away": "Merrimack",
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -113.0,
+   "edge": 2.8,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 52.8,
+   "tm": 56.7
+  },
+  {
    "id": "401856738",
    "sport": "cfb",
    "kick": "2026-11-07T17:45:00.000Z",
@@ -2002,22 +2020,6 @@
    "why": "edge under 6 (season: late)",
    "m": 0.4,
    "tm": 47.7
-  },
-  {
-   "id": "401856741",
-   "sport": "cfb",
-   "kick": "2026-11-08T00:30:00.000Z",
-   "home": "Ole Miss",
-   "away": "Georgia",
-   "mk": "spread",
-   "side": "home",
-   "line": -3.5,
-   "price": -100.0,
-   "edge": 1.7,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": -1.8,
-   "tm": 57.1
   }
  ],
  "games": {
@@ -2441,6 +2443,18 @@
    "away": "James Madison",
    "state": "under"
   },
+  "401858290": {
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -113.0,
+   "edge": 2.8,
+   "ev": null,
+   "units": 0.0,
+   "home": "Wake Forest",
+   "away": "Merrimack",
+   "state": "under"
+  },
   "401858517": {
    "mk": "total",
    "side": "over",
@@ -2782,13 +2796,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7786,
+  "snapshots": 7788,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1872,
+    "clvN": 1873,
     "clvRet": -0.0442,
-    "clvT": -25.74,
+    "clvT": -25.76,
     "clv": 0.21,
     "beat": 0.276,
     "still": 0.525
@@ -2986,7 +3000,7 @@
    "price": -100.0,
    "p": 0.52,
    "ev": 0.041,
-   "units": 3.0,
+   "units": 2.5,
    "edge": 5.0,
    "x": 3.0,
    "pDU": 0.515,
@@ -2997,7 +3011,9 @@
    "flagged": "2026-11-01T14:59:46Z",
    "betTo": 50.5,
    "close": 52.5,
-   "pass": true
+   "pass": true,
+   "unitsRaw": 3.0,
+   "unitsCap": 2.5
   },
   {
    "id": "401858514",
@@ -3921,12 +3937,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-04": {
-    "raw": 27.25,
-    "scale": 1.0,
+    "raw": 30.5,
+    "scale": 0.9016,
     "down": 12.5
    },
    "2026-11-05": {
-    "raw": 26.25,
+    "raw": 27.5,
     "scale": 1.0
    },
    "2026-11-06": {
@@ -3938,11 +3954,11 @@
     "scale": 0.8556
    },
    "2026-11-08": {
-    "raw": 30.5,
+    "raw": 29.75,
     "scale": 1.0
    },
    "2026-11-09": {
-    "raw": 14.25,
+    "raw": 12.75,
     "scale": 1.0
    }
   }
