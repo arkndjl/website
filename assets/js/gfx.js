@@ -1119,6 +1119,90 @@
   }
   var NBAX = null;
   function nbaXpm(w) { return NBAX || (NBAX = fetch(w.getAttribute('data-src') + w.getAttribute('data-cur') + '.json').then(function (r) { return r.json(); }).catch(function () { NBAX = null; return null; })); }
+  // ---- a sparse card's spare room: the season line as stat cells, the player's row on the page's other tables, FV outlook
+  // a stat in a line of text: "1793 pass yds", "25 mpg" (number, label) or "BPM +2.0 (−0.4 O, +2.3 D)", "3P 33.3% on 3"
+  var PC_NUMS = '[-+−~]?\\d[\\d,]*(?:\\.\\d+)?%?';
+  var PC_ST1 = new RegExp('^(' + PC_NUMS + ')\\s+([A-Za-z][A-Za-z/%+.\' -]{0,15})$');
+  var PC_ST2 = new RegExp('^([A-Za-z0-9][\\w/%+.\'-]{0,11}(?: [A-Za-z/%+.-]{1,8})?)\\s+(' + PC_NUMS + ')(?:\\s+(.{1,24}))?$');
+  var PC_STNO = /^(age|lbs?|in|cm|kg)$|\bno\.?$/i;   // size and age are in the header already; "No. 1" is a rank in prose
+  function pcStats(s) {
+    var prot = String(s).replace(/\([^)]*\)/g, function (m) { return m.replace(/,/g, '\u0001'); });
+    var parts = prot.split(/(\s+·\s+|,\s+|;\s+)/), items = [], keep = [], run = '', back = function (t) { return String(t || '').replace(/\u0001/g, ','); };
+    for (var i = 0; i < parts.length; i += 2) {
+      var p = parts[i].trim(), m1 = p.match(PC_ST1), m2 = !m1 && p.match(PC_ST2), it = null;
+      if (m1 && !PC_STNO.test(m1[2].trim())) it = { h: m1[2].trim(), t: m1[1] };
+      else if (m2 && /[a-z]/i.test(m2[1]) && !PC_STNO.test(m2[1])) it = { h: m2[1], t: m2[2], sub: back(m2[3]).replace(/^\((.*)\)$/, '$1') };
+      if (it) { items.push(it); if (run) { keep.push(back(run)); run = ''; } }
+      else if (p) run += (run ? parts[i - 1] : '') + parts[i];
+    }
+    if (run) keep.push(back(run));
+    return { items: items, rest: keep.join(' · ') };
+  }
+  // the first sentence of a line that reads as three or more stats: a group of cells, and what is left of the line
+  function pcStatText(text, title) {
+    var ss = String(text || '').split(/\.\s+/), sen = [];
+    ss.forEach(function (s) { if (sen.length && /\bNo$/i.test(sen[sen.length - 1])) sen[sen.length - 1] += '. ' + s; else sen.push(s); });
+    var group = null, rest = [];
+    sen.forEach(function (s) {
+      s = s.replace(/\.$/, '');
+      if (!group) {
+        var m = s.match(/^([^:·]{2,40}):\s+(.+)$/), st = pcStats(m ? m[2] : s);
+        if (st.items.length >= 3) { group = { title: m ? m[1] : title || 'stats', items: st.items }; if (st.rest) rest.push(st.rest); return; }
+      }
+      if (s) rest.push(s);
+    });
+    return { group: group, rest: rest.length ? rest.join('. ') + (/\.\s*$/.test(text) ? '.' : '') : '' };
+  }
+  var PC_XSKIP = /mock|backup|arklist|breakout|past|^v\d+$|game|ranking|odds|lineup|on\/off|fv model/i;
+  // the player's row on the page's other player tables (same name by the shared rules, same team): its columns the card lacks
+  function pcXGroups(table, name, team, pos, shown) {
+    var nk = window.arkName ? window.arkName.key : pdNorm, key = nk(name), tk = function (s) { return String(s || '').toUpperCase().split('/').map(function (x) { return x.trim(); }).filter(Boolean); };
+    var mine = tk(team), seen = {}, out = [];
+    if (!key) return out;
+    document.querySelectorAll('.win table').forEach(function (t) {
+      if (t === table || !t.tHead || !t.tHead.rows[0] || !t.tBodies[0]) return;
+      var w2 = t.closest('.win'), tab = (t.closest('[data-tab]') || w2 || { getAttribute: function () { return ''; } }).getAttribute('data-tab') || '';
+      var title = txt(w2 && w2.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
+      if (PC_XSKIP.test(tab) || PC_XSKIP.test(title) || !title || seen[title]) return;
+      var hc = pcHeads(t), hs = hc.map(txt), k = pcNameAt(hs); if (k < 0) return;
+      var rs = pcRows(t), r = rs.find(function (x) { return nk(pcName(x, k)) === key; }); if (!r) return;
+      var ti = hs.findIndex(function (h) { return TEAM_COL.test(h); });
+      if (ti >= 0 && mine.length) { var th = tk(pcCell(r.cells[ti]).t); if (th.length && !th.some(function (x) { return mine.indexOf(x) >= 0; })) return; }
+      var items = [];
+      hs.forEach(function (h, i) {
+        var lc = h.toLowerCase();
+        if (i === k || i === ti || !h || shown[lc] || PC_SKIP.test(h) || PC_SUB.test(h) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !r.cells[i] || r.cells[i].hidden) return;
+        var c = pcCell(r.cells[i]); if (c.t === '—' || c.t.length > 12) return;
+        var n = PC_NOPCT.test(h) || PC_INFO.test(h) ? null : pcNum(r.cells[i], c.t), pct = null;
+        if (n != null) {
+          var vals = rs.map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
+          if (vals.length >= 5) pct = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
+        }
+        items.push({ h: h, t: c.t, color: c.color, pct: pct, good: pct == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - pct : pct });
+      });
+      if (items.length < 2) return;
+      items.forEach(function (it) { shown[it.h.toLowerCase()] = 1; });
+      // a table named for his position (QB value, goalies) comes first
+      var pk = String(pos || '').replace(/[^A-Z]/g, ''), pw = pk && new RegExp('(^|[^A-Z])' + pk + '([^A-Z]|$)');
+      seen[title] = 1; out.push({ title: title, items: items, pri: pw && (pw.test(hs[k]) || pw.test(title)) ? 1 : 0 });
+    });
+    return out;
+  }
+  // the dropdown's FV outlook (fvoutlook.html): 80% range, then each tier's odds
+  function pcFvo(d) {
+    var f = d && d.querySelector('.fvo'); if (!f) return null;
+    var items = [], rg = f.querySelector('.fvo__head b');
+    if (rg) items.push({ h: '80% range', t: txt(rg) });
+    [].slice.call(f.querySelectorAll('.fvo__key li')).forEach(function (li) {
+      var b = txt(li.querySelector('b')), lab = txt(li).replace(b, '').trim().split(' '), p = parseFloat(b.replace(/[<>]/g, ''));
+      items.push({ h: lab[0], t: b, sub: lab.slice(1).join(' '), pct: isFinite(p) ? p : null });
+    });
+    return items.length >= 3 ? { title: 'FV outlook', items: items } : null;
+  }
+  function pcGShape(gp) {
+    var n = gp.items.length, cols = n <= 6 ? Math.max(n, 3) : n <= 8 ? 4 : 6;
+    return { cols: cols, rows: Math.ceil(n / cols), ch: gp.items.some(function (it) { return it.pct != null; }) ? 192 : 148 };
+  }
   async function buildPCard(win, row) {
     var table = row.closest('table'); if (!table) return null;
     var mainR = pcMain(row), extraL = mainR ? pdExtra(row) : '';
@@ -1201,6 +1285,61 @@
     var roles = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__role')).map(txt).filter(Boolean) : [];
     if (extraL && roles.indexOf(extraL + '.') < 0) roles.unshift(extraL);
     info = info.filter(function (f) { return !new RegExp('(^|[ ·])' + f[1].replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + ' ').test(sub.join(' · ') + ' '); });   // "250 MP", "415 min" already in the line above
+    // the reserve at the bottom for the dropdown (badges, strengths and concerns, FV inputs)
+    var plus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
+    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts:not(.pd__pct) li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
+    var badges = pcBadges([row, d]);
+    if (!badges.length) { var med = row.querySelector('.cfb__medals'), TT = { Platinum: 'p', Gold: 'g', Silver: 's', Bronze: 'b' };
+      if (med) (med.getAttribute('title') || '').split('\n').forEach(function (l) { var m = l.match(/^(Platinum|Gold|Silver|Bronze) (.+?):/); if (m) badges.push([m[2], TT[m[1]]]); }); }
+    var partsH = parts.length ? 130 + Math.ceil(Math.min(parts.length, 10) / 2) * 60 : 0;
+    var repH = plus.length || minus.length ? 140 + Math.min(6, Math.max(plus.length, minus.length, 1)) * 70 : 0, bdgH = badges.length ? 200 : 0;
+    // the layout as it stands: header lines, the sorted tile, the tiles (four across, as many rows as the room leaves)
+    var y1 = y + (info.length ? 72 : 0), featH = feat ? 44 + 230 + 40 : 0;
+    function hdrEnd(rs) {
+      g.font = '40px ' + FONT; var n = 0; rs.forEach(function (r) { n += wrap(g, r, w - px).length; });
+      return Math.max(y1 + Math.min(n, Math.max(0, Math.floor((top + (info.length ? 460 : 330) - y1) / 56))) * 56, top + 360) + 30;
+    }
+    function roomAt(rs, ls) { return bottom - hdrEnd(rs) - featH - partsH - repH - bdgH - (ls.length ? 60 + Math.min(ls.length, 3) * 64 : 0) - 44; }
+    var cols = tiles.length <= 9 ? 3 : 4, gap = 24, tw = (w - (cols - 1) * gap) / cols, th = 200;
+    var room = roomAt(roles, lines), maxRows = Math.max(1, Math.floor((room + 40) / (th + 24)));
+    // fewer tiles than room: taller tiles and bigger type, so the card fills
+    var nRows = Math.ceil(Math.min(tiles.length, maxRows * cols) / cols);
+    if (nRows) th = Math.max(200, Math.min(nRows <= 2 ? 520 : nRows === 3 ? 420 : 340, Math.floor((room + 24) / nRows) - 24));
+    // what the capped tiles leave empty takes stat cells: a line of text that reads as stats (season line, the dropdown's
+    // season), the player's columns on the page's other tables, the FV outlook; the text they come from leaves the card
+    var shown = {};
+    heads.concat(['player', 'team', 'pos']).forEach(function (h) { shown[h.toLowerCase()] = 1; });
+    var cands = [];
+    roles.forEach(function (r, i) { var s = pcStatText(r, ''); if (s.group) { s.group.src = ['r', i, s.rest]; cands.push(s.group); } });
+    lines.forEach(function (l, i) { var s = pcStatText(l[1], l[0]); if (s.group) { s.group.src = ['l', i, s.rest]; cands.push(s.group); } });
+    cands.forEach(function (gp) { gp.items.forEach(function (it) { shown[it.h.toLowerCase()] = 1; }); });
+    cands = cands.concat(pcXGroups(table, name, team, posC ? txt(posC) : '', shown).sort(function (a, b) { return b.pri - a.pri; }), [pcFvo(d && !auto ? d : null)].filter(Boolean));
+    function used(gs) {   // roles and lines with the picked groups' text taken out
+      var rs = roles.slice(), ls = lines.slice();
+      gs.forEach(function (p) { var s = p.gp.src; if (!s) return; if (s[0] === 'r') rs[s[1]] = s[2]; else ls[s[1]] = s[2] ? [ls[s[1]][0], s[2]] : null; });
+      return { rs: rs.filter(Boolean), ls: ls.filter(Boolean) };
+    }
+    var fillH = function (p) { return 44 + p.rows * (p.sh.ch + 16) + 20; };
+    function pickFill(t) {   // the groups that fit under tiles t px tall, in order, each cut to the rows that fit
+      var tu = nRows ? nRows * (t + 24) + 20 : -44, out = [];
+      if (!cands.length) return out;
+      var all = used(cands.map(function (gp) { return { gp: gp }; })), free = roomAt(all.rs, all.ls) - tu - 24;
+      cands.forEach(function (gp) {
+        var sh = pcGShape(gp), r = Math.min(sh.rows, Math.floor((free - 64 + 16) / (sh.ch + 16)));
+        if (r >= 1) { var p = { gp: gp, sh: sh, rows: r }; out.push(p); free -= fillH(p); }
+      });
+      // a text group left out keeps its line on the card: take groups off the end until the rest fit again
+      while (out.length) {
+        var u = used(out), need = out.reduce(function (a, p) { return a + fillH(p); }, 0);
+        if (roomAt(u.rs, u.ls) - tu - 24 >= need) break;
+        out.pop();
+      }
+      return out;
+    }
+    var cnt = function (f) { return f.reduce(function (a, p) { return a + p.rows; }, 0); }, fill = pickFill(th);
+    // one or two rows of tiles at full height step down (to 400, then 340) when that seats more stat cells
+    if (nRows && nRows <= 2) [400, 340].forEach(function (t) { if (th > t) { var f4 = pickFill(t); if (cnt(f4) > cnt(fill)) { fill = f4; th = t; } } });
+    if (fill.length) { var uu = used(fill); roles = uu.rs; lines = uu.ls; }
     if (info.length) {   // AGE 27.9  G 7  MP 250: label lilac, value white
       g.font = '44px ' + FONT; var ix0 = x + px;
       info.forEach(function (f) {
@@ -1231,21 +1370,6 @@
       if (feat.pct != null) pxBar(g, vx, y + 172, x + w - vx - 40, 28, feat.pct, feat.good != null && feat.good <= 20 ? C.down : C.teal);
       y += fh + 40;
     }
-    // the reserve at the bottom for the dropdown (badges, strengths and concerns, FV inputs)
-    var plus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
-    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts:not(.pd__pct) li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
-    var badges = pcBadges([row, d]);
-    if (!badges.length) { var med = row.querySelector('.cfb__medals'), TT = { Platinum: 'p', Gold: 'g', Silver: 's', Bronze: 'b' };
-      if (med) (med.getAttribute('title') || '').split('\n').forEach(function (l) { var m = l.match(/^(Platinum|Gold|Silver|Bronze) (.+?):/); if (m) badges.push([m[2], TT[m[1]]]); }); }
-    var partsH = parts.length ? 130 + Math.ceil(Math.min(parts.length, 10) / 2) * 60 : 0;
-    var repH = plus.length || minus.length ? 140 + Math.min(6, Math.max(plus.length, minus.length, 1)) * 70 : 0, bdgH = badges.length ? 200 : 0;
-    // tiles: four across, as many rows as the room leaves
-    var cols = tiles.length <= 9 ? 3 : 4, gap = 24, tw = (w - (cols - 1) * gap) / cols, th = 200;
-    var room = bottom - y - partsH - repH - bdgH - (lines.length ? 60 + Math.min(lines.length, 3) * 64 : 0) - 44;
-    var maxRows = Math.max(1, Math.floor((room + 40) / (th + 24)));
-    // fewer tiles than room: taller tiles and bigger type, so the card fills
-    var nRows = Math.ceil(Math.min(tiles.length, maxRows * cols) / cols);
-    if (nRows) th = Math.max(200, Math.min(nRows <= 2 ? 520 : nRows === 3 ? 420 : 340, Math.floor((room + 24) / nRows) - 24));
     var ts = th / 200;
     if (tiles.length) {
       rule(auto ? 'PERCENTILE IN VIEW' : 'NUMBERS');
@@ -1272,6 +1396,28 @@
       });
       y += 20;
     }
+    // the stat cells in the spare room: label, value, small print or pNN, a pixel bar where there is a percentile
+    var fillEnd = bottom - partsH - repH - bdgH;
+    fill.forEach(function (p) {
+      var sh = p.sh, cw = (w - (sh.cols - 1) * 16) / sh.cols;
+      if (y + 44 + sh.ch > fillEnd) return;
+      rule(capHead(p.gp.title));
+      p.gp.items.slice(0, p.rows * sh.cols).forEach(function (it, k) {
+        var cx = x + (k % sh.cols) * (cw + 16), cy = y + Math.floor(k / sh.cols) * (sh.ch + 16);
+        if (cy + sh.ch > fillEnd) return;
+        var hot = it.good != null && it.good >= 80, cold = it.good != null && it.good <= 20, acc = hot ? C.teal : cold ? C.down : null;
+        g.fillStyle = C.face; g.fillRect(cx, cy, cw, sh.ch); bevel(g, cx, cy, cw, sh.ch, true, 3);
+        if (acc) { var u = 6; g.fillStyle = acc; g.fillRect(cx + cw - 5 * u, cy + u, 4 * u, u); g.fillRect(cx + cw - 2 * u, cy + u, u, 4 * u); g.fillRect(cx + cw - 3 * u, cy + 2 * u, u, u); }
+        g.font = '30px ' + FONT; g.fillStyle = acc || C.lilac; g.fillText(fit(g, capHead(it.h), cw - 64), cx + 20, cy + 36);
+        var vs = 60; g.font = vs + 'px ' + FONT;
+        while (vs > 32 && g.measureText(it.t).width > cw - 40) { vs -= 4; g.font = vs + 'px ' + FONT; }
+        g.fillStyle = it.color || C.white; g.fillText(fit(g, it.t, cw - 40), cx + 20, cy + 90);
+        var foot = [it.sub, it.pct != null && p.gp.title !== 'FV outlook' ? 'p' + it.pct : ''].filter(Boolean).join(' · ');
+        if (foot) { g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, foot, cw - 40), cx + 20, cy + 134); }
+        if (it.pct != null) pxBar(g, cx + 20, cy + sh.ch - 30, cw - 40, 12, it.pct, cold ? C.down : C.teal);
+      });
+      y += p.rows * (sh.ch + 16) + 20;
+    });
     // badges: the slot for the board's predictive badges (only badges that pass a held-out test are on a board)
     if (badges.length) { y += 10; rule('BADGES'); y += 6; y += badgeRows(g, badges, x, y, w); }
     if (repH) {
