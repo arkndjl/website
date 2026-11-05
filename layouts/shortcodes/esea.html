@@ -613,15 +613,17 @@
         {{- $rows := slice }}{{ range $ro }}{{ with .rolling }}{{ with index . $k }}{{ $rows = $rows | append . }}{{ end }}{{ end }}{{ end }}
         <div class="wintable__scroll">
         <table class="cfb__table esea-season esea-fm__tbl">
-          <thead><tr><th>Player</th><th title="talent, rolling">Talent</th><th>Maps</th><th title="ARK Rating over these maps">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels: success (shrunk) and net round value; 100 = average, 10 = one SD">Entry+</th><th title="fights after the opening one: share won (shrunk) and kills per round">Duel+</th><th title="multi-kill rounds per round, weighted by size">Multi+</th><th title="1v1/1v2 conversion (shrunk) and clutch value per round">Clutch+</th><th title="utility damage, enemies flashed per flash, flashes per round">Util+</th><th title="AWP impact: sniper kills per round and sniper share, vs everyone">AWP+</th><th title="deaths per round, inverted">Surv+</th></tr></thead>
+          <thead><tr><th>Player</th><th title="talent, rolling">Talent</th><th>Maps</th><th title="RWA: round win % added per round, career ESEA league maps, opponent- and division-adjusted; 0 = average Main player">RWA</th><th title="ARK Rating over these maps">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels: success (shrunk) and net round value; 100 = average, 10 = one SD">Entry+</th><th title="fights after the opening one: share won (shrunk) and kills per round">Duel+</th><th title="multi-kill rounds per round, weighted by size">Multi+</th><th title="1v1/1v2 conversion (shrunk) and clutch value per round">Clutch+</th><th title="utility damage, enemies flashed per flash, flashes per round">Util+</th><th title="AWP impact: sniper kills per round and sniper share, vs everyone">AWP+</th><th title="deaths per round, inverted">Surv+</th></tr></thead>
           <tbody>
-          {{- range $r := sort $ro "form" "desc" }}{{ with $r.rolling }}{{ with index . $k }}{{ $x := . }}
+          {{- $rwp := dict }}{{ with site.Data.esea_rwa }}{{ $rwp = .p }}{{ end }}{{ $ros := slice }}{{ range $ro }}{{ $v := -99.0 }}{{ with index $rwp .id }}{{ $v = float (index . 0) }}{{ end }}{{ $ros = $ros | append (merge . (dict "rwaS" $v)) }}{{ end }}
+          {{- range $r := sort $ros "rwaS" "desc" }}{{ with $r.rolling }}{{ with index . $k }}{{ $x := . }}
           <tr{{ if eq $r.nickname $me }} class="is-me"{{ end }}><td>{{ with $r.country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ $r.nickname }}</td><td>{{ partial "esea/stars.html" (dict "t" $r.talent) }}</td><td class="cfb__num">{{ $x.maps }}</td>
-            <td class="cfb__num esea-rt" data-r="{{ if ge (float ($x.ark | default 0)) 1.1 }}hi{{ else if lt (float ($x.ark | default 0)) 0.9 }}lo{{ end }}"><b>{{ with $x.ark }}{{ printf "%.2f" (float .) }}{{ end }}</b></td>
+            <td class="cfb__num esea-rt" data-v="{{ if gt $r.rwaS -98.0 }}{{ $r.rwaS }}{{ end }}" data-r="{{ if ge $r.rwaS 2.0 }}hi{{ else if and (lt $r.rwaS -2.0) (gt $r.rwaS -98.0) }}lo{{ end }}"><b>{{ if gt $r.rwaS -98.0 }}{{ printf "%+.1f" $r.rwaS }}{{ else }}—{{ end }}</b></td>
+            <td class="cfb__num">{{ with $x.ark }}{{ printf "%.2f" (float .) }}{{ end }}</td>
             <td class="cfb__num">{{ $x.kd }}</td><td class="cfb__num">{{ $x.kpr }}</td><td class="cfb__num">{{ $x.adr }}</td>
             {{- range $k := slice "entryPlus" "duelPlus" "multiPlus" "clutchPlus" "utilPlus" "awpPlus" "survPlus" }}{{ $v := index $x $k }}<td class="cfb__num esea-plus" data-v="{{ $v }}"{{ if and (eq $k "entryPlus") $x.entryPct }} title="{{ $x.entryPct }}% of opening duels won · {{ if gt (int $x.entryPM) 0 }}+{{ end }}{{ $x.entryPM }}"{{ end }}>{{ with $v }}<span class="{{ if ge (int .) 110 }}cfb__up{{ else if lt (int .) 90 }}cfb__down{{ end }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
             </tr>
-          {{- end }}{{ end }}{{ else }}<tr><td colspan="14" class="cfb__dim">no maps.</td></tr>{{ end }}
+          {{- end }}{{ end }}{{ else }}<tr><td colspan="15" class="cfb__dim">no maps.</td></tr>{{ end }}
           </tbody>
         </table>
         </div>
