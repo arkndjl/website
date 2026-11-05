@@ -20,6 +20,7 @@ cover = "/og/predictions.png"
 {{< nbagames title="NBA" tab="games" sport="nba" >}}
 {{< nhlgames title="NHL" tab="games" sport="nhl" >}}
 {{< soccergames title="soccer" tab="games" sport="soccer" >}}
+{{< tennismatches title="tennis" tab="games" sport="tennis" picks="true" >}}
 {{< lazytab tab="game table" >}}
 {{< gamestable title="game table :: every sport" tab="game table" >}}
 {{< /lazytab >}}

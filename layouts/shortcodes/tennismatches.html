@@ -7,7 +7,9 @@
 {{- $list := cond (eq $view "results") .results .matches -}}
 {{- $ctry := site.Data.soccer_countries.name -}}
 {{- $sfn := dict "H" "hard" "C" "clay" "G" "grass" -}}
-<div class="win games tennisgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+{{- $pred := ne ($.Get "sport" | default "") "" -}}
+{{- $pk := dict }}{{ if eq ($.Get "picks") "true" }}{{ with site.Data.games_picks_tennis }}{{ range .picks }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}{{ end -}}
+<div class="win games tennisgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tennis"/></svg>{{ $.Get "title" | default (cond (eq $view "results") "results" "matches") }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -34,7 +36,9 @@
       <div class="games__prob" title="model win chances">
         <span style="width: {{ mul .p 100 }}%">{{ printf "%.0f" (mul .p 100) }}%</span><span style="width: {{ sub 100 (mul .p 100) }}%">{{ printf "%.0f" (sub 100 (mul .p 100)) }}%</span>
       </div>
-      <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}</p>
+      <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}
+        {{- if $pred }}{{ with .nv }} · <span class="cfb__dim" title="Novig, no-vig chance in brackets">market</span> {{ printf "%+d" (int (index .o 0)) }} / {{ printf "%+d" (int (index .o 1)) }} <span class="cfb__dim">({{ printf "%.0f" (mul .p 100) }}%)</span>{{ end }}{{ end }}</p>
+      {{- with index $pk (string .id) }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ printf "%.1f" (float .edge) }} · {{ .units }}% Kelly</p>{{ end }}
     </div>
   </article>
   {{- end }}
