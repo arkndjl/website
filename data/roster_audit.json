@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-05T17:46Z",
+ "asof": "2026-11-05T18:22Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -260,7 +260,7 @@
      "rows": 2130
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 10,
+     "flags": 9,
      "rows": 627
     },
     "static/data/nfl-war.json": {
@@ -3366,24 +3366,6 @@
      "site": "BUF"
     },
     {
-     "d": "2026-11-02",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Goes back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-02",
-      "head": "Goes back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "17923",
-     "player": "Joshua Karty",
-     "pos": "K",
-     "rotowire": "FA",
-     "site": "LA"
-    },
-    {
      "d": "2026-10-26",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3553,7 +3535,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -3574,6 +3556,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-05",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Sent down Thursday",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-05",
+      "head": "Sent down Thursday",
+      "kind": "down"
+     },
+     "pid": "7353",
+     "player": "Arsenii Sergeev",
+     "pos": "G",
+     "rotowire": "CGY",
+     "site": "CGY"
+    },
     {
      "d": "2026-09-11",
      "field": "tm",
