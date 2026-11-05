@@ -2214,13 +2214,14 @@ const injuries = await (async () => {
     console.log(`availability reports: ${rep.list.length} listed for ${rep.teams.size} teams' next games`);
     // manual: by name and school
     const ix = teamIndex(espn.teams);
-    for (const m of manual.injuries || []) {
+    const manualLive = (manual.injuries || []).filter(m => !m.until || Date.now() < Date.parse(m.until + 'T12:00:00Z'));
+    for (const m of manualLive) {
       const tid = ix.resolve(m.team), a = (byNorm[norm(m.name)] || []).find(x => !tid || x.tid === tid);
       if (a) P[a.id] = { name: a.name, tid: a.tid, pos: a.pos, status: m.status, date: new Date().toISOString(), note: m.note || null, src: 'manual' };
     }
     const now = Date.now();
     for (const [k, e] of Object.entries(P)) {
-      const manualStill = e.src !== 'manual' || (manual.injuries || []).some(m => norm(m.name) === norm(e.name));
+      const manualStill = e.src !== 'manual' || manualLive.some(m => norm(m.name) === norm(e.name));
       if (!manualStill || e.status === 'Active' && now - Date.parse(e.date) > 9 * 864e5 || !seasonOut(e.status) && now - Date.parse(e.date) > 9 * 864e5) delete P[k];
     }
     log.asof = new Date().toISOString().slice(0, 10);
