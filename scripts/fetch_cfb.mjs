@@ -49,6 +49,7 @@ import { timelines } from './cfb_avail.mjs';
 import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
+import { returning, draftsBy } from './cfb_ret_war.mjs';
 import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
@@ -2636,40 +2637,14 @@ MD.teamsFbs = await once(`teamsfbs.json`, `teams/fbs?year=${SEASON}`);
 MD.ppaqb = await cur(`ppaqb${SEASON}.json`, `ppa/players/season?year=${SEASON}&position=QB&excludeGarbageTime=true`);
 MD.weather = hasCache('weather.json') ? readCache('weather.json') : {};
 // returning production for the game model, a backtestable stand-in for FV (which has no history): each team's
-// players in season S valued at their season S-1 PFN score (z within position and season, either division on the FBS
-// curve) times S-1 snaps (per 700), transfers included; the QB (the team's highest) and everyone else, each as a z
-// across FBS. Membership comes from PFN's season S rows (who has played there)
-MD.pfnRet = {};
-const AV_STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
-// every season from 2020 (PFN starts in 2019): the history fit (below) learns the weight on 2020 on
-for (let S = 2020; S <= SEASON; S++) {
-  const T = {}, pm = {}, ps = {};
-  for (const p of POS) {
-    const rows = pfn[p.g] || [], prev = rows.filter(r => r.season === S - 1 && r.division === 'FBS');
-    if (!prev.length) continue;
-    const m = prev.reduce((a, r) => a + r.score, 0) / prev.length, sd = Math.sqrt(prev.reduce((a, r) => a + (r.score - m) ** 2, 0) / prev.length) || 1;
-    { const pool = prev.map(r => r.score).sort((a, b) => b - a).slice(0, AV_STARTERS[p.g] * 134), pm0 = pool.reduce((a, b) => a + b, 0) / pool.length;
-      pm[p.g] = pm0; ps[p.g] = Math.sqrt(pool.reduce((a, b) => a + (b - pm0) ** 2, 0) / pool.length) || 1; }
-    const by = {}; for (const r of rows) if (r.season === S - 1) by[norm(r.name)] = r;
-    for (const r of rows) if (r.season === S && r.division === 'FBS') {
-      const tid = idxTeams.resolve(r.team), q = by[norm(r.name)]; if (!tid) continue;
-      const t = (T[tid] ||= { qb: null, rest: 0, av: 0, avRest: 0 });
-      if (!q) continue;
-      const v = (q.score - m) / sd * Math.min(1.3, (volume(q, false, p.g) || 0) / 700);
-      if (p.g === 'QB') t.qb = Math.max(t.qb ?? -Infinity, v); else t.rest += v;
-      // returning season AV (scripts/cfb_av.mjs weights, Stat+ only: badges and FV have no history): S-1 snap
-      // share (per 700) x SAV_W x (quality on the S-1 starter pool over replacement), points a game
-      const a = Math.min(1, (volume(q, false, p.g) || 0) / 700) * SAV_W[p.g] * ((q.score - pm[p.g]) / ps[p.g] - SAV_REPL);
-      t.av += a; if (p.g !== 'QB') t.avRest += a;
-    }
-  }
-  const z = k => { const xs = Object.values(T).map(t => t[k] ?? 0), mm = xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
-    const ss = Math.sqrt(xs.reduce((a, b) => a + (b - mm) ** 2, 0) / Math.max(1, xs.length)) || 1; return t => ((t[k] ?? 0) - mm) / ss; };
-  const zq = z('qb'), zr = z('rest'), za = z('av'), zar = z('avRest');
-  MD.pfnRet[S] = Object.fromEntries(Object.entries(T).map(([tid, t]) => [tid, { qb: Math.round(zq(t) * 100) / 100, rest: Math.round(zr(t) * 100) / 100,
-    av: Math.round(za(t) * 100) / 100, avRest: Math.round(zar(t) * 100) / 100 }]));
-  console.log(`returning production ${S}: ${Object.keys(T).length} teams`);
-}
+// returning players valued at their season S-1 PFN score (z within position and season, either division on the FBS
+// curve) times S-1 snaps (per 700); the QB (the team's highest) and everyone else, each as a z across FBS. Every
+// season from 2020 (PFN starts in 2019): the history fit learns the weight on 2020 on. Membership is what was known in
+// August (scripts/cfb_ret_war.mjs returning(), shared with the walk-forward): the S-1 players less that April's
+// draftees and those on another team's rows in S; PFN's season-S rows (who went on to play there) no longer decide it
+MD.pfnRet = returning(Object.fromEntries(POS.map(p => [p.g, pfn[p.g] || []])), { resolve: t => idxTeams.resolve(t) ?? null,
+  volume: (q, g) => volume(q, false, g), drafted: await draftsBy(), last: SEASON });
+for (const [S, R] of Object.entries(MD.pfnRet)) console.log(`returning production ${S}: ${Object.keys(R).length} teams`);
 // roster turnover for the preseason prior (scripts/cfb_roster_prior.py, refreshed by hand each season after week 2):
 // 247 class talent, returning QB and skill yards, transfers in, by season and team
 { const f = path.join(ROOT, 'data', 'cfb_roster_prior.json'); MD.roster = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).feats || {} : {}; }

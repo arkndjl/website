@@ -151,6 +151,17 @@ def ratings(games, ctl, hl=None, carry=0.5, lam=3.0, form='probit', hca=True, mi
     return feat, finals
 
 
+def cfb_day(iso):
+    """a CFB kickoff's game day for the as-of ratings: the US Eastern date, with kickoffs before 6 a.m. ET (Pacific
+    and Hawaii night games) kept on the day before. The UTC date (Nov 5 2026, the leakage sweep) put every kickoff
+    from 8 p.m. ET on the next day, so a Saturday night game was rated with that Saturday's results in, the 7 p.m.
+    games still being played among them"""
+    import datetime
+    from zoneinfo import ZoneInfo
+    t = datetime.datetime.fromisoformat(iso.replace('Z', '+00:00'))
+    return (t.astimezone(ZoneInfo('America/New_York')) - datetime.timedelta(hours=6)).date().isoformat()
+
+
 CFB_GRID = {'all': dict(hl=None, carry=0.3, lam=3.0), 'all6': dict(hl=None, carry=0.6, lam=3.0),
             'hl42': dict(hl=42, carry=0.3, lam=3.0), 'hl42c6': dict(hl=42, carry=0.6, lam=3.0),
             'all8': dict(hl=None, carry=0.8, lam=3.0), 'all6l6': dict(hl=None, carry=0.6, lam=6.0),
@@ -163,7 +174,7 @@ def cfb_feat(md_path, out_path, espn=True):
     first), for scripts/cfb_control_backtest.mjs"""
     import gzip
     md = json.load(gzip.open(md_path, 'rt'))
-    gl = [(str(g['id']), g['startDate'][:10], int(S), str(g['homeId']), str(g['awayId']), bool(g.get('neutralSite')))
+    gl = [(str(g['id']), cfb_day(g['startDate']), int(S), str(g['homeId']), str(g['awayId']), bool(g.get('neutralSite')))
           for S, gs in md['games'].items() for g in gs]
     gl.sort(key=lambda g: g[1])
     recs = records('cfb')
@@ -246,7 +257,7 @@ def cfb_live(season=None):
     hist = json.load(open(CFB_HIST))
     ctl = dict(hist['control'])
     md = json.load(gzip.open(os.path.join(HERE, 'data', 'cfb_hist_md.json.gz'), 'rt'))
-    gl = [(str(g['id']), g['startDate'][:10], int(S), str(g['homeId']), str(g['awayId']), bool(g.get('neutralSite')))
+    gl = [(str(g['id']), cfb_day(g['startDate']), int(S), str(g['homeId']), str(g['awayId']), bool(g.get('neutralSite')))
           for S, gs in md['games'].items() for g in gs]
     # md seasons the committed control history doesn't reach yet: from the play-by-play cache
     for S, gs in md['games'].items():
@@ -262,7 +273,7 @@ def cfb_live(season=None):
         if not os.path.exists(p):
             continue
         for g in json.load(open(p)):
-            gl.append((str(g['id']), g['date'][:10], S, str(g['h']), str(g['a']), bool(g.get('n'))))
+            gl.append((str(g['id']), cfb_day(g['date']), S, str(g['h']), str(g['a']), bool(g.get('n'))))
             if g.get('done') and str(g['id']) not in ctl:
                 d = Pb.load(str(g['id']))
                 if d:
