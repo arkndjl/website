@@ -10,8 +10,8 @@ test of it against the books' archived prop lines and prices.
 
 Result (Oct 31 2026): fails. Held out at the book's prices every stat but hits and saves loses (all props -2.6%, t -6;
 41k bets); hits won but no free source prices them live; saves won on the 2024 tune props and at the close held out,
-not at the open (t 1.3). Noah picked a paper test of saves (scripts/props_daily.py nhl -> data/props_paper_nhl.json),
-off the picks tab. ESPN BET lists some 2024-25 pairs under first: scripts/props_archive.py reads its over/under marks.
+not at the open (t 1.3; t 1.0 since the market inputs come from opens only, Nov 5 2026). Noah picked a paper test of
+saves (scripts/props_daily.py nhl -> data/props_paper_nhl.json), off the picks tab. ESPN BET lists some 2024-25 pairs under first: scripts/props_archive.py reads its over/under marks.
 
 Projection, walked game by game in start order (nothing from the game itself or later):
     toi     ice time: a 6-game half-life average of his minutes, next to a 30-game one (long)
@@ -19,7 +19,7 @@ Projection, walked game by game in start order (nothing from the game itself or 
             k0 minutes (goalies: shots against a game, the team's, and his save rate shrunk to the league's)
     base    toi x rate; savg his season average to date (last season's before his 3rd game); opp = base x the
             opponent's allowance of the stat over the league's; imp = base x his team's market goals over the league's
-            (from the moneyline and total, open), fav = base x (win chance - .5)
+            (from the moneyline and total, open; 0 with no open: 2021-23), fav = base x (win chance - .5)
     each season's coefficients fit on the seasons before it (least squares, no intercept)
 P(over): negative binomial with variance a mu + b mu^2 and the logistic shape correction (scripts/props_model.py),
 fit on 2023 (the first season with a walked projection; no props). Points = goals + assists.
@@ -215,14 +215,17 @@ class Walk:
 
 def market_opens(boxes):
     """ESPN game id -> open moneyline and total from the NHL game history (scripts/nhl_games_hist.json.gz), matched
-    by home team and day (ESPN's start is UTC: the NHL's day is that day or the one before)"""
+    by home team and day (ESPN's start is UTC: the NHL's day is that day or the one before). Opens only: ESPN has them
+    from 2023-24; a game without one (every 2021-22 and 2022-23 game, 11 in 2023-24) has no market inputs, as a live
+    game with no line. Until Nov 5 2026 those games took the close (here, or the box's pickcenter line), which the
+    prop's open doesn't know."""
     try:
         H = json.load(gzip.open(os.path.join(HERE, 'nhl_games_hist.json.gz'), 'rt'))
     except OSError:
         return {}
     by = {}
     for g in H:
-        o = g.get('o') or g.get('c')
+        o = g.get('o')
         if o and o.get('ml') and o.get('t'):
             by[(g['day'], g['h'])] = (o['ml'], o['t'])
     out = {}
@@ -243,8 +246,8 @@ def walk(boxes):
     for gid, b in sorted(boxes.items(), key=lambda x: x[1]['k']):
         if b['S'] != W.season:
             W.new_season(b['S'])
-        if gid in mk:
-            b = dict(b, ml=mk[gid][0], ou=mk[gid][1])
+        # the box's ml/ou are ESPN's pickcenter line at the end (the close): never a bet-time input
+        b = dict(b, ml=mk[gid][0], ou=mk[gid][1]) if gid in mk else dict(b, ml=None, ou=None)
         for t, pid, fx, kind in W.rows(b):
             if kind == 'sk':
                 r = next(x for x in b['p'][t] if x[0] == pid)
@@ -354,7 +357,7 @@ def test():
                    'verdict': 'pass', 'shape': {'sv': sh['sv']}, 'feats': list(FEATS),
                    'coefs': {str(int(k)): v['sv'] for k, v in coefs.items() if 'sv' in v},
                    'backtest': {'held': held, 'note': 'saves at the book prices, held out 2025-27: a paper test, not a pass '
-                                                      'at the open (t 1.3 at p* .54); shown off the picks tab'}},
+                                                      f"at the open (t {held['open'].get('t')} at p* {ps:g}); shown off the picks tab"}},
                   f, separators=(',', ':'))
     return out, sh, coefs, graded
 
