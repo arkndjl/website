@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-05T23:01:31Z",
+ "asof": "2026-11-05T23:01:56Z",
  "recenter": {
   "week": 0.45
  },
@@ -1382,16 +1382,7 @@
    "flagged": "2026-11-01T17:18:42Z",
    "betTo": 52.0,
    "close": 48.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 48.5,
-    "price": -106.0,
-    "ev": 0.024,
-    "units": 0.5,
-    "unitsRaw": 0.75,
-    "unitsCap": 0.5
-   },
+   "now": null,
    "unitsRaw": 0.5,
    "unitsCap": 0.25
   },
@@ -1617,6 +1608,22 @@
  ],
  "board": [
   {
+   "id": "401856742",
+   "sport": "cfb",
+   "kick": "2026-11-07T21:15:00.000Z",
+   "home": "Mississippi State",
+   "away": "Vanderbilt",
+   "mk": "total",
+   "side": "over",
+   "line": 48.5,
+   "price": -108.0,
+   "edge": 6.6,
+   "x": 3.0,
+   "why": "no edge at -108",
+   "m": 4.2,
+   "tm": 55.1
+  },
+  {
    "id": "401871073",
    "sport": "cfb",
    "kick": "2026-11-07T20:00:00.000Z",
@@ -1631,22 +1638,6 @@
    "why": "no edge at -108",
    "m": -0.8,
    "tm": 51.7
-  },
-  {
-   "id": "401864534",
-   "sport": "cfb",
-   "kick": "2026-11-07T21:00:00.000Z",
-   "home": "San Jos\u00e9 State",
-   "away": "Northern Illinois",
-   "mk": "total",
-   "side": "under",
-   "line": 52.5,
-   "price": -108.0,
-   "edge": 5.3,
-   "x": 3.0,
-   "why": "no edge at -108",
-   "m": 12.4,
-   "tm": 47.2
   },
   {
    "id": "401856738",
@@ -2226,13 +2217,13 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -106.0,
-   "ev": 0.024,
+   "price": -108.0,
    "edge": 6.6,
-   "units": 0.75,
+   "ev": null,
+   "units": 0.0,
    "home": "Mississippi State",
    "away": "Vanderbilt",
-   "state": "pick"
+   "state": "under"
   },
   "401858512": {
    "mk": "total",
@@ -2703,11 +2694,11 @@
    "state": "under"
   },
   "401864534": {
-   "mk": "total",
-   "side": "under",
-   "line": 52.5,
-   "price": -108.0,
-   "edge": 5.3,
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": 106.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "San Jos\u00e9 State",
@@ -2767,7 +2758,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 9036,
+  "snapshots": 9037,
   "buckets": [
    {
     "when": "24h+",
@@ -3982,15 +3973,15 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 49.75,
-    "scale": 0.804
+    "raw": 49.5,
+    "scale": 0.8081
    },
    "2026-11-08": {
-    "raw": 46.5,
-    "scale": 0.8602
+    "raw": 46.75,
+    "scale": 0.8556
    },
    "2026-11-09": {
-    "raw": 12.75,
+    "raw": 9.75,
     "scale": 1.0
    }
   }
