@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-05T22:54:38Z",
+ "asof": "2026-11-05T22:57:12Z",
  "recenter": {
-  "2026-11-05": -11.68,
+  "2026-11-05": -11.69,
   "2026-11-06": -12.5
  },
  "monitor": {
@@ -752,7 +752,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -108.0,
+   "price": -110,
    "edge": 9.5,
    "x": null,
    "why": "total market off",
@@ -816,7 +816,7 @@
    "mk": "total",
    "side": "over",
    "line": 146.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 7.5,
    "x": null,
    "why": "total market off",
@@ -832,7 +832,7 @@
    "mk": "spread",
    "side": "away",
    "line": 40.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 7.2,
    "x": null,
    "why": "spread market off",
@@ -952,22 +952,6 @@
    "tm": 145.1
   },
   {
-   "id": "401921680",
-   "sport": "cbb",
-   "kick": "2026-11-06T00:00:00Z",
-   "home": "Quinnipiac",
-   "away": "Bryant",
-   "mk": "total",
-   "side": "over",
-   "line": 148.5,
-   "price": -108.0,
-   "edge": 5.4,
-   "x": null,
-   "why": "total market off",
-   "m": 7.8,
-   "tm": 153.9
-  },
-  {
    "id": "401921133",
    "sport": "cbb",
    "kick": "2026-11-06T02:00:00Z",
@@ -1062,6 +1046,22 @@
    "why": "spread market off",
    "m": 36.6,
    "tm": 170.1
+  },
+  {
+   "id": "401911195",
+   "sport": "cbb",
+   "kick": "2026-11-06T00:30:00Z",
+   "home": "Fordham",
+   "away": "Stonehill",
+   "mk": "spread",
+   "side": "away",
+   "line": 20.5,
+   "price": -108.0,
+   "edge": 5.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 15.4,
+   "tm": 141.2
   }
  ],
  "games": {
@@ -1069,7 +1069,7 @@
    "mk": "spread",
    "side": "home",
    "line": 17.5,
-   "price": -113.0,
+   "price": -108.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -1129,7 +1129,7 @@
    "mk": "spread",
    "side": "away",
    "line": 40.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 7.2,
    "ev": null,
    "units": 0.0,
@@ -1177,7 +1177,7 @@
    "mk": "total",
    "side": "under",
    "line": 159.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -1225,7 +1225,7 @@
    "mk": "spread",
    "side": "away",
    "line": 29.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -1297,7 +1297,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": 108.0,
+   "price": 104.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -1345,7 +1345,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -110,
+   "price": -105.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -1465,7 +1465,7 @@
    "mk": "spread",
    "side": "home",
    "line": -9.5,
-   "price": -113.0,
+   "price": -108.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -1500,9 +1500,9 @@
   "401921680": {
    "mk": "total",
    "side": "over",
-   "line": 148.5,
-   "price": -108.0,
-   "edge": 5.4,
+   "line": 149.5,
+   "price": 102.0,
+   "edge": 4.4,
    "ev": null,
    "units": 0.0,
    "home": "Quinnipiac",
@@ -1573,7 +1573,7 @@
    "mk": "total",
    "side": "over",
    "line": 146.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 7.5,
    "ev": null,
    "units": 0.0,
@@ -1585,7 +1585,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -108.0,
+   "price": -110,
    "edge": 9.5,
    "ev": null,
    "units": 0.0,
@@ -1658,7 +1658,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 5616,
+  "snapshots": 5631,
   "buckets": [
    {
     "when": "24h+",
@@ -1680,21 +1680,21 @@
    },
    {
     "when": "1-6h",
-    "clvN": 530,
-    "clvRet": -0.0544,
-    "clvT": -26.93,
+    "clvN": 532,
+    "clvRet": -0.0543,
+    "clvT": -27.01,
     "clv": -0.12,
     "beat": 0.098,
-    "still": 0.708
+    "still": 0.709
    },
    {
     "when": "<1h",
-    "clvN": 136,
-    "clvRet": -0.0488,
-    "clvT": -14.7,
+    "clvN": 137,
+    "clvRet": -0.0487,
+    "clvT": -14.8,
     "clv": -0.05,
     "beat": 0.088,
-    "still": 0.765
+    "still": 0.766
    }
   ]
  },
@@ -9028,8 +9028,8 @@
     "scale": 0.9143
    },
    "2026-11-08": {
-    "raw": 47.0,
-    "scale": 0.8511
+    "raw": 46.5,
+    "scale": 0.8602
    },
    "2026-11-09": {
     "raw": 12.75,
