@@ -1210,6 +1210,8 @@ class Model:
     def feats(self, g):
         if g['S'] != self.season:
             self.new_season(g['S'])
+        if hasattr(self.P, 'at'):
+            self.P.at(g)                                # the fit's walk: play chances measured before this game day
         h, a = g['h'], g['a']
         L = self.lg[0] / self.lg[1]
         P = self.lgp[0] / self.lgp[1]
