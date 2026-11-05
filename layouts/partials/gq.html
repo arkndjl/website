@@ -1,0 +1,9 @@
+{{- /* Game quality, 0-100: mean of the two sides' rating percentiles (gqpct.html) ^ 2/3, times closeness
+       1 - (p home - p away)^2 ^ 1/3. Pass dict "a" "b" (percentiles) "p" (home win) "pa" (away win; left out for
+       two-way games) and "d" (percentile for a side missing from the pool; default 0). */ -}}
+{{- $d := float (.d | default 0) }}{{ $a := float (.a | default $d) }}{{ $b := float (.b | default $d) -}}
+{{- $p := float (.p | default 0.5) }}{{ $pa := cond (ne .pa nil) (float (.pa | default 0)) (sub 1.0 $p) -}}
+{{- $m := div (add $a $b) 2.0 -}}
+{{- $c := sub 1.0 (mul (sub $p $pa) (sub $p $pa)) -}}
+{{- $q := 0.0 }}{{ if and (gt $m 0.0) (gt $c 0.0) }}{{ $q = mul 100.0 (mul (math.Pow $m 0.6667) (math.Pow $c 0.3333)) }}{{ end -}}
+{{- return (div (math.Round (mul $q 10)) 10.0) -}}
