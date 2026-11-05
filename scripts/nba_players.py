@@ -664,7 +664,7 @@ def build():
     ros = B.rosters()
     for t, ps in ros.items():
         names.update(ps)
-    m = N.Model(names, GF['P'], **GF['params'])
+    m = N.Model(names, GF['P'], inj=N.load_inj(cur), **GF['params'])      # past games with their reports, as fit
     R = Rates()
     seas = defaultdict(lambda: defaultdict(lambda: [0, 0.0, 0.0, 0.0, 0.0]))
     pos = {}

@@ -703,6 +703,9 @@ def team_fv_live(d, bt, season):
             continue
         f = T[team]
         prev = [dict(zip(d['keep'], s)) for s in c['seasons'] if s[K['year']] < season]
+        # the latest line, whatever its year: history (team_fv) counts only lines from the season before, so live also
+        # counts ~100 players back from a lost season. Kept: served that way on history it is no worse (tune t -3.5,
+        # held -1.6; scripts/cbb_fvgap_research.py, Nov 4 2026), and the 2027 prior moves under .1 a team
         if prev and prev[-1]['min_per']:
             p = prev[-1]
             # the research column team_fv reads in history, not the board's shrunk 5/4/3 (cbb_roster.bpm3_research)
