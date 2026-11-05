@@ -1,0 +1,25 @@
+{{- /* Team NIL, college football (Nov 5 2026, as CBB's team NIL tab): every roster's yNIL (pay going in), xNIL
+       (open-market worth now) and zNIL = xNIL - yNIL, from data/cfb_teams.json (scripts/fetch_cfb.mjs); top three by zNIL. */ -}}
+{{- with site.Data.cfb_teams -}}
+{{- $rows := where .teams "xnil" "!=" nil -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team NIL") "icon" "football" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,yNIL,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table cbbnil">
+  <thead><tr><th>RK</th><th>Team</th><th>Conf</th>
+    <th title="yNIL = the roster's estimated pay going in">yNIL</th><th title="xNIL = the roster's open-market NIL worth now">xNIL</th>
+    <th title="zNIL = xNIL - yNIL">zNIL</th><th title="top three by zNIL">Top</th></tr></thead>
+  <tbody>
+  {{- range $i, $t := sort $rows "xnil" "desc" }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num" data-l="yNIL" data-v="{{ .ynil }}">{{ with .ynil }}{{ partial "nil.html" . }}{{ end }}</td>
+    <td class="cfb__num is-key" data-l="xNIL" data-v="{{ .xnil }}"><b>{{ partial "nil.html" .xnil }}</b></td>
+    <td class="cfb__num" data-l="zNIL" data-v="{{ .znil }}">{{ with .znil }}{{ partial "znil.html" . }}{{ end }}</td>
+    <td class="cbbnil__top" data-l="Top">{{ range $j, $p := .znilTop }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }}</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "cfb_teams" "about" "Each roster's xNIL, yNIL and zNIL, as on the team talent tab; Top = its three largest zNIL.") -}}
+{{- end -}}

@@ -13,7 +13,7 @@
   <thead><tr>
     <th>RK</th><th>Player</th>
     <th title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ printf "%.0f" (mul (index $t.mix $s) 100) }}%{{ end }})">ARK</th>
-    <th title="projected ARK in 12 months if still active: from ARK, age, matches in the last 52 weeks, career matches and official rank, fit on {{ $tl }} top-300 boards each quarter end 2006-25 (cell: 24 and 36 months, projected Elo)">Proj</th>
+    <th title="projected ARK in 12 months if still active: from ARK, age, matches in the last 52 weeks, career matches and official rank, fit on {{ $tl }} top-300 boards each quarter end 2006-25 (cell: 24 and 36 months, projected Elo)">1Y</th>
     <th title="win chance against the average top-50 player on hard courts (best of three)">Hard</th>
     <th title="win chance against the average top-50 player on clay">Clay</th>
     <th title="win chance against the average top-50 player on grass">Grass</th>

@@ -11,7 +11,7 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -29,6 +29,10 @@ cover = "/og/college-football.png"
 {{< /lazytab >}}
 {{< lazytab tab="portal" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
+{{< /lazytab >}}
+{{< cfbboard title="NIL :: xNIL, yNIL, zNIL" tab="NIL" preset="nil" >}}
+{{< lazytab tab="team NIL" >}}
+{{< cfbnil title="team NIL :: every roster" tab="team NIL" >}}
 {{< /lazytab >}}
 {{< cfbgames title="games" tab="games" >}}
 {{< lazytab tab="game table" >}}

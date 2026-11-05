@@ -5,13 +5,14 @@
        {{< cfbboard title="..." tab="all FCS" preset="fcs" >}}       FCS players only (move-up odds column)
        {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
        {{< cfbboard title="..." tab="ARKLIST" preset="star" >}}       only starred players (cfb_manual.json stars)
-       {{< cfbboard title="..." tab="WAA/WAR" preset="war" >}}   everyone, ranked by WAA (RK and position rank by WAA; WAR column beside it)
+       {{< cfbboard title="..." tab="WAR leaders" preset="war" >}}   everyone, ranked by WAA (RK and position rank by WAA; WAR column beside it)
+       {{< cfbboard title="..." tab="NIL" preset="nil" >}}       everyone, ranked by xNIL (RK and position rank by xNIL)
        Filters (year, position, team, class, age, FV, conference; year: a past season's grades from
        static/data/cfb-past.json, ranked within that season, on the all / FBS / FCS boards), click-to-sort headers, a scouting report
        when a name is clicked, GFX export, and the filters kept in the address (#all:pos=QB). */ -}}
 {{- $d := site.Data.cfb -}}
 {{- $preset := .Get "preset" -}}
-{{- $id := .Get "id" | default (index (dict "d27" "draft" "star" "arklist" "fbs" "fbs" "fcs" "fcs" "war" "war") (or $preset "none") | default "all") -}}
+{{- $id := .Get "id" | default (index (dict "d27" "draft" "star" "arklist" "fbs" "fbs" "fcs" "fcs" "war" "war" "nil" "nil") (or $preset "none") | default "all") -}}
 {{- $fcsOn := ne $preset "fbs" }}{{ $fbsOn := ne $preset "fcs" -}}
 {{- $confs := slice }}{{ $teams := slice -}}
 {{- if $fbsOn }}{{ with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end }}{{ end -}}
@@ -22,7 +23,7 @@
 {{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" }}{{ $yrOn := in (slice "" "fbs" "fcs") $preset -}}
 {{- $s := 2026 }}{{ with $d }}{{ $s = int .season }}{{ end -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}" data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,Age,WAA,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,Age,WAA,WAR,Stat+,FV{{ else if eq $preset "nil" }}RK,Player,FV,Pos,School,Class,xNIL,yNIL,zNIL{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -95,7 +96,7 @@
                only carry columns every player has (WAR: 0 without snaps); a column that covers a subset lives on that subset's tab: consensus
                and Draft% on the draft board, FBS% on the FCS board. Transfer% covers every player, so it sits on every tab. PFN and On3 are inputs to FV, so they live in the
                scouting report. */ -}}
-        <th data-sort="rk" data-num{{ if ne $preset "war" }} aria-sort="ascending"{{ end }}{{ if eq $preset "war" }} title="rank by WAA among the players in view"{{ end }}>RK</th>
+        <th data-sort="rk" data-num{{ if not (in (slice "war" "nil") $preset) }} aria-sort="ascending"{{ end }}{{ if eq $preset "war" }} title="rank by WAA among the players in view"{{ else if eq $preset "nil" }} title="rank by xNIL among the players in view"{{ end }}>RK</th>
         <th data-sort="name">Player</th>
         {{- if eq $preset "war" }}
         <th data-sort="waa" data-num class="cfb__war" aria-sort="descending" title="WAA = WAR - snap share x line: wins over an average starter at the position, same snaps; comparable across positions; below average &lt; 0">WAA</th>

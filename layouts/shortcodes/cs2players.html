@@ -32,12 +32,12 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "cs2" "note" (printf "bo3.gg per-map stats · updated %s" $date) "about" (printf "1,000+ rounds in the last year, a map in the last 120 days (%d players). Stat lines weighted by their effect on round share, opponent-adjusted, recency-weighted, small samples regressed. Replacement %.1f. 6M: RWA 182 days on for players still in the pool, from RWA and age (age squared, unknown age flagged); held out Jul 2025 on, RMSE .507 held flat to .485 (t -2.4 by player, 9 of 11 months; scripts/cs2_proj_research.py). Photos: bo3.gg." (int .nPool) .repl)) -}}
 {{- else if eq $view "prospects" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: prospects") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,Proj,T1%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: prospects") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,1Y,T1%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk sp cs__table">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Team</th><th title="the team's event-access tier">Tier</th>
     <th class="cfb__g" title="future value, 20-80: the projected rating over the next year against tier-1 starters; 50 = an average tier-1 starter, 10 a standard deviation">FV</th>
-    <th title="projected RWA over the next year (0 = average tier-1 starter)">Proj</th>
+    <th title="projected RWA over the next year (0 = average tier-1 starter)">1Y</th>
     <th title="RWA change over the last six months">Rise</th>
     <th title="chance of 20+ maps at S-tier events within a year (backtested on 2024-25 prospects)">T1%</th>
     <th>Age</th>

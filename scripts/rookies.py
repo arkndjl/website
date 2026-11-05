@@ -138,12 +138,12 @@ def nfl():
         'def': 'rookies: first NFL season (nflverse rookie flag). slot = overall pick. pre-draft FV fills from the draft ledger from the 2027 class on.',
         'views': [['waa', 'WAA', 'WAA this season: wins over an average regular at the sub-position, same snaps'],
                   ['war', 'WAR', 'WAR this season: .6 x AV WAR + .4 x XV'], ['xv', 'XV', 'XV: WAR on the stat-line parts that track team margin'],
-                  ['pace', 'pace', 'WAR on a 17-game pace'], ['waaP', 'WAA pace', 'WAA on a 17-game pace']],
+                  ['pace', 'WAR/17', 'WAR on a 17-game pace'], ['waaP', 'WAA/17', 'WAA on a 17-game pace']],
         'cols': [col('waa', 'WAA', 'wins over an average regular at the sub-position, same snaps', 's2'), col('war', 'WAR', 'wins above replacement this season', '2'), col('xv', 'XV', 'expected value: WAR from the stat line', '2'),
-                 col('wav', 'AV WAR', 'WAR from approximate value', '2', 1), col('pace', 'Pace', 'WAR on a 17-game pace', '2', 1), col('waaP', 'WAA pace', 'WAA on a 17-game pace', 's2', 1),
+                 col('wav', 'AV WAR', 'WAR from approximate value', '2', 1), col('pace', 'WAR/17', 'WAR on a 17-game pace', '2', 1), col('waaP', 'WAA/17', 'WAA on a 17-game pace', 's2', 1),
                  col('g', 'G', 'games', 'i', 1), col('sn', 'Snaps', 'snaps', 'i', 1), col('line', 'Line', 'season line', 's', 1, 0)],
         'pre': {'l': 'Pick', 't': 'overall pick in the draft (UDFA: undrafted)'}, 'pfv': {'l': 'Pre FV', 't': 'CFB board FV on the eve of the draft (draft ledger, 2027 class on), mean outcome'},
-        'pos': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'EDGE', 'LB', 'CB', 'S'], 'posGroup': 1,
+        'pos': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'EDGE', 'LB', 'CB', 'S', 'K', 'P'], 'posGroup': 1,
         'min': {'k': 'sn', 'l': 'snaps', 'opts': [[0, 'any'], [50, '50+'], [150, '150+'], [300, '300+']], 'def': 50},
         'seasons': [{'s': y, 'l': str(y), 'rows': rows}]})
 
@@ -215,10 +215,10 @@ def nba():
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
         'def': 'rookies: first season on the XPM board. pre-draft FV = the CBB board\'s draft-year FV (college players only); slot = overall pick.',
         'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (XPM + 1.4) x MP / 48'], ['xpm', 'XPM', 'XPM: points per 100 over average, shrunk by minutes (MP / (MP + 300))'],
-                  ['r3', '3-yr proj', 'rookie projection: XPM over the next three seasons, from XPM, age and minutes per 82 games'],
-                  ['axpm', 'age-adj XPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0})"],
-                  ['pxpm', 'XPM (proj)', 'XPM (proj): this season blended with the preseason prior by minutes (current season)'],
-                  ['sur', 'surplus', 'contract surplus this season: projected VORX x $ per win - salary, $M (current season)']],
+                  ['r3', '3Y', 'rookie projection: XPM over the next three seasons, from XPM, age and minutes per 82 games'],
+                  ['axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0})"],
+                  ['pxpm', 'Proj', 'XPM (proj): this season blended with the preseason prior by minutes (current season)'],
+                  ['sur', 'Surplus', 'contract surplus this season: projected VORX x $ per win - salary, $M (current season)']],
         'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'XPM', 'XPM, points per 100 over average, shrunk by minutes', 's1'),
                  col('r3', '3Y', 'rookie projection: XPM over the next three seasons, from XPM, age and minutes per 82 games', 's1', 1),
                  col('axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0}), fit on 2010-23 rookies' next three seasons", 's1', 1),
@@ -273,7 +273,7 @@ def nhl():
         'cols': [col('war', 'WAR', 'wins over replacement this season', '1'), col('pwar', 'pWAR', 'projected WAR', '1'),
                  col('hpm', 'HPM', 'projected goals a 60 over average', 's2', 1), col('gp', 'GP', 'games', 'i', 1),
                  col('toi', 'TOI', 'minutes on ice', 'i', 1), col('pts', 'Pts', 'points', 'i', 1)],
-        'pre': {'l': 'Pick', 't': 'draft class and overall pick'}, 'pfv': {'l': 'Draft FV', 't': 'FV at the draft on the hockey prospects board, mean outcome'},
+        'pre': {'l': 'Pick', 't': 'draft class and overall pick'}, 'pfv': {'l': 'Pre FV', 't': 'FV at the draft on the hockey prospects board, mean outcome'},
         'pos': ['C', 'L', 'R', 'D', 'G'],
         'min': {'k': 'toi', 'l': 'TOI', 'opts': [[0, 'any'], [100, '100+'], [400, '400+'], [800, '800+']], 'def': 0},
         'seasons': seasons})
@@ -324,11 +324,11 @@ def soccer():
         'def': 'rookies: first big-five league season (Understat, 2015-16 on). prospect FV = the soccer prospects board (U22) where the player was graded.',
         'views': [['gar', 'GAR', 'goals above replacement this season'], ['gar90', 'GAR/90', 'GAR per 90 minutes'],
                   ['xmv', 'xMV', 'estimated market value, EUR M']],
-        'cols': [col('gar', 'GAR', 'goals above replacement', '2'), col('xmv', 'xMV', 'estimated market value, EUR M', 'e'),
-                 col('mv', 'MV', 'Transfermarkt market value, EUR M', 'e', 1), col('gar90', 'GAR/90', 'GAR per 90', '3', 1),
+        'cols': [col('gar', 'GAR', 'goals above replacement', 's1'), col('xmv', 'xMV', 'estimated market value, EUR M', 'e'),
+                 col('mv', 'TM', 'Transfermarkt market value, EUR M', 'e', 1), col('gar90', 'GAR/90', 'GAR per 90', 's2', 1),
                  col('par', 'PAR', 'points above replacement', '2', 1), col('min', 'Min', 'minutes', 'i', 1),
                  col('g', 'G', 'goals', 'i', 1), col('a', 'A', 'assists', 'i', 1)],
-        'pfv': {'l': 'Prosp FV', 't': 'soccer prospects board FV, mean outcome (graded U22 players)'},
+        'pfv': {'l': 'Pre FV', 't': 'soccer prospects board FV, mean outcome (graded U22 players)'},
         'pos': ['F', 'M', 'D', 'G'],
         'min': {'k': 'min', 'l': 'min', 'opts': [[0, 'any'], [270, '270+'], [900, '900+'], [1800, '1,800+']], 'def': 0},
         'seasons': seasons})
@@ -358,7 +358,7 @@ def cfb():
         elif r.get('elig') == 1:
             keep.append(r)
     fr = keep
-    rows = [{'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'], 'war': r.get('war'),
+    rows = [{'n': r['name'], 'tm': r['team'], 'pos': 'DT' if r['pos'] == 'DL' else r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'], 'war': r.get('war'),
              'xv': r.get('xv'), 'pfn': r.get('pfn'), 'sn': r.get('snaps'), 'xnil': r['xnil'] / 1e6 if r.get('xnil') else None,
              'pre': r.get('_rk'), 'preL': f"#{r['_rk']}" if r.get('_rk') else '', 'pfv': None,
              'sub': (r.get('pfnLabel') or '') + (f" · {r['div']}" if r.get('div') == 'FCS' else ''), 'div': r.get('div'),
@@ -373,7 +373,7 @@ def cfb():
                  col('pfn', 'Stat+', 'position Stat+, 100 average, 25 per SD', 'i', 1), col('xv', 'XV', 'WAR from the stat line', '2', 1),
                  col('sn', 'Snaps', 'snaps', 'i', 1), col('xnil', 'xNIL', 'expected NIL worth, $M', 'm', 1)],
         'pre': {'l': 'Rec', 't': '247 composite national rank in the high school class'},
-        'pos': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'EDGE', 'LB', 'CB', 'S'], 'posGroup': 1, 'divs': ['FBS', 'FCS'],
+        'pos': ['QB', 'RB', 'WR', 'TE', 'OL', 'DT', 'EDGE', 'LB', 'CB', 'S', 'K', 'P'], 'posGroup': 1, 'divs': ['FBS', 'FCS'],
         'min': {'k': 'sn', 'l': 'snaps', 'opts': [[0, 'any'], [50, '50+'], [150, '150+'], [300, '300+']], 'def': 0},
         'seasons': [{'s': yr, 'l': str(yr), 'rows': rows}]})
 
@@ -468,7 +468,7 @@ def hockey():
                  col('ppg', 'P/GP', 'points a game', '2', 1), col('gp', 'GP', 'games', 'i', 1), col('g', 'G', 'goals', 'i', 1),
                  col('pts', 'Pts', 'points', 'i', 1)],
         'pre': {'l': 'Draft', 't': 'drafted: class and pick; coming class: x = expected slot; else draft class'},
-        'pfv': {'l': 'Draft FV', 't': 'FV at the draft (drafted prospects)'},
+        'pfv': {'l': 'Pre FV', 't': 'FV at the draft (drafted prospects)'},
         'pos': ['C', 'LW', 'RW', 'D', 'G'], 'lgs': ['OHL', 'WHL', 'QMJHL', 'AHL'],
         'min': {'k': 'gp', 'l': 'GP', 'opts': [[0, 'any'], [5, '5+'], [10, '10+'], [20, '20+']], 'def': 5},
         'seasons': [{'s': S, 'l': f'{S - 1}-{str(S)[2:]}', 'rows': rows}]})

@@ -280,7 +280,7 @@
         pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
         cols = w.querySelectorAll('thead th').length, open = null, openP = '', pos = '', page = 0, match = [];
     var recs = data.filter(function (r) { return (preset !== 'd27' || r.draft27) && (preset !== 'star' || r.star) && (preset !== 'fbs' || r.div !== 'FCS') && (preset !== 'fcs' || r.div === 'FCS'); }), byI = {}, RK = {};
-    var opt = { up: w.hasAttribute('data-cfb-up'), draft: w.hasAttribute('data-cfb-draft'), nil: true, div: preset !== 'fbs' && preset !== 'fcs', rankBy: preset === 'war' ? 'war' : 'fv',
+    var opt = { up: w.hasAttribute('data-cfb-up'), draft: w.hasAttribute('data-cfb-draft'), nil: true, div: preset !== 'fbs' && preset !== 'fcs', rankBy: preset === 'war' ? 'war' : preset === 'nil' ? 'nil' : 'fv',
       yr: 0 };
     var gfxCols = w.getAttribute('data-gfx-cols') || '';
     // the WAR leaderboard: ranks (and the default order) by WAA, wins over an average starter at the position, so the
@@ -288,7 +288,10 @@
     // with average QBs); WAR, then FV, break ties; a row with WAR and no WAA ranks on WAR
     var wa = function (r) { return r.waa != null ? r.waa : r.war != null ? r.war : -99; };
     var byWar = function (a, b) { return wa(b) - wa(a) || (b.war == null ? -99 : b.war) - (a.war == null ? -99 : a.war) || a.ovr - b.ovr; };
+    // the NIL board (Nov 5 2026, as CBB's NIL tab): ranks by xNIL, FV breaks ties
+    var byNil = function (a, b) { return (b.xnil || 0) - (a.xnil || 0) || a.ovr - b.ovr; };
     if (opt.rankBy === 'war') recs.sort(byWar);
+    if (opt.rankBy === 'nil') recs.sort(byNil);
     // archetype list for the "type" filter, from the players on this board
     var archSel = bar.querySelector('[data-cfb-arch]');
     if (archSel) { var seen = {}; recs.forEach(function (r) { if (r.arch) seen[r.arch] = 1; });
@@ -337,8 +340,8 @@
       });
       RK = {}; PRK = {}; var seenPos = {};
       var byYr = function (a, b) { return pastAt(b, yr) - pastAt(a, yr) || a.ovr - b.ovr; };
-      view.slice().sort(opt.rankBy === 'war' ? byWar : yr ? byYr : function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) {
-        RK[r.i] = i + 1; if (opt.rankBy === 'war' ? r.war != null : fvOf(r) != null) PRK[r.i] = seenPos[posOf(r)] = (seenPos[posOf(r)] || 0) + 1; });
+      view.slice().sort(opt.rankBy === 'war' ? byWar : opt.rankBy === 'nil' ? byNil : yr ? byYr : function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) {
+        RK[r.i] = i + 1; if (opt.rankBy === 'war' ? r.war != null : opt.rankBy === 'nil' ? r.xnil != null : fvOf(r) != null) PRK[r.i] = seenPos[posOf(r)] = (seenPos[posOf(r)] || 0) + 1; });
       // the default order (RK) follows the year's ranks
       if (yr && cur === 'rk') view.sort(function (a, b) { return (RK[a.i] - RK[b.i]) * dir; });
       match = q ? view.filter(function (r) { return r._q.indexOf(q) >= 0; }) : view;
@@ -406,11 +409,11 @@
       }
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
-    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'waa' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1, sort0 = [cur, dir];
+    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'waa' : opt.rankBy === 'nil' ? 'xnil' : 'rk', dir = opt.rankBy === 'war' || opt.rankBy === 'nil' ? -1 : 1, sort0 = [cur, dir];
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {
-        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|age|cls|cons)$/.test(k), get = k === 'rk' && opt.rankBy === 'war' ? function (r) { return -wa(r); } : k === 'fv' && opt.yr ? function (r) { return pastAt(r, opt.yr); } : KEY[k] || function (r) { return r[k]; };
+        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|age|cls|cons)$/.test(k), get = k === 'rk' && opt.rankBy === 'war' ? function (r) { return -wa(r); } : k === 'rk' && opt.rankBy === 'nil' ? function (r) { return -(r.xnil || 0); } : k === 'fv' && opt.yr ? function (r) { return pastAt(r, opt.yr); } : KEY[k] || function (r) { return r[k]; };
         dir = k === cur ? -dir : (asc ? 1 : -1); cur = k;
         recs.sort(function (a, b) {
           var x = get(a), y = get(b);
