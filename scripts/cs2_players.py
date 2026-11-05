@@ -797,6 +797,11 @@ def build():
            "fit": {k: fitj.get(k) for k in ("beta", "r2", "params", "score", "tune", "held", "aging", "game")}}
     out["fit"]["prospects"] = {k: pf.get(k) for k in ("models", "keep", "reach", "cuts", "nTune")}
     out["fit"]["value"] = v
+    try:    # every flag the board and prospects show (static/img/flags/<iso2>.png), so a new country doesn't 404
+        import soccer_faces
+        soccer_faces.fetch_flags({r.get("nat") for r in board + pros} - {None, ""})
+    except Exception as e:  # noqa: BLE001
+        print("flags skipped:", e, file=sys.stderr)
     OUT.write_text(json.dumps(out, separators=(",", ":"), allow_nan=False))
     print(f"players: {len(board)} board, {len(pros)} prospects; #1 {board[0]['n']}")
 
