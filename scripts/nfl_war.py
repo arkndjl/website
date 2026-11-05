@@ -790,6 +790,11 @@ def current_clubs(out, y):
             n += t != p['t']
             p['t'] = t
     print(f'nfl war: {n} players on a new club since their snaps')
+    try:   # RotoWire's transaction news covers the hours before ESPN's rosters catch a trade or claim (Nov 5 2026)
+        import rotowire_moves
+        rotowire_moves.retag('nfl', out, club='t', pos='pos', hist='tm', label='war')
+    except ImportError:
+        pass
 
 
 def publish(out, y, week, done, lines, alpha):

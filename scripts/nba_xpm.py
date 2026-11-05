@@ -248,6 +248,12 @@ def build(season, fresh=False):
     pri = shrink_prior(season)
     for p in players: shrink(p, gmax, pri)
     badges(players, h, fetch(season, fresh, 'totals'), gmax)
+    if fresh:
+        try:   # the season in progress: today's club from RotoWire's transaction news (Nov 5 2026)
+            import rotowire_moves
+            rotowire_moves.retag('nba', players, club='tm', label='xpm')
+        except ImportError:
+            pass
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'n': len(players), 'games': gmax, 'dpmSrc': src, 'dpmShare': round(hitmp / allmp, 3) if allmp else 0,
            'players': players}
