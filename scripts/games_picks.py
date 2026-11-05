@@ -884,7 +884,8 @@ def board(sport):
                 continue
             ml, so = g.get('ml') or {}, g.get('spreadOdds') or {}
             out.append({'id': str(g['id']), 'espn': str(g['id']), 'kick': g['date'], 'home': g['home']['name'], 'away': g['away']['name'],
-                        'm': p['margin'], 'L': -float(g['market']), 'tm': p.get('total'), 'T': g.get('total'),
+                        # tPre: a week-1 total (cfb_model.mjs predict), shown on the board but never bet
+                        'm': p['margin'], 'L': -float(g['market']), 'tm': None if p.get('tPre') else p.get('total'), 'T': g.get('total'),
                         'mlH': ml.get('home'), 'mlA': ml.get('away'), 'oH': so.get('home'), 'oA': so.get('away'),
                         'neutral': int(bool(g.get('neutral'))),
                         **({'opt': p['parts'].get('opt', 0) + p['parts'].get('hc', 0)} if 'opt' in (p.get('parts') or {}) else {})})

@@ -44,6 +44,9 @@ LOSS = {'nba': 'abs margin error', 'nfl': 'abs margin error', 'cbb': 'abs margin
         'nhl': 'win log loss', 'soccer': '1X2 log loss'}
 SPORTS = tuple(LOSS)
 EXPECT_SEASONS = 5
+# soccer's walk-forward (the expectation) scores only the big five and UEFA (soccer_games.SCORED); live games from the
+# other leagues on the board (Sweden, MLS, Scotland...) run at a different base loss, so they stay out of the test
+SOCCER_LGS = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1', 'uefa.champions', 'uefa.europa', 'uefa.europa.conf'}
 try:
     from zoneinfo import ZoneInfo
     ET = ZoneInfo('America/New_York')
@@ -246,7 +249,8 @@ def expectation(sport, season, rows=None):
 def report(sport, log, season, now, E=None, seasons=None):
     if E is None:
         E, seasons = expectation(sport, season)
-    games = sorted([dict(e, id=gid) for gid, e in log.items() if e.get('res') is not None and season_of(sport, e['k']) == season],
+    games = sorted([dict(e, id=gid) for gid, e in log.items() if e.get('res') is not None and season_of(sport, e['k']) == season
+                    and (sport != 'soccer' or e.get('lg') in SOCCER_LGS)],
                    key=lambda e: e['k'])
     rows, by = [], {}
     for g in games:

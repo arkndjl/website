@@ -83,7 +83,8 @@
       sel.value = seen[want] ? want : '';
     }
     function cols() {
-      var key = view, hasPre = !!D.pre, hasPfv = !!D.pfv;
+      // a season with no pre-draft grades (NFL Pre FV starts with the 2027 class) drops the column, as Age does
+      var key = view, hasPre = !!D.pre, hasPfv = !!D.pfv && season().rows.some(function (r) { return r.pfv != null; });
       var c = [{ k: 'rk', l: 'RK', t: 'rank within the filters, by the view', num: 1, cls: '' }, { k: 'n', l: 'Player', t: '', cls: '' }];
       D.cols.forEach(function (x) { c.push({ k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === key ? ' is-key' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }); });
       c.push({ k: 'pos', l: 'Pos', t: 'position, rank at position within the filters', cls: 'cfb__g nbaxpm__ph' });

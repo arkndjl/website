@@ -34,7 +34,7 @@
     </div>
     <p class="cfb__dim"><span title="a market goes to the paper book as a candidate rule (its own clock, no live claim) when its held-out predictor bets beat the close at t {{ $d.keepT }}+. NBA numbers are an upper bound: the walk-forward model saw tip-time injury news the open did not have. bad opens are dropped with the shared cleaner: the close with home and away swapped (mostly 2025-26 CBB neutral sites) and moves to the close past six robust standard deviations (Harvard -12.5 to +1.5), as are gaps past three standard deviations.">tuning / held out</span>:{{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ delimit .held " " }}{{ end }}{{ end }}</p>
 
-    <p><b>softness index by cell</b> <span class="cfb__dim">(b in the tuning and held-out seasons; the break-even gap for a typical game in that cell; the predictor's held-out bets there)</span></p>
+    <p title="b in the tuning and held-out seasons; the break-even gap for a typical game in that cell; the predictor's held-out bets there"><b>softness index by cell</b></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Market</th><th>Cell</th><th title="games, every season">Games</th><th title="b, tuning seasons">b tune</th><th title="b, held-out seasons">b held</th><th title="points of gap to break even at -110">Break-even</th><th title="held-out predictor bets in the cell: count, worth at the close, t">Held bets</th><th title="passes Benjamini-Hochberg at q .10 across every pre-registered cell (30+ bets to be tested)">FDR</th></tr></thead>
@@ -58,7 +58,7 @@
     </div>
 
     {{- with $d.weather }}{{ if .move }}{{ $w := . }}
-    <p><b>CFB totals and the weather</b> <span class="cfb__dim">(research only; {{ .n }} outdoor games, {{ delimit .seasons " " }}, weather at the nearest airport station over kickoff to 3.5 hours after)</span></p>
+    <p title="research only; {{ .n }} outdoor games, {{ delimit .seasons " " }}, weather at the nearest airport station over kickoff to 3.5 hours after. per mph of mean wind past 10, per degree under 50F, and for a game with a tenth of an inch of rain or more ({{ .rainy }} games; {{ .windy }} had 15+ mph wind). observed weather, not the forecast a bettor had, so it is an upper bound on what a forecast could add.{{ with .windUnder }}{{ if .clvN }} the under at the open in games with 15+ mph wind: {{ .clvN }} bets, worth {{ printf $pct (mul .clvRet 100) }} at the close{{ with .clvT }} (t {{ printf "%.1f" . }}){{ end }}, {{ .w }}-{{ .l }} on results.{{ end }}{{ end }} the game model is not changed by this."><b>CFB totals and the weather</b></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Points per</th><th title="the market's move, open to close">Open to close</th><th title="the final total minus the close">Final vs close</th><th title="the final total minus our model's total">Final vs model</th></tr></thead>
@@ -74,7 +74,6 @@
       </tbody>
     </table>
     </div>
-    <p class="cfb__dim">per mph of mean wind past 10, per degree under 50F, and for a game with a tenth of an inch of rain or more ({{ .rainy }} games; {{ .windy }} had 15+ mph wind). observed weather, not the forecast a bettor had, so it is an upper bound on what a forecast could add.{{ with .windUnder }}{{ if .clvN }} the under at the open in games with 15+ mph wind: {{ .clvN }} bets, worth {{ printf $pct (mul .clvRet 100) }} at the close{{ with .clvT }} (t {{ printf "%.1f" . }}){{ end }}, {{ .w }}-{{ .l }} on results.{{ end }}{{ end }} the game model is not changed by this.</p>
     {{- end }}{{ end }}
   </div>
   <div class="win__status"><span>target: the closing line</span><span class="cfb__asof">fit {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

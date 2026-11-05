@@ -54,7 +54,7 @@
     {{- end }}
   {{- end }}
   {{- else }}{{ $M := site.Data.model_monitor }}
-    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick" title="collecting = under 50 games scored · watch = CUSUM past half the alarm line or t below 0 · Line is the market's error at the line we logged, for scale (the close itself is on the picks backtest tab)">
       <thead><tr><th>Model</th><th>Games</th><th title="the model's mean loss this season">Loss</th><th title="what the walk-forward lost on the same months">Expected</th><th title="mean |result - line| at our logged line (margin models)">Line</th><th title="last 300 games, clustered by game day (negative = worse than the backtest)">t</th><th title="CUSUM now / alarm at">CUSUM</th><th>Status</th></tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" "nhl" "soccer" }}{{ with index $M $s }}
@@ -67,7 +67,6 @@
       {{- end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">collecting = under 50 games scored · watch = CUSUM past half the alarm line or t below 0 · Line is the market's error at the line we logged, for scale (the close itself is on the picks backtest tab).</p>
   {{- end }}
   </div>
   <div class="win__status"><span>{{ if eq $view "ledger" }}scripts/harness_rescore.py · one BH family{{ else if eq $view "pipeline" }}scripts/data_health.py · scripts/refit.py{{ else }}scripts/model_monitor.py · decide() from the rule monitor{{ end }}</span>{{ if eq $view "live" }}{{ partial "fresh.html" (dict "feed" (slice "model_monitor.cfb" "model_monitor.nfl" "model_monitor.nba" "model_monitor.nhl" "model_monitor.soccer" "model_monitor.cbb") "sport" "predictions" ) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

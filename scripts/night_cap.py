@@ -115,7 +115,7 @@ def locked(D, now):
         if isinstance(rows, dict):
             rows = list(rows.values())
         for p in rows:
-            if not isinstance(p, dict) or not p.get('kick') or p.get('pass') or p.get('res') == 'void' or live(p, now):
+            if not isinstance(p, dict) or not p.get('kick') or p.get('pass') or p.get('paper') or p.get('res') == 'void' or live(p, now):
                 continue
             k = ts(p['kick'])
             if k is None or k > now:
@@ -152,7 +152,7 @@ def apply(only=None, now=None):
             if isinstance(rows, dict):
                 rows = list(rows.values())
             for p in rows:
-                if not isinstance(p, dict) or not live(p, now):
+                if not isinstance(p, dict) or not live(p, now) or p.get('paper'):
                     continue
                 k = K.get(night(p['kick']), 1.0)
                 set_units(p, raw(p), k)

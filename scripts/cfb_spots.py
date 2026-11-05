@@ -202,7 +202,12 @@ def research():
     for r in rows:
         r['m_'] = r['m'] - r.get('ld', 0)        # the model before this term
     S = np.array([r['S'] for r in rows])
-    day = np.array([r['date'][:10] for r in rows])
+    # SE clusters by ET game day (control_ratings.cfb_day: kickoffs before 6 a.m. ET on the day before); the UTC date
+    # split every Saturday slate at 8 p.m. ET
+    from zoneinfo import ZoneInfo
+    et = lambda s: (datetime.datetime.fromisoformat(s.replace('Z', '+00:00')).astimezone(ZoneInfo('America/New_York'))
+                    - datetime.timedelta(hours=6)).date().isoformat()
+    day = np.array([et(r['date']) for r in rows])
     y, L, m = (np.array([r[k] for r in rows], float) for k in ('res', 'L', 'm_'))
     tune, held = np.isin(S, TUNE), np.isin(S, HELD)
     Phi = lambda z: 0.5 * (1 + np.vectorize(math.erf)(np.asarray(z) / math.sqrt(2)))
