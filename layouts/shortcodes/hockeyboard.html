@@ -129,12 +129,12 @@
       {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ printf "%.2f" (float $e.gain) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">Calibration, out of class: what each band of grades became.</p>
+    <p class="cfb__dim" title="out of class: what each band of grades became">Calibration</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Grade band</th><th>Picks</th><th>Mean grade</th><th>Mean outcome</th><th>Played in NHL</th></tr></thead>
       <tbody>{{ range $f.calib }}<tr><td>{{ .band }}-{{ add .band 4 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .nhl 100) }}%</td></tr>{{ end }}</tbody>
     </table></div>
-    <p class="cfb__dim">After the draft: error by seasons since the draft, the refit grade vs the draft grade alone.</p>
+    <p class="cfb__dim" title="error by seasons since the draft, the refit grade vs the draft grade alone">After the draft</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Seasons after</th><th>Inputs kept</th><th>Error</th><th>Draft grade only</th></tr></thead>
       <tbody>{{ range $k, $s := $d.stages }}<tr><td>{{ $k }}</td><td>{{ range $i, $c := $s.kept }}{{ if $i }}, {{ end }}{{ index $names $c | default $c }}{{ end }}</td><td class="cfb__num">{{ $s.mse }}</td><td class="cfb__num">{{ $s.mseDraft }}</td></tr>{{ end }}</tbody>

@@ -103,7 +103,7 @@
       {{- range $k, $e := $tf.ev }}{{ if not (in $tf.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}{{ if $e.leak }} (hindsight leak){{ end }}</td><td>{{ if $e.leak }}leak{{ else if in $tf.failfwd $k }}fails forward{{ else }}no{{ end }}</td><td>-</td><td>-</td><td class="cfb__num">{{ printf "%.2f" (float $e.gain) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">Calibration, birth year out: what each band of October grades became.</p>
+    <p class="cfb__dim" title="birth year out: what each band of October grades became">Calibration</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Grade band</th><th>Players</th><th>Mean grade</th><th>Mean outcome</th><th>Reached 50+</th></tr></thead>
       <tbody>{{ range $s.calib }}<tr><td>{{ .band }}{{ if ge .band 65 }}+{{ else }}-{{ add .band 4 }}{{ end }}</td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .p50 100) }}%</td></tr>{{ end }}</tbody>

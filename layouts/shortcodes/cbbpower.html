@@ -86,7 +86,7 @@
   </tbody>
 </table>
 {{- partial "teamjs.html" $ -}}
-{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor") -}}
+{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor" "about" "range and top-N columns: each team's rating plus a normal error at the rating sd measured on 2016-26 (3.9 pts in November, 1.6 by March), ranked over 4,000 draws") -}}
 {{- /* the running record against the polls (data/rank_record.json, scripts/rank_odds.py --record) */ -}}
 {{- with site.Data.rank_record }}{{ with .cbb.polls }}{{ $ap := .ap }}{{ $co := .coaches }}
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -95,7 +95,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <table class="cfb__table cfbm__t">
+    <table class="cfb__table cfbm__t" title="t = ARK minus poll, clustered by poll week">
       <thead><tr><th>Season</th><th title="games after an AP release with an AP-ranked team">Games</th><th>AP</th><th>ARK</th><th title="Kendall tau: AP / ARK">τ AP / ARK</th><th title="games after a Coaches release with a Coaches-ranked team">Games</th><th>Coaches</th><th>ARK</th></tr></thead>
       <tbody>
       {{- range $i, $a := $ap.bySeason }}{{ $c := index $co.bySeason $i }}
@@ -110,7 +110,6 @@
       {{- end }}
       </tbody>
     </table>
-    <p class="cfb__dim">t = ARK minus poll, clustered by poll week. range and top-N columns above: each team's rating plus a normal error at the rating sd measured on 2016-26 (3.9 pts in November, 1.6 by March), ranked over 4,000 draws.</p>
   </div>
 </div>
 {{- end }}{{ end -}}

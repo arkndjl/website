@@ -10,7 +10,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Home win chance = logistic of {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}. Weights from the seasons with closing lines (2019-20 on).</p>
+    <p title="weights from the seasons with closing lines (2019-20 on)">Home win chance = logistic of {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Seasons</th><th>Games</th><th title="win probability log loss, model / closing moneyline with the vig removed (lower is better)">Log loss</th><th title="paired t, model loss minus market loss, clustered by day (positive = the market is better)">t</th><th title="how often each side's favorite won, model / market">Fav. won</th><th title="total goals error, model / closing total">Totals MAE</th></tr></thead>
       <tbody>
@@ -34,7 +34,7 @@
     </table></div>
     {{- end }}
     {{- with site.Data.nhl_picks_research }}
-    <p><b>Picks: none.</b> An NHL market goes on the picks board only if it beats the close on seasons it wasn't tuned on, and none does. The model's moneyline side at the open was worth less than the closing price at every edge cut; totals (no opening over/under prices, so tested on results at DraftKings' closing total) lost at every cut on both sets of seasons; ESPN keeps no opening puck-line prices to judge.</p>
+    <p title="An NHL market goes on the picks board only if it beats the close on seasons it wasn't tuned on, and none does. The model's moneyline side at the open was worth less than the closing price at every edge cut; totals (no opening over/under prices, so tested on results at DraftKings' closing total) lost at every cut on both sets of seasons; ESPN keeps no opening puck-line prices to judge."><b>Picks: none</b></p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th title="model win chance minus the open's no-vig chance">Moneyline edge</th>{{ range $S := slice "2024" "2025" "2026" }}<th title="picks, and what each was worth at the closing price (return per bet)">{{ sub (int $S) 1 }}-{{ substr $S 2 2 }}</th>{{ end }}</tr></thead>
       <tbody>{{ range .ml }}{{ $r := . }}<tr><td>{{ printf "%.0f" (mul .x 100) }}+ pts</td>{{ range $S := slice "2024" "2025" "2026" }}{{ with index $r $S }}<td class="cfb__num">{{ .n }} · {{ printf "%+.1f" (float .ret) }}%</td>{{ else }}<td>-</td>{{ end }}{{ end }}</tr>{{ end }}</tbody>

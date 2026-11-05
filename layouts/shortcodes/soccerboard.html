@@ -96,12 +96,12 @@
       {{- with $d.lines }}{{ with .provLine2 }}<tr><td>academy-only line: club grade slope; youth international level</td><td>prov</td><td class="cfb__num">{{ printf "%.2f" (float .g) }}; {{ printf "%+.2f" (float .yi_lvl) }}</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>{{ end }}{{ with .yiLine }}<tr><td>youth-international-only line: club grade slope; U17/U20 World Cup games (log)</td><td>prov</td><td class="cfb__num">{{ printf "%.2f" (float .g) }}; {{ printf "%+.2f" (float .yi_wc) }}</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>{{ end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">Calibration, held out by birth cohort: what each band of October grades became.</p>
+    <p class="cfb__dim" title="held out by birth cohort: what each band of October grades became">Calibration</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Grade band</th><th>Players</th><th>Mean grade</th><th>Mean outcome</th><th>Reached 50+</th></tr></thead>
       <tbody>{{ range $f.calib }}<tr><td>{{ .band }}-{{ add .band 4 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .p50 100) }}%</td></tr>{{ end }}</tbody>
     </table></div>
-    <p class="cfb__dim">Club strength by league last season (mean club rating, goals a match against an average big-five side).</p>
+    <p class="cfb__dim" title="last season: mean club rating, goals a match against an average big-five side">Club strength by league</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>League</th><th>Mean club</th></tr></thead>
       <tbody>{{ range $k, $v := $f.leagues }}<tr><td>{{ $k }}</td><td class="cfb__num" data-v="{{ $v }}">{{ printf "%+.2f" (float $v) }}</td></tr>{{ end }}</tbody>
