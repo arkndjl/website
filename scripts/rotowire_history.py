@@ -52,6 +52,10 @@ LONG_RE = re.compile(r"season-ending|for the (rest of the |remainder of the )?se
 WEEKS_RE = re.compile(r"(\d+|one|two|three|four|five|six|seven|eight|nine|ten|twelve)(?:\s*(?:-|to|or)\s*(\d+|two|three|four|five|six|seven|eight|nine|ten|twelve))?[\s-]*(week|month)s?")
 NUM = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'twelve': 12}
 HEALTHY = {'Active', 'Probable'}
+# a return after the regular season's last games is a season-ending absence
+SEASON_END = {'cfootball': '2026-12-06', 'football': '2027-01-10', 'basketball': '2027-04-12', 'cbasketball': '2027-03-15',
+              'hockey': '2027-04-16'}
+SHORT = re.compile(r'^(questionable|probable|gtd|game[- ]time|day-to-day|dtd)', re.I)
 
 
 def _day(s):
@@ -185,7 +189,10 @@ def card(sp, pid):
     st = t[0] if t and t[0].lower() != 'injury' else (t[1] if len(t) > 1 else '')
     if st.lower() == 'injury':
         st = t[1] if len(t) > 1 else ''
-    inj = t[t.index('Injury') + 1] if 'Injury' in t[:6] and t.index('Injury') + 1 < len(t) else ''
+    if t and t[0].lower() == 'injury':          # the NBA layout: Injury, status, injury, Est. return, date
+        inj = t[2] if len(t) > 2 and t[2].lower() != 'est. return' else ''
+    else:                                         # the others: status, Injury, injury, Est. Return, date
+        inj = t[t.index('Injury') + 1] if 'Injury' in t[:6] and t.index('Injury') + 1 < len(t) else ''
     ret = next((t[k + 1] for k, x in enumerate(t[:12]) if x.lower() == 'est. return' and k + 1 < len(t)), None)
     return st, inj, ret
 
@@ -236,7 +243,9 @@ def long_term(sp, h, cards=CARDS):
         ret = _ret_date(rtxt, today)
         # season-ending: the card says so (OFS, Out For Season, or a return past the season), else the news does and
         # the card gives no return date
-        season = bool(re.search(r'season|\bofs\b', st.lower() + ' ' + (rtxt or '').lower())) or not ret and \
+        if SHORT.search(st):
+            continue                                     # a game-to-game status: not a long absence
+        season = bool(re.search(r'season|\bofs\b', st.lower() + ' ' + (rtxt or '').lower())) or bool(ret and ret.isoformat() > SEASON_END[sp]) or not ret and \
             RW.status_of(text) == 'Out (season)' and not re.search(r'\breturn(ed|s)? to practice\b|\bactivated\b', spell[-1]['head'].lower())
         w = _weeks(' '.join((x['head'] + ' ' + x['body']).lower() for x in spell[::-1]))
         wd = next((x['d'] for x in spell[::-1] if _weeks((x['head'] + ' ' + x['body']).lower())), None)

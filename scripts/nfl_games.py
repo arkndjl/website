@@ -684,6 +684,32 @@ def live_injuries(last, week, games):
                 r = ros[gsis]
                 put(t, gsis, r['full_name'], r['position'], stt, float(it['ts']), 'rotowire', True)
                 n['rotowire'] += 1
+        # long-term injuries (scripts/rotowire_history.py: the season's RotoWire news and each player's injury card): out
+        # for the season or a reserve list as such; Out with an estimated return after this week's game is this week's
+        # (firm, not carried at last week's rates). Dated by his newest injury news, so later news and reports still win
+        for v in rotowire.long_term('football'):
+            t = team(RW_TEAM.get(v['abbr'], v['abbr']))
+            if t not in TEAMS:
+                continue
+            c = (v['status'] or '').upper()
+            stt = ('Out (season)' if v['season'] else 'Injured Reserve' if c.startswith('IR') else
+                   'Physically Unable to Perform' if c.startswith('PUP') else 'Non Football Injury' if c.startswith('NFI') else
+                   'Suspended' if c.startswith('SUS') else 'Out')
+            until = v['ret'] or (v['window'] or [None, None])[1]
+            if stt == 'Out' and not (until and ko.get(t) and epoch(until + 'T23:59:59Z') > ko[t] + 86400):
+                continue
+            ids = [x for x in by_name.get(_norm(v['player']), []) if team(ros[x]['team']) == t]
+            gsis = ids[0] if len(ids) == 1 else None
+            if not gsis:
+                if t not in team_m:
+                    team_m[t] = NM.Matcher([r for r in ros.values() if r['team'] == t], name='full_name', team=None, pos='position')
+                hit, _ = team_m[t].find(v['player'], pos=v['pos'])
+                gsis = hit['gsis_id'] if hit else None
+            if gsis:
+                r = ros[gsis]
+                # the card is today's: news before the last kickoff counts for him (just after it, so this week's news wins)
+                put(t, gsis, r['full_name'], r['position'], stt, max(epoch(v['last_d'] + 'T12:00:00Z'), lastko.get(t, 0) + 1), 'rotowire', True)
+                n['rotowire long'] += 1
     except Exception as e:
         print('nfl games: RotoWire news unavailable:', e)
     # the league's report for this week's games
