@@ -193,27 +193,15 @@ jobs:
         timeout-minutes: 5
         run: python3 scripts/team_detail.py cfb
       - name: Commit if the board changed
+        # main often moves while the board builds (merged PRs, odds snaps): scripts/data_push.py rebuilds the data commit
+        # on the new main and retries. The generated files are taken whole from this run's build. A line-level rebase
+        # (-X theirs) kept the other side's non-conflicting hunks of the same JSON, which once doubled picks in the mock
+        # draft. Only the files this run changed are taken: a data file it never rebuilds (a model fit, a backtest) is
+        # whatever main has, so a PR merged mid-run isn't rolled back to this run's stale checkout. The picks log and the
+        # rule monitor are shared with the snaps: on main's newer copies they are rebuilt, not copied (a copy dropped the
+        # snaps' new picks, Nov 1); the odds archive is merged by line.
         run: |
-          git add data/cfb*.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
-          base=$(git rev-parse HEAD)
-          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
-          git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
-          # main often moves while the board builds (merged PRs): rebuild the data commit on the new main and retry.
-          # The generated files are taken whole from this run's build. A line-level rebase (-X theirs) kept the other
-          # side's non-conflicting hunks of the same JSON, which once doubled picks in the mock draft.
-          # Only the files this run changed are taken: a data file it never rebuilds (a model fit, a backtest) is
-          # whatever main has, so a PR merged mid-run isn't rolled back to this run's stale checkout.
-          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data"); gone=$(git diff --name-only --diff-filter=D "$base" "$data")
-          for i in 1 2 3 4 5; do
-            git push && exit 0
-            sleep $((i * 5))
-            git fetch origin main && git reset -q --hard origin/main || exit 1
-            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
-            if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
-            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
-            git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
-          done
-          exit 1
+          python3 scripts/data_push.py -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))" \
+            --rebuild data/games_picks_cfb.json data/rule_monitor.json \
+            --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
+            -- 'data/cfb*.json' data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json 'scripts/data/odds/cfb-*.jsonl'

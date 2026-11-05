@@ -11,7 +11,7 @@
   <div class="cfbm__body">
     <p class="pclv"><b>judged by the close</b> · {{ if $r.clvN }}{{ $r.clvN }} closed: worth <b>{{ printf "%+.1f%%" (mul $r.clvRet 100) }}</b> at the close{{ with $r.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }} (games as clusters)</span>{{ end }}{{ with $r.beat }}, beat the close {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}no closes yet{{ end }}
     <br><span class="cfb__dim">results: {{ if $r.graded }}{{ $r.w }}-{{ $r.l }}{{ if $r.push }}-{{ $r.push }}{{ end }}, {{ printf "%+.2f" $r.units }} units on {{ printf "%.1f" $r.staked }} risked{{ with $r.roi }}, {{ printf "%+.1f%%" (mul . 100) }} a bet{{ end }}{{ else }}none graded yet{{ end }} · {{ $r.n }} bets since {{ $u.registered }}</span></p>
-    <p>{{ if $d.live }}<b>gate passed</b>: props qualify as picks.{{ else }}<b>paper only</b> <span class="cfb__dim">until {{ $u.gate.n }}+ graded bets beat the close at t ≥ {{ $u.gate.t }} (games as clusters). ESPN keeps no prop history, so this rule could not be backtested; it was registered before its first bet.</span>{{ end }}</p>
+    <p>{{ if $d.live }}<b title="props qualify as picks">gate passed</b>{{ else }}<b title="until {{ $u.gate.n }}+ graded bets beat the close at t ≥ {{ $u.gate.t }} (games as clusters). ESPN keeps no prop history, so this rule could not be backtested; it was registered before its first bet.">paper only</b> <span class="cfb__dim">gate {{ $u.gate.n }}+ graded · t ≥ {{ $u.gate.t }}</span>{{ end }}</p>
   </div>
   <div class="wintable__scroll">
   <table class="cfb__table">

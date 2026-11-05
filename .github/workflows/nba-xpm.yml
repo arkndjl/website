@@ -160,21 +160,9 @@ jobs:
       - name: Commit if the leaderboard changed
         run: |
           files="static/data/xaav-nba.json data/units_nba.json scripts/data/faces_nba.json scripts/data/nba_dob.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-lineup-leaders.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
-          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
-          base=$(git rev-parse HEAD)
-          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
-          git commit -m "Update the NBA XPM leaderboard and games ($(date -u +%Y-%m-%d))"
-          # main moves while this runs: rebuild the data commit on the new main and retry (see cbb-board.yml)
-          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
-          for i in 1 2 3 4 5; do
-            git push && exit 0
-            sleep $((i * 5))
-            git fetch origin main && git reset -q --hard origin/main || exit 1
-            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
-            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
-            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
-            git commit -q -m "Update the NBA XPM leaderboard and games ($(date -u +%Y-%m-%d))"
-          done
-          exit 1
+          # main moves while this runs: scripts/data_push.py rebuilds the data commit on the new main, the picks log and
+          # the rule monitor on main's newer copies (see cbb-board.yml)
+          python3 scripts/data_push.py -m "Update the NBA XPM leaderboard and games ($(date -u +%Y-%m-%d))" \
+            --rebuild data/games_picks_nba.json data/rule_monitor.json \
+            --regen "python3 scripts/games_picks.py nba; python3 scripts/rule_monitor.py" \
+            -- $files

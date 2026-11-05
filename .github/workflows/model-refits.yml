@@ -124,23 +124,8 @@ jobs:
           python3 scripts/refit.py collect /tmp/legs || echo "some refits failed" >> /tmp/refit_failed
           python3 scripts/refit.py status
       - name: Commit
-        run: |
-          git add -A data scripts/data
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
-          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
-          git commit -m "Refit models ($(date -u +%Y-%m-%d))"
-          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d HEAD~1 HEAD)
-          for i in 1 2 3 4 5; do
-            git push && exit 0
-            sleep $((i * 5))
-            git fetch origin main && git reset -q --hard origin/main || exit 1
-            git checkout "$data" -- $changed
-            git add $changed
-            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
-            git commit -q -m "Refit models ($(date -u +%Y-%m-%d))"
-          done
-          exit 1
+        # the build gate, then the push; on a rejection the kept fits are taken whole onto the new main (scripts/data_push.py)
+        run: python3 scripts/data_push.py -m "Refit models ($(date -u +%Y-%m-%d))" -- data scripts/data
       - name: Fail the run if a refit failed
         run: |
           if [ -s /tmp/refit_failed ]; then echo "::error::a refit failed, see data/refits.json"; exit 1; fi
@@ -163,20 +148,4 @@ jobs:
         run: |
           python3 scripts/games_picks.py --fit && python3 scripts/games_picks.py --rules && python3 scripts/units.py --fit
       - name: Commit
-        run: |
-          git add data/games_picks_fit.json data/games_picks_rules.json data/units_fit.json
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
-          python3 scripts/check_build.py || exit 1
-          git commit -m "Refit pick rules ($(date -u +%Y-%m-%d))"
-          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d HEAD~1 HEAD)
-          for i in 1 2 3 4 5; do
-            git push && exit 0
-            sleep $((i * 5))
-            git fetch origin main && git reset -q --hard origin/main || exit 1
-            git checkout "$data" -- $changed
-            git add $changed
-            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
-            git commit -q -m "Refit pick rules ($(date -u +%Y-%m-%d))"
-          done
-          exit 1
+        run: python3 scripts/data_push.py -m "Refit pick rules ($(date -u +%Y-%m-%d))" -- data/games_picks_fit.json data/games_picks_rules.json data/units_fit.json
