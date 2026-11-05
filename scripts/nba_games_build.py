@@ -117,6 +117,34 @@ def espn_injuries():
     return out
 
 
+RW_NBA = {'Out (season)': 'Out', 'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Questionable', 'Probable': 'Probable',
+          'Active': 'Available'}
+
+
+def rotowire_injuries(ros):
+    """{espn athlete id: (status, epoch s)} from RotoWire's injury news (scripts/rotowire.py; polled every half hour,
+    once more here), the newest item per player with a status, the last 3 days."""
+    import time
+    try:
+        import rotowire as RW
+        RW.refresh('basketball')
+        out, mt = {}, {}
+        for it in RW.items('basketball', since=time.time() - 3 * 86400):
+            st = RW_NBA.get(RW.item_status(it))
+            t = E.team(it['abbr'])
+            if not st or t not in ros:
+                continue
+            if t not in mt:
+                mt[t] = RW.matcher([{'id': k, 'name': v} for k, v in ros[t].items()], team=None, pos=None)
+            hit, _ = mt[t].find(it['player'])
+            if hit:
+                out[hit['id']] = (st, it['ts'])
+        return out
+    except Exception as e:  # noqa: BLE001
+        print('nba games: RotoWire news unavailable:', e)
+        return {}
+
+
 def rosters():
     """{team: {espn id: name}} from ESPN's team rosters"""
     out = {}
@@ -169,6 +197,15 @@ def build():
             m.set_team(p, t)
     rep, rep_at = official_report(now.astimezone(ET))
     espn = espn_injuries()
+    # RotoWire's news, dated: counts for a team's next game when it's newer than the team's last tip-off (older news
+    # was about that game) and, on game day, newer than the NBA's report (a late scratch or upgrade after it)
+    rwn = rotowire_injuries(ros)
+    last_tip = defaultdict(float)
+    for g in cur:
+        if g['fin']:
+            for t in (g['h'], g['a']):
+                last_tip[t] = max(last_tip[t], N.tipdt(g).timestamp())
+    rep_ts = dt.datetime.fromisoformat(rep_at).timestamp() if rep_at else 0.0
     nowiso = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     days = sorted({N.tipdt(g).astimezone(ET).date() for g in upcoming})
     slate = set(days[:2])
@@ -190,7 +227,10 @@ def build():
                 for p in m.roster(t):
                     k = N.norm(names.get(p, ''))
                     s_ = (r_ or {}).get(k) or espn.get(p)
-                    if s_:
+                    w = rwn.get(p)
+                    if w and w[1] > last_tip[t] and (not (r_ or {}).get(k) or w[1] > rep_ts):
+                        st[k] = w[0]; src[p] = 'RotoWire'
+                    elif s_:
                         st[k] = s_; src[p] = 'NBA' if (r_ or {}).get(k) else 'ESPN'
             m.inj[g['id']] = st
         x, tx = m.feats(g)

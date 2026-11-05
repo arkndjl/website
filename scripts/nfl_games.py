@@ -474,6 +474,7 @@ ESPN_STATUS = {'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Questionab
                'Probable': 'Probable', 'Active': 'Active', 'Injured Reserve': 'Injured Reserve', 'Suspension': 'Suspended',
                'Suspended': 'Suspended', 'Physically Unable to Perform': 'Physically Unable to Perform',
                'Reserve-Ret': 'Suspended', 'Non Football Injury': 'Non Football Injury'}
+RW_TEAM = {'LAR': 'LA', 'WSH': 'WAS', 'JAC': 'JAX'}     # RotoWire's abbreviations -> nflverse's
 RB_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
 
 
@@ -599,8 +600,14 @@ def live_injuries(last, week, games):
         if not stt or (stt not in GONE and ts <= lastko.get(t, 0)):
             return
         cur = news[t].get(gsis)
+        # the newest item wins; first/first_src = the earliest report of the status it holds (lead-time record)
+        same = cur is not None and cur['status'] == stt
+        first = (cur['first'], cur['first_src']) if same and cur['first'] <= ts else (ts, src)
         if cur is None or ts >= cur['ts']:
-            news[t][gsis] = {'name': name, 'pos': pos, 'status': stt, 'src': src, 'ts': ts, 'firm': firm or stt in GONE}
+            news[t][gsis] = {'name': name, 'pos': pos, 'status': stt, 'src': src, 'ts': ts, 'firm': firm or stt in GONE,
+                             'first': first[0], 'first_src': first[1]}
+        elif same:
+            cur['first'], cur['first_src'] = first
     try:
         req = urllib.request.Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries', headers={'User-Agent': 'arkndjl.net arkboard'})
         with urllib.request.urlopen(req, timeout=30) as r:
@@ -656,6 +663,29 @@ def live_injuries(last, week, games):
                         break
     except Exception as e:
         print('nfl games: Rotoballer news unavailable:', e)
+    # RotoWire's injury news (scripts/rotowire.py: polled every half hour, once more here): player, team and exact
+    # publish time given; status from the headline ("Won't play Thursday"), else the news sentence, same reader
+    try:
+        import rotowire
+        rotowire.refresh('football')
+        for it in rotowire.items('football', since=time.time() - 14 * 86400):
+            stt = status_of(it['head']) or status_of(re.split(r'(?<=[.!?])\s', it['body'], maxsplit=1)[0])
+            t = team(RW_TEAM.get(it['abbr'], it['abbr']))
+            if not stt or t not in TEAMS:
+                continue
+            ids = [x for x in by_name.get(_norm(it['player']), []) if team(ros[x]['team']) == t]
+            gsis = ids[0] if len(ids) == 1 else None
+            if not gsis:
+                if t not in team_m:
+                    team_m[t] = NM.Matcher([r for r in ros.values() if r['team'] == t], name='full_name', team=None, pos='position')
+                hit, _ = team_m[t].find(it['player'], pos=it['pos'])
+                gsis = hit['gsis_id'] if hit else None
+            if gsis:
+                r = ros[gsis]
+                put(t, gsis, r['full_name'], r['position'], stt, float(it['ts']), 'rotowire', True)
+                n['rotowire'] += 1
+    except Exception as e:
+        print('nfl games: RotoWire news unavailable:', e)
     # the league's report for this week's games
     rep, asof = defaultdict(dict), 0.0
     url = f'{REL}/injuries/injuries_{last}.csv'
@@ -674,7 +704,7 @@ def live_injuries(last, week, games):
             v, L = news[t].get(gsis), R.get(gsis)
             fresh = bool(v and v['firm'] and v['ts'] > asof)      # newer than the report
             r = ros.get(gsis, {})
-            off = r.get('status') == 'RES' and not (v and v['src'] == 'rotoballer' and v['status'] == 'Active')
+            off = r.get('status') == 'RES' and not (v and v['src'] in ('rotoballer', 'rotowire') and v['status'] == 'Active')
             if v and v['status'] in GONE:
                 e = v
             elif off:

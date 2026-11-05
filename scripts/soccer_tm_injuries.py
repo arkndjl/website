@@ -189,6 +189,29 @@ def add_avz(rows, live=False, until=None, e2t=None):
             sp[p] = (D.load(f) or []) if f and os.path.exists(f) else []
         return sp[p]
     v = value_table()
+    # live: RotoWire's injury news (scripts/rotowire.py; Premier League, La Liga, Bundesliga, Serie A, Ligue 1, MLS) for
+    # a player Transfermarkt doesn't have out yet: his newest item in the last 10 days reads Out, so a spell from that
+    # day (fresh, so it counts); a later item with any other status ends it
+    rw = {}
+    if live:
+        try:
+            import rotowire as RW
+            RW.refresh('soccer')
+            for it in RW.items('soccer', since=time.time() - 10 * 86400):
+                rw[(NM.team_key(it['team']), NM.key(it['player']))] = (
+                    dt.datetime.fromtimestamp(it['ts'], dt.timezone.utc).date().isoformat(), RW.item_status(it))
+            rw = {k: d for k, (d, st) in rw.items() if st in ('Out', 'Out (season)')}
+        except Exception as e:  # noqa: BLE001
+            print('injuries: RotoWire news unavailable:', e)
+
+    def rw_spell(t, p, day):
+        if not rw:
+            return []
+        k = NM.key(nm.get(p, ''))
+        for (tk, pk), d in rw.items():
+            if pk == k and d < day and NM.same_team(tk, t):
+                return [(d, None, 'inj', None, None, None)]
+        return []
 
     def deficit(t, day, comp):
         w = window(t, day)
@@ -198,7 +221,7 @@ def add_avz(rows, live=False, until=None, e2t=None):
         cut = (dt.date.fromisoformat(day) - dt.timedelta(days=FRESH)).isoformat()
         tot = 0.0
         for p in set().union(*[x[1] for x in w]):
-            o = out_on(spl(p), day, comp)
+            o = out_on(spl(p), day, comp) or out_on(rw_spell(t, p, day), day, comp)
             if not o or not any(s[0] >= cut for s in o):
                 continue
             ms = [x[1].get(p, 0) for x in w if not out_on(spl(p), x[0], x[2])]

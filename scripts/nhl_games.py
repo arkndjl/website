@@ -48,6 +48,7 @@ import os
 import random
 import re
 import sys
+import time
 import urllib.request
 from collections import defaultdict
 from zoneinfo import ZoneInfo
@@ -1218,8 +1219,39 @@ def injuries():
             if tm not in TEAMS:
                 continue
             war = round(82 * p['num'] / p['gp'], 1) if p and p['gp'] >= 5 else None
-            out.setdefault(tm, []).append({'name': nm, 'status': i.get('status') or '', 'war': war})
+            ts = 0.0
+            try:
+                ts = dt.datetime.fromisoformat((i.get('date') or '').replace('Z', '+00:00')).timestamp()
+            except ValueError:
+                pass
+            out.setdefault(tm, []).append({'name': nm, 'status': i.get('status') or '', 'war': war, 'ts': ts, 'p': p})
+    # RotoWire's injury news (scripts/rotowire.py), the last 3 days: newer than ESPN's entry, its status stands
+    # (Active takes him off); a player ESPN doesn't list is added
+    try:
+        import rotowire as RW
+        RW.refresh('hockey')
+        st_map = {'Out (season)': 'Out', 'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Day-To-Day',
+                  'Probable': 'Day-To-Day', 'Active': 'Active'}
+        for it in RW.items('hockey', since=time.time() - 3 * 86400):
+            st = st_map.get(RW.item_status(it)) or ('Injured Reserve' if re.search(r'\b(ir|injured reserve)\b', it['head'].lower()) else None)
+            tm = D.team(it['abbr'])
+            if not st or tm not in TEAMS:
+                continue
+            p, _ = M.find(it['player'], team=tm)
+            lst = out.setdefault(tm, [])
+            cur = next((r for r in lst if NM.same(r['name'], it['player'])), None)
+            if cur and cur['ts'] >= it['ts']:
+                continue
+            if cur:
+                lst.remove(cur)
+            if st != 'Active':
+                war = round(82 * p['num'] / p['gp'], 1) if p and p['gp'] >= 5 else None
+                lst.append({'name': it['player'], 'status': st, 'war': war, 'ts': it['ts'], 'p': p})
+    except Exception as e:  # noqa: BLE001
+        print('nhl games: RotoWire news unavailable:', e)
     for v in out.values():
+        for r in v:
+            r.pop('ts', None); r.pop('p', None)
         v.sort(key=lambda r: -(r['war'] if r['war'] is not None else -9))
     return out
 

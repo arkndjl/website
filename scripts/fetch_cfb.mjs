@@ -2170,8 +2170,12 @@ const injuries = await (async () => {
   for (const [tid, list] of Object.entries(espn.rosters)) for (const a of list) people.push({ ...a, tid, n: norm(a.name) });
   const byNorm = {}; for (const a of people) (byNorm[a.n] ||= []).push(a);
   const teamNames = Object.fromEntries(Object.entries(espn.teams).map(([id, t]) => [id, [t.name, t.full].filter(Boolean).map(x => x.toLowerCase())]));
-  const put = (a, status, date, note, src) => { const k = a.id; if (P[k] && P[k].date > date && P[k].src !== 'manual') return;
-    P[k] = { name: a.name, tid: a.tid, pos: a.pos, status, date, note: note?.slice(0, 160) || null, src }; };
+  // the newest item per player wins; `first`/`firstSrc` keep the earliest report of the status he holds now (which
+  // source had it first, and when), carried across runs while the status stands
+  const put = (a, status, date, note, src) => { const k = a.id, cur = P[k], same = cur && cur.status === status;
+    const f0 = same ? (cur.first || cur.date) : null, first = same && f0 <= date ? [f0, cur.firstSrc || cur.src] : [date, src];
+    if (cur && cur.date > date && cur.src !== 'manual') { if (same) [cur.first, cur.firstSrc] = first; return; }
+    P[k] = { name: a.name, tid: a.tid, pos: a.pos, status, date, note: note?.slice(0, 160) || null, src, first: first[0], firstSrc: first[1] }; };
     const news = await source('rotoballer.json', () => fetchRotoballer()) || [];
     let matched = 0;
     const findIn = (words, body) => {
@@ -2193,6 +2197,24 @@ const injuries = await (async () => {
         matched++; put(a, st, it.date, it.title, 'rotoballer');
       }
     }
+    // RotoWire's injury news (scripts/rotowire.py, polled every half hour into scripts/data/rotowire_news.json; this
+    // build polls once more first): player, school and exact publish time given, status read from the headline
+    // ("Won't play Saturday"), else the news sentence; the last 9 days (older statuses lapse anyway)
+    let rwMatched = 0, rwN = 0;
+    try {
+      const rw = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'rotowire_news.json'), 'utf8')).items || {};
+      const ixT = teamIndex(espn.teams), since = Date.now() / 1000 - 9 * 86400, teamM = {};
+      for (const it of Object.values(rw).filter(v => v.sport === 'cfootball' && v.ts >= since).sort((x, y) => x.ts - y.ts)) {
+        rwN++;
+        const st = statusOf(it.head) || statusOf(it.body.split(/(?<=\.)\s/)[0] || '', true); if (!st) continue;
+        const tid = ixT.resolve(it.team); if (!tid) continue;
+        let a = (byNorm[norm(it.player)] || []).find(x => x.tid === tid);
+        if (!a) { teamM[tid] ||= new Matcher(people.filter(x => x.tid === tid), { name: 'name', team: null, pos: 'pos' }); a = teamM[tid].find(it.player, { pos: it.pos })?.[0] || null; }
+        if (!a) continue;
+        rwMatched++; put(a, st, new Date(it.ts * 1000).toISOString(), `${it.head}: ${it.body}`, 'rotowire');
+      }
+    } catch (e) { console.log(`rotowire: ${e.message}`); }
+    console.log(`rotowire: ${rwN} news items, ${rwMatched} matched with a status`);
     for (const [tid, list] of Object.entries(espnInjuries)) for (const i of list) {
       const a = (byNorm[norm(i.name)] || []).find(x => x.tid === tid); if (!a) continue;
       const st = /season/i.test(i.detail || '') ? 'Out (season)' : /^out/i.test(i.status || '') ? 'Out' : i.status;

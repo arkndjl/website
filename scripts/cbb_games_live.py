@@ -16,6 +16,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
@@ -223,6 +224,48 @@ def covers_report():
             stt, _, detail = st.partition(' - ')
             team = html.unescape(parts[i])
             out.append((COVERS_TEAMS.get(team, team), name, pos.strip(), stt.strip(), detail.strip(), (when or '').strip()))
+    return merge_rotowire(out)
+
+
+RW_CBB = {'Out (season)': 'Out For Season', 'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Questionable',
+          'Probable': 'Probable', 'Active': None}
+
+
+def merge_rotowire(rows):
+    """Covers' rows with RotoWire's college injury news (scripts/rotowire.py; the last 2 days) merged in, newest per
+    player: a RotoWire item dated the same day as Covers' note or later replaces it (Active takes him off); a player
+    Covers doesn't list is added. Same row shape, so the same sit rates price both."""
+    import datetime as dt
+    from zoneinfo import ZoneInfo
+    try:
+        import rotowire as RW
+        RW.refresh('cbasketball')
+        news = RW.items('cbasketball', since=time.time() - 2 * 86400)
+    except Exception as e:  # noqa: BLE001
+        print('cbb injuries: RotoWire news unavailable:', e)
+        return rows
+    def day(when):            # Covers' "Wed, Oct 7": this season's date
+        try:
+            d = dt.datetime.strptime(when.split(', ', 1)[1] + f' {now_utc().year}', '%b %d %Y').date()
+            return d.replace(year=d.year - 1) if d > now_utc().date() + dt.timedelta(days=1) else d
+        except (IndexError, ValueError):
+            return None
+    out, n = list(rows), 0
+    for it in news:
+        st = RW.item_status(it)
+        if st not in RW_CBB:
+            continue
+        team = COVERS_TEAMS.get(it['team'], it['team'])
+        d = dt.datetime.fromtimestamp(it['ts'], ZoneInfo('America/New_York')).date()
+        same = [r for r in out if NM.team_key(r[0]) == NM.team_key(team) and NM.same(r[1], it['player'])]
+        if any(day(r[5]) and day(r[5]) > d for r in same):
+            continue
+        for r in same:
+            out.remove(r)
+        if RW_CBB[st]:
+            out.append((team, it['player'], it['pos'], RW_CBB[st], it['inj'], d.strftime('%a, %b %-d')))
+        n += 1
+    print(f'cbb injuries: {n} RotoWire items merged')
     return out
 
 
