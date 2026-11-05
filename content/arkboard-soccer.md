@@ -11,9 +11,9 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:player value,player stats,rookies,ARKLIST|rosters:depth chart,lineups,backup watch|games:games,game table|teams:ARK Ranking,attack,defence,set pieces|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League" side="true" label="Soccer views" >}}
-{{< soccergames title="matches" tab="games" >}}
-{{< soccergametable title="match table" tab="game table" >}}
+{{< wintabs groups="players:GAR leaders,player stats,rookies,ARKLIST|rosters:depth chart,lineups,backup watch|games:games,game table|teams:ARK Ranking,offense,defense,set pieces|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League" side="true" label="Soccer views" >}}
+{{< soccergames title="games" tab="games" >}}
+{{< soccergametable title="game table" tab="game table" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}
 {{< soccerleague lg="esp.1" title="La Liga" tab="La Liga" >}}
 {{< soccerleague lg="ger.1" title="Bundesliga" tab="Bundesliga" >}}
@@ -37,19 +37,19 @@ cover = "/og/soccer.png"
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
 {{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking :: every league, one scale" tab="ARK Ranking" >}}{{< /lazytab >}}
-{{< lazytab tab="attack" >}}
-{{< teamunits sport="soccer" view="attack" title="attack :: non-penalty xG, opponent-adjusted" tab="attack" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="soccer" view="attack" title="offense :: non-penalty xG, opponent-adjusted" tab="offense" >}}
 {{< /lazytab >}}
-{{< lazytab tab="defence" >}}
-{{< teamunits sport="soccer" view="defence" title="defence :: non-penalty xG allowed, opponent-adjusted" tab="defence" >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="soccer" view="defence" title="defense :: non-penalty xG allowed, opponent-adjusted" tab="defense" >}}
 {{< /lazytab >}}
 {{< lazytab tab="set pieces" >}}
 {{< teamunits sport="soccer" view="set pieces" title="set pieces :: set-piece xG for and against" tab="set pieces" >}}
 {{< /lazytab >}}
-{{< soccerplayers view="value" title="player value :: GAR and estimated market value" tab="player value" >}}
+{{< soccerplayers view="value" title="GAR leaders :: GAR and estimated market value" tab="GAR leaders" >}}
 {{< soccerplayers view="stats" title="player stats :: xG, xA, xGChain" tab="player stats" >}}
 {{< rookies sport="soccer" icon="soccer" title="rookies :: first big-five season, GAR and xMV" tab="rookies" >}}
-{{< backupwatch sport="soccer" title="backup watch :: backups grading above a starter" tab="backup watch" >}}
+{{< backupwatch sport="soccer" title="backup watch :: 2nd/3rd string out-producing a starter (GAR)" tab="backup watch" >}}
 {{< arklist sport="soccer" title="ARKLIST :: soccer" tab="ARKLIST" >}}
 {{< depthchart sport="soccer" title="depth chart :: every team" tab="depth chart" >}}
 {{< soccerlineups title="lineups :: shapes, most-used XI, pairs" tab="lineups" >}}

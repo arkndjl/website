@@ -9,7 +9,7 @@
 {{- $view := $.Get "view" | default "board" -}}
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- if eq $view "board" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%v NHL draft :: big board" .year)) "icon" "hockey" "filter" "Pos,League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%v NHL draft :: draft board" .year)) "icon" "hockey" "filter" "Pos,League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk" {{ with .rungs }}data-pd-b="{{ index .p30 1 }},{{ index .p60 1 }}" {{ end }}data-pd-kind="hk-board" data-pd-src="{{ (resources.FromString "data/hockey-board-detail.json" (jsonify .board)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean NHL outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
@@ -80,7 +80,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .pipe) "fresh" "hockey" "note" (printf "updated %s" $date) "about" "Picks from the last five drafts with fewer than 100 NHL games (goalies 50). On draft day the grade is the draft model with his real slot; after each season it is refit on what that season told us about past picks: the draft grade, his NHLe that season, whether he played pro, NHL games and WAR so far. Players past 100 games are on the NHL page's WAR board. Badges (medals by the name): Shooter, shots a game in the CHL the season after the draft, regressed by games and tiered by percentile among his birth cohort at his position (bronze 75th, silver 90th, gold 97th, platinum 99th); the one CHL trait of eleven tested (scoring, assists, power play, +/-, shooting %, penalties) that predicted the NHL outcome beyond the stage grade, class held out (scripts/hockey_badge_backtest.py).") -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past classes :: draft grade vs NHL outcome") "icon" "hockey" "filter" "Class,Pos,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Class,Pick,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past boards :: draft grade vs NHL outcome") "icon" "hockey" "filter" "Class,Pos,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Class,Pick,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Class</th><th title="overall pick">Pick</th><th>Team</th><th>Pos</th>

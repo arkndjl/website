@@ -11,21 +11,21 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAA/WAR,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,specialists,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,backup watch|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,development,offense,defense,formations,special teams|market:portal,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
-{{< cfbboard title="WAA/WAR :: college, FBS + FCS" tab="WAA/WAR" preset="war" >}}
+{{< cfbboard title="WAR leaders :: college, FBS + FCS" tab="WAR leaders" preset="war" >}}
 {{< lazytab tab="specialists" >}}
 {{< streturners sport="cfb" title="specialists :: returners, yards over expected" tab="specialists" >}}
 {{< /lazytab >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen :: FV, WAR and Stat+ against recruiting rank" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
-{{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits)" tab="ARKLIST" >}}
+{{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits) and coaches" tab="ARKLIST" >}}
 {{< cfbbreakout title="breakout watch :: 1st-2nd yr QB/RB/WR/TE, touches + targets up" tab="breakouts" >}}
 {{< lazytab tab="backup watch" >}}
-{{< backupwatch sport="cfb" title="backup watch :: 2nd/3rd string graded above a starter (FV)" tab="backup watch" >}}
+{{< backupwatch sport="cfb" title="backup watch :: 2nd/3rd string out-producing a starter (WAA)" tab="backup watch" >}}
 {{< /lazytab >}}
 {{< lazytab tab="portal" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
@@ -132,7 +132,6 @@ cover = "/og/college-football.png"
 - [PFN industry consensus big board](https://www.profootballnetwork.com/nfl-draft-hq/industry-consensus-big-board) | scouting consensus: PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo | live
 - [Tankathon NFL big board](https://www.tankathon.com/nfl/big_board) · [PFF big board](https://www.pff.com/draft/big-board) · [Kiper big board](https://www.espn.com/nfl/draft2027/story/_/id/50182998/2027-nfl-draft-rankings-kiper-big-board-top-prospects) | consensus boards 8, 9 and 10 | live
 - [SEC, ACC, MAC and American availability reports](https://www.secsports.com/fbreports-archive) · [Rotoballer college news](https://www.rotoballer.com/player-news?sport=cfb) · [ESPN injuries](https://www.espn.com/college-football/injuries) | availability | live
-- ARKBOARD · hand-graded Big Board and Mock Draft | end of season | coming
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< /desk >}}

@@ -416,7 +416,7 @@ def cbb():
                  col('nbaP', 'NBA%', 'chance of an NBA career', 'p', 1), col('w', 'Season wt', 'weight on this season\'s line in the grade', '2', 1),
                  col('line', 'Line', 'season line so far', 's', 1, 0)],
         'pre': {'l': 'Rec', 't': 'On3 national recruiting rank'},
-        'pos': ['G', 'W', 'F', 'B'],
+        'pos': ['G', 'F', 'C'],
         'seasons': [{'s': S, 'l': f'{S - 1}-{str(S)[2:]}', 'rows': rows}]})
 
 

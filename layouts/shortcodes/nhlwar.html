@@ -77,6 +77,15 @@
 </div>
 <script>
 (function () {
+  // board state in the hash as #<tab>:<state> (wintabs.html opens <tab>); a board reads only its own tab's state and
+  // writes only while on screen, so two boards on one page don't trade filters (Nov 5 2026)
+  window.__hp = window.__hp || function (win) { var x = location.hash.slice(1), i = x.indexOf(':'), t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    if (i < 0) return new URLSearchParams(x.indexOf('=') >= 0 ? x : '');
+    return new URLSearchParams(!tab || decodeURIComponent(x.slice(0, i)) === tab ? x.slice(i + 1) : ''); };
+  window.__hw = window.__hw || function (win, s) { if (!win.offsetParent) return; var t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    history.replaceState(null, '', tab ? '#' + tab + (s ? ':' + s : '') : s ? '#' + s : location.pathname + location.search); };
   var win = document.querySelector('[data-nhlwar]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
   var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
@@ -101,7 +110,7 @@
     [].forEach.call(bar.querySelectorAll('[data-pos]'), function (c) { var on = !!pos && c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
   }
   function readHash() {
-    var h = new URLSearchParams(location.hash.slice(1)), s = h.get('season');
+    var h = __hp(win), s = h.get('season');
     bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
     pos = h.get('pos') || ''; side = h.get('side') || ''; if (side === 'v' || !KEY[side]) side = '';   // side=v: old VORX links
     bar.elements.team.value = h.get('team') || ''; bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || '';
@@ -112,12 +121,12 @@
     if (e.season.value !== win.dataset.cur) h.set('season', e.season.value);
     if (e.mp.value) h.set('mp', e.mp.value); if (side) h.set('side', side); if (pos) h.set('pos', pos);
     if (e.team.value) h.set('team', e.team.value); if (e.age.value) h.set('age', e.age.value); if (e.q.value.trim()) h.set('q', e.q.value.trim());
-    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+    var s = h.toString(); __hw(win, s);
   }
   function render() {
     if (!data) return;
     var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[side],
-        qual = Math.round(400 * data.games / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
+        gp = Math.min(data.games, ({ 2013: 48, 2020: 70, 2021: 56 })[data.season] || 82), qual = Math.round(400 * gp / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
         ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
     var list = data.players.filter(function (p) {
       if (p.toi < mp) return false;
@@ -141,7 +150,6 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     function k(c) { return c === key ? ' is-key' : ''; }
     table.dataset.key = CSS[key];
-    function k(c) { return c === key ? ' is-key' : ''; }
     function sg2(x) { return sg(x, 2); }
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
@@ -163,12 +171,12 @@
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ min' : '');
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
     var t = new Date(data.asof);
-    asof.textContent = data.label + ' · ' + data.games + (data.games === 1 ? ' game' : ' games') + ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear(); if (window.__arkFreshSet) window.__arkFreshSet(asof, data.asof, 'nhl', bar.elements.season.value === win.dataset.cur);
+    var gpn = Math.min(data.games, ({ 2013: 48, 2020: 70, 2021: 56 })[data.season] || 82); asof.textContent = data.label + ' · ' + gpn + (gpn === 1 ? ' game' : ' games') + ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear(); if (window.__arkFreshSet) window.__arkFreshSet(asof, data.asof, 'nhl', bar.elements.season.value === win.dataset.cur);
     ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
   }
   // the season's teams, keeping the pick when the team still exists
   function teams() {
-    var sel = bar.elements.team, want = sel.value || new URLSearchParams(location.hash.slice(1)).get('team') || '', seen = {};
+    var sel = bar.elements.team, want = sel.value || __hp(win).get('team') || '', seen = {};
     data.players.forEach(function (p) { seen[p.tm] = 1; });
     sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
     sel.value = seen[want] ? want : '';

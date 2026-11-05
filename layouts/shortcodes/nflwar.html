@@ -82,6 +82,15 @@
 </div>
 <script>
 (function () {
+  // board state in the hash as #<tab>:<state> (wintabs.html opens <tab>); a board reads only its own tab's state and
+  // writes only while on screen, so two boards on one page don't trade filters (Nov 5 2026)
+  window.__hp = window.__hp || function (win) { var x = location.hash.slice(1), i = x.indexOf(':'), t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    if (i < 0) return new URLSearchParams(x.indexOf('=') >= 0 ? x : '');
+    return new URLSearchParams(!tab || decodeURIComponent(x.slice(0, i)) === tab ? x.slice(i + 1) : ''); };
+  window.__hw = window.__hw || function (win, s) { if (!win.offsetParent) return; var t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    history.replaceState(null, '', tab ? '#' + tab + (s ? ':' + s : '') : s ? '#' + s : location.pathname + location.search); };
   var win = document.querySelector('[data-nflwar]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
   var bar = win.querySelector('[data-nw-bar]'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nw-count]'), none = win.querySelector('[data-nw-none]'), loading = win.querySelector('[data-nw-loading]'),
@@ -100,7 +109,7 @@
   function f2(x) { return x == null ? '' : x.toFixed(2); }
   function waa(x) { return x == null ? '' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(2) + '</span>'; }
   function readHash() {
-    var h = new URLSearchParams(location.hash.slice(1));
+    var h = __hp(win);
     pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.view.value = h.get('view') === 'pace' ? 'pace' : '';
     bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || ''; bar.elements.rook.checked = h.get('rook') === '1';
     [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
@@ -110,7 +119,7 @@
     if (pos) h.set('pos', pos); if (bar.elements.team.value) h.set('team', bar.elements.team.value);
     if (bar.elements.view.value) h.set('view', 'pace'); if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
     if (bar.elements.age.value) h.set('age', bar.elements.age.value); if (bar.elements.rook.checked) h.set('rook', '1');
-    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+    var s = h.toString(); __hw(win, s);
   }
   function render() {
     var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, pace = bar.elements.view.value === 'pace',

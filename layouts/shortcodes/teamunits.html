@@ -8,7 +8,7 @@
 {{- $feed := .Get "feed" | default (printf "units_%s" $sport) }}
 {{- $lbl := dict "formations" "offense" "fronts" "defense" }}
 {{- $T := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" }}
-{{- $icon := index (dict "nfl" "football" "cfb" "football" "nba" "basketball" "cbb" "basketball" "nhl" "hockey" "soccer" "soccer") $sport | default "football" }}
+{{- $icon := index (dict "nfl" "football" "cfb" "football" "nba" "hoop" "cbb" "basketball" "nhl" "hockey" "soccer" "soccer") $sport | default "football" }}
 {{- $cfh := index (dict "cfb" "Conf" "cbb" "Conf" "soccer" "League") $sport | default "" }}
 {{- with index site.Data $feed -}}
 {{- $d := . }}

@@ -52,7 +52,7 @@
   </tbody>
 </table>
 {{- $pf := $f.prospects -}}
-{{- partial "wintable-close.html" (dict "rows" (len .prospects) "fresh" "cs2" "note" "not age-based: under 20 S-tier maps" "about" (printf "Under 20 S-tier maps, 1,000+ rounds in the last year, any level. FV: projected rating next year (%s), 50 = average tier-1 starter. T1%%: chance of 20+ S-tier maps within a year." $pf.keep)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .prospects) "fresh" "cs2" "note" (printf "updated %s" $date) "about" (printf "Not age-based: under 20 S-tier maps, 1,000+ rounds in the last year, any level. FV: projected rating next year (%s), 50 = average tier-1 starter. T1%%: chance of 20+ S-tier maps within a year." $pf.keep)) -}}
 {{- else if eq $view "values" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: transfer values") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,xTV,RWA,Age" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk cs__table">

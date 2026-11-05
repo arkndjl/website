@@ -5,7 +5,7 @@
        College tiles are coloured by FV on the team builder's ramp (cfbbuilder.html FVT); the pro sports by the
        grade's percentile at the position league-wide, on the same ramp, so a tile reads the same way on every page. */ -}}
 {{- $sport := .Get "sport" | default "cfb" -}}
-{{- $icon := cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football")) -}}
+{{- $icon := cond (eq $sport "nba") "hoop" (cond (eq $sport "cbb") "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football"))) -}}
 {{- $about := dict
       "cfb" "ESPN keeps no college depth charts, so the order is playing time this season within team and position: PFN snaps, and for FBS backs and receivers ESPN box-score touches and catches. Each room runs three deep at every starting spot (QB 1, RB 1, WR 3, TE 1, OL 5, EDGE 2, DT 2, LB 2, CB 3, S 2); players with no snaps yet follow, best FV first. The grade is the board's college WAA a season at a full-time snap share, shrunk toward the position's replacement line with 300 snaps; tiles are coloured by its percentile at the position among players with 50+ snaps."
       "cbb" "No college depth charts, so the order is minutes a game: this season once a player has a line, before that his projected share of the team's minutes (the CBB roster prior). Top five start, 6-10 are the 2nd unit, 11-15 the 3rd. The grade is Barttorvik BPM this season and last at half weight, by minutes, shrunk to -6 with 240 minutes; tiles are coloured by its percentile among guards, forwards or centers with 60+ minutes."

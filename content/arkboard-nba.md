@@ -16,7 +16,7 @@ cover = "/og/nba.png"
 {{< pctl sport="nba" icon="hoop" title="projections :: VORX and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< nbasurplus title="contract value :: surplus over salary" tab="contract value" >}}
 {{< rookies sport="nba" icon="hoop" title="rookies :: VORX, XPM and surplus against draft slot and FV" tab="rookies" >}}
-{{< backupwatch sport="nba" title="backup watch :: 2nd/3rd string producing above the starter" tab="backup watch" >}}
+{{< backupwatch sport="nba" title="backup watch :: 2nd/3rd string out-producing a starter (XPM)" tab="backup watch" >}}
 {{< arklist sport="nba" title="ARKLIST :: NBA" tab="ARKLIST" >}}
 {{< nbagames title="games" tab="games" >}}
 {{< nbagametable title="game table" tab="game table" >}}

@@ -51,8 +51,8 @@
   {{- end }}
   </tbody>
 </table>
-  {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "nfl_breakouts" "note" (printf "week %v · ranked by WAR over expected · updated %s" $w $date)
-        "about" (printf "Young: a rookie, a player in his first three seasons, or %v and under. A game's WAR is the board's (WAR through the week minus WAR before it). xWAR = his WAR rate a snap before the week (the projections' rate: last three seasons at 1 / .7 / .5, shrunk toward his position group, then updated with the season so far; %s) x his snaps in the game. +WAR = WAR - xWAR, the rank. z = +WAR over the spread of a game's WAR over expected at his snaps, fit on every player-week this season; z is large on few snaps. Top %v a week with %v+ snaps." $d.age $rk $d.top $d.min)) }}
+  {{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "nfl_breakouts" "note" (printf "week %v · updated %s" $w $date)
+        "about" (printf "Ranked by WAR over expected. Young: a rookie, a player in his first three seasons, or %v and under. A game's WAR is the board's (WAR through the week minus WAR before it). xWAR = his WAR rate a snap before the week (the projections' rate: last three seasons at 1 / .7 / .5, shrunk toward his position group, then updated with the season so far; %s) x his snaps in the game. +WAR = WAR - xWAR, the rank. z = +WAR over the spread of a game's WAR over expected at his snaps, fit on every player-week this season; z is large on few snaps. Top %v a week with %v+ snaps." $d.age $rk $d.top $d.min)) }}
   </div>
   {{- end }}
 </div>

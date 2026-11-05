@@ -9,7 +9,7 @@ Every prospect board's history, graded the way that board grades today, ranked w
           out of sample to 2016, forward after; still in college: his latest season's end), outcome = peak NBA value FV
           (college exits through 2020, six NBA seasons or more)
   hockey  every 2008-19 pick's draft-day grade, fit without his class (data/hockey.json past), outcome = peak NHL WAR FV
-  soccer  past seasons 2013-20, listed players (data/soccer_prospects.json past), outcome = peak market value FV
+  soccer  past seasons 2013-20, listed players (data/soccer_prospects.json past), outcome = peak GAR FV (best three seasons, 22-26)
   tennis  each player once, at his last October as a prospect (data/tennis_prospects_fit.json alltime, held out by birth
           year), ATP and WTA, outcome = peak ranking FV
 A player shows once: CFB and CBB at the draft that followed his last season (Nov 3 2026: a best season ran hot and
@@ -273,7 +273,7 @@ def soccer():
     peaks = best_per_player(R, lambda r: r['name'])
     groups = ['F', 'M', 'D', 'G']
     return {'label': 'Soccer', 'seasons': [min(r['season'] for r in R), max(r['season'] for r in R)], 'groups': groups, 'n': len(R), 'players': len(peaks),
-            'outcome': 'peak market value on the FV scale', 'rows': listed(peaks, groups, lambda r: r['pos'], SOC_ALL), 'check': check(R, peaks, groups, lambda r: r['pos'], SOC_ALL),
+            'outcome': 'peak GAR (best three seasons, ages 22-26) on the FV scale', 'rows': listed(peaks, groups, lambda r: r['pos'], SOC_ALL), 'check': check(R, peaks, groups, lambda r: r['pos'], SOC_ALL),
             'complete': 'every player graded 50+ at his youngest season (the past list also carries lower grades who reached 55+, left out here)'}
 
 

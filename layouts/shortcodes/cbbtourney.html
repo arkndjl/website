@@ -36,7 +36,7 @@
 </table>
 {{- $about := "" -}}
 {{- with $f }}{{ $about = printf "Each simulation plays out the rest of the regular season, every conference tournament (its automatic bid to the winner), the committee and the bracket, every game from the game model. The committee is fit on the %d fields from 2015 to 2026 on two inputs, our power rating and wins above bubble (a 45th-rated team's expected record against the same schedule): held out a season at a time it picks %.0f%% of the at-large teams and puts %.0f%% of the field on the right seed line, %.1f lines off on average. From March 1 its bid odds beat a rating-only committee in log loss (t %.1f), and on Selection Sunday its round-by-round odds beat seed history (t %.1f). Teams in their D-I transition years can't be selected." (len .seasons) (mul .summary.atLargeHit 100) (mul .summary.exactLine 100) .summary.lineErr .summary.tBidMar1 .summary.tRounds }}{{ end -}}
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (cond $d.tourney.bracket "the real bracket" (printf "%v at-large + %v automatic bids" $d.tourney.atLarge $d.tourney.autobids)) "about" $about) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len $rows) "note" (cond $d.tourney.bracket "the real bracket" (printf "%v at-large + %v automatic bids" $d.tourney.atLarge $d.tourney.autobids)) "about" $about) -}}
 {{- end -}}
 {{- end -}}
 {{- define "partials/inline/cbbt-pct.html" -}}
