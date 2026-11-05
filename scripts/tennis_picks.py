@@ -42,6 +42,11 @@ MLCAP = 0.25             # the side's chance at the price: -300 to +300, as ever
 GAPMAX = 0.35            # a gap past this is a bad line (a withdrawal, a wrong player), not a pick
 XS = (0.04, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18)
 LEAK = 0.5               # the share of the open-to-close edge still there at the live price
+# Paper only (Noah, Nov 5 2026): live picks flagged Oct 27-Nov 5 lost to the close (-1.7%, t -4.2, n 76; only .09 of the
+# open-to-close move was left at Novig's price vs the .5 assumed). Picks keep being logged and graded (paper book) but
+# leave the picks board, night cap and Novig paper exchange until the picks flagged since PAPER_FROM beat the close.
+PAPER_FROM = '2026-11-05T15:00:00Z'
+PAPER_BACK = (30, 1.65)  # back live at n graded since PAPER_FROM, clvRet > 0 at t this or more
 CAP = 2.0                # DU a pick, held until live picks grade
 TUNE, HELD = 2025, 2026
 OOF_TUNE = os.environ.get('TENNIS_OOF_TUNE', '1') == '1'
@@ -267,6 +272,8 @@ def live():
     except (OSError, ValueError):
         old = {}
     log = {str(e['id']): e for e in old.get('log', [])}
+    pv0 = [e['clvRet'] for e in log.values() if e.get('clvRet') is not None and not e.get('pass') and e.get('flagged', '') >= PAPER_FROM]
+    paper0 = not (len(pv0) >= PAPER_BACK[0] and sum(pv0) > 0 and (tstat(pv0) or 0) >= PAPER_BACK[1])
     games, board = {}, []
     for g in T.get('matches', []):
         if g.get('state') != 'pre' or g['tip'] <= stamp:
@@ -317,7 +324,7 @@ def live():
                     prev.pop('pass', None)
         if state == 'pick':
             if prev is None:
-                log[str(g['id'])] = {**row, 'units': u, 'flagged': stamp}
+                log[str(g['id'])] = {**row, 'units': u, 'flagged': stamp, **({'paper': True} if paper0 else {})}
             else:
                 prev['now'] = {'mk': 'ml', 'side': side, 'line': None, 'price': o, 'units': u} if side == prev['side'] else None
         else:
@@ -372,15 +379,26 @@ def live():
     rec.update({'clvN': len(cv), 'clvRet': round(sum(cv) / len(cv), 4) if cv else None, 'clvT': tstat(cv)})
     cut = (now - datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:%M:%SZ')
     picks = [e for e in L if e.get('res') is None and e['kick'] > cut]
+    pv = [e['clvRet'] for e in L if e.get('clvRet') is not None and not e.get('pass') and e.get('flagged', '') >= PAPER_FROM]
+    paper = not (len(pv) >= PAPER_BACK[0] and sum(pv) > 0 and (tstat(pv) or 0) >= PAPER_BACK[1])
+    rec['paperSince'] = {'n': len(pv), 'clvRet': round(sum(pv) / len(pv), 4) if pv else None, 'clvT': tstat(pv)}
+    paper_picks = []
+    if paper:
+        paper_picks, picks = picks, []
+        for e in paper_picks:
+            e['paper'] = True                              # open picks already flagged drop off the night cap too
+        for gm in games.values():
+            if gm['state'] == 'pick':
+                gm['state'], gm['units'] = 'paper', 0.0
     recent = [e for e in L if e.get('res') is not None][-12:]
     out = {'sport': 'tennis', 'name': 'Tennis', 'asof': stamp, 'rule': {'on': bool(on), 'x': F['x'], 'k': F['k'], 'leak': LEAK, 'cap': CAP,
-           'held': F.get('heldAtX')}, 'picks': picks, 'withdrawn': [], 'board': sorted(board, key=lambda r: -r['edge'])[:12],
+           'held': F.get('heldAtX')}, 'paper': paper, 'picks': picks, 'paperPicks': paper_picks, 'withdrawn': [], 'board': sorted(board, key=lambda r: -r['edge'])[:12],
            'games': games, 'record': rec, 'recent': recent, 'log': L[-400:]}
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'), allow_nan=False)
     import night_cap      # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night)
     night_cap.apply(['tennis'])
-    print(f"tennis picks: {len(picks)} open, {len(games)} priced at Novig, rule {'on X ' + str(X) if on else 'off'}, record {rec}")
+    print(f"tennis picks: {'PAPER ' + str(len(paper_picks)) if paper else len(picks)} open, {len(games)} priced at Novig, rule {'on X ' + str(X) if on else 'off'}, record {rec}")
 
 
 if __name__ == '__main__':

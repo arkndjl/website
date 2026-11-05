@@ -9,7 +9,7 @@
 {{- range .picks }}{{ $picks = $picks | append . }}{{ end }}
 {{- range .withdrawn }}{{ $wd = $wd | append . }}{{ end }}
 {{- range .board }}{{ $board = $board | append . }}{{ end }}
-{{- $recs = $recs | append (dict "s" .name "r" .record) }}{{ if gt .asof $asof }}{{ $asof = .asof }}{{ end }}
+{{- $recs = $recs | append (dict "s" (cond (.paper | default false) (printf "%s (paper)" .name) .name) "r" .record) }}{{ if gt .asof $asof }}{{ $asof = .asof }}{{ end }}
 {{- end }}{{ end -}}
 {{- $picks = sort $picks "evDU" "desc" -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" "nflprops" "NFL" -}}
