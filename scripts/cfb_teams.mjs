@@ -490,7 +490,8 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const injRow = (tid, p, name) => { const I = injOf(tid); return I[normName(name || p?.name)] || null; };
   const stageOf = (tid, p, name) => injRow(tid, p, name)?.stage || null;
   // listed out on his team's last SEASON_ABSORB reports or more: a long absence, absorbed like a season-ending one
-  const longOut = (tid, p, name) => (injRow(tid, p, name)?.streak ?? 0) >= SEASON_ABSORB;
+  // (or a RotoWire long-term injury: out for weeks by his injury card, scripts/rotowire_history.py)
+  const longOut = (tid, p, name) => (injRow(tid, p, name)?.streak ?? 0) >= SEASON_ABSORB || !!injRow(tid, p, name)?.long;
   const absorbed = (tid, p, name) => { if (!Object.keys(avTeam(tid)).length) return true; const a = avRow(tid, p, name); return !a || a.streak >= SEASON_ABSORB; };
   // With the conference reports' fit (cfb_avail.mjs relPlay, Oct 31 2026): his chance to play against an unlisted
   // player's with his box record, a starter without a box score (line, defense) at a typical starter's
