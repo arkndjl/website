@@ -29,8 +29,7 @@
     <p class="cfb__none" data-rk-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-rk-none hidden>no players match.</p>
   </div>
-  <p class="cfb__dim rookies__def" data-rk-def></p>
-  <div class="win__status"><span data-rk-count></span>
+  <div class="win__status" data-rk-def><span data-rk-count></span>
     <span class="winpager" data-rk-pager hidden>
       <button type="button" class="winpager__btn" data-rk-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
       <span class="winpager__at" aria-live="polite"><span data-rk-page>1</span>/<span data-rk-pages>1</span></span>
@@ -91,7 +90,7 @@
       if (hasPre) c.push({ k: 'pre', l: D.pre.l, t: D.pre.t, num: 1, cls: 'rookies__pre' });
       if (hasPfv) c.push({ k: 'pfv', l: D.pfv.l, t: D.pfv.t, num: 1, cls: 'nbaxpm__ph' });
       if (hasPre) c.push({ k: 'dl', l: 'Δ', t: 'rank by ' + D.pre.l.toLowerCase() + ' minus rank by the view, among the rows shown that have one: + = playing above where he was picked', num: 1, cls: '' });
-      c.push({ k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' });
+      if (season().rows.some(function (r) { return r.age != null; })) c.push({ k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' });   // a view with no ages (CBB top performers) drops the column
       return c;
     }
     function render() {
@@ -154,7 +153,7 @@
       teams(); chips();
     }
     function setup() {
-      defEl.textContent = D.def || '';
+      if (D.def) defEl.title = D.def; else defEl.removeAttribute('title');   // how the view is built: the status bar's hover only (CLAUDE.md: no visible blurbs)
       if (D.seasons.length > 1) $('[data-rk-season]').hidden = false;
       bar.elements.season.innerHTML = D.seasons.map(function (s) { return '<option value="' + s.s + '">' + esc(s.l) + '</option>'; }).join('');
       if (D.min) {

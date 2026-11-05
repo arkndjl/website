@@ -77,11 +77,11 @@
 <div class="win st-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default "polls" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="st-body"><div class="st-grid st-grid--wide">
-  {{- range . }}
+  {{- range . }}{{ $pts := where .rows "pts" "!=" nil }}
     <table class="cfb__table st-mini">
-      <thead><tr><th colspan="5">{{ .name }}{{ with .date }} <span class="cfb__dim">{{ replaceRE `^.*Poll ` "" . }}</span>{{ end }}</th></tr>
-      <tr><th>RK</th><th>Team</th><th>Rec</th><th>Pts</th><th title="last week">Prev</th></tr></thead>
-      <tbody>{{ range .rows }}<tr><td class="cfb__rk">{{ .rk }}</td><td class="st-team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ .n }}{{ with .fpv }} <span class="cfb__dim">({{ . }})</span>{{ end }}</td><td class="cfb__num">{{ .rec }}</td><td class="cfb__num">{{ with .pts }}{{ . }}{{ end }}</td><td class="cfb__num cfb__dim">{{ with .prev }}{{ if gt (int .) 25 }}NR{{ else }}{{ . }}{{ end }}{{ else }}NR{{ end }}</td></tr>{{ end }}</tbody>
+      <thead><tr><th colspan="{{ if $pts }}5{{ else }}4{{ end }}">{{ .name }}{{ with .date }} <span class="cfb__dim">{{ replaceRE `^.*(Poll|Rankings|Top 25) ` "" . }}</span>{{ end }}</th></tr>
+      <tr><th>RK</th><th>Team</th><th>Rec</th>{{ if $pts }}<th>Pts</th>{{ end }}<th title="last week">Prev</th></tr></thead>
+      <tbody>{{ range .rows }}<tr><td class="cfb__rk">{{ .rk }}</td><td class="st-team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ .n }}{{ with .fpv }} <span class="cfb__dim">({{ . }})</span>{{ end }}</td><td class="cfb__num">{{ .rec }}</td>{{ if $pts }}<td class="cfb__num">{{ with .pts }}{{ . }}{{ end }}</td>{{ end }}<td class="cfb__num cfb__dim">{{ with .prev }}{{ if gt (int .) 25 }}NR{{ else }}{{ . }}{{ end }}{{ else }}NR{{ end }}</td></tr>{{ end }}</tbody>
     </table>
   {{- end }}
   </div></div>

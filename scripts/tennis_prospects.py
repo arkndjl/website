@@ -1133,6 +1133,11 @@ def build():
             del r['espn'], r['wd'], r['dob']
         out[tour] = {'board': rows, 'pool': len(X), 'ta': nta}
         print(tour, len(rows), 'prospects,', nta, 'Tennis Abstract pages;', [(r['name'], r['fv'], r['rank']) for r in rows[:8]])
+    try:    # every flag the board shows (static/img/flags/<iso2>.png), so a new country doesn't 404
+        import soccer_faces
+        soccer_faces.fetch_flags({r.get('nat') for t in out.values() if isinstance(t, dict) for r in t.get('board', [])} - {None, ''})
+    except Exception as e:  # noqa: BLE001
+        print('flags skipped:', e)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print('wrote', OUT)
 

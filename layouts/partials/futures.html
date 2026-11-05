@@ -38,11 +38,10 @@
   <div class="cfbm__body">
     {{- range $sp := slice "nba" "nfl" }}{{ with index $fit $sp }}
     {{- $e := (index .grid.raw.cuts 0).all }}
-    <p class="cfb__dim"><b>{{ upper $sp }}</b>: {{ if and $e.tSeason (ge $e.tSeason 2.0) (gt .rule.held.roi 0.0) }}<b>beats the line</b>{{ else }}<b>no proven edge</b> (needs t 2+ by season and a held-out profit){{ end }}. Tuning {{ index .tune 0 }}-{{ index .tune 1 }}, held out {{ index .held 0 }}-{{ index .held 1 }}. Held-out b {{ printf "%.2f" .accuracy.held.b }} (t {{ printf "%.1f" .accuracy.held.bT }}). Bets shrunk to line + {{ printf "%.2f" .w }} x (ours - line) before EVs; within-season return correlation {{ with (index .grid.raw.cuts 0).all.rho }}{{ printf "%.2f" . }}{{ end }}, so {{ (index .grid.raw.cuts 0).all.n }} bets count as {{ with (index .grid.raw.cuts 0).all.nEff }}{{ printf "%.0f" . }}{{ end }}.</p>
+    <p class="cfb__dim"><b>{{ upper $sp }}</b> {{ if and $e.tSeason (ge $e.tSeason 2.0) (gt .rule.held.roi 0.0) }}<b>beats the line</b>{{ else }}<b>no proven edge</b>{{ end }} · tuning {{ index .tune 0 }}-{{ index .tune 1 }} · held out {{ index .held 0 }}-{{ index .held 1 }} · held-out b {{ printf "%.2f" .accuracy.held.b }} (t {{ printf "%.1f" .accuracy.held.bT }}) · bet = line + {{ printf "%.2f" .w }} x (ours - line) · rho {{ with (index .grid.raw.cuts 0).all.rho }}{{ printf "%.2f" . }}{{ end }} · {{ (index .grid.raw.cuts 0).all.n }} bets = {{ with (index .grid.raw.cuts 0).all.nEff }}{{ printf "%.0f" . }}{{ end }} effective</p>
     {{- end }}{{ end }}
-    <p class="cfb__dim">College football and basketball: {{ $fit.excluded.cfb }}.</p>
   </div>
-  <div class="win__status"><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }} team-seasons</span><span class="cfb__asof">lines as of {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="An edge needs t 2+ by season and a held-out profit. Bets are shrunk toward the line before EVs; rho is the within-season return correlation, which sets the effective number of bets. College football and basketball: {{ $fit.excluded.cfb }}."><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }} team-seasons</span><span class="cfb__asof">lines as of {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}
 {{- $rows := slice }}{{ $asof := "" }}{{ $books := slice }}
