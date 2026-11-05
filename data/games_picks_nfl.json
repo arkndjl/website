@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-05T17:30:42Z",
+ "asof": "2026-11-05T17:44:05Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -228,6 +228,8 @@
    "tm": 41.0,
    "flagged": "2026-11-03T10:48:02Z",
    "close": -3.5,
+   "unitsRaw": 2.5,
+   "unitsCap": 2.25,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -237,9 +239,7 @@
     "units": 1.75,
     "unitsRaw": 2.0,
     "unitsCap": 1.75
-   },
-   "unitsRaw": 2.5,
-   "unitsCap": 2.25
+   }
   },
   {
    "id": "2026_09_NYJ_KC",
@@ -322,9 +322,9 @@
    "tm": 51.4,
    "flagged": "2026-11-03T10:48:02Z",
    "close": -5.5,
-   "now": null,
    "unitsRaw": 0.75,
-   "unitsCap": 0.5
+   "unitsCap": 0.5,
+   "now": null
   },
   {
    "id": "2026_09_ARI_SEA",
@@ -382,6 +382,8 @@
    "tm": 41.3,
    "flagged": "2026-11-03T17:22:24Z",
    "close": -5.5,
+   "unitsRaw": 0.75,
+   "unitsCap": 0.5,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -391,9 +393,7 @@
     "units": 2.0,
     "unitsRaw": 2.25,
     "unitsCap": 2.0
-   },
-   "unitsRaw": 0.75,
-   "unitsCap": 0.5
+   }
   },
   {
    "id": "2026_09_TB_CHI",
@@ -470,7 +470,7 @@
    "edge": 2.2,
    "x": 1.5,
    "why": "no edge at -108",
-   "m": 7.5,
+   "m": 7.9,
    "tm": 49.3
   },
   {
@@ -530,7 +530,7 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 1.4,
    "x": 4.0,
    "why": "edge under 4",
@@ -563,10 +563,10 @@
    "side": "away",
    "line": 3.5,
    "price": -115.0,
-   "edge": 1.1,
+   "edge": 0.4,
    "x": 4.0,
    "why": "edge under 4",
-   "m": 2.4,
+   "m": 3.1,
    "tm": 45.9
   }
  ],
@@ -647,7 +647,7 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -720,7 +720,7 @@
    "side": "away",
    "line": 3.5,
    "price": -115.0,
-   "edge": 1.1,
+   "edge": 0.4,
    "ev": null,
    "units": 0.0,
    "home": "NE",
@@ -804,25 +804,25 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1828,
+  "snapshots": 1839,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 780,
+    "clvN": 784,
     "clvRet": -0.0301,
-    "clvT": -12.06,
+    "clvT": -12.07,
     "clv": 0.3,
-    "beat": 0.212,
-    "still": 0.738
+    "beat": 0.21,
+    "still": 0.74
    },
    {
     "when": "6-24h",
-    "clvN": 79,
-    "clvRet": -0.0537,
-    "clvT": -7.07,
+    "clvN": 80,
+    "clvRet": -0.0527,
+    "clvT": -6.98,
     "clv": 0.28,
-    "beat": 0.139,
-    "still": 0.861
+    "beat": 0.138,
+    "still": 0.863
    },
    {
     "when": "1-6h",
