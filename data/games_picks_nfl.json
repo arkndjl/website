@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-05T18:23:25Z",
+ "asof": "2026-11-05T18:55:49Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -168,9 +168,9 @@
     "line": 52.5,
     "price": 102.0,
     "ev": 0.158,
-    "units": 4.5,
+    "units": 4.75,
     "unitsRaw": 5.0,
-    "unitsCap": 4.5
+    "unitsCap": 4.75
    },
    "unitsRaw": 4.5,
    "unitsCap": 4.25
@@ -234,11 +234,11 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": 160.0,
-    "ev": 0.176,
-    "units": 1.75,
-    "unitsRaw": 2.0,
-    "unitsCap": 1.75
+    "price": 163.0,
+    "ev": 0.19,
+    "units": 2.25,
+    "unitsRaw": 2.5,
+    "unitsCap": 2.25
    }
   },
   {
@@ -298,7 +298,14 @@
    "flagged": "2026-11-04T01:07:06Z",
    "betTo": 45.5,
    "close": 44.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 44.5,
+    "price": -104.0,
+    "ev": 0.058,
+    "units": 0.5
+   }
   },
   {
    "id": "2026_09_DAL_IND",
@@ -390,9 +397,9 @@
     "line": null,
     "price": 203.0,
     "ev": 0.16,
-    "units": 2.0,
-    "unitsRaw": 2.25,
-    "unitsCap": 2.0
+    "units": 1.75,
+    "unitsRaw": 2.0,
+    "unitsCap": 1.75
    }
   },
   {
@@ -659,10 +666,10 @@
    "mk": "ml",
    "side": "home",
    "line": null,
-   "price": 160.0,
-   "ev": 0.176,
+   "price": 163.0,
+   "ev": 0.19,
    "edge": 5.6,
-   "units": 2.0,
+   "units": 2.5,
    "home": "PHI",
    "away": "NYG",
    "state": "pick"
@@ -740,13 +747,13 @@
    "state": "pick"
   },
   "2026_09_BUF_MIN": {
-   "mk": "ml",
+   "mk": "spread",
    "side": "home",
-   "line": null,
-   "price": 170.0,
-   "ev": 0.221,
+   "line": -3.5,
+   "price": -100.0,
+   "ev": 0.172,
    "edge": 5.6,
-   "units": 4.0,
+   "units": 5.0,
    "home": "MIN",
    "away": "BUF",
    "state": "pick"
@@ -804,16 +811,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1860,
+  "snapshots": 1866,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 792,
-    "clvRet": -0.0304,
-    "clvT": -12.26,
+    "clvN": 796,
+    "clvRet": -0.0305,
+    "clvT": -12.34,
     "clv": 0.29,
-    "beat": 0.208,
-    "still": 0.742
+    "beat": 0.207,
+    "still": 0.744
    },
    {
     "when": "6-24h",
@@ -1951,7 +1958,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-05": {
-    "raw": 21.25,
+    "raw": 20.0,
     "scale": 1.0,
     "down": 1.0
    },
@@ -1960,15 +1967,15 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 45.5,
-    "scale": 0.8791
-   },
-   "2026-11-08": {
     "raw": 42.25,
     "scale": 0.9467
    },
+   "2026-11-08": {
+    "raw": 40.75,
+    "scale": 0.9816
+   },
    "2026-11-09": {
-    "raw": 12.5,
+    "raw": 13.0,
     "scale": 1.0
    }
   }
