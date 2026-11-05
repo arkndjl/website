@@ -30,6 +30,10 @@ UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 ALIAS = {'RasenBallsport Leipzig': 'RB Leipzig', 'Hamburger SV': 'Hamburg SV', 'Inter': 'Internazionale',
          'AC Milan': 'AC Milan', 'Athletic Club': 'Athletic Club', 'Paris FC': 'Paris FC',
          'Racing Santander': 'Racing Santander', 'Real Sociedad': 'Real Sociedad'}
+# ESPN team id -> Transfermarkt club id, for clubs ESPN has no crest for and whose ESPN name the 'tm' map (prospect
+# clubs only) does not hold; soccer_games.tm_crest reads it first. Ids checked on transfermarkt.com (Nov 2026).
+ESPN_TM = {'21631': 715,      # Bohemians 1905 (Czech Liga): FC Bohemians Praha 1905
+           '132427': 6456}    # GKS Katowice (Ekstraklasa)
 STOP = set('fc cf afc sc sv kv sk ac as ssc rc ud cd sd ca club de del la le cfc fk nk hnk bk if ik osc ogc rcd '
            'vfb vfl tsg bsc spvgg ssv fsv calcio balompie futbol football us'.split())
 

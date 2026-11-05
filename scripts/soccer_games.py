@@ -1545,6 +1545,8 @@ def tm_crest(tid):
         tm = json.load(open(os.path.join(ROOT, 'data', 'soccer_logos.json'))).get('tm') or {}
     except Exception:
         return None
+    if str(tid) in SL.ESPN_TM:     # pinned by hand (no ESPN crest, name not in the prospect clubs' map)
+        return D.get(f'https://tmssl.akamaized.net/images/wappen/head/{SL.ESPN_TM[str(tid)]}.png', raw=True)
     t = (D.get(f'https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams/{tid}') or {}).get('team') or {}
     want = {SL.norm(n) for n in (t.get('displayName'), t.get('shortDisplayName'), t.get('location')) if n}
     want.discard('')
