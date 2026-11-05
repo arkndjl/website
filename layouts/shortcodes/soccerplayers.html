@@ -63,7 +63,7 @@
         <th data-sort="gar" data-num title="goals above replacement (the fringe of the squads at his position), on one scale across the big five: his league's strength counts">GAR</th>
         <th data-sort="par" data-num title="league points above replacement: GAR x points per goal of difference">PAR</th>
         <th data-sort="gar90" data-num title="goals above replacement a 90 minutes">/90</th>
-        <th data-sort="pj" data-num title="projected GAR next season, if he plays in the big five: this season at full-season pace, the two seasons before, minutes, age and position">Proj</th>
+        <th data-sort="pj" data-num title="projected GAR next season, if he plays in the big five: this season at full-season pace, the two seasons before, minutes, age and position">1Y</th>
         <th data-sort="p3" data-num title="projected GAR over the next three seasons (a season out of the big five counts 0)">3Y</th>
         <th data-sort="off" data-num title="attack part of GAR before replacement: his npxG, xA and xGBuildup at their weights">Off</th>
         <th data-sort="def" data-num title="defence part before replacement: team xG against with him on (keepers: goals saved vs xG faced)">Def</th>
@@ -144,6 +144,15 @@
     var big = p.mv >= 60, cls = big ? 'cfb__dim' : p.gap < 0 ? 'cfb__down' : '';
     return '<span' + (cls ? ' class="' + cls + '"' : '') + ' title="' + (p.gap > 0 ? '+' : '') + Math.round(100 * p.gap / Math.max(p.mv, .1)) + '% of the Transfermarkt value' + (big ? '; above 60m the gap is a weak signal' : '') + '">' + (p.gap > 0 ? '+' : '') + eur(p.gap) + '</span>';
   }
+  // board state in the hash as #<tab>:<state> (wintabs.html opens <tab>); a board reads only its own tab's state and
+  // writes only while on screen, so two boards on one page don't trade filters (Nov 5 2026)
+  window.__hp = window.__hp || function (win) { var x = location.hash.slice(1), i = x.indexOf(':'), t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    if (i < 0) return new URLSearchParams(x.indexOf('=') >= 0 ? x : '');
+    return new URLSearchParams(!tab || decodeURIComponent(x.slice(0, i)) === tab ? x.slice(i + 1) : ''); };
+  window.__hw = window.__hw || function (win, s) { if (!win.offsetParent) return; var t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    history.replaceState(null, '', tab ? '#' + tab + (s ? ':' + s : '') : s ? '#' + s : location.pathname + location.search); };
   function init() { [].forEach.call(document.querySelectorAll('[data-soccerpl]'), function (win) {
     if (win.dataset.ready) return; win.dataset.ready = 1;
     var stats = win.dataset.view === 'stats', KEY = stats ? 'nx90' : 'gar';
@@ -153,18 +162,18 @@
     var PER = 50, data = null, pos = '', sortKey = 'rk', dir = 1, page = 0;
     function chips() { [].forEach.call(bar.querySelectorAll('[data-pos]'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
     function readHash() {
-      var h = new URLSearchParams(location.hash.slice(1)), s = h.get('season');
+      var h = __hp(win), s = h.get('season');
       bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
       pos = h.get('pos') || ''; bar.elements.lg.value = h.get('lg') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.nat.value = h.get('nat') || '';
       bar.elements.q.value = h.get('q') || ''; bar.elements.mp.value = h.get('mp') || ''; chips();
     }
     function writeHash() {
-      var h = new URLSearchParams(location.hash.slice(1)), e = bar.elements;
+      var h = __hp(win), e = bar.elements;
       ['season', 'lg', 'team', 'nat', 'q', 'mp', 'pos'].forEach(function (k) { h.delete(k); });
       if (e.season.value !== win.dataset.cur) h.set('season', e.season.value);
       if (e.lg.value) h.set('lg', e.lg.value); if (e.mp.value) h.set('mp', e.mp.value); if (pos) h.set('pos', pos);
       if (e.team.value) h.set('team', e.team.value); if (e.nat.value) h.set('nat', e.nat.value); if (e.q.value.trim()) h.set('q', e.q.value.trim());
-      var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+      var s = h.toString(); __hw(win, s);
     }
     function render() {
       if (!data) return;
@@ -207,12 +216,12 @@
       ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
     }
     function teams() {
-      var sel = bar.elements.team, lg = bar.elements.lg.value, want = sel.value || new URLSearchParams(location.hash.slice(1)).get('team') || '', seen = {};
+      var sel = bar.elements.team, lg = bar.elements.lg.value, want = sel.value || __hp(win).get('team') || '', seen = {};
       data.players.forEach(function (p) { if (lg === 'all' || (lg ? p.lg === lg : !p.more)) seen[p.team] = 1; });
       sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
       sel.value = seen[want] ? want : '';
       // nations of the players in the league picked, by country name
-      var ns = bar.elements.nat, nw = ns.value || new URLSearchParams(location.hash.slice(1)).get('nat') || '', nn = {};
+      var ns = bar.elements.nat, nw = ns.value || __hp(win).get('nat') || '', nn = {};
       data.players.forEach(function (p) { if (p.nat && (lg === 'all' || (lg ? p.lg === lg : !p.more))) nn[p.nat] = CTRY[p.nat] || p.nat; });
       ns.innerHTML = '<option value="">any</option>' + Object.keys(nn).sort(function (a, b) { return nn[a].localeCompare(nn[b]); }).map(function (c) { return '<option value="' + esc(c) + '">' + esc(nn[c]) + '</option>'; }).join('');
       ns.value = nn[nw] ? nw : '';

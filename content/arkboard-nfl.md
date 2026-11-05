@@ -11,8 +11,8 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAA/WAR,projections,QB value,contract value,specialists,rookies,breakouts,ARKLIST|rosters:depth chart,personnel,backup watch|games:games,game table|teams:ARK Ranking,season odds,team WAR,offense,defense,formations,special teams" side="true" label="NFL views" >}}
-{{< nflwar title="NFL WAA/WAR :: leaderboards" tab="WAA/WAR" >}}
+{{< wintabs groups="players:WAR leaders,projections,QB value,contract value,specialists,rookies,breakouts,ARKLIST|rosters:depth chart,personnel,backup watch|games:games,game table|teams:ARK Ranking,season odds,team WAR,offense,defense,formations,special teams" side="true" label="NFL views" >}}
+{{< nflwar title="WAR leaders :: NFL" tab="WAR leaders" >}}
 {{< pctl sport="nfl" icon="football" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< xaav sport="nfl" title="contract value :: xAAV" tab="contract value" >}}
 {{< nflteamwar title="team WAR :: by position group" tab="team WAR" >}}
@@ -20,7 +20,7 @@ cover = "/og/nfl.png"
 {{< streturners sport="nfl" title="specialists :: returners, yards over expected" tab="specialists" >}}
 {{< rookies sport="nfl" icon="football" title="rookies :: WAR and XV against draft slot" tab="rookies" >}}
 {{< nflbreakouts title="breakouts :: young players, WAR over expected" tab="breakouts" >}}
-{{< backupwatch sport="nfl" title="backup watch :: 2nd/3rd string producing above the starter" tab="backup watch" >}}
+{{< backupwatch sport="nfl" title="backup watch :: 2nd/3rd string out-producing a starter (WAR)" tab="backup watch" >}}
 {{< arklist sport="nfl" title="ARKLIST :: NFL" tab="ARKLIST" >}}
 {{< nflgames title="games" tab="games" >}}
 {{< nflgametable title="game table" tab="game table" >}}

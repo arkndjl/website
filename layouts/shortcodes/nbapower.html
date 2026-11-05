@@ -16,7 +16,7 @@
     <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
     <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
     <th title="possessions a game, expected against an average opponent">Pace</th>
-    <th title="Elo (1505 average)">Elo</th>
+    <th title="Elo ({{ $es := 0.0 }}{{ $en := 0 }}{{ range site.Data.nba_games.power }}{{ $es = add $es (float .elo) }}{{ $en = add $en 1 }}{{ end }}{{ if $en }}{{ printf "%.0f" (div $es $en) }} league average today{{ end }})">Elo</th>
     <th title="market rating: points vs average as earlier closing spreads priced the team">Mkt</th>
     <th title="display only, not part of the rating: the team's players' rest-of-season VORX, median projection (projections tab), summed">Proj</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
@@ -28,7 +28,7 @@
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
-    <td class="cfb__num" data-v="{{ .rating }}">{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     {{- $full := .full | default .rating }}
     <td class="cfb__num" data-v="{{ .inj | default 0 }}">{{ with .inj }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

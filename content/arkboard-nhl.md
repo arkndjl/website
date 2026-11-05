@@ -33,7 +33,7 @@ cover = "/og/nhl.png"
 {{< pctl sport="nhl" icon="hockey" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< xaav sport="nhl" title="contract value :: xAAV" tab="contract value" >}}
 {{< rookies sport="nhl" icon="hockey" title="rookies :: WAR and pWAR against draft slot and FV" tab="rookies" >}}
-{{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
+{{< backupwatch sport="nhl" title="backup watch :: 2nd/3rd string out-producing a starter (HPM)" tab="backup watch" >}}
 {{< arklist sport="nhl" title="ARKLIST :: NHL" tab="ARKLIST" >}}
 {{< depthchart sport="nhl" title="depth chart :: every team" tab="depth chart" >}}
 {{< nhllines title="lines :: 5-on-5 trios, pairs and on/off" tab="lines" >}}

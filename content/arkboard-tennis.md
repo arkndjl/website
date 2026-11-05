@@ -10,9 +10,9 @@ draft = false
 
 {{< winpane title="tennis.exe :: ATP + WTA" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:ATP ARK Ranking,WTA ARK Ranking,ATP serve + return,WTA serve + return|games:matches,results|model:model" side="true" label="Tennis views" >}}
-{{< tennismatches title="matches :: ATP + WTA singles" tab="matches" >}}
-{{< tennismatches view="results" title="results :: the last three days, against the model" tab="results" >}}
+{{< wintabs groups="players:ATP ARK Ranking,WTA ARK Ranking,ATP serve + return,WTA serve + return|games:games,game table|model:model" side="true" label="Tennis views" >}}
+{{< tennismatches title="games :: ATP + WTA singles" tab="games" >}}
+{{< tennismatches view="results" title="game table :: the last three days, against the model" tab="game table" >}}
 {{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ARK Ranking" >}}
 {{< lazytab tab="ATP serve + return" >}}{{< tennisstats tour="atp" title="ATP :: serve + return" tab="ATP serve + return" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA ARK Ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ARK Ranking" >}}{{< /lazytab >}}

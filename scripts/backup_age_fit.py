@@ -20,7 +20,7 @@ errors, t). Coefficients shipped are the full-sample fit.
           only age the college boards carry for everyone). Departures dominate: a senior starter is gone next season.
   nfl     no past seasons on file: borrows the pro sports' fit in standard-deviation units of the gap
   cfb     no past seasons on file: borrows the CBB fit in standard-deviation units of the gap
-The board's live grade for CBB is FV, not BPM, so CBB also ships the SD-unit fit.
+The CBB backup watch grades by BPM (Noah, Nov 5 2026), the history's own units, so CBB ships its own fit.
 """
 import gzip
 import json
@@ -92,14 +92,23 @@ def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn):
 
 
 def cbb_pairs(path):
+    """the live CBB grade (scripts/backup_watch.py cbb_grade): BPM this season and last at half weight, by minutes,
+    shrunk to -6 with 240 minutes; backup and starter need 60 minutes, a gap of 1 BPM"""
     import pandas as pd
     d = pd.read_csv(path, usecols=['pid', 'team', 'year', 'cls', 'gp', 'min_per', 'bpm', 'guard', 'big'])
     d = d.dropna(subset=['bpm', 'min_per', 'cls', 'gp'])
-    K, REP = 20.0, -6.0                                      # BPM shrunk to replacement with 20 games of 30 min shares
-    d['m'] = d.min_per * d.gp / 30.0
-    d['g'] = (d.bpm * d.m + K * REP) / (d.m + K)
+    K, REP, W, MN, GAP = 240.0, -6.0, (1.0, 0.5), 60.0, 1.0
+    d['m'] = d.min_per * 0.4 * d.gp                          # minutes: Min% of 40 a game
     d['grp'] = np.where(d.guard > .5, 'G', np.where(d.big > .5, 'C', 'F'))
     by = {(r.pid, r.year): (r.bpm, r.m) for r in d.itertuples()}
+
+    def grade(pid, y):
+        num = den = mins = 0.0
+        for j, w in enumerate(W):
+            x = by.get((pid, y - j))
+            if x:
+                num += w * x[0] * x[1]; den += w * x[1]; mins += x[1]
+        return (num + K * REP) / (den + K), mins
 
     def fut(pid, y):
         num = den = 0.0
@@ -108,20 +117,24 @@ def cbb_pairs(path):
             if x:
                 num += x[0] * x[1]; den += x[1]
         return (num + K * REP) / (den + K)
+    G = {k: grade(*k) for k in by}
+    d['g'] = [G[(r.pid, r.year)][0] for r in d.itertuples()]
+    d['n'] = [G[(r.pid, r.year)][1] for r in d.itertuples()]
     last = int(d.year.max())
     nxt = {'G': ['G', 'F'], 'F': ['F', 'C', 'G'], 'C': ['C', 'F']}
     out = []
     for (_, y), L in d.groupby(['team', 'year']):
-        if y + H > last:
+        if y + H > last or y - 1 < int(d.year.min()):
             continue
         L = L.sort_values('min_per', ascending=False)
         st = L.iloc[:5]
+        st = st[st.n >= MN]
         for b in L.iloc[5:15].itertuples():
             sg = next((h for h in nxt[b.grp] if (st.grp == h).any()), None)
-            if sg is None:
+            if sg is None or b.n < MN:
                 continue
             s = st[st.grp == sg].sort_values('g').iloc[0]
-            if b.g <= s.g:
+            if b.g - s.g < GAP:
                 continue
             out.append((int(y), b.g - s.g, float(s.cls - b.cls), fut(b.pid, y) - fut(s.pid, y)))
     return out
@@ -186,17 +199,14 @@ def main():
     pros = [F[s]['z'] for s in ('nba', 'nhl', 'soccer')]
     zp = {k: float(np.mean([z[k] for z in pros])) for k in ('a', 'b', 'c')}
     out = {}
-    for s in ('nba', 'nhl', 'soccer'):          # own fit, in the grade's units
+    for s in ('nba', 'nhl', 'soccer', 'cbb'):    # own fit, in the grade's units
         f = F[s]
-        out[s] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'year', 'src': 'fit',
+        out[s] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'class' if s == 'cbb' else 'year', 'src': 'fit',
                   **{k: f[k] for k in ('n', 'held', 'seasons', 't')}}
-    for s, z, src, unit in (('nfl', zp, 'pros', 'year'), ('cbb', F['cbb']['z'], 'fit-sd', 'class'),
-                            ('cfb', F['cbb']['z'], 'cbb', 'class')):
+    for s, z, src, unit in (('nfl', zp, 'pros', 'year'), ('cfb', F['cbb']['z'], 'cbb', 'class')):
         sd = live_sd(s) or (old['sports'].get(s) or {}).get('sd') or 1.0
         out[s] = {'a': round(z['a'] * sd, 5), 'b': round(z['b'], 4), 'c': round(z['c'] * sd, 5), 'unit': unit, 'src': src,
                   'sd': round(sd, 4)}
-        if s == 'cbb':
-            out[s].update({k: F['cbb'][k] for k in ('n', 'held', 'seasons', 't')})
     for s, f in F.items():
         print(f"{s:7s} pairs {f['n']:5d} held {f['held']:5d} mse {f['mse_gap']:.5g} -> {f['mse_age']:.5g} t {f['t']:+.2f}  "
               f"a {f['a']:+.4f} b {f['b']:.3f} c {f['c']:+.5f} / yr")

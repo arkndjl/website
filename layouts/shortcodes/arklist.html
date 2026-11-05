@@ -22,7 +22,7 @@
 {{- $n := 0 }}{{ range $lists }}{{ $n = add $n (len .) }}{{ end -}}
 {{- /* coaches (college football): the staff board's head coaches and coordinators, one row per name */ -}}
 {{- $coaches := slice -}}
-{{- if and (isset $lists "college-football") (ne $only "prospects") }}{{ with site.Data.cfb_teams }}{{ range .coaches }}{{ $c := . }}{{ range split .name " / " }}{{ $coaches = $coaches | append (dict "n" . "t" $c.team "r" $c.role "l" ($c.logo | default "") "p" ($c.photo | default "") "s" $c.score) }}{{ end }}{{ end }}{{ end }}{{ end -}}
+{{- if isset $lists "college-football" }}{{ with site.Data.cfb_teams }}{{ range .coaches }}{{ $c := . }}{{ range split .name " / " }}{{ $coaches = $coaches | append (dict "n" . "t" $c.team "r" $c.role "l" ($c.logo | default "") "p" ($c.photo | default "") "s" $c.score) }}{{ end }}{{ end }}{{ end }}{{ end -}}
 {{- /* the prospect boards live in site data, not static files: their rows ride along only when the list has a name */ -}}
 {{- $inline := dict -}}
 {{- with index $lists "hockey-prospects" }}{{ with site.Data.hockey }}{{ $hk := slice }}{{ range .board }}{{ $hk = $hk | append (dict "n" .name "t" .club "pos" .pos "fv" .fv "d" 0 "ph" (.ph | default "") "lo" (index site.Data.hockey_logos (printf "%s|%s" (.league | default "") (.club | default "")) | default "")) }}{{ end }}{{ range .pipe }}{{ $hk = $hk | append (dict "n" .name "t" .team "pos" .pos "fv" .fv "d" .year "ph" (.ph | default "") "lo" (printf "/img/nhl/%s.png" (lower (.team | default "")))) }}{{ end }}{{ $inline = merge $inline (dict "hk" $hk) }}{{ end }}{{ end -}}

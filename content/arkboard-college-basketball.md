@@ -27,7 +27,7 @@ cover = "/og/college-basketball.png"
 {{< rookies sport="cbb" src="data/cbb/breakouts.json" icon="basketball" title="breakout watch :: 1st-2nd yr, over the preseason projection" tab="breakouts" >}}
 {{< /lazytab >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
-{{< backupwatch sport="cbb" title="backup watch :: 2nd/3rd string graded above a starter (FV)" tab="backup watch" >}}
+{{< backupwatch sport="cbb" title="backup watch :: 2nd/3rd string out-producing a starter (BPM)" tab="backup watch" >}}
 {{< cbbmock mode="pred" title="predictive mock :: where they go, 2 rounds" tab="predictive mock" >}}
 {{< cbbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 2 rounds" tab="blended mock" >}}
 {{< cbbmock mode="conv" title="conviction mock :: slot + what the market misprices, 2 rounds" tab="conviction mock" >}}
@@ -134,7 +134,7 @@ cover = "/og/college-basketball.png"
 | 20 | [Morez Johnson Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Morez%20Johnson%20Jr.&t=Michigan) | 45 | [Michigan](https://barttorvik.com/team.php?team=Michigan&year=2026) |
 | 21 | [Henri Veesaar](https://barttorvik.com/playerstat.php?year=2026&p=Henri%20Veesaar&t=North%20Carolina) | 45 | [North Carolina](https://barttorvik.com/team.php?team=North%20Carolina&year=2026) |
 | 22 | [Joshua Jefferson](https://barttorvik.com/playerstat.php?year=2026&p=Joshua%20Jefferson&t=Iowa%20St.) | 45 | [Iowa St.](https://barttorvik.com/team.php?team=Iowa%20St.&year=2026) |
-| 23 | [Chris Cenac Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Chris%20Cenac%20Jr&t=Houston) | 40+ | [Houston](https://barttorvik.com/team.php?team=Houston&year=2026) |
+| 23 | [Chris Cenac Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Chris%20Cenac%20Jr.&t=Houston) | 40+ | [Houston](https://barttorvik.com/team.php?team=Houston&year=2026) |
 | 24 | [Ebuka Okorie](https://barttorvik.com/playerstat.php?year=2026&p=Ebuka%20Okorie&t=Stanford) | 40+ | [Stanford](https://barttorvik.com/team.php?team=Stanford&year=2026) |
 | 25 | [Christian Anderson](https://barttorvik.com/playerstat.php?year=2026&p=Christian%20Anderson&t=Texas%20Tech) | 40+ | [Texas Tech](https://barttorvik.com/team.php?team=Texas%20Tech&year=2026) |
 | 26 | [Nate Ament](https://barttorvik.com/playerstat.php?year=2026&p=Nate%20Ament&t=Tennessee) | 40+ | [Tennessee](https://barttorvik.com/team.php?team=Tennessee&year=2026) |

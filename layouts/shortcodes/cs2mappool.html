@@ -28,5 +28,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len $rows) "note" "map win % vs the average top-20 team · source: bo3.gg" "about" "Team map rating from every bo3.gg map since Jun 2020: a team Elo plus a team x map offset, both moved on round share; an offset starts at 0 and moves slowly, so a map a team rarely plays stays near its overall level. Shown as the chance to win that map against the average top-20 team (the rating's logit x 2.43, the map-win scale fit on 124k maps). Pool = maps above 3% of pro maps in the last 90 days. Hover a cell for maps played.") -}}
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len $rows) "note" "source: bo3.gg" "about" "Map win % vs the average top-20 team. Team map rating from every bo3.gg map since Jun 2020: a team Elo plus a team x map offset, both moved on round share; an offset starts at 0 and moves slowly, so a map a team rarely plays stays near its overall level. Shown as the chance to win that map against the average top-20 team (the rating's logit x 2.43, the map-win scale fit on 124k maps). Pool = maps above 3% of pro maps in the last 90 days. Hover a cell for maps played.") -}}
 {{- end }}{{ end -}}

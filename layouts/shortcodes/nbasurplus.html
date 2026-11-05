@@ -54,6 +54,15 @@
 </div>
 <script>
 (function () {
+  // board state in the hash as #<tab>:<state> (wintabs.html opens <tab>); a board reads only its own tab's state and
+  // writes only while on screen, so two boards on one page don't trade filters (Nov 5 2026)
+  window.__hp = window.__hp || function (win) { var x = location.hash.slice(1), i = x.indexOf(':'), t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    if (i < 0) return new URLSearchParams(x.indexOf('=') >= 0 ? x : '');
+    return new URLSearchParams(!tab || decodeURIComponent(x.slice(0, i)) === tab ? x.slice(i + 1) : ''); };
+  window.__hw = window.__hw || function (win, s) { if (!win.offsetParent) return; var t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    history.replaceState(null, '', tab ? '#' + tab + (s ? ':' + s : '') : s ? '#' + s : location.pathname + location.search); };
   var win = document.querySelector('[data-nbasur]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
   var bar = win.querySelector('[data-ns-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-ns-count]'), none = win.querySelector('[data-ns-none]'), loading = win.querySelector('[data-ns-loading]'),
@@ -68,15 +77,15 @@
   function m(x) { return x == null ? '' : x.toFixed(1); }
   function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {
-    var h = new URLSearchParams(location.hash.slice(1));
+    var h = __hp(win);
     view = h.get('cview') || ''; if (['', 's', 'w'].indexOf(view) < 0) view = '';
     bar.elements.team.value = h.get('cteam') || ''; bar.elements.q.value = h.get('cq') || ''; bar.elements.age.value = h.get('cage') || ''; chips();
   }
   function writeHash() {
-    var h = new URLSearchParams(location.hash.slice(1)), e = bar.elements;
+    var h = __hp(win), e = bar.elements;
     ['cview', 'cteam', 'cage', 'cq'].forEach(function (k) { h.delete(k); });
     if (view) h.set('cview', view); if (e.team.value) h.set('cteam', e.team.value); if (e.age.value) h.set('cage', e.age.value); if (e.q.value.trim()) h.set('cq', e.q.value.trim());
-    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+    var s = h.toString(); __hw(win, s);
   }
   function render() {
     if (!data) return;

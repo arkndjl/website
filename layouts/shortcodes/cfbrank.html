@@ -61,7 +61,7 @@
       {{- if $tal }}<th title="roster talent (projected starters by FV), points">Talent</th>{{ end }}
       <th title="special teams, points">ST</th>
       {{- if $res }}<th title="record and scoring margin to date, opponent-unadjusted (kept: predicted out of sample), points">Results</th>{{ end }}
-      {{- if .confUsed }}<th title="conference tier: Power 4 (+ Notre Dame) vs Group of 5; corrects Elo and efficiency (few games link the conferences), points">Conf</th>{{ end }}
+      {{- if .confUsed }}<th title="conference tier: Power 4 (+ Notre Dame) vs Group of 5; corrects Elo and efficiency (few games link the conferences), points">Tier</th>{{ end }}
       {{- if .ctlUsed }}<th title="game control: how much of each game a team spent with the win in hand (win chance from score and clock, averaged over the game), opponent-adjusted, carried across seasons, points">Control</th>{{ end }}
       <th title="other inputs kept by the game model (returning WAR, 4th-down aggressiveness, ...), points">Situ</th>
       {{- if $staff }}<th title="head coach / coordinator scores, points">Staff</th>{{ end }}
@@ -101,7 +101,7 @@
     </div>
     <div class="cfbm__body">
       {{- with $ev.inputs }}
-      <p class="cfbm__h">Inputs, fit {{ $ev.trainSeason }}, scored {{ $ev.testSeason }} <span class="cfb__dim">(n = {{ $ev.nTest }} FBS games; log loss on the winner, lower = better)</span></p>
+      <p class="cfbm__h" title="n = {{ $ev.nTest }} FBS games; log loss on the winner, lower = better">Inputs, fit {{ $ev.trainSeason }}, scored {{ $ev.testSeason }}</p>
       <table class="cfb__table cfbm__t">
         <thead><tr><th>Input</th><th title="share of score spread across teams from this input">Weight</th><th title="1 SD of this input across teams, points">SD pts</th><th title="this input + home field and travel only">Alone: log loss</th><th>Alone: winners</th><th title="full model minus this input: Δ log loss (t paired by game); > 0 = input helps">Without it</th></tr></thead>
         <tbody>
@@ -116,7 +116,7 @@
       </table>
       {{- end }}
       {{- with $ev.staff }}
-      <p class="cfbm__h">Staff <span class="cfb__dim">(staff score regressed on model misses, {{ $ev.testSeason }}; enters at t ≥ 2 and positive sign, current Elo and talent held fixed)</span></p>
+      <p class="cfbm__h" title="staff score regressed on model misses, {{ $ev.testSeason }}; enters at t ≥ 2 and positive sign, current Elo and talent held fixed">Staff</p>
       <table class="cfb__table cfbm__t">
         <thead><tr><th></th><th title="points of margin per SD of score difference, on model misses, nothing held fixed">Naive pts per SD</th><th>t</th><th title="same, current Elo and roster talent held fixed">Pts per SD, Elo and talent fixed</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
         <tbody>
@@ -128,7 +128,7 @@
       </table>
       {{- end }}
       {{- with $ev.vsPolls }}
-      <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with 1+ ranked team; poll pick = better-ranked team, ARK pick = higher score; latest poll before kickoff)</span></p>
+      <p class="cfbm__h" title="games with 1+ ranked team; poll pick = better-ranked team, ARK pick = higher score; latest poll before kickoff">Picking winners against the polls</p>
       <table class="cfb__table cfbm__t">
         <thead><tr><th>Season</th><th>Poll</th><th>Games</th><th>Poll</th><th>ARK</th><th title="Elo alone, for reference">Elo</th><th title="games where poll and ARK picked different winners: ARK right - poll right">Disagreed</th><th title="Kendall tau over these games, (concordant - discordant) / pairs = 2 x accuracy - 1: poll vs ARK">τ poll / ARK</th></tr></thead>
         <tbody>

@@ -109,7 +109,8 @@
   // tabs renamed when every sport took one tab order and shared labels (Oct 25 2026): old links still open them; power rankings became ARK Ranking (Oct 26 2026)
   // baseball fv scale + reading became one fv model tab (Nov 2 2026)
   // ARKLIBRARY's per-list tabs became one tab per medium (Oct 26 2026)
-  var ALIAS = { 'matches': 'games', 'match-table': 'game-table', 'rankings': 'ark-ranking', 'power-rankings': 'ark-ranking', 'model': 'fv-model', 'fv-scale': 'fv-model', 'reading': 'fv-model',
+  // Nov 5 2026 one name a tab across sports: '<metric> leaders', games / game table, draft / big / past boards, offense / defense
+  var ALIAS = { 'builder': 'team-builder', 'waa-war': 'war-leaders', 'player-value': 'gar-leaders', 'players': 'rwa-leaders', 'results': 'game-table', 'big-board': 'draft-board', 'past-classes': 'past-boards', 'past-prospects': 'past-boards', 'atp-board': 'atp-big-board', 'wta-board': 'wta-big-board', 'atp-past': 'atp-past-boards', 'wta-past': 'wta-past-boards', 'attack': 'offense', 'defence': 'defense', 'matches': 'games', 'match-table': 'game-table', 'rankings': 'ark-ranking', 'power-rankings': 'ark-ranking', 'model': 'fv-model', 'fv-scale': 'fv-model', 'reading': 'fv-model',
     'albums': 'music', 'profiles': 'music', 'media': 'screen', 'actors': 'screen', 'literature': 'books', 'authors': 'books', 'architects': 'architecture', 'teams': 'sports', 'athletes': 'sports' };
   function fromHash(first) {
     var h = slug(decodeURIComponent(location.hash.slice(1).split(':')[0])); if (!h) return;   // #<tab>:<board state> opens <tab>
