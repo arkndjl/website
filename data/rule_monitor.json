@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-05T06:52:13Z",
+ "asof": "2026-11-05T06:56:18Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1001,7 +1001,7 @@
    "since": "2026-11-04",
    "status": "on",
    "stopped": null,
-   "n": 9,
+   "n": 10,
    "clvN": 5,
    "clvRet": -0.0362,
    "clvT": null,
@@ -1028,30 +1028,30 @@
     "read": "in line"
    },
    "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 5,
+    "window": 5,
+    "mean": -0.0362,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1123,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusum": 0.68,
+    "cusumMax": 0.68,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0099,
-     "n": 0,
+     "n": 4,
      "sd": 0.1123,
      "rho": 0.001,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": -0.125,
+     "info": 0.03,
+     "real": -3.553,
+     "realSe": 5.699,
      "need": 763
     }
    },
@@ -1086,7 +1086,7 @@
    "since": "2026-11-05",
    "status": "on",
    "stopped": null,
-   "n": 8,
+   "n": 12,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -1808,7 +1808,7 @@
    "clvT": -1.54,
    "flat": -0.0213,
    "adds": -0.02,
-   "expEdge": 0.0145,
+   "expEdge": 0.0143,
    "basis": "backtest + live picks"
   },
   {
@@ -1821,7 +1821,7 @@
    "clvT": -5.05,
    "flat": -0.0331,
    "adds": -0.0148,
-   "expEdge": 0.025,
+   "expEdge": 0.0251,
    "basis": "backtest + live picks"
   },
   {
