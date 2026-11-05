@@ -1,0 +1,13 @@
+{{- /* Rating percentile of every team in one sport's pool (mid-rank: best near 1, worst near 0), for game quality (gq.html).
+       Pass the sport: cfb (ARK ranking), nfl/nba/nhl/soccer (power rating), cbb (power rank), cs2 (ARK rank).
+       Call through partialCached with the sport as the variant. */ -}}
+{{- $out := dict -}}
+{{- if eq . "cfb" }}{{ with site.Data.cfb_rank }}{{ $n := len .rk }}{{ range $id, $r := .rk }}{{ $out = merge $out (dict (string $id) (sub 1.0 (div (sub (float $r) 0.5) (float $n)))) }}{{ end }}{{ end -}}
+{{- else if eq . "cs2" }}{{ with site.Data.cs2 }}{{ $n := len .teams }}{{ range .teams }}{{ $out = merge $out (dict .k (math.Max 0 (sub 1.0 (div (sub (float .rk) 0.5) (float $n))))) }}{{ end }}{{ end -}}
+{{- else }}
+{{- $d := index site.Data (printf "%s_games" .) }}{{ $key := cond (or (eq . "soccer") (eq . "cbb")) "id" "t" }}
+{{- with $d }}{{ with .power }}{{ $n := len . }}{{ range $i, $t := sort . "rating" "desc" }}
+{{- $out = merge $out (dict (string (index $t $key)) (sub 1.0 (div (add (float $i) 0.5) (float $n)))) }}
+{{- end }}{{ end }}{{ end -}}
+{{- end -}}
+{{- return $out -}}

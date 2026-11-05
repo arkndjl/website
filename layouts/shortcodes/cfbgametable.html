@@ -1,22 +1,22 @@
 {{- /* Game table: the coming week (data/cfb_games.json) as one sortable table. Model spread, win
        probability, projected score and total (the market line, edge and cover chance are on Predictions), and each game's projected top three on offense and on defense by raw
-       production (this season's per-game stats scaled by the opponent; scripts/cfb_teams.mjs). Kickoff order. */ -}}
+       production (this season's per-game stats scaled by the opponent; scripts/cfb_teams.mjs). Best games first (partials/gq.html). */ -}}
 {{- with site.Data.cfb_games -}}
 {{- $g := . -}}
 {{- $ark := dict }}{{ with site.Data.cfb_rank }}{{ $ark = .rk }}{{ end }}
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: week %v" ($.Get "title" | default "game table") .week) "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Kick,Model,Win %,Proj.,Total" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "13") -}}
-{{- /* kickoff order; the market line, edge and cover chance live on Predictions, the one page for lines and picks */}}
-{{- $games := sort .games "date" -}}
+{{- /* the market line, edge and cover chance live on Predictions, the one page for lines and picks */}}
+{{- $pc := partialCached "gqpct.html" "cfb" "cfb" }}{{ $gs := slice }}{{ range sort .games "date" }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home.id)) "b" (index $pc (string .away.id)) "p" .pHome))) }}{{ end -}}
 <table class="cfb__table cfbg">
   <thead><tr>
-    <th>Matchup</th><th title="kickoff, ET">Kick</th>
+    <th>Matchup</th><th title="game quality, 0-100: mean of both teams' rating percentiles in their league (weight 2/3) x closeness, 1 - (P home win - P away win)², (weight 1/3). Default sort">GQ</th><th title="kickoff, ET">Kick</th>
     <th title="model spread: Elo + opponent-adjusted efficiency + home field, rest, travel, altitude + injuries (scripts/cfb_model.mjs)">Model</th>
     <th title="model win probability, model favorite">Win %</th><th title="projected score, away-home">Proj.</th><th title="model total">Total</th>
     <th title="projected top 3 on offense, both teams: season per-game production x opponent defense">Top offense (proj.)</th>
     <th title="projected top 3 on defense, both teams: season per-game production x opponent offense">Top defense (proj.)</th><th>Day</th>
   </tr></thead>
   <tbody>
-  {{- range $games }}
+  {{- range $x := sort $gs "q" "desc" }}{{ $q := $x.q }}{{ with $x.g }}
   {{- $k := time.In "America/New_York" (time .date) }}
   {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
   {{- $abbrH := .home.name }}{{ $abbrA := .away.name }}
@@ -24,6 +24,7 @@
     <td class="cfbg__match" data-v="{{ .away.name }} {{ .home.name }}">
       {{- range $i, $t := slice .away .home }}<span class="cfbg__side">{{ if $i }}<span class="cfb__dim"> @ </span>{{ end }}{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}{{ $r := $t.rank }}{{ if $ark }}{{ $r = false }}{{ with index $ark (string $t.id) }}{{ if le . 25 }}{{ $r = . }}{{ end }}{{ end }}{{ end }}{{ with $r }}<span class="cfb__dim">#{{ . }}</span> {{ end }}{{ $t.name }}</span>{{ end -}}
     </td>
+    <td class="cfb__num" data-v="{{ $q }}">{{ printf "%.0f" $q }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ .spread }}">{{ if lt .spread 0.0 }}{{ .home.name }} {{ .spread }}{{ else if gt .spread 0.0 }}{{ .away.name }} -{{ .spread }}{{ else }}pick'em{{ end }}</td>
     <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (mul $fp 100) }}% <span class="cfb__dim">{{ $fav.name }}</span></td>
@@ -36,7 +37,7 @@
     {{- end }}
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
   </tr>
-  {{- end }}
+  {{- end }}{{ end }}
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "fresh" "cfb_games" "rows" (len .games)) -}}

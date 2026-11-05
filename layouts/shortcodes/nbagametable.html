@@ -6,7 +6,7 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hoop" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
 <table class="cfb__table cfbg">
   <thead><tr>
-    <th>Matchup</th><th title="tip, Eastern">Tip</th>
+    <th>Matchup</th><th title="game quality, 0-100: mean of both teams' rating percentiles in their league (weight 2/3) x closeness, 1 - (P home win - P away win)², (weight 1/3). Default sort">GQ</th><th title="tip, Eastern">Tip</th>
     <th title="model line = Elo + opponent-adjusted net rating + market rating + lineup + rest + home court; walk-forward fit">Model</th>
     <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
@@ -14,10 +14,12 @@
     <th>Final</th><th>Day</th>
   </tr></thead>
   <tbody>
-  {{- range .games }}{{ $g := . }}
+  {{- $pc := partialCached "gqpct.html" "nba" "nba" }}{{ $gs := slice }}{{ range .games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home)) "b" (index $pc (string .away)) "p" .pHome))) }}{{ end }}
+  {{- range $x := sort $gs "q" "desc" }}{{ $q := $x.q }}{{ with $x.g }}{{ $g := . }}
   {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
   <tr>
     <td data-v="{{ .away }} {{ .home }}"><img class="cfb__logo cfb__logo--in" src="/img/nba/{{ lower .away }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> {{ .away }} <span class="cfb__dim">@</span> <img class="cfb__logo cfb__logo--in" src="/img/nba/{{ lower .home }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> {{ .home }}</td>
+    <td class="cfb__num" data-v="{{ $q }}">{{ printf "%.0f" $q }}</td>
     <td class="cfb__num" data-v="{{ .tip }}">{{ with .tip }}{{ (time.In "America/New_York" (time .)).Format "Mon 3:04 PM" }}{{ else }}{{ (time .day).Format "Mon" }} {{ .time }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .margin }}">{{ partial "nbaline.html" (dict "m" .margin "home" .home "away" .away) }}</td>
     <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (float (mul $fp 100)) }}% <span class="cfb__dim">{{ $fav }}</span></td>
@@ -26,7 +28,7 @@
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ (time .day).Format "Mon" }}</td>
   </tr>
-  {{- end }}
+  {{- end }}{{ end }}
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "fresh" "nba_games" "rows" (len .games)) -}}
