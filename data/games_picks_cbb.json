@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-05T10:57:14Z",
+ "asof": "2026-11-05T10:59:04Z",
  "recenter": {
   "2026-11-05": -12.02
  },
@@ -556,16 +556,7 @@
    "flagged": "2026-11-05T10:55:27Z",
    "betTo": 150.5,
    "close": 146.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 146.5,
-    "price": -108.0,
-    "ev": 0.071,
-    "units": 0.5,
-    "unitsRaw": 1.5,
-    "unitsCap": 0.5
-   },
+   "now": null,
    "unitsRaw": 1.5,
    "unitsCap": 0.5
   },
@@ -1156,7 +1147,14 @@
    "flagged": "2026-11-05T10:49:59Z",
    "betTo": 146.0,
    "close": 143.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 143.5,
+    "price": -108.0,
+    "ev": 0.045,
+    "units": 0.25
+   }
   },
   {
    "id": "401909706",
@@ -1213,6 +1211,22 @@
    "tm": 150.3
   },
   {
+   "id": "401920864",
+   "sport": "cbb",
+   "kick": "2026-11-06T00:00:00Z",
+   "home": "Iona",
+   "away": "NJIT",
+   "mk": "total",
+   "side": "over",
+   "line": 146.5,
+   "price": -117.0,
+   "edge": 6.1,
+   "x": 2.0,
+   "why": "no edge at -117",
+   "m": 10.9,
+   "tm": 152.6
+  },
+  {
    "id": "401919823",
    "sport": "cbb",
    "kick": "2026-11-06T00:00:00Z",
@@ -1243,22 +1257,6 @@
    "why": "no edge at -117",
    "m": 30.3,
    "tm": 155.1
-  },
-  {
-   "id": "401921682",
-   "sport": "cbb",
-   "kick": "2026-11-06T00:00:00Z",
-   "home": "Sacred Heart",
-   "away": "Maine",
-   "mk": "total",
-   "side": "over",
-   "line": 143.5,
-   "price": -117.0,
-   "edge": 4.6,
-   "x": 2.0,
-   "why": "no edge at -117",
-   "m": 9.7,
-   "tm": 148.1
   },
   {
    "id": "401924718",
@@ -1301,10 +1299,10 @@
    "mk": "total",
    "side": "over",
    "line": 155.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 2.2,
    "x": 2.0,
-   "why": "no edge at -108",
+   "why": "no edge at -106",
    "m": 28.4,
    "tm": 157.7
   },
@@ -1397,7 +1395,7 @@
    "mk": "total",
    "side": "under",
    "line": 152.5,
-   "price": -108.0,
+   "price": -104.0,
    "edge": 1.5,
    "x": 2.0,
    "why": "edge under 2",
@@ -1566,7 +1564,7 @@
    "mk": "total",
    "side": "under",
    "line": 152.5,
-   "price": -108.0,
+   "price": -104.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -1722,7 +1720,7 @@
    "mk": "total",
    "side": "over",
    "line": 155.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -1854,13 +1852,13 @@
    "mk": "total",
    "side": "over",
    "line": 143.5,
-   "price": -117.0,
+   "price": -108.0,
+   "ev": 0.045,
    "edge": 4.6,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "Sacred Heart",
    "away": "Maine",
-   "state": "under"
+   "state": "pick"
   },
   "401921679": {
    "mk": "total",
@@ -1926,13 +1924,13 @@
    "mk": "total",
    "side": "over",
    "line": 146.5,
-   "price": -108.0,
-   "ev": 0.071,
+   "price": -117.0,
    "edge": 6.1,
-   "units": 1.5,
+   "ev": null,
+   "units": 0.0,
    "home": "Iona",
    "away": "NJIT",
-   "state": "pick"
+   "state": "under"
   },
   "401921680": {
    "mk": "total",
@@ -2035,7 +2033,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4995,
+  "snapshots": 5000,
   "buckets": [
    {
     "when": "24h+",
@@ -2048,12 +2046,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 688,
+    "clvN": 689,
     "clvRet": -0.0463,
-    "clvT": -11.37,
+    "clvT": -11.39,
     "clv": 0.03,
-    "beat": 0.23,
-    "still": 0.446
+    "beat": 0.229,
+    "still": 0.447
    },
    {
     "when": "1-6h",
