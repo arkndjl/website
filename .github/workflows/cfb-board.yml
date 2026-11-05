@@ -135,6 +135,12 @@ jobs:
         continue-on-error: true
         timeout-minutes: 10
         run: python3 scripts/cfb_dob.py --max 300
+      # RotoWire's college injury news into scripts/data/rotowire_news.json (scripts/rotowire.py; odds-snap.yml polls it
+      # every half hour, this catches the last minutes), read by fetch_cfb.mjs's availability log
+      - name: RotoWire injury news
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python3 scripts/rotowire.py cfootball
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs
