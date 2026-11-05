@@ -44,6 +44,9 @@ XS = (0.04, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18)
 LEAK = 0.5               # the share of the open-to-close edge still there at the live price
 CAP = 2.0                # DU a pick, held until live picks grade
 TUNE, HELD = 2025, 2026
+OOF_TUNE = os.environ.get('TENNIS_OOF_TUNE', '1') == '1'
+CM_LAG = int(os.environ.get('TENNIS_CM_LAG', 7))  # tennis_model.CM_LAG   # market memory sees closes from events started 7+ days earlier, as live
+                                                  # (the weekly feed; this week's ESPN rows carry no prices). Nov 4 2026
 
 
 def sig(z):
@@ -128,8 +131,21 @@ def fit():
     P = dict(M.DEFAULT, **json.load(open(M.FIT))['params'])
     # walk-forward model chances (each season's blend weights from the M.WIN seasons before it), so 2025 and 2026 are
     # both out of sample for the model; then the matches with an open and a close
-    _, rec = M.run(rows, P, score=lambda r: M.scored(r, TUNE - M.WIN, 2100))
+    _, rec = M.run(rows, P, score=lambda r: M.scored(r, TUNE - M.WIN, 2100), cm_lag=CM_LAG)
     pw = M.wf_probs(rec, P)
+    # the tuning season's chances out of fold within it (Nov 4 2026): its walk-forward weights come from 2022-24, which
+    # hold no closes, so the market-memory term would be 0 there while the live model carries it, and k (the open-to-
+    # close move per logit of model minus open) would be measured on a different model. Each quarter of TUNE takes
+    # weights fit on the WIN seasons before it plus TUNE's other quarters, so CM is in, as live
+    if OOF_TUNE:
+        base = M.window(rec, TUNE * 10000)
+        q = lambda x: (x[0][0] // 100 % 100 - 1) // 3
+        idx = [j for j, x in enumerate(rec) if x[0][0] // 10000 == TUNE]
+        for f in range(4):
+            W = dict(P, **M.fit_blend(base + [rec[j] for j in idx if q(rec[j]) != f], M.ALL))
+            for j in idx:
+                if q(rec[j]) == f:
+                    pw[j] = M.blend_p(W, rec[j])
     D = {}
     i = 0
     for x, pm in zip(rec, pw):
@@ -147,7 +163,14 @@ def fit():
     # k: logits of open-to-close move per logit of model minus open, tuning season
     X = [lg(d[0]) - lg(d[1]) for d in tune]
     Y = [lg(d[2]) - lg(d[1]) for d in tune]
-    k = sum(a * b for a, b in zip(X, Y)) / sum(a * a for a in X)
+    kt = sum(a * b for a, b in zip(X, Y)) / sum(a * a for a in X)
+    Xh = [lg(d[0]) - lg(d[1]) for d in held]
+    kh = sum(a * (lg(d[2]) - lg(d[1])) for a, d in zip(Xh, held)) / sum(a * a for a in Xh)
+    # k for the live stakes (Nov 4 2026): pooled over every season whose model carries the market memory as live does
+    # (TUNE out of fold, the held seasons walk forward), so it is the live model's move, not the 2025 model's alone
+    # (2025 .341, 2026 .163). Held-out scores (clvRet, roi, on) don't use k; X's growth ranking on TUNE does
+    k = (sum(a * b for a, b in zip(X, Y)) + sum(a * (lg(d[2]) - lg(d[1])) for a, d in zip(Xh, held))) / \
+        (sum(a * a for a in X) + sum(a * a for a in Xh))
     grid = [{'x': x, **block(bets(tune, x)), 'growth': round(growth(tune, x, k) * 100, 2)} for x in XS]
     # X (Oct 27 2026): the cut with the most Kelly growth at the close on the tuning season, at the live stakes (1x Kelly
     # on the LEAK-calibrated chance at the ask), not the best average pick: on 2026 held out X 4 grew 80.6% at the close
@@ -159,7 +182,7 @@ def fit():
     on = bool(h and h['n'] >= 30 and h['clvRet'] > 0 and (h['clvT'] or 0) >= 1.65)
     out = {'fit_at': datetime.date.today().isoformat(), 'tune': [TUNE], 'held': sorted(y for y in D if y >= HELD),
            'nTune': len(tune), 'nHeld': len(held), 'cost': COST, 'mlCap': MLCAP, 'gapMax': GAPMAX,
-           'k': round(k, 3), 'leak': LEAK, 'cap': CAP, 'x': x, 'on': on, 'tuneAtX': next((g for g in grid if g['x'] == x), None),
+           'k': round(k, 3), 'kTune': round(kt, 3), 'kHeld': round(kh, 3), 'leak': LEAK, 'cap': CAP, 'x': x, 'on': on, 'tuneAtX': next((g for g in grid if g['x'] == x), None),
            'heldAtX': h, 'grid': grid, 'heldGrid': [{'x': g, **block(bets(held, g))} for g in XS],
            'note': 'tour-level main draws, bet at the feed\'s no-vig open plus Novig\'s half spread, judged by its no-vig close; '
                    'the live price comes later than the open, so the close value is an upper bound'}
@@ -285,17 +308,21 @@ def live():
         prev = log.get(str(g['id']))
         if prev is not None and prev.get('res') is None:
             prev['kick'] = g['tip']                        # ESPN moves order-of-play times as the draw fills
+            # pass only when the model moved (Noah, Nov 4 2026): the model's chance for the pick's side no longer
+            # clears X over the market chance it was flagged at; a market move alone never passes it
+            if X and prev.get('mkt') is not None:
+                if (pm if prev['side'] == 'away' else 1 - pm) - prev['mkt'] < X:
+                    prev['pass'] = True
+                else:
+                    prev.pop('pass', None)
         if state == 'pick':
             if prev is None:
                 log[str(g['id'])] = {**row, 'units': u, 'flagged': stamp}
             else:
                 prev['now'] = {'mk': 'ml', 'side': side, 'line': None, 'price': o, 'units': u} if side == prev['side'] else None
-                prev.pop('pass', None)
         else:
             if prev is not None and prev.get('res') is None:
-                same = side == prev['side']
                 prev['now'] = None
-                prev['pass'] = True if not (same and abs(e) >= (X or 1)) else prev.get('pass')
             elif tour_lv and on and abs(e) >= X / 2:
                 board.append({**row, 'why': why})
     # grade from tennis.json's results, judge at Novig's last pregame price
@@ -331,9 +358,13 @@ def live():
         pr = [e['profit'] for e in done]
         risked = sum(e['units'] for e in done)
         su = sum(e['units'] * e['profit'] for e in done)
-        bank = 1.0
+        # per ET night, as games_picks.py and the paper book compound: a night's bets all stand on its opening bankroll
+        import night_cap
+        bank, nights = 1.0, {}
         for e in done:
-            bank *= 1 + e['units'] / 100 * e['profit']
+            nights.setdefault(night_cap.night(e['kick']), []).append(e)
+        for n in sorted(nights):
+            bank *= 1 + sum(e['units'] / 100 * e['profit'] for e in nights[n])
         rec = {'n': len(done), 'w': sum(1 for x in pr if x > 0), 'l': sum(1 for x in pr if x < 0), 'units': round(sum(pr), 1),
                'roi': round(sum(pr) / len(pr), 3), 't': tstat(pr),
                'sized': {'units': round(su, 1), 'risked': round(risked, 1), 'roi': round(su / risked, 3) if risked else None, 'bank': round(bank, 4)}}

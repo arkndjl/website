@@ -155,7 +155,8 @@ def build():
     if F['params'].get('rk') and S - 1 not in N.draft():
         N.write_draft(S - 1, S - 1)                 # the summer's draft, once (rookie priors)
         N._DR.clear()
-    m = N.Model(names, P, **F['params'])
+    # past games walk with the reports the fit walked them with (the season in progress read off the NBA's PDFs)
+    m = N.Model(names, P, inj=N.load_inj(cur), **F['params'])
     for g in games:
         m.feats(g); m.update(g)
     if m.season != S:

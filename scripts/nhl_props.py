@@ -362,10 +362,11 @@ def test():
 def upcoming():
     """today's and tomorrow's games not started: [(espn id, start, home, away, (home ML, away ML), total)]"""
     import nhl_pbox as B
+    from zoneinfo import ZoneInfo
     out = []
     now = datetime.datetime.now(datetime.timezone.utc)
     for d in (0, 1):
-        day = (now - datetime.timedelta(hours=5) + datetime.timedelta(days=d)).strftime('%Y%m%d')
+        day = (now.astimezone(ZoneInfo('America/New_York')) + datetime.timedelta(days=d)).strftime('%Y%m%d')   # ESPN's slate day (ET)
         j = B.get(f'{SITE}/scoreboard?dates={day}&limit=50') or {}
         for e in j.get('events', []):
             if (e.get('status') or {}).get('type', {}).get('state') != 'pre':

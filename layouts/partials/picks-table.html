@@ -12,7 +12,7 @@
   {{- if eq .sport "tennis" }}{{ $flip = and (gt $m 0.5) (lt (float (.mkt | default 1)) 0.5) }}
   {{- else if and (eq .mk "spread") .line }}{{ $L := float .line }}{{ $flip = and (ne $m 0.0) (ne (gt $m 0.0) (gt $L 0.0)) }}
   {{- else if eq .mk "ml" }}{{ $flip = and (ge (float .price) 100.0) (cond (eq .side "home") (gt $m 0.0) (lt $m 0.0)) }}{{ end }}
-  <tr data-day="{{ $k.Format "2006-01-02" }}"{{ if eq .mk "ml" }} data-ml="{{ if and (ge (float .price) -200.0) (le (float .price) 200.0) }}-200 to +200{{ else }}past 200{{ end }}"{{ end }}{{ if $flip }} data-flip="model's winner is the dog"{{ end }}{{ if .pass }} class="cfb__dim" title="flagged earlier, no longer clears at the current line or price (Novig, else DraftKings): pass (kept in the record)"{{ end }}>
+  <tr data-day="{{ $k.Format "2006-01-02" }}"{{ if eq .mk "ml" }} data-ml="{{ if and (ge (float .price) -200.0) (le (float .price) 200.0) }}-200 to +200{{ else }}past 200{{ end }}"{{ end }}{{ if $flip }} data-flip="model's winner is the dog"{{ end }}{{ if .pass }} class="cfb__dim" title="the model moved: no longer clears its cut at the flagged line, pass (out of the record)"{{ end }}>
     <td>{{ if .pass }}<s>{{ partial "gamespick-bet.html" . }}</s> <b>pass</b>{{ else }}<b>{{ partial "gamespick-bet.html" . }}</b>{{ end }}</td>
     <td class="cfb__num" data-v="{{ if .pass }}0{{ else }}{{ .units }}{{ end }}">{{ $v := float .units }}{{ if .pass }}<s>{{ end }}{{ if eq $v (math.Floor $v) }}{{ int $v }}{{ else }}{{ $v }}{{ end }}{{ if .pass }}</s>{{ end }}</td>
     {{- if $.sport }}<td>{{ index $sp .sport }}</td>{{ end }}

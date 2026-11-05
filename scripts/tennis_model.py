@@ -55,6 +55,7 @@ DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET':
 # last 8 closing lines minus the model's chance (logits, 120 days, shrunk by 3) from the feed's no-vig closes (2025+);
 # it predicts the open-to-close move beside the model (2026 held out t 5.8) and lifts held-out pick CLV
 CTX = ('CR', 'CA', 'CH', 'CN', 'CM')
+CM_LAG = 7               # market memory in fits and backtests: closes from events started 7+ days before (Model cm_lag)
 WIN = 3                  # blend weights fit on the last WIN seasons (a 3-season window beat the expanding 2012+ fit 9/9
                          # seasons 2018-26 walk forward: favourites have run a little less sure in recent seasons)
 
@@ -199,8 +200,12 @@ def bios():
 
 class Model:
     """one pass's state; also keeps each player's peak and 90-day-old rating for the ranking table"""
-    def __init__(self, P=None):
+    def __init__(self, P=None, cm_lag=0):
         self.P = dict(DEFAULT, **(P or {}))
+        # cm_lag (days): a backtest sees a match's close in the market memory only once its event started cm_lag+ days
+        # before the predicted match's event, as live, where closes come from the weekly feed (the current week's
+        # matches are ESPN rows without prices). 0: at once (the live build: every feed close is already out)
+        self.cm_lag, self.pend = cm_lag, []
         self.elo = {}          # pid -> [overall, n, {surf: [r, n]}]
         self.pt = {}           # pid -> [s, vs, r, vr, last day]
         self.mu = {}           # (tour, surf) -> league log-odds of a serve point
@@ -342,6 +347,20 @@ class Model:
         z += sum(self.P[k] * v for k, v in zip(CTX, cx))
         return sig(z), pe, pp, gx, cx
 
+    def _mres(self, p, day, v):
+        q = self.mres.setdefault(p, [])
+        q.append((day, v))
+        del q[:-8]
+
+    def release(self, d):
+        """cm_lag: closes from events that started cm_lag+ days before event start d (yyyymmdd) join the memory"""
+        cut = (ymd(d) - DAY0).days - self.cm_lag
+        i = 0
+        while i < len(self.pend) and self.pend[i][0] <= cut:
+            self._mres(*self.pend[i][1:])
+            i += 1
+        del self.pend[:i]
+
     def update(self, r):
         d, tour, lv, sf, rd, bo, tid, w, l, score, ws, ls = r[:12]
         day = dnum(d, rd, lv)
@@ -354,9 +373,10 @@ class Model:
                 self.P['G'] * self.games_x(w, l, sf) * (1.25 if bo == 5 else 1.0)
             z = logit(r[14]) - zb
             for p, v in ((w, z), (l, -z)):
-                q = self.mres.setdefault(p, [])
-                q.append((day, v))
-                del q[:-8]
+                if self.cm_lag:
+                    self.pend.append(((ymd(d) - DAY0).days, p, day, v))
+                else:
+                    self._mres(p, day, v)
         for p in (w, l):
             q = self.days.setdefault(p, [])
             q.append(day)
@@ -375,12 +395,14 @@ class Model:
             if e[1] >= 20 and e[0] > self.peak.get(p, (0, 0))[0]: self.peak[p] = (e[0], d)
 
 
-def run(rows, P=None, score=None, until=None):
-    """one pass; score(r) -> True records (row, blend, elo, points) for that match before updating"""
-    m = Model(P)
+def run(rows, P=None, score=None, until=None, cm_lag=0):
+    """one pass; score(r) -> True records (row, blend, elo, points) for that match before updating. cm_lag: see Model"""
+    m = Model(P, cm_lag)
     out = []
     for r in rows:
         if until and r[0] > until: break
+        if cm_lag:
+            m.release(r[0])
         if score and score(r):
             day = dnum(r[0], r[4], r[2])
             # randomise the side so the blend's intercept means nothing (A = winner on even ids)
@@ -486,7 +508,7 @@ def fit(rows):
     stage('points', {'PHI': [0.35, 0.5, 0.7], 'V0': [0.03, 0.05, 0.10], 'Q': [0.0001, 0.0003, 0.001]}, (0, 1))
     stage('games', {'KG': [1.0, 1.5, 2.0, 3.0], 'GSW': [0.0, 0.3, 0.5]}, (0, 1, 2))
     # the blend weights live: the last WIN seasons up to the last match (walk-forward scores in score_all)
-    _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100))
+    _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100), cm_lag=CM_LAG)
     last = max(x[0][0] for x in rec)
     P.update(fit_blend(window(rec, last + 1), ALL))
     out = {'params': P, 'log': log,
@@ -511,7 +533,7 @@ def score_all(rows, P):
     """tuning, held-out and closing-line scores, by tour. Every chance is walk-forward: blend weights fit on the WIN
     seasons before the match's season (the rating parameters are tuned on 2012-22); ll_ratings drops the context terms"""
     import numpy as np
-    _, rec = run(rows, P, score=lambda r: scored(r, 2012 - WIN, 2100))
+    _, rec = run(rows, P, score=lambda r: scored(r, 2012 - WIN, 2100), cm_lag=CM_LAG)
     pw = wf_probs(rec, P)
     W0 = {}
     p0 = []
@@ -949,10 +971,26 @@ def build(rows, players, tn):
           f"{len(out['results'])} results")
 
 
+def blend_refit(rows):
+    """--blend: the live blend weights and the scores again at the fit's rating parameters (the fit's search stages
+    use only the ratings, not the context terms, so this is the tail of --fit)"""
+    out = json.load(open(FIT))
+    P = dict(DEFAULT, **out['params'])
+    _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100), cm_lag=CM_LAG)
+    P.update(fit_blend(window(rec, max(x[0][0] for x in rec) + 1), ALL))
+    out['params'] = P
+    out['fit_at'] = dt.date.today().isoformat()
+    out.update(score_all(rows, P))
+    json.dump(out, open(FIT, 'w'), indent=1)
+    print(json.dumps({k: v for k, v in out.items() if k not in ('log', 'failed')}, indent=1))
+
+
 if __name__ == '__main__':
     import tennis_data as T
     rows, players, tn = T.load()
     if '--fit' in sys.argv:
         fit(rows)
+    elif '--blend' in sys.argv:
+        blend_refit(rows)
     else:
         build(rows, players, tn)

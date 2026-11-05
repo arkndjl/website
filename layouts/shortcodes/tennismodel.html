@@ -33,7 +33,7 @@
       {{- end }}{{ end }}
       </tbody>
     </table></div>
-    {{- with .add }}<p class="cfb__dim">Does the model add to the close? On the result, the closing price takes x{{ .close }} and the model's difference from it x{{ .model_minus_close }} (t {{ printf "%+.1f" (float .t) }}): {{ if lt (float .t) 2.0 }}no reliable information beyond the close.{{ else }}some information the close lacks.{{ end }} Picks on Predictions bet the model's lead on the opening price, which the close moves toward.</p>{{ end }}
+    {{- with .add }}<p class="cfb__dim">result on close + (model - close): close x{{ .close }} · model - close x{{ .model_minus_close }} (t {{ printf "%+.1f" (float .t) }})</p>{{ end }}
     {{- end }}
     {{- with $f.calib }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
@@ -41,9 +41,13 @@
       <tbody>{{ range . }}{{ if .n }}<tr><td>{{ .bin }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .pred 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}{{ end }}</tbody>
     </table></div>
     {{- end }}
-    {{- with $f.failed }}<p class="cfb__dim">Tried and left out: {{ delimit . "; " }}.</p>{{ end }}
-    <p class="cfb__dim">Data: Jeff Sackmann's tennis_atp / tennis_wta (CC BY-NC-SA, via the Hugging Face archive after the GitHub repos went offline in mid-2026), the Min Maxxxer / Tennis Odds Actor weekly tour feed with closing odds (CC BY 4.0) and ESPN.</p>
+    {{- with $f.failed }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Not kept</th><th>Test</th></tr></thead>
+      <tbody>{{ range . }}<tr>{{ if in . ": " }}<td>{{ replaceRE `^([^:]*?): (?s:.*)$` "$1" . }}</td><td class="cfb__dim">{{ replaceRE `^[^:]*?: ` "" . }}</td>{{ else }}<td colspan="2">{{ . }}</td>{{ end }}</tr>{{ end }}</tbody>
+    </table></div>
+    {{- end }}
   </div>
-  <div class="win__status"><span>walk-forward since 2005 · fit {{ $f.fit_at | default "" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="Picks on Predictions bet the model's lead on the opening price, which the close moves toward. Data: Jeff Sackmann's tennis_atp / tennis_wta (CC BY-NC-SA, via the Hugging Face archive after the GitHub repos went offline in mid-2026), the Min Maxxxer / Tennis Odds Actor weekly tour feed with closing odds (CC BY 4.0) and ESPN."><span>walk-forward since 2005 · fit {{ $f.fit_at | default "" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

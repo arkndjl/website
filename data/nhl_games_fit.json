@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-03",
+ "updated": "2026-11-04",
  "params": {
   "K": 4,
   "reg": 0.2,
@@ -29,18 +29,18 @@
   "one"
  ],
  "coef": {
-  "elo": 0.3113,
-  "xg": 0.329,
+  "elo": 0.3109,
+  "xg": 0.3282,
   "b2b": -0.2897,
   "home": 0.1307,
-  "rv": 0.2906
+  "rv": 0.2929
  },
  "mcoef": {
-  "elo": 0.3569,
-  "xg": 0.4979,
+  "elo": 0.3564,
+  "xg": 0.4967,
   "b2b": -0.3209,
   "home": 0.2118,
-  "rv": 0.4273
+  "rv": 0.4306
  },
  "tcoef": {
   "xgT": 0.338,
@@ -51,44 +51,44 @@
  },
  "pl": {
   "home2": [
-   -1.3,
-   0.6635,
-   0.0612
+   -1.2982,
+   0.6637,
+   0.0609
   ],
   "away2": [
-   -2.3406,
-   -0.7099,
-   0.2359
+   -2.3416,
+   -0.7101,
+   0.236
   ]
  },
  "ot": [
-  -0.1902,
-  -0.0942,
-  -0.1629
+  -0.1912,
+  -0.0944,
+  -0.1627
  ],
  "otWin": [
-  0.0008,
-  0.3673
+  0.0007,
+  0.3676
  ],
  "otWinGames": 2760,
  "sdMargin": 2.481,
  "sdTotal": 2.299,
- "seasonSd": 0.113,
+ "seasonSd": 0.114,
  "evidence": {
   "elo": {
    "kept": true,
-   "tTune": 1.6,
-   "tHeld": -0.57,
-   "dTune": 1.999,
-   "dHeld": -0.539,
+   "tTune": 1.61,
+   "tHeld": -0.58,
+   "dTune": 2.002,
+   "dHeld": -0.545,
    "split": "2021-23 / 2024-26 lined"
   },
   "xg": {
    "kept": true,
-   "tTune": 2.15,
+   "tTune": 2.14,
    "tHeld": 1.43,
-   "dTune": 2.348,
-   "dHeld": 1.055,
+   "dTune": 2.332,
+   "dHeld": 1.05,
    "split": "2021-23 / 2024-26 lined"
   },
   "g": {
@@ -119,16 +119,16 @@
    "kept": true,
    "tTune": 3.39,
    "tHeld": 1.86,
-   "dTune": 2.776,
-   "dHeld": 2.18,
+   "dTune": 2.777,
+   "dHeld": 2.181,
    "split": "2021-23 / 2024-26 lined"
   },
   "home": {
    "kept": true,
    "tTune": 1.18,
-   "tHeld": 2.48,
-   "dTune": 0.97,
-   "dHeld": 2.0,
+   "tHeld": 2.47,
+   "dTune": 0.972,
+   "dHeld": 1.997,
    "split": "2021-23 / 2024-26 lined"
   },
   "x5": {
@@ -149,10 +149,10 @@
   },
   "rv": {
    "kept": true,
-   "tTune": 2.77,
-   "tHeld": 2.06,
-   "dTune": 1.627,
-   "dHeld": 1.879,
+   "tTune": 2.81,
+   "tHeld": 2.07,
+   "dTune": 1.661,
+   "dHeld": 1.9,
    "split": "2021-23 / 2024-26 lined"
   },
   "bk": {
@@ -173,10 +173,10 @@
   },
   "mkt": {
    "kept": false,
-   "tTune": -0.22,
-   "tHeld": 0.26,
-   "dTune": -0.115,
-   "dHeld": 0.073,
+   "tTune": -0.23,
+   "tHeld": 0.25,
+   "dTune": -0.121,
+   "dHeld": 0.071,
    "split": "2021-23 / 2024-26 lined"
   }
  },
@@ -186,9 +186,9 @@
    "logLossModel": 0.6515,
    "brierModel": 0.2298,
    "lined": 3752,
-   "logLossLinedModel": 0.6516,
+   "logLossLinedModel": 0.6515,
    "logLossMarket": 0.6516,
-   "tVsMarket": -0.01,
+   "tVsMarket": -0.04,
    "rModelVsMarket": 0.946,
    "hitModel": 0.62,
    "hitMarket": 0.628,
@@ -204,9 +204,9 @@
    "lined": 4190,
    "logLossLinedModel": 0.6679,
    "logLossMarket": 0.6645,
-   "tVsMarket": 2.18,
-   "rModelVsMarket": 0.936,
-   "hitModel": 0.585,
+   "tVsMarket": 2.17,
+   "rModelVsMarket": 0.935,
+   "hitModel": 0.584,
    "hitMarket": 0.593,
    "totalGames": 4190,
    "totalMaeModel": 1.857,
@@ -217,45 +217,45 @@
  "calib": [
   {
    "bin": 0.5,
-   "n": 1126,
+   "n": 1125,
    "model": 0.525,
-   "won": 0.506
+   "won": 0.505
   },
   {
    "bin": 0.55,
-   "n": 1097,
+   "n": 1098,
    "model": 0.574,
-   "won": 0.544
+   "won": 0.545
   },
   {
    "bin": 0.6,
-   "n": 813,
+   "n": 811,
    "model": 0.624,
-   "won": 0.603
+   "won": 0.599
   },
   {
    "bin": 0.65,
-   "n": 557,
+   "n": 558,
    "model": 0.674,
-   "won": 0.655
+   "won": 0.656
   },
   {
    "bin": 0.7,
-   "n": 349,
+   "n": 347,
    "model": 0.724,
-   "won": 0.668
+   "won": 0.671
   },
   {
    "bin": 0.75,
-   "n": 174,
+   "n": 178,
    "model": 0.773,
-   "won": 0.741
+   "won": 0.742
   },
   {
    "bin": 0.8,
-   "n": 66,
+   "n": 65,
    "model": 0.821,
-   "won": 0.894
+   "won": 0.892
   }
  ],
  "plCheck": {

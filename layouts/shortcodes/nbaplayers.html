@@ -9,6 +9,7 @@
 {{- $src := .Get "src" | default "nba_players" -}}{{ $nba := eq $src "nba_players" -}}
 {{- with index site.Data $src -}}
 {{- $d := . -}}
+{{- $cbbLogo := dict }}{{ if not $nba }}{{ with site.Data.cbb_games }}{{ range .games }}{{ $cbbLogo = merge $cbbLogo (dict (printf "%v|%s" .id .home.n) (.home.logo | default "") (printf "%v|%s" .id .away.n) (.away.logo | default "")) }}{{ end }}{{ end }}{{ end }}
 {{- if not $d.games }}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
@@ -40,7 +41,12 @@
   {{- $home := eq .t $g.h }}{{ $pl := .pr }}
   <tr>
     <td class="cfb__rk">{{ $i }}</td>
-    <td class="cfb__name cfbpj__name">{{ partial "face.html" (dict "u" (cond (ne (.id | default "") "") (printf "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/%v.png&w=96&h=70&scale=crop" .id) "")) }}<b>{{ .n }}</b>{{ with .t }} <img class="cfb__logo cfb__logo--in" src="/img/nba/{{ lower . }}.png" alt="{{ . }}" title="{{ . }}" width="16" height="16" loading="lazy" onerror="this.remove()">{{ end }}
+    {{- /* CBB rows: an ESPN headshot only for "e<espn id>" players (plain ids are Barttorvik's), the logo from cbb_games */}}
+    {{- $pid := printf "%v" (.id | default "") }}{{ $u := "" }}
+    {{- if $nba }}{{ with $pid }}{{ $u = printf "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/%s.png&w=96&h=70&scale=crop" . }}{{ end }}
+    {{- else if hasPrefix $pid "e" }}{{ $u = printf "https://a.espncdn.com/combiner/i?img=/i/headshots/mens-college-basketball/players/full/%s.png&w=96&h=70&scale=crop" (strings.TrimPrefix "e" $pid) }}{{ end }}
+    {{- $lg := "" }}{{ with .t }}{{ if $nba }}{{ $lg = printf "/img/nba/%s.png" (lower .) }}{{ else }}{{ $lg = index $cbbLogo (printf "%v|%s" $g.id .) | default "" }}{{ end }}{{ end }}
+    <td class="cfb__name cfbpj__name">{{ partial "face.html" (dict "u" $u) }}<b>{{ .n }}</b>{{ with $lg }} <img class="cfb__logo cfb__logo--in" src="{{ . }}" alt="{{ $p.t }}" title="{{ $p.t }}" width="16" height="16" loading="lazy" onerror="this.remove()">{{ end }}
       {{- with .st }}{{ if ne . "Available" }}<span class="cfbpj__st{{ if or (eq . "Out") (eq . "Doubtful") }} cfbpj__st--o{{ end }}" title="{{ . }}: plays {{ math.Round (mul $pl 100) }}%">{{ substr . 0 1 }} {{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}</td>
     <td class="cfb__num cfbpj__pts" data-v="{{ .pra }}"><span class="cfb__up">{{ printf "%.1f" .pra }}</span></td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ printf "%.1f" .pts }}</td>

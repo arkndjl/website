@@ -38,9 +38,9 @@
       <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ with .model }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
-    {{- with $f.P }}
-    <p class="cfb__dim">chance to play: out {{ printf "%.0f%%" (mul (index . "Outall" | default 0) 100) }} · doubtful {{ printf "%.0f%%" (mul (index . "Doubtfulall" | default 0) 100) }} · questionable {{ printf "%.0f%%" (mul (index . "Questionableall" | default 0) 100) }} · probable {{ printf "%.0f%%" (mul (index . "Probableall" | default 0) 100) }} · not listed {{ printf "%.0f%%" (mul (index . "none0" | default 0) 100) }}</p>
-    {{- end }}
+    {{- with $f.P }}{{ if isset . "Outall" }}
+    <p class="cfb__dim">chance to play: out {{ printf "%.0f%%" (mul (index . "Outall" | default 0.0) 100) }} · doubtful {{ printf "%.0f%%" (mul (index . "Doubtfulall" | default 0.0) 100) }} · questionable {{ printf "%.0f%%" (mul (index . "Questionableall" | default 0.0) 100) }} · probable {{ printf "%.0f%%" (mul (index . "Probableall" | default 0.0) 100) }} · not listed {{ printf "%.0f%%" (mul (index . "none0" | default 0.0) 100) }}</p>
+    {{- end }}{{ end }}
   </div>
   <div class="win__status"><span>walk-forward, 2015-26</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

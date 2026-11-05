@@ -61,7 +61,7 @@ const rows = I.prepare(seasons, data, geo);
 const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
 I.setExtra([]);
 const effBy = Object.fromEntries(seasons.map(S => [S, I.effObs(data.adv[S], nameId, gameById, fbsBy[S], I.rzByGame(data.drives?.[S]), data.sit?.[S])]));
-for (const S of seasons) I.decisions(effBy[S]);
+{ let dp = null; for (const S of seasons) dp = I.decisions(effBy[S], dp); }
 const stC = I.stCurves(seasons.flatMap(S => data.drives?.[S] || []));
 const stBy = {}, stPrior = {};
 for (const S of seasons) {

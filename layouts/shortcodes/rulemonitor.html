@@ -35,7 +35,7 @@
     </table>
     </div>
     {{- with $d.du }}
-    <p><b>Kelly sizing on the live picks</b> <span class="cfb__dim">does sizing add: close value weighted by stake against the same picks flat, and against the edge they were staked on</span></p>
+    <p><b>Kelly sizing on the live picks</b></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t">
       <thead><tr><th>Market</th><th title="picks judged by the close; units staked">Picks</th><th title="close value weighted by stake; t clustered by game day">stake-weighted</th><th title="the same picks at one stake each">Flat</th><th title="stake-weighted minus flat: positive when bigger stakes went on better bets">Sizing adds</th><th title="the edge Kelly's calibration gave these picks, weighted by stake">Expected</th></tr></thead>
@@ -55,6 +55,6 @@
     </div>
     {{- end }}
   </div>
-  <div class="win__status"><span>judged by the close · Novig (DraftKings via ESPN before Oct 27)</span><span {{ partial "fresh-attrs.html" "rule_monitor" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="Kelly sizing: close value weighted by stake against the same picks flat, and against the edge they were staked on."><span>judged by the close · Novig (DraftKings via ESPN before Oct 27)</span><span {{ partial "fresh-attrs.html" "rule_monitor" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

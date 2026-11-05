@@ -114,6 +114,10 @@ jobs:
         with:
           pattern: refit-*
           path: /tmp/legs
+      - name: Drop refits that started on older code
+        run: |
+          git fetch -q --unshallow origin main 2>/dev/null || git fetch -q origin main
+          python3 scripts/refit.py stale /tmp/legs
       - name: Apply the kept fits, record every result
         run: |
           for d in /tmp/legs/*/; do if [ -d "$d/files" ]; then cp -r "$d/files/." .; fi; done

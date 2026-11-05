@@ -15,7 +15,7 @@
     <p><b>bankroll {{ printf "%.1f" $b.now }}</b> <span class="cfb__dim">from {{ $b.start }} · {{ printf "%.1f" $b.open }} open · peak {{ printf "%.1f" $b.peak }}{{ if gt $b.drawdown 0.0 }} · drawdown {{ printf "%.1f%%" (mul $b.drawdown 100) }}{{ end }}</span></p>
     <p class="pclv"><b>judged by the close</b> · {{ if $r.clvN }}{{ $r.clvN }} graded: worth <b>{{ printf "%+.1f%%" (mul $r.clvRet 100) }}</b> at the close{{ with $d.tEff }} <span class="cfb__dim">t {{ printf "%.1f" . }} (effective n)</span>{{ end }}{{ with $r.beat }}, line moved our way {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}none graded yet{{ end }}
     <br><span class="cfb__dim">results: {{ if $r.settled }}{{ $r.w }}-{{ $r.l }}{{ if $r.p }}-{{ $r.p }}{{ end }}, {{ printf "%+.2f" $r.profit }} units on {{ printf "%.1f" $r.risked }} risked{{ with $r.roi }}, {{ printf "%+.1f%%" (mul . 100) }} a pick{{ end }}{{ else }}none settled yet{{ end }} · {{ $r.n }} picks since {{ lower ((time $d.registered).Format "Jan 2") }}</span></p>
-    <p><b>gates</b> <span class="cfb__dim">(all must pass before real money is discussed)</span></p>
+    <p><b>gates</b></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t">
       <thead><tr><th>Gate</th><th>Now</th><th></th></tr></thead>
@@ -27,7 +27,7 @@
     </table>
     </div>
     {{- $c := $d.corr }}
-    <p class="cfb__dim">slates: {{ $c.slates }}, {{ with $c.avgSlate }}{{ . }} picks each on average{{ else }}none graded{{ end }}; within-slate correlation {{ with $c.rho }}rho {{ printf "%.2f" . }}{{ else }}not measured yet (taken as 0){{ end }}, so {{ $c.n }} picks count as {{ $c.nEff }}.</p>
+    <p class="cfb__dim">slates {{ $c.slates }} · {{ with $c.avgSlate }}{{ . }} picks a slate{{ else }}none graded{{ end }} · within-slate rho {{ with $c.rho }}{{ printf "%.2f" . }}{{ else }}0 (not measured){{ end }} · {{ $c.n }} picks = {{ $c.nEff }} effective</p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Market</th><th title="return the graded picks were worth at the closing line; t">Worth at close</th><th title="picks / graded by the close">Picks</th><th title="mean points the line moved our way, and how often">CLV</th><th title="results at each pick's price and stake">Result</th></tr></thead>
@@ -45,7 +45,7 @@
     </table>
     </div>
   </div>
-  <div class="win__status"><span>paper only · Novig (DraftKings before Oct 27)</span><span {{ partial "fresh-attrs.html" "paper_book" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="Every gate must pass before real money is discussed. Effective n counts picks on one slate as correlated by the within-slate rho."><span>paper only · Novig (DraftKings before Oct 27)</span><span {{ partial "fresh-attrs.html" "paper_book" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- with $d.open }}
 {{- partial "wintable-open.html" (dict "title" "paper book :: open picks" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}

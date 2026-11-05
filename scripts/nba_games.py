@@ -58,7 +58,7 @@ HIST = os.path.join(HERE, 'nba_games_hist.json.gz')     # outside data/: Hugo wo
 FIT = os.path.join(ROOT, 'data', 'nba_games_fit.json')
 OUT = os.path.join(ROOT, 'data', 'nba_games.json')
 XPM = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
-INJ_HIST = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'inj_hist.json')
+INJ_HIST = os.path.join(HERE, 'data', 'nba_inj_hist.json.gz')     # official reports 2019-20 on (nba_inj_hist.py)
 FIRST = 2013                      # 2012-13: XPM from 2010-11 on; ratings warm up two seasons before scoring
 SCORE_FROM, HOLD_FROM = 2015, 2022
 FEATS = ['elo', 'eff', 'mkt', 'lin', 'rest', 'b2b', 'home']
@@ -187,6 +187,26 @@ def load_hist():
 def norm(n):
     """a player's name key, shared by every sport (scripts/names.py): accents, punctuation, suffixes, aliases"""
     return NM.key(n)
+
+
+def load_inj(games=()):
+    """official injury report statuses by game id ({name key: status}): the committed history (scripts/nba_inj_hist.py)
+    plus, for games (the season in progress), its finished games' reports read by the same rule, so the daily walk
+    sees what the fit saw (Nov 4 2026: it walked every past game with no statuses, and a fit run without the then
+    local-only history had none)"""
+    try:
+        with gzip.open(INJ_HIST, 'rt') as f:
+            raw = json.load(f)
+    except (OSError, ValueError):
+        raw = {}
+    new = [g for g in games if g.get('fin') and g['id'] not in raw]
+    if new:
+        try:
+            import nba_inj_hist as I
+            raw.update(I.reports(new))
+        except Exception as e:           # noqa: BLE001  (no pdftotext, the NBA's site down: those games walk unreported)
+            print('injury reports for this season:', repr(e))
+    return {gid: {norm(k): v for k, v in rep.items()} for gid, rep in raw.items()}
 
 
 _XP = {}
