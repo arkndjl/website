@@ -27,6 +27,7 @@ import glob
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -153,6 +154,48 @@ def revert(paths):
             os.remove(os.path.join(ROOT, p))
 
 
+def key_paths(o, depth=2, pre=''):
+    out = set()
+    if isinstance(o, dict) and depth > 0:
+        for k, v in o.items():
+            out.add(pre + '/' + str(k))
+            out |= key_paths(v, depth - 1, pre + '/' + str(k))
+    return out
+
+
+def lost_keys(path):
+    """Key paths (two levels) the committed version of a fit file has and the new one lacks. A refit that silently
+    ran without an input (a missing cache, older code) shows up as missing parts rather than as a crash."""
+    try:
+        old = json.loads(git('show', f'HEAD:{path}') or 'null')
+        new = json.load(open(os.path.join(ROOT, path)))
+    except ValueError:
+        return []
+    return sorted(key_paths(old) - key_paths(new))
+
+
+def cmd_stale(d):
+    """Drop legs whose code or fit files changed on origin/main after the leg checked out. Before this, a refit that
+    started on older code was pushed over newer fits (Nov 2: NHL OT-winner slope and rank-odds game noise lost).
+    Run after `git fetch origin main`; a dropped leg keeps the committed fit and retries at the next run."""
+    for p in sorted(glob.glob(os.path.join(d, '*', '*.json'))):
+        try:
+            r = json.load(open(p))
+        except ValueError:
+            continue
+        if r.get('job') not in JOBS or not r.get('changed') or not r.get('sha'):
+            continue
+        moved = git('diff', '--name-only', r['sha'], 'origin/main', '--', *r['changed'],
+                    'scripts/*.py', 'scripts/*.mjs', 'scripts/games_wf').split()
+        moved = [m for m in moved if not m.startswith('scripts/data/') or m in r['changed']]
+        if moved:
+            shutil.rmtree(os.path.join(os.path.dirname(p), 'files'), ignore_errors=True)
+            r.update(status='stale', changed=[], note='code or fit changed on main during the refit: ' + ', '.join(moved[:4]))
+            json.dump(r, open(p, 'w'), indent=1)
+            print(f'{r["job"]}: stale, dropped ({", ".join(moved[:4])})')
+    return 0
+
+
 def kept(p, keep):
     import fnmatch
     return any(fnmatch.fnmatch(p, k) for k in keep)
@@ -161,7 +204,8 @@ def kept(p, keep):
 def cmd_run(name):
     j = JOBS[name]
     os.makedirs(os.path.join(ROOT, 'scripts', '.refit'), exist_ok=True)
-    res = {'job': name, 'at': now().strftime('%Y-%m-%dT%H:%M:%SZ'), 'status': 'failed', 'note': ''}
+    res = {'job': name, 'at': now().strftime('%Y-%m-%dT%H:%M:%SZ'), 'status': 'failed', 'note': '',
+           'sha': git('rev-parse', 'HEAD').strip()}
     t0 = time.time()
     try:
         p = subprocess.run(j['cmd'], shell=True, cwd=ROOT, timeout=j['timeout'] * 60,
@@ -180,6 +224,10 @@ def cmd_run(name):
         bad = [f'{c}: {e}' for c in keep if c.endswith('.json') and (e := strict_json(os.path.join(ROOT, c)))]
         if bad:
             res['note'] = 'bad JSON: ' + '; '.join(bad)[:300]
+    if not res['note']:
+        lost = [f'{c}: {", ".join(k[:3])}' for c in keep if c.endswith('.json') and (k := lost_keys(c))]
+        if lost:   # Nov 2: an NBA refit without the injury-report cache dropped every status rate and still "passed"
+            res['note'] = 'fit lost keys the committed one has: ' + '; '.join(lost)[:300]
     if not res['note'] and j.get('check'):
         c = subprocess.run(j['check'], shell=True, cwd=ROOT, timeout=3600, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         if c.returncode != 0:
@@ -253,4 +301,6 @@ if __name__ == '__main__':
         sys.exit(cmd_plan(a[1:]))
     if c == 'collect':
         sys.exit(cmd_collect(a[1]))
+    if a[:1] == ['stale'] and len(a) > 1:
+        sys.exit(cmd_stale(a[1]))
     cmd_status()
