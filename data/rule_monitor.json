@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-05T10:57:53Z",
+ "asof": "2026-11-05T15:24:37Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -998,23 +998,31 @@
    "book": "picks",
    "sport": "cbb",
    "label": "CBB spread 2.5+",
-   "since": "2026-11-04",
-   "status": "on",
-   "stopped": null,
-   "n": 14,
-   "clvN": 5,
-   "clvRet": -0.0362,
-   "clvT": null,
-   "days": 1,
-   "beat": 0.0,
-   "settled": 5,
-   "w": 2,
-   "l": 3,
-   "roi": -0.196,
+   "since": "2026-11-01",
+   "status": "stopped",
+   "stopped": {
+    "at": "2026-11-05T15:24:32Z",
+    "n": 79,
+    "t": -1.46,
+    "cusum": 8.16,
+    "why": "last 79 worth t -1.46 at the close",
+    "fit": "182749cc45",
+    "test": "close"
+   },
+   "n": 79,
+   "clvN": 79,
+   "clvRet": -0.0196,
+   "clvT": -1.46,
+   "days": 3,
+   "beat": 0.177,
+   "settled": 79,
+   "w": 36,
+   "l": 43,
+   "roi": -0.1061,
    "week": {
-    "n": 5,
-    "clvRet": -0.0362,
-    "clvT": null
+    "n": 79,
+    "clvRet": -0.0196,
+    "clvT": -1.46
    },
    "exp": {
     "clvRet": 0.0343,
@@ -1023,57 +1031,67 @@
     "n": 4362
    },
    "vsExp": {
-    "gap": -0.0705,
-    "z": -1.4,
-    "read": "in line"
+    "gap": -0.0539,
+    "z": -4.02,
+    "read": "below the backtest"
    },
    "check": {
-    "n": 5,
-    "window": 5,
-    "mean": -0.0362,
-    "t": null,
-    "days": 1,
+    "n": 79,
+    "window": 79,
+    "mean": -0.0196,
+    "t": -1.46,
+    "days": 3,
     "sd": 0.1123,
-    "cusum": 0.68,
-    "cusumMax": 0.68,
+    "cusum": 8.16,
+    "cusumMax": 8.16,
     "h": 10.0,
-    "stop": false,
-    "why": "",
+    "stop": true,
+    "why": "last 79 worth t -1.46 at the close",
     "drift": {
      "mu1": 0.0099,
-     "n": 4,
+     "n": 65,
      "sd": 0.1123,
      "rho": 0.001,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.125,
-     "info": 0.03,
-     "real": -3.553,
-     "realSe": 5.699,
+     "llr": -1.827,
+     "info": 0.5,
+     "real": -3.253,
+     "realSe": 1.426,
      "need": 763
     }
    },
    "drift": {
     "mu1": 0.0099,
-    "n": 4,
+    "n": 65,
     "sd": 0.1123,
     "rho": 0.001,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.125,
-    "info": 0.03,
-    "real": -3.553,
-    "realSe": 5.699,
+    "llr": -1.827,
+    "info": 0.5,
+    "real": -3.253,
+    "realSe": 1.426,
     "need": 763,
     "path": [
      [
+      "2026-11-02",
+      48,
+      -1.016
+     ],
+     [
+      "2026-11-03",
+      61,
+      -1.702
+     ],
+     [
       "2026-11-04",
-      4,
-      -0.125
+      65,
+      -1.827
      ]
     ]
    }
@@ -1083,23 +1101,31 @@
    "book": "picks",
    "sport": "cbb",
    "label": "CBB total 2+",
-   "since": "2026-11-05",
-   "status": "on",
-   "stopped": null,
-   "n": 19,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
+   "since": "2026-11-01",
+   "status": "stopped",
+   "stopped": {
+    "at": "2026-11-05T15:24:32Z",
+    "n": 80,
+    "t": -9.95,
+    "cusum": 6.11,
+    "why": "last 80 worth t -9.95 at the close; drift test: live worth -1.76 of the backtest's expected edge over 80 bets, 19x likelier no edge than the backtest's",
+    "fit": "ce002f1674",
+    "test": "drift"
+   },
+   "n": 80,
+   "clvN": 80,
+   "clvRet": -0.0331,
+   "clvT": -9.95,
+   "days": 3,
+   "beat": 0.275,
+   "settled": 80,
+   "w": 42,
+   "l": 38,
+   "roi": 0.0297,
    "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
+    "n": 80,
+    "clvRet": -0.0331,
+    "clvT": -9.95
    },
    "exp": {
     "clvRet": 0.0493,
@@ -1107,49 +1133,77 @@
     "roi": 0.0625,
     "n": 7151
    },
+   "vsExp": {
+    "gap": -0.0824,
+    "z": -24.78,
+    "read": "below the backtest"
+   },
    "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
+    "n": 80,
+    "window": 80,
+    "mean": -0.0331,
+    "t": -9.95,
+    "days": 3,
     "sd": 0.1113,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusum": 6.11,
+    "cusumMax": 9.23,
     "h": 10.0,
-    "stop": false,
-    "why": "",
+    "stop": true,
+    "why": "last 80 worth t -9.95 at the close; drift test: live worth -1.76 of the backtest's expected edge over 80 bets, 19x likelier no edge than the backtest's",
     "drift": {
      "mu1": 0.0174,
-     "n": 0,
+     "n": 80,
      "sd": 0.1113,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "state": "paused",
+     "at": [
+      "2026-11-02",
+      68
+     ],
+     "llr": -4.411,
+     "info": 1.95,
+     "real": -1.763,
+     "realSe": 0.716,
      "need": 242
-    }
+    },
+    "test": "drift"
    },
    "drift": {
     "mu1": 0.0174,
-    "n": 0,
+    "n": 80,
     "sd": 0.1113,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
-    "state": "watching",
-    "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
+    "state": "paused",
+    "at": [
+     "2026-11-02",
+     68
+    ],
+    "llr": -4.411,
+    "info": 1.95,
+    "real": -1.763,
+    "realSe": 0.716,
     "need": 242,
-    "path": []
+    "path": [
+     [
+      "2026-11-02",
+      68,
+      -3.949
+     ],
+     [
+      "2026-11-03",
+      73,
+      -4.044
+     ],
+     [
+      "2026-11-04",
+      80,
+      -4.411
+     ]
+    ]
    }
   },
   {
@@ -1851,9 +1905,14 @@
    "basis": "backtest + live picks"
   }
  ],
- "stopped": [],
+ "stopped": [
+  "pick:cbb:spread",
+  "pick:cbb:total"
+ ],
  "flags": [
-  "pick:nfl:total"
+  "pick:nfl:total",
+  "pick:cbb:spread",
+  "pick:cbb:total"
  ],
  "drift": {
   "watching": [
@@ -1870,7 +1929,6 @@
    "pick:nfl:spread",
    "pick:nfl:total",
    "pick:cbb:spread",
-   "pick:cbb:total",
    "pick:nba:total",
    "pick:nba:spread | line: 4-9",
    "pick:nba:spread | line: 9-15",
@@ -1881,6 +1939,8 @@
    "pick:nba:spread | venue: home"
   ],
   "confirmed": [],
-  "paused": []
+  "paused": [
+   "pick:cbb:total"
+  ]
  }
 }
