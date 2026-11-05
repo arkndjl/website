@@ -231,9 +231,44 @@ def judged(e):
     return bet(e)
 
 
+# k (the close's move per point of edge) is refit on every game model change and wanders in its third decimal (CBB
+# total .378 -> .379 -> .376, spread .221 -> .216, Nov 3-5 2026). Keying the clock on its exact value restarted every
+# CBB and NBA clock at each model PR, so the stop and drift tests never reached their 50 / 30 bets (CBB's first 147
+# graded bets, -3.1% at the close, sat before the clocks). A clock now restarts when the market, segment or X changes,
+# or k moves more than K_TOL of the k it started with.
+K_TOL = 0.10
+
+
+def same_rule(c, defn):
+    """an existing clock c still stands for the rule defn (see K_TOL). Clocks from before Nov 5 2026 hold only the hash:
+    matched by trying the k values within K_TOL at the three decimals k is written with"""
+    k = defn.get('k')
+    if 'x' in c:
+        k0 = c.get('k0')
+        return (c['x'] == defn.get('x') and c.get('seg') == defn.get('seg') and c.get('mk') == defn.get('mk')
+                and (k == k0 or (k is not None and k0 is not None and abs(k - k0) <= K_TOL * abs(k0))))
+    if k is None:
+        return False
+    span = int(abs(k) * K_TOL * 1000)
+    return any(fp({**defn, 'k': round(k + j / 1000, 3)}) == c['hash'] for j in range(-span, span + 1))
+
+
+def legacy_k(c, defn):
+    """the k an old hash-only clock was started with (same_rule's search), else defn's"""
+    k = defn.get('k')
+    if k is None:
+        return None
+    span = int(abs(k) * K_TOL * 1000)
+    for j in range(-span, span + 1):
+        if fp({**defn, 'k': round(k + j / 1000, 3)}) == c['hash']:
+            return round(k + j / 1000, 3)
+    return k
+
+
 def pick_state(sport, RS, log, old, stamp, P=None):
     """clocks and stops for one sport's pick rules: (state, stopped ids). old: the state games_picks.py kept last run.
-    A rule's clock restarts when its X or k changes; a stop clears when a refit changes the rule or re-tests it."""
+    A rule's clock restarts when its market, segment or X changes or k moves past K_TOL; a stop clears when a refit
+    changes the rule or re-tests it."""
     P = P or params()
     old = old or {}
     clocks, stops = dict(old.get('clocks') or {}), dict(old.get('stopped') or {})
@@ -243,12 +278,16 @@ def pick_state(sport, RS, log, old, stamp, P=None):
     for i, (defn, full, held, _) in rules.items():
         h, fh = fp(defn), fp(full)
         c = clocks.get(i)
-        if c is None or c['hash'] != h:
-            clocks[i] = {'hash': h, 'since': since0 if c is None else stamp}
+        rule = {'mk': defn.get('mk'), 'x': defn.get('x'), **({'seg': defn['seg']} if defn.get('seg') else {})}
+        if c is None or (c['hash'] != h and not same_rule(c, defn)):
+            clocks[i] = {'hash': h, 'since': since0 if c is None else stamp, **rule, 'k0': defn.get('k')}
             stops.pop(i, None)
         elif i in stops and stops[i].get('fit') != fh:
-            clocks[i] = {'hash': h, 'since': stamp}
+            clocks[i] = {'hash': h, 'since': stamp, **rule, 'k0': defn.get('k')}
             stops.pop(i)
+        elif 'x' not in c or c['hash'] != h:
+            # the same rule (k within K_TOL): the clock keeps its start; it records the rule and the k it began with
+            clocks[i] = {**c, 'hash': h, **rule, 'k0': c['k0'] if 'k0' in c else legacy_k(c, defn)}
         bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
         d = decide(bs, sd_of(held), P)
         dr = drift(bs, expected_live(sport, held), sd_of(held), rho_for(sport, defn['mk']), P)
@@ -419,6 +458,21 @@ def test():
     RS3 = {**RS, 'markets': {'total': {**RS['markets']['total'], 'x': 6.0}}}
     st4, off4 = pick_state('nba', RS3, log, st2, '2026-12-03T00:00:00Z', P)
     assert not off4 and st4['clocks']['total']['since'] == '2026-12-03T00:00:00Z'
+    # k refit noise keeps the clock (and the stop); a real move in k restarts it; an old hash-only clock is matched
+    RSk = lambda k: {**RS, 'markets': {'total': {**RS['markets']['total'], 'k': k}}}
+    s0, _ = pick_state('nba', RS, [], {}, '2026-11-02T00:00:00Z', P)
+    s1, _ = pick_state('nba', RSk(0.603), [], s0, '2026-11-03T00:00:00Z', P)
+    assert s1['clocks']['total']['since'] == '2026-11-01' and s1['clocks']['total']['k0'] == 0.6, s1['clocks']
+    s2, _ = pick_state('nba', RSk(0.59), [], s1, '2026-11-04T00:00:00Z', P)
+    assert s2['clocks']['total']['since'] == '2026-11-01', s2['clocks']
+    s3, _ = pick_state('nba', RSk(0.7), [], s2, '2026-11-05T00:00:00Z', P)
+    assert s3['clocks']['total']['since'] == '2026-11-05T00:00:00Z' and s3['clocks']['total']['k0'] == 0.7, s3['clocks']
+    old = {'clocks': {'total': {'hash': fp({'mk': 'total', 'x': 5.5, 'k': 0.6}), 'since': '2026-10-21'}}}
+    s4, _ = pick_state('nba', RSk(0.598), [], old, '2026-11-06T00:00:00Z', P)
+    assert s4['clocks']['total']['since'] == '2026-10-21' and s4['clocks']['total']['k0'] == 0.6, s4['clocks']
+    stk, offk = pick_state('nba', {**RS, 'markets': {'total': {**RS['markets']['total'], 'k': 0.601}}}, log, st2, '2026-12-04T00:00:00Z', P)
+    # a stopped rule still comes back on any refit that re-tests it (its fit entry changes), as pre-registered
+    assert not offk and stk['clocks']['total']['since'] == '2026-12-04T00:00:00Z', stk['clocks']
     # the drift test: a rule worth nothing pauses, one worth its backtest confirms, and a pause stops the rule
     def wk(mu, n, per=18):
         return [{'kick': (k0 + datetime.timedelta(days=7 * (i // per))).strftime('%Y-%m-%dT%H:%M:%SZ'), 'clvRet': rnd.gauss(mu, 0.123)} for i in range(n)]
