@@ -1566,6 +1566,11 @@ def build():
             'ros': F['ros'], 'ablation': F['ablation'], 'paSd': pa_sd, 'params': F['params'],
             'breakout': {k: v for k, v in (F.get('breakout') or {}).items() if k != 'model'}, 'stability': F.get('stability'),
             'avail': {c: avail[c]['p'][0] for c in avail}}
+    try:   # today's club from RotoWire's transaction news; a cut player reads FA (Nov 5 2026)
+        import rotowire_moves
+        rotowire_moves.retag('nfl', players, club='t', pos='pos', released=True, label='fantasy')
+    except ImportError:
+        pass
     body = {'season': last, 'week': week, 'asof': asof, 'paSd': pa_sd, 'scoring': SCORING, 'paTiers': PA_TIERS, 'boCut': BO_CUT,
             'players': players}
     try:

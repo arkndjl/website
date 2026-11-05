@@ -95,7 +95,24 @@ def espn_depth(league):
                 out.append((t['abbreviation'], u.get('name') or '', slot,
                             [(a.get('displayName'), a.get('id'), espn_inj(a)) for a in v.get('athletes') or []]))
         time.sleep(0.15)
-    return hold_starters(league, out)
+    return hold_starters(league, rotowire_gap(league, out))
+
+
+def rotowire_gap(league, charts):
+    """Drop a player RotoWire's transaction news (scripts/rotowire_moves.py) has traded, claimed away, released or
+    (NHL) sent to the minors in the last few days while ESPN's chart still lists him (Nov 5 2026)."""
+    try:
+        import rotowire_moves as RM
+    except Exception:
+        return charts
+    sp, n = league.split('/')[-1], 0
+    for i, (tm, chart, slot, ath) in enumerate(charts):
+        keep = [a for a in ath if not (a[0] and RM.drop_moved(sp, a[0], tm, NFL_SLOT.get(slot, slot).upper() if sp == 'nfl' else None))]
+        n += len(ath) - len(keep)
+        charts[i] = (tm, chart, slot, keep)
+    if n:
+        print(f'depth {sp}: {n} listings dropped (RotoWire moves)')
+    return charts
 
 
 # ---------------------------------------------------------------- injured starters (Noah, Nov 2 2026)

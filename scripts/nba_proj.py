@@ -214,6 +214,11 @@ def project(fresh=True):
     except Exception as e:
         print('faces skipped', e)
     rows.sort(key=lambda r: -r['pxpm'])
+    try:   # today's club from RotoWire's transaction news; released or retired reads FA (Nov 5 2026)
+        import rotowire_moves
+        rotowire_moves.retag('nba', rows, club='tm', released=True, label='proj')
+    except ImportError:
+        pass
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}',
            'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'games': gp,
            'dpw': round(dpw / 1e6, 2), 'min': round(mn / 1e6, 2), 'capG': CAP_G,

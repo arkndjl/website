@@ -2216,6 +2216,18 @@ const injuries = await (async () => {
       }
     } catch (e) { console.log(`rotowire: ${e.message}`); }
     console.log(`rotowire: ${rwN} news items, ${rwMatched} matched with a status`);
+    // RotoWire's move news (scripts/rotowire_moves.py, odds-snap every half hour): a player who left the program in
+    // season (dismissed, entered the portal, medically retired, left the team) is out for the season
+    try {
+      const mv = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'rotowire_moves', 'cfootball.json'), 'utf8')).exits || [];
+      const ixT = teamIndex(espn.teams); let nx = 0;
+      for (const m of mv) {
+        const tid = ixT.resolve(m.team); if (!tid) continue;
+        const a = (byNorm[norm(m.player)] || []).find(x => x.tid === tid); if (!a) continue;
+        nx++; put(a, 'Out (season)', `${m.d}T12:00:00.000Z`, `${m.head} (RotoWire)`, 'rotowire');
+      }
+      console.log(`rotowire: ${nx} program exits`);
+    } catch (e) { console.log(`rotowire moves: ${e.message}`); }
     for (const [tid, list] of Object.entries(espnInjuries)) for (const i of list) {
       const a = (byNorm[norm(i.name)] || []).find(x => x.tid === tid); if (!a) continue;
       const st = /season/i.test(i.detail || '') ? 'Out (season)' : /^out/i.test(i.status || '') ? 'Out' : i.status;
