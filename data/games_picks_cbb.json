@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-05T01:32:00Z",
+ "asof": "2026-11-05T01:33:47Z",
  "recenter": {
   "2026-11-04": -12.49,
   "2026-11-05": -12.41
@@ -200,8 +200,8 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": -208.0,
-    "ev": 0.069,
+    "price": -212.0,
+    "ev": 0.062,
     "units": 1.5,
     "unitsRaw": 5.0,
     "unitsCap": 1.5
@@ -852,22 +852,6 @@
    "tm": 144.9
   },
   {
-   "id": "401925819",
-   "sport": "cbb",
-   "kick": "2026-11-06T00:00:00Z",
-   "home": "Charlotte",
-   "away": "Georgia State",
-   "mk": "total",
-   "side": "under",
-   "line": 151.5,
-   "price": -113.0,
-   "edge": 3.5,
-   "x": 2.0,
-   "why": "no edge at -113",
-   "m": 10.5,
-   "tm": 148.0
-  },
-  {
    "id": "401918968",
    "sport": "cbb",
    "kick": "2026-11-06T01:00:00Z",
@@ -948,6 +932,22 @@
    "tm": 142.6
   },
   {
+   "id": "401925819",
+   "sport": "cbb",
+   "kick": "2026-11-06T00:00:00Z",
+   "home": "Charlotte",
+   "away": "Georgia State",
+   "mk": "spread",
+   "side": "away",
+   "line": 11.5,
+   "price": -104.0,
+   "edge": 1.0,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 10.5,
+   "tm": 148.0
+  },
+  {
    "id": "401921698",
    "sport": "cbb",
    "kick": "2026-11-06T02:00:00Z",
@@ -990,13 +990,13 @@
    "state": "under"
   },
   "401917514": {
-   "mk": "total",
-   "side": "under",
-   "line": 161.5,
-   "price": 102.0,
-   "ev": 0.071,
-   "edge": 3.3,
-   "units": 3.75,
+   "mk": "spread",
+   "side": "home",
+   "line": 5.5,
+   "price": 106.0,
+   "ev": 0.1,
+   "edge": 4.3,
+   "units": 5.0,
    "home": "Loyola Marymount",
    "away": "Queens University",
    "state": "pick"
@@ -1134,11 +1134,11 @@
    "state": "under"
   },
   "401925819": {
-   "mk": "total",
-   "side": "under",
-   "line": 151.5,
-   "price": -113.0,
-   "edge": 3.5,
+   "mk": "spread",
+   "side": "away",
+   "line": 11.5,
+   "price": -104.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "Charlotte",
@@ -1270,7 +1270,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 4712,
+  "snapshots": 4716,
   "buckets": [
    {
     "when": "24h+",
@@ -1292,9 +1292,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 467,
+    "clvN": 468,
     "clvRet": -0.0535,
-    "clvT": -24.16,
+    "clvT": -24.2,
     "clv": -0.12,
     "beat": 0.113,
     "still": 0.679
@@ -8767,16 +8767,16 @@
     "down": 31.5
    },
    "2026-11-05": {
-    "raw": 39.75,
+    "raw": 39.5,
     "scale": 1.0
    },
    "2026-11-06": {
-    "raw": 6.75,
+    "raw": 6.25,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 64.75,
-    "scale": 0.6178
+    "raw": 43.5,
+    "scale": 0.9195
    },
    "2026-11-08": {
     "raw": 28.25,
