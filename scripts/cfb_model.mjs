@@ -346,11 +346,15 @@ const exNet = (k, m, t) => (m.O[t] ?? 0) - (CAND[k].side === 'o' ? 0 : m.D[t] ??
 // (in the model). Rows without fumble counts (the CFBD fallback) keep raw EPA
 export const FUMN = { on: process.env.FUMN !== '0', e: -2.86 };
 const ppaOf = r => r.ppa + (FUMN.on && r.fumN != null && r.fumE != null ? (r.fumN * FUMN.e - r.fumE) / r.plays : 0);
-function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
+// last: last season's final ratings. Before a season's first game no observation sets the league mean (adjust's mu was
+// 0/0, NaN), so every week-1 and preseason total came out NaN and was dropped; points a play and plays then take last
+// season's mean and home term (Nov 5 2026 sweep)
+function ratingsAt(effRows, before, prior, P, keys = EXTRA, last = null) {
   const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
   const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: ppaOf(r), w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
   const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
+  if (!rows.length && last) for (const [a, b] of [[ppp, last.ppp], [pace, last.pace]]) if (b && isFinite(b.mu)) { a.mu = b.mu; a.h = b.h || 0; }
   const ex = {};
   for (const k of keys) { const c = CAND[k]; if (c.special || c.ctx) continue; ex[k] = adjust(rows.filter(c.ok).map(r => ({ o: r.t, d: r.opp, y: c.y(r), w: c.w(r), s: r.s })), {}, P.lam); }
   if (keys.includes('drv') || DRIVES) {
@@ -682,7 +686,7 @@ function walk(rows, effBy, fbsBy, priors, P, seasons, finals, talBy = {}, stBy =
       const before = games.filter(r => r.done && r.w < w);
       const elo = eloRun(before, start, P);
       elo.fcsMean = start.fcsMean;
-      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P), tal: talBy[S], st: stAt(stBy[S] || [], w, stPrior[S]) };
+      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P, EXTRA, finals[S - 1]?.eff), tal: talBy[S], st: stAt(stBy[S] || [], w, stPrior[S]) };
       const id = t => fbs.has(t) ? t : FCS;
       for (const r of games.filter(r => r.w === w && r.fbsGame)) out.push({ r, x: features(r, st, fbs), t: totalOf(r, st, fbs),
         sim: SIMTEST && r.done && st.eff.ex?.drv ? simGame(st.eff.ex.drv, id(r.h), id(r.a), r.n ? 0 : 1, 1000, SIMR) : null });
@@ -1287,7 +1291,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const start = eloStart(SEASON, fbs, prior, finals);
   const elo = eloRun(cur.filter(r => r.done), start, P); elo.fcsMean = start.fcsMean;
   DRIVES = true;     // drive rates for the live drive simulation, whatever the selection kept
-  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
+  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P, EXTRA, finals[SEASON - 1]?.eff), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
   // the model's margin before the early-season stretch (predict applies it) and with the letdown spot
@@ -1308,7 +1312,7 @@ export async function runModel(data, SEASON, opts = {}) {
   let ratingPrev = null;
   if (lastW > 1) {
     const eloP = eloRun(cur.filter(r => r.done && r.w < lastW), start, P); eloP.fcsMean = start.fcsMean;
-    const stP = { elo: eloP, eff: ratingsAt(effBy[SEASON] || [], lastW, prior, P), st: stAt(stBy[SEASON] || [], lastW, stPrior[SEASON]) };
+    const stP = { elo: eloP, eff: ratingsAt(effBy[SEASON] || [], lastW, prior, P, EXTRA, finals[SEASON - 1]?.eff), st: stAt(stBy[SEASON] || [], lastW, stPrior[SEASON]) };
     ratingPrev = { week: lastW - 1, rating: rateAll(stP, eloP) };
   }
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
@@ -1365,7 +1369,10 @@ export async function runModel(data, SEASON, opts = {}) {
       // the simulation alone predicts worse than the model (it has no prior, Elo or talent), so it sets the spread only
       const sim = dv ? { m10: Math.round(m + dv.m10 - dv.mean), m90: Math.round(m + dv.m90 - dv.mean), t10: Math.round(tot + dv.t10 - dv.tot),
         t90: Math.round(tot + dv.t90 - dv.tot), pRaw: r3(dv.p) } : null;
-      return { margin: m, sigma: sigma * ek, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null, sim };
+      // tPre: a week-1 total (from last season's league means and the prior alone) is shown but not bet: held 2023-25 at
+      // 3+ points off the close it hit 43.7% (n158; weeks 2+ 55.5%); games_picks.board drops it
+      return { margin: m, sigma: sigma * ek, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null, sim,
+        ...(r.w <= 1 ? { tPre: 1 } : {}) };
     },
   };
 }

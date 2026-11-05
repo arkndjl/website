@@ -168,7 +168,8 @@ for (const p of games) {
     sport: 'cfb', S: r.S, id: String(r.id), date: new Date(r.date).toISOString(), wk: r.w, home: r.hn, away: r.an, neutral: r.n ? 1 : 0,
     m: +(q.m + (BOWL[String(r.id)] || 0)).toFixed(2), ...(BOWL[String(r.id)] ? { opt: BOWL[String(r.id)] } : {}), L: r.close, Lo, res: r.m,
     mlH: mlH ?? null, mlA: mlA ?? null, oH, oA,
-    tm: q.tm != null ? +q.tm.toFixed(2) : null, T: r.closeTot ?? null, To: To0, tot: r.tot,
+    // week-1 totals (no games yet: last season's league means + the prior) go in tm1, out of the totals rules (cfb_model.mjs tPre)
+    tm: q.tm != null && r.w > 1 ? +q.tm.toFixed(2) : null, ...(q.tm != null && r.w <= 1 ? { tm1: +q.tm.toFixed(2) } : {}), T: r.closeTot ?? null, To: To0, tot: r.tot,
     fold: q.fold, sigma: +q.sigma.toFixed(2), fcs: r.hc === 'fbs' && r.ac === 'fbs' ? 0 : 1,
     // early-season corrections (cfb_model.mjs EARLY): the margin factor and the raw total, for scripts/cfb_early.py
     ...(q.ek && q.ek !== 1 ? { ek: q.ek } : {}), ...(q.tmr != null ? { tmr: +q.tmr.toFixed(2) } : {}),
