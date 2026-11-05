@@ -607,6 +607,12 @@ def build(seasons=None):
         proj3(S, rows, repl, f, gmax if S == cur else {2013: 48, 2020: 70, 2021: 56}.get(S, 82))
         # predictive badges (scripts/nhl_badges.py; tested against next season's WAR in scripts/nhl_badge_backtest.py)
         nhl_badges.assign(S, rows, gmax)
+        if S == cur:
+            try:   # today's club from RotoWire's transaction news (Nov 5 2026)
+                import rotowire_moves
+                rotowire_moves.retag('nhl', rows, club='tm', label='war')
+            except ImportError:
+                pass
         try:   # headshots: ESPN ids by NHL id (scripts/faces.py); the board writes without them
             import faces
             faces.nhl_attach(rows, fresh=S == cur)   # the old seasons reuse the map

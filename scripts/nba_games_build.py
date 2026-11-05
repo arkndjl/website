@@ -145,6 +145,27 @@ def rotowire_injuries(ros):
         return {}
 
 
+def rotowire_long(ros):
+    """{espn athlete id: est. return yyyy-mm-dd or None (season)} for players out for the season or for weeks by their
+    RotoWire injury card (scripts/rotowire_history.py)"""
+    try:
+        import rotowire as RW
+        out, mt = {}, {}
+        for v in RW.long_term('basketball'):
+            t = E.team(v['abbr'])
+            if t not in ros:
+                continue
+            if t not in mt:
+                mt[t] = RW.matcher([{'id': k, 'name': x} for k, x in ros[t].items()], team=None, pos=None)
+            hit, _ = mt[t].find(v['player'])
+            if hit:
+                out[hit['id']] = None if v['season'] else (v['ret'] or (v['window'] or [None, None])[1])
+        return out
+    except Exception as e:  # noqa: BLE001
+        print('nba games: RotoWire long-term injuries unavailable:', e)
+        return {}
+
+
 def rosters():
     """{team: {espn id: name}} from ESPN's team rosters"""
     out = {}
@@ -200,6 +221,7 @@ def build():
     # RotoWire's news, dated: counts for a team's next game when it's newer than the team's last tip-off (older news
     # was about that game) and, on game day, newer than the NBA's report (a late scratch or upgrade after it)
     rwn = rotowire_injuries(ros)
+    rlong = rotowire_long(ros)        # out for weeks or the season: Out for a game before his estimated return
     last_tip = defaultdict(float)
     for g in cur:
         if g['fin']:
@@ -232,6 +254,8 @@ def build():
                         st[k] = w[0]; src[p] = 'RotoWire'
                     elif s_:
                         st[k] = s_; src[p] = 'NBA' if (r_ or {}).get(k) else 'ESPN'
+                    elif p in rlong and (rlong[p] is None or rlong[p] > d.isoformat()):
+                        st[k] = 'Out'; src[p] = 'RotoWire'
             m.inj[g['id']] = st
         x, tx = m.feats(g)
         if g['id'] in show_ids:

@@ -265,7 +265,31 @@ def merge_rotowire(rows):
         if RW_CBB[st]:
             out.append((team, it['player'], it['pos'], RW_CBB[st], it['inj'], d.strftime('%a, %b %-d')))
         n += 1
+    # out for weeks or the season by his RotoWire injury card (scripts/rotowire_history.py), when no row lists him
+    for v in RW.long_term('cbasketball'):
+        team = COVERS_TEAMS.get(v['team'], v['team'])
+        if any(NM.team_key(r[0]) == NM.team_key(team) and NM.same(r[1], v['player']) for r in out):
+            continue
+        out.append((team, v['player'], v['pos'], 'Out For Season' if v['season'] else 'Out', v['injury'],
+                    dt.date.fromisoformat(v['last_d']).strftime('%a, %b %-d')))
+        n += 1
     print(f'cbb injuries: {n} RotoWire items merged')
+    try:   # RotoWire's move news: a player who left the program (dismissed, portal, retired) sits the rest of the season
+        import rotowire_moves as RM
+        k = 0
+        for m in RM.exits('cbasketball'):
+            if not m['team'] or m['team'] in RM.FA:
+                continue
+            team = COVERS_TEAMS.get(m['team'], m['team'])
+            if any(NM.team_key(r[0]) == NM.team_key(team) and NM.same(r[1], m['player']) and r[3] == 'Out For Season' for r in out):
+                continue
+            out = [r for r in out if not (NM.team_key(r[0]) == NM.team_key(team) and NM.same(r[1], m['player']))]
+            out.append((team, m['player'], m['pos'], 'Out For Season', m['head'],
+                        dt.date.fromisoformat(m['d']).strftime('%a, %b %-d')))
+            k += 1
+        print(f'cbb injuries: {k} RotoWire program exits')
+    except Exception as e:  # noqa: BLE001
+        print('cbb injuries: RotoWire exits unavailable:', e)
     return out
 
 

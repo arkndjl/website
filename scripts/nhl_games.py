@@ -1283,6 +1283,16 @@ def injuries():
             if st != 'Active':
                 war = round(82 * p['num'] / p['gp'], 1) if p and p['gp'] >= 5 else None
                 lst.append({'name': it['player'], 'status': st, 'war': war, 'ts': it['ts'], 'p': p})
+        # out for weeks or the season by his RotoWire injury card (scripts/rotowire_history.py), when no one lists him
+        for v in RW.long_term('hockey'):
+            tm = D.team(v['abbr'])
+            if tm not in TEAMS or any(NM.same(r['name'], v['player']) for r in out.get(tm, [])):
+                continue
+            p, _ = M.find(v['player'], team=tm)
+            war = round(82 * p['num'] / p['gp'], 1) if p and p['gp'] >= 5 else None
+            c = (v['status'] or '').upper()
+            st = 'Out (season)' if v['season'] else 'LTIR' if 'LTIR' in c else 'Injured Reserve' if c.startswith('IR') else 'Out'
+            out.setdefault(tm, []).append({'name': v['player'], 'status': st, 'war': war, 'ts': 0, 'p': p})
     except Exception as e:  # noqa: BLE001
         print('nhl games: RotoWire news unavailable:', e)
     for v in out.values():

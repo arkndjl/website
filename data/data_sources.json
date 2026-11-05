@@ -2,7 +2,7 @@
   "note": "Every outside source the ARKBOARD pulls from (scripts/, .github/workflows/). Add a source here when a fetcher starts using it.",
   "groups": [
     { "name": "college football", "sources": [
-      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news" },
+      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, program exits" },
       { "n": "CollegeFootballData (CFBD)", "u": "https://collegefootballdata.com/", "w": "games, drives, plays, rosters, recruiting, returning production" },
       { "n": "cfbfastR data (SportsDataverse)", "u": "https://github.com/sportsdataverse/cfbfastR-data", "w": "historical play-by-play, roster height and weight" },
       { "n": "ESPN", "u": "https://www.espn.com/college-football/", "w": "scores, schedules, box scores, injuries, FPI, depth, headshots" },
@@ -21,14 +21,14 @@
       { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "draft picks (who left before the season, for returning production)" }
     ]},
     { "name": "NFL", "sources": [
-      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news" },
+      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves" },
       { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap)" },
       { "n": "nfldata (Lee Sharpe)", "u": "https://github.com/nflverse/nfldata", "w": "games and closing lines" },
       { "n": "ESPN", "u": "https://www.espn.com/nfl/", "w": "scores, injuries, depth charts, headshots" },
       { "n": "NFL.com", "u": "https://www.nfl.com/", "w": "headshots" }
     ]},
     { "name": "college basketball", "sources": [
-      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news" },
+      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, program exits" },
       { "n": "Barttorvik (T-Rank)", "u": "https://barttorvik.com/", "w": "player and team efficiency, game logs" },
       { "n": "ESPN", "u": "https://www.espn.com/mens-college-basketball/", "w": "scores, box scores, rosters, headshots" },
       { "n": "NCAA.com (via ncaa-api)", "u": "https://www.ncaa.com/scoreboard/basketball-men/d2", "w": "Division II and III box scores" },
@@ -43,7 +43,7 @@
       { "n": "Wikidata", "u": "https://www.wikidata.org/", "w": "birth dates" }
     ]},
     { "name": "NBA", "sources": [
-      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news" },
+      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves" },
       { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions" },
       { "n": "NBA.com", "u": "https://www.nba.com/", "w": "officials, headshots" },
       { "n": "ESPN", "u": "https://www.espn.com/nba/", "w": "scores, injuries, depth" },
@@ -53,7 +53,7 @@
       { "n": "PBP Stats", "u": "https://www.pbpstats.com/", "w": "research backtests" }
     ]},
     { "name": "hockey", "sources": [
-      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news" },
+      { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves" },
       { "n": "NHL API", "u": "https://www.nhl.com/", "w": "games, rosters, stats, headshots" },
       { "n": "MoneyPuck", "u": "https://moneypuck.com/", "w": "expected goals, skater and goalie data" },
       { "n": "Daily Faceoff", "u": "https://www.dailyfaceoff.com/", "w": "starting goalies, lines" },

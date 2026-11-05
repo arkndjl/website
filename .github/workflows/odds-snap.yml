@@ -39,6 +39,21 @@ jobs:
           ref: main
       - name: Snapshot the lines
         run: python3 scripts/odds_snap.py
+      # RotoWire's injury news, every sport (scripts/rotowire.py -> scripts/data/rotowire_news.json): its free pages show
+      # the newest 25 items, under a day in season, so the log is kept here every half hour for the sport builds
+      - name: RotoWire injury news
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python3 scripts/rotowire.py
+      # RotoWire's roster moves (trades, claims, signings, releases, call-ups, send-downs, college exits): the news feed
+      # since the last poll (scripts/rotowire_moves.py -> scripts/data/rotowire_moves/), then every board's roster
+      # checked against it (scripts/roster_audit.py -> data/roster_audit.json). The sport builds retag clubs from it.
+      - name: RotoWire roster moves
+        continue-on-error: true
+        timeout-minutes: 4
+        run: |
+          python3 scripts/rotowire_moves.py --calls 20
+          python3 scripts/roster_audit.py
       # NBA and NFL player props (Novig, DraftKings through ESPN), NFL first-half lines and team totals, and the paper
       # books (scripts/props_snap.py, scripts/props_paper.py, scripts/nfl_props_paper.py)
       - name: Props snapshot and paper book
@@ -101,7 +116,7 @@ jobs:
             --site data/ticker.json data/standings.json data/paper_book.json data/props_paper.json data/props_paper_nfl.json data/novig_paper.json 'data/games_picks_*.json' \
             --rebuild data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json data/paper_book.json \
             --regen "GITHUB_TOKEN= python3 scripts/picks_refresh.py; python3 scripts/paper_book.py" \
-            -- scripts/data/odds_dense scripts/data/rotowire_news.json data/paper_book.json data/ticker.json data/standings.json \
+            -- scripts/data/odds_dense scripts/data/rotowire_news.json scripts/data/rotowire_moves data/roster_audit.json data/paper_book.json data/ticker.json data/standings.json \
                scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_tp data/novig_ladder_test.json data/novig_paper.json \
                scripts/data/props data/props_paper.json data/props_paper_nfl.json data/props_paper_nhl.json data/games_picks_nflprops.json scripts/data/refs \
                data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds

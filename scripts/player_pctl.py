@@ -941,6 +941,11 @@ def write(sport, S, rows, targets, meta):
         i = [t['k'] for t in tg].index('ppr')
         tg.insert(i + 1, {'k': 'pprg', 'l': 'PPR/G', 'd': 1, 'hits': rep['targets']['pprg']['hits'], 'g': 1})
     held = sorted(int(x) for x in rep['targets'][targets[0][0]]['bySeason'])
+    try:   # today's club from RotoWire's transaction news (Nov 5 2026)
+        import rotowire_moves
+        rotowire_moves.retag(sport, rows, club='tm', label='pctl')
+    except ImportError:
+        pass
     body = {'season': S, 'targets': tg, 'test': f'{held[0]}-{held[-1]}', 'def': DEF[sport], **meta, 'players': rows}
     fn = OUT.format(sport)
     old = None

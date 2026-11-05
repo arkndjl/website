@@ -1,0 +1,42 @@
+# RotoWire's injury news archive and long-term injury cards (scripts/rotowire_history.py ->
+# scripts/data/rotowire_history/, scripts/data/rotowire_long.json): the new news since the last run, then each
+# season-ending or multi-week player's injury card (status, estimated return). The sport builds read the result on
+# their next run, so the commit skips the Cloudflare build.
+name: rotowire history
+
+on:
+  schedule:
+    - cron: "13 9,15,21 * 1-6,8-12 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rotowire-history
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: News archive and injury cards
+        run: python3 scripts/rotowire_history.py
+      - name: Commit if it changed
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/data/rotowire_history scripts/data/rotowire_long.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          python3 scripts/check_build.py || exit 1
+          git commit -q -m "RotoWire injury history ($(date -u +%Y-%m-%dT%H:%MZ)) [skip ci]"
+          for i in 1 2 3 4; do
+            git pull --rebase --autostash -X theirs -q origin main && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1

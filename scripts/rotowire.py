@@ -188,6 +188,18 @@ def items(sport, since=0):
     return sorted((v for v in load()['items'].values() if v['sport'] == sport and v['ts'] >= since), key=lambda v: v['ts'])
 
 
+def long_term(sport, on=None):
+    """Players out for the season or for weeks (scripts/rotowire_history.py, from RotoWire's past news and each
+    player's injury card): dicts with player, team, abbr, pos, status, injury, since, last_d, ret, window, season, note.
+    on (yyyy-mm-dd, default today): only those still out then (season, or a return / timeline end after it)."""
+    on = on or datetime.now(timezone.utc).date().isoformat()
+    try:
+        d = json.load(open(os.path.join(ROOT, 'scripts', 'data', 'rotowire_long.json')))['sports'].get(sport, {})
+    except (OSError, ValueError):
+        return []
+    return [dict(v, pid=k) for k, v in d.items() if v['season'] or (v.get('ret') or (v.get('window') or [None, ''])[1] or '') > on]
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     if '--lead' in sys.argv:

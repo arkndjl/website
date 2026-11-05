@@ -565,6 +565,11 @@ def nfl_retag():
         if t and t != r.get('tm'):
             r['tm'] = t
             n += 1
+    try:
+        import rotowire_moves
+        n += rotowire_moves.retag('nfl', X.get('players', []), club='tm', released=True, label='xaav')
+    except ImportError:
+        pass
     if n:
         with open(fn, 'w') as f:
             json.dump(X, f, separators=(',', ':'))
@@ -572,6 +577,11 @@ def nfl_retag():
 
 
 def write(sport, payload):
+    try:   # today's club from RotoWire's transaction news; a released or retired player reads FA (Nov 5 2026)
+        import rotowire_moves
+        rotowire_moves.retag(sport, payload['players'], club='tm', released=True, label='xaav')
+    except ImportError:
+        pass
     fn = os.path.join(ROOT, 'static', 'data', f'xaav-{sport}.json')
     with open(fn, 'w') as fh:
         json.dump(payload, fh, separators=(',', ':'), allow_nan=False)

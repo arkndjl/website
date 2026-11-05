@@ -2201,7 +2201,8 @@ const injuries = await (async () => {
     // RotoWire's injury news (scripts/rotowire.py, polled every half hour into scripts/data/rotowire_news.json; this
     // build polls once more first): player, school and exact publish time given, status read from the headline
     // ("Won't play Saturday"), else the news sentence; the last 9 days (older statuses lapse anyway)
-    let rwMatched = 0, rwN = 0;
+    let rwMatched = 0, rwN = 0, rwLong = 0;
+    const longTerm = [];
     try {
       const rw = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'rotowire_news.json'), 'utf8')).items || {};
       const ixT = teamIndex(espn.teams), since = Date.now() / 1000 - 9 * 86400, teamM = {};
@@ -2214,13 +2215,46 @@ const injuries = await (async () => {
         if (!a) continue;
         rwMatched++; put(a, st, new Date(it.ts * 1000).toISOString(), `${it.head}: ${it.body}`, 'rotowire');
       }
+      // long-term injuries (scripts/rotowire_history.py: the season's RotoWire news and each player's injury card):
+      // out for the season, or Out until the card's estimated return (else the end of the quoted timeline). Dated
+      // by his newest injury news, so later news still wins; kept past the 9-day lapse until that return, and marked
+      // long so the game model absorbs him into the team's ratings like a season-ending absence
+      const lt = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'rotowire_long.json'), 'utf8')).sports?.cfootball || {};
+      const today = new Date().toISOString().slice(0, 10);
+      for (const v of Object.values(lt)) {
+        const until = v.season ? null : (v.ret || v.window?.[1] || null);
+        if (!v.season && !(until && until > today)) continue;
+        const tid = ixT.resolve(v.team); if (!tid) continue;
+        let a = (byNorm[norm(v.player)] || []).find(x => x.tid === tid);
+        if (!a) { teamM[tid] ||= new Matcher(people.filter(x => x.tid === tid), { name: 'name', team: null, pos: 'pos' }); a = teamM[tid].find(v.player, { pos: v.pos })?.[0] || null; }
+        if (!a) continue;
+        const st = v.season ? 'Out (season)' : 'Out', date = `${v.last_d}T12:00:00.000Z`;
+        put(a, st, date, `${v.injury || 'injury'}${until ? `, est. return ${until}` : ', out for the season'} (RotoWire): ${v.note}`, 'rotowire');
+        longTerm.push([a.id, st, until]);
+      }
     } catch (e) { console.log(`rotowire: ${e.message}`); }
     console.log(`rotowire: ${rwN} news items, ${rwMatched} matched with a status`);
+    // RotoWire's move news (scripts/rotowire_moves.py, odds-snap every half hour): a player who left the program in
+    // season (dismissed, entered the portal, medically retired, left the team) is out for the season
+    try {
+      const mv = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'rotowire_moves', 'cfootball.json'), 'utf8')).exits || [];
+      const ixT = teamIndex(espn.teams); let nx = 0;
+      for (const m of mv) {
+        const tid = ixT.resolve(m.team); if (!tid) continue;
+        const a = (byNorm[norm(m.player)] || []).find(x => x.tid === tid); if (!a) continue;
+        nx++; put(a, 'Out (season)', `${m.d}T12:00:00.000Z`, `${m.head} (RotoWire)`, 'rotowire');
+      }
+      console.log(`rotowire: ${nx} program exits`);
+    } catch (e) { console.log(`rotowire moves: ${e.message}`); }
     for (const [tid, list] of Object.entries(espnInjuries)) for (const i of list) {
       const a = (byNorm[norm(i.name)] || []).find(x => x.tid === tid); if (!a) continue;
       const st = /season/i.test(i.detail || '') ? 'Out (season)' : /^out/i.test(i.status || '') ? 'Out' : i.status;
       put(a, st, i.date, i.detail, 'espn');
     }
+    // long-term holds stand while his newest status (any source) is still that Out
+    for (const e of Object.values(P)) { delete e.until; delete e.long; }
+    for (const [k, st, until] of longTerm) if (P[k] && P[k].status === st && P[k].src !== 'manual') { P[k].until = until; P[k].long = true; rwLong++; }
+    console.log(`rotowire: ${longTerm.length} long-term injuries matched, ${rwLong} still standing`);
     // the conference availability reports (SEC, ACC, MAC, American; scripts/cfb_avail_reports.mjs, refreshed by the
     // workflow): each team's report for its next game replaces the news for the players it lists, and a news status
     // from before that week's reports (four days out) lapses for a player his team's report leaves off
@@ -2245,14 +2279,15 @@ const injuries = await (async () => {
     const now = Date.now();
     for (const [k, e] of Object.entries(P)) {
       const manualStill = e.src !== 'manual' || manualLive.some(m => norm(m.name) === norm(e.name));
-      if (!manualStill || e.status === 'Active' && now - Date.parse(e.date) > 9 * 864e5 || !seasonOut(e.status) && now - Date.parse(e.date) > 9 * 864e5) delete P[k];
+      const held = e.until && now < Date.parse(e.until + 'T23:59:59Z');      // a long-term injury, until its return date
+      if (!manualStill || e.status === 'Active' && now - Date.parse(e.date) > 9 * 864e5 || !seasonOut(e.status) && !held && now - Date.parse(e.date) > 9 * 864e5) delete P[k];
     }
     log.asof = new Date().toISOString().slice(0, 10);
     fs.writeFileSync(INJ_LOG, JSON.stringify(log, null, 1) + '\n');
     console.log(`availability: ${news.length} news items, ${matched} matched to a player; ${Object.keys(P).length} listed, ${Object.values(P).filter(e => seasonOut(e.status)).length} out for the season`);
     const out = {};
     for (const e of Object.values(P)) if (e.status !== 'Active') (out[e.tid] ||= []).push({ name: e.name, pos: e.pos, status: e.status, detail: e.note, date: e.date, src: e.src,
-      ...(e.stage ? { stage: e.stage, streak: e.streak } : {}) });
+      ...(e.stage ? { stage: e.stage, streak: e.streak } : {}), ...(e.long ? { long: true, until: e.until || null } : {}) });
     return out;
 })();
 // CFBD: last season's SP+ (once; it doesn't change) and this season's advanced team stats (each run)
