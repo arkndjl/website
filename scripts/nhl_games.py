@@ -9,9 +9,10 @@
 
 Data: the NHL's stats API (scores, last period, goalie and skater game logs), MoneyPuck (each team's expected goals a game, all
 situations and by strength, score- and venue-adjusted), ESPN (every listed book's moneyline and total, 2019-20 on),
-Daily Faceoff (tonight's starting goalies, confirmed or likely). Every input is known before puck drop, except that
-the backtest uses the goalie who actually started (an upper bound: the close sometimes sets before the starter is
-confirmed).
+Daily Faceoff (tonight's starting goalies, confirmed or likely). Every input is known before puck drop. The backtest
+and the fit never see who started: each side's goalie inputs are its goalies' ratings at their start chances before
+starter news (Goalies.pstart); live, a goalie Daily Faceoff names takes his own rating (until Nov 5 2026 history used
+the goalie who went on to start).
 
 Goal margin (home minus away) and the home team's chance to win are linear in:
     elo     Elo difference (538's hockey Elo: margin multiplier, autocorrelation correction, K tuned, part of the way
@@ -22,7 +23,7 @@ Goal margin (home minus away) and the home team's chance to win are linear in:
     g       the same rating on actual goals (finishing and goaltending the xG model doesn't see)
     mkt     market rating: each team's logit win chance against an average team as earlier closing moneylines priced
             it (never the game's own line), the same weighting
-    gk      the starting goalies: goals saved above expected a game (MoneyPuck xG against his share of the game, minus
+    gk      the goalies (named starter live, else start-chance weighted): goals saved above expected a game (MoneyPuck xG against his share of the game, minus
             goals allowed), shrunk toward a new goalie's level, carried across seasons at a fraction, home minus away
     rest    days of rest (0-3) home minus away, and back-to-backs
     rv      lineup value: the skaters each team dressed in its previous game this season, each at his projected
@@ -82,6 +83,11 @@ CONF_OF = {t: c for c, ds in CONF.items() for d in ds for t in DIV[d]}
 FEATS = ['elo', 'xg', 'g', 'mkt', 'gk', 'rest', 'b2b', 'home']
 CANDS = ['x5', 'st', 'rv']       # 5-on-5 xG rating; special teams (power-play xG for, penalty-kill xG against); lineup value
 TFEATS = ['xgT', 'gT', 'mtot', 'gkT', 'one']
+# the starting goalie before starter news (Goalies.pstart, Nov 5 2026 leak fix: fit on 2016-23 starts, grid over share
+# power .5-3, last starter -.5..1, back-to-back -3..-1). History games and live games with no Daily Faceoff name take the
+# start-chance-weighted rating, never the goalie who went on to start (the backtest used to: 66% of team-games the usual
+# starter, 48% the projected one on back-to-backs)
+GK_LAST, GK_B2B = 0.5, -2.5
 P0 = {'K': 6.0, 'reg': 0.3, 'hl': 60.0, 'car': 0.5, 'ghl': 45.0, 'gcar': 0.5, 'mhl': 40.0, 'mcar': 0.4,
       'gk_car': 0.6, 'gk_k': 25.0, 'gk_0': -0.1, 'pen': 4.0}
 
@@ -312,6 +318,7 @@ class Goalies:
         self.n = defaultdict(float); self.d = defaultdict(float); self.name = {}; self.team = {}
         self.starts = defaultdict(lambda: defaultdict(float))     # team -> goalie -> recent starts (decayed)
         self.last = {}                                           # goalie -> day of his last game
+        self.lastst = {}                                         # team -> the goalie who started its last game
 
     def season(self):
         for p in self.n:
@@ -339,6 +346,7 @@ class Goalies:
                 for q in self.starts[t]:
                     self.starts[t][q] *= 0.97
                 self.starts[t][pid] += 1
+                self.lastst[t] = pid
 
     def starter(self, lines):
         st = [l for l in lines if l[2]]
@@ -348,6 +356,24 @@ class Goalies:
         """the team's goalies by recent starts (decayed), only those whose last game was for this team"""
         s = self.starts.get(t, {})
         return sorted([p for p in s if self.team.get(p) == t and s[p] > 0.05], key=lambda p: -s[p])
+
+    def pstart(self, t, b2b=False, out=()):
+        """each goalie's chance to start the team's next game from what is known before it (no starter news): recent
+        start shares, the last game's starter x e^GK_LAST, x e^GK_B2B more on the second night of a back-to-back
+        (multinomial fit on 2016-23 starts: held 2024-26 log loss .774 -> .736 a team-game). out: goalies ruled out"""
+        s = self.starts.get(t, {})
+        ps = [p for p in self.depth(t) if p not in out][:3]
+        w = [s[p] * math.exp((GK_LAST + (GK_B2B if b2b else 0.0)) * (p == self.lastst.get(t))) for p in ps]
+        W = sum(w)
+        return [(p, x / W) for p, x in zip(ps, w)] if W else []
+
+    def projected(self, t, b2b=False, out=()):
+        """(rating, chance the usual starter starts): the team's goalie rating over pstart (g0 with no goalies)"""
+        pr = self.pstart(t, b2b, out)
+        if not pr:
+            return self.g0, 1.0
+        d = self.depth(t)
+        return sum(q * self.rating(p) for p, q in pr), sum(q for p, q in pr if d and p == d[0])
 
     def expected(self, t):
         """the team's goalie rating at its usual start shares"""
@@ -527,21 +553,29 @@ class Model:
             return 3
         return max(0, min(3, _days(self.lastday[t], day) - 1))
 
-    def feats(self, g, gh=None, ga=None, home=1.0):
-        """inputs for game g; gh, ga: the starting goalies (default: the ones who started)"""
+    def feats(self, g, gh=None, ga=None, home=1.0, out=None):
+        """inputs for game g; gh, ga: tonight's named starting goalies (Daily Faceoff, live only). Without a name (every
+        history game: who started isn't known at bet time) the side takes its start-chance-weighted rating
+        (Goalies.projected). out: {team: goalie ids ruled out} (live injuries)"""
         h, a = g['h'], g['a']
-        if gh is None and 'gl' in g:
-            gh, ga = self.gk.starter(g['gl']['h']), self.gk.starter(g['gl']['a'])
-        rgh = self.gk.rating(gh) if gh else self.gk.expected(h)
-        rga = self.gk.rating(ga) if ga else self.gk.expected(a)
         rh, ra = self.rest(h, g['day']), self.rest(a, g['day'])
+        out = out or {}
+
+        def side(t, p, r):
+            d = self.gk.depth(t)
+            if p:
+                return self.gk.rating(p), int(bool(d) and p != d[0])
+            v, p0 = self.gk.projected(t, r == 0, out.get(t, ()))
+            return v, 1.0 - p0
+        rgh, bkh = side(h, gh, rh)
+        rga, bka = side(a, ga, ra)
         rv = self.lv_now(h, g) - self.lv_now(a, g) if h in self.lv and a in self.lv else 0.0
         f = {'elo': (self.elo.r[h] - self.elo.r[a]) / 100, 'xg': self.xg.net(h, a), 'g': self.gl.net(h, a),
              'x5': self.x5.net(h, a), 'st': self.st.net(h, a), 'mkt': self.mk.rating(h) - self.mk.rating(a),
              'gk': rgh - rga, 'gkd': (rgh - self.gk.expected(h)) - (rga - self.gk.expected(a)),
-             'bk': self._backup(a, ga) - self._backup(h, gh), 'rv': rv, 'rest': rh - ra, 'b2b': int(rh == 0) - int(ra == 0), 'home': home,
+             'bk': bka - bkh, 'rv': rv, 'rest': rh - ra, 'b2b': int(rh == 0) - int(ra == 0), 'home': home,
              'xgT': self.xg.total(h, a, home), 'gT': self.gl.total(h, a, home), 'mtot': self.mk.total(h, a),
-             'gkT': -(rgh + rga), 'one': 1.0}
+             'gkT': -(rgh + rga), 'one': 1.0, 'rgh': rgh, 'rga': rga}
         return f
 
     def lv_now(self, t, g=None):
@@ -559,10 +593,6 @@ class Model:
         if t not in self.lv:
             return 0.0
         return self.lv_now(t) - sum(self.lv_now(u) for u in self.lv) / len(self.lv)
-
-    def _backup(self, t, p):
-        d = self.gk.depth(t)
-        return int(bool(p) and bool(d) and p != d[0])
 
     def update(self, g):
         h, a = g['h'], g['a']
@@ -707,7 +737,7 @@ def walk(games, P, upcoming=(), starters=None, moves=None, up_moves=None):
         m.advance(g['day'], g['S'])
         st = (starters or {}).get(g['id'], {})
         g = dict(g, rest={'home': m.rest(g['h'], g['day']), 'away': m.rest(g['a'], g['day'])})
-        up.append((g, m.feats(g, st.get('h'), st.get('a'), 0.0 if g.get('neutral') else 1.0)))
+        up.append((g, m.feats(g, st.get('h'), st.get('a'), 0.0 if g.get('neutral') else 1.0, st.get('out'))))
         m.lastday[g['h']] = m.lastday[g['a']] = g['day']    # tomorrow's rest counts tonight's unplayed game
     m.lastday = last0
     return m, rows, up
@@ -1013,6 +1043,12 @@ def out_names(inj, t):
     return {NM.key(i['name']) for i in (inj or {}).get(t, []) if 'day' not in (i.get('status') or '').lower()}
 
 
+def out_ids(m, t, inj):
+    """the team's rated goalies on ESPN's injury list (out_names), by id"""
+    out = out_names(inj, t)
+    return {p for p in m.gk.depth(t) if NM.key(m.gk.name.get(p) or '') in out}
+
+
 def pick_starter(m, t, df, day, inj=None):
     """tonight's goalie: Daily Faceoff's (confirmed or likely) matched to the goalies the model has rated, else to the
     club's NHL roster (a call-up with no NHL games rates as a new goalie, not as the usual starter); with no Daily
@@ -1279,7 +1315,7 @@ def build():
         inj = injuries()
     except Exception as e:
         print('injuries:', e, file=sys.stderr); inj = {}
-    starters, gsrc = {}, {}
+    starters, gsrc, shown = {}, {}, {}
     for d in days:
         df = starters_df(d)
         for g in up:
@@ -1288,7 +1324,11 @@ def build():
             s = df.get((g['h'], g['a']), {})
             gh, sh = pick_starter(m0, g['h'], s.get('h'), d, inj)
             ga, sa = pick_starter(m0, g['a'], s.get('a'), d, inj)
-            starters[g['id']] = {'h': gh, 'a': ga}
+            shown[g['id']] = {'h': gh, 'a': ga}
+            # the model takes a goalie only when Daily Faceoff names him; a projected side is priced at its start
+            # chances (Goalies.pstart), as every history game is
+            named = lambda x, src: x if not src.startswith('projected') and src != 'unknown' else None
+            starters[g['id']] = {'h': named(gh, sh), 'a': named(ga, sa), 'out': {t: out_ids(m0, t, inj) for t in (g['h'], g['a'])}}
             gsrc[g['id']] = {'h': sh, 'a': sa}
         for g in up:          # the second date's back-to-backs: tonight's games aren't final yet
             if g['day'] == d:
@@ -1311,7 +1351,7 @@ def build():
     for g, f in ups:
         p, mm, T, p2h, p2a, pot = project(f, fit)
         lh = (T + mm) / 2; la = (T - mm) / 2
-        st = starters.get(g['id'], {})
+        st = shown.get(g['id'], {})
         eid = emap.get(g['id'])
         c = consensus(D.espn_odds(eid, fresh=True)) if eid else None
         px = NV.get(str(eid)) if eid else None
@@ -1329,7 +1369,7 @@ def build():
                'goalie': {s: {'name': (m.gk.name.get(st.get(s[0])) or m0.gk.name.get(st.get(s[0]))) if st.get(s[0]) else None,
                               'id': st.get(s[0]),
                               'gsax': round(m.gk.rating(st.get(s[0])), 2) if st.get(s[0]) else None,
-                              'r': round(m.gk.rating(st[s[0]]) if st.get(s[0]) else m.gk.expected(g['h' if s == 'home' else 'a']), 4),
+                              'r': round(f['rg' + s[0]], 4),     # the rating the total used (refresh_goalies swaps from it)
                               'src': gsrc.get(g['id'], {}).get(s[0])} for s in ('home', 'away')},
                'inj': {'home': inj.get(g['h'], [])[:5], 'away': inj.get(g['a'], [])[:5]},
                'line': None, 'tline': None, 'ml': None}

@@ -7,6 +7,7 @@ market, home) enter by forward selection: the candidate that most cuts 2015-21 a
 seasons before them, on games missed in a row, minutes-weighted.
 The total's ratings take their own half-life, tuned on 2015-21 totals error under the same rule.
 """
+import bisect
 import json
 import math
 import os
@@ -28,11 +29,33 @@ def load_inj():
     return N.load_inj()
 
 
+class TimedP:
+    """play chances by status as of each game day, from the games before it (measure_P's snapshots): the fit's walk
+    reads these, so a 2016 game never prices a Questionable player at a rate measured on 2026 reports. Model.feats calls
+    at(g); get() is the dict lookup play_prob does"""
+    def __init__(self, days, snaps):
+        self.days, self.snaps, self.cur = days, snaps, {}
+
+    def at(self, g):
+        i = bisect.bisect_right(self.days, N.gday(N.tipdt(g))) - 1
+        self.cur = self.snaps[i] if i >= 0 else {}
+
+    def get(self, k, d=None):
+        return self.cur.get(k, d)
+
+
 def measure_P(games, names, inj, params):
-    """minutes-weighted share of rotation players who played, by status (or none / no report) and missed streak"""
+    """minutes-weighted share of rotation players who played, by status (or none / no report) and missed streak.
+    Returns (P on every game: the live rates, counts, TimedP: the rates from the days before each game, for the
+    walk-forward)"""
     acc = {}
+    rates = lambda: {k: round(v[0] / v[1], 3) for k, v in acc.items() if v[2] >= 30}
+    days, snaps = [], []
     m = N.Model(names, {}, inj=inj, **params)
     for g in games:
+        d = N.gday(N.tipdt(g))
+        if not days or d > days[-1]:
+            days.append(d); snaps.append(rates())     # this day's games use only the days before
         m.feats(g)
         if g['S'] >= N.SCORE_FROM - 1 and g.get('pl'):
             rep = inj.get(g['id'])
@@ -51,7 +74,7 @@ def measure_P(games, names, inj, params):
                         a = acc.setdefault(k, [0.0, 0.0, 0])
                         a[0] += R * (p in played); a[1] += R; a[2] += 1
         m.update(g)
-    return {k: round(v[0] / v[1], 3) for k, v in acc.items() if v[2] >= 30}, {k: v[2] for k, v in acc.items()}
+    return rates(), {k: v[2] for k, v in acc.items()}, TimedP(days, snaps)
 
 
 def b2b_rows(games, names, inj, params, P):
@@ -183,11 +206,14 @@ def fit():
     base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25,
             'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85, 'lk_mkt': 0.5, 'lk_opp': 1.0,
             'lw3o': 0.75, 'lw3d': 0.75, 'arcw': 0.25, 'tlin': 'xpm'}
-    P, Pn = measure_P(games, names, inj, base)
+    # P (every game's reports) is what the live model reads; the walk-forward below reads PT, each game day's rates
+    # from the days before it (until Nov 5 2026 the backtest priced every season's statuses at the rates measured on
+    # all of them, 2022-26 included)
+    P, Pn, PT = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,
     # measured on 2015-21 only (scripts/nba_sched_research.py, Oct 2026: 2015-21 t -2.3, 2022-26 t -1.6)
-    base['b2b'] = measure_b2b(b2b_rows(games, names, inj, base, P), N.HOLD_FROM - 1)
+    base['b2b'] = measure_b2b(b2b_rows(games, names, inj, base, PT), N.HOLD_FROM - 1)
     print('b2b', json.dumps(base['b2b']))
     tune = lambda S: (S >= N.SCORE_FROM) & (S < N.HOLD_FROM)
     hold = lambda S: S >= N.HOLD_FROM
@@ -221,7 +247,7 @@ def fit():
         if key in seen:
             continue
         seen.add(key)
-        D, X, TX, y, ty, S, line, tline = design(games, names, P, p, inj, feats0)
+        D, X, TX, y, ty, S, line, tline = design(games, names, PT, p, inj, feats0)
         pr = wf(mat(X, feats0), y, S)
         k = tune(S)
         grid.append((float(np.mean(np.abs(pr[k] - y[k]))), p))
@@ -242,7 +268,7 @@ def fit():
     print('best', best, flush=True)
 
     # 2. forward selection of inputs on the tuned walk
-    D, X, TX, y, ty, S, line, tline = design(games, names, P, best, inj, feats0)
+    D, X, TX, y, ty, S, line, tline = design(games, names, PT, best, inj, feats0)
     k1, k2 = tune(S), hold(S)
     feats = list(CORE)
     cur = wf(mat(X, feats), y, S)
@@ -273,7 +299,7 @@ def fit():
     tpred = wf(TX, ty, S)
     tgrid = []
     for thl in (2.0, 3.0, 4.0, 5.0, 7.0, 10.0, 14.0):
-        TXh = design(games, names, P, {**best, 'thl': thl}, inj, feats0)[2]
+        TXh = design(games, names, PT, {**best, 'thl': thl}, inj, feats0)[2]
         pr = wf(TXh, ty, S)
         tgrid.append((float(np.mean(np.abs(pr[k1] - ty[k1]))), thl, TXh, pr))
         print('thl', thl, round(tgrid[-1][0], 4), flush=True)

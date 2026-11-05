@@ -10,7 +10,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Home win chance = logistic of {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}. Weights from the seasons with closing lines (2019-20 on); the backtest uses the goalie who actually started.</p>
+    <p>Home win chance = logistic of {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}. Weights from the seasons with closing lines (2019-20 on).</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Seasons</th><th>Games</th><th title="win probability log loss, model / closing moneyline with the vig removed (lower is better)">Log loss</th><th title="paired t, model loss minus market loss, clustered by day (positive = the market is better)">t</th><th title="how often each side's favorite won, model / market">Fav. won</th><th title="total goals error, model / closing total">Totals MAE</th></tr></thead>
       <tbody>

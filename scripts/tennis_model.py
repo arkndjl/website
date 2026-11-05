@@ -43,6 +43,13 @@ RDAY = {'Q1': -3, 'Q2': -2, 'Q3': -1, 'Q4': -1, 'R128': 0, 'R64': 1, 'R32': 2, '
 # second week 3-6 days early in history while the live chances read the real date (rest, matches in 30 days and the
 # points filter's drift all saw a different week 2 live than in the fit)
 RDAY_G = {'R128': 1, 'R64': 3, 'R32': 5, 'R16': 7, 'QF': 9, 'SF': 11, 'F': 13}
+# the two-week Masters / WTA 1000s (96-draw main draws: Indian Wells and Miami, and in recent years Madrid, Rome, Shanghai,
+# Canada, Cincinnati and Beijing): the archive's rows of an M event with an R128 round. ESPN 2025-26 order of play joined
+# to the archive's start dates (Nov 5 2026, 2,600 matches): median R128 1, R64 3, R32 4 (mean 4.5), R16 6, QF 8, SF 9,
+# F 11 days after it. They used the one-week RDAY (R16 4, QF 5, SF 6, F 7): the second week 2-4 days early in the fit
+# and backtests, while live chances read the real date
+RDAY_M = {'R128': 1, 'R64': 3, 'R32': 4, 'R16': 6, 'QF': 8, 'SF': 9, 'F': 11}
+BIG_M = set()            # event ids of the two-week M events in the rows (mark_two_week)
 
 DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET': 0.5,
            'V0': 0.10, 'Q': 0.00010, 'PHI': 0.35, 'MU_LR': 0.002,
@@ -76,15 +83,23 @@ def ymd(d):
 DAY0 = dt.date(2000, 1, 1)
 
 
-def rday(rd, lv=''):
-    """the round's day offset from the event's start date (lv 'G': a Grand Slam main draw)"""
+def mark_two_week(rows):
+    """note the two-week M events (an R128 round at level M) for rday; run() and build() call it on their rows"""
+    BIG_M.update(r[6] for r in rows if r[2] == 'M' and r[4] == 'R128')
+
+
+def rday(rd, lv='', tid=None):
+    """the round's day offset from the event's start date (lv 'G': a Grand Slam main draw; tid in BIG_M: a two-week
+    Masters / WTA 1000)"""
     if lv == 'G' and rd in RDAY_G:
         return RDAY_G[rd]
+    if lv == 'M' and tid in BIG_M and rd in RDAY_M:
+        return RDAY_M[rd]
     return RDAY.get(rd, 2)
 
 
-def dnum(d, rd='', lv=''):
-    return (ymd(d) - DAY0).days + rday(rd, lv)
+def dnum(d, rd='', lv='', tid=None):
+    return (ymd(d) - DAY0).days + rday(rd, lv, tid)
 
 
 # ---------------------------------------------------------------- Markov chain: serve-point chances -> match chance
@@ -363,7 +378,7 @@ class Model:
 
     def update(self, r):
         d, tour, lv, sf, rd, bo, tid, w, l, score, ws, ls = r[:12]
-        day = dnum(d, rd, lv)
+        day = dnum(d, rd, lv, tid)
         gw, gl, ret = games(score)
         if len(r) > 14 and r[14] and 0 < r[14] < 1:
             # market memory: the close against the ratings alone (no context terms), before this match's update
@@ -398,13 +413,14 @@ class Model:
 def run(rows, P=None, score=None, until=None, cm_lag=0):
     """one pass; score(r) -> True records (row, blend, elo, points) for that match before updating. cm_lag: see Model"""
     m = Model(P, cm_lag)
+    mark_two_week(rows)
     out = []
     for r in rows:
         if until and r[0] > until: break
         if cm_lag:
             m.release(r[0])
         if score and score(r):
-            day = dnum(r[0], r[4], r[2])
+            day = dnum(r[0], r[4], r[2], r[6])
             # randomise the side so the blend's intercept means nothing (A = winner on even ids)
             pb, pe, pp, gx, cx = m.predict(r[7], r[8], r[1], r[3], day, r[5])
             out.append((r, pe, pp, gx, cx))
@@ -772,12 +788,13 @@ def build(rows, players, tn):
     since = int((today - dt.timedelta(days=364)).strftime('%Y%m%d'))
     snap_day = int((today - dt.timedelta(days=91)).strftime('%Y%m%d'))
     m = Model(P)
+    mark_two_week(rows)
     recent, old = [], None
     for r in rows:
         if old is None and r[0] > snap_day:
             old = {k: v[0] for k, v in m.elo.items()}          # overall Elo 13 weeks ago
         if r[0] >= recent_from and r[2] != 'S':
-            day = dnum(r[0], r[4], r[2])
+            day = dnum(r[0], r[4], r[2], r[6])
             recent.append((r, m.predict(r[7], r[8], r[1], r[3], day, r[5])[0]))
         m.update(r)
     old = old or {}

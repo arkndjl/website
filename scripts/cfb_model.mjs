@@ -274,8 +274,9 @@ export const CAND = {
   // the drive simulation's expected margin (simGame): drives a game x (7 x TD rate + 3 x FG rate - 7 x return-TD
   // rate), each opponent-adjusted, home minus away
   drv:   { name: 'drive model expected margin', special: true, x: 1 },
-  // returning production (PFN, last season's scores of this season's players x snaps; z across FBS; non-FBS -2): the
-  // QB, and everyone else. Known before the season, so it carries what FV would if FV had a history
+  // returning production (PFN, last season's scores x snaps of last season's players still on the team in August, less
+  // that April's draftees and the portal's departures; scripts/cfb_ret_war.mjs returning(); z across FBS; non-FBS -2):
+  // the QB, and everyone else. Known before the season, so it carries what FV would if FV had a history
   qbRet: { name: 'returning QB production (PFN)', ctx: (r) => retOf(r, 'qb'), team: (S, t) => RET[S]?.[t]?.qb ?? 0, x: 1 },
   ret:   { name: 'returning production, non-QB (PFN)', ctx: (r) => retOf(r, 'rest'), team: (S, t) => RET[S]?.[t]?.rest ?? 0, x: 1 },
   // returning college WAR (season AV, scripts/cfb_av.mjs position weights on last season's Stat+ x snaps, z across
