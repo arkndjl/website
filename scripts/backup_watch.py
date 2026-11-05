@@ -22,9 +22,11 @@ NHL     ESPN's depth charts, even strength only (C, LW, RW, LD, RD, G; the power
 CBB     No college depth charts, so the order is minutes: this season's minutes a game once a player has a line
         (static/data/cbb-all.json now), else the projected minutes share of the CBB roster prior (scripts/cbb_roster.py,
         fit walk-forward; saved to scripts/data/cbb_proj_min.json, rebuilt here when the research seasons are in the
-        project files). Top five = starters, 6-10 2nd string, 11-15 3rd. A backup is compared with the lowest-graded
-        starter in his group (G, F, C; a group with no starter falls back to the next one) and listed when his FV
-        (headline = mean outcome) beats that starter's by FV_GAP or more.
+        project files). Top five = starters, 6-10 2nd string, 11-15 3rd. The grade is production (Noah, Nov 5 2026: BPM,
+        not FV): Barttorvik BPM this season and last at half weight (CBB_W, by minutes, any team), shrunk to CBB_REPL
+        with CBB_K minutes (the backup_age_fit history's shrink). A backup is compared with the lowest-graded starter in
+        his group (G, F, C; a group with no starter falls back to the next one); both need CBB_MIN minutes, and is listed
+        and he is listed when he beats that starter by CBB_GAP BPM or more.
 Every sport's rows are ranked by xGap (scripts/backup_age.py): the gap projected over the next two seasons from
 today's gap and the age gap to the starter, fit on past seasons by scripts/backup_age_fit.py.
 """
@@ -47,7 +49,7 @@ UA = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.3
 NFL_K, NFL_MIN = 300, 50
 NBA_K, NBA_REPL, NBA_MIN, NBA_W = 500, -2.0, 50, (1.0, 0.5, 0.25)
 NHL_K, NHL_KG, NHL_MIN, NHL_W = 600, 1500, 100, (1.0, 0.5, 0.25)
-FV_GAP = 3
+CBB_K, CBB_REPL, CBB_MIN, CBB_GAP, CBB_W = 240, -6.0, 60, 1.0, (1.0, 0.5)
 NFL_SKIP = {'pk', 'p', 'h', 'pr', 'kr', 'ls'}
 NFL_SLOT = {'qb': 'QB', 'rb': 'RB', 'fb': 'FB', 'wr1': 'WR', 'wr2': 'WR', 'wr3': 'WR', 'te': 'TE', 'lt': 'LT', 'lg': 'LG',
             'c': 'C', 'rg': 'RG', 'rt': 'RT', 'lde': 'DE', 'rde': 'DE', 'ldt': 'DT', 'rdt': 'DT', 'nt': 'NT', 'wlb': 'WLB',
@@ -411,14 +413,24 @@ def cbb_projected():
 CBB_NEXT = {'G': ['G', 'F'], 'F': ['F', 'C', 'G'], 'C': ['C', 'F']}
 
 
+def cbb_grade(now, last):
+    """shrunk BPM over this season and last (half weight), by minutes: (grade, minutes)"""
+    num = den = mins = 0.0
+    for line, w in zip((now, last), CBB_W):
+        if not line or line.get('bpm') is None or not line.get('gp') or not line.get('mpg'):
+            continue
+        m = line['gp'] * line['mpg']
+        num += w * m * line['bpm']; den += w * m; mins += m
+    return round((num + CBB_K * CBB_REPL) / (den + CBB_K), 1), round(mins)
+
+
 def cbb():
     A = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
     ci = {k: i for i, k in enumerate(A['cols'])}
     proj = cbb_projected()
     teams, live = {}, 0
     for r in A['rows']:
-        fv = r[ci['fv']]
-        if fv is None or not r[ci['team']]:
+        if not r[ci['team']]:
             continue
         now = r[ci['now']] if 'now' in ci else None
         if now and (now.get('gp') or 0) >= 1:
@@ -428,8 +440,11 @@ def cbb():
             if sh is None:
                 continue
             mpg, src = 40 * sh / 100, 'proj'
+        cur = now if now and now.get('season') != (r[ci['last']] or {}).get('season') else None
+        g, n = cbb_grade(cur, r[ci['last']])
         teams.setdefault(r[ci['team']], []).append({'name': r[ci['name']], 'team': r[ci['team']], 'logo': r[ci['logo']],
-            'conf': r[ci['conf']], 'pos': r[ci['pos']], 'cls': r[ci['cls']], 'fv': fv, 'mpg': round(mpg, 1), 'src': src})
+            'conf': r[ci['conf']], 'pos': r[ci['pos']], 'cls': r[ci['cls']], 'g': g, 'n': n, 'fv': r[ci['fv']],
+            'mpg': round(mpg, 1), 'src': src})
     rows, rooms = [], 0
     for t, L in teams.items():
         if len(L) < 6:
@@ -437,22 +452,35 @@ def cbb():
         L.sort(key=lambda p: -p['mpg'])
         st = L[:5]; rooms += 1
         for i, b in enumerate(L[5:15]):
-            grp = next((g for g in CBB_NEXT[b['pos']] if any(s['pos'] == g for s in st)), None)
-            if grp is None:
+            sts = [s for s in st if s['n'] >= CBB_MIN]       # a starter with no line yet isn't graded
+            grp = next((g for g in CBB_NEXT[b['pos']] if any(s['pos'] == g for s in sts)), None)
+            if grp is None or b['n'] < CBB_MIN:
                 continue
-            low = min((s for s in st if s['pos'] == grp), key=lambda s: s['fv'])
-            if b['fv'] - low['fv'] < FV_GAP:
+            low = min((s for s in sts if s['pos'] == grp), key=lambda s: s['g'])
+            if b['g'] - low['g'] < CBB_GAP:
                 continue
-            rows.append({**b, 'str': 2 if i < 5 else 3, 'starter': {k: low[k] for k in ('name', 'pos', 'fv', 'mpg', 'cls')}, 'gap': b['fv'] - low['fv']})
-    rows.sort(key=lambda r: (-r['gap'], -r['fv'], -r['mpg']))
-    dt = []
+            rows.append({**b, 'str': 2 if i < 5 else 3,
+                         'starter': {k: low[k] for k in ('name', 'pos', 'g', 'n', 'mpg', 'cls', 'fv')},
+                         'gap': round(b['g'] - low['g'], 1)})
+    rows.sort(key=lambda r: (-r['gap'], -r['g'], -r['mpg']))
+    dt, pcts = [], []
+    grp_of = lambda p: p['pos'] if p['pos'] in ('G', 'F', 'C') else 'F'
     for t, L in sorted(teams.items()):
         L.sort(key=lambda p: -p['mpg'])
-        pl = lambda xs: [[p['name'], p['fv'], p['mpg'], None, ' '.join(x for x in (p['pos'], p['cls']) if x), None] for p in xs]
-        ss = [[lab, pl(L[a:b])] for lab, a, b in (('starters', 0, 5), ('2nd unit', 5, 10), ('3rd unit', 10, 15)) if L[a:b]]
+        ss = []
+        for lab, a, b in (('starters', 0, 5), ('2nd unit', 5, 10), ('3rd unit', 10, 15)):
+            pl = []
+            for p in L[a:b]:
+                row = [p['name'], p['g'], p['mpg'], None, ' '.join(x for x in (p['pos'], p['cls']) if x), None]
+                pl.append(row); pcts.append((grp_of(p), (t, NM.key(p['name'])), p['g'], p['n'], row))
+            if pl:
+                ss.append([lab, pl])
         dt.append({'t': t, 'n': t, 'logo': L[0]['logo'], 'grp': L[0]['conf'], 'units': [{'u': '', 's': ss}]})
-    write_depth('cbb', {'asof': time.strftime('%Y-%m-%d'), 'grade': 'FV', 'use': 'MPG', 'fmt': 0, 'live': live}, dt)
-    return {'asof': time.strftime('%Y-%m-%d'), 'teams': rooms, 'live': live, 'gap': FV_GAP, 'rows': rows}
+    pct_fill(pcts, CBB_MIN)
+    write_depth('cbb', {'asof': time.strftime('%Y-%m-%d'), 'grade': 'BPM', 'use': 'MPG', 'fmt': 1, 'live': live,
+                        'min': CBB_MIN, 'k': CBB_K, 'repl': CBB_REPL}, dt)
+    return {'asof': time.strftime('%Y-%m-%d'), 'teams': rooms, 'live': live, 'gap': CBB_GAP, 'k': CBB_K, 'repl': CBB_REPL,
+            'w': CBB_W, 'min': CBB_MIN, 'rows': rows}
 
 
 def clean(o):
