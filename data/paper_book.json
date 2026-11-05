@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-05T19:03:13Z",
+ "asof": "2026-11-05T20:38:16Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 94.28,
   "peak": 117.38,
   "drawdown": 0.1968,
-  "open": 88.5,
+  "open": 88.25,
   "path": [
    101.5,
    101.6,
@@ -334,11 +334,11 @@
  },
  "record": {
   "n": 378,
-  "clvN": 322,
-  "clvRet": -0.0157,
-  "clvT": -2.83,
-  "clv": -0.1,
-  "beat": 0.274,
+  "clvN": 323,
+  "clvRet": -0.0159,
+  "clvT": -2.87,
+  "clv": -0.11,
+  "beat": 0.273,
   "settled": 321,
   "w": 157,
   "l": 164,
@@ -349,23 +349,23 @@
   "risked": 252.5,
   "yield": -0.0193
  },
- "tEff": -2.83,
+ "tEff": -2.87,
  "corr": {
   "rho": 0.0,
-  "n": 322,
+  "n": 323,
   "slates": 24,
-  "nEff": 322.0,
-  "avgSlate": 13.42
+  "nEff": 323.0,
+  "avgSlate": 13.46
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 322,
+   "value": 323,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.6% t -2.83",
+   "value": "-1.6% t -2.87",
    "pass": false
   },
   {
@@ -602,11 +602,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 69,
-   "clvN": 68,
-   "clvRet": -0.0201,
-   "clvT": -4.67,
-   "clv": -0.15,
-   "beat": 0.235,
+   "clvN": 69,
+   "clvRet": -0.0211,
+   "clvT": -4.84,
+   "clv": -0.19,
+   "beat": 0.232,
    "settled": 67,
    "w": 35,
    "l": 32,
@@ -682,7 +682,11 @@
    "edge": 12.2,
    "ev": 0.0236,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0889,
+   "clv": -2.7,
+   "beat": -1,
+   "close": 0.3325
   },
   {
    "rule": "cfb-total",
@@ -867,7 +871,7 @@
    "ev": 0.0281,
    "event": null,
    "pass": false,
-   "close": 233.5
+   "close": 232.5
   },
   {
    "rule": "cfb-total",
@@ -972,7 +976,7 @@
    "ev": 0.0266,
    "event": null,
    "pass": false,
-   "close": 49.5
+   "close": 48.5
   },
   {
    "rule": "cfb-total",
@@ -1035,7 +1039,7 @@
    "ev": 0.0314,
    "event": null,
    "pass": false,
-   "close": 39.5
+   "close": 38.5
   },
   {
    "rule": "cfb-total",
@@ -1240,7 +1244,7 @@
    "price": 108.0,
    "bet": "over 48.5 +108",
    "placed": "2026-11-02T01:48:24Z",
-   "stake": 4.5,
+   "stake": 4.75,
    "edge": 3.6,
    "ev": 0.066,
    "event": null,
@@ -1413,7 +1417,7 @@
    "ev": 0.0037,
    "event": null,
    "pass": true,
-   "close": 50.5
+   "close": 49.5
   },
   {
    "rule": "cfb-total",
@@ -1476,7 +1480,7 @@
    "ev": 0.0244,
    "event": null,
    "pass": true,
-   "close": 55.5
+   "close": 54.5
   },
   {
    "rule": "cfb-total",
@@ -1555,7 +1559,7 @@
    "price": 108.0,
    "bet": "under 67.5 +108",
    "placed": "2026-11-01T20:17:01Z",
-   "stake": 4.5,
+   "stake": 4.75,
    "edge": 4.4,
    "ev": 0.0694,
    "event": null,
@@ -1576,7 +1580,7 @@
    "price": 113.0,
    "bet": "under 47.5 +113",
    "placed": "2026-11-03T00:08:15Z",
-   "stake": 4.5,
+   "stake": 4.75,
    "edge": 3.0,
    "ev": 0.0889,
    "event": null,
@@ -1597,7 +1601,7 @@
    "price": 102.0,
    "bet": "under 51.5 +102",
    "placed": "2026-11-03T10:48:02Z",
-   "stake": 4.25,
+   "stake": 4.0,
    "edge": 4.1,
    "ev": 0.048,
    "event": null,
@@ -1781,7 +1785,7 @@
    "price": 163.0,
    "bet": "Joe Milton III under 0.5 pass TD +163",
    "placed": "2026-11-05T06:19:00Z",
-   "stake": 4.75,
+   "stake": 4.5,
    "edge": 30.2,
    "ev": 0.6437,
    "event": null,
@@ -14602,7 +14606,11 @@
    "edge": 12.2,
    "ev": 0.0236,
    "event": "Rolex Paris Masters",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0889,
+   "clv": -2.7,
+   "beat": -1,
+   "close": 0.3325
   },
   {
    "rule": "cfb-total",
@@ -14787,7 +14795,7 @@
    "ev": 0.0281,
    "event": null,
    "pass": false,
-   "close": 233.5
+   "close": 232.5
   },
   {
    "rule": "cfb-total",
@@ -14892,7 +14900,7 @@
    "ev": 0.0266,
    "event": null,
    "pass": false,
-   "close": 49.5
+   "close": 48.5
   },
   {
    "rule": "cfb-total",
@@ -14955,7 +14963,7 @@
    "ev": 0.0314,
    "event": null,
    "pass": false,
-   "close": 39.5
+   "close": 38.5
   },
   {
    "rule": "cfb-total",
@@ -15160,7 +15168,7 @@
    "price": 108.0,
    "bet": "over 48.5 +108",
    "placed": "2026-11-02T01:48:24Z",
-   "stake": 4.5,
+   "stake": 4.75,
    "edge": 3.6,
    "ev": 0.066,
    "event": null,
@@ -15333,7 +15341,7 @@
    "ev": 0.0037,
    "event": null,
    "pass": true,
-   "close": 50.5
+   "close": 49.5
   },
   {
    "rule": "cfb-total",
@@ -15396,7 +15404,7 @@
    "ev": 0.0244,
    "event": null,
    "pass": true,
-   "close": 55.5
+   "close": 54.5
   },
   {
    "rule": "cfb-total",
@@ -15475,7 +15483,7 @@
    "price": 108.0,
    "bet": "under 67.5 +108",
    "placed": "2026-11-01T20:17:01Z",
-   "stake": 4.5,
+   "stake": 4.75,
    "edge": 4.4,
    "ev": 0.0694,
    "event": null,
@@ -15496,7 +15504,7 @@
    "price": 113.0,
    "bet": "under 47.5 +113",
    "placed": "2026-11-03T00:08:15Z",
-   "stake": 4.5,
+   "stake": 4.75,
    "edge": 3.0,
    "ev": 0.0889,
    "event": null,
@@ -15517,7 +15525,7 @@
    "price": 102.0,
    "bet": "under 51.5 +102",
    "placed": "2026-11-03T10:48:02Z",
-   "stake": 4.25,
+   "stake": 4.0,
    "edge": 4.1,
    "ev": 0.048,
    "event": null,
@@ -15701,7 +15709,7 @@
    "price": 163.0,
    "bet": "Joe Milton III under 0.5 pass TD +163",
    "placed": "2026-11-05T06:19:00Z",
-   "stake": 4.75,
+   "stake": 4.5,
    "edge": 30.2,
    "ev": 0.6437,
    "event": null,
