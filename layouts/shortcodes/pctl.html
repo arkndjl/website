@@ -27,8 +27,7 @@
     <p class="cfb__none" data-pc-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-pc-none hidden>no players match.</p>
   </div>
-  <p class="cfb__dim rookies__def" data-pc-def></p>
-  <div class="win__status"><span data-pc-count></span>
+  <div class="win__status" data-pc-def><span data-pc-count></span>
     <span class="winpager" data-pc-pager hidden>
       <button type="button" class="winpager__btn" data-pc-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
       <span class="winpager__at" aria-live="polite"><span data-pc-page>1</span>/<span data-pc-pages>1</span></span>
@@ -135,7 +134,7 @@
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
       var t = T(), h = t.hits;
-      defEl.textContent = t.l + ', ' + (span === 'ssn' ? (t.g ? 'full season' : 'full season (to date + rest of season)') : 'rest of season') +
+      defEl.title = t.l + ', ' + (span === 'ssn' ? (t.g ? 'full season' : 'full season (to date + rest of season)') : 'rest of season') +
         ': 20th, 50th and 80th percentile outcomes. ' + (/^ppr/.test(t.k) ? 'PPR: 1 a catch, 1 per 10 rushing or receiving yards, 1 per 25 passing yards, 4 a passing TD, 6 other TDs, -2 an INT or fumble lost, 2 a two-point conversion. ' : '') +
         (t.g ? 'PPR/G: points a game played, from the same draws as PPR (games move with snaps); rest of season counts draws with a game or more left. ' : '') + D.def +
         (h ? ' Held out ' + D.test + ': ' + h.map(function (x) { return (x * 100).toFixed(1) + '%'; }).join(' / ') + ' of outcomes fell below P20 / P50 / P80.' : '');
