@@ -1,0 +1,130 @@
+{
+ "asof": "2026-11-05",
+ "prereg": "FV sweep Nov 4 2026 (intl prereg.md), tests S1-S2, Holm k = 2, alpha .05, one-sided fold t",
+ "rows": "Oct 24 snapshot, seasons 2013-20, cohort-out calibrated grade; folds = birth cohorts",
+ "n": 55420,
+ "keepers": 6324,
+ "shipped": [],
+ "gate": {
+  "S1": {
+   "holm": false,
+   "wins23": true,
+   "tPlayers": false,
+   "pooled": true,
+   "top25": true,
+   "top50": false,
+   "fwd": true
+  },
+  "S2": {
+   "holm": false,
+   "wins23": false,
+   "tPlayers": true,
+   "pooled": true,
+   "top25": true,
+   "top50": true,
+   "fwd": true
+  }
+ },
+ "tests": [
+  {
+   "test": "S1",
+   "n": 55420,
+   "mse0": 54.0349,
+   "mse1": 54.0324,
+   "gain": 0.0196,
+   "t": 1.1,
+   "p": 0.1508,
+   "wins": 7,
+   "of": 10,
+   "tPlayers": -0.02,
+   "top25": [
+    [
+     57.89,
+     60.16
+    ],
+    [
+     57.8,
+     60.24
+    ]
+   ],
+   "top50": [
+    [
+     74.99,
+     56.42
+    ],
+    [
+     75.65,
+     56.33
+    ]
+   ],
+   "fwdMse": [
+    56.8641,
+    56.8517
+   ],
+   "coefMean": [
+    -0.1443
+   ],
+   "coefFwd": [
+    -0.1726
+   ],
+   "gk50": [
+    39,
+    57.25,
+    54.62,
+    53.17
+   ],
+   "holmAlpha": 0.025,
+   "holm": false
+  },
+  {
+   "test": "S2",
+   "n": 55420,
+   "mse0": 54.0349,
+   "mse1": 54.0326,
+   "gain": 0.0064,
+   "t": 1.03,
+   "p": 0.1657,
+   "wins": 6,
+   "of": 10,
+   "tPlayers": 3.46,
+   "top25": [
+    [
+     57.89,
+     60.16
+    ],
+    [
+     57.78,
+     60.16
+    ]
+   ],
+   "top50": [
+    [
+     74.99,
+     56.42
+    ],
+    [
+     74.94,
+     56.42
+    ]
+   ],
+   "fwdMse": [
+    56.8641,
+    56.8598
+   ],
+   "coefMean": [
+    -0.1349
+   ],
+   "coefFwd": [
+    -0.0883
+   ],
+   "gk50": [
+    39,
+    57.25,
+    57.12,
+    53.17
+   ],
+   "holmAlpha": 0.05,
+   "holm": false
+  }
+ ]
+}
