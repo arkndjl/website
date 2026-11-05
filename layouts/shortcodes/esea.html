@@ -873,17 +873,23 @@
   {{- if and $d $d.players }}
   {{- $lv := dict }}{{ with $d.profile }}{{ range .roster }}{{ $lv = merge $lv (dict (lower .nickname) .) }}{{ end }}{{ end }}
   <div class="esea-pc__grid">
-  {{- range $d.players }}{{ $l := index $lv (lower .name) }}
+  {{- $pcN := dict }}{{ $pcP := dict }}{{ with site.Data.esea_rwa }}{{ $pcP = .p }}{{ range $id, $n := .names }}{{ $pcN = merge $pcN (dict (lower $n) $id) }}{{ end }}{{ end }}{{ range $d.members }}{{ $pcN = merge $pcN (dict (lower .nick) .id) }}{{ end }}
+  {{- range $d.players }}{{ $l := index $lv (lower .name) }}{{ $rwv := "" }}{{ with index $pcP (index $pcN (lower .name) | default "-") }}{{ $rwv = printf "%+.1f" (float (index . 0)) }}{{ end }}
     <article class="esea-pc__card{{ if eq .name $me }} is-me{{ end }}">
       <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ with $l }}{{ with .talent }} {{ partial "esea/stars.html" (dict "t" .) }}{{ end }}{{ end }}{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
       {{- with $l }}{{ with .role }}<p class="esea-pc__role"><span class="esea-role" data-role="{{ index (split .role " ") 0 }}">{{ .role }}</span> <span class="cfb__dim">last {{ .maps }} maps</span>{{ with $l.trend }}{{ with .flag }} <span class="esea-trend is-{{ . }}" title="ARK {{ $l.trend.last20 }} over the last 20 maps vs {{ $l.trend.last100 }} over the last 100">{{ if eq . "hot" }}▲ hot{{ else }}▼ cold{{ end }} {{ if gt (float $l.trend.delta) 0 }}+{{ end }}{{ $l.trend.delta }}</span>{{ end }}{{ end }}</p>{{ end }}{{ end }}
       {{- with $l }}{{ with .plus }}{{ $pp := . }}<dl class="esea-pc__plus">{{ range (slice (slice "Entry+" "entryPlus") (slice "Duel+" "duelPlus") (slice "Multi+" "multiPlus") (slice "Clutch+" "clutchPlus") (slice "Util+" "utilPlus") (slice "AWP+" "awpPlus") (slice "Surv+" "survPlus")) }}{{ $v := index $pp (index . 1) }}<div><dt>{{ index . 0 }}</dt><dd class="{{ with $v }}{{ if ge (int .) 110 }}cfb__up{{ else if lt (int .) 90 }}cfb__down{{ end }}{{ end }}">{{ $v | default "—" }}</dd></div>{{ end }}</dl>{{ end }}{{ end }}
-      <div class="esea-pc__rt" title="ARK Rating">
+      <div class="esea-pc__rt" title="RWA: round win % added per round, career ESEA league maps, opponent- and division-adjusted; 0 = average Main player">
+        {{- if ne $rwv "" }}
+        {{ partial "px/digits.html" (dict "s" $rwv "class" (printf "esea-pc__digits%s" (cond (ge (float $rwv) 0.0) " is-up" " is-down")) "label" (printf "RWA %s" $rwv)) }}
+        <span class="esea__k">RWA</span>
+        {{- else }}
         {{ partial "px/digits.html" (dict "s" (printf "%.2f" (float (.rating | default 0))) "class" (printf "esea-pc__digits%s" (cond (ge (float (.rating | default 0)) 1.0) " is-up" " is-down")) "label" (printf "rating %.2f" (float (.rating | default 0)))) }}
-        <span class="esea__k">rating · {{ printf "%.2f" (float (.rating | default 0)) }}</span>
+        <span class="esea__k">rating</span>
+        {{- end }}
       </div>
       <dl class="esea-pc__stats">
-        <div><dt>K/D</dt><dd>{{ .kd }}</dd></div><div><dt>ADR</dt><dd>{{ .adr }}</dd></div><div><dt>swing</dt><dd>{{ with .swing }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}%{{ else }}0%{{ end }}</dd></div>
+        <div><dt>K/D</dt><dd>{{ .kd }}</dd></div><div><dt>ADR</dt><dd>{{ .adr }}</dd></div><div><dt title="ARK Rating, this season">ARK</dt><dd>{{ printf "%.2f" (float (.rating | default 0)) }}</dd></div>
         <div><dt>HS%</dt><dd>{{ .hs }}</dd></div><div><dt>entry ±</dt><dd>{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</dd></div><div><dt>clutch</dt><dd>{{ .clutch }}</dd></div>
       </dl>
       {{- with .best }}<p class="esea-pc__best"><span class="cfb__dim">best:</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> <span class="esea-pc__nw">{{ .k }}-{{ .d }}</span> · <span class="esea-pc__nw">{{ .adr }} ADR</span> · <span class="esea-pc__nw">{{ printf "%.2f" (float (.rating | default 0)) }}</span></p>{{ end }}
@@ -897,6 +903,6 @@
   {{- end }}
   </div>
   {{- else }}<p class="esea__empty-line">no matches played.</p>{{ end }}
-  <div class="win__status"><span>ARK Rating = rounds added per round; weights fitted on round outcomes (kills, deaths, damage, multi-kills, entry ±, clutches, assists, utility) + share of team result · totals (2+ maps) regress each stat to the league mean by its stability (ADR and utility settle in ~30-90 rounds, clutches ~550) · 1.00 = average · bars = rating per map</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>RWA = career round win % added per round, 0 = average Main player · ARK Rating = rounds added per round; weights fitted on round outcomes (kills, deaths, damage, multi-kills, entry ±, clutches, assists, utility) + share of team result · totals (2+ maps) regress each stat to the league mean by its stability (ADR and utility settle in ~30-90 rounds, clutches ~550) · 1.00 = average · bars = rating per map</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}
