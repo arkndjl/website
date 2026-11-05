@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-05T22:57:12Z",
+ "asof": "2026-11-05T22:59:16Z",
  "recenter": {
-  "2026-11-05": -11.69,
-  "2026-11-06": -12.5
+  "2026-11-05": -11.68,
+  "2026-11-06": -12.51
  },
  "monitor": {
   "clocks": {
@@ -824,6 +824,22 @@
    "tm": 154.0
   },
   {
+   "id": "401920423",
+   "sport": "cbb",
+   "kick": "2026-11-06T22:00:00Z",
+   "home": "Virginia",
+   "away": "Northeastern",
+   "mk": "total",
+   "side": "under",
+   "line": 160.5,
+   "price": -108.0,
+   "edge": 7.3,
+   "x": null,
+   "why": "total market off",
+   "m": 27.0,
+   "tm": 153.2
+  },
+  {
    "id": "401909563",
    "sport": "cbb",
    "kick": "2026-11-06T01:00:00Z",
@@ -872,22 +888,6 @@
    "tm": 145.7
   },
   {
-   "id": "401920423",
-   "sport": "cbb",
-   "kick": "2026-11-06T22:00:00Z",
-   "home": "Virginia",
-   "away": "Northeastern",
-   "mk": "spread",
-   "side": "away",
-   "line": 33.5,
-   "price": -113.0,
-   "edge": 6.5,
-   "x": null,
-   "why": "spread market off",
-   "m": 27.0,
-   "tm": 153.2
-  },
-  {
    "id": "401911229",
    "sport": "cbb",
    "kick": "2026-11-06T01:00:00Z",
@@ -902,6 +902,38 @@
    "why": "total market off",
    "m": 15.6,
    "tm": 151.8
+  },
+  {
+   "id": "401921682",
+   "sport": "cbb",
+   "kick": "2026-11-06T00:00:00Z",
+   "home": "Sacred Heart",
+   "away": "Maine",
+   "mk": "total",
+   "side": "over",
+   "line": 141.5,
+   "price": -108.0,
+   "edge": 6.3,
+   "x": null,
+   "why": "total market off",
+   "m": 9.7,
+   "tm": 147.8
+  },
+  {
+   "id": "401909739",
+   "sport": "cbb",
+   "kick": "2026-11-06T03:30:00Z",
+   "home": "Arizona",
+   "away": "Cal Poly",
+   "mk": "spread",
+   "side": "home",
+   "line": 30.5,
+   "price": -111.0,
+   "edge": 6.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 36.6,
+   "tm": 170.1
   },
   {
    "id": "401920864",
@@ -968,22 +1000,6 @@
    "tm": 154.8
   },
   {
-   "id": "401921682",
-   "sport": "cbb",
-   "kick": "2026-11-06T00:00:00Z",
-   "home": "Sacred Heart",
-   "away": "Maine",
-   "mk": "total",
-   "side": "over",
-   "line": 142.5,
-   "price": 104.0,
-   "edge": 5.3,
-   "x": null,
-   "why": "total market off",
-   "m": 9.7,
-   "tm": 147.8
-  },
-  {
    "id": "401906864",
    "sport": "cbb",
    "kick": "2026-11-06T01:00:00Z",
@@ -1030,22 +1046,6 @@
    "why": "total market off",
    "m": 7.1,
    "tm": 154.6
-  },
-  {
-   "id": "401909739",
-   "sport": "cbb",
-   "kick": "2026-11-06T03:30:00Z",
-   "home": "Arizona",
-   "away": "Cal Poly",
-   "mk": "spread",
-   "side": "home",
-   "line": 31.5,
-   "price": 108.0,
-   "edge": 5.1,
-   "x": null,
-   "why": "spread market off",
-   "m": 36.6,
-   "tm": 170.1
   },
   {
    "id": "401911195",
@@ -1248,9 +1248,9 @@
   "401909739": {
    "mk": "spread",
    "side": "home",
-   "line": 31.5,
-   "price": 108.0,
-   "edge": 5.1,
+   "line": 30.5,
+   "price": -111.0,
+   "edge": 6.1,
    "ev": null,
    "units": 0.0,
    "home": "Arizona",
@@ -1416,9 +1416,9 @@
   "401921682": {
    "mk": "total",
    "side": "over",
-   "line": 142.5,
-   "price": 104.0,
-   "edge": 5.3,
+   "line": 141.5,
+   "price": -108.0,
+   "edge": 6.3,
    "ev": null,
    "units": 0.0,
    "home": "Sacred Heart",
@@ -1465,7 +1465,7 @@
    "mk": "spread",
    "side": "home",
    "line": -9.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -1594,11 +1594,11 @@
    "state": "off"
   },
   "401920423": {
-   "mk": "spread",
-   "side": "away",
-   "line": 33.5,
-   "price": -113.0,
-   "edge": 6.5,
+   "mk": "total",
+   "side": "under",
+   "line": 160.5,
+   "price": -108.0,
+   "edge": 7.3,
    "ev": null,
    "units": 0.0,
    "home": "Virginia",
@@ -1658,43 +1658,43 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 5631,
+  "snapshots": 5646,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 423,
-    "clvRet": -0.0285,
-    "clvT": -4.37,
-    "clv": 0.3,
-    "beat": 0.288,
-    "still": 0.303
+    "clvRet": -0.0304,
+    "clvT": -4.66,
+    "clv": 0.27,
+    "beat": 0.262,
+    "still": 0.329
    },
    {
     "when": "6-24h",
-    "clvN": 799,
-    "clvRet": -0.0417,
-    "clvT": -11.51,
-    "clv": 0.09,
-    "beat": 0.254,
-    "still": 0.447
+    "clvN": 800,
+    "clvRet": -0.0433,
+    "clvT": -12.02,
+    "clv": 0.07,
+    "beat": 0.231,
+    "still": 0.47
    },
    {
     "when": "1-6h",
-    "clvN": 532,
-    "clvRet": -0.0543,
-    "clvT": -27.01,
-    "clv": -0.12,
-    "beat": 0.098,
-    "still": 0.709
+    "clvN": 536,
+    "clvRet": -0.0548,
+    "clvT": -27.38,
+    "clv": -0.13,
+    "beat": 0.095,
+    "still": 0.707
    },
    {
     "when": "<1h",
-    "clvN": 137,
+    "clvN": 138,
     "clvRet": -0.0487,
-    "clvT": -14.8,
+    "clvT": -14.9,
     "clv": -0.05,
-    "beat": 0.088,
-    "still": 0.766
+    "beat": 0.087,
+    "still": 0.768
    }
   ]
  },
@@ -9015,17 +9015,17 @@
   "cap": 40.0,
   "nights": {
    "2026-11-05": {
-    "raw": 16.75,
+    "raw": 13.25,
     "scale": 1.0,
     "down": 1.0
    },
    "2026-11-06": {
-    "raw": 8.25,
+    "raw": 13.25,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 43.75,
-    "scale": 0.9143
+    "raw": 45.0,
+    "scale": 0.8889
    },
    "2026-11-08": {
     "raw": 46.5,
