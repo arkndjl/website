@@ -2,11 +2,12 @@
        average team on a neutral field with this week's starting QB and injury reports (the game model's Elo,
        QB, market rating, return game, offseason roster prior and injury terms; EPA/play is shown, not in the rating), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
 {{- with site.Data.nfl_games -}}
+{{- $mvFrom := .mvFrom -}}
 {{- $proj := partial "projsum.html" (dict "sport" "nfl" "k" "war") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table" data-td-kind="nfl" data-td-src="/data/teams/nfl.json" data-td-rows="{{ (resources.FromString "data/nfl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Team</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>
     <th title="rating = expected margin vs average team, neutral field, this week's starting QB and injuries; Elo + QB + market rating + return game + roster prior - injuries">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="this week's injury reports: non-QBs at their chance to miss x WAR a game, points (a QB out shows in the QB column)">Inj</th>
@@ -25,7 +26,7 @@
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
-    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}"{{ with .inj }} title="includes {{ printf "%.1f" (float .) }} pts injury cost, this week"{{ end }}>{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     {{- $full := add (float .rating) (float (.inj | default 0)) }}

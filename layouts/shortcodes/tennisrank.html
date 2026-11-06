@@ -6,12 +6,13 @@
 {{- with site.Data.tennis -}}
 {{- $tour := $.Get "tour" | default "atp" -}}
 {{- $t := index .tours $tour -}}
+{{- $mvFrom := $t.mvFrom -}}
 {{- $ctry := site.Data.soccer_countries.name -}}
 {{- $tl := cond (eq $tour "atp") "ATP" "WTA" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: ARK Ranking" $tl)) "icon" "tennis" "filter" "Plays" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,ARK,Hard,Clay,Grass,Elo,Rank" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2 tennis__table">
   <thead><tr>
-    <th>RK</th><th>Player</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Player</th>
     <th title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ printf "%.0f" (mul (index $t.mix $s) 100) }}%{{ end }})">ARK</th>
     <th title="projected ARK in 12 months if still active: from ARK, age, matches in the last 52 weeks, career matches and official rank, fit on {{ $tl }} top-300 boards each quarter end 2006-25 (cell: 24 and 36 months, projected Elo)">1Y</th>
     <th title="win chance against the average top-50 player on hard courts (best of three)">Hard</th>
@@ -30,7 +31,7 @@
   <tbody>
   {{- range $t.players }}{{ $r := . }}
   <tr>
-    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f pts" "mul" 100) }}
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ partial "badges.html" (dict "b" .bdg "of" "next season's Elo") }}</td>
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
     <td class="cfb__num" data-v="{{ .pj12 | default 0 }}"{{ with .pj24 }} title="24 mo {{ printf "%.1f" (mul . 100) }} · 36 mo {{ printf "%.1f" (mul ($r.pj36 | default 0) 100) }} · Elo {{ $r.pe12 }} (12 mo)"{{ end }}>{{ with .pj12 }}{{ printf "%.1f" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

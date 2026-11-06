@@ -3,11 +3,12 @@
        roster and today's injury report; Full = no report), offense and defense per 100 possessions against average, pace, and the season-odds
        headline numbers. */ -}}
 {{- with site.Data.nba_games -}}
+{{- $mvFrom := .mvFrom -}}
 {{- $proj := partial "projsum.html" (dict "sport" "nba" "k" "vorx") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
 <table class="cfb__table tstick2" data-td-kind="nba" data-td-src="/data/teams/nba.json" data-td-rows="{{ (resources.FromString "data/nba-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Team</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>
     <th title="rating = expected margin vs an average team, neutral floor, current roster and today's injury report: Elo + net rating + market rating + lineup (players' projected XPM x minutes x chance to play), at the model's weights">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="today's injury report (the league's for teams playing today, else ESPN's list): the lineup's points lost, each player at his chance to play x XPM x minutes; negative = players back or cleared">Inj</th>
@@ -27,7 +28,7 @@
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
-    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     {{- $full := .full | default .rating }}

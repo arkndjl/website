@@ -5,12 +5,13 @@
        set. Off = goals scored over average, Def = goals allowed under average. Season columns come from the league
        and UEFA sims. */ -}}
 {{- with site.Data.soccer_games -}}
+{{- $mvFrom := .mvFrom -}}
 {{- $short := dict "eng.1" "EPL" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "por.1" "Portugal" "ned.1" "Netherlands" "bel.1" "Belgium" "sco.1" "Scotland" "tur.1" "Turkey" "aut.1" "Austria" "sui.1" "Switzerland" "gre.1" "Greece" "den.1" "Denmark" "nor.1" "Norway" "swe.1" "Sweden" "rus.1" "Russia" "eng.2" "Championship" "esp.2" "La Liga 2" "ger.2" "2. Bundesliga" "ita.2" "Serie B" "fra.2" "Ligue 2" "usa.1" "MLS" "pol.1" "Poland" "cze.1" "Czechia" "x" "other" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "soccer" "filter" "League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Club,League,Rating,Off,Def,xPts,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 {{- $rows := slice }}{{ range .power }}{{ $rows = $rows | append (merge . (dict "lgName" (index $short .lg | default .lg))) }}{{ end }}
 <table class="cfb__table tstick2" data-td-kind="soccer" data-td-src="/data/teams/soccer.json" data-td-rows="{{ (resources.FromString "data/soccer-power-rows.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Club</th><th>League</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Club</th><th>League</th>
     <th title="expected goal margin a match against an average big-five club, neutral ground">Rating</th>
     <th title="goals scored a match over an average big-five club's">Off</th>
     <th title="goals allowed a match under average (positive = fewer allowed)">Def</th>
@@ -26,7 +27,7 @@
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
-    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.2f" "mul" 1) }}
     <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .n }}</button></td>
     <td>{{ index $short .lg | default .lg }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }}</td>

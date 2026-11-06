@@ -1756,6 +1756,15 @@ def build(days_ahead=4):
                                      for t, v in sorted(u['teams'].items(), key=lambda kv: kv[1]['pos'])]) if u else None)
                     for lg, u in uefa.items()},
            'home': hfa, 'leagueStrength': strength, 'baseGoals': round(mu, 3)}
+    try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
+        import rank_moves
+        try:
+            _old = json.load(open(OUT))
+        except (OSError, ValueError):
+            _old = None
+        rank_moves.apply(out, pw, _old, lambda r: r['id'], lambda r: r['rating'])
+    except Exception as e:      # noqa: BLE001
+        print('rank moves failed:', repr(e))
     txt = json.dumps(out, separators=(',', ':'), allow_nan=False)
     open(OUT, 'w').write(txt)
     print('wrote', OUT, len(games), 'matches', len(pw), 'clubs', len(txt) // 1024, 'KB')

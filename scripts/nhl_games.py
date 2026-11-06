@@ -1463,6 +1463,15 @@ def build():
            'gkAll': {str(p): [m.gk.name.get(p), m.gk.team.get(p), round(m.gk.rating(p), 4)] for p, d in m.gk.last.items()
                      if m.gk.team.get(p) in TEAMS and _days(d, today.isoformat()) <= 400},
            'gk0': P['gk_0']}
+    try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
+        import rank_moves
+        try:
+            _old = json.load(open(OUT))
+        except (OSError, ValueError):
+            _old = None
+        rank_moves.apply(out, power, _old, lambda r: r['t'], lambda r: r['rating'])
+    except Exception as e:
+        print('rank moves failed:', repr(e), file=sys.stderr)
     json.dump(out, open(OUT, 'w'), indent=None, separators=(',', ':'))
     print('wrote', OUT, len(games), 'games', len(left), 'left')
 

@@ -573,6 +573,15 @@ def build():
            "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tiers": tier_fit,
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
+    try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
+        import rank_moves
+        try:
+            _old = json.loads(OUT.read_text())
+        except (OSError, ValueError):
+            _old = None
+        rank_moves.apply(out, teams, _old, lambda r: r["k"], lambda r: r["ark"])
+    except Exception as e:  # noqa: BLE001
+        print("rank moves failed:", repr(e))
     out["pool"] = pool
     OUT.write_text(json.dumps(out, separators=(",", ":")))
     # the next Major's odds (scripts/cs2_events.py) from the same series chance
