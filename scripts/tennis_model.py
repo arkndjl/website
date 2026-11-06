@@ -983,6 +983,15 @@ def build(rows, players, tn):
                                  {g[s_]['nat'] for g in out['matches'] + out['results'] for s_ in 'ab'})
     except Exception as e:  # noqa: BLE001
         print('flags skipped:', e)
+    try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
+        import rank_moves
+        try:
+            _old = json.load(open(OUT))
+        except (OSError, ValueError):
+            _old = None
+        rank_moves.tennis_apply(out, _old)
+    except Exception as e:  # noqa: BLE001
+        print('rank moves failed:', e)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print(f"tennis.json: {sum(len(t['players']) for t in out['tours'].values())} players, {len(out['matches'])} matches, "
           f"{len(out['results'])} results")

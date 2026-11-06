@@ -3,11 +3,12 @@
        data/nhl_games_fit.json mcoef), its win chance against an average team, the xG attack and defence it's built on, the
        goalie it starts most, and the season-odds headline numbers. */ -}}
 {{- with site.Data.nhl_games -}}
+{{- $mvFrom := .mvFrom -}}
 {{- $proj := partial "projsum.html" (dict "sport" "nhl" "k" "war") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Team</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>
     <th title="rating = expected goal margin vs an average team, neutral ice: Elo + xG rating + lineup value, at the model's weights">Rating</th>
     <th title="win chance against an average team, neutral ice">Win%</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
@@ -26,7 +27,7 @@
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
-    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.2f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }}</td>
     <td class="cfb__num" data-v="{{ .pWin }}">{{ printf "%.0f" (mul .pWin 100) }}%</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}

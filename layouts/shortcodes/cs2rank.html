@@ -4,11 +4,12 @@
        region offsets, blended with Valve's VRS points at weights fit on Aug 2024 - Jun 2025. top= rows (default
        all 100). */ -}}
 {{- with site.Data.cs2 -}}
+{{- $mvFrom := .mvFrom -}}
 {{- $top := int ($.Get "top" | default 100) -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: ARK Ranking") "icon" "cs" "filter" "Tier,Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Tier,ARK,Elo,RWA,VRS" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2 cs__table">
   <thead><tr>
-    <th>RK</th><th>Team</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>
     <th title="event-access tier: the bo3.gg event tier a team of this Elo mostly plays (Tier 1 = S-tier events{{ with .tiers }}, Elo {{ index .cuts 0 }}+; Tier 2 = S or A, {{ index .cuts 1 }}+; Tier 3 = B or better, {{ index .cuts 2 }}+{{ end }}), fit on the last 180 days">Tier</th>
     <th title="ARK: series win chance against the average top-20 team">ARK</th>
     <th title="the same strength on the Elo scale: 1500 = the average top-20 team, +400 = 10 to 1">Elo</th>
@@ -24,7 +25,7 @@
   <tbody>
   {{- range first $top .teams }}
   <tr>
-    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f pts" "mul" 100) }}
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
     <td class="cs__tier" data-v="{{ .tier | default 4 }}" data-filter="Tier {{ .tier | default 4 }}"><span class="cs__t cs__t--{{ .tier | default 4 }}">T{{ .tier | default 4 }}</span>{{ with .ev }} <span class="cfb__dim" title="share of series at S-tier events, last 180 days">{{ printf "%.0f" (mul (index . 0) 100) }}%</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>

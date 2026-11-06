@@ -1076,6 +1076,15 @@ def build():
         nfl_picks.live(out, [g for g in games if int(g['season']) == last], sd, last, week)
     except Exception as e:      # noqa: BLE001
         print('nfl picks: failed', repr(e))
+    try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
+        import rank_moves
+        try:
+            _old = json.load(open(OUT))
+        except (OSError, ValueError):
+            _old = None
+        rank_moves.apply(res, res['power'], _old, lambda r: r['t'], lambda r: r['rating'])
+    except Exception as e:      # noqa: BLE001
+        print('rank moves: failed', repr(e))
     try:
         old = json.load(open(OUT))
         if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
