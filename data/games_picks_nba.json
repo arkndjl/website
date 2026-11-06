@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-06T01:31:11Z",
+ "asof": "2026-11-06T01:36:41Z",
  "recenter": {
   "2026-11-05": 1.28,
   "2026-11-06": 1.24
@@ -349,8 +349,15 @@
    "tmRaw": 228.6,
    "lineL": -6.5,
    "flagged": "2026-11-05T22:58:50Z",
-   "close": -7.5,
-   "now": null
+   "close": -6.5,
+   "now": {
+    "mk": "ml",
+    "side": "away",
+    "line": null,
+    "price": -251.0,
+    "ev": 0.081,
+    "units": 1.75
+   }
   },
   {
    "id": "401909937",
@@ -441,9 +448,9 @@
     "mk": "total",
     "side": "under",
     "line": 230.5,
-    "price": -104.0,
-    "ev": 0.068,
-    "units": 0.25
+    "price": -102.0,
+    "ev": 0.078,
+    "units": 1.25
    }
   }
  ],
@@ -568,13 +575,13 @@
    "state": "under"
   },
   "401909292": {
-   "mk": "total",
-   "side": "under",
-   "line": 230.5,
-   "price": -104.0,
-   "ev": 0.068,
-   "edge": 3.1,
-   "units": 0.25,
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -251.0,
+   "ev": 0.081,
+   "edge": 3.4,
+   "units": 1.75,
    "home": "MIL",
    "away": "TOR",
    "state": "pick"
@@ -668,24 +675,24 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2196,
+  "snapshots": 2199,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 261,
-    "clvRet": 0.0247,
-    "clvT": 4.35,
-    "clv": 1.04,
-    "beat": 0.778,
-    "still": 0.092
+    "clvRet": 0.0242,
+    "clvT": 4.25,
+    "clv": 1.03,
+    "beat": 0.77,
+    "still": 0.1
    },
    {
     "when": "6-24h",
-    "clvN": 618,
-    "clvRet": -0.0005,
-    "clvT": -0.16,
+    "clvN": 619,
+    "clvRet": -0.0007,
+    "clvT": -0.22,
     "clv": 0.7,
-    "beat": 0.5,
+    "beat": 0.499,
     "still": 0.388
    },
    {
@@ -5005,7 +5012,7 @@
    "tmRaw": 228.6,
    "lineL": -6.5,
    "flagged": "2026-11-05T22:58:50Z",
-   "close": -7.5
+   "close": -6.5
   },
   {
    "id": "401909292",
@@ -5042,7 +5049,7 @@
     "down": 17.0
    },
    "2026-11-06": {
-    "raw": 13.5,
+    "raw": 11.25,
     "scale": 1.0
    },
    "2026-11-07": {
@@ -5054,7 +5061,7 @@
     "scale": 0.8421
    },
    "2026-11-09": {
-    "raw": 8.5,
+    "raw": 9.5,
     "scale": 1.0
    }
   }
