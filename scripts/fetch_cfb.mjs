@@ -43,7 +43,7 @@ import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
 import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
-import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
+import { fetchRotoballer, fetchNewsHeadlines, headlineStatus, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { fetchBoxes, fetchFullBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
 import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
@@ -84,7 +84,7 @@ const ARGS = new Set(process.argv.slice(2));
 const OFFLINE = ARGS.has('--offline');
 // --offline --news: the daily availability refresh. Everything comes from the cache except ESPN's schedule and
 // injuries and Rotoballer's news, which are free; no PFN, On3 or CFBD pull (the CFBD quota is for the weekly runs).
-const NEWS = OFFLINE && ARGS.has('--news') ? new Set(['games.json', 'injuries.json', 'rotoballer.json']) : new Set();
+const NEWS = OFFLINE && ARGS.has('--news') ? new Set(['games.json', 'injuries.json', 'rotoballer.json', 'headlines.json']) : new Set();
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 
 // ---- board rules ---------------------------------------------------------------------------
@@ -2198,6 +2198,16 @@ const injuries = await (async () => {
         matched++; put(a, st, it.date, it.title, 'rotoballer');
       }
     }
+    // On3/Rivals and ESPN college football headlines (Google News RSS, last 4 days; cfb_teams.mjs fetchNewsHeadlines):
+    // each clause's player (matched on the roster, school in the headline when the name is shared) and strict status
+    const heads = await source('headlines.json', () => fetchNewsHeadlines()) || [];
+    let hMatched = 0;
+    for (const it of heads) for (const c of headlineClauses(it.title, headlineStatus)) {
+      if (!c.status) continue;
+      const a = findIn(c.text, it.body); if (!a) continue;
+      hMatched++; put(a, c.status, it.date, `${it.title} (${it.src === 'on3' ? 'On3' : 'ESPN'})`, it.src);
+    }
+    console.log(`headlines: ${heads.length} On3/ESPN items, ${hMatched} matched with a status`);
     // RotoWire's injury news (scripts/rotowire.py, polled every half hour into scripts/data/rotowire_news.json; this
     // build polls once more first): player, school and exact publish time given, status read from the headline
     // ("Won't play Saturday"), else the news sentence; the last 9 days (older statuses lapse anyway)
@@ -2263,8 +2273,12 @@ const injuries = await (async () => {
     const listed = new Set(rep.list.map(x => x.a.id)), nowIso = new Date().toISOString();
     for (const [k, e] of Object.entries(P)) if (rep.teams.has(e.tid) && !listed.has(k) && e.src !== 'manual' && !seasonOut(e.status)
       && Date.parse(e.date) < Date.parse(rep.list.find(x => x.a.tid === e.tid)?.d || nowIso) - 4 * 864e5) delete P[k];
+    const prevNews = Object.fromEntries(rep.list.map(x => [x.a.id, P[x.a.id]]).filter(([, e]) => e));
     for (const x of rep.list) {
       if (P[x.a.id]?.src === 'manual') continue;
+      // a report's Out doesn't undo news that he's out for the season (or out long-term): the news stands
+      const pn = prevNews[x.a.id];
+      if (pn && /^out/i.test(x.status) && (seasonOut(pn.status) || pn.long)) { if (!/availability report/.test(pn.note || '')) pn.note = `${pn.note || ''}; ${x.raw} on the availability report`.slice(0, 220); continue; }
       P[x.a.id] = { name: x.a.name, tid: x.a.tid, pos: x.a.pos, status: x.status, date: nowIso, note: `${x.raw} on the ${x.stage === 'gd' ? 'game-day' : 'conference'} availability report${x.streak ? ` (listed out the last ${x.streak})` : ''}`,
         src: 'report', stage: x.stage, streak: x.streak };
     }
