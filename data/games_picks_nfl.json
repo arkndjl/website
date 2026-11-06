@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-06T21:32:27Z",
+ "asof": "2026-11-06T21:43:04Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -94,7 +94,7 @@
    "price": 102.0,
    "p": 0.559,
    "ev": 0.129,
-   "units": 3.75,
+   "units": 3.25,
    "edge": 4.1,
    "x": 1.5,
    "pDU": 0.5188,
@@ -110,12 +110,12 @@
     "line": 52.5,
     "price": 102.0,
     "ev": 0.158,
-    "units": 4.0,
+    "units": 3.75,
     "unitsRaw": 5.0,
-    "unitsCap": 4.0
+    "unitsCap": 3.75
    },
    "unitsRaw": 4.5,
-   "unitsCap": 3.75
+   "unitsCap": 3.25
   },
   {
    "id": "2026_09_BUF_MIN",
@@ -161,7 +161,7 @@
    "price": 163.0,
    "p": 0.438,
    "ev": 0.152,
-   "units": 2.0,
+   "units": 1.75,
    "edge": 4.2,
    "x": 4.0,
    "pDU": 0.3964,
@@ -171,7 +171,7 @@
    "flagged": "2026-11-03T10:48:02Z",
    "close": -3.5,
    "unitsRaw": 2.5,
-   "unitsCap": 2.0,
+   "unitsCap": 1.75,
    "now": null
   },
   {
@@ -244,7 +244,7 @@
    "price": -100.0,
    "p": 0.537,
    "ev": 0.073,
-   "units": 1.25,
+   "units": 1.0,
    "edge": 2.5,
    "x": 1.5,
    "pDU": 0.5113,
@@ -265,7 +265,7 @@
     "unitsCap": 0.75
    },
    "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "unitsCap": 1.0
   },
   {
    "id": "2026_09_DAL_IND",
@@ -323,9 +323,9 @@
     "line": 39.5,
     "price": -100.0,
     "ev": 0.139,
-    "units": 3.5,
+    "units": 3.25,
     "unitsRaw": 4.25,
-    "unitsCap": 3.5
+    "unitsCap": 3.25
    }
   },
   {
@@ -358,9 +358,9 @@
     "line": null,
     "price": 217.0,
     "ev": 0.207,
-    "units": 3.25,
+    "units": 3.0,
     "unitsRaw": 4.0,
-    "unitsCap": 3.25
+    "unitsCap": 3.0
    }
   },
   {
@@ -392,9 +392,9 @@
     "line": 47.5,
     "price": -100.0,
     "ev": 0.072,
-    "units": 1.25,
+    "units": 1.0,
     "unitsRaw": 1.5,
-    "unitsCap": 1.25
+    "unitsCap": 1.0
    }
   },
   {
@@ -424,9 +424,11 @@
     "mk": "total",
     "side": "under",
     "line": 51.5,
-    "price": -104.0,
-    "ev": 0.043,
-    "units": 0.25
+    "price": -102.0,
+    "ev": 0.053,
+    "units": 0.25,
+    "unitsRaw": 0.5,
+    "unitsCap": 0.25
    }
   }
  ],
@@ -658,10 +660,10 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -104.0,
-   "ev": 0.043,
+   "price": -102.0,
+   "ev": 0.053,
    "edge": 2.2,
-   "units": 0.25,
+   "units": 0.5,
    "home": "SF",
    "away": "LV",
    "state": "pick"
@@ -767,16 +769,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2098,
+  "snapshots": 2101,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 925,
-    "clvRet": -0.0344,
-    "clvT": -15.08,
+    "clvN": 927,
+    "clvRet": -0.0345,
+    "clvT": -15.13,
     "clv": 0.21,
     "beat": 0.159,
-    "still": 0.775
+    "still": 0.776
    },
    {
     "when": "6-24h",
@@ -1729,7 +1731,7 @@
    "price": 102.0,
    "p": 0.559,
    "ev": 0.129,
-   "units": 3.75,
+   "units": 3.25,
    "edge": 4.1,
    "x": 1.5,
    "pDU": 0.5188,
@@ -1740,7 +1742,7 @@
    "betTo": 49.0,
    "close": 52.5,
    "unitsRaw": 4.5,
-   "unitsCap": 3.75
+   "unitsCap": 3.25
   },
   {
    "id": "2026_09_DAL_IND",
@@ -1781,7 +1783,7 @@
    "price": 163.0,
    "p": 0.438,
    "ev": 0.152,
-   "units": 2.0,
+   "units": 1.75,
    "edge": 4.2,
    "x": 4.0,
    "pDU": 0.3964,
@@ -1791,7 +1793,7 @@
    "flagged": "2026-11-03T10:48:02Z",
    "close": -3.5,
    "unitsRaw": 2.5,
-   "unitsCap": 2.0
+   "unitsCap": 1.75
   },
   {
    "id": "2026_09_LV_SF",
@@ -1974,7 +1976,7 @@
    "price": -100.0,
    "p": 0.537,
    "ev": 0.073,
-   "units": 1.25,
+   "units": 1.0,
    "edge": 2.5,
    "x": 1.5,
    "pDU": 0.5113,
@@ -1985,26 +1987,26 @@
    "betTo": 39.5,
    "close": 38.5,
    "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "unitsCap": 1.0
   }
  ],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-06": {
-    "raw": 16.25,
+    "raw": 16.75,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 45.25,
-    "scale": 0.884
+    "raw": 43.5,
+    "scale": 0.9195
    },
    "2026-11-08": {
-    "raw": 47.75,
-    "scale": 0.8377
+    "raw": 51.75,
+    "scale": 0.7729
    },
    "2026-11-09": {
-    "raw": 10.5,
+    "raw": 9.75,
     "scale": 1.0
    }
   }

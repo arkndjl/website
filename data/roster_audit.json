@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-06T19:56Z",
+ "asof": "2026-11-06T21:42Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -87,7 +87,7 @@
      "rows": 596
     },
     "static/data/nba-proj.json": {
-     "flags": 4,
+     "flags": 5,
      "rows": 495
     },
     "static/data/nba-xpm/2027.json": {
@@ -104,6 +104,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-06",
+     "field": "tm",
+     "file": "static/data/nba-proj.json",
+     "flag": "released",
+     "head": "Stepping away from basketball",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-06",
+      "head": "Stepping away from basketball",
+      "kind": "exit"
+     },
+     "pid": "3669",
+     "player": "Kristaps Porzi\u0146\u0123is",
+     "pos": "C",
+     "rotowire": "GSW",
+     "site": "GSW"
+    },
     {
      "d": "2026-10-22",
      "field": "tm",
@@ -240,7 +258,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 53,
+     "flags": 54,
      "rows": 1650
     }
    },
@@ -1370,6 +1388,20 @@
      "pos": "OL",
      "rotowire": "PHI",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-06",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Will not play in Week 9",
+     "kind": null,
+     "move": null,
+     "pid": "17872",
+     "player": "Trevin Wallace",
+     "pos": "LB",
+     "rotowire": "NYJ",
+     "site": "CAR"
     },
     {
      "d": "2026-09-09",
