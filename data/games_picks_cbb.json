@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-06T11:04:32Z",
+ "asof": "2026-11-06T11:16:39Z",
  "recenter": {
-  "2026-11-06": -11.23
+  "2026-11-06": -11.24
  },
  "monitor": {
   "clocks": {
@@ -193,7 +193,7 @@
    "mk": "total",
    "side": "over",
    "line": 157.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 9.5,
    "x": null,
    "why": "total market off",
@@ -297,22 +297,6 @@
    "tm": 156.0
   },
   {
-   "id": "401917515",
-   "sport": "cbb",
-   "kick": "2026-11-07T02:30:00Z",
-   "home": "San Diego",
-   "away": "Tarleton State",
-   "mk": "total",
-   "side": "over",
-   "line": 147.5,
-   "price": -108.0,
-   "edge": 6.0,
-   "x": null,
-   "why": "total market off",
-   "m": 3.0,
-   "tm": 153.5
-  },
-  {
    "id": "401909751",
    "sport": "cbb",
    "kick": "2026-11-06T22:00:00Z",
@@ -353,7 +337,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 5.6,
    "x": null,
    "why": "spread market off",
@@ -407,6 +391,22 @@
    "why": "total market off",
    "m": 14.3,
    "tm": 145.3
+  },
+  {
+   "id": "401917515",
+   "sport": "cbb",
+   "kick": "2026-11-07T02:30:00Z",
+   "home": "San Diego",
+   "away": "Tarleton State",
+   "mk": "total",
+   "side": "over",
+   "line": 148.5,
+   "price": -102.0,
+   "edge": 5.0,
+   "x": null,
+   "why": "total market off",
+   "m": 3.0,
+   "tm": 153.5
   },
   {
    "id": "401920894",
@@ -481,7 +481,7 @@
    "mk": "total",
    "side": "over",
    "line": 151.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 4.7,
    "x": null,
    "why": "total market off",
@@ -529,7 +529,7 @@
    "mk": "total",
    "side": "under",
    "line": 156.5,
-   "price": -115.0,
+   "price": -104.0,
    "edge": 3.7,
    "x": null,
    "why": "total market off",
@@ -602,7 +602,7 @@
    "mk": "total",
    "side": "over",
    "line": 150.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -614,7 +614,7 @@
    "mk": "total",
    "side": "under",
    "line": 156.5,
-   "price": -115.0,
+   "price": -104.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -650,7 +650,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 5.6,
    "ev": null,
    "units": 0.0,
@@ -758,7 +758,7 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -770,7 +770,7 @@
    "mk": "total",
    "side": "over",
    "line": 151.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -866,7 +866,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 106.0,
+   "price": 104.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -974,7 +974,7 @@
    "mk": "total",
    "side": "over",
    "line": 157.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 9.5,
    "ev": null,
    "units": 0.0,
@@ -1021,9 +1021,9 @@
   "401917515": {
    "mk": "total",
    "side": "over",
-   "line": 147.5,
-   "price": -108.0,
-   "edge": 6.0,
+   "line": 148.5,
+   "price": -102.0,
+   "edge": 5.0,
    "ev": null,
    "units": 0.0,
    "home": "San Diego",
@@ -1083,7 +1083,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 6058,
+  "snapshots": 6072,
   "buckets": [
    {
     "when": "24h+",
@@ -1096,12 +1096,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 928,
-    "clvRet": -0.041,
-    "clvT": -12.74,
+    "clvN": 935,
+    "clvRet": -0.0411,
+    "clvT": -12.85,
     "clv": 0.09,
-    "beat": 0.239,
-    "still": 0.484
+    "beat": 0.237,
+    "still": 0.488
    },
    {
     "when": "1-6h",
@@ -8440,7 +8440,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-06": {
-    "raw": 22.75,
+    "raw": 26.0,
     "scale": 1.0
    },
    "2026-11-07": {
@@ -8448,8 +8448,8 @@
     "scale": 0.7583
    },
    "2026-11-08": {
-    "raw": 46.0,
-    "scale": 0.8696
+    "raw": 45.5,
+    "scale": 0.8791
    },
    "2026-11-09": {
     "raw": 8.5,
