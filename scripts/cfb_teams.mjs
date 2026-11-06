@@ -153,7 +153,7 @@ const QB_CAP = 10;     // most points a QB1 absence moves a margin (see side())
 // matchup previews, and all three played
 export function statusOf(text, strict = false) {
   const t = (text || '').toLowerCase();
-  if (/season-ending|out for (the )?(rest of the |remainder of the )?(season|year)|(rest|remainder) of the (season|year|20\d\d season)|miss the (rest|remainder)|out indefinitely|torn acl|achilles|medical redshirt|career-ending|medically retire|likely out for season/.test(t)) return 'Out (season)';
+  if (/season-ending|(out|done) for (the )?(rest of (the )?|remainder of (the )?)?(season|year)|(rest|remainder) of (the )?(season|year|20\d\d season)|miss the (rest|remainder)|out indefinitely|torn acl|achilles|medical redshirt|career-ending|medically retire|likely out for season/.test(t)) return 'Out (season)';
   if (/doubtful|unlikely to play/.test(t)) return 'Doubtful';
   const out = /\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bsidelined|\binactive|\bwill sit|\bnot dress|\bout for a (week|month)/;
   if (out.test(t) || !strict && /\bout\b(?! of)/.test(t)) return 'Out';
@@ -163,11 +163,39 @@ export function statusOf(text, strict = false) {
 }
 // a headline's clauses ("X Out, Y to Start", "A, B Questionable for Saturday"): each with its own status; a
 // clause with none takes the next one's (a list of names sharing one status)
-export function headlineClauses(title) {
-  const cl = (title || '').split(/,\s*|\s+and\s+|;\s*/).map(c => ({ text: c, status: statusOf(c) }));
+export function headlineClauses(title, status = statusOf) {
+  const cl = (title || '').split(/,\s*|\s+and\s+|;\s*/).map(c => ({ text: c, status: status(c) }));
   for (let i = cl.length - 2; i >= 0; i--) if (!cl[i].status) cl[i].status = cl[i + 1].status;
   return cl;
 }
+// news headlines through Google News search RSS (free, no key): On3/Rivals articles (on3.com itself is Cloudflare-blocked
+// from datacenter IPs, browser or not) and ESPN's college football news, where insiders' X scoops (Thamel, Low) land
+// as "Sources - ..." stories. Headline only: title, publisher, publish time. Headlines are features as often as news,
+// so their status reading is strict (headlineStatus)
+export const GNEWS_QUERIES = {
+  on3: 'site:on3.com (injury OR injured OR out OR season OR surgery OR questionable OR doubtful OR return) when:4d',
+  espn: 'site:espn.com "college football" (sources OR injury OR out) when:4d',
+};
+export async function fetchNewsHeadlines() {
+  const items = [], seen = new Set(), dec = x => x.replace(/&amp;/g, '&').replace(/&#0?39;|&apos;|&#8217;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  for (const [pub, q] of Object.entries(GNEWS_QUERIES)) {
+    const r = await fetch(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`, { headers: { 'user-agent': RB_UA } });
+    if (!r.ok) throw new Error(`google news ${pub}: HTTP ${r.status}`);
+    for (const it of (await r.text()).split('<item>').slice(1)) {
+      const raw = dec(/<title>([^<]*)/.exec(it)?.[1] || ''), date = Date.parse(/<pubDate>([^<]*)/.exec(it)?.[1] || '');
+      const publisher = dec(/<source[^>]*>([^<]*)/.exec(it)?.[1] || ''), title = raw.replace(/\s+-\s+[^-]+$/, '').trim();
+      if (!title || !isFinite(date) || seen.has(title)) continue;
+      seen.add(title);
+      items.push({ title, date: new Date(date).toISOString(), body: `${title} - ${publisher}`, src: /on3|rivals/i.test(publisher) ? 'on3' : 'espn-news' });
+    }
+    await sleep(400);
+  }
+  if (!items.length) throw new Error('google news: no items');
+  return items;
+}
+// a headline clause's status: statusOf's strict reading, plus the headline forms of Out ("out vs. Iowa", "expected out",
+// "ruled out"); a bare "out" in a headline is a feature ("calls out", "out West") too often
+export const headlineStatus = c => statusOf(c, true) || (/\bout (vs\.?|against|for (saturday|the game|week)|at\b|this week|saturday)|\bexpected out\b|\blisted (as )?out\b/i.test(c) ? 'Out' : null);
 // Rotoballer's college football news (~5 days, 15 items a page): headline, time, blurb
 const RB_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 export async function fetchRotoballer(pages = 12) {
