@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-06T18:27Z",
+ "asof": "2026-11-06T19:24Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -3463,7 +3463,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -3484,6 +3484,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-06",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Demoted to minors",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-06",
+      "head": "Demoted to minors",
+      "kind": "down"
+     },
+     "pid": "3356",
+     "player": "James Reimer",
+     "pos": "G",
+     "rotowire": "NYR",
+     "site": "NYR"
+    },
     {
      "d": "2026-09-11",
      "field": "tm",
