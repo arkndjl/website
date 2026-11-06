@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-06T23:26:52Z",
+ "asof": "2026-11-06T23:28:25Z",
  "recenter": {
   "week": 0.5
  },
@@ -560,7 +560,7 @@
    "price": 104.0,
    "p": 0.514,
    "ev": 0.049,
-   "units": 3.25,
+   "units": 3.5,
    "edge": 3.6,
    "x": 3.0,
    "pDU": 0.5125,
@@ -574,7 +574,7 @@
    "pass": true,
    "now": null,
    "unitsRaw": 3.75,
-   "unitsCap": 3.25
+   "unitsCap": 3.5
   },
   {
    "id": "401856852",
@@ -635,9 +635,9 @@
     "line": 54.5,
     "price": 104.0,
     "ev": 0.048,
-    "units": 3.25,
+    "units": 3.5,
     "unitsRaw": 3.75,
-    "unitsCap": 3.25
+    "unitsCap": 3.5
    },
    "unitsRaw": 3.5,
    "unitsCap": 3.25
@@ -1378,16 +1378,7 @@
    "flagged": "2026-11-01T17:18:42Z",
    "betTo": 52.0,
    "close": 48.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 48.5,
-    "price": -106.0,
-    "ev": 0.024,
-    "units": 0.5,
-    "unitsRaw": 0.75,
-    "unitsCap": 0.5
-   },
+   "now": null,
    "unitsRaw": 0.5,
    "unitsCap": 0.25
   },
@@ -1629,6 +1620,22 @@
    "why": "no edge at -111",
    "m": 6.1,
    "tm": 53.3
+  },
+  {
+   "id": "401856742",
+   "sport": "cfb",
+   "kick": "2026-11-07T21:15:00.000Z",
+   "home": "Mississippi State",
+   "away": "Vanderbilt",
+   "mk": "total",
+   "side": "over",
+   "line": 48.5,
+   "price": -108.0,
+   "edge": 6.6,
+   "x": 3.0,
+   "why": "no edge at -108",
+   "m": 4.2,
+   "tm": 55.1
   },
   {
    "id": "401856856",
@@ -1911,7 +1918,7 @@
    "mk": "spread",
    "side": "home",
    "line": 46.5,
-   "price": -108.0,
+   "price": -104.0,
    "edge": 2.3,
    "x": 4.5,
    "why": "edge under 4.5 (tier: mixed)",
@@ -1997,22 +2004,6 @@
    "why": "edge under 6 (season: late)",
    "m": -5,
    "tm": 48.4
-  },
-  {
-   "id": "401858510",
-   "sport": "cfb",
-   "kick": "2026-11-07T01:00:00.000Z",
-   "home": "Illinois",
-   "away": "Nebraska",
-   "mk": "total",
-   "side": "under",
-   "line": 51.5,
-   "price": 104.0,
-   "edge": 1.2,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -5,
-   "tm": 50.3
   }
  ],
  "games": {
@@ -2224,13 +2215,13 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -106.0,
-   "ev": 0.024,
+   "price": -108.0,
    "edge": 6.6,
-   "units": 0.75,
+   "ev": null,
+   "units": 0.0,
    "home": "Mississippi State",
    "away": "Vanderbilt",
-   "state": "pick"
+   "state": "under"
   },
   "401858512": {
    "mk": "total",
@@ -2440,7 +2431,7 @@
    "mk": "spread",
    "side": "home",
    "line": 46.5,
-   "price": -108.0,
+   "price": -104.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -2741,7 +2732,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 9874,
+  "snapshots": 9878,
   "buckets": [
    {
     "when": "24h+",
@@ -2754,12 +2745,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 223,
+    "clvN": 224,
     "clvRet": -0.0554,
-    "clvT": -11.77,
+    "clvT": -11.84,
     "clv": 0.12,
-    "beat": 0.229,
-    "still": 0.605
+    "beat": 0.228,
+    "still": 0.607
    },
    {
     "when": "1-6h",
@@ -3809,7 +3800,7 @@
    "price": 104.0,
    "p": 0.514,
    "ev": 0.049,
-   "units": 3.25,
+   "units": 3.5,
    "edge": 3.6,
    "x": 3.0,
    "pDU": 0.5125,
@@ -3822,7 +3813,7 @@
    "close": 53.5,
    "pass": true,
    "unitsRaw": 3.75,
-   "unitsCap": 3.25
+   "unitsCap": 3.5
   },
   {
    "id": "401869968",
@@ -4022,12 +4013,12 @@
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 43.0,
-    "scale": 0.9302
+    "raw": 42.75,
+    "scale": 0.9357
    },
    "2026-11-08": {
-    "raw": 52.25,
-    "scale": 0.7656
+    "raw": 50.75,
+    "scale": 0.7882
    },
    "2026-11-09": {
     "raw": 8.75,
