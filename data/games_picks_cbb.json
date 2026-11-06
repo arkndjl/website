@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-06T10:50:40Z",
+ "asof": "2026-11-06T10:57:00Z",
  "recenter": {
-  "2026-11-06": -11.23
+  "2026-11-06": -11.24
  },
  "monitor": {
   "clocks": {
@@ -144,9 +144,9 @@
    "away": "Northern Colorado",
    "mk": "total",
    "side": "over",
-   "line": 145.5,
-   "price": -111.0,
-   "edge": 13.0,
+   "line": 144.5,
+   "price": -122.0,
+   "edge": 14.0,
    "x": null,
    "why": "total market off",
    "m": 16.6,
@@ -201,22 +201,6 @@
    "tm": 167.0
   },
   {
-   "id": "401920685",
-   "sport": "cbb",
-   "kick": "2026-11-07T01:00:00Z",
-   "home": "Michigan",
-   "away": "UConn",
-   "mk": "total",
-   "side": "over",
-   "line": 144.5,
-   "price": -110.0,
-   "edge": 8.2,
-   "x": null,
-   "why": "total market off",
-   "m": -4.9,
-   "tm": 152.7
-  },
-  {
    "id": "401909552",
    "sport": "cbb",
    "kick": "2026-11-06T21:00:00Z",
@@ -265,6 +249,22 @@
    "tm": 164.1
   },
   {
+   "id": "401920685",
+   "sport": "cbb",
+   "kick": "2026-11-07T01:00:00Z",
+   "home": "Michigan",
+   "away": "UConn",
+   "mk": "total",
+   "side": "over",
+   "line": 145.5,
+   "price": -110,
+   "edge": 7.2,
+   "x": null,
+   "why": "total market off",
+   "m": -4.9,
+   "tm": 152.7
+  },
+  {
    "id": "401920726",
    "sport": "cbb",
    "kick": "2026-11-07T01:30:00Z",
@@ -273,7 +273,7 @@
    "mk": "spread",
    "side": "away",
    "line": 35.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 6.2,
    "x": null,
    "why": "spread market off",
@@ -311,22 +311,6 @@
    "why": "spread market off",
    "m": 30.7,
    "tm": 157.7
-  },
-  {
-   "id": "401921727",
-   "sport": "cbb",
-   "kick": "2026-11-07T03:00:00Z",
-   "home": "Stanford",
-   "away": "Oakland",
-   "mk": "total",
-   "side": "over",
-   "line": 150.5,
-   "price": -106.0,
-   "edge": 5.7,
-   "x": null,
-   "why": "total market off",
-   "m": 12.6,
-   "tm": 156.2
   },
   {
    "id": "401920952",
@@ -481,12 +465,28 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -102.0,
+   "price": -110,
    "edge": 4.7,
    "x": null,
    "why": "spread market off",
    "m": 7.2,
    "tm": 158.1
+  },
+  {
+   "id": "401921727",
+   "sport": "cbb",
+   "kick": "2026-11-07T03:00:00Z",
+   "home": "Stanford",
+   "away": "Oakland",
+   "mk": "total",
+   "side": "over",
+   "line": 151.5,
+   "price": -100.0,
+   "edge": 4.7,
+   "x": null,
+   "why": "total market off",
+   "m": 12.6,
+   "tm": 156.2
   },
   {
    "id": "401922021",
@@ -541,9 +541,9 @@
   "401920685": {
    "mk": "total",
    "side": "over",
-   "line": 144.5,
-   "price": -110.0,
-   "edge": 8.2,
+   "line": 145.5,
+   "price": -110,
+   "edge": 7.2,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
@@ -554,7 +554,7 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -102.0,
+   "price": -110,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -733,9 +733,9 @@
   "401921732": {
    "mk": "total",
    "side": "over",
-   "line": 145.5,
-   "price": -111.0,
-   "edge": 13.0,
+   "line": 144.5,
+   "price": -122.0,
+   "edge": 14.0,
    "ev": null,
    "units": 0.0,
    "home": "Arizona State",
@@ -769,9 +769,9 @@
   "401921727": {
    "mk": "total",
    "side": "over",
-   "line": 150.5,
-   "price": -106.0,
-   "edge": 5.7,
+   "line": 151.5,
+   "price": -100.0,
+   "edge": 4.7,
    "ev": null,
    "units": 0.0,
    "home": "Stanford",
@@ -914,7 +914,7 @@
    "mk": "spread",
    "side": "away",
    "line": 35.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 6.2,
    "ev": null,
    "units": 0.0,
@@ -1083,7 +1083,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 6031,
+  "snapshots": 6045,
   "buckets": [
    {
     "when": "24h+",
@@ -1096,12 +1096,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 914,
-    "clvRet": -0.0412,
-    "clvT": -12.59,
+    "clvN": 923,
+    "clvRet": -0.041,
+    "clvT": -12.67,
     "clv": 0.09,
     "beat": 0.241,
-    "still": 0.478
+    "still": 0.481
    },
    {
     "when": "1-6h",
@@ -8440,16 +8440,16 @@
   "cap": 40.0,
   "nights": {
    "2026-11-06": {
-    "raw": 14.75,
+    "raw": 15.75,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 53.0,
-    "scale": 0.7547
+    "raw": 53.75,
+    "scale": 0.7442
    },
    "2026-11-08": {
-    "raw": 44.75,
-    "scale": 0.8939
+    "raw": 45.0,
+    "scale": 0.8889
    },
    "2026-11-09": {
     "raw": 8.5,
