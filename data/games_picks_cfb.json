@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-06T03:00:17Z",
+ "asof": "2026-11-06T03:02:54Z",
  "recenter": {
-  "week": 0.43
+  "week": 0.42
  },
  "monitor": {
   "clocks": {
@@ -1688,22 +1688,6 @@
    "tm": 47.3
   },
   {
-   "id": "401856850",
-   "sport": "cfb",
-   "kick": "2026-11-07T20:45:00.000Z",
-   "home": "Kansas",
-   "away": "UCF",
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -106.0,
-   "edge": 3.8,
-   "x": 3.0,
-   "why": "no edge at -106",
-   "m": 4.2,
-   "tm": 51.3
-  },
-  {
    "id": "401858291",
    "sport": "cfb",
    "kick": "2026-11-08T00:30:00.000Z",
@@ -1824,7 +1808,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": 111.0,
+   "price": 113.0,
    "edge": 4.6,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1984,7 +1968,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.6,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -2038,6 +2022,22 @@
    "why": "edge under 3",
    "m": 52.7,
    "tm": 57.3
+  },
+  {
+   "id": "401856741",
+   "sport": "cfb",
+   "kick": "2026-11-08T00:30:00.000Z",
+   "home": "Ole Miss",
+   "away": "Georgia",
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": -104.0,
+   "edge": 2.3,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -1.2,
+   "tm": 56.9
   }
  ],
  "games": {
@@ -2153,7 +2153,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": 111.0,
+   "price": 113.0,
    "edge": 4.6,
    "ev": null,
    "units": 0.0,
@@ -2402,11 +2402,11 @@
    "state": "pick"
   },
   "401856850": {
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -106.0,
-   "edge": 3.8,
+   "mk": "spread",
+   "side": "home",
+   "line": 3.5,
+   "price": 113.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Kansas",
@@ -2645,7 +2645,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -2766,13 +2766,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 9161,
+  "snapshots": 9165,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2147,
+    "clvN": 2149,
     "clvRet": -0.0485,
-    "clvT": -29.62,
+    "clvT": -29.65,
     "clv": 0.14,
     "beat": 0.294,
     "still": 0.461
