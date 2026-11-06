@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-06T06:54:13Z",
+ "asof": "2026-11-06T07:05:51Z",
  "recenter": {
-  "2026-11-06": -11.2
+  "2026-11-06": -11.22
  },
  "monitor": {
   "clocks": {
@@ -185,6 +185,22 @@
    "tm": 145.5
   },
   {
+   "id": "401920423",
+   "sport": "cbb",
+   "kick": "2026-11-06T22:00:00Z",
+   "home": "Virginia",
+   "away": "Northeastern",
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -104.0,
+   "edge": 9.6,
+   "x": null,
+   "why": "total market off",
+   "m": 27.0,
+   "tm": 151.9
+  },
+  {
    "id": "401920305",
    "sport": "cbb",
    "kick": "2026-11-07T00:00:00Z",
@@ -217,22 +233,6 @@
    "tm": 152.7
   },
   {
-   "id": "401909552",
-   "sport": "cbb",
-   "kick": "2026-11-06T21:00:00Z",
-   "home": "Boston College",
-   "away": "Massachusetts",
-   "mk": "total",
-   "side": "over",
-   "line": 145.5,
-   "price": -117.0,
-   "edge": 8.2,
-   "x": null,
-   "why": "total market off",
-   "m": 2.4,
-   "tm": 153.7
-  },
-  {
    "id": "401909797",
    "sport": "cbb",
    "kick": "2026-11-07T02:00:00Z",
@@ -249,22 +249,6 @@
    "tm": 171.3
   },
   {
-   "id": "401920423",
-   "sport": "cbb",
-   "kick": "2026-11-06T22:00:00Z",
-   "home": "Virginia",
-   "away": "Northeastern",
-   "mk": "total",
-   "side": "under",
-   "line": 159.5,
-   "price": -108.0,
-   "edge": 7.6,
-   "x": null,
-   "why": "total market off",
-   "m": 27.0,
-   "tm": 151.9
-  },
-  {
    "id": "401920807",
    "sport": "cbb",
    "kick": "2026-11-07T01:00:00Z",
@@ -279,6 +263,22 @@
    "why": "total market off",
    "m": 20.2,
    "tm": 164.1
+  },
+  {
+   "id": "401909552",
+   "sport": "cbb",
+   "kick": "2026-11-06T21:00:00Z",
+   "home": "Boston College",
+   "away": "Massachusetts",
+   "mk": "total",
+   "side": "over",
+   "line": 146.5,
+   "price": -104.0,
+   "edge": 7.2,
+   "x": null,
+   "why": "total market off",
+   "m": 2.4,
+   "tm": 153.7
   },
   {
    "id": "401920726",
@@ -417,7 +417,7 @@
    "mk": "total",
    "side": "under",
    "line": 154.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 5.4,
    "x": null,
    "why": "total market off",
@@ -497,7 +497,7 @@
    "mk": "total",
    "side": "under",
    "line": 157.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 4.7,
    "x": null,
    "why": "total market off",
@@ -630,7 +630,7 @@
    "mk": "total",
    "side": "under",
    "line": 157.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -641,9 +641,9 @@
   "401909552": {
    "mk": "total",
    "side": "over",
-   "line": 145.5,
-   "price": -117.0,
-   "edge": 8.2,
+   "line": 146.5,
+   "price": -104.0,
+   "edge": 7.2,
    "ev": null,
    "units": 0.0,
    "home": "Boston College",
@@ -714,7 +714,7 @@
    "mk": "total",
    "side": "under",
    "line": 154.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 5.4,
    "ev": null,
    "units": 0.0,
@@ -809,9 +809,9 @@
   "401920423": {
    "mk": "total",
    "side": "under",
-   "line": 159.5,
-   "price": -108.0,
-   "edge": 7.6,
+   "line": 161.5,
+   "price": -104.0,
+   "edge": 9.6,
    "ev": null,
    "units": 0.0,
    "home": "Virginia",
@@ -831,11 +831,11 @@
    "state": "off"
   },
   "401912208": {
-   "mk": "spread",
-   "side": "away",
-   "line": 18.5,
-   "price": -106.0,
-   "edge": 1.4,
+   "mk": "total",
+   "side": "under",
+   "line": 143.5,
+   "price": 108.0,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "Clemson",
@@ -918,7 +918,7 @@
    "mk": "spread",
    "side": "away",
    "line": 8.5,
-   "price": 108.0,
+   "price": 104.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -1099,7 +1099,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 5975,
+  "snapshots": 5993,
   "buckets": [
    {
     "when": "24h+",
@@ -1112,12 +1112,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 887,
-    "clvRet": -0.0413,
-    "clvT": -12.26,
-    "clv": 0.09,
-    "beat": 0.245,
-    "still": 0.466
+    "clvN": 897,
+    "clvRet": -0.0422,
+    "clvT": -12.64,
+    "clv": 0.08,
+    "beat": 0.241,
+    "still": 0.462
    },
    {
     "when": "1-6h",
@@ -8464,8 +8464,8 @@
     "scale": 0.7547
    },
    "2026-11-08": {
-    "raw": 44.25,
-    "scale": 0.904
+    "raw": 43.75,
+    "scale": 0.9143
    },
    "2026-11-09": {
     "raw": 8.5,
