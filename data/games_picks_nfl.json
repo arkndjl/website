@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-05T23:40:34Z",
+ "asof": "2026-11-06T01:31:06Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -130,14 +130,7 @@
    "flagged": "2026-11-03T10:48:02Z",
    "betTo": 44.5,
    "close": 39.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 39.5,
-    "price": -108.0,
-    "ev": 0.154,
-    "units": 2.75
-   }
+   "now": null
   },
   {
    "id": "2026_09_CIN_ATL",
@@ -268,11 +261,11 @@
     "mk": "total",
     "side": "under",
     "line": 47.5,
-    "price": 102.0,
-    "ev": 0.094,
-    "units": 2.5,
-    "unitsRaw": 3.0,
-    "unitsCap": 2.5
+    "price": -100.0,
+    "ev": 0.084,
+    "units": 1.75,
+    "unitsRaw": 2.25,
+    "unitsCap": 1.75
    }
   },
   {
@@ -596,7 +589,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -113.0,
+   "price": -111.0,
    "edge": 1.0,
    "x": 4.0,
    "why": "edge under 4",
@@ -605,18 +598,6 @@
   }
  ],
  "games": {
-  "2026_09_JAX_BAL": {
-   "mk": "total",
-   "side": "over",
-   "line": 39.5,
-   "price": -108.0,
-   "ev": 0.154,
-   "edge": 6.9,
-   "units": 2.75,
-   "home": "BAL",
-   "away": "JAX",
-   "state": "pick"
-  },
   "2026_09_CIN_ATL": {
    "mk": "total",
    "side": "under",
@@ -669,7 +650,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -113.0,
+   "price": -111.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -705,10 +686,10 @@
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": 102.0,
-   "ev": 0.094,
+   "price": -100.0,
+   "ev": 0.084,
    "edge": 2.9,
-   "units": 3.0,
+   "units": 2.25,
    "home": "KC",
    "away": "NYJ",
    "state": "pick"
@@ -838,16 +819,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 1921,
+  "snapshots": 1928,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 831,
-    "clvRet": -0.0326,
-    "clvT": -13.61,
+    "clvN": 833,
+    "clvRet": -0.0327,
+    "clvT": -13.65,
     "clv": 0.25,
-    "beat": 0.177,
-    "still": 0.763
+    "beat": 0.176,
+    "still": 0.764
    },
    {
     "when": "6-24h",
@@ -2011,24 +1992,24 @@
   "cap": 40.0,
   "nights": {
    "2026-11-05": {
-    "raw": 17.75,
+    "raw": 7.5,
     "scale": 1.0,
-    "down": 1.0
+    "down": 17.0
    },
    "2026-11-06": {
     "raw": 13.5,
     "scale": 1.0
    },
    "2026-11-07": {
-    "raw": 59.25,
-    "scale": 0.6751
+    "raw": 54.5,
+    "scale": 0.7339
    },
    "2026-11-08": {
-    "raw": 46.75,
-    "scale": 0.8556
+    "raw": 47.5,
+    "scale": 0.8421
    },
    "2026-11-09": {
-    "raw": 9.75,
+    "raw": 8.5,
     "scale": 1.0
    }
   }

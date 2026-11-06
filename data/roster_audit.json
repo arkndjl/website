@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-05T23:00Z",
+ "asof": "2026-11-06T01:30Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,14 +10,14 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 628,
+   "players": 631,
    "rows": 5261
   },
   "cfb": {
    "by_file": {
     "static/data/depth/cfb.json": {
      "flags": 3,
-     "rows": 16719
+     "rows": 16720
     }
    },
    "flags": [
@@ -78,7 +78,7 @@
    ],
    "joined": 0,
    "players": 2533,
-   "rows": 16719
+   "rows": 16720
   },
   "nba": {
    "by_file": {
@@ -238,19 +238,19 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 4,
-     "rows": 2132
+     "flags": 5,
+     "rows": 2074
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 9,
+     "flags": 11,
      "rows": 627
     },
     "static/data/nfl-war.json": {
-     "flags": 58,
+     "flags": 57,
      "rows": 1749
     },
     "static/data/pctl-nfl.json": {
-     "flags": 57,
+     "flags": 56,
      "rows": 1680
     },
     "static/data/personnel/nfl.json": {
@@ -258,7 +258,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 53,
+     "flags": 54,
      "rows": 1650
     }
    },
@@ -336,22 +336,22 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-04",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
+     "d": "2026-11-05",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
      "flag": "released",
-     "head": "Cut by Las Vegas",
-     "kind": "waived",
+     "head": "Let go by New York",
+     "kind": null,
      "move": {
-      "d": "2026-11-04",
-      "head": "Cut by Las Vegas",
-      "kind": "waived"
+      "d": "2026-10-07",
+      "head": "Signed to Giants' active roster",
+      "kind": "sign"
      },
-     "pid": "14495",
-     "player": "Cody White",
-     "pos": "WR",
+     "pid": "16912",
+     "player": "Jake Haener",
+     "pos": "QB",
      "rotowire": "FA",
-     "site": "LV"
+     "site": "NYG"
     },
     {
      "d": "2026-11-03",
@@ -1786,6 +1786,24 @@
      "site": "ATL"
     },
     {
+     "d": "2026-11-05",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Back with Las Vegas",
+     "kind": null,
+     "move": {
+      "d": "2026-11-04",
+      "head": "Cut by Las Vegas",
+      "kind": "waived"
+     },
+     "pid": "14495",
+     "player": "Cody White",
+     "pos": "WR",
+     "rotowire": "LV",
+     "site": "FA"
+    },
+    {
      "d": "2026-10-22",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2324,24 +2342,6 @@
      "pos": "EDGE",
      "rotowire": "CAR",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-04",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Cut by Las Vegas",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-04",
-      "head": "Cut by Las Vegas",
-      "kind": "waived"
-     },
-     "pid": "14495",
-     "player": "Cody White",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "LV"
     },
     {
      "d": "2026-11-03",
@@ -3348,6 +3348,24 @@
      "site": "BUF"
     },
     {
+     "d": "2026-11-05",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Let go by New York",
+     "kind": null,
+     "move": {
+      "d": "2026-10-07",
+      "head": "Signed to Giants' active roster",
+      "kind": "sign"
+     },
+     "pid": "16912",
+     "player": "Jake Haener",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "NYG"
+    },
+    {
      "d": "2026-10-26",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3364,6 +3382,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "NYG"
+    },
+    {
+     "d": "2026-11-05",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "moved",
+     "head": "Back with Las Vegas",
+     "kind": null,
+     "move": {
+      "d": "2026-11-04",
+      "head": "Cut by Las Vegas",
+      "kind": "waived"
+     },
+     "pid": "14495",
+     "player": "Cody White",
+     "pos": "WR",
+     "rotowire": "LV",
+     "site": "FA"
     },
     {
      "d": "2026-11-02",
@@ -3512,7 +3548,7 @@
    ],
    "joined": 0,
    "players": 2227,
-   "rows": 7902
+   "rows": 7844
   },
   "nhl": {
    "by_file": {
