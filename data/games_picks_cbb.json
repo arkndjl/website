@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-07T18:55:00Z",
+ "asof": "2026-11-07T18:57:21Z",
  "recenter": {
-  "2026-11-07": -10.63,
+  "2026-11-07": -10.64,
   "2026-11-08": -10.15
  },
  "monitor": {
@@ -146,7 +146,7 @@
    "mk": "total",
    "side": "under",
    "line": 167.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 23.0,
    "x": null,
    "why": "total market off",
@@ -162,7 +162,7 @@
    "mk": "total",
    "side": "under",
    "line": 168.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 16.3,
    "x": null,
    "why": "total market off",
@@ -186,6 +186,22 @@
    "tm": 137.4
   },
   {
+   "id": "401920156",
+   "sport": "cbb",
+   "kick": "2026-11-07T19:00:00Z",
+   "home": "South Dakota",
+   "away": "Cal State Fullerton",
+   "mk": "total",
+   "side": "under",
+   "line": 176.5,
+   "price": -113.0,
+   "edge": 11.2,
+   "x": null,
+   "why": "total market off",
+   "m": 4.5,
+   "tm": 165.3
+  },
+  {
    "id": "401926201",
    "sport": "cbb",
    "kick": "2026-11-07T22:00:00Z",
@@ -200,22 +216,6 @@
    "why": "total market off",
    "m": 9.5,
    "tm": 152.9
-  },
-  {
-   "id": "401920156",
-   "sport": "cbb",
-   "kick": "2026-11-07T19:00:00Z",
-   "home": "South Dakota",
-   "away": "Cal State Fullerton",
-   "mk": "total",
-   "side": "under",
-   "line": 175.5,
-   "price": 106.0,
-   "edge": 10.2,
-   "x": null,
-   "why": "total market off",
-   "m": 4.5,
-   "tm": 165.3
   },
   {
    "id": "401924940",
@@ -274,7 +274,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -110,
+   "price": -105.0,
    "edge": 7.4,
    "x": null,
    "why": "spread market off",
@@ -354,7 +354,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 6.3,
    "x": null,
    "why": "spread market off",
@@ -579,7 +579,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 6.3,
    "ev": null,
    "units": 0.0,
@@ -831,7 +831,7 @@
    "mk": "spread",
    "side": "away",
    "line": 10.5,
-   "price": -110,
+   "price": -118.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -915,7 +915,7 @@
    "mk": "total",
    "side": "under",
    "line": 167.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 23.0,
    "ev": null,
    "units": 0.0,
@@ -1010,9 +1010,9 @@
   "401920156": {
    "mk": "total",
    "side": "under",
-   "line": 175.5,
-   "price": 106.0,
-   "edge": 10.2,
+   "line": 176.5,
+   "price": -113.0,
+   "edge": 11.2,
    "ev": null,
    "units": 0.0,
    "home": "South Dakota",
@@ -1035,7 +1035,7 @@
    "mk": "total",
    "side": "under",
    "line": 168.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 16.3,
    "ev": null,
    "units": 0.0,
@@ -1047,7 +1047,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -110,
+   "price": -105.0,
    "edge": 7.4,
    "ev": null,
    "units": 0.0,
@@ -1144,7 +1144,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7937,
+  "snapshots": 7953,
   "buckets": [
    {
     "when": "24h+",
@@ -1157,30 +1157,30 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1471,
-    "clvRet": -0.0399,
-    "clvT": -16.94,
+    "clvN": 1473,
+    "clvRet": -0.04,
+    "clvT": -16.97,
     "clv": 0.1,
-    "beat": 0.262,
-    "still": 0.491
+    "beat": 0.261,
+    "still": 0.492
    },
    {
     "when": "1-6h",
-    "clvN": 933,
+    "clvN": 937,
     "clvRet": -0.0432,
-    "clvT": -27.88,
+    "clvT": -28.03,
     "clv": 0.03,
-    "beat": 0.163,
-    "still": 0.705
+    "beat": 0.162,
+    "still": 0.707
    },
    {
     "when": "<1h",
-    "clvN": 187,
-    "clvRet": -0.0457,
-    "clvT": -17.63,
+    "clvN": 191,
+    "clvRet": -0.0459,
+    "clvT": -18.02,
     "clv": -0.01,
-    "beat": 0.091,
-    "still": 0.802
+    "beat": 0.089,
+    "still": 0.806
    }
   ]
  },
@@ -8501,13 +8501,13 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 51.5,
-    "scale": 0.6553,
+    "raw": 47.75,
+    "scale": 0.7068,
     "down": 6.25
    },
    "2026-11-08": {
-    "raw": 55.75,
-    "scale": 0.7175
+    "raw": 55.25,
+    "scale": 0.724
    },
    "2026-11-09": {
     "raw": 7.75,
