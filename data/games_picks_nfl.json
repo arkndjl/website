@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-06T23:31:11Z",
+ "asof": "2026-11-07T00:05:28Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -423,9 +423,11 @@
     "mk": "total",
     "side": "under",
     "line": 51.5,
-    "price": -104.0,
-    "ev": 0.043,
-    "units": 0.25
+    "price": -102.0,
+    "ev": 0.053,
+    "units": 0.25,
+    "unitsRaw": 0.5,
+    "unitsCap": 0.25
    }
   }
  ],
@@ -657,10 +659,10 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -104.0,
-   "ev": 0.043,
+   "price": -102.0,
+   "ev": 0.053,
    "edge": 2.2,
-   "units": 0.25,
+   "units": 0.5,
    "home": "SF",
    "away": "LV",
    "state": "pick"
@@ -766,13 +768,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2133,
+  "snapshots": 2136,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 949,
-    "clvRet": -0.0346,
-    "clvT": -15.42,
+    "clvN": 952,
+    "clvRet": -0.0345,
+    "clvT": -15.4,
     "clv": 0.21,
     "beat": 0.158,
     "still": 0.778
@@ -1990,16 +1992,17 @@
   "cap": 40.0,
   "nights": {
    "2026-11-06": {
-    "raw": 17.75,
-    "scale": 1.0
+    "raw": 14.0,
+    "scale": 1.0,
+    "down": 3.25
    },
    "2026-11-07": {
-    "raw": 43.0,
-    "scale": 0.9302
+    "raw": 46.25,
+    "scale": 0.8649
    },
    "2026-11-08": {
-    "raw": 50.75,
-    "scale": 0.7882
+    "raw": 50.5,
+    "scale": 0.7921
    },
    "2026-11-09": {
     "raw": 8.75,
