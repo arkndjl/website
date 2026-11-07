@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-07T16:26:41Z",
+ "asof": "2026-11-07T16:29:07Z",
  "recenter": {
-  "2026-11-07": -10.64
+  "2026-11-07": -10.63
  },
  "monitor": {
   "clocks": {
@@ -153,22 +153,6 @@
    "tm": 144.5
   },
   {
-   "id": "401921174",
-   "sport": "cbb",
-   "kick": "2026-11-07T22:00:00Z",
-   "home": "IU Indianapolis",
-   "away": "UT Martin",
-   "mk": "total",
-   "side": "under",
-   "line": 168.5,
-   "price": -110.0,
-   "edge": 16.3,
-   "x": null,
-   "why": "total market off",
-   "m": 0.2,
-   "tm": 152.2
-  },
-  {
    "id": "401926112",
    "sport": "cbb",
    "kick": "2026-11-07T22:00:00Z",
@@ -183,6 +167,22 @@
    "why": "total market off",
    "m": 8.9,
    "tm": 137.4
+  },
+  {
+   "id": "401921174",
+   "sport": "cbb",
+   "kick": "2026-11-07T22:00:00Z",
+   "home": "IU Indianapolis",
+   "away": "UT Martin",
+   "mk": "total",
+   "side": "under",
+   "line": 163.5,
+   "price": -110,
+   "edge": 11.3,
+   "x": null,
+   "why": "total market off",
+   "m": 0.2,
+   "tm": 152.2
   },
   {
    "id": "401920156",
@@ -225,7 +225,7 @@
    "mk": "total",
    "side": "over",
    "line": 140.5,
-   "price": 102.0,
+   "price": -106.0,
    "edge": 9.9,
    "x": null,
    "why": "total market off",
@@ -249,6 +249,22 @@
    "tm": 159.7
   },
   {
+   "id": "401923392",
+   "sport": "cbb",
+   "kick": "2026-11-08T01:00:00Z",
+   "home": "Evansville",
+   "away": "Southern Indiana",
+   "mk": "spread",
+   "side": "away",
+   "line": 9.5,
+   "price": -110,
+   "edge": 9.4,
+   "x": null,
+   "why": "spread market off",
+   "m": 0.1,
+   "tm": 146.0
+  },
+  {
    "id": "401924895",
    "sport": "cbb",
    "kick": "2026-11-07T23:00:00Z",
@@ -263,22 +279,6 @@
    "why": "total market off",
    "m": 22.4,
    "tm": 150.0
-  },
-  {
-   "id": "401923392",
-   "sport": "cbb",
-   "kick": "2026-11-08T01:00:00Z",
-   "home": "Evansville",
-   "away": "Southern Indiana",
-   "mk": "spread",
-   "side": "away",
-   "line": 8.5,
-   "price": -108.0,
-   "edge": 8.4,
-   "x": null,
-   "why": "spread market off",
-   "m": 0.1,
-   "tm": 146.0
   },
   {
    "id": "401918977",
@@ -353,12 +353,28 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 6.3,
    "x": null,
    "why": "spread market off",
    "m": 2.8,
    "tm": 156.3
+  },
+  {
+   "id": "401918948",
+   "sport": "cbb",
+   "kick": "2026-11-07T17:00:00Z",
+   "home": "Louisville",
+   "away": "Morehead State",
+   "mk": "spread",
+   "side": "away",
+   "line": 37.5,
+   "price": -108.0,
+   "edge": 6.2,
+   "x": null,
+   "why": "spread market off",
+   "m": 31.3,
+   "tm": 151.7
   },
   {
    "id": "401926825",
@@ -385,7 +401,7 @@
    "mk": "spread",
    "side": "home",
    "line": 8.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 5.8,
    "x": null,
    "why": "spread market off",
@@ -401,28 +417,12 @@
    "mk": "total",
    "side": "over",
    "line": 136.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 5.6,
    "x": null,
    "why": "total market off",
    "m": -7.3,
    "tm": 142.1
-  },
-  {
-   "id": "401918948",
-   "sport": "cbb",
-   "kick": "2026-11-07T17:00:00Z",
-   "home": "Louisville",
-   "away": "Morehead State",
-   "mk": "spread",
-   "side": "away",
-   "line": 36.5,
-   "price": 104.0,
-   "edge": 5.2,
-   "x": null,
-   "why": "spread market off",
-   "m": 31.3,
-   "tm": 151.7
   },
   {
    "id": "401911470",
@@ -465,7 +465,7 @@
    "mk": "total",
    "side": "under",
    "line": 160.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 4.2,
    "x": null,
    "why": "total market off",
@@ -578,7 +578,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 6.3,
    "ev": null,
    "units": 0.0,
@@ -661,9 +661,9 @@
   "401918948": {
    "mk": "spread",
    "side": "away",
-   "line": 36.5,
-   "price": 104.0,
-   "edge": 5.2,
+   "line": 37.5,
+   "price": -108.0,
+   "edge": 6.2,
    "ev": null,
    "units": 0.0,
    "home": "Louisville",
@@ -719,11 +719,11 @@
    "state": "off"
   },
   "401924912": {
-   "mk": "total",
-   "side": "under",
-   "line": 159.5,
-   "price": -108.0,
-   "edge": 2.4,
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": -115.0,
+   "edge": 3.1,
    "ev": null,
    "units": 0.0,
    "home": "UNLV",
@@ -839,11 +839,11 @@
    "state": "off"
   },
   "401920816": {
-   "mk": "spread",
-   "side": "away",
-   "line": 10.5,
-   "price": -118.0,
-   "edge": 3.0,
+   "mk": "total",
+   "side": "under",
+   "line": 146.5,
+   "price": -110,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "Little Rock",
@@ -854,7 +854,7 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -914,7 +914,7 @@
    "mk": "total",
    "side": "under",
    "line": 160.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -950,7 +950,7 @@
    "mk": "total",
    "side": "over",
    "line": 140.5,
-   "price": 102.0,
+   "price": -106.0,
    "edge": 9.9,
    "ev": null,
    "units": 0.0,
@@ -961,9 +961,9 @@
   "401920192": {
    "mk": "total",
    "side": "over",
-   "line": 147.5,
-   "price": -106.0,
-   "edge": 2.1,
+   "line": 148.5,
+   "price": 102.0,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "Saint Joseph's",
@@ -974,7 +974,7 @@
    "mk": "total",
    "side": "over",
    "line": 136.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 5.6,
    "ev": null,
    "units": 0.0,
@@ -1069,9 +1069,9 @@
   "401921174": {
    "mk": "total",
    "side": "under",
-   "line": 168.5,
-   "price": -110.0,
-   "edge": 16.3,
+   "line": 163.5,
+   "price": -110,
+   "edge": 11.3,
    "ev": null,
    "units": 0.0,
    "home": "IU Indianapolis",
@@ -1081,9 +1081,9 @@
   "401923392": {
    "mk": "spread",
    "side": "away",
-   "line": 8.5,
-   "price": -108.0,
-   "edge": 8.4,
+   "line": 9.5,
+   "price": -110,
+   "edge": 9.4,
    "ev": null,
    "units": 0.0,
    "home": "Evansville",
@@ -1094,7 +1094,7 @@
    "mk": "spread",
    "side": "home",
    "line": 8.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 5.8,
    "ev": null,
    "units": 0.0,
@@ -1167,7 +1167,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7627,
+  "snapshots": 7644,
   "buckets": [
    {
     "when": "24h+",
@@ -1180,30 +1180,30 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1414,
-    "clvRet": -0.0421,
-    "clvT": -17.33,
-    "clv": 0.07,
-    "beat": 0.244,
+    "clvN": 1419,
+    "clvRet": -0.0426,
+    "clvT": -17.58,
+    "clv": 0.06,
+    "beat": 0.242,
     "still": 0.497
    },
    {
     "when": "1-6h",
-    "clvN": 842,
-    "clvRet": -0.0437,
-    "clvT": -26.24,
-    "clv": 0.02,
-    "beat": 0.159,
-    "still": 0.7
+    "clvN": 845,
+    "clvRet": -0.0445,
+    "clvT": -27.04,
+    "clv": 0.01,
+    "beat": 0.149,
+    "still": 0.709
    },
    {
     "when": "<1h",
-    "clvN": 175,
-    "clvRet": -0.046,
-    "clvT": -16.94,
-    "clv": -0.02,
+    "clvN": 176,
+    "clvRet": -0.0472,
+    "clvT": -16.98,
+    "clv": -0.03,
     "beat": 0.091,
-    "still": 0.794
+    "still": 0.778
    }
   ]
  },
@@ -8524,8 +8524,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 67.75,
-    "scale": 0.5904
+    "raw": 68.75,
+    "scale": 0.5818
    },
    "2026-11-08": {
     "raw": 51.25,
