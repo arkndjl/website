@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-07T19:04Z",
+ "asof": "2026-11-07T20:23Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2540,
+   "players": 2543,
    "rows": 16720
   },
   "nba": {
@@ -3687,19 +3687,37 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 826
     },
     "static/data/pctl-nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 826
     },
     "static/data/xaav-nhl.json": {
-     "flags": 8,
+     "flags": 9,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-07",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "released",
+     "head": "On unconditional waivers",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-07",
+      "head": "On unconditional waivers",
+      "kind": "waived"
+     },
+     "pid": "3356",
+     "player": "James Reimer",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "NYR"
+    },
     {
      "d": "2026-09-11",
      "field": "tm",
@@ -3735,6 +3753,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-07",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "released",
+     "head": "On unconditional waivers",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-07",
+      "head": "On unconditional waivers",
+      "kind": "waived"
+     },
+     "pid": "3356",
+     "player": "James Reimer",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "NYR"
     },
     {
      "d": "2026-08-14",
@@ -3843,10 +3879,28 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-07",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "On unconditional waivers",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-07",
+      "head": "On unconditional waivers",
+      "kind": "waived"
+     },
+     "pid": "3356",
+     "player": "James Reimer",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "NYR"
     }
    ],
    "joined": 0,
-   "players": 1373,
+   "players": 1375,
    "rows": 3174
   }
  }
