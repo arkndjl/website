@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-07T02:27:54Z",
+ "asof": "2026-11-07T09:57:36Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1220,19 +1220,19 @@
    "status": "on",
    "stopped": null,
    "n": 6,
-   "clvN": 1,
-   "clvRet": 0.0888,
-   "clvT": null,
-   "days": 1,
-   "beat": 1.0,
-   "settled": 1,
-   "w": 0,
-   "l": 1,
-   "roi": -1.0,
+   "clvN": 5,
+   "clvRet": 0.0316,
+   "clvT": 1.38,
+   "days": 2,
+   "beat": 0.6,
+   "settled": 5,
+   "w": 2,
+   "l": 3,
+   "roi": -0.2036,
    "week": {
-    "n": 1,
-    "clvRet": 0.0888,
-    "clvT": null
+    "n": 5,
+    "clvRet": 0.0316,
+    "clvT": 1.38
    },
    "exp": {
     "clvRet": 0.1183,
@@ -1241,16 +1241,16 @@
     "n": 741
    },
    "vsExp": {
-    "gap": -0.0295,
-    "z": -0.21,
-    "read": "in line"
+    "gap": -0.0867,
+    "z": -3.79,
+    "read": "below the backtest"
    },
    "check": {
-    "n": 1,
-    "window": 1,
-    "mean": 0.0888,
-    "t": null,
-    "days": 1,
+    "n": 5,
+    "window": 5,
+    "mean": 0.0316,
+    "t": 1.38,
+    "days": 2,
     "sd": 0.1438,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1259,39 +1259,44 @@
     "why": "",
     "drift": {
      "mu1": 0.0187,
-     "n": 1,
+     "n": 5,
      "sd": 0.1438,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.057,
-     "info": 0.02,
-     "real": 3.909,
-     "realSe": 7.711,
+     "llr": 0.05,
+     "info": 0.08,
+     "real": 1.095,
+     "realSe": 3.448,
      "need": 350
     }
    },
    "drift": {
     "mu1": 0.0187,
-    "n": 1,
+    "n": 5,
     "sd": 0.1438,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.057,
-    "info": 0.02,
-    "real": 3.909,
-    "realSe": 7.711,
+    "llr": 0.05,
+    "info": 0.08,
+    "real": 1.095,
+    "realSe": 3.448,
     "need": 350,
     "path": [
      [
       "2026-11-05",
       1,
       0.057
+     ],
+     [
+      "2026-11-06",
+      5,
+      0.05
      ]
     ]
    }
@@ -1538,18 +1543,18 @@
    "status": "on",
    "stopped": null,
    "n": 2,
-   "clvN": 0,
-   "clvRet": null,
+   "clvN": 1,
+   "clvRet": 0.0517,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
+   "days": 1,
+   "beat": 1.0,
+   "settled": 1,
+   "w": 1,
    "l": 0,
-   "roi": null,
+   "roi": 0.439,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 1,
+    "clvRet": 0.0517,
     "clvT": null
    },
    "exp": {
@@ -1558,12 +1563,17 @@
     "roi": 0.1923,
     "n": 224
    },
+   "vsExp": {
+    "gap": -0.0536,
+    "z": -0.44,
+    "read": "in line"
+   },
    "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": 0.0517,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1228,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1844,13 +1854,13 @@
    "sport": "cfb",
    "mk": "total",
    "label": "CFB total",
-   "n": 1,
-   "du": 4.0,
-   "clvRet": 0.0496,
-   "clvT": null,
-   "flat": 0.0496,
-   "adds": 0.0,
-   "expEdge": 0.0245,
+   "n": 4,
+   "du": 9.0,
+   "clvRet": -0.0031,
+   "clvT": -0.07,
+   "flat": 0.0017,
+   "adds": -0.0048,
+   "expEdge": 0.025,
    "basis": "backtest"
   },
   {
@@ -1909,26 +1919,26 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 34,
-   "du": 79.75,
-   "clvRet": 0.0242,
-   "clvT": 1.44,
-   "flat": 0.035,
-   "adds": -0.0108,
-   "expEdge": 0.0194,
+   "n": 35,
+   "du": 83.0,
+   "clvRet": 0.0253,
+   "clvT": 1.56,
+   "flat": 0.0355,
+   "adds": -0.0102,
+   "expEdge": 0.0187,
    "basis": "backtest + live picks"
   },
   {
    "sport": "nba",
    "mk": "total",
    "label": "NBA total",
-   "n": 33,
-   "du": 66.75,
-   "clvRet": 0.0058,
-   "clvT": 0.3,
-   "flat": 0.0005,
-   "adds": 0.0053,
-   "expEdge": 0.027,
+   "n": 37,
+   "du": 76.75,
+   "clvRet": 0.0059,
+   "clvT": 0.35,
+   "flat": 0.0023,
+   "adds": 0.0036,
+   "expEdge": 0.0254,
    "basis": "backtest + live picks"
   }
  ],
@@ -1938,7 +1948,8 @@
  ],
  "flags": [
   "pick:cbb:spread",
-  "pick:cbb:total"
+  "pick:cbb:total",
+  "pick:nba:total"
  ],
  "drift": {
   "watching": [
