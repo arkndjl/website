@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-07T23:48:46Z",
+ "asof": "2026-11-07T23:50:17Z",
  "recenter": {
   "2026-11-07": 1.52,
   "2026-11-08": 1.4
@@ -350,6 +350,8 @@
    "lineL": 4.5,
    "flagged": "2026-11-07T23:48:46Z",
    "close": 4.5,
+   "unitsRaw": 3.75,
+   "unitsCap": 2.5,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -359,9 +361,7 @@
     "units": 2.5,
     "unitsRaw": 3.75,
     "unitsCap": 2.5
-   },
-   "unitsRaw": 3.75,
-   "unitsCap": 2.5
+   }
   },
   {
    "id": "401909941",
@@ -473,8 +473,8 @@
    "flagged": "2026-11-07T21:45:18Z",
    "betTo": 9.5,
    "close": 7.5,
-   "now": null,
    "pass": true,
+   "now": null,
    "unitsRaw": 0.5,
    "unitsCap": 0.25
   },
@@ -503,6 +503,8 @@
    "lineL": 6.5,
    "flagged": "2026-11-07T09:59:22Z",
    "close": 6.5,
+   "unitsRaw": 0.5,
+   "unitsCap": 0.25,
    "now": {
     "mk": "ml",
     "side": "home",
@@ -512,9 +514,7 @@
     "units": 4.75,
     "unitsRaw": 5.0,
     "unitsCap": 4.75
-   },
-   "unitsRaw": 0.5,
-   "unitsCap": 0.25
+   }
   },
   {
    "id": "401909943",
@@ -869,7 +869,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2619,
+  "snapshots": 2631,
   "buckets": [
    {
     "when": "24h+",
@@ -891,21 +891,21 @@
    },
    {
     "when": "1-6h",
-    "clvN": 225,
+    "clvN": 226,
     "clvRet": -0.0467,
-    "clvT": -18.03,
+    "clvT": -18.11,
     "clv": 0.0,
     "beat": 0.164,
-    "still": 0.68
+    "still": 0.681
    },
    {
     "when": "<1h",
-    "clvN": 33,
-    "clvRet": -0.05,
-    "clvT": -8.93,
+    "clvN": 35,
+    "clvRet": -0.0497,
+    "clvT": -9.43,
     "clv": -0.03,
-    "beat": 0.091,
-    "still": 0.788
+    "beat": 0.086,
+    "still": 0.8
    }
   ]
  },
@@ -5647,11 +5647,11 @@
     "down": 20.5
    },
    "2026-11-08": {
-    "raw": 58.0,
-    "scale": 0.6897
+    "raw": 57.25,
+    "scale": 0.6987
    },
    "2026-11-09": {
-    "raw": 5.75,
+    "raw": 4.75,
     "scale": 1.0
    }
   }
