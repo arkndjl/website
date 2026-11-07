@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-07T23:52:10Z",
+ "asof": "2026-11-07T23:54:03Z",
  "recenter": {
   "week": 0.3
  },
@@ -563,7 +563,14 @@
    "betTo": 47.5,
    "close": 44.5,
    "pass": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 44.5,
+    "price": -106.0,
+    "ev": 0.023,
+    "units": 0.75
+   }
   },
   {
    "id": "401858291",
@@ -621,9 +628,9 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": -104.0,
-    "ev": 0.04,
-    "units": 2.25
+    "price": -106.0,
+    "ev": 0.031,
+    "units": 1.25
    }
   },
   {
@@ -968,9 +975,9 @@
     "mk": "total",
     "side": "over",
     "line": 43.5,
-    "price": -104.0,
-    "ev": 0.039,
-    "units": 2.0
+    "price": -102.0,
+    "ev": 0.049,
+    "units": 3.0
    }
   },
   {
@@ -1098,22 +1105,6 @@
  ],
  "board": [
   {
-   "id": "401856852",
-   "sport": "cfb",
-   "kick": "2026-11-08T00:30:00.000Z",
-   "home": "Arizona State",
-   "away": "Colorado",
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
-   "price": -108.0,
-   "edge": 6.3,
-   "x": 3.0,
-   "why": "no edge at -108",
-   "m": 5.1,
-   "tm": 50.8
-  },
-  {
    "id": "401858287",
    "sport": "cfb",
    "kick": "2026-11-08T00:30:00.000Z",
@@ -1186,7 +1177,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 3.2,
    "x": 4.5,
    "why": "edge under 4.5 (tier: mixed)",
@@ -1263,7 +1254,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -1311,10 +1302,10 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -104.0,
-   "ev": 0.04,
+   "price": -106.0,
+   "ev": 0.031,
    "edge": 7.6,
-   "units": 2.25,
+   "units": 1.25,
    "home": "Texas Tech",
    "away": "West Virginia",
    "state": "pick"
@@ -1371,10 +1362,10 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -104.0,
-   "ev": 0.039,
+   "price": -102.0,
+   "ev": 0.049,
    "edge": 7.1,
-   "units": 2.0,
+   "units": 3.0,
    "home": "Army",
    "away": "Air Force",
    "state": "pick"
@@ -1383,13 +1374,13 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -108.0,
+   "price": -106.0,
+   "ev": 0.023,
    "edge": 6.3,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.75,
    "home": "Arizona State",
    "away": "Colorado",
-   "state": "under"
+   "state": "pick"
   },
   "401864535": {
    "mk": "total",
@@ -1492,7 +1483,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 10961,
+  "snapshots": 10965,
   "buckets": [
    {
     "when": "24h+",
@@ -1514,21 +1505,21 @@
    },
    {
     "when": "1-6h",
-    "clvN": 185,
-    "clvRet": -0.0625,
-    "clvT": -14.33,
+    "clvN": 186,
+    "clvRet": -0.0626,
+    "clvT": -14.42,
     "clv": 0.05,
-    "beat": 0.135,
-    "still": 0.762
+    "beat": 0.134,
+    "still": 0.763
    },
    {
     "when": "<1h",
-    "clvN": 25,
-    "clvRet": -0.0722,
-    "clvT": -6.55,
+    "clvN": 26,
+    "clvRet": -0.0676,
+    "clvT": -5.85,
     "clv": -0.04,
     "beat": 0.0,
-    "still": 0.96
+    "still": 0.962
    }
   ]
  },
@@ -3229,13 +3220,13 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 19.25,
+    "raw": 18.25,
     "scale": 1.0,
     "down": 20.5
    },
    "2026-11-08": {
-    "raw": 56.75,
-    "scale": 0.7048
+    "raw": 57.5,
+    "scale": 0.6957
    },
    "2026-11-09": {
     "raw": 4.5,
