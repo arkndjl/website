@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-07T23:48Z",
+ "asof": "2026-11-07T23:51Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,11 +274,11 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 5,
-     "rows": 2133
+     "flags": 11,
+     "rows": 2147
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 10,
+     "flags": 9,
      "rows": 628
     },
     "static/data/nfl-war.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 53,
+     "flags": 52,
      "rows": 1650
     }
    },
@@ -316,6 +316,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "ATL"
+    },
+    {
+     "d": "2026-10-30",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-30",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "15313",
+     "player": "Marco Wilson",
+     "pos": "CB",
+     "rotowire": "FA",
+     "site": "CAR"
     },
     {
      "d": "2026-09-16",
@@ -388,6 +406,96 @@
      "pos": "CB",
      "rotowire": "TEN",
      "site": "KC"
+    },
+    {
+     "d": "2026-10-26",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "16714",
+     "player": "Jalin Hyatt",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NYG"
+    },
+    {
+     "d": "2026-10-13",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Let go by Jets",
+     "kind": null,
+     "move": {
+      "d": "2026-09-22",
+      "head": "Signs to 53-man roster",
+      "kind": "sign"
+     },
+     "pid": "14013",
+     "player": "Troy Reeder",
+     "pos": "WLB",
+     "rotowire": "FA",
+     "site": "NYJ"
+    },
+    {
+     "d": "2026-08-31",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Waived by Eagles",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-31",
+      "head": "Waived by Eagles",
+      "kind": "waived"
+     },
+     "pid": "19641",
+     "player": "Cole Wisniewski",
+     "pos": "SS",
+     "rotowire": "FA",
+     "site": "PHI"
+    },
+    {
+     "d": "2026-11-02",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Signs with San Francisco's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-02",
+      "head": "Signs with San Francisco's practice squad",
+      "kind": "practice"
+     },
+     "pid": "13418",
+     "player": "KhaDarel Hodge",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "SF"
+    },
+    {
+     "d": "2026-11-03",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-03",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "19119",
+     "player": "Montorie Foster Jr.",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "SEA"
     },
     {
      "d": "2026-11-03",
@@ -1966,24 +2074,6 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-07",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Cut loose by Saints",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-07",
-      "head": "Cut loose by Saints",
-      "kind": "waived"
-     },
-     "pid": "16898",
-     "player": "Kendre Miller",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "NO"
-    },
-    {
      "d": "2026-10-28",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -3474,24 +3564,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-07",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Cut loose by Saints",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-07",
-      "head": "Cut loose by Saints",
-      "kind": "waived"
-     },
-     "pid": "16898",
-     "player": "Kendre Miller",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "NO"
-    },
-    {
      "d": "2026-10-26",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3528,24 +3600,6 @@
      "site": "NE"
     },
     {
-     "d": "2026-10-26",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Sent back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-26",
-      "head": "Sent back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "16706",
-     "player": "Cedric Tillman",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "NO"
-    },
-    {
      "d": "2026-11-02",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3562,6 +3616,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "TEN"
+    },
+    {
+     "d": "2026-10-26",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Sent back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Sent back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "16706",
+     "player": "Cedric Tillman",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NO"
     },
     {
      "d": "2026-11-03",
@@ -3656,7 +3728,7 @@
    ],
    "joined": 0,
    "players": 2229,
-   "rows": 7905
+   "rows": 7919
   },
   "nhl": {
    "by_file": {
