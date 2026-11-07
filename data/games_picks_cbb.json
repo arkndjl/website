@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-07T10:05:08Z",
+ "asof": "2026-11-07T10:10:01Z",
  "recenter": {
   "2026-11-07": -10.35
  },
@@ -201,22 +201,6 @@
    "tm": 165.2
   },
   {
-   "id": "401911470",
-   "sport": "cbb",
-   "kick": "2026-11-08T03:00:00Z",
-   "home": "UC Irvine",
-   "away": "San Jos\u00e9 State",
-   "mk": "spread",
-   "side": "away",
-   "line": 8.5,
-   "price": -115.0,
-   "edge": 6.0,
-   "x": null,
-   "why": "spread market off",
-   "m": 2.5,
-   "tm": 149.5
-  },
-  {
    "id": "401928352",
    "sport": "cbb",
    "kick": "2026-11-07T21:00:00Z",
@@ -295,6 +279,22 @@
    "why": "spread market off",
    "m": 2.5,
    "tm": 156.2
+  },
+  {
+   "id": "401911470",
+   "sport": "cbb",
+   "kick": "2026-11-08T03:00:00Z",
+   "home": "UC Irvine",
+   "away": "San Jos\u00e9 State",
+   "mk": "spread",
+   "side": "away",
+   "line": 7.5,
+   "price": 111.0,
+   "edge": 5.0,
+   "x": null,
+   "why": "spread market off",
+   "m": 2.5,
+   "tm": 149.5
   },
   {
    "id": "401918986",
@@ -649,9 +649,9 @@
   "401911470": {
    "mk": "spread",
    "side": "away",
-   "line": 8.5,
-   "price": -115.0,
-   "edge": 6.0,
+   "line": 7.5,
+   "price": 111.0,
+   "edge": 5.0,
    "ev": null,
    "units": 0.0,
    "home": "UC Irvine",
@@ -807,24 +807,24 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 7357,
+  "snapshots": 7362,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 430,
-    "clvRet": -0.0302,
-    "clvT": -4.67,
-    "clv": 0.27,
+    "clvRet": -0.0297,
+    "clvT": -4.6,
+    "clv": 0.28,
     "beat": 0.284,
-    "still": 0.302
+    "still": 0.307
    },
    {
     "when": "6-24h",
-    "clvN": 1333,
-    "clvRet": -0.0412,
-    "clvT": -16.49,
+    "clvN": 1334,
+    "clvRet": -0.041,
+    "clvT": -16.39,
     "clv": 0.08,
-    "beat": 0.239,
+    "beat": 0.241,
     "still": 0.509
    },
    {
@@ -8164,15 +8164,15 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 68.5,
-    "scale": 0.5839
+    "raw": 66.25,
+    "scale": 0.6038
    },
    "2026-11-08": {
-    "raw": 48.5,
-    "scale": 0.8247
+    "raw": 47.25,
+    "scale": 0.8466
    },
    "2026-11-09": {
-    "raw": 9.5,
+    "raw": 7.0,
     "scale": 1.0
    }
   }
