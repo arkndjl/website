@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-07T16:59Z",
+ "asof": "2026-11-07T17:02Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -88,11 +88,11 @@
     },
     "static/data/nba-proj.json": {
      "flags": 5,
-     "rows": 495
+     "rows": 498
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 1,
-     "rows": 451
+     "flags": 2,
+     "rows": 456
     },
     "static/data/pctl-nba.json": {
      "flags": 2,
@@ -120,7 +120,7 @@
      "player": "Kristaps Porzi\u0146\u0123is",
      "pos": "C",
      "rotowire": "GSW",
-     "site": "GSW"
+     "site": "FA"
     },
     {
      "d": "2026-10-22",
@@ -199,23 +199,23 @@
      "field": "tm",
      "file": "static/data/nba-xpm/2027.json",
      "flag": "released",
-     "head": "Let go by LAC",
-     "kind": null,
+     "head": "Waived by Golden State",
+     "kind": "waived",
      "move": {
-      "d": "2026-09-27",
-      "head": "Signs with Clippers",
-      "kind": "sign"
+      "d": "2026-10-17",
+      "head": "Waived by Golden State",
+      "kind": "waived"
      },
-     "pid": "5652",
-     "player": "Blake Wesley",
+     "pid": "5724",
+     "player": "Dalen Terry",
      "pos": "SG",
      "rotowire": "FA",
-     "site": "LAC"
+     "site": "OKC"
     },
     {
      "d": "2026-10-17",
      "field": "tm",
-     "file": "static/data/pctl-nba.json",
+     "file": "static/data/nba-xpm/2027.json",
      "flag": "released",
      "head": "Let go by LAC",
      "kind": null,
@@ -226,7 +226,7 @@
      },
      "pid": "5652",
      "player": "Blake Wesley",
-     "pos": "G",
+     "pos": "SG",
      "rotowire": "FA",
      "site": "LAC"
     },
@@ -247,11 +247,29 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "OKC"
+    },
+    {
+     "d": "2026-10-17",
+     "field": "tm",
+     "file": "static/data/pctl-nba.json",
+     "flag": "released",
+     "head": "Let go by LAC",
+     "kind": null,
+     "move": {
+      "d": "2026-09-27",
+      "head": "Signs with Clippers",
+      "kind": "sign"
+     },
+     "pid": "5652",
+     "player": "Blake Wesley",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "LAC"
     }
    ],
    "joined": 0,
    "players": 593,
-   "rows": 1999
+   "rows": 2007
   },
   "nfl": {
    "by_file": {
