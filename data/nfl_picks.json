@@ -1,7 +1,7 @@
 {
  "season": 2026,
  "week": 9,
- "asof": "2026-11-08T20:46:51Z",
+ "asof": "2026-11-08T22:47:01Z",
  "picks": [
   {
    "id": "2026_09_NYG_PHI",
@@ -19,7 +19,8 @@
    "units": 0.75,
    "flagged": "2026-11-03T10:48:02Z",
    "now": null,
-   "started": true
+   "started": true,
+   "won": false
   },
   {
    "id": "2026_09_HOU_LAC",
@@ -36,11 +37,8 @@
    "p": 0.519,
    "units": 1.0,
    "flagged": "2026-11-08T20:42:00Z",
-   "now": {
-    "line": 4.5,
-    "ml": 194.0
-   },
-   "started": false
+   "now": null,
+   "started": true
   },
   {
    "id": "2026_09_BUF_MIN",
@@ -59,7 +57,7 @@
    "flagged": "2026-11-03T10:48:02Z",
    "now": {
     "line": 3.5,
-    "ml": 160.0
+    "ml": 156.0
    },
    "started": false
   }
@@ -986,25 +984,25 @@
  },
  "record": {
   "upset": {
-   "n": 2,
+   "n": 3,
    "won": 1,
    "w": 1,
-   "l": 1,
+   "l": 2,
    "p": 0,
-   "units": 0.2,
-   "roi": 0.085,
+   "units": -0.8,
+   "roi": -0.277,
    "sized": {
-    "units": -0.1,
-    "risked": 1.8,
-    "roi": -0.07
+    "units": -0.9,
+    "risked": 2.5,
+    "roi": -0.349
    },
-   "clv": 0.0,
-   "clvPos": 0.0,
-   "clvN": 2,
-   "clvRet": -0.0133,
-   "clvT": -0.48,
-   "beat": 0.0,
-   "still": 1.0
+   "clv": 0.17,
+   "clvPos": 0.333,
+   "clvN": 3,
+   "clvRet": 0.0143,
+   "clvT": 0.45,
+   "beat": 0.333,
+   "still": 0.667
   },
   "fav": {
    "n": 1,
@@ -1030,17 +1028,17 @@
  },
  "sofar": {
   "upset": {
-   "n": 8,
+   "n": 9,
    "w": 4,
-   "l": 4,
+   "l": 5,
    "p": 0,
-   "units": 0.4,
-   "roi": 0.047,
-   "t": 0.12,
+   "units": -0.6,
+   "roi": -0.069,
+   "t": -0.19,
    "sized": {
-    "risked": 8.0,
-    "units": 0.4,
-    "roi": 0.047
+    "risked": 9.0,
+    "units": -0.6,
+    "roi": -0.069
    },
    "won": 4
   },
@@ -1159,7 +1157,15 @@
    "edge": 4.2,
    "p": 0.522,
    "units": 0.75,
-   "flagged": "2026-11-03T10:48:02Z"
+   "flagged": "2026-11-03T10:48:02Z",
+   "res": -8.0,
+   "close": -3.0,
+   "won": false,
+   "profit": -1.0,
+   "ats": -1.0,
+   "clvRet": 0.0694,
+   "clv": 0.5,
+   "beat": 1
   },
   {
    "id": "2026_09_BUF_MIN",
