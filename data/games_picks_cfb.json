@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-08T01:02:45Z",
+ "asof": "2026-11-08T01:20:30Z",
  "recenter": {
-  "week": 0.43
+  "week": 0.42
  },
  "monitor": {
   "clocks": {
@@ -466,14 +466,14 @@
    "tmRaw": 45.3,
    "flagged": "2026-11-03T00:08:15Z",
    "betTo": 46.5,
-   "close": 49.5,
+   "close": 50.5,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 49.5,
-    "price": 104.0,
-    "ev": 0.069,
-    "units": 5.0
+    "line": 50.5,
+    "price": -104.0,
+    "ev": 0.036,
+    "units": 1.75
    }
   },
   {
@@ -504,9 +504,9 @@
     "mk": "total",
     "side": "under",
     "line": 71.5,
-    "price": -104.0,
-    "ev": 0.049,
-    "units": 2.5
+    "price": -102.0,
+    "ev": 0.059,
+    "units": 3.5
    }
   },
   {
@@ -592,9 +592,9 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": -104.0,
-    "ev": 0.041,
-    "units": 2.0
+    "price": -102.0,
+    "ev": 0.051,
+    "units": 3.0
    }
   },
   {
@@ -798,10 +798,10 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -104.0,
-   "ev": 0.041,
+   "price": -102.0,
+   "ev": 0.051,
    "edge": 7.7,
-   "units": 2.0,
+   "units": 3.0,
    "home": "Texas Tech",
    "away": "West Virginia",
    "state": "pick"
@@ -810,10 +810,10 @@
    "mk": "total",
    "side": "under",
    "line": 71.5,
-   "price": -104.0,
-   "ev": 0.049,
+   "price": -102.0,
+   "ev": 0.059,
    "edge": 8.7,
-   "units": 2.5,
+   "units": 3.5,
    "home": "Oregon State",
    "away": "Texas State",
    "state": "pick"
@@ -833,11 +833,11 @@
   "401864535": {
    "mk": "total",
    "side": "under",
-   "line": 49.5,
-   "price": 104.0,
-   "ev": 0.069,
-   "edge": 6.1,
-   "units": 5.0,
+   "line": 50.5,
+   "price": -104.0,
+   "ev": 0.036,
+   "edge": 7.1,
+   "units": 1.75,
    "home": "UNLV",
    "away": "Wyoming",
    "state": "pick"
@@ -907,7 +907,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 10975,
+  "snapshots": 10979,
   "buckets": [
    {
     "when": "24h+",
@@ -929,12 +929,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 191,
-    "clvRet": -0.063,
-    "clvT": -14.89,
+    "clvN": 194,
+    "clvRet": -0.0632,
+    "clvT": -15.18,
     "clv": 0.05,
-    "beat": 0.131,
-    "still": 0.77
+    "beat": 0.129,
+    "still": 0.773
    },
    {
     "when": "<1h",
@@ -2434,7 +2434,16 @@
    "close": 49.5,
    "pass": true,
    "unitsRaw": 1.25,
-   "unitsCap": 0.75
+   "unitsCap": 0.75,
+   "score": [
+    20.0,
+    23.0
+   ],
+   "res": "w",
+   "profit": 0.98,
+   "clvRet": -0.0107,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "401856850",
@@ -2705,7 +2714,7 @@
    "tmRaw": 45.3,
    "flagged": "2026-11-03T00:08:15Z",
    "betTo": 46.5,
-   "close": 49.5
+   "close": 50.5
   },
   {
    "id": "401858517",
@@ -3018,16 +3027,16 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 10.75,
+    "raw": 9.5,
     "scale": 1.0,
     "down": 26.25
    },
    "2026-11-08": {
-    "raw": 61.25,
-    "scale": 0.6531
+    "raw": 62.0,
+    "scale": 0.6452
    },
    "2026-11-09": {
-    "raw": 5.5,
+    "raw": 4.75,
     "scale": 1.0
    }
   }
