@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-08T01:20:30Z",
+ "asof": "2026-11-08T01:28:18Z",
  "recenter": {
-  "week": 0.42
+  "week": 0.41
  },
  "monitor": {
   "clocks": {
@@ -471,9 +471,9 @@
     "mk": "total",
     "side": "under",
     "line": 50.5,
-    "price": -104.0,
-    "ev": 0.036,
-    "units": 1.75
+    "price": -100.0,
+    "ev": 0.056,
+    "units": 3.75
    }
   },
   {
@@ -592,9 +592,9 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": -102.0,
-    "ev": 0.051,
-    "units": 3.0
+    "price": 102.0,
+    "ev": 0.072,
+    "units": 5.0
    }
   },
   {
@@ -648,33 +648,6 @@
    "flagged": "2026-11-02T01:52:55Z",
    "betTo": 47.5,
    "close": 46.5,
-   "now": null
-  },
-  {
-   "id": "401869968",
-   "espn": "401869968",
-   "sport": "cfb",
-   "kick": "2026-11-07T22:00:00.000Z",
-   "home": "Louisiana",
-   "away": "South Alabama",
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -104.0,
-   "p": 0.513,
-   "ev": 0.006,
-   "units": 0.25,
-   "edge": 3.3,
-   "x": 3.0,
-   "pDU": 0.5119,
-   "evDU": 0.0041,
-   "m": 6.9,
-   "tm": 54.2,
-   "tmRaw": 55,
-   "flagged": "2026-11-03T17:22:21Z",
-   "betTo": 58.0,
-   "close": 56.5,
-   "pass": true,
    "now": null
   },
   {
@@ -798,10 +771,10 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -102.0,
-   "ev": 0.051,
+   "price": 102.0,
+   "ev": 0.072,
    "edge": 7.7,
-   "units": 3.0,
+   "units": 5.0,
    "home": "Texas Tech",
    "away": "West Virginia",
    "state": "pick"
@@ -834,10 +807,10 @@
    "mk": "total",
    "side": "under",
    "line": 50.5,
-   "price": -104.0,
-   "ev": 0.036,
+   "price": -100.0,
+   "ev": 0.056,
    "edge": 7.1,
-   "units": 1.75,
+   "units": 3.75,
    "home": "UNLV",
    "away": "Wyoming",
    "state": "pick"
@@ -907,7 +880,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 10979,
+  "snapshots": 10982,
   "buckets": [
    {
     "when": "24h+",
@@ -929,12 +902,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 194,
-    "clvRet": -0.0632,
-    "clvT": -15.18,
+    "clvN": 197,
+    "clvRet": -0.0635,
+    "clvT": -15.46,
     "clv": 0.05,
-    "beat": 0.129,
-    "still": 0.773
+    "beat": 0.127,
+    "still": 0.777
    },
    {
     "when": "<1h",
@@ -2814,7 +2787,16 @@
    "flagged": "2026-11-03T17:22:21Z",
    "betTo": 58.0,
    "close": 56.5,
-   "pass": true
+   "pass": true,
+   "score": [
+    26.0,
+    28.0
+   ],
+   "res": "w",
+   "profit": 0.962,
+   "clvRet": 0.0293,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "id": "401871073",
@@ -3027,13 +3009,13 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 9.5,
+    "raw": 13.5,
     "scale": 1.0,
     "down": 26.25
    },
    "2026-11-08": {
-    "raw": 62.0,
-    "scale": 0.6452
+    "raw": 61.5,
+    "scale": 0.6504
    },
    "2026-11-09": {
     "raw": 4.75,
