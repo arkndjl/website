@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-08T05:45:02Z",
+ "asof": "2026-11-08T06:24:33Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 84.11,
+  "now": 81.87,
   "peak": 117.38,
-  "drawdown": 0.2835,
-  "open": 40.25,
+  "drawdown": 0.3026,
+  "open": 38.25,
   "path": [
    101.5,
    101.6,
@@ -368,43 +368,44 @@
    88.6,
    88.15,
    83.9,
-   84.11
+   84.11,
+   81.87
   ]
  },
  "record": {
   "n": 404,
-  "clvN": 360,
-  "clvRet": -0.0141,
-  "clvT": -2.67,
-  "clv": -0.09,
-  "beat": 0.292,
-  "settled": 360,
+  "clvN": 361,
+  "clvRet": -0.0146,
+  "clvT": -2.76,
+  "clv": -0.11,
+  "beat": 0.291,
+  "settled": 361,
   "w": 176,
-  "l": 184,
+  "l": 185,
   "p": 0,
-  "roi": -0.032,
-  "roiT": -0.6,
-  "profit": -15.98,
-  "risked": 315.5,
-  "yield": -0.0506
+  "roi": -0.0347,
+  "roiT": -0.65,
+  "profit": -18.48,
+  "risked": 318.0,
+  "yield": -0.0581
  },
- "tEff": -2.68,
+ "tEff": -2.77,
  "corr": {
   "rho": 0.0,
-  "n": 360,
+  "n": 361,
   "slates": 33,
-  "nEff": 360.0,
-  "avgSlate": 10.91
+  "nEff": 361.0,
+  "avgSlate": 10.94
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 360,
+   "value": 361,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.4% t -2.68",
+   "value": "-1.5% t -2.77",
    "pass": false
   },
   {
@@ -419,7 +420,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -3.2% vs -1.4% (SE 5.4)",
+   "value": "ROI -3.5% vs -1.5% (SE 5.4)",
    "pass": true
   }
  ],
@@ -452,20 +453,20 @@
    "sport": "cfb",
    "mk": "total",
    "n": 23,
-   "clvN": 21,
-   "clvRet": -0.0257,
-   "clvT": -1.24,
-   "clv": -0.24,
-   "beat": 0.333,
-   "settled": 21,
+   "clvN": 22,
+   "clvRet": -0.0335,
+   "clvT": -1.58,
+   "clv": -0.41,
+   "beat": 0.318,
+   "settled": 22,
    "w": 9,
-   "l": 12,
+   "l": 13,
    "p": 0,
-   "roi": -0.1582,
-   "roiT": -0.73,
-   "profit": -9.42,
-   "risked": 24.25,
-   "yield": -0.3886
+   "roi": -0.1965,
+   "roiT": -0.93,
+   "profit": -11.92,
+   "risked": 26.75,
+   "yield": -0.4457
   },
   {
    "id": "nfl-ml",
@@ -682,27 +683,6 @@
   {
    "rule": "cfb-total",
    "sport": "cfb",
-   "id": "401856856",
-   "k": "2026-11-08T02:30:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "Texas Tech",
-   "a": "West Virginia",
-   "mk": "total",
-   "side": "under",
-   "line": 64.5,
-   "price": -100.0,
-   "bet": "under 64.5 -100",
-   "placed": "2026-11-02T02:51:13Z",
-   "stake": 2.5,
-   "edge": 4.3,
-   "ev": 0.0271,
-   "event": null,
-   "pass": false,
-   "close": 68.5
-  },
-  {
-   "rule": "cfb-total",
-   "sport": "cfb",
    "id": "401860912",
    "k": "2026-11-08T03:30:00.000Z",
    "slate": "cfb:2026-11-07",
@@ -776,7 +756,7 @@
    "price": 102.0,
    "bet": "under 51.5 +102",
    "placed": "2026-11-03T10:48:02Z",
-   "stake": 2.5,
+   "stake": 2.75,
    "edge": 4.1,
    "ev": 0.048,
    "event": null,
@@ -1201,7 +1181,7 @@
    "price": 130.0,
    "bet": "Braelon Allen over 1.5 rec +130",
    "placed": "2026-11-07T20:58:00Z",
-   "stake": 2.0,
+   "stake": 2.25,
    "edge": 24.1,
    "ev": 0.38,
    "event": null,
@@ -1511,7 +1491,7 @@
    "ev": 0.0122,
    "event": null,
    "pass": false,
-   "close": 224.5
+   "close": 223.5
   },
   {
    "rule": "nba-total",
@@ -1532,7 +1512,7 @@
    "ev": 0.0077,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "close": 222.5
   },
   {
    "rule": "nfl-total",
@@ -1720,6 +1700,37 @@
   }
  ],
  "recent": [
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401856856",
+   "k": "2026-11-08T02:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Texas Tech",
+   "a": "West Virginia",
+   "mk": "total",
+   "side": "under",
+   "line": 64.5,
+   "price": -100.0,
+   "bet": "under 64.5 -100",
+   "placed": "2026-11-02T02:51:13Z",
+   "stake": 2.5,
+   "edge": 4.3,
+   "ev": 0.0271,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.1967,
+   "clv": -4.0,
+   "beat": -1,
+   "close": 68.5,
+   "score": [
+    48.0,
+    53.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -2.5
+  },
   {
    "rule": "nba-total",
    "sport": "nba",
@@ -3502,34 +3513,6 @@
    "beat": -1,
    "close": 0.3825,
    "score": "0-6 2-6",
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186499",
-   "k": "2026-11-05T13:50:00Z",
-   "slate": "tennis:2026-11-05",
-   "h": "Musetti",
-   "a": "Assche",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": -264,
-   "bet": "Musetti ML -264",
-   "placed": "2026-11-05T06:51:06Z",
-   "stake": 0.25,
-   "edge": 4.3,
-   "ev": 0.0034,
-   "event": "Rolex Paris Masters",
-   "pass": false,
-   "clvRet": 0.0238,
-   "clv": 2.0,
-   "beat": 1,
-   "close": 0.7425,
-   "score": "7-5 3-6 6-4",
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
@@ -15873,7 +15856,17 @@
    "ev": 0.0271,
    "event": null,
    "pass": false,
-   "close": 68.5
+   "clvRet": -0.1967,
+   "clv": -4.0,
+   "beat": -1,
+   "close": 68.5,
+   "score": [
+    48.0,
+    53.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -2.5
   },
   {
    "rule": "cfb-total",
@@ -15951,7 +15944,7 @@
    "price": 102.0,
    "bet": "under 51.5 +102",
    "placed": "2026-11-03T10:48:02Z",
-   "stake": 2.5,
+   "stake": 2.75,
    "edge": 4.1,
    "ev": 0.048,
    "event": null,
@@ -16376,7 +16369,7 @@
    "price": 130.0,
    "bet": "Braelon Allen over 1.5 rec +130",
    "placed": "2026-11-07T20:58:00Z",
-   "stake": 2.0,
+   "stake": 2.25,
    "edge": 24.1,
    "ev": 0.38,
    "event": null,
@@ -16686,7 +16679,7 @@
    "ev": 0.0122,
    "event": null,
    "pass": false,
-   "close": 224.5
+   "close": 223.5
   },
   {
    "rule": "nba-total",
@@ -16707,7 +16700,7 @@
    "ev": 0.0077,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "close": 222.5
   },
   {
    "rule": "nfl-total",

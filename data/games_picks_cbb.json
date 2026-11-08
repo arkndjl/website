@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-08T05:44:55Z",
+ "asof": "2026-11-08T06:24:28Z",
  "recenter": {
   "2026-11-08": -11.43
  },
@@ -225,7 +225,7 @@
    "mk": "total",
    "side": "under",
    "line": 154.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 6.5,
    "x": null,
    "why": "total market off",
@@ -297,6 +297,38 @@
    "tm": 148.3
   },
   {
+   "id": "401920424",
+   "sport": "cbb",
+   "kick": "2026-11-08T18:00:00Z",
+   "home": "Virginia",
+   "away": "Arkansas",
+   "mk": "spread",
+   "side": "away",
+   "line": 3.5,
+   "price": -113.0,
+   "edge": 3.6,
+   "x": null,
+   "why": "spread market off",
+   "m": -0.1,
+   "tm": 161.5
+  },
+  {
+   "id": "401919029",
+   "sport": "cbb",
+   "kick": "2026-11-09T04:00:00Z",
+   "home": "Wichita State",
+   "away": "USC",
+   "mk": "spread",
+   "side": "away",
+   "line": -5.5,
+   "price": -110,
+   "edge": 3.4,
+   "x": null,
+   "why": "spread market off",
+   "m": -8.9,
+   "tm": 157.8
+  },
+  {
    "id": "401911453",
    "sport": "cbb",
    "kick": "2026-11-08T21:30:00Z",
@@ -327,38 +359,6 @@
    "why": "total market off",
    "m": 20.2,
    "tm": 148.9
-  },
-  {
-   "id": "401920424",
-   "sport": "cbb",
-   "kick": "2026-11-08T18:00:00Z",
-   "home": "Virginia",
-   "away": "Arkansas",
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": 108.0,
-   "edge": 2.6,
-   "x": null,
-   "why": "spread market off",
-   "m": -0.1,
-   "tm": 161.5
-  },
-  {
-   "id": "401919029",
-   "sport": "cbb",
-   "kick": "2026-11-09T04:00:00Z",
-   "home": "Wichita State",
-   "away": "USC",
-   "mk": "spread",
-   "side": "away",
-   "line": -6.5,
-   "price": -108.0,
-   "edge": 2.4,
-   "x": null,
-   "why": "spread market off",
-   "m": -8.9,
-   "tm": 157.8
   },
   {
    "id": "401918053",
@@ -397,9 +397,9 @@
   "401920424": {
    "mk": "spread",
    "side": "away",
-   "line": 2.5,
-   "price": 108.0,
-   "edge": 2.6,
+   "line": 3.5,
+   "price": -113.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "Virginia",
@@ -409,9 +409,9 @@
   "401919029": {
    "mk": "spread",
    "side": "away",
-   "line": -6.5,
-   "price": -108.0,
-   "edge": 2.4,
+   "line": -5.5,
+   "price": -110,
+   "edge": 3.4,
    "ev": null,
    "units": 0.0,
    "home": "Wichita State",
@@ -434,7 +434,7 @@
    "mk": "total",
    "side": "under",
    "line": 154.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 6.5,
    "ev": null,
    "units": 0.0,
@@ -639,25 +639,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8305,
+  "snapshots": 8315,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 439,
-    "clvRet": -0.0294,
-    "clvT": -4.63,
-    "clv": 0.28,
-    "beat": 0.292,
+    "clvRet": -0.0304,
+    "clvT": -4.78,
+    "clv": 0.27,
+    "beat": 0.285,
     "still": 0.298
    },
    {
     "when": "6-24h",
-    "clvN": 1507,
+    "clvN": 1508,
     "clvRet": -0.0433,
-    "clvT": -18.34,
+    "clvT": -18.35,
     "clv": 0.05,
     "beat": 0.247,
-    "still": 0.476
+    "still": 0.477
    },
    {
     "when": "1-6h",
@@ -7996,11 +7996,11 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 66.0,
-    "scale": 0.6061
+    "raw": 62.0,
+    "scale": 0.6452
    },
    "2026-11-09": {
-    "raw": 4.5,
+    "raw": 4.75,
     "scale": 1.0
    }
   }
