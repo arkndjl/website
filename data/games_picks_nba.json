@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-08T21:18:39Z",
+ "asof": "2026-11-08T21:24:44Z",
  "recenter": {
   "2026-11-08": 1.66
  },
@@ -472,14 +472,7 @@
    "flagged": "2026-11-08T02:47:09Z",
    "betTo": 222.5,
    "close": 222.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 222.5,
-    "price": -104.0,
-    "ev": 0.066,
-    "units": 0.25
-   },
+   "now": null,
    "unitsRaw": 0.75,
    "unitsCap": 0.5
   },
@@ -524,6 +517,22 @@
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401909949",
+   "sport": "nba",
+   "kick": "2026-11-09T01:00:00Z",
+   "home": "MIL",
+   "away": "BOS",
+   "mk": "total",
+   "side": "under",
+   "line": 222.5,
+   "price": -106.0,
+   "edge": 3.1,
+   "x": 3.0,
+   "why": "no edge at -106",
+   "m": -12.6,
+   "tm": 219.4
+  },
   {
    "id": "401909946",
    "sport": "nba",
@@ -614,13 +623,13 @@
    "mk": "total",
    "side": "under",
    "line": 222.5,
-   "price": -104.0,
-   "ev": 0.066,
+   "price": -106.0,
    "edge": 3.1,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "MIL",
    "away": "BOS",
-   "state": "pick"
+   "state": "under"
   },
   "401909950": {
    "mk": "spread",
@@ -699,7 +708,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2816,
+  "snapshots": 2819,
   "buckets": [
    {
     "when": "24h+",
@@ -721,12 +730,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 240,
-    "clvRet": -0.0467,
-    "clvT": -19.22,
+    "clvN": 241,
+    "clvRet": -0.0468,
+    "clvT": -19.33,
     "clv": 0.0,
     "beat": 0.154,
-    "still": 0.7
+    "still": 0.701
    },
    {
     "when": "<1h",
@@ -5680,7 +5689,7 @@
     "down": 21.0
    },
    "2026-11-09": {
-    "raw": 8.5,
+    "raw": 7.5,
     "scale": 1.0
    },
    "2026-11-11": {
