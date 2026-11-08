@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-08T22:46:34Z",
+ "asof": "2026-11-08T22:49:01Z",
  "recenter": {
   "week": 0.03
  },
@@ -614,6 +614,32 @@
    "now": null
   },
   {
+   "id": "401858518",
+   "espn": "401858518",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "Indiana",
+   "away": "USC",
+   "mk": "total",
+   "side": "over",
+   "line": 49.5,
+   "price": -102.0,
+   "p": 0.52,
+   "ev": 0.03,
+   "units": 1.75,
+   "edge": 4.9,
+   "x": 3.0,
+   "pDU": 0.5143,
+   "evDU": 0.0186,
+   "m": 7.9,
+   "tm": 54.4,
+   "tmRaw": 54.4,
+   "flagged": "2026-11-08T22:48:32Z",
+   "betTo": 51.0,
+   "close": 49.5,
+   "now": null
+  },
+  {
    "id": "401858301",
    "espn": "401858301",
    "sport": "cfb",
@@ -917,22 +943,6 @@
    "why": "no edge at -108",
    "m": -1.3,
    "tm": 55.1
-  },
-  {
-   "id": "401858518",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:30:00.000Z",
-   "home": "Indiana",
-   "away": "USC",
-   "mk": "total",
-   "side": "over",
-   "line": 49.5,
-   "price": -106.0,
-   "edge": 4.9,
-   "x": 3.0,
-   "why": "no edge at -106",
-   "m": 7.9,
-   "tm": 54.4
   },
   {
    "id": "401856861",
@@ -1253,15 +1263,31 @@
    "why": "edge under 3",
    "m": -7.8,
    "tm": 53.3
+  },
+  {
+   "id": "401858295",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "Virginia",
+   "away": "California",
+   "mk": "total",
+   "side": "over",
+   "line": 47.5,
+   "price": -110,
+   "edge": 1.7,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 12.6,
+   "tm": 49.2
   }
  ],
  "games": {
   "401858518": {
-   "mk": "total",
-   "side": "over",
-   "line": 49.5,
-   "price": -106.0,
-   "edge": 4.9,
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
+   "price": -104.0,
+   "edge": 0.4,
    "ev": null,
    "units": 0.0,
    "home": "Indiana",
@@ -2077,13 +2103,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 12004,
+  "snapshots": 12023,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2450,
+    "clvN": 2452,
     "clvRet": -0.0514,
-    "clvT": -31.17,
+    "clvT": -31.21,
     "clv": 0.12,
     "beat": 0.33,
     "still": 0.374
@@ -4779,6 +4805,31 @@
    "flagged": "2026-11-08T21:18:23Z",
    "betTo": 47.5,
    "close": 44.5
+  },
+  {
+   "id": "401858518",
+   "espn": "401858518",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "Indiana",
+   "away": "USC",
+   "mk": "total",
+   "side": "over",
+   "line": 49.5,
+   "price": -102.0,
+   "p": 0.52,
+   "ev": 0.03,
+   "units": 1.75,
+   "edge": 4.9,
+   "x": 3.0,
+   "pDU": 0.5143,
+   "evDU": 0.0186,
+   "m": 7.9,
+   "tm": 54.4,
+   "tmRaw": 54.4,
+   "flagged": "2026-11-08T22:48:32Z",
+   "betTo": 51.0,
+   "close": 49.5
   }
  ],
  "nightCap": {
@@ -4790,7 +4841,7 @@
     "down": 29.0
    },
    "2026-11-09": {
-    "raw": 8.0,
+    "raw": 8.25,
     "scale": 1.0
    },
    "2026-11-11": {
@@ -4802,7 +4853,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 25.5,
+    "raw": 27.25,
     "scale": 1.0
    }
   }
