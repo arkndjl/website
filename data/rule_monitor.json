@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-08T00:59:46Z",
+ "asof": "2026-11-08T01:49:02Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1230,20 +1230,20 @@
    "since": "2026-11-05",
    "status": "on",
    "stopped": null,
-   "n": 8,
-   "clvN": 5,
-   "clvRet": 0.0316,
-   "clvT": 1.38,
-   "days": 2,
-   "beat": 0.6,
-   "settled": 5,
+   "n": 9,
+   "clvN": 6,
+   "clvRet": 0.032,
+   "clvT": 1.92,
+   "days": 3,
+   "beat": 0.667,
+   "settled": 6,
    "w": 2,
-   "l": 3,
-   "roi": -0.2036,
+   "l": 4,
+   "roi": -0.3363,
    "week": {
-    "n": 5,
-    "clvRet": 0.0316,
-    "clvT": 1.38
+    "n": 6,
+    "clvRet": 0.032,
+    "clvT": 1.92
    },
    "exp": {
     "clvRet": 0.1183,
@@ -1252,16 +1252,16 @@
     "n": 741
    },
    "vsExp": {
-    "gap": -0.0867,
-    "z": -3.79,
+    "gap": -0.0863,
+    "z": -5.16,
     "read": "below the backtest"
    },
    "check": {
-    "n": 5,
-    "window": 5,
-    "mean": 0.0316,
-    "t": 1.38,
-    "days": 2,
+    "n": 6,
+    "window": 6,
+    "mean": 0.032,
+    "t": 1.92,
+    "days": 3,
     "sd": 0.1438,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1270,33 +1270,33 @@
     "why": "",
     "drift": {
      "mu1": 0.0187,
-     "n": 5,
+     "n": 6,
      "sd": 0.1438,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.05,
-     "info": 0.08,
-     "real": 1.095,
-     "realSe": 3.448,
+     "llr": 0.068,
+     "info": 0.1,
+     "real": 1.174,
+     "realSe": 3.148,
      "need": 350
     }
    },
    "drift": {
     "mu1": 0.0187,
-    "n": 5,
+    "n": 6,
     "sd": 0.1438,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.05,
-    "info": 0.08,
-    "real": 1.095,
-    "realSe": 3.448,
+    "llr": 0.068,
+    "info": 0.1,
+    "real": 1.174,
+    "realSe": 3.148,
     "need": 350,
     "path": [
      [
@@ -1308,6 +1308,11 @@
       "2026-11-06",
       5,
       0.05
+     ],
+     [
+      "2026-11-07",
+      6,
+      0.068
      ]
     ]
    }
@@ -1468,7 +1473,7 @@
    "since": "2026-11-05",
    "status": "on",
    "stopped": null,
-   "n": 1,
+   "n": 2,
    "clvN": 1,
    "clvRet": 0.2216,
    "clvT": null,
@@ -1554,19 +1559,19 @@
    "status": "on",
    "stopped": null,
    "n": 4,
-   "clvN": 1,
-   "clvRet": 0.0517,
-   "clvT": null,
-   "days": 1,
+   "clvN": 2,
+   "clvRet": 0.059,
+   "clvT": 8.08,
+   "days": 2,
    "beat": 1.0,
-   "settled": 1,
-   "w": 1,
+   "settled": 2,
+   "w": 2,
    "l": 0,
-   "roi": 0.439,
+   "roi": 0.4435,
    "week": {
-    "n": 1,
-    "clvRet": 0.0517,
-    "clvT": null
+    "n": 2,
+    "clvRet": 0.059,
+    "clvT": 8.08
    },
    "exp": {
     "clvRet": 0.1053,
@@ -1575,16 +1580,16 @@
     "n": 224
    },
    "vsExp": {
-    "gap": -0.0536,
-    "z": -0.44,
-    "read": "in line"
+    "gap": -0.0463,
+    "z": -6.34,
+    "read": "below the backtest"
    },
    "check": {
-    "n": 1,
-    "window": 1,
-    "mean": 0.0517,
-    "t": null,
-    "days": 1,
+    "n": 2,
+    "window": 2,
+    "mean": 0.059,
+    "t": 8.08,
+    "days": 2,
     "sd": 0.1228,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1865,13 +1870,13 @@
    "sport": "cfb",
    "mk": "total",
    "label": "CFB total",
-   "n": 17,
-   "du": 22.0,
-   "clvRet": -0.0053,
-   "clvT": -0.32,
-   "flat": -0.0229,
-   "adds": 0.0176,
-   "expEdge": 0.0187,
+   "n": 19,
+   "du": 23.5,
+   "clvRet": -0.0106,
+   "clvT": -0.67,
+   "flat": -0.0255,
+   "adds": 0.015,
+   "expEdge": 0.0184,
    "basis": "backtest + live picks"
   },
   {
@@ -1930,26 +1935,26 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 35,
-   "du": 83.0,
-   "clvRet": 0.0253,
-   "clvT": 1.56,
-   "flat": 0.0355,
-   "adds": -0.0102,
-   "expEdge": 0.0187,
+   "n": 36,
+   "du": 87.5,
+   "clvRet": 0.0274,
+   "clvT": 1.76,
+   "flat": 0.0364,
+   "adds": -0.009,
+   "expEdge": 0.018,
    "basis": "backtest + live picks"
   },
   {
    "sport": "nba",
    "mk": "total",
    "label": "NBA total",
-   "n": 37,
-   "du": 76.75,
-   "clvRet": 0.0059,
-   "clvT": 0.35,
-   "flat": 0.0023,
-   "adds": 0.0036,
-   "expEdge": 0.0254,
+   "n": 38,
+   "du": 78.0,
+   "clvRet": 0.0063,
+   "clvT": 0.39,
+   "flat": 0.0032,
+   "adds": 0.0032,
+   "expEdge": 0.0251,
    "basis": "backtest + live picks"
   }
  ],
@@ -1960,7 +1965,8 @@
  "flags": [
   "pick:cbb:spread",
   "pick:cbb:total",
-  "pick:nba:total"
+  "pick:nba:total",
+  "pick:nba:spread | role: favorite"
  ],
  "drift": {
   "watching": [
