@@ -1,6 +1,6 @@
 {
  "season": 59,
- "asof": "2026-11-08T02:45:13.177Z",
+ "asof": "2026-11-08T09:33:47.895Z",
  "championship": {
   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
   "name": "S59 NA Main A - Regular Season",
@@ -50,7 +50,7 @@
  "standing": {
   "name": "1NT",
   "avatar": "https://distribution.faceit-cdn.net/images/a9382b59-5e48-4d43-944b-dec13f312ed4.jpg",
-  "rank": 43,
+  "rank": 44,
   "tied": false,
   "of": 83,
   "points": 15,
@@ -64,7 +64,7 @@
   "streak": 1,
   "group": "Main A",
   "board": "Main",
-  "power": 35
+  "power": 36
  },
  "leaderboards": [
   {
@@ -116,7 +116,7 @@
  "stakes": {
   "group": "Main",
   "teams": 83,
-  "rank": 43,
+  "rank": 44,
   "tied": false,
   "w": 5,
   "l": 5,
@@ -130,17 +130,17 @@
  },
  "sim": {
   "runs": 10000,
-  "pPlayoffs": 74.8,
+  "pPlayoffs": 74.1,
   "pTop16": 3,
   "pTop4": 0,
   "seedMedian": 39,
   "seedP10": 23,
-  "seedP90": 57,
+  "seedP90": 58,
   "expWins": 7.2,
   "cutWins": 7,
   "cutDist": {
-   "6": 32,
-   "7": 68
+   "6": 29.5,
+   "7": 70.5
   },
   "buckets": [
    {
@@ -153,19 +153,19 @@
    },
    {
     "range": "9-16",
-    "p": 3
+    "p": 2.9
    },
    {
     "range": "17-32",
-    "p": 30.2
+    "p": 29.4
    },
    {
     "range": "33-48",
-    "p": 41.7
+    "p": 41.8
    },
    {
     "range": "49+",
-    "p": 25.2
+    "p": 25.9
    }
   ]
  },
@@ -661,75 +661,6 @@
    "points": 9,
    "roster": [
     {
-     "id": "7ebb7aa0-4bf3-41cd-8cf5-2a97e7029ced",
-     "nickname": "deviN-",
-     "country": "us",
-     "level": 10,
-     "elo": 2024,
-     "role": "lurker",
-     "roleMaps": 47,
-     "form": 0.95,
-     "formMaps": 47,
-     "plus": {
-      "entryPlus": 94,
-      "duelPlus": 89,
-      "multiPlus": 91,
-      "clutchPlus": 112,
-      "utilPlus": 97,
-      "awpPlus": 91,
-      "survPlus": 101,
-      "entryPct": 48
-     },
-     "talent": {
-      "exact": 2.33,
-      "stars": 2.5
-     },
-     "apps": 58
-    },
-    {
-     "id": "e6fb9637-daad-4787-9aef-3757800ab799",
-     "nickname": "FuzzyHat",
-     "country": "us",
-     "level": 10,
-     "elo": 2268,
-     "role": "lurker",
-     "roleMaps": 60,
-     "form": 0.98,
-     "formMaps": 60,
-     "plus": {
-      "entryPlus": 95,
-      "duelPlus": 90,
-      "multiPlus": 86,
-      "clutchPlus": 114,
-      "utilPlus": 104,
-      "awpPlus": 92,
-      "survPlus": 110,
-      "entryPct": 48
-     },
-     "talent": {
-      "exact": 2.76,
-      "stars": 3
-     },
-     "apps": 62
-    },
-    {
-     "id": "e3cfd79f-0739-452d-bc1e-f42c26881df7",
-     "nickname": "h0t_s0up",
-     "country": "us",
-     "level": 8,
-     "elo": 1707,
-     "role": null,
-     "roleMaps": null,
-     "form": null,
-     "formMaps": 0,
-     "plus": {},
-     "talent": {
-      "exact": 1.02,
-      "stars": 1
-     },
-     "apps": 17
-    },
-    {
      "id": "603b6821-47c9-436c-8bd7-0c0b0a67889a",
      "nickname": "shaake",
      "country": "us",
@@ -858,6 +789,75 @@
       "stars": 3.5
      },
      "apps": 54
+    },
+    {
+     "id": "7ebb7aa0-4bf3-41cd-8cf5-2a97e7029ced",
+     "nickname": "deviN-",
+     "country": "us",
+     "level": 10,
+     "elo": 2024,
+     "role": "lurker",
+     "roleMaps": 47,
+     "form": 0.95,
+     "formMaps": 47,
+     "plus": {
+      "entryPlus": 94,
+      "duelPlus": 89,
+      "multiPlus": 91,
+      "clutchPlus": 112,
+      "utilPlus": 97,
+      "awpPlus": 91,
+      "survPlus": 101,
+      "entryPct": 48
+     },
+     "talent": {
+      "exact": 2.33,
+      "stars": 2.5
+     },
+     "apps": 58
+    },
+    {
+     "id": "e6fb9637-daad-4787-9aef-3757800ab799",
+     "nickname": "FuzzyHat",
+     "country": "us",
+     "level": 10,
+     "elo": 2268,
+     "role": "lurker",
+     "roleMaps": 60,
+     "form": 0.98,
+     "formMaps": 60,
+     "plus": {
+      "entryPlus": 95,
+      "duelPlus": 90,
+      "multiPlus": 86,
+      "clutchPlus": 114,
+      "utilPlus": 104,
+      "awpPlus": 92,
+      "survPlus": 110,
+      "entryPct": 48
+     },
+     "talent": {
+      "exact": 2.76,
+      "stars": 3
+     },
+     "apps": 62
+    },
+    {
+     "id": "e3cfd79f-0739-452d-bc1e-f42c26881df7",
+     "nickname": "h0t_s0up",
+     "country": "us",
+     "level": 8,
+     "elo": 1707,
+     "role": null,
+     "roleMaps": null,
+     "form": null,
+     "formMaps": 0,
+     "plus": {},
+     "talent": {
+      "exact": 1.02,
+      "stars": 1
+     },
+     "apps": 17
     }
    ],
    "elo": 2343,
@@ -1131,9 +1131,9 @@
    ]
   },
   "us": {
-   "elo": 2517,
-   "prank": 35,
-   "rank": 43,
+   "elo": 2515,
+   "prank": 36,
+   "rank": 44,
    "tied": false,
    "rec": "5-5"
   },
@@ -1693,14 +1693,14 @@
      "exact": 2.08,
      "form": 0.91,
      "plus": {
-      "entryPlus": 98,
-      "duelPlus": 84,
-      "multiPlus": 91,
-      "clutchPlus": 94,
-      "utilPlus": 88,
-      "awpPlus": 92,
-      "survPlus": 88,
-      "entryPct": 50
+      "entryPlus": 99,
+      "duelPlus": 83,
+      "multiPlus": 90,
+      "clutchPlus": 93,
+      "utilPlus": 87,
+      "awpPlus": 93,
+      "survPlus": 89,
+      "entryPct": 51
      },
      "sub": false
     },
@@ -1748,7 +1748,7 @@
    ]
   },
   "spread": {
-   "q": 0.612,
+   "q": 0.611,
    "rounds": 3.8,
    "line": 5.5,
    "cover": 47,
@@ -2991,7 +2991,7 @@
    },
    "b76982b5-6b55-4976-9fd7-ad9e25181615": {
     "nick": "mIKEY-_-",
-    "last": 1793762562000,
+    "last": 1794124065000,
     "seen": [
      "1-71ce97fc-ce4a-4f6d-b684-33fb814d9753/1",
      "1-d5d6f67b-ce27-4e01-999c-338a59e6a187/1"
@@ -3023,16 +3023,36 @@
  },
  "members": [
   {
+   "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
+   "nick": "Saintz"
+  },
+  {
+   "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
+   "nick": "LAURSEN_111"
+  },
+  {
+   "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
+   "nick": "deadacate"
+  },
+  {
+   "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
+   "nick": "Beasty_"
+  },
+  {
    "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
    "nick": "rezzah"
+  },
+  {
+   "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+   "nick": "mf_"
   },
   {
    "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
    "nick": "-BMoney-"
   },
   {
-   "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
-   "nick": "deadacate"
+   "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
+   "nick": "-TMoney-"
   },
   {
    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
@@ -3043,28 +3063,8 @@
    "nick": "mIKEY-_-"
   },
   {
-   "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
-   "nick": "Beasty_"
-  },
-  {
    "id": "45309b43-02c6-4a57-b47e-6a640f9d91bc",
    "nick": "Chawk"
-  },
-  {
-   "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
-   "nick": "Saintz"
-  },
-  {
-   "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
-   "nick": "-TMoney-"
-  },
-  {
-   "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
-   "nick": "mf_"
-  },
-  {
-   "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
-   "nick": "LAURSEN_111"
   }
  ],
  "memberLog": [
@@ -3159,14 +3159,14 @@
     "pts": 27,
     "rd": 54,
     "maps": 9,
-    "ark": 1.27,
+    "ark": 1.26,
     "elo": 2901,
     "rdpm": 6,
     "talent": {
-     "exact": 4.3,
+     "exact": 4.27,
      "stars": 4.5
     },
-    "power": 2.29,
+    "power": 2.27,
     "powerRank": 2
    },
    {
@@ -3188,7 +3188,7 @@
      "exact": 4.02,
      "stars": 4
     },
-    "power": 1.92,
+    "power": 1.93,
     "powerRank": 3
    },
    {
@@ -3298,7 +3298,7 @@
      "exact": 3.74,
      "stars": 3.5
     },
-    "power": 1.55,
+    "power": 1.56,
     "powerRank": 5
    },
    {
@@ -3321,7 +3321,7 @@
      "stars": 3.5
     },
     "power": 0.81,
-    "powerRank": 17
+    "powerRank": 16
    },
    {
     "id": "60547072-c36b-40c2-8f0c-2d6a093286ba",
@@ -3365,7 +3365,7 @@
      "stars": 3
     },
     "power": 0.07,
-    "powerRank": 37
+    "powerRank": 38
    },
    {
     "id": "b31275e7-1e6b-4376-8330-9471fe2421ed",
@@ -3409,7 +3409,7 @@
      "stars": 3.5
     },
     "power": 0.82,
-    "powerRank": 16
+    "powerRank": 15
    },
    {
     "id": "d34be1b4-bbd1-4076-9e5e-fadcdbc70f51",
@@ -3852,32 +3852,54 @@
     "powerRank": 68
    },
    {
-    "id": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
-    "name": "No Future Lifes Over",
-    "avatar": "https://distribution.faceit-cdn.net/images/d36d37ab-331b-4e2a-bfe9-6dcde580a3b3.jpg",
+    "id": "e7f802f2-96fa-4389-8287-affd27a43ce1",
+    "name": "The Homies",
+    "avatar": "https://distribution.faceit-cdn.net/images/28ac9064-f531-420f-b08d-6a52ba6d577d.jpg",
     "rank": 34,
     "tied": false,
     "group": "Main A",
     "w": 5,
     "l": 4,
     "pts": 15,
-    "rd": 13,
+    "rd": -2,
     "maps": 9,
-    "ark": 1.07,
-    "elo": 2640,
-    "rdpm": 1.4444444444444444,
+    "ark": 0.99,
+    "elo": 2458,
+    "rdpm": -0.2222222222222222,
     "talent": {
-     "exact": 3.43,
+     "exact": 3.02,
+     "stars": 3
+    },
+    "power": 0.1,
+    "powerRank": 35
+   },
+   {
+    "id": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
+    "name": "No Future Lifes Over",
+    "avatar": "https://distribution.faceit-cdn.net/images/d36d37ab-331b-4e2a-bfe9-6dcde580a3b3.jpg",
+    "rank": 35,
+    "tied": false,
+    "group": "Main A",
+    "w": 5,
+    "l": 5,
+    "pts": 15,
+    "rd": 9,
+    "maps": 10,
+    "ark": 1.04,
+    "elo": 2640,
+    "rdpm": 0.9,
+    "talent": {
+     "exact": 3.34,
      "stars": 3.5
     },
-    "power": 0.87,
-    "powerRank": 15
+    "power": 0.78,
+    "powerRank": 17
    },
    {
     "id": "042d11d1-1739-481b-8e53-6de20a2209ea",
     "name": "Wiggle Peeks",
     "avatar": "https://distribution.faceit-cdn.net/images/4887d29c-9955-45ef-bde8-81a1e7c2d2dd.jpg",
-    "rank": 35,
+    "rank": 36,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -3899,7 +3921,7 @@
     "id": "2f4c3c42-841e-4fbd-ab67-f3ff6180cf7a",
     "name": "Lynnsanity",
     "avatar": "https://distribution.faceit-cdn.net/images/e056d46c-3552-46b9-9803-a51210023a10.jpg",
-    "rank": 36,
+    "rank": 37,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -3921,7 +3943,7 @@
     "id": "df45dead-ef77-451e-9f67-24f18fa91e6a",
     "name": "Chopped",
     "avatar": "https://distribution.faceit-cdn.net/images/00fccda6-95b4-470c-af3f-4b2010b6b36f.jpg",
-    "rank": 37,
+    "rank": 38,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -3943,7 +3965,7 @@
     "id": "e4849ec9-4118-4201-949f-80dc0241a809",
     "name": "Dude Picks",
     "avatar": "https://distribution.faceit-cdn.net/images/06143b06-91c7-48fc-afe4-b0637340293d.jpg",
-    "rank": 38,
+    "rank": 39,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -3965,7 +3987,7 @@
     "id": "3b27e602-7156-4c08-b4c0-df6cc9735b5c",
     "name": "Top One Percent",
     "avatar": "https://distribution.faceit-cdn.net/images/63e160b9-0314-4be8-a898-976f78e1aef2.jpeg",
-    "rank": 39,
+    "rank": 40,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -3987,7 +4009,7 @@
     "id": "138acd1d-5456-4cbc-aac2-777f978aa339",
     "name": "penazoid",
     "avatar": "https://distribution.faceit-cdn.net/images/f427afe0-1a1c-4885-92cf-0957410dedd1.jpeg",
-    "rank": 40,
+    "rank": 41,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4009,7 +4031,7 @@
     "id": "8f7cdc70-85f6-452c-9a02-51a7d3d17934",
     "name": "puggin4seb",
     "avatar": null,
-    "rank": 41,
+    "rank": 42,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4031,7 +4053,7 @@
     "id": "a02a7421-b0b5-45ff-af40-95179b7b11b8",
     "name": "Absent Minded",
     "avatar": "https://distribution.faceit-cdn.net/images/36e285aa-2a67-407c-95d7-6f6ae65eac8e.jpeg",
-    "rank": 42,
+    "rank": 43,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4053,7 +4075,7 @@
     "id": "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a",
     "name": "1NT",
     "avatar": "https://distribution.faceit-cdn.net/images/a9382b59-5e48-4d43-944b-dec13f312ed4.jpg",
-    "rank": 43,
+    "rank": 44,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4069,13 +4091,13 @@
      "stars": 3
     },
     "power": 0.09,
-    "powerRank": 35
+    "powerRank": 36
    },
    {
     "id": "f38e0f8f-d145-4b3a-bd8c-995ccb156dda",
     "name": "Binky",
     "avatar": "https://distribution.faceit-cdn.net/images/ada95cb8-9470-4477-bc49-4e8f32fa556c.jpeg",
-    "rank": 44,
+    "rank": 45,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4097,7 +4119,7 @@
     "id": "803850b4-dfc0-469a-92bf-cdcd90f31200",
     "name": "TheMotherLovers",
     "avatar": "https://distribution.faceit-cdn.net/images/1b52ce1e-dca1-4a21-94d7-afaf456d3eaa.jpeg",
-    "rank": 45,
+    "rank": 46,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4119,7 +4141,7 @@
     "id": "6f3ff135-f5a2-46ea-a587-2cea0b10f048",
     "name": "MINDTRIP",
     "avatar": "https://distribution.faceit-cdn.net/images/1128137c-3900-4761-aec9-2a8c73b103fd.jpg",
-    "rank": 46,
+    "rank": 47,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4141,7 +4163,7 @@
     "id": "fb715310-91a3-43e1-9465-1886a74431fc",
     "name": "MakeYouSayLate",
     "avatar": "https://distribution.faceit-cdn.net/images/ca51699a-df7e-4642-8ab3-0b6e6e8960da.jpeg",
-    "rank": 47,
+    "rank": 48,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4163,7 +4185,7 @@
     "id": "f268949f-4a52-40f9-87e3-1a449c145339",
     "name": "GoonAssOldheads",
     "avatar": null,
-    "rank": 48,
+    "rank": 49,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4185,7 +4207,7 @@
     "id": "a1452aba-1b6b-4c9c-95d5-6b91a61ba9ce",
     "name": "Flow Esports",
     "avatar": "https://distribution.faceit-cdn.net/images/18a3b4df-22bc-4d28-8786-43dbe850244d.jpg",
-    "rank": 49,
+    "rank": 50,
     "tied": false,
     "group": "Main A",
     "w": 5,
@@ -4207,7 +4229,7 @@
     "id": "ceef1105-ea59-4c8a-ae46-2be06dcd331e",
     "name": "Sassy Sunshines",
     "avatar": "https://distribution.faceit-cdn.net/images/a064481f-68af-44d4-93fc-e3d099a064cd.jpeg",
-    "rank": 50,
+    "rank": 51,
     "tied": false,
     "group": "Main A",
     "w": 4,
@@ -4224,28 +4246,6 @@
     },
     "power": -0.09,
     "powerRank": 41
-   },
-   {
-    "id": "e7f802f2-96fa-4389-8287-affd27a43ce1",
-    "name": "The Homies",
-    "avatar": "https://distribution.faceit-cdn.net/images/28ac9064-f531-420f-b08d-6a52ba6d577d.jpg",
-    "rank": 51,
-    "tied": false,
-    "group": "Main A",
-    "w": 4,
-    "l": 4,
-    "pts": 12,
-    "rd": -6,
-    "maps": 8,
-    "ark": 0.97,
-    "elo": 2458,
-    "rdpm": -0.75,
-    "talent": {
-     "exact": 2.96,
-     "stars": 3
-    },
-    "power": 0.02,
-    "powerRank": 38
    },
    {
     "id": "26a1d874-6095-404e-b904-9aec96b9dd2c",
@@ -4597,7 +4597,7 @@
      "stars": 3
     },
     "power": 0.08,
-    "powerRank": 36
+    "powerRank": 37
    },
    {
     "id": "0cb87283-41bb-4462-83c8-3c66716e73f4",
@@ -4640,7 +4640,7 @@
      "exact": 2.53,
      "stars": 2.5
     },
-    "power": -0.63,
+    "power": -0.64,
     "powerRank": 61
    },
    {
@@ -5106,7 +5106,7 @@
      1.29,
      1.88,
      1.47,
-     1.04,
+     1.03,
      0.77,
      1.4,
      1.48,
@@ -5503,33 +5503,6 @@
     "rank": 20
    },
    {
-    "id": "41bac423-02b2-45f0-90e9-8e694074a748",
-    "name": "Polkan",
-    "team": "No Future Lifes Over",
-    "tid": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
-    "maps": 9,
-    "ark": 1.14,
-    "arkRaw": 1.27,
-    "kd": 1.46,
-    "adr": 84.5,
-    "kpr": 0.89,
-    "entryPM": 18,
-    "clutch": 2,
-    "mvpPR": 0.17,
-    "games": [
-     1.95,
-     1.58,
-     1.45,
-     0.69,
-     0.98,
-     1.38,
-     0.95,
-     1.85,
-     0.89
-    ],
-    "rank": 21
-   },
-   {
     "id": "bfaf117e-ab42-4275-ab0a-25f4b07f68ff",
     "name": "Dubbz117",
     "team": "Firstwave",
@@ -5555,7 +5528,7 @@
      1.09,
      1.11
     ],
-    "rank": 22
+    "rank": 21
    },
    {
     "id": "8c5e57a2-9d89-460f-bbd0-79a22ff5e6d9",
@@ -5577,41 +5550,41 @@
      1.25,
      1.44,
      1.8,
-     0.58,
+     0.57,
      1.08,
      0.69,
      0.94,
      1.69
     ],
-    "rank": 23
+    "rank": 22
    },
    {
-    "id": "755fcf56-d2e4-40ea-bf0c-9ab9a516380a",
-    "name": "Noahhh",
-    "team": "teamington",
-    "tid": "dae52217-785a-442e-87f0-5e95512af168",
+    "id": "41bac423-02b2-45f0-90e9-8e694074a748",
+    "name": "Polkan",
+    "team": "No Future Lifes Over",
+    "tid": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
     "maps": 10,
-    "ark": 1.12,
-    "arkRaw": 1.22,
-    "kd": 1.21,
-    "adr": 87,
-    "kpr": 0.83,
-    "entryPM": -1,
-    "clutch": 3,
-    "mvpPR": 0.15,
+    "ark": 1.13,
+    "arkRaw": 1.23,
+    "kd": 1.4,
+    "adr": 82.6,
+    "kpr": 0.87,
+    "entryPM": 16,
+    "clutch": 2,
+    "mvpPR": 0.16,
     "games": [
-     1.49,
-     0.85,
-     1.35,
-     1.23,
-     1.48,
-     1.72,
-     1.03,
-     1.25,
-     1.05,
+     1.95,
+     1.58,
+     1.45,
+     0.69,
+     0.98,
+     1.38,
+     0.95,
+     1.85,
+     0.89,
      0.91
     ],
-    "rank": 24
+    "rank": 23
    },
    {
     "id": "b4739ac7-0d54-4310-bb66-7c56310570b6",
@@ -5630,14 +5603,14 @@
     "games": [
      1.52,
      0.83,
-     0.88,
+     0.89,
      1.27,
      1.13,
      0.87,
      1.43,
      2.57
     ],
-    "rank": 25
+    "rank": 24
    },
    {
     "id": "47bad91c-f3e5-4943-9871-bd47118fc06a",
@@ -5660,11 +5633,11 @@
      1.94,
      1.11,
      1.39,
-     0.82,
+     0.81,
      1.14,
      1.95
     ],
-    "rank": 26
+    "rank": 25
    },
    {
     "id": "374a3589-26b1-46b4-a9f9-627c1c7c9215",
@@ -5691,7 +5664,7 @@
      1,
      1.47
     ],
-    "rank": 27
+    "rank": 26
    },
    {
     "id": "7e7da02f-0ef5-4503-8e48-a565d3c52ca9",
@@ -5718,7 +5691,7 @@
      1.12,
      0.58
     ],
-    "rank": 28
+    "rank": 27
    },
    {
     "id": "41971170-06b9-4532-b247-bbabfbb9ffb8",
@@ -5745,7 +5718,7 @@
      1.87,
      0.95
     ],
-    "rank": 29
+    "rank": 28
    },
    {
     "id": "5441c421-1d7a-48ff-ae78-f54cefd62f27",
@@ -5772,6 +5745,34 @@
      0.91,
      1.42,
      1.66
+    ],
+    "rank": 29
+   },
+   {
+    "id": "755fcf56-d2e4-40ea-bf0c-9ab9a516380a",
+    "name": "Noahhh",
+    "team": "teamington",
+    "tid": "dae52217-785a-442e-87f0-5e95512af168",
+    "maps": 10,
+    "ark": 1.11,
+    "arkRaw": 1.22,
+    "kd": 1.21,
+    "adr": 87,
+    "kpr": 0.83,
+    "entryPM": -1,
+    "clutch": 3,
+    "mvpPR": 0.15,
+    "games": [
+     1.49,
+     0.85,
+     1.35,
+     1.23,
+     1.48,
+     1.72,
+     1.03,
+     1.25,
+     1.05,
+     0.91
     ],
     "rank": 30
    },
@@ -6170,7 +6171,7 @@
      1.4,
      1.19,
      1,
-     1.05,
+     1.04,
      1.01,
      1.32,
      1.58,
@@ -6308,7 +6309,7 @@
      1.28,
      1.4,
      0.88,
-     1.45,
+     1.46,
      1.45,
      1.73,
      0.63,
@@ -6631,7 +6632,7 @@
      1.47,
      0.57,
      0.89,
-     0.76,
+     0.75,
      1.26,
      1.12,
      1.57,
@@ -6899,7 +6900,7 @@
     "games": [
      1.09,
      1.14,
-     0.99,
+     0.98,
      1.4,
      0.42,
      2.3,
@@ -6917,7 +6918,7 @@
     "tid": "9111bfce-0ba9-4083-af99-995a52da4b11",
     "maps": 10,
     "ark": 1.07,
-    "arkRaw": 1.13,
+    "arkRaw": 1.12,
     "kd": 1.15,
     "adr": 87.4,
     "kpr": 0.77,
@@ -7323,13 +7324,13 @@
     "name": "fdoud",
     "team": "No Future Lifes Over",
     "tid": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
-    "maps": 8,
+    "maps": 9,
     "ark": 1.06,
-    "arkRaw": 1.13,
-    "kd": 1.17,
-    "adr": 85.9,
+    "arkRaw": 1.1,
+    "kd": 1.14,
+    "adr": 85.8,
     "kpr": 0.76,
-    "entryPM": 6,
+    "entryPM": 7,
     "clutch": 3,
     "mvpPR": 0.13,
     "games": [
@@ -7340,7 +7341,8 @@
      0.48,
      0.8,
      1.15,
-     1.12
+     1.12,
+     0.92
     ],
     "rank": 88
    },
@@ -7445,7 +7447,7 @@
      1.32,
      1.37,
      0.8,
-     1.21,
+     1.2,
      0.56
     ],
     "rank": 92
@@ -7524,7 +7526,7 @@
      0.86,
      1.41,
      1.58,
-     0.84,
+     0.85,
      0.68,
      1.38,
      1.24,
@@ -7742,7 +7744,7 @@
     "clutch": 4,
     "mvpPR": 0.08,
     "games": [
-     1.09,
+     1.1,
      1.09,
      0.62,
      0.7,
@@ -7860,7 +7862,7 @@
      1.22,
      0.93,
      1.55,
-     1.45,
+     1.44,
      0.85
     ],
     "rank": 107
@@ -8023,7 +8025,7 @@
      0.97,
      0.93,
      1.23,
-     1.3,
+     1.31,
      1.3,
      0.38,
      1.38
@@ -8047,7 +8049,7 @@
     "games": [
      0.7,
      0.53,
-     1.13,
+     1.12,
      1.43,
      1.86,
      1.19,
@@ -8561,7 +8563,7 @@
     "clutch": 1,
     "mvpPR": 0.09,
     "games": [
-     1.31,
+     1.32,
      0.9,
      1.26,
      1.67,
@@ -8794,6 +8796,33 @@
     "rank": 141
    },
    {
+    "id": "214bcc8d-6e33-410d-85ef-d7793e79f69b",
+    "name": "-Stray-",
+    "team": "The Homies",
+    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
+    "maps": 9,
+    "ark": 1.02,
+    "arkRaw": 1.01,
+    "kd": 0.98,
+    "adr": 84.2,
+    "kpr": 0.7,
+    "entryPM": 9,
+    "clutch": 1,
+    "mvpPR": 0.1,
+    "games": [
+     0.24,
+     0.88,
+     1.08,
+     0.77,
+     1.14,
+     1.29,
+     1.27,
+     1.1,
+     1.12
+    ],
+    "rank": 142
+   },
+   {
     "id": "5df2026d-e970-4238-a2a8-01a557fa12cd",
     "name": "Purple2124",
     "team": "Kaos",
@@ -8818,7 +8847,7 @@
      1.72,
      1.3
     ],
-    "rank": 142
+    "rank": 143
    },
    {
     "id": "c25e5101-276e-4246-82f9-d5c9e1fa8c31",
@@ -8845,7 +8874,7 @@
      1.07,
      0.74
     ],
-    "rank": 143
+    "rank": 144
    },
    {
     "id": "95085cf7-866d-44d2-bb60-5733dafed253",
@@ -8873,7 +8902,7 @@
      0.74,
      0.58
     ],
-    "rank": 144
+    "rank": 145
    },
    {
     "id": "06937782-9ccc-402d-aa12-7cbc600d9691",
@@ -8900,7 +8929,7 @@
      0.87,
      0.78
     ],
-    "rank": 145
+    "rank": 146
    },
    {
     "id": "d162699a-fc31-4ed1-8c3d-0e8d61c4e836",
@@ -8928,7 +8957,7 @@
      1.18,
      0.93
     ],
-    "rank": 146
+    "rank": 147
    },
    {
     "id": "14a9c959-79b1-43ce-835f-e97e07861028",
@@ -8955,7 +8984,7 @@
      1.19,
      1.08
     ],
-    "rank": 147
+    "rank": 148
    },
    {
     "id": "e682257c-e2d5-406f-8a02-06922bbb03f3",
@@ -8982,7 +9011,7 @@
      1.16,
      1.08
     ],
-    "rank": 148
+    "rank": 149
    },
    {
     "id": "14ee47a2-b8dc-4f2c-8566-6f94a56b21cc",
@@ -9010,7 +9039,7 @@
      1.15,
      1.18
     ],
-    "rank": 149
+    "rank": 150
    },
    {
     "id": "8277135d-4f3b-498a-a1e7-b598ecd44bc5",
@@ -9036,7 +9065,7 @@
      0.82,
      1.58
     ],
-    "rank": 150
+    "rank": 151
    },
    {
     "id": "a33c0d87-6cfb-449d-9c96-b0bd20a4a9c5",
@@ -9062,7 +9091,7 @@
      0.94,
      0.65
     ],
-    "rank": 151
+    "rank": 152
    },
    {
     "id": "89b3ed47-de87-4e37-9b55-007399d31598",
@@ -9090,7 +9119,7 @@
      0.55,
      1.21
     ],
-    "rank": 152
+    "rank": 153
    },
    {
     "id": "6958a7db-045a-46db-9889-f52712d9f91b",
@@ -9117,7 +9146,7 @@
      1.42,
      1.07
     ],
-    "rank": 153
+    "rank": 154
    },
    {
     "id": "d1e40d20-4b57-430c-af0b-d30a0ba2c7a2",
@@ -9144,7 +9173,7 @@
      1.14,
      0.7
     ],
-    "rank": 154
+    "rank": 155
    },
    {
     "id": "1d368fe4-4e58-428f-9bbb-afec68ab783f",
@@ -9171,7 +9200,7 @@
      1.25,
      1.02
     ],
-    "rank": 155
+    "rank": 156
    },
    {
     "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
@@ -9198,7 +9227,7 @@
      1.02,
      0.48
     ],
-    "rank": 156
+    "rank": 157
    },
    {
     "id": "6a0d30a6-f86c-4ad4-a5eb-1ee04a8fd041",
@@ -9224,32 +9253,6 @@
      1.15,
      1.13,
      0.75
-    ],
-    "rank": 157
-   },
-   {
-    "id": "214bcc8d-6e33-410d-85ef-d7793e79f69b",
-    "name": "-Stray-",
-    "team": "The Homies",
-    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
-    "maps": 8,
-    "ark": 1.01,
-    "arkRaw": 1,
-    "kd": 0.97,
-    "adr": 83.3,
-    "kpr": 0.7,
-    "entryPM": 9,
-    "clutch": 1,
-    "mvpPR": 0.1,
-    "games": [
-     0.24,
-     0.88,
-     1.08,
-     0.77,
-     1.14,
-     1.29,
-     1.27,
-     1.1
     ],
     "rank": 158
    },
@@ -9571,7 +9574,7 @@
      0.88,
      1.24,
      1.36,
-     0.95,
+     0.94,
      1.2,
      0.94
     ],
@@ -9770,6 +9773,32 @@
     "rank": 177
    },
    {
+    "id": "cb11c6c6-c5b6-4645-bac2-c9ae558b8484",
+    "name": "EclipseHB",
+    "team": "The Homies",
+    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
+    "maps": 8,
+    "ark": 1,
+    "arkRaw": 0.98,
+    "kd": 0.9,
+    "adr": 81.5,
+    "kpr": 0.66,
+    "entryPM": 7,
+    "clutch": 5,
+    "mvpPR": 0.1,
+    "games": [
+     0.37,
+     1.01,
+     0.81,
+     1.09,
+     0.95,
+     1.45,
+     1.22,
+     0.86
+    ],
+    "rank": 178
+   },
+   {
     "id": "4797a228-2d91-4c61-a0b4-39baef30befe",
     "name": "-Garchomp-",
     "team": "MadaNASCAR",
@@ -9785,7 +9814,7 @@
     "mvpPR": 0.07,
     "games": [
      0.88,
-     1.61,
+     1.62,
      0.84,
      0.93,
      0.73,
@@ -9795,7 +9824,7 @@
      1.64,
      0.79
     ],
-    "rank": 178
+    "rank": 179
    },
    {
     "id": "cf668b1e-15ea-4e47-add9-5fda71f04272",
@@ -9821,7 +9850,7 @@
      1.05,
      0.8
     ],
-    "rank": 179
+    "rank": 180
    },
    {
     "id": "d8b3dfab-6f11-4fec-8be4-4c0a5e383b16",
@@ -9848,7 +9877,7 @@
      0.67,
      1.38
     ],
-    "rank": 180
+    "rank": 181
    },
    {
     "id": "0f1eb730-ae1a-4820-98b7-d84788bb78f0",
@@ -9876,7 +9905,7 @@
      0.87,
      1.2
     ],
-    "rank": 181
+    "rank": 182
    },
    {
     "id": "79380534-4eea-4452-a6e1-6867148e1642",
@@ -9904,7 +9933,7 @@
      1.22,
      0.89
     ],
-    "rank": 182
+    "rank": 183
    },
    {
     "id": "c363c30d-79e4-4203-8475-2b6a0624ccf3",
@@ -9932,7 +9961,7 @@
      1.05,
      0.9
     ],
-    "rank": 183
+    "rank": 184
    },
    {
     "id": "860fa219-2a87-46a2-8a84-52b0857c28a7",
@@ -9958,7 +9987,7 @@
      0.95,
      0.95
     ],
-    "rank": 184
+    "rank": 185
    },
    {
     "id": "48fb93f6-dea9-4afb-a59a-402a95e10301",
@@ -9984,7 +10013,7 @@
      0.98,
      1.24
     ],
-    "rank": 185
+    "rank": 186
    },
    {
     "id": "d96e38f1-270e-4c72-beee-97072fadd446",
@@ -10010,7 +10039,7 @@
      0.85,
      1.5
     ],
-    "rank": 186
+    "rank": 187
    },
    {
     "id": "0e9a844a-ed73-46d9-bf1f-a703b53e8055",
@@ -10038,7 +10067,7 @@
      0.83,
      1.01
     ],
-    "rank": 187
+    "rank": 188
    },
    {
     "id": "623883e7-b327-4feb-8062-7b43d1f41d5f",
@@ -10065,7 +10094,7 @@
      0.37,
      1.19
     ],
-    "rank": 188
+    "rank": 189
    },
    {
     "id": "bfa7f9cd-ff04-4668-a154-bacde08a1ea0",
@@ -10092,7 +10121,7 @@
      1.07,
      0.93
     ],
-    "rank": 189
+    "rank": 190
    },
    {
     "id": "02a717d3-f04c-4161-80e7-7d24d87be7de",
@@ -10118,7 +10147,7 @@
      1.15,
      0.8
     ],
-    "rank": 190
+    "rank": 191
    },
    {
     "id": "fe89e4d7-9b5c-4461-a428-446b3a21c072",
@@ -10144,7 +10173,7 @@
      1.3,
      1.01
     ],
-    "rank": 191
+    "rank": 192
    },
    {
     "id": "ebb64722-9c80-4c33-b067-bfceb24231cc",
@@ -10172,7 +10201,7 @@
      0.5,
      0.99
     ],
-    "rank": 192
+    "rank": 193
    },
    {
     "id": "555c296c-12a4-4216-a533-2d878f6e950a",
@@ -10200,7 +10229,7 @@
      0.36,
      0.54
     ],
-    "rank": 193
+    "rank": 194
    },
    {
     "id": "33fd666d-4566-40a1-9598-bd0539b6e6c9",
@@ -10219,14 +10248,14 @@
     "games": [
      1.11,
      0.75,
-     0.31,
+     0.3,
      1.15,
      0.8,
      1.03,
      0.56,
      1.35
     ],
-    "rank": 194
+    "rank": 195
    },
    {
     "id": "2acb0901-ff92-4f61-81a5-375aaaf4c46a",
@@ -10254,7 +10283,7 @@
      1.25,
      1.25
     ],
-    "rank": 195
+    "rank": 196
    },
    {
     "id": "dac919b3-0207-4d7c-ad9a-73c7aef53176",
@@ -10281,7 +10310,7 @@
      1.27,
      0.54
     ],
-    "rank": 196
+    "rank": 197
    },
    {
     "id": "25ad6249-f13c-4880-91db-5b2bb34dd51f",
@@ -10307,7 +10336,7 @@
      1.46,
      1.25
     ],
-    "rank": 197
+    "rank": 198
    },
    {
     "id": "da253464-ebbb-411c-bc65-eec1ba19aa89",
@@ -10334,7 +10363,7 @@
      0.77,
      1.14
     ],
-    "rank": 198
+    "rank": 199
    },
    {
     "id": "8813de0f-ffef-4e54-909a-d03b2083d522",
@@ -10362,7 +10391,7 @@
      1.23,
      0.96
     ],
-    "rank": 199
+    "rank": 200
    },
    {
     "id": "e2ef3642-efae-4765-971d-e35486d59248",
@@ -10390,7 +10419,7 @@
      1.06,
      1.06
     ],
-    "rank": 200
+    "rank": 201
    },
    {
     "id": "c09c66ce-7374-44d1-9be0-49f24f46edf6",
@@ -10416,7 +10445,7 @@
      0.49,
      0.78
     ],
-    "rank": 201
+    "rank": 202
    },
    {
     "id": "6304aa1d-8969-4f3d-aae4-d96c0cb172ef",
@@ -10441,10 +10470,10 @@
      0.68,
      0.99,
      1.57,
-     0.98,
+     0.97,
      0.93
     ],
-    "rank": 202
+    "rank": 203
    },
    {
     "id": "fe591e40-433c-4e7e-9c41-7283b877b0e5",
@@ -10471,7 +10500,7 @@
      1.05,
      0.93
     ],
-    "rank": 203
+    "rank": 204
    },
    {
     "id": "add194d2-9d6e-4e70-b53c-029b1451cf97",
@@ -10498,7 +10527,7 @@
      1.14,
      1.05
     ],
-    "rank": 204
+    "rank": 205
    },
    {
     "id": "0164d715-4891-4f49-b071-b1fa3aa13dd0",
@@ -10526,7 +10555,7 @@
      0.82,
      0.51
     ],
-    "rank": 205
+    "rank": 206
    },
    {
     "id": "53dbdbb0-0e6f-405b-b763-422d0c61b567",
@@ -10553,7 +10582,7 @@
      1.12,
      1.24
     ],
-    "rank": 206
+    "rank": 207
    },
    {
     "id": "44a00086-a1ba-407d-9833-4a5d9a64585f",
@@ -10579,7 +10608,7 @@
      0.83,
      1.29
     ],
-    "rank": 207
+    "rank": 208
    },
    {
     "id": "062b08ef-3174-4bed-8bc3-65372db2c643",
@@ -10606,7 +10635,7 @@
      0.71,
      1.18
     ],
-    "rank": 208
+    "rank": 209
    },
    {
     "id": "9e5cd3fe-2976-4e7b-9534-7ef125e8aa5c",
@@ -10633,7 +10662,7 @@
      1.19,
      1.28
     ],
-    "rank": 209
+    "rank": 210
    },
    {
     "id": "b763cac6-fa60-46aa-b02e-c6d405ca3bec",
@@ -10659,7 +10688,7 @@
      1.05,
      1.05
     ],
-    "rank": 210
+    "rank": 211
    },
    {
     "id": "faf52b84-d27d-4f93-8bc1-0c4ee4033efb",
@@ -10676,7 +10705,7 @@
     "clutch": 1,
     "mvpPR": 0.12,
     "games": [
-     1.3,
+     1.29,
      1.22,
      0.93,
      0.88,
@@ -10687,7 +10716,7 @@
      0.84,
      0.91
     ],
-    "rank": 211
+    "rank": 212
    },
    {
     "id": "686230b5-a629-4eae-aa7b-8ca2fd23d195",
@@ -10715,7 +10744,7 @@
      0.86,
      0.78
     ],
-    "rank": 212
+    "rank": 213
    },
    {
     "id": "70145fda-4776-4f94-bd97-3409c95880fd",
@@ -10742,7 +10771,7 @@
      1.21,
      1.04
     ],
-    "rank": 213
+    "rank": 214
    },
    {
     "id": "45309b43-02c6-4a57-b47e-6a640f9d91bc",
@@ -10768,7 +10797,7 @@
      0.68,
      1.38
     ],
-    "rank": 214
+    "rank": 215
    },
    {
     "id": "4daf34d3-397f-4896-992b-88e057a14c1b",
@@ -10790,12 +10819,12 @@
      1.22,
      1.02,
      1.27,
-     0.93,
+     0.92,
      0.85,
      0.83,
      0.47
     ],
-    "rank": 215
+    "rank": 216
    },
    {
     "id": "9485c4e5-8008-438b-990e-277659b12a9f",
@@ -10821,7 +10850,7 @@
      1.19,
      0.83
     ],
-    "rank": 216
+    "rank": 217
    },
    {
     "id": "19ab76f3-61c0-4997-a9d5-ad8535569302",
@@ -10847,7 +10876,7 @@
      0.99,
      0.88
     ],
-    "rank": 217
+    "rank": 218
    },
    {
     "id": "59caf405-c58c-4b29-912b-937418f05bb2",
@@ -10874,7 +10903,7 @@
      0.57,
      1.15
     ],
-    "rank": 218
+    "rank": 219
    },
    {
     "id": "625925bc-76a1-41ba-9b3e-ca0182f4457e",
@@ -10901,7 +10930,7 @@
      0.47,
      0.89
     ],
-    "rank": 219
+    "rank": 220
    },
    {
     "id": "b7187518-89a6-4a25-85c1-6f9e0d8ca3b3",
@@ -10928,7 +10957,7 @@
      0.49,
      1.13
     ],
-    "rank": 220
+    "rank": 221
    },
    {
     "id": "506b49b4-898e-4e3c-92ac-42aa9a2bd136",
@@ -10955,7 +10984,7 @@
      0.74,
      0.66
     ],
-    "rank": 221
+    "rank": 222
    },
    {
     "id": "05a20454-4ef7-44ca-b2a3-db77711b305a",
@@ -10983,7 +11012,7 @@
      0.96,
      1
     ],
-    "rank": 222
+    "rank": 223
    },
    {
     "id": "9a7c242a-0341-4167-ba4c-a4df67b0e3a4",
@@ -11010,7 +11039,7 @@
      0.83,
      1.77
     ],
-    "rank": 223
+    "rank": 224
    },
    {
     "id": "01363b8f-8b38-4dff-9446-497f7c8c0848",
@@ -11037,7 +11066,7 @@
      0.58,
      0.98
     ],
-    "rank": 224
+    "rank": 225
    },
    {
     "id": "0dad2dae-3258-451d-a1f7-3cbf5ec8d30f",
@@ -11057,13 +11086,13 @@
      0.56,
      0.81,
      0.71,
-     1.46,
+     1.45,
      1.2,
      1.33,
      0.57,
      0.62
     ],
-    "rank": 225
+    "rank": 226
    },
    {
     "id": "3119bda8-99ff-4916-a502-6951a5390326",
@@ -11081,7 +11110,7 @@
     "mvpPR": 0.1,
     "games": [
      0.63,
-     0.49,
+     0.48,
      0.9,
      1.1,
      1.22,
@@ -11089,7 +11118,7 @@
      0.93,
      0.78
     ],
-    "rank": 226
+    "rank": 227
    },
    {
     "id": "076fe988-ff58-4036-8044-964828881dcf",
@@ -11115,7 +11144,7 @@
      1.08,
      0.87
     ],
-    "rank": 227
+    "rank": 228
    },
    {
     "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
@@ -11142,7 +11171,34 @@
      1.07,
      1.11
     ],
-    "rank": 228
+    "rank": 229
+   },
+   {
+    "id": "d26355a5-1336-4925-ae3c-9f7684199e6f",
+    "name": "RustyVibe",
+    "team": "The Homies",
+    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
+    "maps": 9,
+    "ark": 0.97,
+    "arkRaw": 0.94,
+    "kd": 0.88,
+    "adr": 70,
+    "kpr": 0.63,
+    "entryPM": 0,
+    "clutch": 3,
+    "mvpPR": 0.09,
+    "games": [
+     0.37,
+     1.41,
+     0.84,
+     0.48,
+     1.27,
+     0.83,
+     0.95,
+     0.7,
+     1.42
+    ],
+    "rank": 230
    },
    {
     "id": "d1e0ad6f-0f6a-4a41-b2b3-7b71a3323bed",
@@ -11169,7 +11225,7 @@
      0.91,
      0.79
     ],
-    "rank": 229
+    "rank": 231
    },
    {
     "id": "df92ce89-d98b-45b8-8723-b92605970fbb",
@@ -11195,9 +11251,9 @@
      0.82,
      0.73,
      1.28,
-     0.93
+     0.92
     ],
-    "rank": 230
+    "rank": 232
    },
    {
     "id": "c04cfcf5-e92d-42b5-80a6-cfb9f4cbe6bd",
@@ -11225,7 +11281,7 @@
      0.91,
      0.87
     ],
-    "rank": 231
+    "rank": 233
    },
    {
     "id": "236246f5-3fb6-4a40-97c0-3eba299f1f54",
@@ -11251,7 +11307,7 @@
      0.69,
      0.89
     ],
-    "rank": 232
+    "rank": 234
    },
    {
     "id": "ac40fa63-ec4c-48f3-8c5a-49e82f6e5b37",
@@ -11279,7 +11335,7 @@
      1.03,
      1.38
     ],
-    "rank": 233
+    "rank": 235
    },
    {
     "id": "edba0b1b-66fb-42e2-8ece-7ce107968b8c",
@@ -11306,7 +11362,7 @@
      1.22,
      1.22
     ],
-    "rank": 234
+    "rank": 236
    },
    {
     "id": "55459473-6d7c-410e-ad62-840dd4021a34",
@@ -11334,7 +11390,7 @@
      0.82,
      0.82
     ],
-    "rank": 235
+    "rank": 237
    },
    {
     "id": "b61c4ab7-2a62-4978-b22d-832a60db8809",
@@ -11361,7 +11417,7 @@
      1.07,
      0.63
     ],
-    "rank": 236
+    "rank": 238
    },
    {
     "id": "d2c49d56-65e5-4d53-97db-76242a28622b",
@@ -11387,7 +11443,7 @@
      0.94,
      0.73
     ],
-    "rank": 237
+    "rank": 239
    },
    {
     "id": "ad922347-1177-460d-a254-ba500c30a2df",
@@ -11414,7 +11470,7 @@
      1.04,
      0.93
     ],
-    "rank": 238
+    "rank": 240
    },
    {
     "id": "771178ec-ad3d-4b13-9ceb-b9051a810298",
@@ -11440,7 +11496,7 @@
      0.82,
      1.1
     ],
-    "rank": 239
+    "rank": 241
    },
    {
     "id": "d67e4688-612a-4809-8cae-933a085217a7",
@@ -11468,7 +11524,7 @@
      0.89,
      1.16
     ],
-    "rank": 240
+    "rank": 242
    },
    {
     "id": "4e2762da-99e1-4c12-abd4-92576156ee13",
@@ -11494,7 +11550,7 @@
      1.09,
      1.15
     ],
-    "rank": 241
+    "rank": 243
    },
    {
     "id": "e616163e-ab09-470e-b7d9-6cf1ddaec09f",
@@ -11521,7 +11577,7 @@
      0.76,
      0.72
     ],
-    "rank": 242
+    "rank": 244
    },
    {
     "id": "5d1223f6-293b-4c9d-839e-0cadb6fc01b5",
@@ -11548,7 +11604,7 @@
      0.56,
      1.38
     ],
-    "rank": 243
+    "rank": 245
    },
    {
     "id": "576c8a27-4bb1-419f-82a6-69d4fde2d22e",
@@ -11574,7 +11630,7 @@
      1.1,
      0.32
     ],
-    "rank": 244
+    "rank": 246
    },
    {
     "id": "c7ff8620-25d4-4827-baad-c5c6644a793c",
@@ -11602,7 +11658,7 @@
      0.68,
      0.78
     ],
-    "rank": 245
+    "rank": 247
    },
    {
     "id": "a0203b92-7236-4862-88a9-cb1ef1babb4f",
@@ -11629,7 +11685,7 @@
      0.58,
      1.03
     ],
-    "rank": 246
+    "rank": 248
    },
    {
     "id": "861bb79c-f4f8-40a5-9e92-838b34271759",
@@ -11657,7 +11713,33 @@
      1.36,
      0.96
     ],
-    "rank": 247
+    "rank": 249
+   },
+   {
+    "id": "57cd8d2e-84c9-4430-ae28-bc57e7e719a2",
+    "name": "23k",
+    "team": "No Future Lifes Over",
+    "tid": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
+    "maps": 8,
+    "ark": 0.97,
+    "arkRaw": 0.92,
+    "kd": 0.9,
+    "adr": 77.9,
+    "kpr": 0.61,
+    "entryPM": -6,
+    "clutch": 0,
+    "mvpPR": 0.06,
+    "games": [
+     1.04,
+     0.73,
+     0.28,
+     0.67,
+     1.63,
+     1.41,
+     0.95,
+     0.63
+    ],
+    "rank": 250
    },
    {
     "id": "f61a7896-9ee8-40bd-aeea-d002f5a97576",
@@ -11685,7 +11767,7 @@
      0.65,
      0.28
     ],
-    "rank": 248
+    "rank": 251
    },
    {
     "id": "da2eee87-0e7f-4f92-938c-a55c779d87ff",
@@ -11712,7 +11794,7 @@
      0.81,
      0.67
     ],
-    "rank": 249
+    "rank": 252
    },
    {
     "id": "70799ad9-f650-4885-90b5-9f185e93fc26",
@@ -11739,7 +11821,7 @@
      0.88,
      1.06
     ],
-    "rank": 250
+    "rank": 253
    },
    {
     "id": "488a1351-84a3-4c27-87e8-5aaeb1806401",
@@ -11765,7 +11847,7 @@
      0.74,
      1.12
     ],
-    "rank": 251
+    "rank": 254
    },
    {
     "id": "bc2bca55-2eb0-485b-881b-10e60dcfeb4d",
@@ -11793,7 +11875,7 @@
      0.77,
      0.77
     ],
-    "rank": 252
+    "rank": 255
    },
    {
     "id": "58b86ae5-3d80-46ff-85c7-b54e8c443f55",
@@ -11820,7 +11902,7 @@
      0.79,
      1.4
     ],
-    "rank": 253
+    "rank": 256
    },
    {
     "id": "0463174f-14b0-4ce6-bcb0-23d3c4b73eef",
@@ -11848,7 +11930,7 @@
      0.63,
      0.98
     ],
-    "rank": 254
+    "rank": 257
    },
    {
     "id": "4e1b1b7c-7054-46af-b62c-a51aa02fff4c",
@@ -11870,13 +11952,13 @@
      0.94,
      0.96,
      0.9,
-     1.06,
+     1.07,
      1.25,
      1.09,
      0.56,
      0.66
     ],
-    "rank": 255
+    "rank": 258
    },
    {
     "id": "6c4bd750-905c-4bee-882e-15e0e5233859",
@@ -11904,7 +11986,7 @@
      0.58,
      0.9
     ],
-    "rank": 256
+    "rank": 259
    },
    {
     "id": "23c4bce4-cfbf-4468-96ec-0f4e617b534f",
@@ -11932,7 +12014,7 @@
      0.49,
      1.48
     ],
-    "rank": 257
+    "rank": 260
    },
    {
     "id": "1b348367-df28-4921-896a-7d9e686d8bdb",
@@ -11958,7 +12040,7 @@
      0.87,
      0.87
     ],
-    "rank": 258
+    "rank": 261
    },
    {
     "id": "cee09634-1d80-4175-beb6-068b1c9c3baa",
@@ -11986,7 +12068,7 @@
      0.7,
      1
     ],
-    "rank": 259
+    "rank": 262
    },
    {
     "id": "b3ac1554-0423-4da8-8d03-a76681e3cf75",
@@ -12006,13 +12088,13 @@
      0.65,
      0.92,
      1.09,
-     0.89,
+     0.9,
      0.59,
      1.17,
      0.76,
      1.32
     ],
-    "rank": 260
+    "rank": 263
    },
    {
     "id": "dca11c78-71fe-4911-a720-619a97d0f63e",
@@ -12040,7 +12122,7 @@
      0.61,
      0.55
     ],
-    "rank": 261
+    "rank": 264
    },
    {
     "id": "5e1659e1-eb43-4b40-a75d-e3de49e10897",
@@ -12068,7 +12150,7 @@
      0.81,
      0.95
     ],
-    "rank": 262
+    "rank": 265
    },
    {
     "id": "19b15713-f676-47a3-9611-5f08d8ae3c3a",
@@ -12096,22 +12178,22 @@
      0.48,
      0.64
     ],
-    "rank": 263
+    "rank": 266
    },
    {
     "id": "8d1f7d03-f21e-4059-9332-fb6fdd2397b4",
     "name": "Taysak",
     "team": "No Future Lifes Over",
     "tid": "a0e42f29-d916-4b91-91d8-9b73bfdccec1",
-    "maps": 9,
+    "maps": 10,
     "ark": 0.96,
-    "arkRaw": 0.94,
+    "arkRaw": 0.93,
     "kd": 0.88,
-    "adr": 61.5,
+    "adr": 62.4,
     "kpr": 0.56,
-    "entryPM": -10,
+    "entryPM": -8,
     "clutch": 4,
-    "mvpPR": 0.07,
+    "mvpPR": 0.08,
     "games": [
      1.05,
      0.89,
@@ -12121,9 +12203,10 @@
      0.71,
      1.36,
      1.34,
-     0.43
+     0.43,
+     0.87
     ],
-    "rank": 264
+    "rank": 267
    },
    {
     "id": "09c4db2b-5306-4b65-9504-54cd51216252",
@@ -12150,7 +12233,7 @@
      0.57,
      0.59
     ],
-    "rank": 265
+    "rank": 268
    },
    {
     "id": "ab3bd59d-2bf0-4088-a884-09d19bf1ba1c",
@@ -12177,33 +12260,7 @@
      0.81,
      0.85
     ],
-    "rank": 266
-   },
-   {
-    "id": "d26355a5-1336-4925-ae3c-9f7684199e6f",
-    "name": "RustyVibe",
-    "team": "The Homies",
-    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
-    "maps": 8,
-    "ark": 0.95,
-    "arkRaw": 0.88,
-    "kd": 0.81,
-    "adr": 67,
-    "kpr": 0.59,
-    "entryPM": -4,
-    "clutch": 2,
-    "mvpPR": 0.07,
-    "games": [
-     0.37,
-     1.41,
-     0.84,
-     0.48,
-     1.27,
-     0.83,
-     0.95,
-     0.7
-    ],
-    "rank": 267
+    "rank": 269
    },
    {
     "id": "3ddbb58b-6f57-4d73-b220-513ffecc95d3",
@@ -12229,7 +12286,7 @@
      0.84,
      0.97
     ],
-    "rank": 268
+    "rank": 270
    },
    {
     "id": "ee226e29-cce1-44ca-8c9e-3ad4d9aa9d35",
@@ -12256,7 +12313,7 @@
      0.88,
      0.85
     ],
-    "rank": 269
+    "rank": 271
    },
    {
     "id": "29a24819-f63d-4ae3-bfb5-d904732f7949",
@@ -12284,7 +12341,7 @@
      0.67,
      0.92
     ],
-    "rank": 270
+    "rank": 272
    },
    {
     "id": "77b3c88c-9fa4-4940-8416-83a79240338f",
@@ -12312,7 +12369,7 @@
      1.02,
      0.9
     ],
-    "rank": 271
+    "rank": 273
    },
    {
     "id": "42ab6dc0-edc0-462f-8414-9a0c83b3b61a",
@@ -12339,7 +12396,7 @@
      0.67,
      1.09
     ],
-    "rank": 272
+    "rank": 274
    },
    {
     "id": "48da5c10-74b4-43e3-a1ce-688bc99689b3",
@@ -12367,7 +12424,7 @@
      0.53,
      1.13
     ],
-    "rank": 273
+    "rank": 275
    },
    {
     "id": "26cc7f2b-c076-4120-8e0d-4bde235b7601",
@@ -12389,12 +12446,12 @@
      0.85,
      0.7,
      0.34,
-     1.02,
+     1.01,
      0.64,
      0.96,
      0.82
     ],
-    "rank": 274
+    "rank": 276
    },
    {
     "id": "85862bb9-7ead-439b-9834-de10ea12df70",
@@ -12420,7 +12477,7 @@
      0.42,
      0.6
     ],
-    "rank": 275
+    "rank": 277
    },
    {
     "id": "d89d8393-867a-4d6c-b507-ee63eb80cd23",
@@ -12447,7 +12504,7 @@
      0.66,
      1.12
     ],
-    "rank": 276
+    "rank": 278
    },
    {
     "id": "eb950d80-3c71-4677-9117-31d4b53020e6",
@@ -12473,7 +12530,7 @@
      1.03,
      1.09
     ],
-    "rank": 277
+    "rank": 279
    },
    {
     "id": "e6e49f41-c306-49cf-b41f-ea7361c8381a",
@@ -12499,7 +12556,7 @@
      0.78,
      1.44
     ],
-    "rank": 278
+    "rank": 280
    },
    {
     "id": "753406c2-375c-4982-ab71-16451c76664b",
@@ -12526,7 +12583,7 @@
      0.98,
      0.58
     ],
-    "rank": 279
+    "rank": 281
    },
    {
     "id": "ea06f514-5422-485e-83e3-69cf2b2c9d8c",
@@ -12552,7 +12609,7 @@
      0.9,
      0.81
     ],
-    "rank": 280
+    "rank": 282
    },
    {
     "id": "7fb064e9-27d7-4550-a153-76ac6af6aa95",
@@ -12578,7 +12635,7 @@
      0.86,
      1.44
     ],
-    "rank": 281
+    "rank": 283
    },
    {
     "id": "73d00627-67f3-4227-979a-0cf78005ed1c",
@@ -12606,7 +12663,7 @@
      0.76,
      0.41
     ],
-    "rank": 282
+    "rank": 284
    },
    {
     "id": "c0b08cf5-cdde-49f9-807d-e31097437464",
@@ -12634,7 +12691,7 @@
      1.42,
      0.75
     ],
-    "rank": 283
+    "rank": 285
    },
    {
     "id": "3fbe0c5d-450c-4624-b2a2-898f50009ada",
@@ -12660,7 +12717,7 @@
      0.34,
      1.16
     ],
-    "rank": 284
+    "rank": 286
    },
    {
     "id": "6b436961-7e56-43b9-af14-1f0bee58ff12",
@@ -12686,7 +12743,7 @@
      0.6,
      1.85
     ],
-    "rank": 285
+    "rank": 287
    },
    {
     "id": "71c3f1fe-5336-4ba3-b59d-18d46e6e2edb",
@@ -12707,13 +12764,13 @@
      0.78,
      0.72,
      0.72,
-     1.17,
+     1.18,
      0.67,
      1.18,
      0.29,
      0.94
     ],
-    "rank": 286
+    "rank": 288
    },
    {
     "id": "3c54241c-d067-4f21-9a4d-67350ce1309b",
@@ -12741,7 +12798,7 @@
      0.94,
      1.2
     ],
-    "rank": 287
+    "rank": 289
    },
    {
     "id": "87c9c569-ae98-4d54-ab65-48fa0450b93f",
@@ -12767,7 +12824,7 @@
      0.96,
      0.36
     ],
-    "rank": 288
+    "rank": 290
    },
    {
     "id": "1dbc818f-8dff-4773-9548-d60a04cb183f",
@@ -12795,7 +12852,7 @@
      0.66,
      1.01
     ],
-    "rank": 289
+    "rank": 291
    },
    {
     "id": "adf6c584-9fde-4fcd-b600-a3c6d832dc9d",
@@ -12823,7 +12880,7 @@
      0.65,
      0.89
     ],
-    "rank": 290
+    "rank": 292
    },
    {
     "id": "ed1c57f4-f096-405a-9ffb-92371e4fd72f",
@@ -12849,7 +12906,7 @@
      0.84,
      0.94
     ],
-    "rank": 291
+    "rank": 293
    },
    {
     "id": "e1e15bdb-bd14-419a-a5bf-4cbffa16ec51",
@@ -12877,7 +12934,7 @@
      0.96,
      1.05
     ],
-    "rank": 292
+    "rank": 294
    },
    {
     "id": "88cd14b1-2fbf-4f1a-b9e3-50cc1f318d05",
@@ -12903,7 +12960,7 @@
      0.87,
      0.58
     ],
-    "rank": 293
+    "rank": 295
    },
    {
     "id": "845c1a53-4eb8-474d-b5b9-aaa1c6c77909",
@@ -12929,7 +12986,7 @@
      0.75,
      0.44
     ],
-    "rank": 294
+    "rank": 296
    },
    {
     "id": "c250c9f2-8d94-4509-99f3-48b899d45602",
@@ -12956,7 +13013,7 @@
      1.2,
      1.26
     ],
-    "rank": 295
+    "rank": 297
    },
    {
     "id": "0ca245b5-161d-4a82-a016-345809824d07",
@@ -12983,33 +13040,7 @@
      1.37,
      0.31
     ],
-    "rank": 296
-   },
-   {
-    "id": "1d6fd64e-d50e-4d42-aa46-da4aa3cabb13",
-    "name": "Balto-",
-    "team": "The Homies",
-    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
-    "maps": 8,
-    "ark": 0.93,
-    "arkRaw": 0.84,
-    "kd": 0.78,
-    "adr": 65.5,
-    "kpr": 0.56,
-    "entryPM": -8,
-    "clutch": 2,
-    "mvpPR": 0.06,
-    "games": [
-     0.46,
-     0.94,
-     1.02,
-     0.43,
-     0.73,
-     1.19,
-     1.08,
-     0.69
-    ],
-    "rank": 297
+    "rank": 298
    },
    {
     "id": "c4fec783-4bb9-4e08-84fd-6705926b6323",
@@ -13036,7 +13067,7 @@
      1.33,
      0.67
     ],
-    "rank": 298
+    "rank": 299
    },
    {
     "id": "d6243ed5-476e-4f54-b1c1-fe126cb1e850",
@@ -13064,7 +13095,7 @@
      1.11,
      0.69
     ],
-    "rank": 299
+    "rank": 300
    },
    {
     "id": "e5b53fd8-b45b-4dba-a579-72d8482a570a",
@@ -13090,7 +13121,7 @@
      0.87,
      0.14
     ],
-    "rank": 300
+    "rank": 301
    },
    {
     "id": "d115e863-0b61-416d-b728-ecfa7ae79e8a",
@@ -13117,7 +13148,7 @@
      1.1,
      1.13
     ],
-    "rank": 301
+    "rank": 302
    },
    {
     "id": "8321290a-8b06-4118-be7a-fed3f769b52a",
@@ -13143,7 +13174,7 @@
      0.93,
      1.17
     ],
-    "rank": 302
+    "rank": 303
    },
    {
     "id": "6a063821-0141-42b6-a8d5-4e2202d7b2cc",
@@ -13169,7 +13200,7 @@
      1.01,
      1.22
     ],
-    "rank": 303
+    "rank": 304
    },
    {
     "id": "eb349f8d-3c0b-4704-befe-725002d38955",
@@ -13188,14 +13219,14 @@
     "games": [
      0.57,
      0.98,
-     0.82,
+     0.83,
      0.5,
      1.02,
      1.35,
      0.76,
      0.65
     ],
-    "rank": 304
+    "rank": 305
    },
    {
     "id": "949181ba-0881-4c53-a409-0f02fbc87a99",
@@ -13223,7 +13254,7 @@
      0.76,
      0.94
     ],
-    "rank": 305
+    "rank": 306
    },
    {
     "id": "db83f228-7a19-4b06-9b01-a19c3e3e7756",
@@ -13251,7 +13282,7 @@
      1.31,
      0.5
     ],
-    "rank": 306
+    "rank": 307
    },
    {
     "id": "d3b17c3e-7854-4c00-8f4f-a94b06206764",
@@ -13278,7 +13309,7 @@
      1.04,
      0.95
     ],
-    "rank": 307
+    "rank": 308
    },
    {
     "id": "4154f6a7-5a63-4575-8ade-6dea692839c3",
@@ -13306,7 +13337,7 @@
      0.95,
      0.64
     ],
-    "rank": 308
+    "rank": 309
    },
    {
     "id": "49dfbc24-dfed-4500-b89a-b3c3e52391a0",
@@ -13334,7 +13365,7 @@
      1.03,
      0.94
     ],
-    "rank": 309
+    "rank": 310
    },
    {
     "id": "74d295b7-565e-4c6b-97b3-c198bfbe428a",
@@ -13360,7 +13391,7 @@
      0.91,
      0.71
     ],
-    "rank": 310
+    "rank": 311
    },
    {
     "id": "865460fd-07cf-4217-ae75-a68810679987",
@@ -13388,7 +13419,7 @@
      0.98,
      0.52
     ],
-    "rank": 311
+    "rank": 312
    },
    {
     "id": "f66fce00-ef2e-4566-b602-2d695bec8777",
@@ -13416,7 +13447,7 @@
      1.09,
      1.19
     ],
-    "rank": 312
+    "rank": 313
    },
    {
     "id": "f31a8e39-63f3-421f-a516-5b8c89d00d0d",
@@ -13443,7 +13474,7 @@
      1.1,
      0.93
     ],
-    "rank": 313
+    "rank": 314
    },
    {
     "id": "244be7dd-8739-40f4-bdb5-a0f8b3abf38e",
@@ -13469,7 +13500,7 @@
      0.85,
      0.74
     ],
-    "rank": 314
+    "rank": 315
    },
    {
     "id": "22ae2f5d-2049-41e2-9a77-0e2842027631",
@@ -13496,7 +13527,7 @@
      0.78,
      0.63
     ],
-    "rank": 315
+    "rank": 316
    },
    {
     "id": "7ebb7aa0-4bf3-41cd-8cf5-2a97e7029ced",
@@ -13523,7 +13554,7 @@
      0.84,
      0.52
     ],
-    "rank": 316
+    "rank": 317
    },
    {
     "id": "1fedab4f-a878-4505-919d-918286cd0aab",
@@ -13541,7 +13572,7 @@
     "mvpPR": 0.08,
     "games": [
      0.48,
-     1.21,
+     1.2,
      0.59,
      0.75,
      0.96,
@@ -13551,7 +13582,7 @@
      1.05,
      1.39
     ],
-    "rank": 317
+    "rank": 318
    },
    {
     "id": "5c9c8352-93b3-4f1d-a0c4-0f39dff65485",
@@ -13579,7 +13610,34 @@
      1.1,
      1.07
     ],
-    "rank": 318
+    "rank": 319
+   },
+   {
+    "id": "1d6fd64e-d50e-4d42-aa46-da4aa3cabb13",
+    "name": "Balto-",
+    "team": "The Homies",
+    "tid": "e7f802f2-96fa-4389-8287-affd27a43ce1",
+    "maps": 9,
+    "ark": 0.91,
+    "arkRaw": 0.81,
+    "kd": 0.74,
+    "adr": 62.4,
+    "kpr": 0.53,
+    "entryPM": -10,
+    "clutch": 2,
+    "mvpPR": 0.06,
+    "games": [
+     0.46,
+     0.94,
+     1.02,
+     0.43,
+     0.73,
+     1.19,
+     1.08,
+     0.69,
+     0.59
+    ],
+    "rank": 320
    },
    {
     "id": "9606912c-6a15-4acd-acb4-20ad92d3a011",
@@ -13605,7 +13663,7 @@
      1.03,
      0.5
     ],
-    "rank": 319
+    "rank": 321
    },
    {
     "id": "b19112af-ca05-4433-9372-57d2f622e7ae",
@@ -13632,7 +13690,7 @@
      1.02,
      0
     ],
-    "rank": 320
+    "rank": 322
    },
    {
     "id": "486acb3a-bd09-468a-8c33-da00f602a54a",
@@ -13658,7 +13716,7 @@
      0.79,
      0.42
     ],
-    "rank": 321
+    "rank": 323
    },
    {
     "id": "3ad53a56-01e1-4fe7-b4be-944dfaabf043",
@@ -13684,7 +13742,7 @@
      0.63,
      0.85
     ],
-    "rank": 322
+    "rank": 324
    },
    {
     "id": "f89b6392-d079-404d-89d4-ab302ce566ac",
@@ -13711,7 +13769,7 @@
      0.88,
      0.84
     ],
-    "rank": 323
+    "rank": 325
    },
    {
     "id": "2500b169-da2b-4d24-ac1c-d92094a2e022",
@@ -13737,7 +13795,7 @@
      0.32,
      0.89
     ],
-    "rank": 324
+    "rank": 326
    },
    {
     "id": "b3166dde-4247-48fa-ab21-ffa7633a2988",
@@ -13765,7 +13823,7 @@
      0.9,
      0.92
     ],
-    "rank": 325
+    "rank": 327
    },
    {
     "id": "f027cc1e-2b43-419a-9070-9fa28c270c80",
@@ -13792,7 +13850,7 @@
      1.2,
      0.62
     ],
-    "rank": 326
+    "rank": 328
    },
    {
     "id": "bca399f7-2c5c-4b29-9abe-03cfa69951d9",
@@ -13819,7 +13877,7 @@
      0.89,
      0.74
     ],
-    "rank": 327
+    "rank": 329
    },
    {
     "id": "b22deea8-bc4a-414c-9366-dde0ee20f511",
@@ -13846,7 +13904,7 @@
      0.78,
      0.68
     ],
-    "rank": 328
+    "rank": 330
    },
    {
     "id": "76001e64-827d-4642-bc44-eca4ca1a1904",
@@ -13873,7 +13931,7 @@
      0.04,
      0.66
     ],
-    "rank": 329
+    "rank": 331
    },
    {
     "id": "3525d187-fb11-4076-9a76-896e64dc7d1e",
@@ -13899,7 +13957,7 @@
      0.35,
      1.04
     ],
-    "rank": 330
+    "rank": 332
    },
    {
     "id": "b3b9c6f1-fd07-4754-b08d-0e04ab821844",
@@ -13925,7 +13983,7 @@
      0.74,
      0.25
     ],
-    "rank": 331
+    "rank": 333
    },
    {
     "id": "f79d3dc0-ea4a-4489-93b2-b9b8c0363648",
@@ -13952,7 +14010,7 @@
      0.79,
      1.21
     ],
-    "rank": 332
+    "rank": 334
    },
    {
     "id": "7ea525ea-4f7f-4996-8dd1-8a76fed73a4e",
@@ -13979,7 +14037,7 @@
      0.47,
      0.9
     ],
-    "rank": 333
+    "rank": 335
    },
    {
     "id": "9f567ce2-3126-44df-b819-3bf6f0eb84a5",
@@ -14005,7 +14063,7 @@
      1.31,
      0.38
     ],
-    "rank": 334
+    "rank": 336
    },
    {
     "id": "42010414-ad90-4d71-8b0d-bc5c3d216dd8",
@@ -14031,7 +14089,7 @@
      0.82,
      0.39
     ],
-    "rank": 335
+    "rank": 337
    },
    {
     "id": "f03cbad2-29bf-45b0-81bc-17e5cc5ca8eb",
@@ -14059,7 +14117,7 @@
      0.87,
      0.6
     ],
-    "rank": 336
+    "rank": 338
    },
    {
     "id": "c3bf1af0-8d85-400e-9c9e-4aa95900f668",
@@ -14085,7 +14143,7 @@
      0.5,
      1.01
     ],
-    "rank": 337
+    "rank": 339
    },
    {
     "id": "c153a482-89f0-4fee-8f30-3a4fedff404b",
@@ -14113,7 +14171,7 @@
      0.44,
      0.57
     ],
-    "rank": 338
+    "rank": 340
    }
   ],
   "need": 8,
@@ -14122,12 +14180,12 @@
  },
  "arkModel": {
   "fitted": true,
-  "maps": 3103,
+  "maps": 3104,
   "r2": 0.918,
   "beta": {
    "kpr": 0.125,
    "dpr": -0.121,
-   "adr": 0.038,
+   "adr": 0.037,
    "mks": 0.048,
    "entry": 0.011,
    "clutch": 0.2,
@@ -14153,12 +14211,12 @@
     "id": "8f7cdc70-85f6-452c-9a02-51a7d3d17934",
     "name": "puggin4seb",
     "avatar": "https://distribution.faceit-cdn.net/images/3919c287-8cd2-43db-9eb7-5d1718a595a0.jpg",
-    "rank": 41,
+    "rank": 42,
     "tied": false,
     "rec": "5-5",
     "prank": 56
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -14406,7 +14464,7 @@
        "resid": 0.003091397849462365,
        "country": "us",
        "rating": 0.66,
-       "swing": -6.1,
+       "swing": -6,
        "parts": {
         "kpr": -4.2,
         "dpr": -0.4,
@@ -14421,7 +14479,7 @@
         "usr": 0,
         "team": 0.3
        },
-       "rwa": -7.1
+       "rwa": -7
       }
      ],
      "opp": [
@@ -14689,7 +14747,7 @@
     13,
     11
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-74e1fe7f-1b97-4ab0-8044-299c99b362da",
@@ -14708,7 +14766,7 @@
     "rec": "4-6",
     "prank": 67
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -15239,7 +15297,7 @@
     13,
     3
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-9b460705-97fa-4ebf-8f6e-eab4f6e5625f",
@@ -15258,7 +15316,7 @@
     "rec": "6-4",
     "prank": 21
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -15771,7 +15829,7 @@
         "mks": -1.1,
         "entry": -0.1,
         "clutch": -0.4,
-        "apr": 0.4,
+        "apr": 0.3,
         "fpr": 0,
         "udr": 0,
         "fsr": 0.3,
@@ -15789,7 +15847,7 @@
     5,
     13
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-1c946860-c351-4313-af34-8bc13b10a9c1",
@@ -15808,7 +15866,7 @@
     "rec": "8-2",
     "prank": 3
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -16339,7 +16397,7 @@
     10,
     13
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-0035c6e5-e290-4ea5-8c0a-ad3005d09bf0",
@@ -16353,12 +16411,12 @@
     "id": "042d11d1-1739-481b-8e53-6de20a2209ea",
     "name": "Wiggle Peeks",
     "avatar": "https://distribution.faceit-cdn.net/images/4887d29c-9955-45ef-bde8-81a1e7c2d2dd.jpg",
-    "rank": 35,
+    "rank": 36,
     "tied": false,
     "rec": "5-5",
     "prank": 34
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -16461,7 +16519,7 @@
         "mks": -0.1,
         "entry": 0,
         "clutch": 0.7,
-        "apr": 0.2,
+        "apr": 0.1,
         "fpr": 0,
         "udr": 0,
         "fsr": 0.6,
@@ -16820,7 +16878,7 @@
         "mks": -0.6,
         "entry": -0.1,
         "clutch": 0.7,
-        "apr": 0.2,
+        "apr": 0.1,
         "fpr": 0,
         "udr": 0,
         "fsr": -0.2,
@@ -16889,7 +16947,7 @@
     16,
     12
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-52c64d11-020f-413f-82fb-527d01a22f9f",
@@ -16908,7 +16966,7 @@
     "rec": "9-1",
     "prank": 1
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -17160,7 +17218,7 @@
        "parts": {
         "kpr": -5.4,
         "dpr": -2.1,
-        "adr": -1.3,
+        "adr": -1.2,
         "mks": -1.1,
         "entry": 0,
         "clutch": -0.4,
@@ -17439,7 +17497,7 @@
     5,
     13
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-a5dc2ec3-b566-4416-b150-dcae6a0abf0d",
@@ -17453,12 +17511,12 @@
     "id": "e7f802f2-96fa-4389-8287-affd27a43ce1",
     "name": "The Homies",
     "avatar": "https://distribution.faceit-cdn.net/images/28ac9064-f531-420f-b08d-6a52ba6d577d.jpg",
-    "rank": 51,
+    "rank": 34,
     "tied": false,
-    "rec": "4-4",
-    "prank": 38
+    "rec": "5-4",
+    "prank": 35
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -17989,7 +18047,7 @@
     9,
     13
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-82ab6252-9a28-437e-9237-23989806ce38",
@@ -18008,7 +18066,7 @@
     "rec": "4-6",
     "prank": 69
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -18539,7 +18597,7 @@
     13,
     10
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-d5d6f67b-ce27-4e01-999c-338a59e6a187",
@@ -18558,7 +18616,7 @@
     "rec": "7-3",
     "prank": 18
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [
     {
@@ -18755,7 +18813,7 @@
        "resid": -0.007369614512471655,
        "country": "us",
        "rating": 0.69,
-       "swing": -5.7,
+       "swing": -5.6,
        "parts": {
         "kpr": -3.6,
         "dpr": 0.6,
@@ -18770,7 +18828,7 @@
         "usr": 0,
         "team": -0.7
        },
-       "rwa": -3.9
+       "rwa": -3.8
       },
       {
        "name": "LAURSEN_111",
@@ -19089,7 +19147,7 @@
     8,
     13
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-11db6982-b07a-4630-bfdc-4a48300f70b4",
@@ -19108,7 +19166,7 @@
     "rec": "3-6",
     "prank": 61
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [],
    "result": "W",
@@ -19116,7 +19174,7 @@
     1,
     0
    ],
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-59a80420-0edf-4596-b1d4-9f34c66d63e6",
@@ -19135,12 +19193,12 @@
     "rec": "3-6",
     "prank": 51
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [],
    "result": null,
    "score": null,
-   "prank": 35
+   "prank": 36
   },
   {
    "id": "1-4aec23ee-2a1e-44f8-9ba6-2f719ad181fc",
@@ -19154,17 +19212,17 @@
     "id": "803850b4-dfc0-469a-92bf-cdcd90f31200",
     "name": "TheMotherLovers",
     "avatar": "https://distribution.faceit-cdn.net/images/1b52ce1e-dca1-4a21-94d7-afaf456d3eaa.jpeg",
-    "rank": 45,
+    "rank": 46,
     "tied": false,
     "rec": "5-5",
     "prank": 19
    },
-   "rank": 43,
+   "rank": 44,
    "best_of": 1,
    "maps": [],
    "result": null,
    "score": null,
-   "prank": 35
+   "prank": 36
   }
  ],
  "pool": [
@@ -19620,7 +19678,7 @@
    "hltv": 0.69,
    "impact": 0.58,
    "rating": 0.69,
-   "swing": -5.7,
+   "swing": -5.6,
    "parts": {
     "kpr": -3.6,
     "dpr": 0.6,
@@ -19771,6 +19829,639 @@
   },
   "roster": [
    {
+    "nickname": "Yo1nky",
+    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
+    "country": "us",
+    "level": 10,
+    "elo": 2032,
+    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg",
+    "role": {
+     "role": "hybrid AWP / lurker",
+     "sniper": 0.15,
+     "entry": 0.23,
+     "flash": 0.31,
+     "util": 0.4,
+     "clutch": 0.076,
+     "maps": 36,
+     "days": 90
+    },
+    "trend": {
+     "last20": 1.22,
+     "last100": 1.26,
+     "delta": -0.04,
+     "flag": null
+    },
+    "form": 1.26,
+    "formMaps": 36,
+    "talent": {
+     "exact": 3.88,
+     "stars": 4
+    },
+    "rolling": {
+     "all": {
+      "maps": 36,
+      "ark": 1.26,
+      "kd": 1.45,
+      "kpr": 0.96,
+      "adr": 96.5,
+      "entryPM": 62,
+      "clutch": 18,
+      "multi": 65,
+      "udr": 4.9,
+      "fpr": 0.21,
+      "entryPlus": 126,
+      "duelPlus": 124,
+      "multiPlus": 128,
+      "clutchPlus": 104,
+      "utilPlus": 99,
+      "awpPlus": 108,
+      "survPlus": 112,
+      "entryPct": 67
+     },
+     "official": {
+      "maps": 2,
+      "ark": 0.96,
+      "kd": 0.74,
+      "kpr": 0.63,
+      "adr": 57.2,
+      "entryPM": 4,
+      "clutch": 1,
+      "multi": 1,
+      "udr": 1.8,
+      "fpr": 0.17,
+      "entryPlus": 126,
+      "duelPlus": 80,
+      "multiPlus": 79,
+      "clutchPlus": 107,
+      "utilPlus": 108,
+      "awpPlus": 91,
+      "survPlus": 66,
+      "entryPct": 75
+     },
+     "pug": {
+      "maps": 33,
+      "ark": 1.29,
+      "kd": 1.51,
+      "kpr": 0.99,
+      "adr": 99.8,
+      "entryPM": 58,
+      "clutch": 17,
+      "multi": 64,
+      "udr": 5.1,
+      "fpr": 0.22,
+      "entryPlus": 126,
+      "duelPlus": 128,
+      "multiPlus": 132,
+      "clutchPlus": 105,
+      "utilPlus": 99,
+      "awpPlus": 109,
+      "survPlus": 115,
+      "entryPct": 67
+     },
+     "scrim": {
+      "maps": 1,
+      "ark": 0.86,
+      "kd": 0.93,
+      "kpr": 0.61,
+      "adr": 63.5,
+      "entryPM": 0,
+      "clutch": 0,
+      "multi": 0,
+      "udr": 3.1,
+      "fpr": 0,
+      "entryPlus": 98,
+      "duelPlus": 90,
+      "multiPlus": 76,
+      "clutchPlus": null,
+      "utilPlus": 69,
+      "awpPlus": 91,
+      "survPlus": 115,
+      "entryPct": 50
+     }
+    },
+    "plus": {
+     "entryPlus": 126,
+     "duelPlus": 124,
+     "multiPlus": 128,
+     "clutchPlus": 104,
+     "utilPlus": 99,
+     "awpPlus": 108,
+     "survPlus": 112,
+     "entryPct": 67
+    }
+   },
+   {
+    "nickname": "Beasty_",
+    "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
+    "country": "us",
+    "level": 10,
+    "elo": 2198,
+    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg",
+    "role": {
+     "role": "support",
+     "sniper": 0.02,
+     "entry": 0.18,
+     "flash": 0.73,
+     "util": 0.37,
+     "clutch": 0.043,
+     "maps": 44,
+     "days": 90
+    },
+    "trend": {
+     "last20": 0.85,
+     "last100": 0.93,
+     "delta": -0.08,
+     "flag": "cold"
+    },
+    "form": 0.93,
+    "formMaps": 44,
+    "talent": {
+     "exact": 2.42,
+     "stars": 2.5
+    },
+    "rolling": {
+     "all": {
+      "maps": 44,
+      "ark": 0.93,
+      "kd": 0.84,
+      "kpr": 0.63,
+      "adr": 70.2,
+      "entryPM": -35,
+      "clutch": 13,
+      "multi": 32,
+      "udr": 2.7,
+      "fpr": 0.45,
+      "entryPlus": 83,
+      "duelPlus": 87,
+      "multiPlus": 87,
+      "clutchPlus": 100,
+      "utilPlus": 98,
+      "awpPlus": 92,
+      "survPlus": 91,
+      "entryPct": 40
+     },
+     "official": {
+      "maps": 12,
+      "ark": 0.92,
+      "kd": 0.77,
+      "kpr": 0.56,
+      "adr": 63,
+      "entryPM": -14,
+      "clutch": 3,
+      "multi": 7,
+      "udr": 2,
+      "fpr": 0.58,
+      "entryPlus": 76,
+      "duelPlus": 82,
+      "multiPlus": 77,
+      "clutchPlus": 103,
+      "utilPlus": 100,
+      "awpPlus": 93,
+      "survPlus": 98,
+      "entryPct": 34
+     },
+     "pug": {
+      "maps": 6,
+      "ark": 1.06,
+      "kd": 1.11,
+      "kpr": 0.84,
+      "adr": 86.4,
+      "entryPM": -1,
+      "clutch": 3,
+      "multi": 8,
+      "udr": 3.1,
+      "fpr": 0.33,
+      "entryPlus": 95,
+      "duelPlus": 110,
+      "multiPlus": 115,
+      "clutchPlus": 107,
+      "utilPlus": 94,
+      "awpPlus": 95,
+      "survPlus": 89,
+      "entryPct": 48
+     },
+     "scrim": {
+      "maps": 26,
+      "ark": 0.92,
+      "kd": 0.81,
+      "kpr": 0.61,
+      "adr": 69.9,
+      "entryPM": -20,
+      "clutch": 7,
+      "multi": 17,
+      "udr": 2.9,
+      "fpr": 0.42,
+      "entryPlus": 84,
+      "duelPlus": 85,
+      "multiPlus": 85,
+      "clutchPlus": 97,
+      "utilPlus": 97,
+      "awpPlus": 91,
+      "survPlus": 89,
+      "entryPct": 40
+     }
+    },
+    "plus": {
+     "entryPlus": 83,
+     "duelPlus": 87,
+     "multiPlus": 87,
+     "clutchPlus": 100,
+     "utilPlus": 98,
+     "awpPlus": 92,
+     "survPlus": 91,
+     "entryPct": 40
+    }
+   },
+   {
+    "nickname": "rezzah",
+    "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
+    "country": "ca",
+    "level": 9,
+    "elo": 1991,
+    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg",
+    "role": {
+     "role": "rifler",
+     "sniper": 0.02,
+     "entry": 0.23,
+     "flash": 0.31,
+     "util": 0.28,
+     "clutch": 0.029,
+     "maps": 32,
+     "days": 90
+    },
+    "trend": {
+     "last20": 0.89,
+     "last100": 0.91,
+     "delta": -0.02,
+     "flag": null
+    },
+    "form": 0.91,
+    "formMaps": 32,
+    "talent": {
+     "exact": 2.08,
+     "stars": 2
+    },
+    "rolling": {
+     "all": {
+      "maps": 32,
+      "ark": 0.91,
+      "kd": 0.82,
+      "kpr": 0.62,
+      "adr": 71.8,
+      "entryPM": 3,
+      "clutch": 5,
+      "multi": 31,
+      "udr": 2.5,
+      "fpr": 0.17,
+      "entryPlus": 99,
+      "duelPlus": 83,
+      "multiPlus": 90,
+      "clutchPlus": 93,
+      "utilPlus": 87,
+      "awpPlus": 93,
+      "survPlus": 89,
+      "entryPct": 51
+     },
+     "official": {
+      "maps": 7,
+      "ark": 0.93,
+      "kd": 0.79,
+      "kpr": 0.59,
+      "adr": 69.3,
+      "entryPM": 3,
+      "clutch": 2,
+      "multi": 7,
+      "udr": 4.8,
+      "fpr": 0.16,
+      "entryPlus": 105,
+      "duelPlus": 80,
+      "multiPlus": 87,
+      "clutchPlus": 98,
+      "utilPlus": 93,
+      "awpPlus": 92,
+      "survPlus": 91,
+      "entryPct": 55
+     },
+     "pug": {
+      "maps": 11,
+      "ark": 1.06,
+      "kd": 1.09,
+      "kpr": 0.81,
+      "adr": 88.1,
+      "entryPM": 15,
+      "clutch": 3,
+      "multi": 19,
+      "udr": 2.3,
+      "fpr": 0.16,
+      "entryPlus": 121,
+      "duelPlus": 103,
+      "multiPlus": 110,
+      "clutchPlus": 102,
+      "utilPlus": 85,
+      "awpPlus": 95,
+      "survPlus": 93,
+      "entryPct": 63
+     },
+     "scrim": {
+      "maps": 14,
+      "ark": 0.85,
+      "kd": 0.67,
+      "kpr": 0.52,
+      "adr": 62.5,
+      "entryPM": -15,
+      "clutch": 0,
+      "multi": 5,
+      "udr": 1.7,
+      "fpr": 0.17,
+      "entryPlus": 81,
+      "duelPlus": 72,
+      "multiPlus": 78,
+      "clutchPlus": 83,
+      "utilPlus": 87,
+      "awpPlus": 91,
+      "survPlus": 85,
+      "entryPct": 39
+     }
+    },
+    "plus": {
+     "entryPlus": 99,
+     "duelPlus": 83,
+     "multiPlus": 90,
+     "clutchPlus": 93,
+     "utilPlus": 87,
+     "awpPlus": 93,
+     "survPlus": 89,
+     "entryPct": 51
+    }
+   },
+   {
+    "nickname": "-TMoney-",
+    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
+    "country": "us",
+    "level": 10,
+    "elo": 2084,
+    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg",
+    "role": null,
+    "trend": null,
+    "form": null,
+    "formMaps": 0,
+    "talent": {
+     "exact": 2.1,
+     "stars": 2
+    },
+    "rolling": {
+     "all": null,
+     "official": null,
+     "pug": null,
+     "scrim": null
+    },
+    "plus": {}
+   },
+   {
+    "nickname": "mf_",
+    "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+    "country": "us",
+    "level": 10,
+    "elo": 2376,
+    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg",
+    "role": {
+     "role": "AWPer",
+     "sniper": 0.39,
+     "entry": 0.18,
+     "flash": 0.4,
+     "util": 0.44,
+     "clutch": 0.086,
+     "maps": 75,
+     "days": 90
+    },
+    "trend": {
+     "last20": 1.06,
+     "last100": 1.03,
+     "delta": 0.03,
+     "flag": null
+    },
+    "form": 1.03,
+    "formMaps": 75,
+    "talent": {
+     "exact": 3.14,
+     "stars": 3
+    },
+    "rolling": {
+     "all": {
+      "maps": 75,
+      "ark": 1.03,
+      "kd": 1.06,
+      "kpr": 0.69,
+      "adr": 72,
+      "entryPM": 50,
+      "clutch": 40,
+      "multi": 65,
+      "udr": 4.3,
+      "fpr": 0.24,
+      "entryPlus": 111,
+      "duelPlus": 97,
+      "multiPlus": 95,
+      "clutchPlus": 104,
+      "utilPlus": 96,
+      "awpPlus": 127,
+      "survPlus": 115,
+      "entryPct": 59
+     },
+     "official": {
+      "maps": 18,
+      "ark": 0.98,
+      "kd": 0.98,
+      "kpr": 0.63,
+      "adr": 67.3,
+      "entryPM": 9,
+      "clutch": 9,
+      "multi": 14,
+      "udr": 4.4,
+      "fpr": 0.29,
+      "entryPlus": 109,
+      "duelPlus": 91,
+      "multiPlus": 92,
+      "clutchPlus": 102,
+      "utilPlus": 98,
+      "awpPlus": 119,
+      "survPlus": 117,
+      "entryPct": 59
+     },
+     "pug": {
+      "maps": 15,
+      "ark": 0.96,
+      "kd": 0.92,
+      "kpr": 0.64,
+      "adr": 69.6,
+      "entryPM": -1,
+      "clutch": 6,
+      "multi": 6,
+      "udr": 4.7,
+      "fpr": 0.22,
+      "entryPlus": 97,
+      "duelPlus": 90,
+      "multiPlus": 88,
+      "clutchPlus": 101,
+      "utilPlus": 98,
+      "awpPlus": 116,
+      "survPlus": 105,
+      "entryPct": 49
+     },
+     "scrim": {
+      "maps": 42,
+      "ark": 1.07,
+      "kd": 1.14,
+      "kpr": 0.73,
+      "adr": 74.8,
+      "entryPM": 42,
+      "clutch": 25,
+      "multi": 45,
+      "udr": 4,
+      "fpr": 0.23,
+      "entryPlus": 116,
+      "duelPlus": 102,
+      "multiPlus": 98,
+      "clutchPlus": 107,
+      "utilPlus": 95,
+      "awpPlus": 134,
+      "survPlus": 118,
+      "entryPct": 62
+     }
+    },
+    "plus": {
+     "entryPlus": 111,
+     "duelPlus": 97,
+     "multiPlus": 95,
+     "clutchPlus": 104,
+     "utilPlus": 96,
+     "awpPlus": 127,
+     "survPlus": 115,
+     "entryPct": 59
+    }
+   },
+   {
+    "nickname": "Saintz",
+    "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
+    "country": "us",
+    "level": 10,
+    "elo": 2424,
+    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg",
+    "role": {
+     "role": "rifler",
+     "sniper": 0,
+     "entry": 0.21,
+     "flash": 0.43,
+     "util": 0.28,
+     "clutch": 0.04,
+     "maps": 65,
+     "days": 90
+    },
+    "trend": {
+     "last20": 1.01,
+     "last100": 1.08,
+     "delta": -0.07,
+     "flag": null
+    },
+    "form": 1.08,
+    "formMaps": 65,
+    "talent": {
+     "exact": 3.45,
+     "stars": 3.5
+    },
+    "rolling": {
+     "all": {
+      "maps": 65,
+      "ark": 1.08,
+      "kd": 1.1,
+      "kpr": 0.77,
+      "adr": 82,
+      "entryPM": -3,
+      "clutch": 24,
+      "multi": 87,
+      "udr": 2.4,
+      "fpr": 0.27,
+      "entryPlus": 97,
+      "duelPlus": 106,
+      "multiPlus": 105,
+      "clutchPlus": 110,
+      "utilPlus": 92,
+      "awpPlus": 91,
+      "survPlus": 102,
+      "entryPct": 50
+     },
+     "official": {
+      "maps": 18,
+      "ark": 0.99,
+      "kd": 0.99,
+      "kpr": 0.71,
+      "adr": 75.6,
+      "entryPM": 6,
+      "clutch": 0,
+      "multi": 24,
+      "udr": 1.9,
+      "fpr": 0.26,
+      "entryPlus": 103,
+      "duelPlus": 96,
+      "multiPlus": 100,
+      "clutchPlus": 77,
+      "utilPlus": 89,
+      "awpPlus": 91,
+      "survPlus": 99,
+      "entryPct": 53
+     },
+     "pug": {
+      "maps": 5,
+      "ark": 1.11,
+      "kd": 1.36,
+      "kpr": 0.93,
+      "adr": 88.2,
+      "entryPM": 0,
+      "clutch": 3,
+      "multi": 9,
+      "udr": 1.5,
+      "fpr": 0.31,
+      "entryPlus": 98,
+      "duelPlus": 123,
+      "multiPlus": 122,
+      "clutchPlus": 116,
+      "utilPlus": 92,
+      "awpPlus": 92,
+      "survPlus": 107,
+      "entryPct": 50
+     },
+     "scrim": {
+      "maps": 42,
+      "ark": 1.09,
+      "kd": 1.11,
+      "kpr": 0.78,
+      "adr": 83.9,
+      "entryPM": -9,
+      "clutch": 21,
+      "multi": 54,
+      "udr": 2.7,
+      "fpr": 0.27,
+      "entryPlus": 94,
+      "duelPlus": 107,
+      "multiPlus": 105,
+      "clutchPlus": 121,
+      "utilPlus": 93,
+      "awpPlus": 91,
+      "survPlus": 102,
+      "entryPct": 48
+     }
+    },
+    "plus": {
+     "entryPlus": 97,
+     "duelPlus": 106,
+     "multiPlus": 105,
+     "clutchPlus": 110,
+     "utilPlus": 92,
+     "awpPlus": 91,
+     "survPlus": 102,
+     "entryPct": 50
+    }
+   },
+   {
     "nickname": "LAURSEN_111",
     "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
     "country": "dk",
@@ -19916,369 +20607,148 @@
     "plus": {}
    },
    {
-    "nickname": "rezzah",
-    "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
-    "country": "ca",
+    "nickname": "deadacate",
+    "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
+    "country": "us",
     "level": 9,
-    "elo": 1991,
-    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg",
-    "role": {
-     "role": "rifler",
-     "sniper": 0.02,
-     "entry": 0.23,
-     "flash": 0.32,
-     "util": 0.28,
-     "clutch": 0.029,
-     "maps": 34,
-     "days": 90
-    },
-    "trend": {
-     "last20": 0.89,
-     "last100": 0.91,
-     "delta": -0.02,
-     "flag": null
-    },
-    "form": 0.91,
-    "formMaps": 34,
+    "elo": 1829,
+    "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg",
+    "role": null,
+    "trend": null,
+    "form": null,
+    "formMaps": 0,
     "talent": {
-     "exact": 2.08,
-     "stars": 2
+     "exact": 1.37,
+     "stars": 1.5
     },
     "rolling": {
-     "all": {
-      "maps": 34,
-      "ark": 0.91,
-      "kd": 0.82,
-      "kpr": 0.63,
-      "adr": 72.1,
-      "entryPM": 1,
-      "clutch": 6,
-      "multi": 32,
-      "udr": 2.5,
-      "fpr": 0.18,
-      "entryPlus": 98,
-      "duelPlus": 84,
-      "multiPlus": 91,
-      "clutchPlus": 94,
-      "utilPlus": 88,
-      "awpPlus": 92,
-      "survPlus": 88,
-      "entryPct": 50
-     },
-     "official": {
-      "maps": 7,
-      "ark": 0.93,
-      "kd": 0.79,
-      "kpr": 0.59,
-      "adr": 69.3,
-      "entryPM": 3,
-      "clutch": 2,
-      "multi": 7,
-      "udr": 4.8,
-      "fpr": 0.16,
-      "entryPlus": 105,
-      "duelPlus": 80,
-      "multiPlus": 87,
-      "clutchPlus": 98,
-      "utilPlus": 93,
-      "awpPlus": 92,
-      "survPlus": 91,
-      "entryPct": 55
-     },
-     "pug": {
-      "maps": 13,
-      "ark": 1.05,
-      "kd": 1.03,
-      "kpr": 0.78,
-      "adr": 85.5,
-      "entryPM": 13,
-      "clutch": 4,
-      "multi": 20,
-      "udr": 2.1,
-      "fpr": 0.2,
-      "entryPlus": 114,
-      "duelPlus": 100,
-      "multiPlus": 108,
-      "clutchPlus": 103,
-      "utilPlus": 88,
-      "awpPlus": 94,
-      "survPlus": 89,
-      "entryPct": 59
-     },
-     "scrim": {
-      "maps": 14,
-      "ark": 0.85,
-      "kd": 0.67,
-      "kpr": 0.52,
-      "adr": 62.5,
-      "entryPM": -15,
-      "clutch": 0,
-      "multi": 5,
-      "udr": 1.7,
-      "fpr": 0.17,
-      "entryPlus": 81,
-      "duelPlus": 72,
-      "multiPlus": 78,
-      "clutchPlus": 83,
-      "utilPlus": 87,
-      "awpPlus": 91,
-      "survPlus": 85,
-      "entryPct": 39
-     }
+     "all": null,
+     "official": null,
+     "pug": null,
+     "scrim": null
     },
-    "plus": {
-     "entryPlus": 98,
-     "duelPlus": 84,
-     "multiPlus": 91,
-     "clutchPlus": 94,
-     "utilPlus": 88,
-     "awpPlus": 92,
-     "survPlus": 88,
-     "entryPct": 50
-    }
+    "plus": {}
    },
    {
-    "nickname": "Saintz",
-    "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
+    "nickname": "mIKEY-_-",
+    "id": "b76982b5-6b55-4976-9fd7-ad9e25181615",
     "country": "us",
     "level": 10,
-    "elo": 2424,
-    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg",
+    "elo": 2634,
+    "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg",
     "role": {
-     "role": "rifler",
-     "sniper": 0,
-     "entry": 0.21,
-     "flash": 0.43,
-     "util": 0.28,
-     "clutch": 0.04,
-     "maps": 65,
+     "role": "lurker",
+     "sniper": 0.13,
+     "entry": 0.14,
+     "flash": 0.66,
+     "util": 0.38,
+     "clutch": 0.096,
+     "maps": 12,
      "days": 90
     },
     "trend": {
-     "last20": 1.01,
-     "last100": 1.08,
-     "delta": -0.07,
+     "last20": 1.04,
+     "last100": 1.04,
+     "delta": 0,
      "flag": null
     },
-    "form": 1.08,
-    "formMaps": 65,
+    "form": 1.04,
+    "formMaps": 12,
     "talent": {
-     "exact": 3.45,
+     "exact": 3.51,
      "stars": 3.5
     },
     "rolling": {
      "all": {
-      "maps": 65,
-      "ark": 1.08,
-      "kd": 1.1,
-      "kpr": 0.77,
-      "adr": 82,
-      "entryPM": -3,
-      "clutch": 24,
-      "multi": 87,
-      "udr": 2.4,
-      "fpr": 0.27,
-      "entryPlus": 97,
-      "duelPlus": 106,
-      "multiPlus": 105,
-      "clutchPlus": 110,
-      "utilPlus": 92,
-      "awpPlus": 91,
-      "survPlus": 102,
-      "entryPct": 50
-     },
-     "official": {
-      "maps": 18,
-      "ark": 0.99,
-      "kd": 0.99,
-      "kpr": 0.71,
-      "adr": 75.6,
-      "entryPM": 6,
-      "clutch": 0,
-      "multi": 24,
-      "udr": 1.9,
-      "fpr": 0.26,
-      "entryPlus": 103,
-      "duelPlus": 96,
-      "multiPlus": 100,
-      "clutchPlus": 77,
-      "utilPlus": 89,
-      "awpPlus": 91,
-      "survPlus": 99,
-      "entryPct": 53
-     },
-     "pug": {
-      "maps": 5,
-      "ark": 1.11,
-      "kd": 1.36,
-      "kpr": 0.93,
-      "adr": 88.2,
-      "entryPM": 0,
-      "clutch": 3,
-      "multi": 9,
-      "udr": 1.5,
-      "fpr": 0.31,
-      "entryPlus": 98,
-      "duelPlus": 123,
-      "multiPlus": 122,
-      "clutchPlus": 116,
-      "utilPlus": 92,
-      "awpPlus": 92,
-      "survPlus": 107,
-      "entryPct": 50
-     },
-     "scrim": {
-      "maps": 42,
-      "ark": 1.09,
-      "kd": 1.11,
-      "kpr": 0.78,
-      "adr": 83.9,
-      "entryPM": -9,
-      "clutch": 21,
-      "multi": 54,
-      "udr": 2.7,
-      "fpr": 0.27,
-      "entryPlus": 94,
-      "duelPlus": 107,
-      "multiPlus": 105,
-      "clutchPlus": 121,
-      "utilPlus": 93,
-      "awpPlus": 91,
-      "survPlus": 102,
-      "entryPct": 48
-     }
-    },
-    "plus": {
-     "entryPlus": 97,
-     "duelPlus": 106,
-     "multiPlus": 105,
-     "clutchPlus": 110,
-     "utilPlus": 92,
-     "awpPlus": 91,
-     "survPlus": 102,
-     "entryPct": 50
-    }
-   },
-   {
-    "nickname": "mf_",
-    "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
-    "country": "us",
-    "level": 10,
-    "elo": 2376,
-    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg",
-    "role": {
-     "role": "AWPer",
-     "sniper": 0.39,
-     "entry": 0.18,
-     "flash": 0.4,
-     "util": 0.44,
-     "clutch": 0.086,
-     "maps": 75,
-     "days": 90
-    },
-    "trend": {
-     "last20": 1.06,
-     "last100": 1.03,
-     "delta": 0.03,
-     "flag": null
-    },
-    "form": 1.03,
-    "formMaps": 75,
-    "talent": {
-     "exact": 3.14,
-     "stars": 3
-    },
-    "rolling": {
-     "all": {
-      "maps": 75,
-      "ark": 1.03,
-      "kd": 1.06,
+      "maps": 12,
+      "ark": 1.04,
+      "kd": 1.08,
       "kpr": 0.69,
-      "adr": 72,
-      "entryPM": 50,
-      "clutch": 40,
-      "multi": 65,
-      "udr": 4.3,
-      "fpr": 0.24,
-      "entryPlus": 111,
-      "duelPlus": 97,
-      "multiPlus": 95,
-      "clutchPlus": 104,
-      "utilPlus": 96,
-      "awpPlus": 127,
-      "survPlus": 115,
-      "entryPct": 59
+      "adr": 71.7,
+      "entryPM": -2,
+      "clutch": 10,
+      "multi": 14,
+      "udr": 3,
+      "fpr": 0.43,
+      "entryPlus": 95,
+      "duelPlus": 100,
+      "multiPlus": 99,
+      "clutchPlus": 118,
+      "utilPlus": 98,
+      "awpPlus": 102,
+      "survPlus": 120,
+      "entryPct": 47
      },
      "official": {
-      "maps": 18,
-      "ark": 0.98,
-      "kd": 0.98,
+      "maps": 2,
+      "ark": 0.99,
+      "kd": 0.89,
       "kpr": 0.63,
-      "adr": 67.3,
-      "entryPM": 9,
-      "clutch": 9,
-      "multi": 14,
-      "udr": 4.4,
-      "fpr": 0.29,
-      "entryPlus": 109,
-      "duelPlus": 91,
-      "multiPlus": 92,
-      "clutchPlus": 102,
-      "utilPlus": 98,
-      "awpPlus": 119,
-      "survPlus": 117,
-      "entryPct": 59
+      "adr": 58.3,
+      "entryPM": 1,
+      "clutch": 3,
+      "multi": 0,
+      "udr": 2.2,
+      "fpr": 0.73,
+      "entryPlus": 104,
+      "duelPlus": 88,
+      "multiPlus": 78,
+      "clutchPlus": 132,
+      "utilPlus": 107,
+      "awpPlus": 91,
+      "survPlus": 100,
+      "entryPct": 56
      },
      "pug": {
-      "maps": 15,
-      "ark": 0.96,
-      "kd": 0.92,
-      "kpr": 0.64,
-      "adr": 69.6,
-      "entryPM": -1,
-      "clutch": 6,
-      "multi": 6,
-      "udr": 4.7,
-      "fpr": 0.22,
-      "entryPlus": 97,
-      "duelPlus": 90,
-      "multiPlus": 88,
-      "clutchPlus": 101,
-      "utilPlus": 98,
-      "awpPlus": 116,
-      "survPlus": 105,
-      "entryPct": 49
+      "maps": 7,
+      "ark": 1.08,
+      "kd": 1.28,
+      "kpr": 0.76,
+      "adr": 78.9,
+      "entryPM": 0,
+      "clutch": 7,
+      "multi": 12,
+      "udr": 3.6,
+      "fpr": 0.36,
+      "entryPlus": 98,
+      "duelPlus": 110,
+      "multiPlus": 113,
+      "clutchPlus": 121,
+      "utilPlus": 97,
+      "awpPlus": 109,
+      "survPlus": 128,
+      "entryPct": 50
      },
      "scrim": {
-      "maps": 42,
-      "ark": 1.07,
-      "kd": 1.14,
-      "kpr": 0.73,
-      "adr": 74.8,
-      "entryPM": 42,
-      "clutch": 25,
-      "multi": 45,
-      "udr": 4,
-      "fpr": 0.23,
-      "entryPlus": 116,
-      "duelPlus": 102,
-      "multiPlus": 98,
-      "clutchPlus": 107,
-      "utilPlus": 95,
-      "awpPlus": 134,
-      "survPlus": 118,
-      "entryPct": 62
+      "maps": 3,
+      "ark": 0.97,
+      "kd": 0.78,
+      "kpr": 0.51,
+      "adr": 63,
+      "entryPM": -3,
+      "clutch": 0,
+      "multi": 2,
+      "udr": 1.9,
+      "fpr": 0.33,
+      "entryPlus": 81,
+      "duelPlus": 81,
+      "multiPlus": 79,
+      "clutchPlus": 85,
+      "utilPlus": 91,
+      "awpPlus": 91,
+      "survPlus": 114,
+      "entryPct": 33
      }
     },
     "plus": {
-     "entryPlus": 111,
-     "duelPlus": 97,
-     "multiPlus": 95,
-     "clutchPlus": 104,
-     "utilPlus": 96,
-     "awpPlus": 127,
-     "survPlus": 115,
-     "entryPct": 59
+     "entryPlus": 95,
+     "duelPlus": 100,
+     "multiPlus": 99,
+     "clutchPlus": 118,
+     "utilPlus": 98,
+     "awpPlus": 102,
+     "survPlus": 120,
+     "entryPct": 47
     }
    },
    {
@@ -20401,418 +20871,6 @@
      "awpPlus": 94,
      "survPlus": 112,
      "entryPct": 52
-    }
-   },
-   {
-    "nickname": "Yo1nky",
-    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
-    "country": "us",
-    "level": 10,
-    "elo": 2032,
-    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg",
-    "role": {
-     "role": "hybrid AWP / lurker",
-     "sniper": 0.15,
-     "entry": 0.23,
-     "flash": 0.31,
-     "util": 0.4,
-     "clutch": 0.076,
-     "maps": 36,
-     "days": 90
-    },
-    "trend": {
-     "last20": 1.22,
-     "last100": 1.26,
-     "delta": -0.04,
-     "flag": null
-    },
-    "form": 1.26,
-    "formMaps": 36,
-    "talent": {
-     "exact": 3.88,
-     "stars": 4
-    },
-    "rolling": {
-     "all": {
-      "maps": 36,
-      "ark": 1.26,
-      "kd": 1.45,
-      "kpr": 0.96,
-      "adr": 96.5,
-      "entryPM": 62,
-      "clutch": 18,
-      "multi": 65,
-      "udr": 4.9,
-      "fpr": 0.21,
-      "entryPlus": 126,
-      "duelPlus": 124,
-      "multiPlus": 128,
-      "clutchPlus": 104,
-      "utilPlus": 99,
-      "awpPlus": 108,
-      "survPlus": 112,
-      "entryPct": 67
-     },
-     "official": {
-      "maps": 2,
-      "ark": 0.96,
-      "kd": 0.74,
-      "kpr": 0.63,
-      "adr": 57.2,
-      "entryPM": 4,
-      "clutch": 1,
-      "multi": 1,
-      "udr": 1.8,
-      "fpr": 0.17,
-      "entryPlus": 126,
-      "duelPlus": 80,
-      "multiPlus": 79,
-      "clutchPlus": 107,
-      "utilPlus": 108,
-      "awpPlus": 91,
-      "survPlus": 66,
-      "entryPct": 75
-     },
-     "pug": {
-      "maps": 33,
-      "ark": 1.29,
-      "kd": 1.51,
-      "kpr": 0.99,
-      "adr": 99.8,
-      "entryPM": 58,
-      "clutch": 17,
-      "multi": 64,
-      "udr": 5.1,
-      "fpr": 0.22,
-      "entryPlus": 126,
-      "duelPlus": 128,
-      "multiPlus": 132,
-      "clutchPlus": 105,
-      "utilPlus": 99,
-      "awpPlus": 109,
-      "survPlus": 115,
-      "entryPct": 67
-     },
-     "scrim": {
-      "maps": 1,
-      "ark": 0.86,
-      "kd": 0.93,
-      "kpr": 0.61,
-      "adr": 63.5,
-      "entryPM": 0,
-      "clutch": 0,
-      "multi": 0,
-      "udr": 3.1,
-      "fpr": 0,
-      "entryPlus": 98,
-      "duelPlus": 90,
-      "multiPlus": 76,
-      "clutchPlus": null,
-      "utilPlus": 69,
-      "awpPlus": 91,
-      "survPlus": 115,
-      "entryPct": 50
-     }
-    },
-    "plus": {
-     "entryPlus": 126,
-     "duelPlus": 124,
-     "multiPlus": 128,
-     "clutchPlus": 104,
-     "utilPlus": 99,
-     "awpPlus": 108,
-     "survPlus": 112,
-     "entryPct": 67
-    }
-   },
-   {
-    "nickname": "mIKEY-_-",
-    "id": "b76982b5-6b55-4976-9fd7-ad9e25181615",
-    "country": "us",
-    "level": 10,
-    "elo": 2642,
-    "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg",
-    "role": {
-     "role": "lurker",
-     "sniper": 0.13,
-     "entry": 0.14,
-     "flash": 0.67,
-     "util": 0.38,
-     "clutch": 0.099,
-     "maps": 11,
-     "days": 90
-    },
-    "trend": {
-     "last20": 1.01,
-     "last100": 1.01,
-     "delta": 0,
-     "flag": null
-    },
-    "form": 1.01,
-    "formMaps": 11,
-    "talent": {
-     "exact": 3.42,
-     "stars": 3.5
-    },
-    "rolling": {
-     "all": {
-      "maps": 11,
-      "ark": 1.01,
-      "kd": 1.04,
-      "kpr": 0.67,
-      "adr": 69.7,
-      "entryPM": -4,
-      "clutch": 9,
-      "multi": 11,
-      "udr": 3,
-      "fpr": 0.44,
-      "entryPlus": 91,
-      "duelPlus": 98,
-      "multiPlus": 96,
-      "clutchPlus": 115,
-      "utilPlus": 98,
-      "awpPlus": 102,
-      "survPlus": 117,
-      "entryPct": 44
-     },
-     "official": {
-      "maps": 2,
-      "ark": 0.99,
-      "kd": 0.89,
-      "kpr": 0.63,
-      "adr": 58.3,
-      "entryPM": 1,
-      "clutch": 3,
-      "multi": 0,
-      "udr": 2.2,
-      "fpr": 0.73,
-      "entryPlus": 104,
-      "duelPlus": 88,
-      "multiPlus": 78,
-      "clutchPlus": 132,
-      "utilPlus": 107,
-      "awpPlus": 91,
-      "survPlus": 100,
-      "entryPct": 56
-     },
-     "pug": {
-      "maps": 6,
-      "ark": 1.06,
-      "kd": 1.21,
-      "kpr": 0.75,
-      "adr": 76.3,
-      "entryPM": -2,
-      "clutch": 6,
-      "multi": 9,
-      "udr": 3.7,
-      "fpr": 0.38,
-      "entryPlus": 92,
-      "duelPlus": 108,
-      "multiPlus": 110,
-      "clutchPlus": 117,
-      "utilPlus": 98,
-      "awpPlus": 110,
-      "survPlus": 124,
-      "entryPct": 44
-     },
-     "scrim": {
-      "maps": 3,
-      "ark": 0.97,
-      "kd": 0.78,
-      "kpr": 0.51,
-      "adr": 63,
-      "entryPM": -3,
-      "clutch": 0,
-      "multi": 2,
-      "udr": 1.9,
-      "fpr": 0.33,
-      "entryPlus": 81,
-      "duelPlus": 81,
-      "multiPlus": 79,
-      "clutchPlus": 85,
-      "utilPlus": 91,
-      "awpPlus": 91,
-      "survPlus": 114,
-      "entryPct": 33
-     }
-    },
-    "plus": {
-     "entryPlus": 91,
-     "duelPlus": 98,
-     "multiPlus": 96,
-     "clutchPlus": 115,
-     "utilPlus": 98,
-     "awpPlus": 102,
-     "survPlus": 117,
-     "entryPct": 44
-    }
-   },
-   {
-    "nickname": "-TMoney-",
-    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
-    "country": "us",
-    "level": 10,
-    "elo": 2084,
-    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg",
-    "role": null,
-    "trend": null,
-    "form": null,
-    "formMaps": 0,
-    "talent": {
-     "exact": 2.1,
-     "stars": 2
-    },
-    "rolling": {
-     "all": null,
-     "official": null,
-     "pug": null,
-     "scrim": null
-    },
-    "plus": {}
-   },
-   {
-    "nickname": "deadacate",
-    "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
-    "country": "us",
-    "level": 9,
-    "elo": 1829,
-    "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg",
-    "role": null,
-    "trend": null,
-    "form": null,
-    "formMaps": 0,
-    "talent": {
-     "exact": 1.37,
-     "stars": 1.5
-    },
-    "rolling": {
-     "all": null,
-     "official": null,
-     "pug": null,
-     "scrim": null
-    },
-    "plus": {}
-   },
-   {
-    "nickname": "Beasty_",
-    "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
-    "country": "us",
-    "level": 10,
-    "elo": 2198,
-    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg",
-    "role": {
-     "role": "support",
-     "sniper": 0.02,
-     "entry": 0.18,
-     "flash": 0.73,
-     "util": 0.37,
-     "clutch": 0.043,
-     "maps": 44,
-     "days": 90
-    },
-    "trend": {
-     "last20": 0.85,
-     "last100": 0.93,
-     "delta": -0.08,
-     "flag": "cold"
-    },
-    "form": 0.93,
-    "formMaps": 44,
-    "talent": {
-     "exact": 2.42,
-     "stars": 2.5
-    },
-    "rolling": {
-     "all": {
-      "maps": 44,
-      "ark": 0.93,
-      "kd": 0.84,
-      "kpr": 0.63,
-      "adr": 70.2,
-      "entryPM": -35,
-      "clutch": 13,
-      "multi": 32,
-      "udr": 2.7,
-      "fpr": 0.45,
-      "entryPlus": 83,
-      "duelPlus": 87,
-      "multiPlus": 87,
-      "clutchPlus": 100,
-      "utilPlus": 98,
-      "awpPlus": 92,
-      "survPlus": 91,
-      "entryPct": 40
-     },
-     "official": {
-      "maps": 12,
-      "ark": 0.92,
-      "kd": 0.77,
-      "kpr": 0.56,
-      "adr": 63,
-      "entryPM": -14,
-      "clutch": 3,
-      "multi": 7,
-      "udr": 2,
-      "fpr": 0.58,
-      "entryPlus": 76,
-      "duelPlus": 82,
-      "multiPlus": 77,
-      "clutchPlus": 103,
-      "utilPlus": 100,
-      "awpPlus": 93,
-      "survPlus": 98,
-      "entryPct": 34
-     },
-     "pug": {
-      "maps": 6,
-      "ark": 1.06,
-      "kd": 1.11,
-      "kpr": 0.84,
-      "adr": 86.4,
-      "entryPM": -1,
-      "clutch": 3,
-      "multi": 8,
-      "udr": 3.1,
-      "fpr": 0.33,
-      "entryPlus": 95,
-      "duelPlus": 110,
-      "multiPlus": 115,
-      "clutchPlus": 107,
-      "utilPlus": 94,
-      "awpPlus": 95,
-      "survPlus": 89,
-      "entryPct": 48
-     },
-     "scrim": {
-      "maps": 26,
-      "ark": 0.92,
-      "kd": 0.81,
-      "kpr": 0.61,
-      "adr": 69.9,
-      "entryPM": -20,
-      "clutch": 7,
-      "multi": 17,
-      "udr": 2.9,
-      "fpr": 0.42,
-      "entryPlus": 84,
-      "duelPlus": 85,
-      "multiPlus": 85,
-      "clutchPlus": 97,
-      "utilPlus": 97,
-      "awpPlus": 91,
-      "survPlus": 89,
-      "entryPct": 40
-     }
-    },
-    "plus": {
-     "entryPlus": 83,
-     "duelPlus": 87,
-     "multiPlus": 87,
-     "clutchPlus": 100,
-     "utilPlus": 98,
-     "awpPlus": 92,
-     "survPlus": 91,
-     "entryPct": 40
     }
    }
   ],
