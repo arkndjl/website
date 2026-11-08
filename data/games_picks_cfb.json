@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-08T15:03:33Z",
+ "asof": "2026-11-08T15:09:39Z",
  "recenter": {
-  "week": 0.36
+  "week": 0.37
  },
  "monitor": {
   "clocks": {
@@ -471,8 +471,8 @@
     "mk": "total",
     "side": "over",
     "line": 47.5,
-    "price": 122.0,
-    "ev": 0.139,
+    "price": 120.0,
+    "ev": 0.129,
     "units": 5.0
    }
   },
@@ -604,6 +604,22 @@
    "tm": 50.1
   },
   {
+   "id": "401866462",
+   "sport": "cfb",
+   "kick": "2026-11-12T00:30:00.000Z",
+   "home": "Central Michigan",
+   "away": "Sacramento State",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -153.0,
+   "edge": 2.4,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 17.6,
+   "tm": 43.9
+  },
+  {
    "id": "401866459",
    "sport": "cfb",
    "kick": "2026-11-11T00:00:00.000Z",
@@ -628,7 +644,7 @@
    "mk": "spread",
    "side": "away",
    "line": -13.5,
-   "price": -122.0,
+   "price": -120.0,
    "edge": 3.5,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -772,28 +788,12 @@
    "mk": "spread",
    "side": "away",
    "line": -10.5,
-   "price": -125.0,
+   "price": -138.0,
    "edge": 2.1,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
    "m": -12.6,
    "tm": 49.1
-  },
-  {
-   "id": "401866462",
-   "sport": "cfb",
-   "kick": "2026-11-12T00:30:00.000Z",
-   "home": "Central Michigan",
-   "away": "Sacramento State",
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": -122.0,
-   "edge": 2.1,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": 17.6,
-   "tm": 43.9
   },
   {
    "id": "401856863",
@@ -884,7 +884,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -147.0,
+   "price": -150.0,
    "edge": 0.4,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -993,7 +993,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -147.0,
+   "price": -150.0,
    "edge": 0.4,
    "ev": null,
    "units": 0.0,
@@ -1113,8 +1113,8 @@
    "mk": "total",
    "side": "over",
    "line": 47.5,
-   "price": 122.0,
-   "ev": 0.139,
+   "price": 120.0,
+   "ev": 0.129,
    "edge": 3.1,
    "units": 5.0,
    "home": "UCLA",
@@ -1185,7 +1185,7 @@
    "mk": "spread",
    "side": "away",
    "line": -10.5,
-   "price": -125.0,
+   "price": -138.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -1221,7 +1221,7 @@
    "mk": "spread",
    "side": "away",
    "line": -13.5,
-   "price": -122.0,
+   "price": -120.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -1230,11 +1230,11 @@
    "state": "under"
   },
   "401866462": {
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": -122.0,
-   "edge": 2.1,
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -153.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "Central Michigan",
@@ -1318,16 +1318,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 11138,
+  "snapshots": 11158,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2269,
-    "clvRet": -0.0526,
-    "clvT": -30.2,
+    "clvN": 2272,
+    "clvRet": -0.0527,
+    "clvT": -30.25,
     "clv": 0.06,
     "beat": 0.313,
-    "still": 0.37
+    "still": 0.371
    },
    {
     "when": "6-24h",
@@ -3750,8 +3750,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 63.5,
-    "scale": 0.5906,
+    "raw": 60.25,
+    "scale": 0.6224,
     "down": 2.5
    },
    "2026-11-09": {
