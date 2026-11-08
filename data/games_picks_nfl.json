@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-08T22:54:13Z",
+ "asof": "2026-11-08T23:27:14Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -246,16 +246,7 @@
    "flagged": "2026-11-04T01:21:44Z",
    "betTo": 46.5,
    "close": 47.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 47.5,
-    "price": -102.0,
-    "ev": 0.062,
-    "units": 0.75,
-    "unitsRaw": 1.0,
-    "unitsCap": 0.75
-   }
+   "now": null
   },
   {
    "id": "2026_09_LV_SF",
@@ -284,19 +275,36 @@
   }
  ],
  "withdrawn": [],
- "board": [],
+ "board": [
+  {
+   "id": "2026_09_TB_CHI",
+   "sport": "nfl",
+   "kick": "2026-11-09T01:20:00Z",
+   "home": "CHI",
+   "away": "TB",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -106.0,
+   "edge": 2.5,
+   "x": 1.5,
+   "why": "no edge at -106",
+   "m": 6.8,
+   "tm": 45.0
+  }
+ ],
  "games": {
   "2026_09_TB_CHI": {
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": -102.0,
-   "ev": 0.062,
+   "price": -106.0,
    "edge": 2.5,
-   "units": 1.0,
+   "ev": null,
+   "units": 0.0,
    "home": "CHI",
    "away": "TB",
-   "state": "pick"
+   "state": "under"
   },
   "2026_09_BUF_MIN": {
    "mk": "ml",
@@ -363,13 +371,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2633,
+  "snapshots": 2634,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1088,
-    "clvRet": -0.0152,
-    "clvT": -6.48,
+    "clvN": 1089,
+    "clvRet": -0.0151,
+    "clvT": -6.47,
     "clv": 0.47,
     "beat": 0.364,
     "still": 0.573
@@ -1846,9 +1854,9 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 13.5,
-    "scale": 0.8148,
-    "down": 29.0
+    "raw": 9.0,
+    "scale": 0.8889,
+    "down": 32.0
    },
    "2026-11-09": {
     "raw": 8.0,
