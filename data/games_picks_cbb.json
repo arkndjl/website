@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-08T10:23:52Z",
+ "asof": "2026-11-08T10:26:15Z",
  "recenter": {
   "2026-11-08": -11.41
  },
@@ -177,7 +177,7 @@
    "mk": "spread",
    "side": "away",
    "line": 28.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 8.6,
    "x": null,
    "why": "spread market off",
@@ -313,22 +313,6 @@
    "tm": 153.2
   },
   {
-   "id": "401919029",
-   "sport": "cbb",
-   "kick": "2026-11-09T04:00:00Z",
-   "home": "Wichita State",
-   "away": "USC",
-   "mk": "spread",
-   "side": "away",
-   "line": -5.5,
-   "price": -110,
-   "edge": 3.4,
-   "x": null,
-   "why": "spread market off",
-   "m": -8.9,
-   "tm": 157.8
-  },
-  {
    "id": "401911238",
    "sport": "cbb",
    "kick": "2026-11-08T22:00:00Z",
@@ -359,6 +343,22 @@
    "why": "spread market off",
    "m": -0.1,
    "tm": 161.5
+  },
+  {
+   "id": "401919029",
+   "sport": "cbb",
+   "kick": "2026-11-09T04:00:00Z",
+   "home": "Wichita State",
+   "away": "USC",
+   "mk": "spread",
+   "side": "away",
+   "line": -6.5,
+   "price": -108.0,
+   "edge": 2.4,
+   "x": null,
+   "why": "spread market off",
+   "m": -8.9,
+   "tm": 157.8
   },
   {
    "id": "401918053",
@@ -409,9 +409,9 @@
   "401919029": {
    "mk": "spread",
    "side": "away",
-   "line": -5.5,
-   "price": -110,
-   "edge": 3.4,
+   "line": -6.5,
+   "price": -108.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "Wichita State",
@@ -482,7 +482,7 @@
    "mk": "spread",
    "side": "away",
    "line": 28.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 8.6,
    "ev": null,
    "units": 0.0,
@@ -639,25 +639,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8367,
+  "snapshots": 8370,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 439,
-    "clvRet": -0.0299,
-    "clvT": -4.71,
+    "clvRet": -0.0294,
+    "clvT": -4.63,
     "clv": 0.28,
-    "beat": 0.285,
-    "still": 0.305
+    "beat": 0.292,
+    "still": 0.298
    },
    {
     "when": "6-24h",
-    "clvN": 1524,
-    "clvRet": -0.0428,
-    "clvT": -18.29,
+    "clvN": 1526,
+    "clvRet": -0.0426,
+    "clvT": -18.25,
     "clv": 0.05,
-    "beat": 0.25,
-    "still": 0.478
+    "beat": 0.252,
+    "still": 0.476
    },
    {
     "when": "1-6h",
@@ -7996,11 +7996,11 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 66.5,
-    "scale": 0.6015
+    "raw": 68.0,
+    "scale": 0.5882
    },
    "2026-11-09": {
-    "raw": 4.75,
+    "raw": 5.75,
     "scale": 1.0
    },
    "2026-11-14": {
