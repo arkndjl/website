@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-08T10:21:41Z",
+ "asof": "2026-11-08T10:23:47Z",
  "recenter": {
   "week": 0.36
  },
@@ -467,15 +467,8 @@
    "tmRaw": 56.6,
    "flagged": "2026-11-08T10:21:41Z",
    "betTo": -1.0,
-   "close": -1.5,
-   "now": {
-    "mk": "spread",
-    "side": "home",
-    "line": -1.5,
-    "price": -100.0,
-    "ev": 0.016,
-    "units": 0.25
-   }
+   "close": -2.5,
+   "now": null
   }
  ],
  "withdrawn": [],
@@ -495,6 +488,22 @@
    "why": "no edge at -110",
    "m": -2.2,
    "tm": 53.4
+  },
+  {
+   "id": "401858301",
+   "sport": "cfb",
+   "kick": "2026-11-14T17:00:00.000Z",
+   "home": "SMU",
+   "away": "Wake Forest",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": 104.0,
+   "edge": 7.9,
+   "x": 6.0,
+   "why": "no edge at +104",
+   "m": 5.4,
+   "tm": 56.2
   },
   {
    "id": "401858522",
@@ -601,7 +610,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -120.0,
+   "price": -122.0,
    "edge": 1.3,
    "x": 3.0,
    "why": "edge under 3",
@@ -863,22 +872,6 @@
    "why": "edge under 6 (season: late)",
    "m": -2.8,
    "tm": 48.9
-  },
-  {
-   "id": "401869969",
-   "sport": "cfb",
-   "kick": "2026-11-13T02:00:00.000Z",
-   "home": "UL Monroe",
-   "away": "Louisiana",
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -110,
-   "edge": 0.1,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -18.8,
-   "tm": 48.4
   }
  ],
  "games": {
@@ -993,14 +986,14 @@
   "401858301": {
    "mk": "spread",
    "side": "home",
-   "line": -1.5,
-   "price": -100.0,
-   "ev": 0.016,
-   "edge": 6.9,
-   "units": 0.25,
+   "line": -2.5,
+   "price": 104.0,
+   "edge": 7.9,
+   "ev": null,
+   "units": 0.0,
    "home": "SMU",
    "away": "Wake Forest",
-   "state": "pick"
+   "state": "under"
   },
   "401856889": {
    "mk": "spread",
@@ -1150,7 +1143,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -120.0,
+   "price": -122.0,
    "edge": 1.3,
    "ev": null,
    "units": 0.0,
@@ -1259,15 +1252,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 11045,
+  "snapshots": 11057,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2252,
-    "clvRet": -0.0523,
-    "clvT": -29.83,
+    "clvN": 2254,
+    "clvRet": -0.0524,
+    "clvT": -29.9,
     "clv": 0.06,
-    "beat": 0.315,
+    "beat": 0.314,
     "still": 0.367
    },
    {
@@ -3634,7 +3627,7 @@
    "tmRaw": 56.6,
    "flagged": "2026-11-08T10:21:41Z",
    "betTo": -1.0,
-   "close": -1.5
+   "close": -2.5
   }
  ],
  "nightCap": {
