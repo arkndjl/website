@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-08T21:24:40Z",
+ "asof": "2026-11-08T21:26:52Z",
  "recenter": {
-  "2026-11-08": -10.69,
+  "2026-11-08": -10.71,
   "2026-11-09": -10.64
  },
  "monitor": {
@@ -154,22 +154,6 @@
    "tm": 147.0
   },
   {
-   "id": "401929352",
-   "sport": "cbb",
-   "kick": "2026-11-09T00:00:00Z",
-   "home": "UTEP",
-   "away": "Incarnate Word",
-   "mk": "total",
-   "side": "over",
-   "line": 141.5,
-   "price": -111.0,
-   "edge": 5.5,
-   "x": null,
-   "why": "total market off",
-   "m": 10.2,
-   "tm": 147.0
-  },
-  {
    "id": "401911453",
    "sport": "cbb",
    "kick": "2026-11-08T21:30:00Z",
@@ -177,9 +161,9 @@
    "away": "Saint Mary's",
    "mk": "total",
    "side": "under",
-   "line": 146.5,
-   "price": 104.0,
-   "edge": 5.0,
+   "line": 147.5,
+   "price": -104.0,
+   "edge": 6.0,
    "x": null,
    "why": "total market off",
    "m": 2.3,
@@ -200,6 +184,22 @@
    "why": "spread market off",
    "m": 13.2,
    "tm": 144.6
+  },
+  {
+   "id": "401929352",
+   "sport": "cbb",
+   "kick": "2026-11-09T00:00:00Z",
+   "home": "UTEP",
+   "away": "Incarnate Word",
+   "mk": "total",
+   "side": "over",
+   "line": 142.5,
+   "price": 106.0,
+   "edge": 4.5,
+   "x": null,
+   "why": "total market off",
+   "m": 10.2,
+   "tm": 147.0
   },
   {
    "id": "401918053",
@@ -226,7 +226,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -108.0,
+   "price": -110,
    "edge": 2.7,
    "x": null,
    "why": "spread market off",
@@ -242,7 +242,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -115.0,
+   "price": -110,
    "edge": 2.3,
    "x": null,
    "why": "spread market off",
@@ -303,7 +303,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -108.0,
+   "price": -110,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -314,9 +314,9 @@
   "401911453": {
    "mk": "total",
    "side": "under",
-   "line": 146.5,
-   "price": 104.0,
-   "edge": 5.0,
+   "line": 147.5,
+   "price": -104.0,
+   "edge": 6.0,
    "ev": null,
    "units": 0.0,
    "home": "Nevada",
@@ -386,9 +386,9 @@
   "401929352": {
    "mk": "total",
    "side": "over",
-   "line": 141.5,
-   "price": -111.0,
-   "edge": 5.5,
+   "line": 142.5,
+   "price": 106.0,
+   "edge": 4.5,
    "ev": null,
    "units": 0.0,
    "home": "UTEP",
@@ -411,7 +411,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -115.0,
+   "price": -110,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -472,7 +472,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8756,
+  "snapshots": 8763,
   "buckets": [
    {
     "when": "24h+",
@@ -7829,12 +7829,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 22.0,
-    "scale": 0.8636,
-    "down": 21.0
+    "raw": 13.5,
+    "scale": 0.8148,
+    "down": 29.0
    },
    "2026-11-09": {
-    "raw": 7.5,
+    "raw": 8.25,
     "scale": 1.0
    },
    "2026-11-11": {

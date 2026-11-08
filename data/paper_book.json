@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-08T21:24:47Z",
+ "asof": "2026-11-08T21:26:58Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 83.45,
   "peak": 117.38,
   "drawdown": 0.2891,
-  "open": 61.25,
+  "open": 62.25,
   "path": [
    101.5,
    101.6,
@@ -390,9 +390,9 @@
  },
  "record": {
   "n": 424,
-  "clvN": 385,
-  "clvRet": -0.016,
-  "clvT": -3.18,
+  "clvN": 391,
+  "clvRet": -0.0162,
+  "clvT": -3.27,
   "clv": -0.13,
   "beat": 0.288,
   "settled": 377,
@@ -405,23 +405,23 @@
   "risked": 340.5,
   "yield": -0.0459
  },
- "tEff": -3.18,
+ "tEff": -3.27,
  "corr": {
   "rho": 0.0,
-  "n": 385,
+  "n": 391,
   "slates": 36,
-  "nEff": 385.0,
-  "avgSlate": 10.69
+  "nEff": 391.0,
+  "avgSlate": 10.86
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 385,
+   "value": 391,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.6% t -3.18",
+   "value": "-1.6% t -3.27",
    "pass": false
   },
   {
@@ -431,7 +431,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-spread: -1.8%",
+   "value": "without nba-spread: -1.9%",
    "pass": false
   },
   {
@@ -679,9 +679,9 @@
    "sport": "nflprops",
    "mk": "prop",
    "n": 62,
-   "clvN": 52,
-   "clvRet": -0.0204,
-   "clvT": -1.7,
+   "clvN": 58,
+   "clvRet": -0.0214,
+   "clvT": -1.98,
    "clv": null,
    "beat": null,
    "settled": 44,
@@ -1017,7 +1017,9 @@
    "edge": 24.6,
    "ev": 0.1594,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0642,
+   "close": 34.5
   },
   {
    "rule": "nflprops-prop",
@@ -1037,7 +1039,9 @@
    "edge": 14.5,
    "ev": 0.0645,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0679,
+   "close": 77.5
   },
   {
    "rule": "nflprops-prop",
@@ -1057,7 +1061,9 @@
    "edge": 11.2,
    "ev": 0.163,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0191,
+   "close": 35.5
   },
   {
    "rule": "nflprops-prop",
@@ -1077,7 +1083,9 @@
    "edge": 37.3,
    "ev": 0.2227,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0189,
+   "close": 199.5
   },
   {
    "rule": "nflprops-prop",
@@ -1097,7 +1105,9 @@
    "edge": 27.3,
    "ev": 0.1653,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0361,
+   "close": 195.5
   },
   {
    "rule": "nflprops-prop",
@@ -1117,7 +1127,9 @@
    "edge": 18.9,
    "ev": 0.0895,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0118,
+   "close": 3.5
   },
   {
    "rule": "tennis-ml",
@@ -1216,7 +1228,7 @@
    "price": -102.0,
    "bet": "over 220.5 -102",
    "placed": "2026-11-08T09:37:20Z",
-   "stake": 1.25,
+   "stake": 1.0,
    "edge": 3.6,
    "ev": 0.0159,
    "event": null,
@@ -1279,7 +1291,7 @@
    "price": 108.0,
    "bet": "Ted Hurst III under 1.5 rec +108",
    "placed": "2026-11-06T16:50:00Z",
-   "stake": 2.0,
+   "stake": 2.25,
    "edge": 15.2,
    "ev": 0.171,
    "event": null,
@@ -1402,7 +1414,7 @@
    "price": -113.0,
    "bet": "Carson Wentz under 203.5 pass yds -113",
    "placed": "2026-11-05T18:55:00Z",
-   "stake": 1.5,
+   "stake": 1.75,
    "edge": 27.7,
    "ev": 0.1592,
    "event": null,
@@ -1422,7 +1434,7 @@
    "price": -108.0,
    "bet": "DJ Moore under 3.5 rec -108",
    "placed": "2026-11-04T02:15:00Z",
-   "stake": 1.5,
+   "stake": 1.75,
    "edge": 22.6,
    "ev": 0.144,
    "event": null,
@@ -1442,7 +1454,7 @@
    "price": -108.0,
    "bet": "T.J. Hockenson under 4.5 rec -108",
    "placed": "2026-11-04T02:15:00Z",
-   "stake": 1.25,
+   "stake": 1.5,
    "edge": 19.6,
    "ev": 0.119,
    "event": null,
@@ -1462,7 +1474,7 @@
    "price": 108.0,
    "bet": "Justin Jefferson under 5.5 rec +108",
    "placed": "2026-11-04T02:15:00Z",
-   "stake": 2.75,
+   "stake": 3.25,
    "edge": 16.9,
    "ev": 0.1856,
    "event": null,
@@ -1612,7 +1624,7 @@
    "ev": 0.012,
    "event": null,
    "pass": false,
-   "close": 42.5
+   "close": 41.5
   },
   {
    "rule": "cfb-spread",
@@ -1738,7 +1750,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 61.5
   },
   {
    "rule": "cfb-total",
@@ -1780,7 +1792,7 @@
    "ev": 0.0027,
    "event": null,
    "pass": false,
-   "close": 72.5
+   "close": 73.5
   }
  ],
  "recent": [
@@ -16766,7 +16778,9 @@
    "edge": 24.6,
    "ev": 0.1594,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0642,
+   "close": 34.5
   },
   {
    "rule": "nflprops-prop",
@@ -16786,7 +16800,9 @@
    "edge": 14.5,
    "ev": 0.0645,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0679,
+   "close": 77.5
   },
   {
    "rule": "nflprops-prop",
@@ -16806,7 +16822,9 @@
    "edge": 11.2,
    "ev": 0.163,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0191,
+   "close": 35.5
   },
   {
    "rule": "nflprops-prop",
@@ -16826,7 +16844,9 @@
    "edge": 37.3,
    "ev": 0.2227,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0189,
+   "close": 199.5
   },
   {
    "rule": "nflprops-prop",
@@ -16846,7 +16866,9 @@
    "edge": 27.3,
    "ev": 0.1653,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0361,
+   "close": 195.5
   },
   {
    "rule": "nflprops-prop",
@@ -16866,7 +16888,9 @@
    "edge": 18.9,
    "ev": 0.0895,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0118,
+   "close": 3.5
   },
   {
    "rule": "tennis-ml",
@@ -16965,7 +16989,7 @@
    "price": -102.0,
    "bet": "over 220.5 -102",
    "placed": "2026-11-08T09:37:20Z",
-   "stake": 1.25,
+   "stake": 1.0,
    "edge": 3.6,
    "ev": 0.0159,
    "event": null,
@@ -17028,7 +17052,7 @@
    "price": 108.0,
    "bet": "Ted Hurst III under 1.5 rec +108",
    "placed": "2026-11-06T16:50:00Z",
-   "stake": 2.0,
+   "stake": 2.25,
    "edge": 15.2,
    "ev": 0.171,
    "event": null,
@@ -17151,7 +17175,7 @@
    "price": -113.0,
    "bet": "Carson Wentz under 203.5 pass yds -113",
    "placed": "2026-11-05T18:55:00Z",
-   "stake": 1.5,
+   "stake": 1.75,
    "edge": 27.7,
    "ev": 0.1592,
    "event": null,
@@ -17171,7 +17195,7 @@
    "price": -108.0,
    "bet": "DJ Moore under 3.5 rec -108",
    "placed": "2026-11-04T02:15:00Z",
-   "stake": 1.5,
+   "stake": 1.75,
    "edge": 22.6,
    "ev": 0.144,
    "event": null,
@@ -17191,7 +17215,7 @@
    "price": -108.0,
    "bet": "T.J. Hockenson under 4.5 rec -108",
    "placed": "2026-11-04T02:15:00Z",
-   "stake": 1.25,
+   "stake": 1.5,
    "edge": 19.6,
    "ev": 0.119,
    "event": null,
@@ -17211,7 +17235,7 @@
    "price": 108.0,
    "bet": "Justin Jefferson under 5.5 rec +108",
    "placed": "2026-11-04T02:15:00Z",
-   "stake": 2.75,
+   "stake": 3.25,
    "edge": 16.9,
    "ev": 0.1856,
    "event": null,
@@ -17361,7 +17385,7 @@
    "ev": 0.012,
    "event": null,
    "pass": false,
-   "close": 42.5
+   "close": 41.5
   },
   {
    "rule": "cfb-spread",
@@ -17487,7 +17511,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 61.5
   },
   {
    "rule": "cfb-total",
@@ -17529,7 +17553,7 @@
    "ev": 0.0027,
    "event": null,
    "pass": false,
-   "close": 72.5
+   "close": 73.5
   }
  ]
 }
