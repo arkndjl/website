@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-08T17:21Z",
+ "asof": "2026-11-08T18:19Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2548,
+   "players": 2549,
    "rows": 16718
   },
   "nba": {
@@ -87,15 +87,15 @@
      "rows": 596
     },
     "static/data/nba-proj.json": {
-     "flags": 5,
+     "flags": 6,
      "rows": 498
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 458
     },
     "static/data/pctl-nba.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 459
     },
     "static/data/xaav-nba.json": {
@@ -195,6 +195,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-08",
+     "field": "tm",
+     "file": "static/data/nba-proj.json",
+     "flag": "moved",
+     "head": "Traded to Oklahoma City",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-08",
+      "head": "Traded to Oklahoma City",
+      "kind": "trade"
+     },
+     "pid": "6547",
+     "player": "Nique Clifford",
+     "pos": "SG",
+     "rotowire": "OKC",
+     "site": "SAC"
+    },
+    {
      "d": "2026-10-17",
      "field": "tm",
      "file": "static/data/nba-xpm/2027.json",
@@ -231,6 +249,24 @@
      "site": "LAC"
     },
     {
+     "d": "2026-11-08",
+     "field": "tm",
+     "file": "static/data/nba-xpm/2027.json",
+     "flag": "moved",
+     "head": "Traded to Oklahoma City",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-08",
+      "head": "Traded to Oklahoma City",
+      "kind": "trade"
+     },
+     "pid": "6547",
+     "player": "Nique Clifford",
+     "pos": "SG",
+     "rotowire": "OKC",
+     "site": "SAC"
+    },
+    {
      "d": "2026-10-17",
      "field": "tm",
      "file": "static/data/pctl-nba.json",
@@ -265,6 +301,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "LAC"
+    },
+    {
+     "d": "2026-11-08",
+     "field": "tm",
+     "file": "static/data/pctl-nba.json",
+     "flag": "moved",
+     "head": "Traded to Oklahoma City",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-08",
+      "head": "Traded to Oklahoma City",
+      "kind": "trade"
+     },
+     "pid": "6547",
+     "player": "Nique Clifford",
+     "pos": "G",
+     "rotowire": "OKC",
+     "site": "SAC"
     }
    ],
    "joined": 0,
@@ -3373,7 +3427,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 2,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -3394,6 +3448,42 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-08",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Sent back to AHL",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-08",
+      "head": "Sent back to AHL",
+      "kind": "down"
+     },
+     "pid": "4463",
+     "player": "Jonas Johansson",
+     "pos": "G",
+     "rotowire": "OTT",
+     "site": "OTT"
+    },
+    {
+     "d": "2026-11-08",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Heading back to AHL",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-08",
+      "head": "Heading back to AHL",
+      "kind": "down"
+     },
+     "pid": "7754",
+     "player": "Gregor Biber",
+     "pos": "LD",
+     "rotowire": "UTA",
+     "site": "UTA"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
