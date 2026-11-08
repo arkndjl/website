@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-08T16:26:21Z",
+ "asof": "2026-11-08T16:28:30Z",
  "recenter": {
   "2026-11-08": -10.79
  },
@@ -281,22 +281,6 @@
    "tm": 146.0
   },
   {
-   "id": "401921686",
-   "sport": "cbb",
-   "kick": "2026-11-08T19:00:00Z",
-   "home": "UAlbany",
-   "away": "Merrimack",
-   "mk": "total",
-   "side": "over",
-   "line": 134.5,
-   "price": -108.0,
-   "edge": 7.2,
-   "x": null,
-   "why": "total market off",
-   "m": 0.6,
-   "tm": 141.7
-  },
-  {
    "id": "401902277",
    "sport": "cbb",
    "kick": "2026-11-08T19:00:00Z",
@@ -327,6 +311,22 @@
    "why": "total market off",
    "m": -3.5,
    "tm": 147.1
+  },
+  {
+   "id": "401921686",
+   "sport": "cbb",
+   "kick": "2026-11-08T19:00:00Z",
+   "home": "UAlbany",
+   "away": "Merrimack",
+   "mk": "total",
+   "side": "over",
+   "line": 135.5,
+   "price": 102.0,
+   "edge": 6.2,
+   "x": null,
+   "why": "total market off",
+   "m": 0.6,
+   "tm": 141.7
   },
   {
    "id": "401921687",
@@ -497,7 +497,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -110,
+   "price": -108.0,
    "edge": 2.7,
    "x": null,
    "why": "spread market off",
@@ -529,7 +529,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 0.9,
    "x": null,
    "why": "spread market off",
@@ -554,7 +554,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -110,
+   "price": -108.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -722,7 +722,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -817,9 +817,9 @@
   "401921686": {
    "mk": "total",
    "side": "over",
-   "line": 134.5,
-   "price": -108.0,
-   "edge": 7.2,
+   "line": 135.5,
+   "price": 102.0,
+   "edge": 6.2,
    "ev": null,
    "units": 0.0,
    "home": "UAlbany",
@@ -903,7 +903,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8559,
+  "snapshots": 8568,
   "buckets": [
    {
     "when": "24h+",
@@ -925,12 +925,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 1062,
-    "clvRet": -0.042,
-    "clvT": -28.04,
+    "clvN": 1065,
+    "clvRet": -0.0421,
+    "clvT": -28.13,
     "clv": 0.05,
-    "beat": 0.167,
-    "still": 0.699
+    "beat": 0.166,
+    "still": 0.7
    },
    {
     "when": "<1h",
@@ -8260,12 +8260,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 57.75,
-    "scale": 0.6494,
+    "raw": 52.75,
+    "scale": 0.7109,
     "down": 2.5
    },
    "2026-11-09": {
-    "raw": 5.75,
+    "raw": 6.25,
     "scale": 1.0
    },
    "2026-11-13": {
