@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-08T06:24:33Z",
+ "asof": "2026-11-08T09:03:57Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 81.87,
+  "now": 77.39,
   "peak": 117.38,
-  "drawdown": 0.3026,
-  "open": 38.25,
+  "drawdown": 0.3407,
+  "open": 33.0,
   "path": [
    101.5,
    101.6,
@@ -369,43 +369,44 @@
    88.15,
    83.9,
    84.11,
-   81.87
+   81.87,
+   77.39
   ]
  },
  "record": {
   "n": 404,
-  "clvN": 361,
-  "clvRet": -0.0146,
-  "clvT": -2.76,
-  "clv": -0.11,
-  "beat": 0.291,
-  "settled": 361,
+  "clvN": 363,
+  "clvRet": -0.0148,
+  "clvT": -2.83,
+  "clv": -0.12,
+  "beat": 0.29,
+  "settled": 362,
   "w": 176,
-  "l": 185,
+  "l": 186,
   "p": 0,
-  "roi": -0.0347,
-  "roiT": -0.65,
-  "profit": -18.48,
-  "risked": 318.0,
-  "yield": -0.0581
+  "roi": -0.0374,
+  "roiT": -0.7,
+  "profit": -23.48,
+  "risked": 323.0,
+  "yield": -0.0727
  },
- "tEff": -2.77,
+ "tEff": -2.82,
  "corr": {
   "rho": 0.0,
-  "n": 361,
-  "slates": 33,
-  "nEff": 361.0,
-  "avgSlate": 10.94
+  "n": 363,
+  "slates": 34,
+  "nEff": 363.0,
+  "avgSlate": 10.68
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 361,
+   "value": 363,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.5% t -2.77",
+   "value": "-1.5% t -2.82",
    "pass": false
   },
   {
@@ -420,7 +421,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -3.5% vs -1.5% (SE 5.4)",
+   "value": "ROI -3.7% vs -1.5% (SE 5.3)",
    "pass": true
   }
  ],
@@ -453,20 +454,20 @@
    "sport": "cfb",
    "mk": "total",
    "n": 23,
-   "clvN": 22,
-   "clvRet": -0.0335,
-   "clvT": -1.58,
-   "clv": -0.41,
-   "beat": 0.318,
-   "settled": 22,
+   "clvN": 23,
+   "clvRet": -0.0361,
+   "clvT": -1.77,
+   "clv": -0.52,
+   "beat": 0.304,
+   "settled": 23,
    "w": 9,
-   "l": 13,
+   "l": 14,
    "p": 0,
-   "roi": -0.1965,
-   "roiT": -0.93,
-   "profit": -11.92,
-   "risked": 26.75,
-   "yield": -0.4457
+   "roi": -0.2314,
+   "roiT": -1.13,
+   "profit": -16.92,
+   "risked": 31.75,
+   "yield": -0.533
   },
   {
    "id": "nfl-ml",
@@ -642,11 +643,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 73,
-   "clvN": 71,
-   "clvRet": -0.0221,
-   "clvT": -5.01,
-   "clv": -0.26,
-   "beat": 0.225,
+   "clvN": 72,
+   "clvRet": -0.0224,
+   "clvT": -5.13,
+   "clv": -0.28,
+   "beat": 0.222,
    "settled": 71,
    "w": 37,
    "l": 34,
@@ -681,48 +682,6 @@
  ],
  "open": [
   {
-   "rule": "cfb-total",
-   "sport": "cfb",
-   "id": "401860912",
-   "k": "2026-11-08T03:30:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "Oregon State",
-   "a": "Texas State",
-   "mk": "total",
-   "side": "under",
-   "line": 67.5,
-   "price": 108.0,
-   "bet": "under 67.5 +108",
-   "placed": "2026-11-01T20:17:01Z",
-   "stake": 5.0,
-   "edge": 4.4,
-   "ev": 0.0686,
-   "event": null,
-   "pass": true,
-   "close": 71.5
-  },
-  {
-   "rule": "cfb-total",
-   "sport": "cfb",
-   "id": "401864535",
-   "k": "2026-11-08T03:30:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "UNLV",
-   "a": "Wyoming",
-   "mk": "total",
-   "side": "under",
-   "line": 47.5,
-   "price": 113.0,
-   "bet": "under 47.5 +113",
-   "placed": "2026-11-03T00:08:15Z",
-   "stake": 5.0,
-   "edge": 3.0,
-   "ev": 0.0884,
-   "event": null,
-   "pass": false,
-   "close": 50.5
-  },
-  {
    "rule": "tennis-ml",
    "sport": "tennis",
    "id": "186642",
@@ -740,7 +699,11 @@
    "edge": 14.0,
    "ev": 0.0168,
    "event": "Prudential Hong Kong Tennis Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.039,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 0.6775
   },
   {
    "rule": "nfl-total",
@@ -1181,7 +1144,7 @@
    "price": 130.0,
    "bet": "Braelon Allen over 1.5 rec +130",
    "placed": "2026-11-07T20:58:00Z",
-   "stake": 2.25,
+   "stake": 2.0,
    "edge": 24.1,
    "ev": 0.38,
    "event": null,
@@ -1491,7 +1454,7 @@
    "ev": 0.0122,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "close": 224.5
   },
   {
    "rule": "nba-total",
@@ -1700,6 +1663,68 @@
   }
  ],
  "recent": [
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401860912",
+   "k": "2026-11-08T03:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "Oregon State",
+   "a": "Texas State",
+   "mk": "total",
+   "side": "under",
+   "line": 67.5,
+   "price": 108.0,
+   "bet": "under 67.5 +108",
+   "placed": "2026-11-01T20:17:01Z",
+   "stake": 5.0,
+   "edge": 4.4,
+   "ev": 0.0686,
+   "event": null,
+   "pass": true,
+   "clvRet": -0.1646,
+   "clv": -4.0,
+   "beat": -1,
+   "close": 71.5,
+   "score": [
+    42.0,
+    21.0
+   ],
+   "res": "w",
+   "ret": 1.08,
+   "profit": 5.4
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401864535",
+   "k": "2026-11-08T03:30:00.000Z",
+   "slate": "cfb:2026-11-07",
+   "h": "UNLV",
+   "a": "Wyoming",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": 113.0,
+   "bet": "under 47.5 +113",
+   "placed": "2026-11-03T00:08:15Z",
+   "stake": 5.0,
+   "edge": 3.0,
+   "ev": 0.0884,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0937,
+   "clv": -3.0,
+   "beat": -1,
+   "close": 50.5,
+   "score": [
+    41.0,
+    35.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -5.0
+  },
   {
    "rule": "cfb-total",
    "sport": "cfb",
@@ -3460,62 +3485,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.5
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186503",
-   "k": "2026-11-05T18:00:00Z",
-   "slate": "tennis:2026-11-05",
-   "h": "Fils",
-   "a": "Fritz",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 122,
-   "bet": "Fritz ML +122",
-   "placed": "2026-11-05T14:45:25Z",
-   "stake": 0.25,
-   "edge": 4.2,
-   "ev": 0.0042,
-   "event": "Rolex Paris Masters",
-   "pass": false,
-   "clvRet": -0.051,
-   "clv": -2.0,
-   "beat": -1,
-   "close": 0.4275,
-   "score": "6-3 6-4",
-   "res": "w",
-   "ret": 1.22,
-   "profit": 0.305
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186494",
-   "k": "2026-11-05T14:30:00Z",
-   "slate": "tennis:2026-11-05",
-   "h": "Borges",
-   "a": "Buse",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 141,
-   "bet": "Buse ML +141",
-   "placed": "2026-11-04T22:54:24Z",
-   "stake": 0.25,
-   "edge": 5.5,
-   "ev": 0.0106,
-   "event": "Rolex Paris Masters",
-   "pass": false,
-   "clvRet": -0.0782,
-   "clv": -3.0,
-   "beat": -1,
-   "close": 0.3825,
-   "score": "0-6 2-6",
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -15887,7 +15856,17 @@
    "ev": 0.0686,
    "event": null,
    "pass": true,
-   "close": 71.5
+   "clvRet": -0.1646,
+   "clv": -4.0,
+   "beat": -1,
+   "close": 71.5,
+   "score": [
+    42.0,
+    21.0
+   ],
+   "res": "w",
+   "ret": 1.08,
+   "profit": 5.4
   },
   {
    "rule": "cfb-total",
@@ -15908,7 +15887,17 @@
    "ev": 0.0884,
    "event": null,
    "pass": false,
-   "close": 50.5
+   "clvRet": -0.0937,
+   "clv": -3.0,
+   "beat": -1,
+   "close": 50.5,
+   "score": [
+    41.0,
+    35.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -5.0
   },
   {
    "rule": "tennis-ml",
@@ -15928,7 +15917,11 @@
    "edge": 14.0,
    "ev": 0.0168,
    "event": "Prudential Hong Kong Tennis Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.039,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 0.6775
   },
   {
    "rule": "nfl-total",
@@ -16369,7 +16362,7 @@
    "price": 130.0,
    "bet": "Braelon Allen over 1.5 rec +130",
    "placed": "2026-11-07T20:58:00Z",
-   "stake": 2.25,
+   "stake": 2.0,
    "edge": 24.1,
    "ev": 0.38,
    "event": null,
@@ -16679,7 +16672,7 @@
    "ev": 0.0122,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "close": 224.5
   },
   {
    "rule": "nba-total",
