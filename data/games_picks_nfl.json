@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-08T16:30:34Z",
+ "asof": "2026-11-08T16:42:43Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -286,11 +286,11 @@
     "mk": "total",
     "side": "over",
     "line": 37.5,
-    "price": -102.0,
-    "ev": 0.092,
-    "units": 1.25,
-    "unitsRaw": 2.0,
-    "unitsCap": 1.25
+    "price": -100.0,
+    "ev": 0.102,
+    "units": 2.0,
+    "unitsRaw": 3.0,
+    "unitsCap": 2.0
    },
    "unitsRaw": 1.5,
    "unitsCap": 1.0
@@ -417,11 +417,11 @@
     "mk": "total",
     "side": "under",
     "line": 47.5,
-    "price": 104.0,
-    "ev": 0.093,
-    "units": 2.0,
-    "unitsRaw": 3.0,
-    "unitsCap": 2.0
+    "price": -100.0,
+    "ev": 0.072,
+    "units": 1.0,
+    "unitsRaw": 1.5,
+    "unitsCap": 1.0
    }
   },
   {
@@ -550,7 +550,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": 102.0,
+   "price": 106.0,
    "edge": 0.7,
    "x": 4.0,
    "why": "edge under 4",
@@ -563,7 +563,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": 102.0,
+   "price": 106.0,
    "edge": 0.7,
    "ev": null,
    "units": 0.0,
@@ -623,10 +623,10 @@
    "mk": "total",
    "side": "over",
    "line": 37.5,
-   "price": -102.0,
-   "ev": 0.092,
+   "price": -100.0,
+   "ev": 0.102,
    "edge": 3.5,
-   "units": 2.0,
+   "units": 3.0,
    "home": "PHI",
    "away": "NYG",
    "state": "pick"
@@ -695,10 +695,10 @@
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": 104.0,
-   "ev": 0.093,
+   "price": -100.0,
+   "ev": 0.072,
    "edge": 2.5,
-   "units": 3.0,
+   "units": 1.5,
    "home": "CHI",
    "away": "TB",
    "state": "pick"
@@ -768,16 +768,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2552,
+  "snapshots": 2558,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1080,
+    "clvN": 1081,
     "clvRet": -0.0252,
     "clvT": -11.32,
-    "clv": 0.31,
+    "clv": 0.3,
     "beat": 0.26,
-    "still": 0.683
+    "still": 0.684
    },
    {
     "when": "6-24h",
@@ -790,9 +790,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 61,
-    "clvRet": -0.0424,
-    "clvT": -6.16,
+    "clvN": 63,
+    "clvRet": -0.0429,
+    "clvT": -6.33,
     "clv": 0.0,
     "beat": 0.0,
     "still": 1.0
@@ -2019,8 +2019,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 52.75,
-    "scale": 0.7109,
+    "raw": 52.25,
+    "scale": 0.7177,
     "down": 2.5
    },
    "2026-11-09": {
