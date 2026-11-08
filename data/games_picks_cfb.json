@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-08T01:28:18Z",
+ "asof": "2026-11-08T01:55:29Z",
  "recenter": {
-  "week": 0.41
+  "week": 0.42
  },
  "monitor": {
   "clocks": {
@@ -472,7 +472,7 @@
     "side": "under",
     "line": 50.5,
     "price": -100.0,
-    "ev": 0.056,
+    "ev": 0.057,
     "units": 3.75
    }
   },
@@ -498,16 +498,17 @@
    "tm": 63.1,
    "tmRaw": 63.9,
    "flagged": "2026-11-01T20:17:01Z",
-   "betTo": 66.0,
+   "betTo": 69.0,
    "close": 71.5,
    "now": {
     "mk": "total",
     "side": "under",
     "line": 71.5,
-    "price": -102.0,
-    "ev": 0.059,
-    "units": 3.5
-   }
+    "price": -100.0,
+    "ev": 0.047,
+    "units": 3.25
+   },
+   "pass": true
   },
   {
    "id": "401856852",
@@ -592,8 +593,8 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": 102.0,
-    "ev": 0.072,
+    "price": 104.0,
+    "ev": 0.082,
     "units": 5.0
    }
   },
@@ -742,7 +743,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 5.1,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -759,11 +760,11 @@
    "side": "away",
    "line": -6.5,
    "price": -113.0,
-   "edge": 3.7,
+   "edge": 3.8,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
-   "m": -10.2,
-   "tm": 50.6
+   "m": -10.3,
+   "tm": 50.7
   }
  ],
  "games": {
@@ -771,9 +772,9 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": 102.0,
-   "ev": 0.072,
-   "edge": 7.7,
+   "price": 104.0,
+   "ev": 0.082,
+   "edge": 7.6,
    "units": 5.0,
    "home": "Texas Tech",
    "away": "West Virginia",
@@ -783,10 +784,10 @@
    "mk": "total",
    "side": "under",
    "line": 71.5,
-   "price": -102.0,
-   "ev": 0.059,
-   "edge": 8.7,
-   "units": 3.5,
+   "price": -100.0,
+   "ev": 0.047,
+   "edge": 5.9,
+   "units": 3.25,
    "home": "Oregon State",
    "away": "Texas State",
    "state": "pick"
@@ -795,7 +796,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 5.1,
    "ev": null,
    "units": 0.0,
@@ -808,8 +809,8 @@
    "side": "under",
    "line": 50.5,
    "price": -100.0,
-   "ev": 0.056,
-   "edge": 7.1,
+   "ev": 0.057,
+   "edge": 7.2,
    "units": 3.75,
    "home": "UNLV",
    "away": "Wyoming",
@@ -820,7 +821,7 @@
    "side": "away",
    "line": -6.5,
    "price": -113.0,
-   "edge": 3.7,
+   "edge": 3.8,
    "ev": null,
    "units": 0.0,
    "home": "UTEP",
@@ -880,7 +881,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 10982,
+  "snapshots": 10987,
   "buckets": [
    {
     "when": "24h+",
@@ -902,12 +903,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 197,
-    "clvRet": -0.0635,
-    "clvT": -15.46,
+    "clvN": 200,
+    "clvRet": -0.0638,
+    "clvT": -15.75,
     "clv": 0.05,
-    "beat": 0.127,
-    "still": 0.777
+    "beat": 0.125,
+    "still": 0.78
    },
    {
     "when": "<1h",
@@ -2041,8 +2042,9 @@
    "tm": 63.1,
    "tmRaw": 63.9,
    "flagged": "2026-11-01T20:17:01Z",
-   "betTo": 66.0,
-   "close": 71.5
+   "betTo": 69.0,
+   "close": 71.5,
+   "pass": true
   },
   {
    "id": "401862817",
@@ -3009,7 +3011,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-07": {
-    "raw": 13.5,
+    "raw": 10.0,
     "scale": 1.0,
     "down": 26.25
    },
