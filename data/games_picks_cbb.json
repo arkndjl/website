@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-08T17:13:02Z",
+ "asof": "2026-11-08T17:14:54Z",
  "recenter": {
-  "2026-11-08": -10.69
+  "2026-11-08": -10.68
  },
  "monitor": {
   "clocks": {
@@ -185,6 +185,22 @@
    "tm": 142.7
   },
   {
+   "id": "401921685",
+   "sport": "cbb",
+   "kick": "2026-11-08T18:00:00Z",
+   "home": "New Hampshire",
+   "away": "Sacred Heart",
+   "mk": "total",
+   "side": "over",
+   "line": 145.5,
+   "price": -108.0,
+   "edge": 10.0,
+   "x": null,
+   "why": "total market off",
+   "m": 2.0,
+   "tm": 155.5
+  },
+  {
    "id": "401926215",
    "sport": "cbb",
    "kick": "2026-11-08T20:00:00Z",
@@ -231,22 +247,6 @@
    "why": "total market off",
    "m": 11.3,
    "tm": 148.6
-  },
-  {
-   "id": "401921685",
-   "sport": "cbb",
-   "kick": "2026-11-08T18:00:00Z",
-   "home": "New Hampshire",
-   "away": "Sacred Heart",
-   "mk": "total",
-   "side": "over",
-   "line": 146.5,
-   "price": 102.0,
-   "edge": 9.0,
-   "x": null,
-   "why": "total market off",
-   "m": 2.0,
-   "tm": 155.5
   },
   {
    "id": "401920233",
@@ -369,7 +369,7 @@
    "mk": "total",
    "side": "over",
    "line": 141.5,
-   "price": -115.0,
+   "price": -106.0,
    "edge": 5.5,
    "x": null,
    "why": "total market off",
@@ -385,7 +385,7 @@
    "mk": "total",
    "side": "under",
    "line": 146.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 5.0,
    "x": null,
    "why": "total market off",
@@ -465,7 +465,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": 106.0,
+   "price": 102.0,
    "edge": 4.0,
    "x": null,
    "why": "spread market off",
@@ -542,7 +542,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": 106.0,
+   "price": 102.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -566,7 +566,7 @@
    "mk": "total",
    "side": "under",
    "line": 146.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 5.0,
    "ev": null,
    "units": 0.0,
@@ -638,7 +638,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 0.8,
    "ev": null,
    "units": 0.0,
@@ -710,7 +710,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": 106.0,
+   "price": 104.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -721,9 +721,9 @@
   "401921685": {
    "mk": "total",
    "side": "over",
-   "line": 146.5,
-   "price": 102.0,
-   "edge": 9.0,
+   "line": 145.5,
+   "price": -108.0,
+   "edge": 10.0,
    "ev": null,
    "units": 0.0,
    "home": "New Hampshire",
@@ -746,7 +746,7 @@
    "mk": "total",
    "side": "over",
    "line": 141.5,
-   "price": -115.0,
+   "price": -106.0,
    "edge": 5.5,
    "ev": null,
    "units": 0.0,
@@ -927,7 +927,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8654,
+  "snapshots": 8669,
   "buckets": [
    {
     "when": "24h+",
@@ -949,21 +949,21 @@
    },
    {
     "when": "1-6h",
-    "clvN": 1096,
+    "clvN": 1098,
     "clvRet": -0.0412,
-    "clvT": -27.77,
+    "clvT": -27.83,
     "clv": 0.06,
     "beat": 0.168,
-    "still": 0.703
+    "still": 0.704
    },
    {
     "when": "<1h",
-    "clvN": 218,
-    "clvRet": -0.0448,
-    "clvT": -18.99,
+    "clvN": 220,
+    "clvRet": -0.0447,
+    "clvT": -19.11,
     "clv": 0.0,
-    "beat": 0.096,
-    "still": 0.807
+    "beat": 0.095,
+    "still": 0.809
    }
   ]
  },
@@ -8284,8 +8284,8 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 51.25,
-    "scale": 0.7317,
+    "raw": 50.5,
+    "scale": 0.7426,
     "down": 2.5
    },
    "2026-11-09": {
