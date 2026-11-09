@@ -388,14 +388,20 @@ def load_rows(W):
     return chl_rows(ahl_shots(rows), fetch=True)
 
 
+SHORT = {2013: 48, 2020: 69.8, 2021: 56}   # team games in the shortened seasons (2019-20: 1,082 games over 31 teams)
+
+
 def outcome(r, W, cur):
-    """NHL outcome: WAR seasons in the window (and what is in so far)"""
+    """NHL outcome: WAR seasons in the window (and what is in so far), each season's WAR and goals saved on an
+    82-game schedule: the league's WAR was 401 in the 48-game 2012-13 against 680-735 in a full season, so a peak
+    season there counted for .59 of one"""
     wins, gps, gsx = [], 0, []
     for S in range(r['year'] + 1, r['year'] + 1 + WINDOW):
         q = W.get(S, {}).get(r.get('id'))
         if q:
-            wins.append(q.get('war') or 0.0); gps += q.get('gp') or 0
-            gsx.append(q.get('gsax') or 0.0)
+            k = 82 / SHORT.get(S, 82)
+            wins.append(k * (q.get('war') or 0.0)); gps += q.get('gp') or 0
+            gsx.append(k * (q.get('gsax') or 0.0))
     r['nhl_war'] = wins; r['nhl_gp'] = gps
     r['peak'] = sum((sorted(wins, reverse=True) + [0, 0, 0])[:3]) / 3
     r['gpeak'] = sum((sorted(gsx, reverse=True) + [0, 0, 0])[:3]) / 3
