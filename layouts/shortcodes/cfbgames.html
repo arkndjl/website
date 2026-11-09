@@ -143,10 +143,10 @@
     var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
     function active() { var now = Date.now(); return cards.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 5 * 3600e3; }); }
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-    function day(t) { var d = new Date(t); return d.getUTCFullYear() + ('0' + (d.getUTCMonth() + 1)).slice(-2) + ('0' + d.getUTCDate()).slice(-2); }
+    function day(t) { return new Date(t).toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).replace(/-/g, ''); }   // ESPN files a game under its Eastern day
     function poll() {
       if (!active()) return;
-      var days = {}; cards.forEach(function (c) { var t = Date.parse(c.dataset.kick); days[day(t)] = 1; days[day(t + 864e5)] = 1; });
+      var days = {}; cards.forEach(function (c) { var t = Date.parse(c.dataset.kick); days[day(t)] = 1; days[day(t - 216e5)] = 1; });
       Object.keys(days).forEach(function (d) {
         fetch('https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups=80&limit=300&dates=' + d).then(function (r) { return r.json(); }).then(function (j) {
           (j.events || []).forEach(function (e) {
