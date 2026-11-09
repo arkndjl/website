@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-09T00:08:03Z",
+ "asof": "2026-11-09T00:09:38Z",
  "recenter": {
   "week": 0.04
  },
@@ -938,6 +938,22 @@
    "tm": 55.1
   },
   {
+   "id": "401858518",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "Indiana",
+   "away": "USC",
+   "mk": "total",
+   "side": "over",
+   "line": 49.5,
+   "price": -108.0,
+   "edge": 4.9,
+   "x": 3.0,
+   "why": "no edge at -108",
+   "m": 7.9,
+   "tm": 54.4
+  },
+  {
    "id": "401871061",
    "sport": "cfb",
    "kick": "2026-11-14T20:30:00.000Z",
@@ -1250,37 +1266,21 @@
    "mk": "total",
    "side": "over",
    "line": 54.5,
-   "price": -138.0,
+   "price": -135.0,
    "edge": 1.4,
    "x": 3.0,
    "why": "edge under 3",
    "m": 16.9,
    "tm": 55.9
-  },
-  {
-   "id": "401870769",
-   "sport": "cfb",
-   "kick": "2026-11-14T19:00:00.000Z",
-   "home": "Sam Houston",
-   "away": "Kennesaw State",
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -113.0,
-   "edge": 1.4,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -7.7,
-   "tm": 48.9
   }
  ],
  "games": {
   "401858518": {
-   "mk": "spread",
-   "side": "home",
-   "line": 7.5,
-   "price": -104.0,
-   "edge": 0.4,
+   "mk": "total",
+   "side": "over",
+   "line": 49.5,
+   "price": -108.0,
+   "edge": 4.9,
    "ev": null,
    "units": 0.0,
    "home": "Indiana",
@@ -1735,7 +1735,7 @@
    "mk": "spread",
    "side": "away",
    "line": -13.5,
-   "price": -115.0,
+   "price": -111.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -1807,7 +1807,7 @@
    "mk": "total",
    "side": "over",
    "line": 54.5,
-   "price": -138.0,
+   "price": -135.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2096,13 +2096,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 12188,
+  "snapshots": 12201,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2480,
+    "clvN": 2483,
     "clvRet": -0.0515,
-    "clvT": -31.5,
+    "clvT": -31.52,
     "clv": 0.12,
     "beat": 0.329,
     "still": 0.375
