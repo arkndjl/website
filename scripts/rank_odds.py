@@ -21,6 +21,8 @@ floored at the smallest sd measured at any checkpoint (CBB's fit puts a at 0, wh
 March; its 80%-of-season checkpoint measures 1.4). The game noise is the result's variance around the model's own
 pre-game margin less that margin's rating gap error (2 sigma^2, solved with sigma^2), where that scores better on the
 held-out seasons than the raw variance (which double-removes the gap error and shrinks late-season sds; fit_sport).
+The NFL instead takes sigma^2 from the mean product of two different remaining games' residuals (fit_cross: nothing
+to net, where the pure netting ran high late in the season; it scores better on final rank, rank_sd_research.py).
 The NBA keeps its own measurement from the season-sim rating (data/nba_season_sd.json), which this method lands near
 (3.1 open / 2.4 end against 3.7 / 2.9; the ridge read-back smooths the rating a little).
 
@@ -162,7 +164,11 @@ def checkpoints(sport):
                 res[g['away']].append(-e)
             for t, v in res.items():
                 if len(v) >= 3 and seen[t] >= 2:
-                    rows.append((S, f, float(np.mean(v)), len(v), len(v) / tot[t], gn, T))
+                    u, k = np.array(v), len(v)
+                    # mean product of two different remaining games' residuals: the rating error's variance
+                    # (x T/(T-1)) with no game noise to net out
+                    cp = float((u.sum() ** 2 - (u ** 2).sum()) / (k * (k - 1)))
+                    rows.append((S, f, float(np.mean(v)), k, k / tot[t], gn, T, cp))
     return np.array(rows)
 
 
@@ -174,6 +180,8 @@ def fit_sport(sport, R=None, noise='pure'):
     average game's), solved to a fixed point with sigma^2 (six passes), floored at 30% of the own variance."""
     import numpy as np
     R = checkpoints(sport) if R is None else R
+    if noise == 'cross':
+        return fit_cross(R)
     Sx, ck, A, n, sh, gn, T = (R[:, i] for i in range(7))
 
     def nll_rows(s2, gnoise):
@@ -220,6 +228,43 @@ def fit_sport(sport, R=None, noise='pure'):
             '_rows': np.concatenate(rows)}
 
 
+CROSS = ('nfl',)       # sports on the cross-product fit (scripts/rank_sd_research.py: it must not score worse on final rank)
+
+
+def fit_cross(R, upto=None, hl=3):
+    """sigma^2 = a + b x share left with no game noise netted at all: a team's residuals in two different remaining
+    games share only its own rating error, so their mean product (checkpoints, column 7) estimates sigma^2 x T/(T-1)
+    directly. The 'pure' netting takes 2 sigma^2 out of the game noise, but the opponents' errors differ game to game
+    and belong in it, which over-states sigma late (three games left: about x 1.4 to 1.7). Each checkpoint's mean
+    product (seasons weighted by the half-life), a line through the five, a and b kept at 0 or above; the floor is the
+    smallest checkpoint sd. upto: seasons before it only (the walk-forward rows)"""
+    import numpy as np
+    Sx, ck, sh, T, cp = R[:, 0], R[:, 1], R[:, 4], R[:, 6], R[:, 7]
+    seasons = sorted(set(Sx.astype(int).tolist()))
+
+    def one(s_):
+        k = Sx < s_
+        w = 0.5 ** ((s_ - 1 - Sx[k]) / hl)
+        y, x, c = cp[k] * (T[k] - 1) / T[k], sh[k], ck[k]
+        cs = [q for q in (0, .2, .4, .6, .8) if (c == q).any()]
+        ys = np.array([(w * y)[c == q].sum() / w[c == q].sum() for q in cs])
+        xs = np.array([(w * x)[c == q].sum() / w[c == q].sum() for q in cs])
+        b, a = np.polyfit(xs, ys, 1)
+        if a < 0:
+            a, b = 0.0, max(0.0, float((xs * ys).sum() / (xs * xs).sum()))
+        elif b < 0:
+            a, b = max(0.0, float(ys.mean())), 0.0
+        return round(float(a), 2), round(float(b), 2), {str(q): round(math.sqrt(max(0.0, v)), 2) for q, v in zip(cs, ys)}
+    if upto is not None:
+        a, b, msd = one(upto)
+        return a, b, min(msd.values())
+    a, b, msd = one(seasons[-1] + 1)
+    ab = {s_: list(one(s_)[:2]) for s_ in seasons[1:]}
+    return {'a': a, 'b': b, 'halfLife': hl, 'seasons': [seasons[0], seasons[-1]], 'n': int(len(Sx)), 'noise': 'cross',
+            'sdOpen': round(math.sqrt(a + b), 2), 'sdEnd': round(math.sqrt(max(a, 0.05)), 2), 'byCheckpoint': msd,
+            'floor': min(msd.values()), 'walk': {'seasons': seasons[1:], 'ab': ab}}
+
+
 def fit():
     out = {}
     for s in ('nfl', 'cbb', 'cfb', 'nba'):
@@ -229,6 +274,8 @@ def fit():
         t = float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d))))
         # the pure noise only where it scores better on the held-out seasons (walk-forward, per team and checkpoint)
         out[s] = pure if d.mean() < 0 else own
+        if s in CROSS:
+            out[s] = fit_cross(R)
         out[s]['noiseTest'] = {'nllOwn': own['walk']['nll'], 'nllPure': pure['walk']['nll'], 't': round(t, 2),
                                'own': {k: own[k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'floor', 'byCheckpoint')},
                                'pure': {k: pure[k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'floor', 'byCheckpoint', 'gameSd')}}
@@ -237,7 +284,8 @@ def fit():
     out['nba'] = {'a': nba['a'], 'b': nba['b'], 'sdOpen': nba['sdOpen'], 'sdEnd': nba['sdEnd'], 'floor': out['nba']['floor'], 'src': 'data/nba_season_sd.json',
                   'readBack': {k: out['nba'][k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'byCheckpoint', 'walk', 'noise', 'noiseTest')}}
     out['note'] = ('rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit); noise: the game noise '
-                   'the fit nets out (own: around the model margin; pure: that less the gap error, used where it scores better)')
+                   'the fit nets out (own: around the model margin; pure: that less the gap error, used where it scores better; '
+                   'cross: none, sd^2 read from the products of two different remaining games\' residuals)')
     for sp in ('nhl', 'soccer'):               # measured by scripts/nhl_games.py, scripts/soccer_games.py: kept as written
         try:
             out[sp] = json.load(open(SD))[sp]
