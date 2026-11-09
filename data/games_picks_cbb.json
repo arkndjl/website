@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-09T00:14:16Z",
+ "asof": "2026-11-09T00:51:47Z",
  "recenter": {
-  "2026-11-08": -10.51,
+  "2026-11-08": -10.49,
   "2026-11-09": -10.44
  },
  "monitor": {
@@ -138,22 +138,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401918053",
-   "sport": "cbb",
-   "kick": "2026-11-09T01:30:00Z",
-   "home": "California",
-   "away": "Houston",
-   "mk": "spread",
-   "side": "away",
-   "line": 19.5,
-   "price": -105.0,
-   "edge": 41.8,
-   "x": null,
-   "why": "spread market off",
-   "m": -22.3,
-   "tm": 144.2
-  },
-  {
    "id": "401919029",
    "sport": "cbb",
    "kick": "2026-11-09T04:00:00Z",
@@ -162,7 +146,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": -104.0,
+   "price": -100.0,
    "edge": 15.7,
    "x": null,
    "why": "spread market off",
@@ -194,12 +178,28 @@
    "mk": "spread",
    "side": "home",
    "line": 8.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 4.7,
    "x": null,
    "why": "spread market off",
    "m": 13.2,
    "tm": 144.4
+  },
+  {
+   "id": "401918053",
+   "sport": "cbb",
+   "kick": "2026-11-09T01:30:00Z",
+   "home": "California",
+   "away": "Houston",
+   "mk": "spread",
+   "side": "away",
+   "line": -19.5,
+   "price": -110,
+   "edge": 2.8,
+   "x": null,
+   "why": "spread market off",
+   "m": -22.3,
+   "tm": 144.2
   },
   {
    "id": "401909718",
@@ -209,9 +209,9 @@
    "away": "Syracuse",
    "mk": "spread",
    "side": "away",
-   "line": 4.5,
-   "price": -104.0,
-   "edge": 2.3,
+   "line": 3.5,
+   "price": -117.0,
+   "edge": 1.3,
    "x": null,
    "why": "spread market off",
    "m": 2.2,
@@ -223,7 +223,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": -104.0,
+   "price": -100.0,
    "edge": 15.7,
    "ev": null,
    "units": 0.0,
@@ -246,9 +246,9 @@
   "401918053": {
    "mk": "spread",
    "side": "away",
-   "line": 19.5,
-   "price": -105.0,
-   "edge": 41.8,
+   "line": -19.5,
+   "price": -110,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "California",
@@ -259,7 +259,7 @@
    "mk": "spread",
    "side": "home",
    "line": 8.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -270,9 +270,9 @@
   "401909718": {
    "mk": "spread",
    "side": "away",
-   "line": 4.5,
-   "price": -104.0,
-   "edge": 2.3,
+   "line": 3.5,
+   "price": -117.0,
+   "edge": 1.3,
    "ev": null,
    "units": 0.0,
    "home": "Indiana",
@@ -332,32 +332,32 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8808,
+  "snapshots": 8813,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 439,
-    "clvRet": -0.0426,
-    "clvT": -5.39,
-    "clv": -0.08,
-    "beat": 0.278,
+    "clvRet": -0.0351,
+    "clvT": -5.06,
+    "clv": 0.19,
+    "beat": 0.285,
     "still": 0.292
    },
    {
     "when": "6-24h",
     "clvN": 1549,
-    "clvRet": -0.0467,
-    "clvT": -16.26,
-    "clv": -0.09,
-    "beat": 0.259,
+    "clvRet": -0.0432,
+    "clvT": -17.1,
+    "clv": 0.04,
+    "beat": 0.262,
     "still": 0.468
    },
    {
     "when": "1-6h",
-    "clvN": 1109,
-    "clvRet": -0.0412,
-    "clvT": -28.08,
-    "clv": 0.06,
+    "clvN": 1112,
+    "clvRet": -0.0404,
+    "clvT": -23.82,
+    "clv": 0.1,
     "beat": 0.167,
     "still": 0.706
    },
@@ -7689,12 +7689,12 @@
   "cap": 40.0,
   "nights": {
    "2026-11-08": {
-    "raw": 9.25,
-    "scale": 0.8649,
-    "down": 32.0
+    "raw": 5.75,
+    "scale": 0.9565,
+    "down": 34.5
    },
    "2026-11-09": {
-    "raw": 9.0,
+    "raw": 7.0,
     "scale": 1.0
    },
    "2026-11-11": {
