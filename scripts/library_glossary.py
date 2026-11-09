@@ -85,6 +85,7 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
       ['E[FV] = 20 + 10 P(30+) + 10 P(40+) + 10 P(50+) + (mean 60+ career - 50) P(60+); one ridge logistic per rung.',
        'Newcomers: recruit rank (On3, 247, Barttorvik), class. Returners: 3-season BPM, conference power, age, size, rates.',
        'Board stage adds June draft-board rank and guard combine testing. E maps to a grade on pooled 2009-16 boards.',
+       'Outcome odds are fit on each board\'s top 300; below that range they scale down to the floor those boards realized (1.8% NBA).',
        'In season: E = (1 - w) preseason + w now, w = minutes / (minutes + k); k 63 newcomers, 128 returners.'],
       'CBB board, fv model tab, in season window', ['CBB']),
     E('Hockey FV model', 'OLS on outcome FV for the draft class and drafted players short of 100 NHL games.',
