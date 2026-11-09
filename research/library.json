@@ -471,9 +471,9 @@
     },
     {
      "term": "Contract value (surplus)",
-     "short": "Projected VORX x market $ per win, minus salary, every year left.",
+     "short": "Minimum salary + projected VORX x market $ per win, minus salary, every year left.",
      "body": [
-      "$ per win = payroll above the minimum / league projected VORX = $12.65M (2026-27); +7% a year (assumption).",
+      "$ per win = payroll above the minimum / league projected VORX, refit on each update; +7% a year (assumption).",
       "Player option counted only when it pays the player; team option only when it pays the team."
      ],
      "where": "NBA contract value tab",
@@ -515,9 +515,9 @@
      "term": "CBB WAR / WAA",
      "short": "Wins over a replacement / average D-I player.",
      "body": [
-      "WAR = (BPM + 2) x minutes / 40 x team possessions a 40 / 100 x .0124 wins a point; WAA uses BPM.",
-      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 365 team seasons:",
-      "wins = .41 x games + team WAR (r .85). The textbook slope (.0347 at margin sd 11.5) overstates: schedules",
+      "WAR = (BPM + 2) x minutes / 40 x 68 possessions a 40 / 100 x .0143 wins a point; WAA uses BPM.",
+      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 3,485 team seasons 2017-26:",
+      "wins = .395 x games + team WAR (r .86). The textbook slope (.0347 at margin sd 11.5) overstates: schedules",
       "pair strong with strong and win odds flatten at the ends. FV test: WAR, WAA, career and 5/4/3 WAR fail."
      ],
      "where": "CBB WAR leaders, stats, portal, returning",
@@ -529,7 +529,8 @@
      "term": "Stat+ (CBB)",
      "short": "BPM against the position: 100 + 25 x z.",
      "body": [
-      "z = (BPM - position mean) / position sd; G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (10%+ minute seasons 2008-16).",
+      "z = (BPM - position mean) / position sd. Tabs: last season's norms (G -.23 / 3.84, F .57 / 4.13, C 1.71 / 4.56),",
+      "then this season's own once 40 players a position qualify. FV driver norms: G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (2008-16).",
       "FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26)."
      ],
      "where": "CBB stats, WAR leaders, portal; FV inputs",
@@ -591,7 +592,7 @@
      "short": "Descriptive wins over replacement at goal value.",
      "body": [
       "5v5 on-ice xG vs teammates, PP xG /5, PK /4, finishing (goals - ixG), penalties, share of team leftover xG.",
-      "Goalies: GSAx at full credit. Sums to team goal differential (R2 .975).",
+      "Goalies: GSAx at full credit. Sums to team goal differential (R2 .991).",
       "Replacement = players outside each team's top 13 F / 7 D / 2 G."
      ],
      "where": "NHL WAR leaders, rookies; hockey prospect outcome",
@@ -604,9 +605,9 @@
      "term": "pWAR / HPM",
      "short": "Projected WAR and projected goals per 60 over an average player.",
      "body": [
-      "HPM = Marcel-weighted (1 / .7 / .5) shrunk rates, components weighted by how well they carry to next season.",
-      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .38 vs .23 before (t 4.95, 15/17 seasons).",
-      "Goalie GSAx barely repeats (weight .07), so goalie pWAR ~0.4 while goalie WAR runs ~7."
+      "HPM = Marcel-weighted (1 / .5 / .25) shrunk rates, components weighted by how well they carry to next season.",
+      "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .37 vs .26 before (t 4.24, 15/17 seasons).",
+      "Goalie GSAx barely repeats (weight .21), so goalie pWAR ~0.4 while goalie WAR runs ~7."
      ],
      "where": "NHL WAR leaders, backup watch, rookies",
      "sports": [
@@ -1877,7 +1878,7 @@
   },
   {
    "board": "CFB / NFL prospects",
-   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,976 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 74.9 (80 about once per 5 seasons).",
+   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,923 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 74.9 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -1901,7 +1902,7 @@
      "75",
      "3+ time All-Pro",
      "~1",
-     "1 of 4,976 (0.02%)",
+     "1 of 4,923 (0.02%)",
      "0.89 / 0.29",
      "top 2 pick",
      "-"
@@ -1910,7 +1911,7 @@
      "70",
      "2-time All-Pro",
      "~3",
-     "3 of 4,976 (0.06%)",
+     "3 of 4,923 (0.06%)",
      "0.67 / 0.23",
      "top 5 pick",
      "-"
@@ -1919,7 +1920,7 @@
      "65",
      "All-Pro or 3+ Pro Bowls",
      "~7",
-     "5 of 4,976 (0.10%)",
+     "4 of 4,923 (0.08%)",
      "0.49 / 0.17",
      "top 10 pick",
      "65+: 71.2 -> 74.9 (n 19, 50+ 100%)"
@@ -1928,7 +1929,7 @@
      "60",
      "Pro Bowler",
      "~16",
-     "10 of 4,976 (0.20%)",
+     "10 of 4,923 (0.20%)",
      "0.40 / 0.13",
      "1st round",
      "60-64: 62.8 -> 60.6 (n 10, 50+ 70%)"
@@ -1937,7 +1938,7 @@
      "55",
      "6+ seasons as a starter",
      "~25",
-     "16 of 4,976 (0.32%)",
+     "17 of 4,923 (0.35%)",
      "0.31 / 0.10",
      "late 1st / 2nd round",
      "55-59: 57.3 -> 59.5 (n 17, 50+ 65%)"
@@ -1946,7 +1947,7 @@
      "50",
      "4+ seasons as a starter",
      "~32",
-     "73 of 4,976 (1.5%)",
+     "73 of 4,923 (1.5%)",
      "0.19 / 0.07",
      "rounds 2-3",
      "50-54: 51.8 -> 48.5 (n 64, 50+ 38%)"
@@ -1955,7 +1956,7 @@
      "45",
      "2+ seasons as a starter",
      "~43",
-     "212 of 4,976 (4.3%)",
+     "206 of 4,923 (4.2%)",
      "0.09 / 0.05",
      "rounds 3-4",
      "45-49: 47.2 -> 46.1 (n 167, 50+ 37%)"
@@ -1964,7 +1965,7 @@
      "40",
      "rotation, 48+ games",
      "~64",
-     "279 of 4,976 (5.6%)",
+     "276 of 4,923 (5.6%)",
      "0 / 0.02",
      "rounds 4-6",
      "40-44: 42.4 -> 42.3 (n 80, 50+ 32%)"
@@ -1973,7 +1974,7 @@
      "35",
      "backup, 16+ games",
      "~98",
-     "373 of 4,976 (7.5%)",
+     "371 of 4,923 (7.5%)",
      "0 / 0.01",
      "late round",
      "35-39: 37.3 -> 36.2 (n 107, 50+ 21%)"
@@ -1982,7 +1983,7 @@
      "30",
      "drafted / camp roster",
      "~150",
-     "540 of 4,976 (10.9%)",
+     "547 of 4,923 (11.1%)",
      "0 / 0",
      "late round / UDFA",
      "30-34: 32.3 -> 32.6 (n 165, 50+ 17%)"
@@ -2000,7 +2001,7 @@
   },
   {
    "board": "CBB / NBA prospects",
-   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,492). Stretch: headline = mean up to 46.6, linear above to 80 at 54.7 (80 about once per 5 seasons).",
+   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,493). Stretch: headline = mean up to 46.6, linear above to 80 at 54.7 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning (rarity anchor; most common role in band)",
@@ -2046,7 +2047,7 @@
      "65",
      "All-NBA; most common: All-NBA (53%)",
      "2.11",
-     "1 of 5,492 (0.02%)",
+     "1 of 5,493 (0.02%)",
      "+2.0 to +3.2",
      "7.0",
      "median pick 11, 95% drafted",
@@ -2056,7 +2057,7 @@
      "60",
      "2+ All-Star; most common: All-NBA (80%)",
      "0.56",
-     "1 of 5,492 (0.02%)",
+     "2 of 5,493 (0.04%)",
      "+1.7 to +2.0",
      "8.0",
      "median pick 7, 100% drafted",
@@ -2066,7 +2067,7 @@
      "55",
      "All-Star or 6+ seasons as a starter; most common: All-Star or 6+ seasons as a starter (45%)",
      "4.67",
-     "2 of 5,492 (0.04%)",
+     "3 of 5,493 (0.05%)",
      "+0.6 to +1.7",
      "19",
      "median pick 18, 90% drafted",
@@ -2076,7 +2077,7 @@
      "50",
      "4+ seasons as a starter; most common: 4+ seasons as a starter (31%)",
      "3.56",
-     "3 of 5,492 (0.05%)",
+     "5 of 5,493 (0.09%)",
      "+0.0 to +0.6",
      "28",
      "median pick 17, 84% drafted",
@@ -2086,7 +2087,7 @@
      "45",
      "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
      "5.89",
-     "5 of 5,492 (0.09%)",
+     "11 of 5,493 (0.20%)",
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
@@ -2096,7 +2097,7 @@
      "40",
      "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
      "7.33",
-     "19 of 5,492 (0.35%)",
+     "24 of 5,493 (0.44%)",
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
@@ -2106,7 +2107,7 @@
      "35",
      "bench, 100+ games; most common: bench, 100+ games (52%)",
      "12",
-     "45 of 5,492 (0.82%)",
+     "54 of 5,493 (0.98%)",
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
@@ -2116,7 +2117,7 @@
      "30",
      "reached the NBA; most common: reached the NBA (83%)",
      "23",
-     "82 of 5,492 (1.5%)",
+     "92 of 5,493 (1.7%)",
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",
@@ -2175,7 +2176,7 @@
      "4.04+ peak WAR a season",
      "top 2 of a class",
      "top 0.9% of picks",
-     "0 / 4",
+     "0 / 3",
      "-"
     ],
     [
@@ -2183,7 +2184,7 @@
      "3.18+ peak WAR a season",
      "top 5 of a class",
      "top 2.4% of picks",
-     "1 / 10",
+     "1 / 9",
      "60-64: 62.2 -> 58.6 (n 12, NHL 100%)"
     ],
     [
@@ -2191,7 +2192,7 @@
      "2.33+ peak WAR a season",
      "top 10",
      "top 4.7% of picks",
-     "1 / 13",
+     "1 / 12",
      "55-59: 57.3 -> 60.0 (n 16, NHL 100%)"
     ],
     [
@@ -2199,7 +2200,7 @@
      "1.49+ peak WAR a season",
      "top 20 (NHL regular)",
      "top 9.4% of picks",
-     "4 / 30",
+     "4 / 29",
      "50-54: 51.7 -> 50.4 (n 33, NHL 97%)"
     ],
     [
@@ -2207,7 +2208,7 @@
      "0.87+ peak WAR a season",
      "top 30",
      "top 14.2% of picks",
-     "7 / 75",
+     "7 / 74",
      "45-49: 47.3 -> 49.1 (n 63, NHL 98%)"
     ],
     [
@@ -2215,7 +2216,7 @@
      "0.39+ peak WAR a season",
      "top 45 (NHL career)",
      "top 21.3% of picks",
-     "20 / 124",
+     "20 / 121",
      "40-44: 42.4 -> 44.0 (n 128, NHL 98%)"
     ],
     [
@@ -2231,14 +2232,14 @@
      "no NHL games",
      "-",
      "-",
-     "191 / 300",
+     "192 / 300",
      "20-24: 22.8 -> 23.6 (n 811, NHL 24%)"
     ]
    ]
   },
   {
    "board": "Soccer prospects",
-   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,659 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
+   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,731 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -2258,63 +2259,63 @@
      "75",
      "peak GAR a season GK 20.0 / D 14.9 / M 15.9 / F 15.0",
      "the best of a birth year at the position",
-     "1 of 30,659 (<0.01%)",
+     "1 of 30,731 (<0.01%)",
      "-"
     ],
     [
      "70",
      "peak GAR a season GK 15.2 / D 13.0 / M 14.0 / F 13.4",
      "top 3 of a birth year at the position",
-     "1 of 30,659 (<0.01%)",
+     "1 of 30,731 (<0.01%)",
      "70-74: 71.8 -> 66.1 (n 6, 50+ 100%)"
     ],
     [
      "65",
      "peak GAR a season GK 11.4 / D 11.8 / M 11.6 / F 10.6",
      "top 8 at the position",
-     "1 of 30,659 (<0.01%)",
+     "1 of 30,731 (<0.01%)",
      "65-69: 67.4 -> 66.6 (n 12, 50+ 100%)"
     ],
     [
      "60",
      "peak GAR a season GK 10.0 / D 10.2 / M 9.3 / F 8.8",
      "top 20 at the position",
-     "15 of 30,659 (0.05%)",
+     "18 of 30,731 (0.06%)",
      "60-64: 61.8 -> 62.2 (n 64, 50+ 94%)"
     ],
     [
      "55",
      "peak GAR a season GK 6.9 / D 8.4 / M 7.4 / F 7.2",
      "top 45 at the position",
-     "30 of 30,659 (0.10%)",
+     "35 of 30,731 (0.11%)",
      "55-59: 57.7 -> 57.9 (n 143, 50+ 85%)"
     ],
     [
      "50",
      "peak GAR a season GK 5.4 / D 6.7 / M 5.6 / F 5.6",
      "top 90 (big-five regular) at the position",
-     "80 of 30,659 (0.26%)",
+     "88 of 30,731 (0.29%)",
      "50-54: 51.9 -> 51.7 (n 273, 50+ 61%)"
     ],
     [
      "45",
      "peak GAR a season GK 4.0 / D 5.4 / M 4.4 / F 4.5",
      "top 150 at the position",
-     "185 of 30,659 (0.60%)",
+     "194 of 30,731 (0.63%)",
      "45-49: 47.8 -> 47.9 (n 730, 50+ 46%)"
     ],
     [
      "40",
      "peak GAR a season GK 2.9 / D 4.3 / M 3.4 / F 3.4",
      "top 250 (top-flight regular) at the position",
-     "458 of 30,659 (1.5%)",
+     "474 of 30,731 (1.5%)",
      "40-44: 41.9 -> 41.7 (n 1480, 50+ 26%)"
     ],
     [
      "30",
      "some senior value",
      "-",
-     "1,781 of 30,659 (5.8%)",
+     "1,813 of 30,731 (5.9%)",
      "30-34: 32.2 -> 32.2 (n 5208, 50+ 7%)"
     ],
     [
@@ -2355,7 +2356,7 @@
      "70",
      "peak like year-end No. 6",
      "one in two birth years",
-     "3 of 915 (0.33%)",
+     "2 of 915 (0.22%)",
      "-"
     ],
     [
@@ -2383,28 +2384,28 @@
      "50",
      "peak like year-end No. 52",
      "top 7",
-     "22 of 915 (2.4%)",
+     "21 of 915 (2.3%)",
      "50-54: 52.3 -> 52.1 (n 124, 50+ 70%)"
     ],
     [
      "45",
      "peak like year-end No. 76",
      "top 10",
-     "29 of 915 (3.2%)",
+     "30 of 915 (3.3%)",
      "45-49: 47.5 -> 46.9 (n 124, 50+ 54%)"
     ],
     [
      "40",
      "peak like year-end No. 101",
      "top 13 (top-100 regular)",
-     "43 of 915 (4.7%)",
+     "44 of 915 (4.8%)",
      "40-44: 42.2 -> 42.7 (n 244, 50+ 38%)"
     ],
     [
      "30",
      "some value: peak between No. 200 and No. 100",
      "-",
-     "77 of 915 (8.4%)",
+     "75 of 915 (8.2%)",
      "30-34: 32.3 -> 32.0 (n 490, 50+ 15%)"
     ],
     [
@@ -2459,7 +2460,7 @@
      "60",
      "peak like year-end No. 11",
      "top 2 of a birth year",
-     "4 of 752 (0.53%)",
+     "5 of 752 (0.66%)",
      "60-64: 62.3 -> 59.0 (n 30, 50+ 77%)"
     ],
     [
@@ -2473,14 +2474,14 @@
      "50",
      "peak like year-end No. 49",
      "top 7",
-     "14 of 752 (1.9%)",
+     "13 of 752 (1.7%)",
      "50-54: 52.0 -> 47.2 (n 127, 50+ 51%)"
     ],
     [
      "45",
      "peak like year-end No. 76",
      "top 10",
-     "28 of 752 (3.7%)",
+     "30 of 752 (4.0%)",
      "45-49: 47.5 -> 45.0 (n 215, 50+ 50%)"
     ],
     [
@@ -2494,7 +2495,7 @@
      "30",
      "some value: peak between No. 200 and No. 100",
      "-",
-     "81 of 752 (10.8%)",
+     "82 of 752 (10.9%)",
      "30-34: 32.3 -> 33.8 (n 600, 50+ 20%)"
     ],
     [

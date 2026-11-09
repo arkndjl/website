@@ -12,7 +12,7 @@ veterans (500+ MP in the two seasons before) and newcomers. Held out one season 
 season's XPM covers 80% (see --fit). Display only: the same posterior failed as a game model input (Oct 23,
 scripts/nba_inseason.py), where team ratings and the line already carry it.
 
-Contract surplus: projected VORX x $ per win minus salary (Basketball-Reference contracts, y1 = this season).
+Contract surplus: the minimum salary + projected VORX x $ per win, minus salary (Basketball-Reference contracts, y1 = this season).
   season VORX = VORX to date + rest of season at XPM (proj) x his minutes per game x his share of games played
   $ per win   = league payroll above the minimum / league projected VORX (the market's going rate this season)
   later years = XPM (proj) aged on the game model's aging curve (nba_games.aging_curve), same minutes and games share,
@@ -201,7 +201,7 @@ def project(fresh=True):
             else:
                 xj = r['pxpm'] + (sum(aging(r['age'] + i) for i in range(1, j + 1)) if aging and r['age'] else 0)
                 v = X.VORX_K * (xj - X.VORX_REP) * mpg82 / 48
-            val = v * dpw * (1 + CAP_G) ** j
+            val = (mn + v * dpw) * (1 + CAP_G) ** j         # a roster spot costs the minimum, so replacement is worth it
             sp = val - s
             if j and opt == 'P': sp = min(0.0, sp)       # this season's options are already decided
             elif j and opt == 'T': sp = max(0.0, sp)

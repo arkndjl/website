@@ -1,7 +1,7 @@
 {{- /* NBA contract value: every player under contract (static/data/nba-proj.json, built by scripts/nba_proj.py),
        rendered by the browser 50 to a page.
        {{< nbasurplus title="..." tab="..." >}}
-       Value = projected VORX x the season's $ per win (league payroll above the minimum over league projected VORX);
+       Value = the minimum salary + projected VORX x the season's $ per win (league payroll above the minimum over league projected VORX);
        surplus = value - salary. Contract surplus sums every year left: XPM (proj) aged on the game model's curve, the
        same minutes, $ per win grown with the cap; a player option counts only when it costs the team (he opts in when
        paid over his value), a team option only when it pays. Views: contract (the default) or this season. Filters ride
@@ -34,7 +34,7 @@
         <th data-sort="pvorx" data-num class="nbaxpm__ph" title="projected VORX this season: VORX to date plus the rest of the season at XPM (proj), his minutes per game and his share of games last season">VORX</th>
         <th data-sort="sal" data-num class="nbaxpm__ph" title="salary this season, $M (Basketball-Reference)">Salary</th>
         <th data-sort="xa" data-num class="nbaxpm__ph" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age, years in the league and last full season's XPM, VORX, minutes and points, at this season's cap (25/30/35% max by years in the league)">xAAV</th>
-        <th data-sort="val" data-num class="nbaxpm__ph" title="value this season, $M: projected VORX x $ per win">Value</th>
+        <th data-sort="val" data-num class="nbaxpm__ph" title="value this season, $M: minimum salary + projected VORX x $ per win">Value</th>
         <th data-sort="sur" data-num class="c-sur" title="surplus this season, $M: value minus salary">Surplus</th>
         <th data-sort="ny" data-num class="nbaxpm__ph" title="years left including this one; P = player option, T = team option">Yrs</th>
         <th data-sort="csur" data-num class="c-csur" title="contract surplus, $M: every year left, value minus salary (options taken only when they pay their holder)">Contract</th>
