@@ -14,6 +14,9 @@
 - Join sources by player name only through the shared matcher: `scripts/names.py` (Python) and `scripts/names.mjs`
   (Node; `layouts/partials/namekey.html` in the browser). Same rules in all three: run `python3 scripts/names.py --test`
   and `node scripts/names.mjs --test` after a change. Prefer a stable id (ESPN, Barttorvik pid, gsis) when both sides have one.
+- Team short forms (UConn, FAU) live in `scripts/names.py` TEAM_ALIAS; `scripts/names.mjs` holds the same list and the
+  browser reads `data/team_alias.json`. After a change run `python3 scripts/names.py --teams` (the tests and the build
+  gate fail when the three differ).
 - A spelling the rules miss (Neo / Neoklis Avdalas, a source's typo) goes in `data/name_aliases.json` "players"; a
   common nickname goes in its "nicknames". Matches still check team and position, so same-name players stay apart.
 

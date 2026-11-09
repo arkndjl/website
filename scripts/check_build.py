@@ -9,6 +9,8 @@
 - no file under static/ over Cloudflare Pages' 25 MiB per-file limit (warning from 23 MiB)
 - static/data/cfb-all.json and cfb-detail.json carry the same dk (the board split in two, scripts/cfb_all.mjs): a
   mismatched pair leaves every scouting report off the board
+- with --hugo: data/team_alias.json (the browser's team short forms, layouts/partials/namekey.html) matches
+  scripts/names.py TEAM_ALIAS; `python3 scripts/names.py --teams` rewrites it
 Local hook: git config core.hooksPath .githooks (runs the fast checks on each commit). Stdlib only."""
 import json, os, shutil, subprocess, sys, tempfile
 
@@ -53,6 +55,16 @@ def check_pairs():
     return [] if a and a == b else [f'static/data/cfb-all.json dk {a} vs cfb-detail.json dk {b}: write both with scripts/cfb_all.mjs']
 
 
+def check_teams():
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    import names
+    try:
+        built = json.load(open(names.TEAM_FILE, encoding='utf-8'))
+    except (OSError, ValueError):
+        built = None
+    return [] if built == names.TEAM_ALIAS else ['data/team_alias.json is behind scripts/names.py TEAM_ALIAS: run python3 scripts/names.py --teams']
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -67,6 +79,7 @@ def check_hugo():
 if __name__ == '__main__':
     errs, n = check_json()
     e2, warns = check_sizes(); errs += e2 + check_pairs()
+    if '--hugo' in sys.argv[1:]: errs += check_teams()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)
     for e in errs: print('FAIL:', e)
