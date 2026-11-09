@@ -7,6 +7,7 @@
     python3 scripts/refit.py plan [--all | NAME ...]   # the due jobs, as a JSON matrix (GITHUB_OUTPUT)
     python3 scripts/refit.py run NAME                  # one refit with its gate; leaves only its kept files changed
     python3 scripts/refit.py collect DIR               # merge the legs' results into data/refits.json
+    python3 scripts/refit.py checked                   # nothing was due: stamp the check time in data/refits.json
     python3 scripts/refit.py status                    # print every job, its cadence and last result
 
 A job is due when its season months include this month and its last success is at least `every` days old (a
@@ -284,6 +285,19 @@ def cmd_collect(d):
     return 1 if any(json.load(open(p)).get('status') == 'failed' for p in glob.glob(os.path.join(d, '**', '*.json'), recursive=True)) else 0
 
 
+def cmd_checked():
+    """Nothing was due: stamp the check time, so data/refits.json's asof says the schedule ran (the data-health limit
+    on it is 9 days; without this the stamp only moved on a week with a due job and the feed read stale between)."""
+    st = load()
+    t = now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    st['asof'] = st['checked'] = t
+    with open(OUT, 'w') as f:
+        json.dump(st, f, indent=1, sort_keys=False)
+        f.write('\n')
+    print(f'{OUT}: nothing due, checked {t}')
+    return 0
+
+
 def cmd_status():
     st = load()
     for n, j in JOBS.items():
@@ -301,6 +315,8 @@ if __name__ == '__main__':
         sys.exit(cmd_plan(a[1:]))
     if c == 'collect':
         sys.exit(cmd_collect(a[1]))
+    if c == 'checked':
+        sys.exit(cmd_checked())
     if a[:1] == ['stale'] and len(a) > 1:
         sys.exit(cmd_stale(a[1]))
     cmd_status()

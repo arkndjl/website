@@ -59,12 +59,7 @@ jobs:
         continue-on-error: true
         run: pip install -q numpy && python3 scripts/esea_rwa.py
       - name: Commit if it changed
+        # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
-          git config user.name "arkboard-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add data/esea.json data/esea_lab.json data/esea_rwa.json; git add -A static/img/1nt/opp 2>/dev/null || true
-          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
-          git commit -m "Update 1NT's ESEA season ($(date -u +%Y-%m-%dT%H:%MZ))"
-          git pull --rebase -q origin "${GITHUB_REF_NAME}"
-          git push
+          python3 scripts/data_push.py -m "Update 1NT's ESEA season ($(date -u +%Y-%m-%dT%H:%MZ))" \
+            -- data/esea.json data/esea_lab.json data/esea_rwa.json static/img/1nt/opp

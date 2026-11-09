@@ -6,7 +6,9 @@
 window.arkName = window.arkName || (function (D) {
   var SUF = { jr: 1, sr: 1, ii: 1, iii: 1, iv: 1, v: 1, vi: 1, ll: 1, lll: 1 }, NICK = {}, AL = {};
   var LET = { 'ø': 'o', 'Ø': 'o', 'ł': 'l', 'Ł': 'l', 'đ': 'd', 'Đ': 'd', 'ð': 'd', 'þ': 'th', 'ß': 'ss', 'æ': 'ae', 'Æ': 'ae', 'œ': 'oe', 'Œ': 'oe', 'ı': 'i', 'ħ': 'h' };
-  function fold(s) { return String(s == null ? '' : s).replace(/[øØłŁđĐðþßæÆœŒıħ]/g, function (c) { return LET[c]; }).normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  var ENT = { amp: '&', apos: "'", quot: '"', lt: '<', gt: '>', nbsp: ' ' };
+  function unent(s) { return s.indexOf('&') < 0 ? s : s.replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, function (m, e) { return e[0] === '#' ? String.fromCodePoint(e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : +e.slice(1)) : ENT[e.toLowerCase()] || m; }); }
+  function fold(s) { return unent(String(s == null ? '' : s)).replace(/[øØłŁđĐðþßæÆœŒıħ]/g, function (c) { return LET[c]; }).normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
   function base(s) {
     var t = fold(s).replace(/\./g, '. ').replace(/[.'`’‘ʻ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean), out = [], run = '';
     t.forEach(function (w) { if (w.length === 1) { run += w; return; } if (run) { out.push(run); run = ''; } out.push(w); });
@@ -60,9 +62,7 @@ window.arkName = window.arkName || (function (D) {
     if ((ta.length === 3 && ta[1] === m && ta[0] === g) || (tb.length === 3 && tb[1] === l && tb[0] === f)) return 1;
     return 0;
   }
-  var TA = { uconn: 'connecticut', olemiss: 'mississippi', lsu: 'louisianastate', usc: 'southerncalifornia', byu: 'brighamyoung', smu: 'southernmethodist',
-    tcu: 'texaschristian', ucf: 'centralflorida', unlv: 'nevadalasvegas', vcu: 'virginiacommonwealth', unc: 'northcarolina', pitt: 'pittsburgh',
-    umass: 'massachusetts', miamifl: 'miami', stjohns: 'saintjohns', stmarys: 'saintmarys', ncstate: 'northcarolinastate', gatech: 'georgiatech', mizzou: 'missouri', cal: 'california' };
+  var TA = {{ site.Data.team_alias | default dict | jsonify | safeJS }};   // scripts/names.py TEAM_ALIAS (python3 scripts/names.py --teams)
   function teamKey(s) {
     var t = fold(s).replace(/&/g, '').replace(/'/g, '').replace(/^st\.?\s/, 'saint ').replace(/^s\.?\s/, 'south ').replace(/^n\.?\s/, 'north ').replace(/\bst\b\.?/g, 'state')
       .replace(/\buniv(ersity)?\b|\bof\b|\bthe\b|\bu\b/g, ' ').replace(/[^a-z0-9]/g, '');

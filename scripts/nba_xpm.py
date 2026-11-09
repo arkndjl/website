@@ -292,7 +292,10 @@ def rebadge():
         print(f, sum(1 for p in d['players'] if p.get('bdg')), 'with badges')
 
 
-def write_index():
+def write_index(pulled=False):
+    """data/nba_xpm.json: the seasons on file. `updated` is the last clean pull of the season in progress (--current);
+    a season's own asof moves only when its numbers do, so the nba-xpm workflow's gate and the data-health feed
+    read `updated` to tell an idle day from a pull that never ran."""
     seasons = []
     for f in sorted(os.listdir(OUT)):
         if not f.endswith('.json'): continue
@@ -302,6 +305,8 @@ def write_index():
     seasons.sort(key=lambda s: -s['season'])
     old = json.load(open(INDEX)) if os.path.exists(INDEX) else None
     idx = {'seasons': seasons, 'current': seasons[0]['season'] if seasons else None}
+    stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ') if pulled else (old or {}).get('updated')
+    if stamp: idx['updated'] = stamp
     if old != idx: json.dump(idx, open(INDEX, 'w'), indent=1)
 
 
@@ -313,7 +318,8 @@ if __name__ == '__main__':
         rebadge()
     elif a and a[0] == '--current':
         s = current_season()
-        if not build(s, fresh=True): build(s - 1, fresh=True)    # before opening night: last season's final
+        ok = build(s, fresh=True) or build(s - 1, fresh=True)    # before opening night: last season's final
+        write_index(pulled=bool(ok)); sys.exit(0)
     else:
         lo, hi = int(a[0]), int(a[1] if len(a) > 1 else a[0])
         for s in range(lo, hi + 1): build(s, fresh=False)

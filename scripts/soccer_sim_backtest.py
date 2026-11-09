@@ -43,6 +43,7 @@ SD1_GRID = [0.0, 0.15, 0.3]
 BASE = (0.0, 0.38, 0.3)                                 # live: rank_sd soccer a .09 b .054, no shrink
 NSIM = 2000
 MVK = G.params().get('mv', 0.0)
+RHO = G.params()['rho']
 
 
 def league_seasons(rows):
@@ -132,7 +133,9 @@ def sim(sn, LS, a, sd0, sd1, rng):
     sd = math.sqrt(max(0.0, sd1 ** 2 + (sd0 ** 2 - sd1 ** 2) * left))
     dl = rng.normal(0.0, 1.0, (NSIM, n)) * sd
     sh = (dl[:, hi] - dl[:, ai]) / (2 * G.GPM)
-    gh = rng.poisson(lh[None, :] * np.exp(sh)); ga = rng.poisson(la[None, :] * np.exp(-sh))
+    f = G.level(sn['lg'], sn['S'])
+    q = np.array([G.draw_share(u, v, f, RHO) for u, v in zip(lh, la)])
+    gh, ga = G.level_goals(rng, f * lh[None, :] * np.exp(sh), f * la[None, :] * np.exp(-sh), q[None, :])
     Mh = np.zeros((len(fx), n)); Mh[np.arange(len(fx)), hi] = 1
     Ma = np.zeros((len(fx), n)); Ma[np.arange(len(fx)), ai] = 1
     ph = np.where(gh > ga, 3, np.where(gh == ga, 1, 0)); pa = np.where(ga > gh, 3, np.where(gh == ga, 1, 0))

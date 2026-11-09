@@ -59,6 +59,7 @@
   var cards = [].slice.call(document.querySelectorAll('.soccergames .games__card[data-id]'));
   if (!cards.length) return;
   var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function active(c) { var now = Date.now(), k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 2.5 * 3600e3; }
   function poll() {
     var lgs = {}; cards.forEach(function (c) { if (active(c)) lgs[c.dataset.lg] = 1; });
@@ -70,8 +71,8 @@
           if (st.state === 'pre') return;
           var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
           el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FT' : 'LIVE') + '</b> ' +
-            h.team.abbreviation + ' <b>' + h.score + '</b> · ' + a.team.abbreviation + ' <b>' + a.score + '</b>' +
-            (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + '</span>' : '');
+            esc(h.team.abbreviation) + ' <b>' + esc(h.score) + '</b> · ' + esc(a.team.abbreviation) + ' <b>' + esc(a.score) + '</b>' +
+            (st.state === 'in' ? ' <span class="cfb__dim">' + esc(st.shortDetail) + '</span>' : '');
           el.hidden = false;
         });
       }).catch(function () {});

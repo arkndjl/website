@@ -100,7 +100,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // NFL.com headshot (ph = its Cloudinary image id, scripts/nfl_war.py) at 96 px; none, or one that fails, shows the neutral frame (lazy, so only the rows in view load)
   // team logo (static/img/nfl/<abbr>.png), 16 px inline; a code with no file drops it
-  function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
+  function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + esc(t.toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
   // predictive badges (scripts/nfl_badges.py, the CFB board's pixel medals): [name, tier, pct, stat], best first
   var TIER = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
@@ -157,7 +157,7 @@
         '<td class="cfb__num nflwar__war">' + f2(p.pace) + '</td>' +
         '<td class="cfb__num">' + f2(p.p1) + '</td>' +
         '<td class="cfb__num">' + f2(p.p3) + '</td>' +
-        '<td class="cfb__g"' + (p.two ? ' title="two-way: ' + p.two.so + ' offense, ' + p.two.sd + ' defense snaps"' : '') + '>' + p.pos + (p.two ? '/' + p.two.p2 : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
+        '<td class="cfb__g"' + (p.two ? ' title="two-way: ' + esc(p.two.so) + ' offense, ' + esc(p.two.sd) + ' defense snaps"' : '') + '>' + esc(p.pos) + (p.two ? '/' + esc(p.two.p2) : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
         '<td class="nflwar__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
         '<td class="cfb__num">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__num">' + (p.xv == null ? '' : f2(p.xv)) + '</td>' +

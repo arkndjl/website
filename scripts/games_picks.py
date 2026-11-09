@@ -427,15 +427,44 @@ X_FLOOR = 1.0
 SEG_HOLD = {}
 
 
-def calib(sport, mk, side, line, edge, k, ml=False):
+def calib(sport, mk, side, line, edge, k, ml=False, fair=None):
     """(win, push, loss) for the model's side at `line`, priced as if the close moves k x edge toward it; ml: the
-    moneyline on that side, from the same expected close"""
+    moneyline on that side, from the same expected close. fair: the market's fair line when the rung is not a coin
+    (lean()); the close then starts from it and edge is the model's gap from it (fair_gap()), the bet still at `line`"""
     sgn = 1 if side in ('home', 'over') else -1
-    close = line + sgn * k * edge
+    close = (line if fair is None else fair) + sgn * k * edge
     return C.chances(sport, 'ml' if ml else mk, side, line, close)
 
 
-def du_view(sport, mk, c, o, gap=None, cal=None):
+def lean(sport, g, mk, side, line):
+    """(fair line, (the market's win chance for `side` at `line`, the win chance there had the quote been even)) from
+    the rung's two-sided quote: the main rung is the one nearest 50/50, not at it, and one quoted +104 / -118 has its
+    fair line past it. The quote's mid is the market's chance at the rung; the fair line is `line` moved by the
+    points that take clv.chances from an even quote's chance to that mid, so an even quote leaves everything as it
+    was. (None, None) with one price or none (the rung is then taken as even, as before)"""
+    a, b = (g.get('oH'), g.get('oA')) if mk == 'spread' else (g.get('oO'), g.get('oU'))
+    a, b = price(a), price(b)
+    if a is None or b is None or line is None:
+        return None, None
+    f, f0 = C.fair_line(sport, mk, line, (1 / dec(a) + 1 - 1 / dec(b)) / 2), C.fair_line(sport, mk, line, 0.5)
+    if f is None or f0 is None:
+        return None, None
+    fair = line + f - f0
+    return fair, lean_at(sport, mk, side, line, fair)
+
+
+def lean_at(sport, mk, side, line, fair):
+    """units.priced's mkt for a pick at `line` whose market fair line is `fair`"""
+    return C.chances(sport, mk, side, line, fair)[0], C.chances(sport, mk, side, line, line)[0]
+
+
+def fair_gap(side, line, edge, fair, cap=None):
+    """the model's gap from the market's fair line (edge is its gap from `line`), sized at the cap"""
+    sgn = 1 if side in ('home', 'over') else -1
+    return sized(edge if fair is None else edge + sgn * (line - fair), cap)
+
+
+def du_view(sport, mk, c, o, gap=None, cal=None, mkt=None):
     """(win chance, expected return) the Dengler Units stake is sized on, rounded"""
     import units as DU
     if mk == 'ml':
@@ -443,7 +472,7 @@ def du_view(sport, mk, c, o, gap=None, cal=None):
             return None, None
         w, _, l = cal[0]
         return round(w, 4), round(w * (dec(o) - 1) - l, 4)
-    w, e = DU.view(sport, mk, c, o, gap)
+    w, e = DU.view(sport, mk, c, o, gap, mkt)
     return round(w, 4), round(e, 4)
 
 
@@ -464,13 +493,13 @@ def early_scale(sport, kick, u):
     return max(0.25, round(u * f[1] * 4) / 4)
 
 
-def stake_du(sport, mk, c, o, n=None, gap=None, cal=None):
+def stake_du(sport, mk, c, o, n=None, gap=None, cal=None, mkt=None):
     """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate;
     cal: a moneyline's calibrated (chances, u) from ml_cal"""
     import units as DU
     if mk == 'ml':
         return DU.stake_cal(sport, cal[0], cal[1], o, n) if cal else 0.0
-    return DU.stake(sport, mk, c, o, n, gap=gap)
+    return DU.stake(sport, mk, c, o, n, gap=gap, mkt=mkt)      # mkt: the market's own chances at the rung (lean())
 
 
 def ml_cal(sport, side, line, gap, k):
@@ -541,6 +570,16 @@ def rule_stats(es):
     return {'n': len(es), 'clvRet': c, 'clvT': ct, 'clv': round(sum(pts) / len(pts), 2) if pts else None,
             'beat': round(sum(1 for b in beat if b > 0) / len(beat), 3) if beat else None,
             'w': sum(1 for e in es if e['profit'] > 0), 'l': sum(1 for e in es if e['profit'] < 0), 'roi': r, 'roiT': rt}
+
+
+def clv_icc(sport, es):
+    """the within-slate correlation of close value on a rule's picks (one-way ANOVA, units._icc): what the live
+    monitor deflates a game day by (rule_monitor.rho_for). None with under 5 slates of 2+ picks"""
+    d = {}
+    for e in es:
+        if e.get('clvRet') is not None:
+            d.setdefault(DU.slate_of(sport, e['g']), []).append(e['clvRet'])
+    return round(DU._icc(d), 3) if sum(1 for v in d.values() if len(v) >= 2) >= 5 else None
 
 
 def x_cut(sport, mk, es):
@@ -619,7 +658,7 @@ def fit_rules():
             vb = RB([r for r in rs if r['S'] in val], x) if val else tb
             vo = rule_stats(vb)
             hb = RB([r for r in rs if r['S'] in held], x)
-            ho = rule_stats(hb)
+            ho = {**rule_stats(hb), 'clvIcc': clv_icc(sport, hb)}
             # switched on on the validation season(s) (or the tuning one, at a stricter t), then a test-season veto: a
             # market that loses to the close where nothing was chosen is off
             needT = KEEP_T if val else TUNE_KEEP_T
@@ -806,7 +845,9 @@ def fit_segments(res):
                     vb = [e for e in vp if e['gap'] >= x and e['seg'].get(fam) == v]
                     vs = rule_stats(vb)
                     hb = [e for e in hp if e['gap'] >= x and e['seg'].get(fam) == v]
-                    st = rule_stats(hb)
+                    # the market's own within-slate correlation at this X: a segment's 30-200 test picks are too few
+                    # for one of its own (they read 0 to the .5 ceiling)
+                    st = {**rule_stats(hb), 'clvIcc': clv_icc(sport, [e for e in hp if e['gap'] >= x])}
                     t = vs['clvT'] or 0.0
                     pv = 1 - 0.5 * (1 + math.erf(t / math.sqrt(2))) if len(vb) >= SEG_MIN_HELD else 1.0
                     cands.append({'sport': sport, 'mk': mk, 'fam': fam, 'val': v, 'x': x, 'tuneShrunk': round(sh, 4), 'tuneRaw': round(m_, 4),
@@ -1042,23 +1083,32 @@ def rule_options(sport, g, R, segs=()):
             o = price(g.get('mlH') if side == 'home' else g.get('mlA'))
             if o is not None and abs(o) <= ML_CAP:
                 inst.append(('ml', None, o, True))
+        # the spread or total is priced off the market's fair line, not the rung (lean()): the chance and the stake
+        # then follow the rung's own price lean. The cut X still reads the gap from the rung
+        fair, mkt = lean(sport, g, mk, side, line)
+        gf = fair_gap(side, line, edge, fair, cap)
         for imk, iline, o, ml in inst:
-            c = calib(sport, mk, side, line, sized(edge, cap), rule['k'], ml)
+            c = calib(sport, mk, side, line, sized(edge, cap), rule['k'], ml) if ml or fair is None else calib(sport, mk, side, line, gf, rule['k'], fair=fair)
             if c is None:
                 continue
             w, _, l = c
             ev = w * (dec(o) - 1) - l
             if ev <= 0:
+                if imk == mk and fair is not None:
+                    near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
             cal = ml_cal(sport, side, line, sized(edge, cap), rule['k']) if ml else None
-            u = stake_du(sport, imk, c, o, gap=sized(edge, cap), cal=cal)
+            gap, mk_ = (sized(edge, cap), None) if ml else (gf, mkt)
+            u = stake_du(sport, imk, c, o, gap=gap, cal=cal, mkt=mk_)
             if u <= 0:
                 # no calibrated edge at this price (Oct 27 2026): a DraftKings fallback at -110 needs more than Novig
                 if imk == mk:
                     near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': u, '_c': c, '_cal': cal, **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
+                         'units': u, '_c': c, '_cal': cal, '_gap': gap, '_mkt': mk_,
+                         **({'fair': round(fair, 2)} if fair is not None and not ml else {}),
+                         **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
     return opts, near
 
 
@@ -1112,7 +1162,9 @@ def live(sport):
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     # the live rule monitor (scripts/rule_monitor.py): a rule or segment losing to the close since its clock started
     # stops here, and its open picks are withdrawn below, until a refit changes or re-tests it
-    mon, stopped = RM.pick_state(sport, {**RS, '_asof': RJ.get('asof')}, log, old.get('monitor'), stamp)
+    # the tests count every pick the rules flagged (rule_monitor.judged): passes, and the withdrawn ones kept in wlog
+    wlog = old.get('withdrawnLog', [])
+    mon, stopped = RM.pick_state(sport, {**RS, '_asof': RJ.get('asof')}, log + wlog, old.get('monitor'), stamp)
     for i in stopped:
         if ' | ' not in i and R.get(i):
             R[i] = {**R[i], 'on': False, 'why': 'stopped by the live monitor: ' + (
@@ -1149,7 +1201,7 @@ def live(sport):
     # placeholder, 00:00 ET of game day, kept it after the time was set, so it froze as started half a day early:
     # restake, pass, the night cap's locked stakes and the alerts all read the placeholder; Minnesota at UCLA, 05:00Z
     # vs a 17:00Z kick). The odds archive's close already uses each snapshot's own start.
-    for e in log:
+    for e in log + wlog:
         g = Gb.get(e['id'])
         if g and e.get('res') is None and g.get('kick') and iso(g['kick']) != iso(e['kick']):
             e['kick'] = g['kick']
@@ -1172,6 +1224,10 @@ def live(sport):
     wd = [e for e in old.get('withdrawn', []) if iso(e['kick']) > now - datetime.timedelta(hours=4)]
     wd += [{**{k: e[k] for k in ('id', 'sport', 'kick', 'home', 'away', 'mk', 'side', 'line', 'price', 'units', 'edge', 'x') if k in e}, 'withdrawn': stamp} for e in gone]
     if gone:
+        # out of the log (the record, the bankroll, the paper book and the night cap read it as the bets), kept whole in
+        # withdrawnLog and graded there like any pick: it was flagged at a line someone could take, so the close value
+        # tests and the stake calibration count it (rule_monitor.judged, units.live_pairs)
+        wlog = wlog + [{**e, 'withdrawn': stamp} for e in gone]
         log = [e for e in log if e not in gone]
         print(f'{sport}: withdrew {len(gone)} open picks whose rule is off:', ', '.join(f"{e['away']}@{e['home']} {e['mk']} {e['side']}" for e in gone))
     # one pick a game per family, the side (spread or its moneyline) and the total (a game whose total
@@ -1196,9 +1252,9 @@ def live(sport):
         opts, near = ahead[g['id']]
         # every option that clears now, so an open pick's Now cell reads its own market even when another is best
         for o in opts:
-            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], szd(o), o.get('_cal')))
+            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], o['_gap'], o.get('_cal'), o.get('_mkt')))
             if o['mk'] != 'ml':
-                o['_cw'] = DU.priced(DU.params(sport, o['mk']), o['_c'], o['price'], szd(o))[0]
+                o['_cw'] = DU.priced(DU.params(sport, o['mk']), o['_c'], o['price'], o['_gap'], mkt=o.get('_mkt'))[0]
                 o['_cw'] = (o['_cw'], o['_c'][1], 1 - o['_c'][1] - o['_cw'])
             cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
         best = {}
@@ -1208,12 +1264,12 @@ def live(sport):
         for pick in sorted(best.values(), key=lambda o: o['ev']):
             c_, cal_ = pick.pop('_c'), pick.pop('_cal', None)
             pick.pop('_cw', None)
-            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], szd(pick), cal_)
+            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick.pop('_gap'), cal_, pick.pop('_mkt', None))
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if (g['id'], fam(pick['mk'])) not in seen:
                 seen.add((g['id'], fam(pick['mk'])))
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}),
                             **({'lineL': g['L']} if pick['mk'] == 'ml' else {}), 'flagged': stamp})
@@ -1242,12 +1298,16 @@ def live(sport):
             e['seg'] = seg_
         else:
             e.pop('seg', None)
-        c = calib(sport, e['mk'], e['side'], e['line'], szd(e), k_)
+        # at the fair line it was flagged with (lean(); a pick from before it was kept has none: the rung as a coin)
+        fair = e.get('fair')
+        gf = szd(e) if fair is None else fair_gap(e['side'], e['line'], e['edge'], fair, R['_cap'].get(e['mk']))
+        c = calib(sport, e['mk'], e['side'], e['line'], gf, k_, fair=fair)
+        mkt = None if fair is None else lean_at(sport, e['mk'], e['side'], e['line'], fair)
         if c is not None:
-            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, szd(e)))
+            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, gf, mkt=mkt))
             e.pop('unitsRaw', None)     # a fresh stake: the night cap (scripts/night_cap.py) rescales it after the write
             e.pop('unitsCap', None)
-            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], szd(e))
+            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], gf, mkt=mkt)
             e['p'], e['ev'] = round(c[0], 3), round(c[0] * (dec(e['price']) - 1) - c[2], 3)
             # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
             # against the bet): past it, the line has moved through the edge
@@ -1256,7 +1316,7 @@ def live(sport):
                 lo, hi = math.floor((mm - x_) * 2) / 2, math.ceil((mm + x_) * 2) / 2
                 e['betTo'] = lo if e['side'] in ('over', 'home') else hi
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
-    for e in log:
+    for e in log + wlog:
         g = G.get(e['id'])
         if g and e.get('res') is None and iso(g['kick']) > now:
             e['close'] = g['T'] if e['mk'] == 'total' else g['L']
@@ -1287,7 +1347,7 @@ def live(sport):
         e['profit'] = 0.0 if win is None else round(dec(e['price']) - 1 if win else -1.0, 3)
     # closing line value: the pick's line and price against the close (the last line archived before the start, else
     # the last this build saw), as points and as the return the bet was worth if the close is the true price
-    for e in log:
+    for e in log + wlog:
         if e.get('res') in (None, 'void'):
             continue
         c = closes.get(str(e['id']))
@@ -1342,7 +1402,7 @@ def live(sport):
     timing = C.timing(sport, arch, mins[sport])
     out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'monitor': mon, 'picks': picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
-           'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
+           'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log, 'withdrawnLog': wlog}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
         return print(f'{sport} picks: no change')
     with open(fn, 'w') as f:

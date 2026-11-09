@@ -59,7 +59,7 @@
   }
   function legend(D) {
     var fv = D.grade === 'FV';
-    return '<div class="dc__key"><span>' + (fv ? 'FV' : D.grade + ' percentile') + '</span>' + FVT.map(function (t, i) {
+    return '<div class="dc__key"><span>' + (fv ? 'FV' : esc(D.grade) + ' percentile') + '</span>' + FVT.map(function (t, i) {
       var lab = fv ? (i ? t[0] : '&lt;' + FVT[1][0]) : (i ? PCT[i] : '&lt;' + PCT[1]);
       return '<i style="--t:' + t[1] + ';--k:' + t[2] + '">' + lab + (i === FVT.length - 1 ? '+' : '') + '</i>';
     }).join('') + (fv ? '' : '<i class="dc__g--na">small sample</i>') + '</div>';

@@ -114,6 +114,7 @@
   if (!cards2.length) return;
   var byId = {}; cards2.forEach(function (c) { byId[c.dataset.id] = c; });
   function phi(z) { var t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function active() { var now = Date.now(); return cards2.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 3 * 3600e3; }); }
   function day(t) { var d = new Date(t - 5 * 3600e3); return d.getUTCFullYear() + ('0' + (d.getUTCMonth() + 1)).slice(-2) + ('0' + d.getUTCDate()).slice(-2); }
   function poll() {
@@ -134,8 +135,8 @@
             var bar2 = c.querySelectorAll('.games__prob span'); if (bar2.length === 2) { bar2[0].style.width = (100 - ph * 100) + '%'; bar2[1].style.width = ph * 100 + '%'; bar2[0].textContent = Math.round(100 - ph * 100) + '%'; bar2[1].textContent = Math.round(ph * 100) + '%'; }
           }
           el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' +
-            c.dataset.away + ' <b>' + a.score + '</b> · ' + c.dataset.home + ' <b>' + h.score + '</b>' +
-            (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + wp + '</span>' : '');
+            esc(c.dataset.away) + ' <b>' + esc(a.score) + '</b> · ' + esc(c.dataset.home) + ' <b>' + esc(h.score) + '</b>' +
+            (st.state === 'in' ? ' <span class="cfb__dim">' + esc(st.shortDetail) + esc(wp) + '</span>' : '');
           el.hidden = false;
         });
       }).catch(function () {});

@@ -1,0 +1,860 @@
+{
+ "cfb:total": {
+  "mu1": 0.0131,
+  "sd": 0.1178,
+  "rho": 0.038,
+  "bets": 600,
+  "perSlate": 16.6,
+  "edge": {
+   "zero": 0.018,
+   "edge": 0.0,
+   "paused": 0.015,
+   "confirmed": 0.515,
+   "stop": 0.03,
+   "median": 340
+  },
+  "half": {
+   "zero": 0.022,
+   "edge": 0.01,
+   "paused": 0.098,
+   "confirmed": 0.17,
+   "stop": 0.11,
+   "median": 405
+  },
+  "zero": {
+   "zero": 0.058,
+   "edge": 0.155,
+   "paused": 0.345,
+   "confirmed": 0.03,
+   "stop": 0.357,
+   "median": 408
+  },
+  "minus3": {
+   "zero": 0.843,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 158
+  }
+ },
+ "cfb:spread | game: non-conference": {
+  "mu1": 0.0071,
+  "sd": 0.1651,
+  "rho": 0.114,
+  "bets": 600,
+  "perSlate": 4.3,
+  "edge": {
+   "zero": 0.003,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.003,
+   "median": 284
+  },
+  "half": {
+   "zero": 0.003,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.003,
+   "stop": 0.003,
+   "median": 182
+  },
+  "zero": {
+   "zero": 0.015,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.015,
+   "median": 309
+  },
+  "minus3": {
+   "zero": 0.71,
+   "edge": 0.105,
+   "paused": 0.815,
+   "confirmed": 0.0,
+   "stop": 0.875,
+   "median": 331
+  }
+ },
+ "cfb:spread | line: 3-7": {
+  "mu1": 0.0276,
+  "sd": 0.1575,
+  "rho": 0.111,
+  "bets": 600,
+  "perSlate": 1.6,
+  "edge": {
+   "zero": 0.0,
+   "edge": 0.03,
+   "paused": 0.045,
+   "confirmed": 0.873,
+   "stop": 0.062,
+   "median": 276
+  },
+  "half": {
+   "zero": 0.003,
+   "edge": 0.522,
+   "paused": 0.593,
+   "confirmed": 0.188,
+   "stop": 0.655,
+   "median": 273
+  },
+  "zero": {
+   "zero": 0.04,
+   "edge": 0.99,
+   "paused": 0.993,
+   "confirmed": 0.003,
+   "stop": 0.995,
+   "median": 152
+  },
+  "minus3": {
+   "zero": 0.853,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 58
+  }
+ },
+ "cfb:spread | line: 7-14": {
+  "mu1": 0.0236,
+  "sd": 0.1558,
+  "rho": 0.114,
+  "bets": 600,
+  "perSlate": 1.8,
+  "edge": {
+   "zero": 0.005,
+   "edge": 0.072,
+   "paused": 0.06,
+   "confirmed": 0.88,
+   "stop": 0.105,
+   "median": 333
+  },
+  "half": {
+   "zero": 0.065,
+   "edge": 0.338,
+   "paused": 0.325,
+   "confirmed": 0.48,
+   "stop": 0.438,
+   "median": 257
+  },
+  "zero": {
+   "zero": 0.242,
+   "edge": 0.823,
+   "paused": 0.797,
+   "confirmed": 0.125,
+   "stop": 0.877,
+   "median": 205
+  },
+  "minus3": {
+   "zero": 0.968,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 80
+  }
+ },
+ "cfb:spread | role: dog": {
+  "mu1": 0.0004,
+  "sd": 0.1492,
+  "rho": 0.114,
+  "bets": 600,
+  "perSlate": 2.6,
+  "edge": {
+   "zero": 0.068,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.068,
+   "median": 377
+  },
+  "half": {
+   "zero": 0.062,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.062,
+   "median": 273
+  },
+  "zero": {
+   "zero": 0.065,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.065,
+   "median": 361
+  },
+  "minus3": {
+   "zero": 0.88,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.88,
+   "median": 191
+  }
+ },
+ "cfb:spread | role: favorite": {
+  "mu1": 0.0316,
+  "sd": 0.1753,
+  "rho": 0.114,
+  "bets": 600,
+  "perSlate": 2.3,
+  "edge": {
+   "zero": 0.0,
+   "edge": 0.095,
+   "paused": 0.083,
+   "confirmed": 0.868,
+   "stop": 0.138,
+   "median": 283
+  },
+  "half": {
+   "zero": 0.028,
+   "edge": 0.527,
+   "paused": 0.502,
+   "confirmed": 0.352,
+   "stop": 0.637,
+   "median": 250
+  },
+  "zero": {
+   "zero": 0.165,
+   "edge": 0.948,
+   "paused": 0.943,
+   "confirmed": 0.035,
+   "stop": 0.97,
+   "median": 153
+  },
+  "minus3": {
+   "zero": 0.922,
+   "edge": 1.0,
+   "paused": 0.998,
+   "confirmed": 0.003,
+   "stop": 1.0,
+   "median": 71
+  }
+ },
+ "cfb:spread | season: early": {
+  "mu1": 0.0125,
+  "sd": 0.1559,
+  "rho": 0.114,
+  "bets": 600,
+  "perSlate": 6.3,
+  "edge": {
+   "zero": 0.003,
+   "edge": 0.0,
+   "paused": 0.003,
+   "confirmed": 0.29,
+   "stop": 0.005,
+   "median": 592
+  },
+  "half": {
+   "zero": 0.0,
+   "edge": 0.0,
+   "paused": 0.018,
+   "confirmed": 0.072,
+   "stop": 0.018,
+   "median": 410
+  },
+  "zero": {
+   "zero": 0.01,
+   "edge": 0.005,
+   "paused": 0.052,
+   "confirmed": 0.02,
+   "stop": 0.062,
+   "median": 440
+  },
+  "minus3": {
+   "zero": 0.623,
+   "edge": 0.855,
+   "paused": 0.978,
+   "confirmed": 0.0,
+   "stop": 0.978,
+   "median": 282
+  }
+ },
+ "cfb:spread | season: late": {
+  "mu1": 0.011,
+  "sd": 0.164,
+  "rho": 0.023,
+  "bets": 600,
+  "perSlate": 3.8,
+  "edge": {
+   "zero": 0.01,
+   "edge": 0.0,
+   "paused": 0.013,
+   "confirmed": 0.158,
+   "stop": 0.022,
+   "median": 442
+  },
+  "half": {
+   "zero": 0.02,
+   "edge": 0.003,
+   "paused": 0.035,
+   "confirmed": 0.028,
+   "stop": 0.052,
+   "median": 392
+  },
+  "zero": {
+   "zero": 0.06,
+   "edge": 0.028,
+   "paused": 0.215,
+   "confirmed": 0.005,
+   "stop": 0.242,
+   "median": 436
+  },
+  "minus3": {
+   "zero": 0.85,
+   "edge": 0.985,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 200
+  }
+ },
+ "cfb:spread | tier: mixed": {
+  "mu1": 0.0115,
+  "sd": 0.1582,
+  "rho": 0.073,
+  "bets": 600,
+  "perSlate": 6.0,
+  "edge": {
+   "zero": 0.0,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.055,
+   "stop": 0.0,
+   "median": null
+  },
+  "half": {
+   "zero": 0.003,
+   "edge": 0.0,
+   "paused": 0.007,
+   "confirmed": 0.007,
+   "stop": 0.01,
+   "median": 475
+  },
+  "zero": {
+   "zero": 0.0,
+   "edge": 0.003,
+   "paused": 0.037,
+   "confirmed": 0.0,
+   "stop": 0.037,
+   "median": 530
+  },
+  "minus3": {
+   "zero": 0.37,
+   "edge": 0.902,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 290
+  }
+ },
+ "cfb:spread | venue: home": {
+  "mu1": 0.0261,
+  "sd": 0.1591,
+  "rho": 0.114,
+  "bets": 600,
+  "perSlate": 2.3,
+  "edge": {
+   "zero": 0.007,
+   "edge": 0.098,
+   "paused": 0.083,
+   "confirmed": 0.868,
+   "stop": 0.14,
+   "median": 334
+  },
+  "half": {
+   "zero": 0.095,
+   "edge": 0.515,
+   "paused": 0.458,
+   "confirmed": 0.415,
+   "stop": 0.608,
+   "median": 289
+  },
+  "zero": {
+   "zero": 0.285,
+   "edge": 0.922,
+   "paused": 0.877,
+   "confirmed": 0.085,
+   "stop": 0.958,
+   "median": 188
+  },
+  "minus3": {
+   "zero": 0.973,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 78
+  }
+ },
+ "nfl:spread": {
+  "mu1": 0.0406,
+  "sd": 0.1257,
+  "rho": 0.138,
+  "bets": 300,
+  "perSlate": 2.3,
+  "edge": {
+   "zero": 0.0,
+   "edge": 0.092,
+   "paused": 0.045,
+   "confirmed": 0.935,
+   "stop": 0.113,
+   "median": 192
+  },
+  "half": {
+   "zero": 0.003,
+   "edge": 0.767,
+   "paused": 0.68,
+   "confirmed": 0.278,
+   "stop": 0.833,
+   "median": 105
+  },
+  "zero": {
+   "zero": 0.083,
+   "edge": 0.995,
+   "paused": 0.978,
+   "confirmed": 0.02,
+   "stop": 1.0,
+   "median": 51
+  },
+  "minus3": {
+   "zero": 0.91,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 32
+  }
+ },
+ "nfl:total": {
+  "mu1": 0.0094,
+  "sd": 0.1256,
+  "rho": 0.233,
+  "bets": 300,
+  "perSlate": 6.5,
+  "edge": {
+   "zero": 0.003,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.003,
+   "stop": 0.003,
+   "median": 241
+  },
+  "half": {
+   "zero": 0.0,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.0,
+   "stop": 0.0,
+   "median": null
+  },
+  "zero": {
+   "zero": 0.007,
+   "edge": 0.0,
+   "paused": 0.0,
+   "confirmed": 0.003,
+   "stop": 0.007,
+   "median": 214
+  },
+  "minus3": {
+   "zero": 0.49,
+   "edge": 0.007,
+   "paused": 0.35,
+   "confirmed": 0.0,
+   "stop": 0.527,
+   "median": 189
+  }
+ },
+ "cbb:spread": {
+  "mu1": 0.0099,
+  "sd": 0.1123,
+  "rho": 0.01,
+  "bets": 1000,
+  "perSlate": 10.4,
+  "edge": {
+   "zero": 0.0,
+   "edge": 0.003,
+   "paused": 0.025,
+   "confirmed": 0.725,
+   "stop": 0.025,
+   "median": 535
+  },
+  "half": {
+   "zero": 0.003,
+   "edge": 0.142,
+   "paused": 0.212,
+   "confirmed": 0.278,
+   "stop": 0.23,
+   "median": 578
+  },
+  "zero": {
+   "zero": 0.05,
+   "edge": 0.497,
+   "paused": 0.677,
+   "confirmed": 0.058,
+   "stop": 0.705,
+   "median": 564
+  },
+  "minus3": {
+   "zero": 0.993,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 126
+  }
+ },
+ "cbb:total": {
+  "mu1": 0.0174,
+  "sd": 0.1113,
+  "rho": 0.058,
+  "bets": 1000,
+  "perSlate": 16.3,
+  "edge": {
+   "zero": 0.003,
+   "edge": 0.01,
+   "paused": 0.02,
+   "confirmed": 0.922,
+   "stop": 0.025,
+   "median": 437
+  },
+  "half": {
+   "zero": 0.007,
+   "edge": 0.172,
+   "paused": 0.282,
+   "confirmed": 0.403,
+   "stop": 0.307,
+   "median": 607
+  },
+  "zero": {
+   "zero": 0.06,
+   "edge": 0.75,
+   "paused": 0.825,
+   "confirmed": 0.055,
+   "stop": 0.85,
+   "median": 427
+  },
+  "minus3": {
+   "zero": 0.97,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 126
+  }
+ },
+ "nba:total": {
+  "mu1": 0.0187,
+  "sd": 0.1438,
+  "rho": 0.074,
+  "bets": 600,
+  "perSlate": 2.5,
+  "edge": {
+   "zero": 0.025,
+   "edge": 0.013,
+   "paused": 0.045,
+   "confirmed": 0.723,
+   "stop": 0.072,
+   "median": 284
+  },
+  "half": {
+   "zero": 0.07,
+   "edge": 0.285,
+   "paused": 0.378,
+   "confirmed": 0.212,
+   "stop": 0.42,
+   "median": 305
+  },
+  "zero": {
+   "zero": 0.207,
+   "edge": 0.77,
+   "paused": 0.85,
+   "confirmed": 0.025,
+   "stop": 0.858,
+   "median": 257
+  },
+  "minus3": {
+   "zero": 0.96,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 90
+  }
+ },
+ "nba:spread | line: 4-9": {
+  "mu1": 0.0186,
+  "sd": 0.1399,
+  "rho": 0.189,
+  "bets": 600,
+  "perSlate": 1.1,
+  "edge": {
+   "zero": 0.007,
+   "edge": 0.01,
+   "paused": 0.035,
+   "confirmed": 0.868,
+   "stop": 0.045,
+   "median": 164
+  },
+  "half": {
+   "zero": 0.01,
+   "edge": 0.172,
+   "paused": 0.263,
+   "confirmed": 0.35,
+   "stop": 0.3,
+   "median": 349
+  },
+  "zero": {
+   "zero": 0.11,
+   "edge": 0.723,
+   "paused": 0.787,
+   "confirmed": 0.052,
+   "stop": 0.818,
+   "median": 236
+  },
+  "minus3": {
+   "zero": 0.97,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 80
+  }
+ },
+ "nba:spread | line: 9-15": {
+  "mu1": 0.0073,
+  "sd": 0.1354,
+  "rho": 0.107,
+  "bets": 600,
+  "perSlate": 1.3,
+  "edge": {
+   "zero": 0.158,
+   "edge": 0.0,
+   "paused": 0.01,
+   "confirmed": 0.22,
+   "stop": 0.158,
+   "median": 312
+  },
+  "half": {
+   "zero": 0.223,
+   "edge": 0.0,
+   "paused": 0.015,
+   "confirmed": 0.068,
+   "stop": 0.225,
+   "median": 234
+  },
+  "zero": {
+   "zero": 0.32,
+   "edge": 0.003,
+   "paused": 0.033,
+   "confirmed": 0.015,
+   "stop": 0.333,
+   "median": 296
+  },
+  "minus3": {
+   "zero": 0.975,
+   "edge": 0.968,
+   "paused": 0.998,
+   "confirmed": 0.0,
+   "stop": 0.998,
+   "median": 140
+  }
+ },
+ "nba:spread | role: dog": {
+  "mu1": 0.0115,
+  "sd": 0.1435,
+  "rho": 0.148,
+  "bets": 600,
+  "perSlate": 1.5,
+  "edge": {
+   "zero": 0.037,
+   "edge": 0.0,
+   "paused": 0.015,
+   "confirmed": 0.427,
+   "stop": 0.05,
+   "median": 295
+  },
+  "half": {
+   "zero": 0.06,
+   "edge": 0.007,
+   "paused": 0.068,
+   "confirmed": 0.147,
+   "stop": 0.11,
+   "median": 389
+  },
+  "zero": {
+   "zero": 0.145,
+   "edge": 0.095,
+   "paused": 0.297,
+   "confirmed": 0.048,
+   "stop": 0.37,
+   "median": 401
+  },
+  "minus3": {
+   "zero": 0.965,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 144
+  }
+ },
+ "nba:spread | role: favorite": {
+  "mu1": 0.0154,
+  "sd": 0.1228,
+  "rho": 0.101,
+  "bets": 600,
+  "perSlate": 1.3,
+  "edge": {
+   "zero": 0.037,
+   "edge": 0.022,
+   "paused": 0.037,
+   "confirmed": 0.782,
+   "stop": 0.083,
+   "median": 315
+  },
+  "half": {
+   "zero": 0.1,
+   "edge": 0.22,
+   "paused": 0.31,
+   "confirmed": 0.268,
+   "stop": 0.37,
+   "median": 313
+  },
+  "zero": {
+   "zero": 0.195,
+   "edge": 0.718,
+   "paused": 0.805,
+   "confirmed": 0.037,
+   "stop": 0.848,
+   "median": 250
+  },
+  "minus3": {
+   "zero": 0.995,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 72
+  }
+ },
+ "nba:spread | season: late": {
+  "mu1": 0.0186,
+  "sd": 0.1436,
+  "rho": 0.158,
+  "bets": 600,
+  "perSlate": 1.3,
+  "edge": {
+   "zero": 0.007,
+   "edge": 0.035,
+   "paused": 0.058,
+   "confirmed": 0.805,
+   "stop": 0.077,
+   "median": 298
+  },
+  "half": {
+   "zero": 0.045,
+   "edge": 0.247,
+   "paused": 0.362,
+   "confirmed": 0.31,
+   "stop": 0.407,
+   "median": 309
+  },
+  "zero": {
+   "zero": 0.15,
+   "edge": 0.77,
+   "paused": 0.858,
+   "confirmed": 0.035,
+   "stop": 0.873,
+   "median": 247
+  },
+  "minus3": {
+   "zero": 0.98,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 82
+  }
+ },
+ "nba:spread | venue: away": {
+  "mu1": 0.0223,
+  "sd": 0.1581,
+  "rho": 0.158,
+  "bets": 600,
+  "perSlate": 1.2,
+  "edge": {
+   "zero": 0.03,
+   "edge": 0.07,
+   "paused": 0.087,
+   "confirmed": 0.775,
+   "stop": 0.145,
+   "median": 312
+  },
+  "half": {
+   "zero": 0.075,
+   "edge": 0.43,
+   "paused": 0.455,
+   "confirmed": 0.307,
+   "stop": 0.535,
+   "median": 275
+  },
+  "zero": {
+   "zero": 0.28,
+   "edge": 0.875,
+   "paused": 0.89,
+   "confirmed": 0.062,
+   "stop": 0.93,
+   "median": 202
+  },
+  "minus3": {
+   "zero": 0.975,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 79
+  }
+ },
+ "nba:spread | venue: home": {
+  "mu1": 0.0198,
+  "sd": 0.1418,
+  "rho": 0.158,
+  "bets": 600,
+  "perSlate": 1.2,
+  "edge": {
+   "zero": 0.005,
+   "edge": 0.015,
+   "paused": 0.022,
+   "confirmed": 0.882,
+   "stop": 0.035,
+   "median": 265
+  },
+  "half": {
+   "zero": 0.022,
+   "edge": 0.253,
+   "paused": 0.315,
+   "confirmed": 0.385,
+   "stop": 0.36,
+   "median": 258
+  },
+  "zero": {
+   "zero": 0.092,
+   "edge": 0.772,
+   "paused": 0.818,
+   "confirmed": 0.05,
+   "stop": 0.85,
+   "median": 241
+  },
+  "minus3": {
+   "zero": 0.948,
+   "edge": 1.0,
+   "paused": 1.0,
+   "confirmed": 0.0,
+   "stop": 1.0,
+   "median": 76
+  }
+ }
+}

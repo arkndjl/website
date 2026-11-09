@@ -427,7 +427,10 @@ def main():
     out = json.load(open(OUT)) if os.path.exists(OUT) else {}
     out.update({'asof': __import__('datetime').date.today().isoformat(), 'method': 'scripts/fv_dist_fit.py'})
     only = next((a for a in sys.argv[1:] if a in ('--cfb', '--cbb')), None)   # --cfb or --cbb: refit one board
-    if '--scorecard' in sys.argv:                     # the shipped fit's held-out reliability only (scripts/fv_scorecard.py)
+    if '--low' in sys.argv:                           # the floor rule only, on the shipped CBB fit (cbb_low)
+        out['cbb']['low'] = cbb_low(out['cbb'], cbb_rows())
+        print('cbb low', out['cbb']['low'])
+    elif '--scorecard' in sys.argv:                   # the shipped fit's held-out reliability only (scripts/fv_scorecard.py)
         if only != '--cbb': scorecard_cfb(out)
         if only != '--cfb': scorecard_cbb(out)
     else:
@@ -482,8 +485,28 @@ def fit_cbb(out):
         'position': lambda r: r['pos'], 'newcomer': lambda r: r['new'], 'class': lambda r: r['cls'], 'fv': lambda r: min(60, int(r['x'] // 5 * 5)), 'season': lambda r: r['season']})
     fit, m = final_fit(rows, kept)
     HINGES = (45, 60)
+    fit['low'] = cbb_low(fit, rows)
     out['cbb'] = {**fit, 'kept': [t[0] for t in kept], 'hingeSelection': hl, 'selection': log, 'heldOut': res, 'dropOne': drop, 'perFold': pf, 'byGroup': grp,
                   'note': 'fit on the top 300 of each 2010-16 preseason board (model-only grades, out of fold); grades below ~27 extrapolate'}
+
+
+def cbb_low(M, rows):
+    """below the fit's support: the fit rows are each board's top 300 (no grade under about 27), yet the board grades
+    thousands under that, where the extrapolated curve gave a floor grade a 4.6% chance of the NBA and a mean of
+    20.7. The floor's own record is the boards' rows outside the top 300: everyone graded under 30 (data/cbb_fit.json
+    calib '20') less the top-300 rows graded under 30. k0 is their NBA share over the curve's at 20; fv_dist scales
+    every bin above the floor by k, k0 at 20 rising to 1 at the lowest fitted grade (so the curve is untouched where
+    it was fit). The pool includes the best rows outside each top 300, so k0 is an upper bound for the floor grade."""
+    F = json.load(open(os.path.join(ROOT, 'data', 'cbb_fit.json')))
+    c = F['calib']['20']; a, b = (int(v) for v in F['train'].split('-'))
+    per = (b - a + 1) / len(set(r['season'] for r in rows))      # calib pools every training board, the rows one fewer
+    top = [r for r in rows if r['x'] < 30]
+    n = c['n'] - per * len(top)
+    nba = (c['nba'] * c['n'] - per * sum(r['y'] >= 30 for r in top)) / n
+    mean = (c['meanFv'] * c['n'] - per * sum(r['y'] for r in top)) / n
+    H = M['hinges']; mu = sum(k * ((max(0, 20 - H[i - 1]) if i else 20 - 40) / 10) for i, k in enumerate(M['loc']))
+    p20 = 1 - ncdf(M['cuts'][0] - mu)
+    return {'from': round(min(r['x'] for r in rows), 2), 'k0': round(float(nba / p20), 4), 'n': int(round(n)), 'nba': round(float(nba), 4), 'meanFv': round(float(mean), 2)}
 
 
 def scorecard(label, rows, folds, terms, note):

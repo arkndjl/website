@@ -24,7 +24,13 @@
    "slope": 0.987,
    "rho": 0.3147,
    "rhoAge": 0.2761,
-   "rhoClassesWon": 12
+   "rhoClassesWon": 12,
+   "cp": [
+    -0.826,
+    0.6789,
+    -0.0981,
+    0.098
+   ]
   },
   {
    "f": 0.2,
@@ -43,7 +49,13 @@
    "slope": 0.988,
    "rho": 0.3518,
    "rhoAge": 0.2895,
-   "rhoClassesWon": 13
+   "rhoClassesWon": 13,
+   "cp": [
+    -1.2123,
+    0.7536,
+    -0.0956,
+    0.1868
+   ]
   },
   {
    "f": 0.35,
@@ -62,7 +74,13 @@
    "slope": 0.989,
    "rho": 0.389,
    "rhoAge": 0.3192,
-   "rhoClassesWon": 12
+   "rhoClassesWon": 12,
+   "cp": [
+    -1.3337,
+    0.7933,
+    -0.1005,
+    0.2329
+   ]
   },
   {
    "f": 0.5,
@@ -81,7 +99,13 @@
    "slope": 0.99,
    "rho": 0.4246,
    "rhoAge": 0.3509,
-   "rhoClassesWon": 13
+   "rhoClassesWon": 13,
+   "cp": [
+    -1.2634,
+    0.8417,
+    -0.1057,
+    0.2465
+   ]
   },
   {
    "f": 0.75,
@@ -100,7 +124,13 @@
    "slope": 0.991,
    "rho": 0.4577,
    "rhoAge": 0.3862,
-   "rhoClassesWon": 13
+   "rhoClassesWon": 13,
+   "cp": [
+    -1.1081,
+    0.8756,
+    -0.1131,
+    0.2475
+   ]
   },
   {
    "f": 1.0,
@@ -119,9 +149,365 @@
    "slope": 0.992,
    "rho": 0.4808,
    "rhoAge": 0.4128,
-   "rhoClassesWon": 12
+   "rhoClassesWon": 12,
+   "cp": [
+    -0.9068,
+    0.8994,
+    -0.1166,
+    0.2343
+   ]
   }
  ],
  "note": "pred = c0 + c1 XPM + c2 (age - 21) + c3 ln(1 + MP82); interpolate on f = min(1, team games / 82)",
- "kept": true
+ "kept": true,
+ "play": {
+  "kept": true,
+  "minW": 1000.0,
+  "tol": 0.25,
+  "minN": 30,
+  "bins": [
+   [
+    -99,
+    0
+   ],
+   [
+    0,
+    2
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    4,
+    99
+   ]
+  ],
+  "res": {
+   "0.1": {
+    "n": 632,
+    "rmse": {
+     "shrunk": 1.8211,
+     "play": 1.5811
+    },
+    "t": -6.14,
+    "slope": 0.921,
+    "byPred": [
+     {
+      "n": 501,
+      "play": -0.072,
+      "shrunk": -0.805
+     },
+     {
+      "n": 130,
+      "play": -0.124,
+      "shrunk": -1.17
+     },
+     {
+      "n": 0,
+      "play": 0.522,
+      "shrunk": -0.99
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "byXpm": [
+     {
+      "n": 446,
+      "play": -0.097,
+      "shrunk": -0.812
+     },
+     {
+      "n": 182,
+      "play": -0.034,
+      "shrunk": -1.035
+     },
+     {
+      "n": 3,
+      "play": -1.067,
+      "shrunk": -2.457
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "pass": true
+   },
+   "0.2": {
+    "n": 632,
+    "rmse": {
+     "shrunk": 1.7426,
+     "play": 1.5063
+    },
+    "t": -5.95,
+    "slope": 0.941,
+    "byPred": [
+     {
+      "n": 481,
+      "play": -0.083,
+      "shrunk": -0.736
+     },
+     {
+      "n": 147,
+      "play": -0.05,
+      "shrunk": -1.116
+     },
+     {
+      "n": 2,
+      "play": -1.199,
+      "shrunk": -2.808
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "byXpm": [
+     {
+      "n": 491,
+      "play": -0.077,
+      "shrunk": -0.744
+     },
+     {
+      "n": 136,
+      "play": -0.031,
+      "shrunk": -1.105
+     },
+     {
+      "n": 4,
+      "play": -1.436,
+      "shrunk": -2.99
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "pass": true
+   },
+   "0.35": {
+    "n": 632,
+    "rmse": {
+     "shrunk": 1.673,
+     "play": 1.4438
+    },
+    "t": -5.86,
+    "slope": 0.947,
+    "byPred": [
+     {
+      "n": 476,
+      "play": -0.099,
+      "shrunk": -0.698
+     },
+     {
+      "n": 148,
+      "play": 0.046,
+      "shrunk": -0.996
+     },
+     {
+      "n": 6,
+      "play": -1.189,
+      "shrunk": -2.788
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "byXpm": [
+     {
+      "n": 519,
+      "play": -0.076,
+      "shrunk": -0.711
+     },
+     {
+      "n": 105,
+      "play": 0.022,
+      "shrunk": -1.078
+     },
+     {
+      "n": 6,
+      "play": -1.289,
+      "shrunk": -2.886
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "pass": true
+   },
+   "0.5": {
+    "n": 632,
+    "rmse": {
+     "shrunk": 1.6157,
+     "play": 1.3904
+    },
+    "t": -5.83,
+    "slope": 0.952,
+    "byPred": [
+     {
+      "n": 470,
+      "play": -0.089,
+      "shrunk": -0.646
+     },
+     {
+      "n": 151,
+      "play": 0.055,
+      "shrunk": -0.954
+     },
+     {
+      "n": 9,
+      "play": -1.16,
+      "shrunk": -2.737
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "byXpm": [
+     {
+      "n": 538,
+      "play": -0.064,
+      "shrunk": -0.677
+     },
+     {
+      "n": 86,
+      "play": -0.026,
+      "shrunk": -1.151
+     },
+     {
+      "n": 6,
+      "play": -1.131,
+      "shrunk": -2.77
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "pass": true
+   },
+   "0.75": {
+    "n": 632,
+    "rmse": {
+     "shrunk": 1.555,
+     "play": 1.3384
+    },
+    "t": -5.77,
+    "slope": 0.952,
+    "byPred": [
+     {
+      "n": 474,
+      "play": -0.097,
+      "shrunk": -0.62
+     },
+     {
+      "n": 143,
+      "play": 0.086,
+      "shrunk": -0.883
+     },
+     {
+      "n": 13,
+      "play": -0.852,
+      "shrunk": -2.396
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "byXpm": [
+     {
+      "n": 555,
+      "play": -0.065,
+      "shrunk": -0.654
+     },
+     {
+      "n": 69,
+      "play": -0.014,
+      "shrunk": -1.158
+     },
+     {
+      "n": 6,
+      "play": -0.954,
+      "shrunk": -2.61
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "pass": true
+   },
+   "1.0": {
+    "n": 632,
+    "rmse": {
+     "shrunk": 1.5089,
+     "play": 1.3039
+    },
+    "t": -5.65,
+    "slope": 0.951,
+    "byPred": [
+     {
+      "n": 477,
+      "play": -0.086,
+      "shrunk": -0.584
+     },
+     {
+      "n": 139,
+      "play": 0.058,
+      "shrunk": -0.86
+     },
+     {
+      "n": 16,
+      "play": -0.631,
+      "shrunk": -2.111
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "byXpm": [
+     {
+      "n": 570,
+      "play": -0.062,
+      "shrunk": -0.632
+     },
+     {
+      "n": 56,
+      "play": -0.013,
+      "shrunk": -1.161
+     },
+     {
+      "n": 6,
+      "play": -0.928,
+      "shrunk": -2.578
+     },
+     {
+      "n": 0,
+      "play": null,
+      "shrunk": null
+     }
+    ],
+    "pass": true
+   }
+  }
+ }
 }

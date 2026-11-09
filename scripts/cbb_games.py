@@ -633,9 +633,10 @@ def team_fv(y, by):
 
 
 def fr_mean(e, pos):
-    """a freshman's E[FV] restated at the mean of its outcome odds, as the board restates its headline (fv_dist)"""
+    """a freshman's E[FV] restated at the mean of its outcome odds, as the board restates its headline (fv_dist; the
+    fitted curve all the way down, the one the game model's terms were fit on)"""
     from fv_dist import at_mean, cbb_z
-    return at_mean('cbb', e, cbb_z('Fr', False, pos, e))
+    return at_mean('cbb', e, cbb_z('Fr', False, pos, e), low=False)
 
 
 def recruit_pts(*ranks):

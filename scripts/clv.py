@@ -136,6 +136,26 @@ def chances(sport, mk, side, at, close, close_ml=None):
     return (hw, hp, hl) if side == 'home' else (hl, hp, hw)
 
 
+def fair_line(sport, mk, at, q):
+    """the line a two-sided quote at `at` puts the market's fair number on: the close at which chances() gives the
+    home / over side q of the decided chance there (q the quote's mid, pushes aside). A rung quoted +104 / -118 is
+    not a coin: its fair line sits past it. None when q is not a chance"""
+    if at is None or q is None or not 0.02 < q < 0.98:
+        return None
+    side = 'over' if mk == 'total' else 'home'
+    sd, sdT, _ = params(sport)
+    s = sdT if mk == 'total' else sd
+
+    def share(close):
+        w, _, l = chances(sport, mk, side, at, close)
+        return w / (w + l) if w + l > 0 else 0.5
+    lo, hi = at - 4 * s, at + 4 * s
+    for _ in range(50):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if share(mid) < q else (lo, mid)
+    return (lo + hi) / 2
+
+
 def ret(sport, mk, side, at, price, close, close_ml=None):
     """CLV-implied return per unit risked at `price` (American), or None"""
     c = chances(sport, mk, side, at, close, close_ml)

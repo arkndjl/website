@@ -22,8 +22,11 @@ def ncdf(x):
     return 0.5 * (1 + math.erf(x / math.sqrt(2)))
 
 
-def fv_dist(board, fv, z=None):
-    """{'p': bin chances, 'tiers': [<30, 30s, 40s, 50s, 60+], 'p10', 'p50', 'p90', 'mean', 'ev'} or None."""
+def fv_dist(board, fv, z=None, low=True):
+    """{'p': bin chances, 'tiers': [<30, 30s, 40s, 50s, 60+], 'p10', 'p50', 'p90', 'mean', 'ev'} or None.
+    low: below the grades the fit saw (M['low'], fv_dist_fit.cbb_low) the chance of every bin above the floor is
+    scaled down, from 1 at the lowest fitted grade to k0 at 20, so the floor grade carries what the boards' rows
+    outside the fit became; False reads the fitted curve all the way down."""
     M = fit().get(board)
     if not M or fv is None: return None
     z = z or {}
@@ -32,6 +35,10 @@ def fv_dist(board, fv, z=None):
     s = math.exp(max(-3, min(3, sum(g * z.get(k, 0) for k, g in (M.get('scale') or {}).items()))))
     F = [ncdf((c - mu) / s) for c in M['cuts']]
     p = [max(0.0, (F[k] if k < len(F) else 1) - (F[k - 1] if k else 0)) for k in range(len(F) + 1)]
+    L = M.get('low') if low else None
+    if L and fv < L['from']:
+        k = L['k0'] + (1 - L['k0']) * max(0.0, fv - 20) / (L['from'] - 20)
+        p = [1 - k * (1 - p[0])] + [k * v for v in p[1:]]
     edges = M['edges']; lo = [20] + edges; hi = edges + [80]; fl = M['floorShare']
 
     def q(x):
@@ -56,11 +63,11 @@ def cbb_z(cls=None, new=False, pos=None, fv=45):
             'sr': float(cls in ('Sr', 'Gr')), 'level': ((fv if fv is not None else 45) - 45) / 10}
 
 
-def at_mean(board, fv, z=None):
+def at_mean(board, fv, z=None, low=True):
     """the headline FV for a graded FV: the mean of its outcome odds (both boards since Oct 21 2026; the grade, fvg on
     the boards, sat above the mean at the top: CBB 2010-16 boards graded 45+ averaged 51.0, their odds' mean 46.8,
     their careers 47.4). The grade itself when there's no fit."""
-    d = fv_dist(board, fv, z)
+    d = fv_dist(board, fv, z, low)
     return fv if d is None else max(20.0, min(80.0, d['mean']))
 
 

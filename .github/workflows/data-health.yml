@@ -1,5 +1,6 @@
 # ARKBOARD data health (scripts/data_health.py, Nov 2 2026). Opens a GitHub issue (label data-alert) when
-#   - a data workflow ends red ("red run: <workflow>", closed by its next green run),
+#   - a data workflow ends red ("red run: <workflow>"; the job below starts only for a failed run, and the 3-hourly
+#     check closes the issue once the workflow's latest run is green),
 #   - any feed in data/freshness.json passes its limit ("stale data: <sport>"; the sport's workflow is dispatched
 #     on open and at most once a day after), or
 #   - arkndjl.net still serves an older build 90 minutes after a commit to main ("deploy stuck"), or
@@ -9,8 +10,8 @@ name: data health
 
 on:
   workflow_run:
-    workflows: [cbb board, cbb boards, cfb board, cs2, nba xpm, nfl, nhl, odds snap, picks refresh,
-                soccer, soccer prospects, tennis, tennis prospects, model refits, build gate]
+    workflows: [cbb board, cbb boards, cbb recruits, cfb board, cs2, esea season, nba xpm, nfl, nhl, nhl goalies,
+                odds snap, picks refresh, soccer, soccer prospects, tennis, tennis prospects, model refits, build gate]
     types: [completed]
   schedule:
     - cron: "13 */3 * * *"
@@ -27,7 +28,11 @@ concurrency:
 
 jobs:
   run:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event != 'pull_request'
+    # failed runs only: a green, skipped or cancelled completion starts no runner (the check job closes recovered issues)
+    if: >-
+      github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event != 'pull_request' &&
+      contains(fromJSON('["failure", "timed_out", "startup_failure"]'), github.event.workflow_run.conclusion)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -38,7 +43,10 @@ jobs:
       - name: Red-run alert
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 scripts/data_health.py run "${{ github.event.workflow_run.name }}" "${{ github.event.workflow_run.conclusion }}" "${{ github.event.workflow_run.html_url }}"
+          RUN_NAME: ${{ github.event.workflow_run.name }}
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: python3 scripts/data_health.py run "$RUN_NAME" "$RUN_CONCLUSION" "$RUN_URL"
 
   check:
     if: github.event_name != 'workflow_run'
@@ -52,6 +60,10 @@ jobs:
         run: |
           python3 scripts/data_health.py report
           python3 scripts/data_health.py stale
+      - name: Red runs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/data_health.py runs
       - name: Season rollovers
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -261,6 +261,36 @@ def snapdate(season, md):
     return pd.Timestamp(season, *md)
 
 
+MIN_AGE = 13          # a match dated before a player's 13th birthday is another player's, filed under his id
+
+
+def underage(L, P):
+    """rows of L dated before the player's 13th birthday (two players under one archive id: a 2006 birth carrying 339
+    matches from 1991 on)"""
+    dob = P.dobd.reindex(L.pid).to_numpy()
+    return pd.Series((L.date.to_numpy() < dob + np.timedelta64(int(MIN_AGE * 365.25), 'D')) & ~pd.isna(dob), index=L.index)
+
+
+def drop_underage(L, P):
+    """L without those rows, and the Elo of the players who had any run again from 1500 on their own matches (the
+    archive's rule, elo(): k = 250 / (n + 5)^.4, Slams x1.1, walkovers skipped; opponents' ratings as they stood)"""
+    u = underage(L, P)
+    if not u.any():
+        return L, []
+    ids = sorted(set(L.pid[u]))
+    L = L[~u].copy()
+    for pid in ids:
+        e, n = 1500.0, 0
+        for i, r in L[L.pid == pid].iterrows():
+            L.at[i, 'elo_pre'] = e
+            if not r.walk and r.oelo == r.oelo:
+                p = 1 / (1 + 10 ** ((r.oelo - e) / 400))
+                e += (1.1 if r.tourney_level == 'G' else 1.0) * 250 / (n + 5) ** .4 * (r.won - p)
+                n += 1
+            L.at[i, 'elo'] = e
+    return L, ids
+
+
 def features(R, L, P, D, season, tour, ages=(14, AGE_CUT)):
     """Every player under the age cut on July 1 of `season` with a ranking or a pro match in the 52 weeks before D,
     described from what was known at D (matches count once their event week is over: event start <= D - 7 days)."""
@@ -270,6 +300,7 @@ def features(R, L, P, D, season, tour, ages=(14, AGE_CUT)):
     age = ((jul - P.dobd).dt.days / 365.25).rename('age')
     young = age[(age >= ages[0]) & (age < ages[1])]
     Lp = L[(L.date <= D - pd.Timedelta(days=7)) & L.pid.isin(young.index)]
+    Lp = Lp[~underage(Lp, P)]
     Ly = Lp[Lp.date > D - pd.Timedelta(days=365)]
     Rp = R[(R.date <= di) & R.pid.isin(young.index)]
     rd = Rp.date.max() if len(Rp) else None
@@ -1183,6 +1214,9 @@ def build():
         P.index = P.index.astype(str)
         P['dobd'] = pd.to_datetime(P.dob.astype(float).astype('Int64').astype(str), format='%Y%m%d', errors='coerce')
         P = P[P.dobd >= born]
+        L, merged = drop_underage(L, P)
+        if merged:
+            print(tour, 'matches before age', MIN_AGE, 'dropped, Elo rerun:', ', '.join(f"{P.at[k, 'first']} {P.at[k, 'last']}" for k in merged))
         last = L.groupby('pid').tail(1).set_index('pid')
         cnt = L[~L.walk].groupby('pid').size()
         # Tennis Abstract for every ranked prospect: results since the archive ends

@@ -77,7 +77,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
-  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + String(t).toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
+  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + esc(String(t).toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function r1(x) { return Math.round(x * 10) / 10; }
   function fx(x, d) { return x >= 0.05 || x <= -0.05 ? x.toFixed(d) : '<span class="cfb__dim">0</span>'; }
   // points from a stat line in a format; a defense's line carries pap, its expected points-allowed tier points
@@ -161,7 +161,7 @@
     } else if (dir < 0) list = list.slice().reverse();
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
-      var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
+      var tag = p.st ? ' <span class="nflff__st nflff__st--' + esc(p.st.toLowerCase()) + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
       if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: P(starter-line points, next 4 games) = ' + Math.round(p.bo.p * 100) + '%">BRK</span>';
       var opp = ros ? String(p.rg) : p.w ? (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp) : '<span class="cfb__dim">bye</span>';
       var kick = '';
@@ -170,7 +170,7 @@
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td class="nflff__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + tag + '</td>' +
         '<td class="cfb__num nflwar__war is-key nflff__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
-        '<td class="cfb__g nflff__pos">' + p.pos + '<span class="cfb__dim">' + p.pr + '</span></td>' +
+        '<td class="cfb__g nflff__pos">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
         '<td class="nflwar__team nflff__team" style="white-space: nowrap">' + tl(p.t) + esc(p.t) + '</td>' +
         '<td class="nflff__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
         (ros ? '' : '<td class="cfb__num nflff__kick" data-v="' + esc(p.kick || '') + '">' + kick + '</td>') +

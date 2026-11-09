@@ -224,6 +224,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   ok(strength('Sylvester Smith-Reed', 'Sylvester Smith') === 1 && strength('Bryce Underwood', 'Bryce Underwod') === 1 && strength('Devin Jackson', 'Devon Jackson') === 1, 'strength 1');
   ok(strength('J. M. Cerundolo', 'Juan Manuel Cerundolo') === 1 && strength('J. Sinner', 'Jannik Sinner') === 1 && strength('J. Sinner', 'Matteo Sinner') === 0, 'initial');
   ok(sameTeam('N. Carolina', 'North Carolina') && sameTeam('UConn', 'Connecticut') && !sameTeam('Michigan', 'Michigan State'), 'teams');
+  // the short forms here, in scripts/names.py and in the browser (data/team_alias.json, python3 scripts/names.py --teams) are one list
+  const built = JSON.parse(fs.readFileSync(new URL('../data/team_alias.json', import.meta.url), 'utf8'));
+  ok(JSON.stringify(Object.entries(built).sort()) === JSON.stringify(Object.entries(TEAM_ALIAS).sort()), 'TEAM_ALIAS differs from data/team_alias.json (scripts/names.py TEAM_ALIAS)');
   const m = new Matcher([{ name: 'Josh Allen', team: 'Buffalo' }, { name: 'Josh Allen', team: 'Jacksonville' }, { name: 'Neoklis Avdalas', team: 'Virginia Tech' }]);
   ok(m.find('Josh Allen')[0] === null && m.find('Josh Allen', { team: 'Jacksonville' })[0].team === 'Jacksonville', 'dup names');
   ok(m.find('Neo Avdalas', { team: 'North Carolina' })[0].team === 'Virginia Tech', 'alias');

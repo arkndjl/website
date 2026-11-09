@@ -52,7 +52,7 @@
       var u = !r.ph ? '' : SP === 'nfl' ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r.ph : 'https://a.espncdn.com/combiner/i?img=/i/headshots/' + SP + '/players/full/' + r.ph + '.png&w=96&h=70&scale=crop';
       return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
     }
-    function tl(t) { t = String(t || '').split('/').pop(); return SP && t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + SP + '/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
+    function tl(t) { t = String(t || '').split('/').pop(); return SP && t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + SP + '/' + esc(t.toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
     function T() { return D.targets.filter(function (t) { return t.k === stat; })[0] || D.targets[0]; }
     function fmt(x) {
       if (x == null) return '<span class="cfb__dim">–</span>';
@@ -61,7 +61,7 @@
     }
     function rowsOf() { return D.players.filter(function (r) { return r.ros[stat] != null || (r.ssn && r.ssn[stat]); }); }
     function chips() {
-      var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + t.k + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
+      var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + esc(t.k) + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
       var have = {}, ps = [];
       rowsOf().forEach(function (r) { if (!have[r.pos]) { have[r.pos] = 1; ps.push(r.pos); } });
       ps.sort();
@@ -81,8 +81,8 @@
              { k: 'p20', l: 'P20', num: 1, cls: '', t: '20th percentile: 1 in 5 outcomes fall below' },
              { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median' },
              { k: 'p80', l: 'P80', num: 1, cls: '', t: '80th percentile: 1 in 5 outcomes land above' }];
-    var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: 'nbaxpm__ph', x: 1, t: '1Y: projected XPM next season, minutes-weighted (XPM (proj) + age + projected minutes; data/nba_proj3y_fit.json)' },
-              { k: 'x3', l: '3Y XPM', num: 1, cls: '', x: 1, t: '3Y: projected XPM over the next three seasons, minutes-weighted, a season off the board counting as -2 over 1,000 minutes. Held out 2012-23: RMSE .84 vs .90 for XPM (proj) on the aging curve' }];
+    var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: 'nbaxpm__ph', x: 1, t: '1Y: projected XPM next season when he plays, minutes-weighted. Time off the board is not counted' },
+              { k: 'x3', l: '3Y XPM', num: 1, cls: '', x: 1, t: '3Y: projected XPM over the next three seasons when he plays, minutes-weighted. Time off the board is not counted' }];
     function sx(x) { return x == null ? '<span class="cfb__dim">–</span>' : x < 0 ? '<span class="cfb__down">' + x.toFixed(1) + '</span>' : '+' + x.toFixed(1); }
     function val(r, k, span) {
       if (k === 'g' || k === 'age' || k === 'x1' || k === 'x3') return r[k] == null ? null : r[k];
@@ -118,7 +118,7 @@
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var CC = SP === 'nba' && D.players.some(function (r) { return r.x3 != null; }) ? C.concat(XC) : C;
       head.innerHTML = CC.map(function (c) {
-        return '<th data-sort="' + c.k + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
+        return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
       }).join('');
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
         return '<tr>' + CC.map(function (c) {

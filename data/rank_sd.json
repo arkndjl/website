@@ -1,26 +1,24 @@
 {
  "nfl": {
-  "a": 18.0,
-  "b": 0.0,
+  "a": 8.5,
+  "b": 4.82,
   "halfLife": 3,
   "seasons": [
    2015,
    2026
   ],
   "n": 1815,
-  "noise": "pure",
-  "gameSd": 11.21,
-  "ownSd": 12.76,
-  "sdOpen": 4.24,
-  "sdEnd": 4.24,
+  "noise": "cross",
+  "sdOpen": 3.65,
+  "sdEnd": 2.92,
   "byCheckpoint": {
-   "0": 4.23,
-   "0.2": 4.17,
-   "0.4": 4.22,
-   "0.6": 4.02,
-   "0.8": 3.91
+   "0": 3.7,
+   "0.2": 3.5,
+   "0.4": 3.43,
+   "0.6": 2.98,
+   "0.8": 3.24
   },
-  "floor": 3.91,
+  "floor": 2.98,
   "walk": {
    "seasons": [
     2016,
@@ -35,52 +33,50 @@
     2025,
     2026
    ],
-   "nll": 3.1957,
-   "nllFlat": 3.1936,
    "ab": {
     "2016": [
-     12.0,
-     6.5
+     0.0,
+     18.3
     ],
     "2017": [
-     15.0,
-     2.0
+     0.0,
+     16.49
     ],
     "2018": [
-     5.5,
-     17.0
+     0.0,
+     21.1
     ],
     "2019": [
-     1.0,
-     20.5
+     0.0,
+     18.97
     ],
     "2020": [
-     13.0,
-     7.5
+     0.0,
+     20.91
     ],
     "2021": [
-     18.5,
-     0.0
+     4.64,
+     13.38
     ],
     "2022": [
-     11.0,
-     6.5
+     0.0,
+     16.75
     ],
     "2023": [
-     17.0,
-     0.0
+     2.32,
+     14.61
     ],
     "2024": [
-     15.0,
-     0.0
+     3.61,
+     11.33
     ],
     "2025": [
-     14.0,
-     6.0
+     0.0,
+     19.87
     ],
     "2026": [
-     21.5,
-     0.0
+     9.84,
+     9.7
     ]
    }
   },
@@ -453,7 +449,7 @@
    }
   }
  },
- "note": "rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit); noise: the game noise the fit nets out (own: around the model margin; pure: that less the gap error, used where it scores better)",
+ "note": "rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit); noise: the game noise the fit nets out (own: around the model margin; pure: that less the gap error, used where it scores better; cross: none, sd^2 read from the products of two different remaining games' residuals)",
  "nhl": {
   "a": 0.026,
   "b": 0.0,

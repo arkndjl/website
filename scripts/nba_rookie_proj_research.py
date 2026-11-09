@@ -18,6 +18,7 @@ Live use guard. During a season the board has only part of the minutes, so
     20 draws per rookie. Coefficients per f on a grid, linear in between (the board reads f from the season file).
 Forms per f, leave one class out: raw (x), age (x + age), proj (x + age + log1p(MP82)).
 Kept: proj beats age on held-out RMSE with paired t <= -2 at every f, and held-out calibration slope .8-1.2.
+The board shows XPM given he plays: run scripts/nba_rookie_proj_play_research.py --write after this ('cp').
 """
 import json
 import math

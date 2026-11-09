@@ -1,13 +1,15 @@
 {
- "about": "The live rule monitor's pre-registration (scripts/rule_monitor.py), 2026-10-21. One test for every rule that bets: the Predictions pick rules and segments (scripts/games_picks.py) and the paper book rules (scripts/paper_book.py, whose kill switch was the window test alone: it now adds the CUSUM, which catches a rule that turns after a good run about twice as fast). A rule stops when, with minN+ bets judged by the close since its clock started, either its last `window` are worth clustered t below `t` at the close (game day as the cluster), or a one-sided CUSUM on close value standardised by the rule's backtest sd crosses h. It comes back only when it is refit (a pick rule's X or k changes, or a refit re-tests it; a paper rule is changed), which restarts its clock.",
+ "about": "The live rule monitor's pre-registration (scripts/rule_monitor.py), 2026-10-21; the statistics redone 2026-11-09. One test, decide(), for every rule that bets. A Predictions pick rule or segment (scripts/games_picks.py) is judged by game day, each day's evidence divided by 1 + (n - 1) rho, rho the within-slate correlation of close value on the rule's held-out picks (games_picks_rules.json clvIcc). With minN+ bets judged by the close since its clock started it stops on any of: the one-sided CUSUM around zero (cusum k, h: losing to the close); the CUSUM of the log likelihood ratio of no edge against the edge its stakes assume (cusum hL); the drift test's pause. The last `window` bets' clustered t (se never under the iid one) is shown and stops nothing. A rule with no slate structure (the model monitor's losses) keeps the test against zero: the window's t under the Student cut at the one-sided level `t` stands for, with minDays+ game days, or the per-bet CUSUM. A stopped rule comes back only when it is refit (its X changes, or k moves past 10%), which restarts its clock.",
  "registered": "2026-10-21",
  "window": 300,
  "minN": 50,
+ "minDays": 8,
  "t": -1.0,
  "cusum": {
   "k": 0.25,
   "h": 10.0,
-  "note": "S = max(0, S - z - k) per bet in kick order, z = clvRet / sd. k .25, h 10, picked on simulation (sd .12, 4 bets a game day, checked every game day, 600 bets) with the paper book's old window test (last 300, t < -1) kept beside it: a rule losing 1.5% a bet to the close stops by a median 60 bets, losing 3% by 52; one that turns from +3% to -3% after 200 bets stops ~104 bets after the turn (the window test alone: 200); one really at +1.5% stops 6% of the time, at +3% 3%, at the close about two in three (it loses the vig anyway)"
+  "note": "Around zero: S = max(0, S + sum over the day of (-z - k) / (1 + (n - 1) rho)), z = clvRet / sd; k .25, h 10 as registered Oct 21 (the log likelihood ratio of losing half an sd a bet against the close, at 148:1). Per bet and undeflated, as first run, it stopped a rule earning exactly its stakes' edge 9-52% of the time on the history's own slates; by day and deflated 0-3%. Against the stakes' edge (hL): S = max(0, S - day LLR), the drift test's game-day log likelihood ratio (reference mu1 / 2), stop at hL = ln 99. ln 19 and ln 39 stopped an NFL spread rule at its edge 39% and 21% of the time over 300 bets; ln 99 9%, every other market rule 0-1%. The window test (last 300, clustered t < -1) is no longer a stop: checked at every build from 50 bets, with a clustered se that few game days put under the iid one, it and the per-bet CUSUM stopped a rule at its stakes' edge 15-54% of the time.",
+  "hL": 4.595
  },
  "sdDefault": 0.12,
  "weekDays": 7,
@@ -17,6 +19,870 @@
   "A": 19,
   "B": 19,
   "minN": 30,
-  "note": "Overfit test for every pick rule from its clock (so every new or refit rule): Wald's SPRT, H1 the rule is worth its held-out backtest's clvRet x units.TIMING x units.LEAK (the edge its stakes assume), H0 it is worth 0. Game-day LLR with the slate rho from units. Pause at LLR <= -ln B (a stop, cleared only by a refit), confirm at >= ln A (test retires; the close switch keeps running). A 19 / B 19 picked on simulation (CFB totals X 2.5: expected .018, sd .123, 18 bets a week, 1000 bets, 400 runs): worth nothing pauses 96% (median 234 bets), -0.5x pauses 100% (144); at its backtest pauses 4%, confirms 94% (234); at 1.5x confirms 100% (144); at 0.75x pauses 17%; at 0.5x a coin flip (45/44), at 0.25x pauses 80%. B 9 paused 10% of real rules; A 39 left 18% open at 0.5x."
+  "note": "Overfit test for every pick rule from its clock (so every new or refit rule): Wald's SPRT, H1 the rule is worth its held-out backtest's clvRet with its edge over a fair coin x units.TIMING x units.LEAK (the edge its stakes assume), H0 it is worth 0. Game-day LLR deflated by the within-slate correlation of close value on the rule's held-out picks (clvIcc; units' rho is the correlation of results, about 0, and made the LLR up to 2.5x too large). Pause at LLR <= -ln B (a stop, cleared only by a refit), confirm at >= ln A (test retires; the close switch keeps running). A 19 / B 19 as registered Nov 1; the error rates per rule are in `rates`."
+ },
+ "rates": {
+  "about": "Operating characteristics per rule, simulated with decide() and drift() as shipped: whole held-out slates resampled with their own residuals around a set mean, 400 seasons of `bets` bets. edge = the rule earns exactly mu1 (stop = a false stop; zero / under / paused = which test fired); zero = worth nothing (confirmed = a false confirm; stop = power); minus3 = losing 3% a bet to the close; median = bets to the stop.",
+  "sims": 400,
+  "rules": {
+   "cfb:total": {
+    "mu1": 0.0131,
+    "sd": 0.1178,
+    "rho": 0.038,
+    "bets": 600,
+    "perSlate": 16.6,
+    "edge": {
+     "stop": 0.03,
+     "zero": 0.018,
+     "under": 0.0,
+     "paused": 0.015,
+     "confirmed": 0.515,
+     "median": 340
+    },
+    "half": {
+     "stop": 0.11,
+     "zero": 0.022,
+     "under": 0.01,
+     "paused": 0.098,
+     "confirmed": 0.17,
+     "median": 405
+    },
+    "zero": {
+     "stop": 0.357,
+     "zero": 0.058,
+     "under": 0.155,
+     "paused": 0.345,
+     "confirmed": 0.03,
+     "median": 408
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.843,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 158
+    }
+   },
+   "cfb:spread | game: non-conference": {
+    "mu1": 0.0071,
+    "sd": 0.1651,
+    "rho": 0.114,
+    "bets": 600,
+    "perSlate": 4.3,
+    "edge": {
+     "stop": 0.003,
+     "zero": 0.003,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": 284
+    },
+    "half": {
+     "stop": 0.003,
+     "zero": 0.003,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.003,
+     "median": 182
+    },
+    "zero": {
+     "stop": 0.015,
+     "zero": 0.015,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": 309
+    },
+    "minus3": {
+     "stop": 0.875,
+     "zero": 0.71,
+     "under": 0.105,
+     "paused": 0.815,
+     "confirmed": 0.0,
+     "median": 331
+    }
+   },
+   "cfb:spread | line: 3-7": {
+    "mu1": 0.0276,
+    "sd": 0.1575,
+    "rho": 0.111,
+    "bets": 600,
+    "perSlate": 1.6,
+    "edge": {
+     "stop": 0.062,
+     "zero": 0.0,
+     "under": 0.03,
+     "paused": 0.045,
+     "confirmed": 0.873,
+     "median": 276
+    },
+    "half": {
+     "stop": 0.655,
+     "zero": 0.003,
+     "under": 0.522,
+     "paused": 0.593,
+     "confirmed": 0.188,
+     "median": 273
+    },
+    "zero": {
+     "stop": 0.995,
+     "zero": 0.04,
+     "under": 0.99,
+     "paused": 0.993,
+     "confirmed": 0.003,
+     "median": 152
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.853,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 58
+    }
+   },
+   "cfb:spread | line: 7-14": {
+    "mu1": 0.0236,
+    "sd": 0.1558,
+    "rho": 0.114,
+    "bets": 600,
+    "perSlate": 1.8,
+    "edge": {
+     "stop": 0.105,
+     "zero": 0.005,
+     "under": 0.072,
+     "paused": 0.06,
+     "confirmed": 0.88,
+     "median": 333
+    },
+    "half": {
+     "stop": 0.438,
+     "zero": 0.065,
+     "under": 0.338,
+     "paused": 0.325,
+     "confirmed": 0.48,
+     "median": 257
+    },
+    "zero": {
+     "stop": 0.877,
+     "zero": 0.242,
+     "under": 0.823,
+     "paused": 0.797,
+     "confirmed": 0.125,
+     "median": 205
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.968,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 80
+    }
+   },
+   "cfb:spread | role: dog": {
+    "mu1": 0.0004,
+    "sd": 0.1492,
+    "rho": 0.114,
+    "bets": 600,
+    "perSlate": 2.6,
+    "edge": {
+     "stop": 0.068,
+     "zero": 0.068,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": 377
+    },
+    "half": {
+     "stop": 0.062,
+     "zero": 0.062,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": 273
+    },
+    "zero": {
+     "stop": 0.065,
+     "zero": 0.065,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": 361
+    },
+    "minus3": {
+     "stop": 0.88,
+     "zero": 0.88,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": 191
+    }
+   },
+   "cfb:spread | role: favorite": {
+    "mu1": 0.0316,
+    "sd": 0.1753,
+    "rho": 0.114,
+    "bets": 600,
+    "perSlate": 2.3,
+    "edge": {
+     "stop": 0.138,
+     "zero": 0.0,
+     "under": 0.095,
+     "paused": 0.083,
+     "confirmed": 0.868,
+     "median": 283
+    },
+    "half": {
+     "stop": 0.637,
+     "zero": 0.028,
+     "under": 0.527,
+     "paused": 0.502,
+     "confirmed": 0.352,
+     "median": 250
+    },
+    "zero": {
+     "stop": 0.97,
+     "zero": 0.165,
+     "under": 0.948,
+     "paused": 0.943,
+     "confirmed": 0.035,
+     "median": 153
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.922,
+     "under": 1.0,
+     "paused": 0.998,
+     "confirmed": 0.003,
+     "median": 71
+    }
+   },
+   "cfb:spread | season: early": {
+    "mu1": 0.0125,
+    "sd": 0.1559,
+    "rho": 0.114,
+    "bets": 600,
+    "perSlate": 6.3,
+    "edge": {
+     "stop": 0.005,
+     "zero": 0.003,
+     "under": 0.0,
+     "paused": 0.003,
+     "confirmed": 0.29,
+     "median": 592
+    },
+    "half": {
+     "stop": 0.018,
+     "zero": 0.0,
+     "under": 0.0,
+     "paused": 0.018,
+     "confirmed": 0.072,
+     "median": 410
+    },
+    "zero": {
+     "stop": 0.062,
+     "zero": 0.01,
+     "under": 0.005,
+     "paused": 0.052,
+     "confirmed": 0.02,
+     "median": 440
+    },
+    "minus3": {
+     "stop": 0.978,
+     "zero": 0.623,
+     "under": 0.855,
+     "paused": 0.978,
+     "confirmed": 0.0,
+     "median": 282
+    }
+   },
+   "cfb:spread | season: late": {
+    "mu1": 0.011,
+    "sd": 0.164,
+    "rho": 0.023,
+    "bets": 600,
+    "perSlate": 3.8,
+    "edge": {
+     "stop": 0.022,
+     "zero": 0.01,
+     "under": 0.0,
+     "paused": 0.013,
+     "confirmed": 0.158,
+     "median": 442
+    },
+    "half": {
+     "stop": 0.052,
+     "zero": 0.02,
+     "under": 0.003,
+     "paused": 0.035,
+     "confirmed": 0.028,
+     "median": 392
+    },
+    "zero": {
+     "stop": 0.242,
+     "zero": 0.06,
+     "under": 0.028,
+     "paused": 0.215,
+     "confirmed": 0.005,
+     "median": 436
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.85,
+     "under": 0.985,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 200
+    }
+   },
+   "cfb:spread | tier: mixed": {
+    "mu1": 0.0115,
+    "sd": 0.1582,
+    "rho": 0.073,
+    "bets": 600,
+    "perSlate": 6.0,
+    "edge": {
+     "stop": 0.0,
+     "zero": 0.0,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.055,
+     "median": null
+    },
+    "half": {
+     "stop": 0.01,
+     "zero": 0.003,
+     "under": 0.0,
+     "paused": 0.007,
+     "confirmed": 0.007,
+     "median": 475
+    },
+    "zero": {
+     "stop": 0.037,
+     "zero": 0.0,
+     "under": 0.003,
+     "paused": 0.037,
+     "confirmed": 0.0,
+     "median": 530
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.37,
+     "under": 0.902,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 290
+    }
+   },
+   "cfb:spread | venue: home": {
+    "mu1": 0.0261,
+    "sd": 0.1591,
+    "rho": 0.114,
+    "bets": 600,
+    "perSlate": 2.3,
+    "edge": {
+     "stop": 0.14,
+     "zero": 0.007,
+     "under": 0.098,
+     "paused": 0.083,
+     "confirmed": 0.868,
+     "median": 334
+    },
+    "half": {
+     "stop": 0.608,
+     "zero": 0.095,
+     "under": 0.515,
+     "paused": 0.458,
+     "confirmed": 0.415,
+     "median": 289
+    },
+    "zero": {
+     "stop": 0.958,
+     "zero": 0.285,
+     "under": 0.922,
+     "paused": 0.877,
+     "confirmed": 0.085,
+     "median": 188
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.973,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 78
+    }
+   },
+   "nfl:spread": {
+    "mu1": 0.0406,
+    "sd": 0.1257,
+    "rho": 0.138,
+    "bets": 300,
+    "perSlate": 2.3,
+    "edge": {
+     "stop": 0.113,
+     "zero": 0.0,
+     "under": 0.092,
+     "paused": 0.045,
+     "confirmed": 0.935,
+     "median": 192
+    },
+    "half": {
+     "stop": 0.833,
+     "zero": 0.003,
+     "under": 0.767,
+     "paused": 0.68,
+     "confirmed": 0.278,
+     "median": 105
+    },
+    "zero": {
+     "stop": 1.0,
+     "zero": 0.083,
+     "under": 0.995,
+     "paused": 0.978,
+     "confirmed": 0.02,
+     "median": 51
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.91,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 32
+    }
+   },
+   "nfl:total": {
+    "mu1": 0.0094,
+    "sd": 0.1256,
+    "rho": 0.233,
+    "bets": 300,
+    "perSlate": 6.5,
+    "edge": {
+     "stop": 0.003,
+     "zero": 0.003,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.003,
+     "median": 241
+    },
+    "half": {
+     "stop": 0.0,
+     "zero": 0.0,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.0,
+     "median": null
+    },
+    "zero": {
+     "stop": 0.007,
+     "zero": 0.007,
+     "under": 0.0,
+     "paused": 0.0,
+     "confirmed": 0.003,
+     "median": 214
+    },
+    "minus3": {
+     "stop": 0.527,
+     "zero": 0.49,
+     "under": 0.007,
+     "paused": 0.35,
+     "confirmed": 0.0,
+     "median": 189
+    }
+   },
+   "cbb:spread": {
+    "mu1": 0.0099,
+    "sd": 0.1123,
+    "rho": 0.01,
+    "bets": 1000,
+    "perSlate": 10.4,
+    "edge": {
+     "stop": 0.025,
+     "zero": 0.0,
+     "under": 0.003,
+     "paused": 0.025,
+     "confirmed": 0.725,
+     "median": 535
+    },
+    "half": {
+     "stop": 0.23,
+     "zero": 0.003,
+     "under": 0.142,
+     "paused": 0.212,
+     "confirmed": 0.278,
+     "median": 578
+    },
+    "zero": {
+     "stop": 0.705,
+     "zero": 0.05,
+     "under": 0.497,
+     "paused": 0.677,
+     "confirmed": 0.058,
+     "median": 564
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.993,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 126
+    }
+   },
+   "cbb:total": {
+    "mu1": 0.0174,
+    "sd": 0.1113,
+    "rho": 0.058,
+    "bets": 1000,
+    "perSlate": 16.3,
+    "edge": {
+     "stop": 0.025,
+     "zero": 0.003,
+     "under": 0.01,
+     "paused": 0.02,
+     "confirmed": 0.922,
+     "median": 437
+    },
+    "half": {
+     "stop": 0.307,
+     "zero": 0.007,
+     "under": 0.172,
+     "paused": 0.282,
+     "confirmed": 0.403,
+     "median": 607
+    },
+    "zero": {
+     "stop": 0.85,
+     "zero": 0.06,
+     "under": 0.75,
+     "paused": 0.825,
+     "confirmed": 0.055,
+     "median": 427
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.97,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 126
+    }
+   },
+   "nba:total": {
+    "mu1": 0.0187,
+    "sd": 0.1438,
+    "rho": 0.074,
+    "bets": 600,
+    "perSlate": 2.5,
+    "edge": {
+     "stop": 0.072,
+     "zero": 0.025,
+     "under": 0.013,
+     "paused": 0.045,
+     "confirmed": 0.723,
+     "median": 284
+    },
+    "half": {
+     "stop": 0.42,
+     "zero": 0.07,
+     "under": 0.285,
+     "paused": 0.378,
+     "confirmed": 0.212,
+     "median": 305
+    },
+    "zero": {
+     "stop": 0.858,
+     "zero": 0.207,
+     "under": 0.77,
+     "paused": 0.85,
+     "confirmed": 0.025,
+     "median": 257
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.96,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 90
+    }
+   },
+   "nba:spread | line: 4-9": {
+    "mu1": 0.0186,
+    "sd": 0.1399,
+    "rho": 0.189,
+    "bets": 600,
+    "perSlate": 1.1,
+    "edge": {
+     "stop": 0.045,
+     "zero": 0.007,
+     "under": 0.01,
+     "paused": 0.035,
+     "confirmed": 0.868,
+     "median": 164
+    },
+    "half": {
+     "stop": 0.3,
+     "zero": 0.01,
+     "under": 0.172,
+     "paused": 0.263,
+     "confirmed": 0.35,
+     "median": 349
+    },
+    "zero": {
+     "stop": 0.818,
+     "zero": 0.11,
+     "under": 0.723,
+     "paused": 0.787,
+     "confirmed": 0.052,
+     "median": 236
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.97,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 80
+    }
+   },
+   "nba:spread | line: 9-15": {
+    "mu1": 0.0073,
+    "sd": 0.1354,
+    "rho": 0.107,
+    "bets": 600,
+    "perSlate": 1.3,
+    "edge": {
+     "stop": 0.158,
+     "zero": 0.158,
+     "under": 0.0,
+     "paused": 0.01,
+     "confirmed": 0.22,
+     "median": 312
+    },
+    "half": {
+     "stop": 0.225,
+     "zero": 0.223,
+     "under": 0.0,
+     "paused": 0.015,
+     "confirmed": 0.068,
+     "median": 234
+    },
+    "zero": {
+     "stop": 0.333,
+     "zero": 0.32,
+     "under": 0.003,
+     "paused": 0.033,
+     "confirmed": 0.015,
+     "median": 296
+    },
+    "minus3": {
+     "stop": 0.998,
+     "zero": 0.975,
+     "under": 0.968,
+     "paused": 0.998,
+     "confirmed": 0.0,
+     "median": 140
+    }
+   },
+   "nba:spread | role: dog": {
+    "mu1": 0.0115,
+    "sd": 0.1435,
+    "rho": 0.148,
+    "bets": 600,
+    "perSlate": 1.5,
+    "edge": {
+     "stop": 0.05,
+     "zero": 0.037,
+     "under": 0.0,
+     "paused": 0.015,
+     "confirmed": 0.427,
+     "median": 295
+    },
+    "half": {
+     "stop": 0.11,
+     "zero": 0.06,
+     "under": 0.007,
+     "paused": 0.068,
+     "confirmed": 0.147,
+     "median": 389
+    },
+    "zero": {
+     "stop": 0.37,
+     "zero": 0.145,
+     "under": 0.095,
+     "paused": 0.297,
+     "confirmed": 0.048,
+     "median": 401
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.965,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 144
+    }
+   },
+   "nba:spread | role: favorite": {
+    "mu1": 0.0154,
+    "sd": 0.1228,
+    "rho": 0.101,
+    "bets": 600,
+    "perSlate": 1.3,
+    "edge": {
+     "stop": 0.083,
+     "zero": 0.037,
+     "under": 0.022,
+     "paused": 0.037,
+     "confirmed": 0.782,
+     "median": 315
+    },
+    "half": {
+     "stop": 0.37,
+     "zero": 0.1,
+     "under": 0.22,
+     "paused": 0.31,
+     "confirmed": 0.268,
+     "median": 313
+    },
+    "zero": {
+     "stop": 0.848,
+     "zero": 0.195,
+     "under": 0.718,
+     "paused": 0.805,
+     "confirmed": 0.037,
+     "median": 250
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.995,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 72
+    }
+   },
+   "nba:spread | season: late": {
+    "mu1": 0.0186,
+    "sd": 0.1436,
+    "rho": 0.158,
+    "bets": 600,
+    "perSlate": 1.3,
+    "edge": {
+     "stop": 0.077,
+     "zero": 0.007,
+     "under": 0.035,
+     "paused": 0.058,
+     "confirmed": 0.805,
+     "median": 298
+    },
+    "half": {
+     "stop": 0.407,
+     "zero": 0.045,
+     "under": 0.247,
+     "paused": 0.362,
+     "confirmed": 0.31,
+     "median": 309
+    },
+    "zero": {
+     "stop": 0.873,
+     "zero": 0.15,
+     "under": 0.77,
+     "paused": 0.858,
+     "confirmed": 0.035,
+     "median": 247
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.98,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 82
+    }
+   },
+   "nba:spread | venue: away": {
+    "mu1": 0.0223,
+    "sd": 0.1581,
+    "rho": 0.158,
+    "bets": 600,
+    "perSlate": 1.2,
+    "edge": {
+     "stop": 0.145,
+     "zero": 0.03,
+     "under": 0.07,
+     "paused": 0.087,
+     "confirmed": 0.775,
+     "median": 312
+    },
+    "half": {
+     "stop": 0.535,
+     "zero": 0.075,
+     "under": 0.43,
+     "paused": 0.455,
+     "confirmed": 0.307,
+     "median": 275
+    },
+    "zero": {
+     "stop": 0.93,
+     "zero": 0.28,
+     "under": 0.875,
+     "paused": 0.89,
+     "confirmed": 0.062,
+     "median": 202
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.975,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 79
+    }
+   },
+   "nba:spread | venue: home": {
+    "mu1": 0.0198,
+    "sd": 0.1418,
+    "rho": 0.158,
+    "bets": 600,
+    "perSlate": 1.2,
+    "edge": {
+     "stop": 0.035,
+     "zero": 0.005,
+     "under": 0.015,
+     "paused": 0.022,
+     "confirmed": 0.882,
+     "median": 265
+    },
+    "half": {
+     "stop": 0.36,
+     "zero": 0.022,
+     "under": 0.253,
+     "paused": 0.315,
+     "confirmed": 0.385,
+     "median": 258
+    },
+    "zero": {
+     "stop": 0.85,
+     "zero": 0.092,
+     "under": 0.772,
+     "paused": 0.818,
+     "confirmed": 0.05,
+     "median": 241
+    },
+    "minus3": {
+     "stop": 1.0,
+     "zero": 0.948,
+     "under": 1.0,
+     "paused": 1.0,
+     "confirmed": 0.0,
+     "median": 76
+    }
+   }
+  }
  }
 }
