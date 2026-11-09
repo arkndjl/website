@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-09T00:09:38Z",
+ "asof": "2026-11-09T00:14:08Z",
  "recenter": {
   "week": 0.04
  },
@@ -1034,6 +1034,22 @@
    "tm": 46.7
   },
   {
+   "id": "401862828",
+   "sport": "cfb",
+   "kick": "2026-11-14T19:00:00.000Z",
+   "home": "Rice",
+   "away": "Tulane",
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": 102.0,
+   "edge": 5.1,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -2.6,
+   "tm": 46.4
+  },
+  {
    "id": "401861967",
    "sport": "cfb",
    "kick": "2026-11-14T17:00:00.000Z",
@@ -1144,22 +1160,6 @@
    "why": "edge under 3",
    "m": 2.1,
    "tm": 50.6
-  },
-  {
-   "id": "401862828",
-   "sport": "cfb",
-   "kick": "2026-11-14T19:00:00.000Z",
-   "home": "Rice",
-   "away": "Tulane",
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -108.0,
-   "edge": 2.1,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -2.6,
-   "tm": 46.4
   },
   {
    "id": "401858300",
@@ -1506,9 +1506,9 @@
   "401858293": {
    "mk": "spread",
    "side": "home",
-   "line": 4.5,
-   "price": -113.0,
-   "edge": 0.3,
+   "line": 3.5,
+   "price": -115.0,
+   "edge": 1.3,
    "ev": null,
    "units": 0.0,
    "home": "Pittsburgh",
@@ -1651,7 +1651,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -108.0,
+   "price": -115.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -1795,7 +1795,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -133.0,
+   "price": -141.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -1818,9 +1818,9 @@
   "401869928": {
    "mk": "spread",
    "side": "home",
-   "line": -1.5,
-   "price": -111.0,
-   "edge": 0.9,
+   "line": -2.5,
+   "price": -117.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Marshall",
@@ -1841,10 +1841,10 @@
   },
   "401871060": {
    "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -106.0,
-   "edge": 0.4,
+   "side": "home",
+   "line": 4.5,
+   "price": -127.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Delaware",
@@ -1852,11 +1852,11 @@
    "state": "under"
   },
   "401862828": {
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -108.0,
-   "edge": 2.1,
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": 102.0,
+   "edge": 5.1,
    "ev": null,
    "units": 0.0,
    "home": "Rice",
@@ -2023,7 +2023,7 @@
    "mk": "total",
    "side": "over",
    "line": 47.5,
-   "price": -113.0,
+   "price": -115.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2096,16 +2096,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 12201,
+  "snapshots": 12224,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2483,
-    "clvRet": -0.0515,
-    "clvT": -31.52,
+    "clvN": 2486,
+    "clvRet": -0.0513,
+    "clvT": -31.44,
     "clv": 0.12,
     "beat": 0.329,
-    "still": 0.375
+    "still": 0.379
    },
    {
     "when": "6-24h",
@@ -4834,7 +4834,7 @@
     "down": 32.0
    },
    "2026-11-09": {
-    "raw": 9.25,
+    "raw": 9.0,
     "scale": 1.0
    },
    "2026-11-11": {
