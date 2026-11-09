@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-09T21:45:02Z",
+ "asof": "2026-11-09T21:49:06Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -23,58 +23,72 @@
   "stopped": {},
   "checks": {
    "spread": {
-    "n": 3,
-    "window": 3,
-    "mean": 0.0631,
-    "t": null,
-    "days": 1,
+    "n": 5,
+    "window": 5,
+    "mean": 0.0754,
+    "t": 3.12,
+    "p": null,
+    "days": 2,
     "sd": 0.1257,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
+    "rho": 0.138,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0406,
-     "n": 0,
+     "n": 2,
      "sd": 0.1257,
-     "rho": 0.007,
+     "rho": 0.138,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
+     "llr": 0.269,
+     "info": 0.21,
+     "real": 1.793,
+     "realSe": 2.19,
      "need": 56
     }
    },
    "total": {
-    "n": 16,
-    "window": 16,
-    "mean": -0.0279,
-    "t": -0.99,
+    "n": 17,
+    "window": 17,
+    "mean": -0.0333,
+    "t": -1.44,
+    "p": null,
     "days": 4,
     "sd": 0.1256,
-    "cusum": 2.47,
-    "cusumMax": 2.57,
+    "cusum": 2.19,
+    "cusumMax": 2.19,
     "h": 10.0,
+    "rho": 0.233,
+    "edge": {
+     "cusum": 0.27,
+     "cusumMax": 0.27,
+     "h": 4.595
+    },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0094,
-     "n": 16,
+     "n": 17,
      "sd": 0.1256,
-     "rho": 0.0,
+     "rho": 0.233,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.358,
-     "info": 0.09,
-     "real": -3.482,
-     "realSe": 3.334,
+     "llr": -0.269,
+     "info": 0.1,
+     "real": -4.104,
+     "realSe": 4.288,
      "need": 1048
     }
    }
@@ -139,8 +153,8 @@
     "mk": "total",
     "side": "over",
     "line": 45.5,
-    "price": -100.0,
-    "ev": 0.052,
+    "price": 102.0,
+    "ev": 0.055,
     "units": 0.25
    }
   }
@@ -1878,11 +1892,12 @@
    "beat": 1
   }
  ],
+ "withdrawnLog": [],
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-09": {
-    "raw": 27.0,
+    "raw": 29.25,
     "scale": 1.0
    },
    "2026-11-11": {
@@ -1894,8 +1909,8 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 42.5,
-    "scale": 0.9412
+    "raw": 40.25,
+    "scale": 0.9938
    }
   }
  }
