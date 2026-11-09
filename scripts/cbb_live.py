@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The College Basketball ARKBOARD in season: each player's preseason grade blended with what his stats this season
 say, by how many minutes he has played. Run daily from November to April by .github/workflows/cbb-board.yml.
 

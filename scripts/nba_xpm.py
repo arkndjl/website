@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA XPM leaderboard for the NBA ARKBOARD (static/data/nba-xpm/<season>.json, data/nba_xpm.json).
 
 XPM is the board's NBA impact metric: 50/50 databallr DPM + Basketball-Reference BPM, offense and defense blended

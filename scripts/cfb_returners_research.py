@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: college football players back from a lost season in the preseason prior (Oct 23 2026; the NBA's is PR
 #347).
 

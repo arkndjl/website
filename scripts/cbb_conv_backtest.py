@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Censoring check for the conviction mock (scripts/cbb_mock.py fit_conv), audit item #18 (Oct 25 2026).
 
 fit_conv regresses peak NBA XPM (best three seasons) on the slot, 3-season BPM and age over the 2009-23 drafts. The

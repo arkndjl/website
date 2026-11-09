@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tennis prospects ARKBOARD (Noah, Oct 26 2026): every ATP and WTA player under the age cut, graded on the shared
 20-80 FV value scale against what past prospects with the same profile became.
 

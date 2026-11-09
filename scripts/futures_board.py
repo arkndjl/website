@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Our season sims next to DraftKings' futures prices from ESPN (data/futures_board_<sport>.json). Display only: no
 positions, no stakes. The win-total backtest (data/futures_fit.json) found no proven edge, so the page labels these
 as not beating the line yet.

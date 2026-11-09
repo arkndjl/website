@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for Stat+ (PFN's all-in-one score at the position, the board's Stat+ column) as the FV production
 // driver: which blend of seasons and how much regression predict NFL careers best, and how much the score
 // predicts at each position. Run by hand: node scripts/cfb_statplus_backtest.mjs -> data/cfb_statplus_backtest.json

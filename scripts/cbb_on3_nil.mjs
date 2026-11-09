@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // On3's basketball NIL 100 (player valuations), one of the two On3 lists the CBB xNIL / yNIL fit is checked against.
 //   node scripts/cbb_on3_nil.mjs        -> scripts/.cache/cbbmkt/on3_nil100.json, read by scripts/cbb_market_pull.py
 // (the other list, the transfer portal, comes from On3's public API in that script).

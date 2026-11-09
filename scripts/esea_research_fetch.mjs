@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // ESEA NA league history for the 1NT model research (scripts/esea_research.py): every match of the
 // NA Intermediate/Main/Advanced regular seasons and playoffs, seasons ESEA_FROM..ESEA_TO, from the
 // FACEIT Data API: teams, rosters (with each player's skill level at the match), winner, best-of and

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer GAR staple audit (Nov 3 2026) -> data/soccer_gar_research_nov03.json.
 
 Harness = soccer_players.py's fit (last season's shrunk rates x this season's minutes -> team goal difference a match,

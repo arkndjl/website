@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Hockey prospects FV driver sweep, Nov 1 2026 (research only; Noah: "any more stat/qualitative proxies?").
 Rebuilds the live draft and stage models from the frozen rows (scripts/data/hockey_rows.json.gz; stages with nany,
 comps and the preseason share as data/hockey_fit.json has them) and offers each new constructed proxy on top:

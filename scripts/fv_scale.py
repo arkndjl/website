@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The headline FV's top end (Noah, Oct 31 2026: "80 actually attainable, albeit extremely rare", on every board).
 
 The headline is the mean of a player's outcome odds on a 20-80 outcome scale, so it can only reach 80 when every

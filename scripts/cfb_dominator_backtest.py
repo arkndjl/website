@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV driver test (thread "Improve CFB team rankings and FV", Oct 30 2026): college "dominator" share, the player's
 share of his team's production in his final college season. Never tested before (Oct 14 / 21 / 24 sweeps tested raw
 production, breakout age, cast, context, AA, Senior Bowl, ESPN/PFF grades, measurables).

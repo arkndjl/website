@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA player props: is the over/under chance shaped right? (Oct 21 2026, with scripts/skew_research.py)
 
 Points per player game are right-skewed (skew ~+1, mean over the median; 56% of games finish under the mean), so a

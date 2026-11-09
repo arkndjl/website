@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL late-season stakes (Nov 1 2026 sweep): teams with nothing left to play for rest starters who aren't on the
 injury report. Standings from scripts/data/games_wf/nfl.json.gz before each game, weeks 15 on, regular season:
   out    can't reach the conference's 7th place (wins + games left < its wins; 6th before 2020)

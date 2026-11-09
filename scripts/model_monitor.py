@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Live accuracy of each game model against its own walk-forward record (audit item #28, Oct 25 2026). Stdlib only.
 
     python3 scripts/model_monitor.py nba            # one sport (each sport's workflow runs its own): log, score, report

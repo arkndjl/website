@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Draft prospects' bios from Tankathon (basketball and football): draft age to two decimals, height, weight, school,
 position. A birth date backed out of the draft age is good to about two days.
 

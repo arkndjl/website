@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Availability in the soccer game model (Oct 2026): do regulars who sat out (or were sent off in) their club's last
 league match predict the next one beyond the ratings? Big five, Understat line-ups 2014-15 on.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFP selection model: the committee's ranking fit as a rank-ordered (Plackett-Luce) logit, and the season sim's
 playoff odds scored against the old hand-set formula.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NBA and NHL props paper books (Oct 31 2026, Noah: "NBA/NHL player props in the same way we did NFL ones"): paper
 bets on player props from our projections, on rules that passed held out before their first live bet
 (scripts/nba_props_research.py, scripts/nhl_props.py --test -> data/<sport>_props_fit.json). The NFL book's rules

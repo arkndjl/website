@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Nov 2 2026): what LUMA ARC angles are left after PR #509 (arcw .25 shipped) and PR #529 (LOKI failed).
 
     python3 scripts/nba_arc2_research.py CSV   # CSV = arc/v3.1/arc_season_boards.csv (github.com/lumahoops/NBA)

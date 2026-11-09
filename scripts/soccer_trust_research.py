@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects FV sweep (Oct 31 2026): coach-trust and level signals beyond league minutes share, tested on top of
 the board's kept model (data/soccer_prospects_fit.json) on the board's own rows.
 

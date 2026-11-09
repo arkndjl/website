@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Picks (data/cfb_picks.json, the picks tab). Since Oct 14 2026 the tab lists only upset picks (Noah's rule, see
 // upsetBacktest below). The gated markets described here (backtest, livePicks) are kept for reference but not run:
 // moneyline and spread bets where the game model, shrunk toward the market, still beats the price after the vig.

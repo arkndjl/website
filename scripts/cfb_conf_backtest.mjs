@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Hierarchical conference ratings (team model idea 5, scripts/conf_hier_research.py) as an input to the college game
 // model, on the 2015-26 ESPN history (scripts/cfb_hist_backtest.mjs walk). The feature is the pregame home-minus-away
 // rating gap by game id from scripts/.cache/cfb/conf_feat.json (python3 scripts/conf_hier_research.py cfbfeat): a ridge

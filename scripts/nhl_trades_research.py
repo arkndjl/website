@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Trades in the NHL game model's lineup value (Nov 1 2026; Noah: "make all of our pro sports models account for
 trades").
 

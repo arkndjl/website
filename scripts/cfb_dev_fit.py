@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Year-over-year development for the team builder (data/cfb_dev_fit.json).
 
 Every FBS player PFN graded in both 2024 and 2025 (scripts/cfb_transfer_fit.py's build, cached in

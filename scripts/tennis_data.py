@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tennis data layer (TENNIS ARKBOARD and the tennis prospects board): every ATP and WTA singles match on one set of
 player ids, from free sources.
 

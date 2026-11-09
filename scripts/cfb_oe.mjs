@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Actual vs expected for the College Football ARKBOARD: what a player gains over what the play's context predicts,
 // from CFBD play-by-play (the same slim plays as scripts/cfb_pbp.mjs; old and new play-text formats both parse).
 // Context is what he doesn't control: down, distance and field position (the baseline, cell means), the defense,

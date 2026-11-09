@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Renders brand/exports/pixelart/sheet.html (written by make-pixel-art.py) to
 // sheet.png at 1x device pixels, so every sprite pixel is exactly 4x4 screen
 // pixels. The live "loop" previews are paused on frame 0 for the still image.

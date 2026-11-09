@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Unit badges and game-model tests for the team unit ratings (Noah, Nov 2 2026).
 
 The unit tables (scripts/team_units.py) rate each team's offense and defense, opponent-adjusted. This asks two

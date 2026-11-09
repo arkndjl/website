@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Situational splits, kickers and coach traits as NFL game-model inputs, on the walk-forward of
 scripts/nfl_games_research.py (which tested the first round: success rates, 3rd-down rate, red zone, special teams
 EPA, 4th-down aggressiveness, pass rate over expected and the rest).

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Special teams tab, kickers and punters (Noah, Nov 2 2026): points over expected by field position, shrunk for sample.
 
     python3 scripts/st_kickers.py nfl            # nflverse play-by-play -> data/st_kickers_nfl.json (nfl.yml)

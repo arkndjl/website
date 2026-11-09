@@ -1,0 +1,11 @@
+# AI training, AI search and bulk scrapers: not allowed (see /terms/ and /ai.txt).
+{{- range slice "GPTBot" "ChatGPT-User" "OAI-SearchBot" "ClaudeBot" "Claude-User" "Claude-SearchBot" "anthropic-ai" "Claude-Web" "Google-Extended" "GoogleOther" "Applebot-Extended" "CCBot" "PerplexityBot" "Perplexity-User" "Bytespider" "Amazonbot" "Meta-ExternalAgent" "Meta-ExternalFetcher" "FacebookBot" "cohere-ai" "cohere-training-data-crawler" "Diffbot" "DuckAssistBot" "MistralAI-User" "YouBot" "AI2Bot" "Ai2Bot-Dolma" "ImagesiftBot" "Omgilibot" "Omgili" "PetalBot" "Timpibot" "Webzio-Extended" "img2dataset" "Scrapy" "SemrushBot" "AhrefsBot" "MJ12bot" "DotBot" "DataForSeoBot" "magpie-crawler" "Kangaroo Bot" "PanguBot" "Sidetrade indexer bot" "TurnitinBot" "VelenPublicWebCrawler" }}
+User-agent: {{ . }}
+{{- end }}
+Disallow: /
+
+User-agent: *
+Disallow: /data/
+Allow: /
+
+Sitemap: {{ "sitemap.xml" | absURL }}

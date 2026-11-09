@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Last week's designation, carried into a week whose report isn't out yet (nfl_games.CARRY).
 
 Monday and Tuesday, ESPN's injury report still lists last week's questionable, doubtful and out players. This measures

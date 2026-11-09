@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike team RWA research, Nov 3 2026: does a team-level RWA add to the ARK Ranking's series model?
 
     python3 scripts/cs2_team_rwa_research.py   -> data/cs2_team_rwa_research.json (~10 min)

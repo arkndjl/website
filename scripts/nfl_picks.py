@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL picks (data/nfl_picks.json, the picks tab on the NFL ARKBOARD): the college board's two fixed rules on the NFL
 game model, each listed every week whatever its backtest says, with that backtest shown beside it.
 

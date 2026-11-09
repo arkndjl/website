@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA referee crews: who worked each game, and the whistle it drew (team fouls, free throws, techs; player fouls).
 History from ESPN game summaries (gameInfo.officials), frozen to scripts/nba_refs_hist.json.gz. Stdlib only.
 

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The build gate: what breaks a Cloudflare deploy, checked before a commit lands.
 
     python3 scripts/check_build.py            # strict JSON + file sizes (seconds; every bot workflow runs it before committing)

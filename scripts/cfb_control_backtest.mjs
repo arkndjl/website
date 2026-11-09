@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Game-control ratings (scripts/control_ratings.py) as an input to the college game model, on the 2015-26 ESPN
 // history (scripts/cfb_hist_backtest.mjs walk). The feature is the pregame home-minus-away control rating, by game
 // id, from scripts/.cache/cfb/control_feat.json (python3 scripts/control_ratings.py cfbfeat <md> [variant...]).

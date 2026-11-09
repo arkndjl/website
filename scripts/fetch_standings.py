@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Standings page data (Noah, Nov 2 2026): what has happened, no model numbers.
 
     python3 scripts/fetch_standings.py        # writes data/standings.json (only when something changed)

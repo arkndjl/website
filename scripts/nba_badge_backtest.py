@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest: do NBA trait badges (scripts/nba_badges.py) predict next season's XPM beyond this season's XPM?
 
     python3 scripts/nba_xpm.py 2010 2026         # caches bbref's advanced + totals tables (scripts/.cache/nba)

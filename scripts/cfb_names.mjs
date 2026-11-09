@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Name variants across sources: PFN, On3, ESPN and CFBD spell the same player differently ("Sammy" / "Samuel", "TJ" /
 // "T.J.", "Will" / "William", "Smith-Reed" / "Smith"). The rules live in scripts/names.mjs, shared by every sport; this
 // keeps the two helpers scripts/fetch_cfb.mjs and scripts/cfb_teams.mjs use, only to choose among candidates on the

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game-time weather for college football games with opening and closing totals (research only, Oct 21 2026).
 
     python3 scripts/cfb_weather.py        # fills scripts/data/cfb_weather.json, skipping games already in it

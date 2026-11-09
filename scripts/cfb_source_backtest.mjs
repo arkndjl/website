@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest: do data sources FV doesn't use yet predict NFL careers beyond what it already has? Run by hand after
 // scripts/cfb_statplus_backtest.mjs (it reuses that script's cached PFN boards and nflverse picks):
 //   node scripts/cfb_source_backtest.mjs -> data/cfb_source_backtest.json

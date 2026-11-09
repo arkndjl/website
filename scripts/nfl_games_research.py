@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Candidate inputs for the NFL game model, tested the way the college model's were (scripts/cfb_model.mjs CAND).
 
     python3 scripts/nfl_games_research.py      # writes data/nfl_games_research.json (numpy; ~3 min with a warm cache)

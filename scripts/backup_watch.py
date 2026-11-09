@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backup watch (Noah, Oct 23 2026): second- and third-string players graded above the starter they back up, for the
 backup watch tab in each sport (layouts/shortcodes/backupwatch.html). College football is scripts/backup_watch_cfb.mjs.
 

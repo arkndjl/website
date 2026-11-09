@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARK Ranking movement for every sport: rank and rating change over the last week.
 
 Each builder passes its ranking rows and last run's output. The ranking is kept in the output's `mvHist`

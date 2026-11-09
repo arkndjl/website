@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Game-model audit and upgrade tests (scripts/cfb_model.mjs), offline, on the live model's own inputs.
 //   node scripts/cfb_game_backtest.mjs <md.json.gz> [qb.json]
 // md.json.gz: everything runModel reads (fetch_cfb.mjs writes it with CFB_MD_DUMP=<path>; the "cfb game research"

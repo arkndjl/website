@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Positional value on the CFB FV scale (FV_POS_VALUE in scripts/fetch_cfb.mjs), fit on NFL outcomes (audit #24).
 FV grades rarity within a position (data/cfb_calibration.json tiers: players a class at or above each grade), then
 scales each position's top counts by its value, ramping in from 50 to full at 60 (the k-th best RB per class grades

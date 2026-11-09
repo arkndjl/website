@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Round-2 research harness (Oct 24 2026): do KenPom roster-structure fields (last season's height by position,
 experience, bench minutes, points by position) improve the CBB preseason prior?  Prior-level test: walk-forward ridge
 of the season's final KenPom AdjEM on the shipped PRIOR_F terms (scripts/data/cbb_team_prior.json, last = last season's

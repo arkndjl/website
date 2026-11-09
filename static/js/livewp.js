@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 /* In-game win chance for the homepage ticker (Noah, Nov 1 2026). One file for the browser and the backtest
    (research/live_wp_research.mjs), so the page and the test run the same numbers.
 

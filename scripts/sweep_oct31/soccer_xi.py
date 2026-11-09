@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tonight's starting XI value (upper bound: the XI is known ~1 h before kickoff) and last match's XI, each minus the
 team's usual XI this season, on top of the shipped soccer model and vs the close. Values = prior-season GAR/90 on
 the big-five scale (soccer_players fit), newcomers at their position's replacement level."""

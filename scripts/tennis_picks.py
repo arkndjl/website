@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tennis picks on the Predictions page (Noah, Oct 27 2026: "Why aren't counter strike and tennis on the game table /
 picks page now that we're using Novig?"). The same pick rule as every other sport (scripts/games_picks.py, pick-rules):
 the model's side when it sits X+ off the market, X set on the tuning season by closing line value, on only where the

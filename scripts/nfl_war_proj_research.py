@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): next-season and next-three-seasons WAR for the NFL WAR board, from WAR history, age by
 position group and snaps.
 

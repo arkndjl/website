@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Versatility backtest: do players who played more than one position in college have better NFL careers than
 FV already expects? And does the board's position-change flag (a frame that fits another spot) mean more NFL value?
 

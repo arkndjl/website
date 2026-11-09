@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Junior / amateur club development effect as a hockey draft-model FV driver (research, Nov 2 2026).
 
 New angle (the drafting NHL team's past residual failed Oct 31): does the club a prospect plays for in his draft

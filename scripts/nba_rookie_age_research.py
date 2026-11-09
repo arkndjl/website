@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Nov 3 2026): an age-adjusted XPM for the NBA rookie board, built from data and kept only if it predicts
 a rookie's later XPM better than his raw (shrunk) rookie XPM.
 

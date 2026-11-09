@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Return production as a CFB FV driver (Nov 2 2026): does it explain NFL outcomes beyond the shipped FV?
     python3 scripts/research/st_value/cfb_fv_ret_test.py   (needs cfb_ret_hist.py's ret_yoe.json)
 Rows: scripts/data/cfb_alltime_rows.json.gz, every FBS season 2014-25 at QB-LB graded under the shipped weights; the

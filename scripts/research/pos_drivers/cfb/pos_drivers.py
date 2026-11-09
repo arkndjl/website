@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Position-purpose FV drivers for CFB (Nov 2 2026): does a number built from what each position is FOR explain NFL
 outcomes beyond the shipped FV?
     python3 scripts/cfb_espn_pbp.py 2011 2022          # ESPN slim play-by-play (one summary call per FBS game)

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kicker and punter grades, Nov 2 2026 research (scripts/st_kickers.py). Stability: shrinkage k and year-to-year r of every kicker/punter part.  python3 res.py nfl 2012 2025 | cfb 2010 2025"""
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

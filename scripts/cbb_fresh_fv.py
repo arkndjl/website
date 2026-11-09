@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Freshman (newcomer) FV candidates on the shipped newcomer drivers (research, Oct 30 2026)
 
     python3 scripts/cbb_careers_kit.py && python3 scripts/cbb_fresh_fv.py

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer player props test (Oct 31 2026, Noah: "check for CBB, CFB, and soccer props"), on the NFL props method
 (scripts/nfl_props_research.py): a walk-forward player model, a pre-registered rule tuned on one span and judged on a
 later one, matches as clusters.

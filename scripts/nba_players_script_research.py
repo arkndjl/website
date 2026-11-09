@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game-script research for the NBA player projections (Oct 21 2026): blowout minutes, volume with the total, a full
 simulation of each game's margin and total (prop chances as a mixture over the script) against the negative binomial,
 and how teammates' misses correlate. Held out 2024-26, MAE and CRPS, games as clusters.

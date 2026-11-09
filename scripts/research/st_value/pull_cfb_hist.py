@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB return history for the special teams FV test (Nov 2 2026): ESPN summaries 2011-2022, one call per FBS game.
 Keeps the slim play-by-play (espn_pbp), the box with kick/punt returns (CFB_BOX_RETURNS=1) and the returner ids
 (espn_ret, as scripts/st_returners.py), so neither st_returners nor cfb_roster_hist pulls the summary again.

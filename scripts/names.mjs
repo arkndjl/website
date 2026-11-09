@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Player names across sources, every sport: the Node twin of scripts/names.py (same rules, same alias file,
 // data/name_aliases.json). Keep the two in step: `node scripts/names.mjs --test` and `python3 scripts/names.py --test`
 // run the same cases, and the parity check in scripts/names.py compares their keys on every board name.

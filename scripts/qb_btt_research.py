@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Big-time throws (BTT) for quarterbacks: a free proxy, tested as a QB talent signal and as a game-model term
 (thread "Test big time throws for QBs", Nov 1 2026; Noah: "Can we measure big time throws for QBs and see if this
 helps as an FV driver / in the game model?"). Research only. Results in data/qb_btt_research.json.

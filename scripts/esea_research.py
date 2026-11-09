@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NT model research (Oct 26 2026): what predicts an ESEA NA league match, and which inputs the 1NT
 page's preview, season sim and power rank should use.
 

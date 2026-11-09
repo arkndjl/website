@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Predictive trait badges for the soccer player board (scripts/soccer_players.py), the CFB board's medals
 (scripts/cfb_badges.mjs) in soccer terms. A badge is one trait measured by one stat a 90, relative to the league-season
 mean at his position, regressed toward that mean by minutes: v' = m + (v - m) n / (n + k), k = n(1 - r) / r from the

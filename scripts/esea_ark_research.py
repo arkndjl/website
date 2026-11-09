@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARK Rating and veto research (Oct 26 2026): which player rating best predicts the next match, and which
 map-strength source finds real map edges for the veto.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player headshots for the boards that had none: NBA XPM, NHL WAR and goalies, NFL WAR, and the hockey prospects
 board (big board and drafted prospects).
 

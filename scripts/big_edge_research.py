@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Big edges (Noah, Oct 30 2026): "Should we add predictions with an edge of 10 (or X number) or higher to the picks
 board? Can we check to see what the games that we miss with a 10+ edge on have in common and use that absence to
 improve the model?"

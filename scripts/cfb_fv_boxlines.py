@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Box-score season lines for the wide FV backtest (scripts/cfb_fv_refit.mjs --wide). PFN's impact scores start in 2019,
 so seasons 2012-18 get a stand-in built from free ESPN data, in PFN's row format, at QB, RB, WR, TE, EDGE, DL and LB:
   offense  ESPN box scores (scripts/cfb_roster_hist.py), summed by season: games, passing, rushing, receiving, team shares

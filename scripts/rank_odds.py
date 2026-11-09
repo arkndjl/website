@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Rank odds for every power ranking, and ARK's ranking scored against the polls.
 
     python3 scripts/rank_odds.py --fit       # measure each sport's rating sd -> data/rank_sd.json (numpy)

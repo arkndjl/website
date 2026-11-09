@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: first-substitution timing by score state, and whether an early first sub changes the rest of the match."""
 import json, sys
 from collections import defaultdict

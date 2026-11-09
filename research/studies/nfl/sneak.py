@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL short yardage: QB sneak vs other runs vs passes on 3rd/4th-and-1, 2015-2026.
 QB = player with 20+ pass attempts that season. Sneak = designed QB run (not a scramble, no dropback) at the middle.
 Outcome: conversion (first down or TD), EPA. Same down, distance and field zone compared; CIs Wilson / game bootstrap.

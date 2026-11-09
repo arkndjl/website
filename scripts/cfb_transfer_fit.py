@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Fit Transfer% (data/cfb_transfer_fit.json) on real roster moves, and test the hometown pull.
 
     python3 scripts/cfb_transfer_fit.py            # pull (cached in scripts/.cache/transfer/), build, fit

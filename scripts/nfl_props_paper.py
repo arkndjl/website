@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NFL props paper book (Oct 29 2026, ARK Edge Sweep): paper bets on player props from nfl_fantasy's stat lines,
 on a rule that passed held out before its first live bet (scripts/nfl_props_research.py -> data/nfl_props_research.json).
 

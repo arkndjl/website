@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backup watch, college football (Noah, Oct 23 2026): second- and third-string players who out-produce a starter at
 // their position (production, not FV: Noah, Nov 5 2026, as the CBB, NFL, NBA, NHL and soccer tabs). Writes data/backup_cfb.json for the backup watch tab (layouts/shortcodes/backupwatch.html).
 //

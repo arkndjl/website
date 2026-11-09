@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Compact extraction of NHL play-by-play into one JSON-lines file (run with python3 -I).
 usage: extract.py <pbp_dir> <out.jsonl>"""
 import gzip, json, os, sys

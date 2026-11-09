@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Renders one share card per ARKBOARD page into ../static/og/<page>.png from og-board.html, with frame 0 of the
 // page's pixel hero. Each content/arkboard-*.md sets cover = "/og/<page>.png" (layouts/partials/head.html).
 // Needs Node + Playwright and ImageMagick's `convert` (2x render, box downscale, like render.js).

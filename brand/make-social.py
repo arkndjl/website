@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Social link icons as on-palette pixel tiles: a 16 x 16 bevelled button (lilac highlight top-left, dark shadow
 bottom-right, purple face) with a 12 x 12 glyph in lilac / teal / white / dark. Used by the header
 (partials/social-icons.html) and the about/contact tiles (shortcodes/aboutcontact.html) as <use href="#icon-s-NAME">.

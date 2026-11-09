@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Write the study JSON cards from the result files produced by the study_*.py scripts."""
 import json, sys, os
 SCR = sys.argv[1]; OUT = os.path.dirname(os.path.abspath(__file__))

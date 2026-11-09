@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player comps as an FV driver (Noah, Oct 30 2026): hockey (NHL draft picks), soccer and tennis prospects.
 
 A comp term is the mean outcome FV of a prospect's nearest historical profiles (same position group), offered to each

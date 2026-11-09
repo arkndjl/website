@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: NBA timeout after an opponent run.
 
 Trigger: the score that brings an unanswered opponent run to 8+ points (first time per run), Q1-Q4,

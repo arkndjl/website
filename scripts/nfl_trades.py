@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """In-season moves in the NFL game model: trades, waiver claims and signings off other clubs (Nov 1 2026;
 scripts/nfl_trades_research.py, data/nfl_trades_research.json).
 

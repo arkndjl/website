@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV as a distribution (data/fv_dist.json, fit by scripts/fv_dist_fit.py): for a graded FV and a player's spread
 group, the chance of each outcome tier, the 80% range and the expected value. Same rules as fvDist in
 scripts/fv_dist.mjs; layouts/partials/fvoutlook.html draws the result."""

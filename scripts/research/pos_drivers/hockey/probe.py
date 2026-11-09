@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """probe HockeyTech feeds for goalie season stats and team standings"""
 import json
 import urllib.request

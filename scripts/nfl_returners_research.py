@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: players back from a lost season in the NFL priors (Oct 23 2026; the NBA's is PR #347).
 
     python3 scripts/nfl_returners_research.py      # numpy; writes data/nfl_returners_research.json

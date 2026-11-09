@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Sources for the College Basketball market tabs (NIL, team builder, staff, coaching jobs, coach pay).
 
     node scripts/cbb_on3_nil.mjs          # On3 NIL 100 (needs Chromium) -> scripts/.cache/cbbmkt/on3_nil100.json

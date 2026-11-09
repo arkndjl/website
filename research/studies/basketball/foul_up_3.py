@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: foul up 3 (NBA + CBB).
 
 State: final regulation period, leader up exactly 3, trailer in possession and the possession still live

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Personnel inputs (Nov 2 2026): the NFL game model and the receiving props.
 
     python3 scripts/nfl_personnel.py --research    # -> data/nfl_personnel_research.json (numpy; ~10 min warm)

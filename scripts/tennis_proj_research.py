@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): a forward projection for the tennis ARK Ranking (scripts/tennis_model.py): each
 player's Elo and ARK 12 / 24 / 36 months ahead.
 

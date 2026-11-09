@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA game model: past games' injury reports in the live walk (basketball audit, Nov 4 2026).
 
 The fit walks every game 2019-20 on with its official report (scripts/.cache/nba/inj_hist.json), so each game's

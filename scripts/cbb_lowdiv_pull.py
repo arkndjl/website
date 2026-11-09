@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NCAA Division II and III men's basketball box scores (ncaa.com, through the public ncaa-api.henrygd.me proxy), one
 compact player line per game, for the CBB board's non-D-I players (scripts/cbb_lowdiv.py).
 

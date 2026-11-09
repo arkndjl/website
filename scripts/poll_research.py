@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Do the AP and Coaches polls add to the CBB / CFB game models? Research only (data/poll_research.json).
 
 Inputs: the walk-forward game files (scripts/data/games_wf/<sport>.json.gz: model margin m, close L, result res) and

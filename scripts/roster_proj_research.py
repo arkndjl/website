@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Oct 28 2026): does a team strength built from the player projections (scripts/player_pctl.py: rate x
 exposure, Marcel 1 / .7 / .5 shrunk with the fitted K, updated with the season to date) add to each game model, and so
 to the ARK Ranking (each sport's ranking is its game model's rating)?

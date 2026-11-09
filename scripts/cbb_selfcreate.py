@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Self-created scoring from ESPN play-by-play (hoopR parquet, 2014-25 seasons), per college player-season.
 
     python3 scripts/cbb_selfcreate.py      # -> scripts/.cache/cbb/selfcreate.json  {"pid|year": counts}

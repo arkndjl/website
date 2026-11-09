@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest: do NHL badges (scripts/nhl_badges.py) predict next season's value beyond what the board already has?
 
     python3 scripts/nhl_badge_backtest.py      # needs MoneyPuck's season summaries in scripts/.cache/nhl/mp

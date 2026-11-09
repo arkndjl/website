@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tennis entry status as a match-model term (research; Nov 2 2026). New information the shipped model lacks: how a
 player got into the draw (Sackmann's winner_entry / loser_entry).
   q   came through qualifying (Q) or as a lucky loser (LL): match-sharp, on site, and the Elo already moved on the

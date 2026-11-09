@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL breakouts tab (Noah, Nov 2 2026): each week's standout games by young players, against what we expected of them.
 
     python3 scripts/nfl_breakouts.py      # this season, every week played -> data/nfl_breakouts.json (stdlib; run by nfl.yml)

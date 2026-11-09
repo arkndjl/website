@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Commit a bot workflow's data files and push them to main without losing what another run pushed meanwhile.
 
     python3 scripts/data_push.py -m "Update the NBA games (2026-11-05)" \

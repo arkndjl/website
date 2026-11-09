@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtests for the soccer GAR inputs (scripts/soccer_players.py), audit items #19 and #34 (Oct 25 2026).
 
     python3 scripts/soccer_gar_tests.py gk  <fotmob dir>   # #19: FotMob goals prevented (xGOT faced - goals) as the GK term

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV as a distribution: the chance of each outcome tier, an 80% range and the expected value, for every player on the
 CFB and college basketball boards (data/fv_dist.json, read by fetch_cfb.mjs, cfb_teams.mjs, fetch_cbb.py, cbb_live.py).
 

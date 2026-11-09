@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL props: how correlated are the rule's bets in one game, one player, one week (Oct 29 2026)? Held-out growth of
 per-prop, player-joint and per-game-capped sizing at a weekly budget. Research only; scripts/nfl_props_paper.py took
 the player-joint version (Noah: "100%/wk, player props as one bet"). Run from scripts/: python3 nfl_props_corr_research.py"""

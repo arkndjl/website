@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Draft-slot backtest for the mock draft (scripts/cfb_teams.mjs, BOARD_PICK).
 
 Fetches DraftTek final pre-draft big boards (2020-25, top 600), nflverse draft picks and combine results,

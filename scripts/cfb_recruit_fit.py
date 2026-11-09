@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Fit Recruit FV (data/cfb_recruit_fit.json): what FV a high school recruit grows into, from past classes.
 
     python3 scripts/cfb_recruit_fit.py            # pull ESPN's classes (cached in scripts/.cache/recruit/), fit

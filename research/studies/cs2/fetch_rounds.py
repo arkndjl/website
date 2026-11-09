@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Round-level CS2 data from bo3.gg (api.bo3.gg/api/v1/games/<id>/rounds, no key) for the ARKBOARD CS2 studies.
 
 Game list: scripts/data/cs2_bo3.json.gz (repo), CS2 era (from 2023-10-01), finished maps with a score, match tier

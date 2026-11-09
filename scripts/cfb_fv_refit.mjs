@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Joint refit of the FV drivers: rebuild the board as it would have stood at the end of each season 2019-22 (every
 // FBS PFN line at QB, RB, WR, TE, EDGE, DT and LB, every input the way fetch_cfb.mjs computes it), grade it with FV's
 // own scarcity scale, and score each player's last college season against his NFL career. Then refit a multiplier

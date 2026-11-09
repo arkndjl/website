@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Rolling school / coach development effects for the CFB FV candidate stage (Nov 1 2026 FV sweep, research only).
 
 scripts/school_dev.py ranks schools by NFL outcome over what the recruiting rating predicted (CFB tau .42 FV a signee,

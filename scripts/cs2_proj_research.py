@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): a 6-month RWA projection for the Counter-Strike players board (scripts/cs2_players.py).
 
     python3 scripts/cs2_proj_research.py      # numpy; writes data/cs2_proj_fit.json (~2 min)

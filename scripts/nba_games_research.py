@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research on the NBA game model (scripts/nba_games.py): totals, Elo, the win-probability sd, the market blend.
 
     python3 scripts/nba_games_research.py      # writes data/nba_games_research.json (numpy; ~5 min)

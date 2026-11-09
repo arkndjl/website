@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Archived DraftKings soccer player props from ESPN's core API (odds provider 100, propBets) with each match's ESPN
 box score, for the soccer props test (scripts/soccer_props_research.py). ESPN still serves DraftKings' prices for
 finished matches from about April 2026 (none in Feb/Mar 2026, checked Oct 31 2026), one item per player and market:

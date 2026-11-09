@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Walk-forward CBB predictions in the calibration-study schema, from scripts/cbb_games.py with the committed tuning
 (data/cbb_games_fit.json params + selected feats, both chosen on 2016-20 only). Writes no repo data files
 (only the gitignored scripts/.cache/cbb availability caches when missing)."""

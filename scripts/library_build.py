@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Library page data: research studies + glossary/methodology -> data/library.json.
 
   python3 scripts/library_build.py

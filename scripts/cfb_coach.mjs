@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // The coaching market for the College Football ARKBOARD, fed by scripts/fetch_cfb.mjs: what each head coach and
 // coordinator is worth, which jobs open after the season, who fills them and where coaches (and the players who
 // follow them) go. Fit by scripts/cfb_coach_fit.py on USA Today's salary database and ESPN records

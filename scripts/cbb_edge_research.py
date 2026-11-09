@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Four college basketball game-model drivers from the Oct 28 2026 edge sweep, each judged against the closing line.
 
     python3 scripts/cbb_edge_research.py --pull    # caches: Barttorvik coaches, ESPN attendance, hoopR possession time

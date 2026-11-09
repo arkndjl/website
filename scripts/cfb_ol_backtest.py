@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College OL value test (2026-11-01): does the lineman's quality in college WAR/XV gain from PFN's blocking lines?
 Run after node scripts/cfb_av_backtest.mjs (fills scripts/.cache/av): python3 scripts/cfb_ol_backtest.py
     -> data/cfb_ol_backtest.json

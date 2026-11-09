@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team special teams rating: badge and rating tests, and the team table (see scripts/st_teams.py).
 
 Tests (the team badge recipe, scripts/team_badges.py, pre-registered):

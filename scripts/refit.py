@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Scheduled model refits (Nov 2 2026, "every ARKBOARD model auto-updates"). Before this, each model's fit
 (`--fit`, `--refit`) ran only when a thread ran it by hand; the daily workflows only score with the committed fit.
 .github/workflows/model-refits.yml runs this every Monday:

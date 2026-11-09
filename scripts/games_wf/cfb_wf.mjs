@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Out-of-sample CFB game predictions, one row per finished FBS game with a closing spread, in the cross-sport
 // calibration schema.
 //   node cfb_wf.mjs --hist <out.json.gz> [espn_odds_cache.json]

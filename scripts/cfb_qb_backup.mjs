@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backup QBs in the college game model: how much a QB1 absence costs, and how to value the backup, on 2015-26 ESPN
 // history (free; scripts/cfb_espn_pbp.py caches, scripts/cfb_espn_md.mjs history). The live charge (scripts/cfb_teams.mjs
 // side()): P(out) x (backup EPA a play - starter's) x 38 plays, each QB's season EPA a play shrunk toward replacement

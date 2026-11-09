@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Novig vs DraftKings as the closing reference, scored on finished games (Oct 27 2026).
 
 Joins each game's last pregame row in scripts/data/odds_novig/ (scripts/novig.py) with its last pregame row and final in

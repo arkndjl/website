@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB ARK Ranking research (Oct 26 2026): new preseason-prior and game-level terms for the college basketball game
 model (its ratings are the ARK Ranking), none of them tried before.
 

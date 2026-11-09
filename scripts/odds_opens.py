@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Opening-line backfill for the open-based pick rules (Oct 28 2026, edge sweep item 3): more seasons with an opening
 spread and total, so the rules in scripts/games_picks.py (X set by closing line value at the open) tune on more than
 one or two seasons and CBB totals can be judged at all.

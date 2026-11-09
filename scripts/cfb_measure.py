@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Measured height and weight for college football players (Noah, Nov 3 2026: "if we have multiple sources for
 height/weight that differ, take the most recent one OR average them with shrinkage based on recency, weighting certain
 sources higher than others; combine measurements are probably most accurate").

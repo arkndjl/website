@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV sweep Nov 1 2026, tennis prospects: constructed proxies (serve/return dominance, luck-stripped results, surface
 versatility, quality of wins, durability, own extras) on top of the kept model, every snapshot.
 

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL goalie-pull studies. usage: python3 -I analyze.py <scratch_dir> <out_dir>
 Builds per-game exposure/goal tables for late-game states, pull events, and score-effects counts; pickles them."""
 import json, os, pickle, sys

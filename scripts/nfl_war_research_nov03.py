@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL WAR staple audit (Nov 3 2026): the .6 AV WAR / .4 XV blend and the .091 wins-per-AV scale, out of sample.
 
     python3 scripts/nfl_xv.py --prep          # once: scripts/.cache/nfl/xv_<y>.json (2018-25)

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: free throw icing (NBA + CBB).
 
 Sample: first free throw of a trip in the last 2:00 of the final regulation period or OT, margin within 3

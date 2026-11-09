@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Possession tracking over a game's event list (normalized events from bball_common)."""
 
 TERMINAL_NEXT = {"ft", "shot", "tov", "oreb", "dreb", "steal", "endp"}

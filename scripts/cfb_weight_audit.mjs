@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Weight audit for the game model (scripts/cfb_model.mjs), offline, on the live model's own inputs (the dump
 // scripts/cfb_game_backtest.mjs reads):  W8=<tal|prior|scale|ridge|all> node scripts/cfb_weight_audit.mjs <md.json.gz>
 // Season-swap CV as in cfb_game_backtest.mjs. Oct 2026 (2025 + 2026 through week 6, 1,380 games), on the model before

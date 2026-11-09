@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // The college game model's inputs (runModel in scripts/cfb_model.mjs: games, advanced box, lines, drives, situational
 // splits) rebuilt from free ESPN data for any season, so the model can be fit on 2015 on and the CFBD quota stops
 // mattering. Reads the caches of scripts/cfb_espn_hist.py (scoreboards, closing lines) and scripts/cfb_espn_pbp.py

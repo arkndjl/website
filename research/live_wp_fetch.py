@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game states for the in-game win chance backtest (ticker live odds, Nov 1 2026).
 
     python3 research/live_wp_fetch.py [nfl nba nhl soccer]   # -> .cache/live_wp/<sport>.json.gz

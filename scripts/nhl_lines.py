@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL lines: forward trios and defence pairs at 5-on-5 from the NHL's shift charts, with goals and expected goals
 while together (data/nhl_lines.json for the board's lines tab), and the line inputs tested on the game model.
 

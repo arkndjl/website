@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Oct 30 2026): squad age next to squad market value in the soccer game model, after the NHL age line
 (PR #583).
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NFL game model's offseason roster prior (scripts/nfl_offseason_research.py, data/nfl_roster_fit.json; Oct 21 2026).
 
 Each player's WAR for the new season is projected from his last two seasons (AV WAR, as nfl_war.war_ledger, kept by

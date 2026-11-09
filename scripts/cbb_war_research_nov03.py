@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB WAR / Stat+ staple audit (Nov 3 2026), out of sample across 2017-26 Barttorvik seasons.
 
     (needs scripts/.cache/cbb/bt/adv<y>.csv and scripts/.cache/cbb/games/<y>.json.gz, 2017-26)

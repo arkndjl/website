@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Age in the backup watch (Noah, Oct 31 2026: a backup younger than the starter he sits behind should rank above a
 veteran backup). Fits how much the age gap (starter's age - backup's) adds to today's grade gap in predicting the gap
 over the next two seasons, and writes the terms the backup watch ranks by: data/backup_age.json.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CHL game summaries (HockeyTech's public gc feed, OHL/WHL/QMJHL) -> per-player scoring splits a season, for the
 hockey FV driver search (Oct 26 2026): goals, primary and secondary assists, even-strength splits, and on-ice
 even-strength goals for and against (the feed lists the skaters on the ice for every goal).

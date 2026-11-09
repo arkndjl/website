@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA player prop snapshots for the props paper book (Noah, Oct 21 2026: "player props for picks based on DraftKings
 lines from ESPN"). Free data only: DraftKings through ESPN's core API (odds provider 100, propBets), which serves a
 game's props only until about a day after it ends, so there is no history to backtest on: the archive starts now.

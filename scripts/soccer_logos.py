@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Club logos for every soccer table that names a club rather than an ESPN team id (data/soccer_logos.json).
 
     python3 scripts/soccer_logos.py      # map names -> logo, fetch the missing crests

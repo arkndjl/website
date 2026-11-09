@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The market's preseason view of each NBA team in the game model's early weeks (research; Oct 21 2026).
 
     python3 scripts/nba_market_prior.py --research             # margin priors and the totals carry -> data/nba_market_prior.json

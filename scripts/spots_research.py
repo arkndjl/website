@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Schedule spots in every other sport: letdown, look-ahead and blowout (thread "Test a CFB letdown-game driver",
 Oct 28 2026). The CFB version (scripts/cfb_spots.py) shipped the letdown term; this asks the same of NFL, NBA, CBB, NHL,
 soccer and tennis. Research only: nothing passed, nothing ships. Results in data/spots_research.json.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The current AP Top 25 and Coaches Poll for college basketball from ESPN (free site API) -> data/cbb_polls.json, shown
 beside the ARK Ranking (layouts/shortcodes/cbbpower.html) and in its Top 25 graphic. Runs daily in the cbb-board
 workflow, so each Monday's release is up the next run. Display only: the game model doesn't read polls (poll terms

@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // On3 industry (consensus) basketball recruiting rankings for the College Basketball ARKBOARD and its recruit boards.
 //   node scripts/cbb_on3.mjs 2026 2027        # classes to pull -> scripts/.cache/cbb/on3/<class>.json
 // On3 sits behind Cloudflare, so this reads each page's server-rendered __NEXT_DATA__ through Chromium

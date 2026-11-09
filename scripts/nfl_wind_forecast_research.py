@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL totals vs forecast wind at kickoff (research; Nov 2 2026 retest of the Oct 24 lead, scripts/nfl_weather_om_backtest.py).
 
     python3 scripts/nfl_wind_forecast_research.py           # numpy; pulls only games missing from the frozen file

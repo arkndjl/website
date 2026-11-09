@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Extra season lines for the CFB FV candidate stage (scripts/cfb_fv_refit.mjs --wide --stage=cand), Oct 31 2026 sweep:
   returns  kick and punt returns from ESPN box scores (CFB_BOX_RETURNS=1 python3 scripts/cfb_roster_hist.py 2012 2022),
            summed by season and ESPN athlete: returns, yards, TDs, games, team (the team he played most games for)

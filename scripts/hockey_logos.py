@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Club logos for the hockey prospects boards (Oct 31 2026): junior and minor-league clubs from HockeyTech (OHL, WHL,
 QMJHL, USHL, AHL), NCAA schools from the college boards' logos. Logos are copied to static/img/hockey/<client>/<id>.png so
 the GFX canvas can draw them (HockeyTech sends no CORS header).

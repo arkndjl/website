@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA player projections for Predictions: each player's points, rebounds and assists (and PRA) in tonight's game,
 with a full distribution so an over/under prices (data/nba_players.json, static/data/nba-players.json), and the
 model behind them (data/nba_players_fit.json).

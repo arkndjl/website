@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike event odds (the COUNTER-STRIKE ARKBOARD "event odds" tab): S-tier events simulated from the series
 model (scripts/cs2_model.py), Swiss stages paired by Valve's Major rules, then single-elimination playoffs.
 

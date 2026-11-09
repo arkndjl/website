@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Score the soccer league sims (audit item 21) and tune how sure they are.
 
     python3 scripts/soccer_sim_backtest.py       # -> data/soccer_sim_backtest.json

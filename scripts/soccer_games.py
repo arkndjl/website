@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer game projections for the SOCCER ARKBOARD (data/soccer_games.json), and the model behind them
 (data/soccer_games_fit.json).
 

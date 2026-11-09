@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Hockey prospects: frame (height, weight, BMI) as FV drivers, Nov 3 2026 (Noah: "test height/weight/BMI/similar frame
 measurements as FV drivers ... positionally adjusted and weighted correctly"; ht/wt from several sources combined by
 reliability, official measurements weighted highest).

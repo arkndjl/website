@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study mlb-ghost-runner: extra-inning runner on 2nd; home edge and leadoff bunt vs swing away."""
 import importlib.util, json, numpy as np, pandas as pd
 spec = importlib.util.spec_from_file_location("c", "/home/user/website/research/studies/mlb/mlb_common.py"); c = importlib.util.module_from_spec(spec); spec.loader.exec_module(c)

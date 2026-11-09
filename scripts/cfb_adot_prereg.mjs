@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // True aDOT, pre-registered (Oct 26, 2026). ESPN's play text spots every throw from 2026 on ("caught at NMSU24",
 // "thrown to NMSU36"), so 2026 is the first season with real depth of target; earlier seasons only have the PFN proxy
 // (scripts/cfb_fv_refit.mjs RECV_KEYS), which failed as an FV input. This freezes each receiver's 2026 line so the real

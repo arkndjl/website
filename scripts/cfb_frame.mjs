@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // NFL frame: FV points from the draft-slot effect of size against drafted players at the position
 // (combine 2010-25, data/cfb_calibration.json size): below the 10th percentile costs per SD short, between p10
 // and p90 a small slope, above p90 (EDGE weight, RB/TE height) costs too. Halved: size moves draft slot more

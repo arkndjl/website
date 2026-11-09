@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Return production by player-season, FBS 2011-25, for the CFB FV test (Nov 2 2026).
     python3 scripts/research/st_value/cfb_ret_hist.py   -> scripts/.cache/fvrefit/ret_yoe.json, scripts/data/cfb_ret_hist.json.gz (2019-25)
 Uses scripts/st_returners.py's parse (catch spot, yards over expected, drive points) on the cached ESPN play-by-play

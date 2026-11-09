@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Draft-day grades for the all-time CBB list (Noah, Nov 3 2026: "our all-time FV board for CBB has some bad misses").
 
 The all-time list used to show each player at his best PRESEASON grade (static/data/cbb-past.json). A preseason board

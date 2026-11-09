@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Public team ratings with dated snapshots, for stacking into the game models (team model idea 9, Oct 23 2026).
 Only point-in-time sources: every snapshot carries the time it was published, and a game may read only a snapshot
 published before it starts.

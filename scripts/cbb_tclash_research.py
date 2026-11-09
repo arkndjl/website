@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB totals: tempo clash inside the game model (Nov 3 2026). Follow-up to scripts/cbb_matchup_research.py, where the
 box-score pace product (tempo_T: pace x the opponent's pace, z within season) ran over the close in both splits (tune
 t 2.0, held 2.65, against our model 2.5 / 3.2; Holm-significant, held-out SE t -1.47, just short of the -1.5 split rule).

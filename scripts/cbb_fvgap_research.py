@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB game model: the preseason prior's fvtop / agew train/serve check (basketball audit, Nov 4 2026).
 
 History (cbb_games.team_fv) counts a returner or transfer only with a line the season before (by[y - 1]); a player back

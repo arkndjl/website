@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA walk-forward rows for the games page picks (scripts/games_picks.py): run python3 scripts/nba_games.py --fit first (it writes scripts/.cache/nba/wf_preds.json), then this; opening totals from the ESPN odds cache. Writes scripts/data/games_wf/nba.json.gz."""
 import sys, os, json, gzip, collections
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

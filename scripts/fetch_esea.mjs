@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // 1NT's current ESEA season from the FACEIT Data API (https://docs.faceit.com/docs/data-api/data),
 // written to data/esea.json for the LAURSEN_111 page: record, every match (maps, scores, each
 // player's line), map pool and the roster's season stats. Needs a server-side API key in

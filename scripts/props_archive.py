@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Archived NBA and NHL player prop opens from ESPN's core API (propBets), for the props paper tests
 (scripts/nba_props_research.py, scripts/nhl_props_research.py). ESPN BET (odds provider 58) is served from Jan 2024
 (NBA) / Apr 2024 (NHL) until it left ESPN, DraftKings (provider 100) after that; both for finished games (Oct 31 2026).

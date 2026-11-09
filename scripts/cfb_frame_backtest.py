@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """QB frame backtest for frameFV (scripts/fetch_cfb.mjs).
 
 frameFV prices size against drafted QBs at the combine (data/cfb_calibration.json size.QB): -5.7 FV per SD of height

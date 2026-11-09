@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game-control ratings (scripts/control_ratings.py) as an input to the NBA and college basketball game models,
 walk-forward on each model's shipped design, scored through the harness (paired abs margin error, clustered by game
 day x home team-season). Variants (half-life, carry, ridge, form, ESPN's win probability vs score-only) are picked on

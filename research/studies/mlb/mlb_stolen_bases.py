@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study mlb-stolen-bases: steal success vs break-even, 2021-22 vs 2023-25 (Retrosheet PBP)."""
 import importlib.util, numpy as np, pandas as pd, json
 spec = importlib.util.spec_from_file_location("c", "/home/user/website/research/studies/mlb/mlb_common.py"); c = importlib.util.module_from_spec(spec); spec.loader.exec_module(c)

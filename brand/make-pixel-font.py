@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Build a pixel web font from MS Gothic's embedded 16px bitmap strike.
 
 MS Gothic's pixel look comes from bitmap strikes that browsers ignore for web

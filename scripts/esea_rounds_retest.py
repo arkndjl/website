@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Re-test of the 1NT round models (totals o/u and round spread) on the S53-S59 ESEA NA league pull.
 
     python3 scripts/esea_rounds_retest.py [path to esea_matches json.gz]   # default research/esea_matches.json.gz

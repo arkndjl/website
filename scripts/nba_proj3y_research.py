@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): a 3-season projection for every NBA player (the XPM board's "3Y"), extending the rookie
 3Y (scripts/nba_rookie_proj_research.py) to veterans.
 

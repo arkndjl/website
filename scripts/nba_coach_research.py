@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pace matchups and coaching as inputs to the NBA game model (scripts/nba_games.py). Research only.
 
     python3 scripts/nba_coach_research.py      # writes data/nba_coach_research.json (numpy; ~3 min)

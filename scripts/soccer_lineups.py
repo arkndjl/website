@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """static/data/lineups/soccer.json for the soccer "lineups" tab (layouts/shortcodes/soccerlineups.html): every big-five
 club's league lineups this season from Understat match rosters (scripts/soccer_data.py us_match, cached by the soccer
 run). Per club:

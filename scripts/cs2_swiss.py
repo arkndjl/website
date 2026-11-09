@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Valve Swiss stage + single-elimination bracket engine (Major supplemental rulebook,
 github.com/ValveSoftware/counter-strike_rules_and_regs), shared by the CS2 event odds (scripts/cs2_events.py) and
 anything else that simulates a Valve-format stage. Takes a series win function win(a, b, bo) -> P(a beats b).

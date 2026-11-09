@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Dated injury lists in the soccer game model (Oct 2026): Transfermarkt injury and absence spells
 (scripts/soccer_tm_injuries.py) on match day, priced at each missing player's prior-season GAR a 90 x his usual
 league minutes (Understat line-ups). Big five, walk-forward log loss, tune 2013-22 vs held out 2023+.

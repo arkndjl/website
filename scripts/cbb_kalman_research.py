@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: a college basketball team's preseason prior weighted by how uncertain it is (numpy).
 
     python3 scripts/cbb_kalman_research.py

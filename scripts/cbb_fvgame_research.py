@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB game model research, Oct 30 2026: FV in the preseason prior in new forms, freshmen, and the prior's shape.
 
     python3 scripts/cbb_fvgame_research.py [--only lab,lab]    # -> data/cbb_fvgame_research.json

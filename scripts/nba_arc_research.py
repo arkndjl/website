@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: LUMA ARC (scripts/nba_arc.py) in the NBA game model's player values.
 
     python3 scripts/nba_arc_research.py [--only 0,2]   # -> data/nba_arc_research.json

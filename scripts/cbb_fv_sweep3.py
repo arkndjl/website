@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB FV driver test of the production-tab metrics (Nov 3 2026, research only; Noah: "test all of the new stuff we're
 creating for FV drivers"). Every number the new CBB tabs show (scripts/cbb_tabs.py: stats, WAR leaders, breakouts,
 top performers, portal, returning, team talent) is built here for each returner's past board season, from seasons

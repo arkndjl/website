@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Lead time of RotoWire's injury news over the site's other news sources (scripts/rotowire.py --lead).
 
 For each logged RotoWire item with a status and an exact time (its headline page's datePublished, or the source

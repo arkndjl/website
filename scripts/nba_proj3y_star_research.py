@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Nov 4 2026): the shipped 3Y / 1Y (form F4, scripts/nba_proj3y_research.py) runs low on stars (proj 4+:
 3.80 held out vs 4.44 realized over three seasons). Pre-registered (/mnt/project-files/fv/sweep-nov04/nba/prereg.md)
 forms, each F4 plus extra terms, on the same harness (leave one season out with a buffer, simulated partial seasons at

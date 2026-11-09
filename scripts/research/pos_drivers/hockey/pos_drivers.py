@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Hockey prospects: position-purpose FV drivers (Noah, Nov 2 2026; research). Each position's job turned into one or
 two pre-registered numbers from the CHL season line (HockeyTech), offered on top of the live draft model and the live
 stage-1 model (the season after the draft), against NHL outcomes, with the board's gate (sweep2.evalc).

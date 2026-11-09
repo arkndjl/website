@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Birth dates from Tankathon's NFL draft pages for College Football ARKBOARD players: added to data/cfb_dob.json
 (the store scripts/fetch_cfb.mjs reads; it fills the rest from Wikidata and Wikipedia, which win when both have him).
 

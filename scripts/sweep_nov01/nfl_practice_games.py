@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL injury term with questionable players priced by their last practice (Nov 1 2026 sweep), in the game model's
 walk-forward. P(plays) for a questionable non-QB by (last practice, played the team's last game), measured on
 2016-20 only (data/sweep_nov01/nfl_practice.json); everything else as nfl_games.injury_history. Scored: margin MAE

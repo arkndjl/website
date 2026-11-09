@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """feeder profiles: ids on a TM lineup aged <= 23 and not in the dump with dob + height -> players.json.gz"""
 import concurrent.futures as cf
 import glob

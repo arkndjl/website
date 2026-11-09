@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Fit for shrunk XPM (nba_xpm.SHRINK_K / SHRINK_MU), Oct 31 2026. Noah: shrink XPM by sample size so players with very
 few minutes don't post +8 seasons on 12 minutes.
 

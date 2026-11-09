@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL questionable players by their last practice (Nov 1 2026 sweep). The injury term prices a questionable non-QB
 at P(plays) .75 (.5 if he missed the team's last game) whatever his week. The report also says how he practised on
 the last day (full / limited / did not participate). Measured on nflverse injuries x snap counts (played = any snap),

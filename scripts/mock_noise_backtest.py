@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pick noise for the probabilistic CFB mock (mockSims in scripts/cfb_teams.mjs).
 
 The mock takes, at each pick, the player with the best team utility (log-pick units: -ln xPick plus need, less the

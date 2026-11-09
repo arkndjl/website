@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Goalie-pull study: rates with CIs, Markov optimum with game-cluster bootstrap, actual pull times, validation.
 usage: python3 -I study_pull.py <scratch_dir> <out_dir>"""
 import json, math, os, pickle, sys

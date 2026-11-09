@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // History for the game-model backtest (scripts/cfb_game_backtest.mjs): CFBD seasons the live model doesn't pull
 // (games, advanced box scores, drives, lines, talent, returning production, SP+, recruiting classes) and per-game
 // passing lines (who started at QB). Each file is pulled once into scripts/.cache/cfb/hist/. Needs CFBD_API_KEY.

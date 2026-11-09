@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Stay-or-declare as an economic choice (audit #31): does the money on each side beat the board-rank logistic?
 
     python3 scripts/cfb_declare_econ.py    # needs scripts/cfb_draft_pct_backtest.py's cache; writes data/cfb_declare_econ.json

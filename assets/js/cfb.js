@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 (function () {
   if (window.__arkCfb) return; window.__arkCfb = true;
   var PER = 50, DATA = null;

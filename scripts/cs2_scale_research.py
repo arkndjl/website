@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CS2: round-share rating used as a map-win chance (math audit Nov 2 2026, OPEN item "CS2 map round-share vs map-win
 scale"). Research script; results in data/cs2_scale_research.json.
 

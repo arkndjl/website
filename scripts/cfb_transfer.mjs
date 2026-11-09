@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Transfer% and the team builder for the College Football ARKBOARD, fed by scripts/fetch_cfb.mjs.
 //
 // Transfer%: the chance a player is on another FBS or FCS roster next season. A logit fit by

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NT RWA build: every recent ESEA league player's round win % added per round (data/esea_rwa.json).
 
     python3 scripts/esea_rwa.py     # after fetch_esea.mjs (esea.yml); reads research/esea_matches.json.gz, the

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects FV driver search (Noah, Oct 24 2026): candidate inputs a recruitment analyst would look at, each
 tested on top of the board's kept model (scripts/soccer_prospects.py) with the board's own rule, plus the top of the
 board and a forward test.

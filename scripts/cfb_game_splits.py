@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game-level splits for the CFB FV driver search (Oct 26 2026), from the ESPN summaries scripts/cfb_espn_pbp.py caches
 (play-by-play in scripts/.cache/cfb/espn_pbp, box scores in scripts/.cache/cfb/espn_hist/box) and nflverse draft picks.
     python3 scripts/cfb_espn_pbp.py 2015 2022 && python3 scripts/cfb_game_splits.py [first] [last]   # default 2015 2022

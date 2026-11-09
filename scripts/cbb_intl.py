@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """International prospects on the College Basketball ARKBOARD: graded on the same 20-80 FV scale (peak XPM) as the
 D-I players, from where the draft boards rank them and what they produce in pro leagues, adjusted for league
 strength and minutes played.

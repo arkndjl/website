@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """LAN vs online as a CS2 match-model term (research, Nov 2 2026). New information: bo3.gg tags every tournament
 event_type lan / online (api.bo3.gg/api/v1/tournaments, 3.3k events; matches carry tournament_id). Roster continuity
 already failed (data/cs2_fit.json), so this asks a different question: do some players/teams play to a different

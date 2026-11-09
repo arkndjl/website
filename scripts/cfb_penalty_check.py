@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Penalty discipline check (Oct 26 2026): do accepted penalties a team game in a player's final college season
 (scripts/cfb_game_splits.py, ESPN play text) say anything about NFL AV a season beyond draft slot, for drafted OL,
 CB and S (drafts 2016-23)? OL, CB and S have no FV history before PFN's 2024 lines, so this is the only test possible

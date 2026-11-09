@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Positional backtest for the mock draft's pick step (mockDraft in scripts/cfb_teams.mjs).
 
 Replays the 2020-25 drafts pick by pick in the real draft order (after trades): each team takes the board player

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Does a defensive coordinator's career record help the CFB preseason prior? Follow-up to scripts/cfb_coord_va.py,
 where a DC's old-job defense rating over roster talent carried to his new job (walk-forward t -3.3 on movers).
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The live rule monitor (Oct 21 2026): every rule that bets, checked against the closing line as it goes, and stopped
 when it is losing to the close. Stdlib only.
 

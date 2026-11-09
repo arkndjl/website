@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Renders the share image and favicons into ../static, and the X/Twitter and
 // YouTube banners plus the X profile picture into ./exports, from the HTML
 // templates in this folder. Run make-glyph.py first if the glyph font changed. Needs Node + Playwright (npm i -D playwright &&

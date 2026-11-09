@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Offensive line play parts for NFL XV (scripts/nfl_xv.py): what the five on the field allowed, from nflverse
 play-by-play and participation (who was on the field, was_pressure), 2018 on.
 

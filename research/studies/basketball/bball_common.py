@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared helpers for the NBA / CBB research studies.
 
 Source: sportsdataverse-data GitHub releases (espn_nba_pbp, espn_mens_college_basketball_pbp),

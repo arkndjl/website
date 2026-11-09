@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA game projections for the NBA ARKBOARD (data/nba_games.json), and the model behind them (data/nba_games_fit.json).
 
     python3 scripts/nba_games.py           # today's and tomorrow's projections, power rankings, season odds, picks (stdlib)

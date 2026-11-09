@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backup watch age term (Noah, Oct 31 2026): rank each backup by xGap, his gap over the starter projected over the
 next two seasons from today's gap and the age gap (starter's age - his; on the college boards the class gap, Fr 1 ..
 Sr 4), with the terms scripts/backup_age_fit.py fit on past seasons (data/backup_age.json). A missing age adds

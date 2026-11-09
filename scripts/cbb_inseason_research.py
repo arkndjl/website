@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: in-season player values for the college basketball availability term ('inj'), team idea 4 (Oct 23 2026).
 
 The live term values a rotation player who sat at his BPM to date shrunk to a flat -1 by 150 minutes: no prior.

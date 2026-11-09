@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Public ratings stacked into the college game model (team model idea 9, Oct 23 2026): ESPN FPI from the snapshot
 // published before each kickoff (scripts/public_ratings.py --cfb), as extra margin columns on top of the ESPN-history
 // model (scripts/cfb_hist_backtest.mjs, pooled scheme, inputs p4 + aggr), entered on 2017-20, vetoed by 2021-26.

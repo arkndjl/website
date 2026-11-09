@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """How long an injured NFL player stays out (Oct 25 2026, audit W2-H): the season sims' later weeks (nfl_games.season_views)
 carried no non-QB injuries, and a QB listed out came back the next week unless he was on IR. This fits a discrete hazard
 for games missed by this week's status and body part, and tests carrying it into the later weeks.

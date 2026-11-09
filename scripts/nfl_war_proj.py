@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Next-season and next-three-seasons WAR on the NFL WAR board (rows' p1, p3), stdlib, called by scripts/nfl_war.py's build.
 
 Fit and test: scripts/nfl_war_proj_research.py -> data/nfl_war_proj_fit.json. Inputs per player, on a 17-game scale:

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL outcomes for the CFB FV retarget (audit #24): every drafted player's seasons on the NFL WAR scale, and his
 second contract. The FV harness (scripts/cfb_fv_refit.mjs --target) joins these by PFR id.
   war   NFL WAR a season, sub-position lines (data/nfl_war_pos.json: missed games + contracts + AV, holdout r .73

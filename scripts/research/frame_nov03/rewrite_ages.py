@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """One-off (Nov 3 2026): rewrite only the age fields of the committed board JSON to two decimals from real birth dates,
 so the pages show exact ages before the next scheduled builds (which now write them). Each board's age is recomputed
 at the date its builder uses and checked against the stored rounded age; a row whose birth date cannot be found or

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA combine as a stage on the College Basketball ARKBOARD, audit item #15 (Oct 25 2026).
 
     python3 scripts/cbb_combine.py --fit    # the backtest below -> data/cbb_combine.json (needs /mnt/project-files/cbb/frame)

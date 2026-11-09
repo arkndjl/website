@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARKNDJL uniforms as PS1/N64-style low-poly renders (animated GIFs for the ARKNDJL gallery).
 
 The dressed pixel athletes from scripts/uniforms.py are the textures. Each athlete is a puffed

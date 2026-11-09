@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer market rating from the closing 1X2 AND the closing over/under 2.5 (Nov 1 2026 sweep).
 add_market() solves each earlier match's (lambda_h, lambda_a) from the 1X2 alone, which pins the goal gap but only
 weakly the total. Here the O/U 2.5 close (Pinnacle -> Betfair -> average) joins the solve at weight w:

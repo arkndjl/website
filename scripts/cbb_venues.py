@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Where college basketball games were played, for the travel and tip-time research (scripts/cbb_sched_research.py).
 
     python3 scripts/cbb_venues.py      # writes scripts/data/cbb_venues.json (ESPN game summaries, cached; ~10 min cold)

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL pulls for the NHL ARKBOARD (scripts/nhl_games.py, scripts/nhl_players.py): the NHL's stats API (every game's
 score and last period, goalie and skater game logs), MoneyPuck's team game logs (expected goals by situation), and
 ESPN (every listed book's moneyline, puck line and total from 2019-20 on; injuries and rosters). Trimmed copies go to

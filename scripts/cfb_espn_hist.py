@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ESPN college football history (free, no CFBD quota): every FBS and FCS game's score by season, and the
 pickcenter lines (closing spread and total by provider) for each game with an FBS side. ESPN event and team ids
 are CFBD's. Used by scripts/cfb_elo_research.py.

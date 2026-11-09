@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Wait until arkndjl.net serves a build of origin/main (or a later commit).
 
 The Hugo build writes the commit it built to https://arkndjl.net/build.json (layouts/index.buildinfo.json).

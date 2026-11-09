@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Fitted NHLe (audit item 44, Oct 25 2026): league translation factors from the careers of every NHL draft pick.
 
     python3 scripts/hockey_fv_drivers.py --pull   # landing pages of every pick 2008-26 -> scripts/.cache/hockey/full

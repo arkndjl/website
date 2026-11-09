@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects data pull: match lineups, minutes and market values from Transfermarkt's public JSON API.
 
     python3 scripts/soccer_prospect_data.py games [comps] [--seasons 2012-2026]   # every finished game, compact, cached

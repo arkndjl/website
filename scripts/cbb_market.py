@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College Basketball market tabs, scored daily: NIL (xNIL / yNIL / zNIL), staff, coaching jobs, coach pay and the
 team builder. Models from data/cbb_market_fit.json (scripts/cbb_market_fit.py); players from static/data/cbb-all.json.
 

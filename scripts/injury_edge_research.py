@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Injury underpricing (Oct 23 2026): PR #349 found the closing line weights each game model's injury term at about
 half what results do (NFL inj .60 vs 1.36, CBB .29 vs .48, NBA lin .41 vs .52). This turns that into bets three ways,
 each held out against the close:

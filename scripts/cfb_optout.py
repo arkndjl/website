@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB bowl opt-outs: who sits a bowl, what it costs, and whether the game model (and the close) price it.
 
 Data (all free ESPN):

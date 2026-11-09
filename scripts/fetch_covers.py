@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Download ARKLIBRARY cover thumbnails into static/img/covers/.
 
     python3 scripts/fetch_covers.py            # fetch anything missing

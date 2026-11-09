@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Which schools develop talent? Recruit outcome over what his recruiting rating predicted, by school (research, Oct 31 2026).
 
     python3 scripts/school_dev.py cbb     # scripts/data/cbb_recruit_hist.json.gz (On3 classes) -> scripts/data/school_dev/cbb.json

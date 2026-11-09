@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pixel-art icons (16 x 16 grid, 2px strokes) in the brand's style: social icons
 the section marks (arkboard, arklibrary, arkndjl) and the list-window icons (tv, film, note, pointer).
 Writes layouts/partials/icons.html (inline SVG symbols, fill = currentColor)

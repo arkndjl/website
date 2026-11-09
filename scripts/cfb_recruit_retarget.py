@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Recruit model retarget (audit Oct 25, #25): fit the recruit profile on a pedigree-free outcome.
 
     python3 scripts/cfb_recruit_retarget.py            # pulls (cached in scripts/.cache/recruit, fvrefit), test, write

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared helpers for the soccer research studies (StatsBomb open data, compact.jsonl)."""
 import json, math, random
 from collections import defaultdict

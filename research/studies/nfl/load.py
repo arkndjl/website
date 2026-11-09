@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Build a slim combined nflverse play-by-play table (2015-2026) for the NFL studies.
 
 Raw files: SCRATCH/raw/play_by_play_{YEAR}.parquet (downloaded from nflverse-data releases).

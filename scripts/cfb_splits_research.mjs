@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Down-and-distance and kicking splits as CFB game-model inputs (CAND entries marked sit in cfb_model.mjs), on the
 // live model's own selection (runModel: season-swap CV log loss, forward selection at t <= -1.5).
 //   node scripts/cfb_espn_plays.mjs md.json.gz plays.json.gz     # ESPN play-by-play, free (no CFBD quota)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball game projections for the College Basketball ARKBOARD (data/cbb_games.json), the model behind them
 (data/cbb_games_fit.json).
 

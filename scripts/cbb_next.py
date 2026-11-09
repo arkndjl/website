@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB next-season WAR (Nov 3 2026): the inputs and the live projection shared by scripts/cbb_next_research.py (fit)
 and scripts/cbb_tabs.py (the WAR tab's Next column). Pure Python; coefficients in data/cbb_next_fit.json.
 

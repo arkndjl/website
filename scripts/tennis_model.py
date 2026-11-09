@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tennis ratings (the TENNIS ARKBOARD's ARK Ranking and match chances): one pass over every ATP and WTA singles
 match since 2005 (scripts/tennis_data.py), all levels.
 

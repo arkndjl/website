@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer player values for the SOCCER ARKBOARD: GAR, goals above replacement, and PAR, league points above
 replacement, fit to team goal difference (data/soccer_war.json, static/data/soccer-war/<season>.json, the fit in
 data/soccer_war_fit.json).

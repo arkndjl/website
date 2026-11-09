@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer player prop snapshots (Oct 31 2026): Novig's asks for the next two days'
 matches, so the soccer props test (scripts/soccer_props_research.py) can be rerun at the prices a bet would really get.
 That test passed only at holds tighter than Novig's (Oct 31: Novig's asks sat .06 over the fair chance on anytime

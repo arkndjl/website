@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Picks for every sport (Noah, Oct 21 2026): the games page and each sport's picks tab show these same rows.
 
     python3 scripts/games_picks.py --rules         # data/games_picks_rules.json: X per sport and market (after --fit)

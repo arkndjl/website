@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Luck-stripped basketball efficiency (team model idea 6, Oct 23 2026): a result enters the efficiency ratings with
 the threes and free throws each side made partly at expected rates, so a hot or cold shooting night moves the ratings
 less. A defense has little say over its opponents' 3P% (it has more over how many threes they take), and a team's FT%

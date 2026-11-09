@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Hockey prospects ARKBOARD (Noah, Oct 24 2026): every 2027 draft prospect and every drafted player still short of
 the NHL, graded on the 20-80 FV scale against what past picks became in the NHL.
 

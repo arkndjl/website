@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team breakdowns for the power rankings' dropdowns (static/data/teams/<sport>.json, read by
 layouts/partials/teamjs.html on the first click). Display only: nothing here feeds a model.
 

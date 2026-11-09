@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Extract the 🜎 outline from Noto Sans Symbols (weight 500) and write:
    static/favicon.svg        vector favicon: the X logo (purple glyph, teal outline), transparent
    brand/favicon.html        two-tone glyph page that render.js screenshots for PNG/ICO

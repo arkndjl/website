@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for the board's position-change flags (fetch_cfb.mjs build(): "position fit"). Run by hand after
 // scripts/cfb_statplus_backtest.mjs (it reuses that script's cached PFN boards and fetches OL, CB and S itself):
 //   node scripts/cfb_move_backtest.mjs [--examples] -> data/cfb_move_backtest.json

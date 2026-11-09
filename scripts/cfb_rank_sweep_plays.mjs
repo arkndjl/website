@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Team-game play stats for the CFB ARK Ranking sweep (scripts/cfb_rank_sweep.py), from the ESPN play-by-play cache
 // (scripts/cfb_espn_pbp.py) on the model's own EP curve (scripts/data/cfb_hist_md.json.gz ep). One row per team-game
 // (the offense's view): scrimmage plays with and without garbage time, pass and rush EPA, fumbles and interceptions

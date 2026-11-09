@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kicker and punter grades, Nov 2 2026 research (scripts/st_kickers.py). Which punt metric this season best predicts next season (held out by season).  python3 blend2.py nfl|cfb"""
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

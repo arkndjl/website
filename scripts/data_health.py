@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARKBOARD data health (Nov 2 2026): one place that notices when a product stops updating, run from GitHub Actions
 (.github/workflows/data-health.yml) so it needs nothing outside the repo. It replaces the never-deployed staleness
 check in ops/odds-cron/worker.js (same issue titles, so the two can coexist).

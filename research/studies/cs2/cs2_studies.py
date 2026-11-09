@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARKBOARD Research, CS2 studies on bo3.gg round data (see fetch_rounds.py and research/studies/BRIEF.md).
 
     python3 research/studies/cs2/cs2_studies.py

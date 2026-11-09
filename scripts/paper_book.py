@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The paper book: every pick on the Predictions page's picks tab, at the line, price and stake it was posted with,
 graded as the picks are graded. Paper only, no real money.
 

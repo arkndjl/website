@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: NBA 2-for-1.
 
 Sample: quarters 1-3, the first possession of each quarter that starts with 25-40 s left (team A).

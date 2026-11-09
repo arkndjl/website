@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """reliability of the role drivers: same player, next season's snapshot value vs this one (career-to-date drivers share
 earlier seasons, so this is an upper bound), plus raw correlation with outcome FV inside the role"""
 import json

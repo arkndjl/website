@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest: do NFL trait badges (scripts/nfl_badges.py) predict next season's board WAR beyond this season's WAR?
 
     python3 scripts/nfl_xv.py --prep      # the player-season cache 2018-25 (scripts/.cache/nfl/xv_<y>.json), if missing

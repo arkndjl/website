@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Team rankings for the ARKBOARD (data/cfb_rank.json): the AP Top 25, the AFCA Coaches Poll (and the CFP
 // committee's rankings once they are out), from ESPN, next to our own ranking of every FBS team.
 //

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL fantasy projections for the NFL ARKBOARD (static/data/nfl-fantasy.json, data/nfl_fantasy.json), and the
 model behind them (data/nfl_fantasy_fit.json).
 

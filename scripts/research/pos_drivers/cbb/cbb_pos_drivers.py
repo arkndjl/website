@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Position-purpose FV drivers for the College Basketball ARKBOARD (Nov 2 2026, research only).
 
     python3 scripts/cbb_careers_kit.py                                    # once

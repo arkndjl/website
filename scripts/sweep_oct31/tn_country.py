@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 # tour-level tournament name -> ISO2 host country; INDOOR = names (tour-aware where needed) played indoors
 C = {}
 def add(cc, *ns):

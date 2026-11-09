@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Projected NBA position for college players (Nov 3 2026; Noah: "positional change projections for CBB like we do for
 CFB"). Display only: the board shows each player's odds at PG / SG / SF / PF / C and flags a likely position change.
 

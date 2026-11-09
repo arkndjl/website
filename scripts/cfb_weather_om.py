@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Open-Meteo historical weather for CFB home games (research only, round 2, Oct 24 2026).
 
     python3 scripts/cfb_weather_om.py            # fills scripts/data/cfb_weather_om.json (resumable)

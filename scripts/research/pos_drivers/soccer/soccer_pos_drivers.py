@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects: position-purpose FV drivers (Nov 2 2026), tested on top of the board's kept model on the board's
 own rows with the Oct 31 gate (scripts/soccer_trust_research.test: cohort-out t >= 2 and 2/3 of folds, base top-50 MSE
 and new top-50 outcome not worse, forward fit 2013-17 / grade 2018-20 not worse).

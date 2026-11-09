@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): next-season and three-season GAR projections for the soccer players board.
 
     python3 scripts/soccer_proj_research.py --snaps   # partial-season GAR snapshots from the Understat cache

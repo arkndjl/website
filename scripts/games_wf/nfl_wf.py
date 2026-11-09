@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Walk-forward NFL margin + total predictions (live model in scripts/nfl_games.py) in the cross-sport schema.
 Each season s >= 2015 is predicted by least squares fit on seasons 2012..s-1 (same as nfl_games.fit / nfl_picks.backtest)."""
 import sys, os, json, gzip

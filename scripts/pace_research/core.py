@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """shared pieces for the pace research: walk-forward pace ratings and the stack tests against the close"""
 import math
 import os

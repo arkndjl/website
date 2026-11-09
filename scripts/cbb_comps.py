@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Historical comps for the College Basketball ARKBOARD (Oct 30 2026): each player's nearest preseason profiles among
 the 2009-19 boards' players who had left college by 2020, with what they did in the NBA. Display only: the comps' mix
 failed as an FV driver (scripts/cbb_comps_fv.py: returners t 0.6 class folds / 0.9 held out, newcomers t -2.1).

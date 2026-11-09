@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Days of rest in every game model (thread "Measure rest-day effects in each sport", Noah Nov 1 2026: "Can we check how
 days of rest impact each sport?"). Builds on [[schedule-effects]] (Oct 21: NBA night-two lineup factors shipped; travel,
 body clock, time slots failed) and spots_research.py (letdown / look-ahead). Research script; results in

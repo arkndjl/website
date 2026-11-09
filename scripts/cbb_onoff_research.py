@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: college basketball on/off, pairs, trios and lineups (Noah, Nov 3 2026: "test on/off as an FV driver for
 college basketball and test incorporating it into XPM/VORX"; "test lineup/pair/trio FV drivers as well for CBB").
 

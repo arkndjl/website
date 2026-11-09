@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NCAA Division II and III players on the College Basketball ARKBOARD, with D-1%: the chance a player is on a D-I
 roster next season (the football board's FBS% for FCS players, scripts/cfb_fcs_up_fit.py).
 

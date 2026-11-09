@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Does soccer GAR (scripts/soccer_players.py) undercredit deep progressors, the Busquets type who moves the ball
 without shots or key passes? (Nov 1 2026, from a reply to the GAR post.)
 

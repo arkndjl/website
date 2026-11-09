@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects FV sweep 2 (Nov 1 2026): constructed proxies from data the board already pulls, tested on top of
 the board's kept model (data/soccer_prospects_fit.json) on the board's own rows, with the Oct 31 harness's gate
 (scripts/soccer_trust_research.py: cohort-out t >= 2 and 2/3 of folds, base top-50 MSE and new top-50 outcome not

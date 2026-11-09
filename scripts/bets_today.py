@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The exact bets to place now, from the Picks tab's logs (data/games_picks_<sport>.json, the same rows the
 Predictions picks tab and the paper book read). Used by the place-your-picks reminders (Noah, Oct 28 2026).
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """LUMA ARC season boards (LUMA Basketball Research / CourtShare, https://court-share.com/luma, CC BY 4.0).
 
     python3 scripts/nba_arc.py --write      # download ARC v3.1 season boards -> scripts/nba_arc.json.gz

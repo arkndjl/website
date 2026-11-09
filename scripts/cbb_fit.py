@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Fit the College Basketball ARKBOARD FV model (data/cbb_fit.json) on past preseason boards.
 
     python3 scripts/cbb_link.py   # once: link college careers to NBA careers and recruiting grades

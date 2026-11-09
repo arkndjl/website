@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for football WAR (scripts/cfb_av.mjs): the points-per-win rates that turn season AV (college) and NFL
 // AV into wins above replacement. Run by hand: node scripts/cfb_war_backtest.mjs -> data/cfb_war_backtest.json
 // The site's templates read data/cfb_war_backtest.json constants (the scripts/cfb_av.mjs values).

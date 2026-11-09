@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Free roster history for the CFB preseason-prior backtest (scripts/cfb_roster_prior.py): ESPN box scores for every
 finished FBS game (who recorded a stat for whom, and what), pulled with the same summary call scripts/cfb_espn_hist.py
 makes for lines (both slims are written, so neither pull repeats), and 247Sports' composite recruit classes.

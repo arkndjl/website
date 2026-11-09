@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtests for the NFL board's season odds and the margin model (data/nfl_season_backtest.json).
 
     python3 scripts/nfl_season_backtest.py            # tiebreak check, season-odds sd, market blend

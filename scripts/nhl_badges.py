@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player badges for the NHL ARKBOARD's WAR leaderboard (the College Football board's medals, scripts/cfb_badges.mjs).
 
 A badge is one trait (Playmaker, Shooter...) measured by one stat on MoneyPuck's season line. The stat is regressed

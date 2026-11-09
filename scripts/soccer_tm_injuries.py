@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Injuries in the soccer game model: Transfermarkt injury and absence (suspension, other) spells for big-five players
 (tmapi-alpha /player/<id>/injury and /player/<id>/absence, start and end dates back to the 2000s), each player's
 usual league minutes from Understat line-ups, and avz on each match row (soccer_games.add_inj).

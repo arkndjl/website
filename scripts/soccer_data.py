@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer pulls for the SOCCER ARKBOARD (scripts/soccer_games.py, scripts/soccer_players.py): ESPN (every match's
 score in the big five leagues, their second tiers, the other UEFA leagues that feed the European cups, the cups
 themselves and the domestic cups, one calendar year a request; today's lines from DraftKings; rosters and

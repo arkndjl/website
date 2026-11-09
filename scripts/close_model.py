@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Close predictor and market softness index (betting plan item 3, Oct 21 2026).
 
     python3 scripts/close_model.py --fit     # data/close_fit.json (numpy): spec chosen on the tuning seasons, the

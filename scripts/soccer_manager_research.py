@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Manager changes in soccer (Oct 2026 edge sweep): does the close or the game model miss a club's first matches
 under a new head coach?
 

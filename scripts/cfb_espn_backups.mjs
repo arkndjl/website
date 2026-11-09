@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // ESPN backups: every player on an FBS or FCS ESPN roster that the board doesn't grade (PFN never listed him,
 // and On3 doesn't rank him) joins static/data/cfb-all.json, graded up from the 20 FV floor on the drivers we
 // have for him: position, height and weight against the position, years in college,

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARKNDJL full uniforms as pixel art: headwear, jersey, pants or shorts, socks and shoes.
 
 Five sports, four kits each (lilac home, grey road, black-and-lilac alternate,

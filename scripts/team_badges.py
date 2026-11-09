@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team badges (thread "Add predictive team badges", Nov 1 2026; Noah: "team badges, modelled after CFB player badges,
 to improve team rankings further and to display on team GFX pages").
 

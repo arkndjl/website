@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball recruit boards: HS classes graded on the CBB board's FV scale, fit on what past recruits became.
 
     node scripts/cbb_on3.mjs 2027 2028 2029        # the live classes (and 2009-2026 once, for the history)

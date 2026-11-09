@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA position projection for college players (research; Nov 3 2026, thread "Project NBA positions for CBB players").
 
     python3 scripts/research/nbapos/nbapos.py <bbref_pos.json> [outdir]

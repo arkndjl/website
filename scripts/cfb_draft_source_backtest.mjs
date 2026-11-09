@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest: do ESPN's NFL draft prospect file and PFF's college big board add to FV for draft-eligible players
 // beyond production and a final big board? Run by hand after scripts/cfb_statplus_backtest.mjs and
 // scripts/cfb_source_backtest.mjs (their caches: PFN boards, nflverse picks and combine, DraftTek, Wikipedia):

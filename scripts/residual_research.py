@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Residual learner over the failed-input pool (team model idea 11, Oct 23 2026). Research only.
 
     python3 scripts/residual_research.py            # nba nfl cbb -> data/residual_research.json
