@@ -93,6 +93,7 @@ from collections import Counter, defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as NM   # noqa: E402  the shared player-name key (scripts/names.py)
 import cover as CV   # noqa: E402  cover and over chances as the line leaves them
+from nfl_pbp import download   # noqa: E402  retries, then the cached file
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nfl')
@@ -119,10 +120,7 @@ def get(name, url, fresh=False):
     os.makedirs(CACHE, exist_ok=True)
     p = os.path.join(CACHE, name)
     if fresh or not os.path.exists(p):
-        req = urllib.request.Request(url, headers={'User-Agent': 'arkndjl.net arkboard'})
-        with urllib.request.urlopen(req, timeout=120) as r, open(p + '.tmp', 'wb') as f:
-            f.write(r.read())
-        os.replace(p + '.tmp', p)
+        download(url, p)
     return p
 
 

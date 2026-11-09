@@ -5,8 +5,12 @@ side of a stat is the opponent's row. The raw files are shared with nfl_war.py (
 season in scripts/.cache/nfl/pbp."""
 import csv
 import gzip
+import http.client
 import json
 import os
+import sys
+import time
+import urllib.error
 import urllib.request
 from collections import defaultdict
 
@@ -113,16 +117,40 @@ def agg(path):
     return G
 
 
+def download(url, p, ua='arkndjl.net arkboard', tries=3, wait=5.0, timeout=120):
+    """Fetch url into file p. A timeout, a dropped connection, a 5xx or a 429 is tried again (wait, then 3x wait);
+    a 4xx is raised at once (the file is not there). When every try fails and p is already on disk, the copy on
+    disk is kept and a warning printed, so one gateway error does not stop the build; with no copy it raises."""
+    req = urllib.request.Request(url, headers={'User-Agent': ua})
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                body = r.read()
+            with open(p + '.tmp', 'wb') as f:
+                f.write(body)
+            os.replace(p + '.tmp', p)
+            return True
+        except urllib.error.HTTPError as e:
+            if e.code < 500 and e.code != 429:
+                raise
+            err = e
+        except (OSError, http.client.HTTPException) as e:      # URLError, timeouts, resets, short reads
+            err = e
+        if i + 1 < tries:
+            time.sleep(wait * 3 ** i)
+    if not os.path.exists(p):
+        raise err
+    print(f'warning: {url} failed {tries} times ({err}); using the cached {os.path.basename(p)}', file=sys.stderr)
+    return False
+
+
 def season(y, fresh=False):
     """{(game_id, team): line} for season y; fresh refetches the play-by-play (this season's, as games finish)."""
     os.makedirs(DIR, exist_ok=True)
     raw, out = RAW.format(y=y), os.path.join(DIR, f'tg_{y}.json')
     if fresh or not os.path.exists(out):
         if fresh or not os.path.exists(raw):
-            req = urllib.request.Request(URL.format(y=y), headers={'User-Agent': 'arkndjl.net'})
-            with urllib.request.urlopen(req, timeout=120) as r, open(raw + '.tmp', 'wb') as f:
-                f.write(r.read())
-            os.replace(raw + '.tmp', raw)
+            download(URL.format(y=y), raw, 'arkndjl.net')
         G = agg(raw)
         with open(out, 'w') as f:
             json.dump({f'{g}|{t}': {k: round(v, 4) for k, v in a.items()} for (g, t), a in G.items()}, f)
