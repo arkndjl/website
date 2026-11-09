@@ -22,6 +22,8 @@ data/cfb_draft_sim_backtest.json. Usage: python3 scripts/draft_sim_backtest.py (
 """
 import os, subprocess, csv, json, math, re, collections
 import numpy as np
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import mock_roster_backtest as RM   # repeat-position and WAR-need terms
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W = os.path.join(ROOT, 'scripts', '.cache', 'draft'); os.chdir(W)
 NV = 'https://github.com/nflverse/nflverse-data/releases/download/'
@@ -31,7 +33,7 @@ for y in YEARS: get(f'ps_{y - 1}.csv', NV + f'stats_player/stats_player_reg_{y -
 get('players.csv', NV + 'players/players.csv')
 rows = json.load(open('rows.json'))
 dp = list(csv.DictReader(open('draft_picks.csv')))
-TF = {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA', 'LAR': 'LA'}
+TF = {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA', 'LAR': 'LA', 'GNB': 'GB', 'KAN': 'KC', 'NWE': 'NE', 'NOR': 'NO', 'SFO': 'SF', 'TAM': 'TB', 'LVR': 'LV', 'SDG': 'LAC'}   # PFR draft codes to nflverse stats codes
 tf = lambda t: TF.get(t, t)
 G = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S']
 NG = {'QB': 'QB', 'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'T': 'OL', 'G': 'OL', 'C': 'OL', 'OL': 'OL', 'DE': 'EDGE', 'OLB': 'EDGE',
@@ -122,6 +124,10 @@ def sim(Y, prm, pr, prem=None, shift=None):
             if prm.get('recent'):
                 k = SUB.get(p['pos'], g) if prm.get('olsplit') and g == 'OL' else g
                 if k != 'OL' or SUB.get(p['pos']) or not prm.get('olsplit'): u -= prm['recent'] * min(1.0, (recentP if prm.get('prod') else recent2 if prm.get('lag2') else recent)[(Y, t, k)] / NSTART[k])
+            if prm.get('rep'):   # the position the team took in round 1 one / two drafts before (mock_roster_backtest.py)
+                u -= prm['rep'][0] * RM.rep[(Y, t, g, 'rep1')] + prm['rep'][1] * RM.rep[(Y, t, g, 'rep2')]
+            if prm.get('war') and (rd == 1 or not prm.get('warR1')):   # our WAR's room need, centered
+                u += prm['war'] * (RM.WARA.get((Y, t, g), 0.5) - 0.5)
             if prm.get('run'):
                 cap = max(1, round(pr[(g, ri)] * 1.25))
                 if rc[(g, rd)] >= cap: u -= prm['run'] * (rc[(g, rd)] - cap + 1)
@@ -137,8 +143,13 @@ def score(Y, res):
     real = collections.Counter((t, bmap.get(n, g)) for pk, rd, t, g, n in order[Y] if rd <= 3)
     simt = collections.Counter((t, g) for pk, g, rd, t in res.values() if rd <= 3)
     team = sum((real & simt).values()) / sum(real.values())
+    realR1 = collections.Counter((t, bmap.get(n, g)) for pk, rd, t, g, n in order[Y] if rd == 1)
+    simR1 = collections.Counter((t, g) for pk, g, rd, t in res.values() if rd == 1)
+    teamR1 = sum((realR1 & simR1).values()) / sum(realR1.values())
+    hitR1 = sum(1 for pk, rd, t, g, n in order[Y] if rd == 1 and res.get(n, (0,))[0] == pk)   # exact pick (player at his real slot)
+    tmR1 = sum(1 for pk, rd, t, g, n in order[Y] if rd == 1 and n in res and res[n][3] == t)   # player to his real team in round 1
     e = [abs(min(r['pick'], UND) - res.get(norm(r['name']), (UND,))[0]) for r in rows if r['year'] == Y and r['g'] in G and r['pick'] and r['pick'] <= 100]
-    return dict(team=team, cnt=sum(abs(sc[k] - act[k]) for k in ((g, r) for g in G for r in (1, 2, 3))), qbR1=abs(sc[('QB', 1)] - act[('QB', 1)]), mae100=float(np.mean(e)), sc=sc, act=act)
+    return dict(team=team, teamR1=teamR1, hitR1=hitR1, tmR1=tmR1, cnt=sum(abs(sc[k] - act[k]) for k in ((g, r) for g in G for r in (1, 2, 3))), qbR1=abs(sc[('QB', 1)] - act[('QB', 1)]), mae100=float(np.mean(e)), sc=sc, act=act)
 def fit_prem(train, k=20.0, cap=0.5):   # minus the shrunk mean residual by position and board-implied round, net of the round's mean
     s = collections.defaultdict(list)
     for r in rows:
@@ -158,7 +169,7 @@ def run(prm, prem=False, supply=False):
         if supply:
             b = fit_supply(tr); shift = {r['name']: b[0] + b[1] * math.log(r['k']) for r in rows if r['year'] == Y and r['g'] == 'QB'}
         s = score(Y, sim(Y, prm, per_round(Y), fit_prem(tr) if prem else None, shift))
-        for k in ('cnt', 'qbR1', 'mae100', 'team'): agg[k].append(s[k])
+        for k in ('cnt', 'qbR1', 'mae100', 'team', 'teamR1', 'hitR1', 'tmR1'): agg[k].append(s[k])
         qb.append([s['sc'][('QB', 1)], s['act'][('QB', 1)]]); SC.update(s['sc']); AC.update(s['act'])
     return dict(**{k: round(float(np.mean(v)), 3) for k, v in agg.items()}, qbR1_sim_real=qb,
                 byRound={g: [[round(SC[(g, r)] / len(YEARS), 1), round(AC[(g, r)] / len(YEARS), 1)] for r in (1, 2, 3)] for g in G})
@@ -171,7 +182,10 @@ if __name__ == '__main__':
         V[f'+ last draft {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True))
         V[f'+ last 2 drafts {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, lag2=True))
         V[f'+ last 2 drafts {w}, snaps played (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, prod=True))
-    for k, v in V.items(): print(f"{k:40s} teamfit {v['team']:.3f} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
+    for k, w in (('R1 repeat (.25 / .18)', dict(MOCK, rep=(0.249, 0.18))), ('R1 repeat + WAR need .25', dict(MOCK, rep=(0.249, 0.18), war=0.249)),
+                 ('R1 repeat + WAR need .25, round 1 only', dict(MOCK, rep=(0.249, 0.18), war=0.249, warR1=True)), ('WAR need .25', dict(MOCK, war=0.249))):
+        V['+ ' + k] = run(w)
+    for k, v in V.items(): print(f"{k:40s} teamfit {v['team']:.3f} R1 {v['teamR1']:.3f} hitR1 {v['hitR1']:.2f} tmR1 {v['tmR1']:.2f} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
     needy = {Y: sum(v for (y, t), v in qneed.items() if y == Y) for Y in YEARS}
     json.dump({'_readme': __doc__.strip().split('\n\n')[0] + ' Leave-one-draft-out, 2020-25. byRound: [simulated, real] picks per draft in rounds 1-3.',
                'qbNeedyTeams': needy, 'variants': V}, open(os.path.join(ROOT, 'data', 'cfb_draft_sim_backtest.json'), 'w'), indent=1)
