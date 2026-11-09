@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T21:53Z",
+ "asof": "2026-11-09T22:20Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,7 +274,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 9,
+     "flags": 8,
      "rows": 2149
     },
     "static/data/nfl-fantasy.json": {
@@ -282,11 +282,11 @@
      "rows": 630
     },
     "static/data/nfl-war.json": {
-     "flags": 55,
+     "flags": 56,
      "rows": 1790
     },
     "static/data/pctl-nfl.json": {
-     "flags": 54,
+     "flags": 55,
      "rows": 1719
     },
     "static/data/personnel/nfl.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 48,
+     "flags": 49,
      "rows": 1650
     }
    },
@@ -352,20 +352,6 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "IND"
-    },
-    {
-     "d": "2026-10-10",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Cleared to play vs. Minnesota",
-     "kind": null,
-     "move": null,
-     "pid": "11916",
-     "player": "Davon Godchaux",
-     "pos": "DT",
-     "rotowire": "NO",
-     "site": "JAX"
     },
     {
      "d": "2026-11-09",
@@ -753,6 +739,24 @@
      "player": "Kevin Austin",
      "pos": "WR",
      "rotowire": "FA",
+     "site": "NO"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Acquired by Jacksonville",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Acquired by Jacksonville",
+      "kind": "trade"
+     },
+     "pid": "11916",
+     "player": "Davon Godchaux",
+     "pos": "DL",
+     "rotowire": "JAX",
      "site": "NO"
     },
     {
@@ -1524,6 +1528,24 @@
      "pos": "EDGE",
      "rotowire": "FA",
      "site": "MIA"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Acquired by Jacksonville",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Acquired by Jacksonville",
+      "kind": "trade"
+     },
+     "pid": "11916",
+     "player": "Davon Godchaux",
+     "pos": "DL",
+     "rotowire": "JAX",
+     "site": "NO"
     },
     {
      "d": "2026-10-07",
@@ -2617,6 +2639,24 @@
      "player": "Kevin Austin",
      "pos": "WR",
      "rotowire": "FA",
+     "site": "NO"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Acquired by Jacksonville",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Acquired by Jacksonville",
+      "kind": "trade"
+     },
+     "pid": "11916",
+     "player": "Davon Godchaux",
+     "pos": "DL",
+     "rotowire": "JAX",
      "site": "NO"
     },
     {
