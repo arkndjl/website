@@ -537,6 +537,55 @@ def add_inj(rows, live=False, until=None):
     return TI.add_avz(rows, live=live, until=until, e2t=e2t)
 
 
+_LEVEL = None
+
+
+def level(lg, S):
+    """big-five scoring level for season S: goals scored over goals projected in every earlier season of the
+    walk-forward record (scripts/data/games_wf/soccer.json.gz). The market side ratings read a goal level off 1X2
+    prices that runs low (real matches are drawn more often than the score model draws them at the true level), so
+    projected scores, totals and both-teams-score use the means times this; the 1X2 chances do not. 1 for every
+    other competition (UEFA projections sit at the right level) and for a league's first recorded season"""
+    global _LEVEL
+    if _LEVEL is None:
+        _LEVEL = {}
+        try:
+            tot = defaultdict(lambda: [0.0, 0.0])
+            for o in D.load(WF):
+                if o['lg'] in D.BIG5:
+                    t = tot[(o['lg'], o['S'])]
+                    t[0] += o['l'][0] + o['l'][1]; t[1] += o['hs'] + o['as']
+            for lg0 in D.BIG5:
+                ss = sorted(s for l, s in tot if l == lg0)
+                pr = ac = 0.0
+                for s in ss:
+                    pr += tot[(lg0, s)][0]; ac += tot[(lg0, s)][1]
+                    _LEVEL[(lg0, s + 1)] = ac / pr if pr > 0 else 1.0
+        except (OSError, KeyError, ValueError):
+            pass
+    if lg not in D.BIG5:
+        return 1.0
+    have = [s for l, s in _LEVEL if l == lg and s <= S]
+    return _LEVEL[(lg, max(have))] if have else 1.0
+
+
+def draw_share(lh, la, f, rho):
+    """for the sims' goal draws at the scoring level f: the share of undrawn Poisson scores to turn into draws so the
+    draw chance equals the game model's (Dixon-Coles at the unscaled means)"""
+    d0 = wdl(lh, la, rho)[1]
+    d1 = wdl(lh * f, la * f, 0.0)[1]
+    return max(0.0, (d0 - d1) / (1 - d1))
+
+
+def level_goals(rng, mh, ma, q):
+    """goals drawn at means mh, ma (sims x fixtures, already at the scoring level); a share q (a fixture) of the
+    undrawn scores becomes a draw at the higher or the lower side's goals, a coin flip"""
+    gh, ga = rng.poisson(mh), rng.poisson(ma)
+    cv = (gh != ga) & (rng.random(gh.shape) < q)
+    v = np.where(rng.random(gh.shape) < 0.5, np.maximum(gh, ga), np.minimum(gh, ga))
+    return np.where(cv, v, gh), np.where(cv, v, ga)
+
+
 # ---------------------------------------------------------------- the rating engine
 def ex(x):
     return math.exp(min(2.5, max(-4.0, x)))
@@ -1152,7 +1201,10 @@ def sim_matches(L, fx, teams, rng, n, share, knobs=None, with_draws=False, draws
         f = a * share
         lh = lh * np.exp(-f * (dA[hi] - dD[ai])); la = la * np.exp(-f * (dA[ai] - dD[hi]))
     sh = (dl[:, hi] - dl[:, ai]) / (2 * GPM)
-    gh, ga = rng.poisson(lh[None, :] * np.exp(sh)), rng.poisson(la[None, :] * np.exp(-sh))
+    # big-five fixtures: goals at the league's scoring level, draws as often as the game model has them (level)
+    f = np.array([level(r['lg'], D.season_of(r['day'], r['lg'])) for r in fx])
+    q = np.array([draw_share(x, y, k, L.P['rho']) if r['lg'] in D.BIG5 else 0.0 for r, x, y, k in zip(fx, lh, la, f)])
+    gh, ga = level_goals(rng, (f * lh)[None, :] * np.exp(sh), (f * la)[None, :] * np.exp(-sh), q[None, :])
     return (gh, ga, dl) if with_draws else (gh, ga)
 
 
@@ -1713,6 +1765,8 @@ def build(days_ahead=4):
         if pend:
             R.last[r['h']] = R.last[r['a']] = lday(r)
         pw_, pd_, pl_ = wdl(lh, la, P['rho'])
+        lv = level(r['lg'], D.season_of(r['day'], r['lg']))      # projected score and totals at the league's level
+        lh, la = lh * lv, la * lv
         M = score_matrix(lh, la, P['rho'])
         tot = np.add.outer(np.arange(GMAX), np.arange(GMAX))
         i0, j0 = np.unravel_index(np.argmax(M), M.shape)
