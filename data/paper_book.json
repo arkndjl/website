@@ -1,13 +1,13 @@
 {
- "asof": "2026-11-09T01:57:55Z",
+ "asof": "2026-11-09T02:03:15Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 86.62,
+  "now": 84.29,
   "peak": 117.38,
-  "drawdown": 0.2621,
-  "open": 62.5,
+  "drawdown": 0.2819,
+  "open": 62.0,
   "path": [
    101.5,
    101.6,
@@ -403,43 +403,44 @@
    86.17,
    87.22,
    87.39,
-   86.62
+   86.62,
+   84.29
   ]
  },
  "record": {
-  "n": 432,
-  "clvN": 396,
-  "clvRet": -0.0156,
-  "clvT": -3.18,
+  "n": 433,
+  "clvN": 397,
+  "clvRet": -0.0152,
+  "clvT": -3.09,
   "clv": -0.14,
-  "beat": 0.29,
-  "settled": 395,
+  "beat": 0.292,
+  "settled": 396,
   "w": 194,
-  "l": 201,
+  "l": 202,
   "p": 0,
-  "roi": -0.0283,
-  "roiT": -0.55,
-  "profit": -11.56,
-  "risked": 356.25,
-  "yield": -0.0324
+  "roi": -0.0308,
+  "roiT": -0.6,
+  "profit": -14.56,
+  "risked": 359.25,
+  "yield": -0.0405
  },
- "tEff": -3.17,
+ "tEff": -3.09,
  "corr": {
   "rho": 0.0,
-  "n": 396,
-  "slates": 36,
-  "nEff": 396.0,
-  "avgSlate": 11.0
+  "n": 397,
+  "slates": 37,
+  "nEff": 397.0,
+  "avgSlate": 10.73
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 396,
+   "value": 397,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.6% t -3.17",
+   "value": "-1.5% t -3.09",
    "pass": false
   },
   {
@@ -454,7 +455,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.8% vs -1.6% (SE 5.1)",
+   "value": "ROI -3.1% vs -1.5% (SE 5.1)",
    "pass": true
   }
  ],
@@ -486,7 +487,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 40,
+   "n": 41,
    "clvN": 23,
    "clvRet": -0.0361,
    "clvT": -1.77,
@@ -613,20 +614,20 @@
    "sport": "nba",
    "mk": "ml",
    "n": 14,
-   "clvN": 13,
-   "clvRet": 0.034,
-   "clvT": 2.03,
+   "clvN": 14,
+   "clvRet": 0.0416,
+   "clvT": 2.41,
    "clv": null,
-   "beat": 0.615,
-   "settled": 13,
+   "beat": 0.643,
+   "settled": 14,
    "w": 5,
-   "l": 8,
+   "l": 9,
    "p": 0,
-   "roi": -0.4194,
-   "roiT": -1.97,
-   "profit": -0.33,
-   "risked": 19.75,
-   "yield": -0.0165
+   "roi": -0.4609,
+   "roiT": -2.28,
+   "profit": -3.33,
+   "risked": 22.75,
+   "yield": -0.1462
   },
   {
    "id": "nba-spread",
@@ -714,27 +715,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "nba-ml",
-   "sport": "nba",
-   "id": "401909946",
-   "k": "2026-11-08T23:00:00Z",
-   "slate": "nba:2026-11-08",
-   "h": "DET",
-   "a": "LAL",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": -163.0,
-   "bet": "DET ML -163",
-   "placed": "2026-11-07T23:48:46Z",
-   "stake": 3.0,
-   "edge": 2.5,
-   "ev": 0.0618,
-   "event": null,
-   "pass": false,
-   "close": 7.5
-  },
   {
    "rule": "nba-total",
    "sport": "nba",
@@ -1272,7 +1252,7 @@
    "ev": 0.0097,
    "event": null,
    "pass": false,
-   "close": 45.5
+   "close": 44.5
   },
   {
    "rule": "cfb-total",
@@ -1356,7 +1336,7 @@
    "ev": 0.0362,
    "event": null,
    "pass": false,
-   "close": 39.5
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -1397,14 +1377,14 @@
    "edge": 3.1,
    "ev": 0.0206,
    "event": null,
-   "pass": false,
-   "close": 59.5
+   "pass": true,
+   "close": 60.5
   },
   {
    "rule": "cfb-total",
    "sport": "cfb",
    "id": "401856861",
-   "k": "2026-11-14T22:00:00.000Z",
+   "k": "2026-11-14T22:30:00.000Z",
    "slate": "cfb:2026-11-14",
    "h": "West Virginia",
    "a": "Kansas",
@@ -1462,6 +1442,27 @@
    "event": null,
    "pass": false,
    "close": 60.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401856885",
+   "k": "2026-11-15T00:30:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "LSU",
+   "a": "Texas",
+   "mk": "total",
+   "side": "over",
+   "line": 46.5,
+   "price": -100.0,
+   "bet": "over 46.5 -100",
+   "placed": "2026-11-09T02:02:31Z",
+   "stake": 1.25,
+   "edge": 3.0,
+   "ev": 0.0202,
+   "event": null,
+   "pass": false,
+   "close": 46.5
   },
   {
    "rule": "cfb-total",
@@ -1529,6 +1530,27 @@
   {
    "rule": "cfb-total",
    "sport": "cfb",
+   "id": "401860915",
+   "k": "2026-11-15T02:30:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "San Diego State",
+   "a": "Utah State",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -100.0,
+   "bet": "over 41.5 -100",
+   "placed": "2026-11-09T02:02:31Z",
+   "stake": 2.5,
+   "edge": 4.4,
+   "ev": 0.0264,
+   "event": null,
+   "pass": false,
+   "close": 41.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
    "id": "401864537",
    "k": "2026-11-15T04:00:00.000Z",
    "slate": "cfb:2026-11-14",
@@ -1545,10 +1567,40 @@
    "ev": 0.0067,
    "event": null,
    "pass": false,
-   "close": 38.5
+   "close": 39.5
   }
  ],
  "recent": [
+  {
+   "rule": "nba-ml",
+   "sport": "nba",
+   "id": "401909946",
+   "k": "2026-11-08T23:00:00Z",
+   "slate": "nba:2026-11-08",
+   "h": "DET",
+   "a": "LAL",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -163.0,
+   "bet": "DET ML -163",
+   "placed": "2026-11-07T23:48:46Z",
+   "stake": 3.0,
+   "edge": 2.5,
+   "ev": 0.0618,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.14,
+   "beat": 1,
+   "close": 7.5,
+   "score": [
+    121.0,
+    116.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -3.0
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3223,37 +3275,6 @@
    "score": [
     19.0,
     30.0
-   ],
-   "res": "w",
-   "ret": 0.9804,
-   "profit": 0.7353
-  },
-  {
-   "rule": "cfb-total",
-   "sport": "cfb",
-   "id": "401871074",
-   "k": "2026-11-07T21:00:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "Florida International",
-   "a": "Missouri State",
-   "mk": "total",
-   "side": "under",
-   "line": 49.5,
-   "price": -102.0,
-   "bet": "under 49.5 -102",
-   "placed": "2026-11-01T21:25:38Z",
-   "stake": 0.75,
-   "edge": 3.6,
-   "ev": 0.015,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.0107,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 49.5,
-   "score": [
-    20.0,
-    23.0
    ],
    "res": "w",
    "ret": 0.9804,
@@ -16721,7 +16742,16 @@
    "ev": 0.0618,
    "event": null,
    "pass": false,
-   "close": 7.5
+   "clvRet": 0.14,
+   "beat": 1,
+   "close": 7.5,
+   "score": [
+    121.0,
+    116.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -3.0
   },
   {
    "rule": "nba-total",
@@ -17260,7 +17290,7 @@
    "ev": 0.0097,
    "event": null,
    "pass": false,
-   "close": 45.5
+   "close": 44.5
   },
   {
    "rule": "cfb-total",
@@ -17344,7 +17374,7 @@
    "ev": 0.0362,
    "event": null,
    "pass": false,
-   "close": 39.5
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -17385,14 +17415,14 @@
    "edge": 3.1,
    "ev": 0.0206,
    "event": null,
-   "pass": false,
-   "close": 59.5
+   "pass": true,
+   "close": 60.5
   },
   {
    "rule": "cfb-total",
    "sport": "cfb",
    "id": "401856861",
-   "k": "2026-11-14T22:00:00.000Z",
+   "k": "2026-11-14T22:30:00.000Z",
    "slate": "cfb:2026-11-14",
    "h": "West Virginia",
    "a": "Kansas",
@@ -17450,6 +17480,27 @@
    "event": null,
    "pass": false,
    "close": 60.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401856885",
+   "k": "2026-11-15T00:30:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "LSU",
+   "a": "Texas",
+   "mk": "total",
+   "side": "over",
+   "line": 46.5,
+   "price": -100.0,
+   "bet": "over 46.5 -100",
+   "placed": "2026-11-09T02:02:31Z",
+   "stake": 1.25,
+   "edge": 3.0,
+   "ev": 0.0202,
+   "event": null,
+   "pass": false,
+   "close": 46.5
   },
   {
    "rule": "cfb-total",
@@ -17517,6 +17568,27 @@
   {
    "rule": "cfb-total",
    "sport": "cfb",
+   "id": "401860915",
+   "k": "2026-11-15T02:30:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "San Diego State",
+   "a": "Utah State",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -100.0,
+   "bet": "over 41.5 -100",
+   "placed": "2026-11-09T02:02:31Z",
+   "stake": 2.5,
+   "edge": 4.4,
+   "ev": 0.0264,
+   "event": null,
+   "pass": false,
+   "close": 41.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
    "id": "401864537",
    "k": "2026-11-15T04:00:00.000Z",
    "slate": "cfb:2026-11-14",
@@ -17533,7 +17605,7 @@
    "ev": 0.0067,
    "event": null,
    "pass": false,
-   "close": 38.5
+   "close": 39.5
   }
  ]
 }
