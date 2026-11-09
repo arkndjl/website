@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T16:46Z",
+ "asof": "2026-11-09T16:50Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -310,20 +310,20 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 7,
-     "rows": 2148
+     "flags": 8,
+     "rows": 2146
     },
     "static/data/nfl-fantasy.json": {
      "flags": 7,
-     "rows": 629
+     "rows": 630
     },
     "static/data/nfl-war.json": {
      "flags": 55,
-     "rows": 1750
+     "rows": 1790
     },
     "static/data/pctl-nfl.json": {
      "flags": 54,
-     "rows": 1680
+     "rows": 1719
     },
     "static/data/personnel/nfl.json": {
      "flags": 0,
@@ -388,6 +388,20 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "IND"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Bound for Jacksonville",
+     "kind": null,
+     "move": null,
+     "pid": "12564",
+     "player": "Jessie Bates III",
+     "pos": "SS",
+     "rotowire": "ATL",
+     "site": "JAX"
     },
     {
      "d": "2026-09-15",
@@ -1070,6 +1084,24 @@
      "site": "NYG"
     },
     {
+     "d": "2026-10-20",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Cut loose by Giants",
+     "kind": "waived",
+     "move": {
+      "d": "2026-10-20",
+      "head": "Cut loose by Giants",
+      "kind": "waived"
+     },
+     "pid": "10891",
+     "player": "Jihad Ward",
+     "pos": "EDGE",
+     "rotowire": "FA",
+     "site": "MIN"
+    },
+    {
      "d": "2026-10-27",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1176,24 +1208,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "CLE"
-    },
-    {
-     "d": "2026-10-26",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Added to Falcons' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-26",
-      "head": "Added to Falcons' practice squad",
-      "kind": "practice"
-     },
-     "pid": "17218",
-     "player": "E.J. Jenkins",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "ATL"
     },
     {
      "d": "2026-10-17",
@@ -1304,24 +1318,6 @@
      "site": "LA"
     },
     {
-     "d": "2026-10-20",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Cut loose by Giants",
-     "kind": "waived",
-     "move": {
-      "d": "2026-10-20",
-      "head": "Cut loose by Giants",
-      "kind": "waived"
-     },
-     "pid": "10891",
-     "player": "Jihad Ward",
-     "pos": "EDGE",
-     "rotowire": "FA",
-     "site": "MIN"
-    },
-    {
      "d": "2026-10-24",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1356,6 +1352,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
+    },
+    {
+     "d": "2026-10-26",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Added to Falcons' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Added to Falcons' practice squad",
+      "kind": "practice"
+     },
+     "pid": "17218",
+     "player": "E.J. Jenkins",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "ATL"
     },
     {
      "d": "2026-10-19",
@@ -2952,6 +2966,24 @@
      "site": "NYG"
     },
     {
+     "d": "2026-10-20",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Giants",
+     "kind": "waived",
+     "move": {
+      "d": "2026-10-20",
+      "head": "Cut loose by Giants",
+      "kind": "waived"
+     },
+     "pid": "10891",
+     "player": "Jihad Ward",
+     "pos": "EDGE",
+     "rotowire": "FA",
+     "site": "MIN"
+    },
+    {
      "d": "2026-10-27",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3040,24 +3072,6 @@
      "pos": "S",
      "rotowire": "FA",
      "site": "BAL"
-    },
-    {
-     "d": "2026-10-26",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Added to Falcons' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-26",
-      "head": "Added to Falcons' practice squad",
-      "kind": "practice"
-     },
-     "pid": "17218",
-     "player": "E.J. Jenkins",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "ATL"
     },
     {
      "d": "2026-10-17",
@@ -3150,24 +3164,6 @@
      "site": "HOU"
     },
     {
-     "d": "2026-10-20",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Cut loose by Giants",
-     "kind": "waived",
-     "move": {
-      "d": "2026-10-20",
-      "head": "Cut loose by Giants",
-      "kind": "waived"
-     },
-     "pid": "10891",
-     "player": "Jihad Ward",
-     "pos": "EDGE",
-     "rotowire": "FA",
-     "site": "MIN"
-    },
-    {
      "d": "2026-10-24",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3202,6 +3198,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
+    },
+    {
+     "d": "2026-10-26",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Added to Falcons' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Added to Falcons' practice squad",
+      "kind": "practice"
+     },
+     "pid": "17218",
+     "player": "E.J. Jenkins",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "ATL"
     },
     {
      "d": "2026-10-19",
@@ -3404,7 +3418,7 @@
    ],
    "joined": 0,
    "players": 2234,
-   "rows": 7921
+   "rows": 7999
   },
   "nhl": {
    "by_file": {
