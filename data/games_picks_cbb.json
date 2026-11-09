@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-09T02:03:08Z",
+ "asof": "2026-11-09T02:05:20Z",
  "recenter": {
   "2026-11-08": -10.43,
-  "2026-11-09": -10.86
+  "2026-11-09": -10.87
  },
  "monitor": {
   "clocks": {
@@ -162,7 +162,7 @@
    "mk": "spread",
    "side": "away",
    "line": 24.5,
-   "price": -118.0,
+   "price": -110,
    "edge": 10.9,
    "x": null,
    "why": "spread market off",
@@ -177,9 +177,9 @@
    "away": "Eastern Washington",
    "mk": "total",
    "side": "under",
-   "line": 161.5,
-   "price": -105.0,
-   "edge": 9.9,
+   "line": 162.5,
+   "price": -110,
+   "edge": 10.9,
    "x": null,
    "why": "total market off",
    "m": 12.9,
@@ -210,7 +210,7 @@
    "mk": "spread",
    "side": "away",
    "line": 36.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 8.1,
    "x": null,
    "why": "spread market off",
@@ -226,7 +226,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 7.4,
    "x": null,
    "why": "spread market off",
@@ -298,6 +298,22 @@
    "tm": 156.5
   },
   {
+   "id": "401929002",
+   "sport": "cbb",
+   "kick": "2026-11-09T04:00:00Z",
+   "home": "Hawai'i",
+   "away": "UT Arlington",
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
+   "price": -111.0,
+   "edge": 5.7,
+   "x": null,
+   "why": "spread market off",
+   "m": 13.2,
+   "tm": 144.3
+  },
+  {
    "id": "401926181",
    "sport": "cbb",
    "kick": "2026-11-10T00:00:00Z",
@@ -328,22 +344,6 @@
    "why": "spread market off",
    "m": 23.4,
    "tm": 142.8
-  },
-  {
-   "id": "401929002",
-   "sport": "cbb",
-   "kick": "2026-11-09T04:00:00Z",
-   "home": "Hawai'i",
-   "away": "UT Arlington",
-   "mk": "spread",
-   "side": "home",
-   "line": 8.5,
-   "price": 106.0,
-   "edge": 4.7,
-   "x": null,
-   "why": "spread market off",
-   "m": 13.2,
-   "tm": 144.3
   },
   {
    "id": "401916305",
@@ -434,7 +434,7 @@
    "mk": "spread",
    "side": "away",
    "line": 17.5,
-   "price": -108.0,
+   "price": -110,
    "edge": 2.0,
    "x": null,
    "why": "spread market off",
@@ -450,7 +450,7 @@
    "mk": "spread",
    "side": "away",
    "line": -4.5,
-   "price": -112.0,
+   "price": -110,
    "edge": 1.8,
    "x": null,
    "why": "spread market off",
@@ -490,9 +490,9 @@
   "401929002": {
    "mk": "spread",
    "side": "home",
-   "line": 8.5,
-   "price": 106.0,
-   "edge": 4.7,
+   "line": 7.5,
+   "price": -111.0,
+   "edge": 5.7,
    "ev": null,
    "units": 0.0,
    "home": "Hawai'i",
@@ -527,7 +527,7 @@
    "mk": "spread",
    "side": "away",
    "line": 24.5,
-   "price": -118.0,
+   "price": -110,
    "edge": 10.9,
    "ev": null,
    "units": 0.0,
@@ -563,7 +563,7 @@
    "mk": "spread",
    "side": "away",
    "line": -4.5,
-   "price": -112.0,
+   "price": -110,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -610,9 +610,9 @@
   "401920718": {
    "mk": "total",
    "side": "under",
-   "line": 161.5,
-   "price": -105.0,
-   "edge": 9.9,
+   "line": 162.5,
+   "price": -110,
+   "edge": 10.9,
    "ev": null,
    "units": 0.0,
    "home": "Oregon State",
@@ -635,7 +635,7 @@
    "mk": "spread",
    "side": "away",
    "line": 36.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 8.1,
    "ev": null,
    "units": 0.0,
@@ -647,7 +647,7 @@
    "mk": "spread",
    "side": "away",
    "line": 17.5,
-   "price": -108.0,
+   "price": -110,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -671,7 +671,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 7.4,
    "ev": null,
    "units": 0.0,
@@ -780,34 +780,34 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8888,
+  "snapshots": 8903,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 441,
-    "clvRet": -0.0426,
-    "clvT": -5.42,
+    "clvN": 444,
+    "clvRet": -0.0429,
+    "clvT": -5.5,
     "clv": -0.08,
-    "beat": 0.277,
+    "beat": 0.275,
     "still": 0.295
    },
    {
     "when": "6-24h",
-    "clvN": 1579,
-    "clvRet": -0.0464,
-    "clvT": -16.47,
-    "clv": -0.08,
-    "beat": 0.257,
-    "still": 0.475
+    "clvN": 1583,
+    "clvRet": -0.0469,
+    "clvT": -16.67,
+    "clv": -0.09,
+    "beat": 0.253,
+    "still": 0.477
    },
    {
     "when": "1-6h",
-    "clvN": 1115,
-    "clvRet": -0.0412,
-    "clvT": -28.25,
-    "clv": 0.06,
-    "beat": 0.166,
-    "still": 0.708
+    "clvN": 1116,
+    "clvRet": -0.0418,
+    "clvT": -28.45,
+    "clv": 0.05,
+    "beat": 0.165,
+    "still": 0.702
    },
    {
     "when": "<1h",
@@ -8137,7 +8137,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-09": {
-    "raw": 12.5,
+    "raw": 12.25,
     "scale": 1.0
    },
    "2026-11-11": {
@@ -8149,7 +8149,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 31.25,
+    "raw": 31.0,
     "scale": 1.0
    }
   }
