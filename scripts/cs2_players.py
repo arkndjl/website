@@ -371,13 +371,18 @@ def ages(M, pdir, T):
     return out
 
 
-def prospect_rows(M, c, p, T, pdir, min_r=600):
-    """Prospect pool at day T: under T1_MAPS S-tier maps, min_r+ rounds in the last year. -> dict of arrays."""
+def prospect_rows(M, c, p, T, pdir, min_r=1000, recent=120):
+    """Prospect pool at day T, as the live list takes it: under T1_MAPS S-tier maps, min_r+ rounds in the last year and
+    a map in the last `recent` days. (Fit on 600+ rounds with no recency rule, the kept model's held MSE on the live
+    rule's rows was .841 against .798 fit on them, t -12.6.) -> dict of arrays."""
     th, _ = ratings(M, c, T, p)
     th6, _ = ratings(M, c, T - 182, p)
     _, r12 = window_stats(M, c, th, T - 365, T, p)
     sm = s_maps(M, T)
-    ok = (sm < T1_MAPS) & (r12 >= min_r)
+    lastd = np.zeros(len(M.pids))
+    m = M.d < T
+    np.maximum.at(lastd, M.p[m], M.d[m])
+    ok = (sm < T1_MAPS) & (r12 >= min_r) & (lastd >= T - recent)
     return {"i": np.where(ok)[0], "th": th, "rise": th - th6, "r12": r12, "age": ages(M, pdir, T), "sm": sm,
             "ss": sa_share(M, T)}
 
@@ -397,7 +402,11 @@ def ols(X, y, w=None):
 
 def prospect_fit(M, c, p, pdir):
     """Walk forward over quarterly cutoffs: a prospect's rating over the next 12 months (opponent-credited, 600+
-    rounds) from his rating now, his 6-month rise and age. Tune cutoffs before HELD, scored on the rest."""
+    rounds) from his rating now, his 6-month rise and age. Tune cutoffs before HELD, scored on the rest.
+    The target is the rating of those who go on to play 600+ rounds (68% of a pool; the rest finish about 1.0 under
+    the projection). A two-part target, P(600+ rounds) x that rating + the rest's partial lines, was tested on the
+    held cutoffs over everyone with 100+ later rounds and lost: MSE .941 -> 1.141 round-weighted (t +13.0), 1.518 ->
+    1.518 equal-weighted (t 0.0), .872 -> 1.096 on the 600+ rows."""
     last = int(M.gd.max())
     cuts = []
     d = dt.date(2024, 10, 1)
