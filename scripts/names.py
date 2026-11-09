@@ -152,7 +152,9 @@ def strength(a, b):
 def same(a, b): return strength(a, b) >= 2
 
 
-# school short forms the boards and feeds use
+# school short forms the boards and feeds use. The browser (layouts/partials/namekey.html) reads them from
+# data/team_alias.json, written by `python3 scripts/names.py --teams`; --test fails when that file is behind this map.
+TEAM_FILE = os.path.join(ROOT, 'data', 'team_alias.json')
 TEAM_ALIAS = {'uconn': 'connecticut', 'olemiss': 'mississippi', 'lsu': 'louisianastate', 'usc': 'southerncalifornia',
               'byu': 'brighamyoung', 'smu': 'southernmethodist', 'tcu': 'texaschristian', 'ucf': 'centralflorida',
               'unlv': 'nevadalasvegas', 'vcu': 'virginiacommonwealth', 'unc': 'northcarolina', 'uva': 'virginia',
@@ -303,8 +305,22 @@ def _test():
     assert m3.find('J. Sinner', 'it')[1] == 'variant+team' and m3.find('J. Sinner', 'fr')[0] is None and m3.find('A. Zverev', 'de')[0]['name'] == 'Alexander Zverev'
     assert same_team('N. Carolina', 'North Carolina') and same_team('UConn', 'Connecticut') and same_team("St. John's", 'Saint Johns')
     assert same_team('Michigan St.', 'Michigan State') and not same_team('Michigan', 'Michigan State') and not same_team('Virginia', 'Virginia Tech')
+    try:
+        built = json.load(open(TEAM_FILE, encoding='utf-8'))
+    except (OSError, ValueError):
+        built = None
+    assert built == TEAM_ALIAS, 'data/team_alias.json is behind TEAM_ALIAS: run python3 scripts/names.py --teams'
     print('names.py: ok')
 
 
+def write_teams():
+    with open(TEAM_FILE, 'w', encoding='utf-8') as f:
+        json.dump(dict(sorted(TEAM_ALIAS.items())), f, indent=1)
+        f.write('\n')
+    print(f'{TEAM_FILE}: {len(TEAM_ALIAS)} team short forms')
+
+
+if __name__ == '__main__' and '--teams' in sys.argv:
+    write_teams()
 if __name__ == '__main__' and '--test' in sys.argv:
     _test()
