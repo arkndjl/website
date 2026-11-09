@@ -141,6 +141,7 @@
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
       list = list.slice().sort(function (a, b) {
         var x = sortKey === 'pos' ? a.pos + String(1e4 + a.pr) : a[sortKey], y = sortKey === 'pos' ? b.pos + String(1e4 + b.pr) : b[sortKey];
+        if (sortKey === 'age') { if (a.ax != null) x = a.ax; if (b.ax != null) y = b.ax; }
         if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
