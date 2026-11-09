@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Historical comps for the College Basketball ARKBOARD (Oct 30 2026): each player's nearest preseason profiles among
-the 2009-19 boards' players who had left college by 2020, with what they did in the NBA. Display only: the comps' mix
+the 2009-16 boards' players (every one of them out of college by 2020), with what they did in the NBA. Later boards
+are left out: by 2020 only their early leavers had gone, mostly one-and-dones (2019's top-100 freshmen in such a pool:
+33 rows, 91% NBA, against 28-46% on a whole board). Display only: the comps' mix
 failed as an FV driver (scripts/cbb_comps_fv.py: returners t 0.6 class folds / 0.9 held out, newcomers t -2.1).
 
 Profile (the board's preseason features, cbb_fit.features, z-scored on the pool, 4 SD clip), weights picked on held-out
@@ -29,6 +31,7 @@ GROUPS = {
     'newcomer': [(3.0, ['rg_lrk', 'top', 'top5']), (2.0, ['on3', 'r247', 'btrec']), (1.0, ['ht']), (1.0, ['yr'])],
 }
 K, NEAR = 100, 300
+LEFT, POOL_LAST = 2020, 2016   # careers over by LEFT; boards through LEFT - 4, whose whole cohort has left by then
 
 
 def cols_w(grp):
@@ -46,10 +49,10 @@ def build_pool():
         cols, w = cols_w(grp)
         rows = []
         for c in careers:
-            if c['last'] > 2020: continue
+            if c['last'] > LEFT: continue
             y = F.xpm_fv(c, thr)
             for i, s in enumerate(c['seasons']):
-                if not 2009 <= s['year'] <= 2019: continue
+                if not 2009 <= s['year'] <= POOL_LAST: continue
                 f = F.features(c, i)
                 if f['newcomer'] != (grp == 'newcomer'): continue
                 x = [f.get(k) for k in cols]
