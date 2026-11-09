@@ -8,8 +8,11 @@ as not beating the line yet.
     python3 scripts/futures_board.py nfl    # after scripts/nfl_games.py
 
 ESPN's core API lists DraftKings futures (title, conference, division winners; no win totals) for free, no key.
-Each market's prices are turned into chances and the vig removed by scaling them to sum to 1 (Novig: the two-sided
-mids take up what the one-sided bounds leave).
+Each DraftKings market's prices are turned into chances and the vig removed by the power method (devig(): every
+chance raised to the one power that makes them sum to 1). Scaling them all by one factor leaves the longshots too
+high: a book loads its margin on them. Novig: the two-sided mids take up what the one-sided bounds leave.
+
+    python3 scripts/futures_board.py --test
 """
 import json
 import os
@@ -41,6 +44,25 @@ def get(url):
 def implied(american):
     a = float(american)
     return 100 / (a + 100) if a > 0 else -a / (-a + 100)
+
+
+def devig(raw):
+    """{team: implied chance with the vig in} -> {team: no-vig chance} by the power method: p ** k with the one k that
+    makes them sum to 1 (k > 1 when the book holds a margin). Against scaling by 1 / sum it takes more out of the
+    longshots, where a many-way book keeps most of its margin (the favourite-longshot bias). Under two prices, or with
+    no margin to take out, they are scaled"""
+    ps = {t: p for t, p in raw.items() if 0 < p < 1}
+    tot = sum(ps.values())
+    if len(ps) < 2 or tot <= 0:
+        return {t: p / tot for t, p in ps.items()} if tot > 0 else {}
+    lo, hi = (1.0, 50.0) if tot > 1 else (0.02, 1.0)
+    for _ in range(80):
+        k = (lo + hi) / 2
+        lo, hi = (k, hi) if sum(p ** k for p in ps.values()) > 1 else (lo, k)
+    k = (lo + hi) / 2
+    out = {t: p ** k for t, p in ps.items()}
+    z = sum(out.values())
+    return {t: p / z for t, p in out.items()}
 
 
 # Novig event names -> our sim's field (scripts/novig.py; public catalog, no key)
@@ -128,9 +150,7 @@ def main():
                 raw[ids.get(tid, tid)] = implied(b['value'])
             except (ValueError, KeyError):
                 continue
-        s = sum(raw.values())
-        if s > 0:
-            mk.setdefault(f, {}).update({t: p / s for t, p in raw.items()})   # one winner a market (a division or conference)
+        mk.setdefault(f, {}).update(devig(raw))      # one winner a market (a division or conference)
         time.sleep(0.3)
     # Novig's futures first; each event (a conference, a division, the
     # title) stays on DraftKings unless Novig prices 80%+ of that event's own teams (its futures books are thin)
@@ -159,5 +179,17 @@ def main():
     print(sport, len(rows), 'teams', {f: len(v) for f, v in mk.items()})
 
 
+def test():
+    raw = {'a': implied(-150), 'b': implied(250), 'c': implied(600), 'd': implied(2000)}
+    v, tot = devig(raw), sum(raw.values())
+    assert abs(sum(v.values()) - 1) < 1e-9 and tot > 1
+    # the favourite gives up less of its price than scaling takes, the longshot more; the order is kept
+    assert v['a'] > raw['a'] / tot and v['d'] < raw['d'] / tot and v['a'] > v['b'] > v['c'] > v['d'] > 0
+    fair = {'a': 0.5, 'b': 0.3, 'c': 0.2}
+    assert all(abs(devig(fair)[t] - p) < 1e-9 for t, p in fair.items())           # no margin: unchanged
+    assert devig({'a': 0.6}) == {'a': 1.0} and devig({}) == {}
+    print('futures_board: ok')
+
+
 if __name__ == '__main__':
-    main()
+    test() if sys.argv[1:] == ['--test'] else main()

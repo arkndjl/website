@@ -36,8 +36,19 @@ OUT = os.path.join(HERE, 'data', 'odds_novig')
 LADDER = os.path.join(HERE, 'data', 'odds_novig_ladder')   # every two-sided rung at its asks (Oct 28 2026: the alt-line test)
 LAD_PTS, LAD_HOLD = 6.0, 0.15      # rungs kept: within 6 points of the main line, hold 15% or less (off-centre rungs run 6-15%)
 LEAGUE = {'cfb': 'NCAAF', 'nfl': 'NFL', 'cbb': 'NCAAB', 'nba': 'NBA', 'nhl': 'NHL'}
-# margin and total sd that turn a rung's mid chance into points (the game models' own: clv_fit / rank_sd scale)
+# margin and total sd that turn a rung's mid chance into points: the close's own (data/clv_fit.json, scripts/clv.py),
+# so a rung's points here are the points the picks are judged in. The table is the fallback (no fit; the NHL has none)
+# and was the only source before: its totals read 14.0 / 10.0 / 14.5 (CFB / NFL / NBA) against the fit's 16.1 / 13.2 / 17.9
 SD = {'cfb': (16.0, 14.0), 'nfl': (13.5, 10.0), 'cbb': (11.0, 16.0), 'nba': (12.0, 14.5), 'nhl': (2.3, 2.3)}
+
+
+def sds(sport):
+    """(margin sd, total sd) for a sport: clv_fit.json's, else the table's"""
+    try:
+        f = (json.load(open(os.path.join(os.path.dirname(HERE), 'data', 'clv_fit.json'))).get('sports') or {}).get(sport) or {}
+    except (OSError, ValueError):
+        f = {}
+    return f.get('sd') or SD[sport][0], f.get('sdT') or SD[sport][1]
 UA = 'arkndjl.net arkboard (odds research)'
 KEYS = ('pH', 'hML', 'L', 'T', 'Lm', 'hL', 'Tm', 'hT')
 
@@ -128,7 +139,7 @@ def games(sport):
     lg = LEAGUE[sport]
     ev = {e['eventId']: e for e in pages('events', league=lg, status='OPEN_PREGAME')}
     mk = pages('markets', league=lg, marketType='MONEY,SPREAD,TOTAL', eventStatus='OPEN_PREGAME')
-    sm, st = SD[sport]
+    sm, st = sds(sport)
     out = {}
     for eid, e in ev.items():
         away, _, home = (e.get('description') or '').partition(' @ ')
