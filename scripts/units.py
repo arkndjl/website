@@ -139,11 +139,16 @@ def edge(p, ev, gap=None):
     return e, (e * e / (e * e + var) if e > 0 and e * e + var > 0 else 0.0)
 
 
-def priced(p, c, o, gap=None, ml=False):
+def priced(p, c, o, gap=None, ml=False, mkt=None):
     """(win chance, return at price o, uncertainty shrink u) of the calibrated edge. The calibration is fit on picks at
     BASE, so its edge is a BASE return: it becomes a win chance there and that chance is repriced at o (Oct 21 2026
     audit; before, the -110 return was divided by o's smaller payout, so a worse price got a bigger stake). A
-    moneyline's price is its line, so it keeps the calibrated return at its own price."""
+    moneyline's price is its line, so it keeps the calibrated return at its own price.
+    mkt: (the market's own win chance at this rung from its two-sided quote, the win chance there had the quote been
+    even), from games_picks.lean. The calibration is the edge of a pick at an even line, and a rung quoted +104 / -118
+    is not one: with mkt, c's edge over the market's chance is what gets calibrated and the calibrated chance edge is
+    added to the market's chance at the rung, so the chance falls on a plus-priced rung and rises on a juiced one, as
+    the market says. Without it the rung is taken as even (the history's opens; a board with one price)."""
     w, pu, l = c
     if ml:
         ev = w * (dec(o) - 1) - l
@@ -152,11 +157,13 @@ def priced(p, c, o, gap=None, ml=False):
         e, u = edge(p, ev, gap)
         return (e + 1 - pu) / dec(o), e, u
     B0 = dec(BASE) - 1
-    ev0 = w * B0 - l
+    wm, wb = mkt if mkt is not None else (0.0, 0.0)
+    w0 = w + wb - wm                                    # the model's chance had the quote been even
+    ev0 = w0 * B0 - (1 - pu - w0)
     if ev0 <= 0 or w + l <= 0:
         return w, w * (dec(o) - 1) - l, 0.0
     e0, u = edge(p, ev0, gap)
-    ws = (e0 + 1 - pu) / (B0 + 1)
+    ws = min(1 - pu, max(0.0, (e0 + 1 - pu) / (B0 + 1) + wm - wb))
     return ws, ws * (dec(o) - 1) - (1 - pu - ws), u
 
 
@@ -196,9 +203,9 @@ def stake_cal(sport, c, u, o, n=None):
     return min(p['cap'], max(UNIT_MIN, round(f * 4) / 4)) if f > 0 else 0.0
 
 
-def view(sport, mk, c, o, gap=None):
+def view(sport, mk, c, o, gap=None, mkt=None):
     """(win chance, expected return) a pick is staked on: the calibrated edge at this gap, as a chance at price o"""
-    w, e, _ = priced(params(sport, mk), c, o, gap, mk == 'ml')
+    w, e, _ = priced(params(sport, mk), c, o, gap, mk == 'ml', mkt)
     return w, e
 
 
@@ -208,26 +215,26 @@ def slate_scale(p, n):
     return (1 + (nbar - 1) * rho) / (1 + (n - 1) * rho)
 
 
-def kelly_pct(p, c, o, gap=None, ml=False):
+def kelly_pct(p, c, o, gap=None, ml=False, mkt=None):
     """% of bankroll at lam 1 before the slate scale and cap: Kelly on the calibrated edge at price o, shrunk by its
     uncertainty"""
     _, pu, _ = c
     B = dec(o) - 1
-    w, e, u = priced(p, c, o, gap, ml)
+    w, e, u = priced(p, c, o, gap, ml, mkt)
     if e <= 0 or u <= 0:
         return 0.0
     return max(0.0, u * e / (B * (1 - pu))) * 100
 
 
-def stake(sport, mk, c, o, n=None, p=None, gap=None):
+def stake(sport, mk, c, o, n=None, p=None, gap=None, mkt=None):
     """units (% of bankroll) for a pick with calibrated chances c = (win, push, loss) at American price o and gap
     (model minus line, points), n picks on its slate (None: the backtest's average slate). 0 when the model sees no edge at this price; a listed pick with an
-    edge gets at least 0.25u; never more than the market's cap; quarter units."""
+    edge gets at least 0.25u; never more than the market's cap; quarter units. mkt: the rung's own lean (priced())."""
     p = p or params(sport, mk)
     w, _, l = c
     if w * (dec(o) - 1) - l <= 0:
         return 0.0
-    f = p['lam'] * kelly_pct(p, c, o, gap, mk == 'ml') * (slate_scale(p, n) if n else 1.0)
+    f = p['lam'] * kelly_pct(p, c, o, gap, mk == 'ml', mkt) * (slate_scale(p, n) if n else 1.0)
     if f <= 0:
         return 0.0          # no calibrated edge at this price (Oct 27 2026: a pick qualifies only where it has one)
     return min(p['cap'], max(UNIT_MIN, round(f * 4) / 4))
@@ -429,7 +436,11 @@ def live_pairs(sport, mk):
             if e.get('clvRet') is None or e.get('edge') is None or e['mk'] != mk:
                 continue
             r = C.ret(sport, mk, e['side'], e.get('line'), BASE, e.get('close')) if e.get('line') is not None else None
-            out.append((e.get('sz') or e['edge'], e['clvRet'] if r is None else r, 'g' + et_day(e.get('kick'))))
+            gap = e.get('sz') or e['edge']
+            if e.get('fair') is not None and e.get('line') is not None and e.get('sz') is None:
+                # the gap from the market's fair line, as the pick was staked (games_picks.fair_gap)
+                gap += (1 if e['side'] in ('home', 'over') else -1) * (e['line'] - e['fair'])
+            out.append((gap, e['clvRet'] if r is None else r, 'g' + et_day(e.get('kick'))))
     except (OSError, ValueError):
         pass
     try:
@@ -764,6 +775,18 @@ def test():
     assert view('cbb', 'spread', c, -115, 6.0)[0] == view('cbb', 'spread', c, -110, 6.0)[0]       # the chance does not move with price
     assert abs(kelly_pct(g, c, -110) - kelly_pct(g, c, -110, 6.0)) < 1e-12    # no gap: the market's average gap
     assert edge(g, 0.02, 9.0)[0] == 0.02                                      # never more than the model expects
+    # the rung's own lean (mkt): a fair-coin rung is the same number with or without it; a plus-priced rung (the market
+    # puts our side at 47.5%) carries the same chance EDGE on a lower chance, so it stakes less than the coin at that
+    # price, a juiced one more, and a model that only agrees with the market's lean has no stake
+    assert abs(kelly_pct(g, c, BASE, 6.0, mkt=(0.5, 0.5)) - kelly_pct(g, c, BASE, 6.0)) < 1e-12
+    cl, ch = (0.475 + 0.05, 0.0, 0.525 - 0.05), (0.53 + 0.05, 0.0, 0.47 - 0.05)
+    assert kelly_pct(g, cl, 104, 6.0, mkt=(0.475, 0.5)) < kelly_pct(g, c, 104, 6.0)
+    assert kelly_pct(g, ch, -118, 6.0, mkt=(0.53, 0.5)) > kelly_pct(g, c, -118, 6.0) == 0.0
+    assert abs(priced(g, cl, 104, 6.0, mkt=(0.475, 0.5))[0] - (priced(g, c, BASE, 6.0)[0] - 0.025)) < 1e-12
+    assert kelly_pct(g, (0.475, 0.0, 0.525), 104, 6.0, mkt=(0.475, 0.5)) == 0.0
+    assert stake('cbb', 'spread', (0.53, 0.0, 0.47), -105, p=g, gap=6.0, mkt=(0.53, 0.5)) == 0.0
+    # an even quote next to a key number (the even chance there is not one half): unchanged
+    assert abs(kelly_pct(g, (0.6, 0.0, 0.4), BASE, 6.0, mkt=(0.55, 0.55)) - kelly_pct(g, (0.6, 0.0, 0.4), BASE, 6.0)) < 1e-12
     print('units: ok')
 
 
