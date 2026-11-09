@@ -958,7 +958,7 @@ def calibrate(years=range(2021, 2026)):
 def market(players, k):
     """WAR against what teams pay: veteran contracts (3+ years after the draft) signed after a season, the player's
     rank by WAR that season against his rank by cap %, one replacement line for all against NFL_REPL."""
-    import gzip, io, re
+    import gzip, io
     # one name can be two players (Josh Johnson the QB and the CB): seasons kept apart by position group, and a
     # contract goes to the one whose position fits it
     by, grps = {}, defaultdict(set)
@@ -1016,7 +1016,7 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
     over the `cal` seasons (team WAR = wins - REPL_WINS), which sets each line: R = regulars' AV a full season - value / k.
     Checked on the 2021-25 missed games with the blend fit on 2016-20 inputs, and on contracts and team wins."""
     import numpy as np
-    import gzip, io, re
+    import gzip, io
     with open(FIT) as f:
         b = json.load(f)['coef']
     k = NWAR_PER_AV
@@ -1327,7 +1327,7 @@ def defense(years=range(2018, 2026)):
     both seasons), rank r with the next veteran contract (30%+ snaps), and the team fit with actual sacks in place of
     expected ones."""
     import numpy as np
-    import gzip, io, re
+    import gzip, io
     TK = ['solo_tackle_1_player_id', 'solo_tackle_2_player_id', 'assist_tackle_1_player_id', 'assist_tackle_2_player_id',
           'assist_tackle_3_player_id', 'assist_tackle_4_player_id', 'tackle_with_assist_1_player_id', 'tackle_with_assist_2_player_id']
     acc = defaultdict(lambda: [0.0, 0])

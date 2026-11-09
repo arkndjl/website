@@ -22,7 +22,6 @@ fmt (+ ts, scoreA, scoreB, event from Liquipedia)]], "vrs": {snapshot date: [[ra
 import gzip
 import html
 import json
-import os
 import re
 import subprocess
 import sys

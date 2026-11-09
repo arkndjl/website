@@ -287,7 +287,7 @@ def build():
         if g['fin'] and g['t'] == 2 and g['id'] != cupf:
             w = g['hs'] > g['as']
             rec[g['h']][0 if w else 1] += 1; rec[g['a']][1 if w else 0] += 1
-    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
     try:
         import novig
         NV = novig.prices('nba')

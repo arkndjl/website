@@ -16,7 +16,6 @@ import math
 import os
 import re
 import subprocess
-import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
@@ -84,7 +83,6 @@ def update_log():
     except (OSError, ValueError):
         log = {}
     now = now_utc()
-    today = (now - timedelta(hours=5)).strftime('%Y%m%d')
     ds = list(H.dates(SEASON))
     # every date: past ones only while a game there isn't final yet (or the date is within three days)
     final_dates = defaultdict(lambda: True)
@@ -298,7 +296,7 @@ def pre_listed(report, logs):
     """the injury report on last season's Barttorvik players: team -> {pid: chance he sits}, for the players who
     haven't played for the team this season"""
     prev = C.bt_logs(SEASON - 1)
-    pn, pteam = defaultdict(dict), {}
+    pn = defaultdict(dict)
     try:
         for r in json.load(gzip.open(os.path.join(C.BTLOG, f'{SEASON - 1}.json.gz'))):
             pn[r[47]][r[51]] = r[48]
@@ -643,7 +641,7 @@ def build():
     # the slates
     labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'pinj': 'injury report', 'rest': 'rest',
               'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin', 'hatt': 'home crowd'}
-    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
     try:
         import novig
         NV = novig.prices('cbb')

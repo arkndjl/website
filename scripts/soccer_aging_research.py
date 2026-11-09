@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Oct 30 2026): squad age next to squad market value in the soccer game model, after the NHL age line
-(PR #583).
+.
 
     python3 scripts/soccer_aging_research.py     # pandas + numpy; needs the Transfermarkt dump
                                                  # (scripts/.cache/soccer_prospects/dump); writes data/soccer_aging_research.json

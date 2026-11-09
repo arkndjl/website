@@ -175,7 +175,7 @@ def board_badges(y, players, fresh=False, thru=None, frac=1.0):
     return dict(out)
 
 
-# ---------------------------------------------------------------- specialists (Noah, Nov 2 2026)
+# ---------------------------------------------------------------- specialists
 # One badge per special teams job, on the credit scripts/nfl_st_war.py puts into WAR: each kick's EPA split between
 # kicker / punter / returner, shrunk to what carries to the next season (k plays: kick 360, punt 170, KR 90). That
 # credit was tested season to next season (data/nfl_st_war.json 'kinds', 2016-25, forward slope ~1): kicking t 2.25,

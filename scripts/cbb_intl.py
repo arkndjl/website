@@ -33,7 +33,7 @@ averaged over that spread.
 FV: an international's E[FV] sits on the same scale as a D-I player's, so he gets the FV the college board gives
 that E[FV] (the preseason board's E[FV] -> FV curve, scripts/cbb_prior.json.gz). The college grades don't move.
 """
-import csv, gzip, html, json, math, os, re, subprocess, sys, time, difflib
+import csv, html, json, math, os, re, subprocess, sys, time, difflib
 from collections import defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -426,7 +426,6 @@ def oos(rows, cols):
     lam = lam_for(rows, X, idx)
     err, ferr, e = F.cv_error(rows, X, idx, lam)
     y = np.array([r['y'] for r in rows], float)
-    P = None
     return {'drivers': cols, 'pseudoR2': round(1 - err, 4), 'auc_nba': round(F.auc(e, y >= 30), 3),
             'auc_starter': round(F.auc(e, y >= 45), 3), 'corr': round(float(np.corrcoef(e, y)[0, 1]), 3)}, e
 

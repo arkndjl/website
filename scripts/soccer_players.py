@@ -362,7 +362,6 @@ def ridge(X, y, lam):
 
 def loso(ks, X, y, lam):
     seasons = sorted({k[1] for k in ks})
-    err, n = 0.0, 0
     pred = np.zeros(len(y))
     for S in seasons:
         tr = np.array([k[1] != S for k in ks]); te = ~tr

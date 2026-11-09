@@ -284,7 +284,6 @@ def lsq(X, y):
 def fit_rate(kind, rows, Ks):
     """rows: (grp, hist, x, e) one per player-season with e > 0. Choose K (exposure-weighted squared error of the
     season's rate against the prior), then the spread by group and veteran / newcomer."""
-    import numpy as np
     mu = {}
     by = defaultdict(lambda: [0.0, 0.0])
     for grp, hist, x, e in rows:

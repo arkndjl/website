@@ -40,7 +40,7 @@ import subprocess
 import sys
 import time
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 for _v in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
     os.environ.setdefault(_v, '1')        # one thread: the daily 780-team solves run 4x faster than with BLAS threads
@@ -870,7 +870,6 @@ class Ratings:
         if not self.nobs:
             return
         self.decay(day)
-        m = 2 * n + 2
         pri = np.concatenate([self.pO, self.pD, [P['mu0'], P['h0']]])
         prec = np.concatenate([lam * self.lm, lam * self.lm, [0.01, 0.5]])
         prec[self.ix[X]] = prec[n + self.ix[X]] = P.get('xprec', 0.5)

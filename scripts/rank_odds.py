@@ -12,7 +12,7 @@ data/rank_sd.json at the share of the season the team has left) and ranks the dr
 refit: the ratings are the game models' own. The builders call add() (stdlib) when they write the power table;
 scripts/cfb_rank.mjs carries the JS port.
 
-The rating sd, nba_season_sd.json style (PR #338): at checkpoints in each regular season (0, 20, ... 80% of games
+The rating sd, nba_season_sd.json style: at checkpoints in each regular season (0, 20, ... 80% of games
 played), every team's rating is read back from the game model's walk-forward margins over the next days (ridge on
 team and home terms; scripts/data/games_wf), then its mean residual over the rest of the regular season. That mean's
 variance = sigma^2 x T/(T-1) + game noise / games left, and sigma^2 = a + b x share of the season left is fit by
@@ -221,7 +221,6 @@ def fit_sport(sport, R=None, noise='pure'):
 
 
 def fit():
-    import numpy as np
     out = {}
     for s in ('nfl', 'cbb', 'cfb', 'nba'):
         R = checkpoints(s)

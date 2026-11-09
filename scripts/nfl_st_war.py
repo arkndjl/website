@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Special teams in NFL WAR (Noah, Nov 2 2026): kicking, punting and kick / punt returns, in points over an average
+"""Special teams in NFL WAR: kicking, punting and kick / punt returns, in points over an average
 specialist, shrunk to the part that carries over to the next season, over 35.5 points a win.
 
     python3 scripts/nfl_st_war.py --test     # 2016-25 tests -> data/nfl_st_war.json (k by kind and the results)

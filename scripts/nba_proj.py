@@ -29,7 +29,7 @@ Contract surplus: projected VORX x $ per win minus salary (Basketball-Reference 
   python3 scripts/nba_proj.py --fit     # refit tau / sigma (data/nba_proj_fit.json) with the held-out coverage check
   python3 scripts/nba_proj.py           # this season's projections and surplus (refetches the contracts page)
 Stdlib only."""
-import datetime as dt, html, json, math, os, re, sys, time, urllib.request
+import datetime as dt, json, math, os, re, sys, time, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nba_xpm as X
 

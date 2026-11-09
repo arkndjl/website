@@ -29,7 +29,7 @@ import json
 import math
 import os
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 
 import numpy as np
 
@@ -106,7 +106,6 @@ def dataset():
     for y in CLASSES:
         prog = programs_hist(y)
         cl = R.enrich(R.recruit_class(y), prog, Counter())
-        n = Counter()
         for r in cl:
             if not r['tid'] or r['tid'] not in prog: continue
             g = R.group(r['pos'], r['ht'], r['wt'])

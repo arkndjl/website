@@ -137,9 +137,7 @@ def parse(j):
                         if len(f) < 5:
                             f.append(pid)
                 floor[s] = set(f)
-        good = True
         t_prev = length
-        acc = None
 
         def key(left):
             return (tuple(sorted(floor['home'])), tuple(sorted(floor['away'])), garbage(per, left))

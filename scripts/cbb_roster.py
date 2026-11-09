@@ -20,7 +20,6 @@ off by default, --age / --fv to retest.
     python3 scripts/cbb_roster.py --prior [--coaches DIR]   adds the kept terms to scripts/data/cbb_team_prior.json,
         history and the coming season (live rosters from scripts/cbb_prior.json.gz, coaches from ESPN)
 """
-import csv
 import json
 import math
 import os

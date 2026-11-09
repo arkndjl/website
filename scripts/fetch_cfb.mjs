@@ -346,7 +346,7 @@ const FV_BREAK_POS = { WR: 1.3, TE: 1.3, RB: 1.3, QB: 0.8, OL: 0.7, CB: 1, S: 1,
 const FV_COHORTS = 4;         // classes in the playing population
 const FV_POS_STRENGTH = 0.5;  // how much of a position's talent gap vs other positions carries into FV
 let posStrength = {}, youthRarity = {};
-// The grade's reference population, frozen (Noah, Oct 26 2026: FV grades absolute talent, so it can't move with who else
+// The grade's reference population, frozen (FV grades absolute talent, so it can't move with who else
 // is on this season's board or how many players the rosters list). The composite was standardized on the live board
 // (mean, SD and pool size per position, and the position-strength shift), so a deeper scrape, a strong cohort or a
 // thin one moved every grade. data/cfb_norm.json holds those numbers from the first board after the change (the
@@ -1720,7 +1720,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     nilMarket.price.fcs = pool / zf;    // $ per unit of worth in the FCS pool (the team builder reprices move-ups)
   }
 
-  // the headline FV at the mean outcome (Noah, Oct 21 2026): everything above ran on the grade, which stays as fvg (the
+  // the headline FV at the mean outcome: everything above ran on the grade, which stays as fvg (the
   // distribution reads it; the mock, Draft% and the recruit fit are on its scale); fv and fvx from here on are the mean
   // of the FV distribution, the expected outcome (AV check: the mean averages .454 AV a season vs .469 realized, the
   // grade .529)
@@ -2785,7 +2785,7 @@ const kp = (() => {
   const qk = K.filter(k => (k.FGA || 0) >= 3), qp = P.filter(p => p.NO >= 8);
   for (const k of K) k.score = z(qk.map(x => x.rate), k.rate) + 0.25 * z(qk.map(x => x.LONG), k.LONG) + 0.15 * z(qk.map(x => x.xp), k.xp);
   for (const p of P) p.score = 0.6 * z(qp.map(x => x.rate), p.rate) + 0.3 * z(qp.map(x => x.ypp), p.ypp) + 0.1 * z(qp.map(x => x.in20), p.in20);
-  // punter FV input (Noah, Nov 2 2026): career net yards over expected a punt (against punts from the same line, same
+  // punter FV input: career net yards over expected a punt (against punts from the same line, same
   // season), shrunk: sum / (punts + 14), from scripts/st_kickers.py (data/st_kickers_cfb.json pcar, by ESPN id). Held out
   // by class (final college seasons 2011-20, NFL seasons as the primary punter within 5 years): with the score log loss
   // better in 8/10 classes, t 3.5, forward 2016-20 better; the kicker grade failed (t 1.5). Weight 1.45 score units a
@@ -3119,7 +3119,7 @@ if (model) {
     const PICKS = path.join(ROOT, 'data', 'cfb_picks.json');
     const prev = fs.existsSync(PICKS) ? JSON.parse(fs.readFileSync(PICKS, 'utf8')) : {};
     const byId = Object.fromEntries(Object.entries(MD.lines).map(([S, ls]) => [S, Object.fromEntries((ls || []).map(l => [String(l.id), l]))]));
-    // upset picks (Noah, Oct 14 2026): the model flips the winner to the market underdog by more than 4 points; favorite
+    // upset picks: the model flips the winner to the market underdog by more than 4 points; favorite
     // picks (same day): the market favorite at -105 to -200 that the model makes a bigger favorite by more than 4.
     // The gated markets (backtest/livePicks in cfb_picks.mjs) are off the tab: none ever passed
     const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), favBt = { ...favBacktest(btRows), cuts: favCuts(btRows) };

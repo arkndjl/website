@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""NHL picks test (Noah, Oct 24 2026): does any NHL market beat the close held out? Nothing goes on the picks board
+"""NHL picks test: does any NHL market beat the close held out? Nothing goes on the picks board
 unless it does (the pick rules, scripts/games_picks.py).
 
     python3 scripts/nhl_picks_research.py     -> data/nhl_picks_research.json (shown on Predictions, game models tab)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Backup watch (Noah, Oct 23 2026): second- and third-string players graded above the starter they back up, for the
+"""Backup watch: second- and third-string players graded above the starter they back up, for the
 backup watch tab in each sport (layouts/shortcodes/backupwatch.html). College football is scripts/backup_watch_cfb.mjs.
 
     python3 scripts/backup_watch.py [nfl nba cbb nhl]     -> data/backup_<sport>.json (one file a sport: each sport's
@@ -23,7 +23,7 @@ NHL     ESPN's depth charts, even strength only (C, LW, RW, LD, RD, G; the power
 CBB     No college depth charts, so the order is minutes: this season's minutes a game once a player has a line
         (static/data/cbb-all.json now), else the projected minutes share of the CBB roster prior (scripts/cbb_roster.py,
         fit walk-forward; saved to scripts/data/cbb_proj_min.json, rebuilt here when the research seasons are in the
-        project files). Top five = starters, 6-10 2nd string, 11-15 3rd. The grade is production (Noah, Nov 5 2026: BPM,
+        project files). Top five = starters, 6-10 2nd string, 11-15 3rd. The grade is production (BPM,
         not FV): Barttorvik BPM this season and last at half weight (CBB_W, by minutes, any team), shrunk to CBB_REPL
         with CBB_K minutes (the backup_age_fit history's shrink). A backup is compared with the lowest-graded starter in
         his group (G, F, C; a group with no starter falls back to the next one); both need CBB_MIN minutes, and is listed
@@ -118,7 +118,7 @@ def rotowire_gap(league, charts):
     return charts
 
 
-# ---------------------------------------------------------------- injured starters (Noah, Nov 2 2026)
+# ---------------------------------------------------------------- injured starters
 # ESPN drops an injured starter down his slot (Lamar Jackson, out, listed 3rd behind Tyler Huntley). The chart keeps
 # him first with his injury tag, and the healthy player ESPN moved up is tagged a fill-in. data/depth_starters_<sport>.json
 # remembers each chart slot's starter, the first name the last time ESPN listed someone first without an out-type status;
@@ -172,7 +172,7 @@ def espn_age(league, aid):
 def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name=str.upper, need=0, league=None):
     """the shared ESPN-chart logic: (backups above their slot's starter, slots compared). grade(name, team) -> dict
     with g (grade) and n (sample) or None"""
-    starters, listed = set(), {}
+    starters = set()
     slots = []
     for tm, chart, slot, ath in charts:
         if skip(chart, slot) or not ath:
@@ -204,7 +204,7 @@ def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name
     return rows, n
 
 
-# ---------------------------------------------------------------- depth charts (Noah, Oct 26 2026)
+# ---------------------------------------------------------------- depth charts
 # Every team's full chart for the depth chart tab in each sport (layouts/shortcodes/depthchart.html), written next to
 # the backup watch table from the same pull: static/data/depth/<sport>.json, fetched when the tab opens. A player is
 # [name, grade, sample, injury status, tag, percentile]: the percentile ranks his grade among players at his position

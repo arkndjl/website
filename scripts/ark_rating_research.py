@@ -174,7 +174,7 @@ def nfl():
 
 def nfl_fpi():
     """NFL: ESPN's FPI game forecast (scripts/nfl_fpi.py, home margin) stacked on the live inputs, the way CFB FPI and
-    CBB BPI shipped (PR #354). Games with an FPI margin only (2015 on); walk-forward OLS trains on earlier seasons
+    CBB BPI shipped. Games with an FPI margin only (2015 on); walk-forward OLS trains on earlier seasons
     from 2015, so 2016-20 tunes and 2021-25 is held out. FPI never beats the close in any season (no hindsight)."""
     import numpy as np
     import nfl_games as N

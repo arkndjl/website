@@ -201,7 +201,7 @@ class LModel(N.Model):
         self.ion = {}                                   # pid -> [on poss, on margin, team off poss, off margin]
         self.tot = defaultdict(lambda: [0.0, 0.0])
         self.map = (0.0, 0.0)
-        # (e) lineup sNet (PR #732, Nov 3 2026): on-court margin and possessions per pair / five (sorted ids), this
+        # (e) lineup sNet (Nov 3 2026): on-court margin and possessions per pair / five (sorted ids), this
         # season + last at half, garbage time out; team totals the same way (the shrink target)
         self.u2 = defaultdict(lambda: [0.0, 0.0]); self.u5 = defaultdict(lambda: [0.0, 0.0])
         self.ut = defaultdict(lambda: [0.0, 0.0])

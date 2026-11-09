@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Research (Oct 30 2026): more of an age curve in the tennis match chances, after the NHL age line (PR #583).
+"""Research (Oct 30 2026): more of an age curve in the tennis match chances, after the NHL age line.
 
     python3 scripts/tennis_aging_research.py [matches.csv.gz]   # numpy; writes data/tennis_aging_research.json
 

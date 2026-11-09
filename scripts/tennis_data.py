@@ -32,7 +32,6 @@ United Cup), O Olympics, C Challenger / WTA 125, Q tour qualifying, S Futures / 
 import csv
 import datetime as dt
 import gzip
-import io
 import json
 import os
 import re

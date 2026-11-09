@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Research: FV as the prior for low-sample players (Noah, Oct 29 2026: "project game impact for provisional players /
-players with not a lot of games played based on their FV").
+"""Research: FV as the prior for low-sample players.
 
     python3 scripts/fv_lowsample_research.py nba      # player level, NBA years 2-4 -> data/fv_lowsample_research.json
 

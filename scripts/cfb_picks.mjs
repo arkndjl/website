@@ -224,7 +224,7 @@ export function backtest(rows) {
 // the points at the open and at the close. A fixed rule, so nothing is fit and every season is out of sample.
 export const UPSET_EDGE = 4;
 const upsetSide = (m, L) => L == null || L === 0 || Math.sign(m) === Math.sign(L) || Math.abs(m - L) <= UPSET_EDGE ? null : L > 0 ? 'away' : 'home';
-// Favorite picks (Noah, Oct 14 2026): the market favorite on the moneyline at -105 to -200, where the model makes it a
+// Favorite picks: the market favorite on the moneyline at -105 to -200, where the model makes it a
 // bigger favorite than the line by more than FAV_EDGE points. Backtested on the closing moneyline (the only one in the
 // data) for the price band, and the opening line for the rule, like the upset rule
 export const FAV_EDGE = 4, FAV_ML = [-200, -105];
@@ -234,7 +234,7 @@ const favSide = (m, L, mlH, mlA, edge = FAV_EDGE) => {
   if (odds == null || odds < FAV_ML[0] || odds > FAV_ML[1]) return null;
   return (side === 'home' ? m : -m) - Math.abs(L) > edge ? side : null;
 };
-// Sizing (Noah, Oct 14 2026): units in proportion to the Kelly stake at the model's own chance against the price (win
+// Sizing: units in proportion to the Kelly stake at the model's own chance against the price (win
 // chance on the moneyline, cover chance on the points; normal around the model margin, sigma from the fit), scaled so
 // the backtest's average pick is 1 unit, from KELLY_MIN to KELLY_CAP. Literal quarter Kelly on a 100-unit bankroll
 // puts the cap on nearly every pick: the model's raw chance on these games runs ~62% where the dogs won ~44%

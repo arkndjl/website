@@ -26,7 +26,7 @@ grades give the same shrink (r .81) and monotone calibration bands (55: 51.3, 50
 reduce: dropping the ledger's nine "drop" drivers together loses on 2009-16 (deviance .8917 -> .8971, top 50 38.1 ->
 37.05) and ties held out (.8890 -> .8904): they carry information jointly, so all stay.
 """
-import json, math, os, sys
+import json, os, sys
 from collections import defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -258,7 +258,6 @@ def grid(which=None):
                 kept[f'{grp}{k}'] = sel['kept']
         done[name] = {'e': [round(float(x), 4) for x in e], 'kept': kept}
         json.dump(done, open(cache, 'w'))
-    keys = [(r['pid'], r['year']) for r in univ]
     for name, v in done.items():
         json.dump([[r['pid'], r['year'], r['last'], int(r['f']['newcomer']), x, r['yk'], r['yfull']] for r, x in zip(univ, v['e'])],
                   open(os.path.join(D.CACHE, 'grid_' + name[0] + '.json'), 'w'))

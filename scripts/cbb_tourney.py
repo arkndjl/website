@@ -30,7 +30,7 @@ import pickle
 import re
 import sys
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 for _v in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
     os.environ.setdefault(_v, '1')
@@ -768,7 +768,7 @@ def fit():
     print('games', res['games'], internal, flush=True)
 
     # Selection Sunday, the real bracket: chance each team wins each round, against seed history
-    rr, sr, keys = defaultdict(list), defaultdict(list), []
+    rr, sr = defaultdict(list), defaultdict(list)
     seedfreq = {}
     for s in seasons:
         fld = P[s]['field']; w = wins_in(P[s]['ncaa'])

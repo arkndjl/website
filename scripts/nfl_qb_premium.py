@@ -111,7 +111,7 @@ def states(L, y, maxpick=64):
     pool = [(lnx(r), qb, m and int(m['pick']), n) for r, n, qb, dec, m in L if dec and r <= 300]
     pool.sort(key=lambda p: p[0])
     order = sorted([(int(r['pick']), tf(r['team'])) for r in picks[y] if int(r['pick']) <= maxpick])
-    S = []; gone = set()
+    S = []
     for pk, t in order:
         avail = [i for i, p in enumerate(pool) if not (p[2] and p[2] < pk)]
         ch = next((i for i in avail if pool[i][2] == pk), None)

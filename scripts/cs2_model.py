@@ -40,7 +40,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from cs2_data import CACHE, LP_RES, UA, VRS, key  # noqa: E402
+from cs2_data import LP_RES, UA, VRS, key  # noqa: E402
 import cs2_bo3  # noqa: E402
 import cs2_poly  # noqa: E402
 

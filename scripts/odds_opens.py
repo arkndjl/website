@@ -30,7 +30,6 @@ are. The shared cleaner (scripts/units.py bad_open) still screens every open whe
 Order where sources overlap: the history's own open (ESPN, same book as the close), then ESPN 'Opening', then SBR.
 """
 import difflib
-import glob
 import gzip
 import html
 import json

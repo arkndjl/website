@@ -1,7 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Measured height and weight for college football players (Noah, Nov 3 2026: "if we have multiple sources for
-height/weight that differ, take the most recent one OR average them with shrinkage based on recency, weighting certain
-sources higher than others; combine measurements are probably most accurate").
+"""Measured height and weight for college football players.
 
 Truth: NFL combine and pro day measurements (MockDraftable search pages, scripts/.cache/measure/md: height to 1/8 in,
 source 1 combine / 2 pro day; nflverse combine.csv, whole inches, fills players MockDraftable lacks). Sources a college

@@ -37,11 +37,9 @@ by rho). Each input and setting stays only if it lowers walk-forward log loss on
 disagree (see fit()).
 """
 import datetime as dt
-import gzip
 import json
 import math
 import os
-import random
 import re
 import sys
 import time
@@ -1044,7 +1042,7 @@ REL = {'eng.1': (3, 0), 'esp.1': (3, 0), 'ita.1': (3, 0), 'ger.1': (2, 1), 'fra.
 SPLIT = {'den.1': (22, [(6, 10), (6, 10)]), 'aut.1': (22, [(6, 10), (6, 10)], 'halve'),
          'sco.1': (33, [(6, 5), (6, 5)]), 'sui.1': (33, [(6, 5), (6, 5)]),
          'gre.1': (26, [(4, 6), (4, 6), (6, 5)]), 'cze.1': (30, [(6, 5), (4, 0), (6, 5)])}
-# MLS (Noah, Oct 31 2026): its own tab with conference tables, playoff and MLS Cup odds (mls_playoffs). It meets the
+# MLS: its own tab with conference tables, playoff and MLS Cup odds (mls_playoffs). It meets the
 # European leagues only at the Club World Cup, so its strength against them is unknown: its clubs stay out of the
 # one-scale ARK Ranking and are rated against the average MLS club. No MLS picks: the model trails the close by .011
 # log loss a match held out (2023-26) and its side of the close lost at every edge cut (scripts/soccer_mls_research.py).
@@ -1491,7 +1489,6 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     seat = np.argsort(pos, axis=1)              # seat[s, k] = club finishing k-th (0-based)
     reach = {k: np.zeros(nt) for k in ('ko', 'top8', 'r16', 'qf', 'sf', 'fin', 'win')}
     ar = np.arange(n)
-    pick = lambda a, b: np.where(rng.random(n) < 0.5, a, b)
     # knockout play-off: seeds 9-16 (one of each pair) against 17-24, pairs fixed by UEFA's bracket
     po_winner = {}
     for k, (p_hi, p_lo) in enumerate((((8, 9), (22, 23)), ((10, 11), (20, 21)), ((12, 13), (18, 19)), ((14, 15), (16, 17)))):
@@ -1691,7 +1688,7 @@ def build(days_ahead=4):
         for lg in [x for x in LEAGUES_SHOWN if x not in D.FM_LG] + UEFA:
             for e in D.espn_day(lg, day):
                 dk[e['id']] = e
-    # Novig's three-way prices first (Noah, Oct 27 2026: "switch everything to Novig"); DraftKings where Novig has none
+    # Novig's three-way prices first; DraftKings where Novig has none
     try:
         import novig
         span = (today.isoformat(), (today + dt.timedelta(days=days_ahead - 1)).isoformat())

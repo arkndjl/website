@@ -1,5 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Measured size as an FV input (Noah, Nov 3 2026): does frame read on the measured height and weight
+"""Measured size as an FV input: does frame read on the measured height and weight
 (scripts/cfb_measure.py) instead of the single ESPN listing improve FV out of sample, and do height / weight / BMI z
 within the position a player projects to add anything beyond frameFV?
 

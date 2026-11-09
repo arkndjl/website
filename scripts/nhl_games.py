@@ -43,7 +43,6 @@ xG and goals, the market total rating from earlier closing totals, and the two g
 Puck line and overtime chances: logistic on the model margin and total, fit to results.
 """
 import datetime as dt
-import gzip
 import json
 import math
 import os
@@ -1145,7 +1144,6 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
     hc = c.get('home', 0.0)
     otc = fit['ot']
     cnt = {t: defaultdict(float) for t in TEAMS}
-    wins_sum = defaultdict(float)
     pts_sum = defaultdict(float)
     lot = defaultdict(lambda: defaultdict(float))
     for _ in range(sims):
@@ -1352,7 +1350,7 @@ def build():
     m, _, ups = walk(hist + finals, P, pending, starters, up_moves=mv)
     # market lines for the board (ESPN's current consensus)
     emap = D.espn_map([{'id': g['id'], 'day': g['day'], 'h': g['h'], 'a': g['a']} for g in up], fresh_after=today - dt.timedelta(days=1))
-    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
     try:
         import novig
         NV = novig.prices('nhl')

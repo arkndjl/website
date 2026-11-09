@@ -42,7 +42,6 @@ CAP = 2.0          # z cap, as football's FV_ATH
 
 
 def zcols(d, ref=None):
-    import pandas as pd
     """the two drivers, z within group on the testers (ref = the norms to use; None = fit them on d)."""
     d = d.copy()
     d['LANEn'] = -d.LANE; d['SPRINTn'] = -d.SPRINT; d['MAXREACH'] = d.STNDRCH + d.LPVERT

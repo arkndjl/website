@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-// 1NT's live win chance for the homepage ticker (Noah, Nov 1 2026: 1NT first).
+// 1NT's live win chance for the homepage ticker (1NT first).
 //
 //   node scripts/nt_live.mjs --due      # prints "due" when a 1NT match starts within 45 min or is under way
 //   FACEIT_API_KEY=... node scripts/nt_live.mjs [--once]

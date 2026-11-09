@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Rookie WAR-rate prior from draft slot (breakouts tab, Noah Nov 2 2026) -> data/nfl_rookie_prior.json.
+"""Rookie WAR-rate prior from draft slot (breakouts tab) -> data/nfl_rookie_prior.json.
 
     python3 scripts/nfl_rookie_prior.py         # fit + leave-one-season-out test (stdlib)
     python3 scripts/nfl_rookie_prior.py --pctl  # projections test: rest-of-season WAR from weeks 5/9/13 (after a fit)

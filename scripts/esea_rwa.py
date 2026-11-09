@@ -7,7 +7,6 @@
 
 Method and test: scripts/esea_rwa_research.py. The ratings use the fit's settings as of the build day.
 """
-import gzip
 import json
 import os
 import sys

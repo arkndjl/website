@@ -21,7 +21,6 @@ Units: draft-capital AV a season per signee. Keys: names.py team_key of the scho
   coach: recruits attributed to the head coach of the signing school in the class year (CFBD /coaches list from the
   cfb-game-research artifact, scripts/.cache/cfb/hist/coaches.json); hc maps each team-season to its head coach
 """
-import glob
 import html as H
 import json
 import math

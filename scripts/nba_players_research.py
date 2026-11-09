@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Do the player projections help the NBA game model? (Noah, Oct 21 2026: player projections "feeding into the game
+"""Do the player projections help the NBA game model? (player projections "feeding into the game
 models (if it improves them)"). Research only; results to data/nba_players_research.json.
 
     python3 scripts/nba_players_research.py

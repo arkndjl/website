@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Soccer academy and feeder leagues as FV drivers (Noah, Oct 31 2026): youth leagues (UEFA Youth League, U18 Premier
+"""Soccer academy and feeder leagues as FV drivers: youth leagues (UEFA Youth League, U18 Premier
 League, Primavera, French/Turkish/Danish/Dutch U19, Liga Revelacao U23, Swiss U21, plus Premier League 2 already on the
 board) and the senior leagues where B teams and young players start (3. Liga and the Regionalligen, Serie C, the
 Spanish third tier, Ligue 3/National, Austria's 2. Liga, Challenger Pro League, the Czech, Croatian, Danish, Norwegian,

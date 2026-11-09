@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Tennis prospects ARKBOARD (Noah, Oct 26 2026): every ATP and WTA player under the age cut, graded on the shared
+"""Tennis prospects ARKBOARD: every ATP and WTA player under the age cut, graded on the shared
 20-80 FV value scale against what past prospects with the same profile became.
 
     python3 scripts/tennis_prospects.py --rows     # history -> snapshot rows (scripts/.cache/tennis/rows.pkl)
@@ -14,7 +14,7 @@ Value     Ranking points above replacement (the rank-200 player's points that se
           as a share of the top 100's mean surplus that season (an average top-100 player = 1), which washes out the
           points-table changes (ATP 2009, WTA 2016) and puts ATP and WTA alike.
 Outcome   Peak value: the mean of the best three seasons at ages 22-28 (age on July 1), missing seasons 0.
-FV scale  By rarity within a birth year and tour (Noah, Oct 26 2026: tennis's own scale, not the cross-sport value
+FV scale  By rarity within a birth year and tour (tennis's own scale, not the cross-sport value
           scale), births 1979-97: 80 = one in eight birth years (an all-time great), 75 = one in four (a No. 1),
           70 = one in two (a top-5 peak), 65 = the best of a birth year, 60 = top 2 (a top-10 peak), 55 = top 4
           (top 30), 50 = top 7 (top 50), 45 = top 10 (top 75), 40 = top 13 (a top-100 tour regular); below that

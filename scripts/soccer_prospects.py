@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Soccer prospects ARKBOARD (Noah, Oct 24 2026): every player under 22 at the season start in the 14 European
+"""Soccer prospects ARKBOARD: every player under 22 at the season start in the 14 European
 leagues of the Transfermarkt dump and the feeder leagues, graded on the 20-80 FV scale against what past prospects
 became.
 
@@ -22,7 +22,7 @@ FV scale  By rarity within a birth cohort and position group (GK, defence, midfi
           were the whole cohort), cohorts aged 22 in 2013-21: 80 = one in two cohorts, 75 = the best of a cohort,
           70 = top 3, 65 = top 8, 60 = top 20, 55 = top 45, 50 = top 90 (about a big-five regular), 45 = top 150,
           40 = top 250; below that 20 (no value) to 40 by peak. Steps of 1.
-Model     FV = OLS on outcome FV (the mean outcome, Noah Oct 21), one fit per in-season snapshot (Jul 1, Sep 15,
+Model     FV = OLS on outcome FV (the mean outcome), one fit per in-season snapshot (Jul 1, Sep 15,
           Oct 24, Jan 15, Apr 1) from what was known that day: age, market value, last season and this season so far
           (value, minutes share, club rating, league strength, scoring), bench and youth-league (Premier League 2)
           play, academy and feeder-league play (B-team minutes at the first team's strength, minutes young for the

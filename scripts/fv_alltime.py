@@ -1,5 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""All-time FV lists by position, and how the grades turned out (Noah, Nov 1 2026).
+"""All-time FV lists by position, and how the grades turned out.
 
 Every prospect board's history, graded the way that board grades today, ranked within position:
   cfb     every FBS season 2014-25 at QB, RB, WR, TE, EDGE, DT and LB (scripts/cfb_fv_refit.mjs --alltime: the board at the
@@ -95,7 +95,7 @@ def check(rows, peaks, groups, grp, complete=lambda r: True):
     return {'n': len(R), 'bias': r1((y - x).mean()), 'slope': None if slope is None else round(slope, 2), 'bands': bands, 'top': top}
 
 
-# the list shows a player only once he has left college, drafted or not (Noah, Nov 3 2026); grades are untouched
+# the list shows a player only once he has left college, drafted or not; grades are untouched
 GONE = lambda r: r.get('status') != 'college'
 
 
@@ -201,7 +201,7 @@ def cfb(path):
         if r['season'] < 2019:
             r['fvxRaw'] = r['fvx']; r['fvx'] = round(max(20.0, 20 + float(np.dot(boxfit[q['final']], X(r['fvx'])))), 2); r['fv'] = fv_of('cfb', r['fvx'])
             r['box'] = True
-    # the draft (Noah, Nov 3 2026: misses on the all-time board): each player shows once, at his last season graded
+    # the draft (misses on the all-time board): each player shows once, at his last season graded
     # the day of the draft, with the combine in: invited or not, and the athletic composite (cfb_combine). Fit on the
     # mature drafts (2015-23), outcome on (x - 20, max(0, x - 40), invited, athletic z); each mature row takes the fit
     # with its own draft class held out, later drafts the full fit; 2021 (no combine) on the line alone. Class held

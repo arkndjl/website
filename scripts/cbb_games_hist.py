@@ -141,7 +141,7 @@ def season_rows(season):
     with ThreadPoolExecutor(24) as ex:
         odds = list(ex.map(lambda g: cached(ODDS.format(i=g['id']), os.path.join(CACHE, 'odds', str(season), f"{g['id']}.json")), games))
     bt = bart(season)
-    from datetime import datetime, timezone, timedelta as td
+    from datetime import datetime, timedelta as td
     for g, o in zip(games, odds):
         g.update(pick_line((o or {}).get('items', [])))
         # ESPN dates are UTC; Barttorvik's are local (US) dates

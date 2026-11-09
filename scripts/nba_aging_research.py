@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Research (Oct 30 2026): an age term on the NBA lineup values, in the form that passed for the NHL (PR #583).
+"""Research (Oct 30 2026): an age term on the NBA lineup values, in the form that passed for the NHL.
 
     python3 scripts/nba_aging_research.py     # writes data/nba_aging_research.json (numpy)
 

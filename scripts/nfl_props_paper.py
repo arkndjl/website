@@ -50,11 +50,11 @@ OUT = os.path.join(ROOT, 'data', 'props_paper_nfl.json')
 PICKS = os.path.join(ROOT, 'data', 'games_picks_nflprops.json')
 GAMES = os.path.join(ROOT, 'data', 'nfl_games.json')
 BUDGET = 50.0         # % of bankroll the week's props share at most: every stake that week scaled down together to fit
-# (Noah, Oct 29 2026: "50% a week until 300 graded". The backtest beat archived ESPN BET opens at an assumed -110; live
+# ("50% a week until 300 graded". The backtest beat archived ESPN BET opens at an assumed -110; live
 # bets face Novig asks (median -113) on lines that may be sharper. At -113, a true hit rate of 53% instead of the
 # held-out 55.3% gives a 25% drawdown 87% of the time at 100% a week, 1% at 50%. Revisit with live CLV at 300 graded.)
 # one player's props in a game settle together (receptions, receiving yards and rush + rec yards move as one; results
-# correlate .42), so only his best prop is bet (Noah, Oct 29 2026: "why not just choose the most profitable pick as the
+# correlate .42), so only his best prop is bet ("why not just choose the most profitable pick as the
 # one pick for each player, or list them all as a parlay?"). Held out 2025-26 at a 100% week (-103, wed projections):
 # best prop +10.4% log growth a week against +9.6% sharing one stake across his props (paired t 1.4; 2024 tune t 4.7),
 # worst week -6.5% vs -4.5%; a same-player Novig parlay +9.5% even
@@ -163,7 +163,7 @@ def entry(F, R, snaps):
 def with_mean(side, L, m):
     """our mean projection is on the bet's side of the line. The shape's skew alone can put P(under) past .60 with the line
     below our mean (a low median); those unders lost: 45.6% on 217 in the 2024 tune season, 51.7% on 582 held out
-    2025-26, against 56.0% for the rest held out (Noah, Oct 29 2026: "Why are all of our prop bets unders?")"""
+    2025-26, against 56.0% for the rest held out"""
     return L >= m if side == 'u' else L <= m
 
 
@@ -238,7 +238,7 @@ def main():
             o = c['oO'] if b['side'] == 'o' else c['oU']
             un = kelly(R, .5 + R['c'] * (ps - .5), o) if pn is not None and ps >= R['pstar'] and with_mean(b['side'], c['L'], c['m'] if c.get('m') is not None else b['m']) else 0.0
             b['now'] = {'L': c['L'], 'o': o, 'u': un, 'p': None if pn is None else round(ps, 4)}
-            # pass only when the model moved (Noah, Nov 4 2026): the projection as it stands no longer clears the rule
+            # pass only when the model moved: the projection as it stands no longer clears the rule
             # at the FLAGGED line; a market move alone never passes a prop. Frozen at the start.
             mn = c['m'] if c.get('m') is not None else b['m']
             pf = p_over(F, s, mn, b['L'])
@@ -392,7 +392,7 @@ def write_picks(R, bets, now, rec):
         pass
     with open(PICKS, 'w') as f:
         json.dump(out, f, separators=(',', ':'), allow_nan=False)
-    import night_cap      # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night)
+    import night_cap      # the nightly exposure cap over every sport's picks (40% a night)
     night_cap.apply(['nflprops'])
 
 

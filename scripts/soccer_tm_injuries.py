@@ -20,7 +20,6 @@ out t -0.9, big five t -1.7). The end date of a past spell is known only afterwa
 team news (the live run reads Transfermarkt's current list and expected return)."""
 import bisect
 import datetime as dt
-import gzip
 import json
 import os
 import sys

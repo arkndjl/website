@@ -11,9 +11,7 @@ the walk-forward and scores both splits on the model's own loss, paired per row 
 Models whose data can't be rebuilt here enter from their own stored backtest t statistics ('stored': true); the
 FDR control runs over every row at once (harness.judge). Rows are cached per model in scripts/.cache/harness/.
 """
-import gzip
 import json
-import math
 import os
 import sys
 

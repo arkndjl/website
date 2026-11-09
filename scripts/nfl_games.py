@@ -953,7 +953,6 @@ def build():
     qbinfo = resolve_qbs(games, last, week, qbst)
     hist = injury_history(games, [last], live=last)
     proj = {}
-    played_w = []
     for g in games:
         x, tx = m.feats(g)
         if g in nxt or (int(g['season']) == last):
@@ -997,7 +996,7 @@ def build():
         x['inj'] = icost.get(a, 0.0) - icost.get(h, 0.0)
         mix = lambda t, q: qbinfo[t]['pNow'] * qa(t, q) + (1 - qbinfo[t]['pNow']) * qa(t, qbinfo[t]['alt'][0]) if t in qbinfo and qbinfo[t]['alt'][0] else qa(t, q)
         x['qb'] = (mix(h, g['home_qb_id']) - mix(a, g['away_qb_id'])) * 38
-    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
     try:
         import novig
         NV = novig.prices('nfl')

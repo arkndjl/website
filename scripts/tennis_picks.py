@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Tennis picks on the Predictions page (Noah, Oct 27 2026: "Why aren't counter strike and tennis on the game table /
-picks page now that we're using Novig?"). The same pick rule as every other sport (scripts/games_picks.py, pick-rules):
+"""Tennis picks on the Predictions page. The same pick rule as every other sport (scripts/games_picks.py, pick-rules):
 the model's side when it sits X+ off the market, X set on the tuning season by closing line value, on only where the
 picks beat the close held out.
 
@@ -43,7 +42,7 @@ MLCAP = 0.25             # the side's chance at the price: -300 to +300, as ever
 GAPMAX = 0.35            # a gap past this is a bad line (a withdrawal, a wrong player), not a pick
 XS = (0.04, 0.06, 0.08, 0.10, 0.12, 0.15, 0.18)
 LEAK = 0.5               # the share of the open-to-close edge still there at the live price
-# Paper only (Noah, Nov 5 2026): live picks flagged Oct 27-Nov 5 lost to the close (-1.7%, t -4.2, n 76; only .09 of the
+# Paper only: live picks flagged Oct 27-Nov 5 lost to the close (-1.7%, t -4.2, n 76; only .09 of the
 # open-to-close move was left at Novig's price vs the .5 assumed). Picks keep being logged and graded (paper book) but
 # leave the picks board, night cap and Novig paper exchange until the picks flagged since PAPER_FROM beat the close.
 PAPER_FROM = '2026-11-05T15:00:00Z'
@@ -316,7 +315,7 @@ def live():
         prev = log.get(str(g['id']))
         if prev is not None and prev.get('res') is None:
             prev['kick'] = g['tip']                        # ESPN moves order-of-play times as the draw fills
-            # pass only when the model moved (Noah, Nov 4 2026): the model's chance for the pick's side no longer
+            # pass only when the model moved: the model's chance for the pick's side no longer
             # clears X over the market chance it was flagged at; a market move alone never passes it
             if X and prev.get('mkt') is not None:
                 if (pm if prev['side'] == 'away' else 1 - pm) - prev['mkt'] < X:
@@ -397,7 +396,7 @@ def live():
            'games': games, 'record': rec, 'recent': recent, 'log': L[-400:]}
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'), allow_nan=False)
-    import night_cap      # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night)
+    import night_cap      # the nightly exposure cap over every sport's picks (40% a night)
     night_cap.apply(['tennis'])
     print(f"tennis picks: {'PAPER ' + str(len(paper_picks)) if paper else len(picks)} open, {len(games)} priced at Novig, rule {'on X ' + str(X) if on else 'off'}, record {rec}")
 

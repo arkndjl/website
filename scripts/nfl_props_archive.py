@@ -13,7 +13,6 @@ main line is the target that appears twice. Only `open` is used: `current` was l
 
     {gid: {'k': kickoff, 'b': 'espnbet' | 'dk', 'props': [[espn athlete id, stat, open line], ...]}}
 """
-import datetime
 import gzip
 import json
 import os

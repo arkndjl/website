@@ -31,7 +31,6 @@ P >= p*, p* picked on the 2024 props (Mar-Jun 2024), scored on 2025-27 at the bo
 import datetime
 import gzip
 import json
-import math
 import os
 import sys
 from collections import defaultdict
@@ -339,7 +338,7 @@ def test():
                                                                     'heldAllProps', 'diag', 'calib', 'verdict')}), flush=True)
         print('  by stat alone', {st: (v['tune'].get('roi'), v['held'].get('roi'), v['held'].get('t'), v['held'].get('n'))
                                   for st, v in res['byStatAlone'].items()}, flush=True)
-    # the saves rule for the paper test (Noah, Oct 31 2026: "Paper-test NHL saves"): saves alone was the one stat that
+    # the saves rule for the paper test: saves alone was the one stat that
     # won on the 2024 tune props; p* is its tune pick, scored held out on its own
     tune_sv = {ps: M.score(M.bets(graded['open'], ps, TUNE, stat='sv')) for ps in M.PSTAR}
     ps = max(M.PSTAR, key=lambda x: tune_sv[x].get('roi', -9) if tune_sv[x]['n'] >= 100 else -9)

@@ -4,7 +4,7 @@
 
     python3 scripts/cs2_team_rwa_research.py   -> data/cs2_team_rwa_research.json (~10 min)
 
-The live model already carries the five's MEAN player RWA (cs2_players.Live, PR #721). Three pre-registered team
+The live model already carries the five's MEAN player RWA (cs2_players.Live). Three pre-registered team
 versions, each scored the way cs2_players.game_test scores the shipped term (fit on series Jul 2024 - Jun 2025, held
 Jul 2025 on, logistic by tier, ratings as of the first of the series' month, paired t on per-series log loss):
   unit   lineup RWA: what the roster wins as a unit beyond its players' RWA. Each map before the cutoff where 4+ of

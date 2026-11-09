@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""NFL props: three ways to bet a player with several rule props in one game (Noah, Oct 29 2026: "why not just choose
-the most profitable pick as the one pick for each player, or list them all as a parlay?"). Held-out 2025-26 weeks:
+"""NFL props: three ways to bet a player with several rule props in one game. Held-out 2025-26 weeks:
   shared  - every prop, the player's stake split by 1/(1+(m-1)rho)  (live since PR #559)
   best    - only the player's highest-chance prop, full stake
   parlay  - the player's props as one Novig parlay (RFQ, priced by liquidity providers who see the correlation),

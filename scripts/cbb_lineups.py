@@ -251,8 +251,6 @@ def parse(pbp, box=None):
     stints = []
     bad = 0.0
     cur = None
-    st0 = None
-    hs0 = vs0 = 0
     acc = None
 
     def close(t, hs, vs):
