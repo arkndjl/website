@@ -30,7 +30,7 @@ jobs:
           submodules: recursive
       - uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: "0.152.2"
+          hugo-version: "0.147.7"   # the version Cloudflare builds the live site with (build-gate.yml pins the same)
           extended: true
       - run: hugo --minify
       - run: npx --yes wrangler@4 deploy
