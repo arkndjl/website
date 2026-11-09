@@ -26,9 +26,13 @@ before the season (log value, or none on record). Neither enters a player's valu
 soaking up who moved in.
 A player's value a match = his rates at those weights plus his league's strength x LG_SCALE (rates are relative to the
 league-season, so a Ligue 1 regular and a Premier League regular are put on one scale: LG_SCALE is measured on players
-who changed league, this season's value on last season's and the gap); replacement = the minutes-weighted value of
-players with under 900 minutes in a season (the fringe of the squads, every league); GAR = (value - replacement) x
-matches of minutes; PAR = GAR x league points per goal of difference (a team-season regression).
+who changed league, this season's value on last season's and the gap); replacement, by position = the
+minutes-weighted value of the regulars (900+ minutes for the club) on the bottom three sides by goal difference of
+every finished league-season (repl_line: what a relegation-level side fields; the season in progress is not in it, so
+the line holds still through a season); GAR = (value - replacement) x matches of minutes; PAR = GAR x league points
+per goal of difference (a team-season regression). The line before it (replFringe: players with 90-899 minutes, every
+season) sat at about the league median; the fits trained on it still read GAR on it through gar_fringe() until they
+are refit (xMV, the projections, backup watch, the game model's injury term).
 Projections (pj = GAR next season, p3 = GAR over the next three, 0 for a season out of the big five): OLS on the season
 so far at full-season pace, the two seasons before pooled per 90, minutes, age and position, per share of the season
 played (scripts/soccer_proj_research.py -> data/soccer_proj_fit.json).
@@ -474,20 +478,66 @@ def gar_of(r, F, LS):
     return v, (v - F['repl'][r['pos']]) * r['min'] / 90
 
 
+REPL_MIN, REPL_BOTTOM = 900, 3
+
+
+def repl_line(rows, F, LS, cur):
+    """replacement value a match by position: the minutes-weighted value of the regulars (REPL_MIN+ minutes for the
+    club that season) on the REPL_BOTTOM sides with the worst goal difference a match in each finished big-five
+    league-season (S < cur), every such season pooled. A side's goal difference comes from the rows themselves
+    (on-pitch goals for less against summed over its players / 11, over its minutes / 990). None before any season
+    is finished. rows: after prep()"""
+    team = defaultdict(lambda: [0.0, 0.0])
+    for r in rows:
+        if r['S'] < cur:
+            t = team[(r['lg'], r['S'], r['tid'])]; t[0] += r['gf'] - r['ga']; t[1] += r['min']
+    by = defaultdict(list)
+    for (lg, S, tid), (gd, mn) in team.items():
+        if mn > 0:
+            by[(lg, S)].append((gd / 11 / (mn / 990), tid))
+    bottom = {(lg, S, tid) for (lg, S), v in by.items() for _, tid in sorted(v)[:REPL_BOTTOM]}
+    if not bottom:
+        return None
+    out = {}
+    for pos in ('GK', 'D', 'M', 'F'):
+        g = [r for r in rows if r['pos'] == pos and r['min'] >= REPL_MIN and (r['lg'], r['S'], r['tid']) in bottom]
+        out[pos] = round(sum((value(r, F) + lg_adj(r, F, LS)) * r['min'] for r in g) / max(1, sum(r['min'] for r in g)), 4)
+    return out
+
+
+def gar_fringe(o, F=None):
+    """a season-file row's (GAR, GAR a 90) on the fringe line (F['replFringe']), for the fits trained on it"""
+    F = F or _fit()
+    d = F['repl'][o['pos']] - F['replFringe'][o['pos']] if F.get('replFringe') else 0.0
+    return o['gar'] + d * o['min'] / 90, (o.get('gar90') or 0.0) + d
+
+
+_FIT = []
+
+
+def _fit():
+    if not _FIT:
+        _FIT.append(json.load(open(FIT)))
+    return _FIT[0]
+
+
 def write(rows, F, ts, all_seasons=False):
     prep(rows, F['shrink'])
     by = defaultdict(list)
     for r in rows:
         by[r['S']].append(r)
-    # replacement, by position: the minutes-weighted value a match of players under 900 minutes, all seasons (the
-    # squads' fringe): a keeper is measured against a fringe keeper, a striker against a fringe forward
     LS = league_strength()
-    F['repl'] = {}
+    cur = D.current_season()
+    # the fringe line (players under 900 minutes, every season): GAR's line before, still the input of the fits
+    # trained on it (gar_fringe)
+    F['replFringe'] = {}
     for pos in ('GK', 'D', 'M', 'F'):
         fr = [r for r in rows if r['pos'] == pos and 90 <= r['min'] < 900]
-        F['repl'][pos] = round(sum((value(r, F) + lg_adj(r, F, LS)) * r['min'] for r in fr) / max(1, sum(r['min'] for r in fr)), 4)
+        F['replFringe'][pos] = round(sum((value(r, F) + lg_adj(r, F, LS)) * r['min'] for r in fr) / max(1, sum(r['min'] for r in fr)), 4)
+    # replacement, by position: the regulars of each finished league-season's bottom three sides
+    F['repl'] = repl_line(rows, F, LS, cur) or dict(F['replFringe'])
+    _FIT[:] = [F]
     os.makedirs(SDIR, exist_ok=True)
-    cur = D.current_season()
     for S, rs in sorted(by.items()):
         if not all_seasons and S != cur:
             continue
@@ -577,11 +627,14 @@ def proj_x(mn, g, pos, age, prior, f):
 
 def proj_attach(S, out, cur_f=None):
     """pj (GAR next season) and p3 (GAR over the next three) on a season file's players, from the season so far, the
-    two season files before it, age and minutes. cur_f: {league: share of the season played} (None = a full season)"""
+    two season files before it, age and minutes. cur_f: {league: share of the season played} (None = a full season).
+    A fit without garLine 'bottom3' was trained on the fringe line: it is fed GAR on that line and its pj / p3 are
+    GAR over that line (rerun scripts/soccer_proj_research.py --snaps, then the fit, to move them)"""
     try:
         P = json.load(open(PROJ_FIT))
     except OSError:
         return
+    gv = (lambda o: o['gar']) if P.get('garLine') == 'bottom3' else (lambda o: gar_fringe(o)[0])   # the fit's own line
     for o in out:
         o.pop('pj', None); o.pop('p3', None)
     if not os.path.exists(os.path.join(SDIR, f'{S - 2}.json')):    # fit on seasons with two before them on file
@@ -592,13 +645,13 @@ def proj_attach(S, out, cur_f=None):
         m = defaultdict(lambda: [0, 0.0])
         try:
             for o in json.load(open(os.path.join(SDIR, f'{S - k}.json')))['players']:
-                m[o['p']][0] += o['min']; m[o['p']][1] += o['gar']
+                m[o['p']][0] += o['min']; m[o['p']][1] += gv(o)
         except OSError:
             pass
         prev.append(m)
     tot = defaultdict(lambda: [0, 0.0])
     for o in out:
-        tot[o['p']][0] += o['min']; tot[o['p']][1] += o['gar']
+        tot[o['p']][0] += o['min']; tot[o['p']][1] += gv(o)
     longest = {}
     for o in out:
         if o['min'] > longest.get(o['p'], (0, None))[0]:
@@ -652,15 +705,15 @@ BACKUP = os.path.join(ROOT, 'data', 'backup_soccer.json')
 def backup(rows, F, S):
     """data/backup_soccer.json, the shape scripts/backup_watch.py writes: no depth charts for soccer, so the order is
     minutes this season within team and position (GK, D, M, F): the most-used are the starters, the next as many the
-    2nd string, the next the 3rd. The grade is value a 90 above his position's replacement over this season and last
-    (half weight), shrunk to replacement with BW_K minutes. A backup is listed when he beats the lowest-graded
+    2nd string, the next the 3rd. The grade is value a 90 above his position's fringe line (replFringe: the line the
+    xGap fit was trained on) over this season and last (half weight), shrunk to it with BW_K minutes. A backup is listed when he beats the lowest-graded
     starter at his position by BW_GAP goals a 90 and has BW_MIN minutes."""
     past = defaultdict(lambda: [0.0, 0.0])                # player -> [weighted value-above-repl x minutes, weighted minutes]
     LS = league_strength()
     for r in rows:
         w = {S: 1.0, S - 1: 0.5}.get(r['S'])
         if w:
-            past[r['p']][0] += w * (gar_of(r, F, LS)[0] - F['repl'][r['pos']]) * r['min']
+            past[r['p']][0] += w * (gar_of(r, F, LS)[0] - (F.get('replFringe') or F['repl'])[r['pos']]) * r['min']
             past[r['p']][1] += w * r['min']
     grade = {p: a / (m + BW_K) for p, (a, m) in past.items()}
     squads = defaultdict(list)

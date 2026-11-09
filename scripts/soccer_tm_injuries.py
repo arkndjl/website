@@ -109,11 +109,19 @@ def live_link(clubs, link, deadline=None):
 
 def value_table():
     gv = {}
+    # the term was fit on GAR a 90 over the fringe line (soccer_players replFringe): keep its input there
+    try:
+        F = json.load(open(os.path.join(os.path.dirname(WARD), '..', '..', 'data', 'soccer_war_fit.json')))
+        dl = {k: F['repl'][k] - F['replFringe'][k] for k in F['repl']} if F.get('replFringe') else {}
+    except (OSError, KeyError, ValueError):
+        dl = {}
 
     def v(S, p):
         if S not in gv:
             try:
-                gv[S] = {x['p']: x['gar90'] for x in json.load(open(os.path.join(WARD, f'{S}.json')))['players']}
+                # two clubs in a season: the stint with the lower GAR on that line (the file's order when it was fit)
+                rows = [(x['gar'] + dl.get(x['pos'], 0.0) * x['min'] / 90, x) for x in json.load(open(os.path.join(WARD, f'{S}.json')))['players']]
+                gv[S] = {x['p']: x['gar90'] + dl.get(x['pos'], 0.0) for _, x in sorted(rows, key=lambda t: -t[0])}
             except (OSError, KeyError, ValueError):
                 gv[S] = {}
         return gv[S].get(p, V0)

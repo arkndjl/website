@@ -198,6 +198,7 @@ def snaps():
                     i = np.searchsorted(d, day, side='right') - 1
                     if i >= 0 and (day - d[i]).astype('timedelta64[D]').astype(int) <= 400:
                         r['mv'] = float(x[i])
+                r['gl'] = 'bottom3' if F.get('replFringe') else 'fringe'      # the replacement line of its GAR
                 out.append(r)
             print(S, md, len(out), flush=True)
     with gzip.open(SNAP, 'wt') as f:
@@ -318,6 +319,7 @@ def fit():
     (an input stays only if dropping it raises the error), then the gap test: does the held-out gap (xMV over the
     value) forecast the value's next move?"""
     rows = [r for r in D.load(SNAP) if r.get('dob')]
+    line = 'bottom3' if all(r.get('gl') == 'bottom3' for r in rows) else 'fringe'   # snapshots from before the line moved
     for r in rows:
         r['age'] = age_of(r['day'], r['dob'])
     levels(rows)
@@ -408,7 +410,7 @@ def fit():
             'moveAll': round(float(np.mean(ys)), 3),
             'to': 'next season end' if md == (7, 1) else 'this season end'}
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'seasons': [FIRST, LAST],
-           'lambda': LAM, 'feats': keep, 'names': {k: NAMES[k] for k in CANDS}, 'evidence': evidence,
+           'lambda': LAM, 'garLine': line, 'feats': keep, 'names': {k: NAMES[k] for k in CANDS}, 'evidence': evidence,
            'pooledHeldMse': round(best, 4), 'models': models, 'gapTest': test}
     print(json.dumps({k: v for k, v in out.items() if k not in ('names',)}, indent=1))
     json.dump(out, open(FIT, 'w'), indent=1, allow_nan=False)
@@ -488,12 +490,14 @@ def current():
     day = dt.date.today().isoformat()
     fn = os.path.join(SP.SDIR, f'{S}.json')
     J = json.load(open(fn))
+    # GAR on the line the fit was trained on: the fringe line until --snaps and --fit are rerun (garLine)
+    gv = (lambda o: o['gar']) if F.get('garLine') == 'bottom3' else (lambda o: SP.gar_fringe(o)[0])
     prev = {}
     for k in (1, 2):
         agg = defaultdict(lambda: [0.0, 0])
         try:
             for o in json.load(open(os.path.join(SP.SDIR, f'{S - k}.json')))['players']:
-                agg[o['p']][0] += o['gar']; agg[o['p']][1] += o['min']
+                agg[o['p']][0] += gv(o); agg[o['p']][1] += o['min']
         except OSError:
             pass
         prev[k] = agg
@@ -558,7 +562,7 @@ def current():
         if not dob or not n:
             continue
         r = {'p': o['p'], 'lg': o['lg'], 'pos': o['pos'], 'day': day, 'age': age_of(day, dob), 'min': o['min'], 'tmp': n,
-             'gar': o['gar'], 'gar1': prev[1][o['p']][0] if o['p'] in prev[1] else 0.0,
+             'gar': gv(o), 'gar1': prev[1][o['p']][0] if o['p'] in prev[1] else 0.0,
              'min1': prev[1][o['p']][1] if o['p'] in prev[1] else 0, 'gar2': prev[2][o['p']][0] if o['p'] in prev[2] else 0.0,
              'min2': prev[2][o['p']][1] if o['p'] in prev[2] else 0, 'tgd': gd / n, 'txgd': xgd / n,
              'tgd1': gd1 / n1 if n1 else None, 'txgd1': None, 'mv': mv_now(d), 'tm': i}

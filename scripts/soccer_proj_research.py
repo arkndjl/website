@@ -87,6 +87,7 @@ def snaps():
             pl, fl = snapshot(S, f, F, LS)
             out[f'{S}_{f}'] = {'p': pl, 'f': fl}
             print(S, f, len(pl), fl, flush=True)
+    out['garLine'] = 'bottom3' if F.get('replFringe') else 'fringe'      # the replacement line of the snapshots' GAR
     D.save(SNAPS, out)
 
 
@@ -124,6 +125,8 @@ def spearman(a, b):
 def main():
     SF = season_files()
     snap = D.load(SNAPS)
+    # the season files carry GAR on the bottom-three line: snapshots taken on the fringe line would mix two scales
+    assert snap.get('garLine') == 'bottom3', 'rerun --snaps: the snapshots are on the old replacement line'
     dob = SP.proj_dobs()
     res = {'note': 'pred = c . x, x = soccer_players.proj_x(); coefficients per season share f, linear in between',
            'forms': ['pool', 'age', 'agepos'], 'formsTried': 3, 'K': SP.PROJ_K, 'A0': SP.PROJ_A0}
@@ -206,6 +209,7 @@ def main():
             full = dict(zip(ix[form], g['c'][form]))
             g['live'] = [full.get(c, 0.0) for c in SP.PROJ_COLS]
     res['cols'] = SP.PROJ_COLS
+    res['garLine'] = 'bottom3'
     json.dump(res, open(OUT, 'w'), indent=1, allow_nan=False)
 
 

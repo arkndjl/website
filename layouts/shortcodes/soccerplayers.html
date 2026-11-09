@@ -1,7 +1,7 @@
 {{- /* Soccer players: every big-five player in a season (static/data/soccer-war/<season>.json, built by
        scripts/soccer_players.py), fetched and rendered by the browser 50 to a page.
-       view="value" (default): GAR = goals above replacement, (value a 90 - replacement at his position) x 90s
-       played; value a 90 = his shrunk per-90 rates (team xG against with him on, on minus off, his own npxG, xA,
+       view="value" (default): GAR = goals above replacement, (value a 90 - replacement at his position: the regulars
+       of bottom-three sides) x 90s played; value a 90 = his shrunk per-90 rates (team xG against with him on, on minus off, his own npxG, xA,
        xGBuildup; keepers: goals saved vs xG faced) at the weights that best carry last season's players to this
        season's team goal difference (data/soccer_war_fit.json), plus his league's strength x a scale measured on
        players who changed league, so every big-five league sits on one scale; PAR = GAR x league points per goal. xMV = estimated
@@ -60,11 +60,11 @@
         <th data-sort="ch" data-num title="xGChain: xG of every possession he touched">xGChain</th>
         <th data-sort="bu" data-num title="xGBuildup: xGChain without his shots and key passes">xGBuild</th>
         {{- else }}
-        <th data-sort="gar" data-num title="goals above replacement (the fringe of the squads at his position), on one scale across the big five: his league's strength counts">GAR</th>
+        <th data-sort="gar" data-num title="goals above replacement (the regulars of bottom-three sides at his position), on one scale across the big five: his league's strength counts">GAR</th>
         <th data-sort="par" data-num title="league points above replacement: GAR x points per goal of difference">PAR</th>
         <th data-sort="gar90" data-num title="goals above replacement a 90 minutes">/90</th>
-        <th data-sort="pj" data-num title="projected GAR next season, if he plays in the big five: this season at full-season pace, the two seasons before, minutes, age and position">1Y</th>
-        <th data-sort="p3" data-num title="projected GAR over the next three seasons (a season out of the big five counts 0)">3Y</th>
+        <th data-sort="pj" data-num title="projected GAR next season, if he plays in the big five: this season at full-season pace, the two seasons before, minutes, age and position. Over the earlier fringe line until its refit">1Y</th>
+        <th data-sort="p3" data-num title="projected GAR over the next three seasons (a season out of the big five counts 0). Over the earlier fringe line until its refit">3Y</th>
         <th data-sort="off" data-num title="attack part of GAR before replacement: his npxG, xA and xGBuildup at their weights">Off</th>
         <th data-sort="def" data-num title="defence part before replacement: team xG against with him on (keepers: goals saved vs xG faced)">Def</th>
         <th data-sort="onxgd" data-num class="nbaxpm__ph" title="team xG difference a 90 with him on the pitch (penalties out)">On xGD</th>
