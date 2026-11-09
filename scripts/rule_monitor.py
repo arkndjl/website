@@ -342,11 +342,12 @@ def bet(e):
 
 
 def judged(e):
-    """a logged pick that counts toward its rule's tests (stop, drift) and live record: the record's own bets. Pass
-    used to be set by the current line, which selected on the close (Nov 4 2026 audit: pass picks +3.3% CBB / +5.5% NBA
-    at the close, the rest -5.1% / -3.6%); now it is set by the model alone, before the start, so the tests and the
-    record count the same picks"""
-    return bet(e)
+    """a logged pick that counts toward its rule's tests (stop, drift): every pick the rule flagged that was played,
+    passes included. A pass is a pick the model later left, and the model moves on news the line also moves on: passed
+    picks were worth -3.4% at the close against -1.1% for the rest (NBA -5.8% against +2.6%), and whoever took the flag
+    price cannot undo it. The stake calibration (units.live_pairs) counts the same picks. The displayed record and the
+    bankroll stay the bets alone (bet())"""
+    return not (e.get('void') or e.get('res') == 'void')
 
 
 # k (the close's move per point of edge) is refit on every game model change and wanders in its third decimal (CBB
@@ -384,7 +385,8 @@ def legacy_k(c, defn):
 
 
 def pick_state(sport, RS, log, old, stamp, P=None):
-    """clocks and stops for one sport's pick rules: (state, stopped ids). old: the state games_picks.py kept last run.
+    """clocks and stops for one sport's pick rules: (state, stopped ids). old: the state games_picks.py kept last run;
+    log: every flagged pick (the log and the withdrawn picks kept beside it).
     A rule's clock restarts when its market, segment or X changes or k moves past K_TOL, and only that clears a stop
     (Nov 5 2026: a refit that re-tests the rule is one that changes it; before, any refit whose fit entry moved, which
     every game model PR does, cleared the stop, so a stop rarely outlived the next merge)."""
@@ -473,12 +475,14 @@ def build(now=None):
         for i in ids:
             defn, full, held, label = rules.get(i, (None, None, None, i))
             since = ((mon.get('clocks') or {}).get(i) or {}).get('since') or (RJ.get('asof') or '')[:10]
-            bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
+            # the record shown is the bets; the tests count every flagged pick (judged())
+            bs = [e for e in log if bet(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
+            bt = [e for e in log + gp.get('withdrawnLog', []) if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
             sd = sd_of(held)
             mu1, rho = expected_live(s, held), rho_for(s, (defn or {}).get('mk') or i.split(' | ')[0], held)
-            chk = (mon.get('checks') or {}).get(i) or decide(bs, sd, P, mu1, rho)
+            chk = (mon.get('checks') or {}).get(i) or decide(bt, sd, P, mu1, rho)
             stop = (mon.get('stopped') or {}).get(i)
-            dr = drift(bs, mu1, sd, rho, P)
+            dr = drift(bt, mu1, sd, rho, P)
             rows.append({'id': f'pick:{s}:{i}', 'book': 'picks', 'sport': s, 'label': f"{s.upper()} {label}", 'since': since[:10],
                          'status': 'stopped' if stop else ('on' if i in rules else 'off'), 'stopped': stop,
                          **summary(bs, now, P, sd, held), 'check': chk, 'drift': dr})
@@ -632,9 +636,11 @@ def test():
     logd = [{'mk': 'total', 'flagged': '2026-11-01T15:00:00Z', 'kick': b['kick'], 'clvRet': b['clvRet']} for b in wk(-0.005, 600)]
     st5, off5 = pick_state('cfb', RSd, logd, {}, '2026-12-30T00:00:00Z', P)
     assert off5 == {'total'} and st5['stopped']['total']['test'] == 'drift', st5['checks']['total']
-    # pass picks (the model moved before the start) and voids were never bets: they don't count toward a stop
+    # pass picks (the model moved before the start) were flagged at a line someone could take: they count toward the
+    # tests like any pick, as do withdrawn ones; a void (never played) does not
     st6, off6 = pick_state('nba', RS, [{**e, 'pass': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
-    assert not off6 and st6['checks']['total']['n'] == 0, st6['checks']['total']
+    assert off6 == {'total'} and st6['checks']['total']['n'] == len(log), st6['checks']['total']
+    assert judged({'pass': True}) and judged({'withdrawn': 'x'}) and not bet({'pass': True}) and not judged({'res': 'void'})
     st7, _ = pick_state('nba', RS, [{**e, 'void': True} for e in log], {}, '2026-11-30T00:00:00Z', P)
     assert st7['checks']['total']['n'] == 0, st7['checks']['total']
     print('rule monitor: ok, false-alarm share at the close over 300 bets', fa)

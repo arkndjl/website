@@ -1162,7 +1162,9 @@ def live(sport):
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     # the live rule monitor (scripts/rule_monitor.py): a rule or segment losing to the close since its clock started
     # stops here, and its open picks are withdrawn below, until a refit changes or re-tests it
-    mon, stopped = RM.pick_state(sport, {**RS, '_asof': RJ.get('asof')}, log, old.get('monitor'), stamp)
+    # the tests count every pick the rules flagged (rule_monitor.judged): passes, and the withdrawn ones kept in wlog
+    wlog = old.get('withdrawnLog', [])
+    mon, stopped = RM.pick_state(sport, {**RS, '_asof': RJ.get('asof')}, log + wlog, old.get('monitor'), stamp)
     for i in stopped:
         if ' | ' not in i and R.get(i):
             R[i] = {**R[i], 'on': False, 'why': 'stopped by the live monitor: ' + (
@@ -1199,7 +1201,7 @@ def live(sport):
     # placeholder, 00:00 ET of game day, kept it after the time was set, so it froze as started half a day early:
     # restake, pass, the night cap's locked stakes and the alerts all read the placeholder; Minnesota at UCLA, 05:00Z
     # vs a 17:00Z kick). The odds archive's close already uses each snapshot's own start.
-    for e in log:
+    for e in log + wlog:
         g = Gb.get(e['id'])
         if g and e.get('res') is None and g.get('kick') and iso(g['kick']) != iso(e['kick']):
             e['kick'] = g['kick']
@@ -1222,6 +1224,10 @@ def live(sport):
     wd = [e for e in old.get('withdrawn', []) if iso(e['kick']) > now - datetime.timedelta(hours=4)]
     wd += [{**{k: e[k] for k in ('id', 'sport', 'kick', 'home', 'away', 'mk', 'side', 'line', 'price', 'units', 'edge', 'x') if k in e}, 'withdrawn': stamp} for e in gone]
     if gone:
+        # out of the log (the record, the bankroll, the paper book and the night cap read it as the bets), kept whole in
+        # withdrawnLog and graded there like any pick: it was flagged at a line someone could take, so the close value
+        # tests and the stake calibration count it (rule_monitor.judged, units.live_pairs)
+        wlog = wlog + [{**e, 'withdrawn': stamp} for e in gone]
         log = [e for e in log if e not in gone]
         print(f'{sport}: withdrew {len(gone)} open picks whose rule is off:', ', '.join(f"{e['away']}@{e['home']} {e['mk']} {e['side']}" for e in gone))
     # one pick a game per family, the side (spread or its moneyline) and the total (a game whose total
@@ -1310,7 +1316,7 @@ def live(sport):
                 lo, hi = math.floor((mm - x_) * 2) / 2, math.ceil((mm + x_) * 2) / 2
                 e['betTo'] = lo if e['side'] in ('over', 'home') else hi
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
-    for e in log:
+    for e in log + wlog:
         g = G.get(e['id'])
         if g and e.get('res') is None and iso(g['kick']) > now:
             e['close'] = g['T'] if e['mk'] == 'total' else g['L']
@@ -1341,7 +1347,7 @@ def live(sport):
         e['profit'] = 0.0 if win is None else round(dec(e['price']) - 1 if win else -1.0, 3)
     # closing line value: the pick's line and price against the close (the last line archived before the start, else
     # the last this build saw), as points and as the return the bet was worth if the close is the true price
-    for e in log:
+    for e in log + wlog:
         if e.get('res') in (None, 'void'):
             continue
         c = closes.get(str(e['id']))
@@ -1396,7 +1402,7 @@ def live(sport):
     timing = C.timing(sport, arch, mins[sport])
     out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'monitor': mon, 'picks': picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
-           'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
+           'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log, 'withdrawnLog': wlog}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
         return print(f'{sport} picks: no change')
     with open(fn, 'w') as f:

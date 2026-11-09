@@ -426,11 +426,14 @@ def et_day(kick):
 
 
 def live_pairs(sport, mk):
-    """(gap, clvRet, slate) of graded live picks: the games_picks log and the paper book; slate is the ET date"""
+    """(gap, clvRet, slate) of graded live picks: the games_picks log (every flagged pick) and the paper book; slate is
+    the ET date"""
     out = []
     try:
         import clv as C
-        for e in json.load(open(os.path.join(ROOT, 'data', f'games_picks_{sport}.json'))).get('log', []):
+        gp = json.load(open(os.path.join(ROOT, 'data', f'games_picks_{sport}.json')))
+        # every flagged pick: passes, and the withdrawn ones kept beside the log (the picks rule_monitor.judged tests)
+        for e in gp.get('log', []) + gp.get('withdrawnLog', []):
             # judged at BASE, the price the calibration's level is read at, and no moneylines (Nov 2 2026 audit: a -110
             # pick reads ~3 points lower than at -103, and a plus-money moneyline's return is on another scale)
             if e.get('clvRet') is None or e.get('edge') is None or e['mk'] != mk:
