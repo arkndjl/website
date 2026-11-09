@@ -169,13 +169,15 @@ def nba():
     ak, a0 = af['k'], af['A0']
     pg = J('data', 'nba_rookie_proj_fit.json')['grid']           # rookie projection: scripts/nba_rookie_proj_research.py
 
+    ck = 'cp' if all('cp' in g for g in pg) else 'c'            # XPM given he plays (nba_rookie_proj_play_research.py)
+
     def r3c(f):                                                 # coefficients at season share f, linear between grid points
         f = min(max(f, pg[0]['f']), 1.0)
         for a, b in zip(pg, pg[1:]):
             if f <= b['f']:
                 w = (f - a['f']) / (b['f'] - a['f'])
-                return [u + (v - u) * w for u, v in zip(a['c'], b['c'])]
-        return pg[-1]['c']
+                return [u + (v - u) * w for u, v in zip(a[ck], b[ck])]
+        return pg[-1][ck]
     seen, seasons = set(), []
     for S in files:
         d = json.load(open(os.path.join(SD, 'nba-xpm', f'{S}.json')))
@@ -216,12 +218,12 @@ def nba():
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
         'def': 'rookies: first season on the XPM board. pre-draft FV = the CBB board\'s draft-year FV (college players only); slot = overall pick.',
         'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (XPM + 1.4) x MP / 48'], ['xpm', 'XPM', 'XPM: points per 100 over average, shrunk by minutes (MP / (MP + 300))'],
-                  ['r3', '3Y', 'rookie projection: XPM over the next three seasons, from XPM, age and minutes per 82 games'],
+                  ['r3', '3Y', 'rookie projection: XPM over the next three seasons when he plays, from XPM, age and minutes per 82 games'],
                   ['axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0})"],
                   ['pxpm', 'Proj', 'XPM (proj): this season blended with the preseason prior by minutes (current season)'],
                   ['sur', 'Surplus', 'contract surplus this season: projected VORX x $ per win - salary, $M (current season)']],
         'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'XPM', 'XPM, points per 100 over average, shrunk by minutes', 's1'),
-                 col('r3', '3Y', 'rookie projection: XPM over the next three seasons, from XPM, age and minutes per 82 games', 's1', 1),
+                 col('r3', '3Y', 'rookie projection: XPM over the next three seasons when he plays, from XPM, age and minutes per 82 games', 's1', 1),
                  col('axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0}), fit on 2010-23 rookies' next three seasons", 's1', 1),
                  col('pxpm', 'Proj', 'XPM (proj): season blended with the prior', 's1', 1), col('oxpm', 'Off', 'offensive XPM', 's1', 1),
                  col('dxpm', 'Def', 'defensive XPM', 's1', 1), col('sur', 'Surplus', 'contract surplus this season, $M', 'm', 1),

@@ -81,8 +81,8 @@
              { k: 'p20', l: 'P20', num: 1, cls: '', t: '20th percentile: 1 in 5 outcomes fall below' },
              { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median' },
              { k: 'p80', l: 'P80', num: 1, cls: '', t: '80th percentile: 1 in 5 outcomes land above' }];
-    var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: 'nbaxpm__ph', x: 1, t: '1Y: projected XPM next season, minutes-weighted (XPM (proj) + age + projected minutes; data/nba_proj3y_fit.json)' },
-              { k: 'x3', l: '3Y XPM', num: 1, cls: '', x: 1, t: '3Y: projected XPM over the next three seasons, minutes-weighted, a season off the board counting as -2 over 1,000 minutes. Held out 2012-23: RMSE .84 vs .90 for XPM (proj) on the aging curve' }];
+    var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: 'nbaxpm__ph', x: 1, t: '1Y: projected XPM next season when he plays, minutes-weighted. Time off the board is not counted' },
+              { k: 'x3', l: '3Y XPM', num: 1, cls: '', x: 1, t: '3Y: projected XPM over the next three seasons when he plays, minutes-weighted. Time off the board is not counted' }];
     function sx(x) { return x == null ? '<span class="cfb__dim">–</span>' : x < 0 ? '<span class="cfb__down">' + x.toFixed(1) + '</span>' : '+' + x.toFixed(1); }
     function val(r, k, span) {
       if (k === 'g' || k === 'age' || k === 'x1' || k === 'x3') return r[k] == null ? null : r[k];
