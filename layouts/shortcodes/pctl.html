@@ -52,7 +52,7 @@
       var u = !r.ph ? '' : SP === 'nfl' ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r.ph : 'https://a.espncdn.com/combiner/i?img=/i/headshots/' + SP + '/players/full/' + r.ph + '.png&w=96&h=70&scale=crop';
       return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
     }
-    function tl(t) { t = String(t || '').split('/').pop(); return SP && t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + SP + '/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
+    function tl(t) { t = String(t || '').split('/').pop(); return SP && t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + SP + '/' + esc(t.toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
     function T() { return D.targets.filter(function (t) { return t.k === stat; })[0] || D.targets[0]; }
     function fmt(x) {
       if (x == null) return '<span class="cfb__dim">–</span>';
@@ -61,7 +61,7 @@
     }
     function rowsOf() { return D.players.filter(function (r) { return r.ros[stat] != null || (r.ssn && r.ssn[stat]); }); }
     function chips() {
-      var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + t.k + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
+      var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + esc(t.k) + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
       var have = {}, ps = [];
       rowsOf().forEach(function (r) { if (!have[r.pos]) { have[r.pos] = 1; ps.push(r.pos); } });
       ps.sort();
@@ -118,7 +118,7 @@
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var CC = SP === 'nba' && D.players.some(function (r) { return r.x3 != null; }) ? C.concat(XC) : C;
       head.innerHTML = CC.map(function (c) {
-        return '<th data-sort="' + c.k + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
+        return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
       }).join('');
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
         return '<tr>' + CC.map(function (c) {

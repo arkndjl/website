@@ -98,7 +98,7 @@
   var LOGO = {{ site.Data.soccer_logos.espn | jsonify | safeJS }};
   function logo(t) { return LOGO[t] ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + LOGO[t] + '.png" alt="" width="16" height="16" loading="lazy"> ' : ''; }
   var CTRY = {{ site.Data.soccer_countries.name | jsonify | safeJS }};
-  function flag(c) { return c ? '<img class="flag" src="/img/flags/' + c + '.png" alt="' + c + '" title="' + esc(CTRY[c] || c) + '" width="16" height="11" loading="lazy" onerror="this.remove()"> ' : ''; }
+  function flag(c) { return c ? '<img class="flag" src="/img/flags/' + esc(c) + '.png" alt="' + esc(c) + '" title="' + esc(CTRY[c] || c) + '" width="16" height="11" loading="lazy" onerror="this.remove()"> ' : ''; }
   // Transfermarkt portrait (ph) or FotMob's (fph); none, or one that fails, shows the neutral frame
   function face(p) {
     var u = p.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + p.ph : p.fph ? 'https://images.fotmob.com/image_resources/playerimages/' + p.fph + '.png' : '/img/face.svg';
@@ -205,7 +205,7 @@
           : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.pj) + '</td><td class="cfb__num">' + sg(p.p3) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
             '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
         var fv = '<td class="cfb__num">' + (p.fv ? '<b>' + p.fv + '</b>' + (p.prov ? '<span class="cfb__dim" title="provisional grade">*</span>' : '') : '<span class="cfb__dim">–</span>') + '</td>';
-        return head + mid + fv + '<td class="cfb__g">' + (p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
+        return head + mid + fv + '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
           '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
       }).join('');
       none.hidden = list.length > 0;
