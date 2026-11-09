@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T16:50Z",
+ "asof": "2026-11-09T18:42Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2552,
+   "players": 2554,
    "rows": 16718
   },
   "nba": {
@@ -3423,7 +3423,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -3444,6 +3444,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-09",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Reassigned to minors",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Reassigned to minors",
+      "kind": "down"
+     },
+     "pid": "6709",
+     "player": "Filip Bystedt",
+     "pos": "C",
+     "rotowire": "SJS",
+     "site": "SJS"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -3644,7 +3662,7 @@
     }
    ],
    "joined": 0,
-   "players": 1386,
+   "players": 1387,
    "rows": 3188
   }
  }

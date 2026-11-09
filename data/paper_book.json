@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T16:47:43Z",
+ "asof": "2026-11-09T18:43:11Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 86.89,
   "peak": 117.38,
   "drawdown": 0.2597,
-  "open": 70.0,
+  "open": 71.0,
   "path": [
    101.66,
    100.41,
@@ -412,12 +412,12 @@
   ]
  },
  "record": {
-  "n": 443,
-  "clvN": 405,
-  "clvRet": -0.0143,
-  "clvT": -2.95,
-  "clv": -0.1,
-  "beat": 0.3,
+  "n": 444,
+  "clvN": 407,
+  "clvRet": -0.0139,
+  "clvT": -2.86,
+  "clv": -0.07,
+  "beat": 0.301,
   "settled": 405,
   "w": 200,
   "l": 205,
@@ -428,23 +428,23 @@
   "risked": 367.25,
   "yield": -0.0305
  },
- "tEff": -2.95,
+ "tEff": -2.87,
  "corr": {
   "rho": 0.0,
-  "n": 405,
+  "n": 407,
   "slates": 38,
-  "nEff": 405.0,
-  "avgSlate": 10.66
+  "nEff": 407.0,
+  "avgSlate": 10.71
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 405,
+   "value": 407,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.4% t -2.95",
+   "value": "-1.4% t -2.87",
    "pass": false
   },
   {
@@ -454,7 +454,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-spread: -1.7%",
+   "value": "without nba-spread: -1.6%",
    "pass": false
   },
   {
@@ -491,7 +491,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 42,
+   "n": 43,
    "clvN": 23,
    "clvRet": -0.0361,
    "clvT": -1.77,
@@ -681,11 +681,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 80,
-   "clvN": 77,
-   "clvRet": -0.0202,
-   "clvT": -4.7,
-   "clv": -0.21,
-   "beat": 0.247,
+   "clvN": 79,
+   "clvRet": -0.0178,
+   "clvT": -3.71,
+   "clv": -0.1,
+   "beat": 0.253,
    "settled": 77,
    "w": 40,
    "l": 37,
@@ -737,7 +737,11 @@
    "edge": 7.5,
    "ev": 0.0009,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.1648,
+   "clv": 8.8,
+   "beat": 1,
+   "close": 0.56
   },
   {
    "rule": "tennis-ml",
@@ -757,7 +761,11 @@
    "edge": 6.8,
    "ev": 0.0055,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0157,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.4825
   },
   {
    "rule": "nba-spread",
@@ -778,7 +786,7 @@
    "ev": 0.0044,
    "event": null,
    "pass": false,
-   "close": 1.5
+   "close": 2.5
   },
   {
    "rule": "nba-total",
@@ -799,7 +807,7 @@
    "ev": 0.02,
    "event": null,
    "pass": false,
-   "close": 236.5
+   "close": 235.5
   },
   {
    "rule": "nba-spread",
@@ -862,7 +870,7 @@
    "ev": 0.0553,
    "event": null,
    "pass": false,
-   "close": 3.5
+   "close": 2.5
   },
   {
    "rule": "nba-total",
@@ -883,7 +891,7 @@
    "ev": 0.0019,
    "event": null,
    "pass": false,
-   "close": 229.5
+   "close": 228.5
   },
   {
    "rule": "nba-total",
@@ -1068,7 +1076,7 @@
    "ev": 0.0341,
    "event": null,
    "pass": false,
-   "close": 227.5
+   "close": 225.5
   },
   {
    "rule": "tennis-ml",
@@ -1360,7 +1368,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 74.5
+   "close": 73.5
   },
   {
    "rule": "cfb-total",
@@ -1444,7 +1452,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -1507,7 +1515,7 @@
    "ev": 0.0014,
    "event": null,
    "pass": false,
-   "close": 77.5
+   "close": 76.5
   },
   {
    "rule": "cfb-total",
@@ -1550,6 +1558,27 @@
    "event": null,
    "pass": false,
    "close": 41.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401860917",
+   "k": "2026-11-15T03:30:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "Washington State",
+   "a": "Colorado State",
+   "mk": "total",
+   "side": "under",
+   "line": 66.5,
+   "price": -108.0,
+   "bet": "under 66.5 -108",
+   "placed": "2026-11-09T18:42:58Z",
+   "stake": 1.0,
+   "edge": 9.5,
+   "ev": 0.0102,
+   "event": null,
+   "pass": false,
+   "close": 66.5
   },
   {
    "rule": "cfb-total",
@@ -17057,7 +17086,11 @@
    "edge": 7.5,
    "ev": 0.0009,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.1648,
+   "clv": 8.8,
+   "beat": 1,
+   "close": 0.56
   },
   {
    "rule": "tennis-ml",
@@ -17077,7 +17110,11 @@
    "edge": 6.8,
    "ev": 0.0055,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0157,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.4825
   },
   {
    "rule": "nba-spread",
@@ -17098,7 +17135,7 @@
    "ev": 0.0044,
    "event": null,
    "pass": false,
-   "close": 1.5
+   "close": 2.5
   },
   {
    "rule": "nba-total",
@@ -17119,7 +17156,7 @@
    "ev": 0.02,
    "event": null,
    "pass": false,
-   "close": 236.5
+   "close": 235.5
   },
   {
    "rule": "nba-spread",
@@ -17182,7 +17219,7 @@
    "ev": 0.0553,
    "event": null,
    "pass": false,
-   "close": 3.5
+   "close": 2.5
   },
   {
    "rule": "nba-total",
@@ -17203,7 +17240,7 @@
    "ev": 0.0019,
    "event": null,
    "pass": false,
-   "close": 229.5
+   "close": 228.5
   },
   {
    "rule": "nba-total",
@@ -17388,7 +17425,7 @@
    "ev": 0.0341,
    "event": null,
    "pass": false,
-   "close": 227.5
+   "close": 225.5
   },
   {
    "rule": "tennis-ml",
@@ -17680,7 +17717,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 74.5
+   "close": 73.5
   },
   {
    "rule": "cfb-total",
@@ -17764,7 +17801,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -17827,7 +17864,7 @@
    "ev": 0.0014,
    "event": null,
    "pass": false,
-   "close": 77.5
+   "close": 76.5
   },
   {
    "rule": "cfb-total",
@@ -17870,6 +17907,27 @@
    "event": null,
    "pass": false,
    "close": 41.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401860917",
+   "k": "2026-11-15T03:30:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "Washington State",
+   "a": "Colorado State",
+   "mk": "total",
+   "side": "under",
+   "line": 66.5,
+   "price": -108.0,
+   "bet": "under 66.5 -108",
+   "placed": "2026-11-09T18:42:58Z",
+   "stake": 1.0,
+   "edge": 9.5,
+   "ev": 0.0102,
+   "event": null,
+   "pass": false,
+   "close": 66.5
   },
   {
    "rule": "cfb-total",
