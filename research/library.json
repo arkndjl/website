@@ -1212,8 +1212,8 @@
      "term": "Model ledger",
      "short": "Shared rule for every model term.",
      "body": [
-      "Evidence = Stouffer z of tuning and held-out t (drop-one). One Benjamini-Hochberg family over all terms.",
-      "Keep at q <= .10; drop at q > .10 when held-out loss is no worse without it; otherwise watch.",
+      "Evidence = the held-out t alone (drop-one); the tuning t is shown, not combined. One Benjamini-Hochberg family over all terms with a held-out split.",
+      "Keep at q <= .10; drop at q > .10 when held-out loss is no worse without it; otherwise watch. No held-out split = watch.",
       "Terms past 365 days are flagged for re-test."
      ],
      "where": "Predictions game models tab (ledger view)",
@@ -1265,6 +1265,7 @@
      "body": [
       "Edge = min(EV, a + b (gap - mean gap)); a blends close value and ROI; b = the market's own slope, shrunk.",
       "History priced at Novig -103. TIMING .5 halves every backtest edge (live bets come after part of the move).",
+      "Chance at the bet line = the market mid there (from both asks) + the calibrated chance edge; gap measured from the market fair line.",
       "NBA backtest edge also x.5 (history saw tip-time injury news the open did not)."
      ],
      "where": "Predictions picks backtest",
@@ -1384,7 +1385,9 @@
      "term": "Rule monitor (CUSUM)",
      "short": "Live switch that stops a losing pick rule until a refit.",
      "body": [
-      "Judged after 50+ picks: stop if last 300 clustered t < -1 or CUSUM S = max(0, S - clvRet / sd - .25) >= 10."
+      "Judged after 50+ picks, by game day, each day over 1 + (n - 1) rho (rho = within-slate correlation of close value, held-out picks).",
+      "Stop if CUSUM around zero S = max(0, S - clvRet / sd - .25) >= 10, or CUSUM of the log likelihood ratio (no edge vs the stakes' edge) >= ln 99.",
+      "Last-300 clustered t (se floored at iid) is shown, not a stop."
      ],
      "where": "Predictions picks backtest (rule monitor), game models tab",
      "sports": [
@@ -1399,8 +1402,8 @@
      "term": "Rule drift test (SPRT)",
      "short": "Sequential test of each rule's live close value vs its backtest.",
      "body": [
-      "H1 = backtest edge x TIMING; H0 = 0. Pause at 19:1 for no edge; confirm at 19:1 for the edge.",
-      "About 120 (NBA/CBB totals) to 275 (CFB totals) bets to a verdict."
+      "H1 = backtest edge x TIMING; H0 = 0; game days deflated by the within-slate correlation of close value. Pause at 19:1 for no edge; confirm at 19:1 for the edge.",
+      "About 250 (NBA totals) to 430 (CBB, CFB totals) bets to stop a rule with no edge."
      ],
      "where": "Predictions picks backtest (new rules)",
      "sports": [

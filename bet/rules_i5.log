@@ -1,0 +1,116 @@
+cfb spread off x None tune None held None no edge cut beat the close on the tuning seasons
+cfb total off x 3.0 tune {'n': 917, 'clvRet': 0.0289, 'clvT': 5.71, 'clv': 0.9, 'beat': 0.573, 'w': 504, 'l': 402, 'roi': 0.0952, 'roiT': 2.96} held {'n': 813, 'clvRet': 0.0407, 'clvT': 9.85, 'clv': 1.13, 'beat': 0.604, 'w': 472, 'l': 341, 'roi': 0.1442, 'roiT': 4.23, 'clvIcc': 0.038} did not beat the close by the stakes' break-even on the validation season
+nfl spread on x 4.0 tune {'n': 172, 'clvRet': 0.0219, 'clvT': 2.12, 'clv': 0.69, 'beat': 0.517, 'w': 102, 'l': 66, 'roi': 0.192, 'roiT': 2.64} held {'n': 132, 'clvRet': 0.0957, 'clvT': 8.75, 'clv': 1.83, 'beat': 0.773, 'w': 77, 'l': 53, 'roi': 0.1648, 'roiT': 1.96, 'clvIcc': 0.138} 
+nfl total on x 1.5 tune {'n': 639, 'clvRet': 0.0487, 'clvT': 11.78, 'clv': 1.07, 'beat': 0.665, 'w': 334, 'l': 292, 'roi': 0.0505, 'roiT': 1.31} held {'n': 414, 'clvRet': 0.0334, 'clvT': 5.41, 'clv': 0.81, 'beat': 0.553, 'w': 214, 'l': 197, 'roi': 0.026, 'roiT': 0.54, 'clvIcc': 0.233} 
+cbb spread on x 2.5 tune {'n': 5511, 'clvRet': 0.0342, 'clvT': 25.17, 'clv': 0.69, 'beat': 0.611, 'w': 3099, 'l': 2284, 'roi': 0.1315, 'roiT': 10.14} held {'n': 4362, 'clvRet': 0.0343, 'clvT': 20.17, 'clv': 0.7, 'beat': 0.543, 'w': 2414, 'l': 1926, 'roi': 0.0958, 'roiT': 6.47, 'clvIcc': 0.01} 
+cbb total on x 2.0 tune {'n': 10390, 'clvRet': 0.0494, 'clvT': 46.71, 'clv': 1.34, 'beat': 0.678, 'w': 5786, 'l': 4450, 'roi': 0.1124, 'roiT': 11.81} held {'n': 7151, 'clvRet': 0.0493, 'clvT': 37.47, 'clv': 1.34, 'beat': 0.646, 'w': 3841, 'l': 3282, 'roi': 0.0625, 'roiT': 5.39, 'clvIcc': 0.058} 
+nba spread off x None tune None held None no edge cut beat the close on the tuning seasons
+nba total on x 3.0 tune {'n': 966, 'clvRet': 0.0754, 'clvT': 19.64, 'clv': 2.08, 'beat': 0.756, 'w': 519, 'l': 434, 'roi': 0.0723, 'roiT': 2.31} held {'n': 741, 'clvRet': 0.1183, 'clvT': 22.39, 'clv': 3.1, 'beat': 0.772, 'w': 414, 'l': 327, 'roi': 0.1011, 'roiT': 2.81, 'clvIcc': 0.074} 
+segments tested 57 kept 14
+  KEEP cfb spread game non-conference x 8.0 tune 0.0239 91 val 111 0.0541 3.48 held 99 0.0287 1.73 55 44 0.0949 p 0.00554
+  KEEP cfb spread line 7-14 x 8.0 tune 0.0265 32 val 20 0.0696 2.72 held 32 0.0617 2.24 19 13 0.1702 p 0.01578
+  KEEP cfb spread role favorite x 8.0 tune 0.0202 44 val 38 0.0822 3.18 held 52 0.0778 3.2 30 22 0.137 p 0.0044
+  drop cfb spread season early x 8.0 tune 0.0536 61 val 94 0.047 2.63 held 82 0.0396 2.3 47 35 0.1296 p 0.03673
+  drop cfb spread season late x 6.0 tune 0.0027 225 val 112 0.0367 2.93 held 105 0.0365 2.28 60 44 0.1357 p 0.03836
+  drop cfb spread venue home x 8.0 tune 0.0202 55 val 61 0.0519 2.68 held 59 0.0667 3.22 35 24 0.1692 p 0.03836
+  KEEP cfb total conf Big 12 x 4.0 tune 0.0325 30 val 24 0.0976 3.56 held 23 0.0612 2.94 11 12 -0.0574 p 0.00122
+  KEEP cfb total game non-conference x 8.0 tune 0.0712 28 val 35 0.1055 3.1 held 23 0.0462 1.87 14 9 0.1997 p 0.0099
+  drop cfb total season early x 4.5 tune 0.0308 139 val 96 0.0464 2.81 held 168 0.0486 5.06 95 73 0.1145 p 0.0268
+  KEEP cfb total side over x 7.5 tune 0.0716 27 val 25 0.0864 2.97 held 15 0.0444 1.74 9 6 0.1825 p 0.00676
+  KEEP cfb total tier G5 x 6.5 tune 0.0537 35 val 47 0.0736 3.2 held 47 0.0714 3.65 27 20 0.1322 p 0.01017
+  KEEP cfb total tier mixed x 6.5 tune 0.0497 29 val 28 0.0951 2.98 held 30 0.0324 1.22 15 15 -0.0146 p 0.00587
+  KEEP cfb total total high x 5.5 tune 0.0396 120 val 77 0.074 3.63 held 74 0.0473 3.27 43 31 0.1452 p 0.00695
+  drop cfb total total low x 4.5 tune 0.0423 71 val 75 0.0393 2.81 held 96 0.0273 2.25 55 41 0.1291 p 0.03836
+  KEEP nba spread line 4-9 x 4.0 tune 0.0275 102 val 29 0.1189 5.37 held 83 0.1181 7.69 48 34 0.1518 p 0.00047
+  drop nba spread role dog x 3.5 tune 0.027 269 val 93 0.068 5.26 held 227 0.0897 9.42 119 108 0.0332 p 0.03438
+  KEEP nba spread role favorite x 2.5 tune 0.0565 133 val 73 0.1405 8.67 held 224 0.1053 12.83 135 88 0.1923 p 0.0
+  KEEP nba spread season late x 4.5 tune 0.0305 81 val 40 0.1286 5.78 held 93 0.1182 7.94 50 43 0.0596 p 0.0003
+  KEEP nba spread venue away x 4.5 tune 0.0305 65 val 22 0.1176 4.05 held 48 0.133 5.83 27 21 0.1086 p 0.00539
+  KEEP nba spread venue home x 4.5 tune 0.0305 48 val 26 0.1378 4.54 held 90 0.123 8.23 53 37 0.1606 p 0.00097
+cfb adds {'n': 256, 'clvRet': 0.0458, 'clvT': 5.09, 'clv': 1.29, 'beat': 0.582, 'w': 140, 'l': 116, 'roi': 0.0778, 'roiT': 1.27, 'seasons': [2023, 2024, 2025, 2026], 'weeks': 76, 'perWeek': 3.4}
+nba adds {'n': 348, 'clvRet': 0.1045, 'clvT': 14.84, 'clv': 1.8, 'beat': 0.733, 'w': 201, 'l': 146, 'roi': 0.1412, 'roiT': 2.71, 'seasons': [2025, 2026], 'weeks': 69, 'perWeek': 5.0}
+cfb spread (n 80): edge = 0.019 + 0.0000 (gap - 10.17) [se 0.012, 0.0055; own b -0.0011 se 0.0055; close 0.019 se 0.013, roi 0.022 se 0.056, cover 0.537]; rho 0.002 nbar 3.2; lam own 0.1 cap 25.0 -> lam 0.6 cap 1.0; peak 3.0, growth 0 at None (uncapped 0.5)
+   uncapped [(0.25, 0.49, 0.07), (0.5, 0.85, -0.02), (0.75, 1.21, -0.18), (1.0, 1.57, -0.4), (1.25, 1.94, -0.69), (1.5, 2.31, -1.04), (2.0, 3.08, -1.95), (2.5, 3.84, -3.22), (3.0, 4.61, -5.0)]
+   new: mean 0.56u max 1.0u, growth/season close 0.1% real -0.28%, dd25 0.0 dd50 0.0, season 0.955-1.001-1.047
+   old: mean 1.7u max 3.0u, growth/season close 0.56% real 0.95%, dd25 0.001 dd50 0.0, season 0.879-1.009-1.141
+   median pick {'gap': 9.99, 'ev': 0.105, 'edge': 0.0192, 'u': 0.701, 'units': 1.5}
+   caps at lam {'1.0': 0.1, '2.0': -0.02, '3.0': -0.08, '5.0': -0.08, '7.5': -0.08, '10.0': -0.08, '15.0': -0.08, '25.0': -0.08}
+   0.5x Kelly: mean 0.85u, growth/season -0.02%, dd25 0.0 dd50 0.0, season 0.925-1.001-1.078
+   1x Kelly: mean 1.57u, growth/season -0.4%, dd25 0.013 dd50 0.0, season 0.853-1.0-1.155
+   1.5x Kelly: mean 2.31u, growth/season -1.04%, dd25 0.053 dd50 0.002, season 0.78-0.999-1.235
+   2x Kelly: mean 3.08u, growth/season -1.95%, dd25 0.103 dd50 0.01, season 0.705-0.997-1.318
+cfb total (n 140): edge = 0.019 + 0.0002 (gap - 7.05) [se 0.007, 0.0036; own b 0.0013 se 0.0036; close 0.019 se 0.007, roi 0.035 se 0.042, cover 0.550]; rho 0.000 nbar 3.4; lam own 0.1 cap 25.0 -> lam 0.45 cap 1.0; peak 2.15, growth 0 at None (uncapped 0.8)
+   uncapped [(0.25, 0.48, 0.12), (0.5, 0.93, 0.1), (0.75, 1.39, 0.01), (1.0, 1.86, -0.18), (1.25, 2.32, -0.45), (1.5, 2.79, -0.83), (2.0, 3.72, -1.9), (2.5, 4.65, -3.44), (3.0, 5.58, -5.54)]
+   new: mean 0.75u max 1.0u, growth/season close 0.21% real 1.35%, dd25 0.0 dd50 0.0, season 0.929-1.003-1.077
+   old: mean 2.99u max 3.0u, growth/season close 0.45% real 7.54%, dd25 0.105 dd50 0.0, season 0.756-1.004-1.315
+   median pick {'gap': 6.912173913043482, 'ev': 0.0358, 'edge': 0.0186, 'u': 0.888, 'units': 1.75}
+   caps at lam {'1.0': 0.21, '2.0': 0.1, '3.0': 0.1, '5.0': 0.1, '7.5': 0.1, '10.0': 0.1, '15.0': 0.1, '25.0': 0.1}
+   0.5x Kelly: mean 0.93u, growth/season 0.1%, dd25 0.0 dd50 0.0, season 0.904-1.002-1.098
+   1x Kelly: mean 1.86u, growth/season -0.18%, dd25 0.024 dd50 0.0, season 0.813-1.002-1.2
+   1.5x Kelly: mean 2.79u, growth/season -0.83%, dd25 0.112 dd50 0.002, season 0.722-0.999-1.309
+   2x Kelly: mean 3.72u, growth/season -1.9%, dd25 0.223 dd50 0.016, season 0.639-0.995-1.421
+nfl spread (n 117): edge = 0.046 + 0.0012 (gap - 5.49) [se 0.007, 0.0055; own b 0.0037 se 0.0055; close 0.045 se 0.007, roi 0.082 se 0.046, cover 0.600]; rho 0.007 nbar 2.1; lam own 1.05 cap 5.0 -> lam 1.05 cap 5.0; peak 1.35, growth 0 at None (uncapped 2.1)
+   uncapped [(0.25, 1.07, 1.29), (0.5, 2.14, 2.23), (0.75, 3.22, 2.84), (1.0, 4.29, 3.09), (1.25, 5.36, 3.0), (1.5, 6.43, 2.56), (2.0, 8.57, 0.57), (2.5, 10.72, -2.95), (3.0, 12.86, -8.14)]
+   new: mean 4.34u max 5.0u, growth/season close 3.23% real 19.04%, dd25 0.234 dd50 0.003, season 0.69-1.039-1.532
+   old: mean 2.25u max 3.0u, growth/season close 2.82% real 10.42%, dd25 0.015 dd50 0.0, season 0.83-1.032-1.281
+   median pick {'gap': 5.286, 'ev': 0.148, 'edge': 0.0458, 'u': 0.979, 'units': 4.5}
+   caps at lam {'1.0': 1.22, '2.0': 2.18, '3.0': 2.9, '5.0': 3.23, '7.5': 3.1, '10.0': 3.1, '15.0': 3.1, '25.0': 3.1}
+   0.5x Kelly: mean 2.14u, growth/season 2.23%, dd25 0.011 dd50 0.0, season 0.84-1.026-1.246
+   1x Kelly: mean 4.29u, growth/season 3.09%, dd25 0.235 dd50 0.004, season 0.694-1.039-1.527
+   1.5x Kelly: mean 6.43u, growth/season 2.56%, dd25 0.51 dd50 0.051, season 0.564-1.038-1.843
+   2x Kelly: mean 8.57u, growth/season 0.57%, dd25 0.707 dd50 0.172, season 0.448-1.02-2.197
+nfl total (n 356): edge = 0.011 + 0.0093 (gap - 2.90) [se 0.005, 0.0039; own b 0.0106 se 0.0039; close 0.012 se 0.005, roi 0.008 se 0.026, cover 0.523]; rho 0.000 nbar 5.6; lam own 0.7 cap 1.0 -> lam 0.75 cap 1.0; peak 1.85, growth 0 at None (uncapped 1.4)
+   uncapped [(0.25, 0.36, 0.28), (0.5, 0.58, 0.41), (0.75, 0.81, 0.45), (1.0, 1.05, 0.36), (1.25, 1.29, 0.14), (1.5, 1.53, -0.2), (2.0, 2.01, -1.27), (2.5, 2.5, -2.88), (3.0, 2.98, -5.05)]
+   new: mean 0.57u max 1.0u, growth/season close 0.62% real 2.99%, dd25 0.0 dd50 0.0, season 0.909-1.005-1.115
+   old: mean 0.88u max 3.0u, growth/season close 0.63% real 2.63%, dd25 0.004 dd50 0.0, season 0.858-1.005-1.17
+   median pick {'gap': 2.594000000000001, 'ev': 0.0197, 'edge': 0.0085, 'u': 0.759, 'units': 0.75}
+   caps at lam {'1.0': 0.62, '2.0': 0.58, '3.0': 0.46, '5.0': 0.45, '7.5': 0.45, '10.0': 0.45, '15.0': 0.45, '25.0': 0.45}
+   0.5x Kelly: mean 0.58u, growth/season 0.41%, dd25 0.0 dd50 0.0, season 0.89-1.002-1.128
+   1x Kelly: mean 1.05u, growth/season 0.36%, dd25 0.05 dd50 0.0, season 0.794-1.001-1.26
+   1.5x Kelly: mean 1.53u, growth/season -0.2%, dd25 0.207 dd50 0.003, season 0.7-0.996-1.404
+   2x Kelly: mean 2.01u, growth/season -1.27%, dd25 0.389 dd50 0.025, season 0.611-0.985-1.55
+cbb spread (n 2886): edge = 0.011 + 0.0058 (gap - 4.03) [se 0.001, 0.0009; own b 0.0060 se 0.0009; close 0.011 se 0.001, roi 0.044 se 0.009, cover 0.560]; rho 0.001 nbar 7.4; lam own 0.95 cap 25.0 -> lam 0.95 cap 25.0; peak 0.95, growth 0 at 1.9 (uncapped 1.9)
+   uncapped [(0.25, 0.35, 4.37), (0.5, 0.62, 7.14), (0.75, 0.91, 8.71), (1.0, 1.21, 9.01), (1.25, 1.51, 8.06), (1.5, 1.81, 5.83), (2.0, 2.41, -2.6), (2.5, 3.01, -16.64), (3.0, 3.61, -36.99)]
+   new: mean 1.15u max 4.25u, growth/season close 9.05% real 122.32%, dd25 0.75 dd50 0.118, season 0.55-1.077-2.185
+   old: mean 1.04u max 3.0u, growth/season close 8.98% real 107.76%, dd25 0.62 dd50 0.053, season 0.615-1.085-1.966
+   median pick {'gap': 3.68, 'ev': 0.0364, 'edge': 0.0089, 'u': 0.984, 'units': 1.0}
+   caps at lam {'1.0': 6.59, '2.0': 8.42, '3.0': 8.98, '5.0': 9.05, '7.5': 9.05, '10.0': 9.05, '15.0': 9.05, '25.0': 9.05}
+   0.5x Kelly: mean 0.62u, growth/season 7.14%, dd25 0.237 dd50 0.0, season 0.749-1.067-1.549
+   1x Kelly: mean 1.21u, growth/season 9.01%, dd25 0.783 dd50 0.151, season 0.53-1.077-2.264
+   1.5x Kelly: mean 1.81u, growth/season 5.83%, dd25 0.958 dd50 0.485, season 0.355-1.033-3.162
+   2x Kelly: mean 2.41u, growth/season -2.6%, dd25 0.994 dd50 0.722, season 0.226-0.948-4.192
+cbb total (n 6483): edge = 0.019 + 0.0084 (gap - 3.79) [se 0.001, 0.0007; own b 0.0085 se 0.0007; close 0.018 se 0.001, roi 0.026 se 0.006, cover 0.541]; rho 0.000 nbar 14.8; lam own 0.9 cap 5.0 -> lam 0.9 cap 5.0; peak 1.0, growth 0 at 2.7 (uncapped 1.75)
+   uncapped [(0.25, 0.5, 23.53), (0.5, 0.95, 39.14), (0.75, 1.41, 47.85), (1.0, 1.88, 49.18), (1.25, 2.35, 42.68), (1.5, 2.82, 27.34), (2.0, 3.76, -68.41), (2.5, 4.7, -327.11), (3.0, 5.64, -824.13)]
+   new: mean 1.68u max 5.0u, growth/season close 49.87% real 269.36%, dd25 0.995 dd50 0.632, season 0.343-1.585-7.967
+   old: mean 1.31u max 3.0u, growth/season close 44.94% real 206.16%, dd25 0.939 dd50 0.309, season 0.508-1.528-4.864
+   median pick {'gap': 3.372486772486752, 'ev': 0.0451, 'edge': 0.0147, 'u': 0.995, 'units': 1.5}
+   caps at lam {'1.0': 28.38, '2.0': 41.99, '3.0': 47.87, '5.0': 49.87, '7.5': 49.56, '10.0': 49.56, '15.0': 49.56, '25.0': 49.56}
+   0.5x Kelly: mean 0.95u, growth/season 39.14%, dd25 0.82 dd50 0.152, season 0.609-1.447-3.612
+   1x Kelly: mean 1.88u, growth/season 49.18%, dd25 0.999 dd50 0.747, season 0.268-1.574-9.787
+   1.5x Kelly: mean 2.82u, growth/season 27.34%, dd25 1.0 dd50 0.97, season 0.074-1.267-20.46
+   2x Kelly: mean 3.76u, growth/season -68.41%, dd25 1.0 dd50 0.997, season 0.008-0.705-32.263
+nba spread (n 278): edge = 0.015 + 0.0053 (gap - 4.25) [se 0.002, 0.0018; own b 0.0058 se 0.0018; close 0.015 se 0.002, roi 0.030 se 0.015, cover 0.590]; rho 0.000 nbar 1.4; lam own 0.9 cap 2.0 -> lam 0.95 cap 2.0; peak 1.4, growth 0 at None (uncapped 1.8)
+   uncapped [(0.25, 0.4, 0.73), (0.5, 0.75, 1.18), (0.75, 1.12, 1.42), (1.0, 1.49, 1.42), (1.25, 1.87, 1.2), (1.5, 2.24, 0.73), (2.0, 2.99, -0.9), (2.5, 3.73, -3.48), (3.0, 4.48, -7.02)]
+   new: mean 1.33u max 2.0u, growth/season close 1.62% real 28.77%, dd25 0.117 dd50 0.0, season 0.771-1.022-1.352
+   old: mean 1.13u max 2.25u, growth/season close 1.55% real 24.31%, dd25 0.043 dd50 0.0, season 0.809-1.02-1.287
+   median pick {'gap': 4.4, 'ev': 0.122, 'edge': 0.0163, 'u': 0.985, 'units': 1.75}
+   caps at lam {'1.0': 1.35, '2.0': 1.62, '3.0': 1.46, '5.0': 1.44, '7.5': 1.44, '10.0': 1.44, '15.0': 1.44, '25.0': 1.44}
+   0.5x Kelly: mean 0.75u, growth/season 1.18%, dd25 0.004 dd50 0.0, season 0.865-1.013-1.192
+   1x Kelly: mean 1.49u, growth/season 1.42%, dd25 0.197 dd50 0.001, season 0.741-1.02-1.41
+   1.5x Kelly: mean 2.24u, growth/season 0.73%, dd25 0.536 dd50 0.025, season 0.628-1.015-1.644
+   2x Kelly: mean 2.99u, growth/season -0.9%, dd25 0.77 dd50 0.113, season 0.526-1.002-1.895
+nba total (n 700): edge = 0.019 + 0.0072 (gap - 4.70) [se 0.001, 0.0009; own b 0.0073 se 0.0009; close 0.019 se 0.001, roi 0.019 se 0.009, cover 0.567]; rho 0.000 nbar 2.3; lam own 1.05 cap 5.0 -> lam 1.05 cap 5.0; peak 1.1, growth 0 at 3.0 (uncapped 2.1)
+   uncapped [(0.25, 0.49, 3.65), (0.5, 0.95, 6.27), (0.75, 1.43, 7.9), (1.0, 1.91, 8.53), (1.25, 2.39, 8.16), (1.5, 2.86, 6.77), (2.0, 3.82, 0.93), (2.5, 4.77, -9.1), (3.0, 5.73, -23.46)]
+   new: mean 2.0u max 5.0u, growth/season close 8.61% real 62.25%, dd25 0.762 dd50 0.105, season 0.553-1.105-2.19
+   old: mean 2.63u max 3.0u, growth/season close 6.62% real 96.74%, dd25 0.89 dd50 0.215, season 0.491-1.074-2.43
+   median pick {'gap': 4.236754385964929, 'ev': 0.0971, 'edge': 0.0157, 'u': 0.992, 'units': 1.5}
+   caps at lam {'1.0': 4.91, '2.0': 7.29, '3.0': 8.38, '5.0': 8.61, '7.5': 8.54, '10.0': 8.54, '15.0': 8.54, '25.0': 8.54}
+   0.5x Kelly: mean 0.95u, growth/season 6.27%, dd25 0.159 dd50 0.0, season 0.768-1.072-1.485
+   1x Kelly: mean 1.91u, growth/season 8.53%, dd25 0.728 dd50 0.082, season 0.565-1.101-2.11
+   1.5x Kelly: mean 2.86u, growth/season 6.77%, dd25 0.951 dd50 0.386, season 0.399-1.085-2.883
+   2x Kelly: mean 3.82u, growth/season 0.93%, dd25 0.992 dd50 0.639, season 0.268-1.027-3.813
+book {'mult': 0.5, 'g': 57.0, 'dd25': 0.942, 'dd50': 0.245, 'mddMed': 0.4, 'finMed': 1.762, 'fin05': 0.612, 'fin95': 5.033, 'lose': 0.194, 'slates': 568, 'sample': {'low': 854, 'high': 2189, 'end': 1764, 'path': [1000, 963, 1093, 1048, 1511, 2072, 2008, 2049, 1496, 1626, 1784, 1943, 1677, 1764]}}
+book {'mult': 0.75, 'g': 69.7, 'dd25': 0.999, 'dd50': 0.649, 'mddMed': 0.555, 'finMed': 2.003, 'fin05': 0.414, 'fin95': 9.679, 'lose': 0.242, 'slates': 568, 'sample': {'low': 943, 'high': 5250, 'end': 2007, 'path': [1000, 1651, 1976, 2424, 2681, 3476, 3271, 4469, 3729, 2676, 2808, 2936, 2154, 2007]}}
+book {'mult': 1.0, 'g': 73.2, 'dd25': 1.0, 'dd50': 0.88, 'mddMed': 0.667, 'finMed': 2.076, 'fin05': 0.269, 'fin95': 16.188, 'lose': 0.284, 'slates': 568, 'sample': {'low': 333, 'high': 2475, 'end': 2077, 'path': [1000, 637, 719, 933, 390, 709, 659, 686, 748, 1025, 1361, 2259, 1947, 2077]}}
+book {'mult': 1.25, 'g': 66.5, 'dd25': 1.0, 'dd50': 0.971, 'mddMed': 0.768, 'finMed': 1.95, 'fin05': 0.147, 'fin95': 25.986, 'lose': 0.339, 'slates': 568, 'sample': {'low': 814, 'high': 2442, 'end': 1950, 'path': [1000, 1191, 1285, 1249, 1488, 1543, 1435, 2085, 1620, 1088, 1349, 1227, 1752, 1950]}}
+book {'mult': 1.5, 'g': 48.9, 'dd25': 1.0, 'dd50': 0.996, 'mddMed': 0.846, 'finMed': 1.648, 'fin05': 0.069, 'fin95': 37.271, 'lose': 0.395, 'slates': 568, 'sample': {'low': 213, 'high': 2925, 'end': 1650, 'path': [1000, 1806, 1712, 1869, 608, 419, 275, 781, 1080, 556, 1740, 2584, 1596, 1650]}}
