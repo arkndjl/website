@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-09T11:36:46Z",
+ "asof": "2026-11-09T11:38:45Z",
  "recenter": {
-  "2026-11-09": -10.82
+  "2026-11-09": -10.79
  },
  "monitor": {
   "clocks": {
@@ -145,7 +145,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 17.9,
    "x": null,
    "why": "spread market off",
@@ -329,6 +329,22 @@
    "tm": 143.1
   },
   {
+   "id": "401920887",
+   "sport": "cbb",
+   "kick": "2026-11-10T02:30:00Z",
+   "home": "Charlotte",
+   "away": "Seton Hall",
+   "mk": "total",
+   "side": "over",
+   "line": 131.5,
+   "price": -110.0,
+   "edge": 4.6,
+   "x": null,
+   "why": "total market off",
+   "m": -6.3,
+   "tm": 136.1
+  },
+  {
    "id": "401925681",
    "sport": "cbb",
    "kick": "2026-11-10T00:00:00Z",
@@ -409,22 +425,6 @@
    "tm": 147.0
   },
   {
-   "id": "401920887",
-   "sport": "cbb",
-   "kick": "2026-11-10T02:30:00Z",
-   "home": "Charlotte",
-   "away": "Seton Hall",
-   "mk": "spread",
-   "side": "away",
-   "line": -4.5,
-   "price": -110,
-   "edge": 1.8,
-   "x": null,
-   "why": "spread market off",
-   "m": -6.3,
-   "tm": 136.1
-  },
-  {
    "id": "401926132",
    "sport": "cbb",
    "kick": "2026-11-10T01:30:00Z",
@@ -482,7 +482,7 @@
    "mk": "spread",
    "side": "away",
    "line": 30.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 17.9,
    "ev": null,
    "units": 0.0,
@@ -503,11 +503,11 @@
    "state": "off"
   },
   "401920887": {
-   "mk": "spread",
-   "side": "away",
-   "line": -4.5,
-   "price": -110,
-   "edge": 1.8,
+   "mk": "total",
+   "side": "over",
+   "line": 131.5,
+   "price": -110.0,
+   "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "Charlotte",
@@ -723,7 +723,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 9011,
+  "snapshots": 9014,
   "buckets": [
    {
     "when": "24h+",
@@ -736,11 +736,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1647,
+    "clvN": 1648,
     "clvRet": -0.0456,
-    "clvT": -16.78,
+    "clvT": -16.79,
     "clv": -0.07,
-    "beat": 0.267,
+    "beat": 0.266,
     "still": 0.468
    },
    {
@@ -8080,7 +8080,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-09": {
-    "raw": 35.25,
+    "raw": 35.5,
     "scale": 1.0
    },
    "2026-11-11": {
@@ -8092,8 +8092,8 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 48.75,
-    "scale": 0.8205
+    "raw": 46.25,
+    "scale": 0.8649
    }
   }
  }
