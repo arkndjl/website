@@ -5,8 +5,10 @@
 # commits them; the push triggers the Cloudflare build. Daily from mid-October through the Finals in June, plus a
 # late-afternoon run (games only) for the evening injury report, or by hand from the Actions tab. GitHub fires this
 # schedule late or not at all on this repo, so a games-only run also follows each esea season / cfb board run (which
-# do fire, several times a day) whenever the player projections are 4+ hours old: every day's slate gets its PRA lines. A DPM pull that
-# fails keeps the season's last DPM; with nothing new nothing is committed.
+# do fire, several times a day) whenever the player projections are 4+ hours old: every day's slate gets its PRA lines.
+# Such a run also does the full XPM/DPM pull when the last clean pull (data/nba_xpm.json "updated") is 20+ hours old,
+# so the leaderboard does not wait on the 11:23 schedule. A DPM pull that fails keeps the season's last DPM; with
+# nothing new nothing is committed.
 name: nba xpm
 
 on:
@@ -33,33 +35,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # a run that follows another workflow goes ahead only in season and when data/nba_players.json is 4+ hours old
+  # a run that follows another workflow goes ahead only in season and when data/nba_players.json is 4+ hours old;
+  # full = the XPM/DPM pull too (every scheduled or manual run but the 22:40 one, and a following run once the last
+  # clean pull is 20+ hours old)
   gate:
     runs-on: ubuntu-latest
     outputs:
       go: ${{ steps.g.outputs.go }}
+      full: ${{ steps.g.outputs.full }}
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: data/nba_players.json
+          sparse-checkout: |
+            data/nba_players.json
+            data/nba_xpm.json
           sparse-checkout-cone-mode: false
       - id: g
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHED: ${{ github.event.schedule }}
         run: |
-          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           python3 - >> "$GITHUB_OUTPUT" <<'PY'
-          import json, datetime as dt
+          import json, os, datetime as dt
           now = dt.datetime.now(dt.timezone.utc)
-          try:
-              asof = dt.datetime.fromisoformat(json.load(open('data/nba_players.json'))['asof'].replace('Z', '+00:00'))
-          except Exception:
-              asof = now - dt.timedelta(days=1)
-          print('go=' + str(now.month not in (7, 8, 9) and now - asof >= dt.timedelta(hours=4)).lower())
+          def age(p, pick):
+              try:
+                  return now - dt.datetime.fromisoformat(pick(json.load(open(p))).replace('Z', '+00:00'))
+              except Exception:
+                  return dt.timedelta(days=9)
+          ev, sched = os.environ['EVENT'], os.environ.get('SCHED', '')
+          if ev == 'workflow_run':
+              go = now.month not in (7, 8, 9) and age('data/nba_players.json', lambda d: d['asof']) >= dt.timedelta(hours=4)
+              full = go and age('data/nba_xpm.json', lambda d: d.get('updated') or d['seasons'][0]['asof']) >= dt.timedelta(hours=20)
+          else:
+              go = True
+              full = sched != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+          print('go=' + str(go).lower())
+          print('full=' + str(full).lower())
           PY
   update:
     needs: gate
     if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      FULL: ${{ needs.gate.outputs.full }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -69,24 +89,27 @@ jobs:
         with:
           node-version: "22"
       - name: Pull this season's DPM from databallr
-        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        if: env.FULL == 'true'
         continue-on-error: true
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
           season=$(python3 -c "import sys; sys.path.insert(0, 'scripts'); import nba_xpm; print(nba_xpm.current_season())")
           node scripts/cbb_dpm.mjs "$season"
+      # a following run keeps going to the games when the blend fails (the xpm feed in data/freshness.json flags it);
+      # a scheduled or manual run still ends red
       - name: Blend DPM and BPM into XPM
-        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        if: env.FULL == 'true'
+        continue-on-error: ${{ github.event_name == 'workflow_run' }}
         run: python3 scripts/nba_xpm.py --current
       # XPM (proj) and contract surplus (scripts/nba_proj.py: static/data/nba-proj.json), Basketball-Reference contracts
       - name: XPM (proj) and contract value
-        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        if: env.FULL == 'true'
         continue-on-error: true
         run: python3 scripts/nba_proj.py
       # xAAV column on the contract value tab (scripts/xaav.py: static/data/xaav-nba.json, Basketball-Reference per game)
       - name: xAAV
-        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        if: env.FULL == 'true'
         continue-on-error: true
         run: python3 scripts/xaav.py nba
       # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/nba.json), display only
