@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T21:19Z",
+ "asof": "2026-11-09T21:34Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -87,12 +87,12 @@
      "rows": 596
     },
     "static/data/nba-proj.json": {
-     "flags": 6,
-     "rows": 498
+     "flags": 5,
+     "rows": 499
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 3,
-     "rows": 458
+     "flags": 2,
+     "rows": 460
     },
     "static/data/pctl-nba.json": {
      "flags": 2,
@@ -197,24 +197,6 @@
     {
      "d": "2026-11-08",
      "field": "tm",
-     "file": "static/data/nba-proj.json",
-     "flag": "moved",
-     "head": "Traded to Oklahoma City",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-08",
-      "head": "Traded to Oklahoma City",
-      "kind": "trade"
-     },
-     "pid": "6547",
-     "player": "Nique Clifford",
-     "pos": "SG",
-     "rotowire": "OKC",
-     "site": "SAC"
-    },
-    {
-     "d": "2026-11-08",
-     "field": "tm",
      "file": "static/data/nba-xpm/2027.json",
      "flag": "released",
      "head": "Let go Sunday",
@@ -249,22 +231,22 @@
      "site": "LAC"
     },
     {
-     "d": "2026-11-08",
+     "d": "2026-10-17",
      "field": "tm",
-     "file": "static/data/nba-xpm/2027.json",
-     "flag": "moved",
-     "head": "Traded to Oklahoma City",
-     "kind": "trade",
+     "file": "static/data/pctl-nba.json",
+     "flag": "released",
+     "head": "Let go by LAC",
+     "kind": null,
      "move": {
-      "d": "2026-11-08",
-      "head": "Traded to Oklahoma City",
-      "kind": "trade"
+      "d": "2026-09-27",
+      "head": "Signs with Clippers",
+      "kind": "sign"
      },
-     "pid": "6547",
-     "player": "Nique Clifford",
-     "pos": "SG",
-     "rotowire": "OKC",
-     "site": "SAC"
+     "pid": "5652",
+     "player": "Blake Wesley",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "LAC"
     },
     {
      "d": "2026-11-08",
@@ -283,29 +265,11 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "OKC"
-    },
-    {
-     "d": "2026-10-17",
-     "field": "tm",
-     "file": "static/data/pctl-nba.json",
-     "flag": "released",
-     "head": "Let go by LAC",
-     "kind": null,
-     "move": {
-      "d": "2026-09-27",
-      "head": "Signs with Clippers",
-      "kind": "sign"
-     },
-     "pid": "5652",
-     "player": "Blake Wesley",
-     "pos": "G",
-     "rotowire": "FA",
-     "site": "LAC"
     }
    ],
    "joined": 0,
    "players": 593,
-   "rows": 2013
+   "rows": 2016
   },
   "nfl": {
    "by_file": {

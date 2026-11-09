@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-09T21:18:51Z",
+ "asof": "2026-11-09T21:34:35Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 87.13,
+  "now": 86.69,
   "peak": 117.38,
-  "drawdown": 0.2577,
-  "open": 70.5,
+  "drawdown": 0.2614,
+  "open": 70.0,
   "path": [
-   100.41,
    100.41,
    101.85,
    104.21,
@@ -408,7 +407,8 @@
    87.03,
    87.55,
    86.89,
-   87.13
+   87.13,
+   86.69
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -2.86,
   "clv": -0.07,
   "beat": 0.301,
-  "settled": 406,
+  "settled": 407,
   "w": 201,
-  "l": 205,
+  "l": 206,
   "p": 0,
-  "roi": -0.0182,
-  "roiT": -0.36,
-  "profit": -10.92,
-  "risked": 367.5,
-  "yield": -0.0297
+  "roi": -0.0206,
+  "roiT": -0.41,
+  "profit": -11.42,
+  "risked": 368.0,
+  "yield": -0.031
  },
  "tEff": -2.87,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -1.8% vs -1.4% (SE 5.1)",
+   "value": "ROI -2.1% vs -1.4% (SE 5.1)",
    "pass": true
   }
  ],
@@ -686,15 +686,15 @@
    "clvT": -3.71,
    "clv": -0.1,
    "beat": 0.253,
-   "settled": 78,
+   "settled": 79,
    "w": 41,
-   "l": 37,
+   "l": 38,
    "p": 0,
-   "roi": 0.0911,
-   "roiT": 0.7,
-   "profit": -0.43,
-   "risked": 67.75,
-   "yield": -0.0064
+   "roi": 0.0773,
+   "roiT": 0.6,
+   "profit": -0.93,
+   "risked": 68.25,
+   "yield": -0.0137
   },
   {
    "id": "nflprops-prop",
@@ -719,30 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186754",
-   "k": "2026-11-09T18:30:00Z",
-   "slate": "tennis:2026-11-09",
-   "h": "Zidansek",
-   "a": "Grabher",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 104,
-   "bet": "Zidansek ML +104",
-   "placed": "2026-11-09T14:23:09Z",
-   "stake": 0.5,
-   "edge": 6.8,
-   "ev": 0.0055,
-   "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false,
-   "clvRet": -0.0157,
-   "clv": -0.3,
-   "beat": 0,
-   "close": 0.4825
-  },
   {
    "rule": "nba-spread",
    "sport": "nba",
@@ -1621,6 +1597,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186754",
+   "k": "2026-11-09T18:30:00Z",
+   "slate": "tennis:2026-11-09",
+   "h": "Zidansek",
+   "a": "Grabher",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 104,
+   "bet": "Zidansek ML +104",
+   "placed": "2026-11-09T14:23:09Z",
+   "stake": 0.5,
+   "edge": 6.8,
+   "ev": 0.0055,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false,
+   "clvRet": -0.0157,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.4825,
+   "score": "6-2 6-4",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.5
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3278,37 +3282,6 @@
    "score": [
     10.0,
     20.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -3.0
-  },
-  {
-   "rule": "cfb-spread",
-   "sport": "cfb",
-   "id": "401858291",
-   "k": "2026-11-08T00:30:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "Notre Dame",
-   "a": "Miami",
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -100.0,
-   "bet": "Miami +5.5 -100",
-   "placed": "2026-11-02T23:36:02Z",
-   "stake": 3.0,
-   "edge": 5.6,
-   "ev": 0.0367,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.0656,
-   "clv": -2.0,
-   "beat": -1,
-   "close": 7.5,
-   "score": [
-    24.0,
-    31.0
    ],
    "res": "l",
    "ret": -1.0,
@@ -17133,7 +17106,11 @@
    "clvRet": -0.0157,
    "clv": -0.3,
    "beat": 0,
-   "close": 0.4825
+   "close": 0.4825,
+   "score": "6-2 6-4",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.5
   },
   {
    "rule": "nba-spread",
