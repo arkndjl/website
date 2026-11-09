@@ -30,6 +30,8 @@ Model     FV = OLS on outcome FV (the mean outcome), one fit per in-season snaps
           for players it kept scraping, so having any transfer on record was worth +7 FV in hindsight (Oct 24 2026,
           scripts/soccer_fv_drivers.py), and the fee's signal was that record. Inputs added forward on the Oct 24 rows while they cut leave-one-season-out
           error with t >= 2 over the 2013-20 seasons and win 6 of 8; the other snapshots refit the same inputs.
+          Detailed position (centre-back, full-back, defensive / attacking midfield, winger, striker against central
+          midfield) is kept as one block: season-out error -0.10, t 3.9, 7 of 8 seasons, top 50 and forward better.
 Live      This season's lineups from Transfermarkt's JSON API (scripts/soccer_prospect_data.py), current market values
           and birth dates from player profiles; last season and before come frozen in scripts/data/ by --fit.
 """
@@ -90,6 +92,14 @@ GRP = {'Goalkeeper': 'G', 'Defender': 'D', 'Midfield': 'M', 'Attack': 'F'}
 # Transfermarkt API profile category -> the dump's position names (the API says "Midfielder" and "Striker")
 CATS = {'Goalkeeper': 'Goalkeeper', 'Defender': 'Defender', 'Midfielder': 'Midfield', 'Midfield': 'Midfield',
         'Striker': 'Attack', 'Attack': 'Attack'}
+# detailed position block (profile main position; central midfield, keepers and an unknown position are the reference).
+# One block, kept at every snapshot: pre-registered test on the Oct 24 rows, season-out MSE 55.73 -> 55.62, t 3.9
+# (p .003), 7 of 8 seasons, top-50 MSE 77.3 -> 76.9, forward 50.30 -> 50.26; the position started at on lineup sheets
+# before the snapshot gives the same signs (t 7.1 on the rows that have one), so it is not the profile's hindsight
+SUBG = {'Centre-Back': 'CB', 'Left-Back': 'FB', 'Right-Back': 'FB', 'Defensive Midfield': 'DM', 'Central Midfield': 'CM',
+        'Attacking Midfield': 'AM', 'Left Winger': 'W', 'Right Winger': 'W', 'Left Midfield': 'W', 'Right Midfield': 'W',
+        'Centre-Forward': 'ST', 'Second Striker': 'ST'}
+POSB = ['sp_CB', 'sp_FB', 'sp_DM', 'sp_AM', 'sp_W', 'sp_ST']
 LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bundesliga', 'FR1': 'Ligue 1',
           'NL1': 'Eredivisie', 'PO1': 'Liga Portugal', 'BE1': 'Belgian Pro League', 'TR1': 'Super Lig',
           'RU1': 'Russian Premier League', 'SC1': 'Scottish Premiership', 'GR1': 'Greek Super League',
@@ -460,6 +470,7 @@ def features(A, P, V, R, TG, t, snap, live=None):
         X['mv'] = pd.Series(live).reindex(X.index).fillna(X.mv)
     X['grp'] = P.grp.reindex(X.index).fillna('M')
     X['ht'] = P.height_in_cm.reindex(X.index)
+    X['subpos'] = P.sub_position.reindex(X.index) if 'sub_position' in P else None
     X['t'] = t
     return X
 
@@ -643,6 +654,9 @@ def design(X):
     F['gk'] = X.grp.eq('G').astype(float)
     F['fwd'] = X.grp.eq('F').astype(float)
     F['mid'] = X.grp.eq('M').astype(float)
+    sp = X.subpos.map(SUBG) if 'subpos' in X else pd.Series(None, index=X.index, dtype=object)
+    for c in POSB:
+        F[c] = (sp == c[3:]).astype(float)
     F['tier2'] = X.comp1.isin(FEEDV).astype(float) * (F.share1 > 0)
     F['noseen'] = ((z('mins1') + z('mins_td')) == 0).astype(float)
     F['age_lmv'] = F.age * F.lmv
@@ -689,7 +703,7 @@ def select(F, y, t):
     e0, _ = loso(F, y, t, cur)
     seasons = np.unique(t)
     ev, log = {}, []
-    cands = [c for c in F.columns if c not in cur]
+    cands = [c for c in F.columns if c not in cur and c not in POSB]      # the position block is forced (fit)
     while True:
         best = None
         for c in cands:
@@ -895,7 +909,20 @@ def fit(scorecard=False):
     # seasons, with the same outcome, in training (optimism MSE 59.84 season-out vs 59.89 cohort-out). Selection stays
     # on season folds: the cohort gate drops six terms that still help cohort-out (60.44 vs 59.89)
     print('selecting on', len(S), 'rows; outcome var', round(y.var(), 2), flush=True)
-    kept, ev, log = select(F, y, t)
+    # --keep: the stored drivers, refit (no new selection); either way the detailed-position block is forced after them
+    if '--keep' in sys.argv:
+        old = json.load(open(FIT))
+        kept, ev = [c for c in old['kept'] if c not in POSB], {k: v for k, v in old['ev'].items() if k not in POSB}
+    else:
+        kept, ev, log = select(F, y, t)
+    e0, _ = loso(F, y, t, kept)
+    e1, _ = loso(F, y, t, kept + POSB)
+    per = np.array([(e0[t == s] ** 2 - e1[t == s] ** 2).mean() for s in np.unique(t)])
+    blk = {'gain': round(float(per.mean()), 3), 't': round(float(per.mean() / (per.std(ddof=1) / math.sqrt(len(per)) + 1e-12)), 1),
+           'wins': int((per > 0).sum()), 'of': len(per)}
+    print('position block', blk, 'season-out mse', round(float((e0 ** 2).mean()), 2), '->', round(float((e1 ** 2).mean()), 2), flush=True)
+    kept = kept + POSB
+    ev.update({c: blk for c in POSB})
     e_base, _ = loso(F, y, co, BASEF)
     models, oos = {}, {}
     for md in SNAPS:
@@ -1034,7 +1061,7 @@ def fit(scorecard=False):
 
 CLUBS = {}
 PART = {'age': 'age', 'age2': 'age', 'lmv': 'mv', 'lmv2': 'mv', 'nomv': 'mv', 'gk': 'pos', 'fwd': 'pos', 'mid': 'pos',
-        'lmv_fwd': 'pos', 'lmv_gk': 'pos', 'ht_gk': 'ht'}
+        'lmv_fwd': 'pos', 'lmv_gk': 'pos', 'ht_gk': 'ht', **{c: 'pos' for c in POSB}}
 
 
 def club_name(c):
@@ -1264,7 +1291,7 @@ def build():
 
 
 if __name__ == '__main__':
-    if '--fit' in sys.argv:
+    if '--fit' in sys.argv:              # --fit --keep: refit the stored drivers without a new selection
         fit()
     elif '--freeze-yi' in sys.argv:
         yi_freeze()
