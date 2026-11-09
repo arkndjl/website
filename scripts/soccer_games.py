@@ -808,16 +808,48 @@ class Ratings:
         self.last[h] = self.last[a] = lday(r)
 
 
-def run(rows, P, score=None, keep=None):
+def add_r90(rows):
+    """r90 on every scored-competition match that went to extra time: its result after 90 minutes (1 home ahead, 0
+    level, -1 away ahead), where the rows give it. A single match goes on only when level; a second leg only when the
+    tie is level, so its 90 minutes mirror the first leg (the same clubs' leg 1 earlier that season). Not the score:
+    extra-time goals are in hs / as"""
+    first = {}
+    for r in rows:
+        if r['lg'] not in SCORED or r.get('hs') is None:
+            continue
+        k = (r['lg'], D.season_of(r['day'], r['lg']), frozenset((r['h'], r['a'])))
+        if r.get('leg') == 1:
+            first[k] = r
+        elif r['st'] in ('AET', 'PEN') and 'r90' not in r:
+            if not r.get('leg'):
+                r['r90'] = 0
+            elif r['leg'] == 2 and k in first and first[k]['day'] < r['day']:
+                x = first[k]
+                m1 = x['hs'] - x['as'] if x['h'] == r['h'] else x['as'] - x['hs']
+                r['r90'] = (m1 < 0) - (m1 > 0)
+    return rows
+
+
+def res90(r):
+    """the result after 90 minutes: 1 home win, 0 draw, -1 away win (None: extra time and not recoverable)"""
+    if r['st'] == 'FT':
+        return (r['hs'] > r['as']) - (r['hs'] < r['as'])
+    return r.get('r90')
+
+
+def run(rows, P, score=None, keep=None, et=False):
     """walk forward through rows (finished matches in time order); score(r, lh, la) called before each update of a
-    row with lg in SCORED from SCORE_FROM; keep: optional callback after the update"""
+    row with lg in SCORED from SCORE_FROM; keep: optional callback after the update. et: also score the matches that
+    went to extra time and have a 90-minute result (add_r90); the callback must then read res90(r), never hs / as"""
     R = Ratings(P)
     R.set_membership(rows)
+    if et:
+        add_r90(rows)
     for r in rows:
         if r.get('hs') is None:
             continue
         R.prep(r)
-        if score is not None and r['lg'] in SCORED and r['st'] == 'FT':
+        if score is not None and r['lg'] in SCORED and (r['st'] == 'FT' or et and r.get('r90') is not None):
             S = D.season_of(r['day'], r['lg'])
             if S >= SCORE_FROM:
                 lh, la = R.lambdas(r)
@@ -838,10 +870,12 @@ def evaluate(rows, P, lo=TUNE[0], hi=TUNE[1], comps=None):
         if comps and r['lg'] not in comps:
             return
         pw, pd, pl = wdl(lh, la, rho)
-        y = pw if r['hs'] > r['as'] else pd if r['hs'] == r['as'] else pl
+        y = (pl, pd, pw)[res90(r) + 1]
         g = 'euro' if r['lg'] in D.EURO else 'dom'
         ll[g] += -math.log(max(y, 1e-9)); n[g] += 1
-    run(rows, P, score)
+    # knockout matches that went to extra time count on their 90-minute result: left out, the scored UEFA matches
+    # lose the ones level at 90 and the draw chance reads too high against them
+    run(rows, P, score, et=True)
     tot = sum(ll.values()) / max(1, sum(n.values()))
     return tot, {g: round(ll[g] / n[g], 5) for g in n}, dict(n)
 
@@ -1784,6 +1818,8 @@ def build(days_ahead=4):
             g['venue'] = e['venue']
         if e.get('st') and e['st'] not in ('SCHED',) and e.get('hs') is not None:
             g['final'] = [e['hs'], e['as']]
+            if e['st'] in ('AET', 'PEN'):
+                g['et'] = 1                 # the score holds extra-time goals: not a 90-minute result (model_monitor)
         elif r.get('src') == 'fm' and r.get('hs') is not None:
             g['final'] = [r['hs'], r['as']]
         for c in ('h', 'a'):
