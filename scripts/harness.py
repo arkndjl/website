@@ -18,13 +18,14 @@ p is one-sided (does the candidate lower the loss), from Student t on G - 1 degr
 Splits: tune/held masks by season, walk-forward fits (each season from the seasons before it), and group folds
 (whole players or whole schools out).
 
-Selection and re-scoring (the project rule): a term enters on the tuning seasons; the held-out seasons are reported
-and only veto. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the
-Stouffer z of the tuning and held-out t (equal weight), and the Benjamini-Hochberg q runs over every term in the
-ledger at once (one family, all models), so a q of .10 means about one in ten terms at that level is noise.
+Selection and re-scoring (the project rule): a term enters on the tuning seasons; the held-out seasons give the
+verdict. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the held-out t
+alone (the tuning t is the one the term was chosen on, so it is shown, not combined), and the Benjamini-Hochberg q
+runs over every term with a held-out split at once (one family, all models), so a q of .10 means about one in ten
+terms at that level is noise.
     keep   q <= .10
     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)
-    watch  q > .10 but held out is worse without it (not proven, not free to remove)
+    watch  q > .10 but held out is worse without it (not proven, not free to remove), or no held-out split at all
 Core terms (a model's backbone, e.g. efficiency ratings) are scored but never dropped by the rule.
 """
 import json
@@ -362,18 +363,23 @@ def from_t(term, t_tune, t_held, n_tune=None, n_held=None, core=False, d_held=No
 
 
 def judge(rows, q_keep=Q_KEEP):
-    """fills z, p, q and the verdict on every row (one BH family)"""
-    for r in rows:
-        r['z'] = round(stouffer([-s['t'] for s in (r['tune'], r['held']) if s]), 2)
-        r['p'] = p_of_z(r['z'])
-    qs = bh([r['p'] for r in rows])
-    for r, q in zip(rows, qs):
+    """fills z, p, q and the verdict on every row from its held-out split alone (one BH family over the rows that have
+    one). The tuning t is the statistic a term was selected on, so it is not a null draw and is not combined. A row
+    with no held-out split is never keep or drop: watch (core if it is a core term), with z 0, p and q 1 (no
+    held-out evidence; it is outside the family)"""
+    fam = [r for r in rows if r['held']]
+    for r in fam:
+        h = r['held']
+        p = float(t_cdf(h['t'], max(1, (h.get('G') or 10 ** 6) - 1)))        # one-sided: the loss is lower with the term
+        r['p'] = p
+        r['z'] = round(-h['t'] if p <= 0 or p >= 1 else -z_of_p(p), 2)
+    qs = bh([r['p'] for r in fam]) if fam else []
+    for r, q in zip(fam, qs):
         r['q'] = round(float(q), 4)
         r['p'] = round(r['p'], 4)
-        # held-out worse without the term: d > 0 (measured) or t < 0 (stored)
-        # no held-out split (stored CV evidence only): never free to remove
-        hd = r['held'].get('d') if r['held'] else None
-        worse_without = True if not r['held'] else (hd > 0) if hd is not None else (r['held']['t'] < 0)
+        # held-out worse without the term: its paired t (with minus without) is negative. Not the stored d: 29 stored
+        # rows carry it with the other sign (with minus without), which read a helping term as free to remove
+        worse_without = r['held']['t'] < 0
         if r['q'] <= q_keep:
             r['verdict'] = 'keep'
         elif r.get('core'):
@@ -382,6 +388,10 @@ def judge(rows, q_keep=Q_KEEP):
             r['verdict'] = 'watch'
         else:
             r['verdict'] = 'drop'
+    for r in rows:
+        if not r['held']:
+            r['z'], r['p'], r['q'] = 0.0, 1.0, 1.0
+            r['verdict'] = 'core' if r.get('core') else 'watch'
     return rows
 
 
@@ -394,7 +404,7 @@ def write_ledger(models, path=LEDGER, today=None, pending=None):
         m.setdefault('tested', today)
         m.setdefault('revalidate', (dt.date.fromisoformat(str(m['tested'])[:10]) + dt.timedelta(days=REVALIDATE_DAYS)).isoformat())
     out = {'asof': today, 'rule': __doc__.split('Selection and re-scoring')[1].split('Core terms')[0].strip().replace('\n', ' '),
-           'qKeep': Q_KEEP, 'family': len(allrows),
+           'qKeep': Q_KEEP, 'family': sum(1 for r in allrows if r['held']), 'noHeld': sum(1 for r in allrows if not r['held']),
            'counts': {v: sum(r['verdict'] == v for r in allrows) for v in ('keep', 'watch', 'drop', 'core')}, 'models': models,
            'pending': pending or {}}
     with open(path, 'w') as f:
@@ -405,7 +415,7 @@ def write_ledger(models, path=LEDGER, today=None, pending=None):
 def show(path=LEDGER, stale=False):
     L = json.load(open(path))
     today = dt.date.today().isoformat()
-    print(f"ledger {L['asof']}: {L['family']} terms, BH family-wide, keep at q <= {L['qKeep']}: {L['counts']}")
+    print(f"ledger {L['asof']}: {L['family']} terms with a held-out split, BH family-wide, keep at q <= {L['qKeep']}: {L['counts']}")
     for name, m in L['models'].items():
         if stale and m['revalidate'] > today:
             continue
@@ -413,7 +423,8 @@ def show(path=LEDGER, stale=False):
         for r in sorted(m['rows'], key=lambda r: r['q']):
             ht = f"{r['held']['t']:6.2f}" if r['held'] else '     -'
             tt = f"{r['tune']['t']:6.2f}" if r['tune'] else '     -'
-            print(f"  {('removed' if r.get('removed') else r['verdict']):7s} {r['term']:14s} tune t {tt}  held t {ht}  z {r['z']:5.2f}  q {r['q']:.3f}"
+            zq = f"z {r['z']:5.2f}  q {r['q']:.3f}" if r['held'] else 'z     -  q     -'
+            print(f"  {('removed' if r.get('removed') else r['verdict']):7s} {r['term']:14s} tune t {tt}  held t {ht}  {zq}"
                   + ('  (stored)' if r.get('stored') else ''))
 
 
@@ -470,6 +481,12 @@ def selftest():
     rows = judge(drop_one(pred, ['one', 'x1', 'noise'], y, tu, he, cluster=S, core=('one',)))
     v = {r['term']: r['verdict'] for r in rows}
     assert v['x1'] == 'keep' and v['noise'] in ('drop', 'watch'), rows
+    # the verdict is the held-out split's alone: a huge tuning t with nothing held out is not a keep, a term with no
+    # held-out split is watch (core stays core), and the tuning t never rescues or sinks a term
+    jr = judge([from_t('sel', -7.5, 0.6, 500, 500), from_t('cv', -9.0, None, 500), from_t('cvcore', -9.0, None, 500, core=True),
+                from_t('real', 1.0, -4.0, 500, 500), from_t('weak', -3.0, -0.5, 500, 500)])
+    assert [r['verdict'] for r in jr] == ['drop', 'watch', 'core', 'keep', 'watch'], [(r['term'], r['verdict'], r['q']) for r in jr]
+    assert jr[1]['q'] == 1.0 and abs(jr[3]['z'] - 3.97) < 0.02, jr
     F = json.load(open(FIXTURE))
     if 'expect' not in F:
         F['expect'] = R

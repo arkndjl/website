@@ -178,16 +178,21 @@ export function record(term, tune, held, core = false, extra = {}) {
   const side = (s) => ({ d: r5(-s.d), t: r5(s.t, 2), p: r5(s.p, 4), n: s.n, G: s.G, deff: s.deff });
   return { term, core, tune: side(tune), held: side(held), ...extra };
 }
-// verdicts on one BH family, the same rule as harness.py judge()
+// verdicts from the held-out split alone, one BH family over the rows that have one: the same rule as harness.py
+// judge(). The tuning t is what a term was selected on, so it is shown, not combined; no held-out split = watch
 export function judge(rows, qKeep = Q_KEEP) {
-  rows.forEach((r) => { r.z = r5(stouffer([r.tune, r.held].filter(Boolean).map((s) => -s.t)), 2); r.p = pOfZ(r.z); });
-  const q = bh(rows.map((r) => r.p));
-  rows.forEach((r, i) => {
+  const fam = rows.filter((r) => r.held);
+  fam.forEach((r) => {
+    r.p = tCdf(r.held.t, Math.max(1, (r.held.G || 1e6) - 1));
+    r.z = r5(r.p <= 0 || r.p >= 1 ? -r.held.t : -zOfP(r.p), 2);
+  });
+  const q = bh(fam.map((r) => r.p));
+  fam.forEach((r, i) => {
     r.q = r5(q[i], 4); r.p = r5(r.p, 4);
-    // no held-out split (CV evidence only): never free to remove
-    const worse = !r.held ? true : r.held.d != null ? r.held.d > 0 : r.held.t < 0;
+    const worse = r.held.t < 0;   // the paired t's sign, not the stored d (some stored rows carry it reversed)
     r.verdict = r.q <= qKeep ? 'keep' : r.core ? 'core' : worse ? 'watch' : 'drop';
   });
+  rows.filter((r) => !r.held).forEach((r) => { r.z = 0; r.p = 1; r.q = 1; r.verdict = r.core ? 'core' : 'watch'; });
   return rows;
 }
 
