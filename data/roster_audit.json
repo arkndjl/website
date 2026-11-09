@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T19:00Z",
+ "asof": "2026-11-09T21:19Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2554,
+   "players": 2559,
    "rows": 16718
   },
   "nba": {
@@ -310,8 +310,8 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
-     "rows": 2146
+     "flags": 9,
+     "rows": 2149
     },
     "static/data/nfl-fantasy.json": {
      "flags": 7,
@@ -388,6 +388,20 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "IND"
+    },
+    {
+     "d": "2026-10-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Cleared to play vs. Minnesota",
+     "kind": null,
+     "move": null,
+     "pid": "11916",
+     "player": "Davon Godchaux",
+     "pos": "DT",
+     "rotowire": "NO",
+     "site": "JAX"
     },
     {
      "d": "2026-11-09",
@@ -3418,12 +3432,12 @@
    ],
    "joined": 0,
    "players": 2234,
-   "rows": 7999
+   "rows": 8002
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
+     "flags": 0,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -3444,24 +3458,6 @@
     }
    },
    "flags": [
-    {
-     "d": "2026-11-09",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Reassigned to minors",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reassigned to minors",
-      "kind": "down"
-     },
-     "pid": "6709",
-     "player": "Filip Bystedt",
-     "pos": "C",
-     "rotowire": "SJS",
-     "site": "SJS"
-    },
     {
      "d": "2026-11-07",
      "field": "tm",

@@ -595,6 +595,123 @@ def scale_cuts(sc):
     return [[fv, round(float(sc['ref'][max(int(round(n * sc['nco'])) - 1, 0)]), 4)] for fv, n in CUTS]
 
 
+# Training on unfinished careers (ATP). The hurdle used to be fit only on births whose ages 22-28 are complete, so the
+# newest training cohort sat 8+ years behind the board. Rows of later births now join the fit with targets built from
+# what is known at the last year-end: a player past 22 gets P(any value) and the mean FV given value from an imputation
+# fit (per number of window seasons seen, on finished births cut to the same length: FV of the best three so far and the
+# finished-births grade of his last prospect row); a player still under 22 gets the finished-births hurdle's P and MU
+# on his latest October row as the target of his earlier rows (the record of finished players who dropped off the
+# board, when he has no row that season). As-of walk-forward, scoring seasons 2011-18: ATP MSE 21.45 -> 20.24
+# (t 7.8, 8/8 seasons, by player t 4.7), top 50 39.7 -> 39.8. WTA fails (t 1.0, last three seasons worse): not used.
+TD_TOURS = ('atp',)
+
+
+def sig(z):
+    return 1 / (1 + np.exp(-np.clip(z, -30, 30)))
+
+
+def flogit(X, y, l2=1e-3, it=60):
+    """logit on targets in [0, 1]"""
+    b = np.zeros(X.shape[1])
+    for _ in range(it):
+        p = sig(X @ b)
+        H = X.T @ (X * (p * (1 - p) + 1e-9)[:, None]) + l2 * np.eye(len(b))
+        d = np.linalg.solve(H, X.T @ (y - p) - l2 * b)
+        b += d
+        if np.abs(d).max() < 1e-8:
+            break
+    return b
+
+
+def td_prep(B, tour, pids, N):
+    """per player: first season aged 22 on July 1, best-three mean over the window seasons through N-1, and over the
+    first m window seasons"""
+    P = B[tour]['P']
+    S = B[tour]['S'].join(P[['dobd']], on='pid')
+    S = S[S.dobd.notna()].copy()
+    S['ai'] = np.floor((pd.to_datetime(S.y.astype(str) + '-07-01') - S.dobd).dt.days / 365.25).astype(int)
+    W = S[(S.ai >= PEAK_AGES[0]) & (S.ai <= PEAK_AGES[1]) & (S.y <= N - 1)]
+    b3 = lambda w: w.groupby('pid').ts.apply(lambda v: np.sort(v.values)[::-1][:3].sum() / 3)
+    dob = P.dobd.reindex(pd.unique(pids))
+    jul = pd.to_datetime(dob.dt.year.astype(int).astype(str) + '-07-01')
+    return dict(y22=(dob.dt.year + PEAK_AGES[0] + (dob > jul).astype(int)).astype(int), now=b3(W),
+                part={m: b3(W[W.ai <= PEAK_AGES[0] - 1 + m]) for m in range(1, PEAK_AGES[1] - PEAK_AGES[0] + 1)})
+
+
+def td_hurdle(R, F, kept, tr, prep, sc, N):
+    """hurdle coefficients from the finished rows `tr` plus every unfinished player's rows with as-of targets.
+    R: one snapshot's rows of seasons < N (finished and unfinished births), F its design."""
+    Xa = np.column_stack([np.ones(len(F)), F[kept].values])
+    pid, seas, by = R.pid.values, R.season.values, R.by.values
+    y = fv_rarity(pd.Series(pid).map(prep['now']).fillna(0).values, sc)
+    pos = y > 20
+    bl = flogit(Xa[tr], pos[tr].astype(float))
+    bo = np.linalg.lstsq(Xa[tr & pos], y[tr & pos], rcond=None)[0]
+    pb, mb = sig(Xa @ bl), Xa @ bo
+    D = pd.DataFrame({'pid': pid, 'seas': seas, 'by': by, 'gr': (1 - pb) * 20 + pb * mb, 'i': np.arange(len(pid)), 'tr': tr})
+    D['y22'] = D.pid.map(prep['y22']).values
+    D['m'] = np.clip(N - D.y22, 0, PEAK_AGES[1] - PEAK_AGES[0] + 1)
+    last = D.sort_values('seas').groupby('pid').tail(1).set_index('pid')
+    fin, un = last[last.tr], last[last.by > COHORTS[1]]
+    tgt = {}
+    for m, part in prep['part'].items():
+        tg = un[un.m == m]
+        if not len(tg):
+            continue
+        pf = fv_rarity(fin.index.map(part).fillna(0).values, sc)
+        yy, pp, g, av = y[fin.i.values], pos[fin.i.values], fin.gr.values, pf > 20
+        b0 = flogit(np.column_stack([np.ones((~av).sum()), g[~av]]), pp[~av].astype(float))
+        k = ~av & pp
+        c0 = np.linalg.lstsq(np.column_stack([np.ones(k.sum()), g[k]]), yy[k], rcond=None)[0] if k.sum() > 20 else np.array([yy[k].mean() if k.any() else 25.0, 0.0])
+        c1 = np.linalg.lstsq(np.column_stack([np.ones(av.sum()), pf[av], g[av]]), yy[av], rcond=None)[0]
+        pt = fv_rarity(tg.index.map(prep['now']).fillna(0).values, sc)
+        a = pt > 20
+        Pm = np.where(a, 1.0, sig(b0[0] + b0[1] * tg.gr.values))
+        Mm = np.where(a, c1[0] + c1[1] * pt + c1[2] * tg.gr.values, c0[0] + c0[1] * tg.gr.values)
+        tgt.update(zip(tg.index, zip(Pm, np.clip(Mm, 20, 80))))
+    young = un[un.m == 0]
+    has = young[young.seas == N - 1]
+    own = set(has.index)
+    tgt.update(zip(has.index, zip(pb[has.i.values], np.clip(mb[has.i.values], 20, 80))))
+    fl = fin[fin.seas < fin.y22 - 1]                 # finished players whose last board row came before their last eligible season
+    gp = float(pos[fl.i.values].mean()) if len(fl) else 0.0
+    gm = float(y[fl.i.values][pos[fl.i.values]].mean()) if len(fl) and pos[fl.i.values].any() else 25.0
+    for q in young.index[young.seas < N - 1]:
+        tgt[q] = (gp, gm)
+    tp, tm = np.full(len(pid), np.nan), np.full(len(pid), np.nan)
+    for i, (q, s_) in enumerate(zip(pid, seas)):
+        if by[i] > COHORTS[1] and q in tgt and not (q in own and s_ == N - 1):
+            tp[i], tm[i] = tgt[q]
+    td = ~np.isnan(tp)
+    a = tr | td
+    yl = np.where(tr, pos.astype(float), tp)
+    ym = np.where(tr, y, tm)
+    sw = np.sqrt(np.where(tr, pos.astype(float), tp)[a] + 1e-9)
+    return flogit(Xa[a], yl[a]), np.linalg.lstsq(Xa[a] * sw[:, None], ym[a] * sw, rcond=None)[0], int(td.sum())
+
+
+def td_fit(rows, B, tour, snap, kept):
+    """leave-one-birth-year-out P and MU on the finished rows (the unfinished rows' targets rebuilt without the held-out
+    year), and the full-fit coefficients"""
+    N = COHORTS[1] + PEAK_AGES[1] + 1
+    R = rows[tour]
+    R = R[(R.snap == snap) & (R.by >= COHORTS[0]) & (R.season < N)].reset_index(drop=True)
+    F = design(R)
+    sc = scale(B, tour)
+    prep = td_prep(B, tour, R.pid.values, N)
+    by = R.by.values
+    fin = by <= COHORTS[1]
+    Xa = np.column_stack([np.ones(len(F)), F[kept].values])
+    P, MU = np.zeros(len(R)), np.zeros(len(R))
+    for b in np.unique(by[fin]):
+        te = by == b
+        bl, bo, _ = td_hurdle(R, F, kept, fin & ~te, prep, sc, N)
+        P[te], MU[te] = sig(Xa[te] @ bl), Xa[te] @ bo
+    bl, bo, n = td_hurdle(R, F, kept, fin, prep, sc, N)
+    return P[fin], MU[fin], bl, bo, n, R.pid.values[fin]
+
+
+
 def snap_rows(rows, tour, snap):
     X = rows[tour]
     X = X[(X.snap == snap) & (X.by >= COHORTS[0]) & (X.by <= COHORTS[1])].reset_index(drop=True)
@@ -751,11 +868,19 @@ def fit(scorecard_only=False):
             snap = '%02d-%02d' % md
             X, F, y, pos, by = snap_rows(rows, tour, snap)
             P, MU, E = loso(F, y, pos, by, kept)
+            td = None
+            if tour in TD_TOURS:
+                P, MU, tbl, tbo, ntd, tpid = td_fit(rows, B, tour, snap, kept)
+                assert (tpid == X.pid.values).all()
+                E = (1 - P) * 20 + P * MU
+                td = ntd
             Pb, MUb, Eb = loso(F, y, pos, by, BASEF)
             edges, q = resid_bands(MU, y, pos)
             head, odds, lo, hi = dist(P, MU, edges, q)
             cal = {str(t): platt(odds[t], y >= t) for t in (30, 40, 50, 60)}
             bl, bo = hurdle(F, y, pos, kept, np.ones(len(F), bool))
+            if td is not None:
+                bl, bo = tbl, tbo
             fw, fwb = forward(F, y, pos, by, X.season.values, kept), forward(F, y, pos, by, X.season.values, BASEF)
             o = np.argsort(-head)
             top50 = float(pd.Series(y[o]).groupby(X.season.values[o]).head(50).mean())
@@ -774,6 +899,8 @@ def fit(scorecard_only=False):
             s['calib'] = [dict(band=int(b), n=int((band == b).sum()), pred=round(float(head[band == b].mean()), 1),
                                real=round(float(y[band == b].mean()), 1),
                                p50=round(float((y[band == b] >= 50).mean()), 3)) for b in np.unique(band)]
+            if td is not None:
+                s['td'] = td
             T_['snaps'][snap] = s
             print(tour, snap, 'mse %.2f base %.2f null %.2f top50 %.2f/%.2f fwd %s' % (mse, mseb, np.var(y), top50, top50b, s['fwd']))
             if snap == '%02d-%02d' % SEL_SNAP:
