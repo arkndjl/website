@@ -11,11 +11,20 @@ Dengler Units on top of them (does sizing add: close value weighted by stake aga
 (scripts/paper_book.py). For each: n judged by the close, close value (clvRet) with a t clustered by game day, how often
 the line moved our way, flat ROI, the last week alone, and the live record against what the backtest expected.
 
-The switch (scripts/monitor_rules.json, pre-registered): with minN+ bets judged since the rule's clock started, a rule
-stops when its last `window` bets are worth clustered t below `t` at the close, or when a one-sided CUSUM on close
-value (z = clvRet / the rule's backtest sd, S = max(0, S - z - k)) crosses h. decide() is the one test; games_picks.py
-and paper_book.py call it where the bets are made and keep the stop with the rule, and this report reads their state.
-A stopped rule comes back only by a refit, which restarts its clock.
+The switch (scripts/monitor_rules.json, pre-registered): decide() is the one test; games_picks.py calls it where the
+bets are made and keeps the stop with the rule, and this report reads its state. A stopped rule comes back only by a
+refit, which restarts its clock.
+
+A pick rule, with minN+ bets judged since its clock started, stops on any of three, each by game day with the day
+deflated by 1 + (n - 1) rho (rho the within-slate correlation of close value on the rule's held-out picks):
+  - losing to the close: the one-sided CUSUM around zero (z = clvRet / the rule's backtest sd, k, h) past h;
+  - under the edge its stakes assume (mu1 = expected_live()): the CUSUM of the log likelihood ratio of "worth
+    nothing" against "worth mu1" (reference mu1 / 2) past cusum.hL;
+  - the drift test: the same ratio as a sequential test from the clock.
+The last `window` bets' clustered t is shown, not a stop.
+
+A rule with no slate structure passed (the model monitor's standardised losses) keeps the test against zero alone: the
+window's clustered t below the Student cut at the level `t` stands for (minDays+ game days), or the per-bet CUSUM.
 """
 import datetime
 import hashlib
@@ -50,7 +59,8 @@ def fp(d):
 
 
 def clustered(xs, groups, ws=None):
-    """weighted mean with a cluster-robust standard error (CR1, one cluster a game day): (mean, se, t, clusters)"""
+    """weighted mean with a cluster-robust standard error (CR1, one cluster a game day), never under the iid one (a few
+    game days can put the clustered se far below it: 80 bets on 3 days once read t -9.95): (mean, se, t, clusters)"""
     n = len(xs)
     if not n:
         return None, None, None, 0
@@ -66,7 +76,50 @@ def clustered(xs, groups, ws=None):
     if G < 2:
         return m, None, None, G
     se = math.sqrt(sum(v * v for v in acc.values()) * G / (G - 1)) / W
+    iid = math.sqrt(sum((w * (x - m)) ** 2 for x, w in zip(xs, ws)) * n / (n - 1)) / W
+    se = max(se, iid)
     return m, se, (m / se if se else None), G
+
+
+def _betacf(a, b, x):
+    """the continued fraction of the incomplete beta function (Lentz)"""
+    tiny = 1e-300
+    c, d = 1.0, 1.0 - (a + b) * x / (a + 1)
+    d = 1 / (d if abs(d) > tiny else tiny)
+    h = d
+    for m in range(1, 300):
+        for num in (m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m)), -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1))):
+            d = 1 + num * d
+            d = 1 / (d if abs(d) > tiny else tiny)
+            c = 1 + num / c
+            c = c if abs(c) > tiny else tiny
+            h *= d * c
+        if abs(d * c - 1) < 1e-12:
+            break
+    return h
+
+
+def t_cdf(t, df):
+    """P(T <= t) for Student's t on df degrees of freedom"""
+    x = df / (df + t * t)
+    a, b = df / 2.0, 0.5
+    if x <= 0:
+        tail = 0.0
+    elif x >= 1:
+        tail = 0.5
+    else:
+        lb = math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log(1 - x)
+        ib = math.exp(lb) * _betacf(a, b, x) / a if x < (a + 1) / (a + b + 2) else 1 - math.exp(lb) * _betacf(b, a, 1 - x) / b
+        tail = ib / 2
+    return tail if t < 0 else 1 - tail
+
+
+def t_p(t, G, P=None):
+    """the one-sided p of a clustered t on G game days (Student, G - 1 df); None under minDays clusters: no verdict"""
+    P = P or params()
+    if t is None or G < P.get('minDays', 8):
+        return None
+    return t_cdf(t, G - 1)
 
 
 def sd_of(rec):
@@ -90,25 +143,83 @@ def cusum(xs, sd, k, h):
     return S, top, hit
 
 
-def decide(bets, sd=None, P=None):
+def day_llr(xs, mu1, sd, rho):
+    """one game day's log likelihood ratio of "worth mu1 a bet" against "worth nothing": (s - n mu1 / 2) mu1 /
+    (sd^2 (1 + (n - 1) rho)), s the day's summed close value over n bets, rho their within-slate correlation"""
+    n = len(xs)
+    return (sum(xs) - n * mu1 / 2) * mu1 / (sd * sd * (1 + (n - 1) * rho))
+
+
+def cusum_llr(days, mu1, sd, rho, h, min_n=0):
+    """the lower CUSUM of the game-day log likelihood ratio (reference mu1 / 2: it rises while the rule runs under half
+    the edge its stakes assume). days: lists of close values in game-day order. (S now, max S, the bet count at the
+    end of the first day S stood at h or more with min_n+ bets, or None)"""
+    S, top, hit, n = 0.0, 0.0, None, 0
+    for xs in days:
+        n += len(xs)
+        S = max(0.0, S - day_llr(xs, mu1, sd, rho))
+        top = max(top, S)
+        if hit is None and S >= h and n >= min_n:
+            hit = n
+    return S, top, hit
+
+
+def cusum_days(days, sd, k, h, rho, min_n=0):
+    """cusum() by game day: a day adds its bets' summed (-z - k) over 1 + (n - 1) rho, so a slate that moved together
+    counts as the bets it is worth (per bet, undeflated, a rule at its edge stopped 9-52% of the time on the history's
+    slates). Same returns as cusum_llr"""
+    S, top, hit, n = 0.0, 0.0, None, 0
+    for xs in days:
+        n += len(xs)
+        S = max(0.0, S + sum(-x / sd - k for x in xs) / (1 + (len(xs) - 1) * rho))
+        top = max(top, S)
+        if hit is None and S >= h and n >= min_n:
+            hit = n
+    return S, top, hit
+
+
+def decide(bets, sd=None, P=None, mu1=None, rho=None):
     """the one test. bets: dicts with kick (or k) and clvRet, any order; sd the rule's backtest sd of close value.
-    Returns the window's clustered stats, the CUSUM and stop (True when the rule should stop now) with why"""
+    Returns the window's clustered stats, the CUSUM and stop (True when the rule should stop now) with why.
+    A pick rule passes rho (the within-slate correlation of its close value, rho_for) and mu1 (the edge its stakes
+    assume, expected_live): its picks are judged at units.BASE with no moneylines (as drift()), by game day, and it
+    stops on the CUSUM around zero (losing to the close) or the CUSUM against mu1 (out['edge']: running under half the
+    stakes' edge); the window's t is reported, not a stop. Without rho (the paper book, the model monitor) the test is
+    against zero alone: the window's t under the Student cut, or the per-bet CUSUM"""
     P = P or params()
-    jc = sorted([b for b in bets if b.get('clvRet') is not None], key=lambda b: b.get('kick') or b.get('k'))
-    xs = [b['clvRet'] for b in jc]
     sd = sd or P['sdDefault']
+    jc = sorted([b for b in bets if b.get('clvRet') is not None], key=lambda b: b.get('kick') or b.get('k'))
     w = jc[-P['window']:]
     m, se, t, G = clustered([b['clvRet'] for b in w], [day(b.get('kick') or b.get('k')) for b in w])
-    S, top, hit = cusum(xs, sd, P['cusum']['k'], P['cusum']['h'])
-    why = []
-    if len(jc) >= P['minN']:
-        if t is not None and t < P['t']:
-            why.append(f"last {len(w)} worth t {t:.2f} at the close")
-        if S >= P['cusum']['h']:
-            why.append(f"CUSUM {S:.1f} past {P['cusum']['h']:g}")
+    p = t_p(t, G, P)
+    h = P['cusum']['h']
+    why, hit, edge = [], None, None
+    if rho is not None:
+        jb = sorted([{**b, 'clvRet': at_base(b)} for b in bets if at_base(b) is not None], key=lambda b: b.get('kick') or b.get('k'))
+        by = {}
+        for b in jb:
+            by.setdefault(day(b.get('kick') or b.get('k')), []).append(b['clvRet'])
+        days = [by[d] for d in sorted(by)]
+        S, top, hit = cusum_days(days, sd, P['cusum']['k'], h, rho, P['minN'])
+        if len(jb) >= P['minN'] and S >= h:
+            why.append(f"CUSUM {S:.1f} past {h:g}")
+        if mu1 and mu1 > 0:
+            hL = P['cusum']['hL']
+            Se, tope, hite = cusum_llr(days, mu1, sd, rho, hL, P['minN'])
+            edge = {'cusum': round(Se, 2), 'cusumMax': round(tope, 2), 'h': hL, **({'hitAt': hite} if hite else {})}
+            if len(jb) >= P['minN'] and Se >= hL:
+                why.append(f"under half the edge its stakes assume (CUSUM {Se:.1f} past {hL:g})")
+    else:
+        S, top, _ = cusum([b['clvRet'] for b in jc], sd, P['cusum']['k'], h)
+        if len(jc) >= P['minN']:
+            if p is not None and p < 0.5 * (1 + math.erf(P['t'] / math.sqrt(2))):
+                why.append(f"last {len(w)} worth t {t:.2f} at the close")
+            if S >= h:
+                why.append(f"CUSUM {S:.1f} past {h:g}")
     return {'n': len(jc), 'window': len(w), 'mean': None if m is None else round(m, 4), 't': None if t is None else round(t, 2),
-            'days': G, 'sd': round(sd, 4), 'cusum': round(S, 2), 'cusumMax': round(top, 2), 'h': P['cusum']['h'],
-            'stop': bool(why), 'why': '; '.join(why)}
+            'p': None if p is None else round(p, 4), 'days': G, 'sd': round(sd, 4), 'cusum': round(S, 2), 'cusumMax': round(top, 2),
+            'h': h, **({'hitAt': hit} if hit else {}), **({'rho': round(rho, 3)} if rho is not None else {}),
+            **({'edge': edge} if edge else {}), 'stop': bool(why), 'why': '; '.join(why)}
 
 
 # ---------------------------------------------------------------- the drift test: is a rule worth what its backtest said?
@@ -144,7 +255,13 @@ def at_base(b):
     return b['clvRet']
 
 
-def rho_for(sport, mk):
+def rho_for(sport, mk, held=None):
+    """the within-slate correlation of a rule's close value: the ICC of clvRet by slate on its held-out picks
+    (games_picks.py stores it as the held record's clvIcc). units' rho is the correlation of RESULTS against the close
+    (about 0), the right one for stakes and the wrong one here: close value moves together on a slate (CBB totals .06,
+    NFL totals .23), and at 27 bets a day that is a design effect of 2.5. A record without it falls back to units'."""
+    if held and held.get('clvIcc') is not None:
+        return max(0.0, held['clvIcc'])
     try:
         import units as DU
         return max(0.0, DU.params(sport, mk).get('rho') or 0.0)
@@ -156,7 +273,7 @@ def drift(bets, mu1, sd=None, rho=0.0, P=None):
     """Wald's sequential test of "the rule is worth its backtest" (mean close value mu1, the edge its stakes assume)
     against "the rule is worth nothing" (0: the backtest was overfit). Each game day adds its log likelihood ratio
     (s - n mu1 / 2) mu1 / (sd^2 (1 + (n - 1) rho)), s the day's summed clvRet over n bets, rho the within-slate
-    correlation. In game-day order, the first crossing decides: down past -ln(B) pauses the rule, up past ln(A)
+    correlation of close value (rho_for). In game-day order, the first crossing decides: down past -ln(B) pauses the rule, up past ln(A)
     confirms it and retires the test (the close switch in decide() still runs). Since LLR = (sum e^2 / sd^2) x
     (r - 1/2) with r the realization rate (live close value over mu1, here r = mean / mu1), the test is the same as
     asking whether the rule realises more or less than half its expected edge, with a margin that shrinks as bets come in."""
@@ -176,7 +293,7 @@ def drift(bets, mu1, sd=None, rho=0.0, P=None):
         xs = days[d]
         m = len(xs)
         n += m
-        llr += (sum(xs) - m * mu1 / 2) * mu1 / (sd * sd * (1 + (m - 1) * rho))
+        llr += day_llr(xs, mu1, sd, rho)
         path.append([d, n, round(llr, 3)])
         if state == 'watching' and n >= D['minN']:
             if llr <= out['lo']:
@@ -288,8 +405,9 @@ def pick_state(sport, RS, log, old, stamp, P=None):
             # the same rule (k within K_TOL): the clock keeps its start; it records the rule and the k it began with
             clocks[i] = {**c, 'hash': h, **rule, 'k0': c['k0'] if 'k0' in c else legacy_k(c, defn)}
         bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
-        d = decide(bs, sd_of(held), P)
-        dr = drift(bs, expected_live(sport, held), sd_of(held), rho_for(sport, defn['mk']), P)
+        mu1, rho = expected_live(sport, held), rho_for(sport, defn['mk'], held)
+        d = decide(bs, sd_of(held), P, mu1, rho)
+        dr = drift(bs, mu1, sd_of(held), rho, P)
         d = {**d, 'drift': {k: v for k, v in dr.items() if k != 'path'}}
         if dr['state'] == 'paused':
             w = (f"drift test: live worth {dr['real']:.2f} of the backtest's expected edge over {dr['n']} bets, "
@@ -357,9 +475,10 @@ def build(now=None):
             since = ((mon.get('clocks') or {}).get(i) or {}).get('since') or (RJ.get('asof') or '')[:10]
             bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= since]
             sd = sd_of(held)
-            chk = (mon.get('checks') or {}).get(i) or decide(bs, sd, P)
+            mu1, rho = expected_live(s, held), rho_for(s, (defn or {}).get('mk') or i.split(' | ')[0], held)
+            chk = (mon.get('checks') or {}).get(i) or decide(bs, sd, P, mu1, rho)
             stop = (mon.get('stopped') or {}).get(i)
-            dr = drift(bs, expected_live(s, held), sd, rho_for(s, (defn or {}).get('mk') or i.split(' | ')[0]), P)
+            dr = drift(bs, mu1, sd, rho, P)
             rows.append({'id': f'pick:{s}:{i}', 'book': 'picks', 'sport': s, 'label': f"{s.upper()} {label}", 'since': since[:10],
                          'status': 'stopped' if stop else ('on' if i in rules else 'off'), 'stopped': stop,
                          **summary(bs, now, P, sd, held), 'check': chk, 'drift': dr})
@@ -400,7 +519,7 @@ def build(now=None):
                      'status': r.get('status', 'on'), 'stopped': (pb.get('killed') or {}).get(i),
                      **summary(bs, now, P, sd, exp), 'check': decide(bs, sd, P)})
     import units as DU
-    out = {'asof': stamp, 'pre': {**{k: P[k] for k in ('registered', 'window', 'minN', 't', 'cusum', 'weekDays', 'zFlag', 'drift')},
+    out = {'asof': stamp, 'pre': {**{k: P[k] for k in ('registered', 'window', 'minN', 'minDays', 't', 'cusum', 'weekDays', 'zFlag', 'drift') if k in P},
                                   'timing': DU.TIMING, 'leak': DU.LEAK},
            'rules': rows, 'du': du_rows,
            'stopped': [x['id'] for x in rows if x['status'] == 'stopped'],
@@ -433,12 +552,36 @@ def test():
     m, se, t, G = clustered(xs, ['a', 'b', 'c', 'd'])
     sd = math.sqrt(sum((x - m) ** 2 for x in xs) / 3)
     assert abs(se - sd / 2) < 1e-9 and G == 4, (se, sd)
+    # never under the iid se: 60 bets on 3 game days whose day means agree read t -19 clustered, -3.7 floored; under
+    # minDays game days the t carries no verdict; Student's cdf
+    xs = [-0.05 + 0.1 * ((i % 7) - 3) / 3 for i in range(60)]
+    gs = ['abc'[i // 20] for i in range(60)]
+    m, se, t, G = clustered(xs, gs)
+    iid = math.sqrt(sum((x - m) ** 2 for x in xs) / 59 / 60)
+    assert G == 3 and abs(se - iid) < 1e-12 and t_p(t, G, P) is None and t_p(t, 8, P) is not None, (se, iid)
+    assert abs(t_cdf(-1.0, 2) - 0.21132) < 1e-4 and abs(t_cdf(-2.262, 9) - 0.025) < 1e-4 and abs(t_cdf(1.0, 2) - 0.78868) < 1e-4
+    # a pick rule (rho passed): the window's t is not a stop, and a slate that moved together counts as the bets it is
+    # worth. 60 bets on 3 days at -3%: the zero test's old cut (t < -1) would have stopped it
+    sl3 = [{'kick': (k0 + datetime.timedelta(days=i // 20)).strftime('%Y-%m-%dT%H:%M:%SZ'), 'clvRet': -0.03 + 0.1 * ((i % 7) - 3) / 3} for i in range(60)]
+    d = decide(sl3, 0.12, P, 0.015, 0.06)
+    assert d['t'] < -1 and d['p'] is None and not d['stop'] and d['edge']['h'] == P['cusum']['hL'], d
+    # the day's deflation: one day of 20 bets at rho .1 adds its sum over 2.9
+    S1, _, _ = cusum_days([[-0.12] * 20], 0.12, 0.25, 99, 0.1)
+    assert abs(S1 - 20 * 0.75 / 2.9) < 1e-9, S1
+    assert abs(day_llr([0.02, 0.0], 0.02, 0.1, 0.5) - 0.0) < 1e-12 and cusum_llr([[0.0] * 10] * 3, 0.02, 0.1, 0.0, 0.5, 20)[2] == 30
+    # at the edge its stakes assume a pick rule runs on (false stops over 600 bets: rare); worth nothing or losing, it stops
+    pk = lambda mu, n: decide(bets(mu, n), 0.12, P, 0.015, 0.0)
+    fe = sum(pk(0.015, 600)['stop'] for _ in range(100)) / 100
+    assert fe <= 0.08, fe
+    assert sum('hitAt' in pk(0.0, 1500)['edge'] for _ in range(40)) >= 28
+    d = pk(-0.06, 200)
+    assert d['stop'] and d['hitAt'] <= 120, d
     # too few bets never stop; a rule at its edge doesn't stop; one losing half an sd a bet does, quickly
     assert not decide(bets(-0.2, 30), 0.12, P)['stop']
     assert not decide(bets(0.03, 600), 0.12, P)['stop']
     d = decide(bets(-0.06, 120), 0.12, P)
     assert d['stop'] and 'CUSUM' in d['why'], d
-    # false alarms for a rule exactly at the close over 300 bets: rare
+    # the zero test (no rho): false alarms for a rule exactly at the close over 300 bets
     fa = sum(decide(bets(0.0, 300), 0.12, P)['stop'] for _ in range(200)) / 200
     assert fa < 0.5, fa
     # a slow bleed the CUSUM misses, the window t catches

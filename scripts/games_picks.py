@@ -543,6 +543,16 @@ def rule_stats(es):
             'w': sum(1 for e in es if e['profit'] > 0), 'l': sum(1 for e in es if e['profit'] < 0), 'roi': r, 'roiT': rt}
 
 
+def clv_icc(sport, es):
+    """the within-slate correlation of close value on a rule's picks (one-way ANOVA, units._icc): what the live
+    monitor deflates a game day by (rule_monitor.rho_for). None with under 5 slates of 2+ picks"""
+    d = {}
+    for e in es:
+        if e.get('clvRet') is not None:
+            d.setdefault(DU.slate_of(sport, e['g']), []).append(e['clvRet'])
+    return round(DU._icc(d), 3) if sum(1 for v in d.values() if len(v) >= 2) >= 5 else None
+
+
 def x_cut(sport, mk, es):
     """the growth cut from tuning picks at the open (rule_bets at X_FLOOR): d = the close-implied chance edge over a fair
     coin of each pick (leak x timing applied), OLS on the gap clustered by slate; x = the smallest gap where the return
@@ -619,7 +629,7 @@ def fit_rules():
             vb = RB([r for r in rs if r['S'] in val], x) if val else tb
             vo = rule_stats(vb)
             hb = RB([r for r in rs if r['S'] in held], x)
-            ho = rule_stats(hb)
+            ho = {**rule_stats(hb), 'clvIcc': clv_icc(sport, hb)}
             # switched on on the validation season(s) (or the tuning one, at a stricter t), then a test-season veto: a
             # market that loses to the close where nothing was chosen is off
             needT = KEEP_T if val else TUNE_KEEP_T
@@ -806,7 +816,9 @@ def fit_segments(res):
                     vb = [e for e in vp if e['gap'] >= x and e['seg'].get(fam) == v]
                     vs = rule_stats(vb)
                     hb = [e for e in hp if e['gap'] >= x and e['seg'].get(fam) == v]
-                    st = rule_stats(hb)
+                    # the market's own within-slate correlation at this X: a segment's 30-200 test picks are too few
+                    # for one of its own (they read 0 to the .5 ceiling)
+                    st = {**rule_stats(hb), 'clvIcc': clv_icc(sport, [e for e in hp if e['gap'] >= x])}
                     t = vs['clvT'] or 0.0
                     pv = 1 - 0.5 * (1 + math.erf(t / math.sqrt(2))) if len(vb) >= SEG_MIN_HELD else 1.0
                     cands.append({'sport': sport, 'mk': mk, 'fam': fam, 'val': v, 'x': x, 'tuneShrunk': round(sh, 4), 'tuneRaw': round(m_, 4),
