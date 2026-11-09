@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-09T01:57:49Z",
+ "asof": "2026-11-09T01:59:45Z",
  "recenter": {
   "2026-11-08": -10.43,
   "2026-11-09": -10.86
@@ -250,22 +250,6 @@
    "tm": 154.8
   },
   {
-   "id": "401926181",
-   "sport": "cbb",
-   "kick": "2026-11-10T00:00:00Z",
-   "home": "UIC",
-   "away": "UNC Greensboro",
-   "mk": "spread",
-   "side": "away",
-   "line": 20.5,
-   "price": -117.0,
-   "edge": 6.6,
-   "x": null,
-   "why": "spread market off",
-   "m": 13.9,
-   "tm": 149.8
-  },
-  {
    "id": "401921815",
    "sport": "cbb",
    "kick": "2026-11-10T01:00:00Z",
@@ -312,6 +296,22 @@
    "why": "total market off",
    "m": 22.8,
    "tm": 156.5
+  },
+  {
+   "id": "401926181",
+   "sport": "cbb",
+   "kick": "2026-11-10T00:00:00Z",
+   "home": "UIC",
+   "away": "UNC Greensboro",
+   "mk": "spread",
+   "side": "away",
+   "line": 19.5,
+   "price": 104.0,
+   "edge": 5.6,
+   "x": null,
+   "why": "spread market off",
+   "m": 13.9,
+   "tm": 149.8
   },
   {
    "id": "401925681",
@@ -622,9 +622,9 @@
   "401926181": {
    "mk": "spread",
    "side": "away",
-   "line": 20.5,
-   "price": -117.0,
-   "edge": 6.6,
+   "line": 19.5,
+   "price": 104.0,
+   "edge": 5.6,
    "ev": null,
    "units": 0.0,
    "home": "UIC",
@@ -780,7 +780,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 8869,
+  "snapshots": 8876,
   "buckets": [
    {
     "when": "24h+",
@@ -793,21 +793,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1570,
-    "clvRet": -0.0465,
-    "clvT": -16.42,
+    "clvN": 1575,
+    "clvRet": -0.0464,
+    "clvT": -16.43,
     "clv": -0.08,
-    "beat": 0.257,
-    "still": 0.473
+    "beat": 0.258,
+    "still": 0.474
    },
    {
     "when": "1-6h",
-    "clvN": 1114,
+    "clvN": 1115,
     "clvRet": -0.0412,
-    "clvT": -28.22,
+    "clvT": -28.25,
     "clv": 0.06,
     "beat": 0.166,
-    "still": 0.707
+    "still": 0.708
    },
    {
     "when": "<1h",
@@ -8142,7 +8142,7 @@
     "down": 38.25
    },
    "2026-11-09": {
-    "raw": 10.5,
+    "raw": 11.5,
     "scale": 1.0
    },
    "2026-11-11": {
