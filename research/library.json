@@ -222,8 +222,10 @@
      "short": "OLS on outcome FV for every under-22 in 33 leagues plus academy and feeder leagues.",
      "body": [
       "Inputs kept include age, market value (deflated to the fit seasons' level), GAR this and last season,",
-      "minutes share, club strength, scoring rate, height, position, PL2 minutes. 53,680 rows, 2013-20.",
-      "Held out by birth cohort: error 55.65 vs 64.42 for age and market value alone (R2 .42)."
+      "minutes share, club strength, scoring rate, height, position, PL2 minutes. 53,682 rows, 2013-20.",
+      "Detailed position block (centre-back, full-back, defensive / attacking midfield, winger, striker vs central",
+      "midfield): season-out error -0.10, t 3.9, 7 of 8 seasons, top 50 and forward test better.",
+      "Held out by birth cohort: error 55.55 vs 64.42 for age and market value alone (R2 .42)."
      ],
      "where": "Soccer prospects board, fv model tab",
      "sports": [
@@ -1897,7 +1899,7 @@
   },
   {
    "board": "CFB / NFL prospects",
-   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,923 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 74.9 (80 about once per 5 seasons).",
+   "note": "Outcome = NFL career, 2012-18 drafts; per class = players in the band per draft class. pct = live FBS+FCS board (4,919 graded) at FV or higher. Stretch: headline = mean up to 67.8, linear above to 80 at 74.9 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -1921,7 +1923,7 @@
      "75",
      "3+ time All-Pro",
      "~1",
-     "1 of 4,923 (0.02%)",
+     "1 of 4,919 (0.02%)",
      "0.89 / 0.29",
      "top 2 pick",
      "-"
@@ -1930,7 +1932,7 @@
      "70",
      "2-time All-Pro",
      "~3",
-     "3 of 4,923 (0.06%)",
+     "3 of 4,919 (0.06%)",
      "0.67 / 0.23",
      "top 5 pick",
      "-"
@@ -1939,7 +1941,7 @@
      "65",
      "All-Pro or 3+ Pro Bowls",
      "~7",
-     "4 of 4,923 (0.08%)",
+     "5 of 4,919 (0.10%)",
      "0.49 / 0.17",
      "top 10 pick",
      "65+: 71.2 -> 74.9 (n 19, 50+ 100%)"
@@ -1948,7 +1950,7 @@
      "60",
      "Pro Bowler",
      "~16",
-     "10 of 4,923 (0.20%)",
+     "11 of 4,919 (0.22%)",
      "0.40 / 0.13",
      "1st round",
      "60-64: 62.8 -> 60.6 (n 10, 50+ 70%)"
@@ -1957,7 +1959,7 @@
      "55",
      "6+ seasons as a starter",
      "~25",
-     "17 of 4,923 (0.35%)",
+     "17 of 4,919 (0.35%)",
      "0.31 / 0.10",
      "late 1st / 2nd round",
      "55-59: 57.3 -> 59.5 (n 17, 50+ 65%)"
@@ -1966,7 +1968,7 @@
      "50",
      "4+ seasons as a starter",
      "~32",
-     "73 of 4,923 (1.5%)",
+     "73 of 4,919 (1.5%)",
      "0.19 / 0.07",
      "rounds 2-3",
      "50-54: 51.8 -> 48.5 (n 64, 50+ 38%)"
@@ -1975,7 +1977,7 @@
      "45",
      "2+ seasons as a starter",
      "~43",
-     "206 of 4,923 (4.2%)",
+     "205 of 4,919 (4.2%)",
      "0.09 / 0.05",
      "rounds 3-4",
      "45-49: 47.2 -> 46.1 (n 167, 50+ 37%)"
@@ -1984,7 +1986,7 @@
      "40",
      "rotation, 48+ games",
      "~64",
-     "276 of 4,923 (5.6%)",
+     "283 of 4,919 (5.8%)",
      "0 / 0.02",
      "rounds 4-6",
      "40-44: 42.4 -> 42.3 (n 80, 50+ 32%)"
@@ -1993,7 +1995,7 @@
      "35",
      "backup, 16+ games",
      "~98",
-     "371 of 4,923 (7.5%)",
+     "371 of 4,919 (7.5%)",
      "0 / 0.01",
      "late round",
      "35-39: 37.3 -> 36.2 (n 107, 50+ 21%)"
@@ -2002,7 +2004,7 @@
      "30",
      "drafted / camp roster",
      "~150",
-     "547 of 4,923 (11.1%)",
+     "547 of 4,919 (11.1%)",
      "0 / 0",
      "late round / UDFA",
      "30-34: 32.3 -> 32.6 (n 165, 50+ 17%)"
@@ -2258,7 +2260,7 @@
   },
   {
    "board": "Soccer prospects",
-   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,731 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
+   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,840 under-22s. Stretch: headline = mean up to 64.0, linear above to 80 at 72.4 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -2278,71 +2280,71 @@
      "75",
      "peak GAR a season GK 20.0 / D 14.9 / M 15.9 / F 15.0",
      "the best of a birth year at the position",
-     "1 of 30,731 (<0.01%)",
+     "1 of 30,840 (<0.01%)",
      "-"
     ],
     [
      "70",
      "peak GAR a season GK 15.2 / D 13.0 / M 14.0 / F 13.4",
      "top 3 of a birth year at the position",
-     "1 of 30,731 (<0.01%)",
-     "70-74: 71.8 -> 66.1 (n 6, 50+ 100%)"
+     "1 of 30,840 (<0.01%)",
+     "70-74: 71.3 -> 66.3 (n 7, 50+ 100%)"
     ],
     [
      "65",
      "peak GAR a season GK 11.4 / D 11.8 / M 11.6 / F 10.6",
      "top 8 at the position",
-     "1 of 30,731 (<0.01%)",
-     "65-69: 67.4 -> 66.6 (n 12, 50+ 100%)"
+     "1 of 30,840 (<0.01%)",
+     "65-69: 67.3 -> 66.7 (n 10, 50+ 100%)"
     ],
     [
      "60",
      "peak GAR a season GK 10.0 / D 10.2 / M 9.3 / F 8.8",
      "top 20 at the position",
-     "18 of 30,731 (0.06%)",
-     "60-64: 61.8 -> 62.2 (n 64, 50+ 94%)"
+     "19 of 30,840 (0.06%)",
+     "60-64: 61.9 -> 61.9 (n 74, 50+ 92%)"
     ],
     [
      "55",
      "peak GAR a season GK 6.9 / D 8.4 / M 7.4 / F 7.2",
      "top 45 at the position",
-     "35 of 30,731 (0.11%)",
-     "55-59: 57.7 -> 57.9 (n 143, 50+ 85%)"
+     "34 of 30,840 (0.11%)",
+     "55-59: 57.6 -> 57.8 (n 124, 50+ 87%)"
     ],
     [
      "50",
      "peak GAR a season GK 5.4 / D 6.7 / M 5.6 / F 5.6",
      "top 90 (big-five regular) at the position",
-     "88 of 30,731 (0.29%)",
-     "50-54: 51.9 -> 51.7 (n 273, 50+ 61%)"
+     "94 of 30,840 (0.30%)",
+     "50-54: 51.8 -> 51.5 (n 348, 50+ 60%)"
     ],
     [
      "45",
      "peak GAR a season GK 4.0 / D 5.4 / M 4.4 / F 4.5",
      "top 150 at the position",
-     "194 of 30,731 (0.63%)",
-     "45-49: 47.8 -> 47.9 (n 730, 50+ 46%)"
+     "194 of 30,840 (0.63%)",
+     "45-49: 47.7 -> 47.8 (n 649, 50+ 46%)"
     ],
     [
      "40",
      "peak GAR a season GK 2.9 / D 4.3 / M 3.4 / F 3.4",
      "top 250 (top-flight regular) at the position",
-     "474 of 30,731 (1.5%)",
-     "40-44: 41.9 -> 41.7 (n 1480, 50+ 26%)"
+     "491 of 30,840 (1.6%)",
+     "40-44: 41.9 -> 41.7 (n 1493, 50+ 26%)"
     ],
     [
      "30",
      "some senior value",
      "-",
-     "1,813 of 30,731 (5.9%)",
-     "30-34: 32.2 -> 32.2 (n 5208, 50+ 7%)"
+     "1,854 of 30,840 (6.0%)",
+     "30-34: 32.2 -> 32.1 (n 5096, 50+ 7%)"
     ],
     [
      "20",
      "no senior value",
      "-",
      "all",
-     "20-24: 22.4 -> 22.2 (n 33215, 50+ 1%)"
+     "20-24: 22.4 -> 22.2 (n 33225, 50+ 1%)"
     ]
    ]
   },
