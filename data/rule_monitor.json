@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-08T22:50:28Z",
+ "asof": "2026-11-09T01:16:58Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -849,18 +849,18 @@
    "status": "on",
    "stopped": null,
    "n": 4,
-   "clvN": 2,
-   "clvRet": 0.0975,
+   "clvN": 3,
+   "clvRet": 0.0631,
    "clvT": null,
    "days": 1,
-   "beat": 1.0,
-   "settled": 2,
+   "beat": 0.667,
+   "settled": 3,
    "w": 0,
-   "l": 2,
+   "l": 3,
    "roi": -1.0,
    "week": {
-    "n": 2,
-    "clvRet": 0.0975,
+    "n": 3,
+    "clvRet": 0.0631,
     "clvT": null
    },
    "exp": {
@@ -870,8 +870,8 @@
     "n": 132
    },
    "vsExp": {
-    "gap": 0.0018,
-    "z": 0.02,
+    "gap": -0.0326,
+    "z": -0.45,
     "read": "in line"
    },
    "check": {
@@ -928,19 +928,19 @@
    "status": "on",
    "stopped": null,
    "n": 17,
-   "clvN": 13,
-   "clvRet": -0.0177,
-   "clvT": -0.7,
+   "clvN": 15,
+   "clvRet": -0.0285,
+   "clvT": -0.93,
    "days": 4,
-   "beat": 0.231,
-   "settled": 13,
+   "beat": 0.2,
+   "settled": 15,
    "w": 6,
-   "l": 7,
-   "roi": -0.0882,
+   "l": 9,
+   "roi": -0.2098,
    "week": {
-    "n": 13,
-    "clvRet": -0.0177,
-    "clvT": -0.7
+    "n": 7,
+    "clvRet": -0.0731,
+    "clvT": -3.59
    },
    "exp": {
     "clvRet": 0.0334,
@@ -949,51 +949,51 @@
     "n": 414
    },
    "vsExp": {
-    "gap": -0.0511,
-    "z": -2.01,
+    "gap": -0.0619,
+    "z": -2.02,
     "read": "below the backtest"
    },
    "check": {
-    "n": 13,
-    "window": 13,
-    "mean": -0.0177,
-    "t": -0.7,
+    "n": 14,
+    "window": 14,
+    "mean": -0.0178,
+    "t": -0.75,
     "days": 4,
     "sd": 0.1256,
-    "cusum": 1.49,
+    "cusum": 1.4,
     "cusumMax": 1.49,
     "h": 10.0,
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0094,
-     "n": 13,
+     "n": 14,
      "sd": 0.1256,
      "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.218,
-     "info": 0.07,
-     "real": -2.489,
-     "realSe": 3.699,
+     "llr": -0.23,
+     "info": 0.08,
+     "real": -2.422,
+     "realSe": 3.565,
      "need": 1048
     }
    },
    "drift": {
     "mu1": 0.0094,
-    "n": 13,
+    "n": 15,
     "sd": 0.1256,
     "rho": 0.0,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.218,
-    "info": 0.07,
-    "real": -2.489,
-    "realSe": 3.699,
+    "llr": -0.347,
+    "info": 0.08,
+    "real": -3.61,
+    "realSe": 3.444,
     "need": 1048,
     "path": [
      [
@@ -1013,8 +1013,8 @@
      ],
      [
       "2026-11-08",
-      13,
-      -0.218
+      15,
+      -0.347
      ]
     ]
    }
@@ -1893,12 +1893,12 @@
    "sport": "nfl",
    "mk": "spread",
    "label": "NFL spread",
-   "n": 4,
-   "du": 8.25,
-   "clvRet": 0.0197,
-   "clvT": 0.51,
-   "flat": 0.0452,
-   "adds": -0.0255,
+   "n": 5,
+   "du": 8.75,
+   "clvRet": 0.0182,
+   "clvT": 0.53,
+   "flat": 0.035,
+   "adds": -0.0168,
    "expEdge": 0.0451,
    "basis": "backtest"
   },
@@ -1906,13 +1906,13 @@
    "sport": "nfl",
    "mk": "total",
    "label": "NFL total",
-   "n": 13,
-   "du": 20.5,
-   "clvRet": -0.0436,
-   "clvT": -0.9,
-   "flat": -0.0177,
-   "adds": -0.0259,
-   "expEdge": 0.0103,
+   "n": 15,
+   "du": 21.0,
+   "clvRet": -0.0449,
+   "clvT": -0.95,
+   "flat": -0.0285,
+   "adds": -0.0164,
+   "expEdge": 0.0101,
    "basis": "backtest"
   },
   {
