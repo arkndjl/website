@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-09T16:25:15Z",
+ "asof": "2026-11-09T16:44:56Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 87.55,
+  "now": 86.89,
   "peak": 117.38,
-  "drawdown": 0.2542,
-  "open": 70.75,
+  "drawdown": 0.2597,
+  "open": 70.0,
   "path": [
-   102.91,
    101.66,
    100.41,
    100.41,
@@ -408,7 +407,8 @@
    86.77,
    86.95,
    87.03,
-   87.55
+   87.55,
+   86.89
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -2.95,
   "clv": -0.1,
   "beat": 0.3,
-  "settled": 404,
+  "settled": 405,
   "w": 200,
-  "l": 204,
+  "l": 205,
   "p": 0,
-  "roi": -0.0185,
-  "roiT": -0.37,
-  "profit": -10.44,
-  "risked": 366.5,
-  "yield": -0.0285
+  "roi": -0.0209,
+  "roiT": -0.41,
+  "profit": -11.19,
+  "risked": 367.25,
+  "yield": -0.0305
  },
  "tEff": -2.95,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -1.8% vs -1.4% (SE 5.1)",
+   "value": "ROI -2.1% vs -1.4% (SE 5.1)",
    "pass": true
   }
  ],
@@ -686,15 +686,15 @@
    "clvT": -4.7,
    "clv": -0.21,
    "beat": 0.247,
-   "settled": 76,
+   "settled": 77,
    "w": 40,
-   "l": 36,
+   "l": 37,
    "p": 0,
-   "roi": 0.0924,
-   "roiT": 0.7,
-   "profit": 0.05,
-   "risked": 66.75,
-   "yield": 0.0007
+   "roi": 0.0782,
+   "roiT": 0.6,
+   "profit": -0.7,
+   "risked": 67.5,
+   "yield": -0.0104
   },
   {
    "id": "nflprops-prop",
@@ -719,30 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186536",
-   "k": "2026-11-09T13:30:00Z",
-   "slate": "tennis:2026-11-09",
-   "h": "Vallejo",
-   "a": "Humbert",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 213,
-   "bet": "Vallejo ML +213",
-   "placed": "2026-11-08T12:14:57Z",
-   "stake": 0.75,
-   "edge": 8.7,
-   "ev": 0.016,
-   "event": "Bybit Stockholm Open",
-   "pass": false,
-   "clvRet": -0.0219,
-   "clv": -0.3,
-   "beat": 0,
-   "close": 0.3125
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -1489,7 +1465,7 @@
    "ev": 0.0202,
    "event": null,
    "pass": false,
-   "close": 45.5
+   "close": 46.5
   },
   {
    "rule": "cfb-total",
@@ -1598,6 +1574,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186536",
+   "k": "2026-11-09T13:30:00Z",
+   "slate": "tennis:2026-11-09",
+   "h": "Vallejo",
+   "a": "Humbert",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 213,
+   "bet": "Vallejo ML +213",
+   "placed": "2026-11-08T12:14:57Z",
+   "stake": 0.75,
+   "edge": 8.7,
+   "ev": 0.016,
+   "event": "Bybit Stockholm Open",
+   "pass": false,
+   "clvRet": -0.0219,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.3125,
+   "score": "6-4 6-3",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.75
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3265,37 +3269,6 @@
    "res": "w",
    "ret": 0.9615,
    "profit": 2.4038
-  },
-  {
-   "rule": "cfb-total",
-   "sport": "cfb",
-   "id": "401862823",
-   "k": "2026-11-08T00:30:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "Army",
-   "a": "Air Force",
-   "mk": "total",
-   "side": "over",
-   "line": 48.5,
-   "price": -104.0,
-   "bet": "over 48.5 -104",
-   "placed": "2026-11-01T20:52:18Z",
-   "stake": 0.25,
-   "edge": 3.2,
-   "ev": 0.0037,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.2567,
-   "clv": -5.0,
-   "beat": -1,
-   "close": 43.5,
-   "score": [
-    24.0,
-    21.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -17060,7 +17033,11 @@
    "clvRet": -0.0219,
    "clv": -0.3,
    "beat": 0,
-   "close": 0.3125
+   "close": 0.3125,
+   "score": "6-4 6-3",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.75
   },
   {
    "rule": "tennis-ml",
@@ -17808,7 +17785,7 @@
    "ev": 0.0202,
    "event": null,
    "pass": false,
-   "close": 45.5
+   "close": 46.5
   },
   {
    "rule": "cfb-total",
