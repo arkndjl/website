@@ -15,7 +15,7 @@ values), FotMob (team expected goals in twelve other leagues since 2020-21). Tri
 
 Seasons are named by the year they end in (2027 = 2026-27). Teams are ESPN ids, which hold across competitions.
 """
-import csv, datetime as dt, gzip, io, json, os, sys, threading, time, urllib.request
+import csv, datetime as dt, gzip, html, io, json, os, sys, threading, time, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
@@ -494,6 +494,18 @@ def us_get(url):
     return d
 
 
+def us_text(o):
+    """Understat sends names as HTML text (Dara O&#039;Shea): every string in o with its entities decoded. Run on
+    fresh pulls and on cached files alike (caches written before this still hold the entities)."""
+    if isinstance(o, str):
+        return html.unescape(o) if '&' in o else o
+    if isinstance(o, list):
+        return [us_text(v) for v in o]
+    if isinstance(o, dict):
+        return {us_text(k): us_text(v) for k, v in o.items()}
+    return o
+
+
 def us_league(lg, S, fresh=False):
     """Understat's league season (S end year): matches with xG, team match histories, player season totals"""
     name = US_LG.get(lg)
@@ -501,10 +513,10 @@ def us_league(lg, S, fresh=False):
         return None
     p = os.path.join(CACHE, 'us', f'{name}_{S}.json.gz')
     if os.path.exists(p) and not fresh and (S < current_season() or time.time() - os.path.getmtime(p) < 6 * 3600):
-        return load(p)
-    d = us_get(f'{US}/getLeagueData/{name}/{S - 1}')
+        return us_text(load(p))
+    d = us_text(us_get(f'{US}/getLeagueData/{name}/{S - 1}'))
     if not d:
-        return load(p) if os.path.exists(p) else None
+        return us_text(load(p)) if os.path.exists(p) else None
     out = {'matches': [], 'players': d.get('players') or [], 'teams': {}}
     for m in d.get('dates') or []:
         out['matches'].append({'id': m['id'], 'res': bool(m.get('isResult')), 't': m.get('datetime'),
@@ -523,8 +535,8 @@ def us_match(mid, fresh=False):
     """one Understat match: rosters (minutes, position, subs) and shots (minute, xG, player)"""
     p = os.path.join(CACHE, 'usm', str(mid)[-2:], f'{mid}.json.gz')
     if os.path.exists(p) and not fresh:
-        return load(p)
-    d = us_get(f'{US}/getMatchData/{mid}')
+        return us_text(load(p))
+    d = us_text(us_get(f'{US}/getMatchData/{mid}'))
     if not d or 'rosters' not in d:
         return None
     ro = {s: [{k: v.get(k) for k in ('id', 'player_id', 'player', 'position', 'positionOrder', 'time', 'roster_in',
