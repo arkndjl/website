@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-09T02:02:34Z",
+ "asof": "2026-11-09T02:03:46Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1569,19 +1569,19 @@
    "status": "on",
    "stopped": null,
    "n": 5,
-   "clvN": 3,
-   "clvRet": 0.0307,
-   "clvT": 2.19,
-   "days": 2,
-   "beat": 0.667,
-   "settled": 3,
+   "clvN": 4,
+   "clvRet": 0.058,
+   "clvT": 1.69,
+   "days": 3,
+   "beat": 0.75,
+   "settled": 4,
    "w": 3,
-   "l": 0,
-   "roi": 0.4283,
+   "l": 1,
+   "roi": 0.0713,
    "week": {
-    "n": 3,
-    "clvRet": 0.0307,
-    "clvT": 2.19
+    "n": 4,
+    "clvRet": 0.058,
+    "clvT": 1.69
    },
    "exp": {
     "clvRet": 0.1053,
@@ -1590,16 +1590,16 @@
     "n": 224
    },
    "vsExp": {
-    "gap": -0.0746,
-    "z": -5.32,
-    "read": "below the backtest"
+    "gap": -0.0473,
+    "z": -1.38,
+    "read": "in line"
    },
    "check": {
-    "n": 3,
-    "window": 3,
-    "mean": 0.0307,
-    "t": 2.19,
-    "days": 2,
+    "n": 4,
+    "window": 4,
+    "mean": 0.058,
+    "t": 1.69,
+    "days": 3,
     "sd": 0.1228,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1945,13 +1945,13 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 37,
-   "du": 88.0,
-   "clvRet": 0.0271,
-   "clvT": 1.76,
-   "flat": 0.0347,
-   "adds": -0.0076,
-   "expEdge": 0.0179,
+   "n": 38,
+   "du": 91.0,
+   "clvRet": 0.0308,
+   "clvT": 1.97,
+   "flat": 0.0374,
+   "adds": -0.0067,
+   "expEdge": 0.0174,
    "basis": "backtest + live picks"
   },
   {
@@ -1976,8 +1976,7 @@
   "pick:nfl:total",
   "pick:cbb:spread",
   "pick:cbb:total",
-  "pick:nba:total",
-  "pick:nba:spread | role: favorite"
+  "pick:nba:total"
  ],
  "drift": {
   "watching": [
