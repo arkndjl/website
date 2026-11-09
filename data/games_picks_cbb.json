@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-09T21:42:53Z",
+ "asof": "2026-11-09T21:45:04Z",
  "recenter": {
   "2026-11-09": -10.76,
   "2026-11-10": -10.55
@@ -362,22 +362,6 @@
    "tm": 139.6
   },
   {
-   "id": "401916305",
-   "sport": "cbb",
-   "kick": "2026-11-10T00:00:00Z",
-   "home": "Cincinnati",
-   "away": "Minnesota",
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -111.0,
-   "edge": 5.2,
-   "x": null,
-   "why": "spread market off",
-   "m": 11.7,
-   "tm": 143.1
-  },
-  {
    "id": "401925681",
    "sport": "cbb",
    "kick": "2026-11-10T00:00:00Z",
@@ -440,6 +424,22 @@
    "why": "total market off",
    "m": -10.0,
    "tm": 161.2
+  },
+  {
+   "id": "401916305",
+   "sport": "cbb",
+   "kick": "2026-11-10T00:00:00Z",
+   "home": "Cincinnati",
+   "away": "Minnesota",
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
+   "price": 108.0,
+   "edge": 4.2,
+   "x": null,
+   "why": "spread market off",
+   "m": 11.7,
+   "tm": 143.1
   },
   {
    "id": "401906803",
@@ -542,9 +542,9 @@
   "401916305": {
    "mk": "spread",
    "side": "home",
-   "line": 6.5,
-   "price": -111.0,
-   "edge": 5.2,
+   "line": 7.5,
+   "price": 108.0,
+   "edge": 4.2,
    "ev": null,
    "units": 0.0,
    "home": "Cincinnati",
@@ -1060,7 +1060,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 9479,
+  "snapshots": 9487,
   "buckets": [
    {
     "when": "24h+",
@@ -1074,20 +1074,20 @@
    {
     "when": "6-24h",
     "clvN": 1757,
-    "clvRet": -0.0431,
-    "clvT": -16.64,
-    "clv": -0.03,
-    "beat": 0.269,
-    "still": 0.48
+    "clvRet": -0.0425,
+    "clvT": -16.41,
+    "clv": -0.02,
+    "beat": 0.274,
+    "still": 0.477
    },
    {
     "when": "1-6h",
-    "clvN": 1198,
-    "clvRet": -0.0412,
-    "clvT": -30.11,
-    "clv": 0.06,
-    "beat": 0.159,
-    "still": 0.722
+    "clvN": 1201,
+    "clvRet": -0.0407,
+    "clvT": -29.65,
+    "clv": 0.07,
+    "beat": 0.165,
+    "still": 0.716
    },
    {
     "when": "<1h",
@@ -8429,8 +8429,8 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 39.75,
-    "scale": 1.0
+    "raw": 42.5,
+    "scale": 0.9412
    }
   }
  }
