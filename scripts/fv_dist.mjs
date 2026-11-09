@@ -21,7 +21,8 @@ const ncdf = x => { const z = x / Math.SQRT2, a = Math.abs(z), t = 1 / (1 + 0.32
   return 0.5 * (1 + Math.sign(z) * e); };
 
 // z: { term: value } for the board's kept spread terms (missing terms count 0)
-export function fvDist(board, fv, z = {}) {
+// low: below the grades the fit saw (M.low) every bin above the floor is scaled down, to k0 at 20 (fv_dist.py)
+export function fvDist(board, fv, z = {}, low = true) {
   const M = fvDistFit()[board];
   if (!M || fv == null) return null;
   const H = M.hinges || [45, 60];   // the location: the grade per 10 points from 40, plus a slope change at each hinge
@@ -30,6 +31,12 @@ export function fvDist(board, fv, z = {}) {
   const s = Math.exp(Math.max(-3, Math.min(3, ls)));
   const F = M.cuts.map(c => ncdf((c - mu) / s)), p = [];
   for (let k = 0; k <= F.length; k++) p.push(Math.max(0, (k < F.length ? F[k] : 1) - (k ? F[k - 1] : 0)));
+  const L = low ? M.low : null;
+  if (L && fv < L.from) {
+    const k = L.k0 + (1 - L.k0) * Math.max(0, fv - 20) / (L.from - 20);
+    for (let j = 1; j < p.length; j++) p[j] *= k;
+    p[0] = 1 - p.slice(1).reduce((a, v) => a + v, 0);
+  }
   const edges = M.edges, lo = [20, ...edges], hi = [...edges, 80], fl = M.floorShare;
   const q = x => {   // the quantile function (bottom bin: a point mass at 20 of share fl, then flat to 30)
     if (x <= p[0] * fl) return 20;
