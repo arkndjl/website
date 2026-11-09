@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Free preseason win-total history for the futures backtest (scripts/futures_backtest.py).
 
     python3 scripts/futures_hist.py        # writes scripts/data/futures/win_totals.json

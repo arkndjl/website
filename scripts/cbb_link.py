@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Link every Barttorvik college career (2008 on) to its NBA career and to its recruiting grades.
 
     python3 scripts/cbb_link.py     # writes scripts/.cache/cbb/careers.json

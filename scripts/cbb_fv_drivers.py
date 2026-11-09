@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """New-driver search for the College Basketball ARKBOARD FV model (research harness, Oct 24 2026).
 
     python3 scripts/cbb_careers_kit.py          # once: scripts/.cache/cbb/careers.json

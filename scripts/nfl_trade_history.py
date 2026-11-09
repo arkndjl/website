@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Draft-day trade-ups, 2010-25, for the mock draft's projected trades (cfb_teams.mjs, mockDraft).
 
 nflverse's trades file: each draft-day deal with a current-year pick is a trade-up to its earliest pick. The gap

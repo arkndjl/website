@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL totals vs Open-Meteo kickoff weather (research only, round 2, Oct 24 2026). Cheap retest of the Oct 15 failure.
 
     python3 scripts/nfl_weather_om_backtest.py      # needs numpy; ~400 archive calls (one per home city-season)

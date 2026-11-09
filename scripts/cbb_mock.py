@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """2027 NBA mock drafts for the College Basketball ARKBOARD: predictive, blended and conviction, as for college football.
 
     python3 scripts/cbb_mock.py [--offline]     # full run: backtests, fits, writes data/cbb_mock.json + scripts/data/cbb_mock_fit.json

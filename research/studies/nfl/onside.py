@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL onside kicks: surprise vs expected, 2015-2026.
 Expected = 4th quarter with the kicking team trailing. Surprise = any other onside (Q1-Q3, or not trailing).
 Outcome: kicking team recovery (Wilson CI), kicking-team WPA vs a normal kickoff in the same quarter group.

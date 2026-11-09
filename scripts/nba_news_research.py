@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA injury news repricing study (betting plan item 8): does the market under- or over-react when a rotation
 player's status changes between the opening line and the close? Research only: writes data/nba_news_fit.json, read
 by the NBA picks backtest tab. The game model is not changed here.

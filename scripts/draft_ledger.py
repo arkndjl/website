@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pre-registered 2027 draft ledger: dated snapshots of every board's draft read, scored once the drafts happen.
 
     python3 scripts/draft_ledger.py snap cfb|cbb|hockey      after each board run (the board workflows call it)

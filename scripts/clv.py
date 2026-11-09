@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Closing line value: how picks are judged on the site (roadmap item 2, Oct 21 2026).
 
 A pick's result is mostly noise: ROI on a -110 bet has a spread of about 0.95 units a bet, so a 2% edge takes about

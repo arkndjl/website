@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Data pulls for scripts/team_badges.py (cached in scripts/.cache/style/, not committed).
   cbb   Barttorvik getgamestats.php?year=Y&csv=1 -> cbb_gs{Y}.csv (2015 on)
   nfl   nflverse stats_team_week_Y.csv -> nfl_team{Y}.csv (2014 on)

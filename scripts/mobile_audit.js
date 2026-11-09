@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Phone-width audit of every ARKBOARD page and tab: page sideways scroll, wide tables with no pinned label column,
 // tap targets under 24px, text under 11px, inputs that zoom iOS. Build with --baseURL http://localhost:8765/, serve
 // public/ there, then: node scripts/mobile_audit.js <outdir>   (SHOTS=0 skips screenshots, ONLY=nfl,hub limits pages)

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Does the CFB preseason prior gain from roster turnover? A backtest on free data only (no CFBD calls):
 ESPN scores and closes (scripts/cfb_espn_hist.py), ESPN box scores and 247 composite classes
 (scripts/cfb_roster_hist.py), and USA Today's head coach by school and year (scripts/cfb_coach_fit.py's pulls).

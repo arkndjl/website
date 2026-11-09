@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The schedule's side of the NBA game model: who sits or plays fewer minutes on the second night of a back-to-back,
 minutes caps on return from a layoff, road trips, and tip time (local and body clock).
 

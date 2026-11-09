@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // The NFL draft positions (nflverse draft_picks.csv `position`) a college position group's draftee can carry, for
 // every harness that joins a college player to his NFL career by name. nflverse lists most edge rushers as LB (Will
 // Anderson Jr., Zack Baun, Jermaine Johnson: 138 LB picks 2020-25 against 16 OLB) and some as DT (DeMarvin Leal);

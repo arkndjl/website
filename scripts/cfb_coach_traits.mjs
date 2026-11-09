@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Coach traits in the CFB game model (Nov 1 2026). The shipped model has one coach trait, aggr (4th-down go rate over
 // the league's rate in the same situation bins, opponent-adjusted in season, offense side). This tests the rest:
 //   fb bins (ESPN play-by-play, 2015-25; tune 2017-20, held out 2021-25):

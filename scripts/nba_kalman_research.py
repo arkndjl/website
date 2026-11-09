@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: team ratings with their own uncertainty (scripts/kalman.py) in the NBA game model (numpy).
 
     python3 scripts/nba_kalman_research.py          # filter tuning, then each Kalman input against the fitted model

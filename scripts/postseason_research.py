@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Postseason-only layer research (Noah, Nov 2 2026): do playoff games follow the regular-season game model, or do
 some team traits (star concentration, goaltending, form, strength against good teams, experience, rest, variance)
 predict playoff results beyond it?

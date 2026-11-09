@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NBA game model's backtest and fit (python3 scripts/nba_games.py --fit; numpy). Writes data/nba_games_fit.json.
 
 Walk-forward: each season 2015-2026 is scored by weights fit on the seasons before it. The rating memory and market

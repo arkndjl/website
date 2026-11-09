@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team variance profiles (team model idea 10, Oct 23 2026): does a game's spread of outcomes depend on who plays it?
 
 Every games table prices a cover or a win as Phi(gap / sd) with one sd per sport (scripts/cover.py, the win sd in

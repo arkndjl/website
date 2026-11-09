@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike data layer (the COUNTER-STRIKE ARKBOARD): every pro CS2 series between ranked rosters since early
 2024, from free sources.
 

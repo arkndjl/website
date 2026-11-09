@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """QB premium at the top of the NFL draft, for the CFB mock drafts (mockDraftOnce in scripts/cfb_teams.mjs).
 
     python3 scripts/nfl_qb_premium.py      # run scripts/draft_backtest.py first (DraftTek boards, nflverse picks);

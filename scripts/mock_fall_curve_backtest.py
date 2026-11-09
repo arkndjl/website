@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Fall-board test of the mock's board-to-pick curve (BOARD_PICK in scripts/cfb_teams.mjs, fit on final boards).
 
     python3 scripts/mock_fall_curve_backtest.py   # uses scripts/cfb_draft_pct_backtest.py's cache; writes data/cfb_mock_fall_backtest.json

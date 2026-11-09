@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike research, Nov 3 2026: rating metric, prospect FV drivers + badges, series-model terms.
 
     python3 scripts/cs2_nov03_research.py [rating|prospects|game ...]   -> data/cs2_nov03_research.json

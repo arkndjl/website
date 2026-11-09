@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: players back from a lost season (Haliburton 2026-27, Lillard, Irving, Tatum) in the NBA priors.
 
     python3 scripts/nba_returners_research.py           # player level -> data/nba_returners_research.json (numpy)

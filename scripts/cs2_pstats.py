@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Per-map player stats for the Counter-Strike players section, from bo3.gg's public API (no key).
 
     python3 scripts/cs2_pstats.py            # maps finished since the last run (and any earlier gaps), ~1-2 min a run

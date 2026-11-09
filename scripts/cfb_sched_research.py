@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kickoff time in college football: night, noon (local), late (10 PM ET+) and weekday games, on margins and totals.
 
     python3 scripts/cfb_espn_hist.py 2015 2025    # first: ESPN scores and closes (free, cached)

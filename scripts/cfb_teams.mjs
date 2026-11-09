@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Team-level models for the College Football ARKBOARD, fed by scripts/fetch_cfb.mjs:
 //   Elo        team ratings from games (ESPN scoreboard), starting from a preseason prior
 //   Talent     each team's projected starting 22 from our player grades, as expected NFL value

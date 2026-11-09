@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Fumble-neutral EPA inside the CFB game model (cfb_model.mjs FUMN): the model's own walk-forward on the 2015-26 ESPN
 // history (scripts/cfb_hist_backtest.mjs machinery, ESPN-only inputs p4 and aggr, roster prior, pooled fit), raw EPA
 // against fumble-neutral EPA, scored on the project split (tune 2017-20, held out 2021-26), paired per game, clustered.

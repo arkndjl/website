@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL personnel groupings for the NFL ARKBOARD's personnel tab (static/data/personnel/nfl.json), and the personnel
 inputs tested on the game model and the receiving props (data/nfl_personnel_research.json).
 

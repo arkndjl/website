@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer two-legged ties: does the first leg's score move the second leg beyond the model? (Nov 1 2026 sweep)
 UEFA cups and their qualifiers (hist 'leg' 1/2 + 'ser'). For each second leg, agg = first-leg goals of the
 second leg's home side minus its opponent's. Terms on the walk-forward model's expected goals (wf 'l'):

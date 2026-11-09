@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer lineup continuity as a game-model term (big five, Understat league rosters 2015-16 on).
 
 Per side, from Understat starters (position != 'Sub'):

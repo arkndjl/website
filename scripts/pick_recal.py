@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pick rule + stake recalibration for Novig prices (Noah, Oct 27 2026: "recheck/recalibrate what should qualify as a
 pick and how many units to use in order to make our picks as profitable as possible"). Research harness, nothing live
 reads it.

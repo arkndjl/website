@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB next-season player value (Nov 3 2026): research for a "next" WAR column on the CBB WAR / stats tabs.
 
 Target: next season's CBB WAR at a 31-game season, (BPM + 2) x min% / 100 x 31 x .68 x WPP (scripts/cbb_tabs.py WAR,

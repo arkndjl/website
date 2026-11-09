@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Download NHL shift charts (goalie rows only kept) for the game ids listed in a file.
 usage: fetch_shifts.py <gids.txt> <out_dir> <goalies.json: {gid: [goalie ids]}>"""
 import concurrent.futures as cf, gzip, json, os, sys, time, urllib.request

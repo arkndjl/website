@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // The Node port of scripts/harness.py's scoring rules, paired test and multiple-testing control, for the CFB models
 // (cfb_model.mjs, cfb_fv_refit.mjs, the .mjs backtests). Same rules, same numbers: `node scripts/harness.mjs --test`
 // checks the expect values that `python3 scripts/harness.py --test` wrote to scripts/data/harness_fixture.json.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest: do tennis badges (scripts/tennis_badges.py) predict beyond each board's own grade?
 
     python3 scripts/tennis_badge_backtest.py            # both boards -> data/tennis_badge_backtest.json

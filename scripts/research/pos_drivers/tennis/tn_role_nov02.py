@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Position-purpose FV drivers Nov 2 2026, tennis prospects. Copy of scripts/research/tn_drivers_nov01.py (same kept
 model, folds and gate) with three pre-registered role drivers from match scores, which cover every level:
   tbf  serve job (hold): share of sets that reach a tiebreak, shrunk 20 sets to the tour mean. Holding serve both

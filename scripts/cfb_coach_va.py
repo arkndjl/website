@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Head-coach value-added: what a coach adds to his team's rating beyond the program he took over and the talent
 on the roster, measured where it can be checked: on coaches who changed jobs.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike players: ratings, prospects, transfer values and team tiers (data/cs2_players.json).
 
     python3 scripts/cs2_players.py --fit   # backtests -> data/cs2_players_fit.json (settings, scores, failed terms)

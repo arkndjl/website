@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Rest days on UTC dates in the game models other than NBA (Nov 2 2026 follow-up to rest_research.py, where nba_games
 read rest off UTC dates and missed 38% of its back-to-backs). Research script; results in data/rest_dates_research.json.
 

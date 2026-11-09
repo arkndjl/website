@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Coordinator value-added: does a coordinator's record at his old job (his unit's rating over the program's
 before him and the roster's talent) carry to his new job? The head-coach version (scripts/cfb_coach_va.py) failed;
 this is the same test on offensive and defensive coordinators, on unit ratings instead of team ratings.

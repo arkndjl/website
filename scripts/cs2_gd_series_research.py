@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Nov 3 2026 game-model check: does each Nov 3 player-rating change (damage taken in STATS, tier lift, plus-minus,
 headshots) help the SERIES model, not only the per-map rating fit? Same replay, tune / held windows and tiered
 logistic as cs2_players.game_test; per-series log loss of the live model + each rating variant, paired against the

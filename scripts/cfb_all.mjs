@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // The College Football board's player file, in two parts so neither nears Cloudflare's 25 MiB per-file limit and
 // phones parse only what the table needs:
 //   static/data/cfb-all.json     {asof, dk, cols, rows}: every column the table, filters, ARKLIST and GFX read

@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Measured height and weight: the combine-equivalent size from every listing the board has, fit against NFL combine
 // and pro day measurements by scripts/cfb_measure.py (data/cfb_measure.json). Sources, by what the fit gives each:
 // the ESPN roster listing (r) and the 247 composite listing (hs, with years since the class, j), per coarse position

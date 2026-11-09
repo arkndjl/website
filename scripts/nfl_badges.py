@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Predictive trait badges for the NFL ARKBOARD's WAR board (the CFB board's medals, scripts/cfb_badges.mjs).
 
 A badge is one trait measured by one rate on the player's season line (nflverse stats_player_week, PFR advanced stats

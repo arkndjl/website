@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Hockey prospects FV driver search (Noah, Oct 24 2026): new draft-time and post-draft candidates for
 scripts/hockey_prospects.py, tested on the same outcome FV, the same leave-one-class-out rule (t >= 2, 8 of 12
 classes) and two extra checks a driver has to pass before it ships:

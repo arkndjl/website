@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: penalty placement (StatsBomb end location) and conversion, in-game and shootouts."""
 import json, sys
 from collections import defaultdict

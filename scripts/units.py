@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Units (Noah, Oct 21 2026: "a new unit system based on fractional Kelly that is uniquely tailored to our models and
 aims to be much more aggressive"). One unit model for the Predictions picks (scripts/games_picks.py) and the paper book
 (scripts/paper_book.py). DU compounds (Noah: "we are going to keep investing winnings back"): 1 DU = 1% of the bankroll

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB team-ranking research, Oct 30 2026: preseason-prior terms not tried before (the ARK Ranking = cbb_games ratings).
 
     python3 scripts/cbb_oct30_research.py [--only lab,lab]    # -> data/cbb_oct30_research.json

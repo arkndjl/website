@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // College football conference availability reports: the SEC, ACC, MAC and American post every listed player's
 // designation for each conference game (SEC/ACC: an initial report three days out, daily updates, a game-day report
 // 90 minutes before kickoff; MAC/American: game day only). All four publish through the same public report page

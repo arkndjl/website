@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA questionable players by the injury report's reason (Nov 1 2026 sweep; the NFL practice-status idea's NBA twin).
 The official report gives each listed player a reason ("Injury/Illness - Left Ankle; Sprain", "Rest", "Illness",
 "Return to Competition Reconditioning", ...). The game model prices a questionable player by games missed in a row

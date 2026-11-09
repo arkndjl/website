@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB game model research, Nov 3 2026: do the day's new CBB metrics (PR #734 production tabs, Stat+ FV driver, team
 context in xBPM) improve the preseason prior of the game model (= the ARK Ranking)?
 

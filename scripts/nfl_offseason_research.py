@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Offseason roster prior for the NFL game model: does the opening rating need the roster (Oct 21 2026)?
 
     python3 scripts/nfl_offseason_research.py     # numpy; writes data/nfl_offseason_research.json

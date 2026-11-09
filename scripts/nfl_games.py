@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL game projections for the NFL ARKBOARD (data/nfl_games.json), and the model behind them (data/nfl_games_fit.json).
 
     python3 scripts/nfl_games.py          # this week's projections (stdlib only; run by the cfb board job)

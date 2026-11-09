@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL WAR / pWAR research, Nov 3 2026 -> data/nhl_war_research_nov03.json
 
 Pre-registered before any test was run:

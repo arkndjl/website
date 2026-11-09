@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kickoff time in the NFL game model: primetime, the late Sunday window, the body clock in primetime, international
 morning kickoffs, on margins and totals.
 

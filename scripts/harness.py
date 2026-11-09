@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """One scoring and selection harness for every model on the site (numpy only; scripts/harness.mjs is the Node port of
 the scoring, paired-test and multiple-testing parts, for the CFB models; keep the two in step).
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): NHL multi-year projection (next season's and next three seasons' WAR) for the WAR
 leaders table, from pWAR + age (by F / D / G) + ice time.
 

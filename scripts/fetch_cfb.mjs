@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Build the College Football ARKBOARD (data/cfb.json) from public sources.
 //
 //     node scripts/fetch_cfb.mjs            # fetch everything, rebuild data/cfb.json

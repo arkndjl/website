@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The chance a game's model side covers the line, or its total goes over, as the games tables show it.
 
 The tables used to price a gap of e points as Phi(e / sd): the model margin as the truth, sd the result's spread around

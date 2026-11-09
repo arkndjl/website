@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Held-out record of flips (Noah, Oct 30 2026): games where the model's winner is the market's underdog (the model's
 margin and the closing spread name different favorites). Bet the model's winner on the closing moneyline, 1 unit
 flat, every held-out game in the walk-forward files (scripts/data/games_wf/<sport>.json.gz, seasons from

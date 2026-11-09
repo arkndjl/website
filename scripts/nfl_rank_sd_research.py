@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL rating sd: rank odds (data/rank_sd.json) vs the season sims (nfl_games.rating_sd, 5 x sqrt(left)), Nov 2 2026
 audit OPEN item. Research; numpy; reads scripts/data/games_wf/nfl.json.gz and data/nfl_season_backtest.json.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL game projections for the NHL ARKBOARD (data/nhl_games.json), and the model behind them (data/nhl_games_fit.json).
 
     python3 scripts/nhl_games.py           # today's and tomorrow's projections, power rankings, season odds (numpy)

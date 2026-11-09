@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Re-score every model's kept terms through the shared harness (scripts/harness.py) -> data/model_ledger.json.
 
     python3 scripts/harness_rescore.py               # every model this script can rebuild, then the ledger

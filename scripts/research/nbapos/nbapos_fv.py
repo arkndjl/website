@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV test of position-adjusted frame for CBB returners (Nov 3 2026, research). Each board row's projected NBA position
 comes from nbapos.py's model refit without the player's own draft class (his last college season), applied to his last
 college season before the board. Candidates swap into / add to the shipped returner set (data/cbb_fit.json):

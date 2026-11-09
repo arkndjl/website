@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV scorecards: does a board's FV mean what it says? Held-out rows only (each player graded by a fit that never saw
 him), pooled in FV bands: the mean FV the band was given against the mean FV its careers reached, and the predicted
 odds of each outcome tier against the share that got there. Shared by every prospect board, read by

@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // College football game model for the ARKBOARD (scripts/fetch_cfb.mjs), built on CFBD data:
 //   Ratings    Elo (wins and margins) plus opponent-adjusted efficiency: offense and defense EPA per play
 //              (garbage time out), solved as a ridge regression that shrinks each team toward its prior

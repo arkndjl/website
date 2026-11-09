@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """MaxPreps' high school football ratings, every state and season: scripts/.cache/maxpreps/<season>.json.
 
     python3 scripts/cfb_hs_teams.py 22-23 23-24     # pull those seasons (default: 19-20 through this one)

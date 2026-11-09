@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Starts the "odds snap" GitHub workflow on a reliable clock (GitHub's own schedule fires hours late on this repo).
 // A separate Cloudflare Worker, not the site: its cron (wrangler.toml) calls the workflow_dispatch API.
 // Secret: GH_TOKEN, a fine-grained GitHub token for arkndjl/website with "Actions: read and write" and

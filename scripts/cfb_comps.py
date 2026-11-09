@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Historical comps for the CFB board (audit #41): each player's nearest neighbours among the 2014-22 FBS seasons the
 FV backtest rebuilds, with what those players did in the NFL.
 

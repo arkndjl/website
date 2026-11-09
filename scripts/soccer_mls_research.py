@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """MLS in the soccer game model (Oct 31 2026): FotMob team xG as an input, and picks against the close.
 
     python3 scripts/soccer_mls_research.py --pull   # FotMob MLS match pages (soccer_data.fm_xg, id 130) -> scripts/.cache/soccer/fmx/

@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // ESPN college box scores, offense only, one file per finished game (scripts/.cache/cfb/box/<id>.json; a final
 // box score doesn't change, so each game is pulled once). Who played each game and what he did: the
 // availability model and the projection backtest (scripts/cfb_avail.mjs) read them. ESPN lists a player only

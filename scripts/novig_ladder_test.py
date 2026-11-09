@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Novig alt-line test (Noah, Oct 28 2026: "Any way we can tailor our picks specifically based on Novig to improve them?"
 then "Yes" to building the ladder test). Research harness: nothing live reads it.
 

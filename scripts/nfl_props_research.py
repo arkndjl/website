@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL player props paper test (Oct 29 2026, ARK Edge Sweep): do the nfl_fantasy stat-line projections, as they would
 stand on a Wednesday, beat the books' opening prop lines?
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Draft% backtest (draftOdds in scripts/cfb_teams.mjs): DRAFT_SD, DRAFT_CUT and DECLARE.
 
     python3 scripts/cfb_draft_pct_backtest.py   # pulls into scripts/.cache/draftpct/, writes data/cfb_draft_pct_backtest.json

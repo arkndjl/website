@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Returning production from PFN for every season PFN covers (2020 on: PFN starts in 2019), the same function
 // fetch_cfb.mjs builds MD.pfnRet with for the live game model: each team's returning players valued at their S-1 PFN
 // line, QB (the team's best) and everyone else as z across FBS, and returning college WAR (season AV weights,

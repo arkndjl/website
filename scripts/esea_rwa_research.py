@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NT RWA (Nov 3 2026): round win % added per round for ESEA league players, the pro CS2 rating
 (scripts/cs2_players.py) ported to FACEIT box lines, and its test against the shipped player Elo.
 

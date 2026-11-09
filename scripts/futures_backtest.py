@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Season-sim win totals backtest (data/futures_fit.json): do our preseason sims beat the closing win-total lines?
 
     python3 scripts/futures_hist.py         # first: the free lines (scripts/data/futures/win_totals.json)

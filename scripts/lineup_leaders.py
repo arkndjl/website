@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """League-wide lineup leaders (5-man units, trios, pairs) for the basketball ARKBOARD "lineup leaders" tabs.
 Shared by scripts/nba_lineups.py and scripts/cbb_lineups.py; layouts/shortcodes/lineupleaders.html shows it.
 

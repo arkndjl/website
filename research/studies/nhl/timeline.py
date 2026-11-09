@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared helpers: per-game third-period second-by-second state from play-by-play (+ optional goalie shifts)."""
 import gzip, json, os
 

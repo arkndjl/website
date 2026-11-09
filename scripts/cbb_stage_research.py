@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB game model research, Oct 30 2026: margin terms on the shipped walk (no rewalk), mostly season-stage interactions.
 
     python3 scripts/cbb_stage_research.py      # -> data/cbb_stage_research.json

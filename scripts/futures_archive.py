@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Daily archive of DraftKings' team futures from ESPN (free), so a market preseason prior can be backtested later.
 
     python3 scripts/futures_archive.py nba 2027     # appends today's snapshot to scripts/data/futures/archive/nba-2027.jsonl

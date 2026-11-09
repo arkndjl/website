@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Round-2 research harness (Oct 24 2026): do pbpstats player fields (shot-zone mix, assisted share, fouls drawn, shot
 quality, on/off) improve next-season per-minute NBA player stats over this season's rates?  Also an XPM sanity check.
 

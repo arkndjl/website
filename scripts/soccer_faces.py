@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Nationality flags and headshots for the soccer tables (SOCCER and SOCCER PROSPECTS ARKBOARDs).
 
     python3 scripts/soccer_faces.py                # attach nat / ph / fv to this season's big-five player file

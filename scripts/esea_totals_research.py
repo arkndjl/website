@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NT total-rounds over/under research (Oct 26 2026): what sets the line on an ESEA NA Bo1 map.
 
     python3 scripts/esea_totals_research.py   # reads research/esea_matches.json.gz; writes data/esea_totals_research.json

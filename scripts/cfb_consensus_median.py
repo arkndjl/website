@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Median vs mean for the consensus board (fetchConsensus in scripts/fetch_cfb.mjs).
 
 No archive keeps per-analyst boards with NFL outcomes, so this tests the aggregators on today's boards: hold one

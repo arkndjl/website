@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team special teams rating (Noah, Nov 2 2026: "incorporate all special teams value as team badges and into the game
 model; in the special teams tab, a team ranking of who has the best special teams"; FG and punt blocks included).
 

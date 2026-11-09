@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team special teams rating as an NFL game-model input (Nov 2 2026): the model's own walk-forward (nfl_games.fit's
 run, the fitted params) with the shrunk ST rating (scripts/st_teams.py, pre-game, home minus away, points a game)
 added, or in place of the Return Game term, or only its non-return units on top of it. Margin MAE on 2015-20

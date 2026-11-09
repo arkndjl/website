@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Barttorvik T-Rank stacked into the college basketball game model (team model idea 9, Oct 23 2026).
 
     python3 scripts/close_target_research.py --build cbb     # the shipped design (scripts/.cache/ct/cbb.npz)

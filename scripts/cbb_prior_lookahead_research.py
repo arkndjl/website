@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB game model: history's preseason rosters and pinj against live (math audit Nov 2 2026 "CBB prior row filter vs
 live"; bug sweep "CBB roster prior / pinj history use later-played players").
 

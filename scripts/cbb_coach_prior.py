@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The head coach's record against the preseason projection: the CBB game model's prior term 'cres' (Oct 30 2026).
 
     python3 scripts/cbb_coach_prior.py      # cres into scripts/data/cbb_team_prior.json (history + the coming season),

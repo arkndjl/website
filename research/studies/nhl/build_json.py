@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Write the study JSON cards from pull_results.json and other_results.json.
 usage: python3 -I build_json.py <scratch_dir> <out_dir>"""
 import json, os, sys

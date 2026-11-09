@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Style matchup ("rock paper scissors") terms in the game models (thread "Test style matchup drivers across sports",
 Oct 29 2026). Research only. Results in data/style_research.json.
 

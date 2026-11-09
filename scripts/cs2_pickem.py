@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike Major Pick'Em (the COUNTER-STRIKE ARKBOARD "pick'em" tab): the picks that give the best chance of
 each Major coin tier, from the series model (scripts/cs2_model.py) through the Valve Swiss / bracket simulator
 (scripts/cs2_events.py).

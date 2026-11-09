@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest: do badges (scripts/cfb_badges.mjs) predict NFL careers beyond production? Run by hand after
 // scripts/cfb_statplus_backtest.mjs (it reuses that script's cached PFN boards and nflverse picks):
 //   node scripts/cfb_badge_backtest.mjs -> data/cfb_badge_backtest.json

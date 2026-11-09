@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """History for the college basketball game model (scripts/cbb_games.py): every D-I game from 2013-14 on, with the
 market's lines, written to scripts/data/cbb_games_hist.json.gz (committed, so the daily job never re-pulls history).
 

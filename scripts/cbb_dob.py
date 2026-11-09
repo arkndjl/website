@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Birth dates for College Basketball ARKBOARD players that Barttorvik doesn't have yet (freshmen until their games
 count, a few transfers): data/cbb_dob.json, read by scripts/cbb_live.py and scripts/fetch_cbb.py.
 

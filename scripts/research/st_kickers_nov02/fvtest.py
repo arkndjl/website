@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kicker and punter grades, Nov 2 2026 research (scripts/st_kickers.py). CFB K/P FV driver test, rows: college grades (final seasons 2011-20) joined to NFL seasons as the primary K/P (names.py matcher)."""
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

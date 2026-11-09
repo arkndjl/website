@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Download NHL API play-by-play for regular seasons 2021-22..2024-25 (gzip) into the scratchpad."""
 import concurrent.futures as cf, gzip, os, sys, time, urllib.request
 OUT = sys.argv[1]

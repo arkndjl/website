@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Dense odds snapshots for the paper book (ARK Betting Plan item 1, Oct 21 2026). Free data only: DraftKings through
 ESPN's scoreboard (Noah: "Let's just use DraftKings through ESPN"), one scoreboard request per sport and day a run.
 

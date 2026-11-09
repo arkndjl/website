@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 import json
 import numpy as np
 from run_basic import feats_from, run, load, W, OUT

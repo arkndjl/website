@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Penalty and foul discipline as team terms in the game models (thread "Test penalty discipline in game models",
 Oct 31 2026; Noah: "Do we account for penalty discipline in each team/game model?"). Research only. Results in
 data/penalty_research.json.

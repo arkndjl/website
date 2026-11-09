@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Secondary NHL studies: power-play pull (6v4 vs 5v4), pull on offensive-zone faceoff, score effects.
 usage: python3 -I study_other.py <scratch_dir>"""
 import json, math, os, pickle, sys

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared pieces of the NBA and NHL player props tests (scripts/nba_props_research.py, scripts/nhl_props.py): the
 chance of an over from a projection (negative binomial with a fitted spread and a logistic shape correction), and the
 pre-registered one-bet-a-player rule scored at the archived opening prices.

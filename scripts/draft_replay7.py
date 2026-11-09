@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Seven-round draft replay for the mock draft (mockDraft in scripts/cfb_teams.mjs): specialists, FCS, team needs,
 team tendencies, and draft-day trades in every round.
 

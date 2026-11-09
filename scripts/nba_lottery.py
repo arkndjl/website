@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA draft order odds: the lottery and the rest of the order from simulated final standings.
 
     import nba_lottery as L; L.order(wins, playoff, rng)      # one simulated draft order (team -> pick, rounds 1-2)

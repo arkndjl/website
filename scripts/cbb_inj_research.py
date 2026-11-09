@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: the college basketball game model's availability term ('inj') priced by measured sit-again rates.
 
     python3 scripts/cbb_inj_research.py     # writes data/cbb_inj_research.json (numpy; two full walks, ~10 min)

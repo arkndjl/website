@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FV driver test for the CBB market metrics (Nov 3 2026, thread "Add CBB NIL, coaches and team builder").
 
     python3 scripts/cbb_careers_kit.py                       # once: scripts/.cache/cbb/careers.json

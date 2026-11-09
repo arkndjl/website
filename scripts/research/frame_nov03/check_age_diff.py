@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Check that a rewritten JSON differs from git HEAD only in age fields (age, ax, ageEst).
     python3 scripts/research/frame_nov03/check_age_diff.py file...
 """

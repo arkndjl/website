@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Recruit FV for the College Football ARKBOARD: what each incoming recruit and each player who hasn't played
 // yet is projected to be, and next season's roster with them on it. Fit by scripts/cfb_recruit_fit.py
 // (data/cfb_recruit_fit.json) on ESPN's 2023-26 classes followed to this season's board; blocks() mirrors the

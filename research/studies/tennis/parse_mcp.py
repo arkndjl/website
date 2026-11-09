@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Parse Match Charting Project point files into one compact table (pickle in the scratch dir).
 Run: python3 -I parse_mcp.py <mcp_dir> <out.pkl>"""
 import csv, re, sys

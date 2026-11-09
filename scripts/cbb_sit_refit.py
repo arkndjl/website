@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Refit the college basketball injury SIT rates (scripts/cbb_games_live.py) on our own logged listings.
 
     python3 scripts/cbb_sit_refit.py [season]      -> data/cbb_sit_fit.json

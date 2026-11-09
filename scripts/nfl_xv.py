@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """XV for the NFL: WAR with each player's quality measured by the parts of his stat line that track team margin, in
 place of AV's split of his team's points. The NFL twin of the college XV (scripts/cfb_xv_backtest.py).
 

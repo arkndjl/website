@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: protecting a 1-goal lead. xG share by minute band for teams leading by 1 vs their pre-match expected share,
 and the points cost of the late shift."""
 import json, math, sys, random

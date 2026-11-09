@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest for the in-season College Basketball ARKBOARD (scripts/cbb_live.py): how much a season to date should move
 a player's grade off his preseason grade, by minutes played. Writes data/cbb_live_fit.json.
 

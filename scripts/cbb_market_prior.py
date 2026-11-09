@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The market's preseason view for the college basketball game model's totals: last season's closing totals, team by
 team (scripts/cbb_games.py 'tpri', 'tcar'), the test that NBA totals passed (scripts/nba_market_prior.py).
 

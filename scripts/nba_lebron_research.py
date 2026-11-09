@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: LEBRON (BBall Index, scripts/nba_lebron.py) in the NBA game model's player values.
 
     python3 scripts/nba_lebron_research.py [--only 0,2]   # -> data/nba_lebron_research.json

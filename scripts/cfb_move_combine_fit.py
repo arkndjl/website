@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Combine measurements in the position-change flag: fit on where the NFL used college players, 2020-26 combines.
 
 The board's flag (fetch_cfb.mjs, "position fit") reads listed size, projected to 22, and production. When the draft

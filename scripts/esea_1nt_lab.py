@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NTERLYTICS: 1NT's descriptive history book for the team tab of /laursen_111/.
 
 Reads every official 1NT match (research/esea_1nt_history.json.gz, scripts/esea_1nt_history.mjs) plus any

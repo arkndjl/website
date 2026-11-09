@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Nov 2 2026): ESPN lineup stints (scripts/nba_lineups.py) as NBA player-value and game-model inputs.
 
     python3 scripts/nba_lineups_research.py --team        # (a) team-season forward test of prior on/off in player values

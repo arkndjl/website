@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Rookie and first-year leaderboards (Oct 25 2026): one tab in every pro, college and prospect section that ranks the
 newcomers by that section's own value and production metrics, next to their pre-draft (or pre-arrival) grade.
 Display only: no new model, every number comes from the section's existing build.

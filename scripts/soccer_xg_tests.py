@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Audit item #37 (Oct 25 2026): which Understat xG the soccer game model should learn from.
 
     python3 scripts/soccer_xg_tests.py        # -> data/soccer_xg_tests.json

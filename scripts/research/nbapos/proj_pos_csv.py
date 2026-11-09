@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Per board row (Barttorvik pid, board season) projected NBA position for other threads' frame tests, class-out:
 each row's model is refit without the player's own draft class (last college season), on the live features
 (scripts/cbb_nbapos.py), from his college seasons before the board season.  -> /mnt/project-files/cbb/nbapos/proj_pos.csv"""

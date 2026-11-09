@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: the NFL injury term with the starter's backup priced in (Noah, Oct 21: better backup grades should price an
 injury better). Follows scripts/nfl_inj_prov_research.py, which found that netting a backup's WAR a game failed: a
 backup's WAR a game is his part-time role's, not what he does in the starter's snaps.

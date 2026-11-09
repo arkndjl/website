@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research harness for the College Basketball FV core refit (audit items #20, #26, #16; Oct 25 2026).
 
     python3 scripts/cbb_careers_kit.py            # once: scripts/.cache/cbb/careers.json (with each NBA season's XPM)

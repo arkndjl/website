@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects ARKBOARD (Noah, Oct 24 2026): every player under 22 at the season start in the 14 European
 leagues of the Transfermarkt dump and the feeder leagues, graded on the 20-80 FV scale against what past prospects
 became.

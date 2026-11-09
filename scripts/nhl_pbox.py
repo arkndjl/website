@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL box scores from ESPN (ESPN athlete ids, the ids its player props carry), for the NHL player props model
 (scripts/nhl_props.py). Every final game from 2021-22 on, cached a game at a time in scripts/.cache/nhl_box/.
 

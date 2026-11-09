@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB ARK Ranking sweep (thread "Improve CFB arkrank team rankings", Oct 29 2026): do better-built efficiency ratings add
 to the shipped game model (the ARK Ranking is its neutral-field rating)?
 

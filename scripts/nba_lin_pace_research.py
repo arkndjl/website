@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA game model: the lineup term (lin) in points per 100 possessions against the matchup's expected possessions
 (math audit Nov 2 2026, "NBA lin per-100 vs pace"). lin enters the margin regression per 100 while eff is scaled by
 the matchup's pace; this scales lin by pace too and scores it walk-forward on the shipped params (data/nba_games_fit.json).

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Tennis prospects: frame (height) as an FV driver, Nov 3 2026, without the Sackmann height leak.
 
     python3 scripts/tennis_prospects.py --rows                      # snapshot rows (scripts/.cache/tennis/rows.pkl)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """RotoWire's past injury news and current injury cards: the exact status and return window of every player out for
 the season or for weeks (Noah, Nov 5 2026: "go back to previous weeks of RotoWire reports to figure out the exact
 injury status of players who are out for the season or out for multiple weeks").

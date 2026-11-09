@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Closing-line training target (team model idea 2, Oct 23 2026): each game model's weights fit against the close
 (or results + lam x close), put back on the results' scale, scored on results with the shared harness.
 

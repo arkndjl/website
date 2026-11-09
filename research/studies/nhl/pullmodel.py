@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Markov model of the end of regulation for a trailing team (per-second steps).
 rates: dict with per-60 goal rates:
   r0       : each team's 5v5 rate when tied late

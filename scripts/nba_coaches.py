@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA head coaches by game, from Basketball-Reference's season coaching tables (research input for the game model).
 
     python3 scripts/nba_coaches.py 2009 2026     # pulls leagues/NBA_<S>_coaches.html, writes scripts/nba_coaches.json

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Travel, tip time and the second day of back-to-back days in the college basketball game model.
 
     python3 scripts/cbb_venues.py           # first: team home cities and neutral-site venues (scripts/data/cbb_venues.json)

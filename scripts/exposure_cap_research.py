@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Nightly exposure cap test (Nov 1 2026). Research harness, nothing live reads it.
 
 The opening night of the CBB season sent 61 bets at once (104% of the bankroll on Nov 2-3 ET). Each pick is staked

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Place every open pick on Novig's Paper exchange and log the fills (Noah, Nov 1 2026: "Paper auto-betting on Novig").
 
 PAPER ONLY. The host is fixed to https://api.paper.novig.com (play money, no location check). There is no switch to the

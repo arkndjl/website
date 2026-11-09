@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Study: scoring rates in the minutes after a goal (team that conceded / team that scored), against a
 baseline matched on minute band, score state and pre-match strength."""
 import json, sys, math

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: player priors for the NBA game model, player level (the game-level test is in nba_roster_research.py).
 
     python3 scripts/nba_prior_research.py     # writes data/nba_prior_research.json (numpy)

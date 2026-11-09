@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game-control ratings: how much of each game a team spent in control, opponent-adjusted, as a second rating next
 to margin (team model idea 8, Oct 2026). Research and the live feature both come from here.
 

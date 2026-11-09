@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Oct 30 2026): an age term on the NFL QB value, in the form that passed for the NHL lineup value (PR #583).
 
     python3 scripts/nfl_aging_research.py     # numpy; writes data/nfl_aging_research.json

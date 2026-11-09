@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """History for the NCAA tournament model (scripts/cbb_tourney.py): each season's field with seeds and regions, and
 every conference tournament game, written to scripts/data/cbb_tourney_hist.json (committed).
 

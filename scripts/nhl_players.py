@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL player value for the NHL ARKBOARD: HPM (goals per 60 over an average player) and WAR (wins over replacement),
 every skater and goalie since 2008-09, from MoneyPuck's season summaries.
 

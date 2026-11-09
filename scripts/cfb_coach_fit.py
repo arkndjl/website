@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Coaching market: what each head coach and coordinator is worth, which jobs open, and who fills them.
 Writes data/cfb_coach_fit.json (the fitted models and their out-of-sample evidence) and data/cfb_coach_pay.json
 (public pay by coach, the market the value model is priced on). Scoring runs in scripts/cfb_coach.mjs.

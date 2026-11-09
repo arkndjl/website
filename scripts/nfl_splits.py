@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Situational splits and coach traits from nflverse play-by-play (stdlib), for the game-model research in
 scripts/nfl_splits_research.py: conversion rates by down and distance with what the league converts from the same
 distance, two-minute offense, tempo, discipline, 2-point choices, and every field goal and extra point with its kicker.

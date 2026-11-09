@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Does the NHL game model's xG rating overweight the power play? (Noah, Nov 2 2026; lead from scripts/unit_badges.py:
 team power-play ratings fit a negative slope on the model's residual in 2024-26 after a positive one in 2017-23.)
 The xG rating counts every expected goal alike; here power-play xG is weighted ppw (penalty kills follow, being the

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA XPM (proj) and contract surplus for the NBA ARKBOARD (static/data/nba-proj.json, data/nba_proj_fit.json).
 
 XPM (proj): each player's XPM to date blended with his preseason prior (nba_xpm.prior_xpm: his two seasons before,

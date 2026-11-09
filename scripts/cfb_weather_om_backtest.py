@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Does Open-Meteo kickoff weather improve the CFB totals model? (research only, round 2, Oct 24 2026)
 
     python3 scripts/cfb_weather_om_backtest.py     # needs numpy and scripts/data/cfb_weather_om.json (cfb_weather_om.py)

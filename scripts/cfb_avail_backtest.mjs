@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Fits and backtests the availability model of the college projections tab (scripts/cfb_avail.mjs) on ESPN box
 // scores, 2023 on, walk-forward: each season is projected with the P(plays) logistic and the volume elasticities
 // fit on the seasons before it only. Writes data/cfb_avail_fit.json (the fit the board uses, the backtest for the page).

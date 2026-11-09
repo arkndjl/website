@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball preseason prior: roster terms built player by player (Oct 21 2026)
 
 Each player gets a projected BPM and minutes for the coming season, fit walk-forward on earlier seasons only:

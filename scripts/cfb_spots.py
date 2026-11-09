@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB schedule spots: letdown, look-ahead and bounce-back (thread "Test a CFB letdown-game driver", Oct 28 2026).
 
 Does a team play worse than the close (and the model) the week after a big win, the week before a big game, or better

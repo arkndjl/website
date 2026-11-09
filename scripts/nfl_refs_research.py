@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL referee / officiating-crew effects on totals and margin residuals (research only, round 2, Oct 24 2026).
 
     python3 scripts/nfl_refs_research.py       # needs numpy; downloads nflverse games.csv + officials.csv

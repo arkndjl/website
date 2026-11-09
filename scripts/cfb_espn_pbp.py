@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ESPN college football play-by-play, drives and venues for every FBS game (free, no CFBD quota), slimmed and
 cached per game, for the ESPN-built game-model history (scripts/cfb_espn_md.py).
   python3 scripts/cfb_espn_pbp.py [first season] [last season]

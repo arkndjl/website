@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NBA's official injury reports, 2019-20 on, as status history for the game model's play chances. Each game
 takes the latest report out at least half an hour before its tip: 5 PM ET for evening games, an earlier one (11 AM to
 2 PM) for matinees. Needs pdftotext (poppler-utils).

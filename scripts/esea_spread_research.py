@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NT round-spread research (Oct 26 2026): should the preview's round spread treat rounds as coin flips?
 
     python3 scripts/esea_spread_research.py   # reads research/esea_matches.json.gz and data/esea.json history;

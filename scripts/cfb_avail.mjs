@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Availability for the college projections tab: the chance each player plays this week, and who picks up the
 // work of the players who don't. Fit and backtested by scripts/cfb_avail_backtest.mjs on ESPN box scores
 // (scripts/cfb_box.mjs), written to data/cfb_avail_fit.json; scripts/cfb_teams.mjs reads the fit through availability().

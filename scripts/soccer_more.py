@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player stats for the 13 other leagues on the SOCCER ARKBOARD (soccer_data.SHOWN), from FotMob's season stat lists
 (data.fotmob.com/stats/<league>/season/<id>/<stat>.json, free, no key): minutes, matches, goals, assists, xG, xA,
 shots, chances created, FotMob's match rating, nationality. One file a season in static/data/soccer-more/<S>.json,

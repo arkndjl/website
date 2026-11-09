@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """LEBRON (BBall Index) by NBA season, from nbarapm.com's public table.
 
     python3 scripts/nba_lebron.py --write      # -> scripts/nba_lebron.json.gz

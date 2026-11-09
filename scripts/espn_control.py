@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Game control from ESPN play-by-play (free): for every game, the score timeline (each scoring play's elapsed
 seconds and score) and ESPN's own in-game win probability where ESPN has it, slimmed and cached by season.
   python3 scripts/espn_control.py cfb|cbb|nba [first season] [last season]

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player badges for the hockey prospects ARKBOARD's pipeline (the College Football board's medals, scripts/cfb_badges.mjs).
 
 A badge is one trait from a CHL season line (HockeyTech's public OHL/WHL/QMJHL feeds), regressed toward the pool mean

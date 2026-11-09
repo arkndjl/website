@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Lineup-adjusted ratings (team model idea 1, Oct 23 2026): each past result enters the ratings net of who played.
 
 Before a game's result updates the ratings, its margin is corrected for the lineup gap that night on both sides:

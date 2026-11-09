@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared fitting and held-out testing for xAAV (scripts/xaav.py): the AAV a player would sign for as a free agent
 now, as a share of the salary cap, from position, age and the site's metrics.
 

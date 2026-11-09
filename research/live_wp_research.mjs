@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest of the ticker's in-game win chance (static/js/livewp.js), Nov 1 2026.
 //
 //   python3 research/live_wp_fetch.py && node research/live_wp_research.mjs   # -> data/live_wp_research.json

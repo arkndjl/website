@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Basketball-Reference play-by-play position estimates (share of minutes at PG/SG/SF/PF/C) per NBA player season.
     python3 bbref_pos.py <dir with pbp<year>.html> <out.json>
 Traded players: the TOT / 2TM row when the page has one, else team rows summed by minutes."""

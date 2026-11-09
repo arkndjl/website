@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Do historical comps add to the CBB board's FV model? (research, Oct 30 2026)
 
     python3 scripts/cbb_careers_kit.py

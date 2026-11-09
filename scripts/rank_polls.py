@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pull the AP and Coaches polls for college football and college basketball from ESPN's core API (free) into
 scripts/data/polls/<sport>.json: every weekly release, its date and the ranked teams' ESPN ids, with each team's points
 (receiving-votes teams under 'others') and ESPN's lastUpdated stamp, plus an id -> team name map in the game files' spelling. scripts/rank_odds.py --record scores ARK against them.

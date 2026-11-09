@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Phones: every wide table keeps its label column (player, team, matchup...) in view while the numbers scroll.
 // Tables with their own pinned column (.cfb__name, .tstick, .cfbrc, ...) are left alone; the rest get
 // data-pin="<column>" (static/style.css pins it). Tables built later (lazy tabs, re-sorts) are caught by a

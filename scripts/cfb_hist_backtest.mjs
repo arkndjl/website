@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // The college game model (scripts/cfb_model.mjs) on 2015-26 ESPN history (scripts/cfb_espn_md.mjs): every season
 // rated walk-forward exactly as runModel rates one, priors chained season to season, then scored on the project split
 // (tune 2016-20, held out 2021-26; 2015 is burn-in), paired per game with clustered errors (game day, home team-season).

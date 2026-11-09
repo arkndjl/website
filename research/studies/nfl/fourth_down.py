@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL fourth-down study: go vs kick, by state, 2015-2026.
 
 Expected WP of each option is estimated per play from equal states:

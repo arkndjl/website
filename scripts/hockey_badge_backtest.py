@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest: do CHL badges predict what a pick became in the NHL beyond the hockey prospects board's draft grade?
 
     python3 scripts/hockey_badge_backtest.py --pull   # CHL (HockeyTech) skater seasons -> scripts/.cache/hockey/chl

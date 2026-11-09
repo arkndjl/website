@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Can the game models beat the betting market? A research pass, nothing here feeds the site or the picks.
 Writes data/market_edge_research.json (numpy).
 

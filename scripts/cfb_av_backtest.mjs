@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for season AV (scripts/cfb_av.mjs): what a college player is worth to his team this season, against
 // team results. Run by hand: node scripts/cfb_av_backtest.mjs -> data/cfb_av_backtest.json
 // Data: PFN impact rankings (FBS; QB, RB, WR, TE, EDGE, DT, LB since 2019, OL, CB, S since 2024), ESPN results

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pixel New York skyline for the about/contact page (layouts/shortcodes/aboutcontact.html).
 288 x 48 pixel grid (3 px per pixel on desktop; phones show the middle), drawn as <rect>s; classes: s = sky band, b = building, e = edge highlight,
 w = lit window (teal), v = lit window (lilac), k = blinking window, t = star. Colours live in the shortcode CSS.

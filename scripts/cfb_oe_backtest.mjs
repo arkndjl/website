@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for actual vs expected (scripts/cfb_oe.mjs), which sets the FV_OE weights in fetch_cfb.mjs. Run by hand:
 //   node scripts/cfb_oe_backtest.mjs            (pulls what's missing, then writes data/cfb_oe_backtest.json)
 // Data: ESPN play-by-play for every FBS game 2017-26 (the same feed CFBD's play text comes from; slimmed and kept

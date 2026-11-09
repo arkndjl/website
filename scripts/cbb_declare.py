@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Stay-or-declare for college basketball (audit #31): who on the mock's pool actually leaves school after this season.
 
     python3 scripts/cbb_declare.py     # -> data/cbb_declare_fit.json (read by scripts/cbb_mock.py live_pool)

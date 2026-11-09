@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """RotoWire's free injury news (Noah, Nov 5 2026: "they seem to post faster than our current system"), every sport the
 site prices: college and NFL football, NBA, college basketball, NHL, soccer.
 

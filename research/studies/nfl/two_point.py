@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL two-point vs extra point, 2015-2026 (XP moved to the 15 in 2015).
 
 1) Success rates by season (Wilson CIs), expected points per try.

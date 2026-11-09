@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer badge backtest (Nov 1 2026, "predictive badges like CFB's on other sports"): which trait badges predict the
 board's own outcome BEYOND what the board already has. Results -> data/soccer_badge_backtest.json.
 

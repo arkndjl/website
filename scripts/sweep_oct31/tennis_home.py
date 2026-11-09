@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """home country + indoor terms on top of the shipped tennis blend (walk-forward weights, WIN seasons), held 2023+,
 t clustered by tournament; and vs the feed's no-vig close (2025+)."""
 import gzip, csv, json, os, sys, math, shutil

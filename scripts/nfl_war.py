@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL WAR leaderboards for the NFL ARKBOARD (data/nfl_war.json), and the AV model behind them (data/nfl_war_fit.json).
 
     python3 scripts/nfl_war.py          # this season's board from nflverse (stdlib only; run by the cfb board job)

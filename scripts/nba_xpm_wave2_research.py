@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research (Nov 4 2026, wave 2; pre-registered in fv/sweep-nov04/nba/prereg2.md), Holm over 2 tests:
 
 T1  3Y / 1Y: H5 = live H4 + max(0, proj - 3) x (age - 27), against H4 on the nba_proj3y_star_research.py harness.

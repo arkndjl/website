@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """xAAV: the average annual value a player would sign for as a free agent today, from position, age and the site's
 metrics, for the pro leagues (NBA, NHL, NFL). Fit on real free-agent and veteran signings as a share of that year's
 salary cap, then priced at this season's cap and clipped to the league's floor and ceiling.

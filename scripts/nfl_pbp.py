@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team-game lines from nflverse play-by-play (stdlib): success rates, explosiveness, red zone, field position,
 special teams EPA, 4th-down and pass-rate decisions over expected. One row per (game_id, offense team); the defense
 side of a stat is the opponent's row. The raw files are shared with nfl_war.py (scripts/.cache/nfl/play_by_play_YYYY.csv.gz); the lines are cached per

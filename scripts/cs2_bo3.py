@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """bo3.gg map results for the COUNTER-STRIKE ARKBOARD: every finished pro match since Jun 2020 with its maps (map name,
 map number, winner, round score), and the map-level team rating built on them.
 

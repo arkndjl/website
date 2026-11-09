@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // 1NT's whole FACEIT history (every official match the team has played: ESEA S52 on, cups, qualifiers),
 // for the veto, ARK and round-total research. FACEIT's league search only reaches back a season, but each
 // player's per-match stats go back years and name the team they played for, so every 1NT player's stats

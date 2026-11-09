@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Injury signal in the tennis match model (Oct 2026): a player who gave a walkover (withdrew before a match, W/O in
 the archive) in the last N days, A minus B, beside the live blend inputs. Walk-forward: each season's weights fit on
 the WIN seasons before it (the live scheme), log loss tune 2012-22 and held out 2023+, t clustered by tournament.

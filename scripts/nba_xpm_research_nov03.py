@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA XPM / VORX staple audit (Nov 3 2026) -> data/nba_xpm_research_nov03.json. Research only.
 
 Pre-registered (written before any run):

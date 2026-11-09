@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """(copied unchanged in method from the Nov 4 sweep's soc_gk.py, md5 a423b02b; only paths changed and the row build
 limited to the Oct 24 snapshot, which fit() grades independently of the other snapshots)
 Soccer pre-registered tests S1-S2 (prereg.md): keeper top slope / keeper location on the board's cohort-out

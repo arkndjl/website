@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Research (Oct 29 2026, Noah: "players who haven't played enough snaps to qualify should still have the snaps they
 // have played feed FV, regressed"). The board's production term already takes every snap (Marcel blend, FV_K 3000
 // weighted snaps). The stat terms on top of it, the FV badges (FV_BADGE) and XV parts (FV_XV), are each regressed by

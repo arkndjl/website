@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player names across sources, every sport: one key and one matcher so ESPN, Barttorvik, On3, 247, PFN, CFBD,
 nflverse, Basketball-Reference and the draft boards land on the same player. scripts/names.mjs is the same code for
 the Node scripts (keep the two in step; `python3 scripts/names.py --test` and `node scripts/names.mjs --test` run

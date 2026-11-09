@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Counter-Strike ratings, ARK Ranking and match chances (the COUNTER-STRIKE ARKBOARD), from scripts/cs2_data.py.
 
     python3 scripts/cs2_model.py --fit   # backtest: tune Aug 2024 - Jun 2025, held out Jul 2025 on -> data/cs2_fit.json

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Measured height and weight from several listings: each source corrected for its bias and weighted by 1 / its error
 variance (a precision-weighted mean), so a combine measurement outweighs a roster listing, which outweighs a high
 school listing. Shared by the boards; each sport passes its own source table.

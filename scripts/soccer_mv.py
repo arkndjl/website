@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer players' estimated market value (xMV) for the Player value tab: what a big-five player should be worth on
 Transfermarkt from what he has done, next to the value Transfermarkt shows and the gap between them.
 

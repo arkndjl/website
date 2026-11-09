@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """20th / 50th / 80th percentile projections for the NFL, NBA and NHL ARKBOARDs: each player's value (NFL WAR, NBA VORX,
 NHL WAR) and box-score stats, rest of season and full season (to date + rest of season).
 

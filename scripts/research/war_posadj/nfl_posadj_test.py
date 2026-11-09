@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NFL WAR positional adjustment test (Nov 3 2026, Noah: both WAR boards are topped by mid QBs).
 
 The board's WAR at a sub-position s for a player with share sh:  b = value[s] x sh + (b - value[s] x sh)

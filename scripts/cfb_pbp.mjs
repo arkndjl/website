@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Play-by-play player metrics for the College Football ARKBOARD, from CFBD plays (one call a week, kept slim
 // in scripts/.cache/cfb/plays<season>w<week>.json). The play text names the ball carrier, passer, target and,
 // on defense, the sacker and the hurrier ("#22 I.Mozee rush left for 4 yards", "pass complete ... to #13

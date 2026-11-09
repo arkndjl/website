@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for college WAR by position (scripts/cfb_av.mjs CWAR_V, CWAR_QB_OWN). Run by hand:
 // node scripts/cfb_war_pos_backtest.mjs -> data/cfb_war_pos_backtest.json
 // Data: PFN impact rankings and ESPN results (as scripts/cfb_av_backtest.mjs), ESPN box scores of every FBS-vs-FBS game

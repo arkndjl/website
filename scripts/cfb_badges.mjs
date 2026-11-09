@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Player badges and the archetypes built on them, for the College Football ARKBOARD.
 //
 // A badge is one trait (Blocker, Pass Rusher, Ballhawk...) measured by one stat on PFN's season line. Each

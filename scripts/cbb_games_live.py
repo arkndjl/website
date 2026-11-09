@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The daily build of the college basketball game model (python3 scripts/cbb_games.py, run by .github/workflows/cbb-board.yml):
 data/cbb_games.json (the next two slates, power ratings, season odds).
 

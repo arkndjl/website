@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ESPN box scores as a stand-in for Barttorvik's college basketball game logs ({season}_all_advgames.json.gz) when
 Barttorvik's site answers with a page instead of the file (it serves GitHub's runners a browser check). Nothing here
 touches that check: when the pull fails, the season's games come from ESPN's public summaries instead.

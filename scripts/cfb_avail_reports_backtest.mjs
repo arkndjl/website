@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Do the conference availability reports (scripts/cfb_avail_reports.mjs) sharpen the college P(plays)? Every offensive
 // player with a box score in two or more of his team's earlier games this season (scripts/cfb_avail.mjs states), for
 // each game his team filed a report for (2025-26: SEC, ACC; 2026 also MAC, American), against whether he is in that

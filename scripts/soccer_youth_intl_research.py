@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Youth national team call-ups as soccer prospect FV drivers (Noah, Oct 31 2026). MLS NEXT has no free player-level
 source, so the nearest public signal for academy players is a youth international call-up. Transfermarkt's API carries
 lineups for the U17 and U20 World Cups, the U17/U19/U21 Euros and their qualifiers, CONCACAF U17 and U20 (and U20

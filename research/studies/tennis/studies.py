@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARKBOARD research: tennis studies from the Match Charting Project (and tennis_atp / tennis_wta ranks).
 Run: python3 -I studies.py <scratch_dir>   (expects <scratch_dir>/points.pkl from parse_mcp.py)"""
 import json, math, os, sys

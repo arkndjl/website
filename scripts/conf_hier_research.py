@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Hierarchical conference ratings (team model idea 5, Oct 2026): a team's rating as its conference's effect plus its
 own deviation, each with its own prior and season carryover, in place of one flat shrink toward the national mean.
 Conferences link to each other only through non-conference games (most of them in November and December), so a flat

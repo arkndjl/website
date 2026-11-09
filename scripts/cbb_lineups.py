@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball lineups and on/off from NCAA play-by-play (substitution lines).
 
 ESPN's and hoopR's men's college play-by-play carry no substitutions, so on/off can't come from them. NCAA.com's

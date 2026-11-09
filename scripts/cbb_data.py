@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared loaders for the College Basketball ARKBOARD (scripts/cbb_fit.py, scripts/fetch_cbb.py).
 
 Raw pulls live in scripts/.cache/cbb/ (not in git):

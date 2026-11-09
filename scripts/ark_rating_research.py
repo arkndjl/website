@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ARK Ranking upgrade research (Oct 26 2026): new long-memory team ratings tested on the game models.
 
     python3 scripts/ark_rating_research.py nfl     # writes data/ark_rating_research.json (numpy)

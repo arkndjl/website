@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball production tabs (Nov 3 2026): the CBB page's equivalents of the CFB stats, WAR, breakout, top
 performer, draft board, portal, returning and team talent views. Display only: every number is a season line, a
 game line or an existing model output (FV, xBPM, NBA%, the mocks); nothing here feeds the FV model.

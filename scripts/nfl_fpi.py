@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ESPN's NFL game predictor (FPI) for every game, home side: forecast margin (teamPredPtDiff), win chance
 (gameProjection) and the record's lastModified, from the core API .../events/E/competitions/E/predictor.
     python3 scripts/nfl_fpi.py [first season]     # -> scripts/data/public_ratings/nfl_fpi.json.gz (game_id -> row)

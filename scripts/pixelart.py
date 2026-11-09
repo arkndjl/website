@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Draw ARKLIBRARY's generated pixel art and write it as an SVG sprite sheet.
 
     python3 scripts/pixelart.py             # writes layouts/partials/px/sprites.html

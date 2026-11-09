@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Consensus weight backtest for CONS_W (scripts/fetch_cfb.mjs).
 
 FV blends the model grade toward the grade the consensus rank implies (80 - 8.7 ln(rank / 2.7)) by CONS_W. The only

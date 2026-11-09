@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The 2027 NBA draft boards the College Basketball ARKBOARD reads (scripts/data/cbb_boards/), and the map from a
 board rank on a given day to the June rank it predicts (audit item #23, Oct 25 2026).
 

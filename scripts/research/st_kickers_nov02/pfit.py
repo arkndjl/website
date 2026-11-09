@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kicker and punter grades, Nov 2 2026 research (scripts/st_kickers.py). Punter grade weights: next season points over expected a punt on shrunk points + shrunk gross yards.  python3 pfit.py nfl|cfb (after res.py)"""
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

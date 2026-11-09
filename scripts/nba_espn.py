@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """ESPN NBA pulls for the game model (scripts/nba_games.py): schedule and scores, box-score minutes and team lines,
 and every sportsbook's spread, total and moneyline. Trimmed copies go to scripts/.cache/nba/espn/ so a game is
 fetched once; final games never change. Stdlib only.

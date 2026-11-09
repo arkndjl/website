@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The College Football board's player file, read and written as one merged {asof, cols, rows}.
 
 On disk it is two files (scripts/cfb_all.mjs has the layout): static/data/cfb-all.json, the columns the table reads,

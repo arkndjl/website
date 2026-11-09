@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NBA game model's daily build (python3 scripts/nba_games.py; stdlib): the next two slates' projections, power
 rankings and a simulated rest of the season. Writes data/nba_games.json.
 

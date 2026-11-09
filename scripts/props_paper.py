@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The NBA props paper book (Noah, Oct 21 2026): paper bets on player props (points, rebounds, assists,
 PRA) from our projections (scripts/nba_players.py), judged by the close. Paper only. ESPN keeps no prop history, so
 the rule below could not be backtested: it is pre-registered here, and props become picks only once its paper bets

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 import gzip, json
 from collections import defaultdict
 import numpy as np

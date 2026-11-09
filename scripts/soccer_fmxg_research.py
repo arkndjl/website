@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """FotMob team xG in the soccer game model outside the big five (Oct 2026 edge sweep).
 
     python3 scripts/soccer_fmxg_research.py --pull   # FotMob matchDetails team stats (soccer_data.fm_xg) -> scripts/.cache/soccer/fmx/

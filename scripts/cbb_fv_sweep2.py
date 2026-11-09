@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB FV constructed-proxy sweep (Nov 1 2026, research only): new returner drivers on top of the shipped ladder.
 
     python3 scripts/cbb_careers_kit.py      # once: scripts/.cache/cbb/careers.json

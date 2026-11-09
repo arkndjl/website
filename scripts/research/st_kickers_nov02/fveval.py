@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Kicker and punter grades, Nov 2 2026 research (scripts/st_kickers.py). CFB K/P FV driver test, scoring: logistic, held out by class, log loss vs the board score; forward 2016-20.  python3 fveval.py y|y2"""
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

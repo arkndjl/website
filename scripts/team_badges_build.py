@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """This season's team badges (scripts/team_badges.py has the method and the tests). For each sport: last season's and
 this season's games as events keyed by the team file's team key, every shown badge's shrunk season-to-date value
 (n0 from the research), z within this season over the teams with MIN_GAMES games, tiered by the pooled cuts in

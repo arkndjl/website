@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Archived NFL player prop opens from ESPN's core API (propBets), for the props paper test
 (scripts/nfl_props_research.py): ESPN BET (odds provider 58) 2024 through Nov 2025, when ESPN BET left ESPN, and
 DraftKings (provider 100) for 2026's finished games, which ESPN still serves for NFL (Oct 29 2026; its NBA props go a day

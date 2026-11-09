@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB team-rating sweep, round 2 (thread "Improve CFB team rankings and FV", Oct 30 2026): game-level ideas the
 Oct 29 sweep (scripts/cfb_rank_sweep.py) and earlier work never tested, scored on top of the shipped walk-forward
 margin m.

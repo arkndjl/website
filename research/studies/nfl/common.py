@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shared helpers for the NFL studies."""
 import json, math, os
 import numpy as np

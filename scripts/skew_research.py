@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Shape of the result around the line, every sport (Noah, Oct 21 2026: "factor in anything we aren't factoring in
 regarding mean" vs median, skew and key numbers). Research only; writes data/skew_research.json.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Predictive trait badges for the NBA ARKBOARD's XPM board (the CFB board's medals, scripts/cfb_badges.mjs).
 
 A badge is one trait measured by one rate on Basketball-Reference's season line (the advanced table nba_xpm.py already

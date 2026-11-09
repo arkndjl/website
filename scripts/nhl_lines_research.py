@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Line inputs on the NHL game model (Nov 2 2026): walk-forward, add-one on top of the shipped inputs.
 
     python3 scripts/nhl_lines_research.py      # -> data/nhl_lines_research.json (numpy; shifts cached by nhl_lines.py --pull)

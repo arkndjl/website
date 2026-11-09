@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Does the close underprice practice news? (research; Nov 2 2026 lead from the Nov 1 sweep, PRACTICE_Q)
 
     python3 scripts/nfl_practice_close_research.py     # numpy; nflverse downloads + nfl_war ledgers (slow first run)

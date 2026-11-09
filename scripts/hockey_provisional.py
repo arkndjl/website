@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Provisional grades for hockey draft prospects off the board (audit item 33, Oct 25 2026; Noah's Oct 21 rule: unboarded
 players start at the 20 floor, take every available driver, and are ranked on the board like boarded players, tagged
 provisional).

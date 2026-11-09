@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer league sims: plain Poisson goals vs a low-score correction (math audit Nov 2 2026, OPEN item "soccer sims plain
 Poisson"). Research script; results in data/soccer_sim_dc_research.json.
 

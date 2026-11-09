@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest for XV (scripts/cfb_av.mjs XV_W, XV_C): college WAR with each player's quality measured by the parts of his
 stat line that track team margin, in place of PFN's all-in-one score alone. Run by hand, after
 node scripts/cfb_av_backtest.mjs (it fills the caches this reads):

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team ratings that carry their own uncertainty: a Kalman filter on points over an average team (numpy).
 
 Every team's rating is a state with a variance, and the filter keeps the full covariance across teams (ratings are

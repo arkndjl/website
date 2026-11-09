@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Historical comps for the CFB board (audit #41, Oct 25 2026): each graded QB, RB, WR, TE, EDGE, DT and LB's nearest
 // players among the 2014-22 FBS seasons the FV backtest rebuilds (scripts/data/cfb_comps_pool.json, written by
 // scripts/cfb_comps.py), with what they did in the NFL. Profile within position: production z, 247 pedigree z, years on

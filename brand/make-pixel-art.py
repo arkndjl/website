@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Multi-colour, multi-frame pixel art in the brand's style: the animated sibling of
 make-icons.py. Every sprite is a list of ASCII frames, one character per pixel:
 

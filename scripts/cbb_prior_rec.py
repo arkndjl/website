@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Re-attach recruiting grades to the frozen preseason board (scripts/cbb_prior.json.gz), then rebuild the board.
 
     node scripts/cbb_on3.mjs 2025 2026        # the incoming classes (scripts/.cache/cbb/on3/)

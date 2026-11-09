@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Turn photos and logos into small pixel-art images (needs ImageMagick).
 
     python3 scripts/pixel_portraits.py           # make anything missing

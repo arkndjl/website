@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Novig exchange prices as a second free odds source next to DraftKings (Oct 27 2026).
 
 Novig publishes an unauthenticated, cacheable catalog (https://docs.novig.com, `/v3/public/catalog/*`, no key, no

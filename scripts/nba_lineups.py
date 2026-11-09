@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA 5-man lineup stints from ESPN play-by-play, for the NBA ARKBOARD's lineups and on/off tabs, and the lineup
 research (scripts/nba_lineups_research.py). Stdlib only.
 

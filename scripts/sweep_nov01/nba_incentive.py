@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA late-season incentive (Nov 1 2026 sweep; team idea 7's NBA half, never run). Flags from the standings before
 each regular-season game (scripts/data/games_wf/nba.json.gz W-L, play-in games and the playoffs left out):
   out   the team can no longer reach the last post-season place in its conference (10th from 2020-21, 8th before):

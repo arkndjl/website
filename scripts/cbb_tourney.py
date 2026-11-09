@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NCAA tournament odds for the College Basketball ARKBOARD: who makes the field, at what seed, and how far each team
 goes, from the CBB game model (scripts/cbb_games.py) and a committee model fit on the 2014-26 fields.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Rebuild scripts/.cache/cbb/careers.json (what cbb_link.py writes) from the research kit in /mnt/project-files/cbb/kit,
 for a container where 247 Sports refuses the pull: Barttorvik seasons joined to NBA careers, On3/247 grades, DPM.
 The rebuild reproduces data/cbb_fit.json (drivers, cuts, shrink) exactly.  python3 scripts/cbb_careers_kit.py"""

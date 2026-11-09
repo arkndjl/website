@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Retest of the college game model's near misses (memory cfb-game-model-audit) once CFBD's 2015-25 history was pulled
 // (Nov 1 2026, cfb game research workflow): every test walk-forward on the 2015-26 ESPN history, scored with the
 // project's paired clustered t (scripts/harness.mjs via cfb_hist_backtest.mjs cmp).

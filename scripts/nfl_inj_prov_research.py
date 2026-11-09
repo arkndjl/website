@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: provisional values for NFL players the injury term can't price (no WAR to date), and the next man up.
 
     python3 scripts/nfl_inj_prov_research.py     # writes data/nfl_inj_prov_research.json (numpy; ~10 min warm)

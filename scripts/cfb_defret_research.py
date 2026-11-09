@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Returning defensive playmakers in the CFB preseason prior (research, Nov 2 2026).
 
 ESPN box scores carry tackles in full only from 2024, so defensive returning production was untestable

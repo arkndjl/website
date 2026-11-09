@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CHL goalie season tables and team standings (HockeyTech modulekit, OHL/WHL/QMJHL, 2007-26 end years) for the
 position-purpose FV driver test (Nov 2 2026) -> scripts/.cache/hockey/pos/<league>_<end year>_{gk,st}.json"""
 import json

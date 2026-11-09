@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """per (game, offense): scrimmage plays, neutral seconds a play, no-huddle share, drives; stream and drop the raw file"""
 import csv, gzip, io, json, os, subprocess, sys
 from collections import defaultdict

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Where transfers land: a destination-choice model for the team builder's landing odds.
 
 For every 2024 and 2025 transfer with a known hometown (scripts/cfb_transfer_fit.py's build, cached in

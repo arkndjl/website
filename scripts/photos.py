@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player photos and team logos for tables built from another board's rows (Oct 31 2026): backup watch, ARKLIST and the
 like join each row to its sport's main board by name + team (scripts/names.py) and take that board's photo.
 

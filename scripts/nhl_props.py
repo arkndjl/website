@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL player props (Oct 31 2026, Noah: "NBA/NHL player props in the same way we did NFL ones"): a per-game projection
 of each skater's shots on goal, goals, assists, points, blocked shots and hits and each goalie's saves, and the paper
 test of it against the books' archived prop lines and prices.

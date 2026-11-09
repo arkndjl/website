@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // "updated" stamps that know when they're stale (layouts/partials/fresh.html, audit #29). Each .ark-fresh carries its
 // feed's asof and sport; past the sport's threshold (data/freshness.json: inHours in season, offHours outside it) it
 // gets .is-stale and a "stale" tag, so a feed that stopped updating says so even when nothing rebuilds the page.

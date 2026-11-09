@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: do summer roster moves and rookies reach the NBA game model's projections early in a season?
 
     python3 scripts/nba_roster_research.py     # writes data/nba_roster_research.json (numpy)

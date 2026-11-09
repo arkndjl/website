@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Player badges for the College Basketball ARKBOARD (the football board's medals, scripts/cfb_badges.mjs).
 
 A badge is one trait measured by one Barttorvik stat (or a z-composite of two) on the player's last college season,

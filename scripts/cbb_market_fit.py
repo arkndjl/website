@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball market models: Transfer% and landing odds (NIL era), coaching jobs (which head jobs open, who
 fills them) and coach pay (what the market pays a coach's profile). Fit by hand; scored daily by scripts/cbb_market.py.
 

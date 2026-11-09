@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research on the college basketball game model (scripts/cbb_games.py) -> data/cbb_games_research.json.
 Every test is the fit's walk-forward (each season scored from the seasons before), tuned or chosen on 2016-20 and
 reported on 2021-26 held out; a change is kept only at paired per-game t <= -1.5 on 2016-20 and not worse on 2021-26.

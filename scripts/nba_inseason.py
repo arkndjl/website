@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """In-season player values for the NBA game model (team model idea 4, Oct 23 2026).
 
 nba_games.values() freezes every player at his XPM from the two seasons before. Here each player's value moves

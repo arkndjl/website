@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for the mock draft's order (nflDraftOrder in cfb_teams.mjs): rebuilds each 2020-25 draft's first round
 // from the season before (ESPN games, standings and playoffs) and checks it against the real one, by the team
 // each pick started with (ESPN's draft API: the holder, or "From X" on a traded pick). Forfeited picks (Miami 2023)

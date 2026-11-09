@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Build the College Basketball ARKBOARD (data/cbb.json, static/data/cbb-all.json): every player on a 2026-27 D-I
 roster, graded on the 20-80 FV scale by the model fit in scripts/cbb_fit.py (data/cbb_fit.json).
 

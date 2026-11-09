@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Backtest for the efficiency stats FV weighted at OL, CB and S on trust until Oct 2026 (FV_STATS in fetch_cfb.mjs): do
 // they add anything to production? PFN has lines there from 2024 only, so the outcome is draft capital, not an
 // NFL career: the 2025 and 2026 drafts (nflverse), each pick as the AV a season that slot returned in the

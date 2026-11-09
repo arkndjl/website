@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research + fit (Nov 3 2026): a rookie projection for the NBA rookie board, XPM + age + rookie minutes.
 
     python3 scripts/nba_rookie_proj_research.py     # writes data/nba_rookie_proj_fit.json (numpy)

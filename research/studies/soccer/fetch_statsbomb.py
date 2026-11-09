@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Download StatsBomb open-data events for selected competitions and keep a compact per-match record.
 Output: <scratch>/soccer/compact.jsonl (one line per match). Raw event JSON is not kept."""
 import json, os, subprocess, sys, glob

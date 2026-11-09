@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Research: FV as the prior for low-sample players (Noah, Oct 29 2026: "project game impact for provisional players /
 players with not a lot of games played based on their FV").
 

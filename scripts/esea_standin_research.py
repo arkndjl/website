@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """1NT research (Nov 3 2026): stand-in cost (C1) and round-share player Elo (C2) on ESEA league matches.
 
     python3 scripts/esea_standin_research.py   # reads research/esea_matches.json.gz (+ data/esea.json git history)

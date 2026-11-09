@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB early-season corrections to the game model (thread "Improve early-season CFB predictions", Oct 28 2026).
 
 Weeks 0-2 are where the CFB model trails the close most (+1.2 to +1.9 points of MAE). Two shapes in the walk-forward

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Round-2 research harness for NFL XV parts (results: data/nfl_xv_round2.json, note research/round2-nfl-xv.md).
 
     python3 scripts/nfl_xv_round2.py --extract DIR   # compact plays from pbp + pbp_participation (+ FTN) in DIR

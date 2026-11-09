@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Team-specific home advantage (EB-shrunk) and persistent team model bias, on every games_wf file.
 x_hfa = d_H + d_A, d_T = (mean resid at home - mean resid away)/2 shrunk by k games (all earlier games, any season).
 x_bias = b_H - b_A, b_T = shrunk mean team-perspective resid over earlier seasons (long memory).

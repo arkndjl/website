@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball player projections for Predictions: each rotation player's points, rebounds and assists (and
 PRA) in his team's next game, with a negative binomial spread (data/cbb_players.json), the model behind them
 (data/cbb_players_fit.json), and whether they help the game model (data/cbb_players_research.json).

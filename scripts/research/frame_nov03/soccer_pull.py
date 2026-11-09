@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Soccer prospects rebuild for the Nov 3 2026 frame test, with a generic research User-Agent.
 
     python3 scripts/research/frame_nov03/soccer_pull.py dump

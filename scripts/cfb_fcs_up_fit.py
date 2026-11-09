@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest and refit FBS% (the FCS move-up odds, FCS_UP in scripts/fetch_cfb.mjs) on NIL-era cycles.
 
     python3 scripts/cfb_fcs_up_fit.py            # pull (cached in scripts/.cache/fcsup/), build, fit

@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // databallr DPM by NBA season, read from its public stats page (databallr.com/stats?season=<year>), for the College
 // Basketball ARKBOARD's NBA outcome test.
 //   node scripts/cbb_dpm.mjs 2010 2026     # seasons from..to -> scripts/.cache/cbb/dpm/<season>.json

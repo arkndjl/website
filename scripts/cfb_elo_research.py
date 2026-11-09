@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CFB Elo research on ESPN history (scripts/cfb_espn_hist.py; no CFBD calls). Tune on 2016-20 (2015 is the
 burn-in season every run starts from), report on 2021-25 held out.
   1. Elo variants against the live rule in scripts/cfb_model.mjs (eloRun, replicated exactly: 538's margin

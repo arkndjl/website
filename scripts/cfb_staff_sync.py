@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Keep the head coaches in data/cfb_staff.json current (Nov 2 2026, "every model auto-updates").
 
     python3 scripts/cfb_staff_sync.py          # ESPN's current head coach for every team in the file

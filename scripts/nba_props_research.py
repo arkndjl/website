@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA player props paper test (Oct 31 2026, Noah: "NBA/NHL player props in the same way we did NFL ones"): do
 nba_players' projections, as they stand before the injury report, beat the books' opening prop lines and prices?
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Backtest: do player badges (scripts/cbb_badges.py) predict NBA value beyond the College Basketball ARKBOARD's FV?
 
     python3 scripts/cbb_link.py             # once: scripts/.cache/cbb/careers.json

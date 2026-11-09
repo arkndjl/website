@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NBA referee crews as inputs: game totals (scripts/nba_games.py), the totals pick market (scripts/games_picks.py),
 and player points and minutes (scripts/nba_players.py). Research only.
 

@@ -1,3 +1,4 @@
+# Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """NHL lineup-adjusted rating updates (Nov 1 2026 sweep; the NBA's lk_opp idea, PR #353, never tried in the NHL).
 Each game's xG / goals / Elo update is cleaned of how far each side's dressed lineup that night sat from the team's
 own season-to-date mean lineup (goals a game, lineup_value()), split half attack, half defence. Variants:

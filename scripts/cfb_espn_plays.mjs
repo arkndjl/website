@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // ESPN play-by-play for college games, slimmed to the fields sitByGame (cfb_model.mjs) reads from CFBD plays, so the
 // game model's situational splits can be built without CFBD's monthly quota. ESPN event and team ids are CFBD's.
 //   node scripts/cfb_espn_plays.mjs <md.json.gz> <out.json.gz>     # every FBS game in the dump's 2025 and 2026 seasons
