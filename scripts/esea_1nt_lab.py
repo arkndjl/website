@@ -13,7 +13,7 @@ finished match in data/esea.json the history has not caught yet, and writes data
   players  each player's ESEA seasons (10+ maps in total)
   h2h      every opponent met: record and the maps
 
-Descriptive only. Team map records and lifetime splits failed as predictors held out (PR #458), so the
+Descriptive only. Team map records and lifetime splits failed as predictors held out, so the
 match model uses players' FACEIT map splits; this file is for prep and reading the past, not for odds.
 Runs in the esea season workflow after scripts/fetch_esea.mjs.
 """

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Keep the Predictions page's picks fresh between the sport builds (Noah, Oct 27 2026: "make it so that picks auto refresh").
+"""Keep the Predictions page's picks fresh between the sport builds.
 
     python3 scripts/picks_refresh.py            # every pick sport in season (data/freshness.json windows)
     python3 scripts/picks_refresh.py nba nfl    # some sports

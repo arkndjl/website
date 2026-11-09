@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Age in the backup watch (Noah, Oct 31 2026: a backup younger than the starter he sits behind should rank above a
+"""Age in the backup watch (a backup younger than the starter he sits behind should rank above a
 veteran backup). Fits how much the age gap (starter's age - backup's) adds to today's grade gap in predicting the gap
 over the next two seasons, and writes the terms the backup watch ranks by: data/backup_age.json.
 
@@ -21,7 +21,7 @@ errors, t). Coefficients shipped are the full-sample fit.
           only age the college boards carry for everyone). Departures dominate: a senior starter is gone next season.
   nfl     no past seasons on file: borrows the pro sports' fit in standard-deviation units of the gap
   cfb     no past seasons on file: borrows the CBB fit in standard-deviation units of the gap
-The CBB backup watch grades by BPM (Noah, Nov 5 2026), the history's own units, so CBB ships its own fit.
+The CBB backup watch grades by BPM, the history's own units, so CBB ships its own fit.
 """
 import gzip
 import json

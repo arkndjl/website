@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """The exact bets to place now, from the Picks tab's logs (data/games_picks_<sport>.json, the same rows the
-Predictions picks tab and the paper book read). Used by the place-your-picks reminders (Noah, Oct 28 2026).
+Predictions picks tab and the paper book read). Used by the place-your-picks reminders.
 
 Every open pick that hasn't started: not a pass, not withdrawn. Each line gives the game, start (ET), market, the
 side at the current line and price (Novig, else DraftKings; the flagged one when no current quote), the bet-to line
@@ -159,7 +159,7 @@ def main():
         sent.update({r["key"]: {"held": stamp, "kick": r["k"].strftime("%Y-%m-%dT%H:%MZ"), "bet": f"{r['bet']} {r['price']}",
                                 "kelly": 0.0, "game": r["game"]} for r, _ in held})
         rs = [r for r in rs if fam(r["key"]) not in opn]
-        # the nightly cap (scripts/night_cap.py, Noah Nov 1 2026: 40% a night): bets already sent for an ET night count
+        # the nightly cap (scripts/night_cap.py, 40% a night): bets already sent for an ET night count
         # first; new picks share what is left, scaled down together, and none go out once the night is full
         out_n = {}
         for k, v in sent.items():

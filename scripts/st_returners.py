@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Special teams tab (Noah, Nov 2 2026): kick and punt returners ranked by points over expected a return, shrunk for sample.
+"""Special teams tab: kick and punt returners ranked by points over expected a return, shrunk for sample.
 
     python3 scripts/st_returners.py nfl     # nflverse play-by-play -> data/st_returners_nfl.json (run by nfl.yml)
     python3 scripts/st_returners.py cfb     # ESPN play-by-play cache -> data/st_returners_cfb.json (run by cfb-board.yml)

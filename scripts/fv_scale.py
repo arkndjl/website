@@ -1,5 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""The headline FV's top end (Noah, Oct 31 2026: "80 actually attainable, albeit extremely rare", on every board).
+"""The headline FV's top end ("80 actually attainable, albeit extremely rare", on every board).
 
 The headline is the mean of a player's outcome odds on a 20-80 outcome scale, so it can only reach 80 when every
 outcome is an 80: no board had ever shown one (soccer topped out at 72, basketball at 57). This keeps the mean below

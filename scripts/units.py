@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Units (Noah, Oct 21 2026: "a new unit system based on fractional Kelly that is uniquely tailored to our models and
-aims to be much more aggressive"). One unit model for the Predictions picks (scripts/games_picks.py) and the paper book
+"""Units. One unit model for the Predictions picks (scripts/games_picks.py) and the paper book
 (scripts/paper_book.py). DU compounds (Noah: "we are going to keep investing winnings back"): 1 DU = 1% of the bankroll
 as it stands when the bet is placed, so stakes grow as bets hit and shrink in a drawdown. Kelly assumes exactly that,
 and every growth, drawdown and ruin number here is compounded (log growth per slate, bankroll multiplied through).
@@ -87,12 +86,12 @@ HOLD[('nba', 'total')] = 5.0
 # NBA spreads at 5 too, by the same rule (Oct 21 2026): cap 5 keeps 9.0% of the 10.1% held-out growth a season that cap 10
 # gets, on the same injury-leak history
 HOLD[('nba', 'spread')] = 5.0
-# CBB spreads up to 5 too (Oct 27 2026): the bad opens are cleaned out of the rules (PR #304) and its fit now rests on
+# CBB spreads up to 5 too (Oct 27 2026): the bad opens are cleaned out of the rules and its fit now rests on
 # 1,041 test picks; walk-forward (scripts/pick_recal.py) caps 3, 5 and 10 grow alike, 5 for every market
 HOLD[('cbb', 'spread')] = 5.0
 # and CFB totals (Oct 27 2026): their own fit picked 7.5 on 100 test picks; held at 5 like every other market
 HOLD[('cfb', 'total')] = 5.0
-# the system before DU (PR #281): Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
+# the system before DU: Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
 OLD_FRAC = {('cfb', 'total'): 1.0, ('cbb', 'spread'): 0.25, ('nba', 'spread'): 0.1, ('nba', 'total'): 0.25}
 # a market with no fit (NFL: no opening lines in the history) gets the book-wide cap too (Nov 2 2026: was 3, the one
 # market left off the Oct 27 one-cap rule)
@@ -477,7 +476,6 @@ def crossfit(sport, picks):
         for i, p in enumerate(picks):
             if p['fold'] == f:
                 oof[i] = (ks[p['rule']],) + ev_of(p, ks[p['rule']])
-    chosen = []
     best = {}
     for i, p in enumerate(picks):
         k, c, ev = oof[i]

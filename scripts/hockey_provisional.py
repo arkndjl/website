@@ -319,7 +319,7 @@ def fit():
     X = np.array([[f[c] for c in kept] for f in F]); b = H.ols(X, y)
     # the earlier driver set (Oct 25) on the same class-out test
     s_old, _ = H.score(F, y, cls, OLD_KEPT)
-    # approximate age (Noah, Oct 29): a player with no birth date in the feed. Hide every birth date and grade with the
+    # approximate age: a player with no birth date in the feed. Hide every birth date and grade with the
     # kept drivers at (a) the old flat 18.5, (b) an age fitted on what the line still shows (first season in the league,
     # games, size, scoring, position, a line the year before), each class's age model fit on the other classes
     A = np.array([age_x(p, f) for p, f in zip(pop, F)]); ages = np.array([f['age'] + 18.5 for f in F])

@@ -54,7 +54,7 @@ export function cfbZ({ pos, years = null, cls = null, noRec = false, cons = fals
   return { pos_QB: +(pos === 'QB'), pos_TE: +(pos === 'TE'), pos_LB: +(pos === 'LB'), pos_RB: +(pos === 'RB'), pos_EDGE: +(pos === 'EDGE'), pos_DL: +(pos === 'DL'),
     under: +(y <= 2.5), early: last ? 0 : cons && y >= 3 ? 0.5 : 1, walkon: +!!noRec, lowsnap: 0, cons: +!!cons, level: (fv - 45) / 10 };
 }
-// the headline FV at the mean outcome (Noah, Oct 21 2026: FV means the mean outcome on both boards). The grade
+// the headline FV at the mean outcome (FV means the mean outcome on both boards). The grade
 // (r.fvg, the scarcity grade the distribution reads) stays on the row; fvx and fv become the distribution's mean, exact
 // and in steps of 1. Idempotent: a row that already has fvg is left alone. K and P (outside the fit) take the map at
 // the neutral spread terms.

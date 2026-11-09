@@ -1,6 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Player FV as an input to the game models and team rankings (Noah, Oct 30 2026: "figure out how we can use FV as an
-input for game models to improve the game models and team rankings"). Each test adds a form not tried before
+"""Player FV as an input to the game models and team rankings. Each test adds a form not tried before
 (fv-mean-games, fv-lowsample-priors, roster-proj-rankings, cfb/nfl roster priors), scored on each model's own split
 and gate. Every grade is as of the draft / the season before, never after the game.
     python3 scripts/fv_games_research.py nhl      # young returning skaters: draft grade as a development offset in rv

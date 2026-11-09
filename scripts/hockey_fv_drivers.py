@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Hockey prospects FV driver search (Noah, Oct 24 2026): new draft-time and post-draft candidates for
+"""Hockey prospects FV driver search: new draft-time and post-draft candidates for
 scripts/hockey_prospects.py, tested on the same outcome FV, the same leave-one-class-out rule (t >= 2, 8 of 12
 classes) and two extra checks a driver has to pass before it ships:
 
@@ -389,7 +389,6 @@ SCANDS = ['sgrow', 'swjc', 'swjcG', 'sprogp', 'sTsh', 'sES', 'sPM']
 
 def main():
     rows = build_rows()
-    W = None
     sc = H.outcome_scale(rows)
     tr = [r for r in rows if H.FIRST <= r['year'] <= H.LAST_FIT]
     y = np.array([H.fv_of(r, sc) for r in tr]); cls = np.array([r['year'] for r in tr]); picks = np.array([r['pick'] for r in tr])

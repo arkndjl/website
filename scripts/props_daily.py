@@ -180,7 +180,7 @@ def run(sport):
     R = rule_of(sport, F)
     rid = hashlib.sha1(json.dumps(R, sort_keys=True).encode()).hexdigest()[:10]
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    # a paper test (the fit's 'paper': NHL saves, Noah Oct 31 2026) stays off the picks tab and the paper book
+    # a paper test (the fit's 'paper': NHL saves) stays off the picks tab and the paper book
     out_fn = os.path.join(ROOT, 'data', f'props_paper_{sport}.json' if F.get('paper') else f'games_picks_{sport}props.json')
     try:
         old = json.load(open(out_fn))

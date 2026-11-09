@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""CBB matchup, combo and size terms against the close (Noah, Nov 3 2026: "head to head metrics, combo metrics, team
+"""CBB matchup, combo and size terms against the close ("head to head metrics, combo metrics, team
 badges ... good rebounding teams vs high 3 pt shooting teams, tempo vs tempo"; "test team size in the game model").
 Research only; results in data/cbb_matchup_research.json.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Hockey mock drafts (Noah, Oct 24 2026): the 2027 NHL draft, two rounds, three ways, like the basketball mocks.
+"""Hockey mock drafts: the 2027 NHL draft, two rounds, three ways, like the basketball mocks.
 
     python3 scripts/hockey_mock.py      -> data/hockey_mock.json (after scripts/nhl_games.py and hockey_prospects.py)
 

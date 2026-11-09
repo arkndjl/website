@@ -13,7 +13,6 @@ import gzip
 import json
 import os
 import re
-import sys
 import time
 import urllib.request
 from collections import Counter, defaultdict

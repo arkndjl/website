@@ -132,7 +132,7 @@ def main():
         if s > 0:
             mk.setdefault(f, {}).update({t: p / s for t, p in raw.items()})   # one winner a market (a division or conference)
         time.sleep(0.3)
-    # Novig's futures first (Noah, Oct 27 2026: "switch everything to Novig"); each event (a conference, a division, the
+    # Novig's futures first; each event (a conference, a division, the
     # title) stays on DraftKings unless Novig prices 80%+ of that event's own teams (its futures books are thin)
     src = {f: {} for f in mk}                # field -> team -> book
     for f, v in mk.items():

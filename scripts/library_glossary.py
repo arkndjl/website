@@ -1,6 +1,6 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Build research/library.json (then run scripts/library_build.py): ARKBOARD Reference tab content (glossary + FV conversion charts)."""
-import json, re, sys
+import json, re
 
 import pathlib
 ROOT = str(pathlib.Path(__file__).resolve().parent.parent)

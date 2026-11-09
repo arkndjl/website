@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Polymarket CS2 prices as an input to the Counter-Strike match chance (data only, never a betting venue; Noah Oct 29 2026).
+"""Polymarket CS2 prices as an input to the Counter-Strike match chance (data only, never a betting venue).
 
     python3 scripts/cs2_poly.py --fit    # backtest + weights -> data/cs2_poly.json (pulls ~12k price histories, cached)
     python3 scripts/cs2_poly.py          # live: today's open Polymarket CS2 moneylines (what cs2_model.build() reads)

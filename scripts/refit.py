@@ -26,7 +26,6 @@ project rule: any game model change reruns --fit then --rules).
 import datetime as dt
 import glob
 import json
-import math
 import os
 import shutil
 import subprocess

@@ -399,7 +399,6 @@ def main():
     for w0 in sorted(weeks, reverse=True):
         gs = sorted(weeks[w0], key=lambda g: -game_score(g))[:150]
         rows = [trow(g, g[GC['name']], g[GC['team']], str(g[GC['pid']]), g[GC['opp']], g[GC['date']], g[GC['loc']], g[GC['win1']], gline(g)) for g in gs]
-        w1 = w0 + dt.timedelta(days=6)
         wk.append({'s': w0.isoformat(), 'l': f"week of {MON[w0.month - 1].lower()} {w0.day}", 'games': len({g[GC['muid']] for g in weeks[w0]}), 'rows': rows})
     season_best = sorted(games, key=lambda g: -game_score(g))[:150]
     seasons = wk + ([{'s': SEASON, 'l': label(SEASON) + ' season', 'rows': [trow(g, g[GC['name']], g[GC['team']], str(g[GC['pid']]), g[GC['opp']], g[GC['date']], g[GC['loc']], g[GC['win1']], gline(g)) for g in season_best]}] if len(wk) > 1 else [])

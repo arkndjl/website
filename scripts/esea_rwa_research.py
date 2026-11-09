@@ -36,7 +36,7 @@ import esea_ark_research as ARK  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'esea_rwa_fit.json')
 STATS = ['k', 'd', 'a', 'adr', 'mk', 'fk', 'fd', 'cl', 'ud', 'ef']
-PELO = dict(K=128, Kmin=26, n0=50, span=0.5, kmap=1.0, mu_new=-100, gap=100)   # shipped (PR #755)
+PELO = dict(K=128, Kmin=26, n0=50, span=0.5, kmap=1.0, mu_new=-100, gap=100)   # shipped
 TUNE, HELD = (54, 57), (58, 59)
 DAY = 86400
 

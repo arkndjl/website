@@ -71,7 +71,7 @@ const espnJson = async u => {
   }
   return null;
 };
-// Novig's main lines at its asks (Noah, Oct 27 2026: "switch everything to Novig"), written by `python3 scripts/novig.py
+// Novig's main lines at its asks, written by `python3 scripts/novig.py
 // --live cfb` before the board runs; a game Novig doesn't list keeps ESPN's DraftKings numbers
 let NOVIG = null;
 function novigLive() {

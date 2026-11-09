@@ -19,7 +19,6 @@ outcome mix as (a) a mixture weight on fv_dist's tier odds and (b) a spread term
 ordered probit. Either ships only if it beats the shipped model's held-out RPS (.0400) by the selection margin.
 """
 import json, os, sys
-from collections import defaultdict
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

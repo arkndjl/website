@@ -24,7 +24,6 @@ Sources
        before (WAR, WAA, snaps), cached at scripts/.cache/xaav/nfl_boards.json.
 """
 import datetime as dt
-import gzip
 import json
 import math
 import os

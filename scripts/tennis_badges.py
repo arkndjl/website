@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Tennis predictive badges (Noah, Nov 1 2026: "predictive badges like the ones we have in CFB"), shared by the two
+"""Tennis predictive badges, shared by the two
 tennis boards: scripts/tennis_model.py (TENNIS ARKBOARD rows) and scripts/tennis_prospects.py (prospects board).
 
 A badge is one trait measured by one stat, regressed toward the tour pool's mean by volume (the CFB form,

@@ -23,7 +23,6 @@ import datetime as dt
 import gzip
 import io
 import json
-import math
 import os
 import re
 import sys

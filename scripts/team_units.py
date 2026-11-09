@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Team unit ratings for the teams group of every ARKBOARD sport page (Noah, Nov 2 2026: "team offense, defense sections
+"""Team unit ratings for the teams group of every ARKBOARD sport page ("team offense, defense sections
 for each sport as well as stuff like power play and penalty kill for NHL"; "formation analysis for CFB/NFL").
 
     python3 scripts/team_units.py nfl|cfb|nba|cbb|nhl|soccer      # -> data/units_<sport>.json

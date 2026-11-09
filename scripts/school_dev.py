@@ -214,7 +214,7 @@ def tests(rows, key, dkey, classes):
     R = [r for r in rows if key in r.get(dkey, {})]
     out = {}
     # rolling origin: effects from classes < t, scored on class t (from the 4th class on)
-    roll, wins, pooled_e, pooled_u, pooled_s = [], 0, [], [], []
+    wins, pooled_e, pooled_u, pooled_s = 0, [], [], []
     per = []
     for t in classes[3:]:
         tr = [r for r in R if r['cls'] < t]; te = [r for r in R if r['cls'] == t]

@@ -26,7 +26,7 @@ import os
 import re
 import sys
 import time
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 import numpy as np
 import requests

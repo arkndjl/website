@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""NBA player prop snapshots for the props paper book (Noah, Oct 21 2026: "player props for picks based on DraftKings
-lines from ESPN"). Free data only: DraftKings through ESPN's core API (odds provider 100, propBets), which serves a
+"""NBA player prop snapshots for the props paper book. Free data only: DraftKings through ESPN's core API (odds provider 100, propBets), which serves a
 game's props only until about a day after it ends, so there is no history to backtest on: the archive starts now.
 
     python3 scripts/props_snap.py           # the odds-snap workflow runs it every 30 minutes, after odds_snap.py
@@ -161,7 +160,7 @@ def nba(now):
     last = last_rows([prev, fn])
     with ThreadPoolExecutor(6) as ex:
         got = dict(zip(games, ex.map(props, games)))
-    # Novig's main prop rung where it has one (Noah, Oct 27 2026: "switch everything to Novig"), DraftKings otherwise;
+    # Novig's main prop rung where it has one, DraftKings otherwise;
     # Novig names its players, so they join ESPN athletes through the shared matcher within the game
     src = {}
     try:

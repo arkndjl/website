@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Research: college basketball lineups and on/off (Noah, Nov 2 2026: "lineup charts, on-offs for basketball, and
-incorporating this into player/team ratings if it passes").
+"""Research: college basketball lineups and on/off.
 
 Data: scripts/cbb_lineups.py stints from NCAA play-by-play (ncaa-api proxy). Only seasons whose games carry
 substitution lines can be tested (see 'coverage' in the output); that is not the house 2016-20 / 2021-26 split, so

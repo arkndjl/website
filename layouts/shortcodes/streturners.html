@@ -1,4 +1,4 @@
-{{- /* Special teams tab (Noah, Nov 2 2026): kick and punt returners, ranked by return yards over expected a return,
+{{- /* Special teams tab: kick and punt returners, ranked by return yards over expected a return,
        shrunk for sample. data/st_returners_<sport>.json from scripts/st_returners.py (NFL job: nfl.yml; CFB: cfb-board.yml).
        sport="nfl"|"cfb". Two views (KR, PR) on chips, one shown at a time. The team rating has its own tab in the teams group (stteams.html). Phones keep rank, player, Ret, Avg and Adj. */ -}}
 {{- $sport := .Get "sport" | default "nfl" }}

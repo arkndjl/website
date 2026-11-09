@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Every board's roster vs RotoWire's clubs (Noah, Nov 5 2026: "go back through the past of this season to make sure
-all rosters are accurate").
+"""Every board's roster vs RotoWire's clubs.
 
 RotoWire's club for each player its news feed named this season (scripts/rotowire_moves.py: teams) is the reference.
 Each published file that puts a player on a club is read: the depth charts (static/data/depth/*.json) and every

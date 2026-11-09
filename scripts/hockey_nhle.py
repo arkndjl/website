@@ -14,7 +14,6 @@ of consecutive leagues in ~5,000 careers enters at once. A league's term is shru
 (log scale, prior sd PRIOR_SD) by its information (movers' expected points there, halved for overdispersion): thin leagues stay near the published factor.
 """
 import datetime as dt
-import gzip
 import json
 import math
 import os
@@ -203,7 +202,6 @@ def test(kinds=('hand', 'fe', 'pairs')):
     for kind in kinds:
         # strict: each class is graded with factors fit without that class's careers
         p = np.zeros(len(y)); per = []
-        stage_p = {k: {} for k in range(1, 5)}
         facs = {c: variant_factors(kind, allrows, ids[c]) for c in sorted(set(cls))}
         for c in sorted(set(cls)):
             rr = relabel(tr0, facs[c])

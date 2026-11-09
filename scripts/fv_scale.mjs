@@ -1,5 +1,5 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-// The headline FV's stretched top (Noah, Oct 31 2026: 80 reachable, about one a board every five seasons): the mean
+// The headline FV's stretched top (80 reachable, about one a board every five seasons): the mean
 // below each board's knot K, linear above it to 80 at T. K and T per board in data/fv_scale.json (fit and documented
 // in scripts/fv_scale.py, which this mirrors). fvx stays the exact mean on every row; only the whole-number fv moves.
 import fs from 'node:fs';

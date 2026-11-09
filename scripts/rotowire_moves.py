@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""RotoWire roster moves (Noah, Nov 5 2026: "use rotowire for trades/waiver claims/etc and go back through the past of
-this season to make sure all rosters are accurate").
+"""RotoWire roster moves.
 
 Source: each sport's whole news feed, paged back in time through RotoWire's "more updates" call (the same call
 scripts/rotowire_history.py pages for injuries, 25 items a call). Two things are kept:

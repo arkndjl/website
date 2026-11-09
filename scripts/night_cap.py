@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Nightly exposure cap (Noah, Nov 1 2026: "40% a night"). The picks starting on one ET date, every sport together,
+"""Nightly exposure cap. The picks starting on one ET date, every sport together,
 stake at most CAP % of the bankroll in all; a night past it has every stake scaled by CAP / total (quarter units,
 rounded down, 0.25 floor). Research: scripts/exposure_cap_research.py (data/exposure_cap_research.json): at the
 measured within-night correlation a 40% cap keeps 85% of the expected growth if the backtest's edges hold, is the best

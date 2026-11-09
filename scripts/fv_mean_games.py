@@ -1,5 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Does FV at the mean outcome (the headline since Oct 21 2026, PR #335) do better than the grade as an input to the game
+"""Does FV at the mean outcome (the headline since Oct 21 2026) do better than the grade as an input to the game
 models? Each sport's FV-based team or rookie input is rebuilt twice, once on the grade and once at the mean of its
 outcome odds (scripts/fv_dist.py), and scored held out on the shared harness (clustered paired t, scripts/harness.py).
   OMP_NUM_THREADS=1 python3 scripts/fv_mean_games.py cbb      # college basketball preseason prior (fvtop and friends)

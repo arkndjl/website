@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Homepage ticker: the next games of Noah's teams and of 1NT (Noah, Nov 1 2026).
+"""Homepage ticker: the next games of Noah's teams and of 1NT.
 
     python3 scripts/fetch_ticker.py          # writes data/ticker.json (only when the games changed)
 

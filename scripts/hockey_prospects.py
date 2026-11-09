@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Hockey prospects ARKBOARD (Noah, Oct 24 2026): every 2027 draft prospect and every drafted player still short of
+"""Hockey prospects ARKBOARD: every 2027 draft prospect and every drafted player still short of
 the NHL, graded on the 20-80 FV scale against what past picks became in the NHL.
 
     python3 scripts/hockey_data.py            # draft classes 2008-26 (picks, NHL ids, season lines, Central Scouting)
@@ -16,7 +16,7 @@ FV scale  By rarity among picks, classes 2008-19 (about 212 picks a class): 80 =
           one in two, 70 = the best of a class, 65 = top 2, 60 = top 5 (first line, top pair, starting goalie), 55 = top
           10, 50 = top 20 (NHL regular), 45 = top 30, 40 = top 45; below that 20 (no NHL games) to 40 by games played.
           Values between cuts are interpolated. Grades in steps of 1.
-Draft     FV = OLS on outcome FV, so the headline is the MEAN outcome (Noah, Oct 21). Base: log draft slot (and its
+Draft     FV = OLS on outcome FV, so the headline is the MEAN outcome. Base: log draft slot (and its
 model     square), defense and goalie flags. Candidates (draft-year line: NHLe a full season from the league's
           translation factor, fit since Oct 25 2026 on the careers of every pick (scripts/hockey_nhle.py), goals share; age at the draft; height, weight; league group; Central Scouting rank; the
           season before; a first-round pick in the CHL priority selection at 15, from HockeyTech profiles): added
@@ -467,7 +467,7 @@ def feats(r, sl=None):
     return f
 
 
-# Class strength (Noah, Oct 26 2026: FV grades absolute talent, so it can't depend on the class a player is drafted in).
+# Class strength (FV grades absolute talent, so it can't depend on the class a player is drafted in).
 # The slot is a rank within one class, so on slot alone every class's 5th pick grades the same. cs puts the level back:
 # the class's top CS_K picks graded on the draft-time inputs that mean the same in any class (NHLe, age, size, league,
 # position; the ABS fit, no slot), their mean against the 2008-19 average, applied to top picks and fading out by
@@ -649,7 +649,7 @@ def pre_fill(Fk, sub, k, mean=None):
     return mean
 
 
-# Comps (Noah, Oct 30 2026: player comps as an FV driver). A stage-k prospect's 30 nearest past picks at the same stage
+# Comps (player comps as an FV driver). A stage-k prospect's 30 nearest past picks at the same stage
 # (same position group, never his own class; equal weights on the z-scored stage inputs below), and their mean miss
 # from the stage model: what picks with his profile went on to do beyond what the linear grade said. Offered after the
 # stage's other inputs, on the board's gate. Class-out on the board's rows, eq weights / residual / k 30 (the one
@@ -1030,7 +1030,7 @@ def build():
     # the floor (22+), the rest are counted
     import hockey_provisional as HP
     prov = HP.live(year or cur, board, rows) if tk else []
-    # exact ages (Noah, Nov 3 2026): Tankathon gives the birth month only; the CHL, AHL, USHL and Liiga feeds give the
+    # exact ages: Tankathon gives the birth month only; the CHL, AHL, USHL and Liiga feeds give the
     # date (same name, born that month). Display only: the grade keeps the mid-month age (cs moves < .01 FV)
     for (t, *_), b in zip(live, board):
         eb = HP.exact_birth(t['name'], t['birth'])

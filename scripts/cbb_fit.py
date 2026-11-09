@@ -34,7 +34,7 @@ at the top: 4/8 and 0/3).
 FV scale (scarcity): realized FV counts per 2009-2016 preseason board (how many players on a board went on to
 each FV) set how many players on today's board get each FV, in steps of 1, after a shrink (exp_rank, tune_shrink):
 a forecast misses, so a board rank maps to the outcome rank it predicts, set so each grade is the mean outcome of the
-players graded there (Noah, Oct 21 2026: the headline is the mean, as on the football board; it was the 75th
+players graded there (the headline is the mean, as on the football board; it was the 75th
 percentile, r .92). The ranking is E[FV].
 """
 import json, math, os, sys, hashlib
@@ -579,7 +579,7 @@ def pav(x, y, w):
 
 
 def emap_fit(rows, e, cuts):
-    """the absolute grade (Noah, Oct 26 2026: FV grades talent, not where a player ranks on his season's board): one
+    """the absolute grade (FV grades talent, not where a player ranks on his season's board): one
     fixed, non-decreasing map from E[FV] to the 20-80 grade. The rank ladder (grade) still sets the scale: on each
     2009-16 board it gives every E a grade, and the map is the mean of those grades at each E pooled over the eight
     boards (quantile bins, finer at the top, then PAV). So the scale's level and spread are the ladder's (and the
@@ -1040,7 +1040,7 @@ def main():
     tops = [c['nba']['fvx'] for c in careers if c['last'] in SCALE_CLASSES and c['nba']['fvx'] >= 60]
     TOP_MEAN = round(float(np.mean(tops)), 2)
     print(f'mean FV of the 60+ careers: {TOP_MEAN} ({len(tops)} careers)')
-    models, report, nest, books = {}, {}, {}, {}
+    models, nest, books = {}, {}, {}
     for grp, cands in (('newcomer', NEW_CANDS), ('returner', RET_CANDS)):
         tr = [r for r in train if r['f']['newcomer'] == (grp == 'newcomer')]
         sel = select(tr, cands, grp)

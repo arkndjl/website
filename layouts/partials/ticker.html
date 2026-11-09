@@ -1,4 +1,4 @@
-{{- /* Homepage ticker (Noah, Nov 1 2026): 1NT's next matches first (Noah, Nov 1: "prioritize 1NT first"), then the
+{{- /* Homepage ticker: 1NT's next matches first, then the
        next game of each of his teams. Data: data/ticker.json from scripts/fetch_ticker.py (ESPN schedules + the site's
        game models; 1NT from data/esea.json), refreshed by the odds-snap and picks-refresh workflows. Times are ET.
        Each team carries up to three games; the script shows the first one not yet finished.
@@ -87,7 +87,7 @@
     gs.forEach(function (a) { a.hidden = true; if (!shown && !done(a)) shown = a; });
     if (shown) { shown.hidden = false; mark(shown); t.dataset.at = shown.dataset.at; } else t.hidden = true;
   });
-  // 1NT first; then the teams, soonest game first (Noah, Nov 1); teams with nothing scheduled go last
+  // 1NT first; then the teams, soonest game first; teams with nothing scheduled go last
   var run0 = box.querySelector('.tick__run'), teams = [].slice.call(box.querySelectorAll('.tick__team'));
   teams.sort(function (a, b) { return (Date.parse(a.dataset.at) || 9e15) - (Date.parse(b.dataset.at) || 9e15); });
   teams.forEach(function (t) { run0.appendChild(t); });

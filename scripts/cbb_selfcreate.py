@@ -56,7 +56,6 @@ def season(y, btname):
 
 
 def main():
-    import gzip
     import cbb_games as C
     btname = C.bt_map(C.load_hist())
     careers = json.load(open(os.path.join(HERE, '.cache', 'cbb', 'careers.json')))

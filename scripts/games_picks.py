@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Picks for every sport (Noah, Oct 21 2026): the games page and each sport's picks tab show these same rows.
+"""Picks for every sport: the games page and each sport's picks tab show these same rows.
 
     python3 scripts/games_picks.py --rules         # data/games_picks_rules.json: X per sport and market (after --fit)
 
@@ -114,7 +114,7 @@ def novig(a, b):
 CAP = {}                          # per sport: (spread, total) disagreement past which a game is skipped (set by fit)
 # Past the cap (Oct 30 2026, Noah: "Should we add predictions with an edge of 10 (or X number) or higher to the picks
 # board?"; scripts/big_edge_research.py -> data/big_edge.json): the 3 sd cap dates from before the history's bad opens
-# were cleaned (clv.bad_open, PR #304) and dropped most 10+ point edges (CBB spread cap 8.8, NBA 7.1/8.8, NFL 8.6/7.2) as
+# were cleaned (clv.bad_open) and dropped most 10+ point edges (CBB spread cap 8.8, NBA 7.1/8.8, NFL 8.6/7.2) as
 # bad lines. Cleaned, the picks past it beat the close in every market, tuning and held out alike (pooled ex-NBA at
 # Novig -103: 3-4 sd +10.3% tuning n 215, +9.9% held n 242; 4-5 sd +14.2% n 22, +11.8% n 38; held CBB spread +9.2% n 90,
 # CBB total +10.9% n 153, CFB spread +5.4% n 32), and the bad opens it would have let in moved toward the model. What
@@ -393,7 +393,7 @@ def fit():
         json.dump(res, f, indent=1)
 
 
-# ---------------------------------------------------------------- the pick rules (Noah, Oct 21 2026)
+# ---------------------------------------------------------------- the pick rules
 # A pick is the model's side whenever it sits at least X points off the line when the board publishes. X is set per
 # sport and market on the tuning seasons, by the return the picks were worth at the closing line (scripts/clv.py), and
 # a market is turned on only if its picks beat the close on the validation season(s) after them, and measured on the
@@ -671,7 +671,7 @@ def fit_rules():
         json.dump(res, f, indent=1)
 
 
-# ---------------------------------------------------------------- segments (Noah, Oct 21 2026: "more picks on the board")
+# ---------------------------------------------------------------- segments
 # Each market split by conference and tier, conference game, home or road, favorite or dog, line band, total band and
 # early or late season. A segment's edge is shrunk toward its parent market's (empirical Bayes: the spread between the
 # segments of one family, net of sampling noise, sets how far each moves), X is set on the tuning seasons on the shrunk
@@ -921,7 +921,7 @@ def dk_prices(sport, games, now):
             o = OS.dk((ev.get('competitions') or [{}])[0])
             if o:
                 cur[str(ev['id'])] = o[0]
-    # Novig's main lines at its asks first (Noah, Oct 27 2026: "Replace DK with Novig now"); DraftKings where Novig has none
+    # Novig's main lines at its asks first; DraftKings where Novig has none
     import novig
     nv = novig.prices(sport, now)
     n = m = 0
@@ -1174,7 +1174,7 @@ def live(sport):
     if gone:
         log = [e for e in log if e not in gone]
         print(f'{sport}: withdrew {len(gone)} open picks whose rule is off:', ', '.join(f"{e['away']}@{e['home']} {e['mk']} {e['side']}" for e in gone))
-    # one pick a game per family, the side (spread or its moneyline) and the total (Noah, Oct 31 2026: a game whose total
+    # one pick a game per family, the side (spread or its moneyline) and the total (a game whose total
     # was flagged first never got its spread, Denver at Phoenix); both size on the slate's pick count
     fam = lambda mk: 'total' if mk == 'total' else 'side'
     seen = {(e['id'], fam(e['mk'])) for e in log}
@@ -1321,7 +1321,7 @@ def live(sport):
         if e.get('res') is None and iso(e['kick']) > now - datetime.timedelta(hours=4):
             p = dict(e)
             p['now'] = cur.get(e['id'], {}).get((e['mk'], e['side']))
-            # pass only when the model moved (Noah, Nov 4 2026): the model as it stands no longer clears the pick's cut
+            # pass only when the model moved: the model as it stands no longer clears the pick's cut
             # at its FLAGGED line. A market move alone never passes a pick (it stays in the record, the bankroll and the
             # paper book at its flagged line and stake); before, passing on the current line dropped the picks the close
             # moved toward. The last call before the start stands once the game is on; off the board, it stays as was.
@@ -1348,7 +1348,7 @@ def live(sport):
     with open(fn, 'w') as f:
         json.dump(out, f, indent=1)
     print(f'{sport} picks: {len(picks)} open, {len(done)} graded')
-    # the nightly exposure cap over every sport's picks (Noah, Nov 1 2026: 40% a night; scripts/night_cap.py)
+    # the nightly exposure cap over every sport's picks (40% a night; scripts/night_cap.py)
     import night_cap
     night_cap.apply([sport])
 

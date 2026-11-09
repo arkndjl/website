@@ -32,9 +32,8 @@ margin, and nothing ties a team's XV to its scoreboard.
 import json
 import math
 import os
-import re
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nfl_war as W   # noqa: E402
@@ -336,7 +335,6 @@ def missed_test(S, vals):
     for y, d in S.items():
         P = d['players']
         regs = defaultdict(list)
-        per = {n: [] for n in names}
         for i, p in enumerate(P):
             if 'reg' in p:
                 regs[p['t']].append(i)
@@ -470,7 +468,6 @@ def market_test(S, vals):
 
 
 def backtest(lams=(5, 20, 50, 150, 400)):
-    import numpy as np
     S = load(); zscore(S)
     _, value, _ = W.sub_lines()
     ys = sorted(S)

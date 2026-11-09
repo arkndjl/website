@@ -9,7 +9,7 @@
 Tankathon prints each prospect's age on draft day to two decimals; the birth date backed out of it (tankathon_bio.dob_of)
 is good to about +-2 days. The school must match (scripts/names.py), so a namesake at another school is never taken.
 """
-import datetime as dt, json, os, sys
+import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import tankathon_bio as T

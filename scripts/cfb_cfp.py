@@ -42,7 +42,6 @@ import gzip
 import json
 import math
 import os
-import re
 from collections import defaultdict, Counter
 
 import numpy as np
@@ -187,7 +186,6 @@ def release_rows(S, rel, info, wfr, final):
     """feature matrix for one release: every FBS team"""
     fbs, conf, ccg, reg = info
     D = pday(rel['date'])
-    import datetime as dt
     rat, _ = rating_at(wfr, S, D)
     fr = [v for t, v in rat.items() if t not in fbs]
     fcs_r = float(np.mean(fr)) if fr else -25.0

@@ -5,7 +5,7 @@
     python3 scripts/check_build.py --hugo     # also a full Hugo build into a temp folder (the build-gate workflow, PRs and main)
 
 - every .json under data/ and static/ parses as strict JSON: a bare NaN or Infinity (Python's json.dump default) fails
-  Hugo's data loader and every build with it (Oct 21, PR #315)
+  Hugo's data loader and every build with it (Oct 21)
 - no file under static/ over Cloudflare Pages' 25 MiB per-file limit (warning from 23 MiB)
 - static/data/cfb-all.json and cfb-detail.json carry the same dk (the board split in two, scripts/cfb_all.mjs): a
   mismatched pair leaves every scouting report off the board

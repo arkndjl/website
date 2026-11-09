@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Counter-Strike picks test on Thunderpick's prices (Noah, Oct 28 2026: "Yes, allow Thunderpick odds"). Pre-registered:
+"""Counter-Strike picks test on Thunderpick's prices. Pre-registered:
 picks stay off until this passes on the forward archive.
 
     python3 scripts/cs2_picks.py --fit    # -> data/cs2_picks_fit.json

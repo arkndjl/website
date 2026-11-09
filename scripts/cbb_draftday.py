@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Draft-day grades for the all-time CBB list (Noah, Nov 3 2026: "our all-time FV board for CBB has some bad misses").
+"""Draft-day grades for the all-time CBB list.
 
 The all-time list used to show each player at his best PRESEASON grade (static/data/cbb-past.json). A preseason board
 never sees the season that follows, so a one-and-done was graded only as a recruit and a breakout sophomore only on
@@ -212,7 +212,7 @@ def intl_snapshot():
 
 
 def intl_rows():
-    """internationals on the list (Noah, Nov 3 2026: Doncic, Wembanyama), at the mean outcome their draft-day E[FV]
+    """internationals on the list (Doncic, Wembanyama), at the mean outcome their draft-day E[FV]
     predicts: the international model's out-of-fold line (realized - 20 = b (E - 20), as cbb_intl.fv_of), b refit with
     each player's fold held out for the 2009-20 classes, the full fit after. Held out (277 internationals 2009-20) the
     line beats a PAV map (dMSE +6.1, t +1.3), the D-I June-rank curve (t +1.1; it graded the top 15 54.2, they became
