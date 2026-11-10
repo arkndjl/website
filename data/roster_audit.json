@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T21:41Z",
+ "asof": "2026-11-10T21:43Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -275,18 +275,18 @@
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 7,
-     "rows": 2139
+     "rows": 2137
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 15,
+     "flags": 14,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 67,
+     "flags": 65,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 66,
+     "flags": 64,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -294,11 +294,25 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 50,
+     "flags": 48,
      "rows": 1650
     }
    },
    "flags": [
+    {
+     "d": "2026-10-22",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Full practice Thursday",
+     "kind": null,
+     "move": null,
+     "pid": "16773",
+     "player": "Andrew Vorhees",
+     "pos": "LG",
+     "rotowire": "BAL",
+     "site": "ATL"
+    },
     {
      "d": "2026-08-29",
      "field": "depth",
@@ -334,20 +348,6 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "On move to Kansas City",
-     "kind": null,
-     "move": null,
-     "pid": "16689",
-     "player": "Josh Downs",
-     "pos": "WR",
-     "rotowire": "KC",
-     "site": "IND"
     },
     {
      "d": "2026-09-15",
@@ -386,18 +386,22 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-10",
+     "d": "2026-10-07",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Moved to Denver",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "ILB",
-     "rotowire": "DEN",
-     "site": "LAC"
+     "flag": "practice",
+     "head": "Heads to Bay Area on practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-07",
+      "head": "Heads to Bay Area on practice squad",
+      "kind": "practice"
+     },
+     "pid": "17467",
+     "player": "Xavier Smith",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
     },
     {
      "d": "2026-08-30",
@@ -416,34 +420,6 @@
      "pos": "NB",
      "rotowire": "FA",
      "site": "MIN"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "On move to Kansas City",
-     "kind": null,
-     "move": null,
-     "pid": "16689",
-     "player": "Josh Downs",
-     "pos": "WR",
-     "rotowire": "KC",
-     "site": "IND"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Moved to Denver",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "LB",
-     "rotowire": "DEN",
-     "site": "LAC"
     },
     {
      "d": "2026-11-03",
@@ -1616,34 +1592,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Moved to Denver",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "LB",
-     "rotowire": "DEN",
-     "site": "LAC"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "On move to Kansas City",
-     "kind": null,
-     "move": null,
-     "pid": "16689",
-     "player": "Josh Downs",
-     "pos": "WR",
-     "rotowire": "KC",
-     "site": "IND"
-    },
-    {
      "d": "2026-10-26",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2506,34 +2454,6 @@
      "pos": "EDGE",
      "rotowire": "CAR",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "On move to Kansas City",
-     "kind": null,
-     "move": null,
-     "pid": "16689",
-     "player": "Josh Downs",
-     "pos": "WR",
-     "rotowire": "KC",
-     "site": "IND"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "Moved to Denver",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "LB",
-     "rotowire": "DEN",
-     "site": "LAC"
     },
     {
      "d": "2026-11-03",
@@ -3688,20 +3608,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "moved",
-     "head": "On move to Kansas City",
-     "kind": null,
-     "move": null,
-     "pid": "16689",
-     "player": "Josh Downs",
-     "pos": "WR",
-     "rotowire": "KC",
-     "site": "IND"
-    },
-    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3956,7 +3862,7 @@
    ],
    "joined": 0,
    "players": 2238,
-   "rows": 8013
+   "rows": 8011
   },
   "nhl": {
    "by_file": {
