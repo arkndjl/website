@@ -70,7 +70,7 @@ def apply(out, rows, old, key, rating, day=None, days=DAYS, sport=None):
             if v is not None and b[1] is not None:
                 r['dR'] = round(v - b[1], 4)
     out['mvHist'] = hist
-    out['mvFrom'] = back[-1] if back else None
+    out['mvFrom'] = cut if back else None        # the post day; the ranks are the last snapshot on or before it
     return out
 
 

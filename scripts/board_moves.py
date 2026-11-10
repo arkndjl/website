@@ -183,8 +183,10 @@ def update(board, day=None, d=None, h=None, write=True):
     s = season_of(d, path)
     if h.get('season') != s:                # a new season (or a first run) starts the history over
         h = {'season': s, 'hist': {}}
-    h, since = step(h, snap(d, spec), day or et_today(), fv=graded(spec), sport=board)
-    mark(d, spec, h['hist'].get(since) if since else None, since)
+    day = day or et_today()
+    h, since = step(h, snap(d, spec), day, fv=graded(spec), sport=board)
+    # wkFrom names the post day the moves count from (the values are the last snapshot on or before it)
+    mark(d, spec, h['hist'].get(since) if since else None, cutoff(day, board).isoformat() if since else None)
     if write:
         with open(full, 'w', encoding='utf-8') as f:       # the builders' format: compact, UTF-8 as is
             f.write(json.dumps(d, separators=(',', ':'), ensure_ascii=False, allow_nan=False) + ('\n' if raw.endswith('\n') else ''))
