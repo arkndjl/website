@@ -11,7 +11,7 @@
 <script>document.addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='IMG'&&/(^|\s)(cfb__logo|cs__logo|dc__logo|tk__logo)(\s|$)/.test(t.className))t.remove();},true);</script>
 <script>window.__arkJson=window.__arkJson||(function(c){return function(u){u=new URL(u,location.href).href;return c[u]=c[u]||fetch(u).then(function(r){if(!r.ok)throw r.status;return r.json();}).catch(function(e){delete c[u];throw e;});};})({});</script>
 {{- /* weekly moves on the player boards (scripts/board_moves.py: each row's w0 = its metric as of the file's wkFrom,
-       7 days back). __wk.show(win, from) hides the column when the view has no week (past seasons). __wk.rank(list, rank field) re-ranks the rows in view by w0 (rank then, within the filters); __wk.rk(p, from, label,
+       the last weekly post day, scripts/rank_moves.py POST). __wk.show(win, from) hides the column when the view has no week (past seasons). __wk.rank(list, rank field) re-ranks the rows in view by w0 (rank then, within the filters); __wk.rk(p, from, label,
        fmt) is that rank change as a cell; __wk.fv(now, w0, from) is the FV change as a cell. No w0 while from is set = new. */}}
 <script>window.__wk=window.__wk||(function(){function day(f){var m='Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' '),d=String(f||'').split('-');return d.length===3?m[+d[1]-1]+' '+(+d[2]):'';}
 function td(h,v,t){return '<td class="cfb__num cfb__wk" data-v="'+v+'"'+(t?' title="'+t+'"':'')+'>'+h+'</td>';}

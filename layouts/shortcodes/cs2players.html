@@ -15,7 +15,7 @@
     <th>RK</th><th>Player</th><th>Team</th>
     <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
     <th>Age</th>
-    <th class="cfb__g" title="RWA: round win % added per round, opponent-adjusted, 0 = the average tier-1 starter; recent maps count more (half-life {{ $f.params.h }} days)">RWA</th>{{ with $d.wkFrom }}<th data-num title="± = rank change in RWA over the last 7 days, since {{ (time .).Format "Jan 2" }}; hover for the rank and RWA change">±</th>{{ end }}
+    <th class="cfb__g" title="RWA: round win % added per round, opponent-adjusted, 0 = the average tier-1 starter; recent maps count more (half-life {{ $f.params.h }} days)">RWA</th>{{ with $d.wkFrom }}<th data-num title="± = rank change in RWA since {{ (time .).Format "Jan 2" }}; hover for the rank and RWA change">±</th>{{ end }}
     <th title="projected RWA in six months if still active: RWA and age, fit on the monthly boards since Jul 2024">6M</th>
     <th title="RWA change over the last 90 days">90d</th>
     <th title="rounds above replacement over the last year: extra rounds won against a median active pro in the same seat">RAR</th>

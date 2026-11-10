@@ -364,7 +364,7 @@ def build():
     res.update(season_views(m, F, cur, rec, proj, S, slate, tstat))
     try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
         import rank_moves
-        rank_moves.apply(res, res['power'], old, lambda r: r['t'], lambda r: r['rating'])
+        rank_moves.apply(res, res['power'], old, lambda r: r['t'], lambda r: r['rating'], sport='nba')
     except Exception as e:      # noqa: BLE001
         print('rank moves: failed', repr(e))
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):

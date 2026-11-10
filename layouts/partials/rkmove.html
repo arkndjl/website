@@ -1,4 +1,4 @@
-{{- /* ARK Ranking movement cell (scripts/rank_moves.py): rank change against the ranking as of .from (7 days back),
+{{- /* ARK Ranking movement cell (scripts/rank_moves.py): rank change against the ranking as of .from (the last weekly post day, scripts/rank_moves.py POST),
        rating change in the hover. dict "r" row "from" mvFrom date "fmt" printf for the rating change "mul" scale. */ -}}
 {{- $r := .r -}}
 {{- if $r.prev }}{{ $d := sub (int $r.prev) (int $r.rk) -}}

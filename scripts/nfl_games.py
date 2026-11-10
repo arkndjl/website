@@ -1080,7 +1080,7 @@ def build():
             _old = json.load(open(OUT))
         except (OSError, ValueError):
             _old = None
-        rank_moves.apply(res, res['power'], _old, lambda r: r['t'], lambda r: r['rating'])
+        rank_moves.apply(res, res['power'], _old, lambda r: r['t'], lambda r: r['rating'], sport='nfl')
     except Exception as e:      # noqa: BLE001
         print('rank moves: failed', repr(e))
     try:

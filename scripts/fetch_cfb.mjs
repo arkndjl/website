@@ -2532,14 +2532,17 @@ await teamLogos(outFcs);
   console.log('FCS:', JSON.stringify({ population: out.fcs.population, share: out.fcs.share, moveUp: out.fcs.moveUp }));
 }
 
-// movers: each update keeps a snapshot of every grade; the board shows the change over the last week, against the
-// newest snapshot at least 7 days old (re-runs on the same day replace that day's snapshot; the window's snapshots and
+// movers: each update keeps a snapshot of every grade; the board shows the change since the weekly post, against the
+// newest snapshot on or before last Wednesday (re-runs on the same day replace that day's snapshot; the window's snapshots and
 // the one before it are kept). Snapshots carry the model version, so a model change starts the movers over instead of
 // reporting its own churn.
 const MODEL_VERSION = 'mean-2026-10';   // the headline FV at the mean outcome: no movers against the old grades
 const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
-const WEEK_AGO = new Date(Date.parse(out.asof) - 7 * 86400e3).toISOString().slice(0, 10);
+// the weekly CFB post is Wednesday (scripts/rank_moves.py POST): moves count from the last Wednesday before today,
+// a week back on a Wednesday
+const WEEK_AGO = (() => { const t = new Date(`${out.asof}T12:00:00Z`), back = ((t.getUTCDay() - 3 + 7) % 7) || 7;
+  return new Date(t - back * 86400e3).toISOString().slice(0, 10); })();
 const base = hist.snapshots.filter(h => h.date <= WEEK_AGO && h.v === MODEL_VERSION).at(-1)
   ?? hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION)[0];   // a history under a week old: its oldest
 out.since = base?.date ?? null;
