@@ -109,17 +109,20 @@ jobs:
           if [ "$(node scripts/nt_live.mjs --due)" = due ] && [ -z "$(gh run list -w nt-live.yml -s in_progress -L 1 --json databaseId -q '.[].databaseId')" ] && [ -z "$(gh run list -w nt-live.yml -s queued -L 1 --json databaseId -q '.[].databaseId')" ]; then
             gh workflow run nt-live.yml && echo "dispatched 1nt live"
           fi
-      # Only the paper books, the picks, the ticker and the standings are on the site (--site): a snapshot-only commit
+      # The college basketball slate is re-priced on the newest injury report inside the picks refresh, so its games and
+      # injury files ride along (rebuilt on a newer main like the picks: the re-price reruns on the build's snapshot).
+      # Only the paper books, the picks, the ticker, the standings and those CBB files are on the site (--site): a snapshot-only commit
       # skips the Cloudflare build. scripts/data_push.py runs the build gate and pushes; when a sport build pushed its
       # picks meanwhile, the picks and the paper book are rebuilt on the new main by rerunning the refresh and the
       # archives are merged line by line, so neither run's rows are dropped (rebase -X theirs dropped them, Nov 1-4).
       - name: Commit if it changed
         run: |
           python3 scripts/data_push.py -m "Odds snapshot, paper book and picks ($(date -u +%Y-%m-%dT%H:%MZ))" \
-            --site data/transactions data/ticker.json data/standings.json data/paper_book.json data/props_paper.json data/props_paper_nfl.json data/novig_paper.json 'data/games_picks_*.json' \
-            --rebuild data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json data/paper_book.json \
+            --site data/transactions data/ticker.json data/standings.json data/paper_book.json data/props_paper.json data/props_paper_nfl.json data/novig_paper.json 'data/games_picks_*.json' data/cbb_games.json data/cbb_injuries.json \
+            --rebuild data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json data/paper_book.json data/cbb_games.json data/cbb_injuries.json \
             --regen "GITHUB_TOKEN= python3 scripts/picks_refresh.py; python3 scripts/paper_book.py" \
             -- scripts/data/odds_dense scripts/data/rotowire_news.json scripts/data/rotowire_moves data/roster_audit.json data/transactions data/paper_book.json data/ticker.json data/standings.json \
                scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_tp data/novig_ladder_test.json data/novig_paper.json \
                scripts/data/props data/props_paper.json data/props_paper_nfl.json data/props_paper_nhl.json data/games_picks_nflprops.json scripts/data/refs \
-               data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds
+               data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds \
+               data/cbb_games.json data/cbb_injuries.json scripts/data/cbb_injury_log
