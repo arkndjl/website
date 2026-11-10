@@ -1,63 +1,28 @@
 {
  "season": 2026,
- "week": 9,
- "asof": "2026-11-10T04:23:17Z",
+ "week": 10,
+ "asof": "2026-11-10T04:50:39Z",
  "picks": [
   {
-   "id": "2026_09_NYG_PHI",
+   "id": "2026_10_MIN_GB",
    "type": "upset",
-   "side": "home",
-   "team": "PHI",
-   "home": "PHI",
-   "away": "NYG",
-   "kick": "2026-11-08T18:00:00Z",
-   "line": 3.5,
-   "ml": 163.0,
-   "model": 0.7,
-   "edge": 4.2,
-   "p": 0.522,
-   "units": 0.75,
-   "flagged": "2026-11-03T10:48:02Z",
-   "now": null,
-   "started": true,
-   "won": false
-  },
-  {
-   "id": "2026_09_HOU_LAC",
-   "type": "upset",
-   "side": "home",
-   "team": "LAC",
-   "home": "LAC",
-   "away": "HOU",
-   "kick": "2026-11-08T21:05:00Z",
-   "line": 4.5,
-   "ml": 199.0,
-   "model": 0.6,
-   "edge": 5.1,
-   "p": 0.519,
-   "units": 1.0,
-   "flagged": "2026-11-08T20:42:00Z",
-   "now": null,
-   "started": true,
-   "won": false
-  },
-  {
-   "id": "2026_09_BUF_MIN",
-   "type": "upset",
-   "side": "home",
+   "side": "away",
    "team": "MIN",
-   "home": "MIN",
-   "away": "BUF",
-   "kick": "2026-11-10T01:15:00Z",
-   "line": 3.5,
-   "ml": 163.0,
-   "model": 2.9,
-   "edge": 6.4,
-   "p": 0.589,
-   "units": 1.25,
-   "flagged": "2026-11-03T10:48:02Z",
-   "now": null,
-   "started": true
+   "home": "GB",
+   "away": "MIN",
+   "kick": "2026-11-15T18:00:00Z",
+   "line": 4.5,
+   "ml": 174.0,
+   "model": -3.4,
+   "edge": 7.9,
+   "p": 0.604,
+   "units": 1.5,
+   "flagged": "2026-11-10T04:50:39Z",
+   "now": {
+    "line": 4.5,
+    "ml": 174.0
+   },
+   "started": false
   }
  ],
  "upsetBt": {
@@ -982,25 +947,25 @@
  },
  "record": {
   "upset": {
-   "n": 4,
+   "n": 5,
    "won": 1,
    "w": 1,
-   "l": 3,
+   "l": 4,
    "p": 0,
-   "units": -1.8,
-   "roi": -0.458,
+   "units": -2.8,
+   "roi": -0.566,
    "sized": {
-    "units": -1.9,
-    "risked": 3.5,
-    "roi": -0.535
+    "units": -3.1,
+    "risked": 4.8,
+    "roi": -0.657
    },
-   "clv": -0.12,
-   "clvPos": 0.25,
-   "clvN": 4,
-   "clvRet": 0.0081,
-   "clvT": 0.35,
-   "beat": 0.25,
-   "still": 0.5
+   "clv": 0.0,
+   "clvPos": 0.4,
+   "clvN": 5,
+   "clvRet": 0.0051,
+   "clvT": 0.28,
+   "beat": 0.4,
+   "still": 0.4
   },
   "fav": {
    "n": 1,
@@ -1026,17 +991,17 @@
  },
  "sofar": {
   "upset": {
-   "n": 9,
+   "n": 10,
    "w": 4,
-   "l": 5,
+   "l": 6,
    "p": 0,
-   "units": -0.6,
-   "roi": -0.069,
-   "t": -0.19,
+   "units": -1.6,
+   "roi": -0.162,
+   "t": -0.47,
    "sized": {
-    "risked": 9.0,
-    "units": -0.6,
-    "roi": -0.069
+    "risked": 10.0,
+    "units": -1.6,
+    "roi": -0.162
    },
    "won": 4
   },
@@ -1182,7 +1147,15 @@
    "edge": 6.4,
    "p": 0.589,
    "units": 1.25,
-   "flagged": "2026-11-03T10:48:02Z"
+   "flagged": "2026-11-03T10:48:02Z",
+   "res": -17.0,
+   "close": -3.0,
+   "won": false,
+   "profit": -1.0,
+   "ats": -1.0,
+   "clvRet": -0.0071,
+   "clv": 0.5,
+   "beat": 1
   },
   {
    "id": "2026_09_HOU_LAC",
@@ -1210,6 +1183,25 @@
    "clvRet": -0.0103,
    "clv": -1.0,
    "beat": -1
+  },
+  {
+   "id": "2026_10_MIN_GB",
+   "season": 2026,
+   "week": 10,
+   "type": "upset",
+   "side": "away",
+   "team": "MIN",
+   "home": "GB",
+   "away": "MIN",
+   "kick": "2026-11-15T18:00:00Z",
+   "L": 4.5,
+   "line": 4.5,
+   "ml": 174.0,
+   "model": -3.4,
+   "edge": 7.9,
+   "p": 0.604,
+   "units": 1.5,
+   "flagged": "2026-11-10T04:50:39Z"
   }
  ]
 }
