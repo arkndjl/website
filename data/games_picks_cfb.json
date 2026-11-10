@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T16:25:05Z",
+ "asof": "2026-11-10T16:27:32Z",
  "recenter": {
-  "week": 0.12
+  "week": 0.11
  },
  "monitor": {
   "clocks": {
@@ -866,7 +866,7 @@
    "tmRaw": 49.6,
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 46.0,
-   "close": 45.5,
+   "close": 46.5,
    "pass": true,
    "now": null
   },
@@ -1500,10 +1500,10 @@
    "mk": "total",
    "side": "under",
    "line": 65.5,
-   "price": -113.0,
+   "price": -111.0,
    "edge": 4.8,
    "x": 3.0,
-   "why": "no edge at -113",
+   "why": "no edge at -111",
    "m": 14,
    "tm": 60.7
   },
@@ -1532,28 +1532,12 @@
    "mk": "spread",
    "side": "away",
    "line": -10.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 8.3,
    "x": 6.0,
-   "why": "no edge at -102",
+   "why": "no edge at -100",
    "m": -18.8,
    "tm": 48.7
-  },
-  {
-   "id": "401856885",
-   "sport": "cfb",
-   "kick": "2026-11-15T00:30:00.000Z",
-   "home": "LSU",
-   "away": "Texas",
-   "mk": "total",
-   "side": "over",
-   "line": 45.5,
-   "price": -111.0,
-   "edge": 4.0,
-   "x": 3.0,
-   "why": "no edge at -111",
-   "m": 4.1,
-   "tm": 49.5
   },
   {
    "id": "401858521",
@@ -1602,6 +1586,22 @@
    "why": "no edge at -100",
    "m": -0.1,
    "tm": 45.9
+  },
+  {
+   "id": "401856885",
+   "sport": "cfb",
+   "kick": "2026-11-15T00:30:00.000Z",
+   "home": "LSU",
+   "away": "Texas",
+   "mk": "total",
+   "side": "over",
+   "line": 46.5,
+   "price": -100.0,
+   "edge": 3.0,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 4.1,
+   "tm": 49.5
   },
   {
    "id": "401858524",
@@ -1860,9 +1860,9 @@
   "401856885": {
    "mk": "total",
    "side": "over",
-   "line": 45.5,
-   "price": -111.0,
-   "edge": 4.0,
+   "line": 46.5,
+   "price": -100.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "LSU",
@@ -2221,7 +2221,7 @@
    "mk": "total",
    "side": "under",
    "line": 65.5,
-   "price": -113.0,
+   "price": -111.0,
    "edge": 4.8,
    "ev": null,
    "units": 0.0,
@@ -2257,7 +2257,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2473,7 +2473,7 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -117.0,
+   "price": -120.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -2593,7 +2593,7 @@
    "mk": "spread",
    "side": "away",
    "line": -10.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 8.3,
    "ev": null,
    "units": 0.0,
@@ -2678,16 +2678,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 14786,
+  "snapshots": 14802,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3027,
-    "clvRet": -0.05,
-    "clvT": -35.43,
-    "clv": 0.15,
-    "beat": 0.322,
-    "still": 0.42
+    "clvN": 3030,
+    "clvRet": -0.0499,
+    "clvT": -35.16,
+    "clv": 0.16,
+    "beat": 0.321,
+    "still": 0.421
    },
    {
     "when": "6-24h",
@@ -5531,7 +5531,7 @@
    "tmRaw": 49.6,
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 46.0,
-   "close": 45.5,
+   "close": 46.5,
    "pass": true
   },
   {
