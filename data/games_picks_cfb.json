@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T03:56:25Z",
+ "asof": "2026-11-10T04:09:13Z",
  "recenter": {
   "week": 0.12
  },
@@ -829,14 +829,7 @@
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 42.5,
    "close": 42.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 42.5,
-    "price": -100.0,
-    "ev": 0.014,
-    "units": 0.5
-   }
+   "now": null
   },
   {
    "id": "401860916",
@@ -1457,6 +1450,22 @@
    "tm": 56.2
   },
   {
+   "id": "401860915",
+   "sport": "cfb",
+   "kick": "2026-11-15T02:30:00.000Z",
+   "home": "San Diego State",
+   "away": "Utah State",
+   "mk": "total",
+   "side": "over",
+   "line": 42.5,
+   "price": -100.0,
+   "edge": 3.4,
+   "x": 3.0,
+   "why": "no edge at -100",
+   "m": -0.1,
+   "tm": 45.9
+  },
+  {
    "id": "401858525",
    "sport": "cfb",
    "kick": "2026-11-14T17:30:00.000Z",
@@ -1641,7 +1650,7 @@
    "mk": "spread",
    "side": "away",
    "line": -4.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 4.0,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1695,22 +1704,6 @@
    "why": "edge under 3",
    "m": -0.9,
    "tm": 48.3
-  },
-  {
-   "id": "401856882",
-   "sport": "cfb",
-   "kick": "2026-11-15T00:45:00.000Z",
-   "home": "Arkansas",
-   "away": "South Carolina",
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -108.0,
-   "edge": 1.7,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -7.8,
-   "tm": 53.2
   }
  ],
  "games": {
@@ -1849,9 +1842,9 @@
   "401856889": {
    "mk": "spread",
    "side": "away",
-   "line": -15.5,
-   "price": -108.0,
-   "edge": 3.1,
+   "line": -16.5,
+   "price": -100.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "Vanderbilt",
@@ -2030,7 +2023,7 @@
    "mk": "spread",
    "side": "away",
    "line": -4.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -2126,7 +2119,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2175,12 +2168,12 @@
    "side": "over",
    "line": 42.5,
    "price": -100.0,
-   "ev": 0.014,
    "edge": 3.4,
-   "units": 0.5,
+   "ev": null,
+   "units": 0.0,
    "home": "San Diego State",
    "away": "Utah State",
-   "state": "pick"
+   "state": "under"
   },
   "401858525": {
    "mk": "total",
@@ -2258,7 +2251,7 @@
    "mk": "spread",
    "side": "away",
    "line": 17.5,
-   "price": -113.0,
+   "price": -104.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -2389,9 +2382,9 @@
   "401866458": {
    "mk": "spread",
    "side": "away",
-   "line": -15.5,
-   "price": 106.0,
-   "edge": 1.6,
+   "line": -14.5,
+   "price": 108.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Akron",
@@ -2547,22 +2540,22 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 14130,
+  "snapshots": 14156,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2903,
-    "clvRet": -0.0497,
-    "clvT": -33.69,
-    "clv": 0.15,
-    "beat": 0.33,
-    "still": 0.401
+    "clvN": 2910,
+    "clvRet": -0.0496,
+    "clvT": -33.81,
+    "clv": 0.16,
+    "beat": 0.332,
+    "still": 0.4
    },
    {
     "when": "6-24h",
     "clvN": 360,
-    "clvRet": -0.059,
-    "clvT": -17.62,
+    "clvRet": -0.0591,
+    "clvT": -17.72,
     "clv": 0.04,
     "beat": 0.167,
     "still": 0.667
@@ -5568,7 +5561,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 27.0,
+    "raw": 29.0,
     "scale": 1.0
    }
   }

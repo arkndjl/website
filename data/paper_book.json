@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-10T03:56:37Z",
+ "asof": "2026-11-10T04:09:29Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 81.21,
+  "now": 81.62,
   "peak": 117.38,
-  "drawdown": 0.3082,
-  "open": 67.25,
+  "drawdown": 0.3046,
+  "open": 68.25,
   "path": [
-   99.96,
    101.46,
    101.72,
    102.2,
@@ -408,58 +407,59 @@
    84.52,
    85.14,
    85.55,
-   81.21
+   81.21,
+   81.62
   ]
  },
  "record": {
-  "n": 449,
-  "clvN": 415,
-  "clvRet": -0.0138,
-  "clvT": -2.84,
-  "clv": -0.05,
-  "beat": 0.305,
-  "settled": 412,
-  "w": 203,
+  "n": 450,
+  "clvN": 416,
+  "clvRet": -0.0132,
+  "clvT": -2.7,
+  "clv": -0.03,
+  "beat": 0.307,
+  "settled": 413,
+  "w": 204,
   "l": 209,
   "p": 0,
-  "roi": -0.0231,
-  "roiT": -0.46,
-  "profit": -17.73,
-  "risked": 376.75,
-  "yield": -0.0471
+  "roi": -0.0207,
+  "roiT": -0.41,
+  "profit": -17.25,
+  "risked": 377.25,
+  "yield": -0.0457
  },
- "tEff": -2.83,
+ "tEff": -2.69,
  "corr": {
   "rho": 0.0,
-  "n": 415,
+  "n": 416,
   "slates": 40,
-  "nEff": 415.0,
-  "avgSlate": 10.38
+  "nEff": 416.0,
+  "avgSlate": 10.4
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 415,
+   "value": 416,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.4% t -2.83",
+   "value": "-1.3% t -2.69",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "30%",
+   "value": "31%",
    "pass": false
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-spread: -1.7%",
+   "value": "without nba-spread: -1.6%",
    "pass": false
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.3% vs -1.4% (SE 5.0)",
+   "value": "ROI -2.1% vs -1.3% (SE 5.0)",
    "pass": true
   }
  ],
@@ -660,27 +660,27 @@
    "sport": "nba",
    "mk": "total",
    "n": 42,
-   "clvN": 38,
-   "clvRet": 0.0194,
-   "clvT": 1.62,
-   "clv": 0.76,
-   "beat": 0.553,
-   "settled": 38,
-   "w": 17,
+   "clvN": 39,
+   "clvRet": 0.025,
+   "clvT": 1.93,
+   "clv": 0.9,
+   "beat": 0.564,
+   "settled": 39,
+   "w": 18,
    "l": 21,
    "p": 0,
-   "roi": -0.118,
-   "roiT": -0.73,
-   "profit": -6.29,
-   "risked": 56.75,
-   "yield": -0.1108
+   "roi": -0.0903,
+   "roiT": -0.57,
+   "profit": -5.81,
+   "risked": 57.25,
+   "yield": -0.1015
   },
   {
    "id": "tennis-ml",
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 82,
+   "n": 83,
    "clvN": 79,
    "clvRet": -0.0178,
    "clvT": -3.71,
@@ -719,27 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "nba-total",
-   "sport": "nba",
-   "id": "401909956",
-   "k": "2026-11-10T01:00:00Z",
-   "slate": "nba:2026-11-09",
-   "h": "DAL",
-   "a": "IND",
-   "mk": "total",
-   "side": "over",
-   "line": 222.5,
-   "price": -104.0,
-   "bet": "over 222.5 -104",
-   "placed": "2026-11-09T06:15:01Z",
-   "stake": 0.5,
-   "edge": 3.3,
-   "ev": 0.0041,
-   "event": null,
-   "pass": false,
-   "close": 228.5
-  },
   {
    "rule": "nfl-ml",
    "sport": "nfl",
@@ -1013,6 +992,26 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186752",
+   "k": "2026-11-10T15:00:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Bronzetti",
+   "a": "Pareja",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 194,
+   "bet": "Bronzetti ML +194",
+   "placed": "2026-11-10T04:09:29Z",
+   "stake": 1.5,
+   "edge": 30.2,
+   "ev": 0.0283,
+   "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
   {
@@ -1603,6 +1602,37 @@
   }
  ],
  "recent": [
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909956",
+   "k": "2026-11-10T01:00:00Z",
+   "slate": "nba:2026-11-09",
+   "h": "DAL",
+   "a": "IND",
+   "mk": "total",
+   "side": "over",
+   "line": 222.5,
+   "price": -104.0,
+   "bet": "over 222.5 -104",
+   "placed": "2026-11-09T06:15:01Z",
+   "stake": 0.5,
+   "edge": 3.3,
+   "ev": 0.0041,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.2377,
+   "clv": 6.0,
+   "beat": 1,
+   "close": 228.5,
+   "score": [
+    122.0,
+    125.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.4808
+  },
   {
    "rule": "nba-ml",
    "sport": "nba",
@@ -3261,37 +3291,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -5.0
-  },
-  {
-   "rule": "cfb-total",
-   "sport": "cfb",
-   "id": "401856856",
-   "k": "2026-11-08T02:30:00.000Z",
-   "slate": "cfb:2026-11-07",
-   "h": "Texas Tech",
-   "a": "West Virginia",
-   "mk": "total",
-   "side": "under",
-   "line": 64.5,
-   "price": -100.0,
-   "bet": "under 64.5 -100",
-   "placed": "2026-11-02T02:51:13Z",
-   "stake": 2.5,
-   "edge": 4.3,
-   "ev": 0.0271,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.1967,
-   "clv": -4.0,
-   "beat": -1,
-   "close": 68.5,
-   "score": [
-    48.0,
-    53.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -2.5
   }
  ],
  "ledger": [
@@ -17322,7 +17321,17 @@
    "ev": 0.0041,
    "event": null,
    "pass": false,
-   "close": 228.5
+   "clvRet": 0.2377,
+   "clv": 6.0,
+   "beat": 1,
+   "close": 228.5,
+   "score": [
+    122.0,
+    125.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.4808
   },
   {
    "rule": "nfl-ml",
@@ -17597,6 +17606,26 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186752",
+   "k": "2026-11-10T15:00:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Bronzetti",
+   "a": "Pareja",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 194,
+   "bet": "Bronzetti ML +194",
+   "placed": "2026-11-10T04:09:29Z",
+   "stake": 1.5,
+   "edge": 30.2,
+   "ev": 0.0283,
+   "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
   {
