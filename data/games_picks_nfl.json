@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-10T20:26:41Z",
+ "asof": "2026-11-10T20:51:28Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -122,9 +122,9 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 127.0,
-    "ev": 0.058,
-    "units": 3.25
+    "price": 125.0,
+    "ev": 0.048,
+    "units": 3.0
    }
   },
   {
@@ -184,8 +184,8 @@
     "side": "over",
     "line": 39.5,
     "price": -100.0,
-    "ev": 0.143,
-    "units": 0.25
+    "ev": 0.152,
+    "units": 1.25
    }
   },
   {
@@ -215,9 +215,9 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 156.0,
-    "ev": 0.203,
-    "units": 1.25
+    "price": 160.0,
+    "ev": 0.222,
+    "units": 2.0
    }
   },
   {
@@ -309,15 +309,8 @@
    "tm": 44.0,
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 42.5,
-   "close": 40.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 40.5,
-    "price": -104.0,
-    "ev": 0.076,
-    "units": 0.5
-   }
+   "close": 38.5,
+   "now": null
   },
   {
    "id": "2026_10_MIN_GB",
@@ -342,14 +335,14 @@
    "tm": 38.1,
    "flagged": "2026-11-10T13:48:53Z",
    "betTo": 40.0,
-   "close": 42.5,
+   "close": 41.5,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 42.5,
-    "price": -111.0,
-    "ev": 0.088,
-    "units": 1.75
+    "line": 41.5,
+    "price": 104.0,
+    "ev": 0.095,
+    "units": 1.25
    }
   },
   {
@@ -381,8 +374,8 @@
     "side": "over",
     "line": 40.5,
     "price": -108.0,
-    "ev": 0.068,
-    "units": 0.25
+    "ev": 0.071,
+    "units": 0.5
    }
   },
   {
@@ -421,6 +414,22 @@
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "2026_10_MIA_IND",
+   "sport": "nfl",
+   "kick": "2026-11-15T18:00:00Z",
+   "home": "IND",
+   "away": "MIA",
+   "mk": "total",
+   "side": "over",
+   "line": 38.5,
+   "price": -113.0,
+   "edge": 5.5,
+   "x": 1.5,
+   "why": "no edge at -113",
+   "m": 4.2,
+   "tm": 44.0
+  },
   {
    "id": "2026_10_SF_DAL",
    "sport": "nfl",
@@ -622,23 +631,23 @@
   "2026_10_MIA_IND": {
    "mk": "total",
    "side": "over",
-   "line": 40.5,
-   "price": -104.0,
-   "ev": 0.076,
-   "edge": 3.5,
-   "units": 0.5,
+   "line": 38.5,
+   "price": -113.0,
+   "edge": 5.5,
+   "ev": null,
+   "units": 0.0,
    "home": "IND",
    "away": "MIA",
-   "state": "pick"
+   "state": "under"
   },
   "2026_10_MIN_GB": {
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": -108.0,
-   "ev": 0.176,
+   "price": -113.0,
+   "ev": 0.158,
    "edge": 7.3,
-   "units": 4.75,
+   "units": 3.75,
    "home": "GB",
    "away": "MIN",
    "state": "pick"
@@ -648,9 +657,9 @@
    "side": "over",
    "line": 39.5,
    "price": -100.0,
-   "ev": 0.143,
+   "ev": 0.152,
    "edge": 7.8,
-   "units": 0.25,
+   "units": 1.25,
    "home": "ARI",
    "away": "LA",
    "state": "pick"
@@ -660,9 +669,9 @@
    "side": "over",
    "line": 40.5,
    "price": -108.0,
-   "ev": 0.068,
+   "ev": 0.071,
    "edge": 3.6,
-   "units": 0.25,
+   "units": 0.5,
    "home": "LV",
    "away": "SEA",
    "state": "pick"
@@ -756,16 +765,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2936,
+  "snapshots": 2946,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1222,
+    "clvN": 1226,
     "clvRet": -0.0157,
-    "clvT": -7.03,
+    "clvT": -7.02,
     "clv": 0.46,
-    "beat": 0.356,
-    "still": 0.587
+    "beat": 0.357,
+    "still": 0.586
    },
    {
     "when": "6-24h",
@@ -2610,7 +2619,7 @@
    "tm": 44.0,
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 42.5,
-   "close": 40.5
+   "close": 38.5
   },
   {
    "id": "2026_10_MIN_GB",
@@ -2709,7 +2718,7 @@
    "tm": 38.1,
    "flagged": "2026-11-10T13:48:53Z",
    "betTo": 40.0,
-   "close": 42.5
+   "close": 41.5
   },
   {
    "id": "2026_10_NE_DET",
@@ -2771,7 +2780,7 @@
     "scale": 1.0
    },
    "2026-11-12": {
-    "raw": 10.5,
+    "raw": 10.25,
     "scale": 1.0
    },
    "2026-11-13": {
@@ -2779,11 +2788,11 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 37.25,
+    "raw": 35.75,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 14.5,
+    "raw": 17.0,
     "scale": 1.0
    }
   }
