@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T18:22:21Z",
+ "asof": "2026-11-10T18:49:19Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 86.74,
   "peak": 117.38,
   "drawdown": 0.2611,
-  "open": 80.0,
+  "open": 78.25,
   "path": [
    104.5,
    105.52,
@@ -529,27 +529,6 @@
    "yield": -0.4339
   },
   {
-   "id": "nfl-spread",
-   "label": "NFL spread",
-   "sport": "nfl",
-   "mk": "spread",
-   "n": 1,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "clv": null,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "p": 0,
-   "roi": null,
-   "roiT": null,
-   "profit": 0,
-   "risked": 0,
-   "yield": null
-  },
-  {
    "id": "nfl-total",
    "label": "NFL total",
    "sport": "nfl",
@@ -659,7 +638,7 @@
    "label": "NBA spread",
    "sport": "nba",
    "mk": "spread",
-   "n": 17,
+   "n": 18,
    "clvN": 17,
    "clvRet": 0.063,
    "clvT": 2.38,
@@ -827,6 +806,27 @@
    "ev": 0.003,
    "event": "FAGE WTA Finals Indian Wells",
    "pass": false
+  },
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909960",
+   "k": "2026-11-11T00:30:00Z",
+   "slate": "nba:2026-11-10",
+   "h": "NY",
+   "a": "MIL",
+   "mk": "spread",
+   "side": "home",
+   "line": 15.5,
+   "price": 102.0,
+   "bet": "NY -15.5 +102",
+   "placed": "2026-11-10T18:46:47Z",
+   "stake": 0.75,
+   "edge": 2.5,
+   "ev": 0.0139,
+   "event": null,
+   "pass": false,
+   "close": 15.5
   },
   {
    "rule": "nba-total",
@@ -1160,7 +1160,7 @@
    "ev": 0.0107,
    "event": null,
    "pass": false,
-   "close": 53.5
+   "close": 54.5
   },
   {
    "rule": "cfb-spread",
@@ -1265,7 +1265,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 74.5
   },
   {
    "rule": "cfb-total",
@@ -1433,7 +1433,7 @@
    "ev": 0.0569,
    "event": null,
    "pass": false,
-   "close": 57.5
+   "close": 58.5
   },
   {
    "rule": "cfb-total",
@@ -1538,7 +1538,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": true,
-   "close": 40.5
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -1559,7 +1559,7 @@
    "ev": 0.0102,
    "event": null,
    "pass": false,
-   "close": 66.5
+   "close": 67.5
   },
   {
    "rule": "cfb-total",
@@ -1620,7 +1620,7 @@
    "edge": 4.0,
    "ev": 0.0315,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -10.5
   },
   {
@@ -1684,7 +1684,7 @@
    "ev": 0.0199,
    "event": null,
    "pass": false,
-   "close": 5.5
+   "close": 4.5
   },
   {
    "rule": "nfl-total",
@@ -17992,6 +17992,27 @@
    "pass": false
   },
   {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909960",
+   "k": "2026-11-11T00:30:00Z",
+   "slate": "nba:2026-11-10",
+   "h": "NY",
+   "a": "MIL",
+   "mk": "spread",
+   "side": "home",
+   "line": 15.5,
+   "price": 102.0,
+   "bet": "NY -15.5 +102",
+   "placed": "2026-11-10T18:46:47Z",
+   "stake": 0.75,
+   "edge": 2.5,
+   "ev": 0.0139,
+   "event": null,
+   "pass": false,
+   "close": 15.5
+  },
+  {
    "rule": "nba-total",
    "sport": "nba",
    "id": "401909963",
@@ -18323,7 +18344,7 @@
    "ev": 0.0107,
    "event": null,
    "pass": false,
-   "close": 53.5
+   "close": 54.5
   },
   {
    "rule": "cfb-spread",
@@ -18428,7 +18449,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 74.5
   },
   {
    "rule": "cfb-total",
@@ -18596,7 +18617,7 @@
    "ev": 0.0569,
    "event": null,
    "pass": false,
-   "close": 57.5
+   "close": 58.5
   },
   {
    "rule": "cfb-total",
@@ -18701,7 +18722,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": true,
-   "close": 40.5
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -18722,7 +18743,7 @@
    "ev": 0.0102,
    "event": null,
    "pass": false,
-   "close": 66.5
+   "close": 67.5
   },
   {
    "rule": "cfb-total",
@@ -18783,7 +18804,7 @@
    "edge": 4.0,
    "ev": 0.0315,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": -10.5
   },
   {
@@ -18847,7 +18868,7 @@
    "ev": 0.0199,
    "event": null,
    "pass": false,
-   "close": 5.5
+   "close": 4.5
   },
   {
    "rule": "nfl-total",

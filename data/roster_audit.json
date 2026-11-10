@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T18:21Z",
+ "asof": "2026-11-10T18:47Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -275,26 +275,26 @@
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 8,
-     "rows": 2141
+     "rows": 2140
     },
     "static/data/nfl-fantasy.json": {
      "flags": 15,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 69,
-     "rows": 1790
+     "flags": 68,
+     "rows": 1796
     },
     "static/data/pctl-nfl.json": {
      "flags": 67,
-     "rows": 1719
+     "rows": 1725
     },
     "static/data/personnel/nfl.json": {
      "flags": 0,
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 54,
+     "flags": 51,
      "rows": 1650
     }
    },
@@ -318,24 +318,6 @@
      "site": "ATL"
     },
     {
-     "d": "2026-11-10",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Links up with Atlanta",
-     "kind": null,
-     "move": {
-      "d": "2026-11-06",
-      "head": "Reverts to Ravens' practice squad",
-      "kind": "practice"
-     },
-     "pid": "17133",
-     "player": "Jake Moody",
-     "pos": "K",
-     "rotowire": "ATL",
-     "site": "BAL"
-    },
-    {
      "d": "2026-09-16",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -352,6 +334,24 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Shipped to San Francisco",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Shipped to San Francisco",
+      "kind": "trade"
+     },
+     "pid": "8627",
+     "player": "Keenan Allen",
+     "pos": "WR",
+     "rotowire": "SF",
+     "site": "IND"
     },
     {
      "d": "2026-11-09",
@@ -438,6 +438,24 @@
      "pos": "NB",
      "rotowire": "FA",
      "site": "MIN"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Shipped to San Francisco",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Shipped to San Francisco",
+      "kind": "trade"
+     },
+     "pid": "8627",
+     "player": "Keenan Allen",
+     "pos": "WR",
+     "rotowire": "SF",
+     "site": "IND"
     },
     {
      "d": "2026-11-03",
@@ -811,24 +829,6 @@
      "player": "Kevin Austin",
      "pos": "WR",
      "rotowire": "FA",
-     "site": "NO"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Acquired by Jacksonville",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Acquired by Jacksonville",
-      "kind": "trade"
-     },
-     "pid": "11916",
-     "player": "Davon Godchaux",
-     "pos": "DL",
-     "rotowire": "JAX",
      "site": "NO"
     },
     {
@@ -1336,24 +1336,6 @@
      "site": "CHI"
     },
     {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Links up with Atlanta",
-     "kind": null,
-     "move": {
-      "d": "2026-11-06",
-      "head": "Reverts to Ravens' practice squad",
-      "kind": "practice"
-     },
-     "pid": "17133",
-     "player": "Jake Moody",
-     "pos": "K",
-     "rotowire": "ATL",
-     "site": "BAL"
-    },
-    {
      "d": "2026-10-21",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1370,6 +1352,24 @@
      "pos": "S",
      "rotowire": "FA",
      "site": "BAL"
+    },
+    {
+     "d": "2026-11-03",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Released by Buffalo",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-03",
+      "head": "Released by Buffalo",
+      "kind": "waived"
+     },
+     "pid": "15189",
+     "player": "C.J. Gardner-Johnson",
+     "pos": "S",
+     "rotowire": "FA",
+     "site": "BUF"
     },
     {
      "d": "2026-09-17",
@@ -1406,6 +1406,24 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-10-26",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Added to Falcons' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Added to Falcons' practice squad",
+      "kind": "practice"
+     },
+     "pid": "17218",
+     "player": "E.J. Jenkins",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "ATL"
     },
     {
      "d": "2026-10-17",
@@ -1570,24 +1588,6 @@
      "site": "SF"
     },
     {
-     "d": "2026-10-26",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Added to Falcons' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-26",
-      "head": "Added to Falcons' practice squad",
-      "kind": "practice"
-     },
-     "pid": "17218",
-     "player": "E.J. Jenkins",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "ATL"
-    },
-    {
      "d": "2026-10-19",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1624,24 +1624,6 @@
      "site": "LA"
     },
     {
-     "d": "2026-11-03",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Released by Buffalo",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-03",
-      "head": "Released by Buffalo",
-      "kind": "waived"
-     },
-     "pid": "15189",
-     "player": "C.J. Gardner-Johnson",
-     "pos": "S",
-     "rotowire": "FA",
-     "site": "BUF"
-    },
-    {
      "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1676,6 +1658,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "PHI"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Shipped to San Francisco",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Shipped to San Francisco",
+      "kind": "trade"
+     },
+     "pid": "8627",
+     "player": "Keenan Allen",
+     "pos": "WR",
+     "rotowire": "SF",
+     "site": "IND"
     },
     {
      "d": "2026-10-26",
@@ -1728,24 +1728,6 @@
      "site": "ARI"
     },
     {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Headed to Arizona",
-     "kind": null,
-     "move": {
-      "d": "2026-09-21",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "5653",
-     "player": "Josh Johnson",
-     "pos": "QB",
-     "rotowire": "ARI",
-     "site": "WAS"
-    },
-    {
      "d": "2026-09-28",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -1764,24 +1746,6 @@
      "site": "MIA"
     },
     {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Acquired by Jacksonville",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Acquired by Jacksonville",
-      "kind": "trade"
-     },
-     "pid": "11916",
-     "player": "Davon Godchaux",
-     "pos": "DL",
-     "rotowire": "JAX",
-     "site": "NO"
-    },
-    {
      "d": "2026-10-07",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -1798,24 +1762,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Still awaiting medical clearance",
-     "kind": null,
-     "move": {
-      "d": "2026-10-14",
-      "head": "Still rehabbing, no signing imminent",
-      "kind": "sign"
-     },
-     "pid": "11222",
-     "player": "Tyreek Hill",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIA"
     },
     {
      "d": "2026-10-26",
@@ -2085,7 +2031,7 @@
      "player": "Jerome Ford",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "ARI"
+     "site": "CLE"
     },
     {
      "d": "2026-09-02",
@@ -2502,24 +2448,6 @@
      "site": "NE"
     },
     {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Re-signs with Jets",
-     "kind": "sign",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Re-signs with Jets",
-      "kind": "sign"
-     },
-     "pid": "14013",
-     "player": "Troy Reeder",
-     "pos": "LB",
-     "rotowire": "NYJ",
-     "site": "FA"
-    },
-    {
      "d": "2026-07-31",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2644,6 +2572,24 @@
      "pos": "EDGE",
      "rotowire": "CAR",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Shipped to San Francisco",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Shipped to San Francisco",
+      "kind": "trade"
+     },
+     "pid": "8627",
+     "player": "Keenan Allen",
+     "pos": "WR",
+     "rotowire": "SF",
+     "site": "IND"
     },
     {
      "d": "2026-11-03",
@@ -3035,24 +2981,6 @@
      "player": "Kevin Austin",
      "pos": "WR",
      "rotowire": "FA",
-     "site": "NO"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "Acquired by Jacksonville",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Acquired by Jacksonville",
-      "kind": "trade"
-     },
-     "pid": "11916",
-     "player": "Davon Godchaux",
-     "pos": "DL",
-     "rotowire": "JAX",
      "site": "NO"
     },
     {
@@ -3596,6 +3524,24 @@
      "site": "BAL"
     },
     {
+     "d": "2026-11-03",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Released by Buffalo",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-03",
+      "head": "Released by Buffalo",
+      "kind": "waived"
+     },
+     "pid": "15189",
+     "player": "C.J. Gardner-Johnson",
+     "pos": "S",
+     "rotowire": "FA",
+     "site": "BUF"
+    },
+    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3612,6 +3558,24 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-10-26",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Added to Falcons' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Added to Falcons' practice squad",
+      "kind": "practice"
+     },
+     "pid": "17218",
+     "player": "E.J. Jenkins",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "ATL"
     },
     {
      "d": "2026-10-17",
@@ -3758,24 +3722,6 @@
      "site": "SF"
     },
     {
-     "d": "2026-10-26",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Added to Falcons' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-26",
-      "head": "Added to Falcons' practice squad",
-      "kind": "practice"
-     },
-     "pid": "17218",
-     "player": "E.J. Jenkins",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "ATL"
-    },
-    {
      "d": "2026-10-19",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3792,24 +3738,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "PIT"
-    },
-    {
-     "d": "2026-11-03",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Released by Buffalo",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-03",
-      "head": "Released by Buffalo",
-      "kind": "waived"
-     },
-     "pid": "15189",
-     "player": "C.J. Gardner-Johnson",
-     "pos": "S",
-     "rotowire": "FA",
-     "site": "BUF"
     },
     {
      "d": "2026-11-10",
@@ -3852,18 +3780,18 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "moved",
-     "head": "Links up with Atlanta",
-     "kind": null,
+     "head": "Shipped to San Francisco",
+     "kind": "trade",
      "move": {
-      "d": "2026-11-06",
-      "head": "Reverts to Ravens' practice squad",
-      "kind": "practice"
+      "d": "2026-11-10",
+      "head": "Shipped to San Francisco",
+      "kind": "trade"
      },
-     "pid": "17133",
-     "player": "Jake Moody",
-     "pos": "K",
-     "rotowire": "ATL",
-     "site": "BAL"
+     "pid": "8627",
+     "player": "Keenan Allen",
+     "pos": "WR",
+     "rotowire": "SF",
+     "site": "IND"
     },
     {
      "d": "2026-11-09",
@@ -4120,7 +4048,7 @@
    ],
    "joined": 0,
    "players": 2237,
-   "rows": 8003
+   "rows": 8014
   },
   "nhl": {
    "by_file": {
