@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-10T22:31:54Z",
+ "asof": "2026-11-10T22:34:38Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 85.89,
+  "now": 85.67,
   "peak": 117.38,
-  "drawdown": 0.2683,
-  "open": 81.75,
+  "drawdown": 0.2701,
+  "open": 83.25,
   "path": [
-   105.52,
    109.24,
    107.6,
    107.86,
@@ -408,25 +407,26 @@
    84.9,
    84.26,
    86.74,
-   85.89
+   85.89,
+   85.67
   ]
  },
  "record": {
-  "n": 472,
+  "n": 473,
   "clvN": 427,
   "clvRet": -0.0123,
   "clvT": -2.54,
   "clv": 0.01,
   "beat": 0.311,
-  "settled": 425,
+  "settled": 426,
   "w": 209,
-  "l": 216,
+  "l": 217,
   "p": 0,
-  "roi": -0.0227,
-  "roiT": -0.46,
-  "profit": -12.32,
-  "risked": 396.75,
-  "yield": -0.0311
+  "roi": -0.025,
+  "roiT": -0.51,
+  "profit": -12.57,
+  "risked": 397.0,
+  "yield": -0.0317
  },
  "tEff": -2.44,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.3% vs -1.2% (SE 5.0)",
+   "value": "ROI -2.5% vs -1.2% (SE 4.9)",
    "pass": true
   }
  ],
@@ -680,21 +680,21 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 85,
+   "n": 86,
    "clvN": 84,
    "clvRet": -0.0179,
    "clvT": -3.84,
    "clv": -0.07,
    "beat": 0.262,
-   "settled": 82,
+   "settled": 83,
    "w": 42,
-   "l": 40,
+   "l": 41,
    "p": 0,
-   "roi": 0.0737,
-   "roiT": 0.58,
-   "profit": 0.23,
-   "risked": 71.5,
-   "yield": 0.0032
+   "roi": 0.0608,
+   "roiT": 0.48,
+   "profit": -0.02,
+   "risked": 71.75,
+   "yield": -0.0003
   },
   {
    "id": "nflprops-prop",
@@ -719,30 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "187372",
-   "k": "2026-11-10T20:00:00Z",
-   "slate": "tennis:2026-11-10",
-   "h": "Kostyuk",
-   "a": "Pegula",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 167,
-   "bet": "Kostyuk ML +167",
-   "placed": "2026-11-10T07:40:07Z",
-   "stake": 0.25,
-   "edge": 4.0,
-   "ev": 0.0002,
-   "event": "FAGE WTA Finals Indian Wells",
-   "pass": false,
-   "clvRet": -0.0188,
-   "clv": -0.3,
-   "beat": 0,
-   "close": 0.3675
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -808,6 +784,26 @@
    "event": null,
    "pass": false,
    "close": 227.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186540",
+   "k": "2026-11-11T12:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Sonego",
+   "a": "Tabilo",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 138,
+   "bet": "Tabilo ML +138",
+   "placed": "2026-11-10T22:34:38Z",
+   "stake": 1.75,
+   "edge": 16.2,
+   "ev": 0.0258,
+   "event": "Bybit Stockholm Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -1351,7 +1347,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -1813,6 +1809,34 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "187372",
+   "k": "2026-11-10T20:00:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Kostyuk",
+   "a": "Pegula",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 167,
+   "bet": "Kostyuk ML +167",
+   "placed": "2026-11-10T07:40:07Z",
+   "stake": 0.25,
+   "edge": 4.0,
+   "ev": 0.0002,
+   "event": "FAGE WTA Finals Indian Wells",
+   "pass": false,
+   "clvRet": -0.0188,
+   "clv": -0.3,
+   "beat": 0,
+   "close": 0.3675,
+   "score": "6-2 7-5",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3501,32 +3525,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873040-4426485-wy",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 16.5,
-   "price": -104.0,
-   "bet": "Jonathan Mingo under 16.5 rec yds -104",
-   "placed": "2026-11-08T16:54:00Z",
-   "stake": 1.25,
-   "edge": 30.8,
-   "ev": 0.2318,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0052,
-   "close": 16.5,
-   "score": 23.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -1.25
   }
  ],
  "ledger": [
@@ -18048,7 +18046,11 @@
    "clvRet": -0.0188,
    "clv": -0.3,
    "beat": 0,
-   "close": 0.3675
+   "close": 0.3675,
+   "score": "6-2 7-5",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "tennis-ml",
@@ -18115,6 +18117,26 @@
    "event": null,
    "pass": false,
    "close": 227.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186540",
+   "k": "2026-11-11T12:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Sonego",
+   "a": "Tabilo",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 138,
+   "bet": "Tabilo ML +138",
+   "placed": "2026-11-10T22:34:38Z",
+   "stake": 1.75,
+   "edge": 16.2,
+   "ev": 0.0258,
+   "event": "Bybit Stockholm Open",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -18658,7 +18680,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
