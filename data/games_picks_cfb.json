@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T15:55:46Z",
+ "asof": "2026-11-10T15:57:47Z",
  "recenter": {
-  "week": 0.11
+  "week": 0.1
  },
  "monitor": {
   "clocks": {
@@ -544,7 +544,7 @@
     "side": "under",
     "line": 60.5,
     "price": -111.0,
-    "ev": 0.025,
+    "ev": 0.024,
     "units": 1.5
    }
   },
@@ -913,8 +913,8 @@
     "side": "over",
     "line": 49.5,
     "price": -108.0,
-    "ev": 0.016,
-    "units": 0.75
+    "ev": 0.012,
+    "units": 0.25
    }
   },
   {
@@ -974,8 +974,8 @@
     "side": "home",
     "line": 15.5,
     "price": -106.0,
-    "ev": 0.014,
-    "units": 0.75
+    "ev": 0.01,
+    "units": 0.25
    }
   },
   {
@@ -1156,7 +1156,14 @@
    "flagged": "2026-11-10T06:59:18Z",
    "betTo": 53.0,
    "close": 52.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 52.5,
+    "price": -102.0,
+    "ev": 0.02,
+    "units": 1.25
+   }
   },
   {
    "id": "401864537",
@@ -1489,10 +1496,10 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 4.3,
    "x": 3.0,
-   "why": "no edge at -111",
+   "why": "no edge at -113",
    "m": 22.4,
    "tm": 49.2
   },
@@ -1511,22 +1518,6 @@
    "why": "no edge at -106",
    "m": -18.8,
    "tm": 48.7
-  },
-  {
-   "id": "401856884",
-   "sport": "cfb",
-   "kick": "2026-11-14T23:15:00.000Z",
-   "home": "Kentucky",
-   "away": "Florida",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -111.0,
-   "edge": 3.7,
-   "x": 3.0,
-   "why": "no edge at -111",
-   "m": 2.3,
-   "tm": 56.2
   },
   {
    "id": "401858521",
@@ -1601,7 +1592,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 2.7,
    "x": 3.0,
    "why": "edge under 3",
@@ -1863,6 +1854,22 @@
    "why": "edge under 3",
    "m": -2.4,
    "tm": 48.0
+  },
+  {
+   "id": "401856858",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "BYU",
+   "away": "Baylor",
+   "mk": "total",
+   "side": "under",
+   "line": 48.5,
+   "price": 102.0,
+   "edge": 1.4,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 8.6,
+   "tm": 47.1
   }
  ],
  "games": {
@@ -1871,9 +1878,9 @@
    "side": "over",
    "line": 49.5,
    "price": -108.0,
-   "ev": 0.016,
+   "ev": 0.012,
    "edge": 4.8,
-   "units": 0.75,
+   "units": 0.25,
    "home": "Indiana",
    "away": "USC",
    "state": "pick"
@@ -1919,9 +1926,9 @@
    "side": "home",
    "line": 15.5,
    "price": -106.0,
-   "ev": 0.014,
+   "ev": 0.01,
    "edge": 6.3,
-   "units": 0.75,
+   "units": 0.25,
    "home": "Georgia",
    "away": "Missouri",
    "state": "pick"
@@ -2027,7 +2034,7 @@
    "side": "under",
    "line": 60.5,
    "price": -111.0,
-   "ev": 0.025,
+   "ev": 0.024,
    "edge": 5.5,
    "units": 1.5,
    "home": "North Carolina",
@@ -2050,13 +2057,13 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -111.0,
+   "price": -102.0,
+   "ev": 0.02,
    "edge": 3.7,
-   "ev": null,
-   "units": 0.0,
+   "units": 1.25,
    "home": "Kentucky",
    "away": "Florida",
-   "state": "under"
+   "state": "pick"
   },
   "401858526": {
    "mk": "total",
@@ -2206,7 +2213,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2458,7 +2465,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -2699,16 +2706,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 14723,
+  "snapshots": 14733,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3015,
-    "clvRet": -0.05,
-    "clvT": -35.0,
+    "clvN": 3017,
+    "clvRet": -0.0501,
+    "clvT": -35.03,
     "clv": 0.15,
     "beat": 0.32,
-    "still": 0.421
+    "still": 0.422
    },
    {
     "when": "6-24h",
@@ -5857,11 +5864,11 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 38.75,
+    "raw": 38.5,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 9.25,
+    "raw": 9.0,
     "scale": 1.0
    }
   }
