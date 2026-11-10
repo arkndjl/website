@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-10T11:17:11Z",
+ "asof": "2026-11-10T11:18:32Z",
  "recenter": {
-  "2026-11-10": -11.17
+  "2026-11-10": -11.19
  },
  "monitor": {
   "clocks": {
@@ -403,22 +403,6 @@
    "tm": 154.5
   },
   {
-   "id": "401909761",
-   "sport": "cbb",
-   "kick": "2026-11-11T02:00:00Z",
-   "home": "Colorado",
-   "away": "San Diego",
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -111.0,
-   "edge": 6.5,
-   "x": null,
-   "why": "total market off",
-   "m": 18.1,
-   "tm": 158.0
-  },
-  {
    "id": "401920306",
    "sport": "cbb",
    "kick": "2026-11-11T00:00:00Z",
@@ -433,22 +417,6 @@
    "why": "total market off",
    "m": 13.9,
    "tm": 158.5
-  },
-  {
-   "id": "401925107",
-   "sport": "cbb",
-   "kick": "2026-11-11T00:30:00Z",
-   "home": "UT Rio Grande Valley",
-   "away": "Texas State",
-   "mk": "total",
-   "side": "over",
-   "line": 143.5,
-   "price": -122.0,
-   "edge": 6.0,
-   "x": null,
-   "why": "total market off",
-   "m": -4.5,
-   "tm": 149.5
   },
   {
    "id": "401929180",
@@ -481,6 +449,22 @@
    "why": "total market off",
    "m": 34.6,
    "tm": 153.1
+  },
+  {
+   "id": "401909761",
+   "sport": "cbb",
+   "kick": "2026-11-11T02:00:00Z",
+   "home": "Colorado",
+   "away": "San Diego",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -108.0,
+   "edge": 5.6,
+   "x": null,
+   "why": "spread market off",
+   "m": 18.1,
+   "tm": 158.0
   },
   {
    "id": "401911209",
@@ -529,6 +513,22 @@
    "why": "spread market off",
    "m": 1.6,
    "tm": 161.6
+  },
+  {
+   "id": "401925107",
+   "sport": "cbb",
+   "kick": "2026-11-11T00:30:00Z",
+   "home": "UT Rio Grande Valley",
+   "away": "Texas State",
+   "mk": "total",
+   "side": "over",
+   "line": 144.5,
+   "price": -108.0,
+   "edge": 5.0,
+   "x": null,
+   "why": "total market off",
+   "m": -4.5,
+   "tm": 149.5
   },
   {
    "id": "401906771",
@@ -768,7 +768,7 @@
    "mk": "spread",
    "side": "away",
    "line": 25.5,
-   "price": 102.0,
+   "price": 104.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -885,11 +885,11 @@
    "state": "off"
   },
   "401909761": {
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -111.0,
-   "edge": 6.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -108.0,
+   "edge": 5.6,
    "ev": null,
    "units": 0.0,
    "home": "Colorado",
@@ -912,7 +912,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -984,7 +984,7 @@
    "mk": "spread",
    "side": "away",
    "line": 27.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -1031,9 +1031,9 @@
   "401925107": {
    "mk": "total",
    "side": "over",
-   "line": 143.5,
-   "price": -122.0,
-   "edge": 6.0,
+   "line": 144.5,
+   "price": -108.0,
+   "edge": 5.0,
    "ev": null,
    "units": 0.0,
    "home": "UT Rio Grande Valley",
@@ -1213,7 +1213,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 10361,
+  "snapshots": 10375,
   "buckets": [
    {
     "when": "24h+",
@@ -1226,12 +1226,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1909,
+    "clvN": 1915,
     "clvRet": -0.0435,
-    "clvT": -18.13,
+    "clvT": -18.19,
     "clv": -0.03,
-    "beat": 0.258,
-    "still": 0.495
+    "beat": 0.257,
+    "still": 0.497
    },
    {
     "when": "1-6h",
@@ -8575,7 +8575,7 @@
     "scale": 1.0
    },
    "2026-11-12": {
-    "raw": 4.75,
+    "raw": 5.5,
     "scale": 1.0
    },
    "2026-11-13": {
@@ -8583,11 +8583,11 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 33.0,
+    "raw": 34.75,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 5.25,
+    "raw": 5.75,
     "scale": 1.0
    }
   }
