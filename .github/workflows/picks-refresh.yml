@@ -36,12 +36,13 @@ jobs:
         continue-on-error: true
         run: python3 scripts/fetch_ticker.py
       - name: Commit if it changed
-        # every sport's picks file (a refresh that wrote one not listed here left it unstaged and the rebase refused, Nov 2).
+        # every sport's picks file, and the CBB slate and injury report the refresh re-prices (a refresh that wrote one not listed here left it unstaged and the rebase refused, Nov 2).
         # scripts/data_push.py: on a rejected push the picks and the paper book are rebuilt on the new main (the refresh
         # rerun on the newest logs) and the odds archives merged line by line, so a sport build's rows pushed meanwhile stay.
         run: |
           python3 scripts/data_push.py -m "Picks refresh ($(date -u +%Y-%m-%dT%H:%MZ))" \
-            --site data/ticker.json data/paper_book.json 'data/games_picks_*.json' \
-            --rebuild 'data/games_picks_*.json' data/paper_book.json \
+            --site data/ticker.json data/paper_book.json 'data/games_picks_*.json' data/cbb_games.json data/cbb_injuries.json \
+            --rebuild 'data/games_picks_*.json' data/paper_book.json data/cbb_games.json data/cbb_injuries.json \
             --regen "GITHUB_TOKEN= python3 scripts/picks_refresh.py; python3 scripts/paper_book.py" \
-            -- data/paper_book.json data/ticker.json data/games_picks_*.json scripts/data/odds
+            -- data/paper_book.json data/ticker.json data/games_picks_*.json scripts/data/odds \
+               data/cbb_games.json data/cbb_injuries.json scripts/data/cbb_injury_log

@@ -1655,6 +1655,9 @@ if __name__ == '__main__':
         fv_test()
     elif '--fit' in sys.argv:
         report()
+    elif '--injuries' in sys.argv:
+        import cbb_games_live
+        cbb_games_live.refresh_injuries()
     else:
         import cbb_games_live
         cbb_games_live.build()

@@ -10,7 +10,8 @@ Two jobs, run by the odds-snap workflow (every tick, including the ones ops/odds
 picks-refresh workflow on a second schedule, since GitHub drops most of this repo's scheduled runs:
 
 1. Light refresh: scripts/games_picks.py <sport> on the last build's model numbers with DraftKings' current lines and
-   prices through ESPN (a few seconds a sport). New picks, withdrawals, line moves and finals land without a full build.
+   prices through ESPN (a few seconds a sport). College basketball re-prices its injury inputs on the newest report
+   first (INJ). New picks, withdrawals, line moves and finals land without a full build.
    Skipped while that sport's build is queued or running, so the two never write the same files at once.
 2. Watchdog: when a sport's build workflow (freshness.json "workflow") has not succeeded for STALE_H hours in season,
    and nothing of it ran or was queued in the last RETRY_H hours, dispatch it once. That build moves the slate to the
@@ -31,6 +32,9 @@ ROOT = os.path.dirname(HERE)
 SPORTS = ('cfb', 'nfl', 'cbb', 'nba')
 STALE_H = 12          # a sport build older than this in season gets dispatched
 RETRY_H = 4           # ...unless one ran, started or was queued this recently
+# the injury re-price before a sport's picks: the newest report on the last build's availability snapshot, so news
+# between builds moves the margin, win chance and picks (scripts/cbb_games_live.py refresh_injuries)
+INJ = {'cbb': [os.path.join(HERE, 'cbb_games.py'), '--injuries']}
 BUSY = {'queued', 'in_progress', 'waiting', 'requested', 'pending'}
 REPO = os.environ.get('GITHUB_REPOSITORY', 'arkndjl/website')
 TOKEN = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
@@ -81,8 +85,12 @@ def main(args):
         if busy:
             print(f'{s}: {wf} is queued or running, picks left to it')
         elif dry:
-            print(f'{s}: would run games_picks.py {s}')
+            print(f'{s}: would run games_picks.py {s}' + (' after the injury re-price' if s in INJ else ''))
         else:
+            if s in INJ:
+                p = subprocess.run([sys.executable, *INJ[s]], cwd=ROOT, timeout=240)
+                if p.returncode:
+                    print(f'{s}: injury re-price exited {p.returncode}')
             p = subprocess.run([sys.executable, os.path.join(HERE, 'games_picks.py'), s], cwd=ROOT, timeout=300)
             if p.returncode:
                 print(f'{s}: games_picks.py exited {p.returncode}')

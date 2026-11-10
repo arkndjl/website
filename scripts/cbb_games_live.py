@@ -330,77 +330,197 @@ def pre_listed(report, logs):
     return dict(out)
 
 
-def avail_live():
-    """this season's availability (value of rotation players who missed the team's last game or are listed on the
-    injury report) and their names"""
-    logs = C.bt_logs(SEASON)
-    report = covers_report()
-    names, teams = {}, {}
-    p = os.path.join(C.BTLOG, f'{SEASON}.json.gz')
+# the availability snapshot (avail_snapshot, refresh_injuries): this season's part, rewritten by each build, and last
+# season's (players by school, their lines, the board's rosters), rewritten only when it changes
+SNAP = os.path.join(C.HERE, 'data', 'cbb_avail_snap.json.gz')
+SNAP_PREV = os.path.join(C.HERE, 'data', 'cbb_avail_prev.json.gz')
+PREV_KEYS = ('prevTeams', 'pn', 'val', 'roster')
+
+
+def avail_snapshot(logs):
+    """the report-free part of the availability inputs at this build, so a later injury report re-prices the slate
+    without the game logs (refresh_injuries). Per team, this season's players (pid, name, played, value at a full
+    absence over the team's bench as avail() counts it, games missed in a row, minutes a game, BPM shown); last
+    season's players by school; their pre_out() line; the board's rosters with each player's school last season"""
+    names, teams = {}, defaultdict(set)
     try:
-        for r in json.load(gzip.open(p)):
-            names[r[51]] = r[48]; teams.setdefault(r[47], set()).add(r[51])
+        for r in json.load(gzip.open(os.path.join(C.BTLOG, f'{SEASON}.json.gz'))):
+            names[r[51]] = r[48]; teams[r[47]].add(r[51])
     except Exception:
         pass
-    # the report on Barttorvik's teams and players (the shared name matcher; same school by team key)
-    bt_teams = {NM.team_key(t): t for t in logs}
-    listed, status, unmatched, logged = defaultdict(dict), {}, [], []
-    for team, name, pos, stt, detail, when in report:
-        t = bt_teams.get(NM.team_key(team))
-        sit = SIT.get(stt.lower())
-        if not t or sit is None:
-            unmatched.append(f'{name} ({team}, {stt})'); continue
-        m = NM.Matcher([{'pid': pid, 'name': names[pid]} for pid in teams.get(t, ()) if pid in names], team=None, pos=None, sport='basketball')
-        hit, _ = m.find(name)
-        if not hit:
-            unmatched.append(f'{name} ({team}, {stt})'); continue
-        listed[t][hit['pid']] = sit
-        status[(t, hit['pid'])] = stt if not detail else f'{stt} ({detail})'
-        logged.append([t, hit['pid'], name, stt.lower()])
-    if report:
-        print(f'cbb injuries: {len(report)} listed on Covers, {sum(len(v) for v in listed.values())} matched to Barttorvik players'
-              + (f'; not matched: {", ".join(unmatched[:12])}' if unmatched else ''))
-        with open(INJ_OUT, 'w') as f:
-            json.dump({'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), 'src': COVERS,
-                       'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
-                                   for t, n, ps, st, d, w in report]}, f, indent=0)
-        log_injuries(logged)
-    # 'pinj': the report's players who haven't played for the team yet this season, valued off last season's line
-    # (matched among last season's Barttorvik players: at this school, else at the school his board career lists)
-    pl = pre_listed(report, logs)
-    if report:
-        print(f'cbb injuries: {sum(len(v) for v in pl.values())} of the report not yet played this season, valued off last season (pinj)')
-    C.PINJ.update(C.pre_out(logs, C.bt_logs(SEASON - 1), listed=pl))
-    if not logs:
-        return {}, {}
-    av = C.avail(logs, listed=listed)
-    out = {}
-    for t, gl in logs.items():
+    T = {}
+    for t in set(logs) | set(teams):
+        gl = logs.get(t, [])
         k = len(gl)
-        if k < 3:
-            continue
-        st = {}
-        run = defaultdict(int)
+        st, run = {}, defaultdict(int)
         for d, pl in gl:
             for pid, (mn, gb) in pl.items():
                 s = st.setdefault(pid, [0, 0.0, 0.0]); s[0] += 1; s[1] += mn; s[2] += gb * mn
             for pid in st:
                 run[pid] = 0 if pid in pl else run[pid] + 1
-        last = gl[-1][1]
+        rp = -3.0
+        if k >= 3:
+            bs = [(mn, bm) for g, mn, bm in st.values() if g < 0.6 * k or mn / g < 12]
+            rp = (sum(b for _, b in bs) + -3.0 * C.BENCH) / (sum(m for m, _ in bs) + C.BENCH)
+        pl = []
+        for pid in sorted(teams.get(t, ()) | set(st)):
+            g, mn, bm = st.get(pid, (0, 0.0, 0.0))
+            rot = k >= 3 and g >= 0.6 * k and mn / g >= 12
+            u = max(0.0, (bm - 150.0) / (mn + 150.0) - rp) * (mn / k) / 40 if rot else 0.0
+            pl.append([pid, names.get(pid, ''), int(pid in st), int(rot), round(u, 6), run[pid] if rot else 0,
+                       round(mn / g, 1) if g else 0.0, round((bm - 150) / (mn + 150), 1) if g else 0.0])
+        T[t] = {'k': k, 'rp': round(rp, 6), 'pl': pl}
+    # last season: every Barttorvik row by school, and the pre_out() line (200+ minutes, any team)
+    prev = C.bt_logs(SEASON - 1)
+    pn = defaultdict(dict)
+    try:
+        for r in json.load(gzip.open(os.path.join(C.BTLOG, f'{SEASON - 1}.json.gz'))):
+            pn[r[47]][r[51]] = r[48]
+    except Exception:
+        pass
+    tot = defaultdict(lambda: [0.0, 0.0, defaultdict(float)])
+    ng = {t: len(gl) for t, gl in prev.items()}
+    for t, gl in prev.items():
+        for _, d in gl:
+            for pid, (mn, gb) in d.items():
+                z = tot[pid]; z[0] += mn; z[1] += gb * mn; z[2][t] += mn
+    val = {}
+    for pid, (m, b, by) in tot.items():
+        if m >= 200.0:
+            main = max(by, key=by.get)
+            val[pid] = [round((b - 150.0) / (m + 150.0), 6), round(m / max(1, ng[main]), 4)]
+    roster = defaultdict(list)
+    try:
+        d = json.load(gzip.open(os.path.join(C.HERE, 'cbb_prior.json.gz')))
+        K = {k: i for i, k in enumerate(d['keep'])}
+        ci = {k: i for i, k in enumerate(d['cols'])}
+        for row, c in zip(d['rows'], d['careers']):
+            last = [x for x in c['seasons'] if x[K['year']] == SEASON - 1]
+            if c.get('bt') and last:
+                roster[c['bt']].append([row[ci['name']], last[0][K['team']]])
+    except Exception:
+        pass
+    return {'season': SEASON, 'teams': T, 'prevTeams': sorted(prev), 'pn': {t: sorted([p, n] for p, n in v.items()) for t, v in pn.items()},
+            'val': {str(p): v for p, v in val.items()}, 'roster': dict(roster)}
+
+
+def apply_report(snap, report):
+    """the injury report on a snapshot: 'next' availability (avail(listed=...)) and injury-report (pre_out(listed=...))
+    values by Barttorvik team, the matched listings, the missing-player lists shown on the game cards"""
+    T = snap['teams']
+    bt_teams = {NM.team_key(t): t for t in T if T[t]['k']}
+    keys = {NM.team_key(t): t for t in set(snap['prevTeams']) | {t for t in T if T[t]['k']}}
+    val = snap['val']
+    listed, status, unmatched, logged, pre = defaultdict(dict), {}, [], [], defaultdict(dict)
+    M, P = {}, {}
+    def mt(t):
+        if t not in M:
+            M[t] = NM.Matcher([{'pid': p[0], 'name': p[1]} for p in T[t]['pl'] if p[1]], team=None, pos=None, sport='basketball')
+        return M[t]
+    def mp(t):
+        if t not in P:
+            P[t] = NM.Matcher([{'pid': p, 'name': n} for p, n in snap['pn'].get(t, [])], team=None, pos=None, sport='basketball')
+        return P[t]
+    for team, name, pos, stt, detail, when in report:
+        sit = SIT.get(stt.lower())
+        t = bt_teams.get(NM.team_key(team))
+        if not t or sit is None:
+            unmatched.append(f'{name} ({team}, {stt})')
+        else:
+            hit, _ = mt(t).find(name)
+            if not hit:
+                unmatched.append(f'{name} ({team}, {stt})')
+            else:
+                listed[t][hit['pid']] = sit
+                status[(t, hit['pid'])] = stt if not detail else f'{stt} ({detail})'
+                logged.append([t, hit['pid'], name, stt.lower()])
+        # pre_listed(): last season's line, at this school, else at the school his board career lists
+        t2 = keys.get(NM.team_key(team))
+        if not t2 or sit is None:
+            continue
+        played = {p[0] for p in T.get(t2, {}).get('pl', []) if p[2]}
+        hit, _ = mp(t2).find(name)
+        if not hit:
+            r, _ = NM.Matcher([{'pid': o, 'name': n} for n, o in snap['roster'].get(t2, [])], team=None, pos=None, sport='basketball').find(name)
+            old = r and keys.get(NM.team_key(r['pid']))
+            if old:
+                hit, _ = mp(old).find(name)
+        if hit and hit['pid'] not in played:
+            pre[t2][hit['pid']] = sit
+    inj, pinj, missing = {}, {}, {}
+    for t, v in T.items():
+        L = listed.get(t, {})
+        s = 0.0
+        if v['k'] >= 3:
+            for pid, nm, pld, rot, u, run, mpg, bpm in v['pl']:
+                if not u:
+                    continue
+                if pid in L:
+                    s += L[pid] / C.SIT_AGAIN * u
+                elif run:
+                    s += u
+        inj[t] = round(s, 3)
         miss = []
-        for pid, (g, mn, bm) in st.items():
-            if g < 0.6 * k or mn / g < 12:
+        for pid, nm, pld, rot, u, run, mpg, bpm in v['pl']:
+            if not rot:
                 continue
-            if pid in listed.get(t, {}):
+            if pid in L:
                 why = status[(t, pid)]
-            elif pid not in last:
-                why = 'sat last game' if run[pid] == 1 else f'sat last {run[pid]} games'
+            elif run:
+                why = 'sat last game' if run == 1 else f'sat last {run} games'
             else:
                 continue
-            miss.append({'name': names.get(pid, ''), 'st': why, 'mpg': round(mn / g, 1), 'bpm': round((bm - 150) / (mn + 150), 1)})
+            miss.append({'name': nm, 'st': why, 'mpg': mpg, 'bpm': bpm})
         if miss:
-            out[t] = sorted(miss, key=lambda x: -x['mpg'])
-    return av, out
+            missing[t] = sorted(miss, key=lambda x: -x['mpg'])
+    for t in set(pre) | set(T):
+        rp = T[t]['rp'] if t in T and T[t]['k'] >= 3 else -3.0
+        pinj[t] = round(sum(f * max(0.0, val[str(p)][0] - rp) * val[str(p)][1] / 40 for p, f in pre.get(t, {}).items() if str(p) in val), 3)
+    return {'inj': inj, 'pinj': pinj, 'missing': missing, 'listed': dict(listed), 'pre': dict(pre), 'logged': logged, 'unmatched': unmatched}
+
+
+def avail_live():
+    """this season's availability (value of rotation players who missed the team's last game or are listed on the
+    injury report) and their names; the snapshot refresh_injuries() re-prices from"""
+    logs = C.bt_logs(SEASON)
+    report = covers_report()
+    snap = avail_snapshot(logs)
+    A = apply_report(snap, report)
+    listed = A['listed']
+    if report:
+        print(f'cbb injuries: {len(report)} listed on Covers, {sum(len(v) for v in listed.values())} matched to Barttorvik players'
+              + (f'; not matched: {", ".join(A["unmatched"][:12])}' if A['unmatched'] else ''))
+        write_injuries(report)
+        log_injuries(A['logged'])
+    # 'pinj': the report's players who haven't played for the team yet this season, valued off last season's line
+    # (matched among last season's Barttorvik players: at this school, else at the school his board career lists)
+    pl = A['pre']
+    if report:
+        print(f'cbb injuries: {sum(len(v) for v in pl.values())} of the report not yet played this season, valued off last season (pinj)')
+    C.PINJ.update(C.pre_out(logs, C.bt_logs(SEASON - 1), listed=pl))
+    av = C.avail(logs, listed=listed) if logs else {}
+    # the snapshot's 'next' values are the walk's (one reading of the logs, two code paths)
+    bad = [t for t in snap['teams'] if abs(av.get((t, 'next'), 0.0) - A['inj'].get(t, 0.0)) > 1e-3
+           or abs(C.PINJ.get((t, 'next'), 0.0) - A['pinj'].get(t, 0.0)) > 1e-3]
+    if bad:
+        print(f'cbb injuries: snapshot differs from the walk for {len(bad)} teams ({", ".join(bad[:5])})')
+    snap['ok'] = not bad
+    return av, A['missing'], snap
+
+
+def write_injuries(report):
+    """data/cbb_injuries.json, rewritten only when the list changes (the refresh runs every half hour)"""
+    body = {'src': COVERS, 'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
+                                       for t, n, ps, st, d, w in report]}
+    try:
+        old = json.load(open(INJ_OUT))
+        if old.get('players') == body['players']:
+            return False
+    except (OSError, ValueError):
+        pass
+    with open(INJ_OUT, 'w') as f:
+        json.dump({'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), **body}, f, indent=0)
+    return True
 
 
 def build():
@@ -440,7 +560,7 @@ def build():
     if st.get('xfinal'):
         W.xfinal[SEASON - 1] = st['xfinal']       # last season's pooled non-D-I rating (P['xcar'])
     W.attm[SEASON - 1] = st.get('att', {})         # last season's home crowds ('hatt')
-    av, missing = avail_live()
+    av, missing, asnap = avail_live()
     now = now_utc()
     today = C.et_date(now.strftime('%Y-%m-%dT%H:%M:%SZ'))
     dates = sorted({C.et_date(g['date']) for g in rows if C.et_date(g['date']) >= today and g['state'] != 'post'})
@@ -675,6 +795,10 @@ def build():
                 item[k[0] + 'out'] = mi[:3]
         if g.get('hs') is not None:
             item['final'] = {'home': g['hs'], 'away': g['as']}
+        else:
+            # what refresh_injuries() re-prices from: the teams, possessions, margin, the two injury inputs, total
+            asnap.setdefault('games', {})[str(g['id'])] = [btname.get(g['home']), btname.get(g['away']), round(poss, 4), round(m, 6),
+                                                         round(x.get('inj', 0.0), 6), round(x.get('pinj', 0.0), 6), round(tot, 6)]
         out_games.append(item)
     out_games.sort(key=lambda z: (z['date'], z['q'], z['kick']))
     # model against the line this season, games already played (pregame margin, close)
@@ -718,3 +842,84 @@ def build():
         with open(C.OUT, 'w') as f:
             json.dump(res, f, separators=(',', ':'))
         print(f'cbb games: {len(out_games)} games on {sorted(show)}, {len(power)} teams rated, {len(left)} games simulated')
+    save_snap(asnap)
+
+
+def save_snap(snap):
+    """the snapshot in its two files, each written only when its content changed (gzip with no timestamp)"""
+    snap = {k: v for k, v in snap.items() if not k.startswith('_')}
+    for path, part in ((SNAP, {k: v for k, v in snap.items() if k not in PREV_KEYS}), (SNAP_PREV, {k: snap[k] for k in PREV_KEYS if k in snap})):
+        body = json.dumps(part, separators=(',', ':'), sort_keys=True).encode()
+        try:
+            if gzip.open(path).read() == body:
+                continue
+        except (OSError, EOFError):
+            pass
+        with open(path, 'wb') as f, gzip.GzipFile(fileobj=f, mode='wb', mtime=0) as z:
+            z.write(body)
+
+
+def load_snap():
+    snap = json.load(gzip.open(SNAP))
+    snap.update(json.load(gzip.open(SNAP_PREV)))
+    return snap
+
+
+INJ_LABELS = {'inj': 'availability', 'pinj': 'injury report'}
+
+
+def refresh_injuries():
+    """re-price the slate on the newest injury report between builds (python3 scripts/cbb_games.py --injuries; run by
+    scripts/picks_refresh.py every odds-snap tick, before the picks): Covers' report with RotoWire's news merged in,
+    read on the last build's snapshot (scripts/data/cbb_avail_snap.json.gz + cbb_avail_prev.json.gz), the 'inj' and 'pinj' inputs recomputed for
+    every game not yet tipped, the margin moved by the fitted weights on the change. Ratings, lines and everything else
+    stay the build's until the next one. Writes data/cbb_games.json only when a game changed"""
+    try:
+        snap, res = load_snap(), json.load(open(C.OUT))
+    except (OSError, ValueError, EOFError) as e:
+        print('cbb injuries refresh: no snapshot or games file:', e)
+        return 0
+    if snap.get('season') != SEASON or not snap.get('ok') or not snap.get('games'):
+        print('cbb injuries refresh: snapshot not usable (season, parity or no games), left to the build')
+        return 0
+    report = covers_report()
+    if not report:
+        print('cbb injuries refresh: no report read, the build\'s numbers stay')
+        return 0
+    A = apply_report(snap, report)
+    coef, sd = res['coef'], res['sd']
+    now = now_utc().strftime('%Y-%m-%dT%H:%M:%SZ')
+    n = 0
+    for i, item in enumerate(res['games']):
+        gs = snap['games'].get(str(item['id']))
+        if not gs or item.get('final') or (item.get('kick') or '') <= now:
+            continue
+        hb, ab, poss, m0, xi0, xp0, tot = gs
+        x = {'inj': (A['inj'].get(ab, 0.0) - A['inj'].get(hb, 0.0)) * poss / 100,
+             'pinj': (A['pinj'].get(ab, 0.0) - A['pinj'].get(hb, 0.0)) * poss / 100}
+        m = m0 + coef.get('inj', 0.0) * (x['inj'] - xi0) + coef.get('pinj', 0.0) * (x['pinj'] - xp0)
+        new = dict(item, margin=round(m, 1), pHome=round(C.phi(m / sd), 3),
+                   hs=round((tot + m) / 2), **{'as': round((tot - m) / 2)})
+        if item.get('line') is not None:
+            new['edge'] = round(m - item['line'], 1)
+        parts = {k: v for k, v in (item.get('parts') or {}).items() if k not in INJ_LABELS.values()}
+        for f, lab in INJ_LABELS.items():
+            if f in coef and abs(coef[f] * x[f]) >= 0.5:
+                parts[lab] = round(coef[f] * x[f], 1)
+        new['parts'] = parts
+        for k, b in (('home', hb), ('away', ab)):
+            new.pop(k[0] + 'out', None)
+            mi = A['missing'].get(b)
+            if mi:
+                new[k[0] + 'out'] = mi[:3]
+        if new != item:
+            res['games'][i] = new
+            n += 1
+    wrote = write_injuries(report)
+    log_injuries(A['logged'])
+    if n:
+        res['injAsof'] = now
+        with open(C.OUT, 'w') as f:
+            json.dump(res, f, separators=(',', ':'))
+    print(f'cbb injuries refresh: {len(report)} listed, {n} games re-priced' + ('' if wrote else ', report unchanged'))
+    return n
