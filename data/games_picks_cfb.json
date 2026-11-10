@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T00:32:27Z",
+ "asof": "2026-11-10T00:36:36Z",
  "recenter": {
-  "week": 0.1
+  "week": 0.09
  },
  "monitor": {
   "clocks": {
@@ -702,8 +702,8 @@
     "side": "under",
     "line": 67.5,
     "price": -100.0,
-    "ev": 0.05,
-    "units": 2.75
+    "ev": 0.046,
+    "units": 2.25
    }
   },
   {
@@ -968,7 +968,14 @@
    "flagged": "2026-11-08T15:27:24Z",
    "betTo": 15.5,
    "close": 15.5,
-   "now": null
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 15.5,
+    "price": -108.0,
+    "ev": 0.009,
+    "units": 0.25
+   }
   },
   {
    "id": "401856888",
@@ -1222,9 +1229,9 @@
     "mk": "total",
     "side": "under",
     "line": 73.5,
-    "price": -111.0,
-    "ev": 0.048,
-    "units": 1.75
+    "price": -108.0,
+    "ev": 0.057,
+    "units": 2.5
    }
   },
   {
@@ -1483,22 +1490,6 @@
    "tm": 45.9
   },
   {
-   "id": "401856883",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:30:00.000Z",
-   "home": "Georgia",
-   "away": "Missouri",
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": -113.0,
-   "edge": 6.3,
-   "x": 6.0,
-   "why": "no edge at -113",
-   "m": 21.8,
-   "tm": 51.6
-  },
-  {
    "id": "401866463",
    "sport": "cfb",
    "kick": "2026-11-12T00:30:00.000Z",
@@ -1507,7 +1498,7 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 2.8,
    "x": 3.0,
    "why": "edge under 3",
@@ -1689,6 +1680,22 @@
    "why": "edge under 3",
    "m": -8.5,
    "tm": 45.5
+  },
+  {
+   "id": "401864540",
+   "sport": "cfb",
+   "kick": "2026-11-15T03:00:00.000Z",
+   "home": "UTEP",
+   "away": "Wyoming",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -102.0,
+   "edge": 1.9,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": -6.1,
+   "tm": 42.4
   }
  ],
  "games": {
@@ -1744,13 +1751,13 @@
    "mk": "spread",
    "side": "home",
    "line": 15.5,
-   "price": -113.0,
+   "price": -108.0,
+   "ev": 0.009,
    "edge": 6.3,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "Georgia",
    "away": "Missouri",
-   "state": "under"
+   "state": "pick"
   },
   "401858296": {
    "mk": "spread",
@@ -1792,10 +1799,10 @@
    "mk": "total",
    "side": "under",
    "line": 73.5,
-   "price": -111.0,
-   "ev": 0.048,
+   "price": -108.0,
+   "ev": 0.057,
    "edge": 11.7,
-   "units": 1.75,
+   "units": 2.5,
    "home": "Oklahoma State",
    "away": "Texas Tech",
    "state": "pick"
@@ -1900,7 +1907,7 @@
    "mk": "spread",
    "side": "home",
    "line": 29.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -2129,9 +2136,9 @@
    "side": "under",
    "line": 67.5,
    "price": -100.0,
-   "ev": 0.05,
+   "ev": 0.046,
    "edge": 7.8,
-   "units": 2.75,
+   "units": 2.25,
    "home": "West Virginia",
    "away": "Kansas",
    "state": "pick"
@@ -2188,7 +2195,7 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2344,7 +2351,7 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -2525,15 +2532,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 13932,
+  "snapshots": 13948,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2863,
+    "clvN": 2865,
     "clvRet": -0.0474,
-    "clvT": -31.35,
+    "clvT": -31.36,
     "clv": 0.2,
-    "beat": 0.342,
+    "beat": 0.341,
     "still": 0.388
    },
    {
@@ -5550,7 +5557,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 30.5,
+    "raw": 30.0,
     "scale": 1.0
    }
   }
