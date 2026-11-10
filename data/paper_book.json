@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-10T20:18:51Z",
+ "asof": "2026-11-10T20:26:48Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 86.74,
+  "now": 85.89,
   "peak": 117.38,
-  "drawdown": 0.2611,
-  "open": 81.75,
+  "drawdown": 0.2683,
+  "open": 80.75,
   "path": [
-   104.5,
    105.52,
    109.24,
    107.6,
@@ -408,7 +407,8 @@
    86.64,
    84.9,
    84.26,
-   86.74
+   86.74,
+   85.89
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -2.51,
   "clv": 0.01,
   "beat": 0.312,
-  "settled": 424,
+  "settled": 425,
   "w": 209,
-  "l": 215,
+  "l": 216,
   "p": 0,
-  "roi": -0.0204,
-  "roiT": -0.41,
-  "profit": -11.32,
-  "risked": 395.75,
-  "yield": -0.0286
+  "roi": -0.0227,
+  "roiT": -0.46,
+  "profit": -12.32,
+  "risked": 396.75,
+  "yield": -0.0311
  },
  "tEff": -2.43,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.0% vs -1.2% (SE 5.0)",
+   "value": "ROI -2.3% vs -1.2% (SE 5.0)",
    "pass": true
   }
  ],
@@ -686,15 +686,15 @@
    "clvT": -3.71,
    "clv": -0.05,
    "beat": 0.265,
-   "settled": 81,
+   "settled": 82,
    "w": 42,
-   "l": 39,
+   "l": 40,
    "p": 0,
-   "roi": 0.087,
-   "roiT": 0.68,
-   "profit": 1.23,
-   "risked": 70.5,
-   "yield": 0.0174
+   "roi": 0.0737,
+   "roiT": 0.58,
+   "profit": 0.23,
+   "risked": 71.5,
+   "yield": 0.0032
   },
   {
    "id": "nflprops-prop",
@@ -719,30 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186745",
-   "k": "2026-11-10T16:30:00Z",
-   "slate": "tennis:2026-11-10",
-   "h": "Andreescu",
-   "a": "Masarova",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 277,
-   "bet": "Masarova ML +277",
-   "placed": "2026-11-10T02:52:49Z",
-   "stake": 1.0,
-   "edge": 27.5,
-   "ev": 0.0245,
-   "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false,
-   "clvRet": -0.0481,
-   "clv": 0.7,
-   "beat": 1,
-   "close": 0.2525
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -1539,7 +1515,7 @@
    "ev": 0.0102,
    "event": null,
    "pass": false,
-   "close": 67.5
+   "close": 66.5
   },
   {
    "rule": "cfb-total",
@@ -1819,6 +1795,34 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186745",
+   "k": "2026-11-10T16:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Andreescu",
+   "a": "Masarova",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 277,
+   "bet": "Masarova ML +277",
+   "placed": "2026-11-10T02:52:49Z",
+   "stake": 1.0,
+   "edge": 27.5,
+   "ev": 0.0245,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false,
+   "clvRet": -0.0481,
+   "clv": 0.7,
+   "beat": 1,
+   "close": 0.2525,
+   "score": "6-3 3-6 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.0
   },
   {
    "rule": "tennis-ml",
@@ -3478,32 +3482,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -1.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873041-4241985-ry",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "over",
-   "line": 25.5,
-   "price": -113.0,
-   "bet": "J.K. Dobbins over 25.5 rush yds -113",
-   "placed": "2026-11-05T16:25:00Z",
-   "stake": 0.5,
-   "edge": 28.2,
-   "ev": 0.163,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0901,
-   "close": 24.5,
-   "score": 18.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.5
   }
  ],
  "ledger": [
@@ -17969,7 +17947,11 @@
    "clvRet": -0.0481,
    "clv": 0.7,
    "beat": 1,
-   "close": 0.2525
+   "close": 0.2525,
+   "score": "6-3 3-6 4-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.0
   },
   {
    "rule": "tennis-ml",
@@ -18795,7 +18777,7 @@
    "ev": 0.0102,
    "event": null,
    "pass": false,
-   "close": 67.5
+   "close": 66.5
   },
   {
    "rule": "cfb-total",
