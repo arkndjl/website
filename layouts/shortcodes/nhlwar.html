@@ -49,6 +49,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
         <th data-sort="n">Player</th>
+        <th data-sort="wk" data-num title="± = rank change in WAR over the last 7 days, within the filters; hover for the rank and WAR then. WAR view, current season">±</th>
         <th data-sort="war" data-num class="c-vorx" title="WAR: wins over replacement this season, at goal value: on-ice xG relative to teammates, finishing, power play and penalty kill, penalties, a share of the team's xG; goalies GSAx at 1. Adds up to team goal differential. Replacement = the players outside each team's top 13 forwards / 7 defencemen / 2 goalies">WAR</th>
         <th data-sort="pwar" data-num class="c-vorx" title="projected WAR: (HPM - replacement) x TOI / 60 / goals a win, the components weighted by how well they carry to next season">pWAR</th>
         <th data-sort="p3" data-num class="c-pxpm" title="3Y: projected WAR over the next three seasons (82-game pace), from pWAR, Marcel WAR (last three seasons, shrunk), age by F / D / G and TOI per 82 games; fit on 2010-23 players' next three seasons">3Y</th>
@@ -137,6 +138,7 @@
     }).sort(function (a, b) { return (b[key] == null ? -1e9 : b[key]) - (a[key] == null ? -1e9 : a[key]) || b.toi - a.toi; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
+    var wkf = side === '' ? data.wkFrom : null; __wk.rank(list); __wk.show(win, wkf);
     var shown = list.length;
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     if (sortKey !== 'rk') {
@@ -154,6 +156,7 @@
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>' +
+        __wk.rk(p, wkf, 'WAR', null, p.war) +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('pwar') + '">' + (p.pwar == null ? '' : p.pwar.toFixed(1)) + '</td>' +
         '<td class="cfb__num c-pxpm nbaxpm__v' + k('p3') + '">' + (p.p3 == null ? '' : p.p3.toFixed(1)) + '</td>' +

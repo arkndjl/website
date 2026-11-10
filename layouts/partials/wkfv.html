@@ -1,0 +1,13 @@
+{{- /* weekly FV change cell (scripts/board_moves.py): FV now minus w0, the grade as of .from (7 days back); the hover
+       gives the date and the FV then; no w0 = new to the board. Nothing when the board has no week yet.
+       dict "r" row "from" wkFrom date ("fv" field, default fv) */ -}}
+{{- $r := .r -}}
+{{- with .from -}}
+{{- $f := (time .).Format "Jan 2" -}}
+{{- $now := index $r ($.fv | default "fv") -}}
+{{- if and $r.w0 $now -}}{{- $dv := sub (math.Round $now) (math.Round $r.w0) | int -}}
+<td class="cfb__num cfb__wk" data-v="{{ $dv }}" title="{{ $f }}: FV {{ math.Round $r.w0 }}">{{ if gt $dv 0 }}<span class="cfb__up">▲{{ $dv }}</span>{{ else if lt $dv 0 }}<span class="cfb__down">▼{{ sub 0 $dv }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+{{- else if $now -}}<td class="cfb__num cfb__wk" data-v="" title="not on the board {{ $f }}"><span class="cfb__new">new</span></td>
+{{- else -}}<td class="cfb__num cfb__wk" data-v=""><span class="cfb__dim">·</span></td>
+{{- end -}}
+{{- end -}}

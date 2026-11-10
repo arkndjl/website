@@ -1,0 +1,2 @@
+{{- /* the weekly FV change header (partials/wkfv.html), only when the board has a week of history. dict "from" wkFrom */ -}}
+{{- with .from }}<th data-num title="Δ = FV change over the last 7 days, since {{ (time .).Format "Jan 2" }}; hover for the FV then. new = not on the board then">Δ</th>{{ end -}}

@@ -67,9 +67,13 @@ jobs:
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py soccerp
+      # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
+      - name: Board moves
+        continue-on-error: true
+        run: python3 scripts/board_moves.py soccerp
       - name: Commit if anything changed
         run: |
-          files="data/soccer_prospects.json static/data/rookies/soccerp.json scripts/data/soccer_faces_u22.json.gz static/img/flags"
+          files="scripts/data/moves data/soccer_prospects.json static/data/rookies/soccerp.json scripts/data/soccer_faces_u22.json.gz static/img/flags"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

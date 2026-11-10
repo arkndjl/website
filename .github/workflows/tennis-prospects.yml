@@ -65,9 +65,13 @@ jobs:
           restore-keys: tennis-prospects-ta-
       - name: Grade today's prospects
         run: python3 scripts/tennis_prospects.py
+      # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
+      - name: Board moves
+        continue-on-error: true
+        run: python3 scripts/board_moves.py tennisp
       - name: Commit if anything changed
         run: |
-          files="data/tennis_prospects.json"
+          files="scripts/data/moves data/tennis_prospects.json"
           git add $files
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

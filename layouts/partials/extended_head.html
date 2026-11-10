@@ -10,6 +10,19 @@
 {{- /* a team logo or crest that fails to load is dropped rather than shown as a broken image (tables, cards, depth charts) */}}
 <script>document.addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='IMG'&&/(^|\s)(cfb__logo|cs__logo|dc__logo|tk__logo)(\s|$)/.test(t.className))t.remove();},true);</script>
 <script>window.__arkJson=window.__arkJson||(function(c){return function(u){u=new URL(u,location.href).href;return c[u]=c[u]||fetch(u).then(function(r){if(!r.ok)throw r.status;return r.json();}).catch(function(e){delete c[u];throw e;});};})({});</script>
+{{- /* weekly moves on the player boards (scripts/board_moves.py: each row's w0 = its metric as of the file's wkFrom,
+       7 days back). __wk.show(win, from) hides the column when the view has no week (past seasons). __wk.rank(list, rank field) re-ranks the rows in view by w0 (rank then, within the filters); __wk.rk(p, from, label,
+       fmt) is that rank change as a cell; __wk.fv(now, w0, from) is the FV change as a cell. No w0 while from is set = new. */}}
+<script>window.__wk=window.__wk||(function(){function day(f){var m='Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' '),d=String(f||'').split('-');return d.length===3?m[+d[1]-1]+' '+(+d[2]):'';}
+function td(h,v,t){return '<td class="cfb__num cfb__wk" data-v="'+v+'"'+(t?' title="'+t+'"':'')+'>'+h+'</td>';}
+function arrow(d,x){return d>0?'<span class="cfb__up">▲'+x+'</span>':d<0?'<span class="cfb__down">▼'+x+'</span>':'<span class="cfb__dim">–</span>';}
+var none=td('<span class="cfb__dim">·</span>','',''),fresh=function(f){return td('<span class="cfb__new">new</span>','','not on the board '+day(f));};
+return{day:day,none:none,
+show:function(win,from){var t=win.querySelector('th[data-sort="wk"]');if(t)t.hidden=!from;},
+rank:function(list,rf){rf=rf||'rk';var s=list.filter(function(p){return p.w0!=null;}).sort(function(a,b){return b.w0-a.w0;});s.forEach(function(p,i){p.wr=i>0&&s[i-1].w0===p.w0?s[i-1].wr:i+1;});list.forEach(function(p){if(p.w0==null)p.wr=null;p.wk=p.wr==null?null:p.wr-p[rf];});},
+rk:function(p,from,label,fmt,now){if(!from)return '';if(p.w0==null||p.wr==null)return fresh(from);var d=p.wk,v=now==null?null:now-p.w0;
+return td(arrow(d,Math.abs(d)),d,day(from)+': #'+p.wr+(v==null?'':', '+label+' '+(v>=0?'+':'')+(fmt?fmt(v):v.toFixed(2))));},
+fv:function(now,w0,from,label){if(!from)return '';if(now==null)return none;if(w0==null)return fresh(from);var d=Math.round(now-w0);return td(arrow(d,Math.abs(d)),d,day(from)+': '+(label||'FV')+' '+w0);}};})();</script>
 {{- $links := $.Site.Params.links | default dict }}
 {{- with $links.twitter }}
 <link rel="me" href="{{ . }}">

@@ -35,9 +35,13 @@ jobs:
         run: python3 scripts/cbb_live.py || echo "board not regraded"
       - name: Re-draft the three mocks
         run: python3 scripts/cbb_mock.py --daily || echo "mock draft not updated"
+      # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
+      - name: Board moves
+        continue-on-error: true
+        run: python3 scripts/board_moves.py cbb
       - name: Commit if anything changed
         run: |
-          files="scripts/data/cbb_boards static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json"
+          files="scripts/data/moves scripts/data/cbb_boards static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

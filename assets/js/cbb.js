@@ -1,7 +1,7 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 (function () {
   if (window.__arkCbb) return; window.__arkCbb = true;
-  var PER = 50, NOW = null, PAST = null, OVERSEAS = {};
+  var PER = 50, NOW = null, PAST = null, OVERSEAS = {}, WKFROM = null;
   // a player's stable key for links (#<board>:p=<key>): his ESPN id, else his Basketball-Reference page, else name and team
   function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   function pid(r) {
@@ -69,6 +69,7 @@
         moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
       '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="mean outcome ' + (+r.fvx).toFixed(2) + '">' + fv + '</span></td>' +
+      (past || !WKFROM ? '' : r.wkm ? window.__wk.fv(r.fv, r.w0, WKFROM) : window.__wk.none) +
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
       (past ? '<td>' + outcome(r) + '</td>' : up ? '<td class="cfb__num">' + (r.d1P == null ? dim : pct(r.d1P)) + '</td>' : '<td class="cfb__num">' + (r.xbpm == null ? dim : '<span class="' + (r.xbpm >= 0 ? '' : 'cfb__down') + '">' + sgn(r.xbpm) + '</span>') + '</td>') +
       '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
@@ -202,7 +203,7 @@
 
   var KEY = {
     rk: function (r) { return r.ovr; }, name: function (r) { return r.name; }, team: function (r) { return r.team; },
-    fv: function (r) { return r.fvx; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
+    fv: function (r) { return r.fvx; }, wk: function (r) { return r.wkm && r.w0 != null ? r.fv - r.w0 : null; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
     cls: function (r) { return r.elig; }, age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return r.mht != null ? r.mht + 1.17 : inches(r.ht) || null; },
     nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, d1P: function (r) { return r.d1P; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : r.outcome + (r.pick ? (61 - r.pick) / 100 : 0); }
   };
@@ -287,6 +288,7 @@
       past = !!yr;
       w.querySelectorAll('[data-cbb-now]').forEach(function (t) { t.hidden = past; });
       w.querySelectorAll('[data-cbb-then]').forEach(function (t) { t.hidden = !past; });
+      w.querySelectorAll('[data-cbb-wk]').forEach(function (t) { t.hidden = past || !WKFROM; });
       loading.hidden = false;
       return (past ? loadPast(w.getAttribute('data-cbb-past')) : loadNow(w.getAttribute('data-cbb-src'), w.getAttribute('data-cbb-intl'), w.getAttribute('data-cbb-low'))).then(function (all) {
         // international leagues join the conf select once (the D-I conferences come from the page build)
@@ -294,6 +296,7 @@
         if (!past && cs && !cs.querySelector('[data-intl]')) all.filter(function (r) { return r.intl; }).map(function (r) { return r.conf; })
           .filter(function (c, i, a) { return c && a.indexOf(c) === i; }).sort().forEach(function (c) { var o = document.createElement('option'); o.textContent = c; o.setAttribute('data-intl', ''); cs.appendChild(o); });
         recs = past ? all.filter(function (r) { return r.season === +yr; }) : all.slice();
+        w.querySelectorAll('[data-cbb-wk]').forEach(function (t) { t.hidden = past || !WKFROM; });
         byI = {}; recs.forEach(function (r) { byI[r.i] = r; });
         if (asof) { asof.textContent = past ? 'preseason ' + (yr - 1) + '-' + String(yr).slice(2) + ', top ' + recs.length + ' · ' + (yr <= 2016 ? 'out of fold' : 'forward test') : asof0.replace(/ stale$/, ''); if (window.__arkFreshSet) window.__arkFreshSet(asof, asof.getAttribute('data-asof'), 'cbb', !past); }
         loading.hidden = true; resort(); openWanted();
@@ -364,6 +367,8 @@
                                  intl ? window.__arkJson(intl).catch(function () { return null; }) : null,
                                  low ? window.__arkJson(low).catch(function () { return null; }) : null]).then(function (ds) {
       var rs = rows(ds[0]);
+      // weekly FV change (scripts/board_moves.py): the D-I rows carry w0, the extra files don't
+      WKFROM = ds[0].wkFrom || null; rs.forEach(function (r) { r.wkm = 1; });
       if (ds[1]) {
         var n = rs.length;
         OVERSEAS = ds[1].overseas || {};
