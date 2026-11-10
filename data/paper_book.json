@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T12:42:59Z",
+ "asof": "2026-11-10T13:49:01Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 84.9,
   "peak": 117.38,
   "drawdown": 0.2767,
-  "open": 74.0,
+  "open": 77.75,
   "path": [
    100.01,
    101.63,
@@ -412,12 +412,12 @@
   ]
  },
  "record": {
-  "n": 462,
-  "clvN": 422,
-  "clvRet": -0.0122,
+  "n": 465,
+  "clvN": 424,
+  "clvRet": -0.0121,
   "clvT": -2.5,
   "clv": 0.0,
-  "beat": 0.31,
+  "beat": 0.311,
   "settled": 422,
   "w": 208,
   "l": 214,
@@ -428,23 +428,23 @@
   "risked": 393.5,
   "yield": -0.0343
  },
- "tEff": -2.33,
+ "tEff": -2.41,
  "corr": {
-  "rho": 0.004,
-  "n": 422,
-  "slates": 41,
-  "nEff": 366.9,
-  "avgSlate": 10.29
+  "rho": 0.001,
+  "n": 424,
+  "slates": 42,
+  "nEff": 398.5,
+  "avgSlate": 10.1
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 422,
+   "value": 424,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.2% t -2.33",
+   "value": "-1.2% t -2.41",
    "pass": false
   },
   {
@@ -554,7 +554,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 21,
+   "n": 22,
    "clvN": 17,
    "clvRet": -0.0251,
    "clvT": -1.29,
@@ -701,12 +701,12 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 84,
-   "clvN": 79,
-   "clvRet": -0.0178,
-   "clvT": -3.71,
-   "clv": -0.1,
-   "beat": 0.253,
+   "n": 85,
+   "clvN": 81,
+   "clvRet": -0.0173,
+   "clvT": -3.66,
+   "clv": -0.09,
+   "beat": 0.259,
    "settled": 79,
    "w": 41,
    "l": 38,
@@ -722,7 +722,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 62,
+   "n": 63,
    "clvN": 61,
    "clvRet": -0.0202,
    "clvT": -1.88,
@@ -758,7 +758,11 @@
    "edge": 6.7,
    "ev": 0.0061,
    "event": "Bybit Stockholm Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0219,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.5375
   },
   {
    "rule": "tennis-ml",
@@ -778,7 +782,11 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0294,
+   "clv": 1.5,
+   "beat": 1,
+   "close": 0.4575
   },
   {
    "rule": "tennis-ml",
@@ -880,6 +888,26 @@
    "event": null,
    "pass": false,
    "close": 228.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "187385",
+   "k": "2026-11-11T20:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Svitolina",
+   "a": "Muchova",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 135,
+   "bet": "Svitolina ML +135",
+   "placed": "2026-11-10T13:49:01Z",
+   "stake": 0.25,
+   "edge": 12.6,
+   "ev": 0.0032,
+   "event": "FAGE WTA Finals Indian Wells",
+   "pass": false
   },
   {
    "rule": "cfb-total",
@@ -1403,7 +1431,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 59.5
+   "close": 60.5
   },
   {
    "rule": "cfb-total",
@@ -1550,7 +1578,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": true,
-   "close": 40.5
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -1593,6 +1621,26 @@
    "event": null,
    "pass": true,
    "close": 38.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873053-4431431-ry",
+   "k": "2026-11-15T14:30:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DET",
+   "a": "NE",
+   "mk": "prop",
+   "side": "under",
+   "line": 53.5,
+   "price": -122.0,
+   "bet": "Corey Kiner under 53.5 rush yds -122",
+   "placed": "2026-11-10T13:48:00Z",
+   "stake": 2.25,
+   "edge": 28.7,
+   "ev": 0.1264,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nfl-spread",
@@ -1677,6 +1725,27 @@
    "event": null,
    "pass": false,
    "close": 5.5
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_10_MIN_GB",
+   "k": "2026-11-15T18:00:00Z",
+   "slate": "nfl:2026-11-15",
+   "h": "GB",
+   "a": "MIN",
+   "mk": "total",
+   "side": "under",
+   "line": 42.5,
+   "price": -104.0,
+   "bet": "under 42.5 -104",
+   "placed": "2026-11-10T13:48:53Z",
+   "stake": 1.25,
+   "edge": 4.4,
+   "ev": 0.0125,
+   "event": null,
+   "pass": false,
+   "close": 42.5
   },
   {
    "rule": "nfl-total",
@@ -17786,7 +17855,11 @@
    "edge": 6.7,
    "ev": 0.0061,
    "event": "Bybit Stockholm Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0219,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.5375
   },
   {
    "rule": "tennis-ml",
@@ -17806,7 +17879,11 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0294,
+   "clv": 1.5,
+   "beat": 1,
+   "close": 0.4575
   },
   {
    "rule": "tennis-ml",
@@ -17908,6 +17985,26 @@
    "event": null,
    "pass": false,
    "close": 228.5
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "187385",
+   "k": "2026-11-11T20:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Svitolina",
+   "a": "Muchova",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 135,
+   "bet": "Svitolina ML +135",
+   "placed": "2026-11-10T13:49:01Z",
+   "stake": 0.25,
+   "edge": 12.6,
+   "ev": 0.0032,
+   "event": "FAGE WTA Finals Indian Wells",
+   "pass": false
   },
   {
    "rule": "cfb-total",
@@ -18431,7 +18528,7 @@
    "ev": 0.1374,
    "event": null,
    "pass": false,
-   "close": 59.5
+   "close": 60.5
   },
   {
    "rule": "cfb-total",
@@ -18578,7 +18675,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": true,
-   "close": 40.5
+   "close": 39.5
   },
   {
    "rule": "cfb-total",
@@ -18621,6 +18718,26 @@
    "event": null,
    "pass": true,
    "close": 38.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873053-4431431-ry",
+   "k": "2026-11-15T14:30:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DET",
+   "a": "NE",
+   "mk": "prop",
+   "side": "under",
+   "line": 53.5,
+   "price": -122.0,
+   "bet": "Corey Kiner under 53.5 rush yds -122",
+   "placed": "2026-11-10T13:48:00Z",
+   "stake": 2.25,
+   "edge": 28.7,
+   "ev": 0.1264,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nfl-spread",
@@ -18705,6 +18822,27 @@
    "event": null,
    "pass": false,
    "close": 5.5
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_10_MIN_GB",
+   "k": "2026-11-15T18:00:00Z",
+   "slate": "nfl:2026-11-15",
+   "h": "GB",
+   "a": "MIN",
+   "mk": "total",
+   "side": "under",
+   "line": 42.5,
+   "price": -104.0,
+   "bet": "under 42.5 -104",
+   "placed": "2026-11-10T13:48:53Z",
+   "stake": 1.25,
+   "edge": 4.4,
+   "ev": 0.0125,
+   "event": null,
+   "pass": false,
+   "close": 42.5
   },
   {
    "rule": "nfl-total",
