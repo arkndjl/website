@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T17:07Z",
+ "asof": "2026-11-10T18:21Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 778,
+   "players": 780,
    "rows": 5265
   },
   "cfb": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2563,
+   "players": 2564,
    "rows": 16718
   },
   "nba": {
@@ -274,7 +274,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 9,
+     "flags": 8,
      "rows": 2141
     },
     "static/data/nfl-fantasy.json": {
@@ -282,11 +282,11 @@
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 70,
+     "flags": 69,
      "rows": 1790
     },
     "static/data/pctl-nfl.json": {
-     "flags": 68,
+     "flags": 67,
      "rows": 1719
     },
     "static/data/personnel/nfl.json": {
@@ -440,24 +440,6 @@
      "site": "MIN"
     },
     {
-     "d": "2026-11-10",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Dealt to Cincy",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Dealt to Cincy",
-      "kind": "trade"
-     },
-     "pid": "15951",
-     "player": "Arnold Ebiketie",
-     "pos": "WLB",
-     "rotowire": "CIN",
-     "site": "PHI"
-    },
-    {
      "d": "2026-11-03",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -542,24 +524,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Dealt to Cincy",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Dealt to Cincy",
-      "kind": "trade"
-     },
-     "pid": "15951",
-     "player": "Arnold Ebiketie",
-     "pos": "LB",
-     "rotowire": "CIN",
-     "site": "PHI"
     },
     {
      "d": "2026-10-12",
@@ -1678,12 +1642,12 @@
      "site": "BUF"
     },
     {
-     "d": "2026-11-07",
+     "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
      "flag": "released",
-     "head": "Cut loose by Saints",
-     "kind": "waived",
+     "head": "Will visit with Cowboys",
+     "kind": null,
      "move": {
       "d": "2026-11-07",
       "head": "Cut loose by Saints",
@@ -1744,24 +1708,6 @@
      "pos": "OL",
      "rotowire": "PHI",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Dealt to Cincy",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Dealt to Cincy",
-      "kind": "trade"
-     },
-     "pid": "15951",
-     "player": "Arnold Ebiketie",
-     "pos": "EDGE",
-     "rotowire": "CIN",
-     "site": "PHI"
     },
     {
      "d": "2026-09-09",
@@ -1852,6 +1798,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Still awaiting medical clearance",
+     "kind": null,
+     "move": {
+      "d": "2026-10-14",
+      "head": "Still rehabbing, no signing imminent",
+      "kind": "sign"
+     },
+     "pid": "11222",
+     "player": "Tyreek Hill",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIA"
     },
     {
      "d": "2026-10-26",
@@ -2766,24 +2730,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "Dealt to Cincy",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Dealt to Cincy",
-      "kind": "trade"
-     },
-     "pid": "15951",
-     "player": "Arnold Ebiketie",
-     "pos": "LB",
-     "rotowire": "CIN",
-     "site": "PHI"
     },
     {
      "d": "2026-10-12",
@@ -3866,12 +3812,12 @@
      "site": "BUF"
     },
     {
-     "d": "2026-11-07",
+     "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
      "flag": "released",
-     "head": "Cut loose by Saints",
-     "kind": "waived",
+     "head": "Will visit with Cowboys",
+     "kind": null,
      "move": {
       "d": "2026-11-07",
       "head": "Cut loose by Saints",
@@ -4418,7 +4364,7 @@
     }
    ],
    "joined": 0,
-   "players": 1391,
+   "players": 1392,
    "rows": 3188
   }
  }

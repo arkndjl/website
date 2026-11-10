@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-10T17:08:30Z",
+ "asof": "2026-11-10T18:22:21Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 84.26,
+  "now": 86.74,
   "peak": 117.38,
-  "drawdown": 0.2821,
-  "open": 76.5,
+  "drawdown": 0.2611,
+  "open": 80.0,
   "path": [
-   101.63,
    104.5,
    105.52,
    109.24,
@@ -408,25 +407,26 @@
    87.29,
    86.64,
    84.9,
-   84.26
+   84.26,
+   86.74
   ]
  },
  "record": {
-  "n": 465,
+  "n": 466,
   "clvN": 425,
   "clvRet": -0.0121,
   "clvT": -2.5,
   "clv": 0.01,
   "beat": 0.313,
-  "settled": 423,
-  "w": 208,
+  "settled": 424,
+  "w": 209,
   "l": 215,
   "p": 0,
-  "roi": -0.0251,
-  "roiT": -0.51,
-  "profit": -14.23,
-  "risked": 394.25,
-  "yield": -0.0361
+  "roi": -0.0204,
+  "roiT": -0.41,
+  "profit": -11.32,
+  "risked": 395.75,
+  "yield": -0.0286
  },
  "tEff": -2.41,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.5% vs -1.2% (SE 5.0)",
+   "value": "ROI -2.0% vs -1.2% (SE 5.0)",
    "pass": true
   }
  ],
@@ -707,22 +707,22 @@
    "clvT": -3.66,
    "clv": -0.04,
    "beat": 0.268,
-   "settled": 80,
-   "w": 41,
+   "settled": 81,
+   "w": 42,
    "l": 39,
    "p": 0,
-   "roi": 0.0638,
-   "roiT": 0.5,
-   "profit": -1.68,
-   "risked": 69.0,
-   "yield": -0.0244
+   "roi": 0.087,
+   "roiT": 0.68,
+   "profit": 1.23,
+   "risked": 70.5,
+   "yield": 0.0174
   },
   {
    "id": "nflprops-prop",
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 63,
+   "n": 64,
    "clvN": 61,
    "clvRet": -0.0202,
    "clvT": -1.88,
@@ -740,30 +740,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186752",
-   "k": "2026-11-10T15:00:00Z",
-   "slate": "tennis:2026-11-10",
-   "h": "Bronzetti",
-   "a": "Pareja",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 194,
-   "bet": "Bronzetti ML +194",
-   "placed": "2026-11-10T04:09:29Z",
-   "stake": 1.5,
-   "edge": 30.2,
-   "ev": 0.0283,
-   "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false,
-   "clvRet": 0.0584,
-   "clv": 4.2,
-   "beat": 1,
-   "close": 0.36
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -1289,7 +1265,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 74.5
+   "close": 73.5
   },
   {
    "rule": "cfb-total",
@@ -1457,7 +1433,7 @@
    "ev": 0.0569,
    "event": null,
    "pass": false,
-   "close": 58.5
+   "close": 57.5
   },
   {
    "rule": "cfb-total",
@@ -1583,7 +1559,7 @@
    "ev": 0.0102,
    "event": null,
    "pass": false,
-   "close": 67.5
+   "close": 66.5
   },
   {
    "rule": "cfb-total",
@@ -1751,9 +1727,57 @@
    "event": null,
    "pass": false,
    "close": 39.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873063-4361579-rc",
+   "k": "2026-11-15T21:25:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DAL",
+   "a": "SF",
+   "mk": "prop",
+   "side": "under",
+   "line": 2.5,
+   "price": 122.0,
+   "bet": "Javonte Williams under 2.5 rec +122",
+   "placed": "2026-11-10T18:21:00Z",
+   "stake": 5.0,
+   "edge": 10.6,
+   "ev": 0.2077,
+   "event": null,
+   "pass": false
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186752",
+   "k": "2026-11-10T15:00:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Bronzetti",
+   "a": "Pareja",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 194,
+   "bet": "Bronzetti ML +194",
+   "placed": "2026-11-10T04:09:29Z",
+   "stake": 1.5,
+   "edge": 30.2,
+   "ev": 0.0283,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false,
+   "clvRet": 0.0584,
+   "clv": 4.2,
+   "beat": 1,
+   "close": 0.36,
+   "score": "3-6 6-4 3-6",
+   "res": "w",
+   "ret": 1.94,
+   "profit": 2.91
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3436,32 +3460,6 @@
    "res": "w",
    "ret": 0.885,
    "profit": 0.2213
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873043-3930066-wy",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 10.5,
-   "price": -113.0,
-   "bet": "Van Jefferson under 10.5 rec yds -113",
-   "placed": "2026-11-08T05:44:00Z",
-   "stake": 0.25,
-   "edge": 19.6,
-   "ev": 0.0952,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0159,
-   "close": 8.5,
-   "score": 58.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -17899,7 +17897,11 @@
    "clvRet": 0.0584,
    "clv": 4.2,
    "beat": 1,
-   "close": 0.36
+   "close": 0.36,
+   "score": "3-6 6-4 3-6",
+   "res": "w",
+   "ret": 1.94,
+   "profit": 2.91
   },
   {
    "rule": "tennis-ml",
@@ -18426,7 +18428,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 74.5
+   "close": 73.5
   },
   {
    "rule": "cfb-total",
@@ -18594,7 +18596,7 @@
    "ev": 0.0569,
    "event": null,
    "pass": false,
-   "close": 58.5
+   "close": 57.5
   },
   {
    "rule": "cfb-total",
@@ -18720,7 +18722,7 @@
    "ev": 0.0102,
    "event": null,
    "pass": false,
-   "close": 67.5
+   "close": 66.5
   },
   {
    "rule": "cfb-total",
@@ -18888,6 +18890,26 @@
    "event": null,
    "pass": false,
    "close": 39.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873063-4361579-rc",
+   "k": "2026-11-15T21:25:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DAL",
+   "a": "SF",
+   "mk": "prop",
+   "side": "under",
+   "line": 2.5,
+   "price": 122.0,
+   "bet": "Javonte Williams under 2.5 rec +122",
+   "placed": "2026-11-10T18:21:00Z",
+   "stake": 5.0,
+   "edge": 10.6,
+   "ev": 0.2077,
+   "event": null,
+   "pass": false
   }
  ]
 }
