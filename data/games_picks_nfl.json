@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-10T21:26:16Z",
+ "asof": "2026-11-10T21:42:15Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -123,8 +123,8 @@
     "side": "away",
     "line": null,
     "price": 127.0,
-    "ev": 0.058,
-    "units": 3.25
+    "ev": 0.062,
+    "units": 4.0
    }
   },
   {
@@ -216,8 +216,8 @@
     "side": "away",
     "line": null,
     "price": 156.0,
-    "ev": 0.203,
-    "units": 1.25
+    "ev": 0.193,
+    "units": 1.0
    }
   },
   {
@@ -309,8 +309,15 @@
    "tm": 44.0,
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 42.5,
-   "close": 37.5,
-   "now": null
+   "close": 38.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 38.5,
+    "price": -104.0,
+    "ev": 0.129,
+    "units": 1.75
+   }
   },
   {
    "id": "2026_10_MIN_GB",
@@ -448,22 +455,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "2026_10_MIA_IND",
-   "sport": "nfl",
-   "kick": "2026-11-15T18:00:00Z",
-   "home": "IND",
-   "away": "MIA",
-   "mk": "total",
-   "side": "over",
-   "line": 37.5,
-   "price": -127.0,
-   "edge": 6.5,
-   "x": 1.5,
-   "why": "no edge at -127",
-   "m": 4.2,
-   "tm": 44.0
-  },
-  {
    "id": "2026_10_PIT_CIN",
    "sport": "nfl",
    "kick": "2026-11-16T01:20:00Z",
@@ -504,7 +495,7 @@
    "mk": "spread",
    "side": "away",
    "line": -7.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 3.4,
    "x": 4.0,
    "why": "edge under 4",
@@ -556,7 +547,7 @@
    "edge": 1.0,
    "x": 1.5,
    "why": "edge under 1.5",
-   "m": -3.4,
+   "m": -4.2,
    "tm": 45.5
   }
  ],
@@ -589,7 +580,7 @@
    "mk": "spread",
    "side": "away",
    "line": -7.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -648,22 +639,22 @@
   "2026_10_MIA_IND": {
    "mk": "total",
    "side": "over",
-   "line": 37.5,
-   "price": -127.0,
-   "edge": 6.5,
-   "ev": null,
-   "units": 0.0,
+   "line": 38.5,
+   "price": -104.0,
+   "ev": 0.129,
+   "edge": 5.5,
+   "units": 1.75,
    "home": "IND",
    "away": "MIA",
-   "state": "under"
+   "state": "pick"
   },
   "2026_10_MIN_GB": {
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": -108.0,
-   "ev": 0.182,
-   "edge": 7.3,
+   "price": -111.0,
+   "ev": 0.163,
+   "edge": 6.9,
    "units": 5.0,
    "home": "GB",
    "away": "MIN",
@@ -782,16 +773,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2959,
+  "snapshots": 2969,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1232,
-    "clvRet": -0.0159,
-    "clvT": -7.14,
+    "clvN": 1238,
+    "clvRet": -0.0161,
+    "clvT": -7.24,
     "clv": 0.45,
-    "beat": 0.356,
-    "still": 0.585
+    "beat": 0.354,
+    "still": 0.587
    },
    {
     "when": "6-24h",
@@ -2636,7 +2627,7 @@
    "tm": 44.0,
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 42.5,
-   "close": 37.5
+   "close": 38.5
   },
   {
    "id": "2026_10_MIN_GB",
@@ -2822,7 +2813,7 @@
     "scale": 1.0
    },
    "2026-11-12": {
-    "raw": 8.0,
+    "raw": 8.75,
     "scale": 1.0
    },
    "2026-11-13": {
