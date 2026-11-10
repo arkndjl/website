@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T03:31Z",
+ "asof": "2026-11-10T03:55Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,19 +274,19 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 7,
+     "flags": 9,
      "rows": 2149
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 9,
+     "flags": 11,
      "rows": 630
     },
     "static/data/nfl-war.json": {
-     "flags": 57,
+     "flags": 61,
      "rows": 1790
     },
     "static/data/pctl-nfl.json": {
-     "flags": 56,
+     "flags": 60,
      "rows": 1719
     },
     "static/data/personnel/nfl.json": {
@@ -334,6 +334,42 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "19608",
+     "player": "Carsen Ryan",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "19442",
+     "player": "Jordan Hudson",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "DAL"
     },
     {
      "d": "2026-09-14",
@@ -614,6 +650,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "PHI"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "19608",
+     "player": "Carsen Ryan",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
     },
     {
      "d": "2026-09-15",
@@ -1138,6 +1192,42 @@
      "site": "IND"
     },
     {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "19442",
+     "player": "Jordan Hudson",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "DAL"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "14453",
+     "player": "Salvon Ahmed",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "CHI"
+    },
+    {
      "d": "2026-10-21",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1298,6 +1388,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "LA"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "16035",
+     "player": "James Mitchell",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "DAL"
     },
     {
      "d": "2026-10-24",
@@ -2552,6 +2660,24 @@
      "site": "PHI"
     },
     {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "19608",
+     "player": "Carsen Ryan",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
+    },
+    {
      "d": "2026-09-15",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3092,6 +3218,42 @@
      "site": "IND"
     },
     {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "19442",
+     "player": "Jordan Hudson",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "DAL"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "14453",
+     "player": "Salvon Ahmed",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "CHI"
+    },
+    {
      "d": "2026-10-21",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3216,6 +3378,24 @@
      "pos": "LB",
      "rotowire": "FA",
      "site": "HOU"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "16035",
+     "player": "James Mitchell",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "DAL"
     },
     {
      "d": "2026-10-24",
@@ -3398,6 +3578,24 @@
      "site": "NO"
     },
     {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "16035",
+     "player": "James Mitchell",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "DAL"
+    },
+    {
      "d": "2026-11-02",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3504,6 +3702,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "LA"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "19608",
+     "player": "Carsen Ryan",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
     }
    ],
    "joined": 0,
