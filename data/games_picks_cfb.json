@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T02:52:39Z",
+ "asof": "2026-11-10T03:32:32Z",
  "recenter": {
-  "week": 0.13
+  "week": 0.12
  },
  "monitor": {
   "clocks": {
@@ -539,7 +539,14 @@
    "flagged": "2026-11-08T15:27:24Z",
    "betTo": 58.0,
    "close": 60.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 60.5,
+    "price": -117.0,
+    "ev": 0.01,
+    "units": 0.25
+   }
   },
   {
    "id": "401858526",
@@ -822,7 +829,14 @@
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 42.5,
    "close": 42.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 42.5,
+    "price": -100.0,
+    "ev": 0.014,
+    "units": 0.5
+   }
   },
   {
    "id": "401860916",
@@ -934,7 +948,7 @@
    "tmRaw": 56.6,
    "flagged": "2026-11-08T10:21:41Z",
    "betTo": -1.0,
-   "close": 1.5,
+   "close": -1.5,
    "now": null
   },
   {
@@ -1040,14 +1054,14 @@
    "tmRaw": 57,
    "flagged": "2026-11-09T18:42:58Z",
    "betTo": 61.5,
-   "close": 66.5,
+   "close": 67.5,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 66.5,
-    "price": -100.0,
-    "ev": 0.032,
-    "units": 0.75
+    "line": 67.5,
+    "price": -115.0,
+    "ev": 0.022,
+    "units": 0.25
    }
   },
   {
@@ -1225,14 +1239,14 @@
    "tmRaw": 63.8,
    "flagged": "2026-11-08T20:43:33Z",
    "betTo": 65.0,
-   "close": 72.5,
+   "close": 73.5,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 72.5,
-    "price": -100.0,
-    "ev": 0.077,
-    "units": 4.5
+    "line": 73.5,
+    "price": -111.0,
+    "ev": 0.048,
+    "units": 1.75
    }
   },
   {
@@ -1265,8 +1279,8 @@
     "side": "over",
     "line": 46.5,
     "price": 102.0,
-    "ev": 0.018,
-    "units": 0.75
+    "ev": 0.012,
+    "units": 0.25
    }
   },
   {
@@ -1313,22 +1327,6 @@
    "why": "no edge at -106",
    "m": -2.3,
    "tm": 68.0
-  },
-  {
-   "id": "401858298",
-   "sport": "cfb",
-   "kick": "2026-11-15T00:00:00.000Z",
-   "home": "North Carolina",
-   "away": "Louisville",
-   "mk": "total",
-   "side": "under",
-   "line": 60.5,
-   "price": -117.0,
-   "edge": 5.5,
-   "x": 3.0,
-   "why": "no edge at -117",
-   "m": -1.3,
-   "tm": 55.0
   },
   {
    "id": "401858518",
@@ -1459,20 +1457,20 @@
    "tm": 56.2
   },
   {
-   "id": "401860915",
+   "id": "401858525",
    "sport": "cfb",
-   "kick": "2026-11-15T02:30:00.000Z",
-   "home": "San Diego State",
-   "away": "Utah State",
+   "kick": "2026-11-14T17:30:00.000Z",
+   "home": "Rutgers",
+   "away": "Nebraska",
    "mk": "total",
    "side": "over",
-   "line": 42.5,
-   "price": -100.0,
-   "edge": 3.4,
+   "line": 51.5,
+   "price": -117.0,
+   "edge": 3.3,
    "x": 3.0,
-   "why": "no edge at -100",
-   "m": -0.1,
-   "tm": 45.9
+   "why": "no edge at -117",
+   "m": -16.2,
+   "tm": 54.8
   },
   {
    "id": "401856883",
@@ -1483,10 +1481,10 @@
    "mk": "spread",
    "side": "home",
    "line": 15.5,
-   "price": -117.0,
+   "price": -115.0,
    "edge": 6.3,
    "x": 6.0,
-   "why": "no edge at -117",
+   "why": "no edge at -115",
    "m": 21.8,
    "tm": 51.6
   },
@@ -1627,7 +1625,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": 108.0,
+   "price": 106.0,
    "edge": 4.1,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1697,6 +1695,22 @@
    "why": "edge under 3",
    "m": -0.9,
    "tm": 48.3
+  },
+  {
+   "id": "401856882",
+   "sport": "cfb",
+   "kick": "2026-11-15T00:45:00.000Z",
+   "home": "Arkansas",
+   "away": "South Carolina",
+   "mk": "total",
+   "side": "over",
+   "line": 51.5,
+   "price": -108.0,
+   "edge": 1.7,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": -7.8,
+   "tm": 53.2
   }
  ],
  "games": {
@@ -1752,7 +1766,7 @@
    "mk": "spread",
    "side": "home",
    "line": 15.5,
-   "price": -117.0,
+   "price": -115.0,
    "edge": 6.3,
    "ev": null,
    "units": 0.0,
@@ -1799,11 +1813,11 @@
   "401856863": {
    "mk": "total",
    "side": "under",
-   "line": 72.5,
-   "price": -100.0,
-   "ev": 0.077,
-   "edge": 10.7,
-   "units": 4.5,
+   "line": 73.5,
+   "price": -111.0,
+   "ev": 0.048,
+   "edge": 11.7,
+   "units": 1.75,
    "home": "Oklahoma State",
    "away": "Texas Tech",
    "state": "pick"
@@ -1813,9 +1827,9 @@
    "side": "over",
    "line": 46.5,
    "price": 102.0,
-   "ev": 0.018,
+   "ev": 0.012,
    "edge": 3.3,
-   "units": 0.75,
+   "units": 0.25,
    "home": "Ohio State",
    "away": "Northwestern",
    "state": "pick"
@@ -1861,12 +1875,12 @@
    "side": "under",
    "line": 60.5,
    "price": -117.0,
+   "ev": 0.01,
    "edge": 5.5,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "North Carolina",
    "away": "Louisville",
-   "state": "under"
+   "state": "pick"
   },
   "401856884": {
    "mk": "total",
@@ -2004,7 +2018,7 @@
    "mk": "spread",
    "side": "away",
    "line": 17.5,
-   "price": -115.0,
+   "price": -117.0,
    "edge": 1.3,
    "ev": null,
    "units": 0.0,
@@ -2112,7 +2126,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2148,7 +2162,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": 108.0,
+   "price": 106.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -2161,19 +2175,19 @@
    "side": "over",
    "line": 42.5,
    "price": -100.0,
+   "ev": 0.014,
    "edge": 3.4,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.5,
    "home": "San Diego State",
    "away": "Utah State",
-   "state": "under"
+   "state": "pick"
   },
   "401858525": {
-   "mk": "spread",
-   "side": "away",
-   "line": -13.5,
-   "price": -106.0,
-   "edge": 2.7,
+   "mk": "total",
+   "side": "over",
+   "line": 51.5,
+   "price": -117.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "Rutgers",
@@ -2328,7 +2342,7 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -120.0,
+   "price": -117.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -2363,11 +2377,11 @@
   "401860917": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -100.0,
-   "ev": 0.032,
-   "edge": 8.1,
-   "units": 0.75,
+   "line": 67.5,
+   "price": -115.0,
+   "ev": 0.022,
+   "edge": 9.1,
+   "units": 0.25,
    "home": "Washington State",
    "away": "Colorado State",
    "state": "pick"
@@ -2375,9 +2389,9 @@
   "401866458": {
    "mk": "spread",
    "side": "away",
-   "line": -14.5,
-   "price": 104.0,
-   "edge": 2.6,
+   "line": -15.5,
+   "price": 106.0,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "Akron",
@@ -2533,22 +2547,22 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 14071,
+  "snapshots": 14108,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2890,
-    "clvRet": -0.0473,
-    "clvT": -31.51,
-    "clv": 0.2,
-    "beat": 0.342,
-    "still": 0.39
+    "clvN": 2899,
+    "clvRet": -0.0497,
+    "clvT": -33.58,
+    "clv": 0.15,
+    "beat": 0.33,
+    "still": 0.4
    },
    {
     "when": "6-24h",
     "clvN": 360,
-    "clvRet": -0.0591,
-    "clvT": -17.72,
+    "clvRet": -0.059,
+    "clvT": -17.62,
     "clv": 0.04,
     "beat": 0.167,
     "still": 0.667
@@ -4908,7 +4922,7 @@
    "tmRaw": 56.6,
    "flagged": "2026-11-08T10:21:41Z",
    "betTo": -1.0,
-   "close": 1.5
+   "close": -1.5
   },
   {
    "id": "401858523",
@@ -5109,7 +5123,7 @@
    "tmRaw": 63.8,
    "flagged": "2026-11-08T20:43:33Z",
    "betTo": 65.0,
-   "close": 72.5
+   "close": 73.5
   },
   {
    "id": "401860916",
@@ -5460,7 +5474,7 @@
    "tmRaw": 57,
    "flagged": "2026-11-09T18:42:58Z",
    "betTo": 61.5,
-   "close": 66.5
+   "close": 67.5
   },
   {
    "id": "401864540",
@@ -5545,11 +5559,6 @@
  "nightCap": {
   "cap": 40.0,
   "nights": {
-   "2026-11-09": {
-    "raw": 2.75,
-    "scale": 1.0,
-    "down": 22.75
-   },
    "2026-11-11": {
     "raw": 0.25,
     "scale": 1.0
@@ -5559,7 +5568,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 34.75,
+    "raw": 24.25,
     "scale": 1.0
    }
   }
