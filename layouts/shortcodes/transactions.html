@@ -1,0 +1,46 @@
+{{- /* Transactions: every move this season, newest first, from data/transactions/<sport>.json (scripts/transactions.py:
+       RotoWire's news-feed moves for nfl/nba/nhl/cfb/cbb, Transfermarkt transfers for soccer). Trades carry the draft
+       picks in the deal: each club and the picks it gets ("PHI '27 R1, '29 R2"; * conditional). */ -}}
+{{- $sport := .Get "sport" | default "nfl" -}}
+{{- $d := index (site.Data.transactions | default dict) $sport -}}
+{{- with $d -}}
+{{- $college := in (slice "cfb" "cbb") $sport -}}
+{{- $soccer := eq $sport "soccer" -}}
+{{- $pro := in (slice "nfl" "nba" "nhl") $sport -}}
+{{- $icon := cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond $soccer "soccer" "football")) -}}
+{{- $filter := cond $soccer "Move,Lg,From,To" (cond $college "Move,Pos,Team" "Move,Pos,From,To") -}}
+{{- $kt := dict "trade" "traded" "claim" "claimed off waivers" "release" "waived, released or cut" "sign" "signed (contract, extension, active roster)" "practice" "practice squad" "up" "called up / promoted" "down" "sent down / assigned" "exit" (cond $college "left the program (portal, dismissed, retired)" "retired, overseas or parted ways") "transfer" "transfer or loan" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transactions") "icon" $icon "filter" $filter "tab" ($.Get "tab") "gfxCols" (cond $soccer "Date,Player,From,To,Fee" "Date,Player,Pos,Move,From,To,Picks") "gfxDate" (lower ((time .asof).Format "Jan 2")) "gfxMax" "30") -}}
+<table class="cfb__table tx">
+  <thead><tr>
+    <th>Date</th><th>Player</th>{{ if not $soccer }}<th>Pos</th>{{ end }}<th>Move</th>
+    {{- if $soccer }}<th title="league of the club he joined (else the one he left)">Lg</th>{{ end }}
+    {{- if $college }}<th>Team</th>{{ else }}<th>From</th><th>To</th>{{ end }}
+    {{- if $soccer }}<th title="transfer fee, EUR (Transfermarkt)">Fee</th><th class="tx__x" title="market value, EUR (Transfermarkt)">MV</th>{{ end }}
+    {{- if $pro }}<th title="draft picks in the deal: each club and the picks it gets (* conditional)">Picks</th>{{ end }}
+  </tr></thead>
+  <tbody>
+  {{- range .rows }}
+  <tr>
+    <td class="cfb__num" data-v="{{ .d }}">{{ lower ((time .d).Format "Jan 2") }}</td>
+    <td class="cfb__name"{{ with .h }} title="{{ . }}"{{ end }}><b>{{ .n }}</b></td>
+    {{- if not $soccer }}<td>{{ .pos }}</td>{{ end }}
+    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}</span></td>
+    {{- if $soccer }}<td>{{ .lg }}</td>{{ end }}
+    {{- if $college }}
+    <td>{{ .fr | default .to }}</td>
+    {{- else }}
+    <td>{{ with .fr }}<span class="cfb__team">{{ if $pro }}<img class="cfb__logo" src="/img/{{ $sport }}/{{ lower . }}.png" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ end }}</td>
+    <td>{{ with .to }}<span class="cfb__team">{{ if $pro }}<img class="cfb__logo" src="/img/{{ $sport }}/{{ lower . }}.png" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ end }}</td>
+    {{- end }}
+    {{- if $soccer }}
+    <td class="cfb__num" data-v="{{ .fee | default 0 }}">{{ with .fee }}{{ if ge . 1e6 }}€{{ lang.FormatNumber 1 (div . 1e6) }}m{{ else if gt . 0 }}€{{ lang.FormatNumber 0 (div . 1e3) }}k{{ else }}free{{ end }}{{ end }}</td>
+    <td class="cfb__num tx__x" data-v="{{ .mv | default 0 }}">{{ with .mv }}{{ if ge . 1e6 }}€{{ lang.FormatNumber 1 (div . 1e6) }}m{{ else }}€{{ lang.FormatNumber 0 (div . 1e3) }}k{{ end }}{{ end }}</td>
+    {{- end }}
+    {{- if $pro }}<td class="tx__pk">{{ .pk }}</td>{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "transactions.%s" $sport) "note" (cond $soccer "Transfermarkt · " "RotoWire · ") "about" (cond $soccer "Transfermarkt transfers since Jun 1 for clubs in the site's leagues." "RotoWire news-feed moves this season, read again with the current patterns; trade picks read from the item text, data/trade_picks.json hand entries win.")) -}}
+{{- end -}}

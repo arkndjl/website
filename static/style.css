@@ -4582,3 +4582,12 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
   .libstudy__meta { grid-template-columns: 1fr; }
   .libstudy__meta dt { margin-top: 4px; }
 }
+
+/* Transactions tab (layouts/shortcodes/transactions.html): move chips, trades teal, exits lilac */
+.tx__k { display: inline-block; min-width: 7ch; padding: 0 4px; text-align: center; color: #fff; background: var(--win-well); border: 1px solid #241a3a; }
+.tx__k--trade { background: #2bb59a; color: #241a3a; }
+.tx__k--claim { background: #7fe0c8; color: #241a3a; }
+.tx__k--release, .tx__k--exit { background: #b89cf0; color: #241a3a; }
+.tx__k--sign, .tx__k--transfer, .tx__k--loan { background: #6b54a0; }
+.tx__pk { white-space: nowrap; }
+@media (max-width: 640px) { .tx .tx__x { display: none; } }

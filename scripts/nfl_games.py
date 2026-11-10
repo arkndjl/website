@@ -1397,6 +1397,34 @@ def qb_depth(last):
         k = (r['gsis_id'], r['player_name'])
         if k not in dc[team(r['team'])]:
             dc[team(r['team'])].append(k)
+    return qb_moves(dc)
+
+
+def qb_moves(dc):
+    """The chart snapshot lags a trade by days: a QB RotoWire has moved in the last 30 days (a trade, claim or
+    release, scripts/rotowire_moves.py) leaves his old club's list, so the next man up starts (Cousins LV -> MIN
+    Nov 10 2026: Mendoza starts for LV), and joins the new club's list last. Never raises."""
+    try:
+        import rotowire_moves as RM
+        R = RM.Ref('nfl')
+        add = []
+        for t in list(dc):
+            keep = []
+            for g, nm in dc[t]:
+                c = R.check(nm, t, 'QB')
+                if c and c['flag'] in ('moved', 'released') and c['kind'] and c['d'] >= R.fresh:
+                    to = {'LAR': 'LA'}.get(c['rotowire'], c['rotowire'])
+                    print(f'nfl games: QB {nm} off the {t} chart ({c["head"]})')
+                    if c['flag'] == 'moved' and to in DIV_OF:
+                        add.append((to, (g, nm)))
+                    continue
+                keep.append((g, nm))
+            dc[t] = keep
+        for to, q in add:
+            if q not in dc[to]:
+                dc[to].append(q)
+    except Exception as e:  # noqa: BLE001
+        print('nfl games: qb moves skipped', repr(e))
     return dc
 
 

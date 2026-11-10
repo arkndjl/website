@@ -51,7 +51,7 @@ import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { returning, draftsBy } from './cfb_ret_war.mjs';
-import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades, fetchNflRecentR1 } from './cfb_teams.mjs';
+import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades, fetchNflRecentR1, ledgerNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
@@ -2311,13 +2311,14 @@ const advanced = await source('advanced.json', () => cfbd(`stats/season/advanced
 // 2027 draft order (projected from current NFL standings) and team needs (depth charts + contracts), ESPN
 const tank = await source('nfl_order.json', async () => { const o = await fetchNflOrder(SEASON); o.needs = await fetchNflNeeds(o.teams); return o; });
 // picks already traded for that draft (Wikipedia's list of trades): each moves to the team that holds it, keeping its original team
-const nflTrades = await source(`nfl_trades${SEASON + 1}.json`, () => fetchNflTrades(SEASON + 1));
+// plus this season's deals from the transactions log that Wikipedia hasn't listed yet
+const nflTrades = ledgerNflTrades(SEASON + 1, await source(`nfl_trades${SEASON + 1}.json`, () => fetchNflTrades(SEASON + 1)));
 if (tank) applyNflTrades(tank.order, nflTrades, tank.teams);
 // each team's round-1 positions in the last two drafts (nflverse): the mock's repeat-position term (REPEAT_LN)
 const recentR1 = await source(`nfl_r1_${SEASON + 1}.json`, () => fetchNflRecentR1(SEASON + 1));
 if (tank && recentR1) tank.recentR1 = recentR1;
 // next year's picks already traded (the mock's projected trades can only send next-year picks a team still holds)
-const nflTradesNext = await source(`nfl_trades${SEASON + 2}.json`, () => fetchNflTrades(SEASON + 2));
+const nflTradesNext = ledgerNflTrades(SEASON + 2, await source(`nfl_trades${SEASON + 2}.json`, () => fetchNflTrades(SEASON + 2)));
 // recruiting (CFBD, 247 composite): every high school and JUCO class since 2019, keyed by ESPN athlete id.
 // Past classes never change, so each is fetched once and cached; the newest class refreshes each run.
 const recruitNames = [];   // [name, school, record]: most FCS recruits carry no athlete id
