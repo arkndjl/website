@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-10T04:26:12Z",
+ "asof": "2026-11-10T04:30:32Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -94,80 +94,30 @@
    }
   }
  },
- "picks": [
-  {
-   "id": "2026_09_BUF_MIN",
-   "espn": "401873051",
-   "sport": "nfl",
-   "kick": "2026-11-10T01:15:00Z",
-   "home": "MIN",
-   "away": "BUF",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 163.0,
-   "p": 0.461,
-   "ev": 0.212,
-   "units": 2.75,
-   "edge": 6.4,
-   "x": 4.0,
-   "pDU": 0.3977,
-   "evDU": 0.0459,
-   "m": 2.9,
-   "tm": 47.3,
-   "flagged": "2026-11-03T10:48:02Z",
-   "close": -3.5,
-   "now": null
-  },
-  {
-   "id": "2026_09_BUF_MIN",
-   "espn": "401873051",
-   "sport": "nfl",
-   "kick": "2026-11-10T01:15:00Z",
-   "home": "MIN",
-   "away": "BUF",
-   "mk": "total",
-   "side": "over",
-   "line": 45.5,
-   "price": 104.0,
-   "p": 0.525,
-   "ev": 0.07,
-   "units": 0.25,
-   "edge": 1.7,
-   "x": 1.5,
-   "pDU": 0.5075,
-   "evDU": 0.0353,
-   "m": 2.1,
-   "tm": 47.2,
-   "flagged": "2026-11-04T01:07:06Z",
-   "betTo": 45.5,
-   "close": 45.5,
-   "now": null
-  }
- ],
+ "picks": [],
  "withdrawn": [],
  "board": [],
  "games": {},
  "record": {
-  "n": 21,
+  "n": 23,
   "w": 7,
-  "l": 14,
-  "units": -7.0,
-  "roi": -0.332,
-  "t": -1.57,
-  "ev": 0.077,
+  "l": 16,
+  "units": -9.0,
+  "roi": -0.39,
+  "t": -1.98,
+  "ev": 0.083,
   "sized": {
-   "units": -1.4,
-   "risked": 30.0,
-   "roi": -0.046,
-   "bank": 0.9838
+   "units": -4.4,
+   "risked": 33.0,
+   "roi": -0.133,
+   "bank": 0.9543
   },
-  "clvN": 21,
+  "clvN": 23,
   "clvRet": -0.0129,
-  "clvT": -0.74,
-  "clv": -0.31,
-  "beat": 0.286,
-  "still": 0.286,
+  "clvT": -0.8,
+  "clv": -0.29,
+  "beat": 0.261,
+  "still": 0.304,
   "byMarket": {
    "spread": {
     "clvN": 0,
@@ -179,22 +129,22 @@
     "n": 0
    },
    "ml": {
-    "clvN": 5,
-    "clvRet": 0.035,
-    "clvT": 1.34,
+    "clvN": 6,
+    "clvRet": 0.0217,
+    "clvT": 0.86,
     "clv": null,
-    "beat": 0.6,
+    "beat": 0.5,
     "still": 0.0,
-    "n": 5
+    "n": 6
    },
    "total": {
-    "clvN": 16,
-    "clvRet": -0.0279,
-    "clvT": -1.37,
-    "clv": -0.31,
-    "beat": 0.188,
-    "still": 0.375,
-    "n": 16
+    "clvN": 17,
+    "clvRet": -0.0251,
+    "clvT": -1.29,
+    "clv": -0.29,
+    "beat": 0.176,
+    "still": 0.412,
+    "n": 17
    }
   }
  },
@@ -241,6 +191,75 @@
   ]
  },
  "recent": [
+  {
+   "id": "2026_09_BUF_MIN",
+   "espn": "401873051",
+   "sport": "nfl",
+   "kick": "2026-11-10T01:15:00Z",
+   "home": "MIN",
+   "away": "BUF",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 163.0,
+   "p": 0.461,
+   "ev": 0.212,
+   "units": 2.75,
+   "edge": 6.4,
+   "x": 4.0,
+   "pDU": 0.3977,
+   "evDU": 0.0459,
+   "m": 2.9,
+   "tm": 47.3,
+   "flagged": "2026-11-03T10:48:02Z",
+   "close": -3.5,
+   "score": [
+    23.0,
+    6.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "closeML": [
+    174,
+    -178
+   ],
+   "clvRet": -0.0452,
+   "clv": null,
+   "beat": -1
+  },
+  {
+   "id": "2026_09_BUF_MIN",
+   "espn": "401873051",
+   "sport": "nfl",
+   "kick": "2026-11-10T01:15:00Z",
+   "home": "MIN",
+   "away": "BUF",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": 104.0,
+   "p": 0.525,
+   "ev": 0.07,
+   "units": 0.25,
+   "edge": 1.7,
+   "x": 1.5,
+   "pDU": 0.5075,
+   "evDU": 0.0353,
+   "m": 2.1,
+   "tm": 47.2,
+   "flagged": "2026-11-04T01:07:06Z",
+   "betTo": 45.5,
+   "close": 45.5,
+   "score": [
+    23.0,
+    6.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": 0.0203,
+   "clv": 0.0,
+   "beat": 0
+  },
   {
    "id": "2026_09_TB_CHI",
    "espn": "401873050",
@@ -1630,7 +1649,20 @@
    "m": 2.9,
    "tm": 47.3,
    "flagged": "2026-11-03T10:48:02Z",
-   "close": -3.5
+   "close": -3.5,
+   "score": [
+    23.0,
+    6.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "closeML": [
+    174,
+    -178
+   ],
+   "clvRet": -0.0452,
+   "clv": null,
+   "beat": -1
   },
   {
    "id": "2026_09_NYJ_KC",
@@ -1758,7 +1790,16 @@
    "tm": 47.2,
    "flagged": "2026-11-04T01:07:06Z",
    "betTo": 45.5,
-   "close": 45.5
+   "close": 45.5,
+   "score": [
+    23.0,
+    6.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": 0.0203,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_09_TB_CHI",
@@ -1873,16 +1914,12 @@
     "raw": 2.75,
     "scale": 1.0
    },
-   "2026-11-11": {
-    "raw": 0.25,
-    "scale": 1.0
-   },
    "2026-11-13": {
     "raw": 5.0,
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 26.75,
+    "raw": 22.25,
     "scale": 1.0
    }
   }
