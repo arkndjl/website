@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T21:39:56Z",
+ "asof": "2026-11-10T21:42:36Z",
  "recenter": {
   "week": 0.17
  },
@@ -920,8 +920,8 @@
     "side": "over",
     "line": 49.5,
     "price": -108.0,
-    "ev": 0.016,
-    "units": 0.75
+    "ev": 0.012,
+    "units": 0.25
    }
   },
   {
@@ -1562,6 +1562,22 @@
    "tm": 45.8
   },
   {
+   "id": "401866458",
+   "sport": "cfb",
+   "kick": "2026-11-11T00:00:00.000Z",
+   "home": "Akron",
+   "away": "Western Michigan",
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -104.0,
+   "edge": 3.0,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": -17.1,
+   "tm": 47.5
+  },
+  {
    "id": "401856885",
    "sport": "cfb",
    "kick": "2026-11-15T00:30:00.000Z",
@@ -1586,7 +1602,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -113.0,
+   "price": -115.0,
    "edge": 5.5,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1730,7 +1746,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": 106.0,
+   "price": 104.0,
    "edge": 4.1,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1752,22 +1768,6 @@
    "why": "edge under 6 (season: late)",
    "m": -8.5,
    "tm": 57.8
-  },
-  {
-   "id": "401866458",
-   "sport": "cfb",
-   "kick": "2026-11-11T00:00:00.000Z",
-   "home": "Akron",
-   "away": "Western Michigan",
-   "mk": "total",
-   "side": "under",
-   "line": 49.5,
-   "price": -100.0,
-   "edge": 2.0,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -17.1,
-   "tm": 47.5
   },
   {
    "id": "401856887",
@@ -1858,7 +1858,7 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 1.4,
    "x": 3.0,
    "why": "edge under 3",
@@ -1904,9 +1904,9 @@
    "side": "over",
    "line": 49.5,
    "price": -108.0,
-   "ev": 0.016,
+   "ev": 0.012,
    "edge": 4.7,
-   "units": 0.75,
+   "units": 0.25,
    "home": "Indiana",
    "away": "USC",
    "state": "pick"
@@ -2035,7 +2035,7 @@
    "mk": "spread",
    "side": "away",
    "line": -16.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2299,7 +2299,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -113.0,
+   "price": -115.0,
    "edge": 5.5,
    "ev": null,
    "units": 0.0,
@@ -2347,7 +2347,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": 106.0,
+   "price": 104.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -2515,7 +2515,7 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2574,9 +2574,9 @@
   "401866458": {
    "mk": "total",
    "side": "under",
-   "line": 49.5,
-   "price": -100.0,
-   "edge": 2.0,
+   "line": 50.5,
+   "price": -104.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Akron",
@@ -2732,13 +2732,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15289,
+  "snapshots": 15302,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3151,
+    "clvN": 3153,
     "clvRet": -0.0484,
-    "clvT": -34.05,
+    "clvT": -34.09,
     "clv": 0.2,
     "beat": 0.313,
     "still": 0.434
@@ -5876,11 +5876,11 @@
   "cap": 40.0,
   "nights": {
    "2026-11-10": {
-    "raw": 3.0,
+    "raw": 2.75,
     "scale": 1.0
    },
    "2026-11-12": {
-    "raw": 8.0,
+    "raw": 8.75,
     "scale": 1.0
    },
    "2026-11-13": {
@@ -5888,7 +5888,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 38.5,
+    "raw": 38.0,
     "scale": 1.0
    },
    "2026-11-15": {
