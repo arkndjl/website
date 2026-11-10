@@ -1,10 +1,12 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Weekly movement on the player and prospect boards: each row gets its board metric as of 7 days back.
+"""Weekly movement on the player and prospect boards: each row gets its board metric as of the sport's last weekly
+post day (scripts/rank_moves.py POST: CBB Mon, NBA Tue, NFL Thu, soccer Fri, tennis Sat, CS2 Sun; on the post day
+itself, the one a week back), or 7 days back for a sport with no post day (NHL, hockey prospects).
 
 Run after a board's builders, before the commit. Each board keeps its history in scripts/data/moves/<board>.json
 ({season, hist: {date: {id: value}}}), stored only when it changes and pruned to the week window plus the snapshot
 just before it (scripts/rank_moves.py does the same for the ARK Rankings). Rows get `w0` (the value as of the
-snapshot on or before 7 days ago); the row list's file gets `wkFrom` (that snapshot's date). A row with no `w0` while
+last snapshot on or before that day); the row list's file gets `wkFrom` (that snapshot's date). A row with no `w0` while
 `wkFrom` is set is new to the board. The page works out the change: FV boards show FV now minus `w0`; leaderboards
 re-rank the rows in view by `w0` and show the rank change, so the move counts within the filters, like RK.
 
@@ -18,6 +20,9 @@ import json
 import os
 import subprocess
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from rank_moves import cutoff, today as et_today   # noqa: E402  (the weekly post days, POST)
 
 DAYS = 7
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -124,14 +129,14 @@ def regrade(hist, cur, names):
                     s[k] = round(s[k] + dv, 4)
 
 
-def step(h, cur, day, days=DAYS, fv=()):
+def step(h, cur, day, days=DAYS, fv=(), sport=None):
     """adds today's snapshot to history h (on change), prunes, returns (h, base date or None)"""
     hist = dict(sorted((h.get('hist') or {}).items()))
     if fv and hist:
         regrade(hist, cur, fv)
     if not hist or hist[max(hist)] != cur:
         hist[day.isoformat()] = cur
-    cut = (day - dt.timedelta(days=days)).isoformat()
+    cut = cutoff(day, sport, days).isoformat()
     back = [k for k in hist if k <= cut]
     h['hist'] = {k: v for k, v in hist.items() if k > cut or (back and k == back[-1])}
     return h, (back[-1] if back else None)
@@ -178,7 +183,7 @@ def update(board, day=None, d=None, h=None, write=True):
     s = season_of(d, path)
     if h.get('season') != s:                # a new season (or a first run) starts the history over
         h = {'season': s, 'hist': {}}
-    h, since = step(h, snap(d, spec), day or dt.datetime.now(dt.timezone.utc).date(), fv=graded(spec))
+    h, since = step(h, snap(d, spec), day or et_today(), fv=graded(spec), sport=board)
     mark(d, spec, h['hist'].get(since) if since else None, since)
     if write:
         with open(full, 'w', encoding='utf-8') as f:       # the builders' format: compact, UTF-8 as is
@@ -205,7 +210,7 @@ def _git_versions(path, since):
 
 
 def seed(boards):
-    today = dt.datetime.now(dt.timezone.utc).date()
+    today = et_today()
     since = (today - dt.timedelta(days=DAYS + 3)).isoformat()
     for board in boards:
         pat, spec = BOARDS[board]
@@ -219,7 +224,7 @@ def seed(boards):
             s = season_of(d, path)
             if h.get('season') != s:
                 h = {'season': s, 'hist': {}}
-            h, _ = step(h, snap(d, spec), dt.date.fromisoformat(day), fv=graded(spec))
+            h, _ = step(h, snap(d, spec), dt.date.fromisoformat(day), fv=graded(spec), sport=board)
         save_hist(board, h)
         update(board, today)
 

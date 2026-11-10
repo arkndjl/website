@@ -1,5 +1,5 @@
 {{- /* weekly rank change cell for a server-rendered leaderboard (scripts/board_moves.py): wr = rank by the metric as of
-       .from (7 days back), rk = rank now; the hover gives the date, the rank then and the metric change. no w0 = new.
+       .from (the last weekly post day, scripts/rank_moves.py POST), rk = rank now; the hover gives the date, the rank then and the metric change. no w0 = new.
        dict "r" row "from" wkFrom date "v" metric field "label" its name "fmt" printf for the change */ -}}
 {{- $r := .r -}}
 {{- with .from -}}

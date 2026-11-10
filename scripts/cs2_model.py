@@ -580,7 +580,7 @@ def build():
             _old = json.loads(OUT.read_text())
         except (OSError, ValueError):
             _old = None
-        rank_moves.apply(out, teams, _old, lambda r: r["k"], lambda r: r["ark"])
+        rank_moves.apply(out, teams, _old, lambda r: r["k"], lambda r: r["ark"], sport='cs2')
     except Exception as e:  # noqa: BLE001
         print("rank moves failed:", repr(e))
     out["pool"] = pool

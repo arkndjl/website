@@ -1850,7 +1850,7 @@ def build(days_ahead=4):
             _old = json.load(open(OUT))
         except (OSError, ValueError):
             _old = None
-        rank_moves.apply(out, pw, _old, lambda r: r['id'], lambda r: r['rating'])
+        rank_moves.apply(out, pw, _old, lambda r: r['id'], lambda r: r['rating'], sport='soccer')
     except Exception as e:      # noqa: BLE001
         print('rank moves failed:', repr(e))
     txt = json.dumps(out, separators=(',', ':'), allow_nan=False)
