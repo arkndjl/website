@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T22:34:25Z",
+ "asof": "2026-11-10T22:36:36Z",
  "recenter": {
   "week": 0.17
  },
@@ -1143,7 +1143,14 @@
    "flagged": "2026-11-10T06:59:18Z",
    "betTo": 48.5,
    "close": 47.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 47.5,
+    "price": -102.0,
+    "ev": 0.013,
+    "units": 0.25
+   }
   },
   {
    "id": "401856884",
@@ -1842,7 +1849,7 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 1.4,
    "x": 3.0,
    "why": "edge under 3",
@@ -2035,7 +2042,7 @@
    "mk": "spread",
    "side": "away",
    "line": -16.5,
-   "price": 104.0,
+   "price": 102.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2515,7 +2522,7 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2732,16 +2739,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15411,
+  "snapshots": 15420,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3187,
+    "clvN": 3191,
     "clvRet": -0.0487,
-    "clvT": -34.79,
+    "clvT": -34.82,
     "clv": 0.19,
     "beat": 0.309,
-    "still": 0.44
+    "still": 0.441
    },
    {
     "when": "6-24h",
@@ -5876,7 +5883,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-10": {
-    "raw": 2.75,
+    "raw": 3.25,
     "scale": 1.0
    },
    "2026-11-12": {
@@ -5888,15 +5895,15 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 37.0,
+    "raw": 36.5,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 26.0,
+    "raw": 25.75,
     "scale": 1.0
    },
    "2026-11-16": {
-    "raw": 0.5,
+    "raw": 0.25,
     "scale": 1.0
    }
   }

@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-10T22:34:29Z",
+ "asof": "2026-11-10T22:36:41Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -183,9 +183,9 @@
     "mk": "total",
     "side": "over",
     "line": 39.5,
-    "price": 102.0,
-    "ev": 0.195,
-    "units": 5.0
+    "price": -100.0,
+    "ev": 0.188,
+    "units": 4.75
    }
   },
   {
@@ -414,8 +414,8 @@
     "side": "over",
     "line": 38.5,
     "price": -108.0,
-    "ev": 0.054,
-    "units": 0.5
+    "ev": 0.052,
+    "units": 0.25
    }
   },
   {
@@ -455,6 +455,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "2026_10_SF_DAL",
+   "sport": "nfl",
+   "kick": "2026-11-15T21:25:00Z",
+   "home": "DAL",
+   "away": "SF",
+   "mk": "total",
+   "side": "under",
+   "line": 56.5,
+   "price": -111.0,
+   "edge": 2.3,
+   "x": 1.5,
+   "why": "no edge at -111",
+   "m": -3.7,
+   "tm": 54.2
+  },
+  {
    "id": "2026_10_PIT_CIN",
    "sport": "nfl",
    "kick": "2026-11-16T01:20:00Z",
@@ -469,22 +485,6 @@
    "why": "no edge at -108",
    "m": 3.3,
    "tm": 47.8
-  },
-  {
-   "id": "2026_10_SF_DAL",
-   "sport": "nfl",
-   "kick": "2026-11-15T21:25:00Z",
-   "home": "DAL",
-   "away": "SF",
-   "mk": "total",
-   "side": "under",
-   "line": 55.5,
-   "price": 104.0,
-   "edge": 1.3,
-   "x": 1.5,
-   "why": "edge under 1.5",
-   "m": -3.7,
-   "tm": 54.2
   },
   {
    "id": "2026_10_BUF_NYJ",
@@ -664,10 +664,10 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": 102.0,
-   "ev": 0.195,
+   "price": -100.0,
+   "ev": 0.188,
    "edge": 7.8,
-   "units": 5.0,
+   "units": 4.75,
    "home": "ARI",
    "away": "LA",
    "state": "pick"
@@ -687,9 +687,9 @@
   "2026_10_SF_DAL": {
    "mk": "total",
    "side": "under",
-   "line": 55.5,
-   "price": 104.0,
-   "edge": 1.3,
+   "line": 56.5,
+   "price": -111.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "DAL",
@@ -713,9 +713,9 @@
    "side": "over",
    "line": 38.5,
    "price": -108.0,
-   "ev": 0.054,
+   "ev": 0.052,
    "edge": 2.8,
-   "units": 0.5,
+   "units": 0.25,
    "home": "BAL",
    "away": "LAC",
    "state": "pick"
@@ -773,7 +773,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3013,
+  "snapshots": 3015,
   "buckets": [
    {
     "when": "24h+",
@@ -2809,7 +2809,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-10": {
-    "raw": 2.75,
+    "raw": 3.25,
     "scale": 1.0
    },
    "2026-11-12": {
@@ -2821,15 +2821,15 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 37.0,
+    "raw": 36.5,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 26.0,
+    "raw": 25.75,
     "scale": 1.0
    },
    "2026-11-16": {
-    "raw": 0.5,
+    "raw": 0.25,
     "scale": 1.0
    }
   }

@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-10T22:34:32Z",
+ "asof": "2026-11-10T22:36:44Z",
  "recenter": {
-  "2026-11-10": -11.07
+  "2026-11-10": -11.06
  },
  "monitor": {
   "clocks": {
@@ -195,6 +195,22 @@
    "tm": 153.6
   },
   {
+   "id": "401909553",
+   "sport": "cbb",
+   "kick": "2026-11-11T00:00:00Z",
+   "home": "Boston College",
+   "away": "Maryland Eastern Shore",
+   "mk": "total",
+   "side": "over",
+   "line": 127.5,
+   "price": -106.0,
+   "edge": 12.5,
+   "x": null,
+   "why": "total market off",
+   "m": 23.8,
+   "tm": 140.0
+  },
+  {
    "id": "401921733",
    "sport": "cbb",
    "kick": "2026-11-11T02:00:00Z",
@@ -241,22 +257,6 @@
    "why": "total market off",
    "m": 0.1,
    "tm": 145.2
-  },
-  {
-   "id": "401909553",
-   "sport": "cbb",
-   "kick": "2026-11-11T00:00:00Z",
-   "home": "Boston College",
-   "away": "Maryland Eastern Shore",
-   "mk": "total",
-   "side": "over",
-   "line": 128.5,
-   "price": 102.0,
-   "edge": 11.5,
-   "x": null,
-   "why": "total market off",
-   "m": 23.8,
-   "tm": 140.0
   },
   {
    "id": "401921774",
@@ -562,10 +562,10 @@
   },
   "401909564": {
    "mk": "total",
-   "side": "under",
-   "line": 147.5,
-   "price": -112.0,
-   "edge": 0.6,
+   "side": "over",
+   "line": 145.5,
+   "price": -110,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "Duke",
@@ -707,9 +707,9 @@
   "401920817": {
    "mk": "total",
    "side": "under",
-   "line": 146.5,
-   "price": -105.0,
-   "edge": 2.5,
+   "line": 147.5,
+   "price": -110,
+   "edge": 3.5,
    "ev": null,
    "units": 0.0,
    "home": "Ole Miss",
@@ -780,7 +780,7 @@
    "mk": "spread",
    "side": "home",
    "line": 18.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -960,7 +960,7 @@
    "mk": "total",
    "side": "over",
    "line": 141.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 5.3,
    "ev": null,
    "units": 0.0,
@@ -995,9 +995,9 @@
   "401909553": {
    "mk": "total",
    "side": "over",
-   "line": 128.5,
-   "price": 102.0,
-   "edge": 11.5,
+   "line": 127.5,
+   "price": -106.0,
+   "edge": 12.5,
    "ev": null,
    "units": 0.0,
    "home": "Boston College",
@@ -1273,7 +1273,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 11309,
+  "snapshots": 11321,
   "buckets": [
    {
     "when": "24h+",
@@ -1287,20 +1287,20 @@
    {
     "when": "6-24h",
     "clvN": 2096,
-    "clvRet": -0.0375,
-    "clvT": -16.41,
+    "clvRet": -0.0373,
+    "clvT": -16.31,
     "clv": 0.06,
     "beat": 0.297,
     "still": 0.467
    },
    {
     "when": "1-6h",
-    "clvN": 1343,
+    "clvN": 1346,
     "clvRet": -0.0403,
-    "clvT": -31.18,
+    "clvT": -31.26,
     "clv": 0.07,
     "beat": 0.166,
-    "still": 0.717
+    "still": 0.718
    },
    {
     "when": "<1h",
@@ -8631,7 +8631,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-10": {
-    "raw": 2.75,
+    "raw": 3.25,
     "scale": 1.0
    },
    "2026-11-12": {
@@ -8643,15 +8643,15 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 37.0,
+    "raw": 36.5,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 26.0,
+    "raw": 25.75,
     "scale": 1.0
    },
    "2026-11-16": {
-    "raw": 0.5,
+    "raw": 0.25,
     "scale": 1.0
    }
   }
