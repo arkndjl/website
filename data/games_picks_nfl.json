@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-10T21:44:22Z",
+ "asof": "2026-11-10T21:48:34Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -342,14 +342,14 @@
    "tm": 38.1,
    "flagged": "2026-11-10T13:48:53Z",
    "betTo": 40.0,
-   "close": 42.5,
+   "close": 41.5,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 42.5,
-    "price": -111.0,
-    "ev": 0.088,
-    "units": 1.75
+    "line": 41.5,
+    "price": 104.0,
+    "ev": 0.1,
+    "units": 2.0
    }
   },
   {
@@ -503,22 +503,6 @@
    "tm": 50.3
   },
   {
-   "id": "2026_10_HOU_CLE",
-   "sport": "nfl",
-   "kick": "2026-11-15T18:00:00Z",
-   "home": "CLE",
-   "away": "HOU",
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -108.0,
-   "edge": 3.3,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": -2.2,
-   "tm": 39.0
-  },
-  {
    "id": "2026_10_CAR_NO",
    "sport": "nfl",
    "kick": "2026-11-15T18:00:00Z",
@@ -549,6 +533,22 @@
    "why": "edge under 1.5",
    "m": -4.2,
    "tm": 45.5
+  },
+  {
+   "id": "2026_10_HOU_CLE",
+   "sport": "nfl",
+   "kick": "2026-11-15T18:00:00Z",
+   "home": "CLE",
+   "away": "HOU",
+   "mk": "spread",
+   "side": "home",
+   "line": -4.5,
+   "price": 102.0,
+   "edge": 2.3,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": -2.2,
+   "tm": 39.0
   }
  ],
  "games": {
@@ -603,9 +603,9 @@
   "2026_10_HOU_CLE": {
    "mk": "spread",
    "side": "home",
-   "line": -5.5,
-   "price": -108.0,
-   "edge": 3.3,
+   "line": -4.5,
+   "price": 102.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "CLE",
@@ -773,16 +773,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2974,
+  "snapshots": 2984,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1239,
-    "clvRet": -0.0161,
-    "clvT": -7.24,
-    "clv": 0.45,
-    "beat": 0.354,
-    "still": 0.588
+    "clvN": 1242,
+    "clvRet": -0.0152,
+    "clvT": -6.82,
+    "clv": 0.47,
+    "beat": 0.366,
+    "still": 0.577
    },
    {
     "when": "6-24h",
@@ -2726,7 +2726,7 @@
    "tm": 38.1,
    "flagged": "2026-11-10T13:48:53Z",
    "betTo": 40.0,
-   "close": 42.5
+   "close": 41.5
   },
   {
    "id": "2026_10_NE_DET",
@@ -2821,11 +2821,11 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 38.25,
+    "raw": 35.25,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 25.25,
+    "raw": 25.5,
     "scale": 1.0
    },
    "2026-11-16": {
