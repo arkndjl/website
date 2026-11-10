@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T21:26:27Z",
+ "asof": "2026-11-10T21:40:10Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -413,11 +413,11 @@
  },
  "record": {
   "n": 472,
-  "clvN": 426,
-  "clvRet": -0.0122,
-  "clvT": -2.51,
+  "clvN": 427,
+  "clvRet": -0.0123,
+  "clvT": -2.54,
   "clv": 0.01,
-  "beat": 0.312,
+  "beat": 0.311,
   "settled": 425,
   "w": 209,
   "l": 216,
@@ -428,23 +428,23 @@
   "risked": 396.75,
   "yield": -0.0311
  },
- "tEff": -2.43,
+ "tEff": -2.44,
  "corr": {
   "rho": 0.002,
-  "n": 426,
+  "n": 427,
   "slates": 42,
-  "nEff": 395.8,
-  "avgSlate": 10.14
+  "nEff": 393.3,
+  "avgSlate": 10.17
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 426,
+   "value": 427,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.2% t -2.43",
+   "value": "-1.2% t -2.44",
    "pass": false
   },
   {
@@ -681,11 +681,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 85,
-   "clvN": 83,
-   "clvRet": -0.0173,
-   "clvT": -3.71,
-   "clv": -0.05,
-   "beat": 0.265,
+   "clvN": 84,
+   "clvRet": -0.0179,
+   "clvT": -3.84,
+   "clv": -0.07,
+   "beat": 0.262,
    "settled": 82,
    "w": 42,
    "l": 40,
@@ -761,7 +761,11 @@
    "edge": 5.1,
    "ev": 0.003,
    "event": "FAGE WTA Finals Indian Wells",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.064,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 0.36
   },
   {
    "rule": "nba-spread",
@@ -18064,7 +18068,11 @@
    "edge": 5.1,
    "ev": 0.003,
    "event": "FAGE WTA Finals Indian Wells",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.064,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 0.36
   },
   {
    "rule": "nba-spread",
