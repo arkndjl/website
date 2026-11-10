@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T00:50:17Z",
+ "asof": "2026-11-10T00:55:00Z",
  "recenter": {
   "week": 0.11
  },
@@ -859,9 +859,9 @@
     "mk": "total",
     "side": "under",
     "line": 60.5,
-    "price": -111.0,
-    "ev": 0.019,
-    "units": 1.25
+    "price": -113.0,
+    "ev": 0.014,
+    "units": 0.75
    }
   },
   {
@@ -888,8 +888,8 @@
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 46.0,
    "close": 45.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401858518",
@@ -1128,7 +1128,14 @@
    "flagged": "2026-11-09T01:19:12Z",
    "betTo": 39.5,
    "close": 38.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 38.5,
+    "price": 106.0,
+    "ev": 0.037,
+    "units": 1.75
+   }
   },
   {
    "id": "401864540",
@@ -1328,10 +1335,10 @@
    "mk": "total",
    "side": "over",
    "line": 46.5,
-   "price": -115.0,
+   "price": -111.0,
    "edge": 4.5,
    "x": 3.0,
-   "why": "no edge at -115",
+   "why": "no edge at -111",
    "m": 14.9,
    "tm": 51.0
   },
@@ -1382,22 +1389,6 @@
    "why": "no edge at +102",
    "m": -2.6,
    "tm": 47.7
-  },
-  {
-   "id": "401864537",
-   "sport": "cfb",
-   "kick": "2026-11-15T04:00:00.000Z",
-   "home": "Hawai'i",
-   "away": "North Dakota State",
-   "mk": "total",
-   "side": "over",
-   "line": 38.5,
-   "price": -111.0,
-   "edge": 4.2,
-   "x": 3.0,
-   "why": "no edge at -111",
-   "m": -6.6,
-   "tm": 42.7
   },
   {
    "id": "401869969",
@@ -1718,6 +1709,22 @@
    "why": "edge under 3",
    "m": -7.8,
    "tm": 53.2
+  },
+  {
+   "id": "401856889",
+   "sport": "cfb",
+   "kick": "2026-11-14T17:45:00.000Z",
+   "home": "Vanderbilt",
+   "away": "Alabama",
+   "mk": "spread",
+   "side": "away",
+   "line": -15.5,
+   "price": -106.0,
+   "edge": 3.1,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -18.6,
+   "tm": 51.7
   }
  ],
  "games": {
@@ -2049,10 +2056,10 @@
    "mk": "total",
    "side": "under",
    "line": 60.5,
-   "price": -111.0,
-   "ev": 0.019,
+   "price": -113.0,
+   "ev": 0.014,
    "edge": 4.8,
-   "units": 1.25,
+   "units": 0.75,
    "home": "Texas State",
    "away": "Fresno State",
    "state": "pick"
@@ -2073,7 +2080,7 @@
    "mk": "total",
    "side": "over",
    "line": 46.5,
-   "price": -115.0,
+   "price": -111.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -2205,13 +2212,13 @@
    "mk": "total",
    "side": "over",
    "line": 38.5,
-   "price": -111.0,
+   "price": 106.0,
+   "ev": 0.037,
    "edge": 4.2,
-   "ev": null,
-   "units": 0.0,
+   "units": 1.75,
    "home": "Hawai'i",
    "away": "North Dakota State",
-   "state": "under"
+   "state": "pick"
   },
   "401858295": {
    "mk": "spread",
@@ -2253,7 +2260,7 @@
    "mk": "total",
    "side": "over",
    "line": 53.5,
-   "price": -111.0,
+   "price": -108.0,
    "edge": 0.7,
    "ev": null,
    "units": 0.0,
@@ -2554,13 +2561,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 13987,
+  "snapshots": 13999,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2873,
-    "clvRet": -0.0473,
-    "clvT": -31.27,
+    "clvN": 2875,
+    "clvRet": -0.0475,
+    "clvT": -31.55,
     "clv": 0.2,
     "beat": 0.34,
     "still": 0.39
@@ -5567,7 +5574,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-09": {
-    "raw": 19.0,
+    "raw": 19.25,
     "scale": 1.0,
     "down": 8.75
    },
@@ -5580,7 +5587,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 28.25,
+    "raw": 28.75,
     "scale": 1.0
    }
   }
