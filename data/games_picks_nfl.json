@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-10T18:49:08Z",
+ "asof": "2026-11-10T18:50:44Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -372,6 +372,22 @@
    "tm": 44.1
   },
   {
+   "id": "2026_10_NE_DET",
+   "sport": "nfl",
+   "kick": "2026-11-15T14:30:00Z",
+   "home": "DET",
+   "away": "NE",
+   "mk": "total",
+   "side": "over",
+   "line": 50.5,
+   "price": -117.0,
+   "edge": 2.3,
+   "x": 1.5,
+   "why": "no edge at -117",
+   "m": 2.9,
+   "tm": 52.8
+  },
+  {
    "id": "2026_10_SF_DAL",
    "sport": "nfl",
    "kick": "2026-11-15T21:25:00Z",
@@ -402,22 +418,6 @@
    "why": "no edge at -108",
    "m": 3.3,
    "tm": 47.8
-  },
-  {
-   "id": "2026_10_NE_DET",
-   "sport": "nfl",
-   "kick": "2026-11-15T14:30:00Z",
-   "home": "DET",
-   "away": "NE",
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": 102.0,
-   "edge": 1.3,
-   "x": 1.5,
-   "why": "edge under 1.5",
-   "m": 2.9,
-   "tm": 52.8
   },
   {
    "id": "2026_10_BUF_NYJ",
@@ -516,9 +516,9 @@
   "2026_10_NE_DET": {
    "mk": "total",
    "side": "over",
-   "line": 51.5,
-   "price": 102.0,
-   "edge": 1.3,
+   "line": 50.5,
+   "price": -117.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "DET",
@@ -722,11 +722,11 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 2884,
+  "snapshots": 2887,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1205,
+    "clvN": 1206,
     "clvRet": -0.0172,
     "clvT": -7.79,
     "clv": 0.43,
@@ -2683,7 +2683,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-10": {
-    "raw": 3.5,
+    "raw": 3.0,
     "scale": 1.0
    },
    "2026-11-12": {
