@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-10T16:27:47Z",
+ "asof": "2026-11-10T17:08:30Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 84.9,
+  "now": 84.26,
   "peak": 117.38,
-  "drawdown": 0.2767,
-  "open": 77.75,
+  "drawdown": 0.2821,
+  "open": 76.5,
   "path": [
-   100.01,
    101.63,
    104.5,
    105.52,
@@ -408,32 +407,33 @@
    84.25,
    87.29,
    86.64,
-   84.9
+   84.9,
+   84.26
   ]
  },
  "record": {
   "n": 465,
   "clvN": 425,
-  "clvRet": -0.012,
-  "clvT": -2.47,
-  "clv": 0.02,
+  "clvRet": -0.0121,
+  "clvT": -2.5,
+  "clv": 0.01,
   "beat": 0.313,
-  "settled": 422,
+  "settled": 423,
   "w": 208,
-  "l": 214,
+  "l": 215,
   "p": 0,
-  "roi": -0.0228,
-  "roiT": -0.46,
-  "profit": -13.48,
-  "risked": 393.5,
-  "yield": -0.0343
+  "roi": -0.0251,
+  "roiT": -0.51,
+  "profit": -14.23,
+  "risked": 394.25,
+  "yield": -0.0361
  },
- "tEff": -2.35,
+ "tEff": -2.41,
  "corr": {
-  "rho": 0.002,
+  "rho": 0.001,
   "n": 425,
   "slates": 42,
-  "nEff": 385.1,
+  "nEff": 398.5,
   "avgSlate": 10.12
  },
  "gates": [
@@ -444,7 +444,7 @@
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.2% t -2.35",
+   "value": "-1.2% t -2.41",
    "pass": false
   },
   {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.3% vs -1.2% (SE 5.0)",
+   "value": "ROI -2.5% vs -1.2% (SE 5.0)",
    "pass": true
   }
  ],
@@ -703,19 +703,19 @@
    "mk": "ml",
    "n": 85,
    "clvN": 82,
-   "clvRet": -0.0164,
-   "clvT": -3.44,
-   "clv": -0.03,
+   "clvRet": -0.0173,
+   "clvT": -3.66,
+   "clv": -0.04,
    "beat": 0.268,
-   "settled": 79,
+   "settled": 80,
    "w": 41,
-   "l": 38,
+   "l": 39,
    "p": 0,
-   "roi": 0.0773,
-   "roiT": 0.6,
-   "profit": -0.93,
-   "risked": 68.25,
-   "yield": -0.0137
+   "roi": 0.0638,
+   "roiT": 0.5,
+   "profit": -1.68,
+   "risked": 69.0,
+   "yield": -0.0244
   },
   {
    "id": "nflprops-prop",
@@ -740,54 +740,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186533",
-   "k": "2026-11-10T13:30:00Z",
-   "slate": "tennis:2026-11-10",
-   "h": "Sonego",
-   "a": "Halys",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -122,
-   "bet": "Halys ML -122",
-   "placed": "2026-11-09T11:28:07Z",
-   "stake": 0.75,
-   "edge": 6.7,
-   "ev": 0.0061,
-   "event": "Bybit Stockholm Open",
-   "pass": false,
-   "clvRet": -0.0219,
-   "clv": -0.8,
-   "beat": -1,
-   "close": 0.5375
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
-   "id": "186539",
-   "k": "2026-11-10T13:30:00Z",
-   "slate": "tennis:2026-11-10",
-   "h": "Etcheverry",
-   "a": "Tirante",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 125,
-   "bet": "Tirante ML +125",
-   "placed": "2026-11-10T00:55:16Z",
-   "stake": 0.75,
-   "edge": 5.8,
-   "ev": 0.0107,
-   "event": "Bybit Stockholm Open",
-   "pass": false,
-   "clvRet": 0.0294,
-   "clv": 1.5,
-   "beat": 1,
-   "close": 0.4575
-  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -830,7 +782,11 @@
    "edge": 27.5,
    "ev": 0.0245,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0481,
+   "clv": 0.7,
+   "beat": 1,
+   "close": 0.2525
   },
   {
    "rule": "tennis-ml",
@@ -850,7 +806,11 @@
    "edge": 4.2,
    "ev": 0.005,
    "event": "Bybit Stockholm Open",
-   "pass": true
+   "pass": true,
+   "clvRet": -0.0659,
+   "clv": -2.5,
+   "beat": -1,
+   "close": 0.3925
   },
   {
    "rule": "tennis-ml",
@@ -869,6 +829,26 @@
    "stake": 0.25,
    "edge": 4.0,
    "ev": 0.0002,
+   "event": "FAGE WTA Finals Indian Wells",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "187375",
+   "k": "2026-11-10T21:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Gauff",
+   "a": "Noskova",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 160,
+   "bet": "Noskova ML +160",
+   "placed": "2026-11-10T17:08:29Z",
+   "stake": 0.25,
+   "edge": 5.1,
+   "ev": 0.003,
    "event": "FAGE WTA Finals Indian Wells",
    "pass": false
   },
@@ -1078,7 +1058,7 @@
    "ev": 0.016,
    "event": null,
    "pass": false,
-   "close": -1.5
+   "close": 1.5
   },
   {
    "rule": "cfb-total",
@@ -1204,7 +1184,7 @@
    "ev": 0.0107,
    "event": null,
    "pass": false,
-   "close": 54.5
+   "close": 53.5
   },
   {
    "rule": "cfb-spread",
@@ -1519,7 +1499,7 @@
    "ev": 0.0014,
    "event": null,
    "pass": false,
-   "close": 76.5
+   "close": 75.5
   },
   {
    "rule": "cfb-total",
@@ -1774,6 +1754,60 @@
   }
  ],
  "recent": [
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186533",
+   "k": "2026-11-10T13:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Sonego",
+   "a": "Halys",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -122,
+   "bet": "Halys ML -122",
+   "placed": "2026-11-09T11:28:07Z",
+   "stake": 0.75,
+   "edge": 6.7,
+   "ev": 0.0061,
+   "event": "Bybit Stockholm Open",
+   "pass": false,
+   "clvRet": -0.0219,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.5375,
+   "score": "4-6 6-7",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.75
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186539",
+   "k": "2026-11-10T13:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Etcheverry",
+   "a": "Tirante",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 125,
+   "bet": "Tirante ML +125",
+   "placed": "2026-11-10T00:55:16Z",
+   "stake": 0.75,
+   "edge": 5.8,
+   "ev": 0.0107,
+   "event": "Bybit Stockholm Open",
+   "pass": true,
+   "clvRet": 0.0294,
+   "clv": 1.5,
+   "beat": 1,
+   "close": 0.4575,
+   "score": "",
+   "res": "void"
+  },
   {
    "rule": "nba-spread",
    "sport": "nba",
@@ -3428,58 +3462,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873043-5081432-rc",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 3.5,
-   "price": -100.0,
-   "bet": "Antonio Williams under 3.5 rec -100",
-   "placed": "2026-11-04T12:22:00Z",
-   "stake": 0.5,
-   "edge": 10.4,
-   "ev": 0.086,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.1854,
-   "close": 4.5,
-   "score": 3.0,
-   "res": "w",
-   "ret": 1.0,
-   "profit": 0.5
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873044-4040761-rwy",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 77.5,
-   "price": -122.0,
-   "bet": "Devin Singletary under 77.5 rush+rec yds -122",
-   "placed": "2026-11-06T22:14:00Z",
-   "stake": 0.5,
-   "edge": 37.5,
-   "ev": 0.1919,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0695,
-   "close": 74.5,
-   "score": 39.0,
-   "res": "w",
-   "ret": 0.8197,
-   "profit": 0.4098
   }
  ],
  "ledger": [
@@ -17863,7 +17845,11 @@
    "clvRet": -0.0219,
    "clv": -0.8,
    "beat": -1,
-   "close": 0.5375
+   "close": 0.5375,
+   "score": "4-6 6-7",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.75
   },
   {
    "rule": "tennis-ml",
@@ -17883,11 +17869,13 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
-   "pass": false,
+   "pass": true,
    "clvRet": 0.0294,
    "clv": 1.5,
    "beat": 1,
-   "close": 0.4575
+   "close": 0.4575,
+   "score": "",
+   "res": "void"
   },
   {
    "rule": "tennis-ml",
@@ -17931,7 +17919,11 @@
    "edge": 27.5,
    "ev": 0.0245,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0481,
+   "clv": 0.7,
+   "beat": 1,
+   "close": 0.2525
   },
   {
    "rule": "tennis-ml",
@@ -17951,7 +17943,11 @@
    "edge": 4.2,
    "ev": 0.005,
    "event": "Bybit Stockholm Open",
-   "pass": true
+   "pass": true,
+   "clvRet": -0.0659,
+   "clv": -2.5,
+   "beat": -1,
+   "close": 0.3925
   },
   {
    "rule": "tennis-ml",
@@ -17970,6 +17966,26 @@
    "stake": 0.25,
    "edge": 4.0,
    "ev": 0.0002,
+   "event": "FAGE WTA Finals Indian Wells",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "187375",
+   "k": "2026-11-10T21:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Gauff",
+   "a": "Noskova",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 160,
+   "bet": "Noskova ML +160",
+   "placed": "2026-11-10T17:08:29Z",
+   "stake": 0.25,
+   "edge": 5.1,
+   "ev": 0.003,
    "event": "FAGE WTA Finals Indian Wells",
    "pass": false
   },
@@ -18179,7 +18195,7 @@
    "ev": 0.016,
    "event": null,
    "pass": false,
-   "close": -1.5
+   "close": 1.5
   },
   {
    "rule": "cfb-total",
@@ -18305,7 +18321,7 @@
    "ev": 0.0107,
    "event": null,
    "pass": false,
-   "close": 54.5
+   "close": 53.5
   },
   {
    "rule": "cfb-spread",
@@ -18620,7 +18636,7 @@
    "ev": 0.0014,
    "event": null,
    "pass": false,
-   "close": 76.5
+   "close": 75.5
   },
   {
    "rule": "cfb-total",
