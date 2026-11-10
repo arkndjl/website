@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-10T13:48:49Z",
+ "asof": "2026-11-10T13:50:31Z",
  "recenter": {
   "week": 0.11
  },
@@ -1081,8 +1081,8 @@
     "side": "under",
     "line": 67.5,
     "price": -111.0,
-    "ev": 0.052,
-    "units": 3.25
+    "ev": 0.048,
+    "units": 3.0
    }
   },
   {
@@ -1177,14 +1177,7 @@
    "flagged": "2026-11-10T06:59:18Z",
    "betTo": 53.0,
    "close": 52.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 52.5,
-    "price": -108.0,
-    "ev": 0.007,
-    "units": 0.25
-   }
+   "now": null
   },
   {
    "id": "401864537",
@@ -1539,6 +1532,22 @@
    "tm": 49.5
   },
   {
+   "id": "401856884",
+   "sport": "cfb",
+   "kick": "2026-11-14T23:15:00.000Z",
+   "home": "Kentucky",
+   "away": "Florida",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -111.0,
+   "edge": 3.7,
+   "x": 3.0,
+   "why": "no edge at -111",
+   "m": 2.3,
+   "tm": 56.2
+  },
+  {
    "id": "401858521",
    "sport": "cfb",
    "kick": "2026-11-14T21:15:00.000Z",
@@ -1889,22 +1898,6 @@
    "why": "edge under 6 (season: late)",
    "m": 15.9,
    "tm": 49.5
-  },
-  {
-   "id": "401858295",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:30:00.000Z",
-   "home": "Virginia",
-   "away": "California",
-   "mk": "spread",
-   "side": "home",
-   "line": 10.5,
-   "price": 106.0,
-   "edge": 2.2,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": 12.7,
-   "tm": 48.9
   }
  ],
  "games": {
@@ -2092,13 +2085,13 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -108.0,
-   "ev": 0.007,
+   "price": -111.0,
    "edge": 3.7,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "Kentucky",
    "away": "Florida",
-   "state": "pick"
+   "state": "under"
   },
   "401858526": {
    "mk": "total",
@@ -2573,9 +2566,9 @@
    "side": "under",
    "line": 67.5,
    "price": -111.0,
-   "ev": 0.052,
+   "ev": 0.048,
    "edge": 9.1,
-   "units": 3.25,
+   "units": 3.0,
    "home": "Washington State",
    "away": "Colorado State",
    "state": "pick"
@@ -2741,7 +2734,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 14596,
+  "snapshots": 14599,
   "buckets": [
    {
     "when": "24h+",
@@ -5903,7 +5896,7 @@
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 11.0,
+    "raw": 14.0,
     "scale": 1.0
    }
   }

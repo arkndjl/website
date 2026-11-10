@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-10T13:48:55Z",
+ "asof": "2026-11-10T13:50:36Z",
  "recenter": {
-  "2026-11-10": -11.14
+  "2026-11-10": -11.15
  },
  "monitor": {
   "clocks": {
@@ -427,7 +427,7 @@
    "mk": "total",
    "side": "under",
    "line": 160.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 6.1,
    "x": null,
    "why": "total market off",
@@ -443,7 +443,7 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 6.1,
    "x": null,
    "why": "spread market off",
@@ -515,6 +515,22 @@
    "tm": 153.0
   },
   {
+   "id": "401925708",
+   "sport": "cbb",
+   "kick": "2026-11-11T00:00:00Z",
+   "home": "Kennesaw State",
+   "away": "Winthrop",
+   "mk": "total",
+   "side": "under",
+   "line": 169.5,
+   "price": -113.0,
+   "edge": 5.3,
+   "x": null,
+   "why": "total market off",
+   "m": 12.4,
+   "tm": 164.2
+  },
+  {
    "id": "401913101",
    "sport": "cbb",
    "kick": "2026-11-11T00:00:00Z",
@@ -529,22 +545,6 @@
    "why": "total market off",
    "m": 15.0,
    "tm": 150.3
-  },
-  {
-   "id": "401906771",
-   "sport": "cbb",
-   "kick": "2026-11-10T23:00:00Z",
-   "home": "Florida State",
-   "away": "Florida",
-   "mk": "total",
-   "side": "under",
-   "line": 166.5,
-   "price": 104.0,
-   "edge": 5.0,
-   "x": null,
-   "why": "total market off",
-   "m": -10.4,
-   "tm": 161.5
   }
  ],
  "games": {
@@ -828,7 +828,7 @@
    "mk": "total",
    "side": "under",
    "line": 160.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 6.1,
    "ev": null,
    "units": 0.0,
@@ -840,7 +840,7 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 6.1,
    "ev": null,
    "units": 0.0,
@@ -1043,9 +1043,9 @@
   "401925708": {
    "mk": "total",
    "side": "under",
-   "line": 168.5,
-   "price": 108.0,
-   "edge": 4.3,
+   "line": 169.5,
+   "price": -113.0,
+   "edge": 5.3,
    "ev": null,
    "units": 0.0,
    "home": "Kennesaw State",
@@ -1213,7 +1213,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 10493,
+  "snapshots": 10500,
   "buckets": [
    {
     "when": "24h+",
@@ -1226,12 +1226,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1948,
+    "clvN": 1949,
     "clvRet": -0.0422,
-    "clvT": -17.69,
+    "clvT": -17.7,
     "clv": -0.01,
-    "beat": 0.274,
-    "still": 0.472
+    "beat": 0.273,
+    "still": 0.473
    },
    {
     "when": "1-6h",
@@ -8587,7 +8587,7 @@
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 11.0,
+    "raw": 14.0,
     "scale": 1.0
    }
   }
