@@ -248,6 +248,37 @@ def current_teams(y, ros=None):
             g = hit['gsis_id'] if hit else None
         if g:
             now[g] = t
+    return rotowire_overlay(now, ros)
+
+
+def rotowire_overlay(now, ros, days=7):
+    """ESPN's rosters lag a trade by a day or two (Bates, ATL -> JAX Nov 9, was on no ESPN roster the next day):
+    a RotoWire trade, claim or move item from the last `days` days that names the new club puts the player there,
+    joined by the shared name matcher on position (scripts/rotowire_moves.py). Never raises."""
+    try:
+        import rotowire_moves as RM
+        from datetime import date, timedelta
+        cut = (date.today() - timedelta(days=days)).isoformat()
+        R = RM.Ref('nfl')
+        by = {r['gsis_id']: r for r in ros if r.get('gsis_id')}
+        last = {}
+        for m in RM.moves('football'):
+            if m['d'] >= cut and m['kind'] in ('trade', 'claim', 'move') and m.get('to'):
+                last[m['pid']] = m
+        n = 0
+        for g, r in by.items():
+            club = now.get(g) or N.team(r.get('team') or '')
+            c = R.check(r['full_name'], club, r.get('position'))
+            if not c or c['flag'] != 'moved' or c['pid'] not in last or c['d'] < cut:
+                continue
+            to = N.team({'LAR': 'LA'}.get(c['rotowire'], c['rotowire']))
+            if to and to != club:
+                now[g] = to
+                n += 1
+        if n:
+            print(f'nfl trades: {n} players on RotoWire\'s new club ahead of ESPN')
+    except Exception as e:  # noqa: BLE001
+        print('nfl trades: rotowire overlay skipped', repr(e))
     return now
 
 

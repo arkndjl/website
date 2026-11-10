@@ -19,6 +19,7 @@ with it; the depth chart builds call fix_depth() so a moved player leaves his ol
 
   python3 scripts/rotowire_moves.py                  # every sport: new news, then any unfinished backfill
   python3 scripts/rotowire_moves.py football --calls 900
+  python3 scripts/rotowire_moves.py --recent 3       # also re-read the last 3 days
 """
 import json
 import os
@@ -39,7 +40,7 @@ CALLS = 1200
 FA = {'FA', 'Free Agent', ''}
 FRESH = 30             # days: a newest item older than this that isn't a move says nothing about today's club
 
-KINDS = [  # (kind, headline pattern), first match wins
+KINDS = [  # (kind, headline pattern), first match wins; 'move' (a club named as where he is headed) is read in kind()
     ('exit', r'overseas|\babroad\b|\b(to|in) (spain|greece|china|turkey|israel|italy|france|germany|japan|australia|'
              r'serbia|lithuania|russia|switzerland|sweden|finland|the khl|khl)\b|euroleague|announces retirement|'
              r'^retire|hangs? up|hanging up|ends? (his )?career|brings end to career|calls it a career|'
@@ -69,17 +70,123 @@ MAYBE = re.compile(r'\bbut\b|likely to remain|pushes back|consider|mulling|weigh
                    r'rumou?r|denies|not (yet )?retir|un-?retir|comes? out of retirement|return', re.I)
 
 
-def kind(head):
-    """the move a headline reports, or None"""
+# pro clubs: a headline that only names where he is going ("Sent to Jacksonville", "Bound for Jacksonville",
+# "Returning to Minnesota") is a trade when the place is a club's city or nickname (case kept: RotoWire headlines are
+# sentence case, so "Returning to practice" never reads as a place)
+PLACE = re.compile(r'\b(?i:sent|bound|headed|heading|returning|returns|moving|going|off|shipped|flipped|dealt|'
+                   r'traded|trade|lands?|landing|on (?:his|the) way)(?i: (?:to|for|in|with) (?:the )?)([A-Z][a-z]+(?: [A-Z][a-z]+)?)')
+PRO = ('football', 'basketball', 'hockey')
+
+
+# trade talk that isn't a trade: "Trade out of Baltimore unlikely", "Drawing interest on trade market", "Trade to
+# Cincinnati falls through", "Trade target for Vikings", "Eyeing trade out of New York"
+RUMOR = re.compile(r'unlikely|interest|potential|fall(s|en)? through|fell through|\bvoided\b|rescinded|target|candidate|'
+                   r'request|buzz|market|rumou?r|eyeing|eyes\b|drawing|staying|stays|remains?\b|available|availability|'
+                   r'\bnot\b|\bno\b|talks|shopp|won\'t|wouldn\'t|block|could|\bmay\b|might|possib|expected|deadline|'
+                   r'consider|wants?\b|asks?\b|seek|demand|chatter|specul|linked|inquir|calls|\?|discuss|explor|open to|'
+                   r'listening|hold(s|ing)? out|hopes?\b|likely|nearing|close to|in play|on the block|speaking|denies|'
+                   r'declin|assur|reportedly (?:want|seek)|amid|ahead of|before|after|standoff|reshape|desire|persists', re.I)
+
+
+def kind(head, sp=None):
+    """the move a headline reports, or None. sp (a pro sport) also reads a club named as a destination."""
     h = head or ''
     if MAYBE.search(h) and KRE[0][1].search(h):
         return None           # "Retired, but likely to remain on roster", "Mulling retirement"
+    if re.search(r'\b(shipped|sent|sends?) (back )?down\b', h, re.I):
+        return 'down'
+    if re.search(r'trade|\bdeal', h, re.I) and RUMOR.search(h):
+        return None
+    if sp in PRO and not re.search(r'injur|practice|lineup|action|\bIR\b', h, re.I):
+        m = PLACE.search(h)
+        if m and club_of(sp, m.group(1)):
+            return 'move'     # trade or signing: the item text says which (scripts/transactions.py)
     for k, r in KRE:
         if r.search(h):
             if k in ('up', 'sign', 'practice') and NOT.search(h) and not re.search(r'recall|sign|promot|squad', h, re.I):
                 return None
             return k
     return None
+
+
+_CLUBS = {}
+
+
+def clubs(sp):
+    """{city / nickname / full name: RotoWire abbr} from the clubs the feed has named this season (pro sports; a city
+    two clubs share, New York or Los Angeles, is left out)"""
+    if sp not in _CLUBS:
+        full = {}
+        for t in (load(sp).get('teams') or {}).values():
+            if t.get('abbr') and t['abbr'] not in FA and t.get('team') and t['team'] not in FA:
+                full[t['team']] = t['abbr']
+        out, seen = {}, {}
+        for nm, ab in full.items():
+            w = nm.split()
+            keys = {nm, w[-1], ' '.join(w[-2:]) if len(w) > 2 else w[-1], ' '.join(w[:-1])}
+            if nm in ('Boston Red Sox', 'Chicago White Sox'):
+                keys.add(' '.join(w[-2:]))
+            for k in keys:
+                if k:
+                    seen.setdefault(k, set()).add(ab)
+        for k, v in seen.items():
+            if len(v) == 1:
+                out[k] = next(iter(v))
+        _CLUBS[sp] = out
+    return _CLUBS[sp]
+
+
+def club_of(sp, name):
+    """a club's RotoWire abbr from its city / nickname ("Jacksonville", "Jaguars", "New England"); a two-word capture
+    that isn't a club falls back to its first word ("Minnesota Tuesday")"""
+    if sp not in PRO:
+        return None
+    c = clubs(sp)
+    n = (name or '').strip()
+    return c.get(n) or (c.get(n.split()[0]) if ' ' in n else None)
+
+
+_NAMES = {}
+
+
+def _clubs_re(sp):
+    if sp not in _NAMES:
+        ks = sorted(clubs(sp), key=len, reverse=True)
+        _NAMES[sp] = re.compile(r'\b(' + '|'.join(re.escape(k) for k in ks) + r')\b') if ks else None
+    return _NAMES[sp]
+
+
+def dest(sp, head, body):
+    """(to, frm): RotoWire abbrs of the club a trade / claim / signing sends him to and the one he leaves, read from
+    the headline then the item text ("traded to the Jaguars", "Bound for Jacksonville", "The Vikings acquired Cousins
+    from the Raiders", "claimed off waivers by Miami"); None where the text doesn't say"""
+    if sp not in PRO:
+        return None, None
+    R = _clubs_re(sp)
+    if not R:
+        return None, None
+    to = frm = None
+    m = PLACE.search(head or '')
+    if m:
+        to = club_of(sp, m.group(1))
+    b = body or ''
+    if not to:
+        m = re.search(r'\b(?:to|by|with|for|joins?|joining) (?:the )?' + R.pattern, b)
+        to = club_of(sp, m.group(1)) if m else None
+        m2 = re.search(R.pattern + r' (?:have |has |are |were |officially |reportedly )*(?:acquir|claim|sign|land|add|'
+                       r'trad(?:ed|ing) for|pick(?:ed)? up|bring)', b)
+        if m2 and (not m or m2.start() < m.start()) and not re.search(r'\bto (?:the )?' + R.pattern, b[:m2.start()]):
+            to = club_of(sp, m2.group(1))
+    m = re.search(r'\bfrom (?:the )?' + R.pattern, b)
+    if m:
+        frm = club_of(sp, m.group(1))
+    if not frm:
+        for x in R.finditer(b):
+            c = club_of(sp, x.group(1))
+            if c and c != to:
+                frm = c
+                break
+    return to, (frm if frm != to else None)
 
 
 def load(sp):
@@ -116,30 +223,38 @@ def _add(S, items, fetched):
         d = _day(it['day'])
         if not d or not it.get('pid'):
             continue
-        k = kind(it['head'])
+        k = kind(it['head'], sp)
+        to = frm = None
+        if k in ('trade', 'claim', 'sign', 'move'):
+            to, frm = dest(sp, it['head'], it.get('body'))
         t = S['teams'].get(it['pid'])
         # the feed is newest first: the first item a run sees for a player is his newest; a later run's same-day
         # item is newer than an earlier run's
         if t is None or d > t['d'] or (d == t['d'] and fetched > t['seen']):
             S['teams'][it['pid']] = {'player': it['player'], 'pos': it['pos'], 'abbr': it['abbr'], 'team': it['team'],
-                                     'seen': fetched, 'd': d, 'head': it['head'], 'kind': k}
+                                     'seen': fetched, 'd': d, 'head': it['head'], 'kind': k,
+                                     **({'to': to} if to else {})}
         if not k:
             continue
         key = f"{it['pid']}:{d}:{it['head']}"
         if key in S['moves']:
             continue
         S['moves'][key] = {'pid': it['pid'], 'player': it['player'], 'pos': it['pos'], 'abbr': it['abbr'],
-                           'team': it['team'], 'head': it['head'], 'body': it['body'][:400], 'd': d, 'kind': k}
+                           'team': it['team'], 'head': it['head'], 'body': it['body'][:400], 'd': d, 'kind': k,
+                           **({'to': to} if to else {}), **({'frm': frm} if frm else {})}
         n += 1
     return n
 
 
-def walk(sp, calls=CALLS):
+def walk(sp, calls=CALLS, recent=0):
     """Page from now back to the newest stored fetch (new news), then on from the oldest page back to the season's
     start (an unfinished backfill). Saves after every 20 calls so a cut-off run keeps its pages."""
     S = load(sp)
     now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.000')
     legs = []
+    if recent:     # re-read the last few days (items stored before a pattern change)
+        from datetime import timedelta
+        legs.append(('re', now, (datetime.now(timezone.utc) - timedelta(days=recent)).strftime('%Y-%m-%d %H:%M:%S.000')))
     if S['newest']:
         legs.append(('new', now, S['newest']))
     if (S['oldest'] or now) > START[sp]:
@@ -196,9 +311,13 @@ def moves(sp):
     """this season's moves, oldest first (re-read with today's patterns)"""
     out = []
     for m in _data(sp)['moves'].values():
-        k = kind(m['head'])
+        k = kind(m['head'], sp)
         if k:
-            out.append(dict(m, kind=k))
+            m = dict(m, kind=k)
+            if k in ('trade', 'claim', 'sign', 'move') and 'to' not in m:
+                to, frm = dest(sp, m['head'], m.get('body'))
+                m.update({x: v for x, v in (('to', to), ('frm', frm)) if v})
+            out.append(m)
     return sorted(out, key=lambda m: m['d'])
 
 
@@ -258,6 +377,7 @@ class Ref:
         self.rows = [dict(v, pid=k) for k, v in teams(SITE[sport]).items()]
         from datetime import date, timedelta
         self.fresh = (date.today() - timedelta(days=FRESH)).isoformat()
+        self.week = (date.today() - timedelta(days=7)).isoformat()
         self._moves = moves(SITE[sport])
         self.last = {}
         for m in self._moves:
@@ -277,7 +397,19 @@ class Ref:
             return None
         rw = hit['team'] if self.college else hit['abbr']
         mv = self.last.get(hit['pid'])
-        k = hit.get('kind') or kind(hit.get('head') or '')
+        k = kind(hit.get('head') or '', SITE[self.sport])
+        # a trade or claim written before RotoWire moved him: the item still shows the old club, the text names the new
+        to = None
+        # only for a week: past that RotoWire's own club for him is current, and the destination text is history
+        if not self.college and k in ('trade', 'claim', 'move') and hit['d'] >= self.week:
+            to = hit.get('to') or dest(SITE[self.sport], hit.get('head'), '')[0]
+            if not to and mv and mv['d'] >= hit['d'] and mv['kind'] in ('trade', 'claim', 'move'):
+                to = mv.get('to')
+        if to and self.canon(to) != self.canon(rw):
+            rw = to
+            how = (how or '').replace('+team', '')
+            if self.canon(to) == self.canon(club):
+                return None       # already on the club the trade sent him to
         out = lambda f: {'flag': f, 'rotowire': rw if rw and rw not in FA else 'FA', 'd': hit['d'],
                          'head': hit.get('head'), 'kind': k, 'pid': hit['pid'],
                          'move': {x: mv[x] for x in ('d', 'kind', 'head')} if mv else None}
@@ -299,12 +431,12 @@ class Ref:
             if not pos or not g(pos) or g(pos) != g(hit.get('pos')):
                 return None
         # an old item that isn't a move (a summer-league line in July) doesn't outweigh today's chart
-        if not k and hit['d'] < self.fresh:
+        if (not k or k == 'move') and hit['d'] < self.fresh:
             return None
         if k == 'exit':
             return out('released')   # retired or gone abroad; RotoWire may still show a club
         if rw in FA:
-            if k in ('sign', 'claim', 'trade', 'up'):
+            if k in ('sign', 'claim', 'trade', 'up', 'move'):
                 return None   # written before the signing took effect: the item still shows FA
             if k == 'practice' or (not k and mv and mv['kind'] == 'practice'):
                 return out('practice')   # on a practice squad (RotoWire lists FA); club kept
@@ -367,5 +499,7 @@ if __name__ == '__main__':
     calls = int(sys.argv[sys.argv.index('--calls') + 1]) if '--calls' in sys.argv else CALLS
     if '--calls' in sys.argv:
         args = [a for a in args if a != str(calls)]
+    recent = int(sys.argv[sys.argv.index('--recent') + 1]) if '--recent' in sys.argv else 0
+    args = [a for a in args if a != str(recent)]
     for sp in (args or SPORTS):
-        walk(sp, calls)
+        walk(sp, calls, recent)

@@ -852,6 +852,23 @@ export async function fetchNflTrades(draftYear) {
   }
   return out;
 }
+// This season's trades from the transactions log (scripts/transactions.py -> data/transactions/nfl.json: RotoWire's
+// trade items, picks read from the text, data/trade_picks.json hand entries): Wikipedia's list lags deadline deals by
+// days. A deal Wikipedia already lists (a pick in that round from that club, its player named) is left to it; the
+// rest go after its list.
+export function ledgerNflTrades(draftYear, wiki = []) {
+  let D;
+  try { D = JSON.parse(fs.readFileSync(new URL('../data/transactions/nfl.json', import.meta.url))).deals || []; } catch { return wiki || []; }
+  const ESPN = { LA: 'LAR', LAR: 'LAR', WAS: 'WSH', WSH: 'WSH' }, code = t => ESPN[t] || t;
+  const last = n => String(n || '').replace(/ (jr|sr|ii|iii|iv)\.?$/i, '').split(' ').pop().toLowerCase();
+  const have = new Set((wiki || []).map(t => `${t.round}:${t.from}:${last(t.deal)}`)), out = [...(wiki || [])];
+  for (const d of [...D].sort((a, b) => a.d.localeCompare(b.d))) for (const [y, r, from, to, cond] of d.picks || []) {
+    if (y !== draftYear || !from || !to) continue;
+    if ((d.players || []).some(p => have.has(`${r}:${code(from)}:${last(p[0])}`))) continue;
+    out.push({ round: r, from: code(from), to: code(to), deal: d.players?.[0]?.[0] || null, cond: !!cond, earlier: false, log: d.d });
+  }
+  return out;
+}
 // The real trades onto the projected order: each pick keeps its original team in `via`; `team` is who holds it.
 export function applyNflTrades(order, trades, teams = {}) {
   for (const t of trades || []) {

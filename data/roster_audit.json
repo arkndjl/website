@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T18:56Z",
+ "asof": "2026-11-10T20:00Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -278,15 +278,15 @@
      "rows": 2140
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 15,
+     "flags": 16,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 68,
+     "flags": 71,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 67,
+     "flags": 70,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 51,
+     "flags": 55,
      "rows": 1650
     }
    },
@@ -341,49 +341,17 @@
      "file": "static/data/depth/nfl.json",
      "flag": "moved",
      "head": "Shipped to San Francisco",
-     "kind": "trade",
+     "kind": "move",
      "move": {
       "d": "2026-11-10",
       "head": "Shipped to San Francisco",
-      "kind": "trade"
+      "kind": "move"
      },
      "pid": "8627",
      "player": "Keenan Allen",
      "pos": "WR",
      "rotowire": "SF",
      "site": "IND"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Sent to Jacksonville",
-     "kind": null,
-     "move": {
-      "d": "2026-11-09",
-      "head": "Being traded to Jaguars",
-      "kind": "trade"
-     },
-     "pid": "15930",
-     "player": "Jordan Davis",
-     "pos": "DT",
-     "rotowire": "PHI",
-     "site": "JAX"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Bound for Jacksonville",
-     "kind": null,
-     "move": null,
-     "pid": "12564",
-     "player": "Jessie Bates III",
-     "pos": "SS",
-     "rotowire": "ATL",
-     "site": "JAX"
     },
     {
      "d": "2026-09-15",
@@ -422,6 +390,24 @@
      "site": "KC"
     },
     {
+     "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Returning to Minnesota",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Returning to Minnesota",
+      "kind": "move"
+     },
+     "pid": "8057",
+     "player": "Kirk Cousins",
+     "pos": "QB",
+     "rotowire": "MIN",
+     "site": "LV"
+    },
+    {
      "d": "2026-08-30",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -441,21 +427,103 @@
     },
     {
      "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Lands in Buffalo",
+     "kind": null,
+     "move": null,
+     "pid": "13550",
+     "player": "Amani Hooker",
+     "pos": "SS",
+     "rotowire": "BUF",
+     "site": "TEN"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Returning to Minnesota",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Returning to Minnesota",
+      "kind": "move"
+     },
+     "pid": "8057",
+     "player": "Kirk Cousins",
+     "pos": "QB",
+     "rotowire": "MIN",
+     "site": "LV"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Lands in Buffalo",
+     "kind": null,
+     "move": null,
+     "pid": "13550",
+     "player": "Amani Hooker",
+     "pos": "S",
+     "rotowire": "BUF",
+     "site": "TEN"
+    },
+    {
+     "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
      "flag": "moved",
      "head": "Shipped to San Francisco",
-     "kind": "trade",
+     "kind": "move",
      "move": {
       "d": "2026-11-10",
       "head": "Shipped to San Francisco",
-      "kind": "trade"
+      "kind": "move"
      },
      "pid": "8627",
      "player": "Keenan Allen",
      "pos": "WR",
      "rotowire": "SF",
      "site": "IND"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Bound for Jacksonville",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Bound for Jacksonville",
+      "kind": "move"
+     },
+     "pid": "12564",
+     "player": "Jessie Bates III",
+     "pos": "S",
+     "rotowire": "JAX",
+     "site": "ATL"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Sent to Jacksonville",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Sent to Jacksonville",
+      "kind": "move"
+     },
+     "pid": "15930",
+     "player": "Jordan Davis",
+     "pos": "DL",
+     "rotowire": "JAX",
+     "site": "PHI"
     },
     {
      "d": "2026-11-03",
@@ -492,20 +560,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "NE"
-    },
-    {
-     "d": "2026-10-11",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Retired, but likely to remain on roster",
-     "kind": "exit",
-     "move": null,
-     "pid": "8728",
-     "player": "Lane Johnson",
-     "pos": "OL",
-     "rotowire": "PHI",
-     "site": "PHI"
     },
     {
      "d": "2026-10-14",
@@ -1660,16 +1714,70 @@
      "site": "PHI"
     },
     {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Sent to Jacksonville",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Sent to Jacksonville",
+      "kind": "move"
+     },
+     "pid": "15930",
+     "player": "Jordan Davis",
+     "pos": "DL",
+     "rotowire": "JAX",
+     "site": "PHI"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Bound for Jacksonville",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Bound for Jacksonville",
+      "kind": "move"
+     },
+     "pid": "12564",
+     "player": "Jessie Bates III",
+     "pos": "S",
+     "rotowire": "JAX",
+     "site": "ATL"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Returning to Minnesota",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Returning to Minnesota",
+      "kind": "move"
+     },
+     "pid": "8057",
+     "player": "Kirk Cousins",
+     "pos": "QB",
+     "rotowire": "MIN",
+     "site": "LV"
+    },
+    {
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
      "flag": "moved",
      "head": "Shipped to San Francisco",
-     "kind": "trade",
+     "kind": "move",
      "move": {
       "d": "2026-11-10",
       "head": "Shipped to San Francisco",
-      "kind": "trade"
+      "kind": "move"
      },
      "pid": "8627",
      "player": "Keenan Allen",
@@ -1699,9 +1807,9 @@
      "d": "2026-10-11",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "released",
+     "flag": "moved",
      "head": "Retired, but likely to remain on roster",
-     "kind": "exit",
+     "kind": null,
      "move": null,
      "pid": "8728",
      "player": "Lane Johnson",
@@ -1744,6 +1852,20 @@
      "pos": "EDGE",
      "rotowire": "FA",
      "site": "MIA"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Lands in Buffalo",
+     "kind": null,
+     "move": null,
+     "pid": "13550",
+     "player": "Amani Hooker",
+     "pos": "S",
+     "rotowire": "BUF",
+     "site": "TEN"
     },
     {
      "d": "2026-10-07",
@@ -2578,18 +2700,86 @@
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
      "flag": "moved",
+     "head": "Returning to Minnesota",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Returning to Minnesota",
+      "kind": "move"
+     },
+     "pid": "8057",
+     "player": "Kirk Cousins",
+     "pos": "QB",
+     "rotowire": "MIN",
+     "site": "LV"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Lands in Buffalo",
+     "kind": null,
+     "move": null,
+     "pid": "13550",
+     "player": "Amani Hooker",
+     "pos": "S",
+     "rotowire": "BUF",
+     "site": "TEN"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
      "head": "Shipped to San Francisco",
-     "kind": "trade",
+     "kind": "move",
      "move": {
       "d": "2026-11-10",
       "head": "Shipped to San Francisco",
-      "kind": "trade"
+      "kind": "move"
      },
      "pid": "8627",
      "player": "Keenan Allen",
      "pos": "WR",
      "rotowire": "SF",
      "site": "IND"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Bound for Jacksonville",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Bound for Jacksonville",
+      "kind": "move"
+     },
+     "pid": "12564",
+     "player": "Jessie Bates III",
+     "pos": "S",
+     "rotowire": "JAX",
+     "site": "ATL"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Sent to Jacksonville",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Sent to Jacksonville",
+      "kind": "move"
+     },
+     "pid": "15930",
+     "player": "Jordan Davis",
+     "pos": "DL",
+     "rotowire": "JAX",
+     "site": "PHI"
     },
     {
      "d": "2026-11-03",
@@ -2626,20 +2816,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "NE"
-    },
-    {
-     "d": "2026-10-11",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Retired, but likely to remain on roster",
-     "kind": "exit",
-     "move": null,
-     "pid": "8728",
-     "player": "Lane Johnson",
-     "pos": "OL",
-     "rotowire": "PHI",
-     "site": "PHI"
     },
     {
      "d": "2026-10-14",
@@ -3780,12 +3956,30 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "moved",
+     "head": "Returning to Minnesota",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Returning to Minnesota",
+      "kind": "move"
+     },
+     "pid": "8057",
+     "player": "Kirk Cousins",
+     "pos": "QB",
+     "rotowire": "MIN",
+     "site": "LV"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "moved",
      "head": "Shipped to San Francisco",
-     "kind": "trade",
+     "kind": "move",
      "move": {
       "d": "2026-11-10",
       "head": "Shipped to San Francisco",
-      "kind": "trade"
+      "kind": "move"
      },
      "pid": "8627",
      "player": "Keenan Allen",
@@ -4047,7 +4241,7 @@
     }
    ],
    "joined": 0,
-   "players": 2237,
+   "players": 2238,
    "rows": 8014
   },
   "nhl": {
@@ -4061,11 +4255,11 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 833
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 833
     },
     "static/data/xaav-nhl.json": {
@@ -4074,6 +4268,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Headed to Vancouver",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Headed to Vancouver",
+      "kind": "move"
+     },
+     "pid": "5562",
+     "player": "Cameron Crotty",
+     "pos": "D",
+     "rotowire": "VAN",
+     "site": "MIN"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -4273,6 +4485,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "moved",
+     "head": "Headed to Vancouver",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Headed to Vancouver",
+      "kind": "move"
+     },
+     "pid": "5562",
+     "player": "Cameron Crotty",
+     "pos": "D",
+     "rotowire": "VAN",
+     "site": "MIN"
+    },
+    {
      "d": "2026-11-07",
      "field": "tm",
      "file": "static/data/pctl-nhl.json",
@@ -4292,7 +4522,7 @@
     }
    ],
    "joined": 0,
-   "players": 1392,
+   "players": 1394,
    "rows": 3188
   }
  }
