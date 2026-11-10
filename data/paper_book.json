@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T14:58:30Z",
+ "asof": "2026-11-10T15:51:09Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -413,11 +413,11 @@
  },
  "record": {
   "n": 465,
-  "clvN": 424,
-  "clvRet": -0.0121,
-  "clvT": -2.5,
-  "clv": 0.0,
-  "beat": 0.311,
+  "clvN": 425,
+  "clvRet": -0.012,
+  "clvT": -2.47,
+  "clv": 0.02,
+  "beat": 0.313,
   "settled": 422,
   "w": 208,
   "l": 214,
@@ -428,23 +428,23 @@
   "risked": 393.5,
   "yield": -0.0343
  },
- "tEff": -2.41,
+ "tEff": -2.35,
  "corr": {
-  "rho": 0.001,
-  "n": 424,
+  "rho": 0.002,
+  "n": 425,
   "slates": 42,
-  "nEff": 398.5,
-  "avgSlate": 10.1
+  "nEff": 385.1,
+  "avgSlate": 10.12
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 424,
+   "value": 425,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.2% t -2.41",
+   "value": "-1.2% t -2.35",
    "pass": false
   },
   {
@@ -702,11 +702,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 85,
-   "clvN": 81,
-   "clvRet": -0.0173,
-   "clvT": -3.66,
-   "clv": -0.09,
-   "beat": 0.259,
+   "clvN": 82,
+   "clvRet": -0.0164,
+   "clvT": -3.44,
+   "clv": -0.03,
+   "beat": 0.268,
    "settled": 79,
    "w": 41,
    "l": 38,
@@ -806,7 +806,11 @@
    "edge": 30.2,
    "ev": 0.0283,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0584,
+   "clv": 4.2,
+   "beat": 1,
+   "close": 0.36
   },
   {
    "rule": "tennis-ml",
@@ -1200,7 +1204,7 @@
    "ev": 0.0107,
    "event": null,
    "pass": false,
-   "close": 53.5
+   "close": 54.5
   },
   {
    "rule": "cfb-spread",
@@ -1284,7 +1288,7 @@
    "ev": 0.0362,
    "event": null,
    "pass": false,
-   "close": 37.5
+   "close": 38.5
   },
   {
    "rule": "cfb-total",
@@ -1305,7 +1309,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 74.5
   },
   {
    "rule": "cfb-total",
@@ -17903,7 +17907,11 @@
    "edge": 30.2,
    "ev": 0.0283,
    "event": "DIRECTV Open Presentado por Compesar",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.0584,
+   "clv": 4.2,
+   "beat": 1,
+   "close": 0.36
   },
   {
    "rule": "tennis-ml",
@@ -18297,7 +18305,7 @@
    "ev": 0.0107,
    "event": null,
    "pass": false,
-   "close": 53.5
+   "close": 54.5
   },
   {
    "rule": "cfb-spread",
@@ -18381,7 +18389,7 @@
    "ev": 0.0362,
    "event": null,
    "pass": false,
-   "close": 37.5
+   "close": 38.5
   },
   {
    "rule": "cfb-total",
@@ -18402,7 +18410,7 @@
    "ev": 0.05,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 74.5
   },
   {
    "rule": "cfb-total",
