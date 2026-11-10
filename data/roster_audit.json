@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T00:56Z",
+ "asof": "2026-11-10T02:52Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 753,
+   "players": 756,
    "rows": 5262
   },
   "cfb": {
@@ -274,7 +274,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
+     "flags": 7,
      "rows": 2149
     },
     "static/data/nfl-fantasy.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 48,
+     "flags": 49,
      "rows": 1650
     }
    },
@@ -402,24 +402,6 @@
      "pos": "CB",
      "rotowire": "TEN",
      "site": "KC"
-    },
-    {
-     "d": "2026-10-13",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "released",
-     "head": "Let go by Jets",
-     "kind": null,
-     "move": {
-      "d": "2026-09-22",
-      "head": "Signs to 53-man roster",
-      "kind": "sign"
-     },
-     "pid": "14013",
-     "player": "Troy Reeder",
-     "pos": "WLB",
-     "rotowire": "FA",
-     "site": "NYJ"
     },
     {
      "d": "2026-08-31",
@@ -2232,6 +2214,24 @@
      "site": "NE"
     },
     {
+     "d": "2026-11-09",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Re-signs with Jets",
+     "kind": "sign",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Re-signs with Jets",
+      "kind": "sign"
+     },
+     "pid": "14013",
+     "player": "Troy Reeder",
+     "pos": "LB",
+     "rotowire": "NYJ",
+     "site": "FA"
+    },
+    {
      "d": "2026-07-31",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -3489,7 +3489,7 @@
     }
    ],
    "joined": 0,
-   "players": 2234,
+   "players": 2235,
    "rows": 8002
   },
   "nhl": {

@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T00:58:02Z",
+ "asof": "2026-11-10T02:52:49Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 86.69,
   "peak": 117.38,
   "drawdown": 0.2614,
-  "open": 75.0,
+  "open": 76.0,
   "path": [
    100.41,
    101.85,
@@ -412,10 +412,10 @@
   ]
  },
  "record": {
-  "n": 448,
-  "clvN": 407,
-  "clvRet": -0.0139,
-  "clvT": -2.86,
+  "n": 449,
+  "clvN": 410,
+  "clvRet": -0.0142,
+  "clvT": -2.93,
   "clv": -0.07,
   "beat": 0.301,
   "settled": 407,
@@ -428,23 +428,23 @@
   "risked": 368.0,
   "yield": -0.031
  },
- "tEff": -2.87,
+ "tEff": -2.93,
  "corr": {
   "rho": 0.0,
-  "n": 407,
-  "slates": 38,
-  "nEff": 407.0,
-  "avgSlate": 10.71
+  "n": 410,
+  "slates": 39,
+  "nEff": 410.0,
+  "avgSlate": 10.51
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 407,
+   "value": 410,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.4% t -2.87",
+   "value": "-1.4% t -2.93",
    "pass": false
   },
   {
@@ -454,7 +454,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-spread: -1.6%",
+   "value": "without nba-spread: -1.7%",
    "pass": false
   },
   {
@@ -680,7 +680,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 81,
+   "n": 82,
    "clvN": 79,
    "clvRet": -0.0178,
    "clvT": -3.71,
@@ -702,9 +702,9 @@
    "sport": "nflprops",
    "mk": "prop",
    "n": 61,
-   "clvN": 58,
-   "clvRet": -0.0182,
-   "clvT": -1.71,
+   "clvN": 61,
+   "clvRet": -0.0202,
+   "clvT": -1.88,
    "clv": null,
    "beat": null,
    "settled": 58,
@@ -926,7 +926,9 @@
    "edge": 27.7,
    "ev": 0.1592,
    "event": null,
-   "pass": true
+   "pass": true,
+   "clvRet": -0.1172,
+   "close": 215.5
   },
   {
    "rule": "nflprops-prop",
@@ -946,7 +948,9 @@
    "edge": 22.6,
    "ev": 0.144,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0556,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -966,7 +970,9 @@
    "edge": 19.6,
    "ev": 0.119,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.087,
+   "close": 4.5
   },
   {
    "rule": "nflprops-prop",
@@ -986,7 +992,9 @@
    "edge": 16.9,
    "ev": 0.1856,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.213,
+   "close": 6.5
   },
   {
    "rule": "nba-ml",
@@ -1070,7 +1078,7 @@
    "ev": 0.0095,
    "event": null,
    "pass": false,
-   "close": 11.5
+   "close": 10.5
   },
   {
    "rule": "nba-total",
@@ -1131,6 +1139,26 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186745",
+   "k": "2026-11-10T16:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Andreescu",
+   "a": "Masarova",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 277,
+   "bet": "Masarova ML +277",
+   "placed": "2026-11-10T02:52:49Z",
+   "stake": 1.0,
+   "edge": 27.5,
+   "ev": 0.0245,
+   "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
   {
@@ -1466,7 +1494,7 @@
    "ev": 0.0206,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -1571,7 +1599,7 @@
    "ev": 0.0569,
    "event": null,
    "pass": false,
-   "close": 59.5
+   "close": 58.5
   },
   {
    "rule": "cfb-total",
@@ -1613,7 +1641,7 @@
    "ev": 0.0027,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 72.5
   },
   {
    "rule": "cfb-total",
@@ -1655,7 +1683,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": true,
-   "close": 39.5
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -1697,7 +1725,7 @@
    "ev": 0.0067,
    "event": null,
    "pass": false,
-   "close": 39.5
+   "close": 38.5
   }
  ],
  "recent": [
@@ -17423,7 +17451,9 @@
    "edge": 27.7,
    "ev": 0.1592,
    "event": null,
-   "pass": true
+   "pass": true,
+   "clvRet": -0.1172,
+   "close": 215.5
   },
   {
    "rule": "nflprops-prop",
@@ -17443,7 +17473,9 @@
    "edge": 22.6,
    "ev": 0.144,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0556,
+   "close": 3.5
   },
   {
    "rule": "nflprops-prop",
@@ -17463,7 +17495,9 @@
    "edge": 19.6,
    "ev": 0.119,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": 0.087,
+   "close": 4.5
   },
   {
    "rule": "nflprops-prop",
@@ -17483,7 +17517,9 @@
    "edge": 16.9,
    "ev": 0.1856,
    "event": null,
-   "pass": false
+   "pass": false,
+   "clvRet": -0.213,
+   "close": 6.5
   },
   {
    "rule": "nba-ml",
@@ -17567,7 +17603,7 @@
    "ev": 0.0095,
    "event": null,
    "pass": false,
-   "close": 11.5
+   "close": 10.5
   },
   {
    "rule": "nba-total",
@@ -17628,6 +17664,26 @@
    "edge": 5.8,
    "ev": 0.0107,
    "event": "Bybit Stockholm Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186745",
+   "k": "2026-11-10T16:30:00Z",
+   "slate": "tennis:2026-11-10",
+   "h": "Andreescu",
+   "a": "Masarova",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 277,
+   "bet": "Masarova ML +277",
+   "placed": "2026-11-10T02:52:49Z",
+   "stake": 1.0,
+   "edge": 27.5,
+   "ev": 0.0245,
+   "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
   {
@@ -17963,7 +18019,7 @@
    "ev": 0.0206,
    "event": null,
    "pass": false,
-   "close": 60.5
+   "close": 59.5
   },
   {
    "rule": "cfb-total",
@@ -18068,7 +18124,7 @@
    "ev": 0.0569,
    "event": null,
    "pass": false,
-   "close": 59.5
+   "close": 58.5
   },
   {
    "rule": "cfb-total",
@@ -18110,7 +18166,7 @@
    "ev": 0.0027,
    "event": null,
    "pass": false,
-   "close": 73.5
+   "close": 72.5
   },
   {
    "rule": "cfb-total",
@@ -18152,7 +18208,7 @@
    "ev": 0.0049,
    "event": null,
    "pass": true,
-   "close": 39.5
+   "close": 40.5
   },
   {
    "rule": "cfb-total",
@@ -18194,7 +18250,7 @@
    "ev": 0.0067,
    "event": null,
    "pass": false,
-   "close": 39.5
+   "close": 38.5
   }
  ]
 }
