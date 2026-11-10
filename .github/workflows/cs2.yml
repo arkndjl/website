@@ -66,9 +66,13 @@ jobs:
       - name: Model monitor
         continue-on-error: true
         run: python3 scripts/model_monitor.py cs2
+      # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
+      - name: Board moves
+        continue-on-error: true
+        run: python3 scripts/board_moves.py cs2
       - name: Commit if anything changed
         run: |
-          files="data/cs2.json data/cs2_events.json data/cs2_events_fit.json data/cs2_pickem.json data/cs2_pickem_fit.json scripts/data/cs2_pickem_prep.json.gz scripts/data/cs2_events.json.gz data/cs2_players.json data/cs2_players_fit.json data/cs2_proj_fit.json scripts/data/cs2_pstats scripts/data/cs2_pdir.json.gz scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz data/cs2_picks_fit.json static/img/cs2 data/model_monitor/cs2.json scripts/data/model_monitor/cs2.json"
+          files="scripts/data/moves data/cs2.json data/cs2_events.json data/cs2_events_fit.json data/cs2_pickem.json data/cs2_pickem_fit.json scripts/data/cs2_pickem_prep.json.gz scripts/data/cs2_events.json.gz data/cs2_players.json data/cs2_players_fit.json data/cs2_proj_fit.json scripts/data/cs2_pstats scripts/data/cs2_pdir.json.gz scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz data/cs2_picks_fit.json static/img/cs2 data/model_monitor/cs2.json scripts/data/model_monitor/cs2.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

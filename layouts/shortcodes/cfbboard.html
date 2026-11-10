@@ -107,7 +107,7 @@
         <th data-sort="pos" title="position + rank at position by FV (QB3 = 3rd QB); sorts by position, then rank">Pos</th>
         <th data-sort="team">School</th>
         <th data-sort="fv" data-num class="cfb__g">FV</th>
-        <th data-sort="delta" data-num class="cfb__now" title="FV change since last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
+        <th data-sort="delta" data-num class="cfb__now" title="Δ = FV change over the last 7 days{{ with $d }}{{ with .since }}, since {{ . }}{{ end }}{{ end }}. new = not on the board then">Δ</th>
         <th data-sort="stat" data-num class="cfb__now" title="Stat+ = 100 + 25 z; z = position all-in-one score this season (PFN QB+, RB+, WR+, TE+, OLi, EDGE+, DT+, LB+, CB+, SAF+; K+, P+ by percentile) vs snap-weighted position mean, FBS or FCS. hover: source score, snaps">Stat+</th>
 {{- if ne $preset "war" }}
         <th data-sort="war" data-num class="cfb__now"{{ if eq $preset "war" }} aria-sort="descending"{{ end }} title="college WAR = wins a 12-game season over a replacement starter = snap share x (line + weight x quality) x .227; quality from Stat+, badges, FV. line = margin lost when an average starter at the spot sits (OT / IOL, slot WR, nickel CB): QB 2.7 pts a game (regular seasons 2019-25), others .8-1.7; blend of missed games, NFL spot values, position grade. QB production partly credited to offensive teammates. 4.4 pts of margin a game = 1 win. K, P: points over an average K / P. FCS: vs FCS starters. no snaps = 0">WAR</th>

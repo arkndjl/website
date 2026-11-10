@@ -47,6 +47,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters">RK</th>
         <th data-sort="n">Player</th>
+        <th data-sort="wk" data-num title="± = rank change in GAR over the last 7 days, within the filters; hover for the rank and GAR then. GAR view, current season, top leagues">±</th>
         {{- if eq $view "stats" }}
         <th data-sort="g" data-num title="goals">G</th>
         <th data-sort="xg" data-num title="expected goals (penalties in)">xG</th>
@@ -185,6 +186,7 @@
       }).sort(function (a, b) { return (b[KEY] == null ? -1e9 : b[KEY]) - (a[KEY] == null ? -1e9 : a[KEY]) || b.min - a.min; });
       var pr = {};
       list.forEach(function (p, i) { p['rk' + KEY] = i + 1; p['pr' + KEY] = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
+      var wkf = stats ? null : data.wkFrom; __wk.rank(list.filter(function (p) { return !p.more; }), 'rk' + KEY); __wk.show(win, wkf);
       var shown = list.length;
       if (q) list = list.filter(function (p) { return (p.n + ' ' + p.team).toLowerCase().indexOf(q) >= 0; });
       if (sortKey !== 'rk') {
@@ -198,7 +200,7 @@
       } else if (dir < 0) list = list.slice().reverse();
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
-        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
+        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf ? __wk.none : __wk.rk(p, wkf, 'GAR', null, p.gar));
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'

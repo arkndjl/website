@@ -166,9 +166,13 @@ jobs:
       - name: Model monitor
         continue-on-error: true
         run: python3 scripts/model_monitor.py nfl
+      # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
+      - name: Board moves
+        continue-on-error: true
+        run: python3 scripts/board_moves.py nfl
       - name: Commit if anything changed
         run: |
-          files="static/data/xaav-nfl.json data/units_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json static/data/personnel/nfl.json data/depth_starters_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json data/nfl_breakouts.json data/st_returners_nfl.json data/st_teams_nfl.json data/st_kickers_nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
+          files="scripts/data/moves static/data/xaav-nfl.json data/units_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json static/data/personnel/nfl.json data/depth_starters_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json data/nfl_breakouts.json data/st_returners_nfl.json data/st_teams_nfl.json data/st_kickers_nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
           # main moves while the board builds (merged PRs, the college board, odds snaps): scripts/data_push.py rebuilds
           # the data commit on the new main. This run's files are taken whole, only the ones it changed. The picks log and
           # data/rule_monitor.json are shared with the snaps and every sport's job, so when main has newer copies they are

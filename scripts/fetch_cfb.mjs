@@ -2532,13 +2532,16 @@ await teamLogos(outFcs);
   console.log('FCS:', JSON.stringify({ population: out.fcs.population, share: out.fcs.share, moveUp: out.fcs.moveUp }));
 }
 
-// movers: each update keeps a snapshot of every grade; the board shows the change since the last
-// snapshot from an earlier day (re-runs on the same day replace that day's snapshot). Snapshots carry
-// the model version, so a model change starts the movers over instead of reporting its own churn.
+// movers: each update keeps a snapshot of every grade; the board shows the change over the last week, against the
+// newest snapshot at least 7 days old (re-runs on the same day replace that day's snapshot; the window's snapshots and
+// the one before it are kept). Snapshots carry the model version, so a model change starts the movers over instead of
+// reporting its own churn.
 const MODEL_VERSION = 'mean-2026-10';   // the headline FV at the mean outcome: no movers against the old grades
 const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
-const base = hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION).at(-1);
+const WEEK_AGO = new Date(Date.parse(out.asof) - 7 * 86400e3).toISOString().slice(0, 10);
+const base = hist.snapshots.filter(h => h.date <= WEEK_AGO && h.v === MODEL_VERSION).at(-1)
+  ?? hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION)[0];   // a history under a week old: its oldest
 out.since = base?.date ?? null;
 // FBS and FCS in one list, ranked together (ovr): the holistic board
 const merged = () => {
@@ -2554,7 +2557,10 @@ for (const r of everyone) {
 }
 hist.snapshots = hist.snapshots.filter(h => h.date !== out.asof);
 hist.snapshots.push({ date: out.asof, v: MODEL_VERSION, fcs: true, fv: Object.fromEntries(everyone.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
-hist.snapshots = hist.snapshots.slice(-6);
+{
+  const keep = hist.snapshots.filter(h => h.date <= WEEK_AGO).at(-1)?.date ?? '';
+  hist.snapshots = hist.snapshots.filter(h => h.date >= keep);
+}
 fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 
 // every graded player, for the database view: column arrays keep it small (fetched by the page)

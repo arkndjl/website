@@ -1,5 +1,5 @@
 {{- /* One Counter-Strike player row (shortcodes/cs2players.html): dict "r" (a data/cs2_players.json row) "ctry" (country
-       names) "view" (board | prospects | values) "rk" (rank override for re-sorted views). */ -}}
+       names) "view" (board | prospects | values) "rk" (rank override for re-sorted views) "from" (wkFrom, for the weekly move cell: partials/wkrk.html, wkfv.html). */ -}}
 {{- $r := .r -}}{{- $v := .view -}}
 <tr data-pk="{{ $r.id }}">
   <td class="cfb__rk">{{ .rk | default $r.rk }}</td>
@@ -8,7 +8,7 @@
   <td class="cs__tier" data-v="{{ $r.tier }}" data-filter="Tier {{ $r.tier }}"><span class="cs__t cs__t--{{ $r.tier }}">T{{ $r.tier }}</span></td>
   {{- if eq $v "board" }}
   <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td>
-  <td class="cfb__num" data-v="{{ $r.rwa }}"><b>{{ printf "%+.2f" (float $r.rwa) }}</b></td>
+  <td class="cfb__num" data-v="{{ $r.rwa }}"><b>{{ printf "%+.2f" (float $r.rwa) }}</b></td>{{ partial "wkrk.html" (dict "r" $r "from" .from "v" "rwa" "label" "RWA" "fmt" "%+.2f") }}
   <td class="cfb__num" data-v="{{ $r.p6 | default 0 }}">{{ with $r.p6 }}{{ printf "%+.2f" (float .) }}{{ else }}-{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.d90 }}">{{ printf "%+.2f" (float $r.d90) }}</td>
   <td class="cfb__num" data-v="{{ $r.rar }}">{{ printf "%.0f" (float $r.rar) }}</td>
@@ -19,7 +19,7 @@
   <td class="cfb__num hk__x" data-v="{{ $r.ok }}">{{ printf "%+.1f" (float $r.ok) }}</td>
   <td class="cfb__num" data-v="{{ $r.xtv | default 0 }}">{{ with $r.xtv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
   {{- else if eq $v "prospects" }}
-  <td class="fv" data-v="{{ $r.proj }}"><span class="fv-chip" data-fv="{{ mul (div (int $r.fv) 5) 5 }}">{{ $r.fv }}</span></td>
+  <td class="fv" data-v="{{ $r.proj }}"><span class="fv-chip" data-fv="{{ mul (div (int $r.fv) 5) 5 }}">{{ $r.fv }}</span></td>{{ partial "wkfv.html" (dict "r" $r "from" .from) }}
   <td class="cfb__num" data-v="{{ $r.proj }}"><b>{{ printf "%+.2f" (float $r.proj) }}</b></td>
   <td class="cfb__num" data-v="{{ $r.rise }}">{{ if gt (float $r.rise) 0.5 }}<span class="cs__up">{{ printf "%+.2f" (float $r.rise) }}</span>{{ else }}{{ printf "%+.2f" (float $r.rise) }}{{ end }}</td>
   <td class="cfb__num" data-v="{{ $r.t1p | default 0 }}">{{ with $r.t1p }}{{ printf "%.0f" (mul . 100) }}%{{ else }}-{{ end }}</td>

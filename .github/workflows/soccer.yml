@@ -98,8 +98,12 @@ jobs:
       - name: Model monitor
         continue-on-error: true
         run: python3 scripts/model_monitor.py soccer
+      # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
+      - name: Board moves
+        continue-on-error: true
+        run: python3 scripts/board_moves.py soccer
       - name: Commit if anything changed
         run: |
-          files="data/units_soccer.json static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/lineups/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"
+          files="scripts/data/moves data/units_soccer.json static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/lineups/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"
           # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
           python3 scripts/data_push.py -m "Update the soccer matches ($(date -u +%Y-%m-%d))" -- $files
