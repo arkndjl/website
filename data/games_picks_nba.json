@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-10T04:30:41Z",
+ "asof": "2026-11-10T04:33:18Z",
  "recenter": {
   "2026-11-10": 1.89
  },
@@ -98,10 +98,10 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 14,
-    "window": 14,
-    "mean": 0.0721,
-    "t": 2.12,
+    "n": 15,
+    "window": 15,
+    "mean": 0.0824,
+    "t": 2.04,
     "p": null,
     "days": 5,
     "sd": 0.1438,
@@ -118,17 +118,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0187,
-     "n": 14,
+     "n": 15,
      "sd": 0.1438,
      "rho": 0.074,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.665,
-     "info": 0.24,
-     "real": 3.705,
-     "realSe": 2.194,
+     "llr": 0.813,
+     "info": 0.25,
+     "real": 4.329,
+     "realSe": 2.133,
      "need": 350
     }
    },
@@ -238,10 +238,10 @@
     }
    },
    "spread | role: favorite": {
-    "n": 7,
-    "window": 7,
-    "mean": -0.0182,
-    "t": -0.35,
+    "n": 8,
+    "window": 8,
+    "mean": -0.0136,
+    "t": -0.3,
     "p": null,
     "days": 4,
     "sd": 0.1228,
@@ -435,9 +435,9 @@
     "mk": "total",
     "side": "over",
     "line": 228.5,
-    "price": -104.0,
-    "ev": 0.128,
-    "units": 2.75
+    "price": -106.0,
+    "ev": 0.121,
+    "units": 2.5
    }
   },
   {
@@ -555,7 +555,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 0.5,
    "x": 3.5,
    "why": "edge under 3.5 (role: dog)",
@@ -580,7 +580,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -100.0,
+   "price": -102.0,
    "edge": 0.5,
    "ev": null,
    "units": 0.0,
@@ -592,10 +592,10 @@
    "mk": "total",
    "side": "over",
    "line": 228.5,
-   "price": -104.0,
-   "ev": 0.128,
+   "price": -106.0,
+   "ev": 0.121,
    "edge": 5.2,
-   "units": 2.75,
+   "units": 2.5,
    "home": "UTAH",
    "away": "MIA",
    "state": "pick"
@@ -677,7 +677,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3162,
+  "snapshots": 3164,
   "buckets": [
    {
     "when": "24h+",
@@ -6136,7 +6136,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-10": {
-    "raw": 2.75,
+    "raw": 2.5,
     "scale": 1.0
    },
    "2026-11-13": {
