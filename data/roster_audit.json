@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T04:23Z",
+ "asof": "2026-11-10T04:25Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,11 +274,11 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 10,
-     "rows": 2149
+     "flags": 9,
+     "rows": 2150
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 12,
+     "flags": 10,
      "rows": 630
     },
     "static/data/nfl-war.json": {
@@ -336,60 +336,6 @@
      "site": "CIN"
     },
     {
-     "d": "2026-11-09",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Back with practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Back with practice squad",
-      "kind": "practice"
-     },
-     "pid": "19608",
-     "player": "Carsen Ryan",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "CLE"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "19442",
-     "player": "Jordan Hudson",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "DAL"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "17829",
-     "player": "Cody Schrader",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "DEN"
-    },
-    {
      "d": "2026-09-14",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -406,6 +352,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "IND"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Sent to Jacksonville",
+     "kind": null,
+     "move": {
+      "d": "2026-11-09",
+      "head": "Being traded to Jaguars",
+      "kind": "trade"
+     },
+     "pid": "15930",
+     "player": "Jordan Davis",
+     "pos": "DT",
+     "rotowire": "PHI",
+     "site": "JAX"
     },
     {
      "d": "2026-11-09",
@@ -456,6 +420,24 @@
      "pos": "CB",
      "rotowire": "TEN",
      "site": "KC"
+    },
+    {
+     "d": "2026-08-30",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Released by Minnesota",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-30",
+      "head": "Released by Minnesota",
+      "kind": "waived"
+     },
+     "pid": "13219",
+     "player": "Tavierre Thomas",
+     "pos": "NB",
+     "rotowire": "FA",
+     "site": "MIN"
     },
     {
      "d": "2026-08-31",
@@ -3632,6 +3614,24 @@
      "site": "DEN"
     },
     {
+     "d": "2026-11-02",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-02",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "17271",
+     "player": "Ryan Miller",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NE"
+    },
+    {
      "d": "2026-10-26",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3668,24 +3668,6 @@
      "site": "DAL"
     },
     {
-     "d": "2026-11-02",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-02",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "17271",
-     "player": "Ryan Miller",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "NE"
-    },
-    {
      "d": "2026-09-15",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3702,42 +3684,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "KC"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Cut loose by Detroit",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Cut loose by Detroit",
-      "kind": "waived"
-     },
-     "pid": "18480",
-     "player": "Jackson Meeks",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "DET"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Cut by New England",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Cut by New England",
-      "kind": "waived"
-     },
-     "pid": "19365",
-     "player": "Tanner Arkin",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "NE"
     },
     {
      "d": "2026-11-03",
@@ -3796,7 +3742,7 @@
    ],
    "joined": 0,
    "players": 2236,
-   "rows": 8002
+   "rows": 8003
   },
   "nhl": {
    "by_file": {
