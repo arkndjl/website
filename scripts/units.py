@@ -111,7 +111,8 @@ def load():
     if 'fit' not in _FIT:
         try:
             _FIT['fit'] = json.load(open(FIT))
-        except (OSError, ValueError):
+        except (OSError, ValueError) as e:
+            print(f'units: no stake fit ({e!r}), stakes on the defaults', file=sys.stderr)
             _FIT['fit'] = {}
     return _FIT['fit']
 

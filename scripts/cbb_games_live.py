@@ -211,10 +211,13 @@ def covers_report():
     try:
         r = subprocess.run(['curl', '-s', '-m', '60', '-A', H.UA, COVERS], capture_output=True, text=True)
         h = r.stdout
-    except Exception:
+    except Exception as e:
+        print(f'cbb injuries: Covers fetch failed ({e!r}), no report', flush=True)
         return []
     out = []
     parts = re.split(r'<a id="([^"]+)"></a>\s*<section>', h)
+    if len(parts) < 3:
+        print(f'cbb injuries: Covers returned no team sections (curl exit {r.returncode}, {len(h)} bytes), no Covers report', flush=True)
     row = re.compile(r"<tr>\s*<td>\s*<a href='[^']*/players/\d+/([^']+)'[^>]*>\s*([^<]+?)\s*</a>\s*</td>\s*<td>([^<]*)</td>\s*"
                      r"<td><b>([^<]+)</b>(?:<br>\(\s*([^)]+)\))?", re.S)
     for i in range(1, len(parts) - 1, 2):

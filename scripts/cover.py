@@ -63,12 +63,17 @@ def fit():
     _F.clear()
 
 
+_WARNED = []
+
+
 def params(sport, mk):
     if not _F:
         try:
             _F.update(json.load(open(FIT))['sports'])
-        except (OSError, ValueError, KeyError):
-            pass
+        except (OSError, ValueError, KeyError) as e:
+            if not _WARNED:
+                _WARNED.append(e)
+                print(f'cover: no fit ({e!r}), no cover chance', file=sys.stderr)
     return (_F.get(sport) or {}).get(mk)
 
 

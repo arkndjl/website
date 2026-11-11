@@ -70,7 +70,8 @@ def params(sport):
     if _F is None:
         try:
             _F = json.load(open(FIT))
-        except (OSError, ValueError):
+        except (OSError, ValueError) as e:
+            print(f'clv: no fit ({e!r}), margin and total sd from SD0', file=sys.stderr)
             _F = {}
     p = (_F.get('sports') or {}).get(sport) or {}
     return p.get('sd') or SD0[sport][0], p.get('sdT') or SD0[sport][1], p.get('key')

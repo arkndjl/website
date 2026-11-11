@@ -42,11 +42,17 @@ LEAGUE = {'cfb': 'NCAAF', 'nfl': 'NFL', 'cbb': 'NCAAB', 'nba': 'NBA', 'nhl': 'NH
 SD = {'cfb': (16.0, 14.0), 'nfl': (13.5, 10.0), 'cbb': (11.0, 16.0), 'nba': (12.0, 14.5), 'nhl': (2.3, 2.3)}
 
 
+_WARNED = []
+
+
 def sds(sport):
     """(margin sd, total sd) for a sport: clv_fit.json's, else the table's"""
     try:
         f = (json.load(open(os.path.join(os.path.dirname(HERE), 'data', 'clv_fit.json'))).get('sports') or {}).get(sport) or {}
-    except (OSError, ValueError):
+    except (OSError, ValueError) as e:
+        if not _WARNED:
+            _WARNED.append(e)
+            print(f'novig: no clv_fit.json ({e!r}), sd from the table', file=sys.stderr)
         f = {}
     return f.get('sd') or SD[sport][0], f.get('sdT') or SD[sport][1]
 UA = 'arkndjl.net arkboard (odds research)'

@@ -881,10 +881,16 @@ def evaluate(rows, P, lo=TUNE[0], hi=TUNE[1], comps=None):
 
 
 # ---------------------------------------------------------------- fit
+_WARNED = []
+
+
 def params():
     try:
         return dict(P0, **json.load(open(FIT))['params'])
-    except (OSError, KeyError, ValueError):
+    except (OSError, KeyError, ValueError) as e:
+        if not _WARNED:
+            _WARNED.append(e)
+            print(f'soccer games: no fit params ({e!r}), on P0', file=sys.stderr)
         return dict(P0)
 
 
