@@ -45,14 +45,16 @@ ALL = list(range(1, 13))
 BT_HIST = ('needs Barttorvik game logs for every past season (scripts/.cache/cbb/games_bt); the runners\' cache keeps '
            'only the live and last season, and Barttorvik answers runners with a page, so a past season loads empty')
 JOBS = {
-    # ---- game models: walk-forward backtest against the close + refit, monthly in season
-    'nba_games':     dict(cmd='python3 scripts/nba_games.py --fit', months=[11, 12, 1, 2, 3, 4, 5], every=28,
+    # ---- game models: walk-forward backtest against the close + refit, monthly in season. The walk-forward rows the
+    # picks layer reads (scripts/data/games_wf) come from the same run: NHL and soccer write theirs in --fit, NBA, NFL
+    # and CBB in scripts/games_wf/<sport>_wf.py after it (nba_wf reads the wf_preds cache --fit just wrote)
+    'nba_games':     dict(cmd='python3 scripts/nba_games.py --fit && python3 scripts/games_wf/nba_wf.py', months=[11, 12, 1, 2, 3, 4, 5], every=28,
                           keep=['data/nba_games_fit.json', 'scripts/data/games_wf/nba.json.gz'], timeout=150, sport='nba'),
     'nhl_games':     dict(cmd='python3 scripts/nhl_games.py --fit', months=[11, 12, 1, 2, 3, 4, 5], every=28,
                           keep=['data/nhl_games_fit.json', 'scripts/data/games_wf/nhl.json.gz'], timeout=150, sport='nhl'),
-    'nfl_games':     dict(cmd='python3 scripts/nfl_games.py --fit', months=[10, 11, 12, 1], every=28,
+    'nfl_games':     dict(cmd='python3 scripts/nfl_games.py --fit && python3 scripts/games_wf/nfl_wf.py', months=[10, 11, 12, 1], every=28,
                           keep=['data/nfl_games_fit.json', 'scripts/data/games_wf/nfl.json.gz'], timeout=150, sport='nfl'),
-    'cbb_games':     dict(cmd='python3 scripts/cbb_games.py --fit', months=[12, 1, 2, 3], every=28,
+    'cbb_games':     dict(cmd='python3 scripts/cbb_games.py --fit && python3 scripts/games_wf/cbb_wf.py', months=[12, 1, 2, 3], every=28,
                           keep=['data/cbb_games_fit.json', 'scripts/data/games_wf/cbb.json.gz'], timeout=240, sport='cbb', local=BT_HIST),
     'soccer_games':  dict(cmd='python3 scripts/soccer_games.py --fit', months=[10, 11, 12, 1, 2, 3, 4, 5], every=28,
                           keep=['data/soccer_games_fit.json', 'scripts/data/games_wf/soccer.json.gz', 'scripts/data/soccer_team_ratings.json.gz'], timeout=150, sport='soccer'),
