@@ -955,6 +955,23 @@ def fit_segments(res):
 INJ_PART = {'cbb': 'availability'}
 
 
+# a game build older than this flags no new picks (Nov 11 2026 audit, TSF-5: a crashed CBB build froze the model ~25 h
+# while every picks run looked fresh). Open picks keep their stakes; the gate lifts on the next good build
+MODEL_STALE_H = 12
+
+
+def model_age(sport, now):
+    """(the game build's asof, its age in hours); a date-only asof counts from the end of that day"""
+    try:
+        a = json.load(open(os.path.join(ROOT, 'data', f'{sport}_games.json'))).get('asof')
+    except (OSError, ValueError):
+        return None, None
+    if not a:
+        return None, None
+    t = iso(a) if 'T' in a else iso(a + 'T00:00:00Z') + datetime.timedelta(days=1)
+    return a, round((now - t).total_seconds() / 3600, 1)
+
+
 def board(sport):
     """this slate from the sport's own build: list of {id, espn, kick, home, away, m, L, tm, T, mlH, mlA, oH, oA}"""
     out = []
@@ -1221,6 +1238,10 @@ def live(sport):
     if paper:
         print(f"{sport}: PAPER since {pst['since']} ({pst['why']})")
     games = board(sport)
+    m_asof, m_age = model_age(sport, now)
+    stale = m_age is not None and m_age > MODEL_STALE_H
+    if stale:
+        print(f'{sport}: model build {m_asof} is {m_age} h old (> {MODEL_STALE_H}): no new picks')
     dk_prices(sport, games, now)
     arch = archive_rows(sport)
     arch += archive(sport, games, now, arch)
@@ -1312,8 +1333,8 @@ def live(sport):
             c_, cal_ = pick.pop('_c'), pick.pop('_cal', None)
             pick.pop('_cw', None)
             pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick.pop('_gap'), cal_, pick.pop('_mkt', None))
-            gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
-            if (g['id'], fam(pick['mk'])) not in seen:
+            gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'stale' if stale else 'pick'}
+            if (g['id'], fam(pick['mk'])) not in seen and not stale:
                 seen.add((g['id'], fam(pick['mk'])))
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
                             **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
@@ -1459,6 +1480,7 @@ def live(sport):
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
     timing = C.timing(sport, arch, mins[sport])
     out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'monitor': mon, 'paper': paper, 'paperState': pst,
+           'model': {'asof': m_asof, 'ageH': m_age, 'stale': stale},
            'picks': picks, 'paperPicks': paper_picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log, 'withdrawnLog': wlog}
