@@ -8,7 +8,7 @@
 {{- $mode := $.Get "mode" | default "pred" -}}
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- if eq $mode "lottery" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "draft lottery :: chance at the first pick") "icon" "hockey" "tab" ($.Get "tab") "gfxCols" "Spot,Team,xPts,#1" "gfxDate" $date "gfxMax" "16") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "draft lottery") "icon" "hockey" "tab" ($.Get "tab") "gfxCols" "Spot,Team,xPts,#1" "gfxDate" $date "gfxMax" "16") -}}
 <table class="cfb__table hk">
   <thead><tr><th title="projected finish among all 32, worst first">Spot</th><th>Team</th><th title="expected points, 10,000 simulated seasons">xPts</th><th title="chance of missing the playoffs (a lottery team)">Lottery</th><th title="chance at the first pick: simulated finishing spot x the NHL's draw odds for that spot (a team more than ten spots back that wins moves up ten; the pick goes to the last-place team)">#1 pick</th></tr></thead>
   <tbody>
@@ -20,7 +20,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .lottery) "fresh" "hockey_mock" "note" (printf "updated %s" $date) "about" "Lottery teams by projected finish, with each one's chance of landing the first pick across the simulated seasons. The mocks themselves use the projected order without a draw.") -}}
 {{- else -}}
 {{- $picks := index . $mode -}}
-{{- $titles := dict "pred" "predictive mock :: where they go, 2 rounds" "conv" "conviction mock :: our FV board, 2 rounds" "blend" "blended mock :: consensus/FV midpoint, 2 rounds" -}}
+{{- $titles := dict "pred" "predictive mock" "conv" "conviction mock" "blend" "blended mock" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (index $titles $mode)) "icon" "hockey" "filter" "Pos,Team,League" "tab" ($.Get "tab") "gfxCols" "Pick,Team,Player,FV,Pos,Club" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk">
   <thead><tr>

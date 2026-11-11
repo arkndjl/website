@@ -8,11 +8,11 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
+{{< winpane title="arkranking.exe" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
 {{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
-{{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB :: ARK Ranking, with the AP and Coaches Top 25" tab="CFB ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB" tab="CFB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CFB odds" >}}{{< cfbsim title="CFB season odds :: 10,000 simulated seasons" tab="CFB odds" >}}{{< /lazytab >}}
 {{< lazytab tab="NFL ranking" >}}{{< nflpower title="NFL :: ARK Ranking" tab="NFL ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="NFL odds" >}}{{< nflsim title="NFL season odds" tab="NFL odds" >}}{{< /lazytab >}}
@@ -23,7 +23,7 @@ draft = false
 {{< lazytab tab="NBA odds" >}}{{< nbasim title="NBA season odds" tab="NBA odds" >}}{{< /lazytab >}}
 {{< lazytab tab="NHL ranking" >}}{{< nhlpower title="NHL :: ARK Ranking" tab="NHL ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="NHL odds" >}}{{< nhlsim title="NHL season odds" tab="NHL odds" >}}{{< /lazytab >}}
-{{< lazytab tab="soccer ranking" >}}{{< soccerpower title="soccer :: ARK Ranking, every league on one scale" tab="soccer ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="soccer ranking" >}}{{< soccerpower title="soccer" tab="soccer ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="Premier League" >}}{{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}{{< /lazytab >}}
 {{< lazytab tab="La Liga" >}}{{< soccerleague lg="esp.1" title="La Liga" tab="La Liga" >}}{{< /lazytab >}}
 {{< lazytab tab="Bundesliga" >}}{{< soccerleague lg="ger.1" title="Bundesliga" tab="Bundesliga" >}}{{< /lazytab >}}

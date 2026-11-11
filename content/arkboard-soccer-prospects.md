@@ -9,19 +9,19 @@ cover = "/og/soccer-prospects.png"
 
 {{< arknav >}}
 
-{{< winpane title="soccer_prospects.exe :: under 22" icon="soccer" sprite="px/hero-soccer" status="Transfermarkt lineups and values · 33 leagues" class="winpane--art" />}}
+{{< winpane title="soccer_prospects.exe" icon="soccer" sprite="px/hero-soccer" status="Transfermarkt lineups and values · 33 leagues" class="winpane--art" />}}
 
 {{< wintabs groups="players:big board,first-year,ARKLIST|model:fv model,past boards,all-time FV" side="true" label="Soccer prospects views" >}}
 {{< soccerboard view="board" tab="big board" >}}
-{{< rookies sport="soccerp" icon="soccer" title="first-year :: first senior season, FV and GAR" tab="first-year" >}}
-{{< arklist sport="soccer-prospects" title="ARKLIST :: soccer prospects" tab="ARKLIST" >}}
+{{< rookies sport="soccerp" icon="soccer" title="first-year" tab="first-year" >}}
+{{< arklist sport="soccer-prospects" title="ARKLIST" tab="ARKLIST" >}}
 {{< soccerboard view="past" tab="past boards" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
-{{< soccerboard view="model" title="fv model :: value, scale, drivers, calibration" >}}
+{{< soccerboard view="model" title="fv model" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< fvcard sport="soccer" title="fv scorecard :: tier odds vs what happened, held out" >}}
+{{< fvcard sport="soccer" title="fv scorecard" >}}
 {{< /deskcol >}}
 {{< /desk >}}
 {{< lazytab tab="all-time FV" >}}

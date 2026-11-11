@@ -8,19 +8,19 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="counter_strike.exe :: pro CS2" icon="cs" sprite="px/hero-cs" status="Valve VRS · Liquipedia" class="winpane--art" />}}
+{{< winpane title="counter_strike.exe" icon="cs" sprite="px/hero-cs" status="Valve VRS · Liquipedia" class="winpane--art" />}}
 
 {{< wintabs groups="players:RWA leaders,prospects,ARKLIST|games:games,game table|teams:ARK Ranking,map pool,event odds,pick'em|market:transfer values|model:model,player model" side="true" label="Counter-Strike views" >}}
-{{< cs2players title="RWA leaders :: Counter-Strike" tab="RWA leaders" >}}
-{{< cs2players view="prospects" title="prospects :: not yet tier 1" tab="prospects" >}}
-{{< arklist sport="cs2" title="ARKLIST :: CS2" tab="ARKLIST" >}}
+{{< cs2players title="RWA leaders" tab="RWA leaders" >}}
+{{< cs2players view="prospects" title="prospects" tab="prospects" >}}
+{{< arklist sport="cs2" title="ARKLIST" tab="ARKLIST" >}}
 {{< cs2rank title="Counter-Strike :: ARK Ranking" tab="ARK Ranking" >}}
 {{< cs2mappool title="map pool :: map win % vs the top 20" tab="map pool" >}}
 {{< cs2events tab="event odds" >}}
 {{< cs2pickem title="pick'em" tab="pick'em" >}}
-{{< cs2matches title="games :: upcoming pro series" tab="games" >}}
-{{< cs2matches view="results" title="game table :: against the model" tab="game table" >}}
-{{< cs2players view="values" title="transfer values :: estimated buyouts" tab="transfer values" >}}
-{{< cs2model title="model :: inputs, weights, held-out test" tab="model" >}}
-{{< cs2players view="model" title="player model :: ratings, prospects, values" tab="player model" >}}
+{{< cs2matches title="games" tab="games" >}}
+{{< cs2matches view="results" title="game table" tab="game table" >}}
+{{< cs2players view="values" title="transfer values" tab="transfer values" >}}
+{{< cs2model title="model" tab="model" >}}
+{{< cs2players view="model" title="player model" tab="player model" >}}
 {{< /wintabs >}}

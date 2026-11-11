@@ -14,8 +14,8 @@ cover = "/og/hockey-prospects.png"
 {{< wintabs groups="players:draft board,drafted prospects,first-year,ARKLIST|mock draft:predictive mock,blended mock,conviction mock,lottery|model:fv model,past boards,all-time FV" side="true" label="Hockey prospects views" >}}
 {{< hockeyboard view="board" tab="draft board" >}}
 {{< hockeyboard view="pipe" tab="drafted prospects" >}}
-{{< rookies sport="hockey" icon="hockey" title="first-year :: CHL and AHL rookies, NHLe and FV" tab="first-year" >}}
-{{< arklist sport="hockey-prospects" title="ARKLIST :: hockey prospects" tab="ARKLIST" >}}
+{{< rookies sport="hockey" icon="hockey" title="first-year" tab="first-year" >}}
+{{< arklist sport="hockey-prospects" title="ARKLIST" tab="ARKLIST" >}}
 {{< hockeymock mode="pred" tab="predictive mock" >}}
 {{< hockeymock mode="blend" tab="blended mock" >}}
 {{< hockeymock mode="conv" tab="conviction mock" >}}
@@ -23,10 +23,10 @@ cover = "/og/hockey-prospects.png"
 {{< hockeyboard view="past" tab="past boards" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
-{{< hockeyboard view="model" title="fv model :: scale, drivers, calibration" >}}
+{{< hockeyboard view="model" title="fv model" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< fvcard sport="hockey" title="fv scorecard :: tier odds vs what happened, held out" >}}
+{{< fvcard sport="hockey" title="fv scorecard" >}}
 {{< /deskcol >}}
 {{< /desk >}}
 {{< lazytab tab="all-time FV" >}}

@@ -17,26 +17,26 @@ cover = "/og/nhl.png"
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nhlsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="offense" >}}
-{{< teamunits sport="nhl" view="offense" title="offense :: 5-on-5 expected goals for" tab="offense" >}}
+{{< teamunits sport="nhl" view="offense" title="offense" tab="offense" >}}
 {{< /lazytab >}}
 {{< lazytab tab="defense" >}}
-{{< teamunits sport="nhl" view="defense" title="defense :: 5-on-5 expected goals against" tab="defense" >}}
+{{< teamunits sport="nhl" view="defense" title="defense" tab="defense" >}}
 {{< /lazytab >}}
 {{< lazytab tab="power play" >}}
-{{< teamunits sport="nhl" view="power play" title="power play :: 5-on-4" tab="power play" >}}
+{{< teamunits sport="nhl" view="power play" title="power play" tab="power play" >}}
 {{< /lazytab >}}
 {{< lazytab tab="penalty kill" >}}
-{{< teamunits sport="nhl" view="penalty kill" title="penalty kill :: 4-on-5" tab="penalty kill" >}}
+{{< teamunits sport="nhl" view="penalty kill" title="penalty kill" tab="penalty kill" >}}
 {{< /lazytab >}}
-{{< nhlgoalies title="goalies :: goals saved above expected" tab="goalies" >}}
-{{< nhlwar title="NHL WAR :: leaderboard" tab="WAR leaders" >}}
-{{< pctl sport="nhl" icon="hockey" title="projections :: WAR and stats, 20th / 50th / 80th percentile" tab="projections" >}}
-{{< xaav sport="nhl" title="contract value :: xAAV" tab="contract value" >}}
-{{< rookies sport="nhl" icon="hockey" title="rookies :: WAR and pWAR against draft slot and FV" tab="rookies" >}}
-{{< backupwatch sport="nhl" title="backup watch :: 2nd/3rd string out-producing a starter (HPM)" tab="backup watch" >}}
-{{< arklist sport="nhl" title="ARKLIST :: NHL" tab="ARKLIST" >}}
-{{< depthchart sport="nhl" title="depth chart :: every team" tab="depth chart" >}}
-{{< nhllines title="lines :: 5-on-5 trios, pairs and on/off" tab="lines" >}}
+{{< nhlgoalies title="goalies" tab="goalies" >}}
+{{< nhlwar title="NHL WAR" tab="WAR leaders" >}}
+{{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
+{{< xaav sport="nhl" title="contract value" tab="contract value" >}}
+{{< rookies sport="nhl" icon="hockey" title="rookies" tab="rookies" >}}
+{{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
+{{< arklist sport="nhl" title="ARKLIST" tab="ARKLIST" >}}
+{{< depthchart sport="nhl" title="depth chart" tab="depth chart" >}}
+{{< nhllines title="lines" tab="lines" >}}
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="nhl" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}

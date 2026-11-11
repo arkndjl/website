@@ -7,7 +7,7 @@
 {{- $d := . }}{{ $col := eq $sport "cfb" }}{{ $rows := .rows | default slice }}
 {{- $date := lower ((time .asof).Format "Jan 2") }}
 {{- $T := dict "p" "Platinum" "g" "Gold" "s" "Silver" "b" "Bronze" }}
-  {{- partial "wintable-open.html" (dict "title" ($.title | default "special teams :: teams, points over expected a game") "icon" "football" "filter" "Team" "rerank" true "gfxCols" "RK,Team,G,Adj,Pts/G" "gfxDate" (printf "special teams · %v" $d.season) "gfxMax" "25") }}
+  {{- partial "wintable-open.html" (dict "title" ($.title | default "special teams") "icon" "football" "filter" "Team" "rerank" true "gfxCols" "RK,Team,G,Adj,Pts/G" "gfxDate" (printf "special teams · %v" $d.season) "gfxMax" "25") }}
 <table class="cfb__table bw brk__table">
   <thead><tr>
     <th>RK</th><th>Team</th>

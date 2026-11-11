@@ -53,7 +53,7 @@
 {{- end }}{{ end }}{{ end }}
 {{- end }}{{ end -}}
 {{- with $rows }}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "every prediction :: by edge") "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab") "rerank" true) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "every prediction") "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab") "rerank" true) -}}
 <table class="cfb__table cfbm__t tstick">
   <thead><tr><th>RK</th><th title="the side the model favours against the market, at the market's line or price">Bet</th><th>Sport</th><th title="bet market: spread, total or moneyline">Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="the model's line, total or fair moneyline for that side">Model</th><th title="model minus market: points for spreads and totals, % for moneylines">Edge</th><th title="the model's chance for that side">Model %</th><th title="the market's chance: 50% for spreads and totals, the no-vig price for moneylines">Mkt %</th><th title="model % minus market %">Edge %</th><th title="stake when this market is an open pick, % of bankroll">Kelly %</th></tr></thead>
   <tbody>

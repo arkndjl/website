@@ -36,23 +36,23 @@ cover = "/og/soccer.png"
 {{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
-{{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking :: every league, one scale" tab="ARK Ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="offense" >}}
-{{< teamunits sport="soccer" view="attack" title="offense :: non-penalty xG, opponent-adjusted" tab="offense" >}}
+{{< teamunits sport="soccer" view="attack" title="offense" tab="offense" >}}
 {{< /lazytab >}}
 {{< lazytab tab="defense" >}}
-{{< teamunits sport="soccer" view="defence" title="defense :: non-penalty xG allowed, opponent-adjusted" tab="defense" >}}
+{{< teamunits sport="soccer" view="defence" title="defense" tab="defense" >}}
 {{< /lazytab >}}
 {{< lazytab tab="set pieces" >}}
-{{< teamunits sport="soccer" view="set pieces" title="set pieces :: set-piece xG for and against" tab="set pieces" >}}
+{{< teamunits sport="soccer" view="set pieces" title="set pieces" tab="set pieces" >}}
 {{< /lazytab >}}
-{{< soccerplayers view="value" title="GAR leaders :: GAR and estimated market value" tab="GAR leaders" >}}
-{{< soccerplayers view="stats" title="player stats :: xG, xA, xGChain" tab="player stats" >}}
-{{< rookies sport="soccer" icon="soccer" title="rookies :: first big-five season, GAR and xMV" tab="rookies" >}}
-{{< backupwatch sport="soccer" title="backup watch :: 2nd/3rd string out-producing a starter (GAR)" tab="backup watch" >}}
-{{< arklist sport="soccer" title="ARKLIST :: soccer" tab="ARKLIST" >}}
-{{< depthchart sport="soccer" title="depth chart :: every team" tab="depth chart" >}}
-{{< soccerlineups title="lineups :: shapes, most-used XI, pairs" tab="lineups" >}}
+{{< soccerplayers view="value" title="GAR leaders" tab="GAR leaders" >}}
+{{< soccerplayers view="stats" title="player stats" tab="player stats" >}}
+{{< rookies sport="soccer" icon="soccer" title="rookies" tab="rookies" >}}
+{{< backupwatch sport="soccer" title="backup watch" tab="backup watch" >}}
+{{< arklist sport="soccer" title="ARKLIST" tab="ARKLIST" >}}
+{{< depthchart sport="soccer" title="depth chart" tab="depth chart" >}}
+{{< soccerlineups title="lineups" tab="lineups" >}}
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="soccer" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}

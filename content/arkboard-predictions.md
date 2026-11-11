@@ -10,7 +10,7 @@ cover = "/og/predictions.png"
 
 {{< arknav >}}
 
-{{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-predictions" status="" class="winpane--art" />}}
+{{< winpane title="predictions.exe" icon="calendar" sprite="px/hero-predictions" status="" class="winpane--art" />}}
 
 {{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,game models,paper book" side="true" label="Predictions views" >}}
 {{< gamesfilter tab="games" >}}
@@ -22,7 +22,7 @@ cover = "/og/predictions.png"
 {{< soccergames title="soccer" tab="games" sport="soccer" >}}
 {{< tennismatches title="tennis" tab="games" sport="tennis" picks="true" >}}
 {{< lazytab tab="game table" >}}
-{{< gamestable title="game table :: every sport" tab="game table" >}}
+{{< gamestable title="game table" tab="game table" >}}
 {{< /lazytab >}}
 {{< lazytab tab="picks" >}}
 {{< gamespicks tab="picks" >}}
@@ -30,11 +30,11 @@ cover = "/og/predictions.png"
 {{< mlboard tab="picks" >}}
 {{< /lazytab >}}
 {{< lazytab tab="NBA players" >}}
-{{< nbaplayers title="NBA players :: points, rebounds, assists" tab="NBA players" >}}
+{{< nbaplayers title="NBA players" tab="NBA players" >}}
 {{< propspaper title="NBA props :: paper book" tab="NBA players" >}}
 {{< /lazytab >}}
 {{< lazytab tab="CBB players" >}}
-{{< nbaplayers src="cbb_players" title="CBB players :: points, rebounds, assists" tab="CBB players" >}}
+{{< nbaplayers src="cbb_players" title="CBB players" tab="CBB players" >}}
 {{< /lazytab >}}
 {{< nflfantasy title="NFL fantasy" tab="NFL fantasy" >}}
 {{< nflprops title="NFL props :: paper book" tab="NFL fantasy" >}}
@@ -44,9 +44,9 @@ cover = "/og/predictions.png"
 {{< cfbproj title="CFB players" tab="CFB players" >}}
 {{< /lazytab >}}
 {{< lazytab tab="player backtest" >}}
-{{< nbaplayerstest title="NBA player projections :: held out 2024-26" tab="player backtest" >}}
-{{< nbaplayerstest src="cbb_players" title="CBB player projections :: held out 2024-26" tab="player backtest" >}}
-{{< nflfantasytest title="NFL fantasy projections :: 2021-25, held out" tab="player backtest" >}}
+{{< nbaplayerstest title="NBA player projections" tab="player backtest" >}}
+{{< nbaplayerstest src="cbb_players" title="CBB player projections" tab="player backtest" >}}
+{{< nflfantasytest title="NFL fantasy projections" tab="player backtest" >}}
 {{< /lazytab >}}
 {{< lazytab tab="futures" >}}
 {{< predfutures tab="futures" >}}
@@ -59,15 +59,15 @@ cover = "/og/predictions.png"
 {{< nbanews title="NBA injury news vs the line :: 2019-26" tab="picks backtest" >}}
 {{< /lazytab >}}
 {{< lazytab tab="game models" >}}
-{{< modelgov title="game models :: live vs walk-forward" tab="game models" >}}
-{{< cfbmodel title="college football game model :: walk-forward backtest vs the close" tab="game models" >}}
-{{< nbamodel title="NBA game model :: walk-forward vs the close, 2015-26" tab="game models" >}}
-{{< nhlmodel title="NHL game model :: walk-forward vs the close, 2016-26" tab="game models" >}}
-{{< soccermodel title="soccer game model :: walk-forward vs the close, 2012-27" tab="game models" >}}
-{{< cbbgamemodel title="college basketball game model :: inputs, weights, held-out test vs the close" tab="game models" >}}
+{{< modelgov title="game models" tab="game models" >}}
+{{< cfbmodel title="college football game model" tab="game models" >}}
+{{< nbamodel title="NBA game model" tab="game models" >}}
+{{< nhlmodel title="NHL game model" tab="game models" >}}
+{{< soccermodel title="soccer game model" tab="game models" >}}
+{{< cbbgamemodel title="college basketball game model :: inputs" tab="game models" >}}
 {{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
 {{< modelgov view="ledger" title="model ledger" tab="game models" >}}
-{{< modelgov view="pipeline" title="pipeline :: every feed and refit" tab="game models" >}}
+{{< modelgov view="pipeline" title="pipeline" tab="game models" >}}
 {{< /lazytab >}}
 {{< lazytab tab="paper book" >}}
 {{< gamespaper tab="paper book" >}}

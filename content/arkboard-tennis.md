@@ -8,14 +8,14 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="tennis.exe :: ATP + WTA" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
+{{< winpane title="tennis.exe" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
 
 {{< wintabs groups="players:ATP ARK Ranking,WTA ARK Ranking,ATP serve + return,WTA serve + return|games:games,game table|model:model" side="true" label="Tennis views" >}}
-{{< tennismatches title="games :: ATP + WTA singles" tab="games" >}}
-{{< tennismatches view="results" title="game table :: the last three days, against the model" tab="game table" >}}
+{{< tennismatches title="games" tab="games" >}}
+{{< tennismatches view="results" title="game table" tab="game table" >}}
 {{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ARK Ranking" >}}
 {{< lazytab tab="ATP serve + return" >}}{{< tennisstats tour="atp" title="ATP :: serve + return" tab="ATP serve + return" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA ARK Ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ARK Ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA serve + return" >}}{{< tennisstats tour="wta" title="WTA :: serve + return" tab="WTA serve + return" >}}{{< /lazytab >}}
-{{< tennismodel title="model :: inputs, weights, held-out test" tab="model" >}}
+{{< tennismodel title="model" tab="model" >}}
 {{< /wintabs >}}

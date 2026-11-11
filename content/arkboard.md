@@ -11,10 +11,10 @@ draft = false
 
 {{< desk >}}
 {{< deskcol >}}
-{{< fvglance title="fv at a glance :: the 20-80 scale" >}}
+{{< fvglance title="fv at a glance" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< winlist title="arkboard.exe :: reading" icon="arkboard" >}}
+{{< winlist title="arkboard.exe" icon="arkboard" >}}
 - [27 Strategy Questions, Answered](/posts/arkboard-research-27-questions/) | research | Nov 2
 - [How the ARKBOARD Works](/posts/arkboard-every-feature/) | every sport | Nov 2
 - [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | football | Oct 14
