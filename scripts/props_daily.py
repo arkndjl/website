@@ -69,12 +69,20 @@ def p_over(F, s, mu, L):
     return M.p_over(F['shape'][s], mu, L)
 
 
+def timed(R, ch):
+    """the chance the stake sizes on: TIMING scales the edge over a fair coin, as on the game picks and the NFL props"""
+    return .5 + R['timing'] * (ch - .5)
+
+
 def kelly(R, ch, o, n=1):
+    # TIMING on the chance, not on the return at the price: scaling the return staked props whose timed chance does not
+    # beat the price (the NFL book's Nov 2 2026 fix, scripts/nfl_props_paper.py kelly)
+    ch = timed(R, ch)
     b = dec(o) - 1
     e = ch * b - (1 - ch)
     if e <= 0:
         return 0.0
-    return R['kelly'] * R['timing'] * e / b * 100 / (1 + (n - 1) * R['rho'])
+    return R['kelly'] * e / b * 100 / (1 + (n - 1) * R['rho'])
 
 
 def units(R, f, scale):
@@ -312,8 +320,8 @@ def write(sport, R, rid, F, bets, now, out_fn, old):
         e = {'id': f"{b['id']}-{b['a']}-{b['s']}", 'espn': b['id'], 'a': b['a'], 'sport': f'{sport}props', 'kick': b['k'],
              'home': h or '', 'away': a or '', 'mk': 'prop', 'side': 'over' if b['side'] == 'o' else 'under',
              'line': b['L'], 'price': b['o'], 'player': b.get('n') or b['a'], 'stat': b['s'], 'statN': lab.get(b['s'], b['s']),
-             'proj': b['m'], 'p': b['ch'], 'pDU': b['ch'], 'pRaw': b['p'], 'ev': round(b['ch'] * bo - (1 - b['ch']), 4),
-             'evDU': round(b['ch'] * bo - (1 - b['ch']), 4), 'edge': round((b['p'] - .5) * 100, 1),
+             'proj': b['m'], 'p': b['ch'], 'pDU': round(timed(R, b['ch']), 4), 'pRaw': b['p'], 'ev': round(b['ch'] * bo - (1 - b['ch']), 4),
+             'evDU': round(timed(R, b['ch']) * bo - (1 - timed(R, b['ch'])), 4), 'edge': round((b['p'] - .5) * 100, 1),
              'x': round((R['pstar'] - .5) * 100), 'units': b.get('u', 0.0), 'flagged': b['t'], 'bk': b['bk']}
         if b.get('close'):
             e['close'] = b['close']['L']

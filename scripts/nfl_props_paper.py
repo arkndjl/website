@@ -354,11 +354,14 @@ def write_picks(R, bets, now, rec):
     for b in bets:
         g = gm.get(b['id']) or {}
         bo = dec(b['o']) - 1
+        # pDU / evDU are the chance and return the stake sizes on (after TIMING), as on the game picks; before, they
+        # carried the untimed chance, so the props' Exp. ROI read about twice what the stake assumed (15.8% vs 7.9%)
+        sz = .5 + R['timing'] * (b['ch'] - .5)
         e = {'id': f"{b['id']}-{b['a']}-{b['s']}", 'espn': b['id'], 'sport': 'nflprops', 'kick': b['k'],
              'home': g.get('home') or '', 'away': g.get('away') or '', 'mk': 'prop', 'side': 'over' if b['side'] == 'o' else 'under',
              'line': b['L'], 'price': b['o'], 'player': b.get('n') or b['a'], 'stat': b['s'], 'statN': LABEL.get(b['s'], b['s']),
-             'proj': b['m'], 'p': b['ch'], 'pDU': b['ch'], 'pRaw': b['p'], 'ev': round(b['ch'] * bo - (1 - b['ch']), 4),
-             'evDU': round(b['ch'] * bo - (1 - b['ch']), 4),
+             'proj': b['m'], 'p': b['ch'], 'pDU': round(sz, 4), 'pRaw': b['p'], 'ev': round(b['ch'] * bo - (1 - b['ch']), 4),
+             'evDU': round(sz * bo - (1 - sz), 4),
              'edge': round((b['p'] - .5) * 100, 1), 'x': round((R['pstar'] - .5) * 100), 'units': b['u'], 'flagged': b['t'], 'bk': b['bk']}
         if b.get('close'):
             e['close'] = b['close']['L']
