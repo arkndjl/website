@@ -2,5 +2,5 @@
        rating change in the hover. dict "r" row "from" mvFrom date "fmt" printf for the rating change "mul" scale. */ -}}
 {{- $r := .r -}}
 {{- if $r.prev }}{{ $d := sub (int $r.prev) (int $r.rk) -}}
-<td class="cfb__num" data-v="{{ $d }}" title="{{ with .from }}{{ (time .).Format "Jan 2" }} {{ end }}#{{ $r.prev }}{{ with $r.dR }}, rating {{ printf $.fmt (mul (float .) ($.mul | default 1)) }}{{ end }}">{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+<td class="cfb__num" data-v="{{ $d }}" title="{{ with .from }}{{ (time .).Format "Jan 2" }} {{ end }}#{{ $r.prev }}{{ with $r.dR }}, rating {{ partial "num.html" (slice $.fmt (mul (float .) ($.mul | default 1))) }}{{ end }}">{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
 {{- else }}<td class="cfb__num" data-v=""><span class="cfb__dim">·</span></td>{{ end -}}

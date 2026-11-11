@@ -24,16 +24,16 @@
     <td class="cfb__rk">{{ .rk }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .t }}</span></td>
     <td>{{ .conf }}</td>
-    <td class="cfb__num is-key" data-l="Dev" data-v="{{ .dev }}"><b class="{{ if ge .dev 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge .dev 0.0 }}+{{ end }}{{ printf "%.2f" .dev }}</b> <span class="cfb__dim">±{{ printf "%.2f" .se }}</span></td>
-    <td class="cfb__num" data-l="Net" data-v="{{ .net }}">{{ if ge .net 0.0 }}+{{ end }}{{ printf "%.2f" .net }}</td>
-    <td class="cfb__num" data-l="Raw" data-v="{{ .raw }}">{{ if ge .raw 0.0 }}+{{ end }}{{ printf "%.2f" .raw }}</td>
+    <td class="cfb__num is-key" data-l="Dev" data-v="{{ .dev }}"><b class="{{ if ge .dev 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge .dev 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" .dev) }}</b> <span class="cfb__dim">±{{ partial "num.html" (slice "%.2f" .se) }}</span></td>
+    <td class="cfb__num" data-l="Net" data-v="{{ .net }}">{{ if ge .net 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" .net) }}</td>
+    <td class="cfb__num" data-l="Raw" data-v="{{ .raw }}">{{ if ge .raw 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" .raw) }}</td>
     <td class="cfb__num" data-l="N" data-v="{{ .n }}">{{ .n }}</td>
     {{- if $cbb }}
     <td>{{ .coach | default "-" }}</td>
-    <td class="cfb__num" data-l="Coach" data-v="{{ if ne .cdev nil }}{{ .cdev }}{{ end }}">{{ with $r.cdev }}{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }} <span class="cfb__dim">±{{ printf "%.2f" $r.cse }}</span>{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-l="Coach" data-v="{{ if ne .cdev nil }}{{ .cdev }}{{ end }}">{{ with $r.cdev }}{{ if ge . 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" .) }} <span class="cfb__dim">±{{ partial "num.html" (slice "%.2f" $r.cse) }}</span>{{ else }}-{{ end }}</td>
     {{- else }}
     <td class="cfb__num" data-l="Drafted" data-v="{{ .dr }}">{{ .dr }}</td>
-    <td class="cfb__num" data-l="xDrafted" data-v="{{ .xdr }}">{{ printf "%.1f" .xdr }}</td>
+    <td class="cfb__num" data-l="xDrafted" data-v="{{ .xdr }}">{{ partial "num.html" (slice "%.1f" .xdr) }}</td>
     {{- end }}
   </tr>
   {{- end }}

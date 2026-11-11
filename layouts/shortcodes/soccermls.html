@@ -26,17 +26,17 @@
   <tbody>
   {{- range $rows }}
   <tr>
-    <td class="cfb__num" data-v="{{ .cpos }}">{{ printf "%.1f" (float .cpos) }}</td>
+    <td class="cfb__num" data-v="{{ .cpos }}">{{ partial "num.html" (slice "%.1f" (float .cpos)) }}</td>
     <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
     <td class="cfb__num">{{ .gp }}</td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%+d" (int .gd) }}</td>
     <td class="cfb__num">{{ .pts }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .xpts)) }}</td>
     {{- range $v := slice .title .po .r1 .cf .cup }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
-    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }} <span class="cfb__dim">#{{ .rrk }}</span></td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.2f" (float .rating)) }} <span class="cfb__dim">#{{ .rrk }}</span></td>
   </tr>
   {{- end }}
   </tbody>

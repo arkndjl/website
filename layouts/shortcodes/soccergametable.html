@@ -18,15 +18,15 @@
   {{- range $x := sort $gs "q" "desc" }}{{ $q := $x.q }}{{ with $x.g }}
   <tr>
     <td data-v="{{ .hn }} {{ .an }}"><img class="cfb__logo" src="/img/soccer/{{ .h }}.png" alt="" width="16" height="16" loading="lazy"> {{ .hab }} <span class="cfb__dim">v</span> <img class="cfb__logo" src="/img/soccer/{{ .a }}.png" alt="" width="16" height="16" loading="lazy"> {{ .aab }}</td>
-    <td class="cfb__num" data-v="{{ $q }}">{{ printf "%.0f" $q }}</td>
+    <td class="cfb__num" data-v="{{ $q }}">{{ partial "num.html" (slice "%.0f" $q) }}</td>
     <td>{{ index $short .lg | default .lg }}</td>
     <td class="cfb__num" data-v="{{ .tip }}">{{ (time.In "America/New_York" (time .tip)).Format "Mon 3:04 PM" }}</td>
-    {{- range $v := .p }}<td class="cfb__num" data-v="{{ $v }}">{{ printf "%.0f" (mul $v 100) }}%</td>{{ end }}
+    {{- range $v := .p }}<td class="cfb__num" data-v="{{ $v }}">{{ partial "num.html" (slice "%.0f" (mul $v 100)) }}%</td>{{ end }}
     <td class="cfb__num">{{ printf "%+d" (int (index .fair 0)) }} <span class="cfb__dim">/</span> {{ printf "%+d" (int (index .fair 1)) }} <span class="cfb__dim">/</span> {{ printf "%+d" (int (index .fair 2)) }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float (index .l 0)) }}-{{ printf "%.1f" (float (index .l 1)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float (index .l 0))) }}-{{ partial "num.html" (slice "%.1f" (float (index .l 1))) }}</td>
     <td class="cfb__num">{{ .top }}</td>
-    <td class="cfb__num" data-v="{{ .o25 }}">{{ printf "%.0f" (mul .o25 100) }}%</td>
-    <td class="cfb__num" data-v="{{ .btts }}">{{ printf "%.0f" (mul .btts 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .o25 }}">{{ partial "num.html" (slice "%.0f" (mul .o25 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .btts }}">{{ partial "num.html" (slice "%.0f" (mul .btts 100)) }}%</td>
     <td class="cfb__num">{{ with .final }}{{ index . 0 }}-{{ index . 1 }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ (time.In "America/New_York" (time .tip)).Format "Mon" }}</td>
   </tr>

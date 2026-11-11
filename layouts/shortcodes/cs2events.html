@@ -32,7 +32,7 @@
     {{- if or (and (eq $j 0) (gt $t.st 1)) (and (eq $j 1) (gt $t.st 2)) }}
     <td class="cfb__num" data-v="1"><span class="cfb__dim">in</span></td>
     {{- else }}
-    <td class="cfb__num{{ if eq $j 5 }} cs__ev-title{{ end }}" data-v="{{ $p }}">{{ if eq $p 0.0 }}<span class="cfb__dim">—</span>{{ else if lt $p 0.001 }}<span class="cfb__dim">&lt;0.1</span>{{ else if eq $j 5 }}<b>{{ printf "%.1f" (mul $p 100) }}</b>{{ else }}{{ printf "%.1f" (mul $p 100) }}{{ end }}</td>
+    <td class="cfb__num{{ if eq $j 5 }} cs__ev-title{{ end }}" data-v="{{ $p }}">{{ if eq $p 0.0 }}<span class="cfb__dim">—</span>{{ else if lt $p 0.001 }}<span class="cfb__dim">&lt;0.1</span>{{ else if eq $j 5 }}<b>{{ partial "num.html" (slice "%.1f" (mul $p 100)) }}</b>{{ else }}{{ partial "num.html" (slice "%.1f" (mul $p 100)) }}{{ end }}</td>
     {{- end }}
     {{- end }}
     <td class="cfb__num" data-v="{{ index .p 5 }}">{{ if ge (index .p 5) 0.001 }}{{ printf "%+d" (int .fair) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

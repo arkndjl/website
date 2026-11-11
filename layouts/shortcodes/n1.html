@@ -117,8 +117,8 @@
     <ul class="n1-md__facts">
       {{- with $pv.spread }}<li><b>{{ .score }}</b><span class="n1-k">projected score</span></li>{{ end }}
       {{- with $pv.vetoes }}{{ with index . 0 }}<li><b>{{ .decider }}</b><span class="n1-k">likely map</span></li>{{ end }}{{ end }}
-      {{- with $pv.total }}<li><b>{{ printf "%.1f" (float .exp) }}</b><span class="n1-k">expected rounds</span></li>{{ end }}
-      {{- with $pv.talent }}<li><b>{{ printf "%.2f" (float .us) }} v {{ printf "%.2f" (float .them) }}</b><span class="n1-k">team talent (stars)</span></li>{{ end }}
+      {{- with $pv.total }}<li><b>{{ partial "num.html" (slice "%.1f" (float .exp)) }}</b><span class="n1-k">expected rounds</span></li>{{ end }}
+      {{- with $pv.talent }}<li><b>{{ partial "num.html" (slice "%.2f" (float .us)) }} v {{ partial "num.html" (slice "%.2f" (float .them)) }}</b><span class="n1-k">team talent (stars)</span></li>{{ end }}
     </ul>
     {{- with $pv.talent.five }}<p class="n1-md__then"><span class="n1-k">expected five</span> {{ delimit . " · " }}</p>{{ end }}
     {{- end }}
@@ -213,7 +213,7 @@
     {{- range $up | append ($done | collections.Reverse) }}{{ $m := . }}
       {{- $t := dict }}{{ range where $d.rankings.teams "id" .opp.id }}{{ $t = . }}{{ end }}
       {{- $h := index $l.h2h .opp.id }}{{ $p := index $cal .id }}
-      <tr class="{{ if eq .status "FINISHED" }}n1-row-off{{ end }}"><td>{{ (time.In $et (time (int (div .at 1000)))).Format "Jan 2" }}</td><td class="is-l">{{ .opp.name }}</td><td>{{ with $t.w }}{{ . }}{{ else }}0{{ end }}–{{ $t.l | default 0 }}</td><td>{{ with $t.rank }}{{ . }}{{ end }}</td><td>{{ with $t.powerRank }}{{ . }}{{ end }}</td><td>{{ with $t.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td><td>{{ with site.Data.esea_rwa }}{{ with index .teams $m.opp.id }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ printf "%+.1f" (float (index . 0)) }}</b>{{ end }}{{ end }}</td><td>{{ with $t.ark }}{{ printf "%.2f" (float .) }}{{ end }}</td><td>{{ with $t.talent }}{{ printf "%.2f" (float .exact) }}{{ end }}</td><td>{{ with $t.rdpm }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}{{ end }}</td>
+      <tr class="{{ if eq .status "FINISHED" }}n1-row-off{{ end }}"><td>{{ (time.In $et (time (int (div .at 1000)))).Format "Jan 2" }}</td><td class="is-l">{{ .opp.name }}</td><td>{{ with $t.w }}{{ . }}{{ else }}0{{ end }}–{{ $t.l | default 0 }}</td><td>{{ with $t.rank }}{{ . }}{{ end }}</td><td>{{ with $t.powerRank }}{{ . }}{{ end }}</td><td>{{ with $t.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td><td>{{ with site.Data.esea_rwa }}{{ with index .teams $m.opp.id }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float (index . 0))) }}</b>{{ end }}{{ end }}</td><td>{{ with $t.ark }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ end }}</td><td>{{ with $t.talent }}{{ partial "num.html" (slice "%.2f" (float .exact)) }}{{ end }}</td><td>{{ with $t.rdpm }}{{ if gt (float .) 0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}</td>
         <td class="n1-gap">{{ with $h }}{{ .l }}–{{ .w }}{{ else }}<span class="n1-dim">new</span>{{ end }}</td>
         <td>{{ with $p }}{{ .win }}%{{ if .retro }}<span class="n1-dim" title="logged after the match; not scored"> †</span>{{ end }}{{ end }}</td>
         <td>{{ with .result }}<b class="{{ if eq . "W" }}n1-up{{ else }}n1-down{{ end }}">{{ . }}</b>{{ if gt (len $m.maps) 1 }}{{ with $m.score }} {{ index . 0 }}–{{ index . 1 }}{{ end }}{{ range $m.maps }} <span class="n1-dim">{{ .map }} {{ .rf }}–{{ .ra }}</span>{{ end }}{{ else }}{{ with $m.maps }}{{ with index . 0 }} {{ .rf }}–{{ .ra }} <span class="n1-dim">{{ .map }}</span>{{ end }}{{ end }}{{ end }}{{ else }}<span class="n1-dim">upcoming</span>{{ end }}</td></tr>
@@ -294,7 +294,7 @@
       <div class="wintable__scroll">
       <table class="esea-box n1-tbl">
         <thead><tr><th>Season</th><th>Maps</th><th title="season RWA: round win % added per round over the season's league maps, opponent-credited, shrunk toward the division; 0 = average Main player">RWA</th><th title="season ARK Rating on the season's league totals, each stat regressed by its stability; 1.00 = league average">ARK</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
-        <tbody>{{ range .seasons }}{{ $r := . }}{{ $x := index $ps (string .s) }}<tr><td>S{{ .s }}</td><td>{{ .maps }}</td><td>{{ with $x }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ printf "%+.1f" (float (index . 0)) }}</b>{{ else }}–{{ end }}</td><td>{{ with $x }}{{ printf "%.2f" (float (index . 1)) }}{{ else }}–{{ end }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
+        <tbody>{{ range .seasons }}{{ $r := . }}{{ $x := index $ps (string .s) }}<tr><td>S{{ .s }}</td><td>{{ .maps }}</td><td>{{ with $x }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float (index . 0))) }}</b>{{ else }}–{{ end }}</td><td>{{ with $x }}{{ partial "num.html" (slice "%.2f" (float (index . 1))) }}{{ else }}–{{ end }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
       </table>
       </div>
     </details>
@@ -327,7 +327,7 @@
       <li><b>Win chance.</b> Each five's mean FACEIT elo (weight .80) and team talent (.20) on a 600-point scale. Held out on 149 S59 league matches its log loss was .586, against .613 for the power ranking and .661 for the record.</li>
       <li><b>Veto.</b> Each player's lifetime FACEIT win rate on the map against that player's overall rate, shrunk by n/(n+50), averaged over the five and scaled 1.18 on the match log-odds; held out t −3.96. Team map records and pistol share failed, so the map book above is for reading the past.</li>
       <li><b>Rounds.</b> A race to 13 where the round-win chance varies within a map (logit-normal, τ .55). It matches the overtime rate and every total line within 2 points; strength gaps did not move totals held out, so the line is a flat 20.5.</li>
-      <li><b>ARK rating.</b> Per-round box-score stats, each regressed to the mean by its split-half reliability, fit to round win share (R² {{ with $d.arkModel }}{{ printf "%.2f" (float .r2) }}{{ end }}).</li>
+      <li><b>ARK rating.</b> Per-round box-score stats, each regressed to the mean by its split-half reliability, fit to round win share (R² {{ with $d.arkModel }}{{ partial "num.html" (slice "%.2f" (float .r2)) }}{{ end }}).</li>
       <li><b>Season odds.</b> 10,000 simulations of the rest of the regular season on elo win chances; every scheduled match is played out, the rest at each team's mean chance.</li>
     </ol>
   </div>

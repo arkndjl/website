@@ -27,7 +27,7 @@
   {{- $model := partial "nflline.html" (dict "m" .margin "home" $H.ab "away" $A.ab) }}
   {{- $pick := index $pk (string .id) }}
   {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond $pred (cond (ne .line nil) (printf "market %s" (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab))) "no market line yet") "")) }}
-  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond $pred (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total yet") "")) }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (partial "num.html" (slice "%.1f" (float .total))) "s" (cond $pred (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total yet") "")) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %d, %s %d" $A.ab (int .as) $H.ab (int .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) $H.ab $A.ab))) }}
   {{- $tiles = $tiles | append (dict "l" "TEMPO" "v" (printf "%.0f possessions" (float .poss)) "s" (cond .neutral "neutral floor" (printf "at %s" $H.n))) }}
   {{- if $pred }}{{ with .ml }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %+.0f, %s %+.0f" $A.ab (float .away) $H.ab (float .home)) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $H.ab $A.ab))) }}{{ end }}{{ end }}
@@ -53,18 +53,18 @@
     <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $A.ab }} <b>{{ .away }}</b> · {{ $H.ab }} <b>{{ .home }}</b>{{ end }}</p>
     <div class="games__model">
       <div class="games__prob" title="model win probability, away / home">
-        <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (float (sub 100 $ph)) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" (float $ph) }}%</span>
+        <span style="width: {{ sub 100 $ph }}%">{{ partial "num.html" (slice "%.0f" (float (sub 100 $ph))) }}%</span><span style="width: {{ $ph }}%">{{ partial "num.html" (slice "%.0f" (float $ph)) }}%</span>
       </div>
       <p><span class="cfb__dim">model</span> {{ $model }}
         {{- if $pred }}{{ with .line }} · <span class="cfb__dim">market</span> {{ partial "nflline.html" (dict "m" . "home" $H.ab "away" $A.ab) }}{{ end }}
         {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ end }}</p>
-      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ $A.ab }} {{ .as }}, {{ $H.ab }} {{ .hs }} · <span class="cfb__dim">total</span> {{ .total }} · <span class="cfb__dim">{{ printf "%.0f" (float .poss) }} poss.</span></p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ $A.ab }} {{ .as }}, {{ $H.ab }} {{ .hs }} · <span class="cfb__dim">total</span> {{ .total }} · <span class="cfb__dim">{{ partial "num.html" (slice "%.0f" (float .poss)) }} poss.</span></p>
       <p class="games__why cfb__dim" title="model margin by input, home side, points; |x| &gt;= 0.5 shown">
         {{- $first := true }}{{ range $k, $v := .parts }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}</p>
       {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}
-      {{- with index $g (printf "%sout" (substr $side 0 1)) }}<p class="games__out" title="rotation players (12+ minutes, 60% of games) on the injury report (Covers) or who did not play in the team's last game (Barttorvik box scores), priced at their chance to sit">{{ $t.ab }} out: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ with $p.st }}{{ . }}, {{ else }}sat last game, {{ end }}{{ $p.mpg }} mpg, {{ printf "%+.1f" (float $p.bpm) }} BPM)</span>{{ end }}</p>{{ end }}
+      {{- with index $g (printf "%sout" (substr $side 0 1)) }}<p class="games__out" title="rotation players (12+ minutes, 60% of games) on the injury report (Covers) or who did not play in the team's last game (Barttorvik box scores), priced at their chance to sit">{{ $t.ab }} out: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ with $p.st }}{{ . }}, {{ else }}sat last game, {{ end }}{{ $p.mpg }} mpg, {{ partial "num.html" (slice "%+.1f" (float $p.bpm)) }} BPM)</span>{{ end }}</p>{{ end }}
       {{- end }}
-      {{- with $pick }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ printf "%.1f" (float .edge) }} · {{ .units }}% Kelly</p>{{ end }}
+      {{- with $pick }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ partial "num.html" (slice "%.1f" (float .edge)) }} · {{ .units }}% Kelly</p>{{ end }}
     </div>
   </article>
   {{- end }}

@@ -34,7 +34,7 @@
     <td>{{ .season }}</td>
     <td class="cfb__team"><span>{{ if eq $sport "tennis" }}{{ upper (.team | default "") }}{{ else }}{{ .team }}{{ end }}</span></td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
-    <td class="cfb__num cfb__dim">{{ printf "%.1f" (float .fvx) }}</td>
+    <td class="cfb__num cfb__dim">{{ partial "num.html" (slice "%.1f" (float .fvx)) }}</td>
     {{- with .out }}
     <td class="fv" data-v="{{ . }}"><span class="fv-chip" data-fv="{{ mul (div (int (math.Round .)) 5) 5 }}">{{ math.Round . }}</span></td>
     {{- else }}
@@ -42,9 +42,9 @@
     {{- end }}
     {{- if in (slice "cfb" "cbb" "hockey") $sport }}<td class="cfb__num">{{ with .pick }}{{ $r.draft }} #{{ . }}{{ else }}{{ if eq $r.status "college" }}{{ else }}<span class="cfb__dim">undrafted</span>{{ end }}{{ end }}</td>{{ end }}
     <td class="fvat__x cfb__dim">
-      {{- if eq $sport "cfb" }}{{ with .av }}{{ printf "%.1f" (float .) }} AV/season{{ end }}{{ with .pb }} · {{ . }} PB{{ end }}{{ with .ap }} · {{ . }} AP{{ end }}
+      {{- if eq $sport "cfb" }}{{ with .av }}{{ partial "num.html" (slice "%.1f" (float .)) }} AV/season{{ end }}{{ with .pb }} · {{ . }} PB{{ end }}{{ with .ap }} · {{ . }} AP{{ end }}
       {{- else if eq $sport "cbb" }}{{ .role }}
-      {{- else if eq $sport "hockey" }}{{ with .gp }}{{ . }} GP{{ end }}{{ with .peak }} · {{ printf "%.1f" (float .) }} WAR{{ end }}{{ with .gpeak }} · {{ printf "%+.0f" (float .) }} GSAx{{ end }}
+      {{- else if eq $sport "hockey" }}{{ with .gp }}{{ . }} GP{{ end }}{{ with .peak }} · {{ partial "num.html" (slice "%.1f" (float .)) }} WAR{{ end }}{{ with .gpeak }} · {{ partial "num.html" (slice "%+.0f" (float .)) }} GSAx{{ end }}
       {{- else if eq $sport "soccer" }}{{ .age }}
       {{- else }}{{ with .pkr }}No. {{ . }}{{ end }}{{ end }}</td>
   </tr>
@@ -60,12 +60,12 @@
   <thead><tr><th>Group</th><th class="cfb__num">N</th><th class="cfb__num" title="mean FV given (exact mean)">Given</th><th class="cfb__num" title="mean FV the careers became">Became</th><th class="cfb__num" title="became minus given, with its standard error">Gap</th><th class="cfb__num" title="players who reached their grade or better">Reached</th></tr></thead>
   <tbody>
   {{- range .top }}
-    <tr><td>top 25 {{ .pos }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f" (float .given) }}</td><td class="cfb__num"><b>{{ printf "%.1f" (float .became) }}</b></td>
-      <td class="cfb__num">{{ printf "%+.1f" (sub (float .became) (float .given)) }}<span class="fvsc__s cfb__dim">± {{ printf "%.1f" (float .se) }}</span></td><td class="cfb__num">{{ .hit }} of {{ .n }}</td></tr>
+    <tr><td>top 25 {{ .pos }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .given)) }}</td><td class="cfb__num"><b>{{ partial "num.html" (slice "%.1f" (float .became)) }}</b></td>
+      <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (sub (float .became) (float .given))) }}<span class="fvsc__s cfb__dim">± {{ partial "num.html" (slice "%.1f" (float .se)) }}</span></td><td class="cfb__num">{{ .hit }} of {{ .n }}</td></tr>
   {{- end }}
   {{- range .bands }}
-    <tr><td><span class="fv-chip" data-fv="{{ mul (div (int .lo) 5) 5 }}">{{ .lo }}{{ with .hi }}-{{ sub . 1 }}{{ else }}+{{ end }}</span></td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ printf "%.1f" (float .given) }}</td><td class="cfb__num"><b>{{ printf "%.1f" (float .became) }}</b></td>
-      <td class="cfb__num">{{ printf "%+.1f" (sub (float .became) (float .given)) }}{{ with .se }}<span class="fvsc__s cfb__dim">± {{ printf "%.1f" (float .) }}</span>{{ end }}</td><td></td></tr>
+    <tr><td><span class="fv-chip" data-fv="{{ mul (div (int .lo) 5) 5 }}">{{ .lo }}{{ with .hi }}-{{ sub . 1 }}{{ else }}+{{ end }}</span></td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .given)) }}</td><td class="cfb__num"><b>{{ partial "num.html" (slice "%.1f" (float .became)) }}</b></td>
+      <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (sub (float .became) (float .given))) }}{{ with .se }}<span class="fvsc__s cfb__dim">± {{ partial "num.html" (slice "%.1f" (float .)) }}</span>{{ end }}</td><td></td></tr>
   {{- end }}
   </tbody>
 </table>

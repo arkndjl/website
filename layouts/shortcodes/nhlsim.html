@@ -25,9 +25,9 @@
   <tr>
     <td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .xpts)) }}</td>
     {{- range $v := slice .playoff .divw .r2 .cf .final .cup .pres }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
     <td>{{ .div }}</td>
   </tr>

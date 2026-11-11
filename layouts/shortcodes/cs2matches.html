@@ -13,7 +13,7 @@
   {{- if not $list }}<div class="cfbm__body"><p class="cfb__dim">{{ if eq $view "results" }}no finished series yet.{{ else }}no pro series on Liquipedia's ticker right now.{{ end }}</p></div>{{ end }}
   {{- if eq $view "results" }}{{ with $list }}
   {{- $hit := 0 }}{{ range . }}{{ if or (and (gt .sa .sb) (ge .pa 0.5)) (and (lt .sa .sb) (lt .pa 0.5)) }}{{ $hit = add $hit 1 }}{{ end }}{{ end }}
-  <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ printf "%.0f" (mul (div (float $hit) (len .)) 100) }}%)</p></div>
+  <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ partial "num.html" (slice "%.0f" (mul (div (float $hit) (len .)) 100)) }}%)</p></div>
   {{- end }}{{ end }}
   <div class="games__grid">
   {{- range $list }}{{ $g := . }}
@@ -29,11 +29,11 @@
     </header>
     <div class="games__model">
       <div class="games__prob" title="model win chances">
-        <span style="width: {{ mul .pa 100 }}%">{{ printf "%.0f" (mul .pa 100) }}%</span><span style="width: {{ sub 100 (mul .pa 100) }}%">{{ printf "%.0f" (sub 100 (mul .pa 100)) }}%</span>
+        <span style="width: {{ mul .pa 100 }}%">{{ partial "num.html" (slice "%.0f" (mul .pa 100)) }}%</span><span style="width: {{ sub 100 (mul .pa 100) }}%">{{ partial "num.html" (slice "%.0f" (sub 100 (mul .pa 100))) }}%</span>
       </div>
       <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}</p>
       {{- with .veto }}{{ $n := len . }}
-      <p class="cs__veto" title="projected veto (each side bans its worst map and picks its best, higher-ranked side first) · {{ $g.a }} map win % · * decider">{{ range $i, $v := . }}<i{{ if ge (index $v 1) 0.5 }} class="cs__veto--fav"{{ end }}>{{ $m := replace (index $v 0) "de_" "" }}{{ if eq $m "dust2" }}Dust2{{ else }}{{ title $m }}{{ end }}{{ if and (gt $n 1) (eq (add $i 1) $n) }}*{{ end }} {{ printf "%.0f" (mul (index $v 1) 100) }}</i>{{ end }}</p>
+      <p class="cs__veto" title="projected veto (each side bans its worst map and picks its best, higher-ranked side first) · {{ $g.a }} map win % · * decider">{{ range $i, $v := . }}<i{{ if ge (index $v 1) 0.5 }} class="cs__veto--fav"{{ end }}>{{ $m := replace (index $v 0) "de_" "" }}{{ if eq $m "dust2" }}Dust2{{ else }}{{ title $m }}{{ end }}{{ if and (gt $n 1) (eq (add $i 1) $n) }}*{{ end }} {{ partial "num.html" (slice "%.0f" (mul (index $v 1) 100)) }}</i>{{ end }}</p>
       {{- end }}
     </div>
   </article>

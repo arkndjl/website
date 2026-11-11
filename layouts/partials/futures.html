@@ -25,11 +25,11 @@
       <td><b>{{ upper $sp }}</b></td>
       <td>{{ index .seasons 0 }}-{{ index .seasons 1 }}</td>
       <td class="cfb__num">{{ .teamSeasons }}</td>
-      <td class="cfb__num">{{ printf "%.2f" $a.maeOurs }} / {{ printf "%.2f" $a.maeLine }}</td>
-      <td class="cfb__num">{{ printf "%.2f" $a.b }} <span class="cfb__dim">t {{ printf "%.1f" $a.bT }}</span></td>
-      <td class="cfb__num">{{ $e.won }}-{{ $e.lost }}{{ if $e.push }}-{{ $e.push }}{{ end }} {{ printf $pct (mul $e.roi 100) }} <span class="cfb__dim">t {{ with $e.tSeason }}{{ printf "%.1f" . }}{{ else }}-{{ end }}</span></td>
-      <td class="cfb__num">{{ if $h.n }}{{ $h.won }}-{{ $h.lost }} {{ printf $pct (mul $h.roi 100) }} <span class="cfb__dim">EV {{ printf "%.0f" (mul .cut 100) }}%+</span>{{ else }}-{{ end }}</td>
-      <td class="cfb__num">{{ with $e.annual }}{{ printf $pct (mul . 100) }}{{ end }}</td>
+      <td class="cfb__num">{{ partial "num.html" (slice "%.2f" $a.maeOurs) }} / {{ partial "num.html" (slice "%.2f" $a.maeLine) }}</td>
+      <td class="cfb__num">{{ partial "num.html" (slice "%.2f" $a.b) }} <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" $a.bT) }}</span></td>
+      <td class="cfb__num">{{ $e.won }}-{{ $e.lost }}{{ if $e.push }}-{{ $e.push }}{{ end }} {{ partial "num.html" (slice $pct (mul $e.roi 100)) }} <span class="cfb__dim">t {{ with $e.tSeason }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}-{{ end }}</span></td>
+      <td class="cfb__num">{{ if $h.n }}{{ $h.won }}-{{ $h.lost }} {{ partial "num.html" (slice $pct (mul $h.roi 100)) }} <span class="cfb__dim">EV {{ partial "num.html" (slice "%.0f" (mul .cut 100)) }}%+</span>{{ else }}-{{ end }}</td>
+      <td class="cfb__num">{{ with $e.annual }}{{ partial "num.html" (slice $pct (mul . 100)) }}{{ end }}</td>
     </tr>
     {{- end }}{{ end }}
     </tbody>
@@ -38,7 +38,7 @@
   <div class="cfbm__body">
     {{- range $sp := slice "nba" "nfl" }}{{ with index $fit $sp }}
     {{- $e := (index .grid.raw.cuts 0).all }}
-    <p class="cfb__dim"><b>{{ upper $sp }}</b> {{ if and $e.tSeason (ge $e.tSeason 2.0) (gt .rule.held.roi 0.0) }}<b>beats the line</b>{{ else }}<b>no proven edge</b>{{ end }} · tuning {{ index .tune 0 }}-{{ index .tune 1 }} · held out {{ index .held 0 }}-{{ index .held 1 }} · held-out b {{ printf "%.2f" .accuracy.held.b }} (t {{ printf "%.1f" .accuracy.held.bT }}) · bet = line + {{ printf "%.2f" .w }} x (ours - line) · rho {{ with (index .grid.raw.cuts 0).all.rho }}{{ printf "%.2f" . }}{{ end }} · {{ (index .grid.raw.cuts 0).all.n }} bets = {{ with (index .grid.raw.cuts 0).all.nEff }}{{ printf "%.0f" . }}{{ end }} effective</p>
+    <p class="cfb__dim"><b>{{ upper $sp }}</b> {{ if and $e.tSeason (ge $e.tSeason 2.0) (gt .rule.held.roi 0.0) }}<b>beats the line</b>{{ else }}<b>no proven edge</b>{{ end }} · tuning {{ index .tune 0 }}-{{ index .tune 1 }} · held out {{ index .held 0 }}-{{ index .held 1 }} · held-out b {{ partial "num.html" (slice "%.2f" .accuracy.held.b) }} (t {{ partial "num.html" (slice "%.1f" .accuracy.held.bT) }}) · bet = line + {{ partial "num.html" (slice "%.2f" .w) }} x (ours - line) · rho {{ with (index .grid.raw.cuts 0).all.rho }}{{ partial "num.html" (slice "%.2f" .) }}{{ end }} · {{ (index .grid.raw.cuts 0).all.n }} bets = {{ with (index .grid.raw.cuts 0).all.nEff }}{{ partial "num.html" (slice "%.0f" .) }}{{ end }} effective</p>
     {{- end }}{{ end }}
   </div>
   <div class="win__status" title="An edge needs t 2+ by season and a held-out profit. Bets are shrunk toward the line before EVs; rho is the within-season return correlation, which sets the effective number of bets. College football and basketball: {{ $fit.excluded.cfb }}."><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }} team-seasons</span><span class="cfb__asof">fit {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -46,7 +46,7 @@
 {{- end }}
 {{- $rows := slice }}{{ $asof := "" }}{{ $books := slice }}
 {{- range $sp := slice "nba" "nfl" }}{{ with index site.Data (printf "futures_board_%s" $sp) }}{{ $asof = .asof }}{{ range $f, $b := .books }}{{ $books = $books | append (printf "%s %s %s" (upper $sp) $f $b) }}{{ end }}{{ range .rows }}{{ $rows = $rows | append (dict "sp" $sp "r" . "title" (or .title .sb 0)) }}{{ end }}{{ end }}{{ end }}
-{{- define "futpair" }}{{ if eq .o nil }}<span class="cfb__dim">-</span>{{ else }}{{ if lt .o 0.005 }}&lt;1%{{ else }}{{ printf "%.0f%%" (mul .o 100) }}{{ end }} <span class="cfb__dim">/ {{ with .d }}{{ if lt . 0.005 }}&lt;1%{{ else }}{{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}-{{ end }}</span>{{ end }}{{ end }}
+{{- define "futpair" }}{{ if eq .o nil }}<span class="cfb__dim">-</span>{{ else }}{{ if lt .o 0.005 }}&lt;1%{{ else }}{{ partial "num.html" (slice "%.0f%%" (mul .o 100)) }}{{ end }} <span class="cfb__dim">/ {{ with .d }}{{ if lt . 0.005 }}&lt;1%{{ else }}{{ partial "num.html" (slice "%.0f%%" (mul . 100)) }}{{ end }}{{ else }}-{{ end }}</span>{{ end }}{{ end }}
 {{- $book := delimit $books ", " }}
 {{- if $rows }}
 {{- partial "wintable-open.html" (dict "title" "futures :: ours vs the market" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,xW,Title,Conf,Div" "gfxMax" "30") -}}
@@ -63,7 +63,7 @@
   <tr>
     <td>{{ upper .sp }}</td>
     <td><b>{{ $r.t }}</b> <span class="cfb__dim">{{ $r.rec }}</span></td>
-    <td class="cfb__num" data-v="{{ $r.xW }}">{{ printf "%.1f" (float $r.xW) }}</td>
+    <td class="cfb__num" data-v="{{ $r.xW }}">{{ partial "num.html" (slice "%.1f" (float $r.xW)) }}</td>
     <td class="cfb__num" data-v="{{ .title }}">{{ if eq .sp "nba" }}{{ template "futpair" (dict "o" $r.title "d" $r.titleDk) }}{{ else }}{{ template "futpair" (dict "o" $r.sb "d" $r.sbDk) }}{{ end }}</td>
     <td class="cfb__num">{{ template "futpair" (dict "o" $r.conf "d" $r.confDk) }}</td>
     <td class="cfb__num">{{ template "futpair" (dict "o" $r.div "d" $r.divDk) }}</td>

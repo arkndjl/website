@@ -22,8 +22,8 @@
     <td class="cfb__name cfbpj__name"><b>{{ .name }}</b>
       {{- with .st }}<span class="cfbpj__st{{ if hasPrefix . "Out" }} cfbpj__st--o{{ else if eq . "Doubtful" }} cfbpj__st--o{{ end }}" title="{{ . }}{{ with $why }}, {{ . }}{{ end }}: plays {{ math.Round (mul $pl 100) }}%">{{ cond (hasPrefix . "Out") "O" (substr . 0 1) }} {{ math.Round (mul $pl 100) }}%</span>
       {{- else }}{{ if lt $pl 0.8 }}<span class="cfbpj__st cfbpj__st--box" title="{{ $why | default "irregular in box scores" }}: plays {{ math.Round (mul $pl 100) }}%">{{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}
-      {{- with .more }}{{ if ge . 1.1 }}<span class="cfbpj__st cfbpj__st--more" title="teammates listed out: {{ if ge . 2 }}{{ printf "%.1f" . }}x{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }} usual work">{{ if ge . 2 }}×{{ printf "%.1f" . }}{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }}</span>{{ end }}{{ end }}</td>
-    <td class="cfb__num cfbpj__pts"><span class="cfb__up">{{ printf "%.1f" .pts }}</span></td>
+      {{- with .more }}{{ if ge . 1.1 }}<span class="cfbpj__st cfbpj__st--more" title="teammates listed out: {{ if ge . 2 }}{{ partial "num.html" (slice "%.1f" .) }}x{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }} usual work">{{ if ge . 2 }}×{{ partial "num.html" (slice "%.1f" .) }}{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }}</span>{{ end }}{{ end }}</td>
+    <td class="cfb__num cfbpj__pts"><span class="cfb__up">{{ partial "num.html" (slice "%.1f" .pts) }}</span></td>
     <td class="cfb__num cfbpj__play" data-v="{{ $pl }}">{{ if lt $pl 0.9 }}{{ math.Round (mul $pl 100) }}%{{ else }}<span class="cfb__dim">{{ math.Round (mul $pl 100) }}%</span>{{ end }}</td>
     <td class="cfbpj__pos">{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
@@ -36,7 +36,7 @@
     <td class="cfb__num">{{ if $v }}{{ $v }}{{ else }}<span class="cfb__dim">0</span>{{ end }}</td>
     {{- end }}
     {{- end }}
-    <td class="cfb__num">{{ printf "%.1f" .ppg }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" .ppg) }}</td>
     {{- $d := $k.Format "Mon" }}{{ $h := $k.Hour }}{{ $wd := int ($k.Format "2") }}
     <td data-o="{{ $k.Unix }}">{{ $d }}</td>
     <td data-o="{{ if eq $d "Sat" }}{{ add $k.YearDay (cond (lt $h 15) 0.1 (cond (lt $h 19) 0.2 0.3)) }}{{ else }}{{ $k.YearDay }}{{ end }}">{{ if eq $d "Sat" }}{{ if lt $h 15 }}Sat early{{ else if lt $h 19 }}Sat afternoon{{ else }}Sat night{{ end }}{{ else }}{{ $d }}{{ end }}</td>

@@ -46,12 +46,12 @@
     <details class="esea-pv__more"><summary><b>{{ replaceRE ` \(.*\)$` "" $m.desc }}</b> <span class="cfb__dim esea-pv__more-hint">· {{ len $rows }} terms{{ with $cand }} · {{ len . }} candidates{{ end }} · {{ $m.cluster }}</span></summary>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Term</th><th>Verdict</th><th title="paired t on the tuning split (negative = the model is better with it)">t tune</th><th title="paired t held out (negative = better with it)">t held</th><th title="the held-out t as a z (positive = better with it)">z</th><th title="Benjamini-Hochberg q over every term with a held-out split">q</th></tr></thead>
-      <tbody>{{ range sort $rows "q" }}<tr><td>{{ .term }}{{ if .stored }} <span class="cfb__dim" title="read from the model's own backtest">·s</span>{{ end }}</td><td>{{ if eq .verdict "keep" }}keep{{ else }}<span class="cfb__dim">{{ .verdict }}</span>{{ end }}</td><td class="cfb__num">{{ with .tune }}{{ printf "%+.2f" .t }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with .held }}{{ printf "%+.2f" .t }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ if .held }}{{ printf "%.2f" .z }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ if .held }}{{ printf "%.3f" .q }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range sort $rows "q" }}<tr><td>{{ .term }}{{ if .stored }} <span class="cfb__dim" title="read from the model's own backtest">·s</span>{{ end }}</td><td>{{ if eq .verdict "keep" }}keep{{ else }}<span class="cfb__dim">{{ .verdict }}</span>{{ end }}</td><td class="cfb__num">{{ with .tune }}{{ partial "num.html" (slice "%+.2f" .t) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with .held }}{{ partial "num.html" (slice "%+.2f" .t) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ if .held }}{{ partial "num.html" (slice "%.2f" .z) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ if .held }}{{ partial "num.html" (slice "%.3f" .q) }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- with $cand }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th title="tested, not in the live model; outside the q family">Candidate</th><th title="paired t on the tuning split (negative = the model is better with it)">t tune</th><th title="paired t held out (negative = better with it)">t held</th><th title="the held-out t as a z (positive = better with it)">z</th></tr></thead>
-      <tbody>{{ range sort . "z" "desc" }}<tr><td>{{ .term }}{{ if .stored }} <span class="cfb__dim" title="read from the model's own backtest">·s</span>{{ end }}</td><td class="cfb__num">{{ with .tune }}{{ printf "%+.2f" .t }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with .held }}{{ printf "%+.2f" .t }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ if .held }}{{ printf "%.2f" .z }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range sort . "z" "desc" }}<tr><td>{{ .term }}{{ if .stored }} <span class="cfb__dim" title="read from the model's own backtest">·s</span>{{ end }}</td><td class="cfb__num">{{ with .tune }}{{ partial "num.html" (slice "%+.2f" .t) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with .held }}{{ partial "num.html" (slice "%+.2f" .t) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ if .held }}{{ partial "num.html" (slice "%.2f" .z) }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
     </details>
@@ -66,10 +66,10 @@
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" "nhl" "soccer" "tennis" "cs2" }}{{ with index $M $s }}
       <tr><td>{{ index $lab $s }} <span class="cfb__dim">{{ .season }}</span></td><td class="cfb__num">{{ .n }}</td>
-        <td class="cfb__num">{{ with .model }}{{ printf "%.3f" . }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with .expected }}{{ printf "%.3f" . }}{{ else }}-{{ end }}</td>
-        <td class="cfb__num">{{ with .line }}{{ printf (cond (lt . 2.0) "%.3f" "%.2f") . }}{{ else }}-{{ end }}</td>
-        <td class="cfb__num">{{ with .test }}{{ with .t }}{{ printf "%+.1f" . }}{{ else }}-{{ end }}{{ else }}-{{ end }}</td>
-        <td class="cfb__num">{{ with .test }}{{ printf "%.1f" .cusum }} / {{ .h }}{{ else }}-{{ end }}</td>
+        <td class="cfb__num">{{ with .model }}{{ partial "num.html" (slice "%.3f" .) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with .expected }}{{ partial "num.html" (slice "%.3f" .) }}{{ else }}-{{ end }}</td>
+        <td class="cfb__num">{{ with .line }}{{ partial "num.html" (slice (cond (lt . 2.0) "%.3f" "%.2f") .) }}{{ else }}-{{ end }}</td>
+        <td class="cfb__num">{{ with .test }}{{ with .t }}{{ partial "num.html" (slice "%+.1f" .) }}{{ else }}-{{ end }}{{ else }}-{{ end }}</td>
+        <td class="cfb__num">{{ with .test }}{{ partial "num.html" (slice "%.1f" .cusum) }} / {{ .h }}{{ else }}-{{ end }}</td>
         <td{{ if eq .status "alarm" }} class="ark-fresh is-stale" title="{{ .why }}"{{ end }}>{{ if eq .status "alarm" }}<b class="ark-fresh__tag">alarm</b>{{ else if eq .status "ok" }}ok{{ else }}<span class="cfb__dim">{{ .status }}</span>{{ end }}</td></tr>
       {{- end }}{{ end }}
       </tbody>

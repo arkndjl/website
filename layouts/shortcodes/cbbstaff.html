@@ -23,12 +23,12 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num is-key cfbst__score" data-l="Score" data-v="{{ .score }}"><span class="{{ if ge .score 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ .score }}</span></td>
-    <td class="cfb__num" data-l="Rating" data-v="{{ .rating }}">{{ printf "%.1f" .rating }} <span class="cfb__dim">#{{ .rk }}</span></td>
-    <td class="cfb__num" data-l="Over" data-v="{{ .over }}">{{ if ge .over 0.0 }}+{{ end }}{{ printf "%.1f" .over }}</td>
-    <td class="cfb__num" data-l="Dev" data-v="{{ .dev }}">{{ if ne .dev nil }}{{ if ge .dev 0.0 }}+{{ end }}{{ printf "%.2f" .dev }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="Rating" data-v="{{ .rating }}">{{ partial "num.html" (slice "%.1f" .rating) }} <span class="cfb__dim">#{{ .rk }}</span></td>
+    <td class="cfb__num" data-l="Over" data-v="{{ .over }}">{{ if ge .over 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .over) }}</td>
+    <td class="cfb__num" data-l="Dev" data-v="{{ .dev }}">{{ if ne .dev nil }}{{ if ge .dev 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" .dev) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-l="zNIL" data-v="{{ .znilG }}">{{ if ne .znil nil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">#{{ .znilRk }}</span>{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-l="Value" data-v="{{ .value }}">{{ with .value }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-l="Leave" data-v="{{ .leave }}">{{ printf "%.0f" (mul .leave 100) }}%</td>
+    <td class="cfb__num" data-l="Leave" data-v="{{ .leave }}">{{ partial "num.html" (slice "%.0f" (mul .leave 100)) }}%</td>
     <td class="cfb__num" data-l="Yr" data-v="{{ .ten }}">{{ .ten }}</td>
   </tr>
   {{- end }}

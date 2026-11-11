@@ -28,10 +28,10 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="{{ if $col }}{{ .lg }}{{ else }}/img/nfl/{{ lower .ab }}.png{{ end }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span>{{ with .tier }} <span class="cfb__medals" title="{{ index $T . }} Special Teams"><i class="cfb__medal cfb__medal--{{ . }}"></i></span>{{ end }}</td>
     <td class="cfb__num">{{ .g }}</td>
-    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.2f" (float .adj) }}</span></td>
-    <td class="cfb__num" data-v="{{ .pg }}">{{ printf "%+.2f" (float .pg) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.2f" (float .adj)) }}</span></td>
+    <td class="cfb__num" data-v="{{ .pg }}">{{ partial "num.html" (slice "%+.2f" (float .pg)) }}</td>
     {{- range $u := slice "kr" "pr" "cov" "ko" "punt" "fg" "blk" }}
-    <td class="cfb__num bw__x" data-v="{{ index $r $u }}">{{ printf "%+.2f" (float (index $r $u)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ index $r $u }}">{{ partial "num.html" (slice "%+.2f" (float (index $r $u))) }}</td>
     {{- end }}
   </tr>
   {{- end }}

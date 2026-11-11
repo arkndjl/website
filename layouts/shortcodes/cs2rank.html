@@ -27,11 +27,11 @@
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f pts" "mul" 100) }}
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
-    <td class="cs__tier" data-v="{{ .tier | default 4 }}" data-filter="Tier {{ .tier | default 4 }}"><span class="cs__t cs__t--{{ .tier | default 4 }}">T{{ .tier | default 4 }}</span>{{ with .ev }} <span class="cfb__dim" title="share of series at S-tier events, last 180 days">{{ printf "%.0f" (mul (index . 0) 100) }}%</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
+    <td class="cs__tier" data-v="{{ .tier | default 4 }}" data-filter="Tier {{ .tier | default 4 }}"><span class="cs__t cs__t--{{ .tier | default 4 }}">T{{ .tier | default 4 }}</span>{{ with .ev }} <span class="cfb__dim" title="share of series at S-tier events, last 180 days">{{ partial "num.html" (slice "%.0f" (mul (index . 0) 100)) }}%</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .ark }}"><b>{{ partial "num.html" (slice "%.1f" (mul .ark 100)) }}</b></td>
     <td class="cfb__num" data-v="{{ .elo }}">{{ .elo }}</td>
     {{- $rwa := .rwa }}
-    <td class="cfb__num" data-v="{{ if ne $rwa nil }}{{ $rwa }}{{ else }}-99{{ end }}">{{ if ne $rwa nil }}{{ printf "%+.1f" $rwa }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ if ne $rwa nil }}{{ $rwa }}{{ else }}-99{{ end }}">{{ if ne $rwa nil }}{{ partial "num.html" (slice "%+.1f" $rwa) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .d30 | default 0 }}">{{ with .d30 }}{{ printf "%+d" (int .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .vrk }}{{ . }}{{ end }}">{{ with .vrk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .vpts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .w90 }}">{{ .w90 }}-{{ .l90 }}</td>

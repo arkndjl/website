@@ -14,7 +14,7 @@
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body"><p>No games in the next two slates.</p>
-  <p class="cfb__dim">held out {{ with $d.test.pra.hold }}PRA MAE {{ printf "%.2f" .mae }} vs {{ printf "%.2f" .naive }} for the season average{{ end }}</p></div>
+  <p class="cfb__dim">held out {{ with $d.test.pra.hold }}PRA MAE {{ partial "num.html" (slice "%.2f" .mae) }} vs {{ partial "num.html" (slice "%.2f" .naive) }} for the season average{{ end }}</p></div>
 </div>
 {{- else }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA players") "icon" "hoop" "filter" "Day,Team,Pos" "tab" ($.Get "tab") "gfxCols" "RK,Player,Team!,Opp,PRA,PTS,REB,AST" "gfxDate" (printf "updated %s" (lower ((time $d.asof).Format "Jan 2, 2006"))) "gfxMax" "26") -}}
@@ -48,11 +48,11 @@
     {{- $lg := "" }}{{ with .t }}{{ if $nba }}{{ $lg = printf "/img/nba/%s.png" (lower .) }}{{ else }}{{ $lg = index $cbbLogo (printf "%v|%s" $g.id .) | default "" }}{{ end }}{{ end }}
     <td class="cfb__name cfbpj__name">{{ partial "face.html" (dict "u" $u) }}<b>{{ .n }}</b>{{ with $lg }} <img class="cfb__logo cfb__logo--in" src="{{ . }}" alt="{{ $p.t }}" title="{{ $p.t }}" width="16" height="16" loading="lazy" onerror="this.remove()">{{ end }}
       {{- with .st }}{{ if ne . "Available" }}<span class="cfbpj__st{{ if or (eq . "Out") (eq . "Doubtful") }} cfbpj__st--o{{ end }}" title="{{ . }}: plays {{ math.Round (mul $pl 100) }}%">{{ substr . 0 1 }} {{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}</td>
-    <td class="cfb__num cfbpj__pts" data-v="{{ .pra }}"><span class="cfb__up">{{ printf "%.1f" .pra }}</span></td>
-    <td class="cfb__num" data-v="{{ .pts }}">{{ printf "%.1f" .pts }}</td>
-    <td class="cfb__num" data-v="{{ .reb }}">{{ printf "%.1f" .reb }}</td>
-    <td class="cfb__num" data-v="{{ .ast }}">{{ printf "%.1f" .ast }}</td>
-    <td class="cfb__num" data-v="{{ .min }}">{{ printf "%.0f" .min }}</td>
+    <td class="cfb__num cfbpj__pts" data-v="{{ .pra }}"><span class="cfb__up">{{ partial "num.html" (slice "%.1f" .pra) }}</span></td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ partial "num.html" (slice "%.1f" .pts) }}</td>
+    <td class="cfb__num" data-v="{{ .reb }}">{{ partial "num.html" (slice "%.1f" .reb) }}</td>
+    <td class="cfb__num" data-v="{{ .ast }}">{{ partial "num.html" (slice "%.1f" .ast) }}</td>
+    <td class="cfb__num" data-v="{{ .min }}">{{ partial "num.html" (slice "%.0f" .min) }}</td>
     <td class="cfb__num cfbpj__play" data-v="{{ $pl }}">{{ if lt $pl 0.9 }}{{ math.Round (mul $pl 100) }}%{{ else }}<span class="cfb__dim">{{ math.Round (mul $pl 100) }}%</span>{{ end }}</td>
     <td class="cfb__team"><span>{{ .t }}</span></td>
     <td class="cfbpj__opp">{{ if $home }}{{ $g.a }}{{ else }}<span class="cfb__dim">@</span>{{ $g.h }}{{ end }}</td>
@@ -65,7 +65,7 @@
     <td>{{ .pos | default "—" }}</td>
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
     {{- $dk := index ($p.dk | default dict) "pra" }}
-    <td class="cfbpj__line nbapl__m">{{ printf "%.1f" .pts }} pts · {{ printf "%.1f" .reb }} reb · {{ printf "%.1f" .ast }} ast · {{ printf "%.0f" .min }} min{{ with $dk }} · {{ .bk | default "DraftKings" }} PRA {{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ end }}">o{{ math.Round (mul .pO 100) }}%</span>{{ end }}{{ if lt $pl 0.9 }} · plays {{ math.Round (mul $pl 100) }}%{{ end }}</td>
+    <td class="cfbpj__line nbapl__m">{{ partial "num.html" (slice "%.1f" .pts) }} pts · {{ partial "num.html" (slice "%.1f" .reb) }} reb · {{ partial "num.html" (slice "%.1f" .ast) }} ast · {{ partial "num.html" (slice "%.0f" .min) }} min{{ with $dk }} · {{ .bk | default "DraftKings" }} PRA {{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ end }}">o{{ math.Round (mul .pO 100) }}%</span>{{ end }}{{ if lt $pl 0.9 }} · plays {{ math.Round (mul $pl 100) }}%{{ end }}</td>
   </tr>
   {{- end }}
   {{- end }}

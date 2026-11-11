@@ -11,9 +11,9 @@
   </div>
   <div class="cfbm__body">
     {{- with $b }}{{ $h := index .held "-110" }}
-    <p><b title="held out on 2025 ESPN BET and 2026 DraftKings opening lines; the archive has lines but no prices, so each bet is priced at -110 (and -115)">backtest</b> · held out: {{ $h.n }} bets hit <b>{{ printf "%.1f%%" (mul $h.hit 100) }}</b>, {{ printf "%+.1f%%" (mul $h.roi 100) }} a bet at -110 <span class="cfb__dim">t {{ printf "%.1f" $h.t }}, {{ $h.games }} games as clusters; {{ printf "%+.1f%%" (mul (index .held "-115").roi 100) }} at -115</span></p>
+    <p><b title="held out on 2025 ESPN BET and 2026 DraftKings opening lines; the archive has lines but no prices, so each bet is priced at -110 (and -115)">backtest</b> · held out: {{ $h.n }} bets hit <b>{{ partial "num.html" (slice "%.1f%%" (mul $h.hit 100)) }}</b>, {{ partial "num.html" (slice "%+.1f%%" (mul $h.roi 100)) }} a bet at -110 <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" $h.t) }}, {{ $h.games }} games as clusters; {{ partial "num.html" (slice "%+.1f%%" (mul (index .held "-115").roi 100)) }} at -115</span></p>
     {{- end }}
-    <p class="pclv"><b>live</b> · {{ if $r.graded }}{{ $r.w }}-{{ $r.l }}{{ if $r.push }}-{{ $r.push }}{{ end }}, {{ printf "%+.2f" $r.units }} units on {{ printf "%.1f" $r.staked }} risked{{ with $r.roi }}, {{ printf "%+.1f%%" (mul . 100) }} a bet{{ end }}{{ else }}none graded yet{{ end }}{{ if $r.clvN }} · worth {{ printf "%+.1f%%" (mul $r.clvRet 100) }} at the close{{ with $r.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ end }} · {{ $r.n }} bets since {{ $u.registered }}</p>
+    <p class="pclv"><b>live</b> · {{ if $r.graded }}{{ $r.w }}-{{ $r.l }}{{ if $r.push }}-{{ $r.push }}{{ end }}, {{ partial "num.html" (slice "%+.2f" $r.units) }} units on {{ partial "num.html" (slice "%.1f" $r.staked) }} risked{{ with $r.roi }}, {{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }} a bet{{ end }}{{ else }}none graded yet{{ end }}{{ if $r.clvN }} · worth {{ partial "num.html" (slice "%+.1f%%" (mul $r.clvRet 100)) }} at the close{{ with $r.clvT }} <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" .) }}</span>{{ end }}{{ end }} · {{ $r.n }} bets since {{ $u.registered }}</p>
   </div>
   <div class="wintable__scroll">
   <table class="cfb__table">
@@ -25,12 +25,12 @@
       <td data-o="{{ $k.Unix }}">{{ $k.Format "Jan 2" }}</td>
       <td class="cfb__name"><b>{{ .n | default .a }}</b></td>
       <td>{{ if eq .side "o" }}over{{ else }}under{{ end }} {{ .L }} {{ index $lab .s }}</td>
-      <td class="cfb__num">{{ printf "%.1f" .m }}</td>
-      <td class="cfb__num">{{ if gt .o 0.0 }}+{{ end }}{{ printf "%.0f" .o }}</td>
+      <td class="cfb__num">{{ partial "num.html" (slice "%.1f" .m) }}</td>
+      <td class="cfb__num">{{ if gt .o 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.0f" .o) }}</td>
       <td class="cfb__num">{{ math.Round (mul .p 100) }}·{{ math.Round (mul .ch 100) }}/{{ math.Round (mul .mkt 100) }}</td>
-      <td class="cfb__num">{{ printf "%.2f" .u }}</td>
+      <td class="cfb__num">{{ partial "num.html" (slice "%.2f" .u) }}</td>
       <td class="cfb__num">{{ with .close }}{{ .L }} · {{ math.Round (mul .p 100) }}%{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-      <td class="cfb__num">{{ with .clv }}<span class="{{ if ge . 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f%%" (mul . 100) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      <td class="cfb__num">{{ with .clv }}<span class="{{ if ge . 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
       <td>{{ with .res }}{{ if eq . "w" }}<b>won</b>{{ else if eq . "l" }}lost{{ else }}{{ . }}{{ end }}{{ end }}{{ if isset . "x" }} <span class="cfb__dim">({{ .x }})</span>{{ end }}</td>
     </tr>
     {{- end }}

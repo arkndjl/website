@@ -21,12 +21,12 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td class="cfbj__conf">{{ .conf }}</td>
     <td class="cfbj__hc">{{ .hc }}{{ if .interim }} <span class="cfb__dim" title="interim: took over mid-season; the job opens unless he is kept (prior 20%)">interim</span>{{ end }}</td>
-    <td class="cfb__num cfbj__open" data-l="Open" data-v="{{ .open }}"><b class="{{ if ge .open 0.35 }}cfb__down{{ else }}cfb__up{{ end }}">{{ printf "%.0f" (mul .open 100) }}%</b></td>
-    <td class="cfb__num" data-l="Out" data-v="{{ .out }}">{{ printf "%.0f" (mul .out 100) }}%</td>
-    <td class="cfb__num" data-l="Hired away" data-v="{{ .moved }}">{{ printf "%.0f" (mul .moved 100) }}%</td>
-    <td class="cfb__num" data-l="Win%" data-v="{{ .wp }}">{{ printf "%.0f" (mul .wp 100) }}% <span class="{{ if ge .vsNorm 0.0 }}cfb__up{{ else }}cfb__down{{ end }} cfb__dim">{{ if ge .vsNorm 0.0 }}+{{ end }}{{ printf "%.0f" (mul .vsNorm 100) }}</span></td>
+    <td class="cfb__num cfbj__open" data-l="Open" data-v="{{ .open }}"><b class="{{ if ge .open 0.35 }}cfb__down{{ else }}cfb__up{{ end }}">{{ partial "num.html" (slice "%.0f" (mul .open 100)) }}%</b></td>
+    <td class="cfb__num" data-l="Out" data-v="{{ .out }}">{{ partial "num.html" (slice "%.0f" (mul .out 100)) }}%</td>
+    <td class="cfb__num" data-l="Hired away" data-v="{{ .moved }}">{{ partial "num.html" (slice "%.0f" (mul .moved 100)) }}%</td>
+    <td class="cfb__num" data-l="Win%" data-v="{{ .wp }}">{{ partial "num.html" (slice "%.0f" (mul .wp 100)) }}% <span class="{{ if ge .vsNorm 0.0 }}cfb__up{{ else }}cfb__down{{ end }} cfb__dim">{{ if ge .vsNorm 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.0f" (mul .vsNorm 100)) }}</span></td>
     <td class="cfb__num" data-l="Yr" data-v="{{ .tenure }}">{{ .tenure }}</td>
-    <td class="cfbj__hires" data-l="If it opens">{{ range $j, $h := first 3 .hires }}{{ if $j }}, {{ end }}{{ $h.name }} <span class="cfb__dim">{{ $h.role }} {{ $h.from }} {{ if lt $h.p 0.01 }}&lt;1{{ else }}{{ printf "%.0f" (mul $h.p 100) }}{{ end }}%</span>{{ end }}</td>
+    <td class="cfbj__hires" data-l="If it opens">{{ range $j, $h := first 3 .hires }}{{ if $j }}, {{ end }}{{ $h.name }} <span class="cfb__dim">{{ $h.role }} {{ $h.from }} {{ if lt $h.p 0.01 }}&lt;1{{ else }}{{ partial "num.html" (slice "%.0f" (mul $h.p 100)) }}{{ end }}%</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

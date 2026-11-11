@@ -33,11 +33,11 @@
     <td>{{ index $short .lg | default .lg }}</td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
     <td class="cfb__num">{{ .pts }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .pos) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .pos)) }}</td>
     {{- range $v := slice .top8 .ko .r16 .qf .sf .fin .win }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
-    <td class="cfb__num" data-v="{{ with $p }}{{ .rating }}{{ end }}">{{ with $p }}{{ printf "%+.2f" (float .rating) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with $p }}{{ .rating }}{{ end }}">{{ with $p }}{{ partial "num.html" (slice "%+.2f" (float .rating)) }}{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

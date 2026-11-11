@@ -5,7 +5,7 @@
 {{- with .from -}}
 {{- $f := (time .).Format "Jan 2" -}}
 {{- if and $r.wr (ne $r.w0 nil) -}}{{- $d := sub (int $r.wr) (int $r.rk) -}}
-<td class="cfb__num cfb__wk" data-v="{{ $d }}" title="{{ $f }}: #{{ $r.wr }}{{ with index $r $.v }}, {{ $.label }} {{ printf $.fmt (sub (float .) (float $r.w0)) }}{{ end }}">{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+<td class="cfb__num cfb__wk" data-v="{{ $d }}" title="{{ $f }}: #{{ $r.wr }}{{ with index $r $.v }}, {{ $.label }} {{ partial "num.html" (slice $.fmt (sub (float .) (float $r.w0))) }}{{ end }}">{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
 {{- else -}}<td class="cfb__num cfb__wk" data-v="" title="not on the board {{ $f }}"><span class="cfb__new">new</span></td>
 {{- end -}}
 {{- end -}}

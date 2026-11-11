@@ -18,10 +18,10 @@
     <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td>{{ .conf }}</td>
     {{ $wl := split .rec "-" }}{{ $wv := sub (mul 100 (int (index $wl 0))) (int (index $wl 1)) }}<td class="cfb__num" data-v="{{ $wv }}">{{ .rec }}</td>
-    <td class="cfb__num" data-v="{{ .xW }}">{{ with .xW }}{{ printf "%.1f" (float .) }}{{ end }}-{{ with .xL }}{{ printf "%.1f" (float .) }}{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .cxW }}">{{ with .cxW }}{{ printf "%.1f" (float .) }}{{ end }}-{{ with .cxL }}{{ printf "%.1f" (float .) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .xW }}">{{ with .xW }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}-{{ with .xL }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .cxW }}">{{ with .cxW }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}-{{ with .cxL }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}</td>
     {{- $v := float (.title | default 0) }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (mul $v 100) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (mul $v 100)) }}%{{ end }}</td>
     <td class="cfb__rk">{{ .rk }}</td>
   </tr>
   {{- end }}

@@ -24,17 +24,17 @@
   {{- range $i, $r := .board }}
   <tr data-pi="{{ $i }}" data-pk="{{ anchorize .name }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "not on Tankathon's board; graded up from the 20 floor on this season's NHLe, age, weight and position, from what off-board CHL draft-eligibles became (2008-19)") }}{{ end }}{{ with .nhle }} <span class="cfb__dim gfx-off" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's fitted translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</span></td>
+    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "not on Tankathon's board; graded up from the 20 floor on this season's NHLe, age, weight and position, from what off-board CHL draft-eligibles became (2008-19)") }}{{ end }}{{ with .nhle }} <span class="cfb__dim gfx-off" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's fitted translation factor)">{{ partial "num.html" (slice "%.0f" (float .)) }} NHLe</span>{{ end }}</span></td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>{{ partial "wkfv.html" (dict "r" . "from" $d.wkFrom) }}
     <td>{{ .pos }}</td>
     <td style="white-space: nowrap">{{ with index site.Data.hockey_logos (printf "%s|%s" (.league | default "") (.club | default "")) }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .club }}</td>
     <td>{{ .league }}</td>
-    <td class="cfb__num">{{ if .ageEst }}~{{ printf "%.1f" (float .age) }}{{ else }}{{ with .age }}{{ printf "%.1f" (float .) }}{{ end }}{{ end }}</td>
+    <td class="cfb__num">{{ if .ageEst }}~{{ partial "num.html" (slice "%.1f" (float .age)) }}{{ else }}{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}{{ end }}</td>
     <td class="cfb__num hk__x">{{ with .rk }}{{ . }}{{ else }}-{{ end }}</td>
     <td class="cfb__num hk__x">{{ with .xslot }}{{ . }}{{ else }}-{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .p40 }}">{{ printf "%.0f" (mul .p40 100) }}%</td>
-    <td class="cfb__num" data-v="{{ .p50 }}">{{ printf "%.0f" (mul .p50 100) }}%</td>
-    <td class="cfb__num" hidden>{{ with .nhle }}{{ printf "%.0f" (float .) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .p40 }}">{{ partial "num.html" (slice "%.0f" (mul .p40 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .p50 }}">{{ partial "num.html" (slice "%.0f" (mul .p50 100)) }}%</td>
+    <td class="cfb__num" hidden>{{ with .nhle }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -60,7 +60,7 @@
   {{- range $i, $r := .pipe }}
   <tr data-pi="{{ $i }}" data-pk="{{ with .id }}n{{ . }}{{ else }}{{ anchorize $r.name }}{{ end }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ partial "badges.html" (dict "b" .bdg "of" "the NHL outcome") }}{{ with .age }} <span class="cfb__dim gfx-off">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim gfx-off" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ printf "%.1f" (float .) }} min TOI{{ with $r.esog }}, {{ printf "%.1f" (float .) }} shots on goal a game{{ end }}{{ end }}">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</span></td>
+    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ partial "badges.html" (dict "b" .bdg "of" "the NHL outcome") }}{{ with .age }} <span class="cfb__dim gfx-off">{{ partial "num.html" (slice "%.0f" (float .)) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim gfx-off" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ partial "num.html" (slice "%.1f" (float .)) }} min TOI{{ with $r.esog }}, {{ partial "num.html" (slice "%.1f" (float .)) }} shots on goal a game{{ end }}{{ end }}">{{ partial "num.html" (slice "%.0f" (float .)) }} NHLe</span>{{ end }}</span></td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>{{ partial "wkfv.html" (dict "r" . "from" $d.wkFrom) }}
     <td>{{ .pos }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>
@@ -69,10 +69,10 @@
     <td>{{ .league | default "-" }}</td>
     <td class="cfb__num hk__x">{{ .nhlgp }}</td>
     <td class="cfb__num hk__x">{{ .fv0 }}</td>
-    <td class="cfb__num" data-v="{{ .p40 }}">{{ printf "%.0f" (mul .p40 100) }}%</td>
-    <td class="cfb__num" data-v="{{ .p50 }}">{{ printf "%.0f" (mul .p50 100) }}%</td>
-    <td class="cfb__num" hidden>{{ with .age }}{{ printf "%.0f" (float .) }}{{ end }}</td>
-    <td class="cfb__num" hidden>{{ with .nhle }}{{ printf "%.0f" (float .) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .p40 }}">{{ partial "num.html" (slice "%.0f" (mul .p40 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .p50 }}">{{ partial "num.html" (slice "%.0f" (mul .p50 100)) }}%</td>
+    <td class="cfb__num" hidden>{{ with .age }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num" hidden>{{ with .nhle }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -101,7 +101,7 @@
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
     <td class="cfb__num hk__x">{{ .gp }}</td>
-    <td class="cfb__num hk__x">{{ with .peak }}{{ printf "%.1f" (float .) }} pWAR{{ end }}{{ with .gpeak }}{{ printf "%+.0f" (float .) }} GSAx{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .peak }}{{ partial "num.html" (slice "%.1f" (float .)) }} pWAR{{ end }}{{ with .gpeak }}{{ partial "num.html" (slice "%+.0f" (float .)) }} GSAx{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -117,7 +117,7 @@
       <thead><tr><th>FV</th><th>Peak pWAR a season</th><th>How rare</th></tr></thead>
       <tbody>
       {{- $per := dict "80" "one in four classes" "75" "one in two classes" "70" "the best of a class" "65" "top 2 of a class" "60" "top 5" "55" "top 10" "50" "top 20" "45" "top 30" "40" "top 45" }}
-      {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td class="cfb__num">{{ printf "%.2f" (float (index . 1)) }}+</td><td>{{ index $per (string (index . 0)) }}</td></tr>{{ end }}
+      {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" (float (index . 1))) }}+</td><td>{{ index $per (string (index . 0)) }}</td></tr>{{ end }}
       <tr><td><span class="fv-chip" data-fv="30">30</span></td><td class="cfb__num">-</td><td>some NHL games</td></tr>
       <tr><td><span class="fv-chip" data-fv="20">20</span></td><td class="cfb__num">-</td><td>no NHL games</td></tr>
       </tbody>
@@ -125,14 +125,14 @@
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th title="mean squared error cut, out of class">Gain</th><th>t</th><th>Wins</th></tr></thead>
       <tbody>
-      {{- range $k := $f.kept }}{{ if not (in (slice "ls" "ls2" "D" "G") $k) }}{{ $e := index $f.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ printf "%+.2f" (float (index $f.coef $k)) }}</td><td class="cfb__num">{{ with $e }}{{ printf "%.2f" (float .gain) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}{{ end }}
-      {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ printf "%.2f" (float $e.gain) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
+      {{- range $k := $f.kept }}{{ if not (in (slice "ls" "ls2" "D" "G") $k) }}{{ $e := index $f.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float (index $f.coef $k))) }}</td><td class="cfb__num">{{ with $e }}{{ partial "num.html" (slice "%.2f" (float .gain)) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}{{ end }}
+      {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" (float $e.gain)) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
       </tbody>
     </table></div>
     <p class="cfb__dim" title="out of class: what each band of grades became">Calibration</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Grade band</th><th>Picks</th><th>Mean grade</th><th>Mean outcome</th><th>Played in NHL</th></tr></thead>
-      <tbody>{{ range $f.calib }}<tr><td>{{ .band }}-{{ add .band 4 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .nhl 100) }}%</td></tr>{{ end }}</tbody>
+      <tbody>{{ range $f.calib }}<tr><td>{{ .band }}-{{ add .band 4 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.0f" (mul .nhl 100)) }}%</td></tr>{{ end }}</tbody>
     </table></div>
     <p class="cfb__dim" title="error by seasons since the draft, the refit grade vs the draft grade alone">After the draft</p>
     <div class="wintable__scroll"><table class="cfb__table">
@@ -145,7 +145,7 @@
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th>t</th><th>Wins</th></tr></thead>
       <tbody>
-      {{- $pf := . }}{{ range $k := .kept }}{{ $e := index $pf.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ printf "%+.2f" (float (index $pf.coef $k)) }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}
+      {{- $pf := . }}{{ range $k := .kept }}{{ $e := index $pf.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float (index $pf.coef $k))) }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}
       {{- range $k, $e := .ev }}{{ if not (in $pf.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
       </tbody>
     </table></div>

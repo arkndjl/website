@@ -33,12 +33,12 @@
 {{- /* spread: L and m are the home side's expected margin */ -}}
 {{- if and (ne .m nil) (ne .L nil) }}{{ $d := sub (float .m) (float .L) }}{{ if ne $d 0.0 }}
 {{- $home := gt $d 0.0 }}{{ $pm := partial "normcdf.html" (div (math.Abs $d) (float .sd)) }}{{ $hl := mul -1.0 (float .L) }}
-{{- $rows = $rows | append (dict "r" $r "mk" "spread" "side" (cond $home "home" "away") "bet" (printf "%s %s" (cond $home .h .a) (cond (eq $hl 0.0) "pk" (printf "%+g" (cond $home $hl (mul -1.0 $hl))))) "model" (printf "%+.1f" (cond $home (mul -1.0 (float .m)) (float .m))) "edge" (printf "%.1f pts" (math.Abs $d)) "pm" $pm "q" 0.5 "e" (sub $pm 0.5)) }}
+{{- $rows = $rows | append (dict "r" $r "mk" "spread" "side" (cond $home "home" "away") "bet" (printf "%s %s" (cond $home .h .a) (cond (eq $hl 0.0) "pk" (printf "%+g" (cond $home $hl (mul -1.0 $hl))))) "model" (partial "num.html" (slice "%+.1f" (cond $home (mul -1.0 (float .m)) (float .m)))) "edge" (printf "%.1f pts" (math.Abs $d)) "pm" $pm "q" 0.5 "e" (sub $pm 0.5)) }}
 {{- end }}{{ end }}
 {{- /* total */ -}}
 {{- if and (ne .t nil) (ne .T nil) }}{{ $d := sub (float .t) (float .T) }}{{ if ne $d 0.0 }}
 {{- $over := gt $d 0.0 }}{{ $pm := partial "normcdf.html" (div (math.Abs $d) (float .tsd)) }}
-{{- $rows = $rows | append (dict "r" $r "mk" "total" "side" (cond $over "over" "under") "bet" (printf "%s %g" (cond $over "over" "under") (float .T)) "model" (printf (cond (eq .sp "NHL") "%.2f" "%.1f") (float .t)) "edge" (printf (cond (eq .sp "NHL") "%.2f gls" "%.1f pts") (math.Abs $d)) "pm" $pm "q" 0.5 "e" (sub $pm 0.5)) }}
+{{- $rows = $rows | append (dict "r" $r "mk" "total" "side" (cond $over "over" "under") "bet" (printf "%s %g" (cond $over "over" "under") (float .T)) "model" (partial "num.html" (slice (cond (eq .sp "NHL") "%.2f" "%.1f") (float .t))) "edge" (partial "num.html" (slice (cond (eq .sp "NHL") "%.2f gls" "%.1f pts") (math.Abs $d))) "pm" $pm "q" 0.5 "e" (sub $pm 0.5)) }}
 {{- end }}{{ end }}
 {{- /* moneyline: model win chance against the no-vig price */ -}}
 {{- $mh := printf "%v" (.mh | default "") }}{{ $ma := printf "%v" (.ma | default "") }}
@@ -49,7 +49,7 @@
 {{- $qh := div $ih (add $ih $ia) }}{{ $ph := float .p }}{{ $d := sub $ph $qh }}{{ if ne $d 0.0 }}
 {{- $home := gt $d 0.0 }}{{ $o := cond $home $oh $oa }}{{ $pm := cond $home $ph (sub 1.0 $ph) }}{{ $q := cond $home $qh (sub 1.0 $qh) }}
 {{- $fair := 0.0 }}{{ if ge $pm 0.5 }}{{ $fair = div (mul -100.0 $pm) (sub 1.0 $pm) }}{{ else }}{{ $fair = div (mul 100.0 (sub 1.0 $pm)) $pm }}{{ end }}
-{{- $rows = $rows | append (dict "r" $r "mk" "ML" "side" (cond $home "home" "away") "bet" (printf "%s %+.0f" (cond $home .h .a) $o) "model" (printf "%+.0f" $fair) "edge" (printf "%.1f%%" (mul 100 (math.Abs $d))) "pm" $pm "q" $q "e" (math.Abs $d)) }}
+{{- $rows = $rows | append (dict "r" $r "mk" "ML" "side" (cond $home "home" "away") "bet" (printf "%s %+.0f" (cond $home .h .a) $o) "model" (partial "num.html" (slice "%+.0f" $fair)) "edge" (partial "num.html" (slice "%.1f%%" (mul 100 (math.Abs $d)))) "pm" $pm "q" $q "e" (math.Abs $d)) }}
 {{- end }}{{ end }}{{ end }}
 {{- end }}{{ end -}}
 {{- with $rows }}
@@ -67,9 +67,9 @@
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num">{{ .model }}</td>
     <td class="cfb__num">{{ .edge }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (mul .pm 100) }}%</td>
-    <td class="cfb__num">{{ printf "%.1f" (mul .q 100) }}%</td>
-    <td class="cfb__num" data-v="{{ .e }}"><b>{{ printf "%+.1f" (mul .e 100) }}</b></td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul .pm 100)) }}%</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul .q 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .e }}"><b>{{ partial "num.html" (slice "%+.1f" (mul .e 100)) }}</b></td>
     <td class="cfb__num" data-v="{{ $u | default 0 }}">{{ with $u }}<b>{{ . }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
   </tr>
   {{- end }}{{ end }}

@@ -29,16 +29,16 @@
     <td class="cfb__num">{{ .round }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="{{ .teamLogo }}" alt="" width="20" height="20" loading="lazy"><span class="cfbm__tm"><span>{{ .team }}</span>{{ with .via }}<span class="cfbm__trade is-real" title="{{ $p.teamName }} holds this pick, from {{ . }}" data-t="via {{ . }}" data-g="via {{ . }}"></span>{{ end }}</span></td>
     <td>{{ partial "face.html" (dict "u" (.photo | default "")) }}<b class="cfbt__big">{{ .name }}</b>{{ range .grades }}{{ $sfx := cond (eq $mode "blend") (printf " (%s)" (lower (index $short .by))) "" }}{{ if eq .g "value" }} <span class="cfb__valuechip" title="value: the {{ index $names .by }} mock takes him at #{{ .o }}, 2.5x+ earlier">◆ value{{ $sfx }}</span>{{ else }} <span class="cfb__reachchip" title="reach: the {{ index $names .by }} mock takes him {{ with .o }}at #{{ . }}, 2.5x+ later{{ else }}nowhere in 2 rounds{{ end }}">◇ reach{{ $sfx }}</span>{{ end }}{{ end }}
-      <span class="cbbm__why gfx-off">{{ .why }}{{ with .sim }}{{ if .tm }} Sims: likeliest team {{ .tm }} {{ printf "%.0f" (mul .tp 100) }}%{{ end }}{{ end }}{{ with .own }}{{ $o := index . 0 }}; #{{ $p.pick }} held by {{ index $o 0 }} {{ printf "%.0f" (mul (index $o 1) 100) }}%.{{ end }}</span></td>
+      <span class="cbbm__why gfx-off">{{ .why }}{{ with .sim }}{{ if .tm }} Sims: likeliest team {{ .tm }} {{ partial "num.html" (slice "%.0f" (mul .tp 100)) }}%{{ end }}{{ end }}{{ with .own }}{{ $o := index . 0 }}; #{{ $p.pick }} held by {{ index $o 0 }} {{ partial "num.html" (slice "%.0f" (mul (index $o 1) 100)) }}%.{{ end }}</span></td>
     <td>{{ .pos | default "–" }}{{ with .role }}{{ if ne . $p.pos }}<span class="cfb__dim gfx-off">·{{ . }}</span>{{ end }}{{ end }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv">{{ if ne .fv nil }}<span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span>{{ else }}<span class="cfb__dim" title="no D-I line: not on our board">–</span>{{ end }}</td>
-    {{- if $conv }}<td class="cfb__num">{{ if ge .xxpm 0. }}+{{ end }}{{ printf "%.1f" .xxpm }}</td>{{ end }}
+    {{- if $conv }}<td class="cfb__num">{{ if ge .xxpm 0. }}+{{ end }}{{ partial "num.html" (slice "%.1f" .xxpm) }}</td>{{ end }}
     <td>{{ .cls | default "–" }}</td>
-    <td class="cfb__num" data-v="{{ .declare | default 1 }}">{{ printf "%.0f" (mul (.declare | default 1) 100) }}%</td>
-    <td class="cfb__num" data-v="{{ with .age }}{{ . }}{{ end }}">{{ with .age }}{{ if $p.ageEst }}<span class="cfb__dim">~{{ printf "%.1f" . }}</span>{{ else }}{{ printf "%.1f" . }}{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .declare | default 1 }}">{{ partial "num.html" (slice "%.0f" (mul (.declare | default 1) 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ with .age }}{{ . }}{{ end }}">{{ with .age }}{{ if $p.ageEst }}<span class="cfb__dim">~{{ partial "num.html" (slice "%.1f" .) }}</span>{{ else }}{{ partial "num.html" (slice "%.1f" .) }}{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .cons }}{{ . }}{{ end }}">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
-    {{- with .sim }}<td class="cfb__num" data-v="{{ .top5 }}">{{ if lt .top5 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (mul .top5 100) }}%{{ end }}</td><td class="cfb__num" data-v="{{ .lo }}">{{ .lo }}-{{ with .hi }}{{ . }}{{ else }}60+{{ end }}</td>{{ end }}
+    {{- with .sim }}<td class="cfb__num" data-v="{{ .top5 }}">{{ if lt .top5 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (mul .top5 100)) }}%{{ end }}</td><td class="cfb__num" data-v="{{ .lo }}">{{ .lo }}-{{ with .hi }}{{ . }}{{ else }}60+{{ end }}</td>{{ end }}
     {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ with (index $sl .) }}{{ . }}{{ end }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
   </tr>
   {{- end }}

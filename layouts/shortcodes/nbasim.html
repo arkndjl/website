@@ -22,9 +22,9 @@
   <tr>
     <td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .wins)) }}</td>
     {{- range $v := slice .top6 .playin .playoff .conf .title }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
     <td>{{ .cname }}</td>
   </tr>

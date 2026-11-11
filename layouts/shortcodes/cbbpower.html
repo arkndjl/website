@@ -34,7 +34,7 @@
           <span class="cfbr__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}{{ .team }}</span>
           <span class="cfb__dim cfbr__rec">{{ if ne .rec "0-0" }}{{ .rec }}{{ end }}</span>
           {{- if eq $l.key "ark" }}
-          <span class="cfbr__x" title="points vs an average D-I team, neutral floor{{ with .ap }} · AP #{{ . }}{{ end }}">{{ printf "%+.1f" (float .score) }}</span>
+          <span class="cfbr__x" title="points vs an average D-I team, neutral floor{{ with .ap }} · AP #{{ . }}{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .score)) }}</span>
           {{- else }}
           <span class="cfbr__x" title="ARK Ranking{{ with .pts }} · {{ . }} poll points{{ end }}{{ with .fpv }} · {{ . }} first-place votes{{ end }}">{{ with index $ark .tid }}<span class="cfb__dim">ARK</span> #{{ . }}{{ end }}</span>
           {{- end }}
@@ -69,18 +69,18 @@
     <td class="cfb__num" data-v="{{ if .prev }}{{ sub .prev .rk }}{{ end }}">{{ if .prev }}{{ $d := sub .prev .rk }}{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}{{ else }}<span class="cfb__dim">·</span>{{ end }}</td>
     <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td>{{ .conf }}</td>
-    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.1f" (float .rating)) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 4 25)) }}
     <td class="cfb__num" data-v="{{ .g }}">{{ .rec }}{{ if ne .crec "0-0" }} <span class="cfb__dim">({{ .crec }})</span>{{ end }}</td>
     {{- if $P }}{{ $a := index $apk .id }}{{ $c := index $cok .id }}
     <td class="cfb__num" data-v="{{ with $a }}{{ . }}{{ end }}">{{ with $a }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ with $c }}{{ . }}{{ end }}">{{ with $c }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
-    <td class="cfb__num">{{ printf "%.1f" (float .off) }}</td>
-    <td class="cfb__num" data-v="{{ mul -1 .def }}">{{ printf "%.1f" (float .def) }}</td>
-    <td class="cfb__num">{{ with .tempo }}{{ printf "%.1f" (float .) }}{{ end }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .off)) }}</td>
+    <td class="cfb__num" data-v="{{ mul -1 .def }}">{{ partial "num.html" (slice "%.1f" (float .def)) }}</td>
+    <td class="cfb__num">{{ with .tempo }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ .elo }}</td>
-    <td class="cfb__num">{{ printf "%+.1f" (float .mkt) }}</td>
-    <td class="cfb__num" data-v="{{ .prior }}">{{ printf "%+.1f" (float .prior) }} <span class="cfb__dim">#{{ .priorRk }}</span></td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .mkt)) }}</td>
+    <td class="cfb__num" data-v="{{ .prior }}">{{ partial "num.html" (slice "%+.1f" (float .prior)) }} <span class="cfb__dim">#{{ .priorRk }}</span></td>
   </tr>
   {{- end }}
   </tbody>
@@ -99,14 +99,14 @@
       <thead><tr><th>Season</th><th title="games after an AP release with an AP-ranked team">Games</th><th>AP</th><th>ARK</th><th title="Kendall tau: AP / ARK">τ AP / ARK</th><th title="games after a Coaches release with a Coaches-ranked team">Games</th><th>Coaches</th><th>ARK</th></tr></thead>
       <tbody>
       {{- range $i, $a := $ap.bySeason }}{{ $c := index $co.bySeason $i }}
-      <tr><td>{{ $a.S }}</td><td class="cfb__num">{{ $a.n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $a.poll 100) }}</td><td class="cfb__num"><b class="{{ if gt $a.ark $a.poll }}cfb__up{{ else if lt $a.ark $a.poll }}cfb__down{{ end }}">{{ printf "%.1f%%" (mul $a.ark 100) }}</b></td>
-        <td class="cfb__num">{{ printf "%.2f" $a.tauPoll }} / {{ printf "%.2f" $a.tauArk }}</td>
-        <td class="cfb__num">{{ with $c }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $c }}{{ printf "%.1f%%" (mul .poll 100) }}{{ end }}</td><td class="cfb__num">{{ with $c }}<b class="{{ if gt .ark .poll }}cfb__up{{ else if lt .ark .poll }}cfb__down{{ end }}">{{ printf "%.1f%%" (mul .ark 100) }}</b>{{ end }}</td></tr>
+      <tr><td>{{ $a.S }}</td><td class="cfb__num">{{ $a.n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul $a.poll 100)) }}</td><td class="cfb__num"><b class="{{ if gt $a.ark $a.poll }}cfb__up{{ else if lt $a.ark $a.poll }}cfb__down{{ end }}">{{ partial "num.html" (slice "%.1f%%" (mul $a.ark 100)) }}</b></td>
+        <td class="cfb__num">{{ partial "num.html" (slice "%.2f" $a.tauPoll) }} / {{ partial "num.html" (slice "%.2f" $a.tauArk) }}</td>
+        <td class="cfb__num">{{ with $c }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $c }}{{ partial "num.html" (slice "%.1f%%" (mul .poll 100)) }}{{ end }}</td><td class="cfb__num">{{ with $c }}<b class="{{ if gt .ark .poll }}cfb__up{{ else if lt .ark .poll }}cfb__down{{ end }}">{{ partial "num.html" (slice "%.1f%%" (mul .ark 100)) }}</b>{{ end }}</td></tr>
       {{- end }}
       {{- range $k, $lab := dict "all" "all seasons" "bothRanked" "both teams ranked" }}{{ $a := index $ap $k }}{{ $c := index $co $k }}
-      <tr><td><b>{{ $lab }}</b></td><td class="cfb__num">{{ $a.n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $a.poll 100) }}</td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul $a.ark 100) }}</b> <span class="cfb__dim">t {{ printf "%.1f" $a.t }}</span></td>
-        <td class="cfb__num">{{ printf "%.2f" $a.tauPoll }} / {{ printf "%.2f" $a.tauArk }}</td>
-        <td class="cfb__num">{{ $c.n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $c.poll 100) }}</td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul $c.ark 100) }}</b> <span class="cfb__dim">t {{ printf "%.1f" $c.t }}</span></td></tr>
+      <tr><td><b>{{ $lab }}</b></td><td class="cfb__num">{{ $a.n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul $a.poll 100)) }}</td><td class="cfb__num"><b>{{ partial "num.html" (slice "%.1f%%" (mul $a.ark 100)) }}</b> <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" $a.t) }}</span></td>
+        <td class="cfb__num">{{ partial "num.html" (slice "%.2f" $a.tauPoll) }} / {{ partial "num.html" (slice "%.2f" $a.tauArk) }}</td>
+        <td class="cfb__num">{{ $c.n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul $c.poll 100)) }}</td><td class="cfb__num"><b>{{ partial "num.html" (slice "%.1f%%" (mul $c.ark 100)) }}</b> <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" $c.t) }}</span></td></tr>
       {{- end }}
       </tbody>
     </table>

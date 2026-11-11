@@ -29,9 +29,9 @@
   <tr>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
-    <td class="cfb__num" data-v="{{ .net }}"><span class="{{ if ge .net 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt .net 0.0 }}+{{ end }}{{ printf "%.2f" (mul .net $k) }}</span></td>
-    <td class="cfb__num" data-v="{{ .in }}">{{ printf "%.2f" (mul .in $k) }} <span class="cfb__dim">({{ .nIn }})</span></td>
-    <td class="cfb__num" data-v="{{ .out }}">{{ printf "%.2f" (mul .out $k) }} <span class="cfb__dim">({{ .nOut }})</span></td>
+    <td class="cfb__num" data-v="{{ .net }}"><span class="{{ if ge .net 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt .net 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" (mul .net $k)) }}</span></td>
+    <td class="cfb__num" data-v="{{ .in }}">{{ partial "num.html" (slice "%.2f" (mul .in $k)) }} <span class="cfb__dim">({{ .nIn }})</span></td>
+    <td class="cfb__num" data-v="{{ .out }}">{{ partial "num.html" (slice "%.2f" (mul .out $k)) }} <span class="cfb__dim">({{ .nOut }})</span></td>
   </tr>
   {{- end }}
   </tbody>

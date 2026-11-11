@@ -17,7 +17,7 @@
   {{- if not $list }}<div class="cfbm__body"><p class="cfb__dim">{{ if eq $view "results" }}no finished matches in the last three days.{{ else }}no ATP or WTA singles scheduled in the next four days (the off-season runs from late November to the new year).{{ end }}</p></div>{{ end }}
   {{- if eq $view "results" }}{{ with $list }}
   {{- $hit := 0 }}{{ range . }}{{ if or (and .a.won (ge .p 0.5)) (and .b.won (lt .p 0.5)) }}{{ $hit = add $hit 1 }}{{ end }}{{ end }}
-  <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ printf "%.0f" (mul (div (float $hit) (len .)) 100) }}%)</p></div>
+  <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ partial "num.html" (slice "%.0f" (mul (div (float $hit) (len .)) 100)) }}%)</p></div>
   {{- end }}{{ end }}
   <div class="games__grid">
   {{- range $list }}{{ $g := . }}
@@ -34,11 +34,11 @@
     <p class="games__live" data-live{{ if not .sc }} hidden{{ end }}>{{ with .sc }}<b class="games__livetag{{ if eq $g.state "post" }} is-final{{ end }}">{{ if eq $g.state "post" }}FINAL{{ else }}LIVE{{ end }}</b> {{ . }}{{ end }}</p>
     <div class="games__model">
       <div class="games__prob" title="model win chances">
-        <span style="width: {{ mul .p 100 }}%">{{ printf "%.0f" (mul .p 100) }}%</span><span style="width: {{ sub 100 (mul .p 100) }}%">{{ printf "%.0f" (sub 100 (mul .p 100)) }}%</span>
+        <span style="width: {{ mul .p 100 }}%">{{ partial "num.html" (slice "%.0f" (mul .p 100)) }}%</span><span style="width: {{ sub 100 (mul .p 100) }}%">{{ partial "num.html" (slice "%.0f" (sub 100 (mul .p 100))) }}%</span>
       </div>
       <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}
-        {{- if $pred }}{{ with .nv }} · <span class="cfb__dim" title="Novig, no-vig chance in brackets">market</span> {{ printf "%+d" (int (index .o 0)) }} / {{ printf "%+d" (int (index .o 1)) }} <span class="cfb__dim">({{ printf "%.0f" (mul .p 100) }}%)</span>{{ end }}{{ end }}</p>
-      {{- with index $pk (string .id) }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ printf "%.1f" (float .edge) }} · {{ .units }}% Kelly</p>{{ end }}
+        {{- if $pred }}{{ with .nv }} · <span class="cfb__dim" title="Novig, no-vig chance in brackets">market</span> {{ printf "%+d" (int (index .o 0)) }} / {{ printf "%+d" (int (index .o 1)) }} <span class="cfb__dim">({{ partial "num.html" (slice "%.0f" (mul .p 100)) }}%)</span>{{ end }}{{ end }}</p>
+      {{- with index $pk (string .id) }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ partial "num.html" (slice "%.1f" (float .edge)) }} · {{ .units }}% Kelly</p>{{ end }}
     </div>
   </article>
   {{- end }}

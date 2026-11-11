@@ -1,0 +1,6 @@
+{{- /* Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
+       printf for one number that never prints a negative zero: (slice "%+.1f" x) gives what printf gives, except
+       that a value which rounds to zero at the digits shown prints as zero does ("-0.0" -> "0.0", "+0.0" with %+). */ -}}
+{{- $f := index . 0 }}{{ $s := printf $f (index . 1) -}}
+{{- if findRE `^-0(\.0+)?([^0-9.]|$)` $s 1 }}{{ $s = printf $f 0.0 }}{{ end -}}
+{{- return $s -}}

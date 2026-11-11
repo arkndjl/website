@@ -21,7 +21,7 @@
       <thead><tr><th>Held out {{ index $f.held 0 }} to {{ index $f.held 1 }}: {{ index $sub 1 }} ({{ .n }})</th><th title="log loss (lower is better)">Log loss</th><th title="the favourite won">Hit</th><th title="log loss minus Valve's VRS points, paired t">vs VRS</th></tr></thead>
       <tbody>
       {{- range .models }}
-      <tr><td>{{ if eq .name "ARK + VRS" }}<b>ARK + VRS (live)</b>{{ else }}{{ .name }}{{ end }}</td><td class="cfb__num">{{ printf "%.4f" (float .ll) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .acc 100) }}</td><td class="cfb__num">{{ printf "%+.4f" (float .vsVrs) }} <span class="cfb__dim">t {{ printf "%+.1f" (float .tVrs) }}</span></td></tr>
+      <tr><td>{{ if eq .name "ARK + VRS" }}<b>ARK + VRS (live)</b>{{ else }}{{ .name }}{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float .ll)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul .acc 100)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.4f" (float .vsVrs)) }} <span class="cfb__dim">t {{ partial "num.html" (slice "%+.1f" (float .tVrs)) }}</span></td></tr>
       {{- end }}
       </tbody>
     </table></div>
@@ -29,7 +29,7 @@
     {{- with $f.calibration }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Favourite's chance, held out</th><th>Series</th><th>Model</th><th>Won</th></tr></thead>
-      <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .exp 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .obs 100) }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range . }}<tr><td>{{ partial "num.html" (slice "%.0f" (mul .bin 100)) }}-{{ partial "num.html" (slice "%.0f" (add (mul .bin 100) 5)) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul .exp 100)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul .obs 100)) }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
     {{- with $f.failed }}

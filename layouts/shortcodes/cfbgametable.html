@@ -24,12 +24,12 @@
     <td class="cfbg__match" data-v="{{ .away.name }} {{ .home.name }}">
       {{- range $i, $t := slice .away .home }}<span class="cfbg__side">{{ if $i }}<span class="cfb__dim"> @ </span>{{ end }}{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}{{ $r := $t.rank }}{{ if $ark }}{{ $r = false }}{{ with index $ark (string $t.id) }}{{ if le . 25 }}{{ $r = . }}{{ end }}{{ end }}{{ end }}{{ with $r }}<span class="cfb__dim">#{{ . }}</span> {{ end }}{{ $t.name }}</span>{{ end -}}
     </td>
-    <td class="cfb__num" data-v="{{ $q }}">{{ printf "%.0f" $q }}</td>
+    <td class="cfb__num" data-v="{{ $q }}">{{ partial "num.html" (slice "%.0f" $q) }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ .spread }}">{{ if lt .spread 0.0 }}{{ .home.name }} {{ .spread }}{{ else if gt .spread 0.0 }}{{ .away.name }} -{{ .spread }}{{ else }}pick'em{{ end }}</td>
-    <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (mul $fp 100) }}% <span class="cfb__dim">{{ $fav.name }}</span></td>
+    <td class="cfb__num" data-v="{{ $fp }}">{{ partial "num.html" (slice "%.0f" (mul $fp 100)) }}% <span class="cfb__dim">{{ $fav.name }}</span></td>
     <td class="cfb__num">{{ with .proj }}{{ .away }}-{{ .home }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-v="{{ with .proj }}{{ .total }}{{ end }}">{{ with .proj }}{{ printf "%.1f" .total }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .proj }}{{ .total }}{{ end }}">{{ with .proj }}{{ partial "num.html" (slice "%.1f" .total) }}{{ else }}—{{ end }}</td>
     {{- range $unit := slice .stars.off .stars.def }}
     <td class="cfbg__stars" data-v="{{ with index $unit 0 }}{{ .pts }}{{ end }}">
       {{- range $unit }}<span class="cfbg__star"><span class="cfbg__who">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy">{{ end }}{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span> {{ end }}{{ .name }} <span class="cfb__dim">{{ replaceRE "^DL$" "DT" .pos }}</span></span><span class="cfbg__line">{{ .line }}</span></span>{{ end -}}

@@ -22,12 +22,12 @@
       <tr>
         <td>{{ .label }} <span class="cfb__dim">since {{ lower ((time .since).Format "Jan 2") }}</span></td>
         <td>{{ if eq .status "stopped" }}<b>stopped</b>{{ with .stopped }} <span class="cfb__dim">{{ lower ((time .at).Format "Jan 2") }}{{ with .why }}: {{ . }}{{ end }}</span>{{ end }}{{ else if eq .status "on" }}<b>on</b>{{ else }}<span class="cfb__dim">{{ .status }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}<br><span class="cfb__dim">{{ .clvN }} / {{ .days }}d</span></td>
-        <td class="cfb__num">{{ with .exp }}{{ printf "%+.1f%%" (mul .clvRet 100) }}{{ end }}{{ with .vsExp }}<br>{{ if eq .read "in line" }}<span class="cfb__dim">in line, z {{ printf "%+.1f" .z }}</span>{{ else }}<b>{{ .read }}</b> <span class="cfb__dim">z {{ printf "%+.1f" .z }}</span>{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ with .beat }}{{ printf "%.0f%%" (mul . 100) }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ with .exp }}{{ with .beat }}{{ printf "%.0f%%" (mul . 100) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span></td>
-        <td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ with .exp }}{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span>{{ if .settled }}<br><span class="cfb__dim">{{ .w }}-{{ .l }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .week }}{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">{{ .n }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .check }}{{ printf "%.1f" .cusum }} <span class="cfb__dim">/ {{ .h }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" .) }}</span>{{ end }}<br><span class="cfb__dim">{{ .clvN }} / {{ .days }}d</span></td>
+        <td class="cfb__num">{{ with .exp }}{{ partial "num.html" (slice "%+.1f%%" (mul .clvRet 100)) }}{{ end }}{{ with .vsExp }}<br>{{ if eq .read "in line" }}<span class="cfb__dim">in line, z {{ partial "num.html" (slice "%+.1f" .z) }}</span>{{ else }}<b>{{ .read }}</b> <span class="cfb__dim">z {{ partial "num.html" (slice "%+.1f" .z) }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with .beat }}{{ partial "num.html" (slice "%.0f%%" (mul . 100)) }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ with .exp }}{{ with .beat }}{{ partial "num.html" (slice "%.0f%%" (mul . 100)) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span></td>
+        <td class="cfb__num">{{ with .roi }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ with .exp }}{{ with .roi }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span>{{ if .settled }}<br><span class="cfb__dim">{{ .w }}-{{ .l }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .week }}{{ with .clvRet }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">{{ .n }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .check }}{{ partial "num.html" (slice "%.1f" .cusum) }} <span class="cfb__dim">/ {{ .h }}</span>{{ end }}</td>
       </tr>
       {{- end }}{{ end }}
       {{- end }}
@@ -43,11 +43,11 @@
       {{- range . }}
       <tr>
         <td>{{ .label }}</td>
-        <td class="cfb__num">{{ .n }} <span class="cfb__dim">{{ printf "%.1f" .du }} units</span></td>
-        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .flat }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .adds }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .expEdge }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ .n }} <span class="cfb__dim">{{ partial "num.html" (slice "%.1f" .du) }} units</span></td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" .) }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .flat }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .adds }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .expEdge }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
       </tr>
       {{- end }}
       </tbody>

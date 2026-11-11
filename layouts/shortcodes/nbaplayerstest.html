@@ -21,10 +21,10 @@
   {{- $a := index $d.test $s }}{{ $h := $a.hold }}{{ $t := $a.tune }}
   <tr>
     <td><b>{{ index (dict "pra" "PRA" "pts" "PTS" "reb" "REB" "ast" "AST" "min" "MIN") $s }}</b></td>
-    <td class="cfb__num"><b>{{ printf "%.2f" $h.mae }}</b></td>
-    <td class="cfb__num">{{ printf "%.2f" $h.naive }}</td>
-    <td class="cfb__num"><span class="cfb__up">{{ printf "%.1f%%" (mul (div (sub $h.naive $h.mae) $h.naive) 100) }}</span></td>
-    <td class="cfb__num">{{ printf "%.1f" $h.t }}</td>
+    <td class="cfb__num"><b>{{ partial "num.html" (slice "%.2f" $h.mae) }}</b></td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.2f" $h.naive) }}</td>
+    <td class="cfb__num"><span class="cfb__up">{{ partial "num.html" (slice "%.1f%%" (mul (div (sub $h.naive $h.mae) $h.naive) 100)) }}</span></td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" $h.t) }}</td>
     <td class="cfb__num cfb__dim">{{ printf "%.2f / %.2f" $t.mae $t.naive }}</td>
     <td class="cfb__dim">{{ with index $d.feats $s }}{{ delimit . ", " }}{{ else }}sum of the three{{ end }}</td>
   </tr>
@@ -39,7 +39,7 @@
   <tbody>
   {{- range $s := slice "pra" "pts" "reb" "ast" }}
   {{- $c := index $d.calib $s }}
-  <tr><td><b>{{ upper $s }}</b></td><td class="cfb__num">{{ printf "%.4f" $c.brier }}</td><td class="cfb__num cfb__dim">{{ printf "%.4f" $c.brier50 }}</td>
+  <tr><td><b>{{ upper $s }}</b></td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" $c.brier) }}</td><td class="cfb__num cfb__dim">{{ partial "num.html" (slice "%.4f" $c.brier50) }}</td>
     <td class="cfb__dim">{{ range $i, $b := $c.bins }}{{ if $i }} · {{ end }}{{ math.Round (mul $b.p 100) }}→{{ math.Round (mul $b.hit 100) }}{{ end }}</td></tr>
   {{- end }}
   </tbody>

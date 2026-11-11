@@ -16,13 +16,13 @@
       {{- range $t := slice "Silver" "Gold" "Diamond" }}
       <div class="pickem__coin pickem__coin--{{ lower $t }}" title="chance of the {{ $t }} coin ({{ index (dict "Silver" "4" "Gold" "8" "Diamond" "11") $t }} of 11 challenges)">
         <svg aria-hidden="true"><use href="#icon-coin"/></svg>
-        <b>{{ upper $t }}</b><span>{{ printf "%.0f" (mul (index $d.coin $t) 100) }}%</span>
+        <b>{{ upper $t }}</b><span>{{ partial "num.html" (slice "%.0f" (mul (index $d.coin $t) 100)) }}%</span>
       </div>
       {{- end }}
     </div>
     <div class="pickem__stage">
       <b>{{ upper .stage }}</b>
-      {{- if .picks }}<span title="chance of 5+ of the 10 picks correct">5+ / 10 · <b>{{ printf "%.0f" (mul .pPass 100) }}%</b></span><span class="cfb__dim" title="expected correct picks">{{ printf "%.1f" .ev }} xC</span>{{ end }}
+      {{- if .picks }}<span title="chance of 5+ of the 10 picks correct">5+ / 10 · <b>{{ partial "num.html" (slice "%.0f" (mul .pPass 100)) }}%</b></span><span class="cfb__dim" title="expected correct picks">{{ partial "num.html" (slice "%.1f" .ev) }} xC</span>{{ end }}
       {{- if .locked }}<span class="pickem__tag">LOCKED</span>{{ else if .start }}<span class="cfb__dim">lock {{ (time.In "America/New_York" (time .start)).Format "Jan 2 · 3:04 PM" }} ET</span>{{ end }}
       {{- if .projected }}<span class="pickem__tag pickem__tag--dim" title="field from Valve's invitation standings, not yet confirmed">PROJ</span>{{ end }}
     </div>
@@ -35,7 +35,7 @@
         <div class="pickem__pick" title="{{ .n }}: chance of {{ index $lbl $sl }}">
           {{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}
           <span class="pickem__name">{{ .n }}</span>
-          <b>{{ printf "%.0f" (mul (index .p (index $col $sl)) 100) }}%</b>
+          <b>{{ partial "num.html" (slice "%.0f" (mul (index .p (index $col $sl)) 100)) }}%</b>
         </div>
         {{- end }}
       </section>
@@ -52,7 +52,7 @@
         {{- end }}
       </section>
       {{- end }}
-      <p class="pickem__stage"><span title="chance of 1+ / 2+ / all 3 bracket challenges">{{ range $i, $p := $b.pk }}{{ if $i }} · {{ end }}{{ add $i 1 }}+ <b>{{ printf "%.0f" (mul $p 100) }}%</b>{{ end }}</span></p>
+      <p class="pickem__stage"><span title="chance of 1+ / 2+ / all 3 bracket challenges">{{ range $i, $p := $b.pk }}{{ if $i }} · {{ end }}{{ add $i 1 }}+ <b>{{ partial "num.html" (slice "%.0f" (mul $p 100)) }}%</b>{{ end }}</span></p>
     </div>
     {{- end }}
   </div>
@@ -62,11 +62,11 @@
     <tbody>
     {{- range . }}{{ $t := . }}
     <tr><td class="cfb__rk">{{ .seed }}</td><td class="cfb__name" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .n }}</td>
-      {{- range $c := slice 0 1 3 }}<td class="cfb__num">{{ printf "%.0f" (mul (index $t.p $c) 100) }}</td>{{ end }}</tr>
+      {{- range $c := slice 0 1 3 }}<td class="cfb__num">{{ partial "num.html" (slice "%.0f" (mul (index $t.p $c) 100)) }}</td>{{ end }}</tr>
     {{- end }}
     </tbody>
   </table>
   {{- end }}
-  <div class="win__status"><span title="picks: max chance of 5+ correct on {{ .nsim }} joint Swiss sims (Valve pairing, Buchholz, Bo1 / Bo3). Held out ({{ .bt.n }} Swiss stages since Jul 2025): predicted pass {{ printf "%.0f" (mul .bt.pPass 100) }}%, actual {{ printf "%.0f" (mul .bt.pass 100) }}% (seed chalk {{ printf "%.0f" (mul .bt.chalk 100) }}%); {{ .bt.nSe }} brackets: {{ printf "%.1f" .bt.se }} of 3 bracket challenges vs chalk {{ printf "%.1f" .bt.seChalk }}.">Valve Major rules · bo3.gg · Liquipedia</span><span {{ partial "fresh-attrs.html" "cs2" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="picks: max chance of 5+ correct on {{ .nsim }} joint Swiss sims (Valve pairing, Buchholz, Bo1 / Bo3). Held out ({{ .bt.n }} Swiss stages since Jul 2025): predicted pass {{ partial "num.html" (slice "%.0f" (mul .bt.pPass 100)) }}%, actual {{ partial "num.html" (slice "%.0f" (mul .bt.pass 100)) }}% (seed chalk {{ partial "num.html" (slice "%.0f" (mul .bt.chalk 100)) }}%); {{ .bt.nSe }} brackets: {{ partial "num.html" (slice "%.1f" .bt.se) }} of 3 bracket challenges vs chalk {{ partial "num.html" (slice "%.1f" .bt.seChalk) }}.">Valve Major rules · bo3.gg · Liquipedia</span><span {{ partial "fresh-attrs.html" "cs2" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

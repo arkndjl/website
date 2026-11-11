@@ -21,9 +21,9 @@
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num">{{ if gt (float .price) 0.0 }}+{{ end }}{{ int .price }}</td>
     <td class="cfb__num">{{ with .betTo }}{{ if eq $p.mk "total" }}{{ $p.side }} {{ cond (eq $p.side "over") "≤" "≥" }} {{ . }}{{ else }}{{ partial "gamespick-bet.html" (merge $p (dict "line" .)) }} or better{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num">{{ with .edge }}{{ printf "%.1f" (float .) }}{{ end }}{{ if in (slice "tennis" "nflprops") .sport }}%{{ end }}{{ with .x }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ with .seg }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (mul (.pDU | default .p) 100) }}%</td>
-    <td class="cfb__num">{{ printf "%+.1f%%" (mul (.evDU | default .ev) 100) }}</td>
+    <td class="cfb__num">{{ with .edge }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}{{ if in (slice "tennis" "nflprops") .sport }}%{{ end }}{{ with .x }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ with .seg }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul (.pDU | default .p) 100)) }}%</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f%%" (mul (.evDU | default .ev) 100)) }}</td>
     <td class="cfb__num">{{ with .now }}<span class="cfb__dim">{{ partial "gamespick-bet.html" (merge $p (dict "line" .line "mk" .mk "side" .side)) }}{{ with .price }}{{ if ne (float .) -110.0 }} {{ if gt (float .) 0.0 }}+{{ end }}{{ int . }}{{ end }}{{ end }}</span> {{ .units }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
   </tr>
   {{- end }}

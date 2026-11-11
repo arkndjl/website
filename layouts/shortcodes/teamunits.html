@@ -45,8 +45,8 @@
     {{- with $cfh }}<td class="bw__x">{{ $r.cf }}</td>{{ end }}
     {{- range $c := $cols }}{{ $x := index $r $c.k }}
     {{- if eq $x nil }}<td class="cfb__num{{ if isset $c "x" }} bw__x{{ end }}{{ if isset $c "key" }} is-key{{ end }}">–</td>
-    {{- else if isset $c "key" }}{{ $good := eq (int ($r.up | default 0)) 1 }}<td class="cfb__num is-key" data-v="{{ $x }}"><span{{ if not (isset $V "plain") }} class="{{ if $good }}cfb__up{{ else }}cfb__down{{ end }}"{{ end }}>{{ printf (printf "%%%s" $c.f) (float $x) }}</span></td>
-    {{- else }}<td class="cfb__num{{ if isset $c "x" }} bw__x{{ end }}" data-v="{{ $x }}">{{ printf (printf "%%%s" $c.f) (float $x) }}</td>
+    {{- else if isset $c "key" }}{{ $good := eq (int ($r.up | default 0)) 1 }}<td class="cfb__num is-key" data-v="{{ $x }}"><span{{ if not (isset $V "plain") }} class="{{ if $good }}cfb__up{{ else }}cfb__down{{ end }}"{{ end }}>{{ partial "num.html" (slice (printf "%%%s" $c.f) (float $x)) }}</span></td>
+    {{- else }}<td class="cfb__num{{ if isset $c "x" }} bw__x{{ end }}" data-v="{{ $x }}">{{ partial "num.html" (slice (printf "%%%s" $c.f) (float $x)) }}</td>
     {{- end }}{{ end }}
   </tr>
   {{- end }}

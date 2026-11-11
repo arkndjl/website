@@ -11,12 +11,12 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Margin = {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}.</p>
+    <p>Margin = {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ partial "num.html" (slice "%.2f" (index $f.coef $k)) }} x {{ index $names $k | default $k }}{{ end }}.</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Seasons</th><th>Games</th><th title="mean absolute error of the margin, points">MAE model</th><th title="the closing line's error">MAE line</th><th title="paired t, model error minus line error">t</th><th title="against the closing spread when the model is 2+ pts off it">ATS 2+</th><th title="win probability log loss, model vs the closing moneyline (vig removed)">Log loss</th><th title="total points error, model vs closing total">Totals MAE</th></tr></thead>
       <tbody>
       {{- range $k, $v := $f.test }}
-      <tr><td>{{ $k }}</td><td class="cfb__num">{{ $v.games }}</td><td class="cfb__num">{{ $v.maeModel }}</td><td class="cfb__num">{{ $v.maeLine }}</td><td class="cfb__num">{{ printf "%+.1f" $v.tVsLine }}</td><td class="cfb__num">{{ with $v.ats2 }}{{ printf "%.1f%%" (mul .pct 100) }} <span class="cfb__dim">({{ .n }})</span>{{ end }}</td><td class="cfb__num">{{ $v.logLossModel }} <span class="cfb__dim">/ {{ $v.logLossMarket }}</span></td><td class="cfb__num">{{ $v.totalMaeModel }} <span class="cfb__dim">/ {{ $v.totalMaeLine }}</span></td></tr>
+      <tr><td>{{ $k }}</td><td class="cfb__num">{{ $v.games }}</td><td class="cfb__num">{{ $v.maeModel }}</td><td class="cfb__num">{{ $v.maeLine }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" $v.tVsLine) }}</td><td class="cfb__num">{{ with $v.ats2 }}{{ partial "num.html" (slice "%.1f%%" (mul .pct 100)) }} <span class="cfb__dim">({{ .n }})</span>{{ end }}</td><td class="cfb__num">{{ $v.logLossModel }} <span class="cfb__dim">/ {{ $v.logLossMarket }}</span></td><td class="cfb__num">{{ $v.totalMaeModel }} <span class="cfb__dim">/ {{ $v.totalMaeLine }}</span></td></tr>
       {{- end }}
       </tbody>
     </table></div>
@@ -25,21 +25,21 @@
       <thead><tr><th>Input</th><th>Kept</th><th title="change in 2022-26 margin MAE from the input (negative = it helps)">MAE 22-26</th><th title="paired t, 2022-26 (negative = it helps)">t 22-26</th><th title="paired t when added, 2015-21 (kept at -1.5 or lower)">t 15-21</th></tr></thead>
       <tbody>
       {{- range $k := $f.feats }}{{ with index $f.drop $k }}
-      <tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ printf "%+.3f" (sub $base .mae2022_26) }}</td><td class="cfb__num">{{ printf "%+.1f" .t2022_26 }}</td><td class="cfb__num"><span class="cfb__dim">—</span></td></tr>
+      <tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (sub $base .mae2022_26)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" .t2022_26) }}</td><td class="cfb__num"><span class="cfb__dim">—</span></td></tr>
       {{- end }}{{ end }}
       {{- with $f.select }}{{ $last := index . (sub (len .) 1) }}{{ range $last.tried }}
-      <tr><td>{{ index $names .input | default .input }}</td><td><span class="cfb__dim">no</span></td><td class="cfb__num">{{ printf "%+.3f" .d2022_26 }}</td><td class="cfb__num">{{ with .t2022_26 }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ printf "%+.1f" .t2015_21 }}</td></tr>
+      <tr><td>{{ index $names .input | default .input }}</td><td><span class="cfb__dim">no</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.3f" .d2022_26) }}</td><td class="cfb__num">{{ with .t2022_26 }}{{ partial "num.html" (slice "%+.1f" .) }}{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" .t2015_21) }}</td></tr>
       {{- end }}{{ end }}
       </tbody>
     </table></div>
     {{- with $f.calib }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Model favorite, 2022-26</th><th>Games</th><th>Model</th><th>Won</th></tr></thead>
-      <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ with .model }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range . }}<tr><td>{{ partial "num.html" (slice "%.0f" (mul .bin 100)) }}-{{ partial "num.html" (slice "%.0f" (add (mul .bin 100) 5)) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ with .model }}{{ partial "num.html" (slice "%.1f%%" (mul . 100)) }}{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f%%" (mul .won 100)) }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
     {{- with $f.P }}{{ if isset . "Outall" }}
-    <p class="cfb__dim">chance to play: out {{ printf "%.0f%%" (mul (index . "Outall" | default 0.0) 100) }} · doubtful {{ printf "%.0f%%" (mul (index . "Doubtfulall" | default 0.0) 100) }} · questionable {{ printf "%.0f%%" (mul (index . "Questionableall" | default 0.0) 100) }} · probable {{ printf "%.0f%%" (mul (index . "Probableall" | default 0.0) 100) }} · not listed {{ printf "%.0f%%" (mul (index . "none0" | default 0.0) 100) }}</p>
+    <p class="cfb__dim">chance to play: out {{ partial "num.html" (slice "%.0f%%" (mul (index . "Outall" | default 0.0) 100)) }} · doubtful {{ partial "num.html" (slice "%.0f%%" (mul (index . "Doubtfulall" | default 0.0) 100)) }} · questionable {{ partial "num.html" (slice "%.0f%%" (mul (index . "Questionableall" | default 0.0) 100)) }} · probable {{ partial "num.html" (slice "%.0f%%" (mul (index . "Probableall" | default 0.0) 100)) }} · not listed {{ partial "num.html" (slice "%.0f%%" (mul (index . "none0" | default 0.0) 100)) }}</p>
     {{- end }}{{ end }}
   </div>
   <div class="win__status"><span>walk-forward, 2015-26</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

@@ -37,5 +37,5 @@
 {{- $ece := slice }}{{ range $s.tiers }}{{ if ge .t 40 }}{{ $ece = $ece | append (printf "%d+ %.1f pts" (int .t) (mul .ece 100)) }}{{ end }}{{ end -}}
 {{- partial "wintable-close.html" (dict "rows" (len .bands) "note" (printf "%s held out" (lang.FormatNumber 0 $s.n))
     "about" (printf "Held out: %s. Became = the mean FV the band's careers reached, of the mean FV it was given. Each tier cell: the share that got there, the predicted odds under it in teal; the bar runs 0-100%%, the purple band is the realized share's 90%% interval, the white tick the realized share, the teal tick the prediction (lilac when the prediction falls outside the band). Interval numbers print on bands of 65+ or under 40 %s, where a few careers swing the share. Outcome on the FV: slope %.2f (1 = a point of FV is worth a point of outcome), mean miss %s FV. Bands holding the prediction inside their 90%% interval: %s (about 90%% if calibrated). Mean gap, predicted vs realized share: %s."
-      .note $c.who $s.slope (cond (lt (math.Abs $s.bias) 0.05) "0.0" (printf "%+.1f" $s.bias)) (delimit $cov ", ") (delimit $ece ", "))) -}}
+      .note $c.who $s.slope (cond (lt (math.Abs $s.bias) 0.05) "0.0" (partial "num.html" (slice "%+.1f" $s.bias))) (delimit $cov ", ") (delimit $ece ", "))) -}}
 {{- end }}{{ end -}}

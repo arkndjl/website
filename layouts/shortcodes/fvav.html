@@ -15,8 +15,8 @@
   <tbody>
   {{- range $t := seq 65 -5 20 }}{{ with index $c (string $t) }}
   <tr><td><span class="fv-chip" data-fv="{{ $t }}">{{ $t }}{{ if eq $t 65 }}+{{ end }}</span></td>
-    <td class="cfb__num">{{ printf "%.2f" .nflWar }}</td><td class="cfb__num"><b>{{ printf "%.2f" .war50 }}</b></td>
-    <td class="cfb__num">{{ printf "%.2f" .war90 }}</td><td class="cfb__num cfb__dim">{{ .n }}</td></tr>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.2f" .nflWar) }}</td><td class="cfb__num"><b>{{ partial "num.html" (slice "%.2f" .war50) }}</b></td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.2f" .war90) }}</td><td class="cfb__num cfb__dim">{{ .n }}</td></tr>
   {{- end }}{{ end }}
   </tbody>
 </table>

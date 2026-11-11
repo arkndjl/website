@@ -62,13 +62,13 @@
     <td class="fv" data-v="{{ $s.fv }}"><span class="fv-chip" data-fv="{{ mul (div (int $s.fv) 5) 5 }}">{{ $s.fv }}</span></td>
     <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">+{{ .gap }}</span></td>
     {{- else }}
-    <td class="cfb__num" data-v="{{ .g }}">{{ printf (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float .g) }}</td>
+    <td class="cfb__num" data-v="{{ .g }}">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float .g)) }}</td>
     <td>{{ $s.name }}{{ with $s.cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with $s.age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ $s.g }}">{{ printf (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float $s.g) }}</td>
-    <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">{{ printf (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "+%.2f" "+%.1f") (float .gap) }}</span></td>
+    <td class="cfb__num" data-v="{{ $s.g }}">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float $s.g)) }}</td>
+    <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "+%.2f" "+%.1f") (float .gap)) }}</span></td>
     {{- end }}
     {{- $x := .xgap | default .gap }}
-    <td class="cfb__num is-key" data-v="{{ $x }}">{{ printf $xfmt (float $x) }}</td>
+    <td class="cfb__num is-key" data-v="{{ $x }}">{{ partial "num.html" (slice $xfmt (float $x)) }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ .use | default .mpg }}{{ with .unit }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ else }}{{ lang.FormatNumber 0 .use }}{{ end }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ $s.use | default $s.mpg }}{{ else }}{{ lang.FormatNumber 0 $s.use }}{{ end }}</td>
   </tr>

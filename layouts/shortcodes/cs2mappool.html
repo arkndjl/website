@@ -21,7 +21,7 @@
     <td class="cfb__rk">{{ .rk }}</td>
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
     {{- range $i, $p := .maps }}
-    <td class="cfb__num{{ if eq $p $mx }} cs__m--best{{ else if eq $p $mn }} cs__m--worst{{ end }}" data-v="{{ $p }}" title="{{ index $t.mapsN $i }} maps">{{ printf "%.0f" (mul $p 100) }}</td>
+    <td class="cfb__num{{ if eq $p $mx }} cs__m--best{{ else if eq $p $mn }} cs__m--worst{{ end }}" data-v="{{ $p }}" title="{{ index $t.mapsN $i }} maps">{{ partial "num.html" (slice "%.0f" (mul $p 100)) }}</td>
     {{- end }}
     <td data-filter="{{ .rg | default "—" }}">{{ .rg | default "—" }}</td>
   </tr>
