@@ -103,7 +103,7 @@
       var num = function (r, k) { var v = val(r, k, span); return v == null ? -1e9 : v; };
       var list = rowsOf().filter(function (r) {
         return (!pos || r.pos === pos) && (!team || r.tm === team) && (!who || (who === 'r') === !!r.r) &&
-          (!ag || (r.age != null && r.age >= ag[0] && r.age <= ag[1]));
+          (!ag || (r.age != null && r.age >= ag[0] && r.age < ag[1] + 1));
       }).sort(function (a, b) { return num(b, 'p50') - num(a, 'p50') || num(b, 'p80') - num(a, 'p80'); });
       list.forEach(function (r, i) { r.rk = i + 1; });
       var shown = list.length;
