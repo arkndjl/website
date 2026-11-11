@@ -11,7 +11,8 @@ The board's WAR is .6 x this AV WAR + .4 x XV (scripts/nfl_xv.py, data/nfl_xv.js
 parts that track team margin, and the blend is where a point of value lost to an absence costs a point of margin
 (missed games 2018-25, held-out seasons; AV WAR alone explains less than half as much, next season and contracts tie).
 war_ledger (the game model's injury costs) stays on AV WAR. Rows carry wav (AV WAR) and xv.
-Rows also carry p1 / p3, projected WAR next season and over the next three (scripts/nfl_war_proj.py, display only).
+Rows also carry p1 / p3, projected WAR next season and over the next three (scripts/nfl_war_proj.py, display only),
+and xp / pxp / q, the rate per 60 snaps raw and predictive and the qualified flag (scripts/nfl_rate.py).
 
 The board's lines are by sub-position (data/nfl_war_pos.json, see positions()): AV sets the spread inside a spot, and
 what an average regular there is worth over replacement blends missed games, veteran contracts and AV. NFL_REPL below
@@ -570,6 +571,11 @@ def build():
         nfl_war_proj.attach(out, y, teamg)
     except Exception as e:
         print(f'nfl war: projections skipped ({e!r})')
+    try:   # rXP/60 and pXP/60 (scripts/nfl_rate.py)
+        import nfl_rate
+        nfl_rate.attach(out, y)
+    except Exception as e:
+        print(f'nfl war: rate skipped ({e!r})')
     publish(out, y, week, done, lines, alpha)
 
 
@@ -703,7 +709,7 @@ def board(y, thru=None, fresh=False, st=True):
                     **({'stw': round(stw, 2), 'stl': st_line(sv)} if stw is not None and (abs(stw) >= 0.005 or st_line(sv)) else {}),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y), 'ax': age_x(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
-                    '_st': dict(st), '_g': g, '_war': war, **({'bdg': bdg[pfr]} if pfr in bdg else {}), **({'two': two} if two else {})})
+                    '_st': dict(st), '_g': g, '_war': war, '_sub': sub, '_avg': a['avg'], '_tg': tg, **({'bdg': bdg[pfr]} if pfr in bdg else {}), **({'two': two} if two else {})})
     out = [p for p in out if p['sn'] >= 1]
     out += st_rows(stv, y, gs2pfr, teamg, fresh, stb)
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
