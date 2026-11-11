@@ -372,6 +372,35 @@ def same_rule(c, defn):
     return any(fp({**defn, 'k': round(k + j / 1000, 3)}) == c['hash'] for j in range(-span, span + 1))
 
 
+# clocks the pre-Nov 5 2026 rule restarted on k noise alone, outside CBB (which was restored by hand on Nov 5): the rule's
+# market, segment and X never changed and k stayed within K_TOL from these starts (replayed from the commit history of
+# data/games_picks_rules.json under same_rule). Without them the CFB total test saw 2 of its graded picks, the NBA total
+# 18 of 48. A floor applies only while the clock still stands for the same rule (x and k within K_TOL of the floor's k0).
+CLOCK_FLOOR = {
+    ('cfb', 'total'): ('2026-11-02T21:28:21Z', 0.162, 3.0),
+    ('cfb', 'spread | line: 3-7'): ('2026-11-02T22:34:22Z', 0.102, 7.5),
+    ('cfb', 'spread | line: 7-14'): ('2026-10-29T20:05:15Z', 0.131, 8.0),
+    ('cfb', 'spread | role: favorite'): ('2026-10-28T02:43:16Z', 0.183, 8.0),
+    ('cfb', 'spread | season: late'): ('2026-10-29T20:05:15Z', 0.132, 6.0),
+    ('cfb', 'spread | venue: home'): ('2026-10-29T20:05:15Z', 0.114, 8.0),
+    ('nba', 'total'): ('2026-10-28T02:11:55Z', 0.641, 3.0),
+    ('nba', 'spread | line: 9-15'): ('2026-11-01T21:37:43Z', 0.198, 3.0),
+    ('nfl', 'spread'): ('2026-10-28T02:43:16Z', 0.348, 4.0),
+}
+
+
+def floored(sport, i, c, defn):
+    """clock c with its start moved back to CLOCK_FLOOR's when the floor stands for the same rule"""
+    f = CLOCK_FLOOR.get((sport, i))
+    if not f or c.get('since', '') <= f[0]:
+        return c
+    since, k0, x = f
+    k = defn.get('k')
+    if defn.get('x') != x or c.get('x') != x or k is None or abs(k - k0) > K_TOL * abs(k0):
+        return c
+    return {**c, 'since': since, 'k0': k0}
+
+
 def legacy_k(c, defn):
     """the k an old hash-only clock was started with (same_rule's search), else defn's"""
     k = defn.get('k')
@@ -406,6 +435,7 @@ def pick_state(sport, RS, log, old, stamp, P=None):
         elif 'x' not in c or c['hash'] != h:
             # the same rule (k within K_TOL): the clock keeps its start; it records the rule and the k it began with
             clocks[i] = {**c, 'hash': h, **rule, 'k0': c['k0'] if 'k0' in c else legacy_k(c, defn)}
+        clocks[i] = floored(sport, i, clocks[i], defn)
         bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
         mu1, rho = expected_live(sport, held), rho_for(sport, defn['mk'], held)
         d = decide(bs, sd_of(held), P, mu1, rho)
@@ -613,6 +643,12 @@ def test():
     assert s2['clocks']['total']['since'] == '2026-11-01', s2['clocks']
     s3, _ = pick_state('nba', RSk(0.7), [], s2, '2026-11-05T00:00:00Z', P)
     assert s3['clocks']['total']['since'] == '2026-11-05T00:00:00Z' and s3['clocks']['total']['k0'] == 0.7, s3['clocks']
+    # CLOCK_FLOOR: a k-noise restart is moved back to the floor while the rule is the floor's; X past it is not
+    RSf = lambda x, k: {**RS, 'markets': {'total': {**RS['markets']['total'], 'x': x, 'k': k}}}
+    f0, _ = pick_state('nba', RSf(3.0, 0.637), [], {'clocks': {'total': {'hash': 'h', 'since': '2026-11-05T02:15:12Z', 'mk': 'total', 'x': 3.0, 'k0': 0.637}}}, '2026-11-11T00:00:00Z', P)
+    assert f0['clocks']['total']['since'] == CLOCK_FLOOR[('nba', 'total')][0], f0['clocks']
+    f1, _ = pick_state('nba', RSf(3.5, 0.637), [], f0, '2026-11-12T00:00:00Z', P)
+    assert f1['clocks']['total']['since'] == '2026-11-12T00:00:00Z', f1['clocks']
     old = {'clocks': {'total': {'hash': fp({'mk': 'total', 'x': 5.5, 'k': 0.6}), 'since': '2026-10-21'}}}
     s4, _ = pick_state('nba', RSk(0.598), [], old, '2026-11-06T00:00:00Z', P)
     assert s4['clocks']['total']['since'] == '2026-10-21' and s4['clocks']['total']['k0'] == 0.6, s4['clocks']
