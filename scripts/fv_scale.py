@@ -57,7 +57,8 @@ def fv_of(board, x, fv=None):
     """the whole-number headline for an exact mean x; fv (the board's own rounding) is kept below the knot"""
     if x is None: return fv
     s = scale().get(board)
-    if s is None or x <= s['K']: return rnd(x) if fv is None else fv
+    if s is None or x <= s['K']:   # a headline more than 1 off its mean was stretched under an older, lower knot
+        return rnd(x) if fv is None or isinstance(fv, bool) or abs(fv - x) > 1 else fv
     return rnd(show(board, x))
 
 
@@ -137,11 +138,25 @@ def compute():
         cap = reach.get(b, 80.0) - 0.0
         out[b] = {'K': round(K, 2), 'T': round(min(Tb, cap), 2), 'tail': round(th, 2), 'tailT': round(Tb, 2),
                   'reach': round(cap, 2), 'seasons': n, 'src': note}
+    # CBB preseason boards stretch on the draft-day scale (cbbx, scripts/cbb_draftday.py; Noah delegated the call, Nov 11
+    # 2026). The preseason K and T rest on ~33 held-out rows above 45 (90% range of the slope 2.9-6.0): on the 2009-16
+    # boards' 24 out-of-fold rows with a mean of 45+, the headline ran +7.37 over the careers (MSE 343.8); on the
+    # draft-day scale +0.16 (MSE 221.9), the unstretched mean +0.02 (220.8)
+    try:
+        dx = json.load(open(FILE))['boards']['cbbx']
+        out['cbb'].update({'K': dx['K'], 'T': round(min(dx['T'], out['cbb']['reach']), 2),
+                           'src': out['cbb']['src'] + '; K and T from the draft-day scale (cbbx)'})
+    except (OSError, ValueError, KeyError):
+        pass
     return out
 
 
 def fit():
     out = compute()
+    try:    # boards written by their own scripts (cbbx: scripts/cbb_draftday.py) stay as they are
+        out = {**{b: v for b, v in json.load(open(FILE))['boards'].items() if b not in out}, **out}
+    except (OSError, ValueError, KeyError):
+        pass
     json.dump({'asof': __import__('time').strftime('%Y-%m-%d'), 'method': 'scripts/fv_scale.py --fit',
                'rule': f'FV = mean up to K ({PER_K:g} a season); linear above to 80 at T (one a season x {PER_T:g}), capped at the board\'s reach',
                'boards': out}, open(FILE, 'w'), indent=1)

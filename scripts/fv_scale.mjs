@@ -24,7 +24,7 @@ export function fvShow(board, x) {
 export function fvOf(board, x, fv) {
   if (x == null) return fv;
   const s = scale()[board];
-  if (!s || x <= s.K) return fv ?? Math.round(x);
+  if (!s || x <= s.K) return fv == null || typeof fv !== 'number' || Math.abs(fv - x) > 1 ? Math.round(x) : fv;  // >1 off: an older, lower knot
   return Math.round(fvShow(board, x));
 }
 
