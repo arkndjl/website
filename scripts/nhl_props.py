@@ -435,7 +435,13 @@ def build():
     today = datetime.date.today()
     S = today.year + 1 if today.month >= 8 else today.year
     B.pull(since=datetime.date(S - 2, 10, 1))
-    boxes = {g: b for g, b in B.load().items() if b['S'] >= S - 1}
+    # the walk starts where the backtest's does (2021-22), not two seasons back: season carries and the goalie save
+    # rates keep weight from older seasons, so a shorter walk served different projections than were tested
+    boxes = B.load()
+    if not any(b['S'] <= B.season(B.FIRST) + 1 for b in boxes.values()):
+        B.pull(since=B.FIRST)                          # one-time fill of an empty cache (about 10 minutes)
+        boxes = B.load()
+    boxes = {g: b for g, b in boxes.items() if b['S'] <= S}
     W = Walk()
     for gid, b in sorted(boxes.items(), key=lambda x: x[1]['k']):
         if b['S'] != W.season:

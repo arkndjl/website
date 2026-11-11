@@ -536,12 +536,13 @@ class Model:
         self.ln = {}                                             # team -> its last lineup ('<id><F|D>'), this season
         self.moves = None    # (S, team, game) -> (ids gone to another club, ids acquired since): trades, claims
         self.W = defaultdict(int); self.L = defaultdict(int); self.OTL = defaultdict(int)
+        self.RW = defaultdict(int)                               # regulation wins: the first standings tiebreak
 
     def advance(self, day, S):
         if self.S is not None and S != self.S:
             for e in (self.xg, self.gl, self.x5, self.st, self.mk, self.elo, self.gk):
                 e.season()
-            self.W.clear(); self.L.clear(); self.OTL.clear(); self.lv.clear(); self.ln.clear()
+            self.W.clear(); self.L.clear(); self.OTL.clear(); self.RW.clear(); self.lv.clear(); self.ln.clear()
         if self.day is not None and day > self.day:
             n = _days(self.day, day)
             for e in (self.xg, self.gl, self.x5, self.st, self.mk):
@@ -630,6 +631,8 @@ class Model:
         if not g.get('po'):
             w, l = (h, a) if hw else (a, h)
             self.W[w] += 1
+            if not ot:
+                self.RW[w] += 1
             (self.OTL if ot else self.L)[l] += 1
 
 
@@ -1129,8 +1132,10 @@ def win_given_ot(ph, z, pot, ot, ow):
     return po if ot else min(0.995, max(0.005, (ph - pot * po) / max(1 - pot, 1e-6)))
 
 
-def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
-    """rest of the regular season, then the playoffs (division top three + two wild cards a conference; 2-2-1-1-1)"""
+def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None):
+    """rest of the regular season, then the playoffs (division top three + two wild cards a conference; 2-2-1-1-1).
+    rw: regulation wins so far; points ties break on regulation wins (the NHL's first tiebreak), then at random"""
+    rw = rw or {}
     rng = random.Random(seed)
     c = fit['coef']
     base = {t: team_logit(m, fit, t)[1] for t in TEAMS}
@@ -1149,6 +1154,7 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
     for _ in range(sims):
         R = {t: base[t] + rng.gauss(0, sd) for t in TEAMS}
         P = dict(pts)
+        RW = {t: rw.get(t, 0) for t in TEAMS}
         for g in remaining:
             z = R[g['h']] - R[g['a']] + hc * (0.0 if g.get('neutral') else 1.0)
             ph = 1 / (1 + math.exp(-z))
@@ -1160,9 +1166,11 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
             P[w] += 2
             if ot:
                 P[l] += 1
+            else:
+                RW[w] += 1
         for t in TEAMS:
             pts_sum[t] += P[t]
-        order = {t: P[t] + rng.random() * 0.01 for t in TEAMS}
+        order = {t: P[t] + RW[t] / 1000 + rng.random() * 1e-4 for t in TEAMS}
         po = []
         bracket = {}
         for cf, ds in CONF.items():
@@ -1396,7 +1404,7 @@ def build():
     pts = {t: 2 * m.W[t] + m.OTL[t] for t in TEAMS}
     gp = {t: m.W[t] + m.L[t] + m.OTL[t] for t in TEAMS}
     share = len(left) / max(len(reg), 1)
-    sims = simulate(m, fit, left, pts, share=share)
+    sims = simulate(m, fit, left, pts, share=share, rw=dict(m.RW))
     power = []
     for t in TEAMS:
         comp, z = team_logit(m, fit, t)
