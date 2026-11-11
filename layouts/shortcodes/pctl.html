@@ -120,7 +120,7 @@
       head.innerHTML = CC.map(function (c) {
         return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
       }).join('');
-      body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
+      var gfxRow = function (r) {
         return '<tr>' + CC.map(function (c) {
           if (c.x) return '<td class="cfb__num ' + c.cls + '">' + sx(r[c.k]) + '</td>';
           if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
@@ -129,7 +129,11 @@
           if (c.k === 'g' || c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r[c.k] == null ? '<span class="cfb__dim">–</span>' : r[c.k]) + '</td>';
           return '<td class="cfb__num ' + c.cls + '">' + fmt(val(r, c.k, span)) + '</td>';
         }).join('') + '</tr>';
-      }).join('');
+      };
+      body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+      // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+      var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+      body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
       none.hidden = list.length > 0;
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;

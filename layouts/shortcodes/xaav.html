@@ -119,7 +119,7 @@
       });
     } else if (dir < 0) list = list.slice().reverse();
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+    var gfxRow = function (p) {
       var d = deal(p), sub = esc(p.tm) + ' · ' + esc(p.pos) + (p.age == null ? '' : ' · ' + p.age) + (d == null ? '' : ' · $' + d.toFixed(1) + 'M');
       var cells = NHL
         ? '<td class="cfb__num nbaxpm__ph">' + f(p.war) + '</td><td class="cfb__num nbaxpm__ph">' + f(p.pwar) + '</td><td class="cfb__num nbaxpm__ph">' + f(p.p3) + '</td>' +
@@ -130,7 +130,11 @@
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + sub + '</span></td>' + cells +
         '<td class="cfb__num c-x nbaxpm__v' + (view ? '' : ' is-key') + '">' + p.x.toFixed(1) + '</td>' +
         '<td class="cfb__num c-gap nbaxpm__v' + (view ? ' is-key' : '') + '">' + sg(p.gap) + '</td></tr>';
-    }).join('');
+    };
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+    // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+    var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+    body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
     none.hidden = list.length > 0;
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
