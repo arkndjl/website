@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-10T22:35Z",
+ "asof": "2026-11-11T00:52Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 780,
+   "players": 786,
    "rows": 5265
   },
   "cfb": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2564,
+   "players": 2565,
    "rows": 16718
   },
   "nba": {
@@ -87,15 +87,15 @@
      "rows": 596
     },
     "static/data/nba-proj.json": {
-     "flags": 5,
+     "flags": 6,
      "rows": 500
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 461
     },
     "static/data/pctl-nba.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 462
     },
     "static/data/xaav-nba.json": {
@@ -177,6 +177,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/nba-proj.json",
+     "flag": "moved",
+     "head": "Inks two-way deal with Lakers",
+     "kind": "sign",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Inks two-way deal with Lakers",
+      "kind": "sign"
+     },
+     "pid": "7038",
+     "player": "Carson Cooper",
+     "pos": "PF",
+     "rotowire": "LAL",
+     "site": "MEM"
+    },
+    {
      "d": "2026-09-14",
      "field": "tm",
      "file": "static/data/nba-proj.json",
@@ -193,6 +211,24 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/nba-xpm/2027.json",
+     "flag": "moved",
+     "head": "Inks two-way deal with Lakers",
+     "kind": "sign",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Inks two-way deal with Lakers",
+      "kind": "sign"
+     },
+     "pid": "7038",
+     "player": "Carson Cooper",
+     "pos": "PF",
+     "rotowire": "LAL",
+     "site": "MEM"
     },
     {
      "d": "2026-11-08",
@@ -229,6 +265,24 @@
      "pos": "SG",
      "rotowire": "FA",
      "site": "LAC"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nba.json",
+     "flag": "moved",
+     "head": "Inks two-way deal with Lakers",
+     "kind": "sign",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Inks two-way deal with Lakers",
+      "kind": "sign"
+     },
+     "pid": "7038",
+     "player": "Carson Cooper",
+     "pos": "C",
+     "rotowire": "LAL",
+     "site": "MEM"
     },
     {
      "d": "2026-10-17",
@@ -268,25 +322,25 @@
     }
    ],
    "joined": 0,
-   "players": 593,
+   "players": 594,
    "rows": 2019
   },
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
+     "flags": 7,
      "rows": 2137
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 15,
+     "flags": 18,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 66,
+     "flags": 70,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 65,
+     "flags": 69,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -294,25 +348,11 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 48,
+     "flags": 51,
      "rows": 1650
     }
    },
    "flags": [
-    {
-     "d": "2026-10-22",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Full practice Thursday",
-     "kind": null,
-     "move": null,
-     "pid": "16773",
-     "player": "Andrew Vorhees",
-     "pos": "LG",
-     "rotowire": "BAL",
-     "site": "ATL"
-    },
     {
      "d": "2026-08-29",
      "field": "depth",
@@ -330,6 +370,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "ATL"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Two catches in Spain",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Two catches in Spain",
+      "kind": "exit"
+     },
+     "pid": "19247",
+     "player": "Dohnte Meyers",
+     "pos": "WR",
+     "rotowire": "CIN",
+     "site": "CIN"
     },
     {
      "d": "2026-09-16",
@@ -386,24 +444,6 @@
      "site": "KC"
     },
     {
-     "d": "2026-10-07",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Heads to Bay Area on practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-07",
-      "head": "Heads to Bay Area on practice squad",
-      "kind": "practice"
-     },
-     "pid": "17467",
-     "player": "Xavier Smith",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "LA"
-    },
-    {
      "d": "2026-11-10",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -438,6 +478,24 @@
      "pos": "NB",
      "rotowire": "FA",
      "site": "MIN"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Two catches in Spain",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Two catches in Spain",
+      "kind": "exit"
+     },
+     "pid": "19247",
+     "player": "Dohnte Meyers",
+     "pos": "WR",
+     "rotowire": "CIN",
+     "site": "CIN"
     },
     {
      "d": "2026-11-03",
@@ -491,6 +549,20 @@
      "player": "Chris Moore",
      "pos": "WR",
      "rotowire": "FA",
+     "site": "BAL"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Moved to Atlanta",
+     "kind": null,
+     "move": null,
+     "pid": "16773",
+     "player": "Andrew Vorhees",
+     "pos": "OL",
+     "rotowire": "ATL",
      "site": "BAL"
     },
     {
@@ -850,6 +922,24 @@
      "pid": "17759",
      "player": "Caelen Carson",
      "pos": "CB",
+     "rotowire": "FA",
+     "site": "CAR"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Let go by Carolina",
+     "kind": null,
+     "move": {
+      "d": "2026-09-30",
+      "head": "Inked to active roster",
+      "kind": "up"
+     },
+     "pid": "12216",
+     "player": "David Moore",
+     "pos": "WR",
      "rotowire": "FA",
      "site": "CAR"
     },
@@ -1538,21 +1628,21 @@
      "site": "ARI"
     },
     {
-     "d": "2026-10-07",
+     "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Heads to Bay Area on practice squad",
-     "kind": "practice",
+     "flag": "moved",
+     "head": "Returns to Rams to help depleted WR corps",
+     "kind": "move",
      "move": {
-      "d": "2026-10-07",
-      "head": "Heads to Bay Area on practice squad",
-      "kind": "practice"
+      "d": "2026-11-10",
+      "head": "Returns to Rams to help depleted WR corps",
+      "kind": "move"
      },
      "pid": "17467",
      "player": "Xavier Smith",
      "pos": "WR",
-     "rotowire": "FA",
+     "rotowire": "LAR",
      "site": "SF"
     },
     {
@@ -1572,6 +1662,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "PIT"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Let go by Ravens",
+     "kind": null,
+     "move": {
+      "d": "2026-10-07",
+      "head": "Signed to Baltimore's 53-man roster",
+      "kind": "sign"
+     },
+     "pid": "10949",
+     "player": "Nick Vannett",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "BAL"
     },
     {
      "d": "2026-10-13",
@@ -1628,6 +1736,20 @@
      "site": "PHI"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Moved to Atlanta",
+     "kind": null,
+     "move": null,
+     "pid": "16773",
+     "player": "Andrew Vorhees",
+     "pos": "OL",
+     "rotowire": "ATL",
+     "site": "BAL"
+    },
+    {
      "d": "2026-10-26",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -1682,21 +1804,21 @@
      "site": "MIA"
     },
     {
-     "d": "2026-10-07",
+     "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Heads to Bay Area on practice squad",
-     "kind": "practice",
+     "flag": "moved",
+     "head": "Returns to Rams to help depleted WR corps",
+     "kind": "move",
      "move": {
-      "d": "2026-10-07",
-      "head": "Heads to Bay Area on practice squad",
-      "kind": "practice"
+      "d": "2026-11-10",
+      "head": "Returns to Rams to help depleted WR corps",
+      "kind": "move"
      },
      "pid": "17467",
      "player": "Xavier Smith",
      "pos": "WR",
-     "rotowire": "FA",
+     "rotowire": "LAR",
      "site": "SF"
     },
     {
@@ -2420,6 +2542,42 @@
      "site": "KC"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Let go by Ravens",
+     "kind": null,
+     "move": {
+      "d": "2026-10-07",
+      "head": "Signed to Baltimore's 53-man roster",
+      "kind": "sign"
+     },
+     "pid": "10949",
+     "player": "Nick Vannett",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "BAL"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Let go by Carolina",
+     "kind": null,
+     "move": {
+      "d": "2026-09-30",
+      "head": "Inked to active roster",
+      "kind": "up"
+     },
+     "pid": "12216",
+     "player": "David Moore",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "CAR"
+    },
+    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2492,6 +2650,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Two catches in Spain",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Two catches in Spain",
+      "kind": "exit"
+     },
+     "pid": "19247",
+     "player": "Dohnte Meyers",
+     "pos": "WR",
+     "rotowire": "CIN",
+     "site": "CIN"
+    },
+    {
      "d": "2026-11-03",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -2546,6 +2722,20 @@
      "site": "BAL"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Moved to Atlanta",
+     "kind": null,
+     "move": null,
+     "pid": "16773",
+     "player": "Andrew Vorhees",
+     "pos": "OL",
+     "rotowire": "ATL",
+     "site": "BAL"
+    },
+    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -2562,6 +2752,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "SF"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Let go by Carolina",
+     "kind": null,
+     "move": {
+      "d": "2026-09-30",
+      "head": "Inked to active roster",
+      "kind": "up"
+     },
+     "pid": "12216",
+     "player": "David Moore",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "CAR"
     },
     {
      "d": "2026-10-12",
@@ -3590,21 +3798,21 @@
      "site": "ARI"
     },
     {
-     "d": "2026-10-07",
+     "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Heads to Bay Area on practice squad",
-     "kind": "practice",
+     "flag": "moved",
+     "head": "Returns to Rams to help depleted WR corps",
+     "kind": "move",
      "move": {
-      "d": "2026-10-07",
-      "head": "Heads to Bay Area on practice squad",
-      "kind": "practice"
+      "d": "2026-11-10",
+      "head": "Returns to Rams to help depleted WR corps",
+      "kind": "move"
      },
      "pid": "17467",
      "player": "Xavier Smith",
      "pos": "WR",
-     "rotowire": "FA",
+     "rotowire": "LAR",
      "site": "SF"
     },
     {
@@ -3624,6 +3832,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "PIT"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Let go by Ravens",
+     "kind": null,
+     "move": {
+      "d": "2026-10-07",
+      "head": "Signed to Baltimore's 53-man roster",
+      "kind": "sign"
+     },
+     "pid": "10949",
+     "player": "Nick Vannett",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "BAL"
     },
     {
      "d": "2026-11-10",
@@ -3660,6 +3886,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "PHI"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Two catches in Spain",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Two catches in Spain",
+      "kind": "exit"
+     },
+     "pid": "19247",
+     "player": "Dohnte Meyers",
+     "pos": "WR",
+     "rotowire": "CIN",
+     "site": "CIN"
     },
     {
      "d": "2026-11-09",
@@ -3860,6 +4104,24 @@
      "site": "DEN"
     },
     {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Let go by Ravens",
+     "kind": null,
+     "move": {
+      "d": "2026-10-07",
+      "head": "Signed to Baltimore's 53-man roster",
+      "kind": "sign"
+     },
+     "pid": "10949",
+     "player": "Nick Vannett",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "BAL"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3914,6 +4176,24 @@
      "site": "KC"
     },
     {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Let go by Carolina",
+     "kind": null,
+     "move": {
+      "d": "2026-09-30",
+      "head": "Inked to active roster",
+      "kind": "up"
+     },
+     "pid": "12216",
+     "player": "David Moore",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "CAR"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -3933,7 +4213,7 @@
     }
    ],
    "joined": 0,
-   "players": 2238,
+   "players": 2240,
    "rows": 8011
   },
   "nhl": {
