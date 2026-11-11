@@ -32,6 +32,8 @@
     var where = r.team ? (r.signed ? 'signed with ' : 'committed to ') + esc(r.team) : r.school ? 'committed to ' + esc(r.school) + ' (not D-I on the board)' :
       r.lead ? 'uncommitted; On3 prediction leader ' + esc(r.lead[0]) + ' (' + r.lead[1] + '%)' : 'uncommitted';
     var top = Math.max.apply(null, w.rows.map(function (x) { return Math.abs(x[1]); }).concat([1]));
+    var rsum = w.rows.reduce(function (a, x) { return a + x[1]; }, 0);
+    function lv(lab, v, d) { return '<li class="cfb__step"><span class="cfb__bk">' + lab + '</span><span class="cfb__meter"></span><span class="cfb__bv">' + (+v).toFixed(d) + '</span></li>'; }
     var bars = w.rows.map(function (x) {
       var v = x[1], wd = Math.min(50, Math.abs(v) / top * 50);
       return '<li><span class="cfb__bk">' + esc(x[0]) + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
@@ -49,9 +51,11 @@
       '<p class="cfb__role">ARK stars ' + stars(r.ark) + (r.stars ? ' (industry ' + r.stars + (r.fsp ? '+' : '') + ').' : '.') + '</p>' +
       '<p class="cfb__role">college: ' + r.path.map(function (x, k) { return 'year ' + (k + 1) + ' plays D-I ' + pct(x.on) + ', ' + Math.round(x.min) + '% of minutes, BPM ' + sgn(x.bpm) + ' if he plays'; }).join(' · ') + '.</p>' +
       '<p class="cfb__role">xNIL year 1 ' + money(r.xnil) + ': college value ' + r.path[0].v.toFixed(1) + ' (minutes share x BPM above −3) at ' + (r.team ? esc(r.team) + '\'s' : 'the expected school\'s') + ' price.</p>' +
-      '<details class="cfb__nums" open><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">start: the average 2009-16 ranked recruit, FV ' + w.fv0.toFixed(1) +
+      '<details class="cfb__nums" open><summary title="' + esc('start: the average 2009-16 ranked recruit, FV ' + w.fv0.toFixed(1) +
       '. each row moves FV as that input takes his value, in turn; rows sum to his mean outcome ' + r.fvx.toFixed(1) + ' less the start' +
-      (r.fv - r.fvx > 0.6 ? ' (FV ' + r.fv + ' is that mean with the top of the scale stretched)' : '') + '.</p></details></div>';
+      (r.fv - r.fvx > 0.6 ? ' (FV ' + r.fv + ' is that mean with the top of the scale stretched)' : '') + '.') + '">FV inputs</summary><ul class="cfb__parts">' + lv('start', r.fvx - rsum, 1) + bars +
+      (Math.abs(r.fv - r.fvx) >= 0.05 ? '<li class="cfb__step"><span class="cfb__bk">scale</span><span class="cfb__meter"><i class="' + (r.fv < r.fvx ? 'is-neg' : '') + '" style="' + (r.fv < r.fvx ? 'right:50%' : 'left:50%') + ';width:' + Math.min(50, Math.abs(r.fv - r.fvx) / top * 50) + '%"></i></span><span class="cfb__bv">' + sgn(r.fv - r.fvx) + '</span></li>' : '') +
+      lv('FV', r.fv, 0) + '</ul></details></div>';
     tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + tr.cells.length + '">' + html + '</td></tr>');
     var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
   });
