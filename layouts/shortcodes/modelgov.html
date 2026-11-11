@@ -57,7 +57,7 @@
     </details>
     {{- end }}
     {{- with .pending }}
-    <details class="esea-pv__more"><summary><b>not scored yet</b> <span class="cfb__dim esea-pv__more-hint">· {{ len . }} models with no per-row held-out losses to pair</span></summary><ul class="cfb__dim">{{ range $k, $v := . }}<li>{{ $k }}: {{ $v }}</li>{{ end }}</ul></details>
+    <details class="esea-pv__more"><summary><b>not scored yet</b> <span class="cfb__dim esea-pv__more-hint">· {{ len . }} models with no per-row held-out losses to pair</span></summary><ul class="cfb__dim">{{ range $k, $v := . }}<li>{{ $k }}: {{ replaceRE `scripts/\S+ ?` "" $v }}</li>{{ end }}</ul></details>
     {{- end }}
   {{- end }}
   {{- else }}{{ $M := site.Data.model_monitor }}
