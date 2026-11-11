@@ -56,6 +56,7 @@
 {{- /* Kelly %: each game's pick under the pick rules (scripts/games_picks.py), or the market it comes closest in */ -}}
 {{- $gp := dict }}{{ range $s, $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ range $id, $b := .games }}{{ $gp = merge $gp (dict (printf "%s|%s" $sp $id) $b) }}{{ end }}{{ end }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,Kelly %,Best bet,Kick,Model,Market,Diff,Win %" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
+{{- $hasFinal := false }}{{ range $rows }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
 <table class="cfb__table cfbg gamesall">
   <thead><tr>
     <th>Matchup</th><th title="game quality, 0-100: mean of both sides' rating percentiles in their league (weight 2/3) x closeness, 1 - (P home win - P away win)², (weight 1/3). Default sort">GQ</th><th>Sport</th>
@@ -68,7 +69,7 @@
     <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
     <th title="model total / market over/under">Total</th>
-    <th>Final</th><th>Day</th>
+    {{ if $hasFinal }}<th>Final</th>{{ end }}<th>Day</th>
   </tr></thead>
   <tbody>
   {{- range $rows }}{{ $r := . }}{{ $k := time.In "America/New_York" (time .kick) }}
@@ -106,7 +107,9 @@
     <td class="cfb__num">{{ if or (eq .sp "NHL") (eq .sp "Soccer") }}{{ partial "num.html" (slice "%.1f" (float .as)) }}-{{ partial "num.html" (slice "%.1f" (float .hs)) }}{{ else }}{{ partial "num.html" (slice "%.0f" (float .as)) }}-{{ partial "num.html" (slice "%.0f" (float .hs)) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .t }}">{{ partial "num.html" (slice (cond (or (eq .sp "NHL") (eq .sp "Soccer")) "%.2f" "%.1f") (float .t)) }} <span class="cfb__dim">/ {{ .T | default "—" }}</span></td>
     {{- end }}
+    {{- if $hasFinal }}
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
   </tr>
   {{- end }}

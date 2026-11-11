@@ -269,7 +269,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
     E('GAR (soccer, senior)', 'Goals above replacement on one scale across leagues.',
       ['Shrunk per-90 rates (on-ice, npxG, xA, xGBuildup, keeper saves) weighted to next-season team goal difference.',
        'Replacement per position = regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season, pooled: GK -.14, D -.09, M -.05, F .00 a match. League strength counts. Held out R2 .61.',
-       'An average side totals about 27 GAR a season. xMV, 1Y / 3Y and backup watch still read GAR over the earlier line (players under 900 minutes) until refit.',
+       'An average side totals about 26 GAR a season. xMV, 1Y / 3Y and backup watch still read GAR over the earlier line (players under 900 minutes) until refit.',
        'PAR = GAR x points per goal of difference (.626).'],
       'Soccer player value, rookies, backup watch', ['Soccer']),
     E('tGAR (soccer prospects)', 'Team-share goals above replacement: minutes / 90 x (club rating - replacement) / 11.',

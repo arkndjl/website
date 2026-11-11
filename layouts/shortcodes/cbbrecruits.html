@@ -61,7 +61,8 @@
 
 {{- if eq $view "class" -}}{{ $yr := int ($.Get "year") }}{{ $st := $d.model.stars }}
 {{- range where .classes "year" $yr -}}{{ $C := . }}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "icon" "basketball" "filter" "Pos,Team,Conf,Stars,Status" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,FV,NBA%,xNIL" "gfxDate" $date "gfxMax" "25") -}}
+{{- $hasConf := false }}{{ $has247 := false }}{{ range $C.list }}{{ if .conf }}{{ $hasConf = true }}{{ end }}{{ if index .svc "247" }}{{ $has247 = true }}{{ end }}{{ end }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "icon" "basketball" "filter" (cond $hasConf "Pos,Team,Conf,Stars,Status" "Pos,Team,Stars,Status") "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,FV,NBA%,xNIL" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cbbrc">
   <thead><tr>
     <th>RK</th><th>Recruit</th>
@@ -77,8 +78,8 @@
     <th title="BPM in year 1 if he plays (Barttorvik, schedule-adjusted)">BPM</th>
     <th title="expected share of team minutes, years 1 · 2 · 3 (0 when not in D-I: transfer counts, NBA exit does not)">Path</th>
     <th title="expected NIL market value, year 1: college value (minutes share x BPM above -3) at the school's price">xNIL</th>
-    <th title="On3 industry consensus national rank (On3, 247, ESPN)">Nat</th><th title="247Sports rank">247</th><th title="ESPN rank">ESPN</th>
-    <th>Size</th><th>Home</th><th title="conference">Conf</th><th>Status</th>
+    <th title="On3 industry consensus national rank (On3, 247, ESPN)">Nat</th>{{ if $has247 }}<th title="247Sports rank">247</th>{{ end }}<th title="ESPN rank">ESPN</th>
+    <th>Size</th><th>Home</th>{{ if $hasConf }}<th title="conference">Conf</th>{{ end }}<th>Status</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $C.list }}
@@ -101,11 +102,11 @@
     <td class="cfb__num cfb__dim" data-v="{{ mul $y1.on $y1.min }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ math.Round (mul $x.on $x.min) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rk }}">{{ .rk }}</td>
-    <td class="cfb__num" data-v="{{ index .svc "247" | default 9999 }}">{{ index .svc "247" | default "—" }}</td>
+    {{- if $has247 }}<td class="cfb__num" data-v="{{ index .svc "247" | default 9999 }}">{{ index .svc "247" | default "—" }}</td>{{ end }}
     <td class="cfb__num" data-v="{{ with .svc.espn }}{{ . }}{{ end }}">{{ .svc.espn | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt | default 0 }}">{{ .ht | default "—" }}{{ with .wt }}, {{ . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
-    <td>{{ .conf }}</td>
+    {{- if $hasConf }}<td>{{ .conf }}</td>{{ end }}
     <td class="cfb__dim">{{ .status }}</td>
   </tr>
   {{- end }}

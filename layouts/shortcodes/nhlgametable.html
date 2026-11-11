@@ -1,6 +1,7 @@
 {{- /* NHL game table: the next two slates (data/nhl_games.json) as one sortable table: the model's fair moneyline,
        win chance, projected score and total, overtime chance, starting goalies, final. */ -}}
 {{- with site.Data.nhl_games -}}
+{{- $hasFinal := false }}{{ range .games }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hockey" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Start,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
 <table class="cfb__table cfbg">
@@ -12,7 +13,7 @@
     <th title="model total goals">Total</th>
     <th title="chance the game goes past regulation">OT</th>
     <th title="starting goalies, away / home">Goalies</th>
-    <th>Final</th><th>Day</th>
+    {{ if $hasFinal }}<th>Final</th>{{ end }}<th>Day</th>
   </tr></thead>
   <tbody>
   {{- $pc := partialCached "gqpct.html" "nhl" "nhl" }}{{ $gs := slice }}{{ range .games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home)) "b" (index $pc (string .away)) "p" .pHome))) }}{{ end }}
@@ -28,7 +29,9 @@
     <td class="cfb__num" data-v="{{ .total }}">{{ partial "num.html" (slice "%.1f" (float .total)) }}</td>
     <td class="cfb__num" data-v="{{ .pOT }}">{{ partial "num.html" (slice "%.0f" (mul .pOT 100)) }}%</td>
     <td>{{ .goalie.away.name | default "TBD" }} <span class="cfb__dim">/</span> {{ .goalie.home.name | default "TBD" }}</td>
+    {{- if $hasFinal }}
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
     <td>{{ (time .day).Format "Mon" }}</td>
   </tr>
   {{- end }}{{ end }}
