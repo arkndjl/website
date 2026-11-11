@@ -271,10 +271,7 @@ def bt_logs(season):
             else:
                 print(f'barttorvik {season} game logs: got a page, not the file' + (', keeping the cached logs' if os.path.exists(p) else ''))
         _BT_PULLED.add(season)
-    try:
-        rows = json.load(gzip.open(p))
-    except Exception:
-        return {}
+    rows = bt_rows(season)
     by = defaultdict(lambda: defaultdict(dict))
     for r in rows:
         try:
@@ -284,6 +281,48 @@ def bt_logs(season):
         except (IndexError, TypeError, ValueError):
             continue
     return {t: sorted(v.items()) for t, v in by.items()}
+
+
+_PRIOR_ROWS = {}
+
+
+def bt_rows(season):
+    """Barttorvik's per-game player rows for a season (bt_logs pulls them). A past season whose file this run lacks
+    (Barttorvik answers CI with a page: the live injury report's last-season lines) comes from the board's careers
+    (cbb_prior.json.gz): each player's line that season as gp games of his minutes a game at his season BPM, in the
+    row shape the readers use (date, min, game BPM, team, name, pid); [] when neither has it"""
+    try:
+        return json.load(gzip.open(os.path.join(BTLOG, f'{season}.json.gz')))
+    except Exception:
+        pass
+    if season >= BT_LIVE_SEASON:
+        return []
+    if season in _PRIOR_ROWS:
+        return _PRIOR_ROWS[season]
+    try:
+        d = json.load(gzip.open(os.path.join(HERE, 'cbb_prior.json.gz')))
+    except (OSError, ValueError):
+        return []
+    K = {k: i for i, k in enumerate(d['keep'])}; ni = d['cols'].index('name')
+    lines = []
+    for row, c in zip(d['rows'], d['careers']):
+        if not str(c.get('pid') or '').isdigit():
+            continue
+        for x in c['seasons']:
+            if x[K['year']] == season and x[K['gp']] and x[K['mp']] and x[K['bpm']] is not None:
+                lines.append((x[K['team']], row[ni], int(c['pid']), int(round(x[K['gp']])), float(x[K['mp']]), float(x[K['bpm']])))
+    day0 = datetime(season - 1, 11, 1)   # a team's games: as many as its most-used player played
+    out = []
+    for t, nm, pid, g, mp, bpm in lines:
+        for k in range(g):
+            r = [None] * 52
+            r[0] = int((day0 + timedelta(days=k)).strftime('%Y%m%d')); r[8] = mp; r[44] = bpm
+            r[47], r[48], r[51] = t, nm, pid
+            out.append(r)
+    if out:
+        print(f'barttorvik {season} game logs: none this run; {len(lines)} season lines from the board careers stand in')
+    _PRIOR_ROWS[season] = out
+    return out
 
 
 def bt_shoot(season):
