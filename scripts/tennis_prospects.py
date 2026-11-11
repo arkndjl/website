@@ -687,7 +687,8 @@ def td_hurdle(R, F, kept, tr, prep, sc, N):
     yl = np.where(tr, pos.astype(float), tp)
     ym = np.where(tr, y, tm)
     sw = np.sqrt(np.where(tr, pos.astype(float), tp)[a] + 1e-9)
-    return flogit(Xa[a], yl[a]), np.linalg.lstsq(Xa[a] * sw[:, None], ym[a] * sw, rcond=None)[0], int(td.sum())
+    mt = np.where(tr, y, (1 - np.nan_to_num(tp)) * 20 + np.nan_to_num(tp) * np.nan_to_num(tm))     # mean target, for the trees
+    return flogit(Xa[a], yl[a]), np.linalg.lstsq(Xa[a] * sw[:, None], ym[a] * sw, rcond=None)[0], int(td.sum()), a, mt
 
 
 def td_fit(rows, B, tour, snap, kept):
@@ -702,13 +703,81 @@ def td_fit(rows, B, tour, snap, kept):
     by = R.by.values
     fin = by <= COHORTS[1]
     Xa = np.column_stack([np.ones(len(F)), F[kept].values])
-    P, MU = np.zeros(len(R)), np.zeros(len(R))
+    P, MU, g = np.zeros(len(R)), np.zeros(len(R)), np.zeros(len(R))
+    trees = tour in TREE_TOURS
+    gc = tree_cols(F)
+    G = F[gc].values
     for b in np.unique(by[fin]):
         te = by == b
-        bl, bo, _ = td_hurdle(R, F, kept, fin & ~te, prep, sc, N)
+        bl, bo, _, a, mt = td_hurdle(R, F, kept, fin & ~te, prep, sc, N)
         P[te], MU[te] = sig(Xa[te] @ bl), Xa[te] @ bo
-    bl, bo, n = td_hurdle(R, F, kept, fin, prep, sc, N)
-    return P[fin], MU[fin], bl, bo, n, R.pid.values[fin]
+        if trees:
+            g[te] = np.clip(tree_fit(G[a], mt[a]).predict(G[te]), 20, 80)
+    bl, bo, n, a, mt = td_hurdle(R, F, kept, fin, prep, sc, N)
+    tree = None
+    if trees:
+        m = tree_fit(G[a], mt[a])
+        tree = tree_dump(m, gc)
+        assert np.abs(tree_pred(tree, F) - np.clip(m.predict(G), 20, 80)).max() < 1e-3
+    return P[fin], MU[fin], bl, bo, n, R.pid.values[fin], g[fin], tree
+
+
+
+# Tree blend (ATP). The headline mean is half the hurdle's and half a gradient-boosted regression's on every design
+# column the live rows carry (no leaks, no serve stats: the frozen base and the Tennis Abstract rows have none). The
+# trees pick up curves and input combinations the linear hurdle cannot. Leave-one-birth-year-out MSE 24.84 -> 24.45
+# (t 4.9, 17/19 years), top 50 41.4 -> 41.7, forward (fit births <= 1993) 23.14 -> 22.50. WTA fails the forward test.
+# On top of the unfinished-careers fit the trees must train on the same rows (unfinished rows at their mean target):
+# as-of walk-forward 2011-18 MSE 20.24 -> 19.86 (t 2.7, 7/8 seasons); trees on finished births alone add nothing there.
+# The blend moves P(any value) to hit the blended mean (and MU once P is 1), so the odds and the range follow it.
+TREE_TOURS = ('atp',)
+TREE_W = .5
+TREE_OUT = LEAKS + ['lefty', 'spw', 'rpw', 'stx', 'acer']
+TREE_SET = dict(max_depth=3, learning_rate=.05, max_iter=300, min_samples_leaf=40, l2_regularization=1.0, random_state=0)
+
+
+def tree_cols(F):
+    return [c for c in F.columns if c not in TREE_OUT]
+
+
+def tree_fit(G, y):
+    from sklearn.ensemble import HistGradientBoostingRegressor
+    return HistGradientBoostingRegressor(**TREE_SET).fit(G, y)
+
+
+def tree_dump(m, cols):
+    """the fitted trees as plain lists, so the live build needs numpy only"""
+    trees = []
+    for (pr,) in m._predictors:
+        nd = pr.nodes
+        trees.append([nd['feature_idx'].astype(int).tolist(), nd['num_threshold'].astype(float).tolist(), nd['left'].astype(int).tolist(),
+                      nd['right'].astype(int).tolist(), np.round(nd['value'].astype(float), 6).tolist(), nd['is_leaf'].astype(int).tolist()])
+    return dict(cols=cols, base=float(np.ravel(m._baseline_prediction)[0]), w=TREE_W, trees=trees)
+
+
+def tree_pred(T, F):
+    X = F[T['cols']].values.astype(float)
+    out = np.full(len(X), T['base'])
+    rows = np.arange(len(X))
+    for f, thr, le, ri, val, leaf in T['trees']:
+        f, thr, le, ri, val, leaf = np.array(f), np.array(thr), np.array(le), np.array(ri), np.array(val), np.array(leaf)
+        node = np.zeros(len(X), int)
+        while True:
+            go = leaf[node] == 0
+            if not go.any():
+                break
+            left = X[rows[go], f[node[go]]] <= thr[node[go]]
+            node[go] = np.where(left, le[node[go]], ri[node[go]])
+        out += val[node]
+    return np.clip(out, 20, 80)
+
+
+def tree_blend(p, mu, d):
+    """hurdle parts moved so the mean is the hurdle mean + d: P first, MU once P reaches 1"""
+    m = np.clip((1 - p) * 20 + p * mu + d, 20, 80)
+    mu0 = np.maximum(mu, 20.5)
+    p1 = np.clip((m - 20) / (mu0 - 20), 0, 1)
+    return p1, np.where(p1 >= 1, m, mu0)
 
 
 
@@ -870,10 +939,25 @@ def fit(scorecard_only=False):
             P, MU, E = loso(F, y, pos, by, kept)
             td = None
             if tour in TD_TOURS:
-                P, MU, tbl, tbo, ntd, tpid = td_fit(rows, B, tour, snap, kept)
+                P, MU, tbl, tbo, ntd, tpid, tg, ttree = td_fit(rows, B, tour, snap, kept)
                 assert (tpid == X.pid.values).all()
                 E = (1 - P) * 20 + P * MU
                 td = ntd
+            tree = None
+            if tour in TREE_TOURS:
+                if td is not None:              # trees fit on the same rows as the hurdle (finished + unfinished careers)
+                    g, tree = tg, ttree
+                else:
+                    gc = tree_cols(F)
+                    G = F[gc].values
+                    g = np.zeros(len(y))
+                    for b in np.unique(by):
+                        te = by == b
+                        g[te] = np.clip(tree_fit(G[~te], y[~te]).predict(G[te]), 20, 80)
+                    mt = tree_fit(G, y)
+                    tree = tree_dump(mt, gc)
+                P, MU = tree_blend(P, MU, TREE_W * (g - E))
+                E = (1 - P) * 20 + P * MU
             Pb, MUb, Eb = loso(F, y, pos, by, BASEF)
             edges, q = resid_bands(MU, y, pos)
             head, odds, lo, hi = dist(P, MU, edges, q)
@@ -901,6 +985,8 @@ def fit(scorecard_only=False):
                                p50=round(float((y[band == b] >= 50).mean()), 3)) for b in np.unique(band)]
             if td is not None:
                 s['td'] = td
+            if tree is not None:
+                s['tree'] = tree
             T_['snaps'][snap] = s
             print(tour, snap, 'mse %.2f base %.2f null %.2f top50 %.2f/%.2f fwd %s' % (mse, mseb, np.var(y), top50, top50b, s['fwd']))
             if snap == '%02d-%02d' % SEL_SNAP:
@@ -1112,6 +1198,10 @@ def grade(X, s, kept, B=None):
     bl = np.array([s['coefL']['const']] + [s['coefL'][c] for c in kept])
     bo = np.array([s['coefO']['const']] + [s['coefO'][c] for c in kept])
     p, mu = hpred(F, kept, bl, bo)
+    dt_ = None
+    if s.get('tree'):
+        dt_ = s['tree']['w'] * (tree_pred(s['tree'], F) - ((1 - p) * 20 + p * mu))
+        p, mu = tree_blend(p, mu, dt_)
     mean, odds, lo, hi = dist(p, mu, s['edges'], s['q'])
     odds = {t: platt_apply(odds[t], s['cal'][str(t)]) for t in odds}
     # each input group's push on the mean grade against the average prospect of the fit (every input at its fit mean):
@@ -1120,7 +1210,7 @@ def grade(X, s, kept, B=None):
     # the player's own p and mu (the old split) missed by 2-58 FV on the live board.
     from itertools import combinations
     from math import factorial
-    groups = list(dict.fromkeys(PART.get(c, c) for c in kept))
+    groups = list(dict.fromkeys(PART.get(c, c) for c in kept)) + (['tree'] if dt_ is not None else [])
     g = len(groups)
 
     def val(S):
@@ -1129,6 +1219,8 @@ def grade(X, s, kept, B=None):
             if PART.get(c, c) not in S:
                 G[c] = s['means'][c]
         pp, mm = hpred(G, kept, bl, bo)
+        if 'tree' in S:
+            pp, mm = tree_blend(pp, mm, dt_)
         return dist(pp, mm, s['edges'], s['q'])[0]
     V = {S: val(set(S)) for k in range(g + 1) for S in combinations(groups, k)}
     parts = {}

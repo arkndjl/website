@@ -32,6 +32,10 @@ Model     FV = OLS on outcome FV (the mean outcome), one fit per in-season snaps
           error with t >= 2 over the 2013-20 seasons and win 6 of 8; the other snapshots refit the same inputs.
           Detailed position (centre-back, full-back, defensive / attacking midfield, winger, striker against central
           midfield) is kept as one block: season-out error -0.10, t 3.9, 7 of 8 seasons, top 50 and forward better.
+          The raw grade is the mean of that OLS grade and a gradient-boosted grade (300 trees of depth 3 on every
+          design column, one set per snapshot; pre-registered test: season-out error -0.99, t 9.6, 8 of 8 seasons).
+          The trees never see a missing height or which players the dump kept valuing (TREE below); they are stored
+          in the fit json and read with numpy.
 Live      This season's lineups from Transfermarkt's JSON API (scripts/soccer_prospect_data.py), current market values
           and birth dates from player profiles; last season and before come frozen in scripts/data/ by --fit.
 """
@@ -100,6 +104,16 @@ SUBG = {'Centre-Back': 'CB', 'Left-Back': 'FB', 'Right-Back': 'FB', 'Defensive M
         'Attacking Midfield': 'AM', 'Left Winger': 'W', 'Right Winger': 'W', 'Left Midfield': 'W', 'Right Midfield': 'W',
         'Centre-Forward': 'ST', 'Second Striker': 'ST'}
 POSB = ['sp_CB', 'sp_FB', 'sp_DM', 'sp_AM', 'sp_W', 'sp_ST']
+# tree half of the raw grade: sklearn HistGradientBoostingRegressor at --fit, exported as plain lists (tree_dump) and
+# evaluated with numpy (tree_pred) so the daily build needs no sklearn. Hindsight guards on the trees' inputs (a tree
+# can isolate what a straight line cannot): a missing height is replaced (a random known height of the position group
+# in training, the group's mean live: players without one became 20.2 against 26.4); market values count only as they
+# stood on a player's own lineup dates (the dump's valuation history exists for players who later reached its
+# leagues); TREE_DROP is left out because the live build cannot compute it the same way (the value a year back)
+TREE_W = .5
+TREE_KW = dict(max_depth=3, learning_rate=.05, max_iter=300, min_samples_leaf=40, l2_regularization=1.0,
+               early_stopping=False, random_state=0)
+TREE_DROP = ['dmv']
 LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bundesliga', 'FR1': 'Ligue 1',
           'NL1': 'Eredivisie', 'PO1': 'Liga Portugal', 'BE1': 'Belgian Pro League', 'TR1': 'Super Lig',
           'RU1': 'Russian Premier League', 'SC1': 'Scottish Premiership', 'GR1': 'Greek Super League',
@@ -409,7 +423,7 @@ def team_games(G):
     return x
 
 
-def features(A, P, V, R, TG, t, snap, live=None):
+def features(A, P, V, R, TG, t, snap, live=None, Vs=None):
     """one row per prospect (under 22 on July 1 of season t) with what was known on the snapshot date"""
     snap = pd.Timestamp(snap)
     prev = A[A.season.eq(t - 1)]
@@ -468,6 +482,8 @@ def features(A, P, V, R, TG, t, snap, live=None):
     X['mv1'] = vv1.mv
     if live is not None:
         X['mv'] = pd.Series(live).reindex(X.index).fillna(X.mv)
+    # the trees' market value (TREE): as it stood on his own lineup dates; live, the value the build has
+    X['mvs'] = Vs[Vs.player_id.isin(ids) & (Vs.date <= snap)].groupby('player_id').mv.last() if Vs is not None else X.mv
     X['grp'] = P.grp.reindex(X.index).fillna('M')
     X['ht'] = P.height_in_cm.reindex(X.index)
     X['subpos'] = P.sub_position.reindex(X.index) if 'sub_position' in P else None
@@ -674,6 +690,76 @@ def design(X):
 BASEF = ['age', 'lmv', 'nomv']
 
 
+def sym_values(A):
+    """market values as visible on a player's own lineup dates: the lineup's value, else the dump history as of that game"""
+    v = rd('player_valuations', usecols=['player_id', 'date', 'market_value_in_eur']).rename(columns={'market_value_in_eur': 'dv'})
+    v['date'], v['dv'] = pd.to_datetime(v.date), v.dv.astype(float)
+    a = A[['player_id', 'date']].assign(mv=pd.to_numeric(A.mv, errors='coerce').astype(float)).sort_values('date')
+    a = pd.merge_asof(a, v.sort_values('date'), on='date', by='player_id', direction='backward')
+    a['mv'] = a.mv.fillna(a.dv)
+    return a[a.mv.notna()][['player_id', 'date', 'mv']]
+
+
+def tree_design(X, T, draw=None):
+    """the trees' inputs: the design on the guarded market value and height (TREE). draw: player id -> the height
+    drawn for a player without one (training rows); without it the position group's mean"""
+    X2 = X.copy()
+    X2['mv'] = X.mvs if 'mvs' in X else X.mv
+    X2['mvd'] = X2.mv * np.exp(T['mvRef'] - X.mvlvls)
+    fill = X.grp.map(T['htFill'])
+    if draw is not None:
+        fill = X.player_id.map(draw).fillna(fill)
+    X2['ht'] = X.ht.astype(float).fillna(fill)
+    return design(X2)
+
+
+def tree_dump(m, cols):
+    """the fitted trees as plain lists, so the live build needs numpy only"""
+    trees = []
+    for (pr,) in m._predictors:
+        nd = pr.nodes
+        trees.append([nd['feature_idx'].astype(int).tolist(), nd['num_threshold'].astype(float).tolist(), nd['left'].astype(int).tolist(),
+                      nd['right'].astype(int).tolist(), np.round(nd['value'].astype(float), 6).tolist(), nd['is_leaf'].astype(int).tolist()])
+    return dict(cols=cols, base=float(np.ravel(m._baseline_prediction)[0]), w=TREE_W, trees=trees)
+
+
+def tree_pred(T, F):
+    X = F[T['cols']].values.astype(float)
+    out = np.full(len(X), T['base'])
+    rows = np.arange(len(X))
+    for f, thr, le, ri, val, leaf in T['trees']:
+        f, thr, le, ri, val, leaf = np.array(f), np.array(thr), np.array(le), np.array(ri), np.array(val), np.array(leaf)
+        node = np.zeros(len(X), int)
+        while True:
+            go = leaf[node] == 0
+            if not go.any():
+                break
+            left = X[rows[go], f[node[go]]] <= thr[node[go]]
+            node[go] = np.where(left, le[node[go]], ri[node[go]])
+        out += val[node]
+    return out
+
+
+def dump_fit(fitj, fn=None):
+    """the fit json, indented, each snapshot's trees on one line"""
+    hold = {}
+    for k, m in fitj['models'].items():
+        if 'tree' in m:
+            hold[f'@@trees {k}@@'] = m['tree']['trees']
+    slim = {**fitj, 'models': {k: ({**m, 'tree': {**m['tree'], 'trees': f'@@trees {k}@@'}} if 'tree' in m else m) for k, m in fitj['models'].items()}}
+    txt = json.dumps(slim, indent=1)
+    for k, v in hold.items():
+        txt = txt.replace(json.dumps(k), json.dumps(v, separators=(',', ':')))
+    open(fn or FIT, 'w').write(txt)
+
+
+def raw_grade(X, m, kept):
+    """the raw grade of a model (one snapshot of the fit): the OLS grade, averaged with the tree grade when it has trees"""
+    o = pred(design(X), kept, np.array([m['coef'][c] for c in ['const'] + kept]))
+    T = m.get('tree')
+    return o + T['w'] * (tree_pred(T, tree_design(X, T)) - o) if T else o
+
+
 def snapdate(t, md):
     m, d = md
     return pd.Timestamp(year=t + (1 if m < 7 else 0), month=m, day=d)
@@ -832,6 +918,8 @@ def plus_flag(fv, age, pf):
 def plus_refit():
     """--plus: rebuild the Oct 24 rows, grade them cohort out with the fit's inputs and isotonic map (as fit() does),
     and refit only the "+" logits into data/soccer_prospects_fit.json. The rows go to the cache for tests"""
+    if any('tree' in m for m in json.load(open(FIT))['models'].values()):
+        sys.exit('the grade is the OLS + tree blend: the "+" logits are refit by --fit (--keep)')
     G, A, P, V = load()
     for c in ('mins', 'gl', 'ast', 'mv', 'age', 'start'):
         A[c] = pd.to_numeric(A[c], errors='coerce').astype(float)
@@ -862,7 +950,7 @@ def plus_refit():
     S['fvh'] = pc
     S.to_pickle(os.path.join(CACHE, 'plus_rows.pkl'))
     fitj['plus'] = plus_fit(pc, y, S.age.values)
-    json.dump(fitj, open(FIT, 'w'), indent=1)
+    dump_fit(fitj)
     print('rows', len(S), 'mse', round(float(((y - pc) ** 2).mean()), 2), 'plus', fitj['plus'])
 
 
@@ -876,14 +964,16 @@ def fit(scorecard=False):
     O, scale = outcome(A, P)
     TG = team_games(G)
     done = O[O.s22 <= COHORTS[1]]
-    rows, mv_ref, acad, yip = {}, {}, None, []
+    rows, mv_ref, mv_ref_t, acad, yip = {}, {}, {}, None, []
+    Vs = sym_values(A)
     Y = youth_intl(range(2010, LAST + 1))
     ydob = yi_dob(Y, P)
     for md in SNAPS:
         xs = []
         for t in range(ROWS[0], ROWS[1] + 1):
-            X = features(A, P, V, R, TG, t, snapdate(t, md))
+            X = features(A, P, V, R, TG, t, snapdate(t, md), Vs=Vs)
             X['mvlvl'] = mv_level(X.mv)              # the whole pool's level, before the outcome filter
+            X['mvlvls'] = mv_level(X.mvs)
             if md == SEL_SNAP:
                 n = X[X.index.isin(done.index) & ~X.old].assign(fv_out=done.fv)
                 acad = n if acad is None else pd.concat([acad, n])
@@ -892,6 +982,7 @@ def fit(scorecard=False):
                 N = N[s22.between(*COHORTS)]
                 N['fv_out'] = done.fv.reindex(N.index).fillna(20.0)    # never on a lineup in a covered league: the floor
                 N['mvlvl'] = X.mvlvl.iloc[0]
+                N['mvs'], N['mvlvls'] = N.mv, X.mvlvls.iloc[0]
                 yip.append(N)
             X = X[X.index.isin(done.index) & X.old]      # fit on the board's pool (academy-only players: graded, not fit)
             X['fv_out'] = done.fv.reindex(X.index)
@@ -901,6 +992,7 @@ def fit(scorecard=False):
         rows[md] = pd.concat(xs, ignore_index=True)
         mv_ref['%02d-%02d' % md] = round(float(rows[md].groupby('t').mvlvl.first().mean()), 4)
         rows[md]['mvd'] = rows[md].mv * np.exp(mv_ref['%02d-%02d' % md] - rows[md].mvlvl)
+        mv_ref_t['%02d-%02d' % md] = round(float(rows[md].groupby('t').mvlvls.first().mean()), 4)
         print('rows', md, len(rows[md]), 'mv level', mv_ref['%02d-%02d' % md], flush=True)
     S = rows[SEL_SNAP]
     F = design(S)
@@ -924,20 +1016,52 @@ def fit(scorecard=False):
     kept = kept + POSB
     ev.update({c: blk for c in POSB})
     e_base, _ = loso(F, y, co, BASEF)
-    models, oos = {}, {}
+    # the trees (TREE): heights for the training players without one, drawn once from the known heights of the group
+    from sklearn.ensemble import HistGradientBoostingRegressor
+    pl = pd.concat([r[['player_id', 'grp', 'ht']] for r in rows.values()]).drop_duplicates('player_id').set_index('player_id').sort_index()
+    rng, draw, ht_fill = np.random.default_rng(0), pd.Series(np.nan, index=pl.index), {}
+    for g in 'GDMF':
+        known = pl.ht[(pl.grp == g) & pl.ht.notna()].values.astype(float)
+        miss = pl.index[(pl.grp == g) & pl.ht.isna()]
+        draw.loc[miss] = rng.choice(known, len(miss))
+        ht_fill[g] = round(float(known.mean()), 2)
+
+    def tree_oof(Xa, yy, fold):
+        o = np.zeros(len(yy))
+        for f in np.unique(fold):
+            o[fold == f] = HistGradientBoostingRegressor(**TREE_KW).fit(Xa[fold != f], yy[fold != f]).predict(Xa[fold == f])
+        return o
+    models, oos, oos_ols, blend = {}, {}, {}, {}
     for md in SNAPS:
         Sx = rows[md]
         Fx = design(Sx)
-        b = ols(Fx, Sx.fv_out.values, kept)
-        e, p = loso(Fx, Sx.fv_out.values, Sx.s22.values, kept)
-        eb, _ = loso(Fx, Sx.fv_out.values, Sx.s22.values, BASEF)
+        yx, tx, cx = Sx.fv_out.values.astype(float), Sx.t.values, Sx.s22.values
+        b = ols(Fx, yx, kept)
+        e, p = loso(Fx, yx, cx, kept)
+        es, ps = loso(Fx, yx, tx, kept)
+        eb, _ = loso(Fx, yx, cx, BASEF)
         key = '%02d-%02d' % md
+        T0 = {'mvRef': mv_ref_t[key], 'htFill': ht_fill}
+        Ft = tree_design(Sx, T0, draw)
+        tcols = [c for c in Ft.columns if c not in TREE_DROP]
+        Xa = Ft[tcols].values.astype(float)
+        assert not np.isnan(Xa).any()
+        full = HistGradientBoostingRegressor(**TREE_KW).fit(Xa, yx)
+        T = {**tree_dump(full, tcols), **T0}
+        assert np.abs(tree_pred(T, Ft) - full.predict(Xa)).max() < 1e-3, 'numpy trees differ from sklearn'
+        gc, gs = tree_oof(Xa, yx, cx), tree_oof(Xa, yx, tx)
+        pb, pbs = p + TREE_W * (gc - p), ps + TREE_W * (gs - ps)
+        per = np.array([((yx[tx == s] - ps[tx == s]) ** 2).mean() - ((yx[tx == s] - pbs[tx == s]) ** 2).mean() for s in np.unique(tx)])
+        blend[key] = {'seasonOls': round(float((es ** 2).mean()), 2), 'season': round(float(((yx - pbs) ** 2).mean()), 2),
+                      'gain': round(float(per.mean()), 3), 't': round(float(per.mean() / (per.std(ddof=1) / math.sqrt(len(per)) + 1e-12)), 1),
+                      'wins': int((per > 0).sum()), 'of': len(per), 'cohortOls': round(float((e ** 2).mean()), 2),
+                      'cohortTree': round(float(((yx - gc) ** 2).mean()), 2), 'cohort': round(float(((yx - pb) ** 2).mean()), 2)}
         models[key] = {'coef': dict(zip(['const'] + kept, [round(float(v), 4) for v in b])),
-                       'mse': round(float((e ** 2).mean()), 2), 'mseBase': round(float((eb ** 2).mean()), 2),
+                       'mse': blend[key]['cohort'], 'mseOls': blend[key]['cohortOls'], 'mseBase': round(float((eb ** 2).mean()), 2),
                        'var': round(float(Sx.fv_out.var()), 2), 'n': int(len(Sx)),
-                       'sd': round(float(e.std()), 2)}
-        oos[md] = p
-        print(key, models[key]['mse'], models[key]['mseBase'], flush=True)
+                       'sd': round(float((yx - pb).std()), 2), 'tree': T}
+        oos[md], oos_ols[md] = pb, p
+        print(key, models[key]['mse'], models[key]['mseBase'], blend[key], flush=True)
     # the raw grade is a little hot at the top: map it to the mean outcome of its band (monotone), per snapshot. The
     # map is scored cohort-out (fit on the other birth cohorts' out-of-sample grades, applied to the held one; was by season;
     # Oct 25 2026 audit: the map used to be scored on the grades it was fit on), and kept only if that beats the raw
@@ -961,12 +1085,26 @@ def fit(scorecard=False):
             models[key]['iso'], oosc[md] = full, pc
         else:                                            # the identity: the raw grade
             models[key]['iso'], oosc[md] = {'k': [[0.0, 0.0], [100.0, 100.0]], 'slope': 0.0}, pp + .001 * pp
+    # top of the board, calibrated: each season's top 50 by the calibrated OLS grade, its error against the blend's
+    po = oos_ols[SEL_SNAP]
+    poc = np.zeros(len(po))
+    for s in np.unique(co):
+        mm = co == s
+        poc[mm] = calibrate(po[mm], iso_fit(po[~mm], y[~mm]))
+    tb, tc = [], []
+    for s in np.unique(t):
+        i = np.where(t == s)[0]
+        o = i[np.argsort(-poc[i])[:50]]
+        tb.append(float(((y[o] - poc[o]) ** 2).mean())); tc.append(float(((y[o] - oosc[SEL_SNAP][o]) ** 2).mean()))
+    blend['top50Mse'] = {'ols': round(float(np.mean(tb)), 2), 'blend': round(float(np.mean(tc)), 2),
+                         'olsCal': round(float(((y - poc) ** 2).mean()), 2)}
+    print('calibrated top 50', blend['top50Mse'], flush=True)
     # academy-only players (no lineup sheet in the board's leagues): graded by the same model, which runs hot on them
     # (Oct 31 2026: the grade over 20 realised .72x, season-out MSE 21.6 -> 20.3, floor 24.6); a line on their own
     # outcomes, grades from the Oct 24 model
     m = models['%02d-%02d' % SEL_SNAP]
     acad['mvd'] = acad.mv * np.exp(mv_ref['%02d-%02d' % SEL_SNAP] - acad.mvlvl)
-    pa = calibrate(pred(design(acad), kept, np.array([m['coef'][c] for c in ['const'] + kept])), m['iso']).clip(20, 80)
+    pa = calibrate(raw_grade(acad, m, kept), m['iso']).clip(20, 80)
     prov_line = [round(float(v), 4) for v in np.polyfit(pa - 20, acad.fv_out.values - 20, 1)]
     print('academy-only rows', len(acad), 'line', prov_line, flush=True)
     # youth internationals (Oct 31 2026, scripts/soccer_youth_intl_research.py): the highest youth level played adds
@@ -982,7 +1120,7 @@ def fit(scorecard=False):
     prov_line2 = line(pa, acad.fv_out.values, ea[['yi_lvl']].set_axis(acad.index))
     YP = pd.concat(yip)
     YP['mvd'] = YP.mv * np.exp(mv_ref['%02d-%02d' % SEL_SNAP] - YP.mvlvl)
-    py = calibrate(pred(design(YP), kept, np.array([m['coef'][c] for c in ['const'] + kept])), m['iso']).clip(20, 80)
+    py = calibrate(raw_grade(YP, m, kept), m['iso']).clip(20, 80)
     ey = pd.concat([yi_feats(Y, ydob, YP.index[YP.t.eq(t)].unique(), snapdate(t, SEL_SNAP)).reindex(YP.index[YP.t.eq(t)])
                     for t in sorted(YP.t.unique())])
     yi_line = line(py, YP.fv_out.values, ey[['yi_wc']].set_axis(YP.index))
@@ -996,16 +1134,16 @@ def fit(scorecard=False):
         if m.sum() >= 5:
             calib.append({'band': lo, 'n': int(m.sum()), 'pred': round(float(p[m].mean()), 1), 'real': round(float(y[m].mean()), 1),
                           'p50': round(float((y[m] >= 50).mean()), 3)})
+    from fv_scorecard import card
+    sc_ = card(p, y, cls=co, hinges={int(k[1:]): h for k, h in ODDS_HINGES.items()}, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
+               'each graded by a fit that left his birth cohort out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also cohort-out')
+    print('scorecard', sc_['summary'], 'calib', calib)
+    np.savez(os.path.join(CACHE, 'oos_rows.npz'), p=p, y=y, t=t)   # the held-out rows, for tier-odds tests
     if scorecard:
-        from fv_scorecard import card
-        sc_ = card(p, y, cls=co, hinges={int(k[1:]): h for k, h in ODDS_HINGES.items()}, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
-                   'each graded by a fit that left his birth cohort out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also cohort-out')
-        print('scorecard', sc_['summary'], 'calib', calib)
-        np.savez(os.path.join(CACHE, 'oos_rows.npz'), p=p, y=y, t=t)   # the held-out rows, for tier-odds tests
         cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
         if '--odds' in sys.argv:                     # refit only the tier odds (ODDS_HINGES) on these rows
             cur_fit['prob'] = pr
-        json.dump(cur_fit, open(FIT, 'w'), indent=1)
+        dump_fit(cur_fit)
         return
     # top of the board: each season's top 50 by grade
     top = []
@@ -1015,7 +1153,7 @@ def fit(scorecard=False):
         top.append(float(y[m][o].mean()))
     fitj = {'asof': dt.date.today().isoformat(), 'rows': [int(t.min()), int(t.max())], 'n': int(len(y)),
             'cohorts': list(COHORTS), 'peakAges': list(PEAK_AGES), 'ageCut': AGE_CUT, 'repl': REPL,
-            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'provLine': prov_line, 'provN': int(len(acad)), 'provLine2': prov_line2, 'yiLine': yi_line, 'yiN': int(len(YP)), 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
+            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'mvRefTree': mv_ref_t, 'provLine': prov_line, 'provN': int(len(acad)), 'provLine2': prov_line2, 'yiLine': yi_line, 'yiN': int(len(YP)), 'kept': kept, 'ev': ev, 'blend': blend, 'scorecard': sc_, 'models': models, 'prob': pr, 'calib': calib,
             'plus': plus_fit(p, y, S.age.values),
             'mse': round(float(((y - p) ** 2).mean()), 2), 'mseBase': round(float((e_base ** 2).mean()), 2),
             'r2': round(float(1 - ((y - p) ** 2).mean() / y.var()), 3), 'top50': round(float(np.mean(top)), 1),
@@ -1023,7 +1161,7 @@ def fit(scorecard=False):
                       'ref': {g: [round(float(x), 3) for x in v[v > 0]] for g, v in scale['ref'].items()}},
             'clubLine': {str(int(s)): [round(float(d.b.iloc[0]), 3), round(float(d.a.iloc[0]), 3)] for s, d in R.groupby('season')},
             'leagues': {c: round(float(d.r.mean()), 2) for c, d in R[R.season.eq(LAST - 1)].groupby('comp') if c in LEAGUE}}
-    json.dump(fitj, open(FIT, 'w'), indent=1)
+    dump_fit(fitj)
     # past prospects: the youngest Oct 24 row of each player, out of sample, next to what he became
     S = S.assign(fv=np.round(p).astype(int))
     first = S.sort_values('age').groupby('player_id').head(1)
@@ -1222,6 +1360,11 @@ def build():
     m = fitj['models'][key]
     cols = [c for c in m['coef'] if c != 'const']
     raw = m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols])
+    T = m.get('tree')
+    if T:                                    # the raw grade: the OLS grade averaged with the tree grade (TREE)
+        X['mvs'], X['mvlvls'] = X.mv, lvl
+        tpull = T['w'] * (tree_pred(T, tree_design(X, T)) - raw)
+        raw = raw + tpull
     fvx = calibrate(raw, m['iso']).clip(20, 80)
     # provisional players: academy-only on their own line + youth level, youth-international-only on theirs (fit)
     YE = yi_feats(Y, ydob, X.index, today)
@@ -1243,6 +1386,8 @@ def build():
     # the pool, inputs that move together summed
     push = (F[cols] - F[cols].mean()) * np.array([m['coef'][c] for c in cols])
     push = push.T.groupby(lambda c: PART.get(c, c)).sum().T
+    if T:                                    # what the trees add to the OLS grade, against the pool's mean: the sum stays exact
+        push['tree'] = tpull - tpull.mean()
     rawmean = float(raw.mean())
     X['raw'], X['path'] = raw, path
     rows = []
@@ -1285,7 +1430,7 @@ def build():
            'fit': {k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',
                                         'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues') if k in fitj},
            'lines': {k: fitj[k] for k in ('provLine2', 'yiLine') if k in fitj},
-           'model': {'key': key, **m}}
+           'model': {'key': key, **{k: v for k, v in m.items() if k != 'tree'}}}
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print('board', len(rows), 'snapshot', key)
 
