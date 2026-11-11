@@ -442,24 +442,38 @@
      ]
     },
     {
-     "term": "XPM",
-     "short": "NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average.",
+     "term": "rXPM (raw XPM)",
+     "short": "NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.",
      "body": [
-      "Shown shrunk by minutes: raw x MP / (MP + 600) + mean x 600 / (MP + 600).",
-      "Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.",
-      "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw.",
-      "Raw XPM feeds game models, VORX and the CBB board target. BPM only where no DPM row (*)."
+      "The headline XPM on every NBA board. O-XPM and D-XPM are the same blend of each side.",
+      "Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).",
+      "XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: rXPM orders next-three-season VORX .607 (VORX .604); all rookies .330."
      ],
-     "where": "NBA XPM leaders, rookies, contract value, depth chart",
+     "where": "NBA XPM leaders, rookies, team pages, ARKLIST",
+     "sports": [
+      "NBA"
+     ]
+    },
+    {
+     "term": "pXPM (predictive XPM)",
+     "short": "rXPM shrunk by minutes toward what he is expected to be.",
+     "body": [
+      "raw x MP / (MP + 600) + mean x 600 / (MP + 600).",
+      "Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.",
+      "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw."
+     ],
+     "where": "NBA XPM leaders (pXPM chip), rookies",
      "sports": [
       "NBA"
      ]
     },
     {
      "term": "VORX",
-     "short": "NBA wins over replacement: .030 x (XPM + 1.4) x MP / 48.",
+     "short": "NBA wins over replacement: .030 x (rXPM + 1.4) x MP / 48.",
      "body": [
-      "Replacement XPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM board."
+      "Replacement rXPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM and rookie boards.",
+      "Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, rXPM .330).",
+      "Next-three-season XPM: the rookie 3Y orders it best (.481; aXPM .413, rXPM .417, VORX .351)."
      ],
      "where": "NBA XPM leaders, projections, contract value",
      "sports": [
@@ -1983,7 +1997,7 @@
      "45",
      "2+ seasons as a starter",
      "~43",
-     "205 of 4,919 (4.2%)",
+     "204 of 4,919 (4.1%)",
      "0.09 / 0.05",
      "rounds 3-4",
      "45-49: 47.2 -> 46.1 (n 167, 50+ 37%)"
@@ -2259,14 +2273,14 @@
      "no NHL games",
      "-",
      "-",
-     "203 / 300",
+     "196 / 300",
      "20-24: 22.9 -> 23.6 (n 816, NHL 24%)"
     ]
    ]
   },
   {
    "board": "Soccer prospects",
-   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,754 under-22s. Stretch: headline = mean up to 64.8, linear above to 80 at 71.8 (80 about once per 5 seasons).",
+   "note": "Outcome = best three GAR seasons at ages 22-26; rarity within birth year and position group (players 22 in 2013-21). pct = live pool of 30,756 under-22s. Stretch: headline = mean up to 64.8, linear above to 80 at 71.8 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning",
@@ -2279,78 +2293,78 @@
      "80",
      "peak GAR a season GK 20.0 / D 16.3 / M 16.6 / F 15.7",
      "one in two birth years at the position",
-     "none live",
+     "1 of 30,756 (<0.01%)",
      "-"
     ],
     [
      "75",
      "peak GAR a season GK 20.0 / D 14.9 / M 15.9 / F 15.0",
      "the best of a birth year at the position",
-     "1 of 30,754 (<0.01%)",
+     "1 of 30,756 (<0.01%)",
      "-"
     ],
     [
      "70",
      "peak GAR a season GK 15.2 / D 13.0 / M 14.0 / F 13.4",
      "top 3 of a birth year at the position",
-     "1 of 30,754 (<0.01%)",
-     "70-74: 71.3 -> 66.3 (n 7, 50+ 100%)"
+     "1 of 30,756 (<0.01%)",
+     "70-74: 70.7 -> 64.9 (n 5, 50+ 100%)"
     ],
     [
      "65",
      "peak GAR a season GK 11.4 / D 11.8 / M 11.6 / F 10.6",
      "top 8 at the position",
-     "1 of 30,754 (<0.01%)",
-     "65-69: 67.3 -> 66.7 (n 10, 50+ 100%)"
+     "2 of 30,756 (<0.01%)",
+     "65-69: 66.8 -> 66.0 (n 18, 50+ 100%)"
     ],
     [
      "60",
      "peak GAR a season GK 10.0 / D 10.2 / M 9.3 / F 8.8",
      "top 20 at the position",
-     "19 of 30,754 (0.06%)",
-     "60-64: 61.9 -> 61.9 (n 74, 50+ 92%)"
+     "18 of 30,756 (0.06%)",
+     "60-64: 61.9 -> 62.1 (n 70, 50+ 94%)"
     ],
     [
      "55",
      "peak GAR a season GK 6.9 / D 8.4 / M 7.4 / F 7.2",
      "top 45 at the position",
-     "34 of 30,754 (0.11%)",
-     "55-59: 57.6 -> 57.8 (n 124, 50+ 87%)"
+     "45 of 30,756 (0.15%)",
+     "55-59: 57.4 -> 57.0 (n 143, 50+ 82%)"
     ],
     [
      "50",
      "peak GAR a season GK 5.4 / D 6.7 / M 5.6 / F 5.6",
      "top 90 (big-five regular) at the position",
-     "94 of 30,754 (0.31%)",
-     "50-54: 51.8 -> 51.5 (n 348, 50+ 60%)"
+     "103 of 30,756 (0.33%)",
+     "50-54: 52.1 -> 51.1 (n 366, 50+ 58%)"
     ],
     [
      "45",
      "peak GAR a season GK 4.0 / D 5.4 / M 4.4 / F 4.5",
      "top 150 at the position",
-     "194 of 30,754 (0.63%)",
-     "45-49: 47.7 -> 47.8 (n 649, 50+ 46%)"
+     "220 of 30,756 (0.72%)",
+     "45-49: 47.3 -> 47.5 (n 689, 50+ 44%)"
     ],
     [
      "40",
      "peak GAR a season GK 2.9 / D 4.3 / M 3.4 / F 3.4",
      "top 250 (top-flight regular) at the position",
-     "492 of 30,754 (1.6%)",
-     "40-44: 41.9 -> 41.7 (n 1493, 50+ 26%)"
+     "432 of 30,756 (1.4%)",
+     "40-44: 42.2 -> 41.9 (n 1159, 50+ 27%)"
     ],
     [
      "30",
      "some senior value",
      "-",
-     "1,845 of 30,754 (6.0%)",
-     "30-34: 32.2 -> 32.1 (n 5096, 50+ 7%)"
+     "1,783 of 30,756 (5.8%)",
+     "30-34: 32.2 -> 32.5 (n 4803, 50+ 8%)"
     ],
     [
      "20",
      "no senior value",
      "-",
      "all",
-     "20-24: 22.4 -> 22.2 (n 33225, 50+ 1%)"
+     "20-24: 22.4 -> 22.2 (n 32148, 50+ 1%)"
     ]
    ]
   },
@@ -2383,7 +2397,7 @@
      "70",
      "peak like year-end No. 6",
      "one in two birth years",
-     "2 of 894 (0.22%)",
+     "1 of 894 (0.11%)",
      "-"
     ],
     [
@@ -2404,35 +2418,35 @@
      "55",
      "peak like year-end No. 29",
      "top 4",
-     "15 of 894 (1.7%)",
+     "13 of 894 (1.5%)",
      "55-59: 57.5 -> 56.2 (n 83, 50+ 80%)"
     ],
     [
      "50",
      "peak like year-end No. 52",
      "top 7",
-     "22 of 894 (2.5%)",
+     "16 of 894 (1.8%)",
      "50-54: 52.2 -> 50.7 (n 106, 50+ 65%)"
     ],
     [
      "45",
      "peak like year-end No. 76",
      "top 10",
-     "31 of 894 (3.5%)",
+     "27 of 894 (3.0%)",
      "45-49: 47.5 -> 50.7 (n 116, 50+ 66%)"
     ],
     [
      "40",
      "peak like year-end No. 101",
      "top 13 (top-100 regular)",
-     "43 of 894 (4.8%)",
+     "36 of 894 (4.0%)",
      "40-44: 42.2 -> 41.8 (n 207, 50+ 35%)"
     ],
     [
      "30",
      "some value: peak between No. 200 and No. 100",
      "-",
-     "72 of 894 (8.1%)",
+     "70 of 894 (7.8%)",
      "30-34: 32.1 -> 32.7 (n 479, 50+ 17%)"
     ],
     [

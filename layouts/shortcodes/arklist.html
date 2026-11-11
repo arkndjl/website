@@ -87,7 +87,7 @@
       ((D.inline || {}).cs || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph, pos: '', stage: 'tier ' + r.tier, grade: r.fv != null ? fvTxt(r.fv) : r.r != null ? 'RWA ' + (r.r > 0 ? '+' : '') + r.r : '—', v: r.fv != null ? r.fv : r.r == null ? null : 50 + r.r * 10 }); });
     } else if (sport === 'nba') {
       var N = D.nba || {};
-      (N.players || []).forEach(function (r) { var x = r.sxpm != null ? r.sxpm : r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'XPM ' + (x > 0 ? '+' : '') + x : '—', v: x == null ? null : 50 + x * 3 }); });
+      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'rXPM ' + (x > 0 ? '+' : '') + x : '—', v: x == null ? null : 50 + x * 3 }); });
     }
     return out;
   }
