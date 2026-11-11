@@ -75,14 +75,9 @@ def timed(R, ch):
 
 
 def kelly(R, ch, o, n=1):
-    # TIMING on the chance, not on the return at the price: scaling the return staked props whose timed chance does not
-    # beat the price (the NFL book's Nov 2 2026 fix, scripts/nfl_props_paper.py kelly)
-    ch = timed(R, ch)
-    b = dec(o) - 1
-    e = ch * b - (1 - ch)
-    if e <= 0:
-        return 0.0
-    return R['kelly'] * e / b * 100 / (1 + (n - 1) * R['rho'])
+    """the prop books' shared stake rule (units.prop_kelly): TIMING on the chance, not the return at the price"""
+    import units as U
+    return U.prop_kelly(R, ch, o, n)
 
 
 def units(R, f, scale):

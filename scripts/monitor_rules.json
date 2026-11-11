@@ -884,5 +884,14 @@
     }
    }
   }
+ },
+ "pooled": {
+  "registered": "2026-11-11",
+  "A": 19,
+  "B": 19,
+  "minN": 30,
+  "rho": 0.05,
+  "from": "2026-10-28T15:35:00Z",
+  "note": "Pooled test of each sport's whole book (Nov 11 2026 picks audit): Wald's SPRT, H1 every judged pick (moneylines out) is worth the edge its stake sized on (evDU, own price), H0 worth nothing; game-day LLR deflated by rho .05; sd = max(sdDefault, live sd). Pause at LLR <= -ln B (minN 30) sends the sport to paper until 30+ picks judged since beat the close at t 1.65 (rule_monitor.paper_state)."
  }
 }

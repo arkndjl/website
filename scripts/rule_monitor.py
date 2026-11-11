@@ -311,6 +311,77 @@ def drift(bets, mu1, sd=None, rho=0.0, P=None):
             'need': need, 'path': path[-60:]}
 
 
+# ---------------------------------------------------------------- the pooled sport test and the paper switch
+
+# Nov 11 2026 picks audit: the per-rule tests need 240-1,000 bets each for a verdict, while the pooled evidence was plain:
+# 383 graded picks outside the NBA realised -0.06 (se .06) of the edge their stakes assumed, and the pooled game-pick SPRT
+# sat at LLR -5.5 with no single rule past its bound. Noah (Nov 11): every market outside the NBA goes PAPER until it
+# beats the close live; the pooled test below sends any sport (the NBA too) to paper when it pauses.
+POOLED_FROM = '2026-10-28T15:35:00Z'      # the paper book's reset (scripts/paper_rules.json registered)
+PAPER = {'cbb': '2026-11-11T20:00:00Z', 'cfb': '2026-11-11T20:00:00Z', 'nfl': '2026-11-11T20:00:00Z',
+         'nflprops': '2026-11-11T20:00:00Z'}
+PAPER_GO = '2026-11-11T20:00:00Z'       # nothing flagged before the switch turns paper after the fact
+PAPER_BACK = (30, 1.65)                   # back live: 30+ judged since paper, clvRet > 0 at day-clustered t this or more
+
+
+def pooled(bets, sd=None, rho=None, P=None):
+    """Wald's test of a sport's whole book: H1 every pick is worth the edge its stake sized on (evDU, at its own price),
+    H0 worth nothing. Each game day adds sum(x mu - mu^2 / 2) / (sd^2 (1 + (n - 1) rho)); moneylines are out (their
+    return is on another scale, as in drift()). Same bounds and minimum as drift (monitor_rules.json "pooled")."""
+    P = P or params()
+    D = P.get('pooled') or P['drift']
+    rho = D.get('rho', 0.05) if rho is None else rho
+    jc = sorted([b for b in bets if b.get('clvRet') is not None and b.get('mk') != 'ml' and (b.get('evDU') or 0) > 0],
+                key=lambda b: b.get('kick') or '')
+    xs = [b['clvRet'] for b in jc]
+    if sd is None:
+        sd = P['sdDefault']
+        if len(xs) > 30:
+            m0 = sum(xs) / len(xs)
+            sd = max(sd, math.sqrt(sum((x - m0) ** 2 for x in xs) / (len(xs) - 1)))
+    lo, hi = -math.log(D['B']), math.log(D['A'])
+    days = {}
+    for b in jc:
+        days.setdefault(day(b['kick']), []).append(b)
+    llr, n, state, at = 0.0, 0, 'watching', None
+    for d in sorted(days):
+        bs = days[d]
+        n += len(bs)
+        llr += sum(b['clvRet'] * b['evDU'] - b['evDU'] ** 2 / 2 for b in bs) / (sd * sd * (1 + (len(bs) - 1) * rho))
+        if state == 'watching' and n >= D['minN']:
+            if llr <= lo:
+                state, at = 'paused', d
+            elif llr >= hi:
+                state, at = 'confirmed', d
+    sxx = sum(b['evDU'] ** 2 for b in jc)
+    real = sum(b['clvRet'] * b['evDU'] for b in jc) / sxx if sxx else None
+    return {'n': n, 'days': len(days), 'llr': round(llr, 3), 'lo': round(lo, 3), 'hi': round(hi, 3), 'state': state,
+            'at': at, 'sd': round(sd, 4), 'rho': rho, 'real': None if real is None else round(real, 3),
+            'realSe': round(sd / math.sqrt(sxx), 3) if sxx else None,
+            'clvRet': round(sum(xs) / len(xs), 4) if xs else None,
+            'evDU': round(sum(b['evDU'] for b in jc) / len(jc), 4) if jc else None}
+
+
+def paper_state(sport, log, P=None):
+    """is the sport's book paper now: {'paper', 'since', 'why', 'back': the return test, 'pooled': the pooled test}.
+    Paper from PAPER[sport] (Noah, Nov 11 2026), or from the day the pooled test pauses; back live once the picks judged
+    since then beat the close at PAPER_BACK. log: every flagged pick (log + withdrawnLog)."""
+    js = [e for e in log if judged(e) and (e.get('flagged') or '') >= POOLED_FROM]
+    pl = pooled(js, P=P)
+    since, why = PAPER.get(sport), 'owner: paper until live picks beat the close (Nov 11 2026)'
+    if pl['state'] == 'paused' and (since is None or pl['at'] < since[:10]):
+        since, why = pl['at'], f"pooled test paused: picks realised {pl['real']} of their staked edge over {pl['n']}"
+    out = {'paper': False, 'since': since, 'why': None, 'pooled': pl}
+    if since is None:
+        return out
+    bk = [e for e in log if judged(e) and e.get('clvRet') is not None and (e.get('flagged') or '') >= since]
+    m, se, t, G = clustered([e['clvRet'] for e in bk], [day(e['kick']) for e in bk])
+    back = len(bk) >= PAPER_BACK[0] and (m or 0) > 0 and (t or 0) >= PAPER_BACK[1]
+    out['back'] = {'n': len(bk), 'clvRet': None if m is None else round(m, 4), 't': None if t is None else round(t, 2), 'days': G}
+    out['paper'], out['why'] = not back, (None if back else why)
+    return out
+
+
 # ---------------------------------------------------------------- the pick rules' state (kept in games_picks_<sport>.json)
 
 def pick_rules(R):

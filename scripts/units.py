@@ -793,6 +793,19 @@ def test():
     print('units: ok')
 
 
+
+def prop_kelly(R, ch, o, n=1):
+    """the one stake rule every prop book uses (scripts/nfl_props_paper.py, scripts/props_daily.py): % of bankroll, full
+    Kelly x R['kelly'] on the calibrated chance ch with TIMING scaling its edge over a fair coin (as units.adj does for
+    the games), at American price o, for one of n props settling together (slate scale 1 / (1 + (n - 1) rho)); 0 with no
+    edge at that price. Shared since Nov 11 2026: the haircut had been applied to the return instead of the chance twice."""
+    ch = .5 + R['timing'] * (ch - .5)
+    b = (o / 100 if o > 0 else 100 / -o)
+    e = ch * b - (1 - ch)
+    if e <= 0:
+        return 0.0
+    return R['kelly'] * e / b * 100 / (1 + (n - 1) * R.get('rho', 0.0))
+
 if __name__ == '__main__':
     a = sys.argv[1:]
     if a and a[0] == '--fit':
