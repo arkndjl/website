@@ -4591,3 +4591,16 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .tx__k--sign, .tx__k--transfer, .tx__k--loan { background: #6b54a0; }
 .tx__pk { white-space: nowrap; }
 @media (max-width: 640px) { .tx .tx__x { display: none; } }
+
+/* pixel bars under a table's numbers (assets/js/viz.js): the sorted column and th[data-vz] columns */
+td.vz { position: relative; }
+td.vz::after { content: ""; position: absolute; left: 6px; bottom: 2px; height: 4px; pointer-events: none;
+  width: calc((100% - 12px) * var(--vz, 0)); width: round(up, calc((100% - 12px) * var(--vz, 0)), 6px);
+  background: repeating-linear-gradient(90deg, var(--foreground) 0 4px, transparent 4px 6px); opacity: .85; }
+td.vz--neg::after { background: repeating-linear-gradient(90deg, #ff9ec7 0 4px, transparent 4px 6px); }
+td.vz-up { color: var(--foreground); }
+td.vz-dn { color: #ff9ec7; }
+/* a logo straight inside a name cell sits on the name's line */
+.cfb__table td.cfb__name > img.cfb__logo { display: inline-block; vertical-align: -4px; margin-right: 4px; }
+/* ARKBOARD pages: the wide card repeats the window art under it, so the board starts at the top (the card stays the share image) */
+.post:has(.arknav) .post-cover { display: none; }
