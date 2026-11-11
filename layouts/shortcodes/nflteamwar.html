@@ -5,9 +5,9 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team WAR") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,WAR,QB,RB,WR/TE,OL,DL,LB,DB,K/P" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th>Team</th><th>Rec</th><th title="team WAR = sum of player WAR, season to date">WAR</th>
+    <th>Team</th><th title="record (won-lost)">Rec</th><th title="team WAR = sum of player WAR, season to date">WAR</th>
     {{- range $grp }}<th title="{{ if eq . "DL" }}DL and EDGE{{ else if eq . "DB" }}CB and S{{ else if eq . "K/P" }}kickers and punters (special teams over average; returners count in their own group){{ else }}{{ . }}{{ end }} WAR">{{ . }}</th>{{ end }}
-    <th>Div</th>
+    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range sort (where .power "war" "!=" nil) "war" "desc" }}{{ $w := .wars }}

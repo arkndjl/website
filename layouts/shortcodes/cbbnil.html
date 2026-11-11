@@ -7,7 +7,7 @@
 {{- if eq ($.Get "view") "teams" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team NIL") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,yNIL,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cbbnil">
-  <thead><tr><th>RK</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="yNIL = the roster's pay going in (program budget)">yNIL</th><th title="xNIL = the roster's open-market worth now">xNIL</th>
     <th title="zNIL = xNIL - yNIL">zNIL</th><th title="top three by xNIL">Top</th></tr></thead>
   <tbody>
@@ -28,7 +28,7 @@
 {{- else -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NIL") "icon" "basketball" "filter" "Conf,Pos,Cls" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,xNIL,yNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cbbnil">
-  <thead><tr><th>RK</th><th>Player</th><th>Team</th><th>Conf</th><th>Pos</th><th>Cls</th><th>FV</th>
+  <thead><tr><th>RK</th><th>Player</th><th>Team</th><th title="conference">Conf</th><th>Pos</th><th>Cls</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
     <th title="xNIL = worth on the open market now (minutes share x BPM over -3, at his market's price)">xNIL</th>
     <th title="yNIL = likely pay going into the season (program budget split by preseason value)">yNIL</th>
     <th title="zNIL = xNIL - yNIL">zNIL</th>

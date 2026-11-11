@@ -8,7 +8,7 @@
 {{- $c := . -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_war.exe") "gfxCols" "FV,NFL WAR,College WAR,90th") -}}
 <table class="cfb__table">
-  <thead><tr><th>FV</th>
+  <thead><tr><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
     <th title="NFL WAR = expected WAR a season at the FV, busts and backup years in: expected AV at FV (FV curve, 2010-19 drafts) -> WAR a season of drafted players at that AV over a replacement at the spot (2016-21 classes)">NFL WAR</th>
     <th title="college WAR, this season, tier median, FBS: wins a 12-game season over a replacement starter at the spot; 4.4 pts of margin a game = 1 win">College WAR</th>
     <th title="college WAR, tier 90th percentile">90th</th><th>Players</th></tr></thead>

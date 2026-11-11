@@ -85,13 +85,13 @@
     </table></div>
     {{- with $f.game }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Series model + the five's mean rating, held out</th><th>Series</th><th>Log loss</th><th>With ratings</th><th>t</th></tr></thead>
+      <thead><tr><th>Series model + the five's mean rating, held out</th><th>Series</th><th>Log loss</th><th>With ratings</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th></tr></thead>
       <tbody>{{ range $sub := slice (slice "all" "every series") (slice "top50" "both VRS top 50") }}{{ with index site.Data.cs2_players.fit.game (index $sub 0) }}<tr><td>{{ index $sub 1 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float .ll0)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float .ll1)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .t)) }}</td></tr>{{ end }}{{ end }}</tbody>
     </table></div>
     {{- end }}
     {{- with $f.prospects }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Prospects: next year's rating, held out ({{ (index .models "rating now").n }})</th><th>Error²</th><th>vs rating now</th><th>t</th></tr></thead>
+      <thead><tr><th>Prospects: next year's rating, held out ({{ (index .models "rating now").n }})</th><th>Error²</th><th>vs rating now</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th></tr></thead>
       <tbody>{{ range $k, $v := .models }}<tr><td>{{ if eq $k site.Data.cs2_players.fit.prospects.keep }}<b>{{ $k }} (live)</b>{{ else }}{{ $k }}{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float $v.mse)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.4f" (float $v.dmse)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float $v.t)) }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- with .reach }}<p class="cfb__dim">T1% held out: log loss {{ .ll }} vs {{ .llBase }} base rate ({{ partial "num.html" (slice "%.0f" (mul .rate 100)) }}% of {{ .n }})</p>{{ end }}

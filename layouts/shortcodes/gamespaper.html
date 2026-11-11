@@ -30,7 +30,7 @@
     <p class="cfb__dim">slates {{ $c.slates }} · {{ with $c.avgSlate }}{{ . }} picks a slate{{ else }}none graded{{ end }} · within-slate rho {{ with $c.rho }}{{ partial "num.html" (slice "%.2f" .) }}{{ else }}0 (not measured){{ end }} · {{ $c.n }} picks = {{ $c.nEff }} effective</p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th title="return the graded picks were worth at the closing line; t">Worth at close</th><th title="picks / graded by the close">Picks</th><th title="mean points the line moved our way, and how often">CLV</th><th title="results at each pick's price and stake">Result</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="return the graded picks were worth at the closing line; t">Worth at close</th><th title="picks / graded by the close">Picks</th><th title="mean points the line moved our way, and how often">CLV</th><th title="results at each pick's price and stake">Result</th></tr></thead>
       <tbody>
       {{- range $d.markets }}
       <tr>
@@ -50,7 +50,7 @@
 {{- with $d.open }}
 {{- partial "wintable-open.html" (dict "title" "paper book :: open picks" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Pick</th><th title="stake as posted, % of bankroll">Kelly %</th><th>Sport</th><th>Market</th><th title="ET">Start</th><th title="model minus the market: points, or points of win chance for moneylines">Edge</th><th title="expected return at the posted price">EV</th><th title="when the pick was posted, ET">Posted</th></tr></thead>
+  <thead><tr><th>Pick</th><th title="stake as posted, % of bankroll">Kelly %</th><th>Sport</th><th title="bet market: spread, total or moneyline">Market</th><th title="ET">Start</th><th title="model minus the market: points, or points of win chance for moneylines">Edge</th><th title="expected return at the posted price">EV</th><th title="when the pick was posted, ET">Posted</th></tr></thead>
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
   <tr{{ if .pass }} class="cfb__dim"{{ end }}>
@@ -71,7 +71,7 @@
 {{- with $d.recent }}
 {{- partial "wintable-open.html" (dict "title" "paper book :: settled" "icon" "arkboard" "filter" "Sport,Market,Res" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Pick</th><th>Res</th><th title="units, 1 = 1% of bankroll">P/L</th><th title="return the pick was worth at the closing line">At close</th><th title="the closing number">Close</th><th>Sport</th><th>Market</th><th title="ET">Start</th></tr></thead>
+  <thead><tr><th>Pick</th><th>Res</th><th title="units, 1 = 1% of bankroll">P/L</th><th title="return the pick was worth at the closing line">At close</th><th title="the closing number">Close</th><th>Sport</th><th title="bet market: spread, total or moneyline">Market</th><th title="ET">Start</th></tr></thead>
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
   <tr{{ if .pass }} class="cfb__dim"{{ end }}>

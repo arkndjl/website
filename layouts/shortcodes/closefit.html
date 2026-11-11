@@ -15,7 +15,7 @@
   <div class="cfbm__body">
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th title="pooled share of the gap the close took, every season; t">b</th><th title="the gap where a -110 bet at the open breaks even at the predicted close, for a typical game">Break-even</th><th title="held-out share of the open-to-close move explained: this model / a straight b">Move R²</th><th title="held-out bets the predictor picked: count, worth at the close, t">Predictor bets</th><th title="held-out bets of the plain gap rule (X set on tuning): X, count, worth at the close">Gap rule</th><th>Status</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="pooled share of the gap the close took, every season; t">b</th><th title="the gap where a -110 bet at the open breaks even at the predicted close, for a typical game">Break-even</th><th title="held-out share of the open-to-close move explained: this model / a straight b">Move R²</th><th title="held-out bets the predictor picked: count, worth at the close, t">Predictor bets</th><th title="held-out bets of the plain gap rule (X set on tuning): X, count, worth at the close">Gap rule</th><th>Status</th></tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" }}{{ with index $x.markets $mk }}{{ $b := .bets.model }}{{ $g := .bets.gap }}
@@ -37,7 +37,7 @@
     <p title="b in the tuning and held-out seasons; the break-even gap for a typical game in that cell; the predictor's held-out bets there"><b>softness index by cell</b></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th>Cell</th><th title="games, every season">Games</th><th title="b, tuning seasons">b tune</th><th title="b, held-out seasons">b held</th><th title="points of gap to break even at -110">Break-even</th><th title="held-out predictor bets in the cell: count, worth at the close, t">Held bets</th><th title="passes Benjamini-Hochberg at q .10 across every pre-registered cell (30+ bets to be tested)">FDR</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th>Cell</th><th title="games, every season">Games</th><th title="b, tuning seasons">b tune</th><th title="b, held-out seasons">b held</th><th title="points of gap to break even at -110">Break-even</th><th title="held-out predictor bets in the cell: count, worth at the close, t">Held bets</th><th title="passes Benjamini-Hochberg at q .10 across every pre-registered cell (30+ bets to be tested)">FDR</th></tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" }}{{ with index $x.markets $mk }}

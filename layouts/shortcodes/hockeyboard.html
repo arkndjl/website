@@ -114,7 +114,7 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>FV</th><th>Peak pWAR a season</th><th>How rare</th></tr></thead>
+      <thead><tr><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>Peak pWAR a season</th><th>How rare</th></tr></thead>
       <tbody>
       {{- $per := dict "80" "one in four classes" "75" "one in two classes" "70" "the best of a class" "65" "top 2 of a class" "60" "top 5" "55" "top 10" "50" "top 20" "45" "top 30" "40" "top 45" }}
       {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" (float (index . 1))) }}+</td><td>{{ index $per (string (index . 0)) }}</td></tr>{{ end }}
@@ -123,7 +123,7 @@
       </tbody>
     </table></div>
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th title="mean squared error cut, out of class">Gain</th><th>t</th><th>Wins</th></tr></thead>
+      <thead><tr><th>Input</th><th title="kept in the model after the held-out test">Kept</th><th>Coef</th><th title="mean squared error cut, out of class">Gain</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th><th>Wins</th></tr></thead>
       <tbody>
       {{- range $k := $f.kept }}{{ if not (in (slice "ls" "ls2" "D" "G") $k) }}{{ $e := index $f.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float (index $f.coef $k))) }}</td><td class="cfb__num">{{ with $e }}{{ partial "num.html" (slice "%.2f" (float .gain)) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}{{ end }}
       {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" (float $e.gain)) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
@@ -143,7 +143,7 @@
     {{- end }}{{ end }}{{ end }}
     {{- with $d.prov }}{{ with .fit }}
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th>t</th><th>Wins</th></tr></thead>
+      <thead><tr><th>Input</th><th title="kept in the model after the held-out test">Kept</th><th>Coef</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th><th>Wins</th></tr></thead>
       <tbody>
       {{- $pf := . }}{{ range $k := .kept }}{{ $e := index $pf.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float (index $pf.coef $k))) }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}
       {{- range $k, $e := .ev }}{{ if not (in $pf.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}

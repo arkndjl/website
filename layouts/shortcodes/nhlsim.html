@@ -9,7 +9,7 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xPts,Playoff,Div,Final,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table tstick">
   <thead><tr>
-    <th>Team</th><th>Rec</th>
+    <th>Team</th><th title="record (won-lost)">Rec</th>
     <th title="xPts = points so far + mean simulated points, games left">xPts</th>
     <th title="P(playoffs: division top three or wild card)">Playoff</th>
     <th title="P(division title)">Div</th>
@@ -18,7 +18,7 @@
     <th title="P(Stanley Cup Final)">Final</th>
     <th title="P(Stanley Cup)">Cup</th>
     <th title="P(Presidents' Trophy: most points)">Pres</th>
-    <th>Div</th>
+    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range sort .power "cup" "desc" }}

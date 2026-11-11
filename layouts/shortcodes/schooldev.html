@@ -10,7 +10,7 @@
 {{- $cols := cond $cbb "RK,Team,Dev,Net,Recruits,Coach,Coach Dev" "RK,Team,Dev,Net,Signees,Drafted,xDrafted" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "development") "filter" "Conf" "rerank" true "tab" ($.Get "tab") "icon" (cond $cbb "basketball" "football") "gfxCols" $cols "gfxDate" (lower ((time site.Data.school_dev.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table sdev">
-  <thead><tr><th>RK</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="{{ $unit }} per recruit over what his recruiting rating predicted, shrunk by sample; ± 1 SD">Dev</th>
     <th title="Dev with program strength at signing taken out">Net</th>
     <th title="{{ if $cbb }}raw mean BPM over expected, no shrink{{ else }}raw mean FV over expected, no shrink{{ end }}">Raw</th>

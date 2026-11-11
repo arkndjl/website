@@ -80,7 +80,7 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>FV</th><th>How rare</th><th title="peak tGAR a season at the cut">GK</th><th>D</th><th>M</th><th>F</th></tr></thead>
+      <thead><tr><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>How rare</th><th title="peak tGAR a season at the cut">GK</th><th>D</th><th>M</th><th>F</th></tr></thead>
       <tbody>
       {{- $per := dict "80" "one in two birth years" "75" "the best of a birth year" "70" "top 3" "65" "top 8" "60" "top 20" "55" "top 45" "50" "top 90 (big-five regular)" "45" "top 150" "40" "top 250 (top-flight regular)" }}
       {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td>{{ index $per (string (index . 0)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float (index . 1))) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float (index . 2))) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float (index . 3))) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float (index . 4))) }}</td></tr>{{ end }}
@@ -89,7 +89,7 @@
       </tbody>
     </table></div>
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th title="mean squared error cut, out of season">Gain</th><th>t</th><th>Wins</th></tr></thead>
+      <thead><tr><th>Input</th><th title="kept in the model after the held-out test">Kept</th><th>Coef</th><th title="mean squared error cut, out of season">Gain</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th><th>Wins</th></tr></thead>
       <tbody>
       {{- range $k := $f.kept }}{{ if not (in (slice "age" "lmv" "nomv") $k) }}{{ $e := index $f.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ with index $m.coef $k }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ partial "num.html" (slice "%.2f" (float .gain)) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ else }}<tr><td>{{ index $names $k }}</td><td>base</td><td class="cfb__num">{{ with index $m.coef $k }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>{{ end }}{{ end }}
       {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" (float $e.gain)) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}

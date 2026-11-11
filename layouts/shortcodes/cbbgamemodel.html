@@ -40,7 +40,7 @@
     <p class="cfb__dim">recency half-life: {{ with $f.params.hl }}{{ . }} days{{ else }}none{{ end }} · prior worth {{ $f.params.lam }} games · market step {{ $f.params.mk }}</p>
   {{- else }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Candidate</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th>Kept</th></tr></thead>
+      <thead><tr><th>Candidate</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th title="kept in the model after the held-out test">Kept</th></tr></thead>
       <tbody>
       {{- $seen := dict }}{{ range $f.select }}{{ if not (index $seen .cand) }}{{ $seen = merge $seen (dict .cand true) }}
       <tr><td>{{ index $names .cand | default .cand }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .t) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .heldT) }}</td><td>{{ if in $f.feats .cand }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>
@@ -55,7 +55,7 @@
     {{- with $f.fvTest }}
     <p><b>board FV in the preseason prior</b></p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>FV input</th><th>Added to</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th>Kept</th></tr></thead>
+      <thead><tr><th>FV input</th><th>Added to</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th title="kept in the model after the held-out test">Kept</th></tr></thead>
       <tbody>
       {{- range . }}{{ if and (not .replaceBpm) (eq (len .add) 1) }}<tr><td>{{ index $fvn (index .add 0) }}</td><td>model</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .t) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .heldT) }}</td><td>{{ if eq (index .add 0) "fvtop" }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}{{ end }}
       {{- range $f.fvTest2 }}<tr><td>{{ index $fvn (index .add 0) }}</td><td>+ top 5 FV</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .t) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .heldT) }}</td><td>{{ if le .t -1.5 }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}

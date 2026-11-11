@@ -22,7 +22,7 @@
     </table></div>
     {{- $base := (index $f.test "2022-26 (held out)").maeModel }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Input</th><th>Kept</th><th title="change in 2022-26 margin MAE from the input (negative = it helps)">MAE 22-26</th><th title="paired t, 2022-26 (negative = it helps)">t 22-26</th><th title="paired t when added, 2015-21 (kept at -1.5 or lower)">t 15-21</th></tr></thead>
+      <thead><tr><th>Input</th><th title="kept in the model after the held-out test">Kept</th><th title="change in 2022-26 margin MAE from the input (negative = it helps)">MAE 22-26</th><th title="paired t, 2022-26 (negative = it helps)">t 22-26</th><th title="paired t when added, 2015-21 (kept at -1.5 or lower)">t 15-21</th></tr></thead>
       <tbody>
       {{- range $k := $f.feats }}{{ with index $f.drop $k }}
       <tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (sub $base .mae2022_26)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" .t2022_26) }}</td><td class="cfb__num"><span class="cfb__dim">—</span></td></tr>

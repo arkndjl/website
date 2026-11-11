@@ -10,7 +10,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "season odds") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Record,Proj W,Title,Playoff" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cfbs">
   <thead><tr>
-    <th title="by model rating">RK</th><th>Team</th><th>Conf</th>
+    <th title="by model rating">RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="model rating = points vs an average FBS team, neutral field (Elo, opponent-adjusted EPA, talent, special teams, situational stats kept by the backtest)">Rating</th>
     <th title="success rate edge = offense - defense allowed, opponent-adjusted, percentage points">SR</th>
     <th title="early-down (1st, 2nd) success rate edge = offense - defense allowed, opponent-adjusted, percentage points">Early</th>

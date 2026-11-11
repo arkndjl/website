@@ -5,7 +5,7 @@
 {{- with site.Data.cfb_portal -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer portal") "filter" "Pos,To,From" "tab" ($.Get "tab") "gfxCols" "Player,Pos,FV,From,To" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table">
-  <thead><tr><th>Player</th><th>Pos</th><th>FV</th><th>From</th><th>To</th><th title="247 stars as a transfer">Stars</th><th>Class</th></tr></thead>
+  <thead><tr><th>Player</th><th>Pos</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>From</th><th>To</th><th title="247 stars as a transfer">Stars</th><th>Class</th></tr></thead>
   <tbody>
   {{- range .moves }}
   <tr>
@@ -23,7 +23,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .moves) "fresh" "cfb_portal" "note" (printf "%v portal · updated %s" .season (lower ((time .asof).Format "Jan 2")))) -}}
 {{- partial "wintable-open.html" (dict "title" "portal :: team net (expected WAR in − out)" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Net,In,Out" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table cfbt">
-  <thead><tr><th>Team</th><th>Conf</th><th title="expected college WAR a season by FV, in minus out">Net</th><th>In</th><th>Out</th></tr></thead>
+  <thead><tr><th>Team</th><th title="conference">Conf</th><th title="expected college WAR a season by FV, in minus out">Net</th><th>In</th><th>Out</th></tr></thead>
   <tbody>
   {{- range .teams }}
   <tr>

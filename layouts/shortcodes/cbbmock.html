@@ -15,7 +15,7 @@
 {{- $m := .method -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "icon" "basketball" "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
 <table class="cfb__table cfbm cbbm">
-  <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th>
+  <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
     {{- if $conv }}<th title="expected NBA peak XPM (best three seasons of .5 BPM + .5 DPM) against the average drafted player, given the consensus slot and his college line">xXPM</th>{{ end -}}
     <th>Class</th><th title="chance he leaves school for this draft (scripts/cbb_declare.py; seniors and internationals 100%)">Dec%</th><th>Age</th><th title="consensus of the {{ .boards }} 2027 boards: .5 median rank + .5 mean; – = on no board">Cons</th>
     {{- with .sims }}<th title="P(a top-5 pick) in {{ .n }} simulated drafts: the predictive score plus a June shock (sd {{ .sd }} at {{ .days }} days out, fit on dated No Ceilings boards 2022-26)">Top 5</th><th title="the middle 80% of his picks in the simulated drafts; 60+ = past round 2">Range</th>{{ end }}

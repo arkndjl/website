@@ -50,10 +50,10 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,AP,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25" "gfxRank" ($rank | jsonify)) -}}
 <table class="cfb__table tstick2" data-td-kind="cbb" data-td-src="/data/teams/cbb.json" data-td-rows="{{ (resources.FromString "data/cbb-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th title="change since {{ if eq .prevFrom "preseason" }}the preseason prior{{ else }}last week{{ end }}">±</th><th>Team</th><th>Conf</th>
+    <th>RK</th><th title="change since {{ if eq .prevFrom "preseason" }}the preseason prior{{ else }}last week{{ end }}">±</th><th>Team</th><th title="conference">Conf</th>
     <th title="rating = expected margin vs an average D-I team on a neutral floor: adjusted efficiency x possessions, Elo and market rating at the game model's weights">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
-    <th>Rec</th>
+    <th title="record (won-lost)">Rec</th>
     {{- if $P }}<th title="AP Top 25">AP</th><th title="Coaches Poll">Coaches</th>{{ end }}
     <th title="adjusted offense: points per 100 possessions against an average defense">Off</th>
     <th title="adjusted defense: points allowed per 100 possessions against an average offense (lower is better)">Def</th>

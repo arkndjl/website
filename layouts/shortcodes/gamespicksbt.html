@@ -14,7 +14,7 @@
   <div class="cfbm__body">
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th title="return the test-season picks were worth at the closing line, per unit; t">Worth at close</th><th>Status</th><th title="the edge cut, points">X</th><th title="test-season picks">Picks</th><th title="mean points the line moved toward the picks, and how often it did">CLV</th><th title="test-season results at the open, -103 (Novig); t">Result</th><th title="validation season, where the market was switched on: worth at the close, t">Validation</th><th title="tuning seasons: worth at the close, t">Tuning</th><th title="Kelly multiple (1 = full Kelly on the calibrated edge)">λ</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="return the test-season picks were worth at the closing line, per unit; t">Worth at close</th><th>Status</th><th title="the edge cut, points">X</th><th title="test-season picks">Picks</th><th title="mean points the line moved toward the picks, and how often it did">CLV</th><th title="test-season results at the open, -103 (Novig); t">Result</th><th title="validation season, where the market was switched on: worth at the close, t">Validation</th><th title="tuning seasons: worth at the close, t">Tuning</th><th title="Kelly multiple (1 = full Kelly on the calibrated edge)">λ</th></tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" "ml" }}{{ with index $x.markets $mk }}{{ $h := .heldRec }}
@@ -82,7 +82,7 @@
     <p><b>stakes (Kelly %)</b> <span class="cfb__dim">stake = λ x u x Kelly(edge) · u = edge² / (edge² + var) · λ 1 · edge x 0.5 (NBA x 0.25) · cap 5% a bet</span></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th title="what a median pick has been worth at the close, after calibration (NBA halved: the history saw tip-time injury news)">Edge</th><th title="the aggression dial: 1 = full Kelly on the calibrated edge">λ</th><th title="most on one bet, % of bankroll">Cap</th><th title="stake on a median pick, % of bankroll">Kelly %</th><th title="log growth a season at the close, held out; in brackets, the old fraction-of-Kelly units">Growth</th><th title="chance a season falls 25% / 50% from its peak, resampled">DD 25/50</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="what a median pick has been worth at the close, after calibration (NBA halved: the history saw tip-time injury news)">Edge</th><th title="the aggression dial: 1 = full Kelly on the calibrated edge">λ</th><th title="most on one bet, % of bankroll">Cap</th><th title="stake on a median pick, % of bankroll">Kelly %</th><th title="log growth a season at the close, held out; in brackets, the old fraction-of-Kelly units">Growth</th><th title="chance a season falls 25% / 50% from its peak, resampled">DD 25/50</th></tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $u.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" }}{{ with index $x $mk }}{{ $n := index .compare 1 }}{{ $o := index .compare 0 }}
@@ -101,7 +101,7 @@
     </div>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th>{{ range (index (index $u.sports "nba") "total").kellyX }}<th>{{ .label }}</th>{{ end }}</tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th>{{ range (index (index $u.sports "nba") "total").kellyX }}<th>{{ .label }}</th>{{ end }}</tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $u.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" }}{{ with index $x $mk }}

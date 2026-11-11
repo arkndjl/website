@@ -185,7 +185,7 @@
     <h3 class="n1-h">ESEA seasons · rank on 1NT (5+ maps)</h3>
     <div class="wintable__scroll">
     <table class="esea-box n1-tbl">
-      <thead><tr><th>Season</th><th>Maps</th><th>K/D</th><th>ADR</th><th title="kills per round">KPR</th><th>HS %</th><th title="opening duels won">Entry %</th><th title="1v1 and 1v2 won">Clutch %</th><th title="utility damage per round">UD/R</th></tr></thead>
+      <thead><tr><th>Season</th><th>Maps</th><th title="kills per death">K/D</th><th title="average damage a round">ADR</th><th title="kills per round">KPR</th><th title="headshot share of kills">HS %</th><th title="opening duels won">Entry %</th><th title="1v1 and 1v2 won">Clutch %</th><th title="utility damage per round">UD/R</th></tr></thead>
       <tbody>{{ range . }}{{ $s := .s }}{{ $row := . }}
         {{- $peers := slice }}{{ range $l.players }}{{ range .seasons }}{{ if and (eq .s $s) (ge .maps 5) }}{{ $peers = $peers | append . }}{{ end }}{{ end }}{{ end }}
         <tr><td>S{{ .s }}</td><td>{{ .maps }}</td>
@@ -275,14 +275,14 @@
 
 {{- else if eq $part "trends" }}
 {{- /* team and player box-score rates by ESEA season (esea_lab seasons, players) */ -}}
-{{- $cols := slice (dict "k" "kd" "t" "K/D") (dict "k" "adr" "t" "ADR") (dict "k" "kpr" "t" "KPR") (dict "k" "hs" "t" "HS %") (dict "k" "entry" "t" "Entry %") (dict "k" "clutch" "t" "Clutch %") (dict "k" "udr" "t" "UD/R") (dict "k" "fpr" "t" "Flash/R") -}}
+{{- $cols := slice (dict "k" "kd" "t" "K/D" "h" "kills per death") (dict "k" "adr" "t" "ADR" "h" "average damage a round") (dict "k" "kpr" "t" "KPR" "h" "kills a round") (dict "k" "hs" "t" "HS %" "h" "headshot share of kills") (dict "k" "entry" "t" "Entry %" "h" "share of opening duels won") (dict "k" "clutch" "t" "Clutch %" "h" "share of clutch setups won") (dict "k" "udr" "t" "UD/R" "h" "utility damage a round") (dict "k" "fpr" "t" "Flash/R" "h" "flashes thrown a round") -}}
 <div class="win n1-tr{{ with $cls }} {{ . }}{{ end }}">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>season_trends.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
   <div class="n1-body">
     <h3 class="n1-h">1NT by ESEA season</h3>
     <div class="wintable__scroll">
     <table class="esea-box n1-tbl">
-      <thead><tr><th>Season</th><th class="is-l">Division</th><th>Maps</th><th title="share of rounds won">Rounds</th><th title="round diff per map">RD/m</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
+      <thead><tr><th>Season</th><th class="is-l">Division</th><th>Maps</th><th title="share of rounds won">Rounds</th><th title="round diff per map">RD/m</th>{{ range $cols }}<th{{ with .h }} title="{{ . }}"{{ end }}>{{ .t }}</th>{{ end }}</tr></thead>
       <tbody>{{ range $l.seasons }}{{ $r := . }}<tr><td>S{{ .s }}</td><td class="is-l">{{ .div }}</td><td>{{ .w }}–{{ .l }}</td><td>{{ .rwp }}%</td><td>{{ if gt (float .rdpm) 0 }}+{{ end }}{{ .rdpm }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
     </table>
     </div>
@@ -293,7 +293,7 @@
       <summary><b>{{ .name }}</b><span>{{ .maps }} maps</span><span>{{ .kd }} K/D</span><span>{{ .adr }} ADR</span><span class="n1-dim">entry {{ .entry }}% · clutch {{ .clutch }}%</span></summary>
       <div class="wintable__scroll">
       <table class="esea-box n1-tbl">
-        <thead><tr><th>Season</th><th>Maps</th><th title="season RWA: round win % added per round over the season's league maps, opponent-credited, shrunk toward the division; 0 = average Main player">RWA</th><th title="season ARK Rating on the season's league totals, each stat regressed by its stability; 1.00 = league average">ARK</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
+        <thead><tr><th>Season</th><th>Maps</th><th title="season RWA: round win % added per round over the season's league maps, opponent-credited, shrunk toward the division; 0 = average Main player">RWA</th><th title="season ARK Rating on the season's league totals, each stat regressed by its stability; 1.00 = league average">ARK</th>{{ range $cols }}<th{{ with .h }} title="{{ . }}"{{ end }}>{{ .t }}</th>{{ end }}</tr></thead>
         <tbody>{{ range .seasons }}{{ $r := . }}{{ $x := index $ps (string .s) }}<tr><td>S{{ .s }}</td><td>{{ .maps }}</td><td>{{ with $x }}<b class="{{ if ge (float (index . 0)) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float (index . 0))) }}</b>{{ else }}–{{ end }}</td><td>{{ with $x }}{{ partial "num.html" (slice "%.2f" (float (index . 1))) }}{{ else }}–{{ end }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
       </table>
       </div>

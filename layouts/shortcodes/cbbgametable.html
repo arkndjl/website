@@ -9,7 +9,7 @@
     <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
     <th title="model total">Total</th>
-    <th>Final</th><th>Day</th><th>Conf</th>
+    <th>Final</th><th>Day</th><th title="conference">Conf</th>
   </tr></thead>
   <tbody>
   {{- $pc := partialCached "gqpct.html" "cbb" "cbb" }}{{ $gs := slice }}{{ range .games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home.id)) "b" (index $pc (string .away.id)) "p" .pHome))) }}{{ end }}

@@ -6,7 +6,7 @@
 {{- with .udfa -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "UDFA signings") "filter" "Team,Pos" "tab" ($.Get "tab") "gfxCols" "#,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time $asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table cfbu">
-  <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Pos</th><th>School</th><th>FV</th><th>Class</th>
+  <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Pos</th><th>School</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>Class</th>
     <th title="expected pick (predictive mock); past the last pick = projected undrafted">xPick</th><th title="industry consensus board rank; – = unranked">Cons</th><th title="the team's need at his room after the draft (1 = empty room), and what it drafted there">Why</th></tr></thead>
   <tbody>
   {{- range . }}

@@ -33,7 +33,7 @@
 {{- with $board }}
 {{- partial "wintable-open.html" (dict "title" "the board :: closest misses" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Bet</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="model minus the line, points">Edge</th><th title="the market's cut X">Cut</th><th>Why not</th></tr></thead>
+  <thead><tr><th>Bet</th><th>Sport</th><th title="bet market: spread, total or moneyline">Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="model minus the line, points">Edge</th><th title="the market's cut X">Cut</th><th>Why not</th></tr></thead>
   <tbody>
   {{- range sort . "edge" "desc" }}{{ $k := time.In "America/New_York" (time .kick) }}
   <tr data-day="{{ $k.Format "2006-01-02" }}">

@@ -9,7 +9,7 @@
 {{- $rows = sort $rows "surplus" "desc" }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coach pay") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Value,Pay,Surplus" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbp">
-  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th title="conference">Conf</th>
     <th title="Value = predicted pay for this profile; ridge on log pay, inputs kept by leave-one-out gain">Value</th><th title="USA Today: head coaches 2025, assistants 2024">Pay</th>
     <th title="Surplus = Value - Pay; > 0 = paid below Value">Surplus</th>
     <th title="staff board Score, 100 = role average; not a Value input (no leave-one-out gain)">Score</th>

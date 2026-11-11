@@ -65,7 +65,7 @@
 {{- else -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_conversions.exe") "icon" "basketball" "filter" "FV" "gfxCols" "FV,XPM range,Peak XPM,Typical NBA role,Peak BPM,Peak DPM,Per board" "gfxMax" "12" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table>
-  <thead><tr><th>FV</th><th title="peak XPM where the band starts (to where the next one starts); the FV runs linear in XPM inside it">XPM range</th><th title="median peak XPM of the careers in the band">Peak XPM</th><th title="the most common NBA role among the careers in the band, and its share">Typical NBA role</th><th>Peak BPM</th><th title="databallr DPM, best three seasons, same shrink; in parentheses the DPM band the 2026 board used, before it was measured">Peak DPM</th><th>Per board</th><th>Draft value</th></tr></thead>
+  <thead><tr><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th title="peak XPM where the band starts (to where the next one starts); the FV runs linear in XPM inside it">XPM range</th><th title="median peak XPM of the careers in the band">Peak XPM</th><th title="the most common NBA role among the careers in the band, and its share">Typical NBA role</th><th>Peak BPM</th><th title="databallr DPM, best three seasons, same shrink; in parentheses the DPM band the 2026 board used, before it was measured">Peak DPM</th><th>Per board</th><th>Draft value</th></tr></thead>
   <tbody>
   {{- range .fvTable }}
     <tr><td><span class="fv-chip" data-fv="{{ .fv }}">{{ .fv }}</span></td>

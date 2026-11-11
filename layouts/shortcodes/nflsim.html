@@ -7,14 +7,14 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xW,Playoff,Div%,1 seed,Conf,SB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th>Team</th><th>Rec</th>
+    <th>Team</th><th title="record (won-lost)">Rec</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(playoffs)">Playoff</th>
     <th title="P(division title)">Div%</th>
     <th title="P(1 seed, bye)">1 seed</th>
     <th title="P(conference title)">Conf</th>
     <th title="P(Super Bowl win)">SB</th>
-    <th>Div</th>
+    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range sort .power "sb" "desc" }}

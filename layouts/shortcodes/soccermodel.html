@@ -26,7 +26,7 @@
       <tbody>{{ range $lg, $v := $f.euro }}<tr><td>{{ index $nm $lg }}</td><td class="cfb__num">{{ with $v.tune }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $v.tune }}{{ .model }} <span class="cfb__dim">/ {{ .base }}</span>{{ end }}</td><td class="cfb__num">{{ with $v.hold }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $v.hold }}{{ .model }} <span class="cfb__dim">/ {{ .base }}</span>{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Inputs and settings</th><th>Kept</th><th title="log loss on the tuning seasons, big five + UEFA cups">Tuning</th><th title="log loss, held-out seasons">Held out</th><th></th></tr></thead>
+      <thead><tr><th>Inputs and settings</th><th title="kept in the model after the held-out test">Kept</th><th title="log loss on the tuning seasons, big five + UEFA cups">Tuning</th><th title="log loss, held-out seasons">Held out</th><th></th></tr></thead>
       <tbody>{{ range $f.tests }}<tr><td>{{ .name }}</td><td>{{ if .kept }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td><td class="cfb__num">{{ .tune }}</td><td class="cfb__num">{{ .hold }}</td><td class="cfb__dim">{{ .note }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- with $f.calibration }}

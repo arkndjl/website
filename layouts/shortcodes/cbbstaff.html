@@ -6,7 +6,7 @@
 {{- with site.Data.cbb_market -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Coach,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbst">
-  <thead><tr><th>RK</th><th>Coach</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Coach</th><th>Team</th><th title="conference">Conf</th>
     <th title="Score = 100 + 10 z; raw = .8 (.4 rating z + .4 Over z + .2 Dev z) + .2 zNIL z">Score</th>
     <th title="ARK rating (rank)">Rating</th>
     <th title="Over = net rating over the preseason projection a season, his career since 2015, shrunk (sum / (seasons + 2))">Over</th>

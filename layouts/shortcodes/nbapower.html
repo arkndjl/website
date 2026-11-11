@@ -13,7 +13,7 @@
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="today's injury report (the league's for teams playing today, else ESPN's list): the lineup's points lost, each player at his chance to play x XPM x minutes; negative = players back or cleared">Inj</th>
     <th title="rating with nobody on the injury report">Full</th>
-    <th>Rec</th>
+    <th title="record (won-lost)">Rec</th>
     <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
     <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
     <th title="possessions a game, expected against an average opponent">Pace</th>
@@ -23,7 +23,7 @@
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(playoffs, through the play-in), simulated seasons">Playoff</th>
     <th title="P(NBA title)">Title</th>
-    <th>Conf</th>
+    <th title="conference">Conf</th>
   </tr></thead>
   <tbody>
   {{- range $i, $_ := .power }}

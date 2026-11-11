@@ -75,11 +75,11 @@
       sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
       sel.value = seen[want] ? want : '';
     }
-    var C = [{ k: 'rk', l: 'RK', num: 1, cls: '' }, { k: 'n', l: 'Player', cls: '' }, { k: 'pos', l: 'Pos', cls: 'cfb__g nbaxpm__ph' },
+    var C = [{ k: 'rk', l: 'RK', num: 1, cls: '', t: 'rank by P50' }, { k: 'n', l: 'Player', cls: '' }, { k: 'pos', l: 'Pos', cls: 'cfb__g nbaxpm__ph', t: 'position group the model projects' },
              { k: 'age', l: 'Age', num: 1, cls: 'nbaxpm__ph', t: 'age this season' },
              { k: 'g', l: 'G', num: 1, cls: 'nbaxpm__ph', t: 'games played' }, { k: 'td', l: 'To date', num: 1, cls: 'nbaxpm__ph', t: 'season to date' },
              { k: 'p20', l: 'P20', num: 1, cls: '', t: '20th percentile: 1 in 5 outcomes fall below' },
-             { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median' },
+             { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median: half of outcomes fall below' },
              { k: 'p80', l: 'P80', num: 1, cls: '', t: '80th percentile: 1 in 5 outcomes land above' }];
     var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: 'nbaxpm__ph', x: 1, t: '1Y: projected XPM next season when he plays, minutes-weighted. Time off the board is not counted' },
               { k: 'x3', l: '3Y XPM', num: 1, cls: '', x: 1, t: '3Y: projected XPM over the next three seasons when he plays, minutes-weighted. Time off the board is not counted' }];
@@ -117,8 +117,11 @@
       } else if (dir < 0) list = list.slice().reverse();
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var CC = SP === 'nba' && D.players.some(function (r) { return r.x3 != null; }) ? C.concat(XC) : C;
+      // the percentile columns name the stat and the span they are for
+      var pq = { p20: 1, p50: 1, p80: 1 }, pOf = T().l + (T().g ? ' a game' : '') + ', ' + (span === 'ssn' ? 'full season (to date + rest of season)' : 'rest of season');
       head.innerHTML = CC.map(function (c) {
-        return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
+        var tt = c.t ? (pq[c.k] ? c.t + ': ' + pOf : c.k === 'td' ? c.t + ': ' + T().l : c.t) : '';
+        return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (tt ? ' title="' + esc(tt) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
       }).join('');
       var gfxRow = function (r) {
         return '<tr>' + CC.map(function (c) {

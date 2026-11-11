@@ -12,7 +12,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Talent,Elo,TvE,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbt">
   <thead><tr>
-    <th>RK</th><th>Team</th><th>Conf</th>
+    <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="Talent = sum over projected starting 22 (best FV per spot) of expected college WAR a season at FV">Talent</th><th title="Talent split: offense / defense, college WAR">Off / Def</th>
     <th title="WAR = sum of starters' college WAR this season (Stat+ x snap share x position value) vs replacement starters, wins per 12 games; 4.4 points of margin a game = 1 win">WAR</th>
     <th title="count of players FV >= 60 / FV >= 50">60+ / 50+</th>

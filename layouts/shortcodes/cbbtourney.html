@@ -10,7 +10,7 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "tournament odds") $d.tourney.sims) "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Conf,Bid,Seed,S16,F4,Champ" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick">
   <thead><tr>
-    <th>Team</th><th>Conf</th>
+    <th>Team</th><th title="conference">Conf</th>
     <th title="P(in the field of 68): automatic bid or at-large">Bid</th>
     <th title="expected seed line when in the field">Seed</th>
     <th title="P(reach the Sweet 16)">S16</th>

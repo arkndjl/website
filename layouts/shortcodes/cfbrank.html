@@ -53,7 +53,7 @@
   {{- $rows := slice }}{{ range .teams }}{{ $rows = $rows | append (merge . (dict "sim" (index $sim .tid))) }}{{ end }}
   <table class="cfb__table cfbr__t" data-td-kind="cfb" data-td-src="/data/teams/cfb.json" data-td-rows="{{ (resources.FromString "data/cfb-power-rows.json" (jsonify $rows)).RelPermalink }}">
     <thead><tr>
-      <th title="ARK Ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
+      <th title="ARK Ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th title="conference">Conf</th><th>Record</th>
       <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Inj columns">Score</th>
       {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
       <th title="Elo (results and margins, from a preseason prior), points">Elo</th>
@@ -118,7 +118,7 @@
       {{- with $ev.staff }}
       <p class="cfbm__h" title="staff score regressed on model misses, {{ $ev.testSeason }}; enters at t ≥ 2 and positive sign, current Elo and talent held fixed">Staff</p>
       <table class="cfb__table cfbm__t">
-        <thead><tr><th></th><th title="points of margin per SD of score difference, on model misses, nothing held fixed">Naive pts per SD</th><th>t</th><th title="same, current Elo and roster talent held fixed">Pts per SD, Elo and talent fixed</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
+        <thead><tr><th></th><th title="points of margin per SD of score difference, on model misses, nothing held fixed">Naive pts per SD</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th><th title="same, current Elo and roster talent held fixed">Pts per SD, Elo and talent fixed</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th><th>Games</th><th>In the ranking</th></tr></thead>
         <tbody>
         {{- range . }}
         <tr><td>{{ .name }}</td><td class="cfb__num">{{ with .naive }}{{ if gt .ptsPerSd 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.2f" .ptsPerSd) }}{{ end }}</td><td class="cfb__num">{{ with .naive }}{{ partial "num.html" (slice "%.1f" .t) }}{{ end }}</td>

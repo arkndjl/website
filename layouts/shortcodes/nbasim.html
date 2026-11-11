@@ -8,14 +8,14 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xW,Top 6,Play-in,Playoff,Conf title,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
 <table class="cfb__table tstick">
   <thead><tr>
-    <th>Team</th><th>Rec</th>
+    <th>Team</th><th title="record (won-lost)">Rec</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(top 6 seed: straight into the playoffs)">Top 6</th>
     <th title="P(7-10 seed: the play-in)">Play-in</th>
     <th title="P(playoffs, through the play-in)">Playoff</th>
     <th title="P(conference title)">Conf title</th>
     <th title="P(NBA title)">Title</th>
-    <th>Conf</th>
+    <th title="conference">Conf</th>
   </tr></thead>
   <tbody>
   {{- range sort .power "title" "desc" }}

@@ -8,7 +8,7 @@
 {{- with site.Data.cfb_teams -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbst">
-  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="Score = 100 + 10 z within role. HC raw = .8 (.5 Elo z + .5 TvE) + .2 zNIL z; OC/DC raw = .5 Over z + .3 Dev z (n >= 3) + .2 zNIL z">Score</th>
+  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th title="conference">Conf</th><th title="Score = 100 + 10 z within role. HC raw = .8 (.5 Elo z + .5 TvE) + .2 zNIL z; OC/DC raw = .5 Over z + .3 Dev z (n >= 3) + .2 zNIL z">Score</th>
     <th title="Value = predicted pay for this profile (program, results); ridge on log pay, USA Today salaries. ▸: pay, surplus">Value</th>
     <th title="Leave% = P(not in this job next season). HC: out + hired away; multinomial logit, 2010-25 school-seasons · OC/DC: follows HC + head job + leaves; rates from 2010-24 staffs">Leave%</th>
     <th title="HC: Elo (rank) · OC/DC: Over = starters' production z - talent z, snap-weighted">Results / Over</th>

@@ -20,7 +20,7 @@
       </tbody>
     </table></div>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Input</th><th>Kept</th><th title="paired t on the tuning seasons, log loss with the input against without (positive = it helps; enters at 1.5)">t tune</th><th title="paired t on 2023-24 to 2025-26, held out (kept unless below -1)">t held</th><th title="log loss saved per 1,000 games, held out">held /1k</th><th>Seasons</th></tr></thead>
+      <thead><tr><th>Input</th><th title="kept in the model after the held-out test">Kept</th><th title="paired t on the tuning seasons, log loss with the input against without (positive = it helps; enters at 1.5)">t tune</th><th title="paired t on 2023-24 to 2025-26, held out (kept unless below -1)">t held</th><th title="log loss saved per 1,000 games, held out">held /1k</th><th>Seasons</th></tr></thead>
       <tbody>
       {{- range $k, $e := $f.evidence }}
       <tr><td>{{ index $names $k | default $k }}</td><td>{{ if in $f.feats $k }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" $e.tTune) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" $e.tHeld) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" $e.dHeld) }}</td><td class="cfb__dim">{{ $e.split }}</td></tr>

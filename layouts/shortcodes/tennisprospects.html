@@ -88,7 +88,7 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tennis"/></svg>{{ $.Get "title" | default (printf "%s :: fv model" $tl) }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>FV</th><th>How rare</th><th title="the year-end ranking a peak at the cut matches">Peak like</th></tr></thead>
+      <thead><tr><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>How rare</th><th title="the year-end ranking a peak at the cut matches">Peak like</th></tr></thead>
       <tbody>
       {{- $per := dict "80" "one in eight birth years" "75" "one in four birth years" "70" "one in two birth years" "65" "the best of a birth year" "60" "top 2 of a birth year" "55" "top 4" "50" "top 7" "45" "top 10" "40" "top 13 (a top-100 regular)" }}
       {{- range $tf.cuts }}{{ $k := string (index . 0) }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td>{{ index $per $k }}</td><td class="cfb__num">No. {{ index $cr $k }}</td></tr>{{ end }}
@@ -97,7 +97,7 @@
       </tbody>
     </table></div>
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>Input</th><th>Kept</th><th title="logistic coefficient: chance of any peak value">Any</th><th title="OLS coefficient, outcome FV given some value">FV</th><th title="mean squared error cut, birth year out">Gain</th><th>t</th><th>Wins</th></tr></thead>
+      <thead><tr><th>Input</th><th title="kept in the model after the held-out test">Kept</th><th title="logistic coefficient: chance of any peak value">Any</th><th title="OLS coefficient, outcome FV given some value">FV</th><th title="mean squared error cut, birth year out">Gain</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th><th>Wins</th></tr></thead>
       <tbody>
       {{- range $k := $tf.kept }}{{ $e := index $tf.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>{{ if in (slice "age" "lr" "unr") $k }}base{{ else }}yes{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float (index $s.coefL $k))) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float (index $s.coefO $k))) }}</td><td class="cfb__num">{{ with $e }}{{ partial "num.html" (slice "%.2f" (float .gain)) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ else }}-{{ end }}</td></tr>{{ end }}
       {{- range $k, $e := $tf.ev }}{{ if not (in $tf.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}{{ if $e.leak }} (hindsight leak){{ end }}</td><td>{{ if $e.leak }}leak{{ else if in $tf.failfwd $k }}fails forward{{ else }}no{{ end }}</td><td>-</td><td>-</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" (float $e.gain)) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}

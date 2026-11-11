@@ -8,7 +8,7 @@
 {{- $t := .tests -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coaching jobs") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Head coach,Open,Out,Hired away" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbj">
-  <thead><tr><th>RK</th><th>Team</th><th>Conf</th><th>Head coach</th>
+  <thead><tr><th>RK</th><th>Team</th><th title="conference">Conf</th><th>Head coach</th>
     <th title="Open = P(job opens after season) = Out + Hired away">Open</th>
     <th title="Out = fired, retired or to the NBA">Out</th><th title="Hired away = hired by another D-I program">Hired away</th>
     <th title="projected win% (season simulation) · vs the program's 5-year norm">Win% · vs norm</th>

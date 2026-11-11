@@ -12,7 +12,7 @@
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="this week's injury reports: non-QBs at their chance to miss x WAR a game, points (a QB out shows in the QB column)">Inj</th>
     <th title="rating with nobody on the injury report">Full</th>
-    <th>Rec</th>
+    <th title="record (won-lost)">Rec</th>
     <th title="offense EPA/play vs average, opponent-adjusted, weighted to recent games">Off EPA</th>
     <th title="defense EPA/play allowed vs average, opponent-adjusted; negative = fewer allowed">Def EPA</th>
     <th title="Elo (1505 average)">Elo</th>
@@ -21,7 +21,7 @@
     <th title="display only, not part of the rating: the team's players' rest-of-season WAR, median projection (projections tab), summed">Proj</th>
     <th title="xW = mean wins, 10,000 simulated seasons">xW</th>
     <th title="P(playoffs), simulated seasons">Playoff</th>
-    <th>Div</th>
+    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range $i, $_ := .power }}
