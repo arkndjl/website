@@ -336,7 +336,7 @@ def main():
                     {'s': LAST, 'l': label(LAST), 'rows': last_rows, 'mdef': 400}]})
 
     # ---- WAR leaders
-    wcols = [col('war', 'WAR', f"wins over a replacement player: (BPM + {-REPL:.0f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); replacement = the 9th man's BPM", 's2'),
+    wcols = [col('war', 'WAR', f"wins over a replacement player: (BPM + {-REPL:.0f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); replacement = the 9th man's BPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
              col('waa', 'WAA', 'wins over an average D-I player: BPM x the same minutes and pace', 's2'),
              col('bpm', 'BPM', 'Barttorvik box plus-minus', 's1'), col('splus', 'Stat+', 'BPM against his position, 100 + 25 z', '0'),
              col('nx', 'Next', "next season's WAR at 31 games, if he plays D-I: from this line (to date: by share of games played), the 3-year BPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
