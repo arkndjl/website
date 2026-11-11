@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11T18:51Z",
+ "asof": "2026-11-11T18:53Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,19 +274,19 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 4,
-     "rows": 2126
+     "flags": 5,
+     "rows": 2127
     },
     "static/data/nfl-fantasy.json": {
      "flags": 16,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 73,
+     "flags": 71,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 72,
+     "flags": 70,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 53,
+     "flags": 48,
      "rows": 1650
     }
    },
@@ -372,6 +372,24 @@
      "site": "KC"
     },
     {
+     "d": "2026-08-31",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Waived by Tennessee",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-31",
+      "head": "Waived by Tennessee",
+      "kind": "waived"
+     },
+     "pid": "16837",
+     "player": "Mohamoud Diabate",
+     "pos": "SLB",
+     "rotowire": "FA",
+     "site": "TEN"
+    },
+    {
      "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -441,20 +459,6 @@
      "player": "Chris Moore",
      "pos": "WR",
      "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Moved to Atlanta",
-     "kind": null,
-     "move": null,
-     "pid": "16773",
-     "player": "Andrew Vorhees",
-     "pos": "OL",
-     "rotowire": "ATL",
      "site": "BAL"
     },
     {
@@ -1559,24 +1563,6 @@
      "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Returns to Rams to help depleted WR corps",
-     "kind": "move",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Returns to Rams to help depleted WR corps",
-      "kind": "move"
-     },
-     "pid": "17467",
-     "player": "Xavier Smith",
-     "pos": "WR",
-     "rotowire": "LAR",
-     "site": "SF"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
      "flag": "released",
      "head": "Cut loose by Bolts",
      "kind": "waived",
@@ -1682,20 +1668,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Moved to Atlanta",
-     "kind": null,
-     "move": null,
-     "pid": "16773",
-     "player": "Andrew Vorhees",
-     "pos": "OL",
-     "rotowire": "ATL",
-     "site": "BAL"
-    },
-    {
      "d": "2026-10-26",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -1750,24 +1722,6 @@
      "site": "MIA"
     },
     {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Returns to Rams to help depleted WR corps",
-     "kind": "move",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Returns to Rams to help depleted WR corps",
-      "kind": "move"
-     },
-     "pid": "17467",
-     "player": "Xavier Smith",
-     "pos": "WR",
-     "rotowire": "LAR",
-     "site": "SF"
-    },
-    {
      "d": "2026-10-26",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -1820,24 +1774,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "NYJ"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Cut from Browns' practice squad",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Cut from Browns' practice squad",
-      "kind": "waived"
-     },
-     "pid": "16170",
-     "player": "John FitzPatrick",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "GB"
     },
     {
      "d": "2026-09-22",
@@ -2038,24 +1974,6 @@
      "site": "CLE"
     },
     {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Cut from Saints' practice squad",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Cut from Saints' practice squad",
-      "kind": "waived"
-     },
-     "pid": "16321",
-     "player": "Stone Smartt",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "NYJ"
-    },
-    {
      "d": "2026-09-01",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2182,6 +2100,24 @@
      "site": "HOU"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Joins Dallas practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Joins Dallas practice squad",
+      "kind": "practice"
+     },
+     "pid": "16898",
+     "player": "Kendre Miller",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "NO"
+    },
+    {
      "d": "2026-10-28",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2218,6 +2154,24 @@
      "site": "LAC"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Signs to practice squad",
+      "kind": "practice"
+     },
+     "pid": "16530",
+     "player": "Zaire Mitchell-Paden",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "BAL"
+    },
+    {
      "d": "2026-10-12",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2252,24 +2206,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "NE"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Cut by Bucs",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Cut by Bucs",
-      "kind": "waived"
-     },
-     "pid": "13634",
-     "player": "David Sills V",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "TB"
     },
     {
      "d": "2026-10-28",
@@ -2524,42 +2460,6 @@
      "site": "BUF"
     },
     {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Let go by Ravens",
-     "kind": null,
-     "move": {
-      "d": "2026-10-07",
-      "head": "Signed to Baltimore's 53-man roster",
-      "kind": "sign"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Let go by Carolina",
-     "kind": null,
-     "move": {
-      "d": "2026-09-30",
-      "head": "Inked to active roster",
-      "kind": "up"
-     },
-     "pid": "12216",
-     "player": "David Moore",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "CAR"
-    },
-    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2701,20 +2601,6 @@
      "player": "Chris Moore",
      "pos": "WR",
      "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "Moved to Atlanta",
-     "kind": null,
-     "move": null,
-     "pid": "16773",
-     "player": "Andrew Vorhees",
-     "pos": "OL",
-     "rotowire": "ATL",
      "site": "BAL"
     },
     {
@@ -3814,24 +3700,6 @@
      "pos": "S",
      "rotowire": "FA",
      "site": "ARI"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "Returns to Rams to help depleted WR corps",
-     "kind": "move",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Returns to Rams to help depleted WR corps",
-      "kind": "move"
-     },
-     "pid": "17467",
-     "player": "Xavier Smith",
-     "pos": "WR",
-     "rotowire": "LAR",
-     "site": "SF"
     },
     {
      "d": "2026-11-10",
@@ -4214,7 +4082,7 @@
    ],
    "joined": 0,
    "players": 2245,
-   "rows": 8000
+   "rows": 8001
   },
   "nhl": {
    "by_file": {
