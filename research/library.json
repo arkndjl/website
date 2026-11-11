@@ -243,8 +243,8 @@
       "ATP kept: age, rank, unranked, Elo, 52-week win rate, years since pro debut, Futures volume.",
       "WTA kept: age, rank, unranked, Elo, rank x age, tour-qualifying volume. Held out by birth year; OOS R2 .50 / .46.",
       "Height is never an input (the archive fills height for players who made it: a leak).",
-      "ATP grade = mean of the hurdle grade and a gradient-boosted grade (300 trees of depth 3, same rows, no serve",
-      "stats or handedness): as-of 2011-18 error 20.24 -> 19.86, t 2.7, 7 of 8 seasons. WTA trees failed forward."
+      "ATP fit also trains on unfinished careers (later births at imputed targets): as-of 2011-18 error 21.45 -> 20.24, t 7.8, 8 of 8.",
+      "ATP tree blend (mean with a boosted-tree grade): as-of 20.24 -> 19.86, t 2.7, 7 of 8, p .015; a second form after the first failed, so it counts in the sweep's Holm family of 15 and misses (needs p <= .005): not used. WTA trees failed forward."
      ],
      "where": "Tennis prospects ATP and WTA boards, fv model tab",
      "sports": [
