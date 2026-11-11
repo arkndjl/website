@@ -580,7 +580,7 @@ def main():
         print('no games yet: the preseason board, regraded'); return
     # the in-season summary sits in its own file: data/cbb.json stays fetch_cbb.py's (preseason) and isn't rewritten daily
     tiers = Counter(r['fv'] for r in recs)
-    json.dump({'asof': time.strftime('%Y-%m-%d'), 'through': f'{last[:4]}-{last[4:6]}-{last[6:]}' if last else None, 'played': played,
+    json.dump({'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'through': f'{last[:4]}-{last[4:6]}-{last[6:]}' if last else None, 'played': played,
                'population': len(recs), 'tiers': {str(k): v for k, v in sorted(tiers.items(), reverse=True)},
                'top': [[o[ci['name']], o[ci['team']], o[ci['fv']]] for o in out[:30]], 'k': lf['k'], 'kb': {g: v['k'] for g, v in lf['kb'].items()},
                'now': lf['now'], 'byDate': lf['byDate'], 'careers': lf['careers'], 'seasons': lf['seasons']},

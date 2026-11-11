@@ -1,6 +1,7 @@
 {{- /* NBA game table: the next two slates (data/nba_games.json) as one sortable table: model line (the market line
        and the difference are on Predictions), win probability, projected score and total, final. */ -}}
 {{- with site.Data.nba_games -}}
+{{- $hasFinal := false }}{{ range .games }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
 {{- $d := . -}}
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hoop" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
@@ -11,7 +12,7 @@
     <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
     <th title="model total">Total</th>
-    <th>Final</th><th>Day</th>
+    {{ if $hasFinal }}<th>Final</th>{{ end }}<th>Day</th>
   </tr></thead>
   <tbody>
   {{- $pc := partialCached "gqpct.html" "nba" "nba" }}{{ $gs := slice }}{{ range .games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home)) "b" (index $pc (string .away)) "p" .pHome))) }}{{ end }}
@@ -25,7 +26,9 @@
     <td class="cfb__num" data-v="{{ $fp }}">{{ partial "num.html" (slice "%.0f" (float (mul $fp 100))) }}% <span class="cfb__dim">{{ $fav }}</span></td>
     <td class="cfb__num">{{ partial "num.html" (slice "%.0f" (float .as)) }}-{{ partial "num.html" (slice "%.0f" (float .hs)) }}</td>
     <td class="cfb__num" data-v="{{ .total }}">{{ .total }}</td>
+    {{- if $hasFinal }}
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
     <td>{{ (time .day).Format "Mon" }}</td>
   </tr>
   {{- end }}{{ end }}

@@ -1293,7 +1293,7 @@ def build():
     season = today.year
     born = pd.Timestamp(season - AGE_CUT, 7, 2)
     snap = snap_for(today)
-    out = {'asof': today.strftime('%Y-%m-%d'), 'season': season, 'snap': snap, 'born': born.strftime('%Y-%m-%d')}
+    out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': season, 'snap': snap, 'born': born.strftime('%Y-%m-%d')}
     for tour in TOURS:
         z, tf = Z[tour], fit_[tour]
         pre = tour[0]

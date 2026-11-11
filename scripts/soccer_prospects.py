@@ -1425,7 +1425,7 @@ def build():
                 rows[-1]['path'] = r.path
     past = json.load(gzip.open(PAST, 'rt'))
     FS.restate_obj(past, 'soccer', keep=True)   # fvx the grade, fv on the stretched top
-    out = {'asof': dt.date.today().isoformat(), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
+    out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
            'snap': key, 'pool': len(rows), 'rawMean': round(rawmean, 2), 'mvLevel': [round(lvl, 3), fitj['mvRef'][key]], 'board': rows[:2000], 'past': past[:400],
            'fit': {k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',
                                         'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues') if k in fitj},

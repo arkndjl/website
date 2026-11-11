@@ -784,7 +784,7 @@ def grade_live(fit, L):
     if os.path.exists(OUT) and DAILY and json.load(open(OUT)).get('rows') == json.loads(json.dumps(rows)):
         print('no new lines: the internationals are unchanged'); return
     json.dump({'cols': cols, 'rows': rows, 'overseas': fit.get('overseas', {}), 'asof': time.strftime('%Y-%m-%d')}, open(OUT, 'w'), separators=(',', ':'))
-    json.dump({'asof': time.strftime('%Y-%m-%d'), 'train': fit['train'], 'rows': fit['rows'], 'nba': fit['nba'], 'k': fit['k'],
+    json.dump({'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'train': fit['train'], 'rows': fit['rows'], 'nba': fit['nba'], 'k': fit['k'],
                'leagues': {fit['leagues'][lg]: {'gmsc': v, 'se': fit['factors']['gmsc']['_se'][lg]} for lg, v in fit['factors']['gmsc'].items() if not lg.startswith('_')},
                'growth': fit['factors']['gmsc']['_growth'], 'beta': fit['beta'], 'pairs': fit['factors']['gmsc']['_n'], 'ladder': [dict(v, name=k) for k, v in fit['ladder'].items()], 'selected': fit['selected'], 'calib': fit['calib'], 'att': fit['att'],
                'kept': [LABEL.get(k, k) for k in fit['model']['kept']], 'evidence': [dict(x, driver=LABEL.get(x['driver'], x['driver'])) for x in fit['model']['evidence']],

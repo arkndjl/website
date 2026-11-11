@@ -1,8 +1,10 @@
 {{- /* Soccer match table: the next four days (data/soccer_games.json) as one sortable table: home / draw / away
        chances, fair odds, projected score, over 2.5 and both-teams-score chances, final. */ -}}
 {{- with site.Data.soccer_games -}}
+{{- $hasFinal := false }}{{ range .games }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
 {{- $short := dict "eng.1" "EPL" "esp.1" "LIGA" "ger.1" "BUN" "ita.1" "SA" "fra.1" "L1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" "ned.1" "ERE" "por.1" "POR" "bel.1" "BEL" "tur.1" "TUR" "cze.1" "CZE" "gre.1" "GRE" "pol.1" "POL" "den.1" "DEN" "sui.1" "SUI" "nor.1" "NOR" "aut.1" "AUT" "sco.1" "SCO" "swe.1" "SWE" "usa.1" "MLS" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "match table") "icon" "soccer" "filter" "Comp,Day" "tab" ($.Get "tab") "gfxCols" "Match,Comp,Kick,Home,Draw,Away,Proj." "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "20") -}}
+{{- if not .games }}<div class="cfbm__body"><p class="cfb__dim">no matches in the next four days.</p></div>{{ else }}
 <table class="cfb__table cfbg">
   <thead><tr>
     <th>Match</th><th title="game quality, 0-100: mean of both teams' rating percentiles in their league (weight 2/3) x closeness, 1 - (P home win - P away win)², (weight 1/3). Default sort">GQ</th><th>Comp</th><th title="kickoff, Eastern">Kick</th>
@@ -11,7 +13,7 @@
     <th title="expected goals, home-away">Proj.</th>
     <th title="most likely score">Likely</th>
     <th title="P(3+ goals)">O2.5</th><th title="P(both teams score)">BTTS</th>
-    <th>Final</th><th>Day</th>
+    {{ if $hasFinal }}<th>Final</th>{{ end }}<th>Day</th>
   </tr></thead>
   <tbody>
   {{- $pc := partialCached "gqpct.html" "soccer" "soccer" }}{{ $gs := slice }}{{ range .games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .h)) "b" (index $pc (string .a)) "p" (index .p 0) "pa" (index .p 2) "d" 0.5))) }}{{ end }}
@@ -27,11 +29,14 @@
     <td class="cfb__num">{{ .top }}</td>
     <td class="cfb__num" data-v="{{ .o25 }}">{{ partial "num.html" (slice "%.0f" (mul .o25 100)) }}%</td>
     <td class="cfb__num" data-v="{{ .btts }}">{{ partial "num.html" (slice "%.0f" (mul .btts 100)) }}%</td>
+    {{- if $hasFinal }}
     <td class="cfb__num">{{ with .final }}{{ index . 0 }}-{{ index . 1 }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
     <td>{{ (time.In "America/New_York" (time .tip)).Format "Mon" }}</td>
   </tr>
   {{- end }}{{ end }}
   </tbody>
 </table>
+{{- end }}
 {{- partial "wintable-close.html" (dict "fresh" "soccer_games" "rows" (len .games)) -}}
 {{- end -}}

@@ -723,7 +723,7 @@ def main():
         for m in mocks.values(): photos.attach('cbb', m, team='school')
     except Exception as e:
         print('mock photos skipped', e)
-    out = {'asof': time.strftime('%Y-%m-%d'), 'orderAsof': order_asof, 'boards': nb, 'pool': len(pool),
+    out = {'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'orderAsof': order_asof, 'boards': nb, 'pool': len(pool),
            'staying': [{'name': (p['ours'] or {}).get('name') or p['name'], 'school': (p['ours'] or {}).get('team') or p['school'],
                         'cls': (p['ours'] or {}).get('cls'), 'cons': p['cons'] if p['nboards'] else None, 'declare': round(p['declare'], 3)}
                        for p in sorted(staying, key=lambda p: p['cons'])],
