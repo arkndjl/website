@@ -177,7 +177,9 @@ def build(now=None):
             log = json.load(open(os.path.join(ROOT, 'data', f'games_picks_{s}.json'))).get('log', [])
         except (OSError, ValueError):
             continue
-        ledger += [bet_of(s, e) for e in log if max(e.get('flagged') or '', e.get('kick') or '') >= P['registered']]
+        # paper picks (a sport on the paper switch, rule_monitor.paper_state; tennis since Nov 5 2026) are off the picks
+        # board, so they are off the book too: the book is the picks as posted
+        ledger += [bet_of(s, e) for e in log if max(e.get('flagged') or '', e.get('kick') or '') >= P['registered'] and not e.get('paper')]
     ledger.sort(key=lambda b: (b['k'], b['sport'], b['id'], b['mk']))
     bets = [b for b in ledger if not b['pass']]
     bank, peak, path = P['bankroll'], P['bankroll'], []

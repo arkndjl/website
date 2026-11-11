@@ -77,16 +77,10 @@ def rule_of(F):
 
 
 def kelly(R, ch, o, nw=1):
-    """% of bankroll before the week's budget: full Kelly on the calibrated edge x TIMING at American price o, for one of
-    nw props this week (the week's slate scale); 0 with no edge at that price"""
-    b = dec(o) - 1
-    # TIMING scales the edge over a fair coin, as the game picks do (units.adj); Nov 2 2026 audit: it scaled the return
-    # at the price, so ch .554 at -113 was staked 2.5% where the games' rule sees no edge
-    ch = .5 + R['timing'] * (ch - .5)
-    e = ch * b - (1 - ch)
-    if e <= 0:
-        return 0.0
-    return R['kelly'] * e / b * 100 / (1 + (nw - 1) * R['rho'])
+    """% of bankroll before the week's budget: the prop books' shared rule (units.prop_kelly), for one of nw props this
+    week (the week's slate scale)"""
+    import units as U
+    return U.prop_kelly(R, ch, o, nw)
 
 
 def units(R, f, scale):
@@ -381,8 +375,21 @@ def write_picks(R, bets, now, rec):
         if nw and b['k'] > now:
             e['now'] = {'mk': 'prop', 'side': e['side'], 'line': nw['L'], 'price': nw['o'], 'units': nw['u']}
         log.append(e)
+    # the paper switch (rule_monitor.paper_state, Nov 11 2026): props flagged since the switch, and every open one, are
+    # paper: graded and judged, off the picks board, the paper book's bankroll, the night cap and the alerts
+    import rule_monitor as RM
+    pst = RM.paper_state('nflprops', log)
+    if pst['paper']:
+        go = max(pst['since'], RM.PAPER_GO)
+        for e in log:
+            if e['kick'] > now or (e.get('flagged') or '') >= go:
+                e['paper'] = True
     picks = [e for e in log if e['kick'] > now or (e['kick'] > (datetime.datetime.fromisoformat(now.replace('Z', '+00:00')) - datetime.timedelta(hours=12)).strftime('%Y-%m-%dT%H:%M:%SZ'))]
-    out = {'sport': 'nflprops', 'name': 'NFL props', 'asof': now, 'rule': R, 'picks': picks, 'withdrawn': [], 'board': [],
+    paper_picks = []
+    if pst['paper']:
+        paper_picks, picks = picks, []
+    out = {'sport': 'nflprops', 'name': 'NFL props', 'asof': now, 'rule': R, 'paper': pst['paper'], 'paperState': pst,
+           'picks': picks, 'paperPicks': paper_picks, 'withdrawn': [], 'board': [],
            'record': {'n': rec['graded'], 'w': rec['w'], 'l': rec['l'], 'clvN': rec['clvN'], 'clvRet': rec['clvRet'], 'clvT': rec['clvT'],
                       'sized': {'units': rec['units'], 'risked': rec['staked'],
                                 'roi': round(rec['units'] / rec['staked'], 3) if rec['staked'] else None}},

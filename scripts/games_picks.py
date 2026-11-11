@@ -501,13 +501,21 @@ def early_scale(sport, kick, u):
     return max(0.25, round(u * f[1] * 4) / 4)
 
 
+# live realization scale (Nov 11 2026 picks audit, Noah): a normal update of the realization the stakes assume (TIMING .5,
+# sd .25) on the NBA's live picks gave .42, so NBA stakes are .85 of the fit's (quarter units, at least .25)
+REAL_SCALE = {'nba': 0.85}
+
+
 def stake_du(sport, mk, c, o, n=None, gap=None, cal=None, mkt=None):
     """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate;
     cal: a moneyline's calibrated (chances, u) from ml_cal"""
     import units as DU
     if mk == 'ml':
-        return DU.stake_cal(sport, cal[0], cal[1], o, n) if cal else 0.0
-    return DU.stake(sport, mk, c, o, n, gap=gap, mkt=mkt)      # mkt: the market's own chances at the rung (lean())
+        u = DU.stake_cal(sport, cal[0], cal[1], o, n) if cal else 0.0
+    else:
+        u = DU.stake(sport, mk, c, o, n, gap=gap, mkt=mkt)      # mkt: the market's own chances at the rung (lean())
+    f = REAL_SCALE.get(sport)
+    return u if not f or not u else max(0.25, round(u * f * 4) / 4)
 
 
 def ml_cal(sport, side, line, gap, k):
@@ -1205,6 +1213,13 @@ def live(sport):
     SEGS = [z for z in SEGS if f"{z['mk']} | {z['fam']}: {z['val']}" not in stopped]
     if stopped:
         print(f'{sport}: stopped by the live monitor:', ', '.join(sorted(stopped)))
+    # the paper switch (rule_monitor.paper_state, Nov 11 2026): a paper sport keeps flagging, logging and grading its
+    # picks (the tests and the stake calibration read them) but they leave the picks board, the paper book's bankroll,
+    # the night cap and the alerts until the picks judged since it went paper beat the close
+    pst = RM.paper_state(sport, log + wlog)
+    paper = pst['paper']
+    if paper:
+        print(f"{sport}: PAPER since {pst['since']} ({pst['why']})")
     games = board(sport)
     dk_prices(sport, games, now)
     arch = archive_rows(sport)
@@ -1304,7 +1319,7 @@ def live(sport):
                             **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}),
-                            **({'lineL': g['L']} if pick['mk'] == 'ml' else {}), 'flagged': stamp})
+                            **({'lineL': g['L']} if pick['mk'] == 'ml' else {}), 'flagged': stamp, **({'paper': True} if paper else {})})
         if not best and near:
             n = max(near, key=lambda o: o['edge'])
             gtab[str(g['id'])] = {**{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge')}, 'ev': None, 'units': 0.0,
@@ -1426,13 +1441,25 @@ def live(sport):
                     p.pop('pass', None)
             picks.append(p)
     picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
+    paper_picks = []
+    if paper:
+        paper_picks, picks = picks, []
+        for p in paper_picks:
+            p['paper'] = True
+        for e in log:
+            if e.get('res') is None and iso(e['kick']) > now:
+                e['paper'] = True                         # open picks already flagged leave the night cap and alerts too
+        for gm in gtab.values():
+            if gm.get('state') == 'pick':
+                gm['state'] = 'paper'
     live_ids = {(e['id'], fam(e['mk'])) for e in log}
     wd = [w for w in wd if (w['id'], fam(w['mk'])) not in live_ids]
     top.sort(key=lambda b: (b['x'] is None, -(b['edge'] / b['x']) if b['x'] else -b['edge']))
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
     timing = C.timing(sport, arch, mins[sport])
-    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'monitor': mon, 'picks': picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
+    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'monitor': mon, 'paper': paper, 'paperState': pst,
+           'picks': picks, 'paperPicks': paper_picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log, 'withdrawnLog': wlog}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
