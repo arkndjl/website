@@ -21,8 +21,9 @@ Splits: tune/held masks by season, walk-forward fits (each season from the seaso
 Selection and re-scoring (the project rule): a term enters on the tuning seasons; the held-out seasons give the
 verdict. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the held-out t
 alone (the tuning t is the one the term was chosen on, so it is shown, not combined), and the Benjamini-Hochberg q
-runs over every term with a held-out split at once (one family, all models), so a q of .10 means about one in ten
-terms at that level is noise.
+runs over every shipped term with a held-out split at once (one family, all models), so a q of .10 means about one
+in ten terms at that level is noise. A tested term the live model does not use (shipped: false) is a candidate,
+outside the family.
     keep   q <= .10
     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)
     watch  q > .10 but held out is worse without it (not proven, not free to remove), or no held-out split at all
@@ -366,13 +367,19 @@ def judge(rows, q_keep=Q_KEEP):
     """fills z, p, q and the verdict on every row from its held-out split alone (one BH family over the rows that have
     one). The tuning t is the statistic a term was selected on, so it is not a null draw and is not combined. A row
     with no held-out split is never keep or drop: watch (core if it is a core term), with z 0, p and q 1 (no
-    held-out evidence; it is outside the family)"""
-    fam = [r for r in rows if r['held']]
-    for r in fam:
+    held-out evidence; it is outside the family). A row marked shipped: false is a candidate the live model does not
+    use: it gets its own p and z but stays outside the family, with q 1 and the verdict candidate"""
+    cand = [r for r in rows if r.get('shipped') is False]
+    fam = [r for r in rows if r['held'] and r.get('shipped') is not False]
+    for r in fam + [r for r in cand if r['held']]:
         h = r['held']
         p = float(t_cdf(h['t'], max(1, (h.get('G') or 10 ** 6) - 1)))        # one-sided: the loss is lower with the term
         r['p'] = p
         r['z'] = round(-h['t'] if p <= 0 or p >= 1 else -z_of_p(p), 2)
+    for r in cand:
+        if not r['held']:
+            r['z'], r['p'] = 0.0, 1.0
+        r['p'], r['q'], r['verdict'] = round(r['p'], 4), 1.0, 'candidate'
     qs = bh([r['p'] for r in fam]) if fam else []
     for r, q in zip(fam, qs):
         r['q'] = round(float(q), 4)
@@ -389,7 +396,7 @@ def judge(rows, q_keep=Q_KEEP):
         else:
             r['verdict'] = 'drop'
     for r in rows:
-        if not r['held']:
+        if not r['held'] and r.get('shipped') is not False:
             r['z'], r['p'], r['q'] = 0.0, 1.0, 1.0
             r['verdict'] = 'core' if r.get('core') else 'watch'
     return rows
@@ -404,8 +411,9 @@ def write_ledger(models, path=LEDGER, today=None, pending=None):
         m.setdefault('tested', today)
         m.setdefault('revalidate', (dt.date.fromisoformat(str(m['tested'])[:10]) + dt.timedelta(days=REVALIDATE_DAYS)).isoformat())
     out = {'asof': today, 'rule': __doc__.split('Selection and re-scoring')[1].split('Core terms')[0].strip().replace('\n', ' '),
-           'qKeep': Q_KEEP, 'family': sum(1 for r in allrows if r['held']), 'noHeld': sum(1 for r in allrows if not r['held']),
-           'counts': {v: sum(r['verdict'] == v for r in allrows) for v in ('keep', 'watch', 'drop', 'core')}, 'models': models,
+           'qKeep': Q_KEEP, 'family': sum(1 for r in allrows if r['held'] and r.get('shipped') is not False),
+           'noHeld': sum(1 for r in allrows if not r['held'] and r.get('shipped') is not False),
+           'counts': {v: sum(r['verdict'] == v for r in allrows) for v in ('keep', 'watch', 'drop', 'core', 'candidate')}, 'models': models,
            'pending': pending or {}}
     with open(path, 'w') as f:
         json.dump(out, f, indent=1)
