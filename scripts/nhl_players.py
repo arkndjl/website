@@ -603,7 +603,7 @@ def build(seasons=None):
         if not rows:
             continue
         asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
-        gmax = max(r['gp'] for r in rows)
+        gmax = min(82, max(r['gp'] for r in rows))              # traded players can pass 82 (83-85 in full seasons)
         f = min(1.0, gmax / 82) if S == cur else 1.0             # only the season in progress is partial
         proj3(S, rows, repl, f, gmax if S == cur else {2013: 48, 2020: 70, 2021: 56}.get(S, 82))
         # predictive badges (scripts/nhl_badges.py; tested against next season's WAR in scripts/nhl_badge_backtest.py)
