@@ -301,7 +301,7 @@ def pre_listed(report, logs):
     prev = C.bt_logs(SEASON - 1)
     pn = defaultdict(dict)
     try:
-        for r in json.load(gzip.open(os.path.join(C.BTLOG, f'{SEASON - 1}.json.gz'))):
+        for r in C.bt_rows(SEASON - 1):
             pn[r[47]][r[51]] = r[48]
     except Exception:
         return {}
@@ -383,7 +383,7 @@ def avail_snapshot(logs):
     prev = C.bt_logs(SEASON - 1)
     pn = defaultdict(dict)
     try:
-        for r in json.load(gzip.open(os.path.join(C.BTLOG, f'{SEASON - 1}.json.gz'))):
+        for r in C.bt_rows(SEASON - 1):
             pn[r[47]][r[51]] = r[48]
     except Exception:
         pass
