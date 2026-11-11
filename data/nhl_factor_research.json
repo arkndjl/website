@@ -1,0 +1,53 @@
+{
+ "feats": [
+  "elo",
+  "xg",
+  "b2b",
+  "home",
+  "rv"
+ ],
+ "gate": "paired t <= -1.5 on tuning 2017-23 and held out 2024-26",
+ "pc1": {
+  "tune": {
+   "n": 8995,
+   "d": 9e-05,
+   "t": 0.25,
+   "sdRatioVsMarket": 1.045,
+   "sdRatioBase": 1.055
+  },
+  "held": {
+   "n": 4192,
+   "d": -0.00055,
+   "t": -1.94,
+   "sdRatioVsMarket": 1.223,
+   "sdRatioBase": 1.224
+  },
+  "seasonsBetter": [
+   6,
+   10
+  ],
+  "pass": false
+ },
+ "shrunk": {
+  "tune": {
+   "n": 8995,
+   "d": 0.00014,
+   "t": 0.37,
+   "sdRatioVsMarket": 1.041,
+   "sdRatioBase": 1.055
+  },
+  "held": {
+   "n": 4192,
+   "d": -0.0006,
+   "t": -1.84,
+   "sdRatioVsMarket": 1.221,
+   "sdRatioBase": 1.224
+  },
+  "seasonsBetter": [
+   6,
+   10
+  ],
+  "pass": false
+ },
+ "shipped": []
+}
