@@ -1294,7 +1294,7 @@
     info = info.filter(function (f) { return !new RegExp('(^|[ ·])' + f[1].replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + ' ').test(sub.join(' · ') + ' '); });   // "250 MP", "415 min" already in the line above
     // the reserve at the bottom for the dropdown (badges, strengths and concerns, FV inputs)
     var plus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-plus')).map(txt) : [], minus = d && !auto ? [].slice.call(d.querySelectorAll('.cfb__report li.is-minus')).map(txt) : [];
-    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts:not(.pd__pct) li')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
+    var parts = d ? [].slice.call(d.querySelectorAll('.cfb__parts:not(.pd__pct) li:not(.cfb__step)')).map(function (li) { return [txt(li.querySelector('.cfb__bk')), parseFloat(txt(li.querySelector('.cfb__bv')).replace(/−/g, '-'))]; }).filter(function (p) { return p[0] && isFinite(p[1]); }) : [];
     var badges = pcBadges([row, d]);
     if (!badges.length) { var med = row.querySelector('.cfb__medals'), TT = { Platinum: 'p', Gold: 'g', Silver: 's', Bronze: 'b' };
       if (med) (med.getAttribute('title') || '').split('\n').forEach(function (l) { var m = l.match(/^(Platinum|Gold|Silver|Bronze) (.+?):/); if (m) badges.push([m[2], TT[m[1]]]); }); }
