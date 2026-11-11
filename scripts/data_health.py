@@ -28,7 +28,7 @@ Alerts are GitHub issues (label data-alert), which notify the repo owner by mail
                           while describing last season.
 
 Feed limits (data/freshness.json): in season inHours (36), out of season the sport's offHours, unless feedHours names
-the feed (a weekly product gets 8 days). A date-only asof counts from the end of that day (UTC). A feed whose file is
+the feed (a weekly product gets 8 days). A feed's stamp is its checked, else asof, else updated. A date-only asof counts from the end of that day (UTC). A feed whose file is
 missing or has no asof counts as stale, so a renamed file can't hide.
 """
 import datetime as dt
@@ -70,7 +70,8 @@ def feed_asof(name):
         d = json.load(open(p))
     except (OSError, ValueError):
         return None, None
-    a = (d.get('asof') or d.get('updated')) if isinstance(d, dict) else None
+    # checked: the last run that confirmed the content (scripts/checked.py), for files rewritten only on a change
+    a = (d.get('checked') or d.get('asof') or d.get('updated')) if isinstance(d, dict) else None
     return a, parse_at(a)
 
 

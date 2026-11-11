@@ -7,7 +7,7 @@
 {{- $v := .value -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coach pay") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Coach,Team,Value,Pay,Surplus" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbp">
-  <thead><tr><th>RK</th><th>Coach</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Coach</th><th>Team</th><th title="conference">Conf</th>
     <th title="Value = predicted pay for this profile; ridge on log pay (USA Today 2015-26), kept inputs: {{ delimit $v.feats ", " }}">Value</th>
     <th title="USA Today, latest year">Pay</th>
     <th title="Surplus = Value - Pay; > 0 = paid below Value">Surplus</th>
@@ -26,7 +26,7 @@
     <td class="cfb__num is-key" data-l="Surplus" data-v="{{ .surplus }}"><b>{{ partial "znil.html" .surplus }}</b></td>
     <td class="cfb__num" data-l="Buyout" data-v="{{ .buyout }}">{{ with .buyout }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-l="Score" data-v="{{ .score }}">{{ .score }}</td>
-    <td class="cfb__num" data-l="Leave" data-v="{{ .leave }}">{{ printf "%.0f" (mul .leave 100) }}%</td>
+    <td class="cfb__num" data-l="Leave" data-v="{{ .leave }}">{{ partial "num.html" (slice "%.0f" (mul .leave 100)) }}%</td>
   </tr>
   {{- end }}
   </tbody>

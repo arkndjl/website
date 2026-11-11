@@ -81,31 +81,31 @@
     <p class="cfb__dim">{{ $d.nMaps }} maps since {{ (time $d.first).Format "Jan 2006" }} · stat-weight R² {{ $f.r2 }} · half-life {{ $f.params.h }}d · regress {{ $f.params.k }} rounds · opponent credit x{{ $f.params.opp }}{{ with $f.params.pm }} · plus-minus x{{ . }}{{ end }}{{ with $f.params.ssg }} · tier lift x{{ . }}{{ end }}{{ with site.Data.cs2.tiers }} · tier cuts Elo {{ index .cuts 0 }} / {{ index .cuts 1 }} / {{ index .cuts 2 }}{{ end }}</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Predicting later maps' round share, held out {{ index $f.held 0 }} to {{ index $f.held 1 }}</th><th>Maps</th><th title="share of the variance in round share explained (walk forward, ratings from each month's first day)">R²</th><th title="paired t on per-map squared error vs the live rating (positive = worse)">t</th></tr></thead>
-      <tbody>{{ range $f.score }}<tr><td>{{ if eq .name "ARK player rating" }}<b>{{ .name }} (live)</b>{{ else }}{{ .name }}{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.3f" (float .r2) }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" (float .) }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range $f.score }}<tr><td>{{ if eq .name "ARK player rating" }}<b>{{ .name }} (live)</b>{{ else }}{{ .name }}{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.3f" (float .r2)) }}</td><td class="cfb__num">{{ with .t }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- with $f.game }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Series model + the five's mean rating, held out</th><th>Series</th><th>Log loss</th><th>With ratings</th><th>t</th></tr></thead>
-      <tbody>{{ range $sub := slice (slice "all" "every series") (slice "top50" "both VRS top 50") }}{{ with index site.Data.cs2_players.fit.game (index $sub 0) }}<tr><td>{{ index $sub 1 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.4f" (float .ll0) }}</td><td class="cfb__num">{{ printf "%.4f" (float .ll1) }}</td><td class="cfb__num">{{ printf "%+.1f" (float .t) }}</td></tr>{{ end }}{{ end }}</tbody>
+      <thead><tr><th>Series model + the five's mean rating, held out</th><th>Series</th><th>Log loss</th><th>With ratings</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th></tr></thead>
+      <tbody>{{ range $sub := slice (slice "all" "every series") (slice "top50" "both VRS top 50") }}{{ with index site.Data.cs2_players.fit.game (index $sub 0) }}<tr><td>{{ index $sub 1 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float .ll0)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float .ll1)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .t)) }}</td></tr>{{ end }}{{ end }}</tbody>
     </table></div>
     {{- end }}
     {{- with $f.prospects }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Prospects: next year's rating, held out ({{ (index .models "rating now").n }})</th><th>Error²</th><th>vs rating now</th><th>t</th></tr></thead>
-      <tbody>{{ range $k, $v := .models }}<tr><td>{{ if eq $k site.Data.cs2_players.fit.prospects.keep }}<b>{{ $k }} (live)</b>{{ else }}{{ $k }}{{ end }}</td><td class="cfb__num">{{ printf "%.4f" (float $v.mse) }}</td><td class="cfb__num">{{ printf "%+.4f" (float $v.dmse) }}</td><td class="cfb__num">{{ printf "%+.1f" (float $v.t) }}</td></tr>{{ end }}</tbody>
+      <thead><tr><th>Prospects: next year's rating, held out ({{ (index .models "rating now").n }})</th><th>Error²</th><th>vs rating now</th><th title="t statistic (|t| 2+ is unlikely to be chance)">t</th></tr></thead>
+      <tbody>{{ range $k, $v := .models }}<tr><td>{{ if eq $k site.Data.cs2_players.fit.prospects.keep }}<b>{{ $k }} (live)</b>{{ else }}{{ $k }}{{ end }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" (float $v.mse)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.4f" (float $v.dmse)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float $v.t)) }}</td></tr>{{ end }}</tbody>
     </table></div>
-    {{- with .reach }}<p class="cfb__dim">T1% held out: log loss {{ .ll }} vs {{ .llBase }} base rate ({{ printf "%.0f" (mul .rate 100) }}% of {{ .n }})</p>{{ end }}
+    {{- with .reach }}<p class="cfb__dim">T1% held out: log loss {{ .ll }} vs {{ .llBase }} base rate ({{ partial "num.html" (slice "%.0f" (mul .rate 100)) }}% of {{ .n }})</p>{{ end }}
     {{- end }}
     {{- with site.Data.cs2_nov03_research.multiple }}{{ $m := . }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Tested Nov 3, held out</th><th title="paired t on held-out loss vs the model without the term (negative = better)">t</th><th title="Bonferroni cut for {{ $m.n }} tests: |t| over {{ $m.cut }}">Pass</th></tr></thead>
-      <tbody>{{ range $m.tests }}<tr><td>{{ index . 0 }}</td><td class="cfb__num">{{ printf "%+.1f" (float (index . 1)) }}</td><td>{{ if lt (float (index . 1)) (mul -1 $m.cut) }}<b>yes</b>{{ else }}no{{ end }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range $m.tests }}<tr><td>{{ index . 0 }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float (index . 1))) }}</td><td>{{ if lt (float (index . 1)) (mul -1 $m.cut) }}<b>yes</b>{{ else }}no{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
     {{- with $f.value }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Reported fee</th><th>Date</th><th>Age</th><th>Reported</th><th>xTV then</th></tr></thead>
-      <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ printf "%.1f" (float .) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ printf "%.2f" (div (float .usd) 1e6) }}M</td><td class="cfb__num">${{ printf "%.2f" (div (float .xtv) 1e6) }}M</td></tr>{{ end }}</tbody>
+      <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .usd) 1e6)) }}M</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .xtv) 1e6)) }}M</td></tr>{{ end }}</tbody>
     </table></div>
     <p class="cfb__dim">fee fit error x{{ .fx }} · aging fit {{ $f.aging.n }} player-years</p>
     {{- end }}

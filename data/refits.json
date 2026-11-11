@@ -118,7 +118,7 @@
     "data/nba_games_fit.json"
    ],
    "lastOk": "2026-11-02T22:35:08Z",
-   "cmd": "python3 scripts/nba_games.py --fit",
+   "cmd": "python3 scripts/nba_games.py --fit && python3 scripts/games_wf/nba_wf.py",
    "months": [
     11,
     12,
@@ -140,7 +140,7 @@
     "data/nfl_games_fit.json"
    ],
    "lastOk": "2026-11-02T22:35:04Z",
-   "cmd": "python3 scripts/nfl_games.py --fit",
+   "cmd": "python3 scripts/nfl_games.py --fit && python3 scripts/games_wf/nfl_wf.py",
    "months": [
     10,
     11,
@@ -226,7 +226,7 @@
    "sport": "soccer"
   },
   "cbb_games": {
-   "cmd": "python3 scripts/cbb_games.py --fit",
+   "cmd": "python3 scripts/cbb_games.py --fit && python3 scripts/games_wf/cbb_wf.py",
    "months": [
     12,
     1,
@@ -234,7 +234,8 @@
     3
    ],
    "every": 28,
-   "sport": "cbb"
+   "sport": "cbb",
+   "local": true
   },
   "tennis_model": {
    "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit",
@@ -269,7 +270,8 @@
     3
    ],
    "every": 28,
-   "sport": "cbb"
+   "sport": "cbb",
+   "local": true
   },
   "cbb_espn_logs": {
    "cmd": "python3 scripts/cbb_espn_logs.py --fit && python3 scripts/cbb_espn_logs.py --check",
@@ -278,7 +280,8 @@
     2
    ],
    "every": 56,
-   "sport": "cbb"
+   "sport": "cbb",
+   "local": true
   },
   "tennis_picks": {
    "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_picks.py --fit",

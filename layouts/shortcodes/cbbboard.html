@@ -66,7 +66,7 @@
         <th data-sort="fv" data-num class="cfb__g">FV</th>
         <th data-sort="wk" data-num data-cbb-wk hidden title="Δ = FV change since the last Monday post (a model change re-grades the week); hover for the FV then. new = not on the board then">Δ</th>
         <th data-sort="nbaP" data-num title="NBA% = P(he plays in the NBA): the first rung of the FV model (fit on 2009-16 preseason boards against NBA careers)">NBA%</th>
-        <th data-sort="d1P" data-num data-cbb-up hidden title="{{ with site.Data.cbb_lowdiv }}D-1% = P(on a D-I roster next season), D-II and D-III players. logit fit on {{ .train }} moves: {{ delimit .keptLabels ", " }}. held out {{ .test.cycle }}: AUC {{ printf "%.3f" .test.auc }}, log loss {{ printf "%.3f" .test.ll }} vs {{ printf "%.3f" .test.llBase }} base rate{{ else }}D-1% = P(on a D-I roster next season){{ end }}">D-1%</th>
+        <th data-sort="d1P" data-num data-cbb-up hidden title="{{ with site.Data.cbb_lowdiv }}D-1% = P(on a D-I roster next season), D-II and D-III players. logit fit on {{ .train }} moves: {{ delimit .keptLabels ", " }}. held out {{ .test.cycle }}: AUC {{ partial "num.html" (slice "%.3f" .test.auc) }}, log loss {{ partial "num.html" (slice "%.3f" .test.ll) }} vs {{ partial "num.html" (slice "%.3f" .test.llBase) }} base rate{{ else }}D-1% = P(on a D-I roster next season){{ end }}">D-1%</th>
         <th data-sort="xbpm" data-num data-cbb-now data-cbb-d1 title="xBPM = projected Barttorvik BPM this season: ridge fit on last season, recruiting, age, size (r .74 returners, .47 newcomers)">xBPM</th>
         <th data-sort="out" data-cbb-then hidden title="what became of him: NBA role reached (the realized FV) and draft slot">Outcome</th>
         <th data-sort="cls" data-num class="cfb__g">Class</th>

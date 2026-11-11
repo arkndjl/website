@@ -5,6 +5,7 @@
     python3 scripts/harness_rescore.py               # every model this script can rebuild, then the ledger
     python3 scripts/harness_rescore.py nba cbb       # some models (others keep their last rows in the ledger)
     python3 scripts/harness_rescore.py --ledger      # re-judge the saved rows only (no refits)
+    python3 scripts/harness_rescore.py --drift       # ledger terms against the live fits' inputs (exit 1 on a mismatch)
 
 Each adapter rebuilds its model's walk-forward design with the shipped settings, takes each kept term out, refits
 the walk-forward and scores both splits on the model's own loss, paired per row with cluster-robust errors.
@@ -548,7 +549,55 @@ PENDING = {'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses;
            }
 
 
+# the inputs each live fit uses, as ledger term names (models whose fit file lists them)
+def _live_nba():
+    F = jload('nba_games_fit.json')
+    return set(F['coef']) | {'total:' + k for k in F['tcoef']} | {k for k in ('rk', 'rkc') if F['params'].get(k)}
+
+
+def _live_nhl():
+    F = jload('nhl_games_fit.json')
+    return set(F['feats']) | {'total:' + k for k in F['tfeats']}
+
+
+def _live_cbb_board():
+    F = jload('cbb_fit.json')['models']
+    return {f'cbb_board:{m}:{k}' for m, v in F.items() for k in v['kept']}
+
+
+def _live_tennis():
+    P = jload('tennis_fit.json')['params']
+    return {k for k in ('A', 'B', 'C', 'G', 'CR', 'CA', 'CH', 'CN', 'CM') if P.get(k)}
+
+
+LIVE = {'nba': _live_nba, 'nhl_games': _live_nhl, 'cbb_board': _live_cbb_board, 'tennis': _live_tennis}
+
+
+def drift(path=H.LEDGER):
+    """{model: {'unscored': live inputs with no ledger row, 'notLive': keep/watch/core rows the live fit does not use,
+    'liveDrops': drop rows the live fit still uses}} for the models in LIVE"""
+    L = json.load(open(path))['models']
+    out = {}
+    for name, fn in LIVE.items():
+        rows = [r for r in L.get(name, {}).get('rows', []) if not r.get('removed') and r.get('verdict') != 'candidate']
+        live = fn()
+        out[name] = {'unscored': sorted(live - {r['term'] for r in rows}),
+                     'notLive': sorted(r['term'] for r in rows if r['verdict'] in ('keep', 'watch', 'core') and r['term'] not in live),
+                     'liveDrops': sorted(r['term'] for r in rows if r['verdict'] == 'drop' and r['term'] in live)}
+    return out
+
+
 def main(args):
+    if '--drift' in args:
+        D = drift()
+        bad = False
+        for name, d in D.items():
+            for k, v in d.items():
+                if v:
+                    print(f'{name:10s} {k:9s} {", ".join(v)}')
+            bad = bad or bool(d['unscored'] or d['notLive'])
+        print('ledger and live fits differ: rescore the models above' if bad else 'ledger terms match the live fits')
+        sys.exit(1 if bad else 0)
     os.makedirs(CACHE, exist_ok=True)
     want = [a for a in args if not a.startswith('--')] or list(ADAPTERS)
     if '--ledger' not in args:
@@ -569,7 +618,9 @@ def main(args):
             models[name]['rows'] = [r for r in models[name]['rows'] if not r.get('removed')] + models[name].pop('removed', [])
         elif os.path.exists(H.LEDGER) and name in json.load(open(H.LEDGER))['models']:
             models[name] = json.load(open(H.LEDGER))['models'][name]
-    H.write_ledger(models, pending={k: v for k, v in PENDING.items() if k not in models})
+    # re-judging the saved rows scores nothing new: the ledger keeps the date its rows were scored
+    asof = json.load(open(H.LEDGER))['asof'] if '--ledger' in args and os.path.exists(H.LEDGER) else None
+    H.write_ledger(models, today=asof, pending={k: v for k, v in PENDING.items() if k not in models})
     H.show()
 
 

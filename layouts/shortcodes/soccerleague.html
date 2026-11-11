@@ -30,19 +30,19 @@
   <tbody>
   {{- range .teams }}{{ $p := index $pr .id }}
   <tr>
-    <td class="cfb__num" data-v="{{ .pos }}">{{ printf "%.1f" (float .pos) }}</td>
+    <td class="cfb__num" data-v="{{ .pos }}">{{ partial "num.html" (slice "%.1f" (float .pos)) }}</td>
     <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
     <td class="cfb__num">{{ .gp }}</td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%+d" (int .gd) }}</td>
     <td class="cfb__num">{{ .pts }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
-    <td class="cfb__num">{{ printf "%+.0f" (float .xgd) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .xpts)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.0f" (float .xgd)) }}</td>
     {{- $vs := slice .title (cond (ne $L.split nil) .top6 .top4) }}{{ if $po }}{{ $vs = $vs | append .relpo }}{{ end }}{{ $vs = $vs | append .rel }}
     {{- range $v := $vs }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
-    <td class="cfb__num" data-v="{{ with $p }}{{ .rating }}{{ end }}">{{ with $p }}{{ printf "%+.2f" (float .rating) }} <span class="cfb__dim">#{{ .rk }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with $p }}{{ .rating }}{{ end }}">{{ with $p }}{{ partial "num.html" (slice "%+.2f" (float .rating)) }} <span class="cfb__dim">#{{ .rk }}</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

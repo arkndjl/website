@@ -41,6 +41,7 @@ D.UA = UA
 import hockey_prospects as H  # noqa: E402
 import hockey_fv_drivers as HD  # noqa: E402
 import names as NM  # noqa: E402
+import harness as HS  # noqa: E402
 
 CSSD = os.path.join(H.CACHE, 'css_full')
 CHLD = HD.CHLD
@@ -203,7 +204,7 @@ def evalc(F, y, cls, picks, base, cand):
          'dTopMse': round(c1['topMse'] - c0['topMse'], 3), 'dTopRho': round(c1['topRho'] - c0['topRho'], 4),
          'dFwdMse': round(c1['fwdMse'] - c0['fwdMse'], 3), 'dFwdTopMse': round(c1['fwdTopMse'] - c0['fwdTopMse'], 3),
          'dFwdTopRho': round(c1['fwdTopRho'] - c0['fwdTopRho'], 4)}
-    o['p1'] = round(float(0.5 * math.erfc(o['t'] / math.sqrt(2))), 4)           # one-sided, normal approx
+    o['p1'] = round(float(1 - HS.t_cdf(o['t'], o['of'] - 1)), 4)                # one-sided, Student t on the folds
     o['cv'] = bool(o['t'] >= 2 and o['wins'] >= 8)
     o['pass'] = bool(o['cv'] and o['dTopMse'] <= 0 and o['dTopRho'] >= 0 and o['dFwdMse'] <= 0
                      and o['dFwdTopMse'] <= 0 and o['dFwdTopRho'] >= 0)
@@ -352,7 +353,7 @@ def prov():
              'coef': [round(float(v), 3) for v in b[-len(cols):]],
              'top5pctNhl': [round(float(nh[top0].mean()), 3), round(float(nh[top1].mean()), 3)],
              'fwdMse': round(f1[0] - f0[0], 4), 'fwdTop5Nhl': round(f1[1] - f0[1], 3)}
-        o['p1'] = round(float(0.5 * math.erfc(o['t'] / math.sqrt(2))), 4)
+        o['p1'] = round(float(1 - HS.t_cdf(o['t'], o['of'] - 1)), 4)
         o['pass'] = bool(o['t'] >= 2 and o['wins'] >= 8 and o['top5pctNhl'][1] >= o['top5pctNhl'][0] and o['fwdMse'] <= 0
                          and o['fwdTop5Nhl'] >= 0)
         rep['cands'][nm] = o

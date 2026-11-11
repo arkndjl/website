@@ -179,12 +179,18 @@ export function record(term, tune, held, core = false, extra = {}) {
   return { term, core, tune: side(tune), held: side(held), ...extra };
 }
 // verdicts from the held-out split alone, one BH family over the rows that have one: the same rule as harness.py
-// judge(). The tuning t is what a term was selected on, so it is shown, not combined; no held-out split = watch
+// judge(). The tuning t is what a term was selected on, so it is shown, not combined; no held-out split = watch;
+// shipped: false = a candidate the live model does not use, outside the family (own p and z, q 1)
 export function judge(rows, qKeep = Q_KEEP) {
-  const fam = rows.filter((r) => r.held);
-  fam.forEach((r) => {
+  const cand = rows.filter((r) => r.shipped === false);
+  const fam = rows.filter((r) => r.held && r.shipped !== false);
+  fam.concat(cand.filter((r) => r.held)).forEach((r) => {
     r.p = tCdf(r.held.t, Math.max(1, (r.held.G || 1e6) - 1));
     r.z = r5(r.p <= 0 || r.p >= 1 ? -r.held.t : -zOfP(r.p), 2);
+  });
+  cand.forEach((r) => {
+    if (!r.held) { r.z = 0; r.p = 1; }
+    r.p = r5(r.p, 4); r.q = 1; r.verdict = 'candidate';
   });
   const q = bh(fam.map((r) => r.p));
   fam.forEach((r, i) => {
@@ -192,7 +198,7 @@ export function judge(rows, qKeep = Q_KEEP) {
     const worse = r.held.t < 0;   // the paired t's sign, not the stored d (some stored rows carry it reversed)
     r.verdict = r.q <= qKeep ? 'keep' : r.core ? 'core' : worse ? 'watch' : 'drop';
   });
-  rows.filter((r) => !r.held).forEach((r) => { r.z = 0; r.p = 1; r.q = 1; r.verdict = r.core ? 'core' : 'watch'; });
+  rows.filter((r) => !r.held && r.shipped !== false).forEach((r) => { r.z = 0; r.p = 1; r.q = 1; r.verdict = r.core ? 'core' : 'watch'; });
   return rows;
 }
 

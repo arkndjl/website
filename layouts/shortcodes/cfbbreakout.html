@@ -4,7 +4,7 @@
 {{- with site.Data.cfb_breakout -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "breakout watch") "filter" "Pos" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,FV,Before,Last 2" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table">
-  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>FV</th><th title="touches + targets a game, games before the last 2">Before</th><th title="touches + targets a game, last 2 games">Last 2</th><th title="Last 2 - Before, touches + targets a game">Jump</th><th title="by game, oldest first">By game</th></tr></thead>
+  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th title="touches + targets a game, games before the last 2">Before</th><th title="touches + targets a game, last 2 games">Last 2</th><th title="Last 2 - Before, touches + targets a game">Jump</th><th title="by game, oldest first">By game</th></tr></thead>
   <tbody>
   {{- range .players }}
   <tr>

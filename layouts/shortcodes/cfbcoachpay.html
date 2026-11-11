@@ -9,7 +9,7 @@
 {{- $rows = sort $rows "surplus" "desc" }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coach pay") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Value,Pay,Surplus" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbp">
-  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th title="conference">Conf</th>
     <th title="Value = predicted pay for this profile; ridge on log pay, inputs kept by leave-one-out gain">Value</th><th title="USA Today: head coaches 2025, assistants 2024">Pay</th>
     <th title="Surplus = Value - Pay; > 0 = paid below Value">Surplus</th>
     <th title="staff board Score, 100 = role average; not a Value input (no leave-one-out gain)">Score</th>
@@ -26,7 +26,7 @@
     <td class="cfb__num" data-l="Pay" data-v="{{ .pay }}">{{ partial "nil.html" .pay }} <span class="cfb__dim">{{ .payYr }}</span></td>
     <td class="cfb__num cfbp__surplus" data-l="Surplus" data-v="{{ .surplus }}"><b class="{{ if ge .surplus 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge .surplus 0 }}+{{ else }}-{{ end }}{{ partial "nil.html" (math.Abs .surplus) }}</b></td>
     <td class="cfb__num" data-l="Score" data-v="{{ .score }}">{{ .score }}</td>
-    <td class="cfb__num" data-l="Leave" data-v="{{ with .move }}{{ sub 1.0 (float .stay) }}{{ end }}">{{ with .move }}{{ printf "%.0f" (mul (sub 1.0 (float .stay)) 100) }}%{{ end }}</td>
+    <td class="cfb__num" data-l="Leave" data-v="{{ with .move }}{{ sub 1.0 (float .stay) }}{{ end }}">{{ with .move }}{{ partial "num.html" (slice "%.0f" (mul (sub 1.0 (float .stay)) 100)) }}%{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

@@ -21,7 +21,7 @@
     </form>
   </div>
   <div class="tb__body" data-tb-body><p class="cfb__none">loading offseason plans…<noscript> (needs JavaScript)</noscript></p></div>
-  <div class="win__status" title="Transfer% test (2025->26, fit 2022-24): AUC {{ index $fit.move.test.auc 1 }}, top decile moved {{ printf "%.0f" (mul $fit.move.test.top10_1 100) }}% vs {{ printf "%.0f" (mul (index $fit.move.test.rate 1) 100) }}% base. Landing test: actual school in the top 10 of {{ $fit.land.test.teams }} for {{ printf "%.0f" (mul $fit.land.test.top10 100) }}% of moves (median rank {{ $fit.land.test.medianRank }}). Next-season BPM = projected BPM + NIL-era change by class; minutes by rank within a team, NIL-era means; empty spots at BPM -3."><span data-tb-status>team builder</span><span class="cfb__asof" data-tb-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="Transfer% test (2025->26, fit 2022-24): AUC {{ index $fit.move.test.auc 1 }}, top decile moved {{ partial "num.html" (slice "%.0f" (mul $fit.move.test.top10_1 100)) }}% vs {{ partial "num.html" (slice "%.0f" (mul (index $fit.move.test.rate 1) 100)) }}% base. Landing test: actual school in the top 10 of {{ $fit.land.test.teams }} for {{ partial "num.html" (slice "%.0f" (mul $fit.land.test.top10 100)) }}% of moves (median rank {{ $fit.land.test.medianRank }}). Next-season BPM = projected BPM + NIL-era change by class; minutes by rank within a team, NIL-era means; empty spots at BPM -3."><span data-tb-status>team builder</span><span class="cfb__asof" data-tb-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 <script>

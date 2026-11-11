@@ -962,9 +962,11 @@ def write(sport, S, rows, targets, meta):
     print(sport, 'pctl:', len(rows), 'players;', ', '.join(f"{r['n']} {r['td'][lead]} + {r['ros'][lead]}" for r in rows[:3] if lead in r['ros']))
 
 
-def tag(r, age, rookie):
-    """filters on the page: age, rookie (1)"""
-    if age is not None:
+def tag(r, age, rookie, ax=None):
+    """filters on the page: age (to tenths when the board has it, as its own tables show), rookie (1)"""
+    if ax is not None:
+        r['age'] = round(float(ax), 1)
+    elif age is not None:
         r['age'] = age
     if rookie:
         r['r'] = 1
@@ -986,6 +988,10 @@ def nhl_prior_gp(S):
             for p in json.load(open(os.path.join(d, f)))['players']:
                 gp[p['id']].append(p['gp'])
     return gp
+
+
+# ESPN's NBA codes -> Basketball-Reference's (the XPM board's), for a player the board doesn't list yet
+NBA_TEAM = {'GS': 'GSW', 'NO': 'NOP', 'SA': 'SAS', 'NY': 'NYK', 'UTAH': 'UTA', 'WSH': 'WAS', 'PHX': 'PHO', 'BKN': 'BRK', 'CHA': 'CHO'}
 
 
 def build_nba():
@@ -1020,13 +1026,18 @@ def build_nba():
             X[p['ph']] = (prior(p['id'])[0], old.get(p['id'], 0) >= NP.VET_MP)
             cur[p['ph']]['ph'] = p['ph']
             cur[p['ph']]['ref'] = (p['id'], p.get('age'))
+            cur[p['ph']]['board'] = (p.get('n'), p.get('tm'), p.get('ax'))
     rows, targets = project('nba', S, cur, {t: 82 for t in tg}, val, X)
     seen = nba_seen(S)
     drafted = {bid for lst in json.load(open(os.path.join(HERE, 'nba_draft.json'))).values() for _, bid, _, _ in lst}
     for r in rows:
         r['ph'] = r['id']
         bid, age = cur[r['id']].get('ref', (None, None))
-        tag(r, age, bid is not None and bid not in seen and (bid in drafted or (age or 0) <= 27))
+        # the XPM board's name and team code (Basketball-Reference's), so the same player reads the same on every tab
+        bn, btm, ax = cur[r['id']].get('board', (None, None, None))
+        r['n'] = bn or r['n']
+        r['tm'] = btm or NBA_TEAM.get(r['tm'], r['tm'])
+        tag(r, age, bid is not None and bid not in seen and (bid in drafted or (age or 0) <= 27), ax)
     write('nba', S, rows, targets, {'games': max(tg.values())})
 
 
@@ -1064,13 +1075,13 @@ def build_nhl():
             val[p['id']] = (p['war'], p['toi'])
             cur[p['id']]['ph'] = p.get('ph')
     rows, targets = project('nhl', S, cur, {t: 82 for t in tg}, val)
-    age = {p['id']: p.get('age') for p in site['players']}
+    age = {p['id']: (p.get('age'), p.get('ax')) for p in site['players']}
     gp = nhl_prior_gp(S)
     for r in rows:
         if cur[r['id']].get('ph'):
             r['ph'] = cur[r['id']]['ph']
-        g, a = gp.get(r['id'], []), age.get(r['id'])
-        tag(r, a, max(g, default=0) < 25 and sum(1 for x in g if x >= 6) < 2 and (a or 0) < 26)
+        g, (a, ax) = gp.get(r['id'], []), age.get(r['id'], (None, None))
+        tag(r, a, max(g, default=0) < 25 and sum(1 for x in g if x >= 6) < 2 and (a or 0) < 26, ax)
     write('nhl', S, rows, targets, {'games': max(tg.values())})
 
 
@@ -1100,7 +1111,7 @@ def build_nfl():
             r['ph'] = q['ph']
         if q.get('t'):           # today's club (nfl_war.current_clubs: a traded player shows his new team)
             r['tm'] = q['t']
-        tag(r, q.get('age'), q.get('rook'))
+        tag(r, q.get('age'), q.get('rook'), q.get('ax'))
     write('nfl', y, rows, targets, {'week': week})
 
 

@@ -1,2 +1,2 @@
 {{- /* USD as $1.2M or $350k (Counter-Strike transfer values). */ -}}
-{{- if ge (float .) 1e6 -}}${{ printf "%.1f" (div (float .) 1e6) }}M{{- else -}}${{ printf "%.0f" (div (float .) 1e3) }}k{{- end -}}
+{{- if ge (float .) 1e6 -}}${{ partial "num.html" (slice "%.1f" (div (float .) 1e6)) }}M{{- else -}}${{ partial "num.html" (slice "%.0f" (div (float .) 1e3)) }}k{{- end -}}

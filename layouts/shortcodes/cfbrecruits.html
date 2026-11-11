@@ -58,7 +58,7 @@
     <th title="Y1 FV, 10th-90th percentile; width = out-of-sample miss">Range</th>
     <th title="xFV, years 1 · 2 · 3">Path</th><th title="expected NIL market value, year 1">xNIL</th>
     <th title="ESPN grade (90+ 5-star, 80+ 4-star, 70+ 3-star)">Grade</th><th title="247Sports composite">247</th>
-    <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Conf</th><th>Status</th>
+    <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th title="conference">Conf</th><th>Status</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .class }}
@@ -69,15 +69,15 @@
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
-    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ partial "num.html" (slice "%.0f" (index .range 0)) }}–{{ partial "num.html" (slice "%.0f" (index .range 1)) }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ partial "num.html" (slice "%.1f" $x) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
-    <td class="cfb__num" data-v="{{ .comp | default 0 }}">{{ with .comp }}{{ printf "%.4f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .comp | default 0 }}">{{ with .comp }}{{ partial "num.html" (slice "%.4f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ .rank | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
@@ -114,14 +114,14 @@
     {{- end }}
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ partial "num.html" (slice "%.0f" (index .range 0)) }}–{{ partial "num.html" (slice "%.0f" (index .range 1)) }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ partial "num.html" (slice "%.1f" $x) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .grade }}">{{ printf "%.0f" .grade }}</td>
+    <td class="cfb__num" data-v="{{ .grade }}">{{ partial "num.html" (slice "%.0f" .grade) }}</td>
     <td class="cfb__dim" data-v="{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}">{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}</td>
     {{- if $hasEsp }}
     <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ if and .rank (eq .src "espn") }}{{ .rank }}{{ else }}—{{ end }}</td>
@@ -144,7 +144,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbt">
   <thead><tr>
-    <th>RK</th><th>Team</th><th>Conf</th>
+    <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="sum over commits of (xFV - 20)">Class</th><th>Commits</th>
     <th title="sum over commits of P(on) x college WAR/season at FV if on; year 1">Class WAR</th>
     <th title="sum of commits' xNIL, year 1">Class xNIL</th>
@@ -160,16 +160,16 @@
     <td class="cfb__rk">{{ .classRk }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
-    <td class="cfb__num" data-v="{{ .classXfv }}"><b class="cfbt__big">{{ printf "%.1f" .classXfv }}</b></td>
+    <td class="cfb__num" data-v="{{ .classXfv }}"><b class="cfbt__big">{{ partial "num.html" (slice "%.1f" .classXfv) }}</b></td>
     <td class="cfb__num">{{ .classN }}</td>
-    <td class="cfb__num" data-v="{{ .classAv }}">{{ printf "%.2f" (mul .classAv $k) }}</td>
+    <td class="cfb__num" data-v="{{ .classAv }}">{{ partial "num.html" (slice "%.2f" (mul .classAv $k)) }}</td>
     <td class="cfb__num" data-v="{{ .classXnil }}">{{ with .classXnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .avBack }}">{{ printf "%.2f" (add (mul .avBack $k) $b) }}</td>
-    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ printf "%.2f" (add (mul .av27 $k) $b) }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
-    <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.2f" (mul .gain $k) }}</span></td>
-    <td class="cfb__num" data-v="{{ .av26 }}">{{ printf "%.2f" (add (mul .av26 $k) $b) }}</td>
+    <td class="cfb__num" data-v="{{ .avBack }}">{{ partial "num.html" (slice "%.2f" (add (mul .avBack $k) $b)) }}</td>
+    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ partial "num.html" (slice "%.2f" (add (mul .av27 $k) $b)) }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
+    <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ partial "num.html" (slice "%.2f" (mul .gain $k)) }}</span></td>
+    <td class="cfb__num" data-v="{{ .av26 }}">{{ partial "num.html" (slice "%.2f" (add (mul .av26 $k) $b)) }}</td>
     <td class="cfb__num">{{ .redshirtN }}</td>
-    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ partial "rpos.html" $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
+    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ partial "rpos.html" $p.pos }} {{ partial "num.html" (slice "%.1f" $p.xfv) }}</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -187,7 +187,7 @@
     <th title="xFV two seasons on; calibrated on recruits who sat two seasons ago, any school">xFV +2</th>
     <th title="P(on board) two seasons on, any school">On% +2</th>
     <th title="expected NIL market value, next season">xNIL</th>
-    <th title="recruiting class">Class</th><th title="ESPN grade, high school">Grade</th><th>Size</th><th>Conf</th><th title="high school signing program, if different">Signed with</th>
+    <th title="recruiting class">Class</th><th title="ESPN grade, high school">Grade</th><th>Size</th><th title="conference">Conf</th><th title="high school signing program, if different">Signed with</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .redshirts }}
@@ -198,12 +198,12 @@
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
-    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
-    <td class="cfb__num" data-v="{{ .xfv2 | default 0 }}">{{ with .xfv2 }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ partial "num.html" (slice "%.0f" (index .range 0)) }}–{{ partial "num.html" (slice "%.0f" (index .range 1)) }}</td>
+    <td class="cfb__num" data-v="{{ .xfv2 | default 0 }}">{{ with .xfv2 }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ .pOn2 | default 0 }}">{{ with .pOn2 }}{{ math.Round (mul . 100) }}%{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .cls }}</td>
@@ -235,9 +235,9 @@
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
     <td class="cfb__num">{{ .snaps }}</td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
-    <td class="cfb__num" data-v="{{ .rec }}">{{ printf "%.1f" .rec }}</td>
+    <td class="cfb__num" data-v="{{ .rec }}">{{ partial "num.html" (slice "%.1f" .rec) }}</td>
     <td class="cfb__num" data-v="{{ .w }}">{{ math.Round (mul .w 100) }}%</td>
-    <td class="cfb__num" data-v="{{ .next }}"><b>{{ printf "%.1f" .next }}</b></td>
+    <td class="cfb__num" data-v="{{ .next }}"><b>{{ partial "num.html" (slice "%.1f" .next) }}</b></td>
   </tr>
   {{- end }}
   </tbody>
@@ -251,9 +251,9 @@
   </div>
   <div class="winpane__body"><div class="winpane__text">
     <p><b>target</b> xFV = P(on) x FV if on + (1 - P(on)) x 20 · n = {{ lang.FormatNumber 0 $f.n }} signees, ESPN {{ index $f.classes 0 }}-{{ index $f.classes 1 }} classes · on board {{ math.Round (mul $f.onRate 100) }}%</p>
-    <p><b>held out</b> (5 folds, programs) P(on) AUC <b>{{ printf "%.3f" $t.auc }}</b> · FV if on RMSE <b>{{ printf "%.1f" $t.rmse_on }}</b> (R² {{ printf "%.2f" $t.r2_on }}) · xFV r <b>{{ printf "%.2f" $t.r }}</b> (R² {{ printf "%.2f" $t.r2 }}) · position + year r {{ printf "%.2f" $b.pos_year.r }} · grade + year r {{ printf "%.2f" $b.grade_year.r }}</p>
+    <p><b>held out</b> (5 folds, programs) P(on) AUC <b>{{ partial "num.html" (slice "%.3f" $t.auc) }}</b> · FV if on RMSE <b>{{ partial "num.html" (slice "%.1f" $t.rmse_on) }}</b> (R² {{ partial "num.html" (slice "%.2f" $t.r2_on) }}) · xFV r <b>{{ partial "num.html" (slice "%.2f" $t.r) }}</b> (R² {{ partial "num.html" (slice "%.2f" $t.r2) }}) · position + year r {{ partial "num.html" (slice "%.2f" $b.pos_year.r) }} · grade + year r {{ partial "num.html" (slice "%.2f" $b.grade_year.r) }}</p>
     <div class="wintable__scroll"><table class="cfb__table cfbrc">
-      <thead><tr><th>Tier</th><th>Recruits</th><th>On board</th><th>Predicted</th><th>FV if on</th><th>Predicted</th><th>xFV</th><th>Predicted</th></tr></thead>
+      <thead><tr><th>Tier</th><th>Recruits</th><th>On board</th><th>Predicted</th><th>FV if on</th><th>Predicted</th><th title="projected FV for a recruit, on the 20-80 scale">xFV</th><th>Predicted</th></tr></thead>
       <tbody>{{ range $f.tiers }}<tr><td>{{ .tier }}</td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ math.Round (mul .onAct 100) }}%</td><td class="cfb__num cfb__dim">{{ math.Round (mul .onPred 100) }}%</td><td class="cfb__num">{{ .fvOnAct }}</td><td class="cfb__num cfb__dim">{{ .fvOnPred }}</td><td class="cfb__num">{{ .fvAct }}</td><td class="cfb__num cfb__dim">{{ .fvPred }}</td></tr>{{ end }}</tbody>
     </table></div>
     <p><b>development curve</b> years 1 · 2 · 3, xFV (FV if on):
@@ -262,24 +262,24 @@
     <p><b>xFV vs board FV</b> board median {{ $b.p50 }} · 75th pct {{ $b.p75 }} · 90th pct {{ $b.p90 }} · year-1 FV if on: 5-star {{ (index $p5.k 0).fvOn }}, 4-star {{ (index $p4.k 0).fvOn }} · year-1 P(on), 4-star {{ math.Round (mul (index $p4.k 0).on 100) }}%</p>
     {{- end }}
     {{- with $f.stars }}{{ $st := . }}{{ $sc := $st.schemes }}{{ $pk := index $sc $st.pick }}{{ $oth := index $sc (cond (eq $st.pick "band") "share" "band") }}{{ $ind := $sc.industry }}
-    <p><b>ARK stars</b> rule {{ if eq $st.pick "band" }}band{{ else }}share{{ end }} · cuts, year-3 xFV: 2★ {{ index $st.cuts 0 }}, 3★ {{ index $st.cuts 1 }}, 4★ {{ index $st.cuts 2 }}, 5★ {{ index $st.cuts 3 }} · R² of outcome on star: <b>{{ printf "%.1f" (mul $pk.r2 100) }}%</b>, other rule {{ printf "%.1f" (mul $oth.r2 100) }}%, industry {{ printf "%.1f" (mul $ind.r2 100) }}% · rank correlation {{ printf "%.3f" $pk.rho }}, {{ printf "%.3f" $oth.rho }}, {{ printf "%.3f" $ind.rho }}
-      {{- with $st.plusSweep }}{{ $sw := . }}{{ range $sw }}{{ if eq .perClass $st.plusPer }} · <b>5-star+</b> top {{ $st.plusPer }} a class (cut {{ .cut }}): {{ math.Round (mul .elite 100) }}% reach board top 0.5%, {{ math.Round (mul .top10 100) }}% top 10%{{ end }}{{ end }} · top-0.5% rate by size: {{ range $i, $x := $sw }}{{ if $i }} · {{ end }}{{ $x.perClass }}: {{ math.Round (mul $x.elite 100) }}%{{ end }}{{ end }}{{ with $st.halfTest }} · <b>half stars</b> {{ range $i, $h := $st.half }}{{ if $i }}, {{ end }}{{ add $i 1 }}½ at {{ $h }}{{ end }}; realized FV by step {{ range $i, $l := .levels }}{{ if $i }} · {{ end }}{{ $l.fv }}{{ end }}; R² {{ printf "%.2f" (mul .r2Half 100) }}% vs {{ printf "%.2f" (mul .r2Whole 100) }}% whole stars{{ end }}</p>
+    <p><b>ARK stars</b> rule {{ if eq $st.pick "band" }}band{{ else }}share{{ end }} · cuts, year-3 xFV: 2★ {{ index $st.cuts 0 }}, 3★ {{ index $st.cuts 1 }}, 4★ {{ index $st.cuts 2 }}, 5★ {{ index $st.cuts 3 }} · R² of outcome on star: <b>{{ partial "num.html" (slice "%.1f" (mul $pk.r2 100)) }}%</b>, other rule {{ partial "num.html" (slice "%.1f" (mul $oth.r2 100)) }}%, industry {{ partial "num.html" (slice "%.1f" (mul $ind.r2 100)) }}% · rank correlation {{ partial "num.html" (slice "%.3f" $pk.rho) }}, {{ partial "num.html" (slice "%.3f" $oth.rho) }}, {{ partial "num.html" (slice "%.3f" $ind.rho) }}
+      {{- with $st.plusSweep }}{{ $sw := . }}{{ range $sw }}{{ if eq .perClass $st.plusPer }} · <b>5-star+</b> top {{ $st.plusPer }} a class (cut {{ .cut }}): {{ math.Round (mul .elite 100) }}% reach board top 0.5%, {{ math.Round (mul .top10 100) }}% top 10%{{ end }}{{ end }} · top-0.5% rate by size: {{ range $i, $x := $sw }}{{ if $i }} · {{ end }}{{ $x.perClass }}: {{ math.Round (mul $x.elite 100) }}%{{ end }}{{ end }}{{ with $st.halfTest }} · <b>half stars</b> {{ range $i, $h := $st.half }}{{ if $i }}, {{ end }}{{ add $i 1 }}½ at {{ $h }}{{ end }}; realized FV by step {{ range $i, $l := .levels }}{{ if $i }} · {{ end }}{{ $l.fv }}{{ end }}; R² {{ partial "num.html" (slice "%.2f" (mul .r2Half 100)) }}% vs {{ partial "num.html" (slice "%.2f" (mul .r2Whole 100)) }}% whole stars{{ end }}</p>
     <div class="wintable__scroll"><table class="cfb__table cfbrc">
-      <thead><tr><th>Stars</th><th title="share of recruits at this ARK star">ARK share</th><th title="on board; signees 3+ seasons in">On board</th><th title="mean FV (off board = 20); 3+ seasons in">FV</th><th title="reached board top 10%">Top 10%</th><th>Industry share</th><th>On board</th><th>FV</th><th>Top 10%</th></tr></thead>
-      <tbody>{{ range $i, $a := $pk.tiers }}{{ $n := index $ind.tiers $i }}<tr><td><span class="cfbrc__ark" style="--n:{{ $a.stars }}" role="img" aria-label="{{ $a.stars }} stars"><i></i></span></td><td class="cfb__num">{{ printf "%.1f" (mul $a.share 100) }}%</td><td class="cfb__num">{{ with $a.on }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ $a.fv }}</td><td class="cfb__num">{{ with $a.top10 }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ printf "%.1f" (mul $n.share 100) }}%</td><td class="cfb__num cfb__dim">{{ with $n.on }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ $n.fv }}</td><td class="cfb__num cfb__dim">{{ with $n.top10 }}{{ math.Round (mul . 100) }}%{{ end }}</td></tr>{{ end }}</tbody>
+      <thead><tr><th>Stars</th><th title="share of recruits at this ARK star">ARK share</th><th title="on board; signees 3+ seasons in">On board</th><th title="mean FV (off board = 20); 3+ seasons in">FV</th><th title="reached board top 10%">Top 10%</th><th>Industry share</th><th>On board</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>Top 10%</th></tr></thead>
+      <tbody>{{ range $i, $a := $pk.tiers }}{{ $n := index $ind.tiers $i }}<tr><td><span class="cfbrc__ark" style="--n:{{ $a.stars }}" role="img" aria-label="{{ $a.stars }} stars"><i></i></span></td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul $a.share 100)) }}%</td><td class="cfb__num">{{ with $a.on }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ $a.fv }}</td><td class="cfb__num">{{ with $a.top10 }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ partial "num.html" (slice "%.1f" (mul $n.share 100)) }}%</td><td class="cfb__num cfb__dim">{{ with $n.on }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ $n.fv }}</td><td class="cfb__num cfb__dim">{{ with $n.top10 }}{{ math.Round (mul . 100) }}%{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
     {{- $lab := dict "grade" "ESPN grade" "hinge" "4-star hinge (grade 80)" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" "bmi" "BMI against the position" "frame" "size far from the position's norm" "offers" "offer count (vs grade, within class)" "offer_q" "offer quality (strength of offering programs)" "comp" "247 composite" "gap" "247 composite vs ESPN grade, and vs 247's own rank" "hs" "high school output (rated recruits, 2020-29)" "state" "home state (TX, FL, GA, CA, AL, LA, OH)" "grade_k4" "grade in year 4 (drafted-junior censoring)" }}
     {{- with $f.index }}{{ $r := site.Data.cfb_recruit_retarget }}{{ $e := $r.eval }}{{ $v := $r.vsLive.shipped.byClass }}{{ $s0 := $e.boardFit.top3 }}{{ $s1 := $e.shipped.top3 }}
     <p><b>inputs, fit on NFL outcomes</b> ESPN {{ index $r.classes 0 }}-{{ index $r.classes 1 }}, n = {{ lang.FormatNumber 0 $r.n }}, {{ lang.FormatNumber 0 $r.drafted }} drafted · P(drafted): {{ range $i, $b := $r.use.on }}{{ if $i }}, {{ end }}{{ $b }}{{ end }} · FV if drafted: {{ range $i, $b := $r.use.fv }}{{ if $i }}, {{ end }}{{ $b }}{{ end }}
-      · held-out rank correlation with the NFL outcome: board-fit {{ printf "%.3f" $e.boardFit.rho_out }}, ESPN grade {{ printf "%.3f" $e.espn.rho_out }}, 247 composite {{ printf "%.3f" $e.comp247.rho_out }}, <b>this model {{ printf "%.3f" $e.shipped.rho_out }}</b> ({{ $v.won }} classes, t {{ $v.t }}) · within position {{ printf "%.3f" $e.boardFit.rho_pos }} → {{ printf "%.3f" $e.shipped.rho_pos }} · top 3% NFL starters {{ printf "%.1f" (mul $s0.starter 100) }}% → {{ printf "%.1f" (mul $s1.starter 100) }}% · ARK stars rank correlation {{ printf "%.3f" $r.starsNFL.boardFit.rho }} → {{ printf "%.3f" $r.starsNFL.shipped.rho }} · this board, xFV r: board-fit {{ printf "%.3f" $f.boardWeights.r }}, this model {{ printf "%.3f" $f.test.r }}</p>
+      · held-out rank correlation with the NFL outcome: board-fit {{ partial "num.html" (slice "%.3f" $e.boardFit.rho_out) }}, ESPN grade {{ partial "num.html" (slice "%.3f" $e.espn.rho_out) }}, 247 composite {{ partial "num.html" (slice "%.3f" $e.comp247.rho_out) }}, <b>this model {{ partial "num.html" (slice "%.3f" $e.shipped.rho_out) }}</b> ({{ $v.won }} classes, t {{ $v.t }}) · within position {{ partial "num.html" (slice "%.3f" $e.boardFit.rho_pos) }} → {{ partial "num.html" (slice "%.3f" $e.shipped.rho_pos) }} · top 3% NFL starters {{ partial "num.html" (slice "%.1f" (mul $s0.starter 100)) }}% → {{ partial "num.html" (slice "%.1f" (mul $s1.starter 100)) }}% · ARK stars rank correlation {{ partial "num.html" (slice "%.3f" $r.starsNFL.boardFit.rho) }} → {{ partial "num.html" (slice "%.3f" $r.starsNFL.shipped.rho) }} · this board, xFV r: board-fit {{ partial "num.html" (slice "%.3f" $f.boardWeights.r) }}, this model {{ partial "num.html" (slice "%.3f" $f.test.r) }}</p>
     {{- else }}
     <p><b>inputs</b> P(on): {{ range $i, $b := $f.model.on.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.on $b }} (t {{ .t }}){{ end }}{{ end }}
       · FV if on: {{ range $i, $b := $f.model.fv.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.fv $b }} (t {{ .t }}){{ end }}{{ end }}
       · not kept: {{ $n := 0 }}{{ range $b, $g := $f.gains.fv }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} (FV); {{ $n = 0 }}{{ range $b, $g := $f.gains.on }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} (P(on))</p>
     {{- end }}
     {{- with $f.drivers }}{{ $dv := . }}
-    <p><b>drivers</b> xFV r {{ printf "%.3f" $f.testBefore.r }} → <b>{{ printf "%.3f" $f.test.r }}</b> · AUC {{ printf "%.3f" $f.testBefore.auc }} → {{ printf "%.3f" $f.test.auc }} · FV RMSE {{ printf "%.2f" $f.testBefore.rmse_on }} → {{ printf "%.2f" $f.test.rmse_on }}</p>
+    <p><b>drivers</b> xFV r {{ partial "num.html" (slice "%.3f" $f.testBefore.r) }} → <b>{{ partial "num.html" (slice "%.3f" $f.test.r) }}</b> · AUC {{ partial "num.html" (slice "%.3f" $f.testBefore.auc) }} → {{ partial "num.html" (slice "%.3f" $f.test.auc) }} · FV RMSE {{ partial "num.html" (slice "%.2f" $f.testBefore.rmse_on) }} → {{ partial "num.html" (slice "%.2f" $f.test.rmse_on) }}</p>
     <div class="wintable__scroll"><table class="cfb__table cfbrc">
       <thead><tr><th>Driver</th><th title="t, out-of-sample gain when added; P(on)">t, plays</th><th title="t, out-of-sample gain when added; FV if on">t, FV</th><th>Kept for</th></tr></thead>
       <tbody>{{ range $b := slice "offer_q" "offers" "gap" "comp" "hs" "bmi" "frame" "state" "grade_k4" }}{{ $o := index $dv.on $b }}{{ $v := index $dv.fv $b }}<tr><td>{{ index $lab $b }}</td><td class="cfb__num">{{ with $o }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $v }}{{ .t }}{{ end }}</td><td>{{ $k := slice }}{{ if and $o $o.kept }}{{ $k = $k | append (printf "plays (t %v)" $o.tFinal) }}{{ end }}{{ if and $v $v.kept }}{{ $k = $k | append (printf "FV (t %v)" $v.tFinal) }}{{ end }}{{ with $k }}{{ delimit . ", " }}{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>

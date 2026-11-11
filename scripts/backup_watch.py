@@ -43,12 +43,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import names as NM
+from nba_xpm import VORX_REP  # replacement XPM (VORX), the NBA shrink target
 
 PROJ_MIN = os.path.join(HERE, 'data', 'cbb_proj_min.json')
 ESPN = 'https://site.api.espn.com/apis/site/v2/sports'
 UA = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36'}
 NFL_K, NFL_MIN = 300, 50
-NBA_K, NBA_REPL, NBA_MIN, NBA_W = 500, -2.0, 50, (1.0, 0.5, 0.25)
+NBA_K, NBA_REPL, NBA_MIN, NBA_W = 500, VORX_REP, 50, (1.0, 0.5, 0.25)
 NHL_K, NHL_KG, NHL_MIN, NHL_W = 600, 1500, 100, (1.0, 0.5, 0.25)
 CBB_K, CBB_REPL, CBB_MIN, CBB_GAP, CBB_W = 240, -6.0, 60, 1.0, (1.0, 0.5)
 NFL_SKIP = {'pk', 'p', 'h', 'pr', 'kr', 'ls'}

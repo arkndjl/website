@@ -34,6 +34,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+from nba_xpm import VORX_REP  # noqa: E402  replacement XPM, the backup watch's NBA shrink target
 OUT = os.path.join(ROOT, 'data', 'backup_age.json')
 RESEARCH = '/mnt/project-files/cbb/backtest/research_seasons.csv'
 H = 2                                                        # target horizon, seasons
@@ -177,7 +179,7 @@ def main():
                              grp=lambda p: {'PG': 'G', 'SG': 'G', 'SF': 'F', 'PF': 'F', 'C': 'C'}.get(p['pos'].split('-')[0], 'F'),
                              shape={'G': 2, 'F': 2, 'C': 1}, nxt={'G': ['G', 'F'], 'F': ['F', 'C', 'G'], 'C': ['C', 'F']},
                              val=lambda p: p.get('xpm'), use=lambda p: p['mp'], age=lambda p, y: p.get('age'),
-                             k=lambda g: 500, repl=lambda y, g: -2.0, w=(1, .5, .25), mn=50))
+                             k=lambda g: 500, repl=lambda y, g: VORX_REP, w=(1, .5, .25), mn=50))
     nhl = seasons('nhl-war')
     F['nhl'] = fit(pro_pairs(nhl, key=lambda p: p['id'], team=lambda p: p['tm'], grp=lambda p: p['pos'],
                              shape={'C': 1, 'L': 1, 'R': 1, 'D': 2, 'G': 1}, nxt={},

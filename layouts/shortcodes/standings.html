@@ -13,7 +13,8 @@
 {{- $T := . }}{{ $n := 0 }}{{ range .groups }}{{ $n = add $n (len .rows) }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" $icon "tab" $tab) -}}
 <table class="cfb__table st-table">
-  <thead><tr><th>{{ if .rankcol }}#{{ end }}</th><th>Team</th>{{ range $i, $c := .cols }}{{ if or (ne $i 0) (not $T.rankcol) }}<th>{{ $c }}</th>{{ end }}{{ end }}</tr></thead>
+  {{- $tip := dict "GP" "games played" "W" "wins" "L" "losses" "D" "draws" "T" "ties" "OTL" "overtime and shootout losses" "RW" "regulation wins" "GF" "goals for" "GA" "goals against" "GD" "goal difference" "Pts" "points" "PTS" "points" "PF" "points for" "PA" "points against" "Diff" "point differential" "PCT" "win percentage" "L10" "record, last 10 games" "Strk" "current streak" "GB" "games behind the leader" "PPG" "points a game" "Conf" "conference record" "Div" "division record" "Home" "home record" "Road" "road record" "Away" "road record" "Overall" "overall record" "vs AP" "record against AP top 25 teams" "#" "position" }}
+  <thead><tr><th{{ if .rankcol }} title="position"{{ end }}>{{ if .rankcol }}#{{ end }}</th><th>Team</th>{{ range $i, $c := .cols }}{{ if or (ne $i 0) (not $T.rankcol) }}<th{{ with index $tip $c }} title="{{ . }}"{{ end }}>{{ $c }}</th>{{ end }}{{ end }}</tr></thead>
   <tbody>
   {{- range .groups }}
     {{- with .name }}<tr class="st-grp"><th colspan="{{ add (len $T.cols) 2 }}">{{ . }}</th></tr>{{ end }}
@@ -35,7 +36,6 @@
 <div class="win st-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default .title }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="st-body">
-    <p class="cfb__dim st-note">if the season ended today · {{ .note }}</p>
     <div class="st-confs">
     {{- range .confs }}
       <div class="st-conf">
@@ -48,7 +48,7 @@
     {{- end }}
     </div>
   </div>
-  <div class="win__status"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="if the season ended today · {{ .note }}"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}{{ end -}}
 {{- define "partials/inline/st-seed.html" -}}
@@ -80,7 +80,7 @@
   {{- range . }}{{ $pts := where .rows "pts" "!=" nil }}
     <table class="cfb__table st-mini">
       <thead><tr><th colspan="{{ if $pts }}5{{ else }}4{{ end }}">{{ .name }}{{ with .date }} <span class="cfb__dim">{{ replaceRE `^.*(Poll|Rankings|Top 25) ` "" . }}</span>{{ end }}</th></tr>
-      <tr><th>RK</th><th>Team</th><th>Rec</th>{{ if $pts }}<th>Pts</th>{{ end }}<th title="last week">Prev</th></tr></thead>
+      <tr><th title="rank">RK</th><th>Team</th><th title="record">Rec</th>{{ if $pts }}<th>Pts</th>{{ end }}<th title="last week">Prev</th></tr></thead>
       <tbody>{{ range .rows }}<tr><td class="cfb__rk">{{ .rk }}</td><td class="st-team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ .n }}{{ with .fpv }} <span class="cfb__dim">({{ . }})</span>{{ end }}</td><td class="cfb__num">{{ .rec }}</td>{{ if $pts }}<td class="cfb__num">{{ with .pts }}{{ . }}{{ end }}</td>{{ end }}<td class="cfb__num cfb__dim">{{ with .prev }}{{ if gt (int .) 25 }}NR{{ else }}{{ . }}{{ end }}{{ else }}NR{{ end }}</td></tr>{{ end }}</tbody>
     </table>
   {{- end }}

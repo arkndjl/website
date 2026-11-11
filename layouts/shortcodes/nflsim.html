@@ -7,23 +7,23 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xW,Playoff,Div%,1 seed,Conf,SB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th>Team</th><th>Rec</th>
+    <th>Team</th><th title="record (won-lost)">Rec</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(playoffs)">Playoff</th>
     <th title="P(division title)">Div%</th>
     <th title="P(1 seed, bye)">1 seed</th>
     <th title="P(conference title)">Conf</th>
     <th title="P(Super Bowl win)">SB</th>
-    <th>Div</th>
+    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range sort .power "sb" "desc" }}
   <tr>
     <td><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> <b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .wins)) }}</td>
     {{- range $v := slice .playoff .div .seed1 .conf .sb }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
     <td>{{ .dv }}</td>
   </tr>

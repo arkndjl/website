@@ -33,7 +33,7 @@
       {{- with $t.img }}<img class="trophycase__crest trophycase__crest--img pxphoto" src="{{ . | relURL }}" alt="">{{ else }}<svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>{{ end }}
       <div>
         <h3 class="trophycase__name">{{ $t.name }}</h3>
-        <p class="trophycase__meta">{{ $t.sport }} · {{ $t.note }}{{ with $since }} since {{ . }}{{ end }}</p>
+        <p class="trophycase__meta" title="{{ $t.note }}{{ with $since }} since {{ . }}{{ end }}">{{ $t.sport }}</p>
       </div>
       <span class="trophycase__count">{{ $n }}</span>
     </header>

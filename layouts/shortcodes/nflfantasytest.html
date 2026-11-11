@@ -23,13 +23,13 @@
   {{- range $p := slice "QB" "RB" "WR" "TE" "K" "DST" }}{{ with index $t $p }}{{ $o := index $r $p }}
   <tr>
     <td><b>{{ $p }}</b></td>
-    <td class="cfb__num nflwar__war is-key">{{ printf "%.2f" .maeModel }}</td>
-    <td class="cfb__num">{{ printf "%.2f" .maeBase }}</td>
-    <td class="cfb__num">{{ printf "%.0f%%" (mul .gain 100) }}</td>
-    <td class="cfb__num">{{ printf "%.2f" .rModel }}</td>
-    <td class="cfb__num">{{ printf "%.2f" .rBase }}</td>
-    <td class="cfb__num">{{ with $o }}{{ printf "%.1f" .maeModel }}{{ end }}</td>
-    <td class="cfb__num">{{ with $o }}{{ printf "%.1f" .maeBaseAvail }}{{ end }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%.2f" .maeModel) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.2f" .maeBase) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.0f%%" (mul .gain 100)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.2f" .rModel) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.2f" .rBase) }}</td>
+    <td class="cfb__num">{{ with $o }}{{ partial "num.html" (slice "%.1f" .maeModel) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $o }}{{ partial "num.html" (slice "%.1f" .maeBaseAvail) }}{{ end }}</td>
     <td class="cfb__num">{{ with $o }}{{ printf "%.2f / %.2f" .rankModel .rankBase }}{{ end }}</td>
     <td class="cfb__num">{{ .n }}</td>
   </tr>
@@ -60,8 +60,8 @@
     <td><b>{{ $p }}</b></td>
     <td class="cfb__num">{{ $h.n }}</td>
     <td class="cfb__num">{{ $h.flagged }}</td>
-    <td class="cfb__num nflwar__war is-key">{{ printf "%.0f%%" (mul $h.hitFlag 100) }}</td>
-    <td class="cfb__num">{{ printf "%.0f%%" (mul $h.hitRest 100) }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%.0f%%" (mul $h.hitFlag 100)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.0f%%" (mul $h.hitRest 100)) }}</td>
     <td class="cfb__num">{{ printf "%.1fx" (div $h.hitFlag $h.hitRest) }}</td>
     <td class="cfb__num">{{ printf "%+.1f / %+.1f" $h.riseFlag $h.riseRest }}</td>
     <td class="cfb__num">{{ printf "%+.1f / %+.1f" $h.vsProjFlag $h.vsProjRest }}</td>

@@ -35,9 +35,9 @@
     <td>{{ .sp }}</td>
     <td class="cfb__dim">{{ .a }} {{ if .v }}v{{ else }}@{{ end }} {{ .h }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (mul .pm 100) }}%</td>
-    <td class="cfb__num">{{ printf "%.1f" (mul .q 100) }}%</td>
-    <td class="cfb__num">{{ printf "%+.1f" (mul (sub .pm .q) 100) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul .pm 100)) }}%</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul .q 100)) }}%</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (mul (sub .pm .q) 100)) }}</td>
     <td>{{ if .flip }}flip{{ end }}</td>
   </tr>
   {{- end }}

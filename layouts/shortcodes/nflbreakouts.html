@@ -41,10 +41,10 @@
     <td class="bw__x">{{ .yr }}{{ if ne .pk nil }} <span class="cfb__dim">{{ cond (gt (int .pk) 0) (printf "#%v" .pk) "U" }}</span>{{ end }}</td>
     <td class="bw__x">{{ .ha }} {{ .op }}</td>
     <td class="cfb__num bw__x">{{ .sn }}</td>
-    <td class="cfb__num brk__war" data-v="{{ .war }}">{{ printf "%+.3f" (float .war) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .x }}">{{ printf "%+.3f" (float .x) }}</td>
-    <td class="cfb__num is-key" data-v="{{ .ov }}"><span class="{{ if ge (float .ov) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.3f" (float .ov) }}</span></td>
-    <td class="cfb__num">{{ with .z }}{{ printf "%+.1f" (float .) }}{{ end }}</td>
+    <td class="cfb__num brk__war" data-v="{{ .war }}">{{ partial "num.html" (slice "%+.3f" (float .war)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .x }}">{{ partial "num.html" (slice "%+.3f" (float .x)) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .ov }}"><span class="{{ if ge (float .ov) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.3f" (float .ov)) }}</span></td>
+    <td class="cfb__num">{{ with .z }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
     <td class="bw__x cfb__dim">{{ .line }}</td>
     <td class="bw__x cfb__dim">{{ .note }}</td>
   </tr>

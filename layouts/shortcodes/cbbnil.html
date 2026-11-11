@@ -3,11 +3,11 @@
        view="players" (top 400 by xNIL) or view="teams" (every D-I roster). scripts/cbb_market.py, data/cbb_market.json. */ -}}
 {{- with site.Data.cbb_market -}}
 {{- $f := .nilFit -}}
-{{- $about := printf "Budgets (assumed, per season): high major %s, mid-major %s, low major %s, x e^(%.1f z) by program strength. Value = minutes share x (BPM + 3); NBA-value weight a = %.1f chosen by fit to On3 (log error SD %.2f, %d players). On3's top %d valuations run %.1fx this xNIL (On3 includes endorsements); yNIL frozen at the season's first run." (partial "nil.html" $f.budget.HM | plainify) (partial "nil.html" $f.budget.MM | plainify) (partial "nil.html" $f.budget.LM | plainify) $f.tilt $f.a (index $f.valueTest (printf "%.1f" $f.a) | default 0.0) (int $f.n) (int $f.nTail) $f.on3Tail -}}
+{{- $about := printf "Budgets (assumed, per season): high major %s, mid-major %s, low major %s, x e^(%.1f z) by program strength. Value = minutes share x (BPM + 3); NBA-value weight a = %.1f chosen by fit to On3 (log error SD %.2f, %d players). On3's top %d valuations run %.1fx this xNIL (On3 includes endorsements); yNIL frozen at the season's first run." (partial "nil.html" $f.budget.HM | plainify) (partial "nil.html" $f.budget.MM | plainify) (partial "nil.html" $f.budget.LM | plainify) $f.tilt $f.a (index $f.valueTest (partial "num.html" (slice "%.1f" $f.a)) | default 0.0) (int $f.n) (int $f.nTail) $f.on3Tail -}}
 {{- if eq ($.Get "view") "teams" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team NIL") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,yNIL,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cbbnil">
-  <thead><tr><th>RK</th><th>Team</th><th>Conf</th>
+  <thead><tr><th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="yNIL = the roster's pay going in (program budget)">yNIL</th><th title="xNIL = the roster's open-market worth now">xNIL</th>
     <th title="zNIL = xNIL - yNIL">zNIL</th><th title="top three by xNIL">Top</th></tr></thead>
   <tbody>
@@ -28,7 +28,7 @@
 {{- else -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NIL") "icon" "basketball" "filter" "Conf,Pos,Cls" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,xNIL,yNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cbbnil">
-  <thead><tr><th>RK</th><th>Player</th><th>Team</th><th>Conf</th><th>Pos</th><th>Cls</th><th>FV</th>
+  <thead><tr><th>RK</th><th>Player</th><th>Team</th><th title="conference">Conf</th><th>Pos</th><th>Cls</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
     <th title="xNIL = worth on the open market now (minutes share x BPM over -3, at his market's price)">xNIL</th>
     <th title="yNIL = likely pay going into the season (program budget split by preseason value)">yNIL</th>
     <th title="zNIL = xNIL - yNIL">zNIL</th>
@@ -48,7 +48,7 @@
     <td class="cfb__num" data-l="yNIL" data-v="{{ .y }}">{{ if ne .y nil }}{{ partial "nil.html" .y }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-l="zNIL" data-v="{{ .z }}">{{ if ne .z nil }}{{ partial "znil.html" .z }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-l="On3" data-v="{{ .on3 }}">{{ with .on3 }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-l="Transfer%" data-v="{{ .tp }}">{{ printf "%.0f" (mul .tp 100) }}%</td>
+    <td class="cfb__num" data-l="Transfer%" data-v="{{ .tp }}">{{ partial "num.html" (slice "%.0f" (mul .tp 100)) }}%</td>
   </tr>
   {{- end }}
   </tbody>

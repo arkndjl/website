@@ -9,7 +9,7 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xPts,Playoff,Div,Final,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table tstick">
   <thead><tr>
-    <th>Team</th><th>Rec</th>
+    <th>Team</th><th title="record (won-lost)">Rec</th>
     <th title="xPts = points so far + mean simulated points, games left">xPts</th>
     <th title="P(playoffs: division top three or wild card)">Playoff</th>
     <th title="P(division title)">Div</th>
@@ -18,16 +18,16 @@
     <th title="P(Stanley Cup Final)">Final</th>
     <th title="P(Stanley Cup)">Cup</th>
     <th title="P(Presidents' Trophy: most points)">Pres</th>
-    <th>Div</th>
+    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range sort .power "cup" "desc" }}
   <tr>
     <td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .xpts)) }}</td>
     {{- range $v := slice .playoff .divw .r2 .cf .final .cup .pres }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
     <td>{{ .div }}</td>
   </tr>

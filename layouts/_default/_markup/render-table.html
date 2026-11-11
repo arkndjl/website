@@ -23,10 +23,12 @@
   <div class="wintable__scroll">
     <table{{ with .Attributes.class }} class="{{ . }}"{{ end }}{{ with .Attributes.id }} id="{{ . }}"{{ end }}>
       <thead>
+        {{- /* column meanings for the abbreviations the boards' markdown tables use (hover title) */}}
+        {{- $tip := dict "FV" "future value: projected peak on the 20-80 scale (50 = average regular)" "ETA" "expected major-league debut year" "BATS" "bats: L, R or S (switch)" "HT" "height" "WT" "weight" "HAND-HT/WT" "bats (L, R, S) - height / weight" "H-Pos" "bats (L, R, S) - position" "Org/Lvl" "organization / minor-league level" "ACQ/$" "how acquired (draft, international) / signing bonus" "STAT" "headline stat line this season" "TOOLS" "tool grades on the 20-80 scale" "WAR / season" "wins above replacement a season at that FV" }}
         {{- range .THead }}
         <tr>
           {{- range . }}
-          <th{{ with .Alignment }} style="text-align: {{ . }}"{{ end }}>{{ .Text }}</th>
+          <th{{ with .Alignment }} style="text-align: {{ . }}"{{ end }}{{ with index $tip (.Text | plainify | strings.TrimSpace) }} title="{{ . }}"{{ end }}>{{ .Text }}</th>
           {{- end }}
         </tr>
         {{- end }}

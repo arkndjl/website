@@ -82,6 +82,7 @@ jobs:
             scripts/.cache/cbb/games_bt
             scripts/.cache/cbb/games/*.json.gz
             scripts/.cache/cbb/espn_box
+            scripts/.cache/cbb/lineups
           key: cbb-bt-none
           restore-keys: cbb-bt-
       - if: contains(matrix.cache, 'tennis-')

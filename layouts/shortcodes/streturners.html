@@ -53,14 +53,14 @@
     {{- end }}
     <td class="cfb__num">{{ .ret }}</td>
     <td class="cfb__num bw__x">{{ .yds }}</td>
-    <td class="cfb__num" data-v="{{ .avg }}">{{ printf "%.1f" (float .avg) }}</td>
+    <td class="cfb__num" data-v="{{ .avg }}">{{ partial "num.html" (slice "%.1f" (float .avg)) }}</td>
     <td class="cfb__num bw__x">{{ .lng }}</td>
     <td class="cfb__num bw__x">{{ .td }}</td>
     <td class="cfb__num bw__x">{{ .fum }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .ryoe }}">{{ printf "%+.1f" (float .ryoe) }}</td>
-    <td class="cfb__num is-key" data-v="{{ .sry }}"><span class="{{ if ge (float .sry) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.2f" (float .sry) }}</span></td>
-    <td class="cfb__num bw__x" data-v="{{ .val }}">{{ printf "%+.1f" (float .val) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .poe }}">{{ printf "%+.2f" (float .poe) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .ryoe }}">{{ partial "num.html" (slice "%+.1f" (float .ryoe)) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .sry }}"><span class="{{ if ge (float .sry) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.2f" (float .sry)) }}</span></td>
+    <td class="cfb__num bw__x" data-v="{{ .val }}">{{ partial "num.html" (slice "%+.1f" (float .val)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .poe }}">{{ partial "num.html" (slice "%+.2f" (float .poe)) }}</td>
   </tr>
   {{- end }}
   </tbody>

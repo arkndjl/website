@@ -78,12 +78,12 @@
     <td><a href="{{ .url }}">{{ .comp }}</a></td>
     <td>{{ .sport | replaceRE "^hoop$" "basketball" }}</td>
     <td class="cfb__name">{{ with $a.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}{{ $a.n | default "—" }}</td>
-    <td class="cfb__num" data-v="{{ $a.p | default 0 }}">{{ with $a.p }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $a.p | default 0 }}">{{ with $a.p }}{{ partial "num.html" (slice "%.0f" (mul (float .) 100)) }}%{{ else }}—{{ end }}</td>
     <td>{{ $b.n | default "—" }}</td>
-    <td class="cfb__num" data-v="{{ $b.p | default 0 }}">{{ with $b.p }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $b.p | default 0 }}">{{ with $b.p }}{{ partial "num.html" (slice "%.0f" (mul (float .) 100)) }}%{{ else }}—{{ end }}</td>
     <td>{{ .ark | default "—" }}{{ if and .ark $a.n (ne .ark $a.n) }} <span class="cfb__dim" title="the rating leader isn't the title favourite">≠</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .top3 }}">{{ printf "%.0f" (mul .top3 100) }}%</td>
-    <td class="cfb__num" data-v="{{ .eff }}">{{ printf "%.1f" .eff }}</td>
+    <td class="cfb__num" data-v="{{ .top3 }}">{{ partial "num.html" (slice "%.0f" (mul .top3 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .eff }}">{{ partial "num.html" (slice "%.1f" .eff) }}</td>
     <td class="cfb__num">{{ .field }}</td>
   </tr>
   {{- end }}

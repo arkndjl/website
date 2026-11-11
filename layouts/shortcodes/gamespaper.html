@@ -12,9 +12,9 @@
   </div>
   <div class="cfbm__body">
     {{- $b := $d.bankroll }}{{ $r := $d.record }}
-    <p><b>bankroll {{ printf "%.1f" $b.now }}</b> <span class="cfb__dim">from {{ $b.start }} · {{ printf "%.1f" $b.open }} open · peak {{ printf "%.1f" $b.peak }}{{ if gt $b.drawdown 0.0 }} · drawdown {{ printf "%.1f%%" (mul $b.drawdown 100) }}{{ end }}</span></p>
-    <p class="pclv"><b>judged by the close</b> · {{ if $r.clvN }}{{ $r.clvN }} graded: worth <b>{{ printf "%+.1f%%" (mul $r.clvRet 100) }}</b> at the close{{ with $d.tEff }} <span class="cfb__dim">t {{ printf "%.1f" . }} (effective n)</span>{{ end }}{{ with $r.beat }}, line moved our way {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}none graded yet{{ end }}
-    <br><span class="cfb__dim">results: {{ if $r.settled }}{{ $r.w }}-{{ $r.l }}{{ if $r.p }}-{{ $r.p }}{{ end }}, {{ printf "%+.2f" $r.profit }} units on {{ printf "%.1f" $r.risked }} risked{{ with $r.roi }}, {{ printf "%+.1f%%" (mul . 100) }} a pick{{ end }}{{ else }}none settled yet{{ end }} · {{ $r.n }} picks since {{ lower ((time $d.registered).Format "Jan 2") }}</span></p>
+    <p><b>bankroll {{ partial "num.html" (slice "%.1f" $b.now) }}</b> <span class="cfb__dim">from {{ $b.start }} · {{ partial "num.html" (slice "%.1f" $b.open) }} open · peak {{ partial "num.html" (slice "%.1f" $b.peak) }}{{ if gt $b.drawdown 0.0 }} · drawdown {{ partial "num.html" (slice "%.1f%%" (mul $b.drawdown 100)) }}{{ end }}</span></p>
+    <p class="pclv"><b>judged by the close</b> · {{ if $r.clvN }}{{ $r.clvN }} graded: worth <b>{{ partial "num.html" (slice "%+.1f%%" (mul $r.clvRet 100)) }}</b> at the close{{ with $d.tEff }} <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" .) }} (effective n)</span>{{ end }}{{ with $r.beat }}, line moved our way {{ partial "num.html" (slice "%.0f%%" (mul . 100)) }}{{ end }}{{ else }}none graded yet{{ end }}
+    <br><span class="cfb__dim">results: {{ if $r.settled }}{{ $r.w }}-{{ $r.l }}{{ if $r.p }}-{{ $r.p }}{{ end }}, {{ partial "num.html" (slice "%+.2f" $r.profit) }} units on {{ partial "num.html" (slice "%.1f" $r.risked) }} risked{{ with $r.roi }}, {{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }} a pick{{ end }}{{ else }}none settled yet{{ end }} · {{ $r.n }} picks since {{ lower ((time $d.registered).Format "Jan 2") }}</span></p>
     <p><b>gates</b></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t">
@@ -27,18 +27,18 @@
     </table>
     </div>
     {{- $c := $d.corr }}
-    <p class="cfb__dim">slates {{ $c.slates }} · {{ with $c.avgSlate }}{{ . }} picks a slate{{ else }}none graded{{ end }} · within-slate rho {{ with $c.rho }}{{ printf "%.2f" . }}{{ else }}0 (not measured){{ end }} · {{ $c.n }} picks = {{ $c.nEff }} effective</p>
+    <p class="cfb__dim">slates {{ $c.slates }} · {{ with $c.avgSlate }}{{ . }} picks a slate{{ else }}none graded{{ end }} · within-slate rho {{ with $c.rho }}{{ partial "num.html" (slice "%.2f" .) }}{{ else }}0 (not measured){{ end }} · {{ $c.n }} picks = {{ $c.nEff }} effective</p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th title="return the graded picks were worth at the closing line; t">Worth at close</th><th title="picks / graded by the close">Picks</th><th title="mean points the line moved our way, and how often">CLV</th><th title="results at each pick's price and stake">Result</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="return the graded picks were worth at the closing line; t">Worth at close</th><th title="picks / graded by the close">Picks</th><th title="mean points the line moved our way, and how often">CLV</th><th title="results at each pick's price and stake">Result</th></tr></thead>
       <tbody>
       {{- range $d.markets }}
       <tr>
         <td>{{ .label }}</td>
-        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ partial "num.html" (slice "%.1f" .) }}</span>{{ end }}</td>
         <td class="cfb__num">{{ .n }} <span class="cfb__dim">/ {{ .clvN }}</span></td>
-        <td class="cfb__num">{{ with .clv }}{{ printf "%+.1f" . }}{{ end }}{{ with .beat }} <span class="cfb__dim">{{ printf "%.0f%%" (mul . 100) }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ if .settled }}{{ .w }}-{{ .l }} {{ printf "%+.2f" .profit }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .clv }}{{ partial "num.html" (slice "%+.1f" .) }}{{ end }}{{ with .beat }} <span class="cfb__dim">{{ partial "num.html" (slice "%.0f%%" (mul . 100)) }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ if .settled }}{{ .w }}-{{ .l }} {{ partial "num.html" (slice "%+.2f" .profit) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
       </tr>
       {{- end }}
       </tbody>
@@ -50,7 +50,7 @@
 {{- with $d.open }}
 {{- partial "wintable-open.html" (dict "title" "paper book :: open picks" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Pick</th><th title="stake as posted, % of bankroll">Kelly %</th><th>Sport</th><th>Market</th><th title="ET">Start</th><th title="model minus the market: points, or points of win chance for moneylines">Edge</th><th title="expected return at the posted price">EV</th><th title="when the pick was posted, ET">Posted</th></tr></thead>
+  <thead><tr><th>Pick</th><th title="stake as posted, % of bankroll">Kelly %</th><th>Sport</th><th title="bet market: spread, total or moneyline">Market</th><th title="ET">Start</th><th title="model minus the market: points, or points of win chance for moneylines">Edge</th><th title="expected return at the posted price">EV</th><th title="when the pick was posted, ET">Posted</th></tr></thead>
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
   <tr{{ if .pass }} class="cfb__dim"{{ end }}>
@@ -59,8 +59,8 @@
     <td>{{ index $sp .sport }}</td>
     <td>{{ index $mn .mk }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
-    <td class="cfb__num">{{ with .edge }}{{ printf "%.1f" . }}{{ end }}</td>
-    <td class="cfb__num">{{ with .ev }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td>
+    <td class="cfb__num">{{ with .edge }}{{ partial "num.html" (slice "%.1f" .) }}{{ end }}</td>
+    <td class="cfb__num">{{ with .ev }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ end }}</td>
     <td class="cfb__num cfb__dim">{{ with .placed }}{{ $p := time.In "America/New_York" (time .) }}<span data-v="{{ $p.Unix }}">{{ $p.Format "Jan 2 3:04 PM" }}</span>{{ end }}</td>
   </tr>
   {{- end }}
@@ -71,14 +71,14 @@
 {{- with $d.recent }}
 {{- partial "wintable-open.html" (dict "title" "paper book :: settled" "icon" "arkboard" "filter" "Sport,Market,Res" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Pick</th><th>Res</th><th title="units, 1 = 1% of bankroll">P/L</th><th title="return the pick was worth at the closing line">At close</th><th title="the closing number">Close</th><th>Sport</th><th>Market</th><th title="ET">Start</th></tr></thead>
+  <thead><tr><th>Pick</th><th>Res</th><th title="units, 1 = 1% of bankroll">P/L</th><th title="return the pick was worth at the closing line">At close</th><th title="the closing number">Close</th><th>Sport</th><th title="bet market: spread, total or moneyline">Market</th><th title="ET">Start</th></tr></thead>
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
   <tr{{ if .pass }} class="cfb__dim"{{ end }}>
     <td>{{ if .pass }}<s>{{ .bet }}</s> <b>pass</b>{{ else }}<b>{{ .bet }}</b>{{ end }}<br><span class="cfb__dim">{{ .a }} @ {{ .h }}</span></td>
     <td>{{ upper .res }}{{ with .score }} <span class="cfb__dim">{{ if reflect.IsSlice . }}{{ index . 1 }}-{{ index . 0 }}{{ else }}{{ . }}{{ end }}</span>{{ end }}</td>
-    <td class="cfb__num">{{ if .pass }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%+.2f" .profit }}{{ end }}</td>
-    <td class="cfb__num">{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ if .pass }}<span class="cfb__dim">—</span>{{ else }}{{ partial "num.html" (slice "%+.2f" .profit) }}{{ end }}</td>
+    <td class="cfb__num">{{ with .clvRet }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num cfb__dim">{{ with .close }}{{ . }}{{ end }}</td>
     <td>{{ index $sp .sport }}</td>
     <td>{{ index $mn .mk }}</td>
@@ -98,7 +98,7 @@
 {{- $s := . -}}
 {{- $bets := first 60 (sort (where $n.bets "order" "ne" nil) "kick" "desc") -}}
 {{- partial "wintable-open.html" (dict "title" "novig paper exchange :: fills" "icon" "arkboard" "filter" "Sport,Status" "tab" ($.Get "tab")) -}}
-<p class="cfb__dim" style="padding:0 8px">{{ $s.sent }} orders, {{ $s.filled }} filled{{ with $s.fillRate }} ({{ printf "%.0f%%" (mul . 100) }} of contracts){{ end }}{{ with $s.slip }} · fill minus posted price {{ printf "%+.1f" (mul . 100) }} pts{{ end }}{{ with $s.clvFill }} · fills worth {{ printf "%+.1f%%" (mul . 100) }} at the close{{ with $s.clvPick }} vs {{ printf "%+.1f%%" (mul . 100) }} posted{{ end }} (n {{ $s.clvN }}){{ end }}{{ if $s.graded }} · {{ printf "%+.2f" $s.pnl }} on {{ printf "%.2f" $s.risked }} risked{{ end }}{{ with $s.bank }} · bankroll ${{ printf "%.2f" . }}{{ end }}</p>
+<p class="cfb__dim" style="padding:0 8px">{{ $s.sent }} orders, {{ $s.filled }} filled{{ with $s.fillRate }} ({{ partial "num.html" (slice "%.0f%%" (mul . 100)) }} of contracts){{ end }}{{ with $s.slip }} · fill minus posted price {{ partial "num.html" (slice "%+.1f" (mul . 100)) }} pts{{ end }}{{ with $s.clvFill }} · fills worth {{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }} at the close{{ with $s.clvPick }} vs {{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }} posted{{ end }} (n {{ $s.clvN }}){{ end }}{{ if $s.graded }} · {{ partial "num.html" (slice "%+.2f" $s.pnl) }} on {{ partial "num.html" (slice "%.2f" $s.risked) }} risked{{ end }}{{ with $s.bank }} · bankroll ${{ partial "num.html" (slice "%.2f" .) }}{{ end }}</p>
 <table class="cfb__table cfbm__t tstick">
   <thead><tr><th>Pick</th><th>Status</th><th title="contracts filled of those sent">Filled</th><th title="average fill price (chance), and the IOC limit">Fill</th><th title="fill minus the posted price, chance points">Slip</th><th title="what the fill was worth at the close, and the posted pick">At close</th><th title="dollars">P/L</th><th>Sport</th><th title="ET">Start</th></tr></thead>
   <tbody>
@@ -107,10 +107,10 @@
     <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .game }}</span></td>
     <td>{{ if $f.qty }}filled{{ else }}{{ lower (.ostatus | default .status) }}{{ end }}</td>
     <td class="cfb__num">{{ $f.qty | default 0 }} <span class="cfb__dim">/ {{ .qty }}</span></td>
-    <td class="cfb__num">{{ with $f.px }}{{ printf "%.3f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">≤ {{ .limit }}</span></td>
-    <td class="cfb__num">{{ with .slip }}{{ printf "%+.1f" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num">{{ with .clvFill }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvPick }} <span class="cfb__dim">{{ printf "%+.1f%%" (mul . 100) }}</span>{{ end }}</td>
-    <td class="cfb__num">{{ with .pnl }}{{ printf "%+.2f" . }}{{ else }}{{ if .res }}0.00{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}</td>
+    <td class="cfb__num">{{ with $f.px }}{{ partial "num.html" (slice "%.3f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">≤ {{ .limit }}</span></td>
+    <td class="cfb__num">{{ with .slip }}{{ partial "num.html" (slice "%+.1f" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .clvFill }}{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvPick }} <span class="cfb__dim">{{ partial "num.html" (slice "%+.1f%%" (mul . 100)) }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .pnl }}{{ partial "num.html" (slice "%+.2f" .) }}{{ else }}{{ if .res }}0.00{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}</td>
     <td>{{ .sport }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Jan 2 3:04 PM" }}</td>
   </tr>

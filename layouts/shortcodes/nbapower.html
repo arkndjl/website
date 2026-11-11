@@ -13,37 +13,37 @@
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="today's injury report (the league's for teams playing today, else ESPN's list): the lineup's points lost, each player at his chance to play x XPM x minutes; negative = players back or cleared">Inj</th>
     <th title="rating with nobody on the injury report">Full</th>
-    <th>Rec</th>
+    <th title="record (won-lost)">Rec</th>
     <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
     <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
     <th title="possessions a game, expected against an average opponent">Pace</th>
-    <th title="Elo ({{ $es := 0.0 }}{{ $en := 0 }}{{ range site.Data.nba_games.power }}{{ $es = add $es (float .elo) }}{{ $en = add $en 1 }}{{ end }}{{ if $en }}{{ printf "%.0f" (div $es $en) }} league average today{{ end }})">Elo</th>
+    <th title="Elo ({{ $es := 0.0 }}{{ $en := 0 }}{{ range site.Data.nba_games.power }}{{ $es = add $es (float .elo) }}{{ $en = add $en 1 }}{{ end }}{{ if $en }}{{ partial "num.html" (slice "%.0f" (div $es $en)) }} league average today{{ end }})">Elo</th>
     <th title="market rating: points vs average as earlier closing spreads priced the team">Mkt</th>
     <th title="display only, not part of the rating: the team's players' rest-of-season VORX, median projection (projections tab), summed">Proj</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(playoffs, through the play-in), simulated seasons">Playoff</th>
     <th title="P(NBA title)">Title</th>
-    <th>Conf</th>
+    <th title="conference">Conf</th>
   </tr></thead>
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
-    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.1f" (float .rating)) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     {{- $full := .full | default .rating }}
-    <td class="cfb__num" data-v="{{ .inj | default 0 }}">{{ with .inj }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ $full }}">{{ printf "%+.1f" (float $full) }}</td>
+    <td class="cfb__num" data-v="{{ .inj | default 0 }}">{{ with .inj }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ $full }}">{{ partial "num.html" (slice "%+.1f" (float $full)) }}</td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
-    <td class="cfb__num">{{ printf "%+.1f" (float .off) }}</td>
-    <td class="cfb__num">{{ printf "%+.1f" (float .dfn) }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .pace) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .off)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .dfn)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .pace)) }}</td>
     <td class="cfb__num">{{ .elo }}</td>
-    <td class="cfb__num">{{ printf "%+.1f" (float .mkt) }}</td>
-    <td class="cfb__num cfb__dim">{{ with index $proj .t }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
-    <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
-    <td class="cfb__num" data-v="{{ .title }}">{{ if lt .title 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul .title 100)) }}%{{ end }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .mkt)) }}</td>
+    <td class="cfb__num cfb__dim">{{ with index $proj .t }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .wins)) }}</td>
+    <td class="cfb__num" data-v="{{ .playoff }}">{{ partial "num.html" (slice "%.0f" (float (mul .playoff 100))) }}%</td>
+    <td class="cfb__num" data-v="{{ .title }}">{{ if lt .title 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul .title 100))) }}%{{ end }}</td>
     <td>{{ .cname }}</td>
   </tr>
   {{- end }}

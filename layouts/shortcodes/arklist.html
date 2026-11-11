@@ -36,7 +36,8 @@
 <script type="application/json" data-arkl-cbbrec>{{ jsonify $cr | safeJS }}</script>{{ end }}{{ end }}
 <table class="cfb__table arkl" data-arkl{{ if $all }} data-arkl-all{{ end }} data-arkl-only="{{ $only }}" data-arkl-coaches="{{ jsonify $coaches }}" data-arkl-lists="{{ jsonify $lists }}"{{ with $inline }} data-arkl-inline="{{ jsonify . }}"{{ end }}
        data-arkl-from='{{ jsonify (dict "cfb" ("data/cfb-all.json" | relURL) "rec" ("data/cfb-recruits.json" | relURL) "cbb" ("data/cbb-all.json" | relURL) "intl" ("data/cbb-intl.json" | relURL) "nfl" ("data/nfl-war.json" | relURL) "nba" (printf "data/nba-xpm/%v.json" (site.Data.nba_xpm.current | default 2026) | relURL) "nhl" (printf "data/nhl-war/%v.json" (site.Data.nhl_war.current | default 2027) | relURL) "soc" (printf "data/soccer-war/%v.json" (site.Data.soccer_war.current | default 2027) | relURL)) }}'>
-  <thead><tr>{{ range split $cols "," }}<th>{{ . }}</th>{{ end }}</tr></thead>
+  {{- $tip := dict "Sport" "the board the player is on" "Pos" "position on his board" "Class" "recruiting class (high school graduation year)" "Rank" "national recruit rank: ESPN for football, On3 industry for basketball" "Stage" "where he is now: college, recruit, international, pro league or prospect pool" "Grade" "each board's own metric, not one scale: FV (20-80) for college players, internationals and hockey, soccer and CS2 prospects; xFV (projected FV) for recruits; staff score for coaches; WAR this season (NFL, NHL); rXPM last season (NBA); GAR this season (soccer); RWA (other CS2 players)" }}
+  <thead><tr>{{ range split $cols "," }}<th{{ with index $tip . }} title="{{ . }}"{{ end }}>{{ . }}</th>{{ end }}</tr></thead>
   <tbody><tr><td colspan="{{ len (split $cols ",") }}" class="cfb__dim" data-arkl-msg>{{ if $n }}loading the boards…{{ else }}no one on this ARKLIST yet{{ end }}</td></tr></tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" $n "note" (cond (eq $only "prospects") "recruits and internationals" (cond $recs "high school recruits" "players and prospects")) "about" (cond $recs "the high school recruits on the college football and college basketball ARKLISTs, apart from the college and pro players. class is the recruiting class; rank is the national rank (ESPN for football, On3 industry for basketball). grades: projected xFV for football recruits, FV on the CBB board's scale for basketball recruits." (cond $all "every sport's ARKLIST in one table. prospects count: recruits in the 2027-29 classes and international players are on the list with the college players, and coaches with them. grades: FV for college players, internationals and hockey and soccer prospects, projected xFV for recruits, the staff score for coaches, WAR this season in the NFL and NHL, XPM last season in the NBA, GAR this season in soccer, FV for CS2 prospects and RWA for other CS2 players." ""))) -}}
@@ -74,7 +75,7 @@
       ((D.nfl || {}).players || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: '/img/nfl/' + String(r.t || '').split('/').pop().toLowerCase() + '.png', ph: r.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r.ph : '', pos: r.pos, stage: 'NFL' + (r.rook ? ' · rookie' : ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(2) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
     } else if (sport === 'nhl') {
       var H = D.nhl || {};
-      (H.players || []).forEach(function (r) { out.push({ name: r.n, team: r.tm, logo: '/img/nhl/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nhl', r.ph), pos: r.pos, stage: 'NHL · ' + (H.label || ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(2) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
+      (H.players || []).forEach(function (r) { out.push({ name: r.n, team: r.tm, logo: '/img/nhl/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nhl', r.ph), pos: r.pos, stage: 'NHL · ' + (H.label || ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(1) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
     } else if (sport === 'soccer') {
       var S = D.soc || {};
       var SL = (D.inline || {}).socLogo || {};
@@ -84,10 +85,10 @@
     } else if (sport === 'soccer-prospects') {
       ((D.inline || {}).sp || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + r.ph : '', pos: r.pos, stage: 'under 22' + (r.lg ? ' · ' + r.lg : '') + (r.prov ? ' · provisional' : ''), grade: fvTxt(r.fv), v: r.fv, pro: 1 }); });
     } else if (sport === 'cs2') {
-      ((D.inline || {}).cs || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph, pos: '', stage: 'tier ' + r.tier, grade: r.fv != null ? fvTxt(r.fv) : r.r != null ? 'RWA ' + (r.r > 0 ? '+' : '') + r.r : '—', v: r.fv != null ? r.fv : r.r == null ? null : 50 + r.r * 10 }); });
+      ((D.inline || {}).cs || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph, pos: '', stage: 'tier ' + r.tier, grade: r.fv != null ? fvTxt(r.fv) : r.r != null ? 'RWA ' + (r.r > 0 ? '+' : '') + (+r.r).toFixed(2) : '—', v: r.fv != null ? r.fv : r.r == null ? null : 50 + r.r * 10 }); });
     } else if (sport === 'nba') {
       var N = D.nba || {};
-      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'rXPM ' + (x > 0 ? '+' : '') + x : '—', v: x == null ? null : 50 + x * 3 }); });
+      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'rXPM ' + (x > 0 ? '+' : '') + (+x).toFixed(1) : '—', v: x == null ? null : 50 + x * 3 }); });
     }
     return out;
   }

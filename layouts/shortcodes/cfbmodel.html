@@ -20,8 +20,8 @@
       {{- $fitL := cond (isset $r "hist") "held out" "fit" }}
       {{- range $row := slice (slice (printf "model %v (%s)" $r.seasons.train $fitL) $r.train) (slice (printf "model %v (test)" $r.seasons.test) $r.test) (slice (printf "Elo only %v" $r.seasons.test) $r.eloOnly.test) }}
       {{- with index $row 1 }}
-      <tr><td>{{ index $row 0 }}</td><td class="cfb__num">{{ printf "%.3f" .logLoss }}</td><td class="cfb__num">{{ printf "%.3f" .brier }}</td><td class="cfb__num">{{ printf "%.1f" .mae }}</td><td class="cfb__num">{{ with .maeMarket }}{{ printf "%.1f" . }}{{ end }}</td>
-        <td class="cfb__num">{{ .ats.all.w }}-{{ .ats.all.l }} <span class="cfb__dim">{{ with .ats.all.pct }}{{ printf "%.1f" (mul . 100) }}%{{ end }}</span></td></tr>
+      <tr><td>{{ index $row 0 }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.3f" .logLoss) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.3f" .brier) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" .mae) }}</td><td class="cfb__num">{{ with .maeMarket }}{{ partial "num.html" (slice "%.1f" .) }}{{ end }}</td>
+        <td class="cfb__num">{{ .ats.all.w }}-{{ .ats.all.l }} <span class="cfb__dim">{{ with .ats.all.pct }}{{ partial "num.html" (slice "%.1f" (mul . 100)) }}%{{ end }}</span></td></tr>
       {{- end }}{{ end }}
       </tbody>
     </table>
@@ -30,7 +30,7 @@
       <thead><tr><th></th>{{ range (slice "0-3" "3-7" "7+") }}<th>{{ . }}</th>{{ end }}</tr></thead>
       <tbody>
       {{- range $row := slice (slice (printf "backtest %v" $r.seasons.train) $r.train) (slice (printf "backtest %v" $r.seasons.test) $r.test) }}{{ with index $row 1 }}
-      <tr><td>{{ index $row 0 }}</td>{{ range $b := (slice "0-3" "3-7" "7+") }}{{ with index $.Page.Site.Data.cfb_model.report.train.ats $b }}{{ end }}{{ $x := index (index $row 1).ats $b }}<td class="cfb__num">{{ $x.w }}-{{ $x.l }} <span class="cfb__dim">{{ with $x.pct }}{{ printf "%.0f" (mul . 100) }}%{{ end }}</span></td>{{ end }}</tr>
+      <tr><td>{{ index $row 0 }}</td>{{ range $b := (slice "0-3" "3-7" "7+") }}{{ with index $.Page.Site.Data.cfb_model.report.train.ats $b }}{{ end }}{{ $x := index (index $row 1).ats $b }}<td class="cfb__num">{{ $x.w }}-{{ $x.l }} <span class="cfb__dim">{{ with $x.pct }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ end }}</span></td>{{ end }}</tr>
       {{- end }}{{ end }}
       {{- with .live.record }}
       <tr><td>live (logged)</td>{{ range $b := (slice "0-3" "3-7" "7+") }}{{ $x := index $.Page.Site.Data.cfb_model.live.record $b }}<td class="cfb__num">{{ $x.w }}-{{ $x.l }}{{ if $x.p }}-{{ $x.p }}{{ end }}</td>{{ end }}</tr>
@@ -44,7 +44,7 @@
       <tbody>
       {{- $kept := .chosen }}
       {{- range $k, $v := .alone }}
-      <tr><td>{{ $v.name }}</td><td class="cfb__num">{{ printf "%+.4f" $v.dLogLoss }}</td><td class="cfb__num">{{ printf "%+.1f" $v.t }}</td><td class="cfb__num">{{ printf "%+.2f" $v.dMae }}</td><td>{{ if in $kept $k }}<b>yes</b>{{ else }}no{{ end }}</td></tr>
+      <tr><td>{{ $v.name }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.4f" $v.dLogLoss) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" $v.t) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" $v.dMae) }}</td><td>{{ if in $kept $k }}<b>yes</b>{{ else }}no{{ end }}</td></tr>
       {{- end }}
       </tbody>
     </table>
@@ -53,12 +53,12 @@
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th><th>Log loss</th><th>MAE</th><th title="share of games, winner picked">Winners</th></tr></thead>
       <tbody>
-      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td><td></td></tr>{{ end }}
-      <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ printf "%+.4f" .d }}, t {{ printf "%+.1f" .t }})</span>{{ end }}</td><td class="cfb__num"><b>{{ printf "%.4f" .logLoss }}</b></td><td class="cfb__num">{{ printf "%.2f" .mae }}</td><td class="cfb__num">{{ with .acc }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
+      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" .logLoss) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" .mae) }}</td><td></td></tr>{{ end }}
+      <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ partial "num.html" (slice "%+.4f" .d) }}, t {{ partial "num.html" (slice "%+.1f" .t) }})</span>{{ end }}</td><td class="cfb__num"><b>{{ partial "num.html" (slice "%.4f" .logLoss) }}</b></td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" .mae) }}</td><td class="cfb__num">{{ with .acc }}{{ partial "num.html" (slice "%.1f%%" (mul . 100)) }}{{ end }}</td></tr>
       {{- with $.Page.Site.Data.cfb_model.report.extraTest.market }}
-      <tr><td>this model, games with a line <span class="cfb__dim">({{ .n }})</span></td><td class="cfb__num">{{ printf "%.4f" .model }}</td><td class="cfb__num">{{ printf "%.2f" .maeModel }}</td><td class="cfb__num">{{ with .accModel }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
-      <tr><td>closing line</td><td class="cfb__num">{{ printf "%.4f" .close }}</td><td class="cfb__num">{{ printf "%.2f" .maeClose }}</td><td class="cfb__num">{{ with .accClose }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
-      <tr><td>blend <span class="cfb__dim">({{ printf "%.0f" (mul .blendW 100) }}% model)</span></td><td class="cfb__num">{{ printf "%.4f" .blend }}</td><td></td><td></td></tr>
+      <tr><td>this model, games with a line <span class="cfb__dim">({{ .n }})</span></td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" .model) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" .maeModel) }}</td><td class="cfb__num">{{ with .accModel }}{{ partial "num.html" (slice "%.1f%%" (mul . 100)) }}{{ end }}</td></tr>
+      <tr><td>closing line</td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" .close) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.2f" .maeClose) }}</td><td class="cfb__num">{{ with .accClose }}{{ partial "num.html" (slice "%.1f%%" (mul . 100)) }}{{ end }}</td></tr>
+      <tr><td>blend <span class="cfb__dim">({{ partial "num.html" (slice "%.0f" (mul .blendW 100)) }}% model)</span></td><td class="cfb__num">{{ partial "num.html" (slice "%.4f" .blend) }}</td><td></td><td></td></tr>
       {{- end }}
       </tbody>
     </table>
@@ -66,8 +66,8 @@
     {{- with .simTest }}
     <p class="cfbm__h">Drive simulation <span class="cfb__dim">(1,000 drive-by-drive runs per game, opponent-adjusted drive rates; same out-of-sample games, n = {{ .n }})</span></p>
     <ul class="cfbm__list">
-      <li>simulation alone, win chance: log loss <b>{{ printf "%.4f" .sim }}</b>, winners {{ printf "%.1f%%" (mul .simAcc 100) }} <span class="cfb__dim">(model {{ printf "%.4f" .model }})</span></li>
-      <li>blend with model (weight fit on one season, scored on the other: {{ range $i, $w := .w }}{{ if $i }}, {{ end }}{{ printf "%.0f" (mul $w 100) }}% model{{ end }}): <b>{{ printf "%.4f" .blend }}</b> <span class="cfb__dim">({{ printf "%+.4f" .dBlend }}, t {{ printf "%+.1f" .t }})</span></li>
+      <li>simulation alone, win chance: log loss <b>{{ partial "num.html" (slice "%.4f" .sim) }}</b>, winners {{ partial "num.html" (slice "%.1f%%" (mul .simAcc 100)) }} <span class="cfb__dim">(model {{ partial "num.html" (slice "%.4f" .model) }})</span></li>
+      <li>blend with model (weight fit on one season, scored on the other: {{ range $i, $w := .w }}{{ if $i }}, {{ end }}{{ partial "num.html" (slice "%.0f" (mul $w 100)) }}% model{{ end }}): <b>{{ partial "num.html" (slice "%.4f" .blend) }}</b> <span class="cfb__dim">({{ partial "num.html" (slice "%+.4f" .dBlend) }}, t {{ partial "num.html" (slice "%+.1f" .t) }})</span></li>
       <li>totals MAE: simulation {{ .totMaeSim }}, totals model {{ .totMaeModel }} (before weather) · simulated margin sd {{ .sdSim }}</li>
     </ul>
     {{- end }}
@@ -75,26 +75,26 @@
     <p class="cfbm__h">Calibration <span class="cfb__dim">(home win chance, out of sample: predicted vs observed)</span></p>
     <table class="cfb__table cfbm__t">
       <thead><tr><th>Predicted</th><th>Games</th><th>Avg predicted</th><th>Won</th></tr></thead>
-      <tbody>{{ range . }}{{ if .n }}<tr><td>{{ .bin }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .pred 100) }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .won 100) }}</td></tr>{{ end }}{{ end }}</tbody>
+      <tbody>{{ range . }}{{ if .n }}<tr><td>{{ .bin }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.0f%%" (mul .pred 100)) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.0f%%" (mul .won 100)) }}</td></tr>{{ end }}{{ end }}</tbody>
     </table>
     {{- end }}
     {{- end }}
     <p class="cfbm__h">Input weights <span class="cfb__dim">(points of margin per unit)</span></p>
     <ul class="cfbm__list">
-      <li>Elo: <b>{{ printf "%.2f" $r.beta.elo }}</b> per 25 Elo</li>
-      <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
-      {{- with $r.beta.talent }}<li>roster talent: <b>{{ printf "%.2f" . }}</b> per SD of talent gap</li>{{ else }}<li>roster talent: through the preseason prior only <span class="cfb__dim">({{ with $r.prior.pts }}{{ printf "%.1f" (index . 2) }} points{{ end }} per SD of the 247 composite, into Elo's start; separate input scored worse in every form tested: all season, early weeks, fading, by week)</span></li>{{ end }}
-      <li>special teams: <b>{{ printf "%.2f" $r.beta.st }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ printf "%.0f" (mul .fg40 100) }}% at 40 yards, {{ printf "%.0f" (mul .fg50 100) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
+      <li>Elo: <b>{{ partial "num.html" (slice "%.2f" $r.beta.elo) }}</b> per 25 Elo</li>
+      <li>efficiency: <b>{{ partial "num.html" (slice "%.2f" $r.beta.net) }}</b> per point of net EPA (EPA per play × 65 plays)</li>
+      {{- with $r.beta.talent }}<li>roster talent: <b>{{ partial "num.html" (slice "%.2f" .) }}</b> per SD of talent gap</li>{{ else }}<li>roster talent: through the preseason prior only <span class="cfb__dim">({{ with $r.prior.pts }}{{ partial "num.html" (slice "%.1f" (index . 2)) }} points{{ end }} per SD of the 247 composite, into Elo's start)</span></li>{{ end }}
+      <li>special teams: <b>{{ partial "num.html" (slice "%.2f" $r.beta.st) }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ partial "num.html" (slice "%.0f" (mul .fg40 100)) }}% at 40 yards, {{ partial "num.html" (slice "%.0f" (mul .fg50 100)) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
       {{- $cn := dict "sr" "success rate" "ed" "early-down success rate" "td" "3rd-down conversion rate" "rzsr" "red-zone success rate" "rz" "red-zone points per trip" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate over expected" "havoc" "havoc" "stuff" "stuff rate" "line" "line yards" "fp" "field position" "form" "recent form" "wxc" "weather squeeze" "qbRet" "returning QB production" "ret" "returning production" "avRet" "returning college WAR" "avRest" "returning college WAR, non-QB" "drv" "drive model margin" "p4" "conference tier (Power 4 vs Group of 5)" }}
       {{- $unit := dict "sr" "percentage point" "ed" "percentage point" "td" "percentage point" "rzsr" "percentage point" "rz" "point per trip" "xpl" "0.1 of explosiveness" "aggr" "percentage point of go rate over expected" "proe" "percentage point of pass rate over expected" "havoc" "percentage point" "stuff" "percentage point" "line" "line yard" "fp" "yard of starting field position" "form" "point a game of recent form" "wxc" "unit of weather x Elo gap" "qbRet" "SD" "ret" "SD" "avRet" "SD" "avRest" "SD" "drv" "point of drive-model margin" "p4" "step from Group of 5 to Power 4" }}
-      {{- range $k := ($r.extra | default (slice "sr")) }}{{ with index $r.beta $k }}<li>{{ index $cn $k }}: <b>{{ printf "%.2f" . }}</b> per {{ index $unit $k }} edge</li>{{ end }}{{ end }}
-      <li>home field: <b>{{ printf "%.1f" $r.beta.home }}</b> points</li>
-      <li>rest: <b>{{ printf "%.2f" $r.beta.rest }}</b> per day of extra rest</li>
-      <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>
-      <li>travel: <b>{{ printf "%.2f" $r.beta.dist }}</b> per 1,000 km</li>
-      <li>altitude: <b>{{ printf "%.1f" $r.beta.alt }}</b> for a lowland visitor above 1,200 m</li>
+      {{- range $k := ($r.extra | default (slice "sr")) }}{{ with index $r.beta $k }}<li>{{ index $cn $k }}: <b>{{ partial "num.html" (slice "%.2f" .) }}</b> per {{ index $unit $k }} edge</li>{{ end }}{{ end }}
+      <li>home field: <b>{{ partial "num.html" (slice "%.1f" $r.beta.home) }}</b> points</li>
+      <li>rest: <b>{{ partial "num.html" (slice "%.2f" $r.beta.rest) }}</b> per day of extra rest</li>
+      <li>time zones: <b>{{ partial "num.html" (slice "%.2f" $r.beta.tz) }}</b> per zone the visitor crosses beyond the home team</li>
+      <li>travel: <b>{{ partial "num.html" (slice "%.2f" $r.beta.dist) }}</b> per 1,000 km</li>
+      <li>altitude: <b>{{ partial "num.html" (slice "%.1f" $r.beta.alt) }}</b> for a lowland visitor above 1,200 m</li>
       <li>miss: sd <b>{{ $r.params.sigma }}</b> points for win and cover chances (normal around the margin, sd fit to winners){{ with $r.params.sigmaMargin }}; margin miss sd {{ . }}, widened by blowouts{{ end }}</li>
-      <li>totals: plays × points per play (each opponent-adjusted), then <b>{{ printf "%.1f" (index $r.totals.b 2) }}</b> per mph of wind over 10, <b>{{ printf "%.1f" (index $r.totals.b 3) }}</b> in rain, <b>{{ printf "%.1f" (index $r.totals.b 4) }}</b> below 35°F{{ if gt (len $r.totals.b) 5 }}, <b>{{ printf "%+.1f" (index $r.totals.b 5) }}</b> with an FCS side{{ end }} · MAE {{ $r.totals.all.mae }} (close {{ $r.totals.all.maeMarket }}) · O/U {{ $r.totals.all.ou.w }}-{{ $r.totals.all.ou.l }}</li>
+      <li>totals: plays × points per play (each opponent-adjusted), then <b>{{ partial "num.html" (slice "%.1f" (index $r.totals.b 2)) }}</b> per mph of wind over 10, <b>{{ partial "num.html" (slice "%.1f" (index $r.totals.b 3)) }}</b> in rain, <b>{{ partial "num.html" (slice "%.1f" (index $r.totals.b 4)) }}</b> below 35°F{{ if gt (len $r.totals.b) 5 }}, <b>{{ partial "num.html" (slice "%+.1f" (index $r.totals.b 5)) }}</b> with an FCS side{{ end }} · MAE {{ $r.totals.all.mae }} (close {{ $r.totals.all.maeMarket }}) · O/U {{ $r.totals.all.ou.w }}-{{ $r.totals.all.ou.l }}</li>
       <li>settings: Elo K {{ $r.params.k }}, Elo home field {{ $r.params.eloHome }}, efficiency prior worth {{ $r.params.lam }} games {{ if $r.hist }}(best on the 2017-20 tune seasons){{ else }}(best of {{ $r.grid }} on {{ $r.seasons.train }}){{ end }}</li>
     </ul>
   </div>

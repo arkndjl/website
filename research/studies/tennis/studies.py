@@ -94,7 +94,7 @@ def second_serve(d, MIN2=500, B=2000):
         'id': 'tennis-second-serve-first-serve',
         'sport': 'tennis',
         'question': 'Should players hit a first serve on second serve?',
-        'answer': f"No. {M['pos']} of {M['n']} men and {W['pos']} of {W['n']} women would gain. "
+        'answer': f"No. {M['sigpos']} of {M['n']} men and {W['sigpos']} of {W['n']} women gain with CI above 0. "
                   f"Median player loses {abs(M['med'])*100:.1f} pts (men), {abs(W['med'])*100:.1f} (women) per 100.",
         'findings': [
             f"Men: {M['signeg']} of {M['n']} lose with 95% CI below zero; {M['sigpos']} gain with CI above zero.",

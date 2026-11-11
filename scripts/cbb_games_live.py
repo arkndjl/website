@@ -211,10 +211,13 @@ def covers_report():
     try:
         r = subprocess.run(['curl', '-s', '-m', '60', '-A', H.UA, COVERS], capture_output=True, text=True)
         h = r.stdout
-    except Exception:
+    except Exception as e:
+        print(f'cbb injuries: Covers fetch failed ({e!r}), no report', flush=True)
         return []
     out = []
     parts = re.split(r'<a id="([^"]+)"></a>\s*<section>', h)
+    if len(parts) < 3:
+        print(f'cbb injuries: Covers returned no team sections (curl exit {r.returncode}, {len(h)} bytes), no Covers report', flush=True)
     row = re.compile(r"<tr>\s*<td>\s*<a href='[^']*/players/\d+/([^']+)'[^>]*>\s*([^<]+?)\s*</a>\s*</td>\s*<td>([^<]*)</td>\s*"
                      r"<td><b>([^<]+)</b>(?:<br>\(\s*([^)]+)\))?", re.S)
     for i in range(1, len(parts) - 1, 2):
@@ -337,6 +340,12 @@ SNAP_PREV = os.path.join(C.HERE, 'data', 'cbb_avail_prev.json.gz')
 PREV_KEYS = ('prevTeams', 'pn', 'val', 'roster')
 
 
+def pid_order(pid):
+    """sort key for player ids: Barttorvik's int pids first in number order, then the ESPN fill's 'e<id>' strings
+    (cbb_espn_logs gives a player it cannot match to Barttorvik a string id, so one team can hold both)"""
+    return (isinstance(pid, str), pid if isinstance(pid, int) else 0, str(pid))
+
+
 def avail_snapshot(logs):
     """the report-free part of the availability inputs at this build, so a later injury report re-prices the slate
     without the game logs (refresh_injuries). Per team, this season's players (pid, name, played, value at a full
@@ -363,7 +372,7 @@ def avail_snapshot(logs):
             bs = [(mn, bm) for g, mn, bm in st.values() if g < 0.6 * k or mn / g < 12]
             rp = (sum(b for _, b in bs) + -3.0 * C.BENCH) / (sum(m for m, _ in bs) + C.BENCH)
         pl = []
-        for pid in sorted(teams.get(t, ()) | set(st)):
+        for pid in sorted(set(teams.get(t, ())) | set(st), key=pid_order):
             g, mn, bm = st.get(pid, (0, 0.0, 0.0))
             rot = k >= 3 and g >= 0.6 * k and mn / g >= 12
             u = max(0.0, (bm - 150.0) / (mn + 150.0) - rp) * (mn / k) / 40 if rot else 0.0
@@ -400,7 +409,7 @@ def avail_snapshot(logs):
                 roster[c['bt']].append([row[ci['name']], last[0][K['team']]])
     except Exception:
         pass
-    return {'season': SEASON, 'teams': T, 'prevTeams': sorted(prev), 'pn': {t: sorted([p, n] for p, n in v.items()) for t, v in pn.items()},
+    return {'season': SEASON, 'teams': T, 'prevTeams': sorted(prev), 'pn': {t: [[p, v[p]] for p in sorted(v, key=pid_order)] for t, v in pn.items()},
             'val': {str(p): v for p, v in val.items()}, 'roster': dict(roster)}
 
 
@@ -509,18 +518,21 @@ def avail_live():
 
 
 def write_injuries(report):
-    """data/cbb_injuries.json, rewritten only when the list changes (the refresh runs every half hour)"""
+    """data/cbb_injuries.json: asof when the list last changed, checked when a run last read it (scripts/checked.py:
+    an unchanged list moves checked at most twice a day; the refresh runs every half hour). True when the list changed"""
     body = {'src': COVERS, 'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
                                        for t, n, ps, st, d, w in report]}
+    import checked
     try:
         old = json.load(open(INJ_OUT))
-        if old.get('players') == body['players']:
-            return False
     except (OSError, ValueError):
-        pass
-    with open(INJ_OUT, 'w') as f:
-        json.dump({'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), **body}, f, indent=0)
-    return True
+        old = None
+    same = bool(old) and old.get('players') == body['players']
+    out = checked.stamp(old, {'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), **body}, now_utc(), same=same)
+    if out is not None:
+        with open(INJ_OUT, 'w') as f:
+            json.dump(out, f, indent=0)
+    return not same
 
 
 def build():
@@ -836,13 +848,40 @@ def build():
         r['prev'] = snap.get(r['id']) if snap else r.get('priorRk')
     res['prevFrom'] = back[-1] if back else 'preseason'
     res['rkHist'] = hist
-    if old and {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
-        print('cbb games: no change')
-    else:
+    import checked
+    same = bool(old) and checked.body(old) == json.loads(json.dumps(checked.body(res)))
+    out = checked.stamp(old, res, now_utc(), same=same)
+    if same:
+        print('cbb games: no change' + ('' if out is None else ', checked'))
+    if out is not None:
         with open(C.OUT, 'w') as f:
-            json.dump(res, f, separators=(',', ':'))
+            json.dump(out, f, separators=(',', ':'))
+    if not same:
         print(f'cbb games: {len(out_games)} games on {sorted(show)}, {len(power)} teams rated, {len(left)} games simulated')
     save_snap(asnap)
+
+
+def smoke():
+    """the availability snapshot as a runner builds it (python3 scripts/cbb_games.py --smoke, run by the build gate):
+    Barttorvik answers with a page, so this season's file is missing and the ESPN fill gives the players it cannot
+    match 'e<id>' string ids next to Barttorvik's int pids; the snapshot, its JSON round trip and apply_report() run
+    on that mix with no network"""
+    import tempfile
+    saved = C.BTLOG, C.bt_logs
+    try:
+        C.BTLOG = tempfile.mkdtemp(prefix='cbb-smoke-')
+        C.bt_logs = lambda s: {'Duke': [('2026-03-01', {101: (30.0, 9.0), 'e555': (260.0, 4.0)})]}
+        logs = {'Duke': [(f'2026-11-0{i}', {101: (30.0, 6.0), 102: (20.0, 0.0), 'e900': (28.0, 3.5), 'e77': (14.0, -1.0)})
+                         for i in range(1, 5)] + [('2026-11-05', {101: (30.0, 6.0), 102: (20.0, 0.0)})]}
+        snap = avail_snapshot(logs)
+        snap = json.loads(json.dumps(snap, separators=(',', ':'), sort_keys=True))
+        pids = [p[0] for p in snap['teams']['Duke']['pl']]
+        assert pids == [101, 102, 'e77', 'e900'], pids
+        A = apply_report(snap, [])
+        assert A['inj']['Duke'] > 0 and A['missing']['Duke'][0]['st'] == 'sat last game', A
+    finally:
+        C.BTLOG, C.bt_logs = saved
+    print(f'cbb smoke: snapshot of {len(pids)} players (int and ESPN string ids), inj {A["inj"]["Duke"]}: ok')
 
 
 def save_snap(snap):

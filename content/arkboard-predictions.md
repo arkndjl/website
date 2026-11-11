@@ -66,7 +66,7 @@ cover = "/og/predictions.png"
 {{< soccermodel title="soccer game model :: walk-forward vs the close, 2012-27" tab="game models" >}}
 {{< cbbgamemodel title="college basketball game model :: inputs, weights, held-out test vs the close" tab="game models" >}}
 {{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
-{{< modelgov view="ledger" title="model ledger :: every shipped input, one test" tab="game models" >}}
+{{< modelgov view="ledger" title="model ledger" tab="game models" >}}
 {{< modelgov view="pipeline" title="pipeline :: every feed and refit" tab="game models" >}}
 {{< /lazytab >}}
 {{< lazytab tab="paper book" >}}

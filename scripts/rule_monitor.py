@@ -250,8 +250,8 @@ def at_base(b):
             r = C.ret(b['sport'], b['mk'], b['side'], b['line'], DU.BASE, b['close'])
             if r is not None:
                 return r
-        except Exception:
-            pass
+        except Exception as e:
+            print(f'rule monitor: close value recompute failed ({e!r}), the stored clvRet', file=sys.stderr)
     return b['clvRet']
 
 
@@ -265,7 +265,8 @@ def rho_for(sport, mk, held=None):
     try:
         import units as DU
         return max(0.0, DU.params(sport, mk).get('rho') or 0.0)
-    except Exception:
+    except Exception as e:
+        print(f'rule monitor: no units rho for {sport} {mk} ({e!r}), 0', file=sys.stderr)
         return 0.0
 
 

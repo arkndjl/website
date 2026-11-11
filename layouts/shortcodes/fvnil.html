@@ -23,7 +23,7 @@
     {{- $pos := dict -}}
     {{- range $k, $v := $p }}{{ $l := 0.0 }}{{ if gt $v 0 }}{{ $l = div (sub (math.Log (float $v)) $lo) $per }}{{ end }}{{ $pos = merge $pos (dict $k (math.Max 0 (math.Min 100 $l))) }}{{ end }}
     {{- $r := index ($disc.tiers | default dict) (string $t) }}
-    <div class="fvnil__row{{ if $fcs }} fvnil--disc{{ end }}" title="FV {{ $t }} · {{ .n }} players · 10th {{ partial "nil.html" .p10 | plainify }} · 25th {{ partial "nil.html" .p25 | plainify }} · median {{ partial "nil.html" .p50 | plainify }} · 75th {{ partial "nil.html" .p75 | plainify }} · 90th {{ partial "nil.html" .p90 | plainify }}{{ with .qb }} · QB median {{ partial "nil.html" . | plainify }}{{ end }}{{ with $r }} · {{ printf "%.0f" (mul . 100) }}% of the FBS median at this FV{{ end }}">
+    <div class="fvnil__row{{ if $fcs }} fvnil--disc{{ end }}" title="FV {{ $t }} · {{ .n }} players · 10th {{ partial "nil.html" .p10 | plainify }} · 25th {{ partial "nil.html" .p25 | plainify }} · median {{ partial "nil.html" .p50 | plainify }} · 75th {{ partial "nil.html" .p75 | plainify }} · 90th {{ partial "nil.html" .p90 | plainify }}{{ with .qb }} · QB median {{ partial "nil.html" . | plainify }}{{ end }}{{ with $r }} · {{ partial "num.html" (slice "%.0f" (mul . 100)) }}% of the FBS median at this FV{{ end }}">
       <span class="fv-chip" data-fv="{{ $t }}">{{ $t }}</span>
       <span class="fvnil__track">
         <i class="fvnil__whisk" style="left:{{ $pos.p10 }}%;width:{{ sub $pos.p90 $pos.p10 }}%"></i>
@@ -32,10 +32,10 @@
         {{- with .qb }}<i class="fvnil__qb" style="left:{{ $pos.qb }}%"></i>{{ end }}
       </span>
       <b class="fvnil__v">{{ partial "nil.html" .p50 }}</b>
-      {{- if $fcs }}<span class="fvnil__disc">{{ with $r }}{{ printf "%.0f" (mul . 100) }}%{{ else }}—{{ end }}</span>{{ end }}
+      {{- if $fcs }}<span class="fvnil__disc">{{ with $r }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ else }}—{{ end }}</span>{{ end }}
     </div>
     {{- end }}{{ end }}
   </div>
-  <div class="win__status"><span>{{ if $fcs }}{{ with $disc.all }}FCS discount at equal FV: <b>{{ printf "%.0f" (mul . 100) }}%</b> of FBS ({{ printf "%.0f" (mul (sub 1 .) 100) }}% off) · {{ end }}{{ end }}box 25th–75th · whisker 10th–90th · <span class="fvnil__qbkey"></span> QB median · hover a tier</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ if $fcs }}{{ with $disc.all }}FCS discount at equal FV: <b>{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%</b> of FBS ({{ partial "num.html" (slice "%.0f" (mul (sub 1 .) 100)) }}% off) · {{ end }}{{ end }}box 25th–75th · whisker 10th–90th · <span class="fvnil__qbkey"></span> QB median · hover a tier</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

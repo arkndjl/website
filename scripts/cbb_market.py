@@ -11,7 +11,7 @@ NIL, per player (CFB definitions, Noah):
         preseason value^k. The index uses only what was known before the season (last season's college value, else
         the freshman projection from recruiting rank; FV). Frozen per season on first run (scripts/data/cbb_ynil.json).
   xNIL  what he is worth on the open market now: on-field value (college value this season = minutes share x BPM over
-        -3, plus a x NBA value at his FV, the XPM over -2 at the board's cuts) at his market's price; each level's
+        -3, plus a x NBA value at his FV, the XPM over replacement (-1.4, VORX) at the board's cuts) at his market's price; each level's
         pool is its programs' total yNIL; a player at a higher level's rotation standard is priced in that market.
   zNIL  xNIL - yNIL.
   k and a are chosen by fit to On3's valuations (log RMSE; On3 values only the top ~60 players, so a diagnostic).
@@ -31,6 +31,7 @@ sys.path.insert(0, HERE)
 import cbb_market_fit as M  # noqa: E402
 import names as N  # noqa: E402
 from cbb_recruit_fit import XNIL, REP_BPM, LEVELS  # noqa: E402
+from nba_xpm import VORX_REP  # noqa: E402
 
 ALL = os.path.join(ROOT, 'static', 'data', 'cbb-all.json')
 GAMES = os.path.join(ROOT, 'data', 'cbb_games.json')
@@ -45,7 +46,7 @@ OUT = os.path.join(ROOT, 'data', 'cbb_market.json')
 BUILD = os.path.join(ROOT, 'static', 'data', 'cbb-builder.json')
 HM = LEVELS['HM']
 ROSTER = 15            # men's basketball roster limit (House settlement, 2025-26 on)
-NBA_REPL = -2.0
+NBA_REPL = VORX_REP    # replacement XPM, the VORX line
 FLOOR = 0.3            # value floor: a 10% minutes player at BPM 0 (depth is worth something)
 LEVEL_FIT = os.environ.get('CBB_NIL_LEVEL', '0') == '1'   # off: On3's top-42 tail would put the average high-major budget near $18M
 SOFT = 0.25            # the NIL budget is a soft target: P(over) cost rises over 25% of budget (as the CFB builder)

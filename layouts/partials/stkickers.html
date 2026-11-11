@@ -39,16 +39,16 @@
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
     {{- end }}
     <td class="cfb__num" data-v="{{ .fgm }}">{{ .fgm }}/{{ .fga }}</td>
-    <td class="cfb__num" data-v="{{ .pct | default -1 }}">{{ with .pct }}{{ printf "%.0f" (float .) }}{{ else }}–{{ end }}</td>
-    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f" (float .adj) }}</span></td>
-    <td class="cfb__num bw__x" data-v="{{ .xpct | default -1 }}">{{ with .xpct }}{{ printf "%.0f" (float .) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .pct | default -1 }}">{{ with .pct }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .adj)) }}</span></td>
+    <td class="cfb__num bw__x" data-v="{{ .xpct | default -1 }}">{{ with .xpct }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ else }}–{{ end }}</td>
     <td class="cfb__num bw__x">{{ .lng }}</td>
     <td class="cfb__num bw__x">{{ .f50 }}</td>
     <td class="cfb__num bw__x" data-v="{{ .xpm }}">{{ .xpm }}/{{ .xpa }}</td>
     <td class="cfb__num bw__x">{{ .ko }}</td>
     <td class="cfb__num bw__x" data-v="{{ .tb | default -1 }}">{{ with .tb }}{{ . }}{{ else }}–{{ end }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .fgp }}">{{ printf "%+.1f" (float .fgp) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .kop | default 0 }}">{{ with .kop }}{{ printf "%+.1f" (float .) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .fgp }}">{{ partial "num.html" (slice "%+.1f" (float .fgp)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .kop | default 0 }}">{{ with .kop }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}–{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -88,16 +88,16 @@
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
     {{- end }}
     <td class="cfb__num">{{ .pu }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .gross }}">{{ printf "%.1f" (float .gross) }}</td>
-    <td class="cfb__num" data-v="{{ .net }}">{{ printf "%.1f" (float .net) }}</td>
-    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f" (float .adj) }}</span></td>
+    <td class="cfb__num bw__x" data-v="{{ .gross }}">{{ partial "num.html" (slice "%.1f" (float .gross)) }}</td>
+    <td class="cfb__num" data-v="{{ .net }}">{{ partial "num.html" (slice "%.1f" (float .net)) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .adj)) }}</span></td>
     <td class="cfb__num bw__x">{{ .i20 }}</td>
     <td class="cfb__num bw__x">{{ .tb }}</td>
     <td class="cfb__num bw__x">{{ .nr }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .ryr | default -1 }}">{{ with .ryr }}{{ printf "%.1f" (float .) }}{{ else }}–{{ end }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .spin }}">{{ printf "%+.1f" (float .spin) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .sfar }}">{{ printf "%+.1f" (float .sfar) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .leg }}">{{ printf "%+.1f" (float .leg) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .ryr | default -1 }}">{{ with .ryr }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}–{{ end }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .spin }}">{{ partial "num.html" (slice "%+.1f" (float .spin)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .sfar }}">{{ partial "num.html" (slice "%+.1f" (float .sfar)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .leg }}">{{ partial "num.html" (slice "%+.1f" (float .leg)) }}</td>
   </tr>
   {{- end }}
   </tbody>

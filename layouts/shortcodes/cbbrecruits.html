@@ -78,7 +78,7 @@
     <th title="expected share of team minutes, years 1 · 2 · 3 (0 when not in D-I: transfer counts, NBA exit does not)">Path</th>
     <th title="expected NIL market value, year 1: college value (minutes share x BPM above -3) at the school's price">xNIL</th>
     <th title="On3 industry consensus national rank (On3, 247, ESPN)">Nat</th><th title="247Sports rank">247</th><th title="ESPN rank">ESPN</th>
-    <th>Size</th><th>Home</th><th>Conf</th><th>Status</th>
+    <th>Size</th><th>Home</th><th title="conference">Conf</th><th>Status</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $C.list }}
@@ -89,7 +89,7 @@
     <td data-v="{{ if .fsp }}6{{ else }}{{ .stars | default 0 }}{{ end }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat (int .) "★" }}</span>{{ if $r.fsp }}<span title="5-star+">+</span>{{ end }}{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td data-v="{{ .pos }}">{{ .pos }}</td>
     <td data-v="{{ .team | default .school | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}{{ with $r.school }}<span>{{ . }}</span>{{ else }}{{ with $r.lead }}<span class="cfb__dim" title="uncommitted; On3 prediction leader">{{ index . 0 }} {{ index . 1 }}%</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}{{ end }}</td>
-    <td class="fv cfb__g" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ math.Max 20 (mul (div (int .fv) 5) 5) }}" title="mean outcome {{ printf "%.1f" .fvx }}">{{ .fv }}</span></td>
+    <td class="fv cfb__g" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ math.Max 20 (mul (div (int .fv) 5) 5) }}" title="mean outcome {{ partial "num.html" (slice "%.1f" .fvx) }}">{{ .fv }}</span></td>
     <td class="cfb__num" data-v="{{ .p }}">{{ if lt .p 0.005 }}&lt;1%{{ else }}{{ math.Round (mul .p 100) }}%{{ end }}</td>
     <td class="cfb__num" data-v="{{ .p50 }}">{{ if lt .p50 0.005 }}&lt;1%{{ else }}{{ math.Round (mul .p50 100) }}%{{ end }}</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
@@ -97,7 +97,7 @@
     {{- $y1 := index .path 0 }}
     <td class="cfb__num" data-v="{{ $y1.on }}">{{ math.Round (mul $y1.on 100) }}%</td>
     <td class="cfb__num" data-v="{{ $y1.min }}">{{ math.Round $y1.min }}</td>
-    <td class="cfb__num" data-v="{{ $y1.bpm }}">{{ if gt $y1.bpm 0 }}+{{ end }}{{ printf "%.1f" $y1.bpm }}</td>
+    <td class="cfb__num" data-v="{{ $y1.bpm }}">{{ if gt $y1.bpm 0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" $y1.bpm) }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ mul $y1.on $y1.min }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ math.Round (mul $x.on $x.min) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rk }}">{{ .rk }}</td>
@@ -126,19 +126,19 @@
     <th title="year 1: expected share of team minutes the commits play, summed (500 = a full lineup)">Y1 Min</th>
     <th title="year 1: commits' college value (minutes share x BPM above -3), summed">Y1 Value</th>
     <th title="sum of commits' xNIL, year 1">Class xNIL</th>
-    <th title="best consensus rank in the class">Best</th><th>Top commits</th><th>Conf</th>
+    <th title="best consensus rank in the class">Best</th><th>Top commits</th><th title="conference">Conf</th>
   </tr></thead>
   <tbody>
   {{- range .teams }}
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
-    <td class="cfb__num cfb__g" data-v="{{ .ets }}">{{ printf "%.1f" .ets }}</td>
+    <td class="cfb__num cfb__g" data-v="{{ .ets }}">{{ partial "num.html" (slice "%.1f" .ets) }}</td>
     <td class="cfb__num">{{ .n }}</td>
     <td class="cfb__num">{{ .ark5 }}</td><td class="cfb__num">{{ .ark4 }}</td>
     <td class="cfb__num" data-v="{{ .pNba }}">{{ math.Round (mul .pNba 100) }}%</td>
     <td class="cfb__num" data-v="{{ .min1 }}">{{ math.Round .min1 }}</td>
-    <td class="cfb__num" data-v="{{ .v1 }}">{{ printf "%.1f" .v1 }}</td>
+    <td class="cfb__num" data-v="{{ .v1 }}">{{ partial "num.html" (slice "%.1f" .v1) }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .best }}</td>
     <td class="cfb__dim">{{ range $j, $x := .top }}{{ if $j }} · {{ end }}{{ index $x 0 }} ({{ index $x 1 }}, {{ index $x 2 }}){{ end }}</td>
@@ -156,15 +156,15 @@
     <p><b>target</b> FV: 20 no NBA · 30 NBA · 35 100+ games · 40 3+ rotation seasons · 45 2+ seasons as a starter · 50 4+ · 55 6+ or All-Star · 60 2+ All-Star · 65-80 All-NBA</p>
     <p><b>sample</b> On3 {{ index $m.train.classes 0 }}-{{ index $m.train.classes 1 }}, n = {{ $m.train.n }} · reached the NBA {{ $m.train.nba }}</p>
     <p><b>model</b> P(NBA) = logistic · FV if NBA = linear on log(FV - 20) · kept, P(NBA): {{ delimit $m.kept.p ", " }} · kept, FV if NBA: {{ delimit $m.kept.value ", " }}</p>
-    <p><b>held out</b> rank correlation with realized FV: consensus rank {{ printf "%.3f" $m.heldout.rank }}, model <b>{{ printf "%.3f" $m.heldout.model }}</b> (t {{ $m.heldout.t }}, {{ $m.heldout.wins }} of 8 classes) · forward: 2017 {{ (index $m.forward "2017").rank }} → {{ (index $m.forward "2017").model }}, 2018 {{ (index $m.forward "2018").rank }} → {{ (index $m.forward "2018").model }}</p>
+    <p><b>held out</b> rank correlation with realized FV: consensus rank {{ partial "num.html" (slice "%.3f" $m.heldout.rank) }}, model <b>{{ partial "num.html" (slice "%.3f" $m.heldout.model) }}</b> (t {{ $m.heldout.t }}, {{ $m.heldout.wins }} of 8 classes) · forward: 2017 {{ (index $m.forward "2017").rank }} → {{ (index $m.forward "2017").model }}, 2018 {{ (index $m.forward "2018").rank }} → {{ (index $m.forward "2018").model }}</p>
     {{- with $m.stars }}{{ $st := . }}{{ $pk := index .schemes .pick }}{{ $ind := .schemes.industry }}{{ $sh := .schemes.share }}
-    <p><b>ARK stars</b> 5 = FV 45+ · 4 = NBA · 3 = D-I starter at BPM +3 · 2 = D-I · 1 = none · cuts, FV: 2★ {{ index .cuts 0 }}, 3★ {{ index .cuts 1 }}, 4★ {{ index .cuts 2 }}, 5★ {{ index .cuts 3 }} · R² <b>{{ printf "%.1f" (mul $pk.r2 100) }}%</b> (bands), {{ printf "%.1f" (mul $sh.r2 100) }}% (industry shares), {{ printf "%.1f" (mul $ind.r2 100) }}% (industry stars) · rank correlation {{ printf "%.3f" $pk.rho }}, {{ printf "%.3f" $sh.rho }}, {{ printf "%.3f" $ind.rho }}{{ range .plusSweep }}{{ if eq .perClass $st.plusPer }} · <b>5-star+</b> top {{ $st.plusPer }} a class (FV {{ .cut }}+): {{ math.Round (mul .elite 100) }}% FV 55+, {{ math.Round (mul .starter 100) }}% 2+ season starters · FV 55+ by size: {{ range $i, $x := $st.plusSweep }}{{ if $i }} · {{ end }}{{ $x.perClass }}: {{ math.Round (mul $x.elite 100) }}%{{ end }}{{ end }}{{ end }}{{ with .halfTest }} · half stars R² {{ printf "%.1f" (mul .r2Half 100) }}% vs {{ printf "%.1f" (mul .r2Whole 100) }}% whole{{ end }}</p>
+    <p><b>ARK stars</b> 5 = FV 45+ · 4 = NBA · 3 = D-I starter at BPM +3 · 2 = D-I · 1 = none · cuts, FV: 2★ {{ index .cuts 0 }}, 3★ {{ index .cuts 1 }}, 4★ {{ index .cuts 2 }}, 5★ {{ index .cuts 3 }} · R² <b>{{ partial "num.html" (slice "%.1f" (mul $pk.r2 100)) }}%</b> (bands), {{ partial "num.html" (slice "%.1f" (mul $sh.r2 100)) }}% (industry shares), {{ partial "num.html" (slice "%.1f" (mul $ind.r2 100)) }}% (industry stars) · rank correlation {{ partial "num.html" (slice "%.3f" $pk.rho) }}, {{ partial "num.html" (slice "%.3f" $sh.rho) }}, {{ partial "num.html" (slice "%.3f" $ind.rho) }}{{ range .plusSweep }}{{ if eq .perClass $st.plusPer }} · <b>5-star+</b> top {{ $st.plusPer }} a class (FV {{ .cut }}+): {{ math.Round (mul .elite 100) }}% FV 55+, {{ math.Round (mul .starter 100) }}% 2+ season starters · FV 55+ by size: {{ range $i, $x := $st.plusSweep }}{{ if $i }} · {{ end }}{{ $x.perClass }}: {{ math.Round (mul $x.elite 100) }}%{{ end }}{{ end }}{{ end }}{{ with .halfTest }} · half stars R² {{ partial "num.html" (slice "%.1f" (mul .r2Half 100)) }}% vs {{ partial "num.html" (slice "%.1f" (mul .r2Whole 100)) }}% whole{{ end }}</p>
     {{- end }}
     {{- with $m.path }}{{ $p1 := index . "1" }}
     <p><b>college years</b> fit {{ sub $m.pathEra 1 }}-{{ sub $m.pathEra 2000 }} to 2025-26 · value = minutes share x (BPM + 3) · year 1, held out: plays D-I AUC <b>{{ $p1.parts.on.auc }}</b> · minutes RMSE {{ $p1.parts.min.null }} (class mean) → {{ $p1.parts.min.rank }} (rank) → <b>{{ $p1.parts.min.model }}</b> · BPM {{ $p1.parts.bpm.null }} → {{ $p1.parts.bpm.rank }} → <b>{{ $p1.parts.bpm.model }}</b></p>
     {{- end }}
     {{- with $m.xnil }}
-    <p><b>xNIL</b> budget ${{ div .budget.HM 1e6 }}M ({{ delimit .levels.HM ", " }}) · ${{ div .budget.MM 1e6 }}M ({{ delimit .levels.MM ", " }}) · ${{ div .budget.LM 1e3 }}K other · x e^({{ .tilt }} z) · mean roster value {{ .ref.season }}: {{ printf "%.1f" .ref.value.HM }}, {{ printf "%.1f" .ref.value.MM }}, {{ printf "%.1f" .ref.value.LM }}</p>
+    <p><b>xNIL</b> budget ${{ div .budget.HM 1e6 }}M ({{ delimit .levels.HM ", " }}) · ${{ div .budget.MM 1e6 }}M ({{ delimit .levels.MM ", " }}) · ${{ div .budget.LM 1e3 }}K other · x e^({{ .tilt }} z) · mean roster value {{ .ref.season }}: {{ partial "num.html" (slice "%.1f" .ref.value.HM) }}, {{ partial "num.html" (slice "%.1f" .ref.value.MM) }}, {{ partial "num.html" (slice "%.1f" .ref.value.LM) }}</p>
     {{- end }}
     {{- with $m.research }}
     <p><b>not kept</b> isotonic FV map: top-5 bias {{ math.Abs (index .isotonic.top5 0) }} → {{ index .isotonic.top5 1 }}, MSE {{ index .isotonic.mse 0 }} → {{ index .isotonic.mse 1 }} (t {{ .isotonic.t }}, {{ .isotonic.wins }} of 8), with 2017-18 {{ index .isotonic.mse10 0 }} → {{ index .isotonic.mse10 1 }} · top-25 hinge MSE {{ index .linear_top25.mse 0 }} → {{ index .linear_top25.mse 1 }} (t {{ .linear_top25.t }}, {{ .linear_top25.wins }} of 8) · On3 age listed {{ math.Round (mul (index .age_on3 0) 100) }}% (NBA) vs {{ math.Round (mul (index .age_on3 1) 100) }}% (rest); birth-date term on known dates t {{ .old_known.t }}, {{ .old_known.wins }} of 8</p>
@@ -189,16 +189,16 @@
 <div class="win wintable">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>drivers tested :: added to consensus rank, held out<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="wintable__scroll"><table class="cfb__table">
-    <thead><tr><th>Driver</th><th title="chance of reaching the NBA (log loss) or FV if he does (RMSE of log FV above 20)">Part</th><th title="paired t across held-out classes; positive helps">t</th><th>Classes</th><th>Kept</th></tr></thead>
-    <tbody>{{ range $m.tests }}{{ $k := cond (eq .part "p") $m.kept.p $m.kept.value }}<tr><td>{{ .driver }}</td><td>{{ cond (eq .part "p") "NBA%" "size" }}</td><td class="cfb__num">{{ printf "%+.2f" .t }}</td><td class="cfb__num">{{ .classes }}/8</td><td>{{ if in $k .driver }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>
+    <thead><tr><th>Driver</th><th title="chance of reaching the NBA (log loss) or FV if he does (RMSE of log FV above 20)">Part</th><th title="paired t across held-out classes; positive helps">t</th><th>Classes</th><th title="kept in the model after the held-out test">Kept</th></tr></thead>
+    <tbody>{{ range $m.tests }}{{ $k := cond (eq .part "p") $m.kept.p $m.kept.value }}<tr><td>{{ .driver }}</td><td>{{ cond (eq .part "p") "NBA%" "size" }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.2f" .t) }}</td><td class="cfb__num">{{ .classes }}/8</td><td>{{ if in $k .driver }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>
   </table></div>
 </div>
 {{- with $m.stars }}{{ $pk := index .schemes .pick }}{{ $ind := .schemes.industry }}
 <div class="win wintable">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>ARK stars vs industry stars :: held out, 2009-16<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="wintable__scroll"><table class="cfb__table cbbrc">
-    <thead><tr><th>Stars</th><th title="share of ranked recruits at this ARK star">ARK share</th><th title="mean realized FV">FV</th><th>NBA%</th><th title="played D-I">D-I%</th><th title="2+ seasons as an NBA starter">Starter%</th><th>Industry share</th><th>FV</th><th>NBA%</th><th>Starter%</th></tr></thead>
-    <tbody>{{ range $i, $a := $pk.tiers }}{{ $n := index $ind.tiers $i }}<tr><td><span class="cfbrc__ark" style="--n:{{ $a.stars }}" data-n="{{ $a.stars }}" role="img" aria-label="{{ $a.stars }} stars"><i></i></span></td><td class="cfb__num">{{ printf "%.1f" (mul $a.share 100) }}%</td><td class="cfb__num">{{ $a.fv }}</td><td class="cfb__num">{{ with $a.nba }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ with $a.d1 }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ with $a.starter }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ printf "%.1f" (mul $n.share 100) }}%</td><td class="cfb__num cfb__dim">{{ $n.fv }}</td><td class="cfb__num cfb__dim">{{ with $n.nba }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ with $n.starter }}{{ math.Round (mul . 100) }}%{{ end }}</td></tr>{{ end }}</tbody>
+    <thead><tr><th>Stars</th><th title="share of ranked recruits at this ARK star">ARK share</th><th title="mean realized FV">FV</th><th>NBA%</th><th title="played D-I">D-I%</th><th title="2+ seasons as an NBA starter">Starter%</th><th>Industry share</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>NBA%</th><th>Starter%</th></tr></thead>
+    <tbody>{{ range $i, $a := $pk.tiers }}{{ $n := index $ind.tiers $i }}<tr><td><span class="cfbrc__ark" style="--n:{{ $a.stars }}" data-n="{{ $a.stars }}" role="img" aria-label="{{ $a.stars }} stars"><i></i></span></td><td class="cfb__num">{{ partial "num.html" (slice "%.1f" (mul $a.share 100)) }}%</td><td class="cfb__num">{{ $a.fv }}</td><td class="cfb__num">{{ with $a.nba }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ with $a.d1 }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ with $a.starter }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ partial "num.html" (slice "%.1f" (mul $n.share 100)) }}%</td><td class="cfb__num cfb__dim">{{ $n.fv }}</td><td class="cfb__num cfb__dim">{{ with $n.nba }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ with $n.starter }}{{ math.Round (mul . 100) }}%{{ end }}</td></tr>{{ end }}</tbody>
   </table></div>
 </div>
 {{- end }}

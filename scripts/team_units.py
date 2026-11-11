@@ -269,8 +269,13 @@ def _save(sport, obj):
             old = json.load(open(p))
         except ValueError:
             old = None
-    if old and {k: v for k, v in old.items() if k != 'asof'} == {k: v for k, v in obj.items() if k != 'asof'}:
-        print(sport, 'unchanged'); return
+    import checked
+    same = bool(old) and checked.body(old) == checked.body(obj)
+    obj = checked.stamp(old, obj, datetime.datetime.now(datetime.timezone.utc), same=same)
+    if same:
+        print(sport, 'unchanged' if obj is None else 'unchanged, checked')
+    if obj is None:
+        return
     with open(p, 'w') as f:
         json.dump(obj, f, separators=(',', ':'), allow_nan=False)
         f.write('\n')

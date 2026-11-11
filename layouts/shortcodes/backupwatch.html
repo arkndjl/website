@@ -62,13 +62,13 @@
     <td class="fv" data-v="{{ $s.fv }}"><span class="fv-chip" data-fv="{{ mul (div (int $s.fv) 5) 5 }}">{{ $s.fv }}</span></td>
     <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">+{{ .gap }}</span></td>
     {{- else }}
-    <td class="cfb__num" data-v="{{ .g }}">{{ printf (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float .g) }}</td>
+    <td class="cfb__num" data-v="{{ .g }}">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float .g)) }}</td>
     <td>{{ $s.name }}{{ with $s.cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with $s.age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ $s.g }}">{{ printf (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float $s.g) }}</td>
-    <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">{{ printf (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "+%.2f" "+%.1f") (float .gap) }}</span></td>
+    <td class="cfb__num" data-v="{{ $s.g }}">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float $s.g)) }}</td>
+    <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "+%.2f" "+%.1f") (float .gap)) }}</span></td>
     {{- end }}
     {{- $x := .xgap | default .gap }}
-    <td class="cfb__num is-key" data-v="{{ $x }}">{{ printf $xfmt (float $x) }}</td>
+    <td class="cfb__num is-key" data-v="{{ $x }}">{{ partial "num.html" (slice $xfmt (float $x)) }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ .use | default .mpg }}{{ with .unit }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ else }}{{ lang.FormatNumber 0 .use }}{{ end }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ $s.use | default $s.mpg }}{{ else }}{{ lang.FormatNumber 0 $s.use }}{{ end }}</td>
   </tr>
@@ -86,5 +86,5 @@
 {{- with $T.c -}}
 {{- $xabout = printf " Ranked by xGap: the gap projected over the next two seasons, %.2f x today's gap %+.3g plus %.3g for each %s the backup is younger than the starter (a player who leaves counts at replacement). %s" (float $T.b) (float $T.a) (float .) (cond $college "class year" "year") (cond (eq $T.src "fit") (printf "Fit on %v past backup-starter pairs; on held-out seasons the age term cut the squared error (t %v)." $T.n $T.t) (cond (eq $T.src "fit-sd") (printf "No past FV on file, so the class term is fit on %v past pairs graded by BPM (held-out t %v; departures drive it) and scaled to the FV gap." $T.n $T.t) (cond (eq $T.src "pros") "No past depth or grades on file, so the terms are the NBA, NHL and soccer fits, scaled to this gap." "No past depth or grades on file, so the terms are the CBB fit, scaled to this gap."))) -}}
 {{- end -}}
-{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "backup_%s" $sport) "note" (printf "backups above the starter · ranked by xGap · updated %s" $date) "about" (printf "%s%s" (index $about $sport) $xabout)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "backup_%s" $sport) "note" (printf "updated %s" $date) "about" (printf "Backups above the starter, ranked by xGap. %s%s" (index $about $sport) $xabout)) -}}
 {{- end -}}

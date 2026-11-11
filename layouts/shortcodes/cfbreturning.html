@@ -23,7 +23,7 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .n }}</span></td>
     <td class="bw__x">{{ .grp }}</td>
-    <td class="cfb__num is-key" data-v="{{ .pts }}"><span class="{{ if ge (float .pts) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ printf "%+.1f" (float .pts) }}</span></td>
+    <td class="cfb__num is-key" data-v="{{ .pts }}"><span class="{{ if ge (float .pts) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .pts)) }}</span></td>
     {{- range $k := slice "qb" "off" "def" }}{{ $v := index $r $k }}
     <td class="cfb__num"{{ with $v }} data-v="{{ . }}"{{ end }}>{{ if ne $v nil }}{{ $v }}%{{ else }}—{{ end }}</td>
     {{- end }}
