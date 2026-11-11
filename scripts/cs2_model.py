@@ -22,6 +22,10 @@ The rating (scored against Valve's VRS points and a team-name Elo, out of sample
     vs .579). The Thunderpick archive's chances (tp) stay model-only: that picks test was pre-registered on them.
 FAILED (weight 0, numbers in data/cs2_fit.json): team-name Elo beside player Elo, roster continuity, inactivity decay,
 Bo1/Bo3/Bo5 slopes (tested on the 2022-23 sample, the only history with maps), Kalman player ratings.
+Over-confidence in some months (Sep 2025, Jan 2026, Sep-Oct 2026; scripts/cs2_calib_research.py): real, not Valve's
+late-listed series (series listed within 45 days score slope .98 held out); the player Elo term loses about a third of
+its weight in those months. FAILED, by month: days-since-last-series x logit (all t -4.2 but top 50 -0.7), trailing
+90/180-day temperature (all or top 50 only), weights refit each month on all rows so far.
 Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
 flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
 the blend weight absorbs the scale. Kept as is.
