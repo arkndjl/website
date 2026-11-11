@@ -275,6 +275,14 @@ def main():
     def age(r):
         return r.get('age') if r.get('age') is not None else r.get('ageEst')
 
+    def spos(r, L=None):
+        """the Stat+ position: Barttorvik's role (this line's, else last season's on the board), as the 2025-26 norms and
+        the FV driver read it; a newcomer with no role is a C at 6'10" and up (84% of 2025-26 players that tall had a C
+        or PF/C role), else his roster position. ESPN's roster labels made 227 qualified centers against 598 on roles"""
+        p = POSMAP.get((L or {}).get('role')) or POSMAP.get(r.get('role'))
+        if p: return p
+        return 'C' if (r.get('mht') or 0) >= 82 else r.get('pos')
+
     # this season's lines from the board ('now', cbb_live.py)
     cur = []
     for r in B:
@@ -283,15 +291,15 @@ def main():
         mins = (L['mpg'] or 0) * L['gp']
         cur.append((r, L, mins))
     # this season's Stat+ norms: its own 10%+ minute players by position (team games so far), once LIVE_MIN a position
-    pool = [{'pos': r['pos'], 'bpm': L['bpm'], 'mp': mins / L['gp'], 'gp': L['gp'], 'role': None,
+    pool = [{'pos': spos(r, L), 'bpm': L['bpm'], 'mp': mins / L['gp'], 'gp': L['gp'], 'role': None,
              'min_per': 100 * mins / (40 * (len(tg.get(e2t.get(r['team'], r['team']), ())) or L['gp']))}
-            for r, L, mins in cur if L.get('bpm') is not None and r.get('pos') in ('G', 'F', 'C')]
+            for r, L, mins in cur if L.get('bpm') is not None and spos(r, L) in ('G', 'F', 'C')]
     live_n = {p: sum(1 for l in pool if l['pos'] == p and l['min_per'] >= 10) for p in 'GFC'}
     norms_now = pos_norms(pool, key='pos') if min(live_n.values()) >= LIVE_MIN else None
 
     # ---- stats
-    def srow(n, tm, pos, ag, sub, ph, lo, s, fv=None, N=None):
-        return {'n': n, 'tm': tm, 'pos': pos, 'age': ag, 'sub': sub or '', 'ph': ph, 'lo': lo, 'fv': fv, 'splus': splus(s['bpm'], pos, N), **s}
+    def srow(n, tm, pos, ag, sub, ph, lo, s, fv=None, N=None, sp=None):
+        return {'n': n, 'tm': tm, 'pos': pos, 'age': ag, 'sub': sub or '', 'ph': ph, 'lo': lo, 'fv': fv, 'splus': splus(s['bpm'], sp or pos, N), **s}
 
     now_rows = []
     for r, L, mins in cur:
@@ -300,7 +308,7 @@ def main():
              'tpa': L.get('tpa'), 'ft': L.get('ft'), 'astp': L.get('ast'), 'to': L.get('to'), 'stl': L.get('stl'), 'blk': L.get('blk'),
              'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(L['bpm'], mins), 2), 'waa': r1(war(L['bpm'], mins, 0), 2),
              'nx': r1(nx_now.get((r['name'], r['team'])), 2)}
-        now_rows.append(srow(r['name'], r['team'], r['pos'], age(r), r['conf'], r.get('photo'), r.get('logo'), s, r['fv'], norms_now))
+        now_rows.append(srow(r['name'], r['team'], r['pos'], age(r), r['conf'], r.get('photo'), r.get('logo'), s, r['fv'], norms_now, spos(r, L)))
     last_rows = []
     for l in F['lines']:
         r = by_pid.get(l['pid'])
@@ -453,7 +461,7 @@ def main():
         prow.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'ph': r.get('photo'), 'lo': r.get('logo'), 'div': move,
                      'sub': f"from {t2e.get(L['team'], L['team'])}" + (f" ({fc})" if fc else ''),
                      'war': s['war'] if s else r1(war(L['bpm'], L['gp'] * L['mpg']), 2), 'bpm': L['bpm'], 'mpg': L['mpg'], 'ppg': L.get('ppg'),
-                     'splus': splus(L['bpm'], r['pos']), 'fv': r['fv'], 'xbpm': r.get('xbpm'), 'bnow': (r.get('now') or {}).get('bpm')})
+                     'splus': splus(L['bpm'], spos(r, L)), 'fv': r['fv'], 'xbpm': r.get('xbpm'), 'bnow': (r.get('now') or {}).get('bpm')})
     write('portal', {
         'title': 'portal', 'key': 'war', 'def': '',
         'views': [['war', 'WAR', 'WAR last season'], ['fv', 'FV', 'FV now'], ['xbpm', 'xBPM', 'projected BPM this season'], ['bpm', 'BPM', 'BPM last season']],
