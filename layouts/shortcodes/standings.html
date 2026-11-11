@@ -35,7 +35,6 @@
 <div class="win st-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default .title }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="st-body">
-    <p class="cfb__dim st-note">if the season ended today · {{ .note }}</p>
     <div class="st-confs">
     {{- range .confs }}
       <div class="st-conf">
@@ -48,7 +47,7 @@
     {{- end }}
     </div>
   </div>
-  <div class="win__status"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="if the season ended today · {{ .note }}"><span>{{ $note }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}{{ end -}}
 {{- define "partials/inline/st-seed.html" -}}

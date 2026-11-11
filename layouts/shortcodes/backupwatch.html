@@ -86,5 +86,5 @@
 {{- with $T.c -}}
 {{- $xabout = printf " Ranked by xGap: the gap projected over the next two seasons, %.2f x today's gap %+.3g plus %.3g for each %s the backup is younger than the starter (a player who leaves counts at replacement). %s" (float $T.b) (float $T.a) (float .) (cond $college "class year" "year") (cond (eq $T.src "fit") (printf "Fit on %v past backup-starter pairs; on held-out seasons the age term cut the squared error (t %v)." $T.n $T.t) (cond (eq $T.src "fit-sd") (printf "No past FV on file, so the class term is fit on %v past pairs graded by BPM (held-out t %v; departures drive it) and scaled to the FV gap." $T.n $T.t) (cond (eq $T.src "pros") "No past depth or grades on file, so the terms are the NBA, NHL and soccer fits, scaled to this gap." "No past depth or grades on file, so the terms are the CBB fit, scaled to this gap."))) -}}
 {{- end -}}
-{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "backup_%s" $sport) "note" (printf "backups above the starter · ranked by xGap · updated %s" $date) "about" (printf "%s%s" (index $about $sport) $xabout)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "backup_%s" $sport) "note" (printf "updated %s" $date) "about" (printf "Backups above the starter, ranked by xGap. %s%s" (index $about $sport) $xabout)) -}}
 {{- end -}}
