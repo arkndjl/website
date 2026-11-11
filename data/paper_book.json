@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11T05:51:01Z",
+ "asof": "2026-11-11T06:52:26Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 84.83,
   "peak": 117.38,
   "drawdown": 0.2773,
-  "open": 98.0,
+  "open": 101.0,
   "path": [
    106.77,
    109.32,
@@ -412,7 +412,7 @@
   ]
  },
  "record": {
-  "n": 481,
+  "n": 484,
   "clvN": 429,
   "clvRet": -0.0121,
   "clvT": -2.51,
@@ -680,7 +680,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 87,
+   "n": 89,
    "clvN": 84,
    "clvRet": -0.0179,
    "clvT": -3.84,
@@ -701,7 +701,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 68,
+   "n": 69,
    "clvN": 61,
    "clvRet": -0.0202,
    "clvT": -1.88,
@@ -756,6 +756,46 @@
    "stake": 2.0,
    "edge": 13.0,
    "ev": 0.026,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186766",
+   "k": "2026-11-11T15:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Hercog",
+   "a": "Monnet",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 120,
+   "bet": "Hercog ML +120",
+   "placed": "2026-11-11T06:52:25Z",
+   "stake": 0.5,
+   "edge": 10.5,
+   "ev": 0.0057,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186767",
+   "k": "2026-11-11T15:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Maria",
+   "a": "Tubello",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -106,
+   "bet": "Maria ML -106",
+   "placed": "2026-11-11T06:52:25Z",
+   "stake": 0.75,
+   "edge": 11.5,
+   "ev": 0.0078,
    "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
@@ -840,7 +880,7 @@
    "ev": 0.0213,
    "event": null,
    "pass": false,
-   "close": 240.5
+   "close": 239.5
   },
   {
    "rule": "nba-total",
@@ -861,7 +901,7 @@
    "ev": 0.0249,
    "event": null,
    "pass": false,
-   "close": 227.5
+   "close": 228.5
   },
   {
    "rule": "nba-total",
@@ -1742,6 +1782,26 @@
    "event": null,
    "pass": false,
    "close": 41.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873058-4360423-py",
+   "k": "2026-11-15T18:00:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "ATL",
+   "a": "KC",
+   "mk": "prop",
+   "side": "under",
+   "line": 223.5,
+   "price": -106.0,
+   "bet": "Michael Penix Jr. under 223.5 pass yds -106",
+   "placed": "2026-11-11T06:51:00Z",
+   "stake": 1.75,
+   "edge": 11.5,
+   "ev": 0.063,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -18330,6 +18390,46 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186766",
+   "k": "2026-11-11T15:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Hercog",
+   "a": "Monnet",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 120,
+   "bet": "Hercog ML +120",
+   "placed": "2026-11-11T06:52:25Z",
+   "stake": 0.5,
+   "edge": 10.5,
+   "ev": 0.0057,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186767",
+   "k": "2026-11-11T15:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Maria",
+   "a": "Tubello",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -106,
+   "bet": "Maria ML -106",
+   "placed": "2026-11-11T06:52:25Z",
+   "stake": 0.75,
+   "edge": 11.5,
+   "ev": 0.0078,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "187385",
    "k": "2026-11-11T20:00:00Z",
    "slate": "tennis:2026-11-11",
@@ -18408,7 +18508,7 @@
    "ev": 0.0213,
    "event": null,
    "pass": false,
-   "close": 240.5
+   "close": 239.5
   },
   {
    "rule": "nba-total",
@@ -18429,7 +18529,7 @@
    "ev": 0.0249,
    "event": null,
    "pass": false,
-   "close": 227.5
+   "close": 228.5
   },
   {
    "rule": "nba-total",
@@ -19310,6 +19410,26 @@
    "event": null,
    "pass": false,
    "close": 41.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873058-4360423-py",
+   "k": "2026-11-15T18:00:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "ATL",
+   "a": "KC",
+   "mk": "prop",
+   "side": "under",
+   "line": 223.5,
+   "price": -106.0,
+   "bet": "Michael Penix Jr. under 223.5 pass yds -106",
+   "placed": "2026-11-11T06:51:00Z",
+   "stake": 1.75,
+   "edge": 11.5,
+   "ev": 0.063,
+   "event": null,
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
