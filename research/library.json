@@ -403,6 +403,32 @@
      ]
     },
     {
+     "term": "rXP/60 (NFL)",
+     "short": "Points of team margin over an average regular at the sub-position per 60 snaps, this season, as played.",
+     "body": [
+      "(WAA - special teams WAR) x 35.5 points a win / snaps x 60. WAA is the board's WAR minus what an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...) adds in the same snaps.",
+      "Qualified: 40% of his team's snaps on his side so far (the XV regular line). The per 60 snaps view shows qualified players only; blank under 100 snaps.",
+      "Year-to-year r (100+ snaps both seasons, 2016-25): TE .60, RB .55, QB .48, WR .46, DL .39, OL .29, LB .24, DB .18. Snaps to r .5: RB 300, TE 450, WR / DL 900, QB 1,300, OL / LB 1,800, DB 2,600."
+     ],
+     "where": "NFL WAR leaders (rXP/60 column, per 60 snaps view)",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
+     "term": "pXP/60 (NFL)",
+     "short": "rXP/60 that carries to next season: three seasons of rate, shrunk toward the sub-position mean by snaps.",
+     "body": [
+      "(rate x snaps this season + .7 x last season + .5 x the season before, + K x sub-position mean) / (weighted snaps + K). K snaps: QB 650, RB 450, WR 650, TE 300, DL 650, LB 1,300, OL 2,600, DB 3,600.",
+      "Fit on next season's rXP/60 (100+ snaps, weighted by snaps), 2016-24 board seasons, K chosen leaving each season out. MSE .249 vs .832 raw, .310 position mean, .256 one season shrunk (t -4.2). Better than raw every season (9/9; t -18.8 on 100+ snap players). Calibration slope 1.01.",
+      "Failed: prior moved by playing time (t -.2 vs plain), age hinge at 27 by group (t -1.7). Pct = pXP/60 percentile at the position among qualified players in the filters."
+     ],
+     "where": "NFL WAR leaders (pXP/60, Pct)",
+     "sports": [
+      "NFL"
+     ]
+    },
+    {
      "term": "Stat+",
      "short": "Production index: 100 + 25 x z of the position all-in-one score this season.",
      "body": [

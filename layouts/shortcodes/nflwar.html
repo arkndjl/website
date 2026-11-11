@@ -15,7 +15,10 @@
        sides, each against its own side's replacement line; the position cell reads CB/WR, either chip finds him, and
        the stat line opens with the split.
        1Y / 3Y (p1, p3): projected WAR next season and over the next three (scripts/nfl_war_proj.py, fit by
-       scripts/nfl_war_proj_research.py -> data/nfl_war_proj_fit.json). */ -}}
+       scripts/nfl_war_proj_research.py -> data/nfl_war_proj_fit.json).
+       rXP/60 (xp), pXP/60 (pxp), qualified (q): scripts/nfl_rate.py, fit by scripts/nfl_rate_research.py -> data/nfl_rate_fit.json.
+       Per 60 snaps view: qualified players only, ranked by rXP/60. Pct = pXP/60 percentile at the position among the
+       qualified players in the filters. */ -}}
 {{- $d := site.Data.nfl_war -}}
 {{- $fit := site.Data.nfl_war_fit -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" "K" "P" -}}
@@ -27,8 +30,8 @@
   </div>
   <form class="cfb__bar nflwar__bar" data-nw-bar hidden onsubmit="return false" aria-label="filter the leaderboard">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player, team or college" autocomplete="off"></label>
-    <label class="cfb__field" title="season to date: WAR so far. per 17 games: WAR x 17 / team games (100+ snaps)"><span>view</span><select name="view">
-      <option value="">season to date</option><option value="pace">per 17 games</option>
+    <label class="cfb__field" title="season to date: WAR so far. per 17 games: WAR x 17 / team games (100+ snaps). per 60 snaps: qualified players (40%+ of team snaps on their side) by rXP/60"><span>view</span><select name="view">
+      <option value="">season to date</option><option value="pace">per 17 games</option><option value="rate">per 60 snaps</option>
     </select></label>
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
@@ -56,6 +59,9 @@
         <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
         <th data-sort="war" data-num title="WAR = .6 x AV WAR + .4 x XV + ST, season to date. AV WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV; replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
         <th data-sort="pace" data-num title="WAR/17 = WAR x 17 / team games">WAR/17</th>
+        <th data-sort="xp" data-num title="rXP/60 = points of team margin over an average regular at the sub-position per 60 snaps, this season: (WAA - ST) x 35.5 / snaps x 60">rXP/60</th>
+        <th data-sort="pxp" data-num title="pXP/60 = predictive rate: this season and the two before at snap weights 1 / .7 / .5, shrunk to the sub-position mean (K snaps by group: QB 650, RB 450, WR 650, TE 300, OL 2600, DL 650, LB 1300, DB 3600). next-season rXP/60 held out 2016-24: MSE .249 vs .832 raw, .310 position mean; calibration slope 1.01">pXP/60</th>
+        <th data-sort="pct" data-num title="pXP/60 percentile at the position, qualified players (40%+ of team snaps) within the filters">Pct</th>
         <th data-sort="p1" data-num title="1Y = projected WAR next season, from WAR this season (pace) and the two before, snaps, age by position group (scripts/nfl_war_proj.py). special teams not included">1Y</th>
         <th data-sort="p3" data-num title="3Y = projected WAR over the next three seasons, same inputs. held out 2015-22: RMSE .326 vs .342 for the Marcel WAR rate x snaps (calibrated), t -5.9, 8/8 seasons">3Y</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position by WAA within the filters (QB3 = 3rd QB)">Pos</th>
@@ -111,20 +117,20 @@
   function waa(x) { return x == null ? '' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(2) + '</span>'; }
   function readHash() {
     var h = __hp(win);
-    pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.view.value = h.get('view') === 'pace' ? 'pace' : '';
+    pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.view.value = h.get('view') === 'pace' || h.get('view') === 'rate' ? h.get('view') : '';
     bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || ''; bar.elements.rook.checked = h.get('rook') === '1';
     [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
   }
   function writeHash() {
     var h = new URLSearchParams();
     if (pos) h.set('pos', pos); if (bar.elements.team.value) h.set('team', bar.elements.team.value);
-    if (bar.elements.view.value) h.set('view', 'pace'); if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
+    if (bar.elements.view.value) h.set('view', bar.elements.view.value); if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
     if (bar.elements.age.value) h.set('age', bar.elements.age.value); if (bar.elements.rook.checked) h.set('rook', '1');
     var s = h.toString(); __hw(win, s);
   }
   function render() {
     var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, pace = bar.elements.view.value === 'pace',
-        key = pace ? 'waaP' : 'waa', rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
+        rate = bar.elements.view.value === 'rate', key = pace ? 'waaP' : rate ? 'xp' : 'waa', rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
         amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 ? (ag[1] ? +ag[1] : Infinity) : NaN;
     if (bar.elements.age.value && ag[0] === '') { amin = -Infinity; amax = +ag[1]; }
     // who's in: position, team, age, rookies, view; ranks count among them in WAA order (WAR, then AV, break ties)
@@ -132,13 +138,21 @@
       if (pos === 'OFF' ? !OFF[p.pos] && !(p.two && OFF[p.two.p2]) : pos === 'DEF' ? (OFF[p.pos] || ST[p.pos]) && !(p.two && !OFF[p.two.p2]) : pos && p.pos !== pos && !(p.two && p.two.p2 === pos)) return false;
       if (team && p.tm.split('/').indexOf(team) < 0) return false;
       if (pace && p.sn < PACE_MIN && !ST[p.pos]) return false;
+      if (rate && !p.q) return false;
       if (rook && !p.rook) return false;
       if (bar.elements.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
       return true;
     }).sort(function (a, b) { return (b[key] == null ? b.war : b[key]) - (a[key] == null ? a.war : a[key]) || b.war - a.war || b.av - a.av; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
-    __wk.rank(list); __wk.show(win, pace ? null : FROM);
+    // Pct: pXP/60 percentile at the position among the qualified players in the filters (ties at their middle)
+    var byPos = {};
+    list.forEach(function (p) { p.pct = null; if (p.q && p.pxp != null) (byPos[p.pos] = byPos[p.pos] || []).push(p); });
+    Object.keys(byPos).forEach(function (k) {
+      var g = byPos[k], n = g.length;
+      g.forEach(function (p) { var lo = 0, eq = 0; g.forEach(function (o) { if (o.pxp < p.pxp) lo++; else if (o.pxp === p.pxp) eq++; }); p.pct = n > 1 ? Math.round(100 * (lo + (eq - 1) / 2) / (n - 1)) : null; });
+    });
+    __wk.rank(list); __wk.show(win, pace || rate ? null : FROM);
     // search narrows what's shown, not the ranks
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.col + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     if (sortKey !== 'rk') {
@@ -154,10 +168,13 @@
     var gfxRow = function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>' +
-        __wk.rk(p, pace ? null : FROM, 'WAA', null, p.waa) +
-        '<td class="cfb__num nflwar__war is-key">' + waa(pace ? p.waaP : p.waa) + '</td>' +
+        __wk.rk(p, pace || rate ? null : FROM, 'WAA', null, p.waa) +
+        '<td class="cfb__num nflwar__war' + (rate ? '' : ' is-key') + '">' + waa(pace ? p.waaP : p.waa) + '</td>' +
         '<td class="cfb__num nflwar__war">' + f2(p.war) + '</td>' +
         '<td class="cfb__num nflwar__war">' + f2(p.pace) + '</td>' +
+        '<td class="cfb__num' + (rate ? ' is-key' : '') + '">' + (p.xp == null || p.sn < PACE_MIN ? '' : waa(p.xp)) + '</td>' +
+        '<td class="cfb__num">' + (p.pxp == null ? '' : waa(p.pxp)) + '</td>' +
+        '<td class="cfb__num">' + (p.pct == null ? '' : p.pct) + '</td>' +
         '<td class="cfb__num">' + f2(p.p1) + '</td>' +
         '<td class="cfb__num">' + f2(p.p3) + '</td>' +
         '<td class="cfb__g"' + (p.two ? ' title="two-way: ' + esc(p.two.so) + ' offense, ' + esc(p.two.sd) + ' defense snaps"' : '') + '>' + esc(p.pos) + (p.two ? '/' + esc(p.two.p2) : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
