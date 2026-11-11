@@ -26,10 +26,17 @@
 //   combine testing x1.6 (last seasons). Together: AV r .513 -> .520 pooled, .507 -> .525 within position; draft slot
 //   .577 -> .590 and .586 -> .610. Production by position, pedigree, team, class, SOS, breakout, badges, frame and years
 //   past three all refit within noise of today's weights (reverting them costs nothing).
+// Nov 11 2026: 247's pages sit behind a bot check, so the composite comes from CFBD (scripts/data/cfb_recruits_cfbd.json.gz;
+// 72% of rows matched). Rerun on it: old outcome AV .600/.578 before, .636/.621 shipped (Oct: .604/.583, .634/.619); on the
+// common outcome horizon (scripts/cfb_horizon.mjs) .600/.578 -> .635/.621, and the joint and focused refits still lose
+// the 2024 fold, so today's weights stand. FV-2 (`--dist2`, scripts/research/fv2_nov11): fitting `early` on the live rule
+// instead of hindsight lowers RPS .03665 -> .03651 and log loss .447 -> .408, but wins only 3 of 6 classes: fails as
+// pre-registered, not shipped
 // Nov 3 2026: the in-position height term (scripts/cfb_frame.mjs heightFV, key height, FV points like frame) is in
 // grade() at the live weight (multiplier 1; cfb_frame.mjs FV_HT_W, 0 since it was pulled Nov 3), on the measured height (scripts/cfb_measure.mjs: cfbfastR listing + the 247
 // listing parsed below); its test is scripts/cfb_measure_fv.py on the --alltime grades
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -60,7 +67,12 @@ const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55, OL: 65, 
 // (as --past), each row with the draft that followed and its NFL AV, for the all-time lists (scripts/fv_alltime.py)
 const ALLTIME = process.argv.some(a => a.startsWith('--alltime='));
 const WIDE = process.argv.includes('--wide') || ALLTIME, BOXONLY = process.argv.includes('--boxonly'), BOX = WIDE || BOXONLY;
-const FIRST = WIDE ? 2014 : 2019, SEASONS = Array.from({ length: (ALLTIME ? 2026 : 2023) - FIRST }, (_, i) => FIRST + i), NFL_THROUGH = 2025;
+// --dist2 (FV-2 test, Nov 11 2026): the distribution rows with one more season (last college season through 2023, so a
+// row graded in 2019-20 has had four seasons to finish), non-final rows only from 2019-20 (no longer only the players out
+// of college by 2023), and each row's class label (roster year) and consensus flag, so the fit can build `early` the way
+// the live board does (scripts/fv_dist.mjs cfbZ) instead of from hindsight
+const DIST2 = process.argv.includes('--dist2'), LASTCUT = DIST2 ? 2024 : 2023;
+const FIRST = WIDE ? 2014 : 2019, SEASONS = Array.from({ length: (ALLTIME ? 2026 : LASTCUT) - FIRST }, (_, i) => FIRST + i), NFL_THROUGH = 2025;
 const HIST0 = WIDE ? 2012 : 2019;     // first season with a production line (the 3-season blend and breakouts reach back to it)
 // --past: every FBS PFN season 2019-25 graded under the shipped weights, written for the board's past-season grades
 // (static/data/cfb-past.json; see the --past block below). OL, CB and S join there: PFN has their lines from 2024
@@ -174,16 +186,21 @@ function pull(file, url) {
 const picksAll = PAST ? [] : csv(fs.readFileSync(path.join(SP, 'draft_picks.csv'), 'utf8'));
 const picks = picksAll.filter(r => +r.season >= FIRST + 1 && +r.season <= (ALLTIME ? 2026 : 2025));
 // one outcome horizon for every class (scripts/cfb_horizon.mjs): AV a season elapsed / h(draft class)
-const HZ = PAST ? (() => 1) : horizon(picksAll, NFL_THROUGH);
+const HZ = PAST || process.env.CFB_HZ === '0' ? (() => 1) : horizon(picksAll, NFL_THROUGH);   // CFB_HZ=0: the old seasons-elapsed outcome, for comparison
 // draft capital: AV a season by slot, a + b ln(pick), fit on the 2012-19 drafts (on the common horizon)
 const capital = (() => {
   const S = picksAll.filter(r => +r.season >= 2012 && +r.season <= 2019 && +r.pick > 0), x = S.map(r => Math.log(+r.pick)), y = S.map(r => (+r.w_av || 0) / (NFL_THROUGH - +r.season + 1) / HZ(+r.season));
   const mx = mean(x), my = mean(y), b = x.reduce((a, v, i) => a + (v - mx) * (y[i] - my), 0) / x.reduce((a, v) => a + (v - mx) ** 2, 0);
   return pick => Math.max(0, my + b * (Math.log(pick) - mx));
 })();
-// 247 composite, high school classes 2014-21 (--wide: 2009-21)
+// 247 composite, high school classes 2014-21 (--wide: 2009-21). From CFBD's copy (scripts/cfb_recruits_cfbd.mjs,
+// scripts/data/cfb_recruits_cfbd.json.gz) when present, since 247's own pages now sit behind a bot check; the top 3,000
+// a class by rating, as 247's 60 listing pages held (CFBD's ranking field repeats)
 const rec = {};
-for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST || ALLTIME ? 2025 : 2021); y++, rk = 0) for (let pg = 1; pg <= 60; pg++) {
+const CFBD_REC = (() => { const f = path.join(ROOT, 'scripts', 'data', 'cfb_recruits_cfbd.json.gz'); try { return JSON.parse(zlib.gunzipSync(fs.readFileSync(f))); } catch { return null; } })();
+for (let y = WIDE ? 2009 : 2014; y <= (PAST || ALLTIME ? 2025 : LASTCUT - 2); y++) if (CFBD_REC?.[y]) [...CFBD_REC[y]].sort((p, q) => q[1] - p[1]).slice(0, 3000).forEach(([name, rating, stars, , sch, ht, wt], i) =>
+  (rec[nm(name)] ||= []).push({ y, rating: +rating, stars: +stars || 0, school: school(sch), sraw: sch, rank: i + 1, ht: ht || null, wt: wt || null }));
+for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST || ALLTIME ? 2025 : LASTCUT - 2); y++, rk = 0) for (let pg = 1; pg <= 60 && !CFBD_REC?.[y]; pg++) {
   const h = pull(`247/c_${y}_${pg}.html`, `https://247sports.com/season/${y}-football/compositerecruitrankings/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page=${pg}`);
   const items = h.split('rankings-page__list-item"').slice(1); if (!items.length) break;
   for (const x of items) {
@@ -196,7 +213,7 @@ for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST || ALLTIME ? 2025 : 2021); y
 }
 // rosters (height, weight, ESPN class) and team schedules (games, start-of-season Elo)
 const ros = {}, elo = {}, games = {};
-for (let y = WIDE ? 2012 : 2017; y <= (PAST || ALLTIME ? 2025 : 2022); y++) {
+for (let y = WIDE ? 2012 : 2017; y <= (PAST || ALLTIME ? 2025 : LASTCUT - 1); y++) {
   for (const r of csv(pull(`ros/r${y}.csv`, `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/csv/cfb_rosters_${y}.csv`))) {
     const k = y + '|' + nm(r.first_name + ' ' + r.last_name);
     (ros[k] ||= []).push({ team: school(r.team), ht: +r.height || null, wt: +r.weight || null, year: +r.year });
@@ -213,7 +230,7 @@ for (let y = WIDE ? 2012 : 2017; y <= (PAST || ALLTIME ? 2025 : 2022); y++) {
 }
 // DraftTek final boards (cached by cfb_source_backtest.mjs)
 const board = {};
-for (const D of [2020, 2021, 2022, 2023]) {
+for (const D of DIST2 ? [2020, 2021, 2022, 2023, 2024] : [2020, 2021, 2022, 2023]) {
   board[D] = {};
   for (let pg = 1; pg <= 6; pg++) {
     const f = path.join(SRC, `dt_${D}_${pg}.html`); if (!fs.existsSync(f)) continue;
@@ -265,7 +282,7 @@ if (!PAST) {
   const athOf = (p, g) => { const zs = g ? Object.entries(met(p)).filter(([k, v]) => v != null && ms[g + k]).map(([k, v]) => (v - ms[g + k][0]) / ms[g + k][1]) : []; return zs.length >= 2 ? mean(zs) : null; };
   const tm = {};
   for (const p of combine) { const g = GR[p.pos], a = +p.season >= 2010 ? athOf(p, g) : null; if (a != null) (tm[g] ||= []).push(a); }
-  for (const p of combine) { const g = GR[p.pos], a = athOf(p, g); if (a != null && +p.season >= FIRST + 1 && +p.season <= 2023) ath[p.season + '|' + nm(p.player_name)] = { ath: a - mean(tm[g]), school: school(p.school) }; }
+  for (const p of combine) { const g = GR[p.pos], a = athOf(p, g); if (a != null && +p.season >= FIRST + 1 && +p.season <= LASTCUT) ath[p.season + '|' + nm(p.player_name)] = { ath: a - mean(tm[g]), school: school(p.school) }; }
 }
 
 console.error("data loaded", process.uptime().toFixed(1));
@@ -381,7 +398,7 @@ function xRaw(o, hist, tgOf) {
 const N1_KEYS = ['sdS', 'sdC', 'sdP', 'sdH', 'blk', 'blkS', 'blkLow', 'dShare', 'dShareY', 'ppa', 'ppaPD', 'use', 'usePD', 'dUse'];
 const SDV = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'schooldev.json'), 'utf8')); } catch { return null; } })();
 const CFBD = {};
-for (let S = 2015; S <= 2022; S++) {
+for (let S = 2015; S <= LASTCUT - 1; S++) {
   const H = path.join(ROOT, 'scripts', '.cache', 'cfb', 'hist'), rd = f => { try { return JSON.parse(fs.readFileSync(path.join(H, f), 'utf8')); } catch { return null; } };
   const pp = rd(`ppaplayers${S}.json`), us = rd(`usage${S}.json`); if (!pp || !us) continue;
   const U = new Map(us.map(x => [x.id, x.usage])), R = pp.map(x => ({ ...x, usage: U.get(x.id) || null }));
@@ -560,7 +577,7 @@ for (const g of GP) {
       P.push({
         g, s, id: r.id, name: r.name, final: last === s, last, lastRow: by[last], row: r, marcel: a / (d + CUR.K), hist, snapsN: r._v,
         share: g === 'RB' && num(r.share) != null ? Math.min(1, r.share / 100) : r._v ? Math.min(1, r._v / side) : null,
-        rating: rc?.rating ?? null, stars: rc?.stars ?? 0, walkOn: !rc, years, ht: rl?.ht ?? null, wt: rl?.wt ?? null,
+        rating: rc?.rating ?? null, stars: rc?.stars ?? 0, walkOn: !rc, years, rosY: rl?.year ?? null, ht: rl?.ht ?? null, wt: rl?.wt ?? null,
         // measured height (ESPN listing + 247 listing) for the in-position height term (cfb_frame.mjs heightFV)
         mht: measureOf({ g, espnHt: rl?.ht ?? null, espnWt: rl?.wt ?? null, recHt: rc?.ht ?? null, recWt: rc?.wt ?? null, recYear: rc?.y ?? null }, s)?.ht ?? null,
         team: elo[s][sch] ?? null, sos: num(r.sos), breakYear: visible && brk ? brk - rc.y + 1 : null, breakKnown: !!visible,
@@ -624,7 +641,7 @@ const OLPOS = new Set(['OL', 'T', 'G', 'C', 'OT', 'OG']);
 const FAMPOS = (() => { const F = [['QB'], ['RB', 'WR', 'TE'], ['EDGE', 'DL', 'LB']], o = {}; for (const f of F) { const u = [...new Set(f.flatMap(g => NFLPOS[g] || []))]; for (const g of f) o[g] = g === 'RB' || g === 'WR' ? u.filter(x => !OLPOS.has(x)) : u; } return o; })();
 if (ALLTIME) for (const p of rows) Object.assign(p, { av: 0, cap: 0, pick: null, pfr: null, ap: 0, pb: 0, ath: null, dt: null, open: true });
 for (const p of PAST ? [] : rows) {
-  if (p.last > (ALLTIME ? 2025 : 2023)) continue;
+  if (p.last > (ALLTIME ? 2025 : LASTCUT)) continue;
   const D = p.last + 1, n = nm(p.name), tm = school(p.lastRow.team), cand = picks.filter(x => nm(x.pfr_player_name) === n && (ALLTIME ? FAMPOS[p.g] : NFLPOS[p.g]).includes(x.position));
   let pk = cand.find(x => +x.season === D && school(x.college) === tm) || cand.find(x => +x.season === D);
   // --alltime: a later draft within two years at his last school or under his name alone (an opt-out season, or PFN
@@ -649,7 +666,7 @@ for (const p of PAST ? [] : rows) {
     const B = INSEASON ? pffIn : board;
     p.dt = B[D]?.[n + '|' + famOf(p.g)] ?? B[D]?.['last|' + lastName(p.name) + '|' + tm + '|' + famOf(p.g)] ?? null;
     finals.push(p);
-  } else if (p.s <= 2021) early.push(p);
+  } else if (DIST2 ? p.s + 4 <= LASTCUT : p.s <= 2021) early.push(p);
 }
 console.log('rows', rows.length, 'finals', finals.length, 'drafted', finals.filter(p => p.pick).length, '247 matched', r3(mean(finals.map(p => +!p.walkOn))),
   'roster ht', r3(mean(finals.map(p => +!!p.ht))), 'elo', r3(mean(finals.map(p => +(p.team != null)))), 'board', finals.filter(p => p.dt).length, 'ath', finals.filter(p => p.ath != null).length);
@@ -957,7 +974,7 @@ if (PAST) {
 if (arg('dist').length) {
   const G = grade({ ...ONE, ...SHIP }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
   const S = U.filter(p => G.has(p)).map(p => ({ name: p.name, g: p.g, s: p.s, last: p.last, final: p.final, years: p.years, walkOn: p.walkOn, stars: p.stars, snaps: p.snapsN,
-    z: r3(p.zPfn), fm: r3(G.get(p).fm), fc: r3(G.get(p).fc), dt: p.dt, av: r3(p.av), pick: p.pick, ap: p.ap, pb: p.pb }));
+    z: r3(p.zPfn), fm: r3(G.get(p).fm), fc: r3(G.get(p).fc), dt: p.dt, av: r3(p.av), pick: p.pick, ap: p.ap, pb: p.pb, rosY: p.rosY }));
   fs.writeFileSync(arg('dist')[0], JSON.stringify(S));
   console.log('dist rows', S.length);
   process.exit(0);
