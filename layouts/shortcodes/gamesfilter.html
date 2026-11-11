@@ -4,7 +4,7 @@
 {{- $sports := slice (slice "all" "all") (slice "cfb" "college football") (slice "nfl" "NFL") (slice "cbb" "college basketball") (slice "nba" "NBA") (slice "nhl" "NHL") (slice "soccer" "soccer") (slice "tennis" "tennis") -}}
 <div class="win gamesf"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ .Get "title" | default "games :: every sport" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ .Get "title" | default "games" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">

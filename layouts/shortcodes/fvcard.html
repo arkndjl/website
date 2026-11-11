@@ -15,7 +15,7 @@
 {{- $c := index $cfg $sport -}}
 {{- with $c }}{{ with .d.scorecard -}}
 {{- $s := .summary -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv scorecard :: does the FV mean what it says") "icon" $c.icon "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv scorecard") "icon" $c.icon "tab" ($.Get "tab")) -}}
 <table class="fvsc">
   <thead><tr><th title="FV band">FV</th><th class="cfb__num">N</th><th class="cfb__num" title="the mean FV the band's careers reached; under it, the mean FV it was given">Became</th>
     {{- range .tiers }}{{ if ge . 40 }}<th title="{{ index $c (printf "t%d" .) }}: realized share, predicted odds under it">{{ . }}+</th>{{ end }}{{ end }}</tr></thead>

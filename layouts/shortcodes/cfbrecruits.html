@@ -216,7 +216,7 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .redshirts) "note" (printf "on a roster, no snaps yet · top %d of %d" (len .redshirts) (int .counts.redshirts))) -}}
-{{- partial "wintable-open.html" (dict "title" "low-snap young players :: next-season FV = board FV and recruit projection, blended by snaps" "filter" "Pos,Team" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Snaps,FV,Recruit,Next" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" "low-snap young players" "filter" "Pos,Team" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Snaps,FV,Recruit,Next" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Pos</th><th>Team</th><th title="recruiting class">Class</th><th title="ESPN grade, high school">Grade</th><th>Snaps</th>

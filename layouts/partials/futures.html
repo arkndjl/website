@@ -49,7 +49,7 @@
 {{- define "futpair" }}{{ if eq .o nil }}<span class="cfb__dim">-</span>{{ else }}{{ if lt .o 0.005 }}&lt;1%{{ else }}{{ partial "num.html" (slice "%.0f%%" (mul .o 100)) }}{{ end }} <span class="cfb__dim">/ {{ with .d }}{{ if lt . 0.005 }}&lt;1%{{ else }}{{ partial "num.html" (slice "%.0f%%" (mul . 100)) }}{{ end }}{{ else }}-{{ end }}</span>{{ end }}{{ end }}
 {{- $book := delimit $books ", " }}
 {{- if $rows }}
-{{- partial "wintable-open.html" (dict "title" "futures :: ours vs the market" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,xW,Title,Conf,Div" "gfxMax" "30") -}}
+{{- partial "wintable-open.html" (dict "title" "futures" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,xW,Title,Conf,Div" "gfxMax" "30") -}}
 <table class="cfb__table">
   <thead><tr>
     <th>Lg</th><th>Team</th>

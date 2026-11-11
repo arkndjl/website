@@ -25,7 +25,7 @@
 {{- if or $flip $in }}{{ $rows = $rows | append (dict "sp" .sp "kick" .kick "h" .h "a" .a "v" .v "team" $team "o" $o "pm" $pm "q" $q "flip" $flip "in" $in) }}{{ end }}
 {{- end }}{{ end }}{{ end -}}
 {{- with $rows }}
-{{- partial "wintable-open.html" (dict "title" "moneyline board :: flips and -200 to +200" "icon" "arkboard" "filter" "Sport,Flip,moneyline@ml" "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" "moneyline board" "icon" "arkboard" "filter" "Sport,Flip,moneyline@ml" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
   <thead><tr><th title="the model's winner and its moneyline">Model ML</th><th>Sport</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="the model's win chance for its side">Model %</th><th title="the market's no-vig chance for the model's side">Market %</th><th title="model minus market, points of %">Diff</th><th title="the model's winner is the market's underdog">Flip</th></tr></thead>
   <tbody>

@@ -48,7 +48,7 @@
   </div>
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
-  {{- partial "wintable-open.html" (dict "title" "ARK Ranking :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
+  {{- partial "wintable-open.html" (dict "title" "ARK Ranking" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
   {{- $sim := dict }}{{ with site.Data.cfb_model }}{{ range .sim }}{{ $sim = merge $sim (dict .tid (dict "projW" .projW "ccg" .ccg "title" .title "cfp" .cfp "bye" .bye "natl" .natl)) }}{{ end }}{{ end }}
   {{- $rows := slice }}{{ range .teams }}{{ $rows = $rows | append (merge . (dict "sim" (index $sim .tid))) }}{{ end }}
   <table class="cfb__table cfbr__t" data-td-kind="cfb" data-td-src="/data/teams/cfb.json" data-td-rows="{{ (resources.FromString "data/cfb-power-rows.json" (jsonify $rows)).RelPermalink }}">
@@ -96,7 +96,7 @@
   {{- /* the evidence */}}
   <div class="win cfbm cfbr__ev">
     <div class="win__title">
-      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>ARK Ranking :: how the inputs are weighted<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>ARK Ranking<span class="win__cursor" aria-hidden="true">_</span></span>
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
     </div>
     <div class="cfbm__body">

@@ -8,7 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="tennis_prospects.exe :: under 22" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · Tennis Abstract" class="winpane--art" />}}
+{{< winpane title="tennis_prospects.exe" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · Tennis Abstract" class="winpane--art" />}}
 
 {{< wintabs groups="players:ATP big board,WTA big board|model:fv model,ATP past boards,WTA past boards,all-time FV" side="true" label="Tennis prospects views" >}}
 {{< tennisprospects view="board" tour="atp" tab="ATP big board" >}}
@@ -18,12 +18,12 @@ draft = false
 {{< lazytab tab="fv model" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
-{{< tennisprospects view="model" tour="atp" title="ATP :: fv model, value, scale, drivers, calibration" >}}
-{{< fvcard sport="tennis-atp" title="ATP :: fv scorecard, tier odds vs what happened, held out" >}}
+{{< tennisprospects view="model" tour="atp" title="ATP :: fv model" >}}
+{{< fvcard sport="tennis-atp" title="ATP :: fv scorecard" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< tennisprospects view="model" tour="wta" title="WTA :: fv model, value, scale, drivers, calibration" >}}
-{{< fvcard sport="tennis-wta" title="WTA :: fv scorecard, tier odds vs what happened, held out" >}}
+{{< tennisprospects view="model" tour="wta" title="WTA :: fv model" >}}
+{{< fvcard sport="tennis-wta" title="WTA :: fv scorecard" >}}
 {{< /deskcol >}}
 {{< /desk >}}
 {{< /lazytab >}}

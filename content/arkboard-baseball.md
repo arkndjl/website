@@ -9,15 +9,15 @@ cover = "/og/baseball.png"
 
 {{< arknav >}}
 
-{{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="winpane--art" />}}
+{{< winpane title="baseball.exe" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="winpane--art" />}}
 
 {{< wintabs groups="players:draft hitters,U19 MiLB,White Sox org|model:fv model" side="true" label="Baseball views" >}}
-{{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" tab="draft hitters" >}}
-{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 10)" icon="baseball" filter="FV,TEAM,POS" tab="U19 MiLB" >}}
-{{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" icon="baseball" filter="FV,Org/Lvl,H-Pos" tab="White Sox org" >}}
+{{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026" icon="baseball" filter="POS,FV,BATS,School" tab="draft hitters" >}}
+{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB" icon="baseball" filter="FV,TEAM,POS" tab="U19 MiLB" >}}
+{{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades" icon="baseball" filter="FV,Org/Lvl,H-Pos" tab="White Sox org" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
-{{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" >}}
+{{< wintable title="fv conversions" gfx="1" icon="baseball" >}}
 | FV | Hitter | Starting pitcher | Reliever | WAR / season |
 | :---: | ----- | ----- | ----- | :---: |
 | 80 | top 5 overall | #1 (top 1–3 arm) | — | 7.0+ |

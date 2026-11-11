@@ -12,104 +12,104 @@ cover = "/og/college-basketball.png"
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
 {{< wintabs groups="players:all,draft board,WAR leaders,stats,true freshmen,breakouts,ARKLIST|rosters:depth chart,returning,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
-{{< cbbboard title="CBB 2026-27 :: all players" tab="all" >}}
+{{< cbbboard title="CBB 2026-27" tab="all" >}}
 {{< lazytab tab="draft board" >}}
-{{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board :: 2027 draft, predictive mock order" tab="draft board" >}}
+{{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board" tab="draft board" >}}
 {{< /lazytab >}}
 {{< lazytab tab="WAR leaders" >}}
-{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders :: wins over replacement" tab="WAR leaders" >}}
+{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders" tab="WAR leaders" >}}
 {{< /lazytab >}}
 {{< lazytab tab="stats" >}}
-{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats :: season lines, Stat+" tab="stats" >}}
+{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats" tab="stats" >}}
 {{< /lazytab >}}
-{{< rookies sport="cbb" icon="basketball" title="true freshmen :: FV and xBPM against recruiting rank" tab="true freshmen" >}}
+{{< rookies sport="cbb" icon="basketball" title="true freshmen" tab="true freshmen" >}}
 {{< lazytab tab="breakouts" >}}
-{{< rookies sport="cbb" src="data/cbb/breakouts.json" icon="basketball" title="breakout watch :: 1st-2nd yr, over the preseason projection" tab="breakouts" >}}
+{{< rookies sport="cbb" src="data/cbb/breakouts.json" icon="basketball" title="breakout watch" tab="breakouts" >}}
 {{< /lazytab >}}
-{{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
-{{< backupwatch sport="cbb" title="backup watch :: 2nd/3rd string out-producing a starter (BPM)" tab="backup watch" >}}
-{{< cbbmock mode="pred" title="predictive mock :: where they go, 2 rounds" tab="predictive mock" >}}
-{{< cbbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 2 rounds" tab="blended mock" >}}
-{{< cbbmock mode="conv" title="conviction mock :: slot + what the market misprices, 2 rounds" tab="conviction mock" >}}
+{{< arklist sport="college-basketball" title="ARKLIST" tab="ARKLIST" >}}
+{{< backupwatch sport="cbb" title="backup watch" tab="backup watch" >}}
+{{< cbbmock mode="pred" title="predictive mock" tab="predictive mock" >}}
+{{< cbbmock mode="blend" title="blended mock" tab="blended mock" >}}
+{{< cbbmock mode="conv" title="conviction mock" tab="conviction mock" >}}
 {{< cbbgames title="games" tab="games" >}}
 {{< cbbgametable title="game table" tab="game table" >}}
 {{< lazytab tab="top performers" >}}
-{{< rookies sport="cbb" src="data/cbb/top.json" icon="basketball" title="top performers :: best single games, Game Score" tab="top performers" >}}
+{{< rookies sport="cbb" src="data/cbb/top.json" icon="basketball" title="top performers" tab="top performers" >}}
 {{< /lazytab >}}
 {{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
 {{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
 {{< lazytab tab="offense" >}}
-{{< teamunits sport="cbb" view="offense" title="offense :: adjusted efficiency, four factors" tab="offense" >}}
+{{< teamunits sport="cbb" view="offense" title="offense" tab="offense" >}}
 {{< /lazytab >}}
 {{< lazytab tab="defense" >}}
-{{< teamunits sport="cbb" view="defense" title="defense :: adjusted efficiency allowed, four factors" tab="defense" >}}
+{{< teamunits sport="cbb" view="defense" title="defense" tab="defense" >}}
 {{< /lazytab >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
-{{< cbbfv title="fv conversions :: basketball (peak XPM, measured)" >}}
-{{< cbbfv view="calib" title="fv calibration :: what the grades became (2009-16 boards)" >}}
-{{< fvcard sport="cbb" title="fv scorecard :: tier odds vs what happened, held out" >}}
+{{< cbbfv title="fv conversions" >}}
+{{< cbbfv view="calib" title="fv calibration" >}}
+{{< fvcard sport="cbb" title="fv scorecard" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< cbbfv view="model" title="fv model :: drivers kept, out-of-sample evidence" >}}
-{{< cbbfv view="intl" title="internationals :: league strength, what each input adds" >}}
-{{< cbblive title="in season :: this season vs the preseason grade" >}}
+{{< cbbfv view="model" title="fv model" >}}
+{{< cbbfv view="intl" title="internationals" >}}
+{{< cbblive title="in season" >}}
 {{< /deskcol >}}
 {{< /desk >}}
 {{< lazytab tab="team talent" >}}
-{{< teamunits sport="cbb" feed="cbb_teamtabs" view="talent" title="team talent :: roster FV against the ARK rating" tab="team talent" >}}
+{{< teamunits sport="cbb" feed="cbb_teamtabs" view="talent" title="team talent" tab="team talent" >}}
 {{< /lazytab >}}
 {{< lazytab tab="returning" >}}
-{{< teamunits sport="cbb" feed="cbb_teamtabs" view="returning" title="returning :: last season's minutes and WAR back" tab="returning" >}}
+{{< teamunits sport="cbb" feed="cbb_teamtabs" view="returning" title="returning" tab="returning" >}}
 {{< /lazytab >}}
 {{< lazytab tab="portal" >}}
-{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal :: 2026 moves, last season's WAR" tab="portal" >}}
+{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" >}}
 {{< /lazytab >}}
 {{< lazytab tab="development" >}}
-{{< schooldev sport="cbb" title="development :: college BPM over On3 rank, by school and coach" tab="development" >}}
+{{< schooldev sport="cbb" title="development" tab="development" >}}
 {{< /lazytab >}}
 {{< lazytab tab="NIL" >}}
-{{< cbbnil title="NIL :: xNIL, yNIL, zNIL, top 400" tab="NIL" >}}
+{{< cbbnil title="NIL" tab="NIL" >}}
 {{< /lazytab >}}
 {{< lazytab tab="team NIL" >}}
-{{< cbbnil view="teams" title="team NIL :: every D-I roster" tab="team NIL" >}}
+{{< cbbnil view="teams" title="team NIL" tab="team NIL" >}}
 {{< /lazytab >}}
-{{< cbbbuilder title="team builder :: offseason plan per team, NIL budget" tab="team builder" >}}
+{{< cbbbuilder title="team builder" tab="team builder" >}}
 {{< lazytab tab="staff" >}}
-{{< cbbstaff title="staff :: head coaches" tab="staff" >}}
+{{< cbbstaff title="staff" tab="staff" >}}
 {{< /lazytab >}}
 {{< lazytab tab="coaching jobs" >}}
-{{< cbbjobs title="coaching jobs :: projected openings and hires" tab="coaching jobs" >}}
+{{< cbbjobs title="coaching jobs" tab="coaching jobs" >}}
 {{< /lazytab >}}
 {{< lazytab tab="coach pay" >}}
-{{< cbbcoachpay title="coach pay :: market value vs public pay" tab="coach pay" >}}
+{{< cbbcoachpay title="coach pay" tab="coach pay" >}}
 {{< /lazytab >}}
-{{< cbblineups view="units" title="lineups :: 5-man units, per 100 possessions" tab="lineups" >}}
-{{< cbblineups view="onoff" title="on/off :: team net with each player on and off" tab="on/off" >}}
+{{< cbblineups view="units" title="lineups" tab="lineups" >}}
+{{< cbblineups view="onoff" title="on/off" tab="on/off" >}}
 {{< lineupleaders sport="cbb" title="lineup leaders" tab="lineup leaders" >}}
-{{< depthchart sport="cbb" title="depth chart :: every team" tab="depth chart" >}}
+{{< depthchart sport="cbb" title="depth chart" tab="depth chart" >}}
 {{< lazytab tab="2027 class" >}}
-{{< cbbrecruits view="class" year="2027" title="2027 class :: projected FV, every ranked recruit" tab="2027 class" >}}
+{{< cbbrecruits view="class" year="2027" title="2027 class" tab="2027 class" >}}
 {{< /lazytab >}}
 {{< lazytab tab="2028 class" >}}
-{{< cbbrecruits view="class" year="2028" title="2028 class :: projected FV, every ranked recruit" tab="2028 class" >}}
+{{< cbbrecruits view="class" year="2028" title="2028 class" tab="2028 class" >}}
 {{< /lazytab >}}
 {{< lazytab tab="2029 class" >}}
-{{< cbbrecruits view="class" year="2029" title="2029 class :: projected FV, ranked recruits" tab="2029 class" >}}
+{{< cbbrecruits view="class" year="2029" title="2029 class" tab="2029 class" >}}
 {{< /lazytab >}}
 {{< lazytab tab="class rankings" >}}
-{{< cbbrecruits view="teams" title="class rankings :: 2027 commits by expected NBA value" tab="class rankings" >}}
+{{< cbbrecruits view="teams" title="class rankings" tab="class rankings" >}}
 {{< /lazytab >}}
 {{< lazytab tab="recruit model" >}}
-{{< cbbrecruits view="model" title="recruit model :: target, drivers, held-out test" tab="recruit model" >}}
+{{< cbbrecruits view="model" title="recruit model" tab="recruit model" >}}
 {{< /lazytab >}}
 {{< lazytab tab="all-time FV" >}}
 {{< fvalltime sport="cbb" tab="all-time FV" >}}
 {{< /lazytab >}}
 {{< desk tab="past boards" >}}
 {{< deskcol >}}
-{{< wintable title="ARKBOARD NBA 2026 :: final top 30 (jun 19)" icon="basketball" filter="FV,Team" >}}
+{{< wintable title="ARKBOARD NBA 2026" icon="basketball" filter="FV,Team" >}}
 | RK | Player | FV | Team |
 | :---: | ----- | :---: | ----- |
 | 1 | [Caleb Wilson](https://barttorvik.com/playerstat.php?year=2026&p=Caleb%20Wilson&t=North%20Carolina) | 65 | [North Carolina](https://barttorvik.com/team.php?team=North%20Carolina&year=2026) |
@@ -153,9 +153,9 @@ cover = "/og/college-basketball.png"
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< wintabs tabs="v3,v2,v1" label="ARKBOARD NBA 2026 versions" >}}
-{{< board post="arkboard-nba-2026-v3" n="1" title="ARKBOARD NBA 2026 v3 :: top 50 (feb 15)" tab="v3" icon="basketball" filter="FV,Team" >}}
-{{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2 :: top 40 ranked, 118 graded (feb 8)" tab="v2" icon="basketball" filter="FV,Class,Team" >}}
-{{< board post="nba-future-value-grading-system" n="1" title="ARKBOARD NBA 2026 v1 :: top 30 + 13 unranked (jan 31)" tab="v1" icon="basketball" filter="FV,Team" >}}
+{{< board post="arkboard-nba-2026-v3" n="1" title="ARKBOARD NBA 2026 v3" tab="v3" icon="basketball" filter="FV,Team" >}}
+{{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2" tab="v2" icon="basketball" filter="FV,Class,Team" >}}
+{{< board post="nba-future-value-grading-system" n="1" title="ARKBOARD NBA 2026 v1" tab="v1" icon="basketball" filter="FV,Team" >}}
 {{< /wintabs >}}
 {{< /deskcol >}}
 {{< /desk >}}
