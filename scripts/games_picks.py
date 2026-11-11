@@ -1462,8 +1462,14 @@ def live(sport):
            'picks': picks, 'paperPicks': paper_picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log, 'withdrawnLog': wlog}
-    if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
-        return print(f'{sport} picks: no change')
+    import checked
+    same = bool(old) and checked.body(old) == json.loads(json.dumps(checked.body(out)))
+    out = checked.stamp(old, out, now, same=same)
+    if same:
+        if out is not None:
+            with open(fn, 'w') as f:
+                json.dump(out, f, indent=1)
+        return print(f'{sport} picks: no change' + ('' if out is None else ', checked'))
     with open(fn, 'w') as f:
         json.dump(out, f, indent=1)
     print(f'{sport} picks: {len(picks)} open, {len(done)} graded')

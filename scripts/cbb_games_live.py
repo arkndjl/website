@@ -515,18 +515,21 @@ def avail_live():
 
 
 def write_injuries(report):
-    """data/cbb_injuries.json, rewritten only when the list changes (the refresh runs every half hour)"""
+    """data/cbb_injuries.json: asof when the list last changed, checked when a run last read it (scripts/checked.py:
+    an unchanged list moves checked at most twice a day; the refresh runs every half hour). True when the list changed"""
     body = {'src': COVERS, 'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
                                        for t, n, ps, st, d, w in report]}
+    import checked
     try:
         old = json.load(open(INJ_OUT))
-        if old.get('players') == body['players']:
-            return False
     except (OSError, ValueError):
-        pass
-    with open(INJ_OUT, 'w') as f:
-        json.dump({'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), **body}, f, indent=0)
-    return True
+        old = None
+    same = bool(old) and old.get('players') == body['players']
+    out = checked.stamp(old, {'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), **body}, now_utc(), same=same)
+    if out is not None:
+        with open(INJ_OUT, 'w') as f:
+            json.dump(out, f, indent=0)
+    return not same
 
 
 def build():
@@ -842,11 +845,15 @@ def build():
         r['prev'] = snap.get(r['id']) if snap else r.get('priorRk')
     res['prevFrom'] = back[-1] if back else 'preseason'
     res['rkHist'] = hist
-    if old and {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
-        print('cbb games: no change')
-    else:
+    import checked
+    same = bool(old) and checked.body(old) == json.loads(json.dumps(checked.body(res)))
+    out = checked.stamp(old, res, now_utc(), same=same)
+    if same:
+        print('cbb games: no change' + ('' if out is None else ', checked'))
+    if out is not None:
         with open(C.OUT, 'w') as f:
-            json.dump(res, f, separators=(',', ':'))
+            json.dump(out, f, separators=(',', ':'))
+    if not same:
         print(f'cbb games: {len(out_games)} games on {sorted(show)}, {len(power)} teams rated, {len(left)} games simulated')
     save_snap(asnap)
 
