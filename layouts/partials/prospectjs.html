@@ -159,7 +159,7 @@
     };
   }
 
-  var TN_LAB = { age: 'age', rank: 'ranking', elo: 'Elo', form: 'win rate, last 52 weeks', pro: 'years on the pro tour', itf: 'Futures / ITF matches', qual: 'tour qualifying matches', tree: 'inputs in combination' };
+  var TN_LAB = { age: 'age', rank: 'ranking', elo: 'Elo', form: 'win rate, last 52 weeks', pro: 'years on the pro tour', itf: 'Futures / ITF matches', qual: 'tour qualifying matches' };
   var TN_TIP = 'Outcome tiers on the FV scale by peak value (ranking points above the No. 200 player, best three seasons at ages 22-28), by rarity within a birth year on his tour: 40 = top 13 of a birth year (about a top-100 peak), 50 = top 7 (about top 50), 60 = top 2 (about top 12). Odds from the 1993-2019 October prospects: what players graded like him became, held out by birth year.';
   var TN_TIERS = ['below the top 200', 'top-200 fringe', 'top-100 player', 'top-50 player', 'top-12 player'];
   function wl(w, n) { return (w || 0) + '-' + ((n || 0) - (w || 0)); }
@@ -173,7 +173,6 @@
         case 'pro': return r.deb ? 'first pro match at ' + f1(r.deb) + ', ' + r.car + ' pro matches so far' : 'no pro matches yet';
         case 'itf': return wl(r.wS, r.nS) + ' at Futures / ITF level over the last 52 weeks' + (up ? '' : ': still a lot of time below Challengers');
         case 'qual': return wl(r.wQ, r.nQ) + ' in tour qualifying over the last 52 weeks';
-        case 'tree': return 'his inputs taken together (tree model)';
       }
       return TN_LAB[k] || k;
     };

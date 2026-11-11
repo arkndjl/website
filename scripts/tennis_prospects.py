@@ -726,14 +726,14 @@ def td_fit(rows, B, tour, snap, kept):
 
 
 
-# Tree blend (ATP). The headline mean is half the hurdle's and half a gradient-boosted regression's on every design
-# column the live rows carry (no leaks, no serve stats: the frozen base and the Tennis Abstract rows have none). The
-# trees pick up curves and input combinations the linear hurdle cannot. Leave-one-birth-year-out MSE 24.84 -> 24.45
-# (t 4.9, 17/19 years), top 50 41.4 -> 41.7, forward (fit births <= 1993) 23.14 -> 22.50. WTA fails the forward test.
-# On top of the unfinished-careers fit the trees must train on the same rows (unfinished rows at their mean target):
-# as-of walk-forward 2011-18 MSE 20.24 -> 19.86 (t 2.7, 7/8 seasons); trees on finished births alone add nothing there.
-# The blend moves P(any value) to hit the blended mean (and MU once P is 1), so the odds and the range follow it.
-TREE_TOURS = ('atp',)
+# Tree blend: off for both tours (TREE_TOURS empty). The blend would make the headline mean half the hurdle's and half
+# a gradient-boosted regression's on every design column the live rows carry (no leaks, no serve stats), moving
+# P(any value) to hit the blended mean (and MU once P is 1). ATP on finished births: leave-one-birth-year-out MSE
+# 24.84 -> 24.45 (t 4.9, 17/19), but on top of the unfinished-careers fit those trees add nothing (as-of t -0.55, 2/8).
+# Trees trained on the unfinished rows too: as-of walk-forward 2011-18 MSE 20.24 -> 19.86 (t 2.7, 7/8, one-sided p .015
+# on 7 df), a second form tried after the first failed and judged on the same seasons; counted with the sweep's other
+# tests under Holm (15) it needs p <= .005 and fails. WTA fails the forward test. The grade is the linear hurdle alone.
+TREE_TOURS = ()
 TREE_W = .5
 TREE_OUT = LEAKS + ['lefty', 'spw', 'rpw', 'stx', 'acer']
 TREE_SET = dict(max_depth=3, learning_rate=.05, max_iter=300, min_samples_leaf=40, l2_regularization=1.0, random_state=0)
