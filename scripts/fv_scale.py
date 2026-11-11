@@ -106,7 +106,8 @@ def cfb_groups():
     return list(out.values())
 
 
-def fit():
+def compute():
+    """the fit's boards from the tables on disk (no write)"""
     sys.path.insert(0, os.path.join(ROOT, 'scripts'))
     from fv_dist import fv_dist
     J = lambda *p: json.load(open(os.path.join(ROOT, *p)))
@@ -136,6 +137,11 @@ def fit():
         cap = reach.get(b, 80.0) - 0.0
         out[b] = {'K': round(K, 2), 'T': round(min(Tb, cap), 2), 'tail': round(th, 2), 'tailT': round(Tb, 2),
                   'reach': round(cap, 2), 'seasons': n, 'src': note}
+    return out
+
+
+def fit():
+    out = compute()
     json.dump({'asof': __import__('time').strftime('%Y-%m-%d'), 'method': 'scripts/fv_scale.py --fit',
                'rule': f'FV = mean up to K ({PER_K:g} a season); linear above to 80 at T (one a season x {PER_T:g}), capped at the board\'s reach',
                'boards': out}, open(FILE, 'w'), indent=1)

@@ -11,6 +11,8 @@
   mismatched pair leaves every scouting report off the board
 - static/data/cbb-past.json carries fvg (the grade; fv and fvx at the mean outcome) and data/cbb_fit.json carries
   calibMean: both come from scripts/fv_dist.py past_at_mean, which cbb_fit.py runs after it rewrites the past boards
+- data/fv_scale.json K and T match a refit from the boards' tables (scripts/fv_scale.py compute) within 0.25; hockey's
+  gap is a warning until its scale is refit (`python3 scripts/fv_scale.py --fit`)
 - with --hugo: data/team_alias.json (the browser's team short forms, layouts/partials/namekey.html) matches
   scripts/names.py TEAM_ALIAS; `python3 scripts/names.py --teams` rewrites it
 Local hook: git config core.hooksPath .githooks (runs the fast checks on each commit). Stdlib only."""
@@ -82,6 +84,25 @@ def check_teams():
     return [] if built == names.TEAM_ALIAS else ['data/team_alias.json is behind scripts/names.py TEAM_ALIAS: run python3 scripts/names.py --teams']
 
 
+def check_fv_scale(tol=0.25, warn_only=('hockey',)):
+    """stored K/T against a fresh fit from the tables on disk; returns (errors, warnings)"""
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    try:
+        import fv_scale
+        fresh = fv_scale.compute()
+        stored = json.load(open(os.path.join(ROOT, 'data', 'fv_scale.json')))['boards']
+    except Exception as e:
+        return [], [f'fv_scale check skipped: {type(e).__name__}: {e}']
+    errs, warns = [], []
+    for b, f in fresh.items():
+        for k in ('K', 'T'):
+            d = abs(f[k] - stored[b][k])
+            if d > tol:
+                (warns if b in warn_only else errs).append(
+                    f'data/fv_scale.json {b} {k} {stored[b][k]} but the tables fit {f[k]}: rerun scripts/fv_scale.py --fit --restate')
+    return errs, warns
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -96,6 +117,7 @@ def check_hugo():
 if __name__ == '__main__':
     errs, n = check_json()
     e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean()
+    e3, w3 = check_fv_scale(); errs += e3; warns += w3
     if '--hugo' in sys.argv[1:]: errs += check_teams()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)
