@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11T11:02:29Z",
+ "asof": "2026-11-11T12:59:58Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 84.83,
   "peak": 117.38,
   "drawdown": 0.2773,
-  "open": 99.75,
+  "open": 101.0,
   "path": [
    106.77,
    109.32,
@@ -412,11 +412,11 @@
   ]
  },
  "record": {
-  "n": 485,
-  "clvN": 429,
+  "n": 487,
+  "clvN": 430,
   "clvRet": -0.0121,
   "clvT": -2.51,
-  "clv": 0.0,
+  "clv": 0.01,
   "beat": 0.312,
   "settled": 429,
   "w": 211,
@@ -428,23 +428,23 @@
   "risked": 404.0,
   "yield": -0.0336
  },
- "tEff": -2.49,
+ "tEff": -2.52,
  "corr": {
   "rho": 0.0,
-  "n": 429,
-  "slates": 43,
-  "nEff": 422.3,
-  "avgSlate": 9.98
+  "n": 430,
+  "slates": 44,
+  "nEff": 430.0,
+  "avgSlate": 9.77
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 429,
+   "value": 430,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.2% t -2.49",
+   "value": "-1.2% t -2.52",
    "pass": false
   },
   {
@@ -659,7 +659,7 @@
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 48,
+   "n": 49,
    "clvN": 43,
    "clvRet": 0.0298,
    "clvT": 2.29,
@@ -680,12 +680,12 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 89,
-   "clvN": 84,
-   "clvRet": -0.0179,
-   "clvT": -3.84,
-   "clv": -0.07,
-   "beat": 0.262,
+   "n": 90,
+   "clvN": 85,
+   "clvRet": -0.0177,
+   "clvT": -3.86,
+   "clv": -0.06,
+   "beat": 0.259,
    "settled": 84,
    "w": 43,
    "l": 41,
@@ -737,7 +737,11 @@
    "edge": 16.2,
    "ev": 0.0258,
    "event": "Bybit Stockholm Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0064,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.4175
   },
   {
    "rule": "tennis-ml",
@@ -802,6 +806,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186764",
+   "k": "2026-11-11T18:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Carle",
+   "a": "Ribera",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 208,
+   "bet": "Carle ML +208",
+   "placed": "2026-11-11T12:59:58Z",
+   "stake": 0.25,
+   "edge": 5.5,
+   "ev": 0.0047,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "187385",
    "k": "2026-11-11T20:00:00Z",
    "slate": "tennis:2026-11-11",
@@ -838,7 +862,7 @@
    "ev": 0.0078,
    "event": null,
    "pass": false,
-   "close": 225.5
+   "close": 226.5
   },
   {
    "rule": "cfb-total",
@@ -880,7 +904,7 @@
    "ev": 0.0213,
    "event": null,
    "pass": false,
-   "close": 240.5
+   "close": 239.5
   },
   {
    "rule": "nba-total",
@@ -922,7 +946,28 @@
    "ev": 0.0238,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 230.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909973",
+   "k": "2026-11-12T02:00:00Z",
+   "slate": "nba:2026-11-11",
+   "h": "UTAH",
+   "a": "ORL",
+   "mk": "total",
+   "side": "over",
+   "line": 215.5,
+   "price": -106.0,
+   "bet": "over 215.5 -106",
+   "placed": "2026-11-11T12:59:57Z",
+   "stake": 1.0,
+   "edge": 3.7,
+   "ev": 0.0098,
+   "event": null,
+   "pass": false,
+   "close": 215.5
   },
   {
    "rule": "nba-total",
@@ -18407,7 +18452,11 @@
    "edge": 16.2,
    "ev": 0.0258,
    "event": "Bybit Stockholm Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0064,
+   "clv": 0.5,
+   "beat": 0,
+   "close": 0.4175
   },
   {
    "rule": "tennis-ml",
@@ -18472,6 +18521,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "186764",
+   "k": "2026-11-11T18:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Carle",
+   "a": "Ribera",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 208,
+   "bet": "Carle ML +208",
+   "placed": "2026-11-11T12:59:58Z",
+   "stake": 0.25,
+   "edge": 5.5,
+   "ev": 0.0047,
+   "event": "DIRECTV Open Presentado por Compesar",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "187385",
    "k": "2026-11-11T20:00:00Z",
    "slate": "tennis:2026-11-11",
@@ -18508,7 +18577,7 @@
    "ev": 0.0078,
    "event": null,
    "pass": false,
-   "close": 225.5
+   "close": 226.5
   },
   {
    "rule": "cfb-total",
@@ -18550,7 +18619,7 @@
    "ev": 0.0213,
    "event": null,
    "pass": false,
-   "close": 240.5
+   "close": 239.5
   },
   {
    "rule": "nba-total",
@@ -18592,7 +18661,28 @@
    "ev": 0.0238,
    "event": null,
    "pass": false,
-   "close": 231.5
+   "close": 230.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909973",
+   "k": "2026-11-12T02:00:00Z",
+   "slate": "nba:2026-11-11",
+   "h": "UTAH",
+   "a": "ORL",
+   "mk": "total",
+   "side": "over",
+   "line": 215.5,
+   "price": -106.0,
+   "bet": "over 215.5 -106",
+   "placed": "2026-11-11T12:59:57Z",
+   "stake": 1.0,
+   "edge": 3.7,
+   "ev": 0.0098,
+   "event": null,
+   "pass": false,
+   "close": 215.5
   },
   {
    "rule": "nba-total",
