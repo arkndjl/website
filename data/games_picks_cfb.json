@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-11T03:53:20Z",
+ "asof": "2026-11-11T03:55:33Z",
  "recenter": {
   "week": 0.21
  },
@@ -982,8 +982,15 @@
    "tmRaw": 50.9,
    "flagged": "2026-11-08T15:27:24Z",
    "betTo": 15.5,
-   "close": 16.5,
-   "now": null
+   "close": 15.5,
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 15.5,
+    "price": -108.0,
+    "ev": 0.021,
+    "units": 1.5
+   }
   },
   {
    "id": "401856888",
@@ -1909,7 +1916,7 @@
    "mk": "spread",
    "side": "home",
    "line": 29.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.0,
    "x": 4.5,
    "why": "edge under 4.5 (tier: mixed)",
@@ -1983,13 +1990,13 @@
    "state": "under"
   },
   "401856883": {
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -102.0,
-   "ev": 0.017,
-   "edge": 4.2,
-   "units": 0.75,
+   "mk": "spread",
+   "side": "home",
+   "line": 15.5,
+   "price": -108.0,
+   "ev": 0.021,
+   "edge": 6.3,
+   "units": 1.5,
    "home": "Georgia",
    "away": "Missouri",
    "state": "pick"
@@ -2142,7 +2149,7 @@
    "mk": "spread",
    "side": "home",
    "line": 29.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -2731,16 +2738,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15609,
+  "snapshots": 15617,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3241,
-    "clvRet": -0.0463,
-    "clvT": -33.38,
-    "clv": 0.24,
-    "beat": 0.337,
-    "still": 0.424
+    "clvN": 3244,
+    "clvRet": -0.0478,
+    "clvT": -34.98,
+    "clv": 0.21,
+    "beat": 0.319,
+    "still": 0.442
    },
    {
     "when": "6-24h",
@@ -5182,7 +5189,7 @@
    "tmRaw": 50.9,
    "flagged": "2026-11-08T15:27:24Z",
    "betTo": 15.5,
-   "close": 16.5
+   "close": 15.5
   },
   {
    "id": "401858298",
@@ -5914,11 +5921,11 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 35.25,
+    "raw": 35.75,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 35.25,
+    "raw": 36.0,
     "scale": 1.0
    },
    "2026-11-16": {
