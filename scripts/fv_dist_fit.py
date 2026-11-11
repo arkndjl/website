@@ -429,6 +429,7 @@ def main():
     only = next((a for a in sys.argv[1:] if a in ('--cfb', '--cbb')), None)   # --cfb or --cbb: refit one board
     if '--low' in sys.argv:                           # the floor rule only, on the shipped CBB fit (cbb_low)
         out['cbb']['low'] = cbb_low(out['cbb'], cbb_rows())
+        out['cbb']['low']['cal'] = cbb_low_cal(out['cbb']['low'])
         print('cbb low', out['cbb']['low'])
     elif '--scorecard' in sys.argv:                   # the shipped fit's held-out reliability only (scripts/fv_scorecard.py)
         if only != '--cbb': scorecard_cfb(out)
@@ -486,6 +487,7 @@ def fit_cbb(out):
     fit, m = final_fit(rows, kept)
     HINGES = (45, 60)
     fit['low'] = cbb_low(fit, rows)
+    fit['low']['cal'] = cbb_low_cal(fit['low'])
     out['cbb'] = {**fit, 'kept': [t[0] for t in kept], 'hingeSelection': hl, 'selection': log, 'heldOut': res, 'dropOne': drop, 'perFold': pf, 'byGroup': grp,
                   'note': 'fit on the top 300 of each 2010-16 preseason board (model-only grades, out of fold); grades below ~27 extrapolate'}
 
@@ -507,6 +509,39 @@ def cbb_low(M, rows):
     H = M['hinges']; mu = sum(k * ((max(0, 20 - H[i - 1]) if i else 20 - 40) / 10) for i, k in enumerate(M['loc']))
     p20 = 1 - ncdf(M['cuts'][0] - mu)
     return {'from': round(min(r['x'] for r in rows), 2), 'k0': round(float(nba / p20), 4), 'n': int(round(n)), 'nba': round(float(nba), 4), 'meanFv': round(float(mean), 2)}
+
+
+def cbb_low_cal(low):
+    """the floor rule's per-grade correction: on every 2009-16 board row's out-of-fold E[FV] (scripts/.cache/cbb/fit_oof.json,
+    graded through data/cbb_fit.json emap), the realized NBA share (FV 30+) over the share the k0 line gives, by grade
+    band under the support, at each band's mean grade, monotone, 1 at the support. Nov 11 2026: the k0 line had the
+    boards' rows under the support summing 380 NBA players a board against 191 realized (a grade-21 row 6% against 1%,
+    the whole live board 315 against about 226); the correction chosen one board out at a time cut log loss on all 8
+    held boards (t -29.8). Needs the CBB caches (cbb_careers_kit.py, cbb_fit.py)"""
+    import fv_dist as FD
+    F = json.load(open(os.path.join(ROOT, 'data', 'cbb_fit.json')))
+    oof = json.load(open(os.path.join(ROOT, 'scripts', '.cache', 'cbb', 'fit_oof.json')))
+    x, g = np.array(F['emap']['model']['e']), np.array(F['emap']['model']['g'])
+    FD.fit()['cbb']['low'] = {k: v for k, v in low.items() if k != 'cal'}
+    edges = [20.25, 20.5, 21, 22, 23, 24, 25, 26, low['from']]
+    acc = [[0, 0.0, 0.0, 0] for _ in edges[:-1]]
+    for pid, yr, last, new, e, yh, yf in oof:
+        if not (int(F['train'][:4]) <= yr <= int(F['train'][-4:])) or yf is None:
+            continue
+        fvx = float(np.clip(np.interp(e, x, g), 20, 80))
+        if fvx >= low['from']:
+            continue
+        b = max(0, int(np.searchsorted(edges, fvx, side='right')) - 1)
+        if b >= len(acc):
+            continue
+        d = FD.fv_dist('cbb', fvx, FD.cbb_z(None, bool(new), None, fvx))
+        a = acc[b]; a[0] += 1; a[1] += fvx; a[2] += 1 - d['tiers'][0]; a[3] += yf >= 30
+    pts, m = [], 0.0
+    for n, sx, ps, ys in acc:
+        if n:
+            m = max(m, min(1.0, (ys + 0.5) / (ps + 0.5)))
+            pts.append([round(sx / n, 3), round(m, 4)])
+    return pts + [[low['from'], 1.0]]
 
 
 def scorecard(label, rows, folds, terms, note):

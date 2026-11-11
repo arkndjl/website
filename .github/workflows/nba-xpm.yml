@@ -180,13 +180,17 @@ jobs:
       - name: Model monitor
         continue-on-error: true
         run: python3 scripts/model_monitor.py nba
+      # the lineup term's pre-registered live test (drop verdict at 400 games if it makes live margins worse)
+      - name: Lineup term watch
+        continue-on-error: true
+        run: python3 scripts/nba_lin_watch.py
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
       - name: Board moves
         continue-on-error: true
         run: python3 scripts/board_moves.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="scripts/data/moves static/data/xaav-nba.json data/units_nba.json scripts/data/faces_nba.json scripts/data/nba_dob.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-lineup-leaders.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
+          files="scripts/data/moves static/data/xaav-nba.json data/units_nba.json scripts/data/faces_nba.json scripts/data/nba_dob.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-lineup-leaders.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json data/model_monitor/nba_lin.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
           # main moves while this runs: scripts/data_push.py rebuilds the data commit on the new main, the picks log and
           # the rule monitor on main's newer copies (see cbb-board.yml)
           python3 scripts/data_push.py -m "Update the NBA XPM leaderboard and games ($(date -u +%Y-%m-%d))" \
