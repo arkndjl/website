@@ -1,12 +1,12 @@
 {
- "asof": "2026-11-11T18:08:36Z",
+ "asof": "2026-11-11T22:18:44Z",
  "sport": "cbb",
  "season": 2027,
  "loss": "abs margin error",
- "n": 592,
- "logged": 662,
+ "n": 597,
+ "logged": 691,
  "expectFrom": "walk-forward 2022-2026, same calendar month",
- "model": 11.7514,
+ "model": 11.7575,
  "expected": 9.4778,
  "z": -0.308,
  "line": 9.106,
@@ -15,25 +15,25 @@
  "byMonth": [
   {
    "month": "nov",
-   "n": 592,
-   "model": 11.7514,
+   "n": 597,
+   "model": 11.7575,
    "expected": 9.4778
   }
  ],
  "test": {
-  "n": 592,
+  "n": 597,
   "window": 300,
-  "mean": -0.1319,
-  "t": -1.91,
+  "mean": -0.1416,
+  "t": -2.05,
   "p": null,
-  "days": 6,
+  "days": 7,
   "sd": 1.0,
-  "cusum": 37.95,
+  "cusum": 38.73,
   "cusumMax": 76.35,
   "h": 10.0,
   "stop": true,
-  "why": "CUSUM 37.9 past 10"
+  "why": "CUSUM 38.7 past 10"
  },
  "status": "alarm",
- "why": "CUSUM 37.9 past 10"
+ "why": "CUSUM 38.7 past 10"
 }
