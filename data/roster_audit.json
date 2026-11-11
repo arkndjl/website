@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11T01:18Z",
+ "asof": "2026-11-11T01:33Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -328,19 +328,19 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 7,
+     "flags": 9,
      "rows": 2137
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 18,
+     "flags": 20,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 70,
+     "flags": 72,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 69,
+     "flags": 71,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -348,7 +348,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 51,
+     "flags": 52,
      "rows": 1650
     }
    },
@@ -448,6 +448,24 @@
      "field": "depth",
      "file": "static/data/depth/nfl.json",
      "flag": "released",
+     "head": "Cut loose by Bolts",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut loose by Bolts",
+      "kind": "waived"
+     },
+     "pid": "18251",
+     "player": "Hayden Rucci",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LAC"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
      "head": "Cut by Minnesota",
      "kind": "waived",
      "move": {
@@ -478,6 +496,24 @@
      "pos": "NB",
      "rotowire": "FA",
      "site": "MIN"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Cut by Bucs",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut by Bucs",
+      "kind": "waived"
+     },
+     "pid": "13634",
+     "player": "David Sills V",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "TB"
     },
     {
      "d": "2026-11-10",
@@ -854,16 +890,16 @@
      "site": "DET"
     },
     {
-     "d": "2026-11-07",
+     "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Let go by Saints",
-     "kind": null,
+     "flag": "practice",
+     "head": "Joins Saints' practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-09-12",
-      "head": "Signs with New Orleans",
-      "kind": "sign"
+      "d": "2026-11-10",
+      "head": "Joins Saints' practice squad",
+      "kind": "practice"
      },
      "pid": "18263",
      "player": "Treyton Welch",
@@ -1592,6 +1628,24 @@
      "site": "LA"
     },
     {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Cut by Bucs",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut by Bucs",
+      "kind": "waived"
+     },
+     "pid": "13634",
+     "player": "David Sills V",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "TB"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1644,6 +1698,24 @@
      "pos": "WR",
      "rotowire": "LAR",
      "site": "SF"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Cut loose by Bolts",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut loose by Bolts",
+      "kind": "waived"
+     },
+     "pid": "18251",
+     "player": "Hayden Rucci",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LAC"
     },
     {
      "d": "2026-10-19",
@@ -2092,16 +2164,16 @@
      "site": "CLE"
     },
     {
-     "d": "2026-09-02",
+     "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Signs with New Orleans' practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Cut from Saints' practice squad",
+     "kind": "waived",
      "move": {
-      "d": "2026-09-02",
-      "head": "Signs with New Orleans' practice squad",
-      "kind": "practice"
+      "d": "2026-11-10",
+      "head": "Cut from Saints' practice squad",
+      "kind": "waived"
      },
      "pid": "16321",
      "player": "Stone Smartt",
@@ -2306,6 +2378,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Cut by Bucs",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut by Bucs",
+      "kind": "waived"
+     },
+     "pid": "13634",
+     "player": "David Sills V",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "TB"
     },
     {
      "d": "2026-10-28",
@@ -3060,16 +3150,16 @@
      "site": "DET"
     },
     {
-     "d": "2026-11-07",
+     "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Let go by Saints",
-     "kind": null,
+     "flag": "practice",
+     "head": "Joins Saints' practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-09-12",
-      "head": "Signs with New Orleans",
-      "kind": "sign"
+      "d": "2026-11-10",
+      "head": "Joins Saints' practice squad",
+      "kind": "practice"
      },
      "pid": "18263",
      "player": "Treyton Welch",
@@ -3762,6 +3852,24 @@
      "site": "HOU"
     },
     {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Cut by Bucs",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut by Bucs",
+      "kind": "waived"
+     },
+     "pid": "13634",
+     "player": "David Sills V",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "TB"
+    },
+    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3814,6 +3922,24 @@
      "pos": "WR",
      "rotowire": "LAR",
      "site": "SF"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Bolts",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut loose by Bolts",
+      "kind": "waived"
+     },
+     "pid": "18251",
+     "player": "Hayden Rucci",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LAC"
     },
     {
      "d": "2026-10-19",
@@ -4158,6 +4284,24 @@
      "site": "SEA"
     },
     {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Cut by Bucs",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut by Bucs",
+      "kind": "waived"
+     },
+     "pid": "13634",
+     "player": "David Sills",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "TB"
+    },
+    {
      "d": "2026-09-15",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4192,6 +4336,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "CAR"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Cut loose by Bolts",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Cut loose by Bolts",
+      "kind": "waived"
+     },
+     "pid": "18251",
+     "player": "Hayden Rucci",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LAC"
     },
     {
      "d": "2026-11-09",
