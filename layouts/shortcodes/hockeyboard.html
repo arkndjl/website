@@ -85,9 +85,9 @@
   <thead><tr>
     <th>RK</th><th>Player</th><th>Class</th><th title="overall pick">Pick</th><th>Team</th><th>Pos</th>
     <th class="cfb__g" title="the draft-day grade, fit without his class (out of sample)">FV</th>
-    <th title="outcome FV: peak NHL value (best three WAR seasons in his first seven after the draft; goalies by saves above expected) on the same scale">Out</th>
+    <th title="outcome FV: peak NHL value (best three pWAR seasons in his first seven after the draft; goalies by saves above expected) on the same scale">Out</th>
     <th class="hk__x" title="NHL games, first seven seasons after the draft">NHL GP</th>
-    <th class="hk__x" title="peak: mean of his best three WAR seasons (skaters) or goals saved above expected (goalies)">Peak</th>
+    <th class="hk__x" title="peak: mean of his best three pWAR seasons (skaters) or goals saved above expected (goalies)">Peak</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .past }}
@@ -101,7 +101,7 @@
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
     <td class="cfb__num hk__x">{{ .gp }}</td>
-    <td class="cfb__num hk__x">{{ with .peak }}{{ printf "%.1f" (float .) }} WAR{{ end }}{{ with .gpeak }}{{ printf "%+.0f" (float .) }} GSAx{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .peak }}{{ printf "%.1f" (float .) }} pWAR{{ end }}{{ with .gpeak }}{{ printf "%+.0f" (float .) }} GSAx{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -114,7 +114,7 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>FV</th><th>Peak WAR a season</th><th>How rare</th></tr></thead>
+      <thead><tr><th>FV</th><th>Peak pWAR a season</th><th>How rare</th></tr></thead>
       <tbody>
       {{- $per := dict "80" "one in four classes" "75" "one in two classes" "70" "the best of a class" "65" "top 2 of a class" "60" "top 5" "55" "top 10" "50" "top 20" "45" "top 30" "40" "top 45" }}
       {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td class="cfb__num">{{ printf "%.2f" (float (index . 1)) }}+</td><td>{{ index $per (string (index . 0)) }}</td></tr>{{ end }}
