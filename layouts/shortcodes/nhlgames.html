@@ -11,7 +11,7 @@
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
 <div class="win games nhlgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit $days ", " }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ $.Get "title" | default "games" }} :: {{ delimit $days ", " }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ $.Get "title" | default "games" }}{{ with $days }} :: {{ delimit . ", " }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- if not .games }}<div class="cfbm__body"><p class="cfb__dim">no games on the schedule yet.</p></div>{{ end }}
