@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-11T23:11:07Z",
+ "asof": "2026-11-11T23:13:26Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -220,8 +220,8 @@
     "side": "over",
     "line": 38.5,
     "price": -111.0,
-    "ev": 0.18,
-    "units": 5.0
+    "ev": 0.175,
+    "units": 4.75
    }
   },
   {
@@ -544,6 +544,22 @@
    "tm": 39.0
   },
   {
+   "id": "2026_10_KC_ATL",
+   "sport": "nfl",
+   "kick": "2026-11-15T18:00:00Z",
+   "home": "ATL",
+   "away": "KC",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -111.0,
+   "edge": 2.0,
+   "x": 1.5,
+   "why": "no edge at -111",
+   "m": -5.2,
+   "tm": 45.5
+  },
+  {
    "id": "2026_10_PIT_CIN",
    "sport": "nfl",
    "kick": "2026-11-16T01:20:00Z",
@@ -606,22 +622,6 @@
    "why": "edge under 1.5",
    "m": 2.3,
    "tm": 49.6
-  },
-  {
-   "id": "2026_10_KC_ATL",
-   "sport": "nfl",
-   "kick": "2026-11-15T18:00:00Z",
-   "home": "ATL",
-   "away": "KC",
-   "mk": "spread",
-   "side": "away",
-   "line": -3.5,
-   "price": 113.0,
-   "edge": 1.7,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": -5.2,
-   "tm": 45.5
   }
  ],
  "games": {
@@ -698,11 +698,11 @@
    "state": "paper"
   },
   "2026_10_KC_ATL": {
-   "mk": "spread",
-   "side": "away",
-   "line": -3.5,
-   "price": 113.0,
-   "edge": 1.7,
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -111.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "ATL",
@@ -738,9 +738,9 @@
    "side": "over",
    "line": 38.5,
    "price": -111.0,
-   "ev": 0.18,
+   "ev": 0.175,
    "edge": 8.8,
-   "units": 5.0,
+   "units": 4.75,
    "home": "ARI",
    "away": "LA",
    "state": "paper"
@@ -846,7 +846,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3331,
+  "snapshots": 3333,
   "buckets": [
    {
     "when": "24h+",
@@ -2917,12 +2917,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-11T23:11:07Z",
+ "checked": "2026-11-11T23:13:26Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-11": {
-    "raw": 10.25,
+    "raw": 10.75,
     "scale": 1.0
    }
   }
