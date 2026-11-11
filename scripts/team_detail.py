@@ -86,8 +86,8 @@ def players(sport):
         for p in (_latest('nba-xpm') or {}).get('players', []):
             if (p.get('mp') or 0) >= 30:
                 tm = p['tm'].split('/')[-1]                 # a traded player's teams in order ("LAC/POR"): list him on his current one
-                by[NBA_BR.get(tm, tm)].append((p.get('vorx') or 0, [p['n'], p['pos'], p.get('sxpm', p['xpm']), f"{p['g']} G, {p['mp']} min"]))
-        return 'XPM', _top(by)
+                by[NBA_BR.get(tm, tm)].append((p.get('vorx') or 0, [p['n'], p['pos'], p['xpm'], f"{p['g']} G, {p['mp']} min"]))
+        return 'rXPM', _top(by)
     if sport == 'nhl':
         for p in (_latest('nhl-war') or {}).get('players', []):
             note = f"{p['gp']} GP" + (f", {p['pts']} pts" if p.get('grp') != 'G' else (f", {p['gsax']:+.1f} GSAx" if p.get('gsax') is not None else ''))
@@ -105,7 +105,7 @@ def players(sport):
 
 # elite young talent: per sport, who counts as young and the metric they are ordered by
 YOUNG = {'cbb': ('FV', 'Fr/So by FV'), 'cfb': ('FV', 'Fr/So by FV'), 'nfl': ('WAR', 'age 24 and under by WAR'),
-         'nba': ('XPM', 'age 23 and under by XPM'), 'nhl': ('FV', 'drafted prospects by FV'), 'soccer': ('FV', 'under-22 by FV')}
+         'nba': ('rXPM', 'age 23 and under by VORX'), 'nhl': ('FV', 'drafted prospects by FV'), 'soccer': ('FV', 'under-22 by FV')}
 
 
 def young(sport, n=3):
@@ -124,8 +124,8 @@ def young(sport, n=3):
     elif sport == 'nba':
         for p in (_latest('nba-xpm') or {}).get('players', []):
             if p.get('age') and p['age'] <= 23 and (p.get('mp') or 0) >= 30:
-                x, tm = p.get('sxpm', p['xpm']), p['tm'].split('/')[-1]
-                by[NBA_BR.get(tm, tm)].append((x, [p['n'], p['pos'], x, f"age {p['age']}, {p['mp']} min"]))
+                x, tm = p['xpm'], p['tm'].split('/')[-1]
+                by[NBA_BR.get(tm, tm)].append((p.get('vorx') or 0, [p['n'], p['pos'], x, f"age {p['age']}, {p['mp']} min"]))
     elif sport == 'nhl':
         for p in (_load(os.path.join(ROOT, 'data', 'hockey.json')) or {}).get('pipe', []):
             if p.get('team') and p.get('fv'):

@@ -199,8 +199,8 @@ def nba():
             c = cbb.get((dr[0], dr[1])) if dr else None
             if c and not NM.same(c['name'], p['n']):
                 c = None
-            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'vorx': p['vorx'], 'xpm': p.get('sxpm', p['xpm']),
-                   'oxpm': p.get('soxpm', p['oxpm']), 'dxpm': p.get('sdxpm', p['dxpm']), 'rxpm': p['xpm'], 'mp': p['mp'], 'g': p['g'],
+            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'vorx': p['vorx'], 'xpm': p['xpm'],
+                   'sx': p.get('sxpm', p['xpm']), 'oxpm': p['oxpm'], 'dxpm': p['dxpm'], 'mp': p['mp'], 'g': p['g'],
                    'r3': round(cf[0] + cf[1] * XP.role_sxpm(p, gms) + cf[2] * (p['age'] - a0) + cf[3] * math.log1p(p['mp'] * 82 / gms), 1)
                    if p.get('age') and p.get('xpm') is not None else None,
                    'axpm': round(XP.role_sxpm(p, gms) + ak * (p['age'] - a0), 1) if p.get('age') and p.get('xpm') is not None else None,
@@ -217,16 +217,18 @@ def nba():
     write('nba', {
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
         'def': 'rookies: first season on the XPM board. pre-draft FV = the CBB board\'s draft-year FV (college players only); slot = overall pick.',
-        'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (XPM + 1.4) x MP / 48'], ['xpm', 'XPM', 'XPM: points per 100 over average, shrunk by minutes (MP / (MP + 300))'],
+        'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (rXPM + 1.4) x MP / 48'], ['xpm', 'rXPM', 'rXPM: raw XPM, points per 100 over average'],
+                  ['sx', 'pXPM', 'pXPM: predictive XPM, rXPM shrunk by minutes toward a role mean'],
                   ['r3', '3Y', 'rookie projection: XPM over the next three seasons when he plays, from XPM, age and minutes per 82 games'],
                   ['axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0})"],
                   ['pxpm', 'Proj', 'XPM (proj): this season blended with the preseason prior by minutes (current season)'],
                   ['sur', 'Surplus', 'contract surplus this season: projected VORX x $ per win - salary, $M (current season)']],
-        'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'XPM', 'XPM, points per 100 over average, shrunk by minutes', 's1'),
+        'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'rXPM', 'rXPM: raw XPM, points per 100 over average', 's1'),
+                 col('sx', 'pXPM', 'pXPM: predictive XPM, rXPM shrunk by minutes toward a role mean', 's1', 1),
                  col('r3', '3Y', 'rookie projection: XPM over the next three seasons when he plays, from XPM, age and minutes per 82 games', 's1', 1),
                  col('axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0}), fit on 2010-23 rookies' next three seasons", 's1', 1),
-                 col('pxpm', 'Proj', 'XPM (proj): season blended with the prior', 's1', 1), col('oxpm', 'Off', 'offensive XPM', 's1', 1),
-                 col('dxpm', 'Def', 'defensive XPM', 's1', 1), col('sur', 'Surplus', 'contract surplus this season, $M', 'm', 1),
+                 col('pxpm', 'Proj', 'XPM (proj): season blended with the prior', 's1', 1), col('oxpm', 'Off', 'offensive rXPM', 's1', 1),
+                 col('dxpm', 'Def', 'defensive rXPM', 's1', 1), col('sur', 'Surplus', 'contract surplus this season, $M', 'm', 1),
                  col('sal', 'Salary', 'salary this season, $M', 'm', 1), col('mp', 'MP', 'minutes', 'i', 1)],
         'pre': {'l': 'Pick', 't': 'overall pick (year shown when drafted earlier; UDFA: undrafted)'},
         'pfv': {'l': 'Pre FV', 't': 'draft-year FV on the CBB board, mean outcome'},
