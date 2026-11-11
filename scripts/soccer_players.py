@@ -84,7 +84,10 @@ def parse_match(m, lg, S, mid):
     out = []
     for s in 'ha':
         o = 'a' if s == 'h' else 'h'
-        rs = {r['id']: r for r in ro[s]}
+        rs = {}
+        for r in ro[s]:                                      # Understat lists a whole side twice in a few matches
+            if all(str(q.get('player_id')) != str(r.get('player_id')) for q in rs.values()):
+                rs[r['id']] = r
         start = {}
         for r in rs.values():
             if int(f(r.get('positionOrder'))) < 17 and str(r.get('roster_out')) in ('0', 'None', ''):
