@@ -22,11 +22,20 @@ def ncdf(x):
     return 0.5 * (1 + math.erf(x / math.sqrt(2)))
 
 
+def interp(x, pts):
+    """piecewise linear through [[x, y], ...] (sorted), flat past either end"""
+    if x <= pts[0][0]: return pts[0][1]
+    for (a, u), (b, v) in zip(pts, pts[1:]):
+        if x <= b: return u + (v - u) * (x - a) / (b - a)
+    return pts[-1][1]
+
+
 def fv_dist(board, fv, z=None, low=True):
     """{'p': bin chances, 'tiers': [<30, 30s, 40s, 50s, 60+], 'p10', 'p50', 'p90', 'mean', 'ev'} or None.
     low: below the grades the fit saw (M['low'], fv_dist_fit.cbb_low) the chance of every bin above the floor is
     scaled down, from 1 at the lowest fitted grade to k0 at 20, so the floor grade carries what the boards' rows
-    outside the fit became; False reads the fitted curve all the way down."""
+    outside the fit became, then by M['low']['cal'] (each grade's realized NBA share over that, fv_dist_fit.cbb_low_cal);
+    False reads the fitted curve all the way down."""
     M = fit().get(board)
     if not M or fv is None: return None
     z = z or {}
@@ -38,6 +47,8 @@ def fv_dist(board, fv, z=None, low=True):
     L = M.get('low') if low else None
     if L and fv < L['from']:
         k = L['k0'] + (1 - L['k0']) * max(0.0, fv - 20) / (L['from'] - 20)
+        if L.get('cal'):
+            k *= interp(fv, L['cal'])
         p = [1 - k * (1 - p[0])] + [k * v for v in p[1:]]
     edges = M['edges']; lo = [20] + edges; hi = edges + [80]; fl = M['floorShare']
 

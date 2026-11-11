@@ -22,6 +22,15 @@ const ncdf = x => { const z = x / Math.SQRT2, a = Math.abs(z), t = 1 / (1 + 0.32
 
 // z: { term: value } for the board's kept spread terms (missing terms count 0)
 // low: below the grades the fit saw (M.low) every bin above the floor is scaled down, to k0 at 20 (fv_dist.py)
+function interp(x, pts) {   // piecewise linear through [[x, y], ...], flat past either end (fv_dist.py interp)
+  if (x <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) {
+    const [a, u] = pts[i - 1], [b, v] = pts[i];
+    if (x <= b) return u + (v - u) * (x - a) / (b - a);
+  }
+  return pts[pts.length - 1][1];
+}
+
 export function fvDist(board, fv, z = {}, low = true) {
   const M = fvDistFit()[board];
   if (!M || fv == null) return null;
@@ -33,7 +42,8 @@ export function fvDist(board, fv, z = {}, low = true) {
   for (let k = 0; k <= F.length; k++) p.push(Math.max(0, (k < F.length ? F[k] : 1) - (k ? F[k - 1] : 0)));
   const L = low ? M.low : null;
   if (L && fv < L.from) {
-    const k = L.k0 + (1 - L.k0) * Math.max(0, fv - 20) / (L.from - 20);
+    let k = L.k0 + (1 - L.k0) * Math.max(0, fv - 20) / (L.from - 20);
+    if (L.cal) k *= interp(fv, L.cal);   // each grade's realized NBA share over the line (fv_dist_fit.cbb_low_cal)
     for (let j = 1; j < p.length; j++) p[j] *= k;
     p[0] = 1 - p.slice(1).reduce((a, v) => a + v, 0);
   }
