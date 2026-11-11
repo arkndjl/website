@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-11T08:30:26Z",
+ "asof": "2026-11-11T08:31:44Z",
  "recenter": {
   "week": 0.22
  },
@@ -926,9 +926,9 @@
     "mk": "total",
     "side": "over",
     "line": 50.5,
-    "price": -108.0,
-    "ev": 0.007,
-    "units": 0.25
+    "price": -106.0,
+    "ev": 0.013,
+    "units": 0.5
    }
   },
   {
@@ -1181,9 +1181,9 @@
     "mk": "total",
     "side": "over",
     "line": 52.5,
-    "price": -104.0,
-    "ev": 0.009,
-    "units": 0.25
+    "price": -102.0,
+    "ev": 0.015,
+    "units": 0.75
    }
   },
   {
@@ -1324,7 +1324,14 @@
    "flagged": "2026-11-10T06:59:18Z",
    "betTo": 53.0,
    "close": 53.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 53.5,
+    "price": -106.0,
+    "ev": 0.014,
+    "units": 0.75
+   }
   },
   {
    "id": "401856863",
@@ -1551,22 +1558,6 @@
    "tm": 48.6
   },
   {
-   "id": "401871061",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:30:00.000Z",
-   "home": "Liberty",
-   "away": "Middle Tennessee",
-   "mk": "total",
-   "side": "under",
-   "line": 53.5,
-   "price": -111.0,
-   "edge": 3.9,
-   "x": 3.0,
-   "why": "no edge at -111",
-   "m": 22.4,
-   "tm": 49.6
-  },
-  {
    "id": "401858521",
    "sport": "cfb",
    "kick": "2026-11-14T21:15:00.000Z",
@@ -1575,10 +1566,10 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 3.6,
    "x": 3.0,
-   "why": "no edge at -104",
+   "why": "no edge at -102",
    "m": -5,
    "tm": 47.1
   },
@@ -1917,6 +1908,22 @@
    "why": "edge under 6 (season: late)",
    "m": -16.2,
    "tm": 54.1
+  },
+  {
+   "id": "401858294",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "Notre Dame",
+   "away": "Boston College",
+   "mk": "spread",
+   "side": "home",
+   "line": 29.5,
+   "price": -104.0,
+   "edge": 2.0,
+   "x": 4.5,
+   "why": "edge under 4.5 (tier: mixed)",
+   "m": 31.5,
+   "tm": 51.0
   }
  ],
  "games": {
@@ -1924,10 +1931,10 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -108.0,
-   "ev": 0.007,
+   "price": -106.0,
+   "ev": 0.013,
    "edge": 3.7,
-   "units": 0.25,
+   "units": 0.5,
    "home": "Indiana",
    "away": "USC",
    "state": "pick"
@@ -2104,10 +2111,10 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -104.0,
-   "ev": 0.009,
+   "price": -102.0,
+   "ev": 0.015,
    "edge": 3.6,
-   "units": 0.25,
+   "units": 0.75,
    "home": "Kentucky",
    "away": "Florida",
    "state": "pick"
@@ -2188,7 +2195,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -2452,7 +2459,7 @@
    "mk": "total",
    "side": "under",
    "line": 56.5,
-   "price": -111.0,
+   "price": -106.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -2500,13 +2507,13 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -111.0,
+   "price": -106.0,
+   "ev": 0.014,
    "edge": 3.9,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.75,
    "home": "Liberty",
    "away": "Middle Tennessee",
-   "state": "under"
+   "state": "pick"
   },
   "401862828": {
    "mk": "total",
@@ -2717,7 +2724,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15705,
+  "snapshots": 15708,
   "buckets": [
    {
     "when": "24h+",
@@ -5900,7 +5907,7 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 35.5,
+    "raw": 36.75,
     "scale": 1.0
    },
    "2026-11-15": {
