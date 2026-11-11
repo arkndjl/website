@@ -40,6 +40,7 @@ import { NFLPOS, famOf } from './cfb_nflpos.mjs';
 import { Matcher, teamKey } from './names.mjs';
 import { heightFV } from './cfb_frame.mjs';
 import { measureOf } from './cfb_measure.mjs';
+import { horizon } from './cfb_horizon.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SP = path.join(ROOT, 'scripts', '.cache', 'statplus'), SRC = path.join(ROOT, 'scripts', '.cache', 'sources');
@@ -172,9 +173,11 @@ function pull(file, url) {
 // ---- data -----------------------------------------------------------------------------------------------------
 const picksAll = PAST ? [] : csv(fs.readFileSync(path.join(SP, 'draft_picks.csv'), 'utf8'));
 const picks = picksAll.filter(r => +r.season >= FIRST + 1 && +r.season <= (ALLTIME ? 2026 : 2025));
-// draft capital: AV a season by slot, a + b ln(pick), fit on the 2012-19 drafts
+// one outcome horizon for every class (scripts/cfb_horizon.mjs): AV a season elapsed / h(draft class)
+const HZ = PAST ? (() => 1) : horizon(picksAll, NFL_THROUGH);
+// draft capital: AV a season by slot, a + b ln(pick), fit on the 2012-19 drafts (on the common horizon)
 const capital = (() => {
-  const S = picksAll.filter(r => +r.season >= 2012 && +r.season <= 2019 && +r.pick > 0), x = S.map(r => Math.log(+r.pick)), y = S.map(r => (+r.w_av || 0) / (NFL_THROUGH - +r.season + 1));
+  const S = picksAll.filter(r => +r.season >= 2012 && +r.season <= 2019 && +r.pick > 0), x = S.map(r => Math.log(+r.pick)), y = S.map(r => (+r.w_av || 0) / (NFL_THROUGH - +r.season + 1) / HZ(+r.season));
   const mx = mean(x), my = mean(y), b = x.reduce((a, v, i) => a + (v - mx) * (y[i] - my), 0) / x.reduce((a, v) => a + (v - mx) ** 2, 0);
   return pick => Math.max(0, my + b * (Math.log(pick) - mx));
 })();
@@ -630,7 +633,7 @@ for (const p of PAST ? [] : rows) {
   if (!pk && cand.some(x => +x.season > D)) continue;
   // no exact name: the one draftee that year with his last name, position group and school
   if (!pk) { const c = picks.filter(x => +x.season === D && lastName(x.pfr_player_name) === lastName(p.name) && NFLPOS[p.g].includes(x.position) && school(x.college) === tm); if (c.length === 1) pk = c[0]; }
-  p.av = pk ? (+pk.w_av || 0) / (NFL_THROUGH - (ALLTIME ? +pk.season : D) + 1) : 0; p.draftY = pk ? +pk.season : null;
+  p.av = pk && +pk.season <= NFL_THROUGH ? (+pk.w_av || 0) / (NFL_THROUGH - +pk.season + 1) / HZ(+pk.season) : 0; p.draftY = pk ? +pk.season : null;
   p.cap = pk ? capital(+pk.pick) : 0;
   p.pick = pk ? +pk.pick : null; p.pfr = pk?.pfr_player_id || null;
   // --target outcomes (scripts/cfb_fv_target.py): NFL WAR a season since the draft (seasons from 2016) and the second
@@ -892,7 +895,7 @@ const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
 if (ALLTIME) {
   const G = grade({ ...ONE, ...SHIP, prodBox: 1, hsBox: 1.25 }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
   const S = rows.filter(p => G.has(p)).map(p => ({ s: p.s, g: p.g, name: p.name, team: p.row.team, id: p.row.id ?? null, years: p.years, final: p.final, last: p.last,
-    stars: p.stars, fm: r3(G.get(p).fm), fvx: r3(pastAtMean(G.get(p).fm, p.g, p.years)), draft: p.pick ? p.draftY : null, pick: p.pick, av: p.open ? null : r3(p.av), ap: p.ap, pb: p.pb }));
+    stars: p.stars, fm: r3(G.get(p).fm), fvx: r3(pastAtMean(G.get(p).fm, p.g, p.years)), draft: p.pick ? p.draftY : null, pick: p.pick, av: p.open ? null : r3(p.av), hz: 1, ap: p.ap, pb: p.pb }));
   fs.writeFileSync(arg('alltime')[0], JSON.stringify(S));
   console.log('alltime rows', S.length, 'by season', JSON.stringify(Object.fromEntries(SEASONS.map(s => [s, S.filter(r => r.s === s).length]))), 'drafted', S.filter(r => r.final && r.pick).length);
   process.exit(0);

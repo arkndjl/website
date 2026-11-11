@@ -139,6 +139,7 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
       'Every board (medals by the name), player cards', ALLP),
     E('All-time FV', 'Each player\'s grade at their best season, listed by position.',
       ['CFB rebuilds every FBS season 2014-25; box-score era (2014-18) means recalibrated to NFL outcomes.',
+       'CFB outcome: NFL AV a season since the draft over a class horizon index h (mean 1 on 2020-23 drafts), so old classes\' out-of-league years don\'t count against them.',
        'Other boards read their past lists; only grade-complete rows are used.'],
       'all-time FV tab on CFB, CBB, hockey, soccer and tennis prospect pages', ['CFB', 'CBB', 'Hockey', 'Soccer', 'Tennis']),
 ]})
