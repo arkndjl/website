@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-11T08:31:44Z",
+ "asof": "2026-11-11T08:43:21Z",
  "recenter": {
   "week": 0.22
  },
@@ -926,9 +926,9 @@
     "mk": "total",
     "side": "over",
     "line": 50.5,
-    "price": -106.0,
-    "ev": 0.013,
-    "units": 0.5
+    "price": -108.0,
+    "ev": 0.007,
+    "units": 0.25
    }
   },
   {
@@ -982,8 +982,15 @@
    "tmRaw": 50.9,
    "flagged": "2026-11-08T15:27:24Z",
    "betTo": 15.5,
-   "close": 16.5,
-   "now": null
+   "close": 15.5,
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 15.5,
+    "price": -108.0,
+    "ev": 0.021,
+    "units": 1.5
+   }
   },
   {
    "id": "401856888",
@@ -1324,14 +1331,7 @@
    "flagged": "2026-11-10T06:59:18Z",
    "betTo": 53.0,
    "close": 53.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 53.5,
-    "price": -106.0,
-    "ev": 0.014,
-    "units": 0.75
-   }
+   "now": null
   },
   {
    "id": "401856863",
@@ -1556,6 +1556,22 @@
    "why": "no edge at -100",
    "m": -18.8,
    "tm": 48.6
+  },
+  {
+   "id": "401871061",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:30:00.000Z",
+   "home": "Liberty",
+   "away": "Middle Tennessee",
+   "mk": "total",
+   "side": "under",
+   "line": 53.5,
+   "price": -111.0,
+   "edge": 3.9,
+   "x": 3.0,
+   "why": "no edge at -111",
+   "m": 22.4,
+   "tm": 49.6
   },
   {
    "id": "401858521",
@@ -1908,22 +1924,6 @@
    "why": "edge under 6 (season: late)",
    "m": -16.2,
    "tm": 54.1
-  },
-  {
-   "id": "401858294",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:30:00.000Z",
-   "home": "Notre Dame",
-   "away": "Boston College",
-   "mk": "spread",
-   "side": "home",
-   "line": 29.5,
-   "price": -104.0,
-   "edge": 2.0,
-   "x": 4.5,
-   "why": "edge under 4.5 (tier: mixed)",
-   "m": 31.5,
-   "tm": 51.0
   }
  ],
  "games": {
@@ -1931,10 +1931,10 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -106.0,
-   "ev": 0.013,
+   "price": -108.0,
+   "ev": 0.007,
    "edge": 3.7,
-   "units": 0.5,
+   "units": 0.25,
    "home": "Indiana",
    "away": "USC",
    "state": "pick"
@@ -1976,13 +1976,13 @@
    "state": "under"
   },
   "401856883": {
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -102.0,
-   "ev": 0.017,
-   "edge": 4.2,
-   "units": 0.75,
+   "mk": "spread",
+   "side": "home",
+   "line": 15.5,
+   "price": -108.0,
+   "ev": 0.021,
+   "edge": 6.3,
+   "units": 1.5,
    "home": "Georgia",
    "away": "Missouri",
    "state": "pick"
@@ -2459,7 +2459,7 @@
    "mk": "total",
    "side": "under",
    "line": 56.5,
-   "price": -106.0,
+   "price": -111.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -2507,13 +2507,13 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -106.0,
-   "ev": 0.014,
+   "price": -111.0,
    "edge": 3.9,
-   "units": 0.75,
+   "ev": null,
+   "units": 0.0,
    "home": "Liberty",
    "away": "Middle Tennessee",
-   "state": "pick"
+   "state": "under"
   },
   "401862828": {
    "mk": "total",
@@ -2724,16 +2724,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15708,
+  "snapshots": 15714,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3267,
-    "clvRet": -0.0464,
-    "clvT": -33.65,
-    "clv": 0.24,
-    "beat": 0.335,
-    "still": 0.428
+    "clvN": 3268,
+    "clvRet": -0.0479,
+    "clvT": -35.26,
+    "clv": 0.21,
+    "beat": 0.316,
+    "still": 0.446
    },
    {
     "when": "6-24h",
@@ -5175,7 +5175,7 @@
    "tmRaw": 50.9,
    "flagged": "2026-11-08T15:27:24Z",
    "betTo": 15.5,
-   "close": 16.5
+   "close": 15.5
   },
   {
    "id": "401858298",
@@ -5895,7 +5895,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-11": {
-    "raw": 10.0,
+    "raw": 9.5,
     "scale": 1.0
    },
    "2026-11-12": {
@@ -5907,12 +5907,12 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 36.75,
+    "raw": 36.5,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 40.25,
-    "scale": 0.9938
+    "raw": 36.75,
+    "scale": 1.0
    },
    "2026-11-16": {
     "raw": 0.75,
