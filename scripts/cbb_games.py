@@ -4,6 +4,7 @@
 (data/cbb_games_fit.json).
 
     python3 scripts/cbb_games.py --fit     # walk-forward backtest 2016-2026 against the closing line, tune, select inputs
+    python3 scripts/cbb_games.py --smoke   # the availability snapshot on a runner's mixed player ids, no network (build gate)
     python3 scripts/cbb_games.py           # today's and tomorrow's games, power ratings, season odds (run by cbb-board)
 
 The same design as the football models (scripts/cfb_model.mjs, scripts/nfl_games.py): a rating core, market ratings
@@ -1658,6 +1659,9 @@ if __name__ == '__main__':
     elif '--injuries' in sys.argv:
         import cbb_games_live
         cbb_games_live.refresh_injuries()
+    elif '--smoke' in sys.argv:
+        import cbb_games_live
+        cbb_games_live.smoke()
     else:
         import cbb_games_live
         cbb_games_live.build()
