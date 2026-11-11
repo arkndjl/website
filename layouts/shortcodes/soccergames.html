@@ -13,7 +13,7 @@
 {{- $days := slice }}{{ range $games }}{{ $k := lower ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2") }}{{ if not (in $days $k) }}{{ $days = $days | append $k }}{{ end }}{{ end -}}
 <div class="win games soccergames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit (first 4 $days) ", " }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "matches" }} :: {{ with $days }}{{ index . 0 }}{{ if gt (len .) 1 }} to {{ index . (sub (len .) 1) }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "matches" }}{{ with $days }} :: {{ index . 0 }}{{ if gt (len .) 1 }} to {{ index . (sub (len .) 1) }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- if not $games }}<div class="cfbm__body"><p class="cfb__dim">no matches in the next four days.</p></div>{{ end }}
