@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-11T23:36:20Z",
+ "asof": "2026-11-11T23:46:03Z",
  "recenter": {
-  "2026-11-11": 1.96
+  "2026-11-11": 1.98
  },
  "monitor": {
   "clocks": {
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-11T23:07:13Z",
-  "ageH": 0.5,
+  "ageH": 0.6,
   "stale": false
  },
  "picks": [
@@ -402,7 +402,7 @@
    "tmRaw": 221.2,
    "flagged": "2026-11-11T18:49:49Z",
    "betTo": 222.0,
-   "close": 221.5,
+   "close": 220.5,
    "now": null
   },
   {
@@ -495,9 +495,9 @@
     "mk": "spread",
     "side": "home",
     "line": -14.5,
-    "price": 102.0,
-    "ev": 0.095,
-    "units": 1.5
+    "price": -100.0,
+    "ev": 0.088,
+    "units": 1.0
    }
   }
  ],
@@ -505,32 +505,16 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401909967",
-   "sport": "nba",
-   "kick": "2026-11-12T00:00:00Z",
-   "home": "NY",
-   "away": "CLE",
-   "mk": "total",
-   "side": "under",
-   "line": 221.5,
-   "price": -104.0,
-   "edge": 2.1,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": 4.9,
-   "tm": 219.4
-  },
-  {
    "id": "401909972",
    "sport": "nba",
    "kick": "2026-11-12T01:00:00Z",
    "home": "NO",
    "away": "BKN",
-   "mk": "total",
-   "side": "under",
-   "line": 228.5,
-   "price": -106.0,
-   "edge": 2.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": 102.0,
+   "edge": 1.8,
    "x": 2.5,
    "why": "edge under 2.5",
    "m": 0.7,
@@ -577,7 +561,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 1.5,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -617,6 +601,22 @@
    "tm": 231.7
   },
   {
+   "id": "401909967",
+   "sport": "nba",
+   "kick": "2026-11-12T00:00:00Z",
+   "home": "NY",
+   "away": "CLE",
+   "mk": "total",
+   "side": "under",
+   "line": 220.5,
+   "price": -100.0,
+   "edge": 1.1,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": 4.9,
+   "tm": 219.4
+  },
+  {
    "id": "401909968",
    "sport": "nba",
    "kick": "2026-11-12T00:00:00Z",
@@ -625,7 +625,7 @@
    "mk": "total",
    "side": "under",
    "line": 215.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 1.0,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -649,9 +649,9 @@
   "401909967": {
    "mk": "total",
    "side": "under",
-   "line": 221.5,
-   "price": -104.0,
-   "edge": 2.1,
+   "line": 220.5,
+   "price": -100.0,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "NY",
@@ -662,7 +662,7 @@
    "mk": "total",
    "side": "under",
    "line": 215.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -698,20 +698,20 @@
    "mk": "spread",
    "side": "home",
    "line": -14.5,
-   "price": 102.0,
-   "ev": 0.095,
+   "price": -100.0,
+   "ev": 0.088,
    "edge": 3.7,
-   "units": 1.5,
+   "units": 1.0,
    "home": "MIL",
    "away": "LAL",
    "state": "pick"
   },
   "401909972": {
-   "mk": "total",
-   "side": "under",
-   "line": 228.5,
-   "price": -106.0,
-   "edge": 2.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": 102.0,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "NO",
@@ -734,7 +734,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -807,7 +807,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3618,
+  "snapshots": 3625,
   "buckets": [
    {
     "when": "24h+",
@@ -829,11 +829,11 @@
    },
    {
     "when": "1-6h",
-    "clvN": 312,
+    "clvN": 313,
     "clvRet": -0.0568,
-    "clvT": -14.47,
+    "clvT": -14.51,
     "clv": -0.16,
-    "beat": 0.151,
+    "beat": 0.15,
     "still": 0.696
    },
    {
@@ -6568,7 +6568,7 @@
    "tmRaw": 221.2,
    "flagged": "2026-11-11T18:49:49Z",
    "betTo": 222.0,
-   "close": 221.5
+   "close": 220.5
   },
   {
    "id": "401909975",
@@ -6599,12 +6599,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-11T23:36:20Z",
+ "checked": "2026-11-11T23:46:03Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-11": {
-    "raw": 10.75,
+    "raw": 10.25,
     "scale": 1.0
    }
   }
