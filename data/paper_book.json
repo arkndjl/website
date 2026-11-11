@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11T02:23:56Z",
+ "asof": "2026-11-11T03:53:28Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 86.01,
   "peak": 117.38,
   "drawdown": 0.2672,
-  "open": 99.25,
+  "open": 101.5,
   "path": [
    107.6,
    107.86,
@@ -412,7 +412,7 @@
   ]
  },
  "record": {
-  "n": 477,
+  "n": 479,
   "clvN": 427,
   "clvRet": -0.0123,
   "clvT": -2.54,
@@ -491,7 +491,7 @@
    "label": "CFB total",
    "sport": "cfb",
    "mk": "total",
-   "n": 48,
+   "n": 49,
    "clvN": 23,
    "clvRet": -0.0361,
    "clvT": -1.77,
@@ -680,7 +680,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 86,
+   "n": 87,
    "clvN": 84,
    "clvRet": -0.0179,
    "clvT": -3.84,
@@ -719,27 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "nba-spread",
-   "sport": "nba",
-   "id": "401909960",
-   "k": "2026-11-11T00:30:00Z",
-   "slate": "nba:2026-11-10",
-   "h": "NY",
-   "a": "MIL",
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": 102.0,
-   "bet": "NY -15.5 +102",
-   "placed": "2026-11-10T18:46:47Z",
-   "stake": 0.75,
-   "edge": 2.5,
-   "ev": 0.0139,
-   "event": null,
-   "pass": true,
-   "close": 15.5
-  },
   {
    "rule": "nba-ml",
    "sport": "nba",
@@ -800,6 +779,26 @@
    "edge": 16.2,
    "ev": 0.0258,
    "event": "Bybit Stockholm Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186760",
+   "k": "2026-11-11T15:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Garcia",
+   "a": "Ortenzi",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -117,
+   "bet": "Garcia ML -117",
+   "placed": "2026-11-11T03:53:28Z",
+   "stake": 2.0,
+   "edge": 13.0,
+   "ev": 0.026,
+   "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
   {
@@ -1176,7 +1175,7 @@
    "ev": 0.0142,
    "event": null,
    "pass": false,
-   "close": 15.5
+   "close": 16.5
   },
   {
    "rule": "cfb-total",
@@ -1387,6 +1386,27 @@
    "event": null,
    "pass": false,
    "close": 59.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401858524",
+   "k": "2026-11-15T00:00:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "Penn State",
+   "a": "Minnesota",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -111.0,
+   "bet": "over 41.5 -111",
+   "placed": "2026-11-11T03:53:20Z",
+   "stake": 0.25,
+   "edge": 3.2,
+   "ev": 0.0015,
+   "event": null,
+   "pass": false,
+   "close": 41.5
   },
   {
    "rule": "cfb-total",
@@ -1888,6 +1908,37 @@
   }
  ],
  "recent": [
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909960",
+   "k": "2026-11-11T00:30:00Z",
+   "slate": "nba:2026-11-10",
+   "h": "NY",
+   "a": "MIL",
+   "mk": "spread",
+   "side": "home",
+   "line": 15.5,
+   "price": 102.0,
+   "bet": "NY -15.5 +102",
+   "placed": "2026-11-10T18:46:47Z",
+   "stake": 0.75,
+   "edge": 2.5,
+   "ev": 0.0139,
+   "event": null,
+   "pass": true,
+   "clvRet": 0.0098,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 15.5,
+   "score": [
+    85.0,
+    117.0
+   ],
+   "res": "w",
+   "ret": 1.02,
+   "profit": 0.765
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -3580,32 +3631,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.75
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873040-3051889-rc",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "over",
-   "line": 1.5,
-   "price": 111.0,
-   "bet": "Laquon Treadwell over 1.5 rec +111",
-   "placed": "2026-11-06T21:42:00Z",
-   "stake": 1.0,
-   "edge": 11.1,
-   "ev": 0.1521,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0195,
-   "close": 1.5,
-   "score": 0.0,
-   "res": "l",
-   "ret": -1.0,
-   "profit": -1.0
   }
  ],
  "ledger": [
@@ -18180,7 +18205,17 @@
    "ev": 0.0139,
    "event": null,
    "pass": true,
-   "close": 15.5
+   "clvRet": 0.0098,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 15.5,
+   "score": [
+    85.0,
+    117.0
+   ],
+   "res": "w",
+   "ret": 1.02,
+   "profit": 0.765
   },
   {
    "rule": "nba-ml",
@@ -18242,6 +18277,26 @@
    "edge": 16.2,
    "ev": 0.0258,
    "event": "Bybit Stockholm Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186760",
+   "k": "2026-11-11T15:00:00Z",
+   "slate": "tennis:2026-11-11",
+   "h": "Garcia",
+   "a": "Ortenzi",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -117,
+   "bet": "Garcia ML -117",
+   "placed": "2026-11-11T03:53:28Z",
+   "stake": 2.0,
+   "edge": 13.0,
+   "ev": 0.026,
+   "event": "DIRECTV Open Presentado por Compesar",
    "pass": false
   },
   {
@@ -18618,7 +18673,7 @@
    "ev": 0.0142,
    "event": null,
    "pass": false,
-   "close": 15.5
+   "close": 16.5
   },
   {
    "rule": "cfb-total",
@@ -18829,6 +18884,27 @@
    "event": null,
    "pass": false,
    "close": 59.5
+  },
+  {
+   "rule": "cfb-total",
+   "sport": "cfb",
+   "id": "401858524",
+   "k": "2026-11-15T00:00:00.000Z",
+   "slate": "cfb:2026-11-14",
+   "h": "Penn State",
+   "a": "Minnesota",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -111.0,
+   "bet": "over 41.5 -111",
+   "placed": "2026-11-11T03:53:20Z",
+   "stake": 0.25,
+   "edge": 3.2,
+   "ev": 0.0015,
+   "event": null,
+   "pass": false,
+   "close": 41.5
   },
   {
    "rule": "cfb-total",
