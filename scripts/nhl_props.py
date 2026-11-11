@@ -48,6 +48,7 @@ COMBO = {'sog': ('sog',), 'g': ('g',), 'ast': ('a',), 'pts': ('g', 'a'), 'blk': 
          'sv': ('sv',)}
 FEATS = ('base', 'long', 'savg', 'opp', 'imp', 'fav')
 SHAPE, TUNE, HELD = (2023,), (2024,), (2025, 2026, 2027)
+SV_PSTAR = 0.56                                    # registered saves rule p* (paper)
 BUDGET = 25.0                                      # % of bankroll a day's saves bets share at most (paper)
 LIVE = os.path.join(ROOT, 'data', 'nhl_props.json')
 SITE = 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl'
@@ -238,10 +239,41 @@ def market_opens(boxes):
     return out
 
 
+def started(boxes):
+    """{(ESPN game id, ESPN goalie id): started} from the NHL game history's goalie lines (scripts/nhl_games_hist.json.gz,
+    starter flag), matched by home team and day (as market_opens), then by ice time (within 30 s) and saves. ESPN's box
+    has no starter flag; until Nov 11 2026 a goalie row was any line of 20+ minutes in the game itself, which kept
+    relievers who came in early (4.8% of rows; no saves prop stands on them, and their partial games pulled the fit's
+    saves down) and dropped starters pulled inside 20 minutes (1.1% of starts, 5.5 saves on average: unders a prop
+    settles). Rows without a match keep the old rule."""
+    try:
+        H = json.load(gzip.open(os.path.join(HERE, 'nhl_games_hist.json.gz'), 'rt'))
+    except OSError:
+        return {}
+    by = {}
+    for g in H:
+        if 'gl' in g:
+            by[(g['day'], g['h'])] = g
+    out = {}
+    for gid, b in boxes.items():
+        d = datetime.date.fromisoformat(b['k'][:10])
+        g = next((by[k] for k in ((x.isoformat(), b['h']) for x in (d - datetime.timedelta(days=1), d)) if k in by), None)
+        if g is None:
+            continue
+        for t, side in ((b['h'], 'h'), (b['a'], 'a')):
+            lines = g['gl'].get(side) or []
+            for r in b['gk'].get(t, []):
+                m = [l for l in lines if abs(l[3] - r[2] * 60) <= 30 and (r[4] is None or l[4] - l[5] == r[4])]
+                if len(m) == 1:
+                    out[(gid, r[0])] = bool(m[0][2])
+    return out
+
+
 def walk(boxes):
     """every played row: {S, g, p, t, kind, po, fx, y}"""
     W = Walk()
     mk = market_opens(boxes)
+    st = started(boxes)
     rows = []
     for gid, b in sorted(boxes.items(), key=lambda x: x[1]['k']):
         if b['S'] != W.season:
@@ -254,7 +286,8 @@ def walk(boxes):
                 y = {s: r[IX[s]] for s in SK}
             else:
                 r = next(x for x in b['gk'][t] if x[0] == pid)
-                if r[2] < 20:
+                s0 = st.get((gid, pid))
+                if (not s0) if s0 is not None else r[2] < 20:
                     continue                                 # a relief appearance: no saves prop stands on it
                 y = {'sv': r[4]}
             rows.append({'S': b['S'], 'g': gid, 'p': pid, 't': t, 'kind': kind, 'po': b['po'], 'fx': fx, 'y': y})
@@ -342,6 +375,9 @@ def test():
     # won on the 2024 tune props; p* is its tune pick, scored held out on its own
     tune_sv = {ps: M.score(M.bets(graded['open'], ps, TUNE, stat='sv')) for ps in M.PSTAR}
     ps = max(M.PSTAR, key=lambda x: tune_sv[x].get('roi', -9) if tune_sv[x]['n'] >= 100 else -9)
+    # the paper rule was registered at .56 (Oct 31 2026); the Nov 11 starter fix moves the tune pick to .60, which would
+    # start a new rule mid-test: the registered p* stays (held open ROI 2.02% -> 2.15% at .56 with the fix)
+    ps = SV_PSTAR if SV_PSTAR in tune_sv else ps
     tb = M.bets(graded['open'], ps, TUNE, stat='sv')
     tp = np.array([b[6] for b in tb]); ty = np.array([float(b[1] > 0) for b in tb])
     c = float(((tp - .5) * (ty - .5)).sum() / ((tp - .5) ** 2).sum())
