@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-11T20:07:28Z",
+ "asof": "2026-11-11T20:10:13Z",
  "recenter": {
   "week": 0.21
  },
@@ -837,9 +837,9 @@
     "mk": "total",
     "side": "over",
     "line": 50.5,
-    "price": -102.0,
-    "ev": 0.015,
-    "units": 0.5
+    "price": -100.0,
+    "ev": 0.021,
+    "units": 1.0
    }
   },
   {
@@ -1873,22 +1873,6 @@
    "tm": 55.3
   },
   {
-   "id": "401856860",
-   "sport": "cfb",
-   "kick": "2026-11-14T03:15:00.000Z",
-   "home": "Colorado",
-   "away": "Houston",
-   "mk": "spread",
-   "side": "away",
-   "line": -8.5,
-   "price": -106.0,
-   "edge": 4.0,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": -12.5,
-   "tm": 49.3
-  },
-  {
    "id": "401856887",
    "sport": "cfb",
    "kick": "2026-11-14T21:15:00.000Z",
@@ -1983,6 +1967,22 @@
    "why": "edge under 3",
    "m": -9.9,
    "tm": 44.1
+  },
+  {
+   "id": "401856860",
+   "sport": "cfb",
+   "kick": "2026-11-14T03:15:00.000Z",
+   "home": "Colorado",
+   "away": "Houston",
+   "mk": "spread",
+   "side": "away",
+   "line": -9.5,
+   "price": -100.0,
+   "edge": 3.0,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -12.5,
+   "tm": 49.3
   },
   {
    "id": "401858294",
@@ -2322,10 +2322,10 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -102.0,
-   "ev": 0.015,
+   "price": -100.0,
+   "ev": 0.021,
    "edge": 4.6,
-   "units": 0.5,
+   "units": 1.0,
    "home": "Mississippi State",
    "away": "Auburn",
    "state": "paper"
@@ -2429,9 +2429,9 @@
   "401856860": {
    "mk": "spread",
    "side": "away",
-   "line": -8.5,
-   "price": -106.0,
-   "edge": 4.0,
+   "line": -9.5,
+   "price": -100.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Colorado",
@@ -2863,16 +2863,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16161,
+  "snapshots": 16166,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3389,
-    "clvRet": -0.0468,
-    "clvT": -34.99,
+    "clvN": 3390,
+    "clvRet": -0.0465,
+    "clvT": -34.9,
     "clv": 0.23,
     "beat": 0.325,
-    "still": 0.441
+    "still": 0.447
    },
    {
     "when": "6-24h",
@@ -6122,7 +6122,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-11": {
-    "raw": 10.25,
+    "raw": 10.0,
     "scale": 1.0
    }
   }
