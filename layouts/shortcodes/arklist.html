@@ -74,7 +74,7 @@
       ((D.nfl || {}).players || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: '/img/nfl/' + String(r.t || '').split('/').pop().toLowerCase() + '.png', ph: r.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r.ph : '', pos: r.pos, stage: 'NFL' + (r.rook ? ' · rookie' : ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(2) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
     } else if (sport === 'nhl') {
       var H = D.nhl || {};
-      (H.players || []).forEach(function (r) { out.push({ name: r.n, team: r.tm, logo: '/img/nhl/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nhl', r.ph), pos: r.pos, stage: 'NHL · ' + (H.label || ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(2) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
+      (H.players || []).forEach(function (r) { out.push({ name: r.n, team: r.tm, logo: '/img/nhl/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nhl', r.ph), pos: r.pos, stage: 'NHL · ' + (H.label || ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(1) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
     } else if (sport === 'soccer') {
       var S = D.soc || {};
       var SL = (D.inline || {}).socLogo || {};
@@ -84,10 +84,10 @@
     } else if (sport === 'soccer-prospects') {
       ((D.inline || {}).sp || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + r.ph : '', pos: r.pos, stage: 'under 22' + (r.lg ? ' · ' + r.lg : '') + (r.prov ? ' · provisional' : ''), grade: fvTxt(r.fv), v: r.fv, pro: 1 }); });
     } else if (sport === 'cs2') {
-      ((D.inline || {}).cs || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph, pos: '', stage: 'tier ' + r.tier, grade: r.fv != null ? fvTxt(r.fv) : r.r != null ? 'RWA ' + (r.r > 0 ? '+' : '') + r.r : '—', v: r.fv != null ? r.fv : r.r == null ? null : 50 + r.r * 10 }); });
+      ((D.inline || {}).cs || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph, pos: '', stage: 'tier ' + r.tier, grade: r.fv != null ? fvTxt(r.fv) : r.r != null ? 'RWA ' + (r.r > 0 ? '+' : '') + (+r.r).toFixed(2) : '—', v: r.fv != null ? r.fv : r.r == null ? null : 50 + r.r * 10 }); });
     } else if (sport === 'nba') {
       var N = D.nba || {};
-      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'rXPM ' + (x > 0 ? '+' : '') + x : '—', v: x == null ? null : 50 + x * 3 }); });
+      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'rXPM ' + (x > 0 ? '+' : '') + (+x).toFixed(1) : '—', v: x == null ? null : 50 + x * 3 }); });
     }
     return out;
   }

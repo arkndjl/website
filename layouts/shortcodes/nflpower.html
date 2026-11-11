@@ -27,7 +27,7 @@
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
-    <td class="cfb__num" data-v="{{ .rating }}"{{ with .inj }} title="includes {{ partial "num.html" (slice "%.1f" (float .)) }} pts injury cost, this week"{{ end }}>{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}"{{ with .inj }} title="includes {{ partial "num.html" (slice "%.1f" (float .)) }} pts injury cost, this week"{{ end }}>{{ partial "num.html" (slice "%+.1f" (float .rating)) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     {{- $full := add (float .rating) (float (.inj | default 0)) }}
     <td class="cfb__num" data-v="{{ .inj | default 0 }}">{{ with .inj }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
