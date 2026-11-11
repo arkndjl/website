@@ -22,6 +22,10 @@ t overstates it):
              month (Valve's lag), shrunk toward 1 with 1,000 rows.
   temp_top   the same on top-50 series only (the audit's top-50 Bo3 slope .79).
   expanding  weights refit each month on every row up to 35 days before it (vs the fixed tune fit).
+Second family (registered after the first, same gate, Holm over three), aimed at the top 50:
+  elo_stale    the player Elo gap (the term that loses weight) x staleness, a fifth term by tier
+  pooled       base logit x staleness with ONE coefficient for both tiers (more data behind the top 50)
+  known_stale  staleness of players with 20+ series only (new players count 0 days), x logit
 """
 import datetime as dt
 import gzip
@@ -57,7 +61,7 @@ def build_rows():
     bo3 = cs2_bo3.Bo3()
     rows, _ = CM.replay(series, CM.Vrs(H["vrs"]), json.loads(CM.FIT.read_text())["params"], bo3=bo3)
     nk, nkt = P.nick_index(M, bo3)
-    snaps, lastP, lastros = {}, {}, {}
+    snaps, lastP, lastros, cnt = {}, {}, {}, {}
     for r, S in zip(rows, series):
         mo = r["d"][:7]
         if mo not in snaps:
@@ -77,9 +81,12 @@ def build_rows():
                 lastros[k] = ro
         gp = [min(d - lastP.get(q, d - 90), 90) for ro in (ra, rb) for q in (ro or [])]
         r["gP"] = (np.mean(gp) if gp else 90) / 30
+        gk = [min(d - lastP[q], 90) for ro in (ra, rb) for q in (ro or []) if cnt.get(q, 0) >= 20]
+        r["gK"] = (np.mean(gk) if gk else 0) / 30
         for ro in (ra, rb):
             for q in ro or []:
                 lastP[q] = d
+                cnt[q] = cnt.get(q, 0) + 1
         win = S[1] if S[3] == 0 else S[2]
         r["vk"] = (S[0],) + tuple(sorted((S[1], S[2]))) + (win,)
         del r["r"]
@@ -101,6 +108,17 @@ def tt(dl, mo):
     return {"d": round(float(dl.mean()), 5), "t": round(float(dl.mean() / (dl.std() + 1e-12) * math.sqrt(len(dl))), 2),
             "tMonth": round(float(a.mean() / (a.std() + 1e-12) * math.sqrt(len(a))), 2),
             "monthsBetter": [int((a < 0).sum()), len(a)]}
+
+
+def holm(res):
+    """Holm over the family on the held t by month; the Live gate also needs top-50 t by month < -2."""
+    going = True
+    order = sorted(res, key=lambda k: res[k]["all"]["tMonth"])
+    for i, nm in enumerate(order):
+        cut = NormalDist().inv_cdf(1 - .025 / (len(order) - i))
+        going = going and res[nm]["all"]["tMonth"] < -cut
+        res[nm]["holmCut"] = round(-cut, 2)
+        res[nm]["pass"] = bool(going and res[nm]["top50"]["tMonth"] < -2)
 
 
 def main():
@@ -184,20 +202,29 @@ def main():
         dl = l - base
         res[nm] = {"all": tt(dl, mo), "top50": tt(dl[top], mo[top]),
                    "weakMonths": {m: round(float(dl[mo == m].mean()), 4) for m in WEAK if (mo == m).any()}}
-    # Holm over the five tests on the all-series t; the Live gate also needs top-50 t < -2
-    order = sorted(res, key=lambda k: res[k]["all"]["tMonth"])
-    going = True
-    for i, nm in enumerate(order):
-        cut = NormalDist().inv_cdf(1 - .025 / (len(order) - i))
-        going = going and res[nm]["all"]["tMonth"] < -cut
-        res[nm]["holmCut"] = round(-cut, 2)
-        res[nm]["pass"] = bool(going and res[nm]["top50"]["tMonth"] < -2)
+    holm(res)
+
+    # second family, registered after the first: the stale lead passed all series but not the top 50
+    Lt = np.array([r["L"] for r in tr])
+    st, gt = np.array([r["s"] for r in tr]), np.array([r["gP"] for r in tr])
+    cp = 0.0
+    for _ in range(30):  # one staleness coefficient for both tiers, the base logit as offset
+        q = 1 / (1 + np.exp(-Lt * (1 + cp * gt)))
+        cp -= ((q - st) * Lt * gt).sum() / ((q * (1 - q)) * (Lt * gt) ** 2).sum()
+    gh = np.array([r["gP"] for r in he])
+    lead = {"elo_stale": tiered(lambda r: F4(r) + [r["x"] * r["gP"]]) - base4 + base,
+            "pooled": CM.ll(1 / (1 + np.exp(-L * (1 + cp * gh))), s),
+            "known_stale": tiered(lambda r: F4(r) + [r["L"] * r["gK"]]) - base4 + base}
+    lres = {nm: {"all": tt(l - base, mo), "top50": tt((l - base)[top], mo[top])} for nm, l in lead.items()}
+    lres["pooled"]["coef"] = round(float(cp), 3)
+    holm(lres)
+    out["lead"] = lres
     out["base"] = {"n": len(he), "ll": round(float(base.mean()), 5), "slopeTop50": lstats([r for r in he if r["top"]]),
                    "slopeRest": lstats([r for r in he if not r["top"]])}
     out["fixes"] = res
-    out["shipped"] = [k for k, v in res.items() if v["pass"]]
+    out["shipped"] = [k for v_ in (res, lres) for k, v in v_.items() if v["pass"]]
     OUT.write_text(json.dumps(out, indent=1))
-    print(json.dumps({k: out[k] for k in ("base", "fixes", "shipped")}, indent=1))
+    print(json.dumps({k: out[k] for k in ("base", "fixes", "lead", "shipped")}, indent=1))
 
 
 if __name__ == "__main__":
