@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-11T02:19:56Z",
+ "asof": "2026-11-11T02:21:58Z",
  "recenter": {
   "2026-11-10": 2.0,
   "2026-11-11": 1.96
@@ -492,10 +492,10 @@
    "mk": "total",
    "side": "over",
    "line": 227.5,
-   "price": -125.0,
+   "price": -120.0,
    "edge": 4.7,
    "x": 3.0,
-   "why": "no edge at -125",
+   "why": "no edge at -120",
    "m": -3.8,
    "tm": 232.2
   },
@@ -508,28 +508,12 @@
    "mk": "total",
    "side": "under",
    "line": 238.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 3.3,
    "x": 3.0,
-   "why": "no edge at -111",
+   "why": "no edge at -113",
    "m": -14.2,
    "tm": 235.2
-  },
-  {
-   "id": "401909972",
-   "sport": "nba",
-   "kick": "2026-11-12T01:00:00Z",
-   "home": "NO",
-   "away": "BKN",
-   "mk": "total",
-   "side": "under",
-   "line": 230.5,
-   "price": -113.0,
-   "edge": 3.1,
-   "x": 3.0,
-   "why": "no edge at -113",
-   "m": 2.9,
-   "tm": 227.4
   },
   {
    "id": "401909965",
@@ -562,6 +546,22 @@
    "why": "edge under 3.5 (role: dog)",
    "m": 1.8,
    "tm": 228.5
+  },
+  {
+   "id": "401909972",
+   "sport": "nba",
+   "kick": "2026-11-12T01:00:00Z",
+   "home": "NO",
+   "away": "BKN",
+   "mk": "total",
+   "side": "under",
+   "line": 229.5,
+   "price": 102.0,
+   "edge": 2.1,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 2.9,
+   "tm": 227.4
   },
   {
    "id": "401909975",
@@ -637,7 +637,7 @@
    "mk": "total",
    "side": "under",
    "line": 238.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 3.3,
    "ev": null,
    "units": 0.0,
@@ -649,7 +649,7 @@
    "mk": "total",
    "side": "over",
    "line": 227.5,
-   "price": -125.0,
+   "price": -120.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -660,9 +660,9 @@
   "401909972": {
    "mk": "total",
    "side": "under",
-   "line": 230.5,
-   "price": -113.0,
-   "edge": 3.1,
+   "line": 229.5,
+   "price": 102.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "NO",
@@ -746,7 +746,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3366,
+  "snapshots": 3369,
   "buckets": [
    {
     "when": "24h+",
@@ -759,12 +759,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 836,
+    "clvN": 837,
     "clvRet": -0.0092,
-    "clvT": -2.76,
+    "clvT": -2.77,
     "clv": 0.58,
     "beat": 0.458,
-    "still": 0.404
+    "still": 0.405
    },
    {
     "when": "1-6h",
@@ -6286,11 +6286,11 @@
     "scale": 1.0
    },
    "2026-11-14": {
-    "raw": 37.5,
+    "raw": 36.5,
     "scale": 1.0
    },
    "2026-11-15": {
-    "raw": 39.0,
+    "raw": 38.75,
     "scale": 1.0
    },
    "2026-11-16": {
