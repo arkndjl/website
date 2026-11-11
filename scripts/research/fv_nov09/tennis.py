@@ -42,7 +42,7 @@ for tour in T.TOURS:
     # ---------------- T3/T4 gbm
     if which in ('all', 'gbm'):
         X, F, y, pos, by = T.snap_rows(rows, tour, snap); season = X.season.values
-        gc = [c for c in F.columns if c not in T.LEAKS + ['lefty']]
+        gc = [c for c in F.columns if c not in T.LEAKS + ['lefty'] + os.environ.get('EXCL', '').split(',')]
         G = F[gc].values
         p0 = T.loso(F, y, pos, by, kept)[2]; pg = np.zeros(len(y))
         mk = lambda: GB(max_depth=3, learning_rate=.05, max_iter=300, min_samples_leaf=40, l2_regularization=1.0, random_state=0)
@@ -136,6 +136,10 @@ for tour in T.TOURS:
             bl1 = flogit(Xa[a], yl[a]); bo1 = wols(Xa[a], ym[a], wm[a] + 1e-9)
             p1 = (1 - sig(Xa[te] @ bl1)) * 20 + sig(Xa[te] @ bl1) * (Xa[te] @ bo1)
             yt = yfull[te]
+            if os.environ.get('JOINT'):
+                gc = [c for c in F.columns if c not in T.LEAKS + ['lefty'] + os.environ.get('EXCL', '').split(',')]
+                gm = GB(max_depth=3, learning_rate=.05, max_iter=300, min_samples_leaf=40, l2_regularization=1.0, random_state=0).fit(F[gc].values[a if os.environ.get('JOINT') == 'td' else fin], (np.where(fin, yN, (1 - np.nan_to_num(tp)) * 20 + np.nan_to_num(tp) * np.nan_to_num(tm)))[a if os.environ.get('JOINT') == 'td' else fin])
+                p0 = p1; p1 = .5 * p1 + .5 * np.clip(gm.predict(F[gc].values[te]), 20, 80)
             top = lambda p: float(yt[np.argsort(-p)[:50]].mean())
             res.append(dict(b0=float(np.mean(p0 - yt)), b1=float(np.mean(p1 - yt)), N=N, n=int(te.sum()), nfin=int(fin.sum()), ntd=int(td.sum()), mse0=float(np.mean((p0 - yt) ** 2)), mse1=float(np.mean((p1 - yt) ** 2)),
                             top0=top(p0), top1=top(p1), e0=((p0 - yt) ** 2), e1=((p1 - yt) ** 2), pid=pid[te]))
@@ -148,4 +152,4 @@ for tour in T.TOURS:
                                  last3=dict(gain=round(float(g[-3:].mean()), 3), t=t3), t_player=round(tc, 2),
                                  bias=[round(float(np.mean([r['b0'] for r in res])), 3), round(float(np.mean([r['b1'] for r in res])), 3)], seasons=[dict(N=r['N'], n=r['n'], nfin=r['nfin'], ntd=r['ntd'], mse0=round(r['mse0'], 3), mse1=round(r['mse1'], 3), top0=round(r['top0'], 2), top1=round(r['top1'], 2)) for r in res])
         print(tour, 'td', {k: v for k, v in OUT['td_' + tour].items() if k != 'seasons'}, flush=True)
-json.dump(OUT, open(f'/mnt/project-files/fv/sweep-nov09/tennis_{which}' + ('' if snap == '10-26' and PARTS == 'ab' else f'_{snap}_{PARTS}') + '.json', 'w'), indent=1)
+json.dump(OUT, open(f'/mnt/project-files/fv/sweep-nov09/tennis_{which}' + ('' if snap == '10-26' and PARTS == 'ab' else f'_{snap}_{PARTS}') + ('_live' if os.environ.get('EXCL') else '') + ('_joint' + os.environ.get('JOINT', '') if os.environ.get('JOINT') else '') + '.json', 'w'), indent=1)
