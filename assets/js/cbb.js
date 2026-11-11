@@ -115,6 +115,20 @@
       '. Draft-board consensus and combine testing are stages on top of the model. E[FV] = 20 + 10 x P(30+) + 10 x P(40+) + 10 x P(50+) + (mean FV of 60+ careers - 50) x P(60+), each rung a logistic fit on 2009-16 preseason boards against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50). ' +
       'One fixed calibration map (2009-16 boards simulated with preseason information), not the rank on this board, takes E[FV] to ' + toFv(r) + '.';
   }
+  // FV inputs as a waterfall that ends on the headline: the level the bars start from, the bars, the steps after them
+  // (calibration map, scale), then FV. The method note is the box's hover title only.
+  function fvStep(lab, v, lvl, tip) {
+    if (v == null || !isFinite(v) || (!lvl && Math.abs(v) < 0.05)) return '';
+    var w = Math.min(50, Math.abs(v) / 4 * 50);
+    return '<li class="cfb__step" title="' + esc(tip || '') + '"><span class="cfb__bk">' + lab + '</span><span class="cfb__meter">' + (lvl ? '' : '<i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
+      (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i>') + '</span><span class="cfb__bv">' + (lvl ? (+v).toFixed(lvl === 2 ? 0 : 1) : (v > 0 ? '+' : '') + v.toFixed(2)) + '</span></li>';
+  }
+  function fvBox(r, bars, sum) {
+    var base = r.src === 'bt' ? 20 : r.e != null ? r.e - sum : r.fvx != null ? r.fvx - sum : null;
+    return '<details class="cfb__nums"><summary title="' + esc(fvNote(r, sum)) + '">FV inputs</summary><ul class="cfb__parts">' + fvStep('start', base, 1, 'the comparison player every bar is measured against') + bars +
+      (r.fvx != null && base != null ? fvStep('map', r.fvx - base - sum, 0, 'the inputs to the mean outcome of the grade they calibrate to') + fvStep('scale', r.fv - r.fvx, 0, 'the mean outcome on the board scale: the top is stretched, then rounded') : '') +
+      fvStep('FV', r.fv, 2) + '</ul></details>';
+  }
   // the scouting report: this season's line to date (in season), last season's line, recruiting grades, + strengths and − concerns, and the FV inputs
   function detailHtml(r, cols, width) {
     var L = r.last, g = r.rec || {}, rep = r.report || {};
@@ -142,7 +156,7 @@
       (r.npos ? '<p class="cfb__role">' + moveChip(r) + 'NBA position: ' + esc(nposLine(r)) + '.</p>' : '') + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + fvNote(r, sum) + '</p></details></div></td></tr>';
+      fvBox(r, bars, sum) + '</div></td></tr>';
   }
   // before D-I: his last overseas line (scripts/cbb_intl.py), shown only; too few players have taken this path to test it as an FV input
   function overseasLine(o) {
@@ -169,7 +183,7 @@
       '<p class="cfb__role">' + line + '.</p><p class="cfb__role">draft boards: consensus No. ' + r.cons + ', on ' + r.boards + ' of 7 boards.</p>' +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + fvNote(r, sum) + '</p></details></div></td></tr>';
+      fvBox(r, bars, sum) + '</div></td></tr>';
   }
   // a D-II / D-III player's report: his line at that level and what moves his D-1%
   function lowDetail(r, cols, width) {

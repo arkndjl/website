@@ -249,7 +249,7 @@ a.link-card__title:focus-visible {
    brand/make-pixel-font.py): MS Gothic's pixel drawings with proportional
    widths, so slim letters like i and l sit tight. Same rendering on every OS.
    Sizes are whole multiples of 16px where it matters so pixels stay square.
-   Code blocks keep the theme's Fira Code. */
+   Code blocks use it too: one face on the whole site. */
 @font-face {
   font-family: "MS PGothic Pixel";
   src: url("/fonts/mspgothic-pixel.woff2") format("woff2");
@@ -264,7 +264,7 @@ a.link-card__title:focus-visible {
 }
 
 body {
-  font-family: "MS PGothic Pixel", "MS PGothic", "ＭＳ Ｐゴシック", "MS Gothic", "Fira Code", monospace;
+  font-family: "MS PGothic Pixel", "MS PGothic", "ＭＳ Ｐゴシック", "MS Gothic", monospace;
 }
 
 h1 { font-size: 2rem; }
@@ -4604,3 +4604,13 @@ td.vz-dn { color: #ff9ec7; }
 .cfb__table td.cfb__name > img.cfb__logo { display: inline-block; vertical-align: -4px; margin-right: 4px; }
 /* ARKBOARD pages: the wide card repeats the window art under it, so the board starts at the top (the card stays the share image) */
 .post:has(.arknav) .post-cover { display: none; }
+
+/* one face everywhere: code, pre and keyboard text take the pixel font, not the theme's Fira Code */
+code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
+  font-family: "MS PGothic Pixel", "MS PGothic", "ＭＳ Ｐゴシック", "MS Gothic", monospace !important;
+  font-feature-settings: normal;
+}
+/* FV inputs waterfall: the start level, the steps after the inputs and the headline sit apart from the input bars */
+.post ul.cfb__parts li.cfb__step .cfb__bk { color: var(--foreground); }
+.post ul.cfb__parts li.cfb__step:last-child { border-top: 2px solid var(--accent); padding-top: 4px; margin-top: 4px; }
+.post ul.cfb__parts li.cfb__step:last-child .cfb__bv { color: var(--foreground); }

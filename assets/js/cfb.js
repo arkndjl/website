@@ -215,7 +215,7 @@
       html += '<ul class="cfb__parts">' + PARTS.map(function (p, i) {
         if (i === 0 && r.div === 'FCS') p = ['level', 'FCS: team and conference strength (SRS, this season, FBS + FCS games); replaces the On3 grade'];
         var v = r.parts[i] || 0; sum += v; return bar(p[0], p[1], v, 2, 2);
-      }).join('') + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(2) + ': the sum of the bars above, in composite units.</p>';
+      }).join('') + '</ul>';
     }
     var st = fvSteps(r);
     if (st) {
@@ -225,8 +225,7 @@
         if (k === 'g' && r.div === 'FCS') d = [d[0], d[1] + '; FCS: translated to the FBS scale, one NFL scarcity scale for both divisions'];
         // the first step is a level (FV), the rest are pushes on it
         return i === 0 ? '<li title="' + esc(d[1]) + '"><span class="cfb__bk">' + esc(d[0]) + '</span><span class="cfb__meter"></span><span class="cfb__bv">' + (+x[1]).toFixed(1) + '</span></li>' : bar(d[0], d[1], +x[1], 5, 1);
-      }).join('') + '</ul><p class="cfb__dim">' + (comp ? 'grade steps in FV, from the composite to the headline: ' : r.src === 'espn' ? 'ESPN roster backup, graded from the 20 floor; steps in FV: ' : r.pos === 'K' || r.pos === 'P' ? 'specialist; steps in FV: ' : 'steps in FV: ') +
-        'they sum to FV ' + esc(r.fv) + '.</p>';
+      }).join('') + '</ul>';
     }
     return html ? '<details class="cfb__nums"><summary>FV inputs</summary>' + html + '</details>' : '';
   }

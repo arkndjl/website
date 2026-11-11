@@ -50,6 +50,22 @@
     }).join('');
     return { html: html, sum: sum };
   }
+  // FV inputs as a waterfall that ends on the headline: a level row to start from, the input bars, then the steps
+  // the grade takes after the inputs (outcome map, scale), then FV. The method note is the box's hover title only.
+  function lvl(lab, v, tip, d) {
+    return '<li class="cfb__step" title="' + esc(tip || '') + '"><span class="cfb__bk">' + lab + '</span><span class="cfb__meter"></span><span class="cfb__bv">' + (+v).toFixed(d == null ? 1 : d) + '</span></li>';
+  }
+  function fvBox(r, b, base, mids, note) {
+    var mid = mids.filter(function (m) { return m[1] != null && isFinite(m[1]) && Math.abs(m[1]) >= 0.05; }).map(function (m) {
+      var v = m[1], w = Math.min(50, Math.abs(v) / 6 * 50);
+      return '<li class="cfb__step" title="' + esc(m[2] || '') + '"><span class="cfb__bk">' + m[0] + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
+        (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + sgn(v, 2) + '</span></li>';
+    }).join('');
+    return '<details class="cfb__nums"><summary title="' + esc(note || '') + '">FV inputs</summary><ul class="cfb__parts">' + (base != null && isFinite(base) ? lvl('start', base, 'the comparison player every input is measured against') : '') +
+      b.html + mid + lvl('FV', r.fv, '', 0) + '</ul></details>';
+  }
+  var SCALE_TIP = 'the mean outcome on the board\'s scale: the top is stretched, then rounded';
+  function scaleStep(r) { return ['scale', r.fvx != null ? r.fv - r.fvx : null, SCALE_TIP]; }
   // + strengths and − concerns: the inputs that move the grade most either way, each said with his number
   function report(parts, say) {
     var li = function (xs, c) { return xs.map(function (p) { return '<li class="' + c + '">' + esc(say(p[0], p[1] > 0)) + '</li>'; }).join(''); };
@@ -178,8 +194,8 @@
         '<p class="cfb__role">this season: ' + (r.gp ? r.gp + ' GP, ' + r.pts + ' pts' + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') : 'no games yet') +
         (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + fa(r) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
-        '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (' + hkSum(r, b) +
-        '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
+        fvBox(r, b, r.fvx != null ? r.fvx - b.sum : null, [scaleStep(r)], note || 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (' + hkSum(r, b) +
+        '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.');
     },
     'hk-pipe': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
@@ -191,8 +207,8 @@
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + ' (draft ' + r.fv0 + ') · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + link + '</p>' +
         '<p class="cfb__role">drafted ' + r.year + ', pick ' + r.pick + ' by ' + esc(r.team) + (r.age ? ' · age ' + fa(r) : '') + ' · NHL so far: ' + r.nhlgp + ' GP' + (r.war != null ? ', ' + sgn(r.war, 2) + ' WAR' : '') + '.</p>' +
         '<p class="cfb__role">' + line + '.</p>' + bdgChips(r) + outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
-        '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.k ? 'the stage model ' + r.k + ' season' + (r.k > 1 ? 's' : '') + ' after the draft: each input\'s push against the average 2008-19 pick at that stage, the draft grade carrying what was known on draft day' : 'the draft model with his real slot: each input\'s push against an average 2008-19 pick') +
-        ' (' + hkSum(r, b) + ').</p></details>';
+        fvBox(r, b, r.fvx != null ? r.fvx - b.sum : null, [scaleStep(r)], (r.k ? 'the stage model ' + r.k + ' season' + (r.k > 1 ? 's' : '') + ' after the draft: each input\'s push against the average 2008-19 pick at that stage, the draft grade carrying what was known on draft day' : 'the draft model with his real slot: each input\'s push against an average 2008-19 pick') +
+        ' (' + hkSum(r, b) + ').');
     },
     'tn-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], TN_LAB[x[0]] || x[0]]; }), b = bars(p), he = r.id.charAt(0) === 'w' ? 'she' : 'he';
@@ -207,12 +223,13 @@
         '<p class="cfb__role">last 52 weeks: ' + wl(r.w, r.n) + ' · tour ' + wl(r.wT, r.nT) + ' · qualifying ' + wl(r.wQ, r.nQ) + ' · Challenger / 125 ' + wl(r.wC, r.nC) + ' · Futures / ITF ' + wl(r.wS, r.nS) +
         (r.deb ? ' · pro since ' + f1(r.deb) + ', ' + r.car + ' matches' : '') + '.</p>' +
         outlook([[30, r.p30], [40, r.p40], [50, r.p50], [60, r.p60]], B, TN_TIERS, [0, 1, 2, 3, 4], TN_TIP, [r.lo, r.hi]) + report(p, tnSay(r)) +
-        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its share of the gap between his grade and the average prospect\'s (every input at the mean of the 1979-97-born prospects at this point of the season), split exactly through both halves of the model, the chance of any peak value and the outcome given some. ' +
-        (r.b0 != null ? 'Average prospect ' + f1(r.b0) + ' ' + sgn(b.sum, 1) + ' = ' + f1(r.fvx) + ', the mean outcome; ' : 'The pushes sum to ' + sgn(b.sum, 1) + ' over the average prospect; ') + 'FV ' + r.fv + ' is that grade on the board\'s scale (the top is stretched).</p></details>' : '');
+        (p.length ? fvBox(r, b, r.fvx != null ? r.fvx - b.sum : r.b0, [scaleStep(r)], 'each input: its share of the gap between his grade and the average prospect\'s (every input at the mean of the 1979-97-born prospects at this point of the season), split exactly through both halves of the model, the chance of any peak value and the outcome given some. ' +
+        (r.b0 != null ? 'Average prospect ' + f1(r.b0) + ' ' + sgn(b.sum, 1) + ' = ' + f1(r.fvx) + ', the mean outcome; ' : 'The pushes sum to ' + sgn(b.sum, 1) + ' over the average prospect; ') + 'FV ' + r.fv + ' is that grade on the board\'s scale (the top is stretched).') : '');
     },
     'sp-board': function (r, B) {
       var rmEl = document.querySelector('table.sp[data-sp-raw]'), SP_RAWMEAN = rmEl ? +rmEl.getAttribute('data-sp-raw') : null;
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], SP_LAB[x[0]] || x[0]]; }), b = bars(p);
+      var spRaw = !r.path && r.raw != null && r.fvx != null;
       var link = ' · <a href="https://www.transfermarkt.com/-/profil/spieler/' + esc(r.id) + '" rel="noopener">Transfermarkt ↗</a>';
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.club || '-') + (r.league ? ' (' + esc(r.league) + ')' : '') + ' · FV ' + r.fv +
@@ -223,10 +240,10 @@
         // predictive badges (scripts/soccer_badges.py), the chips of layouts/partials/badges.html
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (x) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[x[1]]; return '<span class="cfb__bdg cfb__bdg--' + esc(x[1]) + '" title="' + esc(T + ' ' + x[0] + ': ' + x[2] + ' pct at position, ' + x[3] + '; predictive of outcome FV beyond the grade') + '">' + esc(T + ' ' + x[0]) + '</span>'; }).join('') + '</p>' : '') +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +
-        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.path ?
+        (p.length ? fvBox(r, b, spRaw ? r.raw - b.sum : r.fvx != null ? r.fvx - b.sum : null, [['map', spRaw ? r.fvx - r.raw : null, 'the raw grade to the mean outcome of its band'], scaleStep(r)], (r.path ?
         'graded on the provisional ' + (r.path === 'yi' ? 'youth-international-only' : 'academy-only') + ' line: the club inputs count at the line\'s slope (each push shown already scaled), plus the youth level term; then 20 + the line\'s intercept (sum ' + sgn(b.sum, 2) + ').' :
         'each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) + (r.raw != null && SP_RAWMEAN != null ? '; pool average ' + f1(SP_RAWMEAN) + ' + inputs = raw grade ' + f1(r.raw) : '') +
-        '). The raw grade is the mean of an OLS fit and boosted trees on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top); above the board\'s top few a season the FV scale stretches, so the FV and the sum differ.') + '</p></details>' : '');
+        '). The raw grade is the mean of an OLS fit and boosted trees on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top); above the board\'s top few a season the FV scale stretches, so the FV and the sum differ.')) : '');
     }
   };
 
