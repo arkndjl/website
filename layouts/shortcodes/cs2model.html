@@ -11,10 +11,10 @@
   </div>
   <div class="cfbm__body">
     <ul>
-      <li><b>Player Elo, map by map.</b> A series found on bo3.gg ({{ $f.nJoined }} of {{ $f.nSeriesFit }}) updates once per map on round share, so 13-3 moves a rating more than 13-11 (x{{ $p.kmap }} of the series K per map). Other series update on the series result. K is {{ $p.K }} for a new player, falling toward {{ $p.Kmin }} over about {{ $p.n0 }} series. Players new after March 2024 start {{ sub 0 $p.mu_new }} points below average. Everyone starts from Valve's 2022-23 sample season played forward with the same rules.</li>
-      <li><b>Region offsets</b> for Europe, the Americas and Asia, moved only by inter-region series (K {{ $p.Kr }}). Now: {{ range $k, $v := .roff }}{{ $k }} {{ printf "%+d" (int $v) }} · {{ end }}Elo points.</li>
-      <li><b>Team map rating</b> from bo3.gg's map results since June 2020: a team Elo moved by round share on every map, plus each team's offset on each map. A series chance comes from a simple veto (each side bans its worst map and picks its best, both orders averaged).</li>
-      <li><b>Valve's VRS points</b> from the snapshot before each day, blended in log-odds. Between two VRS top-50 teams the weights are player rating x{{ index $f.weights.top 0 }}, VRS x{{ index $f.weights.top 1 }}, team map rating x{{ index $f.weights.top 2 }}. Otherwise they are x{{ index $f.weights.rest 0 }}, x{{ index $f.weights.rest 1 }} and x{{ index $f.weights.rest 2 }}. Valve's points carry real information at the top and little below it.</li>
+      <li><b>Player Elo, map by map</b>: bo3.gg series ({{ $f.nJoined }} of {{ $f.nSeriesFit }}) per map on round share, x{{ $p.kmap }} of the series K a map; others on the series result · K {{ $p.K }} new, toward {{ $p.Kmin }} over ~{{ $p.n0 }} series · new after Mar 2024 start -{{ sub 0 $p.mu_new }} · seeded from Valve's 2022-23 sample season</li>
+      <li><b>Region offsets</b> (Europe, Americas, Asia), inter-region series only, K {{ $p.Kr }}: {{ range $k, $v := .roff }}{{ $k }} {{ printf "%+d" (int $v) }} · {{ end }}Elo points</li>
+      <li><b>Team map rating</b>: bo3.gg maps since Jun 2020, team Elo on round share + team x map offset · veto: each side bans its worst map, picks its best, both orders averaged</li>
+      <li><b>Valve's VRS points</b>, snapshot before each day, blended in log-odds (player rating / VRS / team map rating): both VRS top 50 x{{ index $f.weights.top 0 }} / x{{ index $f.weights.top 1 }} / x{{ index $f.weights.top 2 }} · otherwise x{{ index $f.weights.rest 0 }} / x{{ index $f.weights.rest 1 }} / x{{ index $f.weights.rest 2 }}</li>
     </ul>
     {{- range $sub := slice (slice "all" "every series") (slice "joined" "series found on bo3.gg") (slice "top50" "both teams VRS top 50") (slice "top20" "both teams VRS top 20") }}{{ with index $f.score (index $sub 0) }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
