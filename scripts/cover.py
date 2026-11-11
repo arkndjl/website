@@ -19,6 +19,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 WF = os.path.join(HERE, 'data', 'games_wf')
 FIT = os.path.join(HERE, '..', 'data', 'cover_fit.json')
 SEASONS = 3
+# first season whose closing lines come from today's source: the stored CBB closes end in .5 about half the time through
+# 2024 and every time from 2025, and the model's slope on the softer pre-2025 closes ran .33-.66 against .17-.27 since.
+# Fit on 2025 alone, the 2026 CBB spread cover log loss improved by .00199 (t -2.93, n 5,327); totals t -1.56
+SAME_SOURCE = {'cbb': 2025}
 SPORTS = ('nba', 'nfl', 'cbb', 'cfb')
 _F = {}
 
@@ -48,7 +52,7 @@ def fit():
         if not os.path.exists(fn):
             continue
         rows = [r for r in json.load(gzip.open(fn)) if r.get('res') is not None]
-        S = sorted({r['S'] for r in rows})[-SEASONS:]
+        S = sorted({r['S'] for r in rows if r['S'] >= SAME_SOURCE.get(sp, 0)})[-SEASONS:]
         rows = [r for r in rows if r['S'] in S]
         sp_ = _slope([(r['m'] - r['L'], r['res'] - r['L']) for r in rows if r.get('m') is not None and r.get('L') is not None])
         to_ = _slope([(r['tm'] - r['T'], r['tot'] - r['T']) for r in rows if r.get('tm') is not None and r.get('T') and r.get('tot') is not None])
