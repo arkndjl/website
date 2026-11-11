@@ -26,6 +26,8 @@ Over-confidence in some months (Sep 2025, Jan 2026, Sep-Oct 2026; scripts/cs2_ca
 late-listed series (series listed within 45 days score slope .98 held out); the player Elo term loses about a third of
 its weight in those months. FAILED, by month: days-since-last-series x logit (all t -4.2 but top 50 -0.7), trailing
 90/180-day temperature (all or top 50 only), weights refit each month on all rows so far.
+Second family (top-50 aimed): player Elo x staleness (all -5.0, top 50 -1.7), one pooled staleness coefficient (-5.6 /
+-1.65), staleness of established players only (-2.8 / -0.8): all FAIL the top-50 gate. Lead: retest as top-50 data grows.
 Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
 flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
 the blend weight absorbs the scale. Kept as is.

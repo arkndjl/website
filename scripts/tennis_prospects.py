@@ -719,6 +719,9 @@ def td_fit(rows, B, tour, snap, kept):
         m = tree_fit(G[a], mt[a])
         tree = tree_dump(m, gc)
         assert np.abs(tree_pred(tree, F) - np.clip(m.predict(G), 20, 80)).max() < 1e-3
+        Fn = F.copy()  # the same with missing inputs, so served trees route them as sklearn does
+        Fn.loc[Fn.index[::5], gc] = np.where(np.arange(len(gc)) % 3 == 0, np.nan, Fn.loc[Fn.index[::5], gc])
+        assert np.abs(tree_pred(tree, Fn) - np.clip(m.predict(Fn[gc].values), 20, 80)).max() < 1e-3
     return P[fin], MU[fin], bl, bo, n, R.pid.values[fin], g[fin], tree
 
 
@@ -751,7 +754,8 @@ def tree_dump(m, cols):
     for (pr,) in m._predictors:
         nd = pr.nodes
         trees.append([nd['feature_idx'].astype(int).tolist(), nd['num_threshold'].astype(float).tolist(), nd['left'].astype(int).tolist(),
-                      nd['right'].astype(int).tolist(), np.round(nd['value'].astype(float), 6).tolist(), nd['is_leaf'].astype(int).tolist()])
+                      nd['right'].astype(int).tolist(), np.round(nd['value'].astype(float), 6).tolist(), nd['is_leaf'].astype(int).tolist(),
+                      nd['missing_go_to_left'].astype(int).tolist()])
     return dict(cols=cols, base=float(np.ravel(m._baseline_prediction)[0]), w=TREE_W, trees=trees)
 
 
@@ -759,14 +763,21 @@ def tree_pred(T, F):
     X = F[T['cols']].values.astype(float)
     out = np.full(len(X), T['base'])
     rows = np.arange(len(X))
-    for f, thr, le, ri, val, leaf in T['trees']:
-        f, thr, le, ri, val, leaf = np.array(f), np.array(thr), np.array(le), np.array(ri), np.array(val), np.array(leaf)
+    nan = np.isnan(X)
+    if nan.any() and any(len(t) < 7 for t in T['trees']):
+        # trees dumped before the missing-value branch was kept send a missing input right; refit to serve sklearn's
+        print(f'tree_pred: {int(nan.any(1).sum())} rows with a missing input, served on the right branch', file=sys.stderr)
+    for t in T['trees']:
+        f, thr, le, ri, val, leaf = (np.array(a) for a in t[:6])
+        mleft = np.array(t[6]) if len(t) > 6 else np.zeros(len(f), int)
         node = np.zeros(len(X), int)
         while True:
             go = leaf[node] == 0
             if not go.any():
                 break
-            left = X[rows[go], f[node[go]]] <= thr[node[go]]
+            x = X[rows[go], f[node[go]]]
+            # as sklearn's HistGradientBoosting: a missing value takes the node's missing branch
+            left = np.where(np.isnan(x), mleft[node[go]] == 1, x <= thr[node[go]])
             node[go] = np.where(left, le[node[go]], ri[node[go]])
         out += val[node]
     return np.clip(out, 20, 80)

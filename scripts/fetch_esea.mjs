@@ -1159,6 +1159,8 @@ async function preview(nx) {
   for (const w of watch) { const r = roster.find(x => x.nickname.toLowerCase() === w.name.toLowerCase()); if (r) apps[r.id] = (apps[r.id] || 0) + 3 * (w.maps || 1); }
   for (const r of roster) r.apps = apps[r.id] || 0;
   const theirFive = [...roster].sort((a, b) => b.apps - a.apps || (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5);
+  // FACEIT elo of the five who play (logged beside the roster top-5 the preview uses, for a later out-of-sample test)
+  const ourElo5 = avg(five.map(x => x.elo)), theirElo5 = avg(theirFive.map(x => x.elo));
   const tAvg = a => { const v = a.map(r => r.talent?.exact).filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length * 100) / 100 : null; };
   const ourT = tAvg(five), theirT = tAvg(theirFive);
   const lg = p => Math.log(p / (1 - p)), ex = x => 1 / (1 + Math.exp(-x));
@@ -1224,8 +1226,8 @@ async function preview(nx) {
   const ts = os?.lifetime || {};
   const room = matches.find(m => m.id === nx.id);
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
-      streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
-    us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
+      streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, elo5: theirElo5, results: res.sort((a, b) => b.at - a.at), watch },
+    us: { elo: ourElo, elo5: ourElo5, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rwa: pRwa != null ? Math.round(pRwa * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
     w: { ...Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100 * wA)])), pelo: pRwa == null && pPelo != null ? 100 : 0, rwa: pRwa != null ? 100 : 0 },
     rwa: rwGap != null ? { us: Math.round(rwUs.sum * 10) / 10, them: Math.round(rwThem.sum * 10) / 10, five: five.map(r => [r.nickname, rwUs.each[r.id]?.rwa ?? null, rwUs.each[r.id]?.rounds ?? 0]),
@@ -1458,7 +1460,9 @@ function simulate(N = 10000) {
 // ---- calibration log: each preview's projection, frozen at kickoff, then scored -------------------
 const calibration = [...(prev.calibration || [])];
 if (prev_ && pvNext && Date.now() < pvNext.at) {
-  const snap = { id: pvNext.id, at: pvNext.at, opp: pvNext.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, ou: prev_.total?.line ?? null, over: prev_.total?.over ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
+  const snap = { id: pvNext.id, at: pvNext.at, opp: pvNext.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, ou: prev_.total?.line ?? null, over: prev_.total?.over ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null,
+    eloGap: prev_.us?.elo != null && prev_.opp?.elo != null ? prev_.us.elo - prev_.opp.elo : null,
+    eloGap5: prev_.us?.elo5 != null && prev_.opp?.elo5 != null ? prev_.us.elo5 - prev_.opp.elo5 : null };
   const i = calibration.findIndex(c => c.id === pvNext.id); if (i >= 0) calibration[i] = { ...calibration[i], ...snap }; else calibration.push(snap);
 }
 // reschedules: an unplayed line follows its match to the new date (and opponent), and a cancelled or vanished
