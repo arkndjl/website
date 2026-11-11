@@ -151,7 +151,7 @@
       });
     } else if (dir < 0) list = list.slice().reverse();
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+    var gfxRow = function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>' +
         __wk.rk(p, pace ? null : FROM, 'WAA', null, p.waa) +
@@ -169,7 +169,11 @@
         '<td class="cfb__num cfb__g">' + p.g + '</td>' +
         '<td class="cfb__num">' + p.sn + '</td>' +
         '<td class="cfb__dim">' + (p.two ? 'off ' + f2(p.two.o) + ' (' + p.two.so + ' sn) / def ' + f2(p.two.d) + ' (' + p.two.sd + ' sn) WAR; ' : '') + esc(p.line) + '</td></tr>';
-    }).join('');
+    };
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+    // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+    var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+    body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
     none.hidden = list.length > 0;
     count.textContent = (list.length === all.length ? all.length : list.length + ' of ' + all.length) + ' players';
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;

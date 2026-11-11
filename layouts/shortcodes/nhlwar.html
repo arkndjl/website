@@ -153,7 +153,7 @@
     function k(c) { return c === key ? ' is-key' : ''; }
     table.dataset.key = CSS[key];
     function sg2(x) { return sg(x, 2); }
-    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+    var gfxRow = function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>' +
         __wk.rk(p, wkf, 'WAR', null, p.war) +
@@ -169,7 +169,11 @@
         '<td class="cfb__num cfb__g nbaxpm__ph">' + p.gp + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.toi + '</td>' +
         '<td class="cfb__num cfb__g nbaxpm__src">' + (p.grp === 'G' ? sg(p.gsax) : p.pts) + '</td></tr>';
-    }).join('');
+    };
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+    // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+    var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+    body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
     none.hidden = list.length > 0;
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ min' : '');
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;

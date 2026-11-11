@@ -1061,6 +1061,12 @@
   var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;
   var PC_MARKS = '.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, svg, img';
   function pcRows(table) { return [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; }); }
+  // boards that render one page of a longer list hand over every filtered row (table.__gfxAll, built off the page by the
+  // board's shortcode) so percentiles and "#k of N" read the whole view, not the 50 rows on screen
+  function pcAll(table) { try { if (table.__gfxAll) { var a = table.__gfxAll().filter(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2; }); if (a.length) return a; } } catch (e) {} return pcRows(table); }
+  function pcAt(table, rows, row) { var i = pcRows(table).indexOf(row); return table.__gfxAll && i >= 0 && rows.length > pcRows(table).length ? (table.__gfxOff || 0) + i : rows.indexOf(row) >= 0 ? rows.indexOf(row) : i; }
+  // share of the other rows below a value, ties at their middle rank
+  function pcPct(vals, n) { var b = 0, t = 0; vals.forEach(function (v) { if (v < n) b++; else if (v === n) t++; }); return Math.round(100 * (b + 0.5 * Math.max(0, t - 1)) / Math.max(1, vals.length - 1)); }
   function pcHeads(table) {
     var hc = [].slice.call(table.tHead.rows[0].cells), vis = hc.filter(function (h) { return !h.hidden; }), r0 = pcRows(table)[0];
     return r0 && vis.length < hc.length && r0.cells.length === vis.length ? vis : hc;
@@ -1176,8 +1182,8 @@
         var c = pcCell(r.cells[i]); if (c.t === '—' || c.t.length > 12) return;
         var n = PC_NOPCT.test(h) || PC_INFO.test(h) ? null : pcNum(r.cells[i], c.t), pct = null;
         if (n != null) {
-          var vals = rs.map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
-          if (vals.length >= 5) pct = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
+          var vals = pcAll(t).map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
+          if (vals.length >= 5) pct = pcPct(vals, n);
         }
         items.push({ h: h, t: c.t, color: c.color, pct: pct, good: pct == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - pct : pct });
       });
@@ -1209,7 +1215,7 @@
     var mainR = pcMain(row), extraL = mainR ? pdExtra(row) : '';
     if (mainR) { row = mainR; table = row.closest('table'); }
     var hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
-    var rows = pcRows(table), at = rows.indexOf(row), nameI = pcNameAt(heads);
+    var rows = pcAll(table), at = pcAt(table, rows, row), nameI = pcNameAt(heads);
     var det = await pcDetail(row), d = det.el;
     var gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
     var nameC = cells[nameI >= 0 ? nameI : 1];
@@ -1242,7 +1248,7 @@
       var n = PC_NOPCT.test(h) ? null : pcNum(cells[i], c.t), pct = null;
       if (n != null) {
         var vals = rows.map(function (r) { var cc = r.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
-        if (vals.length >= 5) pct = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
+        if (vals.length >= 5) pct = pcPct(vals, n);
       }
       // context columns (age, games, minutes, size, contract) are facts, not grades: a strip under the name, no percentile
       if (PC_INFO.test(h)) { info.push([capHead(h), c.t]); return; }
@@ -1257,7 +1263,7 @@
       var xp = hits.length > 1 && tmU ? hits.find(function (p) { return p.tm === tmU; }) || hits[0] : hits[0];
       if (xp && xp.vorx != null) {
         var vs = xd.players.filter(function (p) { return p.mp >= 100 && p.vorx != null; }).map(function (p) { return p.vorx; });
-        var vp = vs.length >= 5 ? Math.round(100 * vs.filter(function (v) { return v < xp.vorx; }).length / Math.max(1, vs.length - 1)) : null;
+        var vp = vs.length >= 5 ? pcPct(vs, xp.vorx) : null;
         tiles.unshift({ i: -1, h: 'VORX', t: xp.vorx.toFixed(1), pct: vp, good: vp, tip: 'wins over replacement on XPM, ' + xd.label });
       }
     }
@@ -1464,7 +1470,7 @@
   function ord(n) { var m = n % 100, d = n % 10; return n + (m >= 11 && m <= 13 ? 'th' : d === 1 ? 'st' : d === 2 ? 'nd' : d === 3 ? 'rd' : 'th'); }
   function esc2(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function pdHtml(win, table, row, extra, span) {
-    var hc = pcHeads(table), heads = hc.map(txt), cells = [].slice.call(row.cells), rows = pcRows(table), N = rows.length, at = rows.indexOf(row);
+    var hc = pcHeads(table), heads = hc.map(txt), cells = [].slice.call(row.cells), rows = pcAll(table), N = rows.length, at = pcAt(table, rows, row);
     var ni = pcNameAt(heads), name = pcName(row, ni), gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
     var teamI = gi(TEAM_COL), posI = gi(POS_COL), lgI = gi(/^(league|lg|conf)$/i), fvI = gi(FV_COL), tm = row.querySelector('.nbaxpm__tm, .nflwar__tm');
     var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) posC.querySelectorAll('span').forEach(function (e) { e.remove(); });
@@ -1481,7 +1487,7 @@
       var n = PC_NOPCT.test(h) && !PD_LOWER.test(h) ? null : pcNum(cells[i], c.t), p = null;
       if (n != null) {
         var vals = rows.map(function (r) { var cc = r.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
-        if (vals.length >= 5) p = Math.round(100 * vals.filter(function (v) { return v < n; }).length / Math.max(1, vals.length - 1));
+        if (vals.length >= 5) p = pcPct(vals, n);
       }
       var judge = p == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - p : p;
       stats.push({ h: h, t: c.t, sub: c.sub, p: p, good: judge, tip: hc[i] ? hc[i].getAttribute('title') || '' : '' });

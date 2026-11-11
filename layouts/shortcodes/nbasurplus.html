@@ -111,7 +111,7 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     table.dataset.key = key;
     function k(c) { return c === key ? ' is-key' : ''; }
-    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+    var gfxRow = function (p) {
       var yrs = p.yrs.map(function (y, i) { return (data.season - 1 + i) + '-' + String(data.season + i).slice(2) + ': $' + m(y[0]) + 'M salary, $' + m(y[1]) + 'M value' + (y[2] ? ' (' + (y[2] === 'P' ? 'player' : 'team') + ' option)' : ''); }).join('\n');
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + (p.age == null ? '' : p.age + ' · ') + '$' + m(p.sal) + 'M</span></td>' +
@@ -123,7 +123,11 @@
         '<td class="cfb__num c-sur nbaxpm__v' + k('sur') + '">' + sg(p.sur) + '</td>' +
         '<td class="cfb__num nbaxpm__ph" title="' + esc(yrs) + '">' + p.ny + '<span class="cfb__dim">' + p.yrs.map(function (y) { return y[2]; }).join('') + '</span></td>' +
         '<td class="cfb__num c-csur nbaxpm__v' + k('csur') + '">' + sg(p.csur) + '</td></tr>';
-    }).join('');
+    };
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+    // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+    var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+    body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
     none.hidden = list.length > 0;
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players under contract';
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;

@@ -160,7 +160,7 @@
       });
     } else if (dir < 0) list = list.slice().reverse();
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+    var gfxRow = function (p) {
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + esc(p.st.toLowerCase()) + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
       if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: P(starter-line points, next 4 games) = ' + Math.round(p.bo.p * 100) + '%">BRK</span>';
       var opp = ros ? String(p.rg) : p.w ? (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp) : '<span class="cfb__dim">bye</span>';
@@ -181,7 +181,11 @@
           '<td class="cfb__num nflff__x">' + fx(p.rc, 1) + '</td><td class="cfb__num nflff__x">' + fx(p.td, ros ? 1 : 2) + '</td>') +
         '<td class="cfb__num nflff__av"><span class="nflff__m">' + (ros ? 'exp. games ' : 'plays ') + '</span>' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
         '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
-    }).join('');
+    };
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+    // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+    var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+    body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
     none.hidden = list.length > 0;
     count.textContent = list.length + (list.length === 1 ? ' player' : ' players');
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;

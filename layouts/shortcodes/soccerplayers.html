@@ -199,7 +199,7 @@
         });
       } else if (dir < 0) list = list.slice().reverse();
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-      body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+      var gfxRow = function (p) {
         var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf ? __wk.none : __wk.rk(p, wkf, 'GAR', null, p.gar));
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
@@ -209,7 +209,11 @@
         var fv = '<td class="cfb__num">' + (p.fv ? '<b>' + p.fv + '</b>' + (p.prov ? '<span class="cfb__dim" title="provisional grade">*</span>' : '') : '<span class="cfb__dim">–</span>') + '</td>';
         return head + mid + fv + '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
           '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
-      }).join('');
+      };
+      body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
+      // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+      var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+      body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
       none.hidden = list.length > 0;
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ min' : '');
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
