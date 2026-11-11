@@ -4,7 +4,7 @@ post day (scripts/rank_moves.py POST: CBB Mon, NBA Tue, NFL Thu, soccer Fri, ten
 itself, the one a week back), or 7 days back for a sport with no post day (NHL, hockey prospects).
 
 Run after a board's builders, before the commit. Each board keeps its history in scripts/data/moves/<board>.json
-({season, hist: {date: {id: value}}}), stored only when it changes and pruned to the week window plus the snapshot
+({season, model, hist: {date: {id: value}}}), stored only when it changes and pruned to the week window plus the snapshot
 just before it (scripts/rank_moves.py does the same for the ARK Rankings). Rows get `w0` (the value as of the
 last snapshot on or before that day); the row list's file gets `wkFrom` (that snapshot's date). A row with no `w0` while
 `wkFrom` is set is new to the board. The page works out the change: FV boards show FV now minus `w0`; leaderboards
@@ -16,10 +16,13 @@ re-rank the rows in view by `w0` and show the rank change, so the move counts wi
 """
 import datetime as dt
 import glob
+import hashlib
+import io
 import json
 import os
 import subprocess
 import sys
+import tokenize
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from rank_moves import cutoff, today as et_today   # noqa: E402  (the weekly post days, POST)
@@ -52,6 +55,42 @@ BOARDS = {
     'tennisp': ('data/tennis_prospects.json', [(('atp', 'board'), 'id', 'fv'), (('wta', 'board'), 'id', 'fv')]),
     'cs2': ('data/cs2_players.json', [(('board',), 'id', 'rwa', True), (('prospects',), 'id', 'fv')]),
 }
+
+
+# FV boards: the files that set the grades (fit, display scale, the script that writes the board). A change in their
+# hash between two runs is a model change, and the earlier snapshots are regraded by it (regrade)
+MODEL = {
+    'cbb': ('data/cbb_fit.json', 'data/cbb_live_fit.json', 'data/fv_dist.json', 'data/fv_scale.json',
+            'scripts/fetch_cbb.py', 'scripts/cbb_live.py'),
+    'hockey': ('data/hockey_fit.json', 'data/fv_scale.json', 'scripts/hockey_prospects.py'),
+    'soccerp': ('data/soccer_prospects_fit.json', 'data/fv_scale.json', 'scripts/soccer_prospects.py'),
+    'tennisp': ('data/tennis_prospects_fit.json', 'data/fv_scale.json', 'scripts/tennis_prospects.py'),
+    'cs2': ('data/cs2_players_fit.json', 'data/fv_scale.json', 'scripts/cs2_players.py'),
+}
+
+
+def fingerprint(board, rev=None):
+    """hash of the board's MODEL files (a script by its tokens, comments left out), from the working tree or (rev) a git commit;
+    None for a board with none"""
+    files = MODEL.get(board)
+    if not files:
+        return None
+    h = hashlib.sha256()
+    for f in files:
+        if rev:
+            r = subprocess.run(['git', 'show', f'{rev}:{f}'], cwd=ROOT, capture_output=True)
+            b = r.stdout if r.returncode == 0 else b''
+        else:
+            p = os.path.join(ROOT, f)
+            b = open(p, 'rb').read() if os.path.exists(p) else b''
+        if f.endswith('.py'):                # the code, not its comments or layout
+            try:
+                b = ' '.join(t.string for t in tokenize.tokenize(io.BytesIO(b).readline)
+                             if t.type not in (tokenize.COMMENT, tokenize.NL, tokenize.ENCODING)).encode()
+            except (tokenize.TokenError, SyntaxError):
+                pass
+        h.update(f.encode() + b'\0' + hashlib.sha256(b).digest())
+    return h.hexdigest()[:16]
 
 
 class Columnar:
@@ -102,7 +141,7 @@ def snap(d, spec):
     return out
 
 
-REGRADE = .5     # FV boards: more than half the grades moving in one run is a model change, not the players
+REGRADE = .5     # FV boards: more than half the grades moving in one run is a model change even when MODEL misses it
 
 
 def graded(spec):
@@ -110,16 +149,18 @@ def graded(spec):
     return {'.'.join(path) for path, _, val, *_ in spec if val == 'fv'}
 
 
-def regrade(hist, cur, names):
+def regrade(hist, cur, names, changed=False):
     """a model change re-grades the earlier snapshots by the same shift, so the week's moves stay player moves (the
-    change on the re-grade day itself is lost). leaderboard metrics move every day and are left as they are"""
+    change on the re-grade day itself is lost). changed: the MODEL fingerprint moved since the last run; otherwise
+    only a run that moves more than REGRADE of the grades counts. leaderboard metrics move every day and are left
+    as they are"""
     last = hist[max(hist)]
     for name, now in cur.items():
         if name not in names:
             continue
         was = last.get(name) or {}
         com = [k for k in now if k in was]
-        if len(com) < 20 or sum(now[k] != was[k] for k in com) <= REGRADE * len(com):
+        if len(com) < 20 or (not changed and sum(now[k] != was[k] for k in com) <= REGRADE * len(com)):
             continue
         shift = {k: now[k] - was[k] for k in com}
         for snap_ in hist.values():
@@ -129,11 +170,14 @@ def regrade(hist, cur, names):
                     s[k] = round(s[k] + dv, 4)
 
 
-def step(h, cur, day, days=DAYS, fv=(), sport=None):
-    """adds today's snapshot to history h (on change), prunes, returns (h, base date or None)"""
+def step(h, cur, day, days=DAYS, fv=(), sport=None, model=None):
+    """adds today's snapshot to history h (on change), prunes, returns (h, base date or None). model: the board's
+    MODEL fingerprint now, kept in h['model']"""
     hist = dict(sorted((h.get('hist') or {}).items()))
     if fv and hist:
-        regrade(hist, cur, fv)
+        regrade(hist, cur, fv, changed=bool(model and h.get('model') and model != h['model']))
+    if model:
+        h['model'] = model
     if not hist or hist[max(hist)] != cur:
         hist[day.isoformat()] = cur
     cut = cutoff(day, sport, days).isoformat()
@@ -184,7 +228,7 @@ def update(board, day=None, d=None, h=None, write=True):
     if h.get('season') != s:                # a new season (or a first run) starts the history over
         h = {'season': s, 'hist': {}}
     day = day or et_today()
-    h, since = step(h, snap(d, spec), day, fv=graded(spec), sport=board)
+    h, since = step(h, snap(d, spec), day, fv=graded(spec), sport=board, model=fingerprint(board))
     # wkFrom names the post day the moves count from (the values are the last snapshot on or before it)
     mark(d, spec, h['hist'].get(since) if since else None, cutoff(day, board).isoformat() if since else None)
     if write:
@@ -205,7 +249,7 @@ def _git_versions(path, since):
         by_day[when[:10]] = hsh
     for day, hsh in sorted(by_day.items()):
         try:
-            yield day, json.loads(subprocess.run(['git', 'show', f'{hsh}:{path}'], cwd=ROOT, capture_output=True,
+            yield day, hsh, json.loads(subprocess.run(['git', 'show', f'{hsh}:{path}'], cwd=ROOT, capture_output=True,
                                                  text=True, check=True).stdout)
         except (subprocess.CalledProcessError, ValueError):
             continue
@@ -220,13 +264,13 @@ def seed(boards):
         if not path:
             continue
         h = {}
-        for day, d in _git_versions(path, since):
+        for day, rev, d in _git_versions(path, since):
             if dt.date.fromisoformat(day) >= today:
                 continue
             s = season_of(d, path)
             if h.get('season') != s:
                 h = {'season': s, 'hist': {}}
-            h, _ = step(h, snap(d, spec), dt.date.fromisoformat(day), fv=graded(spec), sport=board)
+            h, _ = step(h, snap(d, spec), dt.date.fromisoformat(day), fv=graded(spec), sport=board, model=fingerprint(board, rev))
         save_hist(board, h)
         update(board, today)
 
@@ -258,6 +302,27 @@ def test():
     h3, since = step(h3, snap(rr, spec), dt.date(2026, 11, 9))
     mark(rr, spec, h3['hist'][since], since)
     assert [p['wr'] for p in rr['players']] == [1, 2], rr
+    # a model change that moves under half the grades (most rows at the floor) is regraded on the fingerprint
+    fb = {'rows': [{'id': str(i), 'fv': 20 if i < 30 else 50} for i in range(40)]}
+    spec = [(('rows',), 'id', 'fv')]
+    h4, _ = step({}, snap(fb, spec), dt.date(2026, 11, 1), fv={'rows'}, model='a')
+    for r in fb['rows'][30:]:
+        r['fv'] = 55
+    h4, since = step(h4, snap(fb, spec), dt.date(2026, 11, 9), fv={'rows'}, model='b')
+    mark(fb, spec, h4['hist'][since], since)
+    assert h4['model'] == 'b' and all(r['w0'] == r['fv'] for r in fb['rows']), fb['rows'][-1]
+    for r in fb['rows'][30:]:                                # same model, same share: player moves, kept
+        r['fv'] = 58
+    h4, since = step(h4, snap(fb, spec), dt.date(2026, 11, 10), fv={'rows'}, model='b')
+    mark(fb, spec, h4['hist'][since], since)
+    assert fb['rows'][-1]['w0'] == 55 and fb['rows'][0]['w0'] == 20, fb['rows'][-1]
+    h5, _ = step({}, snap(fb, spec), dt.date(2026, 11, 1), fv={'rows'})   # no fingerprint stored yet: the share rule
+    for r in fb['rows'][30:]:
+        r['fv'] = 60
+    h5, since = step(h5, snap(fb, spec), dt.date(2026, 11, 9), fv={'rows'}, model='c')
+    mark(fb, spec, h5['hist'][since], since)
+    assert fb['rows'][-1]['w0'] == 58 and h5['model'] == 'c', fb['rows'][-1]
+    assert fingerprint('tennisp') and fingerprint('nfl') is None
     del BOARDS['_t']
     print('board_moves ok')
 
