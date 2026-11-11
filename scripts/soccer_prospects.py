@@ -367,6 +367,14 @@ def age_at(t, dob):
     return (pd.Timestamp(f'{t}-07-01') - dob).dt.days / 365.25
 
 
+def s22_of(dob):
+    """the first season a player is 22 on July 1, by the outcome window's age rule (whole years of 365.25 days to July
+    1): his birth year + 22, or + 23 when he was born after July 1"""
+    y = dob.dt.year + 22
+    jul = pd.to_datetime(y.astype('Int64').astype(str) + '-07-01', errors='coerce')
+    return (y + (np.floor((jul - dob).dt.days / 365.25) < 22).astype(int)).where(dob.notna())
+
+
 def outcome(A, P):
     """peak value (best three GAR seasons at ages 22-26, zeros for missing) and its FV on the rarity scale"""
     s = A[A.gar > 0].groupby(['player_id', 'season']).gar.sum().reset_index()
@@ -375,7 +383,7 @@ def outcome(A, P):
     s = s[s.age.between(*PEAK_AGES)]
     peak = s.groupby('player_id').gar.apply(lambda v: float(np.sort(np.r_[v.values, 0, 0, 0])[-3:].mean()))
     d = P[P.dob.notna()].copy()
-    d['s22'] = d.dob.dt.year + 22 - (d.dob.dt.month >= 7).astype(int)
+    d['s22'] = s22_of(d.dob)
     d['peak'] = d.index.map(peak).fillna(0.0)
     ref = d[d.s22.between(*COHORTS) & d.index.isin(A.player_id.unique())]
     nco = COHORTS[1] - COHORTS[0] + 1
@@ -978,7 +986,7 @@ def fit(scorecard=False):
                 n = X[X.index.isin(done.index) & ~X.old].assign(fv_out=done.fv)
                 acad = n if acad is None else pd.concat([acad, n])
                 N = yi_pool(Y, ydob, t, snapdate(t, md), X.index)
-                s22 = ydob.reindex(N.index).dt.year + 22 - (ydob.reindex(N.index).dt.month >= 7).astype(int)
+                s22 = s22_of(ydob.reindex(N.index))
                 N = N[s22.between(*COHORTS)]
                 N['fv_out'] = done.fv.reindex(N.index).fillna(20.0)    # never on a lineup in a covered league: the floor
                 N['mvlvl'] = X.mvlvl.iloc[0]
