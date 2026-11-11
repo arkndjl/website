@@ -31,6 +31,7 @@ import cbb_data as D
 import cbb_fit as F
 import cbb_fv_drivers as H
 import cbb_fv_sweep2 as S2
+import harness as HS
 
 OUT = next((a for a in sys.argv[1:] if not a.startswith('-')), os.path.join(HERE, 'cbb.json'))
 K_MIN, K_FGM = 300, 40
@@ -83,11 +84,7 @@ def add(c, i, f, T, ref):
 
 def tp(t, df):
     """exact one-sided p of Student t"""
-    try:
-        from scipy import stats
-        return float(stats.t.sf(t, df))
-    except ImportError:
-        return float(0.5 * math.erfc(t / math.sqrt(2)))
+    return float(1 - HS.t_cdf(t, df))
 
 
 def clus_t(d, cl):

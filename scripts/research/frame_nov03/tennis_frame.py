@@ -17,7 +17,6 @@ fills heights for players who made it (Oct 26 2026: "no listed height" +3.4 FV A
   3. the full-pool height (missing -> 0) shown for reference only: it is the leak.
 """
 import json
-import math
 import os
 import pickle
 import sys
@@ -29,6 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SCR = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, SCR)
 import tennis_prospects as tp  # noqa: E402
+import harness as HS  # noqa: E402
 
 OUTD = os.environ.get('FRAME_OUT') or '/mnt/project-files/fv/frame-nov03/tennis/'
 BANDS = [(20, 20.5), (20.5, 40), (40, 50), (50, 81)]
@@ -53,7 +53,7 @@ def test(F, y, pos, by, se, kept, cols):
              mse0=round(float(np.mean((E0 - y) ** 2)), 3))
     bl, bo = tp.hurdle(F, y, pos, kept + cols, np.ones(len(F), bool))
     g['coefL'], g['coefO'] = round(float(bl[-1]), 3), round(float(bo[-1]), 3)
-    g['p1'] = round(float(0.5 * math.erfc(g['t'] / math.sqrt(2))), 4)
+    g['p1'] = round(float(1 - HS.t_cdf(g['t'], g['of'] - 1)), 4)
     g['cv'] = bool(g['t'] >= 2 and g['wins'] >= 2 * g['of'] / 3)
     g['pass'] = bool(g['cv'] and g['top50'] >= 0 and g['fwd'] >= 0 and g['fwdtop'] >= 0)
     return g

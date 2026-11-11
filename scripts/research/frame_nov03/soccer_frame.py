@@ -33,6 +33,7 @@ SCR = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, SCR)
 import soccer_prospects as SP  # noqa: E402
 import soccer_trust_research as TR  # noqa: E402
+import harness as HS  # noqa: E402
 
 OUTD = os.environ.get('FRAME_OUT') or '/mnt/project-files/fv/frame-nov03/soccer/'
 CACHE = os.path.join(SP.CACHE, 'frame')
@@ -117,7 +118,7 @@ def main():
         for nm, (base, add) in tests.items():
             # an addition goes through the board's own test; a replacement swaps the pooled height out of the kept model
             r = TR.test(Z, kept, add) if base is kept else swap_test(Z, kept, base + add)
-            r['p1'] = round(float(0.5 * math.erfc(r['t'] / math.sqrt(2))), 4)
+            r['p1'] = round(float(1 - HS.t_cdf(r['t'], r['of'] - 1)), 4)
             res['cands'][nm] = r
             allc[f'{key} {nm}'] = r
             print(key, nm, r, flush=True)

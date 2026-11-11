@@ -31,6 +31,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import nhl_data as D
 import nhl_players as P
+import harness as HS
 
 OUT = os.path.join(os.path.dirname(HERE), 'data', 'nhl_war_research_nov03.json')
 LAST = D.current_season() - 1          # last complete season
@@ -45,11 +46,7 @@ NAMES = P.COMPS + ['gsax'] + P.PRIORS
 
 
 def tdist_p(t, df):
-    try:
-        from scipy import stats
-        return float(2 * stats.t.sf(abs(t), df))
-    except ImportError:
-        return float(math.erfc(abs(t) / math.sqrt(2)))
+    return float(2 * (1 - HS.t_cdf(abs(t), df)))
 
 
 def splits(S):
