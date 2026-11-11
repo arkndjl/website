@@ -31,6 +31,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fv_scale import fv_of
+import cfb_horizon
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P = lambda *a: os.path.join(ROOT, *a)
@@ -177,20 +178,26 @@ def cfb_combine(src):
 
 def cfb(path):
     src = json.load(gzip.open(path) if path.endswith('.gz') else open(path))
+    # one outcome horizon for every class (scripts/cfb_horizon.py): AV a season elapsed / h(draft), so a 2015 draftee's
+    # out-of-league years don't count against him next to a 2022 one's prime; rows built before the fix carry no hz
+    hz = cfb_horizon.saved()
     rows = []
     for r in src:
         draft = r['draft'] or r['last'] + 1
+        avs = r['av'] / hz(r['draft']) if r['av'] and r['draft'] and not r.get('hz') else r['av']
         mature = r['av'] is not None and draft <= CFB_MATURE
         status = 'college' if r['last'] >= 2026 else None
         rows.append({'name': r['name'], 'season': r['s'], 'team': r['team'], 'pos': CFB_POS.get(r['g'], r['g']), 'id': r['id'],
-                     'fvx': r['fvx'], 'fv': fv_of('cfb', r['fvx']), 'out': r1(fv_from_av(r['av'])) if mature else None,
+                     'fvx': r['fvx'], 'fv': fv_of('cfb', r['fvx']), 'out': r1(fv_from_av(avs)) if mature else None,
                      'pick': r['pick'], 'draft': r['draft'], 'pb': r['pb'] or 0, 'ap': r['ap'] or 0, 'av': r1(r['av']) if mature else None,
                      'status': status, 'last': r['last']})
     # box-score era (2014-18): the stand-in line is a noisier read than PFN's, and its grades ran hot above 40 against
     # the NFL (finals 60+: 65.8 given, 55.5 became; PFN-era finals 66.1 -> 71.9). Each box-era mean is put on what
     # such grades became: outcome on (x - 20, max(0, x - 40)), fit on box rows with outcomes, last and earlier seasons
     # apart. Class held out (Nov 1 2026): last seasons MSE t 1.8, 40+ better in 4 of 5 classes; earlier seasons t 2.9,
-    # 6 of 8. PFN-era grades (2019+) stay as graded
+    # 6 of 8. PFN-era grades (2019+) stay as graded. On the common outcome horizon (scripts/cfb_horizon.py): last seasons
+    # tie held out (MSE 94.24 -> 94.27, class-clustered t -0.05) but kept, since dropping them lets the hot box-era finals
+    # pull the pooled draft-day fit below down at the top (PFN 75+ grades -4); earlier seasons 135.54 -> 131.49 (t 3.05, 6/8)
     X = lambda x: [x - 20, max(0.0, x - 40)]
     boxfit = {}
     for fin in (True, False):

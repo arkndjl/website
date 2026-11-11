@@ -36,6 +36,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cfb_recruit_fit as R   # noqa: E402
 from names import Matcher     # noqa: E402
+from cfb_horizon import horizon   # noqa: E402
 
 ROOT = R.ROOT
 SP = os.path.join(ROOT, 'scripts', '.cache', 'statplus')
@@ -85,15 +86,16 @@ def nfl():
     """Draft picks 2014-25 with ESPN ids, and the capital map."""
     pe = {x['gsis_id']: x['espn_id'] for x in csv.DictReader(open(os.path.join(SP, 'players.csv'))) if x['gsis_id']}
     d = [r for r in csv.DictReader(open(os.path.join(SP, 'draft_picks.csv'))) if 2012 <= int(r['season']) <= NFL_THROUGH]
+    hz = horizon(d, NFL_THROUGH)      # one outcome horizon for every class (scripts/cfb_horizon.py)
     S = [r for r in d if int(r['season']) <= 2019 and int(r['pick'] or 0) > 0]
-    x = np.log([int(r['pick']) for r in S]); yv = np.array([float(r['w_av'] or 0) / (NFL_THROUGH - int(r['season']) + 1) for r in S])
+    x = np.log([int(r['pick']) for r in S]); yv = np.array([float(r['w_av'] or 0) / (NFL_THROUGH - int(r['season']) + 1) / hz(r['season']) for r in S])
     b = np.cov(x, yv)[0, 1] / x.var(ddof=1); a = yv.mean() - b * x.mean()
     cap = lambda p: max(0.0, a + b * math.log(p))
     rows = []
     for r in d:
         s = int(r['season'])
         if s < 2014: continue
-        av = float(r['w_av'] or 0) / (NFL_THROUGH - s + 1)
+        av = float(r['w_av'] or 0) / (NFL_THROUGH - s + 1) / hz(s)
         rows.append({'name': r['pfr_player_name'], 'team': r['college'], 'pos': r['position'], 'season': s, 'espn': pe.get(r['gsis_id']) or None,
                      'pick': int(r['pick']), 'av': av, 'cap': cap(int(r['pick']))})
     return rows, (round(float(a), 4), round(float(b), 4))
