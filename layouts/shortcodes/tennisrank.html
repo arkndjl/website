@@ -45,7 +45,7 @@
     <td class="cfb__num" data-v="{{ .rpwp }}">{{ printf "%+.1f" (float .rpwp) }}</td>
     <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ with .rank }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .pts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .w }}">{{ .w }}-{{ .l }} <span class="cfb__dim">({{ .tw }}-{{ .tl }})</span></td>
-    <td class="cfb__num" data-v="{{ .age | default 0 }}">{{ with .age }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .age }}{{ . }}{{ end }}">{{ with .age }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ cond (eq .hand "L") "left" (cond (eq .hand "R") "right" "—") }}</td>
   </tr>
   {{- end }}
