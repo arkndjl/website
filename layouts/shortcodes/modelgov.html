@@ -26,7 +26,7 @@
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Model</th><th>Sport</th><th title="months it refits in">Months</th><th title="days between refits">Every</th><th>Last</th><th>Status</th></tr></thead>
       <tbody>{{ range $n, $j := .jobs }}
-      <tr><td>{{ $n }}</td><td class="cfb__dim">{{ $j.sport }}</td><td class="cfb__dim">{{ if eq (len $j.months) 12 }}all{{ else }}{{ delimit $j.months "," }}{{ end }}</td><td class="cfb__num">{{ $j.every }} d</td><td class="cfb__num">{{ with $j.last }}{{ substr . 0 10 }}{{ else }}-{{ end }}</td><td{{ if eq $j.status "failed" }} class="ark-fresh is-stale" title="{{ $j.note }}"{{ end }}>{{ if eq $j.status "failed" }}<b class="ark-fresh__tag">failed</b>{{ else }}{{ $j.status | default "not run" }}{{ end }}</td></tr>
+      <tr><td>{{ $n }}</td><td class="cfb__dim">{{ $j.sport }}</td><td class="cfb__dim">{{ if eq (len $j.months) 12 }}all{{ else }}{{ delimit $j.months "," }}{{ end }}</td><td class="cfb__num">{{ $j.every }} d</td><td class="cfb__num">{{ with $j.last }}{{ substr . 0 10 }}{{ else }}-{{ end }}</td><td{{ if eq $j.status "failed" }} class="ark-fresh is-stale" title="{{ $j.note }}"{{ end }}>{{ if eq $j.status "failed" }}<b class="ark-fresh__tag">failed</b>{{ else }}{{ $j.status | default (cond (eq $j.local true) "local" "not run") }}{{ end }}</td></tr>
       {{- end }}</tbody>
     </table></div>
     {{- end }}

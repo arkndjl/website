@@ -16,8 +16,9 @@ a candidate input by itself (inputs are chosen by the selection rules each fit a
 held-out seasons). The gate, per job:
   1. the fit exits 0 within its time limit;
   2. every file it changed parses as strict JSON (no NaN or Infinity: a bare NaN breaks the Hugo build);
-  3. the job's check passes, when it has one (the daily build run on the new fit);
-  4. only the job's `keep` files are kept (the check's own outputs are thrown away; the daily workflow owns them).
+  3. no key path of the committed fit is lost, and no sample size (games, rows, a top-level n) falls below 90% of the committed one;
+  4. the job's check passes, when it has one (the daily build run on the new fit);
+  5. only the job's `keep` files are kept (the check's own outputs are thrown away; the daily workflow owns them).
 A job that fails any step leaves the committed fit as it was and shows "failed" in data/refits.json, which the
 data-health check (scripts/data_health.py) turns into a GitHub issue through the red run.
 
@@ -39,7 +40,10 @@ OUT = os.path.join(ROOT, 'data', 'refits.json')
 ALL = list(range(1, 13))
 
 # name: cmd (shell), months (season months when it refits), every (days between refits), keep (files kept; globs,
-# repo-relative), check (shell, optional), timeout (minutes), cache (Actions cache key prefixes to restore), py (pip)
+# repo-relative), check (shell, optional), timeout (minutes), cache (Actions cache key prefixes to restore), py (pip),
+# local (why the job cannot run on a runner: `plan` leaves it out, it is run by hand with `refit.py run NAME`)
+BT_HIST = ('needs Barttorvik game logs for every past season (scripts/.cache/cbb/games_bt); the runners\' cache keeps '
+           'only the live and last season, and Barttorvik answers runners with a page, so a past season loads empty')
 JOBS = {
     # ---- game models: walk-forward backtest against the close + refit, monthly in season
     'nba_games':     dict(cmd='python3 scripts/nba_games.py --fit', months=[11, 12, 1, 2, 3, 4, 5], every=28,
@@ -49,7 +53,7 @@ JOBS = {
     'nfl_games':     dict(cmd='python3 scripts/nfl_games.py --fit', months=[10, 11, 12, 1], every=28,
                           keep=['data/nfl_games_fit.json', 'scripts/data/games_wf/nfl.json.gz'], timeout=150, sport='nfl'),
     'cbb_games':     dict(cmd='python3 scripts/cbb_games.py --fit', months=[12, 1, 2, 3], every=28,
-                          keep=['data/cbb_games_fit.json', 'scripts/data/games_wf/cbb.json.gz'], timeout=240, sport='cbb'),
+                          keep=['data/cbb_games_fit.json', 'scripts/data/games_wf/cbb.json.gz'], timeout=240, sport='cbb', local=BT_HIST),
     'soccer_games':  dict(cmd='python3 scripts/soccer_games.py --fit', months=[10, 11, 12, 1, 2, 3, 4, 5], every=28,
                           keep=['data/soccer_games_fit.json', 'scripts/data/games_wf/soccer.json.gz', 'scripts/data/soccer_team_ratings.json.gz'], timeout=150, sport='soccer'),
     'tennis_model':  dict(cmd='python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit', cache=['tennis-'], months=[2, 4, 6, 8, 10], every=56,
@@ -60,9 +64,9 @@ JOBS = {
     'nba_players':   dict(cmd='python3 scripts/nba_players.py --fit', months=[12, 1, 2, 3, 4], every=28,
                           keep=['data/nba_players_fit.json'], timeout=60, sport='nba'),
     'cbb_players':   dict(cmd='python3 scripts/cbb_players.py --fit', months=[12, 1, 2, 3], every=28,
-                          keep=['data/cbb_players_fit.json'], timeout=60, sport='cbb'),
+                          keep=['data/cbb_players_fit.json'], timeout=60, sport='cbb', local=BT_HIST),
     'cbb_espn_logs': dict(cmd='python3 scripts/cbb_espn_logs.py --fit && python3 scripts/cbb_espn_logs.py --check', months=[12, 2], every=56,
-                          keep=['data/cbb_espn_fit.json'], timeout=40, sport='cbb', cache=['cbb-bt-']),
+                          keep=['data/cbb_espn_fit.json'], timeout=40, sport='cbb', cache=['cbb-bt-'], local=BT_HIST),
     # ---- the pricing layer the picks read: the close, the margin/total spread around it, cover, rating sd
     'close_model':   dict(cmd='python3 scripts/close_model.py --fit', months=ALL, every=28,
                           keep=['data/close_fit.json'], timeout=60, sport='predictions'),
@@ -175,6 +179,32 @@ def lost_keys(path):
     return sorted(key_paths(old) - key_paths(new))
 
 
+COUNT_KEYS = ('games', 'rows')
+
+
+def counts(o, pre=''):
+    """A fit's sample sizes by key path: a number under 'games' or 'rows' at any depth, and a top-level 'n'. Nested
+    'n' are left out: most count the bets a rule passes, which a refit can shrink (close_fit's model bets did)"""
+    out = {}
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if (k in COUNT_KEYS or (k == 'n' and not pre)) and isinstance(v, (int, float)) and not isinstance(v, bool):
+                out[pre + '/' + str(k)] = v
+            out.update(counts(v, pre + '/' + str(k)))
+    return out
+
+
+def shrunk_counts(path, floor=50, frac=0.9):
+    """Sample counts that fell below `frac` of the committed fit's. A refit only adds data, so a fit whose rows shrank
+    ran on a partial input (a cache that missed, a source that answered with a page) even when every key survived."""
+    try:
+        old = counts(json.loads(git('show', f'HEAD:{path}') or 'null'))
+        new = counts(json.load(open(os.path.join(ROOT, path))))
+    except ValueError:
+        return []
+    return [f'{k} {old[k]:g} -> {new[k]:g}' for k in sorted(old) if k in new and old[k] >= floor and new[k] < frac * old[k]]
+
+
 def cmd_stale(d):
     """Drop legs whose code or fit files changed on origin/main after the leg checked out. Before this, a refit that
     started on older code was pushed over newer fits (Nov 2: NHL OT-winner slope and rank-odds game noise lost).
@@ -229,6 +259,10 @@ def cmd_run(name):
         lost = [f'{c}: {", ".join(k[:3])}' for c in keep if c.endswith('.json') and (k := lost_keys(c))]
         if lost:   # Nov 2: an NBA refit without the injury-report cache dropped every status rate and still "passed"
             res['note'] = 'fit lost keys the committed one has: ' + '; '.join(lost)[:300]
+    if not res['note']:
+        few = [f'{c}: {", ".join(k[:3])}' for c in keep if c.endswith('.json') and (k := shrunk_counts(c))]
+        if few:
+            res['note'] = 'fit ran on fewer rows than the committed one: ' + '; '.join(few)[:300]
     if not res['note'] and j.get('check'):
         c = subprocess.run(j['check'], shell=True, cwd=ROOT, timeout=3600, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         if c.returncode != 0:
@@ -248,6 +282,9 @@ def cmd_run(name):
 def cmd_plan(args):
     st = load()
     names = list(JOBS) if '--all' in args else [a for a in args if a in JOBS] or [n for n, j in JOBS.items() if is_due(n, j, st)]
+    for n in [n for n in names if JOBS[n].get('local')]:
+        print(f'{n}: local only, not planned ({JOBS[n]["local"][:80]})', file=sys.stderr)
+    names = [n for n in names if not JOBS[n].get('local')]
     inc = [{'job': n, 'timeout': JOBS[n]['timeout'] + 15, 'cache': ' '.join(JOBS[n].get('cache', []))} for n in names]
     m = json.dumps({'include': inc})
     print(m)
@@ -274,6 +311,10 @@ def cmd_collect(d):
     for n, jb in JOBS.items():
         e = st['jobs'].setdefault(n, {})
         e['cmd'], e['months'], e['every'], e['sport'] = jb['cmd'], jb['months'], jb['every'], jb.get('sport')
+        if jb.get('local'):
+            e['local'] = True
+        else:
+            e.pop('local', None)
     st['asof'] = now().strftime('%Y-%m-%dT%H:%M:%SZ')
     st['about'] = ('Scheduled model refits (scripts/refit.py, .github/workflows/model-refits.yml, Mondays): each job refits '
                    'its model on the data to date in its season months every `every` days, kept only if it exits clean, '
@@ -302,7 +343,7 @@ def cmd_status():
     st = load()
     for n, j in JOBS.items():
         s = st.get('jobs', {}).get(n, {})
-        print(f'{n:20} months {",".join(map(str, j["months"])):28} every {j["every"]:>3}d  due {is_due(n, j, st)!s:5}  '
+        print(f'{n:20} months {",".join(map(str, j["months"])):28} every {j["every"]:>3}d  due {"local" if j.get("local") else is_due(n, j, st)!s:5}  '
               f'last {s.get("last")} {s.get("status")} {s.get("note", "")[:60]}')
 
 

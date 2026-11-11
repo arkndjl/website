@@ -234,7 +234,8 @@
     3
    ],
    "every": 28,
-   "sport": "cbb"
+   "sport": "cbb",
+   "local": true
   },
   "tennis_model": {
    "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit",
@@ -269,7 +270,8 @@
     3
    ],
    "every": 28,
-   "sport": "cbb"
+   "sport": "cbb",
+   "local": true
   },
   "cbb_espn_logs": {
    "cmd": "python3 scripts/cbb_espn_logs.py --fit && python3 scripts/cbb_espn_logs.py --check",
@@ -278,7 +280,8 @@
     2
    ],
    "every": 56,
-   "sport": "cbb"
+   "sport": "cbb",
+   "local": true
   },
   "tennis_picks": {
    "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_picks.py --fit",
