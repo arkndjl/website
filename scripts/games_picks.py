@@ -405,8 +405,16 @@ def fit():
 # switched on on the SBR seasons after them, measured on the seasons with the history's own (ESPN) opens, which are
 # the opens we bet now. Before: CFB 2023-24 / 2025 / 2026, CBB 2024 / 2025 / 2026 (spreads only), NFL on results.
 RULES = os.path.join(ROOT, 'data', 'games_picks_rules.json')
-RULE_TUNE = {'cfb': tuple(range(2017, 2021)), 'cbb': tuple(range(2016, 2021)), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2020))}
-RULE_VAL = {'cfb': (2021, 2022), 'cbb': (2021,), 'nba': (2024,), 'nfl': (2020, 2021)}   # switch on here; () = on the tuning season
+RULE_TUNE = {'cfb': tuple(range(2017, 2021)), 'cbb': (2025,), 'nba': (2025,), 'nfl': tuple(range(2015, 2020))}
+RULE_VAL = {'cfb': (2021, 2022), 'cbb': (2026,), 'nba': (2026,), 'nfl': (2020, 2021)}   # switch on here; () = on the tuning season
+# Basketball re-judged on recent seasons plus live (Noah, Nov 11 2026). The stored closes change source at 2025 (CBB and
+# NBA closes end in .5 about half the time through 2024, every time since) and the CBB model's slope on the older,
+# softer closes ran .33-.66 against .17-.27 since, so older seasons flattered every basketball rule. Set before the
+# refit: X on 2025, switched on on 2026, and the live record is the test: a market is off once 30+ live picks at its X
+# lose to the close. The stakes calibrate on 2026 (the history's only season after tuning) pooled with the live picks;
+# segments are switched on on 2026 after the BH cut and the live rule monitor governs them from there
+LIVE_TEST = {'cbb', 'nba'}
+LIVE_VETO_N = 30
 TUNE_KEEP_T = 2.0               # the t a market needs where its X was also picked (no separate validation season)
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65
@@ -614,6 +622,18 @@ def x_cut(sport, mk, es):
             'timing': DU.TIMING, 'leak': DU.LEAK.get(sport)}
 
 
+def live_rec(sport, mk, x):
+    """the graded live picks (units.live_pairs: every flagged pick, judged at BASE) a rule at X would have made"""
+    v = [c for g, c, _ in DU.live_pairs(sport, mk) if g >= x]
+    n = len(v)
+    if n < 2:
+        return {'n': n, 'clvRet': v[0] if v else None, 'clvT': None}
+    mu = sum(v) / n
+    sd = math.sqrt(sum((a - mu) ** 2 for a in v) / (n - 1))
+    return {'n': n, 'clvRet': round(mu, 4), 'clvT': round(mu / (sd / math.sqrt(n)), 2) if sd else None,
+            'days': len({d for g, _, d in DU.live_pairs(sport, mk) if g >= x})}
+
+
 def fit_rules():
     """data/games_picks_rules.json: X and the record for every sport and market"""
     F = json.load(open(FIT))['sports']
@@ -630,6 +650,8 @@ def fit_rules():
             rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None] if at_open else rows
             val = set(RULE_VAL[sport])
             held = sorted({r['S'] for r in rs if r['S'] > max(tune | val)})
+            if sport in LIVE_TEST and not held:
+                held = sorted(val & {r['S'] for r in rs})
             if not rs or not held:
                 out['markets'][mk] = {'on': False, 'why': 'no opening lines for this market in the history'}
                 continue
@@ -668,6 +690,11 @@ def fit_rules():
                                        else 'did not beat the close on the ' + ('validation' if val else 'tuning') + ' season')
                 if on and (ho['n'] < 20 or (ho['clvRet'] or 0) <= 0):
                     on, why = False, 'did not beat the close on the test seasons'
+                if sport in LIVE_TEST:
+                    lv = live_rec(sport, mk, x)
+                    m['liveRec'] = lv
+                    if on and lv['n'] >= LIVE_VETO_N and (lv['clvRet'] or 0) <= 0:
+                        on, why = False, f"lost to the close live ({lv['n']} picks at {x}+, {lv['clvRet']:+.1%})"
             else:
                 on = vo['n'] >= 30 and (vo['roi'] or 0) > 0 and ho['n'] >= 30 and (ho['roi'] or 0) > 0
                 why = None if on else 'lost on the validation or test seasons'
@@ -804,6 +831,8 @@ def fit_segments(res):
                 continue
             cap = caps[0] if mk == 'spread' else caps[1]
             held = sorted({r['S'] for r in rs if r['S'] > max(tune | val)})
+            if sport in LIVE_TEST and not held:
+                held = sorted(val & {r['S'] for r in rs})
             par = res['sports'][sport]['markets'][mk]
             # every pick at the smallest X, tagged with its segments; larger X filter these
             allp = rule_bets(sport, rs, mk, RULE_GRID[mk][0], True, cap)
@@ -870,6 +899,9 @@ def fit_segments(res):
         on = i in keep and c['held']['n'] >= 10 and (c['held']['clvRet'] or 0) > 0
         if on and (c['sport'], c['mk']) in SEG_HOLD:
             on, c['why'] = False, SEG_HOLD[(c['sport'], c['mk'])]
+        pw = (res['sports'][c['sport']]['markets'][c['mk']].get('why') or '')
+        if on and c['sport'] in LIVE_TEST and pw.startswith('lost to the close live'):
+            on, c['why'] = False, 'its market ' + pw     # the live record that switched the market off covers its segments
         c['on'] = on
         if i in keep and not on and not c.get('why'):
             c['why'] = 'lost to the close on the test seasons'
