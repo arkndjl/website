@@ -99,7 +99,7 @@
     function render() {
       if (!D) return;
       var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, S = season(),
-          mk = D.min && D.min.k, mv = D.min ? +(e.min.value || 0) : 0, C = cols(), key = view,
+          mk = D.min && D.min.k, mv = !D.min ? 0 : e.min.value === 'q' ? (S.qual || 0) : +(e.min.value || 0), C = cols(), key = view,
           lo = D.cols.some(function (c) { return c.k === key && c.lo; });   // lo: lower is better (a mock slot, a rank)
       var list = S.rows.filter(function (r) {
         if (mk && (r[mk] || 0) < mv) return false;

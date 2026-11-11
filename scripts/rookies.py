@@ -212,7 +212,7 @@ def nba():
                 q = q or {}
                 row.update({'pxpm': q.get('pxpm'), 'pvorx': q.get('pvorx'), 'sur': q.get('sur'), 'sal': q.get('sal')})
             rows.append(row)
-        seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games')})
+        seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games'), 'qual': round(1000 * gms / 82), 'mdef': 'q'})
     seasons.reverse()
     write('nba', {
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
@@ -233,7 +233,7 @@ def nba():
         'pre': {'l': 'Pick', 't': 'overall pick (year shown when drafted earlier; UDFA: undrafted)'},
         'pfv': {'l': 'Pre FV', 't': 'draft-year FV on the CBB board, mean outcome'},
         'pos': ['PG', 'SG', 'SF', 'PF', 'C'],
-        'min': {'k': 'mp', 'l': 'MP', 'opts': [[0, 'any'], [100, '100+'], [500, '500+'], [1000, '1,000+']], 'def': 0},
+        'min': {'k': 'mp', 'l': 'MP', 'opts': [['q', 'qualified'], [0, 'any'], [100, '100+'], [500, '500+'], [1000, '1,000+']], 'def': 'q'},
         'seasons': seasons})
 
 

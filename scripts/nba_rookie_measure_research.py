@@ -12,7 +12,8 @@ Measures (rookie season):
     axpm  role_sxpm + k (age - 21)          r3    a + b role_sxpm + c (age - 21) + d ln(1 + MP82)
     vage  a + b VORX + c (age - 21)
 axpm, r3 and vage are fit leave one class out on the target being scored; the others need no fit.
-Score: Spearman rho within each held-out class (the board sorts), mean over classes, all rookies and 500+ MP;
+Score: Spearman rho within each held-out class (the board sorts), mean over classes, all rookies, 500+ MP and qualified
+(1,000 MP per 82 team games, the XPM board's line);
 classes won vs VORX; held-out RMSE after a leave-one-class-out linear calibration; paired squared-error t vs VORX.
 Pre-registered: the rookie board's default sort = the plain measure (vorx, rxpm, pxpm, axpm) with the highest mean
 rho on fv at all minutes; a fitted measure replaces it only if it beats it in 10+ of 13 classes on fv AND fx.
@@ -71,7 +72,7 @@ def main():
              'vage': loco(np.column_stack([one, vorx, a]), T, S, classes)}
         cal = {k: (v if k in ('axpm', 'r3', 'vage') else loco(np.column_stack([one, v]), T, S, classes)) for k, v in M.items()}
         out = {}
-        for lab, m in (('all', mp >= 0), ('500', mp >= 500)):
+        for lab, m in (('all', mp >= 0), ('500', mp >= 500), ('qual', mp82 >= 1000)):
             base = [spearman(M['vorx'][m & (S == c)], T[m & (S == c)]) for c in classes]
             e0 = (cal['vorx'] - T)[m] ** 2
             for k, v in M.items():
@@ -87,7 +88,8 @@ def main():
         print(tn)
         for k, v in out.items():
             print(f"  {k:5s}  all rho {v['all']['rho']:.3f} won {v['all']['wonVsVorx']:2d}/13 rmse {v['all']['rmse']:.3f} t {v['all']['tVsVorx']:+.2f}"
-                  f"  | 500+ rho {v['500']['rho']:.3f} won {v['500']['wonVsVorx']:2d}/13 rmse {v['500']['rmse']:.3f} t {v['500']['tVsVorx']:+.2f}")
+                  f"  | 500+ rho {v['500']['rho']:.3f} won {v['500']['wonVsVorx']:2d}/13 rmse {v['500']['rmse']:.3f} t {v['500']['tVsVorx']:+.2f}"
+                  f"  | qual rho {v['qual']['rho']:.3f} won {v['qual']['wonVsVorx']:2d}/13 n {v['qual']['n']}")
 
 
 if __name__ == '__main__':
