@@ -1,0 +1,36 @@
+# 247 composite high-school classes from CFBD for the CFB FV harnesses (scripts/cfb_recruits_cfbd.mjs), uploaded as an
+# artifact (download it into scripts/data/ and commit). Run by hand from the Actions tab; ~17 CFBD calls at most.
+name: cfb recruits cfbd
+
+on:
+  workflow_dispatch:
+    inputs:
+      first:
+        default: "2009"
+      last:
+        default: "2025"
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/cfb/hist
+          key: cfbhist-none
+          restore-keys: cfbhist-
+      - name: Pull
+        run: node scripts/cfb_recruits_cfbd.mjs ${{ inputs.first }} ${{ inputs.last }}
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          MIN_LEFT: "500"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cfb-recruits-cfbd
+          path: scripts/data/cfb_recruits_cfbd.json.gz
+          retention-days: 7
