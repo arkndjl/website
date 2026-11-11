@@ -9,6 +9,8 @@
 - no file under static/ over Cloudflare Pages' 25 MiB per-file limit (warning from 23 MiB)
 - static/data/cfb-all.json and cfb-detail.json carry the same dk (the board split in two, scripts/cfb_all.mjs): a
   mismatched pair leaves every scouting report off the board
+- static/data/cbb-past.json carries fvg (the grade; fv and fvx at the mean outcome) and data/cbb_fit.json carries
+  calibMean: both come from scripts/fv_dist.py past_at_mean, which cbb_fit.py runs after it rewrites the past boards
 - with --hugo: data/team_alias.json (the browser's team short forms, layouts/partials/namekey.html) matches
   scripts/names.py TEAM_ALIAS; `python3 scripts/names.py --teams` rewrites it
 Local hook: git config core.hooksPath .githooks (runs the fast checks on each commit). Stdlib only."""
@@ -55,6 +57,21 @@ def check_pairs():
     return [] if a and a == b else [f'static/data/cfb-all.json dk {a} vs cfb-detail.json dk {b}: write both with scripts/cfb_all.mjs']
 
 
+def check_cbb_mean():
+    errs = []
+    try:
+        with open(os.path.join(ROOT, 'static', 'data', 'cbb-past.json'), encoding='utf-8') as fh: cols = json.load(fh)['cols']
+        if 'fvg' not in cols: errs.append('static/data/cbb-past.json has no fvg (past boards on the grade): run python3 scripts/fv_dist.py --past')
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
+        with open(os.path.join(ROOT, 'data', 'cbb_fit.json'), encoding='utf-8') as fh: F = json.load(fh)
+        if not F.get('calibMean'): errs.append('data/cbb_fit.json has no calibMean: run python3 scripts/fv_dist.py --past')
+    except (OSError, ValueError):
+        pass
+    return errs
+
+
 def check_teams():
     sys.path.insert(0, os.path.join(ROOT, 'scripts'))
     import names
@@ -78,7 +95,7 @@ def check_hugo():
 
 if __name__ == '__main__':
     errs, n = check_json()
-    e2, warns = check_sizes(); errs += e2 + check_pairs()
+    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean()
     if '--hugo' in sys.argv[1:]: errs += check_teams()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)
