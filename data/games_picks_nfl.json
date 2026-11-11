@@ -1,16 +1,16 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-11T18:59:29Z",
+ "asof": "2026-11-11T19:45:44Z",
  "recenter": {},
  "monitor": {
   "clocks": {
    "spread": {
     "hash": "20f6c609b8",
-    "since": "2026-11-01T20:50:54Z",
+    "since": "2026-10-28T02:43:16Z",
     "mk": "spread",
     "x": 4.0,
-    "k0": 0.344
+    "k0": 0.348
    },
    "total": {
     "hash": "c5444e8998",
@@ -23,37 +23,37 @@
   "stopped": {},
   "checks": {
    "spread": {
-    "n": 6,
-    "window": 6,
-    "mean": 0.0553,
-    "t": 1.9,
+    "n": 9,
+    "window": 9,
+    "mean": 0.0331,
+    "t": 1.05,
     "p": null,
-    "days": 3,
+    "days": 4,
     "sd": 0.1257,
     "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusumMax": 0.31,
     "h": 10.0,
     "rho": 0.138,
     "edge": {
      "cusum": 0.0,
-     "cusumMax": 0.0,
+     "cusumMax": 0.23,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0406,
-     "n": 2,
+     "n": 3,
      "sd": 0.1257,
      "rho": 0.138,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.269,
-     "info": 0.21,
-     "real": 1.793,
-     "realSe": 2.19,
+     "llr": 0.036,
+     "info": 0.31,
+     "real": 0.614,
+     "realSe": 1.788,
      "need": 56
     }
    },
@@ -94,7 +94,35 @@
    }
   }
  },
- "picks": [
+ "paper": true,
+ "paperState": {
+  "paper": true,
+  "since": "2026-11-11T20:00:00Z",
+  "why": "owner: paper until live picks beat the close (Nov 11 2026)",
+  "pooled": {
+   "n": 13,
+   "days": 4,
+   "llr": -0.839,
+   "lo": -2.944,
+   "hi": 2.944,
+   "state": "watching",
+   "at": null,
+   "sd": 0.12,
+   "rho": 0.05,
+   "real": -0.223,
+   "realSe": 0.879,
+   "clvRet": -0.0299,
+   "evDU": 0.0298
+  },
+  "back": {
+   "n": 0,
+   "clvRet": null,
+   "t": null,
+   "days": 0
+  }
+ },
+ "picks": [],
+ "paperPicks": [
   {
    "id": "2026_10_WAS_NYG",
    "espn": "401873052",
@@ -125,7 +153,8 @@
     "price": 130.0,
     "ev": 0.074,
     "units": 4.5
-   }
+   },
+   "paper": true
   },
   {
    "id": "2026_10_JAX_TEN",
@@ -140,7 +169,7 @@
    "price": 111.0,
    "p": 0.489,
    "ev": 0.032,
-   "units": 2.0,
+   "units": 2.5,
    "edge": 4.0,
    "x": 4.0,
    "pDU": 0.4889,
@@ -153,8 +182,7 @@
    "close": -10.5,
    "pass": true,
    "now": null,
-   "unitsRaw": 2.5,
-   "unitsCap": 2.0
+   "paper": true
   },
   {
    "id": "2026_10_LA_ARI",
@@ -169,7 +197,7 @@
    "price": -113.0,
    "p": 0.611,
    "ev": 0.152,
-   "units": 2.0,
+   "units": 2.25,
    "edge": 7.8,
    "x": 1.5,
    "pDU": 0.5416,
@@ -187,12 +215,9 @@
     "line": 39.5,
     "price": 104.0,
     "ev": 0.195,
-    "units": 4.25,
-    "unitsRaw": 5.0,
-    "unitsCap": 4.25
+    "units": 5.0
    },
-   "unitsRaw": 2.25,
-   "unitsCap": 2.0
+   "paper": true
   },
   {
    "id": "2026_10_MIN_GB",
@@ -219,16 +244,8 @@
    "close": 3.5,
    "unitsRaw": 1.0,
    "unitsCap": 0.75,
-   "now": {
-    "mk": "ml",
-    "side": "away",
-    "line": null,
-    "price": 156.0,
-    "ev": 0.201,
-    "units": 1.0,
-    "unitsRaw": 1.25,
-    "unitsCap": 1.0
-   }
+   "now": null,
+   "paper": true
   },
   {
    "id": "2026_10_JAX_TEN",
@@ -243,7 +260,7 @@
    "price": -102.0,
    "p": 0.548,
    "ev": 0.085,
-   "units": 1.25,
+   "units": 1.5,
    "edge": 3.4,
    "x": 1.5,
    "pDU": 0.5135,
@@ -260,12 +277,9 @@
     "line": 46.5,
     "price": -104.0,
     "ev": 0.084,
-    "units": 2.0,
-    "unitsRaw": 2.25,
-    "unitsCap": 2.0
+    "units": 2.25
    },
-   "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "paper": true
   },
   {
    "id": "2026_10_WAS_NYG",
@@ -298,7 +312,8 @@
     "price": 104.0,
     "ev": 0.125,
     "units": 2.75
-   }
+   },
+   "paper": true
   },
   {
    "id": "2026_10_MIA_IND",
@@ -313,7 +328,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.078,
-   "units": 1.25,
+   "units": 1.5,
    "edge": 3.5,
    "x": 1.5,
    "pDU": 0.5221,
@@ -329,13 +344,10 @@
     "side": "over",
     "line": 37.5,
     "price": -111.0,
-    "ev": 0.146,
-    "units": 3.5,
-    "unitsRaw": 4.0,
-    "unitsCap": 3.5
+    "ev": 0.144,
+    "units": 3.5
    },
-   "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "paper": true
   },
   {
    "id": "2026_10_MIN_GB",
@@ -350,7 +362,7 @@
    "price": -104.0,
    "p": 0.56,
    "ev": 0.099,
-   "units": 1.0,
+   "units": 1.25,
    "edge": 4.4,
    "x": 1.5,
    "pDU": 0.5162,
@@ -366,13 +378,10 @@
     "side": "under",
     "line": 42.5,
     "price": -113.0,
-    "ev": 0.081,
-    "units": 1.0,
-    "unitsRaw": 1.25,
-    "unitsCap": 1.0
+    "ev": 0.083,
+    "units": 1.75
    },
-   "unitsRaw": 1.25,
-   "unitsCap": 1.0
+   "paper": true
   },
   {
    "id": "2026_10_SEA_LV",
@@ -387,7 +396,7 @@
    "price": -104.0,
    "p": 0.551,
    "ev": 0.081,
-   "units": 0.75,
+   "units": 1.0,
    "edge": 3.6,
    "x": 1.5,
    "pDU": 0.5144,
@@ -404,12 +413,9 @@
     "line": 40.5,
     "price": -104.0,
     "ev": 0.091,
-    "units": 2.0,
-    "unitsRaw": 2.5,
-    "unitsCap": 2.0
+    "units": 2.5
    },
-   "unitsRaw": 1.0,
-   "unitsCap": 0.75
+   "paper": true
   },
   {
    "id": "2026_10_HOU_CLE",
@@ -439,12 +445,11 @@
     "mk": "total",
     "side": "under",
     "line": 40.5,
-    "price": 108.0,
-    "ev": 0.059,
-    "units": 0.5,
-    "unitsRaw": 0.75,
-    "unitsCap": 0.5
-   }
+    "price": 106.0,
+    "ev": 0.052,
+    "units": 0.25
+   },
+   "paper": true
   },
   {
    "id": "2026_10_LAC_BAL",
@@ -477,7 +482,8 @@
     "price": -108.0,
     "ev": 0.057,
     "units": 0.75
-   }
+   },
+   "paper": true
   },
   {
    "id": "2026_10_NE_DET",
@@ -503,18 +509,28 @@
    "flagged": "2026-11-10T20:04:24Z",
    "betTo": 51.0,
    "close": 50.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 50.5,
-    "price": -108.0,
-    "ev": 0.039,
-    "units": 0.25
-   }
+   "now": null,
+   "paper": true
   }
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "2026_10_NE_DET",
+   "sport": "nfl",
+   "kick": "2026-11-15T14:30:00Z",
+   "home": "DET",
+   "away": "NE",
+   "mk": "total",
+   "side": "over",
+   "line": 50.5,
+   "price": -111.0,
+   "edge": 2.3,
+   "x": 1.5,
+   "why": "no edge at -111",
+   "m": 2.9,
+   "tm": 52.8
+  },
   {
    "id": "2026_10_PIT_CIN",
    "sport": "nfl",
@@ -524,10 +540,10 @@
    "mk": "total",
    "side": "under",
    "line": 49.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 1.7,
    "x": 1.5,
-   "why": "no edge at -108",
+   "why": "no edge at -111",
    "m": 3.3,
    "tm": 47.8
   },
@@ -607,19 +623,19 @@
    "units": 2.75,
    "home": "NYG",
    "away": "WAS",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_NE_DET": {
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -108.0,
-   "ev": 0.039,
+   "price": -111.0,
    "edge": 2.3,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "DET",
    "away": "NE",
-   "state": "pick"
+   "state": "under"
   },
   "2026_10_BUF_NYJ": {
    "mk": "spread",
@@ -649,13 +665,13 @@
    "mk": "total",
    "side": "under",
    "line": 40.5,
-   "price": 108.0,
-   "ev": 0.059,
+   "price": 106.0,
+   "ev": 0.052,
    "edge": 1.5,
-   "units": 0.75,
+   "units": 0.25,
    "home": "CLE",
    "away": "HOU",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_JAX_TEN": {
    "mk": "total",
@@ -667,7 +683,7 @@
    "units": 2.25,
    "home": "TEN",
    "away": "JAX",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_KC_ATL": {
    "mk": "spread",
@@ -686,24 +702,24 @@
    "side": "over",
    "line": 37.5,
    "price": -111.0,
-   "ev": 0.146,
+   "ev": 0.144,
    "edge": 6.5,
-   "units": 4.0,
+   "units": 3.5,
    "home": "IND",
    "away": "MIA",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_MIN_GB": {
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": -111.0,
-   "ev": 0.166,
+   "price": -122.0,
+   "ev": 0.143,
    "edge": 7.2,
-   "units": 4.5,
+   "units": 4.75,
    "home": "GB",
    "away": "MIN",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_LA_ARI": {
    "mk": "total",
@@ -715,7 +731,7 @@
    "units": 5.0,
    "home": "ARI",
    "away": "LA",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_SEA_LV": {
    "mk": "total",
@@ -727,7 +743,7 @@
    "units": 2.5,
    "home": "LV",
    "away": "SEA",
-   "state": "pick"
+   "state": "paper"
   },
   "2026_10_SF_DAL": {
    "mk": "total",
@@ -745,7 +761,7 @@
    "mk": "total",
    "side": "under",
    "line": 49.5,
-   "price": -108.0,
+   "price": -111.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -763,7 +779,7 @@
    "units": 0.75,
    "home": "BAL",
    "away": "LAC",
-   "state": "pick"
+   "state": "paper"
   }
  },
  "record": {
@@ -818,16 +834,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3272,
+  "snapshots": 3282,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1326,
-    "clvRet": -0.0199,
-    "clvT": -9.09,
+    "clvN": 1330,
+    "clvRet": -0.0201,
+    "clvT": -9.19,
     "clv": 0.43,
-    "beat": 0.343,
-    "still": 0.6
+    "beat": 0.342,
+    "still": 0.601
    },
    {
     "when": "6-24h",
@@ -2596,7 +2612,8 @@
    "tm": 45.7,
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 44.0,
-   "close": 41.5
+   "close": 41.5,
+   "paper": true
   },
   {
    "id": "2026_10_JAX_TEN",
@@ -2611,7 +2628,7 @@
    "price": 111.0,
    "p": 0.489,
    "ev": 0.032,
-   "units": 2.0,
+   "units": 2.5,
    "edge": 4.0,
    "x": 4.0,
    "pDU": 0.4889,
@@ -2623,8 +2640,7 @@
    "betTo": -10.0,
    "close": -10.5,
    "pass": true,
-   "unitsRaw": 2.5,
-   "unitsCap": 2.0
+   "paper": true
   },
   {
    "id": "2026_10_JAX_TEN",
@@ -2639,7 +2655,7 @@
    "price": -102.0,
    "p": 0.548,
    "ev": 0.085,
-   "units": 1.25,
+   "units": 1.5,
    "edge": 3.4,
    "x": 1.5,
    "pDU": 0.5135,
@@ -2650,8 +2666,7 @@
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 45.0,
    "close": 46.5,
-   "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "paper": true
   },
   {
    "id": "2026_10_MIA_IND",
@@ -2666,7 +2681,7 @@
    "price": -106.0,
    "p": 0.555,
    "ev": 0.078,
-   "units": 1.25,
+   "units": 1.5,
    "edge": 3.5,
    "x": 1.5,
    "pDU": 0.5221,
@@ -2677,8 +2692,7 @@
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 42.5,
    "close": 37.5,
-   "unitsRaw": 1.5,
-   "unitsCap": 1.25
+   "paper": true
   },
   {
    "id": "2026_10_MIN_GB",
@@ -2704,7 +2718,8 @@
    "flagged": "2026-11-10T04:50:39Z",
    "close": 3.5,
    "unitsRaw": 1.0,
-   "unitsCap": 0.75
+   "unitsCap": 0.75,
+   "paper": true
   },
   {
    "id": "2026_10_LA_ARI",
@@ -2719,7 +2734,7 @@
    "price": -113.0,
    "p": 0.611,
    "ev": 0.152,
-   "units": 2.0,
+   "units": 2.25,
    "edge": 7.8,
    "x": 1.5,
    "pDU": 0.5416,
@@ -2731,8 +2746,7 @@
    "flagged": "2026-11-10T04:50:39Z",
    "betTo": 45.5,
    "close": 39.5,
-   "unitsRaw": 2.25,
-   "unitsCap": 2.0
+   "paper": true
   },
   {
    "id": "2026_10_WAS_NYG",
@@ -2756,7 +2770,8 @@
    "tm": 45.7,
    "lineL": 2.5,
    "flagged": "2026-11-10T06:59:22Z",
-   "close": 2.5
+   "close": 2.5,
+   "paper": true
   },
   {
    "id": "2026_10_MIN_GB",
@@ -2771,7 +2786,7 @@
    "price": -104.0,
    "p": 0.56,
    "ev": 0.099,
-   "units": 1.0,
+   "units": 1.25,
    "edge": 4.4,
    "x": 1.5,
    "pDU": 0.5162,
@@ -2782,8 +2797,7 @@
    "flagged": "2026-11-10T13:48:53Z",
    "betTo": 40.0,
    "close": 42.5,
-   "unitsRaw": 1.25,
-   "unitsCap": 1.0
+   "paper": true
   },
   {
    "id": "2026_10_NE_DET",
@@ -2808,7 +2822,8 @@
    "tm": 52.8,
    "flagged": "2026-11-10T20:04:24Z",
    "betTo": 51.0,
-   "close": 50.5
+   "close": 50.5,
+   "paper": true
   },
   {
    "id": "2026_10_SEA_LV",
@@ -2823,7 +2838,7 @@
    "price": -104.0,
    "p": 0.551,
    "ev": 0.081,
-   "units": 0.75,
+   "units": 1.0,
    "edge": 3.6,
    "x": 1.5,
    "pDU": 0.5144,
@@ -2834,8 +2849,7 @@
    "flagged": "2026-11-10T20:04:24Z",
    "betTo": 42.5,
    "close": 40.5,
-   "unitsRaw": 1.0,
-   "unitsCap": 0.75
+   "paper": true
   },
   {
    "id": "2026_10_LAC_BAL",
@@ -2860,7 +2874,8 @@
    "tm": 41.3,
    "flagged": "2026-11-10T21:26:16Z",
    "betTo": 39.5,
-   "close": 38.5
+   "close": 38.5,
+   "paper": true
   },
   {
    "id": "2026_10_HOU_CLE",
@@ -2885,7 +2900,8 @@
    "tm": 39.0,
    "flagged": "2026-11-11T17:55:12Z",
    "betTo": 40.5,
-   "close": 40.5
+   "close": 40.5,
+   "paper": true
   }
  ],
  "withdrawnLog": [],
@@ -2893,27 +2909,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-11": {
-    "raw": 13.75,
-    "scale": 1.0
-   },
-   "2026-11-12": {
-    "raw": 12.25,
-    "scale": 1.0
-   },
-   "2026-11-13": {
-    "raw": 5.0,
-    "scale": 1.0
-   },
-   "2026-11-14": {
-    "raw": 39.0,
-    "scale": 1.0
-   },
-   "2026-11-15": {
-    "raw": 44.75,
-    "scale": 0.8939
-   },
-   "2026-11-16": {
-    "raw": 5.75,
+    "raw": 9.75,
     "scale": 1.0
    }
   }

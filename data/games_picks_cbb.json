@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-11T18:59:32Z",
+ "asof": "2026-11-11T19:45:46Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -68,80 +68,37 @@
     "test": "drift"
    }
   },
-  "checks": {
-   "spread": {
-    "n": 79,
-    "window": 79,
-    "mean": -0.0196,
-    "t": -1.2,
-    "p": null,
-    "days": 3,
-    "sd": 0.1123,
-    "cusum": 3.89,
-    "cusumMax": 3.89,
-    "h": 10.0,
-    "rho": 0.01,
-    "edge": {
-     "cusum": 1.47,
-     "cusumMax": 1.47,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0099,
-     "n": 65,
-     "sd": 0.1123,
-     "rho": 0.01,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": -1.465,
-     "info": 0.5,
-     "real": -3.253,
-     "realSe": 1.551,
-     "need": 763
-    }
-   },
-   "total": {
-    "n": 84,
-    "window": 84,
-    "mean": -0.0314,
-    "t": -2.9,
-    "p": null,
-    "days": 3,
-    "sd": 0.1113,
-    "cusum": 0.04,
-    "cusumMax": 0.41,
-    "h": 10.0,
-    "rho": 0.058,
-    "edge": {
-     "cusum": 1.13,
-     "cusumMax": 1.13,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0174,
-     "n": 84,
-     "sd": 0.1113,
-     "rho": 0.058,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": -1.134,
-     "info": 2.05,
-     "real": -1.686,
-     "realSe": 1.12,
-     "need": 242
-    }
-   }
+  "checks": {}
+ },
+ "paper": true,
+ "paperState": {
+  "paper": true,
+  "since": "2026-11-11T20:00:00Z",
+  "why": "owner: paper until live picks beat the close (Nov 11 2026)",
+  "pooled": {
+   "n": 147,
+   "days": 3,
+   "llr": -2.511,
+   "lo": -2.944,
+   "hi": 2.944,
+   "state": "watching",
+   "at": null,
+   "sd": 0.12,
+   "rho": 0.05,
+   "real": -0.867,
+   "realSe": 0.366,
+   "clvRet": -0.032,
+   "evDU": 0.0192
+  },
+  "back": {
+   "n": 0,
+   "clvRet": null,
+   "t": null,
+   "days": 0
   }
  },
  "picks": [],
+ "paperPicks": [],
  "withdrawn": [],
  "board": [],
  "games": {},
@@ -7555,27 +7512,7 @@
   "cap": 40.0,
   "nights": {
    "2026-11-11": {
-    "raw": 13.75,
-    "scale": 1.0
-   },
-   "2026-11-12": {
-    "raw": 12.25,
-    "scale": 1.0
-   },
-   "2026-11-13": {
-    "raw": 5.0,
-    "scale": 1.0
-   },
-   "2026-11-14": {
-    "raw": 39.0,
-    "scale": 1.0
-   },
-   "2026-11-15": {
-    "raw": 44.75,
-    "scale": 0.8939
-   },
-   "2026-11-16": {
-    "raw": 5.75,
+    "raw": 9.75,
     "scale": 1.0
    }
   }
