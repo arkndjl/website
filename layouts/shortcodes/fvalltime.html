@@ -8,7 +8,7 @@
     "cfb" (dict "icon" "football" "unit" "player-seasons" "what" "FBS seasons" "out" "NFL AV a season through 2025, read on the FV scale; drafts 2015-23 (later picks show as pending)")
     "cbb" (dict "icon" "basketball" "unit" "players" "what" "seasons (top 300 each)" "out" "peak NBA value (XPM and role) on the FV scale, college exits through 2020; the grade reads his last season and the June draft boards; internationals on the boards from the international model, at their draft")
     "hockey" (dict "icon" "hockey" "unit" "picks" "what" "draft classes" "out" "peak NHL WAR (goalies GSAx) on the FV scale")
-    "soccer" (dict "icon" "soccer" "unit" "player-seasons" "what" "seasons" "out" "peak GAR (best three seasons, ages 22-26) on the FV scale")
+    "soccer" (dict "icon" "soccer" "unit" "player-seasons" "what" "seasons" "out" "peak tGAR (best three seasons, ages 22-26) on the FV scale")
     "tennis" (dict "icon" "tennis" "unit" "player-seasons" "what" "seasons" "out" "peak ranking on the FV scale") -}}
 {{- $c := index $cfg $sport -}}
 {{- with index site.Data.fv_alltime $sport -}}

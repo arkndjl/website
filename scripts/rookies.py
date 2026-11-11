@@ -490,8 +490,8 @@ def soccerp():
     write('soccerp', {
         'asof': d.get('asof'), 'title': f"first senior season {d.get('season', '')}", 'key': 'fv',
         'def': 'first-year: on the prospect board with no senior league minutes last season (this is the debut season).',
-        'views': [['fv', 'FV', 'FV: mean outcome grade'], ['gar', 'GAR', 'goals above replacement this season'], ['mv', 'MV', 'Transfermarkt value, EUR M']],
-        'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('gar', 'GAR', 'goals above replacement this season', '2'),
+        'views': [['fv', 'FV', 'FV: mean outcome grade'], ['gar', 'tGAR', 'team-share goals above replacement this season (not the senior GAR)'], ['mv', 'MV', 'Transfermarkt value, EUR M']],
+        'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('gar', 'tGAR', 'team-share goals above replacement this season (not the senior GAR)', '2'),
                  col('p50', '50+%', 'chance of a 50+ FV outcome', 'p', 1), col('mv', 'MV', 'Transfermarkt market value, EUR M', 'e', 1),
                  col('min', 'Min', 'league minutes', 'i', 1)],
         'pos': ['F', 'M', 'D', 'G'],

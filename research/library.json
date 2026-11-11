@@ -658,10 +658,9 @@
       "Goalies: GSAx at full credit. Sums to team goal differential (R2 .991).",
       "Replacement = players outside each team's top 13 F / 7 D / 2 G."
      ],
-     "where": "NHL WAR leaders, rookies; hockey prospect outcome",
+     "where": "NHL WAR leaders, rookies",
      "sports": [
-      "NHL",
-      "Hockey"
+      "NHL"
      ]
     },
     {
@@ -672,9 +671,10 @@
       "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .37 vs .26 before (t 4.24, 15/17 seasons).",
       "Goalie GSAx barely repeats (weight .21), so goalie pWAR ~0.4 while goalie WAR runs ~7."
      ],
-     "where": "NHL WAR leaders, backup watch, rookies",
+     "where": "NHL WAR leaders, backup watch, rookies; hockey prospect outcome (skaters)",
      "sports": [
-      "NHL"
+      "NHL",
+      "Hockey"
      ]
     },
     {
@@ -715,11 +715,11 @@
      ]
     },
     {
-     "term": "GAR (soccer prospects)",
-     "short": "Team-share value: minutes / 90 x (club rating - replacement) / 11.",
+     "term": "tGAR (soccer prospects)",
+     "short": "Team-share goals above replacement: minutes / 90 x (club rating - replacement) / 11.",
      "body": [
       "Club rating = goals a match vs an average big-five club; replacement -2.5 (a bottom Scotland/Greece/Denmark side).",
-      "Outcome = mean of the best three GAR seasons at ages 22-26. Differs from the senior GAR above."
+      "Outcome = mean of the best three tGAR seasons at ages 22-26. Differs from the senior GAR above (about 4-5x larger)."
      ],
      "where": "Soccer prospects board, first-year tab",
      "sports": [

@@ -108,7 +108,7 @@
   }
   function hkKnots(r) { return [[30, r.p30], [40, r.p40], [50, r.p50], [60, r.p60]]; }
 
-  var SP_LAB = { age: 'age', mv: 'market value', pos: 'position (and how the market prices it)', gar_td: 'value this season (GAR)', gar1: 'value last season (GAR)',
+  var SP_LAB = { age: 'age', mv: 'market value', pos: 'position (and how the market prices it)', gar_td: 'value this season (tGAR)', gar1: 'value last season (tGAR)',
     share_td: 'minutes share', rclub_td: 'club strength', lg_share: 'minutes share x league strength', ga90_td: 'goals + assists a 90', ymins: 'Premier League 2 minutes',
     ht: 'height (keepers on their own slope)', age_lmv: 'age x market value', res_parm: 'B-team / feeder minutes x first-team strength',
     res_young: 'feeder-league minutes, young for the level', uyl_young: 'UEFA Youth League minutes, young for the level', acad_ga: 'U18/U19 league goals + assists a 90',
@@ -123,8 +123,8 @@
         case 'age': return 'age ' + fa(r) + ' at the season start';
         case 'mv': return 'market value ' + eur(r.mv);
         case 'pos': return 'a ' + (SPOS[r.pos] || r.pos) + (r.grp === 'F' ? ': the market overprices forwards' : r.grp === 'G' ? ': the market underprices keepers' : '');
-        case 'gar_td': return f1(r.gar) + ' GAR this season in ' + r.min + ' minutes';
-        case 'gar1': return f1(r.gar1) + ' GAR last season in ' + r.min1 + ' minutes';
+        case 'gar_td': return f1(r.gar) + ' tGAR this season in ' + r.min + ' minutes';
+        case 'gar1': return f1(r.gar1) + ' tGAR last season in ' + r.min1 + ' minutes';
         case 'share_td': return Math.round(r.sh * 100) + '% of his club\'s league minutes';
         case 'rclub_td': return r.rc != null ? 'club rating ' + sgn(r.rc, 2) + ' goals a match vs an average big-five side' : 'no senior club this season';
         case 'lg_share': return Math.round(r.sh * 100) + '% of the minutes in ' + (r.league || 'his league');
@@ -217,8 +217,8 @@
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.club || '-') + (r.league ? ' (' + esc(r.league) + ')' : '') + ' · FV ' + r.fv +
         ' · Top ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + ' · Star ' + pc(r.p60) + link + '</p>' +
-        '<p class="cfb__role">this season: ' + r.min + ' min' + (r.sh ? ' (' + Math.round(r.sh * 100) + '% of league minutes)' : '') + ', ' + r.ga + ' goals + assists, ' + f1(r.gar) + ' GAR' +
-        (r.rc != null ? ' · club rating ' + sgn(r.rc, 2) : '') + ' · last season: ' + r.min1 + ' min, ' + f1(r.gar1) + ' GAR' + (r.ym ? ' · ' + r.ym + ' PL2 min' : '') + '.</p>' +
+        '<p class="cfb__role">this season: ' + r.min + ' min' + (r.sh ? ' (' + Math.round(r.sh * 100) + '% of league minutes)' : '') + ', ' + r.ga + ' goals + assists, ' + f1(r.gar) + ' tGAR' +
+        (r.rc != null ? ' · club rating ' + sgn(r.rc, 2) : '') + ' · last season: ' + r.min1 + ' min, ' + f1(r.gar1) + ' tGAR' + (r.ym ? ' · ' + r.ym + ' PL2 min' : '') + '.</p>' +
         '<p class="cfb__role">market value ' + eur(r.mv) + (r.ht ? ' · ' + r.ht + ' cm' : '') + ' · age ' + fa(r) + (r.prov ? ' · provisional: no senior minutes yet' : '') + '.</p>' +
         // predictive badges (scripts/soccer_badges.py), the chips of layouts/partials/badges.html
         (r.bdg ? '<p class="cfb__badges">' + r.bdg.map(function (x) { var T = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' }[x[1]]; return '<span class="cfb__bdg cfb__bdg--' + esc(x[1]) + '" title="' + esc(T + ' ' + x[0] + ': ' + x[2] + ' pct at position, ' + x[3] + '; predictive of outcome FV beyond the grade') + '">' + esc(T + ' ' + x[0]) + '</span>'; }).join('') + '</p>' : '') +

@@ -17,7 +17,7 @@
     <th title="age on July 1 of this season">Age</th>
     <th class="hk__x" title="Transfermarkt market value, euros">Value</th>
     <th class="hk__x" title="minutes this season in league and European games">Min</th>
-    <th class="hk__x" title="goals above replacement this season so far: minutes/90 x (club rating - replacement) / 11, at last season's club ratings">GAR</th>
+    <th class="hk__x" title="team-share goals above replacement this season so far: minutes/90 x (club rating - replacement) / 11, at last season's club ratings (not the senior board's GAR)">tGAR</th>
     <th title="chance of a 40+ outcome: a regular in one of the 14 covered top flights or better (top 250 of a birth year at his position)">Top%</th>
     <th title="chance of a 50+ outcome: big-five regular level (top 90 of a birth year at his position)">Reg%</th>
     <th class="hk__x" title="chance of a 60+ outcome: top 20 of a birth year at his position">Star%</th>
@@ -52,8 +52,8 @@
   <thead><tr>
     <th>RK</th><th>Player</th><th title="the season of his first grade (October 24 snapshot)">Season</th><th>Age</th><th>Pos</th><th class="hk__x">Club</th>
     <th class="cfb__g" title="his grade on October 24 of that season, fit without that season (out of sample)">FV</th>
-    <th title="outcome FV: peak value (best three GAR seasons at ages 22-26) on the same scale">Out</th>
-    <th class="hk__x" title="peak: mean of his best three seasons of goals above replacement at ages 22-26">Peak</th>
+    <th title="outcome FV: peak value (best three tGAR seasons at ages 22-26) on the same scale">Out</th>
+    <th class="hk__x" title="peak: mean of his best three seasons of team-share goals above replacement (tGAR) at ages 22-26">Peak</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .past }}
@@ -75,12 +75,12 @@
 {{- else -}}
 {{- $f := .fit -}}
 {{- $m := .model -}}
-{{- $names := dict "age" "age (July 1)" "age2" "age, squared" "lmv" "log market value" "lmv2" "log market value, squared" "nomv" "no market value" "dmv" "market value change on the year" "gar1" "last season's value (GAR)" "gar2" "value two seasons ago" "share1" "last season's league minutes share" "rclub1" "last season's club rating" "ga90_1" "last season's goals + assists a 90" "gar_td" "this season's value so far" "share_td" "this season's minutes share" "rclub_td" "this season's club rating" "ga90_td" "this season's goals + assists a 90" "emins" "European minutes" "bench" "matchday squads (log)" "ymins" "Premier League 2 minutes" "yga" "Premier League 2 goals + assists a 90" "lg_share" "minutes share x league strength" "ht" "height" "noht" "no listed height" "gk" "goalkeeper" "fwd" "forward" "mid" "midfielder" "tier2" "second tier or smaller league" "noseen" "no senior minutes" "age_lmv" "age x market value" "ga90_fwd" "forward goals + assists a 90" "ht_gk" "height x goalkeeper" "age_share" "age x minutes share" "lmv_fwd" "market value x forward" "lmv_gk" "market value x goalkeeper" "club_up" "move to a stronger club" "res_parm" "B-team / feeder-league minutes x first-team strength" "res_young" "feeder-league minutes, young for the level" "uyl_young" "UEFA Youth League minutes, young for the level" "acad_ga" "U18/U19 league goals + assists a 90" "sp_CB" "centre-back (position block)" "sp_FB" "full-back (position block)" "sp_DM" "defensive midfield (position block)" "sp_AM" "attacking midfield (position block)" "sp_W" "winger (position block)" "sp_ST" "striker (position block)" -}}
+{{- $names := dict "age" "age (July 1)" "age2" "age, squared" "lmv" "log market value" "lmv2" "log market value, squared" "nomv" "no market value" "dmv" "market value change on the year" "gar1" "last season's value (tGAR)" "gar2" "value two seasons ago" "share1" "last season's league minutes share" "rclub1" "last season's club rating" "ga90_1" "last season's goals + assists a 90" "gar_td" "this season's value so far" "share_td" "this season's minutes share" "rclub_td" "this season's club rating" "ga90_td" "this season's goals + assists a 90" "emins" "European minutes" "bench" "matchday squads (log)" "ymins" "Premier League 2 minutes" "yga" "Premier League 2 goals + assists a 90" "lg_share" "minutes share x league strength" "ht" "height" "noht" "no listed height" "gk" "goalkeeper" "fwd" "forward" "mid" "midfielder" "tier2" "second tier or smaller league" "noseen" "no senior minutes" "age_lmv" "age x market value" "ga90_fwd" "forward goals + assists a 90" "ht_gk" "height x goalkeeper" "age_share" "age x minutes share" "lmv_fwd" "market value x forward" "lmv_gk" "market value x goalkeeper" "club_up" "move to a stronger club" "res_parm" "B-team / feeder-league minutes x first-team strength" "res_young" "feeder-league minutes, young for the level" "uyl_young" "UEFA Youth League minutes, young for the level" "acad_ga" "U18/U19 league goals + assists a 90" "sp_CB" "centre-back (position block)" "sp_FB" "full-back (position block)" "sp_DM" "defensive midfield (position block)" "sp_AM" "attacking midfield (position block)" "sp_W" "winger (position block)" "sp_ST" "striker (position block)" -}}
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
     <div class="wintable__scroll"><table class="cfb__table">
-      <thead><tr><th>FV</th><th>How rare</th><th title="peak GAR a season at the cut">GK</th><th>D</th><th>M</th><th>F</th></tr></thead>
+      <thead><tr><th>FV</th><th>How rare</th><th title="peak tGAR a season at the cut">GK</th><th>D</th><th>M</th><th>F</th></tr></thead>
       <tbody>
       {{- $per := dict "80" "one in two birth years" "75" "the best of a birth year" "70" "top 3" "65" "top 8" "60" "top 20" "55" "top 45" "50" "top 90 (big-five regular)" "45" "top 150" "40" "top 250 (top-flight regular)" }}
       {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td>{{ index $per (string (index . 0)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 1)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 2)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 3)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 4)) }}</td></tr>{{ end }}
