@@ -7,9 +7,9 @@ the NHL, graded on the 20-80 FV scale against what past picks became in the NHL.
     python3 scripts/hockey_prospects.py --fit # outcome scale, driver selection, stage models -> data/hockey_fit.json
     python3 scripts/hockey_prospects.py       # grades -> data/hockey.json (board, pipeline, past classes)
 
-Outcome   Peak NHL value: the mean of a player's best three seasons of descriptive WAR (static/data/nhl-war/,
-          scripts/nhl_players.py; since Oct 25 2026, was the projected value, which underrated defencemen: D coefficient
-          -0.55 -> +0.28) in his first seven seasons after the draft, missing seasons counted as 0. Goalies are ranked
+Outcome   Peak NHL value: the mean of a player's best three seasons of projected WAR (pWAR, static/data/nhl-war/,
+          scripts/nhl_players.py; Nov 11 2026, Noah: descriptive WAR from Oct 25 to Nov 11, which loses to pWAR's rate as
+          a game-model input) in his first seven seasons after the draft, missing seasons counted as 0. Goalies are ranked
           among goalies on peak goals saved above expected and given the skater value at the same rarity, so a goalie
           and a skater with the same FV were as rare among picks.
 FV scale  By rarity among picks, classes 2008-19 (about 212 picks a class): 80 = one in four classes (McDavid), 75 =
@@ -389,6 +389,11 @@ def load_rows(W):
 
 
 SHORT = {2013: 48, 2020: 69.8, 2021: 56}   # team games in the shortened seasons (2019-20: 1,082 games over 31 teams)
+# The outcome's season value (Noah, Nov 11 2026): projected WAR (pWAR: the season file's HPM, a Marcel rate through that
+# season, over replacement x that season's ice time), not descriptive WAR. Descriptive WAR hands each skater the whole
+# 5-on-5 on-ice differential and travels with teammates; priced as the NHL game model's lineup value it loses to HPM
+# (walk-forward win log loss t -2.4 tune / -2.8 held, 1 of 10 seasons). Stage inputs read the same column.
+VALUE = 'pwar'
 
 
 def outcome(r, W, cur):
@@ -400,7 +405,7 @@ def outcome(r, W, cur):
         q = W.get(S, {}).get(r.get('id'))
         if q:
             k = 82 / SHORT.get(S, 82)
-            wins.append(k * (q.get('war') or 0.0)); gps += q.get('gp') or 0
+            wins.append(k * (q.get(VALUE) or 0.0)); gps += q.get('gp') or 0
             gsx.append(k * (q.get('gsax') or 0.0))
     r['nhl_war'] = wins; r['nhl_gp'] = gps
     r['peak'] = sum((sorted(wins, reverse=True) + [0, 0, 0])[:3]) / 3
@@ -713,7 +718,7 @@ def nhl_so_far(rows, W):
         for k in range(1, 6):
             q = W.get(r['year'] + k, {}).get(r['id']) if r['id'] else None
             if q:
-                gp += q.get('gp') or 0; wl.append(q.get('war') or 0.0)
+                gp += q.get('gp') or 0; wl.append(q.get(VALUE) or 0.0)
             r['gp_k'][k] = gp; r['war_k'][k] = list(wl)
     durability(rows)
 
