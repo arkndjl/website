@@ -76,5 +76,5 @@
     </table></div>
   {{- end }}
   </div>
-  <div class="win__status"><span>{{ if eq $view "ledger" }}scripts/harness_rescore.py · one BH family{{ else if eq $view "pipeline" }}scripts/data_health.py · scripts/refit.py{{ else }}scripts/model_monitor.py · decide() from the rule monitor{{ end }}</span>{{ if eq $view "live" }}{{ partial "fresh.html" (dict "feed" (slice "model_monitor.cfb" "model_monitor.nfl" "model_monitor.nba" "model_monitor.nhl" "model_monitor.soccer" "model_monitor.cbb") "sport" "predictions" ) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ if eq $view "ledger" }}one BH family{{ else if eq $view "pipeline" }}data health · refits{{ else }}rule monitor{{ end }}</span>{{ if eq $view "live" }}{{ partial "fresh.html" (dict "feed" (slice "model_monitor.cfb" "model_monitor.nfl" "model_monitor.nba" "model_monitor.nhl" "model_monitor.soccer" "model_monitor.cbb") "sport" "predictions" ) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
