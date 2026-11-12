@@ -476,7 +476,7 @@
       "Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).",
       "XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: rXPM orders next-three-season VORX .607 (VORX .604); all rookies .330."
      ],
-     "where": "NBA XPM leaders, rookies, team pages, ARKLIST",
+     "where": "NBA VORX/XPM leaders, rookies, team pages, ARKLIST",
      "sports": [
       "NBA"
      ]
@@ -489,7 +489,7 @@
       "Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.",
       "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw."
      ],
-     "where": "NBA XPM leaders (pXPM chip), rookies",
+     "where": "NBA VORX/XPM leaders (pXPM chip), rookies",
      "sports": [
       "NBA"
      ]
@@ -502,7 +502,7 @@
       "Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, rXPM .330).",
       "Next-three-season XPM: the rookie 3Y orders it best (.481; aXPM .413, rXPM .417, VORX .351)."
      ],
-     "where": "NBA XPM leaders, projections, contract value",
+     "where": "NBA VORX/XPM leaders, projections, contract value",
      "sports": [
       "NBA"
      ]
@@ -515,7 +515,7 @@
       "Fit on seasons with minutes, weighted by them. The chance he is off the board is not in it.",
       "Held out 2012-23, 1,000+ minutes in the window: 3Y RMSE 1.13, 1Y 1.14; bias within .25 at every level. Display only."
      ],
-     "where": "NBA XPM leaders (3Y chip), projections",
+     "where": "NBA VORX/XPM leaders (3Y chip), projections",
      "sports": [
       "NBA"
      ]
