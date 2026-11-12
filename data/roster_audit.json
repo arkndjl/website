@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-12T16:57Z",
+ "asof": "2026-11-12T17:23Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -1610,11 +1610,11 @@
      "site": "DAL"
     },
     {
-     "d": "2026-11-11",
+     "d": "2026-11-12",
      "field": "t",
      "file": "static/data/nfl-war.json",
      "flag": "moved",
-     "head": "Joining Baltimore",
+     "head": "Set to kick Monday",
      "kind": null,
      "move": null,
      "pid": "15512",
@@ -1818,11 +1818,11 @@
      "site": "ARI"
     },
     {
-     "d": "2026-11-11",
+     "d": "2026-11-12",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
      "flag": "moved",
-     "head": "Joining Baltimore",
+     "head": "Set to kick Monday",
      "kind": null,
      "move": null,
      "pid": "15512",
@@ -4301,7 +4301,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -4322,6 +4322,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-12",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Headed back to minors",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Headed back to minors",
+      "kind": "down"
+     },
+     "pid": "7340",
+     "player": "Kenny Connors",
+     "pos": "C",
+     "rotowire": "LAK",
+     "site": "LAK"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
