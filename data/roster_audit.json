@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-12T14:02Z",
+ "asof": "2026-11-12T15:19Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -292,7 +292,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 6,
+     "flags": 5,
      "rows": 2127
     },
     "static/data/nfl-fantasy.json": {
@@ -300,11 +300,11 @@
      "rows": 640
     },
     "static/data/nfl-war.json": {
-     "flags": 74,
+     "flags": 75,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 72,
+     "flags": 73,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -312,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 51,
+     "flags": 52,
      "rows": 1650
     }
    },
@@ -390,20 +390,6 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-10",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "moved",
-     "head": "Moved to Denver",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "ILB",
-     "rotowire": "DEN",
-     "site": "LAC"
-    },
-    {
      "d": "2026-08-31",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -420,6 +406,20 @@
      "pos": "WLB",
      "rotowire": "FA",
      "site": "TEN"
+    },
+    {
+     "d": "2026-11-12",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "moved",
+     "head": "Deal to Denver nixed",
+     "kind": null,
+     "move": null,
+     "pid": "16948",
+     "player": "Daiyan Henley",
+     "pos": "LB",
+     "rotowire": "LAC",
+     "site": "DEN"
     },
     {
      "d": "2026-11-10",
@@ -1768,6 +1768,20 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Deal to Denver nixed",
+     "kind": null,
+     "move": null,
+     "pid": "16948",
+     "player": "Daiyan Henley",
+     "pos": "LB",
+     "rotowire": "LAC",
+     "site": "DEN"
+    },
+    {
      "d": "2026-10-26",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2662,6 +2676,20 @@
      "pos": "EDGE",
      "rotowire": "CAR",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "moved",
+     "head": "Deal to Denver nixed",
+     "kind": null,
+     "move": null,
+     "pid": "16948",
+     "player": "Daiyan Henley",
+     "pos": "LB",
+     "rotowire": "LAC",
+     "site": "DEN"
     },
     {
      "d": "2026-11-10",
