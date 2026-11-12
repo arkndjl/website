@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-12T12:00:23Z",
+ "asof": "2026-11-12T14:01:35Z",
  "recenter": {
-  "2026-11-12": 1.8
+  "2026-11-12": 1.79
  },
  "monitor": {
   "clocks": {
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-12T11:05:52Z",
-  "ageH": 0.9,
+  "ageH": 2.9,
   "stale": false
  },
  "picks": [
@@ -272,8 +272,8 @@
     "side": "away",
     "line": 6.5,
     "price": -102.0,
-    "ev": 0.076,
-    "units": 0.75
+    "ev": 0.079,
+    "units": 1.25
    }
   },
   {
@@ -305,9 +305,9 @@
     "mk": "spread",
     "side": "away",
     "line": 9.5,
-    "price": 106.0,
-    "ev": 0.121,
-    "units": 1.5
+    "price": -106.0,
+    "ev": 0.097,
+    "units": 1.75
    }
   },
   {
@@ -357,7 +357,7 @@
    "mk": "spread",
    "side": "home",
    "line": -10.5,
-   "price": -106.0,
+   "price": -100.0,
    "edge": 0.6,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -370,10 +370,10 @@
    "mk": "spread",
    "side": "away",
    "line": 9.5,
-   "price": 106.0,
-   "ev": 0.121,
+   "price": -106.0,
+   "ev": 0.097,
    "edge": 4.5,
-   "units": 1.5,
+   "units": 1.75,
    "home": "PHI",
    "away": "TOR",
    "state": "pick"
@@ -382,7 +382,7 @@
    "mk": "spread",
    "side": "home",
    "line": -10.5,
-   "price": -106.0,
+   "price": -100.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -407,9 +407,9 @@
    "side": "away",
    "line": 6.5,
    "price": -102.0,
-   "ev": 0.076,
+   "ev": 0.079,
    "edge": 3.4,
-   "units": 0.75,
+   "units": 1.25,
    "home": "PHX",
    "away": "CHA",
    "state": "pick"
@@ -467,7 +467,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3666,
+  "snapshots": 3670,
   "buckets": [
    {
     "when": "24h+",
@@ -480,12 +480,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 859,
-    "clvRet": -0.0097,
-    "clvT": -2.99,
+    "clvN": 861,
+    "clvRet": -0.0098,
+    "clvT": -3.02,
     "clv": 0.57,
-    "beat": 0.454,
-    "still": 0.411
+    "beat": 0.453,
+    "still": 0.412
    },
    {
     "when": "1-6h",
@@ -6402,12 +6402,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-12T12:00:23Z",
+ "checked": "2026-11-12T14:01:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-12": {
-    "raw": 3.0,
+    "raw": 3.75,
     "scale": 1.0
    }
   }
