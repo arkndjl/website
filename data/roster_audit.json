@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-12T18:42Z",
+ "asof": "2026-11-12T19:04Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -88,11 +88,11 @@
     },
     "static/data/nba-proj.json": {
      "flags": 5,
-     "rows": 500
+     "rows": 501
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 2,
-     "rows": 461
+     "flags": 3,
+     "rows": 463
     },
     "static/data/pctl-nba.json": {
      "flags": 3,
@@ -195,6 +195,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-10-17",
+     "field": "tm",
+     "file": "static/data/nba-xpm/2027.json",
+     "flag": "released",
+     "head": "Waived by Milwaukee",
+     "kind": "waived",
+     "move": {
+      "d": "2026-10-17",
+      "head": "Waived by Milwaukee",
+      "kind": "waived"
+     },
+     "pid": "6050",
+     "player": "Pete Nance",
+     "pos": "PF",
+     "rotowire": "FA",
+     "site": "MIL"
+    },
+    {
      "d": "2026-11-08",
      "field": "tm",
      "file": "static/data/nba-xpm/2027.json",
@@ -247,24 +265,6 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "OKC"
-    },
-    {
-     "d": "2026-10-17",
-     "field": "tm",
-     "file": "static/data/pctl-nba.json",
-     "flag": "released",
-     "head": "Let go by LAC",
-     "kind": null,
-     "move": {
-      "d": "2026-09-27",
-      "head": "Signs with Clippers",
-      "kind": "sign"
-     },
-     "pid": "5652",
-     "player": "Blake Wesley",
-     "pos": "G",
-     "rotowire": "FA",
-     "site": "LAC"
     },
     {
      "d": "2026-10-17",
@@ -283,11 +283,29 @@
      "pos": "F",
      "rotowire": "FA",
      "site": "MIL"
+    },
+    {
+     "d": "2026-10-17",
+     "field": "tm",
+     "file": "static/data/pctl-nba.json",
+     "flag": "released",
+     "head": "Let go by LAC",
+     "kind": null,
+     "move": {
+      "d": "2026-09-27",
+      "head": "Signs with Clippers",
+      "kind": "sign"
+     },
+     "pid": "5652",
+     "player": "Blake Wesley",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "LAC"
     }
    ],
    "joined": 0,
    "players": 595,
-   "rows": 2021
+   "rows": 2024
   },
   "nfl": {
    "by_file": {
