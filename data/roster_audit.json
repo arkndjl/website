@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11T23:47Z",
+ "asof": "2026-11-12T02:00Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 818,
+   "players": 819,
    "rows": 5269
   },
   "cfb": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2570,
+   "players": 2571,
    "rows": 16718
   },
   "nba": {
@@ -268,13 +268,13 @@
     }
    ],
    "joined": 0,
-   "players": 594,
+   "players": 595,
    "rows": 2019
   },
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 5,
+     "flags": 6,
      "rows": 2127
     },
     "static/data/nfl-fantasy.json": {
@@ -282,11 +282,11 @@
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 73,
+     "flags": 74,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 71,
+     "flags": 72,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 50,
+     "flags": 51,
      "rows": 1650
     }
    },
@@ -372,6 +372,24 @@
      "site": "KC"
     },
     {
+     "d": "2026-11-11",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Won't play in Germany",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-11",
+      "head": "Won't play in Germany",
+      "kind": "exit"
+     },
+     "pid": "16512",
+     "player": "Ben Brown",
+     "pos": "LG",
+     "rotowire": "NE",
+     "site": "NE"
+    },
+    {
      "d": "2026-08-31",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -406,6 +424,24 @@
      "pos": "WR",
      "rotowire": "CIN",
      "site": "CIN"
+    },
+    {
+     "d": "2026-11-11",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Won't play in Germany",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-11",
+      "head": "Won't play in Germany",
+      "kind": "exit"
+     },
+     "pid": "16512",
+     "player": "Ben Brown",
+     "pos": "OL",
+     "rotowire": "NE",
+     "site": "NE"
     },
     {
      "d": "2026-11-03",
@@ -1822,6 +1858,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-11",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Won't play in Germany",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-11",
+      "head": "Won't play in Germany",
+      "kind": "exit"
+     },
+     "pid": "16512",
+     "player": "Ben Brown",
+     "pos": "OL",
+     "rotowire": "NE",
+     "site": "NE"
+    },
+    {
      "d": "2026-10-05",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2612,6 +2666,24 @@
      "pos": "WR",
      "rotowire": "CIN",
      "site": "CIN"
+    },
+    {
+     "d": "2026-11-11",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Won't play in Germany",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-11",
+      "head": "Won't play in Germany",
+      "kind": "exit"
+     },
+     "pid": "16512",
+     "player": "Ben Brown",
+     "pos": "OL",
+     "rotowire": "NE",
+     "site": "NE"
     },
     {
      "d": "2026-11-03",
