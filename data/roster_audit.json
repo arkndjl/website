@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-12T07:28Z",
+ "asof": "2026-11-12T11:01Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,12 +274,12 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 5,
+     "flags": 6,
      "rows": 2127
     },
     "static/data/nfl-fantasy.json": {
      "flags": 17,
-     "rows": 639
+     "rows": 640
     },
     "static/data/nfl-war.json": {
      "flags": 74,
@@ -370,6 +370,20 @@
      "pos": "CB",
      "rotowire": "TEN",
      "site": "KC"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "moved",
+     "head": "Moved to Denver",
+     "kind": null,
+     "move": null,
+     "pid": "16948",
+     "player": "Daiyan Henley",
+     "pos": "ILB",
+     "rotowire": "DEN",
+     "site": "LAC"
     },
     {
      "d": "2026-08-31",
@@ -4029,11 +4043,11 @@
       "head": "Back to practice squad",
       "kind": "practice"
      },
-     "pid": "15852",
-     "player": "Zamir White",
+     "pid": "17944",
+     "player": "Jabari Small",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "NO"
+     "site": "DET"
     },
     {
      "d": "2026-11-09",
@@ -4047,11 +4061,11 @@
       "head": "Back to practice squad",
       "kind": "practice"
      },
-     "pid": "17944",
-     "player": "Jabari Small",
+     "pid": "15852",
+     "player": "Zamir White",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "DET"
+     "site": "NO"
     },
     {
      "d": "2026-11-02",
@@ -4162,24 +4176,6 @@
      "site": "SEA"
     },
     {
-     "d": "2026-11-11",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Signs to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-11",
-      "head": "Signs to practice squad",
-      "kind": "practice"
-     },
-     "pid": "12216",
-     "player": "David Moore",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "CAR"
-    },
-    {
      "d": "2026-09-15",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4196,6 +4192,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "KC"
+    },
+    {
+     "d": "2026-11-11",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-11",
+      "head": "Signs to practice squad",
+      "kind": "practice"
+     },
+     "pid": "12216",
+     "player": "David Moore",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "CAR"
     },
     {
      "d": "2026-11-10",
@@ -4236,7 +4250,7 @@
    ],
    "joined": 0,
    "players": 2247,
-   "rows": 8001
+   "rows": 8002
   },
   "nhl": {
    "by_file": {
