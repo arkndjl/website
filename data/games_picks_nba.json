@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-12T17:24:18Z",
+ "asof": "2026-11-12T17:43:12Z",
  "recenter": {
   "2026-11-12": 1.79
  },
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-12T11:05:52Z",
-  "ageH": 6.3,
+  "ageH": 6.6,
   "stale": false
  },
  "picks": [
@@ -271,9 +271,9 @@
     "mk": "spread",
     "side": "away",
     "line": 6.5,
-    "price": -106.0,
-    "ev": 0.07,
-    "units": 1.0
+    "price": -104.0,
+    "ev": 0.071,
+    "units": 0.75
    }
   },
   {
@@ -335,7 +335,14 @@
    "flagged": "2026-11-12T16:47:07Z",
    "betTo": 223.5,
    "close": 223.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 223.5,
+    "price": -100.0,
+    "ev": 0.066,
+    "units": 0.5
+   }
   },
   {
    "id": "401909979",
@@ -420,7 +427,7 @@
    "mk": "spread",
    "side": "home",
    "line": -10.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 0.6,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -445,7 +452,7 @@
    "mk": "spread",
    "side": "home",
    "line": -10.5,
-   "price": 104.0,
+   "price": 106.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -469,10 +476,10 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": -106.0,
-   "ev": 0.07,
+   "price": -104.0,
+   "ev": 0.071,
    "edge": 3.4,
-   "units": 1.0,
+   "units": 0.75,
    "home": "PHX",
    "away": "CHA",
    "state": "pick"
@@ -530,7 +537,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3688,
+  "snapshots": 3691,
   "buckets": [
    {
     "when": "24h+",
@@ -543,12 +550,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 871,
-    "clvRet": -0.0097,
-    "clvT": -3.04,
+    "clvN": 873,
+    "clvRet": -0.0098,
+    "clvT": -3.07,
     "clv": 0.57,
-    "beat": 0.455,
-    "still": 0.412
+    "beat": 0.454,
+    "still": 0.414
    },
    {
     "when": "1-6h",
@@ -6517,12 +6524,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-12T17:24:18Z",
+ "checked": "2026-11-12T17:43:12Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-12": {
-    "raw": 3.25,
+    "raw": 2.75,
     "scale": 1.0
    }
   }
