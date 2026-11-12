@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-12T03:52:11Z",
+ "asof": "2026-11-12T03:54:29Z",
  "recenter": {
   "week": 0.2
  },
@@ -138,37 +138,37 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 13,
-    "window": 13,
-    "mean": -0.0502,
-    "t": null,
+    "n": 14,
+    "window": 14,
+    "mean": -0.048,
+    "t": -2.69,
     "p": null,
-    "days": 1,
+    "days": 2,
     "sd": 0.1178,
-    "cusum": 2.54,
+    "cusum": 2.42,
     "cusumMax": 2.54,
     "h": 10.0,
     "rho": 0.038,
     "edge": {
-     "cusum": 0.58,
-     "cusumMax": 0.58,
+     "cusum": 0.61,
+     "cusumMax": 0.61,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0131,
-     "n": 13,
+     "n": 14,
      "sd": 0.1178,
      "rho": 0.038,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.585,
-     "info": 0.16,
-     "real": -4.823,
-     "realSe": 3.017,
+     "llr": -0.605,
+     "info": 0.17,
+     "real": -4.56,
+     "realSe": 2.67,
      "need": 479
     }
    },
@@ -520,19 +520,19 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 38,
-   "days": 6,
-   "llr": -1.479,
+   "n": 39,
+   "days": 7,
+   "llr": -1.485,
    "lo": -2.944,
    "hi": 2.944,
    "state": "watching",
    "at": null,
    "sd": 0.12,
    "rho": 0.05,
-   "real": -0.995,
+   "real": -0.997,
    "realSe": 0.638,
-   "clvRet": -0.0356,
-   "evDU": 0.0228
+   "clvRet": -0.0352,
+   "evDU": 0.0223
   },
   "back": {
    "n": 0,
@@ -1915,7 +1915,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": 102.0,
+   "price": 106.0,
    "edge": 3.8,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -1963,7 +1963,7 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 1.4,
    "x": 3.0,
    "why": "edge under 3",
@@ -2043,7 +2043,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 1.9,
    "x": 6.0,
    "why": "edge under 6 (season: late)",
@@ -2304,7 +2304,7 @@
    "mk": "total",
    "side": "over",
    "line": 50.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2328,7 +2328,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -2640,7 +2640,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": 102.0,
+   "price": 106.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -2857,16 +2857,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16529,
+  "snapshots": 16534,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3475,
+    "clvN": 3477,
     "clvRet": -0.0448,
-    "clvT": -34.12,
+    "clvT": -34.13,
     "clv": 0.27,
     "beat": 0.343,
-    "still": 0.434
+    "still": 0.435
    },
    {
     "when": "6-24h",
@@ -6147,12 +6147,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-12T03:52:11Z",
+ "checked": "2026-11-12T03:54:29Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-12": {
-    "raw": 1.5,
+    "raw": 1.75,
     "scale": 1.0
    }
   }
