@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-12T07:29:57Z",
+ "asof": "2026-11-12T09:53:58Z",
  "recenter": {
-  "2026-11-12": 1.8
+  "2026-11-12": 1.79
  },
  "monitor": {
   "clocks": {
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-12T03:18:51Z",
-  "ageH": 4.2,
+  "ageH": 6.6,
   "stale": false
  },
  "picks": [
@@ -301,39 +301,30 @@
    "flagged": "2026-11-12T03:54:41Z",
    "betTo": 227.5,
    "close": 227.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 227.5,
+    "price": -106.0,
+    "ev": 0.052,
+    "units": 0.25
+   }
   }
  ],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
   {
-   "id": "401909978",
-   "sport": "nba",
-   "kick": "2026-11-13T01:00:00Z",
-   "home": "MIN",
-   "away": "DAL",
-   "mk": "total",
-   "side": "under",
-   "line": 227.5,
-   "price": -106.0,
-   "edge": 2.9,
-   "x": 2.5,
-   "why": "no edge at -106",
-   "m": 5.7,
-   "tm": 224.6
-  },
-  {
    "id": "401909977",
    "sport": "nba",
    "kick": "2026-11-13T00:00:00Z",
    "home": "WSH",
    "away": "DET",
-   "mk": "spread",
-   "side": "home",
-   "line": -10.5,
-   "price": -115.0,
-   "edge": 0.4,
+   "mk": "total",
+   "side": "under",
+   "line": 221.5,
+   "price": -108.0,
+   "edge": 1.0,
    "x": 2.5,
    "why": "edge under 2.5",
    "m": -10.1,
@@ -342,11 +333,11 @@
  ],
  "games": {
   "401909977": {
-   "mk": "spread",
-   "side": "home",
-   "line": -10.5,
-   "price": -115.0,
-   "edge": 0.4,
+   "mk": "total",
+   "side": "under",
+   "line": 221.5,
+   "price": -108.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "WSH",
@@ -358,12 +349,12 @@
    "side": "under",
    "line": 227.5,
    "price": -106.0,
+   "ev": 0.052,
    "edge": 2.9,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
    "home": "MIN",
    "away": "DAL",
-   "state": "under"
+   "state": "pick"
   },
   "401909979": {
    "mk": "spread",
@@ -430,7 +421,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3650,
+  "snapshots": 3653,
   "buckets": [
    {
     "when": "24h+",
@@ -443,12 +434,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 852,
+    "clvN": 853,
     "clvRet": -0.0094,
-    "clvT": -2.87,
+    "clvT": -2.89,
     "clv": 0.57,
-    "beat": 0.458,
-    "still": 0.406
+    "beat": 0.457,
+    "still": 0.407
    },
    {
     "when": "1-6h",
@@ -6339,7 +6330,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-12T07:29:57Z",
+ "checked": "2026-11-12T09:53:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
