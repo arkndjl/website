@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-12T19:53Z",
+ "asof": "2026-11-12T19:56Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -318,11 +318,11 @@
      "rows": 640
     },
     "static/data/nfl-war.json": {
-     "flags": 75,
+     "flags": 73,
      "rows": 1796
     },
     "static/data/pctl-nfl.json": {
-     "flags": 73,
+     "flags": 72,
      "rows": 1725
     },
     "static/data/personnel/nfl.json": {
@@ -330,7 +330,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 52,
+     "flags": 51,
      "rows": 1650
     }
    },
@@ -424,20 +424,6 @@
      "pos": "WLB",
      "rotowire": "FA",
      "site": "TEN"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Deal to Denver nixed",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "LB",
-     "rotowire": "LAC",
-     "site": "DEN"
     },
     {
      "d": "2026-11-10",
@@ -1412,24 +1398,6 @@
      "site": "BAL"
     },
     {
-     "d": "2026-11-03",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Released by Buffalo",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-03",
-      "head": "Released by Buffalo",
-      "kind": "waived"
-     },
-     "pid": "15189",
-     "player": "C.J. Gardner-Johnson",
-     "pos": "S",
-     "rotowire": "FA",
-     "site": "BUF"
-    },
-    {
      "d": "2026-09-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1628,20 +1596,6 @@
      "site": "DAL"
     },
     {
-     "d": "2026-11-12",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "moved",
-     "head": "Set to kick Monday",
-     "kind": null,
-     "move": null,
-     "pid": "15512",
-     "player": "Riley Patterson",
-     "pos": "K",
-     "rotowire": "BAL",
-     "site": "MIA"
-    },
-    {
      "d": "2026-10-24",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1658,6 +1612,24 @@
      "pos": "S",
      "rotowire": "FA",
      "site": "ARI"
+    },
+    {
+     "d": "2026-11-03",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Released by Buffalo",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-03",
+      "head": "Released by Buffalo",
+      "kind": "waived"
+     },
+     "pid": "15189",
+     "player": "C.J. Gardner-Johnson",
+     "pos": "S",
+     "rotowire": "FA",
+     "site": "BUF"
     },
     {
      "d": "2026-11-10",
@@ -1729,7 +1701,7 @@
      "player": "Harrison Mevis",
      "pos": "K",
      "rotowire": "FA",
-     "site": "LA"
+     "site": "BAL"
     },
     {
      "d": "2026-11-10",
@@ -1747,7 +1719,7 @@
      "player": "Kendre Miller",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "NO"
+     "site": "DAL"
     },
     {
      "d": "2026-11-06",
@@ -1766,38 +1738,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "PHI"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Participating in Thursday's practice",
-     "kind": null,
-     "move": {
-      "d": "2026-11-11",
-      "head": "Will travel to Germany",
-      "kind": "exit"
-     },
-     "pid": "13432",
-     "player": "A.J. Brown",
-     "pos": "WR",
-     "rotowire": "NE",
-     "site": "FA"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Deal to Denver nixed",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "LB",
-     "rotowire": "LAC",
-     "site": "DEN"
     },
     {
      "d": "2026-10-26",
@@ -1834,20 +1774,6 @@
      "pos": "OL",
      "rotowire": "FA",
      "site": "ARI"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "moved",
-     "head": "Set to kick Monday",
-     "kind": null,
-     "move": null,
-     "pid": "15512",
-     "player": "Riley Patterson",
-     "pos": "K",
-     "rotowire": "BAL",
-     "site": "MIA"
     },
     {
      "d": "2026-09-28",
@@ -1904,6 +1830,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Lands with Baltimore's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Lands with Baltimore's practice squad",
+      "kind": "practice"
+     },
+     "pid": "17921",
+     "player": "Harrison Mevis",
+     "pos": "K",
+     "rotowire": "FA",
+     "site": "BAL"
+    },
+    {
      "d": "2026-11-11",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -1919,7 +1863,7 @@
      "player": "Ben Brown",
      "pos": "OL",
      "rotowire": "NE",
-     "site": "NE"
+     "site": "FA"
     },
     {
      "d": "2026-10-05",
@@ -2279,7 +2223,7 @@
      "player": "Kendre Miller",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "NO"
+     "site": "DAL"
     },
     {
      "d": "2026-10-28",
@@ -2624,6 +2568,24 @@
      "site": "BUF"
     },
     {
+     "d": "2026-11-11",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-11",
+      "head": "Signs to practice squad",
+      "kind": "practice"
+     },
+     "pid": "12216",
+     "player": "David Moore",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "CAR"
+    },
+    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2694,20 +2656,6 @@
      "pos": "EDGE",
      "rotowire": "CAR",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "moved",
-     "head": "Deal to Denver nixed",
-     "kind": null,
-     "move": null,
-     "pid": "16948",
-     "player": "Daiyan Henley",
-     "pos": "LB",
-     "rotowire": "LAC",
-     "site": "DEN"
     },
     {
      "d": "2026-11-10",
@@ -3718,24 +3666,6 @@
      "site": "BAL"
     },
     {
-     "d": "2026-11-03",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Released by Buffalo",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-03",
-      "head": "Released by Buffalo",
-      "kind": "waived"
-     },
-     "pid": "15189",
-     "player": "C.J. Gardner-Johnson",
-     "pos": "S",
-     "rotowire": "FA",
-     "site": "BUF"
-    },
-    {
      "d": "2026-11-11",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3916,6 +3846,24 @@
      "site": "ARI"
     },
     {
+     "d": "2026-11-03",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Released by Buffalo",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-03",
+      "head": "Released by Buffalo",
+      "kind": "waived"
+     },
+     "pid": "15189",
+     "player": "C.J. Gardner-Johnson",
+     "pos": "S",
+     "rotowire": "FA",
+     "site": "BUF"
+    },
+    {
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3985,7 +3933,7 @@
      "player": "Kendre Miller",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "NO"
+     "site": "DAL"
     },
     {
      "d": "2026-11-06",
