@@ -373,4 +373,7 @@ def holm(res, stats, top=True):
 
 
 if __name__ == "__main__":
+    if "--smoke" in sys.argv:  # code check on a cut-down grid; writes nothing that the held pass reads
+        ADJ[:] = ADJ[1:3]
+        TUNEF = ROOT / "data" / "cs2_nov13_smoke.json"
     held_phase() if "--held" in sys.argv else tune_phase()
