@@ -37,3 +37,20 @@ Draw chance x exp(.06 x max(0, 1 - |home win - away win| / .15)), renormalised.
 - Pass: Holm.
 
 Tuning-season numbers: scripts/research/soccer_nov13/tune.json.
+
+## Batch 1 result (held out, one pass, prereg sha 75c6724a1dd1)
+
+T passes: 21,763 matches, .68265 -> .67531 (t -8.93, 4/4 seasons); big five -.00199 (t -2.51), other eleven -.00991
+(t -8.66); club leans vs league term only -.000415 (t -2.55): kept. D fails: -.000082, t -0.77.
+
+## Batch 2 (written before its held-out pass; alpha .05 / 2 on this split)
+
+### DT: the match's total in the draw chance
+
+1X2 chances from the game model's means x exp(.5 x (z - m)), z = log(totals-ratings total / model total) for the
+match, m = the league's mean z over earlier matches (50+ behind it). The ratio between the sides and the league's
+average total stay the model's; only the match's total relative to its league moves.
+- Rows: league matches with a totals rating in the 16 leagues, S 2023-2026. Control: the live 1X2 chances.
+- Metric: 1X2 log loss, treatment minus control, t clustered by match day, one-sided p <= .025.
+- Tuning (2021-22): g .25 t -2.42, g .5 t -2.03 (d -.00023), g 1 t -1.25. g .5 is the one tested.
+- `python3 scripts/research/soccer_nov13/draw_total.py --held`
