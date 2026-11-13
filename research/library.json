@@ -759,7 +759,7 @@
       "multi-kills, clutches, headshots, damage taken). Plus-minus: half the round share the box misses, split across the five.",
       "No utility measure: bo3.gg has no flash or utility damage data; utility $ bought failed (t -2.5), accuracy hurt.",
       "Tier lift: +0.5 x share of last year's rounds at S/A-tier events (low-tier pools link to the top through few maps).",
-      "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink. Held out R2 .131 vs .120 Nov 2, .108 K-D."
+      "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink toward .75 x the teammates' mean rating (Nov 13: held t -3.6 by month). Held out R2 .134 vs .120 Nov 2, .113 K-D."
      ],
      "where": "Counter-Strike players, prospects, player model",
      "sports": [
@@ -1091,7 +1091,7 @@
      "short": "Series win chance vs the average top-20 team.",
      "body": [
       "Player Elo that follows players between rosters (per map, on round share), bo3.gg team map rating with veto,",
-      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .553 vs VRS .667. No picks: no free closing odds history."
+      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .552 vs VRS .667. No picks: the model loses to Thunderpick's close."
      ],
      "where": "Counter-Strike ARK Ranking, matches, model",
      "sports": [
@@ -1562,7 +1562,7 @@
      "term": "Not picked",
      "short": "Markets tested and off because they did not beat the close.",
      "body": [
-      "NHL (ML and totals), soccer (1X2, O/U 2.5, MLS, props), CS2 (no free closing odds), NBA/NHL props.",
+      "NHL (ML and totals), soccer (1X2, O/U 2.5, MLS, props), CS2 (loses to Thunderpick's close), NBA/NHL props.",
       "Their game projections still show; Kelly % reads off."
      ],
      "where": "Predictions game table",
@@ -1575,13 +1575,16 @@
     },
     {
      "term": "CS2 game model",
-     "short": "Series win chance from player Elo, region offsets, a team map rating and Valve's VRS points.",
+     "short": "Series win chance from player Elo, region offsets, a team map rating, Valve's VRS points and the five's RWA.",
      "body": [
       "Player Elo, map by map: a series found on bo3.gg updates once per map on round share, so 13-3 moves a rating more than 13-11; other series update on the series result. K starts high for a new player and falls over about 100 series. Players new after March 2024 start below average; everyone starts from Valve's 2022-23 sample season played forward with the same rules.",
       "Region offsets for Europe, the Americas and Asia, moved only by inter-region series.",
       "Team map rating from bo3.gg's map results since June 2020: a team Elo moved by round share on every map, plus each team's offset on each map. A series chance comes from a simple veto (each side bans its worst map and picks its best, both orders averaged).",
       "Valve's VRS points from the snapshot before each day, blended in log-odds, with separate weights when both teams are VRS top 50: Valve's points carry real information at the top and little below it.",
-      "Walk-forward over every series since Feb 2024; weights tuned Aug 2024 - Jun 2025, scored from Jul 2025 on."
+      "Only maps played to the end (13+ rounds) update on round share; bo3.gg lists forfeits as 1-0.",
+      "Where Thunderpick prices a series, the shown chance blends the price with the model (weights refit each build on the archive; Oct 28 - Nov 10 2026, 173 series: price .597 log loss, model .687). ARK Ranking, event odds and Pick'Em stay model-only.",
+      "Walk-forward over every series since Feb 2024; weights tuned Aug 2024 - Jun 2025, scored from Jul 2025 on.",
+      "Nov 13 2026, failed held out (Holm over 8): round share adjusted for side and buy (bo3.gg round data), Valve's four VRS factors as separate terms, new-player start from teammates, event-tier K, Bo1/Bo5 slopes, experience shrink, boosted-tree stack."
      ],
      "where": "Counter-Strike model tab, matches",
      "sports": [

@@ -94,10 +94,9 @@ class Lab:
         """Replay with settings p (default: live). adj: an adjusted-share config for the player Elo map updates (elo)
         and / or the team map rating (tm = its settings). rwa: (tag, contributions, params) for the player term."""
         bo3 = cs2_bo3.Bo3(self.bo3d)
-        bo3.valid_only = valid
         if adj is not None:
             bo3.adj, bo3.adj_elo = self.adj(adj), elo
-        p = dict(p or self.p)
+        p = dict(p or self.p, valid=int(valid))  # the base is the model as it stood before the forfeit-map fix
         if tm:
             p["tm"] = tm
         rows, _ = CM.replay(self.series, self.vrs, p, bo3=bo3)

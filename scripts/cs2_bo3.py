@@ -386,8 +386,9 @@ def odds_snap(now=None):
         cj = json.loads((ROOT / "data" / "cs2.json").read_text())
         tp = cj.get("tp", {})
         for m in cj.get("matches", []):
-            mods[(m["ka"], m["kb"])] = m["pa"]
-            mods[(m["kb"], m["ka"])] = 1 - m["pa"]
+            pm_ = m.get("pmod", m["pa"])  # the model alone (pa may carry a market blend)
+            mods[(m["ka"], m["kb"])] = pm_
+            mods[(m["kb"], m["ka"])] = 1 - pm_
         for g in gs:
             pm = tp.get(str(g["id"]), mods.get((key(g["n1"]), key(g["n2"]))))
             if pm is not None:

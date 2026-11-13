@@ -164,6 +164,46 @@ def adjusted(bo3, cfg, rd=None):
     return out
 
 
+STAT = ["n", "rd", "ct", "t", "pistol", "gun", "adv", "dis", "open", "c54", "c45"]
+
+
+def team_stats(bo3, since, rd=None):
+    """bo3 team id -> round rates over maps on or after `since` (ISO day): maps, then % of rounds won overall, on CT,
+    on T, pistols, gun rounds (both teams on a full buy), with the better buy class, with the worse one, % of rounds
+    with the first kill, % won after the first kill (5v4) and after conceding it (4v5). Descriptive, not adjusted."""
+    rd = rd if rd is not None else load()
+    acc = defaultdict(lambda: [0] * 21)
+    for g in bo3["games"]:
+        rr = rd.get(g[0])
+        if not rr or not g[2] or g[2][:10] < since:
+            continue
+        for tid, w in ((g[5], 1), (g[6], 0)):
+            a = acc[tid]
+            a[0] += 1
+            for r in rr:
+                win = r[1] if w else 1 - r[1]
+                ct = r[0] if w else 1 - r[0]
+                fk = r[6] if w else 1 - r[6]
+                own, opp = (klass(r[3]), klass(r[4])) if w else (klass(r[4]), klass(r[3]))
+                keys = [1, 3 if ct else 5]
+                if r[2]:
+                    keys.append(7)
+                elif own == 2 and opp == 2:
+                    keys.append(9)
+                elif own > opp:
+                    keys.append(11)
+                elif own < opp:
+                    keys.append(13)
+                keys.append(17 if fk else 19)
+                for k in keys:
+                    a[k] += win
+                    a[k + 1] += 1
+                a[15] += fk
+                a[16] += 1
+    pct = lambda w, n: round(100 * w / n, 1) if n else None  # noqa: E731
+    return {t: [a[0]] + [pct(a[k], a[k + 1]) for k in (1, 3, 5, 7, 9, 11, 13, 15, 17, 19)] for t, a in acc.items()}
+
+
 def sync(full=False, limit=None):
     bo3 = cs2_bo3.load()
     games = [g for g in bo3["games"] if g[2] and g[2] >= START and g[5] is not None and g[7] is not None]

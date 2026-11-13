@@ -28,6 +28,11 @@ its weight in those months. FAILED, by month: days-since-last-series x logit (al
 90/180-day temperature (all or top 50 only), weights refit each month on all rows so far.
 Second family (top-50 aimed): player Elo x staleness (all -5.0, top 50 -1.7), one pooled staleness coefficient (-5.6 /
 -1.65), staleness of established players only (-2.8 / -0.8): all FAIL the top-50 gate. Lead: retest as top-50 data grows.
+Nov 13 2026 (scripts/cs2_nov13_research.py, pre-registered in research/cs2_nov13_prereg.md, Holm over 8): round share
+adjusted for side and buy matchup from bo3.gg round rows (scripts/cs2_rounds.py), Valve's VRS factors as separate
+terms, new-player start from teammates, event-tier K, Bo1/Bo5 slopes, experience shrink and a boosted-tree stack all
+FAIL (best: the stack, t by month -2.5, p .011). Shipped from it: maps not played to the end are skipped (valid), the
+player rating's teammate prior (scripts/cs2_players.py), and Thunderpick's price blended into the shown series chance.
 Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
 flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
 the blend weight absorbs the scale. Kept as is.
@@ -60,7 +65,8 @@ TUNE = ("2024-08-07", "2025-06-30")
 HELD = ("2025-07-01", "2099-12-31")
 BURN = "2024-03-15"
 TOP = 50
-DEF = {"K": 480, "Kmin": 144, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0, "kmap": 0.6, "span": 0.4}
+DEF = {"K": 480, "Kmin": 144, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0, "kmap": 0.6, "span": 0.4,
+       "valid": 1}  # valid: only maps played to the end (13+ rounds) update on round share (forfeits are listed 1-0)
 OLD = {"K": 160, "Kmin": 32, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0}  # the Oct 26 series-level model
 
 
@@ -131,6 +137,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     warm = {} if ignore_warm else warm_start(p)
     tview, tm = {}, None
     if bo3 is not None:
+        bo3.valid_only = bool(p.get("valid"))
         joined = bo3.join(series)
         ask = defaultdict(list)
         for i, m in joined.items():
@@ -311,7 +318,14 @@ def fit():
                {"term": "player Elo per map on wins only", "note": "no round share: tune .5845 vs .5618"},
                {"term": "rating start by bo3 tier", "note": "lower start for tier-c/d teams: tune +.0006"},
                {"term": "Kalman player ratings", "note": "variance per player: tune .5985 vs Elo .5869"},
-               {"term": "closing line", "note": "no free CS2 odds history, so no picks"}]}
+               {"term": "round share adjusted for side and buy", "note": "bo3.gg rounds, Nov 13: player Elo held +.0003 (t by month +0.3), team map rating -.0001 (-1.5)"},
+               {"term": "VRS factors as separate terms", "note": "bounty offered / collected, opponent network, LAN wins, H2H: held +.0008"},
+               {"term": "new-player start from teammates", "note": "held -.0002, t by month -2.2, fails Holm over 8"},
+               {"term": "event-tier K", "note": "no setting beat the base on tune"},
+               {"term": "Bo1 / Bo5 slopes on bo3.gg formats", "note": "held -.0001, t by month -1.2"},
+               {"term": "experience shrink", "note": "held -.0005, t by month -2.3, top 50 worse; fails Holm"},
+               {"term": "boosted-tree stack", "note": "held -.0018, t by month -2.5 (p .011), fails Holm over 8: lead"},
+               {"term": "closing line", "note": "Thunderpick forward archive: the model's picks lose to the close, so no picks"}]}
     FIT.write_text(json.dumps(out, indent=1))
     for sub, v in score.items():
         print(sub, v["n"])
@@ -498,6 +512,29 @@ def build():
     def is_top(ka, kb):
         va, vb = vt.get(ka), vt.get(kb)
         return bool(va and vb and va[0] <= TOP and vb[0] <= TOP)
+    # Thunderpick's price (scripts/data/odds_tp, the forward archive): on its archived series the price beats the model
+    # (scripts/cs2_nov13_research.py M_tp), so the shown chance = a x logit(model) + b x logit(price), a and b refit
+    # here on every archived series with a result (a >= 0). The archive's own model column (tp below), the ARK
+    # Ranking, event odds and Pick'Em stay model-only.
+    tpw, tpp = None, {}
+    try:
+        won = {r[0]: r[6] for r in bo3.mt.values()}
+        arch = cs2_bo3.closes()
+        fitr = [(cs2_bo3.logit(o["m"]), cs2_bo3.logit(o["p"]), float(won[mid] == o["t1"]))
+                for mid, (o, c) in arch.items() if o.get("m") is not None and won.get(mid) is not None]
+        if len(fitr) >= 100:
+            A = np.array(fitr)
+            w = fitlog(A[:, :2], A[:, 2], l2=1e-2)
+            if w[0] < 0:
+                w = np.array([0.0, fitlog(A[:, 1:2], A[:, 2], l2=1e-2)[0]])
+            tpw = [round(float(z), 4) for z in w]
+        nowz = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+        for mid, (o, c) in arch.items():
+            if c["start"] > nowz:
+                k1, k2 = bo3.k(c["t1"]) or key(c["n1"]), bo3.k(c["t2"]) or key(c["n2"])
+                tpp[(k1, k2)], tpp[(k2, k1)] = c["p"], 1 - c["p"]
+    except Exception as ex:  # noqa: BLE001
+        print("thunderpick blend skipped:", ex)
     matches = []
     for m in H.get("upcoming", []):
         ka, kb = key(m["a"]), key(m["b"])
@@ -506,9 +543,16 @@ def build():
         bo = int(m["fmt"][2:]) if (m.get("fmt") or "").startswith("Bo") and m["fmt"][2:].isdigit() else 3
         pa = chance(ka, kb, bo)
         pm = poly_pa(ka, kb, m.get("ts") or 0)
+        pmod = pa
         pa = cs2_poly.blend(pa, pm, is_top(ka, kb), pfit)
         if pm is not None:
             m = dict(m, pm=round(pm, 4))
+        pt = tpp.get((ka, kb))
+        if pt is not None and tpw is not None:  # Thunderpick's current price, blended on the model alone
+            pa = 1 / (1 + math.exp(-(tpw[0] * cs2_bo3.logit(pmod) + tpw[1] * cs2_bo3.logit(pt))))
+            m = dict(m, tpp=round(pt, 4))
+        if pa != pmod:
+            m = dict(m, pmod=round(pmod, 4))
         matches.append(dict(m, a=names.get(ka, m["a"].replace(" (page does not exist)", "")), b=names.get(kb, m["b"].replace(" (page does not exist)", "")), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
                             la=(LOGOS / f"{ka}.png").exists(), lb=(LOGOS / f"{kb}.png").exists()))
     # map pool (display only): each ranked team's map win chance against the top 20's average on that map, on the
@@ -527,6 +571,16 @@ def build():
         if tid and tm.n.get(tid, 0) >= 10:
             t["maps"] = [round(1 / (1 + math.exp(-sc * (mr(tid, mp) - avg[mp]))), 3) for mp in pool]
             t["mapsN"] = [tm.nm[(tid, mp)] for mp in pool]
+    # round rates over the last 180 days (display only; scripts/cs2_rounds.py)
+    try:
+        import cs2_rounds
+        rst = cs2_rounds.team_stats(cs2_bo3.load(), (dt.date.today() - dt.timedelta(days=180)).isoformat())
+        for t in teams:
+            v = rst.get(tids.get(t["k"]))
+            if v and v[0] >= 10:
+                t["rd"] = v
+    except Exception as ex:  # noqa: BLE001
+        print("cs2 round rates skipped:", ex)
     for m in matches:
         ta, tb = bo3.team_of(m["ka"]), bo3.team_of(m["kb"])
         if not (ta and tb and ta != tb and pool):
@@ -589,7 +643,7 @@ def build():
     out = {"asof": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "vrsDate": last, "lastVrs": H["lastVrs"],
            "nSeries": len(rows), "nLp": nlp, "first": rows[0]["d"], "teams": teams,
            "matches": sorted(matches, key=lambda m: m["ts"]), "results": res,
-           "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tiers": tier_fit,
+           "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tpw": tpw, "tiers": tier_fit,
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
     try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)

@@ -300,6 +300,15 @@ def fit():
         lifts.append((predict_score(M, c, q, tm[1::2])[0], g, q))
         print(f"lift {g} mse {lifts[-1][0]:.6f}", file=sys.stderr)
     best = min(lifts, key=lambda x: x[0])[2]
+    # teammate prior: shrink toward tp x the rounds-weighted mean rating of the player's teammates instead of
+    # toward 0 (scripts/cs2_nov13_research.py P1: held t by month -3.6, series model t -5.6), same tune months
+    tps = []
+    for g in (0.0, 0.25, 0.5, 0.75, 1.0):
+        q = dict(best, tp=g)
+        q["a"] = fit_scale(M, c, q, tm[::2])
+        tps.append((predict_score(M, c, q, tm[1::2])[0], g, q))
+        print(f"teammate prior {g} mse {tps[-1][0]:.6f}", file=sys.stderr)
+    best = min(tps, key=lambda x: x[0])[2]
     out = {"beta": dict(zip(STATS, [round(float(b), 4) for b in beta])), "mline": [round(float(x), 5) for x in ml],
            "r2": round(r2, 3), "params": best, "tune": list(TUNE), "held": [HELD[0], last.isoformat()]}
     # held out: ours vs alternatives (each with its own a fit on tune), paired t on per-map squared error
@@ -317,6 +326,7 @@ def fit():
             "no damage taken": (c_nogd, best),
             "no plus-minus": (cs[0.0], dict(best, pm=0.0)),
             "no tier lift": (c, dict(best, ssg=0.0)),
+            "no teammate prior": (c, dict(best, tp=0.0)),
             "no opponent credit": (c, dict(best, opp=0.0)),
             "kills minus deaths per round": ((M.X[:, 0] - M.X[:, 1]) * 100 / 2, best)}
     score, e_ours = [], None
