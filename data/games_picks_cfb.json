@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-13T16:14:42Z",
+ "asof": "2026-11-13T16:16:46Z",
  "recenter": {
   "week": 0.29
  },
@@ -495,7 +495,7 @@
  },
  "model": {
   "asof": "2026-11-13",
-  "ageH": -7.8,
+  "ageH": -7.7,
   "stale": false
  },
  "picks": [],
@@ -699,9 +699,9 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": -104.0,
-    "ev": 0.032,
-    "units": 0.25
+    "price": -102.0,
+    "ev": 0.038,
+    "units": 0.5
    }
   },
   {
@@ -837,8 +837,8 @@
     "mk": "spread",
     "side": "away",
     "line": 8.5,
-    "price": -100.0,
-    "ev": 0.123,
+    "price": -102.0,
+    "ev": 0.116,
     "units": 0.5
    }
   },
@@ -2059,6 +2059,22 @@
    "tm": 49.0
   },
   {
+   "id": "401871100",
+   "sport": "cfb",
+   "kick": "2026-11-15T00:00:00.000Z",
+   "home": "South Alabama",
+   "away": "Troy",
+   "mk": "spread",
+   "side": "home",
+   "line": 2.5,
+   "price": -117.0,
+   "edge": 2.1,
+   "x": 6.0,
+   "why": "edge under 6 (game: conference)",
+   "m": 4.6,
+   "tm": 54.9
+  },
+  {
    "id": "401862829",
    "sport": "cfb",
    "kick": "2026-11-14T18:00:00.000Z",
@@ -2121,22 +2137,6 @@
    "why": "edge under 6 (game: conference)",
    "m": -7.1,
    "tm": 53.0
-  },
-  {
-   "id": "401856858",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:30:00.000Z",
-   "home": "BYU",
-   "away": "Baylor",
-   "mk": "spread",
-   "side": "home",
-   "line": 7.5,
-   "price": 106.0,
-   "edge": 1.2,
-   "x": 6.0,
-   "why": "edge under 6 (game: conference)",
-   "m": 8.7,
-   "tm": 49.7
   }
  ],
  "games": {
@@ -2556,10 +2556,10 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -104.0,
-   "ev": 0.032,
+   "price": -102.0,
+   "ev": 0.038,
    "edge": 7.1,
-   "units": 0.25,
+   "units": 0.5,
    "home": "West Virginia",
    "away": "Kansas",
    "state": "paper"
@@ -2735,9 +2735,9 @@
   "401871100": {
    "mk": "spread",
    "side": "home",
-   "line": 3.5,
-   "price": 111.0,
-   "edge": 1.1,
+   "line": 2.5,
+   "price": -117.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "South Alabama",
@@ -2893,25 +2893,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 17868,
+  "snapshots": 17872,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3764,
-    "clvRet": -0.0468,
-    "clvT": -36.45,
+    "clvN": 3765,
+    "clvRet": -0.0469,
+    "clvT": -36.54,
     "clv": 0.22,
     "beat": 0.34,
     "still": 0.409
    },
    {
     "when": "6-24h",
-    "clvN": 381,
-    "clvRet": -0.0646,
-    "clvT": -19.1,
+    "clvN": 382,
+    "clvRet": -0.0648,
+    "clvT": -19.17,
     "clv": -0.01,
     "beat": 0.157,
-    "still": 0.635
+    "still": 0.636
    },
    {
     "when": "1-6h",
@@ -6297,12 +6297,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T16:14:42Z",
+ "checked": "2026-11-13T16:16:46Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-13": {
-    "raw": 4.25,
+    "raw": 4.0,
     "scale": 1.0
    }
   }
