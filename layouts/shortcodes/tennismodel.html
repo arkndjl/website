@@ -10,7 +10,7 @@
   </div>
   <div class="cfbm__body">
     <ul>
-      <li><b>Elo on wins</b> x{{ partial "num.html" (slice "%.2f" (float $p.A)) }}: start {{ partial "num.html" (slice "%.0f" (float $p.START)) }} · K = {{ $p.KC }} / (matches + {{ $p.KO }})^{{ $p.KS }} · overall / surface {{ partial "num.html" (slice "%.0f" (mul (sub 1 $p.SW) 100)) }} / {{ partial "num.html" (slice "%.0f" (mul $p.SW 100)) }} · retirements x{{ $p.RET }}</li>
+      <li><b>Elo on wins</b> x{{ partial "num.html" (slice "%.2f" (float $p.A)) }}: start {{ partial "num.html" (slice "%.0f" (float $p.START)) }} · K = {{ $p.KC }} / (matches + {{ $p.KO }})^{{ $p.KS }} · overall / surface {{ partial "num.html" (slice "%.0f" (mul (sub 1 $p.SW) 100)) }} / {{ partial "num.html" (slice "%.0f" (mul $p.SW 100)) }} · retirements x{{ $p.RET }}{{ with $p.KLV_C }} · Challenger / 125 x{{ . }}{{ end }}</li>
       <li><b>Games won</b> x{{ partial "num.html" (slice "%.2f" (float $p.G)) }}: log-odds of a game on share of games won · {{ partial "num.html" (slice "%.0f" (mul $p.GSW 100)) }}% surface</li>
       <li><b>Serve and return points</b> x{{ partial "num.html" (slice "%.2f" (float $p.B)) }}: Kalman filter per player on points won on serve · game, tiebreak, set, match chain, best of 3 / 5 · SPW+ / RPW+</li>
       <li><b>Match context</b>, player minus opponent: rest ln(days) x{{ partial "num.html" (slice "%.2f" (float $p.CR)) }} · age (age - 26) / 5 x{{ partial "num.html" (slice "%.2f" (float $p.CA)) }} · head-to-head (W - L) / (meetings + 4) x{{ partial "num.html" (slice "%.2f" (float $p.CH)) }} · matches in 30 days / 5 x{{ partial "num.html" (slice "%.2f" (float $p.CN)) }} · market memory (last 8 closes - ratings' chance, 2025 on) x{{ partial "num.html" (slice "%.2f" (float $p.CM)) }} · not in the ARK Ranking</li>
@@ -48,6 +48,6 @@
     </table></div>
     {{- end }}
   </div>
-  <div class="win__status" title="Picks on Predictions bet the model's lead on the opening price, which the close moves toward. Data: Jeff Sackmann's tennis_atp / tennis_wta (CC BY-NC-SA, via the Hugging Face archive after the GitHub repos went offline in mid-2026), the Min Maxxxer / Tennis Odds Actor weekly tour feed with closing odds (CC BY 4.0) and ESPN."><span>walk-forward since 2005 · fit {{ $f.fit_at | default "" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="Picks on Predictions bet the model's lead on the opening price, which the close moves toward. Data: Jeff Sackmann's tennis_atp / tennis_wta (CC BY-NC-SA, via the Hugging Face archive after the GitHub repos went offline in mid-2026), Tennis Abstract's player pages for Challenger, ITF and qualifying results since then, the Min Maxxxer / Tennis Odds Actor weekly tour feed with closing odds (CC BY 4.0) and ESPN."><span>walk-forward since 2005 · fit {{ $f.fit_at | default "" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

@@ -54,8 +54,12 @@ BIG_M = set()            # event ids of the two-week M events in the rows (mark_
 
 DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET': 0.5,
            'V0': 0.10, 'Q': 0.00010, 'PHI': 0.35, 'MU_LR': 0.002,
-           'KG': 0.0, 'GSW': 0.3, 'KLV_S': 1.0, 'KLV_G': 1.0,
+           'KG': 0.0, 'GSW': 0.3, 'KLV_S': 1.0, 'KLV_G': 1.0, 'KLV_C': 0.85,
            'A': 1.0, 'B': 0.0, 'C': 0.0, 'G': 0.0, 'CR': 0.0, 'CA': 0.0, 'CH': 0.0, 'CN': 0.0, 'CM': 0.0}
+# KLV_C: an Elo update from a Challenger / WTA 125 match counts x0.85 (results a level down carry over to the tour a
+# little less than Elo assumes). Pre-registered grid {0.7, 0.85}, value picked on 2012-22: tour main-draw log loss
+# -0.6e-4 (t -2.1 by tournament), held out 2023-26 -1.0e-4 (t -3.0, Holm p .009 over 6 tests, 4/4 seasons), against
+# the close 2025-26 -1.1e-4 (t -2.7). scripts/research/tennis_nov13/mtests.py
 # match-context terms beside the ratings (Oct 28 2026; held out 2023-26 log loss t -6.2 by tournament, 4/4 seasons, 11/11
 # tuning years left out), each player A minus player B: CR rest (log of days since the last match, capped at 60), CA age
 # ((age - 26) / 5: Elo lags a young player's rise and an old player's fall), CH head-to-head lead ((wins - losses) /
@@ -398,7 +402,8 @@ class Model:
             q.append(day)
             del q[:-16]
         self.h2h[(w, l)] = self.h2h.get((w, l), 0) + 1
-        mult = (self.P['RET'] if ret else 1.0) * (self.P['KLV_S'] if lv == 'S' else self.P['KLV_G'] if lv == 'G' else 1.0)
+        mult = (self.P['RET'] if ret else 1.0) * (self.P['KLV_S'] if lv == 'S' else self.P['KLV_G'] if lv == 'G'
+                                                  else self.P['KLV_C'] if lv == 'C' else 1.0)
         self.elo_update(w, l, sf, mult)
         if not ret: self.games_update(w, l, sf, gw, gl)
         if ws and ls:
@@ -539,7 +544,11 @@ def fit(rows):
                       'under-22 hinge +0.6 / +0.2, quadratic +1.6 / +0.2, age x WTA +1.2 / +0.9, career matches '
                       '+0.1 / +1.9, under-22 x few matches +1.1 / +0.7',
                       'Oct 28 2026: gave a walkover (withdrew injured) in the last 14 / 30 / 60 days, A minus B: held '
-                      '+0.2 / +0.6 / +0.0 (t 0.2 / 0.7 / 0.1); walkover givers won 57.2% vs 57.5% expected'],
+                      '+0.2 / +0.6 / +0.0 (t 0.2 / 0.7 / 0.1); walkover givers won 57.2% vs 57.5% expected',
+                      'Nov 13 2026, pre-registered, Holm over 6 (tune / held x1e4, t by tournament): blend weights per '
+                      'tour +5.4 / +4.1, Elo K raised after a layoff -0.4 / +0.4, surface share of its own on clay and '
+                      'grass +0.7 / +4.1, ratings shrunk for inactive players -1.0 / -7.6 (tune t -0.7), tree stack on '
+                      'the blend inputs +1.3 / +2.0. Kept: Challenger K x0.85'],
            'fit_at': dt.date.today().isoformat()}
     out.update(score_all(rows, P))
     json.dump(out, open(FIT, 'w'), indent=1)
