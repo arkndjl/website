@@ -1331,13 +1331,33 @@
     },
     {
      "term": "Kelly %",
-     "short": "Stake as % of bankroll: full Kelly on the calibrated edge, compounding.",
+     "short": "Stake as % of bankroll: Kelly on the calibrated edge x the book's live realization, compounding.",
      "body": [
       "Formerly Dengler Units (DU); 1 DU = 1% of bankroll. Picks qualify where the edge at the price > 0.",
       "Cap 5% a bet (tennis 2%). Joint slate Kelly gave the same growth as per-pick (rho ~0).",
-      "Walk-forward: 1x Kelly most log growth at the backtest edge and at half of it."
+      "Walk-forward: 1x Kelly most log growth at the backtest edge and at half of it.",
+      "Stake x: r = close value per point of staked edge on the book's live picks, normal update around .5 (sd .25), clipped 0-1. Walk-forward by game day it beat posted stakes at the close (all books -21.7% -> -6.4% log growth; NBA +0.81% -> +1.05%)."
      ],
      "where": "Predictions picks, game table, paper book",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Live vs the market",
+     "short": "Every flagged pick, live and paper, judged out of sample.",
+     "body": [
+      "Close value and ROI with 95% ranges clustered by game day; one-sided p on G - 1 df.",
+      "Holm across the books (the unit that goes live or paper) and across rules with 8+ game days, family-wise .05.",
+      "Win - chance: win rate minus the stake's chance; Brier skill against the close's chance at the pick's price.",
+      "Venue: Novig, or Polymarket US after its taker fee (.095 p(1 - p)) when it pays more at the same line.",
+      "Polymarket's flag-time price as a signal failed its pre-registered test (143 matched picks: slope t .47; the filter kept worse picks; a noisier forecast of the close than the posted price)."
+     ],
+     "where": "Predictions picks backtest",
      "sports": [
       "CFB",
       "NFL",

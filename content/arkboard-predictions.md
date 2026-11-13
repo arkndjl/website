@@ -52,6 +52,7 @@ cover = "/og/predictions.png"
 {{< predfutures tab="futures" >}}
 {{< /lazytab >}}
 {{< lazytab tab="picks backtest" >}}
+{{< picksoos tab="picks backtest" >}}
 {{< ruledrift tab="picks backtest" >}}
 {{< rulemonitor tab="picks backtest" >}}
 {{< gamespicksbt tab="picks backtest" >}}
