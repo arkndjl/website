@@ -121,7 +121,9 @@
         var wl = list.filter(function (r) { return r[key] != null && r.w0 && r.w0[wi] != null; })
           .sort(function (a, b) { return lo ? a.w0[wi] - b.w0[wi] : b.w0[wi] - a.w0[wi]; });
         wl.forEach(function (r, i) { r.wr = i > 0 && wl[i - 1].w0[wi] === r.w0[wi] ? wl[i - 1].wr : i + 1; });
-        var nr = 0; list.forEach(function (r) { if (r.wr != null) { nr++; r.wk = r.wr - nr; } });
+        // rank now among the same rows, ties shared both ways, so an unchanged value in a tie shows no move
+        var nl = wl.slice().sort(function (a, b) { return lo ? a[key] - b[key] : b[key] - a[key]; });
+        nl.forEach(function (r, i) { r._nr = i > 0 && nl[i - 1][key] === r[key] ? nl[i - 1]._nr : i + 1; r.wk = r.wr - r._nr; });
       }
       // Δ: the pre-draft order against the view's order, both among the shown rows that have a pre-draft rank
       var wp = list.filter(function (r) { return r.pre != null && r[key] != null; });
@@ -152,7 +154,7 @@
             if (r[key] == null) return window.__wk.none;
             var wf = season().wkFrom, wd = window.__wk.day(wf), kc = D.cols.filter(function (x) { return x.k === key; })[0] || {};
             if (r.wr == null) return '<td class="cfb__num cfb__wk" data-v="" title="not on the board ' + wd + '"><span class="cfb__new">new</span></td>';
-            var dv = r[key] - r.w0[wi], dd = kc.f && /^s?\d$/.test(kc.f) ? +kc.f.replace('s', '') : 1;
+            var dv = r[key] - r.w0[wi], dd = kc.f && /^s?\d$/.test(kc.f) ? +kc.f.replace('s', '') : kc.f === 'i' || kc.f === 'p' ? 0 : 1;
             return '<td class="cfb__num cfb__wk" data-v="' + r.wk + '" title="' + esc(wd + ': #' + r.wr + ', ' + (kc.l || key) + ' ' + (dv >= 0 ? '+' : '') + dv.toFixed(dd)) + '">' +
               (r.wk > 0 ? '<span class="cfb__up">▲' + r.wk + '</span>' : r.wk < 0 ? '<span class="cfb__down">▼' + (-r.wk) + '</span>' : '<span class="cfb__dim">–</span>') + '</td>';
           }
