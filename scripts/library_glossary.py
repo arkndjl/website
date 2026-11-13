@@ -362,7 +362,7 @@ sections.append({'id': 'teams', 'title': 'Team ratings', 'entries': [
       'ARK Ranking tab on every sport page; ARKRANKING page', ['CFB', 'NFL', 'CBB', 'NBA', 'NHL', 'Soccer', 'Tennis', 'CS2']),
     E('CFB rating', 'Points vs an average FBS team, neutral field.',
       ['Elo (preseason prior: last season, SP+, 247 talent, returning production, transfers) + opponent-adjusted EPA/play.',
-       'Plus home, rest, travel, altitude, FCS, special teams, P4 tier, 4th-down aggressiveness, returning production,',
+       'Plus home, rest, travel, altitude, FCS (and the FCS side\'s own margin rating), special teams, P4 tier, 4th-down aggressiveness, returning production,',
        'game control. Sim win sd 14.2. Current injuries charged (Inj); Full = at full strength.'],
       'CFB ARK Ranking, games, season odds', ['CFB']),
     E('NFL rating', 'Expected margin vs an average team, neutral field, with this week\'s QB and injuries.',
