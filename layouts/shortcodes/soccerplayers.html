@@ -75,6 +75,7 @@
         {{- end }}
         <th data-sort="fv" data-num title="FV: the soccer prospects board's grade (20-80), players under 22 on it">FV</th>
         <th data-sort="pos" class="cfb__g" title="position (most common start): GK, D, M, F">Pos</th>
+        <th data-sort="age" data-num title="age today (past seasons: at season's end)">Age</th>
         <th data-sort="team" class="nbaxpm__team">Team</th>
         <th data-sort="mp" data-num class="cfb__g nbaxpm__ph" title="matches played (starts)">MP</th>
         <th data-sort="min" data-num class="nbaxpm__ph" title="minutes">Min</th>
@@ -207,7 +208,7 @@
           : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.pj) + '</td><td class="cfb__num">' + sg(p.p3) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
             '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
         var fv = '<td class="cfb__num">' + (p.fv ? '<b>' + p.fv + '</b>' + (p.prov ? '<span class="cfb__dim" title="provisional grade">*</span>' : '') : '<span class="cfb__dim">–</span>') + '</td>';
-        return head + mid + fv + '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
+        return head + mid + fv + '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="cfb__num">' + (p.age != null ? p.age.toFixed(1) : '<span class="cfb__dim">–</span>') + '</td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
           '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
       };
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');

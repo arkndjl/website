@@ -628,6 +628,28 @@ def proj_x(mn, g, pos, age, prior, f):
     return [1.0, g0, P * m0 / 90, math.log1p(m0), a, a * a / 10, a * m0 / 900, d, m, fw, a * d, a * m, a * fw]
 
 
+def attach_age(S, out, dob=None):
+    """age (years, two decimals): today for the current season, Jun 30 of the season's last year for past ones"""
+    dob = proj_dobs() if dob is None else dob
+    at = min(dt.date.today(), dt.date(S, 6, 30))
+    for o in out:
+        b = dob.get(o['p'])
+        o.pop('age', None)
+        if b:
+            o['age'] = round((at - dt.date.fromisoformat(b[:10])).days / 365.25, 2)
+
+
+def inject_ages():
+    """--ages: write age into every season file from the birth dates on file"""
+    dob = proj_dobs()
+    for fn in sorted(os.listdir(SDIR)):
+        path = os.path.join(SDIR, fn)
+        d = json.load(open(path))
+        attach_age(int(fn[:4]), d['players'], dob)
+        open(path, 'w').write(json.dumps(d, separators=(',', ':'), allow_nan=False))
+        print(fn, sum(1 for o in d['players'] if o.get('age') is not None), 'aged of', len(d['players']), flush=True)
+
+
 def proj_attach(S, out, cur_f=None):
     """pj (GAR next season) and p3 (GAR over the next three) on a season file's players, from the season so far, the
     two season files before it, age and minutes. cur_f: {league: share of the season played} (None = a full season).
@@ -640,6 +662,7 @@ def proj_attach(S, out, cur_f=None):
     gv = (lambda o: o['gar']) if P.get('garLine') == 'bottom3' else (lambda o: gar_fringe(o)[0])   # the fit's own line
     for o in out:
         o.pop('pj', None); o.pop('p3', None)
+    attach_age(S, out)
     if not os.path.exists(os.path.join(SDIR, f'{S - 2}.json')):    # fit on seasons with two before them on file
         return
     dob = proj_dobs()
@@ -847,6 +870,8 @@ def inject_proj():
 if __name__ == '__main__':
     if '--badges' in sys.argv:
         inject_badges()
+    elif '--ages' in sys.argv:
+        inject_ages()
     elif '--proj' in sys.argv:
         inject_proj()
     elif '--fit' in sys.argv:

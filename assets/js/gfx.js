@@ -970,12 +970,11 @@
       y += th + 40;
     }
     var dash = '—', age = r.age != null ? r.age.toFixed(1) : r.ageEst != null ? '~' + r.ageEst.toFixed(1) : dash;
-    var zm = function (n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }, d = r.delta;
-    var moved = d === 'new' ? 'new this week' : typeof d === 'number' && d ? (d > 0 ? '▲' + d : '▼' + (-d)) + ' this week' : null;
+    var zm = function (n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); };
     band('PROFILE', [['AGE', age, null, [r.cls, r.draft27 ? '2027 draft eligible' : null].filter(Boolean).join(' · ')],
                      ['HT / WT', (r.ht || dash) + ' / ' + (r.wt || dash), null, r.bmi ? 'BMI ' + r.bmi.toFixed(1) : null],
                      ['SNAP SHARE', r.snapShare != null ? Math.round(r.snapShare * 100) + '%' : dash, null, r.snaps ? r.snaps + ' snaps' : null],
-                     ['BOARD', '#' + r.ovr, null, moved]], 4);
+                     ['BOARD', '#' + r.ovr, null, null]], 4);
     band('GRADE', [['STAT+', r.statPlus == null ? dash : String(r.statPlus), r.statPlus != null && r.statPlus >= 100 ? C.teal : null,
                     '100 = avg' + (r.pfn != null ? ' · ' + (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : '')],
                    ['ON3', r.on3 == null ? dash : String(r.on3), null, 'talent grade'],
@@ -1057,6 +1056,13 @@
     var n = 20, gap = Math.max(3, Math.round(h / 4)), cw = (w - (n - 1) * gap) / n, lit = Math.round(pct / 5);
     for (var k = 0; k < n; k++) { g.fillStyle = k < lit ? col : C.dark; g.fillRect(Math.round(x + k * (cw + gap)), y, Math.ceil(cw), h); }
   }
+  // percentile tiers, judged the good way round (lower-is-better columns flipped): 90+, 70-89, 30-69, 10-29, under 10.
+  // Neutral columns (age, minutes, contract) have no tier: lilac bar, no accent
+  var PTIER = [[90, '#7fffd4'], [70, '#3fc6a0'], [30, '#c8c7ff'], [10, '#d887b4'], [0, '#ff9ec7']];
+  function tierCol(good) { if (good == null) return null; for (var k = 0; k < PTIER.length; k++) if (good >= PTIER[k][0]) return PTIER[k][1]; return PTIER[PTIER.length - 1][1]; }
+  function tierAcc(good) { return good == null || (good >= 30 && good < 70) ? null : tierCol(good); }
+  // never on a player card: GAP / xGAP (value minus market or starter, read as noise on a card) and the weekly move
+  var PC_DROP = /^(gap|xgap|±|\+\/-|δ|Δ)$/i;
   var PC_SKIP = /^(rk|#|pick|spot|tm)$/i, PC_SUB = /^(pos|position|team|school|club|org|league|lg|conf|class|yr|year|season|plays|tag|stage)$/i;
   var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;
   var PC_MARKS = '.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, svg, img';
@@ -1178,7 +1184,7 @@
       var items = [];
       hs.forEach(function (h, i) {
         var lc = h.toLowerCase();
-        if (i === k || i === ti || !h || shown[lc] || PC_SKIP.test(h) || PC_SUB.test(h) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !r.cells[i] || r.cells[i].hidden) return;
+        if (i === k || i === ti || !h || shown[lc] || PC_SKIP.test(h) || PC_DROP.test(h) || PC_SUB.test(h) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !r.cells[i] || r.cells[i].hidden) return;
         var c = pcCell(r.cells[i]); if (c.t === '—' || c.t.length > 12) return;
         var n = PC_NOPCT.test(h) || PC_INFO.test(h) ? null : pcNum(r.cells[i], c.t), pct = null;
         if (n != null) {
@@ -1242,7 +1248,7 @@
     var sortI = sortedCol(table, hcells), desc = (hcells[sortI] || { getAttribute: function () {} }).getAttribute('aria-sort') !== 'ascending';
     var tiles = [], lines = [], info = [];
     heads.forEach(function (h, i) {
-      if (i === nameI || i === fvI || i === ageI || PC_SKIP.test(h) || PC_SUB.test(h) || !h || (hcells[i] && hcells[i].hidden) || !cells[i] || cells[i].hidden) return;
+      if (i === nameI || i === fvI || i === ageI || PC_SKIP.test(h) || PC_DROP.test(h) || PC_SUB.test(h) || !h || (hcells[i] && hcells[i].hidden) || !cells[i] || cells[i].hidden) return;
       var c = pcCell(cells[i]); if (c.t === '—' && !c.sub) return;
       if (c.t.length > 18) { lines.push([h, c.t + (c.sub ? ' · ' + c.sub : '')]); return; }
       var n = PC_NOPCT.test(h) ? null : pcNum(cells[i], c.t), pct = null;
@@ -1374,7 +1380,7 @@
       g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText('#' + (at + 1) + ' of ' + rows.length + ' in view', vx, y + 78);
       g.font = '36px ' + FONT; g.fillStyle = C.lilac;
       if (feat.sub) g.fillText(fit(g, feat.sub, x + w - vx - 40), vx, y + 140);
-      if (feat.pct != null) pxBar(g, vx, y + 172, x + w - vx - 40, 28, feat.pct, feat.good != null && feat.good <= 20 ? C.down : C.teal);
+      if (feat.pct != null) pxBar(g, vx, y + 172, x + w - vx - 40, 28, feat.pct, tierCol(feat.good) || C.lilac);
       y += fh + 40;
     }
     var ts = th / 200;
@@ -1382,17 +1388,18 @@
       rule(auto ? 'PERCENTILE IN VIEW' : 'NUMBERS');
       tiles.slice(0, maxRows * cols).forEach(function (t, k) {
         var tx = x + (k % cols) * (tw + gap), ty = y + Math.floor(k / cols) * (th + 24);
-        var hot = t.good != null && t.good >= 80, cold = t.good != null && t.good <= 20, acc = hot ? C.teal : cold ? C.down : null;
+        var acc = tierAcc(t.good), tc = tierCol(t.good) || C.lilac;
         g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
-        if (acc) { var u = 8; g.fillStyle = acc; g.fillRect(tx + tw - 5 * u, ty + u, 4 * u, u); g.fillRect(tx + tw - 2 * u, ty + u, u, 4 * u); g.fillRect(tx + tw - 3 * u, ty + 2 * u, u, u); }   // pixel corner: top or bottom fifth
+        if (acc) { var u = 8; g.fillStyle = acc; g.fillRect(tx + tw - 5 * u, ty + u, 4 * u, u); g.fillRect(tx + tw - 2 * u, ty + u, u, 4 * u); g.fillRect(tx + tw - 3 * u, ty + 2 * u, u, u); }   // pixel corner: the outer tiers
         g.font = Math.round(34 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = acc || C.lilac; g.fillText(fit(g, capHead(t.h), tw - 96), tx + 24, ty + 40 * ts);
         var vsz = Math.round(72 * Math.min(ts, 1.6)); g.font = vsz + 'px ' + FONT;
         while (vsz > 40 && g.measureText(t.t).width > tw - 48) { vsz -= 4; g.font = vsz + 'px ' + FONT; }   // long values step down before they clip
         g.fillStyle = t.color || C.white; g.fillText(fit(g, t.t, tw - 48), tx + 24, ty + 102 * ts);
         g.font = Math.round(30 * Math.min(ts, 1.3)) + 'px ' + FONT; g.fillStyle = C.lilac;
-        var foot = [t.sub, t.pct != null ? 'p' + t.pct : ''].filter(Boolean).join(' · ');
-        if (foot) g.fillText(fit(g, foot, tw - 48), tx + 24, ty + 150 * ts);
-        if (t.pct != null) { var bh = Math.round(14 * ts); pxBar(g, tx + 24, ty + th - 28 - bh, tw - 48, bh, t.pct, cold ? C.down : C.teal); }
+        var fy = ty + 150 * ts, fx0 = tx + 24;
+        if (t.sub) { var st = fit(g, t.sub + (t.pct != null ? ' · ' : ''), tw - 48 - (t.pct != null ? 90 : 0)); g.fillText(st, fx0, fy); fx0 += g.measureText(st).width; }
+        if (t.pct != null) { g.fillStyle = tc; g.fillText('p' + t.pct, fx0, fy); }
+        if (t.pct != null) { var bh = Math.round(14 * ts); pxBar(g, tx + 24, ty + th - 28 - bh, tw - 48, bh, t.pct, tc); }
       });
       y += Math.ceil(Math.min(tiles.length, maxRows * cols) / cols) * (th + 24) + 20;
     }
@@ -1412,16 +1419,18 @@
       p.gp.items.slice(0, p.rows * sh.cols).forEach(function (it, k) {
         var cx = x + (k % sh.cols) * (cw + 16), cy = y + Math.floor(k / sh.cols) * (sh.ch + 16);
         if (cy + sh.ch > fillEnd) return;
-        var hot = it.good != null && it.good >= 80, cold = it.good != null && it.good <= 20, acc = hot ? C.teal : cold ? C.down : null;
+        var acc = tierAcc(it.good), tc = tierCol(it.good) || C.lilac;
         g.fillStyle = C.face; g.fillRect(cx, cy, cw, sh.ch); bevel(g, cx, cy, cw, sh.ch, true, 3);
         if (acc) { var u = 6; g.fillStyle = acc; g.fillRect(cx + cw - 5 * u, cy + u, 4 * u, u); g.fillRect(cx + cw - 2 * u, cy + u, u, 4 * u); g.fillRect(cx + cw - 3 * u, cy + 2 * u, u, u); }
         g.font = '30px ' + FONT; g.fillStyle = acc || C.lilac; g.fillText(fit(g, capHead(it.h), cw - 64), cx + 20, cy + 36);
         var vs = 60; g.font = vs + 'px ' + FONT;
         while (vs > 32 && g.measureText(it.t).width > cw - 40) { vs -= 4; g.font = vs + 'px ' + FONT; }
         g.fillStyle = it.color || C.white; g.fillText(fit(g, it.t, cw - 40), cx + 20, cy + 90);
-        var foot = [it.sub, it.pct != null && p.gp.title !== 'FV outlook' ? 'p' + it.pct : ''].filter(Boolean).join(' · ');
-        if (foot) { g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, foot, cw - 40), cx + 20, cy + 134); }
-        if (it.pct != null) pxBar(g, cx + 20, cy + sh.ch - 30, cw - 40, 12, it.pct, cold ? C.down : C.teal);
+        var pp = it.pct != null && p.gp.title !== 'FV outlook', fx1 = cx + 20;
+        g.font = '26px ' + FONT; g.fillStyle = C.lilac;
+        if (it.sub) { var st1 = fit(g, it.sub + (pp ? ' · ' : ''), cw - 40 - (pp ? 70 : 0)); g.fillText(st1, fx1, cy + 134); fx1 += g.measureText(st1).width; }
+        if (pp) { g.fillStyle = tc; g.fillText('p' + it.pct, fx1, cy + 134); }
+        if (it.pct != null) pxBar(g, cx + 20, cy + sh.ch - 30, cw - 40, 12, it.pct, tc);
       });
       y += p.rows * (sh.ch + 16) + 20;
     });
