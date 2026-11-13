@@ -539,7 +539,7 @@ def implied(last, fresh=False, walkforward=False, snaps_at=()):
     for gid, (x, _) in feats.items():
         r = ih.get(gid)
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
     seas = {g['game_id']: int(g['season']) for g in allg}
     cf = defaultdict(lambda: (F['coef'], F['tcoef']))
     if walkforward:

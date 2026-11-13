@@ -151,7 +151,7 @@ def main():
         x = dict(x)
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         D.append((g, x, before))
     S = np.array([int(g['season']) for g, _, _ in D]); WK = np.array([int(g['week']) for g, _, _ in D])
     y = np.array([N.num(g['result']) for g, _, _ in D])

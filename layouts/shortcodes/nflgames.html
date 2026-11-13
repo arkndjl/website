@@ -9,7 +9,7 @@
 {{- /* market lines, moneylines and the record against the line show only on Predictions (shortcode called with sport=) */}}
 {{- $pred := ne ($.Get "sport" | default "") "" -}}
 {{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
-{{- $names := dict "elo" "Elo" "epa" "EPA" "qb" "QB" "rest" "rest" "home" "home field" "inj" "injuries" "mkt" "market" "ret" "return game" "roster" "roster moves" "trade" "in-season moves" -}}
+{{- $names := dict "elo" "Elo" "epa" "EPA" "qb" "QB" "rest" "rest" "home" "home field" "inj" "injuries" "mkt" "market" "ret" "return game" "ir" "reserve lists" "roster" "roster moves" "trade" "in-season moves" -}}
 <div class="win games nflgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="week {{ .week }} · {{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>

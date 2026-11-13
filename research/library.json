@@ -1014,9 +1014,10 @@
      "term": "NFL rating",
      "short": "Expected margin vs an average team, neutral field, with this week's QB and injuries.",
      "body": [
-      "Fitted terms: Elo, starting QB, rest, home, injuries, market rating from earlier closes, return game.",
+      "Fitted terms: Elo, starting QB, rest, home, injuries, market rating from earlier closes, return game, reserve lists.",
       "Injury cost = WAR a game x 36 pts a win x P(miss); questionable .25, doubtful .98.",
-      "Failed Nov 13 2026 (pre-registered, Holm over 7): reserve-list players at the injury value (2015-20 t -.2, 2021-25 t -1.7; lead, re-score after 2026), QB term on ESPN QBR (t +1.0), injuries valued with contract cap share (t -.6 / +.4), QB term in totals (t -1.6 / -.8), offense minus defense injuries in totals (t +2.0)."
+      "Reserve lists: non-QBs on IR, PUP or another list and off the game status report, WAR a game x 36, weight .65 (t 2.9). Held out 2021-25 MAE 10.03 to 9.99 (t -3.4 in the best of 8 versions, all 8 better); flat 2015-20, so it failed the pre-registered gate and was added on the owner's call Nov 13 2026. Scored once on the 2026 season.",
+      "Failed Nov 13 2026 (pre-registered, Holm over 7): QB term on ESPN QBR (t +1.0), injuries valued with contract cap share (t -.6 / +.4), QB term in totals (t -1.6 / -.8), offense minus defense injuries in totals (t +2.0)."
      ],
      "where": "NFL ARK Ranking, games, season odds",
      "sports": [

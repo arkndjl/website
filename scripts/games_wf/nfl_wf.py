@@ -30,7 +30,7 @@ def main():
             continue
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         D.append((g, x, tx))
     X = np.array([[x[f] for f in N.FEATS] for _, x, _ in D]); y = np.array([N.num(g['result']) for g, _, _ in D])
     TX = np.array([[tx[f] for f in N.TFEATS] for _, _, tx in D]); ty = np.array([N.num(g['total']) for g, _, _ in D])

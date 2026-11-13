@@ -273,7 +273,7 @@ def main():
         """does the candidate's move predict result minus the close? slope and t"""
         return None
 
-    base, tbase = list(N.FEATS), list(N.TFEATS)
+    base, tbase = [f for f in N.FEATS if f != 'ir'], list(N.TFEATS)
     e0, p0, _ = wf(base); t0, tp0, _ = wf(tbase, True)
     res = {'prereg': 'scripts/research/nfl_nov13/PREREG.md', 'base': {
         'mae1520': round(float(e0[A].mean()), 3), 'mae2125': round(float(e0[B].mean()), 3),

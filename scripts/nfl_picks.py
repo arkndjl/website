@@ -157,7 +157,7 @@ def backtest():
             continue
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         D.append((g, x))
     X = np.array([[x[f] for f in N.FEATS] for _, x in D]); y = np.array([N.num(g['result']) for g, _ in D])
     S = np.array([int(g['season']) for g, _ in D]); pred = np.full(len(y), np.nan)
