@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T22:09Z",
+ "asof": "2026-11-13T22:44Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -314,15 +314,15 @@
      "rows": 2126
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 18,
+     "flags": 20,
      "rows": 640
     },
     "static/data/nfl-war.json": {
-     "flags": 73,
+     "flags": 74,
      "rows": 1797
     },
     "static/data/pctl-nfl.json": {
-     "flags": 72,
+     "flags": 73,
      "rows": 1726
     },
     "static/data/personnel/nfl.json": {
@@ -330,7 +330,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 50,
+     "flags": 51,
      "rows": 1650
     }
    },
@@ -516,12 +516,12 @@
      "site": "BAL"
     },
     {
-     "d": "2026-11-11",
+     "d": "2026-11-13",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Waived by Kansas City",
-     "kind": "waived",
+     "flag": "moved",
+     "head": "New opportunity with Houston",
+     "kind": null,
      "move": {
       "d": "2026-11-11",
       "head": "Waived by Kansas City",
@@ -530,7 +530,7 @@
      "pid": "16744",
      "player": "Nikko Remigio",
      "pos": "WR",
-     "rotowire": "FA",
+     "rotowire": "HOU",
      "site": "KC"
     },
     {
@@ -1538,6 +1538,24 @@
      "pid": "14434",
      "player": "Kenneth Murray",
      "pos": "LB",
+     "rotowire": "FA",
+     "site": "HOU"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Cut loose by Houston",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Cut loose by Houston",
+      "kind": "waived"
+     },
+     "pid": "11768",
+     "player": "Dare Ogunbowale",
+     "pos": "RB",
      "rotowire": "FA",
      "site": "HOU"
     },
@@ -2442,6 +2460,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Houston",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Cut loose by Houston",
+      "kind": "waived"
+     },
+     "pid": "11768",
+     "player": "Dare Ogunbowale",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "HOU"
+    },
+    {
      "d": "2026-08-31",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2964,12 +3000,12 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-11",
+     "d": "2026-11-13",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Waived by Kansas City",
-     "kind": "waived",
+     "flag": "moved",
+     "head": "New opportunity with Houston",
+     "kind": null,
      "move": {
       "d": "2026-11-11",
       "head": "Waived by Kansas City",
@@ -2978,7 +3014,7 @@
      "pid": "16744",
      "player": "Nikko Remigio",
      "pos": "WR",
-     "rotowire": "FA",
+     "rotowire": "HOU",
      "site": "KC"
     },
     {
@@ -3774,6 +3810,24 @@
      "site": "HOU"
     },
     {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Houston",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Cut loose by Houston",
+      "kind": "waived"
+     },
+     "pid": "11768",
+     "player": "Dare Ogunbowale",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "HOU"
+    },
+    {
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4152,6 +4206,24 @@
      "site": "WAS"
     },
     {
+     "d": "2026-11-13",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Cut loose by Houston",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Cut loose by Houston",
+      "kind": "waived"
+     },
+     "pid": "11768",
+     "player": "Dare Ogunbowale",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "HOU"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4224,6 +4296,24 @@
      "site": "CAR"
     },
     {
+     "d": "2026-11-13",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "moved",
+     "head": "New opportunity with Houston",
+     "kind": null,
+     "move": {
+      "d": "2026-11-11",
+      "head": "Waived by Kansas City",
+      "kind": "waived"
+     },
+     "pid": "16744",
+     "player": "Nikko Remigio",
+     "pos": "WR",
+     "rotowire": "HOU",
+     "site": "FA"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4267,7 +4357,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -4288,6 +4378,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-13",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Heads to minors",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Heads to minors",
+      "kind": "down"
+     },
+     "pid": "4334",
+     "player": "Laurent Brossoit",
+     "pos": "G",
+     "rotowire": "ANA",
+     "site": "ANA"
+    },
     {
      "d": "2026-11-13",
      "field": "tm",
