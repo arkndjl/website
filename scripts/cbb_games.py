@@ -21,6 +21,9 @@ Margin (home minus away, points) is a linear model, fit on the seasons before th
             (never the game's own line), part carried over each summer
     home    1 at a true home game, 0 neutral
     + candidates kept only when they cut 2016-20 error at t <= -1.5 (CANDS; data/cbb_games_fit.json 'select')
+    mdis    market disagreement: each team's running gap between the closing spreads of its EARLIER games this season
+            and the margin the inputs above gave those games (DIS_K a game, 0 at the season's start); tdis the same
+            on the total
 Preseason prior (the efficiency solve's starting point): last season's final rating and the roster, by player from
 Barttorvik's lines: returning minutes, returners' projected BPM x projected minutes share (scripts/cbb_roster.py),
 incoming transfers' BPM x minutes, freshmen by recruiting rank (On3, 247), newcomers with no D-I line (juco,
@@ -126,6 +129,14 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # Oct 30 2026 audit: history's fvtop/agew/fvfrm rebuilt (fvfrm had been cached under an older fv_dist map, +.55 a
 # team live over history) with the board's age date, guard and power flags; live unranked freshmen count at FR_PLAY.
 # History error unchanged (2021-26 MAE +.0001, t .5; lined t -.2); the live prior sits .28 lower, flat (sd .10)
+# market disagreement (scripts/cbb_mdis_research.py, data/cbb_mdis_research.json; pre-registered, Holm over 5): where the
+# close and the model disagree about a team, they disagree again in its next game (r .45) and the close is mostly right.
+# d_team starts each season at 0; after each day, e = (close - p0) - (d_home - d_away), both sides move DIS_K x e, p0
+# the other inputs' margin (walk-forward weights in the history, 'coef0' live). mdis = d_home - d_away is one more
+# input; tdis the same on totals (d_home + d_away). Lined games 2021-26: margin MAE 9.057 -> 9.009 (t -8.6; close
+# 8.986), totals 13.401 -> 13.366 (t -5.6); 2016-20 t -4.3 / -5.0; 2025-26 (closes after the line source changed)
+# -.044 / -.033. Constant .2 picked on 2016-20 (.1-.5, 1/n gains, a season carry and a daily ridge solve all flat)
+DIS_K = 0.2
 PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm', 'nohist', 'ptrdn', 'cres']   # fr, lastret, newmin out Oct 21 2026
 # nohist (Oct 26 2026, scripts/cbb_ark_research.py): 1 for a season with no final ratings the season before (2014, where
 # the history starts). Every 2014 team's 'last' was the -8 stand-in, so those rows bent the 'last' coefficient (and the
@@ -145,11 +156,28 @@ PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'r
 # carried by the returning minutes (ltrend), projected-minutes-weighted roster height (hgt), and blowout damping in
 # the efficiency solve (bcap: raw or from the expected margin, 15-30 pts per 100; helps 2016-20, worse 2021-26)
 X = 'X'                                   # every non-D-I opponent, one rating
+LG = '__lg__'                             # the prior's league-level entry (tempo, efficiency: P['lgcar'])
 NOFEAT = True                             # roster-less teams take the mean final of earlier ones (Oct 21 2026)
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
 # Utah Valley, Utah Tech, Southern Utah, Weber St., New Mexico, Northern Arizona, Montana St., Idaho St., Nevada, UNLV?
 # (UNLV 2,000 ft, left out), Northern Colorado, Grand Canyon (1,100, left out)
 ALT = {'2005', '38', '36', '2172', '2751', '254', '328', '252', '3084', '3101', '253', '2692', '167', '2464', '147', '304', '2440', '2458'}
+
+
+def box_poss(summary):
+    """a game's possessions from ESPN's box score: each side's FGA - offensive rebounds + turnovers + .475 x FTA, the
+    two averaged. Barttorvik's count to within .06 a game (647 games of 2026-27, r .999): the stand-in when its
+    schedule file doesn't come"""
+    v = []
+    for t in (summary.get('boxscore') or {}).get('teams') or []:
+        st = {x.get('name'): x.get('displayValue') for x in t.get('statistics') or []}
+        try:
+            fga = float(st['fieldGoalsMade-fieldGoalsAttempted'].split('-')[1])
+            fta = float(st['freeThrowsMade-freeThrowsAttempted'].split('-')[1])
+            v.append(fga - float(st['offensiveRebounds']) + float(st.get('totalTurnovers') or st['turnovers']) + 0.475 * fta)
+        except (KeyError, ValueError, IndexError, AttributeError, TypeError):
+            return None
+    return round(sum(v) / 2, 1) if len(v) == 2 and min(v) > 30 else None
 
 
 def poss_secs(plays, home, away):
@@ -804,6 +832,10 @@ class Ratings:
         # each team's prior weight as a multiple of lam ('lm'; 1 = the same for every team): research only so far
         # (scripts/cbb_kalman_research.py, a prior's precision by how uncertain the roster makes it)
         self.lm = np.array([prior.get(t, {}).get('lm', 1.0) for t in self.teams])
+        # the league's tempo and efficiency before any game: last season's final values (prior[LG], P['lgcar']), else
+        # the constants. Team tempo priors are last season's deviations, so a constant league tempo under last
+        # season's left every opening day short of possessions
+        self.tau0, self.mu0 = prior.get(LG, {}).get('tau', P['tau0']), prior.get(LG, {}).get('mu', P['mu0'])
         # hierarchical prior (team model idea 5): with P['cv'] > 0 each team's offense and defense are its conference's
         # effect plus its own deviation, the conference effect with cv times a team's prior variance, so a result moves
         # every conference-mate's rating a little (precision lam x (I - cv / (1 + cv n_k) J) inside conference k)
@@ -830,13 +862,13 @@ class Ratings:
         self.dB = np.zeros(m)
         self.dO, self.dD, self.dmu = np.zeros(n), np.zeros(n), 0.0
         self.AA, self.Ab = np.zeros((2 * n + 1, 2 * n + 1)), np.zeros(2 * n + 1)
-        self.ao, self.ad, self.ac = self.pAo.copy(), self.pAd.copy(), 1200.0 / P['tau0']
+        self.ao, self.ad, self.ac = self.pAo.copy(), self.pAd.copy(), 1200.0 / self.tau0
         self.day = None
         self.nobs = 0
         self.O, self.D, self.T = self.pO.copy(), self.pD.copy(), self.pT.copy()
         self.T2 = self.T
-        self.tau2 = P['tau0']
-        self.mu, self.h, self.tau = P['mu0'], P['h0'], P['tau0']
+        self.tau2 = self.tau0
+        self.mu, self.h, self.tau = self.mu0, P['h0'], self.tau0
         self.ng = defaultdict(int)
 
     def i(self, t):
@@ -911,7 +943,7 @@ class Ratings:
         if not self.nobs:
             return
         self.decay(day)
-        pri = np.concatenate([self.pO, self.pD, [P['mu0'], P['h0']]])
+        pri = np.concatenate([self.pO, self.pD, [self.mu0, P['h0']]])
         prec = np.concatenate([lam * self.lm, lam * self.lm, [0.01, 0.5]])
         prec[self.ix[X]] = prec[n + self.ix[X]] = P.get('xprec', 0.5)
         if self.PM is not None:
@@ -928,7 +960,7 @@ class Ratings:
         self.dO, self.dD, self.dmu = s[:n, 1], s[n:2 * n, 1], s[2 * n, 1]
         self.D = self.D + P.get('ldft', 0.0) * self.dD
         prec = np.concatenate([np.full(n, P.get('tlam', lam)), [0.01]])
-        pt = prec * np.concatenate([self.pT, [P['tau0']]])
+        pt = prec * np.concatenate([self.pT, [self.tau0]])
         s = np.linalg.solve(self.TA + np.diag(prec), self.Tb + pt)
         self.T, self.tau = s[:n], s[n]
         self.T2, self.tau2 = self.T, self.tau
@@ -937,7 +969,7 @@ class Ratings:
             self.T2, self.tau2 = s[:n], s[n]
         if P.get('aplmix'):
             prec = np.concatenate([np.full(n, P['aplo']), np.full(n, P['apld']), [0.01]])
-            s = np.linalg.solve(self.AA + np.diag(prec), self.Ab + prec * np.concatenate([self.pAo, self.pAd, [1200.0 / P['tau0']]]))
+            s = np.linalg.solve(self.AA + np.diag(prec), self.Ab + prec * np.concatenate([self.pAo, self.pAd, [1200.0 / self.tau0]]))
             self.ao, self.ad, self.ac = s[:n], s[n:2 * n], s[2 * n]
 
     def net(self, t):
@@ -971,6 +1003,8 @@ class Walk:
         self.P, self.tprior, self.btname = P, tprior, btname
         self.elo = defaultdict(lambda: 1500.0)
         self.mkt, self.tm = defaultdict(float), defaultdict(float)
+        self.md, self.td, self.p0 = defaultdict(float), defaultdict(float), {}   # market disagreement (DIS_K)
+        self.c0 = self.tc0 = None                 # the other inputs' weights (live: fit file coef0 / tcoef0)
         self.tm0 = {}                   # last season's final market total gaps ('tpri')
         self.tlg = 140.0
         self.final = {}                 # season -> team -> {O, D, T, net}
@@ -1056,6 +1090,9 @@ class Walk:
         xl, xc = self.xfinal.get(s - 1), self.P.get('xcar', 0.0)
         if xl and xc:
             out[X] = {'O': -10.0 + xc * (xl['O'] + 10.0), 'D': -10.0 + xc * (xl['D'] + 10.0), 'T': xc * xl['T']}
+        lc = self.P.get('lgcar', 0.0)
+        if xl and lc and xl.get('tau'):
+            out[LG] = {'tau': self.P['tau0'] + lc * (xl['tau'] - self.P['tau0']), 'mu': self.P['mu0'] + lc * (xl['mu'] - self.P['mu0'])}
         return out, feats
 
     def new_season(self, s):
@@ -1064,6 +1101,7 @@ class Walk:
             self.elo[t] = 1500 + (self.elo[t] - 1500) * P['ecarry']
         for t in list(self.mkt):
             self.mkt[t] *= P['mrev']
+        self.md, self.td, self.p0 = defaultdict(float), defaultdict(float), {}
         self.tm0 = dict(self.tm)
         for v in self.shot.values():
             v[:] = [x * 0.5 for x in v]
@@ -1082,6 +1120,14 @@ class Walk:
         if g.get('total'):
             e = g['total'] - (self.tlg + self.tm[h] + self.tm[a])
             self.tm[h] += self.P['tk'] * e; self.tm[a] += self.P['tk'] * e; self.tlg += 0.005 * e
+        p = self.p0.get(g.get('id'))
+        if p:
+            if L is not None:
+                e = (L - p[0]) - (self.md[h] - self.md[a])
+                self.md[h] += DIS_K * e; self.md[a] -= DIS_K * e
+            if g.get('total'):
+                e = (g['total'] - p[1]) - (self.td[h] + self.td[a])
+                self.td[h] += DIS_K * e; self.td[a] += DIS_K * e
 
     def luck(self, g, d):
         """(home, away) points of shooting luck to take off each score, and the shooting lines to add after"""
@@ -1233,6 +1279,10 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
                   # tempo clash (Nov 3 2026, scripts/cbb_tclash_research.py): the product of the two sides' tempo
                   # deviations (total's tempo solve) and of their market total ratings
                   'tclash': R.T2[R.i(h)] * R.T2[R.i(a)], 'mclash': W.tm[h] * W.tm[a] / 10}
+            # market disagreement: live from the walk's own state; the history walk leaves 0 and matrices() fills it
+            x['mdis'] = W.md[h] - W.md[a]; tx['tdis'] = W.td[h] + W.td[a]
+            if W.c0 and W.tc0:
+                W.p0[g['id']] = (sum(v * x[f] for f, v in W.c0.items()), sum(v * tx[f] for f, v in W.tc0.items()))
             collect(g, x, tx, R)
         for g in by_day[d]:
             W.market(g)
@@ -1255,7 +1305,7 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
         R.solve((datetime(s, 4, 10) - day0).days)
         W.final[s] = {t: {'O': float(R.O[R.ix[t]]), 'D': float(R.D[R.ix[t]]), 'T': float(R.T[R.ix[t]]),
                           'net': float(R.O[R.ix[t]] + R.D[R.ix[t]]), 'ao': float(R.ao[R.ix[t]]), 'ad': float(R.ad[R.ix[t]])} for t in teams}
-        W.xfinal[s] = {'O': float(R.O[R.ix[X]]), 'D': float(R.D[R.ix[X]]), 'T': float(R.T[R.ix[X]])}
+        W.xfinal[s] = {'O': float(R.O[R.ix[X]]), 'D': float(R.D[R.ix[X]]), 'T': float(R.T[R.ix[X]]), 'tau': float(R.tau), 'mu': float(R.mu)}
         for t in teams:
             if t in pfeats and R.ng[t] >= 15:
                 W.prior_rows.append((s, t, pfeats[t], W.final[s][t]['net']))
@@ -1369,6 +1419,8 @@ def load_all():
 
 
 def matrices(rows, feats, tfeats=TFEATS):
+    """'mdis' in feats / 'tdis' in tfeats: the market-disagreement column is built here from the other columns'
+    walk-forward prediction (dis_col), so every reader of the history walk gets the same input"""
     D = [(g, x, tx) for g, x, tx in rows if g['season'] >= FIRST + 1]
     Xm = np.array([[x[f] for f in feats] for _, x, _ in D]); y = np.array([g['hs'] - g['as'] for g, _, _ in D], float)
     TX = np.array([[tx[f] for f in tfeats] for _, _, tx in D]); ty = np.array([g['hs'] + g['as'] for g, _, _ in D], float)
@@ -1376,7 +1428,41 @@ def matrices(rows, feats, tfeats=TFEATS):
     line = np.array([-g['spread'] if g.get('spread') is not None else np.nan for g, _, _ in D])
     tline = np.array([g['total'] if g.get('total') else np.nan for g, _, _ in D])
     d1 = np.array([g['home'] != X and g['away'] != X and 'hb' in g for g, _, _ in D])
+    if 'mdis' in feats:
+        j = list(feats).index('mdis'); o = [i for i in range(len(feats)) if i != j]
+        Xm[:, j] = dis_col(D, Xm[:, o], y, S, d1, line, -1)
+    if 'tdis' in tfeats:
+        j = list(tfeats).index('tdis'); o = [i for i in range(len(tfeats)) if i != j]
+        TX[:, j] = dis_col(D, TX[:, o], ty, S, d1, tline, +1)
     return D, Xm, y, TX, ty, S, line, tline, d1
+
+
+def dis_col(D, X0, y, S, d1, line, sign, k=None):
+    """the market-disagreement input for every history game (DIS_K): the other inputs X0 give each game's margin
+    walk-forward (the first season, with none before it, from its own fit: training rows only), and each team's
+    running gap to the close is read before its day's lines are added. sign -1: margin (home minus away), +1: total"""
+    k = DIS_K if k is None else k
+    p0 = walk_pred(X0, y, S, d1, first=int(S.min()) + 1)
+    nn = np.isnan(p0)
+    if nn.any():
+        tr = nn & d1
+        p0[nn] = X0[nn] @ np.linalg.lstsq(X0[tr], y[tr], rcond=None)[0]
+    out = np.zeros(len(D))
+    by = defaultdict(lambda: defaultdict(list))
+    for i, (g, _, _) in enumerate(D):
+        by[g['season']][et_date(g['date'])].append(i)
+    for s in sorted(by):
+        d = defaultdict(float)
+        for day in sorted(by[s]):
+            for i in by[s][day]:
+                out[i] = d[D[i][0]['home']] + sign * d[D[i][0]['away']]
+            for i in by[s][day]:
+                if line[i] != line[i]:
+                    continue
+                h, a = D[i][0]['home'], D[i][0]['away']
+                e = (line[i] - p0[i]) - (d[h] + sign * d[a])
+                d[h] += k * e; d[a] += sign * k * e
+    return out
 
 
 def walk_pred(Xm, y, S, d1, first=SCORE0, ridge=0.0):
@@ -1539,6 +1625,12 @@ def report():
     D, Xa, y, TX, ty, S, line, tline, d1, col = M
     Xm = Xa[:, [col[f] for f in feats]]
     tpred = walk_pred(TX, ty, S, d1)
+    # the market-disagreement inputs go in after the selection: each is built from the selected inputs' own
+    # walk-forward prediction (DIS_K, dis_col)
+    pred0, tpred0, feats0, tfeats = pred, tpred, list(feats), TFEATS + ['tdis']
+    Xm = np.column_stack([Xm, dis_col(D, Xm, y, S, d1, line, -1)]); feats = feats + ['mdis']
+    TX = np.column_stack([TX, dis_col(D, TX, ty, S, d1, tline, +1)])
+    pred, tpred = walk_pred(Xm, y, S, d1), walk_pred(TX, ty, S, d1)
     ok = ~np.isnan(pred) & d1
     tune = ok & (S <= TUNE_END); held = ok & (S > TUNE_END)
     mlh = np.array([g.get('mlh') or np.nan for g, _, _ in D]); mla = np.array([g.get('mla') or np.nan for g, _, _ in D])
@@ -1605,6 +1697,16 @@ def report():
     b = np.linalg.lstsq(Xm[tr], y[tr], rcond=None)[0]
     res = y[tr] - Xm[tr] @ b; cov = (res @ res / (tr.sum() - len(b))) * np.linalg.inv(Xm[tr].T @ Xm[tr])
     tb = np.linalg.lstsq(TX[tr], ty[tr], rcond=None)[0]
+    b0 = np.linalg.lstsq(Xm[tr][:, :-1], y[tr], rcond=None)[0]
+    tb0 = np.linalg.lstsq(TX[tr][:, :-1], ty[tr], rcond=None)[0]
+
+    def dis_test(new, old, yy, ln):
+        r = {}
+        for nm, kk in (('tune', tune), ('held', held), ('2025-26', ok & (S >= 2025))):
+            kk = kk & ~np.isnan(ln) & ~np.isnan(new) & ~np.isnan(old)
+            e1, e0 = np.abs(new[kk] - yy[kk]), np.abs(old[kk] - yy[kk])
+            r[nm] = {'games': int(kk.sum()), 'maeWithout': round(float(e0.mean()), 4), 'mae': round(float(e1.mean()), 4), 't': round(paired_t(e1, e0), 2)}
+        return r
     tsd = float(np.std((tpred - ty)[ok & ~np.isnan(tpred)]))
     # the preseason prior: walk-forward fit (each season's weights from the seasons before) against the season's final rating
     pri = W.prior_rows
@@ -1621,7 +1723,9 @@ def report():
     pc = W.prior_coef(LAST + 1)
     out = {'params': P, 'feats': feats, 'coef': {f: round(float(v), 4) for f, v in zip(feats, b)},
            't': {f: round(float(v / math.sqrt(cov[i, i])), 1) for i, (f, v) in enumerate(zip(feats, b))},
-           'tcoef': {f: round(float(v), 4) for f, v in zip(TFEATS, tb)}, 'sd': round(sd, 2), 'sdBySeason': {str(k_): round(v, 2) for k_, v in sd_by.items()}, 'sdFixed2016_20': round(sd0, 2), 'tsd': round(tsd, 2), 'blend': wb,
+           'tcoef': {f: round(float(v), 4) for f, v in zip(tfeats, tb)}, 'tfeats': tfeats,
+           'coef0': {f: round(float(v), 4) for f, v in zip(feats0, b0)}, 'tcoef0': {f: round(float(v), 4) for f, v in zip(TFEATS, tb0)},
+           'dis': {'k': DIS_K, 'margin': dis_test(pred, pred0, y, line), 'total': dis_test(tpred, tpred0, ty, tline)}, 'sd': round(sd, 2), 'sdBySeason': {str(k_): round(v, 2) for k_, v in sd_by.items()}, 'sdFixed2016_20': round(sd0, 2), 'tsd': round(tsd, 2), 'blend': wb,
            'prior': {k: round(float(v), 4) for k, v in pc.items()}, 'priorTest': pr_test,
            'test': test, 'bySeason': by_season, 'calib': cal, 'select': cand_log, 'drop': drop_log,
            'grid': log, 'seasons': [SCORE0, LAST], 'tune': [SCORE0, TUNE_END]}

@@ -54,7 +54,7 @@ def _board(path):
     if not d:
         return []
     c = {k: i for i, k in enumerate(d['cols'])}
-    return [{k: r[i] for k, i in c.items()} for r in d['rows']]
+    return [{k: (r[i] if i < len(r) else None) for k, i in c.items()} for r in d['rows']]      # a late column is short on some rows
 
 
 def _top(by, n=5):
