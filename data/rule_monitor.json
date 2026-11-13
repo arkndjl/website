@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T05:24:03Z",
+ "asof": "2026-11-13T05:29:06Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -699,6 +699,87 @@
     "real": null,
     "realSe": null,
     "need": 174,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cfb:spread | tier: power",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 8+ (tier: power)",
+   "since": "2026-11-05",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0689,
+    "beat": 0.56,
+    "roi": 0.1037,
+    "n": 25
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.1648,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.174,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": "",
+    "drift": {
+     "mu1": 0.0272,
+     "n": 0,
+     "sd": 0.1648,
+     "rho": 0.174,
+     "lo": -2.944,
+     "hi": 2.944,
+     "state": "watching",
+     "at": null,
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 217
+    }
+   },
+   "drift": {
+    "mu1": 0.0272,
+    "n": 0,
+    "sd": 0.1648,
+    "rho": 0.174,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 217,
     "path": []
    }
   },
@@ -1513,6 +1594,7 @@
    "pick:cfb:spread | season: early",
    "pick:cfb:spread | season: late",
    "pick:cfb:spread | tier: mixed",
+   "pick:cfb:spread | tier: power",
    "pick:cfb:spread | venue: home",
    "pick:nfl:spread",
    "pick:nfl:total",
