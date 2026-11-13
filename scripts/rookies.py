@@ -130,6 +130,7 @@ def nfl():
         m, _ = M.find(p['n'], team=p.get('col') or None)
         pre = int(d['pick']) if d and d['pick'] else None
         rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'waa': p.get('waa'), 'waaP': p.get('waaP'), 'war': p['war'], 'xv': p.get('xv'),
+                     'pxp': p.get('pxp'), 'xp': p.get('xp') if (p.get('sn') or 0) >= 100 else None,
                      'wav': p.get('wav'), 'pace': p.get('pace'), 'g': p['g'], 'sn': p.get('sn'),
                      'pre': pre, 'preL': f"R{d['round']} #{d['pick']}" if pre else 'UDFA', 'pfv': m['fv'] if m else None,
                      'sub': p.get('col') or '', 'line': p.get('line') or '',
@@ -138,9 +139,12 @@ def nfl():
         'asof': b.get('last'), 'title': f'{y} rookies', 'key': 'waa',
         'def': 'rookies: first NFL season (nflverse rookie flag). slot = overall pick. pre-draft FV fills from the draft ledger from the 2027 class on.',
         'views': [['waa', 'WAA', 'WAA this season: wins over an average regular at the sub-position, same snaps'],
-                  ['war', 'WAR', 'WAR this season: .6 x AV WAR + .4 x XV'], ['xv', 'XV', 'XV: WAR on the stat-line parts that track team margin'],
+                  ['war', 'WAR', 'WAR this season: .6 x AV WAR + .4 x XV'],
+                  ['pxp', 'pXP/60', 'pXP/60: predictive points over an average regular per 60 snaps (a rookie has no past seasons, so this season alone, shrunk to the sub-position mean by K snaps)'], ['xv', 'XV', 'XV: WAR on the stat-line parts that track team margin'],
                   ['pace', 'WAR/17', 'WAR on a 17-game pace'], ['waaP', 'WAA/17', 'WAA on a 17-game pace']],
-        'cols': [col('waa', 'WAA', 'wins over an average regular at the sub-position, same snaps', 's2'), col('war', 'WAR', 'wins above replacement this season', '2'), col('xv', 'XV', 'expected value: WAR from the stat line', '2'),
+        'cols': [col('waa', 'WAA', 'wins over an average regular at the sub-position, same snaps', 's2'), col('war', 'WAR', 'wins above replacement this season', '2'),
+                 col('pxp', 'pXP/60', 'predictive points over an average regular at the sub-position per 60 snaps: this season shrunk to the sub-position mean by K snaps (QB 650, RB 450, WR 650, TE 300, DL 650, LB 1300, OL 2600, DB 3600)', 's2'),
+                 col('xp', 'rXP/60', 'points over an average regular at the sub-position per 60 snaps, this season (100+ snaps)', 's2', 1), col('xv', 'XV', 'expected value: WAR from the stat line', '2'),
                  col('wav', 'AV WAR', 'WAR from approximate value', '2', 1), col('pace', 'WAR/17', 'WAR on a 17-game pace', '2', 1), col('waaP', 'WAA/17', 'WAA on a 17-game pace', 's2', 1),
                  col('g', 'G', 'games', 'i', 1), col('sn', 'Snaps', 'snaps', 'i', 1), col('line', 'Line', 'season line', 's', 1, 0)],
         'pre': {'l': 'Pick', 't': 'overall pick in the draft (UDFA: undrafted)'}, 'pfv': {'l': 'Pre FV', 't': 'CFB board FV on the eve of the draft (draft ledger, 2027 class on), mean outcome'},

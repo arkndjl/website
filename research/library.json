@@ -419,11 +419,11 @@
      "term": "pXP/60 (NFL)",
      "short": "Headline NFL rate, shown beside WAR: three seasons of rXP/60, shrunk toward the sub-position mean by snaps.",
      "body": [
-      "(rate x snaps this season + .7 x last season + .5 x the season before, + K x sub-position mean) / (weighted snaps + K). K snaps: QB 650, RB 450, WR 650, TE 300, DL 650, LB 1,300, OL 2,600, DB 3,600.",
+      "(rate x snaps this season + .7 x last season + .5 x the season before, + K x sub-position mean) / (weighted snaps + K). K snaps: QB 650, RB 450, WR 650, TE 300, DL 650, LB 1,300, OL 2,600, DB 3,600. A rookie has no past seasons, so his is this season alone, shrunk by the same K.",
       "Fit on next season's rXP/60 (100+ snaps, weighted by snaps), 2016-24 board seasons, K chosen leaving each season out. MSE .249 vs .832 raw, .310 position mean, .256 one season shrunk (t -4.2). Better than raw every season (9/9; t -18.8 on 100+ snap players). Calibration slope 1.01.",
       "Failed: prior moved by playing time (t -.2 vs plain), age hinge at 27 by group (t -1.7). Pct = pXP/60 percentile at the position among qualified players in the filters. Game model input (active roster's preseason pXP/60 x snap share, home minus away; with QBs, fading, absences only): all fail, 2015-20 t +.2 to +.5, 2021-25 t -.6 to +1.3, nothing over the close (t .05). Board only."
      ],
-     "where": "NFL WAR leaders (pXP/60, Pct)",
+     "where": "NFL WAR leaders (pXP/60, Pct), rookies",
      "sports": [
       "NFL"
      ]
