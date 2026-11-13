@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-13T11:07:21Z",
+ "asof": "2026-11-13T11:09:35Z",
  "recenter": {
   "week": 0.27
  },
@@ -495,7 +495,7 @@
  },
  "model": {
   "asof": "2026-11-13",
-  "ageH": -12.9,
+  "ageH": -12.8,
   "stale": false
  },
  "picks": [],
@@ -591,7 +591,7 @@
     "side": "under",
     "line": 57.5,
     "price": -106.0,
-    "ev": 0.02,
+    "ev": 0.025,
     "units": 0.25
    }
   },
@@ -756,7 +756,14 @@
    "betTo": 63.5,
    "close": 63.5,
    "paper": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 63.5,
+    "price": -106.0,
+    "ev": 0.007,
+    "units": 0.25
+   }
   },
   {
    "id": "401856886",
@@ -1032,8 +1039,8 @@
     "mk": "total",
     "side": "over",
     "line": 44.5,
-    "price": -102.0,
-    "ev": 0.024,
+    "price": -104.0,
+    "ev": 0.018,
     "units": 0.25
    }
   },
@@ -1816,22 +1823,6 @@
    "tm": 49.0
   },
   {
-   "id": "401860914",
-   "sport": "cfb",
-   "kick": "2026-11-14T23:00:00.000Z",
-   "home": "Boise State",
-   "away": "Oregon State",
-   "mk": "spread",
-   "side": "home",
-   "line": 14.5,
-   "price": -106.0,
-   "edge": 4.9,
-   "x": 6.0,
-   "why": "edge under 6 (game: conference)",
-   "m": 19.4,
-   "tm": 60.4
-  },
-  {
    "id": "401858300",
    "sport": "cfb",
    "kick": "2026-11-14T17:00:00.000Z",
@@ -2102,6 +2093,22 @@
    "why": "edge under 6 (game: conference)",
    "m": 15.2,
    "tm": 54.1
+  },
+  {
+   "id": "401858524",
+   "sport": "cfb",
+   "kick": "2026-11-15T00:00:00.000Z",
+   "home": "Penn State",
+   "away": "Minnesota",
+   "mk": "spread",
+   "side": "home",
+   "line": 9.5,
+   "price": -106.0,
+   "edge": 1.5,
+   "x": 6.0,
+   "why": "edge under 6 (game: conference)",
+   "m": 11,
+   "tm": 43.6
   }
  ],
  "games": {
@@ -2181,8 +2188,8 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -102.0,
-   "ev": 0.024,
+   "price": -104.0,
+   "ev": 0.018,
    "edge": 4.4,
    "units": 0.25,
    "home": "Texas A&M",
@@ -2494,16 +2501,16 @@
    "state": "under"
   },
   "401860914": {
-   "mk": "spread",
-   "side": "home",
-   "line": 14.5,
+   "mk": "total",
+   "side": "under",
+   "line": 63.5,
    "price": -106.0,
-   "edge": 4.9,
-   "ev": null,
-   "units": 0.0,
+   "ev": 0.007,
+   "edge": 3.1,
+   "units": 0.25,
    "home": "Boise State",
    "away": "Oregon State",
-   "state": "under"
+   "state": "paper"
   },
   "401858520": {
    "mk": "total",
@@ -2606,7 +2613,7 @@
    "side": "under",
    "line": 57.5,
    "price": -106.0,
-   "ev": 0.02,
+   "ev": 0.025,
    "edge": 3.7,
    "units": 0.25,
    "bk": "poly",
@@ -2859,13 +2866,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 17710,
+  "snapshots": 17713,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 3735,
+    "clvN": 3736,
     "clvRet": -0.046,
-    "clvT": -36.45,
+    "clvT": -36.47,
     "clv": 0.24,
     "beat": 0.338,
     "still": 0.428
@@ -6236,7 +6243,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T11:07:21Z",
+ "checked": "2026-11-13T11:09:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
