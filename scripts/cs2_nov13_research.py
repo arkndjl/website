@@ -321,8 +321,40 @@ def held_phase():
     for nm in pr:
         pr[nm]["pass"] = bool(pr[nm]["pass"] and pr[nm]["tuneBetter"] and pr[nm]["series"]["d"] <= 0)
     out["players"] = pr
+    out["market"] = market_phase()
     OUT.write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
+
+
+def market_phase():
+    """M_tp: does Thunderpick's opening price add to the model's chance on the forward archive?"""
+    win = {m[0]: m[6] for m in cs2_bo3.load()["matches"]}
+    R = []
+    for mid, (o, c) in cs2_bo3.closes().items():
+        if o.get("m") is None or win.get(mid) is None or o["start"][:10] > END:
+            continue
+        R.append((o["start"][:10], CM.cs2_bo3.logit(o["m"]), cs2_bo3.logit(o["p"]), cs2_bo3.logit(c["p"]),
+                  float(win[mid] == o["t1"])))
+    days = sorted({r[0] for r in R})
+    A = np.array([r[1:] for r in R])
+    dd = np.array([r[0] for r in R])
+    out = {"n": len(R), "days": len(days)}
+    lm = CM.ll(1 / (1 + np.exp(-A[:, 0])), A[:, 3])
+    for nm, j in (("open", 1), ("close", 2)):
+        L = np.zeros(len(R))
+        for d in days:
+            te = dd == d
+            w = CM.fitlog(A[~te][:, [0, j]], A[~te, 3], l2=1e-2)
+            L[te] = A[te][:, [0, j]] @ w
+        dl = CM.ll(1 / (1 + np.exp(-L)), A[:, 3]) - lm
+        a = np.array([dl[dd == d].sum() for d in days]) / len(R) * len(days)
+        w = CM.fitlog(A[:, [0, j]], A[:, 3], l2=1e-2)
+        out[nm] = {"llModel": round(float(lm.mean()), 4), "llPrice": round(float(CM.ll(1 / (1 + np.exp(-A[:, j])), A[:, 3]).mean()), 4),
+                   "llBlend": round(float((lm + dl).mean()), 4), "d": round(float(dl.mean()), 4),
+                   "tDay": round(float(a.mean() / (a.std(ddof=1) + 1e-12) * math.sqrt(len(a))), 2),
+                   "w": [round(float(z), 3) for z in w]}
+    out["pass"] = bool(out["open"]["d"] < 0 and out["open"]["tDay"] <= -2)
+    return out
 
 
 def nxt(mo):

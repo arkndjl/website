@@ -47,6 +47,10 @@ Metric: walk-forward squared error of the round-share prediction on held months 
 
 A pass refits `cs2_players.py --fit` (prospect FV and transfer values follow the rating).
 
+## Market blend (1 test)
+
+M_tp: the forward Thunderpick archive (`scripts/data/odds_tp`, since Oct 28 2026) scores the model's picks at -6.5% against the close (t -9.8, `data/cs2_picks_fit.json`), so the price knows more than the model. Test: on archived series that started by Nov 10 2026 with a result and a model chance at the open, logit = a x logit(model) + b x logit(Thunderpick no-vig price at the OPEN, the first archived price), a and b fit leave-one-day-out. Pass: paired log loss against the model alone below 0 with t over days at or under -2. A pass blends the current Thunderpick price into the shown series chance (as Polymarket's is outside the top 50), with a and b refit on every archived series each build; the archive's own model column, the ARK Ranking, event odds and Pick'Em stay model-only. The close is reported beside it, not tested.
+
 ## 1NT / ESEA
 
 Conditional: only if C_tprior or P1_tp passes, the same teammate prior is tested once on the ESEA RWA (tune S54-S57, held S58-S59 match log loss, t by match day, .025).
