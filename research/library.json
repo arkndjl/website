@@ -395,7 +395,8 @@
      "body": [
       "AV WAR = (AV - replacement AV at the sub-position x snap share) x .091 wins per AV.",
       ".091 from team wins on team AV (160 team seasons 2021-25, r .86). Replacement team wins 3 of 17.",
-      "Defensive AV rebuilt from pressures, stops and plays on the ball. Two-way players earn WAR on each side."
+      "Defensive AV rebuilt from pressures, stops and plays on the ball. Two-way players earn WAR on each side.",
+      "1Y / 3Y: next-season and three-season WAR from WAR pace, the two seasons before, snaps, age by position group, and the market read (draft slot on a rookie deal, cap share after). Market inputs pre-registered Nov 13 2026: 1Y RMSE .1403 to .1395 (t -3.1), 3Y .3264 to .3236 (t -3.6, 8/8 seasons)."
      ],
      "where": "NFL WAR leaders, team WAR, rookies, breakouts",
      "sports": [
@@ -417,10 +418,11 @@
     },
     {
      "term": "pXP/60 (NFL)",
-     "short": "Headline NFL rate, shown beside WAR: three seasons of rXP/60, shrunk toward the sub-position mean by snaps.",
+     "short": "Headline NFL rate, shown beside WAR: three seasons of rXP/60, shrunk by snaps toward a prior set by position and the market.",
      "body": [
-      "(rate x snaps this season + .7 x last season + .5 x the season before, + K x sub-position mean) / (weighted snaps + K). K snaps: QB 650, RB 450, WR 650, TE 300, DL 650, LB 1,300, OL 2,600, DB 3,600. A rookie has no past seasons, so his is this season alone, shrunk by the same K.",
-      "Fit on next season's rXP/60 (100+ snaps, weighted by snaps), 2016-24 board seasons, K chosen leaving each season out. MSE .249 vs .832 raw, .310 position mean, .256 one season shrunk (t -4.2). Better than raw every season (9/9; t -18.8 on 100+ snap players). Calibration slope 1.01.",
+      "(rate x snaps this season + .7 x last season + .5 x the season before, + K x prior) / (weighted snaps + K). K snaps: QB 900, RB 450, WR 900, TE 300, DL 900, LB 1,300, OL 2,600, DB 3,600. A rookie has no past seasons, so his is this season alone, shrunk by the same K.",
+      "Prior = sub-position mean + slope x (market read - its mean). Market read: -ln(draft pick) through the fourth season (undrafted = 300), ln(APY share of the cap) of the contract in force after that (OverTheCap). Slopes in points per 60 per log unit, rookie deal / later contract: QB .07 / .25, RB .23 / .26, WR .12 / .21, TE .19 / .37, DL .11 / .18, LB .04 / .07, DB .03 / .07, OL .00 / .02. Pre-registered Nov 13 2026: next-season MSE .2485 to .2438, t -4.85, 9/9 seasons, calibration slope 1.00.",
+      "Fit on next season's rXP/60 (100+ snaps, weighted by snaps), 2016-24 board seasons, K chosen leaving each season out. MSE .244 vs .832 raw, .310 position mean, .256 one season shrunk (t -4.2). Better than raw every season (9/9; t -18.8 on 100+ snap players).",
       "Failed: prior moved by playing time (t -.2 vs plain), age hinge at 27 by group (t -1.7). Pct = pXP/60 percentile at the position among qualified players in the filters. Game model input (active roster's preseason pXP/60 x snap share, home minus away; with QBs, fading, absences only): all fail, 2015-20 t +.2 to +.5, 2021-25 t -.6 to +1.3, nothing over the close (t .05). Board only."
      ],
      "where": "NFL WAR leaders (pXP/60, Pct), rookies",
@@ -1013,7 +1015,8 @@
      "short": "Expected margin vs an average team, neutral field, with this week's QB and injuries.",
      "body": [
       "Fitted terms: Elo, starting QB, rest, home, injuries, market rating from earlier closes, return game.",
-      "Injury cost = WAR a game x 36 pts a win x P(miss); questionable .25, doubtful .98."
+      "Injury cost = WAR a game x 36 pts a win x P(miss); questionable .25, doubtful .98.",
+      "Failed Nov 13 2026 (pre-registered, Holm over 7): reserve-list players at the injury value (2015-20 t -.2, 2021-25 t -1.7; lead, re-score after 2026), QB term on ESPN QBR (t +1.0), injuries valued with contract cap share (t -.6 / +.4), QB term in totals (t -1.6 / -.8), offense minus defense injuries in totals (t +2.0)."
      ],
      "where": "NFL ARK Ranking, games, season odds",
      "sports": [

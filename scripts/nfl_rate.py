@@ -6,7 +6,8 @@ Rows get
     xp    rXP/60: points of margin over an average regular at his sub-position per 60 scrimmage snaps, this season
           ((WAA - special teams WAR) x 35.5 / snaps x 60)
     pxp   pXP/60: the rate that carries forward (data/nfl_rate_fit.json form: seasons S to date, S-1, S-2 at snap weights
-          1 / .7 / .5, shrunk to a prior by K snaps per group; the prior is the sub-position mean moved by playing time)
+          1 / .7 / .5, shrunk to a prior by K snaps per group; form marcelM's prior is the sub-position mean moved by
+          the market's read of him, scripts/nfl_market.py: draft slot on a rookie deal, cap share of his contract after)
     q     1 when qualified: 40% of his team's snaps on his side so far (the XV regular line)
 """
 import gzip
@@ -47,6 +48,12 @@ def attach(out, y):
         return print(f'nfl war: rate skipped ({e!r})')
     M = fit['model']
     use = fit.get('kept')
+    mq = M.get('mq') or {}
+    MK = None
+    if fit['form'] == 'marcelM':
+        import nfl_market as MK
+        if not MK.load(fresh=True):      # without the files the prior is the sub-position mean (plain Marcel)
+            MK = None
     n = 0
     for p in out:
         r = row_of(p)
@@ -61,6 +68,12 @@ def attach(out, y):
         prior = M['m'].get(r['sub'], 0.0)
         if fit['form'] in ('marcelP', 'marcelA'):
             prior += M['b'].get(g, 0.0) * (r['shr'] - M['xb'].get(g, 0.0))
+        if MK:
+            s = MK.signal(p['id'], y)
+            k = f'{g}:{s[0]}' if s else None
+            if k in mq.get('b', {}):
+                prior += mq['b'][k] * (s[1] - mq['xb'][k])
+                p['_mq'] = round(mq['b'][k] * (s[1] - mq['xb'][k]), 3)
         P, S = r['pts'] * PER, r['sn']
         if fit['form'] != 'shrink1':
             for i, w in enumerate(M['marcel'][1:], 1):
