@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T05:17:51Z",
+ "asof": "2026-11-13T05:24:03Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -1144,8 +1144,8 @@
    "exp": {
     "clvRet": 0.0715,
     "beat": 0.648,
-    "roi": 0.0992,
-    "n": 338
+    "roi": 0.1031,
+    "n": 335
    },
    "vsExp": {
     "gap": -0.0249,
@@ -1153,17 +1153,17 @@
     "read": "in line"
    },
    "check": {
-    "n": 3,
-    "window": 3,
-    "mean": 0.0362,
-    "t": 0.44,
+    "n": 4,
+    "window": 4,
+    "mean": 0.0347,
+    "t": 0.58,
     "p": null,
     "days": 2,
-    "sd": 0.13,
+    "sd": 0.1301,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.082,
+    "rho": 0.08,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.02,
@@ -1173,25 +1173,25 @@
     "why": "",
     "drift": {
      "mu1": 0.007,
-     "n": 3,
-     "sd": 0.13,
-     "rho": 0.082,
+     "n": 4,
+     "sd": 0.1301,
+     "rho": 0.08,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.03,
+     "llr": 0.02,
      "info": 0.01,
-     "real": 3.84,
-     "realSe": 11.016,
-     "need": 2059
+     "real": 2.358,
+     "realSe": 9.722,
+     "need": 2062
     }
    },
    "drift": {
     "mu1": 0.007,
     "n": 4,
-    "sd": 0.13,
-    "rho": 0.082,
+    "sd": 0.1301,
+    "rho": 0.08,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -1199,8 +1199,8 @@
     "llr": 0.02,
     "info": 0.01,
     "real": 2.358,
-    "realSe": 9.726,
-    "need": 2059,
+    "realSe": 9.722,
+    "need": 2062,
     "path": [
      [
       "2026-11-11",
@@ -1239,28 +1239,28 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0877,
+    "clvRet": 0.0873,
     "beat": 0.725,
-    "roi": 0.0575,
-    "n": 451
+    "roi": 0.0679,
+    "n": 454
    },
    "vsExp": {
-    "gap": -0.0902,
-    "z": -1.2,
+    "gap": -0.0898,
+    "z": -1.21,
     "read": "in line"
    },
    "check": {
-    "n": 2,
-    "window": 2,
-    "mean": -0.0112,
+    "n": 3,
+    "window": 3,
+    "mean": -0.0025,
     "t": null,
     "p": null,
     "days": 1,
-    "sd": 0.1302,
+    "sd": 0.1283,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.057,
+    "rho": 0.044,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -1269,40 +1269,40 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.011,
-     "n": 2,
-     "sd": 0.1302,
-     "rho": 0.057,
+     "mu1": 0.0109,
+     "n": 3,
+     "sd": 0.1283,
+     "rho": 0.044,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.002,
-     "info": 0.01,
-     "real": 0.667,
-     "realSe": 8.606,
-     "need": 825
+     "llr": 0.017,
+     "info": 0.02,
+     "real": 1.343,
+     "realSe": 7.086,
+     "need": 815
     }
    },
    "drift": {
-    "mu1": 0.011,
+    "mu1": 0.0109,
     "n": 3,
-    "sd": 0.1302,
-    "rho": 0.057,
+    "sd": 0.1283,
+    "rho": 0.044,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.016,
+    "llr": 0.017,
     "info": 0.02,
-    "real": 1.331,
-    "realSe": 7.213,
-    "need": 825,
+    "real": 1.343,
+    "realSe": 7.086,
+    "need": 815,
     "path": [
      [
       "2026-11-12",
       3,
-      0.016
+      0.017
      ]
     ]
    }
@@ -1332,9 +1332,9 @@
    },
    "exp": {
     "clvRet": 0.0542,
-    "beat": 0.545,
-    "roi": 0.1825,
-    "n": 55
+    "beat": 0.537,
+    "roi": 0.1679,
+    "n": 54
    },
    "check": {
     "n": 0,
@@ -1343,11 +1343,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1132,
+    "sd": 0.1141,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.023,
+    "rho": 0.028,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -1358,8 +1358,8 @@
     "drift": {
      "mu1": 0.0026,
      "n": 0,
-     "sd": 0.1132,
-     "rho": 0.023,
+     "sd": 0.1141,
+     "rho": 0.028,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -1368,14 +1368,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 10934
+     "need": 11108
     }
    },
    "drift": {
     "mu1": 0.0026,
     "n": 0,
-    "sd": 0.1132,
-    "rho": 0.023,
+    "sd": 0.1141,
+    "rho": 0.028,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -1384,7 +1384,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 10934,
+    "need": 11108,
     "path": []
    }
   }
@@ -1478,7 +1478,7 @@
    "clvT": 1.09,
    "flat": 0.0361,
    "adds": -0.0127,
-   "expEdge": 0.0137,
+   "expEdge": 0.0135,
    "basis": "backtest + live picks"
   },
   {
@@ -1491,7 +1491,7 @@
    "clvT": 1.61,
    "flat": 0.0278,
    "adds": 0.0006,
-   "expEdge": 0.0192,
+   "expEdge": 0.0186,
    "basis": "backtest + live picks"
   }
  ],
