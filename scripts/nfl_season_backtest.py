@@ -54,7 +54,7 @@ def walk(games, box, qbs, params, inj, weeks=WEEKS):
         x, tx = m.feats(g)
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         if s in SEASONS and g['game_type'] == 'REG' and wk in weeks and (s, wk) not in snaps:
             L = m.lgepa()
             # each team's QB: the listed starter of its next game (from this week on)

@@ -61,7 +61,8 @@ on Friday and moved to IR on Saturday is on both lists (5% of Out players in 201
 off (`IR_CLEAN=1`), A1 reads 2015-20 t -0.5 to +1.4 and 2021-25 t -1.8 to -3.4 in all 8 cells (scope all, no fade:
 MAE -.042, coefficient .65; by season 2021 .000, 2022 -.023, 2023 -.012, 2024 -.059, 2025 -.112). IR with a return
 became routine in 2020, and the input starts in 2016, so the 2015-20 walk trains its weight on 0 to 4 seasons.
-D (public bet share): not run.
+D (public bet share, 2009-25, n 3,305): slope of result minus close on the home ticket share .44 points per 100% (t .34);
+the side with 65%+ of tickets covered 48.4% (n 1,515). No signal.
 
 ## Registered for the one season-end score (2026 season, every week; the Nov 11 lockbox rules)
 

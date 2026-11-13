@@ -88,7 +88,7 @@ def nfl(without=()):
     for g, x, _ in data:
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
     Dd = [(g, x) for g, x, _ in data if g['home_score'] not in ('', 'NA') and int(g['season']) >= 2012]
     TXd = [tx for g, _, tx in data if g['home_score'] not in ('', 'NA') and int(g['season']) >= 2012]
     feats = list(G.FEATS)

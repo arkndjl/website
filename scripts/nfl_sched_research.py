@@ -67,7 +67,7 @@ def main():
             continue
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         sx, stx = sched(g)
         D.append((g, {**x, **sx}, {**tx, **stx}))
     S = np.array([int(g['season']) for g, _, _ in D])
