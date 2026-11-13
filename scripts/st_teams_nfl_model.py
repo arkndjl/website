@@ -35,7 +35,7 @@ def main():
             continue
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         p = pre.get(g['game_id'])
         st = lambda k: (p['h'][k] - p['a'][k]) if p and p['h'].get(k) is not None and p['a'].get(k) is not None else 0.0
         x['st'] = st('st')

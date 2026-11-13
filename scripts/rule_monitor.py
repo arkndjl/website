@@ -461,6 +461,12 @@ CLOCK_FLOOR = {
 }
 
 
+def live_from(sport):
+    """the stamp a sport's live picks count from (units.LIVE_FROM), None when it has none"""
+    import units as DU
+    return DU.LIVE_FROM.get(sport)
+
+
 def floored(sport, i, c, defn):
     """clock c with its start moved back to CLOCK_FLOOR's when the floor stands for the same rule"""
     f = CLOCK_FLOOR.get((sport, i))
@@ -508,6 +514,11 @@ def pick_state(sport, RS, log, old, stamp, P=None):
             # the same rule (k within K_TOL): the clock keeps its start; it records the rule and the k it began with
             clocks[i] = {**c, 'hash': h, **rule, 'k0': c['k0'] if 'k0' in c else legacy_k(c, defn)}
         clocks[i] = floored(sport, i, clocks[i], defn)
+        lf = live_from(sport)
+        if lf and clocks[i].get('since', '') < lf:
+            # the sport's live record restarts (units.LIVE_FROM): the clock moves up and a stop on the older picks clears
+            clocks[i] = {**clocks[i], 'since': lf}
+            stops.pop(i, None)
         bs = [e for e in log if judged(e) and rule_of(e) == i and (e.get('flagged') or '') >= clocks[i]['since']]
         mu1, rho = expected_live(sport, held), rho_for(sport, defn['mk'], held)
         d = decide(bs, sd_of(held), P, mu1, rho)

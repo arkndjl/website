@@ -376,7 +376,7 @@ def main():
         r = inj.get(g['game_id'])
         x = dict(x); x.update(cand[g['game_id']])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['injf'] = r[2] - r[0]; x['injc'] = r[3] - r[1]
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]; x['injf'] = r[2] - r[0]; x['injc'] = r[3] - r[1]
         else:
             x['injf'] = x['injc'] = 0.0
         x['wxc'] = x['wind'] * x['elo']

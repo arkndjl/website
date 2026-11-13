@@ -25,6 +25,11 @@ Margin (home minus away, points) is a linear model on:
             Tested Oct 2026 and not kept: returning players (missed the team's last game, active again, at WAR a game x
             P(plays)), all of them or only those listed out or doubtful the week before: walk-forward MAE worse in
             2017-20 (t +1.6, +1.1), better in 2021-25 (t -1.2, -1.3), so no consistent gain
+    ir      reserve lists, away minus home: each non-QB on IR, PUP, a suspension or another reserve list (and off the
+            week's game status report) at the injury term's value, WAR a game x 36, with no chance to play. He leaves
+            the report the day he goes on a list, so the injury term drops him while Elo and the market rating have
+            seen few games without him (scripts/research/nfl_nov13/: held out 2021-25 MAE -.04, t -3.4, every version
+            better; flat 2015-20, before IR with a return was routine)
 Tested Oct 18 2026 and not kept (scripts/nfl_games_research.py, data/nfl_games_research.json): every input the college
 model uses or tried, as ratings from nflverse play-by-play (scripts/nfl_pbp.py), each added to this model's walk-forward:
 success rate (all, win prob 10-90%), EPA without garbage time, early-down success and EPA, EPA a dropback, 3rd-down
@@ -103,7 +108,7 @@ INJ_OUT = os.path.join(ROOT, 'data', 'nfl_injuries.json')     # this week's stat
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 FIRST = 2009                       # EPA history starts here; ratings warm up for three seasons before scoring
-FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt', 'ret']
+FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt', 'ret', 'ir']
 # ret: the Return Game team badge (scripts/team_badges.py, Nov 1 2026): kick and punt return yards a return, season to
 # date, shrunk to half last season's team rate and half the league's worth RET_N0 games, against the league this season.
 # Passed vs the close (tune 2015-21 t 1.95, held 2022-26 b +.65 t 2.5, held SE t -1.7) and vs this model held out.
@@ -245,7 +250,7 @@ class Model:
         x = {'elo': (self.elo[h] - self.elo[a]) / 25, 'epa': (net(h) - net(a)) * 62,
              'qb': (qadj(h, g['home_qb_id']) - qadj(a, g['away_qb_id'])) * 38,
              'rest': rest(g['home_rest']) - rest(g['away_rest']), 'home': home, 'inj': 0.0,
-             'mkt': self.mkt[h] - self.mkt[a], 'ret': self.retv(h) - self.retv(a)}
+             'mkt': self.mkt[h] - self.mkt[a], 'ret': self.retv(h) - self.retv(a), 'ir': 0.0}
         if self.lk or self.lk_mkt:
             r = self.inj.get(g['game_id']) or (0.0, 0.0, 0.0, 0.0)
             self._gap[g['game_id']] = (self.lq * 38 * qadj(h, g['home_qb_id']) - self.li * (r[0] + r[1]),
@@ -356,6 +361,7 @@ def walk(games, box, qbs, params, collect=True, inj=None):
 PTS_PER_WIN = 36.0    # season point differential a win is worth (so a player's WAR a game x 36 = points a game)
 INJ_FIRST = 2016      # nflverse game status reports and snap counts start here
 GONE = {'Injured Reserve', 'Physically Unable to Perform', 'Non Football Injury', 'Suspended', 'Out (season)'}
+RESERVE = {'RES', 'PUP', 'SUS', 'NWT', 'RSN', 'EXE'}     # the weekly roster's gameday statuses that are a reserve list
 
 
 # a questionable non-QB's chance to play by his last practice that week (nflverse game status reports x snap counts,
@@ -404,12 +410,13 @@ def player_value(prev, cur):
 
 
 def injury_history(games, years, live=None):
-    """game_id -> [home fresh, home continuing, away fresh, away continuing] injury cost in points (non-QBs; the QB
-    term already has the starter). Fresh: the player played the team's last game, so its ratings don't yet carry
-    the loss; continuing: he missed it too. Each player's value is his WAR a game to that week (nfl_war.py's model,
-    no look-ahead), costed at 1 - P(plays) by his status on the game status report."""
+    """game_id -> [home fresh, home continuing, away fresh, away continuing, home reserve, away reserve] injury cost
+    in points (non-QBs; the QB term already has the starter). Fresh: the player played the team's last game, so its
+    ratings don't yet carry the loss; continuing: he missed it too. Each player's value is his WAR a game to that week
+    (nfl_war.py's model, no look-ahead), costed at 1 - P(plays) by his status on the game status report. Reserve: the
+    non-QBs on a reserve list on the weekly roster that week and off the report, at full value (the 'ir' input)."""
     import nfl_war as W
-    cp = os.path.join(CACHE, 'inj_hist_v3.json')      # v3: names.py roster join (Nov 1 2026)
+    cp = os.path.join(CACHE, 'inj_hist_v4.json')      # v4: the reserve lists
     try:
         cache = json.load(open(cp))
     except (OSError, ValueError):
@@ -425,12 +432,19 @@ def injury_history(games, years, live=None):
         for r in rows(get(f'injuries_{y}.csv', f'{REL}/injuries/injuries_{y}.csv')):
             if r['report_status'] and r['position'] != 'QB':
                 rep[(team(r['team']), int(r['week']))].append((r['gsis_id'], r['report_status'], practice_of(r['practice_status'])))
+        res = defaultdict(set)
+        try:
+            for r in rows(get(f'roster_weekly_{y}.csv', f'{REL}/weekly_rosters/roster_weekly_{y}.csv', y == live)):
+                if r['status'] in RESERVE and r['position'] != 'QB' and r['gsis_id'] and r['week'] not in ('', 'NA'):
+                    res[(team(r['team']), int(r['week']))].add(r['gsis_id'])
+        except Exception as e:      # noqa: BLE001
+            print('nfl games: weekly roster', y, repr(e))
         sg = [g for g in games if int(g['season']) == y and g['home_score'] not in ('', 'NA')]
         last_wk = {}
         out = {}
         for g in sg:
             w = int(g['week'])
-            row = []
+            row, rsv = [], []
             for side in ('home', 'away'):
                 t = team(g[f'{side}_team'])
                 pw = last_wk.get(t)
@@ -448,8 +462,12 @@ def injury_history(games, years, live=None):
                     else:
                         cont += c
                 row += [round(fresh, 3), round(cont, 3)]
+                L = led[min(w, 19, top + 1)]
+                listed = {x[0] for x in rep.get((t, w), [])}
+                rsv.append(round(sum(max(player_value(prev.get(q, (0.0, 0)), L.get(q, (0.0, 0))), 0.0)
+                                     for q in res.get((t, w), set()) - listed) * PTS_PER_WIN, 3))
                 last_wk[t] = w
-            out[g['game_id']] = row
+            out[g['game_id']] = row + rsv
         cache[str(y)] = out
         if y != live:
             json.dump(cache, open(cp, 'w'))
@@ -769,7 +787,8 @@ def live_injuries(last, week, games):
 
 def injury_costs(last, week, games, coef):
     """This week's injury cost by team, in points (non-QBs at 1 - P(plays) x WAR a game x 36 x the backtest's
-    weight), the players behind it, and every QB's status for the starter call."""
+    weight), the players behind it, and every QB's status for the starter call; and the reserve lists' cost by team
+    (non-QBs on IR, PUP or another list at WAR a game x 36, unweighted) with the players' values."""
     import nfl_war as W
     rep, n = live_injuries(last, week, games)
     import datetime
@@ -787,6 +806,7 @@ def injury_costs(last, week, games, coef):
             lastw[team(g[f'{side}_team'])] = max(lastw.get(team(g[f'{side}_team']), 0), int(g['week']))
     before = {}
     cost, who, qbst = {}, {}, {}
+    rcost, rcarry = defaultdict(float), defaultdict(list)
     carry = defaultdict(list)          # team -> [(status, points a game at full value)] for the later weeks (hazard)
     for t, ps in rep.items():
         c, lst = 0.0, []
@@ -795,7 +815,13 @@ def injury_costs(last, week, games, coef):
                 qbst[gsis] = p['status']              # by id: two QBs can share a name
                 qbst.setdefault((t, _norm(p['name'])), p['status'])     # a name only on his own team
                 continue
-            if p['status'] in GONE or p['status'] == 'Active':
+            if p['status'] in GONE:
+                v = max(player_value(prev.get(gsis, (0.0, 0)), cur.get(gsis, (0.0, 0))), 0.0)
+                if v > 0:
+                    rcost[t] += v * PTS_PER_WIN
+                    rcarry[t].append(('Reserve', v * PTS_PER_WIN))
+                continue
+            if p['status'] == 'Active':
                 continue
             pw = lastw.get(t)
             if pw:
@@ -816,7 +842,7 @@ def injury_costs(last, week, games, coef):
         cost[t] = c
         who[t] = sorted([x for x in lst if x['pts'] >= 0.1], key=lambda x: -x['pts'])[:5]
     print('nfl games: injury reports', n)
-    return cost, who, qbst, n, dict(carry)
+    return cost, who, qbst, n, dict(carry), dict(rcost), dict(rcarry)
 
 
 # ---------------------------------------------------------------- fit
@@ -834,7 +860,7 @@ def fit():
         for g, x, _ in data:
             r = inj.get(g['game_id'])
             if r:
-                x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+                x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         D = [(g, x, tx) for g, x, tx in data if played(g) and int(g['season']) >= 2012]
         X = np.array([[x[f] for f in feats] for _, x, _ in D]); y = np.array([num(g['result']) for g, _, _ in D])
         TX = np.array([[tx[f] for f in tfeats] for _, _, tx in D]); ty = np.array([num(g['total']) for g, _, _ in D])
@@ -947,7 +973,7 @@ def build():
         return print('nfl games: no games left this season')
     week = min(int(g['week']) for g in upcoming if g['game_type'] == 'REG') if any(g['game_type'] == 'REG' for g in upcoming) else int(upcoming[0]['week'])
     nxt = [g for g in upcoming if int(g['week']) == week]
-    icost, iwho, qbst, isrc, icarry = injury_costs(last, week, games, F['coef'].get('inj', 0.0))
+    icost, iwho, qbst, isrc, icarry, rcost, rcarry = injury_costs(last, week, games, F['coef'].get('inj', 0.0))
     qbinfo = resolve_qbs(games, last, week, qbst)
     hist = injury_history(games, [last], live=last)
     proj = {}
@@ -986,12 +1012,13 @@ def build():
     for gid, (x, _) in proj.items():
         r = hist.get(gid)
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
     qa = lambda t, q: (m.qbval(q) - m.rate(m.qbt, t, m.repl)) if q else 0.0
     for g in nxt:
         x = proj[g['game_id']][0]
         h, a = team(g['home_team']), team(g['away_team'])
         x['inj'] = icost.get(a, 0.0) - icost.get(h, 0.0)
+        x['ir'] = rcost.get(a, 0.0) - rcost.get(h, 0.0)
         mix = lambda t, q: qbinfo[t]['pNow'] * qa(t, q) + (1 - qbinfo[t]['pNow']) * qa(t, qbinfo[t]['alt'][0]) if t in qbinfo and qbinfo[t]['alt'][0] else qa(t, q)
         x['qb'] = (mix(h, g['home_qb_id']) - mix(a, g['away_qb_id'])) * 38
     # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
@@ -1063,10 +1090,13 @@ def build():
            'elo': {t: round(v) for t, v in sorted(m.elo.items(), key=lambda z: -z[1])},
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef'], 'injSrc': isrc, 'injTest': F.get('injTest')}
-    res.update(season_views(m, F, games, last, week, rec, qbinfo, {t: b.get('inj', 0.0) * c for t, c in icost.items()},
+    bi, br = b.get('inj', 0.0), b.get('ir', 0.0)
+    res.update(season_views(m, F, games, last, week, rec, qbinfo,
+                            {t: bi * icost.get(t, 0.0) + br * rcost.get(t, 0.0) for t in set(icost) | set(rcost)},
                             ({t: (NR.points(moves, t, gp[t]) if moves else 0.0) + tpts.get(t, 0.0) for t in set(moves) | set(tpts)}
                              if moves or tpts else None),
-                            {t: [(st, b.get('inj', 0.0) * v) for st, v in ps] for t, ps in icarry.items()}))
+                            {t: [(st, bi * v) for st, v in icarry.get(t, ())] + [(st, br * v) for st, v in rcarry.get(t, ())]
+                             for t in set(icarry) | set(rcarry)}))
     # picks: the college board's upset and favorite rules on this model (scripts/nfl_picks.py); a failure never holds up
     # the projections
     try:

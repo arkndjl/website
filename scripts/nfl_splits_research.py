@@ -166,7 +166,7 @@ def main():
         r = inj.get(g['game_id'])
         x = dict(x); x.update(ts[g['game_id']]); x.update(kk[g['game_id']])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         close = math.exp(-0.5 * ((x['mkt'] + 1.8 * x['home']) / 7) ** 2)
         outdoor = g['roof'] in ('outdoors', 'open')
         bad = 1.0 if outdoor and (N.num(g.get('wind'), 0) >= 12 or N.num(g.get('temp'), 60) <= 35) else 0.0

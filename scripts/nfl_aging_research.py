@@ -138,7 +138,7 @@ def main():
         for g, x in data:
             r = inj.get(g['game_id'])
             if r:
-                x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+                x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
         D = [(g, x) for g, x in data if played(g) and int(g['season']) >= 2012]
         return D, m
 

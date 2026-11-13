@@ -311,7 +311,7 @@ def nfl():
     for g, x, _ in data:
         r = inj.get(g['game_id'])
         if r:
-            x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
+            x['inj'] = (r[2] + r[3]) - (r[0] + r[1]); x['ir'] = r[5] - r[4]
     Dd = [(g, x, tx) for g, x, tx in data if g['home_score'] not in ('', 'NA') and int(g['season']) >= 2012]
     feats = [f for f in G.FEATS if f != 'epa']
     allx = sorted(set(G.FEATS) | {'epa'})
