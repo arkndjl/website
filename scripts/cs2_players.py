@@ -135,14 +135,14 @@ def stat_weights(M, mask_games=None, l2=1e-4):
     return beta, mu / 5, float(r2)
 
 
-def contributions(M, beta, mline, pm=0.0):
+def contributions(M, beta, mline, pm=0.0, y=None):
     """Each player-map's share of his team's round share above .5 (x100: round win % added). pm: share of the team's
     residual (round share its five box lines miss) credited to each of the five equally, x pm (box + plus-minus)."""
     c = (M.X - mline) @ beta * 100
     if pm:
         tot = np.zeros((len(M.games), 2))
         np.add.at(tot, (M.g, M.side), c)
-        c = c + pm * (100 * (M.y - 0.5) - tot[M.g, M.side]) / 5
+        c = c + pm * (100 * ((M.y if y is None else y) - 0.5) - tot[M.g, M.side]) / 5
     return c
 
 
@@ -163,7 +163,11 @@ def ratings(M, c, T, p):
         th_row = (theta + lift)[M.p]
         opp = th_row[M.five[M.g, 1 - M.side]].mean(1)
         adj = c + p["opp"] * opp
-        theta = (np.bincount(M.p, w * adj, n) + p["k"] * prior) / (wsum + p["k"])
+        pri = prior
+        if p.get("tp"):  # shrink toward the teammates' mean (rounds-weighted over the player's maps), not toward 0
+            mate = (theta[M.p][M.five[M.g, M.side]].sum(1) - theta[M.p]) / 4
+            pri = prior + p["tp"] * np.bincount(M.p, w * mate, n) / np.maximum(wsum, 1e-9)
+        theta = (np.bincount(M.p, w * adj, n) + p["k"] * pri) / (wsum + p["k"])
     return theta + lift, wsum
 
 

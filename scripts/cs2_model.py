@@ -135,7 +135,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
         ask = defaultdict(list)
         for i, m in joined.items():
             ask[m[0]].append(i)
-        tm = cs2_bo3.TeamMaps(bo3)
+        tm = cs2_bo3.TeamMaps(bo3, p.get("tm") or cs2_bo3.TM)
         tview = tm.play(ask=ask)
     pl, pn, lastros, roff, team = {}, defaultdict(int), {}, defaultdict(float), {}
     hist = defaultdict(list)  # team key -> [(date, rating after)]
@@ -152,6 +152,13 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
             lastros[ka] = ra
         if rb:
             lastros[kb] = rb
+        if p.get("tprior") and d >= BURN:  # a new player starts part-way to the teammates he joins
+            for ros in (ra, rb):
+                known = [pl[q] for q in ros or [] if q in pl and pn[q] >= 10]
+                if known:
+                    for q in ros:
+                        if q not in pl and q not in warm:
+                            pl[q] = p["mu_new"] + p["tprior"] * (sum(known) / len(known) - p["mu_new"])
 
         def pv(q):
             if q not in pl:
@@ -170,9 +177,14 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
         t = 0.0
         if i in tview:
             t = tview[i][0] if bo3.k(tview[i][1]) == ka else -tview[i][0]
+        jm = bo3.joined.get(i) if bo3 is not None else None
+        both = (ra or []) + (rb or [])
         rows.append({"i": i, "d": d, "a": ka, "b": kb, "x": (sa - sb) / 400,
                      "v": ((va[1] if va else 400) - (vb[1] if vb else 400)) / 400, "t": t,
-                     "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r})
+                     "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r,
+                     "bo": (jm[9] if jm else 0) or 0, "tier": jm[10] if jm else None,
+                     "u": sum(math.exp(-pn[q] / p["n0"]) for q in both) / len(both) if both else 1.0})
+        kt = p.get("ktier", 1.0) if jm and jm[10] in ("s", "a") else 1.0
         team[ka] = team.get(ka, p["mu_new"]) + 32 * (s - e)
         team[kb] = team.get(kb, p["mu_new"]) - 32 * (s - e)
         if p["Kr"] and rga and rgb and rga != rgb:
@@ -185,11 +197,11 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
                                        - (roff[rgb] if rgb else 0)) / 400))
                 for ros, sg in ((ra, 1), (rb, -1)):
                     for q in ros or []:
-                        pl[q] = pv(q) + sg * p["kmap"] * kfac(p, pn[q]) * (sm - em)
+                        pl[q] = pv(q) + sg * kt * p["kmap"] * kfac(p, pn[q]) * (sm - em)
         else:
             for ros, sg in ((ra, 1), (rb, -1)):
                 for q in ros or []:
-                    pl[q] = pv(q) + sg * kfac(p, pn[q]) * (s - e)
+                    pl[q] = pv(q) + sg * kt * kfac(p, pn[q]) * (s - e)
         for ros in (ra, rb):
             for q in ros or []:
                 pn[q] += 1
