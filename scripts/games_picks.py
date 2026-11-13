@@ -254,8 +254,9 @@ def recenter_live(sport, games, arch, now):
     seen = {str(r['id']) for r in wf}
     past = [(str(r.get('date')), r['tm'] - r['T']) for r in wf]
     last = {}
+    lf = DU.LIVE_FROM.get(sport, '')      # model totals archived before the live record restarted are not the model's level
     for r in arch:
-        if r['t'] < r['k'] and r.get('tm') is not None and r.get('T') is not None and r['id'] not in seen:
+        if r['t'] < r['k'] and r['t'] >= lf and r.get('tm') is not None and r.get('T') is not None and r['id'] not in seen:
             last[r['id']] = r
     past += [(r['k'], r['tm'] - r['T']) for r in last.values() if now - datetime.timedelta(days=150) < iso(r['k']) <= now]
     past = [v for _, v in sorted(past)][-RC_N:]
