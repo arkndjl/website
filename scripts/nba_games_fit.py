@@ -153,6 +153,18 @@ def wf(Xm, y, S, lo=N.SCORE_FROM):
     return pred
 
 
+def absm(TX, Xm, y, S):
+    """TX with its 'absm' column filled: |margin| as the walk-forward fit projects it (the seasons before the first
+    scored one take the fit on themselves)"""
+    pr = wf(Xm, y, S)
+    k = np.isnan(pr)
+    if k.any():
+        pr[k] = Xm[k] @ np.linalg.lstsq(Xm[k], y[k], rcond=None)[0]
+    TX = TX.copy()
+    TX[:, N.TFEATS.index('absm')] = np.abs(pr)
+    return TX
+
+
 def mat(X, feats):
     return np.column_stack([X[f] for f in feats])
 
@@ -297,10 +309,11 @@ def fit():
 
     # 3. totals: the total's pace and efficiency ratings on their own half-life (thl), tuned on 2015-21 totals error
     # (kept at t <= -1.5 if 2022-26 agrees; scripts/nba_games_research.py has the possession model's other forms)
+    TX = absm(TX, Xm, y, S)
     tpred = wf(TX, ty, S)
     tgrid = []
     for thl in (2.0, 3.0, 4.0, 5.0, 7.0, 10.0, 14.0):
-        TXh = design(games, names, PT, {**best, 'thl': thl}, inj, feats0)[2]
+        TXh = absm(design(games, names, PT, {**best, 'thl': thl}, inj, feats0)[2], Xm, y, S)
         pr = wf(TXh, ty, S)
         tgrid.append((float(np.mean(np.abs(pr[k1] - ty[k1]))), thl, TXh, pr))
         print('thl', thl, round(tgrid[-1][0], 4), flush=True)

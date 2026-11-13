@@ -1,0 +1,165 @@
+{
+ "prereg": "/mnt/project-files/nba-audit-nov13/prereg.md",
+ "base": {
+  "tune": 9.8979,
+  "held": 10.7248
+ },
+ "poMult": {
+  "r1": 1.079,
+  "r4": 1.036,
+  "r6": 0.903,
+  "r9": 0.62
+ },
+ "terms": {
+  "usg": {
+   "coef": -3.528,
+   "sd": 0.0174,
+   "tune_t": 0.1,
+   "tune_d": 0.0002,
+   "held_t": 0.15,
+   "held_d": 0.0002
+  },
+  "usgd": {
+   "coef": -19.71,
+   "sd": 0.013,
+   "tune_t": 0.35,
+   "tune_d": 0.0014,
+   "held_t": -0.81,
+   "held_d": -0.0025
+  },
+  "tank": {
+   "coef": -1.702,
+   "sd": 0.3012,
+   "tune_t": -1.74,
+   "tune_d": -0.0032,
+   "held_t": -2.59,
+   "held_d": -0.011
+  },
+  "poMin": {
+   "coef": -0.412,
+   "sd": 0.1284,
+   "tune_t": 0.31,
+   "tune_d": 0.0006,
+   "held_t": 0.87,
+   "held_d": 0.0016,
+   "po_tune_t": 0.29,
+   "po_held_t": 0.69,
+   "po_tune_d": 0.008,
+   "po_held_d": 0.0198,
+   "n_po": [
+    578,
+    422
+   ]
+  }
+ },
+ "late": {
+  "n": 6596,
+  "held_d": -0.0013,
+  "held_t": -0.15,
+  "meanMove": 0.387,
+  "moved1": 669,
+  "moved1_d": -0.032,
+  "bySeason": {
+   "2022": -0.0069,
+   "2023": 0.0117,
+   "2024": 0.0467,
+   "2025": -0.0459,
+   "2026": -0.0118
+  }
+ },
+ "pass": {
+  "usg": false,
+  "usgd": false,
+  "tank": "gate pass, Holm fail (scripts/nba_tank_watch.py scores it on 2026-27)",
+  "poMin": false,
+  "late": false
+ },
+ "wave2": {
+  "linR": {
+   "d2021_26": -0.0069,
+   "t": -1.27,
+   "seasonsBetter": "4/6",
+   "coef": [
+    0.553,
+    0.316
+   ],
+   "pass": false
+  },
+  "tlinR": {
+   "d": 0.0028,
+   "t": 0.76,
+   "pass": false
+  }
+ },
+ "wave3": {
+  "bubbleNeutral": {
+   "games": 172,
+   "tune_d": -0.0019,
+   "held_d": 0.0004,
+   "shipped": true
+  },
+  "po": {
+   "coef": 2.013,
+   "tune_t": 0.37,
+   "held_d": -0.0074,
+   "held_t": -1.24,
+   "pass": false
+  }
+ },
+ "wave4": {
+  "stretch": {
+   "c": {
+    "2022": 1.061,
+    "2023": 1.077,
+    "2024": 1.049,
+    "2025": 1.056,
+    "2026": 1.06
+   },
+   "pooled_d": -0.0007,
+   "t": -0.23,
+   "pass": false
+  }
+ },
+ "totals": {
+  "base": {
+   "tune2016_21": 14.434,
+   "held": 14.4582
+  },
+  "ot": {
+   "coef": -2.849,
+   "tune_t": -2.87,
+   "held_d": -0.0019,
+   "held_t": -0.29,
+   "pass": "gate and Holm; same effect as absm, not shipped"
+  },
+  "absm": {
+   "coef": 0.099,
+   "tune_t": -2.46,
+   "held_d": -0.0022,
+   "held_t": -0.39,
+   "pass": true,
+   "shipped": true
+  },
+  "b2bT": {
+   "tune_t": 0.48,
+   "held_t": 0.55,
+   "pass": false
+  },
+  "tankT": {
+   "tune_t": 0.14,
+   "held_t": 0.41,
+   "pass": false
+  }
+ },
+ "pxpmShrinkGrid": {
+  "grid": "h0 500/1000/2000 x k 600..3000",
+  "picks": [
+   [
+    1000,
+    600
+   ]
+  ],
+  "rmse": 1.2352,
+  "pass": false
+ }
+}

@@ -65,7 +65,7 @@ SCORE_FROM, HOLD_FROM = 2015, 2022
 FEATS = ['elo', 'eff', 'mkt', 'lin', 'rest', 'b2b', 'home']
 # elo re-scored Nov 3 2026 (harness_rescore.py): tune t +1.15, held 2022-26 t -1.12 (held MAE 10.8742 vs 10.8763
 # without): 'watch', held out is worse without it, so it stays
-TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri', 'tlin']
+TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri', 'tlin', 'absm']
 NOT_BOOKS = ('Live',)             # in-game prices
 REPL = -1.4                       # replacement-level XPM (VORX's, fit to NBA wins)
 
@@ -154,6 +154,7 @@ def write_hist(lo, hi):
         json.dump({'games': out, 'names': names}, f, separators=(',', ':'))
 
 
+BUBBLE = ('2020-07-30', '2020-10-12')   # the 2020 restart: every game in Orlando, stored by ESPN as home games
 OPEN_DAYS = 14        # past seasons: on the opening roster only if the first game played comes this soon after opening night
 _FIRST = {}           # past (all-final) season -> {player id: (first tip, team)}, from the box scores
 
@@ -180,6 +181,9 @@ def dated_firsts(games):
 def load_hist():
     with gzip.open(HIST, 'rt') as f:
         d = json.load(f)
+    for g in d['games']:
+        if BUBBLE[0] <= g['tip'][:10] <= BUBBLE[1]:
+            g['n'] = 1
     dated_firsts(d['games'])
     return d['games'], d['names']
 
@@ -1260,7 +1264,10 @@ class Model:
               'ptsM': (2 * L + both(h) + both(a)) * tpM / 100, 'thome': home,
               # last season's closing totals, team by team (each team's final market total gap), fading as it plays
               'tpri': sum(self.tm0.get(t, 0.0) * self.tphl / (self.tphl + self.ngp[t]) for t in (h, a)),
-              'tlin': 0.0, 'tlinst': 0.0}
+              'tlin': 0.0, 'tlinst': 0.0,
+              # |projected margin|: totals run higher the more lopsided the game (scripts/nba_audit_research.py). The
+              # margin needs the fit's coefficients, so the fit (nba_games_fit.absm) and the daily build fill it in
+              'absm': 0.0}
         if self.tlin:
             g_ = {}
             for nm_, vals, bs, rp in (('O', self.valO, self.baseO, -0.7), ('D', self.valD, self.baseD, -0.7)):

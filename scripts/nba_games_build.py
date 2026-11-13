@@ -305,6 +305,7 @@ def build():
             continue
         x, tx, inj, (Vh, Va, pace) = proj[g['id']]
         mar = sum(b[f] * x[f] for f in feats)
+        tx['absm'] = abs(mar)
         tot = sum(tb.get(f, 0.0) * tx[f] for f in N.TFEATS)
         tip = N.tipdt(g).astimezone(ET)
         r = {'id': g['id'], 'tip': g['tip'], 'day': tip.date().isoformat(), 'time': tip.strftime('%-I:%M'),
@@ -484,6 +485,9 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
     R = {t: R0[t] - avg - inj[t] for t in teams}
     RL = {t: R0[t] - avg for t in teams}
     hfa = b.get('home', 0.0)
+    # playoff series carry the game model's playoff Elo term (series log loss 2016-26 .609 -> .579, 10 of 11 seasons;
+    # scripts/nba_sim_research.py)
+    EP = {t: b.get('eloPo', 0.0) * (m.elo[t] - 1505) / 28 for t in teams}
     wins0 = {t: rec[t][0] if t in rec else 0 for t in teams}
     cupf = cup_final(cur)
     reg = [g for g in cur if g['t'] == 2 and g['id'] != cupf]
@@ -511,7 +515,7 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
         for i in range(7):
             home = hi if i in (0, 1, 4, 6) else lo
             away = lo if home == hi else hi
-            mu = RL[home] - RL[away] + shock[home] - shock[away] + hfa
+            mu = RL[home] - RL[away] + shock[home] - shock[away] + hfa + EP[home] - EP[away]
             if rng.gauss(mu, sd) > 0:
                 if home == hi: wh += 1
                 else: wl += 1
