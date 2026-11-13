@@ -476,9 +476,23 @@ def espn_rows(comps, eid, kind, hist):
     return out
 
 
-def rankings(players):
+def ta_ranks():
+    """{tour: {Tennis Abstract name: current rank}}"""
+    out = {}
+    for tour in ('atp', 'wta'):
+        try:
+            b = get(f'https://www.tennisabstract.com/jsplayers/curr_rank_{tour}.js', os.path.join(CACHE, f'ta_rank_{tour}.js'), max_age=6 * 3600)
+            js = b.decode('utf-8', 'replace')
+            out[tour] = json.loads(js[js.index('{'):js.rindex('}') + 1])
+        except Exception as e:  # noqa: BLE001
+            print('Tennis Abstract ranks', tour, e)
+    return out
+
+
+def rankings(players, ta=None):
     """pid -> {rank, pts}: ESPN's top 150 (with points), Tennis Abstract's current ranks by name for the rest"""
     out = {}
+    ta = ta_ranks() if ta is None else ta
     im = {}
     try:
         with gzip.open(IDMAP, 'rt') as fh: im = json.load(fh).get('espn', {})
@@ -492,13 +506,8 @@ def rankings(players):
                 if pid: out[pid] = {'rank': int(x['current']), 'pts': int(x.get('points') or 0)}
         except Exception as e:  # noqa: BLE001
             print('ESPN rankings', tour, e)
-        try:
-            b = get(f'https://www.tennisabstract.com/jsplayers/curr_rank_{tour}.js', os.path.join(CACHE, f'ta_rank_{tour}.js'), max_age=6 * 3600)
-            js = b.decode('utf-8', 'replace')
-            ranks = json.loads(js[js.index('{'):js.rindex('}') + 1])
-        except Exception as e:  # noqa: BLE001
-            print('Tennis Abstract ranks', tour, e)
-            continue
+        ranks = ta.get(tour)
+        if not ranks: continue
         pool = [dict(v, id=k) for k, v in players.items() if k[0] == tour[0]]
         for v in list(pool):
             if v.get('nat') in ('cn', 'tw', 'hk', 'kr', 'kp', 'mo'):
@@ -546,6 +555,16 @@ def build(refresh=True):
             if not b: continue
             if not b.get('ioc') and r.get(f'{side}_ioc'): b['ioc'] = r[f'{side}_ioc']
             if not b.get('ht') and _int(r.get(f'{side}_ht')): b['ht'] = _int(r[f'{side}_ht'])
+    # Challenger, ITF and qualifying results since the archive froze (scripts/tennis_ta.py, Tennis Abstract's pages)
+    tar = ta_ranks()
+    try:
+        import tennis_ta
+        ta_all, _ = tennis_ta.refresh(bios, tar, fetch=refresh)
+        ta_new = tennis_ta.add(hist, ta_all)
+        hist += ta_new
+        print(f'Tennis Abstract: {len(ta_new)} matches added')
+    except Exception as e:  # noqa: BLE001
+        print('Tennis Abstract results skipped:', e)
     hist.sort(key=lambda r: (r[0], r[6], RORD.get(r[4], 5)))
     # ESPN: 2025 to next week, for ids (headshots), flags and each ESPN tournament's surface
     today = dt.date.today()
@@ -564,7 +583,7 @@ def build(refresh=True):
         players[pid] = {'n': b.get('n', ''), 'nat': iso2(b.get('ioc')), 'dob': b.get('dob'), 'hand': b.get('hand') or None,
                         'ht': b.get('ht'), 'espn': b.get('espn'), 'wd': b.get('wd')}
     with gzip.open(IDMAP, 'wt') as fh: json.dump({'mm': idmap, 'espn': eid}, fh, separators=(',', ':'), sort_keys=True)
-    rk = rankings(players)
+    rk = rankings(players, tar)
     for pid, v in rk.items():
         if pid in players: players[pid].update(v)
     print(f'current ranks for {len(rk)} players')

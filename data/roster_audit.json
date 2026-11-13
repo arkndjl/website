@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T03:07Z",
+ "asof": "2026-11-13T04:59Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 832,
+   "players": 836,
    "rows": 5273
   },
   "cfb": {
@@ -311,11 +311,11 @@
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 5,
-     "rows": 2128
+     "rows": 2127
     },
     "static/data/nfl-fantasy.json": {
      "flags": 18,
-     "rows": 640
+     "rows": 639
     },
     "static/data/nfl-war.json": {
      "flags": 73,
@@ -694,24 +694,6 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "CLE"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Rejoins Vikings on practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Rejoins Vikings on practice squad",
-      "kind": "practice"
-     },
-     "pid": "9255",
-     "player": "Odell Beckham Jr.",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIN"
     },
     {
      "d": "2026-09-15",
@@ -1414,6 +1396,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "CLE"
+    },
+    {
+     "d": "2026-11-12",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Rejoins Vikings on practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Rejoins Vikings on practice squad",
+      "kind": "practice"
+     },
+     "pid": "9255",
+     "player": "Odell Beckham Jr.",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
     },
     {
      "d": "2026-11-11",
@@ -2928,24 +2928,6 @@
      "site": "CLE"
     },
     {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Rejoins Vikings on practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Rejoins Vikings on practice squad",
-      "kind": "practice"
-     },
-     "pid": "9255",
-     "player": "Odell Beckham Jr.",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIN"
-    },
-    {
      "d": "2026-09-15",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3648,6 +3630,24 @@
      "site": "BAL"
     },
     {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Rejoins Vikings on practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Rejoins Vikings on practice squad",
+      "kind": "practice"
+     },
+     "pid": "9255",
+     "player": "Odell Beckham Jr.",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
+    },
+    {
      "d": "2026-11-11",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4030,24 +4030,6 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "20040",
-     "player": "Jaden Bradley",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "WAS"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
      "head": "Back to practice squad",
      "kind": "practice",
      "move": {
@@ -4096,6 +4078,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "TEN"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "20040",
+     "player": "Jaden Bradley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "WAS"
     },
     {
      "d": "2026-11-09",
@@ -4262,12 +4262,12 @@
    ],
    "joined": 0,
    "players": 2250,
-   "rows": 8003
+   "rows": 8001
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
+     "flags": 0,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -4275,37 +4275,19 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 1,
      "rows": 839
     },
     "static/data/pctl-nhl.json": {
-     "flags": 2,
+     "flags": 1,
      "rows": 839
     },
     "static/data/xaav-nhl.json": {
-     "flags": 11,
+     "flags": 10,
      "rows": 850
     }
    },
    "flags": [
-    {
-     "d": "2026-11-12",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "released",
-     "head": "Departs Thursday's contest",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Departs Thursday's contest",
-      "kind": "exit"
-     },
-     "pid": "6689",
-     "player": "Lian Bichsel",
-     "pos": "LD",
-     "rotowire": "DAL",
-     "site": "DAL"
-    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -4323,24 +4305,6 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/nhl-war/2027.json",
-     "flag": "released",
-     "head": "Departs Thursday's contest",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Departs Thursday's contest",
-      "kind": "exit"
-     },
-     "pid": "6689",
-     "player": "Lian Bichsel",
-     "pos": "D",
-     "rotowire": "DAL",
-     "site": "DAL"
     },
     {
      "d": "2026-09-11",
@@ -4431,24 +4395,6 @@
      "pos": "L",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "released",
-     "head": "Departs Thursday's contest",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Departs Thursday's contest",
-      "kind": "exit"
-     },
-     "pid": "6689",
-     "player": "Lian Bichsel",
-     "pos": "D",
-     "rotowire": "DAL",
-     "site": "DAL"
     },
     {
      "d": "2026-09-21",
@@ -4557,24 +4503,6 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
-    },
-    {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/pctl-nhl.json",
-     "flag": "released",
-     "head": "Departs Thursday's contest",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Departs Thursday's contest",
-      "kind": "exit"
-     },
-     "pid": "6689",
-     "player": "Lian Bichsel",
-     "pos": "D",
-     "rotowire": "DAL",
-     "site": "DAL"
     }
    ],
    "joined": 0,

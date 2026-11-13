@@ -7,6 +7,10 @@ this season's WAR and snaps pace (pre special teams, x 17 / team games), the las
 (scripts/data/pctl_hist_nfl.json.gz, written by player_pctl.py --fit, which rolls forward after each season), age on
 Sept 1 and position group. Coefficients per share of the season played (f = team games / 17), linear in between.
 Kickers and punters get none; a season whose last season is not in the history file gets none.
+Form E adds the market's read of him (scripts/nfl_market.py) to the live form, by group: a rookie-deal flag, the flag
+x -ln pick, and ln cap % of a later contract (pre-registered, scripts/research/nfl_nov13/PREREG.md C2: held
+out at week 9 and the season's end, 1Y and 3Y, t -2.6 to -3.6 against the live form, 30 of 34 season folds). It is
+used when the fit kept it and the contract files loaded; otherwise the live form's own coefficients.
 """
 import gzip
 import json
@@ -21,10 +25,22 @@ GROUPS = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'DB']
 A0 = 27
 
 
-def feats(form, g, W0, W1, W2, h1, h2, s0, s1, a):
+def market_feats(g, mk):
+    """form E's extra inputs by group: rookie-deal flag, flag x -ln pick, later contract's ln cap %; mk = nfl_market.signal"""
+    x = []
+    for G in GROUPS:
+        d = 1.0 if g == G else 0.0
+        x += [d * (1.0 if mk and mk[0] == 'r' else 0.0), d * (mk[1] if mk and mk[0] == 'r' else 0.0),
+              d * (mk[1] if mk and mk[0] == 'v' else 0.0)]
+    return x
+
+
+def feats(form, g, W0, W1, W2, h1, h2, s0, s1, a, mk=None, base=None):
     """the projection's inputs (forms in scripts/nfl_war_proj_research.py): group intercepts, WAR this season and the
     two before, whether he played them, log snaps this season and last; B a pooled age curve; C / D a curve per group
     (years past 27 and under it, and years past 27 x this season's WAR); D also this season's WAR by group"""
+    if form == 'E':
+        return feats(base, g, W0, W1, W2, h1, h2, s0, s1, a) + market_feats(g, mk)
     x = [1.0 if g == G else 0.0 for G in GROUPS] + [W0, W1, W2, h1, h2, math.log1p(s0), math.log1p(s1)]
     if form == 'B':
         x += [max(0.0, a - 29), max(0.0, 25 - a), W0 * max(0.0, a - 29)]
@@ -58,6 +74,12 @@ def attach(out, y, teamg):
     if not fit.get('kept') or str(y - 1) not in H:
         return print('nfl war: projections skipped (no fit or no history for last season)')
     grid, form = fit['grid'], fit['form']
+    MK = None
+    if (fit.get('market') or {}).get('kept'):
+        import nfl_market as MK
+        if not MK.load(fresh=True):
+            MK = None
+    sfx = 'E' if MK else ''
 
     def past(S, pid):
         h = H.get(str(S), {}).get(pid)
@@ -76,8 +98,8 @@ def attach(out, y, teamg):
         s0 = p['sn'] * 17 / tg
         W1, s1, h1 = past(y - 1, p['id'])
         W2, _, h2 = past(y - 2, p['id'])
-        x = feats(form, g, W0, W1, W2, h1, h2, s0, s1, a)
-        for k, key in (('p1', 'y1c'), ('p3', 'y3c')):
+        x = feats('E', g, W0, W1, W2, h1, h2, s0, s1, a, MK.signal(p['id'], y), form) if MK else feats(form, g, W0, W1, W2, h1, h2, s0, s1, a)
+        for k, key in (('p1', 'y1c' + sfx), ('p3', 'y3c' + sfx)):
             p[k] = round(sum(c * v for c, v in zip(coefs(grid, f, key), x)), 2)
         n += 1
     print(f'nfl war: projections for {n} players')

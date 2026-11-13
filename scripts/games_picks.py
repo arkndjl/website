@@ -501,9 +501,10 @@ def early_scale(sport, kick, u):
     return max(0.25, round(u * f[1] * 4) / 4)
 
 
-# live realization scale (Nov 11 2026 picks audit, Noah): a normal update of the realization the stakes assume (TIMING .5,
-# sd .25) on the NBA's live picks gave .42, so NBA stakes are .85 of the fit's (quarter units, at least .25)
-REAL_SCALE = {'nba': 0.85}
+# live realization (Nov 13 2026, Noah: "optimized for the ideal unit amounts for each bet"): every stake is Kelly on the
+# staked edge times the share of that edge the sport's live picks have realized at the close, a normal update around .5
+# (sd .25) clipped to [0, 1] (scripts/picks_oos.py mult). Walk-forward by game day it beat the posted stakes at the
+# close in every book (all books -21.7% -> -6.4% log growth, NBA +0.81% -> +1.05%). Replaces the NBA's fixed .85
 
 
 def stake_du(sport, mk, c, o, n=None, gap=None, cal=None, mkt=None):
@@ -514,8 +515,8 @@ def stake_du(sport, mk, c, o, n=None, gap=None, cal=None, mkt=None):
         u = DU.stake_cal(sport, cal[0], cal[1], o, n) if cal else 0.0
     else:
         u = DU.stake(sport, mk, c, o, n, gap=gap, mkt=mkt)      # mkt: the market's own chances at the rung (lean())
-    f = REAL_SCALE.get(sport)
-    return u if not f or not u else max(0.25, round(u * f * 4) / 4)
+    import picks_oos
+    return picks_oos.scaled(u, sport)
 
 
 def ml_cal(sport, side, line, gap, k):
@@ -568,6 +569,12 @@ def rule_bets(sport, rows, mk, x, at_open, cap=None, outer=1.0):
 def price_of(g, mk, side):
     k = {('spread', 'home'): 'oH', ('spread', 'away'): 'oA', ('total', 'over'): 'oO', ('total', 'under'): 'oU'}[(mk, side)]
     return price(g.get(k), -110)
+
+
+def best_of(g, k, o):
+    """(price, venue) of a side: Polymarket's when dk_prices found it paying more at the same line, else the board's"""
+    v = (g.get('pm') or {}).get(k)
+    return (price(v), 'poly') if v is not None and o is not None and dec(price(v)) > dec(o) else (o, None)
 
 
 def rule_stats(es):
@@ -1034,6 +1041,21 @@ def dk_prices(sport, games, now):
             if c.get(k) is not None:
                 g[k] = c[k]
     print(f'{sport}: lines and prices on {n} games ({m} Novig, {n - m} DraftKings)')
+    # Polymarket US next to Novig (Nov 13 2026, Noah: "use Polymarket in addition to Novig"): a side Polymarket pays more
+    # on at the SAME line, after its taker fee, is priced there (g['pm']); the lean and fair line stay on the board's
+    # own two-sided quote
+    try:
+        import polymarket
+        pm = polymarket.prices(sport, now)
+    except Exception as e:
+        print(f'{sport}: Polymarket failed ({e})')
+        pm = {}
+    k = 0
+    for g in games:
+        b = polymarket.better(g, pm[str(g['espn'])]) if str(g['espn']) in pm else {}
+        g['pm'] = b
+        k += len(b)
+    print(f'{sport}: Polymarket on {len(pm)} games, pays more on {k} sides')
 
 
 VOID_STATUS = {'STATUS_POSTPONED', 'STATUS_CANCELED', 'STATUS_CANCELLED', 'STATUS_FORFEIT', 'STATUS_ABANDONED'}
@@ -1120,7 +1142,10 @@ def rule_options(sport, g, R, segs=()):
         rules = [{'x': r['x'], 'k': r['k'], 'frac': r.get('frac'), 'seg': None}] if r.get('on') and r.get('k') else []
         rules += [{'x': z['x'], 'k': z['k'], 'frac': z.get('frac'), 'seg': f"{z['fam']}: {z['val']}"} for z in segs
                   if z['mk'] == mk and sg.get(z['fam']) == z['val']]
-        base = {'mk': mk, 'side': side, 'line': line, 'edge': round(edge, 1), 'price': price_of(g, mk, side)}
+        pk = {('spread', 'home'): 'oH', ('spread', 'away'): 'oA', ('total', 'over'): 'oO', ('total', 'under'): 'oU'}[(mk, side)]
+        po, pbk = best_of(g, pk, price_of(g, mk, side))
+        base = {'mk': mk, 'side': side, 'line': line, 'edge': round(edge, 1), 'price': po,
+                **({'bk': pbk, 'nv': price_of(g, mk, side)} if pbk else {})}
         if not rules:
             near.append({**base, 'x': None, 'why': f'{mk} market off'})
             continue
@@ -1135,16 +1160,17 @@ def rule_options(sport, g, R, segs=()):
             continue
         if rule['seg']:
             base['seg'] = rule['seg']
-        inst = [(mk, line, base['price'], False)]
+        inst = [(mk, line, base['price'], False, pbk)]
         if mk == 'spread':
-            o = price(g.get('mlH') if side == 'home' else g.get('mlA'))
+            o, obk = best_of(g, 'mlH' if side == 'home' else 'mlA', price(g.get('mlH') if side == 'home' else g.get('mlA')))
             if o is not None and abs(o) <= ML_CAP:
-                inst.append(('ml', None, o, True))
+                inst.append(('ml', None, o, True, obk))
+                mlnv = price(g.get('mlH') if side == 'home' else g.get('mlA'))
         # the spread or total is priced off the market's fair line, not the rung (lean()): the chance and the stake
         # then follow the rung's own price lean. The cut X still reads the gap from the rung
         fair, mkt = lean(sport, g, mk, side, line)
         gf = fair_gap(side, line, edge, fair, cap)
-        for imk, iline, o, ml in inst:
+        for imk, iline, o, ml, ibk in inst:
             c = calib(sport, mk, side, line, sized(edge, cap), rule['k'], ml) if ml or fair is None else calib(sport, mk, side, line, gf, rule['k'], fair=fair)
             if c is None:
                 continue
@@ -1162,7 +1188,9 @@ def rule_options(sport, g, R, segs=()):
                 if imk == mk:
                     near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
-            opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
+            opts.append({**{k: v for k, v in base.items() if k not in ('bk', 'nv')},
+                         **({'bk': ibk, 'nv': base['nv'] if not ml else mlnv} if ibk else {}),
+                         'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
                          'units': u, '_c': c, '_cal': cal, '_gap': gap, '_mkt': mk_,
                          **({'fair': round(fair, 2)} if fair is not None and not ml else {}),
                          **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
@@ -1333,11 +1361,11 @@ def live(sport):
             c_, cal_ = pick.pop('_c'), pick.pop('_cal', None)
             pick.pop('_cw', None)
             pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick.pop('_gap'), cal_, pick.pop('_mkt', None))
-            gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'stale' if stale else 'pick'}
+            gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units', 'bk') if k in pick}, 'home': g['home'], 'away': g['away'], 'state': 'stale' if stale else 'pick'}
             if (g['id'], fam(pick['mk'])) not in seen and not stale:
                 seen.add((g['id'], fam(pick['mk'])))
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair', 'bk', 'nv') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}),
                             **({'lineL': g['L']} if pick['mk'] == 'ml' else {}), 'flagged': stamp, **({'paper': True} if paper else {})})

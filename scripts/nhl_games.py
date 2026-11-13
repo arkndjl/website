@@ -33,7 +33,9 @@ Goal margin (home minus away) and the home team's chance to win are linear in:
             played. Each skater's HPM is moved by an age line (age_line(): season rate minus projected HPM on age,
             fit on the seasons before; ~-.024 goals a 60 a year from 27, so young players are priced up and old ones
             down: Oct 30 2026, lined tune t 2.2 / held 2.7, every game 2.6 / 3.0, 8 of 10 seasons; the draft grade
-            adds nothing on top, scripts/fv_games_research.py). A bottom-up roster rating beside the team-level ones, after HockeyStats.com's game model
+            adds nothing on top, scripts/fv_games_research.py). A past season's HPM carries the weights known when
+            that season ended (scripts/data/nhl_hpm_nested.json.gz, nhl_players.py nested(): with weights fit on
+            every season the held-out gain read 1.75 mil, with these 1.24). A bottom-up roster rating beside the team-level ones, after HockeyStats.com's game model
             (TopDownHockey: player impacts summed over the lineup); 2012-26 skater logs frozen in
             scripts/data/nhl_lineups.json.gz
     home    1 at a home rink
@@ -421,11 +423,30 @@ def _lineups(S):
 
 
 _WF = {}
+NESTED = os.path.join(HERE, 'data', 'nhl_hpm_nested.json.gz')
+_NEST = []
+
+
+def _nested():
+    """past seasons' skaters with HPM on the weights known when each season ended (scripts/nhl_players.py nested())"""
+    if not _NEST:
+        try:
+            _NEST.append(D.load(NESTED))
+        except OSError:
+            _NEST.append({})
+    return _NEST[0]
 
 
 def _war_file(S):
-    """the WAR run's season S skaters by id, and its replacement levels; (None, None) without the file"""
+    """the WAR run's season S skaters by id, and its replacement levels; (None, None) without the file. A season in
+    the nested store is read from there: its HPM carries weights fit on the seasons up to it, so a past game's
+    lineup value never sees later seasons (the season files are all on the latest fit)"""
     if S not in _WF:
+        n = _nested().get(str(S))
+        if n:
+            _WF[S] = ({i: dict(zip(('grp', 'age', 'gp', 'toi', 'hpm', 'go', 'gd'), v), id=i) for i, v in n['p'].items()},
+                      n['repl'])
+            return _WF[S]
         try:
             d = json.load(open(os.path.join(WARD, f'{S}.json')))
             _WF[S] = ({p['id']: p for p in d['players'] if p['grp'] in ('F', 'D')}, d['repl'])

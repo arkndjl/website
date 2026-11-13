@@ -251,7 +251,8 @@ def stake(pc, o):
     ev = pc * (b + 1) - 1
     if ev <= 0:
         return 0.0, ev
-    return min(CAP, max(0.25, round(ev / b * 100 * 4) / 4)), ev
+    import picks_oos                           # x the book's live realization (Nov 13 2026)
+    return min(CAP, picks_oos.scaled(max(0.25, round(ev / b * 100 * 4) / 4), 'tennis')), ev
 
 
 def live():

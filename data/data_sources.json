@@ -72,7 +72,7 @@
       { "n": "Football-Data.co.uk", "u": "https://www.football-data.co.uk/", "w": "historical results and closing odds" }
     ]},
     { "name": "tennis", "sources": [
-      { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches, rankings, Elo, player data" }
+      { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches (Challenger, ITF and qualifying results since June 2026 from the player pages), rankings, Elo, player data" }
     ]},
     { "name": "Counter-Strike", "sources": [
       { "n": "bo3.gg", "u": "https://bo3.gg/", "w": "matches, maps, player stats, odds, event stages and pairings" },
@@ -88,7 +88,8 @@
     { "name": "odds and markets", "sources": [
       { "n": "Novig", "u": "https://novig.com/", "w": "lines and props (primary)" },
       { "n": "DraftKings (via ESPN)", "u": "https://www.espn.com/", "w": "fallback lines" },
-      { "n": "Polymarket", "u": "https://polymarket.com/", "w": "market prices as a data signal" },
+      { "n": "Polymarket", "u": "https://polymarket.com/", "w": "CS2 prices as a model input; price histories for the pick signal test" },
+      { "n": "Polymarket US", "u": "https://polymarket.us/", "w": "game lines after fees, a second venue next to Novig" },
       { "n": "Sportsbook Reviews Online", "u": "https://www.sportsbookreviewsonline.com/", "w": "historical opening and closing lines" }
     ]},
     { "name": "weather and places", "sources": [

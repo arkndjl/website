@@ -323,7 +323,12 @@ def soccer_games():
     if mv and base:
         rows.append(H.from_t('squad mv', None, -3.9, d_held=round(base['hold'] - mv['hold'], 5),
                              note=f"Transfermarkt top-18 value; 1X2 log loss held {base['hold']} -> {mv['hold']} (scripts/data/soccer_squad_mv.json.gz)"))
-    return {'desc': 'Soccer match model (scripts/soccer_games.py)', 'loss': '1X2 log loss', 'split': f"tune {F['tune'][0]}-{F['holdFrom'] - 1}, held {F['holdFrom']}+",
+    tt = F.get('totals') or {}
+    if tt.get('tune') and tt.get('hold'):
+        rows.append(H.from_t('market totals ratings', tt['tune']['t'], tt['hold']['t'], d_held=round(tt['hold']['level'] - tt['hold']['ratings'], 5),
+                             note=f"over 2.5 log loss held {tt['hold']['level']} -> {tt['hold']['ratings']} (close {tt['hold']['close']}), 16 leagues; "
+                                  'pre-registered, one held pass (scripts/research/soccer_nov13)'))
+    return {'desc': 'Soccer match model (scripts/soccer_games.py)', 'loss': '1X2 log loss; over 2.5 log loss for the totals ratings', 'split': f"tune {F['tune'][0]}-{F['holdFrom'] - 1}, held {F['holdFrom']}+",
             'cluster': 'none (stored t)', 'source': 'stored', 'tested': F['asof'][:10], 'rows': rows}
 
 

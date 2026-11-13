@@ -1,0 +1,60 @@
+{{- /* Every live pick against the market, out of sample (data/picks_oos.json, scripts/picks_oos.py; Nov 13 2026): each
+       book and its markets by close value, results, calibration and realization, Holm across rules, and the stake
+       multiplier the book's Kelly stakes carry. */ -}}
+{{- with site.Data.picks_oos -}}
+{{- $d := . -}}
+{{- $pct := "%+.1f%%" -}}
+{{- partial "wintable-open.html" (dict "title" "live vs the market" "icon" "arkboard" "tab" ($.Get "tab")) -}}
+<table class="cfb__table cfbm__t tstick">
+  <thead><tr>
+    <th>Book</th>
+    <th title="live: real stakes; paper: logged, not bet">Status</th>
+    <th title="picks judged by the close (passes in), game days">Picks</th>
+    <th title="mean return at the closing price, 95% range clustered by game day">Close value</th>
+    <th title="one-sided p that close value is 0 or less; Holm-adjusted across the books (bold: passes .05) and across every rule with 8+ game days">p / Holm</th>
+    <th title="flat ROI, 1u a pick, 95% range">ROI</th>
+    <th title="win rate minus the chance the stake sized on; Brier skill against the close's chance">Win − chance</th>
+    <th title="close value per point of staked edge (1 = worth what it was staked on), ± se">Realized</th>
+    <th title="Kelly x this: the realized share, normal update around {{ index $d.prior 0 }} (sd {{ index $d.prior 1 }}), 0 to 1">Stake ×</th>
+  </tr></thead>
+  <tbody>
+  {{- range $b := $d.books }}
+  <tr>
+    <td><b>{{ $b.name }}</b></td>
+    <td>{{ if $b.paper }}paper{{ else }}<b>live</b>{{ end }}</td>
+    <td class="cfb__num">{{ $b.n }} <span class="cfb__dim">{{ $b.days }}d</span></td>
+    <td class="cfb__num"><b>{{ partial "num.html" (slice $pct (mul $b.clvRet 100)) }}</b>{{ with $b.clvCi }}<br><span class="cfb__dim">{{ partial "num.html" (slice $pct (mul (index . 0) 100)) }} to {{ partial "num.html" (slice $pct (mul (index . 1) 100)) }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with $b.p }}{{ partial "num.html" (slice "%.3f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with $b.holm }} / {{ if .pass }}<b>{{ partial "num.html" (slice "%.3f" .pAdj) }}</b>{{ else }}{{ partial "num.html" (slice "%.3f" .pAdj) }}{{ end }}{{ end }}</td>
+    <td class="cfb__num">{{ with $b.roi }}{{ partial "num.html" (slice $pct (mul . 100)) }}{{ end }}{{ with $b.roiCi }}<br><span class="cfb__dim">{{ partial "num.html" (slice $pct (mul (index . 0) 100)) }} to {{ partial "num.html" (slice $pct (mul (index . 1) 100)) }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with $b.cal }}{{ partial "num.html" (slice $pct (mul .winMinusP 100)) }}<br><span class="cfb__dim">skill {{ partial "num.html" (slice "%+.3f" .skill) }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with $b.real }}{{ partial "num.html" (slice "%.2f" .) }}{{ end }}{{ with $b.realSe }} <span class="cfb__dim">± {{ partial "num.html" (slice "%.2f" .) }}</span>{{ end }}</td>
+    <td class="cfb__num"><b>{{ partial "num.html" (slice "%.2f" $b.mult) }}</b></td>
+  </tr>
+  {{- range $r := where $d.rules "book" $b.book }}{{ if ne $r.mk "all" }}
+  <tr class="cfb__dim">
+    <td>&nbsp;&nbsp;{{ $r.mk }}</td>
+    <td></td>
+    <td class="cfb__num">{{ $r.n }} <span>{{ $r.days }}d</span></td>
+    <td class="cfb__num">{{ partial "num.html" (slice $pct (mul $r.clvRet 100)) }}</td>
+    <td class="cfb__num">{{ with $r.p }}{{ partial "num.html" (slice "%.3f" .) }}{{ end }}{{ with $r.holm }} / {{ partial "num.html" (slice "%.3f" .pAdj) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $r.roi }}{{ partial "num.html" (slice $pct (mul . 100)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $r.cal }}{{ partial "num.html" (slice $pct (mul .winMinusP 100)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $r.real }}{{ partial "num.html" (slice "%.2f" .) }}{{ end }}</td>
+    <td></td>
+  </tr>
+  {{- end }}{{ end }}
+  {{- end }}
+  <tr>
+    <td><b>all</b></td><td></td>
+    <td class="cfb__num">{{ $d.all.n }} <span class="cfb__dim">{{ $d.all.days }}d</span></td>
+    <td class="cfb__num"><b>{{ partial "num.html" (slice $pct (mul $d.all.clvRet 100)) }}</b>{{ with $d.all.clvCi }}<br><span class="cfb__dim">{{ partial "num.html" (slice $pct (mul (index . 0) 100)) }} to {{ partial "num.html" (slice $pct (mul (index . 1) 100)) }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with $d.all.p }}{{ partial "num.html" (slice "%.3f" .) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $d.all.roi }}{{ partial "num.html" (slice $pct (mul . 100)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $d.all.cal }}{{ partial "num.html" (slice $pct (mul .winMinusP 100)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with $d.all.real }}{{ partial "num.html" (slice "%.2f" .) }}{{ end }}</td>
+    <td></td>
+  </tr>
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $d.books) "fresh" "picks_oos" "note" (printf "walk-forward close growth %+.1f%% posted, %+.1f%% at stake ×" $d.multTest.growthPosted $d.multTest.growthMult) "about" "Every pick flagged before its game, live and paper, judged at the closing price. Stake × is fit only on earlier game days when tested: each day's picks were scored at the close at the posted stake and at the multiplied one. Prices: Novig, or Polymarket US after its taker fee when it pays more at the same line.") -}}
+{{- end -}}

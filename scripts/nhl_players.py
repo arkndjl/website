@@ -4,6 +4,7 @@
 every skater and goalie since 2008-09, from MoneyPuck's season summaries.
 
     python3 scripts/nhl_players.py --fit     # fit pWAR's weights to team results out of sample, WAR's levels (numpy)
+    python3 scripts/nhl_players.py --nested  # past seasons' HPM on weights known at the time (--fit runs it too)
     python3 scripts/nhl_players.py           # write static/data/nhl-war/<season>.json and data/nhl_war.json
 
 Skater components, each in goals per 60 of the player's ice time, centred on the league:
@@ -338,8 +339,8 @@ def history(pid, idx, S, wts):
     return [(w, idx.get(S - 1 - j, {}).get(pid)) for j, w in enumerate(wts)]
 
 
-def fit():
-    import numpy as np
+def fit_data():
+    """every season's skater and goalie rows (and by id), team results, and each mover's ice time by team"""
     seasons = list(range(FIRST - 1, D.current_season()))
     sk = {S: skaters(S) for S in seasons}
     gk = {S: goalies(S) for S in seasons}
@@ -347,46 +348,101 @@ def fit():
     gix = {S: {r['id']: r for r in gk[S]} for S in seasons}
     res = {S: team_results(S) for S in seasons}
     spl = {S: team_split(S) for S in range(FIRST + 1, D.current_season())}   # movers' ice time by team
-    names = COMPS + ['gsax'] + PRIORS
+    return {'seasons': seasons, 'sk': sk, 'gk': gk, 'six': six, 'gix': gix, 'res': res, 'spl': spl}
+
+
+FIT_NAMES = COMPS + ['gsax', 'pl', 'pD', 'gpl']      # the design's columns: components, goalies, the shrink target
+
+
+def team_design(fd, K, KG, wts, norm=True, prior=True):
+    """team-season rows: sum over this season's players of (ice time this season) x (projected rates from the
+    seasons before: Marcel-weighted, shrunk toward a learned target by the shrink share), per game. norm: ice time
+    as a share of the team's (5 skaters, 1 goalie a game), so time short-handed, in overtime or with the goalie
+    pulled (trailing teams) doesn't leak this season's result into the inputs"""
+    import numpy as np
+    sk, gk, six, gix, res, spl = (fd[k] for k in ('sk', 'gk', 'six', 'gix', 'res', 'spl'))
+    names = FIT_NAMES
+    X, y, keys = [], [], []
+    for S in range(FIRST + 1, D.current_season()):
+        ss, gs = spl[S]
+        sp = [(r, pieces(r, ss)) for r in sk[S]]
+        gp_ = [(r, pieces(r, gs)) for r in gk[S]]
+        tt, tg = defaultdict(float), defaultdict(float)
+        for r, pc in sp:
+            for t, s in pc:
+                tt[t] += s
+        for r, pc in gp_:
+            for t, s in pc:
+                tg[t] += s
+        agg = defaultdict(lambda: np.zeros(len(names)))
+        for r, pc in sp:
+            m, sh = marcel(history(r['id'], six, S, wts), K, COMPS)
+            v = np.array([m[c] for c in COMPS] + [0.0] + ([sh, sh * (r['pos'] == 'D'), 0.0] if prior else [0.0] * 3))
+            for t, s in pc:
+                if t in res[S]:
+                    agg[t] += v * (s / tt[t] * 5 * res[S][t][2] if norm else s / 3600)
+        for r, pc in gp_:
+            m, sh = marcel(history(r['id'], gix, S, wts), KG, ['gsax60'])
+            for t, s in pc:
+                if t not in res[S]:
+                    continue
+                h = s / tg[t] * res[S][t][2] if norm else s / 3600
+                agg[t][len(COMPS)] += m['gsax60'] * h
+                if prior:
+                    agg[t][-1] += sh * h
+        for t, v in sorted(agg.items()):
+            gdpg, ppg, gp = res[S][t]
+            X.append(v / gp); y.append(gdpg); keys.append((S, t))
+    return np.array(X), np.array(y), keys
+
+
+def ridge_w(X, y, cols, lam):
+    """ridge weights on the kept columns (the intercept unpenalized)"""
+    import numpy as np
+    A = np.column_stack([X[:, cols], np.ones(len(y))])
+    R = lam * np.eye(A.shape[1]); R[-1, -1] = 0
+    return np.linalg.solve(A.T @ A + R, A.T @ y)[:-1]
+
+
+NESTED = os.path.join(HERE, 'data', 'nhl_hpm_nested.json.gz')
+NEST_FROM = 2015
+
+
+def nested(fd=None):
+    """each past season's HPM as it stood when the season ended: the kept inputs' weights refit on the team-seasons
+    up to it (never later ones; the first seasons share the weights known after NEST_FROM), the Marcel settings and
+    the kept inputs as stored. The game model's history prices lineups from these (scripts/nhl_games.py _war_file),
+    so a past game's lineup value never reads weights fit on later seasons; the season files stay on the stored fit"""
+    import numpy as np
+    fitd = json.load(open(FIT))
+    fd = fd or fit_data()
+    X, y, keys = team_design(fd, fitd['K'], fitd['KG'], tuple(fitd['wts']))
+    S_ = np.array([k[0] for k in keys])
+    kept = list(fitd['w'])
+    cols = [FIT_NAMES.index(c) for c in kept]
+    bio = bios()
+    out = {}
+    for Y in range(FIRST, D.current_season()):
+        m = S_ <= max(Y, NEST_FROM)
+        w = {c: float(v) for c, v in zip(kept, ridge_w(X[m], y[m], cols, fitd['lam']))}
+        rows, repl = season_table(Y, dict(fitd, w=w), bio)
+        out[str(Y)] = {'w': {c: round(v, 4) for c, v in w.items()}, 'repl': {k: round(v, 3) for k, v in repl.items()},
+                       'p': {r['id']: [r['grp'], r['age'], r['gp'], r['toi'], r['hpm'], r['go'], r['gd']]
+                             for r in rows if r['grp'] != 'G'}}
+        print(Y, out[str(Y)]['w'], flush=True)
+    D.save(NESTED, out)
+    print('wrote', NESTED)
+
+
+def fit():
+    import numpy as np
+    fd = fit_data()
+    seasons, res = fd['seasons'], fd['res']
+    names = FIT_NAMES
     print('seasons', len(seasons), flush=True)
 
     def design(K, KG, wts, norm=True, prior=True):
-        """team-season rows: sum over this season's players of (ice time this season) x (projected rates from the
-        seasons before: Marcel-weighted, shrunk toward a learned target by the shrink share), per game. norm: ice time
-        as a share of the team's (5 skaters, 1 goalie a game), so time short-handed, in overtime or with the goalie
-        pulled (trailing teams) doesn't leak this season's result into the inputs"""
-        X, y, keys = [], [], []
-        for S in range(FIRST + 1, D.current_season()):
-            ss, gs = spl[S]
-            sp = [(r, pieces(r, ss)) for r in sk[S]]
-            gp_ = [(r, pieces(r, gs)) for r in gk[S]]
-            tt, tg = defaultdict(float), defaultdict(float)
-            for r, pc in sp:
-                for t, s in pc:
-                    tt[t] += s
-            for r, pc in gp_:
-                for t, s in pc:
-                    tg[t] += s
-            agg = defaultdict(lambda: np.zeros(len(names)))
-            for r, pc in sp:
-                m, sh = marcel(history(r['id'], six, S, wts), K, COMPS)
-                v = np.array([m[c] for c in COMPS] + [0.0] + ([sh, sh * (r['pos'] == 'D'), 0.0] if prior else [0.0] * 3))
-                for t, s in pc:
-                    if t in res[S]:
-                        agg[t] += v * (s / tt[t] * 5 * res[S][t][2] if norm else s / 3600)
-            for r, pc in gp_:
-                m, sh = marcel(history(r['id'], gix, S, wts), KG, ['gsax60'])
-                for t, s in pc:
-                    if t not in res[S]:
-                        continue
-                    h = s / tg[t] * res[S][t][2] if norm else s / 3600
-                    agg[t][len(COMPS)] += m['gsax60'] * h
-                    if prior:
-                        agg[t][-1] += sh * h
-            for t, v in sorted(agg.items()):
-                gdpg, ppg, gp = res[S][t]
-                X.append(v / gp); y.append(gdpg); keys.append((S, t))
-        return np.array(X), np.array(y), keys
+        return team_design(fd, K, KG, wts, norm, prior)
 
     def loso_of(X, y, S_, cols, lam):
         pred = np.zeros(len(y))
@@ -472,6 +528,7 @@ def fit():
            'desc': fit_desc()}
     print(out, flush=True)
     json.dump(out, open(FIT, 'w'), indent=1)
+    nested(fd)
 
 
 def rate(r, hist, fitd):
@@ -633,6 +690,8 @@ def build(seasons=None):
 if __name__ == '__main__':
     if '--fit' in sys.argv:
         fit()
+    elif '--nested' in sys.argv:
+        nested()
     elif '--current' in sys.argv:
         build([D.current_season()])
     else:

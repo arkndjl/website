@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-03",
+ "asof": "2026-11-13",
  "rule": "(the project rule): a term enters on the tuning seasons; the held-out seasons give the verdict. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the held-out t alone (the tuning t is the one the term was chosen on, so it is shown, not combined), and the Benjamini-Hochberg q runs over every shipped term with a held-out split at once (one family, all models), so a q of .10 means about one in ten terms at that level is noise. A tested term the live model does not use (shipped: false) is a candidate, outside the family.     keep   q <= .10     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)     watch  q > .10 but held out is worse without it (not proven, not free to remove), or no held-out split at all",
  "qKeep": 0.1,
  "family": 141,
@@ -156,7 +156,7 @@
      },
      "z": 1.17,
      "p": 0.1219,
-     "q": 0.1702,
+     "q": 0.1686,
      "verdict": "watch"
     },
     {
@@ -589,7 +589,7 @@
      },
      "z": 1.66,
      "p": 0.0489,
-     "q": 0.0841,
+     "q": 0.0851,
      "verdict": "keep"
     },
     {
@@ -1284,7 +1284,7 @@
      "note": "weights pooled from 2016 vs last season / last two",
      "z": 1.7,
      "p": 0.0446,
-     "q": 0.0785,
+     "q": 0.0795,
      "verdict": "keep"
     },
     {
@@ -1902,7 +1902,7 @@
      "note": "roster step, log loss",
      "z": 1.97,
      "p": 0.0244,
-     "q": 0.0472,
+     "q": 0.0478,
      "verdict": "keep"
     },
     {
@@ -2294,7 +2294,7 @@
      "shipped": true,
      "z": 1.97,
      "p": 0.0244,
-     "q": 0.0472,
+     "q": 0.0478,
      "verdict": "keep"
     },
     {
@@ -2384,7 +2384,7 @@
      "note": "3 both .75 ({\"lw3o\": 0.75, \"lw3d\": 0.75}); abs total error",
      "z": 2.46,
      "p": 0.0069,
-     "q": 0.0166,
+     "q": 0.0163,
      "verdict": "keep"
     },
     {
@@ -2449,32 +2449,32 @@
    "split": "tune 2017-23 (lined 2021-23), held 2024-26",
    "cluster": "none (stored t)",
    "source": "stored",
-   "tested": "2026-10-28",
+   "tested": "2026-11-13",
    "rows": [
     {
      "term": "elo",
      "core": false,
      "tune": {
       "d": null,
-      "t": -1.57,
-      "p": 0.0582,
+      "t": -1.79,
+      "p": 0.0367,
       "n": null,
       "G": null,
       "deff": null
      },
      "held": {
-      "d": -0.491,
-      "t": 0.58,
-      "p": 0.719,
+      "d": -0.435,
+      "t": 0.45,
+      "p": 0.6736,
       "n": null,
       "G": null,
       "deff": null
      },
      "stored": true,
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
-     "z": -0.58,
-     "p": 0.719,
-     "q": 0.7799,
+     "p": 0.6736,
+     "z": -0.45,
+     "q": 0.7363,
      "verdict": "drop"
     },
     {
@@ -2482,25 +2482,25 @@
      "core": false,
      "tune": {
       "d": null,
-      "t": -2.35,
-      "p": 0.0094,
+      "t": -2.1,
+      "p": 0.0179,
       "n": null,
       "G": null,
       "deff": null
      },
      "held": {
-      "d": 1.673,
-      "t": -1.99,
-      "p": 0.0233,
+      "d": 1.153,
+      "t": -1.57,
+      "p": 0.0582,
       "n": null,
       "G": null,
       "deff": null
      },
      "stored": true,
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
-     "z": 1.99,
-     "p": 0.0233,
-     "q": 0.0463,
+     "p": 0.0582,
+     "z": 1.57,
+     "q": 0.097,
      "verdict": "keep"
     },
     {
@@ -2508,25 +2508,25 @@
      "core": false,
      "tune": {
       "d": null,
-      "t": -3.33,
-      "p": 0.0004,
+      "t": -3.39,
+      "p": 0.0003,
       "n": null,
       "G": null,
       "deff": null
      },
      "held": {
-      "d": 2.163,
-      "t": -1.87,
-      "p": 0.0307,
+      "d": 2.172,
+      "t": -1.85,
+      "p": 0.0322,
       "n": null,
       "G": null,
       "deff": null
      },
      "stored": true,
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
-     "z": 1.87,
-     "p": 0.0307,
-     "q": 0.0578,
+     "p": 0.0322,
+     "z": 1.85,
+     "q": 0.0605,
      "verdict": "keep"
     },
     {
@@ -2534,25 +2534,25 @@
      "core": true,
      "tune": {
       "d": null,
-      "t": -1.2,
-      "p": 0.1151,
+      "t": -1.18,
+      "p": 0.119,
       "n": null,
       "G": null,
       "deff": null
      },
      "held": {
-      "d": 1.984,
-      "t": -2.45,
-      "p": 0.0071,
+      "d": 1.988,
+      "t": -2.46,
+      "p": 0.0069,
       "n": null,
       "G": null,
       "deff": null
      },
      "stored": true,
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
-     "z": 2.45,
-     "p": 0.0071,
-     "q": 0.0168,
+     "p": 0.0069,
+     "z": 2.46,
+     "q": 0.0163,
      "verdict": "keep"
     },
     {
@@ -2560,29 +2560,29 @@
      "core": false,
      "tune": {
       "d": null,
-      "t": -1.62,
-      "p": 0.0526,
+      "t": -2.31,
+      "p": 0.0104,
       "n": null,
       "G": null,
       "deff": null
      },
      "held": {
-      "d": 0.834,
-      "t": -1.14,
-      "p": 0.1271,
+      "d": 1.219,
+      "t": -1.24,
+      "p": 0.1075,
       "n": null,
       "G": null,
       "deff": null
      },
      "stored": true,
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
-     "z": 1.14,
-     "p": 0.1271,
-     "q": 0.1741,
+     "p": 0.1075,
+     "z": 1.24,
+     "q": 0.1516,
      "verdict": "watch"
     }
    ],
-   "revalidate": "2027-10-28"
+   "revalidate": "2027-11-13"
   },
   "soccer_games": {
    "desc": "Soccer match model (scripts/soccer_games.py)",
@@ -4406,7 +4406,7 @@
      "note": "feature group, out of time",
      "z": 1.63,
      "p": 0.0516,
-     "q": 0.0876,
+     "q": 0.0886,
      "verdict": "keep"
     },
     {
@@ -4607,7 +4607,7 @@
      },
      "z": 1.86,
      "p": 0.0314,
-     "q": 0.0583,
+     "q": 0.0598,
      "verdict": "keep"
     },
     {
@@ -4887,7 +4887,7 @@
      },
      "z": 1.59,
      "p": 0.0561,
-     "q": 0.0942,
+     "q": 0.0953,
      "verdict": "keep"
     },
     {
@@ -4915,7 +4915,7 @@
      },
      "z": 1.82,
      "p": 0.0346,
-     "q": 0.0633,
+     "q": 0.0641,
      "verdict": "keep"
     },
     {
@@ -4943,7 +4943,7 @@
      },
      "z": -0.54,
      "p": 0.7053,
-     "q": 0.7709,
+     "q": 0.765,
      "verdict": "drop"
     },
     {
@@ -5083,7 +5083,7 @@
      },
      "z": 1.66,
      "p": 0.0488,
-     "q": 0.0841,
+     "q": 0.0851,
      "verdict": "keep"
     },
     {
@@ -5264,7 +5264,7 @@
      },
      "z": 1.89,
      "p": 0.0297,
-     "q": 0.0565,
+     "q": 0.0573,
      "verdict": "keep"
     },
     {
@@ -5348,7 +5348,7 @@
      },
      "z": 1.8,
      "p": 0.0362,
-     "q": 0.0647,
+     "q": 0.0655,
      "verdict": "keep"
     },
     {
@@ -5539,7 +5539,7 @@
      "note": "player rating input (PR #724), series log loss without it; top 50 t 0.33",
      "z": 1.19,
      "p": 0.117,
-     "q": 0.165,
+     "q": 0.1634,
      "verdict": "watch"
     },
     {
@@ -5607,7 +5607,7 @@
      "note": "elo .80 + talent .20 vs the old four-part blend, .575 vs .595 (fetch_esea.mjs PREVIEW_W)",
      "z": 1.8,
      "p": 0.0362,
-     "q": 0.0647,
+     "q": 0.0655,
      "verdict": "keep"
     },
     {

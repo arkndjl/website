@@ -85,7 +85,8 @@ def kelly(R, ch, o, nw=1):
 
 def units(R, f, scale):
     """the posted stake: f times the week's budget scale, quarter units from .25, never past the book's cap"""
-    return 0.0 if f <= 0 else min(R['cap'], max(.25, round(f * scale * 4) / 4))
+    import picks_oos                           # x the book's live realization (Nov 13 2026)
+    return 0.0 if f <= 0 else min(R['cap'], picks_oos.scaled(max(.25, round(f * scale * 4) / 4), 'nflprops'))
 
 
 def week(k):

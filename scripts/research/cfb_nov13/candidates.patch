@@ -1,0 +1,246 @@
+diff --git a/scripts/cfb_model.mjs b/scripts/cfb_model.mjs
+index 98a4d7b..91a3fe0 100644
+--- a/scripts/cfb_model.mjs
++++ b/scripts/cfb_model.mjs
+@@ -87,6 +87,31 @@ function massey(games, lam = 1, iters = 60) {
+   return R;
+ }
+ 
++// the same margin rating with every team on its own (FCS teams too) and a prior each team is shrunk toward
++function masseyP(games, lam = 2, prior = {}, iters = 60) {
++  const R = {}, by = {};
++  for (const g of games) { (by[g.h] ||= []).push(g); (by[g.a] ||= []).push(g); }
++  for (const t of Object.keys(prior)) R[t] = prior[t];
++  for (const t of Object.keys(by)) R[t] ??= 0;
++  let hfa = 0;
++  for (let it = 0; it < iters; it++) {
++    const hs = games.filter(g => !g.n); hfa = hs.length ? mean(hs.map(g => g.m - R[g.h] + R[g.a])) : 0;
++    for (const [t, list] of Object.entries(by)) {
++      let n = lam * (prior[t] ?? 0); for (const g of list) { const e = g.m - (g.n ? 0 : hfa); n += g.h === t ? e + R[g.a] : R[g.h] - e; }
++      R[t] = n / (list.length + lam);
++    }
++  }
++  return R;
++}
++export const FCSM = { lam: 2, carry: 0.5, clip: 35 };
++const fcsmGames = rows => rows.map(r => ({ h: r.h, a: r.a, m: Math.max(-FCSM.clip, Math.min(FCSM.clip, r.m)), n: r.n }));
++const fcsmPrior = f => Object.fromEntries(Object.entries(f?.massAll || {}).map(([t, v]) => [t, FCSM.carry * v]));
++// an FCS team's rating against the FCS mean, from the all-team margin rating M
++function fcsmDev(M, fbs) {
++  const non = Object.entries(M).filter(([t]) => !fbs.has(t)).map(([, v]) => v), mu = non.length ? mean(non) : 0;
++  return t => M[t] != null ? M[t] - mu : 0;
++}
++
+ // ---- Elo -------------------------------------------------------------------------------------------
+ // FiveThirtyEight-style, as scripts/cfb_teams.mjs; here K and home field are tuned in the backtest. Oct 2026
+ // (scripts/cfb_elo_research.py, data/cfb_elo_research.json): a margin Elo (K/10 Elo a point of miss) beats this rule
+@@ -240,7 +265,7 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
+     const s = g.n ? 0 : t === g.h ? 1 : -1;
+     const pts = t === g.h ? g.hp : g.ap;
+     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
+-    out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
++    out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), tid: t, oid: o, s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
+       rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0, dr: z?.dr ?? 0, dTd: z?.dTd ?? 0, dFg: z?.dFg ?? 0, dLost: z?.dLost ?? 0,
+       stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, fumN: r.offense?.fumbles ?? null, fumE: r.offense?.fumblePpa ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb, cb: c.cb, kb: c.kb });
+   }
+@@ -312,6 +337,8 @@ export const CAND = {
+   // 2017-20, -2.1 held out 2021-26, MAE t -3.6 / -4.2; on the shipped model held out 2023-26 t -2.2 / -4.2. The same
+   // long-memory rating on final margins does nearly as well (control vs margin t -1.2 / -0.5), so most of the gain is the
+   // multi-season memory; control edges margin and was the idea, so it is the one kept
++  fcsm: { name: 'FCS opponent: own margin rating against the FCS mean', special: true, x: 1 },
++  fcsq: { name: 'FCS opponent: own Elo against the FCS mean', special: true, x: 1 },
+   gc: { name: 'game-control rating (long memory)', ctx: r => GC?.feat[String(r.id)] ?? 0, team: (S, t) => (S === GC?.season ? GC?.team[t] : 0) ?? 0, x: 1 },
+ };
+ // league rates by situation bin, then each row's expected goes and passes. The rates for a game are the league's in
+@@ -350,9 +377,13 @@ const ppaOf = r => r.ppa + (FUMN.on && r.fumN != null && r.fumE != null ? (r.fum
+ // last: last season's final ratings. Before a season's first game no observation sets the league mean (adjust's mu was
+ // 0/0, NaN), so every week-1 and preseason total came out NaN and was dropped; points a play and plays then take last
+ // season's mean and home term (Nov 5 2026 sweep)
+-function ratingsAt(effRows, before, prior, P, keys = EXTRA, last = null) {
++// FCS opponent credit: an FBS side's EPA a play against an FCS team is moved by that team's margin rating against the
++// FCS mean (fq, fcsmDev), c x dev over two sides x 65 plays
++export const FCSADJ = { c: +process.env.FCSADJ || 0 };
++const fcsShift = (r, fq) => !fq || !FCSADJ.c ? 0 : r.opp === FCS && r.t !== FCS ? FCSADJ.c * fq(r.oid) / 130 : r.t === FCS && r.opp !== FCS ? -FCSADJ.c * fq(r.tid) / 130 : 0;
++function ratingsAt(effRows, before, prior, P, keys = EXTRA, last = null, fq = null) {
+   const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
+-  const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: ppaOf(r), w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
++  const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: ppaOf(r) + fcsShift(r, fq), w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
+   const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
+   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
+   if (!rows.length && last) for (const [a, b] of [[ppp, last.ppp], [pace, last.pace]]) if (b && isFinite(b.mu)) { a.mu = b.mu; a.h = b.h || 0; }
+@@ -553,6 +584,19 @@ function stAt(rows, before, prior = {}) {
+ // ---- preseason prior ---------------------------------------------------------------------------------
+ // features: last season's final Elo (points over average), SP+, final efficiency (net EPA/play), and
+ // this season's talent and returning production (z across FBS); a team new to FBS gets the FCS level.
++// a team new to FBS (or back from a season off): its own last final Elo, not the FCS average
++export const NEWFBS = { on: process.env.NEWFBS === '1' };
++function newAnchor(S, t, finals) {
++  if (NEWFBS.on) for (let k = S - 1; k >= S - 3; k--) { const v = finals[k]?.elo?.[t]; if (v != null && (k === S - 1 || finals[k].fbs.has(t))) return (v - 1500) / 25; }
++  return -12;
++}
++// the pooled FCS team's preseason efficiency prior: last season's final pooled rating
++export const FCSP = { on: process.env.FCSP === '1' };
++function fcsPrior(pr, f) {
++  if (!FCSP.on || !pr || !f?.eff) return pr;
++  for (const a of ['ppa', 'ppp', 'pace']) for (const sd of ['O', 'D']) { const v = f.eff[a]?.[sd]?.[FCS]; if (v != null && isFinite(v)) (pr[a] ||= { O: {}, D: {} })[sd][FCS] = v; }
++  return pr;
++}
+ function priorFeatures(S, data, fbsS, nameId, finals) {
+   const z = (list, f) => {
+     const vals = list.map(f).filter(v => v != null), m = mean(vals), s = sd(vals);
+@@ -564,13 +608,14 @@ function priorFeatures(S, data, fbsS, nameId, finals) {
+   for (const t of fbsS) {
+     const f = finals[S - 1];
+     const was = f && f.fbs.has(t);
+-    F[t] = { elo: f?.elo[t] != null ? (f.elo[t] - 1500) / 25 : (f ? (f.elo.fcsMean - 1500) / 25 : -10), sp: sp[t] ?? (was ? (f.elo[t] - 1500) / 25 : -12),
++    F[t] = { elo: f?.elo[t] != null ? (f.elo[t] - 1500) / 25 : (f ? (f.elo.fcsMean - 1500) / 25 : -10), sp: sp[t] ?? (was ? (f.elo[t] - 1500) / 25 : newAnchor(S, t, finals)),
+       net: was ? (f.eff.ppa.O[t] ?? 0) - (f.eff.ppa.D[t] ?? 0) : (f ? (f.eff.ppa.O[FCS] ?? 0) - (f.eff.ppa.D[FCS] ?? 0) : -0.2),
+       o: was ? f.eff.ppa.O[t] ?? 0 : f?.eff.ppa.O[FCS] ?? -0.1, d: was ? f.eff.ppa.D[t] ?? 0 : f?.eff.ppa.D[FCS] ?? 0.1,
+       po: was ? f.eff.ppp.O[t] ?? 0 : f?.eff.ppp.O[FCS] ?? 0, pd: was ? f.eff.ppp.D[t] ?? 0 : f?.eff.ppp.D[FCS] ?? 0,
+       ko: was ? f.eff.pace.O[t] ?? 0 : 0, kd: was ? f.eff.pace.D[t] ?? 0 : 0,
+       tal: tal[t] ?? -1.5, ret: ret[t] ?? 0 };
+     const r = data.roster?.[S]?.[t];
++    F[t].dLost = DLOST?.[S]?.[t] ?? 0;
+     Object.assign(F[t], { tal247: r?.tal247 ?? -1, offRet: r?.offRet ?? 0, qbRetE: r?.qbRet ?? 0, offIn: r?.offIn ?? 0, jDn: r?.jDn ?? 0, jump: r?.jump ?? 0, defPlay: r?.defPlay ?? 0 });
+   }
+   return F;
+@@ -586,7 +631,8 @@ function priorFeatures(S, data, fbsS, nameId, finals) {
+ // each is kept: held-out MAE 13.33 -> 13.07, week 1 15.68 -> 14.95; coach change, two seasons back, the freshman class,
+ // young players back (development) and QB transfers in all fail. In this model (season-swap CV, 2025-26):
+ // log loss .4500 -> .4464 (t -2.1), MAE 12.50 -> 12.44 (t -1.9); 2026, the prior's out-of-sample season, .4131 -> .4126
+-const PTS_LIVE = f => [1, f.sp, f.tal, f.ret], PTS_ROSTER = f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn];
++const DLOST = process.env.DLOST && fs.existsSync(process.env.DLOST) ? JSON.parse(fs.readFileSync(process.env.DLOST, 'utf8')) : null;
++const PTS_LIVE = f => [1, f.sp, f.tal, f.ret], PTS_ROSTER = f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, ...(DLOST ? [f.dLost] : [])];
+ const PRIOR_X = {
+   pts: PTS_LIVE,
+   o: f => [1, f.o, f.tal, f.ret], d: f => [1, f.d, f.tal],
+@@ -631,9 +677,10 @@ function finalOf(S, rows, effRows, fbs, prior, P, finals = {}) {
+   const elo = eloRun(done, start, P);
+   const non = Object.entries(elo).filter(([t]) => t !== 'fcsMean' && !fbs.has(t)).map(([, v]) => v);
+   elo.fcsMean = non.length ? mean(non) : 1200;
+-  const eff = ratingsAt(effRows, 99, prior || {}, { ...P, lam: P.lam });
++  const massAll = masseyP(fcsmGames(done), FCSM.lam, fcsmPrior(finals[S - 1]));
++  const eff = ratingsAt(effRows, 99, prior || {}, { ...P, lam: P.lam }, EXTRA, null, fcsmDev(massAll, fbs));
+   const mass = massey(done.map(r => ({ h: fbs.has(r.h) ? r.h : FCS, a: fbs.has(r.a) ? r.a : FCS, m: Math.max(-35, Math.min(35, r.m)), n: r.n })));
+-  return { elo, eff, mass, fbs };
++  return { elo, eff, mass, massAll, fbs };
+ }
+ 
+ // Elo at the start of a season: FBS teams from the prior (ELO_PT Elo a point); everyone else from last season's
+@@ -664,6 +711,8 @@ function features(r, st, fbs) {
+   const x = [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
+     (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
+   return [...x, ...EXTRA.map(k => { if (CAND[k].ctx) return CAND[k].ctx(r, x) * CAND[k].x;
++    if (k === 'fcsm') { const hf = fbs.has(r.h), af = fbs.has(r.a); if (hf === af || !st.fcsm) return 0; return hf ? -st.fcsm(r.a) : st.fcsm(r.h); }
++    if (k === 'fcsq') { const hf = fbs.has(r.h), af = fbs.has(r.a); if (hf === af) return 0; const q = t => (e(t) - (st.elo.fcsMean ?? 1200)) / 25; return hf ? -q(r.a) : q(r.h); }
+     if (k === 'drv') return st.eff.ex?.drv ? driveMargin(st.eff.ex.drv, id(r.h), id(r.a), r.n ? 0 : 1) : 0;
+     const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => exNet(k, m, id(t)); return (n(r.h) - n(r.a)) * CAND[k].x; })];
+ }
+@@ -687,7 +736,8 @@ function walk(rows, effBy, fbsBy, priors, P, seasons, finals, talBy = {}, stBy =
+       const before = games.filter(r => r.done && r.w < w);
+       const elo = eloRun(before, start, P);
+       elo.fcsMean = start.fcsMean;
+-      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P, EXTRA, finals[S - 1]?.eff), tal: talBy[S], st: stAt(stBy[S] || [], w, stPrior[S]) };
++      const fq = EXTRA.includes('fcsm') || FCSADJ.c ? fcsmDev(masseyP(fcsmGames(before), FCSM.lam, fcsmPrior(finals[S - 1])), fbs) : null;
++      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P, EXTRA, finals[S - 1]?.eff, fq), tal: talBy[S], st: stAt(stBy[S] || [], w, stPrior[S]), fcsm: fq };
+       const id = t => fbs.has(t) ? t : FCS;
+       for (const r of games.filter(r => r.w === w && r.fbsGame)) out.push({ r, x: features(r, st, fbs), t: totalOf(r, st, fbs),
+         sim: SIMTEST && r.done && st.eff.ex?.drv ? simGame(st.eff.ex.drv, id(r.h), id(r.a), r.n ? 0 : 1, 1000, SIMR) : null });
+@@ -747,6 +797,28 @@ export function fitBeta(preds, opt = {}) {
+   return { beta, sigma, sigmaMargin };
+ }
+ 
++// weights by part of season: week 1, weeks 2-3 and week 11 on each get the pooled weights plus a shift, the shift a
++// ridge fit on that part's games (results plus lam x the close, as fitBeta), kappa games at zero on each standardized input
++export const PHASE = { kappa: +process.env.PHASE || 0, of: w => w <= 1 ? 0 : w <= 3 ? 1 : w >= 11 ? 2 : -1 };
++export function phaseFit(preds, f, opt = {}) {
++  if (!PHASE.kappa) return null;
++  const ok = preds.filter(p => p.r.done && p.r.fbsGame), lam = opt.lam || 0, q = Math.sqrt(isFinite(lam) ? lam : 1), clip = v => Math.max(-45, Math.min(45, v));
++  if (!ok.length) return null;
++  const b = f.beta.slice(1), s = b.map((_, j) => sd(ok.map(p => p.x[j])));
++  return [0, 1, 2].map(ph => {
++    const X = [], Y = [];
++    for (const p of ok) if (PHASE.of(p.r.w) === ph) {
++      const m = dot(b, p.x), z = p.x.map((v, j) => v / s[j]);
++      X.push(z); Y.push(clip(p.r.m) - m);
++      if (lam && p.r.close != null) { X.push(z.map(v => v * q)); Y.push((clip(p.r.close) - m) * q); }
++    }
++    if (X.length < 50) return f.beta;
++    const d = ols(X, Y, PHASE.kappa, 0);
++    return [0, ...b.map((v, j) => v + d[j] / s[j])];
++  });
++}
++export const betaFor = (f, w) => { const ph = PHASE.of(w); return f.phase && ph >= 0 ? f.phase[ph] : f.beta; };
++
+ // ---- weather (Open-Meteo) ------------------------------------------------------------------------------
+ // historical (archive) for played games, forecast for the coming week; kickoff hour at the venue. A forecast (f: 1)
+ // is pulled again every run until kickoff and replaced by the archive once that has the game (Nov 2 2026: the cache
+@@ -1015,7 +1087,7 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert
+ // FBS v FBS margins in weeks 1-3 run compressed (result on margin slope 1.13, above 1 in every season 2017-26; the
+ // close ~1.0): margin and sigma x k, so win chances don't move (MAE t -1.9 tune, -2.4 held). Totals in weeks 2-6 run
+ // too spread (slope .75): each shrinks toward its week's mean total by s (MAE t -1.9, -1.1). The season sim is left as is.
+-export const EARLY = { wk: 3, k: 1.13, tw: [2, 6], s: 0.75 };
++export const EARLY = { wk: 3, k: +process.env.EARLYK || 1.13, tw: [2, 6], s: 0.75 };
+ const earlyK = r => r.w <= EARLY.wk && r.hc === 'fbs' && r.ac === 'fbs' ? EARLY.k : 1;
+ const earlyTotal = (r, tm, mu) => tm != null && isFinite(mu) && r.w >= EARLY.tw[0] && r.w <= EARLY.tw[1] ? mu + EARLY.s * (tm - mu) : tm;
+ function earlyTotals(ps) {
+@@ -1024,7 +1096,7 @@ function earlyTotals(ps) {
+   return ps;
+ }
+ 
+-export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret', ...(GC ? ['gc'] : [])], fit: { lam: 0.25 }, fpi: { from: 2023 } };
++export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret', ...(GC ? ['gc'] : []), ...(process.env.FCSQ === '1' ? ['fcsq'] : []), ...(process.env.FCSM === '1' ? ['fcsm'] : [])], fit: { lam: 0.25 }, fpi: { from: 2023 } };
+ 
+ // ESPN FPI stacked onto the model's margin (team model idea 9, scripts/public_ratings_cfb.mjs, Oct 23 2026): margin =
+ // a x model + b x (home FPI - away FPI), FPI from the last run published 6 hours or more before kickoff
+@@ -1121,7 +1193,7 @@ export async function runModel(data, SEASON, opts = {}) {
+       raw[S] = finalOf(S, rows, effBy[S], fbsBy[S], null, P0, finals);
+       const from = seasons.filter(s => s > S0 && s < S);
+       W[S] = fitPriorPooled((from.length ? from : [S]).map(s => [Fs[s], raw[s]]));
+-      priors[S] = applyPrior(Fs[S], W[S]);
++      priors[S] = fcsPrior(applyPrior(Fs[S], W[S]), finals[S - 1]);
+       finals[S] = { ...finalOf(S, rows, effBy[S], fbsBy[S], priors[S], P0, finals), mass: raw[S].mass };
+     }
+     W[S1] = W[SEASON];
+@@ -1134,13 +1206,13 @@ export async function runModel(data, SEASON, opts = {}) {
+   const F1 = priorFeatures(S1, data, fbsBy[S1], nameId, finals);
+   finals[S1] = finalOf(S1, rows, effBy[S1], fbsBy[S1], null, P0, finals);
+   W[S1] = fitPrior(F1, finals[S1]);                    // fit on S1 itself: S1's own backtest is in-sample for the prior
+-  priors[S1] = applyPrior(F1, W[S1]);
++  priors[S1] = fcsPrior(applyPrior(F1, W[S1]), finals[S0]);
+   const mass1 = finals[S1].mass;
+   finals[S1] = { ...finalOf(S1, rows, effBy[S1], fbsBy[S1], priors[S1], P0, finals), mass: mass1 };   // with the prior: next season's features
+   const evalS = seasons.filter(S => S > S0);
+   if (data.games[SEASON]?.length && SEASON > S1) {
+     const F2 = priorFeatures(SEASON, data, fbsBy[SEASON], nameId, finals);
+-    priors[SEASON] = applyPrior(F2, W[S1]);           // out of sample: weights from S1
++    priors[SEASON] = fcsPrior(applyPrior(F2, W[S1]), finals[S1]);           // out of sample: weights from S1
+   }
+   }
+ 
+@@ -1271,12 +1343,13 @@ export async function runModel(data, SEASON, opts = {}) {
+     for (const S of Ss.slice(1)) {
+       if (!HI?.wf && S < FP.from) continue;
+       const tr = Ss.filter(s => s < S).flatMap(s => byS[s]), f = fitBeta(tr, FO), tt = HI?.wf ? fitTotals(tr, wx) : null;
++      f.phase = phaseFit(tr, f, FO);
+       const stk = FP ? fpiStack(wf.map(q => ({ r: q.r, m: q.m0 })), FP.gap, S, FP.from) : null;
+       const out = [];
+       for (const p of byS[S]) if (p.r.done && p.r.fbsGame) {
+-        const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null, ek = earlyK(p.r);
++        const m0 = dot(betaFor(f, p.r.w), [1, ...p.x]), g = stk ? FP.gap(p.r) : null, ek = earlyK(p.r);
+         const ld = ldOf(LD, p.r);
+-        out.push({ r: p.r, m: (g != null ? stackM(stk, m0, g, p.r) : m0) * ek + ld, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, ld, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
++        out.push({ r: p.r, x: p.x, g, m: (g != null ? stackM(stk, m0, g, p.r) : m0) * ek + ld, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, ld, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
+           tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0, p.t.tot)]) : null });
+       }
+       wf.push(...earlyTotals(out));
+@@ -1292,7 +1365,8 @@ export async function runModel(data, SEASON, opts = {}) {
+   const start = eloStart(SEASON, fbs, prior, finals);
+   const elo = eloRun(cur.filter(r => r.done), start, P); elo.fcsMean = start.fcsMean;
+   DRIVES = true;     // drive rates for the live drive simulation, whatever the selection kept
+-  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P, EXTRA, finals[SEASON - 1]?.eff), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
++  const fqNow = fcsmDev(masseyP(fcsmGames(cur.filter(r => r.done)), FCSM.lam, fcsmPrior(finals[SEASON - 1])), fbs);
++  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P, EXTRA, finals[SEASON - 1]?.eff, fqNow), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]), fcsm: fqNow };
+   await weather(cur, wx, true);
+   const { beta, sigma } = fitAll;
+   // the model's margin before the early-season stretch (predict applies it) and with the letdown spot

@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-05",
+ "updated": "2026-11-13",
  "params": {
   "K": 4,
   "reg": 0.2,
@@ -29,18 +29,18 @@
   "one"
  ],
  "coef": {
-  "elo": 0.3109,
-  "xg": 0.3282,
-  "b2b": -0.2897,
-  "home": 0.1307,
-  "rv": 0.2929
+  "elo": 0.3241,
+  "xg": 0.3301,
+  "b2b": -0.289,
+  "home": 0.1308,
+  "rv": 0.301
  },
  "mcoef": {
-  "elo": 0.3564,
-  "xg": 0.4967,
-  "b2b": -0.3209,
-  "home": 0.2118,
-  "rv": 0.4306
+  "elo": 0.3735,
+  "xg": 0.4961,
+  "b2b": -0.3201,
+  "home": 0.212,
+  "rv": 0.4521
  },
  "tcoef": {
   "xgT": 0.3625,
@@ -51,44 +51,44 @@
  },
  "pl": {
   "home2": [
-   -1.2762,
-   0.6638,
-   0.0573
+   -1.2681,
+   0.655,
+   0.0564
   ],
   "away2": [
-   -2.4442,
-   -0.7101,
-   0.2527
+   -2.4369,
+   -0.6991,
+   0.2512
   ]
  },
  "ot": [
-  -0.0771,
-  -0.0937,
-  -0.1813
+  -0.0769,
+  -0.0877,
+  -0.1817
  ],
  "otWin": [
-  0.0007,
-  0.3676
+  0.0019,
+  0.3603
  ],
  "otWinGames": 2760,
- "sdMargin": 2.481,
+ "sdMargin": 2.482,
  "sdTotal": 2.299,
- "seasonSd": 0.114,
+ "seasonSd": 0.117,
  "evidence": {
   "elo": {
    "kept": true,
-   "tTune": 1.61,
-   "tHeld": -0.58,
-   "dTune": 2.002,
-   "dHeld": -0.545,
+   "tTune": 1.79,
+   "tHeld": -0.45,
+   "dTune": 2.279,
+   "dHeld": -0.435,
    "split": "2021-23 / 2024-26 lined"
   },
   "xg": {
    "kept": true,
-   "tTune": 2.14,
-   "tHeld": 1.43,
-   "dTune": 2.332,
-   "dHeld": 1.05,
+   "tTune": 2.1,
+   "tHeld": 1.57,
+   "dTune": 2.296,
+   "dHeld": 1.153,
    "split": "2021-23 / 2024-26 lined"
   },
   "g": {
@@ -118,17 +118,17 @@
   "b2b": {
    "kept": true,
    "tTune": 3.39,
-   "tHeld": 1.86,
-   "dTune": 2.777,
-   "dHeld": 2.181,
+   "tHeld": 1.85,
+   "dTune": 2.766,
+   "dHeld": 2.172,
    "split": "2021-23 / 2024-26 lined"
   },
   "home": {
    "kept": true,
    "tTune": 1.18,
-   "tHeld": 2.47,
-   "dTune": 0.972,
-   "dHeld": 1.997,
+   "tHeld": 2.46,
+   "dTune": 0.975,
+   "dHeld": 1.988,
    "split": "2021-23 / 2024-26 lined"
   },
   "x5": {
@@ -149,10 +149,10 @@
   },
   "rv": {
    "kept": true,
-   "tTune": 2.81,
-   "tHeld": 2.07,
-   "dTune": 1.661,
-   "dHeld": 1.9,
+   "tTune": 2.31,
+   "tHeld": 1.24,
+   "dTune": 1.483,
+   "dHeld": 1.219,
    "split": "2021-23 / 2024-26 lined"
   },
   "bk": {
@@ -173,10 +173,10 @@
   },
   "mkt": {
    "kept": false,
-   "tTune": -0.23,
-   "tHeld": 0.25,
-   "dTune": -0.121,
-   "dHeld": 0.071,
+   "tTune": -0.05,
+   "tHeld": 0.63,
+   "dTune": -0.026,
+   "dHeld": 0.202,
    "split": "2021-23 / 2024-26 lined"
   }
  },
@@ -186,27 +186,27 @@
    "logLossModel": 0.6515,
    "brierModel": 0.2298,
    "lined": 3752,
-   "logLossLinedModel": 0.6515,
+   "logLossLinedModel": 0.6516,
    "logLossMarket": 0.6516,
-   "tVsMarket": -0.04,
-   "rModelVsMarket": 0.946,
-   "hitModel": 0.62,
+   "tVsMarket": 0.02,
+   "rModelVsMarket": 0.945,
+   "hitModel": 0.618,
    "hitMarket": 0.628,
    "totalGames": 3752,
    "totalMaeModel": 1.838,
    "totalMaeLine": 1.834,
-   "maeMargin": 2.081
+   "maeMargin": 2.08
   },
   "2024-26 (held out)": {
    "games": 4192,
-   "logLossModel": 0.6678,
-   "brierModel": 0.2378,
+   "logLossModel": 0.6685,
+   "brierModel": 0.238,
    "lined": 4190,
-   "logLossLinedModel": 0.6679,
+   "logLossLinedModel": 0.6685,
    "logLossMarket": 0.6645,
-   "tVsMarket": 2.17,
+   "tVsMarket": 2.42,
    "rModelVsMarket": 0.935,
-   "hitModel": 0.584,
+   "hitModel": 0.585,
    "hitMarket": 0.593,
    "totalGames": 4190,
    "totalMaeModel": 1.857,
@@ -217,51 +217,51 @@
  "calib": [
   {
    "bin": 0.5,
-   "n": 1125,
+   "n": 1086,
    "model": 0.525,
-   "won": 0.505
+   "won": 0.508
   },
   {
    "bin": 0.55,
-   "n": 1098,
+   "n": 1051,
    "model": 0.574,
-   "won": 0.545
+   "won": 0.538
   },
   {
    "bin": 0.6,
-   "n": 811,
-   "model": 0.624,
-   "won": 0.599
+   "n": 818,
+   "model": 0.623,
+   "won": 0.594
   },
   {
    "bin": 0.65,
-   "n": 558,
+   "n": 578,
    "model": 0.674,
-   "won": 0.656
+   "won": 0.657
   },
   {
    "bin": 0.7,
-   "n": 347,
-   "model": 0.724,
-   "won": 0.671
+   "n": 352,
+   "model": 0.723,
+   "won": 0.665
   },
   {
    "bin": 0.75,
-   "n": 178,
-   "model": 0.773,
+   "n": 213,
+   "model": 0.772,
    "won": 0.742
   },
   {
    "bin": 0.8,
-   "n": 65,
-   "model": 0.821,
-   "won": 0.892
+   "n": 77,
+   "model": 0.822,
+   "won": 0.792
   }
  ],
  "plCheck": {
   "home2Model": 0.329,
   "home2": 0.329,
-  "away2Model": 0.27,
+  "away2Model": 0.271,
   "away2": 0.271,
   "otModel": 0.221,
   "ot": 0.221
