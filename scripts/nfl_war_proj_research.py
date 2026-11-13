@@ -25,6 +25,10 @@ Forms (pre-registered, 4), OLS leaving one season S out, per f on the checkpoint
     C   A + by group: (age - 27)+, (27 - age)+, W0 (age - 27)+     (RBs can fall off early, QBs late)
     D   C + W0 by group (how much of a season's WAR carries differs by spot)
 Live form: D if it is the best at every grid point for both targets, else C (scripts/nfl_war_proj.py reads it).
+    E   the live form + the market's read of him by group (scripts/nfl_market.py: rookie-deal flag, flag x -ln pick,
+        a later contract's ln cap %); pre-registered (scripts/research/nfl_nov13/PREREG.md C2). Kept
+        (out['market']) when it beats the live form at week 9 and at the season's end on both targets, paired t <= -2
+        and most held-out seasons; the build then reads the grid's y1cE / y3cE
 Kept: the best of C / D beats the strongest baseline on held-out RMSE at every f with paired t <= -2 (player-seasons),
 wins most held-out seasons, calibration slope .8-1.2, for both targets. Also reported: C vs B (position curves vs pooled)
 and a time split (fit S <= 2018, test 2019+).
@@ -44,6 +48,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import names as NM   # noqa: E402  the shared player-name key
 from nfl_war_proj import A0, GROUPS, feats   # noqa: E402  the live build's inputs
+import nfl_market as MK   # noqa: E402
 OUT = os.path.join(ROOT, 'data', 'nfl_war_proj_fit.json')
 FRAMES = os.path.join(HERE, '.cache', 'pctl', 'frames_nfl.json.gz')
 MARCEL = (1.0, 0.7, 0.5)
@@ -211,10 +216,29 @@ def evaluate(R, tgt, forward=False):
     return res, {f_: [round(float(c), 5) for c in fit_all(Xs[f_], y)] for f_ in ('C', 'D')}
 
 
+def market_test(R, tgt, live):
+    """form E against the live form, leaving one season out; and E's coefficients on every season"""
+    R = [r for r in R if r[tgt] is not None and r['S'] >= 2015]
+    y = np.array([r[tgt] for r in R]); S = np.array([r['S'] for r in R])
+    X0 = X_of(live, R)
+    X1 = np.array([feats('E', r['g'], r['W0'], r['W1'], r['W2'], r['h1'], r['h2'], r['s0'], r['s1'], r['a'],
+                         MK.signal(r['pid'], r['S']), live) for r in R])
+    e0 = (loso(X0, y, S) - y) ** 2; p1 = loso(X1, y, S); e1 = (p1 - y) ** 2
+    d = e1 - e0
+    seasons = sorted(set(S))
+    ds = np.array([d[S == s].mean() for s in seasons])
+    res = {'rmse': [round(float(np.sqrt(e0.mean())), 4), round(float(np.sqrt(e1.mean())), 4)], 't': round(tstat(d), 2),
+           'tSeason': round(tstat(ds), 2), 'won': f'{int((ds < 0).sum())}/{len(seasons)}',
+           'slope': round(float(np.polyfit(p1, y, 1)[0]), 3)}
+    res['pass'] = bool(res['t'] <= -2 and (ds < 0).sum() * 2 > len(seasons))
+    return res, [round(float(c), 5) for c in fit_all(X1, y)]
+
+
 def main():
     F, rate, B = load()
     T = season_tab(F)
     grid = []
+    rows_w = {}
     for w in ['3', '5', '7', '9', '11', '13', '15', 'end']:
         R, fs = [], []
         for S in sorted(F):
@@ -222,6 +246,7 @@ def main():
             R += rs
             if f is not None and S >= 2015:
                 fs.append(f)
+        rows_w[w] = R
         g = {'w': w, 'f': round(float(np.median(fs)), 3)}
         for tgt in ('y1', 'y3'):
             res, coef = evaluate(R, tgt, forward=(w in ('9', 'end')))
@@ -245,6 +270,13 @@ def main():
     for g in grid:   # the live form's coefficients, fit on every season
         for t in ('y1c', 'y3c'):
             g[t] = g[t][out['form']]
+    if MK.load():   # the market's read on top of the live form
+        for g in grid:
+            for t in ('y1', 'y3'):
+                g[t]['market'], g[t + 'cE'] = market_test(rows_w[g['w']], t, out['form'])
+        out['market'] = {'kept': all(g[t]['market']['pass'] for g in grid if g['w'] in ('9', 'end') for t in ('y1', 'y3')),
+                         'gate': 'week 9 and the season end, 1Y and 3Y: paired t <= -2 and most held-out seasons vs the live form'}
+        print('market', out['market']['kept'], {g['w']: (g['y1']['market']['t'], g['y3']['market']['t']) for g in grid})
     json.dump(out, open(OUT, 'w'), indent=1)
     print('kept', out['kept'], 'form', out['form'])
 
