@@ -1,41 +1,41 @@
 {
- "asof": "2026-11-13T01:52:27Z",
+ "asof": "2026-11-13T11:08:32Z",
  "sport": "nhl",
  "season": 2027,
  "loss": "win log loss",
- "n": 131,
- "logged": 143,
+ "n": 141,
+ "logged": 157,
  "expectFrom": "walk-forward 2022-2026, same calendar month",
- "model": 0.6181,
- "expected": 0.6709,
- "z": 0.203,
- "line": 0.6263,
- "lineN": 131,
- "modelAtLine": 0.6181,
+ "model": 0.6242,
+ "expected": 0.6715,
+ "z": 0.176,
+ "line": 0.6303,
+ "lineN": 141,
+ "modelAtLine": 0.6242,
  "byMonth": [
   {
    "month": "oct",
    "n": 56,
    "model": 0.6423,
-   "expected": 0.6722
+   "expected": 0.673
   },
   {
    "month": "nov",
-   "n": 75,
-   "model": 0.6,
-   "expected": 0.67
+   "n": 85,
+   "model": 0.6123,
+   "expected": 0.6706
   }
  ],
  "test": {
-  "n": 131,
-  "window": 131,
-  "mean": 0.2031,
-  "t": 2.81,
-  "p": 0.9944,
+  "n": 141,
+  "window": 141,
+  "mean": 0.176,
+  "t": 2.64,
+  "p": 0.9919,
   "days": 20,
   "sd": 1.0,
-  "cusum": 0.0,
-  "cusumMax": 2.99,
+  "cusum": 1.8,
+  "cusumMax": 2.88,
   "h": 10.0,
   "stop": false,
   "why": ""
