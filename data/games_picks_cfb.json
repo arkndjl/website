@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-13T16:16:46Z",
+ "asof": "2026-11-13T16:19:35Z",
  "recenter": {
   "week": 0.29
  },
@@ -666,7 +666,7 @@
     "side": "over",
     "line": 39.5,
     "price": 738.0,
-    "ev": 3.391,
+    "ev": 3.375,
     "units": 1.0
    }
   },
@@ -699,9 +699,9 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": -102.0,
-    "ev": 0.038,
-    "units": 0.5
+    "price": -104.0,
+    "ev": 0.032,
+    "units": 0.25
    }
   },
   {
@@ -1307,14 +1307,7 @@
    "betTo": 53.0,
    "close": 52.5,
    "paper": true,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 52.5,
-    "price": -108.0,
-    "ev": 0.006,
-    "units": 0.25
-   }
+   "now": null
   },
   {
    "id": "401864537",
@@ -1465,7 +1458,7 @@
    "tmRaw": 55.8,
    "flagged": "2026-11-08T20:39:29Z",
    "betTo": 59.0,
-   "close": 58.5,
+   "close": 59.5,
    "paper": true,
    "now": null
   },
@@ -1668,7 +1661,7 @@
     "side": "over",
     "line": 46.5,
     "price": 738.0,
-    "ev": 3.32,
+    "ev": 3.321,
     "units": 1.0
    }
   },
@@ -1739,6 +1732,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401856859",
+   "sport": "cfb",
+   "kick": "2026-11-14T17:00:00.000Z",
+   "home": "Iowa State",
+   "away": "Cincinnati",
+   "mk": "total",
+   "side": "under",
+   "line": 59.5,
+   "price": -111.0,
+   "edge": 3.8,
+   "x": 3.0,
+   "why": "no edge at -111",
+   "m": 1.7,
+   "tm": 55.7
+  },
+  {
    "id": "401858521",
    "sport": "cfb",
    "kick": "2026-11-14T21:15:00.000Z",
@@ -1753,6 +1762,22 @@
    "why": "no edge at -111",
    "m": -5,
    "tm": 47.1
+  },
+  {
+   "id": "401856884",
+   "sport": "cfb",
+   "kick": "2026-11-14T23:15:00.000Z",
+   "home": "Kentucky",
+   "away": "Florida",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -111.0,
+   "edge": 3.5,
+   "x": 3.0,
+   "why": "no edge at -111",
+   "m": 2,
+   "tm": 56.0
   },
   {
    "id": "401871060",
@@ -1779,28 +1804,12 @@
    "mk": "total",
    "side": "over",
    "line": 46.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 2.8,
    "x": 3.0,
    "why": "edge under 3",
    "m": 2.4,
    "tm": 49.3
-  },
-  {
-   "id": "401856859",
-   "sport": "cfb",
-   "kick": "2026-11-14T17:00:00.000Z",
-   "home": "Iowa State",
-   "away": "Cincinnati",
-   "mk": "total",
-   "side": "under",
-   "line": 58.5,
-   "price": -100.0,
-   "edge": 2.8,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 1.7,
-   "tm": 55.7
   },
   {
    "id": "401858293",
@@ -2121,22 +2130,6 @@
    "why": "edge under 6 (game: conference)",
    "m": 11,
    "tm": 43.6
-  },
-  {
-   "id": "401856882",
-   "sport": "cfb",
-   "kick": "2026-11-15T00:45:00.000Z",
-   "home": "Arkansas",
-   "away": "South Carolina",
-   "mk": "spread",
-   "side": "home",
-   "line": -8.5,
-   "price": -104.0,
-   "edge": 1.4,
-   "x": 6.0,
-   "why": "edge under 6 (game: conference)",
-   "m": -7.1,
-   "tm": 53.0
   }
  ],
  "games": {
@@ -2156,7 +2149,7 @@
    "mk": "total",
    "side": "over",
    "line": 46.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -2241,7 +2234,7 @@
    "side": "over",
    "line": 39.5,
    "price": 738.0,
-   "ev": 3.391,
+   "ev": 3.375,
    "edge": 6.3,
    "units": 1.0,
    "bk": "poly",
@@ -2326,13 +2319,13 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -108.0,
-   "ev": 0.006,
+   "price": -111.0,
    "edge": 3.5,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "Kentucky",
    "away": "Florida",
-   "state": "paper"
+   "state": "under"
   },
   "401858526": {
    "mk": "total",
@@ -2397,9 +2390,9 @@
   "401856859": {
    "mk": "total",
    "side": "under",
-   "line": 58.5,
-   "price": -100.0,
-   "edge": 2.8,
+   "line": 59.5,
+   "price": -111.0,
+   "edge": 3.8,
    "ev": null,
    "units": 0.0,
    "home": "Iowa State",
@@ -2496,7 +2489,7 @@
    "side": "over",
    "line": 46.5,
    "price": 738.0,
-   "ev": 3.32,
+   "ev": 3.321,
    "edge": 4.2,
    "units": 1.0,
    "bk": "poly",
@@ -2556,10 +2549,10 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -102.0,
-   "ev": 0.038,
+   "price": -104.0,
+   "ev": 0.032,
    "edge": 7.1,
-   "units": 0.5,
+   "units": 0.25,
    "home": "West Virginia",
    "away": "Kansas",
    "state": "paper"
@@ -2893,7 +2886,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 17872,
+  "snapshots": 17878,
   "buckets": [
    {
     "when": "24h+",
@@ -2906,12 +2899,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 382,
-    "clvRet": -0.0648,
-    "clvT": -19.17,
+    "clvN": 383,
+    "clvRet": -0.065,
+    "clvT": -19.25,
     "clv": -0.01,
     "beat": 0.157,
-    "still": 0.636
+    "still": 0.637
    },
    {
     "when": "1-6h",
@@ -5453,7 +5446,7 @@
    "tmRaw": 55.8,
    "flagged": "2026-11-08T20:39:29Z",
    "betTo": 59.0,
-   "close": 58.5,
+   "close": 59.5,
    "paper": true
   },
   {
@@ -6297,12 +6290,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T16:16:46Z",
+ "checked": "2026-11-13T16:19:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-13": {
-    "raw": 4.0,
+    "raw": 4.25,
     "scale": 1.0
    }
   }
