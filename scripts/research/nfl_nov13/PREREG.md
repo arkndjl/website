@@ -69,3 +69,9 @@ the side with 65%+ of tickets covered 48.4% (n 1,515). No signal.
 L1 `ir`: non-QBs on a reserve list and off that week's game status report, every such player (scope all), no fade,
    its own walk-forward weight, against the model without it. Pass = paired t <= -1.65 by season-week on 2026.
 L2 `tqb`: as B1. Pass = paired t <= -1.65 on 2026 totals.
+
+## Owner's call
+
+L1 `ir` was added to the model on the owner's call (it failed the 2015-20 gate above): refit weight .65 (t 2.9),
+held-out 2021-25 MAE 10.03 to 9.99; NFL spread rule X 4 to 4.5 after `--fit` / `--rules`. The season-end score of L1
+stands as registered.
