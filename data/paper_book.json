@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T01:06:45Z",
+ "asof": "2026-11-13T01:18:15Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 86.76,
   "peak": 117.38,
   "drawdown": 0.2608,
-  "open": 6.25,
+  "open": 8.75,
   "path": [
    103.59,
    105.6,
@@ -412,10 +412,10 @@
   ]
  },
  "record": {
-  "n": 426,
-  "clvN": 418,
-  "clvRet": -0.0108,
-  "clvT": -2.18,
+  "n": 427,
+  "clvN": 419,
+  "clvRet": -0.0115,
+  "clvT": -2.3,
   "clv": 0.04,
   "beat": 0.319,
   "settled": 418,
@@ -428,23 +428,23 @@
   "risked": 397.75,
   "yield": -0.0281
  },
- "tEff": -1.89,
+ "tEff": -1.78,
  "corr": {
-  "rho": 0.01,
-  "n": 418,
-  "slates": 40,
-  "nEff": 311.7,
-  "avgSlate": 10.45
+  "rho": 0.027,
+  "n": 419,
+  "slates": 41,
+  "nEff": 249.9,
+  "avgSlate": 10.22
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 418,
+   "value": 419,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.1% t -1.89",
+   "value": "-1.1% t -1.78",
    "pass": false
   },
   {
@@ -454,7 +454,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-total: -1.7%",
+   "value": "without nba-total: -1.8%",
    "pass": false
   },
   {
@@ -701,10 +701,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 61,
-   "clvN": 61,
-   "clvRet": -0.0202,
-   "clvT": -1.88,
+   "n": 62,
+   "clvN": 62,
+   "clvRet": -0.0245,
+   "clvT": -2.15,
    "clv": null,
    "beat": null,
    "settled": 61,
@@ -781,6 +781,28 @@
    "event": null,
    "pass": false,
    "close": 226.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873052-4040761-ry",
+   "k": "2026-11-13T01:15:00Z",
+   "slate": "nflprops:2026-11-12",
+   "h": "NYG",
+   "a": "WAS",
+   "mk": "prop",
+   "side": "over",
+   "line": 27.5,
+   "price": -108.0,
+   "bet": "Devin Singletary over 27.5 rush yds -108",
+   "placed": "2026-11-10T04:52:00Z",
+   "stake": 2.5,
+   "edge": 22.6,
+   "ev": 0.0535,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.2862,
+   "close": 19.5
   },
   {
    "rule": "nba-spread",
@@ -17044,6 +17066,28 @@
    "event": null,
    "pass": false,
    "close": 226.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873052-4040761-ry",
+   "k": "2026-11-13T01:15:00Z",
+   "slate": "nflprops:2026-11-12",
+   "h": "NYG",
+   "a": "WAS",
+   "mk": "prop",
+   "side": "over",
+   "line": 27.5,
+   "price": -108.0,
+   "bet": "Devin Singletary over 27.5 rush yds -108",
+   "placed": "2026-11-10T04:52:00Z",
+   "stake": 2.5,
+   "edge": 22.6,
+   "ev": 0.0535,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.2862,
+   "close": 19.5
   },
   {
    "rule": "nba-spread",
