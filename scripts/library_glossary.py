@@ -434,7 +434,7 @@ sections.append({'id': 'games', 'title': 'Game models and predictions', 'entries
     E('Game projection', 'Model line, win chance and projected score for every game.',
       ['Margin from the sport\'s rating (see Team ratings); win chance = normal (or logistic) on the margin.',
        'Win sd fit walk-forward: NBA ~12, CBB 11.9, CFB 14.2. Totals: separate model per sport.',
-       'Soccer big five: projected score, over 2.5 and both-score at the league\'s scoring level (goals scored / goals projected, earlier seasons); 1X2 unchanged.',
+       'Soccer: projected score, over 2.5 and both-score from market totals ratings in 16 leagues (a league term and a lean per club, learned from earlier matches\' closing over/under prices; never the match\'s own). Held out over 2.5 log loss .675 vs .683 before, close .672. 1X2 unchanged.',
        'Predictions is the only page with picks, lines and props; sport pages show projections only.'],
       'games and game table tabs; Predictions', ['CFB', 'NFL', 'CBB', 'NBA', 'NHL', 'Soccer', 'Tennis', 'CS2']),
     E('Walk-forward test', 'Each game is predicted with a model fit only on games before it.',

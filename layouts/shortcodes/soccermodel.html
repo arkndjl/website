@@ -25,6 +25,16 @@
       <thead><tr><th>UEFA cups</th><th title="matches scored">Tuning</th><th title="log loss, model / a flat 45-26-29 guess">Log loss</th><th>Held out</th><th>Log loss</th></tr></thead>
       <tbody>{{ range $lg, $v := $f.euro }}<tr><td>{{ index $nm $lg }}</td><td class="cfb__num">{{ with $v.tune }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $v.tune }}{{ .model }} <span class="cfb__dim">/ {{ .base }}</span>{{ end }}</td><td class="cfb__num">{{ with $v.hold }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $v.hold }}{{ .model }} <span class="cfb__dim">/ {{ .base }}</span>{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
+    {{- with $f.totals }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Over 2.5 goals</th><th>Matches</th><th title="over 2.5 log loss: market totals ratings / the model's total at the league's scoring level / the closing over-under price without the vig (lower is better)">Log loss</th><th title="paired t, totals ratings minus scoring level, clustered by match day (negative = the ratings are better)">t</th></tr></thead>
+      <tbody>
+      {{- range $pl := slice (slice "tune" "2020-21 to 2021-22 (tuning)") (slice "hold" "2022-23 on (held out)") (slice "holdBig5" "· big five") (slice "holdOther" "· eleven more leagues") }}{{ $lbl := index $pl 1 }}{{ with index $f.totals (index $pl 0) }}
+      <tr><td>{{ $lbl }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .ratings }} <span class="cfb__dim">/ {{ .level }} / {{ .close }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .t)) }}</td></tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- end }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Inputs and settings</th><th title="kept in the model after the held-out test">Kept</th><th title="log loss on the tuning seasons, big five + UEFA cups">Tuning</th><th title="log loss, held-out seasons">Held out</th><th></th></tr></thead>
       <tbody>{{ range $f.tests }}<tr><td>{{ .name }}</td><td>{{ if .kept }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td><td class="cfb__num">{{ .tune }}</td><td class="cfb__num">{{ .hold }}</td><td class="cfb__dim">{{ .note }}</td></tr>{{ end }}</tbody>
