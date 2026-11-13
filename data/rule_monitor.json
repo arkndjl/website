@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T04:51:45Z",
+ "asof": "2026-11-13T05:17:51Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -148,10 +148,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0287,
-    "beat": 0.495,
-    "roi": 0.0949,
-    "n": 99
+    "clvRet": 0.0455,
+    "beat": 0.545,
+    "roi": 0.075,
+    "n": 110
    },
    "check": {
     "n": 0,
@@ -160,11 +160,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1651,
+    "sd": 0.1501,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.114,
+    "rho": 0.174,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -173,10 +173,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0071,
+     "mu1": 0.0155,
      "n": 0,
-     "sd": 0.1651,
-     "rho": 0.114,
+     "sd": 0.1501,
+     "rho": 0.174,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -185,14 +185,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 3211
+     "need": 554
     }
    },
    "drift": {
-    "mu1": 0.0071,
+    "mu1": 0.0155,
     "n": 0,
-    "sd": 0.1651,
-    "rho": 0.114,
+    "sd": 0.1501,
+    "rho": 0.174,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -201,16 +201,16 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 3211,
+    "need": 554,
     "path": []
    }
   },
   {
-   "id": "pick:cfb:spread | line: 14+",
+   "id": "pick:cfb:spread | game: conference",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB spread 8+ (line: 14+)",
-   "since": "2026-11-05",
+   "label": "CFB spread 6+ (game: conference)",
+   "since": "2026-11-13",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -229,9 +229,9 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0138,
-    "beat": 0.486,
-    "roi": 0.0981,
+    "clvRet": 0.0581,
+    "beat": 0.557,
+    "roi": 0.1544,
     "n": 70
    },
    "check": {
@@ -241,77 +241,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1519,
+    "sd": 0.1438,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.114,
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0,
-     "n": 0,
-     "sd": 0.1519,
-     "rho": 0.114,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "no test",
-     "llr": null
-    }
-   },
-   "drift": {
-    "mu1": 0.0,
-    "n": 0,
-    "sd": 0.1519,
-    "rho": 0.114,
-    "lo": -2.944,
-    "hi": 2.944,
-    "state": "no test",
-    "llr": null,
-    "path": []
-   }
-  },
-  {
-   "id": "pick:cfb:spread | line: 3-7",
-   "book": "picks",
-   "sport": "cfb",
-   "label": "CFB spread 7.5+ (line: 3-7)",
-   "since": "2026-11-02",
-   "status": "on",
-   "stopped": null,
-   "n": 0,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0698,
-    "beat": 0.577,
-    "roi": 0.0612,
-    "n": 26
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "p": null,
-    "days": 0,
-    "sd": 0.1575,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "rho": 0.111,
+    "rho": 0.06,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -320,91 +254,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0276,
+     "mu1": 0.0218,
      "n": 0,
-     "sd": 0.1575,
-     "rho": 0.111,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 191
-    }
-   },
-   "drift": {
-    "mu1": 0.0276,
-    "n": 0,
-    "sd": 0.1575,
-    "rho": 0.111,
-    "lo": -2.944,
-    "hi": 2.944,
-    "state": "watching",
-    "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
-    "need": 191,
-    "path": []
-   }
-  },
-  {
-   "id": "pick:cfb:spread | line: 7-14",
-   "book": "picks",
-   "sport": "cfb",
-   "label": "CFB spread 8+ (line: 7-14)",
-   "since": "2026-10-29",
-   "status": "on",
-   "stopped": null,
-   "n": 0,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0617,
-    "beat": 0.562,
-    "roi": 0.1702,
-    "n": 32
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "p": null,
-    "days": 0,
-    "sd": 0.1558,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "rho": 0.114,
-    "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0236,
-     "n": 0,
-     "sd": 0.1558,
-     "rho": 0.114,
+     "sd": 0.1438,
+     "rho": 0.06,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -417,10 +270,10 @@
     }
    },
    "drift": {
-    "mu1": 0.0236,
+    "mu1": 0.0218,
     "n": 0,
-    "sd": 0.1558,
-    "rho": 0.114,
+    "sd": 0.1438,
+    "rho": 0.06,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -434,11 +287,11 @@
    }
   },
   {
-   "id": "pick:cfb:spread | role: dog",
+   "id": "pick:cfb:spread | line: 3-7",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB spread 8+ (role: dog)",
-   "since": "2026-11-05",
+   "label": "CFB spread 7.5+ (line: 3-7)",
+   "since": "2026-11-13",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -457,10 +310,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0154,
-    "beat": 0.408,
-    "roi": 0.1151,
-    "n": 76
+    "clvRet": 0.078,
+    "beat": 0.577,
+    "roi": -0.0146,
+    "n": 26
    },
    "check": {
     "n": 0,
@@ -469,11 +322,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1492,
+    "sd": 0.1554,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.114,
+    "rho": 0.136,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -482,10 +335,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0004,
+     "mu1": 0.0317,
      "n": 0,
-     "sd": 0.1492,
-     "rho": 0.114,
+     "sd": 0.1554,
+     "rho": 0.136,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -494,14 +347,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 748381
+     "need": 141
     }
    },
    "drift": {
-    "mu1": 0.0004,
+    "mu1": 0.0317,
     "n": 0,
-    "sd": 0.1492,
-    "rho": 0.114,
+    "sd": 0.1554,
+    "rho": 0.136,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -510,7 +363,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 748381,
+    "need": 141,
     "path": []
    }
   },
@@ -519,7 +372,7 @@
    "book": "picks",
    "sport": "cfb",
    "label": "CFB spread 8+ (role: favorite)",
-   "since": "2026-10-28",
+   "since": "2026-11-13",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -538,10 +391,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0778,
-    "beat": 0.673,
-    "roi": 0.137,
-    "n": 52
+    "clvRet": 0.0853,
+    "beat": 0.685,
+    "roi": 0.2044,
+    "n": 54
    },
    "check": {
     "n": 0,
@@ -550,11 +403,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1753,
+    "sd": 0.1632,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.114,
+    "rho": 0.174,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -563,10 +416,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0316,
+     "mu1": 0.0354,
      "n": 0,
-     "sd": 0.1753,
-     "rho": 0.114,
+     "sd": 0.1632,
+     "rho": 0.174,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -575,14 +428,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 181
+     "need": 125
     }
    },
    "drift": {
-    "mu1": 0.0316,
+    "mu1": 0.0354,
     "n": 0,
-    "sd": 0.1753,
-    "rho": 0.114,
+    "sd": 0.1632,
+    "rho": 0.174,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -591,7 +444,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 181,
+    "need": 125,
     "path": []
    }
   },
@@ -600,7 +453,7 @@
    "book": "picks",
    "sport": "cfb",
    "label": "CFB spread 8+ (season: early)",
-   "since": "2026-11-05",
+   "since": "2026-11-13",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -619,10 +472,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0396,
-    "beat": 0.537,
-    "roi": 0.1296,
-    "n": 82
+    "clvRet": 0.0484,
+    "beat": 0.549,
+    "roi": 0.0396,
+    "n": 91
    },
    "check": {
     "n": 0,
@@ -631,11 +484,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1559,
+    "sd": 0.1399,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.114,
+    "rho": 0.174,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -644,10 +497,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0125,
+     "mu1": 0.0169,
      "n": 0,
-     "sd": 0.1559,
-     "rho": 0.114,
+     "sd": 0.1399,
+     "rho": 0.174,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -656,14 +509,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 913
+     "need": 403
     }
    },
    "drift": {
-    "mu1": 0.0125,
+    "mu1": 0.0169,
     "n": 0,
-    "sd": 0.1559,
-    "rho": 0.114,
+    "sd": 0.1399,
+    "rho": 0.174,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -672,7 +525,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 913,
+    "need": 403,
     "path": []
    }
   },
@@ -700,14 +553,14 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0365,
-    "beat": 0.543,
-    "roi": 0.1357,
-    "n": 105
+    "clvRet": 0.0508,
+    "beat": 0.568,
+    "roi": 0.1308,
+    "n": 95
    },
    "vsExp": {
-    "gap": -0.0425,
-    "z": -0.26,
+    "gap": -0.0568,
+    "z": -0.36,
     "read": "in line"
    },
    "check": {
@@ -717,53 +570,53 @@
     "t": 0.28,
     "p": null,
     "days": 2,
-    "sd": 0.164,
+    "sd": 0.1597,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.023,
+    "rho": 0.06,
     "edge": {
-     "cusum": 0.01,
-     "cusumMax": 0.01,
+     "cusum": 0.02,
+     "cusumMax": 0.02,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.011,
+     "mu1": 0.0181,
      "n": 1,
-     "sd": 0.164,
-     "rho": 0.023,
+     "sd": 0.1597,
+     "rho": 0.06,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.011,
-     "info": 0.0,
-     "real": -1.864,
-     "realSe": 14.956,
-     "need": 1317
+     "llr": -0.021,
+     "info": 0.01,
+     "real": -1.128,
+     "realSe": 8.815,
+     "need": 458
     }
    },
    "drift": {
-    "mu1": 0.011,
+    "mu1": 0.0181,
     "n": 1,
-    "sd": 0.164,
-    "rho": 0.023,
+    "sd": 0.1597,
+    "rho": 0.06,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.011,
-    "info": 0.0,
-    "real": -1.864,
-    "realSe": 14.956,
-    "need": 1317,
+    "llr": -0.021,
+    "info": 0.01,
+    "real": -1.128,
+    "realSe": 8.815,
+    "need": 458,
     "path": [
      [
       "2026-10-31",
       1,
-      -0.011
+      -0.021
      ]
     ]
    }
@@ -772,8 +625,8 @@
    "id": "pick:cfb:spread | tier: mixed",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB spread 4.5+ (tier: mixed)",
-   "since": "2026-11-05",
+   "label": "CFB spread 8+ (tier: mixed)",
+   "since": "2026-11-13",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -792,10 +645,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0376,
-    "beat": 0.542,
-    "roi": 0.0241,
-    "n": 179
+    "clvRet": 0.0718,
+    "beat": 0.571,
+    "roi": 0.0206,
+    "n": 56
    },
    "check": {
     "n": 0,
@@ -804,11 +657,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1582,
+    "sd": 0.1557,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.073,
+    "rho": 0.174,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -817,10 +670,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0115,
+     "mu1": 0.0286,
      "n": 0,
-     "sd": 0.1582,
-     "rho": 0.073,
+     "sd": 0.1557,
+     "rho": 0.174,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -829,14 +682,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 1111
+     "need": 174
     }
    },
    "drift": {
-    "mu1": 0.0115,
+    "mu1": 0.0286,
     "n": 0,
-    "sd": 0.1582,
-    "rho": 0.073,
+    "sd": 0.1557,
+    "rho": 0.174,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -845,7 +698,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 1111,
+    "need": 174,
     "path": []
    }
   },
@@ -873,10 +726,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0667,
-    "beat": 0.61,
-    "roi": 0.1692,
-    "n": 59
+    "clvRet": 0.0682,
+    "beat": 0.613,
+    "roi": 0.208,
+    "n": 62
    },
    "check": {
     "n": 0,
@@ -885,11 +738,11 @@
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1591,
+    "sd": 0.1471,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.114,
+    "rho": 0.174,
     "edge": {
      "cusum": 0.0,
      "cusumMax": 0.0,
@@ -898,10 +751,10 @@
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0261,
+     "mu1": 0.0268,
      "n": 0,
-     "sd": 0.1591,
-     "rho": 0.114,
+     "sd": 0.1471,
+     "rho": 0.174,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
@@ -910,14 +763,14 @@
      "info": 0.0,
      "real": null,
      "realSe": null,
-     "need": 219
+     "need": 177
     }
    },
    "drift": {
-    "mu1": 0.0261,
+    "mu1": 0.0268,
     "n": 0,
-    "sd": 0.1591,
-    "rho": 0.114,
+    "sd": 0.1471,
+    "rho": 0.174,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
@@ -926,7 +779,7 @@
     "info": 0.0,
     "real": null,
     "realSe": null,
-    "need": 219,
+    "need": 177,
     "path": []
    }
   },
@@ -965,12 +818,12 @@
     "read": "below the backtest"
    },
    "check": {
-    "n": 9,
-    "window": 9,
-    "mean": 0.0331,
-    "t": 1.05,
+    "n": 10,
+    "window": 10,
+    "mean": 0.0303,
+    "t": 1.08,
     "p": null,
-    "days": 4,
+    "days": 5,
     "sd": 0.1257,
     "cusum": 0.0,
     "cusumMax": 0.31,
@@ -1067,37 +920,37 @@
     "read": "below the backtest"
    },
    "check": {
-    "n": 18,
-    "window": 18,
-    "mean": -0.0304,
-    "t": -1.46,
+    "n": 19,
+    "window": 19,
+    "mean": -0.0343,
+    "t": -1.67,
     "p": null,
-    "days": 5,
+    "days": 6,
     "sd": 0.1256,
-    "cusum": 2.06,
-    "cusumMax": 2.19,
+    "cusum": 2.39,
+    "cusumMax": 2.39,
     "h": 10.0,
     "rho": 0.233,
     "edge": {
-     "cusum": 0.28,
-     "cusumMax": 0.28,
+     "cusum": 0.33,
+     "cusumMax": 0.33,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0094,
-     "n": 18,
+     "n": 19,
      "sd": 0.1256,
      "rho": 0.233,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.28,
-     "info": 0.1,
-     "real": -3.961,
-     "realSe": 3.984,
+     "llr": -0.326,
+     "info": 0.11,
+     "real": -4.161,
+     "realSe": 3.754,
      "need": 1048
     }
    },
@@ -1274,19 +1127,19 @@
    "status": "on",
    "stopped": null,
    "n": 4,
-   "clvN": 2,
-   "clvRet": 0.0549,
-   "clvT": 0.53,
+   "clvN": 3,
+   "clvRet": 0.0466,
+   "clvT": 0.73,
    "days": 2,
-   "beat": 0.5,
-   "settled": 2,
-   "w": 1,
+   "beat": 0.333,
+   "settled": 3,
+   "w": 2,
    "l": 1,
-   "roi": -0.0495,
+   "roi": 0.3203,
    "week": {
-    "n": 2,
-    "clvRet": 0.0549,
-    "clvT": 0.53
+    "n": 3,
+    "clvRet": 0.0466,
+    "clvT": 0.73
    },
    "exp": {
     "clvRet": 0.0715,
@@ -1295,8 +1148,8 @@
     "n": 338
    },
    "vsExp": {
-    "gap": -0.0165,
-    "z": -0.16,
+    "gap": -0.0249,
+    "z": -0.39,
     "read": "in line"
    },
    "check": {
@@ -1336,17 +1189,17 @@
    },
    "drift": {
     "mu1": 0.007,
-    "n": 3,
+    "n": 4,
     "sd": 0.13,
     "rho": 0.082,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.03,
+    "llr": 0.02,
     "info": 0.01,
-    "real": 3.84,
-    "realSe": 11.016,
+    "real": 2.358,
+    "realSe": 9.726,
     "need": 2059,
     "path": [
      [
@@ -1356,8 +1209,8 @@
      ],
      [
       "2026-11-12",
-      3,
-      0.03
+      4,
+      0.02
      ]
     ]
    }
@@ -1371,18 +1224,18 @@
    "status": "on",
    "stopped": null,
    "n": 5,
-   "clvN": 1,
-   "clvRet": -0.0283,
+   "clvN": 3,
+   "clvRet": -0.0025,
    "clvT": null,
    "days": 1,
-   "beat": 0.0,
-   "settled": 1,
-   "w": 0,
+   "beat": 0.667,
+   "settled": 3,
+   "w": 2,
    "l": 1,
-   "roi": -1.0,
+   "roi": 0.2897,
    "week": {
-    "n": 1,
-    "clvRet": -0.0283,
+    "n": 3,
+    "clvRet": -0.0025,
     "clvT": null
    },
    "exp": {
@@ -1392,14 +1245,14 @@
     "n": 451
    },
    "vsExp": {
-    "gap": -0.116,
-    "z": -0.89,
+    "gap": -0.0902,
+    "z": -1.2,
     "read": "in line"
    },
    "check": {
-    "n": 1,
-    "window": 1,
-    "mean": -0.0283,
+    "n": 2,
+    "window": 2,
+    "mean": -0.0112,
     "t": null,
     "p": null,
     "days": 1,
@@ -1409,47 +1262,47 @@
     "h": 10.0,
     "rho": 0.057,
     "edge": {
-     "cusum": 0.01,
-     "cusumMax": 0.01,
+     "cusum": 0.0,
+     "cusumMax": 0.0,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.011,
-     "n": 1,
+     "n": 2,
      "sd": 0.1302,
      "rho": 0.057,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.013,
+     "llr": 0.002,
      "info": 0.01,
-     "real": -1.324,
-     "realSe": 11.837,
+     "real": 0.667,
+     "realSe": 8.606,
      "need": 825
     }
    },
    "drift": {
     "mu1": 0.011,
-    "n": 1,
+    "n": 3,
     "sd": 0.1302,
     "rho": 0.057,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.013,
-    "info": 0.01,
-    "real": -1.324,
-    "realSe": 11.837,
+    "llr": 0.016,
+    "info": 0.02,
+    "real": 1.331,
+    "realSe": 7.213,
     "need": 825,
     "path": [
      [
       "2026-11-12",
-      1,
-      -0.013
+      3,
+      0.016
      ]
     ]
    }
@@ -1547,7 +1400,7 @@
    "clvT": null,
    "flat": -0.006,
    "adds": 0.0,
-   "expEdge": 0.0216,
+   "expEdge": 0.0222,
    "basis": "backtest"
   },
   {
@@ -1560,7 +1413,7 @@
    "clvT": -1.52,
    "flat": -0.0361,
    "adds": -0.0022,
-   "expEdge": 0.0154,
+   "expEdge": 0.0152,
    "basis": "backtest + live picks"
   },
   {
@@ -1619,25 +1472,25 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 48,
-   "du": 105.5,
-   "clvRet": 0.0233,
-   "clvT": 1.07,
-   "flat": 0.0362,
-   "adds": -0.0129,
-   "expEdge": 0.0138,
+   "n": 49,
+   "du": 107.0,
+   "clvRet": 0.0234,
+   "clvT": 1.09,
+   "flat": 0.0361,
+   "adds": -0.0127,
+   "expEdge": 0.0137,
    "basis": "backtest + live picks"
   },
   {
    "sport": "nba",
    "mk": "total",
    "label": "NBA total",
-   "n": 56,
-   "du": 105.0,
-   "clvRet": 0.0286,
+   "n": 58,
+   "du": 105.5,
+   "clvRet": 0.0285,
    "clvT": 1.61,
-   "flat": 0.0284,
-   "adds": 0.0001,
+   "flat": 0.0278,
+   "adds": 0.0006,
    "expEdge": 0.0192,
    "basis": "backtest + live picks"
   }
@@ -1654,9 +1507,8 @@
   "watching": [
    "pick:cfb:total",
    "pick:cfb:spread | game: non-conference",
+   "pick:cfb:spread | game: conference",
    "pick:cfb:spread | line: 3-7",
-   "pick:cfb:spread | line: 7-14",
-   "pick:cfb:spread | role: dog",
    "pick:cfb:spread | role: favorite",
    "pick:cfb:spread | season: early",
    "pick:cfb:spread | season: late",
