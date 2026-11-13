@@ -1,6 +1,8 @@
 # Rebuilds the TENNIS ARKBOARD (scripts/tennis_data.py + scripts/tennis_model.py: data/tennis.json, the active
 # players' ratings in scripts/data/tennis_ratings.json.gz) from the Sackmann archive (frozen, cached), the weekly
-# Min Maxxxer tour feed (new every Monday) and ESPN's draws and results, and commits it; the push triggers the
+# Min Maxxxer tour feed (new every Monday), Tennis Abstract's player pages (Challenger, ITF and qualifying results
+# since the archive froze: scripts/tennis_ta.py -> scripts/data/tennis_ta.jsonl, ten minutes of pages a run) and
+# ESPN's draws and results, and commits it; the push triggers the
 # Cloudflare build. Twice a day from January to late November, and by hand from the Actions tab. The model's
 # settings come from data/tennis_fit.json (re-run `python3 scripts/tennis_model.py --fit` after each season).
 name: tennis
@@ -23,7 +25,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,7 +42,13 @@ jobs:
           path: scripts/.cache/tennis/espn
           key: tennis-espn-${{ github.run_id }}
           restore-keys: tennis-espn-
-      - name: Match history (archive + weekly feed + ESPN)
+      # Tennis Abstract's player pages, read again after three days (the matches themselves are committed)
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/tennis/ta_full
+          key: tennis-ta-${{ github.run_id }}
+          restore-keys: tennis-ta-
+      - name: Match history (archive + weekly feed + Tennis Abstract + ESPN)
         run: python3 scripts/tennis_data.py
       - name: Ratings, ARK Ranking, matches
         run: python3 scripts/tennis_model.py
@@ -50,7 +58,7 @@ jobs:
         run: python3 scripts/model_monitor.py tennis
       - name: Commit if anything changed
         run: |
-          files="data/tennis.json scripts/data/tennis_ratings.json.gz scripts/data/tennis_idmap.json.gz scripts/data/tennis_espn_kind.json.gz scripts/data/tennis_faces.json.gz static/img/flags data/model_monitor/tennis.json scripts/data/model_monitor/tennis.json"
+          files="data/tennis.json scripts/data/tennis_ta.jsonl scripts/data/tennis_ratings.json.gz scripts/data/tennis_idmap.json.gz scripts/data/tennis_espn_kind.json.gz scripts/data/tennis_faces.json.gz static/img/flags data/model_monitor/tennis.json scripts/data/model_monitor/tennis.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
