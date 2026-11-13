@@ -12,6 +12,8 @@ re-rank the rows in view by `w0` and show the rank change, so the move counts wi
 
   python3 scripts/board_moves.py nfl nba ...   update those boards (all when none named)
   python3 scripts/board_moves.py --seed         rebuild every history from git (needs a non-shallow fetch)
+  python3 scripts/board_moves.py r-* cbb-*      the view tables (rookies-shaped tabs, VIEWS): rows get `w0`, one
+                                                value per view in the season's `wkV`, the season gets `wkFrom`
   python3 scripts/board_moves.py --test         self-check
 """
 import datetime as dt
@@ -25,7 +27,7 @@ import sys
 import tokenize
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from rank_moves import cutoff, today as et_today   # noqa: E402  (the weekly post days, POST)
+from rank_moves import POST, cutoff, today as et_today   # noqa: E402  (the weekly post days)
 
 DAYS = 7
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -204,6 +206,125 @@ def mark(d, spec, base, since):
         holder['wkFrom'] = since
 
 
+# view tables (the rookies-shaped tabs: scripts/rookies.py, scripts/cbb_tabs.py): {views, seasons: [{s, rows}]}, ranked by
+# whichever view is picked. board -> (file, the sport whose post day it counts from, the board whose MODEL re-grades its FV)
+VIEWS = {
+    'r-nba': ('static/data/rookies/nba.json', 'nba', None),
+    'r-nfl': ('static/data/rookies/nfl.json', 'nfl', None),
+    'r-nhl': ('static/data/rookies/nhl.json', 'nhl', None),
+    'r-soccer': ('static/data/rookies/soccer.json', 'soccer', None),
+    'r-cbb': ('static/data/rookies/cbb.json', 'cbb', 'cbb'),
+    'r-cfb': ('static/data/rookies/cfb.json', 'cfb', None),
+    'r-hockey': ('static/data/rookies/hockey.json', 'hockey', 'hockey'),
+    'r-soccerp': ('static/data/rookies/soccerp.json', 'soccerp', 'soccerp'),
+    'cbb-draft': ('static/data/cbb/draft.json', 'cbb', 'cbb'),
+    'cbb-war': ('static/data/cbb/war.json', 'cbb', None),
+    'cbb-stats': ('static/data/cbb/stats.json', 'cbb', None),
+    'cbb-breakouts': ('static/data/cbb/breakouts.json', 'cbb', None),
+}
+
+
+def vkey(r):
+    return f"{r.get('n')}|{r.get('tm')}"
+
+
+def vsnap(S, views):
+    """{id: [value per view]} for the season's rows (a row with no value in any view left out)"""
+    out = {}
+    for r in S.get('rows') or []:
+        vs = [_num(r.get(v)) for v in views]
+        if any(v is not None for v in vs):
+            out[vkey(r)] = [None if v is None else round(v, 3) for v in vs]
+    return out
+
+
+def vstep(h, cur, views, day, sport, model=None):
+    """step() for a view table: one list of value arrays per snapshot. A board with a post day keeps only the base and the
+    newest snapshot (the newest is the only one that can become the next base); a rolling one keeps the 7-day window"""
+    hist = dict(sorted((h.get('hist') or {}).items()))
+    was = h.get('views')
+    if hist and was != views:              # a view added or dropped: the snapshots are re-laid to the new views
+        ix = [was.index(v) if was and v in was else None for v in views]
+        hist = {k: {i: [None if j is None or j >= len(a) else a[j] for j in ix] for i, a in s_.items()} for k, s_ in hist.items()}
+    fv = [i for i, v in enumerate(views) if v == 'fv']
+    if fv and hist:
+        last = hist[max(hist)]
+        com = [k for k in cur if k in last]
+        for i in fv:
+            pairs = [(k, cur[k][i], last[k][i]) for k in com if cur[k][i] is not None and last[k][i] is not None]
+            moved = sum(a != b for _, a, b in pairs)
+            if len(pairs) >= 20 and ((model and h.get('model') and model != h['model']) or moved > REGRADE * len(pairs)):
+                shift = {k: a - b for k, a, b in pairs}
+                for s_ in hist.values():
+                    for k, dv in shift.items():
+                        if k in s_ and s_[k][i] is not None:
+                            s_[k][i] = round(s_[k][i] + dv, 3)
+    if model:
+        h['model'] = model
+    h['views'] = views
+    if not hist or hist[max(hist)] != cur:
+        hist[day.isoformat()] = cur
+    cut = cutoff(day, sport).isoformat()
+    back = [k for k in hist if k <= cut]
+    post = sport in POST
+    keep = {k for k in hist if k > cut}
+    if post and keep:
+        keep = {max(keep)}
+    if back:
+        keep.add(back[-1])
+    h['hist'] = {k: hist[k] for k in sorted(keep)}
+    return h, (back[-1] if back else None)
+
+
+def vmark(S, views, base, since):
+    """rows get `w0` (their values as of `since`, one per view in the season's `wkV`); a name that changed teams is
+    matched by name when it is the only one"""
+    S.pop('wkFrom', None); S.pop('wkV', None)
+    for r in S.get('rows') or []:
+        r.pop('w0', None)
+    if not since or base is None:
+        return
+    byname, dup = {}, set()
+    for k in base:
+        n = k.rsplit('|', 1)[0]
+        if n in byname:
+            dup.add(n)
+        byname[n] = k
+    for r in S.get('rows') or []:
+        k = vkey(r)
+        if k not in base and r.get('n') in byname and r.get('n') not in dup:
+            k = byname[r['n']]
+        if k in base:
+            r['w0'] = base[k]
+    S['wkFrom'], S['wkV'] = since, views
+
+
+def vupdate(board, day=None, d=None, h=None, write=True):
+    path, sport, mb = VIEWS[board]
+    full = os.path.join(ROOT, path)
+    if d is None and not os.path.exists(full):
+        print(board, 'no data file'); return None
+    raw = open(full, encoding='utf-8').read() if d is None else ''
+    d = d if d is not None else json.loads(raw)
+    S = (d.get('seasons') or [None])[0]
+    if not S:
+        return None
+    views = [v[0] for v in d.get('views') or []]
+    h = h if h is not None else load_hist(board)
+    s = str(S.get('s'))
+    if h.get('season') != s:
+        h = {'season': s, 'hist': {}}
+    day = day or et_today()
+    h, since = vstep(h, vsnap(S, views), views, day, sport, model=fingerprint(mb) if mb else None)
+    vmark(S, views, h['hist'].get(since) if since else None, cutoff(day, sport).isoformat() if since else None)
+    if write:
+        with open(full, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(d, separators=(',', ':'), ensure_ascii=False, allow_nan=False) + ('\n' if raw.endswith('\n') else ''))
+        save_hist(board, h)
+        print(board, path, 'from', since, 'snapshots', len(h['hist']), 'rows with w0', sum('w0' in r for r in S['rows']))
+    return d, h
+
+
 def load_hist(board):
     p = os.path.join(HIST, board + '.json')
     return json.load(open(p)) if os.path.exists(p) else {}
@@ -275,6 +396,25 @@ def seed(boards):
         update(board, today)
 
 
+def vseed(boards):
+    today = et_today()
+    since = (today - dt.timedelta(days=DAYS + 3)).isoformat()
+    for board in boards:
+        path, sport, mb = VIEWS[board]
+        h = {}
+        for day, rev, d in _git_versions(path, since):
+            day = dt.date.fromisoformat(day)
+            S = (d.get('seasons') or [None])[0]
+            if day >= today or not S:
+                continue
+            views = [v[0] for v in d.get('views') or []]
+            if h.get('season') != str(S.get('s')):
+                h = {'season': str(S.get('s')), 'hist': {}}
+            h, _ = vstep(h, vsnap(S, views), views, day, sport, model=fingerprint(mb, rev) if mb else None)
+        save_hist(board, h)
+        vupdate(board, today)
+
+
 def test():
     d = {'season': 1, 'players': [{'id': 'a', 'v': 1.0}, {'id': 'b', 'v': 2.0}]}
     BOARDS['_t'] = ('x', [(('players',), 'id', 'v')])
@@ -324,6 +464,20 @@ def test():
     assert fb['rows'][-1]['w0'] == 58 and h5['model'] == 'c', fb['rows'][-1]
     assert fingerprint('tennisp') and fingerprint('nfl') is None
     del BOARDS['_t']
+    # view tables: a post-day board keeps the base and the newest snapshot; a traded player is matched by name
+    vt = {'views': [['fv', 'FV'], ['war', 'WAR']], 'seasons': [{'s': 2027, 'rows': [
+        {'n': 'A', 'tm': 'X', 'fv': 50, 'war': 1.0}, {'n': 'B', 'tm': 'Y', 'fv': 40, 'war': 2.0}]}]}
+    V = ['fv', 'war']
+    S = vt['seasons'][0]
+    hv = {}
+    for i in range(10):                     # Nov 1 2026 is a Sunday; cbb posts Monday
+        S['rows'][1]['war'] = 2.0 + i
+        if i == 6:
+            S['rows'][0]['tm'] = 'Z'
+        hv, since = vstep(hv, vsnap(S, V), V, dt.date(2026, 11, 1) + dt.timedelta(days=i), 'cbb')
+    vmark(S, V, hv['hist'][since], since)
+    assert since == '2026-11-09' and len(hv['hist']) == 2, (since, list(hv['hist']))
+    assert S['rows'][1]['w0'] == [40, 10.0] and S['rows'][0]['w0'] == [50, 1.0] and S['wkV'] == V, S
     print('board_moves ok')
 
 
@@ -332,7 +486,15 @@ if __name__ == '__main__':
     if '--test' in sys.argv:
         test()
     elif '--seed' in sys.argv:
-        seed(args or list(BOARDS))
+        seed([b for b in args or list(BOARDS) if b in BOARDS])
+        vseed([b for b in args or list(VIEWS) if b in VIEWS])
     else:
-        for b in args or list(BOARDS):
-            update(b)
+        for b in args or list(BOARDS) + list(VIEWS):
+            if b in VIEWS:
+                vupdate(b)
+            elif b.endswith('*'):               # a prefix: every view table of it (r-*, cbb-*)
+                for v in VIEWS:
+                    if v.startswith(b[:-1]):
+                        vupdate(v)
+            else:
+                update(b)

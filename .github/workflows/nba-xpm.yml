@@ -191,7 +191,7 @@ jobs:
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
       - name: Board moves
         continue-on-error: true
-        run: python3 scripts/board_moves.py nba
+        run: python3 scripts/board_moves.py nba r-nba
       - name: Commit if the leaderboard changed
         run: |
           files="scripts/data/moves static/data/xaav-nba.json data/units_nba.json scripts/data/faces_nba.json scripts/data/nba_dob.json static/data/nba-xpm static/data/nba-lineups.json static/data/nba-lineup-leaders.json static/data/nba-proj.json static/data/pctl-nba.json static/data/rookies/nba.json data/backup_nba.json static/data/depth/nba.json data/depth_starters_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json data/model_monitor/nba_lin.json data/model_monitor/nba_tank.json scripts/data/model_monitor/nba.json static/data/teams/nba.json data/team_badges"
