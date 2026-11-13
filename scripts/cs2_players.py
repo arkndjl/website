@@ -135,14 +135,14 @@ def stat_weights(M, mask_games=None, l2=1e-4):
     return beta, mu / 5, float(r2)
 
 
-def contributions(M, beta, mline, pm=0.0):
+def contributions(M, beta, mline, pm=0.0, y=None):
     """Each player-map's share of his team's round share above .5 (x100: round win % added). pm: share of the team's
     residual (round share its five box lines miss) credited to each of the five equally, x pm (box + plus-minus)."""
     c = (M.X - mline) @ beta * 100
     if pm:
         tot = np.zeros((len(M.games), 2))
         np.add.at(tot, (M.g, M.side), c)
-        c = c + pm * (100 * (M.y - 0.5) - tot[M.g, M.side]) / 5
+        c = c + pm * (100 * ((M.y if y is None else y) - 0.5) - tot[M.g, M.side]) / 5
     return c
 
 
@@ -163,7 +163,11 @@ def ratings(M, c, T, p):
         th_row = (theta + lift)[M.p]
         opp = th_row[M.five[M.g, 1 - M.side]].mean(1)
         adj = c + p["opp"] * opp
-        theta = (np.bincount(M.p, w * adj, n) + p["k"] * prior) / (wsum + p["k"])
+        pri = prior
+        if p.get("tp"):  # shrink toward the teammates' mean (rounds-weighted over the player's maps), not toward 0
+            mate = (theta[M.p][M.five[M.g, M.side]].sum(1) - theta[M.p]) / 4
+            pri = prior + p["tp"] * np.bincount(M.p, w * mate, n) / np.maximum(wsum, 1e-9)
+        theta = (np.bincount(M.p, w * adj, n) + p["k"] * pri) / (wsum + p["k"])
     return theta + lift, wsum
 
 
@@ -296,6 +300,15 @@ def fit():
         lifts.append((predict_score(M, c, q, tm[1::2])[0], g, q))
         print(f"lift {g} mse {lifts[-1][0]:.6f}", file=sys.stderr)
     best = min(lifts, key=lambda x: x[0])[2]
+    # teammate prior: shrink toward tp x the rounds-weighted mean rating of the player's teammates instead of
+    # toward 0 (scripts/cs2_nov13_research.py P1: held t by month -3.6, series model t -5.6), same tune months
+    tps = []
+    for g in (0.0, 0.25, 0.5, 0.75, 1.0):
+        q = dict(best, tp=g)
+        q["a"] = fit_scale(M, c, q, tm[::2])
+        tps.append((predict_score(M, c, q, tm[1::2])[0], g, q))
+        print(f"teammate prior {g} mse {tps[-1][0]:.6f}", file=sys.stderr)
+    best = min(tps, key=lambda x: x[0])[2]
     out = {"beta": dict(zip(STATS, [round(float(b), 4) for b in beta])), "mline": [round(float(x), 5) for x in ml],
            "r2": round(r2, 3), "params": best, "tune": list(TUNE), "held": [HELD[0], last.isoformat()]}
     # held out: ours vs alternatives (each with its own a fit on tune), paired t on per-map squared error
@@ -313,6 +326,7 @@ def fit():
             "no damage taken": (c_nogd, best),
             "no plus-minus": (cs[0.0], dict(best, pm=0.0)),
             "no tier lift": (c, dict(best, ssg=0.0)),
+            "no teammate prior": (c, dict(best, tp=0.0)),
             "no opponent credit": (c, dict(best, opp=0.0)),
             "kills minus deaths per round": ((M.X[:, 0] - M.X[:, 1]) * 100 / 2, best)}
     score, e_ours = [], None

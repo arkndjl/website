@@ -119,10 +119,18 @@ def shift(d, k):
     return (dt.date.fromisoformat(d) + dt.timedelta(days=k)).isoformat()
 
 
+def share_score(rs, span):
+    return min(1.0, max(0.0, (rs - 0.5) / span * 0.5 + 0.5))
+
+
 def round_share(won, lost, span):
     """Map result as a score in [0, 1]: .5 + half the round share's distance from .5 over span (13-3 counts more)."""
-    rs = won / ((won + lost) or 24)
-    return min(1.0, max(0.0, (rs - 0.5) / span * 0.5 + 0.5))
+    return share_score(won / ((won + lost) or 24), span)
+
+
+def real_map(g):
+    """A map played to the end: 13+ rounds for the winner, more than the loser (bo3.gg lists forfeits as 1-0)."""
+    return g[7] >= 13 and g[7] > g[8]
 
 
 class Bo3:
@@ -141,6 +149,9 @@ class Bo3:
             names[r[3]][key(r[5])] += 1
         self.tkey = {t: max(v, key=v.get) for t, v in names.items()}
         self.alias = {}
+        self.adj = {}  # game id -> the map winner's adjusted round share (scripts/cs2_rounds.py), when set
+        self.adj_elo = True  # the player Elo's map updates read it (the team map rating: its own "adj" setting)
+        self.valid_only = False  # rate only finished maps (13+ rounds for the winner); forfeits and cut-off maps skip
         self.byday = defaultdict(list)
         for r in sorted(self.mt.values(), key=lambda r: r[1]):
             self.byday[r[1][:10]].append(r)
@@ -189,6 +200,11 @@ class Bo3:
         self.joined = j
         return j
 
+    def score(self, g, span, use=True):
+        """The map winner's score in [0, 1]: the adjusted round share where the map has rounds, else the plain one."""
+        rs = self.adj.get(g[0]) if use else None
+        return round_share(g[7], g[8], span) if rs is None else share_score(rs, span)
+
     def map_updates(self, i, ka, span):
         """Joined series i -> [(score for side A in [0, 1])] per map, or None."""
         m = self.joined.get(i)
@@ -196,9 +212,12 @@ class Bo3:
             return None
         out = []
         for g in self.maps[m[0]]:
-            aw = self.k(g[5]) == ka
-            won, lost = (g[7], g[8]) if aw else (g[8], g[7])
-            out.append(round_share(won, lost, span))
+            if not real_map(g):
+                if not self.valid_only:  # as before: a 1-0 forfeit counts as a full share, a 0-0 map as 0 for side A
+                    out.append(round_share(*((g[7], g[8]) if self.k(g[5]) == ka else (g[8], g[7])), span))
+                continue
+            sw = self.score(g, span, self.adj_elo)
+            out.append(sw if self.k(g[5]) == ka else 1 - sw)
         return out
 
     def team_of(self, k):
@@ -310,8 +329,10 @@ class TeamMaps:
                 if {w, lo} != {a, b}:
                     continue
                 self.recent.append((m[1][:10], mp))
+                if self.b.valid_only and not real_map(g):
+                    continue
                 e = sig(self.R[w] + self.Mo[(w, mp)] - self.R[lo] - self.Mo[(lo, mp)])
-                s = round_share(g[7], g[8], p["span"])
+                s = self.b.score(g, p["span"]) if p.get("adj") else round_share(g[7], g[8], p["span"])
                 for t, sg in ((w, 1), (lo, -1)):
                     self.R[t] += sg * p["K"] * (1 + p["Kn"] * math.exp(-self.n[t] / 30)) * (s - e)
                     self.n[t] += 1
@@ -365,8 +386,9 @@ def odds_snap(now=None):
         cj = json.loads((ROOT / "data" / "cs2.json").read_text())
         tp = cj.get("tp", {})
         for m in cj.get("matches", []):
-            mods[(m["ka"], m["kb"])] = m["pa"]
-            mods[(m["kb"], m["ka"])] = 1 - m["pa"]
+            pm_ = m.get("pmod", m["pa"])  # the model alone (pa may carry a market blend)
+            mods[(m["ka"], m["kb"])] = pm_
+            mods[(m["kb"], m["ka"])] = 1 - pm_
         for g in gs:
             pm = tp.get(str(g["id"]), mods.get((key(g["n1"]), key(g["n2"]))))
             if pm is not None:

@@ -41,7 +41,8 @@ LEAD = 3600                            # the price an hour before the start
 def get(u, tries=4):
     for k in range(tries):
         try:
-            r = subprocess.run(["curl", "-sS", "-m", "30", u], capture_output=True, text=True, timeout=40)
+            # --compressed: Polymarket serves /events pages above 50 rows gzip only
+            r = subprocess.run(["curl", "-sS", "--compressed", "-m", "30", u], capture_output=True, text=True, timeout=40)
             return json.loads(r.stdout)
         except (ValueError, subprocess.TimeoutExpired):
             time.sleep(2 * (k + 1))

@@ -1,0 +1,43 @@
+{{- /* Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
+       Counter-Strike round rates (data/cs2.json teams[].rd, scripts/cs2_rounds.py team_stats): each ranked team's share
+       of rounds won overall, by side, on pistols, on gun rounds (both teams on a full buy), with the better and the
+       worse buy, and around the first kill, over the last 180 days. Descriptive. top= rows (default 50). */ -}}
+{{- with site.Data.cs2 -}}
+{{- $d := . -}}
+{{- $top := int ($.Get "top" | default 50) -}}
+{{- $rows := slice -}}{{ range $d.teams }}{{ if .rd }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
+{{- $rows = first $top $rows -}}
+{{- if $rows -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: rounds") "icon" "cs" "filter" "Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Rd%,CT%,T%,Pistol%,Gun%" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick2 cs__table cs__rounds">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th title="maps with round data, last 180 days">Maps</th>
+    <th title="% of rounds won">Rd%</th>
+    <th title="% of CT-side rounds won">CT%</th>
+    <th title="% of T-side rounds won">T%</th>
+    <th title="% of pistol rounds won">Pistol%</th>
+    <th title="% of rounds won when both teams are on a full buy (20,000+ equipment)">Gun%</th>
+    <th title="% of rounds won with the better buy (eco / force / full)">Adv%</th>
+    <th title="% of rounds won with the worse buy">Dis%</th>
+    <th title="% of rounds with the first kill">Open%</th>
+    <th title="% of rounds won after getting the first kill">5v4%</th>
+    <th title="% of rounds won after conceding the first kill">4v5%</th>
+    <th>Region</th>
+  </tr></thead>
+  <tbody>
+  {{- range $rows }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__num" data-v="{{ index .rd 0 }}">{{ index .rd 0 }}</td>
+    {{- range $i, $p := after 1 .rd }}
+    <td class="cfb__num" data-v="{{ $p | default "" }}">{{ if ne $p nil }}{{ partial "num.html" (slice "%.1f" $p) }}{{ else }}—{{ end }}</td>
+    {{- end }}
+    <td data-filter="{{ .rg | default "—" }}">{{ .rg | default "—" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len $rows) "note" "source: bo3.gg" "about" "Round rates over the last 180 days, from bo3.gg round data (side, pistol flag, equipment value after the buy, first kill). Gun round = both teams at 20,000+ equipment; buy classes are eco under 5,000, force under 20,000, full. Not opponent-adjusted.") -}}
+{{- end }}{{ end -}}

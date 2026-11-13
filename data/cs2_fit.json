@@ -7,7 +7,8 @@
   "Kr": 8,
   "warm": 1.0,
   "kmap": 0.6,
-  "span": 0.4
+  "span": 0.4,
+  "valid": 1
  },
  "teamMaps": {
   "K": 0.03,
@@ -28,26 +29,26 @@
  ],
  "weights": {
   "top": [
-   1.1437,
-   0.4293,
-   0.8898
+   1.1439,
+   0.3969,
+   0.9084
   ],
   "rest": [
-   1.7273,
-   0.1722,
-   1.1788
+   1.6534,
+   0.1503,
+   1.195
   ]
  },
  "weightsTune": {
   "top": [
-   1.1142,
-   0.4313,
-   1.2124
+   1.1336,
+   0.3904,
+   1.2398
   ],
   "rest": [
-   1.7247,
-   0.213,
-   1.2244
+   1.6256,
+   0.1752,
+   1.2289
   ]
  },
  "tune": [
@@ -69,53 +70,53 @@
      "acc": 0.5998,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.1051,
-     "tArk": 35.57
+     "vsArk": 0.1061,
+     "tArk": 36.43
     },
     {
      "name": "ARK rating",
-     "ll": 0.5766,
-     "acc": 0.6953,
-     "vsVrs": -0.0908,
-     "tVrs": -28.54,
-     "vsArk": 0.0142,
-     "tArk": 10.67
+     "ll": 0.5752,
+     "acc": 0.6963,
+     "vsVrs": -0.0922,
+     "tVrs": -29.58,
+     "vsArk": 0.014,
+     "tArk": 11.03
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.5623,
-     "acc": 0.7129,
-     "vsVrs": -0.1051,
-     "tVrs": -35.57,
+     "ll": 0.5612,
+     "acc": 0.7136,
+     "vsVrs": -0.1061,
+     "tVrs": -36.43,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.5699,
-     "acc": 0.7052,
-     "vsVrs": -0.0974,
-     "tVrs": -34.69,
-     "vsArk": 0.0076,
-     "tArk": 8.28
+     "ll": 0.5691,
+     "acc": 0.7057,
+     "vsVrs": -0.0983,
+     "tVrs": -35.51,
+     "vsArk": 0.0078,
+     "tArk": 8.51
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.5901,
-     "acc": 0.684,
-     "vsVrs": -0.0773,
-     "tVrs": -32.07,
-     "vsArk": 0.0278,
-     "tArk": 13.82
+     "ll": 0.5877,
+     "acc": 0.6855,
+     "vsVrs": -0.0796,
+     "tVrs": -32.42,
+     "vsArk": 0.0265,
+     "tArk": 13.45
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.5876,
-     "acc": 0.7026,
-     "vsVrs": -0.0798,
-     "tVrs": -27.63,
-     "vsArk": 0.0253,
-     "tArk": 13.83
+     "ll": 0.5856,
+     "acc": 0.7044,
+     "vsVrs": -0.0817,
+     "tVrs": -28.61,
+     "vsArk": 0.0244,
+     "tArk": 13.92
     },
     {
      "name": "team-name Elo",
@@ -123,8 +124,8 @@
      "acc": 0.6488,
      "vsVrs": -0.0463,
      "tVrs": -21.0,
-     "vsArk": 0.0587,
-     "tArk": 23.93
+     "vsArk": 0.0598,
+     "tArk": 24.69
     }
    ]
   },
@@ -137,52 +138,52 @@
      "acc": 0.6271,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.0951,
-     "tArk": 26.02
+     "vsArk": 0.096,
+     "tArk": 26.77
     },
     {
      "name": "ARK rating",
-     "ll": 0.5769,
-     "acc": 0.6895,
-     "vsVrs": -0.073,
-     "tVrs": -20.03,
-     "vsArk": 0.0221,
-     "tArk": 10.79
+     "ll": 0.5757,
+     "acc": 0.6899,
+     "vsVrs": -0.0742,
+     "tVrs": -20.78,
+     "vsArk": 0.0218,
+     "tArk": 11.04
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.5548,
-     "acc": 0.7168,
-     "vsVrs": -0.0951,
-     "tVrs": -26.02,
+     "ll": 0.5539,
+     "acc": 0.7182,
+     "vsVrs": -0.096,
+     "tVrs": -26.77,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.5648,
-     "acc": 0.7044,
-     "vsVrs": -0.0851,
-     "tVrs": -25.91,
-     "vsArk": 0.01,
-     "tArk": 6.93
+     "ll": 0.565,
+     "acc": 0.7045,
+     "vsVrs": -0.0849,
+     "tVrs": -26.25,
+     "vsArk": 0.0111,
+     "tArk": 7.68
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.5853,
-     "acc": 0.6874,
-     "vsVrs": -0.0646,
-     "tVrs": -23.54,
-     "vsArk": 0.0305,
-     "tArk": 12.37
+     "ll": 0.5831,
+     "acc": 0.6875,
+     "vsVrs": -0.0669,
+     "tVrs": -24.06,
+     "vsArk": 0.0292,
+     "tArk": 12.09
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.5906,
-     "acc": 0.6964,
-     "vsVrs": -0.0593,
-     "tVrs": -17.83,
-     "vsArk": 0.0358,
+     "ll": 0.5883,
+     "acc": 0.6989,
+     "vsVrs": -0.0616,
+     "tVrs": -18.77,
+     "vsArk": 0.0345,
      "tArk": 14.87
     },
     {
@@ -191,8 +192,8 @@
      "acc": 0.6546,
      "vsVrs": -0.0328,
      "tVrs": -12.77,
-     "vsArk": 0.0623,
-     "tArk": 21.03
+     "vsArk": 0.0632,
+     "tArk": 21.57
     }
    ]
   },
@@ -205,53 +206,53 @@
      "acc": 0.5983,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.02,
-     "tArk": 3.47
+     "vsArk": 0.0205,
+     "tArk": 3.46
     },
     {
      "name": "ARK rating",
-     "ll": 0.6598,
-     "acc": 0.5978,
-     "vsVrs": -0.0024,
-     "tVrs": -0.39,
-     "vsArk": 0.0176,
-     "tArk": 2.91
+     "ll": 0.658,
+     "acc": 0.6013,
+     "vsVrs": -0.0042,
+     "tVrs": -0.67,
+     "vsArk": 0.0163,
+     "tArk": 2.76
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.6422,
-     "acc": 0.6335,
-     "vsVrs": -0.02,
-     "tVrs": -3.47,
+     "ll": 0.6417,
+     "acc": 0.6437,
+     "vsVrs": -0.0205,
+     "tVrs": -3.46,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.6436,
-     "acc": 0.6279,
-     "vsVrs": -0.0186,
-     "tVrs": -4.47,
-     "vsArk": 0.0013,
+     "ll": 0.6431,
+     "acc": 0.633,
+     "vsVrs": -0.0191,
+     "tVrs": -4.48,
+     "vsArk": 0.0014,
      "tArk": 0.38
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.6476,
+     "ll": 0.6468,
      "acc": 0.6166,
-     "vsVrs": -0.0146,
-     "tVrs": -4.1,
-     "vsArk": 0.0054,
-     "tArk": 1.24
+     "vsVrs": -0.0154,
+     "tVrs": -4.12,
+     "vsArk": 0.0051,
+     "tArk": 1.14
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.6552,
-     "acc": 0.6263,
-     "vsVrs": -0.007,
-     "tVrs": -1.36,
-     "vsArk": 0.0129,
-     "tArk": 2.37
+     "ll": 0.6539,
+     "acc": 0.6314,
+     "vsVrs": -0.0083,
+     "tVrs": -1.63,
+     "vsArk": 0.0122,
+     "tArk": 2.24
     },
     {
      "name": "team-name Elo",
@@ -259,8 +260,8 @@
      "acc": 0.6131,
      "vsVrs": -0.0039,
      "tVrs": -0.88,
-     "vsArk": 0.0161,
-     "tArk": 3.12
+     "vsArk": 0.0166,
+     "tArk": 3.11
     }
    ]
   },
@@ -273,53 +274,53 @@
      "acc": 0.6009,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.0273,
+     "vsArk": 0.0279,
      "tArk": 3.14
     },
     {
      "name": "ARK rating",
-     "ll": 0.6633,
-     "acc": 0.5994,
-     "vsVrs": 0.0011,
-     "tVrs": 0.12,
-     "vsArk": 0.0283,
-     "tArk": 2.84
+     "ll": 0.6621,
+     "acc": 0.5979,
+     "vsVrs": -0.0002,
+     "tVrs": -0.02,
+     "vsArk": 0.0277,
+     "tArk": 2.83
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.635,
-     "acc": 0.6388,
-     "vsVrs": -0.0273,
+     "ll": 0.6344,
+     "acc": 0.6555,
+     "vsVrs": -0.0279,
      "tVrs": -3.14,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.6456,
-     "acc": 0.6282,
-     "vsVrs": -0.0167,
-     "tVrs": -2.97,
-     "vsArk": 0.0106,
-     "tArk": 1.83
+     "ll": 0.6454,
+     "acc": 0.6388,
+     "vsVrs": -0.0169,
+     "tVrs": -2.89,
+     "vsArk": 0.011,
+     "tArk": 1.86
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.643,
-     "acc": 0.6297,
-     "vsVrs": -0.0193,
-     "tVrs": -3.37,
-     "vsArk": 0.008,
-     "tArk": 1.29
+     "ll": 0.6416,
+     "acc": 0.6404,
+     "vsVrs": -0.0207,
+     "tVrs": -3.45,
+     "vsArk": 0.0072,
+     "tArk": 1.15
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.6565,
-     "acc": 0.6297,
-     "vsVrs": -0.0058,
-     "tVrs": -0.72,
-     "vsArk": 0.0215,
-     "tArk": 2.52
+     "ll": 0.6549,
+     "acc": 0.6313,
+     "vsVrs": -0.0074,
+     "tVrs": -0.94,
+     "vsArk": 0.0205,
+     "tArk": 2.43
     },
     {
      "name": "team-name Elo",
@@ -327,8 +328,8 @@
      "acc": 0.6328,
      "vsVrs": -0.0151,
      "tVrs": -2.47,
-     "vsArk": 0.0122,
-     "tArk": 1.71
+     "vsArk": 0.0128,
+     "tArk": 1.72
     }
    ]
   }
@@ -336,63 +337,63 @@
  "calibration": [
   {
    "bin": 0.5,
-   "n": 2661,
-   "exp": 0.524,
-   "obs": 0.531
+   "n": 2727,
+   "exp": 0.525,
+   "obs": 0.537
   },
   {
    "bin": 0.55,
-   "n": 2714,
+   "n": 2841,
    "exp": 0.575,
-   "obs": 0.593
+   "obs": 0.587
   },
   {
    "bin": 0.6,
-   "n": 2615,
+   "n": 2568,
    "exp": 0.624,
-   "obs": 0.635
+   "obs": 0.638
   },
   {
    "bin": 0.65,
-   "n": 2407,
-   "exp": 0.675,
-   "obs": 0.677
+   "n": 2497,
+   "exp": 0.674,
+   "obs": 0.689
   },
   {
    "bin": 0.7,
-   "n": 2375,
-   "exp": 0.724,
-   "obs": 0.723
+   "n": 2440,
+   "exp": 0.725,
+   "obs": 0.726
   },
   {
    "bin": 0.75,
-   "n": 2322,
-   "exp": 0.774,
-   "obs": 0.777
+   "n": 2281,
+   "exp": 0.775,
+   "obs": 0.789
   },
   {
    "bin": 0.8,
-   "n": 2161,
-   "exp": 0.825,
-   "obs": 0.835
+   "n": 2135,
+   "exp": 0.824,
+   "obs": 0.837
   },
   {
    "bin": 0.85,
-   "n": 1808,
-   "exp": 0.874,
-   "obs": 0.866
+   "n": 1663,
+   "exp": 0.873,
+   "obs": 0.863
   },
   {
    "bin": 0.9,
-   "n": 1311,
-   "exp": 0.924,
-   "obs": 0.889
+   "n": 1229,
+   "exp": 0.923,
+   "obs": 0.897
   },
   {
    "bin": 0.95,
-   "n": 682,
+   "n": 675,
    "exp": 0.969,
-   "obs": 0.943
+   "obs": 0.945
   }
  ],
  "failed": [
@@ -429,8 +430,36 @@
    "note": "variance per player: tune .5985 vs Elo .5869"
   },
   {
+   "term": "round share adjusted for side and buy",
+   "note": "bo3.gg rounds, Nov 13: player Elo held +.0003 (t by month +0.3), team map rating -.0001 (-1.5)"
+  },
+  {
+   "term": "VRS factors as separate terms",
+   "note": "bounty offered / collected, opponent network, LAN wins, H2H: held +.0008"
+  },
+  {
+   "term": "new-player start from teammates",
+   "note": "held -.0002, t by month -2.2, fails Holm over 8"
+  },
+  {
+   "term": "event-tier K",
+   "note": "no setting beat the base on tune"
+  },
+  {
+   "term": "Bo1 / Bo5 slopes on bo3.gg formats",
+   "note": "held -.0001, t by month -1.2"
+  },
+  {
+   "term": "experience shrink",
+   "note": "held -.0005, t by month -2.3, top 50 worse; fails Holm"
+  },
+  {
+   "term": "boosted-tree stack",
+   "note": "held -.0018, t by month -2.5 (p .011), fails Holm over 8: lead"
+  },
+  {
    "term": "closing line",
-   "note": "no free CS2 odds history, so no picks"
+   "note": "Thunderpick forward archive: the model's picks lose to the close, so no picks"
   }
  ]
 }
