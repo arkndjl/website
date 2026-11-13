@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-13T07:58:48Z",
+ "asof": "2026-11-13T09:37:06Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -123,7 +123,7 @@
  },
  "model": {
   "asof": "2026-11-13T06:13:17Z",
-  "ageH": 1.8,
+  "ageH": 3.4,
   "stale": false
  },
  "picks": [],
@@ -330,8 +330,8 @@
     "side": "over",
     "line": 40.5,
     "price": -104.0,
-    "ev": 0.086,
-    "units": 0.5
+    "ev": 0.083,
+    "units": 0.25
    }
   },
   {
@@ -474,7 +474,14 @@
    "paper": true,
    "betTo": 47.0,
    "close": 47.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 47.5,
+    "price": -104.0,
+    "ev": 0.042,
+    "units": 0.25
+   }
   }
  ],
  "withdrawn": [
@@ -558,22 +565,6 @@
    "why": "edge under 4.5",
    "m": -10.6,
    "tm": 50.3
-  },
-  {
-   "id": "2026_10_KC_ATL",
-   "sport": "nfl",
-   "kick": "2026-11-15T18:00:00Z",
-   "home": "ATL",
-   "away": "KC",
-   "mk": "spread",
-   "side": "away",
-   "line": -3.5,
-   "price": 113.0,
-   "edge": 2.4,
-   "x": 4.5,
-   "why": "edge under 4.5",
-   "m": -5.9,
-   "tm": 45.5
   },
   {
    "id": "2026_10_SF_DAL",
@@ -670,16 +661,16 @@
    "state": "paper"
   },
   "2026_10_KC_ATL": {
-   "mk": "spread",
-   "side": "away",
-   "line": -3.5,
-   "price": 113.0,
-   "edge": 2.4,
-   "ev": null,
-   "units": 0.0,
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -104.0,
+   "ev": 0.042,
+   "edge": 2.0,
+   "units": 0.25,
    "home": "ATL",
    "away": "KC",
-   "state": "under"
+   "state": "paper"
   },
   "2026_10_MIA_IND": {
    "mk": "total",
@@ -722,9 +713,9 @@
    "side": "over",
    "line": 40.5,
    "price": -104.0,
-   "ev": 0.086,
+   "ev": 0.083,
    "edge": 3.6,
-   "units": 0.5,
+   "units": 0.25,
    "home": "LV",
    "away": "SEA",
    "state": "paper"
@@ -818,13 +809,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3678,
+  "snapshots": 3682,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1464,
-    "clvRet": -0.0188,
-    "clvT": -8.83,
+    "clvN": 1465,
+    "clvRet": -0.0189,
+    "clvT": -8.87,
     "clv": 0.48,
     "beat": 0.384,
     "still": 0.565
@@ -3038,12 +3029,12 @@
    "withdrawn": "2026-11-13T06:13:22Z"
   }
  ],
- "checked": "2026-11-13T07:58:48Z",
+ "checked": "2026-11-13T09:37:06Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-13": {
-    "raw": 3.0,
+    "raw": 3.25,
     "scale": 1.0
    }
   }
