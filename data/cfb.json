@@ -24,10 +24,10 @@
  "count": 400,
  "dist": {
   "all": {
-   "20": 4017,
-   "25": 356,
-   "30": 173,
-   "35": 89,
+   "20": 4018,
+   "25": 355,
+   "30": 174,
+   "35": 88,
    "40": 78,
    "45": 134,
    "50": 54,
@@ -40,8 +40,8 @@
   "draft": {
    "20": 3173,
    "25": 170,
-   "30": 88,
-   "35": 56,
+   "30": 89,
+   "35": 55,
    "40": 47,
    "45": 82,
    "50": 37,
@@ -54,16 +54,16 @@
  },
  "nilCurve": {
   "20": {
-   "n": 4017,
+   "n": 4018,
    "p10": 58000,
    "p25": 71000,
-   "p50": 103000,
-   "p75": 306000,
+   "p50": 104000,
+   "p75": 307000,
    "p90": 403000,
    "qb": 205000
   },
   "25": {
-   "n": 356,
+   "n": 355,
    "p10": 162000,
    "p25": 421000,
    "p50": 571000,
@@ -72,16 +72,16 @@
    "qb": 1577000
   },
   "30": {
-   "n": 173,
+   "n": 174,
    "p10": 627000,
    "p25": 795000,
-   "p50": 941000,
+   "p50": 947000,
    "p75": 1088000,
    "p90": 1249000,
    "qb": 2424000
   },
   "35": {
-   "n": 89,
+   "n": 88,
    "p10": 941000,
    "p25": 1081000,
    "p50": 1247000,
@@ -104,7 +104,7 @@
    "p25": 1767000,
    "p50": 2065000,
    "p75": 2375000,
-   "p90": 2868000,
+   "p90": 2867000,
    "qb": 4816000
   },
   "50": {
@@ -120,33 +120,33 @@
    "n": 7,
    "p10": 2828000,
    "p25": 2927000,
-   "p50": 4366000,
+   "p50": 4365000,
    "p75": 7578000,
    "p90": 7901000,
    "qb": 7578000
   },
   "60": {
    "n": 6,
-   "p10": 3574000,
-   "p25": 3574000,
+   "p10": 3573000,
+   "p25": 3573000,
    "p50": 3674000,
-   "p75": 3851000,
+   "p75": 3850000,
    "p90": 4189000,
    "qb": null
   }
  },
  "avCurve": {
   "20": {
-   "n": 4000,
+   "n": 4001,
    "nfl": 0,
    "p50": 0,
    "p90": 1,
    "nflWar": 0,
    "war50": 0.06,
-   "war90": 0.21
+   "war90": 0.2
   },
   "25": {
-   "n": 352,
+   "n": 351,
    "nfl": 0.2,
    "p50": 0.6,
    "p90": 2.1,
@@ -155,16 +155,16 @@
    "war90": 0.3
   },
   "30": {
-   "n": 167,
+   "n": 168,
    "nfl": 0.4,
    "p50": 1,
-   "p90": 4,
+   "p90": 3.7,
    "nflWar": 0,
    "war50": 0.2,
-   "war90": 0.46
+   "war90": 0.45
   },
   "35": {
-   "n": 85,
+   "n": 84,
    "nfl": 1.05,
    "p50": 1.2,
    "p90": 3,
@@ -231,16 +231,16 @@
   "n": 257,
   "value": "fv",
   "perWar": {
-   "p4": 13633000,
+   "p4": 13632000,
    "g5": 3717000
   },
   "valueTest": {
    "fv": 0.802,
    "sav": 0.954,
-   "savRaw": 0.938,
+   "savRaw": 0.939,
    "ev": 0.887
   },
-  "savN": 2457,
+  "savN": 2455,
   "pool": 1962227000,
   "fvP4": {
    "QB": 33,
@@ -326,8 +326,8 @@
  },
  "frameSlope": {
   "QB": 0,
-  "RB": 0.23653121214149053,
-  "WR": 0.4836372883037183,
+  "RB": 0.24273080785724682,
+  "WR": 0.47957820620124025,
   "TE": 3,
   "OL": 3,
   "EDGE": 3,
@@ -349,11 +349,11 @@
   "S": {}
  },
  "pbpRel": {
-  "rEpaCar": 0.52,
+  "rEpaCar": 0.51,
   "xRecTgt": 0.34,
-  "rzTd": 0.26,
-  "xRushCar": 0.31,
-  "cEpaTgt": 0.29
+  "rzTd": 0.25,
+  "xRushCar": 0.34,
+  "cEpaTgt": 0.28
  },
  "model": {
   "stats": {
@@ -1249,7 +1249,7 @@
    "prodOver": null,
    "ageZ": 0.01,
    "classZ": -0.04,
-   "wtProj": 223,
+   "wtProj": 222,
    "sizeZ": 0.21,
    "sosZ": 0,
    "statZ": 0.02,
@@ -1343,9 +1343,9 @@
    "mk": [
     0.99,
     1,
-    11,
-    "TEN",
-    0.18
+    10,
+    "LAC",
+    0.25
    ],
    "_home": [
     25.95,
@@ -1458,11 +1458,11 @@
    "healthFV": null,
    "posRank": 1,
    "sav": 5,
-   "savQ": 4.63,
+   "savQ": 4.62,
    "war": 0.54,
    "waa": 0.39,
    "xv": 0.48,
-   "comp": 3.449,
+   "comp": 3.45,
    "prodZ": 4.71,
    "talentZ": 3.12,
    "castZ": null,
@@ -1562,11 +1562,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.98,
+    0.97,
     1,
     18,
-    "PHI",
-    0.14
+    "TEN",
+    0.15
    ],
    "_home": [
     32.79,
@@ -1974,9 +1974,9 @@
    "mk": [
     0.97,
     1,
-    18,
-    "LAC",
-    0.18
+    16,
+    "NYJ",
+    0.21
    ],
    "_home": [
     30.53,
@@ -2074,7 +2074,7 @@
    "war": 0.48,
    "waa": 0.29,
    "xv": 0.39,
-   "comp": 2.739,
+   "comp": 2.737,
    "prodZ": 2.95,
    "talentZ": 2.94,
    "castZ": null,
@@ -2086,14 +2086,14 @@
    "wtProj": 205,
    "sizeZ": 0.03,
    "sosZ": 0,
-   "statZ": 0.08,
+   "statZ": 0.07,
    "hsZ": 0.04,
    "parts": [
     1.18,
     1.21,
     0.21,
     0,
-    0.08,
+    0.07,
     0.04,
     0.02,
     -0.01
@@ -2214,9 +2214,9 @@
    "hsStars": 3,
    "hsGrade": 84.76818181818182,
    "transfer": true,
-   "xnil": 3851000,
+   "xnil": 3850000,
    "ynil": 1184000,
-   "znil": 2667000,
+   "znil": 2666000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -2263,7 +2263,7 @@
    "war": 0.47,
    "waa": 0.29,
    "xv": 0.34,
-   "comp": 2.57,
+   "comp": 2.569,
    "prodZ": 3.25,
    "talentZ": 2.4,
    "castZ": null,
@@ -2272,7 +2272,7 @@
    "prodOver": null,
    "ageZ": 0.3,
    "classZ": 0.03,
-   "wtProj": 219,
+   "wtProj": 220,
    "sizeZ": 0.11,
    "sosZ": 0,
    "statZ": 0.03,
@@ -2402,9 +2402,9 @@
    "hsStars": 4,
    "hsGrade": 93.67027173913043,
    "transfer": false,
-   "xnil": 3574000,
+   "xnil": 3573000,
    "ynil": 1524000,
-   "znil": 2050000,
+   "znil": 2049000,
    "nilMkt": "p4",
    "cons": 12.6,
    "consRk": 8,
@@ -2563,11 +2563,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.78,
-    3,
-    72,
+    0.8,
+    4,
+    52,
     "NYJ",
-    0.16
+    0.14
    ],
    "_home": [
     33.9,
@@ -2616,9 +2616,9 @@
    "hsStars": 3,
    "hsGrade": 87.3,
    "transfer": true,
-   "xnil": 3574000,
+   "xnil": 3573000,
    "ynil": 1430000,
-   "znil": 2144000,
+   "znil": 2143000,
    "nilMkt": "p4",
    "cons": 22.2,
    "consRk": 15,
@@ -2777,11 +2777,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.57,
+    0.55,
     7,
-    98,
-    "TEN",
-    0.1
+    105,
+    "NYJ",
+    0.16
    ],
    "_home": [
     39.19,
@@ -2911,7 +2911,7 @@
     0.98,
     -0.09,
     0,
-    -0.01,
+    0,
     0.15,
     0.02,
     0.05
@@ -2991,11 +2991,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.9,
+    0.92,
     2,
-    33,
-    "CLE",
-    0.11
+    30,
+    "PHI",
+    0.14
    ],
    "_home": [
     38.9,
@@ -3044,9 +3044,9 @@
    "hsStars": 4,
    "hsGrade": 95.57898550724637,
    "transfer": false,
-   "xnil": 3574000,
+   "xnil": 3573000,
    "ynil": 1717000,
-   "znil": 1857000,
+   "znil": 1856000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -3400,11 +3400,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.87,
+    0.8,
     3,
-    48,
-    "NYJ",
-    0.1
+    55,
+    "LAC",
+    0.11
    ],
    "_home": [
     35.80916167664669,
@@ -3615,11 +3615,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.78,
+    0.79,
     4,
-    62,
+    56,
     "NYJ",
-    0.13
+    0.18
    ],
    "_home": [
     37.29,
@@ -3668,9 +3668,9 @@
    "hsStars": 3,
    "hsGrade": 85.13333333333334,
    "transfer": false,
-   "xnil": 4366000,
+   "xnil": 4365000,
    "ynil": 186000,
-   "znil": 4180000,
+   "znil": 4179000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -4026,11 +4026,11 @@
    "_exp": 2,
    "_ent": false,
    "mk": [
-    0.84,
-    1,
-    66,
+    0.79,
+    2,
+    70,
     "NYJ",
-    0.33
+    0.35
    ],
    "_home": [
     30.3,
@@ -4051,7 +4051,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 20.84,
+   "age": 20.85,
    "ageEst": null,
    "dob": "2006-01-09",
    "ht": "6-2",
@@ -4143,11 +4143,11 @@
    "healthFV": null,
    "posRank": 2,
    "sav": 9,
-   "savQ": 4.26,
+   "savQ": 4.27,
    "war": 0.98,
    "waa": 0.7,
    "xv": 0.62,
-   "comp": 2.622,
+   "comp": 2.62,
    "prodZ": 3.47,
    "talentZ": 2.83,
    "castZ": null,
@@ -4155,7 +4155,7 @@
    "oeZ": null,
    "prodOver": null,
    "ageZ": 0.02,
-   "classZ": -0.02,
+   "classZ": -0.03,
    "wtProj": 208,
    "sizeZ": 0.16,
    "sosZ": 0,
@@ -4244,9 +4244,9 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.72,
-    4,
-    70,
+    0.73,
+    5,
+    74,
     "NYJ",
     0.13
    ],
@@ -4308,7 +4308,7 @@
    "consAdj": null,
    "avg": 92.1,
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5141629.png",
-   "qbr": 86.4,
+   "qbr": 86.5,
    "arch": "gunslinger",
    "badges": [
     [
@@ -4409,13 +4409,13 @@
     "plus": [
      "On3 98 (#4 QB)",
      "QB+ 86.2 (91st pct QB, 1-yr, regressed)",
-     "ANY/A over exp +1.12/db, CPOE +5.7% (265 db)",
+     "ANY/A over exp +1.13/db, CPOE +5.7% (265 db)",
      "Context adj +0.04 comp (raw below over-expected)",
      "NFL-predictive badges: Bronze Accurate, Silver Deep Ball (+0.17 comp)",
      "HS 5-star (100)",
      "SOS +0.12 comp",
      "Snap share 100%",
-     "QBR 86.4 (SOS-adj)",
+     "QBR 86.5 (SOS-adj)",
      "Early contributor: RS-Fr"
     ],
     "minus": [
@@ -4663,10 +4663,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.4,
-    10,
-    203,
-    "NYJ",
+    0.41,
+    11,
+    null,
+    "TEN",
     0.1
    ],
    "_home": [
@@ -4716,9 +4716,9 @@
    "hsStars": 4,
    "hsGrade": 95.30059782608696,
    "transfer": false,
-   "xnil": 7254000,
+   "xnil": 7253000,
    "ynil": 5276000,
-   "znil": 1978000,
+   "znil": 1977000,
    "nilMkt": "p4",
    "cons": 20.2,
    "consRk": 13,
@@ -4880,11 +4880,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.59,
-    3,
-    130,
+    0.66,
+    2,
+    109,
     "NYJ",
-    0.16
+    0.18
    ],
    "_home": [
     42.17,
@@ -5096,10 +5096,10 @@
    "_ent": false,
    "mk": [
     0.05,
-    42,
+    50,
     null,
-    "IND",
-    0.06
+    "NYJ",
+    0.05
    ],
    "_home": [
     35.29,
@@ -5312,10 +5312,10 @@
    "_ent": false,
    "_lvl": "G5",
    "mk": [
-    0.05,
-    44,
+    0.06,
+    54,
     null,
-    "TEN",
+    "DEN",
     0.04
    ],
    "_home": [
@@ -5533,10 +5533,10 @@
    "_ent": true,
    "mk": [
     0.23,
-    21,
+    14,
     null,
-    "MIN",
-    0.11
+    "MIA",
+    0.08
    ],
    "_home": [
     35.27,
@@ -5728,10 +5728,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/samuel-omosigho-104799/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4899483",
-   "draftP": 0.814,
+   "draftP": 0.812,
    "transferP": 0.022,
-   "exitP": 0.814,
-   "stayP": 0.164,
+   "exitP": 0.812,
+   "stayP": 0.166,
    "homeMi": 1254,
    "inState": false,
    "hcP": 0.06,
@@ -5748,10 +5748,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.14,
-    25,
+    0.19,
+    17,
     null,
-    "LAC",
+    "ATL",
     0.05
    ],
    "_home": [
@@ -5963,8 +5963,8 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.04,
-    81,
+    0.06,
+    65,
     null,
     "TEN",
     0.02
@@ -6178,11 +6178,11 @@
    "_exp": 2,
    "_ent": false,
    "mk": [
-    0.04,
-    52,
+    0.07,
+    51,
     null,
-    "TEN",
-    0.06
+    "NYJ",
+    0.04
    ],
    "_home": [
     35.83,
@@ -6289,11 +6289,11 @@
    "healthFV": null,
    "posRank": 1,
    "sav": 1.3,
-   "savQ": 2.2,
+   "savQ": 2.21,
    "war": 0.35,
    "waa": 0.15,
    "xv": 0.35,
-   "comp": 2.367,
+   "comp": 2.368,
    "prodZ": 1.78,
    "talentZ": 2.38,
    "castZ": null,
@@ -6604,11 +6604,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.1,
-    33,
+    0.11,
+    32,
     null,
-    "MIN",
-    0.04
+    "NO",
+    0.05
    ],
    "_home": [
     30.3,
@@ -6713,7 +6713,7 @@
    "war": 0.35,
    "waa": 0.15,
    "xv": 0.5,
-   "comp": 2.52,
+   "comp": 2.521,
    "prodZ": 2.92,
    "talentZ": 2.1,
    "castZ": null,
@@ -6913,7 +6913,7 @@
    "war": 0.3,
    "waa": 0.13,
    "xv": 0.37,
-   "comp": 2.359,
+   "comp": 2.36,
    "prodZ": 1.69,
    "talentZ": 1.56,
    "castZ": null,
@@ -7054,9 +7054,9 @@
    "hsStars": 4,
    "hsGrade": 92.42994565217391,
    "transfer": false,
-   "xnil": 3577000,
+   "xnil": 3576000,
    "ynil": 1665000,
-   "znil": 1912000,
+   "znil": 1911000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -7523,7 +7523,7 @@
    "war": 0.21,
    "waa": 0.11,
    "xv": 0.19,
-   "comp": 2.51,
+   "comp": 2.511,
    "prodZ": 2.02,
    "talentZ": 2.84,
    "castZ": 1.67,
@@ -7604,10 +7604,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/treydez-green-147668/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079420",
-   "draftP": 0.953,
+   "draftP": 0.954,
    "transferP": 0.006,
-   "exitP": 0.953,
-   "stayP": 0.041,
+   "exitP": 0.954,
+   "stayP": 0.04,
    "homeMi": 27,
    "inState": true,
    "hcP": 0.05,
@@ -7624,11 +7624,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.47,
-    9,
-    208,
+    0.39,
+    12,
+    175,
     "CLE",
-    0.1
+    0.08
    ],
    "_home": [
     30.83,
@@ -7821,11 +7821,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.38,
-    12,
+    0.33,
+    13,
     null,
-    "ATL",
-    0.07
+    "TEN",
+    0.06
    ],
    "_home": [
     34.12,
@@ -8047,10 +8047,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.1,
-    34,
+    0.11,
+    31,
     null,
-    "PIT",
+    "MIN",
     0.07
    ],
    "_home": [
@@ -8100,9 +8100,9 @@
    "hsStars": 3,
    "hsGrade": 87.73333333333333,
    "transfer": false,
-   "xnil": 3573000,
+   "xnil": 3572000,
    "ynil": 1150000,
-   "znil": 2423000,
+   "znil": 2422000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -8351,7 +8351,7 @@
    "war": 0.25,
    "waa": 0.05,
    "xv": 0.33,
-   "comp": 1.997,
+   "comp": 1.998,
    "prodZ": 2.63,
    "talentZ": 2.8,
    "castZ": null,
@@ -8447,10 +8447,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.43,
-    12,
-    206,
-    "LV",
+    0.41,
+    11,
+    192,
+    "ATL",
     0.07
    ],
    "_home": [
@@ -8556,7 +8556,7 @@
    "war": 0.23,
    "waa": 0.11,
    "xv": 0.3,
-   "comp": 2.192,
+   "comp": 2.193,
    "prodZ": 1.35,
    "talentZ": 1.31,
    "castZ": null,
@@ -8701,9 +8701,9 @@
    "hsStars": 5,
    "hsGrade": 97.82882713884992,
    "transfer": false,
-   "xnil": 3040000,
+   "xnil": 3039000,
    "ynil": 1275000,
-   "znil": 1765000,
+   "znil": 1764000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -9166,7 +9166,7 @@
    "war": 0.31,
    "waa": 0.11,
    "xv": 0.35,
-   "comp": 2.249,
+   "comp": 2.25,
    "prodZ": 3.01,
    "talentZ": 3.29,
    "castZ": null,
@@ -9264,11 +9264,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.25,
-    19,
+    0.28,
+    16,
     null,
-    "PHI",
-    0.06
+    "ATL",
+    0.07
    ],
    "_home": [
     40.17,
@@ -9464,10 +9464,10 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.49,
-    9,
-    null,
-    "ARI",
+    0.48,
+    8,
+    170,
+    "CAR",
     0.06
    ],
    "_home": [
@@ -9588,7 +9588,7 @@
    "war": 0.38,
    "waa": 0.18,
    "xv": 0.48,
-   "comp": 2.185,
+   "comp": 2.186,
    "prodZ": 2.57,
    "talentZ": 2.21,
    "castZ": null,
@@ -9662,10 +9662,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/guerby-lambert-150918/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079559",
-   "draftP": 0.475,
+   "draftP": 0.474,
    "transferP": 0.126,
-   "exitP": 0.475,
-   "stayP": 0.399,
+   "exitP": 0.474,
+   "stayP": 0.4,
    "homeMi": 781,
    "inState": false,
    "hcP": 0.13,
@@ -9682,11 +9682,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.06,
-    57,
+    0.03,
+    61,
     null,
-    "MIA",
-    0.06
+    "BUF",
+    0.04
    ],
    "_home": [
     42.34,
@@ -9707,7 +9707,7 @@
    "cls": "RS-Jr",
    "elig": 3,
    "rs": true,
-   "age": 21.73,
+   "age": 21.74,
    "ageEst": null,
    "dob": "2005-02-18",
    "ht": "6-3",
@@ -9797,14 +9797,14 @@
    "war": 0.26,
    "waa": 0.08,
    "xv": 0.33,
-   "comp": 1.912,
+   "comp": 1.909,
    "prodZ": 2.79,
    "talentZ": 2.34,
    "castZ": null,
    "castAdj": null,
    "oeZ": null,
    "prodOver": null,
-   "ageZ": -0.12,
+   "ageZ": -0.13,
    "classZ": -0.07,
    "wtProj": 299,
    "sizeZ": -0.14,
@@ -9896,11 +9896,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.37,
-    11,
-    204,
-    "NYJ",
-    0.08
+    0.32,
+    16,
+    null,
+    "SF",
+    0.07
    ],
    "_home": [
     42.03,
@@ -9998,7 +9998,7 @@
    "war": 0.3,
    "waa": 0.1,
    "xv": 0.22,
-   "comp": 1.835,
+   "comp": 1.834,
    "prodZ": 2.22,
    "talentZ": 2.02,
    "castZ": null,
@@ -10096,9 +10096,9 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.48,
-    9,
-    166,
+    0.44,
+    10,
+    162,
     "NYG",
     0.09
    ],
@@ -10149,9 +10149,9 @@
    "hsStars": 4,
    "hsGrade": 96.57343969144462,
    "transfer": false,
-   "xnil": 3224000,
+   "xnil": 3223000,
    "ynil": 1571000,
-   "znil": 1653000,
+   "znil": 1652000,
    "nilMkt": "p4",
    "cons": 62.9,
    "consRk": 60,
@@ -10305,11 +10305,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.1,
-    34,
+    0.13,
+    26,
     null,
-    "CLE",
-    0.04
+    "MIN",
+    0.06
    ],
    "_home": [
     33.89,
@@ -10358,9 +10358,9 @@
    "hsStars": 0,
    "hsGrade": null,
    "transfer": true,
-   "xnil": 3224000,
+   "xnil": 3223000,
    "ynil": 1204000,
-   "znil": 2020000,
+   "znil": 2019000,
    "nilMkt": "p4",
    "cons": 107.9,
    "consRk": 228,
@@ -10525,11 +10525,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.04,
-    48,
+    0.08,
+    42,
     null,
-    "MIA",
-    0.06
+    "CLE",
+    0.04
    ],
    "_home": [
     35.99,
@@ -10736,10 +10736,10 @@
    "_ent": true,
    "mk": [
     0.49,
-    7,
+    8,
     null,
-    "ATL",
-    0.1
+    "NYJ",
+    0.09
    ],
    "_home": [
     33.29,
@@ -10849,14 +10849,14 @@
    "wtProj": 216,
    "sizeZ": 0.2,
    "sosZ": 0,
-   "statZ": 0.03,
+   "statZ": 0.02,
    "hsZ": 0.06,
    "parts": [
     0.5,
     0.66,
     0.72,
     0,
-    0.03,
+    0.02,
     0.06,
     0.03,
     0
@@ -11040,7 +11040,7 @@
    "war": 0.55,
    "waa": 0.33,
    "xv": 0.36,
-   "comp": 1.769,
+   "comp": 1.77,
    "prodZ": 1.22,
    "talentZ": 2.55,
    "castZ": null,
@@ -11137,11 +11137,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.68,
-    6,
-    82,
-    "NYJ",
-    0.1
+    0.69,
+    5,
+    80,
+    "DET",
+    0.08
    ],
    "_home": [
     41.31,
@@ -11381,9 +11381,9 @@
    "hsStars": 5,
    "hsGrade": 98.25474053295933,
    "transfer": true,
-   "xnil": 3224000,
+   "xnil": 3223000,
    "ynil": 1937000,
-   "znil": 1287000,
+   "znil": 1286000,
    "nilMkt": "p4",
    "cons": 59.7,
    "consRk": 58,
@@ -11537,10 +11537,10 @@
    "_ent": true,
    "mk": [
     0.16,
-    23,
+    28,
     null,
-    "NE",
-    0.08
+    "KC",
+    0.06
    ],
    "_home": [
     33.53,
@@ -11589,9 +11589,9 @@
    "hsStars": 4,
    "hsGrade": 95.62421809256662,
    "transfer": true,
-   "xnil": 2054000,
+   "xnil": 2053000,
    "ynil": 1020000,
-   "znil": 1034000,
+   "znil": 1033000,
    "nilMkt": "p4",
    "cons": 45.6,
    "consRk": 42,
@@ -11744,9 +11744,9 @@
    "_ent": false,
    "mk": [
     0.22,
-    17,
+    20,
     null,
-    "MIA",
+    "CLE",
     0.06
    ],
    "_home": [
@@ -11946,10 +11946,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/anthonie-knapp-158129/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5139001",
-   "draftP": 0.883,
+   "draftP": 0.884,
    "transferP": 0.026,
-   "exitP": 0.883,
-   "stayP": 0.091,
+   "exitP": 0.884,
+   "stayP": 0.09,
    "homeMi": 539,
    "inState": false,
    "hcP": 0.13,
@@ -11966,11 +11966,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.2,
-    21,
+    0.21,
+    19,
     null,
     "TB",
-    0.06
+    0.07
    ],
    "_home": [
     34.04,
@@ -12019,9 +12019,9 @@
    "hsStars": 3,
    "hsGrade": 88.38,
    "transfer": true,
-   "xnil": 2536000,
+   "xnil": 2535000,
    "ynil": 1031000,
-   "znil": 1505000,
+   "znil": 1504000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -12075,7 +12075,7 @@
    "war": 0.16,
    "waa": 0.06,
    "xv": 0.33,
-   "comp": 1.927,
+   "comp": 1.928,
    "prodZ": 2.54,
    "talentZ": 1.55,
    "castZ": null,
@@ -12267,7 +12267,7 @@
    "prodOver": null,
    "ageZ": 0.3,
    "classZ": 0.03,
-   "wtProj": 218,
+   "wtProj": 219,
    "sizeZ": 0.1,
    "sosZ": 0,
    "statZ": 0,
@@ -12552,11 +12552,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.21,
-    19,
+    0.25,
+    15,
     null,
-    "NYJ",
-    0.08
+    "CLE",
+    0.07
    ],
    "_home": [
     38.57,
@@ -12577,7 +12577,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 21.99,
+   "age": 22,
    "ageEst": null,
    "dob": "2004-11-15",
    "ht": "6-5",
@@ -12671,7 +12671,7 @@
    "war": 0.26,
    "waa": 0.06,
    "xv": 0.22,
-   "comp": 1.988,
+   "comp": 1.986,
    "prodZ": 2.63,
    "talentZ": 2.48,
    "castZ": null,
@@ -12748,10 +12748,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/cayden-green-19225/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4870727",
-   "draftP": 0.806,
+   "draftP": 0.808,
    "transferP": 0.037,
-   "exitP": 0.806,
-   "stayP": 0.157,
+   "exitP": 0.808,
+   "stayP": 0.155,
    "homeMi": 110,
    "inState": true,
    "hcP": 0.19,
@@ -12768,10 +12768,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.19,
-    21,
+    0.18,
+    23,
     null,
-    "LV",
+    "NYJ",
     0.05
    ],
    "_home": [
@@ -12883,7 +12883,7 @@
    "war": 0.24,
    "waa": 0.13,
    "xv": 0.42,
-   "comp": 2.38,
+   "comp": 2.381,
    "prodZ": 4.18,
    "talentZ": 2.05,
    "castZ": null,
@@ -12988,10 +12988,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.09,
-    38,
+    0.1,
+    34,
     null,
-    "LAC",
+    "DEN",
     0.06
    ],
    "_home": [
@@ -13090,7 +13090,7 @@
    "war": 0.29,
    "waa": 0.15,
    "xv": 0.23,
-   "comp": 1.935,
+   "comp": 1.934,
    "prodZ": 1.65,
    "talentZ": 0.89,
    "castZ": null,
@@ -13400,11 +13400,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.62,
-    7,
-    179,
-    "TEN",
-    0.11
+    0.63,
+    6,
+    174,
+    "PHI",
+    0.13
    ],
    "_home": [
     44.73,
@@ -13610,11 +13610,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.47,
-    9,
-    198,
+    0.4,
+    11,
+    213,
     "CLE",
-    0.09
+    0.1
    ],
    "_home": [
     33.96,
@@ -13712,7 +13712,7 @@
    "war": 0.1,
    "waa": -0.02,
    "xv": 0.04,
-   "comp": 1.965,
+   "comp": 1.964,
    "prodZ": 1.75,
    "talentZ": 1.96,
    "castZ": null,
@@ -13815,11 +13815,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.23,
+    0.28,
     15,
     null,
-    "TEN",
-    0.07
+    "CLE",
+    0.08
    ],
    "_home": [
     32.79,
@@ -13840,7 +13840,7 @@
    "cls": "RS-Sr",
    "elig": 4,
    "rs": true,
-   "age": 23.02,
+   "age": 23.03,
    "ageEst": null,
    "dob": "2003-11-05",
    "ht": "6-3",
@@ -13917,14 +13917,14 @@
    "war": 0,
    "waa": 0,
    "xv": 0,
-   "comp": 2.067,
+   "comp": 2.063,
    "prodZ": 3.36,
    "talentZ": 3.17,
    "castZ": null,
    "castAdj": null,
    "oeZ": null,
    "prodOver": null,
-   "ageZ": -0.37,
+   "ageZ": -0.38,
    "classZ": -0.16,
    "wtProj": 300,
    "sizeZ": 0.01,
@@ -14015,11 +14015,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.1,
-    34,
+    0.08,
+    39,
     null,
     "LV",
-    0.08
+    0.06
    ],
    "_home": [
     29.79,
@@ -14218,11 +14218,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    155,
+    0.02,
+    134,
     null,
-    "CIN",
-    0.03
+    "DET",
+    0.02
    ],
    "_home": [
     41.61,
@@ -14626,9 +14626,9 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.39,
-    13,
-    null,
+    0.42,
+    12,
+    185,
     "CLE",
     0.11
    ],
@@ -14824,10 +14824,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.51,
+    0.44,
     9,
-    162,
-    "LV",
+    143,
+    "KC",
     0.08
    ],
    "_home": [
@@ -14933,7 +14933,7 @@
    "war": 0.18,
    "waa": 0.04,
    "xv": 0.19,
-   "comp": 1.828,
+   "comp": 1.829,
    "prodZ": 2.48,
    "talentZ": 2.55,
    "castZ": null,
@@ -15029,10 +15029,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.17,
-    21,
+    0.16,
+    26,
     null,
-    "TEN",
+    "IND",
     0.08
    ],
    "_home": [
@@ -15248,11 +15248,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.3,
-    18,
+    0.33,
+    15,
     null,
     "CLE",
-    0.07
+    0.09
    ],
    "_home": [
     42.34,
@@ -15363,7 +15363,7 @@
    "war": 0.35,
    "waa": 0.14,
    "xv": 0.22,
-   "comp": 1.912,
+   "comp": 1.913,
    "prodZ": 0.79,
    "talentZ": 1.6,
    "castZ": null,
@@ -15858,11 +15858,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.35,
-    13,
+    0.41,
+    11,
     null,
-    "LV",
-    0.08
+    "ARI",
+    0.07
    ],
    "_home": [
     40.95,
@@ -16070,8 +16070,8 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.03,
-    80,
+    0.05,
+    52,
     null,
     "TEN",
     0.03
@@ -16270,10 +16270,10 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.13,
-    28,
+    0.11,
+    31,
     null,
-    "NE",
+    "CLE",
     0.05
    ],
    "_home": [
@@ -16391,7 +16391,7 @@
    "war": 0.27,
    "waa": 0.1,
    "xv": 0.45,
-   "comp": 1.965,
+   "comp": 1.966,
    "prodZ": 1.57,
    "talentZ": 1.71,
    "castZ": null,
@@ -16630,7 +16630,7 @@
     "plus": [
      "On3 98 (#2 RB)",
      "RB+ 90.5 (99th pct RB, 2-yr blend)",
-     "RYOE +0.34/carry (195 car)",
+     "RYOE +0.33/carry (195 car)",
      "Context adj +0.03 comp (raw below over-expected)",
      "Riser: model 54 FV vs consensus 48 (#173)",
      "EPA/carry +0.24; 15+ yd 8%; 12 TD (38 RZ car)"
@@ -16677,10 +16677,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.07,
-    55,
+    0.03,
+    56,
     null,
-    "NYG",
+    "PIT",
     0.04
    ],
    "_home": [
@@ -16792,7 +16792,7 @@
    "war": 0.73,
    "waa": 0.49,
    "xv": 0.56,
-   "comp": 2.003,
+   "comp": 2.004,
    "prodZ": 2.34,
    "talentZ": 2.5,
    "castZ": null,
@@ -16884,10 +16884,10 @@
    "_exp": 2,
    "_ent": false,
    "mk": [
-    0.01,
-    79,
+    0.02,
+    63,
     null,
-    "IND",
+    "NE",
     0.03
    ],
    "_home": [
@@ -16999,7 +16999,7 @@
    "war": 0.16,
    "waa": 0.01,
    "xv": 0.07,
-   "comp": 1.895,
+   "comp": 1.896,
    "prodZ": 2.39,
    "talentZ": 1.71,
    "castZ": null,
@@ -17297,11 +17297,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.02,
-    70,
+    0.03,
+    62,
     null,
-    "MIN",
-    0.03
+    "CLE",
+    0.04
    ],
    "_home": [
     33.95,
@@ -17516,11 +17516,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.72,
-    6,
-    70,
-    "LV",
-    0.1
+    0.79,
+    5,
+    69,
+    "NYJ",
+    0.11
    ],
    "_home": [
     38.9,
@@ -17726,11 +17726,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.2,
-    18,
+    0.19,
+    21,
     null,
-    "IND",
-    0.07
+    "SEA",
+    0.06
    ],
    "_home": [
     39.97,
@@ -17835,7 +17835,7 @@
    "war": 0.55,
    "waa": -0.06,
    "xv": 0.45,
-   "comp": 1.232,
+   "comp": 1.233,
    "prodZ": 0.38,
    "talentZ": 1.56,
    "castZ": -0.16,
@@ -17936,11 +17936,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.43,
-    4,
-    183,
-    "NYJ",
-    0.19
+    0.33,
+    9,
+    195,
+    "PIT",
+    0.12
    ],
    "_home": [
     30.05,
@@ -18146,11 +18146,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.19,
-    23,
+    0.2,
+    16,
     null,
     "TEN",
-    0.06
+    0.09
    ],
    "_home": [
     40.61,
@@ -18405,9 +18405,9 @@
    "hsStars": 4,
    "hsGrade": 94.45434782608696,
    "transfer": false,
-   "xnil": 2004000,
+   "xnil": 2003000,
    "ynil": 873000,
-   "znil": 1131000,
+   "znil": 1130000,
    "nilMkt": "p4",
    "cons": 77.1,
    "consRk": 84,
@@ -18557,9 +18557,9 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/tony-rojas-146420/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4918098",
-   "draftP": 0.835,
-   "transferP": 0.03,
-   "exitP": 0.835,
+   "draftP": 0.836,
+   "transferP": 0.029,
+   "exitP": 0.836,
    "stayP": 0.135,
    "homeMi": 124,
    "inState": false,
@@ -18577,10 +18577,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.12,
-    30,
+    0.13,
+    25,
     null,
-    "CLE",
+    "DAL",
     0.05
    ],
    "_home": [
@@ -18602,7 +18602,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 21.47,
+   "age": 21.48,
    "ageEst": null,
    "dob": "2005-05-24",
    "ht": "6-3",
@@ -18679,7 +18679,7 @@
    "war": 0,
    "waa": 0,
    "xv": 0,
-   "comp": 1.226,
+   "comp": 1.223,
    "prodZ": 1.33,
    "talentZ": 1.36,
    "castZ": null,
@@ -18756,10 +18756,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/dante-moore-29804/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4870921",
-   "draftP": 0.715,
-   "transferP": 0.175,
-   "exitP": 0.715,
-   "stayP": 0.11,
+   "draftP": 0.719,
+   "transferP": 0.172,
+   "exitP": 0.719,
+   "stayP": 0.109,
    "homeMi": 1998,
    "inState": false,
    "hcP": 0.17,
@@ -18777,11 +18777,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.17,
-    20,
+    0.21,
+    21,
     null,
-    "MIA",
-    0.09
+    "PIT",
+    0.08
    ],
    "_home": [
     42.38,
@@ -18886,7 +18886,7 @@
    "war": 0.31,
    "waa": 0.14,
    "xv": 0.32,
-   "comp": 1.66,
+   "comp": 1.659,
    "prodZ": 1.72,
    "talentZ": 1.86,
    "castZ": null,
@@ -18958,10 +18958,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jkoby-williams-152075/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5086393",
-   "draftP": 0.257,
+   "draftP": 0.256,
    "transferP": 0.119,
-   "exitP": 0.257,
-   "stayP": 0.624,
+   "exitP": 0.256,
+   "stayP": 0.625,
    "homeMi": 440,
    "inState": true,
    "hcP": 0.13,
@@ -18978,10 +18978,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0,
-    124,
+    0.01,
+    122,
     null,
-    "CLE",
+    "CIN",
     0.03
    ],
    "_home": [
@@ -19031,9 +19031,9 @@
    "hsStars": 5,
    "hsGrade": 98.97153225806451,
    "transfer": false,
-   "xnil": 2868000,
+   "xnil": 2867000,
    "ynil": 1590000,
-   "znil": 1278000,
+   "znil": 1277000,
    "nilMkt": "p4",
    "cons": 51.7,
    "consRk": 47,
@@ -19178,10 +19178,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.15,
-    23,
+    0.16,
+    25,
     null,
-    "CAR",
+    "KC",
     0.06
    ],
    "_home": [
@@ -19391,10 +19391,10 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.03,
-    60,
+    0.05,
+    56,
     null,
-    "CLE",
+    "MIA",
     0.04
    ],
    "_home": [
@@ -19603,9 +19603,9 @@
    "_ent": false,
    "mk": [
     0.13,
-    28,
+    30,
     null,
-    "SF",
+    "TEN",
     0.06
    ],
    "_home": [
@@ -19655,9 +19655,9 @@
    "hsStars": 4,
    "hsGrade": 93.59472826086956,
    "transfer": false,
-   "xnil": 2868000,
+   "xnil": 2867000,
    "ynil": 1426000,
-   "znil": 1442000,
+   "znil": 1441000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -19815,7 +19815,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 20.66,
+   "age": 20.67,
    "ageEst": null,
    "dob": "2006-03-16",
    "ht": "6-3",
@@ -19899,7 +19899,7 @@
    "war": 0.16,
    "waa": 0.06,
    "xv": 0.35,
-   "comp": 1.471,
+   "comp": 1.468,
    "prodZ": 1.03,
    "talentZ": 2.34,
    "castZ": null,
@@ -19998,11 +19998,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.3,
+    0.28,
     15,
     null,
-    "LAC",
-    0.07
+    "ATL",
+    0.08
    ],
    "_home": [
     36.92675455116138,
@@ -20100,7 +20100,7 @@
    "war": 0.27,
    "waa": 0.1,
    "xv": 0.23,
-   "comp": 1.795,
+   "comp": 1.794,
    "prodZ": 0.96,
    "talentZ": 1.22,
    "castZ": null,
@@ -20241,9 +20241,9 @@
    "hsStars": 4,
    "hsGrade": 89.49021739130434,
    "transfer": true,
-   "xnil": 5487000,
+   "xnil": 5486000,
    "ynil": 4760000,
-   "znil": 727000,
+   "znil": 726000,
    "nilMkt": "p4",
    "cons": 101.9,
    "consRk": 176,
@@ -20363,7 +20363,7 @@
     "plus": [
      "On3 97 (#5 QB)",
      "QB+ 85.0 (95th pct QB, 3-yr blend)",
-     "ANY/A over exp +0.71/db, CPOE +4.3% (312 db)",
+     "ANY/A over exp +0.70/db, CPOE +4.3% (312 db)",
      "Context adj +0.02 comp (raw below over-expected)",
      "NFL-predictive badges: Silver Accurate, Bronze Deep Ball (+0.29 comp)",
      "HS 4-star (89), now 97",
@@ -20394,7 +20394,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/sam-leavitt-104361/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5078810",
-   "draftP": 0.706,
+   "draftP": 0.708,
    "transferP": 0.069,
    "exitP": 0.771,
    "stayP": 0.16,
@@ -20415,10 +20415,10 @@
    "_ent": true,
    "mk": [
     0.03,
-    71,
+    89,
     null,
-    "MIN",
-    0.04
+    "CLE",
+    0.05
    ],
    "_home": [
     45.37,
@@ -20867,9 +20867,9 @@
    "hsStars": 4,
    "hsGrade": 95.8928471248247,
    "transfer": false,
-   "xnil": 2425000,
+   "xnil": 2424000,
    "ynil": 955000,
-   "znil": 1470000,
+   "znil": 1469000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -21072,9 +21072,9 @@
    "hsStars": 4,
    "hsGrade": 93.65543478260868,
    "transfer": true,
-   "xnil": 1773000,
+   "xnil": 1772000,
    "ynil": 1036000,
-   "znil": 737000,
+   "znil": 736000,
    "nilMkt": "p4",
    "cons": 103.6,
    "consRk": 187,
@@ -21188,7 +21188,7 @@
     "plus": [
      "On3 96 (#3 TE)",
      "TE+ 87.6 (97th pct TE, 1-yr, regressed)",
-     "ANY/A over exp +0.39/target (69 tgt)",
+     "ANY/A over exp +0.38/target (69 tgt)",
      "NFL-predictive badges: Gold Pass Catcher (+0.30 comp)",
      "HS 4-star (94)",
      "Snap share 93%"
@@ -21237,10 +21237,10 @@
    "_lvl": "P4",
    "mk": [
     0.04,
-    73,
+    82,
     null,
-    "KC",
-    0.05
+    "CLE",
+    0.03
    ],
    "_home": [
     33.55,
@@ -21338,7 +21338,7 @@
    "war": 0.34,
    "waa": 0.18,
    "xv": 0.3,
-   "comp": 1.669,
+   "comp": 1.667,
    "prodZ": 1.74,
    "talentZ": 1.74,
    "castZ": null,
@@ -21388,7 +21388,7 @@
     "plus": [
      "On3 93 (#13 RB)",
      "RB+ 89.7 (96th pct RB, 2-yr blend)",
-     "RYOE +0.52/carry (164 car)",
+     "RYOE +0.51/carry (164 car)",
      "Returns +0.68 yds over exp a team game (10 KR + PR, +0.6 FV)",
      "EPA/carry +0.30; 15+ yd 9%; 10 TD (21 RZ car)"
     ],
@@ -21433,10 +21433,10 @@
    "_lvl": "G5",
    "mk": [
     0.01,
-    108,
+    97,
     null,
-    "WSH",
-    0.05
+    "GB",
+    0.04
    ],
    "_home": [
     33.92,
@@ -21910,7 +21910,7 @@
    "war": 0.42,
    "waa": 0.22,
    "xv": 0.34,
-   "comp": 1.735,
+   "comp": 1.734,
    "prodZ": 1.85,
    "talentZ": 1.02,
    "castZ": null,
@@ -22051,9 +22051,9 @@
    "hsStars": 4,
    "hsGrade": 90.22260869565218,
    "transfer": false,
-   "xnil": 2425000,
+   "xnil": 2424000,
    "ynil": 971000,
-   "znil": 1454000,
+   "znil": 1453000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -22204,8 +22204,8 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.03,
-    100,
+    0.02,
+    103,
     null,
     "IND",
     0.03
@@ -22422,6 +22422,208 @@
    ]
   },
   {
+   "name": "Jeremiah Tuiileila",
+   "pos": "EDGE",
+   "spot": null,
+   "team": "San José State",
+   "tid": "23",
+   "logo": "/img/cfb/logos/23.png",
+   "color": "#0038a8",
+   "conf": "MWC",
+   "div": "FBS",
+   "cls": "RS-Fr",
+   "elig": 1,
+   "rs": true,
+   "age": null,
+   "ageEst": 19.9,
+   "dob": null,
+   "ht": "6-3",
+   "wt": 255,
+   "mz": [
+    74.5,
+    254,
+    32.1,
+    "EDGE",
+    75,
+    255,
+    2025,
+    75,
+    225,
+    75,
+    225
+   ],
+   "pfn": 86.5,
+   "pfnLabel": "EDGE+",
+   "snaps": 344,
+   "gp": 10,
+   "on3": 89,
+   "on3Rank": null,
+   "on3PosRank": 64,
+   "hsStars": 3,
+   "hsGrade": 83.51,
+   "transfer": false,
+   "xnil": 2782000,
+   "ynil": 101000,
+   "znil": 2681000,
+   "nilMkt": "p4",
+   "cons": null,
+   "consRk": null,
+   "consN": null,
+   "fvModel": null,
+   "consAdj": null,
+   "avg": 87.8,
+   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5238038.png",
+   "qbr": null,
+   "arch": "three-down end",
+   "badges": [
+    [
+     "Pass Rusher",
+     "g",
+     98,
+     "pressure rate"
+    ],
+    [
+     "Disruptor",
+     "s",
+     93,
+     "TFL a snap"
+    ]
+   ],
+   "rbRole": null,
+   "rbSd": null,
+   "rbPd": null,
+   "snapShare": 0.48,
+   "move": null,
+   "moveWhy": null,
+   "moveOdds": null,
+   "multi": null,
+   "up": null,
+   "moveUp": null,
+   "fv": 48,
+   "fvx": 47.98,
+   "fvg": 49.9,
+   "fvd": [
+    0.262,
+    0.127,
+    0.145,
+    0.079,
+    0.386,
+    20,
+    75.3
+   ],
+   "eav": 3.822,
+   "plus": false,
+   "star": true,
+   "riser": null,
+   "riserWhy": null,
+   "inj": null,
+   "healthFV": null,
+   "posRank": 16,
+   "sav": 3,
+   "savQ": 2.1,
+   "war": 0.34,
+   "waa": 0.19,
+   "xv": 0.31,
+   "comp": 1.692,
+   "prodZ": 1.99,
+   "talentZ": 1.14,
+   "castZ": null,
+   "castAdj": null,
+   "oeZ": null,
+   "prodOver": null,
+   "ageZ": 0.36,
+   "classZ": 0.15,
+   "wtProj": 261,
+   "sizeZ": 0.02,
+   "sosZ": 0,
+   "statZ": 0.08,
+   "hsZ": -0.05,
+   "parts": [
+    0.46,
+    0.75,
+    0.51,
+    0,
+    0.08,
+    -0.05,
+    -0.06,
+    -0.01
+   ],
+   "fvBase": 50,
+   "frameFV": -0.1,
+   "htFV": 0,
+   "yearsFV": 0,
+   "fvs": [
+    [
+     "g",
+     50
+    ],
+    [
+     "fr",
+     -0.1
+    ],
+    [
+     "yr",
+     0
+    ]
+   ],
+   "retFV": null,
+   "breakYear": 2,
+   "priorOnly": false,
+   "report": {
+    "role": "2+ yr starter",
+    "plus": [
+     "On3 89 (#64 EDGE)",
+     "EDGE+ 86.5 (98th pct EDGE, 1-yr, regressed)",
+     "NFL-predictive sack rate +1.16 SD (+0.08 comp)",
+     "Age ~19.9 (young for output)",
+     "Early contributor: RS-Fr"
+    ],
+    "minus": [],
+    "type": "three-down end"
+   },
+   "bmi": 31.9,
+   "draft27": false,
+   "note": null,
+   "why": [
+    "fr-on3",
+    "fr-pfn"
+   ],
+   "links": {
+    "on3": "https://www.on3.com/rivals/jeremiah-tuiileila-241392/",
+    "espn": "https://www.espn.com/college-football/player/_/id/5238038"
+   },
+   "ovr": 104,
+   "rk": 104,
+   "delta": 0,
+   "on3l": "https://www.on3.com/rivals/jeremiah-tuiileila-241392/",
+   "espnl": "https://www.espn.com/college-football/player/_/id/5238038",
+   "transferP": 0.229,
+   "exitP": 0.046,
+   "stayP": 0.725,
+   "homeMi": 90,
+   "inState": true,
+   "hcP": 0.24,
+   "tWhy": [
+    "+ G5 producer (P4 demand)",
+    "+ Group of 5 program",
+    "− first-year player",
+    "− home-state school, 90 mi"
+   ],
+   "_rz": -1,
+   "_prod": 0.472972972972973,
+   "_st": 1,
+   "_grade": null,
+   "_exp": 1,
+   "_ent": false,
+   "_lvl": "G5",
+   "mk": null,
+   "_home": [
+    38.57,
+    -121.47,
+    "CA"
+   ]
+  },
+  {
    "name": "Brice Pollock",
    "pos": "CB",
    "spot": null,
@@ -22588,8 +22790,8 @@
     "on3": "https://www.on3.com/rivals/brice-pollock-150489/",
     "espn": "https://www.espn.com/college-football/player/_/id/5075540"
    },
-   "ovr": 104,
-   "rk": 104,
+   "ovr": 105,
+   "rk": 105,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/brice-pollock-150489/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5075540",
@@ -22614,11 +22816,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.09,
-    37,
+    0.06,
+    41,
     null,
-    "PIT",
-    0.05
+    "WSH",
+    0.04
    ],
    "_home": [
     33.86,
@@ -22799,8 +23001,8 @@
     "on3": "https://www.on3.com/rivals/braydon-brus-13589/",
     "espn": "https://www.espn.com/college-football/player/_/id/4868925"
    },
-   "ovr": 106,
-   "rk": 105,
+   "ovr": 107,
+   "rk": 106,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/braydon-brus-13589/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4868925",
@@ -22824,8 +23026,8 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.02,
-    108,
+    0.03,
+    70,
     null,
     "NE",
     0.03
@@ -22888,7 +23090,7 @@
    "consAdj": null,
    "avg": 89.6,
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5177084.png",
-   "qbr": 81.6,
+   "qbr": 81.8,
    "arch": "pocket passer",
    "badges": [
     [
@@ -22933,7 +23135,7 @@
    "war": 0.53,
    "waa": 0.14,
    "xv": 0.53,
-   "comp": 1.648,
+   "comp": 1.649,
    "prodZ": 0.68,
    "talentZ": 1.66,
    "castZ": -0.77,
@@ -22982,12 +23184,12 @@
     "role": "2+ yr starter",
     "plus": [
      "On3 96 (#9 QB)",
-     "ANY/A over exp +1.00/db, CPOE +1.9% (171 db)",
+     "ANY/A over exp +0.99/db, CPOE +1.9% (171 db)",
      "NFL-predictive badges: Bronze Deep Ball (+0.09 comp)",
      "HS 4-star (95)",
      "NFL frame 6-4, 230 lb, BMI 28.0 (+0.6 FV)",
      "Snap share 63% (yr 2)",
-     "QBR 81.6 (SOS-adj)"
+     "QBR 81.8 (SOS-adj)"
     ],
     "minus": [
      "Injury: Out"
@@ -23005,8 +23207,8 @@
     "on3": "https://www.on3.com/rivals/kamario-taylor-175074/",
     "espn": "https://www.espn.com/college-football/player/_/id/5177084"
    },
-   "ovr": 107,
-   "rk": 106,
+   "ovr": 108,
+   "rk": 107,
    "delta": 1,
    "on3l": "https://www.on3.com/rivals/kamario-taylor-175074/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5177084",
@@ -23077,9 +23279,9 @@
    "hsStars": 5,
    "hsGrade": 98.04015427769986,
    "transfer": false,
-   "xnil": 2425000,
+   "xnil": 2424000,
    "ynil": 1137000,
-   "znil": 1288000,
+   "znil": 1287000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -23161,7 +23363,7 @@
     0.57,
     0.33,
     0,
-    0.02,
+    0.03,
     0.15,
     0.05,
     0.05
@@ -23212,8 +23414,8 @@
     "on3": "https://www.on3.com/rivals/michael-carroll-157319/",
     "espn": "https://www.espn.com/college-football/player/_/id/5164635"
    },
-   "ovr": 108,
-   "rk": 107,
+   "ovr": 109,
+   "rk": 108,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/michael-carroll-157319/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5164635",
@@ -23422,8 +23624,8 @@
     "on3": "https://www.on3.com/rivals/kelley-jones-155990/",
     "espn": "https://www.espn.com/college-football/player/_/id/5076950"
    },
-   "ovr": 109,
-   "rk": 108,
+   "ovr": 110,
+   "rk": 109,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/kelley-jones-155990/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5076950",
@@ -23447,11 +23649,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.47,
-    9,
-    175,
+    0.43,
+    10,
+    180,
     "NYJ",
-    0.1
+    0.08
    ],
    "_home": [
     34.19,
@@ -23619,8 +23821,8 @@
     "on3": "https://www.on3.com/rivals/ahmad-hardy-240668/",
     "espn": "https://www.espn.com/college-football/player/_/id/5197065"
    },
-   "ovr": 110,
-   "rk": 109,
+   "ovr": 111,
+   "rk": 110,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/ahmad-hardy-240668/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5197065",
@@ -23644,11 +23846,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.15,
-    25,
+    0.12,
+    28,
     null,
     "CLE",
-    0.08
+    0.07
    ],
    "_home": [
     32.959295774647906,
@@ -23833,8 +24035,8 @@
     "on3": "https://www.on3.com/rivals/cam-buffington-146259/",
     "espn": "https://www.espn.com/college-football/player/_/id/5079353"
    },
-   "ovr": 111,
-   "rk": 110,
+   "ovr": 112,
+   "rk": 111,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/cam-buffington-146259/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079353",
@@ -23859,237 +24061,16 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.03,
-    118,
+    0.01,
+    95,
     null,
-    "MIN",
-    0.04
+    "NE",
+    0.03
    ],
    "_home": [
     41.13,
     -91.44,
     "IA"
-   ]
-  },
-  {
-   "name": "Tobi Osunsanmi",
-   "pos": "EDGE",
-   "spot": null,
-   "team": "Indiana",
-   "tid": "84",
-   "logo": "/img/cfb/logos/84.png",
-   "color": "#970310",
-   "conf": "Big Ten",
-   "div": "FBS",
-   "cls": "RS-Sr",
-   "elig": 4,
-   "rs": true,
-   "age": 22.65,
-   "ageEst": null,
-   "dob": "2004-03-19",
-   "ht": "6-2",
-   "wt": 250,
-   "mz": [
-    73.75,
-    249,
-    32.3,
-    "EDGE",
-    74,
-    250,
-    2022,
-    74,
-    210,
-    74,
-    250
-   ],
-   "pfn": 92.3,
-   "pfnLabel": "EDGE+",
-   "snaps": 357,
-   "gp": 9,
-   "on3": 93,
-   "on3Rank": 145,
-   "on3PosRank": 19,
-   "hsStars": 3,
-   "hsGrade": 87.23853754940711,
-   "transfer": true,
-   "xnil": 2647000,
-   "ynil": 1563000,
-   "znil": 1084000,
-   "nilMkt": "p4",
-   "cons": 99.3,
-   "consRk": 160,
-   "consN": 1,
-   "fvModel": 50,
-   "consAdj": -0.2,
-   "avg": 92.7,
-   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4857878.png",
-   "qbr": null,
-   "arch": "three-down end",
-   "badges": [
-    [
-     "Disruptor",
-     "g",
-     97,
-     "TFL a snap"
-    ],
-    [
-     "Pass Rusher",
-     "s",
-     97,
-     "pressure rate"
-    ],
-    [
-     "Run Stopper",
-     "s",
-     91,
-     "tackles a snap"
-    ]
-   ],
-   "rbRole": null,
-   "rbSd": null,
-   "rbPd": null,
-   "snapShare": 0.69,
-   "move": null,
-   "moveWhy": null,
-   "moveOdds": null,
-   "multi": null,
-   "up": null,
-   "moveUp": null,
-   "fv": 48,
-   "fvx": 47.63,
-   "fvg": 49.36,
-   "fvd": [
-    0.14,
-    0.181,
-    0.246,
-    0.132,
-    0.302,
-    20,
-    68.8
-   ],
-   "eav": 3.458,
-   "plus": false,
-   "star": null,
-   "riser": null,
-   "riserWhy": null,
-   "inj": null,
-   "healthFV": null,
-   "posRank": 16,
-   "sav": 6,
-   "savQ": 3.41,
-   "war": 0.66,
-   "waa": 0.44,
-   "xv": 0.7,
-   "comp": 1.746,
-   "prodZ": 3.07,
-   "talentZ": 1.83,
-   "castZ": null,
-   "castAdj": null,
-   "oeZ": null,
-   "prodOver": null,
-   "ageZ": -0.37,
-   "classZ": -0.12,
-   "wtProj": 250,
-   "sizeZ": -0.13,
-   "sosZ": 0,
-   "statZ": 0.2,
-   "hsZ": 0,
-   "parts": [
-    0.73,
-    1.16,
-    -0.5,
-    0,
-    0.24,
-    0,
-    0.12,
-    -0.05
-   ],
-   "fvBase": 51,
-   "frameFV": -0.5,
-   "htFV": 0,
-   "yearsFV": -1,
-   "fvs": [
-    [
-     "g",
-     51
-    ],
-    [
-     "fr",
-     -0.5
-    ],
-    [
-     "yr",
-     -1
-    ],
-    [
-     "cs",
-     -0.14
-    ]
-   ],
-   "retFV": null,
-   "breakYear": 5,
-   "priorOnly": false,
-   "report": {
-    "role": "2+ yr starter",
-    "plus": [
-     "On3 93 (#19 EDGE)",
-     "EDGE+ 92.3 (99th pct EDGE, 1-yr, regressed)",
-     "NFL-predictive sack rate +3.87 SD (+0.20 comp)"
-    ],
-    "minus": [
-     "Consensus #160 (median board 93, 1/10 boards); model FV 50, +0 FV",
-     "Age 22.6 (old for output)",
-     "NFL frame 6-2, 250 lb, BMI 32.1 (-0.5 FV)",
-     "Sack conv 33% vs 15% avg (10 sk / 30 prs): expect regression down"
-    ],
-    "type": "three-down end"
-   },
-   "bmi": 32.1,
-   "draft27": true,
-   "note": null,
-   "why": [
-    "pfn",
-    "avg"
-   ],
-   "links": {
-    "on3": "https://www.on3.com/rivals/tobi-osunsanmi-113206/",
-    "espn": "https://www.espn.com/college-football/player/_/id/4857878"
-   },
-   "ovr": 112,
-   "rk": 111,
-   "delta": 0,
-   "on3l": "https://www.on3.com/rivals/tobi-osunsanmi-113206/",
-   "espnl": "https://www.espn.com/college-football/player/_/id/4857878",
-   "draftP": 0.787,
-   "transferP": 0.029,
-   "exitP": 0.921,
-   "stayP": 0.05,
-   "homeMi": 595,
-   "inState": false,
-   "hcP": 0.13,
-   "tWhy": [
-    "− fifth-year+ player",
-    "+ Power 4 program",
-    "+ ranked recruit",
-    "− producer at high-talent program"
-   ],
-   "_rz": -0.6,
-   "_prod": 0.49099099099099097,
-   "_st": 1,
-   "_grade": 77,
-   "_exp": 5,
-   "_ent": false,
-   "mk": [
-    0.03,
-    56,
-    null,
-    "NE",
-    0.07
-   ],
-   "_home": [
-    37.69,
-    -97.35,
-    "KS"
    ]
   },
   {
@@ -24281,208 +24262,6 @@
    ]
   },
   {
-   "name": "Jeremiah Tuiileila",
-   "pos": "EDGE",
-   "spot": null,
-   "team": "San José State",
-   "tid": "23",
-   "logo": "/img/cfb/logos/23.png",
-   "color": "#0038a8",
-   "conf": "MWC",
-   "div": "FBS",
-   "cls": "RS-Fr",
-   "elig": 1,
-   "rs": true,
-   "age": null,
-   "ageEst": 19.9,
-   "dob": null,
-   "ht": "6-3",
-   "wt": 255,
-   "mz": [
-    74.5,
-    254,
-    32.1,
-    "EDGE",
-    75,
-    255,
-    2025,
-    75,
-    225,
-    75,
-    225
-   ],
-   "pfn": 86.5,
-   "pfnLabel": "EDGE+",
-   "snaps": 344,
-   "gp": 10,
-   "on3": 89,
-   "on3Rank": null,
-   "on3PosRank": 64,
-   "hsStars": 3,
-   "hsGrade": 83.51,
-   "transfer": false,
-   "xnil": 2647000,
-   "ynil": 101000,
-   "znil": 2546000,
-   "nilMkt": "p4",
-   "cons": null,
-   "consRk": null,
-   "consN": null,
-   "fvModel": null,
-   "consAdj": null,
-   "avg": 87.8,
-   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5238038.png",
-   "qbr": null,
-   "arch": "three-down end",
-   "badges": [
-    [
-     "Pass Rusher",
-     "g",
-     98,
-     "pressure rate"
-    ],
-    [
-     "Disruptor",
-     "s",
-     93,
-     "TFL a snap"
-    ]
-   ],
-   "rbRole": null,
-   "rbSd": null,
-   "rbPd": null,
-   "snapShare": 0.48,
-   "move": null,
-   "moveWhy": null,
-   "moveOdds": null,
-   "multi": null,
-   "up": null,
-   "moveUp": null,
-   "fv": 48,
-   "fvx": 47.56,
-   "fvg": 48.9,
-   "fvd": [
-    0.269,
-    0.128,
-    0.145,
-    0.079,
-    0.378,
-    20,
-    75.1
-   ],
-   "eav": 3.755,
-   "plus": false,
-   "star": true,
-   "riser": null,
-   "riserWhy": null,
-   "inj": null,
-   "healthFV": null,
-   "posRank": 17,
-   "sav": 2.9,
-   "savQ": 2.08,
-   "war": 0.34,
-   "waa": 0.19,
-   "xv": 0.31,
-   "comp": 1.692,
-   "prodZ": 1.99,
-   "talentZ": 1.14,
-   "castZ": null,
-   "castAdj": null,
-   "oeZ": null,
-   "prodOver": null,
-   "ageZ": 0.36,
-   "classZ": 0.15,
-   "wtProj": 261,
-   "sizeZ": 0.02,
-   "sosZ": 0,
-   "statZ": 0.08,
-   "hsZ": -0.05,
-   "parts": [
-    0.46,
-    0.75,
-    0.51,
-    0,
-    0.08,
-    -0.05,
-    -0.06,
-    -0.01
-   ],
-   "fvBase": 49,
-   "frameFV": -0.1,
-   "htFV": 0,
-   "yearsFV": 0,
-   "fvs": [
-    [
-     "g",
-     49
-    ],
-    [
-     "fr",
-     -0.1
-    ],
-    [
-     "yr",
-     0
-    ]
-   ],
-   "retFV": null,
-   "breakYear": 2,
-   "priorOnly": false,
-   "report": {
-    "role": "2+ yr starter",
-    "plus": [
-     "On3 89 (#64 EDGE)",
-     "EDGE+ 86.5 (98th pct EDGE, 1-yr, regressed)",
-     "NFL-predictive sack rate +1.16 SD (+0.08 comp)",
-     "Age ~19.9 (young for output)",
-     "Early contributor: RS-Fr"
-    ],
-    "minus": [],
-    "type": "three-down end"
-   },
-   "bmi": 31.9,
-   "draft27": false,
-   "note": null,
-   "why": [
-    "fr-on3",
-    "fr-pfn"
-   ],
-   "links": {
-    "on3": "https://www.on3.com/rivals/jeremiah-tuiileila-241392/",
-    "espn": "https://www.espn.com/college-football/player/_/id/5238038"
-   },
-   "ovr": 114,
-   "rk": 113,
-   "delta": 0,
-   "on3l": "https://www.on3.com/rivals/jeremiah-tuiileila-241392/",
-   "espnl": "https://www.espn.com/college-football/player/_/id/5238038",
-   "transferP": 0.229,
-   "exitP": 0.046,
-   "stayP": 0.725,
-   "homeMi": 90,
-   "inState": true,
-   "hcP": 0.24,
-   "tWhy": [
-    "+ G5 producer (P4 demand)",
-    "+ Group of 5 program",
-    "− first-year player",
-    "− home-state school, 90 mi"
-   ],
-   "_rz": -1,
-   "_prod": 0.472972972972973,
-   "_st": 1,
-   "_grade": null,
-   "_exp": 1,
-   "_ent": false,
-   "_lvl": "G5",
-   "mk": null,
-   "_home": [
-    38.57,
-    -121.47,
-    "CA"
-   ]
-  },
-  {
    "name": "Mariyon Dye",
    "pos": "EDGE",
    "spot": null,
@@ -24573,7 +24352,7 @@
    "riserWhy": null,
    "inj": null,
    "healthFV": null,
-   "posRank": 18,
+   "posRank": 17,
    "sav": 1.9,
    "savQ": 1.01,
    "war": 0.24,
@@ -24647,8 +24426,8 @@
     "on3": "https://www.on3.com/rivals/mariyon-dye-178374/",
     "espn": "https://www.espn.com/college-football/player/_/id/5167702"
    },
-   "ovr": 115,
-   "rk": 114,
+   "ovr": 114,
+   "rk": 113,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/mariyon-dye-178374/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5167702",
@@ -24855,8 +24634,8 @@
     "on3": "https://www.on3.com/rivals/eli-finley-155200/",
     "espn": "https://www.espn.com/college-football/player/_/id/5121453"
    },
-   "ovr": 116,
-   "rk": 115,
+   "ovr": 115,
+   "rk": 114,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/eli-finley-155200/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5121453",
@@ -24881,10 +24660,10 @@
    "_ent": false,
    "_lvl": "G5",
    "mk": [
-    0.01,
-    82,
+    0.02,
+    75,
     null,
-    "CIN",
+    "KC",
     0.03
    ],
    "_home": [
@@ -24996,7 +24775,7 @@
    "war": 0.31,
    "waa": 0.14,
    "xv": 0.47,
-   "comp": 1.752,
+   "comp": 1.753,
    "prodZ": 2.72,
    "talentZ": 0.76,
    "castZ": null,
@@ -25065,8 +24844,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5141721"
    },
-   "ovr": 117,
-   "rk": 116,
+   "ovr": 116,
+   "rk": 115,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5141721",
@@ -25275,8 +25054,8 @@
     "on3": "https://www.on3.com/rivals/francis-brewu-175123/",
     "espn": "https://www.espn.com/college-football/player/_/id/5136784"
    },
-   "ovr": 118,
-   "rk": 117,
+   "ovr": 117,
+   "rk": 116,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/francis-brewu-175123/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5136784",
@@ -25300,11 +25079,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.06,
-    44,
+    0.04,
+    46,
     null,
-    "CAR",
-    0.04
+    "CLE",
+    0.05
    ],
    "_home": [
     40.12,
@@ -25409,7 +25188,7 @@
    "riserWhy": null,
    "inj": null,
    "healthFV": null,
-   "posRank": 19,
+   "posRank": 18,
    "sav": 3.2,
    "savQ": 0.8,
    "war": 0.42,
@@ -25482,8 +25261,8 @@
     "on3": "https://www.on3.com/rivals/sidney-stewart-176774/",
     "espn": "https://www.espn.com/college-football/player/_/id/5216961"
    },
-   "ovr": 119,
-   "rk": 118,
+   "ovr": 118,
+   "rk": 117,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/sidney-stewart-176774/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5216961",
@@ -25603,7 +25382,7 @@
    "war": 0.19,
    "waa": 0.08,
    "xv": 0.22,
-   "comp": 1.738,
+   "comp": 1.737,
    "prodZ": 2.78,
    "talentZ": 1.63,
    "castZ": null,
@@ -25677,8 +25456,8 @@
     "on3": "https://www.on3.com/rivals/lj-martin-146562/",
     "espn": "https://www.espn.com/college-football/player/_/id/4918126"
    },
-   "ovr": 120,
-   "rk": 119,
+   "ovr": 119,
+   "rk": 118,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/lj-martin-146562/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4918126",
@@ -25704,10 +25483,10 @@
    "_lvl": "P4",
    "mk": [
     0.05,
-    68,
+    62,
     null,
-    "CIN",
-    0.04
+    "BAL",
+    0.03
    ],
    "_home": [
     31.85,
@@ -25884,8 +25663,8 @@
     "on3": "https://www.on3.com/rivals/jyaire-hill-147515/",
     "espn": "https://www.espn.com/college-football/player/_/id/4918449"
    },
-   "ovr": 121,
-   "rk": 120,
+   "ovr": 120,
+   "rk": 119,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jyaire-hill-147515/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4918449",
@@ -25909,10 +25688,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.04,
-    92,
+    0.03,
+    77,
     null,
-    "MIN",
+    "TEN",
     0.02
    ],
    "_home": [
@@ -26079,8 +25858,8 @@
     "on3": "https://www.on3.com/rivals/amauri-washington-147295/",
     "espn": "https://www.espn.com/college-football/player/_/id/4899488"
    },
-   "ovr": 122,
-   "rk": 121,
+   "ovr": 121,
+   "rk": 120,
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/amauri-washington-147295/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4899488",
@@ -26104,11 +25883,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.17,
+    0.24,
     18,
     null,
     "NYJ",
-    0.06
+    0.08
    ],
    "_home": [
     42.38,
@@ -26272,8 +26051,8 @@
     "on3": "https://www.on3.com/rivals/brandon-finney-176795/",
     "espn": "https://www.espn.com/college-football/player/_/id/5179153"
    },
-   "ovr": 123,
-   "rk": 122,
+   "ovr": 122,
+   "rk": 121,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/brandon-finney-176795/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5179153",
@@ -26459,8 +26238,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5141572"
    },
-   "ovr": 124,
-   "rk": 123,
+   "ovr": 123,
+   "rk": 122,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5141572",
@@ -26593,7 +26372,7 @@
    "war": 0.24,
    "waa": 0.06,
    "xv": 0.24,
-   "comp": 1.707,
+   "comp": 1.708,
    "prodZ": 1.96,
    "talentZ": 1.3,
    "castZ": null,
@@ -26660,8 +26439,8 @@
     "on3": "https://www.on3.com/rivals/maki-stewart-175760/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141698"
    },
-   "ovr": 126,
-   "rk": 124,
+   "ovr": 125,
+   "rk": 123,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/maki-stewart-175760/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5141698",
@@ -26854,8 +26633,8 @@
     "on3": "https://www.on3.com/rivals/bryce-fitzgerald-175337/",
     "espn": "https://www.espn.com/college-football/player/_/id/5298737"
    },
-   "ovr": 127,
-   "rk": 125,
+   "ovr": 126,
+   "rk": 124,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/bryce-fitzgerald-175337/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5298737",
@@ -27044,8 +26823,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5161013"
    },
-   "ovr": 128,
-   "rk": 126,
+   "ovr": 127,
+   "rk": 125,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5161013",
@@ -27239,8 +27018,8 @@
     "on3": "https://www.on3.com/rivals/david-sanders-jr-150016/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141662"
    },
-   "ovr": 129,
-   "rk": 127,
+   "ovr": 128,
+   "rk": 126,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/david-sanders-jr-150016/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5141662",
@@ -27359,7 +27138,7 @@
    "war": 0.37,
    "waa": 0.17,
    "xv": 0.38,
-   "comp": 1.604,
+   "comp": 1.603,
    "prodZ": 1.3,
    "talentZ": 0.9,
    "castZ": null,
@@ -27429,8 +27208,8 @@
     "on3": "https://www.on3.com/rivals/javian-mallory-176059/",
     "espn": "https://www.espn.com/college-football/player/_/id/5160496"
    },
-   "ovr": 130,
-   "rk": 128,
+   "ovr": 129,
+   "rk": 127,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/javian-mallory-176059/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5160496",
@@ -27500,9 +27279,9 @@
    "hsStars": 4,
    "hsGrade": 91.12853260869566,
    "transfer": false,
-   "xnil": 5071000,
+   "xnil": 5070000,
    "ynil": 3010000,
-   "znil": 2061000,
+   "znil": 2060000,
    "nilMkt": "p4",
    "cons": 93,
    "consRk": 136,
@@ -27548,7 +27327,7 @@
    "star": null,
    "riser": null,
    "riserWhy": null,
-   "inj": "Questionable",
+   "inj": "Probable",
    "healthFV": null,
    "posRank": 10,
    "sav": 12.6,
@@ -27617,7 +27396,7 @@
      "QBR 73.1 (SOS-adj)"
     ],
     "minus": [
-     "Injury: Questionable"
+     "Injury: Probable"
     ],
     "type": "running QB"
    },
@@ -27632,8 +27411,8 @@
     "on3": "https://www.on3.com/rivals/lanorris-sellers-145821/",
     "espn": "https://www.espn.com/college-football/player/_/id/4875127"
    },
-   "ovr": 131,
-   "rk": 129,
+   "ovr": 130,
+   "rk": 128,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/lanorris-sellers-145821/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4875127",
@@ -27657,16 +27436,237 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.01,
-    137,
+    0.03,
+    144,
     null,
-    "MIA",
+    "SEA",
     0.02
    ],
    "_home": [
     34.18,
     -79.79,
     "SC"
+   ]
+  },
+  {
+   "name": "Tobi Osunsanmi",
+   "pos": "EDGE",
+   "spot": null,
+   "team": "Indiana",
+   "tid": "84",
+   "logo": "/img/cfb/logos/84.png",
+   "color": "#970310",
+   "conf": "Big Ten",
+   "div": "FBS",
+   "cls": "RS-Sr",
+   "elig": 4,
+   "rs": true,
+   "age": 22.66,
+   "ageEst": null,
+   "dob": "2004-03-19",
+   "ht": "6-2",
+   "wt": 250,
+   "mz": [
+    73.75,
+    249,
+    32.3,
+    "EDGE",
+    74,
+    250,
+    2022,
+    74,
+    210,
+    74,
+    250
+   ],
+   "pfn": 92.3,
+   "pfnLabel": "EDGE+",
+   "snaps": 357,
+   "gp": 9,
+   "on3": 93,
+   "on3Rank": 145,
+   "on3PosRank": 19,
+   "hsStars": 3,
+   "hsGrade": 87.23853754940711,
+   "transfer": true,
+   "xnil": 2647000,
+   "ynil": 1563000,
+   "znil": 1084000,
+   "nilMkt": "p4",
+   "cons": 99.3,
+   "consRk": 160,
+   "consN": 1,
+   "fvModel": 49,
+   "consAdj": -0.1,
+   "avg": 92.7,
+   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4857878.png",
+   "qbr": null,
+   "arch": "three-down end",
+   "badges": [
+    [
+     "Disruptor",
+     "g",
+     97,
+     "TFL a snap"
+    ],
+    [
+     "Pass Rusher",
+     "s",
+     97,
+     "pressure rate"
+    ],
+    [
+     "Run Stopper",
+     "s",
+     91,
+     "tackles a snap"
+    ]
+   ],
+   "rbRole": null,
+   "rbSd": null,
+   "rbPd": null,
+   "snapShare": 0.69,
+   "move": null,
+   "moveWhy": null,
+   "moveOdds": null,
+   "multi": null,
+   "up": null,
+   "moveUp": null,
+   "fv": 47,
+   "fvx": 47.13,
+   "fvg": 48.52,
+   "fvd": [
+    0.147,
+    0.185,
+    0.247,
+    0.13,
+    0.291,
+    20,
+    68.5
+   ],
+   "eav": 3.38,
+   "plus": false,
+   "star": null,
+   "riser": null,
+   "riserWhy": null,
+   "inj": null,
+   "healthFV": null,
+   "posRank": 19,
+   "sav": 6,
+   "savQ": 3.41,
+   "war": 0.66,
+   "waa": 0.44,
+   "xv": 0.7,
+   "comp": 1.743,
+   "prodZ": 3.07,
+   "talentZ": 1.83,
+   "castZ": null,
+   "castAdj": null,
+   "oeZ": null,
+   "prodOver": null,
+   "ageZ": -0.38,
+   "classZ": -0.13,
+   "wtProj": 250,
+   "sizeZ": -0.13,
+   "sosZ": 0,
+   "statZ": 0.2,
+   "hsZ": 0,
+   "parts": [
+    0.73,
+    1.16,
+    -0.5,
+    0,
+    0.24,
+    0,
+    0.12,
+    -0.05
+   ],
+   "fvBase": 50,
+   "frameFV": -0.5,
+   "htFV": 0,
+   "yearsFV": -1,
+   "fvs": [
+    [
+     "g",
+     50
+    ],
+    [
+     "fr",
+     -0.5
+    ],
+    [
+     "yr",
+     -1
+    ],
+    [
+     "cs",
+     0.02
+    ]
+   ],
+   "retFV": null,
+   "breakYear": 5,
+   "priorOnly": false,
+   "report": {
+    "role": "2+ yr starter",
+    "plus": [
+     "On3 93 (#19 EDGE)",
+     "EDGE+ 92.3 (99th pct EDGE, 1-yr, regressed)",
+     "NFL-predictive sack rate +3.87 SD (+0.20 comp)"
+    ],
+    "minus": [
+     "Consensus #160 (median board 93, 1/10 boards); model FV 49, +0 FV",
+     "Age 22.7 (old for output)",
+     "NFL frame 6-2, 250 lb, BMI 32.1 (-0.5 FV)",
+     "Sack conv 33% vs 15% avg (10 sk / 30 prs): expect regression down"
+    ],
+    "type": "three-down end"
+   },
+   "bmi": 32.1,
+   "draft27": true,
+   "note": null,
+   "why": [
+    "pfn",
+    "avg"
+   ],
+   "links": {
+    "on3": "https://www.on3.com/rivals/tobi-osunsanmi-113206/",
+    "espn": "https://www.espn.com/college-football/player/_/id/4857878"
+   },
+   "ovr": 131,
+   "rk": 129,
+   "delta": -1,
+   "on3l": "https://www.on3.com/rivals/tobi-osunsanmi-113206/",
+   "espnl": "https://www.espn.com/college-football/player/_/id/4857878",
+   "draftP": 0.781,
+   "transferP": 0.029,
+   "exitP": 0.921,
+   "stayP": 0.05,
+   "homeMi": 595,
+   "inState": false,
+   "hcP": 0.13,
+   "tWhy": [
+    "− fifth-year+ player",
+    "+ Power 4 program",
+    "+ ranked recruit",
+    "− producer at high-talent program"
+   ],
+   "_rz": -0.6,
+   "_prod": 0.49099099099099097,
+   "_st": 1,
+   "_grade": 77,
+   "_exp": 5,
+   "_ent": false,
+   "mk": [
+    0.05,
+    54,
+    null,
+    "CHI",
+    0.04
+   ],
+   "_home": [
+    37.69,
+    -97.35,
+    "KS"
    ]
   },
   {
@@ -27710,9 +27710,9 @@
    "hsStars": null,
    "hsGrade": null,
    "transfer": null,
-   "xnil": 1753000,
+   "xnil": 1752000,
    "ynil": 56000,
-   "znil": 1697000,
+   "znil": 1696000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -27912,9 +27912,9 @@
    "hsStars": null,
    "hsGrade": null,
    "transfer": null,
-   "xnil": 1753000,
+   "xnil": 1752000,
    "ynil": 57000,
-   "znil": 1696000,
+   "znil": 1695000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -27980,7 +27980,7 @@
    "war": 0.47,
    "waa": 0.3,
    "xv": 0.58,
-   "comp": 1.594,
+   "comp": 1.595,
    "prodZ": 3.53,
    "talentZ": 0.76,
    "castZ": null,
@@ -28182,7 +28182,7 @@
    "war": 0.95,
    "waa": 0.33,
    "xv": 0.88,
-   "comp": 1.591,
+   "comp": 1.592,
    "prodZ": 1.64,
    "talentZ": 1.11,
    "castZ": 1.94,
@@ -28483,11 +28483,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.2,
-    22,
+    0.22,
+    20,
     null,
     "CLE",
-    0.06
+    0.07
    ],
    "_home": [
     41.11,
@@ -28696,11 +28696,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.04,
-    48,
+    0.03,
+    60,
     null,
-    "WSH",
-    0.04
+    "CLE",
+    0.03
    ],
    "_home": [
     39.3,
@@ -28906,8 +28906,8 @@
    "_ent": false,
    "_lvl": "G5",
    "mk": [
-    0.01,
-    121,
+    0,
+    133,
     null,
     "IND",
     0.03
@@ -29129,10 +29129,10 @@
    "_ent": true,
    "mk": [
     0.04,
-    59,
+    62,
     null,
-    "CIN",
-    0.03
+    "PIT",
+    0.04
    ],
    "_home": [
     39.59,
@@ -29443,7 +29443,7 @@
    "war": 0.16,
    "waa": 0.03,
    "xv": 0.19,
-   "comp": 1.69,
+   "comp": 1.691,
    "prodZ": 1.45,
    "talentZ": 1.09,
    "castZ": 0.68,
@@ -29743,10 +29743,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.13,
-    27,
+    0.16,
+    28,
     null,
-    "NYG",
+    "IND",
     0.08
    ],
    "_home": [
@@ -29845,7 +29845,7 @@
    "war": 0.42,
    "waa": 0.22,
    "xv": 0.34,
-   "comp": 1.464,
+   "comp": 1.463,
    "prodZ": 1.77,
    "talentZ": 1.55,
    "castZ": null,
@@ -29944,11 +29944,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.06,
-    50,
+    0.07,
+    51,
     null,
-    "CAR",
-    0.05
+    "PIT",
+    0.04
    ],
    "_home": [
     37.95,
@@ -29997,9 +29997,9 @@
    "hsStars": 5,
    "hsGrade": 98.65822580645161,
    "transfer": false,
-   "xnil": 2004000,
+   "xnil": 2003000,
    "ynil": 1073000,
-   "znil": 931000,
+   "znil": 930000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -30747,10 +30747,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    190,
+    0.02,
+    131,
     null,
-    "IND",
+    "NE",
     0.02
    ],
    "_home": [
@@ -31044,7 +31044,7 @@
    "star": null,
    "riser": null,
    "riserWhy": null,
-   "inj": "Probable",
+   "inj": null,
    "healthFV": null,
    "posRank": 13,
    "sav": 7.5,
@@ -31052,7 +31052,7 @@
    "war": 0.66,
    "waa": 0.04,
    "xv": 0.62,
-   "comp": 1.136,
+   "comp": 1.137,
    "prodZ": 1.68,
    "talentZ": 1.79,
    "castZ": 0.08,
@@ -31113,8 +31113,7 @@
     ],
     "minus": [
      "Age 24.2 (old for output)",
-     "NFL frame 6-0, 205 lb, BMI 27.8 (-4.7 FV)",
-     "Injury: Probable"
+     "NFL frame 6-0, 205 lb, BMI 27.8 (-4.7 FV)"
     ],
     "type": "pocket passer"
    },
@@ -31154,11 +31153,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.33,
-    17,
-    204,
-    "PIT",
-    0.14
+    0.21,
+    16,
+    null,
+    "NO",
+    0.08
    ],
    "_home": [
     42.96,
@@ -31356,9 +31355,9 @@
    "_lvl": "P4",
    "mk": [
     0.01,
-    224,
+    167,
     null,
-    "SF",
+    "IND",
     0.02
    ],
    "_home": [
@@ -31558,10 +31557,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.04,
+    0.06,
     42,
     null,
-    "PIT",
+    "MIN",
     0.05
    ],
    "_home": [
@@ -31775,7 +31774,7 @@
     32,
     null,
     "LV",
-    0.07
+    0.06
    ],
    "_home": [
     33.57,
@@ -31965,10 +31964,10 @@
    "_lvl": "P4",
    "mk": [
     0.01,
-    117,
+    123,
     null,
-    "BAL",
-    0.03
+    "IND",
+    0.02
    ],
    "_home": null
   },
@@ -31985,7 +31984,7 @@
    "cls": "Gr",
    "elig": 5,
    "rs": false,
-   "age": 22.16,
+   "age": 22.17,
    "ageEst": null,
    "dob": "2004-09-14",
    "ht": "6-5",
@@ -32067,7 +32066,7 @@
    "star": null,
    "riser": null,
    "riserWhy": null,
-   "inj": "Questionable",
+   "inj": "Probable",
    "healthFV": null,
    "posRank": 16,
    "sav": 0.7,
@@ -32075,7 +32074,7 @@
    "war": 0.17,
    "waa": 0.04,
    "xv": 0.13,
-   "comp": 1.536,
+   "comp": 1.533,
    "prodZ": 2.58,
    "talentZ": 1.41,
    "castZ": null,
@@ -32135,7 +32134,7 @@
     "minus": [
      "Consensus #196 (median board 110, 2/10 boards); model FV 47, +0 FV",
      "On3 89 vs HS 94 (-5)",
-     "Injury: Questionable"
+     "Injury: Probable"
     ],
     "type": "run defender"
    },
@@ -32173,10 +32172,10 @@
    "_ent": true,
    "mk": [
     0.03,
-    65,
+    67,
     null,
-    "IND",
-    0.05
+    "TB",
+    0.04
    ],
    "_home": null
   },
@@ -32283,7 +32282,7 @@
    "war": 0.24,
    "waa": 0.07,
    "xv": 0.27,
-   "comp": 1.619,
+   "comp": 1.62,
    "prodZ": 1.55,
    "talentZ": 1.29,
    "castZ": null,
@@ -32776,11 +32775,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.03,
-    58,
+    0.02,
+    55,
     null,
-    "IND",
-    0.05
+    "ARI",
+    0.04
    ],
    "_home": [
     34.54,
@@ -32993,10 +32992,10 @@
    "_ent": true,
    "mk": [
     0.01,
-    120,
+    121,
     null,
-    "PHI",
-    0.02
+    "CIN",
+    0.03
    ],
    "_home": [
     36.23,
@@ -33094,7 +33093,7 @@
    "war": 0.26,
    "waa": 0.08,
    "xv": 0.27,
-   "comp": 1.433,
+   "comp": 1.432,
    "prodZ": 1.58,
    "talentZ": 1.38,
    "castZ": null,
@@ -33149,7 +33148,7 @@
      "On3 91 (#26 RB)",
      "Consensus #122 (median board 70, 3/10 boards); model FV 46, +1 FV",
      "RB+ 82.7 (94th pct RB, 3-yr blend)",
-     "RYOE +0.38/carry (63 car)",
+     "RYOE +0.37/carry (63 car)",
      "HS 4-star (96)",
      "EPA/carry +0.33; 15+ yd 8%; 6 TD (17 RZ car)"
     ],
@@ -33191,11 +33190,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.08,
-    41,
+    0.04,
+    54,
     null,
-    "CAR",
-    0.05
+    "CIN",
+    0.03
    ],
    "_home": [
     33.89,
@@ -33581,10 +33580,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.17,
-    23,
+    0.2,
+    15,
     null,
-    "IND",
+    "WSH",
     0.07
    ],
    "_home": [
@@ -33794,11 +33793,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.01,
-    68,
+    0.04,
+    70,
     null,
-    "SEA",
-    0.04
+    "NE",
+    0.03
    ],
    "_home": [
     41.84,
@@ -33905,7 +33904,7 @@
    "prodOver": null,
    "ageZ": 0.23,
    "classZ": 0.02,
-   "wtProj": 216,
+   "wtProj": 217,
    "sizeZ": 0.01,
    "sosZ": 0,
    "statZ": -0.02,
@@ -34652,7 +34651,7 @@
    "war": 0.24,
    "waa": 0.02,
    "xv": 0.2,
-   "comp": 1.286,
+   "comp": 1.287,
    "prodZ": 1.66,
    "talentZ": 1.51,
    "castZ": null,
@@ -34748,11 +34747,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.14,
-    23,
+    0.12,
+    30,
     null,
-    "TEN",
-    0.07
+    "NE",
+    0.06
    ],
    "_home": [
     31.56,
@@ -34878,7 +34877,7 @@
     0,
     0.19,
     0.01,
-    0.08,
+    0.07,
     -0.02
    ],
    "fvBase": 46,
@@ -35051,7 +35050,7 @@
    "prodOver": null,
    "ageZ": 0.28,
    "classZ": 0.03,
-   "wtProj": 206,
+   "wtProj": 207,
    "sizeZ": 0.11,
    "sosZ": 0,
    "statZ": 0,
@@ -35338,7 +35337,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 21.12,
+   "age": 21.13,
    "ageEst": null,
    "dob": "2005-09-29",
    "ht": "6-2",
@@ -35422,7 +35421,7 @@
    "war": 0.2,
    "waa": 0.01,
    "xv": 0.13,
-   "comp": 1.087,
+   "comp": 1.085,
    "prodZ": 1.52,
    "talentZ": 1.49,
    "castZ": null,
@@ -35498,9 +35497,9 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/sammy-brown-104675/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079342",
-   "draftP": 0.862,
-   "transferP": 0.027,
-   "exitP": 0.862,
+   "draftP": 0.863,
+   "transferP": 0.026,
+   "exitP": 0.863,
    "stayP": 0.111,
    "homeMi": 50,
    "inState": false,
@@ -35518,11 +35517,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.2,
-    21,
+    0.14,
+    28,
     null,
-    "NE",
-    0.07
+    "IND",
+    0.06
    ],
    "_home": [
     34.21,
@@ -35642,7 +35641,7 @@
    "war": 0.29,
    "waa": 0.12,
    "xv": 0.33,
-   "comp": 1.655,
+   "comp": 1.656,
    "prodZ": 2.95,
    "talentZ": 2.54,
    "castZ": null,
@@ -35721,7 +35720,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/justin-evans-69293/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4832033",
-   "draftP": 0.888,
+   "draftP": 0.889,
    "transferP": 0.037,
    "exitP": 0.929,
    "stayP": 0.034,
@@ -35741,11 +35740,11 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.14,
-    26,
+    0.16,
+    24,
     null,
-    "TEN",
-    0.06
+    "ATL",
+    0.05
    ],
    "_home": [
     40.77,
@@ -35925,10 +35924,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/dj-vonnahme-176748/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5218931",
-   "draftP": 0.62,
+   "draftP": 0.621,
    "transferP": 0.041,
-   "exitP": 0.62,
-   "stayP": 0.339,
+   "exitP": 0.621,
+   "stayP": 0.338,
    "homeMi": 181,
    "inState": true,
    "hcP": 0.15,
@@ -35945,11 +35944,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.02,
-    71,
+    0.05,
+    52,
     null,
-    "KC",
-    0.03
+    "CLE",
+    0.05
    ],
    "_home": [
     42.18,
@@ -35970,7 +35969,7 @@
    "cls": "RS-Jr",
    "elig": 3,
    "rs": true,
-   "age": 21.01,
+   "age": 21.02,
    "ageEst": null,
    "dob": "2005-11-08",
    "ht": "6-4",
@@ -35998,9 +35997,9 @@
    "hsStars": 4,
    "hsGrade": 91.01277173913044,
    "transfer": true,
-   "xnil": 4562000,
+   "xnil": 4561000,
    "ynil": 2059000,
-   "znil": 2503000,
+   "znil": 2502000,
    "nilMkt": "p4",
    "cons": 36.6,
    "consRk": 33,
@@ -36047,7 +36046,7 @@
    "war": 0.64,
    "waa": 0.02,
    "xv": 0.6,
-   "comp": 0.842,
+   "comp": 0.841,
    "prodZ": 0.34,
    "talentZ": 1.2,
    "castZ": 1.57,
@@ -36144,11 +36143,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.15,
-    28,
+    0.2,
+    20,
     null,
     "NO",
-    0.08
+    0.11
    ],
    "_home": [
     25.78,
@@ -36352,10 +36351,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.02,
-    92,
+    0.01,
+    83,
     null,
-    "IND",
+    "PIT",
     0.03
    ],
    "_home": [
@@ -36377,7 +36376,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 20.84,
+   "age": 20.85,
    "ageEst": null,
    "dob": "2006-01-09",
    "ht": "5-9",
@@ -36454,15 +36453,15 @@
    "war": 0.15,
    "waa": -0.01,
    "xv": 0.11,
-   "comp": 1.573,
+   "comp": 1.568,
    "prodZ": 1.72,
    "talentZ": 1.73,
    "castZ": null,
    "castAdj": null,
    "oeZ": 0.01,
    "prodOver": null,
-   "ageZ": 0.06,
-   "classZ": -0.02,
+   "ageZ": 0.05,
+   "classZ": -0.03,
    "wtProj": 181,
    "sizeZ": -0.21,
    "sosZ": 0,
@@ -36530,9 +36529,9 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/mario-craver-150238/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079345",
-   "draftP": 0.696,
-   "transferP": 0.098,
-   "exitP": 0.696,
+   "draftP": 0.697,
+   "transferP": 0.097,
+   "exitP": 0.697,
    "stayP": 0.206,
    "homeMi": 592,
    "inState": false,
@@ -36551,11 +36550,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.06,
-    42,
+    0.02,
+    59,
     null,
-    "IND",
-    0.05
+    "PHI",
+    0.04
    ],
    "_home": [
     33.53,
@@ -36702,7 +36701,7 @@
     "role": "2+ yr starter",
     "plus": [
      "RB+ 90.4 (98th pct RB, 1-yr, regressed)",
-     "RYOE +0.49/carry (65 car)",
+     "RYOE +0.48/carry (65 car)",
      "HS 4-star (91)",
      "EPA/carry +0.25; 15+ yd 12%; 1 TD (7 RZ car)"
     ],
@@ -36747,10 +36746,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0,
-    137,
+    0.01,
+    139,
     null,
-    "CAR",
+    "CLE",
     0.03
    ],
    "_home": [
@@ -37135,11 +37134,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.07,
-    42,
+    0.1,
+    33,
     null,
-    "ARI",
-    0.05
+    "LAR",
+    0.04
    ],
    "_home": [
     38.64,
@@ -37218,7 +37217,7 @@
    "rbRole": null,
    "rbSd": null,
    "rbPd": null,
-   "snapShare": 0.99,
+   "snapShare": 0.86,
    "move": null,
    "moveWhy": null,
    "moveOdds": null,
@@ -37251,12 +37250,12 @@
    "inj": null,
    "healthFV": null,
    "posRank": 11,
-   "sav": 6.7,
+   "sav": 5.9,
    "savQ": 2.95,
-   "war": 0.76,
-   "waa": 0.47,
-   "xv": 0.44,
-   "comp": 1.723,
+   "war": 0.66,
+   "waa": 0.42,
+   "xv": 0.39,
+   "comp": 1.712,
    "prodZ": 2.24,
    "talentZ": 1.69,
    "castZ": null,
@@ -37275,7 +37274,7 @@
     0.9,
     0.2,
     0,
-    0.05,
+    0.04,
     -0.05,
     -0.04,
     0
@@ -37306,7 +37305,7 @@
     "plus": [
      "On3 91 (#30 CB)",
      "CB+ 86.8 (99th pct CB, 2-yr blend)",
-     "Snap share 99%"
+     "Snap share 86%"
     ],
     "minus": [
      "HS 3-star (84), now 91"
@@ -37852,7 +37851,7 @@
    "war": 0.84,
    "waa": 0.24,
    "xv": 0.8,
-   "comp": 1.297,
+   "comp": 1.298,
    "prodZ": 1.88,
    "talentZ": 1.61,
    "castZ": 1.63,
@@ -37907,7 +37906,7 @@
      "On3 96 (#10 QB)",
      "Consensus #77 (median board 61, 5/10 boards); model FV 44, +3 FV",
      "QB+ 82.6 (97th pct QB, 3-yr blend)",
-     "ANY/A over exp +1.41/db, CPOE +2.9% (306 db)",
+     "ANY/A over exp +1.42/db, CPOE +3.0% (306 db)",
      "Context adj +0.05 comp (raw below over-expected)",
      "NFL-predictive badges: Bronze Accurate, Bronze Deep Ball (+0.16 comp)",
      "NFL frame 6-4, 230 lb, BMI 28.0 (+0.6 FV)",
@@ -37956,10 +37955,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.05,
-    52,
+    0.08,
+    41,
     null,
-    "ARI",
+    "PIT",
     0.06
    ],
    "_home": [
@@ -38156,10 +38155,10 @@
    "_lvl": "P4",
    "mk": [
     0.02,
-    67,
+    64,
     null,
-    "NE",
-    0.04
+    "TEN",
+    0.03
    ],
    "_home": [
     33.28,
@@ -38208,9 +38207,9 @@
    "hsStars": 4,
    "hsGrade": 94.4953804347826,
    "transfer": false,
-   "xnil": 1952000,
+   "xnil": 1951000,
    "ynil": 855000,
-   "znil": 1097000,
+   "znil": 1096000,
    "nilMkt": "p4",
    "cons": 91.7,
    "consRk": 128,
@@ -38270,7 +38269,7 @@
    "war": 0.33,
    "waa": 0.15,
    "xv": 0.41,
-   "comp": 1.571,
+   "comp": 1.572,
    "prodZ": 2.35,
    "talentZ": 1.64,
    "castZ": null,
@@ -38367,10 +38366,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.07,
-    47,
+    0.05,
+    58,
     null,
-    "IND",
+    "PIT",
     0.04
    ],
    "_home": [
@@ -38469,7 +38468,7 @@
    "war": 0.43,
    "waa": 0.24,
    "xv": 0.48,
-   "comp": 1.428,
+   "comp": 1.426,
    "prodZ": 1.34,
    "talentZ": 1.77,
    "castZ": null,
@@ -38566,10 +38565,10 @@
    "_lvl": "P4",
    "mk": [
     0.02,
-    102,
+    130,
     null,
-    "IND",
-    0.02
+    "MIN",
+    0.03
    ],
    "_home": [
     30.42,
@@ -38680,7 +38679,7 @@
    "war": 0.54,
    "waa": 0.36,
    "xv": 0.43,
-   "comp": 1.731,
+   "comp": 1.732,
    "prodZ": 2.55,
    "talentZ": 1.21,
    "castZ": null,
@@ -38817,9 +38816,9 @@
    "hsStars": null,
    "hsGrade": null,
    "transfer": null,
-   "xnil": 2102000,
+   "xnil": 2101000,
    "ynil": 920000,
-   "znil": 1182000,
+   "znil": 1181000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -39158,10 +39157,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    157,
+    0,
+    148,
     null,
-    "MIN",
+    "NO",
     0.02
    ],
    "_home": [
@@ -39260,7 +39259,7 @@
    "war": 0.3,
    "waa": 0.09,
    "xv": 0.31,
-   "comp": 1.36,
+   "comp": 1.359,
    "prodZ": 1.33,
    "talentZ": 1.6,
    "castZ": null,
@@ -39549,10 +39548,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.04,
-    120,
+    0.03,
+    104,
     null,
-    "TB",
+    "KC",
     0.02
    ],
    "_home": [
@@ -39752,10 +39751,10 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.15,
-    24,
+    0.23,
+    19,
     null,
-    "TEN",
+    "NYJ",
     0.08
    ],
    "_home": [
@@ -40144,10 +40143,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.08,
-    38,
+    0.1,
+    35,
     null,
-    "ARI",
+    "CLE",
     0.04
    ],
    "_home": [
@@ -40197,9 +40196,9 @@
    "hsStars": 4,
    "hsGrade": 93.51603260869565,
    "transfer": true,
-   "xnil": 2240000,
+   "xnil": 2239000,
    "ynil": 1560000,
-   "znil": 680000,
+   "znil": 679000,
    "nilMkt": "p4",
    "cons": 70.7,
    "consRk": 71,
@@ -40352,10 +40351,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.14,
-    28,
+    0.09,
+    34,
     null,
-    "KC",
+    "IND",
     0.05
    ],
    "_home": [
@@ -40552,11 +40551,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.02,
-    86,
+    0.01,
+    92,
     null,
-    "IND",
-    0.04
+    "NE",
+    0.03
    ],
    "_home": [
     30.706027173913057,
@@ -40646,7 +40645,7 @@
    "star": null,
    "riser": null,
    "riserWhy": null,
-   "inj": "Probable",
+   "inj": null,
    "healthFV": null,
    "posRank": 25,
    "sav": 1.6,
@@ -40712,8 +40711,7 @@
      "ANY/A over exp +0.32/target (72 tgt)"
     ],
     "minus": [
-     "Returns -0.08 yds over exp a team game (3 KR + PR, -0.1 FV)",
-     "Injury: Probable"
+     "Returns -0.08 yds over exp a team game (3 KR + PR, -0.1 FV)"
     ],
     "type": null
    },
@@ -40750,10 +40748,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.2,
-    22,
+    0.15,
+    23,
     null,
-    "CLE",
+    "ARI",
     0.06
    ],
    "_home": [
@@ -40775,7 +40773,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 21.53,
+   "age": 21.54,
    "ageEst": null,
    "dob": "2005-05-02",
    "ht": "6-5",
@@ -40865,15 +40863,15 @@
    "war": 0.29,
    "waa": 0.13,
    "xv": 0.3,
-   "comp": 1.53,
+   "comp": 1.527,
    "prodZ": 1.41,
    "talentZ": 1.97,
    "castZ": 1.17,
    "castAdj": null,
    "oeZ": -0.07,
    "prodOver": -0.16,
-   "ageZ": -0.07,
-   "classZ": -0.05,
+   "ageZ": -0.08,
+   "classZ": -0.06,
    "wtProj": 241,
    "sizeZ": 0.02,
    "sosZ": 0,
@@ -40939,7 +40937,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/patrick-overmyer-156399/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5120299",
-   "draftP": 0.105,
+   "draftP": 0.107,
    "transferP": 0.077,
    "exitP": 0.382,
    "stayP": 0.54,
@@ -40960,9 +40958,9 @@
    "_ent": false,
    "mk": [
     0,
+    207,
     null,
-    null,
-    "SEA",
+    "MIA",
     0.02
    ],
    "_home": [
@@ -41146,7 +41144,7 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/4918136"
    },
-   "ovr": 204,
+   "ovr": 205,
    "rk": 196,
    "delta": -1,
    "on3l": null,
@@ -41172,11 +41170,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.05,
-    57,
+    0.04,
+    48,
     null,
-    "KC",
-    0.04
+    "CLE",
+    0.06
    ],
    "_home": [
     34.78,
@@ -41281,7 +41279,7 @@
    "war": 0.07,
    "waa": -0.02,
    "xv": 0.05,
-   "comp": 1.449,
+   "comp": 1.45,
    "prodZ": 2.18,
    "talentZ": 1.67,
    "castZ": 0.84,
@@ -41378,11 +41376,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.05,
+    0.04,
     45,
     null,
-    "KC",
-    0.06
+    "CAR",
+    0.05
    ],
    "_home": [
     31.08,
@@ -41403,7 +41401,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 22.19,
+   "age": 22.2,
    "ageEst": null,
    "dob": "2004-09-03",
    "ht": "6-2",
@@ -41487,7 +41485,7 @@
    "war": 0.26,
    "waa": 0.05,
    "xv": 0.32,
-   "comp": 1.422,
+   "comp": 1.419,
    "prodZ": 1.69,
    "talentZ": 1.9,
    "castZ": null,
@@ -41562,7 +41560,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/austin-romaine-156488/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5084891",
-   "draftP": 0.481,
+   "draftP": 0.484,
    "transferP": 0.053,
    "exitP": 0.578,
    "stayP": 0.369,
@@ -41583,10 +41581,10 @@
    "_ent": true,
    "mk": [
     0.01,
-    85,
+    82,
     null,
-    "TEN",
-    0.03
+    "GB",
+    0.04
    ],
    "_home": [
     38.23,
@@ -41764,9 +41762,9 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/isaac-brown-151622/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079349",
-   "draftP": 0.679,
-   "transferP": 0.094,
-   "exitP": 0.679,
+   "draftP": 0.68,
+   "transferP": 0.093,
+   "exitP": 0.68,
    "stayP": 0.227,
    "homeMi": 918,
    "inState": false,
@@ -41785,10 +41783,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.07,
-    51,
+    0.04,
+    52,
     null,
-    "CLE",
+    "MIN",
     0.04
    ],
    "_home": [
@@ -41999,11 +41997,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.14,
-    27,
+    0.1,
+    33,
     null,
-    "ATL",
-    0.05
+    "ARI",
+    0.06
    ],
    "_home": [
     40.3590232185749,
@@ -42195,10 +42193,10 @@
    "_ent": false,
    "mk": [
     0.05,
-    53,
+    44,
     null,
-    "TEN",
-    0.05
+    "GB",
+    0.04
    ],
    "_home": [
     46.71,
@@ -42377,10 +42375,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/bryce-young-156026/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5112630",
-   "draftP": 0.614,
+   "draftP": 0.615,
    "transferP": 0.085,
-   "exitP": 0.614,
-   "stayP": 0.301,
+   "exitP": 0.615,
+   "stayP": 0.3,
    "homeMi": 535,
    "inState": false,
    "hcP": 0.13,
@@ -42397,10 +42395,10 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.04,
-    61,
+    0.05,
+    62,
     null,
-    "CHI",
+    "ARI",
     0.04
    ],
    "_home": [
@@ -42594,11 +42592,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.02,
-    89,
+    0.01,
+    88,
     null,
-    "IND",
-    0.05
+    "MIN",
+    0.03
    ],
    "_home": [
     39.78,
@@ -42808,11 +42806,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.02,
-    82,
+    0.04,
+    62,
     null,
-    "PIT",
-    0.03
+    "KC",
+    0.04
    ],
    "_home": [
     21.65,
@@ -43021,11 +43019,11 @@
    "_exp": 6,
    "_ent": false,
    "mk": [
-    0.24,
-    17,
+    0.28,
+    21,
     null,
-    "DEN",
-    0.07
+    "LV",
+    0.09
    ],
    "_home": [
     33.57,
@@ -43046,7 +43044,7 @@
    "cls": "RS-Sr",
    "elig": 4,
    "rs": true,
-   "age": 22.65,
+   "age": 22.66,
    "ageEst": null,
    "dob": "2004-03-19",
    "ht": "6-4",
@@ -43130,7 +43128,7 @@
    "war": 0.18,
    "waa": 0.05,
    "xv": 0.15,
-   "comp": 1.369,
+   "comp": 1.366,
    "prodZ": 2.48,
    "talentZ": 2.18,
    "castZ": null,
@@ -43138,7 +43136,7 @@
    "oeZ": null,
    "prodOver": null,
    "ageZ": -0.29,
-   "classZ": -0.12,
+   "classZ": -0.13,
    "wtProj": 300,
    "sizeZ": 0.01,
    "sosZ": 0,
@@ -43147,7 +43145,7 @@
    "parts": [
     0.87,
     0.91,
-    -0.41,
+    -0.42,
     0,
     0.01,
     -0.11,
@@ -43224,11 +43222,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.03,
-    60,
+    0.07,
+    38,
     null,
-    "LV",
-    0.04
+    "TEN",
+    0.05
    ],
    "_home": [
     39.22,
@@ -43326,7 +43324,7 @@
    "war": 0.43,
    "waa": 0.25,
    "xv": 0.42,
-   "comp": 1.449,
+   "comp": 1.448,
    "prodZ": 1.86,
    "talentZ": 1.7,
    "castZ": null,
@@ -43400,7 +43398,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jahiem-white-149878/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4911971",
-   "draftP": 0.088,
+   "draftP": 0.087,
    "transferP": 0.343,
    "exitP": 0.342,
    "stayP": 0.316,
@@ -43422,9 +43420,9 @@
    "_lvl": "G5",
    "mk": [
     0,
-    207,
     null,
-    "DET",
+    null,
+    "PIT",
     0.02
    ],
    "_home": [
@@ -43830,11 +43828,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    120,
+    0.03,
+    103,
     null,
-    "DEN",
-    0.02
+    "DET",
+    0.03
    ],
    "_home": [
     34.08,
@@ -43932,7 +43930,7 @@
    "war": 0.23,
    "waa": 0.01,
    "xv": 0.3,
-   "comp": 1.329,
+   "comp": 1.33,
    "prodZ": 3.16,
    "talentZ": 1.77,
    "castZ": null,
@@ -44030,11 +44028,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.09,
-    39,
+    0.08,
+    36,
     null,
-    "IND",
-    0.06
+    "CLE",
+    0.05
    ],
    "_home": [
     40.46,
@@ -44214,9 +44212,9 @@
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/iapani-laloulu-48876/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4870845",
-   "draftP": 0.714,
-   "transferP": 0.069,
-   "exitP": 0.714,
+   "draftP": 0.713,
+   "transferP": 0.07,
+   "exitP": 0.713,
    "stayP": 0.217,
    "homeMi": 2519,
    "inState": false,
@@ -44234,11 +44232,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.06,
-    44,
+    0.05,
+    50,
     null,
     "IND",
-    0.04
+    0.05
    ],
    "_home": [
     20.810745341614904,
@@ -44336,7 +44334,7 @@
    "war": 0.1,
    "waa": -0.06,
    "xv": 0.08,
-   "comp": 1.297,
+   "comp": 1.296,
    "prodZ": 0.99,
    "talentZ": 0.93,
    "castZ": null,
@@ -44345,7 +44343,7 @@
    "prodOver": null,
    "ageZ": 0.24,
    "classZ": 0.02,
-   "wtProj": 225,
+   "wtProj": 226,
    "sizeZ": 0.2,
    "sosZ": 0,
    "statZ": 0.04,
@@ -44544,7 +44542,7 @@
    "war": 0.2,
    "waa": 0.07,
    "xv": 0.24,
-   "comp": 1.493,
+   "comp": 1.494,
    "prodZ": 3.54,
    "talentZ": 1.96,
    "castZ": null,
@@ -44637,10 +44635,10 @@
    "_ent": false,
    "mk": [
     0.01,
-    127,
+    129,
     null,
-    "NE",
-    0.02
+    "IND",
+    0.03
    ],
    "_home": [
     38.61,
@@ -44751,7 +44749,7 @@
    "war": 0.35,
    "waa": 0.22,
    "xv": 0.27,
-   "comp": 1.369,
+   "comp": 1.37,
    "prodZ": 1.26,
    "talentZ": 0.62,
    "castZ": null,
@@ -44953,7 +44951,7 @@
    "war": 0.07,
    "waa": 0.01,
    "xv": 0.09,
-   "comp": 1.333,
+   "comp": 1.334,
    "prodZ": 0.85,
    "talentZ": 0.83,
    "castZ": null,
@@ -45440,10 +45438,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.12,
-    29,
+    0.06,
+    38,
     null,
-    "NE",
+    "TEN",
     0.08
    ],
    "_home": [
@@ -45656,10 +45654,10 @@
    "_lvl": "P4",
    "mk": [
     0.01,
-    71,
+    63,
     null,
-    "IND",
-    0.04
+    "CLE",
+    0.03
    ],
    "_home": [
     44.73,
@@ -45853,10 +45851,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/peter-clarke-152500/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5080547",
-   "draftP": 0.339,
-   "transferP": 0.367,
-   "exitP": 0.339,
-   "stayP": 0.294,
+   "draftP": 0.341,
+   "transferP": 0.366,
+   "exitP": 0.341,
+   "stayP": 0.293,
    "homeMi": null,
    "inState": false,
    "hcP": 0.18,
@@ -45874,13 +45872,204 @@
    "_ent": false,
    "_lvl": "G5",
    "mk": [
-    0.01,
-    135,
+    0.02,
+    109,
     null,
-    "DEN",
-    0.03
+    "NE",
+    0.02
    ],
    "_home": null
+  },
+  {
+   "name": "Cooper Catalano",
+   "pos": "LB",
+   "spot": null,
+   "team": "Wisconsin",
+   "tid": "275",
+   "logo": "/img/cfb/logos/275.png",
+   "color": "#a00000",
+   "conf": "Big Ten",
+   "div": "FBS",
+   "cls": "So",
+   "elig": 2,
+   "rs": false,
+   "age": null,
+   "ageEst": 19.9,
+   "dob": null,
+   "ht": "6-1",
+   "wt": 232,
+   "mz": [
+    72.75,
+    233,
+    30.8,
+    "LB",
+    73,
+    232,
+    2025,
+    74,
+    200,
+    74,
+    205
+   ],
+   "pfn": 81.5,
+   "pfnLabel": "LB+",
+   "snaps": 550,
+   "gp": 9,
+   "on3": 89,
+   "on3Rank": null,
+   "on3PosRank": 51,
+   "hsStars": 3,
+   "hsGrade": 87.04,
+   "transfer": false,
+   "xnil": 1374000,
+   "ynil": 605000,
+   "znil": 769000,
+   "nilMkt": "p4",
+   "cons": null,
+   "consRk": null,
+   "consN": null,
+   "fvModel": null,
+   "consAdj": null,
+   "avg": 85.3,
+   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5167173.png",
+   "qbr": null,
+   "arch": "run defender",
+   "badges": [
+    [
+     "Run Stopper",
+     "s",
+     91,
+     "tackles a snap"
+    ]
+   ],
+   "rbRole": null,
+   "rbSd": null,
+   "rbPd": null,
+   "snapShare": 0.97,
+   "move": null,
+   "moveWhy": null,
+   "moveOdds": null,
+   "multi": null,
+   "up": null,
+   "moveUp": null,
+   "fv": 44,
+   "fvx": 43.88,
+   "fvg": 43.9,
+   "fvd": [
+    0.334,
+    0.137,
+    0.145,
+    0.075,
+    0.31,
+    20,
+    73.6
+   ],
+   "eav": 3.183,
+   "plus": false,
+   "star": null,
+   "riser": null,
+   "riserWhy": null,
+   "inj": null,
+   "healthFV": null,
+   "posRank": 21,
+   "sav": 1.5,
+   "savQ": 0.64,
+   "war": 0.27,
+   "waa": 0.06,
+   "xv": 0.15,
+   "comp": 1.333,
+   "prodZ": 1.24,
+   "talentZ": 1.26,
+   "castZ": null,
+   "castAdj": null,
+   "oeZ": null,
+   "prodOver": null,
+   "ageZ": 0.25,
+   "classZ": 0.03,
+   "wtProj": 238,
+   "sizeZ": 0.03,
+   "sosZ": 0,
+   "statZ": 0.06,
+   "hsZ": 0,
+   "parts": [
+    0.5,
+    0.47,
+    0.27,
+    0,
+    0.11,
+    0,
+    -0.02,
+    -0.01
+   ],
+   "fvBase": 44,
+   "frameFV": -0.1,
+   "htFV": 0,
+   "yearsFV": 0,
+   "fvs": [
+    [
+     "g",
+     44
+    ],
+    [
+     "fr",
+     -0.1
+    ],
+    [
+     "yr",
+     0
+    ]
+   ],
+   "retFV": null,
+   "breakYear": 2,
+   "priorOnly": false,
+   "report": {
+    "role": "rotation, 48+ games",
+    "plus": [
+     "On3 89 (#51 LB)",
+     "LB+ 81.5 (89th pct LB, 1-yr, regressed)",
+     "NFL-predictive badges: above avg (+0.06 comp)",
+     "Snap share 97%"
+    ],
+    "minus": [],
+    "type": "run defender"
+   },
+   "bmi": 30.6,
+   "draft27": false,
+   "note": null,
+   "why": [],
+   "links": {
+    "on3": "https://www.on3.com/rivals/cooper-catalano-157326/",
+    "espn": "https://www.espn.com/college-football/player/_/id/5167173"
+   },
+   "ovr": 236,
+   "rk": 220,
+   "delta": 2,
+   "on3l": "https://www.on3.com/rivals/cooper-catalano-157326/",
+   "espnl": "https://www.espn.com/college-football/player/_/id/5167173",
+   "transferP": 0.108,
+   "exitP": 0.018,
+   "stayP": 0.874,
+   "homeMi": 61,
+   "inState": true,
+   "hcP": 0.16,
+   "tWhy": [
+    "− producer at high-talent program",
+    "+ Power 4 program",
+    "+ ranked recruit",
+    "− full-time player"
+   ],
+   "_rz": -0.8,
+   "_prod": 0.3827292110874201,
+   "_st": 1,
+   "_grade": 76,
+   "_exp": 2,
+   "_ent": true,
+   "mk": null,
+   "_home": [
+    43.24,
+    -88.23,
+    "WI"
+   ]
   },
   {
    "name": "Jaylin Carter",
@@ -45940,7 +46129,7 @@
    "rbRole": null,
    "rbSd": null,
    "rbPd": null,
-   "snapShare": 0.44,
+   "snapShare": 0.4,
    "move": null,
    "moveWhy": null,
    "moveOdds": null,
@@ -45967,12 +46156,12 @@
    "inj": null,
    "healthFV": null,
    "posRank": 29,
-   "sav": 1.6,
+   "sav": 1.5,
    "savQ": 0.9,
-   "war": 0.26,
-   "waa": 0.1,
-   "xv": 0.25,
-   "comp": 1.25,
+   "war": 0.24,
+   "waa": 0.09,
+   "xv": 0.22,
+   "comp": 1.255,
    "prodZ": 1.24,
    "talentZ": 1.14,
    "castZ": null,
@@ -45981,7 +46170,7 @@
    "prodOver": null,
    "ageZ": 0.27,
    "classZ": 0.03,
-   "wtProj": 190,
+   "wtProj": 191,
    "sizeZ": -0.25,
    "sosZ": 0,
    "statZ": 0.02,
@@ -46036,8 +46225,8 @@
     "on3": "https://www.on3.com/rivals/jaylin-carter-176744/",
     "espn": "https://www.espn.com/college-football/player/_/id/5222671"
    },
-   "ovr": 236,
-   "rk": 220,
+   "ovr": 237,
+   "rk": 221,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jaylin-carter-176744/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5222671",
@@ -46234,6 +46423,7 @@
     ],
     "minus": [
      "Cast talent 92nd pct QB; top target Jaleel Skinner; -0.06 comp",
+     "Context adj -0.02 comp (raw above over-expected)",
      "NFL frame 6-2, 215 lb, BMI 27.6 (-0.5 FV)"
     ],
     "type": "dual-threat"
@@ -46249,8 +46439,8 @@
     "on3": "https://www.on3.com/rivals/lincoln-kienholz-151248/",
     "espn": "https://www.espn.com/college-football/player/_/id/5078278"
    },
-   "ovr": 237,
-   "rk": 221,
+   "ovr": 239,
+   "rk": 222,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/lincoln-kienholz-151248/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5078278",
@@ -46275,11 +46465,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0,
-    177,
+    0.02,
+    146,
     null,
-    "IND",
-    0.02
+    "NE",
+    0.03
    ],
    "_home": [
     44.38,
@@ -46444,8 +46634,8 @@
     "on3": "https://www.on3.com/rivals/jj-buchanan-239144/",
     "espn": "https://www.espn.com/college-football/player/_/id/5214557"
    },
-   "ovr": 239,
-   "rk": 222,
+   "ovr": 240,
+   "rk": 223,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jj-buchanan-239144/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5214557",
@@ -46632,8 +46822,8 @@
     "on3": "https://www.on3.com/rivals/dakorien-moore-28026/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141586"
    },
-   "ovr": 241,
-   "rk": 223,
+   "ovr": 242,
+   "rk": 224,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/dakorien-moore-28026/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5141586",
@@ -46675,7 +46865,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 22.07,
+   "age": 22.08,
    "ageEst": null,
    "dob": "2004-10-17",
    "ht": "6-2",
@@ -46752,14 +46942,14 @@
    "war": 0.33,
    "waa": 0.15,
    "xv": 0.25,
-   "comp": 1.207,
+   "comp": 1.204,
    "prodZ": 1.65,
    "talentZ": 1.49,
    "castZ": null,
    "castAdj": null,
    "oeZ": 0.03,
    "prodOver": null,
-   "ageZ": -0.18,
+   "ageZ": -0.19,
    "classZ": -0.11,
    "wtProj": 225,
    "sizeZ": 0.06,
@@ -46825,12 +47015,12 @@
     "on3": "https://www.on3.com/rivals/mark-fletcher-83394/",
     "espn": "https://www.espn.com/college-football/player/_/id/4870736"
    },
-   "ovr": 242,
-   "rk": 224,
+   "ovr": 243,
+   "rk": 225,
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/mark-fletcher-83394/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4870736",
-   "draftP": 0.597,
+   "draftP": 0.6,
    "transferP": 0.033,
    "exitP": 0.737,
    "stayP": 0.23,
@@ -46850,11 +47040,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.06,
-    47,
+    0.04,
+    49,
     null,
-    "TEN",
-    0.06
+    "CLE",
+    0.04
    ],
    "_home": [
     26.14,
@@ -47022,8 +47212,8 @@
     "on3": "https://www.on3.com/rivals/trent-mosley-155110/",
     "espn": "https://www.espn.com/college-football/player/_/id/5160469"
    },
-   "ovr": 243,
-   "rk": 225,
+   "ovr": 244,
+   "rk": 226,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/trent-mosley-155110/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5160469",
@@ -47215,15 +47405,15 @@
     "on3": "https://www.on3.com/rivals/collin-dixon-147718/",
     "espn": "https://www.espn.com/college-football/player/_/id/4923226"
    },
-   "ovr": 244,
-   "rk": 226,
+   "ovr": 245,
+   "rk": 227,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/collin-dixon-147718/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4923226",
-   "draftP": 0.617,
+   "draftP": 0.616,
    "transferP": 0.102,
-   "exitP": 0.617,
-   "stayP": 0.281,
+   "exitP": 0.616,
+   "stayP": 0.282,
    "homeMi": 253,
    "inState": false,
    "hcP": 0.17,
@@ -47242,10 +47432,10 @@
    "_lvl": "P4",
    "mk": [
     0.02,
-    85,
+    64,
     null,
-    "ARI",
-    0.04
+    "IND",
+    0.05
    ],
    "_home": [
     41.11,
@@ -47411,8 +47601,8 @@
     "on3": "https://www.on3.com/rivals/jack-foley-240487/",
     "espn": "https://www.espn.com/college-football/player/_/id/5239156"
    },
-   "ovr": 245,
-   "rk": 227,
+   "ovr": 246,
+   "rk": 228,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jack-foley-240487/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5239156",
@@ -47541,7 +47731,7 @@
    "healthFV": null,
    "posRank": 30,
    "sav": 3.2,
-   "savQ": 1.51,
+   "savQ": 1.5,
    "war": 0.38,
    "waa": 0.18,
    "xv": 0.51,
@@ -47613,8 +47803,8 @@
     "on3": "https://www.on3.com/rivals/aycen-stevens-9007/",
     "espn": "https://www.espn.com/college-football/player/_/id/4920136"
    },
-   "ovr": 246,
-   "rk": 228,
+   "ovr": 247,
+   "rk": 229,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/aycen-stevens-9007/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4920136",
@@ -47686,9 +47876,9 @@
    "hsStars": null,
    "hsGrade": null,
    "transfer": null,
-   "xnil": 1232000,
+   "xnil": 1231000,
    "ynil": 771000,
-   "znil": 461000,
+   "znil": 460000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -47812,8 +48002,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5159077"
    },
-   "ovr": 247,
-   "rk": 229,
+   "ovr": 248,
+   "rk": 230,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5159077",
@@ -48008,8 +48198,8 @@
     "on3": "https://www.on3.com/rivals/luke-dehnicke-283281/",
     "espn": "https://www.espn.com/college-football/player/_/id/5328488"
    },
-   "ovr": 248,
-   "rk": 230,
+   "ovr": 249,
+   "rk": 231,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/luke-dehnicke-283281/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5328488",
@@ -48206,8 +48396,8 @@
     "on3": "https://www.on3.com/rivals/armondo-blount-7572/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141370"
    },
-   "ovr": 249,
-   "rk": 231,
+   "ovr": 250,
+   "rk": 232,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/armondo-blount-7572/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5141370",
@@ -48251,7 +48441,7 @@
    "cls": "Fr",
    "elig": 1,
    "rs": false,
-   "age": 18.33,
+   "age": 18.34,
    "ageEst": null,
    "dob": "2008-07-14",
    "ht": "6-4",
@@ -48335,14 +48525,14 @@
    "war": 0.08,
    "waa": -0.01,
    "xv": 0.07,
-   "comp": 1.354,
+   "comp": 1.352,
    "prodZ": 0.25,
    "talentZ": 0.76,
    "castZ": null,
    "castAdj": null,
    "oeZ": null,
    "prodOver": null,
-   "ageZ": 0.51,
+   "ageZ": 0.5,
    "classZ": 0.09,
    "wtProj": 253,
    "sizeZ": 0.05,
@@ -48399,8 +48589,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5209310"
    },
-   "ovr": 252,
-   "rk": 232,
+   "ovr": 253,
+   "rk": 233,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5209310",
@@ -48597,8 +48787,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5126998"
    },
-   "ovr": 253,
-   "rk": 233,
+   "ovr": 254,
+   "rk": 234,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5126998",
@@ -48789,15 +48979,15 @@
     "on3": "https://www.on3.com/rivals/mike-matthews-151466/",
     "espn": "https://www.espn.com/college-football/player/_/id/5079580"
    },
-   "ovr": 254,
-   "rk": 234,
+   "ovr": 255,
+   "rk": 235,
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/mike-matthews-151466/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079580",
-   "draftP": 0.528,
+   "draftP": 0.527,
    "transferP": 0.121,
-   "exitP": 0.528,
-   "stayP": 0.351,
+   "exitP": 0.527,
+   "stayP": 0.352,
    "homeMi": 144,
    "inState": false,
    "hcP": 0.14,
@@ -48815,9 +49005,9 @@
    "_ent": true,
    "mk": [
     0.02,
-    98,
+    77,
     null,
-    "NYG",
+    "SF",
     0.03
    ],
    "_home": [
@@ -48839,7 +49029,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 21.5,
+   "age": 21.51,
    "ageEst": null,
    "dob": "2005-05-13",
    "ht": "6-1",
@@ -48929,7 +49119,7 @@
    "war": 0.44,
    "waa": 0.16,
    "xv": 0.39,
-   "comp": 1.542,
+   "comp": 1.54,
    "prodZ": 1.68,
    "talentZ": 2.27,
    "castZ": null,
@@ -48938,7 +49128,7 @@
    "prodOver": null,
    "ageZ": -0.04,
    "classZ": -0.05,
-   "wtProj": 212,
+   "wtProj": 211,
    "sizeZ": 0.02,
    "sosZ": 0,
    "statZ": 0,
@@ -49000,12 +49190,12 @@
     "on3": "https://www.on3.com/rivals/john-nestor-151280/",
     "espn": "https://www.espn.com/college-football/player/_/id/4941011"
    },
-   "ovr": 255,
-   "rk": 235,
+   "ovr": 256,
+   "rk": 236,
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/john-nestor-151280/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4941011",
-   "draftP": 0.403,
+   "draftP": 0.408,
    "transferP": 0.147,
    "exitP": 0.524,
    "stayP": 0.329,
@@ -49026,8 +49216,8 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.02,
-    59,
+    0.04,
+    86,
     null,
     "PHI",
     0.03
@@ -49214,12 +49404,12 @@
     "on3": "https://www.on3.com/rivals/gunner-stockton-47246/",
     "espn": "https://www.espn.com/college-football/player/_/id/4685578"
    },
-   "ovr": 256,
-   "rk": 236,
+   "ovr": 257,
+   "rk": 237,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/gunner-stockton-47246/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4685578",
-   "draftP": 0.255,
+   "draftP": 0.254,
    "transferP": 0.014,
    "exitP": 0.976,
    "stayP": 0.011,
@@ -49239,10 +49429,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.01,
-    144,
+    0,
+    159,
     null,
-    "MIN",
+    "IND",
     0.03
    ],
    "_home": [
@@ -49418,8 +49608,8 @@
     "on3": "https://www.on3.com/rivals/jayden-savoury-235780/",
     "espn": "https://www.espn.com/college-football/player/_/id/5214448"
    },
-   "ovr": 257,
-   "rk": 237,
+   "ovr": 258,
+   "rk": 238,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jayden-savoury-235780/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5214448",
@@ -49547,7 +49737,7 @@
    "prodOver": null,
    "ageZ": 0.22,
    "classZ": 0.02,
-   "wtProj": 205,
+   "wtProj": 206,
    "sizeZ": -0.03,
    "sosZ": 0,
    "statZ": 0,
@@ -49605,8 +49795,8 @@
     "on3": "https://www.on3.com/rivals/dierre-hill-152391/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141499"
    },
-   "ovr": 258,
-   "rk": 238,
+   "ovr": 259,
+   "rk": 239,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/dierre-hill-152391/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5141499",
@@ -49800,8 +49990,8 @@
     "on3": "https://www.on3.com/rivals/sahir-west-176254/",
     "espn": "https://www.espn.com/college-football/player/_/id/5197086"
    },
-   "ovr": 259,
-   "rk": 239,
+   "ovr": 260,
+   "rk": 240,
    "delta": 2,
    "on3l": "https://www.on3.com/rivals/sahir-west-176254/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5197086",
@@ -49826,206 +50016,15 @@
    "_ent": true,
    "mk": [
     0.08,
-    39,
+    44,
     null,
-    "NE",
-    0.09
+    "MIN",
+    0.05
    ],
    "_home": [
     39.3,
     -76.61,
     "MD"
-   ]
-  },
-  {
-   "name": "Cooper Catalano",
-   "pos": "LB",
-   "spot": null,
-   "team": "Wisconsin",
-   "tid": "275",
-   "logo": "/img/cfb/logos/275.png",
-   "color": "#a00000",
-   "conf": "Big Ten",
-   "div": "FBS",
-   "cls": "So",
-   "elig": 2,
-   "rs": false,
-   "age": null,
-   "ageEst": 19.9,
-   "dob": null,
-   "ht": "6-1",
-   "wt": 232,
-   "mz": [
-    72.75,
-    233,
-    30.8,
-    "LB",
-    73,
-    232,
-    2025,
-    74,
-    200,
-    74,
-    205
-   ],
-   "pfn": 81.5,
-   "pfnLabel": "LB+",
-   "snaps": 550,
-   "gp": 9,
-   "on3": 89,
-   "on3Rank": null,
-   "on3PosRank": 51,
-   "hsStars": 3,
-   "hsGrade": 87.04,
-   "transfer": false,
-   "xnil": 1279000,
-   "ynil": 605000,
-   "znil": 674000,
-   "nilMkt": "p4",
-   "cons": null,
-   "consRk": null,
-   "consN": null,
-   "fvModel": null,
-   "consAdj": null,
-   "avg": 85.3,
-   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5167173.png",
-   "qbr": null,
-   "arch": "run defender",
-   "badges": [
-    [
-     "Run Stopper",
-     "s",
-     91,
-     "tackles a snap"
-    ]
-   ],
-   "rbRole": null,
-   "rbSd": null,
-   "rbPd": null,
-   "snapShare": 0.97,
-   "move": null,
-   "moveWhy": null,
-   "moveOdds": null,
-   "multi": null,
-   "up": null,
-   "moveUp": null,
-   "fv": 42,
-   "fvx": 42.06,
-   "fvg": 42.9,
-   "fvd": [
-    0.368,
-    0.139,
-    0.142,
-    0.072,
-    0.278,
-    20,
-    72.6
-   ],
-   "eav": 2.908,
-   "plus": false,
-   "star": null,
-   "riser": null,
-   "riserWhy": null,
-   "inj": null,
-   "healthFV": null,
-   "posRank": 21,
-   "sav": 1.5,
-   "savQ": 0.62,
-   "war": 0.27,
-   "waa": 0.05,
-   "xv": 0.15,
-   "comp": 1.333,
-   "prodZ": 1.24,
-   "talentZ": 1.26,
-   "castZ": null,
-   "castAdj": null,
-   "oeZ": null,
-   "prodOver": null,
-   "ageZ": 0.25,
-   "classZ": 0.03,
-   "wtProj": 238,
-   "sizeZ": 0.03,
-   "sosZ": 0,
-   "statZ": 0.06,
-   "hsZ": 0,
-   "parts": [
-    0.5,
-    0.47,
-    0.27,
-    0,
-    0.11,
-    0,
-    -0.02,
-    -0.01
-   ],
-   "fvBase": 43,
-   "frameFV": -0.1,
-   "htFV": 0,
-   "yearsFV": 0,
-   "fvs": [
-    [
-     "g",
-     43
-    ],
-    [
-     "fr",
-     -0.1
-    ],
-    [
-     "yr",
-     0
-    ]
-   ],
-   "retFV": null,
-   "breakYear": 2,
-   "priorOnly": false,
-   "report": {
-    "role": "rotation, 48+ games",
-    "plus": [
-     "On3 89 (#51 LB)",
-     "LB+ 81.5 (89th pct LB, 1-yr, regressed)",
-     "NFL-predictive badges: above avg (+0.06 comp)",
-     "Snap share 97%"
-    ],
-    "minus": [],
-    "type": "run defender"
-   },
-   "bmi": 30.6,
-   "draft27": false,
-   "note": null,
-   "why": [],
-   "links": {
-    "on3": "https://www.on3.com/rivals/cooper-catalano-157326/",
-    "espn": "https://www.espn.com/college-football/player/_/id/5167173"
-   },
-   "ovr": 260,
-   "rk": 240,
-   "delta": 0,
-   "on3l": "https://www.on3.com/rivals/cooper-catalano-157326/",
-   "espnl": "https://www.espn.com/college-football/player/_/id/5167173",
-   "transferP": 0.108,
-   "exitP": 0.018,
-   "stayP": 0.874,
-   "homeMi": 61,
-   "inState": true,
-   "hcP": 0.16,
-   "tWhy": [
-    "− producer at high-talent program",
-    "+ Power 4 program",
-    "+ ranked recruit",
-    "− full-time player"
-   ],
-   "_rz": -0.8,
-   "_prod": 0.3827292110874201,
-   "_st": 1,
-   "_grade": 76,
-   "_exp": 2,
-   "_ent": true,
-   "mk": null,
-   "_home": [
-    43.24,
-    -88.23,
-    "WI"
    ]
   },
   {
@@ -50118,7 +50117,7 @@
    "war": 0.13,
    "waa": -0.06,
    "xv": 0.16,
-   "comp": 1.188,
+   "comp": 1.187,
    "prodZ": 0.37,
    "talentZ": 0.76,
    "castZ": null,
@@ -50328,7 +50327,7 @@
    "war": 0.2,
    "waa": 0.03,
    "xv": 0.17,
-   "comp": 1.366,
+   "comp": 1.365,
    "prodZ": 2.14,
    "talentZ": 1.59,
    "castZ": 0.42,
@@ -50426,11 +50425,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.02,
-    67,
+    0.03,
+    59,
     null,
-    "CLE",
-    0.04
+    "CAR",
+    0.03
    ],
    "_home": [
     40.63,
@@ -50528,7 +50527,7 @@
    "war": 0.23,
    "waa": 0.06,
    "xv": 0.16,
-   "comp": 1.131,
+   "comp": 1.13,
    "prodZ": 1.5,
    "talentZ": 1.34,
    "castZ": null,
@@ -50549,7 +50548,7 @@
     0,
     0.02,
     -0.07,
-    0.04,
+    0.03,
     0.01
    ],
    "fvBase": 43,
@@ -50833,9 +50832,9 @@
    "_lvl": "G5",
    "mk": [
     0.01,
-    148,
+    178,
     null,
-    "NE",
+    "IND",
     0.02
    ],
    "_home": [
@@ -51045,7 +51044,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 21.18,
+   "age": 21.19,
    "ageEst": null,
    "dob": "2005-09-07",
    "ht": "6-5",
@@ -51129,7 +51128,7 @@
    "war": 0.12,
    "waa": 0,
    "xv": 0.1,
-   "comp": 1.241,
+   "comp": 1.239,
    "prodZ": 0.2,
    "talentZ": 1.72,
    "castZ": 1.99,
@@ -51341,7 +51340,7 @@
    "war": 0.28,
    "waa": 0.09,
    "xv": 0.31,
-   "comp": 1.456,
+   "comp": 1.457,
    "prodZ": 0.62,
    "talentZ": 1.66,
    "castZ": null,
@@ -52050,7 +52049,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 20.84,
+   "age": 20.85,
    "ageEst": null,
    "dob": "2006-01-09",
    "ht": "6-4",
@@ -52134,7 +52133,7 @@
    "war": 0.18,
    "waa": 0,
    "xv": 0.29,
-   "comp": 1.265,
+   "comp": 1.262,
    "prodZ": 1.53,
    "talentZ": 1.73,
    "castZ": null,
@@ -52142,7 +52141,7 @@
    "oeZ": null,
    "prodOver": null,
    "ageZ": 0.04,
-   "classZ": -0.02,
+   "classZ": -0.03,
    "wtProj": 293,
    "sizeZ": -0.03,
    "sosZ": 0,
@@ -52151,7 +52150,7 @@
    "parts": [
     0.69,
     0.56,
-    0.02,
+    0.01,
     0,
     -0.04,
     -0.09,
@@ -52209,10 +52208,10 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/mario-landino-177811/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5149301",
-   "draftP": 0.508,
+   "draftP": 0.509,
    "transferP": 0.151,
-   "exitP": 0.508,
-   "stayP": 0.341,
+   "exitP": 0.509,
+   "stayP": 0.34,
    "homeMi": 589,
    "inState": false,
    "hcP": 0.13,
@@ -52231,9 +52230,9 @@
    "_lvl": "P4",
    "mk": [
     0.01,
-    84,
+    72,
     null,
-    "NYG",
+    "IND",
     0.03
    ],
    "_home": [
@@ -52617,8 +52616,8 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.02,
-    96,
+    0.01,
+    111,
     null,
     "CLE",
     0.03
@@ -52823,10 +52822,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.06,
-    43,
+    0.09,
+    45,
     null,
-    "ARI",
+    "CLE",
     0.05
    ],
    "_home": [
@@ -53224,7 +53223,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/gideon-lampron-145957/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5328093",
-   "draftP": 0.239,
+   "draftP": 0.24,
    "transferP": 0.034,
    "exitP": 0.96,
    "stayP": 0.007,
@@ -53245,10 +53244,10 @@
    "_ent": false,
    "mk": [
     0.01,
-    122,
+    108,
     null,
-    "PIT",
-    0.02
+    "GB",
+    0.03
    ],
    "_home": [
     41.24,
@@ -53805,7 +53804,7 @@
      "On3 92 (#18 QB)",
      "Consensus #158 (avg 99, 1/10 boards); model FV 42, +1 FV",
      "QB+ 89.5 (97th pct QB, 2-yr blend)",
-     "ANY/A over exp +1.75/db, CPOE +1.9% (261 db)",
+     "ANY/A over exp +1.75/db, CPOE +2.0% (261 db)",
      "NFL-predictive badges: Bronze Accurate, Silver Deep Ball (+0.14 comp)",
      "HS 5-star (97)",
      "Snap share 99%",
@@ -53856,9 +53855,9 @@
    "_ent": false,
    "mk": [
     0.02,
-    105,
+    102,
     null,
-    "NO",
+    "DEN",
     0.04
    ],
    "_home": [
@@ -54060,11 +54059,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.04,
-    46,
+    0.06,
+    48,
     null,
     "CLE",
-    0.03
+    0.04
    ],
    "_home": [
     27.12,
@@ -54259,9 +54258,9 @@
    "_lvl": "P4",
    "mk": [
     0.01,
-    110,
+    145,
     null,
-    "LV",
+    "PHI",
     0.02
    ],
    "_home": [
@@ -54360,7 +54359,7 @@
    "war": 0.19,
    "waa": -0.01,
    "xv": 0.18,
-   "comp": 1.516,
+   "comp": 1.517,
    "prodZ": 1.21,
    "talentZ": 1.62,
    "castZ": null,
@@ -54629,12 +54628,12 @@
     "on3": "https://www.on3.com/rivals/addison-nichols-1471/",
     "espn": "https://www.espn.com/college-football/player/_/id/4685485"
    },
-   "ovr": 292,
+   "ovr": 293,
    "rk": 263,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/addison-nichols-1471/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4685485",
-   "draftP": 0.289,
+   "draftP": 0.288,
    "transferP": 0.046,
    "exitP": 0.886,
    "stayP": 0.069,
@@ -54654,10 +54653,10 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.01,
-    133,
+    0.02,
+    106,
     null,
-    "PIT",
+    "NYJ",
     0.03
    ],
    "_home": [
@@ -54679,7 +54678,7 @@
    "cls": "RS-Sr",
    "elig": 4,
    "rs": true,
-   "age": 22.76,
+   "age": 22.77,
    "ageEst": null,
    "dob": "2004-02-08",
    "ht": "6-1",
@@ -54756,7 +54755,7 @@
    "war": 0.23,
    "waa": 0.1,
    "xv": 0.31,
-   "comp": 1.361,
+   "comp": 1.359,
    "prodZ": 2.01,
    "talentZ": 1.98,
    "castZ": null,
@@ -54773,7 +54772,7 @@
    "parts": [
     0.79,
     0.81,
-    -0.32,
+    -0.33,
     0,
     0,
     0,
@@ -54850,10 +54849,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.11,
-    30,
+    0.14,
+    28,
     null,
-    "PIT",
+    "NYJ",
     0.06
    ],
    "_home": [
@@ -54952,7 +54951,7 @@
    "war": 0.06,
    "waa": -0.1,
    "xv": 0,
-   "comp": 0.999,
+   "comp": 1,
    "prodZ": 0.47,
    "talentZ": 1.45,
    "castZ": null,
@@ -55047,11 +55046,11 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.14,
-    29,
+    0.1,
+    34,
     null,
-    "PIT",
-    0.07
+    "GB",
+    0.05
    ],
    "_home": [
     33.74,
@@ -55345,7 +55344,7 @@
    "war": 0.44,
    "waa": 0.17,
    "xv": 0.34,
-   "comp": 1.505,
+   "comp": 1.506,
    "prodZ": 1.46,
    "talentZ": 1.56,
    "castZ": null,
@@ -56400,7 +56399,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/howard-sampson-150534/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4917335",
-   "draftP": 0.286,
+   "draftP": 0.284,
    "transferP": 0.023,
    "exitP": 0.907,
    "stayP": 0.07,
@@ -56420,10 +56419,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0,
-    126,
+    0.01,
+    108,
     null,
-    "MIA",
+    "KC",
     0.03
    ],
    "_home": [
@@ -56529,7 +56528,7 @@
    "war": 0.09,
    "waa": -0.03,
    "xv": 0.08,
-   "comp": 1.289,
+   "comp": 1.29,
    "prodZ": 0.19,
    "talentZ": 0.73,
    "castZ": null,
@@ -57000,11 +56999,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.04,
-    81,
+    0.02,
+    98,
     null,
     "MIA",
-    0.03
+    0.04
    ],
    "_home": [
     37.773254972875236,
@@ -57111,7 +57110,7 @@
    "healthFV": null,
    "posRank": 20,
    "sav": 5,
-   "savQ": 2.29,
+   "savQ": 2.3,
    "war": 0.59,
    "waa": 0.33,
    "xv": 0.52,
@@ -57804,10 +57803,10 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.05,
-    58,
+    0.04,
+    55,
     null,
-    "NYJ",
+    "DET",
     0.04
    ],
    "_home": [
@@ -57913,7 +57912,7 @@
    "war": 0.34,
    "waa": 0.14,
    "xv": 0.33,
-   "comp": 1.237,
+   "comp": 1.238,
    "prodZ": 1.28,
    "talentZ": 0.69,
    "castZ": null,
@@ -58598,11 +58597,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.05,
-    47,
+    0.07,
+    40,
     null,
-    "TB",
-    0.03
+    "NYJ",
+    0.05
    ],
    "_home": [
     33.96,
@@ -58700,26 +58699,26 @@
    "war": 0.34,
    "waa": 0.14,
    "xv": 0.37,
-   "comp": 1.07,
+   "comp": 1.068,
    "prodZ": 1.63,
    "talentZ": 0.48,
    "castZ": null,
    "castAdj": null,
-   "oeZ": 0,
+   "oeZ": 0.01,
    "prodOver": null,
    "ageZ": -0.06,
    "classZ": -0.06,
    "wtProj": 224,
    "sizeZ": 0.25,
    "sosZ": 0,
-   "statZ": 0.09,
+   "statZ": 0.08,
    "hsZ": 0.27,
    "parts": [
     0.19,
     0.67,
     -0.12,
     0,
-    0.09,
+    0.08,
     0.27,
     -0.03,
     0.01
@@ -58967,7 +58966,7 @@
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/isaiah-jones-145664/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4819232",
-   "draftP": 0.591,
+   "draftP": 0.592,
    "transferP": 0.025,
    "exitP": 0.903,
    "stayP": 0.072,
@@ -58987,11 +58986,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.05,
-    62,
+    0.01,
+    73,
     null,
-    "CLE",
-    0.03
+    "IND",
+    0.06
    ],
    "_home": [
     39.89,
@@ -59492,7 +59491,7 @@
    "war": 1.34,
    "waa": 0.73,
    "xv": 1.17,
-   "comp": 1.241,
+   "comp": 1.242,
    "prodZ": 1.59,
    "talentZ": 0.76,
    "castZ": -0.77,
@@ -59707,7 +59706,7 @@
    "war": 0.15,
    "waa": 0.03,
    "xv": 0.2,
-   "comp": 1.305,
+   "comp": 1.306,
    "prodZ": 1.55,
    "talentZ": 0.75,
    "castZ": null,
@@ -59782,12 +59781,12 @@
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5269153",
-   "transferP": 0.255,
+   "transferP": 0.254,
    "exitP": 0.05,
-   "stayP": 0.696,
+   "stayP": 0.697,
    "homeMi": 200,
    "inState": true,
-   "hcP": 0.25,
+   "hcP": 0.24,
    "tWhy": [
     "+ G5 producer (P4 demand)",
     "+ Group of 5 program",
@@ -59898,7 +59897,7 @@
    "war": 0.17,
    "waa": 0.05,
    "xv": 0.19,
-   "comp": 1.007,
+   "comp": 1.008,
    "prodZ": 0.43,
    "talentZ": 0.98,
    "castZ": 1.98,
@@ -60182,11 +60181,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.02,
-    92,
+    0.03,
+    77,
     null,
-    "PIT",
-    0.06
+    "KC",
+    0.03
    ],
    "_home": [
     40.27408045977015,
@@ -60284,7 +60283,7 @@
    "war": 0.29,
    "waa": 0.08,
    "xv": 0.28,
-   "comp": 1.205,
+   "comp": 1.204,
    "prodZ": 0.95,
    "talentZ": 0.75,
    "castZ": null,
@@ -60391,7 +60390,7 @@
    "cls": "Jr",
    "elig": 3,
    "rs": false,
-   "age": 20.78,
+   "age": 20.79,
    "ageEst": null,
    "dob": "2006-01-31",
    "ht": "6-4",
@@ -60481,7 +60480,7 @@
    "war": 0.11,
    "waa": -0.07,
    "xv": 0.02,
-   "comp": 0.605,
+   "comp": 0.603,
    "prodZ": -0.58,
    "talentZ": 0.77,
    "castZ": null,
@@ -60555,10 +60554,10 @@
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5079678",
-   "draftP": 0.878,
+   "draftP": 0.879,
    "transferP": 0.054,
-   "exitP": 0.878,
-   "stayP": 0.068,
+   "exitP": 0.879,
+   "stayP": 0.067,
    "homeMi": 1177,
    "inState": false,
    "hcP": 0.13,
@@ -60575,10 +60574,10 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.16,
-    27,
+    0.18,
+    21,
     null,
-    "NYJ",
+    "CAR",
     0.06
    ],
    "_home": [
@@ -60600,7 +60599,7 @@
    "cls": "Sr",
    "elig": 4,
    "rs": false,
-   "age": 21.35,
+   "age": 21.36,
    "ageEst": null,
    "dob": "2005-07-07",
    "ht": "6-1",
@@ -60702,7 +60701,7 @@
    "war": 0.34,
    "waa": 0.16,
    "xv": 0.35,
-   "comp": 1.246,
+   "comp": 1.244,
    "prodZ": 0.8,
    "talentZ": 1.97,
    "castZ": null,
@@ -60779,7 +60778,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/raylen-wilson-98945/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4871074",
-   "draftP": 0.138,
+   "draftP": 0.14,
    "transferP": 0.034,
    "exitP": 0.771,
    "stayP": 0.195,
@@ -60802,8 +60801,8 @@
     0,
     null,
     null,
-    "SEA",
-    0.01
+    "GB",
+    0.02
    ],
    "_home": [
     30.45,
@@ -61210,10 +61209,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    140,
+    0,
+    146,
     null,
-    "DEN",
+    "NO",
     0.02
    ],
    "_home": [
@@ -61905,7 +61904,7 @@
    "war": 0.23,
    "waa": 0.06,
    "xv": 0.28,
-   "comp": 1.173,
+   "comp": 1.174,
    "prodZ": 1.83,
    "talentZ": 1.48,
    "castZ": null,
@@ -61973,7 +61972,7 @@
     "on3": "https://www.on3.com/rivals/evan-tengesdahl-146007/",
     "espn": "https://www.espn.com/college-football/player/_/id/4910957"
    },
-   "ovr": 347,
+   "ovr": 346,
    "rk": 300,
    "delta": 1,
    "on3l": "https://www.on3.com/rivals/evan-tengesdahl-146007/",
@@ -61998,11 +61997,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.06,
-    50,
+    0.07,
+    39,
     null,
-    "GB",
-    0.04
+    "IND",
+    0.07
    ],
    "_home": [
     39.78,
@@ -62178,7 +62177,7 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5141651"
    },
-   "ovr": 349,
+   "ovr": 348,
    "rk": 301,
    "delta": 0,
    "on3l": null,
@@ -62381,7 +62380,7 @@
     "on3": "https://www.on3.com/rivals/taimane-purcell-242140/",
     "espn": "https://www.espn.com/college-football/player/_/id/5217177"
    },
-   "ovr": 350,
+   "ovr": 349,
    "rk": 302,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/taimane-purcell-242140/",
@@ -62579,7 +62578,7 @@
     "on3": "https://www.on3.com/rivals/benjamin-brahmer-10118/",
     "espn": "https://www.espn.com/college-football/player/_/id/4870608"
    },
-   "ovr": 352,
+   "ovr": 351,
    "rk": 303,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/benjamin-brahmer-10118/",
@@ -62605,9 +62604,9 @@
    "_ent": false,
    "mk": [
     0.01,
-    122,
+    184,
     null,
-    "CLE",
+    "DET",
     0.02
    ],
    "_home": [
@@ -62783,7 +62782,7 @@
     "on3": "https://www.on3.com/rivals/jayden-woods-162306/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141766"
    },
-   "ovr": 354,
+   "ovr": 353,
    "rk": 304,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jayden-woods-162306/",
@@ -62911,7 +62910,7 @@
    "war": 0.14,
    "waa": 0.02,
    "xv": 0.11,
-   "comp": 1.182,
+   "comp": 1.183,
    "prodZ": 0.51,
    "talentZ": 0.63,
    "castZ": null,
@@ -62978,7 +62977,7 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5245124"
    },
-   "ovr": 355,
+   "ovr": 354,
    "rk": 305,
    "delta": 0,
    "on3l": null,
@@ -63170,7 +63169,7 @@
     "on3": "https://www.on3.com/rivals/sullivan-schlimgen-243305/",
     "espn": "https://www.espn.com/college-football/player/_/id/5264502"
    },
-   "ovr": 358,
+   "ovr": 357,
    "rk": 306,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/sullivan-schlimgen-243305/",
@@ -63357,7 +63356,7 @@
     "on3": "https://www.on3.com/rivals/micah-gilbert-147720/",
     "espn": "https://www.espn.com/college-football/player/_/id/5079475"
    },
-   "ovr": 359,
+   "ovr": 358,
    "rk": 307,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/micah-gilbert-147720/",
@@ -63542,7 +63541,7 @@
     "on3": "https://www.on3.com/rivals/dezmen-roebuck-158504/",
     "espn": "https://www.espn.com/college-football/player/_/id/5166797"
    },
-   "ovr": 360,
+   "ovr": 359,
    "rk": 308,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/dezmen-roebuck-158504/",
@@ -63879,7 +63878,7 @@
    "war": 0.39,
    "waa": 0.14,
    "xv": 0.28,
-   "comp": 1.446,
+   "comp": 1.447,
    "prodZ": 1.67,
    "talentZ": 2.04,
    "castZ": null,
@@ -64155,13 +64154,13 @@
     "avg"
    ],
    "links": {
-    "on3": "https://www.on3.com/rivals/earnest-greene-40326/",
+    "on3": "https://www.on3.com/rivals/earnest-greene-iii-40326/",
     "espn": "https://www.espn.com/college-football/player/_/id/4685360"
    },
    "ovr": 366,
    "rk": 311,
    "delta": 0,
-   "on3l": "https://www.on3.com/rivals/earnest-greene-40326/",
+   "on3l": "https://www.on3.com/rivals/earnest-greene-iii-40326/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4685360",
    "draftP": 0.777,
    "transferP": 0.02,
@@ -64183,10 +64182,10 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.03,
-    53,
+    0.09,
+    35,
     null,
-    "CIN",
+    "IND",
     0.04
    ],
    "_home": [
@@ -64298,7 +64297,7 @@
    "war": 0.49,
    "waa": 0.26,
    "xv": 0.56,
-   "comp": 1.449,
+   "comp": 1.45,
    "prodZ": 2.59,
    "talentZ": 1.81,
    "castZ": null,
@@ -64391,10 +64390,10 @@
    "_ent": false,
    "mk": [
     0,
+    207,
     null,
-    null,
-    "CIN",
-    0.01
+    "LAR",
+    0.02
    ],
    "_home": [
     26.69,
@@ -64603,11 +64602,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.01,
-    222,
+    0,
     null,
-    "SF",
-    0.01
+    null,
+    "CIN",
+    0.02
    ],
    "_home": [
     27.97,
@@ -64775,7 +64774,7 @@
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/cam-cook-147286/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4918103",
-   "draftP": 0.12,
+   "draftP": 0.121,
    "transferP": 0.129,
    "exitP": 0.552,
    "stayP": 0.319,
@@ -64797,10 +64796,10 @@
    "_lvl": "P4",
    "mk": [
     0,
-    185,
+    199,
     null,
-    "BUF",
-    0.02
+    "PHI",
+    0.01
    ],
    "_home": [
     30.53,
@@ -64910,14 +64909,14 @@
    "wtProj": 168,
    "sizeZ": 0.01,
    "sosZ": 0,
-   "statZ": -0.02,
+   "statZ": -0.01,
    "hsZ": 0.3,
    "parts": [
     0.28,
     0.07,
     0.5,
     0,
-    -0.02,
+    -0.01,
     0.3,
     0.06,
     -0.06
@@ -65554,11 +65553,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.06,
-    43,
+    0.05,
+    98,
     null,
-    "LV",
-    0.03
+    "MIA",
+    0.02
    ],
    "_home": [
     35.80916167664669,
@@ -65727,7 +65726,7 @@
     "on3": "https://www.on3.com/rivals/griffin-wilde-247608/",
     "espn": "https://www.espn.com/college-football/player/_/id/5154734"
    },
-   "ovr": 380,
+   "ovr": 379,
    "rk": 319,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/griffin-wilde-247608/",
@@ -65752,11 +65751,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.01,
-    124,
+    0,
+    161,
     null,
     "IND",
-    0.03
+    0.02
    ],
    "_home": [
     43.54,
@@ -65925,7 +65924,7 @@
     "on3": "https://www.on3.com/rivals/kenyatta-jackson-jr-144735/",
     "espn": "https://www.espn.com/college-football/player/_/id/5081821"
    },
-   "ovr": 382,
+   "ovr": 381,
    "rk": 320,
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/kenyatta-jackson-jr-144735/",
@@ -65950,11 +65949,11 @@
    "_exp": 4,
    "_ent": true,
    "mk": [
-    0.08,
-    39,
+    0.12,
+    30,
     null,
-    "CLE",
-    0.05
+    "NE",
+    0.06
    ],
    "_home": [
     25.95,
@@ -66123,12 +66122,12 @@
     "on3": "https://www.on3.com/rivals/justice-haynes-68957/",
     "espn": "https://www.espn.com/college-football/player/_/id/4870760"
    },
-   "ovr": 383,
+   "ovr": 382,
    "rk": 321,
    "delta": -1,
    "on3l": "https://www.on3.com/rivals/justice-haynes-68957/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4870760",
-   "draftP": 0.345,
+   "draftP": 0.346,
    "transferP": 0.098,
    "exitP": 0.622,
    "stayP": 0.28,
@@ -66150,10 +66149,10 @@
    "_lvl": "P4",
    "mk": [
     0.01,
-    138,
+    130,
     null,
-    "CLE",
-    0.03
+    "MIN",
+    0.02
    ],
    "_home": [
     34.07,
@@ -66353,11 +66352,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.02,
-    91,
+    0.01,
+    98,
     null,
-    "NE",
-    0.02
+    "PIT",
+    0.03
    ],
    "_home": [
     33.14,
@@ -66557,11 +66556,11 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.18,
-    22,
+    0.21,
+    17,
     null,
-    "CLE",
-    0.07
+    "NE",
+    0.06
    ],
    "_home": [
     37.73,
@@ -67510,10 +67509,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.04,
-    56,
+    0.07,
+    43,
     null,
-    "DET",
+    "DEN",
     0.05
    ],
    "_home": [
@@ -67599,7 +67598,7 @@
    "rbRole": null,
    "rbSd": null,
    "rbPd": null,
-   "snapShare": 0.72,
+   "snapShare": 0.65,
    "move": null,
    "moveWhy": null,
    "moveOdds": null,
@@ -67626,17 +67625,17 @@
    "inj": null,
    "healthFV": null,
    "posRank": 31,
-   "sav": 1.5,
+   "sav": 1.3,
    "savQ": 2.08,
-   "war": 0.26,
-   "waa": 0.13,
-   "xv": 0.26,
-   "comp": 1.207,
+   "war": 0.24,
+   "waa": 0.12,
+   "xv": 0.23,
+   "comp": 1.181,
    "prodZ": 1.87,
    "talentZ": 1.48,
    "castZ": 0.1,
    "castAdj": null,
-   "oeZ": -0.02,
+   "oeZ": -0.03,
    "prodOver": 0.49,
    "ageZ": -0.35,
    "classZ": -0.15,
@@ -67650,9 +67649,9 @@
     0.81,
     -0.5,
     0,
-    0.33,
+    0.32,
     -0.04,
-    0.01,
+    0,
     0
    ],
    "fvBase": 43,
@@ -67684,6 +67683,7 @@
      "NFL-predictive badges: Silver Pass Catcher (+0.30 comp)"
     ],
     "minus": [
+     "Context adj -0.03 comp (raw above over-expected)",
      "Age ~22.9 (old for output)"
     ],
     "type": "dual-threat TE"
@@ -67725,9 +67725,9 @@
    "_lvl": "G5",
    "mk": [
     0.01,
-    114,
+    135,
     null,
-    "GB",
+    "CLE",
     0.03
    ],
    "_home": [
@@ -68304,10 +68304,10 @@
    "_ent": false,
    "mk": [
     0.01,
-    190,
+    208,
     null,
-    "JAX",
-    0.02
+    "DEN",
+    0.03
    ],
    "_home": [
     39.03,
@@ -68517,10 +68517,10 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.26,
-    17,
+    0.28,
+    16,
     null,
-    "LV",
+    "ATL",
     0.06
    ],
    "_home": [
@@ -68619,7 +68619,7 @@
    "war": 0.09,
    "waa": 0,
    "xv": 0.13,
-   "comp": 1.095,
+   "comp": 1.096,
    "prodZ": 0.57,
    "talentZ": 0.52,
    "castZ": null,
@@ -68911,9 +68911,9 @@
    "_ent": true,
    "mk": [
     0,
-    189,
+    191,
     null,
-    "CHI",
+    "NE",
     0.02
    ],
    "_home": [
@@ -69212,7 +69212,7 @@
    "war": 0.26,
    "waa": 0.09,
    "xv": 0.21,
-   "comp": 0.932,
+   "comp": 0.933,
    "prodZ": 0.74,
    "talentZ": 1.21,
    "castZ": null,
@@ -69409,7 +69409,7 @@
    "war": 0.21,
    "waa": 0.06,
    "xv": 0.19,
-   "comp": 1.212,
+   "comp": 1.213,
    "prodZ": 1.88,
    "talentZ": 1.78,
    "castZ": null,
@@ -69504,11 +69504,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.02,
-    99,
+    0.01,
+    101,
     null,
-    "IND",
-    0.03
+    "BUF",
+    0.02
    ],
    "_home": [
     27.97,
@@ -69715,10 +69715,10 @@
    "_exp": 3,
    "_ent": false,
    "mk": [
-    0.04,
-    56,
+    0.03,
+    60,
     null,
-    "NO",
+    "DET",
     0.04
    ],
    "_home": [
@@ -70099,11 +70099,11 @@
    "_exp": 3,
    "_ent": true,
    "mk": [
-    0.06,
-    50,
+    0.08,
+    40,
     null,
-    "CLE",
-    0.04
+    "DEN",
+    0.06
    ],
    "_home": [
     39.43,
@@ -70208,7 +70208,7 @@
    "war": 0.33,
    "waa": 0.13,
    "xv": 0.35,
-   "comp": 1.325,
+   "comp": 1.326,
    "prodZ": 0.65,
    "talentZ": 0.76,
    "castZ": null,
@@ -70490,11 +70490,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0,
-    132,
+    0.02,
+    124,
     null,
-    "DEN",
-    0.02
+    "TEN",
+    0.03
    ],
    "_home": [
     32.63,
@@ -70705,10 +70705,10 @@
    "_lvl": "G5",
    "mk": [
     0.01,
-    194,
     null,
-    "IND",
-    0.02
+    null,
+    "GB",
+    0.01
    ],
    "_home": [
     37.08,
@@ -71066,7 +71066,7 @@
     "on3": "https://www.on3.com/rivals/chris-durr-178340/",
     "espn": "https://www.espn.com/college-football/player/_/id/5193298"
    },
-   "ovr": 428,
+   "ovr": 427,
    "rk": 346,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/chris-durr-178340/",
@@ -71111,7 +71111,7 @@
    "cls": "RS-Sr",
    "elig": 4,
    "rs": true,
-   "age": 23.14,
+   "age": 23.15,
    "ageEst": null,
    "dob": "2003-09-22",
    "ht": "6-1",
@@ -71201,7 +71201,7 @@
    "war": 0.53,
    "waa": 0.28,
    "xv": 0.47,
-   "comp": 1.254,
+   "comp": 1.252,
    "prodZ": 2.13,
    "talentZ": 1.64,
    "castZ": null,
@@ -71296,11 +71296,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.07,
-    44,
+    0.08,
+    45,
     null,
-    "GB",
-    0.07
+    "PIT",
+    0.05
    ],
    "_home": [
     25.78,
@@ -71417,7 +71417,7 @@
    "war": 0.27,
    "waa": 0.09,
    "xv": 0.25,
-   "comp": 1.188,
+   "comp": 1.189,
    "prodZ": 2.15,
    "talentZ": 2.08,
    "castZ": null,
@@ -71516,10 +71516,10 @@
    "_ent": false,
    "mk": [
     0.02,
-    74,
+    111,
     null,
-    "NE",
-    0.04
+    "CLE",
+    0.03
    ],
    "_home": [
     39.17,
@@ -72570,7 +72570,7 @@
    "war": 0.25,
    "waa": 0,
    "xv": 0.25,
-   "comp": 0.909,
+   "comp": 0.91,
    "prodZ": 0.98,
    "talentZ": 1.49,
    "castZ": null,
@@ -72664,11 +72664,11 @@
    "_exp": 4,
    "_ent": false,
    "mk": [
-    0.11,
-    31,
+    0.1,
+    33,
     null,
-    "TB",
-    0.05
+    "NYJ",
+    0.06
    ],
    "_home": [
     33.58,
@@ -73218,7 +73218,7 @@
    "report": {
     "role": "backup, 16+ games",
     "plus": [
-     "ANY/A over exp +0.30/target (22 tgt)",
+     "ANY/A over exp +0.31/target (22 tgt)",
      "NFL-predictive badges: above avg (+0.12 comp)"
     ],
     "minus": [
@@ -73456,11 +73456,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    112,
+    0,
+    111,
     null,
-    "LV",
-    0.02
+    "WSH",
+    0.03
    ],
    "_home": [
     38.67,
@@ -73526,7 +73526,7 @@
    "rbRole": null,
    "rbSd": null,
    "rbPd": null,
-   "snapShare": 0.87,
+   "snapShare": 0.75,
    "move": null,
    "moveWhy": null,
    "moveOdds": null,
@@ -73553,12 +73553,12 @@
    "inj": null,
    "healthFV": null,
    "posRank": 32,
-   "sav": 0.7,
+   "sav": 0.6,
    "savQ": -0.14,
-   "war": 0.18,
+   "war": 0.16,
    "waa": -0.01,
-   "xv": 0.29,
-   "comp": 1.16,
+   "xv": 0.25,
+   "comp": 1.145,
    "prodZ": 0.73,
    "talentZ": 1.04,
    "castZ": null,
@@ -73577,7 +73577,7 @@
     0.28,
     0.21,
     0,
-    0.23,
+    0.22,
     0,
     0.03,
     -0.21
@@ -73608,7 +73608,7 @@
     "plus": [
      "On3 89 (#72 LB)",
      "NFL-predictive coverage (rating allowed) +2.07 SD (+0.17 comp)",
-     "Snap share 87%"
+     "Snap share 75% (yr 2)"
     ],
     "minus": [
      "NFL frame 6-4, 199 lb, BMI 24.2 (-2.1 FV)"
@@ -73739,12 +73739,12 @@
    "inj": null,
    "healthFV": null,
    "posRank": 40,
-   "sav": 0.6,
-   "savQ": -0.31,
+   "sav": 0.7,
+   "savQ": -0.3,
    "war": 0.16,
    "waa": -0.03,
    "xv": 0.11,
-   "comp": 0.904,
+   "comp": 0.905,
    "prodZ": 0.81,
    "talentZ": 1.91,
    "castZ": null,
@@ -73838,10 +73838,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.01,
-    93,
+    0.02,
+    75,
     null,
-    "TEN",
+    "CLE",
     0.03
    ],
    "_home": [
@@ -74037,10 +74037,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.02,
-    84,
+    0.03,
+    79,
     null,
-    "TEN",
+    "MIA",
     0.03
    ],
    "_home": [
@@ -74146,7 +74146,7 @@
    "war": 0.13,
    "waa": -0.02,
    "xv": 0.02,
-   "comp": 1.004,
+   "comp": 1.005,
    "prodZ": 0.11,
    "talentZ": 1.69,
    "castZ": null,
@@ -74241,10 +74241,10 @@
    "_lvl": "P4",
    "mk": [
     0.03,
-    84,
+    80,
     null,
-    "LV",
-    0.03
+    "IND",
+    0.04
    ],
    "_home": [
     39.987631307929945,
@@ -74355,7 +74355,7 @@
    "war": 0.83,
    "waa": 0.21,
    "xv": 0.75,
-   "comp": 1.037,
+   "comp": 1.036,
    "prodZ": 0.63,
    "talentZ": 1.39,
    "castZ": 1.28,
@@ -74653,9 +74653,9 @@
    "_lvl": "G5",
    "mk": [
     0,
-    188,
+    213,
     null,
-    "GB",
+    "TEN",
     0.02
    ],
    "_home": [
@@ -74944,7 +74944,7 @@
    "war": 0.21,
    "waa": 0,
    "xv": 0.14,
-   "comp": 0.769,
+   "comp": 0.768,
    "prodZ": 0.85,
    "talentZ": 1.12,
    "castZ": null,
@@ -75230,202 +75230,6 @@
    ]
   },
   {
-   "name": "T.J. Moore",
-   "pos": "WR",
-   "spot": null,
-   "team": "Clemson",
-   "tid": "228",
-   "logo": "/img/cfb/logos/228.png",
-   "color": "#f56600",
-   "conf": "ACC",
-   "div": "FBS",
-   "cls": "Jr",
-   "elig": 3,
-   "rs": false,
-   "age": 20.58,
-   "ageEst": null,
-   "dob": "2006-04-14",
-   "ht": "6-3",
-   "wt": 200,
-   "mz": [
-    74.5,
-    200,
-    25.4,
-    "WR",
-    75,
-    200,
-    2024,
-    75,
-    195,
-    null,
-    null
-   ],
-   "pfn": 73.7,
-   "pfnLabel": "WR+",
-   "snaps": null,
-   "gp": 9,
-   "on3": null,
-   "on3Rank": null,
-   "on3PosRank": null,
-   "hsStars": null,
-   "hsGrade": null,
-   "transfer": null,
-   "xnil": 1424000,
-   "ynil": 929000,
-   "znil": 495000,
-   "nilMkt": "p4",
-   "cons": 123.2,
-   "consRk": 280,
-   "consN": 2,
-   "fvModel": 38,
-   "consAdj": 2.1,
-   "avg": null,
-   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5218753.png",
-   "qbr": null,
-   "arch": null,
-   "badges": null,
-   "rbRole": null,
-   "rbSd": null,
-   "rbPd": null,
-   "snapShare": 0.64,
-   "move": null,
-   "moveWhy": null,
-   "moveOdds": null,
-   "multi": null,
-   "up": null,
-   "moveUp": null,
-   "fv": 35,
-   "fvx": 34.68,
-   "fvg": 39.87,
-   "fvd": [
-    0.471,
-    0.183,
-    0.156,
-    0.064,
-    0.126,
-    20,
-    62.2
-   ],
-   "eav": 1.718,
-   "plus": false,
-   "star": null,
-   "riser": null,
-   "riserWhy": null,
-   "inj": null,
-   "healthFV": null,
-   "posRank": 53,
-   "sav": 0.7,
-   "savQ": -0.16,
-   "war": 0.14,
-   "waa": -0.05,
-   "xv": 0.1,
-   "comp": 0.929,
-   "prodZ": 0.5,
-   "talentZ": 0.73,
-   "castZ": null,
-   "castAdj": null,
-   "oeZ": 0.04,
-   "prodOver": null,
-   "ageZ": 0.09,
-   "classZ": -0.01,
-   "wtProj": 201,
-   "sizeZ": 0.18,
-   "sosZ": 0,
-   "statZ": -0.03,
-   "hsZ": 0.3,
-   "parts": [
-    0.29,
-    0.21,
-    0.08,
-    0,
-    -0.03,
-    0.3,
-    0.07,
-    0
-   ],
-   "fvBase": 38,
-   "frameFV": 0,
-   "htFV": 0,
-   "yearsFV": -0.25,
-   "fvs": [
-    [
-     "g",
-     38
-    ],
-    [
-     "fr",
-     0
-    ],
-    [
-     "yr",
-     -0.25
-    ],
-    [
-     "cs",
-     2.12
-    ]
-   ],
-   "retFV": null,
-   "breakYear": null,
-   "priorOnly": false,
-   "report": {
-    "role": "backup, 16+ games",
-    "plus": [
-     "Consensus #280 (median board 110, 2/10 boards); model FV 38, +2 FV",
-     "Context adj +0.04 comp (raw below over-expected)"
-    ],
-    "minus": [
-     "On3: outside top 75 WR"
-    ],
-    "type": null
-   },
-   "bmi": 25,
-   "draft27": true,
-   "note": null,
-   "why": [],
-   "links": {
-    "on3": null,
-    "espn": "https://www.espn.com/college-football/player/_/id/5218753"
-   },
-   "ovr": 466,
-   "rk": 368,
-   "delta": 0,
-   "on3l": null,
-   "espnl": "https://www.espn.com/college-football/player/_/id/5218753",
-   "draftP": 0.41,
-   "transferP": 0.133,
-   "exitP": 0.41,
-   "stayP": 0.457,
-   "homeMi": 701,
-   "inState": false,
-   "hcP": 0.22,
-   "tWhy": [
-    "+ Power 4 program",
-    "+ third-year player",
-    "− full-time player",
-    "− producer at high-talent program"
-   ],
-   "_rz": -1,
-   "_prod": -0.04825462012320331,
-   "_st": 1,
-   "_grade": null,
-   "_exp": 3,
-   "_ent": false,
-   "_lvl": "P4",
-   "mk": [
-    0.02,
-    124,
-    null,
-    "DEN",
-    0.04
-   ],
-   "_home": [
-    24.57,
-    -81.78,
-    "FL"
-   ]
-  },
-  {
    "name": "Rabbit Evans",
    "pos": "S",
    "spot": null,
@@ -75596,8 +75400,8 @@
     "on3": "https://www.on3.com/rivals/rabbit-evans-238243/",
     "espn": "https://www.espn.com/college-football/player/_/id/5219993"
    },
-   "ovr": 467,
-   "rk": 369,
+   "ovr": 466,
+   "rk": 368,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/rabbit-evans-238243/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5219993",
@@ -75622,9 +75426,9 @@
    "_ent": false,
    "mk": [
     0,
-    116,
+    108,
     null,
-    "TEN",
+    "MIN",
     0.03
    ],
    "_home": [
@@ -75793,8 +75597,8 @@
     "on3": "https://www.on3.com/rivals/tamarcus-cooley-149766/",
     "espn": "https://www.espn.com/college-football/player/_/id/5078914"
    },
-   "ovr": 468,
-   "rk": 370,
+   "ovr": 467,
+   "rk": 369,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/tamarcus-cooley-149766/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5078914",
@@ -75979,8 +75783,8 @@
     "on3": "https://www.on3.com/rivals/jerome-carter-153707/",
     "espn": "https://www.espn.com/college-football/player/_/id/5194806"
    },
-   "ovr": 469,
-   "rk": 371,
+   "ovr": 468,
+   "rk": 370,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jerome-carter-153707/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5194806",
@@ -76166,8 +75970,8 @@
     "on3": "https://www.on3.com/rivals/cameron-dickey-179900/",
     "espn": "https://www.espn.com/college-football/player/_/id/5193580"
    },
-   "ovr": 471,
-   "rk": 372,
+   "ovr": 470,
+   "rk": 371,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/cameron-dickey-179900/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5193580",
@@ -76370,8 +76174,8 @@
     "on3": "https://www.on3.com/rivals/jacarrius-peak-147253/",
     "espn": "https://www.espn.com/college-football/player/_/id/4911915"
    },
-   "ovr": 473,
-   "rk": 373,
+   "ovr": 472,
+   "rk": 372,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jacarrius-peak-147253/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4911915",
@@ -76395,11 +76199,11 @@
    "_exp": 5,
    "_ent": true,
    "mk": [
-    0.06,
-    49,
+    0.03,
+    65,
     null,
-    "KC",
-    0.03
+    "LV",
+    0.04
    ],
    "_home": [
     30.85,
@@ -76510,7 +76314,7 @@
    "war": 0.17,
    "waa": -0.03,
    "xv": 0.12,
-   "comp": 1.22,
+   "comp": 1.221,
    "prodZ": 0.92,
    "talentZ": 1.83,
    "castZ": null,
@@ -76574,8 +76378,8 @@
     "on3": "https://www.on3.com/rivals/nathan-roy-157368/",
     "espn": "https://www.espn.com/college-football/player/_/id/5110450"
    },
-   "ovr": 475,
-   "rk": 374,
+   "ovr": 474,
+   "rk": 373,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/nathan-roy-157368/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5110450",
@@ -76776,8 +76580,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5295532"
    },
-   "ovr": 476,
-   "rk": 375,
+   "ovr": 475,
+   "rk": 374,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5295532",
@@ -76963,8 +76767,8 @@
     "on3": "https://www.on3.com/rivals/jason-patterson-152398/",
     "espn": "https://www.espn.com/college-football/player/_/id/5123048"
    },
-   "ovr": 477,
-   "rk": 376,
+   "ovr": 476,
+   "rk": 375,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jason-patterson-152398/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5123048",
@@ -77092,7 +76896,7 @@
    "war": 0.11,
    "waa": -0.01,
    "xv": 0.09,
-   "comp": 0.82,
+   "comp": 0.821,
    "prodZ": 0.8,
    "talentZ": 0.89,
    "castZ": 0.67,
@@ -77156,8 +76960,8 @@
     "on3": "https://www.on3.com/rivals/decker-degraaf-154502/",
     "espn": "https://www.espn.com/college-football/player/_/id/5079373"
    },
-   "ovr": 478,
-   "rk": 377,
+   "ovr": 477,
+   "rk": 376,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/decker-degraaf-154502/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5079373",
@@ -77278,7 +77082,7 @@
    "war": 0.18,
    "waa": -0.02,
    "xv": 0.09,
-   "comp": 1.172,
+   "comp": 1.173,
    "prodZ": 0.19,
    "talentZ": 0.71,
    "castZ": null,
@@ -77342,8 +77146,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5208134"
    },
-   "ovr": 480,
-   "rk": 378,
+   "ovr": 479,
+   "rk": 377,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5208134",
@@ -77534,8 +77338,8 @@
     "on3": "https://www.on3.com/rivals/elijah-griffin-147460/",
     "espn": "https://www.espn.com/college-football/player/_/id/5141464"
    },
-   "ovr": 481,
-   "rk": 379,
+   "ovr": 480,
+   "rk": 378,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/elijah-griffin-147460/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5141464",
@@ -77649,7 +77453,7 @@
    "riserWhy": null,
    "inj": "Out (season)",
    "healthFV": -2,
-   "posRank": 54,
+   "posRank": 53,
    "sav": 1.2,
    "savQ": 0.64,
    "war": 0.21,
@@ -77733,8 +77537,8 @@
     "on3": "https://www.on3.com/rivals/duce-robinson-39307/",
     "espn": "https://www.espn.com/college-football/player/_/id/4870922"
    },
-   "ovr": 482,
-   "rk": 380,
+   "ovr": 481,
+   "rk": 379,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/duce-robinson-39307/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4870922",
@@ -77759,10 +77563,10 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.03,
-    93,
+    0.01,
+    77,
     null,
-    "IND",
+    "DET",
     0.03
    ],
    "_home": [
@@ -77931,8 +77735,8 @@
     "on3": "https://www.on3.com/rivals/tao-johnson-147464/",
     "espn": "https://www.espn.com/college-football/player/_/id/4901131"
    },
-   "ovr": 487,
-   "rk": 381,
+   "ovr": 486,
+   "rk": 380,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/tao-johnson-147464/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4901131",
@@ -77957,11 +77761,11 @@
    "_ent": false,
    "_lvl": "P4",
    "mk": [
-    0.04,
-    75,
+    0.03,
+    66,
     null,
-    "NE",
-    0.03
+    "MIN",
+    0.05
    ],
    "_home": [
     43.49,
@@ -78137,8 +77941,8 @@
     "on3": "https://www.on3.com/rivals/jayden-sanders-236000/",
     "espn": "https://www.espn.com/college-football/player/_/id/5214512"
    },
-   "ovr": 488,
-   "rk": 382,
+   "ovr": 487,
+   "rk": 381,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jayden-sanders-236000/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5214512",
@@ -78232,7 +78036,7 @@
    "rbRole": null,
    "rbSd": null,
    "rbPd": null,
-   "snapShare": 0.83,
+   "snapShare": 0.74,
    "move": null,
    "moveWhy": null,
    "moveOdds": null,
@@ -78259,12 +78063,12 @@
    "inj": null,
    "healthFV": null,
    "posRank": 31,
-   "sav": 4,
+   "sav": 3.6,
    "savQ": 1.84,
-   "war": 0.48,
-   "waa": 0.25,
-   "xv": 0.49,
-   "comp": 1.219,
+   "war": 0.43,
+   "waa": 0.22,
+   "xv": 0.44,
+   "comp": 1.208,
    "prodZ": 2.3,
    "talentZ": 0.86,
    "castZ": null,
@@ -78283,7 +78087,7 @@
     0.69,
     0.09,
     0,
-    0.03,
+    0.02,
     0.02,
     0.04,
     0
@@ -78313,7 +78117,7 @@
     "role": "drafted / camp roster",
     "plus": [
      "CB+ 87.5 (99th pct CB, 1-yr, regressed)",
-     "Snap share 83% (yr 2)"
+     "Snap share 74% (yr 2)"
     ],
     "minus": [
      "On3: outside top 75 CB"
@@ -78328,8 +78132,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5147170"
    },
-   "ovr": 489,
-   "rk": 383,
+   "ovr": 488,
+   "rk": 382,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5147170",
@@ -78526,8 +78330,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5264247"
    },
-   "ovr": 490,
-   "rk": 384,
+   "ovr": 489,
+   "rk": 383,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5264247",
@@ -78718,8 +78522,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5296616"
    },
-   "ovr": 491,
-   "rk": 385,
+   "ovr": 490,
+   "rk": 384,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5296616",
@@ -78914,8 +78718,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5255015"
    },
-   "ovr": 492,
-   "rk": 386,
+   "ovr": 491,
+   "rk": 385,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5255015",
@@ -79098,8 +78902,8 @@
     "on3": "https://www.on3.com/rivals/messiah-delhomme-174864/",
     "espn": "https://www.espn.com/college-football/player/_/id/5148665"
    },
-   "ovr": 493,
-   "rk": 387,
+   "ovr": 492,
+   "rk": 386,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/messiah-delhomme-174864/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5148665",
@@ -79219,7 +79023,7 @@
    "war": 0.09,
    "waa": -0.04,
    "xv": 0.09,
-   "comp": 0.656,
+   "comp": 0.657,
    "prodZ": 0.17,
    "talentZ": 0.62,
    "castZ": -1.09,
@@ -79286,8 +79090,8 @@
     "on3": "https://www.on3.com/rivals/caden-piening-154567/",
     "espn": "https://www.espn.com/college-football/player/_/id/5148656"
    },
-   "ovr": 494,
-   "rk": 388,
+   "ovr": 493,
+   "rk": 387,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/caden-piening-154567/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5148656",
@@ -79498,12 +79302,12 @@
     "on3": "https://www.on3.com/rivals/devon-dampier-36365/",
     "espn": "https://www.espn.com/college-football/player/_/id/5105849"
    },
-   "ovr": 495,
-   "rk": 389,
+   "ovr": 494,
+   "rk": 388,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/devon-dampier-36365/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5105849",
-   "draftP": 0.106,
+   "draftP": 0.107,
    "transferP": 0.123,
    "exitP": 0.487,
    "stayP": 0.39,
@@ -79527,8 +79331,8 @@
     0,
     null,
     null,
-    "IND",
-    0.02
+    "NE",
+    0.01
    ],
    "_home": [
     33.57,
@@ -79695,8 +79499,8 @@
     "on3": "https://www.on3.com/rivals/jontez-williams-65108/",
     "espn": "https://www.espn.com/college-football/player/_/id/4913037"
    },
-   "ovr": 497,
-   "rk": 390,
+   "ovr": 496,
+   "rk": 389,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/jontez-williams-65108/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4913037",
@@ -79720,11 +79524,11 @@
    "_exp": 5,
    "_ent": false,
    "mk": [
-    0.02,
-    84,
+    0.04,
+    59,
     null,
-    "CLE",
-    0.04
+    "DET",
+    0.03
    ],
    "_home": [
     29.95,
@@ -79773,9 +79577,9 @@
    "hsStars": 3,
    "hsGrade": 87.8,
    "transfer": true,
-   "xnil": 1262000,
+   "xnil": 1261000,
    "ynil": 898000,
-   "znil": 364000,
+   "znil": 363000,
    "nilMkt": "p4",
    "cons": null,
    "consRk": null,
@@ -79822,7 +79626,7 @@
    "war": 0.31,
    "waa": 0.14,
    "xv": 0.39,
-   "comp": 0.982,
+   "comp": 0.981,
    "prodZ": 1.64,
    "talentZ": 1.24,
    "castZ": null,
@@ -79890,7 +79694,7 @@
     "espn": "https://www.espn.com/college-football/player/_/id/4923046"
    },
    "ovr": 499,
-   "rk": 391,
+   "rk": 390,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/keyjuan-brown-146404/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4923046",
@@ -80011,7 +79815,7 @@
    "war": 0.2,
    "waa": 0.03,
    "xv": 0.2,
-   "comp": 1.186,
+   "comp": 1.187,
    "prodZ": 0.81,
    "talentZ": 1.12,
    "castZ": null,
@@ -80079,7 +79883,7 @@
     "espn": "https://www.espn.com/college-football/player/_/id/5212668"
    },
    "ovr": 501,
-   "rk": 392,
+   "rk": 391,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/dylan-villarouel-240586/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5212668",
@@ -80268,7 +80072,7 @@
     "espn": "https://www.espn.com/college-football/player/_/id/5214472"
    },
    "ovr": 502,
-   "rk": 393,
+   "rk": 392,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5214472",
@@ -80388,7 +80192,7 @@
    "war": 0.26,
    "waa": 0.08,
    "xv": 0.21,
-   "comp": 1.03,
+   "comp": 1.029,
    "prodZ": 1.63,
    "talentZ": 1.4,
    "castZ": null,
@@ -80450,8 +80254,8 @@
     "on3": "https://www.on3.com/rivals/king-miller-156529/",
     "espn": "https://www.espn.com/college-football/player/_/id/5233016"
    },
-   "ovr": 505,
-   "rk": 394,
+   "ovr": 504,
+   "rk": 393,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/king-miller-156529/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5233016",
@@ -80476,10 +80280,10 @@
    "_ent": true,
    "mk": [
     0,
-    null,
+    208,
     null,
     "NE",
-    0.02
+    0.01
    ],
    "_home": [
     34.13,
@@ -80571,7 +80375,7 @@
    "riserWhy": null,
    "inj": null,
    "healthFV": null,
-   "posRank": 55,
+   "posRank": 54,
    "sav": 1.1,
    "savQ": 0.22,
    "war": 0.21,
@@ -80641,8 +80445,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5385726"
    },
-   "ovr": 507,
-   "rk": 395,
+   "ovr": 506,
+   "rk": 394,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5385726",
@@ -80755,7 +80559,7 @@
    "riserWhy": null,
    "inj": null,
    "healthFV": null,
-   "posRank": 56,
+   "posRank": 55,
    "sav": 1.4,
    "savQ": 0.64,
    "war": 0.29,
@@ -80826,8 +80630,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5207842"
    },
-   "ovr": 508,
-   "rk": 396,
+   "ovr": 507,
+   "rk": 395,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5207842",
@@ -81028,8 +80832,8 @@
     "on3": null,
     "espn": "https://www.espn.com/college-football/player/_/id/5209334"
    },
-   "ovr": 509,
-   "rk": 397,
+   "ovr": 508,
+   "rk": 396,
    "delta": 0,
    "on3l": null,
    "espnl": "https://www.espn.com/college-football/player/_/id/5209334",
@@ -81226,8 +81030,8 @@
     "on3": "https://www.on3.com/rivals/ethan-grunkemeyer-152359/",
     "espn": "https://www.espn.com/college-football/player/_/id/5144078"
    },
-   "ovr": 511,
-   "rk": 398,
+   "ovr": 510,
+   "rk": 397,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/ethan-grunkemeyer-152359/",
    "espnl": "https://www.espn.com/college-football/player/_/id/5144078",
@@ -81256,191 +81060,6 @@
     40.3590232185749,
     -82.78962369895923,
     "OH"
-   ]
-  },
-  {
-   "name": "Daune Morris",
-   "pos": "RB",
-   "spot": null,
-   "team": "Tennessee",
-   "tid": "2633",
-   "logo": "/img/cfb/logos/2633.png",
-   "color": "#ff8200",
-   "conf": "SEC",
-   "div": "FBS",
-   "cls": "So",
-   "elig": 2,
-   "rs": false,
-   "age": null,
-   "ageEst": 20.4,
-   "dob": null,
-   "ht": "5-10",
-   "wt": 200,
-   "mz": [
-    69.5,
-    202,
-    29.4,
-    "RB",
-    70,
-    200,
-    2025,
-    70,
-    185,
-    null,
-    null
-   ],
-   "pfn": 80.3,
-   "pfnLabel": "RB+",
-   "snaps": null,
-   "gp": 9,
-   "on3": null,
-   "on3Rank": null,
-   "on3PosRank": null,
-   "hsStars": null,
-   "hsGrade": null,
-   "transfer": null,
-   "xnil": 1030000,
-   "ynil": 810000,
-   "znil": 220000,
-   "nilMkt": "p4",
-   "cons": null,
-   "consRk": null,
-   "consN": null,
-   "fvModel": null,
-   "consAdj": null,
-   "avg": null,
-   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5141598.png",
-   "qbr": null,
-   "arch": null,
-   "badges": null,
-   "rbRole": null,
-   "rbSd": null,
-   "rbPd": null,
-   "snapShare": 0.46,
-   "move": null,
-   "moveWhy": null,
-   "moveOdds": null,
-   "multi": null,
-   "up": null,
-   "moveUp": null,
-   "fv": 34,
-   "fvx": 33.59,
-   "fvg": 37.8,
-   "fvd": [
-    0.555,
-    0.134,
-    0.116,
-    0.051,
-    0.144,
-    20,
-    64.2
-   ],
-   "eav": 1.692,
-   "plus": false,
-   "star": null,
-   "riser": null,
-   "riserWhy": null,
-   "inj": null,
-   "healthFV": null,
-   "posRank": 46,
-   "sav": 0.9,
-   "savQ": -0.04,
-   "war": 0.16,
-   "waa": -0.02,
-   "xv": 0.18,
-   "comp": 0.745,
-   "prodZ": 0.7,
-   "talentZ": 0.4,
-   "castZ": null,
-   "castAdj": null,
-   "oeZ": 0.01,
-   "prodOver": null,
-   "ageZ": 0.11,
-   "classZ": 0,
-   "wtProj": 200,
-   "sizeZ": -0.04,
-   "sosZ": 0,
-   "statZ": 0.04,
-   "hsZ": 0.08,
-   "parts": [
-    0.16,
-    0.29,
-    0.11,
-    0,
-    0.04,
-    0.08,
-    0.06,
-    -0.02
-   ],
-   "fvBase": 38,
-   "frameFV": -0.2,
-   "htFV": 0,
-   "yearsFV": 0,
-   "fvs": [
-    [
-     "g",
-     38
-    ],
-    [
-     "fr",
-     -0.2
-    ],
-    [
-     "yr",
-     0
-    ]
-   ],
-   "retFV": -0.08,
-   "breakYear": null,
-   "priorOnly": false,
-   "report": {
-    "role": "drafted / camp roster",
-    "plus": [
-     "RYOE +0.35/carry (65 car)",
-     "EPA/carry +0.26; 15+ yd 6%; 3 TD (6 RZ car)"
-    ],
-    "minus": [
-     "On3: outside top 75 RB",
-     "Returns -0.06 yds over exp a team game (12 KR + PR, -0.1 FV)"
-    ],
-    "type": null
-   },
-   "bmi": 28.7,
-   "draft27": false,
-   "note": null,
-   "why": [],
-   "links": {
-    "on3": null,
-    "espn": "https://www.espn.com/college-football/player/_/id/5141598"
-   },
-   "ovr": 513,
-   "rk": 399,
-   "delta": 0,
-   "on3l": null,
-   "espnl": "https://www.espn.com/college-football/player/_/id/5141598",
-   "transferP": 0.101,
-   "exitP": 0.025,
-   "stayP": 0.874,
-   "homeMi": 96,
-   "inState": true,
-   "hcP": 0.14,
-   "tWhy": [
-    "− producer at high-talent program",
-    "+ Power 4 program",
-    "+ ranked recruit",
-    "− full-time player"
-   ],
-   "_rz": -0.4,
-   "_prod": 0.2807308970099668,
-   "_st": 0,
-   "_grade": 78,
-   "_exp": 2,
-   "_ent": true,
-   "mk": null,
-   "_home": [
-    35.07,
-    -85.25,
-    "TN"
    ]
   },
   {
@@ -81621,8 +81240,8 @@
     "on3": "https://www.on3.com/rivals/anthony-donkoh-150123/",
     "espn": "https://www.espn.com/college-football/player/_/id/4916884"
    },
-   "ovr": 514,
-   "rk": 400,
+   "ovr": 512,
+   "rk": 398,
    "delta": 0,
    "on3l": "https://www.on3.com/rivals/anthony-donkoh-150123/",
    "espnl": "https://www.espn.com/college-football/player/_/id/4916884",
@@ -81650,6 +81269,414 @@
     38.98,
     -77.65,
     "VA"
+   ]
+  },
+  {
+   "name": "Coleton Price",
+   "pos": "OL",
+   "spot": "C",
+   "team": "Kentucky",
+   "tid": "96",
+   "logo": "/img/cfb/logos/96.png",
+   "color": "#0033a0",
+   "conf": "SEC",
+   "div": "FBS",
+   "cls": "RS-Sr",
+   "elig": 4,
+   "rs": true,
+   "age": null,
+   "ageEst": 22.9,
+   "dob": null,
+   "ht": "6-3",
+   "wt": 308,
+   "mz": [
+    74.75,
+    307,
+    38.6,
+    "OL",
+    75,
+    308,
+    2022,
+    75,
+    280,
+    75,
+    280
+   ],
+   "pfn": 88.2,
+   "pfnLabel": "OLi",
+   "snaps": 572,
+   "gp": 9,
+   "on3": 94,
+   "on3Rank": 99,
+   "on3PosRank": 7,
+   "hsStars": 3,
+   "hsGrade": 84.925,
+   "transfer": true,
+   "xnil": 1242000,
+   "ynil": 1067000,
+   "znil": 175000,
+   "nilMkt": "p4",
+   "cons": 101.1,
+   "consRk": 170,
+   "consN": 3,
+   "fvModel": 37,
+   "consAdj": 3.3,
+   "avg": 91.1,
+   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4720942.png",
+   "qbr": null,
+   "arch": "complete blocker",
+   "badges": [
+    [
+     "Run Blocker",
+     "s",
+     94,
+     "run-block score"
+    ],
+    [
+     "Pass Protector",
+     "b",
+     88,
+     "pass-block score"
+    ]
+   ],
+   "rbRole": null,
+   "rbSd": null,
+   "rbPd": null,
+   "snapShare": 1,
+   "move": null,
+   "moveWhy": null,
+   "moveOdds": null,
+   "multi": null,
+   "up": null,
+   "moveUp": null,
+   "fv": 33,
+   "fvx": 33.49,
+   "fvg": 40.24,
+   "fvd": [
+    0.439,
+    0.239,
+    0.186,
+    0.063,
+    0.074,
+    20,
+    54.1
+   ],
+   "eav": 1.447,
+   "plus": false,
+   "star": null,
+   "riser": null,
+   "riserWhy": null,
+   "inj": null,
+   "healthFV": null,
+   "posRank": 50,
+   "sav": 1.1,
+   "savQ": 1.61,
+   "war": 0.23,
+   "waa": 0.05,
+   "xv": 0.3,
+   "comp": 1.176,
+   "prodZ": 2.19,
+   "talentZ": 2.06,
+   "castZ": null,
+   "castAdj": null,
+   "oeZ": null,
+   "prodOver": null,
+   "ageZ": -0.4,
+   "classZ": -0.15,
+   "wtProj": 308,
+   "sizeZ": -0.09,
+   "sosZ": 0,
+   "statZ": 0,
+   "hsZ": -0.01,
+   "parts": [
+    0.82,
+    0.87,
+    -0.55,
+    0,
+    0.03,
+    -0.01,
+    0,
+    -0.01
+   ],
+   "fvBase": 38,
+   "frameFV": -0.1,
+   "htFV": 0,
+   "yearsFV": -1,
+   "fvs": [
+    [
+     "g",
+     38
+    ],
+    [
+     "fr",
+     -0.1
+    ],
+    [
+     "yr",
+     -1
+    ],
+    [
+     "cs",
+     3.34
+    ]
+   ],
+   "retFV": null,
+   "breakYear": 4,
+   "priorOnly": false,
+   "report": {
+    "role": "drafted / camp roster",
+    "plus": [
+     "On3 94 (#7 IOL)",
+     "Consensus #170 (median board 98, 3/10 boards); model FV 37, +3 FV",
+     "OLi 88.2 (99th pct OL, 3-yr blend)",
+     "Snap share 100%"
+    ],
+    "minus": [
+     "Age ~22.9 (old for output)"
+    ],
+    "type": "complete blocker"
+   },
+   "bmi": 38.5,
+   "draft27": true,
+   "note": null,
+   "why": [
+    "avg"
+   ],
+   "links": {
+    "on3": "https://www.on3.com/rivals/coleton-price-24967/",
+    "espn": "https://www.espn.com/college-football/player/_/id/4720942"
+   },
+   "ovr": 513,
+   "rk": 399,
+   "delta": -1,
+   "on3l": "https://www.on3.com/rivals/coleton-price-24967/",
+   "espnl": "https://www.espn.com/college-football/player/_/id/4720942",
+   "draftP": 0.678,
+   "transferP": 0.032,
+   "exitP": 0.897,
+   "stayP": 0.07,
+   "homeMi": 755,
+   "inState": false,
+   "hcP": 0.05,
+   "tWhy": [
+    "− fifth-year+ player",
+    "− producer at high-talent program",
+    "+ Power 4 program",
+    "+ ranked recruit"
+   ],
+   "_rz": -0.4,
+   "_prod": 0.4240890688259109,
+   "_st": 1,
+   "_grade": 78,
+   "_exp": 5,
+   "_ent": false,
+   "mk": [
+    0.02,
+    64,
+    null,
+    "ATL",
+    0.04
+   ],
+   "_home": [
+    33.56,
+    -97.85,
+    "TX"
+   ]
+  },
+  {
+   "name": "Brauntae Johnson",
+   "pos": "S",
+   "spot": null,
+   "team": "Notre Dame",
+   "tid": "87",
+   "logo": "/img/cfb/logos/87.png",
+   "color": "#062340",
+   "conf": null,
+   "div": "FBS",
+   "cls": "RS-So",
+   "elig": 2,
+   "rs": true,
+   "age": null,
+   "ageEst": 20.9,
+   "dob": null,
+   "ht": "6-2",
+   "wt": 200,
+   "mz": [
+    73.75,
+    202,
+    26,
+    "S",
+    74,
+    200,
+    2024,
+    75,
+    170,
+    73.5,
+    185
+   ],
+   "pfn": null,
+   "pfnLabel": "SAF+",
+   "snaps": null,
+   "gp": null,
+   "on3": 90,
+   "on3Rank": null,
+   "on3PosRank": 36,
+   "hsStars": 4,
+   "hsGrade": 91.5196195652174,
+   "transfer": false,
+   "xnil": 519000,
+   "ynil": 959000,
+   "znil": -440000,
+   "nilMkt": "p4",
+   "cons": 26,
+   "consRk": 19,
+   "consN": 1,
+   "fvModel": 35,
+   "consAdj": 4.2,
+   "avg": null,
+   "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5218506.png",
+   "qbr": null,
+   "arch": null,
+   "badges": null,
+   "rbRole": null,
+   "rbSd": null,
+   "rbPd": null,
+   "snapShare": null,
+   "move": null,
+   "moveWhy": null,
+   "moveOdds": null,
+   "multi": null,
+   "up": null,
+   "moveUp": null,
+   "fv": 33,
+   "fvx": 33.45,
+   "fvg": 39.2,
+   "fvd": [
+    0.504,
+    0.18,
+    0.148,
+    0.059,
+    0.11,
+    20,
+    60.9
+   ],
+   "eav": 1.554,
+   "plus": false,
+   "star": null,
+   "riser": null,
+   "riserWhy": null,
+   "inj": null,
+   "healthFV": null,
+   "posRank": 30,
+   "sav": null,
+   "savQ": null,
+   "war": 0,
+   "waa": 0,
+   "xv": 0,
+   "comp": 0.674,
+   "prodZ": -0.08,
+   "talentZ": 1.35,
+   "castZ": null,
+   "castAdj": null,
+   "oeZ": null,
+   "prodOver": null,
+   "ageZ": 0.02,
+   "classZ": -0.03,
+   "wtProj": 203,
+   "sizeZ": 0.07,
+   "sosZ": 0,
+   "statZ": 0,
+   "hsZ": 0.09,
+   "parts": [
+    0.54,
+    -0.03,
+    -0.01,
+    0,
+    0,
+    0.09,
+    0.09,
+    0
+   ],
+   "fvBase": 35,
+   "frameFV": 0,
+   "htFV": 0,
+   "yearsFV": 0,
+   "fvs": [
+    [
+     "g",
+     35
+    ],
+    [
+     "fr",
+     0
+    ],
+    [
+     "yr",
+     0
+    ],
+    [
+     "cs",
+     4.2
+    ]
+   ],
+   "retFV": null,
+   "breakYear": null,
+   "priorOnly": false,
+   "report": {
+    "role": "drafted / camp roster",
+    "plus": [
+     "On3 90 (#36 S)",
+     "Consensus #19 (avg 26, 1/10 boards); model FV 35, +4 FV",
+     "HS 4-star (92)"
+    ],
+    "minus": [
+     "No PFN line (injury, depth or redshirt)"
+    ],
+    "type": null
+   },
+   "bmi": 25.7,
+   "draft27": true,
+   "note": null,
+   "why": [],
+   "links": {
+    "on3": "https://www.on3.com/rivals/brauntae-johnson-147088/",
+    "espn": "https://www.espn.com/college-football/player/_/id/5218506"
+   },
+   "ovr": 514,
+   "rk": 400,
+   "delta": 0,
+   "on3l": "https://www.on3.com/rivals/brauntae-johnson-147088/",
+   "espnl": "https://www.espn.com/college-football/player/_/id/5218506",
+   "draftP": 0.906,
+   "transferP": 0.02,
+   "exitP": 0.906,
+   "stayP": 0.074,
+   "homeMi": 71,
+   "inState": true,
+   "hcP": 0.13,
+   "tWhy": [
+    "+ Power 4 program",
+    "+ third-year player",
+    "− spot player (~1/13 games)",
+    "− home-state school, 71 mi"
+   ],
+   "_rz": -1,
+   "_prod": 0,
+   "_st": 0,
+   "_grade": null,
+   "_exp": 3,
+   "_ent": false,
+   "mk": [
+    0.19,
+    19,
+    null,
+    "TEN",
+    0.08
+   ],
+   "_home": [
+    41.09,
+    -85.14,
+    "IN"
    ]
   }
  ],
@@ -81754,12 +81781,12 @@
   },
   "nilDiscount": {
    "tiers": {
-    "20": 0.175,
+    "20": 0.173,
     "25": 0.086,
-    "30": 0.111,
+    "30": 0.11,
     "35": 0.428
    },
-   "all": 0.171,
+   "all": 0.17,
    "n": 4191
   },
   "teams": [
