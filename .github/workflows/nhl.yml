@@ -117,7 +117,7 @@ jobs:
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
       - name: Board moves
         continue-on-error: true
-        run: python3 scripts/board_moves.py nhl hockey
+        run: python3 scripts/board_moves.py nhl hockey r-nhl r-hockey
       - name: Commit if anything changed
         run: |
           files="scripts/data/moves static/data/xaav-nhl.json data/units_nhl.json static/data/pctl-nhl.json static/data/lines/nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/hockey_logos.json static/img/hockey data/nhl_games.json data/nhl_props.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json data/depth_starters_nhl.json static/data/nhl-war data/hockey.json scripts/data/hockey_pre.json.gz scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json data/team_badges"

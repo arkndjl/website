@@ -101,7 +101,7 @@ jobs:
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
       - name: Board moves
         continue-on-error: true
-        run: python3 scripts/board_moves.py soccer
+        run: python3 scripts/board_moves.py soccer r-soccer
       - name: Commit if anything changed
         run: |
           files="scripts/data/moves data/units_soccer.json static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/lineups/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"

@@ -3,6 +3,7 @@
        shape (the CBB stats, WAR, breakouts, top performers, draft board and portal tabs, scripts/cbb_tabs.py), fetched the first time the tab is on screen. The file
        names the columns, the views (the number the board ranks by), the pre-draft (or pre-arrival) grade and who counts
        as a rookie, so one renderer serves NFL, NBA, NHL, soccer, CFB, CBB, hockey prospects and soccer prospects.
+       ±: weekly rank change by the view (rows' w0 from scripts/board_moves.py VIEWS), after Player like the leaderboards.
        Pre / Δ: Δ = rank by the pre-draft order (pick, recruiting rank, expected slot) minus rank by the view's number,
        both among the rows shown that have one: + = playing above where he was picked. Rows carry a photo (ph) and team logo (lo) where the section has one. Phones keep rank, player,
        the ranked number, the pre-draft grade and Δ. */ -}}
@@ -85,9 +86,13 @@
       sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
       sel.value = seen[want] ? want : '';
     }
+    // weekly move (scripts/board_moves.py VIEWS): rows carry w0, their values as of the season's wkFrom, one per view in wkV
+    var DOW = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' ');
+    function wkIdx() { var S = season(); return S.wkFrom && S.wkV && window.__wk ? S.wkV.indexOf(view) : -1; }
     function cols() {
       var key = view, hasPre = !!D.pre && has('pre'), hasPfv = !!D.pfv && has('pfv');
       var c = [{ k: 'rk', l: 'RK', t: 'rank within the filters, by the view', num: 1, cls: '' }, { k: 'n', l: 'Player', t: '', cls: '' }];
+      if (wkIdx() >= 0) c.push({ k: 'wk', l: '±', t: '± = rank change by the view since the last ' + DOW[new Date(season().wkFrom + 'T12:00Z').getUTCDay()] + ' post (' + window.__wk.day(season().wkFrom) + '), within the filters; hover for the rank and value then', num: 1, cls: '' });
       D.cols.forEach(function (x) { if (x.k !== key && !has(x.k)) return; c.push({ k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === key ? ' is-key' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }); });
       c.push({ k: 'pos', l: 'Pos', t: 'position, rank at position within the filters', cls: 'cfb__g nbaxpm__ph' });
       if (hasPre) c.push({ k: 'pre', l: D.pre.l, t: D.pre.t, num: 1, cls: 'rookies__pre' });
@@ -109,7 +114,17 @@
         return true;
       }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return lo ? x - y : y - x; });
       var pr = {};
-      list.forEach(function (r, i) { r.rk = i + 1; r.pr = (pr[r.pos] = (pr[r.pos] || 0) + 1); r.dl = null; });
+      list.forEach(function (r, i) { r.rk = i + 1; r.pr = (pr[r.pos] = (pr[r.pos] || 0) + 1); r.dl = null; r.wr = null; r.wk = null; });
+      // ±: rank then (by the view's value as of wkFrom, among the rows shown that had one) minus rank now
+      var wi = wkIdx();
+      if (wi >= 0) {
+        var wl = list.filter(function (r) { return r[key] != null && r.w0 && r.w0[wi] != null; })
+          .sort(function (a, b) { return lo ? a.w0[wi] - b.w0[wi] : b.w0[wi] - a.w0[wi]; });
+        wl.forEach(function (r, i) { r.wr = i > 0 && wl[i - 1].w0[wi] === r.w0[wi] ? wl[i - 1].wr : i + 1; });
+        // rank now among the same rows, ties shared both ways, so an unchanged value in a tie shows no move
+        var nl = wl.slice().sort(function (a, b) { return lo ? a[key] - b[key] : b[key] - a[key]; });
+        nl.forEach(function (r, i) { r._nr = i > 0 && nl[i - 1][key] === r[key] ? nl[i - 1]._nr : i + 1; r.wk = r.wr - r._nr; });
+      }
       // Δ: the pre-draft order against the view's order, both among the shown rows that have a pre-draft rank
       var wp = list.filter(function (r) { return r.pre != null && r[key] != null; });
       wp.slice().sort(function (a, b) { return a.pre - b.pre; }).forEach(function (r, i) { r._p = i + 1; });
@@ -135,6 +150,14 @@
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '<span class="cfb__dim">' + r.pr + '</span></td>';
           if (c.k === 'pre') return '<td class="cfb__num ' + c.cls + '">' + (r.preL ? esc(r.preL) : DASH) + '</td>';
           if (c.k === 'pfv') return '<td class="cfb__num ' + c.cls + '">' + (r.pfv == null ? DASH : r.pfv) + '</td>';
+          if (c.k === 'wk') {
+            if (r[key] == null) return window.__wk.none;
+            var wf = season().wkFrom, wd = window.__wk.day(wf), kc = D.cols.filter(function (x) { return x.k === key; })[0] || {};
+            if (r.wr == null) return '<td class="cfb__num cfb__wk" data-v="" title="not on the board ' + wd + '"><span class="cfb__new">new</span></td>';
+            var dv = r[key] - r.w0[wi], dd = kc.f && /^s?\d$/.test(kc.f) ? +kc.f.replace('s', '') : kc.f === 'i' || kc.f === 'p' ? 0 : 1;
+            return '<td class="cfb__num cfb__wk" data-v="' + r.wk + '" title="' + esc(wd + ': #' + r.wr + ', ' + (kc.l || key) + ' ' + (dv >= 0 ? '+' : '') + dv.toFixed(dd)) + '">' +
+              (r.wk > 0 ? '<span class="cfb__up">▲' + r.wk + '</span>' : r.wk < 0 ? '<span class="cfb__down">▼' + (-r.wk) + '</span>' : '<span class="cfb__dim">–</span>') + '</td>';
+          }
           if (c.k === 'dl') return '<td class="cfb__num">' + (r.dl == null ? DASH : fmt(r.dl, 's0')) + '</td>';
           if (c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r.age == null ? '' : r.ageEst ? '~' + r.age.toFixed(1) : r.age % 1 ? r.age.toFixed(1) : r.age) + '</td>';
           return '<td class="cfb__num ' + c.cls + '">' + fmt(r[c.k], c.f) + '</td>';
