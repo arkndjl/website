@@ -153,15 +153,17 @@ def coefs(rows, feats, margin):
     return out
 
 
-def team_rating(net, T, tau, elo, gm, teams, coef):
+def team_rating(net, T, tau, elo, gm, teams, coef, md=None):
     """points against an average D-I team on a neutral floor, from the game model's weights: efficiency (its own and,
-    with no ESPN forecast for a game not yet scheduled, BPI's fallback to it), Elo, long-memory margin"""
+    with no ESPN forecast for a game not yet scheduled, BPI's fallback to it), Elo, long-memory margin, and (md, live)
+    the market-disagreement rating (cbb_games DIS_K)"""
     P0 = tau + 2 * float(np.mean([T[t] for t in teams]))
     mn = float(np.mean([net[t] for t in teams])); me = float(np.mean([elo[t] for t in teams]))
     mg = float(np.mean([gm.get(t, 0.0) for t in teams]))
     ce = coef.get('eff', 0.0) + coef.get('bpi', 0.0)
+    mm = float(np.mean([md.get(t, 0.0) for t in teams])) if md else 0.0
     return {t: ce * (net[t] - mn) * P0 / 100 + coef.get('elo', 0.0) * (elo[t] - me) / 25 + coef.get('gm', 0.0) * (gm.get(t, 0.0) - mg)
-            for t in teams}
+            + (coef.get('mdis', 0.0) * (md.get(t, 0.0) - mm) if md else 0.0) for t in teams}
 
 
 def home_edge(coef, conf_game, h):
@@ -871,7 +873,7 @@ def live_gm(rows, season):
     return fin.get(season) or {t: CR.CBB_FIT['carry'] * v for t, v in H['final']['gm'].get(str(season - 1), {}).items()}
 
 
-def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=None):
+def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=None, md=None):
     """today's tournament odds for cbb_games_live: rows (this season's ESPN games), d1 (rated teams), confs (team ->
     board conference), the efficiency solve's net/T/tau, Elo, games played (gm: live_gm's, when the caller has it).
     Returns {team: odds} or {} with no fit"""
@@ -883,7 +885,7 @@ def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=
     ts = set(teams)
     if gm is None:
         gm = live_gm(rows, season)
-    rating = team_rating(net, T, tau, elo, gm, teams, coef)
+    rating = team_rating(net, T, tau, elo, gm, teams, coef, md=md)
     rank = {t: i + 1 for i, t in enumerate(sorted(teams, key=lambda t: -rating[t]))}
     hist = C.load_hist()
     d1s = {s: C.d1_set([g for g in hist if g['season'] == s]) for s in range(season - 4, season)}

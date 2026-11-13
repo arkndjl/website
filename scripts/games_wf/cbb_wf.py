@@ -15,7 +15,7 @@ P, feats = F['params'], F['feats']
 os.makedirs(C.CACHE, exist_ok=True)
 games, btname, d1s, tprior, avs = C.load_all()
 W, rows = C.run_walk(P, games, tprior, btname, d1s, avs)
-D, Xm, y, TX, ty, S, line, tline, d1 = C.matrices(rows, feats)
+D, Xm, y, TX, ty, S, line, tline, d1 = C.matrices(rows, feats, F.get('tfeats', C.TFEATS))
 pred = C.walk_pred(Xm, y, S, d1)
 tpred = C.walk_pred(TX, ty, S, d1)
 # the availability term's points in each game (home minus away), at that season's walk-forward weight: the 'inj'

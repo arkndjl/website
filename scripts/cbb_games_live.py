@@ -98,7 +98,7 @@ def update_log():
                 if not g or g['season'] != SEASON:
                     continue
                 old = log.get(g['id'], {})
-                for k in ('spread', 'total', 'mlh', 'mla', 'open', 'book', 'closed', 'poss', 'hb', 'ab', 'seen', 'pt', 'ptx'):
+                for k in ('spread', 'total', 'mlh', 'mla', 'open', 'book', 'closed', 'poss', 'hb', 'ab', 'seen', 'pt', 'ptx', 'eposs', 'epx', 'bpi', 'bpx'):
                     if k in old:
                         g[k] = old[k]
                 log[g['id']] = g
@@ -120,15 +120,36 @@ def update_log():
                 g['seen'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     # each final game's possession time from its ESPN play-by-play, once (the asymmetric tempo, cbb_games aplmix); a game
     # whose log is partial is tried again on the next two runs ('ptx')
-    todo = [g for g in log.values() if g.get('hs') is not None and 'pt' not in g and g.get('ptx', 0) < 3]
+    # and its possessions from the same summary's box score ('eposs'): Barttorvik's count ('poss', below) wins when its
+    # schedule file comes; when it doesn't, build() reads these, or the tempo solve never leaves its preseason prior
+    todo = [g for g in log.values() if g.get('hs') is not None and (('pt' not in g and g.get('ptx', 0) < 3) or ('eposs' not in g and g.get('epx', 0) < 3))]
     with ThreadPoolExecutor(12) as ex:
         for g, j in zip(todo, ex.map(lambda g: fetch_json(SUMMARY.format(i=g['id'])), todo)):
-            v = C.poss_secs((j or {}).get('plays') or [], g['home'], g['away'])
-            if v:
-                g['pt'] = v
-                g.pop('ptx', None)
+            if 'pt' not in g and g.get('ptx', 0) < 3:
+                v = C.poss_secs((j or {}).get('plays') or [], g['home'], g['away'])
+                if v:
+                    g['pt'] = v
+                    g.pop('ptx', None)
+                else:
+                    g['ptx'] = g.get('ptx', 0) + 1
+            if 'eposs' not in g:
+                e = C.box_poss(j or {})
+                if e:
+                    g['eposs'] = e
+                    g.pop('epx', None)
+                else:
+                    g['epx'] = g.get('epx', 0) + 1
+    # each final game's ESPN BPI forecast, once: the 'bpi' input of the games already played, which the
+    # market-disagreement rating reads (every earlier game's margin without the market, as the history has it)
+    import public_ratings
+    todo = [g for g in log.values() if g.get('hs') is not None and 'bpi' not in g and g.get('bpx', 0) < 2]
+    with ThreadPoolExecutor(16) as ex:
+        for g, (_, v) in zip(todo, ex.map(lambda g: public_ratings.bpi_one(str(g['id'])), todo)):
+            if v and v[1] is not None:
+                g['bpi'] = v
+                g.pop('bpx', None)
             else:
-                g['ptx'] = g.get('ptx', 0) + 1
+                g['bpx'] = g.get('bpx', 0) + 1
     # possessions and Barttorvik names (this season's super_sked)
     os.makedirs(C.CACHE, exist_ok=True)
     p = os.path.join(C.CACHE, f'bt_sked{SEASON}.csv')
@@ -560,7 +581,17 @@ def build():
             c = {k: v for k, v in opp[t].items() if k}
             if c:
                 confs[t] = max(c, key=c.get)
+    # possessions: Barttorvik's where its schedule file came, else ESPN's box-score count (the history has possessions
+    # for 93% of games, non-D-I opponents included)
+    ne = 0
+    for g in rows:
+        if g.get('hs') is not None and not g.get('poss') and g.get('eposs'):
+            g['poss'] = g['eposs']; ne += 1
+    fin = [g for g in rows if g.get('hs') is not None]
+    print(f"cbb possessions: {sum(1 for g in fin if g.get('poss'))} of {len(fin)} finished games ({ne} from ESPN box scores)", flush=True)
     W = C.Walk(P, {SEASON: tp}, btname, coefs={SEASON: F['prior']})
+    W.c0, W.tc0 = F.get('coef0'), F.get('tcoef0')      # the market-disagreement inputs' base margin and total
+    tfeats = F.get('tfeats', C.TFEATS)
     for t, v in st['elo'].items():
         W.elo[t] = v
     for t, v in st['mkt'].items():
@@ -582,6 +613,9 @@ def build():
     # ESPN BPI's forecast for the games on the page (the 'bpi' input; scripts/public_ratings.py)
     if 'bpi' in feats:
         import public_ratings
+        for g in rows:
+            if g.get('bpi'):
+                C.BPI[str(g['id'])] = g['bpi']
         from concurrent.futures import ThreadPoolExecutor
         ids = [str(g['id']) for g in rows if C.et_date(g['date']) in show and g['state'] == 'pre']
         with ThreadPoolExecutor(12) as ex:
@@ -600,7 +634,7 @@ def build():
 
     def collect(g, x, tx, R):
         m = sum(coef[f] * x[f] for f in feats)
-        tot = sum(F['tcoef'][f] * tx[f] for f in C.TFEATS)
+        tot = sum(F['tcoef'][f] * tx[f] for f in tfeats)
         proj[g['id']] = (m, tot, x, R.poss(g['home'], g['away']))
     R, pri, pfeats = C.season_walk(W, SEASON, rows, d1, av, collect, upto=upto or '0000')
     if not R.nobs and not upto:
@@ -637,7 +671,9 @@ def build():
         print('margin rating failed:', repr(e), flush=True)
         gm_t = {}
     gm_avg = float(np.mean([gm_t.get(t, 0.0) for t in teams]))
-    rating = cbb_tourney.team_rating(net_, T_, float(R.tau), W.elo, gm_t, teams, coef)
+    md_avg = float(np.mean([W.md[t] for t in teams]))
+    md_t = {t: float(W.md[t]) for t in teams} if coef.get('mdis') else None
+    rating = cbb_tourney.team_rating(net_, T_, float(R.tau), W.elo, gm_t, teams, coef, md=md_t)
     edge = lambda g: 0.0 if g['neutral'] else cbb_tourney.home_edge(coef, 1.0 if g.get('conf') else 0.0, g['home'])
     order = sorted(teams, key=lambda t: -rating[t])
     rk = {t: i + 1 for i, t in enumerate(order)}
@@ -716,7 +752,7 @@ def build():
     tmeta = None
     try:
         nc, tmeta = cbb_tourney.live(rows, set(teams), confs, net_, T_, float(R.tau), W.elo, R.ng, coef, sd, SEASON,
-                                     gm=gm_t if 'gm' in feats else None)
+                                     gm=gm_t if 'gm' in feats else None, md=md_t)
         for r in power:
             if r['id'] in nc:
                 r['nc'] = nc[r['id']]
@@ -748,6 +784,8 @@ def build():
                      ['elo', round(coef.get('elo', 0.0) * (W.elo[t] - elo_avg) / 25, 2)]]
             if coef.get('gm'):
                 parts.append(['gm', round(coef['gm'] * (gm_t.get(t, 0.0) - gm_avg), 2)])
+            if md_t:
+                parts.append(['market', round(coef['mdis'] * (md_t[t] - md_avg), 2)])
             TD[t] = {'parts': parts, 'pparts': pp}
         sg = []
         for g in rows:
@@ -771,7 +809,7 @@ def build():
         print('team breakdowns failed:', repr(e), flush=True)
 
     # the slates
-    labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'pinj': 'injury report', 'rest': 'rest',
+    labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'mdis': 'market', 'home': 'home court', 'inj': 'availability', 'pinj': 'injury report', 'rest': 'rest',
               'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin', 'hatt': 'home crowd'}
     # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
     try:
