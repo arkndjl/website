@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-13T04:54:38Z",
+ "asof": "2026-11-13T05:00:02Z",
  "recenter": {
-  "2026-11-13": -10.9
+  "2026-11-13": -10.88
  },
  "monitor": {
   "clocks": {
@@ -157,22 +157,6 @@
    "tm": 157.4
   },
   {
-   "id": "401921803",
-   "sport": "cbb",
-   "kick": "2026-11-14T00:00:00Z",
-   "home": "Kentucky",
-   "away": "Northern Arizona",
-   "mk": "spread",
-   "side": "away",
-   "line": 35.5,
-   "price": -113.0,
-   "edge": 11.3,
-   "x": null,
-   "why": "spread market off",
-   "m": 24.2,
-   "tm": 149.4
-  },
-  {
    "id": "401902278",
    "sport": "cbb",
    "kick": "2026-11-13T23:30:00Z",
@@ -203,6 +187,22 @@
    "why": "spread market off",
    "m": 34.1,
    "tm": 142.7
+  },
+  {
+   "id": "401921803",
+   "sport": "cbb",
+   "kick": "2026-11-14T00:00:00Z",
+   "home": "Kentucky",
+   "away": "Northern Arizona",
+   "mk": "spread",
+   "side": "away",
+   "line": 34.5,
+   "price": 108.0,
+   "edge": 10.3,
+   "x": null,
+   "why": "spread market off",
+   "m": 24.2,
+   "tm": 149.4
   },
   {
    "id": "401917525",
@@ -237,6 +237,22 @@
    "tm": 144.1
   },
   {
+   "id": "401921191",
+   "sport": "cbb",
+   "kick": "2026-11-14T00:00:00Z",
+   "home": "Hofstra",
+   "away": "Iona",
+   "mk": "total",
+   "side": "over",
+   "line": 133.5,
+   "price": -108.0,
+   "edge": 9.4,
+   "x": null,
+   "why": "total market off",
+   "m": 9.0,
+   "tm": 142.9
+  },
+  {
    "id": "401917916",
    "sport": "cbb",
    "kick": "2026-11-14T01:00:00Z",
@@ -267,22 +283,6 @@
    "why": "spread market off",
    "m": 24.8,
    "tm": 155.6
-  },
-  {
-   "id": "401921191",
-   "sport": "cbb",
-   "kick": "2026-11-14T00:00:00Z",
-   "home": "Hofstra",
-   "away": "Iona",
-   "mk": "total",
-   "side": "over",
-   "line": 135.5,
-   "price": -113.0,
-   "edge": 7.4,
-   "x": null,
-   "why": "total market off",
-   "m": 9.0,
-   "tm": 142.9
   },
   {
    "id": "401919049",
@@ -550,7 +550,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 0.5,
    "ev": null,
    "units": 0.0,
@@ -715,11 +715,11 @@
    "state": "off"
   },
   "401906850": {
-   "mk": "total",
-   "side": "over",
-   "line": 154.5,
-   "price": -106.0,
-   "edge": 1.2,
+   "mk": "spread",
+   "side": "away",
+   "line": 29.5,
+   "price": -108.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Tennessee",
@@ -825,9 +825,9 @@
   "401921803": {
    "mk": "spread",
    "side": "away",
-   "line": 35.5,
-   "price": -113.0,
-   "edge": 11.3,
+   "line": 34.5,
+   "price": 108.0,
+   "edge": 10.3,
    "ev": null,
    "units": 0.0,
    "home": "Kentucky",
@@ -871,11 +871,11 @@
    "state": "off"
   },
   "401920379": {
-   "mk": "total",
-   "side": "under",
-   "line": 150.5,
-   "price": -111.0,
-   "edge": 1.6,
+   "mk": "spread",
+   "side": "away",
+   "line": 28.5,
+   "price": -108.0,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "Virginia Tech",
@@ -909,9 +909,9 @@
   "401921191": {
    "mk": "total",
    "side": "over",
-   "line": 135.5,
-   "price": -113.0,
-   "edge": 7.4,
+   "line": 133.5,
+   "price": -108.0,
+   "edge": 9.4,
    "ev": null,
    "units": 0.0,
    "home": "Hofstra",
@@ -1031,7 +1031,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 12503,
+  "snapshots": 12515,
   "buckets": [
    {
     "when": "24h+",
@@ -1044,12 +1044,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 2403,
-    "clvRet": -0.0318,
+    "clvN": 2410,
+    "clvRet": -0.0317,
     "clvT": -14.96,
     "clv": 0.15,
-    "beat": 0.324,
-    "still": 0.453
+    "beat": 0.323,
+    "still": 0.456
    },
    {
     "when": "1-6h",
@@ -8385,12 +8385,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T04:54:38Z",
+ "checked": "2026-11-13T05:00:02Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-13": {
-    "raw": 2.0,
+    "raw": 1.75,
     "scale": 1.0
    }
   }
