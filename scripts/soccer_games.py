@@ -35,6 +35,12 @@ and UEFA matches also move by the value of players out injured or suspended (Tra
 last 3 weeks, scripts/soccer_tm_injuries.py). Win, draw and loss: Dixon-Coles (a Poisson score matrix with the low scores corrected
 by rho). Each input and setting stays only if it lowers walk-forward log loss on 2013-22 and 2023-27 doesn't
 disagree (see fit()).
+
+Projected goals and over/under: the 1X2 prices behind the market ratings fix the gap between the sides, not how many
+goals they share, so the projected total comes from market totals ratings (Ratings.total): a league term and a lean
+for every club, learned from the closing over/under 2.5 price of earlier league matches in football-data's 16
+leagues, on top of .77 of the model's own log total. The split between the sides stays the game model's. Where no
+over/under close has been seen the total is the model's, at the league's scoring level (level()).
 """
 import datetime as dt
 import json
@@ -68,7 +74,11 @@ SUBS = {'x': ('hx', 'ax'), 'm': ('mh', 'ma'), 's': ('hsg', 'asg'), 'n': ('nh', '
 P0 = {'k': 0.02592, 'kl': 0.00346, 'ke': 2e-05, 'kh': 0.0012, 'car': 1.0, 'boost': 1.5, 'nb': 9, 'rho': -0.04,
       'prom': 0.0, 'cup': 0.36, 'kx': 0.1106, 'carx': 1.0, 'wx': 0.108, 'km': 0.128, 'carm': 1.0, 'wm': 1.0,
       'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0, 'mv': 0.0317,
-      'kn': 0.128, 'carn': 1.0, 'wn': 1.0, 'av': 0.35, 'r45': -0.02}
+      'kn': 0.128, 'carn': 1.0, 'wn': 1.0, 'av': 0.35, 'r45': -0.02, 'trel': 0.77, 'tkt': 0.03, 'tkb': 0.06}
+# trel, tkt, tkb: the market totals ratings (Ratings.total). Set on 2020-21 and 2021-22, pre-registered, one pass on
+# 2022-23 to 2025-26 (scripts/research/soccer_nov13): over 2.5 log loss .68265 -> .67531 against the model's total at
+# the league's level (21,763 matches in 16 leagues, t -8.9 by match day, 4 of 4 seasons; big five -.0020, t -2.5;
+# the other eleven -.0099, t -8.7; the close .67168). The club leans add -.0004 (t -2.6) over the league term alone
 # r45 (Nov 1 2026, scripts/rest_research.py): a club 4-5 days off its last match in any competition (mostly after a
 # Champions League Tuesday or Wednesday) is .02 log goals worse each way (both sides' lambdas). Pre-registered band;
 # in the model on top of everything else, log loss 2013-22 -.00019 a match (t -2.2 by day), 2023-27 -.00027 (t -1.7),
@@ -586,6 +596,29 @@ def level_goals(rng, mh, ma, q):
     return np.where(cv, v, gh), np.where(cv, v, ga)
 
 
+def ou_close(r):
+    """the closing chance of over 2.5 goals without the vig (Pinnacle, Betfair Exchange, then the average close)"""
+    for k in ('ouc', 'oubc', 'ouac'):
+        o = r.get(k)
+        if o and o[0] > 1 and o[1] > 1:
+            a, b = 1 / o[0], 1 / o[1]
+            if 1.0 <= a + b <= 1.15:
+                return a / (a + b)
+    return None
+
+
+_MU = None
+
+
+def mu_of(p):
+    """the total goals whose Poisson chance of three or more is p"""
+    global _MU
+    if _MU is None:
+        g = np.arange(0.8, 6.0, 0.005)
+        _MU = (g, 1 - np.exp(-g) * (1 + g + g * g / 2))
+    return float(np.interp(p, _MU[1], _MU[0]))
+
+
 # ---------------------------------------------------------------- the rating engine
 def ex(x):
     return math.exp(min(2.5, max(-4.0, x)))
@@ -609,6 +642,9 @@ class Ratings:
         self.home_lg = {}                                                   # (club, season) -> domestic league
         self.rolled = set()
         self.last = {}
+        self.totals = False                                                 # run(totals=True): keep the totals ratings
+        self.tt = defaultdict(float)                                        # club -> lean on total goals (log)
+        self.tb = {}                                                        # league -> its term in the projected total
 
     # -- league membership: the domestic league a club plays most of a season's league matches in
     def set_membership(self, rows):
@@ -756,8 +792,38 @@ class Ratings:
             return 7.0
         return float(min(7, max(2, (dt.date.fromisoformat(day) - dt.date.fromisoformat(l)).days)))
 
+    def total(self, r, lh, la):
+        """projected total goals for a league match from the market totals ratings (None: the league has had no
+        over/under close, or the match is a cup or European one); lh, la the game model's means"""
+        lg = r['lg']
+        if lg not in self.tb or self.lg.get(r['h']) != lg or self.lg.get(r['a']) != lg:
+            return None
+        own = self.P['trel'] * math.log((lh + la) * level(lg, D.season_of(r['day'], lg)))
+        return math.exp(own + self.tb[lg] + self.tt[r['h']] + self.tt[r['a']])
+
+    def update_total(self, r):
+        """before the match's own ratings move: the league term and both clubs' leans step toward the total its closing
+        over/under price implied"""
+        lg = r['lg']
+        if lg in D.EURO or lg in D.CUPS or self.lg.get(r['h']) != lg or self.lg.get(r['a']) != lg:
+            return
+        pc = ou_close(r)
+        if pc is None:
+            return
+        m = math.log(mu_of(min(0.95, max(0.05, pc))))
+        lh, la = self.lambdas(r)
+        if lg not in self.tb:
+            self.tb[lg] = m - self.P['trel'] * math.log((lh + la) * level(lg, D.season_of(r['day'], lg)))
+            return
+        e = m - math.log(self.total(r, lh, la))
+        self.tt[r['h']] += self.P['tkt'] * e
+        self.tt[r['a']] += self.P['tkt'] * e
+        self.tb[lg] += self.P['tkb'] * e
+
     def update(self, r):
         P = self.P
+        if self.totals:
+            self.update_total(r)
         h, a = r['h'], r['a']
         Lh, La = self.lg.get(h, 'x'), self.lg.get(a, 'x')
         cross = Lh != La
@@ -837,11 +903,12 @@ def res90(r):
     return r.get('r90')
 
 
-def run(rows, P, score=None, keep=None, et=False):
+def run(rows, P, score=None, keep=None, et=False, totals=False, scored=None):
     """walk forward through rows (finished matches in time order); score(r, lh, la) called before each update of a
     row with lg in SCORED from SCORE_FROM; keep: optional callback after the update. et: also score the matches that
     went to extra time and have a 90-minute result (add_r90); the callback must then read res90(r), never hs / as"""
     R = Ratings(P)
+    R.totals = totals
     R.set_membership(rows)
     if et:
         add_r90(rows)
@@ -849,7 +916,7 @@ def run(rows, P, score=None, keep=None, et=False):
         if r.get('hs') is None:
             continue
         R.prep(r)
-        if score is not None and r['lg'] in SCORED and (r['st'] == 'FT' or et and r.get('r90') is not None):
+        if score is not None and r['lg'] in (scored or SCORED) and (r['st'] == 'FT' or et and r.get('r90') is not None):
             S = D.season_of(r['day'], r['lg'])
             if S >= SCORE_FROM:
                 lh, la = R.lambdas(r)
@@ -1050,6 +1117,40 @@ def ratings_history(rows, P):
             'seasons': out})
 
 
+OU_TUNE, OU_HOLD = (2021, 2022), 2023
+
+
+def totals_test(rows, P):
+    """over 2.5 log loss, walk-forward, every league match with an over/under close behind its league: the market
+    totals ratings against the model's total at the league's scoring level, and the close itself"""
+    tot = np.add.outer(np.arange(GMAX), np.arange(GMAX))
+    recs = []
+
+    def over(lh, la):
+        return min(1 - 1e-6, max(1e-6, float(score_matrix(lh, la, P['rho'])[tot > 2.5].sum())))
+
+    def score(r, S, lh, la, R):
+        pc = ou_close(r)
+        mu = R.total(r, lh, la)
+        if pc is None or mu is None or r['st'] != 'FT':
+            return
+        f = level(r['lg'], S)
+        y = r['hs'] + r['as'] > 2
+        ll = [-math.log(p if y else 1 - p) for p in (over(lh * f, la * f), over(lh * mu / (lh + la), la * mu / (lh + la)), pc)]
+        recs.append((S, r['day'], r['lg'] in D.BIG5, ll))
+    lgs = {r['lg'] for r in rows if r['lg'] not in D.EURO and r['lg'] not in D.CUPS and (r.get('ouc') or r.get('oubc') or r.get('ouac'))}
+    run(rows, P, score, totals=True, scored=lgs)
+    out = {}
+    for nm, keep in (('tune', lambda S, b: OU_TUNE[0] <= S <= OU_TUNE[1]), ('hold', lambda S, b: S >= OU_HOLD),
+                     ('holdBig5', lambda S, b: S >= OU_HOLD and b), ('holdOther', lambda S, b: S >= OU_HOLD and not b)):
+        v = [x for x in recs if keep(x[0], x[2])]
+        if v:
+            n = len(v)
+            out[nm] = {'n': n, 'level': round(sum(x[3][0] for x in v) / n, 5), 'ratings': round(sum(x[3][1] for x in v) / n, 5),
+                       'close': round(sum(x[3][2] for x in v) / n, 5), 't': cl_t([x[3][1] - x[3][0] for x in v], [x[1] for x in v])}
+    return out
+
+
 def fit():
     rows = add_inj(add_mv(add_market(D.load(HIST))))
     P = params()
@@ -1113,6 +1214,7 @@ def fit():
     ratings_history(rows, P)
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'params': P, 'tune': list(TUNE),
            'holdFrom': HOLD_FROM, 'tests': tests, 'vsClose': vs, 'euro': euro, 'calibration': cal, 'seasonSd': sd,
+           'totals': totals_test(rows, P),
            'n': {'matches': len(rows), 'scored': len(wf)}}
     json.dump(out, open(FIT, 'w'), indent=1, allow_nan=False)
     print(json.dumps({k: out[k] for k in ('vsClose', 'euro', 'seasonSd')}, indent=1))
@@ -1164,7 +1266,7 @@ class Live:
     def __init__(self, P, rows):
         self.P = P
         self.rows = rows
-        self.R = run(rows, P)
+        self.R = run(rows, P, totals=True)
         self.names = D.load(NAMES) if os.path.exists(NAMES) else {}
         for r in rows:
             for c in ('h', 'a'):
@@ -1805,7 +1907,8 @@ def build(days_ahead=4):
         if pend:
             R.last[r['h']] = R.last[r['a']] = lday(r)
         pw_, pd_, pl_ = wdl(lh, la, P['rho'])
-        lv = level(r['lg'], D.season_of(r['day'], r['lg']))      # projected score and totals at the league's level
+        mu = R.total(r, lh, la)                  # projected score and totals: the market totals ratings, else
+        lv = mu / (lh + la) if mu else level(r['lg'], D.season_of(r['day'], r['lg']))    # the league's scoring level
         lh, la = lh * lv, la * lv
         M = score_matrix(lh, la, P['rho'])
         tot = np.add.outer(np.arange(GMAX), np.arange(GMAX))
@@ -1871,6 +1974,11 @@ if __name__ == '__main__':
         patch_fmxg(sys.argv[sys.argv.index('--fmxg') + 1] if len(sys.argv) > sys.argv.index('--fmxg') + 1 else None)
     elif '--fit' in sys.argv:
         fit()
+    elif '--totals' in sys.argv:           # the totals ratings' backtest alone, into the stored fit
+        F = json.load(open(FIT))
+        F['totals'] = totals_test(add_inj(add_mv(add_market(D.load(HIST)))), params())
+        json.dump(F, open(FIT, 'w'), indent=1, allow_nan=False)
+        print(json.dumps(F['totals'], indent=1))
     elif '--eval' in sys.argv:
         rows = add_mv(add_market(D.load(HIST)))
         print(evaluate(rows, params()), evaluate(rows, params(), lo=HOLD_FROM, hi=2100))
