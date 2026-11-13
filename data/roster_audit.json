@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T13:40Z",
+ "asof": "2026-11-13T14:39Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -4267,7 +4267,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -4275,19 +4275,55 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 842
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 845
     },
     "static/data/xaav-nhl.json": {
-     "flags": 10,
+     "flags": 11,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-13",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "LD",
+     "rotowire": "CAR",
+     "site": "CAR"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -4305,6 +4341,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
     },
     {
      "d": "2026-09-11",
@@ -4485,6 +4539,24 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
     },
     {
      "d": "2026-11-07",
