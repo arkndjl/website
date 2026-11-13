@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T01:17Z",
+ "asof": "2026-11-13T01:47Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -17,7 +17,7 @@
    "by_file": {
     "static/data/depth/cfb.json": {
      "flags": 3,
-     "rows": 16718
+     "rows": 16716
     }
    },
    "flags": [
@@ -78,7 +78,7 @@
    ],
    "joined": 0,
    "players": 2573,
-   "rows": 16718
+   "rows": 16716
   },
   "nba": {
    "by_file": {
@@ -4261,13 +4261,13 @@
     }
    ],
    "joined": 0,
-   "players": 2248,
+   "players": 2250,
    "rows": 8003
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -4275,19 +4275,37 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 839
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 839
     },
     "static/data/xaav-nhl.json": {
-     "flags": 10,
+     "flags": 11,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-12",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "released",
+     "head": "Departs Thursday's contest",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Departs Thursday's contest",
+      "kind": "exit"
+     },
+     "pid": "6689",
+     "player": "Lian Bichsel",
+     "pos": "LD",
+     "rotowire": "DAL",
+     "site": "DAL"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -4305,6 +4323,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "released",
+     "head": "Departs Thursday's contest",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Departs Thursday's contest",
+      "kind": "exit"
+     },
+     "pid": "6689",
+     "player": "Lian Bichsel",
+     "pos": "D",
+     "rotowire": "DAL",
+     "site": "DAL"
     },
     {
      "d": "2026-09-11",
@@ -4395,6 +4431,24 @@
      "pos": "L",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "released",
+     "head": "Departs Thursday's contest",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Departs Thursday's contest",
+      "kind": "exit"
+     },
+     "pid": "6689",
+     "player": "Lian Bichsel",
+     "pos": "D",
+     "rotowire": "DAL",
+     "site": "DAL"
     },
     {
      "d": "2026-09-21",
@@ -4503,6 +4557,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Departs Thursday's contest",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Departs Thursday's contest",
+      "kind": "exit"
+     },
+     "pid": "6689",
+     "player": "Lian Bichsel",
+     "pos": "D",
+     "rotowire": "DAL",
+     "site": "DAL"
     }
    ],
    "joined": 0,

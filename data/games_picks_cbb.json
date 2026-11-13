@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-13T01:19:03Z",
+ "asof": "2026-11-13T01:48:01Z",
  "recenter": {
   "2026-11-12": -10.28,
   "2026-11-13": -10.34
@@ -102,7 +102,7 @@
  },
  "model": {
   "asof": "2026-11-12T22:48:25Z",
-  "ageH": 2.5,
+  "ageH": 3.0,
   "stale": false
  },
  "picks": [],
@@ -118,7 +118,7 @@
    "mk": "total",
    "side": "under",
    "line": 162.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 10.6,
    "x": null,
    "why": "total market off",
@@ -158,22 +158,6 @@
    "tm": 141.3
   },
   {
-   "id": "401911533",
-   "sport": "cbb",
-   "kick": "2026-11-13T02:00:00Z",
-   "home": "UTEP",
-   "away": "New Mexico State",
-   "mk": "spread",
-   "side": "home",
-   "line": 4.5,
-   "price": -111.0,
-   "edge": 4.1,
-   "x": null,
-   "why": "spread market off",
-   "m": 8.6,
-   "tm": 147.4
-  },
-  {
    "id": "401916316",
    "sport": "cbb",
    "kick": "2026-11-14T00:30:00Z",
@@ -206,6 +190,22 @@
    "tm": 150.2
   },
   {
+   "id": "401911533",
+   "sport": "cbb",
+   "kick": "2026-11-13T02:00:00Z",
+   "home": "UTEP",
+   "away": "New Mexico State",
+   "mk": "spread",
+   "side": "home",
+   "line": 5.5,
+   "price": 108.0,
+   "edge": 3.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 8.6,
+   "tm": 147.4
+  },
+  {
    "id": "401921728",
    "sport": "cbb",
    "kick": "2026-11-14T02:00:00Z",
@@ -214,7 +214,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -133.0,
+   "price": -138.0,
    "edge": 3.1,
    "x": null,
    "why": "spread market off",
@@ -227,13 +227,13 @@
    "kick": "2026-11-14T02:00:00Z",
    "home": "Alabama",
    "away": "Seton Hall",
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -113.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 16.5,
+   "price": -117.0,
    "edge": 2.7,
    "x": null,
-   "why": "total market off",
+   "why": "spread market off",
    "m": 13.8,
    "tm": 153.8
   }
@@ -243,7 +243,7 @@
    "mk": "total",
    "side": "under",
    "line": 162.5,
-   "price": -102.0,
+   "price": 102.0,
    "edge": 10.6,
    "ev": null,
    "units": 0.0,
@@ -266,9 +266,9 @@
   "401911533": {
    "mk": "spread",
    "side": "home",
-   "line": 4.5,
-   "price": -111.0,
-   "edge": 4.1,
+   "line": 5.5,
+   "price": 108.0,
+   "edge": 3.1,
    "ev": null,
    "units": 0.0,
    "home": "UTEP",
@@ -300,10 +300,10 @@
    "state": "off"
   },
   "401906760": {
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -113.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 16.5,
+   "price": -117.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -327,7 +327,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -133.0,
+   "price": -138.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -388,43 +388,43 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 12260,
+  "snapshots": 12266,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 480,
-    "clvRet": -0.0401,
-    "clvT": -5.49,
+    "clvN": 481,
+    "clvRet": -0.0402,
+    "clvT": -5.51,
     "clv": -0.03,
-    "beat": 0.292,
-    "still": 0.302
+    "beat": 0.291,
+    "still": 0.304
    },
    {
     "when": "6-24h",
-    "clvN": 2295,
-    "clvRet": -0.0312,
-    "clvT": -14.16,
-    "clv": 0.16,
-    "beat": 0.324,
-    "still": 0.454
+    "clvN": 2297,
+    "clvRet": -0.0306,
+    "clvT": -13.85,
+    "clv": 0.17,
+    "beat": 0.328,
+    "still": 0.453
    },
    {
     "when": "1-6h",
     "clvN": 1474,
-    "clvRet": -0.0417,
-    "clvT": -33.82,
-    "clv": 0.05,
-    "beat": 0.161,
-    "still": 0.71
+    "clvRet": -0.0415,
+    "clvT": -33.57,
+    "clv": 0.06,
+    "beat": 0.164,
+    "still": 0.707
    },
    {
     "when": "<1h",
-    "clvN": 278,
-    "clvRet": -0.0448,
-    "clvT": -23.04,
-    "clv": 0.01,
-    "beat": 0.086,
-    "still": 0.831
+    "clvN": 280,
+    "clvRet": -0.0439,
+    "clvT": -21.98,
+    "clv": 0.02,
+    "beat": 0.1,
+    "still": 0.818
    }
   ]
  },
@@ -7742,12 +7742,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T01:19:03Z",
+ "checked": "2026-11-13T01:48:01Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-12": {
-    "raw": 1.0,
+    "raw": 0.5,
     "scale": 1.0,
     "down": 4.75
    },
