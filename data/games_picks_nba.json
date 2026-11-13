@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-13T17:19:44Z",
+ "asof": "2026-11-13T17:47:22Z",
  "recenter": {
-  "2026-11-13": 1.67
+  "2026-11-13": 1.66
  },
  "monitor": {
   "clocks": {
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-13T16:12:29Z",
-  "ageH": 1.1,
+  "ageH": 1.6,
   "stale": false
  },
  "picks": [
@@ -361,14 +361,7 @@
    "flagged": "2026-11-13T16:13:52Z",
    "betTo": 237.5,
    "close": 237.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 237.5,
-    "price": -102.0,
-    "ev": 0.065,
-    "units": 0.25
-   }
+   "now": null
   },
   {
    "id": "401909299",
@@ -400,8 +393,8 @@
     "side": "under",
     "line": 245.5,
     "price": -102.0,
-    "ev": 0.088,
-    "units": 0.5
+    "ev": 0.09,
+    "units": 0.75
    }
   }
  ],
@@ -425,6 +418,22 @@
    "tm": 220.5
   },
   {
+   "id": "401909300",
+   "sport": "nba",
+   "kick": "2026-11-14T01:00:00Z",
+   "home": "NO",
+   "away": "MEM",
+   "mk": "total",
+   "side": "under",
+   "line": 237.5,
+   "price": -108.0,
+   "edge": 2.9,
+   "x": 2.5,
+   "why": "no edge at -108",
+   "m": -1.9,
+   "tm": 234.6
+  },
+  {
    "id": "401909304",
    "sport": "nba",
    "kick": "2026-11-14T03:30:00Z",
@@ -433,7 +442,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.1,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -449,7 +458,7 @@
    "mk": "total",
    "side": "under",
    "line": 223.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 1.8,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -465,7 +474,7 @@
    "mk": "total",
    "side": "under",
    "line": 219.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 1.3,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -478,11 +487,11 @@
    "kick": "2026-11-14T03:00:00Z",
    "home": "SAC",
    "away": "POR",
-   "mk": "total",
-   "side": "over",
-   "line": 228.5,
-   "price": -100.0,
-   "edge": 0.8,
+   "mk": "spread",
+   "side": "away",
+   "line": -9.5,
+   "price": 273.0,
+   "edge": 1.2,
    "x": 2.5,
    "why": "edge under 2.5",
    "m": -10.7,
@@ -494,7 +503,7 @@
    "mk": "total",
    "side": "under",
    "line": 219.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 1.3,
    "ev": null,
    "units": 0.0,
@@ -506,7 +515,7 @@
    "mk": "total",
    "side": "under",
    "line": 223.5,
-   "price": -100.0,
+   "price": -104.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -531,9 +540,9 @@
    "side": "under",
    "line": 245.5,
    "price": -102.0,
-   "ev": 0.088,
+   "ev": 0.09,
    "edge": 4.0,
-   "units": 0.5,
+   "units": 0.75,
    "home": "CHI",
    "away": "ATL",
    "state": "pick"
@@ -542,13 +551,13 @@
    "mk": "total",
    "side": "under",
    "line": 237.5,
-   "price": -102.0,
-   "ev": 0.065,
+   "price": -108.0,
    "edge": 2.9,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "NO",
    "away": "MEM",
-   "state": "pick"
+   "state": "under"
   },
   "401909301": {
    "mk": "spread",
@@ -575,11 +584,11 @@
    "state": "pick"
   },
   "401909303": {
-   "mk": "total",
-   "side": "over",
-   "line": 228.5,
-   "price": -100.0,
-   "edge": 0.8,
+   "mk": "spread",
+   "side": "away",
+   "line": -9.5,
+   "price": 273.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "SAC",
@@ -590,7 +599,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -651,7 +660,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 3919,
+  "snapshots": 3928,
   "buckets": [
    {
     "when": "24h+",
@@ -664,12 +673,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 901,
-    "clvRet": -0.0099,
-    "clvT": -3.18,
+    "clvN": 904,
+    "clvRet": -0.01,
+    "clvT": -3.23,
     "clv": 0.56,
-    "beat": 0.445,
-    "still": 0.426
+    "beat": 0.444,
+    "still": 0.428
    },
    {
     "when": "1-6h",
@@ -6808,12 +6817,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T17:19:44Z",
+ "checked": "2026-11-13T17:47:22Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-13": {
-    "raw": 4.25,
+    "raw": 4.5,
     "scale": 1.0
    }
   }
