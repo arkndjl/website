@@ -426,6 +426,11 @@ def et_day(kick):
     return t.astimezone(ZoneInfo('America/New_York')).date().isoformat()
 
 
+# a sport's live picks count from here: before it the scheduled CBB build had no possessions for finished games (tempo
+# stuck near 64 against 72 played, totals 11 under the lines), so those picks tested the build, not the model
+LIVE_FROM = {'cbb': '2026-11-13T05:26:00Z'}
+
+
 def live_pairs(sport, mk):
     """(gap, clvRet, slate) of graded live picks: the games_picks log (every flagged pick) and the paper book; slate is
     the ET date"""
@@ -438,6 +443,8 @@ def live_pairs(sport, mk):
             # judged at BASE, the price the calibration's level is read at, and no moneylines (Nov 2 2026 audit: a -110
             # pick reads ~3 points lower than at -103, and a plus-money moneyline's return is on another scale)
             if e.get('clvRet') is None or e.get('edge') is None or e['mk'] != mk:
+                continue
+            if (e.get('flagged') or '') < LIVE_FROM.get(sport, ''):
                 continue
             r = C.ret(sport, mk, e['side'], e.get('line'), BASE, e.get('close')) if e.get('line') is not None else None
             gap = e.get('sz') or e['edge']
@@ -452,7 +459,7 @@ def live_pairs(sport, mk):
         for b in json.load(open(os.path.join(HERE, 'data', 'paper_book_rules_2026-10.json'))).get('ledger', []):
             # staked bets only, and no totals where DU's gap is the recentred one (games_picks.RC_SPORTS): the paper
             # book's totals gap is the raw model minus the line (Oct 21 2026 audit)
-            if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None \
+            if b.get('sport') == sport and sport not in LIVE_FROM and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None \
                     and (b.get('stake') or 0) > 0 and not (mk == 'total' and sport in GP_RC_SPORTS()):
                 out.append((b['gap'], b['clvRet'], 'p' + et_day(b.get('k'))))
     except (OSError, ValueError):

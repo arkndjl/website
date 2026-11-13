@@ -700,41 +700,6 @@
     },
     {
      "mk": "spread",
-     "fam": "tier",
-     "val": "power",
-     "x": 8.0,
-     "k": 0.105,
-     "frac": 1.0,
-     "valRec": {
-      "n": 31,
-      "clvRet": 0.0342,
-      "clvT": 1.37,
-      "clv": 1.03,
-      "beat": 0.613,
-      "w": 21,
-      "l": 9,
-      "roi": 0.3674,
-      "roiT": 2.26
-     },
-     "held": {
-      "n": 25,
-      "clvRet": 0.0689,
-      "clvT": 2.09,
-      "clv": 1.76,
-      "beat": 0.56,
-      "w": 14,
-      "l": 11,
-      "roi": 0.1037,
-      "roiT": 0.52,
-      "clvIcc": 0.174
-     },
-     "tuneShrunk": 0.0269,
-     "tuneN": 39,
-     "addN": 31,
-     "addClv": 0.0342
-    },
-    {
-     "mk": "spread",
      "fam": "venue",
      "val": "home",
      "x": 8.0,
@@ -1473,12 +1438,11 @@
       "leak": null
      },
      "liveRec": {
-      "n": 65,
-      "clvRet": -0.0321,
-      "clvT": -3.15,
-      "days": 3
+      "n": 0,
+      "clvRet": null,
+      "clvT": null
      },
-     "on": false,
+     "on": true,
      "x": 1.5,
      "tuneRec": {
       "n": 1969,
@@ -1514,9 +1478,9 @@
       "roiT": 3.52,
       "clvIcc": 0.036
      },
-     "why": "lost to the close live (65 picks at 1.5+, -3.2%)",
+     "why": null,
      "k": 0.364,
-     "frac": null,
+     "frac": 1.0,
      "cap": 8.0,
      "bySeason": [
       {
@@ -1531,7 +1495,17 @@
        "roi": 0.0759,
        "roiT": 3.52
       }
-     ]
+     ],
+     "du": {
+      "lam": 1.0,
+      "cap": 5.0,
+      "edge": 0.0184,
+      "units": 2.0,
+      "n": 1431,
+      "gClose": 24.69,
+      "dd25": 0.927,
+      "dd50": 0.308
+     }
     },
     "total": {
      "grid": [
@@ -1705,12 +1679,11 @@
       "leak": null
      },
      "liveRec": {
-      "n": 86,
-      "clvRet": -0.0267,
-      "clvT": -2.41,
-      "days": 3
+      "n": 0,
+      "clvRet": null,
+      "clvT": null
      },
-     "on": false,
+     "on": true,
      "x": 2.0,
      "tuneRec": {
       "n": 2013,
@@ -1746,9 +1719,9 @@
       "roiT": 5.51,
       "clvIcc": 0.054
      },
-     "why": "lost to the close live (86 picks at 2.0+, -2.7%)",
+     "why": null,
      "k": 0.548,
-     "frac": null,
+     "frac": 1.0,
      "cap": 9.3,
      "bySeason": [
       {
@@ -1763,12 +1736,670 @@
        "roi": 0.1088,
        "roiT": 5.51
       }
-     ]
+     ],
+     "du": {
+      "lam": 1.0,
+      "cap": 5.0,
+      "edge": 0.0331,
+      "units": 3.5,
+      "n": 2196,
+      "gClose": 159.88,
+      "dd25": 1.0,
+      "dd50": 0.862
+     }
     },
     "ml": {
      "on": false,
      "why": "no opening moneylines in the history, so moneyline picks can't be judged by the close"
     }
+   },
+   "segments": [
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "A10",
+     "x": 1.0,
+     "k": 0.576,
+     "frac": 1.0,
+     "valRec": {
+      "n": 63,
+      "clvRet": 0.0576,
+      "clvT": 4.31,
+      "clv": 1.06,
+      "beat": 0.587,
+      "w": 38,
+      "l": 25,
+      "roi": 0.1888,
+      "roiT": 1.54
+     },
+     "held": {
+      "n": 63,
+      "clvRet": 0.0576,
+      "clvT": 4.31,
+      "clv": 1.06,
+      "beat": 0.587,
+      "w": 38,
+      "l": 25,
+      "roi": 0.1888,
+      "roiT": 1.54,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0225,
+     "tuneN": 40,
+     "addN": 25,
+     "addClv": 0.0345
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "CUSA",
+     "x": 1.0,
+     "k": 0.531,
+     "frac": 1.0,
+     "valRec": {
+      "n": 39,
+      "clvRet": 0.0562,
+      "clvT": 4.09,
+      "clv": 1.03,
+      "beat": 0.641,
+      "w": 23,
+      "l": 16,
+      "roi": 0.1623,
+      "roiT": 1.03
+     },
+     "held": {
+      "n": 39,
+      "clvRet": 0.0562,
+      "clvT": 4.09,
+      "clv": 1.03,
+      "beat": 0.641,
+      "w": 23,
+      "l": 16,
+      "roi": 0.1623,
+      "roiT": 1.03,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0259,
+     "tuneN": 29,
+     "addN": 13,
+     "addClv": 0.0464
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "Horz",
+     "x": 1.0,
+     "k": 0.547,
+     "frac": 1.0,
+     "valRec": {
+      "n": 57,
+      "clvRet": 0.0611,
+      "clvT": 5.77,
+      "clv": 1.07,
+      "beat": 0.702,
+      "w": 21,
+      "l": 36,
+      "roi": -0.2739,
+      "roiT": -2.16
+     },
+     "held": {
+      "n": 57,
+      "clvRet": 0.0611,
+      "clvT": 5.77,
+      "clv": 1.07,
+      "beat": 0.702,
+      "w": 21,
+      "l": 36,
+      "roi": -0.2739,
+      "roiT": -2.16,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0152,
+     "tuneN": 49,
+     "addN": 23,
+     "addClv": 0.0431
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "Ivy",
+     "x": 1.0,
+     "k": 0.336,
+     "frac": 1.0,
+     "valRec": {
+      "n": 31,
+      "clvRet": 0.0348,
+      "clvT": 1.97,
+      "clv": 0.68,
+      "beat": 0.613,
+      "w": 14,
+      "l": 17,
+      "roi": -0.1099,
+      "roiT": -0.61
+     },
+     "held": {
+      "n": 31,
+      "clvRet": 0.0348,
+      "clvT": 1.97,
+      "clv": 0.68,
+      "beat": 0.613,
+      "w": 14,
+      "l": 17,
+      "roi": -0.1099,
+      "roiT": -0.61,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0272,
+     "tuneN": 28,
+     "addN": 8,
+     "addClv": 0.0214
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "MAC",
+     "x": 1.0,
+     "k": 0.6,
+     "frac": 1.0,
+     "valRec": {
+      "n": 40,
+      "clvRet": 0.0638,
+      "clvT": 4.24,
+      "clv": 1.15,
+      "beat": 0.575,
+      "w": 23,
+      "l": 17,
+      "roi": 0.1333,
+      "roiT": 0.85
+     },
+     "held": {
+      "n": 40,
+      "clvRet": 0.0638,
+      "clvT": 4.24,
+      "clv": 1.15,
+      "beat": 0.575,
+      "w": 23,
+      "l": 17,
+      "roi": 0.1333,
+      "roiT": 0.85,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0224,
+     "tuneN": 35,
+     "addN": 11,
+     "addClv": 0.0182
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "MVC",
+     "x": 1.0,
+     "k": 0.592,
+     "frac": 1.0,
+     "valRec": {
+      "n": 41,
+      "clvRet": 0.062,
+      "clvT": 4.12,
+      "clv": 1.1,
+      "beat": 0.707,
+      "w": 23,
+      "l": 18,
+      "roi": 0.1056,
+      "roiT": 0.68
+     },
+     "held": {
+      "n": 41,
+      "clvRet": 0.062,
+      "clvT": 4.12,
+      "clv": 1.1,
+      "beat": 0.707,
+      "w": 23,
+      "l": 18,
+      "roi": 0.1056,
+      "roiT": 0.68,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.033,
+     "tuneN": 38,
+     "addN": 17,
+     "addClv": 0.0286
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "OVC",
+     "x": 1.0,
+     "k": 0.513,
+     "frac": 1.0,
+     "valRec": {
+      "n": 26,
+      "clvRet": 0.0478,
+      "clvT": 2.39,
+      "clv": 0.88,
+      "beat": 0.615,
+      "w": 18,
+      "l": 8,
+      "roi": 0.3645,
+      "roiT": 2.0
+     },
+     "held": {
+      "n": 26,
+      "clvRet": 0.0478,
+      "clvT": 2.39,
+      "clv": 0.88,
+      "beat": 0.615,
+      "w": 18,
+      "l": 8,
+      "roi": 0.3645,
+      "roiT": 2.0,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.025,
+     "tuneN": 31,
+     "addN": 11,
+     "addClv": 0.0311
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "Pat",
+     "x": 1.0,
+     "k": 0.607,
+     "frac": 1.0,
+     "valRec": {
+      "n": 46,
+      "clvRet": 0.061,
+      "clvT": 4.97,
+      "clv": 1.09,
+      "beat": 0.652,
+      "w": 22,
+      "l": 24,
+      "roi": -0.0574,
+      "roiT": -0.39
+     },
+     "held": {
+      "n": 46,
+      "clvRet": 0.061,
+      "clvT": 4.97,
+      "clv": 1.09,
+      "beat": 0.652,
+      "w": 22,
+      "l": 24,
+      "roi": -0.0574,
+      "roiT": -0.39,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0374,
+     "tuneN": 31,
+     "addN": 23,
+     "addClv": 0.0412
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "SC",
+     "x": 1.0,
+     "k": 0.385,
+     "frac": 1.0,
+     "valRec": {
+      "n": 37,
+      "clvRet": 0.0343,
+      "clvT": 2.65,
+      "clv": 0.73,
+      "beat": 0.459,
+      "w": 19,
+      "l": 18,
+      "roi": 0.0121,
+      "roiT": 0.07
+     },
+     "held": {
+      "n": 37,
+      "clvRet": 0.0343,
+      "clvT": 2.65,
+      "clv": 0.73,
+      "beat": 0.459,
+      "w": 19,
+      "l": 18,
+      "roi": 0.0121,
+      "roiT": 0.07,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0308,
+     "tuneN": 42,
+     "addN": 13,
+     "addClv": 0.015
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "SWAC",
+     "x": 1.0,
+     "k": 0.373,
+     "frac": 1.0,
+     "valRec": {
+      "n": 49,
+      "clvRet": 0.0348,
+      "clvT": 3.2,
+      "clv": 0.71,
+      "beat": 0.592,
+      "w": 28,
+      "l": 21,
+      "roi": 0.1262,
+      "roiT": 0.9
+     },
+     "held": {
+      "n": 49,
+      "clvRet": 0.0348,
+      "clvT": 3.2,
+      "clv": 0.71,
+      "beat": 0.592,
+      "w": 28,
+      "l": 21,
+      "roi": 0.1262,
+      "roiT": 0.9,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0408,
+     "tuneN": 52,
+     "addN": 22,
+     "addClv": 0.0198
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "Sum",
+     "x": 1.0,
+     "k": 0.628,
+     "frac": 1.0,
+     "valRec": {
+      "n": 29,
+      "clvRet": 0.0701,
+      "clvT": 4.0,
+      "clv": 1.21,
+      "beat": 0.724,
+      "w": 14,
+      "l": 15,
+      "roi": -0.0485,
+      "roiT": -0.26
+     },
+     "held": {
+      "n": 29,
+      "clvRet": 0.0701,
+      "clvT": 4.0,
+      "clv": 1.21,
+      "beat": 0.724,
+      "w": 14,
+      "l": 15,
+      "roi": -0.0485,
+      "roiT": -0.26,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0167,
+     "tuneN": 25,
+     "addN": 13,
+     "addClv": 0.015
+    },
+    {
+     "mk": "spread",
+     "fam": "conf",
+     "val": "WCC",
+     "x": 1.0,
+     "k": 0.564,
+     "frac": 1.0,
+     "valRec": {
+      "n": 33,
+      "clvRet": 0.0561,
+      "clvT": 4.06,
+      "clv": 1.03,
+      "beat": 0.727,
+      "w": 17,
+      "l": 16,
+      "roi": 0.0153,
+      "roiT": 0.09
+     },
+     "held": {
+      "n": 33,
+      "clvRet": 0.0561,
+      "clvT": 4.06,
+      "clv": 1.03,
+      "beat": 0.727,
+      "w": 17,
+      "l": 16,
+      "roi": 0.0153,
+      "roiT": 0.09,
+      "clvIcc": 0.018
+     },
+     "tuneShrunk": 0.0277,
+     "tuneN": 32,
+     "addN": 15,
+     "addClv": 0.0182
+    },
+    {
+     "mk": "total",
+     "fam": "conf",
+     "val": "BSth",
+     "x": 1.5,
+     "k": 0.462,
+     "frac": 1.0,
+     "valRec": {
+      "n": 38,
+      "clvRet": 0.0546,
+      "clvT": 3.97,
+      "clv": 1.45,
+      "beat": 0.711,
+      "w": 26,
+      "l": 12,
+      "roi": 0.3485,
+      "roiT": 2.31
+     },
+     "held": {
+      "n": 38,
+      "clvRet": 0.0546,
+      "clvT": 3.97,
+      "clv": 1.45,
+      "beat": 0.711,
+      "w": 26,
+      "l": 12,
+      "roi": 0.3485,
+      "roiT": 2.31,
+      "clvIcc": 0.04
+     },
+     "tuneShrunk": 0.0336,
+     "tuneN": 30,
+     "addN": 10,
+     "addClv": 0.0431
+    },
+    {
+     "mk": "total",
+     "fam": "conf",
+     "val": "BW",
+     "x": 1.5,
+     "k": 0.607,
+     "frac": 1.0,
+     "valRec": {
+      "n": 42,
+      "clvRet": 0.0871,
+      "clvT": 4.18,
+      "clv": 2.14,
+      "beat": 0.786,
+      "w": 20,
+      "l": 22,
+      "roi": -0.0615,
+      "roiT": -0.4
+     },
+     "held": {
+      "n": 42,
+      "clvRet": 0.0871,
+      "clvT": 4.18,
+      "clv": 2.14,
+      "beat": 0.786,
+      "w": 20,
+      "l": 22,
+      "roi": -0.0615,
+      "roiT": -0.4,
+      "clvIcc": 0.04
+     },
+     "tuneShrunk": 0.0388,
+     "tuneN": 32,
+     "addN": 4,
+     "addClv": 0.0215
+    },
+    {
+     "mk": "total",
+     "fam": "conf",
+     "val": "CUSA",
+     "x": 1.5,
+     "k": 0.535,
+     "frac": 1.0,
+     "valRec": {
+      "n": 43,
+      "clvRet": 0.0665,
+      "clvT": 5.04,
+      "clv": 1.7,
+      "beat": 0.628,
+      "w": 25,
+      "l": 18,
+      "roi": 0.1459,
+      "roiT": 0.97
+     },
+     "held": {
+      "n": 43,
+      "clvRet": 0.0665,
+      "clvT": 5.04,
+      "clv": 1.7,
+      "beat": 0.628,
+      "w": 25,
+      "l": 18,
+      "roi": 0.1459,
+      "roiT": 0.97,
+      "clvIcc": 0.04
+     },
+     "tuneShrunk": 0.0414,
+     "tuneN": 25,
+     "addN": 11,
+     "addClv": 0.0071
+    },
+    {
+     "mk": "total",
+     "fam": "conf",
+     "val": "Ivy",
+     "x": 1.5,
+     "k": 0.682,
+     "frac": 1.0,
+     "valRec": {
+      "n": 27,
+      "clvRet": 0.0883,
+      "clvT": 5.98,
+      "clv": 2.15,
+      "beat": 0.889,
+      "w": 22,
+      "l": 5,
+      "roi": 0.6059,
+      "roiT": 4.04
+     },
+     "held": {
+      "n": 27,
+      "clvRet": 0.0883,
+      "clvT": 5.98,
+      "clv": 2.15,
+      "beat": 0.889,
+      "w": 22,
+      "l": 5,
+      "roi": 0.6059,
+      "roiT": 4.04,
+      "clvIcc": 0.04
+     },
+     "tuneShrunk": 0.0357,
+     "tuneN": 30,
+     "addN": 5,
+     "addClv": 0.0527
+    },
+    {
+     "mk": "total",
+     "fam": "conf",
+     "val": "OVC",
+     "x": 1.5,
+     "k": 0.639,
+     "frac": 1.0,
+     "valRec": {
+      "n": 39,
+      "clvRet": 0.0698,
+      "clvT": 4.57,
+      "clv": 1.77,
+      "beat": 0.846,
+      "w": 19,
+      "l": 20,
+      "roi": -0.0398,
+      "roiT": -0.25
+     },
+     "held": {
+      "n": 39,
+      "clvRet": 0.0698,
+      "clvT": 4.57,
+      "clv": 1.77,
+      "beat": 0.846,
+      "w": 19,
+      "l": 20,
+      "roi": -0.0398,
+      "roiT": -0.25,
+      "clvIcc": 0.04
+     },
+     "tuneShrunk": 0.031,
+     "tuneN": 25,
+     "addN": 13,
+     "addClv": 0.0262
+    },
+    {
+     "mk": "total",
+     "fam": "conf",
+     "val": "WCC",
+     "x": 1.0,
+     "k": 0.714,
+     "frac": 1.0,
+     "valRec": {
+      "n": 46,
+      "clvRet": 0.0706,
+      "clvT": 5.45,
+      "clv": 1.78,
+      "beat": 0.717,
+      "w": 26,
+      "l": 20,
+      "roi": 0.114,
+      "roiT": 0.78
+     },
+     "held": {
+      "n": 46,
+      "clvRet": 0.0706,
+      "clvT": 5.45,
+      "clv": 1.78,
+      "beat": 0.717,
+      "w": 26,
+      "l": 20,
+      "roi": 0.114,
+      "roiT": 0.78,
+      "clvIcc": 0.028
+     },
+     "tuneShrunk": 0.0309,
+     "tuneN": 29,
+     "addN": 20,
+     "addClv": 0.0525
+    }
+   ],
+   "segAdds": {
+    "n": 257,
+    "clvRet": 0.0309,
+    "clvT": 6.79,
+    "clv": 0.72,
+    "beat": 0.572,
+    "w": 134,
+    "l": 123,
+    "roi": 0.0276,
+    "roiT": 0.45,
+    "seasons": [
+     2026
+    ],
+    "weeks": 23,
+    "perWeek": 11.2
    }
   },
   "nba": {
@@ -3098,11 +3729,7 @@
     2025,
     2026
    ],
-   "addN": 31,
-   "addClv": 0.0342,
-   "on": true,
-   "k": 0.105,
-   "frac": 0.25
+   "on": false
   },
   {
    "sport": "cfb",
@@ -3308,51 +3935,11 @@
    "seasons": [
     2026
    ],
-   "addN": 63,
-   "addClv": 0.0576,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "ACC",
-   "x": 2.0,
-   "tuneShrunk": 0.0425,
-   "tuneRaw": 0.0463,
-   "tuneN": 30,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.1295,
-    "clvT": 8.0,
-    "clv": 2.02,
-    "beat": 0.837,
-    "w": 27,
-    "l": 16,
-    "roi": 0.2375,
-    "roiT": 1.62
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.1295,
-    "clvT": 8.0,
-    "clv": 2.02,
-    "beat": 0.837,
-    "w": 27,
-    "l": 16,
-    "roi": 0.2375,
-    "roiT": 1.62,
-    "clvIcc": 0.048
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.1295,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 25,
+   "addClv": 0.0345,
+   "on": true,
+   "k": 0.576,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -3390,173 +3977,6 @@
    "seasons": [
     2026
    ],
-   "addN": 29,
-   "addClv": 0.019,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "Amer",
-   "x": 1.5,
-   "tuneShrunk": 0.0332,
-   "tuneRaw": 0.0237,
-   "tuneN": 28,
-   "valRec": {
-    "n": 31,
-    "clvRet": 0.0439,
-    "clvT": 3.35,
-    "clv": 0.81,
-    "beat": 0.645,
-    "w": 15,
-    "l": 16,
-    "roi": -0.0464,
-    "roiT": -0.26
-   },
-   "held": {
-    "n": 31,
-    "clvRet": 0.0439,
-    "clvT": 3.35,
-    "clv": 0.81,
-    "beat": 0.645,
-    "w": 15,
-    "l": 16,
-    "roi": -0.0464,
-    "roiT": -0.26,
-    "clvIcc": 0.036
-   },
-   "p": 0.0004,
-   "seasons": [
-    2026
-   ],
-   "addN": 31,
-   "addClv": 0.0439,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "B10",
-   "x": 2.0,
-   "tuneShrunk": 0.0425,
-   "tuneRaw": -0.0119,
-   "tuneN": 32,
-   "valRec": {
-    "n": 47,
-    "clvRet": 0.1,
-    "clvT": 7.98,
-    "clv": 1.64,
-    "beat": 0.809,
-    "w": 19,
-    "l": 28,
-    "roi": -0.2033,
-    "roiT": -1.43
-   },
-   "held": {
-    "n": 47,
-    "clvRet": 0.1,
-    "clvT": 7.98,
-    "clv": 1.64,
-    "beat": 0.809,
-    "w": 19,
-    "l": 28,
-    "roi": -0.2033,
-    "roiT": -1.43,
-    "clvIcc": 0.048
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 47,
-   "addClv": 0.1,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "B12",
-   "x": 2.0,
-   "tuneShrunk": 0.0425,
-   "tuneRaw": 0.0494,
-   "tuneN": 41,
-   "valRec": {
-    "n": 33,
-    "clvRet": 0.1336,
-    "clvT": 6.58,
-    "clv": 2.12,
-    "beat": 0.909,
-    "w": 22,
-    "l": 11,
-    "roi": 0.3139,
-    "roiT": 1.91
-   },
-   "held": {
-    "n": 33,
-    "clvRet": 0.1336,
-    "clvT": 6.58,
-    "clv": 2.12,
-    "beat": 0.909,
-    "w": 22,
-    "l": 11,
-    "roi": 0.3139,
-    "roiT": 1.91,
-    "clvIcc": 0.048
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 33,
-   "addClv": 0.1336,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "BE",
-   "x": 1.5,
-   "tuneShrunk": 0.0346,
-   "tuneRaw": 0.0343,
-   "tuneN": 25,
-   "valRec": {
-    "n": 38,
-    "clvRet": 0.0551,
-    "clvT": 2.73,
-    "clv": 1.03,
-    "beat": 0.579,
-    "w": 21,
-    "l": 17,
-    "roi": 0.0892,
-    "roiT": 0.55
-   },
-   "held": {
-    "n": 38,
-    "clvRet": 0.0551,
-    "clvT": 2.73,
-    "clv": 1.03,
-    "beat": 0.579,
-    "w": 21,
-    "l": 17,
-    "roi": 0.0892,
-    "roiT": 0.55,
-    "clvIcc": 0.036
-   },
-   "p": 0.00317,
-   "seasons": [
-    2026
-   ],
-   "addN": 38,
-   "addClv": 0.0551,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
    "on": false
   },
   {
@@ -3595,50 +4015,8 @@
    "seasons": [
     2026
    ],
-   "addN": 35,
-   "addClv": 0.0297,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "BW",
-   "x": 1.5,
-   "tuneShrunk": 0.0324,
-   "tuneRaw": 0.0072,
-   "tuneN": 26,
-   "valRec": {
-    "n": 24,
-    "clvRet": 0.0544,
-    "clvT": 3.44,
-    "clv": 1.0,
-    "beat": 0.708,
-    "w": 12,
-    "l": 12,
-    "roi": -0.0146,
-    "roiT": -0.07
-   },
-   "held": {
-    "n": 24,
-    "clvRet": 0.0544,
-    "clvT": 3.44,
-    "clv": 1.0,
-    "beat": 0.708,
-    "w": 12,
-    "l": 12,
-    "roi": -0.0146,
-    "roiT": -0.07,
-    "clvIcc": 0.036
-   },
-   "p": 0.00029,
-   "seasons": [
-    2026
-   ],
-   "addN": 24,
-   "addClv": 0.0544,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
+   "addN": 20,
+   "addClv": -0.0061,
    "on": false
   },
   {
@@ -3677,9 +4055,8 @@
    "seasons": [
     2026
    ],
-   "addN": 44,
-   "addClv": 0.0292,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
+   "addN": 21,
+   "addClv": -0.0239,
    "on": false
   },
   {
@@ -3718,10 +4095,11 @@
    "seasons": [
     2026
    ],
-   "addN": 39,
-   "addClv": 0.0562,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 13,
+   "addClv": 0.0464,
+   "on": true,
+   "k": 0.531,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -3759,10 +4137,11 @@
    "seasons": [
     2026
    ],
-   "addN": 57,
-   "addClv": 0.0611,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 23,
+   "addClv": 0.0431,
+   "on": true,
+   "k": 0.547,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -3800,10 +4179,11 @@
    "seasons": [
     2026
    ],
-   "addN": 31,
-   "addClv": 0.0348,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 8,
+   "addClv": 0.0214,
+   "on": true,
+   "k": 0.336,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -3841,10 +4221,11 @@
    "seasons": [
     2026
    ],
-   "addN": 40,
-   "addClv": 0.0638,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 11,
+   "addClv": 0.0182,
+   "on": true,
+   "k": 0.6,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -3882,9 +4263,6 @@
    "seasons": [
     2026
    ],
-   "addN": 20,
-   "addClv": 0.0336,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
    "on": false
   },
   {
@@ -3923,51 +4301,11 @@
    "seasons": [
     2026
    ],
-   "addN": 41,
-   "addClv": 0.062,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "Metro",
-   "x": 1.5,
-   "tuneShrunk": 0.0392,
-   "tuneRaw": 0.0574,
-   "tuneN": 42,
-   "valRec": {
-    "n": 33,
-    "clvRet": 0.0405,
-    "clvT": 2.64,
-    "clv": 0.79,
-    "beat": 0.576,
-    "w": 19,
-    "l": 14,
-    "roi": 0.1347,
-    "roiT": 0.78
-   },
-   "held": {
-    "n": 33,
-    "clvRet": 0.0405,
-    "clvT": 2.64,
-    "clv": 0.79,
-    "beat": 0.576,
-    "w": 19,
-    "l": 14,
-    "roi": 0.1347,
-    "roiT": 0.78,
-    "clvIcc": 0.036
-   },
-   "p": 0.00415,
-   "seasons": [
-    2026
-   ],
-   "addN": 33,
-   "addClv": 0.0405,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 17,
+   "addClv": 0.0286,
+   "on": true,
+   "k": 0.592,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -4005,9 +4343,6 @@
    "seasons": [
     2026
    ],
-   "addN": 27,
-   "addClv": 0.0268,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
    "on": false
   },
   {
@@ -4046,10 +4381,11 @@
    "seasons": [
     2026
    ],
-   "addN": 26,
-   "addClv": 0.0478,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 11,
+   "addClv": 0.0311,
+   "on": true,
+   "k": 0.513,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -4087,51 +4423,11 @@
    "seasons": [
     2026
    ],
-   "addN": 46,
-   "addClv": 0.061,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "SB",
-   "x": 1.5,
-   "tuneShrunk": 0.0358,
-   "tuneRaw": 0.0433,
-   "tuneN": 25,
-   "valRec": {
-    "n": 22,
-    "clvRet": 0.0854,
-    "clvT": 4.41,
-    "clv": 1.45,
-    "beat": 0.773,
-    "w": 16,
-    "l": 6,
-    "roi": 0.4334,
-    "roiT": 2.26
-   },
-   "held": {
-    "n": 22,
-    "clvRet": 0.0854,
-    "clvT": 4.41,
-    "clv": 1.45,
-    "beat": 0.773,
-    "w": 16,
-    "l": 6,
-    "roi": 0.4334,
-    "roiT": 2.26,
-    "clvIcc": 0.036
-   },
-   "p": 1e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 22,
-   "addClv": 0.0854,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 23,
+   "addClv": 0.0412,
+   "on": true,
+   "k": 0.607,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -4169,51 +4465,11 @@
    "seasons": [
     2026
    ],
-   "addN": 37,
-   "addClv": 0.0343,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "SEC",
-   "x": 2.0,
-   "tuneShrunk": 0.0425,
-   "tuneRaw": 0.0347,
-   "tuneN": 29,
-   "valRec": {
-    "n": 37,
-    "clvRet": 0.1058,
-    "clvT": 6.75,
-    "clv": 1.73,
-    "beat": 0.811,
-    "w": 22,
-    "l": 15,
-    "roi": 0.1719,
-    "roiT": 1.07
-   },
-   "held": {
-    "n": 37,
-    "clvRet": 0.1058,
-    "clvT": 6.75,
-    "clv": 1.73,
-    "beat": 0.811,
-    "w": 22,
-    "l": 15,
-    "roi": 0.1719,
-    "roiT": 1.07,
-    "clvIcc": 0.048
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 37,
-   "addClv": 0.1058,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 13,
+   "addClv": 0.015,
+   "on": true,
+   "k": 0.385,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -4251,51 +4507,11 @@
    "seasons": [
     2026
    ],
-   "addN": 49,
-   "addClv": 0.0348,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "conf",
-   "val": "Slnd",
-   "x": 1.5,
-   "tuneShrunk": 0.0374,
-   "tuneRaw": 0.0511,
-   "tuneN": 29,
-   "valRec": {
-    "n": 39,
-    "clvRet": 0.0689,
-    "clvT": 5.15,
-    "clv": 1.18,
-    "beat": 0.667,
-    "w": 20,
-    "l": 19,
-    "roi": 0.0107,
-    "roiT": 0.07
-   },
-   "held": {
-    "n": 39,
-    "clvRet": 0.0689,
-    "clvT": 5.15,
-    "clv": 1.18,
-    "beat": 0.667,
-    "w": 20,
-    "l": 19,
-    "roi": 0.0107,
-    "roiT": 0.07,
-    "clvIcc": 0.036
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 39,
-   "addClv": 0.0689,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 22,
+   "addClv": 0.0198,
+   "on": true,
+   "k": 0.373,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -4333,10 +4549,11 @@
    "seasons": [
     2026
    ],
-   "addN": 29,
-   "addClv": 0.0701,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
+   "addN": 13,
+   "addClv": 0.015,
+   "on": true,
+   "k": 0.628,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -4374,912 +4591,11 @@
    "seasons": [
     2026
    ],
-   "addN": 33,
-   "addClv": 0.0561,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "game",
-   "val": "conference",
-   "x": 4.0,
-   "tuneShrunk": 0.1249,
-   "tuneRaw": 0.1385,
-   "tuneN": 30,
-   "valRec": {
-    "n": 40,
-    "clvRet": 0.1748,
-    "clvT": 10.76,
-    "clv": 2.75,
-    "beat": 0.925,
-    "w": 24,
-    "l": 16,
-    "roi": 0.1825,
-    "roiT": 1.18
-   },
-   "held": {
-    "n": 40,
-    "clvRet": 0.1748,
-    "clvT": 10.76,
-    "clv": 2.75,
-    "beat": 0.925,
-    "w": 24,
-    "l": 16,
-    "roi": 0.1825,
-    "roiT": 1.18,
-    "clvIcc": 0.077
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 40,
-   "addClv": 0.1748,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "game",
-   "val": "non-conference",
-   "x": 6.0,
-   "tuneShrunk": 0.0818,
-   "tuneRaw": 0.0805,
-   "tuneN": 41,
-   "valRec": {
-    "n": 57,
-    "clvRet": 0.088,
-    "clvT": 4.59,
-    "clv": 1.49,
-    "beat": 0.684,
-    "w": 31,
-    "l": 26,
-    "roi": 0.0719,
-    "roiT": 0.55
-   },
-   "held": {
-    "n": 57,
-    "clvRet": 0.088,
-    "clvT": 4.59,
-    "clv": 1.49,
-    "beat": 0.684,
-    "w": 31,
-    "l": 26,
-    "roi": 0.0719,
-    "roiT": 0.55,
-    "clvIcc": 0.173
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 57,
-   "addClv": 0.088,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "inj",
-   "val": "against",
-   "x": 2.5,
-   "tuneShrunk": 0.0526,
-   "tuneRaw": 0.0695,
-   "tuneN": 29,
-   "valRec": {
-    "n": 34,
-    "clvRet": 0.0707,
-    "clvT": 3.09,
-    "clv": 1.21,
-    "beat": 0.676,
-    "w": 18,
-    "l": 16,
-    "roi": 0.0434,
-    "roiT": 0.25
-   },
-   "held": {
-    "n": 34,
-    "clvRet": 0.0707,
-    "clvT": 3.09,
-    "clv": 1.21,
-    "beat": 0.676,
-    "w": 18,
-    "l": 16,
-    "roi": 0.0434,
-    "roiT": 0.25,
-    "clvIcc": 0.042
-   },
-   "p": 0.001,
-   "seasons": [
-    2026
-   ],
-   "addN": 34,
-   "addClv": 0.0707,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "inj",
-   "val": "none",
-   "x": 5.5,
-   "tuneShrunk": 0.0776,
-   "tuneRaw": 0.0746,
-   "tuneN": 69,
-   "valRec": {
-    "n": 82,
-    "clvRet": 0.099,
-    "clvT": 6.44,
-    "clv": 1.63,
-    "beat": 0.707,
-    "w": 39,
-    "l": 43,
-    "roi": -0.0626,
-    "roiT": -0.57
-   },
-   "held": {
-    "n": 82,
-    "clvRet": 0.099,
-    "clvT": 6.44,
-    "clv": 1.63,
-    "beat": 0.707,
-    "w": 39,
-    "l": 43,
-    "roi": -0.0626,
-    "roiT": -0.57,
-    "clvIcc": 0.088
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 82,
-   "addClv": 0.099,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "inj",
-   "val": "with",
-   "x": 3.5,
-   "tuneShrunk": 0.0623,
-   "tuneRaw": 0.0757,
-   "tuneN": 49,
-   "valRec": {
-    "n": 54,
-    "clvRet": 0.1234,
-    "clvT": 7.84,
-    "clv": 1.96,
-    "beat": 0.778,
-    "w": 34,
-    "l": 20,
-    "roi": 0.2409,
-    "roiT": 1.84
-   },
-   "held": {
-    "n": 54,
-    "clvRet": 0.1234,
-    "clvT": 7.84,
-    "clv": 1.96,
-    "beat": 0.778,
-    "w": 34,
-    "l": 20,
-    "roi": 0.2409,
-    "roiT": 1.84,
-    "clvIcc": 0.063
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 54,
-   "addClv": 0.1234,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "line",
-   "val": "15+",
-   "x": 5.5,
-   "tuneShrunk": 0.1009,
-   "tuneRaw": 0.1159,
-   "tuneN": 25,
-   "valRec": {
-    "n": 28,
-    "clvRet": 0.0878,
-    "clvT": 3.88,
-    "clv": 1.43,
-    "beat": 0.786,
-    "w": 12,
-    "l": 16,
-    "roi": -0.1553,
-    "roiT": -0.83
-   },
-   "held": {
-    "n": 28,
-    "clvRet": 0.0878,
-    "clvT": 3.88,
-    "clv": 1.43,
-    "beat": 0.786,
-    "w": 12,
-    "l": 16,
-    "roi": -0.1553,
-    "roiT": -0.83,
-    "clvIcc": 0.088
-   },
-   "p": 5e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 28,
-   "addClv": 0.0878,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "line",
-   "val": "4-9",
-   "x": 5.0,
-   "tuneShrunk": 0.0799,
-   "tuneRaw": 0.0736,
-   "tuneN": 35,
-   "valRec": {
-    "n": 35,
-    "clvRet": 0.0759,
-    "clvT": 3.31,
-    "clv": 1.29,
-    "beat": 0.6,
-    "w": 16,
-    "l": 19,
-    "roi": -0.099,
-    "roiT": -0.59
-   },
-   "held": {
-    "n": 35,
-    "clvRet": 0.0759,
-    "clvT": 3.31,
-    "clv": 1.29,
-    "beat": 0.6,
-    "w": 16,
-    "l": 19,
-    "roi": -0.099,
-    "roiT": -0.59,
-    "clvIcc": 0.144
-   },
-   "p": 0.00047,
-   "seasons": [
-    2026
-   ],
-   "addN": 35,
-   "addClv": 0.0759,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "line",
-   "val": "9-15",
-   "x": 4.5,
-   "tuneShrunk": 0.0716,
-   "tuneRaw": 0.0738,
-   "tuneN": 34,
-   "valRec": {
-    "n": 37,
-    "clvRet": 0.0951,
-    "clvT": 4.08,
-    "clv": 1.54,
-    "beat": 0.757,
-    "w": 23,
-    "l": 14,
-    "roi": 0.2251,
-    "roiT": 1.41
-   },
-   "held": {
-    "n": 37,
-    "clvRet": 0.0951,
-    "clvT": 4.08,
-    "clv": 1.54,
-    "beat": 0.757,
-    "w": 23,
-    "l": 14,
-    "roi": 0.2251,
-    "roiT": 1.41,
-    "clvIcc": 0.079
-   },
-   "p": 2e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 37,
-   "addClv": 0.0951,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "line",
-   "val": "<4",
-   "x": 5.0,
-   "tuneShrunk": 0.0799,
-   "tuneRaw": 0.0489,
-   "tuneN": 25,
-   "valRec": {
-    "n": 37,
-    "clvRet": 0.1181,
-    "clvT": 4.73,
-    "clv": 1.95,
-    "beat": 0.703,
-    "w": 19,
-    "l": 18,
-    "roi": 0.0121,
-    "roiT": 0.07
-   },
-   "held": {
-    "n": 37,
-    "clvRet": 0.1181,
-    "clvT": 4.73,
-    "clv": 1.95,
-    "beat": 0.703,
-    "w": 19,
-    "l": 18,
-    "roi": 0.0121,
-    "roiT": 0.07,
-    "clvIcc": 0.144
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 37,
-   "addClv": 0.1181,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "role",
-   "val": "dog",
-   "x": 5.0,
-   "tuneShrunk": 0.0799,
-   "tuneRaw": 0.0622,
-   "tuneN": 41,
-   "valRec": {
-    "n": 61,
-    "clvRet": 0.0886,
-    "clvT": 4.49,
-    "clv": 1.54,
-    "beat": 0.639,
-    "w": 30,
-    "l": 31,
-    "roi": -0.0307,
-    "roiT": -0.24
-   },
-   "held": {
-    "n": 61,
-    "clvRet": 0.0886,
-    "clvT": 4.49,
-    "clv": 1.54,
-    "beat": 0.639,
-    "w": 30,
-    "l": 31,
-    "roi": -0.0307,
-    "roiT": -0.24,
-    "clvIcc": 0.144
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 61,
-   "addClv": 0.0886,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "role",
-   "val": "favorite",
-   "x": 6.0,
-   "tuneShrunk": 0.0979,
-   "tuneRaw": 0.1007,
-   "tuneN": 31,
-   "valRec": {
-    "n": 32,
-    "clvRet": 0.0748,
-    "clvT": 3.68,
-    "clv": 1.25,
-    "beat": 0.688,
-    "w": 18,
-    "l": 14,
-    "roi": 0.1086,
-    "roiT": 0.62
-   },
-   "held": {
-    "n": 32,
-    "clvRet": 0.0748,
-    "clvT": 3.68,
-    "clv": 1.25,
-    "beat": 0.688,
-    "w": 18,
-    "l": 14,
-    "roi": 0.1086,
-    "roiT": 0.62,
-    "clvIcc": 0.173
-   },
-   "p": 0.00012,
-   "seasons": [
-    2026
-   ],
-   "addN": 32,
-   "addClv": 0.0748,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "season",
-   "val": "early",
-   "x": 5.5,
-   "tuneShrunk": 0.0831,
-   "tuneRaw": 0.0791,
-   "tuneN": 69,
-   "valRec": {
-    "n": 74,
-    "clvRet": 0.0902,
-    "clvT": 5.53,
-    "clv": 1.51,
-    "beat": 0.676,
-    "w": 35,
-    "l": 39,
-    "roi": -0.0678,
-    "roiT": -0.59
-   },
-   "held": {
-    "n": 74,
-    "clvRet": 0.0902,
-    "clvT": 5.53,
-    "clv": 1.51,
-    "beat": 0.676,
-    "w": 35,
-    "l": 39,
-    "roi": -0.0678,
-    "roiT": -0.59,
-    "clvIcc": 0.088
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 74,
-   "addClv": 0.0902,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "season",
-   "val": "late",
-   "x": 4.5,
-   "tuneShrunk": 0.1153,
-   "tuneRaw": 0.1295,
-   "tuneN": 27,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.1548,
-    "clvT": 9.61,
-    "clv": 2.42,
-    "beat": 0.93,
-    "w": 25,
-    "l": 18,
-    "roi": 0.1459,
-    "roiT": 0.97
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.1548,
-    "clvT": 9.61,
-    "clv": 2.42,
-    "beat": 0.93,
-    "w": 25,
-    "l": 18,
-    "roi": 0.1459,
-    "roiT": 0.97,
-    "clvIcc": 0.079
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.1548,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "tier",
-   "val": "mid-major",
-   "x": 6.0,
-   "tuneShrunk": 0.0873,
-   "tuneRaw": 0.0804,
-   "tuneN": 31,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.087,
-    "clvT": 3.76,
-    "clv": 1.49,
-    "beat": 0.628,
-    "w": 23,
-    "l": 20,
-    "roi": 0.0542,
-    "roiT": 0.36
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.087,
-    "clvT": 3.76,
-    "clv": 1.49,
-    "beat": 0.628,
-    "w": 23,
-    "l": 20,
-    "roi": 0.0542,
-    "roiT": 0.36,
-    "clvIcc": 0.173
-   },
-   "p": 8e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.087,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "tier",
-   "val": "mixed",
-   "x": 5.0,
-   "tuneShrunk": 0.1137,
-   "tuneRaw": 0.1271,
-   "tuneN": 36,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.097,
-    "clvT": 4.86,
-    "clv": 1.56,
-    "beat": 0.744,
-    "w": 23,
-    "l": 20,
-    "roi": 0.0542,
-    "roiT": 0.36
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.097,
-    "clvT": 4.86,
-    "clv": 1.56,
-    "beat": 0.744,
-    "w": 23,
-    "l": 20,
-    "roi": 0.0542,
-    "roiT": 0.36,
-    "clvIcc": 0.144
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.097,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "tier",
-   "val": "power",
-   "x": 4.0,
-   "tuneShrunk": 0.0714,
-   "tuneRaw": 0.0722,
-   "tuneN": 26,
-   "valRec": {
-    "n": 34,
-    "clvRet": 0.1642,
-    "clvT": 8.08,
-    "clv": 2.56,
-    "beat": 0.853,
-    "w": 20,
-    "l": 14,
-    "roi": 0.1593,
-    "roiT": 0.94
-   },
-   "held": {
-    "n": 34,
-    "clvRet": 0.1642,
-    "clvT": 8.08,
-    "clv": 2.56,
-    "beat": 0.853,
-    "w": 20,
-    "l": 14,
-    "roi": 0.1593,
-    "roiT": 0.94,
-    "clvIcc": 0.077
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 34,
-   "addClv": 0.1642,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "venue",
-   "val": "away",
-   "x": 4.5,
-   "tuneShrunk": 0.0456,
-   "tuneRaw": 0.0272,
-   "tuneN": 28,
-   "valRec": {
-    "n": 60,
-    "clvRet": 0.0604,
-    "clvT": 3.3,
-    "clv": 1.08,
-    "beat": 0.617,
-    "w": 31,
-    "l": 29,
-    "roi": 0.0183,
-    "roiT": 0.14
-   },
-   "held": {
-    "n": 60,
-    "clvRet": 0.0604,
-    "clvT": 3.3,
-    "clv": 1.08,
-    "beat": 0.617,
-    "w": 31,
-    "l": 29,
-    "roi": 0.0183,
-    "roiT": 0.14,
-    "clvIcc": 0.079
-   },
-   "p": 0.00048,
-   "seasons": [
-    2026
-   ],
-   "addN": 60,
-   "addClv": 0.0604,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "venue",
-   "val": "home",
-   "x": 6.0,
-   "tuneShrunk": 0.0979,
-   "tuneRaw": 0.1012,
-   "tuneN": 34,
-   "valRec": {
-    "n": 33,
-    "clvRet": 0.0909,
-    "clvT": 4.32,
-    "clv": 1.52,
-    "beat": 0.697,
-    "w": 15,
-    "l": 18,
-    "roi": -0.1041,
-    "roiT": -0.6
-   },
-   "held": {
-    "n": 33,
-    "clvRet": 0.0909,
-    "clvT": 4.32,
-    "clv": 1.52,
-    "beat": 0.697,
-    "w": 15,
-    "l": 18,
-    "roi": -0.1041,
-    "roiT": -0.6,
-    "clvIcc": 0.173
-   },
-   "p": 1e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 33,
-   "addClv": 0.0909,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "spread",
-   "fam": "venue",
-   "val": "neutral",
-   "x": 4.0,
-   "tuneShrunk": 0.0979,
-   "tuneRaw": 0.102,
-   "tuneN": 47,
-   "valRec": {
-    "n": 40,
-    "clvRet": 0.12,
-    "clvT": 4.91,
-    "clv": 1.95,
-    "beat": 0.7,
-    "w": 22,
-    "l": 18,
-    "roi": 0.084,
-    "roiT": 0.53
-   },
-   "held": {
-    "n": 40,
-    "clvRet": 0.12,
-    "clvT": 4.91,
-    "clv": 1.95,
-    "beat": 0.7,
-    "w": 22,
-    "l": 18,
-    "roi": 0.084,
-    "roiT": 0.53,
-    "clvIcc": 0.077
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 40,
-   "addClv": 0.12,
-   "why": "its market lost to the close live (65 picks at 1.5+, -3.2%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "A10",
-   "x": 2.0,
-   "tuneShrunk": 0.0557,
-   "tuneRaw": 0.0698,
-   "tuneN": 34,
-   "valRec": {
-    "n": 44,
-    "clvRet": 0.0862,
-    "clvT": 5.69,
-    "clv": 2.11,
-    "beat": 0.727,
-    "w": 21,
-    "l": 23,
-    "roi": -0.0594,
-    "roiT": -0.4
-   },
-   "held": {
-    "n": 44,
-    "clvRet": 0.0862,
-    "clvT": 5.69,
-    "clv": 2.11,
-    "beat": 0.727,
-    "w": 21,
-    "l": 23,
-    "roi": -0.0594,
-    "roiT": -0.4,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 44,
-   "addClv": 0.0862,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "ACC",
-   "x": 2.5,
-   "tuneShrunk": 0.0468,
-   "tuneRaw": 0.0445,
-   "tuneN": 34,
-   "valRec": {
-    "n": 52,
-    "clvRet": 0.139,
-    "clvT": 10.24,
-    "clv": 3.23,
-    "beat": 0.923,
-    "w": 26,
-    "l": 26,
-    "roi": -0.0146,
-    "roiT": -0.11
-   },
-   "held": {
-    "n": 52,
-    "clvRet": 0.139,
-    "clvT": 10.24,
-    "clv": 3.23,
-    "beat": 0.923,
-    "w": 26,
-    "l": 26,
-    "roi": -0.0146,
-    "roiT": -0.11,
-    "clvIcc": 0.078
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 52,
-   "addClv": 0.139,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "AE",
-   "x": 2.0,
-   "tuneShrunk": 0.0404,
-   "tuneRaw": 0.0365,
-   "tuneN": 31,
-   "valRec": {
-    "n": 23,
-    "clvRet": 0.085,
-    "clvT": 4.08,
-    "clv": 2.09,
-    "beat": 0.783,
-    "w": 12,
-    "l": 11,
-    "roi": 0.0283,
-    "roiT": 0.13
-   },
-   "held": {
-    "n": 23,
-    "clvRet": 0.085,
-    "clvT": 4.08,
-    "clv": 2.09,
-    "beat": 0.783,
-    "w": 12,
-    "l": 11,
-    "roi": 0.0283,
-    "roiT": 0.13,
-    "clvIcc": 0.054
-   },
-   "p": 2e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 23,
-   "addClv": 0.085,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 15,
+   "addClv": 0.0182,
+   "on": true,
+   "k": 0.564,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -5317,214 +4633,8 @@
    "seasons": [
     2026
    ],
-   "addN": 21,
-   "addClv": 0.0584,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "Amer",
-   "x": 2.5,
-   "tuneShrunk": 0.0475,
-   "tuneRaw": 0.0456,
-   "tuneN": 27,
-   "valRec": {
-    "n": 42,
-    "clvRet": 0.127,
-    "clvT": 9.19,
-    "clv": 2.98,
-    "beat": 0.929,
-    "w": 24,
-    "l": 18,
-    "roi": 0.1262,
-    "roiT": 0.83
-   },
-   "held": {
-    "n": 42,
-    "clvRet": 0.127,
-    "clvT": 9.19,
-    "clv": 2.98,
-    "beat": 0.929,
-    "w": 24,
-    "l": 18,
-    "roi": 0.1262,
-    "roiT": 0.83,
-    "clvIcc": 0.078
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 42,
-   "addClv": 0.127,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "B10",
-   "x": 2.5,
-   "tuneShrunk": 0.0565,
-   "tuneRaw": 0.06,
-   "tuneN": 36,
-   "valRec": {
-    "n": 61,
-    "clvRet": 0.1472,
-    "clvT": 11.86,
-    "clv": 3.41,
-    "beat": 0.934,
-    "w": 34,
-    "l": 27,
-    "roi": 0.0985,
-    "roiT": 0.78
-   },
-   "held": {
-    "n": 61,
-    "clvRet": 0.1472,
-    "clvT": 11.86,
-    "clv": 3.41,
-    "beat": 0.934,
-    "w": 34,
-    "l": 27,
-    "roi": 0.0985,
-    "roiT": 0.78,
-    "clvIcc": 0.078
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 61,
-   "addClv": 0.1472,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "B12",
-   "x": 2.5,
-   "tuneShrunk": 0.0655,
-   "tuneRaw": 0.0758,
-   "tuneN": 27,
-   "valRec": {
-    "n": 49,
-    "clvRet": 0.1391,
-    "clvT": 8.59,
-    "clv": 3.24,
-    "beat": 0.918,
-    "w": 31,
-    "l": 18,
-    "roi": 0.2469,
-    "roiT": 1.8
-   },
-   "held": {
-    "n": 49,
-    "clvRet": 0.1391,
-    "clvT": 8.59,
-    "clv": 3.24,
-    "beat": 0.918,
-    "w": 31,
-    "l": 18,
-    "roi": 0.2469,
-    "roiT": 1.8,
-    "clvIcc": 0.078
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 49,
-   "addClv": 0.1391,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "BE",
-   "x": 3.0,
-   "tuneShrunk": 0.1011,
-   "tuneRaw": 0.1117,
-   "tuneN": 25,
-   "valRec": {
-    "n": 21,
-    "clvRet": 0.1219,
-    "clvT": 7.27,
-    "clv": 2.86,
-    "beat": 0.905,
-    "w": 12,
-    "l": 9,
-    "roi": 0.1262,
-    "roiT": 0.58
-   },
-   "held": {
-    "n": 21,
-    "clvRet": 0.1219,
-    "clvT": 7.27,
-    "clv": 2.86,
-    "beat": 0.905,
-    "w": 12,
-    "l": 9,
-    "roi": 0.1262,
-    "roiT": 0.58,
-    "clvIcc": 0.092
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 21,
-   "addClv": 0.1219,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "BSky",
-   "x": 2.0,
-   "tuneShrunk": 0.0413,
-   "tuneRaw": 0.0388,
-   "tuneN": 27,
-   "valRec": {
-    "n": 41,
-    "clvRet": 0.0928,
-    "clvT": 7.85,
-    "clv": 2.24,
-    "beat": 0.927,
-    "w": 24,
-    "l": 17,
-    "roi": 0.1537,
-    "roiT": 1.0
-   },
-   "held": {
-    "n": 41,
-    "clvRet": 0.0928,
-    "clvT": 7.85,
-    "clv": 2.24,
-    "beat": 0.927,
-    "w": 24,
-    "l": 17,
-    "roi": 0.1537,
-    "roiT": 1.0,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 41,
-   "addClv": 0.0928,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
+   "addN": 7,
+   "addClv": -0.0077,
    "on": false
   },
   {
@@ -5563,10 +4673,11 @@
    "seasons": [
     2026
    ],
-   "addN": 38,
-   "addClv": 0.0546,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 10,
+   "addClv": 0.0431,
+   "on": true,
+   "k": 0.462,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -5604,51 +4715,11 @@
    "seasons": [
     2026
    ],
-   "addN": 42,
-   "addClv": 0.0871,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "CAA",
-   "x": 2.0,
-   "tuneShrunk": 0.031,
-   "tuneRaw": 0.0126,
-   "tuneN": 37,
-   "valRec": {
-    "n": 46,
-    "clvRet": 0.083,
-    "clvT": 6.26,
-    "clv": 2.04,
-    "beat": 0.761,
-    "w": 27,
-    "l": 19,
-    "roi": 0.1568,
-    "roiT": 1.08
-   },
-   "held": {
-    "n": 46,
-    "clvRet": 0.083,
-    "clvT": 6.26,
-    "clv": 2.04,
-    "beat": 0.761,
-    "w": 27,
-    "l": 19,
-    "roi": 0.1568,
-    "roiT": 1.08,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 46,
-   "addClv": 0.083,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 4,
+   "addClv": 0.0215,
+   "on": true,
+   "k": 0.607,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -5686,51 +4757,11 @@
    "seasons": [
     2026
    ],
-   "addN": 43,
-   "addClv": 0.0665,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "Horz",
-   "x": 3.0,
-   "tuneShrunk": 0.0685,
-   "tuneRaw": 0.072,
-   "tuneN": 26,
-   "valRec": {
-    "n": 30,
-    "clvRet": 0.103,
-    "clvT": 6.3,
-    "clv": 2.47,
-    "beat": 0.833,
-    "w": 19,
-    "l": 11,
-    "roi": 0.2482,
-    "roiT": 1.41
-   },
-   "held": {
-    "n": 30,
-    "clvRet": 0.103,
-    "clvT": 6.3,
-    "clv": 2.47,
-    "beat": 0.833,
-    "w": 19,
-    "l": 11,
-    "roi": 0.2482,
-    "roiT": 1.41,
-    "clvIcc": 0.092
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 30,
-   "addClv": 0.103,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 11,
+   "addClv": 0.0071,
+   "on": true,
+   "k": 0.535,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -5768,174 +4799,11 @@
    "seasons": [
     2026
    ],
-   "addN": 27,
-   "addClv": 0.0883,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "MAC",
-   "x": 2.0,
-   "tuneShrunk": 0.0483,
-   "tuneRaw": 0.0549,
-   "tuneN": 29,
-   "valRec": {
-    "n": 47,
-    "clvRet": 0.0809,
-    "clvT": 5.93,
-    "clv": 2.0,
-    "beat": 0.766,
-    "w": 25,
-    "l": 22,
-    "roi": 0.0483,
-    "roiT": 0.33
-   },
-   "held": {
-    "n": 47,
-    "clvRet": 0.0809,
-    "clvT": 5.93,
-    "clv": 2.0,
-    "beat": 0.766,
-    "w": 25,
-    "l": 22,
-    "roi": 0.0483,
-    "roiT": 0.33,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 47,
-   "addClv": 0.0809,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "MEAC",
-   "x": 2.0,
-   "tuneShrunk": 0.0477,
-   "tuneRaw": 0.0549,
-   "tuneN": 29,
-   "valRec": {
-    "n": 23,
-    "clvRet": 0.0833,
-    "clvT": 5.3,
-    "clv": 2.04,
-    "beat": 0.87,
-    "w": 17,
-    "l": 6,
-    "roi": 0.4567,
-    "roiT": 2.48
-   },
-   "held": {
-    "n": 23,
-    "clvRet": 0.0833,
-    "clvT": 5.3,
-    "clv": 2.04,
-    "beat": 0.87,
-    "w": 17,
-    "l": 6,
-    "roi": 0.4567,
-    "roiT": 2.48,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 23,
-   "addClv": 0.0833,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "MVC",
-   "x": 2.5,
-   "tuneShrunk": 0.0376,
-   "tuneRaw": 0.0266,
-   "tuneN": 29,
-   "valRec": {
-    "n": 50,
-    "clvRet": 0.1096,
-    "clvT": 9.04,
-    "clv": 2.6,
-    "beat": 0.9,
-    "w": 31,
-    "l": 19,
-    "roi": 0.2219,
-    "roiT": 1.62
-   },
-   "held": {
-    "n": 50,
-    "clvRet": 0.1096,
-    "clvT": 9.04,
-    "clv": 2.6,
-    "beat": 0.9,
-    "w": 31,
-    "l": 19,
-    "roi": 0.2219,
-    "roiT": 1.62,
-    "clvIcc": 0.078
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 50,
-   "addClv": 0.1096,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "Metro",
-   "x": 2.0,
-   "tuneShrunk": 0.044,
-   "tuneRaw": 0.0453,
-   "tuneN": 28,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.1119,
-    "clvT": 8.43,
-    "clv": 2.65,
-    "beat": 0.837,
-    "w": 26,
-    "l": 17,
-    "roi": 0.1917,
-    "roiT": 1.29
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.1119,
-    "clvT": 8.43,
-    "clv": 2.65,
-    "beat": 0.837,
-    "w": 26,
-    "l": 17,
-    "roi": 0.1917,
-    "roiT": 1.29,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.1119,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 5,
+   "addClv": 0.0527,
+   "on": true,
+   "k": 0.682,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -5973,9 +4841,8 @@
    "seasons": [
     2026
    ],
-   "addN": 46,
-   "addClv": 0.0641,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
+   "addN": 12,
+   "addClv": -0.0425,
    "on": false
   },
   {
@@ -6014,294 +4881,11 @@
    "seasons": [
     2026
    ],
-   "addN": 39,
-   "addClv": 0.0698,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "Pat",
-   "x": 2.0,
-   "tuneShrunk": 0.0333,
-   "tuneRaw": 0.0252,
-   "tuneN": 29,
-   "valRec": {
-    "n": 40,
-    "clvRet": 0.0774,
-    "clvT": 5.7,
-    "clv": 1.93,
-    "beat": 0.85,
-    "w": 24,
-    "l": 16,
-    "roi": 0.1825,
-    "roiT": 1.18
-   },
-   "held": {
-    "n": 40,
-    "clvRet": 0.0774,
-    "clvT": 5.7,
-    "clv": 1.93,
-    "beat": 0.85,
-    "w": 24,
-    "l": 16,
-    "roi": 0.1825,
-    "roiT": 1.18,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 40,
-   "addClv": 0.0774,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "SB",
-   "x": 2.0,
-   "tuneShrunk": 0.0335,
-   "tuneRaw": 0.0197,
-   "tuneN": 35,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.0554,
-    "clvT": 4.09,
-    "clv": 1.47,
-    "beat": 0.698,
-    "w": 26,
-    "l": 17,
-    "roi": 0.1917,
-    "roiT": 1.29
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.0554,
-    "clvT": 4.09,
-    "clv": 1.47,
-    "beat": 0.698,
-    "w": 26,
-    "l": 17,
-    "roi": 0.1917,
-    "roiT": 1.29,
-    "clvIcc": 0.054
-   },
-   "p": 2e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.0554,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "SC",
-   "x": 2.0,
-   "tuneShrunk": 0.0396,
-   "tuneRaw": 0.0364,
-   "tuneN": 33,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.1065,
-    "clvT": 9.17,
-    "clv": 2.53,
-    "beat": 0.884,
-    "w": 21,
-    "l": 22,
-    "roi": -0.0375,
-    "roiT": -0.25
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.1065,
-    "clvT": 9.17,
-    "clv": 2.53,
-    "beat": 0.884,
-    "w": 21,
-    "l": 22,
-    "roi": -0.0375,
-    "roiT": -0.25,
-    "clvIcc": 0.054
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.1065,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "SEC",
-   "x": 2.5,
-   "tuneShrunk": 0.0545,
-   "tuneRaw": 0.0586,
-   "tuneN": 34,
-   "valRec": {
-    "n": 48,
-    "clvRet": 0.1125,
-    "clvT": 8.42,
-    "clv": 2.67,
-    "beat": 0.917,
-    "w": 26,
-    "l": 22,
-    "roi": 0.0676,
-    "roiT": 0.47
-   },
-   "held": {
-    "n": 48,
-    "clvRet": 0.1125,
-    "clvT": 8.42,
-    "clv": 2.67,
-    "beat": 0.917,
-    "w": 26,
-    "l": 22,
-    "roi": 0.0676,
-    "roiT": 0.47,
-    "clvIcc": 0.078
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 48,
-   "addClv": 0.1125,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "SWAC",
-   "x": 3.0,
-   "tuneShrunk": 0.0815,
-   "tuneRaw": 0.0893,
-   "tuneN": 29,
-   "valRec": {
-    "n": 19,
-    "clvRet": 0.1006,
-    "clvT": 4.04,
-    "clv": 2.42,
-    "beat": 0.737,
-    "w": 12,
-    "l": 7,
-    "roi": 0.2448,
-    "roiT": 1.09
-   },
-   "held": {
-    "n": 19,
-    "clvRet": 0.1006,
-    "clvT": 4.04,
-    "clv": 2.42,
-    "beat": 0.737,
-    "w": 12,
-    "l": 7,
-    "roi": 0.2448,
-    "roiT": 1.09,
-    "clvIcc": 0.092
-   },
-   "p": 1.0,
-   "seasons": [
-    2026
-   ],
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "Slnd",
-   "x": 2.0,
-   "tuneShrunk": 0.0489,
-   "tuneRaw": 0.0594,
-   "tuneN": 31,
-   "valRec": {
-    "n": 49,
-    "clvRet": 0.0633,
-    "clvT": 4.18,
-    "clv": 1.63,
-    "beat": 0.694,
-    "w": 25,
-    "l": 24,
-    "roi": 0.0055,
-    "roiT": 0.04
-   },
-   "held": {
-    "n": 49,
-    "clvRet": 0.0633,
-    "clvT": 4.18,
-    "clv": 1.63,
-    "beat": 0.694,
-    "w": 25,
-    "l": 24,
-    "roi": 0.0055,
-    "roiT": 0.04,
-    "clvIcc": 0.054
-   },
-   "p": 1e-05,
-   "seasons": [
-    2026
-   ],
-   "addN": 49,
-   "addClv": 0.0633,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "conf",
-   "val": "Sum",
-   "x": 2.0,
-   "tuneShrunk": 0.0445,
-   "tuneRaw": 0.0459,
-   "tuneN": 27,
-   "valRec": {
-    "n": 20,
-    "clvRet": 0.0547,
-    "clvT": 2.78,
-    "clv": 1.45,
-    "beat": 0.7,
-    "w": 8,
-    "l": 12,
-    "roi": -0.2117,
-    "roiT": -0.96
-   },
-   "held": {
-    "n": 20,
-    "clvRet": 0.0547,
-    "clvT": 2.78,
-    "clv": 1.45,
-    "beat": 0.7,
-    "w": 8,
-    "l": 12,
-    "roi": -0.2117,
-    "roiT": -0.96,
-    "clvIcc": 0.054
-   },
-   "p": 0.00272,
-   "seasons": [
-    2026
-   ],
-   "addN": 20,
-   "addClv": 0.0547,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 13,
+   "addClv": 0.0262,
+   "on": true,
+   "k": 0.639,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -6339,502 +4923,11 @@
    "seasons": [
     2026
    ],
-   "addN": 46,
-   "addClv": 0.0706,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "game",
-   "val": "conference",
-   "x": 5.5,
-   "tuneShrunk": 0.1019,
-   "tuneRaw": 0.1007,
-   "tuneN": 39,
-   "valRec": {
-    "n": 111,
-    "clvRet": 0.1778,
-    "clvT": 17.47,
-    "clv": 4.07,
-    "beat": 0.919,
-    "w": 67,
-    "l": 44,
-    "roi": 0.1896,
-    "roiT": 2.06
-   },
-   "held": {
-    "n": 111,
-    "clvRet": 0.1778,
-    "clvT": 17.47,
-    "clv": 4.07,
-    "beat": 0.919,
-    "w": 67,
-    "l": 44,
-    "roi": 0.1896,
-    "roiT": 2.06,
-    "clvIcc": 0.179
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 111,
-   "addClv": 0.1778,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "game",
-   "val": "non-conference",
-   "x": 7.5,
-   "tuneShrunk": 0.1512,
-   "tuneRaw": 0.1456,
-   "tuneN": 37,
-   "valRec": {
-    "n": 60,
-    "clvRet": 0.1542,
-    "clvT": 7.77,
-    "clv": 3.6,
-    "beat": 0.833,
-    "w": 38,
-    "l": 22,
-    "roi": 0.2482,
-    "roiT": 2.01
-   },
-   "held": {
-    "n": 60,
-    "clvRet": 0.1542,
-    "clvT": 7.77,
-    "clv": 3.6,
-    "beat": 0.833,
-    "w": 38,
-    "l": 22,
-    "roi": 0.2482,
-    "roiT": 2.01,
-    "clvIcc": 0.34
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 60,
-   "addClv": 0.1542,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "season",
-   "val": "early",
-   "x": 7.5,
-   "tuneShrunk": 0.1512,
-   "tuneRaw": 0.1452,
-   "tuneN": 32,
-   "valRec": {
-    "n": 51,
-    "clvRet": 0.148,
-    "clvT": 6.66,
-    "clv": 3.47,
-    "beat": 0.804,
-    "w": 30,
-    "l": 21,
-    "roi": 0.1593,
-    "roiT": 1.16
-   },
-   "held": {
-    "n": 51,
-    "clvRet": 0.148,
-    "clvT": 6.66,
-    "clv": 3.47,
-    "beat": 0.804,
-    "w": 30,
-    "l": 21,
-    "roi": 0.1593,
-    "roiT": 1.16,
-    "clvIcc": 0.34
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 51,
-   "addClv": 0.148,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "season",
-   "val": "late",
-   "x": 6.0,
-   "tuneShrunk": 0.1117,
-   "tuneRaw": 0.1116,
-   "tuneN": 35,
-   "valRec": {
-    "n": 97,
-    "clvRet": 0.1824,
-    "clvT": 16.23,
-    "clv": 4.18,
-    "beat": 0.938,
-    "w": 61,
-    "l": 36,
-    "roi": 0.2394,
-    "roiT": 2.46
-   },
-   "held": {
-    "n": 97,
-    "clvRet": 0.1824,
-    "clvT": 16.23,
-    "clv": 4.18,
-    "beat": 0.938,
-    "w": 61,
-    "l": 36,
-    "roi": 0.2394,
-    "roiT": 2.46,
-    "clvIcc": 0.256
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 97,
-   "addClv": 0.1824,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "side",
-   "val": "over",
-   "x": 7.5,
-   "tuneShrunk": 0.1512,
-   "tuneRaw": 0.1562,
-   "tuneN": 35,
-   "valRec": {
-    "n": 38,
-    "clvRet": 0.1399,
-    "clvT": 5.81,
-    "clv": 3.29,
-    "beat": 0.816,
-    "w": 26,
-    "l": 12,
-    "roi": 0.3485,
-    "roiT": 2.31
-   },
-   "held": {
-    "n": 38,
-    "clvRet": 0.1399,
-    "clvT": 5.81,
-    "clv": 3.29,
-    "beat": 0.816,
-    "w": 26,
-    "l": 12,
-    "roi": 0.3485,
-    "roiT": 2.31,
-    "clvIcc": 0.34
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 38,
-   "addClv": 0.1399,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "side",
-   "val": "under",
-   "x": 6.5,
-   "tuneShrunk": 0.1358,
-   "tuneRaw": 0.1339,
-   "tuneN": 32,
-   "valRec": {
-    "n": 80,
-    "clvRet": 0.1803,
-    "clvT": 11.44,
-    "clv": 4.16,
-    "beat": 0.875,
-    "w": 40,
-    "l": 40,
-    "roi": -0.0146,
-    "roiT": -0.13
-   },
-   "held": {
-    "n": 80,
-    "clvRet": 0.1803,
-    "clvT": 11.44,
-    "clv": 4.16,
-    "beat": 0.875,
-    "w": 40,
-    "l": 40,
-    "roi": -0.0146,
-    "roiT": -0.13,
-    "clvIcc": 0.305
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 80,
-   "addClv": 0.1803,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "tier",
-   "val": "mid-major",
-   "x": 7.5,
-   "tuneShrunk": 0.1512,
-   "tuneRaw": 0.1448,
-   "tuneN": 27,
-   "valRec": {
-    "n": 43,
-    "clvRet": 0.1583,
-    "clvT": 6.75,
-    "clv": 3.7,
-    "beat": 0.814,
-    "w": 25,
-    "l": 18,
-    "roi": 0.1459,
-    "roiT": 0.97
-   },
-   "held": {
-    "n": 43,
-    "clvRet": 0.1583,
-    "clvT": 6.75,
-    "clv": 3.7,
-    "beat": 0.814,
-    "w": 25,
-    "l": 18,
-    "roi": 0.1459,
-    "roiT": 0.97,
-    "clvIcc": 0.34
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 43,
-   "addClv": 0.1583,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "tier",
-   "val": "mixed",
-   "x": 6.5,
-   "tuneShrunk": 0.1375,
-   "tuneRaw": 0.1399,
-   "tuneN": 34,
-   "valRec": {
-    "n": 38,
-    "clvRet": 0.1447,
-    "clvT": 5.44,
-    "clv": 3.39,
-    "beat": 0.842,
-    "w": 19,
-    "l": 19,
-    "roi": -0.0146,
-    "roiT": -0.09
-   },
-   "held": {
-    "n": 38,
-    "clvRet": 0.1447,
-    "clvT": 5.44,
-    "clv": 3.39,
-    "beat": 0.842,
-    "w": 19,
-    "l": 19,
-    "roi": -0.0146,
-    "roiT": -0.09,
-    "clvIcc": 0.305
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 38,
-   "addClv": 0.1447,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "tier",
-   "val": "power",
-   "x": 5.0,
-   "tuneShrunk": 0.1195,
-   "tuneRaw": 0.1395,
-   "tuneN": 30,
-   "valRec": {
-    "n": 82,
-    "clvRet": 0.194,
-    "clvT": 14.35,
-    "clv": 4.44,
-    "beat": 0.927,
-    "w": 49,
-    "l": 33,
-    "roi": 0.1777,
-    "roiT": 1.65
-   },
-   "held": {
-    "n": 82,
-    "clvRet": 0.194,
-    "clvT": 14.35,
-    "clv": 4.44,
-    "beat": 0.927,
-    "w": 49,
-    "l": 33,
-    "roi": 0.1777,
-    "roiT": 1.65,
-    "clvIcc": 0.175
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 82,
-   "addClv": 0.194,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "total",
-   "val": "high",
-   "x": 7.0,
-   "tuneShrunk": 0.1237,
-   "tuneRaw": 0.1037,
-   "tuneN": 26,
-   "valRec": {
-    "n": 59,
-    "clvRet": 0.1655,
-    "clvT": 9.63,
-    "clv": 3.83,
-    "beat": 0.847,
-    "w": 32,
-    "l": 27,
-    "roi": 0.0689,
-    "roiT": 0.53
-   },
-   "held": {
-    "n": 59,
-    "clvRet": 0.1655,
-    "clvT": 9.63,
-    "clv": 3.83,
-    "beat": 0.847,
-    "w": 32,
-    "l": 27,
-    "roi": 0.0689,
-    "roiT": 0.53,
-    "clvIcc": 0.221
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 59,
-   "addClv": 0.1655,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "total",
-   "val": "low",
-   "x": 5.0,
-   "tuneShrunk": 0.0892,
-   "tuneRaw": 0.098,
-   "tuneN": 31,
-   "valRec": {
-    "n": 39,
-    "clvRet": 0.1569,
-    "clvT": 9.92,
-    "clv": 3.62,
-    "beat": 0.872,
-    "w": 24,
-    "l": 15,
-    "roi": 0.2128,
-    "roiT": 1.37
-   },
-   "held": {
-    "n": 39,
-    "clvRet": 0.1569,
-    "clvT": 9.92,
-    "clv": 3.62,
-    "beat": 0.872,
-    "w": 24,
-    "l": 15,
-    "roi": 0.2128,
-    "roiT": 1.37,
-    "clvIcc": 0.175
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 39,
-   "addClv": 0.1569,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
-  },
-  {
-   "sport": "cbb",
-   "mk": "total",
-   "fam": "total",
-   "val": "mid",
-   "x": 7.0,
-   "tuneShrunk": 0.1525,
-   "tuneRaw": 0.1571,
-   "tuneN": 31,
-   "valRec": {
-    "n": 42,
-    "clvRet": 0.1477,
-    "clvT": 5.29,
-    "clv": 3.48,
-    "beat": 0.81,
-    "w": 27,
-    "l": 15,
-    "roi": 0.267,
-    "roiT": 1.81
-   },
-   "held": {
-    "n": 42,
-    "clvRet": 0.1477,
-    "clvT": 5.29,
-    "clv": 3.48,
-    "beat": 0.81,
-    "w": 27,
-    "l": 15,
-    "roi": 0.267,
-    "roiT": 1.81,
-    "clvIcc": 0.221
-   },
-   "p": 0.0,
-   "seasons": [
-    2026
-   ],
-   "addN": 42,
-   "addClv": 0.1477,
-   "why": "its market lost to the close live (86 picks at 2.0+, -2.7%)",
-   "on": false
+   "addN": 20,
+   "addClv": 0.0525,
+   "on": true,
+   "k": 0.714,
+   "frac": 0.25
   },
   {
    "sport": "nba",
@@ -6882,34 +4975,34 @@
  "du": {
   "book": {
    "mult": 1.0,
-   "g": 6.3,
-   "dd25": 0.897,
-   "dd50": 0.258,
-   "mddMed": 0.392,
-   "finMed": 1.07,
-   "fin05": 0.447,
-   "fin95": 2.545,
-   "lose": 0.452,
-   "slates": 345,
+   "g": 193.0,
+   "dd25": 1.0,
+   "dd50": 0.995,
+   "mddMed": 0.804,
+   "finMed": 6.946,
+   "fin05": 0.204,
+   "fin95": 228.562,
+   "lose": 0.176,
+   "slates": 628,
    "sample": {
-    "low": 967,
-    "high": 1646,
-    "end": 1070,
+    "low": 527,
+    "high": 11745,
+    "end": 6949,
     "path": [
      1000,
-     1220,
-     1111,
-     1316,
-     1255,
-     1321,
-     1514,
-     1635,
-     1407,
-     1393,
-     1144,
-     970,
-     1048,
-     1070
+     1029,
+     638,
+     847,
+     1693,
+     2609,
+     5779,
+     9184,
+     7744,
+     4476,
+     4909,
+     4124,
+     6122,
+     6949
     ]
    }
   },
