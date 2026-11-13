@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13T05:29:06Z",
+ "asof": "2026-11-13T06:13:24Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -703,87 +703,6 @@
    }
   },
   {
-   "id": "pick:cfb:spread | tier: power",
-   "book": "picks",
-   "sport": "cfb",
-   "label": "CFB spread 8+ (tier: power)",
-   "since": "2026-11-05",
-   "status": "on",
-   "stopped": null,
-   "n": 0,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0689,
-    "beat": 0.56,
-    "roi": 0.1037,
-    "n": 25
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "p": null,
-    "days": 0,
-    "sd": 0.1648,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "rho": 0.174,
-    "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0272,
-     "n": 0,
-     "sd": 0.1648,
-     "rho": 0.174,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 217
-    }
-   },
-   "drift": {
-    "mu1": 0.0272,
-    "n": 0,
-    "sd": 0.1648,
-    "rho": 0.174,
-    "lo": -2.944,
-    "hi": 2.944,
-    "state": "watching",
-    "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
-    "need": 217,
-    "path": []
-   }
-  },
-  {
    "id": "pick:cfb:spread | venue: home",
    "book": "picks",
    "sport": "cfb",
@@ -868,102 +787,81 @@
    "id": "pick:nfl:spread",
    "book": "picks",
    "sport": "nfl",
-   "label": "NFL spread 4+",
-   "since": "2026-10-28",
+   "label": "NFL spread 4.5+",
+   "since": "2026-11-13",
    "status": "on",
    "stopped": null,
-   "n": 8,
-   "clvN": 7,
-   "clvRet": 0.0193,
-   "clvT": 0.75,
-   "days": 4,
-   "beat": 0.571,
-   "settled": 7,
-   "w": 2,
-   "l": 5,
-   "roi": -0.3729,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
    "week": {
-    "n": 5,
-    "clvRet": 0.0298,
-    "clvT": 0.96
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
    },
    "exp": {
-    "clvRet": 0.0957,
-    "beat": 0.773,
-    "roi": 0.1648,
-    "n": 132
-   },
-   "vsExp": {
-    "gap": -0.0764,
-    "z": -2.96,
-    "read": "below the backtest"
+    "clvRet": 0.1185,
+    "beat": 0.818,
+    "roi": 0.2346,
+    "n": 99
    },
    "check": {
-    "n": 10,
-    "window": 10,
-    "mean": 0.0303,
-    "t": 1.08,
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
     "p": null,
-    "days": 5,
-    "sd": 0.1257,
+    "days": 0,
+    "sd": 0.1171,
     "cusum": 0.0,
-    "cusumMax": 0.31,
+    "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.138,
+    "rho": 0.197,
     "edge": {
      "cusum": 0.0,
-     "cusumMax": 0.23,
+     "cusumMax": 0.0,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0406,
-     "n": 3,
-     "sd": 0.1257,
-     "rho": 0.138,
+     "mu1": 0.052,
+     "n": 0,
+     "sd": 0.1171,
+     "rho": 0.197,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.036,
-     "info": 0.31,
-     "real": 0.614,
-     "realSe": 1.788,
-     "need": 56
+     "llr": 0.0,
+     "info": 0.0,
+     "real": null,
+     "realSe": null,
+     "need": 30
     }
    },
    "drift": {
-    "mu1": 0.0406,
-    "n": 3,
-    "sd": 0.1257,
-    "rho": 0.138,
+    "mu1": 0.052,
+    "n": 0,
+    "sd": 0.1171,
+    "rho": 0.197,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.036,
-    "info": 0.31,
-    "real": 0.614,
-    "realSe": 1.788,
-    "need": 56,
-    "path": [
-     [
-      "2026-11-01",
-      1,
-      -0.234
-     ],
-     [
-      "2026-11-05",
-      2,
-      -0.212
-     ],
-     [
-      "2026-11-08",
-      3,
-      0.036
-     ]
-    ]
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 30,
+    "path": []
    }
   },
   {
@@ -1087,7 +985,7 @@
    "id": "pick:cbb:spread",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread",
+   "label": "CBB spread 1.5+",
    "since": "2026-11-01",
    "status": "stopped",
    "stopped": {
@@ -1114,6 +1012,17 @@
     "clvRet": null,
     "clvT": null
    },
+   "exp": {
+    "clvRet": 0.0563,
+    "beat": 0.619,
+    "roi": 0.0759,
+    "n": 2070
+   },
+   "vsExp": {
+    "gap": -0.0759,
+    "z": -4.64,
+    "read": "below the backtest"
+   },
    "check": {
     "n": 79,
     "window": 79,
@@ -1121,31 +1030,57 @@
     "t": -1.2,
     "p": null,
     "days": 3,
-    "sd": 0.12,
-    "cusum": 3.78,
-    "cusumMax": 3.78,
+    "sd": 0.1173,
+    "cusum": 2.81,
+    "cusumMax": 2.81,
     "h": 10.0,
-    "rho": 0.0,
+    "rho": 0.036,
+    "edge": {
+     "cusum": 2.18,
+     "cusumMax": 2.18,
+     "h": 4.595
+    },
     "stop": false,
     "why": ""
    },
    "drift": {
-    "mu1": null,
+    "mu1": 0.0209,
     "n": 65,
-    "sd": 0.12,
-    "rho": 0.0,
+    "sd": 0.1173,
+    "rho": 0.036,
     "lo": -2.944,
     "hi": 2.944,
-    "state": "no test",
-    "llr": null,
-    "path": []
+    "state": "watching",
+    "at": null,
+    "llr": -2.178,
+    "info": 2.06,
+    "real": -1.538,
+    "realSe": 0.921,
+    "need": 186,
+    "path": [
+     [
+      "2026-11-02",
+      48,
+      -0.914
+     ],
+     [
+      "2026-11-03",
+      61,
+      -1.929
+     ],
+     [
+      "2026-11-04",
+      65,
+      -2.178
+     ]
+    ]
    }
   },
   {
    "id": "pick:cbb:total",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB total",
+   "label": "CBB total 2+",
    "since": "2026-11-01",
    "status": "stopped",
    "stopped": {
@@ -1172,6 +1107,17 @@
     "clvRet": null,
     "clvT": null
    },
+   "exp": {
+    "clvRet": 0.0839,
+    "beat": 0.75,
+    "roi": 0.1088,
+    "n": 2453
+   },
+   "vsExp": {
+    "gap": -0.117,
+    "z": -10.5,
+    "read": "below the backtest"
+   },
    "check": {
     "n": 84,
     "window": 84,
@@ -1179,23 +1125,1237 @@
     "t": -2.9,
     "p": null,
     "days": 3,
-    "sd": 0.12,
+    "sd": 0.1146,
     "cusum": 0.0,
-    "cusumMax": 0.62,
+    "cusumMax": 0.31,
     "h": 10.0,
-    "rho": 0.0,
+    "rho": 0.054,
+    "edge": {
+     "cusum": 2.78,
+     "cusumMax": 2.78,
+     "h": 4.595
+    },
     "stop": false,
     "why": ""
    },
    "drift": {
-    "mu1": null,
+    "mu1": 0.0347,
     "n": 84,
-    "sd": 0.12,
-    "rho": 0.0,
+    "sd": 0.1146,
+    "rho": 0.054,
     "lo": -2.944,
     "hi": 2.944,
-    "state": "no test",
-    "llr": null,
+    "state": "watching",
+    "at": null,
+    "llr": -2.784,
+    "info": 7.68,
+    "real": -0.845,
+    "realSe": 0.566,
+    "need": 64,
+    "path": [
+     [
+      "2026-11-02",
+      72,
+      -1.901
+     ],
+     [
+      "2026-11-03",
+      77,
+      -2.142
+     ],
+     [
+      "2026-11-04",
+      84,
+      -2.784
+     ]
+    ]
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: A10",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: A10)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0576,
+    "beat": 0.587,
+    "roi": 0.1888,
+    "n": 63
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.1061,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0215,
+    "n": 0,
+    "sd": 0.1061,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 143,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: CUSA",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: CUSA)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0562,
+    "beat": 0.641,
+    "roi": 0.1623,
+    "n": 39
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0858,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0208,
+    "n": 0,
+    "sd": 0.0858,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 100,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: Horz",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: Horz)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0611,
+    "beat": 0.702,
+    "roi": -0.2739,
+    "n": 57
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0799,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0233,
+    "n": 0,
+    "sd": 0.0799,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 70,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: Ivy",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: Ivy)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0348,
+    "beat": 0.613,
+    "roi": -0.1099,
+    "n": 31
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0984,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0101,
+    "n": 0,
+    "sd": 0.0984,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 556,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: MAC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: MAC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0638,
+    "beat": 0.575,
+    "roi": 0.1333,
+    "n": 40
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0952,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0246,
+    "n": 0,
+    "sd": 0.0952,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 88,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: MVC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: MVC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.062,
+    "beat": 0.707,
+    "roi": 0.1056,
+    "n": 41
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0964,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0237,
+    "n": 0,
+    "sd": 0.0964,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 97,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: OVC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: OVC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0478,
+    "beat": 0.615,
+    "roi": 0.3645,
+    "n": 26
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.102,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0166,
+    "n": 0,
+    "sd": 0.102,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 222,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: Pat",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: Pat)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.061,
+    "beat": 0.652,
+    "roi": -0.0574,
+    "n": 46
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0832,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0232,
+    "n": 0,
+    "sd": 0.0832,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 76,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: SC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: SC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0343,
+    "beat": 0.459,
+    "roi": 0.0121,
+    "n": 37
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0787,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0099,
+    "n": 0,
+    "sd": 0.0787,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 375,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: SWAC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: SWAC)",
+   "since": "2026-10-31",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0348,
+    "beat": 0.592,
+    "roi": 0.1262,
+    "n": 49
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0761,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0101,
+    "n": 0,
+    "sd": 0.0761,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 333,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: Sum",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: Sum)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0701,
+    "beat": 0.724,
+    "roi": -0.0485,
+    "n": 29
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0944,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0278,
+    "n": 0,
+    "sd": 0.0944,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 68,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: WCC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 1+ (conf: WCC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0561,
+    "beat": 0.727,
+    "roi": 0.0153,
+    "n": 33
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0794,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.018,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0208,
+    "n": 0,
+    "sd": 0.0794,
+    "rho": 0.018,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 86,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:total | conf: BSth",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB total 1.5+ (conf: BSth)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0546,
+    "beat": 0.711,
+    "roi": 0.3485,
+    "n": 38
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0848,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.04,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.02,
+    "n": 0,
+    "sd": 0.0848,
+    "rho": 0.04,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 106,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:total | conf: BW",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB total 1.5+ (conf: BW)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0871,
+    "beat": 0.786,
+    "roi": -0.0615,
+    "n": 42
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.135,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.04,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0363,
+    "n": 0,
+    "sd": 0.135,
+    "rho": 0.04,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 82,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:total | conf: CUSA",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB total 1.5+ (conf: CUSA)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0665,
+    "beat": 0.628,
+    "roi": 0.1459,
+    "n": 43
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0865,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.04,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.026,
+    "n": 0,
+    "sd": 0.0865,
+    "rho": 0.04,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 65,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:total | conf: Ivy",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB total 1.5+ (conf: Ivy)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0883,
+    "beat": 0.889,
+    "roi": 0.6059,
+    "n": 27
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0767,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.04,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0369,
+    "n": 0,
+    "sd": 0.0767,
+    "rho": 0.04,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 26,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:total | conf: OVC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB total 1.5+ (conf: OVC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0698,
+    "beat": 0.846,
+    "roi": -0.0398,
+    "n": 39
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0954,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.04,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.0276,
+    "n": 0,
+    "sd": 0.0954,
+    "rho": 0.04,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 70,
+    "path": []
+   }
+  },
+  {
+   "id": "pick:cbb:total | conf: WCC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB total 1+ (conf: WCC)",
+   "since": "2026-11-13",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0706,
+    "beat": 0.717,
+    "roi": 0.114,
+    "n": 46
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "p": null,
+    "days": 0,
+    "sd": 0.0879,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "rho": 0.028,
+    "edge": {
+     "cusum": 0.0,
+     "cusumMax": 0.0,
+     "h": 4.595
+    },
+    "stop": false,
+    "why": ""
+   },
+   "drift": {
+    "mu1": 0.028,
+    "n": 0,
+    "sd": 0.0879,
+    "rho": 0.028,
+    "lo": -2.944,
+    "hi": 2.944,
+    "state": "watching",
+    "at": null,
+    "llr": 0.0,
+    "info": 0.0,
+    "real": null,
+    "realSe": null,
+    "need": 58,
     "path": []
    }
   },
@@ -1507,7 +2667,7 @@
    "clvT": 0.17,
    "flat": 0.0193,
    "adds": -0.0159,
-   "expEdge": 0.044,
+   "expEdge": 0.0515,
    "basis": "backtest"
   },
   {
@@ -1520,7 +2680,7 @@
    "clvT": -1.16,
    "flat": -0.0296,
    "adds": -0.0189,
-   "expEdge": 0.011,
+   "expEdge": 0.0104,
    "basis": "backtest"
   },
   {
@@ -1533,8 +2693,8 @@
    "clvT": -1.54,
    "flat": -0.0213,
    "adds": -0.02,
-   "expEdge": 0.0324,
-   "basis": "default: half Kelly on the expected return"
+   "expEdge": 0.0308,
+   "basis": "backtest"
   },
   {
    "sport": "cbb",
@@ -1546,8 +2706,8 @@
    "clvT": -3.25,
    "flat": -0.0331,
    "adds": -0.0148,
-   "expEdge": 0.0348,
-   "basis": "default: half Kelly on the expected return"
+   "expEdge": 0.0452,
+   "basis": "backtest"
   },
   {
    "sport": "nba",
@@ -1581,8 +2741,9 @@
   "pick:cbb:total"
  ],
  "flags": [
-  "pick:nfl:spread",
-  "pick:nfl:total"
+  "pick:nfl:total",
+  "pick:cbb:spread",
+  "pick:cbb:total"
  ],
  "drift": {
   "watching": [
@@ -1594,10 +2755,29 @@
    "pick:cfb:spread | season: early",
    "pick:cfb:spread | season: late",
    "pick:cfb:spread | tier: mixed",
-   "pick:cfb:spread | tier: power",
    "pick:cfb:spread | venue: home",
    "pick:nfl:spread",
    "pick:nfl:total",
+   "pick:cbb:spread",
+   "pick:cbb:total",
+   "pick:cbb:spread | conf: A10",
+   "pick:cbb:spread | conf: CUSA",
+   "pick:cbb:spread | conf: Horz",
+   "pick:cbb:spread | conf: Ivy",
+   "pick:cbb:spread | conf: MAC",
+   "pick:cbb:spread | conf: MVC",
+   "pick:cbb:spread | conf: OVC",
+   "pick:cbb:spread | conf: Pat",
+   "pick:cbb:spread | conf: SC",
+   "pick:cbb:spread | conf: SWAC",
+   "pick:cbb:spread | conf: Sum",
+   "pick:cbb:spread | conf: WCC",
+   "pick:cbb:total | conf: BSth",
+   "pick:cbb:total | conf: BW",
+   "pick:cbb:total | conf: CUSA",
+   "pick:cbb:total | conf: Ivy",
+   "pick:cbb:total | conf: OVC",
+   "pick:cbb:total | conf: WCC",
    "pick:nba:spread",
    "pick:nba:total",
    "pick:nba:spread | line: 15+"
