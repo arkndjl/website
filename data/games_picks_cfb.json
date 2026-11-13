@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-13T07:56:09Z",
+ "asof": "2026-11-13T07:58:39Z",
  "recenter": {
   "week": 0.23
  },
@@ -495,7 +495,7 @@
  },
  "model": {
   "asof": "2026-11-13",
-  "ageH": -16.1,
+  "ageH": -16.0,
   "stale": false
  },
  "picks": [],
@@ -659,7 +659,7 @@
     "side": "over",
     "line": 39.5,
     "price": 738.0,
-    "ev": 3.396,
+    "ev": 3.413,
     "units": 1.0
    }
   },
@@ -692,8 +692,8 @@
     "mk": "total",
     "side": "under",
     "line": 67.5,
-    "price": -102.0,
-    "ev": 0.038,
+    "price": -100.0,
+    "ev": 0.044,
     "units": 0.5
    }
   },
@@ -860,14 +860,7 @@
    "betTo": 42.5,
    "close": 42.5,
    "paper": true,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 42.5,
-    "price": -108.0,
-    "ev": 0.02,
-    "units": 0.25
-   }
+   "now": null
   },
   {
    "id": "401860916",
@@ -1052,8 +1045,8 @@
     "mk": "total",
     "side": "over",
     "line": 44.5,
-    "price": -104.0,
-    "ev": 0.012,
+    "price": -102.0,
+    "ev": 0.018,
     "units": 0.25
    }
   },
@@ -1692,6 +1685,22 @@
    "tm": 47.2
   },
   {
+   "id": "401860915",
+   "sport": "cfb",
+   "kick": "2026-11-15T02:30:00.000Z",
+   "home": "San Diego State",
+   "away": "Utah State",
+   "mk": "total",
+   "side": "over",
+   "line": 42.5,
+   "price": -117.0,
+   "edge": 3.4,
+   "x": 3.0,
+   "why": "no edge at -117",
+   "m": 0.1,
+   "tm": 45.9
+  },
+  {
    "id": "401856885",
    "sport": "cfb",
    "kick": "2026-11-15T00:30:00.000Z",
@@ -2058,22 +2067,6 @@
    "why": "edge under 6 (game: conference)",
    "m": 4.3,
    "tm": 48.0
-  },
-  {
-   "id": "401858296",
-   "sport": "cfb",
-   "kick": "2026-11-14T17:00:00.000Z",
-   "home": "Miami",
-   "away": "Duke",
-   "mk": "spread",
-   "side": "home",
-   "line": 13.5,
-   "price": -104.0,
-   "edge": 1.7,
-   "x": 6.0,
-   "why": "edge under 6 (game: conference)",
-   "m": 15.2,
-   "tm": 54.3
   }
  ],
  "games": {
@@ -2153,8 +2146,8 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -104.0,
-   "ev": 0.012,
+   "price": -102.0,
+   "ev": 0.018,
    "edge": 3.7,
    "units": 0.25,
    "home": "Texas A&M",
@@ -2178,7 +2171,7 @@
    "side": "over",
    "line": 39.5,
    "price": 738.0,
-   "ev": 3.396,
+   "ev": 3.413,
    "edge": 6.5,
    "units": 1.0,
    "bk": "poly",
@@ -2491,8 +2484,8 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -102.0,
-   "ev": 0.038,
+   "price": -100.0,
+   "ev": 0.044,
    "edge": 7.0,
    "units": 0.5,
    "home": "West Virginia",
@@ -2515,13 +2508,13 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -108.0,
-   "ev": 0.02,
+   "price": -117.0,
    "edge": 3.4,
-   "units": 0.25,
+   "ev": null,
+   "units": 0.0,
    "home": "San Diego State",
    "away": "Utah State",
-   "state": "paper"
+   "state": "under"
   },
   "401858525": {
    "mk": "total",
@@ -2829,7 +2822,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 17627,
+  "snapshots": 17628,
   "buckets": [
    {
     "when": "24h+",
@@ -6179,7 +6172,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-13T07:56:09Z",
+ "checked": "2026-11-13T07:58:39Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
