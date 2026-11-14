@@ -1282,7 +1282,7 @@
   function pcDash(t) { return /^[—–−-]$/.test(String(t).trim()); }
   function pcProb(it) { if (/%$/.test(it.h) && /^[<>~]?\d+(\.\d+)?%$/.test(it.t)) { it.prob = parseFloat(it.t.replace(/[<>~]/g, '')); it.good = null; } return it; }
   // a card's tiles in bands by what they measure; a column no band claims stays in the board's own band
-  var PC_CATS = [['VALUE', /^(war|waa|war\/17|vorx|gar|par|tgar|xv|av|st|ark|elo|rank|13wk|peak|[rp]?xpm|x?bpm|dpm|hpm|\/90|[rp]xp\/60|gar\/90|war\/1k|nhle|stat\+|pts \/ gsax|gsax\/gp|pts\/g|rating|epa\/play|on xgd)$/i],
+  var PC_CATS = [['VALUE', /^(war|waa|war\/17|vorx|gar|par|tgar|xv|av|st|ark|elo|rank|13wk|peak|[rp]?xpm|x?bpm|dpm|hpm|\/90|[rp]xp\/60|gar\/90|war\/1k|nhle|stat\+|pts \/ gsax|gsax\/gp|pts\/g|rating|epa\/play|on xgd|waa\/fs|gar\/60|p\/90|r?pa|raa)$/i],
                  ['SPLITS', /^(o-xpm|d-xpm|off|def|hard|clay|grass|spw\+|rpw\+)$/i], ['PROJECTION', /^(proj|1y|3y|pwar|next|6m)$/i],
                  ['ODDS', /%$/], ['MARKET', /^(salary|xaav|surplus|apy|cap hit|xmv|tm|value|xnil|ynil|znil|contract|yrs)$/i]];
   function pcBands(tiles) {

@@ -51,6 +51,7 @@
         <th data-sort="n">Player</th>
         <th data-sort="wk" data-num title="± = rank change in WAR over the last 7 days, within the filters; hover for the rank and WAR then. WAR view, current season">±</th>
         <th data-sort="war" data-num class="c-vorx" title="WAR: wins over replacement this season, at goal value: on-ice xG relative to teammates, finishing, power play and penalty kill, penalties, a share of the team's xG; goalies GSAx at 1. Adds up to team goal differential. Replacement = the players outside each team's top 13 forwards / 7 defencemen / 2 goalies">WAR</th>
+        <th data-sort="g60" data-num title="GAR/60: goals above replacement a 60 this season (WAR's goals over ice time)">GAR/60</th>
         <th data-sort="pwar" data-num class="c-vorx" title="projected WAR: (HPM - replacement) x TOI / 60 / goals a win, the components weighted by how well they carry to next season">pWAR</th>
         <th data-sort="p3" data-num class="c-pxpm" title="3Y: projected WAR over the next three seasons (82-game pace), from pWAR, Marcel WAR (last three seasons, shrunk), age by F / D / G and TOI per 82 games; fit on 2010-23 players' next three seasons">3Y</th>
         <th data-sort="hpm" data-num title="HPM: projected goals a 60 over an average player (goalies: GSAx a 60, at its predictive weight)">HPM</th>
@@ -129,6 +130,7 @@
     var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[side],
         gp = Math.min(data.games, ({ 2013: 48, 2020: 70, 2021: 56 })[data.season] || 82), qual = Math.round(400 * gp / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
         ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
+    data.players.forEach(function (p) { if (p.g60 === undefined) p.g60 = p.toi && p.gar != null ? p.gar / p.toi * 60 : null; });
     var list = data.players.filter(function (p) {
       if (p.toi < mp) return false;
       if (pos && p.pos !== pos) return false;
@@ -158,6 +160,7 @@
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>' +
         __wk.rk(p, wkf, 'WAR', null, p.war) +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>' +
+        '<td class="cfb__num">' + (p.g60 == null ? '' : sg2(p.g60)) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('pwar') + '">' + (p.pwar == null ? '' : p.pwar.toFixed(1)) + '</td>' +
         '<td class="cfb__num c-pxpm nbaxpm__v' + k('p3') + '">' + (p.p3 == null ? '' : p.p3.toFixed(1)) + '</td>' +
         '<td class="cfb__num nbaxpm__v' + k('hpm') + '">' + sg2(p.hpm) + '</td>' +

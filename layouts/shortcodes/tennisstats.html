@@ -18,6 +18,7 @@
     <th title="return points won over the average top-100 player, percentage points, opponent-adjusted (against an average top-100 server)">RPW+</th>
     <th title="service games held against an average top-100 returner, from SPW+ through the game chain">xHold</th>
     <th title="return games broken against an average top-100 server, from RPW+">xBreak</th>
+    <th title="rPA: points won a 100 points over the average top-100 player against the same opponents, last 52 weeks, unweighted (PA on the ARK Ranking is the recency-weighted, shrunk version)">rPA</th>
     <th title="serve points won, last 52 weeks (raw)">SPW</th>
     <th title="return points won, last 52 weeks (raw)">RPW</th>
     <th title="service games held">Hold</th>
@@ -42,6 +43,7 @@
     <td class="cfb__num" data-v="{{ .rpwp }}"><b>{{ partial "num.html" (slice "%+.1f" (float .rpwp)) }}</b></td>
     <td class="cfb__num" data-v="{{ .xhold }}">{{ partial "num.html" (slice "%.0f" (float .xhold)) }}%</td>
     <td class="cfb__num" data-v="{{ .xbrk }}">{{ partial "num.html" (slice "%.0f" (float .xbrk)) }}%</td>
+    <td class="cfb__num" data-v="{{ if ne .rpa nil }}{{ .rpa }}{{ end }}">{{ if eq .rpa nil }}<span class="cfb__dim">—</span>{{ else }}{{ partial "num.html" (slice "%+.1f" (float .rpa)) }}{{ end }}</td>
     {{- range $v := slice .spw .rpw .hold .brk }}
     <td class="cfb__num" data-v="{{ if ne $v nil }}{{ $v }}{{ end }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ partial "num.html" (slice "%.1f" (float $v)) }}{{ end }}</td>
     {{- end }}
