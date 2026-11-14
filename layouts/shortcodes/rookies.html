@@ -1,3 +1,6 @@
+{{- /* unless="cfb|cbb": skipped while that sport's transfer watch is live (layouts/shortcodes/xferwatch.html) */ -}}
+{{- $xw := false -}}{{- with .Get "unless" }}{{ with index site.Data (printf "%s_watch" .) }}{{ $xw = and .live .players }}{{ end }}{{ end -}}
+{{- if not $xw -}}
 {{- /* Rookie / first-year leaderboard, one per section: {{< rookies sport="nba" title="rookies :: ..." tab="rookies" >}}.
        Data: static/data/rookies/<sport>.json (scripts/rookies.py), or src="data/..." for another table in the same
        shape (the CBB stats, WAR, breakouts, top performers, draft board and portal tabs, scripts/cbb_tabs.py), fetched the first time the tab is on screen. The file
@@ -229,3 +232,4 @@
 })();
 </script>
 {{- partial "gfx.html" . -}}
+{{- end -}}

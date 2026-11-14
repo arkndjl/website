@@ -3284,6 +3284,23 @@ table.trophycase__hist td.trophycase__post {
   .cfbj td[data-l]::before, .cfbp td[data-l]::before { content: attr(data-l) " "; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
   .cfbj .cfbj__hires { overflow-wrap: anywhere; }
 
+  /* transfer + coaching watch (xferwatch.html): rank, name and the key odds; team; then the labelled cells */
+  .xw thead { display: none; }
+  .xw, .xw tbody { display: block; }
+  .xw tbody tr { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto; gap: 2px 8px; padding: 6px 8px; border-bottom: 1px solid var(--win-dark); }
+  .xw tbody tr[hidden] { display: none; }
+  .xw td { display: none; padding: 0 !important; border: 0; text-align: left; white-space: normal; }
+  .xw td:first-child { display: block; grid-column: 1; grid-row: 1 / span 6; padding-top: 1px !important; }
+  .xw tbody td.cfb__name { display: block; grid-column: 2; grid-row: 1; overflow-wrap: anywhere; position: static !important; background: none !important; box-shadow: none !important; }
+  .xw td.is-key { display: block; grid-column: 3; grid-row: 1; text-align: right; }
+  .xw td.is-key::before { content: attr(data-l) " "; font-size: 0.75em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+  .xw td.xw__team { display: flex; grid-column: 2 / span 2; grid-row: 2; font-size: 0.85em; }
+  .xw td.xw__dest { display: inline-flex; grid-column: 2 / span 2; font-size: 0.85em; }
+  .xw td.xw__dest::before { content: attr(data-l) " "; margin-right: 6px; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+  .xw td.xw__dest .cfb__team { display: inline-flex; align-items: center; gap: 6px; }
+  .xw td.xw__sub { display: block; grid-column: 2 / span 2; font-size: 0.85em; }
+  .xw td.xw__sub::before { content: attr(data-l) " "; margin-right: 6px; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+
   /* player projections: rank, player and PPR; position, team, opponent and kick; then the projected line.
      The per-stat columns (in the line already), PPR/G, Day and Slate stay in the table for sorting and the
      Day/Slate filters, but not on the card */

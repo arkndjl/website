@@ -148,7 +148,7 @@ export function coachMarket(coaches, teamList, { fit, history, sim, loc, start }
   const TO = fit.turnover;
   const dest = (list, total) => { const s = list.reduce((a, d) => a + d.w, 0) || 1;
     const agg = {}; for (const d of list) agg[d.to] = (agg[d.to] || 0) + d.w / s * total;
-    return Object.entries(agg).map(([to, p]) => ({ tid: to, team: T[to]?.team, p: r3(p) })).filter(d => d.p >= 0.001).sort((a, b) => b.p - a.p).slice(0, 4); };
+    return Object.entries(agg).map(([to, p]) => ({ tid: to, team: T[to]?.team, p: r3(p), s: total > 0 ? r3(p / total) : 0 })).filter(d => d.s >= 0.01).sort((a, b) => b.s - a.s).slice(0, 4); };
   const flows = [];
   for (const c of coaches) {
     const tm = team[c.tid]; if (!tm) continue;

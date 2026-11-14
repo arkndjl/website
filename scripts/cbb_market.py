@@ -440,7 +440,7 @@ def main():
     for s_, c in CO.items():
         TS[(season, B[s_])] = {**TS.get((season, B[s_]), {}), 'wp': jobs.get(s_, {}).get('wp', .5), 'srs': srs_now.get(s_, 0.0)}
     cand = [(t, c) for t, c in CO.items()]
-    hires = {}
+    hires, hire_p = {}, {}
     for t in jobs:
         X, who = [], []
         for s, c in cand:
@@ -449,6 +449,7 @@ def main():
             f = M.feats_hire(TS, season, B[t], B[s], c['cres'] or 0.0, loc, c['ten'])
             X.append(f); who.append((s, c))
         u = np.array(X) @ hb; u -= u.max(); e = np.exp(u); e /= e.sum()
+        hire_p[t] = {who[i][0]: float(e[i]) for i in range(len(who))}
         o = np.argsort(-e)[:3]
         hires[t] = [{'name': who[i][1]['name'], 'from': who[i][0], 'p': round(float(e[i] * hf['fromHC']), 3)} for i in o]
     jl = []
@@ -472,12 +473,39 @@ def main():
     for p in pool:
         o = p['team']
         r = {'bpm': p.get('xbpm')}
-        X = [M.feats_land(r, o, t, srs_now.get(t), srs_now.get(o), p.get('conf'), tconf[t], loc.get(B[o]), loc.get(B[t]), False, newhc[t], openm.get(t, .5)) for t in teams]
+        # every other D-I team (the fit's choice set: a mover is on another team's roster)
+        ts = [t for t in teams if t != o]
+        X = [M.feats_land(r, o, t, srs_now.get(t), srs_now.get(o), p.get('conf'), tconf[t], loc.get(B[o]), loc.get(B[t]), False, newhc[t], openm.get(t, .5)) for t in ts]
         X = np.array(X, float)
         # the land fit's power flags are the high-major set (P12 was one through 2024)
         u = X @ lb; u -= u.max(); e = np.exp(u); e /= e.sum()
-        land[id(p)] = dict(zip(teams, e)); p['_lmax'] = float(e.max())
-    # follow-the-coach: a coach who may move takes players along (odds through the jobs model's hire candidates)
+        land[id(p)] = dict(zip(ts, e)); p['_lmax'] = float(e.max())
+    # where each head coach goes if he is hired away: every opening's odds of opening x his share of its hire model
+    # (sitting head coaches), scaled to his P(hired away); dest[s] = {job: P(he takes it)}
+    dest = {}
+    for t, hp in hire_p.items():
+        op = 1 - jobs[t]['stay']
+        for s_, e_ in hp.items():
+            dest.setdefault(s_, {})[t] = op * e_
+    for s_, d in dest.items():
+        z = sum(d.values()) or 1; mv = jobs.get(s_, {}).get('moved', 0.0)
+        dest[s_] = {t: v / z * mv for t, v in d.items()}
+    # follow-the-coach: the land fit's follow term (his coach takes that job) as a mixture over the coach's destinations
+    FOLLOW = math.exp(lb[M.LAND_F.index('follow')])
+    for p in pool:
+        sh = land[id(p)]
+        h = sorted(dest.get(p['team'], {}).items(), key=lambda kv: -kv[1])[:12]
+        if not h:
+            continue
+        H = sum(v for _, v in h)
+        mix = {t: (1 - H) * v for t, v in sh.items()}
+        for t2, hv in h:
+            if t2 not in sh:
+                continue
+            zz = 1 + sh[t2] * (FOLLOW - 1)
+            for t, v in sh.items():
+                mix[t] += hv * v * (FOLLOW if t == t2 else 1) / zz
+        p['_land'] = mix
 
     # ---- team builder ----------------------------------------------------------------------------------------
     sched = fit.get('minsched') or [0.78, 0.74, 0.68, 0.6, 0.52, 0.42, 0.32, 0.22, 0.14, 0.08, 0.05, 0.03, 0.02]
@@ -595,6 +623,8 @@ def main():
     tp_rows = sorted([p for p in P if p['team'] in power], key=lambda p: -p['pMove'])[:300]
     transfer = [{'name': p['name'], 'team': p['team'], 'logo': p.get('logo'), 'conf': p.get('conf'), 'pos': p['pos'], 'cls': p.get('cls'), 'fv': p.get('fv'),
                  'bpm': p.get('xbpm'), 'tp': round(p['pMove'], 3), 'back': round(p['pBack'], 3), 'gone': round(p['pGone'], 3), 'x': p['xnil']} for p in tp_rows]
+    # ---- transfer + coaching watch (the portal and coaching jobs tabs in season) ---------------------------------
+    write_watch(G.get('asof'), season, P, pool, land, power, jl, dest, CO, fit)
     out = {'asof': G.get('asof'), 'season': season, 'nilFit': nilfit, 'nil': nil_rows, 'teamsNil': teams_nil, 'staff': staff, 'jobs': jl,
            'transfer': transfer, 'tests': {k: fit[k]['test'] for k in ('move', 'land', 'vacancy', 'hires')}, 'value': {k: fit['value'][k] for k in ('feats', 'n', 'looR2', 'looRmse')},
            'eOpen': round(sum(x['open'] for x in jl), 1)}
@@ -603,6 +633,39 @@ def main():
     with open(BUILD, 'w') as h:
         json.dump({'asof': G.get('asof'), 'season': season, 'roster': ROSTER, 'teams': out_b}, h, separators=(',', ':'))
     print('staff', len(staff), 'jobs', len(jl), 'E[open]', out['eOpen'], 'builder', len(out_b), 'movers pool', len(pool))
+
+
+WATCH = os.path.join(ROOT, 'data', 'cbb_watch.json')
+WATCH_MIN = 0.25       # on the watch: P(on another D-I roster next season) at least this
+WATCH_N = 150
+
+
+def write_watch(asof, season, P, pool, land, power, jl, dest, CO, fit):
+    """data/cbb_watch.json: the likeliest movers with the schools likeliest to land them (P(school | he moves), the
+    landing model with his coach's possible moves mixed in), and every head coach's odds of leaving with the jobs he
+    would likeliest take (P(job | hired away))"""
+    logo = lambda t: (power.get(t) or {}).get('logo')
+    rows = []
+    for p in sorted((q for q in pool if q['pMove'] >= WATCH_MIN), key=lambda q: (-(q.get('fv') or 0), -q['pMove']))[:WATCH_N]:
+        sh = p.get('_land') or land[id(p)]
+        top = sorted(sh.items(), key=lambda kv: -kv[1])[:3]
+        rows.append({'name': p['name'], 'team': p['team'], 'logo': p.get('logo'), 'conf': p.get('conf'), 'pos': p['pos'], 'cls': p.get('cls'),
+                     'fv': p.get('fv'), 'tp': round(p['pMove'], 3), 'back': round(p['pBack'], 3),
+                     'dest': [{'team': t, 'logo': logo(t), 'p': round(v, 3)} for t, v in top]})
+    coaches = []
+    for j in jl:
+        d = dest.get(j['team'], {})
+        mv = j['moved'] or 0.0
+        top = sorted(d.items(), key=lambda kv: -kv[1])[:3]
+        coaches.append({'name': j['hc'], 'team': j['team'], 'logo': j.get('logo'), 'conf': j.get('conf'), 'ten': j['ten'], 'wp': j['wp'],
+                        'leave': j['open'], 'out': j['out'], 'moved': j['moved'],
+                        'dest': [{'team': t, 'logo': logo(t), 'p': round(v / mv, 3)} for t, v in top if mv > 0 and v / mv >= 0.01]})
+    coaches.sort(key=lambda c: -c['leave'])
+    month = int((asof or '2026-01-01')[5:7])
+    with open(WATCH, 'w') as h:
+        json.dump({'asof': asof, 'season': season, 'live': month >= 10 or month <= 3, 'players': rows, 'coaches': coaches,
+                   'tests': {k: fit[k]['test'] for k in ('move', 'land', 'vacancy', 'hires')}}, h, separators=(',', ':'))
+    print('watch', len(rows), 'players', len(coaches), 'coaches')
 
 
 if __name__ == '__main__':

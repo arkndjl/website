@@ -1,3 +1,6 @@
+{{- /* unless="cfb|cbb": skipped while that sport's transfer watch is live (layouts/shortcodes/xferwatch.html) */ -}}
+{{- $xw := false -}}{{- with .Get "unless" }}{{ with index site.Data (printf "%s_watch" .) }}{{ $xw = and .live .players }}{{ end }}{{ end -}}
+{{- if not $xw -}}
 {{- /* Transfer portal (data/cfb_portal.json, scripts/fetch_cfb.mjs): this season's portal moves (CFBD) matched to
        the board at the destination, with FV; and each team's net, expected college WAR a season by FV (AV at FV x
        the college WAR rate, data/cfb_war_backtest.json) in minus out, over the graded players who moved. */ -}}
@@ -37,4 +40,5 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .teams) "note" "college WAR a season by FV, graded players only") -}}
+{{- end -}}
 {{- end -}}

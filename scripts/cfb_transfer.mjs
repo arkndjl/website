@@ -736,3 +736,25 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   const labels = { DL: 'DT' };
   return { season, next: season + 1, labels, dev: devCheck, moveCost: MOVE_COST, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
 }
+
+// transfer watch (the portal tab in season, data/cfb_watch.json): the likeliest FBS movers with the schools likeliest
+// to land them. P(school | he moves) is the landing model mixed with his head coach's possible moves: with h_j the
+// coaching market's chance his coach takes job j and f the measured follow share, P(j) = (1 - f H) s_j + f h_j, H = sum h_j
+export const WATCH_MIN = 0.25, WATCH_N = 150;
+export function transferWatch(rows, teamList, { fit, geo, coachFlows = [], coachOpen = {} }) {
+  const land = landingModel(fit, geo, rows, teamList, coachOpen); if (!land) return null;
+  const follow = fit.landing?.follow ?? HC_FOLLOW;
+  const hc = {}; for (const f of coachFlows) if (f.role === 'HC') ((hc[f.from] ||= {})[f.to] = (hc[f.from]?.[f.to] || 0) + f.p);
+  const info = {}; for (const r of rows) if (r.tid && !info[r.tid]) info[r.tid] = { team: r.team, logo: r.logo || null };
+  for (const t of teamList) info[t.tid] = { team: t.team, logo: t.logo || null };
+  const cand = rows.filter(r => r.div !== 'FCS' && r.tid && r.fv != null && (r.transferP ?? 0) >= WATCH_MIN)
+    .sort((a, b) => b.fv - a.fv || b.transferP - a.transferP).slice(0, WATCH_N);
+  return cand.map(r => {
+    const L = land(r), h = hc[r.tid] || {}, H = Object.values(h).reduce((a, v) => a + v, 0);
+    const P = {}; for (const [j, s] of Object.entries(L.share)) P[j] = (1 - follow * H) * s + follow * (h[j] || 0);
+    const top = Object.entries(P).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    return { name: r.name, pos: r.pos, cls: r.cls, team: r.team, logo: r.logo || null, conf: r.conf, fv: r.fv, photo: r.photo || null, star: r.star || null,
+      tp: r3(r.transferP), stay: r3(r.stayP ?? 0), dp: r.draftP != null ? r3(r.draftP) : null,
+      dest: top.map(([j, p]) => ({ team: info[j]?.team || j, logo: info[j]?.logo || null, p: r3(p) })) };
+  });
+}
