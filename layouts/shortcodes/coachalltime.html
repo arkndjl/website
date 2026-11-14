@@ -1,0 +1,46 @@
+{{- /* All-time head coaches (scripts/coach_alltime.py, data/coach_alltime.json). sport="cfb" | "cbb".
+       Score (wins) = cWAR + per-title and per-conference-title weights fit on Hall of Fame selection (+ CFB coordinator
+       wins at the measured translation rate). Method on Reference (Glossary/Methodology). Mobile: the cfbp cards. */ -}}
+{{- $sp := $.Get "sport" | default "cfb" -}}
+{{- with index site.Data.coach_alltime $sp -}}
+{{- $cfb := eq $sp "cfb" -}}
+{{- $t := .test -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "all-time coaches") "filter" "Status,Era" "rerank" true "tab" ($.Get "tab") "icon" (cond $cfb "football" "basketball") "gfxCols" (cond $cfb "RK,Coach,Schools,Years,W-L,NT,CT,WAx,Score" "RK,Coach,Schools,Years,W-L,NT,CT,WAx,Score") "gfxDate" (lower ((time site.Data.coach_alltime.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table cfbp coachat">
+  <thead><tr><th>RK</th><th>Coach</th><th title="schools, most seasons first">Schools</th><th>Years</th>
+    <th title="active = head coach this season">Status</th><th title="decade of the middle of his head-coaching career">Era</th>
+    <th title="head-coaching seasons{{ if $cfb }} at major-college (FBS / pre-split major) programs{{ else }} in Division I{{ end }}">Seasons</th>
+    <th>W-L</th>
+    <th title="wins over the program's expectation (its other coaches' seasons, nearest weighted most), per {{ cond $cfb 12 30 }}-game season, summed">WAx</th>
+    <th title="WAx + {{ printf "%.2f" (math.Abs .R0) }} a season (replacement level: coaches with two or fewer seasons)">cWAR</th>
+    <th title="national titles ({{ if $cfb }}AP / Coaches Poll shares from 1936; major-selector shares before{{ else }}NCAA tournament{{ end }}), era-weighted by field difficulty">NT</th>
+    <th title="conference titles{{ if $cfb }} (title game, else best conference record; ties split){{ else }} (regular season, ties split){{ end }}, weighted by conference difficulty">CT</th>
+    {{- if $cfb }}<th title="coordinator wins: his unit's points over the program's expectation as OC/DC (1990-2025), in wins; counts x {{ printf "%.2f" .coordW }} in Score (rate at which coordinator value carried into head-coaching value)">Coord</th>{{ end }}
+    <th title="cWAR + {{ printf "%.0f" .lamN }} a national title + {{ printf "%.1f" .lamC }} a conference title{{ if $cfb }} + Coord{{ end }}; title weights fit on Hall of Fame selection">Score</th>
+    <th title="Score per season, shrunk toward 0 by {{ printf "%.1f" .kc }} seasons">Rate</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $c := .rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfbp__name"><b>{{ .c }}</b>{{ if .hof }} <span class="cfb__dim" title="Hall of Fame">HOF</span>{{ end }}</td>
+    <td class="cfb__team"><span>{{ .s }}</span></td>
+    <td class="cfbp__role">{{ .y0 }}-{{ if .act }}now{{ else }}{{ .y1 }}{{ end }}</td>
+    <td class="cfbp__conf">{{ if .act }}active{{ else }}retired{{ end }}</td>
+    <td class="cfbp__conf">{{ .era }}s</td>
+    <td class="cfb__num" data-l="Seasons" data-v="{{ .n }}">{{ .n }}</td>
+    <td class="cfb__num" data-l="W-L" data-v="{{ .w }}">{{ .w }}-{{ .l }}{{ with .t }}-{{ . }}{{ end }}</td>
+    <td class="cfb__num" data-l="WAx" data-v="{{ .wax }}">{{ if ge .wax 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .wax) }}</td>
+    <td class="cfb__num" data-l="cWAR" data-v="{{ .war }}">{{ partial "num.html" (slice "%.1f" .war) }}</td>
+    <td class="cfb__num" data-l="NT" data-v="{{ .nt }}">{{ if .nt }}{{ partial "num.html" (slice "%.1f" .nt) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-l="CT" data-v="{{ .ct }}">{{ if .ct }}{{ partial "num.html" (slice "%.1f" .ct) }}{{ else }}-{{ end }}</td>
+    {{- if $cfb }}<td class="cfb__num" data-l="Coord" data-v="{{ .co }}">{{ if .co }}{{ if ge .co 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .co) }}{{ else }}-{{ end }}</td>{{ end }}
+    <td class="cfb__num cfbp__surplus is-key" data-l="Score" data-v="{{ .sc }}"><b>{{ partial "num.html" (slice "%.0f" .sc) }}</b></td>
+    <td class="cfb__num" data-l="Rate" data-v="{{ .rt }}">{{ partial "num.html" (slice "%.1f" .rt) }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $about := printf "Head coaches %v-%v with %v+ seasons, top %v by Score plus every active coach. Hall of Fame: Score AUC %.2f (raw wins %.2f). Walk-forward: Score per season before %v predicts the next 10 seasons' WAx at r %.2f (win%% %.2f)." .from .to .minN .top $t.aucScore $t.aucWins $t.cut $t.rScore $t.rWpct -}}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" (printf "Score in wins · updated %s" (lower ((time site.Data.coach_alltime.asof).Format "Jan 2, 2006"))) "about" $about) -}}
+{{- end -}}
