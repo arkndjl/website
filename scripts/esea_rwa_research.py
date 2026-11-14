@@ -5,6 +5,9 @@
 
     python3 scripts/esea_rwa_research.py           # reads research/esea_matches.json.gz -> data/esea_rwa_fit.json (~15 min)
     python3 scripts/esea_rwa_research.py --fixed   # same tests at the saved settings (no grid)
+    --five actual|live|expected|sharp              # how each side is priced (default live = the page rule; see
+                                                   # esea_standin_research.py; actual = the five who played)
+    --out FILE                                     # write somewhere else
 
 RWA:
   1. Stat weights: a team's round share on a map regressed on the sum of its five per-round lines (kills, deaths,
@@ -170,8 +173,12 @@ def weekly(ms):
     return out
 
 
-def rwa_gaps(ms, M, c, p, cuts):
-    """match id -> (sum theta five1 - sum theta five2) / 100, ratings from before the match's week"""
+def rwa_gaps(ms, M, c, p, cuts, five=None):
+    """match id -> (sum theta five1 - sum theta five2) / 100, ratings from before the match's week.
+    five: how each side is priced (SR.FIVES, default SR.FIVE = the page rule)"""
+    five = five or SR.FIVE
+    if five != 'actual' and ms and 'pf' not in ms[0]:
+        SR.predicted_fives(ms)
     out = {}
     j = 0
     pidx = M.pid
@@ -192,8 +199,11 @@ def rwa_gaps(ms, M, c, p, cuts):
                 return p['g'] * m['div_r'] + p['nu']
             return th[i]
         for m in week:
-            a = sum(val(q, m) for q in m['five1'][:5]) / len(m['five1'][:5]) * 5
-            b = sum(val(q, m) for q in m['five2'][:5]) / len(m['five2'][:5]) * 5
+            if five != 'actual':
+                a, b = (sum(w * val(q, m) for q, w in ws_) * 5 for ws_ in m['pf'][five])
+            else:
+                a = sum(val(q, m) for q in m['five1'][:5]) / len(m['five1'][:5]) * 5
+                b = sum(val(q, m) for q in m['five2'][:5]) / len(m['five2'][:5]) * 5
             out[m['id']] = (a - b) / 100
     return out
 
@@ -216,6 +226,10 @@ def tune_ll(rows, cols):
 
 
 def main():
+    if '--out' in sys.argv:
+        OUT_ = sys.argv[sys.argv.index('--out') + 1]
+    else:
+        OUT_ = OUT
     d, ms = SR.load()
     M = Maps(ms)
     cuts = weekly(ms)
@@ -226,15 +240,11 @@ def main():
            'mline': [round(float(x), 5) for x in ml], 'weights_r2': round(r2, 3), 'weights_n': nfit}
 
     # player Elo (shipped) + FACEIT level of the five, as in the C2 test
-    gp, _ = SR.run_pelo(ms, **PELO)
-    lvd = {}
-    for m in ms:
-        def lv(f):
-            v = [m['lv'].get(q) for q in f[:5] if m['lv'].get(q)]
-            return sum(v) / len(v) if v else None
-        a, b = lv(m['five1']), lv(m['five2'])
-        if a is not None and b is not None:
-            lvd[m['id']] = a - b
+    five = SR.five_arg()
+    SR.predicted_fives(ms)
+    res['five'] = five
+    gp, _ = SR.run_pelo(ms, five=five, **PELO)
+    lvd = {m['id']: m['pflv'][five] for m in ms if m['pflv'][five] is not None}
 
     cs = {pm: contributions(M, beta, ml, pm) for pm in (0.0, 0.5, 1.0)}
     quick = '--quick' in sys.argv
@@ -245,7 +255,7 @@ def main():
         import itertools
         for vals in itertools.product(*[space[k] for k in keys]):
             p = dict(fixed, **dict(zip(keys, vals)))
-            rg = rwa_gaps(ms, M, c_of(p), p, cuts)
+            rg = rwa_gaps(ms, M, c_of(p), p, cuts, five)
             v = tune_ll(rows_of(ms, {'x': rg}), ['x'])
             grid.append((v, p))
             print(p, round(v, 4), file=sys.stderr)
@@ -266,16 +276,16 @@ def main():
     best = gr[0][1]
     res['grid_top'] = old['grid_top'] if old else [{**p, 'tune_ll': round(v, 4)} for v, p in gr[:6]]
     res['params'] = best
-    rg = rwa_gaps(ms, M, cw(best), best, cuts)
+    rg = rwa_gaps(ms, M, cw(best), best, cuts, five)
     bo = next(p for v, p in gr if p['w'] == 'ols')
     res['params_ols'] = bo
-    rgo = rwa_gaps(ms, M, cw(bo), bo, cuts)
+    rgo = rwa_gaps(ms, M, cw(bo), bo, cuts, five)
     # ARK Rating (the page's 1NTERLYTICS player rating) through the same walk-forward, its own h/k tuned, no
     # opponent or division terms (as the page shows it)
     ga = search(lambda p: av, pin({'h': one([100000, 365]), 'k': one([50, 150]), 'nu': [0.0]}, ('ark_params',)), {'opp': 0.0, 'g': 0.0, 'pm': 0.0})
     res['ark_params'] = ga[0][1]
     res['ark_grid_top'] = old['ark_grid_top'] if old else [{**p, 'tune_ll': round(v, 4)} for v, p in ga[:4]]
-    ra = rwa_gaps(ms, M, av, ga[0][1], cuts)
+    ra = rwa_gaps(ms, M, av, ga[0][1], cuts, five)
 
     rows = rows_of(ms, {'rwa': rg, 'ark': ra, 'rwa_ols': rgo, 'pelo': gp, 'lv': lvd})
     held = {}
@@ -346,8 +356,8 @@ def main():
     res['note'] = 'held = fit on S54-S57, scored on S58-S59 matches; t < -2 and most seasons = passes'
     for k, v in res['tests'].items():
         print(k, v, file=sys.stderr)
-    json.dump(res, open(OUT, 'w'), indent=1)
-    print('wrote', OUT, file=sys.stderr)
+    json.dump(res, open(OUT_, 'w'), indent=1)
+    print('wrote', OUT_, file=sys.stderr)
 
 
 if __name__ == '__main__':

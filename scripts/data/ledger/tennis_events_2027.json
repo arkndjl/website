@@ -1,0 +1,6 @@
+{
+ "registered": "2026-11-14",
+ "rule": "Tennis event odds, scored once after the 2027 Australian Open. Record: the first complete-field odds of every tour-level event (scripts/tennis_events.py ledger, append-only, never rewritten); 'played' = main-draw matches finished when recorded. Score: the Australian Open men's and women's singles records with played = 0 (if none, the earliest record of each), title log loss and Brier against the outright market's no-vig title prices taken at the draw, and against the same bracket on Elo alone and ranking alone; every other recorded event with played = 0 is reported beside it, by event. No tuning on these records. Outright prices are data only (no order is placed).",
+ "source": "scripts/tennis_events.py",
+ "events": {}
+}

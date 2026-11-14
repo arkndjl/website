@@ -16,12 +16,15 @@ draft = false
 {{< arklist sport="cs2" title="ARKLIST" tab="ARKLIST" >}}
 {{< cs2rank title="Counter-Strike :: ARK Ranking" tab="ARK Ranking" >}}
 {{< cs2mappool title="map pool :: map win % vs the top 20" tab="map pool" >}}
-{{< cs2rounds title="rounds" tab="rounds" >}}
 {{< cs2matches title="games" tab="games" >}}
 {{< cs2matches view="results" title="game table" tab="game table" >}}
 {{< cs2players view="values" title="transfer values" tab="transfer values" >}}
 {{< cs2model title="model" tab="model" >}}
 {{< cs2players view="model" title="player model" tab="player model" >}}
+{{< wintabs tab="rounds" tabs="rounds,economy" sub="true" label="rounds views" >}}
+{{< cs2rounds title="rounds" tab="rounds" >}}
+{{< cs2econ tab="economy" >}}
+{{< /wintabs >}}
 {{< wintabs tab="events" tabs="event odds,pick'em" sub="true" label="events views" >}}
 {{< cs2events tab="event odds" >}}
 {{< cs2pickem title="pick'em" tab="pick'em" >}}

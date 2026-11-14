@@ -4,6 +4,8 @@
 
     python3 scripts/esea_standin_research.py   # reads research/esea_matches.json.gz (+ data/esea.json git history)
                                                 # writes data/esea_standin_research.json
+    --five actual|live|expected|sharp           # how each side is priced (default live = the page rule; actual
+                                                # = the five who played, an oracle the page does not have)
 
 Every rating is walk-forward: a match is predicted from earlier matches only, then the ratings update.
 Unit = one league match, predicted for faction1 (Bo1 regular season; Bo3 playoffs use the first map's five).
@@ -111,6 +113,108 @@ def standin_features(ms):
             level[p] = v
 
 
+# ---- predicted fives -----------------------------------------------------------------------------
+# The page has to guess who plays. FIVE picks how a harness prices a side:
+#   actual    the first map's five (an oracle: what the page cannot know)
+#   live      the page rule: top 5 by the team's league maps in the prior 90 days, last 30 double
+#   expected  top 7 by the same counts, weighted by share
+#   sharp     top 7 by same-season maps, the team's latest map x3, weighted by share (short sides use expected)
+FIVES = ('actual', 'live', 'expected', 'sharp')
+FIVE = 'live'
+DAY = 86400
+
+
+def five_arg(argv=None):
+    argv = sys.argv if argv is None else argv
+    if '--five' in argv:
+        v = argv[argv.index('--five') + 1]
+        if v not in FIVES:
+            raise SystemExit(f'--five must be one of {FIVES}')
+        return v
+    return FIVE
+
+
+def weights_of(apps, last, top, share):
+    """-> [(player, weight)] summing to 1: the top players by apps (ties: later last appearance, then id)"""
+    order = sorted(apps, key=lambda q: (-apps[q], -last[q], q))[:top]
+    if share:
+        tot = sum(apps[q] for q in order)
+        return [(q, apps[q] / tot) for q in order]
+    return [(q, 1 / len(order)) for q in order]
+
+
+def predicted_fives(ms):
+    """walk forward: m['pf'][mode] = ([(player, weight)] for f1, same for f2), m['pf_ok'] = both sides have 5+
+    players under the live count (the rows the five tests score)"""
+    hist = defaultdict(list)    # team -> [(at, season, five)] per prior map
+    level = {}
+    for m in ms:
+        t = m['at']
+        pf = {k: [None, None] for k in FIVES}
+        ok = True
+        for si, (side, five) in enumerate((('f1', m['five1'][:5]), ('f2', m['five2'][:5]))):
+            pf['actual'][si] = [(q, 1 / len(five)) for q in five]
+            apps, last, sapps, slast = defaultdict(float), {}, defaultdict(float), {}
+            h = hist[m[side]['id']]
+            ssn = [x for x in h if x[1] == m['season']]
+            for j, (tt, _, f) in enumerate(h):
+                if t - tt <= 90 * DAY:
+                    w = 2 if t - tt <= 30 * DAY else 1
+                    for q in f:
+                        apps[q] += w
+                        last[q] = j
+            for j, (tt, _, f) in enumerate(ssn):
+                w = 3 if j == len(ssn) - 1 else 1
+                for q in f:
+                    sapps[q] += w
+                    slast[q] = j
+            if len(apps) < 5:
+                ok = False
+                # short history: fill from the match roster by FACEIT level (as the page fills from elo)
+                ros = sorted((p for p in m[side]['roster'] if p[0] not in apps), key=lambda p: (-(p[1] or level.get(p[0]) or 0), p[0]))
+                for k, p in enumerate(ros[:5 - len(apps)]):
+                    apps[p[0]] = 1e-6
+                    last[p[0]] = -1 - k
+            if apps:
+                pf['live'][si] = weights_of(apps, last, 5, False)
+                pf['expected'][si] = weights_of(apps, last, 7, True) if len([q for q in apps if apps[q] > 1e-3]) >= 5 else pf['live'][si]
+                pf['sharp'][si] = weights_of(sapps, slast, 7, True) if len(sapps) >= 5 else pf['expected'][si]
+            else:
+                for k in ('live', 'expected', 'sharp'):
+                    pf[k][si] = pf['actual'][si]
+        m['pf'], m['pf_ok'] = pf, ok
+        # FACEIT level of each priced side (match-time roster level, else the player's last seen level)
+        m['pflv'] = {}
+        for k in FIVES:
+            g = []
+            for ws in pf[k]:
+                v = [(m['lv'].get(q) or (None if k == 'actual' else level.get(q)), w) for q, w in ws]
+                v = [(x, w) for x, w in v if x]
+                g.append(sum(x * w for x, w in v) / sum(w for _, w in v) if v else None)
+            m['pflv'][k] = g[0] - g[1] if None not in g else None
+        for mp in m['maps']:
+            hist[m['f1']['id']].append((t, m['season'], [p[0] for p in mp['p1']][:5]))
+            hist[m['f2']['id']].append((t, m['season'], [p[0] for p in mp['p2']][:5]))
+        for q, v in m['lv'].items():
+            level[q] = v
+
+
+def day_t(a, b, day):
+    """paired a - b clustered by match day: {n, days, diff, t}"""
+    by = defaultdict(float)
+    ids = [i for i in a if i in b]
+    for i in ids:
+        by[day[i]] += a[i] - b[i]
+    v = list(by.values())
+    n = len(v)
+    if n < 3:
+        return None
+    mu = sum(v) / n
+    sd = math.sqrt(sum((x - mu) ** 2 for x in v) / (n - 1)) or 1e-12
+    return {'n': len(ids), 'days': n, 'll_base': round(sum(b[i] for i in ids) / len(ids), 4), 'll_new': round(sum(a[i] for i in ids) / len(ids), 4),
+            'diff': round(sum(v) / len(ids), 5), 't': round(mu / (sd / math.sqrt(n)), 2)}
+
+
 # ---- C2 player Elo ---------------------------------------------------------------------------------
 def round_share(won, lost, span):
     rs = won / ((won + lost) or 24)
@@ -139,7 +243,14 @@ class PElo:
     def team(self, five, m):
         return sum(self.get(q, m) for q in five) / len(five)
 
-    def gap_of(self, m):
+    def wteam(self, ws, m):
+        new = self.p['gap'] * m['div_r'] + self.p['mu_new']    # read only: a predicted player may never play
+        return sum(w * (self.get(q, m) if q in self.r else new) for q, w in ws)
+
+    def gap_of(self, m, five='actual'):
+        if five != 'actual' and m.get('pf'):
+            a, b = m['pf'][five]
+            return (self.wteam(a, m) - self.wteam(b, m)) / 400
         return (self.team(m['five1'], m) - self.team(m['five2'], m)) / 400
 
     def update(self, m):
@@ -156,11 +267,15 @@ class PElo:
                 self.n[q] += 1
 
 
-def run_pelo(ms, **kw):
+def run_pelo(ms, five=None, **kw):
+    """five: how each side is priced (FIVES; default FIVE = the page rule). Updates always use who played."""
+    five = five or FIVE
+    if five != 'actual' and ms and 'pf' not in ms[0]:
+        predicted_fives(ms)
     mdl = PElo(**kw)
     out = {}
     for m in ms:
-        out[m['id']] = mdl.gap_of(m)
+        out[m['id']] = mdl.gap_of(m, five)
         mdl.update(m)
     return out, mdl
 
@@ -297,7 +412,9 @@ def snapshots():
 def main():
     d, ms = load()
     standin_features(ms)
-    res = {'asof': d.get('asof'), 'matches': len(ms), 'core': {'window_maps': CORE_N, 'min_prior_maps': CORE_MIN}}
+    five = five_arg()
+    predicted_fives(ms)
+    res = {'asof': d.get('asof'), 'matches': len(ms), 'five': five, 'core': {'window_maps': CORE_N, 'min_prior_maps': CORE_MIN}}
 
     # descriptive: raw win % by own subs (prior-only core), both sides defined
     desc = defaultdict(lambda: [0, 0])
@@ -322,7 +439,7 @@ def main():
         grid = [dict(K=96, Kmin=19, n0=50, span=0.4, kmap=1.0, mu_new=-100, gap=0)]
     best, bestll, tab = None, 9, []
     for g in grid:
-        gp, _ = run_pelo(ms, **g)
+        gp, _ = run_pelo(ms, five=five, **g)
         rows = [{'id': m['id'], 'y': m['y'], 'season': m['season'], 'x': gp[m['id']]} for m in ms if m['season'] > BURN]
         b, lls = split_fit(rows, ['x'], TUNE, TUNE)   # in-sample fit on tune: slope absorbs the scale
         v = sum(lls.values()) / len(lls)
@@ -331,8 +448,8 @@ def main():
             best, bestll = g, v
     res['c2_grid_top'] = sorted(tab, key=lambda r: r['tune_ll'])[:8]
     res['c2_best'] = best
-    gp, PE = run_pelo(ms, **best)
-    gw, _ = run_pelo(ms, **{**best, 'wins': True})          # same model, wins only (round share check)
+    gp, PE = run_pelo(ms, five=five, **best)
+    gw, _ = run_pelo(ms, five=five, **{**best, 'wins': True})          # same model, wins only (round share check)
     from esea_research import Elo  # team round-share Elo, the Oct 26 best (relo)
     te = Elo(K=96, carry=0.0, div_gap=0, margin=True)
     trelo = {}

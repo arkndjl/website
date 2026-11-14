@@ -12,6 +12,8 @@ import fs from 'node:fs';
 import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PELO, PELO_DIV, FIVE_V, archiveGames, replayElo, teamHistory, fiveWeights, restrict, wmean } from './esea_five.mjs';
+import { price, readLog, writeLog, merge as mergeLog, settle } from './esea_league_log.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'data', 'esea.json');
@@ -1016,21 +1018,11 @@ function pairUp(ours, theirs) {
 // .6105 (t -9.3, n 1,860); S59 holdout t -4.3; on the page's own S59 inputs (n 154, leave-one-day-out)
 // .588 -> .558. Blend: .75 x the elo/talent log-odds + 4.8 x the player Elo gap / 400.
 // Stand-in term (C1) failed out of sample: the stand-in's own rating carries his cost.
-const PELO = { K: 128, Kmin: 26, n0: 50, span: 0.5, muNew: -100, gap: 100, a: 0.75, b: 4.8 };
-const PELO_DIV = { 'open9-10': -2, 'open1-8': -2, open: -2, intermediate: -1, main: 0, advanced: 1 };
 let peloMemo = null;
 function playerElo() {
   if (peloMemo) return peloMemo;
-  const r = new Map(), n = new Map(), games = [];
   let arch = null; try { arch = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, 'research', 'esea_matches.json.gz')))); } catch { arch = null; }
-  const seen = new Set();
-  for (const m of arch?.matches || []) {
-    if (!m.at || !['faction1', 'faction2'].includes(m.winner)) continue;
-    const maps = (m.maps || []).filter(mp => mp.s1 != null && mp.s2 != null && mp.p1?.length && mp.p2?.length);
-    if (!maps.length) continue;
-    seen.add(m.id);
-    games.push({ at: m.at, dr: PELO_DIV[String(m.div).toLowerCase()] ?? 0, maps: maps.map(mp => ({ a: mp.p1.map(x => x[0]), b: mp.p2.map(x => x[0]), s1: mp.s1, s2: mp.s2 })) });
-  }
+  const games = archiveGames(arch), seen = new Set(games.map(g => g.id));
   // this season's finished league maps from the run's cache (per-map player lines: [.., rf, ra, nick, id])
   const dr = PELO_DIV[String(myDiv || '').split(/\s+/)[0]] ?? 0;
   for (const m of allM) {
@@ -1043,29 +1035,24 @@ function playerElo() {
       if (!la.length || !lb.length) continue;
       maps.push({ a: la.map(x => x[20]).filter(Boolean), b: lb.map(x => x[20]).filter(Boolean), s1: la[0][17], s2: la[0][18] });
     }
-    if (maps.length) { seen.add(m.match_id); games.push({ at: m.started_at || m.finished_at || 0, dr, maps }); }
+    if (maps.length) { seen.add(m.match_id); games.push({ id: m.match_id, at: m.started_at || m.finished_at || 0, season: SEASON, dr, t1: A, t2: B, maps }); }
   }
-  games.sort((x, y) => x.at - y.at);
-  const get = (q, g) => { if (!r.has(q)) r.set(q, PELO.gap * g.dr + PELO.muNew); return r.get(q); };
-  const team = (ids, g) => ids.reduce((s, q) => s + get(q, g), 0) / (ids.length || 1);
-  for (const g of games) for (const mp of g.maps) {
-    if (!mp.a.length || !mp.b.length) continue;
-    const e = 1 / (1 + 10 ** (-(team(mp.a, g) - team(mp.b, g)) / 400));
-    const rs = mp.s1 / ((mp.s1 + mp.s2) || 24), sc = Math.min(1, Math.max(0, (rs - 0.5) / PELO.span * 0.5 + 0.5));
-    for (const [ids, sg] of [[mp.a, 1], [mp.b, -1]]) for (const q of ids) {
-      const k = PELO.Kmin + (PELO.K - PELO.Kmin) * Math.exp(-(n.get(q) || 0) / PELO.n0);
-      r.set(q, get(q, g) + sg * k * (sc - e));
-    }
-    for (const q of [...mp.a, ...mp.b]) n.set(q, (n.get(q) || 0) + 1);
-  }
-  peloMemo = { r, n, maps: games.reduce((s, g) => s + g.maps.length, 0), dr };
+  const E = replayElo(games);
+  peloMemo = { ...E, dr, games, hist: teamHistory(games) };
   return peloMemo;
 }
+// who a team is priced as: [[player id, weight]] (scripts/esea_five.mjs: same-season league maps, latest x3, top 7
+// by share; a short season falls back to the 90-day count). at in seconds.
+function teamWeights(tid, at) {
+  try { const w = fiveWeights(playerElo().hist.get(tid) || [], at, SEASON); return w.sharp; } catch { return null; }
+}
 // a five's player Elo (players with no league maps start at the division level - 100)
-function fiveElo(ids) {
+// ids: player ids (equal weights) or [[id, weight]]
+const asW = ids => ids.map(x => (Array.isArray(x) ? x : [x, 1 / ids.length]));
+function fiveElo(ids, dr = null) {
   const P = playerElo(); if (!P.maps || !ids.length) return null;
-  const v = ids.map(q => (P.r.has(q) ? P.r.get(q) : PELO.gap * P.dr + PELO.muNew));
-  return { elo: Math.round(v.reduce((a, x) => a + x, 0) / v.length), each: Object.fromEntries(ids.map((q, i) => [q, { elo: Math.round(v[i]), maps: P.n.get(q) || 0 }])) };
+  const ws = asW(ids), of = q => (P.r.has(q) ? P.r.get(q) : PELO.gap * (dr ?? P.dr) + PELO.muNew);
+  return { elo: Math.round(wmean(ws, of)), exact: wmean(ws, of), each: Object.fromEntries(ws.map(([q, w]) => [q, { elo: Math.round(of(q)), maps: P.n.get(q) || 0, w }])) };
 }
 const PREVIEW_W = { elo: 0.80, rating: 0.20, map: 0, matchup: 0 };
 // RWA (round win % added per round, scripts/esea_rwa_research.py, Nov 3 2026): ARK 2 weights + outcome credit,
@@ -1073,12 +1060,14 @@ const PREVIEW_W = { elo: 0.80, rating: 0.20, map: 0, matchup: 0 };
 // Held S58-S59 match log loss .5972 vs player Elo .6205 (t -6.0) and ARK Rating .6532 (t -12.9), 2/2 seasons; on
 // the page's S59 inputs (n 154, leave-one-day-out) elo/talent + RWA .516 vs elo/talent + player Elo .558
 // (t -1.7). Player Elo adds nothing beside it there (coef < 0), so RWA replaces it in the blend.
+// Those numbers price the five who played. Priced as the page has to (a predicted five) the held loss is .6216
+// for RWA and .6317 for player Elo (t -3.7); the expected five of scripts/esea_five.mjs gets back .009 of the gap.
 const RWA_W = { a: 0.316, b: 14.2 };
-function fiveRwa(ids) {
+function fiveRwa(ids, lift = 0) {
   if (!RWA?.p || !ids.length) return null;
-  const dflt = RWA.new ?? -3;   // no league maps: the division prior
-  const v = ids.map(q => (RWA.p[q] ? RWA.p[q][0] : dflt));
-  return { sum: v.reduce((a, x) => a + x, 0) / v.length * 5, each: Object.fromEntries(ids.map((q, i) => [q, { rwa: v[i], rounds: RWA.p[q]?.[1] ?? 0 }])) };
+  const dflt = (RWA.new ?? -3) + lift;   // no league maps: the division prior
+  const ws = asW(ids), of = q => (RWA.p[q] ? RWA.p[q][0] : dflt);
+  return { sum: wmean(ws, of) * 5, known: ws.reduce((a, [q, w]) => a + (RWA.p[q] ? w : 0), 0), each: Object.fromEntries(ws.map(([q, w]) => [q, { rwa: of(q), rounds: RWA.p[q]?.[1] ?? 0, w }])) };
 }
 async function preview(nx) {
   if (!nx?.opp?.id) return null;
@@ -1153,14 +1142,35 @@ async function preview(nx) {
   let cs = {}; try { cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch {}
   // a one-match lineup (data/cs.json matchLineups, by match id) beats the regular starting five
   const ml = cs.matchLineups?.[nx.id];
-  const five = (ml?.five || (cs.roster?.starters || []).map(x => (Array.isArray(x) ? x[0] : x))).map(x => talentBy[String(x).toLowerCase()]).filter(Boolean);
+  let five = (ml?.five || (cs.roster?.starters || []).map(x => (Array.isArray(x) ? x[0] : x))).map(x => talentBy[String(x).toLowerCase()]).filter(Boolean);
+  // no match lineup and no starters on file: 1NT is priced like any other team, from who has played its league maps
+  const atS = Math.floor((nx.at || Date.now()) / 1000);
+  let usW = null;
+  if (five.length < 4) {
+    const own = new Map(Object.values(talentBy).filter(r => r?.id).map(r => [r.id, r]));
+    usW = restrict(teamWeights(TEAM_ID, atS), new Set(own.keys()), 5);
+    if (usW) five = usW.slice(0, 5).map(([q]) => own.get(q));
+  }
   // their five: who actually plays their official maps (90 days, last 30 count double; this season's
   // box scores add 3 a map), not the FACEIT roster order; elo breaks ties and fills gaps
   for (const w of watch) { const r = roster.find(x => x.nickname.toLowerCase() === w.name.toLowerCase()); if (r) apps[r.id] = (apps[r.id] || 0) + 3 * (w.maps || 1); }
   for (const r of roster) r.apps = apps[r.id] || 0;
-  const theirFive = [...roster].sort((a, b) => b.apps - a.apps || (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5);
-  // FACEIT elo of the five who play (logged beside the roster top-5 the preview uses, for a later out-of-sample test)
-  const ourElo5 = avg(five.map(x => x.elo)), theirElo5 = avg(theirFive.map(x => x.elo));
+  const ranked = [...roster].sort((a, b) => b.apps - a.apps || (b.elo ?? 0) - (a.elo ?? 0));
+  // priced as an expected five, not a hard top 5: this season's league maps (latest x3), top 7 by share, current
+  // roster only (scripts/esea_five.mjs); a team short of season maps uses the counts above the same way
+  const byId = new Map(roster.map(r => [r.id, r]));
+  let theirW = restrict(teamWeights(oid, atS), new Set(byId.keys()), 5);
+  if (!theirW) {
+    const top = ranked.filter(r => r.apps > 0).slice(0, 7), tot = top.reduce((a, r) => a + r.apps, 0);
+    theirW = top.length >= 5 ? top.map(r => [r.id, r.apps / tot]) : ranked.slice(0, 5).map((r, _, v) => [r.id, 1 / v.length]);
+  }
+  for (const [q, w] of theirW) byId.get(q).share = Math.round(w * 1000) / 1000;
+  // the five shown (matchups, talent, map splits): the five heaviest
+  const theirFive = theirW.slice(0, 5).map(([q]) => byId.get(q));
+  // FACEIT elo of the side as priced (logged beside the roster top-5 the preview uses, for a later out-of-sample test)
+  const wAvg = (ws, of) => { const v = ws.map(([q, w]) => [of(q), w]).filter(x => x[0] != null), t = v.reduce((a, x) => a + x[1], 0); return t ? Math.round(v.reduce((a, x) => a + x[0] * x[1], 0) / t) : null; };
+  const usById = new Map(five.map(r => [r.id, r]));
+  const ourElo5 = usW ? wAvg(usW, q => usById.get(q)?.elo ?? null) : avg(five.map(x => x.elo)), theirElo5 = wAvg(theirW, q => byId.get(q)?.elo ?? null);
   const tAvg = a => { const v = a.map(r => r.talent?.exact).filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length * 100) / 100 : null; };
   const ourT = tAvg(five), theirT = tAvg(theirFive);
   const lg = p => Math.log(p / (1 - p)), ex = x => 1 / (1 + Math.exp(-x));
@@ -1179,11 +1189,11 @@ async function preview(nx) {
   const W = parts.reduce((a, x) => a + x.w, 0) || 1, pFace = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
   // ESEA player Elo of the two fives (ours: the match lineup or starters; theirs: who plays their maps)
   let peUs = null, peThem = null;
-  try { peUs = fiveElo(five.map(r => r.id).filter(Boolean)); peThem = fiveElo(theirFive.map(r => r.id).filter(Boolean)); } catch (e) { console.log('player elo:', e.message); }
+  try { peUs = fiveElo(usW || five.map(r => r.id).filter(Boolean)); peThem = fiveElo(theirW); } catch (e) { console.log('player elo:', e.message); }
   const peGap = peUs && peThem && five.length >= 4 && theirFive.length >= 4 ? peUs.elo - peThem.elo : null;
   const pPelo = peGap != null ? ex(PELO.b * peGap / 400) : null;
   let rwUs = null, rwThem = null;
-  try { rwUs = fiveRwa(five.map(r => r.id).filter(Boolean)); rwThem = fiveRwa(theirFive.map(r => r.id).filter(Boolean)); } catch (e) { console.log('rwa:', e.message); }
+  try { rwUs = fiveRwa(usW || five.map(r => r.id).filter(Boolean)); rwThem = fiveRwa(theirW); } catch (e) { console.log('rwa:', e.message); }
   const rwGap = rwUs && rwThem && five.length >= 4 && theirFive.length >= 4 ? (rwUs.sum - rwThem.sum) / 100 : null;
   const pRwa = rwGap != null ? ex(RWA_W.b * rwGap) : null;
   const lf = lg(Math.min(0.97, Math.max(0.03, pFace)));
@@ -1231,10 +1241,10 @@ async function preview(nx) {
     pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rwa: pRwa != null ? Math.round(pRwa * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
     w: { ...Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100 * wA)])), pelo: pRwa == null && pPelo != null ? 100 : 0, rwa: pRwa != null ? 100 : 0 },
     rwa: rwGap != null ? { us: Math.round(rwUs.sum * 10) / 10, them: Math.round(rwThem.sum * 10) / 10, five: five.map(r => [r.nickname, rwUs.each[r.id]?.rwa ?? null, rwUs.each[r.id]?.rounds ?? 0]),
-      theirFive: theirFive.map(r => [r.nickname, rwThem.each[r.id]?.rwa ?? null, rwThem.each[r.id]?.rounds ?? 0]) } : null,
+      theirFive: theirW.map(([q, w]) => [byId.get(q).nickname, rwThem.each[q]?.rwa ?? null, rwThem.each[q]?.rounds ?? 0, Math.round(w * 1000) / 1000]) } : null,
     pelo: peGap != null ? { us: peUs.elo, them: peThem.elo, gap: peGap, five: five.map(r => [r.nickname, peUs.each[r.id]?.elo ?? null, peUs.each[r.id]?.maps ?? 0]),
-      theirFive: theirFive.map(r => [r.nickname, peThem.each[r.id]?.elo ?? null, peThem.each[r.id]?.maps ?? 0]) } : null,
-    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, mapK: MAP_K, mapCoef: MAP_COEF };
+      theirFive: theirW.map(([q, w]) => [byId.get(q).nickname, peThem.each[q]?.elo ?? null, peThem.each[q]?.maps ?? 0, Math.round(w * 1000) / 1000]) } : null,
+    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, mapK: MAP_K, mapCoef: MAP_COEF, fiveV: FIVE_V };
 }
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------
@@ -1456,6 +1466,111 @@ function simulate(N = 10000) {
   return { runs: N, pPlayoffs: P(FORMAT.playoffSpots), pTop16: P(16), pTop4: P(4), seedMedian: q(0.5), seedP10: q(0.1), seedP90: q(0.9), expWins: Math.round(wins / N * 10) / 10,
     cutWins: cutMode ? +cutMode[0] : null, cutDist: Object.fromEntries(Object.entries(cut).map(([k, v]) => [k, Math.round(v / N * 1000) / 10])), buckets };
 }
+
+// ---- league-wide forward log -----------------------------------------------------------------------
+// Every division match still ahead is priced with the preview logit on team-level inputs (ranking elo and
+// talent, the priced five's RWA) and logged before it starts (scripts/esea_league_log.mjs). Main needs no API
+// call beyond what the page already made. Advanced is extra and capped per run: its match list (hourly), box
+// scores of finished matches (for who plays) and team elo (daily), all kept in .cache/esea/rounds.json. Ratings
+// of Advanced players are only as fresh as the archive, so those lines carry their own version tag.
+// Logging only: nothing here reaches the page.
+const LEAGUE_W = { a: RWA_W.a, b: RWA_W.b, elo: PREVIEW_W.elo, rating: PREVIEW_W.rating, star: 0.48, eloScale: ELO_SCALE };
+const LEAGUE_V = `pv3/rwa${RWA_W.a}-${RWA_W.b}/${FIVE_V}`;
+const LEAGUE_KNOWN = 0.6;   // share of a priced side's weight that must have an RWA rating
+const ADV = { calls: 80, stats: 30, elos: 4, listEvery: 55 * 60e3, findEvery: 6 * 3600e3 };
+async function advancedFeed() {
+  if (process.env.ESEA_LEAGUE_ADV === '0' || !/main/i.test(myDiv || '')) return { list: [], games: [] };
+  let left = ADV.calls;
+  const call = async p => { if (left <= 0) return undefined; left--; return api(p).catch(() => undefined); };   // null = 404, undefined = not answered
+  const A = (rcache.adv && rcache.adv.season === SEASON ? rcache.adv : (rcache.adv = { season: SEASON, champs: [], foundAt: 0, list: [], listAt: 0, box: {} }));
+  A.box ||= {}; A.list ||= []; A.champs ||= [];
+  if (!A.champs.length && Date.now() - (A.foundAt || 0) > ADV.findEvery) {
+    A.foundAt = Date.now();
+    const base = mine.replace(/main/i, 'Advanced'), pre = mine.slice(0, mine.search(/main/i)).toLowerCase(), names = [...new Set([base, base.replace(/(\s)[A-Z](\s*-\s*Regular Season)/i, '$2'), ...'AB'.split('').map(L => base.replace(/(\s)[A-Z](\s*-\s*Regular Season)/i, `$1${L}$2`))])];
+    for (const q of names) for (const type of ['ongoing', 'all']) {
+      const r = await call(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=50`);
+      for (const x of r?.items || []) { const id = x.competition_id || x.championship_id, nm = String(x.name || '').toLowerCase();
+        if (id && /regular/i.test(nm) && nm.startsWith(pre) && /^advanced\b/.test(nm.slice(pre.length)) && !A.champs.some(c => c.id === id)) A.champs.push({ id, name: x.name }); }
+      if (A.champs.length) break;
+    }
+  }
+  if (A.champs.length && Date.now() - (A.listAt || 0) > ADV.listEvery) {
+    const list = []; let ok = true;
+    for (const c of A.champs) for (let off = 0; off < 2000; off += 100) {
+      const j = await call(`/championships/${c.id}/matches?type=all&offset=${off}&limit=100`);
+      if (!j) { ok = false; break; }
+      for (const m of j.items || []) list.push({ match_id: m.match_id, status: m.status, scheduled_at: m.scheduled_at || null, started_at: m.started_at || null, finished_at: m.finished_at || null,
+        results: m.results ? { winner: m.results.winner, score: m.results.score } : null,
+        teams: Object.fromEntries(['faction1', 'faction2'].map(f => [f, { faction_id: m.teams?.[f]?.faction_id || null, name: m.teams?.[f]?.name || null, roster: (m.teams?.[f]?.roster || []).map(p => p.player_id).filter(Boolean) }])) });
+      if ((j.items || []).length < 100) break;
+    }
+    if (ok) { A.list = list; A.listAt = Date.now(); }
+  }
+  // who played: one box score per finished match, kept
+  let got = 0;
+  for (const m of A.list) {
+    if (m.status !== 'FINISHED' || A.box[m.match_id] || got >= ADV.stats) continue;
+    const st = await call(`/matches/${m.match_id}/stats`); if (st === undefined) { if (left <= 0) break; continue; }
+    if (st === null) { A.box[m.match_id] = { maps: [] }; continue; }
+    got++;
+    const f1 = m.teams.faction1.faction_id;
+    A.box[m.match_id] = { maps: (st.rounds || []).map(r => { const T = r.teams || [], a = T.find(t => t.team_id === f1), b = T.find(t => t !== a);
+      return a && b ? { a: (a.players || []).map(p => p.player_id), b: (b.players || []).map(p => p.player_id), s1: n(a.team_stats?.['Final Score']) || 0, s2: n(b.team_stats?.['Final Score']) || 0 } : null; }).filter(Boolean) };
+  }
+  // team elo for the sides playing soonest (teamElo keeps each for a day)
+  const soon = A.list.filter(m => m.status !== 'FINISHED' && (m.scheduled_at || 0) * 1000 > Date.now()).sort((a, b) => a.scheduled_at - b.scheduled_at);
+  let asked = 0;
+  for (const m of soon) for (const f of ['faction1', 'faction2']) {
+    const tid = m.teams[f].faction_id, c = tid && rcache.elo[tid];
+    if (!tid || (c && Date.now() - c.at < 864e5) || asked >= ADV.elos || left < 12) continue;
+    asked++; left -= 10; await teamElo(tid).catch(() => 0);
+  }
+  const games = A.list.filter(m => m.status === 'FINISHED' && A.box[m.match_id]?.maps?.length).map(m => ({ id: m.match_id, at: m.started_at || m.finished_at || 0, season: SEASON, dr: 1,
+    t1: m.teams.faction1.faction_id, t2: m.teams.faction2.faction_id, maps: A.box[m.match_id].maps }));
+  console.log(`league log: advanced ${A.champs.length} championship(s), ${A.list.length} matches, ${games.length} boxed, ${ADV.calls - left} calls`);
+  return { list: A.list, games };
+}
+async function leagueLog() {
+  const now = Math.floor(Date.now() / 1000), P = playerElo();
+  const adv = await advancedFeed().catch(e => (console.log('league log advanced:', e.message), { list: [], games: [] }));
+  const hist = adv.games.length ? teamHistory([...P.games, ...adv.games]) : P.hist;
+  const rk = new Map((RANKINGS?.teams || []).map(r => [r.id, r]));
+  const mainDr = P.dr, g = RWA?.params?.g ?? 4;
+  const seenM = new Set(), feed = [];
+  const row = (m, div) => {
+    if (!m?.match_id || seenM.has(m.match_id)) return; seenM.add(m.match_id);
+    const a = m.teams?.faction1, b = m.teams?.faction2; if (!a?.faction_id || !b?.faction_id || /^bye$/i.test(a.faction_id) || /^bye$/i.test(b.faction_id)) return;
+    const box = div === 'main' ? rcache.P?.[m.match_id] : null;
+    const maps = m.status !== 'FINISHED' ? null : div === 'main' ? (box ? Math.min(box[a.faction_id]?.length || 0, box[b.faction_id]?.length || 0) : null) : (rcache.adv?.box?.[m.match_id] ? rcache.adv.box[m.match_id].maps.length : null);
+    feed.push({ id: m.match_id, div, status: m.status, at: m.scheduled_at || null, started: m.started_at || null, t1: a.faction_id, t2: b.faction_id, n1: a.name || null, n2: b.name || null,
+      winner: m.results?.winner || null, score: m.results?.score ? [m.results.score.faction1 ?? null, m.results.score.faction2 ?? null] : null, maps,
+      ros: [a, b].map(t => new Set((t.roster || []).map(p => (typeof p === 'string' ? p : p.player_id)).filter(Boolean))) });
+  };
+  for (const m of allM) if (regular.has(m.competition_id)) row(m, 'main');
+  for (const m of adv.list) row(m, 'advanced');
+  const quote = m => {
+    const dr = m.div === 'advanced' ? 1 : mainDr, sides = [];
+    for (const [i, tid] of [m.t1, m.t2].entries()) {
+      let ws = fiveWeights(hist.get(tid) || [], m.at, SEASON).sharp; if (!ws) return null;
+      // a roster on the match room drops players who have left; too few left = the room's roster is not the team's
+      if (m.ros[i].size >= 5) ws = restrict(ws, m.ros[i], 4) || ws;
+      if (ws.length < 4) return null;
+      const rw = fiveRwa(ws, g * (dr - mainDr)), pe = fiveElo(ws, dr); if (!rw || rw.known < LEAGUE_KNOWN) return null;   // the model is the RWA gap: no rating, no price
+      const r = rk.get(tid), elo = r?.elo || rcache.elo[tid]?.elo || null;
+      sides.push({ ws, elo, tal: r?.talent?.exact ?? null, rwa: rw.sum, known: rw.known, pelo: pe?.exact ?? null });
+    }
+    const q = price(sides[0], sides[1], LEAGUE_W); if (!q) return null;
+    const r2 = x => (x == null ? null : Math.round(x * 100) / 100);
+    return { f1: sides[0].ws, f2: sides[1].ws, p: q.p, v: LEAGUE_V + (m.div === 'advanced' ? '/adv' : '') + (q.face ? '' : '/noelo'),
+      in: { elo: sides.map(x => x.elo), tal: sides.map(x => x.tal), rwa: sides.map(x => r2(x.rwa)), known: sides.map(x => r2(x.known)), pelo: sides.map(x => (x.pelo == null ? null : Math.round(x.pelo))),
+        lf: Math.round(q.lf * 1e4) / 1e4, rw: Math.round(q.rw * 1e5) / 1e5 } };
+  };
+  const before = readLog(), { lines, stats } = mergeLog(before, feed, quote, now);
+  writeLog(settle(before, lines));
+  console.log(`league log: ${lines.length} lines (${stats.priced} priced, ${stats.frozen} frozen, ${stats.filled} filled, ${stats.dropped} dropped)`);
+}
+await leagueLog().catch(e => console.log('league log:', e.message));
+fs.writeFileSync(RCACHE, JSON.stringify(rcache));
 
 // ---- calibration log: each preview's projection, frozen at kickoff, then scored -------------------
 const calibration = [...(prev.calibration || [])];
