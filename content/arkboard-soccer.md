@@ -11,14 +11,43 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:GAR leaders,player stats,rookies,ARKLIST|rosters:depth chart,lineups,backup watch,transactions|games:games,game table|teams:ARK Ranking,offense,defense,set pieces|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS,MLS bracket|UEFA cups:Champions League,Europa League,Conference League,UCL bracket,UEL bracket,UECL bracket|national teams:world ranking,internationals,Nations League" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:leaders,rookies,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
+{{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
+{{< rookies sport="soccer" icon="soccer" title="rookies" tab="rookies" >}}
+{{< arklist sport="soccer" title="ARKLIST" tab="ARKLIST" >}}
+{{< soccerlineups title="lineups" tab="lineups" >}}
+{{< lazytab tab="transactions" >}}
+{{< transactions sport="soccer" title="transactions" tab="transactions" >}}
+{{< /lazytab >}}
+{{< wintabs tab="leaders" tabs="GAR leaders,player stats" sub="true" label="leaders views" >}}
+{{< soccerplayers view="value" title="GAR leaders" tab="GAR leaders" >}}
+{{< soccerplayers view="stats" title="player stats" tab="player stats" >}}
+{{< /wintabs >}}
+{{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}
+{{< depthchart sport="soccer" title="depth chart" tab="depth chart" >}}
+{{< backupwatch sport="soccer" title="backup watch" tab="backup watch" >}}
+{{< /wintabs >}}
+{{< wintabs tab="units" tabs="offense,defense,set pieces" sub="true" label="units views" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="soccer" view="attack" title="offense" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="soccer" view="defence" title="defense" tab="defense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="set pieces" >}}
+{{< teamunits sport="soccer" view="set pieces" title="set pieces" tab="set pieces" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="big five" tabs="Premier League,La Liga,Bundesliga,Serie A,Ligue 1" sub="true" label="big five views" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}
 {{< soccerleague lg="esp.1" title="La Liga" tab="La Liga" >}}
 {{< soccerleague lg="ger.1" title="Bundesliga" tab="Bundesliga" >}}
 {{< soccerleague lg="ita.1" title="Serie A" tab="Serie A" >}}
 {{< soccerleague lg="fra.1" title="Ligue 1" tab="Ligue 1" >}}
+{{< /wintabs >}}
+{{< wintabs tab="more leagues" tabs="Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan" sub="true" label="more leagues views" >}}
 {{< lazytab tab="Eredivisie" >}}{{< soccerleague lg="ned.1" title="Eredivisie" tab="Eredivisie" >}}{{< /lazytab >}}
 {{< lazytab tab="Primeira Liga" >}}{{< soccerleague lg="por.1" title="Primeira Liga" tab="Primeira Liga" >}}{{< /lazytab >}}
 {{< lazytab tab="Pro League" >}}{{< soccerleague lg="bel.1" title="Belgian Pro League" tab="Pro League" >}}{{< /lazytab >}}
@@ -32,35 +61,22 @@ cover = "/og/soccer.png"
 {{< lazytab tab="Austria" >}}{{< soccerleague lg="aut.1" title="Austrian Bundesliga" tab="Austria" >}}{{< /lazytab >}}
 {{< lazytab tab="Scottish Prem" >}}{{< soccerleague lg="sco.1" title="Scottish Premiership" tab="Scottish Prem" >}}{{< /lazytab >}}
 {{< lazytab tab="Allsvenskan" >}}{{< soccerleague lg="swe.1" title="Allsvenskan" tab="Allsvenskan" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="MLS" tabs="MLS,MLS bracket" sub="true" label="MLS views" >}}
 {{< lazytab tab="MLS" >}}{{< soccermls tab="MLS" >}}{{< /lazytab >}}
 {{< lazytab tab="MLS bracket" >}}{{< bracket k="soccer" title="projected bracket" tab="MLS bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="UEFA cups" tabs="Champions League,Europa League,Conference League,UCL bracket,UEL bracket,UECL bracket" sub="true" label="UEFA cups views" >}}
 {{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
 {{< lazytab tab="UCL bracket" >}}{{< bracket k="ucl" title="Champions League projected bracket" tab="UCL bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="UEL bracket" >}}{{< bracket k="uel" title="Europa League projected bracket" tab="UEL bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="UECL bracket" >}}{{< bracket k="uecl" title="Conference League projected bracket" tab="UECL bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="national teams" tabs="world ranking,internationals,Nations League" sub="true" label="national teams views" >}}
 {{< lazytab tab="world ranking" >}}{{< soccerintl view="ranking" title="world ranking" tab="world ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="internationals" >}}{{< soccerintl view="games" title="internationals" tab="internationals" >}}{{< /lazytab >}}
 {{< lazytab tab="Nations League" >}}{{< soccerintl view="nl" title="Nations League" tab="Nations League" >}}{{< /lazytab >}}
-{{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
-{{< lazytab tab="offense" >}}
-{{< teamunits sport="soccer" view="attack" title="offense" tab="offense" >}}
-{{< /lazytab >}}
-{{< lazytab tab="defense" >}}
-{{< teamunits sport="soccer" view="defence" title="defense" tab="defense" >}}
-{{< /lazytab >}}
-{{< lazytab tab="set pieces" >}}
-{{< teamunits sport="soccer" view="set pieces" title="set pieces" tab="set pieces" >}}
-{{< /lazytab >}}
-{{< soccerplayers view="value" title="GAR leaders" tab="GAR leaders" >}}
-{{< soccerplayers view="stats" title="player stats" tab="player stats" >}}
-{{< rookies sport="soccer" icon="soccer" title="rookies" tab="rookies" >}}
-{{< backupwatch sport="soccer" title="backup watch" tab="backup watch" >}}
-{{< arklist sport="soccer" title="ARKLIST" tab="ARKLIST" >}}
-{{< depthchart sport="soccer" title="depth chart" tab="depth chart" >}}
-{{< soccerlineups title="lineups" tab="lineups" >}}
-{{< lazytab tab="transactions" >}}
-{{< transactions sport="soccer" title="transactions" tab="transactions" >}}
-{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}
