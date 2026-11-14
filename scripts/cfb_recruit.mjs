@@ -19,6 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { avOf, STARTERS } from './cfb_teams.mjs';
 import { compact, key } from './names.mjs';
@@ -82,6 +83,10 @@ function blocks(r, sz, KMAX, index) {
     comp: { compz: r.comp ? (r.comp - 0.87) / 0.04 : 0, noComp: r.comp ? 0 : 1 },
     gap: { gapEspn: r.comp && rated && !r.mapped ? (r.comp - 0.87) / 0.04 - g : 0, gap247: r.cRank && r.r247 ? Math.log(r.cRank) - Math.log(r.r247) : 0 },
     hs: { lHs: r.hsN != null ? Math.log1p(r.hsN) : 0 },
+    // On3's industry table: the rating, 247 and ESPN against it, commit timing centred on the index's history
+    on3: { indz: r.ind && !r.byRank ? (r.ind - 85) / 5 : 0, noInd: r.ind ? 0 : 1 },   // a class read by rank: its mapped grade already holds the rank, so the rating stays neutral
+    svc: { g247: r.g247 || 0, gEspn: r.gEspn || 0 },
+    tm: (t => ({ commitM: t ? t[0] - (index?.tm?.[0] ?? 0) : 0, commitEarly: t ? t[1] - (index?.tm?.[1] ?? 0) : 0 }))(commitTiming(r)),
     state: {},
     grade_k4: { g_k4: k === 4 ? g : 0, g80_k4: k === 4 ? h80 : 0 },
   };
@@ -95,6 +100,18 @@ function blocks(r, sz, KMAX, index) {
     o.idx = { iOn, iFv, iOn_k: iOn * (k - 1), iFv_k: iFv * (k - 1) };
   }
   return o;
+}
+// months committed before the December signing day of his senior year (0-24) and committed before his senior season;
+// null with no date or a later transfer's (scripts/cfb_recruit_fit.py commit_timing). A recruit of the class now
+// signing who has not committed is timed as if he committed today (the latest he still can be: no credit for waiting
+// that he has not shown yet); the classes further out stay neutral until their own cycle.
+const TODAY = new Date();
+function commitTiming(r) {
+  const y = r.year, sign = Date.UTC(y - 1, 11, 20), senior = Date.UTC(y - 1, 8, 1);
+  let d = r.commit ? Date.parse(r.commit + 'T00:00:00Z') : null;
+  if (d != null && d > Date.UTC(y, 7, 1)) d = null;
+  if (d == null) { if (!r.asOf || TODAY.getTime() > sign) return null; d = TODAY.getTime(); }
+  return [Math.max(0, Math.min(24, (sign - d) / 864e5 / 30.4)), d < senior ? 1 : 0];
 }
 // each index part's linear term by source block
 function indexParts(index, b) {
@@ -125,7 +142,7 @@ function atMeanOn(fit, r, pOn, fvOnG) {
 // exactly), and xFV - 20 = P(on) x (FV - 20) is split as dP x mean(FV - 20) + dFV x mean(P), also exact.
 const WHY_LABEL = { grade: 'ESPN grade and rank', hinge: 'ESPN grade and rank', grade_year: 'ESPN grade and rank', grade_k4: 'ESPN grade and rank', posrank: 'ESPN grade and rank', rank: 'ESPN grade and rank',
   pos: 'position', pos_year1: 'position', year: 'year in school', size: 'height and weight', bmi: 'height and weight', frame: 'height and weight',
-  offer_q: 'offer quality', offers: 'offer count', gap: '247 ratings', comp: '247 ratings', hs: 'high school pipeline', state: 'home state',
+  offer_q: 'offer quality', offers: 'offer count', gap: '247 ratings', comp: '247 ratings', on3: 'industry rating', svc: '247 and ESPN vs industry', tm: 'commit timing', hs: 'high school pipeline', state: 'home state',
   elo: 'program strength', elo_grade: 'program strength', level: 'program level', dev: 'program development' };
 function linParts(fit, m, r, KMAX) {
   const b = blocks(r, fit.sizeNorms, KMAX, fit.index), out = {};
@@ -223,29 +240,47 @@ async function espnClass(y, fresh, offline) {
   if (acc.length) writeCache(name, acc);
   return acc.length ? acc : hasCache(name) ? readCache(name) : [];
 }
-// 247Sports' composite (score 0-1, composite rank, 247's own rank) for class y, or 247's own list (kind 'own',
-// score 0-100; it starts a class before the composite does). Past classes come from the fit's snapshot
-// (scripts/cfb_recruit_247.json); classes still being recruited are re-read once a day.
-async function rank247(y, kind, snap, offline) {
-  const name = `247-${kind}-${y}.json`;
-  if (hasCache(name) && (offline || Date.now() - fs.statSync(cachePath(name)).mtimeMs < 20 * 3600e3)) return readCache(name);
-  const fromSnap = () => (snap?.[kind]?.[y] || []).map(([name, state, comp, cRank, r247]) => ({ name, state, comp, cRank, r247 }));
-  if (offline || y < season0) return hasCache(name) ? readCache(name) : fromSnap();
-  const out = [], path = kind === 'composite' ? 'compositerecruitrankings' : 'recruitrankings';
-  for (let pg = 1; pg <= 80; pg++) {
-    let h = '';
-    for (let i = 0; i < 3 && !h; i++) { try { const r = await fetch(`https://247sports.com/season/${y}-football/${path}/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page=${pg}`, { headers: { 'user-agent': 'Mozilla/5.0' } }); if (r.ok) h = await r.text(); } catch { await sleep(1000 * 2 ** i); } }
-    const items = h.split('rankings-page__list-item"').slice(1);
-    for (const x of items) {
-      const g = re => re.exec(x)?.[1], sc = g(/class="score">([\d.]+)/); if (!sc) continue;
-      const meta = g(/class="meta">\s*([^<]*?)\s*<\/span>/) || '', st = /,\s*([A-Z]{2})\)\s*$/.exec(meta);
-      out.push({ name: unescapeHtml(g(/name-link"[^>]*>([^<]*)/) || ''), state: st ? st[1] : null, comp: +sc, cRank: +(g(/class="primary">\s*(\d+)/) || 0) || null, r247: +(g(/class="other">\s*(\d+)/) || 0) || null });
-    }
-    if (items.length < 50) break;
-    await sleep(300);
+// The composite for class y: {name, state, comp (247's 0-1 scale), cRank, r247}. 247's pages sit behind a bot check
+// (Nov 2026), so a class still being recruited reads On3's industry table (scripts/data/cfb_on3_live.json, pulled daily
+// by scripts/cfb_on3.mjs and packed by scripts/cfb_on3_pack.py), its rating put on the composite's scale by the packed
+// line; signed classes, and 247's own early list (kind 'own'), come from the last snapshot (scripts/cfb_recruit_247.json).
+let ON3 = null;
+function on3Rows(y) {
+  if (!ON3) {
+    ON3 = {};
+    try { Object.assign(ON3, JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_on3_hist.json.gz'))))); } catch {}
+    try { const L = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_on3_live.json'), 'utf8')); ON3.map = L.map; Object.assign(ON3, L.classes || {}); } catch {}
   }
-  if (out.length) { writeCache(name, out); return out; }
-  return hasCache(name) ? readCache(name) : fromSnap();
+  return ON3[y] || [];
+}
+// A class two or three years out is rated low across the board this early (the top 2029 recruit is an 89 where a signed
+// class tops out near 99), so its ratings are read by rank: each recruit takes the rating that the same industry rank
+// holds in the reference class (the next class to sign).
+const byRank = y => { const o3 = on3Rows(y); return o3.length > 0 && y > season0 && on3Rows(season0).length > 0 && Math.max(...o3.map(o => o[2])) < 95; };
+function on3Class(y) {
+  const o3 = on3Rows(y), ref = on3Rows(season0);
+  if (!byRank(y)) return o3;
+  const rr = ref.map(o => o[2]).sort((a, b) => b - a);
+  return o3.map(o => { const c = o.slice(); if (o[3]) c[2] = rr[Math.min(o[3], rr.length) - 1]; return c; });
+}
+async function rank247(y, kind, snap, offline) {
+  const fromSnap = () => (snap?.[kind]?.[y] || []).map(([name, state, comp, cRank, r247]) => ({ name, state, comp, cRank, r247 }));
+  const o3 = on3Class(y);
+  if (kind === 'composite' && y >= season0 && o3.length && ON3.map)
+    return o3.map(([name, state, ind, indRank, r247]) => ({ name, state, comp: Math.min(1, ON3.map[0] + ON3.map[1] * ind), cRank: indRank, r247 }));
+  return fromSnap();
+}
+// each recruit's On3 row: name + home state, else a name that is unique in the class (scripts/cfb_recruit_fit.py attach_on3)
+function attachOn3(cl, y, asOf) {
+  const o3 = on3Class(y), by = {}, n = {};
+  for (const o of o3) n[norm(o[0])] = (n[norm(o[0])] || 0) + 1;
+  for (const o of o3) { (by[norm(o[0]) + '|' + o[1]] ||= []).push(o); if (n[norm(o[0])] === 1) (by[norm(o[0]) + '|'] ||= []).push(o); }
+  for (const r of cl) {
+    const m = by[norm(r.name) + '|' + r.state] || by[norm(r.name) + '|'] || [], o = m.length === 1 ? m[0] : [];
+    r.ind = o[2] ?? null; r.indRank = o[3] ?? null; r.g247 = o[5] ?? null; r.gEspn = o[6] ?? null; r.commit = o[7] ?? null; r.asOf = asOf; r.byRank = byRank(y);
+    if (o[4] && !r.r247) r.r247 = o[4];
+  }
+  return cl;
 }
 let season0 = 9999;   // the first class still being recruited (set by recruitBoard)
 const unescapeHtml = s => s.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
@@ -339,6 +374,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     const cl = enrich(await espnClass(y, fresh, offline), prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
     if (comp.length) attach247(cl, comp);
     else for (const r of cl) { r.comp = r.grade >= 60 ? 0.87 + 0.04 * (r.grade - 75) / 5 : null; r.cRank = r.r247 = null; }
+    attachOn3(cl, y, y === season0);
     return cl;
   };
   // xNIL a recruit would draw at an FV and level: the board's median at that FV (whole points) and level

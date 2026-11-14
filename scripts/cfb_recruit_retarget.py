@@ -104,10 +104,24 @@ def nfl():
 def dataset():
     picks, capfit = nfl()
     M = Matcher(picks, name='name', team='team', pos=None, cls='season', id='espn')
+    progs = {y: programs_hist(y) for y in CLASSES}
+    classes = {y: R.enrich(R.recruit_class(y), progs[y], Counter()) for y in CLASSES}
+    # ESPN's NFL ids differ from its college ids for the older drafts (none of the 2014 picks share one), and the
+    # matcher won't join a name to a row that carries another id: picks whose id is no recruit's are matched by name
+    # and school without it
+    rids = {str(r['id']) for cl in classes.values() for r in cl if r['id']}
+    M2 = Matcher([{**p, 'espn': None} for p in picks if str(p['espn']) not in rids], name='name', team='team', pos=None, cls='season', id='espn')
+    # a recruit listed in two classes (a prep year, a junior college or transfer listing) counts once: his earliest
+    # listing with a grade, else his earliest
+    first = {}
+    for y in CLASSES:
+        for r in classes[y]:
+            k = r['id'] or ('rid', r['rid']); v = (0 if r['grade'] >= 60 else 1, y)
+            if k not in first or v < first[k][0]: first[k] = (v, r['rid'], y)
+    keep = {(rid, y) for _, rid, y in first.values()}
     data, how = [], Counter()
     for y in CLASSES:
-        prog = programs_hist(y)
-        cl = R.enrich(R.recruit_class(y), prog, Counter())
+        prog, cl = progs[y], [r for r in classes[y] if (r['rid'], y) in keep]
         for r in cl:
             if not r['tid'] or r['tid'] not in prog: continue
             g = R.group(r['pos'], r['ht'], r['wt'])
@@ -115,6 +129,8 @@ def dataset():
             # by ESPN id, else the name with his signing school as the draft college (a transfer drafted from his
             # second school is missed by name: a common name drafted out of another school is too often someone else)
             pk, h = M.find(r['name'], team=prog[r['tid']]['team'], id=r['id'], cls=lambda s, y=y: y + 3 <= s <= y + 6, cross_team='none')
+            if pk is None:
+                pk, h = M2.find(r['name'], team=prog[r['tid']]['team'], cls=lambda s, y=y: y + 3 <= s <= y + 6, cross_team='none')
             if pk is not None and h != 'id' and not (y + 3 <= pk['season'] <= y + 6): pk, h = None, None
             how[h] += 1
             av, cap = (pk['av'], pk['cap']) if pk else (0.0, 0.0)
@@ -168,7 +184,10 @@ def boot(data, s0, s1, n=400, seed=3):
     g = np.array(g); return {'gain': round(float(g.mean()), 4), 'se': round(float(g.std()), 4), 't': round(float(g.mean() / g.std()), 2)}
 
 
-BLOCKS = ['grade', 'hinge', 'rank', 'posrank', 'pos', 'size', 'level', 'elo', 'elo_grade', 'offer_q', 'comp', 'gap', 'offers', 'bmi', 'frame', 'state']
+# Nov 14 2026: On3's industry table replaces the 247 composite blocks ('comp', 'gap'), which the live classes can no
+# longer be read for (247's pages sit behind a bot check): 'on3' the industry rating, 'svc' 247 and ESPN against it,
+# 'tm' commit timing (tests: scripts/research/recruits_nov14)
+BLOCKS = ['grade', 'hinge', 'rank', 'posrank', 'pos', 'size', 'level', 'elo', 'elo_grade', 'offer_q', 'on3', 'svc', 'tm', 'offers', 'bmi', 'frame', 'state']
 CORE = {'grade'}
 
 
@@ -254,6 +273,8 @@ def stars_nfl(data, scores):
 
 def main():
     data, how, capfit = dataset()
+    tms = [t for t in (R.commit_timing(r) for r in data) if t]
+    R.TM_MEAN = [round(float(np.mean([t[0] for t in tms])), 3), round(float(np.mean([t[1] for t in tms])), 3)]
     print('rows', len(data), 'drafted', sum(r['drafted'] for r in data), dict(how), flush=True)
     live = json.load(open(BEFORE)); szl = live['sizeNorms']
     SZ = R.size_norms(data)
@@ -285,7 +306,7 @@ def main():
     stars = stars_nfl(data, {'boardFit': cur, 'shipped': sb}) if sb is not None else None
     if stars: print(json.dumps(stars, indent=1))
     out = {'classes': [CLASSES[0], CLASSES[-1]], 'n': len(data), 'drafted': int(sum(r['drafted'] for r in data)), 'link': dict(how), 'capital': capfit,
-           'use': use, 'gains': gains, 'eval': ev, 'vsLive': vs, 'index': index_fit(data, use, SZ), 'sizeNorms': SZ, 'starsNFL': stars}
+           'use': use, 'gains': gains, 'eval': ev, 'vsLive': vs, 'index': {**index_fit(data, use, SZ), 'tm': R.TM_MEAN}, 'sizeNorms': SZ, 'starsNFL': stars}
     json.dump(out, open(OUT, 'w'), indent=1)
     return data, use, SZ
 

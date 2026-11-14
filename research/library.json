@@ -282,7 +282,10 @@
      "short": "Projected FV for high school recruits.",
      "body": [
       "CFB xFV = P(on board) x FV if on + (1 - P(on)) x 20, year 1; hurdle fit on ESPN 2023-26 classes.",
-      "CFB recruit profile weighed on NFL outcomes of 2011-19 classes; the board sets the level.",
+      "CFB recruit profile weighed on NFL outcomes of 2011-19 classes (24,450 signees, 1,895 drafted); the board sets the level.",
+      "Profile inputs: ESPN grade and rank, size, program level and Elo, On3 industry rating, 247 and ESPN vs industry, commit timing.",
+      "Held-out schools: rank correlation with NFL outcome .255 (ESPN grade alone .222). Later commits are drafted more at the same grade.",
+      "Failed Nov 14 2026: track marks, grade by position, tree blend; CBB wider training window, RSCI 1998-2008 classes.",
       "CBB: hurdle on consensus rank and old-for-class; P(reach NBA) then log(FV - 20) given NBA; trained 2009-16."
      ],
      "where": "Recruits tabs: 2027-2029 classes, class rankings, recruit model",
@@ -1935,7 +1938,7 @@
      "term": "Sources: football",
      "short": "Free public sources for CFB and NFL.",
      "body": [
-      "CFB: PFN impact rankings, On3, ESPN rosters and play-by-play (2015-26), CFBD (1,000 calls/month), 247, Rotoballer.",
+      "CFB: PFN impact rankings, On3 (industry recruiting ratings, daily), ESPN rosters and play-by-play (2015-26), CFBD (1,000 calls/month), 247 (snapshot), Rotoballer.",
       "Consensus boards: PFN industry (7 analysts), Tankathon, PFF, Kiper. Conference availability reports.",
       "NFL: nflverse (play-by-play, rosters, injuries, draft picks), PFR AV, ESPN."
      ],

@@ -141,6 +141,16 @@ jobs:
         continue-on-error: true
         timeout-minutes: 3
         run: python3 scripts/rotowire.py cfootball
+      # On3's industry recruiting table for the classes being recruited (the recruit tabs' ratings: 247's own pages sit
+      # behind a bot check). A failed pull leaves scripts/data/cfb_on3_live.json as it was.
+      - name: On3 industry recruiting classes
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          Y=$(python3 -c "import json; print(json.load(open('data/cfb_recruits.json'))['next'])")
+          node scripts/cfb_on3.mjs $Y $((Y + 1)) $((Y + 2))
+          python3 scripts/cfb_on3_pack.py --live $Y $((Y + 1)) $((Y + 2))
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs
@@ -214,4 +224,4 @@ jobs:
           python3 scripts/data_push.py -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))" \
             --rebuild data/games_picks_cfb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
-            -- 'data/cfb*.json' data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json 'scripts/data/odds/cfb-*.jsonl'
+            -- 'data/cfb*.json' data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json 'scripts/data/odds/cfb-*.jsonl'
