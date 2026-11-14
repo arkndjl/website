@@ -29,7 +29,8 @@ cover = "/og/college-football.png"
 {{< backupwatch sport="cfb" title="backup watch" tab="backup watch" >}}
 {{< /lazytab >}}
 {{< lazytab tab="portal" >}}
-{{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
+{{< xferwatch sport="cfb" view="players" tab="portal" >}}
+{{< cfbportal title="transfer portal :: 2026 moves" tab="portal" unless="cfb" >}}
 {{< /lazytab >}}
 {{< cfbboard title="NIL" tab="NIL" preset="nil" >}}
 {{< lazytab tab="team NIL" >}}
@@ -67,6 +68,7 @@ cover = "/og/college-football.png"
 {{< cfbstaff title="staff" tab="staff" >}}
 {{< /lazytab >}}
 {{< lazytab tab="coaching jobs" >}}
+{{< xferwatch sport="cfb" view="coaches" tab="coaching jobs" >}}
 {{< cfbjobs title="coaching jobs" tab="coaching jobs" >}}
 {{< /lazytab >}}
 {{< lazytab tab="coach pay" >}}

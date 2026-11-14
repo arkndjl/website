@@ -65,7 +65,8 @@ cover = "/og/college-basketball.png"
 {{< teamunits sport="cbb" feed="cbb_teamtabs" view="returning" title="returning" tab="returning" >}}
 {{< /lazytab >}}
 {{< lazytab tab="portal" >}}
-{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" >}}
+{{< xferwatch sport="cbb" view="players" tab="portal" >}}
+{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" unless="cbb" >}}
 {{< /lazytab >}}
 {{< lazytab tab="development" >}}
 {{< schooldev sport="cbb" title="development" tab="development" >}}
@@ -81,6 +82,7 @@ cover = "/og/college-basketball.png"
 {{< cbbstaff title="staff" tab="staff" >}}
 {{< /lazytab >}}
 {{< lazytab tab="coaching jobs" >}}
+{{< xferwatch sport="cbb" view="coaches" tab="coaching jobs" >}}
 {{< cbbjobs title="coaching jobs" tab="coaching jobs" >}}
 {{< /lazytab >}}
 {{< lazytab tab="coach pay" >}}

@@ -41,7 +41,7 @@ import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBackte
 import { writeComps } from './cfb_comps.mjs';
 import { assignBadges, archetypeOf, regressedZ, badgeSnaps, TIERS as BADGE_TIERS } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
-import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
+import { loadGeo, pfnIndex, transferOdds, teamBuilder, transferWatch } from './cfb_transfer.mjs';
 import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, fetchNewsHeadlines, headlineStatus, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
@@ -2980,6 +2980,11 @@ if (fs.existsSync(TFIT)) {
     const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, dev, coachFlows: coachMkt?.flows || [],
       coachOpen: Object.fromEntries((coachMkt?.teams || []).map(t => [t.tid, t.open ?? 0])) });
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }, FVR));
+    // transfer watch: the likeliest movers and where they land (the coaching watch is added with the coach market below)
+    try {
+      const w = transferWatch(all, teamList, { fit: tctx.fit, geo, coachFlows: coachMkt?.flows || [], coachOpen: Object.fromEntries((coachMkt?.teams || []).map(t => [t.tid, t.open ?? 0])) });
+      if (w) { writeWatch({ asof: out.asof, season: SEASON, players: w }); console.log(`transfer watch: ${w.length} players`); }
+    } catch (e) { console.log(`transfer watch: ${e.stack?.slice(0, 300)}`); }
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings; development x${tb.dev.k} (league next/now: ${tb.dev.flat} flat, ${tb.dev.measured} measured, ${tb.dev.level} scaled)`);
   }
   for (const r of all) { delete r._home; delete r._past; }
@@ -3207,6 +3212,25 @@ for (const c of coaches) { const x = scheme?.[c.tid]; if (!x) continue;
 // coaching market (scripts/cfb_coach.mjs, fit by scripts/cfb_coach_fit.py): each coach's market value against his
 // public pay, the chance each job opens after the season, likely hires, and where coaches go; the moves
 // (data/cfb_coach_market.json) are what the team builder reads for players following a coach
+// transfer + coaching watch (data/cfb_watch.json, the portal and coaching jobs tabs in season): players from the
+// transfer block, coaches from the coach market; each part replaces its own key. Live from August through January 1
+// (the January window); off season the tabs show the portal moves
+function writeWatch(part) {
+  const F = path.join(ROOT, 'data', 'cfb_watch.json'); let cur = {}; try { cur = JSON.parse(fs.readFileSync(F, 'utf8')); } catch {}
+  const now = new Date(), m = now.getUTCMonth() + 1, live = m >= 8 || (m === 1 && now.getUTCDate() <= 1);
+  fs.writeFileSync(F, JSON.stringify({ ...cur, ...part, live }, null, 0) + '\n');
+}
+// each FBS head coach: P(out: fired, retired, NFL), P(hired to another FBS head job) and the jobs he'd likeliest take
+// (P(job | hired away), the hire model's share of each opening x its odds of opening)
+const r3w = x => x == null ? null : Math.round(x * 1000) / 1000;
+function coachWatch(coaches, market) {
+  const T = Object.fromEntries(market.teams.map(t => [t.tid, t]));
+  return coaches.filter(c => c.role === 'HC' && c.move && T[c.tid]).map(c => { const t = T[c.tid], mv = c.move.moved || 0;
+    return { name: c.name, team: c.team, logo: c.logo || null, conf: c.conf, photo: c.photo || null, ten: t.tenure, wp: t.wp, interim: t.interim || null,
+      leave: r3w(t.open), out: r3w(t.out), moved: r3w(mv), pay: c.pay || null, buyout: c.buyout || null,
+      dest: mv > 0 ? c.move.dest.slice(0, 3).map(d => ({ team: d.team, logo: T[d.tid]?.logo || null, p: d.s ?? r3w(d.p / mv) })) : [] }; })
+    .sort((a, b) => b.leave - a.leave);
+}
 let market = null;
 {
   const CFIT = path.join(ROOT, 'data', 'cfb_coach_fit.json'), CPAY = path.join(ROOT, 'data', 'cfb_coach_pay.json');
@@ -3216,6 +3240,7 @@ let market = null;
         sim: model?.sim, loc: geo.loc, start: (() => { try { const hs = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_hc_start.json'), 'utf8'));
           return hs.season === SEASON ? hs.coaches : null; } catch { return null; } })() });
       if (market) {
+        writeWatch({ coaches: coachWatch(coaches, market) });
         fs.writeFileSync(path.join(ROOT, 'data', 'cfb_coach_market.json'), JSON.stringify({ asof: out.asof, ...market }, null, 1) + '\n');
         console.log(`coach market: ${market.teams.length} jobs, ${market.teams.reduce((a, t) => a + t.open, 0).toFixed(1)} expected openings, ${market.flows.length} moves`);
       }

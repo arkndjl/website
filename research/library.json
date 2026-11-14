@@ -904,6 +904,22 @@
      ]
     },
     {
+     "term": "Transfer watch (Lean / 2nd / 3rd)",
+     "short": "In season: likeliest movers (Xfer% 25%+) by FV, with the three likeliest schools, P(school | he transfers).",
+     "body": [
+      "Destination = conditional logit over every school, NIL-era moves. CFB: level step, talent fit, record, open snaps at his position, miles from home, home state, new head coach, private school; held out, the real school is in the top 10 for 21% of moves (random 4%). CBB: team strength step x production, conference, distance, open minutes, new coach, high-major; top 10 for 13% (random 3%).",
+      "His head coach's moves are mixed in: P(school) = (1 - f H) s + f h, h = P(his coach takes that job), H = sum of h, f = share who follow (CFB .35; CBB from the fit's follow term).",
+      "Top-school reliability, held out: CFB mean top share 5.0% vs 3.9% hit; CBB 4.3% vs 4.0% (top shares of 10-20% hit 6-8% in CFB, 21-24% in CBB).",
+      "Failed (Nov 14 2026, pre-registered, gate t >= 2 held out): temperature on the landing odds (CFB, CBB: best fit 1.0); CBB ex-coach reunion (t 1.82 / 1.47; 11x the random rate, 1% of moves); CBB open minutes at his position (t 1.83 / 4.52); CBB 3-point style fit (t 1.54 / .94). CFB reunion untested (head-coach history unavailable).",
+      "Off season the portal tab shows the moves."
+     ],
+     "where": "CFB and CBB portal tab (in season)",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
      "term": "FBS%",
      "short": "P(on an FBS roster next season) for FCS players.",
      "body": [
@@ -1312,6 +1328,20 @@
      "where": "CFB staff, coach pay, coaching jobs tabs",
      "sports": [
       "CFB"
+     ]
+    },
+    {
+     "term": "Coaching watch (Leave / Out / Hired away)",
+     "short": "Each head coach: P(leaves) = out (fired, retired, pro) + hired away, and the three head jobs he'd likeliest take, P(job | hired away).",
+     "body": [
+      "Leave: multinomial logit on school-seasons (CFB 2010-25, CBB 2016-25): projected win% (season sim), vs program norm, first or second year, level x win%. Held out: CFB AUC .72 (2020-25), CBB .65 (2022-25). Interim coaches: job opens 80%.",
+      "Landing jobs: each opening's P(opens) x the hire model's share of sitting head coaches (pay or level step up, results, conference, distance), scaled to his P(hired away). Held out, the hire is in the top 10 for 29% (CFB, random 8%) and 31% (CBB).",
+      "Failed: pay over level median in the hot seat (CFB Oct 2026, CBB Nov 14 2026 t .25). Buyouts: only the current year is public, so untestable."
+     ],
+     "where": "CFB and CBB coaching jobs tab",
+     "sports": [
+      "CFB",
+      "CBB"
      ]
     }
    ]
