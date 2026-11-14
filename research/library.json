@@ -904,6 +904,20 @@
      ]
     },
     {
+     "term": "ARK lean (recruit commitment)",
+     "short": "Model pick for where an uncommitted recruit commits, with its chance.",
+     "body": [
+      "Conditional logit over the schools in his ESPN recruitment list (3+ schools): school pull and tier, his grade x tier, |grade - tier|, log(1 + miles from home / 100), home-state school.",
+      "Walk-forward by class, CFB 2018-26 (n 16,934) and CBB 2015-26 (n 1,553). Distance + home state: log loss 2.076 -> 2.011 (t 21.7), top-1 24.3% -> 29.2% CFB; 1.945 -> 1.932 (t 3.8), 22.6% -> 25.4% CBB.",
+      "Failed: state pipeline, distance x school tier, distance x recruit grade. Top-1 chance calibrated held out (mean .25 vs hit .26). CBB shows On3's prediction leader where On3 has one."
+     ],
+     "where": "CFB 2028-2029 class tabs, CBB 2027-2029 class tabs (Team column)",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
      "term": "Transfer watch (Lean / 2nd / 3rd)",
      "short": "In season: likeliest movers (Xfer% 25%+) by FV, with the three likeliest schools, P(school | he transfers).",
      "body": [
