@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:VORX/XPM leaders,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units" side="true" label="NBA views" >}}
+{{< wintabs groups="players:VORX/XPM leaders,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< pctl sport="nba" icon="hoop" title="projections" tab="projections" >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
@@ -45,4 +45,7 @@ cover = "/og/nba.png"
 {{< teamunits sport="nba" view="defense" title="defense" tab="defense" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
+{{< lazytab tab="all-time coaches" >}}
+{{< coachalltime sport="nba" title="all-time coaches" tab="all-time coaches" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}

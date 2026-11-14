@@ -1397,12 +1397,17 @@
       "Hall of Fame AUC: Score 0.89 vs raw wins 0.90 (CFB); 0.88 vs 0.83 (CBB).",
       "Movers (old-job WAx rate vs new job, 3+ seasons each): CFB r 0.14 (n 373, t 2.69); CBB r 0.20 (n 754, t 5.51).",
       "Walk-forward from 2010: shrunk WAx predicts the next 10 seasons' WAx at r 0.19 CFB / 0.37 CBB (win% 0.19 / 0.12); Score per season predicts next-10 title equity at r 0.40 / 0.60 (win% 0.09 / 0.43).",
-      "Stability: top-100 rank correlation across expectation settings (decay 3-12, shrink 1-3, no skip) 0.97+ CFB, 0.98+ CBB; odd/even-season WAx split-half 0.75 / 0.82."
+      "Stability: top-100 rank correlation across expectation settings (decay 3-12, shrink 1-3, no skip) 0.97+ CFB, 0.98+ CBB; odd/even-season WAx split-half 0.75 / 0.82.",
+      "NBA / NHL: the same method on Sports Reference SRS (NBA points, NHL goals), an 82-game season, the franchise as the program (one id through relocations), league title = national title, a place in the Finals / Stanley Cup Final = conference title; a coach replaced in season gets his share of the games. Seasons with an SRS on file: 1947-2026 / 1922-2026.",
+      "NBA / NHL replacement level 8.61 / 5.04 wins a season; Score = cWAR + 166 / 39 a title + 0.0 / 3.2 a Finals appearance. Hall of Fame label: NBA the Naismith Coach category (17/45); NHL the Hockey Hall of Fame Builder category (11/29; that Hall has no coach class, and coaches inducted as players are left out of the fit).",
+      "NBA / NHL tests: Hall of Fame AUC Score 0.96 / 0.89 vs raw wins 0.85 / 0.66; movers r 0.17 (n 100, t 1.75) / 0.15 (n 89, t 1.4); walk-forward from 2010: shrunk WAx to next-10 WAx r -0.07 / -0.14 (win% 0.03 / -0.11), Score per season to next-10 title equity r 0.52 / -0.12 (win% 0.36 / 0.02); split-half 0.74 / 0.86."
      ],
-     "where": "all-time coaches tab on the CFB and CBB pages (market group)",
+     "where": "all-time coaches tab on the CFB and CBB pages (market group) and the NBA and NHL pages (teams group)",
      "sports": [
       "CFB",
-      "CBB"
+      "CBB",
+      "NBA",
+      "NHL"
      ]
     }
    ]
