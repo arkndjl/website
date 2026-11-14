@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="standings.exe" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
-{{< wintabs groups="football:NFL standings,NFL playoffs,NFL leaders,NFL scores,CFB standings,CFB polls,CFB leaders,CFB scores|basketball:NBA standings,NBA playoffs,NBA leaders,NBA scores,CBB standings,CBB polls,CBB leaders,CBB scores|hockey:NHL standings,NHL playoffs,NHL leaders,NHL scores|soccer:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="Standings views" >}}
+{{< wintabs groups="football:NFL standings,NFL playoffs,NFL leaders,NFL scores,CFB standings,CFB polls,CFB leaders,CFB scores|basketball:NBA standings,NBA playoffs,NBA leaders,NBA scores,CBB standings,CBB polls,CBB leaders,CBB scores|hockey:NHL standings,NHL playoffs,NHL leaders,NHL scores|soccer:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League|brackets:CFB bracket,NFL bracket,NBA bracket,NHL bracket,CBB bracket,MLS bracket,UCL bracket,UEL bracket,UECL bracket|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="Standings views" >}}
 {{< lazytab tab="NFL standings" >}}{{< standings part="table" k="nfl" title="NFL standings" tab="NFL standings" icon="football" >}}{{< /lazytab >}}
 {{< lazytab tab="NFL playoffs" >}}{{< standings part="picture" k="nfl" title="NFL playoff picture" tab="NFL playoffs" icon="football" >}}{{< /lazytab >}}
 {{< lazytab tab="NFL leaders" >}}{{< standings part="leaders" k="nfl" title="NFL stat leaders" tab="NFL leaders" icon="football" >}}{{< /lazytab >}}
@@ -53,6 +53,15 @@ draft = false
 {{< lazytab tab="Champions League" >}}{{< standings part="table" k="uefa.champions" title="Champions League table" tab="Champions League" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="Europa League" >}}{{< standings part="table" k="uefa.europa" title="Europa League table" tab="Europa League" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="Conference League" >}}{{< standings part="table" k="uefa.europa.conf" title="Conference League table" tab="Conference League" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="CFB bracket" >}}{{< bracket k="cfb" title="CFP projected bracket" tab="CFB bracket" icon="football" >}}{{< /lazytab >}}
+{{< lazytab tab="NFL bracket" >}}{{< bracket k="nfl" title="NFL projected bracket" tab="NFL bracket" icon="football" >}}{{< /lazytab >}}
+{{< lazytab tab="NBA bracket" >}}{{< bracket k="nba" title="NBA projected bracket" tab="NBA bracket" icon="basketball" >}}{{< /lazytab >}}
+{{< lazytab tab="NHL bracket" >}}{{< bracket k="nhl" title="NHL projected bracket" tab="NHL bracket" icon="hockey" >}}{{< /lazytab >}}
+{{< lazytab tab="CBB bracket" >}}{{< bracket k="cbb" title="NCAA tournament projected bracket" tab="CBB bracket" icon="basketball" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS bracket" >}}{{< bracket k="soccer" title="MLS projected bracket" tab="MLS bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="UCL bracket" >}}{{< bracket k="ucl" title="Champions League projected bracket" tab="UCL bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="UEL bracket" >}}{{< bracket k="uel" title="Europa League projected bracket" tab="UEL bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="UECL bracket" >}}{{< bracket k="uecl" title="Conference League projected bracket" tab="UECL bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="ATP ranking" >}}{{< standings part="rank" k="atp" title="ATP ranking" tab="ATP ranking" icon="tennis" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA ranking" >}}{{< standings part="rank" k="wta" title="WTA ranking" tab="WTA ranking" icon="tennis" >}}{{< /lazytab >}}
 {{< lazytab tab="CS2 ranking" >}}{{< standings part="vrs" title="Counter-Strike" tab="CS2 ranking" >}}{{< /lazytab >}}

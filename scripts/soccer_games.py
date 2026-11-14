@@ -1768,6 +1768,10 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     for w1, w2 in po_winner.values():
         np.add.at(reach['r16'], w1, 1); np.add.at(reach['r16'], w2, 1)
     reach['r16'] += reach['top8']
+    try:
+        uefa_bracket(L, lg, teams, seat, reach, n)
+    except Exception as e:            # the bracket keeps its last file rather than stop the build
+        print(f'{lg} bracket failed:', repr(e), flush=True)
     out = {}
     for i, t in enumerate(teams):
         x = T0[t]
@@ -1775,6 +1779,52 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
                   'xpts': round(float(pts[:, i].mean()), 1), 'pos': round(float(pos[:, i].mean()) + 1, 1),
                   **{k: round(float(v[i] / n), 4) for k, v in reach.items()}}
     return {'teams': out, 'left': len(fx), 'games': len(lp)}
+
+
+def uefa_bracket(L, lg, teams, seat, reach, n):
+    """data/brackets/<ucl|uel|uecl>.json: league-phase place odds 1-24 and the projected knockout bracket (scripts/
+    bracket.py). The play-off and round-of-16 pairs within each seeding pair are drawn; shown as 9 v 24, 10 v 23 and
+    1 v the 15-18 tie's first winner, 2 v its second"""
+    import bracket as BK
+    tal = BK.Tally({'League phase': 24}, ['ko'])
+    tal.n = n
+    S = tal.seed['League phase']
+    for k in range(24):
+        ids, cnt = np.unique(seat[:, k], return_counts=True)
+        for i, m in zip(ids, cnt):
+            S.setdefault(teams[i], [0] * 24)[k] += int(m)
+    proj, _, sd = tal.project()
+    P = [r['t'] for r in proj['League phase']]
+    seed = {t: i + 1 for i, t in enumerate(P)}
+    odds = {t: {k: round(float(reach[k][i] / n), 3) for k in ('ko', 'top8', 'r16', 'qf', 'sf', 'fin', 'win')} for i, t in enumerate(teams)}
+    odds = {t: o for t, o in odds.items() if o['ko'] >= 0.005 or t in seed}
+    po = []                                          # (9 v 24, 10 v 23), (11 v 22, 12 v 21), (13 v 20, 14 v 19), (15 v 18, 16 v 17)
+    for k in range(4):
+        a, b = 8 + 2 * k, 23 - 2 * k
+        po.append((BK.game(P[a], P[b], seed, odds, 'ko', 'r16'), BK.game(P[a + 1], P[b - 1], seed, odds, 'ko', 'r16')))
+    halves, hg = [[], []], [[], []]
+    for k in range(4):                              # 1/2 v the 15-18 winners, 3/4 v 13-14/19-20, 5/6 v 11-12/21-22, 7/8 v 9-10/23-24
+        g1, g2 = po[3 - k]
+        for h, (st, g) in enumerate(((2 * k, g1), (2 * k + 1, g2))):
+            gm = BK.game(P[st], g['w'], seed, odds, 'r16', 'qf')
+            halves[h].append(gm['w']); hg[h].append((gm, g))
+    # listed in tree order (each quarterfinal's two ties together): 1, 7, 3, 5 then 2, 8, 4, 6
+    tree = [hg[h][k] for h in (0, 1) for k in (0, 3, 1, 2)]
+    r16, pol = [x[0] for x in tree], [x[1] for x in tree]
+    qf, sfs = [], []
+    for hv in halves:
+        q = [BK.game(hv[0], hv[3], seed, odds, 'qf', 'sf'), BK.game(hv[1], hv[2], seed, odds, 'qf', 'sf')]
+        qf += q
+        sfs.append(BK.game(q[0]['w'], q[1]['w'], seed, odds, 'sf', 'fin'))
+    fg = BK.game(sfs[0]['w'], sfs[1]['w'], seed, odds, 'fin', 'win')
+    secs = [{'name': 'Knockouts', 'rounds': [
+        {'name': 'Play-off', 'games': pol}, {'name': 'Round of 16', 'games': r16},
+        {'name': 'Quarterfinals', 'games': qf}, {'name': 'Semifinals', 'games': sfs}, {'name': 'Final', 'games': [fg]}],
+        'champ': {'t': fg['w'], 'p': odds[fg['w']]['win']}}]
+    nm = {t: {'n': (L.names.get(t) or [t, t])[0], 'a': (L.names.get(t) or [t, t])[1], 'logo': f'/img/soccer/{t}.png'} for t in teams}
+    BK.save(D.SHORT.get(lg, lg).lower(), BK.payload(dt.date.today().isoformat(), n, tal, proj, odds, sd, secs,
+            [['ko', 'Top 24'], ['top8', 'Top 8'], ['r16', 'R16'], ['qf', 'QF'], ['sf', 'SF'], ['fin', 'Final'], ['win', 'Win']], nm,
+            league=lg))
 
 
 def tm_crest(tid):
