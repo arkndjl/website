@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-14T19:32:03Z",
+ "asof": "2026-11-14T19:34:31Z",
  "recenter": {
   "week": 0.18
  },
@@ -495,7 +495,7 @@
  },
  "model": {
   "asof": "2026-11-14",
-  "ageH": -4.5,
+  "ageH": -4.4,
   "stale": false
  },
  "picks": [],
@@ -819,8 +819,8 @@
     "mk": "spread",
     "side": "away",
     "line": 9.5,
-    "price": -100.0,
-    "ev": 0.094,
+    "price": -102.0,
+    "ev": 0.088,
     "units": 1.0
    }
   },
@@ -881,8 +881,8 @@
     "mk": "total",
     "side": "under",
     "line": 60.5,
-    "price": -106.0,
-    "ev": 0.015,
+    "price": -108.0,
+    "ev": 0.017,
     "units": 0.25
    }
   },
@@ -1284,7 +1284,7 @@
     "side": "over",
     "line": 43.5,
     "price": -108.0,
-    "ev": 0.019,
+    "ev": 0.015,
     "units": 0.25
    }
   },
@@ -1519,7 +1519,7 @@
     "side": "over",
     "line": 46.5,
     "price": 923.0,
-    "ev": 4.36,
+    "ev": 4.339,
     "units": 2.25
    }
   },
@@ -1645,7 +1645,7 @@
     "side": "under",
     "line": 49.5,
     "price": -106.0,
-    "ev": 0.014,
+    "ev": 0.01,
     "units": 0.25
    }
   },
@@ -1805,7 +1805,7 @@
     "side": "under",
     "line": 76.5,
     "price": -108.0,
-    "ev": 0.057,
+    "ev": 0.053,
     "units": 1.5
    }
   }
@@ -1843,6 +1843,22 @@
    "why": "edge under 3",
    "m": -3.9,
    "tm": 53.6
+  },
+  {
+   "id": "401870796",
+   "sport": "cfb",
+   "kick": "2026-11-14T20:00:00.000Z",
+   "home": "Missouri State",
+   "away": "New Mexico State",
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -111.0,
+   "edge": 5.2,
+   "x": 6.0,
+   "why": "edge under 6 (game: conference)",
+   "m": 3.7,
+   "tm": 50.2
   },
   {
    "id": "401858298",
@@ -1955,22 +1971,6 @@
    "why": "edge under 3",
    "m": -0.6,
    "tm": 53.4
-  },
-  {
-   "id": "401870796",
-   "sport": "cfb",
-   "kick": "2026-11-14T20:00:00.000Z",
-   "home": "Missouri State",
-   "away": "New Mexico State",
-   "mk": "spread",
-   "side": "home",
-   "line": 1.5,
-   "price": 106.0,
-   "edge": 2.2,
-   "x": 6.0,
-   "why": "edge under 6 (game: conference)",
-   "m": 3.7,
-   "tm": 50.2
   },
   {
    "id": "401856882",
@@ -2212,7 +2212,7 @@
    "side": "under",
    "line": 76.5,
    "price": -108.0,
-   "ev": 0.057,
+   "ev": 0.053,
    "edge": 8.7,
    "units": 1.5,
    "home": "UTSA",
@@ -2248,7 +2248,7 @@
    "side": "over",
    "line": 43.5,
    "price": -108.0,
-   "ev": 0.019,
+   "ev": 0.015,
    "edge": 3.8,
    "units": 0.25,
    "home": "Michigan State",
@@ -2307,8 +2307,8 @@
    "mk": "total",
    "side": "under",
    "line": 60.5,
-   "price": -106.0,
-   "ev": 0.015,
+   "price": -108.0,
+   "ev": 0.017,
    "edge": 3.5,
    "units": 0.25,
    "home": "Texas State",
@@ -2381,7 +2381,7 @@
    "side": "over",
    "line": 46.5,
    "price": 923.0,
-   "ev": 4.36,
+   "ev": 4.339,
    "edge": 3.2,
    "units": 2.25,
    "bk": "poly",
@@ -2537,9 +2537,9 @@
   "401870796": {
    "mk": "spread",
    "side": "home",
-   "line": 1.5,
-   "price": 106.0,
-   "edge": 2.2,
+   "line": -1.5,
+   "price": -111.0,
+   "edge": 5.2,
    "ev": null,
    "units": 0.0,
    "home": "Missouri State",
@@ -2623,7 +2623,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19188,
+  "snapshots": 19196,
   "buckets": [
    {
     "when": "24h+",
@@ -2645,12 +2645,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 271,
-    "clvRet": -0.0622,
-    "clvT": -17.88,
+    "clvN": 272,
+    "clvRet": -0.0619,
+    "clvT": -17.82,
     "clv": 0.03,
     "beat": 0.118,
-    "still": 0.775
+    "still": 0.776
    },
    {
     "when": "<1h",
@@ -6254,7 +6254,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-14T19:32:03Z",
+ "checked": "2026-11-14T19:34:31Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
