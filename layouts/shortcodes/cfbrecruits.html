@@ -89,7 +89,7 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .class) "fresh" "cfb_recruits" "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "future" -}}{{ $yr := int ($.Get "year") }}
-{{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}{{ $hasEsp := gt (len (where $F.list "src" "espn")) 0 }}
+{{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}{{ $LN := index (site.Data.recruit_commit_leans.cfb | default dict) (string $yr) | default dict }}{{ $hasEsp := gt (len (where $F.list "src" "espn")) 0 }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Stars,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,Grade,xFV,xNIL,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
@@ -113,7 +113,7 @@
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     {{- end }}
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
-    <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}{{ with index $LN $r.name }}<span class="cfb__team cfb__dim" title="uncommitted; ARK lean {{ index . 0 }} {{ index . 1 }}%">{{ with index . 2 }}<img class="cfb__logo" src="/img/cfb/logos/{{ . }}.png" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ index . 0 }} {{ index . 1 }}%</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}</td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
