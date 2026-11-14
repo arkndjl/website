@@ -413,6 +413,8 @@ def cbb():
         rec = r.get('rec') or {}
         if rec.get('cls') and rec['cls'] < S - 1:
             continue        # a reclassified or returning player listed Fr with an older recruiting class
+        if (r.get('now') or {}).get('yr') not in (None, 'Fr'):
+            continue        # Barttorvik's class this season says otherwise: a redshirt, a transfer or an upperclassman
         rows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'],
                      'xbpm': r.get('xbpm'), 'nbaP': r['nbaP'] * 100 if r.get('nbaP') is not None else None, 'w': r.get('w'),
                      'pre': rec.get('on3rk'), 'preL': f"#{rec['on3rk']}" if rec.get('on3rk') else '', 'pfv': None,

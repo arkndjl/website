@@ -13,7 +13,7 @@ Sources, first that has him:
   3. Wikidata P569 for a basketball player (Q3665646) whose teams or schools include his school
 Each date is kept with its source; a miss is retried after 14 days. Matching goes through scripts/names.py.
 """
-import datetime as dt, json, os, subprocess, sys, time, urllib.parse
+import datetime as dt, json, os, re, subprocess, sys, time, urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import names as N
@@ -36,6 +36,13 @@ def key(name, team): return f'{N.key(name)}|{team}'
 def plausible(d, lo=1994, hi=2011):
     try: return lo <= int(d[:4]) <= hi
     except (TypeError, ValueError): return False
+
+
+def school_in(school, labels):
+    """the whole school name, as words, in one of his Wikidata team/school labels (a first word alone let 'North'
+    match North Carolina and handed a namesake's birth date to a freshman)"""
+    pat = re.compile(r'\b' + re.escape(school) + r'\b')
+    return bool(school) and any(pat.search(l) for l in labels.split('|'))
 
 
 def wikidata(names):
@@ -83,8 +90,8 @@ def main():
     wd = wikidata(sorted({r[ci['name']] for r in rest}))
     for r in rest:
         k = key(r[ci['name']], r[ci['team']])
-        school = (r[ci['team']] or '').lower().replace(' st', ' state')
-        hit = next((d for d, t in wd.get(r[ci['name']], []) if plausible(d) and school.split()[0] in t), None)
+        school = re.sub(r'\bst$', 'state', (r[ci['team']] or '').lower())
+        hit = next((d for d, t in wd.get(r[ci['name']], []) if plausible(d) and school_in(school, t)), None)
         if hit:
             store[k] = {'name': r[ci['name']], 'dob': hit, 'src': 'wikidata'}; found['wikidata'] += 1
         else:

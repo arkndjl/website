@@ -290,6 +290,10 @@ def season_to_date(prior):
             ln = {k: o.get(k) for k in KEEP}
         else:
             ln = line(a, recon, {'team': team, 'conf': o['conf'] if o else None, 'role': o['role'] if o else None})
+        # his class this season: Barttorvik's file, else his game rows (ESPN-filled rows carry none). Never guessed here:
+        # a missing class used to read as Fr downstream, which put transfers and seniors on the true freshmen tab
+        yr = (o or {}).get('yr') or rs[-1][C['cls']]
+        ln['yr'] = yr if yr in NEXT_YR else None
         ln['n'] = a['mp'] * a['gp']
         ln['team_g'] = tg.get(team, 1)
         ln['name'] = rs[-1][C['name']]
@@ -307,7 +311,8 @@ def show_line(L, season_label, seasons):
             'tp': round((L['tp'] or 0) * 100, 1), 'tpa': int(L['tpa'] or 0), 'ft': round((L['ft'] or 0) * 100, 1),
             'ast': round(L['ast'] or 0, 1), 'stl': round(L['stl'] or 0, 1), 'blk': round(L['blk'] or 0, 1), 'role': L.get('role'),
             'to': round(L['to'] or 0, 1), 'ftr': round(L['ftr'] or 0, 1), 'orb': round(L['orb'] or 0, 1),
-            'prpg': round((L['porpag'] or 0) * (L['min_per'] or 0) / 100, 1), 'conf': L.get('conf'), 'seasons': seasons}
+            'prpg': round((L['porpag'] or 0) * (L['min_per'] or 0) / 100, 1), 'conf': L.get('conf'), 'seasons': seasons,
+            'yr': L.get('yr') if L.get('yr') in NEXT_YR else None}
 
 
 POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE'}
@@ -365,7 +370,7 @@ def prov_fit(prior, ci, lam=5.0):
 
 
 def espn_sizes(team_ids):
-    """weight and age from ESPN's current rosters (a player added after the preseason pull): name key -> (wt, age)"""
+    """weight, age and class from ESPN's current rosters (a player added after the preseason pull): name key -> (wt, age, yr)"""
     import fetch_cbb as B
     out = {}
     for tid in team_ids:
@@ -374,7 +379,8 @@ def espn_sizes(team_ids):
         except Exception:
             continue
         for a in d.get('athletes', []):
-            out[(tid, D.norm(a.get('displayName') or a.get('fullName') or ''))] = (a.get('weight'), a.get('age'))
+            yr = B.CLS.get((a.get('experience') or {}).get('displayValue'))
+            out[(tid, D.norm(a.get('displayName') or a.get('fullName') or ''))] = (a.get('weight'), a.get('age'), 'Sr' if yr == 'Gr' else yr)
     return out
 
 
@@ -399,10 +405,11 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
     out = []
     for pid, ln in todo:
         tname, logo, conf = teams[ln['team']]
-        yr = ln.get('yr') if ln.get('yr') in NEXT_YR else 'Fr'
+        wt, age, eyr = sizes.get((tid(logo), D.norm(ln['name'])), (None, None, None))
+        # class: Barttorvik's (the line), else ESPN's current roster; Fr only when neither source has him
+        yr = ln.get('yr') if ln.get('yr') in NEXT_YR else eyr if eyr in NEXT_YR else 'Fr'
         elig = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 1)
         hti = int(ln.get('hti') or 77)
-        wt, age = sizes.get((tid(logo), D.norm(ln['name'])), (None, None))
         dob = dob_of(pid, ln['name'], tname, ln['team'])
         if dob: age = age_now(dob)
         bt = ln.get('rec')
