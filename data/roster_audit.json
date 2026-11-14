@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-14T18:43Z",
+ "asof": "2026-11-14T19:31Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 851,
+   "players": 855,
    "rows": 5276
   },
   "cfb": {
@@ -318,11 +318,11 @@
      "rows": 640
     },
     "static/data/nfl-war.json": {
-     "flags": 72,
+     "flags": 70,
      "rows": 1797
     },
     "static/data/pctl-nfl.json": {
-     "flags": 71,
+     "flags": 69,
      "rows": 1726
     },
     "static/data/personnel/nfl.json": {
@@ -330,7 +330,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 50,
+     "flags": 51,
      "rows": 1650
     }
    },
@@ -1506,24 +1506,6 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-13",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Cut loose by Houston",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-13",
-      "head": "Cut loose by Houston",
-      "kind": "waived"
-     },
-     "pid": "11768",
-     "player": "Dare Ogunbowale",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "HOU"
-    },
-    {
      "d": "2026-11-04",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1558,24 +1540,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "TB"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "16035",
-     "player": "James Mitchell",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "DAL"
     },
     {
      "d": "2026-10-24",
@@ -2388,12 +2352,12 @@
      "site": "LAC"
     },
     {
-     "d": "2026-10-13",
+     "d": "2026-11-14",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Signs to practice squad",
-     "kind": "practice",
+     "flag": "moved",
+     "head": "Elevated for Week 10",
+     "kind": null,
      "move": {
       "d": "2026-10-13",
       "head": "Signs to practice squad",
@@ -2402,7 +2366,7 @@
      "pid": "18482",
      "player": "Brady Cook",
      "pos": "QB",
-     "rotowire": "FA",
+     "rotowire": "MIA",
      "site": "NYJ"
     },
     {
@@ -2421,6 +2385,24 @@
      "player": "Dante Pettis",
      "pos": "WR",
      "rotowire": "FA",
+     "site": "FA"
+    },
+    {
+     "d": "2026-11-14",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Signs with Houston's PS and elevated",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-14",
+      "head": "Signs with Houston's PS and elevated",
+      "kind": "practice"
+     },
+     "pid": "11768",
+     "player": "Dare Ogunbowale",
+     "pos": "RB",
+     "rotowire": "HOU",
      "site": "FA"
     },
     {
@@ -3720,24 +3702,6 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-13",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Cut loose by Houston",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-13",
-      "head": "Cut loose by Houston",
-      "kind": "waived"
-     },
-     "pid": "11768",
-     "player": "Dare Ogunbowale",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "HOU"
-    },
-    {
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3754,24 +3718,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "TB"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "16035",
-     "player": "James Mitchell",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "DAL"
     },
     {
      "d": "2026-10-24",
@@ -4116,22 +4062,22 @@
      "site": "WAS"
     },
     {
-     "d": "2026-11-09",
+     "d": "2026-11-14",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
+     "flag": "moved",
+     "head": "Signs with Houston's PS and elevated",
      "kind": "practice",
      "move": {
-      "d": "2026-11-09",
-      "head": "Returns to practice squad",
+      "d": "2026-11-14",
+      "head": "Signs with Houston's PS and elevated",
       "kind": "practice"
      },
-     "pid": "16035",
-     "player": "James Mitchell",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "DAL"
+     "pid": "11768",
+     "player": "Dare Ogunbowale",
+     "pos": "RB",
+     "rotowire": "HOU",
+     "site": "FA"
     },
     {
      "d": "2026-11-09",
@@ -4207,7 +4153,7 @@
     }
    ],
    "joined": 0,
-   "players": 2257,
+   "players": 2258,
    "rows": 8010
   },
   "nhl": {

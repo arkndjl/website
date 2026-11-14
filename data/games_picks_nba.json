@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-14T18:44:51Z",
+ "asof": "2026-11-14T19:32:17Z",
  "recenter": {
-  "2026-11-14": 1.7
+  "2026-11-14": 1.69
  },
  "monitor": {
   "clocks": {
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-14T17:14:25Z",
-  "ageH": 1.5,
+  "ageH": 2.3,
   "stale": false
  },
  "picks": [
@@ -326,7 +326,14 @@
    "lineL": 1.5,
    "flagged": "2026-11-14T09:15:15Z",
    "close": -4.5,
-   "now": null
+   "now": {
+    "mk": "ml",
+    "side": "home",
+    "line": null,
+    "price": 178.0,
+    "ev": 0.211,
+    "units": 0.75
+   }
   },
   {
    "id": "401909982",
@@ -412,16 +419,9 @@
    "tm": 230.5,
    "tmRaw": 232.2,
    "flagged": "2026-11-14T18:44:51Z",
-   "betTo": 227.5,
-   "close": 227.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 227.5,
-    "price": -108.0,
-    "ev": 0.046,
-    "units": 0.25
-   }
+   "betTo": 228.0,
+   "close": 228.5,
+   "now": null
   }
  ],
  "paperPicks": [],
@@ -477,10 +477,10 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -102.0,
-   "ev": 0.161,
+   "price": 104.0,
+   "ev": 0.172,
    "edge": 9.8,
-   "units": 1.0,
+   "units": 1.25,
    "home": "CLE",
    "away": "DAL",
    "state": "pick"
@@ -574,7 +574,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4123,
+  "snapshots": 4126,
   "buckets": [
    {
     "when": "24h+",
@@ -587,21 +587,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 967,
+    "clvN": 968,
     "clvRet": -0.0177,
-    "clvT": -5.44,
+    "clvT": -5.45,
     "clv": 0.44,
     "beat": 0.433,
-    "still": 0.408
+    "still": 0.409
    },
    {
     "when": "1-6h",
-    "clvN": 340,
+    "clvN": 341,
     "clvRet": -0.0538,
-    "clvT": -14.59,
+    "clvT": -14.63,
     "clv": -0.12,
-    "beat": 0.171,
-    "still": 0.685
+    "beat": 0.17,
+    "still": 0.686
    },
    {
     "when": "<1h",
@@ -6929,17 +6929,17 @@
    "tm": 230.5,
    "tmRaw": 232.2,
    "flagged": "2026-11-14T18:44:51Z",
-   "betTo": 227.5,
-   "close": 227.5
+   "betTo": 228.0,
+   "close": 228.5
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-14T18:44:51Z",
+ "checked": "2026-11-14T19:32:17Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-14": {
-    "raw": 3.25,
+    "raw": 3.5,
     "scale": 1.0
    }
   }
