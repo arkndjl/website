@@ -38,6 +38,7 @@ import numpy as np
 import tennis_badges as TB
 import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)
 import pandas as pd
+from tennis_data import is_qual
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -95,7 +96,7 @@ def matches(tour):
         lv = M.tourney_level.astype(str)
         cls = lv.map(LEVEL).fillna('X')
         if kind == 'qc':
-            q = M['round'].astype(str).str.startswith('Q')
+            q = M['round'].astype(str).map(is_qual)
             cls = np.where(q & cls.eq('T'), 'Q', cls)
             if tour == 'wta':
                 # WTA qualifying file holds tour qualifying (level of the event) and ITF events (prize levels)
@@ -1177,7 +1178,7 @@ def ta_rows(rows, tour, pid, end, opp, curve, elo0, n0):
         d = dict(zip(TA_HEAD, r + [''] * (len(TA_HEAD) - len(r))))
         lv = d['level']
         cls = LEVEL.get(lv, 'S' if lv.isdigit() else 'T')
-        if d['round'].startswith('Q') and cls == 'T':
+        if is_qual(d['round']) and cls == 'T':
             cls = 'Q'
         o = opp.get(f"{names.key(d['opp'])}|{d['obday']}")
         orank = float(d['orank']) if d['orank'].isdigit() else np.nan

@@ -18,6 +18,8 @@ blend weights are a logistic regression on the last WIN seasons, and every score
 feed's no-vig close 2025+) is walk-forward, each season from weights fit on the seasons before it.
 
     python3 scripts/tennis_model.py --fit     # tune, walk-forward scores, the close -> data/tennis_fit.json
+    python3 scripts/tennis_model.py --blend   # the blend weights and scores again at the fit's rating parameters
+                                              # (--fit / --blend --until YYYYMMDD: nothing played after that day is read)
     python3 scripts/tennis_model.py           # build data/tennis.json (ARK Ranking, metrics, matches) with the fit params
 """
 import datetime as dt
@@ -33,6 +35,7 @@ from functools import lru_cache
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+from tennis_data import is_qual  # noqa: E402
 
 FIT = os.path.join(ROOT, 'data', 'tennis_fit.json')
 SURFS = ('H', 'C', 'G')
@@ -512,8 +515,18 @@ def run(rows, P=None, score=None, until=None, cm_lag=0):
     return m, out
 
 
+def until_rows(rows, argv=None):
+    """rows played on or before --until YYYYMMDD (a fit's data cut), every row without the flag"""
+    argv = sys.argv if argv is None else argv
+    if '--until' not in argv: return rows
+    u = int(argv[argv.index('--until') + 1])
+    mark_two_week(rows)
+    last = (ymd(u) - DAY0).days
+    return [r for r in rows if r[0] <= u and dnum(r[0], r[4], r[2], r[6]) <= last]
+
+
 def scored(r, y0, y1):
-    return y0 <= r[0] // 10000 <= y1 and r[2] in TOUR_LV and not r[4].startswith('Q') and not games(r[9])[2]
+    return y0 <= r[0] // 10000 <= y1 and r[2] in TOUR_LV and not is_qual(r[4]) and not games(r[9])[2]
 
 
 def ll(ps):
@@ -721,7 +734,7 @@ def surface_mix(rows, tour, since):
     """each surface's share of the tour's main-draw matches in the last 52 weeks"""
     c = {s: 0 for s in SURFS}
     for r in rows:
-        if r[0] >= since and r[1] == tour and r[2] in TOUR_LV and not r[4].startswith('Q'): c[r[3]] += 1
+        if r[0] >= since and r[1] == tour and r[2] in TOUR_LV and not is_qual(r[4]): c[r[3]] += 1
     t = sum(c.values()) or 1
     return {s: round(v / t, 3) for s, v in c.items()}
 
@@ -1018,7 +1031,7 @@ def build(rows, players, tn):
         if not pa_ or not pb_: continue
         lv, sf = kind.get(c['tid'], ('A', 'H'))
         rd = T.espn_round(c['rd'])
-        bo = 5 if (lv == 'G' and c['tour'] == 'atp' and not rd.startswith('Q')) else 3
+        bo = 5 if (lv == 'G' and c['tour'] == 'atp' and not is_qual(rd)) else 3
         if c['done']:
             k = pre.get((c['tour'], frozenset((pa_, pb_))))
             if not k: continue
@@ -1052,11 +1065,11 @@ def build(rows, players, tn):
     games_.sort(key=lambda g: (g['state'] != 'in', g['state'] == 'post', g['tip'] if g['state'] != 'post' else '~' + g['tip']))
     # main draws first; qualifying only while there's room (60 cards upcoming, 48 results)
     up = [g for g in games_ if g['state'] != 'post']
-    main = [g for g in up if not g['rd'].startswith('Q')]
-    out['matches'] = (main + [g for g in up if g['rd'].startswith('Q')])[:60]
+    main = [g for g in up if not is_qual(g['rd'])]
+    out['matches'] = (main + [g for g in up if is_qual(g['rd'])])[:60]
     out['matches'].sort(key=lambda g: (g['state'] != 'in', g['tip']))
     done = sorted([g for g in games_ if g['state'] == 'post'], key=lambda g: g['tip'], reverse=True)
-    done = [g for g in done if not g['rd'].startswith('Q')] + [g for g in done if g['rd'].startswith('Q')]
+    done = [g for g in done if not is_qual(g['rd'])] + [g for g in done if is_qual(g['rd'])]
     out['results'] = sorted(done[:48], key=lambda g: g['tip'], reverse=True)
     # model card
     out['model'] = {k: fitp.get(k) for k in ('held', 'close', 'calib', 'tune') if k in fitp}
@@ -1113,8 +1126,8 @@ if __name__ == '__main__':
     import tennis_data as T
     rows, players, tn = T.load()
     if '--fit' in sys.argv:
-        fit(rows)
+        fit(until_rows(rows))
     elif '--blend' in sys.argv:
-        blend_refit(rows)
+        blend_refit(until_rows(rows))
     else:
         build(rows, players, tn)

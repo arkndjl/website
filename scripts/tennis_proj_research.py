@@ -108,7 +108,7 @@ def snaps():
             di += 1
         if di >= len(dates):
             break
-        if r[2] in TM.TOUR_LV and not r[4].startswith('Q'):
+        if r[2] in TM.TOUR_LV and not TM.is_qual(r[4]):
             mixq.append((r[0], r[1], r[3]))
         for p, rk in ((r[7], r[12]), (r[8], r[13])):
             days[p].append(r[0])
