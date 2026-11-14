@@ -160,12 +160,69 @@ def get_html(url):
     return v
 
 
+def _cfbd_rec():
+    import gzip
+    f = os.path.join(ROOT, 'scripts', 'data', 'cfb_recruits_cfbd.json.gz')
+    return json.load(gzip.open(f, 'rt')) if os.path.exists(f) else {}
+
+
+SNAP247 = json.load(open(os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json'))) if os.path.exists(os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json')) else {}
+CFBD_REC = _cfbd_rec()   # the 247 composite by class, 2009-25 (scripts/cfb_recruits_cfbd.mjs)
+
+
+ON3_HIST = os.path.join(ROOT, 'scripts', 'data', 'cfb_on3_hist.json.gz')
+ON3_LIVE = os.path.join(ROOT, 'scripts', 'data', 'cfb_on3_live.json')
+_ON3 = {}
+
+
+def on3_class(y):
+    """On3's industry table for class y (scripts/cfb_on3.mjs, packed by scripts/cfb_on3_pack.py): rows of [name, state,
+    industry rating, industry rank, 247's own rank, 247 vs industry, ESPN vs industry, commit date]."""
+    if not _ON3:
+        import gzip
+        if os.path.exists(ON3_LIVE): _ON3.update(json.load(open(ON3_LIVE))['classes'])
+        if os.path.exists(ON3_HIST): _ON3.update(json.load(gzip.open(ON3_HIST, 'rt')))
+    return _ON3.get(str(y), [])
+
+
+def attach_on3(cl):
+    """Each recruit's On3 row (name + home state, else a name that is unique in the class): the industry rating and
+    rank, the 247 and ESPN gaps to it, the commit date, and 247's own rank where the composite source has none."""
+    if not cl: return cl
+    o3 = on3_class(cl[0]['year']); by = defaultdict(list); n = Counter(norm(o[0]) for o in o3)
+    for o in o3: by[(norm(o[0]), o[1])].append(o)
+    for o in o3:
+        if n[norm(o[0])] == 1: by[(norm(o[0]), None)].append(o)
+    for r in cl:
+        m = by.get((norm(r['name']), r['state'])) or by.get((norm(r['name']), None)) or []
+        o = m[0] if len(m) == 1 else [None] * 8
+        r['ind'], r['indRank'], r['g247'], r['gEspn'], r['commit'] = o[2], o[3], o[5], o[6], o[7]
+        if o[4] and not r.get('r247'): r['r247'] = o[4]
+    return cl
+
+
+def commit_timing(r):
+    """(months committed before the December signing day of his senior year, 0-24; committed before his senior season),
+    or None with no date (or one after August of his class year: a later transfer's)"""
+    import datetime as dt
+    c = r.get('commit'); y = r['year']
+    if not c: return None
+    d = dt.date.fromisoformat(c)
+    if d > dt.date(y, 8, 1): return None
+    return max(0.0, min(24.0, (dt.date(y - 1, 12, 20) - d).days / 30.4)), 1.0 if d < dt.date(y - 1, 9, 1) else 0.0
+
+
 def composite(y, pages=80, kind='composite'):
     """247Sports' composite for class y (the average of the services, 247's own rank beside it): composite score
     (0-1), composite rank, 247's own rank, stars, position, size, home state and committed school.
     kind='own': 247's own rankings instead (score 0-100), which start a class earlier than the composite."""
     import html as H
     out = []
+    # 247's pages sit behind a bot check (Nov 2026): a class comes from the last snapshot of them, else from CFBD's copy
+    if str(y) in SNAP247.get(kind, {}):
+        return [{'name': n, 'state': st, 'pos': None, 'comp': c, 'cRank': rk, 'r247': r2, 'school': None} for n, st, c, rk, r2 in SNAP247[kind][str(y)]]
+    if kind == 'composite' and str(y) in CFBD_REC:
+        return [{'name': n, 'state': None, 'pos': None, 'comp': c, 'cRank': rk, 'r247': None, 'school': sch} for n, c, _, rk, sch, *_ in CFBD_REC[str(y)] if c]
     path = 'compositerecruitrankings' if kind == 'composite' else 'recruitrankings'
     for pg in range(1, pages + 1):
         h = get_html(f'https://247sports.com/season/{y}-football/{path}/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page={pg}')
@@ -200,7 +257,7 @@ def attach_composite(cl, comp):
     by = defaultdict(list)
     for c in comp: by[(norm(c['name']), c['state'])].append(c); by[(short(c['name']), c['state'])].append(c)
     for r in cl:
-        m = by.get((norm(r['name']), r['state'])) or by.get((short(r['name']), r['state'])) or []
+        m = by.get((norm(r['name']), r['state'])) or by.get((short(r['name']), r['state'])) or by.get((norm(r['name']), None)) or []
         r['comp'] = m[0]['comp'] if len(m) == 1 else None
         r['cRank'] = m[0]['cRank'] if len(m) == 1 else None
         r['r247'] = m[0]['r247'] if len(m) == 1 else None
@@ -272,6 +329,7 @@ def enrich(cl, prog, hsn):
     """Candidate drivers: the programs in his recruitment (count, official visits, their strength), the 247
     composite (and its gap to ESPN's grade and to 247's own rank), his high school's output, and home state."""
     attach_composite(cl, composite(cl[0]['year']) if cl else [])
+    attach_on3(cl)
     for r in cl:
         offs = [prog[t] for t in set(r.get('offers') or []) if t in prog]
         fbs = [o for o in offs if o['level'] != 'FCS']
@@ -356,6 +414,7 @@ def bmiz(r, sz):
 # fits the old way (every block on the board grade), for comparison.
 RETARGET = os.path.join(ROOT, 'data', 'cfb_recruit_retarget.json')
 INDEX = json.load(open(RETARGET)).get('index') if os.path.exists(RETARGET) and '--board-weights' not in sys.argv else None
+TM_MEAN = (INDEX or {}).get('tm') or [0.0, 0.0]   # mean commit timing of the index's history (set by the retarget when it fits)
 IDX_BLOCKS = ['year', 'pos', 'pos_year1', 'level', 'elo', 'idx']   # program terms here too: a G5 freshman plays sooner, an NFL fact the index can't hold
 BOARDFIT = os.path.join(ROOT, 'scripts', 'cfb_recruit_fit_boardfit.json')   # the last board-weights fit (Oct 14 2026)
 
@@ -408,6 +467,11 @@ def blocks0(r, sz):
         'gap': {'gapEspn': ((r['comp'] - 0.87) / 0.04 - g) if r.get('comp') and rated else 0.0,
                 'gap247': (math.log(r['cRank']) - math.log(r['r247'])) if r.get('cRank') and r.get('r247') else 0.0},
         'hs': {'lHs': math.log1p(r['hsN']) if r.get('hsN') is not None else 0.0},
+        # ---- On3's industry table (Nov 14 2026): the rating, the services against it, commit timing (centred on the
+        # history's means, so a recruit with no date is neutral) ----
+        'on3': {'indz': (r['ind'] - 85) / 5 if r.get('ind') else 0.0, 'noInd': 0.0 if r.get('ind') else 1.0},
+        'svc': {'g247': r.get('g247') or 0.0, 'gEspn': r.get('gEspn') or 0.0},
+        'tm': (lambda t: {'commitM': t[0] - TM_MEAN[0] if t else 0.0, 'commitEarly': t[1] - TM_MEAN[1] if t else 0.0})(commit_timing(r)),
         'state': {f's_{x}': 1.0 if r.get('state') == x else 0.0 for x in TOP_STATES},
         'grade_k4': {'g_k4': g * (k == 4), 'g80_k4': (max(0.0, gr - 80) / 5 if rated else 0.0) * (k == 4)},
     }
@@ -1029,7 +1093,11 @@ def main():
     fs_, snap = future_support(season, data, p_on, p_fv)
     out.update(fs_)
     if INDEX: out['index'] = INDEX; out['boardWeights'] = board_test
-    json.dump(snap, open(os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json'), 'w'), separators=(',', ':'))
+    sf = os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json')
+    if os.path.exists(sf):   # 247's pages sit behind a bot check: a class this run could not read keeps its last snapshot
+        old = json.load(open(sf))
+        for kind in snap: snap[kind] = {**{str(y): v for y, v in old.get(kind, {}).items()}, **{str(y): v for y, v in snap[kind].items()}}
+    json.dump(snap, open(sf, 'w'), separators=(',', ':'))
     json.dump(out, open(OUT, 'w'), indent=1)
     print(json.dumps({k: out[k] for k in ('test', 'testPlayer', 'baseline', 'tiers', 'byYear', 'redshirt', 'gains')}, indent=1))
 
