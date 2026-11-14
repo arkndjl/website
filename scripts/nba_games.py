@@ -60,6 +60,7 @@ FIT = os.path.join(ROOT, 'data', 'nba_games_fit.json')
 OUT = os.path.join(ROOT, 'data', 'nba_games.json')
 XPM = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
 INJ_HIST = os.path.join(HERE, 'data', 'nba_inj_hist.json.gz')     # official reports 2019-20 on (nba_inj_hist.py)
+INJ_PREV = os.path.join(HERE, 'data', 'nba_inj_prev.json.gz')     # each game's last report of the day before (nba_inj_hist.py --prev)
 FIRST = 2013                      # 2012-13: XPM from 2010-11 on; ratings warm up two seasons before scoring
 SCORE_FROM, HOLD_FROM = 2015, 2022
 FEATS = ['elo', 'eff', 'mkt', 'lin', 'rest', 'b2b', 'home']
@@ -186,6 +187,30 @@ def load_hist():
             g['n'] = 1
     dated_firsts(d['games'])
     return d['games'], d['names']
+
+
+_PREV = None
+
+
+def load_prev(games=()):
+    """each game's statuses on the last report of the day before ({game id: {name key: status}}): the committed
+    history plus, for games (the season in progress and tonight's slate), the NBA's PDFs read by the same rule"""
+    global _PREV
+    if _PREV is None:
+        try:
+            with gzip.open(INJ_PREV, 'rt') as f:
+                _PREV = json.load(f)
+        except (OSError, ValueError):
+            _PREV = {}
+    raw = dict(_PREV)
+    new = [g for g in games if g['id'] not in raw]
+    if new:
+        try:
+            import nba_inj_hist as I
+            raw.update(I.prev_reports(new))
+        except Exception as e:           # noqa: BLE001
+            print('day-before injury reports:', repr(e))
+    return {gid: {norm(k): v for k, v in rep.items()} for gid, rep in raw.items() if rep is not None}
 
 
 # ---------------------------------------------------------------- player value
@@ -873,6 +898,11 @@ def opening_rosters(S, names):
 
 # ---------------------------------------------------------------- play chances
 STATUSES = ('Out', 'Doubtful', 'Questionable', 'Probable', 'Available')
+PLAY_MODEL = os.environ.get('NBA_PLAY_MODEL', '1') != '0'      # reported games priced by scripts/nba_play.py; 0 = the table
+# with no day-before report for the game (tomorrow's slate, a neutral lineup) these statuses keep the table: the fit
+# without the report is overconfident on them (held out 2023-26, predicted .06 plays .26, .85 plays .72)
+NO_PREV_TABLE = ('Questionable', 'Doubtful')
+MIN_ROLE = 8.0                                                  # rotation players: the rows the play chances are measured on
 
 
 def bucket(streak):
@@ -920,7 +950,8 @@ class Model:
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, ypf=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
                  tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
-                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0, lbw=0.0, lbside='d', tlbw=0.0):
+                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0, lbw=0.0, lbside='d', tlbw=0.0,
+                 play=None, prev=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -1018,6 +1049,15 @@ class Model:
         self.team = {}                                  # pid -> current team
         self.members = defaultdict(set)                 # team -> pids
         self.streak = defaultdict(int)                  # pid -> team games missed in a row
+        # play chances in reported games (scripts/nba_play.py): the fit by season, the day-before reports, and what
+        # its inputs need: each player's games this season, the club's record at each status, his last game, wins
+        self.play = PLAY_MODEL if play is None else play
+        self.prev = prev if prev is not None else (load_prev() if self.play else {})    # game id -> {name key: status}, day-before report
+        self.pgp = defaultdict(lambda: [0, 0])          # pid -> [played, club games] this season
+        self.pclub = defaultdict(lambda: [0.0, 0.0])    # (team, status) -> [played, listed] this season
+        self.plast = {}                                 # pid -> (status, played) at his club's last game
+        self.pwl = defaultdict(lambda: [0, 0])          # team -> [wins, games] this regular season
+        self._pg, self._pfit = None, None               # the game being priced and its season's fit
         self.base = defaultdict(lambda: [0.0, 0.0])     # team -> lineup value actually played (weighted)
         self.last = {}                                  # team -> (tip datetime, arena team)
         self.recent = defaultdict(list)                 # team -> tips (for 3-in-4)
@@ -1026,6 +1066,7 @@ class Model:
 
     # -- season rollover
     def new_season(self, S):
+        self.pgp.clear(); self.pclub.clear(); self.pwl.clear()
         for t in list(self.elo):
             self.elo[t] = 1505 + (self.elo[t] - 1505) * self.elo_keep
         for t in list(self.pelo):
@@ -1174,12 +1215,13 @@ class Model:
                 continue
             R = m / w
             st = status.get(p)
-            pr = self.qrate if self.qrate is not None and st == 'Questionable' else play_prob(self.P, st, self.streak[p], reported)
+            fitted = self._fitted(st, reported, R) and self.qrate is None
+            pr = self.play_chance(p, t, st, reported, R)
             if self.cap and self.streak[p] > 0:
                 R *= self.cap.get(str(bucket(self.streak[p])), 1.0)
             if self.b2b and t in self.night2:
                 g_ = b2b_group(self.ages.get(p, 0), R)
-                if not st and self.streak[p] == 0:      # listed players' rest is on the report already
+                if not st and self.streak[p] == 0 and not fitted:      # listed players' rest is on the report already
                     pr = min(1.0, pr * self.b2b['P'].get(('rep' if reported else 'norep') + g_, 1.0))
                 R *= self.b2b['M'].get(g_, 1.0)
             exp.append((p, R * pr, R * (play_prob(self.P, None, self.streak[p], reported) if self.fill else pr)))
@@ -1191,6 +1233,35 @@ class Model:
         if tot * sc < 240:
             V += repl * (240 - tot * sc) / 48
         return V
+
+    def play_chance(self, p, t, st, reported, R):
+        """P(plays): the fitted chance for a rotation player in a reported game (scripts/nba_play.py; its inputs carry
+        night two), else the status x missed-streak table"""
+        if self.qrate is not None and st == 'Questionable':
+            return self.qrate
+        if self._fitted(st, reported, R):
+            import nba_play
+            return nba_play.prob(self.play_ctx(p, t, st, R), self._pfit)
+        return play_prob(self.P, st, self.streak[p], reported)
+
+    def _fitted(self, st, reported, R):
+        noprev = not self._pg or self.prev.get(self._pg['id']) is None
+        return bool(reported and self._pfit is not None and R >= MIN_ROLE and not (st in NO_PREV_TABLE and noprev))
+
+    def play_ctx(self, p, t, st, R):
+        """nba_play's inputs for one rostered player before the game being priced (feats sets it; none, as in the
+        rankings' lineups: a neutral site two days after the last game, no day-before report)"""
+        g = self._pg
+        lt = self.last.get(t)
+        w, n = self.pwl[t]
+        pv = self.prev.get(g['id']) if g else None
+        age = self.ages.get(p, 0)
+        return {'st': st or 'none', 'bk': bucket(self.streak[p]), 'n2': t in self.night2, 'R': R, 'age': age, 'grp': b2b_group(age, R),
+                'home': 0.5 if not g else float(t == g['h'] and not g.get('n')),
+                'days': 2 if not g else 3 if not lt else max(0, min(5, (gday(tipdt(g)) - gday(lt[0])).days)),
+                'club': tuple(self.pclub[(t, st or 'none')]), 'own': tuple(self.pgp[p]), 'last': self.plast.get(p, ('first', 1.0)),
+                'gnum': n, 'wsh': w / n if n >= 55 else 0.0, 'late': float(n >= 55),
+                'prev': None if pv is None else pv.get(norm(self.names.get(p, '')), 'none')}
 
     def status_for(self, g, t):
         rep = self.inj.get(g['id'])
@@ -1226,6 +1297,10 @@ class Model:
         self.night2 = {t for t in (h, a) if self.last.get(t) and self.sched(g, t, h)[0] == 0}
         sh, rh = self.status_for(g, h)
         sa, ra = self.status_for(g, a)
+        self._pg = g
+        if self.play:
+            import nba_play
+            self._pfit = nba_play.fit_for(g['S'])
         Vh, Va = self.lineup(h, sh, rh), self.lineup(a, sa, ra)
         linst = (Vh - self.lineup(h, None, False)) - (Va - self.lineup(a, None, False))
         Bh, Ba = self.brate(h), self.brate(a)
@@ -1305,6 +1380,7 @@ class Model:
 
     def update(self, g):
         self.night2 = set()                             # night two applies to this game's lineups only
+        self._pg = None
         self.market(g)
         for t, ar in ((g['h'], g['h']), (g['a'], g['h'])):    # schedule first: a projected slate feeds the next day's rest
             self.last[t] = (tipdt(g), ar)
@@ -1378,6 +1454,26 @@ class Model:
                 if g['t'] != 3 and a3 and af:
                     self.lgs[0] = self.lgs[0] * 0.998 + m3 / a3; self.lgs[1] = self.lgs[1] * 0.998 + 1
                     self.lgs[2] = self.lgs[2] * 0.998 + mf / af; self.lgs[3] = self.lgs[3] * 0.998 + 1
+        # play-chance inputs: who was listed how and played, before the rosters and roles below move
+        for t in (h, a):
+            if not pl.get(t):
+                continue
+            mins = dict(pl[t])
+            st, reported = self.status_for(g, t)
+            st = st or {}
+            for p in self.roster(t):
+                w_, n_ = self.role[p]
+                if (w_ / n_ if n_ else 0.0) < MIN_ROLE:
+                    continue
+                played = float(mins.get(p, 0) > 0)
+                if reported:
+                    c = self.pclub[(t, st.get(p) or 'none')]
+                    c[0] += played; c[1] += 1
+                self.pgp[p][0] += played; self.pgp[p][1] += 1
+                self.plast[p] = (st.get(p) or ('none' if reported else 'norep'), played)
+        if g['t'] == 2 and g.get('hs') is not None and g.get('as') is not None:
+            self.pwl[h][0] += g['hs'] > g['as']; self.pwl[h][1] += 1
+            self.pwl[a][0] += g['as'] > g['hs']; self.pwl[a][1] += 1
         # lineups: minutes played, the value actually on the floor, who missed
         for t in (h, a):
             rows = pl.get(t) or []

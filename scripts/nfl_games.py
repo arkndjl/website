@@ -369,6 +369,7 @@ RESERVE = {'RES', 'PUP', 'SUS', 'NWT', 'RSN', 'EXE'}     # the weekly roster's g
 # Fit on 2016-20, held 2021-25 player Brier .2080 vs .2202 for the flat .75/.5 (t -5.8); game model MAE better in both
 # periods (2017-20 -.010, t -1.25; 2021-25 -.004, t -0.7), and the change also predicts result minus the close (b 2.3, t 1.6;
 # 3.7, t 2.5): the close prices practice news only in part. Pooled 2016-25 rates
+Q_MODEL = os.environ.get('NFL_Q_MODEL', '1') != '0'      # questionables by scripts/nfl_q.py's fit; 0 = the practice table
 PRACTICE_Q = {('dnp', True): 0.48, ('limited', True): 0.76, ('full', True): 0.90,
               ('dnp', False): 0.23, ('limited', False): 0.55, ('full', False): 0.70}
 
@@ -379,10 +380,12 @@ def practice_of(s):
     return 'full' if s.startswith('full') else 'limited' if s.startswith('limited') else 'dnp' if s.startswith('did not') else None
 
 
-def play_prob(status, recent=True, practice=None):
+def play_prob(status, recent=True, practice=None, ctx=None, qfit=None):
     """Chance a listed player plays. Out 0; doubtful .02, questionable .75 for a player who played the team's last
     game and .5 for one who didn't (2016-25 game status reports against snap counts: 1.6%, 75% and 51%), or by his last
-    practice when the league's report gives it (PRACTICE_Q: did not participate .48, limited .76, full .90); probable .95
+    practice when the league's report gives it (PRACTICE_Q: did not participate .48, limited .76, full .90), or, with
+    his listing's inputs (ctx) and a fit, scripts/nfl_q.py's model (position, body part, last week's listing, snap
+    share, the club's record with its questionables: held 2021-25 log loss .608 -> .577); probable .95
     (news only: the league dropped the designation in 2016); last week's designation before this week's report, CARRY.
     Players on IR, PUP or suspended are off the roster: the team's ratings already carry the games without them, as in
     the weekly reports, which don't list them."""
@@ -395,6 +398,9 @@ def play_prob(status, recent=True, practice=None):
     if status == 'Doubtful':
         return 0.02
     if status == 'Questionable':
+        if ctx is not None and qfit:
+            import nfl_q
+            return nfl_q.prob(ctx, qfit)
         q = PRACTICE_Q.get((practice, bool(recent)))
         if q is not None:
             return q
@@ -416,7 +422,8 @@ def injury_history(games, years, live=None):
     (nfl_war.py's model, no look-ahead), costed at 1 - P(plays) by his status on the game status report. Reserve: the
     non-QBs on a reserve list on the weekly roster that week and off the report, at full value (the 'ir' input)."""
     import nfl_war as W
-    cp = os.path.join(CACHE, 'inj_hist_v4.json')      # v4: the reserve lists
+    import nfl_q
+    cp = os.path.join(CACHE, 'inj_hist_v5.json')      # v5: questionables priced by nfl_q's fit on the seasons before
     try:
         cache = json.load(open(cp))
     except (OSError, ValueError):
@@ -440,6 +447,8 @@ def injury_history(games, years, live=None):
         except Exception as e:      # noqa: BLE001
             print('nfl games: weekly roster', y, repr(e))
         sg = [g for g in games if int(g['season']) == y and g['home_score'] not in ('', 'NA')]
+        qfit = nfl_q.fit_for(y) if Q_MODEL else None
+        qctx = nfl_q.context(y, games, y == live) if qfit else {}
         last_wk = {}
         out = {}
         for g in sg:
@@ -456,7 +465,7 @@ def injury_history(games, years, live=None):
                         played = True
                     else:
                         played = led[pw + 1].get(gsis, (0, 0))[1] > led[pw].get(gsis, (0, 0))[1]
-                    c = (1 - play_prob(stt, played, prac)) * max(v, 0.0) * PTS_PER_WIN
+                    c = (1 - play_prob(stt, played, prac, qctx.get((t, w, gsis)), qfit)) * max(v, 0.0) * PTS_PER_WIN
                     if played:
                         fresh += c
                     else:
@@ -799,6 +808,15 @@ def injury_costs(last, week, games, coef):
     maps = W.gsis_map(last)
     prev = W.war_ledger(last - 1, maps=W.gsis_map(last - 1))
     cur = W.war_ledger(last, maps=maps)
+    qfit, qctx = None, {}
+    if Q_MODEL:
+        try:
+            import nfl_q
+            qfit = nfl_q.fit_for()
+            qctx = nfl_q.context(last, games, True) if qfit else {}
+        except Exception as e:      # noqa: BLE001  (no fit or no files: the practice table prices them)
+            print('nfl games: questionable model unavailable:', repr(e))
+            qfit, qctx = None, {}
     played = [g for g in games if int(g['season']) == last and g['game_type'] == 'REG' and g['home_score'] not in ('', 'NA')]
     lastw = {}
     for g in played:
@@ -830,7 +848,9 @@ def injury_costs(last, week, games, coef):
                 rec_ = cur.get(gsis, (0, 0))[1] > before[pw].get(gsis, (0, 0))[1]
             else:
                 rec_ = True
-            miss = 1 - play_prob(p['status'], rec_, p.get('prac'))
+            # the model prices the league report's own listings; a status from news alone keeps the table
+            cx = qctx.get((t, week, gsis)) if p.get('src') == 'league' else None
+            miss = 1 - play_prob(p['status'], rec_, p.get('prac'), cx, qfit)
             v = max(player_value(prev.get(gsis, (0.0, 0)), cur.get(gsis, (0.0, 0))), 0.0)
             raw = miss * v * PTS_PER_WIN
             if v > 0:

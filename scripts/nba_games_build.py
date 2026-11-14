@@ -206,7 +206,10 @@ def build():
         N.write_draft(S - 1, S - 1)                 # the summer's draft, once (rookie priors)
         N._DR.clear()
     # past games walk with the reports the fit walked them with (the season in progress read off the NBA's PDFs)
-    m = N.Model(names, P, inj=N.load_inj(cur), **F['params'])
+    # day-before reports (scripts/nba_play.py reads them): this season's finished games and today's slate
+    etd = now.astimezone(ET).date()
+    prev = N.load_prev([g for g in cur if g['fin'] or N.tipdt(g).astimezone(ET).date() == etd]) if N.PLAY_MODEL else None
+    m = N.Model(names, P, inj=N.load_inj(cur), prev=prev, **F['params'])
     for g in games:
         m.feats(g); m.update(g)
     if m.season != S:
@@ -271,7 +274,7 @@ def build():
                         continue
                     w_, n_ = m.role[p]
                     R = w_ / n_ if n_ else 0
-                    pr = N.play_prob(P, s_, m.streak[p], True)
+                    pr = m.play_chance(p, t, s_, True, R)
                     pts = b.get('lin', 0.0) * (1 - pr) * R * (m.v(p) - N.REPL) / 48
                     if R >= 5:
                         lst.append({'name': names.get(p, ''), 'status': s_, 'p': round(pr, 2), 'min': round(R, 1),

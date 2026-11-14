@@ -42,7 +42,7 @@ if (HISTM) {
   const mdl = await runModel(data, SEASON, { hist: { ...HIST_FIT, wf: true }, sim: false });
   wx = data.weather; S1 = HIST_FIT.first + 1;
   A = mdl.wf.map(q => ({ r: q.r })); B = [];
-  for (const q of mdl.wf) pred[q.r.id] = { m: q.m, sigma: q.sigma, fold: q.fold, tm: q.tm, ek: q.ek, tmr: q.tmr };
+  for (const q of mdl.wf) pred[q.r.id] = { m: q.m, sigma: q.sigma, fold: q.fold, tm: q.tm, ek: q.ek, tmr: q.tmr, md: q.md, mc: q.mc };
   console.error(`history walk-forward: ${A.length} games ${S1}-${SEASON}`);
 } else {
 // ---- harness setup, verbatim in substance ----
@@ -174,6 +174,8 @@ for (const p of games) {
     fold: q.fold, sigma: +q.sigma.toFixed(2), fcs: r.hc === 'fbs' && r.ac === 'fbs' ? 0 : 1,
     // early-season corrections (cfb_model.mjs EARLY): the margin factor and the raw total, for scripts/cfb_early.py
     ...(q.ek && q.ek !== 1 ? { ek: q.ek } : {}), ...(q.tmr != null ? { tmr: +q.tmr.toFixed(2) } : {}),
+    // market disagreement (cfb_model.mjs MDIS): the input and the points it adds to m
+    ...(q.md ? { md: +q.md.toFixed(2), mdp: +((q.mc || 0) * q.md).toFixed(2) } : {}),
     // the letdown spot's points (cfb_model.mjs LETDOWN), for scripts/cfb_spots.py
     ...(q.ld ? { ld: +q.ld.toFixed(2) } : {}),
   });

@@ -71,3 +71,37 @@ file and the pick rules. Each shipped item is registered for one season-end lock
 
 Not tested, and why: CBB (every open lead is season-gated on 2026-27); NBA team terms (the Nov 13 audit closed
 the linear terms; no new data source since); terms listed as failed in the project notes.
+
+## Amendment 1 (Nov 14, written before it was run)
+
+- **G6 NFL market disagreement.** G4's construction on scripts/data/games_wf/nfl.json.gz (close minus the committed
+  walk-forward margin, 0.2 a game, reset each season, weight from the seasons before). Tune 2015-20, held 2021-25,
+  2026 not read. Suggested by the lead-sweep thread after G1-G5 were scored; family G is now six tests, so G4's
+  Holm bar is recomputed over the tests run.
+
+## Results (Nov 14, after every test above was scored)
+
+| Test | Tune | Held | Verdict |
+|---|---|---|---|
+| J1 NFL questionable | | log loss .6076 to .5766, t -8.53, every season 2021-25 | pass, shipped (scripts/nfl_q.py) |
+| J2 NFL return timeline | t -9.1 | t +1.75 (Questionable -4.4, Out -2.0, Reserve +3.1, Doubtful +2.3) | fail; G3 not run |
+| J3 NBA play chance | | weighted log loss .1455 to .1079, t -7.16 | pass |
+| J4 NBA day-before report | | t -10.82 on J3 (refit on listed rows t -4.63) | pass, shipped with J3 (scripts/nba_play.py) |
+| J5 CFB news statuses | | t -2.26 against the status table, t -1.27 against the live pricing | not shipped |
+| G1 NFL injury term repriced | d -.001, t -0.33 | d +.005, t +0.97 | within the rule, shipped |
+| G2 NBA lineup term repriced | 2022 d -.030, t -2.34 | 2023-26 MAE 10.683 to 10.667, t -2.08 | pass, shipped |
+| G4 CFB market disagreement | MAE 12.918 to 12.829, t -2.59 | 12.502 to 12.439, t -2.45, p .0073 | pass (Holm over 5 run), shipped |
+| G5 NFL game control | t +0.17 | t -0.59 | fail |
+| G6 NFL market disagreement | t -0.84 | t -1.40 | fail |
+
+Deviations. J5's registered base was the status table; the live board prices news statuses through the report fit, so
+it was scored against both and judged on the live one. J4's "not yet submitted" level was merged into "not listed".
+The CFB reader has no Probable level (Active). Found after scoring, in the live build: without a day-before report
+(tomorrow's slate, the rankings' neutral lineups) J3 alone is overconfident on Questionable (held out, predicted .06
+plays .26, .85 plays .72), so Questionable and Doubtful keep the status table there; no walked game changes (every
+listed row in 2022-26 has a day-before report but two).
+
+Season-end lockbox scores (once each, alpha per the lockbox rule): J1 on 2026 weeks 11+ questionable listings (log
+loss against the practice table); J3+J4 on 2026-27 reported rotation rows (log loss against the status table); G4 on
+2026 weeks 11+ lined games (absolute error with and without the term); G2 on 2026-27 (absolute error, table against
+fit). Leads for the same date, not shipped: J5, J2 on Questionable and Out only, G6.
