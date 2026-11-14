@@ -1404,6 +1404,21 @@
       "CFB",
       "CBB"
      ]
+    },
+    {
+     "term": "Economy baselines (CS2)",
+     "short": "Round win % by buy class against buy class, pistol conversion, and force against save, from pro round data.",
+     "body": [
+      "Buy class = team equipment value after the buy: eco under 5,000, force 5,000 to 19,999, full 20,000+. Pistol rounds are their own class. Regulation rounds of maps since Jan 2024 with bo3.gg round data (61,254 maps), all tiers and by bo3.gg event tier; tier C is the baseline on the 1NT page.",
+      "Full v full the T side wins 49%; full v force 73% (T full) and 29% (T force v CT full); an eco wins 6% against a full buy.",
+      "Pistol conversion: the pistol winner takes the next round 84% (T) / 81% (CT) of the time.",
+      "Force v save: the round after a lost round, short of a full buy; value = rounds won over that round and the next. Forcing after a lost pistol is worth +0.12 rounds over saving (se 0.004). The data has no bank, so the losing streak stands in for money, and who forces is the teams' choice: a comparison, not an experiment.",
+      "Cells under 200 rounds are dimmed. Descriptive: no opponent or map adjustment, and not a model input."
+     ],
+     "where": "Counter-Strike rounds > economy; 1NTERLYTICS",
+     "sports": [
+      "CS2"
+     ]
     }
    ]
   },

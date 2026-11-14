@@ -65,6 +65,7 @@ draft = false
 {{< n1 part="mapbook" class="desk__wide" >}}
 {{< n1 part="halves" >}}
 {{< n1 part="econ" >}}
+{{< cs2econ tier="c" class="desk__wide" >}}
 {{< n1 part="trends" class="desk__wide" >}}
 {{< esea part="players" >}}
 {{< esea part="lineups" >}}
