@@ -1,0 +1,163 @@
+{
+ "asof": "2026-10-26T15:18:37.543Z",
+ "rows": {
+  "fit": 11606,
+  "held": 1715
+ },
+ "pools": {
+  "53": [
+   "ancient",
+   "anubis",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke",
+   "train"
+  ],
+  "54": [
+   "ancient",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke",
+   "overpass",
+   "train"
+  ],
+  "55": [
+   "ancient",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke",
+   "overpass",
+   "train"
+  ],
+  "56": [
+   "ancient",
+   "anubis",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke",
+   "overpass"
+  ],
+  "57": [
+   "ancient",
+   "anubis",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke",
+   "overpass"
+  ],
+  "58": [
+   "ancient",
+   "anubis",
+   "cache",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke"
+  ],
+  "59": [
+   "ancient",
+   "anubis",
+   "cache",
+   "dust2",
+   "inferno",
+   "mirage",
+   "nuke"
+  ]
+ },
+ "softmax": {
+  "a": 0.309,
+  "b": -0.924,
+  "fit_ll": 1.7308,
+  "held_ll": 1.685,
+  "uniform_held_ll": 1.9459
+ },
+ "grid_top": [
+  {
+   "w": 0.9,
+   "L": 0.85,
+   "fit_ll": 1.7131
+  },
+  {
+   "w": 0.85,
+   "L": 0.85,
+   "fit_ll": 1.7134
+  },
+  {
+   "w": 0.95,
+   "L": 0.85,
+   "fit_ll": 1.714
+  },
+  {
+   "w": 0.8,
+   "L": 0.85,
+   "fit_ll": 1.7145
+  },
+  {
+   "w": 0.9,
+   "L": 0.9,
+   "fit_ll": 1.7145
+  },
+  {
+   "w": 0.95,
+   "L": 0.9,
+   "fit_ll": 1.7146
+  }
+ ],
+ "fitted": {
+  "w_habit": 0.9,
+  "L_softmax": 0.85
+ },
+ "tree_alone_fit_ll": {
+  "0.0": 4.0518,
+  "0.25": 3.0964,
+  "0.5": 2.6899,
+  "0.75": 2.558,
+  "1.0": 3.0765
+ },
+ "minimax_decider_hit": {
+  "held": 0.1551,
+  "habit_line": 0.3685,
+  "softmax_mean_p": 0.2019
+ },
+ "E3": {
+  "held": {
+   "n": 1715,
+   "days": 50,
+   "ll_base": 1.685,
+   "ll_new": 1.6315,
+   "diff": -0.05351,
+   "t": -4.64
+  },
+  "fit": {
+   "n": 11606,
+   "days": 206,
+   "ll_base": 1.7308,
+   "ll_new": 1.7131,
+   "diff": -0.01766,
+   "t": -5.9
+  },
+  "p": 0.0
+ },
+ "holm": {
+  "E1": {
+   "p": 0.00357,
+   "holm_p": 0.00357,
+   "pass": true
+  },
+  "E2": {
+   "p": 0.00082,
+   "holm_p": 0.00164,
+   "pass": true
+  },
+  "E3": {
+   "p": 0.0,
+   "holm_p": 0.0,
+   "pass": true
+  }
+ }
+}

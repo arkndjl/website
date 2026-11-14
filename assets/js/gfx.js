@@ -2313,6 +2313,10 @@
   // ---- teamGFX: pick/ban tree. 1NT's move = best expected map win (expectimax); at each opponent move two branches:
   // HABIT (ban the map they have played least in 90 days, pick the one they play most: held-out decider log loss -1.61
   // vs -1.95 uniform on ESEA S53-S59 Bo1s) and EDGE (minimax on the player map edges). Expected line = habit.
+  // HABIT_W = the chance a ban is HABIT, fit by likelihood on the played map (scripts/esea_veto_research.py: S53-S57
+  // fit, S58-S59 played-map log loss 1.685 -> 1.632 vs the habit softmax, t -4.6 by day; the minimax decider alone
+  // is the played map 16% of the time, the habit line 37%).
+  var HABIT_W = 0.9;
   // Knife side: map win % of the team starting T on that map (ARKBOARD Research cs2-side-first, bo3.gg pro maps).
   function vetoTree(d, weStart) {
     var bo = +d.bon === 3 ? 3 : 1, P = {}, E = {}, N = {};
@@ -2338,7 +2342,7 @@
       var act = S[t][1], h = left.slice().sort(function (a, b) { return act === 'ban' ? ((N[a] || 0) - (N[b] || 0) || E[b] - E[a]) : ((N[b] || 0) - (N[a] || 0) || E[a] - E[b]); })[0];
       var em = null, ev = null;
       left.forEach(function (m) { var n = nxt(left, pk, t, m), v = mm(n[0], n[1], t + 1); if (ev == null || v < ev) { ev = v; em = m; } });
-      return h === em ? [[h, 1, '']] : [[h, 0.5, 'HABIT'], [em, 0.5, 'EDGE']];
+      return h === em ? [[h, 1, '']] : [[h, HABIT_W, 'HABIT'], [em, 1 - HABIT_W, 'EDGE']];
     }
     var memo = {};
     function ex(left, pk, t) {
