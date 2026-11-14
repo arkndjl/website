@@ -1195,6 +1195,7 @@
      "body": [
       "Attack and defence in log goals per nation, learned match by match from every full international since 1872 (martj42, ESPN); learning rate x tournament weight (World Cup, continental finals, qualifiers, Nations Leagues, friendlies, other), faster for new nations, goals capped at 7; home edge learned (none at neutral venues).",
       "Each side's log expected goals also moves by 0.124 x half the gap in log top-23 Transfermarkt value (players by national team, else first citizenship), held out 2016+ 0.8618 -> 0.8595 log loss (t -5.9).",
+      "Called-up squads: when both sides have one on record (Transfermarkt matchday squads, lineup and bench, of the nation's matches in the 12 days before, else of its last match inside 400 days; never the match's own), the squad term is 0.24 x half the gap in log top-18 value of those squads + 0.04 x half the top-23 gap. Pre-registered, set on 2000-15 (t -2.7), one pass on 2016 to Jul 2026: 0.8590 -> 0.8568 over 9,734 matches (6,076 with both squads; t -3.1 by match day). The match's own squad would give 0.8554.",
       "Beats World Football Elo (K by tournament, goal multiplier, ordered logit) held out: 0.8595 vs 0.8750 (t -8.3)."
      ],
      "where": "world ranking tab, Soccer page",
