@@ -52,13 +52,16 @@ jobs:
         run: python3 scripts/tennis_data.py
       - name: Ratings, ARK Ranking, matches
         run: python3 scripts/tennis_model.py
+      # event odds: every tour-level draw ESPN lists, the rest of the bracket simulated from the match model
+      - name: Event odds
+        run: python3 scripts/tennis_events.py || echo "event odds failed; keeping the committed file"
       # the series model's season so far against its own chances (scripts/model_monitor.py -> data/model_monitor/tennis.json)
       - name: Model monitor
         continue-on-error: true
         run: python3 scripts/model_monitor.py tennis
       - name: Commit if anything changed
         run: |
-          files="data/tennis.json scripts/data/tennis_ta.jsonl scripts/data/tennis_ratings.json.gz scripts/data/tennis_idmap.json.gz scripts/data/tennis_espn_kind.json.gz scripts/data/tennis_faces.json.gz static/img/flags data/model_monitor/tennis.json scripts/data/model_monitor/tennis.json"
+          files="data/tennis.json data/tennis_events.json scripts/data/ledger/tennis_events_2027.json scripts/data/tennis_ta.jsonl scripts/data/tennis_ratings.json.gz scripts/data/tennis_idmap.json.gz scripts/data/tennis_espn_kind.json.gz scripts/data/tennis_faces.json.gz static/img/flags data/model_monitor/tennis.json scripts/data/model_monitor/tennis.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
