@@ -33,6 +33,7 @@ SPORTS = ('nfl', 'nba', 'cbb', 'cfb', 'nhl')
 AHEAD = 2 * 3600
 LOOKBACK = 7 * 86400
 CUT = 1.5
+CUT_SD = 2.0
 FIT_SHARE = 0.4
 MIN_FIT = 20
 
@@ -196,6 +197,11 @@ def b2():
             continue
         fit_ids = {i for _, i in ids[:nfit]}
         F = fit([r for r in rows if r['id'] in fit_ids])
+        dv = {}
+        for r in rows:
+            if r['id'] in fit_ids and r['mk'] in F:
+                dv.setdefault(r['mk'], []).append(dev(r, F))
+        cut = {mk: CUT_SD * (sum(x * x for x in v) / len(v)) ** .5 for mk, v in dv.items()}
         for r in rows:
             if r['id'] in fit_ids or r['mk'] not in F:
                 continue
@@ -203,8 +209,9 @@ def b2():
             if d == 0:
                 continue
             y = -math.copysign(1, d) * (r['fz'] - r['fa'])
-            (flagged if abs(d) >= CUT else base).append((y, r['day'], sp, r['mk']))
-            if abs(d) >= CUT:
+            hit = abs(d) >= cut.get(r['mk'], float('inf'))
+            (flagged if hit else base).append((y, r['day'], sp, r['mk']))
+            if hit:
                 by[f"{sp} {r['mk']}"] = by.get(f"{sp} {r['mk']}", 0) + 1
 
     def st(v):
@@ -221,7 +228,7 @@ def b2():
 
 def test():
     S, sha = spec()
-    assert len(sha) == 64 and S['trigger']['games'] == 300
+    assert len(sha) == 64 and S['trigger']['games'] == 1500
     r = {'L': 23.5, 'oO': -110.0, 'oU': -110.0}
     assert abs(quote_fair(S, 'nfl', '1ht', r) - 23.5) < 1e-6
     assert quote_fair(S, 'nfl', '1ht', {'L': 23.5, 'oO': -130.0, 'oU': 110.0}) > 23.5
