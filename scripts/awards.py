@@ -47,7 +47,7 @@ def gauss(rng, m, s):
 
 # injuries over the games left: a Poisson count of new injuries (H a game) each costing a lognormal number of games
 # (median MED, sigma 1: a fat tail of long absences), on top of the share of games he has played so far
-INJ = {'nba': (.012, 4.0), 'nhl': (.008, 4.5), 'cbb': (.008, 2.5), 'cfb': (.03, 1.5), 'nfl': (.035, 1.5)}
+INJ = {'nba': (.012, 4.0), 'nhl': (.008, 4.5), 'cbb': (.008, 2.5), 'cfb': (.03, 1.5), 'nfl': (.035, 1.5), 'soccer': (.012, 3.0)}
 
 
 def games_left(rng, left, share, sport):
@@ -147,7 +147,7 @@ def rows_out(pool, p, draw, show, rng, n=200, top=SHOW):
     for c, pi in top:
         x = {k: round(sum(acc[(c['id'], k)]) / len(acc[(c['id'], k)]), 3) for k, _, _ in show if acc.get((c['id'], k))}
         r = {'n': c['n'], 'tm': c['tm'], 'p': round(pi, 4), 'x': x}
-        for k in ('ph', 'logo', 'cls', 'pos', 'war'):
+        for k in ('ph', 'phu', 'logo', 'cls', 'pos', 'war'):
             if c.get(k) is not None: r[k] = c[k]
         out.append(r)
     return out
@@ -652,13 +652,78 @@ def nfl_races(fit, rng, cands, teams, sims=SIMS):
         yield aw, pl, p, draw, show
 
 
+# ---------------------------------------------------------------- soccer
+
+def pick(rng, pairs):
+    """one key from [(key, weight)]"""
+    t = sum(max(w, 0) for _, w in pairs)
+    if t <= 0: return None
+    x = rng.random() * t
+    for k, w in pairs:
+        x -= max(w, 0)
+        if x <= 0: return k
+    return pairs[-1][0]
+
+
+def soccer(fit, rng):
+    """the Ballon d'Or for the season in progress: big-five players by GAR to date, run out to the season; each
+    simulation draws every league's champion and the Champions League finalists from the season odds"""
+    import awards_soccer as SO
+    spec = fit.get('ballon')
+    G = jload(os.path.join(ROOT, 'data', 'soccer_games.json'), {})
+    if not spec or not spec['test'].get('pass') or not G.get('leagues'): return None
+    S = int(G['season'])
+    rows, _ = SO.season_rows(S)
+    lg_t, tinfo = {}, {}
+    for lg, L in G['leagues'].items():
+        n = len(L['teams'])
+        lg_t[lg] = [(t['id'], t.get('title') or 0) for t in L['teams']]
+        for t in L['teams']: tinfo[t['id']] = (t.get('gp') or 0, 2 * (n - 1))
+    U = (G.get('uefa') or {}).get('uefa.champions', {}).get('teams', [])
+    uw = [(t['id'], t.get('win') or 0) for t in U]
+    ul = {t['id']: max((t.get('fin') or 0) - (t.get('win') or 0), 0) for t in U}
+    prev = fit.get('_prev', {}).get('ballon', {})
+    cands = []
+    for r in sorted(rows, key=lambda r: -r['gar'])[:SO.POOL_N]:
+        if r['tid'] not in tinfo: continue
+        cands.append({'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['team'], 'lg': r['lg'], 'pos': r.get('pos'),
+                      'logo': f"/img/soccer/{r['tid']}.png", 'gar': r['gar'], 'ga': r['g'] + r['a'],
+                      'prev': prev.get(NM.key(r['n']), 0)})
+    ph = {r['p']: r.get('ph') for r in (jload(os.path.join(SO.WAR, f'{S}.json'), {}) or {}).get('players', [])}
+    for c in cands:
+        if ph.get(c['id']): c['phu'] = 'https://img.a.transfermarkt.technology/portrait/medium/' + ph[c['id']]
+
+    def teams_draw(rng):
+        td = {'champ': {pick(rng, v) for v in lg_t.values()}}
+        w = pick(rng, uw)
+        td['uw'], td['ul'] = w, pick(rng, [(t, x) for t, x in ul.items() if t != w])
+        return td
+
+    def draw(c, td, rng):
+        gp, tot = tinfo[c['tid']]
+        gr = games_left(rng, max(tot - gp, 0), .93, 'soccer')
+        out = {}
+        for k, kind in (('gar', 'yds'), ('ga', 'count')):
+            mu = c[k] / max(gp, 1) * gr
+            out[k] = c[k] + (gauss(rng, mu, .3 * abs(mu)) if kind == 'yds' else max(gauss(rng, mu, math.sqrt(max(mu, 0))), 0))
+        out.update(lgw=1.0 if c['tid'] in td['champ'] else 0.0, ucl=1.0 if c['tid'] == td['uw'] else .5 if c['tid'] == td['ul'] else 0.0,
+                   natw=0.0, prev=c['prev'], uclw=1.0 if c['tid'] == td['uw'] else 0.0)
+        return out
+
+    draw.teams = teams_draw
+    show = [('gar', 'GAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')]
+    pool = prune(cands, spec, draw, rng)
+    p = race(pool, spec, draw, rng)
+    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': [('ballon', rows_out(pool, p, draw, show, rng), show)], 'logo': 'soccer'}
+
+
 # ---------------------------------------------------------------- output
 
 NULL_LABEL = {'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gsax': 'GSAx', 'bpm': 'BPM', 'yds': 'yards',
               'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
               'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
-              'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs'}
-BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl}
+              'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR'}
+BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl, 'soccer': soccer}
 
 
 def main(argv):

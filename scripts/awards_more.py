@@ -11,7 +11,7 @@ droy    NFL Defensive Rookie of the Year: rookie defenders from nflverse weekly 
         hold a handful a season), winner only
 allnba  All-NBA: the 15 named, a top-k race (the exploded logit down the 15 slots), scored on the held-out
         log-likelihood of the 15
-allpro  AP All-Pro first team by position (QB, RB, WR, TE, edge / interior line, linebacker, defensive back)
+ballon  Ballon d'Or: big-five-league players by GAR with club and national-team honours (scripts/awards_soccer.py)
 numpy."""
 import json, math, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -102,21 +102,25 @@ def gate(cur, sport, new):
 
 
 def main(argv):
-    want = [a for a in argv if not a.startswith('-')] or ['droy', 'allnba', 'allpro']
+    want = [a for a in argv if not a.startswith('-')] or ['droy', 'allnba', 'ballon']
     cur = json.load(open(OUT))
     nfl, nba = {}, {}
     if 'droy' in want:
         r = test(droy_races(), DROY_COLS, DROY_NULL, 1)
         nfl['droy'] = dict(r, award='droy', label='DROY', more=True)
-    if 'allpro' in want:
-        import awards_allpro as AP
-        for a, r in AP.run(test).items(): nfl[a] = r
     if 'allnba' in want:
         races, prev = allnba_races()
         r = test(races, ALLNBA_COLS, ALLNBA_NULL, ALLNBA_K, k=ALLNBA_K)
         nba['allnba'] = dict(r, award='allnba', label='All-NBA', k=ALLNBA_K, more=True)
         cur['nba'].setdefault('_prev', {})['allnba'] = prev
-    for sport, new in (('nfl', nfl), ('nba', nba)):
+    soc = {}
+    if 'ballon' in want:
+        import awards_soccer as SO
+        races, prev = SO.races()
+        r = test(races, SO.COLS, SO.NULL, 3)
+        soc['ballon'] = dict(r, award='ballon', label="Ballon d'Or", more=True)
+        cur.setdefault('soccer', {})['_prev'] = {'ballon': prev}
+    for sport, new in (('nfl', nfl), ('nba', nba), ('soccer', soc)):
         if not new: continue
         gate(cur, sport, new)
         cur[sport].update(new)
