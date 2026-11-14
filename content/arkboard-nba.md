@@ -11,12 +11,13 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:VORX/XPM leaders,projections,contract value,rookies,ARKLIST|rosters:depth chart,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,offense,defense" side="true" label="NBA views" >}}
+{{< wintabs groups="players:VORX/XPM leaders,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,offense,defense" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< pctl sport="nba" icon="hoop" title="projections" tab="projections" >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
 {{< rookies sport="nba" icon="hoop" title="rookies" tab="rookies" >}}
 {{< backupwatch sport="nba" title="backup watch" tab="backup watch" >}}
+{{< awards sport="nba" tab="awards" >}}
 {{< arklist sport="nba" title="ARKLIST" tab="ARKLIST" >}}
 {{< nbagames title="games" tab="games" >}}
 {{< nbagametable title="game table" tab="game table" >}}

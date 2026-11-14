@@ -1,0 +1,53 @@
+# Award races on every sport page's awards tab (scripts/awards.py -> data/awards.json): each race simulates the rest of
+# the season from the boards' own season odds and player values and scores it with the voter models in
+# data/awards_fit.json (scripts/awards_research.py, refit by hand once a season ends). Daily; GitHub fires schedules late
+# or not at all on this repo, so a run also follows each cfb board run (several a day) once the races are 20+ hours old.
+name: awards
+
+on:
+  schedule:
+    - cron: "35 13 * 1-6,8-12 *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["cfb board"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: awards
+  cancel-in-progress: false
+
+jobs:
+  races:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gate (a following run only when the races are 20+ hours old)
+        id: g
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, os, datetime as dt
+          now = dt.datetime.now(dt.timezone.utc)
+          go = True
+          if os.environ.get('EVENT') == 'workflow_run':
+              try:
+                  d = json.load(open('data/awards.json'))
+                  last = min(dt.datetime.fromisoformat(v['asof'].replace('Z', '+00:00')) for v in d.values())
+                  go = (now - last).total_seconds() > 20 * 3600
+              except Exception:
+                  go = True
+          print('go=' + ('true' if go else 'false'))
+          PY
+      - name: Award races
+        if: steps.g.outputs.go == 'true'
+        run: python3 scripts/awards.py
+      - name: Commit if the races changed
+        if: steps.g.outputs.go == 'true'
+        run: |
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/data_push.py -m "Update the award races ($(date -u +%Y-%m-%d))" -- data/awards.json
