@@ -16,7 +16,15 @@ LEAGUE = {'cfb': 'college-football', 'nfl': 'nfl'}
 SORTS = [('offense', 'passing.passingYards', 60), ('offense', 'rushing.rushingYards', 50),
          ('offense', 'receiving.receivingYards', 50), ('offense', 'scoring.totalTouchdowns', 30),
          ('defense', 'defensive.sacks', 25), ('defense', 'defensive.totalTackles', 25),
-         ('defense', 'defensiveInterceptions.interceptions', 15)]
+         ('defense', 'defensiveInterceptions.interceptions', 15), ('offense', 'receiving.receptions', 150),
+         ('defense', 'defensive.totalTackles', 100), ('defense', 'defensive.passesDefended', 50),
+         ('defense', 'defensive.tacklesForLoss', 50), ('specialTeams', 'kicking.fieldGoalsMade', 40),
+         ('specialTeams', 'punting.punts', 40)]
+# CFB only: every FBS punter and kicker, and deeper defensive and receiving lists (position award pools)
+CFB_DEEP = [('specialTeams', 'punting.punts', 140), ('specialTeams', 'kicking.fieldGoalsMade', 140),
+            ('defense', 'defensive.sacks', 100), ('defense', 'defensive.tacklesForLoss', 120),
+            ('defense', 'defensive.passesDefended', 150), ('defense', 'defensiveInterceptions.interceptions', 100),
+            ('defense', 'defensive.totalTackles', 200), ('offense', 'receiving.receivingYards', 200)]
 STATS = {'passing': ['passingYards', 'passingTouchdowns', 'interceptions', 'passingAttempts', 'completions',
                      'QBRating', 'yardsPerPassAttempt', 'sacks'],
          'rushing': ['rushingYards', 'rushingTouchdowns', 'rushingAttempts'],
@@ -24,7 +32,10 @@ STATS = {'passing': ['passingYards', 'passingTouchdowns', 'interceptions', 'pass
          'defensive': ['sacks', 'totalTackles', 'tacklesForLoss', 'passesDefended', 'stuffs'],
          'defensiveInterceptions': ['interceptions', 'interceptionTouchdowns'],
          'general': ['gamesPlayed', 'fumblesForced'], 'scoring': ['totalTouchdowns'],
-         'returning': ['kickReturnTouchdowns', 'puntReturnTouchdowns']}
+         'returning': ['kickReturnTouchdowns', 'puntReturnTouchdowns'],
+         'kicking': ['fieldGoalsMade', 'fieldGoalAttempts', 'fieldGoalPct', 'longFieldGoalMade', 'fieldGoalsMade50',
+                     'fieldGoalAttempts50', 'extraPointsMade'],
+         'punting': ['punts', 'grossAvgPuntYards', 'netAvgPuntYards', 'puntsInside20']}
 
 
 def get(url, fn=None, tries=4):
@@ -51,11 +62,11 @@ def get(url, fn=None, tries=4):
 
 def leaders(lg, season, stype=2):
     ids = {}
-    for cat, sort, n in SORTS:
+    for cat, sort, n in SORTS + (CFB_DEEP if lg == 'cfb' else []):
         u = ('https://site.web.api.espn.com/apis/common/v3/sports/football/%s/statistics/byathlete?region=us&lang=en'
              '&contentorigin=espn&isqualified=false&page=1&limit=%d&season=%d&seasontype=%d&category=%s&sort=%s:desc'
              % (LEAGUE[lg], n, season, stype, cat, sort))
-        d = get(u, f'{lg}/lead_{season}_{sort}.json')
+        d = get(u, f'{lg}/lead_{season}_{sort}_{n}.json')
         for a in d.get('athletes', []):
             x = a['athlete']
             ids.setdefault(x['id'], {'id': x['id'], 'n': x['displayName'], 'tid': x.get('teamId'),
@@ -214,7 +225,7 @@ def fix_teams(lg, pool, workers=8):
     return pool
 
 
-POOL = os.path.join(ROOT, 'scripts', '.cache', 'awards', '%s_pool2.json')
+POOL = os.path.join(ROOT, 'scripts', '.cache', 'awards', '%s_pool3.json')       # pull(): cfb with CFB_DEEP
 DEF_POS = {'DE', 'DT', 'NT', 'LB', 'ILB', 'OLB', 'MLB', 'CB', 'S', 'FS', 'SS', 'DB', 'DL', 'EDGE'}
 HEIS_COLS = ['yds', 'td', 'int', 'wp', 'qb', 'def', 'prev_top5']
 NULL_COLS = ['yds', 'td']
@@ -240,7 +251,14 @@ def features(v):
             'int': g('pass.interceptions'), 'sacks': g('defe.sacks'), 'dint': g('defe.interceptions'),
             'tackles': g('defe.totalTackles'), 'tfl': g('defe.tacklesForLoss'), 'pd': g('defe.passesDefended'),
             'ff': g('gene.fumblesForced'), 'wp': rec.get('wp', .5), 'w': rec.get('w', 0), 'l': rec.get('l', 0),
-            'qb': 1.0 if pos == 'QB' else 0.0, 'def': 1.0 if d else 0.0, 'debut': v.get('debut')}
+            'qb': 1.0 if pos == 'QB' else 0.0, 'def': 1.0 if d else 0.0, 'debut': v.get('debut'),
+            'ptd': ptd, 'rtd': rtd, 'ctd': ctd, 'rush_y': ry, 'rec_y': cy, 'rec': g('rece.receptions'),
+            'ypa': py / g('pass.passingAttempts') if g('pass.passingAttempts') >= 50 else 0.0,
+            'ypc': ry / g('rush.rushingAttempts') if g('rush.rushingAttempts') >= 50 else 0.0,
+            'itd': g('defe.interceptionTouchdowns'), 'fgm': g('kick.fieldGoalsMade'), 'fga': g('kick.fieldGoalAttempts'),
+            'fgpct': g('kick.fieldGoalsMade') / g('kick.fieldGoalAttempts') if g('kick.fieldGoalAttempts') else 0.0,
+            'fg50': g('kick.fieldGoalsMade50'), 'long': g('kick.longFieldGoalMade'), 'punts': g('punt.punts'),
+            'gross': g('punt.grossAvgPuntYards'), 'net': g('punt.netAvgPuntYards'), 'in20': g('punt.puntsInside20')}
 
 
 def _order(pool, names):
@@ -251,6 +269,68 @@ def _order(pool, names):
         if r is not None and pool.index(r) not in out: out.append(pool.index(r))
         elif r is None: out.append(None)
     return out
+
+
+LB_POS, DB_POS = {'LB', 'ILB', 'OLB', 'MLB'}, {'CB', 'S', 'FS', 'SS', 'DB'}
+# the other major CFB awards: (Wikipedia page, label, pool, pre-registered voter features, null)
+CFB_AWARDS = {
+    'maxwell': ('Maxwell_Award', 'Maxwell', lambda r: True, HEIS_COLS, NULL_COLS),
+    'camp': ('Walter_Camp_Award', 'Walter Camp', lambda r: True, HEIS_COLS, NULL_COLS),
+    'obrien': ("Davey_O%27Brien_Award", "O'Brien", lambda r: r['pos'] == 'QB' and r['pass_y'] >= 1000,
+               ['pass_y', 'ptd', 'int', 'ypa', 'rush_y', 'wp'], ['pass_y', 'ptd']),
+    'doak': ('Doak_Walker_Award', 'Doak Walker', lambda r: r['pos'] in ('RB', 'FB') and r['rush_y'] >= 300,
+             ['rush_y', 'rtd', 'ypc', 'scrim', 'wp'], ['rush_y', 'rtd']),
+    'bilet': ('Fred_Biletnikoff_Award', 'Biletnikoff', lambda r: r['pos'] not in ('QB', 'RB', 'FB') and r['rec_y'] >= 300,
+              ['rec_y', 'ctd', 'rec', 'wp'], ['rec_y', 'ctd']),
+    'mackey': ('John_Mackey_Award', 'Mackey', lambda r: r['pos'] == 'TE' and r['rec_y'] >= 100,
+               ['rec_y', 'ctd', 'rec', 'wp'], ['rec_y', 'ctd']),
+    'bednarik': ('Chuck_Bednarik_Award', 'Bednarik', lambda r: r['def'] > 0,
+                 ['sacks', 'dint', 'tfl', 'pd', 'tackles', 'ff', 'wp'], ['sacks', 'dint']),
+    'nagurski': ('Bronko_Nagurski_Trophy', 'Nagurski', lambda r: r['def'] > 0,
+                 ['sacks', 'dint', 'tfl', 'pd', 'tackles', 'ff', 'wp'], ['sacks', 'dint']),
+    'butkus': ('Butkus_Award', 'Butkus', lambda r: r['pos'] in LB_POS,
+               ['tackles', 'tfl', 'sacks', 'dint', 'pd', 'wp'], ['tackles', 'sacks']),
+    'thorpe': ('Jim_Thorpe_Award', 'Thorpe', lambda r: r['pos'] in DB_POS,
+               ['dint', 'pd', 'tackles', 'itd', 'wp'], ['dint', 'pd']),
+    'groza': ('Lou_Groza_Award', 'Groza', lambda r: r['fga'] >= 8, ['fgm', 'fgpct', 'fg50', 'long', 'wp'], ['fgm', 'fgpct']),
+    'guy': ('Ray_Guy_Award', 'Ray Guy', lambda r: r['punts'] >= 20, ['gross', 'net', 'in20', 'punts'], ['gross']),
+}
+
+
+def award_winners(page):
+    """{season: winner} from an award's Wikipedia page: the table with the most seasons since 2005 (the college award;
+    some pages also list a high-school or older award)"""
+    best = {}
+    for t in re.findall(r'<table class="wikitable.*?</table>', wiki(page), re.S):
+        out = {}
+        for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', t, re.S):
+            c = cells(tr)
+            if c and re.match(r'^(19|20)\d\d$', c[0]) and len(c) > 1 and int(c[0]) not in out:
+                n = re.sub(r'\[.*?\]|\(\d+\)|[*†‡^+§#]', '', c[1]).strip()
+                if n and not re.match(r'^\d', n): out[int(c[0])] = n
+        if sum(y >= 2005 for y in out) > sum(y >= 2005 for y in best): best = out
+    return best
+
+
+def cfb_award_races():
+    P = json.load(open(POOL % 'cfb'))
+    W = {a: award_winners(v[0]) for a, v in CFB_AWARDS.items()}
+    races = {a: [] for a in CFB_AWARDS}
+    for s in sorted(P, key=int):
+        S = int(s)
+        rows = [features(v) for v in P[s].values()]
+        for a, (_, _, f, _, _) in CFB_AWARDS.items():
+            pool = [r for r in rows if f(r)]
+            if a in ('maxwell', 'camp'):
+                pool = [r for r in pool if r['yds'] >= 500 or r['tackles'] >= 40 or r['sacks'] >= 6 or r['dint'] >= 4]
+            for r in pool: r.setdefault('prev_top5', 0.0)
+            w = W[a].get(S)
+            o = _order(pool, [w]) if w else []
+            if not o or o[0] is None:
+                if w: print('cfb', S, a, 'winner outside pool', w)
+                races[a].append((S, pool, [])); continue
+            races[a].append((S, pool, o[:1]))
+    return races
 
 
 def cfb_races():

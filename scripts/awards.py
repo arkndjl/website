@@ -433,6 +433,9 @@ def football_draw(teams, per_left, sport):
             mu = rate * gr
             sdv = math.sqrt(max(mu, 0)) if kind == 'count' else .3 * mu
             f[k] = c['f'][k] + max(gauss(rng, mu, sdv), 0)
+        if 'rush_y' in f and 'rush_y' in dict(per_left): f['scrim'] = f['rush_y'] + f['rec_y']
+        if 'ptd' in f and 'ptd' in dict(per_left):
+            f['td'] = c['f']['td'] + sum(f[k] - c['f'][k] for k in ('ptd', 'rtd', 'ctd'))
         if 'yds' in f and 'pass_y' in f: f['yds'] = f['pass_y'] + f['scrim']
         f['wp'] = td[c['tid']]
         return f
@@ -440,13 +443,32 @@ def football_draw(teams, per_left, sport):
     return draw
 
 
+CFB_SHOW = {
+    'heisman': [('yds', 'YDS', '%.0f'), ('td', 'TD', '%.0f'), ('int', 'INT', '%.0f'), ('wp', 'W%', 'pct')],
+    'obrien': [('pass_y', 'YDS', '%.0f'), ('ptd', 'TD', '%.0f'), ('int', 'INT', '%.0f'), ('wp', 'W%', 'pct')],
+    'doak': [('rush_y', 'YDS', '%.0f'), ('rtd', 'TD', '%.0f'), ('ypc', 'YPC', '%.1f'), ('wp', 'W%', 'pct')],
+    'bilet': [('rec_y', 'YDS', '%.0f'), ('rec', 'REC', '%.0f'), ('ctd', 'TD', '%.0f'), ('wp', 'W%', 'pct')],
+    'bednarik': [('sacks', 'SACK', '%.1f'), ('tfl', 'TFL', '%.1f'), ('dint', 'INT', '%.0f'), ('tackles', 'TKL', '%.0f')],
+    'butkus': [('tackles', 'TKL', '%.0f'), ('tfl', 'TFL', '%.1f'), ('sacks', 'SACK', '%.1f'), ('dint', 'INT', '%.0f')],
+    'thorpe': [('dint', 'INT', '%.0f'), ('pd', 'PD', '%.0f'), ('tackles', 'TKL', '%.0f'), ('wp', 'W%', 'pct')],
+    'groza': [('fgm', 'FGM', '%.0f'), ('fgpct', 'FG%', 'pct'), ('long', 'LNG', '%.0f'), ('wp', 'W%', 'pct')],
+    'guy': [('gross', 'AVG', '%.1f'), ('net', 'NET', '%.1f'), ('in20', 'IN20', '%.0f'), ('punts', 'PUNTS', '%.0f')]}
+for _a, _b in (('maxwell', 'heisman'), ('camp', 'heisman'), ('mackey', 'bilet'), ('nagurski', 'bednarik')):
+    CFB_SHOW[_a] = CFB_SHOW[_b]
+CFB_LEFT = [('pass_y', 'yds'), ('rush_y', 'yds'), ('rec_y', 'yds'), ('ptd', 'count'), ('rtd', 'count'), ('ctd', 'count'),
+            ('int', 'count'), ('rec', 'count'), ('sacks', 'count'), ('dint', 'count'), ('tackles', 'yds'),
+            ('tfl', 'count'), ('pd', 'count'), ('ff', 'count'), ('itd', 'count'), ('fgm', 'count'), ('fga', 'count'),
+            ('fg50', 'count'), ('punts', 'count'), ('in20', 'count')]
+
+
 def cfb(fit, rng):
+    """the Heisman and every other modelled CFB award that passed its held-out test"""
     import awards_football as F
     M = jload(os.path.join(ROOT, 'data', 'cfb_model.json'), {})
     if not M.get('sim'): return None
     S = int(str(M.get('asof', dt.date.today().isoformat()))[:4])
-    spec = fit.get('heisman')
-    if not spec or not spec['test'].get('pass'): return None
+    keys = [a for a in ['heisman'] + list(F.CFB_AWARDS) if fit.get(a, {}).get('test', {}).get('pass')]
+    if not keys: return None
     teams, logos = {}, {}
     for t in M['sim']:
         w, l = (int(x) for x in t['rec'].split('-')[:2])
@@ -459,16 +481,28 @@ def cfb(fit, rng):
     for v in pool.values():
         f = F.features(v)
         if f['tid'] not in teams: continue
-        if not (f['yds'] >= 300 or f['tackles'] >= 25 or f['sacks'] >= 4 or f['dint'] >= 3): continue
         f['prev_top5'] = 1.0 if NM.key(f['n']) in top5 else 0.0
         nm, logo = logos[f['tid']]
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': nm, 'logo': logo, 'pos': f['pos'], 'ph': v['id'], 'f': f})
-    draw = football_draw(teams, [('pass_y', 'yds'), ('scrim', 'yds'), ('td', 'count'), ('int', 'count'),
-                                 ('sacks', 'count'), ('dint', 'count'), ('tackles', 'yds')], 'cfb')
-    pool = prune(cands, spec, draw, rng)
-    p = race(pool, spec, draw, rng)
-    show = [('yds', 'YDS', '%.0f'), ('td', 'TD', '%.0f'), ('int', 'INT', '%.0f'), ('wp', 'W%', 'pct')]
-    return {'season': str(S), 'races': [('heisman', rows_out(pool, p, draw, show, rng), show)], 'logo': 'cfb'}
+    for c in cands:                      # the pool rules use season-end thresholds: test them on full-season pace
+        w, g, _, _, G = teams[c['tid']]
+        k = G / max(g, 1)
+        c['pf'] = dict(c['f'], **{x: c['f'][x] * k for x, _ in CFB_LEFT}, yds=c['f']['yds'] * k)
+    draw = football_draw(teams, CFB_LEFT, 'cfb')
+    big = lambda f: f['yds'] >= 300 or f['tackles'] >= 25 or f['sacks'] >= 4 or f['dint'] >= 3
+    races = []
+    for a in keys:
+        spec = fit[a]
+        if a == 'heisman': ok = big
+        else:
+            elig = F.CFB_AWARDS[a][2]
+            ok = (lambda f, e=elig: e(f) and big(f)) if a in ('maxwell', 'camp') else elig
+        sub = [c for c in cands if ok(c['pf'])]
+        if not sub: continue
+        sub = prune(sub, spec, draw, rng)
+        p = race(sub, spec, draw, rng)
+        races.append((a, rows_out(sub, p, draw, CFB_SHOW[a], rng), CFB_SHOW[a]))
+    return {'season': str(S), 'races': races, 'logo': 'cfb'}
 
 
 def nfl(fit, rng):
@@ -521,7 +555,9 @@ def nfl(fit, rng):
 # ---------------------------------------------------------------- output
 
 NULL_LABEL = {'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gsax': 'GSAx', 'bpm': 'BPM', 'yds': 'yards',
-              'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs'}
+              'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
+              'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
+              'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs'}
 BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl}
 
 
