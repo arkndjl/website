@@ -1,0 +1,79 @@
+# Rebuilds the SOCCER ARKBOARD's national-team views (scripts/soccer_intl.py: data/soccer_intl.json): the world
+# ranking, the next ten days' internationals and the UEFA Nations League odds, from martj42's international results,
+# ESPN's scores and fixtures and Novig's prices, and commits them; the push triggers the Cloudflare build. Twice a day,
+# by hand from the Actions tab, and after each esea season / cfb board run (those schedules do fire) whenever
+# data/soccer_intl.json is 6+ hours old. Also grows the book's open/close archive (--odds) and, once a month,
+# refreshes squad values from the Transfermarkt dump (--sq). The model: `python3 scripts/soccer_intl.py --fit`.
+name: soccer intl
+
+on:
+  schedule:
+    - cron: "40 9 * * *"
+    - cron: "40 21 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["esea season", "cfb board"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: soccer-intl
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/soccer_intl.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          now = dt.datetime.now(dt.timezone.utc)
+          try:
+              asof = dt.datetime.fromisoformat(json.load(open('data/soccer_intl.json'))['asof'].replace('Z', '+00:00'))
+          except Exception:
+              asof = now - dt.timedelta(days=1)
+          print('go=' + str(now - asof >= dt.timedelta(hours=6)).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
+      # ESPN's finished calendar years never change; martj42's files are refetched every 12 hours
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/soccer
+          key: soccer-intl-${{ github.run_id }}
+          restore-keys: soccer-intl-
+      - name: Squad values (Transfermarkt dump, the 2nd of each month)
+        continue-on-error: true
+        run: |
+          if [ "$(date -u +%d)" = "02" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            pip install -q pandas && python3 scripts/soccer_intl.py --sq
+            rm -f scripts/.cache/soccer/intl/tm.zip
+          fi
+      - name: Book open/close archive
+        continue-on-error: true
+        run: python3 scripts/soccer_intl.py --odds
+      - name: Ratings, matches and Nations League odds
+        run: python3 scripts/soccer_intl.py
+      - name: Commit if anything changed
+        run: |
+          files="data/soccer_intl.json scripts/data/soccer_intl_odds.json.gz scripts/data/soccer_intl_sq.json.gz scripts/data/soccer_intl_map.json static/img/flags"
+          python3 scripts/data_push.py -m "Update the national-team soccer views ($(date -u +%Y-%m-%d))" -- $files
