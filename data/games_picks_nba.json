@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-14T20:45:11Z",
+ "asof": "2026-11-14T20:47:14Z",
  "recenter": {
   "2026-11-14": 1.7
  },
@@ -270,9 +270,9 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": -117.0,
-    "ev": 0.132,
-    "units": 1.5
+    "price": -120.0,
+    "ev": 0.119,
+    "units": 1.0
    }
   },
   {
@@ -391,9 +391,9 @@
     "mk": "spread",
     "side": "away",
     "line": 15.5,
-    "price": 102.0,
-    "ev": 0.109,
-    "units": 0.75
+    "price": 104.0,
+    "ev": 0.118,
+    "units": 1.0
    }
   },
   {
@@ -498,13 +498,13 @@
    "state": "under"
   },
   "401909983": {
-   "mk": "ml",
+   "mk": "spread",
    "side": "home",
-   "line": null,
-   "price": -117.0,
-   "ev": 0.132,
+   "line": 1.5,
+   "price": -104.0,
+   "ev": 0.13,
    "edge": 4.8,
-   "units": 1.5,
+   "units": 1.0,
    "home": "MEM",
    "away": "BKN",
    "state": "pick"
@@ -513,10 +513,10 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": 102.0,
-   "ev": 0.109,
+   "price": 104.0,
+   "ev": 0.118,
    "edge": 3.7,
-   "units": 0.75,
+   "units": 1.0,
    "home": "MIN",
    "away": "CHI",
    "state": "pick"
@@ -574,7 +574,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4135,
+  "snapshots": 4139,
   "buckets": [
    {
     "when": "24h+",
@@ -587,21 +587,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 968,
+    "clvN": 969,
     "clvRet": -0.0183,
-    "clvT": -5.6,
+    "clvT": -5.62,
     "clv": 0.43,
-    "beat": 0.433,
-    "still": 0.406
+    "beat": 0.432,
+    "still": 0.407
    },
    {
     "when": "1-6h",
-    "clvN": 348,
-    "clvRet": -0.0538,
-    "clvT": -14.91,
+    "clvN": 351,
+    "clvRet": -0.0537,
+    "clvT": -14.99,
     "clv": -0.12,
-    "beat": 0.167,
-    "still": 0.687
+    "beat": 0.165,
+    "still": 0.689
    },
    {
     "when": "<1h",
@@ -6934,12 +6934,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-14T20:45:11Z",
+ "checked": "2026-11-14T20:47:14Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-14": {
-    "raw": 4.5,
+    "raw": 4.25,
     "scale": 1.0
    }
   }
