@@ -20,6 +20,7 @@ import names as NM
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 FIT = os.path.join(ROOT, 'data', 'awards_fit.json')
 OUT = os.path.join(ROOT, 'data', 'awards.json')
+TEMP = os.path.join(ROOT, 'data', 'awards_temp.json')
 SIMS = 3000
 SHOW = 20
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
@@ -93,6 +94,38 @@ def race(cands, spec, draw, rng, sims=SIMS):
     return [a / sims for a in acc]
 
 
+def race_k(cands, spec, draw, rng, k, sims=SIMS):
+    """a top-k race (k named): P(named) per candidate = the share of simulations in which he is in a Plackett-Luce
+    draw of k from the voter utilities of the simulated finish (the k largest of utility + Gumbel noise)"""
+    cols, b, mu, sd = spec['cols'], spec['b'], spec['mu'], spec['sd']
+    acc = [0] * len(cands)
+    for _ in range(sims):
+        td = draw.teams(rng)
+        z = []
+        for i, c in enumerate(cands):
+            f = draw(c, td, rng)
+            if f is None: continue
+            u = sum(bk * ((f[x] - m) / v) for bk, x, m, v in zip(b, cols, mu, sd))
+            z.append((u - math.log(-math.log(max(rng.random(), 1e-300))), i))
+        z.sort(reverse=True)
+        for _, i in z[:k]: acc[i] += 1
+    return [a / sims for a in acc]
+
+
+def temper(p, T):
+    """the in-season temperature: p_i ^ (1 / T), renormalised (scripts/awards_asof.py fits T's slope a sport)"""
+    if not T or abs(T - 1) < 1e-9: return p
+    q = [max(v, 1e-300) ** (1 / T) for v in p]
+    t = sum(q)
+    return [v / t for v in q]
+
+
+def season_T(sport, share):
+    """T = 1 + a x (1 - share of the season played); a = 0 where the as-of backtest did not pass"""
+    a = ((jload(TEMP, {}) or {}).get(sport) or {}).get('a') or 0.0
+    return 1 + a * (1 - min(max(share, 0.0), 1.0))
+
+
 def prune(cands, spec, draw, rng, keep=45):
     """the voter model at a few draws to drop candidates with no chance, so the full simulation runs on a short list"""
     p = race(cands, spec, draw, rng, sims=60)
@@ -100,9 +133,9 @@ def prune(cands, spec, draw, rng, keep=45):
     return [cands[i] for i in order[:keep] if p[i] > 1e-5 or i == order[0]]
 
 
-def rows_out(pool, p, draw, show, rng, n=200):
-    """the top SHOW candidates with their mean projected finish on the shown stats"""
-    top = sorted(zip(pool, p), key=lambda t: -t[1])[:SHOW]
+def rows_out(pool, p, draw, show, rng, n=200, top=SHOW):
+    """the top candidates with their mean projected finish on the shown stats"""
+    top = sorted(zip(pool, p), key=lambda t: -t[1])[:top]
     acc = {}
     for _ in range(n):
         td = draw.teams(rng)
@@ -180,6 +213,31 @@ def nba(fit, rng):
         t = E2B.get(p['t'], p['t'])
         teams[t] = (w, g, p['wins'], team_sd(82 - g, p['wins'] / 82, p.get('rsd', 3), .030), 82)
         conf[t] = p.get('cname')
+    cands = []
+    for pid, r in X.items():
+        p = pg.get(pid)
+        if not p or r['tm'] not in teams and '/' not in r['tm']: continue
+        tm = r['tm'].split('/')[-1]
+        if tm not in teams: continue
+        w, g, _, _, _ = teams[tm]
+        q = pg0.get(pid, {})
+        cands.append({'id': pid, 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'g': p['games'], 'tg': g, 'mp': r['mp'],
+                      'xpm': r['xpm'], 'dxpm': r['dxpm'], 'sx': r.get('sxpm', r['xpm']), 'sdx': r.get('sdxpm', r['dxpm']),
+                      'ppg': p['pts_per_g'], 'ppg0': q.get('pts_per_g'), 'rpg': p['trb_per_g'], 'rpg0': q.get('trb_per_g'),
+                      'apg': p['ast_per_g'], 'apg0': q.get('ast_per_g'), 'st': p['stl_per_g'] + p['blk_per_g'],
+                      'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
+                      'mpg': p['mp_per_g'], 'pos': r.get('pos', ''), 'rookie': pid not in seen})
+    out = []
+    T = season_T('nba', sum(v[1] for v in teams.values()) / max(82 * len(teams), 1))
+    for aw, pool, p, dm, show in nba_races(fit, rng, cands, teams, conf):
+        if aw == 'allnba': out.append((aw, rows_out(pool, p, dm, show, rng, top=30), show))
+        else: out.append((aw, rows_out(pool, temper(p, T), dm, show, rng), show))
+    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'nba', 'T': T}
+
+
+def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
+    """yields (award, pool, P(win), draw for the shown stats, shown stats) for each passing NBA award. cands: to-date
+    lines; teams: {t: (wins, games, mean final wins, sd, G)}; conf: {t: conference}; min_g: the games rule (0 = none)"""
     TAU, TAUD, K = 2.05, 0.95, 600
     prev = fit.get('_prev', {})
 
@@ -192,30 +250,15 @@ def nba(fit, rng):
         td['_seed1'] = {t for _, t in best.values()}
         return td
 
-    cands = []
-    for pid, r in X.items():
-        p = pg.get(pid)
-        if not p or r['tm'] not in teams and '/' not in r['tm']: continue
-        tm = r['tm'].split('/')[-1]
-        if tm not in teams: continue
-        w, g, _, _, _ = teams[tm]
-        q = pg0.get(pid, {})
-        cands.append({'id': pid, 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'g': p['games'], 'tg': g, 'mp': r['mp'],
-                      'xpm': r['xpm'], 'dxpm': r['dxpm'], 'sx': r.get('sxpm', r['xpm']), 'sdx': r.get('sdxpm', r['dxpm']),
-                      'ppg': p['pts_per_g'], 'ppg0': q.get('pts_per_g'), 'rpg': p['trb_per_g'], 'rpg0': q.get('trb_per_g'),
-                      'st': p['stl_per_g'] + p['blk_per_g'],
-                      'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
-                      'mpg': p['mp_per_g'], 'pos': r.get('pos', ''), 'rookie': pid not in seen})
-
     def blend(now, g, prior, g0=15):
         return (now * g + (.85 * now if prior is None else prior) * g0) / (g + g0)   # no last season: toward 85%
 
     def draw(c, td, rng, elig65=False):
-        left = 82 - c['tg']
+        left = max(G - c['tg'], 0)
         av = min((c['g'] + .9 * 8) / (c['tg'] + 8), 1.0)
         gr = games_left(rng, left, av, 'nba')
         gf = c['g'] + gr
-        if elig65 and gf < 65: return None
+        if elig65 and gf < min_g: return None
         mr = gr * c['mpg']
         mp = c['mp'] + mr
         if mp <= 0: return None
@@ -227,12 +270,13 @@ def nba(fit, rng):
         ppg = (c['ppg'] * c['g'] + pp_r * gr) / max(gf, 1)
         rp = (c['rpg'] * c['g'] + gauss(rng, blend(c['rpg'], c['g'], c['rpg0']), .8) * gr) / max(gf, 1)
         st = (c['st'] * c['g'] + gauss(rng, blend(c['st'], c['g'], c['st0']), .3) * gr) / max(gf, 1)
-        return {'vorx': .030 * (xpm + 1.4) * mp / 48, 'xpm': xpm, 'dxpm': dx, 'ppg': ppg, 'rpg': rp, 'stocks': st,
+        ap = (c['apg'] * c['g'] + blend(c['apg'], c['g'], c.get('apg0')) * gr) / max(gf, 1) if 'apg' in c else 0.0
+        return {'apg': ap, 'prev_allnba': prev.get('allnba', {}).get(c['id'], 0),
+                'vorx': .030 * (xpm + 1.4) * mp / 48, 'xpm': xpm, 'dxpm': dx, 'ppg': ppg, 'rpg': rp, 'stocks': st,
                 'mpg': mp / max(gf, 1), 'big': 1.0 if c['pos'] in ('C', 'PF') else 0.0, 'wp': td[c['tm']],
-                'seed1': 1.0 if c['tm'] in td['_seed1'] else 0.0, 'gfrac': gf / 82,
+                'seed1': 1.0 if c['tm'] in td['_seed1'] else 0.0, 'gfrac': gf / G,
                 'prev_mvp': prev.get('mvp', {}).get(c['id'], 0), 'prev_dpoy': prev.get('dpoy', {}).get(c['id'], 0)}
 
-    out = []
     for aw, pool_f, elig, show in (
             ('mvp', lambda c: c['mpg'] >= 20, True, [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]),
             ('dpoy', lambda c: c['mpg'] >= 20, True, [('dxpm', 'D-XPM', '%+.1f'), ('stocks', 'STL+BLK', '%.1f'), ('rpg', 'RPG', '%.1f'), ('wp', 'W%', 'pct')]),
@@ -243,11 +287,19 @@ def nba(fit, rng):
         dr = lambda c, td, rng, e=elig: draw(c, td, rng, e)
         dr.teams = teams_draw
         pool = prune(pool, spec, dr, rng)
-        p = race(pool, spec, dr, rng)
+        p = race(pool, spec, dr, rng, sims)
         dm = lambda c, td, rng: draw(c, td, rng, False)
         dm.teams = teams_draw
-        out.append((aw, rows_out(pool, p, dm, show, rng), show))
-    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'nba'}
+        yield aw, pool, p, dm, show
+    spec = fit.get('allnba')
+    if spec and spec['test'].get('pass'):
+        dr = lambda c, td, rng: draw(c, td, rng, True)
+        dr.teams = teams_draw
+        pool = prune([c for c in cands if c['mpg'] >= 20], spec, dr, rng, keep=60)
+        dm = lambda c, td, rng: draw(c, td, rng, False)
+        dm.teams = teams_draw
+        yield 'allnba', pool, race_k(pool, spec, dr, rng, spec.get('k', 15), sims), dm, [
+            ('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]
 
 
 # ---------------------------------------------------------------- NHL
@@ -267,7 +319,6 @@ def nhl(fit, rng):
     hist = {}
     for s in range(A.FIRST - 1, S):
         for r in A.war(s): hist.setdefault(NM.key(r['n']), []).append(r.get('gp') or 0)
-    prev = fit.get('_prev', {})
     TG = {t: v[1] / 2 for t, v in teams.items()}
     cands = []
     for r in cur:
@@ -286,8 +337,19 @@ def nhl(fit, rng):
                       'gsx0': (q.get('gsax') or 0) / max(q.get('toi') or 1, 1) * 60 if q.get('gp') else None,
                       'rookie': rookie, 'key': k})
 
+    out = []
+    T = season_T('nhl', sum(TG.values()) / max(82 * len(TG), 1))
+    for aw, pool, p, draw, show in nhl_races(fit, rng, cands, teams): out.append((aw, rows_out(pool, temper(p, T), draw, show, rng), show))
+    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'nhl', 'T': T}
+
+
+def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
+    """yields (award, pool, P(win), draw, shown stats) for each passing NHL award. cands: to-date lines; teams:
+    {t: (points, 2 x games, mean final points, sd, 2 x G)}"""
+    prev = fit.get('_prev', {})
+
     def draw(c, td, rng):
-        left = max(82 - c['tg'], 0)
+        left = max(G - c['tg'], 0)
         if c['grp'] == 'G':
             share = min((c['gp'] + .55 * 6) / (c['tg'] + 6), 1.0)  # starts so far, toward a 1A's share
         else:
@@ -308,7 +370,7 @@ def nhl(fit, rng):
         gs_rate = c['gsax'] / max(c['toi'], 1) * 60
         gs_rate = bl(gs_rate, c['gsx0'], 40) if c['gsx0'] is not None else gs_rate * c['gp'] / (c['gp'] + 40)
         gsax = c['gsax'] + gauss(rng, gs_rate * tr / 60, 1.4 * math.sqrt(max(tr / 60, 0)))   # 1.4 goals a game
-        return {'war': war, 'pts': pts, 'g': g, 'gsax': gsax, 'gp': gp, 'gfrac': gp / 82, 'toipg': tpg,
+        return {'war': war, 'pts': pts, 'g': g, 'gsax': gsax, 'gp': gp, 'gfrac': gp / G, 'toipg': tpg,
                 'tpct': td[c['tm']], 'goalie': 1.0 if c['grp'] == 'G' else 0.0, 'gd': c['gd'] * gp / max(c['gp'], 1),
                 'prev_hart': prev.get('hart', {}).get(c['key'], 0), 'prev_norris': prev.get('norris', {}).get(c['key'], 0),
                 'prev_vezina': prev.get('vezina', {}).get(c['key'], 0)}
@@ -320,7 +382,6 @@ def nhl(fit, rng):
         return out
 
     draw.teams = teams_draw
-    out = []
     for aw, pool_f, show in (
             ('hart', lambda c: c['gp'] >= 5, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('tpct', 'PTS%', 'pct')]),
             ('norris', lambda c: c['grp'] == 'D' and c['gp'] >= 5, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('toipg', 'TOI', 'toi'), ('tpct', 'PTS%', 'pct')]),
@@ -329,9 +390,8 @@ def nhl(fit, rng):
         spec = fit.get(aw)
         if not spec or not spec['test'].get('pass'): continue
         pool = prune([c for c in cands if pool_f(c)], spec, draw, rng)
-        p = race(pool, spec, draw, rng)
-        out.append((aw, rows_out(pool, p, draw, show, rng), show))
-    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'nhl'}
+        p = race(pool, spec, draw, rng, sims)
+        yield aw, pool, p, draw, show
 
 
 # ---------------------------------------------------------------- CBB
@@ -536,9 +596,50 @@ def nfl(fit, rng):
         wr = war.get(NM.key(f['n']), {})
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': tmap[f['tid']], 'pos': f['pos'], 'ph': v['id'],
                       'war': wr.get('war'), 'f': f})
+    out = []
+    T = season_T('nfl', sum(v[1] for v in teams.values()) / max(17 * len(teams), 1))
+    for aw, pl, p, draw, show in nfl_races(fit, rng, cands, teams): out.append((aw, rows_out(pl, temper(p, T), draw, show, rng), show))
+    try:
+        r = nfl_droy(fit, rng, teams, tmap, S)
+        if r: out.append((r[0], rows_out(r[1], temper(r[2], T), r[3], r[4], rng), r[4]))
+    except Exception as e:
+        print('nfl droy skipped:', e)
+    return {'season': str(S), 'races': out, 'logo': 'nfl', 'T': T}
+
+
+NFLV_TEAM = {'LA': 'LAR', 'WAS': 'WSH'}
+DROY_LEFT = [('sacks', 'count'), ('dint', 'count'), ('tfl', 'count'), ('pd', 'count'), ('ff', 'count'), ('tackles', 'yds'),
+             ('dtd', 'count')]
+
+
+def nfl_droy(fit, rng, teams, tmap, S, sims=SIMS):
+    """Defensive Rookie of the Year: the rookie defenders of nflverse's weekly lines (the ESPN leader lists hold a handful)"""
+    spec = fit.get('droy')
+    if not spec or not spec['test'].get('pass'): return None
+    import awards_nflverse as V
+    W = V.nfl_weekly(S, fresh=True)
+    if not W: return None
+    RK = V.rookies()
+    espn = {r['gsis_id']: r.get('espn_id') for r in V.nfl_file('players.csv', '')}
+    tid = {ab: t for t, ab in tmap.items()}
+    cands = []
+    for r in V.nfl_totals(W, 99, {k: v[0] for k, v in RK.items()}, S).values():
+        t = tid.get(NFLV_TEAM.get(r['tid'], r['tid']))
+        if not (r['rookie'] and r['def']) or t not in teams: continue
+        f = dict(r, tid=t, r1=1.0 if RK.get(r['id'], (0, None))[1] == 1 else 0.0)
+        cands.append({'id': r['id'], 'n': r['n'], 'tid': t, 'tm': tmap[t], 'pos': r['pos'], 'ph': espn.get(r['id']) or None, 'f': f})
+    if not cands: return None
+    draw = football_draw(teams, DROY_LEFT, 'nfl')
+    pool = prune(cands, spec, draw, rng)
+    return 'droy', pool, race(pool, spec, draw, rng, sims), draw, [
+        ('sacks', 'SCK', '%.1f'), ('tackles', 'TKL', '%.0f'), ('tfl', 'TFL', '%.0f'), ('dint', 'INT', '%.0f')]
+
+
+def nfl_races(fit, rng, cands, teams, sims=SIMS):
+    """yields (award, pool, P(win), draw, shown stats) for each passing NFL award. cands: to-date lines ('f' = features,
+    'tid' = team key); teams: {tid: (wins, games, mean final wins, sd, G)}"""
     draw = football_draw(teams, [('pass_y', 'yds'), ('scrim', 'yds'), ('td', 'count'), ('int', 'count'),
                                  ('sacks', 'count'), ('dint', 'count'), ('tfl', 'count'), ('pd', 'count'), ('ff', 'count')], 'nfl')
-    out = []
     for aw, pool_f, show in (
             ('mvp', lambda c: not c['f']['def'], [('yds', 'YDS', '%.0f'), ('td', 'TD', '%.0f'), ('int', 'INT', '%.0f'), ('wp', 'W%', 'pct')]),
             ('opoy', lambda c: not c['f']['def'], [('pass_y', 'PASS', '%.0f'), ('scrim', 'SCRIM', '%.0f'), ('td', 'TD', '%.0f'), ('wp', 'W%', 'pct')]),
@@ -547,9 +648,8 @@ def nfl(fit, rng):
         spec = fit.get(aw)
         if not spec or not spec['test'].get('pass'): continue
         pl = prune([c for c in cands if pool_f(c)], spec, draw, rng)
-        p = race(pl, spec, draw, rng)
-        out.append((aw, rows_out(pl, p, draw, show, rng), show))
-    return {'season': str(S), 'races': out, 'logo': 'nfl'}
+        p = race(pl, spec, draw, rng, sims)
+        yield aw, pl, p, draw, show
 
 
 # ---------------------------------------------------------------- output
@@ -585,10 +685,12 @@ def main(argv):
                                    'pw': t['model']['pw'], 'll': t['model']['ll'], 'll0': t['null']['ll'], 't': t['t'],
                                    'from': spec['seasons'][0], 'to': spec['seasons'][1],
                                    'null': [NULL_LABEL.get(c, c) for c in spec['null']]}})
+            if spec.get('k'): races[-1]['k'] = spec['k']
             top = rows[0] if rows else {}
             print(sp, spec['label'], 'top:', ', '.join(f"{r['n']} {r['p']:.0%}" + (f" (mkt {r['mkt']:.0%})" if 'mkt' in r else '') for r in rows[:5]))
         cur[sp] = {'season': res['season'], 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
                    'sims': SIMS, 'logo': res['logo'], 'races': races}
+        if abs(res.get('T', 1) - 1) > 1e-9: cur[sp]['temp'] = round(res['T'], 3)
     json.dump(cur, open(OUT, 'w'), indent=1, sort_keys=True)
     print('wrote', OUT)
 
