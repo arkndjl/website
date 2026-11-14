@@ -26,6 +26,7 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import names  # noqa: E402
+from tennis_data import is_qual  # noqa: E402
 
 CACHE = os.path.join(HERE, '.cache', 'tennis')
 PAGES = os.path.join(CACHE, 'ta_full')
@@ -132,7 +133,7 @@ def _stat(d, o=''):
 def _level(tour, raw, rnd):
     raw = (raw or '').strip()
     if raw == 'D': return 'D'
-    if raw in TOUR_RAW[tour]: return 'Q' if rnd.startswith('Q') else 'T'
+    if raw in TOUR_RAW[tour]: return 'Q' if is_qual(rnd) else 'T'
     return 'C' if raw == 'C' else 'S'          # as the archive files them: the ITF W75 / W100 events are 'S'
 
 
@@ -228,6 +229,8 @@ def refresh(bios, ranks, fetch=True, budget=BUDGET):
     """read the stalest pool pages inside the budget, merge their matches into the store; returns (rows, new bios).
     bios (our id -> dict(n, ioc, dob, ...)) gains the players only Tennis Abstract knows; ranks: {tour: {name: rank}}"""
     rows, tb = load()
+    # a tour quarterfinal is a main-draw match (left to the feed), never a qualifying row
+    rows = {k: r for k, r in rows.items() if not (r[2] == 'Q' and not is_qual(r[4]))}
     for pid, b in tb.items(): bios.setdefault(pid, b)
     t0, got, seen = time.time(), 0, 0
     for tour in ('wta', 'atp'):                    # the WTA pages are static files, the ATP ones a CGI: quick ones first

@@ -1070,18 +1070,21 @@
       "Voter model: rank-ordered logit on each season's pool (P(1st) = softmax of features, then 2nd among the rest, 3 places deep where vote order is public; winner only for CBB and NFL). L2 1, features standardized.",
       "Features: the board's value metric + box stats + team success + narrative (prior wins, games played, position). NBA MVP: VORX, XPM, PPG, W%, 1 seed, games, prior MVPs. NHL Hart: WAR, points, goals, team points %, games, goalie, prior Harts. Heisman, Maxwell, Walter Camp: yards, TDs, INTs, W%, QB, defender, last year's top 5. O'Brien: pass yards, TDs, INTs, YPA, rush yards, W%. Ray Guy: gross, net, inside 20, punts. Wooden: BPM, PPG, W%, barthag, minutes, power conference.",
       "Test: leave one season out, log P(actual winner) vs the value metric alone (NBA VORX / D-XPM, NHL WAR / GSAx, CBB BPM; football yards + TDs). Ships when the paired t passes Holm at .05 across the sport's awards and the model wins most seasons.",
-      "Held out: NBA MVP 13/17 winners picked (VORX alone 9), DPOY 7/17, ROY 12/15; NHL Hart 8/17 (WAR 4), Norris 8/17, Vezina 10/17, Calder 7/15; Wooden 11/19 (BPM 2); Heisman 7/21 (box 5); NFL MVP 14/21, OPOY 11/21, OROY 10/21. NFL DPOY failed (t .8): not shown. DROY not modelled (pool too thin).",
+      "Held out: NBA MVP 13/17 winners picked (VORX alone 9), DPOY 7/17, ROY 12/15; NHL Hart 8/17 (WAR 4), Norris 8/17, Vezina 10/17, Calder 7/15; Wooden 11/19 (BPM 2); Heisman 7/21 (box 5); NFL MVP 14/21, OPOY 11/21, OROY 10/21. NFL DPOY failed (t .8): not shown.",
       "Other CFB awards, winner only, 2005-25, null = the award's two headline stats: Maxwell 6/21 (t 5.1), Walter Camp 5/21 (t 4.0), O'Brien 12/20 (pass yards + TDs 5, t 6.6), Ray Guy 10/20 (gross average 8, t 5.7) ship. Failed Holm over 13 CFB awards: Doak Walker (t .1), Biletnikoff (.9), Mackey (1.6), Bednarik (2.5), Nagurski (2.0), Butkus (2.7), Thorpe (.5), Groza (1.4). Not modelled: Outland, Lombardi, Rimington (no lineman box stats), Broyles and coach of the year.",
-      "Simulation: 3,000 rests of the season. Team finish from the board's season odds; player rates toward last season (NBA shrunk XPM, NHL pWAR a minute, CBB BPM by 300 minutes), Poisson injuries with lognormal length; NBA 65-game rule for MVP and DPOY. In-season odds are not backtested (no free in-season history): only the end-of-season voter model is.",
+      "Added Nov 14 2026, same gate: NFL DROY (rookie defenders from nflverse weekly lines; sacks, INTs, TFL, PDs, FF, tackles, TDs, W%, first-round pick) 12/21 winners (sacks + INTs alone 7, t 4.0). All-NBA as a top-15 race (the logit run down the 15 slots; VORX, XPM, PPG, RPG, APG, W%, games, prior All-NBA teams): 203 of 255 named in its top 15 (VORX alone 190, t 5.3); P(team) = share of simulations in which he is in a Plackett-Luce draw of 15. Ballon d'Or (award years 2015-26, big-five players, top 150 by GAR; GAR, goals + assists, league title, Champions League won / final, World Cup / Euro / Copa America won, prior wins): 8/11 winners (GAR alone 2, t 4.0); league and Champions League winners are drawn from the season odds. AP All-Pro not modelled.",
+      "Simulation: 3,000 rests of the season. Team finish from the board's season odds; player rates toward last season (NBA shrunk XPM, NHL pWAR a minute, CBB BPM by 300 minutes), Poisson injuries with lognormal length; NBA 65-game rule for MVP and DPOY.",
+      "In-season backtest (scripts/awards_asof.py): to-date lines rebuilt at 25 / 50 / 75% of each past season and run through the same simulation, voter model refit without that season. NFL 2005-25 from nflverse weekly; NHL 2010-11 on from the stats API by date and the goalie archive; NBA 2012-13 on from archived box lines; WAR and XPM stand in as box-stat estimates (they exist only as season files). Favourite's P vs hit rate at 25 / 50 / 75%: NBA .43 / .56 / .59 vs .38 / .40 / .48; NHL .41 / .44 / .50 vs .22 / .37 / .44; NFL .41 / .47 / .49 vs .25 / .30 / .38. A temperature by season share (p^(1/T), T = 1 + a x share left, a fit leaving a season out) did not pass on log loss: NBA a 0 (t 0), NHL a .5 (t -1.3), NFL a .5 (t -.2). Not applied. CFB and CBB not backtested (no by-date source for the inputs).",
       "Mkt: Polymarket mid of a two-sided quote, no vig, display only. Failed for the Heisman vs the shipped model: position-relative yards (t .6), passing and scrimmage yards and TDs split (t 1.0), plus a two-way term (t .9)."
      ],
-     "where": "awards tab: NBA, NHL, NFL, CFB, CBB",
+     "where": "awards tab: NBA, NHL, NFL, CFB, CBB, soccer",
      "sports": [
       "NBA",
       "NHL",
       "NFL",
       "CFB",
-      "CBB"
+      "CBB",
+      "Soccer"
      ]
     }
    ]
@@ -1200,6 +1203,7 @@
      "body": [
       "Attack and defence in log goals per nation, learned match by match from every full international since 1872 (martj42, ESPN); learning rate x tournament weight (World Cup, continental finals, qualifiers, Nations Leagues, friendlies, other), faster for new nations, goals capped at 7; home edge learned (none at neutral venues).",
       "Each side's log expected goals also moves by 0.124 x half the gap in log top-23 Transfermarkt value (players by national team, else first citizenship), held out 2016+ 0.8618 -> 0.8595 log loss (t -5.9).",
+      "Called-up squads: when both sides have one on record (Transfermarkt matchday squads, lineup and bench, of the nation's matches in the 12 days before, else of its last match inside 400 days; never the match's own), the squad term is 0.24 x half the gap in log top-18 value of those squads + 0.04 x half the top-23 gap. Pre-registered, set on 2000-15 (t -2.7), one pass on 2016 to Jul 2026: 0.8590 -> 0.8568 over 9,734 matches (6,076 with both squads; t -3.1 by match day). The match's own squad would give 0.8554.",
       "Beats World Football Elo (K by tournament, goal multiplier, ordered logit) held out: 0.8595 vs 0.8750 (t -8.3)."
      ],
      "where": "world ranking tab, Soccer page",
@@ -1402,12 +1406,17 @@
       "Hall of Fame AUC: Score 0.89 vs raw wins 0.90 (CFB); 0.88 vs 0.83 (CBB).",
       "Movers (old-job WAx rate vs new job, 3+ seasons each): CFB r 0.14 (n 373, t 2.69); CBB r 0.20 (n 754, t 5.51).",
       "Walk-forward from 2010: shrunk WAx predicts the next 10 seasons' WAx at r 0.19 CFB / 0.37 CBB (win% 0.19 / 0.12); Score per season predicts next-10 title equity at r 0.40 / 0.60 (win% 0.09 / 0.43).",
-      "Stability: top-100 rank correlation across expectation settings (decay 3-12, shrink 1-3, no skip) 0.97+ CFB, 0.98+ CBB; odd/even-season WAx split-half 0.75 / 0.82."
+      "Stability: top-100 rank correlation across expectation settings (decay 3-12, shrink 1-3, no skip) 0.97+ CFB, 0.98+ CBB; odd/even-season WAx split-half 0.75 / 0.82.",
+      "NBA / NHL: the same method on Sports Reference SRS (NBA points, NHL goals), an 82-game season, the franchise as the program (one id through relocations), league title = national title, a place in the Finals / Stanley Cup Final = conference title; a coach replaced in season gets his share of the games. Seasons with an SRS on file: 1947-2026 / 1922-2026.",
+      "NBA / NHL replacement level 8.61 / 5.04 wins a season; Score = cWAR + 166 / 39 a title + 0.0 / 3.2 a Finals appearance. Hall of Fame label: NBA the Naismith Coach category (17/45); NHL the Hockey Hall of Fame Builder category (11/29; that Hall has no coach class, and coaches inducted as players are left out of the fit).",
+      "NBA / NHL tests: Hall of Fame AUC Score 0.96 / 0.89 vs raw wins 0.85 / 0.66; movers r 0.17 (n 100, t 1.75) / 0.15 (n 89, t 1.4); walk-forward from 2010: shrunk WAx to next-10 WAx r -0.07 / -0.14 (win% 0.03 / -0.11), Score per season to next-10 title equity r 0.52 / -0.12 (win% 0.36 / 0.02); split-half 0.74 / 0.86."
      ],
-     "where": "all-time coaches tab on the CFB and CBB pages (market group)",
+     "where": "all-time coaches tab on the CFB and CBB pages (market group) and the NBA and NHL pages (teams group)",
      "sports": [
       "CFB",
-      "CBB"
+      "CBB",
+      "NBA",
+      "NHL"
      ]
     },
     {

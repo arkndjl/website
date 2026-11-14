@@ -5,21 +5,27 @@
 
     python3 scripts/soccer_intl.py            # ratings, ARK Ranking, upcoming matches, Nations League odds
     python3 scripts/soccer_intl.py --sq       # squad values by nation from the Transfermarkt dump -> scripts/data/soccer_intl_sq.json.gz
+    python3 scripts/soccer_intl.py --squads   # every nation's matchday squads this year from Transfermarkt -> scripts/data/soccer_intl_squads.json.gz
     python3 scripts/soccer_intl.py --odds     # DraftKings open/close 1X2 and totals for ESPN's international matches -> scripts/data/soccer_intl_odds.json.gz
     python3 scripts/soccer_intl.py --fit      # tune on 2000-15, walk forward 2016+, score against the close, test picks
 
 Data (free): every full international since 1872 with its tournament and neutral flag (github.com/martj42/
 international_results, results.csv and shootouts.csv), ESPN's scoreboards for the international competitions
 (recent results the file hasn't reached yet, fixtures, extra time, and DraftKings' opening and closing prices through
-ESPN's core API from mid-2024), Transfermarkt's market value history (dcaribou/transfermarkt-datasets) for squad values.
+ESPN's core API from mid-2024), Transfermarkt's market value history (dcaribou/transfermarkt-datasets) for squad values,
+Transfermarkt's match pages (its JSON API) for the squad each nation actually called up.
 
 Ratings: every nation has an attack and a defence (log goals a match). Expected goals for the home side
     log lambda_h = m + H/2 (not at a neutral venue) + a_h - d_a + sq x (q_h - q_a) / 2
-with q the log of the nation's top-23 Transfermarkt values on the day. After each match both terms move by
+with q the log of the nation's top-23 Transfermarkt values on the day. When both sides have a called-up squad on
+record (the matchday squads, lineup and bench, of the nation's matches in the 12 days before, else of its last match
+inside 400 days: never the match's own), the squad term is sqc x (c_h - c_a) / 2 + sqr x (q_h - q_a) / 2 instead, c
+the log of the top 18 values in that squad. After each match both terms move by
 k x w(tournament) x (goals - lambda) (goals capped), new nations learn faster, and ratings drift back toward zero
 between matches. 1X2 from a Dixon-Coles score matrix. An Elo rating (World Football Elo's K and goal multiplier) is
 kept beside it as the comparison model. Settings are tuned on 2000-15 walk-forward log loss and scored once on 2016+.
 """
+import bisect
 import csv
 import datetime as dt
 import gzip
@@ -28,6 +34,8 @@ import json
 import math
 import os
 import sys
+import time
+import urllib.error
 import urllib.request
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
@@ -43,6 +51,9 @@ CACHE = os.path.join(HERE, '.cache', 'soccer', 'intl')
 OUT = os.path.join(ROOT, 'data', 'soccer_intl.json')
 FIT = os.path.join(ROOT, 'data', 'soccer_intl_fit.json')
 SQF = os.path.join(HERE, 'data', 'soccer_intl_sq.json.gz')
+CUF = os.path.join(HERE, 'data', 'soccer_intl_squads.json.gz')
+TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
+TM_UA = 'arkndjl.net-arkboard/1.0 (https://arkndjl.net)'
 ODDSF = os.path.join(HERE, 'data', 'soccer_intl_odds.json.gz')
 MAPF = os.path.join(HERE, 'data', 'soccer_intl_map.json')
 MJ = 'https://raw.githubusercontent.com/martj42/international_results/master'
@@ -419,6 +430,166 @@ def sq_of(team, day):
     return math.log1p(x)
 
 
+# ---------------------------------------------------------------- call-up squads (Transfermarkt matchday squads)
+CU_WINDOW, CU_STALE, CU_MIN, CU_TOP = 12, 400, 14, 18
+_CU = None
+
+
+def tm_api(path, tries=3):
+    """Transfermarkt's JSON API: the 'data' block, {} for a 404, None when it can't be read"""
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(TMAPI + path, headers={'User-Agent': TM_UA, 'Accept': 'application/json'})
+            with urllib.request.urlopen(req, timeout=40) as r:
+                return (json.loads(r.read()) or {}).get('data') or {}
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return {}
+        except Exception:
+            pass
+        time.sleep(1 + 2 * i)
+    return None
+
+
+def callups():
+    """{'tm': Transfermarkt national team id -> nation, 'sq': nation -> [[day, game id, opponent, [player id, value
+    in EUR thousands (0: none), ...]], ...] in time order}: every matchday squad (lineup + bench) on record. A match
+    whose page lists no squad keeps an empty list"""
+    global _CU
+    if _CU is None:
+        _CU = {'tm': {}, 'sq': {}}
+        if os.path.exists(CUF):
+            _CU = json.load(gzip.open(CUF, 'rt'))
+        _CU['days'] = {t: [x[0] for x in v] for t, v in _CU['sq'].items()}
+    return _CU
+
+
+def save_callups(C):
+    for v in C['sq'].values():
+        v.sort(key=lambda x: (x[0], int(x[1])))
+    C['days'] = {t: [x[0] for x in v] for t, v in C['sq'].items()}
+    with gzip.open(CUF, 'wt') as f:
+        json.dump({'tm': C['tm'], 'sq': C['sq']}, f, separators=(',', ':'), sort_keys=True, ensure_ascii=False)
+
+
+def cu_side(c):
+    """one side of a Transfermarkt match page -> the flat [player id, value in thousands, ...] list ([] under 11 players)"""
+    lu = (c or {}).get('lineup') or {}
+    out = []
+    for p in (lu.get('players') or []) + (lu.get('substitutes') or []):
+        if p.get('id'):
+            out += [int(p['id']), int(round(((p.get('marketValue') or {}).get('value') or 0) / 1000))]
+    return out if len(out) >= 22 else []
+
+
+def update_callups(rows=None, budget=240):
+    """new matchday squads: the nations that have played since their last squad on record (rows: the history), or
+    every nation's fixtures this year and last (rows None). A page without a squad is kept empty once the match is
+    four days old, so it isn't asked for again"""
+    C = callups()
+    if not C['tm']:
+        return 0
+    today = dt.date.today()
+    t0 = time.time()
+    ids = {n: i for i, n in C['tm'].items()}
+    seen = {x[1] for v in C['sq'].values() for x in v}
+    if rows is None:
+        need = sorted(ids)
+        years = [today.year - 1, today.year]
+    else:
+        lim = (today - dt.timedelta(days=CU_STALE)).isoformat()
+        played = {}
+        for r in rows:
+            if r['day'] >= lim:
+                played[r['h']] = played[r['a']] = r['day']
+        need = sorted(n for n, d in played.items() if n in ids and d > ((C['days'].get(n) or [''])[-1]))
+        years = [today.year - 1, today.year] if today.month == 1 else [today.year]
+    jobs = [(n, y) for n in need for y in years]
+    todo = {}
+    with ThreadPoolExecutor(8) as ex:
+        for (n, y), d in zip(jobs, ex.map(lambda j: tm_api(f'/club/{ids[j[0]]}/fixtures?season={j[1]}'), jobs)):
+            for g in (d or {}).get('games') or []:
+                gid = str(g.get('gameId') or '')
+                day = (((g.get('baseDetails') or {}).get('date') or {}).get('dateTimeUTC') or '')[:10]
+                h, a = (g.get('homeClub') or {}).get('clubId'), (g.get('awayClub') or {}).get('clubId')
+                if gid and gid not in seen and g.get('isFinished') and day and h in C['tm'] and a in C['tm']:
+                    todo[gid] = (day, h, a)
+        gids = sorted(todo)
+        n = 0
+        for i in range(0, len(gids), 40):
+            if time.time() - t0 > budget:
+                break
+            ch = gids[i:i + 40]
+            for gid, d in zip(ch, ex.map(lambda g: tm_api(f'/game/{g}'), ch)):
+                if d is None:
+                    continue
+                day, h, a = todo[gid]
+                sides = [(h, a, cu_side(d.get('homeClub'))), (a, h, cu_side(d.get('awayClub')))]
+                if not all(s[2] for s in sides) and (today - dt.date.fromisoformat(day)).days < 4:
+                    continue
+                for t, o, sq in sides:
+                    C['sq'].setdefault(C['tm'][t], []).append([day, gid, C['tm'][o], sq])
+                n += 1
+    if n:
+        save_callups(C)
+    print('call-up squads:', len(need), 'nations asked,', n, 'new matches', flush=True)
+    return n
+
+
+def _day(d, k):
+    return (dt.date.fromisoformat(d) + dt.timedelta(days=k)).isoformat()
+
+
+def cu_q(team, day, opp=None):
+    """log(1 + the top-18 Transfermarkt values, EUR m) of the squad the nation had called up going into a match on
+    `day`: its matchday squads in the 12 days before (a player's latest page gives his value), else its last match
+    inside 400 days. The match's own page (same opponent within a day) and anything after it never count. None
+    under 14 valued players"""
+    C = callups()
+    v = C['sq'].get(team)
+    if not v:
+        return None
+    d = C['days'][team]
+    end = bisect.bisect_left(d, day)
+    if opp is not None:
+        lo = bisect.bisect_left(d, _day(day, -1))
+        for i in range(lo, min(len(v), lo + 6)):
+            if v[i][0] <= _day(day, 1) and v[i][2] == opp:
+                end = min(end, i)
+                break
+    pre = {}
+    w0 = _day(day, -CU_WINDOW)
+    i = end - 1
+    while i >= 0 and d[i] >= w0:
+        sq = v[i][3]
+        for j in range(0, len(sq), 2):
+            pre.setdefault(sq[j], sq[j + 1])
+        i -= 1
+    if not pre:
+        i = end - 1
+        while i >= 0 and not v[i][3]:
+            i -= 1
+        if i >= 0 and d[i] >= _day(day, -CU_STALE):
+            sq = v[i][3]
+            pre = {sq[j]: sq[j + 1] for j in range(0, len(sq), 2)}
+    vals = sorted((x for x in pre.values() if x), reverse=True)
+    if len(vals) < CU_MIN:
+        return None
+    return math.log1p(sum(vals[:CU_TOP]) / 1000)
+
+
+def attach_cu(rows):
+    """ch / ca on each row: both sides' called-up squad value going into the match (cu_q)"""
+    for r in rows:
+        if r['day'] >= '2005-01-01':
+            c = cu_q(r['h'], r['day'], r['a'])
+            if c is not None:
+                r['ch'] = c
+            c = cu_q(r['a'], r['day'], r['h'])
+            if c is not None:
+                r['ca'] = c
+
+
 # ---------------------------------------------------------------- the model
 GMAX = 11
 FAC = [math.factorial(i) for i in range(GMAX)]
@@ -459,7 +630,7 @@ def wdl(lh, la, rho):
 # tuned on 2000-15 walk-forward log loss (fit() rewrites data/soccer_intl_fit.json; these are its start and the fallback)
 P0 = {'k': 0.06, 'kh': 0.002, 'H0': 0.30, 'km': 0.001, 'm0': 0.25, 'rev': 0.10, 'boost': 1.5, 'nb': 10.0, 'cap': 5,
       'wwc': 1.2, 'wcf': 1.0, 'wq': 1.0, 'wnl': 1.0, 'wf': 0.6, 'wo': 0.8, 'rho': -0.05, 'sq': 0.0, 'kd': 1.0,
-      'a0': 0.0, 'd0': 0.0}
+      'a0': 0.0, 'd0': 0.0, 'sqc': 0.24, 'sqr': 0.04}
 TUNE, HOLD = ('2000-01-01', '2015-12-31'), '2016-01-01'
 ELO_K = {'wc': 60, 'cf': 50, 'q': 40, 'nl': 40, 'o': 30, 'f': 20}
 
@@ -484,12 +655,16 @@ class Ratings:
             self.d[t] *= f
         self.last[t] = day
 
-    def rates(self, h, a, neu, qh=None, qa=None):
+    def rates(self, h, a, neu, qh=None, qa=None, ch=None, ca=None):
         P = self.P
         hh = 0 if neu else self.H / 2
         x = 0.0
         if P['sq'] and qh is not None and qa is not None:
-            x = P['sq'] * (qh - qa) / 2
+            if P.get('sqc') and ch is not None and ca is not None:
+                # both squads on record: the called-up squads' value gap, the citizenship gap at its smaller weight
+                x = (P['sqc'] * (ch - ca) + P['sqr'] * (qh - qa)) / 2
+            else:
+                x = P['sq'] * (qh - qa) / 2
         lh = math.exp(self.m + hh + self.a[h] - self.d[a] + x)
         la = math.exp(self.m - hh + self.a[a] - self.d[h] - x)
         return lh, la
@@ -546,7 +721,7 @@ def run(rows, P, lo=TUNE[0], hi=TUNE[1], keep=False, minn=5):
         R._decay(h, r['day'])
         R._decay(a, r['day'])
         qh, qa = r.get('qh'), r.get('qa')
-        lh, la = R.rates(h, a, r['neu'], qh, qa)
+        lh, la = R.rates(h, a, r['neu'], qh, qa, r.get('ch'), r.get('ca'))
         if lo <= r['day'] <= hi and R.n[h] >= minn and R.n[a] >= minn:
             if keep:
                 w, d_, l_, o25, _, _, _ = wdl(lh, la, rho)
@@ -774,6 +949,7 @@ def picks_test(sc, odds, rho, cut=0.05):
 def fit(retune=True):
     rows, _, _ = load()
     attach_sq(rows)
+    attach_cu(rows)
     P = params()
     log = []
 
@@ -785,6 +961,9 @@ def fit(retune=True):
     R, sc = run(rows, P, '2000-01-01', '2099-12-31', keep=True)
     P_nosq = dict(P, sq=0.0)
     _, sc0 = run(rows, P_nosq, '2000-01-01', '2099-12-31', keep=True)
+    _, sc1 = run(rows, dict(P, sqc=0.0), '2000-01-01', '2099-12-31', keep=True)      # top-23 value only, no call-ups
+    cit = {id(x[0]): x for x in sc1}
+    cu = {'sqc': P.get('sqc'), 'sqr': P.get('sqr'), 'to': max(x[0]['day'] for x in sc)}
     th, _ = elo_fit([x for x in sc if x[0]['day'] <= TUNE[1]])
     l = lambda p: -math.log(max(p, 1e-9))  # noqa: E731
     base = {id(x[0]): x for x in sc0}
@@ -795,6 +974,10 @@ def fit(retune=True):
         lm = [l(x[1 + yy]) for x, yy in zip(S, y)]
         l0 = [l(base[id(x[0])][1 + yy]) for x, yy in zip(S, y)]
         le = [l(elo_probs(x[4], th)[yy]) for x, yy in zip(S, y)]
+        l1 = [l(cit[id(x[0])][1 + yy]) for x, yy in zip(S, y)]
+        dc, tc = cluster_t([a - b for a, b in zip(lm, l1)], [x[0]['day'] for x in S])
+        cu[lab] = {'n': len(S), 'both': sum(1 for x in S if x[0].get('ch') is not None and x[0].get('ca') is not None and 'qh' in x[0]),
+                   'model': round(sum(lm) / len(S), 5), 'top23': round(sum(l1) / len(S), 5), 'd': round(dc, 6), 't': round(tc, 2)}
         k = [x[0]['day'][:7] for x in S]
         by = defaultdict(lambda: [0, 0.0, 0.0, 0.0])
         for x, a, b, c in zip(S, lm, l0, le):
@@ -811,6 +994,7 @@ def fit(retune=True):
                     'byCat': {c: [e[0], round(e[1] / e[0], 4), round(e[2] / e[0], 4), round(e[3] / e[0], 4)] for c, e in sorted(by.items())},
                     'o25': round(sum(l(p if y_ else 1 - p) for p, y_ in o25) / len(o25), 5),
                     'drawPred': round(sum(x[2] for x in S) / len(S), 4), 'drawReal': round(sum(1 for yy in y if yy == 1) / len(S), 4)}
+    rep['callup'] = cu
     odds = json.load(gzip.open(ODDSF, 'rt')) if os.path.exists(ODDSF) else {}
     C = []
     for x in sc:
@@ -984,7 +1168,7 @@ def rank_group(ids, pts, gd, gf, res, rng):
     return order
 
 
-def nations_league(R, P, rows, fx, mp, rng, q_of, rating):
+def nations_league(P, rows, fx, mp, rng, rates, rating):
     """UEFA Nations League: the league phase so far (ESPN's standings) plus 10,000 runs of the matches left;
     League A's top two in each group then play the two-legged quarter-finals (winners against runners-up of
     another group, the winner at home in the second leg), and the semi-finals and final at a neutral ground"""
@@ -1015,7 +1199,7 @@ def nations_league(R, P, rows, fx, mp, rng, q_of, rating):
         ms = [e for e in left if e['H'] in ts and e['A'] in ts]
         draws = []
         for e in ms:
-            lh, la = R.rates(e['H'], e['A'], e.get('neu', 0), q_of(e['H']), q_of(e['A']))
+            lh, la = rates(e['H'], e['A'], e.get('neu', 0), e['day'])
             draws.append(sample_scores(lh, la, rho, SIMS, rng))
         res0 = [x for x in played if x[0] in ts and x[1] in ts]
         pos = {t: [0] * len(ids) for t in ids}
@@ -1057,7 +1241,7 @@ def nations_league(R, P, rows, fx, mp, rng, q_of, rating):
     ga = sorted(k for k in sims if k.startswith('Group A'))
     if len(ga) == 4:
         def one(h, a, neu):
-            lh, la = R.rates(h, a, neu, q_of(h), q_of(a))
+            lh, la = rates(h, a, neu)
             w, d_, l_ = wdl(lh, la, rho)[:3]
             return w, d_, l_
         cache = {}
@@ -1066,8 +1250,8 @@ def nations_league(R, P, rows, fx, mp, rng, q_of, rating):
             """x hosts the second leg; P(x goes through) over both legs, level ties settled 50/50 in extra time and penalties"""
             k = (x, y)
             if k not in cache:
-                lh1, la1 = R.rates(y, x, 0, q_of(y), q_of(x))
-                lh2, la2 = R.rates(x, y, 0, q_of(x), q_of(y))
+                lh1, la1 = rates(y, x, 0)
+                lh2, la2 = rates(x, y, 0)
                 a1, b1 = pmf(lh1), pmf(la1)   # y home goals, x away goals
                 a2, b2 = pmf(lh2), pmf(la2)   # x home goals, y away goals
                 gx = np.convolve(b1, a2)
@@ -1143,6 +1327,11 @@ def build():
     P = params()
     rows, fx, mp = load()
     attach_sq(rows)
+    try:
+        update_callups(rows)
+    except Exception as ex:
+        print(f'call-up squads: {ex!r}, on the stored file', file=sys.stderr)
+    attach_cu(rows)
     today = dt.date.today().isoformat()
     R, _ = run(rows, P, '9999', '9999')
     week = (dt.date.today() - dt.timedelta(days=7)).isoformat()
@@ -1156,16 +1345,26 @@ def build():
         return v if v is not None else 0.0
     sqv = {t: math.expm1(q_of(t)) for t in pool}
 
+    def rates(h, a, neu, day=today):
+        return R.rates(h, a, neu, q_of(h, day), q_of(a, day), cu_q(h, day, a), cu_q(a, day, h))
+
     def board(Rx, day):
         raw = sorted(pool, key=lambda t: -Rx.strength(t, sq_of(t, day) or 0.0, 0.0))
         top = raw[:TOPN]
         ab = sum(Rx.a[t] for t in top) / len(top)
         db = sum(Rx.d[t] for t in top) / len(top)
         qb = sum((sq_of(t, day) or 0.0) for t in top) / len(top)
+        # the called-up squads, when most of the top sides have one on record (the match rule, against the average)
+        cs = {t: cu_q(t, day) for t in pool} if P.get('sqc') else {}
+        ct = [cs[t] for t in top if cs.get(t) is not None]
+        cb = sum(ct) / len(ct) if len(ct) >= .75 * len(top) else None
         out = {}
         for t in pool:
             q = sq_of(t, day) or 0.0
-            x = P['sq'] * (q - qb) / 2
+            if cb is not None and cs.get(t) is not None:
+                x = (P['sqc'] * (cs[t] - cb) + P['sqr'] * (q - qb)) / 2
+            else:
+                x = P['sq'] * (q - qb) / 2
             lf = math.exp(Rx.m + Rx.a[t] - db + x)
             la = math.exp(Rx.m + ab - Rx.d[t] - x)
             out[t] = (lf - la, lf - math.exp(Rx.m + ab - db), math.exp(Rx.m + ab - db) - la, lf, la)
@@ -1200,7 +1399,7 @@ def build():
     games = []
     for e in show:
         h, a = e['H'], e['A']
-        lh, la = R.rates(h, a, e.get('neu', 0), q_of(h), q_of(a))
+        lh, la = rates(h, a, e.get('neu', 0), e['day'])
         w, d_, l_, o25, btts, top, pt = wdl(lh, la, P['rho'])
         g = {'id': e['id'], 'lg': e['lg'], 'comp': SHORT.get(e['lg'], e['lg']), 'tip': tip_of(e['t']), 'day': e['day'], 'hn': h, 'an': a,
              'hab': e.get('hab'), 'aab': e.get('aab'), 'hiso': iso_of(h), 'aiso': iso_of(a), 'neu': e.get('neu', 0),
@@ -1219,7 +1418,7 @@ def build():
     rng = np.random.default_rng(int(dt.date.today().strftime('%Y%m%d')))
     nl = None
     try:
-        nl = nations_league(R, P, rows, fx, mp, rng, q_of, {t: round(B[t][0], 3) for t in pool})
+        nl = nations_league(P, rows, fx, mp, rng, rates, {t: round(B[t][0], 3) for t in pool})
     except Exception as ex:
         print(f'nations league sims failed: {ex!r}', file=sys.stderr)
     flags([p['iso'] for p in power] + [g['hiso'] for g in games] + [g['aiso'] for g in games])
@@ -1241,6 +1440,8 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     if '--sq' in a:
         build_sq()
+    elif '--squads' in a:
+        update_callups()
     elif '--odds' in a:
         fetch_odds()
     elif '--fit' in a:

@@ -12,6 +12,20 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TERM = 'All-time coaches'
 
 
+def pro(d):
+    """the NBA / NHL lines, when those sports are in the file"""
+    P = [(k, d[k]) for k in ('nba', 'nhl') if k in d]
+    if not P: return []
+    wf = lambda t: t['walkForward'][-1]
+    lab = ' / '.join(k.upper() for k, _ in P)
+    j = lambda f: ' / '.join(f(x, x['test']) for _, x in P)
+    return [
+        f'{lab}: the same method on Sports Reference SRS (NBA points, NHL goals), an 82-game season, the franchise as the program (one id through relocations), league title = national title, a place in the Finals / Stanley Cup Final = conference title; a coach replaced in season gets his share of the games. Seasons with an SRS on file: {j(lambda x, t: f"{x['from']}-{x['to']}")}.',
+        f'{lab} replacement level {j(lambda x, t: f"{abs(x['R0']):.2f}")} wins a season; Score = cWAR + {j(lambda x, t: f"{x['lamN']:.0f}")} a title + {j(lambda x, t: f"{x['lamC']:.1f}")} a Finals appearance. Hall of Fame label: NBA the Naismith Coach category ({P[0][1]["test"]["hof"]}/{P[0][1]["test"]["hofPool"]}); NHL the Hockey Hall of Fame Builder category ({P[-1][1]["test"]["hof"]}/{P[-1][1]["test"]["hofPool"]}; that Hall has no coach class, and coaches inducted as players are left out of the fit).',
+        f'{lab} tests: Hall of Fame AUC Score {j(lambda x, t: f"{t['aucScore']:.2f}")} vs raw wins {j(lambda x, t: f"{t['aucWins']:.2f}")}; movers r {j(lambda x, t: f"{t['movers']['r']:.2f} (n {t['movers']['n']}, t {t['movers']['t']})")}; walk-forward from {wf(P[0][1]["test"])["cut"]}: shrunk WAx to next-10 WAx r {j(lambda x, t: f"{wf(t)['wax']['wax']['r']:.2f}")} (win% {j(lambda x, t: f"{wf(t)['wax']['wpct']['r']:.2f}")}), Score per season to next-10 title equity r {j(lambda x, t: f"{wf(t)['titles']['score']['r']:.2f}")} (win% {j(lambda x, t: f"{wf(t)['titles']['wpct']['r']:.2f}")}); split-half {j(lambda x, t: f"{t['splitHalf']['r']:.2f}")}.',
+    ]
+
+
 def main():
     d = json.load(open(os.path.join(ROOT, 'data', 'coach_alltime.json')))
     f, b = d['cfb'], d['cbb']; tf, tb = f['test'], b['test']
@@ -33,8 +47,9 @@ def main():
                  f'Movers (old-job WAx rate vs new job, 3+ seasons each): CFB r {tf["movers"]["r"]:.2f} (n {tf["movers"]["n"]}, t {tf["movers"]["t"]}); CBB r {tb["movers"]["r"]:.2f} (n {tb["movers"]["n"]}, t {tb["movers"]["t"]}).',
                  f'Walk-forward from {wf(tf)["cut"]}: shrunk WAx predicts the next 10 seasons\' WAx at r {wf(tf)["wax"]["wax"]["r"]:.2f} CFB / {wf(tb)["wax"]["wax"]["r"]:.2f} CBB (win% {wf(tf)["wax"]["wpct"]["r"]:.2f} / {wf(tb)["wax"]["wpct"]["r"]:.2f}); Score per season predicts next-10 title equity at r {wf(tf)["titles"]["score"]["r"]:.2f} / {wf(tb)["titles"]["score"]["r"]:.2f} (win% {wf(tf)["titles"]["wpct"]["r"]:.2f} / {wf(tb)["titles"]["wpct"]["r"]:.2f}).',
                  f'Stability: top-100 rank correlation across expectation settings (decay 3-12, shrink 1-3, no skip) {min(tf["stability"].values()):.2f}+ CFB, {min(tb["stability"].values()):.2f}+ CBB; odd/even-season WAx split-half {tf["splitHalf"]["r"]:.2f} / {tb["splitHalf"]["r"]:.2f}.',
-             ],
-             where='all-time coaches tab on the CFB and CBB pages (market group)', sports=['CFB', 'CBB'])
+             ] + pro(d),
+             where='all-time coaches tab on the CFB and CBB pages (market group)' + (' and the NBA and NHL pages (teams group)' if pro(d) else ''),
+             sports=['CFB', 'CBB'] + [k.upper() for k in ('nba', 'nhl') if k in d])
     p = os.path.join(ROOT, 'research', 'library.json'); lib = json.load(open(p))
     sec = next(s for s in lib['sections'] if s['id'] == 'teams')
     sec['entries'] = [x for x in sec['entries'] if x['term'] != TERM] + [e]

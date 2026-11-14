@@ -55,7 +55,7 @@ for tour in ('wta', 'atp'):
         for raw in json.load(open(f)):
             for r in TA.derive(pid, tour, [raw], find):
                 h = have.get((frozenset((r[7], r[8])), r[4], r[0]))
-                if h and h[2] != r[2]: c[(tour, raw[3], raw[8][:1] == 'Q', 'ta ' + r[2], 'arch ' + h[2])] += 1
+                if h and h[2] != r[2]: c[(tour, raw[3], T.is_qual(raw[8]), 'ta ' + r[2], 'arch ' + h[2])] += 1
 print(c.most_common(20))
 dd = Counter()
 for tour in ('wta', 'atp'):

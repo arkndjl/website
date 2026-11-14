@@ -1,22 +1,25 @@
-{{- /* All-time head coaches (scripts/coach_alltime.py, data/coach_alltime.json). sport="cfb" | "cbb".
+{{- /* All-time head coaches (scripts/coach_alltime.py, data/coach_alltime.json). sport="cfb" | "cbb" | "nba" | "nhl".
        Score (wins) = cWAR + per-title and per-conference-title weights fit on Hall of Fame selection (+ CFB coordinator
        wins at the measured translation rate). Method on Reference (Glossary/Methodology). Mobile: the cfbp cards. */ -}}
 {{- $sp := $.Get "sport" | default "cfb" -}}
 {{- with index site.Data.coach_alltime $sp -}}
 {{- $cfb := eq $sp "cfb" -}}
+{{- $nba := eq $sp "nba" -}}{{- $nhl := eq $sp "nhl" -}}{{- $pro := or $nba $nhl -}}
+{{- $ntL := cond $nhl "Cup" (cond $nba "Title" "NT") -}}{{- $ctL := cond $nhl "Final" (cond $nba "Finals" "CT") -}}
+{{- $tmL := cond $pro "Teams" "Schools" -}}{{- $G := cond $cfb 12 (cond $pro 82 30) -}}
 {{- $t := .test -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "all-time coaches") "filter" "Status,Era" "rerank" true "tab" ($.Get "tab") "icon" (cond $cfb "football" "basketball") "gfxCols" (cond $cfb "RK,Coach,Schools,Years,W-L,NT,CT,WAx,Score" "RK,Coach,Schools,Years,W-L,NT,CT,WAx,Score") "gfxDate" (lower ((time site.Data.coach_alltime.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "all-time coaches") "filter" "Status,Era" "rerank" true "tab" ($.Get "tab") "icon" (cond $cfb "football" (cond $nhl "hockey" "basketball")) "gfxCols" (printf "RK,Coach,%s,Years,W-L,%s,%s,WAx,Score" $tmL $ntL $ctL) "gfxDate" (lower ((time site.Data.coach_alltime.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cfbp coachat">
-  <thead><tr><th>RK</th><th>Coach</th><th title="schools, most seasons first">Schools</th><th>Years</th>
+  <thead><tr><th>RK</th><th>Coach</th><th title="{{ lower $tmL }}, most seasons first">{{ $tmL }}</th><th>Years</th>
     <th title="active = head coach this season">Status</th><th title="decade of the middle of his head-coaching career">Era</th>
-    <th title="head-coaching seasons{{ if $cfb }} at major-college (FBS / pre-split major) programs{{ else }} in Division I{{ end }}">Seasons</th>
+    <th title="head-coaching seasons{{ if $cfb }} at major-college (FBS / pre-split major) programs{{ else if $nba }} in the NBA and BAA (a part season counts its share of the games){{ else if $nhl }} in the NHL (a part season counts its share of the games){{ else }} in Division I{{ end }}">Seasons</th>
     <th>W-L</th>
-    <th title="wins over the program's expectation (its other coaches' seasons, nearest weighted most), per {{ cond $cfb 12 30 }}-game season, summed">WAx</th>
+    <th title="wins over the {{ cond $pro "franchise" "program" }}'s expectation (its other coaches' seasons, nearest weighted most), per {{ $G }}-game season, summed">WAx</th>
     <th title="WAx + {{ printf "%.2f" (math.Abs .R0) }} a season (replacement level: coaches with two or fewer seasons)">cWAR</th>
-    <th title="national titles ({{ if $cfb }}AP / Coaches Poll shares from 1936; major-selector shares before{{ else }}NCAA tournament{{ end }}), era-weighted by field difficulty">NT</th>
-    <th title="conference titles{{ if $cfb }} (title game, else best conference record; ties split){{ else }} (regular season, ties split){{ end }}, weighted by conference difficulty">CT</th>
+    <th title="{{ if $nba }}NBA / BAA championships{{ else if $nhl }}Stanley Cups{{ else }}national titles ({{ if $cfb }}AP / Coaches Poll shares from 1936; major-selector shares before{{ else }}NCAA tournament{{ end }}){{ end }}, era-weighted by field difficulty">{{ $ntL }}</th>
+    <th title="{{ if $nba }}Finals appearances (conference titles){{ else if $nhl }}Stanley Cup Final appearances{{ else }}conference titles{{ if $cfb }} (title game, else best conference record; ties split){{ else }} (regular season, ties split){{ end }}{{ end }}, weighted by conference difficulty">{{ $ctL }}</th>
     {{- if $cfb }}<th title="coordinator wins: his unit's points over the program's expectation as OC/DC (1990-2025), in wins; counts x {{ printf "%.2f" .coordW }} in Score (rate at which coordinator value carried into head-coaching value)">Coord</th>{{ end }}
-    <th title="cWAR + {{ printf "%.0f" .lamN }} a national title + {{ printf "%.1f" .lamC }} a conference title{{ if $cfb }} + Coord{{ end }}; title weights fit on Hall of Fame selection">Score</th>
+    <th title="cWAR + {{ printf "%.0f" .lamN }} a {{ if $nba }}championship{{ else if $nhl }}Stanley Cup{{ else }}national title{{ end }} + {{ printf "%.1f" .lamC }} a {{ if $pro }}Finals appearance{{ else }}conference title{{ end }}{{ if $cfb }} + Coord{{ end }}; title weights fit on Hall of Fame selection">Score</th>
     <th title="Score per season, shrunk toward 0 by {{ printf "%.1f" .kc }} seasons">Rate</th>
   </tr></thead>
   <tbody>
@@ -32,8 +35,8 @@
     <td class="cfb__num" data-l="W-L" data-v="{{ .w }}">{{ .w }}-{{ .l }}{{ with .t }}-{{ . }}{{ end }}</td>
     <td class="cfb__num" data-l="WAx" data-v="{{ .wax }}">{{ if ge .wax 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .wax) }}</td>
     <td class="cfb__num" data-l="cWAR" data-v="{{ .war }}">{{ partial "num.html" (slice "%.1f" .war) }}</td>
-    <td class="cfb__num" data-l="NT" data-v="{{ .nt }}">{{ if .nt }}{{ partial "num.html" (slice "%.1f" .nt) }}{{ else }}-{{ end }}</td>
-    <td class="cfb__num" data-l="CT" data-v="{{ .ct }}">{{ if .ct }}{{ partial "num.html" (slice "%.1f" .ct) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-l="{{ $ntL }}" data-v="{{ .nt }}">{{ if .nt }}{{ partial "num.html" (slice "%.1f" .nt) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-l="{{ $ctL }}" data-v="{{ .ct }}">{{ if .ct }}{{ partial "num.html" (slice "%.1f" .ct) }}{{ else }}-{{ end }}</td>
     {{- if $cfb }}<td class="cfb__num" data-l="Coord" data-v="{{ .co }}">{{ if .co }}{{ if ge .co 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .co) }}{{ else }}-{{ end }}</td>{{ end }}
     <td class="cfb__num cfbp__surplus is-key" data-l="Score" data-v="{{ .sc }}"><b>{{ partial "num.html" (slice "%.0f" .sc) }}</b></td>
     <td class="cfb__num" data-l="Rate" data-v="{{ .rt }}">{{ partial "num.html" (slice "%.1f" .rt) }}</td>

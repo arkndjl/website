@@ -31,6 +31,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+from tennis_data import is_qual  # noqa: E402
 
 FIT = os.path.join(ROOT, 'data', 'tennis_picks_fit.json')
 OUT = os.path.join(ROOT, 'data', 'games_picks_tennis.json')
@@ -133,6 +134,7 @@ def fit():
     import tennis_model as M
     import tennis_data as T
     rows, _, _ = T.load()
+    rows = M.until_rows(rows)                              # --until YYYYMMDD: the fit's data cut
     P = dict(M.DEFAULT, **json.load(open(M.FIT))['params'])
     # walk-forward model chances (each season's blend weights from the M.WIN seasons before it), so 2025 and 2026 are
     # both out of sample for the model; then the matches with an open and a close
@@ -295,7 +297,7 @@ def live():
                'kick': g['tip'], 'home': short(b['n']), 'away': short(a['n']), 'homeN': b['n'], 'awayN': a['n'],
                'mk': 'ml', 'side': side, 'line': None, 'price': o, 'edge': round(abs(e) * 100, 1), 'x': round(X * 100) if X else None,
                'm': round(sm, 4), 'mkt': round(sn, 4), 'p': round(pc, 4), 'ev': round(ev, 4), 'pDU': round(pc, 4), 'evDU': round(ev, 4)}
-        tour_lv = g.get('lv') in TOUR_LV and not g.get('rd', '').startswith('Q')
+        tour_lv = g.get('lv') in TOUR_LV and not is_qual(g.get('rd', ''))
         long_ = not MLCAP <= sn + COST <= 1 - MLCAP
         why = None
         if not on:

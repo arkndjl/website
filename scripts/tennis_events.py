@@ -27,6 +27,7 @@ import random
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tennis_data as TD  # noqa: E402
 import tennis_model as TM  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -135,7 +136,7 @@ def live():
     ev = {}
     for c in comps:
         rd = T.espn_round(c['rd'])
-        if not c.get('date') or (rd.startswith('Q') and rd != 'QF'):
+        if not c.get('date') or TD.is_qual(rd):
             continue
         ev.setdefault((c['tour'], c['tid']), []).append((rd, c))
     sizes = {}                                                 # draw sizes already on record (the ledger)
@@ -288,7 +289,7 @@ def backtest(y0=20230101, y1=20261110):
     events, seen, rk_fit = [], set(), []
     for r in rows:
         tid = r[6]
-        if tid in main and tid not in seen and (r[4] == 'QF' or not r[4].startswith('Q')):
+        if tid in main and tid not in seen and not TD.is_qual(r[4]):
             seen.add(tid)
             ms = sorted(main[tid], key=lambda x: {'QF': 500, 'SF': 600, 'F': 700}.get(x[4], 0) - (int(x[4][1:]) if x[4][1:].isdigit() else 0))
             unit, rank = {}, {}
@@ -312,7 +313,7 @@ def backtest(y0=20230101, y1=20261110):
                         pe[(a, b)], pe[(b, a)] = e, 1 - e
                 events.append({'tid': tid, 'd': r[0], 'tour': tour, 'lv': lvl[tid], 'root': root, 'rank': rank, 'champ': fin[0][7],
                                'pm': pm, 'pe': pe, 'n': len(ps)})
-        if 20150101 <= r[0] < y0 and r[2] in ('G', 'M', 'A') and r[12] and r[13] and not r[4].startswith('Q'):
+        if 20150101 <= r[0] < y0 and r[2] in ('G', 'M', 'A') and r[12] and r[13] and not TD.is_qual(r[4]):
             rk_fit.append(math.log(r[13]) - math.log(r[12]))          # winner's edge in log rank
         m.update(r)
     x = np.array(rk_fit)

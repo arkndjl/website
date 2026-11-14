@@ -30,7 +30,7 @@ def td_key(s):
 idx = {}
 for r in rows:
     if r[0] < 20061201 or r[0] > 20230201 or r[2] not in ('G', 'M', 'A', 'F', 'O'): continue
-    if r[4].startswith('Q'): continue
+    if T.is_qual(r[4]): continue
     for side, pid in ((0, r[7]), (1, r[8])):
         for k in keys(pid): idx.setdefault((r[1], k), []).append((dn(r[0]), side, r))
 out, stat = {}, dict(m_rows=0, m_hit=0, m_amb=0, g_rows=0, g_hit=0, conflict=0)

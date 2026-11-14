@@ -46,8 +46,14 @@ jobs:
       - name: Award races
         if: steps.g.outputs.go == 'true'
         run: python3 scripts/awards.py
+      # forward ledger (scripts/awards_ledger.py): one row per race per week of our chance and the market price,
+      # scored when the awards are announced
+      - name: Awards ledger
+        if: steps.g.outputs.go == 'true'
+        continue-on-error: true
+        run: python3 scripts/awards_ledger.py
       - name: Commit if the races changed
         if: steps.g.outputs.go == 'true'
         run: |
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
-          python3 scripts/data_push.py -m "Update the award races ($(date -u +%Y-%m-%d))" -- data/awards.json
+          python3 scripts/data_push.py -m "Update the award races ($(date -u +%Y-%m-%d))" -- data/awards.json scripts/data/ledger/awards_2027.jsonl

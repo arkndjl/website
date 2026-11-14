@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """All-time head-coach rankings, CFB and CBB: data/coach_alltime.json from scripts/data/coach_alltime_src.json.gz
-(scripts/coach_alltime_pull.py pull + build).
+(scripts/coach_alltime_pull.py pull + build). NBA and NHL: the same method on scripts/data/coach_alltime_pro_src.json.gz
+(scripts/coach_alltime_pro.py): the rating is Sports Reference SRS, the standard season 82 games, the "program" the
+franchise, the national title the league title and the conference title a place in the Finals / Stanley Cup Final.
 
     python3 scripts/coach_alltime.py            # fit, tests, write data/coach_alltime.json
 
@@ -39,11 +41,13 @@ sys.path.insert(0, HERE)
 import names as N
 
 SRC = os.path.join(HERE, 'data', 'coach_alltime_src.json.gz')
+SRC_PRO = os.path.join(HERE, 'data', 'coach_alltime_pro_src.json.gz')
 OUT = os.path.join(ROOT, 'data', 'coach_alltime.json')
 PHI = NormalDist().cdf
 P = dict(tau=6.0, win=15, k=1.0, skip=2)
-GAMES = {'cfb': 12, 'cbb': 30}
-LAST = {'cfb': 2025, 'cbb': 2026}
+GAMES = {'cfb': 12, 'cbb': 30, 'nba': 82, 'nhl': 82}
+LAST = {'cfb': 2025, 'cbb': 2026, 'nba': 2026, 'nhl': 2026}
+CUTS = {'cfb': (1980, 1995, 2010)}
 TOP = 300
 MIN_N = 3
 SHORT = {'SouthernCalifornia': 'USC', 'BrighamYoung': 'BYU', 'LouisianaState': 'LSU', 'SouthernMethodist': 'SMU',
@@ -177,7 +181,9 @@ def auc(s, y):
 
 
 def corr(x, y):
-    x, y = np.array(x, float), np.array(y, float); r = float(np.corrcoef(x, y)[0, 1]); n = len(x)
+    x, y = np.array(x, float), np.array(y, float); n = len(x)
+    r = float(np.corrcoef(x, y)[0, 1]) if n > 2 and x.std() > 0 and y.std() > 0 else 0.0   # no spread (a small league's cut): 0
+    r = max(-.9999, min(.9999, r))
     return dict(r=round(r, 3), t=round(r * math.sqrt((n - 2) / (1 - r * r)), 2), n=n)
 
 
@@ -227,7 +233,8 @@ def run(sp):
     # Hall of Fame weights
     hof = set(S.D['hof'])
     key = lambda cid: N.key(re.sub(r'\s*\(.*?\)', '', names.get(cid, cid)))
-    el = [(cid, c) for cid, c in C.items() if c['last'] <= 2019 and c['n'] >= 8]
+    skip = set(S.D.get('hofSkip', []))            # honoured for something else (NHL: inducted as players)
+    el = [(cid, c) for cid, c in C.items() if c['last'] <= 2019 and c['n'] >= 8 and key(cid) not in skip]
     y = np.array([1 if key(cid) in hof else 0 for cid, _ in el])
     X = np.array([[c['war'], c['ntw'], c['ctw']] for _, c in el]); sd = X.std(0); b = logit(X / sd, y)[1:] / sd
     lamN = max(0.0, b[1] / b[0]); lamC = max(0.0, b[2] / b[0])
@@ -258,7 +265,7 @@ def run(sp):
     full = defaultdict(list)
     for v in V: full[v['c']].append(v)
     wf = []
-    for cut in ((1980, 1995, 2010) if sp == 'cfb' else (1985, 1998, 2010)):
+    for cut in CUTS.get(sp, (1985, 1998, 2010)):
         Cp = S.table(S.values(cut)); X = defaultdict(list); Y = []; YT = []
         for cid, c in Cp.items():
             fut = [v for v in full.get(cid, []) if cut <= v['y'] < cut + 10]; nf = sum(v['sh'] for v in fut)
@@ -310,7 +317,10 @@ def main():
     global SRC_D
     with gzip.open(SRC, 'rt') as f: SRC_D = json.load(f)
     out = dict(asof=date.today().isoformat())
-    for sp in ('cfb', 'cbb'):
+    if os.path.exists(SRC_PRO):
+        with gzip.open(SRC_PRO, 'rt') as f: SRC_D.update(json.load(f))
+    for sp in ('cfb', 'cbb', 'nba', 'nhl'):
+        if sp not in SRC_D: continue
         o = run(sp); o['from'] = o.pop('from_'); out[sp] = o
     with open(OUT, 'w') as f: json.dump(out, f, separators=(',', ':'), allow_nan=False)
     print('wrote', OUT, os.path.getsize(OUT) // 1024, 'KB')

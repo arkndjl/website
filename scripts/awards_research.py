@@ -134,8 +134,10 @@ def main(argv):
     want = [a for a in argv if a in sp] or list(sp)
     cur = json.load(open(OUT)) if os.path.exists(OUT) else {}
     for s in want:
+        old = cur.get(s, {})
         cur[s] = {r['award']: r for r in run_sport(s, sp[s])}
-        cur[s]['_prev'] = PREV[s]
+        cur[s].update({k: v for k, v in old.items() if isinstance(v, dict) and v.get('more') and k not in cur[s]})
+        cur[s]['_prev'] = dict(old.get('_prev', {}), **PREV[s])            # races added by scripts/awards_more.py stay
     json.dump(cur, open(OUT, 'w'), indent=1, sort_keys=True)
     print('wrote', OUT)
 

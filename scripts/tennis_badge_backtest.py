@@ -226,7 +226,7 @@ def pro_rows():
             snap(yr)
             agg, mix = {}, defaultdict(lambda: defaultdict(int))
             yr = y
-        if r[2] in TM.TOUR_LV and not r[4].startswith('Q'):
+        if r[2] in TM.TOUR_LV and not TM.is_qual(r[4]):
             mix[r[1]][r[3]] += 1
         tw, tl = tb_count(r[9])
         for me, mine, theirs, tbw, tbl in ((r[7], r[10], r[11], tw, tl), (r[8], r[11], r[10], tl, tw)):

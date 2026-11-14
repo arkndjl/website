@@ -1,11 +1,12 @@
 {{- /* Award races, one tab a sport: {{< awards sport="nba" tab="awards" >}}. Data: data/awards.json (scripts/awards.py,
        voter models in data/awards_fit.json from scripts/awards_research.py; only awards that passed their held-out
        test are written). One window an award, picked by the chips; P(win) is the rank. Mkt: Polymarket, no vig, where
-       a two-sided market is open. Stat columns are the projected finish (mean of the simulations). */ -}}
+       a two-sided market is open. Stat columns are the projected finish (mean of the simulations). A race with k
+       (All-NBA: 15 named) shows P(team), the share of simulations in which the player is named. */ -}}
 {{- $sport := .Get "sport" -}}
 {{- with index (site.Data.awards | default dict) $sport -}}
 {{- $d := . -}}
-{{- $icon := cond (in (slice "nba" "cbb") $sport) "basketball" (cond (eq $sport "nhl") "hockey" "football") -}}
+{{- $icon := cond (in (slice "nba" "cbb") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football")) -}}
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 <div class="awards" data-tab="{{ $.Get "tab" | default "awards" }}" data-awards>
 {{- if gt (len .races) 1 }}
@@ -15,13 +16,14 @@
 {{- end }}
 {{- range $i, $r := .races }}
 {{- $t := .test }}
-{{- $cols := slice "RK" "Player" "Team" "P(win)" }}{{ if .mkt }}{{ $cols = $cols | append "Mkt" }}{{ end }}{{ range .show }}{{ $cols = $cols | append .l }}{{ end }}
+{{- $pl := cond (isset . "k") "P(team)" "P(win)" }}
+{{- $cols := slice "RK" "Player" "Team" $pl }}{{ if .mkt }}{{ $cols = $cols | append "Mkt" }}{{ end }}{{ range .show }}{{ $cols = $cols | append .l }}{{ end }}
 <div class="awards__panel" data-award-panel="{{ .key }}"{{ if gt $i 0 }} hidden{{ end }}>
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" (lower .label) $d.season) "icon" $icon "filter" "Team" "rerank" true "gfxCols" (delimit $cols ",") "gfxDate" $date "gfxMax" "20") }}
 <table class="cfb__table awards__table">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Team</th>
-    <th title="P(win): the voter model over {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season">P(win)</th>
+    <th title="{{ $pl }}: the voter model over {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season">{{ $pl }}</th>
     {{- if .mkt }}<th title="Polymarket, no vig (display only)">Mkt</th>{{ end }}
     {{- range $k, $c := .show }}<th{{ if gt $k 0 }} class="awards__x"{{ end }} title="projected finish">{{ .l }}</th>{{ end }}
   </tr></thead>
@@ -31,7 +33,7 @@
   {{- $lg := cond (eq $sport "cbb") "mens-college-basketball" (cond (eq $sport "cfb") "college-football" $sport) }}
   <tr>
     <td class="cfb__rk">{{ add $j 1 }}</td>
-    <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://a.espncdn.com/combiner/i?img=/i/headshots/%s/players/full/%v.png&w=96&h=70&scale=crop" $lg .ph) "")) }}<b>{{ .n }}</b>{{ with .pos }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (.phu | default (cond (ne .ph nil) (printf "https://a.espncdn.com/combiner/i?img=/i/headshots/%s/players/full/%v.png&w=96&h=70&scale=crop" $lg .ph) ""))) }}<b>{{ .n }}</b>{{ with .pos }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__team">{{ with $logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .tm }}</span></td>
     <td class="cfb__num is-key" data-v="{{ .p }}">{{ if lt .p 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul .p 100))) }}%{{ end }}</td>
     {{- if $r.mkt }}<td class="cfb__num" data-v="{{ .mkt | default -1 }}">{{ with .mkt }}{{ if lt . 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul . 100))) }}%{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
@@ -44,8 +46,10 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "awards.%s" $sport) "note" (printf "updated %s" $date)
-      "about" (printf "Voter model fit on %v-%v; held out a season at a time it gave the winner %.0f%% on average and picked him %v of %v times (%s alone: %v). P(win) averages it over %v simulated rests of the season." $t.from $t.to (mul $t.pw 100) $t.hit $t.n (delimit $t.null " + ") $t.hit0 $d.sims)) }}
+{{- $about := printf "Voter model fit on %v-%v; held out a season at a time it gave the winner %.0f%% on average and picked him %v of %v times (%s alone: %v). P(win) averages it over %v simulated rests of the season." $t.from $t.to (mul $t.pw 100) $t.hit $t.n (delimit $t.null " + ") $t.hit0 $d.sims }}
+{{- with $d.temp }}{{ $about = printf "%s In season the odds are flattened: p^(1/T), T %.2f today." $about . }}{{ end }}
+{{- with .k }}{{ $about = printf "Voter model fit on %v-%v; held out a season at a time its top %v held %v of the %v named (%s alone: %v). P(team) is the share of %v simulated rests of the season in which he is named." $t.from $t.to . $t.hit (mul $t.n .) (delimit $t.null " + ") $t.hit0 $d.sims }}{{ end }}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "awards.%s" $sport) "note" (printf "updated %s" $date) "about" $about) }}
 </div>
 {{- end }}
 </div>
