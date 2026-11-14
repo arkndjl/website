@@ -48,14 +48,16 @@
   </div>
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
-  {{- partial "wintable-open.html" (dict "title" "ARK Ranking" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
+  {{- partial "wintable-open.html" (dict "title" "ARK Ranking" "filter" "Conf" "gfxCols" "RK,Team,Rating,Rec,AP" "gfxDate" $date "gfxMax" "25") -}}
   {{- $sim := dict }}{{ with site.Data.cfb_model }}{{ range .sim }}{{ $sim = merge $sim (dict .tid (dict "projW" .projW "ccg" .ccg "title" .title "cfp" .cfp "bye" .bye "natl" .natl)) }}{{ end }}{{ end }}
   {{- $rows := slice }}{{ range .teams }}{{ $rows = $rows | append (merge . (dict "sim" (index $sim .tid))) }}{{ end }}
   <table class="cfb__table cfbr__t" data-td-kind="cfb" data-td-src="/data/teams/cfb.json" data-td-rows="{{ (resources.FromString "data/cfb-power-rows.json" (jsonify $rows)).RelPermalink }}">
     <thead><tr>
-      <th title="ARK Ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th title="conference">Conf</th><th>Record</th>
-      <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Inj columns">Score</th>
+      <th title="ARK Ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th title="conference">Conf</th>
+      <th title="rating = points vs an average FBS team, neutral field = sum of the Elo to Inj columns">Rating</th>
       {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
+      <th title="record (won-lost)">Rec</th>
+      <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
       <th title="Elo (results and margins, from a preseason prior), points">Elo</th>
       <th title="opponent-adjusted EPA per play, offense - defense, points">Eff</th>
       {{- if $tal }}<th title="roster talent (projected starters by FV), points">Talent</th>{{ end }}
@@ -65,8 +67,7 @@
       {{- if .ctlUsed }}<th title="game control: how much of each game a team spent with the win in hand (win chance from score and clock, averaged over the game), opponent-adjusted, carried across seasons, points">Control</th>{{ end }}
       <th title="other inputs kept by the game model (returning WAR, 4th-down aggressiveness, ...), points">Situ</th>
       {{- if $staff }}<th title="head coach / coordinator scores, points">Staff</th>{{ end }}
-      {{- if .injUsed }}<th title="current injuries: starters on this week's report at their chance to miss, a season-ending injury until the team has played 3 games without him, points">Inj</th><th title="score at full strength (no injuries)">Full</th>{{ end }}
-      <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
+      {{- if .injUsed }}<th title="current injuries: starters on this week's report at their chance to miss, a season-ending injury until the team has played 3 games without him, points">Inj</th><th title="rating at full strength (no injuries)">Full</th>{{ end }}
     </tr></thead>
     <tbody>
     {{- range $i, $_ := .teams }}
@@ -75,17 +76,17 @@
       <td class="cfb__num" data-v="{{ if .prev }}{{ sub .prev .rk }}{{ end }}">{{ if .prev }}{{ $d := sub .prev .rk }}{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}{{ else }}<span class="cfb__dim">·</span>{{ end }}</td>
       <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .team }}</button></td>
       <td>{{ .conf | default "—" }}</td>
-      <td class="cfb__num">{{ .rec }}</td>
       <td class="cfb__num" data-v="{{ .score }}"><b>{{ if gt .score 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .score) }}</b></td>
       {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 4 25)) }}
+      <td class="cfb__num">{{ .rec }}</td>
+      <td class="cfb__num" data-v="{{ with .ap }}{{ . }}{{ end }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      <td class="cfb__num" data-v="{{ with .coaches }}{{ . }}{{ end }}">{{ with .coaches }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      {{- if $R.polls.cfp }}<td class="cfb__num" data-v="{{ with .cfp }}{{ . }}{{ end }}">{{ with .cfp }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
       {{- $p := .parts }}
       {{- range $k := $keys }}{{ $v := index $p $k | default 0.0 }}
       <td class="cfb__num" data-v="{{ $v }}"><span class="{{ if ge $v 0.5 }}cfb__up{{ else if le $v -0.5 }}cfb__down{{ else }}cfb__dim{{ end }}">{{ if gt $v 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" $v) }}</span></td>
       {{- end }}
       {{- if $R.injUsed }}<td class="cfb__num cfb__dim" data-v="{{ .full }}">{{ if gt .full 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" (.full | default .score)) }}</td>{{ end }}
-      <td class="cfb__num" data-v="{{ with .ap }}{{ . }}{{ end }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-      <td class="cfb__num" data-v="{{ with .coaches }}{{ . }}{{ end }}">{{ with .coaches }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-      {{- if $R.polls.cfp }}<td class="cfb__num" data-v="{{ with .cfp }}{{ . }}{{ end }}">{{ with .cfp }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
     </tr>
     {{- end }}
     </tbody>

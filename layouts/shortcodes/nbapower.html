@@ -5,17 +5,17 @@
 {{- with site.Data.nba_games -}}
 {{- $mvFrom := .mvFrom -}}
 {{- $proj := partial "projsum.html" (dict "sport" "nba" "k" "vorx") -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
 <table class="cfb__table tstick2" data-td-kind="nba" data-td-src="/data/teams/nba.json" data-td-rows="{{ (resources.FromString "data/nba-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th><th title="conference">Conf</th>
     <th title="rating = expected margin vs an average team, neutral floor, current roster and today's injury report: Elo + net rating + market rating + lineup (players' projected XPM x minutes x chance to play), at the model's weights">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="today's injury report (the league's for teams playing today, else ESPN's list): the lineup's points lost, each player at his chance to play x XPM x minutes; negative = players back or cleared">Inj</th>
     <th title="rating with nobody on the injury report">Full</th>
     <th title="record (won-lost)">Rec</th>
-    <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
-    <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
+    <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">Off</th>
+    <th title="defense, points per 100 allowed over average; negative = fewer allowed">Def</th>
     <th title="possessions a game, expected against an average opponent">Pace</th>
     <th title="Elo ({{ $es := 0.0 }}{{ $en := 0 }}{{ range site.Data.nba_games.power }}{{ $es = add $es (float .elo) }}{{ $en = add $en 1 }}{{ end }}{{ if $en }}{{ partial "num.html" (slice "%.0f" (div $es $en)) }} league average today{{ end }})">Elo</th>
     <th title="market rating: points vs average as earlier closing spreads priced the team">Mkt</th>
@@ -23,12 +23,12 @@
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(playoffs, through the play-in), simulated seasons">Playoff</th>
     <th title="P(NBA title)">Title</th>
-    <th title="conference">Conf</th>
   </tr></thead>
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
+    <td>{{ .cname }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.1f" (float .rating)) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     {{- $full := .full | default .rating }}
@@ -44,7 +44,6 @@
     <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .wins)) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ partial "num.html" (slice "%.0f" (float (mul .playoff 100))) }}%</td>
     <td class="cfb__num" data-v="{{ .title }}">{{ if lt .title 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul .title 100))) }}%{{ end }}</td>
-    <td>{{ .cname }}</td>
   </tr>
   {{- end }}
   </tbody>
