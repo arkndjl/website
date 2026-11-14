@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-14T15:59Z",
+ "asof": "2026-11-14T16:02Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -88,11 +88,11 @@
     },
     "static/data/nba-proj.json": {
      "flags": 5,
-     "rows": 502
+     "rows": 504
     },
     "static/data/nba-xpm/2027.json": {
      "flags": 3,
-     "rows": 465
+     "rows": 467
     },
     "static/data/pctl-nba.json": {
      "flags": 3,
@@ -249,6 +249,24 @@
      "site": "LAC"
     },
     {
+     "d": "2026-11-08",
+     "field": "tm",
+     "file": "static/data/pctl-nba.json",
+     "flag": "released",
+     "head": "Let go Sunday",
+     "kind": null,
+     "move": {
+      "d": "2026-10-17",
+      "head": "Waived by Golden State",
+      "kind": "waived"
+     },
+     "pid": "5724",
+     "player": "Dalen Terry",
+     "pos": "G",
+     "rotowire": "FA",
+     "site": "OKC"
+    },
+    {
      "d": "2026-10-17",
      "field": "tm",
      "file": "static/data/pctl-nba.json",
@@ -283,29 +301,11 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "LAC"
-    },
-    {
-     "d": "2026-11-08",
-     "field": "tm",
-     "file": "static/data/pctl-nba.json",
-     "flag": "released",
-     "head": "Let go Sunday",
-     "kind": null,
-     "move": {
-      "d": "2026-10-17",
-      "head": "Waived by Golden State",
-      "kind": "waived"
-     },
-     "pid": "5724",
-     "player": "Dalen Terry",
-     "pos": "G",
-     "rotowire": "FA",
-     "site": "OKC"
     }
    ],
    "joined": 0,
    "players": 596,
-   "rows": 2030
+   "rows": 2034
   },
   "nfl": {
    "by_file": {
@@ -4268,7 +4268,7 @@
    "by_file": {
     "static/data/depth/nhl.json": {
      "flags": 0,
-     "rows": 640
+     "rows": 639
     },
     "static/data/lines/nhl.json": {
      "flags": 0,
@@ -4561,7 +4561,7 @@
    ],
    "joined": 0,
    "players": 1405,
-   "rows": 3212
+   "rows": 3211
   }
  }
 }
