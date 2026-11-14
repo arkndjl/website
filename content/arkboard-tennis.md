@@ -10,9 +10,10 @@ draft = false
 
 {{< winpane title="tennis.exe" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:ATP,WTA|games:games,game table|model:model" side="true" label="Tennis views" >}}
+{{< wintabs groups="players:ATP,WTA|games:games,game table,event odds|model:model" side="true" label="Tennis views" >}}
 {{< tennismatches title="games" tab="games" >}}
 {{< tennismatches view="results" title="game table" tab="game table" >}}
+{{< lazytab tab="event odds" >}}{{< tennisevents tab="event odds" >}}{{< /lazytab >}}
 {{< tennismodel title="model" tab="model" >}}
 {{< wintabs tab="ATP" tabs="ATP ARK Ranking,ATP serve + return" sub="true" label="ATP views" >}}
 {{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ARK Ranking" >}}

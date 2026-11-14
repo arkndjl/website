@@ -1,0 +1,41 @@
+{{- /* Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
+       Tennis event odds (data/tennis_events.json, scripts/tennis_events.py): each ATP / WTA tour-level singles event
+       with a complete draw, the rest of the bracket simulated from the match model; one window per event. Renders
+       nothing when no event is listed (the lazytab then hides the tab). */ -}}
+{{- with site.Data.tennis_events -}}
+{{- $d := . -}}
+{{- $ctry := site.Data.soccer_countries.name -}}
+{{- $sfn := dict "H" "hard" "C" "clay" "G" "grass" -}}
+{{- $tip := dict "R2" "chance to reach round 2" "R3" "chance to reach round 3" "R4" "chance to reach round 4" "R5" "chance to reach round 5" "QF" "chance to reach the quarterfinals" "SF" "chance to reach the semifinals" "F" "chance to reach the final" "W" "chance to win the title" -}}
+{{- range $e := .events }}
+{{- $tl := upper $e.tour -}}
+{{- partial "wintable-open.html" (dict "title" (printf "event odds :: %s %s" $tl $e.name) "icon" "tennis" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,SF,F,W" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "16") -}}
+<table class="cfb__table tstick2 tennis__table tennis__ev">
+  <thead><tr>
+    <th>RK</th><th>Player</th>
+    <th title="official {{ $tl }} singles ranking">Rank</th>
+    <th title="ARK Ranking">ARK</th>
+    {{- range $e.rounds }}
+    <th title="{{ index $tip . | default . }}">{{ . }}</th>
+    {{- end }}
+    <th title="title chance as American odds without the vig">Fair</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $p := $e.players }}
+  <tr{{ if not (index $p "in") }} class="cfb__dim"{{ end }}>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name" data-v="{{ $p.n }}" style="white-space: nowrap">{{ partial "tennisface.html" $p }}{{ with $p.nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ $p.n }}</b></td>
+    <td class="cfb__num" data-v="{{ $p.rank | default 9999 }}">{{ with $p.rank }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $p.rk | default 9999 }}">{{ with $p.rk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- $last := sub (len $p.p) 1 }}
+    {{- range $j, $q := $p.p }}
+    <td class="cfb__num" data-v="{{ $q }}">{{ if eq $q 0.0 }}<span class="cfb__dim">—</span>{{ else if eq $q 1.0 }}<span class="cfb__dim">in</span>{{ else if lt $q 0.001 }}<span class="cfb__dim">&lt;0.1</span>{{ else if eq $j $last }}<b>{{ partial "num.html" (slice "%.1f" (mul $q 100)) }}</b>{{ else }}{{ partial "num.html" (slice "%.1f" (mul $q 100)) }}{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ index $p.p $last }}">{{ if and (index $p "in") (ge (index $p.p $last) 0.001) }}{{ printf "%+d" (int $p.fair) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $e.players) "note" (printf "%s · %s · %s · draw of %d · %d left · %d sims" $tl $e.level (index $sfn $e.sf) (int $e.size) (int $e.left) (int $d.nsim)) "about" (printf "%d simulations of the rest of the draw from the match model (the games tab's chances: surface Elo, games and serve / return point ratings, match context; best of %d). Played matches are fixed and listed pairings are played as drawn. Pairings ESPN has not listed yet (it lists a match once both players are known) are drawn by the seeding principle: in each round the better-ranked half of the players left meets the other half at random, so early-round chances are averaged over where the draw could fall. Shown once the field is complete; round-robin events are left out." (int $d.nsim) (int $e.bo))) -}}
+{{- end }}
+{{- end -}}

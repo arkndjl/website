@@ -1404,6 +1404,21 @@
       "CFB",
       "CBB"
      ]
+    },
+    {
+     "term": "Economy baselines (CS2)",
+     "short": "Round win % by buy class against buy class, pistol conversion, and force against save, from pro round data.",
+     "body": [
+      "Buy class = team equipment value after the buy: eco under 5,000, force 5,000 to 19,999, full 20,000+. Pistol rounds are their own class. Regulation rounds of maps since Jan 2024 with bo3.gg round data (61,254 maps), all tiers and by bo3.gg event tier; tier C is the baseline on the 1NT page.",
+      "Full v full the T side wins 49%; full v force 73% (T full) and 29% (T force v CT full); an eco wins 6% against a full buy.",
+      "Pistol conversion: the pistol winner takes the next round 84% (T) / 81% (CT) of the time.",
+      "Force v save: the round after a lost round, short of a full buy; value = rounds won over that round and the next. Forcing after a lost pistol is worth +0.12 rounds over saving (se 0.004). The data has no bank, so the losing streak stands in for money, and who forces is the teams' choice: a comparison, not an experiment.",
+      "Cells under 200 rounds are dimmed. Descriptive: no opponent or map adjustment, and not a model input."
+     ],
+     "where": "Counter-Strike rounds > economy; 1NTERLYTICS",
+     "sports": [
+      "CS2"
+     ]
     }
    ]
   },
@@ -1738,6 +1753,21 @@
       "Tour-level main draws; tuned 2025, held out 2026: 1,935 picks, +4.5% worth at close (t 19)."
      ],
      "where": "Predictions picks, game table",
+     "sports": [
+      "Tennis"
+     ]
+    },
+    {
+     "term": "Event odds (tennis)",
+     "short": "Each player's chance to reach every round and win the title, for every tour-level draw in progress.",
+     "body": [
+      "10,000 simulations of the rest of the draw from the tennis game model (surface, match context, best of 5 for men at the Slams). Played matches are fixed; listed pairings are played as drawn.",
+      "ESPN lists a match once both players are known, so later pairings are drawn by the seeding principle: in each round the better-ranked half of the players left meets the other half at random. Early-round numbers are therefore averaged over where the draw could fall.",
+      "Shown once the field is complete (a 1000 event from round 2, where its byes show). Round-robin events are left out.",
+      "Check on 327 past draws rebuilt from results, 2023 to Oct 2026, real brackets: title log loss 2.62 against 2.65 on Elo alone (t -1.3) and 2.78 on ranking alone (t -3.0). Better than ranking, level with Elo; the blend weights are today's, so this is a check and not a held-out score.",
+      "Registered: scored once against outright prices after the 2027 Australian Open, from an append-only record of each event's first odds."
+     ],
+     "where": "Tennis page, games > event odds",
      "sports": [
       "Tennis"
      ]

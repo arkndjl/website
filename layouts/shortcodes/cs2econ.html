@@ -1,0 +1,93 @@
+{{- /* Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
+       Counter-Strike economy baselines (data/cs2_econ.json, scripts/cs2_econ.py): round win % by buy class against buy
+       class, pistol conversion, and the two-round value of forcing against saving after a lost round.
+       tier= all (default: every tier side by side) or s / a / b / c (that tier beside all tiers); tab=, class=. */ -}}
+{{- with site.Data.cs2_econ -}}
+{{- $e := . -}}
+{{- $tier := $.Get "tier" | default "all" -}}
+{{- $cls := $.Get "class" -}}
+{{- $tabn := $.Get "tab" -}}
+{{- $cols := cond (eq $tier "all") (slice "all" "s" "a" "b" "c") (slice $tier "all") -}}
+{{- $name := dict "all" "All" "s" "S" "a" "A" "b" "B" "c" "C" -}}
+{{- $tm := index $e.tiers $tier -}}
+{{- $note := printf "source: bo3.gg · %s maps · %s rounds%s" (lang.FormatNumber 0 $tm.maps) (lang.FormatNumber 0 $tm.rounds) (cond (eq $tier "all") "" (printf " · tier %s" $tier)) -}}
+{{- $about := printf "Regulation rounds of pro maps since Jan 2024 with bo3.gg round data, through %s. Buy class = team equipment value after the buy: eco under 5,000, force 5,000 to 19,999, full 20,000+. Tiers are bo3.gg event tiers (S, A, B, C). Cells under %d rounds are dimmed. Not adjusted for opponent or map." $e.through (int $e.thin) -}}
+{{- partial "wintable-open.html" (dict "title" "economy :: buy v buy" "icon" "cs" "tab" $tabn "class" $cls) -}}
+<table class="cfb__table cs__table cs__econ">
+  <thead><tr>
+    <th title="T-side buy class">T buy</th><th title="CT-side buy class">CT buy</th>
+    {{- range $cols }}
+    <th title="% of these rounds the T side wins, {{ if eq . "all" }}all tiers{{ else }}tier {{ . }}{{ end }}">{{ index $name . }} T%</th>
+    {{- end }}
+    <th title="% of these rounds the CT side wins">{{ index $name $tier }} CT%</th>
+    <th title="rounds">n</th>
+  </tr></thead>
+  <tbody>
+  {{- range $r := $e.buy }}
+  <tr>
+    <td>{{ $r.t }}</td><td>{{ $r.ct }}</td>
+    {{- range $cols }}{{ $c := index $r . }}
+    <td class="cfb__num" data-v="{{ $c.p | default "" }}" title="n {{ lang.FormatNumber 0 $c.n }}">{{ if ne $c.p nil }}{{ if $c.thin }}<span class="cfb__dim">{{ end }}{{ partial "num.html" (slice "%.1f" (mul $c.p 100)) }}{{ if $c.thin }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
+    {{- $c := index $r $tier }}
+    <td class="cfb__num">{{ if ne $c.p nil }}{{ if $c.thin }}<span class="cfb__dim">{{ end }}{{ partial "num.html" (slice "%.1f" (mul (sub 1 $c.p) 100)) }}{{ if $c.thin }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $c.n }}">{{ lang.FormatNumber 0 $c.n }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $e.buy) "note" $note "about" $about) -}}
+{{- partial "wintable-open.html" (dict "title" "economy :: pistol conversion" "icon" "cs" "tab" $tabn "class" $cls) -}}
+<table class="cfb__table cs__table cs__econ">
+  <thead><tr>
+    <th title="result of the pistol round (rounds 1 and 13)">Pistol</th><th title="side played">Side</th>
+    {{- range $cols }}
+    <th title="% winning the next round, {{ if eq . "all" }}all tiers{{ else }}tier {{ . }}{{ end }}">{{ index $name . }} next%</th>
+    {{- end }}
+    <th title="after a pistol win: % winning both of the next two rounds; after a loss: % winning at least one">Next two%</th>
+    <th title="rounds won of the next two">Rd/2</th>
+    <th title="pistol rounds">n</th>
+  </tr></thead>
+  <tbody>
+  {{- range $r := $e.conv }}{{ $c := index $r $tier }}
+  <tr>
+    <td>{{ $r.after }}</td><td>{{ $r.side }}</td>
+    {{- range $cols }}{{ $x := index $r . }}
+    <td class="cfb__num" title="n {{ lang.FormatNumber 0 $x.n }}">{{ if ne $x.next nil }}{{ partial "num.html" (slice "%.1f" (mul $x.next 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num">{{ if ne $c.two nil }}{{ partial "num.html" (slice "%.1f" (mul $c.two 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ if ne $c.rd nil }}{{ partial "num.html" (slice "%.2f" $c.rd) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ lang.FormatNumber 0 $c.n }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $e.conv) "note" $note "about" $about) -}}
+{{- partial "wintable-open.html" (dict "title" "economy :: force v save" "icon" "cs" "tab" $tabn "class" $cls) -}}
+<table class="cfb__table cs__table cs__econ">
+  <thead><tr>
+    <th title="the round after a lost round: after a lost pistol, or the losing streak in the half (1, 2, 3+ rounds)">After</th><th title="side played">Side</th>
+    <th title="rounds won over this round and the next when the team saved (equipment under 5,000)">Save</th><th title="save rounds">n</th>
+    <th title="rounds won over this round and the next when the team forced (5,000 to 19,999)">Force</th><th title="force rounds">n</th>
+    <th title="force minus save, rounds won over two rounds">Diff</th>
+    <th title="standard error of the difference, clustered by map">SE</th>
+    <th title="rounds won over this round and the next on a full buy (20,000+)">Full</th><th title="full-buy rounds">n</th>
+  </tr></thead>
+  <tbody>
+  {{- range $r := $e.force }}{{ $c := index $r $tier }}
+  <tr>
+    <td>{{ if eq $r.band "pistol" }}pistol loss{{ else }}{{ $r.band }} lost{{ end }}</td><td>{{ $r.side }}</td>
+    {{- range (slice "save" "force") }}{{ $x := index $c . }}
+    <td class="cfb__num">{{ if ne $x.v nil }}{{ if lt $x.n $e.thin }}<span class="cfb__dim">{{ end }}{{ partial "num.html" (slice "%.2f" $x.v) }}{{ if lt $x.n $e.thin }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ lang.FormatNumber 0 $x.n }}</td>
+    {{- end }}
+    <td class="cfb__num">{{ if ne $c.d nil }}{{ if $c.thin }}<span class="cfb__dim">{{ end }}<b>{{ partial "num.html" (slice "%+.2f" $c.d) }}</b>{{ if $c.thin }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ if ne $c.se nil }}{{ partial "num.html" (slice "%.3f" $c.se) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ if ne $c.full.v nil }}{{ partial "num.html" (slice "%.2f" $c.full.v) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ lang.FormatNumber 0 $c.full.n }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $e.force) "note" $note "about" (printf "%s Force v save: rounds after a lost round where the team is short of a full buy; rounds with either team on 12 and the last round of a half are left out. The data has no bank, so the losing streak (loss bonus) stands in for money. Who forces is the teams' own choice: a comparison, not an experiment." $about)) -}}
+{{- end -}}
