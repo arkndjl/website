@@ -456,10 +456,12 @@ def nba_props(espn=None):
 DERIV = 'SPREAD_1H,TOTAL_1H,MONEY_1H,TEAM_TOTAL'
 
 
-def derivs(sport='nfl', espn=None):
+def derivs(sport='nfl', espn=None, main=False):
     """{espn game id: {key: [line, price, price]}} for the game's derivative markets at Novig's main rung (nearest 50/50,
     hold <= .12) and asks (Oct 29 2026): '1hs' first-half home-margin line (home -3 is +3) [L, home, away], '1ht'
-    first-half total [T, over, under], '1hml' [None, home, away], 'ttH' / 'ttA' team totals [T, over, under]"""
+    first-half total [T, over, under], '1hml' [None, home, away], 'ttH' / 'ttA' team totals [T, over, under].
+    main=True adds the full-game lines read in the same pass, so a derivative row has its reference beside it:
+    'ms' [L, home, away, fair L] and 'mt' [T, over, under, fair T]"""
     try:
         espn = espn if espn is not None else espn_games(sport)
         nv = games(sport)
@@ -506,6 +508,14 @@ def derivs(sport='nfl', espn=None):
     for (gid, k), v in rungs.items():
         _, x, a, b = min(v, key=lambda r: r[0])
         out.setdefault(gid, {})[k] = [x, float(american(a)), float(american(b))]
+    if main:
+        for nid, g in nv.items():
+            gid, px = ids.get(nid), g.get('px') or {}
+            if gid not in out:
+                continue
+            for k, lk, ak, bk in (('ms', 'L', 'oH', 'oA'), ('mt', 'T', 'oO', 'oU')):
+                if px.get(lk) is not None and g.get(lk) is not None:
+                    out[gid][k] = [px[lk], float(px[ak]), float(px[bk]), g[lk]]
     return out
 
 
