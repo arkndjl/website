@@ -168,6 +168,16 @@
       {{- end }}{{ end }}
       </tbody>
     </table></div>
+    {{- with .callup }}{{ $cu := . }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Called-up squads</th><th title="matches with both squads on record / all scored matches">Matches</th><th title="home / draw / away log loss at 90 minutes, all scored matches: model / top-23 value only (lower is better)">Log loss</th><th title="model minus top-23 value only, paired t clustered by match day">t</th></tr></thead>
+      <tbody>
+      {{- range $pl := slice (slice "tune" "tuning") (slice "held" (printf "held out, to %s" ((time $cu.to).Format "Jan 2006"))) }}{{ with index $cu (index $pl 0) }}
+      <tr><td>{{ index $pl 1 }}</td><td class="cfb__num">{{ .both }} <span class="cfb__dim">/ {{ .n }}</span></td><td class="cfb__num">{{ .model }} <span class="cfb__dim">/ {{ .top23 }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .t)) }}</td></tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- end }}
     {{- with .close }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Against the book (ESPN BET, DraftKings)</th><th>Matches</th><th title="log loss: model / the price without the vig (lower is better)">Log loss</th><th title="paired t, model minus price, clustered by month (positive = the price is better)">t</th></tr></thead>

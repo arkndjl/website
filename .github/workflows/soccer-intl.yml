@@ -68,6 +68,14 @@ jobs:
             pip install -q pandas && python3 scripts/soccer_intl.py --sq
             rm -f scripts/.cache/soccer/intl/tm.zip
           fi
+      # every run adds the squads of nations that have played since their last one on record (inside the build);
+      # this pass rereads every nation's fixtures for this year and last
+      - name: Call-up squads, every nation (Transfermarkt match pages, the 2nd of each month)
+        continue-on-error: true
+        run: |
+          if [ "$(date -u +%d)" = "02" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python3 scripts/soccer_intl.py --squads
+          fi
       - name: Book open/close archive
         continue-on-error: true
         run: python3 scripts/soccer_intl.py --odds
@@ -75,5 +83,5 @@ jobs:
         run: python3 scripts/soccer_intl.py
       - name: Commit if anything changed
         run: |
-          files="data/soccer_intl.json scripts/data/soccer_intl_odds.json.gz scripts/data/soccer_intl_sq.json.gz scripts/data/soccer_intl_map.json static/img/flags"
+          files="data/soccer_intl.json scripts/data/soccer_intl_odds.json.gz scripts/data/soccer_intl_sq.json.gz scripts/data/soccer_intl_squads.json.gz scripts/data/soccer_intl_map.json static/img/flags"
           python3 scripts/data_push.py -m "Update the national-team soccer views ($(date -u +%Y-%m-%d))" -- $files
