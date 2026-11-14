@@ -8,12 +8,12 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th><th title="division">Div</th>
     <th title="rating = expected goal margin vs an average team, neutral ice: Elo + xG rating + lineup value, at the model's weights">Rating</th>
-    <th title="win chance against an average team, neutral ice">Win%</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="wins-losses-overtime losses">Rec</th>
     <th>Pts</th>
+    <th title="win chance against an average team, neutral ice">Win%</th>
     <th title="attack: score- and venue-adjusted expected goals a game over average, opponent-adjusted, weighted to recent games">xGF</th>
     <th title="defence: expected goals allowed a game against average; negative = fewer allowed">xGA</th>
     <th title="the goalie with the most recent starts, and the team's goalies' goals saved above expected a game at their start shares">Goalie</th>
@@ -22,17 +22,17 @@
     <th title="xPts = points so far + mean simulated points, games left">xPts</th>
     <th title="P(playoffs)">Playoff</th>
     <th title="P(Stanley Cup)">Cup</th>
-    <th title="division">Div</th>
   </tr></thead>
   <tbody>
   {{- range $i, $_ := .power }}
   <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.2f" "mul" 1) }}<td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
+    <td>{{ .div }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.2f" (float .rating)) }}</td>
-    <td class="cfb__num" data-v="{{ .pWin }}">{{ partial "num.html" (slice "%.0f" (mul .pWin 100)) }}%</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
     <td class="cfb__num">{{ .pts }}</td>
+    <td class="cfb__num" data-v="{{ .pWin }}">{{ partial "num.html" (slice "%.0f" (mul .pWin 100)) }}%</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float .xgf)) }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float .xga)) }}</td>
     <td data-v="{{ .gk }}">{{ .goalie | default "—" }} <span class="cfb__dim">{{ partial "num.html" (slice "%+.2f" (float .gk)) }}</span></td>
@@ -41,7 +41,6 @@
     <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .xpts)) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ partial "num.html" (slice "%.0f" (float (mul .playoff 100))) }}%</td>
     <td class="cfb__num" data-v="{{ .cup }}">{{ if lt .cup 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul .cup 100))) }}%{{ end }}</td>
-    <td>{{ .div }}</td>
   </tr>
   {{- end }}
   </tbody>
