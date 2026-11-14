@@ -1,14 +1,14 @@
 {
- "asof": "2026-11-14T19:29:44Z",
+ "asof": "2026-11-14T22:00:15Z",
  "sport": "cfb",
  "season": 2026,
  "loss": "abs margin error",
- "n": 696,
+ "n": 709,
  "logged": 752,
  "expectFrom": "walk-forward 2021-2025, same calendar month",
- "model": 12.5447,
- "expected": 12.4859,
- "z": -0.006,
+ "model": 12.6498,
+ "expected": 12.4301,
+ "z": -0.022,
  "line": 11.781,
  "lineN": 393,
  "modelAtLine": 12.9885,
@@ -17,41 +17,41 @@
    "month": "aug",
    "n": 8,
    "model": 13.1188,
-   "expected": 13.2157
+   "expected": 13.1966
   },
   {
    "month": "sep",
    "n": 323,
    "model": 12.969,
-   "expected": 12.6362
+   "expected": 12.5491
   },
   {
    "month": "oct",
    "n": 286,
    "model": 11.9155,
-   "expected": 12.3193
+   "expected": 12.2966
   },
   {
    "month": "nov",
-   "n": 79,
-   "model": 13.0291,
-   "expected": 12.4008
+   "n": 92,
+   "model": 13.7707,
+   "expected": 12.3605
   }
  ],
  "test": {
-  "n": 696,
+  "n": 709,
   "window": 300,
-  "mean": 0.0402,
-  "t": 0.71,
-  "p": 0.7586,
-  "days": 27,
+  "mean": 0.003,
+  "t": 0.05,
+  "p": 0.5199,
+  "days": 26,
   "sd": 1.0,
-  "cusum": 0.78,
-  "cusumMax": 16.84,
+  "cusum": 5.7,
+  "cusumMax": 17.21,
   "h": 10.0,
   "stop": false,
   "why": ""
  },
- "status": "ok",
+ "status": "watch",
  "why": ""
 }
