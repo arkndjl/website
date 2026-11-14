@@ -578,6 +578,7 @@ def write(rows, F, ts, all_seasons=False):
         import soccer_mv as MV                           # estimated market value next to GAR (scripts/soccer_mv.py)
         MV.attach(S, out)
         proj_attach(S, out, league_share(S, out) if S == cur else None)   # pj / p3: data/soccer_proj_fit.json
+        rate_attach(S, out)
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
                           'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
                           'mv': MV.meta(S)}, separators=(',', ':'), allow_nan=False)
@@ -855,6 +856,58 @@ def inject_badges():
         print(S, sum(1 for o in d['players'] if o.get('bdg')), 'players with badges', flush=True)
 
 
+# predictive GAR a 90 (pg90): Marcel over this season and the two before (weights RATE_W, minutes / 90 as exposure),
+# shrunk toward the position's mean by RATE_K 90s. scripts/rate_metrics_research.py soccer: next season's GAR a 90
+# (900+ min), held out by season 2016-26, MSE .00302 vs raw .00324 (t -10.2, 11/11), one-season shrink t -8.5, movers
+# t -5.2. Keepers' GAR a 90 does not repeat (K at the grid top): their pg90 sits at the keeper mean
+RATE_W, RATE_K = (1, .5, .25), {'F': 5, 'M': 5, 'D': 10, 'GK': 640}
+RATE_MU = {'F': .0813, 'M': .0652, 'D': .0544, 'GK': .0617}
+_RATE_PRIOR = {}
+
+
+def _season_rate(S):
+    """{player: [GAR, 90s]} from a written season file (both clubs pooled)"""
+    if S not in _RATE_PRIOR:
+        acc = {}
+        try:
+            for o in json.load(open(os.path.join(SDIR, f'{S}.json')))['players']:
+                if o.get('min') and o.get('gar') is not None:
+                    a = acc.setdefault(o['p'], [0.0, 0.0]); a[0] += o['gar']; a[1] += o['min'] / 90
+        except OSError:
+            pass
+        _RATE_PRIOR[S] = acc
+    return _RATE_PRIOR[S]
+
+
+def rate_attach(S, out):
+    """pg90 on a season's players: this season (as written in out) plus the S-1 and S-2 files"""
+    cur = {}
+    for o in out:
+        if o.get('min') and o.get('gar') is not None:
+            a = cur.setdefault(o['p'], [0.0, 0.0]); a[0] += o['gar']; a[1] += o['min'] / 90
+    prev = [_season_rate(S - 1), _season_rate(S - 2)]
+    for o in out:
+        pos = o.get('pos') or 'M'
+        K = RATE_K.get(pos, 5)
+        num, den = K * RATE_MU.get(pos, .065), K
+        for w, src in zip(RATE_W, [cur] + prev):
+            h = src.get(o['p'])
+            if h:
+                num += w * h[0]; den += w * h[1]
+        o['pg90'] = round(num / den, 3)
+
+
+def inject_rate():
+    """--rate: recompute pg90 in every written season file"""
+    for fn in sorted(os.listdir(SDIR)):
+        S = int(fn[:4])
+        path = os.path.join(SDIR, fn)
+        d = json.load(open(path))
+        rate_attach(S, d['players'])
+        open(path, 'w').write(json.dumps(d, separators=(',', ':'), allow_nan=False))
+        print(S, len(d['players']), flush=True)
+
+
 def inject_proj():
     """--proj: recompute pj / p3 in every written season file, oldest first (each reads the two before it)"""
     cur = D.current_season()
@@ -872,6 +925,8 @@ if __name__ == '__main__':
         inject_badges()
     elif '--ages' in sys.argv:
         inject_ages()
+    elif '--rate' in sys.argv:
+        inject_rate()
     elif '--proj' in sys.argv:
         inject_proj()
     elif '--fit' in sys.argv:

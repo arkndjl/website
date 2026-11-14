@@ -55,7 +55,8 @@ BIG_M = set()            # event ids of the two-week M events in the rows (mark_
 DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET': 0.5,
            'V0': 0.10, 'Q': 0.00010, 'PHI': 0.35, 'MU_LR': 0.002,
            'KG': 0.0, 'GSW': 0.3, 'KLV_S': 1.0, 'KLV_G': 1.0, 'KLV_C': 0.85,
-           'A': 1.0, 'B': 0.0, 'C': 0.0, 'G': 0.0, 'CR': 0.0, 'CA': 0.0, 'CH': 0.0, 'CN': 0.0, 'CM': 0.0}
+           'A': 1.0, 'B': 0.0, 'C': 0.0, 'G': 0.0, 'CR': 0.0, 'CA': 0.0, 'CH': 0.0, 'CN': 0.0, 'CM': 0.0,
+           'CP': 0.0, 'CW': 0.0}
 # KLV_C: an Elo update from a Challenger / WTA 125 match counts x0.85 (results a level down carry over to the tour a
 # little less than Elo assumes). Pre-registered grid {0.7, 0.85}, value picked on 2012-22: tour main-draw log loss
 # -0.6e-4 (t -2.1 by tournament), held out 2023-26 -1.0e-4 (t -3.0, Holm p .009 over 6 tests, 4/4 seasons), against
@@ -66,7 +67,22 @@ DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET':
 # (meetings + 4)), CN matches in the last 30 days / 5 (match play and form). CM market memory: the mean of the player's
 # last 8 closing lines minus the model's chance (logits, 120 days, shrunk by 3) from the feed's no-vig closes (2025+);
 # it predicts the open-to-close move beside the model (2026 held out t 5.8) and lifts held-out pick CLV
-CTX = ('CR', 'CA', 'CH', 'CN', 'CM')
+# CP points added (pPA gap / 10) and CW WAR a match (52 weeks, shrunk by 10 matches), A minus B: player value terms
+# (scripts/tennis_value_research.py, pre-registered, Holm over 5): each alone held 2023-26 log loss -3.5e-4 (t -2.5 /
+# -2.3 by tournament), tune 2012-22 -1.2 / -1.7e-4. Only CP is in the blend (ALL)
+CTX = ('CR', 'CA', 'CH', 'CN', 'CM', 'CP', 'CW')
+# player value (Nov 14 2026, scripts/tennis_value_research.py):
+#   PA   points won over what an average player (serve and return ratings 0) wins against the same opponent, both
+#        sides of the ball. rPA = 100 x sum PA / points, last 52 weeks; pPA = the same with each match weighted
+#        .5 ** (days ago / PA_H), shrunk by PA_K points (H, K picked leaving each year out 2011-26, 16/16 the same).
+#        Next 52 weeks' rPA (1,000+ points), held out by year: MSE 3.76 vs raw 4.37 (t -12.5) and the Kalman serve +
+#        return ratings 4.80 (t -19.1), 16/16 years
+#   WAR  wins minus P(a replacement player beats the same opponents): Elo with the surface blend, replacement = the
+#        median pre-match Elo of players ranked 101-150 at their matches 2005-26 (PA_REPL), every level, 52 weeks.
+#        The next year-end ranking: Spearman +.12 over 52-week wins (t 4.3, 25/30 tour-years) and +.26 over W - L;
+#        the same year's ranking: no better than wins (t 0.9)
+PA_H, PA_K = 365, 300
+PA_REPL = {'atp': 2008.8, 'wta': 1993.4}
 CM_LAG = 7               # market memory in fits and backtests: closes from events started 7+ days before (Model cm_lag)
 WIN = 3                  # blend weights fit on the last WIN seasons (a 3-season window beat the expanding 2012+ fit 9/9
                          # seasons 2018-26 walk forward: favourites have run a little less sure in recent seasons)
@@ -237,6 +253,9 @@ class Model:
         self.h2h = {}          # (a, b) -> a's wins over b
         self.mres = {}         # pid -> last 8 (day, close minus model in logits, the player's side)
         self.born = {}         # pid -> birth day number, from the bios
+        self.pa = {}           # pid -> [decayed points added, decayed points, day] (pPA)
+        self.wq = {}           # pid -> [(day, won - replacement chance, level)] for 52 weeks (WAR)
+        self.pq = {}           # pid -> [(day, points added, points)] for 52 weeks (rPA)
         self.set_bios()
 
     def set_bios(self, players=None):
@@ -261,7 +280,65 @@ class Model:
             return math.log1p(rest), (age - 26) / 5, n30 / 5, sum(mr) / (len(mr) + 3)
         fa, fb = one(a), one(b)
         wa, wb = self.h2h.get((a, b), 0), self.h2h.get((b, a), 0)
-        return [fa[0] - fb[0], fa[1] - fb[1], (wa - wb) / (wa + wb + 4), fa[2] - fb[2], fa[3] - fb[3]]
+        return [fa[0] - fb[0], fa[1] - fb[1], (wa - wb) / (wa + wb + 4), fa[2] - fb[2], fa[3] - fb[3],
+                (self.ppa(a, day) - self.ppa(b, day)) / 10, self.war_rate(a, day) - self.war_rate(b, day)]
+
+    # player value
+    def _pa(self, pid, day):
+        x = self.pa.get(pid)
+        if x is None:
+            x = self.pa[pid] = [0.0, 0.0, day]
+        elif day > x[2]:
+            f = 0.5 ** ((day - x[2]) / PA_H); x[0] *= f; x[1] *= f; x[2] = day
+        return x
+
+    def ppa(self, pid, day):
+        """pPA: points added a 100 points, decayed and shrunk (0 = serve and return ratings 0)"""
+        x = self._pa(pid, day)
+        return 100 * x[0] / (x[1] + PA_K)
+
+    def _wq(self, pid, day):
+        q = self.wq.setdefault(pid, [])
+        i = 0
+        while i < len(q) and q[i][0] < day - 364: i += 1
+        if i: del q[:i]
+        return q
+
+    def rpa(self, pid, day):
+        """rPA: points added a 100 points, the 52 weeks to day (None without statistics)"""
+        q = self.pq.get(pid, [])
+        a = [x for x in q if x[0] >= day - 364]
+        self.pq[pid] = a
+        n = sum(x[2] for x in a)
+        return 100 * sum(x[1] for x in a) / n if n else None
+
+    def war(self, pid, day):
+        """wins above replacement, the 52 weeks to day"""
+        return sum(v for _, v, _ in self._wq(pid, day))
+
+    def war_rate(self, pid, day):
+        q = self._wq(pid, day)
+        return sum(v for _, v, _ in q) / (len(q) + 10)
+
+    def value_update(self, r, day):
+        """PA and WAR from a finished match, before the ratings move"""
+        d, tour, lv, sf, rd, bo, tid, w, l, score, ws, ls = r[:12]
+        sw = self.P['SW']
+        ew, el = self._e(w), self._e(l)
+        rr = PA_REPL.get(tour, 2000.0)
+        for pid, won, e in ((w, 1, el), (l, 0, ew)):
+            ro = (1 - sw) * e[0] + sw * e[2][sf][0]
+            p = 1 / (1 + 10 ** ((ro - rr) / 400))
+            if bo == 5: p = bo5(p)
+            self._wq(pid, day).append((day, won - p, lv))
+        if not (ws and ls and ws[0] and ls[0]) or games(score)[2]: return
+        mu = self.mu_of(tour, sf)
+        pw, pl = self.pt.get(w, [0.0, 0, 0.0]), self.pt.get(l, [0.0, 0, 0.0])
+        n = ws[0] + ls[0]
+        for pid, mine, theirs, op in ((w, ws, ls, pl), (l, ls, ws, pw)):
+            pa = (mine[2] + mine[3] - mine[0] * sig(mu - op[2])) + ((theirs[0] - theirs[2] - theirs[3]) - theirs[0] * (1 - sig(mu + op[0])))
+            x = self._pa(pid, day); x[0] += pa; x[1] += n
+            self.pq.setdefault(pid, []).append((day, pa, n))
 
     # Elo
     def _e(self, pid):
@@ -402,6 +479,7 @@ class Model:
             q.append(day)
             del q[:-16]
         self.h2h[(w, l)] = self.h2h.get((w, l), 0) + 1
+        self.value_update(r, day)
         mult = (self.P['RET'] if ret else 1.0) * (self.P['KLV_S'] if lv == 'S' else self.P['KLV_G'] if lv == 'G'
                                                   else self.P['KLV_C'] if lv == 'C' else 1.0)
         self.elo_update(w, l, sf, mult)
@@ -443,7 +521,9 @@ def ll(ps):
 
 
 NAMES = ('A', 'B', 'G') + CTX
-ALL = tuple(range(len(NAMES)))
+# CW is kept out of the blend: inside the walk-forward fit (scripts/research/tennis_value_nov14/wf_check.py) CP alone
+# held -9.8e-4 (t -4.1), close period -13.4e-4 (t -3.2); CW alone -1.6e-4 (t -2.0); both -9.3e-4, no better than CP
+ALL = tuple(i for i, k in enumerate(NAMES) if k != 'CW')
 
 
 def feats(x):
@@ -853,7 +933,7 @@ def build(rows, players, tn):
                 'elo': round(e[0]), 'eH': round(e[2]['H'][0]), 'eC': round(e[2]['C'][0]), 'eG': round(e[2]['G'][0]),
                 'd90': round(e[0] - old[p]) if p in old else None,
                 'peak': round(m.peak[p][0]) if p in m.peak else None, 'peakd': m.peak[p][1] if p in m.peak else None,
-                '_s': x[0], '_r': x[2],
+                '_s': x[0], '_r': x[2], 'war': round(m.war(p, tday), 1), '_pp': m.ppa(p, tday), '_rp': m.rpa(p, tday),
                 'unc': round((x[1] + x[3]) ** 0.5, 3),
                 'w': rw.get('w', 0), 'l': rw.get('l', 0), 'tw': rw.get('tw', 0), 'tl': rw.get('tl', 0),
                 'gwp': rate(rw.get('gw', 0), rw.get('gw', 0) + rw.get('gl', 0)), 'sm': rw.get('m', 0),
@@ -904,6 +984,14 @@ def build(rows, players, tn):
             r['rpwp'] = round(100 * (base - rv), 1)
             r['xhold'] = round(100 * p_game(sv), 1)
             r['xbrk'] = round(100 * (1 - p_game(rv)), 1)
+        # PA (points added a 100 points) against the average top-100 player by ARK, like serve / return above
+        cp = sum(r['_pp'] for r in t100) / len(t100)
+        rr_ = [r['_rp'] for r in t100 if r['_rp'] is not None]
+        cr = sum(rr_) / len(rr_) if rr_ else 0.0
+        for r in rowsout:
+            r['ppa'] = round(r.pop('_pp') - cp, 2)
+            v = r.pop('_rp')
+            r['rpa'] = round(v - cr, 2) if v is not None and r['sm'] else None
         for s in SURFS:
             for i, r in enumerate(sorted(rowsout, key=lambda r: -r['p' + s])): r['rk' + s] = i + 1
         keep = rowsout[:TOP]

@@ -68,6 +68,8 @@
   }
   // WAA: wins over an average starter at his position (the position-adjusted view of WAR)
   function ageCell(r) { return r.age != null ? (+r.age).toFixed(1) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—'; }
+  function waaFs(r) { return r.waa != null && r.snapShare != null && r.snapShare >= 0.2 ? r.waa / Math.min(1, r.snapShare) : null; }
+  function fsCell(r) { var v = waaFs(r); return v == null ? dim : '<span' + (v < 0 ? ' class="cfb__down"' : '') + '>' + (v > 0 ? '+' : '') + v.toFixed(2) + '</span>'; }
   function waaCell(r) {
     if (r.waa == null) return dim;
     return '<span title="wins over an average ' + (r.pos === 'K' ? 'kicker' : r.pos === 'P' ? 'punter' : r.pos + ' starter') + ', same snaps"' + (r.waa < 0 ? ' class="cfb__down"' : r.waa === 0 ? ' class="cfb__dim"' : '') + '>' + (r.waa > 0 ? '+' : '') + (+r.waa).toFixed(2) + '</span>';
@@ -172,7 +174,7 @@
       (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season)">▲FBS</span>' : '') +
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') +
       (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '') + '</td>' +
-      (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war is-key">' + waaCell(r) + '</td><td class="cfb__num">' + warCell(r) + '</td><td class="cfb__num">' + xvCell(r) + '</td><td class="cfb__num">' + ageCell(r) + '</td>' : '') +
+      (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war is-key">' + waaCell(r) + '</td><td class="cfb__num">' + warCell(r) + '</td><td class="cfb__num">' + fsCell(r) + '</td><td class="cfb__num">' + xvCell(r) + '</td><td class="cfb__num">' + ageCell(r) + '</td>' : '') +
       (yx ? '<td class="cfb__pos-cell" title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '">' + yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : '') + '</td>' :
       '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAA' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>') +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span></td>' +
@@ -269,7 +271,7 @@
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; }, mht: function (r) { return r.mz ? r.mz[0] : null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
     up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, xfer: function (r) { return r.transferP; },
-    war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, xv: function (r) { return r.xv; },
+    war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, waafs: waaFs, xv: function (r) { return r.xv; },
   };
 
   // filtering and sorting run on the records; only the 50 rows of the current page are ever in the
