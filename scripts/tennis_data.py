@@ -159,9 +159,14 @@ def _flt(x):
         return None
 
 
+def is_qual(rd):
+    """a qualifying round (Q1-Q4); 'QF' is the quarterfinal of a main draw"""
+    return bool(rd) and rd.startswith('Q') and rd != 'QF'
+
+
 def level(tour, raw, rnd, fname):
     raw = (raw or '').strip()
-    if rnd and rnd.startswith('Q') and raw not in ('C',) and 'futures' not in fname and raw not in ('15', '25', '35', '50', '75', '100', 'S'):
+    if is_qual(rnd) and raw not in ('C',) and 'futures' not in fname and raw not in ('15', '25', '35', '50', '75', '100', 'S'):
         return 'Q'
     if tour == 'wta':
         return {'G': 'G', 'PM': 'M', 'P': 'A', 'I': 'A', 'W': 'A', 'F': 'F', 'D': 'D', 'O': 'O', 'C': 'C', 'T1': 'M',
@@ -470,8 +475,8 @@ def espn_rows(comps, eid, kind, hist):
         if any(abs((d0s - x).days) <= 10 for x in have.get(key, ())): continue     # the same event's meeting
         have.setdefault(key, []).append(d0s)
         d = int(d0s.strftime('%Y%m%d'))
-        if rd.startswith('Q'): lv = 'Q'
-        out.append([d, c['tour'], lv, sf, rd, 5 if (lv == 'G' and c['tour'] == 'atp' and not rd.startswith('Q')) else 3,
+        if is_qual(rd): lv = 'Q'
+        out.append([d, c['tour'], lv, sf, rd, 5 if (lv == 'G' and c['tour'] == 'atp' and not is_qual(rd)) else 3,
                     f"{c['tour'][0]}e{c['eid']}", w, l, sc, None, None, None, None, None, None, c['tn']])
     return out
 
