@@ -1,0 +1,22 @@
+{
+ "test": "B2 derivative markets vs the main line",
+ "registered": "2026-11-14",
+ "status": "registered, not scored",
+ "runs": "once, by scripts/derivs_research.py --b2, when the trigger is met; the result is written beside this file and never overwritten",
+ "trigger": {"games": 300, "game": "a game with a derivative quote and a full-game fair line both standing 2 h before the start, in scripts/data/props (nfl-*.jsonl game rows, derivs-*.jsonl)"},
+ "markets": ["1hs", "1ht", "ttH", "ttA"],
+ "sd": {"cfb": [16.0, 14.0], "nfl": [13.5, 10.0], "cbb": [11.0, 16.0], "nba": [12.0, 14.5], "nhl": [2.3, 2.3]},
+ "halfSd": 0.72,
+ "teamTotalSd": "sqrt(margin sd^2 + total sd^2) / 2",
+ "quoteFair": "line + sd x zinv(p), p = (ask of the first side + 1 - ask of the second side) / 2; first side = home (1hs) or over",
+ "mainFair": "Novig fair full-game margin M (home) and total T: odds_novig rows for the NFL, the ms / mt rows' m elsewhere",
+ "asOf": "the rows standing 2 h before the start (lookback 7 days); last = the rows standing at the start",
+ "implied": {"1hs": "b x M", "1ht": "b x T", "ttH": "a + (T + M) / 2", "ttA": "a + (T - M) / 2",
+             "fit": "per league and market, least squares on the league's first 40% of trigger games by start time (20+ games, else the league is left out)"},
+ "rows": "game-markets of the remaining 60% with |quote fair - implied| >= 1.5 points 2 h before the start",
+ "score": "y = -sign(dev) x (quote fair at the start - quote fair 2 h before): points the derivative moved toward the implied value",
+ "pass": "mean y > 0 with t >= 2, CR1 by game day (US Eastern date of the start), one-sided, all leagues and markets pooled",
+ "reported": ["n by league and market", "the same drift for quotes under 1.5 off (baseline)", "share of flagged quotes that moved toward"],
+ "outcome": "pass = a lead for a priced test (asks, not lines); no pick and no page claim either way",
+ "priorLooks": "Nov 14 2026: NFL archive, counts and dispersion of dev only (in-sample fit, no drift read)"
+}

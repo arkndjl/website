@@ -27,6 +27,10 @@ NFL (Oct 29 2026, ARK Edge Sweep) -> scripts/data/props/nfl-<yyyy-mm>.jsonl, the
     game markets   a = 'game', s in 1hs (first-half home-margin line, oO/oU = home/away price), 1hml (oO/oU = home/
                    away), 1ht (first-half total), ttH / ttA (team totals; m = the game model's team points),
                    tt1hH / tt1hA (team first-half totals, DraftKings only)
+Other leagues' game markets -> scripts/data/props/derivs-<sport>-<yyyy-mm>.jsonl (nba, cbb, cfb, nhl; Novig only, whatever
+of first-half spread / total / moneyline and team totals it lists): the NFL game-market rows plus the full-game line
+read in the same pass (s = ms, mt; m = Novig's fair line). A row when the line changes or a price moves two points of
+chance, so the files stay small.
 NHL (Oct 31 2026) -> scripts/data/props/nhl-<yyyy-mm>.jsonl: every DraftKings prop (s in sog g ast pts sv blk ppp hit ga,
 scripts/props_archive.py) for the forward archive; m only on saves (data/nhl_props.json) for the saves paper test.
 ESPN serves DraftKings' NFL lines without prices (oO/oU None on a 'dk' row); Novig's rows carry its asks. ESPN still
@@ -136,6 +140,10 @@ def main():
             nhl(now)
         except Exception as ex:
             print('nhl props failed:', ex)
+    try:
+        derivs(now)
+    except Exception as ex:
+        print('derivatives failed:', ex)
 
 
 def nba(now):
@@ -373,6 +381,57 @@ def nfl(now):
                 f.write(json.dumps(r, separators=(',', ':')) + '\n')
     print('nfl:', len(games), 'games,', sum(len(v[0]) for v in got.values()), 'player props,',
           sum(len(v[1]) for v in got.values()), 'game markets (', len(src), 'Novig ),', len(rows), 'rows written')
+
+
+DERIV_SEASON = {'nba': SEASON, 'nhl': SEASON, 'cbb': (11, 12, 1, 2, 3, 4), 'cfb': (8, 9, 10, 11, 12, 1)}
+DERIV_DAYS = {'nba': (0, 2), 'nhl': (0, 2), 'cbb': (0, 2), 'cfb': (0, 6)}
+DERIV_MOVE = 0.02            # a price row needs this much chance; a line change always writes
+
+
+def _chance(o):
+    return None if o is None else (100 / (o + 100) if o > 0 else -o / (-o + 100))
+
+
+def deriv_changed(old, r):
+    """True when a derivative row is worth writing after `old` (its last written row)"""
+    if not old or old.get('L') != r['L'] or old.get('m') != r['m']:
+        return True
+    for k in ('oO', 'oU'):
+        a, b = _chance(old.get(k)), _chance(r[k])
+        if (a is None) != (b is None) or (a is not None and abs(a - b) >= DERIV_MOVE - 1e-9):
+            return True
+    return False
+
+
+def derivs(now, sports=None):
+    """first-half and team-total markets beside the full-game line for the leagues other than the NFL"""
+    sys.path.insert(0, HERE)
+    import novig
+    os.makedirs(OUT, exist_ok=True)
+    t = now.strftime('%Y-%m-%dT%H:%MZ')
+    for sp in sports or [s for s in DERIV_SEASON if now.month in DERIV_SEASON[s]]:
+        espn = novig.espn_games(sp, DERIV_DAYS[sp])
+        got = novig.derivs(sp, espn, main=True)
+        fn = os.path.join(OUT, f"derivs-{sp}-{now.strftime('%Y-%m')}.jsonl")
+        prev = os.path.join(OUT, f"derivs-{sp}-{(now.replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m')}.jsonl")
+        last = last_rows([prev, fn])
+        rows = []
+        for gid, lines in got.items():
+            kick = espn[gid][2]
+            if not kick or datetime.datetime.fromisoformat(kick.replace('Z', '+00:00')) <= now:
+                continue
+            if not any(k not in ('ms', 'mt') for k in lines):
+                continue                                     # no derivative listed: the main line alone is archived elsewhere
+            for k, v in lines.items():
+                r = {'t': t, 'id': gid, 'k': kick, 'a': 'game', 's': k, 'L': v[0], 'oO': v[1], 'oU': v[2],
+                     'm': v[3] if len(v) > 3 else None, 'src': 'novig'}
+                if deriv_changed(last.get((gid, 'game', k)), r):
+                    rows.append(r)
+        if rows:
+            with open(fn, 'a') as f:
+                for r in rows:
+                    f.write(json.dumps(r, separators=(',', ':')) + '\n')
+        print(f'derivatives {sp}:', len(got), 'games,', len(rows), 'rows written')
 
 
 NHL_SITE = 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl'
