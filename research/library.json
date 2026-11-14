@@ -1285,7 +1285,8 @@
      "short": "Committee model plus bracket for the 12-team playoff.",
      "body": [
       "Plackett-Luce fit on CFP releases 2017-25: losses, wins, rating, wins above bubble, P4. Held out field log loss .029 vs .090.",
-      "2026 rules: P4 champions in, best G6 champion, Notre Dame if top 12; top 4 byes."
+      "2026 rules: P4 champions in, best G6 champion, Notre Dame if top 12; top 4 byes.",
+      "Committee memory: + gamma x (26 - rank) / 25 in the latest CFP release (gamma .75 after week 10, 2.75 after week 12). Held out 2022-25: final-ranking log likelihood -185.2 to -175.4 (week 12); seed log loss t -3.7 (week 10), -2.4 (week 12)."
      ],
      "where": "CFB season odds (Bye, Semis, Natl title)",
      "sports": [
@@ -1302,6 +1303,25 @@
      "where": "CBB tournament odds tab",
      "sports": [
       "CBB"
+     ]
+    },
+    {
+     "term": "Projected bracket",
+     "short": "The bracket with the most expected exact seeds across 10,000 simulated seasons.",
+     "body": [
+      "Seeds: assignment of teams to seed slots maximising the sum of P(team at that seed) (Hungarian). Division and conference-winner slots go to the likeliest winner even below 50%.",
+      "Each game goes to the side with the higher P(reach the next round). % beside a team = P(reach that round).",
+      "NFL reseeds after the wild card; NBA play-in 7-8, 9-10, loser v winner; NHL division slots + 2 wild cards; MLS 8-9 wild card; NCAA lines sized from the sims (First Four lines 6), regions by S-curve.",
+      "CFB backtest, weeks 10 and 12 of 2017-25: 2.1 exact seeds a season at both, vs 1.25 and 2.4 for the committee's own top 12 that week. Full assignment beat seeding the 12 likeliest teams (1.75 at week 10)."
+     ],
+     "where": "bracket tab on CFB, NFL, NBA, NHL, CBB; MLS bracket on soccer",
+     "sports": [
+      "CFB",
+      "NFL",
+      "CBB",
+      "NBA",
+      "NHL",
+      "Soccer"
      ]
     },
     {

@@ -964,7 +964,57 @@ def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=
             if t in sr:
                 out[t]['seed'] = sr[t][0]
     meta = {'atLarge': n_at, 'autobids': len(ctinfo), 'bracket': bool(actual), 'sims': nsim}
+    try:
+        meta['proj'] = project_bracket(SS, teams, o, ctinfo, confs, actual, sr if actual else None, nsim)
+    except Exception as e:            # the projected bracket sits out rather than stop the odds
+        print('projected bracket failed:', repr(e), flush=True)
     return out, meta
+
+
+def project_bracket(SS, teams, o, ctinfo, confs, actual, sr, nsim):
+    """the projected bracket (scripts/bracket.py): each conference's automatic bid to its likeliest champion, the
+    at-large bids to the likeliest of the rest, seed lines by the assignment with the most expected exact lines
+    (each line's size from the sims: 4, 6 on the First Four lines), then the S-curve into regions and First Four
+    pairs as the sims do (bracket_slots). Once the bracket is out, the real one. -> {slots: [(team, partner)] x 64,
+    seed: {team: line}, regions}"""
+    import bracket as BK
+    if actual:
+        seed = {t: sr[t][0] for t in sr}
+        reg = []
+        for i in range(0, 64, 16):
+            t = actual[i][0]
+            reg.append(sr.get(t, (None, f'Region {i // 16 + 1}'))[1])
+        return {'slots': [[a, b] for a, b in actual], 'seed': seed, 'regions': reg, 'real': True}
+    n = len(teams)
+    bid, auto, sd = o['bid'], o['auto'], o['seed']
+    autos = []
+    for c in ctinfo:
+        mem = [i for i, t in enumerate(teams) if confs.get(t) == c]
+        if mem:
+            autos.append(max(mem, key=lambda i: (auto[i], bid[i])))
+    aset = set(autos)
+    n_at = 68 - len(autos)
+    pool = sorted([i for i in range(n) if i not in aset], key=lambda i: -(bid[i] - auto[i]))
+    field = autos + pool[:n_at]
+    al = set(pool[:n_at])
+    # line sizes from the sims (sum of P(line) over teams), rounded to 68
+    cap = sd.sum(0)
+    size = np.floor(cap).astype(int)
+    for k in np.argsort(-(cap - size))[:68 - size.sum()]:
+        size[k] += 1
+    slots_l = [k for k in range(16) for _ in range(size[k])]
+    P = [[float(sd[i, k]) for i in field] for k in slots_l]
+    pick = BK.assign(P)
+    line = {field[j]: slots_l[r] + 1 for r, j in enumerate(pick)}
+    # within a line: more P(this line or better) first, so the S-curve keeps the order the sims lean to
+    ms = {i: float((np.arange(1, 17) * sd[i]).sum() / max(1e-9, sd[i].sum())) for i in field}
+    z = {i: -(line[i] + 0.01 * ms[i]) for i in field}
+    sl, seedl = bracket_slots(z, al)
+    return {'slots': [[teams[a], teams[b] if b >= 0 else None] for a, b in sl], 'seed': {teams[i]: v for i, v in seedl.items()},
+            'regions': ['Region 1', 'Region 2', 'Region 3', 'Region 4'], 'real': False,
+            'auto': [teams[i] for i in autos], 'atLarge': [teams[i] for i in pool[:n_at]],
+            'lastIn': [teams[i] for i in pool[n_at - 4:n_at]], 'firstOut': [teams[i] for i in pool[n_at:n_at + 4]],
+            'sd': {teams[i]: [round(float(x), 3) for x in sd[i]] for i in range(n) if bid[i] >= 0.005}}
 
 
 def summary(res):

@@ -422,6 +422,80 @@ def tiebreak_check(games, info, wfr):
 
 
 # ------------------------------------------------------------------------------------------------ season sims
+def sim_draws(S, wk, fr, info, wfr, rng, N=2000):
+    """the season from week wk's end: N simulated finishes (strength draws, results, conference champions, the
+    committee's inputs) for every team of the final release fr"""
+    fbs, conf, ccg, reg = info[S]
+    teams = fr['teams']; ix = {t: i for i, t in enumerate(teams)}; T = len(teams)
+    nxt = [r['d'] for r in wfr if r['S'] == S and r['wk'] == wk + 1]
+    rat, hfa = rating_at(wfr, S, min(nxt))
+    fcs_r = float(np.mean([v for t, v in rat.items() if t not in fbs] or [-25.0]))
+    sig = float(np.mean([r['sigma'] for r in wfr if r['S'] == S]))
+    done = [g for g in reg if g['week'] <= wk]; left = [g for g in reg if g['week'] > wk]
+    r0 = np.array([rat.get(t, 0.0) for t in teams])
+    nleft = Counter()
+    for g in left:
+        nleft[str(g['homeId'])] += 1; nleft[str(g['awayId'])] += 1
+    tu = np.array([8 * math.sqrt(min(1, nleft[t] / 12)) for t in teams])
+    strn = r0[None, :] + rng.standard_normal((N, T)) * tu[None, :]
+    Wm = np.zeros((N, T)); Lm = np.zeros((N, T)); CWm = np.zeros((N, T)); CLm = np.zeros((N, T))
+    wab = np.zeros((N, T))
+    # every game: home/away index (-1 = FCS), result per sim
+    allg = done + left
+    hi = np.array([ix.get(str(g['homeId']), -1) for g in allg]); ai = np.array([ix.get(str(g['awayId']), -1) for g in allg])
+    neu = np.array([g['neutralSite'] for g in allg]); cg = np.array([bool(g['conferenceGame']) for g in allg])
+    sh = np.where(hi[None, :] >= 0, strn[:, np.maximum(hi, 0)], fcs_r)
+    sa = np.where(ai[None, :] >= 0, strn[:, np.maximum(ai, 0)], fcs_r)
+    nd = len(done)
+    hw = np.zeros((N, len(allg)))
+    hw[:, :nd] = np.array([1.0 if g['homePoints'] > g['awayPoints'] else 0.0 for g in done])[None, :]
+    mu = sh[:, nd:] - sa[:, nd:] + np.where(neu[nd:], 0, hfa)[None, :]
+    hw[:, nd:] = (mu + rng.standard_normal(mu.shape) * sig > 0).astype(float)
+    # h2h within conference for tiebreaks: kept per sim only for the top-two step below (dict of arrays)
+    for j in range(len(allg)):
+        h, a = hi[j], ai[j]
+        if h >= 0:
+            Wm[:, h] += hw[:, j]; Lm[:, h] += 1 - hw[:, j]
+        if a >= 0:
+            Wm[:, a] += 1 - hw[:, j]; Lm[:, a] += hw[:, j]
+        if cg[j] and h >= 0 and a >= 0:
+            CWm[:, h] += hw[:, j]; CLm[:, h] += 1 - hw[:, j]; CWm[:, a] += 1 - hw[:, j]; CLm[:, a] += hw[:, j]
+    bub = -np.sort(-strn, axis=1)[:, 11]
+    for j in range(len(allg)):
+        h, a = hi[j], ai[j]; site = 0 if neu[j] else 2.5
+        if h >= 0:
+            wab[:, h] += hw[:, j] - 0.5 * (1 + erf_v((bub - sa[:, j] + site) / GSD / math.sqrt(2)))
+        if a >= 0:
+            wab[:, a] += (1 - hw[:, j]) - 0.5 * (1 + erf_v((bub - sh[:, j] - site) / GSD / math.sqrt(2)))
+    # conference title games (conferences that held one that season), top two by conference pct, ties strength
+    champ = np.zeros((N, T))
+    ccg_confs = {g['homeConference'] for g in ccg if g['homeConference'] == g['awayConference']}
+    byc = defaultdict(list)
+    for t in teams:
+        if conf.get(t) and 'Independent' not in conf[t]:
+            byc[conf[t]].append(ix[t])
+    for c, ts in byc.items():
+        if len(ts) < 4:
+            continue
+        ts = np.array(ts)
+        key = CWm[:, ts] / np.maximum(1, CWm[:, ts] + CLm[:, ts]) * 1000 + strn[:, ts] / 100
+        o = np.argsort(-key, axis=1)
+        a1 = ts[o[:, 0]]; a2 = ts[o[:, 1]]
+        if c in ccg_confs:
+            s1 = strn[np.arange(N), a1]; s2 = strn[np.arange(N), a2]
+            w1 = (s1 - s2 + rng.standard_normal(N) * sig) > 0
+            win = np.where(w1, a1, a2); lose = np.where(w1, a2, a1)
+            Wm[np.arange(N), win] += 1; Lm[np.arange(N), lose] += 1
+            wab[np.arange(N), win] += 1 - 0.5 * (1 + erf_v((bub - strn[np.arange(N), lose]) / GSD / math.sqrt(2)))
+            wab[np.arange(N), lose] += 0 - 0.5 * (1 + erf_v((bub - strn[np.arange(N), win]) / GSD / math.sqrt(2)))
+            champ[np.arange(N), win] = 1
+        else:
+            champ[np.arange(N), a1] = 1
+    p4 = np.array([power(t, conf, S) for t in teams], float)
+    feats = {'L': Lm, 'W': Wm, 'rating': strn, 'wab': wab, 'champ': champ, 'p4': np.broadcast_to(p4, (N, T))}
+    return {'teams': teams, 'feats': feats, 'champ': champ, 'conf': conf, 'N': N, 'T': T}
+
+
 def sim_backtest(games, info, wfr, rels, beta, cols, T0, finals):
     """from weeks 6, 9 and 12: P(in field) by the committee model vs the old formula, log loss vs the real field"""
     fin_by = {r['S']: r for r in finals}
@@ -432,75 +506,10 @@ def sim_backtest(games, info, wfr, rels, beta, cols, T0, finals):
         for S in range(2017, 2026):
             if S == 2020 or S not in fin_by:
                 continue
-            fbs, conf, ccg, reg = info[S]
-            fr = fin_by[S]; teams = fr['teams']; ix = {t: i for i, t in enumerate(teams)}; T = len(teams)
-            nxt = [r['d'] for r in wfr if r['S'] == S and r['wk'] == wk + 1]
-            rat, hfa = rating_at(wfr, S, min(nxt))
-            fcs_r = float(np.mean([v for t, v in rat.items() if t not in fbs] or [-25.0]))
-            sig = float(np.mean([r['sigma'] for r in wfr if r['S'] == S]))
-            done = [g for g in reg if g['week'] <= wk]; left = [g for g in reg if g['week'] > wk]
-            r0 = np.array([rat.get(t, 0.0) for t in teams])
-            nleft = Counter()
-            for g in left:
-                nleft[str(g['homeId'])] += 1; nleft[str(g['awayId'])] += 1
-            tu = np.array([8 * math.sqrt(min(1, nleft[t] / 12)) for t in teams])
-            N = 2000
-            strn = r0[None, :] + rng.standard_normal((N, T)) * tu[None, :]
-            Wm = np.zeros((N, T)); Lm = np.zeros((N, T)); CWm = np.zeros((N, T)); CLm = np.zeros((N, T))
-            wab = np.zeros((N, T))
-            # every game: home/away index (-1 = FCS), result per sim
-            allg = done + left
-            hi = np.array([ix.get(str(g['homeId']), -1) for g in allg]); ai = np.array([ix.get(str(g['awayId']), -1) for g in allg])
-            neu = np.array([g['neutralSite'] for g in allg]); cg = np.array([bool(g['conferenceGame']) for g in allg])
-            sh = np.where(hi[None, :] >= 0, strn[:, np.maximum(hi, 0)], fcs_r)
-            sa = np.where(ai[None, :] >= 0, strn[:, np.maximum(ai, 0)], fcs_r)
-            nd = len(done)
-            hw = np.zeros((N, len(allg)))
-            hw[:, :nd] = np.array([1.0 if g['homePoints'] > g['awayPoints'] else 0.0 for g in done])[None, :]
-            mu = sh[:, nd:] - sa[:, nd:] + np.where(neu[nd:], 0, hfa)[None, :]
-            hw[:, nd:] = (mu + rng.standard_normal(mu.shape) * sig > 0).astype(float)
-            # h2h within conference for tiebreaks: kept per sim only for the top-two step below (dict of arrays)
-            for j in range(len(allg)):
-                h, a = hi[j], ai[j]
-                if h >= 0:
-                    Wm[:, h] += hw[:, j]; Lm[:, h] += 1 - hw[:, j]
-                if a >= 0:
-                    Wm[:, a] += 1 - hw[:, j]; Lm[:, a] += hw[:, j]
-                if cg[j] and h >= 0 and a >= 0:
-                    CWm[:, h] += hw[:, j]; CLm[:, h] += 1 - hw[:, j]; CWm[:, a] += 1 - hw[:, j]; CLm[:, a] += hw[:, j]
-            bub = -np.sort(-strn, axis=1)[:, 11]
-            for j in range(len(allg)):
-                h, a = hi[j], ai[j]; site = 0 if neu[j] else 2.5
-                if h >= 0:
-                    wab[:, h] += hw[:, j] - 0.5 * (1 + erf_v((bub - sa[:, j] + site) / GSD / math.sqrt(2)))
-                if a >= 0:
-                    wab[:, a] += (1 - hw[:, j]) - 0.5 * (1 + erf_v((bub - sh[:, j] - site) / GSD / math.sqrt(2)))
-            # conference title games (conferences that held one that season), top two by conference pct, ties strength
-            champ = np.zeros((N, T))
-            ccg_confs = {g['homeConference'] for g in ccg if g['homeConference'] == g['awayConference']}
-            byc = defaultdict(list)
-            for t in teams:
-                if conf.get(t) and 'Independent' not in conf[t]:
-                    byc[conf[t]].append(ix[t])
-            for c, ts in byc.items():
-                if len(ts) < 4:
-                    continue
-                ts = np.array(ts)
-                key = CWm[:, ts] / np.maximum(1, CWm[:, ts] + CLm[:, ts]) * 1000 + strn[:, ts] / 100
-                o = np.argsort(-key, axis=1)
-                a1 = ts[o[:, 0]]; a2 = ts[o[:, 1]]
-                if c in ccg_confs:
-                    s1 = strn[np.arange(N), a1]; s2 = strn[np.arange(N), a2]
-                    w1 = (s1 - s2 + rng.standard_normal(N) * sig) > 0
-                    win = np.where(w1, a1, a2); lose = np.where(w1, a2, a1)
-                    Wm[np.arange(N), win] += 1; Lm[np.arange(N), lose] += 1
-                    wab[np.arange(N), win] += 1 - 0.5 * (1 + erf_v((bub - strn[np.arange(N), lose]) / GSD / math.sqrt(2)))
-                    wab[np.arange(N), lose] += 0 - 0.5 * (1 + erf_v((bub - strn[np.arange(N), win]) / GSD / math.sqrt(2)))
-                    champ[np.arange(N), win] = 1
-                else:
-                    champ[np.arange(N), a1] = 1
-            p4 = np.array([power(t, conf, S) for t in teams], float)
-            feats = {'L': Lm, 'W': Wm, 'rating': strn, 'wab': wab, 'champ': champ, 'p4': np.broadcast_to(p4, (N, T))}
+            fr = fin_by[S]
+            D = sim_draws(S, wk, fr, info, wfr, rng)
+            teams, T, N, champ, feats = D['teams'], D['T'], D['N'], D['champ'], D['feats']
+            Lm, Wm, strn = feats['L'], feats['W'], feats['rating']
             snew = sum(beta[k] * feats[FEATS_ALL[c]] for k, c in enumerate(cols))
             sold = (-6 * Lm + 0.5 * strn + 3 * champ)
             pn = np.zeros(T); po = np.zeros(T); pod = np.zeros(T)

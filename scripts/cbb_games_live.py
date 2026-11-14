@@ -556,6 +556,45 @@ def write_injuries(report):
     return not same
 
 
+def cbb_bracket(pj, nc, names, abbr, logo, confs, sims):
+    """data/brackets/cbb.json: the projected NCAA bracket (scripts/cbb_tourney.py project_bracket), four regions of
+    16 lines with the First Four, each game to the side more likely to reach the next round"""
+    import bracket as BK
+    rk = ['bid', 'r32', 's16', 'e8', 'f4', 'final', 'champ']
+    odds = {t: {k: v.get(k, 0.0) for k in rk} for t, v in nc.items() if v.get('bid', 0) >= 0.005 or t in pj['seed']}
+    seed = pj['seed']
+    secs, alive = [], []
+    rn = ['First round', 'Second round', 'Sweet 16', 'Elite 8']
+    for r in range(4):
+        sl = pj['slots'][r * 16:(r + 1) * 16]
+        ff = [BK.game(a, b, seed, odds, 'bid', 'r32') for a, b in sl if b]
+        cur = [BK.advance(a, b, odds, 'r32') if b else a for a, b in sl]
+        rounds = ([{'name': 'First Four', 'games': ff}] if ff else [])
+        for k in range(4):
+            gs = [BK.game(cur[i], cur[i + 1], seed, odds, rk[k] if k else 'bid', rk[k + 1]) for i in range(0, len(cur), 2)]
+            rounds.append({'name': rn[k], 'games': gs})
+            cur = [g['w'] for g in gs]
+        alive.append(cur[0])
+        secs.append({'name': pj['regions'][r], 'rounds': rounds})
+    f4 = [BK.game(alive[0], alive[1], seed, odds, 'f4', 'final'), BK.game(alive[2], alive[3], seed, odds, 'f4', 'final')]
+    fg = BK.game(f4[0]['w'], f4[1]['w'], seed, odds, 'final', 'champ')
+    secs.append({'name': 'Final Four', 'rounds': [{'name': 'Semifinals', 'games': f4}, {'name': 'Final', 'games': [fg]}],
+                 'champ': {'t': fg['w'], 'p': odds.get(fg['w'], {}).get('champ', 0.0)}})
+    lines = sorted(seed, key=lambda t: (seed[t], -odds.get(t, {}).get('bid', 0)))
+    groups = [{'name': 'Field', 'n': 16, 'seeds': [{'t': t, 'seed': seed[t], 'p': (pj.get('sd', {}).get(t) or [0] * 16)[seed[t] - 1],
+                                                           'pin': odds.get(t, {}).get('bid', 0.0), 'auto': t in set(pj.get('auto', ()))} for t in lines]}]
+    od = {}
+    for t, o in odds.items():
+        od[t] = dict(o)
+        if t in pj.get('sd', {}):
+            od[t]['sd'] = pj['sd'][t]; od[t]['g'] = 'Field'
+    teams = {t: {'n': names.get(t, t), 'a': abbr.get(t, t), 'logo': logo(t), 'c': confs.get(t, '')} for t in od}
+    BK.save('cbb', {'asof': datetime.now(timezone.utc).date().isoformat(), 'sims': sims, 'groups': groups, 'sections': secs,
+                    'rounds': [['bid', 'Bid'], ['r32', 'R32'], ['s16', 'S16'], ['e8', 'E8'], ['f4', 'F4'], ['final', 'Final'], ['champ', 'Title']],
+                    'odds': od, 'teams': teams, 'real': pj.get('real', False),
+                    'lastIn': pj.get('lastIn', []), 'firstOut': pj.get('firstOut', [])})
+
+
 def build():
     F = json.load(open(C.FIT))
     st = json.load(open(C.STATE))
@@ -756,6 +795,8 @@ def build():
         for r in power:
             if r['id'] in nc:
                 r['nc'] = nc[r['id']]
+        if tmeta and tmeta.get('proj'):
+            cbb_bracket(tmeta.pop('proj'), nc, names, abbr, logo, confs, tmeta.get('sims'))
     except Exception as e:            # the odds sit out a day rather than stop the build
         print('tournament odds failed:', repr(e), flush=True)
     import rank_odds                  # 80% rank range and P(#1 / top 4 / top 25) from the measured rating sd

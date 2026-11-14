@@ -1153,9 +1153,11 @@ def win_given_ot(ph, z, pot, ot, ow):
     return po if ot else min(0.995, max(0.005, (ph - pot * po) / max(1 - pot, 1e-6)))
 
 
-def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None):
+def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None, tally=None):
     """rest of the regular season, then the playoffs (division top three + two wild cards a conference; 2-2-1-1-1).
-    rw: regulation wins so far; points ties break on regulation wins (the NHL's first tiebreak), then at random"""
+    rw: regulation wins so far; points ties break on regulation wins (the NHL's first tiebreak), then at random.
+    tally: a bracket.Tally over the conferences' eight slots (the better division winner, its division's 2 and 3, the
+    other winner, its 2 and 3, wild cards 1 and 2), filled in place"""
     rw = rw or {}
     rng = random.Random(seed)
     c = fit['coef']
@@ -1206,6 +1208,11 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None):
                 opp = wc[1] if DIV_OF[tops[d][0]] == best_div else wc[0]
                 sides.append([(tops[d][0], opp), (tops[d][1], tops[d][2])])
             bracket[cf] = sides
+            if tally is not None:
+                da, db = DIV_OF[dw[0]], DIV_OF[dw[1]]
+                tally.seeds(cf, tops[da] + tops[db] + wc)
+                for t in tops[da] + tops[db] + wc:
+                    tally.reached(t, 'playoff')
             po += [t for d in ds for t in tops[d]] + wc
             for t in tops[ds[0]] + tops[ds[1]]:
                 cnt[t]['div'] += 0
@@ -1229,6 +1236,8 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None):
                     return win
             return hi
         champs = {}
+        if tally is not None:
+            tally.season()
         for cf, sides in bracket.items():
             r2 = []
             for side in sides:
@@ -1251,6 +1260,39 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None):
         out[t]['pts'] = round(pts_sum[t] / sims, 1)
         out[t]['lottery'] = {str(k): round(v / sims, 4) for k, v in sorted(lot[t].items())}
     return out
+
+
+def nhl_bracket(BK, tal, sims):
+    """data/brackets/nhl.json: slot odds per conference (the better division winner v the second wild card, the other
+    winner v the first, 2 v 3 in each division; fixed bracket) and the projected bracket"""
+    import datetime
+    proj, _, sd = tal.project()
+    odds = {t: {k: sims[t].get(k, 0.0) for k in ('playoff', 'r2', 'cf', 'final', 'cup', 'divw')} for t in sims}
+    secs, champ = [], {}
+    # slots: A = the better division winner's division, B the other; shown in the bracket by the team's division (M1, A2)
+    labels = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'WC1', 'WC2']
+    for cf in CONF:
+        sl = [r['t'] for r in proj[cf]]
+        seed = {t: (DIV_OF[t][0] + labels[i][1] if i < 6 else labels[i]) for i, t in enumerate(sl)}
+        r1 = [BK.game(sl[0], sl[7], seed, odds, 'playoff', 'r2'), BK.game(sl[1], sl[2], seed, odds, 'playoff', 'r2'),
+              BK.game(sl[3], sl[6], seed, odds, 'playoff', 'r2'), BK.game(sl[4], sl[5], seed, odds, 'playoff', 'r2')]
+        r2 = [BK.game(r1[0]['w'], r1[1]['w'], seed, odds, 'r2', 'cf'), BK.game(r1[2]['w'], r1[3]['w'], seed, odds, 'r2', 'cf')]
+        cg = BK.game(r2[0]['w'], r2[1]['w'], seed, odds, 'cf', 'final')
+        champ[cf] = cg['w']
+        secs.append({'name': cf, 'rounds': [{'name': 'First round', 'games': r1}, {'name': 'Second round', 'games': r2},
+                                           {'name': 'Conf final', 'games': [cg]}]})
+    cfs = list(CONF)
+    fg = BK.game(champ[cfs[0]], champ[cfs[1]], {}, odds, 'final', 'cup')
+    secs.append({'name': 'Stanley Cup Final', 'rounds': [{'name': 'Final', 'games': [fg]}], 'champ': {'t': fg['w'], 'p': odds[fg['w']]['cup']}})
+    for g in tal.groups:
+        for i, r in enumerate(proj[g]):
+            r['lab'] = labels[i]
+            if r['t'] and i < 6:
+                r['div'] = DIV_OF[r['t']]
+    pay = BK.payload(datetime.date.today().isoformat(), tal.n, tal, proj, odds, sd, secs,
+                     [['playoff', 'Playoff'], ['r2', 'Round 2'], ['cf', 'Conf final'], ['final', 'Final'], ['cup', 'Cup']],
+                     {t: {'n': t, 'a': t, 'logo': f'/img/nhl/{t.lower()}.png'} for t in sims}, labels=labels)
+    BK.save('nhl', pay)
 
 
 def injuries():
@@ -1425,7 +1467,13 @@ def build():
     pts = {t: 2 * m.W[t] + m.OTL[t] for t in TEAMS}
     gp = {t: m.W[t] + m.L[t] + m.OTL[t] for t in TEAMS}
     share = len(left) / max(len(reg), 1)
-    sims = simulate(m, fit, left, pts, share=share, rw=dict(m.RW))
+    import bracket as BK                  # seed odds and the projected bracket (scripts/bracket.py)
+    tal = BK.Tally({cf: 8 for cf in CONF}, ['playoff'])
+    sims = simulate(m, fit, left, pts, share=share, rw=dict(m.RW), tally=tal)
+    try:
+        nhl_bracket(BK, tal, sims)
+    except Exception as e:            # the bracket keeps its last file rather than stop the build
+        print('nhl bracket failed:', repr(e), flush=True)
     power = []
     for t in TEAMS:
         comp, z = team_logit(m, fit, t)

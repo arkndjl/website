@@ -3172,6 +3172,15 @@ if (model) {
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_model.json'), JSON.stringify({ asof: out.asof, report: model.report, live: { record: rec, ou: ouRec },
     sim: model.sim.filter(s => T[s.tid]).map(s => ({ ...s, team: T[s.tid].team, abbr: T[s.tid].abbr, logo: T[s.tid].logo, rating: r1(model.rating[s.tid] ?? 0), situ: model.situ?.[s.tid] || null,
       ratingRk: null })).sort((a, b) => b.rating - a.rating).map((s, i) => ({ ...s, ratingRk: i + 1 })) }, null, 1) + '\n');
+  // projected CFP bracket: data/brackets/cfb.json (layouts/shortcodes/bracket.html)
+  const bk = model.sim.bracket;
+  if (bk) {
+    const tm = id => T[id] ? { n: T[id].team, a: T[id].abbr, logo: T[id].logo } : { n: id };
+    const teams = Object.fromEntries(Object.keys(bk.odds).map(id => [id, tm(id)]));
+    fs.mkdirSync(path.join(ROOT, 'data', 'brackets'), { recursive: true });
+    fs.writeFileSync(path.join(ROOT, 'data', 'brackets', 'cfb.json'), JSON.stringify({ asof: out.asof, sims: 10000, ...bk, teams,
+      groups: [{ name: 'CFP', n: 12, seeds: bk.seeds }] }) + '\n');
+  }
 }
 // player projections for the week (PPR): the top 300, plus each team's top PROJ_PER_TEAM so a team filter
 // always finds its game (a weak offense such as Tulane's can have no one in the top 300): data/cfb_proj.json

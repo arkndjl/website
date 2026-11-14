@@ -1337,6 +1337,32 @@ class League:
         return [self.T[i] for i in sorted(range(n), key=key.get)]
 
 
+def nfl_bracket(BK, tal, sims):
+    """data/brackets/nfl.json: seed odds and the projected bracket (wild card 2-7 3-6 4-5, 1 on a bye; the top seed left
+    plays the lowest after it, the NFL's reseeding)"""
+    proj, odds, sd = tal.project()
+    secs, champ = [], {}
+    for conf in ('AFC', 'NFC'):
+        sds = [r['t'] for r in proj[conf]]
+        seed = {t: i + 1 for i, t in enumerate(sds)}
+        wc = [BK.game(sds[i], sds[7 - i], seed, odds, 'playoff', 'r2') for i in (1, 2, 3)]
+        bye = BK.game(sds[0], None, seed, odds, 'playoff', 'r2')
+        alive = sorted([sds[0]] + [g['w'] for g in wc], key=seed.get)
+        dv = [BK.game(alive[0], alive[3], seed, odds, 'r2', 'r3'), BK.game(alive[1], alive[2], seed, odds, 'r2', 'r3')]
+        cg = BK.game(*sorted([g['w'] for g in dv], key=seed.get), seed, odds, 'r3', 'conf')
+        champ[conf] = cg['w']
+        secs.append({'name': conf, 'rounds': [{'name': 'Wild card', 'games': [bye] + wc}, {'name': 'Divisional', 'games': dv},
+                                             {'name': 'Conference', 'games': [cg]}]})
+    a, n = champ['AFC'], champ['NFC']
+    sbg = BK.game(a, n, {}, odds, 'conf', 'sb')
+    secs.append({'name': 'Super Bowl', 'rounds': [{'name': 'Super Bowl', 'games': [sbg]}], 'champ': {'t': sbg['w'], 'p': odds.get(sbg['w'], {}).get('sb', 0.0)}})
+    import datetime
+    pay = BK.payload(datetime.date.today().isoformat(), sims, tal, proj, odds, sd, secs,
+                     [['playoff', 'Playoff'], ['r2', 'Divisional'], ['r3', 'Conf game'], ['conf', 'Super Bowl'], ['sb', 'Title']],
+                     {t: {'n': t, 'a': t, 'logo': f'/img/nfl/{t.lower()}.png'} for t in odds})
+    BK.save('nfl', pay)
+
+
 def season_results(games, season):
     """A season's regular-season schedule and results (home side: 1 win, 0 loss, .5 tie, None not played yet)."""
     sg = [g for g in games if int(g['season']) == season and g['game_type'] == 'REG']
@@ -1637,6 +1663,8 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
             + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest']))) for k, g in left]
     keys = ('playoff', 'div', 'seed1', 'conf', 'sb')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
+    import bracket as BK                  # seed odds and the projected bracket (scripts/bracket.py)
+    tal = BK.Tally({'AFC': 7, 'NFC': 7}, ['playoff', 'r2', 'r3', 'conf', 'sb'])
     wsum = dict.fromkeys(teams, 0.0)
     slot = dict.fromkeys(teams, 0.0)      # draft slot, summed over the sims (the mock draft's order: draft_slots)
     top = dict.fromkeys(teams, 0)         # sims with a top-5 pick
@@ -1653,8 +1681,12 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
         for t in teams:
             wsum[t] += w[t]
         champs, exits = [], {}
+        tal.season()
         for conf in ('AFC', 'NFC'):
             seeds = field[conf]
+            tal.seeds(conf, seeds)
+            for t in seeds:
+                tal.reached(t, 'playoff')
             for t in seeds[:4]:
                 cnt[t]['div'] += 1
             for t in seeds:
@@ -1670,13 +1702,17 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
             alive = [seeds[0]] + [play(seeds[i], seeds[7 - i], 1) for i in (1, 2, 3)]
             rd = 2
             while len(alive) > 1:
+                for t in alive:
+                    tal.reached(t, 'r2' if rd == 2 else 'r3')
                 alive.sort(key=lambda t: seed[t])
                 alive = [play(alive[i], alive[-1 - i], rd) for i in range(len(alive) // 2)]
                 rd += 1
             cnt[alive[0]]['conf'] += 1
+            tal.reached(alive[0], 'conf')
             champs.append(alive[0])
         sbw = (lambda h, a: h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)
         cnt[sbw]['sb'] += 1
+        tal.reached(sbw, 'sb')
         exits[champs[0] if sbw == champs[1] else champs[1]] = 4
         exits[sbw] = 5
         do = lg.draft_order(res, exits, drng)
@@ -1686,6 +1722,10 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
             slot[t] += i + 1
             top[t] += i < 5
     print(f'nfl games: {SIMS} season sims in {time.time() - t0:.1f}s (rating sd {rsd:.2f})')
+    try:
+        nfl_bracket(BK, tal, SIMS)
+    except Exception as e:            # the bracket keeps its last file rather than stop the build
+        print('nfl bracket failed:', repr(e), flush=True)
 
     power = []
     for t in teams:

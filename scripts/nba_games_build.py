@@ -458,6 +458,35 @@ class Table:
         return self.order(EAST, w, lead, elig), self.order(WEST, w, lead, elig)
 
 
+def nba_bracket(BK, tal, sims):
+    """data/brackets/nba.json: seed odds 1-10 and the projected bracket: the play-in (7 v 8, 9 v 10, the 7-8 loser v the
+    9-10 winner), then 1-8 2-7 3-6 4-5, fixed bracket, best of seven"""
+    proj, odds, sd = tal.project()
+    secs, champ = [], {}
+    for cn in ('East', 'West'):
+        s10 = [r['t'] for r in proj[cn]]
+        seed = {t: i + 1 for i, t in enumerate(s10)}
+        g78 = BK.game(s10[6], s10[7], seed, odds, 'top10', 'playoff')
+        g910 = BK.game(s10[8], s10[9], seed, odds, 'top10', 'playoff')
+        l78 = s10[7] if g78['w'] == s10[6] else s10[6]
+        g8 = BK.game(l78, g910['w'], seed, odds, 'top10', 'playoff')
+        sds = s10[:6] + [g78['w'], g8['w']]
+        ps = {t: i + 1 for i, t in enumerate(sds)}
+        r1 = [BK.game(sds[i], sds[7 - i], ps, odds, 'playoff', 'r2') for i in range(4)]
+        w = [g['w'] for g in r1]
+        r2 = [BK.game(*sorted((w[0], w[3]), key=ps.get), ps, odds, 'r2', 'cf'), BK.game(*sorted((w[1], w[2]), key=ps.get), ps, odds, 'r2', 'cf')]
+        cf = BK.game(*sorted([g['w'] for g in r2], key=ps.get), ps, odds, 'cf', 'conf')
+        champ[cn] = cf['w']
+        secs.append({'name': cn, 'rounds': [{'name': 'Play-in', 'games': [g78, g910, g8]}, {'name': 'First round', 'games': r1},
+                                           {'name': 'Semifinals', 'games': r2}, {'name': 'Conf finals', 'games': [cf]}]})
+    fg = BK.game(champ['East'], champ['West'], {}, odds, 'conf', 'title')
+    secs.append({'name': 'Finals', 'rounds': [{'name': 'Finals', 'games': [fg]}], 'champ': {'t': fg['w'], 'p': odds.get(fg['w'], {}).get('title', 0.0)}})
+    pay = BK.payload(dt.date.today().isoformat(), sims, tal, proj, odds, sd, secs,
+                     [['top10', 'Top 10'], ['playoff', 'Playoff'], ['r2', 'Round 2'], ['cf', 'Conf finals'], ['conf', 'Finals'], ['title', 'Title']],
+                     {t: {'n': t, 'a': t, 'logo': f'/img/nba/{t.lower()}.png'} for t in odds})
+    BK.save('nba', pay)
+
+
 # ---------------------------------------------------------------- power rankings and season odds
 def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
     """tstat: {team: {player: status}} today's injury report and ESPN's list; the ranking's rating counts it (the game
@@ -508,6 +537,9 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
     keys = ('playoff', 'playin', 'top6', 'conf', 'title')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
     wsum = dict.fromkeys(teams, 0.0)
+    import bracket as BK                             # seed odds and the projected bracket (scripts/bracket.py)
+    # seeds 1-10 by the standings (7-10 into the play-in), then the playoff seeds 7 and 8 out of the play-in
+    tal = BK.Tally({'East': 10, 'West': 10}, ['top10', 'playoff', 'r2', 'cf', 'conf', 'title'])
 
     def series(hi, lo, shock, need=4):
         """best of seven, the higher seed at home in games 1, 2, 5, 7"""
@@ -549,8 +581,13 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
         seeded = T.standings(w)
         tbk = {t: w[t] + rng.random() * 1e-3 for t in teams}       # Finals home court: record, then a coin flip
         champs, po = [], set()
+        tal.season()
         for conf in (EAST, WEST):
             order = seeded[conf is WEST]
+            cn = 'West' if conf is WEST else 'East'
+            tal.seeds(cn, order[:10])
+            for t in order[:10]:
+                tal.reached(t, 'top10')
             for t in order[:6]:
                 cnt[t]['top6'] += 1
             for t in order[6:10]:
@@ -564,17 +601,29 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
             for t in seeds:
                 cnt[t]['playoff'] += 1
                 po.add(t)
+                tal.reached(t, 'playoff')
             r1 = [series(seeds[i], seeds[7 - i], shock) for i in range(4)]
             r2 = [series(*sorted((r1[0], r1[3]), key=seeds.index), shock), series(*sorted((r1[1], r1[2]), key=seeds.index), shock)]
+            for t in r1:
+                tal.reached(t, 'r2')
+            for t in r2:
+                tal.reached(t, 'cf')
             cf = series(*sorted(r2, key=seeds.index), shock)
             cnt[cf]['conf'] += 1
+            tal.reached(cf, 'conf')
             champs.append(cf)
         hi, lo = sorted(champs, key=lambda t: -tbk[t])
-        cnt[series(hi, lo, shock)]['title'] += 1
+        _ch = series(hi, lo, shock)
+        cnt[_ch]['title'] += 1
+        tal.reached(_ch, 'title')
         do = LOT.order(w, po, lrng, S)
         for t, (a1, a2) in do.items(): dcnt[t][a1 - 1] += 1; dcnt[t][a2 - 1] += 1
         if _s % DRAFT_EVERY == 0:
             orders.append([t for t, _ in sorted(do.items(), key=lambda x: x[1][0])] + [t for t, _ in sorted(do.items(), key=lambda x: x[1][1])])
+    try:
+        nba_bracket(BK, tal, SIMS)
+    except Exception as e:                           # the bracket keeps its last file rather than stop the build
+        print('nba bracket failed:', repr(e), flush=True)
     power = []
     for t in teams:
         power.append({'t': t, 'cname': 'East' if t in EAST else 'West', 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
