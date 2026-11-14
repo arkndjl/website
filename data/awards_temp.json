@@ -1,0 +1,329 @@
+{
+ "nba": {
+  "a": 0.0,
+  "test": {
+   "a_all": 0.0,
+   "bound": {
+    "a_all": -0.25,
+    "d": 0.0012,
+    "d_insample": -0.017,
+    "folds": [
+     -0.5,
+     -0.25
+    ],
+    "ll_now": 1.5557,
+    "ll_temp_loso": 1.5569,
+    "no_pool": 5,
+    "p": 0.51681,
+    "rel": [
+     {
+      "arm": "now",
+      "fav": 0.421,
+      "hit": 0.5,
+      "n": 42,
+      "share": 0.25
+     },
+     {
+      "arm": "temp",
+      "fav": 0.51,
+      "hit": 0.5,
+      "n": 42,
+      "share": 0.25
+     },
+     {
+      "arm": "now",
+      "fav": 0.52,
+      "hit": 0.452,
+      "n": 42,
+      "share": 0.5
+     },
+     {
+      "arm": "temp",
+      "fav": 0.574,
+      "hit": 0.452,
+      "n": 42,
+      "share": 0.5
+     },
+     {
+      "arm": "now",
+      "fav": 0.596,
+      "hit": 0.619,
+      "n": 42,
+      "share": 0.75
+     },
+     {
+      "arm": "temp",
+      "fav": 0.622,
+      "hit": 0.619,
+      "n": 42,
+      "share": 0.75
+     }
+    ],
+    "rows": 126,
+    "seasons": 14,
+    "sport": "nba",
+    "t": 0.04,
+    "var": "end",
+    "wins": 12
+   },
+   "d": 0.0,
+   "d_insample": 0.0,
+   "folds": [
+    0.0
+   ],
+   "ll_now": 1.84,
+   "ll_temp_loso": 1.84,
+   "no_pool": 5,
+   "p": 0.5,
+   "pass": false,
+   "rel": [
+    {
+     "arm": "now",
+     "fav": 0.431,
+     "hit": 0.381,
+     "n": 42,
+     "share": 0.25
+    },
+    {
+     "arm": "temp",
+     "fav": 0.431,
+     "hit": 0.381,
+     "n": 42,
+     "share": 0.25
+    },
+    {
+     "arm": "now",
+     "fav": 0.558,
+     "hit": 0.405,
+     "n": 42,
+     "share": 0.5
+    },
+    {
+     "arm": "temp",
+     "fav": 0.558,
+     "hit": 0.405,
+     "n": 42,
+     "share": 0.5
+    },
+    {
+     "arm": "now",
+     "fav": 0.593,
+     "hit": 0.476,
+     "n": 42,
+     "share": 0.75
+    },
+    {
+     "arm": "temp",
+     "fav": 0.593,
+     "hit": 0.476,
+     "n": 42,
+     "share": 0.75
+    }
+   ],
+   "rows": 126,
+   "seasons": 14,
+   "sport": "nba",
+   "t": 0.0,
+   "var": "box",
+   "wins": 0
+  }
+ },
+ "nfl": {
+  "a": 0.0,
+  "test": {
+   "a_all": 0.5,
+   "bound": null,
+   "d": -0.0057,
+   "d_insample": -0.0329,
+   "folds": [
+    0.25,
+    0.5
+   ],
+   "ll_now": 2.4047,
+   "ll_temp_loso": 2.399,
+   "no_pool": 5,
+   "p": 0.41573,
+   "pass": false,
+   "rel": [
+    {
+     "arm": "now",
+     "fav": 0.408,
+     "hit": 0.254,
+     "n": 63,
+     "share": 0.25
+    },
+    {
+     "arm": "temp",
+     "fav": 0.304,
+     "hit": 0.254,
+     "n": 63,
+     "share": 0.25
+    },
+    {
+     "arm": "now",
+     "fav": 0.465,
+     "hit": 0.302,
+     "n": 63,
+     "share": 0.5
+    },
+    {
+     "arm": "temp",
+     "fav": 0.384,
+     "hit": 0.302,
+     "n": 63,
+     "share": 0.5
+    },
+    {
+     "arm": "now",
+     "fav": 0.49,
+     "hit": 0.381,
+     "n": 63,
+     "share": 0.75
+    },
+    {
+     "arm": "temp",
+     "fav": 0.449,
+     "hit": 0.381,
+     "n": 63,
+     "share": 0.75
+    }
+   ],
+   "rows": 189,
+   "seasons": 21,
+   "sport": "nfl",
+   "t": -0.22,
+   "var": "box",
+   "wins": 13
+  }
+ },
+ "nhl": {
+  "a": 0.0,
+  "test": {
+   "a_all": 0.5,
+   "bound": {
+    "a_all": 0.25,
+    "d": -0.0026,
+    "d_insample": -0.0191,
+    "folds": [
+     0.25,
+     0.5
+    ],
+    "ll_now": 2.3784,
+    "ll_temp_loso": 2.3765,
+    "no_pool": 4,
+    "p": 0.45356,
+    "rel": [
+     {
+      "arm": "now",
+      "fav": 0.417,
+      "hit": 0.206,
+      "n": 63,
+      "share": 0.25
+     },
+     {
+      "arm": "temp",
+      "fav": 0.332,
+      "hit": 0.206,
+      "n": 63,
+      "share": 0.25
+     },
+     {
+      "arm": "now",
+      "fav": 0.441,
+      "hit": 0.349,
+      "n": 63,
+      "share": 0.5
+     },
+     {
+      "arm": "temp",
+      "fav": 0.381,
+      "hit": 0.349,
+      "n": 63,
+      "share": 0.5
+     },
+     {
+      "arm": "now",
+      "fav": 0.489,
+      "hit": 0.46,
+      "n": 63,
+      "share": 0.75
+     },
+     {
+      "arm": "temp",
+      "fav": 0.456,
+      "hit": 0.46,
+      "n": 63,
+      "share": 0.75
+     }
+    ],
+    "rows": 189,
+    "seasons": 16,
+    "sport": "nhl",
+    "t": -0.12,
+    "var": "end",
+    "wins": 11
+   },
+   "d": -0.0417,
+   "d_insample": -0.0498,
+   "folds": [
+    0.5,
+    0.75
+   ],
+   "ll_now": 2.5097,
+   "ll_temp_loso": 2.4693,
+   "no_pool": 5,
+   "p": 0.10101,
+   "pass": false,
+   "rel": [
+    {
+     "arm": "now",
+     "fav": 0.411,
+     "hit": 0.222,
+     "n": 63,
+     "share": 0.25
+    },
+    {
+     "arm": "temp",
+     "fav": 0.284,
+     "hit": 0.222,
+     "n": 63,
+     "share": 0.25
+    },
+    {
+     "arm": "now",
+     "fav": 0.444,
+     "hit": 0.365,
+     "n": 63,
+     "share": 0.5
+    },
+    {
+     "arm": "temp",
+     "fav": 0.352,
+     "hit": 0.365,
+     "n": 63,
+     "share": 0.5
+    },
+    {
+     "arm": "now",
+     "fav": 0.502,
+     "hit": 0.444,
+     "n": 63,
+     "share": 0.75
+    },
+    {
+     "arm": "temp",
+     "fav": 0.448,
+     "hit": 0.444,
+     "n": 63,
+     "share": 0.75
+    }
+   ],
+   "rows": 189,
+   "seasons": 16,
+   "sport": "nhl",
+   "t": -1.33,
+   "var": "box",
+   "wins": 11
+  }
+ }
+}

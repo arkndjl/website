@@ -25,10 +25,10 @@
     ]},
     { "name": "NFL", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap)" },
+      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap); weekly player lines (rookie defenders for DROY, the award backtest by week)" },
       { "n": "nfldata (Lee Sharpe)", "u": "https://github.com/nflverse/nfldata", "w": "games and closing lines" },
       { "n": "ESPN", "u": "https://www.espn.com/nfl/", "w": "scores, injuries, depth charts, headshots, season stats and leaders (award races)" },
-      { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "AP award winners (MVP, OPOY, DPOY, OROY)" },
+      { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "AP award winners (MVP, OPOY, DPOY, OROY, DROY)" },
       { "n": "NFL.com", "u": "https://www.nfl.com/", "w": "headshots" }
     ]},
     { "name": "college basketball", "sources": [
@@ -49,7 +49,7 @@
     ]},
     { "name": "NBA", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions, award voting, standings" },
+      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions, award voting (incl. All-NBA teams), standings" },
       { "n": "NBA.com", "u": "https://www.nba.com/", "w": "officials, headshots" },
       { "n": "ESPN", "u": "https://www.espn.com/nba/", "w": "scores, injuries, depth" },
       { "n": "databallr", "u": "https://databallr.com/", "w": "DPM" },
@@ -59,7 +59,7 @@
     ]},
     { "name": "hockey", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "NHL API", "u": "https://www.nhl.com/", "w": "games, rosters, stats, headshots" },
+      { "n": "NHL API", "u": "https://www.nhl.com/", "w": "games, rosters, stats, headshots; skater totals by date (award backtest)" },
       { "n": "MoneyPuck", "u": "https://moneypuck.com/", "w": "expected goals, skater and goalie data" },
       { "n": "Hockey Reference", "u": "https://www.hockey-reference.com/", "w": "award voting (Hart, Norris, Vezina, Calder), standings" },
       { "n": "Daily Faceoff", "u": "https://www.dailyfaceoff.com/", "w": "starting goalies, lines" },
@@ -74,7 +74,8 @@
       { "n": "FotMob", "u": "https://www.fotmob.com/", "w": "fixtures, lineups, player stats, academy leagues" },
       { "n": "Transfermarkt", "u": "https://www.transfermarkt.com/", "w": "market values, transfers (transactions log), headshots, national-team matchday squads" },
       { "n": "Football-Data.co.uk", "u": "https://www.football-data.co.uk/", "w": "historical results and closing odds" },
-      { "n": "International football results (martj42)", "u": "https://github.com/martj42/international_results", "w": "every full international since 1872, shootouts (national-team ratings)" }
+      { "n": "International football results (martj42)", "u": "https://github.com/martj42/international_results", "w": "every full international since 1872, shootouts (national-team ratings); tournament winners and goalscorers (Ballon d'Or race)" },
+      { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "Ballon d'Or voting by year" }
     ]},
     { "name": "tennis", "sources": [
       { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches (Challenger, ITF and qualifying results since June 2026 from the player pages), rankings, Elo, player data" }
