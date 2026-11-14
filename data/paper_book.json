@@ -1,18 +1,14 @@
 {
- "asof": "2026-11-14T02:24:05Z",
+ "asof": "2026-11-14T06:00:10Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 84.65,
+  "now": 84.64,
   "peak": 117.38,
-  "drawdown": 0.2789,
-  "open": 1.0,
+  "drawdown": 0.279,
+  "open": 0,
   "path": [
-   104.5,
-   105.52,
-   109.24,
-   107.6,
    107.86,
    106.77,
    109.32,
@@ -408,43 +404,47 @@
    85.23,
    83.06,
    84.44,
-   84.65
+   84.65,
+   84.86,
+   85.06,
+   84.85,
+   84.64
   ]
  },
  "record": {
   "n": 428,
-  "clvN": 424,
-  "clvRet": -0.0109,
-  "clvT": -2.21,
+  "clvN": 428,
+  "clvRet": -0.011,
+  "clvT": -2.24,
   "clv": 0.05,
-  "beat": 0.323,
-  "settled": 424,
-  "w": 210,
-  "l": 214,
+  "beat": 0.325,
+  "settled": 428,
+  "w": 212,
+  "l": 216,
   "p": 0,
-  "roi": -0.0205,
+  "roi": -0.0204,
   "roiT": -0.42,
-  "profit": -13.63,
-  "risked": 404.25,
+  "profit": -13.64,
+  "risked": 405.25,
   "yield": -0.0337
  },
- "tEff": -1.71,
+ "tEff": -1.76,
  "corr": {
-  "rho": 0.028,
-  "n": 424,
-  "slates": 42,
-  "nEff": 253.0,
-  "avgSlate": 10.1
+  "rho": 0.025,
+  "n": 428,
+  "slates": 43,
+  "nEff": 263.4,
+  "avgSlate": 9.95
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 424,
+   "value": 428,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.1% t -1.71",
+   "value": "-1.1% t -1.76",
    "pass": false
   },
   {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.1% vs -1.1% (SE 4.9)",
+   "value": "ROI -2.0% vs -1.1% (SE 4.9)",
    "pass": true
   }
  ],
@@ -660,20 +660,20 @@
    "sport": "nba",
    "mk": "total",
    "n": 57,
-   "clvN": 53,
-   "clvRet": 0.033,
-   "clvT": 2.93,
-   "clv": 1.11,
-   "beat": 0.604,
-   "settled": 53,
-   "w": 24,
-   "l": 29,
+   "clvN": 57,
+   "clvRet": 0.0293,
+   "clvT": 2.66,
+   "clv": 1.02,
+   "beat": 0.596,
+   "settled": 57,
+   "w": 26,
+   "l": 31,
    "p": 0,
-   "roi": -0.1095,
-   "roiT": -0.81,
-   "profit": -9.28,
-   "risked": 75.5,
-   "yield": -0.1229
+   "roi": -0.1025,
+   "roiT": -0.78,
+   "profit": -9.29,
+   "risked": 76.5,
+   "yield": -0.1214
   },
   {
    "id": "tennis-ml",
@@ -718,27 +718,38 @@
    "yield": 0.396
   }
  ],
- "open": [
+ "open": [],
+ "recent": [
   {
    "rule": "nba-total",
    "sport": "nba",
-   "id": "401909297",
-   "k": "2026-11-14T00:00:00Z",
+   "id": "401909302",
+   "k": "2026-11-14T02:30:00Z",
    "slate": "nba:2026-11-13",
-   "h": "ORL",
-   "a": "MIL",
+   "h": "SA",
+   "a": "GS",
    "mk": "total",
-   "side": "under",
-   "line": 224.5,
+   "side": "over",
+   "line": 219.5,
    "price": -100.0,
-   "bet": "under 224.5 -100",
-   "placed": "2026-11-13T14:40:57Z",
+   "bet": "over 219.5 -100",
+   "placed": "2026-11-13T01:06:42Z",
    "stake": 0.25,
-   "edge": 2.8,
-   "ev": 0.013,
+   "edge": 3.3,
+   "ev": 0.0078,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "clvRet": -0.0888,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 217.5,
+   "score": [
+    85.0,
+    123.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "nba-ml",
@@ -759,7 +770,16 @@
    "ev": 0.0574,
    "event": null,
    "pass": true,
-   "close": 2.5
+   "clvRet": 0.0159,
+   "beat": 1,
+   "close": 2.5,
+   "score": [
+    121.0,
+    133.0
+   ],
+   "res": "w",
+   "ret": 0.8,
+   "profit": 1.0
   },
   {
    "rule": "nba-total",
@@ -780,7 +800,17 @@
    "ev": 0.0001,
    "event": null,
    "pass": false,
-   "close": 246.5
+   "clvRet": -0.1063,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 246.5,
+   "score": [
+    117.0,
+    125.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.2404
   },
   {
    "rule": "nba-total",
@@ -801,31 +831,49 @@
    "ev": 0.0064,
    "event": null,
    "pass": false,
-   "close": 235.5
+   "clvRet": 0.0678,
+   "clv": 2.0,
+   "beat": 1,
+   "close": 235.5,
+   "score": [
+    142.0,
+    111.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "nba-total",
    "sport": "nba",
-   "id": "401909302",
-   "k": "2026-11-14T02:30:00Z",
+   "id": "401909297",
+   "k": "2026-11-14T00:00:00Z",
    "slate": "nba:2026-11-13",
-   "h": "SA",
-   "a": "GS",
+   "h": "ORL",
+   "a": "MIL",
    "mk": "total",
-   "side": "over",
-   "line": 219.5,
+   "side": "under",
+   "line": 224.5,
    "price": -100.0,
-   "bet": "over 219.5 -100",
-   "placed": "2026-11-13T01:06:42Z",
+   "bet": "under 224.5 -100",
+   "placed": "2026-11-13T14:40:57Z",
    "stake": 0.25,
-   "edge": 3.3,
-   "ev": 0.0078,
+   "edge": 2.8,
+   "ev": 0.013,
    "event": null,
    "pass": false,
-   "close": 217.5
-  }
- ],
- "recent": [
+   "clvRet": 0.0445,
+   "clv": 1.0,
+   "beat": 1,
+   "close": 223.5,
+   "score": [
+    99.0,
+    107.0
+   ],
+   "res": "w",
+   "ret": 1.0,
+   "profit": 0.25
+  },
   {
    "rule": "nba-spread",
    "sport": "nba",
@@ -2459,151 +2507,6 @@
    "res": "w",
    "ret": 1.08,
    "profit": 1.35
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873046-4612826-rc",
-   "k": "2026-11-08T21:05:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 3.5,
-   "price": -108.0,
-   "bet": "Ladd McConkey under 3.5 rec -108",
-   "placed": "2026-11-03T18:37:00Z",
-   "stake": 0.25,
-   "edge": 11.4,
-   "ev": 0.0082,
-   "event": null,
-   "pass": true,
-   "clvRet": -0.147,
-   "close": 4.5,
-   "res": "void"
-  },
-  {
-   "rule": "nfl-ml",
-   "sport": "nfl",
-   "id": "2026_09_DAL_IND",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nfl:2026-11-08",
-   "h": "IND",
-   "a": "DAL",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 228.0,
-   "bet": "IND ML +228",
-   "placed": "2026-11-03T10:48:02Z",
-   "stake": 0.5,
-   "edge": 4.5,
-   "ev": 0.0165,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.1093,
-   "beat": 1,
-   "close": -3.5,
-   "score": [
-    27.0,
-    23.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.5
-  },
-  {
-   "rule": "nfl-ml",
-   "sport": "nfl",
-   "id": "2026_09_NYG_PHI",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nfl:2026-11-08",
-   "h": "PHI",
-   "a": "NYG",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": 163.0,
-   "bet": "PHI ML +163",
-   "placed": "2026-11-03T10:48:02Z",
-   "stake": 1.75,
-   "edge": 4.2,
-   "ev": 0.0426,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0857,
-   "beat": 1,
-   "close": -2.5,
-   "score": [
-    19.0,
-    11.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -1.75
-  },
-  {
-   "rule": "nfl-total",
-   "sport": "nfl",
-   "id": "2026_09_NYG_PHI",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nfl:2026-11-08",
-   "h": "PHI",
-   "a": "NYG",
-   "mk": "total",
-   "side": "over",
-   "line": 38.5,
-   "price": -100.0,
-   "bet": "over 38.5 -100",
-   "placed": "2026-11-05T22:12:34Z",
-   "stake": 1.0,
-   "edge": 2.5,
-   "ev": 0.0225,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0585,
-   "clv": -1.0,
-   "beat": -1,
-   "close": 37.5,
-   "score": [
-    19.0,
-    11.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -1.0
-  },
-  {
-   "rule": "nfl-total",
-   "sport": "nfl",
-   "id": "2026_09_NYJ_KC",
-   "k": "2026-11-08T18:00:00Z",
-   "slate": "nfl:2026-11-08",
-   "h": "KC",
-   "a": "NYJ",
-   "mk": "total",
-   "side": "under",
-   "line": 46.5,
-   "price": 104.0,
-   "bet": "under 46.5 +104",
-   "placed": "2026-11-03T17:22:24Z",
-   "stake": 0.25,
-   "edge": 1.9,
-   "ev": 0.0372,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0417,
-   "clv": -1.0,
-   "beat": -1,
-   "close": 47.5,
-   "score": [
-    12.0,
-    35.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -17144,7 +17047,17 @@
    "ev": 0.013,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "clvRet": 0.0445,
+   "clv": 1.0,
+   "beat": 1,
+   "close": 223.5,
+   "score": [
+    99.0,
+    107.0
+   ],
+   "res": "w",
+   "ret": 1.0,
+   "profit": 0.25
   },
   {
    "rule": "nba-ml",
@@ -17165,7 +17078,16 @@
    "ev": 0.0574,
    "event": null,
    "pass": true,
-   "close": 2.5
+   "clvRet": 0.0159,
+   "beat": 1,
+   "close": 2.5,
+   "score": [
+    121.0,
+    133.0
+   ],
+   "res": "w",
+   "ret": 0.8,
+   "profit": 1.0
   },
   {
    "rule": "nba-total",
@@ -17186,7 +17108,17 @@
    "ev": 0.0001,
    "event": null,
    "pass": false,
-   "close": 246.5
+   "clvRet": -0.1063,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 246.5,
+   "score": [
+    117.0,
+    125.0
+   ],
+   "res": "w",
+   "ret": 0.9615,
+   "profit": 0.2404
   },
   {
    "rule": "nba-total",
@@ -17207,7 +17139,17 @@
    "ev": 0.0064,
    "event": null,
    "pass": false,
-   "close": 235.5
+   "clvRet": 0.0678,
+   "clv": 2.0,
+   "beat": 1,
+   "close": 235.5,
+   "score": [
+    142.0,
+    111.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "nba-total",
@@ -17228,7 +17170,17 @@
    "ev": 0.0078,
    "event": null,
    "pass": false,
-   "close": 217.5
+   "clvRet": -0.0888,
+   "clv": -2.0,
+   "beat": -1,
+   "close": 217.5,
+   "score": [
+    85.0,
+    123.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   }
  ]
 }
