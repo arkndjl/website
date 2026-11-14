@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-13",
+ "asof": "2026-11-14",
  "teams": [
   {
    "tid": "52",
@@ -3835,6 +3835,64 @@
    "other": 0.585
   },
   {
+   "tid": "2459",
+   "team": "Northern Illinois",
+   "logo": "/img/cfb/logos/2459.png",
+   "conf": "MWC",
+   "hc": "Rob Harley",
+   "open": 0.164,
+   "moved": 0.002,
+   "out": 0.162,
+   "wp": 0.075,
+   "vsNorm": -0.36,
+   "tenure": 1,
+   "hires": [
+    {
+     "name": "Phil Parker",
+     "role": "DC",
+     "from": "Iowa",
+     "fromTid": "2294",
+     "p": 0.007
+    },
+    {
+     "name": "Quinn Sanders",
+     "role": "OC",
+     "from": "Northern Illinois",
+     "fromTid": "2459",
+     "p": 0.007
+    },
+    {
+     "name": "Tony Petersen",
+     "role": "OC",
+     "from": "Northern Illinois",
+     "fromTid": "2459",
+     "p": 0.007
+    },
+    {
+     "name": "Mike Denbrock",
+     "role": "OC",
+     "from": "Notre Dame",
+     "fromTid": "87",
+     "p": 0.005
+    },
+    {
+     "name": "Bryant Haines",
+     "role": "DC",
+     "from": "Indiana",
+     "fromTid": "84",
+     "p": 0.005
+    },
+    {
+     "name": "Chris Ash",
+     "role": "DC",
+     "from": "Notre Dame",
+     "fromTid": "87",
+     "p": 0.005
+    }
+   ],
+   "other": 0.585
+  },
+  {
    "tid": "275",
    "team": "Wisconsin",
    "logo": "/img/cfb/logos/275.png",
@@ -4123,64 +4181,6 @@
     }
    ],
    "other": 0.332
-  },
-  {
-   "tid": "2459",
-   "team": "Northern Illinois",
-   "logo": "/img/cfb/logos/2459.png",
-   "conf": "MWC",
-   "hc": "Rob Harley",
-   "open": 0.159,
-   "moved": 0.002,
-   "out": 0.156,
-   "wp": 0.083,
-   "vsNorm": -0.36,
-   "tenure": 1,
-   "hires": [
-    {
-     "name": "Phil Parker",
-     "role": "DC",
-     "from": "Iowa",
-     "fromTid": "2294",
-     "p": 0.007
-    },
-    {
-     "name": "Quinn Sanders",
-     "role": "OC",
-     "from": "Northern Illinois",
-     "fromTid": "2459",
-     "p": 0.007
-    },
-    {
-     "name": "Tony Petersen",
-     "role": "OC",
-     "from": "Northern Illinois",
-     "fromTid": "2459",
-     "p": 0.007
-    },
-    {
-     "name": "Mike Denbrock",
-     "role": "OC",
-     "from": "Notre Dame",
-     "fromTid": "87",
-     "p": 0.005
-    },
-    {
-     "name": "Bryant Haines",
-     "role": "DC",
-     "from": "Indiana",
-     "fromTid": "84",
-     "p": 0.005
-    },
-    {
-     "name": "Chris Ash",
-     "role": "DC",
-     "from": "Notre Dame",
-     "fromTid": "87",
-     "p": 0.005
-    }
-   ],
-   "other": 0.585
   },
   {
    "tid": "30",
@@ -9159,6 +9159,13 @@
    "p": 0.004
   },
   {
+   "from": "58",
+   "to": "52",
+   "role": "HC",
+   "name": "Brian Hartline",
+   "p": 0.004
+  },
+  {
    "from": "326",
    "to": "52",
    "role": "HC",
@@ -9170,13 +9177,6 @@
    "to": "152",
    "role": "HC",
    "name": "Shane Beamer",
-   "p": 0.004
-  },
-  {
-   "from": "58",
-   "to": "52",
-   "role": "HC",
-   "name": "Brian Hartline",
    "p": 0.004
   },
   {
@@ -11006,51 +11006,6 @@
    "how": "follows HC"
   },
   {
-   "from": "2641",
-   "to": "52",
-   "role": "DC",
-   "name": "Shiel Wood / Rob Greene",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2641",
-   "to": "239",
-   "role": "DC",
-   "name": "Shiel Wood / Rob Greene",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2641",
-   "to": "166",
-   "role": "DC",
-   "name": "Shiel Wood / Rob Greene",
-   "p": 0.002,
-   "how": "head coach"
-  },
-  {
-   "from": "30",
-   "to": "9",
-   "role": "HC",
-   "name": "Lincoln Riley",
-   "p": 0.002
-  },
-  {
-   "from": "30",
-   "to": "38",
-   "role": "HC",
-   "name": "Lincoln Riley",
-   "p": 0.002
-  },
-  {
-   "from": "2294",
-   "to": "59",
-   "role": "HC",
-   "name": "Kirk Ferentz",
-   "p": 0.002
-  },
-  {
    "from": "2390",
    "to": "52",
    "role": "OC",
@@ -11097,6 +11052,51 @@
    "name": "Shannon Dawson",
    "p": 0.002,
    "how": "head coach"
+  },
+  {
+   "from": "2641",
+   "to": "52",
+   "role": "DC",
+   "name": "Shiel Wood / Rob Greene",
+   "p": 0.002,
+   "how": "follows HC"
+  },
+  {
+   "from": "2641",
+   "to": "239",
+   "role": "DC",
+   "name": "Shiel Wood / Rob Greene",
+   "p": 0.002,
+   "how": "follows HC"
+  },
+  {
+   "from": "2641",
+   "to": "166",
+   "role": "DC",
+   "name": "Shiel Wood / Rob Greene",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "30",
+   "to": "9",
+   "role": "HC",
+   "name": "Lincoln Riley",
+   "p": 0.002
+  },
+  {
+   "from": "30",
+   "to": "38",
+   "role": "HC",
+   "name": "Lincoln Riley",
+   "p": 0.002
+  },
+  {
+   "from": "2294",
+   "to": "59",
+   "role": "HC",
+   "name": "Kirk Ferentz",
+   "p": 0.002
   },
   {
    "from": "154",
@@ -11366,6 +11366,27 @@
   },
   {
    "from": "58",
+   "to": "59",
+   "role": "HC",
+   "name": "Brian Hartline",
+   "p": 0.002
+  },
+  {
+   "from": "58",
+   "to": "120",
+   "role": "HC",
+   "name": "Brian Hartline",
+   "p": 0.002
+  },
+  {
+   "from": "58",
+   "to": "152",
+   "role": "HC",
+   "name": "Brian Hartline",
+   "p": 0.002
+  },
+  {
+   "from": "58",
    "to": "52",
    "role": "DC",
    "name": "Josh Aldridge",
@@ -11451,27 +11472,6 @@
    "to": "52",
    "role": "HC",
    "name": "Alex Golesh",
-   "p": 0.002
-  },
-  {
-   "from": "58",
-   "to": "59",
-   "role": "HC",
-   "name": "Brian Hartline",
-   "p": 0.002
-  },
-  {
-   "from": "58",
-   "to": "120",
-   "role": "HC",
-   "name": "Brian Hartline",
-   "p": 0.002
-  },
-  {
-   "from": "58",
-   "to": "152",
-   "role": "HC",
-   "name": "Brian Hartline",
    "p": 0.002
   },
   {
@@ -12468,6 +12468,14 @@
    "p": 0.002
   },
   {
+   "from": "58",
+   "to": "52",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.002,
+   "how": "follows HC"
+  },
+  {
    "from": "2653",
    "to": "52",
    "role": "HC",
@@ -12574,14 +12582,6 @@
    "role": "HC",
    "name": "P.J. Fleck",
    "p": 0.002
-  },
-  {
-   "from": "58",
-   "to": "52",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.002,
-   "how": "follows HC"
   },
   {
    "from": "103",
@@ -13291,6 +13291,14 @@
    "how": "head coach"
   },
   {
+   "from": "2390",
+   "to": "38",
+   "role": "OC",
+   "name": "Shannon Dawson",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
    "from": "2641",
    "to": "38",
    "role": "DC",
@@ -13393,14 +13401,6 @@
    "name": "Pete Thomas / Nic Cardwell",
    "p": 0.001,
    "how": "head coach"
-  },
-  {
-   "from": "2390",
-   "to": "38",
-   "role": "OC",
-   "name": "Shannon Dawson",
-   "p": 0.001,
-   "how": "follows HC"
   },
   {
    "from": "97",
@@ -17803,6 +17803,30 @@
    "p": 0.001
   },
   {
+   "from": "58",
+   "to": "59",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "58",
+   "to": "120",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "58",
+   "to": "152",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
    "from": "2026",
    "to": "52",
    "role": "OC",
@@ -18465,30 +18489,6 @@
    "role": "HC",
    "name": "Pat Fitzgerald",
    "p": 0.001
-  },
-  {
-   "from": "58",
-   "to": "59",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "58",
-   "to": "120",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "58",
-   "to": "152",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
   },
   {
    "from": "2572",
