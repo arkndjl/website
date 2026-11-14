@@ -4,6 +4,7 @@
 under each way of pricing a side (scripts/esea_standin_research.py FIVES) on rows where both sides have a history.
 
     python3 scripts/esea_five_research.py    # research/esea_matches.json.gz -> data/esea_five_research.json (~2 min)
+    python3 scripts/esea_five_research.py --parity   # the page's JS port against this file
 
 E1 expected five vs the page rule, E2 sharp vs expected: one-term logistic on the RWA gap (saved settings), fit
 S54-S57, scored S58-S59, paired differences summed by match day. Player Elo and RWA + FACEIT level are reported
@@ -34,7 +35,39 @@ def holm(ps):
     return out
 
 
+def parity(n=400):
+    """the JS port (scripts/esea_five.mjs, used by the page) against this file on the last n archive matches"""
+    import subprocess
+    d, ms = SR.load()
+    SR.predicted_fives(ms)
+    gp, mdl = SR.run_pelo(ms, five='sharp', **R.PELO)
+    js = json.loads(subprocess.check_output(['node', os.path.join(SR.ROOT, 'scripts', 'esea_five.mjs'), '--parity', str(n)]))
+    bad, seen = 0, 0
+    for m in ms[-n:]:
+        j = js['matches'].get(m['id'])
+        if j is None:
+            bad += 1
+            continue
+        if not m['pf_ok']:
+            continue
+        seen += 1
+        for k in ('live', 'expected', 'sharp'):
+            for si in (0, 1):
+                a, b = m['pf'][k][si], j[k][si]
+                if [q for q, _ in a] != [q for q, _ in b] or any(abs(x[1] - y[1]) > 1e-9 for x, y in zip(a, b)):
+                    bad += 1
+        if abs(gp[m['id']] - j['gap']) > 1e-9:
+            bad += 1
+    es = sum(mdl.r.values())
+    if abs(es - js['eloSum']) > 1e-6 * max(1, len(mdl.r)):
+        bad += 1
+    print(f'esea five parity: {seen} matches with both histories, {len(mdl.r)} players, {bad} mismatches')
+    return bad
+
+
 def main():
+    if '--parity' in sys.argv:
+        raise SystemExit(1 if parity() else 0)
     d, ms = SR.load()
     SR.predicted_fives(ms)
     fit = json.load(open(R.OUT))
