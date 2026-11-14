@@ -38,6 +38,12 @@
 {{- $rows = $rows | append (dict "sp" "Soccer" "kick" .tip "id" .id "h" (.hab | default .hn) "a" (.aab | default .an) "hn" .hn "an" .an "hl" (printf "/img/soccer/%s.png" .h) "al" (printf "/img/soccer/%s.png" .a) "neutral" (eq .neu 1)
       "m" (sub $lh $la) "L" nil "p" (index .p 0) "pa" (index .p 2) "pd" (index .p 1) "hs" $lh "as" $la "t" (add $lh $la) "T" nil "final" $fin "gq" (partial "gq.html" (dict "a" (index $pc.soccer (string .h)) "b" (index $pc.soccer (string .a)) "p" (index .p 0) "pa" (index .p 2) "d" 0.5))) }}
 {{- end }}{{ end -}}
+{{- with site.Data.soccer_intl }}{{ $nr := float (len .power) }}{{ range .games }}{{ if le (sub (time .tip).Unix now.Unix) 345600 }}
+{{- $lh := float (index .l 0) }}{{ $la := float (index .l 1) }}
+{{- $qa := cond (ne .hr nil) (sub 1.0 (div (sub (float (.hr | default 0)) 0.5) $nr)) 0.0 }}{{ $qb := cond (ne .ar nil) (sub 1.0 (div (sub (float (.ar | default 0)) 0.5) $nr)) 0.0 }}
+{{- $rows = $rows | append (dict "sp" "Soccer" "sub" "INTL" "kick" .tip "id" .id "h" (.hab | default .hn) "a" (.aab | default .an) "hn" .hn "an" .an "hl" (cond (ne .hiso nil) (printf "/img/flags/%s.png" (.hiso | default "")) "") "al" (cond (ne .aiso nil) (printf "/img/flags/%s.png" (.aiso | default "")) "") "neutral" (eq .neu 1)
+      "m" (sub $lh $la) "L" nil "p" (index .p 0) "pa" (index .p 2) "pd" (index .p 1) "hs" $lh "as" $la "t" (add $lh $la) "T" nil "final" false "gq" (partial "gq.html" (dict "a" $qa "b" $qb "p" (index .p 0) "pa" (index .p 2) "d" 0.5))) }}
+{{- end }}{{ end }}{{ end -}}
 {{- with site.Data.tennis }}{{ range .matches }}{{ if and (eq .state "pre") (gt (time .tip).Unix now.Unix) }}
 {{- $an := .a.n }}{{ $bn := .b.n }}{{ $ph := sub 1 (float .p) }}
 {{- $mk := dict }}{{ with .nv }}{{ $pm := sub 1 (float .p) }}{{ $fb := ge $pm 0.5 }}{{ $mk = dict "pm" $pm "ml" (dict "t" (cond $fb "h" "a") "o" (cond $fb (index .o 1) (index .o 0))) }}{{ end }}
@@ -115,4 +121,4 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games" "tennis" "cs2") "rows" (len $rows) "about" "diff = model minus market, in points (NHL, tennis: win chance vs the no-vig moneyline, in %; soccer and Counter-Strike: no market). Tennis picks: paper only (logged in the paper book, off the picks board) until picks flagged since Nov 5 beat the close. Counter-Strike: model only until Novig lists matches and a closing-line archive can test a rule. Kelly % = the stake on the best bet (% of bankroll, full Kelly on our calibrated edge); bold = pick") -}}
+{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games" "soccer_intl" "tennis" "cs2") "rows" (len $rows) "about" "diff = model minus market, in points (NHL, tennis: win chance vs the no-vig moneyline, in %; soccer and Counter-Strike: no market). Tennis picks: paper only (logged in the paper book, off the picks board) until picks flagged since Nov 5 beat the close. Counter-Strike: model only until Novig lists matches and a closing-line archive can test a rule. Kelly % = the stake on the best bet (% of bankroll, full Kelly on our calibrated edge); bold = pick") -}}

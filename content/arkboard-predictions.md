@@ -20,6 +20,7 @@ cover = "/og/predictions.png"
 {{< nbagames title="NBA" tab="games" sport="nba" >}}
 {{< nhlgames title="NHL" tab="games" sport="nhl" >}}
 {{< soccergames title="soccer" tab="games" sport="soccer" >}}
+{{< soccerintl view="games" title="national teams" tab="games" sport="soccer" >}}
 {{< tennismatches title="tennis" tab="games" sport="tennis" picks="true" >}}
 {{< lazytab tab="game table" >}}
 {{< gamestable title="game table" tab="game table" >}}
@@ -65,6 +66,7 @@ cover = "/og/predictions.png"
 {{< nbamodel title="NBA game model" tab="game models" >}}
 {{< nhlmodel title="NHL game model" tab="game models" >}}
 {{< soccermodel title="soccer game model" tab="game models" >}}
+{{< soccerintl view="model" title="national-team game model" tab="game models" >}}
 {{< cbbgamemodel title="college basketball game model :: inputs" tab="game models" >}}
 {{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
 {{< modelgov view="ledger" title="model ledger" tab="game models" >}}

@@ -1,0 +1,192 @@
+{{- /* National-team soccer (data/soccer_intl.json, scripts/soccer_intl.py). view="ranking": every FIFA nation with
+       20+ matches on one scale (expected goal margin against an average side of the top 48 at a neutral ground);
+       view="games": the next ten days' internationals (sport= on Predictions adds the market's 1X2);
+       view="nl": UEFA Nations League groups with position odds and League A's finals odds from 10,000 runs. */ -}}
+{{- with site.Data.soccer_intl -}}
+{{- $d := . -}}
+{{- $view := $.Get "view" | default "ranking" -}}
+{{- $upd := lower ((time .asof).Format "Jan 2, 2006") -}}
+{{- if eq $view "ranking" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "world ranking") "icon" "soccer" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Nation,Conf,Rating,Off,Def,Elo" "gfxDate" $upd "gfxMax" "25") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Nation</th><th>Conf</th>
+    <th title="expected goal margin a match against an average side of the top {{ .topN }}, neutral ground">Rating</th>
+    <th title="goals scored a match over that average side's">Off</th>
+    <th title="goals allowed a match under average (positive = fewer allowed)">Def</th>
+    <th title="win / draw chances against that average side, neutral ground">W / D</th>
+    <th title="World Football Elo formula (K by tournament, goal-margin multiplier, +100 at home)">Elo</th>
+    <th title="top-23 Transfermarkt market values of the nation's players, EUR m">Squad €m</th>
+    <th title="last 12 months, won-drawn-lost (extra time counted)">Rec</th>
+    <th title="next match">Next</th>
+  </tr></thead>
+  <tbody>
+  {{- range .power }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "fmt" "%+.2f" "mul" 1) }}
+    <td data-v="{{ .n }}" style="white-space: nowrap">{{ with .iso }}<img class="flag" src="/img/flags/{{ . }}.png" alt="" width="18" height="12" loading="lazy" onerror="this.remove()"> {{ end }}{{ .n }}</td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.2f" (float .rating)) }}</td>
+    <td class="cfb__num" data-v="{{ .off }}">{{ partial "num.html" (slice "%+.2f" (float .off)) }}</td>
+    <td class="cfb__num" data-v="{{ .def }}">{{ partial "num.html" (slice "%+.2f" (float .def)) }}</td>
+    <td class="cfb__num" data-v="{{ .pW }}">{{ partial "num.html" (slice "%.0f" (mul .pW 100)) }}% <span class="cfb__dim">/ {{ partial "num.html" (slice "%.0f" (mul .pD 100)) }}%</span></td>
+    <td class="cfb__num" data-v="{{ .elo }}">{{ .elo }}</td>
+    <td class="cfb__num" data-v="{{ .sq }}">{{ if .sq }}{{ .sq }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ .rec | default "—" }}</td>
+    <td data-v="{{ with .next }}{{ .day }}{{ end }}">{{ with .next }}<span class="cfb__dim">{{ if .h }}v{{ else }}at{{ end }}</span> {{ .o }} <span class="cfb__dim">{{ (time .day).Format "Jan 2" }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "soccer_intl" "rows" (len .power) "about" (printf "Every full international since 1872 (martj42/international_results, ESPN). Attack and defence in log goals, learned match by match at a tournament weight; each side's expected goals also move with the gap in top-23 Transfermarkt value. Rating = expected goal margin against an average side of the top %d at a neutral ground." .topN)) -}}
+{{- else if eq $view "games" -}}
+{{- $pred := ne ($.Get "sport" | default "") "" -}}
+{{- $games := .games -}}
+{{- $days := slice }}{{ range $games }}{{ $k := lower ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2") }}{{ if not (in $days $k) }}{{ $days = $days | append $k }}{{ end }}{{ end -}}
+<div class="win games soccergames soccerintl"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit (first 4 $days) ", " }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "internationals" }}{{ with $days }} :: {{ index . 0 }}{{ if gt (len .) 1 }} to {{ index . (sub (len .) 1) }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if not $games }}<div class="cfbm__body"><p class="cfb__dim">no internationals in the next ten days.</p></div>{{ end }}
+  <div class="games__grid">
+  {{- range $games }}{{ $g := . }}
+  {{- $ph := index .p 0 }}{{ $pd := index .p 1 }}{{ $pa := index .p 2 }}
+  {{- $tiles := slice (dict "l" "HOME / DRAW / AWAY" "v" (printf "%.0f%% / %.0f%% / %.0f%%" (mul $ph 100) (mul $pd 100) (mul $pa 100)) "s" (cond (and $pred (ne .dk nil)) (printf "%s %+.0f / %+.0f / %+.0f" (.book | default "market") (float .dk.h) (float .dk.d) (float .dk.a)) (printf "fair %+.0f / %+.0f / %+.0f" (float (index .fair 0)) (float (index .fair 1)) (float (index .fair 2))))) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.1f, %s %.1f" .hab (float (index .l 0)) .aab (float (index .l 1))) "s" (printf "most likely %s (%.0f%%)" .top (mul .pTop 100))) }}
+  {{- $tiles = $tiles | append (dict "l" "GOALS" "v" (printf "over 2.5: %.0f%%" (mul .o25 100)) "s" (printf "both score %.0f%%" (mul .btts 100))) }}
+  {{- $one := dict "lg" .comp "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" $ph "pD" $pd "pA" $pa "tiles" $tiles
+        "a" (dict "n" .an "l" (cond (ne .aiso nil) (printf "/img/flags/%s.png" (.aiso | default "")) "") "rec" (.arec | default "") "r" (.ar | default false))
+        "h" (dict "n" .hn "l" (cond (ne .hiso nil) (printf "/img/flags/%s.png" (.hiso | default "")) "") "rec" (.hrec | default "") "r" (.hr | default false)) }}
+  <article class="games__card" data-id="{{ .id }}" data-lg="{{ .lg }}" data-comp="{{ .comp }}" data-kick="{{ .tip }}" data-gfx-one="{{ $one | jsonify }}">
+    <header class="games__head">
+      {{- range $i, $side := slice "h" "a" }}
+      <div class="games__team">
+        <b>{{ with index $g (printf "%siso" $side) }}<img class="flag" src="/img/flags/{{ . }}.png" alt="" width="18" height="12" loading="lazy" onerror="this.remove()"> {{ end }}{{ if $i }}<span class="cfb__dim">v </span>{{ end }}{{ index $g (printf "%sn" $side) }}</b>
+        <span class="cfb__dim">{{ with index $g (printf "%srec" $side) }}{{ . }} · {{ end }}{{ with index $g (printf "%sr" $side) }}ARK #{{ . }}{{ else }}unranked{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta"><b>{{ .comp }}</b>{{ with .ser }} · {{ lower . }}{{ end }} · {{ (time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ if .neu }} · neutral{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .an }} at {{ .hn }}" title="graphic: this match">GFX</button></p>
+    </header>
+    <p class="games__live" data-live hidden></p>
+    <div class="games__model">
+      <div class="games__prob soccer__prob" title="model chances: home win / draw / away win (90 minutes)">
+        <span style="width: {{ mul $ph 100 }}%">{{ partial "num.html" (slice "%.0f" (mul $ph 100)) }}%</span><span class="soccer__draw" style="width: {{ mul $pd 100 }}%">{{ partial "num.html" (slice "%.0f" (mul $pd 100)) }}%</span><span style="width: {{ mul $pa 100 }}%">{{ partial "num.html" (slice "%.0f" (mul $pa 100)) }}%</span>
+      </div>
+      <p><span class="cfb__dim">fair</span> {{ .hab }} {{ printf "%+d" (int (index .fair 0)) }} · <span class="cfb__dim">draw</span> {{ printf "%+d" (int (index .fair 1)) }} · {{ .aab }} {{ printf "%+d" (int (index .fair 2)) }}
+        {{- if $pred }}{{ with .dk }}<br><span class="cfb__dim">{{ $g.book | default "market" }}</span> {{ $g.hab }} {{ partial "num.html" (slice "%+.0f" (float .h)) }} · <span class="cfb__dim">draw</span> {{ partial "num.html" (slice "%+.0f" (float .d)) }} · {{ $g.aab }} {{ partial "num.html" (slice "%+.0f" (float .a)) }}{{ with .ou }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ else }} · <span class="cfb__dim">no market line yet</span>{{ end }}{{ end }}</p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .hab }} {{ partial "num.html" (slice "%.1f" (float (index .l 0))) }}, {{ .aab }} {{ partial "num.html" (slice "%.1f" (float (index .l 1))) }} · <span class="cfb__dim">most likely</span> {{ .top }} · <span class="cfb__dim">over 2.5</span> {{ partial "num.html" (slice "%.0f" (mul .o25 100)) }}% · <span class="cfb__dim">both score</span> {{ partial "num.html" (slice "%.0f" (mul .btts 100)) }}%</p>
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len $games }} matches</span><span {{ partial "fresh-attrs.html" "soccer_intl" | safeHTMLAttr }}>updated {{ $upd }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  // live scores: while a match is inside its window, poll ESPN's public scoreboard for its competition each minute
+  var cards = [].slice.call(document.querySelectorAll('.soccerintl .games__card[data-id]'));
+  if (!cards.length) return;
+  var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function active(c) { var now = Date.now(), k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 2.5 * 3600e3; }
+  function poll() {
+    var lgs = {}; cards.forEach(function (c) { if (active(c)) lgs[c.dataset.lg] = 1; });
+    Object.keys(lgs).forEach(function (lg) {
+      fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/' + lg + '/scoreboard').then(function (r) { return r.json(); }).then(function (j) {
+        (j.events || []).forEach(function (e) {
+          var c = byId[e.id]; if (!c) return;
+          var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+          if (st.state === 'pre') return;
+          var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+          el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FT' : 'LIVE') + '</b> ' +
+            esc(h.team.abbreviation) + ' <b>' + esc(h.score) + '</b> · ' + esc(a.team.abbreviation) + ' <b>' + esc(a.score) + '</b>' +
+            (st.state === 'in' ? ' <span class="cfb__dim">' + esc(st.shortDetail) + '</span>' : '');
+          el.hidden = false;
+        });
+      }).catch(function () {});
+    });
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
+{{- else if eq $view "nl" -}}
+{{- with .nl -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Nations League") "icon" "soccer" "filter" "League,Group" "tab" ($.Get "tab") "gfxCols" "Nation,Group,Pts,xPts,1st,2nd,3rd,4th,Finals,Title" "gfxDate" $upd "gfxMax" "16") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th>Nation</th><th>Group</th><th title="points">Pts</th>
+    <th title="points so far + mean simulated points over the group matches left">xPts</th>
+    <th title="P(1st). League A: quarter-finals; B, C: promotion; D: promotion">1st</th>
+    <th title="P(2nd). League A: quarter-finals; B, C: promotion play-off; D: promotion play-off">2nd</th>
+    <th title="P(3rd). League A: relegation play-off; B: relegation play-off; C, D: stays">3rd</th>
+    <th title="P(4th). League A, B: relegated; C: relegation play-off">4th</th>
+    <th title="League A: P(reach the finals: semi-final)">Finals</th>
+    <th title="League A: P(win the Nations League)">Title</th>
+    <th title="played, won-drawn-lost">Rec</th><th title="goal difference">GD</th>
+    <th title="rating: expected goal margin against an average top-{{ $d.topN }} side, neutral ground">Rating</th><th>League</th>
+  </tr></thead>
+  <tbody>
+  {{- range $g := .groups }}{{ $lgl := substr $g.name 0 1 }}{{ range $g.teams }}
+  <tr>
+    <td data-v="{{ .n }}" style="white-space: nowrap">{{ with .iso }}<img class="flag" src="/img/flags/{{ . }}.png" alt="" width="18" height="12" loading="lazy" onerror="this.remove()"> {{ end }}{{ .n }}</td>
+    <td>{{ $g.name }}</td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ .pts }}</td>
+    <td class="cfb__num" data-v="{{ .xpts }}">{{ partial "num.html" (slice "%.1f" (float .xpts)) }}</td>
+    {{- $ps := .p }}{{ range $i := seq 0 3 }}{{ $v := cond (lt $i (len $ps)) (index $ps $i) nil }}
+    <td class="cfb__num" data-v="{{ if ne $v nil }}{{ $v }}{{ end }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else if lt $v 0.0005 }}<span class="cfb__dim">0</span>{{ else if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
+    {{- end }}
+    {{- range $v := slice .sf .title }}
+    <td class="cfb__num" data-v="{{ if ne $v nil }}{{ $v }}{{ end }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num">{{ .gp }} <span class="cfb__dim">{{ .rec }}</span></td>
+    <td class="cfb__num" data-v="{{ .gd }}">{{ printf "%+d" (int .gd) }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ with .rating }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
+    <td>{{ $lgl }}</td>
+  </tr>
+  {{- end }}{{ end }}
+  </tbody>
+</table>
+{{- $nt := 0 }}{{ range .groups }}{{ $nt = add $nt (len .teams) }}{{ end -}}
+{{- partial "wintable-close.html" (dict "fresh" "soccer_intl" "rows" $nt "about" "League phase so far from ESPN's standings, then 10,000 runs of the group matches left on the match model; ties on points go to head-to-head points, goal difference and goals, then overall goal difference and goals. League A quarter-finals: group winners against runners-up of another group, two legs, the winner at home second; semi-finals and final at a neutral ground; level ties 55/45 to the second-leg host in extra time and penalties.") -}}
+{{- end -}}
+{{- else if eq $view "model" -}}
+{{- with site.Data.soccer_intl_fit }}{{ $f := . }}{{ with .report -}}
+{{- $cat := dict "wc" "World Cup finals" "cf" "continental finals" "q" "qualifiers" "nl" "Nations Leagues" "f" "friendlies" "o" "other tournaments" -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "national-team game model" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Walk-forward</th><th>Matches</th><th title="home / draw / away log loss at 90 minutes: model / without squad value / Elo (lower is better)">Log loss</th><th title="model minus no squad value, paired t clustered by month">Squad t</th><th title="model minus Elo, paired t clustered by month">Elo t</th></tr></thead>
+      <tbody>
+      {{- range $pl := slice (slice "tune" (printf "%s to %s (tuning)" (substr (index $f.tune 0) 0 4) (substr (index $f.tune 1) 0 4))) (slice "held" (printf "%s on (held out)" (substr $f.hold 0 4))) }}{{ with index $f.report (index $pl 0) }}
+      <tr><td>{{ index $pl 1 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .model }} <span class="cfb__dim">/ {{ .noSquad }} / {{ .elo }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float (index .squad 1))) }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float (index .vsElo 1))) }}</td></tr>
+      {{- range $c, $v := .byCat }}<tr><td class="cfb__dim">· {{ index $cat $c }}</td><td class="cfb__num">{{ index $v 0 }}</td><td class="cfb__num">{{ index $v 1 }} <span class="cfb__dim">/ {{ index $v 2 }} / {{ index $v 3 }}</span></td><td></td><td></td></tr>{{ end }}
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- with .close }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Against the book (ESPN BET, DraftKings)</th><th>Matches</th><th title="log loss: model / the price without the vig (lower is better)">Log loss</th><th title="paired t, model minus price, clustered by month (positive = the price is better)">t</th></tr></thead>
+      <tbody>
+      <tr><td>1X2 at the close, {{ (time .from).Format "Jan 2006" }} on</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .model }} <span class="cfb__dim">/ {{ .close }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float (index .gap 1))) }}</td></tr>
+      <tr><td>1X2 at the open</td><td class="cfb__num">{{ .nOpen }}</td><td class="cfb__num">{{ .modelOnOpen }} <span class="cfb__dim">/ {{ .open }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float (index .vsOpen 1))) }}</td></tr>
+      {{- with .o25 }}<tr><td>over 2.5 at the close</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .model }} <span class="cfb__dim">/ {{ .close }}</span></td><td></td></tr>{{ end }}
+      </tbody>
+    </table></div>
+    {{- end }}
+    {{- with .picks }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Picks at the open, EV 5%+</th><th>Bets</th><th title="expected return at the open price on the close's no-vig chance; t clustered by month">CLV</th><th title="realized return at the open price ± 1 SE">Return</th><th title="open-to-close move per unit of model-minus-open, logit">Tilt</th><th>Pass</th></tr></thead>
+      <tbody>{{ range $k, $v := . }}<tr><td>{{ if eq $k "ou" }}over / under{{ else }}1X2{{ end }}</td><td class="cfb__num">{{ $v.bets }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f%%" (mul (float $v.clv) 100)) }} <span class="cfb__dim">t {{ partial "num.html" (slice "%+.1f" (float $v.clv_t)) }}</span></td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f%%" (mul (float $v.ret) 100)) }} <span class="cfb__dim">± {{ partial "num.html" (slice "%.1f" (mul (float $v.ret_se) 100)) }}</span></td><td class="cfb__num">{{ $v.tilt }} <span class="cfb__dim">± {{ $v.tilt_se }}</span></td><td>{{ if $v.pass }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    {{- end }}
+  </div>
+  <div class="win__status"><span>walk-forward from 1872 · updated {{ lower ((time $f.asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}{{ end -}}
+{{- end -}}
+{{- end -}}

@@ -21,6 +21,8 @@
    "feeds": {"board": "hockey", "mock": "hockey_mock"}},
   "soccer": {"label": "soccer", "season": ["08-08", "05-31"], "offHours": 336, "workflow": "soccer.yml",
    "feeds": {"matches": "soccer_games", "players": "soccer_war", "backups": "backup_soccer", "model monitor": "model_monitor.soccer", "units": "units_soccer"}},
+  "soccerint": {"label": "national teams", "season": ["01-01", "12-31"], "offHours": 336, "workflow": "soccer-intl.yml",
+   "feeds": {"ratings": "soccer_intl"}},
   "soccerp": {"label": "soccer prospects", "season": ["01-01", "12-31"], "offHours": 336, "workflow": "soccer-prospects.yml",
    "feeds": {"board": "soccer_prospects"}},
   "tennis": {"label": "tennis", "season": ["01-01", "11-25"], "offHours": 336, "workflow": "tennis.yml",

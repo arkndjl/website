@@ -1136,6 +1136,19 @@
      ]
     },
     {
+     "term": "National-team rating",
+     "short": "Expected goal margin against an average top-48 nation at a neutral ground.",
+     "body": [
+      "Attack and defence in log goals per nation, learned match by match from every full international since 1872 (martj42, ESPN); learning rate x tournament weight (World Cup, continental finals, qualifiers, Nations Leagues, friendlies, other), faster for new nations, goals capped at 7; home edge learned (none at neutral venues).",
+      "Each side's log expected goals also moves by 0.124 x half the gap in log top-23 Transfermarkt value (players by national team, else first citizenship), held out 2016+ 0.8618 -> 0.8595 log loss (t -5.9).",
+      "Beats World Football Elo (K by tournament, goal multiplier, ordered logit) held out: 0.8595 vs 0.8750 (t -8.3)."
+     ],
+     "where": "world ranking tab, Soccer page",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
      "term": "Tennis ARK",
      "short": "Win chance vs the average top-50 player, best of three, over the tour's 52-week surface mix.",
      "body": [
@@ -1575,6 +1588,20 @@
      "where": "Predictions NFL fantasy (props), picks",
      "sports": [
       "NFL"
+     ]
+    },
+    {
+     "term": "National-team game model",
+     "short": "Home, draw and away at 90 minutes from the national-team ratings (Dixon-Coles).",
+     "body": [
+      "Tuned on 2000-15, scored once on 2016+ (10133 matches). Extra-time matches count as level at 90.",
+      "Against the book's close (ESPN BET, then DraftKings, through ESPN, 2024-06 on): 0.8485 vs 0.8349; level with the open (0.8485 vs 0.8499).",
+      "Picks at the open (EV 5%+, pre-registered): 1X2 CLV -0.7% (t -0.5), over/under -1.4% (t -2.5): failed, no national-team picks.",
+      "Nations League: 10,000 runs of the group matches left; League A quarter-finals two legs, finals at a neutral ground."
+     ],
+     "where": "internationals and Nations League tabs, Soccer page; Predictions",
+     "sports": [
+      "Soccer"
      ]
     },
     {
