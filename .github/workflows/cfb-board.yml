@@ -179,6 +179,11 @@ jobs:
       - name: Draft ledger
         continue-on-error: true
         run: python3 scripts/draft_ledger.py snap cfb
+      # pre-registered transfer watch ledger (scripts/watch_ledger.py): Xfer% and the Lean / 2nd / 3rd schools, frozen
+      # in the last week before the January window (Dec 25 - Jan 1); committed with scripts/data/ledger/cfb below
+      - name: Transfer watch ledger
+        continue-on-error: true
+        run: python3 scripts/watch_ledger.py players cfb --due
       # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/cfb.json), display only
       - name: Rookies tab
         continue-on-error: true
