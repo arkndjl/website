@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,draft board,WAR leaders,stats,true freshmen,breakouts,awards,ARKLIST|rosters:depth chart,returning,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all,draft board,WAR leaders,stats,true freshmen,breakouts,awards,ARKLIST|rosters:depth chart,returning,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,bracket,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27" tab="all" >}}
 {{< lazytab tab="draft board" >}}
 {{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board" tab="draft board" >}}
@@ -40,6 +40,7 @@ cover = "/og/college-basketball.png"
 {{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
 {{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
+{{< lazytab tab="bracket" >}}{{< bracket k="cbb" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}
 {{< lazytab tab="offense" >}}
 {{< teamunits sport="cbb" view="offense" title="offense" tab="offense" >}}
 {{< /lazytab >}}

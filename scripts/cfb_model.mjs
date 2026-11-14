@@ -928,6 +928,51 @@ function gauss(R) { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); re
 const CFP_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cfb_cfp.json');
 const CFP = (() => { try { const j = JSON.parse(fs.readFileSync(CFP_PATH, 'utf8')); return { feats: j.feats, beta: j.beta, gsd: j.gsd || 15 }; } catch { return null; } })();
 const CFP_FORMAT = { p4: ['SEC', 'Big Ten', 'ACC', 'Big 12'], nd: '87', size: 12, byes: 4 };
+// Committee memory: the final ranking leans on the committee's latest release. score + gamma x (26 - rank) / 25 (0
+// unranked), gamma by how many weeks are left (scripts/cfb_cfp_seeds.py, data/cfb_cfp_seeds.json gammaLive keyed by the
+// release's week label). From weeks 10 and 12 of 2017-25: the final release's held-out log likelihood 2022-25 -185.2 ->
+// -181.7 (gamma 1, wk 10) and -175.4 (gamma 3.25, wk 12); seed log loss t -3.7 / -2.4; exact seeds right a season at
+// week 10 1.1 -> 2.1 (t 2.9), against 1.25 for the committee's own top 12 that week; level with it at week 12
+const SEEDS_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cfb_cfp_seeds.json');
+const STAND_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'standings.json');
+function cfpMemory() {
+  try {
+    const g = JSON.parse(fs.readFileSync(SEEDS_PATH, 'utf8')).gammaLive || {};
+    const rel = (JSON.parse(fs.readFileSync(STAND_PATH, 'utf8')).polls?.cfb || []).find(p => /playoff|cfp/i.test(p.name || ''));
+    const wk = +(String(rel?.date || '').match(/week (\d+)/i)?.[1]);
+    if (!rel || !wk) return null;
+    const ks = Object.keys(g).map(Number).sort((a, b) => a - b);
+    if (!ks.length) return null;
+    // linear between the fitted labels, held at the ends
+    let gamma = wk <= ks[0] ? g[ks[0]] : wk >= ks.at(-1) ? g[ks.at(-1)] : null;
+    if (gamma == null) for (let i = 1; i < ks.length; i++) if (wk <= ks[i]) { const f = (wk - ks[i - 1]) / (ks[i] - ks[i - 1]); gamma = g[ks[i - 1]] + f * (g[ks[i]] - g[ks[i - 1]]); break; }
+    const mem = {};
+    for (const r of rel.rows || []) { const id = String(r.logo || '').match(/\/(\d+)\.png/)?.[1]; if (id) mem[id] = (26 - r.rk) / 25; }
+    return { gamma, mem, week: wk };
+  } catch { return null; }
+}
+// Hungarian: slots (rows) x candidates (cols, >= rows), maximise the sum -> slot i's column (scripts/bracket.py assign)
+function assign(P) {
+  const n = P.length, m = n ? P[0].length : 0; if (!n) return [];
+  const big = Math.max(...P.flat()), a = P.map(r => r.map(x => big - x));
+  const u = new Float64Array(n + 1), v = new Float64Array(m + 1), p = new Int32Array(m + 1), way = new Int32Array(m + 1);
+  for (let i = 1; i <= n; i++) {
+    p[0] = i; let j0 = 0; const minv = new Float64Array(m + 1).fill(Infinity), used = new Uint8Array(m + 1);
+    do {
+      used[j0] = 1; const i0 = p[j0]; let delta = Infinity, j1 = 0;
+      for (let j = 1; j <= m; j++) if (!used[j]) {
+        const cur = a[i0 - 1][j - 1] - u[i0] - v[j];
+        if (cur < minv[j]) { minv[j] = cur; way[j] = j0; }
+        if (minv[j] < delta) { delta = minv[j]; j1 = j; }
+      }
+      for (let j = 0; j <= m; j++) if (used[j]) { u[p[j]] += delta; v[j] -= delta; } else minv[j] -= delta;
+      j0 = j1;
+    } while (p[j0] !== 0);
+    do { const j1 = way[j0]; p[j0] = p[j1]; j0 = j1; } while (j0);
+  }
+  const out = Array(n).fill(null); for (let j = 1; j <= m; j++) if (p[j]) out[p[j] - 1] = j - 1;
+  return out;
+}
 const WAB_HFA = 2.5;
 // ridge rating per team from margins m = r_h - r_a + h x (not neutral): { r: {team: rating}, h }
 function readback(games, lam = 1) {
@@ -946,7 +991,7 @@ function readback(games, lam = 1) {
   return { r: Object.fromEntries(ts.map((t, i) => [t, b[i]])), h: b[k - 1] };
 }
 function gumbel(R) { let u = 0; while (!u) u = R(); return -Math.log(-Math.log(u)); }
-function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 8) {
+export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 8) {
   const R = rng(20261008);
   const S = rows[0]?.S, season = rows.filter(r => r.S === S && r.w < 20);
   const done = season.filter(r => r.done), left = season.filter(r => !r.done);
@@ -959,7 +1004,8 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
   const rOf = t => rb.r[t] ?? ratingNow[t] ?? 0, hfa = Math.max(0, rb.h);
   const nLeft = {}; for (const r of left) { nLeft[r.h] = (nLeft[r.h] || 0) + 1; nLeft[r.a] = (nLeft[r.a] || 0) + 1; }
   const tu = Object.fromEntries(teams.map(t => [t, uncert * Math.sqrt(Math.min(1, (nLeft[t] || 0) / 12))]));
-  const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bye: 0, semi: 0, natl: 0, seed: 0, bowl: 0, wins: Array(16).fill(0) }]));
+  const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bye: 0, qf: 0, semi: 0, fin: 0, natl: 0, seed: 0, bowl: 0, wins: Array(16).fill(0), sd: Array(CFP_FORMAT.size).fill(0) }]));
+  const MEM = cfpMemory();
   const confs = {}; for (const t of teams) if (conf[t] && !/independent/i.test(conf[t])) (confs[conf[t]] ||= []).push(t);
   const ix = Object.fromEntries(teams.map((t, i) => [t, i]));
   const p4 = teams.map(t => t === CFP_FORMAT.nd || CFP_FORMAT.p4.includes(conf[t]) ? 1 : 0);
@@ -1014,7 +1060,7 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
       for (const [w, l] of ccgG) { wab[w] += 1 - pB(l, 0); wab[l] -= pB(w, 0); }
       const isCh = new Set(champs);
       const x = { L: t => W[t].l, W: t => W[t].w, rating: str, wab: t => wab[t], champ: t => isCh.has(t) ? 1 : 0, p4: t => p4[ix[t]] };
-      const score = teams.map(t => CFP.feats.reduce((a, f) => a + B[f] * x[f](t), 0) + gumbel(R));
+      const score = teams.map(t => CFP.feats.reduce((a, f) => a + B[f] * x[f](t), 0) + (MEM ? MEM.gamma * (MEM.mem[t] || 0) : 0) + gumbel(R));
       const order = teams.map((t, i) => i).sort((i, j) => score[j] - score[i]).map(i => teams[i]);
       const rank = Object.fromEntries(order.map((t, i) => [t, i + 1]));
       const auto = new Set(champs.filter(t => CFP_FORMAT.p4.includes(conf[t])));
@@ -1029,8 +1075,10 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
       const qf = [[seeds[0], fr[3]], [seeds[1], fr[2]], [seeds[2], fr[1]], [seeds[3], fr[0]]].map(([a, b]) => play(a, b, false));
       const sf = [play(qf[0], qf[3], false), play(qf[1], qf[2], false)];
       for (const t of qf) acc[t].semi++;
+      for (const t of sf) acc[t].fin++;
+      for (const t of [...seeds.slice(0, 4), ...fr]) acc[t].qf++;
       acc[play(sf[0], sf[1], false)].natl++;
-      for (const t of seeds) { acc[t].cfp++; acc[t].seed += seedOf[t]; if (seedOf[t] <= CFP_FORMAT.byes) acc[t].bye++; }
+      for (const t of seeds) { acc[t].cfp++; acc[t].seed += seedOf[t]; acc[t].sd[seedOf[t] - 1]++; if (seedOf[t] <= CFP_FORMAT.byes) acc[t].bye++; }
     } else {
       // no committee fit on disk: the old stand-in (losses, then strength, champions +3)
       const resume = t => -W[t].l * 6 + str(t) * 0.5 + (champs.includes(t) ? 3 : 0);
@@ -1044,10 +1092,46 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
       if (regW >= 6) acc[t].bowl++;
     }
   }
-  return teams.map(t => ({ tid: t, rec: `${base[t].w}-${base[t].l}`, conf: conf[t] || null, projW: r1(acc[t].w / N),
+  // projected bracket: the seeding with the most expected exact seeds (scripts/bracket.py), each game to the side more
+  // likely to reach the next round
+  let bracket = null;
+  if (CFP) {
+    // full assignment over every team: more exact seeds in the backtest than the 12 likeliest teams seeded after
+    // (weeks 10 + 12, 2017-25: 2.1 / 2.1 a season vs 1.75 / 2.1)
+    const cand = teams.filter(t => acc[t].cfp > 0).sort((a, b) => acc[b].cfp - acc[a].cfp);
+    if (cand.length >= CFP_FORMAT.size) {
+      const pick = assign(Array.from({ length: CFP_FORMAT.size }, (_, k) => cand.map(t => acc[t].sd[k] / N)));
+      const sd = pick.map(j => cand[j]);
+      const P = (t, k) => r3(acc[t][k] / N), adv = (a, b, k) => (acc[a][k] >= acc[b][k] ? a : b);
+      const ent = (t, k) => ({ t, seed: sd.indexOf(t) + 1, p: P(t, k) });
+      const fr = [[5, 12], [6, 11], [7, 10], [8, 9]].map(([x, y]) => [sd[x - 1], sd[y - 1]]);
+      const frW = fr.map(([a, b]) => adv(a, b, 'qf'));
+      const qf = [[sd[0], frW[3]], [sd[1], frW[2]], [sd[2], frW[1]], [sd[3], frW[0]]];
+      const qfW = qf.map(([a, b]) => adv(a, b, 'semi'));
+      const sf = [[qfW[0], qfW[3]], [qfW[1], qfW[2]]], sfW = sf.map(([a, b]) => adv(a, b, 'fin'));
+      const ch = adv(sfW[0], sfW[1], 'natl');
+      const games = (gs, k, kw) => gs.map(([a, b]) => { const w = adv(a, b, kw); return { a: ent(a, k), b: ent(b, k), w }; });
+      bracket = {
+        memory: MEM ? { week: MEM.week, gamma: r3(MEM.gamma) } : null,
+        seeds: sd.map((t, i) => ({ t, seed: i + 1, p: r3(acc[t].sd[i] / N), pin: P(t, 'cfp') })),
+        sections: [{ name: 'CFP', rounds: [
+          { name: 'First round', games: games(fr, 'cfp', 'qf') },
+          { name: 'Quarterfinals', games: games(qf, 'qf', 'semi') },
+          { name: 'Semifinals', games: games(sf, 'semi', 'fin') },
+          { name: 'Final', games: games([sfW], 'fin', 'natl') },
+        ], champ: { t: ch, p: P(ch, 'natl') } }],
+        rounds: [['cfp', 'Playoff'], ['bye', 'Bye'], ['qf', 'QF'], ['semi', 'Semis'], ['fin', 'Final'], ['natl', 'Title']],
+        odds: Object.fromEntries(teams.filter(t => acc[t].cfp / N >= 0.005).map(t => [t, { cfp: P(t, 'cfp'), bye: P(t, 'bye'), qf: P(t, 'qf'), semi: P(t, 'semi'), fin: P(t, 'fin'), natl: P(t, 'natl'),
+          sd: acc[t].sd.map(c => r3(c / N)) }])),
+      };
+    }
+  }
+  const res = teams.map(t => ({ tid: t, rec: `${base[t].w}-${base[t].l}`, conf: conf[t] || null, projW: r1(acc[t].w / N),
     ccg: r3(acc[t].ccg / N), title: r3(acc[t].title / N), cfp: r3(acc[t].cfp / N), bye: r3(acc[t].bye / N), semi: r3(acc[t].semi / N),
     natl: r3(acc[t].natl / N), seed: acc[t].cfp ? r1(acc[t].seed / acc[t].cfp) : null, bowl: r3(acc[t].bowl / N),
     left: left.filter(r => r.h === t || r.a === t).length }));
+  res.bracket = bracket;
+  return res;
 }
 
 // ---- the whole model ----------------------------------------------------------------------------------------

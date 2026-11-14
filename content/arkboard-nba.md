@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:VORX/XPM leaders,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,offense,defense" side="true" label="NBA views" >}}
+{{< wintabs groups="players:VORX/XPM leaders,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,bracket,offense,defense" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< pctl sport="nba" icon="hoop" title="projections" tab="projections" >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
@@ -23,6 +23,7 @@ cover = "/og/nba.png"
 {{< nbagametable title="game table" tab="game table" >}}
 {{< nbapower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nbasim title="season odds" tab="season odds" >}}
+{{< lazytab tab="bracket" >}}{{< bracket k="nba" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}
 {{< lazytab tab="offense" >}}
 {{< teamunits sport="nba" view="offense" title="offense" tab="offense" >}}
 {{< /lazytab >}}

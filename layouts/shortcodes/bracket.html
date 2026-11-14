@@ -1,0 +1,90 @@
+{{- /* Projected bracket and seed odds from the season sims: data/brackets/<k>.json (scripts/bracket.py; written by
+       cfb_model.mjs via fetch_cfb.mjs, nfl_games.py, nba_games_build.py, nhl_games.py, cbb_games_live.py, soccer_games.py).
+       {{< bracket k="cfb" tab="bracket" title="..." icon="football" >}}
+       Projected seeds: the seeding with the most expected exact seeds (Hungarian on P(seed)); each game goes to the side
+       more likely to reach the next round. Percent beside a team = P(reach that round). Method on Reference. */ -}}
+{{- $k := .Get "k" -}}
+{{- $tab := .Get "tab" -}}
+{{- $icon := .Get "icon" | default "football" -}}
+{{- with index (site.Data.brackets | default dict) $k -}}
+{{- $D := . -}}
+{{- $T := .teams -}}
+{{- $asof := lower ((time .asof).Format "Jan 2") -}}
+<div class="win bk-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default "projected bracket" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="bk-body">
+  {{- range .sections }}
+    <section class="bk-sec">
+      <h3 class="st-h">{{ .name }}</h3>
+      <div class="bk-rounds">
+      {{- range .rounds }}
+        <div class="bk-col">
+          <span class="st-lab">{{ .name }}</span>
+          <div class="bk-gs">
+          {{- range .games }}{{ $w := .w }}
+          <div class="bk-g{{ if not .b }} bk-g--bye{{ end }}">
+            {{- range $s := slice .a .b }}{{ if $s }}{{ $t := index $T $s.t | default (dict "n" $s.t) }}
+            <div class="bk-t{{ if eq $s.t $w }} bk-t--w{{ end }}" title="{{ $t.n }}">
+              <b class="bk-s">{{ $s.seed }}</b>
+              {{- with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="18" height="18" loading="lazy" onerror="this.style.display='none'">{{ end }}
+              <span class="bk-n">{{ $t.a | default $t.n }}</span>
+              <span class="bk-p">{{ if ge $s.p 0.995 }}&gt;99{{ else if lt $s.p 0.005 }}&lt;1{{ else }}{{ partial "num.html" (slice "%.0f" (mul $s.p 100)) }}{{ end }}%</span>
+            </div>
+            {{- else }}<div class="bk-t bk-t--bye"><span class="bk-n">bye</span></div>{{ end }}{{ end }}
+          </div>
+          {{- end }}
+          </div>
+        </div>
+      {{- end }}
+      {{- with .champ }}{{ $t := index $T .t | default (dict "n" .t) }}
+        <div class="bk-col bk-col--champ">
+          <span class="st-lab">champion</span>
+          <div class="bk-gs"><div class="bk-g bk-g--champ"><div class="bk-t bk-t--w" title="{{ $t.n }}">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="24" height="24" loading="lazy" onerror="this.style.display='none'">{{ end }}<span class="bk-n">{{ $t.a | default $t.n }}</span><span class="bk-p">{{ partial "num.html" (slice "%.0f" (mul .p 100)) }}%</span></div></div></div>
+        </div>
+      {{- end }}
+      </div>
+    </section>
+  {{- end }}
+  {{- with $D.lastIn }}
+    <div class="bk-bub">
+      <div class="st-m"><span class="st-lab">last four in</span>{{ range . }}{{ $t := index $T . | default (dict "n" .) }}<div class="st-t">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="18" height="18" loading="lazy" onerror="this.style.display='none'">{{ end }}<span class="st-tn">{{ $t.n }}</span><span class="cfb__dim st-tr">{{ partial "num.html" (slice "%.0f" (mul (index $D.odds .).bid 100)) }}%</span></div>{{ end }}</div>
+      {{- with $D.firstOut }}<div class="st-out"><span class="st-lab">first four out</span>{{ range . }}{{ $t := index $T . | default (dict "n" .) }}<div class="st-t">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="18" height="18" loading="lazy" onerror="this.style.display='none'">{{ end }}<span class="st-tn">{{ $t.n }}</span><span class="cfb__dim st-tr">{{ with index $D.odds . }}{{ partial "num.html" (slice "%.0f" (mul .bid 100)) }}%{{ end }}</span></div>{{ end }}</div>{{ end }}
+    </div>
+  {{- end }}
+  </div>
+  <div class="win__status" title="projected seeds: the seeding with the most expected exact seeds across the sims · each game to the side more likely to reach the next round · % = chance to reach that round"><span>{{ lang.FormatNumber 0 $D.sims }} simulated seasons</span><span class="cfb__asof">updated {{ $asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- /* seed odds: every team with a 0.5%+ chance in */ -}}
+{{- $rows := slice -}}
+{{- range $t, $o := $D.odds }}{{ $rows = $rows | append (dict "t" $t "o" $o "p0" (index $o (index (index $D.rounds 0) 0))) }}{{ end -}}
+{{- $rows = sort $rows "p0" "desc" -}}
+{{- $nseed := 0 }}{{ range $D.groups }}{{ if gt .n $nseed }}{{ $nseed = .n }}{{ end }}{{ end -}}
+{{- $proj := dict }}{{ range $D.groups }}{{ $g := .name }}{{ range .seeds }}{{ if .t }}{{ $proj = merge $proj (dict .t (dict "s" .seed "g" $g)) }}{{ end }}{{ end }}{{ end -}}
+{{- $multi := gt (len $D.groups) 1 -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: seed odds" ($.Get "title" | default "projected bracket")) "icon" $icon "tab" $tab "filter" (cond $multi "Group" "")) -}}
+<table class="cfb__table bk-odds">
+  <thead><tr>
+    <th>Team</th>{{ if $multi }}<th title="conference">Group</th>{{ end }}
+    <th title="seed in the projected bracket">Proj</th>
+    {{- range $D.rounds }}<th title="P({{ index . 1 }})">{{ index . 1 }}</th>{{ end }}
+    {{- if le $nseed 16 }}{{ range $i := seq $nseed }}<th class="bk-sdh" title="P(seed {{ cond (gt (len ($D.labels | default slice)) 0) (index $D.labels (sub $i 1)) $i }})">{{ cond (gt (len ($D.labels | default slice)) 0) (index $D.labels (sub $i 1)) $i }}</th>{{ end }}{{ end }}
+  </tr></thead>
+  <tbody>
+  {{- range $rows }}{{ $t := index $T .t | default (dict "n" .t) }}{{ $o := .o }}{{ $pj := index $proj .t }}
+  <tr>
+    <td class="cfb__team">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'">{{ end }}<span>{{ $t.n }}</span></td>
+    {{- if $multi }}<td>{{ with $pj }}{{ .g }}{{ else }}{{ $o.g | default "—" }}{{ end }}</td>{{ end }}
+    <td class="cfb__num" data-v="{{ with $pj }}{{ .s }}{{ else }}99{{ end }}">{{ with $pj }}{{ .s }}{{ else }}—{{ end }}</td>
+    {{- range $D.rounds }}{{ $v := index $o (index . 0) | default 0.0 }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if ge $v 0.995 }}&gt;99%{{ else if and (gt $v 0.0) (lt $v 0.005) }}&lt;1%{{ else }}{{ partial "num.html" (slice "%.0f" (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    {{- if le $nseed 16 }}{{ range $i := seq $nseed }}{{ $v := 0.0 }}{{ with $o.sd }}{{ if le $i (len .) }}{{ $v = index . (sub $i 1) }}{{ end }}{{ end }}
+    <td class="bk-sd" data-v="{{ $v }}" style="--a:{{ math.Min 1 (mul $v 2.5) }}"{{ if gt $v 0.0 }} title="{{ partial "num.html" (slice "%.0f" (mul $v 100)) }}%"{{ end }}>{{ if ge $v 0.1 }}{{ partial "num.html" (slice "%.0f" (mul $v 100)) }}{{ end }}</td>
+    {{- end }}{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "%s simulated seasons · updated %s" (lang.FormatNumber 0 $D.sims) $asof) "about" "seed columns: P(that seed), darker = likelier") -}}
+{{- end -}}

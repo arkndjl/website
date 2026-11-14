@@ -1514,7 +1514,8 @@ def mls_playoffs(L, lg, teams, groups, pts, gd, gf, dl, rng, share, knobs, po, o
     key = pts * 1e6 + (gd + 500) * 1e3 + gf + rng.random(pts.shape)
     seed = np.zeros((n, nt), int)
     champ = {}
-    res = {k: np.zeros((n, nt)) for k in ('po', 'r1', 'cf')}
+    res = {k: np.zeros((n, nt)) for k in ('po', 'r1', 'cf', 'sf', 'cfin')}
+    sdk = {}                                                       # conference: (n x 9) seed k's club
     for c in sorted({groups[t] for t in teams}):
         cols = np.array([ix[t] for t in teams if groups[t] == c])
         order = cols[np.argsort(-key[:, cols], axis=1)]          # n x conference size: seed k's club
@@ -1526,7 +1527,12 @@ def mls_playoffs(L, lg, teams, groups, pts, gd, gf, dl, rng, share, knobs, po, o
         def single(x, y):
             hx = seed[ar, x] < seed[ar, y]
             return game(np.where(hx, x, y), np.where(hx, y, x), True)
-        champ[c] = single(single(a, b), single(c_, d_))
+        for x in (a, b, c_, d_):
+            res['sf'][ar, x] = 1
+        f1, f2 = single(a, b), single(c_, d_)
+        res['cfin'][ar, f1] = 1; res['cfin'][ar, f2] = 1
+        champ[c] = single(f1, f2)
+        sdk[c] = np.stack(S_, 1)
         for k in range(9):
             res['po'][ar, S_[k]] = 1
             if k < 7:
@@ -1542,6 +1548,48 @@ def mls_playoffs(L, lg, teams, groups, pts, gd, gf, dl, rng, share, knobs, po, o
         out[t].update(conf=groups[t], cpos=round(float(seed[:, i].mean()) + 1, 1),
                       po=round(float(res['po'][:, i].mean()), 4), r1=round(float(res['r1'][:, i].mean()), 4),
                       cf=round(float(res['cf'][:, i].mean()), 4), cup=round(float(cup[:, i].mean()), 4))
+    try:
+        mls_bracket(L, teams, sdk, res, cup, n)
+    except Exception as e:            # the bracket keeps its last file rather than stop the build
+        print('mls bracket failed:', repr(e), flush=True)
+
+
+def mls_bracket(L, teams, sdk, res, cup, n):
+    """data/brackets/soccer.json: MLS seed odds 1-9 a conference and the projected bracket (scripts/bracket.py)"""
+    import bracket as BK
+    tal = BK.Tally({c: 9 for c in sdk}, ['po'])
+    tal.n = n
+    for c, M in sdk.items():
+        for k in range(M.shape[1]):
+            ids, cnt = np.unique(M[:, k], return_counts=True)
+            for i, m in zip(ids, cnt):
+                tal.seed[c].setdefault(teams[i], [0] * 9)[k] += int(m)
+    proj, _, sd = tal.project()
+    odds = {t: {'po': round(float(res['po'][:, i].mean()), 3), 'sf': round(float(res['sf'][:, i].mean()), 3),
+                'cfin': round(float(res['cfin'][:, i].mean()), 3), 'cf': round(float(res['cf'][:, i].mean()), 3),
+                'cup': round(float(cup[:, i].mean()), 3)} for i, t in enumerate(teams)}
+    odds = {t: o for t, o in odds.items() if o['po'] >= 0.005}
+    # r1 reach = in round one: seeds 1-7 and the wild-card winner; the wild card goes to the side more likely in round one
+    secs, champ = [], {}
+    for c in sdk:
+        S_ = [r['t'] for r in proj[c]]
+        seed = {t: i + 1 for i, t in enumerate(S_)}
+        wc = BK.game(S_[7], S_[8], seed, odds, 'po', 'sf')
+        r1 = [BK.game(S_[0], wc['w'], seed, odds, 'po', 'sf'), BK.game(S_[3], S_[4], seed, odds, 'po', 'sf'),
+              BK.game(S_[1], S_[6], seed, odds, 'po', 'sf'), BK.game(S_[2], S_[5], seed, odds, 'po', 'sf')]
+        sf = [BK.game(r1[0]['w'], r1[1]['w'], seed, odds, 'sf', 'cfin'), BK.game(r1[2]['w'], r1[3]['w'], seed, odds, 'sf', 'cfin')]
+        cfg = BK.game(sf[0]['w'], sf[1]['w'], seed, odds, 'cfin', 'cf')
+        champ[c] = cfg['w']
+        secs.append({'name': c, 'rounds': [{'name': 'Wild card', 'games': [wc]}, {'name': 'Round one', 'games': r1},
+                                          {'name': 'Conf semis', 'games': sf}, {'name': 'Conf final', 'games': [cfg]}]})
+    cs = list(champ.values())
+    if len(cs) == 2:
+        fg = BK.game(cs[0], cs[1], {}, odds, 'cf', 'cup')
+        secs.append({'name': 'MLS Cup', 'rounds': [{'name': 'MLS Cup', 'games': [fg]}], 'champ': {'t': fg['w'], 'p': odds[fg['w']]['cup']}})
+    nm = {t: {'n': (L.names.get(t) or [t, t])[0], 'a': (L.names.get(t) or [t, t])[1], 'logo': f'/img/soccer/{t}.png'} for t in teams}
+    BK.save('soccer', BK.payload(dt.date.today().isoformat(), n, tal, proj, odds, sd, secs,
+                                 [['po', 'Playoff'], ['sf', 'Conf semis'], ['cfin', 'Conf final'], ['cf', 'Final'], ['cup', 'Cup']], nm,
+                                 league='MLS'))
 
 
 def unlisted(reg, teams, G, lg):
