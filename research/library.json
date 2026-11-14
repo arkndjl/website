@@ -1791,6 +1791,21 @@
      ]
     },
     {
+     "term": "1NT preview (ESEA)",
+     "short": "Win chance for an ESEA league match: FACEIT elo and talent plus the RWA gap of the players each side is expected to field.",
+     "body": [
+      "Logit = .316 x logit(elo .8 / talent .2) + 14.2 x RWA gap / 100.",
+      "Who is priced: the opponent's top 7 by this season's league maps (latest map x3), weighted by share, current roster only. 1NT: the match lineup or starters on file.",
+      "Held S58-S59 on the RWA gap (n 2,066, t by match day): hard top 5 .6221, 90-day top 7 by share .6192 (t -2.7), season top 7 .6130 (t -3.2). The five who actually played: .6010. The hard top 5 misses a player in 78% of matches.",
+      "Pick/ban tree: an opponent ban is HABIT (their least-played map) 90%, EDGE (minimax on map edges) 10%, fit on the played map of 11,606 Bo1s, held 1,715: log loss 1.685 -> 1.632 (t -4.6).",
+      "League log: every Main match (and Advanced where ratings exist) priced before the start with team-level inputs, scored after. Forward record only."
+     ],
+     "where": "1NT matchday, 1NTERLYTICS preview",
+     "sports": [
+      "CS2"
+     ]
+    },
+    {
      "term": "Major Pick'Em (CS2)",
      "short": "Valve Major Pick'Em picks with the best chance of each coin tier.",
      "body": [

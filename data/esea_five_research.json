@@ -1,0 +1,383 @@
+{
+ "asof": "2026-10-26T15:18:37.543Z",
+ "rows": {
+  "tune": 11841,
+  "held": 2066
+ },
+ "params": {
+  "opp": 1.0,
+  "w": "ark",
+  "h": 100000,
+  "k": 15,
+  "pm": 0.0,
+  "g": 4.0,
+  "nu": -3.0
+ },
+ "live_rule_miss": {
+  "share_matches": 0.783,
+  "players_per_match": 1.49
+ },
+ "models": {
+  "rwa": {
+   "actual": {
+    "coef": [
+     6.176
+    ],
+    "n": 2066,
+    "held_ll": 0.601,
+    "tune_ll": 0.6426
+   },
+   "live": {
+    "coef": [
+     5.13
+    ],
+    "n": 2066,
+    "held_ll": 0.6221,
+    "tune_ll": 0.6556
+   },
+   "expected": {
+    "coef": [
+     5.403
+    ],
+    "n": 2066,
+    "held_ll": 0.6192,
+    "tune_ll": 0.6538
+   },
+   "sharp": {
+    "coef": [
+     5.595
+    ],
+    "n": 2066,
+    "held_ll": 0.613,
+    "tune_ll": 0.6511
+   },
+   "live_vs_actual": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.601,
+     "ll_new": 0.6221,
+     "diff": 0.02115,
+     "t": 4.87
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6426,
+     "ll_new": 0.6556,
+     "diff": 0.01302,
+     "t": 7.8
+    }
+   },
+   "expected_vs_live": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.6221,
+     "ll_new": 0.6192,
+     "diff": -0.00289,
+     "t": -2.69
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6556,
+     "ll_new": 0.6538,
+     "diff": -0.00177,
+     "t": -3.23
+    }
+   },
+   "sharp_vs_expected": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.6192,
+     "ll_new": 0.613,
+     "diff": -0.00622,
+     "t": -3.15
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6538,
+     "ll_new": 0.6511,
+     "diff": -0.0027,
+     "t": -3.63
+    }
+   },
+   "expected_vs_actual": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.601,
+     "ll_new": 0.6192,
+     "diff": 0.01826,
+     "t": 4.94
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6426,
+     "ll_new": 0.6538,
+     "diff": 0.01125,
+     "t": 7.53
+    }
+   }
+  },
+  "pelo": {
+   "actual": {
+    "coef": [
+     3.75
+    ],
+    "n": 2066,
+    "held_ll": 0.6232,
+    "tune_ll": 0.6609
+   },
+   "live": {
+    "coef": [
+     3.204
+    ],
+    "n": 2066,
+    "held_ll": 0.6322,
+    "tune_ll": 0.6669
+   },
+   "expected": {
+    "coef": [
+     3.413
+    ],
+    "n": 2066,
+    "held_ll": 0.6295,
+    "tune_ll": 0.6652
+   },
+   "sharp": {
+    "coef": [
+     3.602
+    ],
+    "n": 2066,
+    "held_ll": 0.6264,
+    "tune_ll": 0.6631
+   },
+   "live_vs_actual": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.6232,
+     "ll_new": 0.6322,
+     "diff": 0.00898,
+     "t": 3.08
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6609,
+     "ll_new": 0.6669,
+     "diff": 0.00596,
+     "t": 6.22
+    }
+   },
+   "expected_vs_live": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.6322,
+     "ll_new": 0.6295,
+     "diff": -0.00266,
+     "t": -2.5
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6669,
+     "ll_new": 0.6652,
+     "diff": -0.00172,
+     "t": -4.8
+    }
+   },
+   "sharp_vs_expected": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.6295,
+     "ll_new": 0.6264,
+     "diff": -0.00313,
+     "t": -2.5
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6652,
+     "ll_new": 0.6631,
+     "diff": -0.00212,
+     "t": -3.4
+    }
+   },
+   "expected_vs_actual": {
+    "held": {
+     "n": 2066,
+     "days": 68,
+     "ll_base": 0.6232,
+     "ll_new": 0.6295,
+     "diff": 0.00632,
+     "t": 2.67
+    },
+    "tune": {
+     "n": 11841,
+     "days": 250,
+     "ll_base": 0.6609,
+     "ll_new": 0.6652,
+     "diff": 0.00424,
+     "t": 4.86
+    }
+   }
+  },
+  "rwa+lv": {
+   "actual": {
+    "coef": [
+     5.135,
+     0.548
+    ],
+    "n": 1645,
+    "held_ll": 0.5911,
+    "tune_ll": 0.6232
+   },
+   "live": {
+    "coef": [
+     4.236,
+     0.445
+    ],
+    "n": 1645,
+    "held_ll": 0.6132,
+    "tune_ll": 0.6427
+   },
+   "expected": {
+    "coef": [
+     4.427,
+     0.471
+    ],
+    "n": 1645,
+    "held_ll": 0.6092,
+    "tune_ll": 0.6407
+   },
+   "sharp": {
+    "coef": [
+     4.62,
+     0.477
+    ],
+    "n": 1645,
+    "held_ll": 0.602,
+    "tune_ll": 0.6374
+   },
+   "live_vs_actual": {
+    "held": {
+     "n": 1645,
+     "days": 65,
+     "ll_base": 0.5911,
+     "ll_new": 0.6132,
+     "diff": 0.02208,
+     "t": 4.36
+    },
+    "tune": {
+     "n": 11356,
+     "days": 248,
+     "ll_base": 0.6232,
+     "ll_new": 0.6427,
+     "diff": 0.01952,
+     "t": 7.83
+    }
+   },
+   "expected_vs_live": {
+    "held": {
+     "n": 1645,
+     "days": 65,
+     "ll_base": 0.6132,
+     "ll_new": 0.6092,
+     "diff": -0.004,
+     "t": -2.82
+    },
+    "tune": {
+     "n": 11356,
+     "days": 248,
+     "ll_base": 0.6427,
+     "ll_new": 0.6407,
+     "diff": -0.00198,
+     "t": -2.43
+    }
+   },
+   "sharp_vs_expected": {
+    "held": {
+     "n": 1645,
+     "days": 65,
+     "ll_base": 0.6092,
+     "ll_new": 0.602,
+     "diff": -0.00726,
+     "t": -2.62
+    },
+    "tune": {
+     "n": 11356,
+     "days": 248,
+     "ll_base": 0.6407,
+     "ll_new": 0.6374,
+     "diff": -0.00335,
+     "t": -3.96
+    }
+   },
+   "expected_vs_actual": {
+    "held": {
+     "n": 1645,
+     "days": 65,
+     "ll_base": 0.5911,
+     "ll_new": 0.6092,
+     "diff": 0.01808,
+     "t": 4.35
+    },
+    "tune": {
+     "n": 11356,
+     "days": 248,
+     "ll_base": 0.6232,
+     "ll_new": 0.6407,
+     "diff": 0.01754,
+     "t": 7.69
+    }
+   }
+  }
+ },
+ "E1": {
+  "held": {
+   "n": 2066,
+   "days": 68,
+   "ll_base": 0.6221,
+   "ll_new": 0.6192,
+   "diff": -0.00289,
+   "t": -2.69
+  },
+  "tune": {
+   "n": 11841,
+   "days": 250,
+   "ll_base": 0.6556,
+   "ll_new": 0.6538,
+   "diff": -0.00177,
+   "t": -3.23
+  },
+  "p": 0.00357
+ },
+ "E2": {
+  "held": {
+   "n": 2066,
+   "days": 68,
+   "ll_base": 0.6192,
+   "ll_new": 0.613,
+   "diff": -0.00622,
+   "t": -3.15
+  },
+  "tune": {
+   "n": 11841,
+   "days": 250,
+   "ll_base": 0.6538,
+   "ll_new": 0.6511,
+   "diff": -0.0027,
+   "t": -3.63
+  },
+  "p": 0.00082
+ },
+ "note": "Holm over the ESEA family (E1, E2, E3) is applied in scripts/esea_veto_research.py once E3 is scored"
+}
