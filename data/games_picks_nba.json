@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-14T20:47:14Z",
+ "asof": "2026-11-14T21:40:56Z",
  "recenter": {
   "2026-11-14": 1.7
  },
@@ -238,7 +238,7 @@
  },
  "model": {
   "asof": "2026-11-14T17:14:25Z",
-  "ageH": 3.5,
+  "ageH": 4.4,
   "stale": false
  },
  "picks": [
@@ -270,9 +270,9 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": -120.0,
-    "ev": 0.119,
-    "units": 1.0
+    "price": -122.0,
+    "ev": 0.111,
+    "units": 0.5
    }
   },
   {
@@ -325,15 +325,8 @@
    "tmRaw": 232.2,
    "lineL": 1.5,
    "flagged": "2026-11-14T09:15:15Z",
-   "close": -4.5,
-   "now": {
-    "mk": "ml",
-    "side": "home",
-    "line": null,
-    "price": 186.0,
-    "ev": 0.246,
-    "units": 1.25
-   }
+   "close": -5.5,
+   "now": null
   },
   {
    "id": "401909982",
@@ -391,9 +384,9 @@
     "mk": "spread",
     "side": "away",
     "line": 15.5,
-    "price": 104.0,
-    "ev": 0.118,
-    "units": 1.0
+    "price": 102.0,
+    "ev": 0.109,
+    "units": 0.75
    }
   },
   {
@@ -436,7 +429,7 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 1.8,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -474,13 +467,13 @@
    "state": "under"
   },
   "401909981": {
-   "mk": "ml",
+   "mk": "spread",
    "side": "home",
-   "line": null,
-   "price": 186.0,
-   "ev": 0.246,
-   "edge": 9.8,
-   "units": 1.25,
+   "line": -5.5,
+   "price": -108.0,
+   "ev": 0.161,
+   "edge": 10.8,
+   "units": 1.5,
    "home": "CLE",
    "away": "DAL",
    "state": "pick"
@@ -489,7 +482,7 @@
    "mk": "spread",
    "side": "home",
    "line": -4.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -513,10 +506,10 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": 104.0,
-   "ev": 0.118,
+   "price": 102.0,
+   "ev": 0.109,
    "edge": 3.7,
-   "units": 1.0,
+   "units": 0.75,
    "home": "MIN",
    "away": "CHI",
    "state": "pick"
@@ -574,7 +567,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4139,
+  "snapshots": 4144,
   "buckets": [
    {
     "when": "24h+",
@@ -588,20 +581,20 @@
    {
     "when": "6-24h",
     "clvN": 969,
-    "clvRet": -0.0183,
-    "clvT": -5.62,
-    "clv": 0.43,
+    "clvRet": -0.0198,
+    "clvT": -5.83,
+    "clv": 0.4,
     "beat": 0.432,
-    "still": 0.407
+    "still": 0.406
    },
    {
     "when": "1-6h",
-    "clvN": 351,
-    "clvRet": -0.0537,
-    "clvT": -14.99,
-    "clv": -0.12,
-    "beat": 0.165,
-    "still": 0.689
+    "clvN": 354,
+    "clvRet": -0.0546,
+    "clvT": -15.3,
+    "clv": -0.14,
+    "beat": 0.164,
+    "still": 0.675
    },
    {
     "when": "<1h",
@@ -6827,7 +6820,7 @@
    "tmRaw": 232.2,
    "lineL": 1.5,
    "flagged": "2026-11-14T09:15:15Z",
-   "close": -4.5
+   "close": -5.5
   },
   {
    "id": "401909984",
@@ -6934,12 +6927,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-14T20:47:14Z",
+ "checked": "2026-11-14T21:40:56Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-14": {
-    "raw": 4.25,
+    "raw": 2.75,
     "scale": 1.0
    }
   }
