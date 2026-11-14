@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-14T22:09:06Z",
+ "asof": "2026-11-14T22:29:58Z",
  "recenter": {
   "2026-11-14": 1.68
  },
@@ -203,7 +203,7 @@
  },
  "model": {
   "asof": "2026-11-14T21:48:34Z",
-  "ageH": 0.3,
+  "ageH": 0.7,
   "stale": false
  },
  "picks": [
@@ -293,7 +293,14 @@
    "flagged": "2026-11-14T09:15:15Z",
    "close": -5.5,
    "pass": true,
-   "now": null
+   "now": {
+    "mk": "ml",
+    "side": "home",
+    "line": null,
+    "price": 203.0,
+    "ev": 0.23,
+    "units": 0.5
+   }
   },
   {
    "id": "401909982",
@@ -352,9 +359,9 @@
     "mk": "spread",
     "side": "away",
     "line": 15.5,
-    "price": 102.0,
-    "ev": 0.093,
-    "units": 0.75
+    "price": 104.0,
+    "ev": 0.101,
+    "units": 1.0
    }
   },
   {
@@ -439,10 +446,10 @@
    "mk": "spread",
    "side": "home",
    "line": -5.5,
-   "price": -100.0,
-   "ev": 0.182,
+   "price": 104.0,
+   "ev": 0.185,
    "edge": 6.6,
-   "units": 1.75,
+   "units": 1.25,
    "home": "CLE",
    "away": "DAL",
    "state": "pick"
@@ -463,10 +470,10 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -106.0,
-   "ev": 0.103,
+   "price": -108.0,
+   "ev": 0.096,
    "edge": 3.5,
-   "units": 0.75,
+   "units": 0.5,
    "home": "MEM",
    "away": "BKN",
    "state": "pick"
@@ -475,10 +482,10 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": 102.0,
-   "ev": 0.093,
+   "price": 104.0,
+   "ev": 0.101,
    "edge": 3.3,
-   "units": 0.75,
+   "units": 1.0,
    "home": "MIN",
    "away": "CHI",
    "state": "pick"
@@ -536,7 +543,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4166,
+  "snapshots": 4169,
   "buckets": [
    {
     "when": "24h+",
@@ -558,12 +565,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 374,
-    "clvRet": -0.054,
-    "clvT": -15.95,
+    "clvN": 377,
+    "clvRet": -0.0538,
+    "clvT": -16.03,
     "clv": -0.13,
-    "beat": 0.155,
-    "still": 0.693
+    "beat": 0.154,
+    "still": 0.695
    },
    {
     "when": "<1h",
@@ -6900,7 +6907,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-14T22:09:06Z",
+ "checked": "2026-11-14T22:29:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
