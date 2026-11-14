@@ -4,6 +4,7 @@ takes the latest report out at least half an hour before its tip: 5 PM ET for ev
 2 PM) for matinees. Needs pdftotext (poppler-utils).
 
     python3 scripts/nba_inj_hist.py 2020 2026     # seasons from..to; writes scripts/data/nba_inj_hist.json.gz
+    python3 scripts/nba_inj_hist.py --prev 2020 2026     # each game's last report of the day before (nba_inj_prev.json.gz)
 
 The finished seasons are committed (scripts/data/nba_inj_hist.json.gz), so the fit (nba_games.py --fit, also the
 scheduled refit) and the daily build walk the same statuses; the daily build reads the season in progress with
@@ -19,6 +20,7 @@ import nba_espn as E
 
 CACHE = os.path.join(E.ROOT, 'scripts', '.cache', 'nba', 'injrep')
 OUT = os.path.join(E.ROOT, 'scripts', 'data', 'nba_inj_hist.json.gz')
+PREV = os.path.join(E.ROOT, 'scripts', 'data', 'nba_inj_prev.json.gz')
 ET = ZoneInfo('America/New_York')
 URL = 'https://ak-static.cms.nba.com/referee/injury/Injury-Report_{d}_{t}.pdf'
 STATUS = ('Out', 'Doubtful', 'Questionable', 'Probable', 'Available')
@@ -122,6 +124,60 @@ def reports(gs):
     return out
 
 
+PREV_HOURS = (23, 20, 17)     # the day before's last report: 11 PM since reports went hourly (2021-22), 8 PM before, else 5 PM
+
+
+def prev_reports(gs, now=None):
+    """{game id: {name: status}} from the last report of the day before each game's US date; {} when the report lists
+    the game with nobody on it, None when the day had no report. Hours not yet past (now, ET) are not asked for: a
+    missing file is remembered as empty"""
+    now = now or dt.datetime.now(ET)
+    byday = {}
+    for g in gs:
+        tip = dt.datetime.fromisoformat(g['tip'].replace('Z', '+00:00')).astimezone(ET)
+        byday.setdefault(tip.date(), []).append(g)
+    jobs = []
+    for d in byday:
+        p = d - dt.timedelta(days=1)
+        jobs += [(p.isoformat(), h) for h in PREV_HOURS if dt.datetime(p.year, p.month, p.day, h, 20, tzinfo=ET) <= now]
+    with ThreadPoolExecutor(8) as ex:
+        texts = dict(zip(jobs, ex.map(lambda j: fetch(*j), jobs)))
+    out = {}
+    for d, lst in byday.items():
+        p = (d - dt.timedelta(days=1)).isoformat()
+        rep = None
+        for h in PREV_HOURS:
+            if texts.get((p, h)):
+                rep = parse(texts[(p, h)], d)
+                break
+        for g in lst:
+            if rep is None:
+                if (p, PREV_HOURS[-1]) in texts:      # the day is over and had no report
+                    out[g['id']] = None
+                continue
+            found = {}
+            for (a, h), v in rep.items():
+                if (E.team(ABBR.get(a, a)), E.team(ABBR.get(h, h))) == (g['a'], g['h']):
+                    found = v
+            out[g['id']] = found
+    return out
+
+
+def build_prev(lo, hi):
+    """the day-before reports of finished seasons, committed like the history"""
+    try:
+        with gzip.open(PREV, 'rt') as f:
+            hist = json.load(f)
+    except (OSError, ValueError):
+        hist = {}
+    for S in range(lo, hi + 1):
+        gs = [g for g in E.games(S) if g['final']]
+        hist.update(prev_reports(gs))
+        print(S, len(gs), 'games', flush=True)
+    with gzip.open(PREV, 'wt') as f:
+        json.dump(dict(sorted(hist.items())), f, separators=(',', ':'))
+
+
 def load():
     """the committed history: {game id: {name: status}}"""
     try:
@@ -145,4 +201,8 @@ def build(lo, hi):
 
 
 if __name__ == '__main__':
-    build(int(sys.argv[1]), int(sys.argv[2]))
+    if '--prev' in sys.argv:
+        a = [x for x in sys.argv[1:] if x != '--prev']
+        build_prev(int(a[0]), int(a[1]))
+    else:
+        build(int(sys.argv[1]), int(sys.argv[2]))
