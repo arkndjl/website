@@ -1029,6 +1029,26 @@
       "CFB",
       "Hockey"
      ]
+    },
+    {
+     "term": "Award odds (P(win))",
+     "short": "P(player wins the award): a voter model fit on past voting, averaged over simulated rests of the season.",
+     "body": [
+      "Voter model: rank-ordered logit on each season's pool (P(1st) = softmax of features, then 2nd among the rest, 3 places deep where vote order is public; winner only for CBB and NFL). L2 1, features standardized.",
+      "Features: the board's value metric + box stats + team success + narrative (prior wins, games played, position). NBA MVP: VORX, XPM, PPG, W%, 1 seed, games, prior MVPs. NHL Hart: WAR, points, goals, team points %, games, goalie, prior Harts. Heisman: yards, TDs, INTs, W%, QB, defender, last year's top 5. Wooden: BPM, PPG, W%, barthag, minutes, power conference.",
+      "Test: leave one season out, log P(actual winner) vs the value metric alone (NBA VORX / D-XPM, NHL WAR / GSAx, CBB BPM; football yards + TDs). Ships when the paired t passes Holm at .05 across the sport's awards and the model wins most seasons.",
+      "Held out: NBA MVP 13/17 winners picked (VORX alone 9), DPOY 7/17, ROY 12/15; NHL Hart 8/17 (WAR 4), Norris 8/17, Vezina 10/17, Calder 7/15; Wooden 11/19 (BPM 2); Heisman 7/21 (box 5); NFL MVP 14/21, OPOY 11/21, OROY 10/21. NFL DPOY failed (t .8): not shown. DROY not modelled (pool too thin).",
+      "Simulation: 3,000 rests of the season. Team finish from the board's season odds; player rates toward last season (NBA shrunk XPM, NHL pWAR a minute, CBB BPM by 300 minutes), Poisson injuries with lognormal length; NBA 65-game rule for MVP and DPOY. In-season odds are not backtested (no free in-season history): only the end-of-season voter model is.",
+      "Mkt: Polymarket mid of a two-sided quote, no vig, display only. Failed: position-relative yards for the Heisman (no gain held out)."
+     ],
+     "where": "awards tab: NBA, NHL, NFL, CFB, CBB",
+     "sports": [
+      "NBA",
+      "NHL",
+      "NFL",
+      "CFB",
+      "CBB"
+     ]
     }
    ]
   },

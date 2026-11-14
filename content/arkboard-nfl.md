@@ -11,7 +11,7 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,projections,QB value,contract value,specialists,rookies,breakouts,ARKLIST|rosters:depth chart,personnel,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,team WAR,offense,defense,formations,special teams" side="true" label="NFL views" >}}
+{{< wintabs groups="players:WAR leaders,projections,QB value,contract value,specialists,rookies,breakouts,awards,ARKLIST|rosters:depth chart,personnel,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,team WAR,offense,defense,formations,special teams" side="true" label="NFL views" >}}
 {{< nflwar title="WAR leaders" tab="WAR leaders" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
 {{< xaav sport="nfl" title="contract value" tab="contract value" >}}
@@ -21,6 +21,7 @@ cover = "/og/nfl.png"
 {{< rookies sport="nfl" icon="football" title="rookies" tab="rookies" >}}
 {{< nflbreakouts title="breakouts" tab="breakouts" >}}
 {{< backupwatch sport="nfl" title="backup watch" tab="backup watch" >}}
+{{< awards sport="nfl" tab="awards" >}}
 {{< arklist sport="nfl" title="ARKLIST" tab="ARKLIST" >}}
 {{< nflgames title="games" tab="games" >}}
 {{< nflgametable title="game table" tab="game table" >}}
