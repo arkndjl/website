@@ -131,6 +131,8 @@ jobs:
       - name: Draft ledger and SIT refit
         run: |
           python3 scripts/draft_ledger.py snap cbb || echo "ledger not snapped"
+          # pre-registered transfer watch ledger (scripts/watch_ledger.py): frozen Dec 25 - Jan 1 and Mar 15 - Apr 5
+          python3 scripts/watch_ledger.py players cbb --due || echo "transfer watch not frozen"
           python3 scripts/cbb_sit_refit.py || echo "sit not refit"
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)

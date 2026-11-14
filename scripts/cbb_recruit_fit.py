@@ -5,6 +5,7 @@
     node scripts/cbb_on3.mjs 2027 2028 2029        # the live classes (and 2009-2026 once, for the history)
     python3 scripts/cbb_recruit_fit.py              # link, test, fit, write data/cbb_recruits.json
     python3 scripts/cbb_recruit_fit.py --offline    # refit from scripts/data/cbb_recruit_hist.json.gz (no kit, no pulls)
+    python3 scripts/cbb_recruit_fit.py --relink     # rerun the NBA link audit on the committed history (needs the kit)
 
 Outcome: the board's realized FV, the NBA role a career reached (scripts/cbb_link.py TIERS: 20 non-NBA, 30 reached
 the NBA ... 50 4+ seasons as a starter, 60 2+ All-Star, 65-80 All-NBA), so a recruit's FV reads like a freshman's on the
@@ -209,6 +210,8 @@ def build_history():
             row['col'] = {str(y): v for y, v in sorted(col.get((cls, row['rk']), {}).items())}
             out.append(row)
     print('linked to NBA careers:', dict(how), 'of', len(out), 'recruits')
+    log = relink(out, *kit_tables())
+    print('link audit: added', len(log['added']), 'dropped', len(log['dropped']))
     # program strength, z-scored within each season (the season before a recruit arrives is what he chose on)
     teams = {}
     for y in sorted({y for y, _ in net}):
@@ -226,6 +229,115 @@ def build_history():
     os.makedirs(os.path.dirname(HIST), exist_ok=True)
     with gzip.open(HIST, 'wt') as f: json.dump(H, f, separators=(',', ':'))
     return H
+
+
+# ---------------------------------------------------------------- NBA link audit
+# The first pass misses three kinds of NBA career: a recruit older than his class (a prep year or a reclass puts his
+# NBA age two or three classes early, outside the +-1 the name link allowed), a career under another name (Fab Melo
+# was listed as Fabricio de Melo; spellings in data/name_aliases.json, two common names pinned by id below), and a
+# college player the kit never ranked. It also let two recruits share one career through the college link.
+LINK_UP = 10                         # first NBA season within 10 seasons of the class
+LINK_OLD = 3                         # NBA age may imply a class up to 3 earlier than the recruit's (old for the class)
+LINK_PIN = {(2013, 'anthony barber'): 'barbeca01', (2020, 'david jones'): 'jonesda06'}
+
+
+def _tnorm(s):
+    return ''.join(ch for ch in (s or '').lower().replace('st.', 'state') if ch.isalpha())
+
+
+def _team_fits(slug, teams):
+    """the recruit's On3 team slug against the colleges an NBA player's Barttorvik seasons carry; None = can't tell"""
+    if not slug or not teams: return None
+    s = slug.replace('-', '')
+    return any(s.startswith(_tnorm(t)) for t in teams)
+
+
+def relink(recs, car, bbs, kitfv, bteams, bname, bpos=None):
+    """second pass of the NBA link, in place; returns {'added': [...], 'dropped': [...]}"""
+    bpos = bpos or {}
+    nba = {}
+    for b, ss in bbs.items():
+        s0 = min(ss, key=lambda x: x['year'])
+        nba[b] = {'id': b, 'name': s0['name'], 'y0': int(s0['year']), 'age0': s0.get('age')}
+    log = {'added': [], 'dropped': []}
+
+    def clear(r, why):
+        log['dropped'].append([r['cls'], r['rk'], r['name'], r['bref'], why])
+        r['bref'] = None; r['nba'] = []; r['rfv'] = 20
+
+    def fits(r, b):
+        p = nba.get(b)
+        if p:
+            d = p['y0'] - r['cls']
+            if not 1 <= d <= LINK_UP: return False
+            if p['age0'] is not None and not -LINK_OLD <= (p['y0'] - p['age0'] + 17) - r['cls'] <= 1: return False
+        tf = _team_fits(r.get('team'), bteams.get(b))
+        if tf is False: return False
+        if not p and not tf: return False              # never played in the NBA: the college has to agree
+        if r.get('pos') and bpos.get(b) and not N.pos_fits(r['pos'], bpos[b], 'basketball'): return False
+        return True
+    # one career, one recruit: the class his first NBA season fits best keeps it
+    by = defaultdict(list)
+    for r in recs:
+        if r.get('bref'): by[r['bref']].append(r)
+    for b, rs in by.items():
+        if len(rs) < 2: continue
+        y0 = nba[b]['y0'] if b in nba else None
+        gap = lambda r: (y0 - r['cls'] if y0 is not None and y0 - r['cls'] >= 1 else 99, -r['cls'])
+        keep = min(rs, key=gap)
+        for r in rs:
+            if r is not keep: clear(r, 'shared with %d %s' % (keep['cls'], keep['name']))
+    used = {r['bref'] for r in recs if r.get('bref')}
+    free = [{'id': b, 'name': p['name']} for b, p in nba.items() if b not in used]
+    kitn = {b: n for b, n in bname.items() if b in bteams}
+    free += [{'id': b, 'name': n} for b, n in kitn.items() if b not in used and b not in nba]
+    free += [{'id': b, 'name': n} for b, n in kitn.items() if b not in used and b in nba and N.key(n) != N.key(nba[b]['name'])]
+    M = N.Matcher(free, name='name', team=None, pos=None, sport='basketball')
+    for r in recs:
+        if r.get('bref') or r['cls'] > NBA_LAST - 1: continue
+        b = LINK_PIN.get((r['cls'], N.key(r['name'])))
+        if not b:
+            cand = [m for m in M.by_key.get(N.key(r['name']), []) + M.candidates(r['name'], least=2) if m['id'] not in used and fits(r, m['id'])]
+            ids = sorted({m['id'] for m in cand})
+            b = ids[0] if len(ids) == 1 else None
+        if not b or b in used or (b not in nba and b not in bteams): continue
+        used.add(b)
+        r['bref'] = b
+        r['nba'] = [s for s in car[b]['s']] if b in car else []
+        r['rfv'] = kitfv.get(b) or tier_of(b, bbs)
+        log['added'].append([r['cls'], r['rk'], r['name'], b, r['rfv']])
+    return log
+
+
+def kit_tables():
+    """the kit's NBA tables for relink(): careers, bbref seasons, realized FV, colleges and positions by bref id"""
+    car = nba_careers()
+    bbs = defaultdict(list)
+    for x in json.load(open(os.path.join(KIT, 'kit', 'bbref_nba_seasons.json'))): bbs[x['bref']].append(x)
+    kitfv, bteams, bname = {}, defaultdict(set), {}
+    for r in csv.DictReader(open(os.path.join(KIT, 'kit', 'college_seasons_nba.csv'))):
+        if not r['nba_bref']: continue
+        bteams[r['nba_bref']].add(r['team']); bname[r['nba_bref']] = r['name']
+        if r['realized_fv']: kitfv[r['nba_bref']] = int(float(r['realized_fv']))
+    bpos = {}
+    try:
+        for r in csv.DictReader(open(os.path.join(KIT, 'xpm', 'players.csv'))):
+            if r.get('pos'): bpos.setdefault(r['pid'], r['pos'])
+    except OSError:
+        pass
+    return car, bbs, kitfv, bteams, bname, bpos
+
+
+def relink_hist():
+    """apply the audit to the committed history (the On3 class cache is not needed)"""
+    H = json.load(gzip.open(HIST, 'rt'))
+    log = relink(H['recruits'], *kit_tables())
+    with gzip.GzipFile(HIST, 'wb', mtime=0) as g:
+        g.write(json.dumps(H, separators=(',', ':')).encode())
+    for k in ('added', 'dropped'):
+        print(k, len(log[k]))
+        for x in log[k]: print('  ', x)
+    return log
 
 
 def history():
@@ -1030,4 +1142,4 @@ def write():
 
 
 if __name__ == '__main__':
-    write()
+    relink_hist() if '--relink' in sys.argv else write()
