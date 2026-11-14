@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-14T06:00:07Z",
+ "asof": "2026-11-14T06:32:17Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -107,12 +107,12 @@
   "stopped": {},
   "checks": {
    "spread": {
-    "n": 4,
-    "window": 4,
-    "mean": 0.0347,
-    "t": 0.58,
+    "n": 5,
+    "window": 5,
+    "mean": 0.0309,
+    "t": 0.74,
     "p": null,
-    "days": 2,
+    "days": 3,
     "sd": 0.1301,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -142,37 +142,37 @@
     }
    },
    "total": {
-    "n": 3,
-    "window": 3,
-    "mean": -0.0025,
-    "t": null,
+    "n": 7,
+    "window": 7,
+    "mean": -0.0129,
+    "t": -0.52,
     "p": null,
-    "days": 1,
+    "days": 2,
     "sd": 0.1283,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "rho": 0.044,
     "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
+     "cusum": 0.07,
+     "cusumMax": 0.07,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0109,
-     "n": 3,
+     "n": 7,
      "sd": 0.1283,
      "rho": 0.044,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.017,
-     "info": 0.02,
-     "real": 1.343,
-     "realSe": 7.086,
+     "llr": -0.056,
+     "info": 0.05,
+     "real": -0.76,
+     "realSe": 4.685,
      "need": 815
     }
    },
@@ -219,24 +219,24 @@
   "since": null,
   "why": null,
   "pooled": {
-   "n": 77,
-   "days": 14,
-   "llr": 1.351,
+   "n": 81,
+   "days": 15,
+   "llr": 1.362,
    "lo": -2.944,
    "hi": 2.944,
    "state": "watching",
    "at": null,
    "sd": 0.12,
    "rho": 0.05,
-   "real": 1.175,
-   "realSe": 0.629,
-   "clvRet": 0.0309,
-   "evDU": 0.0162
+   "real": 1.174,
+   "realSe": 0.627,
+   "clvRet": 0.0284,
+   "evDU": 0.0157
   }
  },
  "model": {
   "asof": "2026-11-14T02:40:25Z",
-  "ageH": 3.3,
+  "ageH": 3.9,
   "stale": false
  },
  "picks": [],
@@ -6502,7 +6502,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-14T06:00:07Z",
+ "checked": "2026-11-14T06:32:17Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
