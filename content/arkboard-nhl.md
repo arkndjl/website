@@ -11,12 +11,32 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,goalies,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lines,backup watch,transactions|games:games,game table|teams:ARK Ranking,season odds,bracket,offense,defense,power play,penalty kill" side="true" label="NHL views" >}}
+{{< wintabs groups="players:leaders,projections,contract value,rookies,awards,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,season odds,units" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
+{{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
+{{< xaav sport="nhl" title="contract value" tab="contract value" >}}
+{{< rookies sport="nhl" icon="hockey" title="rookies" tab="rookies" >}}
+{{< awards sport="nhl" tab="awards" >}}
+{{< arklist sport="nhl" title="ARKLIST" tab="ARKLIST" >}}
+{{< nhllines title="lines" tab="lines" >}}
+{{< lazytab tab="transactions" >}}
+{{< transactions sport="nhl" title="transactions" tab="transactions" >}}
+{{< /lazytab >}}
+{{< wintabs tab="leaders" tabs="WAR leaders,goalies" sub="true" label="leaders views" >}}
+{{< nhlwar title="NHL WAR" tab="WAR leaders" >}}
+{{< nhlgoalies title="goalies" tab="goalies" >}}
+{{< /wintabs >}}
+{{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}
+{{< depthchart sport="nhl" title="depth chart" tab="depth chart" >}}
+{{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
+{{< /wintabs >}}
+{{< wintabs tab="season odds" tabs="season odds,bracket" sub="true" label="season odds views" >}}
 {{< nhlsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nhl" title="projected bracket" tab="bracket" icon="hockey" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="units" tabs="offense,defense,power play,penalty kill" sub="true" label="units views" >}}
 {{< lazytab tab="offense" >}}
 {{< teamunits sport="nhl" view="offense" title="offense" tab="offense" >}}
 {{< /lazytab >}}
@@ -29,17 +49,5 @@ cover = "/og/nhl.png"
 {{< lazytab tab="penalty kill" >}}
 {{< teamunits sport="nhl" view="penalty kill" title="penalty kill" tab="penalty kill" >}}
 {{< /lazytab >}}
-{{< nhlgoalies title="goalies" tab="goalies" >}}
-{{< nhlwar title="NHL WAR" tab="WAR leaders" >}}
-{{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
-{{< xaav sport="nhl" title="contract value" tab="contract value" >}}
-{{< rookies sport="nhl" icon="hockey" title="rookies" tab="rookies" >}}
-{{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
-{{< awards sport="nhl" tab="awards" >}}
-{{< arklist sport="nhl" title="ARKLIST" tab="ARKLIST" >}}
-{{< depthchart sport="nhl" title="depth chart" tab="depth chart" >}}
-{{< nhllines title="lines" tab="lines" >}}
-{{< lazytab tab="transactions" >}}
-{{< transactions sport="nhl" title="transactions" tab="transactions" >}}
-{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}

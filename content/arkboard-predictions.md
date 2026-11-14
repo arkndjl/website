@@ -12,7 +12,7 @@ cover = "/og/predictions.png"
 
 {{< winpane title="predictions.exe" icon="calendar" sprite="px/hero-predictions" status="" class="winpane--art" />}}
 
-{{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,game models,paper book" side="true" label="Predictions views" >}}
+{{< wintabs groups="games:games,game table,picks|projections:players,futures|record:paper book,picks backtest,player backtest,game models" side="true" label="Predictions views" >}}
 {{< gamesfilter tab="games" >}}
 {{< cfbgames title="college football" tab="games" sport="cfb" picks="true" >}}
 {{< nflgames title="NFL" tab="games" sport="nfl" >}}
@@ -29,20 +29,6 @@ cover = "/og/predictions.png"
 {{< gamespicks tab="picks" >}}
 {{< predtable tab="picks" >}}
 {{< mlboard tab="picks" >}}
-{{< /lazytab >}}
-{{< lazytab tab="NBA players" >}}
-{{< nbaplayers title="NBA players" tab="NBA players" >}}
-{{< propspaper title="NBA props :: paper book" tab="NBA players" >}}
-{{< /lazytab >}}
-{{< lazytab tab="CBB players" >}}
-{{< nbaplayers src="cbb_players" title="CBB players" tab="CBB players" >}}
-{{< /lazytab >}}
-{{< nflfantasy title="NFL fantasy" tab="NFL fantasy" >}}
-{{< nflprops title="NFL props :: paper book" tab="NFL fantasy" >}}
-{{< nflrank title="NFL rankings" tab="NFL rankings" >}}
-{{< nflbreakout title="NFL breakouts" tab="NFL breakouts" >}}
-{{< lazytab tab="CFB players" >}}
-{{< cfbproj title="CFB players" tab="CFB players" >}}
 {{< /lazytab >}}
 {{< lazytab tab="player backtest" >}}
 {{< nbaplayerstest title="NBA player projections" tab="player backtest" >}}
@@ -77,4 +63,20 @@ cover = "/og/predictions.png"
 {{< propspaper tab="paper book" >}}
 {{< nflprops tab="paper book" >}}
 {{< /lazytab >}}
+{{< wintabs tab="players" tabs="NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players" sub="true" label="players views" >}}
+{{< lazytab tab="NBA players" >}}
+{{< nbaplayers title="NBA players" tab="NBA players" >}}
+{{< propspaper title="NBA props :: paper book" tab="NBA players" >}}
+{{< /lazytab >}}
+{{< lazytab tab="CBB players" >}}
+{{< nbaplayers src="cbb_players" title="CBB players" tab="CBB players" >}}
+{{< /lazytab >}}
+{{< nflfantasy title="NFL fantasy" tab="NFL fantasy" >}}
+{{< nflprops title="NFL props :: paper book" tab="NFL fantasy" >}}
+{{< nflrank title="NFL rankings" tab="NFL rankings" >}}
+{{< nflbreakout title="NFL breakouts" tab="NFL breakouts" >}}
+{{< lazytab tab="CFB players" >}}
+{{< cfbproj title="CFB players" tab="CFB players" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}

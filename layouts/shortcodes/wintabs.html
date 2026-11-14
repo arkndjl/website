@@ -13,17 +13,22 @@
        tab name lowercased, spaces and symbols as "-"), along with the tabs that contain it; clicking a
        tab puts its name in the address bar. Short paths such as /1nt redirect here (static/_redirects).
        Grouped:  {{< wintabs groups="players:all FBS,draft board|games:games,game table" side="true" >}} labels each
-       group; side="true" puts the strip in a sticky left column on wide screens (labelled rows on phones). */ -}}
+       group; side="true" puts the strip in a sticky left column on wide screens (on phones: a row of groups, then the
+       open group's tabs).
+       Subtabs:  {{< wintabs tab="units" tabs="offense,defense" sub="true" >}}…{{< /wintabs >}} inside another group is
+       that group's "units" panel with its own chip row; "#defense" opens units, then defense. */ -}}
 {{- $groups := slice -}}
 {{- with .Get "groups" }}{{ range split . "|" }}{{ $kv := split . ":" }}{{ $groups = $groups | append (dict "label" (trim (index $kv 0) " ") "tabs" (split (index $kv 1) ",")) }}{{ end }}{{ end -}}
 {{- $tabs := split (.Get "tabs") "," -}}
 {{- if $groups }}{{ $tabs = slice }}{{ range $groups }}{{ range .tabs }}{{ $tabs = $tabs | append . }}{{ end }}{{ end }}{{ end -}}
 {{- $md := eq (.Get "markdown") "true" -}}
 {{- $first := trim (index $tabs 0) " " -}}
-<div class="wintabs{{ if eq (.Get "side") "true" }} wintabs--side{{ end }}{{ with .Get "class" }} {{ . }}{{ end }}" data-wintabs>
-  <div class="wintabs__strip{{ if $groups }} wintabs__strip--grouped{{ end }}" role="tablist"{{ with .Get "label" }} aria-label="{{ . }}"{{ end }}>
+{{- $side := eq (.Get "side") "true" -}}
+<div class="wintabs{{ if $side }} wintabs--side{{ end }}{{ if eq (.Get "sub") "true" }} wintabs--sub{{ end }}{{ with .Get "class" }} {{ . }}{{ end }}" data-wintabs{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="wintabs__strip{{ if $groups }} wintabs__strip--grouped{{ end }}{{ if and $side (gt (len $groups) 1) }} wintabs__strip--bar{{ end }}" role="tablist"{{ with .Get "label" }} aria-label="{{ . }}"{{ end }}>
+    {{- if and $side (gt (len $groups) 1) }}<div class="wintabs__gbar" role="presentation">{{ range $groups }}<button type="button" class="wintabs__gbtn" tabindex="-1" data-wingroup="{{ .label }}">{{ .label }}</button>{{ end }}</div>{{ end }}
     {{- range $g := (cond (gt (len $groups) 0) $groups (slice (dict "label" "" "tabs" $tabs))) }}
-    {{- if $g.label }}<div class="wintabs__group" role="presentation"><span class="wintabs__glabel">{{ $g.label }}</span>{{ end }}
+    {{- if $g.label }}<div class="wintabs__group" role="presentation" data-wingroup="{{ $g.label }}"><span class="wintabs__glabel">{{ $g.label }}</span>{{ end }}
     {{- range $g.tabs }}{{ $t := trim . " " }}
     <button type="button" class="wintabs__tab{{ if eq $t $first }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $t $first }}true{{ else }}false{{ end }}" data-wintab="{{ $t }}">{{ $t }}</button>
     {{- end }}
@@ -40,6 +45,7 @@
   // lazytab.html panels: fetch the windows the first time the tab is shown
   function build(p) {
     var src = p.getAttribute('data-lazy'); if (!src) return;
+    if (!p.offsetParent && p.closest('[data-tab]:not(.is-active)')) return;   // inside a closed tab: built when that tab opens
     p.removeAttribute('data-lazy');
     p.__built = fetch(src).then(function (r) { if (!r.ok) throw r.status; return r.text(); }).then(function (html) {
       p.innerHTML = html;
@@ -58,6 +64,7 @@
       var box = g.querySelector('.wintabs__panels');
       if (!strip || !box) return;
       var tabs = Array.prototype.slice.call(strip.querySelectorAll('[data-wintab]'));
+      var gbtns = Array.prototype.slice.call(strip.querySelectorAll('.wintabs__gbtn')), ggroups = Array.prototype.slice.call(strip.querySelectorAll('.wintabs__group')), last = {};
       var kids = Array.prototype.slice.call(box.children);
       var panels = kids.filter(function (el) { return el.hasAttribute('data-tab'); });
       if (!panels.length) {
@@ -79,15 +86,28 @@
       panels.forEach(function (p, i) { p.id = p.id || (gid + '-panel-' + i); p.setAttribute('role', 'tabpanel'); if (tabs[i]) p.setAttribute('aria-labelledby', tabs[i].id); });
       function show(name) {
         tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.setAttribute('tabindex', on ? '0' : '-1'); });
-        panels.forEach(function (p) { var on = p.getAttribute('data-tab') === name; p.classList.toggle('is-active', on); if (on) build(p); });
+        panels.forEach(function (p) { var on = p.getAttribute('data-tab') === name; p.classList.toggle('is-active', on); if (on) { build(p); [].forEach.call(p.querySelectorAll('.is-active[data-lazy]'), build); } });
         // a sideways-scrolling strip (phones): bring the active tab into view without moving the page
         var at = tabs.filter(function (t) { return t.getAttribute('data-wintab') === name; })[0];
-        if (at && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = at.offsetLeft - strip.offsetLeft - (strip.clientWidth - at.offsetWidth) / 2;
+        var grp = at && at.closest('.wintabs__group'), gname = grp && grp.getAttribute('data-wingroup');
+        if (grp) last[gname] = name;
+        ggroups.forEach(function (x) { x.classList.toggle('is-open', x === grp); });
+        gbtns.forEach(function (b) { var on = b.getAttribute('data-wingroup') === gname; b.classList.toggle('is-active', on); if (on && b.parentElement.scrollWidth > b.parentElement.clientWidth) b.parentElement.scrollLeft = b.offsetLeft - b.parentElement.offsetLeft - (b.parentElement.clientWidth - b.offsetWidth) / 2; });
+        var sc = grp && grp.scrollWidth > grp.clientWidth ? grp : strip;
+        if (at && sc.scrollWidth > sc.clientWidth) sc.scrollLeft = at.offsetLeft - sc.offsetLeft - (sc.clientWidth - at.offsetWidth) / 2;
       }
       g.__show = show;
+      gbtns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          var gn = b.getAttribute('data-wingroup'), grp = ggroups.filter(function (x) { return x.getAttribute('data-wingroup') === gn; })[0]; if (!grp) return;
+          var name = last[gn] || (grp.querySelector('[data-wintab]') || b).getAttribute('data-wintab'); if (!name) return;
+          show(name);
+          try { history.replaceState(null, '', '#' + slug(name)); } catch (e) {}
+        });
+      });
       tabs.forEach(function (t, i) {
         t.addEventListener('click', function () {
-          show(t.getAttribute('data-wintab'));
+          show(t.getAttribute('data-wintab')); openUp(g);
           // a side strip: bring the opened view's top into sight when the page was scrolled past it
           if (g.classList.contains('wintabs--side')) { var top = box.getBoundingClientRect().top; if (top < 0) box.scrollIntoView({ block: 'start' }); }
           try { history.replaceState(null, '', '#' + slug(t.getAttribute('data-wintab'))); } catch (e) {}
@@ -101,6 +121,17 @@
       if (tabs.length) show(tabs[0].getAttribute('data-wintab'));
     });
   }
+  // open every tab around a group (a subtab group is a panel of the group above it); true when there was one
+  function openUp(g) {
+    var nested = false;
+    for (var el = g; el; ) {
+      var panel = el.hasAttribute('data-tab') ? el : el.closest('[data-tab]'); if (!panel || !panel.parentElement) break;
+      var outer = panel.parentElement.closest('[data-wintabs]'); if (!outer) break;
+      if (outer.__show) { outer.__show(panel.getAttribute('data-tab')); nested = true; }
+      el = outer;
+    }
+    return nested;
+  }
   function init() {
     groups();
     fromHash(true);
@@ -110,7 +141,7 @@
   // baseball fv scale + reading became one fv model tab (Nov 2 2026)
   // ARKLIBRARY's per-list tabs became one tab per medium (Oct 26 2026)
   // Nov 5 2026 one name a tab across sports: '<metric> leaders', games / game table, draft / big / past boards, offense / defense
-  var ALIAS = { 'xpm-leaders': 'vorx-xpm-leaders', 'builder': 'team-builder', 'waa-war': 'war-leaders', 'player-value': 'gar-leaders', 'players': 'rwa-leaders', 'results': 'game-table', 'big-board': 'draft-board', 'past-classes': 'past-boards', 'past-prospects': 'past-boards', 'atp-board': 'atp-big-board', 'wta-board': 'wta-big-board', 'atp-past': 'atp-past-boards', 'wta-past': 'wta-past-boards', 'attack': 'offense', 'defence': 'defense', 'matches': 'games', 'match-table': 'game-table', 'rankings': 'ark-ranking', 'power-rankings': 'ark-ranking', 'model': 'fv-model', 'fv-scale': 'fv-model', 'reading': 'fv-model',
+  var ALIAS = { 'all': 'board', 'xpm-leaders': 'vorx-xpm-leaders', 'builder': 'team-builder', 'waa-war': 'war-leaders', 'player-value': 'gar-leaders', 'players': 'rwa-leaders', 'results': 'game-table', 'big-board': 'draft-board', 'past-classes': 'past-boards', 'past-prospects': 'past-boards', 'atp-board': 'atp-big-board', 'wta-board': 'wta-big-board', 'atp-past': 'atp-past-boards', 'wta-past': 'wta-past-boards', 'attack': 'offense', 'defence': 'defense', 'matches': 'games', 'match-table': 'game-table', 'rankings': 'ark-ranking', 'power-rankings': 'ark-ranking', 'model': 'fv-model', 'fv-scale': 'fv-model', 'reading': 'fv-model',
     'albums': 'music', 'profiles': 'music', 'media': 'screen', 'actors': 'screen', 'literature': 'books', 'authors': 'books', 'architects': 'architecture', 'teams': 'sports', 'athletes': 'sports' };
   function fromHash(first) {
     var h = slug(decodeURIComponent(location.hash.slice(1).split(':')[0])); if (!h) return;   // #<tab>:<board state> opens <tab>
@@ -118,14 +149,9 @@
     if (ALIAS[h] && ![].some.call(all, function (t) { return slug(t.getAttribute('data-wintab')) === h; })) h = ALIAS[h];
     all.forEach(function (t) {
       if (slug(t.getAttribute('data-wintab')) !== h) return;
-      var g = t.closest('[data-wintabs]'), nested = false;
+      var g = t.closest('[data-wintabs]');
       if (g && g.__show) g.__show(t.getAttribute('data-wintab'));
-      for (var el = g && g.parentElement; el; el = el.parentElement) {
-        var panel = el.closest('[data-tab]'); if (!panel) break;
-        var outer = panel.parentElement && panel.parentElement.closest('[data-wintabs]');
-        if (outer && outer.__show) { outer.__show(panel.getAttribute('data-tab')); nested = true; }
-        el = panel;
-      }
+      var nested = (g ? openUp(g) : false) && !g.classList.contains('wintabs--sub');   // a chip row sits at the top of its panel already
       if (nested && !first) t.scrollIntoView({ block: 'start' });
       else if (nested) setTimeout(function () { t.scrollIntoView({ block: 'start' }); }, 50);
     });

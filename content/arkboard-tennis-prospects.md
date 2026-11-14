@@ -10,11 +10,9 @@ draft = false
 
 {{< winpane title="tennis_prospects.exe" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · Tennis Abstract" class="winpane--art" />}}
 
-{{< wintabs groups="players:ATP big board,WTA big board|model:fv model,ATP past boards,WTA past boards,all-time FV" side="true" label="Tennis prospects views" >}}
+{{< wintabs groups="players:ATP big board,WTA big board|model:fv model,past boards,all-time FV" side="true" label="Tennis prospects views" >}}
 {{< tennisprospects view="board" tour="atp" tab="ATP big board" >}}
 {{< lazytab tab="WTA big board" >}}{{< tennisprospects view="board" tour="wta" tab="WTA big board" >}}{{< /lazytab >}}
-{{< lazytab tab="ATP past boards" >}}{{< tennisprospects view="past" tour="atp" tab="ATP past boards" >}}{{< /lazytab >}}
-{{< lazytab tab="WTA past boards" >}}{{< tennisprospects view="past" tour="wta" tab="WTA past boards" >}}{{< /lazytab >}}
 {{< lazytab tab="fv model" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
@@ -30,4 +28,8 @@ draft = false
 {{< lazytab tab="all-time FV" >}}
 {{< fvalltime sport="tennis" tab="all-time FV" >}}
 {{< /lazytab >}}
+{{< wintabs tab="past boards" tabs="ATP past boards,WTA past boards" sub="true" label="past boards views" >}}
+{{< lazytab tab="ATP past boards" >}}{{< tennisprospects view="past" tour="atp" tab="ATP past boards" >}}{{< /lazytab >}}
+{{< lazytab tab="WTA past boards" >}}{{< tennisprospects view="past" tour="wta" tab="WTA past boards" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}

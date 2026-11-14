@@ -11,16 +11,10 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,draft board,WAR leaders,stats,true freshmen,breakouts,awards,ARKLIST|rosters:depth chart,returning,lineups,on/off,lineup leaders,backup watch,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,tournament odds,bracket,team talent,development,offense,defense|market:portal,NIL,team NIL,team builder,staff,coaching jobs,coach pay,all-time coaches|recruits:2027 class,2028 class,2029 class,class rankings|mock draft:predictive mock,blended mock,conviction mock|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
-{{< cbbboard title="CBB 2026-27" tab="all" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,breakouts,awards,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings|draft:draft board,mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< cbbboard title="CBB 2026-27" tab="board" >}}
 {{< lazytab tab="draft board" >}}
 {{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board" tab="draft board" >}}
-{{< /lazytab >}}
-{{< lazytab tab="WAR leaders" >}}
-{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders" tab="WAR leaders" >}}
-{{< /lazytab >}}
-{{< lazytab tab="stats" >}}
-{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats" tab="stats" >}}
 {{< /lazytab >}}
 {{< rookies sport="cbb" icon="basketball" title="true freshmen" tab="true freshmen" >}}
 {{< lazytab tab="breakouts" >}}
@@ -28,25 +22,12 @@ cover = "/og/college-basketball.png"
 {{< /lazytab >}}
 {{< awards sport="cbb" tab="awards" >}}
 {{< arklist sport="college-basketball" title="ARKLIST" tab="ARKLIST" >}}
-{{< backupwatch sport="cbb" title="backup watch" tab="backup watch" >}}
-{{< cbbmock mode="pred" title="predictive mock" tab="predictive mock" >}}
-{{< cbbmock mode="blend" title="blended mock" tab="blended mock" >}}
-{{< cbbmock mode="conv" title="conviction mock" tab="conviction mock" >}}
 {{< cbbgames title="games" tab="games" >}}
 {{< cbbgametable title="game table" tab="game table" >}}
 {{< lazytab tab="top performers" >}}
 {{< rookies sport="cbb" src="data/cbb/top.json" icon="basketball" title="top performers" tab="top performers" >}}
 {{< /lazytab >}}
 {{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
-{{< cbbsim title="season odds" tab="season odds" >}}
-{{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
-{{< lazytab tab="bracket" >}}{{< bracket k="cbb" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}
-{{< lazytab tab="offense" >}}
-{{< teamunits sport="cbb" view="offense" title="offense" tab="offense" >}}
-{{< /lazytab >}}
-{{< lazytab tab="defense" >}}
-{{< teamunits sport="cbb" view="defense" title="defense" tab="defense" >}}
-{{< /lazytab >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
 {{< cbbfv title="fv conversions" >}}
@@ -59,9 +40,6 @@ cover = "/og/college-basketball.png"
 {{< cbblive title="in season" >}}
 {{< /deskcol >}}
 {{< /desk >}}
-{{< lazytab tab="team talent" >}}
-{{< teamunits sport="cbb" feed="cbb_teamtabs" view="talent" title="team talent" tab="team talent" >}}
-{{< /lazytab >}}
 {{< lazytab tab="returning" >}}
 {{< teamunits sport="cbb" feed="cbb_teamtabs" view="returning" title="returning" tab="returning" >}}
 {{< /lazytab >}}
@@ -69,42 +47,7 @@ cover = "/og/college-basketball.png"
 {{< xferwatch sport="cbb" view="players" tab="portal" >}}
 {{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" unless="cbb" >}}
 {{< /lazytab >}}
-{{< lazytab tab="development" >}}
-{{< schooldev sport="cbb" title="development" tab="development" >}}
-{{< /lazytab >}}
-{{< lazytab tab="NIL" >}}
-{{< cbbnil title="NIL" tab="NIL" >}}
-{{< /lazytab >}}
-{{< lazytab tab="team NIL" >}}
-{{< cbbnil view="teams" title="team NIL" tab="team NIL" >}}
-{{< /lazytab >}}
 {{< cbbbuilder title="team builder" tab="team builder" >}}
-{{< lazytab tab="staff" >}}
-{{< cbbstaff title="staff" tab="staff" >}}
-{{< /lazytab >}}
-{{< lazytab tab="coaching jobs" >}}
-{{< xferwatch sport="cbb" view="coaches" tab="coaching jobs" >}}
-{{< cbbjobs title="coaching jobs" tab="coaching jobs" >}}
-{{< /lazytab >}}
-{{< lazytab tab="coach pay" >}}
-{{< cbbcoachpay title="coach pay" tab="coach pay" >}}
-{{< /lazytab >}}
-{{< lazytab tab="all-time coaches" >}}
-{{< coachalltime sport="cbb" title="all-time coaches" tab="all-time coaches" >}}
-{{< /lazytab >}}
-{{< cbblineups view="units" title="lineups" tab="lineups" >}}
-{{< cbblineups view="onoff" title="on/off" tab="on/off" >}}
-{{< lineupleaders sport="cbb" title="lineup leaders" tab="lineup leaders" >}}
-{{< depthchart sport="cbb" title="depth chart" tab="depth chart" >}}
-{{< lazytab tab="2027 class" >}}
-{{< cbbrecruits view="class" year="2027" title="2027 class" tab="2027 class" >}}
-{{< /lazytab >}}
-{{< lazytab tab="2028 class" >}}
-{{< cbbrecruits view="class" year="2028" title="2028 class" tab="2028 class" >}}
-{{< /lazytab >}}
-{{< lazytab tab="2029 class" >}}
-{{< cbbrecruits view="class" year="2029" title="2029 class" tab="2029 class" >}}
-{{< /lazytab >}}
 {{< lazytab tab="class rankings" >}}
 {{< cbbrecruits view="teams" title="class rankings" tab="class rankings" >}}
 {{< /lazytab >}}
@@ -169,4 +112,81 @@ cover = "/og/college-basketball.png"
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="cbb" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
+{{< wintabs tab="leaders" tabs="WAR leaders,stats" sub="true" label="leaders views" >}}
+{{< lazytab tab="WAR leaders" >}}
+{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders" tab="WAR leaders" >}}
+{{< /lazytab >}}
+{{< lazytab tab="stats" >}}
+{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats" tab="stats" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}
+{{< depthchart sport="cbb" title="depth chart" tab="depth chart" >}}
+{{< backupwatch sport="cbb" title="backup watch" tab="backup watch" >}}
+{{< /wintabs >}}
+{{< wintabs tab="lineups" tabs="lineups,on/off,lineup leaders" sub="true" label="lineups views" >}}
+{{< cbblineups view="units" title="lineups" tab="lineups" >}}
+{{< cbblineups view="onoff" title="on/off" tab="on/off" >}}
+{{< lineupleaders sport="cbb" title="lineup leaders" tab="lineup leaders" >}}
+{{< /wintabs >}}
+{{< wintabs tab="season odds" tabs="season odds,tournament odds,bracket" sub="true" label="season odds views" >}}
+{{< cbbsim title="season odds" tab="season odds" >}}
+{{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
+{{< lazytab tab="bracket" >}}{{< bracket k="cbb" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="units" tabs="offense,defense" sub="true" label="units views" >}}
+{{< lazytab tab="offense" >}}
+{{< teamunits sport="cbb" view="offense" title="offense" tab="offense" >}}
+{{< /lazytab >}}
+{{< lazytab tab="defense" >}}
+{{< teamunits sport="cbb" view="defense" title="defense" tab="defense" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="talent" tabs="team talent,development" sub="true" label="talent views" >}}
+{{< lazytab tab="team talent" >}}
+{{< teamunits sport="cbb" feed="cbb_teamtabs" view="talent" title="team talent" tab="team talent" >}}
+{{< /lazytab >}}
+{{< lazytab tab="development" >}}
+{{< schooldev sport="cbb" title="development" tab="development" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="NIL" tabs="NIL,team NIL" sub="true" label="NIL views" >}}
+{{< lazytab tab="NIL" >}}
+{{< cbbnil title="NIL" tab="NIL" >}}
+{{< /lazytab >}}
+{{< lazytab tab="team NIL" >}}
+{{< cbbnil view="teams" title="team NIL" tab="team NIL" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="coaches" tabs="staff,coaching jobs,coach pay,all-time coaches" sub="true" label="coaches views" >}}
+{{< lazytab tab="staff" >}}
+{{< cbbstaff title="staff" tab="staff" >}}
+{{< /lazytab >}}
+{{< lazytab tab="coaching jobs" >}}
+{{< xferwatch sport="cbb" view="coaches" tab="coaching jobs" >}}
+{{< cbbjobs title="coaching jobs" tab="coaching jobs" >}}
+{{< /lazytab >}}
+{{< lazytab tab="coach pay" >}}
+{{< cbbcoachpay title="coach pay" tab="coach pay" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time coaches" >}}
+{{< coachalltime sport="cbb" title="all-time coaches" tab="all-time coaches" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="classes" tabs="2027 class,2028 class,2029 class" sub="true" label="classes views" >}}
+{{< lazytab tab="2027 class" >}}
+{{< cbbrecruits view="class" year="2027" title="2027 class" tab="2027 class" >}}
+{{< /lazytab >}}
+{{< lazytab tab="2028 class" >}}
+{{< cbbrecruits view="class" year="2028" title="2028 class" tab="2028 class" >}}
+{{< /lazytab >}}
+{{< lazytab tab="2029 class" >}}
+{{< cbbrecruits view="class" year="2029" title="2029 class" tab="2029 class" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="mock draft" tabs="predictive mock,blended mock,conviction mock" sub="true" label="mock draft views" >}}
+{{< cbbmock mode="pred" title="predictive mock" tab="predictive mock" >}}
+{{< cbbmock mode="blend" title="blended mock" tab="blended mock" >}}
+{{< cbbmock mode="conv" title="conviction mock" tab="conviction mock" >}}
+{{< /wintabs >}}
 {{< /wintabs >}}

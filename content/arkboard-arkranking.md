@@ -10,27 +10,46 @@ draft = false
 
 {{< winpane title="arkranking.exe" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
-{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,national teams,Nations League,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS|UEFA cups:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
+{{< wintabs groups="all sports:title odds|football:CFB,NFL|basketball:CBB,NBA|hockey:NHL|soccer:soccer ranking,national teams,big five,more leagues,MLS,UEFA cups|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
+{{< lazytab tab="soccer ranking" >}}{{< soccerpower title="soccer" tab="soccer ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS" >}}{{< soccermls tab="MLS" >}}{{< /lazytab >}}
+{{< lazytab tab="ATP ranking" >}}{{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="WTA ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="CS2 ranking" >}}{{< cs2rank title="Counter-Strike :: ARK Ranking" tab="CS2 ranking" >}}{{< /lazytab >}}
+{{< wintabs tab="CFB" tabs="CFB ranking,CFB odds" sub="true" label="CFB views" >}}
 {{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB" tab="CFB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CFB odds" >}}{{< cfbsim title="CFB season odds :: 10,000 simulated seasons" tab="CFB odds" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="NFL" tabs="NFL ranking,NFL odds" sub="true" label="NFL views" >}}
 {{< lazytab tab="NFL ranking" >}}{{< nflpower title="NFL :: ARK Ranking" tab="NFL ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="NFL odds" >}}{{< nflsim title="NFL season odds" tab="NFL odds" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="CBB" tabs="CBB ranking,CBB odds,NCAA tourney" sub="true" label="CBB views" >}}
 {{< lazytab tab="CBB ranking" >}}{{< cbbpower title="CBB :: ARK Ranking" tab="CBB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CBB odds" >}}{{< cbbsim title="CBB season odds" tab="CBB odds" >}}{{< /lazytab >}}
 {{< lazytab tab="NCAA tourney" >}}{{< cbbtourney title="NCAA tournament odds" tab="NCAA tourney" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="NBA" tabs="NBA ranking,NBA odds" sub="true" label="NBA views" >}}
 {{< lazytab tab="NBA ranking" >}}{{< nbapower title="NBA :: ARK Ranking" tab="NBA ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="NBA odds" >}}{{< nbasim title="NBA season odds" tab="NBA odds" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="NHL" tabs="NHL ranking,NHL odds" sub="true" label="NHL views" >}}
 {{< lazytab tab="NHL ranking" >}}{{< nhlpower title="NHL :: ARK Ranking" tab="NHL ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="NHL odds" >}}{{< nhlsim title="NHL season odds" tab="NHL odds" >}}{{< /lazytab >}}
-{{< lazytab tab="soccer ranking" >}}{{< soccerpower title="soccer" tab="soccer ranking" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="national teams" tabs="national teams,Nations League" sub="true" label="national teams views" >}}
 {{< lazytab tab="national teams" >}}{{< soccerintl view="ranking" title="national teams" tab="national teams" >}}{{< /lazytab >}}
 {{< lazytab tab="Nations League" >}}{{< soccerintl view="nl" title="Nations League" tab="Nations League" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="big five" tabs="Premier League,La Liga,Bundesliga,Serie A,Ligue 1" sub="true" label="big five views" >}}
 {{< lazytab tab="Premier League" >}}{{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}{{< /lazytab >}}
 {{< lazytab tab="La Liga" >}}{{< soccerleague lg="esp.1" title="La Liga" tab="La Liga" >}}{{< /lazytab >}}
 {{< lazytab tab="Bundesliga" >}}{{< soccerleague lg="ger.1" title="Bundesliga" tab="Bundesliga" >}}{{< /lazytab >}}
 {{< lazytab tab="Serie A" >}}{{< soccerleague lg="ita.1" title="Serie A" tab="Serie A" >}}{{< /lazytab >}}
 {{< lazytab tab="Ligue 1" >}}{{< soccerleague lg="fra.1" title="Ligue 1" tab="Ligue 1" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="more leagues" tabs="Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan" sub="true" label="more leagues views" >}}
 {{< lazytab tab="Eredivisie" >}}{{< soccerleague lg="ned.1" title="Eredivisie" tab="Eredivisie" >}}{{< /lazytab >}}
 {{< lazytab tab="Primeira Liga" >}}{{< soccerleague lg="por.1" title="Primeira Liga" tab="Primeira Liga" >}}{{< /lazytab >}}
 {{< lazytab tab="Pro League" >}}{{< soccerleague lg="bel.1" title="Belgian Pro League" tab="Pro League" >}}{{< /lazytab >}}
@@ -44,11 +63,10 @@ draft = false
 {{< lazytab tab="Austria" >}}{{< soccerleague lg="aut.1" title="Austrian Bundesliga" tab="Austria" >}}{{< /lazytab >}}
 {{< lazytab tab="Scottish Prem" >}}{{< soccerleague lg="sco.1" title="Scottish Premiership" tab="Scottish Prem" >}}{{< /lazytab >}}
 {{< lazytab tab="Allsvenskan" >}}{{< soccerleague lg="swe.1" title="Allsvenskan" tab="Allsvenskan" >}}{{< /lazytab >}}
-{{< lazytab tab="MLS" >}}{{< soccermls tab="MLS" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="UEFA cups" tabs="Champions League,Europa League,Conference League" sub="true" label="UEFA cups views" >}}
 {{< lazytab tab="Champions League" >}}{{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}{{< /lazytab >}}
 {{< lazytab tab="Europa League" >}}{{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}{{< /lazytab >}}
 {{< lazytab tab="Conference League" >}}{{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}{{< /lazytab >}}
-{{< lazytab tab="ATP ranking" >}}{{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ranking" >}}{{< /lazytab >}}
-{{< lazytab tab="WTA ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ranking" >}}{{< /lazytab >}}
-{{< lazytab tab="CS2 ranking" >}}{{< cs2rank title="Counter-Strike :: ARK Ranking" tab="CS2 ranking" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}
