@@ -81,6 +81,12 @@
         tabs = pairs.map(function (x) { return x.t; }).concat(tabs.filter(function (t) { return !pairs.some(function (x) { return x.t === t; }); }));
         panels = pairs.map(function (x) { return x.p; });
       }
+      // a tab whose panels all rendered nothing (lazytab data-empty: no data yet) is left out
+      tabs = tabs.filter(function (t) {
+        var ps = panels.filter(function (p) { return p.getAttribute('data-tab') === t.getAttribute('data-wintab'); });
+        if (ps.length && ps.every(function (p) { return p.hasAttribute('data-empty'); })) { t.hidden = true; return false; }
+        return true;
+      });
       var gid = 'wintabs-' + (window.__arkWintabsN = (window.__arkWintabsN || 0) + 1);
       tabs.forEach(function (t, i) { t.id = gid + '-tab-' + i; t.setAttribute('aria-controls', gid + '-panel-' + i); });
       panels.forEach(function (p, i) { p.id = p.id || (gid + '-panel-' + i); p.setAttribute('role', 'tabpanel'); if (tabs[i]) p.setAttribute('aria-labelledby', tabs[i].id); });

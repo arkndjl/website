@@ -40,3 +40,14 @@
 - Method prose lives only in Reference (Glossary/Methodology). Model and backtest tabs on sport pages show tables,
   formulas and numbers, no explanatory paragraphs or "how it works" windows (Noah, Nov 2). Kept: Reference text,
   article bodies, source attributions in status bars, résumé content on about/contact.
+
+## ARKBOARD tabs
+
+- Side strip = sections, kept short. Tabs that are views of one thing share a side tab and sit under it as subtabs:
+  `{{< wintabs tab="units" tabs="offense,defense" sub="true" >}}…{{< /wintabs >}}` inside the page's main `wintabs`
+  (board, leaders, depth chart + backup watch, lineups, season odds + bracket, units, talent, NIL, coaches, classes,
+  mock draft, leagues). A new view goes into the subtab group it belongs to before it gets a side tab of its own.
+- Group order: players | rosters | games | teams | market | recruits | draft | model (soccer: leagues after teams).
+- Tab names are the URL hash. A subtab's own name still opens it (`#defense`), so nest without renaming; a renamed
+  or removed name needs an ALIAS entry in `layouts/shortcodes/wintabs.html`.
+- Phones show the groups in one row and the open group's tabs in the next. A lazytab that renders nothing hides its tab.
