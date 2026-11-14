@@ -1,39 +1,39 @@
 {
- "asof": "2026-11-14T00:55:38Z",
+ "asof": "2026-11-14T12:31:00Z",
  "sport": "tennis",
  "season": 2026,
  "loss": "win log loss",
- "n": 109,
- "logged": 127,
+ "n": 110,
+ "logged": 128,
  "expectFrom": "the model's own chances",
- "model": 0.5632,
- "expected": 0.579,
- "z": 0.003,
- "line": 0.6019,
- "lineN": 62,
- "modelAtLine": 0.5894,
+ "model": 0.569,
+ "expected": 0.5793,
+ "z": -0.011,
+ "line": 0.6092,
+ "lineN": 63,
+ "modelAtLine": 0.5991,
  "byMonth": [
   {
    "month": "nov",
-   "n": 109,
-   "model": 0.5632,
-   "expected": 0.579
+   "n": 110,
+   "model": 0.569,
+   "expected": 0.5793
   }
  ],
  "test": {
-  "n": 109,
-  "window": 109,
-  "mean": 0.0027,
-  "t": 0.03,
-  "p": 0.5114,
+  "n": 110,
+  "window": 110,
+  "mean": -0.0111,
+  "t": -0.12,
+  "p": 0.4532,
   "days": 8,
   "sd": 1.0,
-  "cusum": 0.12,
+  "cusum": 1.39,
   "cusumMax": 5.16,
   "h": 10.0,
   "stop": false,
   "why": ""
  },
- "status": "ok",
+ "status": "watch",
  "why": ""
 }
