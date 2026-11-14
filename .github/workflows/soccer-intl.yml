@@ -3,7 +3,9 @@
 # ESPN's scores and fixtures and Novig's prices, and commits them; the push triggers the Cloudflare build. Twice a day,
 # by hand from the Actions tab, and after each esea season / cfb board run (those schedules do fire) whenever
 # data/soccer_intl.json is 6+ hours old. Also grows the book's open/close archive (--odds) and, once a month,
-# refreshes squad values from the Transfermarkt dump (--sq). The model: `python3 scripts/soccer_intl.py --fit`.
+# refreshes squad values from the Transfermarkt dump (--sq) and rereads every nation's matchday squads from
+# Transfermarkt's match pages (--squads; each build adds the squads of nations that have just played).
+# The model: `python3 scripts/soccer_intl.py --fit`.
 name: soccer intl
 
 on:
