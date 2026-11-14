@@ -58,7 +58,8 @@ def specs():
     try:
         import awards_football as FB
         if os.path.exists(FB.POOL % 'cfb'):
-            out['cfb'] = lambda: (lambda R: [('heisman', 'Heisman', R['heisman'], FB.HEIS_COLS, FB.NULL_COLS, 3)])(FB.cfb_races())
+            out['cfb'] = lambda: (lambda R, A: [('heisman', 'Heisman', R['heisman'], FB.HEIS_COLS, FB.NULL_COLS, 3)] +
+                                  [(a, v[1], A[a], v[3], v[4], 1) for a, v in FB.CFB_AWARDS.items()])(FB.cfb_races(), FB.cfb_award_races())
         if os.path.exists(FB.POOL % 'nfl'):
             out['nfl'] = lambda: (lambda R: [(a, FB.NFL_LABEL[a], R[a], FB.NFL_COLS[a], FB.NFL_NULL[a], 1) for a in FB.NFL_COLS])(FB.nfl_races())
     except (ImportError, AttributeError):
