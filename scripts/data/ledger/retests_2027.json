@@ -1,0 +1,35 @@
+{
+  "registered": "2026-11-14",
+  "prereg": "leads-nov14/prereg.md",
+  "prereg_sha256": "f1f209edf799ca40538f6039bdbc5722d87dd60be67ad483e9f7d07503caadb3",
+  "rule": "Each family is scored once, on the data named, with Holm at .05 inside the family. No look before the trigger.",
+  "families": [
+    {
+      "key": "tennis_year_end",
+      "trigger": "ATP and WTA year-end rankings final (births of 1998 complete their window)",
+      "harness": "scripts/tennis_prospects.py rows + /mnt/project-files/fv/sweep-nov07/scripts/recency.py",
+      "tests": [
+        {"key": "gluck", "form": "tiebreaks + deciding sets won above game-share chance, as defined Nov 1", "gate": "birth-year-out t >= 2, 12/19, forward top-50 not worse"},
+        {"key": "gapmx", "form": "longest layoff, as defined Nov 1", "gate": "same"},
+        {"key": "recency_h4", "form": "training weight .5^(cohort age / 4)", "gate": "walk-forward paired t >= 2, top-50 not worse"},
+        {"key": "wta_age_top_slope", "form": "age-dependent top slope T1, WTA", "gate": "t >= 2"},
+        {"key": "atp_tree_forward", "form": "ATP .5 linear + .5 tree blend, forward 2026 year-end", "gate": "forward MSE t >= 2"}
+      ]
+    },
+    {
+      "key": "tree_stacks",
+      "trigger": "next matured outcome data per board (hockey 2020 class after 2026-27; CS2 series after the lockbox season; ATP as above counts once in its own family)",
+      "tests": [
+        {"key": "hockey_draft_gbm", "form": "mean of live fit and HistGradientBoosting depth 3, lr .05, 300 iters, leaf 40", "gate": "class-out t >= 2, top-64 and forward better"},
+        {"key": "cs2_series_gbm", "form": "boosted-tree stack on series inputs as run Nov 13", "gate": "t by month <= -2 and top-50 gate"}
+      ]
+    },
+    {
+      "key": "cbb_next_prior",
+      "trigger": "Oct 2027 preseason prior build, or earlier only if Barttorvik and BPI caches for past seasons are on disk",
+      "tests": [
+        {"key": "next_as_team_prior", "form": "minutes-weighted cbb_next.py projection replacing the roster prior's player input", "gate": "lined-game margin MAE, tune t <= -1.5 and held one-sided p < .05"}
+      ]
+    }
+  ]
+}
