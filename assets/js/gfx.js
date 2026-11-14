@@ -933,6 +933,7 @@
     photoFrame(g, photo, x, y - 60, 370, 400);
     var all = window.__arkCfbRecs || [], peers = all.filter(function (o) { return o.pos === r.pos && o.div === r.div; });
     if (r.fv != null) fvPlaque(g, x + w - PW, y - 60, PW, PH, String(r.fv) + (r.plus ? '+' : ''), r.fv, ['#' + r.ovr + ' of ' + all.length, r.posRank ? r.pos + ' #' + r.posRank + ' of ' + peers.length : '']);
+    if (r.fv != null) movePill(g, x + w - PW / 2, y - 60 + PH + 14, typeof r.delta === 'number' ? r.delta : null, PW);
     var logo = await loadImg(r.logo);
     if (logo) drawLogo(g, logo, x + px, y - 48, 96, 96);
     var nx = x + px + (logo ? 120 : 0), ns = 96, nroom = x + px + tcol - nx;
@@ -1277,6 +1278,24 @@
     ls.slice(0, 2).forEach(function (l, i) { g.fillText(fit(g, l, PW - 30), qc, qy + (ls.length > 1 ? 226 + i * 36 : 240)); });
     g.textAlign = 'left';
   }
+  // the weekly move under a plaque: a raised tab with a pixel arrow, teal up, pink down; nothing without a prior snapshot or a change
+  function movePill(g, cx, y, d, pw) {
+    if (typeof d !== 'number' || !isFinite(d) || !d) return;
+    var up = d > 0, col = up ? C.teal : C.down, n = String(Math.abs(d)), u = 7, ph = 68, qx = Math.round(cx - pw / 2);
+    g.fillStyle = C.face; g.fillRect(qx, y, pw, ph); bevel(g, qx, y, pw, ph, true, 6);
+    g.font = '52px ' + FONT; var nw = g.measureText(n).width, cw = 7 * u + 16 + nw, ax = Math.round(cx - cw / 2), ay = y + Math.round((ph - 4 * u) / 2);
+    g.fillStyle = col;
+    for (var i = 0; i < 4; i++) { var k = up ? i : 3 - i; g.fillRect(ax + (3 - k) * u, ay + i * u, (2 * k + 1) * u, u); }
+    var ta = g.textAlign; g.textAlign = 'left'; g.fillText(n, ax + 7 * u + 16, y + ph / 2 + 3); g.textAlign = ta;
+  }
+  // a board row's weekly move (scripts/board_moves.py, partials/wkfv.html / wkrk.html: the ± or Δ cell's data-v); null when the
+  // column is hidden (past seasons), the player is new or the board has no week yet
+  function pcMove(row) {
+    var t = row && row.closest('table'); if (!t || !t.tHead) return null;
+    var hc = pcHeads(t), i = hc.findIndex(function (h) { return !h.hidden && /^(±|Δ)$/.test(txt(h)); }), c = i >= 0 && row.cells[i];
+    if (!c || c.hidden) return null;
+    var v = c.getAttribute('data-v'); return v != null && v !== '' && isFinite(+v) && +v ? +v : null;
+  }
   // a bare dash is an empty cell; a probability column ("NBA%": 99%) is its own bar
   var PC_ORD = /^(rd|round|blend|conv|pred|pick|str|role)$/i;   // picks, rounds and depth-chart strings: no percentile
   function pcDash(t) { return /^[—–−-]$/.test(String(t).trim()); }
@@ -1316,7 +1335,8 @@
   function pcNumsIn(s) { return (String(s).replace(/−/g, '-').match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function (n) { return String(parseFloat(n.replace(/,/g, ''))); }); }
   async function buildPCard(win, row) {
     var table = row.closest('table'); if (!table) return null;
-    var mainR = pcMain(row), subRow = mainR ? row : null;
+    var mainR = pcMain(row), subRow = mainR ? row : null, mv = pcMove(mainR || row);
+    if (mv == null && mainR) mv = pcMove(row);
     if (mainR) { row = mainR; table = row.closest('table'); }
     var hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
     var rows = pcAll(table), at = pcAt(table, rows, row), nameI = pcNameAt(heads);
@@ -1406,6 +1426,7 @@
         g.fillText(feat.t, qc, qy + 132);
         g.font = '32px ' + FONT; g.fillText(place, qc, qy + (posPlace ? 216 : 236)); if (posPlace) g.fillText(fit(g, posPlace, PW - 30), qc, qy + 256);
       }
+      movePill(g, qc, qy + PH + 14, mv, PW);
       g.textAlign = 'left';
     }
     if (logo) drawLogo(g, logo, x + px, y - 48, 96, 96);
@@ -1715,6 +1736,7 @@
     g.fillStyle = C.dark; g.font = '36px ' + FONT; g.textAlign = 'center'; g.fillText('ARK RANK', x + w - pw / 2, ly + 44);
     g.font = '124px ' + FONT; g.fillText('#' + d.rk, x + w - pw / 2, ly + 136);
     g.font = '32px ' + FONT; g.fillText('of ' + d.N, x + w - pw / 2, ly + 238); g.textAlign = 'left';
+    movePill(g, x + w - pw / 2, ly + ph + 12, d.prev ? d.prev - d.rk : null, pw);
     var ns = 96; g.font = ns + 'px ' + FONT; while (ns > 72 && g.measureText(d.name).width > tw) { ns -= 4; g.font = ns + 'px ' + FONT; }
     g.fillStyle = C.white;
     var nl = wrap(g, d.name, tw); if (nl.length > 2) nl = [nl[0], fit(g, nl.slice(1).join(' '), tw)];

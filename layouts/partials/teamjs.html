@@ -149,7 +149,7 @@
     var Sg = T.sch || [], gl = Sg.filter(function (g) { return g[3] == null; }), gp = Sg.filter(function (g) { return g[3] != null; });
     var gres = function (g) { return g[3] > g[4] ? 'W' : g[3] < g[4] ? 'L' : c.draws ? 'D' : 'T'; };
     window.__arkTeamGfx[gi] = { sport: kind, key: key, name: (FULL[kind] || {})[key] || c.name(r), short: c.name(r), logo: c.logo(key, r),
-      head: c.head(r).filter(Boolean).map(String), rec: r.rec || '', rk: r.rk, N: N, rkLo: r.rkLo, rkHi: r.rkHi, rating: sgn(rt, c.d), unit: c.unit, vs: c.vs,
+      head: c.head(r).filter(Boolean).map(String), rec: r.rec || '', rk: r.rk, prev: r.prev || null, N: N, rkLo: r.rkLo, rkHi: r.rkHi, rating: sgn(rt, c.d), unit: c.unit, vs: c.vs,
       parts: parts.map(function (p) { return [c.lab[p[0]] || p[0], p[1]]; }), scale: c.scale, d: c.d,
       plus: plain(plus), minus: plain(minus), last: gp.slice(-5).map(gres).join(' '),
       xw: gl.filter(function (g) { return g[5] != null; }).reduce(function (s_, g) { return s_ + (c.draws ? 3 * g[5] + (g[7] || 0) : g[5]); }, 0), left: gl.length, draws: !!c.draws,
