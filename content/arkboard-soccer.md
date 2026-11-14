@@ -11,7 +11,7 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:GAR leaders,player stats,rookies,ARKLIST|rosters:depth chart,lineups,backup watch,transactions|games:games,game table|teams:ARK Ranking,offense,defense,set pieces|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS,MLS bracket|UEFA cups:Champions League,Europa League,Conference League|national teams:world ranking,internationals,Nations League" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:GAR leaders,player stats,rookies,ARKLIST|rosters:depth chart,lineups,backup watch,transactions|games:games,game table|teams:ARK Ranking,offense,defense,set pieces|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|MLS:MLS,MLS bracket|UEFA cups:Champions League,Europa League,Conference League,UCL bracket,UEL bracket,UECL bracket|national teams:world ranking,internationals,Nations League" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}
@@ -37,6 +37,9 @@ cover = "/og/soccer.png"
 {{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
+{{< lazytab tab="UCL bracket" >}}{{< bracket k="ucl" title="Champions League projected bracket" tab="UCL bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="UEL bracket" >}}{{< bracket k="uel" title="Europa League projected bracket" tab="UEL bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="UECL bracket" >}}{{< bracket k="uecl" title="Conference League projected bracket" tab="UECL bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="world ranking" >}}{{< soccerintl view="ranking" title="world ranking" tab="world ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="internationals" >}}{{< soccerintl view="games" title="internationals" tab="internationals" >}}{{< /lazytab >}}
 {{< lazytab tab="Nations League" >}}{{< soccerintl view="nl" title="Nations League" tab="Nations League" >}}{{< /lazytab >}}
