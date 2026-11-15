@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-15T13:56:35Z",
+ "asof": "2026-11-15T14:43:49Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 84.62,
   "peak": 117.38,
   "drawdown": 0.2791,
-  "open": 1.25,
+  "open": 1.5,
   "path": [
    113.5,
    112.41,
@@ -412,10 +412,10 @@
   ]
  },
  "record": {
-  "n": 436,
-  "clvN": 431,
-  "clvRet": -0.0107,
-  "clvT": -2.2,
+  "n": 437,
+  "clvN": 432,
+  "clvRet": -0.0098,
+  "clvT": -1.99,
   "clv": 0.06,
   "beat": 0.328,
   "settled": 431,
@@ -428,23 +428,23 @@
   "risked": 406.25,
   "yield": -0.0336
  },
- "tEff": -1.74,
+ "tEff": -1.38,
  "corr": {
-  "rho": 0.024,
-  "n": 431,
-  "slates": 44,
-  "nEff": 270.0,
-  "avgSlate": 9.8
+  "rho": 0.055,
+  "n": 432,
+  "slates": 45,
+  "nEff": 210.4,
+  "avgSlate": 9.6
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 431,
+   "value": 432,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.1% t -1.74",
+   "value": "-1.0% t -1.38",
    "pass": false
   },
   {
@@ -454,7 +454,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-total: -1.7%",
+   "value": "without nba-total: -1.6%",
    "pass": false
   },
   {
@@ -701,10 +701,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 62,
-   "clvN": 62,
-   "clvRet": -0.0245,
-   "clvT": -2.15,
+   "n": 63,
+   "clvN": 63,
+   "clvRet": -0.0184,
+   "clvT": -1.43,
    "clv": null,
    "beat": null,
    "settled": 62,
@@ -719,6 +719,28 @@
   }
  ],
  "open": [
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873053-4431431-ry",
+   "k": "2026-11-15T14:30:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DET",
+   "a": "NE",
+   "mk": "prop",
+   "side": "under",
+   "line": 53.5,
+   "price": -122.0,
+   "bet": "Corey Kiner under 53.5 rush yds -122",
+   "placed": "2026-11-10T13:48:00Z",
+   "stake": 0.25,
+   "edge": 28.7,
+   "ev": 0.0181,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.3635,
+   "close": 29.5
+  },
   {
    "rule": "nba-ml",
    "sport": "nba",
@@ -17521,6 +17543,28 @@
    "res": "w",
    "ret": 0.9434,
    "profit": 0.2359
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873053-4431431-ry",
+   "k": "2026-11-15T14:30:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DET",
+   "a": "NE",
+   "mk": "prop",
+   "side": "under",
+   "line": 53.5,
+   "price": -122.0,
+   "bet": "Corey Kiner under 53.5 rush yds -122",
+   "placed": "2026-11-10T13:48:00Z",
+   "stake": 0.25,
+   "edge": 28.7,
+   "ev": 0.0181,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.3635,
+   "close": 29.5
   },
   {
    "rule": "nba-ml",
