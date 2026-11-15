@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-15T01:57:56Z",
+ "asof": "2026-11-15T02:11:22Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -122,8 +122,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-15T00:23:38Z",
-  "ageH": 1.6,
+  "asof": "2026-11-15T02:11:19Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -156,8 +156,8 @@
     "mk": "ml",
     "side": "home",
     "line": null,
-    "price": 203.0,
-    "ev": 0.281,
+    "price": 208.0,
+    "ev": 0.302,
     "units": 1.5
    }
   },
@@ -431,7 +431,7 @@
     "side": "over",
     "line": 38.5,
     "price": 1213.0,
-    "ev": 6.242,
+    "ev": 6.219,
     "units": 1.5
    }
   },
@@ -655,8 +655,8 @@
    "mk": "ml",
    "side": "home",
    "line": null,
-   "price": 203.0,
-   "ev": 0.281,
+   "price": 208.0,
+   "ev": 0.302,
    "edge": 6.3,
    "units": 1.5,
    "home": "CLE",
@@ -765,7 +765,7 @@
    "side": "over",
    "line": 38.5,
    "price": 1213.0,
-   "ev": 6.242,
+   "ev": 6.219,
    "edge": 2.8,
    "units": 1.5,
    "bk": "poly",
@@ -826,7 +826,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4044,
+  "snapshots": 4048,
   "buckets": [
    {
     "when": "24h+",
@@ -839,12 +839,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 243,
-    "clvRet": -0.0303,
-    "clvT": -6.37,
-    "clv": 0.32,
-    "beat": 0.305,
-    "still": 0.663
+    "clvN": 245,
+    "clvRet": -0.03,
+    "clvT": -6.34,
+    "clv": 0.31,
+    "beat": 0.302,
+    "still": 0.665
    },
    {
     "when": "1-6h",
@@ -3071,9 +3071,14 @@
    "withdrawn": "2026-11-13T06:13:22Z"
   }
  ],
- "checked": "2026-11-15T01:57:56Z",
+ "checked": "2026-11-15T02:11:22Z",
  "nightCap": {
   "cap": 40.0,
-  "nights": {}
+  "nights": {
+   "2026-11-15": {
+    "raw": 0.75,
+    "scale": 1.0
+   }
+  }
  }
 }
