@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T02:14:03Z",
+ "asof": "2026-11-15T02:15:49Z",
  "recenter": {
-  "week": 0.11
+  "week": 0.13
  },
  "monitor": {
   "clocks": {
@@ -421,7 +421,7 @@
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -21.8,
+  "ageH": -21.7,
   "stale": false
  },
  "picks": [],
@@ -680,9 +680,16 @@
    "tmRaw": 46,
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 42.5,
-   "close": 43.5,
+   "close": 42.5,
    "paper": true,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 42.5,
+    "price": -108.0,
+    "ev": 0.016,
+    "units": 0.5
+   }
   },
   {
    "id": "401856885",
@@ -833,7 +840,7 @@
     "side": "over",
     "line": 39.5,
     "price": 821.0,
-    "ev": 3.792,
+    "ev": 3.791,
     "units": 5.0
    }
   },
@@ -999,38 +1006,22 @@
    "away": "Utah",
    "mk": "total",
    "side": "under",
-   "line": 56.5,
-   "price": -106.0,
-   "edge": 2.6,
+   "line": 55.5,
+   "price": 102.0,
+   "edge": 1.6,
    "x": 3.0,
    "why": "edge under 3",
    "m": -1.9,
    "tm": 53.9
-  },
-  {
-   "id": "401860915",
-   "sport": "cfb",
-   "kick": "2026-11-15T02:30:00.000Z",
-   "home": "San Diego State",
-   "away": "Utah State",
-   "mk": "total",
-   "side": "over",
-   "line": 43.5,
-   "price": 104.0,
-   "edge": 2.4,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -1.5,
-   "tm": 45.9
   }
  ],
  "games": {
   "401856864": {
    "mk": "total",
    "side": "under",
-   "line": 56.5,
-   "price": -106.0,
-   "edge": 2.6,
+   "line": 55.5,
+   "price": 102.0,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "Arizona",
@@ -1064,21 +1055,21 @@
   "401860915": {
    "mk": "total",
    "side": "over",
-   "line": 43.5,
-   "price": 104.0,
-   "edge": 2.4,
-   "ev": null,
-   "units": 0.0,
+   "line": 42.5,
+   "price": -108.0,
+   "ev": 0.016,
+   "edge": 3.4,
+   "units": 0.5,
    "home": "San Diego State",
    "away": "Utah State",
-   "state": "under"
+   "state": "paper"
   },
   "401864537": {
    "mk": "total",
    "side": "over",
    "line": 39.5,
    "price": 821.0,
-   "ev": 3.792,
+   "ev": 3.791,
    "edge": 3.3,
    "units": 5.0,
    "bk": "poly",
@@ -1163,7 +1154,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19479,
+  "snapshots": 19488,
   "buckets": [
    {
     "when": "24h+",
@@ -4755,7 +4746,7 @@
    "tmRaw": 46,
    "flagged": "2026-11-09T02:02:31Z",
    "betTo": 42.5,
-   "close": 43.5,
+   "close": 42.5,
    "paper": true
   },
   {
@@ -5763,7 +5754,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T02:14:03Z",
+ "checked": "2026-11-15T02:15:49Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
