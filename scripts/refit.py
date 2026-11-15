@@ -58,8 +58,10 @@ JOBS = {
                           keep=['data/cbb_games_fit.json', 'scripts/data/games_wf/cbb.json.gz'], timeout=240, sport='cbb', local=BT_HIST),
     'soccer_games':  dict(cmd='python3 scripts/soccer_games.py --fit', months=[10, 11, 12, 1, 2, 3, 4, 5], every=28,
                           keep=['data/soccer_games_fit.json', 'scripts/data/games_wf/soccer.json.gz', 'scripts/data/soccer_team_ratings.json.gz'], timeout=150, sport='soccer'),
-    'tennis_model':  dict(cmd='python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit', cache=['tennis-'], months=[2, 4, 6, 8, 10], every=56,
-                          keep=['data/tennis_fit.json'], timeout=150, sport='tennis'),
+    # the projection coefficients are in the fit's Elo and ARK units: refit with it (a new Elo schedule moves the scale)
+    'tennis_model':  dict(cmd='python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit && '
+                              'python3 scripts/tennis_proj_research.py --refresh', cache=['tennis-'], months=[2, 4, 6, 8, 10], every=56,
+                          keep=['data/tennis_fit.json', 'data/tennis_proj_fit.json'], timeout=150, sport='tennis'),
     'cs2_model':     dict(cmd='python3 scripts/cs2_model.py --fit', months=ALL, every=42,
                           keep=['data/cs2_fit.json'], timeout=90, sport='cs2', cache=['cs2-vrs-v1']),
     # ---- player projections / props (game-level)
