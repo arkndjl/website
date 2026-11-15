@@ -156,6 +156,19 @@ jobs:
         run: node scripts/fetch_cfb.mjs
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+      # CFBD's copy of the 247 composite for the classes being recruited (the recruit tabs' composite index;
+      # 247Sports itself is never requested): a class is pulled again once its last pull is 6.5 days old, so 3 calls a
+      # week. After the board's own calls, and only while CFBD's count for the month, less the call, stays at or above
+      # MIN_LEFT (the board's reserve): the count is the one CFBD gave the board a moment ago
+      # (scripts/.cache/cfb/cfbd_left.json), so under the reserve this step spends nothing.
+      - name: CFBD 247 composite (weekly)
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        timeout-minutes: 3
+        run: node scripts/cfb_recruits_cfbd.mjs --live
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          MIN_LEFT: "500"
       # the refresh: the board from the last full run's cache, with fresh college news, ESPN's schedule and injuries
       # (the injury-aware player projections and game lines). No CFBD key, so it can't spend the quota.
       - name: Refresh college availability
@@ -229,4 +242,4 @@ jobs:
           python3 scripts/data_push.py -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))" \
             --rebuild data/games_picks_cfb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
-            -- 'data/cfb*.json' data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json 'scripts/data/odds/cfb-*.jsonl'
+            -- 'data/cfb*.json' data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json 'scripts/data/odds/cfb-*.jsonl'

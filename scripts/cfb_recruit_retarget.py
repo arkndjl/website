@@ -239,6 +239,37 @@ def index_fit(data, use, sz, rows=None):
             'fv': {'blocks': use['fv'], 'names': n_fv, 'b0': round(float(a1), 4), 'coef': [round(float(x), 4) for x in b1]}}
 
 
+# The 247 composite as CFBD holds it ('c247': the 'comp' block's form on that one source), tested on top of the kept
+# P(drafted) blocks (scripts/research/composite_nov15). It is not in BLOCKS: the live classes have it only where CFBD's
+# copy covers the class, so it is fit as a second index ('indexComp') beside the one every class can use.
+COMP = 'c247'
+
+
+def comp_gate(data, use, sz):
+    """P(drafted) out-of-fold log loss with and without the composite block: the gain a recruit, t over recruits and
+    clustered by school, classes won, and the two halves of the classes."""
+    for r in data: r.pop('_bc', None)
+    y = np.array([r['on'] for r in data], float); cls = np.array([r['year'] for r in data]); sch = np.array([r['tid'] for r in data])
+    fo = R.folds(data); ll = []
+    for u in (use['on'], use['on'] + [COMP]):
+        X, _ = R.design(data, u, sz); p = np.zeros(len(data))
+        for f in range(5):
+            a, b = R.logit(X[fo != f], y[fo != f], R.LAM); p[fo == f] = R.sig(a + X[fo == f] @ b)
+        ll.append(-(y * np.log(np.clip(p, 1e-6, 1)) + (1 - y) * np.log(np.clip(1 - p, 1e-6, 1))))
+    d = ll[0] - ll[1]
+
+    def t_school(d, g):
+        u = {}
+        for x, k in zip(d - d.mean(), g): u[k] = u.get(k, 0.0) + x
+        return float(d.mean() / (math.sqrt(sum(v * v for v in u.values())) / len(d) * math.sqrt(len(u) / (len(u) - 1))))
+    by = {int(c): float(d[cls == c].mean()) for c in sorted(set(cls))}
+    half = lambda i: {'n': int(i.sum()), 'gain': round(float(d[i].mean()), 6), 't': round(t_school(d[i], sch[i]), 2)}
+    return {'ll': [round(float(ll[0].mean()), 5), round(float(ll[1].mean()), 5)], 'gain': round(float(d.mean()), 6),
+            't': round(float(d.mean() / (d.std() / math.sqrt(len(d)))), 2), 'tSchool': round(t_school(d, sch), 2),
+            'won': f'{sum(v > 0 for v in by.values())}/{len(by)}', 'byClass': {c: round(v, 6) for c, v in by.items()},
+            'early': half(cls <= 2015), 'late': half(cls >= 2016), 'covered': round(float(np.mean([bool(r.get(COMP)) for r in data])), 4)}
+
+
 def stage_b(data, use, sz, live):
     """The shipped live model (board-calibrated on the index), year 3, with the index refit without each held-out
     fold's schools: what it would have said about recruits it never saw, on the NFL outcome."""
@@ -307,6 +338,9 @@ def main():
     if stars: print(json.dumps(stars, indent=1))
     out = {'classes': [CLASSES[0], CLASSES[-1]], 'n': len(data), 'drafted': int(sum(r['drafted'] for r in data)), 'link': dict(how), 'capital': capfit,
            'use': use, 'gains': gains, 'eval': ev, 'vsLive': vs, 'index': {**index_fit(data, use, SZ), 'tm': R.TM_MEAN}, 'sizeNorms': SZ, 'starsNFL': stars}
+    use_c = {'on': use['on'] + [COMP], 'fv': use['fv']}
+    out['compGate'] = comp_gate(data, use, SZ); print('composite', out['compGate'])
+    out['indexComp'] = {**index_fit(data, use_c, SZ), 'tm': R.TM_MEAN}
     json.dump(out, open(OUT, 'w'), indent=1)
     return data, use, SZ
 
