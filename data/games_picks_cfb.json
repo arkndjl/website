@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T17:13:48Z",
+ "asof": "2026-11-15T17:35:48Z",
  "recenter": {
   "week": 0.22
  },
@@ -87,12 +87,20 @@
     "k0": 0.114
    },
    "total | game: non-conference": {
-    "hash": "82ccca78c5",
-    "since": "2026-10-28"
+    "hash": "cfaee6707c",
+    "since": "2026-11-15T17:35:48Z",
+    "mk": "total",
+    "x": 8.0,
+    "seg": "game: non-conference",
+    "k0": 0.266
    },
    "total | side: over": {
-    "hash": "4c08cbdb3c",
-    "since": "2026-10-28"
+    "hash": "c490f818c5",
+    "since": "2026-11-15T17:35:48Z",
+    "mk": "total",
+    "x": 7.5,
+    "seg": "side: over",
+    "k0": 0.231
    },
    "total | total: low": {
     "hash": "c565c3820c",
@@ -180,214 +188,54 @@
   },
   "stopped": {},
   "checks": {
-   "spread": {
+   "total | game: non-conference": {
     "n": 0,
     "window": 0,
     "mean": null,
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1469,
+    "sd": 0.1175,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.072,
-    "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
-     "h": 4.595
-    },
+    "rho": 0.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0132,
+     "mu1": 0.0,
      "n": 0,
-     "sd": 0.1469,
-     "rho": 0.072,
+     "sd": 0.1175,
+     "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 733
+     "state": "no test",
+     "llr": null
     }
    },
-   "total": {
-    "n": 52,
-    "window": 52,
-    "mean": 0.0825,
-    "t": 0.89,
-    "p": null,
-    "days": 4,
-    "sd": 0.1178,
-    "cusum": 0.0,
-    "cusumMax": 2.54,
-    "h": 10.0,
-    "rho": 0.038,
-    "edge": {
-     "cusum": 0.67,
-     "cusumMax": 0.67,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0131,
-     "n": 52,
-     "sd": 0.1178,
-     "rho": 0.038,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": -0.668,
-     "info": 0.64,
-     "real": -1.104,
-     "realSe": 1.509,
-     "need": 479
-    }
-   },
-   "spread | conf: Big Ten": {
-    "n": 2,
-    "window": 2,
-    "mean": -0.0025,
-    "t": null,
-    "p": null,
-    "days": 1,
-    "sd": 0.116,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "rho": 0.044,
-    "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0022,
-     "n": 2,
-     "sd": 0.116,
-     "rho": 0.044,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.005,
-     "info": 0.0,
-     "real": 8.13,
-     "realSe": 37.78,
-     "need": 16103
-    }
-   },
-   "spread | conf: SEC": {
-    "n": 2,
-    "window": 2,
-    "mean": -0.0397,
-    "t": null,
-    "p": null,
-    "days": 1,
-    "sd": 0.1318,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "rho": 0.044,
-    "edge": {
-     "cusum": 0.07,
-     "cusumMax": 0.07,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0258,
-     "n": 2,
-     "sd": 0.1318,
-     "rho": 0.044,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": -0.073,
-     "info": 0.08,
-     "real": -0.495,
-     "realSe": 3.695,
-     "need": 154
-    }
-   },
-   "spread | season: late": {
-    "n": 1,
-    "window": 1,
-    "mean": -0.0041,
-    "t": null,
-    "p": null,
-    "days": 1,
-    "sd": 0.1453,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "rho": 0.061,
-    "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
-     "h": 4.595
-    },
-    "stop": false,
-    "why": "",
-    "drift": {
-     "mu1": 0.0087,
-     "n": 0,
-     "sd": 0.1453,
-     "rho": 0.061,
-     "lo": -2.944,
-     "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 1635
-    }
-   },
-   "spread | venue: neutral": {
+   "total | side: over": {
     "n": 0,
     "window": 0,
     "mean": null,
     "t": null,
     "p": null,
     "days": 0,
-    "sd": 0.1713,
+    "sd": 0.0953,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
-    "rho": 0.026,
-    "edge": {
-     "cusum": 0.0,
-     "cusumMax": 0.0,
-     "h": 4.595
-    },
+    "rho": 0.0,
     "stop": false,
     "why": "",
     "drift": {
-     "mu1": 0.0032,
+     "mu1": 0.0,
      "n": 0,
-     "sd": 0.1713,
-     "rho": 0.026,
+     "sd": 0.0953,
+     "rho": 0.0,
      "lo": -2.944,
      "hi": 2.944,
-     "state": "watching",
-     "at": null,
-     "llr": 0.0,
-     "info": 0.0,
-     "real": null,
-     "realSe": null,
-     "need": 17221
+     "state": "no test",
+     "llr": null
     }
    }
   }
@@ -421,14 +269,14 @@
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -6.8,
+  "ageH": -6.4,
   "stale": false
  },
  "picks": [],
- "paperPicks": [
+ "paperPicks": [],
+ "withdrawn": [
   {
    "id": "401856887",
-   "espn": "401856887",
    "sport": "cfb",
    "kick": "2026-11-15T18:00:00.000Z",
    "home": "Oklahoma",
@@ -437,45 +285,42 @@
    "side": "away",
    "line": null,
    "price": 130.0,
-   "p": 0.464,
-   "ev": 0.068,
    "units": 0.25,
    "edge": 3.3,
    "x": 3.0,
-   "pDU": 0.4642,
-   "evDU": 0.0676,
-   "seg": "conf: SEC",
-   "m": -0.8,
-   "tm": 50.0,
-   "tmRaw": 50.2,
-   "lineL": 2.5,
-   "flagged": "2026-11-14T21:52:13Z",
-   "paper": true,
-   "close": 2.5,
-   "now": {
-    "mk": "ml",
-    "side": "away",
-    "line": null,
-    "price": 120.0,
-    "ev": 0.039,
-    "units": 2.5
-   }
+   "withdrawn": "2026-11-15T17:35:48Z"
   }
  ],
- "withdrawn": [],
- "board": [],
+ "board": [
+  {
+   "id": "401856887",
+   "sport": "cfb",
+   "kick": "2026-11-15T18:00:00.000Z",
+   "home": "Oklahoma",
+   "away": "Ole Miss",
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": -112.0,
+   "edge": 4.3,
+   "x": null,
+   "why": "spread market off",
+   "m": -1.8,
+   "tm": 47.5
+  }
+ ],
  "games": {
   "401856887": {
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": 104.0,
-   "ev": 0.036,
+   "price": -112.0,
    "edge": 4.3,
-   "units": 3.25,
+   "ev": null,
+   "units": 0.0,
    "home": "Oklahoma",
    "away": "Ole Miss",
-   "state": "paper"
+   "state": "off"
   }
  },
  "record": {
@@ -530,7 +375,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19536,
+  "snapshots": 19537,
   "buckets": [
    {
     "when": "24h+",
@@ -561,12 +406,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 60,
-    "clvRet": -0.0719,
-    "clvT": -9.83,
+    "clvN": 61,
+    "clvRet": -0.072,
+    "clvT": -10.01,
     "clv": -0.07,
-    "beat": 0.017,
-    "still": 0.867
+    "beat": 0.016,
+    "still": 0.869
    }
   ]
  },
@@ -5118,33 +4963,6 @@
    "beat": 0
   },
   {
-   "id": "401856887",
-   "espn": "401856887",
-   "sport": "cfb",
-   "kick": "2026-11-15T18:00:00.000Z",
-   "home": "Oklahoma",
-   "away": "Ole Miss",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 130.0,
-   "p": 0.464,
-   "ev": 0.068,
-   "units": 0.25,
-   "edge": 3.3,
-   "x": 3.0,
-   "pDU": 0.4642,
-   "evDU": 0.0676,
-   "seg": "conf: SEC",
-   "m": -0.8,
-   "tm": 50.0,
-   "tmRaw": 50.2,
-   "lineL": 2.5,
-   "flagged": "2026-11-14T21:52:13Z",
-   "paper": true,
-   "close": 2.5
-  },
-  {
    "id": "401856863",
    "espn": "401856863",
    "sport": "cfb",
@@ -5297,16 +5115,39 @@
    "beat": 0
   }
  ],
- "withdrawnLog": [],
- "checked": "2026-11-15T17:13:48Z",
+ "withdrawnLog": [
+  {
+   "id": "401856887",
+   "espn": "401856887",
+   "sport": "cfb",
+   "kick": "2026-11-15T18:00:00.000Z",
+   "home": "Oklahoma",
+   "away": "Ole Miss",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 130.0,
+   "p": 0.464,
+   "ev": 0.068,
+   "units": 0.25,
+   "edge": 3.3,
+   "x": 3.0,
+   "pDU": 0.4642,
+   "evDU": 0.0676,
+   "seg": "conf: SEC",
+   "m": -0.8,
+   "tm": 50.0,
+   "tmRaw": 50.2,
+   "lineL": 2.5,
+   "flagged": "2026-11-14T21:52:13Z",
+   "paper": true,
+   "close": 2.5,
+   "withdrawn": "2026-11-15T17:35:48Z"
+  }
+ ],
+ "checked": "2026-11-15T17:35:48Z",
  "nightCap": {
   "cap": 40.0,
-  "nights": {
-   "2026-11-15": {
-    "raw": 2.0,
-    "scale": 1.0,
-    "down": 0.25
-   }
-  }
+  "nights": {}
  }
 }
