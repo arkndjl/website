@@ -157,7 +157,12 @@ export function transferOdds(rows, ctx) {
     // Draft% is the better read on leaving for the NFL: exit is at least it; stay and transfer share the rest
     const exit = Math.max(pE, r.draftP ?? 0), stay0 = Math.max(0.01, 1 - pT - pE), k = (1 - exit) / (stay0 + pT);
     r.transferP = r3(pT * k); r.exitP = r3(exit); r.stayP = r3(stay0 * k);
-    if (p.g === 'QB' && p.starter >= 0.5 && r.tid) qbOut[r.tid] = Math.max(qbOut[r.tid] || 0, pT * k);
+    // a reported return for next season (scripts/college_returns.py): Transfer% is last cycle's measured rate among
+    // reported returners; leaving for the draft keeps its odds (a re-signed player can still declare)
+    const lk = ctx.locks?.get(ctx.norm(r.name) + '|' + r.tid);
+    r.lock = lk ? [lk.state === 'pending' ? 'pending' : 'signed', lk.amt ?? null, lk.date] : null;
+    if (lk && ctx.lockP != null && r.transferP > ctx.lockP) { r.transferP = r3(ctx.lockP * (1 - exit)); r.stayP = r3(1 - exit - r.transferP); }
+    if (p.g === 'QB' && p.starter >= 0.5 && r.tid) qbOut[r.tid] = Math.max(qbOut[r.tid] || 0, r.transferP);
     r.homeMi = p.dist != null ? Math.round(p.dist) : null; r.inState = p.inState;
     r.hcP = r2(c);
     r.tWhy = why(p, fit, x0, c);
@@ -468,7 +473,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   const upOf = r => r.div === 'FCS' && r.up != null ? r.up : null, moveP = r => upOf(r) ?? r.transferP ?? 0;
   // the market: everyone likely to move, by position
   const pool = {};
-  for (const r of rows) if (r.fv != null && ST[gOf(r)] && r.xnil > 0 && moveP(r) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent) {
+  for (const r of rows) if (r.fv != null && ST[gOf(r)] && r.xnil > 0 && moveP(r) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent && !r.lock) {
     // at his FV next season, and in the room he's flagged to move to, at his first-year FV there
     (pool[gOf(r)] ||= []).push({ r, fv: projFv(r), as: null });
     for (const g of moveTo(r)) (pool[g] ||= []).push({ r, fv: projFv(r) - MOVE_COST, as: g });
@@ -491,11 +496,12 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       const list = ps.filter(r => gOf(r) === g).sort((a, b) => projFv(b) - projFv(a)), fvs = list.map(projFv), full = roomAv(fvs, g, repl[lvl][g]);
       list.forEach((r, i) => edge.set(r, Math.max(0, full - roomAv(fvs.filter((_, j) => j !== i), g, repl[lvl][g]))));
     }
-    const order = ps.filter(r => (r.stayP ?? 1) > 0.02).map(r => ({ r, cost: (r.stayP ?? 1) * (r.xnil || 0), v: edge.get(r) * R / Math.max(2e4, r.xnil || 0) }))
+    // a reported return (r.lock) is signed: kept, at the reported price when there is one
+    const order = ps.filter(r => (r.stayP ?? 1) > 0.02).map(r => ({ r, cost: (r.stayP ?? 1) * (r.lock?.[1] || r.xnil || 0), v: edge.get(r) * R / Math.max(2e4, r.xnil || 0) }))
       .sort((a, b) => b.v - a.v);
     // keep him while his worth per market dollar beats the cost of the money (dollarCost at the midpoint of his deal)
     let kept = 0; const unkept = [];
-    for (const o of order) { if (o.cost < 1e3 || o.v >= dollarCost(reserve + kept + o.cost / 2, budget)) kept += o.cost; else unkept.push(o); }
+    for (const o of order) { if (o.r.lock || o.cost < 1e3 || o.v >= dollarCost(reserve + kept + o.cost / 2, budget)) kept += o.cost; else unkept.push(o); }
     const keepCost = Math.round(kept), space = budget - reserve - kept;
     const stayOf = r => unkept.some(o => o.r === r) ? Math.min(r.stayP ?? 1, UNKEPT_STAY) : (r.stayP ?? 1);
     // position changes (MOVE_*): likely returners and the class at their expected FVs, room by room; a flagged

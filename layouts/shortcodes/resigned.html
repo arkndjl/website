@@ -1,0 +1,61 @@
+{{- /* Re-signed: players reported returning for next season (scripts/college_returns.py -> data/college_returns.json),
+       locked to their roster. {{< resigned sport="cfb|cbb" tab="..." >}}. Locks table, then every report it read. */ -}}
+{{- $sport := .Get "sport" | default "cfb" -}}
+{{- $d := site.Data.college_returns -}}
+{{- $s := cond (and $d $d.sports) (index $d.sports $sport) dict -}}
+{{- $icon := cond (eq $sport "cbb") "basketball" "football" -}}
+{{- $lp := cond (and $d $d.lockP) (index $d.lockP $sport) nil -}}
+{{- with $s.locks -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "re-signed :: %v" $s.target)) "icon" $icon "filter" "Pos,Team,Conf,Status" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,FV,Team,Status,Reported,xNIL" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table xw">
+  <thead><tr><th>RK</th><th>Player</th><th>Pos</th><th>Cls</th><th>Team</th><th title="conference">Conf</th>
+    <th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
+    <th title="signed = re-signed or announced; close = deal reported close">Status</th>
+    <th title="reported deal value (largest any report gives)">Reported</th>
+    <th title="xNIL = open-market NIL worth now">xNIL</th><th title="yNIL = estimated pay this season">yNIL</th>
+    <th title="Transfer% before the report{{ with $lp }}; locked: {{ partial "num.html" (slice "%.1f" (mul . 100)) }}% x P(no draft){{ end }}">Xfer% pre</th>
+    <th title="latest report">Date</th></tr></thead>
+  <tbody>
+  {{- range $i, $p := . }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name">{{ with .photo }}{{ partial "face.html" (dict "u" .) }}{{ end }}{{ .name }}{{ partial "arkstar.html" (dict "sport" (cond (eq $sport "cbb") "college-basketball" "college-football") "name" .name "team" .team) }}</td>
+    <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
+    <td>{{ .cls | default "—" }}</td>
+    <td class="xw__team" data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
+    <td>{{ .conf | default "—" }}</td>
+    <td class="fv" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td data-l="Status" data-v="{{ cond (eq .state "pending") "close" "signed" }}"><span class="cfb__lockchip{{ if eq .state "pending" }} is-pend{{ end }}">{{ cond (eq .state "pending") "CLOSE" "LOCK" }}</span></td>
+    <td class="cfb__num is-key" data-l="Reported" data-v="{{ .amt | default 0 }}">{{ with .amt }}<b>{{ partial "nil.html" . }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-l="xNIL" data-v="{{ .xnil | default 0 }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-l="yNIL" data-v="{{ .ynil | default 0 }}">{{ with .ynil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-l="Xfer% pre" data-v="{{ .tp0 | default 0 }}">{{ with .tp0 }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__dim">{{ lower ((time (substr .date 0 10)).Format "Jan 2") }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $t := "" -}}
+{{- with $d.test }}{{ if eq $sport "cfb" }}{{ $t = printf "Google News + RotoWire headlines. Test %s: %v of %v reported returners moved (%.1f%%) vs %.1f%% Transfer%%; log loss %.3f to %.3f, t %.2f" .cycle .moved .players (mul .rate 100) (mul .tp_mean 100) .logloss_model .logloss_lock_cv .gain_t }}{{ end }}{{ end -}}
+{{- partial "wintable-close.html" (dict "rows" (len .) "fresh" "college_returns" "about" (cond (eq $t "") "Google News + RotoWire headlines; tag only (no tested lock rate for this sport)" $t)) -}}
+{{- end -}}
+{{- with $s.feed -}}
+{{- partial "wintable-open.html" (dict "title" "return reports" "icon" $icon "filter" "Kind" "tab" ($.Get "tab")) -}}
+<table class="cfb__table xw">
+  <thead><tr><th>Date</th><th>Player</th><th>Team</th><th title="return = re-signed or announced; out = portal or draft">Kind</th><th>Reported</th><th>Headline</th><th>Source</th></tr></thead>
+  <tbody>
+  {{- range . }}
+  <tr>
+    <td class="cfb__dim">{{ lower ((time (substr .date 0 10)).Format "Jan 2") }}</td>
+    <td class="cfb__name">{{ .name }}</td>
+    <td>{{ .team }}</td>
+    <td data-l="Kind" data-v="{{ .kind }}">{{ .kind }}</td>
+    <td class="cfb__num">{{ with .amt }}{{ partial "nil.html" . }}{{ end }}</td>
+    <td data-l="Headline">{{ with .url }}<a href="{{ . }}" rel="noopener nofollow" target="_blank">{{ end }}{{ .title }}{{ with .url }}</a>{{ end }}</td>
+    <td class="cfb__dim">{{ .src | default "—" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "fresh" "college_returns") -}}
+{{- end -}}
