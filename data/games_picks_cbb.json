@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-15T23:29:14Z",
+ "asof": "2026-11-15T23:31:46Z",
  "recenter": {
   "2026-11-15": 2.12,
   "2026-11-16": 2.0
@@ -2038,21 +2038,6 @@
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
-   "id": "401909525",
-   "sport": "cbb",
-   "kick": "2026-11-15T19:30:00Z",
-   "home": "Marquette",
-   "away": "Missouri",
-   "mk": "total",
-   "side": "under",
-   "line": 153.5,
-   "price": -104.0,
-   "units": 0.25,
-   "edge": 2.1,
-   "x": 2.0,
-   "withdrawn": "2026-11-15T17:36:01Z"
-  },
-  {
    "id": "401909493",
    "sport": "cbb",
    "kick": "2026-11-15T20:00:00Z",
@@ -2411,21 +2396,6 @@
    "edge": 2.2,
    "x": 2.0,
    "withdrawn": "2026-11-15T17:36:01Z"
-  },
-  {
-   "id": "401909525",
-   "sport": "cbb",
-   "kick": "2026-11-15T19:30:00Z",
-   "home": "Marquette",
-   "away": "Missouri",
-   "mk": "spread",
-   "side": "home",
-   "line": 1.5,
-   "price": -108.0,
-   "units": 0.5,
-   "edge": 1.5,
-   "x": 1.5,
-   "withdrawn": "2026-11-15T17:36:01Z"
   }
  ],
  "board": [
@@ -2494,6 +2464,22 @@
    "tm": 162.2
   },
   {
+   "id": "401916307",
+   "sport": "cbb",
+   "kick": "2026-11-17T01:00:00Z",
+   "home": "Minnesota",
+   "away": "Western Illinois",
+   "mk": "spread",
+   "side": "away",
+   "line": 36.5,
+   "price": -110,
+   "edge": 4.5,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 32.0,
+   "tm": 135.0
+  },
+  {
    "id": "401909798",
    "sport": "cbb",
    "kick": "2026-11-17T01:00:00Z",
@@ -2524,22 +2510,6 @@
    "why": "edge under 5 (tier: power)",
    "m": 10.3,
    "tm": 152.1
-  },
-  {
-   "id": "401916307",
-   "sport": "cbb",
-   "kick": "2026-11-17T01:00:00Z",
-   "home": "Minnesota",
-   "away": "Western Illinois",
-   "mk": "total",
-   "side": "under",
-   "line": 139.5,
-   "price": -120.0,
-   "edge": 4.5,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 32.0,
-   "tm": 135.0
   },
   {
    "id": "401927364",
@@ -2846,10 +2816,10 @@
    "state": "under"
   },
   "401916307": {
-   "mk": "total",
-   "side": "under",
-   "line": 139.5,
-   "price": -120.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 36.5,
+   "price": -110,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -2958,16 +2928,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16228,
+  "snapshots": 16233,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 517,
-    "clvRet": -0.0285,
-    "clvT": -3.59,
-    "clv": 0.23,
-    "beat": 0.311,
-    "still": 0.302
+    "clvN": 520,
+    "clvRet": -0.0293,
+    "clvT": -3.71,
+    "clv": 0.22,
+    "beat": 0.302,
+    "still": 0.312
    },
    {
     "when": "6-24h",
@@ -19281,7 +19251,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-15T23:29:14Z",
+ "checked": "2026-11-15T23:31:46Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
