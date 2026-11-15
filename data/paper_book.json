@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-15T21:18:34Z",
+ "asof": "2026-11-15T22:00:49Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 85.17,
   "peak": 117.38,
   "drawdown": 0.2745,
-  "open": 0.5,
+  "open": 1.25,
   "path": [
    113.96,
    114.51,
@@ -412,10 +412,10 @@
   ]
  },
  "record": {
-  "n": 436,
-  "clvN": 436,
+  "n": 437,
+  "clvN": 437,
   "clvRet": -0.0096,
-  "clvT": -1.94,
+  "clvT": -1.96,
   "clv": 0.06,
   "beat": 0.328,
   "settled": 434,
@@ -428,23 +428,23 @@
   "risked": 407.0,
   "yield": -0.032
  },
- "tEff": -1.5,
+ "tEff": -1.53,
  "corr": {
-  "rho": 0.03,
-  "n": 436,
+  "rho": 0.027,
+  "n": 437,
   "slates": 45,
-  "nEff": 258.5,
-  "avgSlate": 9.69
+  "nEff": 266.0,
+  "avgSlate": 9.71
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 436,
+   "value": 437,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.0% t -1.5",
+   "value": "-1.0% t -1.53",
    "pass": false
   },
   {
@@ -701,10 +701,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 67,
-   "clvN": 67,
-   "clvRet": -0.0161,
-   "clvT": -1.29,
+   "n": 68,
+   "clvN": 68,
+   "clvRet": -0.0162,
+   "clvT": -1.32,
    "clv": null,
    "beat": null,
    "settled": 65,
@@ -762,6 +762,28 @@
    "pass": false,
    "clvRet": -0.1216,
    "close": 174.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873063-4361579-rc",
+   "k": "2026-11-15T21:25:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DAL",
+   "a": "SF",
+   "mk": "prop",
+   "side": "under",
+   "line": 2.5,
+   "price": 122.0,
+   "bet": "Javonte Williams under 2.5 rec +122",
+   "placed": "2026-11-10T18:21:00Z",
+   "stake": 0.75,
+   "edge": 10.6,
+   "ev": 0.1588,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0271,
+   "close": 2.5
   }
  ],
  "recent": [
@@ -17640,6 +17662,28 @@
    "pass": false,
    "clvRet": -0.1216,
    "close": 174.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873063-4361579-rc",
+   "k": "2026-11-15T21:25:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "DAL",
+   "a": "SF",
+   "mk": "prop",
+   "side": "under",
+   "line": 2.5,
+   "price": 122.0,
+   "bet": "Javonte Williams under 2.5 rec +122",
+   "placed": "2026-11-10T18:21:00Z",
+   "stake": 0.75,
+   "edge": 10.6,
+   "ev": 0.1588,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0271,
+   "close": 2.5
   }
  ]
 }
