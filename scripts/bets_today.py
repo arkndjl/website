@@ -4,7 +4,7 @@
 Predictions picks tab and the paper book read). Used by the place-your-picks reminders.
 
 Every open pick that hasn't started: not a pass, not withdrawn. Each line gives the game, start (ET), market, the
-side at the current line and price (Novig, else DraftKings; the flagged one when no current quote), the bet-to line
+side at the current line and price (Polymarket US after its fee, else Novig, else DraftKings; the flagged one when no current quote), the bet-to line
 and the stake: Kelly % and dollars on the paper book's bankroll (data/paper_book.json, or --bankroll). Picks flagged
 in the last --new hours are marked new.
 

@@ -290,12 +290,12 @@ def build():
         if g['fin'] and g['t'] == 2 and g['id'] != cupf:
             w = g['hs'] > g['as']
             rec[g['h']][0 if w else 1] += 1; rec[g['a']][1 if w else 0] += 1
-    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
+    # Polymarket US's main lines after its fee first (Novig only where Polymarket has no game); ESPN's DraftKings for the rest
     try:
-        import novig
-        NV = novig.prices('nba')
+        import polymarket
+        NV = polymarket.book('nba')
     except Exception as e:
-        print('novig:', e); NV = {}
+        print('polymarket:', e); NV = {}
     for g in show:
         if not g['fin'] and str(g['id']) in NV:
             g.update({k: v for k, v in NV[str(g['id'])].items() if k in ('L', 'T', 'mlH', 'mlA') and v is not None})

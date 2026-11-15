@@ -71,8 +71,8 @@ const espnJson = async u => {
   }
   return null;
 };
-// Novig's main lines at its asks, written by `python3 scripts/novig.py
-// --live cfb` before the board runs; a game Novig doesn't list keeps ESPN's DraftKings numbers
+// Polymarket US's main lines after its fee (Novig where Polymarket has no game), written by `python3 scripts/novig.py
+// --live cfb` before the board runs; a game neither lists keeps ESPN's DraftKings numbers
 let NOVIG = null;
 function novigLive() {
   if (NOVIG) return NOVIG;
@@ -86,7 +86,7 @@ function novigOver(r) {
   const px = !r.done && novigLive()[r.id];
   if (!px) return r;
   const L = px.L, fav = L > 0 ? r.homeAbbr : r.awayAbbr;
-  return { ...r, book: 'Novig',
+  return { ...r, book: px.src === 'poly' ? 'Polymarket' : 'Novig',
     line: L == null ? r.line : L === 0 ? 'EVEN' : `${fav} -${Math.abs(L)}`, spread: L == null ? r.spread : -L, total: px.T ?? r.total,
     ml: px.mlH != null ? { home: px.mlH > 0 ? `+${px.mlH}` : `${px.mlH}`, away: px.mlA > 0 ? `+${px.mlA}` : `${px.mlA}` } : r.ml,
     spreadOdds: px.oH != null ? { home: px.oH > 0 ? `+${px.oH}` : `${px.oH}`, away: px.oA > 0 ? `+${px.oA}` : `${px.oA}` } : r.spreadOdds };

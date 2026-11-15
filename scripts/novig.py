@@ -591,12 +591,12 @@ def h2h_price(games_, a, b, lg=None, team=False):
     return {'p': pa, 'h': g['h'], 'o': [oa, ob], 'vol': g['vol']}
 
 
-def h2h_snap(sport, now=None):
+def h2h_snap(sport, now=None, gs=None):
     """append a row per game when its no-vig chance moves a point (or it first appears) to
     scripts/data/odds_novig/<sport>-<yyyy-mm>.jsonl: the archive closing lines for tennis and CS2 picks must come from"""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     try:
-        gs = h2h(sport)
+        gs = h2h(sport) if gs is None else gs
     except Exception as ex:
         print(f'novig {sport}: catalog failed ({ex})')
         return 0
@@ -632,8 +632,10 @@ def h2h_snap(sport, now=None):
 
 
 def write_live(sport):
-    """scripts/data/novig_live/<sport>.json for builds that read it as a file (the CFB board, in Node)"""
-    px = prices(sport)
+    """scripts/data/novig_live/<sport>.json for builds that read it as a file (the CFB board, in Node): Polymarket US's
+    main lines after its fee first, Novig where Polymarket has no game (polymarket.book, Nov 15 2026); rows carry src"""
+    import polymarket
+    px = polymarket.book(sport)
     d = os.path.join(HERE, 'data', 'novig_live')
     os.makedirs(d, exist_ok=True)
     with open(os.path.join(d, f'{sport}.json'), 'w') as f:

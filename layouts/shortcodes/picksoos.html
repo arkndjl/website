@@ -56,5 +56,5 @@
   </tr>
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $d.books) "fresh" "picks_oos" "note" (printf "walk-forward close growth %+.1f%% posted, %+.1f%% at stake ×" $d.multTest.growthPosted $d.multTest.growthMult) "about" "Every pick flagged before its game, live and paper, judged at the closing price. Stake × is fit only on earlier game days when tested: each day's picks were scored at the close at the posted stake and at the multiplied one. Prices: Novig, or Polymarket US after its taker fee when it pays more at the same line.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len $d.books) "fresh" "picks_oos" "note" (printf "walk-forward close growth %+.1f%% posted, %+.1f%% at stake ×" $d.multTest.growthPosted $d.multTest.growthMult) "about" "Every pick flagged before its game, live and paper, judged at the closing price. Stake × is fit only on earlier game days when tested: each day's picks were scored at the close at the posted stake and at the multiplied one. Prices: Polymarket US after its taker fee from Nov 15 2026 (Novig before, and where Polymarket has no game), else DraftKings.") -}}
 {{- end -}}

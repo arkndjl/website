@@ -127,6 +127,54 @@ def novig_futures(sport, ids):
     return out
 
 
+# Polymarket US futures (Nov 15 2026: the primary venue): event slug prefix -> our sim's field and the event's size
+PM_FUT = {'nba': {'nba-champ-': ('title', 30), 'nba-eastconf-': ('conf', 15), 'nba-westconf-': ('conf', 15)},
+          'nfl': {'nfl-champ-': ('sb', 32), 'nfl-afcchamp-': ('conf', 16), 'nfl-nfcchamp-': ('conf', 16),
+                  **{f'nfl-{c}{d}-': ('div', 4) for c in ('afc', 'nfc') for d in ('east', 'north', 'south', 'west')}}}
+
+
+def pm_futures(sport):
+    """[(field, event, teams in the event, {team: no-vig chance})] from Polymarket US's Yes/No team markets, the mid where
+    both sides are quoted, else the one bound (scale_event); team names through the shared matcher"""
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    import names
+    import polymarket
+    full = {}
+    for t in get(TEAMS.format(*LG[sport]))['sports'][0]['leagues'][0]['teams']:
+        ab = t['team']['abbreviation']
+        full[names.team_key(t['team']['displayName'])] = NFL.get(ab, ab) if sport == 'nfl' else ab
+    slugs, off = [], 0
+    while off < 3000:
+        j = polymarket.get(f'/v1/events?limit=100&offset={off}&active=true&closed=false')
+        ev = (j or {}).get('events') or []
+        slugs += [e['slug'] for e in ev if e.get('slug')]
+        if len(ev) < 100:
+            break
+        off += 100
+    out = []
+    for pre, (f, n) in PM_FUT[sport].items():
+        hit = [x for x in slugs if x.startswith(pre) and x.endswith('-w')]
+        if len(hit) != 1:
+            continue
+        j = polymarket.get(f'/v1/events/slug/{hit[0]}')
+        e = (j or {}).get('event') or j or {}
+        tm = {t['id']: t.get('name') for t in e.get('teams') or []}
+        raw = {}
+        for m in e.get('markets') or []:
+            if m.get('closed'):
+                continue
+            yes = [x for x in m.get('marketSides') or [] if x.get('long')]
+            t = full.get(names.team_key(tm.get(yes[0].get('teamId')) or '')) if yes else None
+            b, a = polymarket._v(m.get('bestBidQuote')), polymarket._v(m.get('bestAskQuote'))
+            p = (b + a) / 2 if b is not None and a is not None else b if b is not None else a
+            if p is not None and t:
+                raw[t] = (max(p, 1e-4), b is not None and a is not None)
+        v = scale_event(raw)
+        if v:
+            out.append((f, e.get('title') or hit[0], n, v))
+    return out
+
+
 def main():
     sport = sys.argv[1]
     sp, lg = LG[sport]
@@ -152,8 +200,8 @@ def main():
                 continue
         mk.setdefault(f, {}).update(devig(raw))      # one winner a market (a division or conference)
         time.sleep(0.3)
-    # Novig's futures first; each event (a conference, a division, the
-    # title) stays on DraftKings unless Novig prices 80%+ of that event's own teams (its futures books are thin)
+    # Polymarket US's futures first, then Novig's; each event (a conference, a division, the title) stays on DraftKings
+    # unless the venue prices 80%+ of that event's own teams
     src = {f: {} for f in mk}                # field -> team -> book
     for f, v in mk.items():
         for t in v: src[f][t] = 'DraftKings'
@@ -164,6 +212,14 @@ def main():
     for f, desc, n, v in nv:
         if len(v) >= 0.8 * n:
             mk.setdefault(f, {}).update(v); src.setdefault(f, {}).update(dict.fromkeys(v, 'Novig'))
+    # Polymarket US over both (Nov 15 2026, Noah: Polymarket instead of Novig), same 80% coverage rule per event
+    try:
+        pv = pm_futures(sport)
+    except Exception as e:
+        print('polymarket futures failed:', e); pv = []
+    for f, desc, n, v in pv:
+        if len(v) >= 0.8 * n:
+            mk.setdefault(f, {}).update(v); src.setdefault(f, {}).update(dict.fromkeys(v, 'Polymarket'))
     book = {f: ' / '.join(sorted(set(v.values()))) for f, v in src.items() if v}
     rows = []
     for t in d['power']:

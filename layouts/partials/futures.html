@@ -54,7 +54,7 @@
   <thead><tr>
     <th>Lg</th><th>Team</th>
     <th title="our expected regular-season wins (wins so far + simulated rest of season)">xW</th>
-    <th title="our sim's chance / the market's price as a chance, vig removed (Novig where it quotes 80%+ of teams, else DraftKings; see the note)">Title ours / mkt</th>
+    <th title="our sim's chance / the market's price as a chance, vig removed (Polymarket US where it quotes 80%+ of teams, else Novig, else DraftKings; see the note)">Title ours / mkt</th>
     <th title="conference title: our sim / the market, vig removed">Conf ours / mkt</th>
     <th title="division title (NFL): our sim / the market, vig removed">Div ours / mkt</th>
   </tr></thead>
@@ -71,6 +71,6 @@
   {{- end }}
   </tbody>
 </table>
-{{- $about := "Display only: no bets, no positions. Our season sims next to the market's futures prices: Novig's where it quotes 80%+ of a market's teams (one-sided quotes count as the bound they give), else DraftKings' through ESPN; each market's vig removed. The backtest above found no proven edge against the line, so a gap here is a disagreement, not a pick." }}
+{{- $about := "Display only: no bets, no positions. Our season sims next to the market's futures prices: Polymarket US's (then Novig's) where it quotes 80%+ of a market's teams (one-sided quotes count as the bound they give), else DraftKings' through ESPN; each market's vig removed. The backtest above found no proven edge against the line, so a gap here is a disagreement, not a pick." }}
 {{- partial "wintable-close.html" (dict "fresh" (slice "futures_board_nba" "futures_board_nfl") "rows" (len $rows) "note" (printf "%s, %s" $book (substr $asof 0 10)) "about" $about) -}}
 {{- end -}}

@@ -26,8 +26,8 @@
     <th title="chance he plays: injury report status (official NBA report, then ESPN) and games missed in a row; rates measured 2020-26">Play</th>
     <th>Team</th><th title="opponent (@ = on the road)">Opp</th><th title="tip, ET">Tip</th>
     {{- if $nba }}
-    <th title="market PRA line (Novig, DraftKings where Novig has none) · our chance of the over">Mkt PRA</th><th title="market points line (Novig, else DraftKings) · our chance of the over">Mkt PTS</th>
-    <th title="market rebounds line (Novig, else DraftKings) · our chance of the over">Mkt REB</th><th title="market assists line (Novig, else DraftKings) · our chance of the over">Mkt AST</th>
+    <th title="market PRA line (Polymarket US, else Novig, else DraftKings) · our chance of the over">Mkt PRA</th><th title="market points line (Polymarket US, else Novig, else DraftKings) · our chance of the over">Mkt PTS</th>
+    <th title="market rebounds line (Polymarket US, else Novig, else DraftKings) · our chance of the over">Mkt REB</th><th title="market assists line (Polymarket US, else Novig, else DraftKings) · our chance of the over">Mkt AST</th>
     {{- end }}
     <th title="season average to date: points / rebounds / assists">Avg</th><th>Pos</th><th>Day</th><th class="nbapl__m">Line</th>
   </tr></thead>
@@ -72,7 +72,7 @@
   </tbody>
 </table>
 {{- $note := "if he plays · props void when he sits" -}}
-{{- $about := "Each line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and the market total. Play is his chance to play from the official injury report. Mkt: Novig's line where it lists the prop, else DraftKings' through ESPN (hover a cell for the book), then our chance of the over (negative binomial around our line; green = ours 8+ points above the no-vig market, red = 8+ below). The backtest is on the player backtest tab, and the props paper book is on the paper book tab." -}}
+{{- $about := "Each line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and the market total. Play is his chance to play from the official injury report. Mkt: Polymarket US's line where it lists the prop, else Novig's, else DraftKings' through ESPN (hover a cell for the book), then our chance of the over (negative binomial around our line; green = ours 8+ points above the no-vig market, red = 8+ below). The backtest is on the player backtest tab, and the props paper book is on the paper book tab." -}}
 {{- if not $nba }}{{ $about = "Each line is his minutes if he plays (recent role, plus the minutes teammates who sat their last games or are on Covers' injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and home court. Play: his chance to play from Covers' status, else from the games he has sat in a row. Barttorvik box scores; the backtest is on the player backtest tab." }}{{ $note = "if he plays" }}{{ end -}}
 {{- partial "wintable-close.html" (dict "fresh" $src "rows" $d.n "note" $note "about" $about) -}}
 {{- end }}

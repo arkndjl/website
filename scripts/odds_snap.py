@@ -136,13 +136,14 @@ def snap(sport, now):
             continue
         for ev in j.get('events', []):
             events[str(ev['id'])] = ev
-    # Novig's main lines and asks are the book since Oct 27 2026 (Noah: "Replace DK with Novig now"); DraftKings fills
-    # games Novig doesn't list. ESPN's (DraftKings') opening numbers stay in a game's first row as `open`.
+    # Polymarket US's main lines after its taker fee are the book since Nov 15 2026 (Noah: "use Polymarket instead of
+    # Novig"); Novig fills a game Polymarket doesn't list, DraftKings the rest. ESPN's (DraftKings') opening numbers stay
+    # in a game's first row as `open`.
     try:
-        import novig
-        nv = novig.prices(sport, now)
+        import polymarket
+        nv = polymarket.book(sport, now)
     except Exception as e:
-        print(f'{sport}: Novig prices failed ({e})')
+        print(f'{sport}: Polymarket prices failed ({e})')
         nv = {}
     new = []
     for ev in events.values():
@@ -167,7 +168,12 @@ def snap(sport, now):
         cur, op = o if o else ({}, None)
         src = 'dk'
         if gid in nv:
-            cur, src = {k: nv[gid].get(k) for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA')}, 'novig'
+            # market by market: the book's (Polymarket, Novig) where it has a two-sided price, DraftKings' otherwise
+            mg, ss = polymarket.merge(nv[gid], cur)
+            cur = {k: mg.get(k) for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA')}
+            src = ss.get('L') or ss.get('T') or ss.get('mlH') or 'dk'
+            if len(set(ss.values())) > 1:
+                cur['srcs'] = ss
         m = M.get(gid) or (None, None, None, None)
         row = {**cur, 'm': None if m[0] is None else round(float(m[0]), 2), 'tm': None if m[1] is None else round(float(m[1]), 2), 'src': src}
         prev = last.get(gid)
@@ -200,8 +206,10 @@ if __name__ == '__main__':
         for s in want:
             novig.snap(s, now)
         # tennis and Counter-Strike, year-round: Novig is their only free closing line, so the archive starts here
+        # (from Nov 15 2026 Polymarket US's match winners first, nid 'pm:<slug>', Novig's for the rest)
+        import polymarket
         for s in novig.H2H:
-            novig.h2h_snap(s, now)
+            novig.h2h_snap(s, now, polymarket.h2h_book(s, now))
     except Exception as e:
         print(f'novig: failed ({e})')
     # Counter-Strike: Thunderpick's prices as bo3.gg shows them (scripts/cs2_bo3.py, Oct 28 2026), pre-start only

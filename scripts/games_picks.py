@@ -573,9 +573,9 @@ def price_of(g, mk, side):
 
 
 def best_of(g, k, o):
-    """(price, venue) of a side: Polymarket's when dk_prices found it paying more at the same line, else the board's"""
-    v = (g.get('pm') or {}).get(k)
-    return (price(v), 'poly') if v is not None and o is not None and dec(price(v)) > dec(o) else (o, None)
+    """(price, venue) of a side: the board's price and the book its market came from (dk_prices: 'poly', 'novig', 'dk')"""
+    grp = {'oH': 'L', 'oA': 'L', 'oO': 'T', 'oU': 'T', 'mlH': 'mlH', 'mlA': 'mlH'}.get(k)
+    return o, (g.get('bks') or {}).get(grp) or g.get('book')
 
 
 def rule_stats(es):
@@ -1027,36 +1027,27 @@ def dk_prices(sport, games, now):
             o = OS.dk((ev.get('competitions') or [{}])[0])
             if o:
                 cur[str(ev['id'])] = o[0]
-    # Novig's main lines at its asks first; DraftKings where Novig has none
-    import novig
-    nv = novig.prices(sport, now)
-    n = m = 0
+    # Polymarket US's main lines after its taker fee first (Nov 15 2026, Noah: "use Polymarket instead of Novig across
+    # the site"); Novig where Polymarket has no game; DraftKings where neither has one
+    import polymarket
+    try:
+        nv = polymarket.book(sport, now)
+    except Exception as e:
+        print(f'{sport}: Polymarket failed ({e})')
+        nv = {}
+    n, by = 0, {}
     for g in games:
-        c = nv.get(str(g['espn'])) or cur.get(str(g['espn']))
+        c, src = polymarket.merge(nv.get(str(g['espn'])), cur.get(str(g['espn'])))
         if not c:
             continue
         n += 1
-        m += str(g['espn']) in nv
-        g['book'] = 'novig' if str(g['espn']) in nv else 'dk'
+        g['book'] = src.get('L') or src.get('T') or src.get('mlH')
+        g['bks'] = src                          # each market's venue: a spread on Polymarket, a total on DraftKings
+        by[g['book']] = by.get(g['book'], 0) + 1
         for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA'):
             if c.get(k) is not None:
                 g[k] = c[k]
-    print(f'{sport}: lines and prices on {n} games ({m} Novig, {n - m} DraftKings)')
-    # Polymarket US next to Novig (Nov 13 2026, Noah: "use Polymarket in addition to Novig"): a side Polymarket pays more
-    # on at the SAME line, after its taker fee, is priced there (g['pm']); the lean and fair line stay on the board's
-    # own two-sided quote
-    try:
-        import polymarket
-        pm = polymarket.prices(sport, now)
-    except Exception as e:
-        print(f'{sport}: Polymarket failed ({e})')
-        pm = {}
-    k = 0
-    for g in games:
-        b = polymarket.better(g, pm[str(g['espn'])]) if str(g['espn']) in pm else {}
-        g['pm'] = b
-        k += len(b)
-    print(f'{sport}: Polymarket on {len(pm)} games, pays more on {k} sides')
+    print(f'{sport}: lines and prices on {n} games {by}')
 
 
 VOID_STATUS = {'STATUS_POSTPONED', 'STATUS_CANCELED', 'STATUS_CANCELLED', 'STATUS_FORFEIT', 'STATUS_ABANDONED'}
@@ -1146,7 +1137,7 @@ def rule_options(sport, g, R, segs=()):
         pk = {('spread', 'home'): 'oH', ('spread', 'away'): 'oA', ('total', 'over'): 'oO', ('total', 'under'): 'oU'}[(mk, side)]
         po, pbk = best_of(g, pk, price_of(g, mk, side))
         base = {'mk': mk, 'side': side, 'line': line, 'edge': round(edge, 1), 'price': po,
-                **({'bk': pbk, 'nv': price_of(g, mk, side)} if pbk else {})}
+                **({'bk': pbk} if pbk else {})}
         if not rules:
             near.append({**base, 'x': None, 'why': f'{mk} market off'})
             continue
@@ -1166,7 +1157,6 @@ def rule_options(sport, g, R, segs=()):
             o, obk = best_of(g, 'mlH' if side == 'home' else 'mlA', price(g.get('mlH') if side == 'home' else g.get('mlA')))
             if o is not None and abs(o) <= ML_CAP:
                 inst.append(('ml', None, o, True, obk))
-                mlnv = price(g.get('mlH') if side == 'home' else g.get('mlA'))
         # the spread or total is priced off the market's fair line, not the rung (lean()): the chance and the stake
         # then follow the rung's own price lean. The cut X still reads the gap from the rung
         fair, mkt = lean(sport, g, mk, side, line)
@@ -1190,7 +1180,7 @@ def rule_options(sport, g, R, segs=()):
                     near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
             opts.append({**{k: v for k, v in base.items() if k not in ('bk', 'nv')},
-                         **({'bk': ibk, 'nv': base['nv'] if not ml else mlnv} if ibk else {}),
+                         **({'bk': ibk} if ibk else {}),
                          'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
                          'units': u, '_c': c, '_cal': cal, '_gap': gap, '_mkt': mk_,
                          **({'fair': round(fair, 2)} if fair is not None and not ml else {}),

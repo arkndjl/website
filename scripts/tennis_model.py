@@ -1147,7 +1147,8 @@ def build(rows, players, tn):
     # where tennis closing lines, and so any tennis pick rule, must come from)
     try:
         import novig
-        nvg = novig.h2h('tennis')
+        import polymarket
+        nvg = polymarket.h2h_book('tennis')     # Polymarket US after its fee, Novig where it has no match
     except Exception as ex:  # noqa: BLE001
         print('novig tennis skipped:', ex)
         nvg = []

@@ -175,21 +175,29 @@ def nba(now):
         sys.path.insert(0, HERE)
         import names
         import novig
+        import polymarket
         nv = novig.nba_props()
     except Exception as ex:
         print('novig props failed:', ex)
         nv = {}
-    for gid, lines in nv.items():
-        if gid not in got:
-            continue
-        roster = {a: p.get('n') for (g, a), p in P.items() if g == gid and p.get('n')}
-        for (name, s), v in lines.items():
-            hit = [a for a, n in roster.items() if names.same(name, n)]
-            if len(hit) != 1:
+    try:
+        pm = polymarket.props('nba')
+    except Exception as ex:
+        print('polymarket props failed:', ex)
+        pm = {}
+    # Polymarket US after its fee first (Nov 15 2026, applied last so it wins), Novig where Polymarket has no rung
+    for book, vs in (('novig', nv), ('poly', pm)):
+        for gid, lines in vs.items():
+            if gid not in got:
                 continue
-            old = got[gid].get((hit[0], s))
-            got[gid][(hit[0], s)] = v + (old[3:] if old else v)
-            src[(gid, hit[0], s)] = 'novig'
+            roster = {a: p.get('n') for (g, a), p in P.items() if g == gid and p.get('n')}
+            for (name, s), v in lines.items():
+                hit = [a for a, n in roster.items() if names.same(name, n)]
+                if len(hit) != 1:
+                    continue
+                old = got[gid].get((hit[0], s))
+                got[gid][(hit[0], s)] = v + (old[3:] if old else v)
+                src[(gid, hit[0], s)] = book
     t = now.strftime('%Y-%m-%dT%H:%MZ')
     rows = []
     for gid, pr in got.items():
@@ -323,22 +331,30 @@ def nfl(now):
         sys.path.insert(0, HERE)
         import names
         import novig
+        import polymarket
         nvp, nvg = novig.props('nfl', novig.NFL_PROPS), novig.derivs('nfl')
     except Exception as ex:
         print('novig nfl failed:', ex)
         nvp, nvg = {}, {}
-    for gid, lines in nvp.items():
-        if gid not in got or gid not in GM:
-            continue
-        teams = (GM[gid].get('home'), GM[gid].get('away'))
-        roster = [p for p in P if p.get('t') in teams and p.get('espn')]
-        for (name, s), v in lines.items():
-            hit = [p['espn'] for p in roster if names.same(name, p.get('n'))]
-            if len(hit) != 1:
+    try:
+        pmp = polymarket.props('nfl')
+    except Exception as ex:
+        print('polymarket nfl props failed:', ex)
+        pmp = {}
+    # Polymarket US after its fee first (Nov 15 2026, applied last so it wins), Novig where Polymarket has no rung
+    for book, vs in (('novig', nvp), ('poly', pmp)):
+        for gid, lines in vs.items():
+            if gid not in got or gid not in GM:
                 continue
-            old = got[gid][0].get((hit[0], s))
-            got[gid][0][(hit[0], s)] = v + (old[3:] if old else [None] * 3)
-            src[(gid, hit[0], s)] = 'novig'
+            teams = (GM[gid].get('home'), GM[gid].get('away'))
+            roster = [p for p in P if p.get('t') in teams and p.get('espn')]
+            for (name, s), v in lines.items():
+                hit = [p['espn'] for p in roster if names.same(name, p.get('n'))]
+                if len(hit) != 1:
+                    continue
+                old = got[gid][0].get((hit[0], s))
+                got[gid][0][(hit[0], s)] = v + (old[3:] if old else [None] * 3)
+                src[(gid, hit[0], s)] = book
     for gid, lines in nvg.items():
         if gid not in got:
             continue
