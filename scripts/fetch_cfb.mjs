@@ -2570,7 +2570,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk', 'fvs', 'mz'];
+              'transferP', 'stayP', 'lock', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk', 'fvs', 'mz'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
@@ -2955,7 +2955,15 @@ if (fs.existsSync(TFIT)) {
   // of opening, and coaches' moves for the team builder
   let coachMkt = null; try { coachMkt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_coach_market.json'), 'utf8')); } catch {}
   const coachOpen = coachMkt ? Object.fromEntries(coachMkt.teams.filter(t => t.open != null).map(t => [t.tid, t.open])) : null;
-  tctx = { coachOpen, fit: JSON.parse(fs.readFileSync(TFIT, 'utf8')), season: SEASON, geo, norm, roster, recruits: espnRec, winp, newcomers,
+  // reported returns for next season (scripts/college_returns.py, data/college_returns.json): locked to the roster
+  const locks = new Map(); let lockP = null;
+  try {
+    const CR = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'college_returns.json'), 'utf8')), c = CR.sports?.cfb;
+    if (c && c.target === SEASON + 1) for (const x of c.locks || []) { const t = idxAll.resolve(x.team); if (t) locks.set(norm(x.name) + '|' + t, x); }
+    lockP = CR.lockP?.cfb ?? null;
+  } catch {}
+  console.log(`return reports: ${locks.size} locked for ${SEASON + 1}${lockP != null ? `, Transfer% ${lockP}` : ', tag only'}`);
+  tctx = { locks, lockP, coachOpen, fit: JSON.parse(fs.readFileSync(TFIT, 'utf8')), season: SEASON, geo, norm, roster, recruits: espnRec, winp, newcomers,
     pfnIx: pfnIndex(pfn, SEASON, n => idxAll.resolve(n), norm, volume), played: new Set((pstats || []).map(x => String(x.playerId))),
     gp: Object.keys(gpl).length ? gpl : null, teamGames };
   writeAll();

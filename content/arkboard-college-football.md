@@ -18,10 +18,15 @@ cover = "/og/college-football.png"
 {{< awards sport="cfb" tab="awards" >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits) and coaches" tab="ARKLIST" >}}
 {{< cfbbreakout title="breakout watch" tab="breakouts" >}}
+{{< wintabs tab="portal" tabs="portal,re-signed" sub="true" label="portal views" >}}
 {{< lazytab tab="portal" >}}
 {{< xferwatch sport="cfb" view="players" tab="portal" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" unless="cfb" >}}
 {{< /lazytab >}}
+{{< lazytab tab="re-signed" >}}
+{{< resigned sport="cfb" tab="re-signed" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
 {{< cfbgames title="games" tab="games" >}}
 {{< lazytab tab="game table" >}}
 {{< cfbgametable title="game table" tab="game table" >}}

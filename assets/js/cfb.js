@@ -126,8 +126,14 @@
     if (r.transferP == null) return dim;
     var t = 'Transfer% ' + Math.round(r.transferP * 100) + '% · stays ' + Math.round((r.stayP || 0) * 100) + '% · leaves (draft or eligibility) ' + Math.round(Math.max(0, 1 - r.transferP - (r.stayP || 0)) * 100) + '%' +
       (r.homeMi != null ? '\n' + r.homeMi + ' mi from home' + (r.inState ? ' (home state)' : '') : '') + (r.tWhy && r.tWhy.length ? '\n' + r.tWhy.join('\n') : '');
-    return '<span title="' + esc(t) + '" class="' + (r.transferP >= 0.3 ? 'cfb__xhot' : r.transferP < 0.05 ? 'cfb__dim' : '') + '">' + pct(r.transferP) + '</span>';
+    return '<span title="' + esc(t) + '" class="' + (r.transferP >= 0.3 ? 'cfb__xhot' : r.transferP < 0.05 ? 'cfb__dim' : '') + '">' + pct(r.transferP) + '</span>' + lockChip(r);
   }
+  // a reported return for next season (scripts/college_returns.py): r.lock = [signed | pending, reported $, date]
+  function lockLine(r) {
+    var l = r.lock; if (!l) return '';
+    return (l[0] === 'pending' ? 'deal reported close' : 'returning') + (l[1] ? ' · $' + (l[1] >= 1e6 ? (l[1] / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : Math.round(l[1] / 1e3) + 'K') + ' reported' : '') + ' · ' + l[2];
+  }
+  function lockChip(r) { return r.lock ? '<span class="cfb__lockchip' + (r.lock[0] === 'pending' ? ' is-pend' : '') + '" title="' + esc(lockLine(r)) + '">LOCK</span>' : ''; }
   // multi-position eligibility: spots he has played (PFN graded him there, 100+ snaps in a season) and spots the
   // position-change model gives 25%+; the flagged move has its own chip
   function multiOf(r) { return (r.multi || []).filter(function (m) { return m.pos !== r.move && !(r.move === 'IOL' && (m.pos === 'G' || m.pos === 'C')); }); }
@@ -248,6 +254,7 @@
       (multiOf(r).length ? '<p class="cfb__role"><span class="cfb__multichip">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span> multi-position: ' + esc(multiLine(r)) + '.</p>' : '') +
       // mock sims (mockSims, scripts/cfb_teams.mjs): [P(round 1), 80% pick range low, high (null: past the last pick), likeliest team, its share]
       (r.mk ? '<p class="cfb__role">Mock sims: round 1 ' + pct(r.mk[0]) + ', picks ' + r.mk[1] + '-' + (r.mk[2] == null ? 'UDFA' : r.mk[2]) + ' in 80% of simulated drafts, likeliest team ' + esc(r.mk[3]) + ' (' + pct(r.mk[4]) + ').</p>' : '') +
+      (r.lock ? '<p class="cfb__role">' + lockChip(r) + ' ' + esc(lockLine(r)) + '</p>' : '') +
       (r.transferP != null ? '<p class="cfb__role"><span class="cfb__xchip">⇆ ' + pct(r.transferP) + '</span> Transfer%: ' + pct(r.transferP) + ' elsewhere next season, ' + pct(r.stayP || 0) + ' stay' +
         (1 - r.transferP - (r.stayP || 0) > 0.05 ? ', ' + pct(1 - r.transferP - (r.stayP || 0)) + ' exit (draft, eligibility)' : '') + '.' +
         (r.homeMi != null ? ' <span class="cfb__dim">' + r.homeMi + ' mi from home' + (r.inState ? ', home state' : '') + '.</span>' : '') +
