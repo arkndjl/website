@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-15T18:10:07Z",
+ "asof": "2026-11-15T18:15:02Z",
  "recenter": {
   "2026-11-15": 2.16,
   "2026-11-16": 2.02
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-15T17:28:32Z",
-  "ageH": 0.7,
+  "ageH": 0.8,
   "stale": false
  },
  "picks": [],
@@ -2064,9 +2064,9 @@
     "mk": "spread",
     "side": "home",
     "line": 7.5,
-    "price": -106.0,
-    "ev": 0.094,
-    "units": 1.0
+    "price": -110.0,
+    "ev": 0.079,
+    "units": 0.75
    }
   },
   {
@@ -2905,22 +2905,6 @@
    "tm": 171.7
   },
   {
-   "id": "401917175",
-   "sport": "cbb",
-   "kick": "2026-11-15T21:30:00Z",
-   "home": "Penn State",
-   "away": "New Haven",
-   "mk": "spread",
-   "side": "away",
-   "line": 24.5,
-   "price": -114.0,
-   "edge": 4.4,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": 20.1,
-   "tm": 138.2
-  },
-  {
    "id": "401926073",
    "sport": "cbb",
    "kick": "2026-11-15T22:00:00Z",
@@ -2967,6 +2951,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": 6.8,
    "tm": 161.2
+  },
+  {
+   "id": "401917175",
+   "sport": "cbb",
+   "kick": "2026-11-15T21:30:00Z",
+   "home": "Penn State",
+   "away": "New Haven",
+   "mk": "total",
+   "side": "under",
+   "line": 142.5,
+   "price": -110.0,
+   "edge": 4.3,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 20.1,
+   "tm": 138.2
   },
   {
    "id": "401920124",
@@ -3233,7 +3233,7 @@
    "mk": "spread",
    "side": "away",
    "line": 45.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 1.0,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -3433,7 +3433,7 @@
    "mk": "spread",
    "side": "away",
    "line": 45.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -3466,11 +3466,11 @@
    "state": "under"
   },
   "401917175": {
-   "mk": "spread",
-   "side": "away",
-   "line": 24.5,
-   "price": -114.0,
-   "edge": 4.4,
+   "mk": "total",
+   "side": "under",
+   "line": 142.5,
+   "price": -110.0,
+   "edge": 4.3,
    "ev": null,
    "units": 0.0,
    "home": "Penn State",
@@ -3652,7 +3652,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16134,
+  "snapshots": 16139,
   "buckets": [
    {
     "when": "24h+",
@@ -3666,20 +3666,20 @@
    {
     "when": "6-24h",
     "clvN": 3191,
-    "clvRet": -0.0219,
-    "clvT": -11.85,
-    "clv": 0.31,
-    "beat": 0.356,
-    "still": 0.445
+    "clvRet": -0.0213,
+    "clvT": -11.59,
+    "clv": 0.32,
+    "beat": 0.357,
+    "still": 0.45
    },
    {
     "when": "1-6h",
-    "clvN": 1888,
-    "clvRet": -0.0401,
-    "clvT": -33.68,
+    "clvN": 1890,
+    "clvRet": -0.0398,
+    "clvT": -33.57,
     "clv": 0.08,
     "beat": 0.163,
-    "still": 0.712
+    "still": 0.714
    },
    {
     "when": "<1h",
@@ -19083,7 +19083,7 @@
    "flagged": "2026-11-15T06:55:26Z",
    "paper": true,
    "betTo": 22.0,
-   "close": 24.5,
+   "close": 23.5,
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
@@ -19534,7 +19534,7 @@
    "withdrawn": "2026-11-15T17:36:01Z"
   }
  ],
- "checked": "2026-11-15T18:10:07Z",
+ "checked": "2026-11-15T18:15:02Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
