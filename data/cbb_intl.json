@@ -1,8 +1,8 @@
 {
- "asof": "2026-11-14T15:04:19Z",
+ "asof": "2026-11-15T23:31:01Z",
  "train": "2009-2020",
- "rows": 280,
- "nba": 114,
+ "rows": 277,
+ "nba": 113,
  "k": 100,
  "leagues": {
   "ABA": {
@@ -55,7 +55,7 @@
   }
  },
  "growth": 2.1392,
- "beta": 1.3095,
+ "beta": 1.3376,
  "pairs": 26977,
  "ladder": [
   {
@@ -157,57 +157,70 @@
    "gmsc_x_age",
    "big"
   ],
-  "pseudoR2": 0.1183,
+  "top": [
+   "lr",
+   "top",
+   "age",
+   "big",
+   "intl"
+  ],
+  "pseudoR2": 0.1415,
+  "rungs": [
+   0.604,
+   0.909,
+   0.964,
+   0.957
+  ],
   "auc_nba": 0.872,
-  "auc_starter": 0.806,
-  "corr": 0.656
+  "auc_starter": 0.81,
+  "corr": 0.667
  },
  "calib": [
   {
    "e": "20-25",
    "n": 155,
-   "meanE": 22.2,
-   "meanFv": 22.6,
-   "nba": 0.135,
+   "meanE": 22.1,
+   "meanFv": 22.8,
+   "nba": 0.148,
    "starter": 0.032
   },
   {
    "e": "25-30",
-   "n": 50,
-   "meanE": 27.7,
-   "meanFv": 30.3,
-   "nba": 0.52,
-   "starter": 0.08
+   "n": 49,
+   "meanE": 27.6,
+   "meanFv": 29.1,
+   "nba": 0.469,
+   "starter": 0.061
   },
   {
    "e": "30-35",
-   "n": 38,
-   "meanE": 32.8,
-   "meanFv": 36.3,
-   "nba": 0.816,
-   "starter": 0.158
+   "n": 40,
+   "meanE": 32.6,
+   "meanFv": 37.9,
+   "nba": 0.85,
+   "starter": 0.2
   },
   {
    "e": "35-40",
    "n": 24,
-   "meanE": 37.5,
-   "meanFv": 41.5,
-   "nba": 0.958,
-   "starter": 0.333
+   "meanE": 37.8,
+   "meanFv": 42.8,
+   "nba": 1.0,
+   "starter": 0.375
   },
   {
    "e": "40-45",
-   "n": 11,
-   "meanE": 42.0,
-   "meanFv": 50.1,
+   "n": 6,
+   "meanE": 42.5,
+   "meanFv": 46.8,
    "nba": 1.0,
-   "starter": 0.636
+   "starter": 0.5
   },
   {
    "e": "45-80",
-   "n": 2,
-   "meanE": 46.5,
-   "meanFv": 68.9,
+   "n": 3,
+   "meanE": 48.4,
+   "meanFv": 68.2,
    "nba": 1.0,
    "starter": 1.0
   }
@@ -226,7 +239,8 @@
   "scoring rate",
   "league level",
   "production for age",
-  "big"
+  "big",
+  "age"
  ],
  "evidence": [
   {
@@ -269,7 +283,7 @@
   [
    "Stefan Joksimovic",
    "Baskonia",
-   42
+   43
   ],
   [
    "Hugo Yimga-Moukouri",
