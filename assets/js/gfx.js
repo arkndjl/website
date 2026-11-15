@@ -1719,8 +1719,8 @@
   // logo, rank and rating, season odds, next games, key players, strengths and concerns, the rating's inputs
   async function buildTeamCard(win, btn) {
     var d = (window.__arkTeamGfx || [])[+btn.getAttribute('data-gfx-i')]; if (!d) return null;
-    var LG = { cfb: 'CFB', cbb: 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'soccer' };
-    var F = await frame(2160, 2700, (LG[d.sport] || '') + ' :: ' + d.name, win.getAttribute('data-gfx-date'), SITE + '#ark-ranking');
+    var LG = { cfb: 'CFB', cbb: 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'soccer', soccerintl: 'soccer' };
+    var F = await frame(2160, 2700, (LG[d.sport] || '') + ' :: ' + d.name, win.getAttribute('data-gfx-date'), SITE + (d.sport === 'soccerintl' ? '#world-ranking' : '#ark-ranking'));
     var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, dash = '—', gap = 20;
     well(g, F.x, F.y, F.w, F.h);
     // the logo in a raised frame at the left (full colour, smoothed), then name and line; the rank plaque at the right,
@@ -1819,7 +1819,7 @@
       py += 76;
       list.forEach(function (p) {
         if (py + 40 > lbot - 60) return;
-        var val = metric === 'FV' ? String(p[2]) : (p[2] > 0 ? '+' : p[2] < 0 ? '−' : '') + Math.abs(+p[2]).toFixed(2);
+        var val = typeof p[2] === 'string' || metric === 'FV' ? String(p[2]) : (p[2] > 0 ? '+' : p[2] < 0 ? '−' : '') + Math.abs(+p[2]).toFixed(2);
         g.font = '44px ' + FONT; var vw = g.measureText(val).width; g.fillStyle = p[2] < 0 ? C.down : C.teal; g.fillText(val, px + pwid - vw, py);
         g.font = '30px ' + FONT; var pos = String(p[1] || ''), posw = pos ? g.measureText(pos).width + 16 : 0;
         g.font = '40px ' + FONT; g.fillStyle = C.white; var pn = fit(g, p[0], pwid - vw - 32 - posw); g.fillText(pn, px, py);

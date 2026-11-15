@@ -8,7 +8,7 @@
 {{- $upd := lower ((time .asof).Format "Jan 2, 2006") -}}
 {{- if eq $view "ranking" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "world ranking") "icon" "soccer" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Nation,Conf,Rating,Off,Def,Elo" "gfxDate" $upd "gfxMax" "25") -}}
-<table class="cfb__table tstick2">
+<table class="cfb__table tstick2" data-td-kind="soccerintl" data-td-src="/data/teams/soccer-intl.json" data-td-rows="{{ (resources.FromString "data/soccer-intl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Nation</th><th>Conf</th>
     <th title="expected goal margin a match against an average side of the top {{ .topN }}, neutral ground">Rating</th>
@@ -21,10 +21,10 @@
     <th title="next match">Next</th>
   </tr></thead>
   <tbody>
-  {{- range .power }}
-  <tr>
+  {{- range $i, $_ := .power }}
+  <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "fmt" "%+.2f" "mul" 1) }}
-    <td data-v="{{ .n }}" style="white-space: nowrap">{{ with .iso }}<img class="flag" src="/img/flags/{{ . }}.png" alt="" width="18" height="12" loading="lazy" onerror="this.remove()"> {{ end }}{{ .n }}</td>
+    <td data-v="{{ .n }}" style="white-space: nowrap">{{ with .iso }}<img class="flag" src="/img/flags/{{ . }}.png" alt="" width="18" height="12" loading="lazy" onerror="this.remove()"> {{ end }}<button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .n }}</button></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ partial "num.html" (slice "%+.2f" (float .rating)) }}</td>
     <td class="cfb__num" data-v="{{ .off }}">{{ partial "num.html" (slice "%+.2f" (float .off)) }}</td>
@@ -39,6 +39,7 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "fresh" "soccer_intl" "rows" (len .power) "about" (printf "Every full international since 1872 (martj42/international_results, ESPN). Attack and defence in log goals, learned match by match at a tournament weight; each side's expected goals also move with the gap in top-23 Transfermarkt value. Rating = expected goal margin against an average side of the top %d at a neutral ground." .topN)) -}}
+{{- partial "teamjs.html" $ -}}
 {{- else if eq $view "games" -}}
 {{- $pred := ne ($.Get "sport" | default "") "" -}}
 {{- $games := .games -}}
