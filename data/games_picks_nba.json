@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T03:12:23Z",
+ "asof": "2026-11-15T03:12:53Z",
  "recenter": {
   "2026-11-15": 1.77
  },
@@ -144,19 +144,19 @@
     }
    },
    "total": {
-    "n": 7,
-    "window": 7,
-    "mean": -0.0129,
-    "t": -0.52,
+    "n": 8,
+    "window": 8,
+    "mean": 0.0026,
+    "t": 0.1,
     "p": null,
-    "days": 2,
+    "days": 3,
     "sd": 0.1278,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
     "rho": 0.083,
     "edge": {
-     "cusum": 0.07,
+     "cusum": 0.0,
      "cusumMax": 0.07,
      "h": 4.595
     },
@@ -164,17 +164,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0114,
-     "n": 7,
+     "n": 8,
      "sd": 0.1278,
      "rho": 0.083,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.053,
+     "llr": 0.024,
      "info": 0.06,
-     "real": -0.73,
-     "realSe": 4.675,
+     "real": 0.642,
+     "realSe": 4.246,
      "need": 746
     }
    }
@@ -186,24 +186,24 @@
   "since": null,
   "why": null,
   "pooled": {
-   "n": 81,
-   "days": 15,
-   "llr": 1.362,
+   "n": 82,
+   "days": 16,
+   "llr": 1.456,
    "lo": -2.944,
    "hi": 2.944,
    "state": "watching",
    "at": null,
    "sd": 0.12,
    "rho": 0.05,
-   "real": 1.174,
-   "realSe": 0.627,
-   "clvRet": 0.0284,
+   "real": 1.208,
+   "realSe": 0.625,
+   "clvRet": 0.0294,
    "evDU": 0.0157
   }
  },
  "model": {
-  "asof": "2026-11-15T02:06:10Z",
-  "ageH": 1.1,
+  "asof": "2026-11-15T03:09:12Z",
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [
@@ -469,7 +469,7 @@
     "side": "under",
     "line": 217.5,
     "price": -104.0,
-    "ev": 0.063,
+    "ev": 0.066,
     "units": 0.25
    }
   }
@@ -572,8 +572,8 @@
    "side": "under",
    "line": 217.5,
    "price": -104.0,
-   "ev": 0.063,
-   "edge": 3.2,
+   "ev": 0.066,
+   "edge": 3.3,
    "units": 0.25,
    "home": "TOR",
    "away": "NY",
@@ -668,7 +668,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4220,
+  "snapshots": 4225,
   "buckets": [
    {
     "when": "24h+",
@@ -681,12 +681,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 978,
-    "clvRet": -0.022,
-    "clvT": -5.81,
+    "clvN": 980,
+    "clvRet": -0.0221,
+    "clvT": -5.84,
     "clv": 0.36,
-    "beat": 0.439,
-    "still": 0.41
+    "beat": 0.438,
+    "still": 0.411
    },
    {
     "when": "1-6h",
@@ -7146,7 +7146,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T03:12:23Z",
+ "checked": "2026-11-15T03:12:53Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
