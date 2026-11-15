@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T22:10:47Z",
+ "asof": "2026-11-15T22:53:15Z",
  "recenter": {
-  "2026-11-15": 1.67
+  "2026-11-15": 1.66
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-15T17:53:35Z",
-  "ageH": 4.3,
+  "ageH": 5.0,
   "stale": false
  },
  "picks": [],
@@ -412,6 +412,22 @@
  ],
  "board": [
   {
+   "id": "401909990",
+   "sport": "nba",
+   "kick": "2026-11-15T23:00:00Z",
+   "home": "TOR",
+   "away": "NY",
+   "mk": "total",
+   "side": "under",
+   "line": 218.5,
+   "price": -114.0,
+   "edge": 4.4,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
+   "m": -2.3,
+   "tm": 214.1
+  },
+  {
    "id": "401909991",
    "sport": "nba",
    "kick": "2026-11-16T00:00:00Z",
@@ -420,7 +436,7 @@
    "mk": "total",
    "side": "over",
    "line": 223.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.9,
    "x": 6.5,
    "why": "edge under 6.5 (side: over)",
@@ -442,22 +458,6 @@
    "why": "edge under 5 (role: dog)",
    "m": 12.8,
    "tm": 218.6
-  },
-  {
-   "id": "401909990",
-   "sport": "nba",
-   "kick": "2026-11-15T23:00:00Z",
-   "home": "TOR",
-   "away": "NY",
-   "mk": "total",
-   "side": "under",
-   "line": 217.5,
-   "price": -110.0,
-   "edge": 3.4,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": -2.3,
-   "tm": 214.1
   },
   {
    "id": "401909992",
@@ -508,9 +508,9 @@
   "401909990": {
    "mk": "total",
    "side": "under",
-   "line": 217.5,
-   "price": -110.0,
-   "edge": 3.4,
+   "line": 218.5,
+   "price": -114.0,
+   "edge": 4.4,
    "ev": null,
    "units": 0.0,
    "home": "TOR",
@@ -521,7 +521,7 @@
    "mk": "total",
    "side": "over",
    "line": 223.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -606,7 +606,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4407,
+  "snapshots": 4409,
   "buckets": [
    {
     "when": "24h+",
@@ -7085,7 +7085,7 @@
    "tmRaw": 216.1,
    "flagged": "2026-11-15T02:08:44Z",
    "betTo": 217.0,
-   "close": 217.5,
+   "close": 218.5,
    "withdrawn": "2026-11-15T17:36:16Z"
   },
   {
@@ -7236,7 +7236,7 @@
    "withdrawn": "2026-11-15T17:36:16Z"
   }
  ],
- "checked": "2026-11-15T22:10:47Z",
+ "checked": "2026-11-15T22:53:15Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
