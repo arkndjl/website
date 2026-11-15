@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T20:09:03Z",
+ "asof": "2026-11-15T21:12:09Z",
  "recenter": {
   "2026-11-15": 1.66
  },
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-15T17:53:35Z",
-  "ageH": 2.3,
+  "ageH": 3.3,
   "stale": false
  },
  "picks": [],
@@ -427,6 +427,22 @@
  ],
  "board": [
   {
+   "id": "401909991",
+   "sport": "nba",
+   "kick": "2026-11-16T00:00:00Z",
+   "home": "WSH",
+   "away": "HOU",
+   "mk": "spread",
+   "side": "home",
+   "line": -8.5,
+   "price": -124.0,
+   "edge": 2.9,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": -5.6,
+   "tm": 227.4
+  },
+  {
    "id": "401909990",
    "sport": "nba",
    "kick": "2026-11-15T23:00:00Z",
@@ -441,22 +457,6 @@
    "why": "edge under 6.5 (total: mid)",
    "m": -2.3,
    "tm": 214.1
-  },
-  {
-   "id": "401909991",
-   "sport": "nba",
-   "kick": "2026-11-16T00:00:00Z",
-   "home": "WSH",
-   "away": "HOU",
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -110.0,
-   "edge": 2.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: over)",
-   "m": -5.6,
-   "tm": 227.4
   },
   {
    "id": "401909989",
@@ -507,22 +507,6 @@
    "tm": 232.3
   },
   {
-   "id": "401909986",
-   "sport": "nba",
-   "kick": "2026-11-15T21:00:00Z",
-   "home": "PHX",
-   "away": "LAL",
-   "mk": "total",
-   "side": "under",
-   "line": 225.5,
-   "price": -110.0,
-   "edge": 1.0,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": -2.6,
-   "tm": 224.5
-  },
-  {
    "id": "401909988",
    "sport": "nba",
    "kick": "2026-11-15T22:00:00Z",
@@ -530,9 +514,9 @@
    "away": "SA",
    "mk": "spread",
    "side": "away",
-   "line": -15.5,
-   "price": -110.0,
-   "edge": 2.0,
+   "line": -14.5,
+   "price": -114.0,
+   "edge": 3.0,
    "x": null,
    "why": "spread market off",
    "m": -17.5,
@@ -556,18 +540,6 @@
   }
  ],
  "games": {
-  "401909986": {
-   "mk": "total",
-   "side": "under",
-   "line": 225.5,
-   "price": -110.0,
-   "edge": 1.0,
-   "ev": null,
-   "units": 0.0,
-   "home": "PHX",
-   "away": "LAL",
-   "state": "under"
-  },
   "401909987": {
    "mk": "spread",
    "side": "away",
@@ -583,9 +555,9 @@
   "401909988": {
    "mk": "spread",
    "side": "away",
-   "line": -15.5,
-   "price": -110.0,
-   "edge": 2.0,
+   "line": -14.5,
+   "price": -114.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "UTAH",
@@ -617,10 +589,10 @@
    "state": "under"
   },
   "401909991": {
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -110.0,
+   "mk": "spread",
+   "side": "home",
+   "line": -8.5,
+   "price": -124.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -705,7 +677,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4392,
+  "snapshots": 4397,
   "buckets": [
    {
     "when": "24h+",
@@ -719,20 +691,20 @@
    {
     "when": "6-24h",
     "clvN": 1015,
-    "clvRet": -0.0215,
-    "clvT": -5.83,
-    "clv": 0.37,
-    "beat": 0.441,
-    "still": 0.404
+    "clvRet": -0.0227,
+    "clvT": -6.19,
+    "clv": 0.35,
+    "beat": 0.435,
+    "still": 0.409
    },
    {
     "when": "1-6h",
-    "clvN": 397,
-    "clvRet": -0.0556,
-    "clvT": -13.03,
-    "clv": -0.16,
-    "beat": 0.179,
-    "still": 0.655
+    "clvN": 399,
+    "clvRet": -0.0563,
+    "clvT": -13.24,
+    "clv": -0.17,
+    "beat": 0.178,
+    "still": 0.644
    },
    {
     "when": "<1h",
@@ -7238,7 +7210,7 @@
    "tmRaw": 229.2,
    "flagged": "2026-11-15T02:08:44Z",
    "betTo": -8.5,
-   "close": -7.5,
+   "close": -8.5,
    "withdrawn": "2026-11-15T17:36:16Z"
   },
   {
@@ -7265,7 +7237,20 @@
    "lineL": 6.5,
    "flagged": "2026-11-15T03:21:17Z",
    "close": 7.5,
-   "withdrawn": "2026-11-15T17:36:16Z"
+   "withdrawn": "2026-11-15T17:36:16Z",
+   "score": [
+    124.0,
+    131.0
+   ],
+   "res": "w",
+   "profit": 0.389,
+   "closeML": [
+    -283,
+    223
+   ],
+   "clvRet": -0.0211,
+   "clv": null,
+   "beat": -1
   },
   {
    "id": "401909986",
@@ -7322,7 +7307,7 @@
    "withdrawn": "2026-11-15T17:36:16Z"
   }
  ],
- "checked": "2026-11-15T20:09:03Z",
+ "checked": "2026-11-15T21:12:09Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

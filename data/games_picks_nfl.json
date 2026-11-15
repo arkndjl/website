@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-15T20:08:44Z",
+ "asof": "2026-11-15T21:11:44Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-15T17:55:33Z",
-  "ageH": 2.2,
+  "ageH": 3.3,
   "stale": false
  },
  "picks": [],
@@ -241,38 +241,6 @@
  ],
  "board": [
   {
-   "id": "2026_10_LA_ARI",
-   "sport": "nfl",
-   "kick": "2026-11-15T21:05:00Z",
-   "home": "ARI",
-   "away": "LA",
-   "mk": "total",
-   "side": "over",
-   "line": 37.5,
-   "price": -122.0,
-   "edge": 9.8,
-   "x": null,
-   "why": "total market off",
-   "m": -7.0,
-   "tm": 47.3
-  },
-  {
-   "id": "2026_10_SEA_LV",
-   "sport": "nfl",
-   "kick": "2026-11-15T21:05:00Z",
-   "home": "LV",
-   "away": "SEA",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -114.0,
-   "edge": 3.6,
-   "x": null,
-   "why": "total market off",
-   "m": -5.3,
-   "tm": 44.1
-  },
-  {
    "id": "2026_10_LAC_BAL",
    "sport": "nfl",
    "kick": "2026-11-17T01:15:00Z",
@@ -297,7 +265,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -108.0,
+   "price": -114.0,
    "edge": 2.5,
    "x": null,
    "why": "spread market off",
@@ -322,35 +290,11 @@
   }
  ],
  "games": {
-  "2026_10_LA_ARI": {
-   "mk": "total",
-   "side": "over",
-   "line": 37.5,
-   "price": -122.0,
-   "edge": 9.8,
-   "ev": null,
-   "units": 0.0,
-   "home": "ARI",
-   "away": "LA",
-   "state": "off"
-  },
-  "2026_10_SEA_LV": {
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -114.0,
-   "edge": 3.6,
-   "ev": null,
-   "units": 0.0,
-   "home": "LV",
-   "away": "SEA",
-   "state": "off"
-  },
   "2026_10_SF_DAL": {
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -108.0,
+   "price": -114.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -435,7 +379,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4292,
+  "snapshots": 4295,
   "buckets": [
    {
     "when": "24h+",
@@ -457,12 +401,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 136,
-    "clvRet": -0.044,
-    "clvT": -7.64,
+    "clvN": 137,
+    "clvRet": -0.0436,
+    "clvT": -7.61,
     "clv": 0.09,
-    "beat": 0.132,
-    "still": 0.824
+    "beat": 0.131,
+    "still": 0.825
    },
    {
     "when": "<1h",
@@ -2516,7 +2460,20 @@
    "unitsRaw": 1.0,
    "unitsCap": 0.75,
    "paper": true,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    30.0,
+    10.0
+   ],
+   "res": "w",
+   "profit": 1.74,
+   "closeML": [
+    -144,
+    118
+   ],
+   "clvRet": 0.1983,
+   "clv": null,
+   "beat": 1
   },
   {
    "id": "2026_10_LA_ARI",
@@ -2571,7 +2528,16 @@
    "betTo": 40.0,
    "close": 42.5,
    "paper": true,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    30.0,
+    10.0
+   ],
+   "res": "w",
+   "profit": 0.962,
+   "clvRet": -0.0198,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_10_SEA_LV",
@@ -2735,7 +2701,7 @@
    "withdrawn": "2026-11-15T17:35:56Z"
   }
  ],
- "checked": "2026-11-15T20:08:44Z",
+ "checked": "2026-11-15T21:11:44Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

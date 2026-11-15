@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-15T18:01:18Z",
+ "asof": "2026-11-15T21:12:15Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 84.79,
   "peak": 117.38,
   "drawdown": 0.2777,
-  "open": 0.75,
+  "open": 1.0,
   "path": [
    112.41,
    113.4,
@@ -412,10 +412,10 @@
   ]
  },
  "record": {
-  "n": 435,
-  "clvN": 435,
-  "clvRet": -0.0095,
-  "clvT": -1.93,
+  "n": 436,
+  "clvN": 436,
+  "clvRet": -0.0096,
+  "clvT": -1.94,
   "clv": 0.06,
   "beat": 0.328,
   "settled": 432,
@@ -428,23 +428,23 @@
   "risked": 406.5,
   "yield": -0.0331
  },
- "tEff": -1.45,
+ "tEff": -1.5,
  "corr": {
-  "rho": 0.035,
-  "n": 435,
+  "rho": 0.03,
+  "n": 436,
   "slates": 45,
-  "nEff": 246.9,
-  "avgSlate": 9.67
+  "nEff": 258.5,
+  "avgSlate": 9.69
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 435,
+   "value": 436,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-0.9% t -1.45",
+   "value": "-1.0% t -1.5",
    "pass": false
   },
   {
@@ -701,10 +701,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 66,
-   "clvN": 66,
-   "clvRet": -0.0158,
-   "clvT": -1.26,
+   "n": 67,
+   "clvN": 67,
+   "clvRet": -0.0161,
+   "clvT": -1.29,
    "clv": null,
    "beat": null,
    "settled": 63,
@@ -788,6 +788,52 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873062-4428718-wy",
+   "k": "2026-11-15T21:05:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "LV",
+   "a": "SEA",
+   "mk": "prop",
+   "side": "over",
+   "line": 26.5,
+   "price": -111.0,
+   "bet": "Tre Tucker over 26.5 rec yds -111",
+   "placed": "2026-11-10T21:25:00Z",
+   "stake": 0.25,
+   "edge": 13.7,
+   "ev": 0.0046,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.0021,
+   "close": 29.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873062-4837248-py",
+   "k": "2026-11-15T21:05:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "LV",
+   "a": "SEA",
+   "mk": "prop",
+   "side": "under",
+   "line": 181.5,
+   "price": -122.0,
+   "bet": "Fernando Mendoza under 181.5 pass yds -122",
+   "placed": "2026-11-10T20:06:00Z",
+   "stake": 0.25,
+   "edge": 28.2,
+   "ev": 0.0163,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.1216,
+   "close": 174.5
+  }
+ ],
+ "recent": [
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873060-4360569-ry",
    "k": "2026-11-15T18:00:00Z",
    "slate": "nflprops:2026-11-15",
@@ -805,7 +851,11 @@
    "event": null,
    "pass": true,
    "clvRet": 0.0256,
-   "close": 49.5
+   "close": 49.5,
+   "score": 59.0,
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "nflprops-prop",
@@ -825,12 +875,11 @@
    "edge": 14.9,
    "ev": 0.0416,
    "event": null,
-   "pass": false,
+   "pass": true,
    "clvRet": -0.087,
-   "close": 3.5
-  }
- ],
- "recent": [
+   "close": 3.5,
+   "res": "void"
+  },
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -2582,58 +2631,6 @@
     3.0,
     17.0
    ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873047-3043116-wy",
-   "k": "2026-11-08T21:25:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 32.5,
-   "price": -108.0,
-   "bet": "Demarcus Robinson under 32.5 rec yds -108",
-   "placed": "2026-11-06T21:42:00Z",
-   "stake": 1.5,
-   "edge": 24.6,
-   "ev": 0.0612,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0642,
-   "close": 34.5,
-   "score": 22.0,
-   "res": "w",
-   "ret": 0.9259,
-   "profit": 1.3888
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873047-4432665-wy",
-   "k": "2026-11-08T21:25:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 76.5,
-   "price": -111.0,
-   "bet": "Brock Bowers under 76.5 rec yds -111",
-   "placed": "2026-11-04T05:56:00Z",
-   "stake": 0.25,
-   "edge": 14.5,
-   "ev": 0.0075,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0679,
-   "close": 77.5,
-   "score": 111.0,
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
@@ -17639,7 +17636,11 @@
    "event": null,
    "pass": true,
    "clvRet": 0.0256,
-   "close": 49.5
+   "close": 49.5,
+   "score": 59.0,
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "nflprops-prop",
@@ -17659,9 +17660,54 @@
    "edge": 14.9,
    "ev": 0.0416,
    "event": null,
-   "pass": false,
+   "pass": true,
    "clvRet": -0.087,
-   "close": 3.5
+   "close": 3.5,
+   "res": "void"
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873062-4428718-wy",
+   "k": "2026-11-15T21:05:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "LV",
+   "a": "SEA",
+   "mk": "prop",
+   "side": "over",
+   "line": 26.5,
+   "price": -111.0,
+   "bet": "Tre Tucker over 26.5 rec yds -111",
+   "placed": "2026-11-10T21:25:00Z",
+   "stake": 0.25,
+   "edge": 13.7,
+   "ev": 0.0046,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.0021,
+   "close": 29.5
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873062-4837248-py",
+   "k": "2026-11-15T21:05:00Z",
+   "slate": "nflprops:2026-11-15",
+   "h": "LV",
+   "a": "SEA",
+   "mk": "prop",
+   "side": "under",
+   "line": 181.5,
+   "price": -122.0,
+   "bet": "Fernando Mendoza under 181.5 pass yds -122",
+   "placed": "2026-11-10T20:06:00Z",
+   "stake": 0.25,
+   "edge": 28.2,
+   "ev": 0.0163,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.1216,
+   "close": 174.5
   }
  ]
 }
