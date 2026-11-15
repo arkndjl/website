@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-15T21:11:44Z",
+ "asof": "2026-11-15T21:18:44Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -29,30 +29,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 15,
+   "n": 20,
    "days": 6,
-   "llr": -0.96,
+   "llr": -1.119,
    "lo": -2.944,
    "hi": 2.944,
    "state": "watching",
    "at": null,
    "sd": 0.12,
    "rho": 0.05,
-   "real": -0.304,
-   "realSe": 0.872,
-   "clvRet": -0.0316,
-   "evDU": 0.0273
+   "real": -0.376,
+   "realSe": 0.836,
+   "clvRet": -0.0295,
+   "evDU": 0.0246
   },
   "back": {
-   "n": 0,
-   "clvRet": null,
+   "n": 2,
+   "clvRet": 0.0517,
    "t": null,
-   "days": 0
+   "days": 1
   }
  },
  "model": {
-  "asof": "2026-11-15T17:55:33Z",
-  "ageH": 3.3,
+  "asof": "2026-11-15T21:17:48Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -265,11 +265,11 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -114.0,
-   "edge": 2.5,
+   "price": -117.0,
+   "edge": 2.1,
    "x": null,
    "why": "spread market off",
-   "m": -1.0,
+   "m": -1.4,
    "tm": 54.2
   },
   {
@@ -294,8 +294,8 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -114.0,
-   "edge": 2.5,
+   "price": -117.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "DAL",
@@ -379,7 +379,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4295,
+  "snapshots": 4296,
   "buckets": [
    {
     "when": "24h+",
@@ -410,9 +410,9 @@
    },
    {
     "when": "<1h",
-    "clvN": 42,
-    "clvRet": -0.0654,
-    "clvT": -7.75,
+    "clvN": 43,
+    "clvRet": -0.0637,
+    "clvT": -7.56,
     "clv": 0.0,
     "beat": 0.0,
     "still": 1.0
@@ -2378,7 +2378,16 @@
    "close": -10.5,
    "pass": true,
    "paper": true,
-   "withdrawn": "2026-11-13T06:13:22Z"
+   "withdrawn": "2026-11-13T06:13:22Z",
+   "score": [
+    40.0,
+    23.0
+   ],
+   "res": "w",
+   "profit": 1.11,
+   "clvRet": -0.0214,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_10_JAX_TEN",
@@ -2405,7 +2414,16 @@
    "betTo": 45.0,
    "close": 45.5,
    "paper": true,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    40.0,
+    23.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": 0.0497,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "id": "2026_10_MIA_IND",
@@ -2432,7 +2450,16 @@
    "betTo": 42.5,
    "close": 38.5,
    "paper": true,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    22.0,
+    24.0
+   ],
+   "res": "w",
+   "profit": 0.943,
+   "clvRet": -0.1439,
+   "clv": -2.0,
+   "beat": -1
   },
   {
    "id": "2026_10_MIN_GB",
@@ -2618,7 +2645,16 @@
    "betTo": 40.5,
    "close": 40.5,
    "paper": true,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    24.0,
+    27.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": 0.019,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_10_KC_ATL",
@@ -2645,7 +2681,16 @@
    "paper": true,
    "betTo": 47.0,
    "close": 47.5,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    35.0,
+    13.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": -0.0284,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "id": "2026_10_PIT_CIN",
@@ -2698,10 +2743,23 @@
    "flagged": "2026-11-13T22:06:32Z",
    "paper": true,
    "close": -3.5,
-   "withdrawn": "2026-11-15T17:35:56Z"
+   "withdrawn": "2026-11-15T17:35:56Z",
+   "score": [
+    24.0,
+    27.0
+   ],
+   "res": "w",
+   "profit": 2.08,
+   "closeML": [
+    160,
+    -196
+   ],
+   "clvRet": 0.1317,
+   "clv": null,
+   "beat": 1
   }
  ],
- "checked": "2026-11-15T21:11:44Z",
+ "checked": "2026-11-15T21:18:44Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
