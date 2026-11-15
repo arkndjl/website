@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T00:24:16Z",
+ "asof": "2026-11-15T00:27:08Z",
  "recenter": {
-  "week": 0.19
+  "week": 0.18
  },
  "monitor": {
   "clocks": {
@@ -216,37 +216,37 @@
     }
    },
    "total": {
-    "n": 32,
-    "window": 32,
-    "mean": 0.124,
-    "t": 0.83,
+    "n": 33,
+    "window": 33,
+    "mean": 0.1229,
+    "t": 0.85,
     "p": null,
     "days": 4,
     "sd": 0.1178,
-    "cusum": 0.09,
+    "cusum": 0.0,
     "cusumMax": 2.54,
     "h": 10.0,
     "rho": 0.038,
     "edge": {
-     "cusum": 0.76,
-     "cusumMax": 0.76,
+     "cusum": 0.71,
+     "cusumMax": 0.71,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0131,
-     "n": 32,
+     "n": 33,
      "sd": 0.1178,
      "rho": 0.038,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.757,
-     "info": 0.39,
-     "real": -2.328,
-     "realSe": 1.793,
+     "llr": -0.708,
+     "info": 0.41,
+     "real": -2.063,
+     "realSe": 1.772,
      "need": 479
     }
    },
@@ -398,30 +398,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 60,
+   "n": 62,
    "days": 9,
-   "llr": 15.259,
+   "llr": 14.99,
    "lo": -2.944,
    "hi": 2.944,
    "state": "confirmed",
    "at": "2026-11-14",
-   "sd": 0.6241,
+   "sd": 0.6138,
    "rho": 0.05,
    "real": 1.0,
-   "realSe": 0.131,
-   "clvRet": 0.0573,
-   "evDU": 0.0994
+   "realSe": 0.129,
+   "clvRet": 0.0583,
+   "evDU": 0.0969
   },
   "back": {
-   "n": 6,
-   "clvRet": 0.7471,
-   "t": 0.93,
+   "n": 7,
+   "clvRet": 0.6529,
+   "t": 0.95,
    "days": 2
   }
  },
  "model": {
   "asof": "2026-11-14",
-  "ageH": 0.4,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -1009,7 +1009,7 @@
     "side": "over",
     "line": 39.5,
     "price": 923.0,
-    "ev": 4.39,
+    "ev": 4.369,
     "units": 5.0
    }
   },
@@ -1140,7 +1140,7 @@
     "side": "over",
     "line": 46.5,
     "price": 669.0,
-    "ev": 3.015,
+    "ev": 3.047,
     "units": 5.0
    }
   },
@@ -1174,8 +1174,8 @@
     "side": "under",
     "line": 75.5,
     "price": 102.0,
-    "ev": 0.052,
-    "units": 3.0
+    "ev": 0.055,
+    "units": 3.25
    }
   },
   {
@@ -1219,10 +1219,10 @@
    "mk": "spread",
    "side": "away",
    "line": -7.5,
-   "price": 108.0,
+   "price": 111.0,
    "edge": 3.8,
    "x": 3.0,
-   "why": "no edge at +108",
+   "why": "no edge at +111",
    "m": -11.3,
    "tm": 53.2
   },
@@ -1235,7 +1235,7 @@
    "mk": "spread",
    "side": "away",
    "line": 19.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.7,
    "x": 3.0,
    "why": "edge under 3 (conf: Big Ten)",
@@ -1345,9 +1345,9 @@
    "side": "under",
    "line": 75.5,
    "price": 102.0,
-   "ev": 0.052,
+   "ev": 0.055,
    "edge": 7.7,
-   "units": 3.0,
+   "units": 3.25,
    "home": "UTSA",
    "away": "North Texas",
    "state": "paper"
@@ -1356,7 +1356,7 @@
    "mk": "spread",
    "side": "away",
    "line": -7.5,
-   "price": 108.0,
+   "price": 111.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -1368,7 +1368,7 @@
    "mk": "spread",
    "side": "away",
    "line": 19.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -1381,7 +1381,7 @@
    "side": "over",
    "line": 46.5,
    "price": 669.0,
-   "ev": 3.015,
+   "ev": 3.047,
    "edge": 4.3,
    "units": 5.0,
    "bk": "poly",
@@ -1406,7 +1406,7 @@
    "side": "over",
    "line": 39.5,
    "price": 923.0,
-   "ev": 4.39,
+   "ev": 4.369,
    "edge": 3.4,
    "units": 5.0,
    "bk": "poly",
@@ -1503,7 +1503,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19404,
+  "snapshots": 19419,
   "buckets": [
    {
     "when": "24h+",
@@ -1516,9 +1516,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 544,
+    "clvN": 545,
     "clvRet": -0.0623,
-    "clvT": -22.36,
+    "clvT": -22.42,
     "clv": -0.04,
     "beat": 0.165,
     "still": 0.618
@@ -1534,12 +1534,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 52,
-    "clvRet": -0.0657,
-    "clvT": -8.69,
+    "clvN": 55,
+    "clvRet": -0.0676,
+    "clvT": -9.3,
     "clv": -0.02,
-    "beat": 0.019,
-    "still": 0.904
+    "beat": 0.018,
+    "still": 0.909
    }
   ]
  },
@@ -5995,7 +5995,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T00:24:16Z",
+ "checked": "2026-11-15T00:27:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
