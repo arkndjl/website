@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-15T02:15:58Z",
+ "asof": "2026-11-15T02:18:36Z",
  "recenter": {
   "2026-11-14": 2.04,
   "2026-11-15": 2.03
@@ -1049,7 +1049,7 @@
  },
  "model": {
   "asof": "2026-11-15T01:19:22Z",
-  "ageH": 0.9,
+  "ageH": 1.0,
   "stale": false
  },
  "picks": [],
@@ -2207,8 +2207,8 @@
     "side": "home",
     "line": 9.5,
     "price": -102.0,
-    "ev": 0.066,
-    "units": 0.75
+    "ev": 0.061,
+    "units": 0.5
    }
   },
   {
@@ -2326,15 +2326,8 @@
    "flagged": "2026-11-15T00:03:20Z",
    "paper": true,
    "betTo": 165.0,
-   "close": 162.5,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 162.5,
-    "price": 102.0,
-    "ev": 0.125,
-    "units": 1.75
-   }
+   "close": 163.5,
+   "now": null
   },
   {
    "id": "401909493",
@@ -2490,6 +2483,40 @@
    }
   },
   {
+   "id": "401925926",
+   "espn": "401925926",
+   "sport": "cbb",
+   "kick": "2026-11-15T19:00:00Z",
+   "home": "Charleston",
+   "away": "South Carolina State",
+   "mk": "total",
+   "side": "under",
+   "line": 162.5,
+   "price": -110,
+   "p": 0.56,
+   "ev": 0.069,
+   "units": 0.5,
+   "edge": 4.5,
+   "x": 2.0,
+   "pDU": 0.5295,
+   "evDU": 0.0109,
+   "m": 19.4,
+   "tm": 158.0,
+   "tmRaw": 160.0,
+   "flagged": "2026-11-15T02:18:36Z",
+   "paper": true,
+   "betTo": 160.0,
+   "close": 162.5,
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 162.5,
+    "price": -110,
+    "ev": 0.07,
+    "units": 0.5
+   }
+  },
+  {
    "id": "401924858",
    "espn": "401924858",
    "sport": "cbb",
@@ -2555,8 +2582,8 @@
     "side": "under",
     "line": 147.5,
     "price": -104.0,
-    "ev": 0.05,
-    "units": 0.75
+    "ev": 0.048,
+    "units": 0.5
    }
   },
   {
@@ -2645,14 +2672,14 @@
    "flagged": "2026-11-14T21:37:37Z",
    "paper": true,
    "betTo": 163.0,
-   "close": 160.5,
+   "close": 159.5,
    "now": {
     "mk": "total",
     "side": "over",
-    "line": 160.5,
-    "price": -110,
-    "ev": 0.074,
-    "units": 0.5
+    "line": 159.5,
+    "price": -110.0,
+    "ev": 0.099,
+    "units": 0.75
    }
   },
   {
@@ -2715,7 +2742,14 @@
    "paper": true,
    "betTo": 13.0,
    "close": 11.5,
-   "now": null
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 11.5,
+    "price": -106.0,
+    "ev": 0.047,
+    "units": 0.25
+   }
   },
   {
    "id": "401921775",
@@ -3084,28 +3118,12 @@
    "mk": "total",
    "side": "over",
    "line": 165.5,
-   "price": -127.0,
+   "price": -129.0,
    "edge": 6.7,
    "x": 2.0,
-   "why": "no edge at -127",
+   "why": "no edge at -129",
    "m": 30.6,
    "tm": 172.2
-  },
-  {
-   "id": "401925926",
-   "sport": "cbb",
-   "kick": "2026-11-15T19:00:00Z",
-   "home": "Charleston",
-   "away": "South Carolina State",
-   "mk": "total",
-   "side": "under",
-   "line": 162.5,
-   "price": -127.0,
-   "edge": 4.5,
-   "x": 2.0,
-   "why": "no edge at -127",
-   "m": 19.4,
-   "tm": 158.0
   },
   {
    "id": "401911251",
@@ -3312,11 +3330,11 @@
   "401906866": {
    "mk": "total",
    "side": "over",
-   "line": 160.5,
-   "price": -110,
-   "ev": 0.074,
-   "edge": 4.7,
-   "units": 0.5,
+   "line": 159.5,
+   "price": -110.0,
+   "ev": 0.099,
+   "edge": 5.7,
+   "units": 0.75,
    "home": "Texas",
    "away": "Baylor",
    "state": "paper"
@@ -3358,13 +3376,13 @@
    "state": "paper"
   },
   "401918949": {
-   "mk": "total",
-   "side": "over",
-   "line": 162.5,
-   "price": 102.0,
-   "ev": 0.125,
-   "edge": 4.7,
-   "units": 1.75,
+   "mk": "spread",
+   "side": "away",
+   "line": -8.5,
+   "price": -115.0,
+   "ev": 0.031,
+   "edge": 2.8,
+   "units": 0.25,
    "home": "Memphis",
    "away": "Louisville",
    "state": "paper"
@@ -3374,9 +3392,9 @@
    "side": "home",
    "line": 9.5,
    "price": -102.0,
-   "ev": 0.066,
+   "ev": 0.061,
    "edge": 3.0,
-   "units": 0.75,
+   "units": 0.5,
    "home": "Nebraska",
    "away": "Boise State",
    "state": "paper"
@@ -3409,7 +3427,7 @@
    "mk": "total",
    "side": "over",
    "line": 165.5,
-   "price": -127.0,
+   "price": -129.0,
    "edge": 6.7,
    "ev": null,
    "units": 0.0,
@@ -3505,13 +3523,13 @@
    "mk": "total",
    "side": "under",
    "line": 162.5,
-   "price": -127.0,
+   "price": -110,
+   "ev": 0.07,
    "edge": 4.5,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.5,
    "home": "Charleston",
    "away": "South Carolina State",
-   "state": "under"
+   "state": "paper"
   },
   "401923393": {
    "mk": "total",
@@ -3530,9 +3548,9 @@
    "side": "under",
    "line": 147.5,
    "price": -104.0,
-   "ev": 0.05,
+   "ev": 0.048,
    "edge": 2.6,
-   "units": 0.75,
+   "units": 0.5,
    "home": "Delaware",
    "away": "Colgate",
    "state": "paper"
@@ -3662,7 +3680,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15294,
+  "snapshots": 15306,
   "buckets": [
    {
     "when": "24h+",
@@ -3675,12 +3693,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3037,
-    "clvRet": -0.0224,
-    "clvT": -11.74,
+    "clvN": 3041,
+    "clvRet": -0.0225,
+    "clvT": -11.77,
     "clv": 0.3,
-    "beat": 0.353,
-    "still": 0.448
+    "beat": 0.352,
+    "still": 0.449
    },
    {
     "when": "1-6h",
@@ -17294,7 +17312,7 @@
    "flagged": "2026-11-14T21:37:37Z",
    "paper": true,
    "betTo": 163.0,
-   "close": 160.5
+   "close": 159.5
   },
   {
    "id": "401909493",
@@ -17527,7 +17545,7 @@
    "flagged": "2026-11-15T00:03:20Z",
    "paper": true,
    "betTo": 165.0,
-   "close": 162.5
+   "close": 163.5
   },
   {
    "id": "401909774",
@@ -18065,10 +18083,36 @@
    "paper": true,
    "betTo": 146.0,
    "close": 148.5
+  },
+  {
+   "id": "401925926",
+   "espn": "401925926",
+   "sport": "cbb",
+   "kick": "2026-11-15T19:00:00Z",
+   "home": "Charleston",
+   "away": "South Carolina State",
+   "mk": "total",
+   "side": "under",
+   "line": 162.5,
+   "price": -110,
+   "p": 0.56,
+   "ev": 0.069,
+   "units": 0.5,
+   "edge": 4.5,
+   "x": 2.0,
+   "pDU": 0.5295,
+   "evDU": 0.0109,
+   "m": 19.4,
+   "tm": 158.0,
+   "tmRaw": 160.0,
+   "flagged": "2026-11-15T02:18:36Z",
+   "paper": true,
+   "betTo": 160.0,
+   "close": 162.5
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T02:15:58Z",
+ "checked": "2026-11-15T02:18:36Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
