@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T02:21:19Z",
+ "asof": "2026-11-15T02:34:34Z",
  "recenter": {
-  "week": 0.11
+  "week": 0.15
  },
  "monitor": {
   "clocks": {
@@ -421,7 +421,7 @@
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -21.6,
+  "ageH": -21.4,
   "stale": false
  },
  "picks": [],
@@ -764,14 +764,14 @@
    "tmRaw": 57,
    "flagged": "2026-11-09T18:42:58Z",
    "betTo": 61.5,
-   "close": 64.5,
+   "close": 63.5,
    "paper": true,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 64.5,
+    "line": 63.5,
     "price": -100.0,
-    "ev": 0.041,
+    "ev": 0.037,
     "units": 2.5
    }
   },
@@ -833,7 +833,7 @@
     "side": "over",
     "line": 39.5,
     "price": 821.0,
-    "ev": 3.792,
+    "ev": 3.79,
     "units": 5.0
    }
   },
@@ -889,14 +889,7 @@
    "betTo": 67.0,
    "close": 73.5,
    "paper": true,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 73.5,
-    "price": -100.0,
-    "ev": 0.071,
-    "units": 4.25
-   }
+   "now": null
   },
   {
    "id": "401862827",
@@ -993,28 +986,12 @@
    "mk": "total",
    "side": "over",
    "line": 41.5,
-   "price": 106.0,
-   "edge": 3.0,
+   "price": -100.0,
+   "edge": 2.9,
    "x": 3.0,
    "why": "edge under 3",
    "m": -7.9,
-   "tm": 44.5
-  },
-  {
-   "id": "401860915",
-   "sport": "cfb",
-   "kick": "2026-11-15T02:30:00.000Z",
-   "home": "San Diego State",
-   "away": "Utah State",
-   "mk": "total",
-   "side": "over",
-   "line": 43.5,
-   "price": 104.0,
-   "edge": 2.4,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -1.5,
-   "tm": 45.9
+   "tm": 44.4
   },
   {
    "id": "401856864",
@@ -1026,11 +1003,11 @@
    "side": "under",
    "line": 55.5,
    "price": 102.0,
-   "edge": 1.6,
+   "edge": 1.7,
    "x": 3.0,
    "why": "edge under 3",
    "m": -1.9,
-   "tm": 53.9
+   "tm": 53.8
   }
  ],
  "games": {
@@ -1039,7 +1016,7 @@
    "side": "under",
    "line": 55.5,
    "price": 102.0,
-   "edge": 1.6,
+   "edge": 1.7,
    "ev": null,
    "units": 0.0,
    "home": "Arizona",
@@ -1058,37 +1035,13 @@
    "away": "Ole Miss",
    "state": "paper"
   },
-  "401856863": {
-   "mk": "total",
-   "side": "under",
-   "line": 73.5,
-   "price": -100.0,
-   "ev": 0.071,
-   "edge": 9.9,
-   "units": 4.25,
-   "home": "Oklahoma State",
-   "away": "Texas Tech",
-   "state": "paper"
-  },
-  "401860915": {
-   "mk": "total",
-   "side": "over",
-   "line": 43.5,
-   "price": 104.0,
-   "edge": 2.4,
-   "ev": null,
-   "units": 0.0,
-   "home": "San Diego State",
-   "away": "Utah State",
-   "state": "under"
-  },
   "401864537": {
    "mk": "total",
    "side": "over",
    "line": 39.5,
    "price": 821.0,
-   "ev": 3.792,
-   "edge": 3.3,
+   "ev": 3.79,
+   "edge": 3.2,
    "units": 5.0,
    "bk": "poly",
    "home": "Hawai'i",
@@ -1098,10 +1051,10 @@
   "401860917": {
    "mk": "total",
    "side": "under",
-   "line": 64.5,
+   "line": 63.5,
    "price": -100.0,
-   "ev": 0.041,
-   "edge": 6.1,
+   "ev": 0.037,
+   "edge": 5.2,
    "units": 2.5,
    "home": "Washington State",
    "away": "Colorado State",
@@ -1111,8 +1064,8 @@
    "mk": "total",
    "side": "over",
    "line": 41.5,
-   "price": 106.0,
-   "edge": 3.0,
+   "price": -100.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "UTEP",
@@ -1172,25 +1125,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19496,
+  "snapshots": 19501,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 3828,
     "clvRet": -0.0488,
-    "clvT": -34.06,
+    "clvT": -34.02,
     "clv": 0.18,
     "beat": 0.35,
     "still": 0.291
    },
    {
     "when": "6-24h",
-    "clvN": 551,
-    "clvRet": -0.0639,
-    "clvT": -23.57,
+    "clvN": 552,
+    "clvRet": -0.064,
+    "clvT": -23.62,
     "clv": -0.07,
     "beat": 0.163,
-    "still": 0.593
+    "still": 0.594
    },
    {
     "when": "1-6h",
@@ -4825,7 +4778,7 @@
    "tmRaw": 57,
    "flagged": "2026-11-09T18:42:58Z",
    "betTo": 61.5,
-   "close": 64.5,
+   "close": 63.5,
    "paper": true
   },
   {
@@ -5772,12 +5725,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T02:21:19Z",
+ "checked": "2026-11-15T02:34:34Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-15": {
-    "raw": 0.75,
+    "raw": 1.75,
     "scale": 1.0
    }
   }
