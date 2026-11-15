@@ -39,7 +39,7 @@ jobs:
   # full = the XPM/DPM pull too (every scheduled or manual run but the 22:40 one, and a following run once the last
   # clean pull is 20+ hours old)
   gate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       go: ${{ steps.g.outputs.go }}
       full: ${{ steps.g.outputs.full }}
@@ -76,7 +76,7 @@ jobs:
   update:
     needs: gate
     if: needs.gate.outputs.go == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       FULL: ${{ needs.gate.outputs.full }}
