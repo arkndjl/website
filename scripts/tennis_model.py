@@ -18,7 +18,8 @@ blend weights are a logistic regression on the last WIN seasons, and every score
 feed's no-vig close 2025+) is walk-forward, each season from weights fit on the seasons before it.
 
     python3 scripts/tennis_model.py --fit     # tune, walk-forward scores, the close -> data/tennis_fit.json
-    python3 scripts/tennis_model.py --blend   # the blend weights and scores again at the fit's rating parameters
+    python3 scripts/tennis_model.py --blend   # the blend weights, replacement Elo and scores again at the fit's rating
+                                              # parameters; then scripts/tennis_proj_research.py --refresh (after --fit too)
                                               # (--fit / --blend --until YYYYMMDD: nothing played after that day is read)
     python3 scripts/tennis_model.py           # build data/tennis.json (ARK Ranking, metrics, matches) with the fit params
 """
@@ -59,7 +60,7 @@ DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET':
            'V0': 0.10, 'Q': 0.00010, 'PHI': 0.35, 'MU_LR': 0.002,
            'KG': 0.0, 'GSW': 0.3, 'KLV_S': 1.0, 'KLV_G': 1.0, 'KLV_C': 0.85,
            'A': 1.0, 'B': 0.0, 'C': 0.0, 'G': 0.0, 'CR': 0.0, 'CA': 0.0, 'CH': 0.0, 'CN': 0.0, 'CM': 0.0,
-           'CP': 0.0, 'CW': 0.0}
+           'CP': 0.0, 'CW': 0.0, 'REPL_ATP': 2000.0, 'REPL_WTA': 2000.0}
 # KLV_C: an Elo update from a Challenger / WTA 125 match counts x0.85 (results a level down carry over to the tour a
 # little less than Elo assumes). Pre-registered grid {0.7, 0.85}, value picked on 2012-22: tour main-draw log loss
 # -0.6e-4 (t -2.1 by tournament), held out 2023-26 -1.0e-4 (t -3.0, Holm p .009 over 6 tests, 4/4 seasons), against
@@ -81,11 +82,12 @@ CTX = ('CR', 'CA', 'CH', 'CN', 'CM', 'CP', 'CW')
 #        Next 52 weeks' rPA (1,000+ points), held out by year: MSE 3.76 vs raw 4.37 (t -12.5) and the Kalman serve +
 #        return ratings 4.80 (t -19.1), 16/16 years
 #   WAR  wins minus P(a replacement player beats the same opponents): Elo with the surface blend, replacement = the
-#        median pre-match Elo of players ranked 101-150 at their matches 2005-26 (PA_REPL), every level, 52 weeks.
+#        median pre-match Elo of players ranked 101-150 at their matches since 2005 (repl_elo; REPL_ATP / REPL_WTA in
+#        the fit file, recomputed by every --fit / --blend since the level moves with the Elo schedule), every level,
+#        52 weeks.
 #        The next year-end ranking: Spearman +.12 over 52-week wins (t 4.3, 25/30 tour-years) and +.26 over W - L;
 #        the same year's ranking: no better than wins (t 0.9)
 PA_H, PA_K = 365, 300
-PA_REPL = {'atp': 2008.8, 'wta': 1993.4}
 CM_LAG = 7               # market memory in fits and backtests: closes from events started 7+ days before (Model cm_lag)
 WIN = 3                  # blend weights fit on the last WIN seasons (a 3-season window beat the expanding 2012+ fit 9/9
                          # seasons 2018-26 walk forward: favourites have run a little less sure in recent seasons)
@@ -328,7 +330,7 @@ class Model:
         d, tour, lv, sf, rd, bo, tid, w, l, score, ws, ls = r[:12]
         sw = self.P['SW']
         ew, el = self._e(w), self._e(l)
-        rr = PA_REPL.get(tour, 2000.0)
+        rr = self.P['REPL_' + tour.upper()]
         for pid, won, e in ((w, 1, el), (l, 0, ew)):
             ro = (1 - sw) * e[0] + sw * e[2][sf][0]
             p = 1 / (1 + 10 ** ((ro - rr) / 400))
@@ -442,10 +444,26 @@ class Model:
         if bo == 5: pe = bo5(pe)
         pp = self.pts_p(a, b, tour, sf, day, bo)
         gx = self.games_x(a, b, sf)
+        if not match:
+            # ratings alone: their own blend weights (A0 / B0 / G0), not the match blend's with the context terms at 0
+            # (the points-added term CP takes weight off the ratings there)
+            wa, wb, wg = (self.P.get(k + '0', self.P[k]) for k in 'ABG')
+            return sig(wa * logit(pe) + wb * logit(pp) + wg * gx * (1.25 if bo == 5 else 1.0)), pe, pp, gx, [0.0] * len(CTX)
         z = self.P['A'] * logit(pe) + self.P['B'] * logit(pp) + self.P['G'] * gx * (1.25 if bo == 5 else 1.0)
-        cx = self.ctx(a, b, day) if match else [0.0] * len(CTX)
+        cx = self.ctx(a, b, day)
         z += sum(self.P[k] * v for k, v in zip(CTX, cx))
         return sig(z), pe, pp, gx, cx
+
+    def set_ref(self, tour, act, day):
+        """the ARK reference opponent: the average of the top 50 of act by overall Elo, in every rating (Elo and its
+        surfaces, serve / return points, games). Returns its id"""
+        top = sorted(act, key=lambda p: -self.elo[p][0])[:50]
+        n = len(top)
+        ref = 'REF' + tour
+        self.elo[ref] = [sum(self.elo[p][0] for p in top) / n, 999, {s: [sum(self.elo[p][2][s][0] for p in top) / n, 999] for s in SURFS}]
+        self.pt[ref] = [sum(self._pt(p, day)[0] for p in top) / n, 0.0, sum(self._pt(p, day)[2] for p in top) / n, 0.0, day]
+        self.gr[ref] = [sum(self._g(p)[0] for p in top) / n, 999, {s: [sum(self._g(p)[2][s][0] for p in top) / n, 999] for s in SURFS}]
+        return ref
 
     def _mres(self, p, day, v):
         q = self.mres.setdefault(p, [])
@@ -587,6 +605,40 @@ def wf_probs(rec, P):
     return out
 
 
+def repl_elo(rows, P):
+    """the WAR replacement level under P's Elo schedule: by tour, the median pre-match Elo (surface blend) of players
+    officially ranked 101-150 with 20+ matches, every level"""
+    m = Model(P)
+    band = {'atp': [], 'wta': []}
+    sw = m.P['SW']
+    for r in rows:
+        for pid, rk in ((r[7], r[12]), (r[8], r[13])):
+            if rk and 101 <= rk <= 150:
+                e = m._e(pid)
+                if e[1] >= 20 and r[1] in band:
+                    band[r[1]].append((1 - sw) * e[0] + sw * e[2][r[3]][0])
+        m.elo_update(r[7], r[8], r[3], (m.P['RET'] if games(r[9])[2] else 1.0) *
+                     (m.P['KLV_S'] if r[2] == 'S' else m.P['KLV_G'] if r[2] == 'G' else m.P['KLV_C'] if r[2] == 'C' else 1.0))
+    return {'REPL_' + t.upper(): round(sorted(v)[len(v) // 2], 1) for t, v in band.items() if v}
+
+
+def live_weights(rows, P):
+    """what a fit adds once the rating parameters are set: the replacement Elo, the match blend (the last WIN seasons up
+    to the last match) and the ratings-only blend A0 / B0 / G0 on the same window (the ARK Ranking's weights)"""
+    P = dict(P, **repl_elo(rows, P))
+    # the market memory is measured against the ratings blend (Model.update), so the weights feed their own input:
+    # repeated until they stop moving (a new games or Elo scale under the last fit's weights is far off at first)
+    for _ in range(6):
+        _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100), cm_lag=CM_LAG)
+        win = window(rec, max(x[0][0] for x in rec) + 1)
+        W = fit_blend(win, ALL)
+        step = max(abs(W[k] - P[k]) for k in W)
+        P.update(W)
+        if step < 5e-4: break
+    P.update({k + '0': v for k, v in fit_blend(win, (0, 1, 2)).items() if k in 'ABG'})
+    return P
+
+
 def blend_ll(rec, W):
     return ll([blend_p(W, x) for x in rec])
 
@@ -623,9 +675,7 @@ def fit(rows):
     stage('points', {'PHI': [0.35, 0.5, 0.7], 'V0': [0.03, 0.05, 0.10], 'Q': [0.0001, 0.0003, 0.001]}, (0, 1))
     stage('games', {'KG': [1.0, 1.5, 2.0, 3.0], 'GSW': [0.0, 0.3, 0.5]}, (0, 1, 2))
     # the blend weights live: the last WIN seasons up to the last match (walk-forward scores in score_all)
-    _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100), cm_lag=CM_LAG)
-    last = max(x[0][0] for x in rec)
-    P.update(fit_blend(window(rec, last + 1), ALL))
+    P = live_weights(rows, P)
     out = {'params': P, 'log': log,
            'failed': ['K by level (ITF x0.7 / x1.2, Grand Slam x1.2): tune .58621 / .58600 / .58601 vs .58601, held no change',
                       'Oct 28 2026, each beside the rest (held 2023-26 log loss x1e4, t by tournament): surface-specific '
@@ -737,6 +787,57 @@ def surface_mix(rows, tour, since):
         if r[0] >= since and r[1] == tour and r[2] in TOUR_LV and not is_qual(r[4]): c[r[3]] += 1
     t = sum(c.values()) or 1
     return {s: round(v / t, 3) for s, v in c.items()}
+
+
+def ark_board(m, rows, tour, today):
+    """the ARK Ranking's inputs on a day: (the board's players: 15+ matches, one in the last 183 days; the tour's
+    52-week surface mix; the reference player's id; {player: (ARK, {surface: chance})}). ARK = the ratings' chance of
+    beating the average top-50 player, best of three, over the surface mix"""
+    tday = (today - DAY0).days
+    act = [p for p, d in m.last.items() if p[0] == tour[0] and tday - d <= 183 and m.nm.get(p, 0) >= 15]
+    mix = surface_mix(rows, tour, int((today - dt.timedelta(days=364)).strftime('%Y%m%d')))
+    ref = m.set_ref(tour, act, tday)
+    val = {}
+    for p in act:
+        pv = {s: m.predict(p, ref, tour, s, tday, 3, match=False)[0] for s in SURFS}
+        val[p] = (sum(mix[s] * pv[s] for s in SURFS), pv)
+    return act, mix, ref, val
+
+
+def model_sig(P):
+    """changes whenever a fit changes the ratings or the ARK weights (the ranking's scale moves with them)"""
+    import hashlib
+    return hashlib.sha1(json.dumps({k: P[k] for k in sorted(P)}, sort_keys=True).encode()).hexdigest()[:10]
+
+
+def rebase_moves(rows, P, old):
+    """after a refit: last run's ranking history (tours.<tour>.mvHist, scripts/rank_moves.py) again under the new
+    parameters, each snapshot from the matches played by its day, so the week's moves compare like with like
+    instead of showing the change of scale"""
+    import copy
+    dates = sorted({k for t in old.get('tours', {}).values() for k in (t.get('mvHist') or {})})
+    if not dates: return
+    start = int((dt.date.fromisoformat(dates[0]) - dt.timedelta(days=28)).strftime('%Y%m%d'))
+    m = Model(P)
+    mark_two_week(rows)
+    i = 0
+    while i < len(rows) and rows[i][0] < start:
+        m.update(rows[i]); i += 1
+    new = {}
+    for k in dates:
+        day = dt.date.fromisoformat(k)
+        dn = (day - DAY0).days
+        mm = copy.deepcopy(m)
+        part = [r for r in rows[i:] if dnum(r[0], r[4], r[2], r[6]) <= dn]
+        for r in part: mm.update(r)
+        seen = [r for r in rows[:i] if r[0] >= start - 10000] + part
+        for tour in old['tours']:
+            val = ark_board(mm, seen, tour, day)[3]
+            top = sorted(val, key=lambda p: -val[p][0])[:TOP]
+            new.setdefault(tour, {})[k] = {p: [j + 1, round(val[p][0], 4)] for j, p in enumerate(top)}
+    for tour, t in old['tours'].items():
+        t['mvHist'] = {k: new[tour][k] for k in (t.get('mvHist') or {})}
+    print('ranking history rebased to the new fit:', ', '.join(dates))
 
 
 def raw52(rows, since):
@@ -908,20 +1009,12 @@ def build(rows, players, tn):
     shown = set()
     allrk = {}
     for tour in ('atp', 'wta'):
-        t0 = tour[0]
-        act = [p for p, d in m.last.items() if p[0] == t0 and tday - d <= 183 and m.nm.get(p, 0) >= 15]
-        mix = surface_mix(rows, tour, since)
-        # the reference opponent: the average of the top 50 by overall Elo
-        top50 = sorted(act, key=lambda p: -m.elo[p][0])[:50]
-        ref = 'REF' + tour
-        m.elo[ref] = [sum(m.elo[p][0] for p in top50) / 50, 999, {s: [sum(m.elo[p][2][s][0] for p in top50) / 50, 999] for s in SURFS}]
-        m.pt[ref] = [sum(m._pt(p, tday)[0] for p in top50) / 50, 0.0, sum(m._pt(p, tday)[2] for p in top50) / 50, 0.0, tday]
+        act, mix, ref, val = ark_board(m, rows, tour, today)
         rowsout = []
         mu = m.mu_of(tour, 'H')
         for p in act:
             e = m.elo[p]
-            pv = {s: m.predict(p, ref, tour, s, tday, 3, match=False)[0] for s in SURFS}
-            ark = sum(mix[s] * pv[s] for s in SURFS)
+            ark, pv = val[p]
             x = m._pt(p, tday)
             b = players.get(p, {})
             rw = raw.get(p, {})
@@ -1100,6 +1193,9 @@ def build(rows, players, tn):
             _old = json.load(open(OUT))
         except (OSError, ValueError):
             _old = None
+        out['mvModel'] = model_sig(P)
+        if _old and _old.get('mvModel') != out['mvModel']:
+            rebase_moves(rows, P, _old)
         rank_moves.tennis_apply(out, _old)
     except Exception as e:  # noqa: BLE001
         print('rank moves failed:', e)
@@ -1112,9 +1208,7 @@ def blend_refit(rows):
     """--blend: the live blend weights and the scores again at the fit's rating parameters (the fit's search stages
     use only the ratings, not the context terms, so this is the tail of --fit)"""
     out = json.load(open(FIT))
-    P = dict(DEFAULT, **out['params'])
-    _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100), cm_lag=CM_LAG)
-    P.update(fit_blend(window(rec, max(x[0][0] for x in rec) + 1), ALL))
+    P = live_weights(rows, dict(DEFAULT, **out['params']))
     out['params'] = P
     out['fit_at'] = dt.date.today().isoformat()
     out.update(score_all(rows, P))

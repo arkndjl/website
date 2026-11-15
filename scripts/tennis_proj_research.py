@@ -10,8 +10,8 @@ Needs scripts/.cache/tennis/hist.json.gz + players.json.gz (python3 scripts/tenn
 
 Snapshots: the end of every quarter 2006-25 (Mar / Jun / Sep / Dec), one pass with the live parameters
 (data/tennis_fit.json), each tour's board universe (15+ matches, one in the last 183 days), each row read the way
-build() reads it: overall Elo, ARK (the blend's win chance against the average top-50 player by Elo over the last-52-week
-tour-level surface mix; games rating against 0, like the live build), age from the bios, career matches (every level),
+build() reads it: overall Elo, ARK (the ratings' win chance against the average top-50 player by Elo over the last-52-week
+tour-level surface mix, Model.set_ref), age from the bios, career matches (every level),
 matches in the last 52 weeks, the official rank on the player's last match before the snapshot (unranked = none).
 Target: the same player's logit ARK (and Elo over the tour's top-50 mean, since the Elo pool's level drifts) h = 12 / 24
 / 36 months later; rows = the top 300 by ARK at the snapshot (the page shows 200) still on the board h months on
@@ -35,6 +35,11 @@ Results (Nov 3 2026), logit ARK RMSE flatCA -> proj, t by player, years won:
     Elo (over top-50 mean) 12 mo ATP 90.6 -> 84.9 (t -15.8, 14/19), WTA flat 98.2 -> 94.6 (-13.6, 15/19); slopes .99-1.0
     age alone barely beats elo (regression to the mean) at 12 mo (ATP t -.1, WTA +3.4: fails); volume + rank carry it
     (proj vs age t -11.2 ATP, -5.3 WTA). projX: RMSE no better, years 10/19: not kept. Kept: proj, every tour / horizon.
+Rerun on the refit ratings (K = 250 / (n + 20) ^ .45, quarterfinals in the fit, the reference player's games rating at the
+top-50 mean, ratings-only ARK weights), same rule:
+    ATP 12 mo .497 -> .461 (t -21.5, 15/19), 24 mo .630 -> .567 (-20.5, 17/18), 36 mo .745 -> .648 (-19.6, 17/17)
+    WTA 12 mo flat .498 -> .478 (t -18.6, 14/19), 24 mo .643 -> .600 (-16.1, 15/18), 36 mo .751 -> .688 (-16.4, 14/17)
+    Elo 12 mo ATP 63.5 -> 59.7 (t -14.9 but 9/19 years: not kept, no projected Elo shown), WTA 71.4 -> 69.2 (-13.2, 14/19)
 """
 import gzip
 import json
@@ -88,10 +93,7 @@ def snaps():
                 if t_ == tour: c[s] += 1
             tt = sum(c.values()) or 1
             mix = {s: c[s] / tt for s in TM.SURFS}
-            top = sorted(act, key=lambda p: -m.elo[p][0])[:50]
-            ref = 'REF' + tour
-            m.elo[ref] = [sum(m.elo[p][0] for p in top) / 50, 999, {s: [sum(m.elo[p][2][s][0] for p in top) / 50, 999] for s in TM.SURFS}]
-            m.pt[ref] = [sum(m._pt(p, day)[0] for p in top) / 50, 0.0, sum(m._pt(p, day)[2] for p in top) / 50, 0.0, day]
+            ref = m.set_ref(tour, act, day)
             for p in act:
                 ark = sum(mix[s] * m.predict(p, ref, tour, s, day, 3, match=False)[0] for s in TM.SURFS)
                 q = days[p]

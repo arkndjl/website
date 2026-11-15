@@ -203,11 +203,7 @@ def pro_rows():
                 continue
             t = sum(mix[tour].values()) or 1
             mx = {s: mix[tour][s] / t for s in TM.SURFS}
-            top = sorted(act, key=lambda p: -m.elo[p][0])[:50]
-            ref = 'REF' + tour
-            m.elo[ref] = [sum(m.elo[p][0] for p in top) / 50, 999, {s: [sum(m.elo[p][2][s][0] for p in top) / 50, 999] for s in TM.SURFS}]
-            m.pt[ref] = [sum(m._pt(p, day)[0] for p in top) / 50, 0.0, sum(m._pt(p, day)[2] for p in top) / 50, 0.0, day]
-            m.gr[ref] = [sum(m._g(p)[0] for p in top) / 50, 999, {s: [sum(m._g(p)[2][s][0] for p in top) / 50, 999] for s in TM.SURFS}]
+            ref = m.set_ref(tour, act, day)
             for p in act:
                 e = m.elo[p]
                 ark = sum(mx[s] * m.predict(p, ref, tour, s, day, 3, match=False)[0] for s in TM.SURFS)
