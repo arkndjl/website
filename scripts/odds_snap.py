@@ -142,6 +142,7 @@ def snap(sport, now):
     try:
         import polymarket
         nv = polymarket.book(sport, now)
+        print(f'{sport}: {polymarket.snap_ladder(sport, nv, now)} Polymarket ladder rows')
     except Exception as e:
         print(f'{sport}: Polymarket prices failed ({e})')
         nv = {}

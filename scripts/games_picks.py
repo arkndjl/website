@@ -476,7 +476,7 @@ def fair_gap(side, line, edge, fair, cap=None):
 def du_view(sport, mk, c, o, gap=None, cal=None, mkt=None):
     """(win chance, expected return) the Dengler Units stake is sized on, rounded"""
     import units as DU
-    if mk == 'ml':
+    if mk == 'ml' or cal:
         if not cal:
             return None, None
         w, _, l = cal[0]
@@ -512,8 +512,8 @@ def stake_du(sport, mk, c, o, n=None, gap=None, cal=None, mkt=None):
     """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate;
     cal: a moneyline's calibrated (chances, u) from ml_cal"""
     import units as DU
-    if mk == 'ml':
-        u = DU.stake_cal(sport, cal[0], cal[1], o, n) if cal else 0.0
+    if mk == 'ml' or cal:
+        u = DU.stake_cal(sport, cal[0], cal[1], o, n, mk='spread' if mk == 'ml' else mk) if cal else 0.0
     else:
         u = DU.stake(sport, mk, c, o, n, gap=gap, mkt=mkt)      # mkt: the market's own chances at the rung (lean())
     import picks_oos
@@ -524,6 +524,33 @@ def ml_cal(sport, side, line, gap, k):
     """the moneyline's calibrated chances and shrink: priced at the close the spread's calibrated edge implies"""
     import units as DU
     return DU.ml_cal(sport, side, line, gap, k, lambda mk, close: C.chances(sport, mk, side, line, close))
+
+
+def rung_cal(sport, mk, side, line, gap, k, rung):
+    """(calibrated chances at a ladder rung, shrink u): the pick's calibrated edge at its main rung `line` becomes the
+    close move t that gives it (as units.ml_cal does for the moneyline), and the rung is priced at that close. Polymarket
+    charges .095 c(1 - c) a contract on every rung, so another rung of the same pick can grow the bankroll more than the
+    main one (Nov 15 2026 pre-registered test, /mnt/project-files/polymarket-edges-nov15: close-judged growth t 10.9 over
+    36,193 held games, flat ROI +0.6 pts a game)"""
+    import units as DU
+    p = DU.params(sport, mk)
+    B0 = dec(DU.BASE) - 1
+    sgn = 1 if side in ('home', 'over') else -1
+    r = lambda t: (lambda c: c[0] * B0 - c[2])(C.chances(sport, mk, side, line, line + sgn * t))
+    ev0 = r(k * gap)
+    if ev0 <= 0:
+        return None
+    e0, u = DU.edge(p, ev0, gap)
+    if e0 <= 0 or u <= 0:
+        return None
+    lo, hi = 0.0, k * gap
+    for _ in range(40):
+        t = (lo + hi) / 2
+        lo, hi = (t, hi) if r(t) < e0 else (lo, t)
+    return C.chances(sport, mk, side, rung, line + sgn * (lo + hi) / 2), u
+
+
+RUNG_PTS = 6.0                    # ladder rungs considered: within this many points of the main line
 
 
 def growth(o):
@@ -1043,6 +1070,7 @@ def dk_prices(sport, games, now):
         n += 1
         g['book'] = src.get('L') or src.get('T') or src.get('mlH')
         g['bks'] = src                          # each market's venue: a spread on Polymarket, a total on DraftKings
+        g['lad'] = c.get('lad') or {}           # Polymarket's other rungs of each market it priced (rung picks)
         by[g['book']] = by.get(g['book'], 0) + 1
         for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA'):
             if c.get(k) is not None:
@@ -1157,12 +1185,24 @@ def rule_options(sport, g, R, segs=()):
             o, obk = best_of(g, 'mlH' if side == 'home' else 'mlA', price(g.get('mlH') if side == 'home' else g.get('mlA')))
             if o is not None and abs(o) <= ML_CAP:
                 inst.append(('ml', None, o, True, obk))
+        # Polymarket's other rungs of the same market (dk_prices: g['lad'], all-in after the fee)
+        for x, a, b in (g.get('lad') or {}).get('L' if mk == 'spread' else 'T') or []:
+            o = a if side in ('home', 'over') else b
+            if o is not None and x != line and abs(x - line) <= RUNG_PTS and abs(o) <= ML_CAP:
+                inst.append((mk, x, o, 'rung', 'poly'))
         # the spread or total is priced off the market's fair line, not the rung (lean()): the chance and the stake
         # then follow the rung's own price lean. The cut X still reads the gap from the rung
         fair, mkt = lean(sport, g, mk, side, line)
         gf = fair_gap(side, line, edge, fair, cap)
         for imk, iline, o, ml, ibk in inst:
-            c = calib(sport, mk, side, line, sized(edge, cap), rule['k'], ml) if ml or fair is None else calib(sport, mk, side, line, gf, rule['k'], fair=fair)
+            rg = ml == 'rung'
+            if rg:
+                cal = rung_cal(sport, mk, side, line, sized(edge, cap), rule['k'], iline)
+                if not cal:
+                    continue
+                c, ml = cal[0], False
+            else:
+                c = calib(sport, mk, side, line, sized(edge, cap), rule['k'], ml) if ml or fair is None else calib(sport, mk, side, line, gf, rule['k'], fair=fair)
             if c is None:
                 continue
             w, _, l = c
@@ -1171,8 +1211,9 @@ def rule_options(sport, g, R, segs=()):
                 if imk == mk and fair is not None:
                     near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
-            cal = ml_cal(sport, side, line, sized(edge, cap), rule['k']) if ml else None
-            gap, mk_ = (sized(edge, cap), None) if ml else (gf, mkt)
+            if not rg:
+                cal = ml_cal(sport, side, line, sized(edge, cap), rule['k']) if ml else None
+            gap, mk_ = (sized(edge, cap), None) if ml or rg else (gf, mkt)
             u = stake_du(sport, imk, c, o, gap=gap, cal=cal, mkt=mk_)
             if u <= 0:
                 # no calibrated edge at this price (Oct 27 2026): a DraftKings fallback at -110 needs more than Novig
@@ -1183,7 +1224,8 @@ def rule_options(sport, g, R, segs=()):
                          **({'bk': ibk} if ibk else {}),
                          'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
                          'units': u, '_c': c, '_cal': cal, '_gap': gap, '_mkt': mk_,
-                         **({'fair': round(fair, 2)} if fair is not None and not ml else {}),
+                         **({'fair': round(fair, 2)} if fair is not None and not ml and not rg else {}),
+                         **({'lineM': line} if rg else {}),
                          **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
     return opts, near
 
@@ -1192,7 +1234,7 @@ def flag_line(e):
     """the line a pick was flagged at, as the market's own number (home margin or total): a moneyline's is the spread
     line beside it (lineL; older picks rebuilt from the model and the gap they were flagged with)"""
     if e['mk'] != 'ml':
-        return e.get('line')
+        return e['lineM'] if e.get('lineM') is not None else e.get('line')
     if e.get('lineL') is not None:
         return e['lineL']
     if e.get('m') is None or e.get('edge') is None:
@@ -1340,10 +1382,11 @@ def live(sport):
         # every option that clears now, so an open pick's Now cell reads its own market even when another is best
         for o in opts:
             o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], o['_gap'], o.get('_cal'), o.get('_mkt')))
-            if o['mk'] != 'ml':
+            if o['mk'] != 'ml' and not o.get('_cal'):
                 o['_cw'] = DU.priced(DU.params(sport, o['mk']), o['_c'], o['price'], o['_gap'], mkt=o.get('_mkt'))[0]
                 o['_cw'] = (o['_cw'], o['_c'][1], 1 - o['_c'][1] - o['_cw'])
-            cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
+            if 'lineM' not in o:
+                cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
         best = {}
         for o in opts:
             if fam(o['mk']) not in best or (growth(o), o['ev']) > (growth(best[fam(o['mk'])]), best[fam(o['mk'])]['ev']):
@@ -1356,7 +1399,7 @@ def live(sport):
             if (g['id'], fam(pick['mk'])) not in seen and not stale:
                 seen.add((g['id'], fam(pick['mk'])))
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair', 'bk', 'nv') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz', 'fair', 'bk', 'nv', 'lineM') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}),
                             **({'lineL': g['L']} if pick['mk'] == 'ml' else {}), 'flagged': stamp, **({'paper': True} if paper else {})})
@@ -1388,20 +1431,25 @@ def live(sport):
         # at the fair line it was flagged with (lean(); a pick from before it was kept has none: the rung as a coin)
         fair = e.get('fair')
         gf = szd(e) if fair is None else fair_gap(e['side'], e['line'], e['edge'], fair, R['_cap'].get(e['mk']))
-        c = calib(sport, e['mk'], e['side'], e['line'], gf, k_, fair=fair)
-        mkt = None if fair is None else lean_at(sport, e['mk'], e['side'], e['line'], fair)
+        cal = None
+        if e.get('lineM') is not None:          # a ladder rung: calibrated off its main line (rung_cal)
+            cal = rung_cal(sport, e['mk'], e['side'], e['lineM'], szd(e), k_, e['line'])
+            c, gf, mkt = (cal[0] if cal else None), szd(e), None
+        else:
+            c = calib(sport, e['mk'], e['side'], e['line'], gf, k_, fair=fair)
+            mkt = None if fair is None else lean_at(sport, e['mk'], e['side'], e['line'], fair)
         if c is not None:
-            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, gf, mkt=mkt))
+            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, gf, cal=cal, mkt=mkt))
             e.pop('unitsRaw', None)     # a fresh stake: the night cap (scripts/night_cap.py) rescales it after the write
             e.pop('unitsCap', None)
-            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], gf, mkt=mkt)
+            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], gf, cal=cal, mkt=mkt)
             e['p'], e['ev'] = round(c[0], 3), round(c[0] * (dec(e['price']) - 1) - c[2], 3)
             # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
             # against the bet): past it, the line has moved through the edge
             mm = g.get('tm') if e['mk'] == 'total' else g.get('m')
             if mm is not None:
                 lo, hi = math.floor((mm - x_) * 2) / 2, math.ceil((mm + x_) * 2) / 2
-                e['betTo'] = lo if e['side'] in ('over', 'home') else hi
+                e['betTo'] = (lo if e['side'] in ('over', 'home') else hi) + ((e['line'] - e['lineM']) if e.get('lineM') is not None else 0)
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log + wlog:
         g = G.get(e['id'])
