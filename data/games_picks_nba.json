@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T23:34:22Z",
+ "asof": "2026-11-15T23:36:43Z",
  "recenter": {
-  "2026-11-15": 1.71
+  "2026-11-15": 1.7
  },
  "monitor": {
   "clocks": {
@@ -417,13 +417,13 @@
    "kick": "2026-11-16T00:00:00Z",
    "home": "WSH",
    "away": "HOU",
-   "mk": "total",
-   "side": "over",
-   "line": 223.5,
+   "mk": "spread",
+   "side": "home",
+   "line": -8.5,
    "price": -114.0,
-   "edge": 3.7,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: over)",
+   "edge": 2.9,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
    "m": -5.6,
    "tm": 227.2
   },
@@ -462,11 +462,11 @@
  ],
  "games": {
   "401909991": {
-   "mk": "total",
-   "side": "over",
-   "line": 223.5,
+   "mk": "spread",
+   "side": "home",
+   "line": -8.5,
    "price": -114.0,
-   "edge": 3.7,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "WSH",
@@ -550,7 +550,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4414,
+  "snapshots": 4415,
   "buckets": [
    {
     "when": "24h+",
@@ -581,12 +581,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 57,
+    "clvN": 58,
     "clvRet": -0.049,
-    "clvT": -14.91,
+    "clvT": -15.15,
     "clv": -0.02,
-    "beat": 0.053,
-    "still": 0.877
+    "beat": 0.052,
+    "still": 0.879
    }
   ]
  },
@@ -7056,7 +7056,7 @@
    "tmRaw": 229.2,
    "flagged": "2026-11-15T02:08:44Z",
    "betTo": 224.5,
-   "close": 223.5,
+   "close": 224.5,
    "withdrawn": "2026-11-15T17:36:16Z"
   },
   {
@@ -7180,7 +7180,7 @@
    "withdrawn": "2026-11-15T17:36:16Z"
   }
  ],
- "checked": "2026-11-15T23:34:22Z",
+ "checked": "2026-11-15T23:36:43Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
