@@ -127,7 +127,7 @@ jobs:
             --rebuild data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json data/paper_book.json data/picks_oos.json data/cbb_games.json data/cbb_injuries.json \
             --regen "GITHUB_TOKEN= python3 scripts/picks_refresh.py; python3 scripts/paper_book.py; python3 scripts/picks_oos.py" \
             -- scripts/data/odds_dense scripts/data/rotowire_news.json scripts/data/rotowire_moves data/roster_audit.json data/transactions data/paper_book.json data/picks_oos.json data/ticker.json data/standings.json \
-               scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_tp data/novig_ladder_test.json data/novig_paper.json \
+               scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_pm_ladder scripts/data/odds_tp data/novig_ladder_test.json data/novig_paper.json \
                scripts/data/props scripts/data/ledger/derivs_b2_result.json data/props_paper.json data/props_paper_nfl.json data/props_paper_nhl.json data/games_picks_nflprops.json scripts/data/refs \
                data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds \
                data/cbb_games.json data/cbb_injuries.json scripts/data/cbb_injury_log

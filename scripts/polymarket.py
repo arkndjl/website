@@ -39,6 +39,7 @@ MAX_EVENTS = 400
 # full-game markets only: an event also lists halves, quarters, periods and team totals under the same SPREAD/TOTAL
 # types (sportsMarketType basketball_team_first_half_spread, football_team_points_full_game_total, ...)
 FULL = ('_full_game_spread', '_full_game_total', '_full_game_winner')
+LAD_PTS = 6.0                   # ladder rungs kept around the main line (games_picks prices picks on any of them)
 HOLD = 0.15                     # a main rung's all-in hold at most this (a 50/50 side after the fee holds ~5-6%)
 UA = 'arkndjl.net arkboard (odds research)'
 FEE = 0.095
@@ -233,14 +234,20 @@ def main(g, th, ta):
         mh = 1 - g['mid'][('sp', ta, -h)] if mh is None and ('sp', ta, -h) in g['mid'] else mh
         if mh is not None and c + ca - 1 <= HOLD:
             sp.append((abs(mh - .5), c + ca, h, c, ca))
+    lad = {}
     if sp:
         _, _, h, c, ca = min(sp)
         px['L'], px['oH'], px['oA'] = -h, american(c), american(ca)
+        # every two-sided rung within LAD_PTS of the main one: [home margin, home all-in, away all-in] (American)
+        lad['L'] = sorted([-r[2], american(r[3]), american(r[4])] for r in sp if abs(r[2] - h) <= LAD_PTS and r[0] < .45)
     tot = [(abs(g['mid'][('tot', x)] - .5), c + g['tot'][(False, x)], x, c, g['tot'][(False, x)])
            for (over, x), c in g['tot'].items() if over and (False, x) in g['tot'] and ('tot', x) in g['mid'] and c + g['tot'][(False, x)] - 1 <= HOLD]
     if tot:
         _, _, x, co, cu = min(tot)
         px['T'], px['oO'], px['oU'] = x, american(co), american(cu)
+        lad['T'] = sorted([r[2], american(r[3]), american(r[4])] for r in tot if abs(r[2] - x) <= LAD_PTS and r[0] < .45)
+    if lad:
+        px['lad'] = lad
     if th in g['ml'] and ta in g['ml'] and g['ml'][th] + g['ml'][ta] - 1 <= HOLD:
         px['mlH'], px['mlA'] = american(g['ml'][th]), american(g['ml'][ta])
     return px
@@ -257,7 +264,12 @@ def lines(sport, now=None, espn=None):
     except Exception as ex:
         print(f'polymarket {sport}: failed ({ex})')
         return {}
-    return {str(gid): main(pm[i], th, ta) for i, (gid, th, ta) in ids.items() if main(pm[i], th, ta)}
+    out = {}
+    for i, (gid, th, ta) in ids.items():
+        px = main(pm[i], th, ta)
+        if any(k in px for k in ('L', 'T', 'mlH')):
+            out[str(gid)] = px
+    return out
 
 
 _BOOK = {}
@@ -292,6 +304,8 @@ def book(sport, now=None, espn=None):
             r.update({k: q.get(k) for k in keys if q})
             if q is n and n and p:
                 r.setdefault('fill', []).append(keys[0])
+            if q is p and keys[0] in (p.get('lad') or {}):
+                r.setdefault('lad', {})[keys[0]] = p['lad'][keys[0]]
         out[gid] = r
     k = sum(1 for r in out.values() if r['src'] == 'poly')
     print(f'{sport}: {k} games on Polymarket, {len(out) - k} on Novig only')
@@ -496,6 +510,31 @@ def props(sport='nba', types=None, espn=None, now=None):
     return out
 
 
+LADDER = os.path.join(HERE, 'data', 'odds_pm_ladder')
+
+
+def snap_ladder(sport, bk, now):
+    """scripts/data/odds_pm_ladder/<sport>-<ym>.jsonl: a game's Polymarket ladder {L: [[home margin, home, away]], T:
+    [[total, over, under]]} (all-in American) whenever it changes, so the rung test can be re-run on real rungs and
+    their closes (pre-registered Nov 15 2026: 300 graded picks a sport)"""
+    last = {}
+    if os.path.isdir(LADDER):
+        for fn in sorted(os.listdir(LADDER)):
+            if fn.startswith(sport + '-') and fn.endswith('.jsonl'):
+                for x in open(os.path.join(LADDER, fn)):
+                    if x.strip():
+                        r = json.loads(x)
+                        last[r['id']] = r['lad']
+    stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    rows = [{'t': stamp, 'id': gid, 'lad': r['lad']} for gid, r in bk.items() if r.get('lad') and last.get(gid) != r['lad']]
+    if rows:
+        os.makedirs(LADDER, exist_ok=True)
+        with open(os.path.join(LADDER, f'{sport}-{now:%Y-%m}.jsonl'), 'a') as f:
+            for r in rows:
+                f.write(json.dumps(r, separators=(',', ':')) + '\n')
+    return len(rows)
+
+
 GROUPS = (('L', 'oH', 'oA'), ('T', 'oO', 'oU'), ('mlH', 'mlA'))
 
 
@@ -508,6 +547,8 @@ def merge(bk, dk):
             if all(row.get(k) is not None for k in keys):
                 out.update({k: row[k] for k in keys})
                 src[keys[0]] = s or ('novig' if keys[0] in (row.get('fill') or ()) else row.get('src', 'poly'))
+                if src[keys[0]] == 'poly' and keys[0] in ((row.get('lad') or {}) if s is None else {}):
+                    out.setdefault('lad', {})[keys[0]] = row['lad'][keys[0]]
                 break
     return out, src
 

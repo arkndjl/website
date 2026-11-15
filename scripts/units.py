@@ -193,9 +193,9 @@ def ml_cal(sport, side, line, gap, k, chances):
     return chances('ml', line + sgn * (lo + hi) / 2), u
 
 
-def stake_cal(sport, c, u, o, n=None):
-    """stake_ like stake(), on chances that are already calibrated (ml_cal) with their shrink u"""
-    p = params(sport, 'spread')
+def stake_cal(sport, c, u, o, n=None, mk='spread'):
+    """stake_ like stake(), on chances that are already calibrated (ml_cal, games_picks.rung_cal) with their shrink u"""
+    p = params(sport, mk)
     w, pu, l = c
     B = dec(o) - 1
     ev = w * B - l
