@@ -68,6 +68,21 @@ export function merge(lines, feed, quote, now, horizon = 3 * 86400) {
   }
   return { lines: [...by.values()], stats };
 }
+// the Advanced regular season that sits above a Main group: same season and region, whatever the group word or
+// prefix ("S59 NA Main A - Regular Season" -> "S59 NA Advanced - Regular Season", "ESEA S59 NA Advanced Central -
+// Regular Season", "ESEA Season 59 North America Advanced Regular Season")
+export function advKey(mine) {
+  const m = /\bS(?:eason)?\s*0*(\d+)\s+(.*?)\s*\bMain\b/i.exec(String(mine || ''));
+  return m ? { season: +m[1], region: m[2].trim().toLowerCase() } : null;
+}
+const REGION = { na: ['na', 'north america'], eu: ['eu', 'europe'], sa: ['sa', 'south america'], oce: ['oce', 'oceania', 'au', 'anz'] };
+export function isAdvanced(name, key) {
+  const nm = String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if (!key || !/\badvanced\b/.test(nm) || !/\bregular\b/.test(nm)) return false;
+  if (!new RegExp(`\\bs(?:eason)? ?0*${key.season}\\b`).test(nm)) return false;
+  const want = REGION[key.region] || (key.region ? [key.region] : []);
+  return !want.length || want.some(w => new RegExp(`\\b${w.replace(/[^a-z0-9]+/g, ' ')}\\b`).test(nm));
+}
 // a line is unchanged between runs when only `logged` moved: keep the old stamp so the file stays put
 export function settle(prev, next) {
   const old = new Map(prev.map(l => [l.id, l]));
@@ -97,6 +112,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   checks.push(['no rating, no price', price({ elo: 1, rwa: null }, { elo: 1, rwa: 0 }, W) === null]);
   const s = settle(L, merge(L, [mk('m1')], q, 1200).lines);
   checks.push(['an unchanged line keeps its stamp', s[0].logged === 1000]);
+  const K = advKey('S59 NA Main A - Regular Season');
+  checks.push(['advanced key from the Main name', K && K.season === 59 && K.region === 'na' && advKey('ESEA S54 NA Main Central - Regular Season').season === 54 && advKey('x') === null]);
+  checks.push(['advanced names match', ['S59 NA Advanced - Regular Season', 'S59 NA Advanced A - Regular Season', 'ESEA S59 NA Advanced Central - Regular Season',
+    'ESEA Season 59 North America Advanced: Regular Season', 's59 na advanced regular season'].every(x => isAdvanced(x, K))]);
+  checks.push(['other seasons, regions, stages and divisions do not', !['S58 NA Advanced - Regular Season', 'S59 EU Advanced - Regular Season', 'S59 NA Advanced - Playoffs',
+    'S59 NA Main B - Regular Season', 'S590 NA Advanced - Regular Season', 'S59 SA Advanced - Regular Season', ''].some(x => isAdvanced(x, K))]);
   let bad = 0; for (const [n, ok] of checks) if (!ok) { bad++; console.log('FAIL', n); }
   console.log(bad ? `${bad} failed` : `esea_league_log: ${checks.length} checks ok`);
   process.exit(bad ? 1 : 0);
