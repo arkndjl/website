@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-15T00:25Z",
+ "asof": "2026-11-15T00:28Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -311,10 +311,10 @@
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 6,
-     "rows": 2136
+     "rows": 2142
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 16,
+     "flags": 15,
      "rows": 640
     },
     "static/data/nfl-war.json": {
@@ -372,24 +372,6 @@
      "site": "CIN"
     },
     {
-     "d": "2026-11-14",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "released",
-     "head": "Let go by Packers",
-     "kind": null,
-     "move": {
-      "d": "2026-10-24",
-      "head": "Signs with active roster",
-      "kind": "sign"
-     },
-     "pid": "18877",
-     "player": "Coleman Owen",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "GB"
-    },
-    {
      "d": "2026-09-15",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -424,6 +406,24 @@
      "pos": "CB",
      "rotowire": "TEN",
      "site": "KC"
+    },
+    {
+     "d": "2026-08-30",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Released by Seattle",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-30",
+      "head": "Released by Seattle",
+      "kind": "waived"
+     },
+     "pid": "14389",
+     "player": "Trevon Diggs",
+     "pos": "CB",
+     "rotowire": "FA",
+     "site": "SEA"
     },
     {
      "d": "2026-08-31",
@@ -4080,24 +4080,6 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-14",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Let go by Packers",
-     "kind": null,
-     "move": {
-      "d": "2026-10-24",
-      "head": "Signs with active roster",
-      "kind": "sign"
-     },
-     "pid": "18877",
-     "player": "Coleman Owen",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "GB"
-    },
-    {
      "d": "2026-11-11",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4136,7 +4118,7 @@
    ],
    "joined": 0,
    "players": 2259,
-   "rows": 8013
+   "rows": 8019
   },
   "nhl": {
    "by_file": {
