@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-15T22:09Z",
+ "asof": "2026-11-15T23:25Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 873,
+   "players": 875,
    "rows": 5288
   },
   "cfb": {
@@ -315,7 +315,7 @@
     },
     "static/data/nfl-fantasy.json": {
      "flags": 15,
-     "rows": 640
+     "rows": 638
     },
     "static/data/nfl-war.json": {
      "flags": 72,
@@ -3936,18 +3936,18 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Back to practice squad",
+     "head": "Reverts to practice squad",
      "kind": "practice",
      "move": {
       "d": "2026-11-09",
-      "head": "Back to practice squad",
+      "head": "Reverts to practice squad",
       "kind": "practice"
      },
-     "pid": "17465",
-     "player": "Carlos Washington",
+     "pid": "18531",
+     "player": "Phil Mafah",
      "pos": "RB",
      "rotowire": "FA",
-     "site": "MIA"
+     "site": "NYG"
     },
     {
      "d": "2026-11-09",
@@ -3961,11 +3961,11 @@
       "head": "Reverts to practice squad",
       "kind": "practice"
      },
-     "pid": "18531",
-     "player": "Phil Mafah",
-     "pos": "RB",
+     "pid": "13418",
+     "player": "KhaDarel Hodge",
+     "pos": "WR",
      "rotowire": "FA",
-     "site": "NYG"
+     "site": "SF"
     },
     {
      "d": "2026-11-12",
@@ -3990,24 +3990,6 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "13418",
-     "player": "KhaDarel Hodge",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "SF"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
      "head": "Returns to practice squad",
      "kind": "practice",
      "move": {
@@ -4020,24 +4002,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "DAL"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "17944",
-     "player": "Jabari Small",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "DET"
     },
     {
      "d": "2026-11-09",
@@ -4074,6 +4038,42 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "WAS"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "17465",
+     "player": "Carlos Washington",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "MIA"
+    },
+    {
+     "d": "2026-11-09",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-09",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "17944",
+     "player": "Jabari Small",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "DET"
     },
     {
      "d": "2026-11-09",
@@ -4167,8 +4167,8 @@
     }
    ],
    "joined": 0,
-   "players": 2271,
-   "rows": 8027
+   "players": 2274,
+   "rows": 8025
   },
   "nhl": {
    "by_file": {
@@ -4181,15 +4181,15 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 3,
+     "flags": 5,
      "rows": 851
     },
     "static/data/pctl-nhl.json": {
-     "flags": 3,
+     "flags": 5,
      "rows": 851
     },
     "static/data/xaav-nhl.json": {
-     "flags": 12,
+     "flags": 13,
      "rows": 850
     }
    },
@@ -4231,6 +4231,24 @@
      "site": "CAR"
     },
     {
+     "d": "2026-11-15",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Sent to Chicago",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-15",
+      "head": "Sent to Chicago",
+      "kind": "move"
+     },
+     "pid": "4211",
+     "player": "Spencer Martin",
+     "pos": "G",
+     "rotowire": "CHI",
+     "site": "NYR"
+    },
+    {
      "d": "2026-11-07",
      "field": "tm",
      "file": "static/data/nhl-war/2027.json",
@@ -4247,6 +4265,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-15",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Dealt to Rangers",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-15",
+      "head": "Dealt to Rangers",
+      "kind": "move"
+     },
+     "pid": "6439",
+     "player": "Arvid Soderblom",
+     "pos": "G",
+     "rotowire": "NYR",
+     "site": "CHI"
     },
     {
      "d": "2026-11-13",
@@ -4319,6 +4355,24 @@
      "pos": "L",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-15",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "moved",
+     "head": "Dealt to Rangers",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-15",
+      "head": "Dealt to Rangers",
+      "kind": "move"
+     },
+     "pid": "6439",
+     "player": "Arvid Soderblom",
+     "pos": "G",
+     "rotowire": "NYR",
+     "site": "CHI"
     },
     {
      "d": "2026-11-07",
@@ -4501,6 +4555,24 @@
      "site": "CAR"
     },
     {
+     "d": "2026-11-15",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "moved",
+     "head": "Sent to Chicago",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-15",
+      "head": "Sent to Chicago",
+      "kind": "move"
+     },
+     "pid": "4211",
+     "player": "Spencer Martin",
+     "pos": "G",
+     "rotowire": "CHI",
+     "site": "NYR"
+    },
+    {
      "d": "2026-11-07",
      "field": "tm",
      "file": "static/data/pctl-nhl.json",
@@ -4517,6 +4589,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-15",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "moved",
+     "head": "Dealt to Rangers",
+     "kind": "move",
+     "move": {
+      "d": "2026-11-15",
+      "head": "Dealt to Rangers",
+      "kind": "move"
+     },
+     "pid": "6439",
+     "player": "Arvid Soderblom",
+     "pos": "G",
+     "rotowire": "NYR",
+     "site": "CHI"
     }
    ],
    "joined": 0,
