@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-15T17:36:21Z",
+ "asof": "2026-11-15T17:47:57Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 84.62,
+  "now": 84.79,
   "peak": 117.38,
-  "drawdown": 0.2791,
-  "open": 0.25,
+  "drawdown": 0.2777,
+  "open": 0,
   "path": [
-   113.5,
    112.41,
    113.4,
    113.96,
@@ -408,7 +407,8 @@
    84.64,
    84.21,
    84.41,
-   84.62
+   84.62,
+   84.79
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -1.99,
   "clv": 0.06,
   "beat": 0.328,
-  "settled": 431,
-  "w": 214,
+  "settled": 432,
+  "w": 215,
   "l": 217,
   "p": 0,
-  "roi": -0.0182,
-  "roiT": -0.37,
-  "profit": -13.66,
-  "risked": 406.25,
-  "yield": -0.0336
+  "roi": -0.0163,
+  "roiT": -0.33,
+  "profit": -13.46,
+  "risked": 406.5,
+  "yield": -0.0331
  },
  "tEff": -1.38,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -1.8% vs -1.1% (SE 4.9)",
+   "value": "ROI -1.6% vs -1.0% (SE 4.9)",
    "pass": true
   }
  ],
@@ -707,18 +707,19 @@
    "clvT": -1.43,
    "clv": null,
    "beat": null,
-   "settled": 62,
-   "w": 41,
+   "settled": 63,
+   "w": 42,
    "l": 21,
    "p": 0,
-   "roi": 0.3206,
-   "roiT": 2.63,
-   "profit": 32.57,
-   "risked": 82.25,
-   "yield": 0.396
+   "roi": 0.3285,
+   "roiT": 2.73,
+   "profit": 32.78,
+   "risked": 82.5,
+   "yield": 0.3973
   }
  ],
- "open": [
+ "open": [],
+ "recent": [
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -739,10 +740,12 @@
    "event": null,
    "pass": false,
    "clvRet": 0.3635,
-   "close": 29.5
-  }
- ],
- "recent": [
+   "close": 29.5,
+   "score": 25.0,
+   "res": "w",
+   "ret": 0.8197,
+   "profit": 0.2049
+  },
   {
    "rule": "nba-spread",
    "sport": "nba",
@@ -2523,32 +2526,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873047-4890973-wy",
-   "k": "2026-11-08T21:25:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 33.5,
-   "price": 113.0,
-   "bet": "Ashton Jeanty under 33.5 rec yds +113",
-   "placed": "2026-11-04T00:34:00Z",
-   "stake": 2.25,
-   "edge": 11.2,
-   "ev": 0.114,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0191,
-   "close": 35.5,
-   "score": -5.0,
-   "res": "w",
-   "ret": 1.13,
-   "profit": 2.5425
   }
  ],
  "ledger": [
@@ -17459,7 +17436,11 @@
    "event": null,
    "pass": false,
    "clvRet": 0.3635,
-   "close": 29.5
+   "close": 29.5,
+   "score": 25.0,
+   "res": "w",
+   "ret": 0.8197,
+   "profit": 0.2049
   }
  ]
 }
