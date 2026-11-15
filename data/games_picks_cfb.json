@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T06:55:23Z",
+ "asof": "2026-11-15T06:58:40Z",
  "recenter": {
   "week": 0.22
  },
@@ -216,10 +216,10 @@
     }
    },
    "total": {
-    "n": 47,
-    "window": 47,
-    "mean": 0.0863,
-    "t": 0.85,
+    "n": 50,
+    "window": 50,
+    "mean": 0.083,
+    "t": 0.86,
     "p": null,
     "days": 4,
     "sd": 0.1178,
@@ -228,25 +228,25 @@
     "h": 10.0,
     "rho": 0.038,
     "edge": {
-     "cusum": 0.78,
-     "cusumMax": 0.78,
+     "cusum": 0.74,
+     "cusumMax": 0.74,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0131,
-     "n": 47,
+     "n": 50,
      "sd": 0.1178,
      "rho": 0.038,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.784,
-     "info": 0.58,
-     "real": -1.681,
-     "realSe": 1.561,
+     "llr": -0.736,
+     "info": 0.62,
+     "real": -1.411,
+     "realSe": 1.528,
      "need": 479
     }
    },
@@ -321,12 +321,12 @@
     }
    },
    "spread | season: late": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0041,
     "t": null,
     "p": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1453,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -398,30 +398,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 82,
+   "n": 85,
    "days": 9,
-   "llr": 13.184,
+   "llr": 13.016,
    "lo": -2.944,
    "hi": 2.944,
    "state": "confirmed",
    "at": "2026-11-14",
-   "sd": 0.5345,
+   "sd": 0.525,
    "rho": 0.05,
    "real": 1.0,
-   "realSe": 0.113,
-   "clvRet": 0.043,
-   "evDU": 0.0801
+   "realSe": 0.111,
+   "clvRet": 0.0426,
+   "evDU": 0.0777
   },
   "back": {
-   "n": 15,
-   "clvRet": 0.2936,
+   "n": 16,
+   "clvRet": 0.275,
    "t": 0.92,
    "days": 2
   }
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -17.1,
+  "ageH": -17.0,
   "stale": false
  },
  "picks": [],
@@ -5332,7 +5332,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T06:55:23Z",
+ "checked": "2026-11-15T06:58:40Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
