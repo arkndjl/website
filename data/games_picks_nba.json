@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T17:58:54Z",
+ "asof": "2026-11-15T18:01:15Z",
  "recenter": {
-  "2026-11-15": 1.66
+  "2026-11-15": 1.65
  },
  "monitor": {
   "clocks": {
@@ -443,22 +443,6 @@
    "tm": 214.1
   },
   {
-   "id": "401909985",
-   "sport": "nba",
-   "kick": "2026-11-15T18:00:00Z",
-   "home": "PHI",
-   "away": "IND",
-   "mk": "spread",
-   "side": "home",
-   "line": 7.5,
-   "price": -110.0,
-   "edge": 2.4,
-   "x": 5.0,
-   "why": "edge under 5 (venue: home)",
-   "m": 9.9,
-   "tm": 226.5
-  },
-  {
    "id": "401909991",
    "sport": "nba",
    "kick": "2026-11-16T00:00:00Z",
@@ -491,6 +475,22 @@
    "tm": 212.6
   },
   {
+   "id": "401909989",
+   "sport": "nba",
+   "kick": "2026-11-15T23:00:00Z",
+   "home": "BOS",
+   "away": "DAL",
+   "mk": "spread",
+   "side": "away",
+   "line": 14.5,
+   "price": -124.0,
+   "edge": 1.7,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 12.8,
+   "tm": 218.6
+  },
+  {
    "id": "401909992",
    "sport": "nba",
    "kick": "2026-11-16T01:00:00Z",
@@ -521,22 +521,6 @@
    "why": "edge under 6.5 (total: mid)",
    "m": -2.6,
    "tm": 224.5
-  },
-  {
-   "id": "401909989",
-   "sport": "nba",
-   "kick": "2026-11-15T23:00:00Z",
-   "home": "BOS",
-   "away": "DAL",
-   "mk": "total",
-   "side": "under",
-   "line": 219.5,
-   "price": -110.0,
-   "edge": 0.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": 12.8,
-   "tm": 218.6
   },
   {
    "id": "401909988",
@@ -572,18 +556,6 @@
   }
  ],
  "games": {
-  "401909985": {
-   "mk": "spread",
-   "side": "home",
-   "line": 7.5,
-   "price": -110.0,
-   "edge": 2.4,
-   "ev": null,
-   "units": 0.0,
-   "home": "PHI",
-   "away": "IND",
-   "state": "under"
-  },
   "401909986": {
    "mk": "total",
    "side": "under",
@@ -621,11 +593,11 @@
    "state": "off"
   },
   "401909989": {
-   "mk": "total",
-   "side": "under",
-   "line": 219.5,
-   "price": -110.0,
-   "edge": 0.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 14.5,
+   "price": -124.0,
+   "edge": 1.7,
    "ev": null,
    "units": 0.0,
    "home": "BOS",
@@ -733,7 +705,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4379,
+  "snapshots": 4380,
   "buckets": [
    {
     "when": "24h+",
@@ -7350,7 +7322,7 @@
    "withdrawn": "2026-11-15T17:36:16Z"
   }
  ],
- "checked": "2026-11-15T17:58:54Z",
+ "checked": "2026-11-15T18:01:15Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
