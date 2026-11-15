@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-15T17:53:21Z",
+ "asof": "2026-11-15T17:58:41Z",
  "recenter": {
-  "2026-11-15": 2.23,
+  "2026-11-15": 2.2,
   "2026-11-16": 2.1
  },
  "monitor": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-15T17:28:32Z",
-  "ageH": 0.4,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -1861,7 +1861,7 @@
    "tmRaw": 150.7,
    "flagged": "2026-11-15T03:17:19Z",
    "paper": true,
-   "betTo": 155.5,
+   "betTo": 156.0,
    "close": 150.5,
    "now": null
   },
@@ -1893,6 +1893,43 @@
    "close": 167.5,
    "pass": true,
    "now": null
+  },
+  {
+   "id": "401906866",
+   "espn": "401906866",
+   "sport": "cbb",
+   "kick": "2026-11-15T20:00:00Z",
+   "home": "Texas",
+   "away": "Baylor",
+   "mk": "total",
+   "side": "over",
+   "line": 160.5,
+   "price": -101,
+   "p": 0.53,
+   "ev": 0.054,
+   "units": 1.5,
+   "edge": 5.0,
+   "x": 5.0,
+   "pDU": 0.5297,
+   "evDU": 0.0541,
+   "bk": "poly",
+   "lineM": 159.5,
+   "seg": "tier: power",
+   "m": 4.1,
+   "tm": 164.5,
+   "tmRaw": 166.7,
+   "flagged": "2026-11-15T17:58:41Z",
+   "paper": true,
+   "betTo": 160.5,
+   "close": 159.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 159.5,
+    "price": -110.0,
+    "ev": 0.117,
+    "units": 1.5
+   }
   },
   {
    "id": "401926068",
@@ -2028,8 +2065,8 @@
     "side": "home",
     "line": 7.5,
     "price": -106.0,
-    "ev": 0.088,
-    "units": 0.75
+    "ev": 0.094,
+    "units": 1.0
    }
   },
   {
@@ -2127,21 +2164,6 @@
    "units": 0.5,
    "edge": 1.6,
    "x": 1.5,
-   "withdrawn": "2026-11-15T17:36:01Z"
-  },
-  {
-   "id": "401906866",
-   "sport": "cbb",
-   "kick": "2026-11-15T20:00:00Z",
-   "home": "Texas",
-   "away": "Baylor",
-   "mk": "total",
-   "side": "over",
-   "line": 160.5,
-   "price": -115.0,
-   "units": 0.25,
-   "edge": 4.6,
-   "x": 2.0,
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
@@ -2867,22 +2889,6 @@
  ],
  "board": [
   {
-   "id": "401906866",
-   "sport": "cbb",
-   "kick": "2026-11-15T20:00:00Z",
-   "home": "Texas",
-   "away": "Baylor",
-   "mk": "total",
-   "side": "over",
-   "line": 159.5,
-   "price": -110.0,
-   "edge": 5.0,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
-   "m": 4.1,
-   "tm": 164.5
-  },
-  {
    "id": "401918453",
    "sport": "cbb",
    "kick": "2026-11-15T19:00:00Z",
@@ -2891,7 +2897,7 @@
    "mk": "spread",
    "side": "home",
    "line": 26.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 4.4,
    "x": 5.0,
    "why": "edge under 5 (tier: mixed)",
@@ -2931,22 +2937,6 @@
    "tm": 138.2
   },
   {
-   "id": "401920124",
-   "sport": "cbb",
-   "kick": "2026-11-15T23:00:00Z",
-   "home": "Montana State",
-   "away": "Cal Poly",
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -124.0,
-   "edge": 4.3,
-   "x": 5.0,
-   "why": "edge under 5 (line: 4-9)",
-   "m": 10.8,
-   "tm": 164.0
-  },
-  {
    "id": "401926073",
    "sport": "cbb",
    "kick": "2026-11-15T22:00:00Z",
@@ -2971,7 +2961,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.9,
    "x": 4.0,
    "why": "edge under 4 (venue: neutral)",
@@ -3009,6 +2999,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": 6.8,
    "tm": 161.2
+  },
+  {
+   "id": "401920124",
+   "sport": "cbb",
+   "kick": "2026-11-15T23:00:00Z",
+   "home": "Montana State",
+   "away": "Cal Poly",
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
+   "price": -106.0,
+   "edge": 3.3,
+   "x": 5.0,
+   "why": "edge under 5 (line: 4-9)",
+   "m": 10.8,
+   "tm": 164.0
   },
   {
    "id": "401920235",
@@ -3051,7 +3057,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -119.0,
+   "price": -110.0,
    "edge": 2.9,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -3067,7 +3073,7 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.9,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -3153,6 +3159,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": 2.9,
    "tm": 150.2
+  },
+  {
+   "id": "401925926",
+   "sport": "cbb",
+   "kick": "2026-11-15T19:00:00Z",
+   "home": "Charleston",
+   "away": "South Carolina State",
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -114.0,
+   "edge": 3.3,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 19.3,
+   "tm": 158.2
   },
   {
    "id": "401920681",
@@ -3251,34 +3273,35 @@
    "tm": 149.9
   },
   {
-   "id": "401925926",
+   "id": "401928789",
    "sport": "cbb",
-   "kick": "2026-11-15T19:00:00Z",
-   "home": "Charleston",
-   "away": "South Carolina State",
-   "mk": "total",
-   "side": "under",
-   "line": 160.5,
+   "kick": "2026-11-15T21:00:00Z",
+   "home": "San Diego State",
+   "away": "New Mexico State",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
    "price": -110.0,
-   "edge": 2.3,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 19.3,
-   "tm": 158.2
+   "edge": 1.3,
+   "x": 4.0,
+   "why": "edge under 4 (venue: neutral)",
+   "m": 13.8,
+   "tm": 143.1
   }
  ],
  "games": {
   "401906866": {
    "mk": "total",
    "side": "over",
-   "line": 159.5,
-   "price": -110.0,
+   "line": 160.5,
+   "price": -101,
+   "ev": 0.054,
    "edge": 5.0,
-   "ev": null,
-   "units": 0.0,
+   "units": 1.5,
+   "bk": "poly",
    "home": "Texas",
    "away": "Baylor",
-   "state": "under"
+   "state": "paper"
   },
   "401909525": {
    "mk": "total",
@@ -3332,7 +3355,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -3368,7 +3391,7 @@
    "mk": "spread",
    "side": "home",
    "line": 26.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 4.4,
    "ev": null,
    "units": 0.0,
@@ -3465,9 +3488,9 @@
   "401920124": {
    "mk": "spread",
    "side": "home",
-   "line": 6.5,
-   "price": -124.0,
-   "edge": 4.3,
+   "line": 7.5,
+   "price": -106.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "Montana State",
@@ -3501,9 +3524,9 @@
   "401925926": {
    "mk": "total",
    "side": "under",
-   "line": 160.5,
-   "price": -110.0,
-   "edge": 2.3,
+   "line": 161.5,
+   "price": -114.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "Charleston",
@@ -3538,7 +3561,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -119.0,
+   "price": -110.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -3623,7 +3646,7 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -3658,9 +3681,9 @@
   "401926068": {
    "mk": "spread",
    "side": "home",
-   "line": -3.5,
-   "price": -114.0,
-   "ev": 0.099,
+   "line": -5.5,
+   "price": -146,
+   "ev": 0.052,
    "edge": 6.9,
    "units": 1.5,
    "bk": "poly",
@@ -3745,7 +3768,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16112,
+  "snapshots": 16123,
   "buckets": [
    {
     "when": "24h+",
@@ -3760,18 +3783,18 @@
     "when": "6-24h",
     "clvN": 3191,
     "clvRet": -0.0219,
-    "clvT": -11.9,
+    "clvT": -11.85,
     "clv": 0.31,
-    "beat": 0.355,
-    "still": 0.446
+    "beat": 0.356,
+    "still": 0.445
    },
    {
     "when": "1-6h",
-    "clvN": 1883,
-    "clvRet": -0.0403,
-    "clvT": -33.78,
-    "clv": 0.07,
-    "beat": 0.161,
+    "clvN": 1886,
+    "clvRet": -0.04,
+    "clvT": -33.64,
+    "clv": 0.08,
+    "beat": 0.163,
     "still": 0.712
    },
    {
@@ -17936,7 +17959,7 @@
    "tmRaw": 150.7,
    "flagged": "2026-11-15T03:17:19Z",
    "paper": true,
-   "betTo": 155.5,
+   "betTo": 156.0,
    "close": 150.5
   },
   {
@@ -18054,6 +18077,35 @@
    "paper": true,
    "betTo": -2.0,
    "close": -3.5
+  },
+  {
+   "id": "401906866",
+   "espn": "401906866",
+   "sport": "cbb",
+   "kick": "2026-11-15T20:00:00Z",
+   "home": "Texas",
+   "away": "Baylor",
+   "mk": "total",
+   "side": "over",
+   "line": 160.5,
+   "price": -101,
+   "p": 0.53,
+   "ev": 0.054,
+   "units": 1.5,
+   "edge": 5.0,
+   "x": 5.0,
+   "pDU": 0.5297,
+   "evDU": 0.0541,
+   "bk": "poly",
+   "lineM": 159.5,
+   "seg": "tier: power",
+   "m": 4.1,
+   "tm": 164.5,
+   "tmRaw": 166.7,
+   "flagged": "2026-11-15T17:58:41Z",
+   "paper": true,
+   "betTo": 160.5,
+   "close": 159.5
   }
  ],
  "withdrawnLog": [
@@ -18726,7 +18778,7 @@
    "flagged": "2026-11-15T02:11:16Z",
    "paper": true,
    "betTo": 145.5,
-   "close": 142.5,
+   "close": 143.5,
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
@@ -18753,7 +18805,7 @@
    "flagged": "2026-11-15T02:18:36Z",
    "paper": true,
    "betTo": 160.5,
-   "close": 160.5,
+   "close": 161.5,
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
@@ -19315,7 +19367,7 @@
    "flagged": "2026-11-15T13:54:26Z",
    "paper": true,
    "betTo": 9.0,
-   "close": 6.5,
+   "close": 7.5,
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
@@ -19510,7 +19562,7 @@
    "flagged": "2026-11-15T15:37:55Z",
    "paper": true,
    "betTo": 145.5,
-   "close": 144.5,
+   "close": 145.5,
    "withdrawn": "2026-11-15T17:36:01Z"
   },
   {
@@ -19598,7 +19650,7 @@
    "withdrawn": "2026-11-15T17:36:01Z"
   }
  ],
- "checked": "2026-11-15T17:53:21Z",
+ "checked": "2026-11-15T17:58:41Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
