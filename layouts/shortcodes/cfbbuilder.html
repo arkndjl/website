@@ -6,7 +6,7 @@
        explains Transfer% and the hometown study (data/cfb_transfer_fit.json).
        {{< cfbbuilder title="..." tab="team builder" >}} */ -}}
 {{- $fit := site.Data.cfb_transfer_fit -}}
-<div class="win tb" data-tb data-tb-src="{{ "data/cfb-builder.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+<div class="win tb" data-tb data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}" data-tb-src="{{ "data/cfb-builder.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "team_builder.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -57,7 +57,9 @@
   // a name opens the player's card (cfbjs.html): his current school, else the team on screen
   var curTeam = '';
   function card(name, team) { return ' data-cfb-card="' + esc(name + '|' + (team || curTeam)) + '"'; }
-  function who(p) { return '<button type="button" class="tb__who"' + card(p.name, p.team) + ' title="player card">' + esc(p.name) + '</button>' + (p.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : ''); }
+  var ARK = JSON.parse(document.querySelector('[data-tb]').getAttribute('data-arklist') || '[]');
+  function arkOn(p) { return ARK.indexOf(p.name) >= 0 || ARK.indexOf(p.name + '|' + p.team) >= 0; }
+  function who(p) { return '<button type="button" class="tb__who"' + card(p.name, p.team) + ' title="player card">' + esc(p.name) + '</button>' + (arkOn(p) ? '<span class="cfb__star" title="ARKLIST">★</span>' : ''); }
   function from(p) { return '<span class="cfb__team">' + logo(p.logo) + '<span>' + esc(p.team) + (p.div ? '<span class="cfb__divtag">FCS</span>' : '') + '</span></span>'; }
 
   // next season's starters at a position after the plan: returners by expected value, signings into the weakest slots
