@@ -265,7 +265,9 @@ export async function cfbd(pathq) {
   const r = await fetch(`https://api.collegefootballdata.com/${pathq}`, { headers: { Authorization: `Bearer ${key}`, accept: 'application/json' } });
   const h = r.headers.get('x-calllimit-remaining');
   if (!cfbdUse.calls++) process.on('exit', () => console.log(`CFBD: ${cfbdUse.calls} calls this run, ${cfbdUse.left ?? '?'} left this month`));
-  if (h != null) cfbdUse.left = +h;
+  // the count CFBD last reported, kept for the steps that run after the board in the same job (scripts/cfb_recruits_cfbd.mjs
+  // reads it before it spends a call)
+  if (h != null) { cfbdUse.left = +h; try { fs.mkdirSync(CFBD_MEMO, { recursive: true }); fs.writeFileSync(path.join(CFBD_MEMO, '..', 'cfbd_left.json'), JSON.stringify({ at: Date.now(), left: +h })); } catch {} }
   if (!r.ok) throw new Error(`CFBD ${r.status} ${pathq}`);
   const data = await r.json();
   try { fs.mkdirSync(CFBD_MEMO, { recursive: true }); fs.writeFileSync(memo, JSON.stringify({ at: Date.now(), data })); } catch {}

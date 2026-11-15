@@ -144,22 +144,6 @@ def recruit_class(y, ttl=None):
     return out
 
 
-def get_html(url):
-    """GET a page's text, cached on disk by URL (ttl: a day for classes still being recruited)."""
-    f = os.path.join(CACHE, hashlib.sha1(url.encode()).hexdigest() + '.html')
-    if os.path.exists(f) and (OFFLINE or time.time() - os.path.getmtime(f) < 86400 or '-football/' in url and int(re.search(r'(\d{4})-football', url).group(1)) < 2027):
-        return open(f).read()
-    if OFFLINE: return ''
-    import subprocess   # curl: 247 turns away Python's HTTP client
-    for i in range(4):
-        r = subprocess.run(['curl', '-sS', '-f', '-A', 'Mozilla/5.0', url], capture_output=True, text=True)
-        if r.returncode == 0: v = r.stdout; break
-        if i == 3: print('fail', url, r.stderr.strip()); return ''
-        time.sleep(2 ** i)
-    open(f, 'w').write(v)
-    return v
-
-
 def _cfbd_rec():
     import gzip
     f = os.path.join(ROOT, 'scripts', 'data', 'cfb_recruits_cfbd.json.gz')
@@ -214,31 +198,15 @@ def commit_timing(r):
 
 def composite(y, pages=80, kind='composite'):
     """247Sports' composite for class y (the average of the services, 247's own rank beside it): composite score
-    (0-1), composite rank, 247's own rank, stars, position, size, home state and committed school.
-    kind='own': 247's own rankings instead (score 0-100), which start a class earlier than the composite."""
-    import html as H
-    out = []
-    # 247's pages sit behind a bot check (Nov 2026): a class comes from the last snapshot of them, else from CFBD's copy
+    (0-1), composite rank, 247's own rank, home state and committed school.
+    kind='own': 247's own rankings instead (score 0-100), which start a class earlier than the composite.
+    247's pages sit behind a bot check and are never requested: a class comes from the last snapshot of them
+    (scripts/cfb_recruit_247.json), else from CFBD's copy of the composite (rows marked 'cfbd'), else it is empty."""
     if str(y) in SNAP247.get(kind, {}):
         return [{'name': n, 'state': st, 'pos': None, 'comp': c, 'cRank': rk, 'r247': r2, 'school': None} for n, st, c, rk, r2 in SNAP247[kind][str(y)]]
     if kind == 'composite' and str(y) in CFBD_REC:
-        return [{'name': n, 'state': None, 'pos': None, 'comp': c, 'cRank': rk, 'r247': None, 'school': sch} for n, c, _, rk, sch, *_ in CFBD_REC[str(y)] if c]
-    path = 'compositerecruitrankings' if kind == 'composite' else 'recruitrankings'
-    for pg in range(1, pages + 1):
-        h = get_html(f'https://247sports.com/season/{y}-football/{path}/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page={pg}')
-        items = h.split('rankings-page__list-item"')[1:]
-        if not items: break
-        for x in items:
-            g = lambda p: (re.search(p, x, re.S) or [None, None])[1]
-            meta = g(r'class="meta">\s*([^<]*?)\s*</span>') or ''
-            st = re.search(r',\s*([A-Z]{2})\)\s*$', meta)
-            sc = g(r'class="score">([\d.]+)')
-            if not sc: continue
-            out.append({'name': H.unescape(g(r'name-link"[^>]*>([^<]*)') or ''), 'state': st.group(1) if st else None, 'pos': (g(r'class="position">\s*([^<]*?)\s*</div>') or '').strip(),
-                        'comp': float(sc), 'cRank': int(g(r'class="primary">\s*(\d+)') or 0) or None, 'r247': int(g(r'class="other">\s*(\d+)') or 0) or None,
-                        'school': H.unescape(g(r'class="img-link"[^>]*>\s*<img alt="([^"]*)"') or '') or None})
-        if len(items) < 50: break
-    return out
+        return [{'name': n, 'state': None, 'pos': None, 'comp': c, 'cRank': rk, 'r247': None, 'school': sch, 'cfbd': True} for n, c, _, rk, sch, *_ in CFBD_REC[str(y)] if c]
+    return []
 
 
 def parse_rank_page(h):
@@ -261,6 +229,7 @@ def attach_composite(cl, comp):
         r['comp'] = m[0]['comp'] if len(m) == 1 else None
         r['cRank'] = m[0]['cRank'] if len(m) == 1 else None
         r['r247'] = m[0]['r247'] if len(m) == 1 else None
+        r['c247'] = m[0]['comp'] if len(m) == 1 and m[0].get('cfbd') else None   # the composite as CFBD holds it
     return cl
 
 
@@ -467,6 +436,8 @@ def blocks0(r, sz):
         'gap': {'gapEspn': ((r['comp'] - 0.87) / 0.04 - g) if r.get('comp') and rated else 0.0,
                 'gap247': (math.log(r['cRank']) - math.log(r['r247'])) if r.get('cRank') and r.get('r247') else 0.0},
         'hs': {'lHs': math.log1p(r['hsN']) if r.get('hsN') is not None else 0.0},
+        # the 247 composite as CFBD holds it (the 'comp' block's form on that one source; the composite index only)
+        'c247': {'c247z': (r['c247'] - 0.87) / 0.04 if r.get('c247') else 0.0, 'noC247': 0.0 if r.get('c247') else 1.0},
         # ---- On3's industry table (Nov 14 2026): the rating, the services against it, commit timing (centred on the
         # history's means, so a recruit with no date is neutral) ----
         'on3': {'indz': (r['ind'] - 85) / 5 if r.get('ind') else 0.0, 'noInd': 0.0 if r.get('ind') else 1.0},
@@ -1092,7 +1063,12 @@ def main():
            'away1': round(float(np.mean([r['nowTid'] != r['tid'] for r in data if r['on'] and r['k'] == 1])), 3), 'path': path(m, SZ, data), 'redshirt': rs, 'stars': stars}
     fs_, snap = future_support(season, data, p_on, p_fv)
     out.update(fs_)
-    if INDEX: out['index'] = INDEX; out['boardWeights'] = board_test
+    if INDEX:
+        out['index'] = INDEX
+        # the index with the 247 composite, for the classes CFBD's copy covers (scripts/cfb_recruit.mjs indexOf)
+        ic = json.load(open(RETARGET)).get('indexComp')
+        if ic: out['indexComp'] = ic
+        out['boardWeights'] = board_test
     sf = os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json')
     if os.path.exists(sf):   # 247's pages sit behind a bot check: a class this run could not read keeps its last snapshot
         old = json.load(open(sf))

@@ -83,6 +83,9 @@ function blocks(r, sz, KMAX, index) {
     comp: { compz: r.comp ? (r.comp - 0.87) / 0.04 : 0, noComp: r.comp ? 0 : 1 },
     gap: { gapEspn: r.comp && rated && !r.mapped ? (r.comp - 0.87) / 0.04 - g : 0, gap247: r.cRank && r.r247 ? Math.log(r.cRank) - Math.log(r.r247) : 0 },
     hs: { lHs: r.hsN != null ? Math.log1p(r.hsN) : 0 },
+    // the 247 composite as CFBD holds it (the composite index only: indexOf)
+    c247: { c247z: r.c247 ? (r.c247 - 0.87) / 0.04 : 0, noC247: r.c247 ? 0 : 1 },
+    cqOff: r.cqOff || 0,
     // On3's industry table: the rating, 247 and ESPN against it, commit timing centred on the index's history
     on3: { indz: r.ind && !r.byRank ? (r.ind - 85) / 5 : 0, noInd: r.ind ? 0 : 1 },   // a class read by rank: its mapped grade already holds the rank, so the rating stays neutral
     svc: { g247: r.g247 || 0, gEspn: r.gEspn || 0 },
@@ -119,11 +122,23 @@ function indexParts(index, b) {
   for (const part of ['on', 'fv']) {
     const m = index[part]; out[part] = {};
     for (const u of m.blocks) out[part][u] = m.names.reduce((a, n, i) => a + (b[u][n] ?? 0) * m.coef[i], 0);
+    if (index.shift) out[part].c247 = (out[part].c247 || 0) + index.shift[part] - (part === 'on' ? b.cqOff : 0);
   }
   return out;
 }
+// The index a recruit is read through. A class CFBD's copy of the 247 composite covers (r.cq, set by attachCfbd)
+// takes the index fit with the composite ('indexComp'); every other class the one without. The fit put the index on
+// the board's scale without its intercept, so the composite index carries its intercept's distance to the other's
+// (shift), held with the composite's own term. The composite re-orders the recruits of a class and does not move the
+// class's level: r.cqOff (centreCq) is the class's mean distance between the two indexes, taken back out.
+function indexOf(fit, r) {
+  const ic = fit.indexComp;
+  if (!r.cq || !ic || !fit.index) return fit.index;
+  ic.shift ||= { on: ic.on.b0 - fit.index.on.b0, fv: ic.fv.b0 - fit.index.fv.b0 };
+  return ic;
+}
 export function predict(fit, r) {
-  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, fit.index);
+  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, indexOf(fit, r));
   const lin = m => { const row = {}; for (const u of m.blocks) Object.assign(row, b[u]); return m.names.reduce((a, n, i) => a + (row[n] ?? 0) * m.coef[i], m.b0); };
   const pOn = sig(lin(fit.model.on)), fvOn = Math.max(fit.floor, lin(fit.model.fv));
   return atMeanOn(fit, r, pOn, fvOn);
@@ -142,13 +157,13 @@ function atMeanOn(fit, r, pOn, fvOnG) {
 // exactly), and xFV - 20 = P(on) x (FV - 20) is split as dP x mean(FV - 20) + dFV x mean(P), also exact.
 const WHY_LABEL = { grade: 'ESPN grade and rank', hinge: 'ESPN grade and rank', grade_year: 'ESPN grade and rank', grade_k4: 'ESPN grade and rank', posrank: 'ESPN grade and rank', rank: 'ESPN grade and rank',
   pos: 'position', pos_year1: 'position', year: 'year in school', size: 'height and weight', bmi: 'height and weight', frame: 'height and weight',
-  offer_q: 'offer quality', offers: 'offer count', gap: '247 ratings', comp: '247 ratings', on3: 'industry rating', svc: '247 and ESPN vs industry', tm: 'commit timing', hs: 'high school pipeline', state: 'home state',
+  offer_q: 'offer quality', offers: 'offer count', gap: '247 ratings', comp: '247 ratings', c247: '247 composite', on3: 'industry rating', svc: '247 and ESPN vs industry', tm: 'commit timing', hs: 'high school pipeline', state: 'home state',
   elo: 'program strength', elo_grade: 'program strength', level: 'program level', dev: 'program development' };
 function linParts(fit, m, r, KMAX) {
-  const b = blocks(r, fit.sizeNorms, KMAX, fit.index), out = {};
+  const b = blocks(r, fit.sizeNorms, KMAX, indexOf(fit, r)), out = {};
   for (const u of m.blocks) {
     if (u === 'idx') {   // the index's term goes back to the inputs it is made of (ESPN grade, 247, size, program)
-      const ip = indexParts(fit.index, b), c = n => m.coef[m.names.indexOf(n)] ?? 0, k1 = (r.k ?? 1) - 1;
+      const ip = indexParts(indexOf(fit, r), b), c = n => m.coef[m.names.indexOf(n)] ?? 0, k1 = (r.k ?? 1) - 1;
       for (const [part, w] of [['on', c('iOn') + c('iOn_k') * k1], ['fv', c('iFv') + c('iFv_k') * k1]])
         for (const [s, v] of Object.entries(ip[part])) out[s] = (out[s] || 0) + w * v;
       continue;
@@ -184,7 +199,7 @@ const RS_EXTRA = { games: r => ({ gp14: r.gpLast >= 1 && r.gpLast <= 4 ? 1 : 0 }
   bmi: (r, b) => b.bmi, size: (r, b) => b.size, level: r => ({ p4: r.level === 'P4' ? 1 : 0 }), moved: r => ({ moved: r.signedTid && r.tid !== r.signedTid ? 1 : 0 }) };
 function rsExtra(fit, r) {
   const rs = fit.redshirt; if (!rs.names?.length) return 0;
-  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, fit.index), ex = Object.assign({}, ...(rs.extra || []).map(u => RS_EXTRA[u](r, b)));
+  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, indexOf(fit, r)), ex = Object.assign({}, ...(rs.extra || []).map(u => RS_EXTRA[u](r, b)));
   return rs.names.reduce((a, n, i) => a + (ex[n] ?? 0) * rs.coef[i], 0);
 }
 export function predictRedshirt(fit, r) {
@@ -282,6 +297,39 @@ function attachOn3(cl, y, asOf) {
   }
   return cl;
 }
+// CFBD's copy of the 247 composite for a class being recruited (scripts/data/cfb_recruits_cfbd_live.json, pulled weekly
+// by scripts/cfb_recruits_cfbd.mjs --live; 247's own pages are never requested): each recruit's composite by name + home
+// state, else a name that is unique in the class. The class reads the composite index (cq) only when CFBD covers it as
+// it covered the classes the index was fit on: at least CQ_MIN of CQ_N or more ESPN-graded recruits matched (2011-19:
+// .86 to .94). Returns the coverage for the output.
+const CQ_MIN = 0.8, CQ_N = 100;
+let CFBD_LIVE = null;
+function attachCfbd(cl, y) {
+  if (!CFBD_LIVE) { try { CFBD_LIVE = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_recruits_cfbd_live.json'), 'utf8')); } catch { CFBD_LIVE = { at: {}, classes: {} }; } }
+  const rows = y >= season0 ? CFBD_LIVE.classes?.[y] || [] : [];
+  if (!rows.length) return null;
+  const by = {}, n = {};
+  for (const c of rows) n[key(c[0])] = (n[key(c[0])] || 0) + 1;
+  for (const c of rows) { (by[key(c[0]) + '|' + (c[7] || '')] ||= []).push(c); if (n[key(c[0])] === 1) (by[key(c[0]) + '|'] ||= []).push(c); }
+  let rated = 0, hit = 0;
+  for (const r of cl) {
+    const m = by[key(r.name) + '|' + (r.state || '')] || by[key(r.name) + '|'] || [];
+    r.c247 = m.length === 1 ? m[0][1] : null;
+    if (r.grade >= 60) { rated++; if (r.c247) hit++; }
+  }
+  const on = rated >= CQ_N && hit / rated >= CQ_MIN;
+  for (const r of cl) r.cq = on;
+  return { year: y, at: CFBD_LIVE.at?.[y] || null, rows: rows.length, graded: rated, matched: rated ? Math.round(1000 * hit / rated) / 1000 : null, on };
+}
+// the mean distance of the composite index's P term from the other index's over a class's scored rows, set on each
+// row (and on its source record, for the rows built from it later)
+function centreCq(fit, rs) {
+  rs = rs.filter(r => r && r.cq);
+  if (!rs.length || !fit.indexComp || !fit.index) return;
+  const KMAX = fit.classes[1] - fit.classes[0] + 1, iOn = r => blocks(r, fit.sizeNorms, KMAX, indexOf(fit, r)).idx.iOn;
+  const off = rs.reduce((a, r) => a + iOn({ ...r, cqOff: 0 }) - iOn({ ...r, cq: false }), 0) / rs.length;
+  for (const r of rs) r.cqOff = off;
+}
 let season0 = 9999;   // the first class still being recruited (set by recruitBoard)
 const unescapeHtml = s => s.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 function attach247(cl, comp) {
@@ -370,11 +418,13 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   // one class with the fit's drivers: offers and high school (ESPN) and the 247 composite; a class 247 can't be
   // read for gets a composite level with its ESPN grade (no gap), so the gap terms stay neutral
   const whyQueue = [];   // [output row, feature row, redshirt?]: filled once the reference signee is known
+  const cfbdCover = {};  // class -> CFBD composite coverage (attachCfbd)
   const prep = async (y, fresh) => {
     const cl = enrich(await espnClass(y, fresh, offline), prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
     if (comp.length) attach247(cl, comp);
     else for (const r of cl) { r.comp = r.grade >= 60 ? 0.87 + 0.04 * (r.grade - 75) / 5 : null; r.cRank = r.r247 = null; }
     attachOn3(cl, y, y === season0);
+    const cq = attachCfbd(cl, y); if (cq) cfbdCover[y] = cq;
     return cl;
   };
   // xNIL a recruit would draw at an FV and level: the board's median at that FV (whole points) and level
@@ -389,9 +439,10 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   // 1) the next class: commitments to FBS and FCS programs, year 1 next season
   const next = season + 1;
   const cls = (await prep(next, true)).filter(c => c.tid && prog[c.tid]);
-  const klass = [];
-  for (const c of cls) {
-    const r = mk(c, 1); if (!r) continue;
+  const klass = [], clsRows = cls.map(c => mk(c, 1));
+  centreCq(fit, clsRows);
+  for (const [i, c] of cls.entries()) {
+    const r = clsRows[i]; if (!r) continue;
     const p = predict(fit, r), P = prog[c.tid];
     whyQueue.push([null, r, false]);
     klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
@@ -466,13 +517,16 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     }
     let wsd = 5;
     if (mappedWatch.length >= 20) { watchGrade = mappedWatch.reduce((a, x) => a + x, 0) / mappedWatch.length; wsd = Math.sqrt(mappedWatch.reduce((a, x) => a + (x - watchGrade) ** 2, 0) / mappedWatch.length); }
-    const list = [];
+    const list = [], futRows = [];
     for (const c of cl) {
       if (c.src === 'watch') { if (watchGrade == null) continue; c.grade = watchGrade; c.gsd = Math.sqrt((gm.composite?.[2] ?? 4) ** 2 + wsd ** 2); }
       const committed = c.tid && prog[c.tid], t = typical[band(c.grade)] || typical[0];
       const P = committed ? prog[c.tid] : { level: t && t.p4 * 2 >= t.n ? 'P4' : 'G5', eloZ: t ? t.elo / t.n : 0 };
       const g = group(c.pos, c.wt); if (!g) continue;
-      const r = { ...c, g, k: 1, level: P.level, eloZ: P.eloZ, dev: committed ? fit.model.dev[c.tid] || 0 : 0 };
+      futRows.push([c, committed, P, g, { ...c, g, k: 1, level: P.level, eloZ: P.eloZ, dev: committed ? fit.model.dev[c.tid] || 0 : 0 }]);
+    }
+    centreCq(fit, futRows.map(x => x[4]));
+    for (const [c, committed, P, g, r] of futRows) {
       const p = predict(fit, r);
       whyQueue.push([null, r, false]);
       list.push({ name: c.name, pos: c.pos, g, ht: c.ht, wt: c.wt, grade: r1(c.grade), src: c.src, rank: c.rank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
@@ -548,7 +602,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const q = f => boardFv[Math.floor(f * (boardFv.length - 1))];
   const boardRef = { p50: q(0.5), p75: q(0.75), p90: q(0.9), p99: q(0.99) };
   return { asof, season, next, floor: fit.floor, blendGames: BLEND_GAMES, boardRef, class: klass, future, redshirts, young, teams: roster,
-    counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) } };
+    counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
+    ...(Object.keys(cfbdCover).length ? { cfbd: Object.values(cfbdCover) } : {}) };
 }
 // expected FV at each starting slot (as the team builder's slots()): each player there with his chance
 function slotsAv(players, n, repl, rand) {

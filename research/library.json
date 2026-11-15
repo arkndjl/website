@@ -285,6 +285,7 @@
       "CFB recruit profile weighed on NFL outcomes of 2011-19 classes (24,450 signees, 1,895 drafted); the board sets the level.",
       "Profile inputs: ESPN grade and rank, size, program level and Elo, On3 industry rating, 247 and ESPN vs industry, commit timing.",
       "Held-out schools: rank correlation with NFL outcome .255 (ESPN grade alone .222). Later commits are drafted more at the same grade.",
+      "247 composite (CFBD's copy, pulled weekly; 247Sports is never requested) added to P(drafted) for a class CFBD covers (80%+ of ESPN-graded recruits matched): held-out log loss .23136 to .23097, t 2.2 over recruits, 2.17 by school, 6 of 9 classes; classes 2011-15 t 2.56, 2016-19 t .37. It re-orders a class and leaves its level.",
       "Failed Nov 14 2026: track marks, grade by position, tree blend; CBB wider training window, RSCI 1998-2008 classes.",
       "CBB: hurdle on consensus rank and old-for-class; P(reach NBA) then log(FV - 20) given NBA; trained 2009-16."
      ],
@@ -792,7 +793,7 @@
      "term": "WAR / PA (tennis)",
      "short": "WAR: wins above replacement over 52 weeks. PA: points won a 100 points over an average top-100 player, opponent-adjusted.",
      "body": [
-      "WAR = wins - sum of P(a replacement player beats the same opponents), every level, last 52 weeks. Replacement = the median pre-match Elo of players ranked 101-150 at their matches 2005-26 (ATP 2009, WTA 1993), surface-blended Elo, best of five where played.",
+      "WAR = wins - sum of P(a replacement player beats the same opponents), every level, last 52 weeks. Replacement = the median pre-match Elo of players ranked 101-150 at their matches since 2005 (ATP 1900, WTA 1884), surface-blended Elo, best of five where played. Recomputed with every rating refit, since the Elo scale moves with the K schedule.",
       "PA a match = serve points won - what a serve rating of 0 wins against this returner + return points won - what a return rating of 0 wins against this server (the points filter's opponent ratings before the match). rPA = 100 x sum / points, last 52 weeks. PA (headline) = each match weighted .5 ^ (days ago / 365), shrunk by 300 points. Both shown against the average top-100 player.",
       "Pre-registered Nov 14 2026, Holm over 5. Next 52 weeks' rPA (1,000+ points), held out by year 2011-26: MSE 3.76 vs raw 4.37 (t -12.5) and the Kalman serve + return ratings 4.80 (t -19.1), 16/16 years; half-life and K the same every year left out. WAR vs the next year-end ranking: Spearman +.12 over 52-week wins (t 4.3, 25/30 tour-years), +.26 over W-L; the same year's ranking: no better than wins (t 0.9, fail).",
       "Game model: PA gap / 10 is a blend term (CP). Walk-forward held 2023-26 log loss -9.8e-4 (t -4.1 by tournament), close period -13.4e-4 (t -3.2); gap to the close .0092 to .0079. WAR a match gap alone -1.6e-4 (t -2.0), nothing beside PA: not in the blend.",
@@ -1216,7 +1217,8 @@
      "short": "Win chance vs the average top-50 player, best of three, over the tour's 52-week surface mix.",
      "body": [
       "Surface Elo blended with a games-won rating and opponent-adjusted serve and return point ratings (Markov chain).",
-      "Fit on 2012-22 tour main draws; held 2023-26 log loss ~.596 vs Elo .603."
+      "The reference player carries the top-50 mean of every rating (Elo, serve and return points, games). Weights: the ratings-only blend, without the match-context terms.",
+      "Fit on 2012-22 tour main draws, quarterfinals included; held 2023-26 log loss .5927 (ratings alone .5969, Elo .6050)."
      ],
      "where": "Tennis ATP / WTA ARK Ranking",
      "sports": [
@@ -1997,7 +1999,7 @@
      "term": "Sources: football",
      "short": "Free public sources for CFB and NFL.",
      "body": [
-      "CFB: PFN impact rankings, On3 (industry recruiting ratings, daily), ESPN rosters and play-by-play (2015-26), CFBD (1,000 calls/month), 247 (snapshot), Rotoballer.",
+      "CFB: PFN impact rankings, On3 (industry recruiting ratings, daily), ESPN rosters and play-by-play (2015-26), CFBD (1,000 calls/month; 247 composite for the classes being recruited, weekly), 247 (snapshot), Rotoballer.",
       "Consensus boards: PFN industry (7 analysts), Tankathon, PFF, Kiper. Conference availability reports.",
       "NFL: nflverse (play-by-play, rosters, injuries, draft picks), PFR AV, ESPN."
      ],
