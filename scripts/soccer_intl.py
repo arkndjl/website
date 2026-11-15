@@ -1298,6 +1298,13 @@ def market(fx):
     """Novig's 1X2 and goals line for the matches it lists (UEFA Nations League so far), else ESPN's book for
     today's and tomorrow's matches"""
     out = {}
+    # Polymarket US's national-team listings after its fee first (Nov 15 2026)
+    try:
+        import polymarket
+        for gid, px in polymarket.soccer_prices([(e['id'], '_intl', e['hn'], e['an'], e['day']) for e in fx]).items():
+            out[gid] = dict(px, book='Polymarket')
+    except Exception as ex:
+        print(f'polymarket: {ex!r}', file=sys.stderr)
     try:
         import novig
         lgs = sorted({e['league'] for e in novig.pages('events', status='OPEN_PREGAME') if e.get('sport') == 'SOCCER'
@@ -1308,7 +1315,7 @@ def market(fx):
                 novig.SOCCER['_' + lg] = lg
             ms = [(e['id'], '_' + lg, e['hn'], e['an'], e['day']) for e in fx for lg in lgs]
             for gid, px in novig.soccer_prices(ms).items():
-                out[gid] = dict(px, book='Novig')
+                out.setdefault(gid, dict(px, book='Novig'))
     except Exception as ex:
         print(f'novig: {ex!r}', file=sys.stderr)
     today = dt.date.today()

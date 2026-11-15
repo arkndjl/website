@@ -14,7 +14,7 @@
   <div class="cfbm__body">
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="return the test-season picks were worth at the closing line, per unit; t">Worth at close</th><th>Status</th><th title="the edge cut, points">X</th><th title="test-season picks">Picks</th><th title="mean points the line moved toward the picks, and how often it did">CLV</th><th title="test-season results at the open, -103 (Novig); t">Result</th><th title="validation season, where the market was switched on: worth at the close, t">Validation</th><th title="tuning seasons: worth at the close, t">Tuning</th><th title="Kelly multiple (1 = full Kelly on the calibrated edge)">λ</th></tr></thead>
+      <thead><tr><th title="bet market: spread, total or moneyline">Market</th><th title="return the test-season picks were worth at the closing line, per unit; t">Worth at close</th><th>Status</th><th title="the edge cut, points">X</th><th title="test-season picks">Picks</th><th title="mean points the line moved toward the picks, and how often it did">CLV</th><th title="test-season results at the open, -112 (Polymarket US after its fee); t">Result</th><th title="validation season, where the market was switched on: worth at the close, t">Validation</th><th title="tuning seasons: worth at the close, t">Tuning</th><th title="Kelly multiple (1 = full Kelly on the calibrated edge)">λ</th></tr></thead>
       <tbody>
       {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" "ml" }}{{ with index $x.markets $mk }}{{ $h := .heldRec }}
@@ -60,7 +60,7 @@
     {{- with $kept }}
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Segment</th><th title="test-season picks worth at the close; t">Worth at close</th><th title="the segment's cut, points">X</th><th title="test-season picks in the segment">Picks</th><th title="validation picks it adds under the market's own cut, and what they were worth at the close">Adds</th><th title="test-season results at the open, -103 (Novig)">Result</th><th title="tuning seasons, shrunk toward the market">Tuning</th></tr></thead>
+      <thead><tr><th>Segment</th><th title="test-season picks worth at the close; t">Worth at close</th><th title="the segment's cut, points">X</th><th title="test-season picks in the segment">Picks</th><th title="validation picks it adds under the market's own cut, and what they were worth at the close">Adds</th><th title="test-season results at the open, -112 (Polymarket US after its fee)">Result</th><th title="tuning seasons, shrunk toward the market">Tuning</th></tr></thead>
       <tbody>
       {{- range . }}
       <tr>

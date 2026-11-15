@@ -1421,12 +1421,12 @@ def build():
     m, _, ups = walk(hist + finals, P, pending, starters, up_moves=mv)
     # market lines for the board (ESPN's current consensus)
     emap = D.espn_map([{'id': g['id'], 'day': g['day'], 'h': g['h'], 'a': g['a']} for g in up], fresh_after=today - dt.timedelta(days=1))
-    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
+    # Polymarket US's main lines after its fee first (Novig only where Polymarket has no game); ESPN's DraftKings for the rest
     try:
-        import novig
-        NV = novig.prices('nhl')
+        import polymarket
+        NV = polymarket.book('nhl')
     except Exception as e:
-        print('novig:', e); NV = {}
+        print('polymarket:', e); NV = {}
     games = []
     for g, f in ups:
         p, mm, T, p2h, p2a, pot = project(f, fit)

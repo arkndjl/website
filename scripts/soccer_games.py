@@ -1981,13 +1981,23 @@ def build(days_ahead=4):
             for e in D.espn_day(lg, day):
                 dk[e['id']] = e
     # Novig's three-way prices first; DraftKings where Novig has none
+    # Polymarket US's 1X2 after its fee first (Nov 15 2026), Novig's for a match Polymarket doesn't list
+    NV, BK = {}, {}
+    span = (today.isoformat(), (today + dt.timedelta(days=days_ahead - 1)).isoformat())
+    want = [(r['id'], r['lg'], L.names.get(r['h'], ['?'])[0], L.names.get(r['a'], ['?'])[0], r['day'])
+            for r in rows if span[0] <= lday(r) <= span[1] and r.get('hs') is None]
+    try:
+        import polymarket
+        NV = polymarket.soccer_prices(want)
+        BK = {k: 'Polymarket' for k in NV}
+    except Exception as e:
+        print('polymarket:', e)
     try:
         import novig
-        span = (today.isoformat(), (today + dt.timedelta(days=days_ahead - 1)).isoformat())
-        NV = novig.soccer_prices([(r['id'], r['lg'], L.names.get(r['h'], ['?'])[0], L.names.get(r['a'], ['?'])[0], r['day'])
-                                  for r in rows if span[0] <= lday(r) <= span[1] and r.get('hs') is None])
+        for k, v in novig.soccer_prices([w for w in want if w[0] not in NV]).items():
+            NV[k], BK[k] = v, 'Novig'
     except Exception as e:
-        print('novig:', e); NV = {}
+        print('novig:', e)
     hi = (today + dt.timedelta(days=days_ahead - 1)).isoformat()
     last0 = dict(R.last)      # unplayed matches in the window count for later ones' rest bands
     for r in rows:
@@ -1998,7 +2008,7 @@ def build(days_ahead=4):
             continue
         e = dk.get(r['id'], {})
         if r['id'] in NV:
-            e = {**e, 'dk': {**(e.get('dk') or {}), **NV[r['id']]}, 'book': 'Novig'}
+            e = {**e, 'dk': {**(e.get('dk') or {}), **NV[r['id']]}, 'book': BK[r['id']]}
         if r.get('hs') is not None and lday(r) < today.isoformat():
             continue
         lh, la = L.lam(r)

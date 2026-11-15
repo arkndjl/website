@@ -736,7 +736,7 @@ def build():
                     pp = props.get((g['id'], pid, s))
                     if pp and mu[s] > 0:
                         po = p_over(s, mu[s], sd[s] ** 2, pp['L'])
-                        lines[s] = {'L': pp['L'], 'oO': pp['oO'], 'oU': pp['oU'], 'pO': round(po, 3), 'bk': 'Novig' if pp.get('src') == 'novig' else 'DraftKings',
+                        lines[s] = {'L': pp['L'], 'oO': pp['oO'], 'oU': pp['oU'], 'pO': round(po, 3), 'bk': {'poly': 'Polymarket', 'novig': 'Novig'}.get(pp.get('src'), 'DraftKings'),
                                     'mkt': None if no_vig(pp['oO'], pp['oU']) is None else round(no_vig(pp['oO'], pp['oU']), 3)}
                 if lines:
                     row['dk'] = lines

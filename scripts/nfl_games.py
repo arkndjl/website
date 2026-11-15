@@ -1041,12 +1041,12 @@ def build():
         x['ir'] = rcost.get(a, 0.0) - rcost.get(h, 0.0)
         mix = lambda t, q: qbinfo[t]['pNow'] * qa(t, q) + (1 - qbinfo[t]['pNow']) * qa(t, qbinfo[t]['alt'][0]) if t in qbinfo and qbinfo[t]['alt'][0] else qa(t, q)
         x['qb'] = (mix(h, g['home_qb_id']) - mix(a, g['away_qb_id'])) * 38
-    # Novig's main lines at its asks first; ESPN's DraftKings where Novig has none
+    # Polymarket US's main lines after its fee first (Novig only where Polymarket has no game); ESPN's DraftKings for the rest
     try:
-        import novig
-        NV = novig.prices('nfl')
+        import polymarket
+        NV = polymarket.book('nfl')
     except Exception as e:
-        print('novig:', e); NV = {}
+        print('polymarket:', e); NV = {}
     out = []
     for g in [g for g in games if int(g['season']) == last and int(g['week']) <= week]:
         px = NV.get(str(g['espn'])) if g['home_score'] in ('', 'NA') else None

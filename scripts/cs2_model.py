@@ -604,7 +604,8 @@ def build():
     # Novig's moneyline where it lists the series (none listed as of Oct 27 2026; scripts/novig.py archives any it does)
     try:
         import novig
-        nvg = novig.h2h("cs2")
+        import polymarket
+        nvg = polymarket.h2h_book("cs2")      # Polymarket US after its fee, Novig where it has no series
     except Exception as ex:  # noqa: BLE001
         print("novig cs2 skipped:", ex)
         nvg = []

@@ -259,14 +259,15 @@ def stake(pc, o):
 
 def live():
     import novig
+    import polymarket
     F = json.load(open(FIT))
     X, k = F['x'], F['k'] * LEAK
     on = F['on'] and X
     T = json.load(open(TEN))
     try:
-        nvg = novig.h2h('tennis')
+        nvg = polymarket.h2h_book('tennis')       # Polymarket US after its fee, Novig where it has no match (Nov 15 2026)
     except Exception as ex:  # noqa: BLE001
-        print('novig tennis failed:', ex)
+        print('tennis prices failed:', ex)
         nvg = []
     now = datetime.datetime.now(datetime.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')

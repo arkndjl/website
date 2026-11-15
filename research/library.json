@@ -1536,7 +1536,7 @@
      "short": "Expected return at the price, from held-out picks judged by the close.",
      "body": [
       "Edge = min(EV, a + b (gap - mean gap)); a blends close value and ROI; b = the market's own slope, shrunk.",
-      "History priced at Novig -103. TIMING .5 halves every backtest edge (live bets come after part of the move).",
+      "History priced at Polymarket US -112 (after its fee; Novig -103 before Nov 15 2026). TIMING .5 halves every backtest edge (live bets come after part of the move).",
       "Chance at the bet line = the market mid there (from both asks) + the calibrated chance edge; gap measured from the market fair line.",
       "NBA backtest edge also x.5 (history saw tip-time injury news the open did not)."
      ],
@@ -1574,7 +1574,7 @@
       "Close value and ROI with 95% ranges clustered by game day; one-sided p on G - 1 df.",
       "Holm across the books (the unit that goes live or paper) and across rules with 8+ game days, family-wise .05.",
       "Win - chance: win rate minus the stake's chance; Brier skill against the close's chance at the pick's price.",
-      "Venue: Novig, or Polymarket US after its taker fee (.095 p(1 - p)) when it pays more at the same line.",
+      "Venue: Polymarket US after its taker fee (.095 p(1 - p)) from Nov 15 2026; Novig where it has no game, then DraftKings.",
       "Polymarket's flag-time price as a signal failed its pre-registered test (143 matched picks: slope t .47; the filter kept worse picks; a noisier forecast of the close than the posted price)."
      ],
      "where": "Predictions picks backtest",
@@ -1722,7 +1722,7 @@
     },
     {
      "term": "NFL props",
-     "short": "One prop per player per game, full Kelly at Novig prices, week scaled to a budget.",
+     "short": "One prop per player per game, full Kelly at Polymarket US prices (else Novig), week scaled to a budget.",
      "body": [
       "P(over) from projection shape by decile, shrunk .414. Held out 2025-26: 3,732 bets 55.3%, t 3.1 at -110.",
       "Weekly budget 50% of bankroll until ~300 props are graded."
@@ -1763,7 +1763,7 @@
     },
     {
      "term": "Tennis picks",
-     "short": "Model side when it differs from the Novig no-vig price by 4+ points of win chance.",
+     "short": "Model side when it differs from the market no-vig price (Polymarket US, else Novig) by 4+ points of win chance.",
      "body": [
       "Calibrated chance = no-vig + .5 x k toward the model (k .25 logits). Cap 2% a bet.",
       "Tour-level main draws; tuned 2025, held out 2026: 1,935 picks, +4.5% worth at close (t 19)."
@@ -2041,7 +2041,7 @@
     },
     {
      "term": "Odds",
-     "short": "Novig (free, no key) is the price source; DraftKings via ESPN is the fallback.",
+     "short": "Polymarket US after its taker fee is the price source; Novig, then DraftKings via ESPN, fill gaps.",
      "body": [
       "Polymarket prices are a data signal only. Odds snapshots every 30 min, 13-04 UTC, plus 08 and 11 UTC."
      ],

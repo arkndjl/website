@@ -114,7 +114,7 @@ def main(args):
 
 
 def tennis(dry):
-    """tennis picks (scripts/tennis_picks.py, Oct 27 2026): the last tennis build's model chances at Novig's current
+    """tennis picks (scripts/tennis_picks.py, Oct 27 2026): the last tennis build's model chances at Polymarket US's (else Novig's) current
     moneylines; its own build (tennis.yml) moves the draw on"""
     if dry:
         print('tennis: would run tennis_picks.py')

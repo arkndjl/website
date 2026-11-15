@@ -64,9 +64,10 @@ CAPS = (1.0, 2.0, 3.0, 5.0, 7.5, 10.0, 15.0, 25.0)  # % of bankroll a bet
 FOLDS, DRAWS, SEASONS_SIM = 5, 400, 2000
 LAM_N0 = 100                    # picks of prior weight on lam = 1
 LEAK = {'nba': 0.5}             # the backtest edge's multiplier where the history saw news the open did not
-# the price the history is priced at (Oct 27 2026): picks are bet on Novig, whose main rungs hold ~1-2% (about -103 a
-# side; DraftKings was -110). A live price other than this is repriced from the calibrated chance (priced())
-BASE = -103
+# the price the history is priced at: picks are bet on Polymarket US (Nov 15 2026, was Novig at -103), whose main rungs
+# hold ~5.6% after its .095 x p(1-p) taker fee (about -112 a side; DraftKings -110). A live price other than this is
+# repriced from the calibrated chance (priced())
+BASE = -112
 # the history's edges are at the OPEN; a live pick is bet at the line when it is posted, after part of the move
 # (Oct 27 2026): the odds archive's first week (Oct 21-27, CFB + NBA, ~220 sides) was worth 0.44 of what the open-based
 # calibration said at the same gap (CFB spread .60, NBA spread .79, CFB total .23, NBA total .34). Every backtest edge
@@ -772,7 +773,7 @@ def test():
     assert stake('cbb', 'spread', c, -110, p=p) == round(k * 100 * 4) / 4
     assert stake('cbb', 'spread', (0.5, 0.0, 0.5), -110, p=p) == 0.0          # no edge at this price
     assert stake('cbb', 'spread', (0.53, 0.0, 0.47), BASE, p={**p, 'b': 0.05}) == UNIT_MIN   # a small edge: the floor
-    assert stake('cbb', 'spread', (0.53, 0.0, 0.47), -110, p={**p, 'b': 0.05}) == 0.0        # gone at a worse price
+    assert stake('cbb', 'spread', (0.53, 0.0, 0.47), -120, p={**p, 'b': 0.05}) == 0.0        # gone at a worse price
     assert stake('cbb', 'spread', (0.7, 0.0, 0.3), -110, p=p) == 10.0         # the cap
     q = {**p, 'V': [[0.0004, 0.0], [0.0, 0.0]]}                               # an uncertain edge stakes less
     assert kelly_pct(q, c, -110) < kelly_pct(p, c, -110)
@@ -781,8 +782,8 @@ def test():
     assert kelly_pct(p, (0.5, 0.1, 0.4), -110) > kelly_pct(p, (0.5, 0.0, 0.5), -110)
     g = {**p, 'on': 'gap', 'a': 0.03, 'b': 0.01, 'evbar': 6.0}                   # on the gap: bigger gaps stake more
     assert kelly_pct(g, c, BASE, 8.0) > kelly_pct(g, c, BASE, 6.0) > kelly_pct(g, c, BASE, 4.5)
-    assert kelly_pct(g, c, -106, 6.0) < kelly_pct(g, c, BASE, 6.0) < kelly_pct(g, c, -101, 6.0)  # a worse price, a smaller stake
-    assert kelly_pct(g, c, -110, 6.0) == 0.0                                  # past the edge: no stake
+    assert kelly_pct(g, c, -118, 6.0) < kelly_pct(g, c, BASE, 6.0) < kelly_pct(g, c, -106, 6.0)  # a worse price, a smaller stake
+    assert kelly_pct(g, c, -120, 6.0) == 0.0                                  # past the edge: no stake
     assert view('cbb', 'spread', c, -115, 6.0)[0] == view('cbb', 'spread', c, -110, 6.0)[0]       # the chance does not move with price
     assert abs(kelly_pct(g, c, -110) - kelly_pct(g, c, -110, 6.0)) < 1e-12    # no gap: the market's average gap
     assert edge(g, 0.02, 9.0)[0] == 0.02                                      # never more than the model expects
@@ -792,7 +793,7 @@ def test():
     assert abs(kelly_pct(g, c, BASE, 6.0, mkt=(0.5, 0.5)) - kelly_pct(g, c, BASE, 6.0)) < 1e-12
     cl, ch = (0.475 + 0.05, 0.0, 0.525 - 0.05), (0.53 + 0.05, 0.0, 0.47 - 0.05)
     assert kelly_pct(g, cl, 104, 6.0, mkt=(0.475, 0.5)) < kelly_pct(g, c, 104, 6.0)
-    assert kelly_pct(g, ch, -118, 6.0, mkt=(0.53, 0.5)) > kelly_pct(g, c, -118, 6.0) == 0.0
+    assert kelly_pct(g, ch, -125, 6.0, mkt=(0.53, 0.5)) > kelly_pct(g, c, -125, 6.0) == 0.0
     assert abs(priced(g, cl, 104, 6.0, mkt=(0.475, 0.5))[0] - (priced(g, c, BASE, 6.0)[0] - 0.025)) < 1e-12
     assert kelly_pct(g, (0.475, 0.0, 0.525), 104, 6.0, mkt=(0.475, 0.5)) == 0.0
     assert stake('cbb', 'spread', (0.53, 0.0, 0.47), -105, p=g, gap=6.0, mkt=(0.53, 0.5)) == 0.0
