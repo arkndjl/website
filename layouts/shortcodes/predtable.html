@@ -48,7 +48,7 @@
 {{- $ia := div (math.Abs $oa) (add (math.Abs $oa) 100.0) }}{{ if gt $oa 0.0 }}{{ $ia = div 100.0 (add $oa 100.0) }}{{ end }}
 {{- $qh := div $ih (add $ih $ia) }}{{ $ph := float .p }}{{ $d := sub $ph $qh }}{{ if ne $d 0.0 }}
 {{- $home := gt $d 0.0 }}{{ $o := cond $home $oh $oa }}{{ $pm := cond $home $ph (sub 1.0 $ph) }}{{ $q := cond $home $qh (sub 1.0 $qh) }}
-{{- $fair := 0.0 }}{{ if ge $pm 0.5 }}{{ $fair = div (mul -100.0 $pm) (sub 1.0 $pm) }}{{ else }}{{ $fair = div (mul 100.0 (sub 1.0 $pm)) $pm }}{{ end }}
+{{- $pc := math.Min 0.999 (math.Max 0.001 $pm) }}{{ $fair := 0.0 }}{{ if ge $pc 0.5 }}{{ $fair = div (mul -100.0 $pc) (sub 1.0 $pc) }}{{ else }}{{ $fair = div (mul 100.0 (sub 1.0 $pc)) $pc }}{{ end }}
 {{- $rows = $rows | append (dict "r" $r "mk" "ML" "side" (cond $home "home" "away") "bet" (printf "%s %+.0f" (cond $home .h .a) $o) "model" (partial "num.html" (slice "%+.0f" $fair)) "edge" (partial "num.html" (slice "%.1f%%" (mul 100 (math.Abs $d)))) "pm" $pm "q" $q "e" (math.Abs $d)) }}
 {{- end }}{{ end }}{{ end }}
 {{- end }}{{ end -}}
