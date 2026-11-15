@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-15T23:49:56Z",
+ "asof": "2026-11-15T23:58:16Z",
  "recenter": {
   "2026-11-15": 2.13,
-  "2026-11-16": 2.0
+  "2026-11-16": 2.03
  },
  "monitor": {
   "clocks": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-15T21:52:57Z",
-  "ageH": 1.9,
+  "ageH": 2.1,
   "stale": false
  },
  "picks": [],
@@ -1963,7 +1963,7 @@
     "side": "over",
     "line": 158.5,
     "price": -119.0,
-    "ev": 0.086,
+    "ev": 0.085,
     "units": 0.25
    }
   },
@@ -2407,22 +2407,6 @@
  ],
  "board": [
   {
-   "id": "401911240",
-   "sport": "cbb",
-   "kick": "2026-11-17T00:00:00Z",
-   "home": "Virginia Tech",
-   "away": "Richmond",
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -5413.0,
-   "edge": 15.8,
-   "x": 5.0,
-   "why": "gap too big: a bad line",
-   "m": 13.3,
-   "tm": 155.7
-  },
-  {
    "id": "401918075",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2495,7 +2479,7 @@
    "mk": "total",
    "side": "over",
    "line": 148.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 3.6,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2615,6 +2599,22 @@
    "tm": 150.0
   },
   {
+   "id": "401911240",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:00:00Z",
+   "home": "Virginia Tech",
+   "away": "Richmond",
+   "mk": "total",
+   "side": "over",
+   "line": 154.5,
+   "price": -124.0,
+   "edge": 1.2,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 13.3,
+   "tm": 155.7
+  },
+  {
    "id": "401920735",
    "sport": "cbb",
    "kick": "2026-11-17T01:00:00Z",
@@ -2637,12 +2637,12 @@
    "home": "UTEP",
    "away": "Florida A&M",
    "mk": "total",
-   "side": "under",
-   "line": 141.5,
+   "side": "over",
+   "line": 140.5,
    "price": -124.0,
    "edge": 0.5,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
+   "x": 7.0,
+   "why": "edge under 7",
    "m": 19.9,
    "tm": 141.0
   }
@@ -2652,7 +2652,7 @@
    "mk": "total",
    "side": "over",
    "line": 148.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -2710,11 +2710,11 @@
    "state": "paper"
   },
   "401911240": {
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -5413.0,
-   "edge": 15.8,
+   "mk": "total",
+   "side": "over",
+   "line": 154.5,
+   "price": -124.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "Virginia Tech",
@@ -2823,7 +2823,7 @@
    "side": "over",
    "line": 158.5,
    "price": -119.0,
-   "ev": 0.086,
+   "ev": 0.085,
    "edge": 8.0,
    "units": 0.25,
    "bk": "poly",
@@ -2845,8 +2845,8 @@
   },
   "401929419": {
    "mk": "total",
-   "side": "under",
-   "line": 141.5,
+   "side": "over",
+   "line": 140.5,
    "price": -124.0,
    "edge": 0.5,
    "ev": null,
@@ -2920,16 +2920,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16250,
+  "snapshots": 16255,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 530,
-    "clvRet": -0.0297,
-    "clvT": -3.91,
-    "clv": 0.19,
+    "clvN": 533,
+    "clvRet": -0.0274,
+    "clvT": -3.49,
+    "clv": 0.25,
     "beat": 0.306,
-    "still": 0.317
+    "still": 0.319
    },
    {
     "when": "6-24h",
@@ -19243,7 +19243,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-15T23:49:56Z",
+ "checked": "2026-11-15T23:58:16Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
