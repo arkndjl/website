@@ -147,6 +147,9 @@ export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionab
 export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
 export const seasonOut = st => /season/i.test(st || '');
 const SEASON_ABSORB = 3;   // games a team plays without a season-out player before its ratings carry the loss (see gamesModel)
+// A gradual fade by games missed (linear, half-life, longer cutoffs, none) instead of this cutoff: no shape beat it held
+// out 2021-26 on the QB charge (scripts/cfb_qb_backup.mjs fade: tune pick cut2 held log loss t +1.48, MAE t +2.22; every
+// fade t +.75 to +1.2), though the charge's residual slope does fall with the streak (1.1 at 0-1 missed, .55 at 2, .35 at 3-4)
 const QB_CAP = 10;     // most points a QB1 absence moves a margin (see side())
 // status from one clause of a news headline (or, failing that, the blurb's first sentence): the most serious
 // reading wins; null = not availability news. strict (the blurb): no bare "out", which matchup write-ups use

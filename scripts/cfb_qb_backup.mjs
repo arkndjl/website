@@ -6,6 +6,8 @@
 //   node scripts/cfb_qb_backup.mjs build [first] [last]   # QB EPA by game from ESPN play-by-play -> scripts/.cache/cfb/qb_epa.json.gz
 //   node scripts/cfb_qb_backup.mjs test [espn_md.json.gz]  # the backtest -> data/cfb_qb_backup.json
 //   node scripts/cfb_qb_backup.mjs check <cfbd md.json.gz> # ESPN QB EPA against CFBD's season QB PPA (same ids)
+//   node scripts/cfb_qb_backup.mjs fade                    # the charge faded by games missed against the three-game cutoff
+//                                                          # -> data/cfb_qb_backup.json 'fade' (no shape beat the cutoff held out)
 //   node scripts/cfb_qb_backup.mjs fv                      # each QB's prior moved by his 247 composite (recruit FV input;
 //                                                          # python3 scripts/fv_games_research.py qb247 first) -> data/fv_games_research.json
 // The test: each team's QB1 before the game (most QB plays in its earlier games this season, 60 or more) and whether
@@ -73,7 +75,7 @@ if (mode === 'check') {
   process.exit(0);
 }
 
-if (mode !== 'test' && mode !== 'fv') { console.log('usage: build | test | check | fv'); process.exit(1); }
+if (mode !== 'test' && mode !== 'fv' && mode !== 'fade') { console.log('usage: build | test | check | fv | fade'); process.exit(1); }
 
 // ---- the test --------------------------------------------------------------------------------------------
 process.env.ONLYSHIP = '1';
@@ -97,6 +99,7 @@ const byId = Object.fromEntries(rows.map(r => [String(r.id), r]));
 const ctx = {};
 {
   const cur = {}, teamPlays = {};   // season|aid -> [plays, EPA]; season|team -> aid -> plays
+  const tgi = {}, last = {};        // season|team -> team games so far; season|team|aid -> index of his last game with a QB play
   const games = Object.entries(Q.games).sort((a, b) => a[1].date.localeCompare(b[1].date));
   for (const [id, g] of games) {
     for (const [t, P] of Object.entries(g.q)) {
@@ -105,7 +108,11 @@ const ctx = {};
       const q1 = order[0]?.[0], q2 = order[1]?.[0];
       const st = Object.entries(P).sort((a, b) => b[1][0] - a[1][0])[0]?.[0];
       const snap = a => a && { aid: a, cur: [...(cur[g.S + '|' + a] || [0, 0])], prev: [...(cur[(g.S - 1) + '|' + a] || [0, 0])] };
-      if (q1 && st && (tp[q1] || 0) >= 60) ctx[id + '|' + t] = { S: g.S, t, out: st !== q1, q1: snap(q1), st: snap(st), q2: q2 ? snap(q2) : null, stIsQ2: st === q2 };
+      const gi = tgi[g.S + '|' + t] || 0, li = last[g.S + '|' + t + '|' + q1];
+      // streak: the team's games in a row before this one that QB1 had no QB play (the live avail streak)
+      if (q1 && st && (tp[q1] || 0) >= 60) ctx[id + '|' + t] = { S: g.S, t, out: st !== q1, q1: snap(q1), st: snap(st), q2: q2 ? snap(q2) : null, stIsQ2: st === q2, streak: li == null ? gi : gi - li - 1 };
+      tgi[g.S + '|' + t] = gi + 1;
+      for (const a of Object.keys(P)) if (P[a][0] > 0) last[g.S + '|' + t + '|' + a] = gi;
       for (const [a, v] of Object.entries(P)) {
         tp[a] = (tp[a] || 0) + v[0];
         const c = (cur[g.S + '|' + a] ||= [0, 0]); c[0] += v[0]; c[1] += v[1];
@@ -130,7 +137,7 @@ const cost = (c, sp, who = 'st') => {
   if (!c?.out) return 0;
   const tal = ROSTER[c.S]?.[c.t]?.tal247 ?? 0;
   const vb = Math.max(val(c[who], sp, tal), sp.floor ?? -0.25), v1 = val(c.q1, sp, tal);
-  return Math.max(-(sp.cap ?? 6), (vb - v1) * (sp.plays ?? 38)) * (sp.scale ?? 1);
+  return Math.max(-(sp.cap ?? 6), (vb - v1) * (sp.plays ?? 38)) * (sp.scale ?? 1) * (sp.fade ? sp.fade(c.streak ?? 0) : 1);
 };
 // sigma per season from the base predictions (m / Phi^-1(ph)) so the charge moves win probability as live
 const ninv = p => { // Acklam
@@ -164,6 +171,48 @@ const none = base.map(x => ({ ...x, g: 0 }));
 const liveO = apply(LIVE, 'st'), liveQ2 = apply(LIVE, 'q2');
 report.live = { oracle: { ...both(liveO, none), slope: { tune: slope(liveO, inTune), held: slope(liveO, inHold) } }, q2: { ...both(liveQ2, none), slope: { tune: slope(liveQ2, inTune), held: slope(liveQ2, inHold) } } };
 console.log('live', JSON.stringify(report.live));
+if (mode === 'fade') {
+  // the absence charge faded by games missed (QB1 out, streak = team games in a row he has missed before this one),
+  // against the live hard cutoff (full charge for streak 0-2, none from 3: SEASON_ABSORB in scripts/cfb_teams.mjs).
+  // Shapes picked on tune 2016-20 by log loss; the pick scored once on held 2021-26 (2026 weeks 1-10; week 11 on is
+  // the 2026-27 lockbox), paired per game, t clustered by day x home team. Oracle starter (the man who started)
+  const SHIP = { ...LIVE, k: 500, repl: -0.2, cap: 10 };
+  const tuneX = x => inTune(x.S), heldX = x => inHold(x.S) && !(x.S === 2026 && (x.w ?? 0) >= 11);
+  const cmpX = (a, b, key, f) => { const A = a.filter(f), B = b.filter(f); const t = paired(A.map(x => x[key]), B.map(x => x[key]), [A.map(x => x.day), A.map(x => x.ht)]); return { d: r4(t.d), t: r2(t.t), n: A.length }; };
+  const bothX = (a, b) => ({ ll: { tune: cmpX(a, b, 'll', tuneX), held: cmpX(a, b, 'll', heldX) }, mae: { tune: cmpX(a, b, 'ae', tuneX), held: cmpX(a, b, 'ae', heldX) } });
+  const SH = {
+    cut3: s => s < 3 ? 1 : 0, none: () => 1, cut2: s => s < 2 ? 1 : 0, cut4: s => s < 4 ? 1 : 0, cut6: s => s < 6 ? 1 : 0,
+    ...Object.fromEntries([2, 3, 4, 5, 6, 8, 10].map(n => ['lin' + n, s => Math.max(0, 1 - s / n)])),
+    ...Object.fromEntries([1, 2, 3, 4, 6].map(h => ['half' + h, s => 0.5 ** (s / h)])),
+    // after the live cutoff's three full games, linear to zero over n more
+    ...Object.fromEntries([3, 6].map(n => ['hold3lin' + n, s => s < 3 ? 1 : Math.max(0, 1 - (s - 2) / (n + 1))])),
+  };
+  const byStreak = {};
+  for (const c of outs) { const k = Math.min(c.streak, 8); byStreak[k] = (byStreak[k] || 0) + 1; }
+  const live = apply({ ...SHIP, fade: SH.cut3 }, 'st'), none0 = base.map(x => ({ ...x, g: 0 }));
+  // the miss on QB1-out games by streak against the model without the charge: the charge the ratings still lack
+  const slopeBy = o => { const r = {}; for (const [lo, hi] of [[0, 0], [1, 1], [2, 2], [3, 4], [5, 7], [8, 99]]) {
+    const xs = o.filter(x => x.g && (tuneX(x) || heldX(x))).filter(x => { const r0 = byId[x.id]; const c = ctx[x.id + '|' + r0.h]?.out ? ctx[x.id + '|' + r0.h] : ctx[x.id + '|' + r0.a]; return c && c.streak >= lo && c.streak <= hi; });
+    const sxx = xs.reduce((a, x) => a + x.g * x.g, 0), sxy = xs.reduce((a, x) => a + x.g * (x.res - (x.m - x.g)), 0);
+    r[lo === hi ? String(lo) : `${lo}-${hi}`] = { n: xs.length, b: r2(sxy / (sxx || 1)), cost: r2(mean(xs.map(x => Math.abs(x.g)))) }; } return r; };
+  const full = apply({ ...SHIP, fade: SH.none }, 'st');
+  const rows2 = [];
+  for (const [k, f] of Object.entries(SH)) {
+    const o = apply({ ...SHIP, fade: f }, 'st');
+    rows2.push({ k, tune: mean(o.filter(tuneX).map(x => x.ll)), held: mean(o.filter(heldX).map(x => x.ll)), o });
+  }
+  rows2.sort((a, b) => a.tune - b.tune);
+  const pick = rows2.find(r => r.k !== 'cut3');
+  const res = { asof: new Date().toISOString().slice(0, 10), qb1Out: outs.length, byStreak, slopeByStreak: slopeBy(full),
+    grid: rows2.map(r => ({ shape: r.k, tune: r4(r.tune), held: r4(r.held), vsLive: bothX(r.o, live) })),
+    pick: pick.k, pickVsLive: bothX(pick.o, live), liveVsNone: bothX(live, none0) };
+  console.log(JSON.stringify({ byStreak: res.byStreak, slope: res.slopeByStreak }));
+  for (const g of res.grid) console.log(g.shape.padEnd(10), g.tune, g.held, 'tune t', g.vsLive.ll.tune.t, 'held t', g.vsLive.ll.held.t, 'mae', g.vsLive.mae.tune.t, g.vsLive.mae.held.t);
+  console.log('pick', pick.k, JSON.stringify(res.pickVsLive));
+  const f = path.join(ROOT, 'data', 'cfb_qb_backup.json'), j = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+  j.fade = res; fs.writeFileSync(f, JSON.stringify(j, null, 1));
+  process.exit(0);
+}
 if (mode === 'fv') {
   // shipped charge, each QB's prior moved by his recruit grade; grid on tune (b per 1.0 of composite, unrated level u,
   // replacement re-centred), scored against the shipped charge
