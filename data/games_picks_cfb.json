@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T07:00:49Z",
+ "asof": "2026-11-15T09:30:38Z",
  "recenter": {
   "week": 0.22
  },
@@ -216,10 +216,10 @@
     }
    },
    "total": {
-    "n": 50,
-    "window": 50,
-    "mean": 0.083,
-    "t": 0.86,
+    "n": 51,
+    "window": 51,
+    "mean": 0.0834,
+    "t": 0.89,
     "p": null,
     "days": 4,
     "sd": 0.1178,
@@ -228,25 +228,25 @@
     "h": 10.0,
     "rho": 0.038,
     "edge": {
-     "cusum": 0.74,
-     "cusumMax": 0.74,
+     "cusum": 0.68,
+     "cusumMax": 0.68,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0131,
-     "n": 50,
+     "n": 51,
      "sd": 0.1178,
      "rho": 0.038,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.736,
-     "info": 0.62,
-     "real": -1.411,
-     "realSe": 1.528,
+     "llr": -0.683,
+     "info": 0.63,
+     "real": -1.186,
+     "realSe": 1.518,
      "need": 479
     }
    },
@@ -398,19 +398,19 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 85,
+   "n": 86,
    "days": 9,
-   "llr": 13.016,
+   "llr": 12.964,
    "lo": -2.944,
    "hi": 2.944,
    "state": "confirmed",
    "at": "2026-11-14",
-   "sd": 0.525,
+   "sd": 0.5219,
    "rho": 0.05,
    "real": 1.0,
-   "realSe": 0.111,
-   "clvRet": 0.0426,
-   "evDU": 0.0777
+   "realSe": 0.11,
+   "clvRet": 0.0433,
+   "evDU": 0.077
   },
   "back": {
    "n": 16,
@@ -421,7 +421,7 @@
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -17.0,
+  "ageH": -14.5,
   "stale": false
  },
  "picks": [],
@@ -456,11 +456,121 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 130.0,
-    "ev": 0.075,
-    "units": 2.0
+    "price": 125.0,
+    "ev": 0.052,
+    "units": 1.5
    }
+  }
+ ],
+ "withdrawn": [],
+ "board": [],
+ "games": {
+  "401856887": {
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 125.0,
+   "ev": 0.052,
+   "edge": 3.7,
+   "units": 1.5,
+   "home": "Oklahoma",
+   "away": "Ole Miss",
+   "state": "paper"
+  }
+ },
+ "record": {
+  "n": 63,
+  "w": 25,
+  "l": 38,
+  "units": -14.0,
+  "roi": -0.222,
+  "t": -1.82,
+  "ev": 0.112,
+  "sized": {
+   "units": -25.0,
+   "risked": 84.2,
+   "roi": -0.297,
+   "bank": 0.7733
   },
+  "clvN": 63,
+  "clvRet": 0.0695,
+  "clvT": 0.91,
+  "clv": 0.06,
+  "beat": 0.349,
+  "still": 0.349,
+  "byMarket": {
+   "spread": {
+    "clvN": 8,
+    "clvRet": -0.012,
+    "clvT": -0.58,
+    "clv": -0.12,
+    "beat": 0.0,
+    "still": 0.875,
+    "n": 8
+   },
+   "ml": {
+    "clvN": 0,
+    "clvRet": null,
+    "clvT": null,
+    "clv": null,
+    "beat": null,
+    "still": null,
+    "n": 0
+   },
+   "total": {
+    "clvN": 55,
+    "clvRet": 0.0814,
+    "clvT": 0.93,
+    "clv": 0.09,
+    "beat": 0.4,
+    "still": 0.273,
+    "n": 55
+   }
+  }
+ },
+ "timing": {
+  "minEdge": 3,
+  "snapshots": 19522,
+  "buckets": [
+   {
+    "when": "24h+",
+    "clvN": 3828,
+    "clvRet": -0.0488,
+    "clvT": -34.02,
+    "clv": 0.18,
+    "beat": 0.35,
+    "still": 0.291
+   },
+   {
+    "when": "6-24h",
+    "clvN": 557,
+    "clvRet": -0.0641,
+    "clvT": -23.89,
+    "clv": -0.07,
+    "beat": 0.162,
+    "still": 0.598
+   },
+   {
+    "when": "1-6h",
+    "clvN": 305,
+    "clvRet": -0.0586,
+    "clvT": -17.34,
+    "clv": 0.03,
+    "beat": 0.161,
+    "still": 0.702
+   },
+   {
+    "when": "<1h",
+    "clvN": 60,
+    "clvRet": -0.0719,
+    "clvT": -9.83,
+    "clv": -0.07,
+    "beat": 0.017,
+    "still": 0.867
+   }
+  ]
+ },
+ "recent": [
   {
    "id": "401864537",
    "espn": "401864537",
@@ -486,118 +596,16 @@
    "betTo": 39.5,
    "close": 40.5,
    "paper": true,
-   "now": null
-  }
- ],
- "withdrawn": [],
- "board": [],
- "games": {
-  "401856887": {
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 130.0,
-   "ev": 0.075,
-   "edge": 3.7,
-   "units": 2.0,
-   "home": "Oklahoma",
-   "away": "Ole Miss",
-   "state": "paper"
-  }
- },
- "record": {
-  "n": 62,
-  "w": 25,
-  "l": 37,
-  "units": -13.0,
-  "roi": -0.209,
-  "t": -1.7,
-  "ev": 0.114,
-  "sized": {
-   "units": -24.2,
-   "risked": 83.5,
-   "roi": -0.29,
-   "bank": 0.7793
+   "score": [
+    21.0,
+    13.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": 0.035,
+   "clv": 1.0,
+   "beat": 1
   },
-  "clvN": 62,
-  "clvRet": 0.0701,
-  "clvT": 0.9,
-  "clv": 0.05,
-  "beat": 0.339,
-  "still": 0.355,
-  "byMarket": {
-   "spread": {
-    "clvN": 8,
-    "clvRet": -0.012,
-    "clvT": -0.58,
-    "clv": -0.12,
-    "beat": 0.0,
-    "still": 0.875,
-    "n": 8
-   },
-   "ml": {
-    "clvN": 0,
-    "clvRet": null,
-    "clvT": null,
-    "clv": null,
-    "beat": null,
-    "still": null,
-    "n": 0
-   },
-   "total": {
-    "clvN": 54,
-    "clvRet": 0.0823,
-    "clvT": 0.92,
-    "clv": 0.07,
-    "beat": 0.389,
-    "still": 0.278,
-    "n": 54
-   }
-  }
- },
- "timing": {
-  "minEdge": 3,
-  "snapshots": 19521,
-  "buckets": [
-   {
-    "when": "24h+",
-    "clvN": 3828,
-    "clvRet": -0.0488,
-    "clvT": -34.02,
-    "clv": 0.18,
-    "beat": 0.35,
-    "still": 0.291
-   },
-   {
-    "when": "6-24h",
-    "clvN": 556,
-    "clvRet": -0.0641,
-    "clvT": -23.83,
-    "clv": -0.07,
-    "beat": 0.162,
-    "still": 0.597
-   },
-   {
-    "when": "1-6h",
-    "clvN": 305,
-    "clvRet": -0.0586,
-    "clvT": -17.34,
-    "clv": 0.03,
-    "beat": 0.161,
-    "still": 0.702
-   },
-   {
-    "when": "<1h",
-    "clvN": 60,
-    "clvRet": -0.0719,
-    "clvT": -9.83,
-    "clv": -0.07,
-    "beat": 0.017,
-    "still": 0.867
-   }
-  ]
- },
- "recent": [
   {
    "id": "401860917",
    "espn": "401860917",
@@ -1989,40 +1997,6 @@
    "profit": -1.0,
    "clvRet": -0.0937,
    "clv": -3.0,
-   "beat": -1
-  },
-  {
-   "id": "401856856",
-   "espn": "401856856",
-   "sport": "cfb",
-   "kick": "2026-11-08T02:30:00.000Z",
-   "home": "Texas Tech",
-   "away": "West Virginia",
-   "mk": "total",
-   "side": "under",
-   "line": 64.5,
-   "price": -100.0,
-   "p": 0.517,
-   "ev": 0.034,
-   "units": 2.5,
-   "edge": 4.3,
-   "x": 3.0,
-   "pDU": 0.5136,
-   "evDU": 0.0271,
-   "m": 14.8,
-   "tm": 60.2,
-   "tmRaw": 60.9,
-   "flagged": "2026-11-02T02:51:13Z",
-   "betTo": 63.0,
-   "close": 68.5,
-   "score": [
-    48.0,
-    53.0
-   ],
-   "res": "l",
-   "profit": -1.0,
-   "clvRet": -0.1967,
-   "clv": -4.0,
    "beat": -1
   }
  ],
@@ -4082,7 +4056,16 @@
    "flagged": "2026-11-09T01:19:12Z",
    "betTo": 39.5,
    "close": 40.5,
-   "paper": true
+   "paper": true,
+   "score": [
+    21.0,
+    13.0
+   ],
+   "res": "l",
+   "profit": -1.0,
+   "clvRet": 0.035,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "id": "401858301",
@@ -5315,12 +5298,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T07:00:49Z",
+ "checked": "2026-11-15T09:30:38Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-15": {
-    "raw": 1.75,
+    "raw": 2.75,
     "scale": 1.0
    }
   }
