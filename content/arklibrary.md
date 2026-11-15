@@ -137,6 +137,7 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 - m b v | my bloody valentine | 2013 | /img/covers/a-mbv.jpg
 - Comedown Machine | The Strokes | 2013 | /img/covers/a-comedown-machine.jpg
 - Angles | The Strokes | 2011 | /img/covers/a-angles.jpg
+- The Fashion | The Fashion | 2007 | /img/covers/a-the-fashion.jpg
 - First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
 - Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
 - Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
@@ -166,6 +167,7 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 - Lauryn Hill | | | /img/covers/p-lauryn-hill.jpg
 - Fleetwood Mac | | | /img/covers/p-fleetwood-mac.jpg
 - Nas | | | /img/covers/p-nas.jpg
+- The Fashion | | | /img/covers/p-the-fashion.jpg
 {{< /winlist >}}
 {{< winlist title="profiles.exe" icon="note" >}}
 - [spotify](https://open.spotify.com/user/my8ni6uyjvfrii5qjqa7wbgbv) | playlists and listening | | | #icon-spotify

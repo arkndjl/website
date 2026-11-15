@@ -80,6 +80,7 @@ COVERS = {
     "a-rumours":        ("album", "Fleetwood Mac|Rumours"),
     "st-patricks":      ("url", "https://live.staticflickr.com/3/4309341_195a078e36_b.jpg|https://www.flickr.com/photos/35034359460@N01/4309341|photo: Peter Kaminski, CC BY 2.0"),
     "a-virtue": ("album", "The Voidz|Virtue"),
+    "a-the-fashion": ("album", "The Fashion|The Fashion"),
     # people (rows in the artists / authors / actors / architects tabs)
     "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
     "p-warhol":         ("url", "https://uploads3.wikiart.org/images/andy-warhol.jpg!Portrait.jpg|https://www.wikiart.org/en/andy-warhol|self-portrait, via WikiArt"),
@@ -124,6 +125,7 @@ COVERS = {
     "p-sextile": ("deezer", "Sextile"),
     "p-lauryn-hill": ("deezer", "1117"),  # pinned: the search's top hit is a different page
     "p-fleetwood-mac": ("deezer", "Fleetwood Mac"),
+    "p-the-fashion": ("deezer", "71908"),  # pinned: Danish band
 }
 
 
