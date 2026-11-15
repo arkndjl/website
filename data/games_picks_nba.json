@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T13:33:53Z",
+ "asof": "2026-11-15T13:36:00Z",
  "recenter": {
-  "2026-11-15": 1.67
+  "2026-11-15": 1.66
  },
  "monitor": {
   "clocks": {
@@ -203,7 +203,7 @@
  },
  "model": {
   "asof": "2026-11-15T10:43:21Z",
-  "ageH": 2.8,
+  "ageH": 2.9,
   "stale": false
  },
  "picks": [
@@ -422,22 +422,6 @@
    "tm": 223.0
   },
   {
-   "id": "401909988",
-   "sport": "nba",
-   "kick": "2026-11-15T22:00:00Z",
-   "home": "UTAH",
-   "away": "SA",
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -106.0,
-   "edge": 1.1,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": -17.5,
-   "tm": 225.6
-  },
-  {
    "id": "401909992",
    "sport": "nba",
    "kick": "2026-11-16T01:00:00Z",
@@ -452,6 +436,22 @@
    "why": "edge under 2.5",
    "m": -8.0,
    "tm": 232.4
+  },
+  {
+   "id": "401909988",
+   "sport": "nba",
+   "kick": "2026-11-15T22:00:00Z",
+   "home": "UTAH",
+   "away": "SA",
+   "mk": "spread",
+   "side": "away",
+   "line": -16.5,
+   "price": 669.0,
+   "edge": 1.0,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": -17.5,
+   "tm": 225.6
   },
   {
    "id": "401909989",
@@ -508,11 +508,11 @@
    "state": "under"
   },
   "401909988": {
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -106.0,
-   "edge": 1.1,
+   "mk": "spread",
+   "side": "away",
+   "line": -16.5,
+   "price": 669.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "UTAH",
@@ -632,7 +632,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4290,
+  "snapshots": 4292,
   "buckets": [
    {
     "when": "24h+",
@@ -7216,7 +7216,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T13:33:53Z",
+ "checked": "2026-11-15T13:36:00Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
