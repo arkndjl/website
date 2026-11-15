@@ -75,7 +75,7 @@ NEG = re.compile(r"\?|\bpotential(ly)?\b|\bcould\b|\bmay\b|\bmight\b|\bif\b|\bwo
                  r"the lineup|play|injury|campus)|\bkick(off)? return|\bpunt return|\breturn (yards|touchdown|td|man|specialist)|"
                  r"\bbowl\b|\bcoach(es|ing)?\b(?! (says|confirms))|\bcoordinator\b|\bdeadline\b|\bwatch\b|\btracker\b|\bpredict|"
                  r"\bodds\b|\bmock\b|\bsigning day\b|\bcommits? to\b(?! return)|\bflip|\bwilling\b|\boffer(s|ed)?\b|\bpay for\b|"
-                 r"\bturn(s|ed)? down\b|\b\d+(st|nd|rd|th) season\b", re.I)
+                 r"\bturn(s|ed)? down\b|\bbelieve|\bthink|\bconfident\b|\bI\b|\bI'm\b|\bshould\b|\bopinion\b|\b\d+(st|nd|rd|th) season\b", re.I)
 # pro clubs that share a word with a college headline (Vikings, Chiefs): a pro re-signing is not a college return
 PRO = {'cfb': re.compile(r"\b(nfl|vikings|packers|bears|lions|cowboys|giants|eagles|commanders|49ers|niners|seahawks|rams|cardinals|"
                          r"saints|falcons|panthers|buccaneers|bucs|patriots|jets|bills|dolphins|ravens|steelers|browns|bengals|"
@@ -270,6 +270,7 @@ def main():
         ix = Index(board_rows(s))
         old = prev.get('sports', {}).get(s, {})
         feed = [x for x in old.get('feed', []) if old.get('target') == target]
+        feed = [x for x in feed if reading(x['title'], target, s)[0] == x['kind']]   # re-read with today's rules
         try:
             new = pull(s, a.days, target, ix)
         except Exception as e:      # a dead feed keeps what was pulled before
