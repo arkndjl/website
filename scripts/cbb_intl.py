@@ -7,6 +7,7 @@ strength and minutes played.
     sh scripts/cbb_intl_pull.sh       # raw pulls: Basketball-Reference international league totals, Barttorvik seasons
     python3 scripts/cbb_intl.py       # full run: league factors, backtest, fit (scripts/data/cbb_intl_fit.json), grade
     python3 scripts/cbb_intl.py --daily   # in season: re-pull this season's league pages, re-grade with the committed fit
+    python3 scripts/cbb_intl.py --top     # refit only the two upper rungs on the committed model (needs careers.json)
 
 Population: the non-college prospects on the big boards. Training: every international on ESPN's final board or
 NBADraft.net's final board for the 2009-2020 drafts (no D-I season that year or the one before, not G League), each
@@ -29,6 +30,13 @@ kept only if they lower out-of-sample deviance with whole players held out (cbb_
 consensus in training; the live boards are months earlier, so the live rank enters as the distribution of the June
 rank it predicts (No Ceilings' first board of each class 2019-26 against ESPN's final: slope, intercept and spread),
 averaged over that spread.
+
+Top of the scale: only a few dozen board internationals reached 50+ (seven reached 60+), too few to fit the two upper
+rungs on them alone (their penalty left both as constants, so no input could lift a top prospect past E[FV] ~49). Those
+two rungs, P(50+ | 40+) and P(60+ | 50+), are fit on the internationals together with the college players on the same
+final boards (college_board_rows: the same rank definition and outcome scale, about seven times the careers), on what
+both pools share: board rank, the top-10 hinge, age at the draft, big, and an international offset (TOP_COLS). The
+lower rungs stay the internationals' own.
 
 FV: an international's E[FV] sits on the same scale as a D-I player's, so he gets the FV the college board gives
 that E[FV] (the preseason board's E[FV] -> FV curve, scripts/cbb_prior.json.gz). The college grades don't move.
@@ -405,6 +413,118 @@ CANDS = ['lr', 'top', 'gmsc', 'ts', 'ft', 'pts', 'ast', 'stl', 'blk', 'tov', 'or
 
 # ---------------------------------------------------------------- fit
 GRID = (1, 3, 10, 30, 100, 300, 1000)
+TOP_COLS = ['lr', 'top', 'age', 'big', 'intl']   # what the two upper rungs read, on internationals and college players
+TOP_RUNGS = (2, 3)                               # P(50+ | 40+), P(60+ | 50+)
+
+
+def college_board_rows(years):
+    """the college players on the same final boards (ESPN, NBADraft.net), with the internationals' rank definition
+    (mean -ln rank, 1.5 x the board's depth when off one) and outcome scale: the pool the upper rungs borrow from.
+    Needs scripts/.cache/cbb/careers.json (scripts/cbb_careers_kit.py)."""
+    es = defaultdict(dict); nd = defaultdict(dict)
+    for r in read_csv(os.path.join(BOARDS, 'espn.csv')):
+        if r['rank'] and int(r['draft_year']) in years: es[int(r['draft_year'])][D.norm(r['name'])] = int(r['rank'])
+    for r in read_csv(os.path.join(BOARDS, 'nbadraftnet.csv')):
+        if int(r['draft_year']) in years: nd[int(r['draft_year'])][D.norm(r['name'])] = int(r['rank'])
+    careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
+    thr = F.xpm_scale(careers)
+    by = defaultdict(list)
+    for c in careers:
+        if c['last'] in years: by[(c['last'], D.norm(c['name']))].append(c)
+    out = []
+    for y in years:
+        dep = {'espn': max(es[y].values() or [100]), 'ndn': max(nd[y].values() or [100])}
+        for k in sorted(set(es[y]) | set(nd[y])):
+            cs = by.get((y, k))
+            if not cs: continue
+            c = next((q for q in cs if q['nba'].get('draft') == y), max(cs, key=lambda q: q['seasons'][-1].get('min_per') or 0))
+            lr = float(np.mean([-math.log(es[y].get(k, 1.5 * dep['espn'])), -math.log(nd[y].get(k, 1.5 * dep['ndn']))]))
+            a = D.age_on(c.get('dob'), y, 6, 25) if c.get('dob') else None
+            out.append({'pid': 'c' + str(c['pid']), 'name': c['name'], 'year': y, 'y': float(F.xpm_fv(c, thr)),
+                        'f': {'lr': lr, 'top': max(0.0, lr + math.log(10)), 'age': a, 'big': 1.0 if c['seasons'][-1].get('role') == 'C' else 0.0, 'intl': 0.0}})
+    known = [r['f']['age'] for r in out if r['f']['age']]
+    for r in out:
+        if not r['f']['age']: r['f']['age'] = float(np.mean(known))
+    return out
+
+
+def _rung_fit(pool, j, lam):
+    y = np.array([r['y'] for r in pool], float); on = y >= F.LADDER[j - 1]
+    X = F.matrix([r for r, o in zip(pool, on) if o], TOP_COLS); std = F.Std(X)
+    return std, F.logit_fit(std(X), (y[on] >= F.LADDER[j]).astype(float), lam)
+
+
+def _rung_p(m, rows):
+    std, w = m; Z = std(F.matrix(rows, TOP_COLS))
+    return 1 / (1 + np.exp(-np.clip(w[0] + Z @ w[1:], -30, 30)))
+
+
+def _rung_lam(pool, j):
+    """the rung's penalty: the grid's best by player-held-out log loss on the pool"""
+    sub = [r for r in pool if r['y'] >= F.LADDER[j - 1]]
+    fo = np.array([F.fold_of(r['pid']) for r in sub]); o = (np.array([r['y'] for r in sub]) >= F.LADDER[j]).astype(float)
+    best = None
+    for g in GRID:
+        c = np.zeros(len(sub))
+        for k in range(F.FOLDS):
+            if (fo == k).any(): c[fo == k] = _rung_p(_rung_fit([r for r, t in zip(sub, fo != k) if t], j, g), [r for r, t in zip(sub, fo == k) if t])
+        c = np.clip(c, 1e-6, 1 - 1e-6); d = -(o * np.log(c) + (1 - o) * np.log(1 - c)).sum()
+        if best is None or d < best[0]: best = (d, g)
+    return best[1]
+
+
+def top_fit(rows, coll):
+    """the two upper rungs on internationals + college board players: [(Std, weights), ...] and their penalties"""
+    for r in rows: r['f']['intl'] = 1.0
+    pool = list(rows) + list(coll)
+    lams = [_rung_lam(pool, j) for j in TOP_RUNGS]
+    return [_rung_fit(pool, j, g) for j, g in zip(TOP_RUNGS, lams)], lams
+
+
+def top_apply(P, tops, rows):
+    """cumulative rung probabilities with the upper rungs replaced by the pooled fit"""
+    P = P.copy()
+    for j, m in zip(TOP_RUNGS, tops): P[:, j] = P[:, j - 1] * _rung_p(m, rows)
+    return P
+
+
+def pooled_oos(rows, coll, cols):
+    """out of fold (whole players held out): the internationals' ladder for the lower rungs (penalties as oos picks
+    them), the pooled upper rungs refit without the held-out internationals. Returns the summary, E[FV] and the rung
+    probabilities."""
+    X = F.matrix(rows, cols); idx = list(range(len(cols)))
+    lam = lam_for(rows, X, idx)
+    y = np.array([r['y'] for r in rows], float); folds = F.folds_of(rows)
+    P = np.zeros((len(rows), len(F.LADDER)))
+    for k in np.unique(folds):
+        tr, te = folds != k, folds == k
+        trr = [r for r, t in zip(rows, tr) if t]; ter = [r for r, t in zip(rows, te) if t]
+        tops, _ = top_fit(trr, coll)
+        P[te] = top_apply(F.predict(F.fit(trr, X[tr], idx, lam), X[te])[1], tops, ter)
+    e = F.expected(P)
+    return {'drivers': cols, 'top': TOP_COLS, 'pseudoR2': round(1 - F.deviance(P, y), 4), 'rungs': [round(float(v), 3) for v in F.rung_dev(P, y)],
+            'auc_nba': round(F.auc(e, y >= 30), 3), 'auc_starter': round(F.auc(e, y >= 45), 3), 'corr': round(float(np.corrcoef(e, y)[0, 1]), 3)}, e, P
+
+
+def unify(model, m, tops, rows):
+    """one weight table for all four rungs: the kept drivers plus the upper rungs' inputs, each on the internationals'
+    own mean and spread (the upper rungs' pool scaling folded into the weights; the international offset into the
+    intercept), so the grader, the FV inputs and the draft history read one model"""
+    kept = list(model['kept']); extra = [c for c in TOP_COLS if c not in kept and c != 'intl']
+    cols = kept + extra
+    std = F.Std(F.matrix(rows, cols))
+    std.m[:len(kept)] = model['mean'][:len(kept)]; std.s[:len(kept)] = model['sd'][:len(kept)]   # the lower rungs' own scaling
+    W = [list(np.r_[np.asarray(w, float), np.zeros(len(extra))]) for w in m['w'][:TOP_RUNGS[0]]]
+    for (s2, w2) in tops:
+        w = np.zeros(len(cols) + 1); w[0] = w2[0]
+        for i, c in enumerate(TOP_COLS):
+            if c == 'intl': w[0] += w2[1 + i] * (1.0 - s2.m[i]) / s2.s[i]; continue
+            j = cols.index(c)
+            w[1 + j] = w2[1 + i] * std.s[j] / s2.s[i]; w[0] += w2[1 + i] * (std.m[j] - s2.m[i]) / s2.s[i]
+        W.append(list(w))
+    out = dict(model, kept=cols, mean=[round(float(x), 6) for x in std.m], sd=[round(float(x), 6) for x in std.s],
+               w=[[round(float(x), 6) for x in w] for w in W], topCols=TOP_COLS)
+    return out
 
 
 def lam_for(rows, X, idx):
@@ -583,8 +703,14 @@ def full():
     sel = F.select(rows, CANDS, 'international')
     X = F.matrix(rows, sel['kept'])
     m = F.fit(rows, X, list(range(len(sel['kept']))), sel['lam'])
-    res, e_oof = oos(rows, sel['kept'])
-    print('selected:', res)
+    own, e_own = oos(rows, sel['kept'])
+    # the two upper rungs: internationals + the college players on the same boards (top_fit)
+    coll = college_board_rows(TRAIN)
+    tops, top_lam = top_fit(rows, coll)
+    res, e_oof, _ = pooled_oos(rows, coll, sel['kept'])
+    print('college board rows for the upper rungs:', len(coll), 'by rung', [sum(r['y'] >= t for r in coll) for t in F.LADDER], 'penalties', top_lam)
+    print('internationals\' own ladder:', own)
+    print('selected (upper rungs pooled):', res)
     # calibration: out-of-fold E[FV] bands against what they became
     cal = []
     y = np.array([r['y'] for r in rows])
@@ -597,6 +723,12 @@ def full():
     print('preseason rank -> June rank:', att)
     model = F.model_json(sel, m)
     model['topMean'] = F.TOP_MEAN
+    model['own'] = list(sel['kept']); model['topLam'] = top_lam
+    model = unify(model, m, tops, rows)
+    # the one weight table must grade as the two fits do (a z past the 4-SD cap in either scaling would differ)
+    chk = np.array([ev_model(model, r["f"])[0] for r in rows])
+    ref = F.expected(top_apply(F.predict(m, X)[1], tops, rows))
+    print('one-table check: max |E difference|', round(float(np.abs(chk - ref).max()), 4))
     curve = college_curve()
     omap = outcome_map(curve)
     beta = float(((e_oof - F.FLOOR) * (y - F.FLOOR)).sum() / ((e_oof - F.FLOOR) ** 2).sum())
@@ -635,7 +767,19 @@ def draft_history(last=SEASON - 1):
     player's fold held out, as topOof), the committed fit for the classes after it (a forward test). Needs the
     Basketball-Reference cache (scripts/cbb_intl_pull.sh)."""
     fit = json.load(open(FIT)); m = fit['model']
-    L = load_leagues(); LF = fit['factors']   # the committed league offsets and prospect growth
+    rows = history_rows(fit, last)
+    tr = [r for r in rows if r['year'] in TRAIN]
+    _, e, _ = pooled_oos(tr, college_board_rows(TRAIN), m.get('own', m['kept']))
+    for r, v in zip(tr, e): r['e'] = float(v); r['oof'] = True
+    for r in rows:
+        if r['year'] not in TRAIN: r['e'] = float(ev_model(m, r['f'])[0]); r['oof'] = False
+    return rows
+
+
+def history_rows(fit, last, L=None):
+    """the board internationals of 2009-<last> with outcomes and features under the committed league offsets and k"""
+    m = fit['model']
+    L = L or load_leagues(); LF = fit['factors']   # the committed league offsets and prospect growth
     coll, teams = college_names()
     pop = board_population(range(TRAIN[0], last + 1), coll, teams)
     fit_cbb = json.load(open(F.OUT))
@@ -652,13 +796,50 @@ def draft_history(last=SEASON - 1):
         rows.append({'pid': D.norm(p['name']), 'name': p['name'], 'year': y, 'slug': slug, 'p': p, 'info': player_page(slug) if slug else {},
                      'y': o['fv'] if o else float(F.FLOOR), 'xpm': o['peakXpm'] if o else None, 'club': p['school'], 'pos': pos_of(p['pos'])})
     lines = season_lines(L, LF)
-    for r in rows: r['f'] = features(r['p'], lines.get(r['slug']) if r['slug'] else None, LF, fit['k'], r['info'])
-    tr = [r for r in rows if r['year'] in TRAIN]
-    _, e = oos(tr, m['kept'])
-    for r, v in zip(tr, e): r['e'] = float(v); r['oof'] = True
-    for r in rows:
-        if r['year'] not in TRAIN: r['e'] = float(ev_model(m, r['f'])[0]); r['oof'] = False
+    for r in rows: r['f'] = features(r['p'], lines.get(r['slug']) if r['slug'] else None, LF, fit['k'], r['info']); r['f']['intl'] = 1.0
     return rows
+
+
+def calib_of(e_oof, y):
+    cal = []
+    for lo, hi in ((20, 25), (25, 30), (30, 35), (35, 40), (40, 45), (45, 80)):
+        ix = (e_oof >= lo) & (e_oof < hi)
+        if ix.sum(): cal.append({'e': f'{lo}-{hi}', 'n': int(ix.sum()), 'meanE': round(float(e_oof[ix].mean()), 1), 'meanFv': round(float(y[ix].mean()), 1),
+                                 'nba': round(float((y[ix] >= 30).mean()), 3), 'starter': round(float((y[ix] >= 45).mean()), 3)})
+    return cal
+
+
+def retop():
+    """refit only the two upper rungs (internationals + college board players) on the committed model: its kept
+    drivers, lower-rung weights, league offsets and k stay as they are; the out-of-fold line, calibration and held-out
+    list are redone, then the live internationals are graded. `python3 scripts/cbb_intl.py --top`"""
+    fit = json.load(open(FIT)); m0 = fit['model']
+    own = m0.get('own', m0['kept']); n = len(own)
+    F.TOP_MEAN = m0['topMean']
+    L = load_leagues()
+    rows = history_rows(fit, TRAIN[-1], L)
+    coll = college_board_rows(TRAIN)
+    base = {'std': F.Std(np.zeros((1, n))), 'idx': list(range(n)), 'w': [np.array(w[:n + 1], float) for w in m0['w']]}
+    base['std'].m, base['std'].s = np.array(m0['mean'][:n], float), np.array(m0['sd'][:n], float)
+    tops, top_lam = top_fit(rows, coll)
+    res, e_oof, _ = pooled_oos(rows, coll, own)
+    y = np.array([r['y'] for r in rows])
+    print('college board rows for the upper rungs:', len(coll), 'by rung', [sum(r['y'] >= t for r in coll) for t in F.LADDER], 'penalties', top_lam)
+    print('selected (upper rungs pooled):', res)
+    model = unify(dict(m0, kept=list(own), mean=m0['mean'][:n], sd=m0['sd'][:n], own=list(own), topLam=top_lam), base, tops, rows)
+    X = F.matrix(rows, own)
+    chk = np.array([ev_model(model, r['f'])[0] for r in rows]); ref = F.expected(top_apply(F.predict(base, X)[1], tops, rows))
+    print('one-table check: max |E difference|', round(float(np.abs(chk - ref).max()), 4))
+    beta = float(((e_oof - F.FLOOR) * (y - F.FLOOR)).sum() / ((e_oof - F.FLOOR) ** 2).sum())
+    tmp = {'beta': beta, 'omap': fit['omap'], 'curve': fit['curve']}
+    hist = sorted(({'year': r['year'], 'name': r['name'], 'e': round(float(e), 2), 'fv': int(fv_of(float(e), tmp)), 'outcome': r['y'], 'xpm': r['xpm']}
+                   for r, e in zip(rows, e_oof)), key=lambda h: -h['e'])
+    if 'own' not in fit: fit['own'] = fit['selected']
+    fit.update({'asof': time.strftime('%Y-%m-%d'), 'rows': len(rows), 'nba': int((y >= 30).sum()), 'model': model, 'selected': res, 'calib': calib_of(e_oof, y), 'beta': round(beta, 4), 'topOof': hist[:40]})
+    print('out-of-fold line', round(beta, 3), 'calibration', fit['calib'])
+    json.dump(fit, open(FIT, 'w'), separators=(',', ':'))
+    print('wrote', FIT)
+    grade_live(fit, L)
 
 
 def overseas_lines(L, LF, names_now):
@@ -702,6 +883,7 @@ def live_population(teams):
     teams = set(teams) | {D.norm(r[1]).replace('st', 'state') for r in a['rows']}
     out = []
     for k, p in ppl.items():
+        if not re.search(r'[a-z]', k): continue     # a board row that is no name (a stat line a pull misread)
         if k in ours or any(same_person(k, q) for q in ours if q.split() and q.split()[-1] == k.split()[-1]): continue
         if G_LEAGUE.search(p['school'] or '') or is_college_school(p['school'], teams): continue
         out.append({'name': p['name'], 'school': p['school'], 'pos': p['pos'], 'cons': p['cons'], 'nb': p['nboards'],
@@ -835,4 +1017,4 @@ def daily():
 
 
 if __name__ == '__main__':
-    daily() if DAILY else full()
+    daily() if DAILY else retop() if '--top' in sys.argv else full()
