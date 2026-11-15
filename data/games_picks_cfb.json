@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T02:18:24Z",
+ "asof": "2026-11-15T02:21:19Z",
  "recenter": {
   "week": 0.11
  },
@@ -421,7 +421,7 @@
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -21.7,
+  "ageH": -21.6,
   "stale": false
  },
  "picks": [],
@@ -860,16 +860,9 @@
    "tmRaw": 44.5,
    "flagged": "2026-11-09T19:56:04Z",
    "betTo": 41.0,
-   "close": 40.5,
+   "close": 41.5,
    "paper": true,
-   "now": {
-    "mk": "total",
-    "side": "over",
-    "line": 40.5,
-    "price": -106.0,
-    "ev": 0.023,
-    "units": 1.25
-   }
+   "now": null
   },
   {
    "id": "401856863",
@@ -894,15 +887,15 @@
    "tmRaw": 63.8,
    "flagged": "2026-11-08T20:43:33Z",
    "betTo": 67.0,
-   "close": 74.5,
+   "close": 73.5,
    "paper": true,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 74.5,
-    "price": -102.0,
-    "ev": 0.081,
-    "units": 5.0
+    "line": 73.5,
+    "price": -100.0,
+    "ev": 0.071,
+    "units": 4.25
    }
   },
   {
@@ -992,6 +985,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401864540",
+   "sport": "cfb",
+   "kick": "2026-11-15T03:00:00.000Z",
+   "home": "UTEP",
+   "away": "Wyoming",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": 106.0,
+   "edge": 3.0,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": -7.9,
+   "tm": 44.5
+  },
+  {
    "id": "401860915",
    "sport": "cfb",
    "kick": "2026-11-15T02:30:00.000Z",
@@ -1000,7 +1009,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": 106.0,
+   "price": 104.0,
    "edge": 2.4,
    "x": 3.0,
    "why": "edge under 3",
@@ -1052,11 +1061,11 @@
   "401856863": {
    "mk": "total",
    "side": "under",
-   "line": 74.5,
-   "price": -102.0,
-   "ev": 0.081,
-   "edge": 10.9,
-   "units": 5.0,
+   "line": 73.5,
+   "price": -100.0,
+   "ev": 0.071,
+   "edge": 9.9,
+   "units": 4.25,
    "home": "Oklahoma State",
    "away": "Texas Tech",
    "state": "paper"
@@ -1065,7 +1074,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": 106.0,
+   "price": 104.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -1101,14 +1110,14 @@
   "401864540": {
    "mk": "total",
    "side": "over",
-   "line": 40.5,
-   "price": -106.0,
-   "ev": 0.023,
-   "edge": 4.0,
-   "units": 1.25,
+   "line": 41.5,
+   "price": 106.0,
+   "edge": 3.0,
+   "ev": null,
+   "units": 0.0,
    "home": "UTEP",
    "away": "Wyoming",
-   "state": "paper"
+   "state": "under"
   }
  },
  "record": {
@@ -1163,7 +1172,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19493,
+  "snapshots": 19496,
   "buckets": [
    {
     "when": "24h+",
@@ -4386,7 +4395,7 @@
    "tmRaw": 63.8,
    "flagged": "2026-11-08T20:43:33Z",
    "betTo": 67.0,
-   "close": 74.5,
+   "close": 73.5,
    "paper": true
   },
   {
@@ -4842,7 +4851,7 @@
    "tmRaw": 44.5,
    "flagged": "2026-11-09T19:56:04Z",
    "betTo": 41.0,
-   "close": 40.5,
+   "close": 41.5,
    "paper": true
   },
   {
@@ -5763,7 +5772,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T02:18:24Z",
+ "checked": "2026-11-15T02:21:19Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {

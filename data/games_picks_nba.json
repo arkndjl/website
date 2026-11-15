@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T02:18:46Z",
+ "asof": "2026-11-15T02:21:39Z",
  "recenter": {
-  "2026-11-15": 1.76
+  "2026-11-15": 1.77
  },
  "monitor": {
   "clocks": {
@@ -203,7 +203,7 @@
  },
  "model": {
   "asof": "2026-11-15T02:06:10Z",
-  "ageH": 0.2,
+  "ageH": 0.3,
   "stale": false
  },
  "picks": [
@@ -513,12 +513,28 @@
    "mk": "total",
    "side": "over",
    "line": 222.5,
-   "price": -111.0,
+   "price": -106.0,
    "edge": 3.9,
    "x": 2.5,
-   "why": "no edge at -111",
+   "why": "no edge at -106",
    "m": 9.8,
    "tm": 226.4
+  },
+  {
+   "id": "401909988",
+   "sport": "nba",
+   "kick": "2026-11-15T22:00:00Z",
+   "home": "UTAH",
+   "away": "SA",
+   "mk": "total",
+   "side": "over",
+   "line": 223.5,
+   "price": -108.0,
+   "edge": 2.1,
+   "x": 2.5,
+   "why": "edge under 2.5",
+   "m": -17.5,
+   "tm": 225.6
   },
   {
    "id": "401909993",
@@ -535,22 +551,6 @@
    "why": "edge under 2.5",
    "m": -12.2,
    "tm": 222.9
-  },
-  {
-   "id": "401909988",
-   "sport": "nba",
-   "kick": "2026-11-15T22:00:00Z",
-   "home": "UTAH",
-   "away": "SA",
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -100.0,
-   "edge": 1.1,
-   "x": 2.5,
-   "why": "edge under 2.5",
-   "m": -17.5,
-   "tm": 225.6
   },
   {
    "id": "401909992",
@@ -574,7 +574,7 @@
    "mk": "total",
    "side": "over",
    "line": 222.5,
-   "price": -111.0,
+   "price": -106.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -585,9 +585,9 @@
   "401909988": {
    "mk": "total",
    "side": "over",
-   "line": 224.5,
-   "price": -100.0,
-   "edge": 1.1,
+   "line": 223.5,
+   "price": -108.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "UTAH",
@@ -695,7 +695,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4208,
+  "snapshots": 4210,
   "buckets": [
    {
     "when": "24h+",
@@ -708,12 +708,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 973,
+    "clvN": 974,
     "clvRet": -0.0219,
-    "clvT": -5.75,
+    "clvT": -5.77,
     "clv": 0.36,
-    "beat": 0.441,
-    "still": 0.407
+    "beat": 0.44,
+    "still": 0.408
    },
    {
     "when": "1-6h",
@@ -7163,7 +7163,7 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T02:18:46Z",
+ "checked": "2026-11-15T02:21:39Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
