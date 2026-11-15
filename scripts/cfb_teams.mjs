@@ -159,7 +159,7 @@ export function statusOf(text, strict = false) {
   const out = /\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bsidelined|\binactive|\bwill sit|\bnot dress|\bout for a (week|month)/;
   if (out.test(t) || !strict && /\bout\b(?! of)/.test(t)) return 'Out';
   if (/questionable|game-time decision|day-to-day|uncertain to play|status (is )?uncertain|limited in practice/.test(t)) return 'Questionable';
-  if (/probable|expected to play|on track to (play|return)|\bcleared|\bavailable|will play|good to go|returns? to (practice|action|the lineup)|back in the lineup|set to return|will return|to start\b|will start|making his return|off injury report|expected to start/.test(t)) return 'Active';
+  if (/probable|expected to play|on track to (play|return)|\bcleared|\bavailable|will play|good to go|returns? to (practice|action|the lineup)|back in the lineup|set to return|will return|to start\b|will start|making his return|off (the |an? )?injury report|not (listed )?on (the |an? |[\w. ]+'s )?injury report|expected to start/.test(t)) return 'Active';
   return null;
 }
 // a headline's clauses ("X Out, Y to Start", "A, B Questionable for Saturday"): each with its own status; a
