@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-15T13:53:31Z",
+ "asof": "2026-11-15T13:56:32Z",
  "recenter": {
-  "2026-11-15": 1.64
+  "2026-11-15": 1.63
  },
  "monitor": {
   "clocks": {
@@ -203,7 +203,7 @@
  },
  "model": {
   "asof": "2026-11-15T13:45:03Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [
@@ -291,7 +291,7 @@
    "units": 0.25,
    "edge": 3.9,
    "x": 2.5,
-   "pDU": 0.5122,
+   "pDU": 0.5123,
    "evDU": 0.0048,
    "fair": 223.5,
    "m": -5.7,
@@ -299,14 +299,14 @@
    "tmRaw": 229.2,
    "flagged": "2026-11-15T02:08:44Z",
    "betTo": 224.5,
-   "close": 222.5,
+   "close": 223.5,
    "now": {
     "mk": "total",
     "side": "over",
-    "line": 222.5,
-    "price": -102.0,
-    "ev": 0.114,
-    "units": 1.0
+    "line": 223.5,
+    "price": 102.0,
+    "ev": 0.103,
+    "units": 0.75
    }
   },
   {
@@ -398,7 +398,7 @@
    "mk": "total",
    "side": "under",
    "line": 234.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.0,
    "x": 2.5,
    "why": "edge under 2.5",
@@ -546,11 +546,11 @@
   "401909991": {
    "mk": "total",
    "side": "over",
-   "line": 222.5,
-   "price": -102.0,
-   "ev": 0.114,
-   "edge": 4.9,
-   "units": 1.0,
+   "line": 223.5,
+   "price": 102.0,
+   "ev": 0.103,
+   "edge": 3.9,
+   "units": 0.75,
    "home": "WSH",
    "away": "HOU",
    "state": "pick"
@@ -559,7 +559,7 @@
    "mk": "total",
    "side": "under",
    "line": 234.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -632,7 +632,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4315,
+  "snapshots": 4318,
   "buckets": [
    {
     "when": "24h+",
@@ -645,12 +645,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1005,
+    "clvN": 1006,
     "clvRet": -0.0218,
-    "clvT": -5.91,
+    "clvT": -5.92,
     "clv": 0.36,
-    "beat": 0.44,
-    "still": 0.413
+    "beat": 0.439,
+    "still": 0.414
    },
    {
     "when": "1-6h",
@@ -7127,7 +7127,7 @@
    "units": 0.25,
    "edge": 3.9,
    "x": 2.5,
-   "pDU": 0.5122,
+   "pDU": 0.5123,
    "evDU": 0.0048,
    "fair": 223.5,
    "m": -5.7,
@@ -7135,7 +7135,7 @@
    "tmRaw": 229.2,
    "flagged": "2026-11-15T02:08:44Z",
    "betTo": 224.5,
-   "close": 222.5
+   "close": 223.5
   },
   {
    "id": "401909991",
@@ -7216,12 +7216,12 @@
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T13:53:31Z",
+ "checked": "2026-11-15T13:56:32Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
    "2026-11-15": {
-    "raw": 2.5,
+    "raw": 2.25,
     "scale": 1.0
    }
   }
