@@ -13,7 +13,7 @@ import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PELO, PELO_DIV, FIVE_V, archiveGames, replayElo, teamHistory, fiveWeights, restrict, wmean } from './esea_five.mjs';
-import { price, readLog, writeLog, merge as mergeLog, settle } from './esea_league_log.mjs';
+import { price, readLog, writeLog, merge as mergeLog, settle, advKey, isAdvanced } from './esea_league_log.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'data', 'esea.json');
@@ -1477,22 +1477,36 @@ function simulate(N = 10000) {
 const LEAGUE_W = { a: RWA_W.a, b: RWA_W.b, elo: PREVIEW_W.elo, rating: PREVIEW_W.rating, star: 0.48, eloScale: ELO_SCALE };
 const LEAGUE_V = `pv3/rwa${RWA_W.a}-${RWA_W.b}/${FIVE_V}`;
 const LEAGUE_KNOWN = 0.6;   // share of a priced side's weight that must have an RWA rating
-const ADV = { calls: 80, stats: 30, elos: 4, listEvery: 55 * 60e3, findEvery: 6 * 3600e3 };
+const ADV = { calls: 80, stats: 30, elos: 4, listEvery: 55 * 60e3, findEvery: 6 * 3600e3, findV: 2 };
 async function advancedFeed() {
   if (process.env.ESEA_LEAGUE_ADV === '0' || !/main/i.test(myDiv || '')) return { list: [], games: [] };
   let left = ADV.calls;
   const call = async p => { if (left <= 0) return undefined; left--; return api(p).catch(() => undefined); };   // null = 404, undefined = not answered
   const A = (rcache.adv && rcache.adv.season === SEASON ? rcache.adv : (rcache.adv = { season: SEASON, champs: [], foundAt: 0, list: [], listAt: 0, box: {} }));
   A.box ||= {}; A.list ||= []; A.champs ||= [];
+  if (A.findV !== ADV.findV) { A.findV = ADV.findV; if (!A.champs.length) A.foundAt = 0; }   // a changed lookup asks again
   if (!A.champs.length && Date.now() - (A.foundAt || 0) > ADV.findEvery) {
     A.foundAt = Date.now();
-    const base = mine.replace(/main/i, 'Advanced'), pre = mine.slice(0, mine.search(/main/i)).toLowerCase(), names = [...new Set([base, base.replace(/(\s)[A-Z](\s*-\s*Regular Season)/i, '$2'), ...'AB'.split('').map(L => base.replace(/(\s)[A-Z](\s*-\s*Regular Season)/i, `$1${L}$2`))])];
-    for (const q of names) for (const type of ['ongoing', 'all']) {
-      const r = await call(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=50`);
-      for (const x of r?.items || []) { const id = x.competition_id || x.championship_id, nm = String(x.name || '').toLowerCase();
-        if (id && /regular/i.test(nm) && nm.startsWith(pre) && /^advanced\b/.test(nm.slice(pre.length)) && !A.champs.some(c => c.id === id)) A.champs.push({ id, name: x.name }); }
-      if (A.champs.length) break;
+    // FACEIT's search is fuzzy and the group word changes by season (none, a letter, "Central"), so ask a few
+    // ways, take whatever names the same season and region's Advanced regular season, and say what came back
+    const key = advKey(mine), pre = mine.slice(0, mine.search(/main/i)).trim(), seen = new Map();
+    const take = r => { for (const x of r?.items || []) { const id = x.competition_id || x.championship_id; if (!id) continue;
+      seen.set(id, String(x.name || ''));
+      if (isAdvanced(x.name, key) && !A.champs.some(c => c.id === id)) A.champs.push({ id, name: x.name }); } };
+    const names = [...new Set([`${pre} Advanced`, mine.replace(/main/i, 'Advanced').replace(/(\s)[A-Z](\s*-\s*Regular Season)/i, '$2'), `${pre} Advanced Central - Regular Season`, `ESEA ${pre} Advanced`])];
+    find: for (const q of names) for (const type of ['ongoing', 'all']) {
+      take(await call(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=50`));
+      if (A.champs.length) break find;
     }
+    // the organizer's own list of running championships (ESEA's id from any of our matches)
+    const org = allM.find(m => m.organizer_id)?.organizer_id;
+    if (!A.champs.length && org) for (let off = 0; off < 300; off += 100) {
+      const r = await call(`/organizers/${org}/championships?type=ongoing&offset=${off}&limit=100`); take(r);
+      if (A.champs.length || (r?.items || []).length < 100) break;
+    }
+    const all = [...seen.values()], near = all.filter(x => /advanced/i.test(x));
+    console.log(A.champs.length ? `league log: advanced lookup found ${A.champs.map(c => JSON.stringify(c.name)).join(', ')}`
+      : `league log: advanced lookup matched none of ${all.length} names (season ${key?.season}, region ${key?.region}); with "advanced": ${JSON.stringify(near.slice(0, 12))}; others: ${JSON.stringify(all.filter(x => !/advanced/i.test(x)).slice(0, 8))}`);
   }
   if (A.champs.length && Date.now() - (A.listAt || 0) > ADV.listEvery) {
     const list = []; let ok = true;
