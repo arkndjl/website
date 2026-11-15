@@ -52,6 +52,8 @@ OUT = os.path.join(ROOT, 'data', 'soccer_intl.json')
 FIT = os.path.join(ROOT, 'data', 'soccer_intl_fit.json')
 SQF = os.path.join(HERE, 'data', 'soccer_intl_sq.json.gz')
 CUF = os.path.join(HERE, 'data', 'soccer_intl_squads.json.gz')
+PLF = os.path.join(HERE, 'data', 'soccer_intl_players.json.gz')
+TEAMF = os.path.join(ROOT, 'static', 'data', 'teams', 'soccer-intl.json')
 TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
 TM_UA = 'arkndjl.net-arkboard/1.0 (https://arkndjl.net)'
 ODDSF = os.path.join(HERE, 'data', 'soccer_intl_odds.json.gz')
@@ -1367,7 +1369,8 @@ def build():
                 x = P['sq'] * (q - qb) / 2
             lf = math.exp(Rx.m + Rx.a[t] - db + x)
             la = math.exp(Rx.m + ab - Rx.d[t] - x)
-            out[t] = (lf - la, lf - math.exp(Rx.m + ab - db), math.exp(Rx.m + ab - db) - la, lf, la)
+            out[t] = (lf - la, lf - math.exp(Rx.m + ab - db), math.exp(Rx.m + ab - db) - la, lf, la,
+                      math.exp(Rx.m + Rx.a[t] - db), math.exp(Rx.m + ab - Rx.d[t]))
         return out, (ab, db, qb)
     B, base = board(R, today)
     B7, _ = board(R7, week)
@@ -1385,7 +1388,7 @@ def build():
             nxt.setdefault(t, {'o': o, 'day': e['day'], 'h': home, 'lg': e['lg']})
     power = []
     for i, t in enumerate(order):
-        m, off, de, lf, la = B[t]
+        m, off, de, lf, la = B[t][:5]
         w, d_, l_ = wdl(lf, la, P['rho'])[:3]
         power.append({'n': t, 'iso': iso_of(t), 'conf': cf.get(t), 'rk': i + 1, 'prev': rk7.get(t), 'dR': round(m - B7[t][0], 3),
                       'rating': round(m, 3), 'off': round(off, 3), 'def': round(de, 3), 'pW': round(w, 3), 'pD': round(d_, 3),
@@ -1431,9 +1434,118 @@ def build():
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'topN': TOPN, 'home': round(R.H, 3),
            'base': round(math.exp(R.m + base[0] - base[1]), 3), 'power': power, 'games': games, 'nl': nl,
            'last': max(r['day'] for r in rows), 'held': (rep.get('held') or {}).get('model'), 'n': len(rows)}
+    if nl:
+        by = {p['n']: p for p in power}
+        for g in nl.get('groups') or []:
+            for x in g.get('teams') or []:
+                if x.get('n') in by:
+                    by[x['n']]['nl'] = {'g': g['name'], 'xpts': x.get('xpts'), 'p1': (x.get('p') or [None])[0], 'sf': x.get('sf'),
+                                        'title': x.get('title')}
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'), ensure_ascii=False)
+    try:
+        team_file(pool, B, base, rows, fx, rates, P)
+    except Exception as ex:
+        print(f'team breakdowns failed: {ex!r}', file=sys.stderr)
     print(f'{len(power)} nations, {len(games)} matches, last result {out["last"]}; #1 {order[0]}')
+
+
+# ---------------------------------------------------------------- team breakdowns (the world ranking's dropdowns)
+def latest_squad(team):
+    """(day, {player id: value in EUR thousands}): every player in the nation's matchday squads inside 12 days of its
+    last squad on record (its latest international window), None past 400 days"""
+    v = callups()['sq'].get(team) or []
+    i = len(v) - 1
+    while i >= 0 and not v[i][3]:
+        i -= 1
+    if i < 0 or v[i][0] < _day(dt.date.today().isoformat(), -CU_STALE):
+        return None, {}
+    d0, out = v[i][0], {}
+    while i >= 0 and v[i][0] >= _day(d0, -CU_WINDOW):
+        sq = v[i][3]
+        for j in range(0, len(sq), 2):
+            out.setdefault(sq[j], sq[j + 1])
+        i -= 1
+    return d0, out
+
+
+def player_info(ids, budget=180):
+    """{player id: [name, position, date of birth]} from Transfermarkt's players API (100 a call), kept in PLF"""
+    info = json.load(gzip.open(PLF, 'rt')) if os.path.exists(PLF) else {}
+    need = sorted({str(i) for i in ids} - set(info))
+    t0, n0 = time.time(), len(info)
+    for k in range(0, len(need), 100):
+        if time.time() - t0 > budget:
+            break
+        d = tm_api('/players?' + '&'.join(f'ids[]={i}' for i in need[k:k + 100]))
+        for p in d if isinstance(d, list) else []:
+            a = p.get('attributes') or {}
+            info[str(p.get('id'))] = [p.get('name') or p.get('shortName') or '', ((a.get('position') or {}).get('shortName') or ''),
+                                      ((p.get('lifeDates') or {}).get('dateOfBirth') or '')]
+    if len(info) > n0:
+        with gzip.open(PLF, 'wt') as f:
+            json.dump(info, f, separators=(',', ':'), sort_keys=True, ensure_ascii=False)
+    return info
+
+
+def team_file(pool, B, base, rows, fx, rates, P):
+    """static/data/teams/soccer-intl.json for the world ranking's dropdowns (layouts/partials/teamjs.html): the rating
+    split into attack and defence (results) and the squad term, the last 12 months' results and every fixture on
+    record at the model's chances, the latest call-up's most valuable players and its 21-and-unders"""
+    import team_detail as TD
+    today = dt.date.today()
+    bm = math.exp(base[0] - base[1])
+    ps = set(pool)
+    yr = (today - dt.timedelta(days=365)).isoformat()
+    games = [{'d': r['day'], 'h': r['h'], 'a': r['a'], 'n': r['neu'], 'hs': r['hs'], 'as': r['as']}
+             for r in rows if r['day'] >= yr and (r['h'] in ps or r['a'] in ps)]
+    for e in fx:
+        h, a = e['H'], e['A']
+        if h not in ps and a not in ps:
+            continue
+        lh, la = rates(h, a, e.get('neu', 0), e['day'])
+        w, d_, _ = wdl(lh, la, P['rho'])[:3]
+        games.append({'d': e['day'], 'h': h, 'a': a, 'n': e.get('neu', 0), 'p': w, 'dr': d_, 'm': lh - la})
+    sch = TD.schedules(games, pool)
+    sqs = {t: latest_squad(t) for t in pool}
+    info = player_info([i for _, s in sqs.values() for i in s])
+
+    def age(dob):
+        try:
+            return (today - dt.date.fromisoformat(dob)).days / 365.25
+        except ValueError:
+            return None
+
+    teams = {}
+    for t in pool:
+        m, off, _, lf, _, lf0, la0 = B[t]
+        avg = lf - off            # an average top side's goals at a neutral ground
+        # attack and defence from results (the squad term off), the squad term the rest: the three sum to the rating
+        v = {'parts': [['att', round(lf0 - avg, 3)], ['dfn', round(avg - la0, 3)], ['sq', round(m - (lf0 - la0), 3)]],
+             'sch': sch.get(t) or []}
+        d0, sq = sqs[t]
+        pl = []
+        for i, val in sorted(sq.items(), key=lambda x: -x[1]):
+            nm, pos, dob = info.get(str(i)) or ['', '', '']
+            if nm and val:
+                ag = age(dob)
+                pl.append((ag, [nm, pos, f'€{val / 1000:.0f}m' if val >= 1000 else f'€{val / 1000:.1f}m', f'age {ag:.1f}' if ag else '']))
+        if pl:
+            v['pl'] = [x[1] for x in pl[:6]]
+            yg = [x[1] for x in pl if x[0] is not None and x[0] < 22]
+            if yg:
+                v['yg'] = yg[:3]
+            v['cu'] = d0
+        teams[t] = v
+    res = TD._finite({'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'sport': 'soccerintl',
+                      'pm': 'value', 'ym': 'value', 'yd': 'under-22 by value', 'teams': teams})
+    old = TD._load(TEAMF)
+    if old and {k: v for k, v in old.items() if k != 'asof'} == {k: v for k, v in json.loads(json.dumps(res)).items() if k != 'asof'}:
+        return print(f'team breakdowns: {TEAMF} unchanged')
+    os.makedirs(os.path.dirname(TEAMF), exist_ok=True)
+    with open(TEAMF, 'w') as f:
+        json.dump(res, f, separators=(',', ':'), ensure_ascii=False, allow_nan=False)
+    print(f'team breakdowns: {TEAMF} ({len(teams)} nations)')
 
 
 if __name__ == '__main__':

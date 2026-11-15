@@ -85,5 +85,5 @@ jobs:
         run: python3 scripts/soccer_intl.py
       - name: Commit if anything changed
         run: |
-          files="data/soccer_intl.json scripts/data/soccer_intl_odds.json.gz scripts/data/soccer_intl_sq.json.gz scripts/data/soccer_intl_squads.json.gz scripts/data/soccer_intl_map.json static/img/flags"
+          files="data/soccer_intl.json static/data/teams/soccer-intl.json scripts/data/soccer_intl_players.json.gz scripts/data/soccer_intl_odds.json.gz scripts/data/soccer_intl_sq.json.gz scripts/data/soccer_intl_squads.json.gz scripts/data/soccer_intl_map.json static/img/flags"
           python3 scripts/data_push.py -m "Update the national-team soccer views ($(date -u +%Y-%m-%d))" -- $files
