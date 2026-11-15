@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-15T02:11:32Z",
+ "asof": "2026-11-15T03:12:27Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 84.64,
+  "now": 84.21,
   "peak": 117.38,
-  "drawdown": 0.279,
-  "open": 1.75,
+  "drawdown": 0.2826,
+  "open": 1.25,
   "path": [
-   107.86,
    106.77,
    109.32,
    113.5,
@@ -408,48 +407,49 @@
    84.86,
    85.06,
    84.85,
-   84.64
+   84.64,
+   84.21
   ]
  },
  "record": {
   "n": 434,
-  "clvN": 428,
-  "clvRet": -0.011,
-  "clvT": -2.24,
-  "clv": 0.05,
-  "beat": 0.325,
-  "settled": 428,
+  "clvN": 429,
+  "clvRet": -0.0107,
+  "clvT": -2.18,
+  "clv": 0.06,
+  "beat": 0.327,
+  "settled": 429,
   "w": 212,
-  "l": 216,
+  "l": 217,
   "p": 0,
-  "roi": -0.0204,
-  "roiT": -0.42,
-  "profit": -13.64,
-  "risked": 405.25,
-  "yield": -0.0337
+  "roi": -0.0227,
+  "roiT": -0.46,
+  "profit": -14.14,
+  "risked": 405.75,
+  "yield": -0.0348
  },
- "tEff": -1.76,
+ "tEff": -1.7,
  "corr": {
-  "rho": 0.025,
-  "n": 428,
-  "slates": 43,
-  "nEff": 263.4,
-  "avgSlate": 9.95
+  "rho": 0.026,
+  "n": 429,
+  "slates": 44,
+  "nEff": 261.3,
+  "avgSlate": 9.75
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 428,
+   "value": 429,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.1% t -1.76",
+   "value": "-1.1% t -1.7",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "32%",
+   "value": "33%",
    "pass": false
   },
   {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.0% vs -1.1% (SE 4.9)",
+   "value": "ROI -2.3% vs -1.1% (SE 4.9)",
    "pass": true
   }
  ],
@@ -660,20 +660,20 @@
    "sport": "nba",
    "mk": "total",
    "n": 61,
-   "clvN": 57,
-   "clvRet": 0.0293,
-   "clvT": 2.66,
-   "clv": 1.02,
-   "beat": 0.596,
-   "settled": 57,
+   "clvN": 58,
+   "clvRet": 0.0307,
+   "clvT": 2.81,
+   "clv": 1.05,
+   "beat": 0.603,
+   "settled": 58,
    "w": 26,
-   "l": 31,
+   "l": 32,
    "p": 0,
-   "roi": -0.1025,
-   "roiT": -0.78,
-   "profit": -9.29,
-   "risked": 76.5,
-   "yield": -0.1214
+   "roi": -0.118,
+   "roiT": -0.91,
+   "profit": -9.79,
+   "risked": 77.0,
+   "yield": -0.1271
   },
   {
    "id": "tennis-ml",
@@ -719,27 +719,6 @@
   }
  ],
  "open": [
-  {
-   "rule": "nba-total",
-   "sport": "nba",
-   "id": "401909980",
-   "k": "2026-11-15T00:00:00Z",
-   "slate": "nba:2026-11-14",
-   "h": "NO",
-   "a": "DEN",
-   "mk": "total",
-   "side": "over",
-   "line": 233.5,
-   "price": -104.0,
-   "bet": "over 233.5 -104",
-   "placed": "2026-11-14T09:15:15Z",
-   "stake": 0.5,
-   "edge": 3.9,
-   "ev": 0.013,
-   "event": null,
-   "pass": false,
-   "close": 236.5
-  },
   {
    "rule": "nba-ml",
    "sport": "nba",
@@ -927,10 +906,41 @@
    "ev": 0.0048,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "close": 222.5
   }
  ],
  "recent": [
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909980",
+   "k": "2026-11-15T00:00:00Z",
+   "slate": "nba:2026-11-14",
+   "h": "NO",
+   "a": "DEN",
+   "mk": "total",
+   "side": "over",
+   "line": 233.5,
+   "price": -104.0,
+   "bet": "over 233.5 -104",
+   "placed": "2026-11-14T09:15:15Z",
+   "stake": 0.5,
+   "edge": 3.9,
+   "ev": 0.013,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.111,
+   "clv": 3.0,
+   "beat": 1,
+   "close": 236.5,
+   "score": [
+    116.0,
+    108.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.5
+  },
   {
    "rule": "nba-total",
    "sport": "nba",
@@ -2692,32 +2702,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873046-4366031-rc",
-   "k": "2026-11-08T21:05:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "over",
-   "line": 1.5,
-   "price": 108.0,
-   "bet": "Tank Dell over 1.5 rec +108",
-   "placed": "2026-11-05T17:30:00Z",
-   "stake": 1.25,
-   "edge": 11.1,
-   "ev": 0.0878,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.1719,
-   "close": 1.5,
-   "score": 4.0,
-   "res": "w",
-   "ret": 1.08,
-   "profit": 1.35
   }
  ],
  "ledger": [
@@ -17412,7 +17396,17 @@
    "ev": 0.013,
    "event": null,
    "pass": false,
-   "close": 236.5
+   "clvRet": 0.111,
+   "clv": 3.0,
+   "beat": 1,
+   "close": 236.5,
+   "score": [
+    116.0,
+    108.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.5
   },
   {
    "rule": "nba-ml",
@@ -17601,7 +17595,7 @@
    "ev": 0.0048,
    "event": null,
    "pass": false,
-   "close": 223.5
+   "close": 222.5
   }
  ]
 }
