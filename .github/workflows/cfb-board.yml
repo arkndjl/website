@@ -48,7 +48,7 @@ concurrency:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       REFRESH: ${{ github.event.schedule == '37 22 * 8-12,1 *' || github.event.schedule == '7 3 * 8-12,1 *' || github.event.schedule == '57 18 * 8-12,1 0' || inputs.refresh == true }}
