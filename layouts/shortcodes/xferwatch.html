@@ -25,7 +25,7 @@
   {{- $d := .dest | default slice }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ with .photo }}{{ partial "face.html" (dict "u" .) }}{{ end }}{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
+    <td class="cfb__name">{{ with .photo }}{{ partial "face.html" (dict "u" .) }}{{ end }}{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td>{{ .cls | default "—" }}</td>
     <td class="xw__team" data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>

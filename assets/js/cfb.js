@@ -458,6 +458,7 @@
       // the ARKLIST star from data/arklist.json as built, so a name added there shows before the next data run
       // (names matched by the shared rules in namekey.html, so "Neo" finds "Neoklis" and "Will" finds "William")
       var ark = []; [].forEach.call(document.querySelectorAll('[data-arklist]'), function (el) { ark = ark.concat(JSON.parse(el.getAttribute('data-arklist') || '[]')); });
+      recs.forEach(function (r) { r.star = false; });
       ark.forEach(function (e) { var b = String(e).split('|'); window.arkName.find(recs, b[0].trim(), b[1] && b[1].trim()).forEach(function (r) { r.star = true; }); });
       recs.forEach(function (r) { r.pos = dt(r.pos); r.move = dt(r.move); r.moveWhy = dt(r.moveWhy); });
       // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).
