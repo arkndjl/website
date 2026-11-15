@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-15T21:15:41Z",
+ "asof": "2026-11-15T21:56:18Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -720,18 +720,18 @@
    "status": "on",
    "stopped": null,
    "n": 2,
-   "clvN": 0,
-   "clvRet": null,
+   "clvN": 1,
+   "clvRet": -0.0967,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
+   "days": 1,
+   "beat": 0.0,
+   "settled": 1,
+   "w": 1,
    "l": 0,
-   "roi": null,
+   "roi": 0.806,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 1,
+    "clvRet": -0.0967,
     "clvT": null
    },
    "exp": {
@@ -739,6 +739,11 @@
     "beat": 0.778,
     "roi": 0.1918,
     "n": 54
+   },
+   "vsExp": {
+    "gap": -0.1756,
+    "z": -1.58,
+    "read": "in line"
    },
    "check": {
     "n": 0,
@@ -777,19 +782,25 @@
    },
    "drift": {
     "mu1": 0.0127,
-    "n": 0,
+    "n": 1,
     "sd": 0.1111,
     "rho": 0.063,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.0,
-    "info": 0.0,
-    "real": null,
-    "realSe": null,
+    "llr": -0.061,
+    "info": 0.01,
+    "real": -4.223,
+    "realSe": 8.77,
     "need": 453,
-    "path": []
+    "path": [
+     [
+      "2026-11-15",
+      1,
+      -0.061
+     ]
+    ]
    }
   },
   {
@@ -1094,7 +1105,7 @@
    "since": "2026-11-15",
    "status": "on",
    "stopped": null,
-   "n": 0,
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -3744,8 +3755,8 @@
    "clvT": -0.62,
    "flat": -0.012,
    "adds": 0.0039,
-   "expEdge": 0.0232,
-   "basis": "backtest"
+   "expEdge": 0.0359,
+   "basis": "default: half Kelly on the expected return"
   },
   {
    "sport": "cfb",
@@ -3757,7 +3768,7 @@
    "clvT": 1.04,
    "flat": 0.0814,
    "adds": 0.0733,
-   "expEdge": 0.0178,
+   "expEdge": -0.0721,
    "basis": "backtest + live picks"
   },
   {
@@ -3770,8 +3781,8 @@
    "clvT": 0.17,
    "flat": 0.0193,
    "adds": -0.0159,
-   "expEdge": 0.0505,
-   "basis": "backtest"
+   "expEdge": 0.0677,
+   "basis": "default: half Kelly on the expected return"
   },
   {
    "sport": "nfl",
@@ -3783,20 +3794,20 @@
    "clvT": -1.18,
    "flat": -0.0269,
    "adds": -0.0208,
-   "expEdge": 0.0104,
-   "basis": "backtest"
+   "expEdge": 0.0399,
+   "basis": "default: half Kelly on the expected return"
   },
   {
    "sport": "cbb",
    "mk": "spread",
    "label": "CBB spread",
-   "n": 173,
-   "du": 95.0,
-   "clvRet": -0.0118,
-   "clvT": -0.74,
-   "flat": -0.0077,
-   "adds": -0.0042,
-   "expEdge": 0.0294,
+   "n": 174,
+   "du": 95.75,
+   "clvRet": -0.0125,
+   "clvT": -0.78,
+   "flat": -0.0082,
+   "adds": -0.0043,
+   "expEdge": -0.0017,
    "basis": "backtest + live picks"
   },
   {
@@ -3809,7 +3820,7 @@
    "clvT": -1.38,
    "flat": -0.0105,
    "adds": -0.0068,
-   "expEdge": 0.0446,
+   "expEdge": 0.0117,
    "basis": "backtest + live picks"
   },
   {
@@ -3822,7 +3833,7 @@
    "clvT": 1.1,
    "flat": 0.0359,
    "adds": -0.0125,
-   "expEdge": 0.0179,
+   "expEdge": -0.0163,
    "basis": "backtest + live picks"
   },
   {
@@ -3835,7 +3846,7 @@
    "clvT": 1.63,
    "flat": 0.0248,
    "adds": 0.0034,
-   "expEdge": 0.0184,
+   "expEdge": -0.0263,
    "basis": "backtest + live picks"
   }
  ],
