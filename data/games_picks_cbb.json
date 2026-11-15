@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-15T06:58:47Z",
+ "asof": "2026-11-15T07:00:58Z",
  "recenter": {
-  "2026-11-15": 2.02
+  "2026-11-15": 2.0
  },
  "monitor": {
   "clocks": {
@@ -1464,15 +1464,8 @@
    "flagged": "2026-11-15T06:55:26Z",
    "paper": true,
    "betTo": 22.0,
-   "close": 24.5,
-   "now": {
-    "mk": "spread",
-    "side": "away",
-    "line": 24.5,
-    "price": -117.0,
-    "ev": 0.07,
-    "units": 0.75
-   }
+   "close": 23.5,
+   "now": null
   },
   {
    "id": "401925812",
@@ -1646,7 +1639,7 @@
     "line": 163.5,
     "price": -110.0,
     "ev": 0.051,
-    "units": 0.25
+    "units": 0.5
    }
   },
   {
@@ -1911,14 +1904,14 @@
    "flagged": "2026-11-15T03:17:19Z",
    "paper": true,
    "betTo": 129.5,
-   "close": 130.5,
+   "close": 132.5,
    "now": {
     "mk": "total",
     "side": "under",
-    "line": 130.5,
-    "price": -100.0,
-    "ev": 0.063,
-    "units": 0.5
+    "line": 132.5,
+    "price": -104.0,
+    "ev": 0.105,
+    "units": 1.0
    }
   },
   {
@@ -2016,14 +2009,7 @@
    "paper": true,
    "betTo": 12.5,
    "close": 11.5,
-   "now": {
-    "mk": "spread",
-    "side": "home",
-    "line": 11.5,
-    "price": -100.0,
-    "ev": 0.061,
-    "units": 0.5
-   }
+   "now": null
   },
   {
    "id": "401920235",
@@ -2370,9 +2356,9 @@
     "mk": "total",
     "side": "under",
     "line": 153.5,
-    "price": -108.0,
-    "ev": 0.034,
-    "units": 0.25
+    "price": -100.0,
+    "ev": 0.063,
+    "units": 1.0
    }
   },
   {
@@ -2458,6 +2444,22 @@
    "why": "no edge at -127",
    "m": 11.9,
    "tm": 136.1
+  },
+  {
+   "id": "401925896",
+   "sport": "cbb",
+   "kick": "2026-11-15T18:00:00Z",
+   "home": "Georgia State",
+   "away": "Norfolk State",
+   "mk": "total",
+   "side": "under",
+   "line": 147.5,
+   "price": -117.0,
+   "edge": 4.0,
+   "x": 2.0,
+   "why": "no edge at -117",
+   "m": 14.4,
+   "tm": 143.5
   },
   {
    "id": "401926063",
@@ -2605,10 +2607,10 @@
    "mk": "total",
    "side": "under",
    "line": 153.5,
-   "price": -108.0,
-   "ev": 0.034,
+   "price": -100.0,
+   "ev": 0.063,
    "edge": 2.5,
-   "units": 0.25,
+   "units": 1.0,
    "home": "Marquette",
    "away": "Missouri",
    "state": "paper"
@@ -2644,7 +2646,7 @@
    "price": -110.0,
    "ev": 0.051,
    "edge": 3.6,
-   "units": 0.25,
+   "units": 0.5,
    "bk": "poly",
    "home": "Memphis",
    "away": "Louisville",
@@ -2915,16 +2917,16 @@
    "state": "paper"
   },
   "401925896": {
-   "mk": "spread",
-   "side": "home",
-   "line": 11.5,
-   "price": -100.0,
-   "ev": 0.061,
-   "edge": 2.9,
-   "units": 0.5,
+   "mk": "total",
+   "side": "under",
+   "line": 147.5,
+   "price": -117.0,
+   "edge": 4.0,
+   "ev": null,
+   "units": 0.0,
    "home": "Georgia State",
    "away": "Norfolk State",
-   "state": "paper"
+   "state": "under"
   },
   "401924858": {
    "mk": "spread",
@@ -3003,7 +3005,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 15564,
+  "snapshots": 15570,
   "buckets": [
    {
     "when": "24h+",
@@ -3016,12 +3018,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3108,
-    "clvRet": -0.0232,
-    "clvT": -12.37,
+    "clvN": 3110,
+    "clvRet": -0.023,
+    "clvT": -12.28,
     "clv": 0.29,
     "beat": 0.35,
-    "still": 0.449
+    "still": 0.45
    },
    {
     "when": "1-6h",
@@ -17977,7 +17979,7 @@
    "flagged": "2026-11-15T03:17:19Z",
    "paper": true,
    "betTo": 129.5,
-   "close": 130.5
+   "close": 132.5
   },
   {
    "id": "401912210",
@@ -18248,11 +18250,11 @@
    "flagged": "2026-11-15T06:55:26Z",
    "paper": true,
    "betTo": 22.0,
-   "close": 24.5
+   "close": 23.5
   }
  ],
  "withdrawnLog": [],
- "checked": "2026-11-15T06:58:47Z",
+ "checked": "2026-11-15T07:00:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
