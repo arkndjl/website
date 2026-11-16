@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import zlib from 'node:zlib';
 
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
@@ -991,6 +992,19 @@ function readback(games, lam = 1) {
   return { r: Object.fromEntries(ts.map((t, i) => [t, b[i]])), h: b[k - 1] };
 }
 function gumbel(R) { let u = 0; while (!u) u = R(); return -Math.log(-Math.log(u)); }
+function writeDraws(season, teams, draws, N) {
+  const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '.cache', 'draws');
+  fs.mkdirSync(dir, { recursive: true });
+  const out = { sport: 'cfb', season, asof: new Date().toISOString().replace(/\.\d+Z$/, 'Z'), sims: N, teams,
+    fields: { wins: 'regular-season wins (FBS opponents and FCS games; conference title game not included)',
+      ccg: '0 no conference title game, 1 lost it, 2 won it', seed: 'CFP seed 1-12, 0 = not in the field',
+      stage: '0 not in the CFP, 1 lost first round, 2 lost quarterfinal, 3 lost semifinal, 4 lost the final, 5 won the title' },
+    draws };
+  const file = path.join(dir, 'cfb.json.gz');
+  fs.writeFileSync(file, zlib.gzipSync(JSON.stringify(out), { level: 6 }));
+  console.log(`cfb draws: ${N} sims x ${teams.length} teams -> scripts/.cache/draws/cfb.json.gz (${(fs.statSync(file).size / 1e6).toFixed(2)} MB)`);
+}
+
 export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 8) {
   const R = rng(20261008);
   const S = rows[0]?.S, season = rows.filter(r => r.S === S && r.w < 20);
@@ -1011,7 +1025,10 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
   const p4 = teams.map(t => t === CFP_FORMAT.nd || CFP_FORMAT.p4.includes(conf[t]) ? 1 : 0);
   const B = CFP ? Object.fromEntries(CFP.feats.map((f, i) => [f, CFP.beta[i]])) : null, gsd = CFP?.gsd || 15;
   const games = [...done, ...left];
+  // every draw kept for the private TLS feed when ARK_DRAWS=1 (scripts/sim_draws.py has the file format; never in git)
+  const DR = process.env.ARK_DRAWS === '1' ? { wins: [], ccg: [], seed: [], stage: [] } : null;
   for (let s = 0; s < N; s++) {
+    const cg = {}, stg = {};
     const shock = {}; for (const t of teams) shock[t] = gauss(R) * tu[t];
     const str = t => fbs.has(t) ? rOf(t) + shock[t] : rOf(t);
     const W = {}, C = {}, h2h = {};
@@ -1044,6 +1061,7 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
       const [a, b] = top;
       acc[a].ccg++; acc[b].ccg++;
       const m = str(a) - str(b) + gauss(R) * sigma, win = m > 0 ? a : b, lose = win === a ? b : a;
+      cg[a] = 1; cg[b] = 1; cg[win] = 2;
       W[win].w++; W[lose].l++; acc[win].title++; champs.push(win); ccgG.push([win, lose]);
     }
     let field = null, seedOf = null;
@@ -1077,7 +1095,9 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
       for (const t of qf) acc[t].semi++;
       for (const t of sf) acc[t].fin++;
       for (const t of [...seeds.slice(0, 4), ...fr]) acc[t].qf++;
-      acc[play(sf[0], sf[1], false)].natl++;
+      const nc = play(sf[0], sf[1], false);
+      acc[nc].natl++;
+      if (DR) { for (const t of seeds) stg[t] = 1; for (const t of [...seeds.slice(0, 4), ...fr]) stg[t] = 2; for (const t of qf) stg[t] = 3; for (const t of sf) stg[t] = 4; stg[nc] = 5; }
       for (const t of seeds) { acc[t].cfp++; acc[t].seed += seedOf[t]; acc[t].sd[seedOf[t] - 1]++; if (seedOf[t] <= CFP_FORMAT.byes) acc[t].bye++; }
     } else {
       // no committee fit on disk: the old stand-in (losses, then strength, champions +3)
@@ -1091,7 +1111,12 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
       acc[t].w += regW; acc[t].wins[Math.min(15, regW)]++;
       if (regW >= 6) acc[t].bowl++;
     }
+    if (DR) {
+      DR.wins.push(teams.map(t => W[t].w - (champs.includes(t) ? 1 : 0))); DR.ccg.push(teams.map(t => cg[t] || 0));
+      DR.seed.push(teams.map(t => (seedOf && seedOf[t]) || 0)); DR.stage.push(teams.map(t => stg[t] || 0));
+    }
   }
+  if (DR) writeDraws(S, teams, DR, N);
   // projected bracket: the seeding with the most expected exact seeds (scripts/bracket.py), each game to the side more
   // likely to reach the next round
   let bracket = null;

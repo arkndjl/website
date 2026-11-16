@@ -1,0 +1,11 @@
+# The private TLS feed: a separate worker from the site (the site's wrangler.toml is at the repo root). Deployed by
+# .github/workflows/tls-feed.yml, or from this folder with `npx wrangler deploy`. Secrets (never in the repo):
+# TLS_READ_TOKEN (what TLS Fantasy sends) and TLS_UPLOAD_TOKEN (what this repo's workflows send).
+name = "ark-tls-feed"
+main = "worker.js"
+compatibility_date = "2026-02-14"
+workers_dev = true
+
+[[r2_buckets]]
+binding = "FEED"
+bucket_name = "ark-tls-feed"

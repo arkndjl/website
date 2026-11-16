@@ -1,0 +1,42 @@
+# Deploys the private TLS feed worker (ops/tls-feed): creates its R2 bucket if missing, deploys the worker and sets its
+# two tokens from repository secrets. Run by hand (Actions > tls feed > Run workflow) after adding the secrets, and on
+# every change to ops/tls-feed on main. Setup steps: ops/tls-feed/README.md.
+name: tls feed
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['ops/tls-feed/**']
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TLS_READ_TOKEN: ${{ secrets.TLS_READ_TOKEN }}
+      TLS_UPLOAD_TOKEN: ${{ secrets.TLS_UPLOAD_TOKEN }}
+    steps:
+      - name: Check the secrets
+        run: |
+          for s in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID TLS_READ_TOKEN TLS_UPLOAD_TOKEN; do
+            [ -n "${!s}" ] || { echo "Missing repository secret $s (ops/tls-feed/README.md)"; exit 1; }
+          done
+          [ ${#TLS_READ_TOKEN} -ge 32 ] && [ ${#TLS_UPLOAD_TOKEN} -ge 32 ] || { echo "Each token needs 32+ characters"; exit 1; }
+      - uses: actions/checkout@v4
+      - name: R2 bucket
+        working-directory: ops/tls-feed
+        run: npx --yes wrangler@4 r2 bucket create ark-tls-feed || echo "bucket exists (or see the line above)"
+      - name: Deploy the worker
+        working-directory: ops/tls-feed
+        run: npx --yes wrangler@4 deploy
+      - name: Set the tokens
+        working-directory: ops/tls-feed
+        run: |
+          printf '%s' "$TLS_READ_TOKEN" | npx --yes wrangler@4 secret put TLS_READ_TOKEN
+          printf '%s' "$TLS_UPLOAD_TOKEN" | npx --yes wrangler@4 secret put TLS_UPLOAD_TOKEN

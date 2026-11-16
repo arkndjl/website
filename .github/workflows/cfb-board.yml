@@ -53,6 +53,7 @@ jobs:
     timeout-minutes: 45
     env:
       REFRESH: ${{ github.event.schedule == '37 22 * 8-12,1 *' || github.event.schedule == '7 3 * 8-12,1 *' || github.event.schedule == '57 18 * 8-12,1 0' || inputs.refresh == true }}
+      ARK_DRAWS: '1'     # season sims keep every draw for the TLS feed (scripts/sim_draws.py)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -255,3 +256,11 @@ jobs:
             --rebuild data/games_picks_cfb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
             -- 'data/cfb*.json' data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json scripts/data/school_bios_cfb.json data/dob_conflicts_cfb.json 'scripts/data/odds/cfb-*.jsonl'
+      # the private TLS feed (ops/tls-feed): this run's model output and sim draws (draws never go to git); skipped
+      # without the TLS_FEED_URL / TLS_UPLOAD_TOKEN secrets, never fails the run
+      - name: TLS feed upload
+        continue-on-error: true
+        env:
+          TLS_FEED_URL: ${{ secrets.TLS_FEED_URL }}
+          TLS_UPLOAD_TOKEN: ${{ secrets.TLS_UPLOAD_TOKEN }}
+        run: python3 scripts/tls_upload.py cfb

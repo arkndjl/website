@@ -185,8 +185,11 @@ Nothing in the repo is built for one:
 The inbound direction is documented: every outside source the site pulls from is in
 [`data/data_sources.json`](../data/data_sources.json) (Data Sources tab on Reference).
 
-A TLS Fantasy integration would need the owner's permission and, practically, a server-side fetch of
-`/data/nfl-fantasy.json` (or a purpose-built export), plus `/build.json` for freshness.
+**Private TLS feed.** TLS Fantasy reads through a private, token-gated feed outside the public site:
+[`ops/tls-feed/`](../ops/tls-feed/README.md) (Cloudflare Worker + R2). After each NFL, NBA, CBB and CFB build,
+[`scripts/tls_upload.py`](../scripts/tls_upload.py) uploads that sport's game and season file and its per-draw season
+sims ([`scripts/sim_draws.py`](../scripts/sim_draws.py); never committed), keeping one draws snapshot per week. Access:
+a read token issued by the owner, sent as `Authorization: Bearer`. Endpoints and file formats are in that README.
 
 ## 6. Planned or unfinished
 

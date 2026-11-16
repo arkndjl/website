@@ -570,6 +570,12 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
     lrng = random.Random(2027)
     dcnt = {t: [0] * 60 for t in teams}
     orders = []
+    import sim_draws                                 # every draw kept for the private TLS feed when ARK_DRAWS=1 (never in git)
+    DR = sim_draws.Draws('nba', S, teams, {
+        'wins': 'regular-season wins', 'seed': 'playoff seed 1-8 after the play-in, 0 = missed',
+        'stage': '0 missed, 1 lost in the play-in, 2 lost first round, 3 lost second round, 4 lost conference finals, '
+                 '5 lost the Finals, 6 won the title',
+        'pick': 'draft slot 1-30 after the lottery'})
     for _s in range(SIMS):
         shock = {t: rng.gauss(0, rsd) for t in teams}
         w = dict(wins0)
@@ -584,6 +590,7 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
         seeded = T.standings(w)
         tbk = {t: w[t] + rng.random() * 1e-3 for t in teams}       # Finals home court: record, then a coin flip
         champs, po = [], set()
+        stg, sd_ = {}, {}
         tal.season()
         for conf in (EAST, WEST):
             order = seeded[conf is WEST]
@@ -612,6 +619,16 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
             for t in r2:
                 tal.reached(t, 'cf')
             cf = series(*sorted(r2, key=seeds.index), shock)
+            if DR.on:
+                for t in order[:10]:
+                    stg[t] = 1
+                for i, t in enumerate(seeds):
+                    stg[t] = 2; sd_[t] = i + 1
+                for t in r1:
+                    stg[t] = 3
+                for t in r2:
+                    stg[t] = 4
+                stg[cf] = 5
             cnt[cf]['conf'] += 1
             tal.reached(cf, 'conf')
             champs.append(cf)
@@ -621,8 +638,12 @@ def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
         tal.reached(_ch, 'title')
         do = LOT.order(w, po, lrng, S)
         for t, (a1, a2) in do.items(): dcnt[t][a1 - 1] += 1; dcnt[t][a2 - 1] += 1
+        if DR.on:
+            stg[_ch] = 6
+            DR.add(wins=w, seed=sd_, stage=stg, pick={t: a1 for t, (a1, _a2) in do.items()})
         if _s % DRAFT_EVERY == 0:
             orders.append([t for t, _ in sorted(do.items(), key=lambda x: x[1][0])] + [t for t, _ in sorted(do.items(), key=lambda x: x[1][1])])
+    DR.write()
     try:
         nba_bracket(BK, tal, SIMS)
     except Exception as e:                           # the bracket keeps its last file rather than stop the build
