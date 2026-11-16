@@ -127,7 +127,9 @@ jobs:
         if: env.FULL == 'true'
         continue-on-error: true
         timeout-minutes: 10
-        run: python3 scripts/gleague_callup.py
+        run: |
+          python3 -m venv /tmp/glv && /tmp/glv/bin/pip install -q numpy
+          /tmp/glv/bin/python scripts/gleague_callup.py
       # ESPN box scores and lines already pulled this season (final games never change), and the official injury reports
       # the walk reads for this season's past games (scripts/nba_inj_hist.py reports())
       - uses: actions/cache@v4
