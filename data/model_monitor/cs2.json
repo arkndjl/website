@@ -1,14 +1,14 @@
 {
- "asof": "2026-11-16T06:53:11Z",
+ "asof": "2026-11-16T18:44:14Z",
  "sport": "cs2",
  "season": 2026,
  "loss": "win log loss",
- "n": 91,
- "logged": 91,
+ "n": 93,
+ "logged": 93,
  "expectFrom": "the model's own chances",
- "model": 0.6408,
- "expected": 0.531,
- "z": -0.239,
+ "model": 0.63,
+ "expected": 0.5264,
+ "z": -0.227,
  "line": null,
  "lineN": 0,
  "modelAtLine": null,
@@ -21,25 +21,25 @@
   },
   {
    "month": "nov",
-   "n": 70,
-   "model": 0.6248,
-   "expected": 0.5456
+   "n": 72,
+   "model": 0.6113,
+   "expected": 0.5393
   }
  ],
  "test": {
-  "n": 91,
-  "window": 91,
-  "mean": -0.2393,
-  "t": -1.88,
-  "p": 0.0385,
-  "days": 18,
+  "n": 93,
+  "window": 93,
+  "mean": -0.2267,
+  "t": -1.82,
+  "p": 0.0429,
+  "days": 19,
   "sd": 1.0,
-  "cusum": 5.5,
+  "cusum": 4.31,
   "cusumMax": 8.18,
   "h": 10.0,
   "stop": true,
-  "why": "last 91 worth t -1.88 at the close"
+  "why": "last 93 worth t -1.82 at the close"
  },
  "status": "alarm",
- "why": "last 91 worth t -1.88 at the close"
+ "why": "last 93 worth t -1.82 at the close"
 }
