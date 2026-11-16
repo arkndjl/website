@@ -1333,10 +1333,10 @@
   }
   // numbers a line of text carries, for telling when it only repeats what the card already shows
   function pcNumsIn(s) { return (String(s).replace(/−/g, '-').match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function (n) { return String(parseFloat(n.replace(/,/g, ''))); }); }
-  // CBB comps (cbb.js fillComps, static/data/cbb-comps.json): the 100-nearest mix and the 3 nearest who reached the NBA
+  // CBB comps (cbb.js fillComps, static/data/cbb-comps.json; internationals cbb-comps-intl.json): the 100-nearest mix and the 3 nearest who reached the NBA
   async function pcComps(win, d) {
     var el = d && d.querySelector('[data-comps]'), src = win.getAttribute('data-cbb-src'); if (!el || !src || !window.__arkJson) return null;
-    var cd = await window.__arkJson(src.replace(/cbb-all\.json.*$/, 'cbb-comps.json')).catch(function () { return null; });
+    var cd = await window.__arkJson(src.replace(/cbb-all\.json.*$/, el.hasAttribute('data-comps-intl') ? 'cbb-comps-intl.json' : 'cbb-comps.json')).catch(function () { return null; });
     var e = cd && cd.players[el.getAttribute('data-comps')]; if (!e || !e.length) return null;
     var lg = {}; (window.__arkCbbRecs || []).forEach(function (r) { if (r.logo && r.team && !lg[r.team]) lg[r.team] = r.logo; });
     var near = e.slice(0, -1).map(function (x) { return cd.pool[x[0]]; }).filter(Boolean).slice(0, 3);
@@ -1357,7 +1357,7 @@
       g.fillStyle = C.face; g.fillRect(cx, y, cw, h); bevel(g, cx, y, cw, h, true, 3);
       if (img) drawLogo(g, img, cx + pad, y + pad, 64, 64);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, c[0], tw), tx, y + pad + 18);
-      g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, c[1] + ' ' + String(c[2] - 1).slice(2) + '-' + String(c[2]).slice(2) + ' ' + c[3], tw), tx, y + 76);
+      g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [c[1], String(c[2] - 1).slice(2) + '-' + String(c[2]).slice(2), c[3]].filter(Boolean).join(' '), tw), tx, y + 76);
       var by = y + h - 40, fvT = String(Math.round(c[4])); g.font = '40px ' + FONT; var chw = chip(g, cx + pad, by, fvT, 40, c[4]), rx = cx + pad + chw + 16;
       var pk = c[6] ? '#' + c[6] + " '" + String(c[7]).slice(2) : 'undrafted'; g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(pk, rx, by); rx += g.measureText(pk).width + 16;
       g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, COMP_ROLE[c[5]] || c[5], cx + cw - pad - rx), rx, by);
@@ -1508,7 +1508,7 @@
       });
       // shares of one whole (NBA position: PF 46%, SF 37% ...): each cell's bar is its share
       var ps = b.items.map(function (it) { return /^\d+(\.\d+)?%$/.test(it.t) ? parseFloat(it.t) : NaN; }), tot = ps.reduce(function (a, v) { return a + v; }, 0);
-      if (b.items.length >= 2 && tot >= 95 && tot <= 105) b.items.forEach(function (it, k) { it.prob = ps[k]; it.pct = null; it.good = null; });
+      if (b.items.length >= 2 && (tot >= 95 && tot <= 105 || /position/i.test(b.title) && ps.every(isFinite) && tot <= 105)) b.items.forEach(function (it, k) { it.prob = ps[k]; it.pct = null; it.good = null; });
     });
     bands = bands.filter(function (b) { return b.items.length >= (b.compact && !b.src ? 2 : 1); });
     bands.forEach(function (b) { b.cols = b.fvo ? 1 : pcCols(b.items.length, b.compact); b.rows = b.fvo ? 1 : Math.ceil(b.items.length / b.cols); });
