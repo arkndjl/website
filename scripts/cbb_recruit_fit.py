@@ -600,6 +600,7 @@ def select(F, ts, cls, folds):
             best = None
             for c in CANDS:
                 if c in (cp if part == 'p' else cv_): continue
+                if len({f[c] for f in F}) < 2: continue   # one value in every training row (On3's own rank starts with the 2021 class): nothing to test
                 tp, tv = (cp + [c], cv_) if part == 'p' else (cp, cv_ + [c])
                 a, b = losses(tp, tv)
                 if part == 'p': d, t, w = paired(a, lp, cls, folds)
@@ -965,6 +966,18 @@ def reliability(H):
     return rel
 
 
+def old_p(age, c, today=None):
+    """The chance a class-c recruit is 18 or older on Oct 26 of his senior year (the history's 'old'), from the whole-year
+    age On3 shows today. A birthday falls in a stretch of the year with chance equal to its length, so the flag is a
+    share while that date is less than a year off on the side his age leaves open, and 0 or 1 otherwise."""
+    import datetime as dt
+    d = (dt.date(c - 1, 10, 26) - (today or dt.date.today())).days / 365.25   # years until the date (negative once past)
+    w, f = math.floor(abs(d)), abs(d) - math.floor(abs(d))
+    lo = age + w if d >= 0 else age - w - 1     # his age on the date is lo or lo + 1
+    p_hi = f if d >= 0 else 1 - f               # chance it is lo + 1
+    return 1.0 if lo >= 18 else round(p_hi, 3) if lo == 17 else 0.0
+
+
 def board_teams():
     d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
     i = {c: k for k, c in enumerate(d['cols'])}
@@ -1077,7 +1090,7 @@ def write():
             nat = 'au' if hm in ('NSW', 'VIC', 'QLD', 'Canberra', 'Australia') else 'ca' if hm in CA_PROV else None
             row['nat'] = nat
             a = r.get('age')
-            if a is not None and 14 <= a <= 21: row['old'] = 1 if a >= 18 - (c - 2027) else 0
+            if a is not None and 14 <= a <= 21: row['old'] = old_p(a, c)
             lst.append((r, row, tm))
         Fl, _ = frame([x[1] for x in lst], smap, teams, ref)
         G = grade(M, Fl, rel[c]['shrink'])

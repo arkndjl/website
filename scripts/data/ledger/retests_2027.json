@@ -70,6 +70,18 @@
      "gate": "lined-game margin MAE, tune t <= -1.5 and held one-sided p < .05"
     }
    ]
+  },
+  {
+   "key": "cbb_recruit_ladder",
+   "trigger": "2026-27 NBA season final (the 2017 and 2018 recruit classes reach nine and eight seasons out)",
+   "harness": "scripts/research/cbb_recruits_nov16/fv_tests.py (classes 2009-18, each held out)",
+   "tests": [
+    {
+     "key": "ordinal_ladder",
+     "form": "continuation-ratio ladder on the FV tiers (P1 as defined Nov 16 2026: rung 1 = shipped P part, rungs 35-55 lam 1, 60-80 lam 10)",
+     "gate": "ranked probability score gain, t >= 2.33 over recruits, 8 of 10 classes, squared error of E[FV] not worse; scored on the 2017-18 classes plus the pooled ten"
+    }
+   ]
   }
  ]
 }
