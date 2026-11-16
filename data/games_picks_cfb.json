@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-16T07:45:37Z",
+ "asof": "2026-11-16T07:48:24Z",
  "recenter": {
-  "week": 0.28
+  "week": 0.31
  },
  "monitor": {
   "clocks": {
@@ -277,6 +277,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401856752",
+   "sport": "cfb",
+   "kick": "2026-11-21T20:45:00.000Z",
+   "home": "Oklahoma",
+   "away": "Texas A&M",
+   "mk": "total",
+   "side": "over",
+   "line": 22.5,
+   "price": -5413.0,
+   "edge": 16.7,
+   "x": 7.5,
+   "why": "no edge at -5413",
+   "m": 7.8,
+   "tm": 39.2
+  },
+  {
    "id": "401856754",
    "sport": "cfb",
    "kick": "2026-11-21T20:30:00.000Z",
@@ -469,6 +485,22 @@
    "tm": 54.4
   },
   {
+   "id": "401869938",
+   "sport": "cfb",
+   "kick": "2026-11-22T00:00:00.000Z",
+   "home": "Louisiana Tech",
+   "away": "Arkansas State",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -134.0,
+   "edge": 1.9,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 12.4,
+   "tm": 54.4
+  },
+  {
    "id": "401869953",
    "sport": "cfb",
    "kick": "2026-11-21T21:00:00.000Z",
@@ -483,22 +515,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -8.6,
    "tm": 47.9
-  },
-  {
-   "id": "401856752",
-   "sport": "cfb",
-   "kick": "2026-11-21T20:45:00.000Z",
-   "home": "Oklahoma",
-   "away": "Texas A&M",
-   "mk": "spread",
-   "side": "home",
-   "line": -8.5,
-   "price": -7255.0,
-   "edge": 16.3,
-   "x": null,
-   "why": "spread market off",
-   "m": 7.8,
-   "tm": 39.2
   },
   {
    "id": "401862834",
@@ -659,22 +675,6 @@
    "why": "total market off",
    "m": 16.9,
    "tm": 58.6
-  },
-  {
-   "id": "401862833",
-   "sport": "cfb",
-   "kick": "2026-11-21T19:30:00.000Z",
-   "home": "Florida Atlantic",
-   "away": "South Florida",
-   "mk": "total",
-   "side": "under",
-   "line": 65.5,
-   "price": -119.0,
-   "edge": 5.7,
-   "x": null,
-   "why": "total market off",
-   "m": 1.1,
-   "tm": 59.8
   }
  ],
  "games": {
@@ -787,16 +787,16 @@
    "state": "off"
   },
   "401856752": {
-   "mk": "spread",
-   "side": "home",
-   "line": -8.5,
-   "price": -7255.0,
-   "edge": 16.3,
+   "mk": "total",
+   "side": "over",
+   "line": 22.5,
+   "price": -5413.0,
+   "edge": 16.7,
    "ev": null,
    "units": 0.0,
    "home": "Oklahoma",
    "away": "Texas A&M",
-   "state": "off"
+   "state": "under"
   },
   "401856751": {
    "mk": "total",
@@ -1159,16 +1159,16 @@
    "state": "off"
   },
   "401869938": {
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -108.0,
-   "edge": 1.1,
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -134.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana Tech",
    "away": "Arkansas State",
-   "state": "off"
+   "state": "under"
   },
   "401861968": {
    "mk": "spread",
@@ -1402,7 +1402,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -1499,15 +1499,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20935,
+  "snapshots": 20945,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4176,
-    "clvRet": -0.0497,
-    "clvT": -36.32,
-    "clv": 0.16,
-    "beat": 0.336,
+    "clvN": 4178,
+    "clvRet": -0.0494,
+    "clvT": -35.57,
+    "clv": 0.17,
+    "beat": 0.337,
     "still": 0.312
    },
    {
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T07:45:37Z",
+ "checked": "2026-11-16T07:48:24Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
