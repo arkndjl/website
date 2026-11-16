@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T21:13:05Z",
+ "asof": "2026-11-16T21:16:07Z",
  "recenter": {
-  "2026-11-16": 2.11
+  "2026-11-16": 2.12
  },
  "monitor": {
   "clocks": {
@@ -1964,22 +1964,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401917964",
-   "sport": "cbb",
-   "kick": "2026-11-17T01:00:00Z",
-   "home": "Missouri State",
-   "away": "Abilene Christian",
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -124.0,
-   "edge": 5.6,
-   "x": 5.0,
-   "why": "no edge at -124",
-   "m": -0.1,
-   "tm": 145.8
-  },
-  {
    "id": "401927364",
    "sport": "cbb",
    "kick": "2026-11-17T00:30:00Z",
@@ -2010,6 +1994,22 @@
    "why": "edge under 5 (line: 4-9)",
    "m": 11.4,
    "tm": 156.1
+  },
+  {
+   "id": "401917964",
+   "sport": "cbb",
+   "kick": "2026-11-17T01:00:00Z",
+   "home": "Missouri State",
+   "away": "Abilene Christian",
+   "mk": "total",
+   "side": "over",
+   "line": 139.5,
+   "price": -110.0,
+   "edge": 6.3,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": -0.1,
+   "tm": 145.8
   },
   {
    "id": "401920808",
@@ -2164,7 +2164,7 @@
    "mk": "spread",
    "side": "away",
    "line": 18.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 1.7,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2301,7 +2301,7 @@
    "mk": "spread",
    "side": "away",
    "line": 18.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -2527,11 +2527,11 @@
    "state": "under"
   },
   "401917964": {
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -124.0,
-   "edge": 5.6,
+   "mk": "total",
+   "side": "over",
+   "line": 139.5,
+   "price": -110.0,
+   "edge": 6.3,
    "ev": null,
    "units": 0.0,
    "home": "Missouri State",
@@ -2591,7 +2591,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16759,
+  "snapshots": 16761,
   "buckets": [
    {
     "when": "24h+",
@@ -2613,9 +2613,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 1904,
+    "clvN": 1905,
     "clvRet": -0.0401,
-    "clvT": -34.0,
+    "clvT": -34.02,
     "clv": 0.08,
     "beat": 0.161,
     "still": 0.714
@@ -19168,7 +19168,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T21:13:05Z",
+ "checked": "2026-11-16T21:16:07Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
