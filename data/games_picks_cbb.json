@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T06:37:46Z",
+ "asof": "2026-11-16T06:55:41Z",
  "recenter": {
-  "2026-11-16": 2.08
+  "2026-11-16": 2.07
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T05:13:03Z",
-  "ageH": 1.4,
+  "ageH": 1.7,
   "stale": false
  },
  "picks": [],
@@ -2069,22 +2069,6 @@
    "tm": 141.5
   },
   {
-   "id": "401916298",
-   "sport": "cbb",
-   "kick": "2026-11-16T23:00:00Z",
-   "home": "Maryland",
-   "away": "Alcorn State",
-   "mk": "total",
-   "side": "over",
-   "line": 152.5,
-   "price": -124.0,
-   "edge": 4.7,
-   "x": 6.5,
-   "why": "edge under 6.5 (tier: mixed)",
-   "m": 37.1,
-   "tm": 157.2
-  },
-  {
    "id": "401917532",
    "sport": "cbb",
    "kick": "2026-11-17T03:00:00Z",
@@ -2099,6 +2083,22 @@
    "why": "edge under 7",
    "m": 19.8,
    "tm": 154.2
+  },
+  {
+   "id": "401906783",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:00:00Z",
+   "home": "Georgia",
+   "away": "Jacksonville",
+   "mk": "spread",
+   "side": "away",
+   "line": 23.5,
+   "price": -124.0,
+   "edge": 3.2,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 20.3,
+   "tm": 151.6
   },
   {
    "id": "401920808",
@@ -2125,12 +2125,28 @@
    "mk": "total",
    "side": "under",
    "line": 139.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 4.1,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
    "m": 31.9,
    "tm": 135.4
+  },
+  {
+   "id": "401916317",
+   "sport": "cbb",
+   "kick": "2026-11-16T23:30:00Z",
+   "home": "Ohio State",
+   "away": "Prairie View A&M",
+   "mk": "total",
+   "side": "over",
+   "line": 153.5,
+   "price": -124.0,
+   "edge": 4.0,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 35.9,
+   "tm": 157.5
   },
   {
    "id": "401929192",
@@ -2165,38 +2181,6 @@
    "tm": 145.4
   },
   {
-   "id": "401916317",
-   "sport": "cbb",
-   "kick": "2026-11-16T23:30:00Z",
-   "home": "Ohio State",
-   "away": "Prairie View A&M",
-   "mk": "total",
-   "side": "over",
-   "line": 154.5,
-   "price": -119.0,
-   "edge": 3.0,
-   "x": 6.5,
-   "why": "edge under 6.5 (tier: mixed)",
-   "m": 35.9,
-   "tm": 157.5
-  },
-  {
-   "id": "401906783",
-   "sport": "cbb",
-   "kick": "2026-11-17T00:00:00Z",
-   "home": "Georgia",
-   "away": "Jacksonville",
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": -119.0,
-   "edge": 2.2,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": 20.3,
-   "tm": 151.6
-  },
-  {
    "id": "401920373",
    "sport": "cbb",
    "kick": "2026-11-17T03:00:00Z",
@@ -2211,6 +2195,22 @@
    "why": "edge under 5 (role: dog)",
    "m": 17.4,
    "tm": 158.4
+  },
+  {
+   "id": "401916298",
+   "sport": "cbb",
+   "kick": "2026-11-16T23:00:00Z",
+   "home": "Maryland",
+   "away": "Alcorn State",
+   "mk": "total",
+   "side": "over",
+   "line": 154.5,
+   "price": -119.0,
+   "edge": 2.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 37.1,
+   "tm": 157.2
   },
   {
    "id": "401921087",
@@ -2333,9 +2333,9 @@
   "401906783": {
    "mk": "spread",
    "side": "away",
-   "line": 22.5,
-   "price": -119.0,
-   "edge": 2.2,
+   "line": 23.5,
+   "price": -124.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "Georgia",
@@ -2441,9 +2441,9 @@
   "401916317": {
    "mk": "total",
    "side": "over",
-   "line": 154.5,
-   "price": -119.0,
-   "edge": 3.0,
+   "line": 153.5,
+   "price": -124.0,
+   "edge": 4.0,
    "ev": null,
    "units": 0.0,
    "home": "Ohio State",
@@ -2453,9 +2453,9 @@
   "401916298": {
    "mk": "total",
    "side": "over",
-   "line": 152.5,
-   "price": -124.0,
-   "edge": 4.7,
+   "line": 154.5,
+   "price": -119.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "Maryland",
@@ -2466,7 +2466,7 @@
    "mk": "total",
    "side": "under",
    "line": 139.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -2612,25 +2612,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16501,
+  "snapshots": 16512,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 541,
     "clvRet": -0.0262,
-    "clvT": -3.36,
+    "clvT": -3.38,
     "clv": 0.27,
     "beat": 0.323,
     "still": 0.29
    },
    {
     "when": "6-24h",
-    "clvN": 3287,
-    "clvRet": -0.0218,
-    "clvT": -12.16,
+    "clvN": 3290,
+    "clvRet": -0.022,
+    "clvT": -12.32,
     "clv": 0.31,
-    "beat": 0.352,
-    "still": 0.457
+    "beat": 0.349,
+    "still": 0.461
    },
    {
     "when": "1-6h",
@@ -19189,7 +19189,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T06:37:46Z",
+ "checked": "2026-11-16T06:55:41Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
