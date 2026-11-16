@@ -639,6 +639,15 @@ export async function writeRecruits(root = ROOT, { offline = false } = {}) {
   const sp = path.join(root, 'scripts', 'cfb_recruit_247.json'), snap247 = fs.existsSync(sp) ? JSON.parse(fs.readFileSync(sp, 'utf8')) : null;
   const out = await recruitBoard({ fit, rows, teams, builder, season: +all.asof.slice(0, 4), asof: all.asof, offline, snap247 });
   fs.writeFileSync(path.join(root, 'static', 'data', 'cfb-recruits.json'), JSON.stringify(out));
+  // the team builder's depth charts carry each newcomer's ARK stars from the recruit file it was built on (the board
+  // writes the builder before this runs): restamp them from this run so a star change shows there at once
+  if (builder?.teams) {
+    const st = new Map([...(out.class || []), ...(out.redshirts || [])].filter(x => x.tid).map(x => [x.tid + '|' + x.name, x.ark ?? null]));
+    let n = 0;
+    for (const t of builder.teams) for (const g of t.positions || []) for (const k of ['chart', 'lineup', 'bench'])
+      for (const p of g[k] || []) if ((p.kind === 'recruit' || p.kind === 'redshirt') && st.has(t.tid + '|' + p.name) && p.ark !== st.get(t.tid + '|' + p.name)) { p.ark = st.get(t.tid + '|' + p.name); n++; }
+    if (n) { fs.writeFileSync(bp, JSON.stringify(builder)); console.log(`recruits: ${n} team builder ARK stars restamped`); }
+  }
   // the page renders the top of each list server-side; the full lists are in static/data/cfb-recruits.json
   const page = { ...out, class: out.class.slice(0, 300), future: out.future.map(f => ({ ...f, list: f.list.slice(0, 300) })), redshirts: out.redshirts.slice(0, 150), young: out.young.slice(0, 100), teams: out.teams.map(({ pos, ...t }) => t) };
   fs.writeFileSync(path.join(root, 'data', 'cfb_recruits.json'), JSON.stringify(page, null, 1) + '\n');

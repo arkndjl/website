@@ -1,0 +1,69 @@
+# Refreshes the College Football ARKBOARD recruit tabs (2027-29 classes, ARK stars, class rankings, team builder
+# newcomers) on days the cfb board does not pull On3: On3's industry table (scripts/cfb_on3.mjs, headless Chromium),
+# then scripts/cfb_recruit.mjs from the committed board files. No CFBD calls (the board's weekly 247 pull covers that).
+# Daily; skipped when scripts/data/cfb_on3_live.json was already pulled today (the in-season board runs do that).
+name: cfb recruits
+
+on:
+  schedule:
+    - cron: "47 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cfb-board
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/data/cfb_on3_live.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          try:
+              asof = dt.date.fromisoformat(json.load(open('scripts/data/cfb_on3_live.json'))['asof'][:10])
+          except Exception:
+              asof = dt.date.today() - dt.timedelta(days=2)
+          print('go=' + str(dt.datetime.now(dt.timezone.utc).date() > asof).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: On3 industry recruiting classes
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          Y=$(python3 -c "import json; print(json.load(open('data/cfb_recruits.json'))['next'])")
+          node scripts/cfb_on3.mjs $Y $((Y + 1)) $((Y + 2))
+          python3 scripts/cfb_on3_pack.py --live $Y $((Y + 1)) $((Y + 2))
+      - name: Recruit tabs and ARK stars
+        run: node scripts/cfb_recruit.mjs
+      - name: Commit if anything changed
+        run: |
+          python3 scripts/data_push.py -m "Update the CFB recruit classes ($(date -u +%Y-%m-%d))" \
+            -- data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json
