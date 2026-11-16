@@ -702,6 +702,8 @@ def main():
     if os.path.exists(path) and open(path).read() == body:
         print('no new games: the board is unchanged'); return
     open(path, 'w').write(body)
+    import rookies             # the true freshmen tab reads this board: rebuild it with every board write
+    rookies.cbb()
     if not played:
         # the preseason summary's top 30 and tier counts follow the regraded headline (the mean), not a stale grade
         sp = os.path.join(D.ROOT, 'data', 'cbb.json')
