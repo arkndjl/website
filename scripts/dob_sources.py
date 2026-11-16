@@ -24,6 +24,8 @@ ROOT = os.path.dirname(HERE)
 OVERRIDES = os.path.join(ROOT, 'data', 'dob_overrides.json')
 CONFLICTS = os.path.join(ROOT, 'data', 'dob_conflicts_{sport}.json')
 UA = 'arkboard-research/1.0 (+https://arkndjl.net)'
+# a college Sports Reference player id: the item is a US college player of that sport even when it lists no team
+SR = {'basketball': 'P3696', 'football': 'P3697'}
 OCC = {'basketball': 'Q3665646', 'football': 'Q19204627', 'hockey': 'Q11774891', 'soccer': 'Q937857', 'tennis': 'Q10833314'}
 
 
@@ -40,7 +42,8 @@ def pinned(sport):
 
 
 def wikidata(names, occ='basketball', batch=40):
-    """name -> [{'qid', 'dob', 'label', 'teams' (lowercase labels joined by |), 'nat'}], day-precision dates only.
+    """name -> [{'qid', 'dob', 'label', 'teams' (lowercase labels joined by |), 'nat', 'sr' (college Sports Reference
+    id, or ''), 'espn' (ESPN college football id, or '')}], day-precision dates only.
     Each name goes through Wikidata's own entity search (run inside the SPARQL call: labels, aliases, accents
     folded, so "Roko Prkacin" finds "Roko Prkačin"); a hit counts only when its English label has the same name key
     (scripts/names.py) as ours."""
@@ -49,14 +52,15 @@ def wikidata(names, occ='basketball', batch=40):
     for i in range(0, len(names), batch):
         vals = ' '.join(json.dumps(n) for n in names[i:i + batch])
         q = f'''SELECT ?name ?p ?lab ?dob (GROUP_CONCAT(DISTINCT ?tl; separator="|") AS ?teams)
-          (GROUP_CONCAT(DISTINCT ?cl; separator="|") AS ?nat) WHERE {{
+          (GROUP_CONCAT(DISTINCT ?cl; separator="|") AS ?nat) (SAMPLE(?sr0) AS ?sr) (SAMPLE(?es0) AS ?espn) WHERE {{
           VALUES ?name {{ {vals} }}
           SERVICE wikibase:mwapi {{ bd:serviceParam wikibase:endpoint "www.wikidata.org"; wikibase:api "EntitySearch";
             mwapi:search ?name; mwapi:language "en". ?p wikibase:apiOutputItem mwapi:item. }}
           ?p wdt:P106 wd:{OCC[occ]}; rdfs:label ?lab FILTER(lang(?lab)="en")
           ?p p:P569/psv:P569 [ wikibase:timeValue ?dob; wikibase:timePrecision 11 ].
           OPTIONAL {{ ?p wdt:P54|wdt:P69 ?t. ?t rdfs:label ?tl FILTER(lang(?tl)="en") }}
-          OPTIONAL {{ ?p wdt:P27 ?c. ?c rdfs:label ?cl FILTER(lang(?cl)="en") }} }} GROUP BY ?name ?p ?lab ?dob'''
+          OPTIONAL {{ ?p wdt:P27 ?c. ?c rdfs:label ?cl FILTER(lang(?cl)="en") }}
+          OPTIONAL {{ ?p wdt:{SR.get(occ, 'P3696')} ?sr0 }} OPTIONAL {{ ?p wdt:P7262 ?es0 }} }} GROUP BY ?name ?p ?lab ?dob'''
         for wait in (0, 30, 90):   # a 429 asks for a pause: back off, then give the batch up for this run
             time.sleep(wait)
             code, body = _get('https://query.wikidata.org/sparql?format=json&query=' + urllib.parse.quote(q), 90)
@@ -66,12 +70,53 @@ def wikidata(names, occ='basketball', batch=40):
                 n, lab = b['name']['value'], b['lab']['value']
                 if N.key(lab) != N.key(n): continue
                 c = {'qid': b['p']['value'].rsplit('/', 1)[-1], 'dob': b['dob']['value'][:10], 'label': lab,
-                     'teams': b.get('teams', {}).get('value', '').lower(), 'nat': b.get('nat', {}).get('value', '')}
+                     'teams': b.get('teams', {}).get('value', '').lower(), 'nat': b.get('nat', {}).get('value', ''),
+                     'sr': b.get('sr', {}).get('value', ''), 'espn': b.get('espn', {}).get('value', '')}
                 if all(x['qid'] != c['qid'] for x in out.get(n, [])): out.setdefault(n, []).append(c)
         except (ValueError, KeyError):
             print('wikidata batch failed', i, code)
         time.sleep(1)
     return out
+
+
+def sr_players(occ='basketball', since=1998):
+    """name key -> [{'qid', 'dob', 'label', 'teams', 'sr'}]: every Wikidata item with a college Sports Reference id for
+    the sport and a day-precision birth date (one query; ~8,600 basketball, ~1,300 football). Many of these items
+    list no team, which the per-name search above can't tie to a school; callers match them by name, class and
+    birth year instead."""
+    import names as N
+    q = f'''SELECT ?p ?lab ?dob ?sr (GROUP_CONCAT(DISTINCT ?tl; separator="|") AS ?teams) WHERE {{
+      ?p wdt:{SR[occ]} ?sr; rdfs:label ?lab FILTER(lang(?lab)="en")
+      ?p p:P569/psv:P569 [ wikibase:timeValue ?dob; wikibase:timePrecision 11 ]. FILTER(YEAR(?dob) >= {since})
+      OPTIONAL {{ ?p wdt:P54|wdt:P69 ?t. ?t rdfs:label ?tl FILTER(lang(?tl)="en") }} }} GROUP BY ?p ?lab ?dob ?sr'''
+    for wait in (0, 30, 90):
+        time.sleep(wait)
+        code, body = _get('https://query.wikidata.org/sparql?format=json&query=' + urllib.parse.quote(q), 120)
+        if code != 429: break
+    out = {}
+    try:
+        for b in json.loads(body)['results']['bindings']:
+            c = {'qid': b['p']['value'].rsplit('/', 1)[-1], 'dob': b['dob']['value'][:10], 'label': b['lab']['value'],
+                 'teams': b.get('teams', {}).get('value', '').lower(), 'sr': b['sr']['value']}
+            k = N.key(c['label'])
+            if all(x['qid'] != c['qid'] for x in out.get(k, [])): out.setdefault(k, []).append(c)
+    except (ValueError, KeyError):
+        print('wikidata sports reference list failed', code)
+    return out
+
+
+CLASS_N = {'Fr': 0, 'So': 1, 'Jr': 2, 'Sr': 3, 'Gr': 4}
+
+
+def fits_class(dob, cls, season, years=None):
+    """a birth date that fits his class: age on Nov 1 of the season's first year from 17.3 (a true freshman) to 20.8,
+    one more a class (a redshirt adds 1.5), and within a year of his Barttorvik birth year when there is one (`years`:
+    set of years; Barttorvik's year-only stand-in is off by one now and then: Ethan Brown 2008, bio Nov 14, 2007)"""
+    c = (cls or '').replace('RS-', '')
+    if c not in CLASS_N: return False
+    a = (dt.date(season, 11, 1) - dt.date.fromisoformat(dob)).days / 365.25
+    lo, hi = 17.3 + CLASS_N[c], 20.8 + CLASS_N[c] + (1.5 if (cls or '').startswith('RS-') else 0)
+    return lo <= a <= hi and (not years or any(abs(int(dob[:4]) - y) <= 1 for y in years))
 
 
 BIRTH = re.compile(r'\{\{\s*birth[ _]date(?: and age)?\s*\|(?:\s*\w+\s*=[^|}]*\|)*\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})', re.I)
