@@ -13,6 +13,12 @@ College basketball (CBB, barefoot inches and pounds; fit Nov 3 2026, research in
   weight   NBA combine (sd 3, plus 6 lb a year since it: the 2026 testers back in school list +6.4 by fall, sd 7.3);
            ESPN roster (sd 7.3); Tankathon (sd 7.3); On3 high school listing + 16 lb (the board's ESPN listings run
            15-17 lb over each recruit's On3 weight in every class year, sd 14)
+Refit against the same testers (1,015, 623 with a high school listing), one combine class held out: the blend above
+scores .711 in RMSE; per-group linear fits shrunk to the group's combine mean, on recency-weighted listings (half-life
+.5-2 seasons) plus the high school listing, .705-.707 (t .4-.8, 9-11 of 19 classes) and worse forward (.649 vs .639),
+so the blend stays. Its two weights (.64 roster / .36 high school) already match the correlated-error optimum
+(.62 / .38; the two listings' errors correlate .43). The high school listing is worth .706 -> .638 where it exists;
+the other listings a player has (school bio, MaxPreps) restate one of these sources.
 """
 
 CBB_HT = {'combine': (0.0, 0.25), 'roster': (1.17, 0.72), 'tankathon': (1.2, 0.75), 'hs': (1.06, 0.95)}

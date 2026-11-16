@@ -15,6 +15,7 @@ import { compact, Matcher } from './names.mjs';
 import { frameFV, bmiOf } from './cfb_frame.mjs';
 import { atMean, cfbZ } from './fv_dist.mjs';
 import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
+import { measureOf } from './cfb_measure.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const FLOOR = 20, TRAIN_SNAPS = 60, RIDGE = 5;
@@ -155,11 +156,14 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
       const x = feats(g, ht, wt, years, div === 'FCS', rc), fr = Math.round(frOf(g, a.pos, ht, wt) * 10) / 10;
       const fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0) + fr));
       const bmi = bmiOf(ht, wt), rep = report(g, x, w, { ht, wt, bmi, fr, years, rc });
+      // measured (combine-equivalent) size from his ESPN and 247 listings, as for graded rows (scripts/cfb_measure.mjs)
+      const meas = measureOf({ g, espnHt: inches(a.ht), espnWt: a.wt || null, recHt: prof?.ht || null, recWt: prof?.wt || null,
+        recYear: prof?.year || null }, season);
       have.add(`${norm(a.name)}|${tid}`);
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
         ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, bmi: bmi ? Math.round(bmi * 10) / 10 : null, age: a.dob && age != null ? Math.round(age * 10) / 10 : null, ageEst: !a.dob && age != null ? Math.round(age * 10) / 10 : null,
         photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
-        report: rep.report, parts: rep.parts, fvs: g === 'K' || g === 'P' ? [['b', FLOOR]] : [['b', Math.round((x.reduce((s, v, k) => s + v * w[k], 0) + fr - rep.steps.reduce((s, z) => s + z[1], 0)) * 100) / 100], ...rep.steps], frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', noRec: !rc, years, star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
+        report: rep.report, parts: rep.parts, fvs: g === 'K' || g === 'P' ? [['b', FLOOR]] : [['b', Math.round((x.reduce((s, v, k) => s + v * w[k], 0) + fr - rep.steps.reduce((s, z) => s + z[1], 0)) * 100) / 100], ...rep.steps], frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', mz: meas?.mz ?? null, noRec: !rc, years, star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
     }
   }
   const lifted = out.filter(r => r.fv > FLOOR).length;
