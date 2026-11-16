@@ -74,7 +74,7 @@
         <th data-sort="mv" data-num title="Transfermarkt market value, EUR millions (this season: today; past seasons: Jul 1)">TM</th>
         <th data-sort="gap" data-num title="xMV minus Transfermarkt value, EUR millions: plus = the production is worth more than the market says">Gap</th>
         {{- end }}
-        <th data-sort="fv" data-num title="FV: the soccer prospects board's grade (20-80), players under 22 on it">FV</th>
+        <th data-sort="fv" data-num data-sparse title="FV: the soccer prospects board's grade (20-80), players under 22 on it">FV</th>
         <th data-sort="pos" class="cfb__g" title="position (most common start): GK, D, M, F">Pos</th>
         <th data-sort="age" data-num title="age today (past seasons: at season's end)">Age</th>
         <th data-sort="team" class="nbaxpm__team">Team</th>
@@ -137,7 +137,7 @@
     return cache['m' + s];
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
+  function sg(x, d) { if (x == null) return '<span class="cfb__dim">–</span>'; var s = x.toFixed(d == null ? 1 : d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function fx(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(d); }
   // EUR millions: one decimal under 10, whole above
   function eur(x) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(Math.abs(x) < 10 ? 1 : 0); }

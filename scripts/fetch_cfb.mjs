@@ -40,7 +40,7 @@ import { liveInput, espnPlays, espnQbPpa } from './cfb_espn_md.mjs';
 import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
 import { writeComps } from './cfb_comps.mjs';
 import { assignBadges, archetypeOf, regressedZ, badgeSnaps, TIERS as BADGE_TIERS } from './cfb_badges.mjs';
-import { teamRankings, readPolls } from './cfb_rank.mjs';
+import { teamRankings, readPolls, corePoll } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder, transferWatch } from './cfb_transfer.mjs';
 import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
@@ -3283,8 +3283,19 @@ if (model && teamList.length) {
     const ts = Math.sqrt(tl.reduce((x, t) => x + (t.talent - tm) ** 2, 0) / Math.max(1, tl.length)) || 1;
     const prev = fs.existsSync(RANK_OUT) ? JSON.parse(fs.readFileSync(RANK_OUT, 'utf8')) : null;
     const weeksPlayed = games?.some(g => g.done) ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0;
+    // a poll missing from the site feed (AP or CFP not out yet this week): the latest week's from the core API
+    const polls = readPolls(espnPolls);
+    for (const [key, id] of [['ap', 1], ['cfp', 21]]) {
+      if (polls[key]) continue;
+      for (let w = (nextWeek ?? weeksPlayed + 1) + 1; w >= Math.max(1, weeksPlayed - 2) && !polls[key]; w--) {
+        try {
+          const doc = await source(`poll-${key}-${w}.json`, () => fetch(`https://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/${SEASON}/types/2/weeks/${w}/rankings/${id}`, { headers: { 'user-agent': UA } }).then(r => r.ok ? r.json() : null));
+          const p = corePoll(doc); if (p) polls[key] = p;
+        } catch (e) { /* that week has none */ }
+      }
+    }
     const R = teamRankings({ model, teamList, coaches, talentZ: Object.fromEntries(tl.map(t => [String(t.tid), (t.talent - tm) / ts])), late: (nextWeek ?? 0) >= 5,
-      polls: readPolls(espnPolls), hist, resolve: n => idxTeams.resolve(n), prev, week: weeksPlayed, inj: slate.inj || null });
+      polls, hist, resolve: n => idxTeams.resolve(n), prev, week: weeksPlayed, inj: slate.inj || null });
     fs.writeFileSync(RANK_OUT, JSON.stringify({ asof: out.asof, ...R }, FVR, 1) + '\n');
     const ev = R.evidence;
     console.log(`rankings: ${R.teams.length} teams · polls ${Object.keys(R.polls).join(', ')} · staff ${R.staffUsed.join(', ') || 'none'} · ` +

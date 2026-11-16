@@ -4699,3 +4699,19 @@ code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
 }
 .wintabs__tab[hidden] { display: none !important; }
+
+/* sport-page hero: one slim row, pixel art at 2x beside the source line, so the board starts higher */
+.win.winpane--art { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+.win.winpane--art > .win__title { grid-column: 1 / -1; }
+.winpane--art .winpane__body { margin: 6px 0 6px 10px; }
+.winpane--art .winpane__sprite { padding: 4px; }
+.winpane--art .winpane__sprite svg, .winpane--art .winpane__sprite .px { width: 128px; height: 80px; max-height: none; }
+.winpane--art > .win__status { margin: 6px 8px 6px 12px; align-self: center; }
+@media (max-width: 684px) {
+  .winpane--art .winpane__body { margin: 4px 0 4px 6px; }
+  .winpane--art .winpane__sprite svg, .winpane--art .winpane__sprite .px { width: 77px; height: 48px; }
+  .winpane--art > .win__status { margin: 4px 6px 4px 8px; font-size: 0.9em; }
+  .winpane--art > .win__status > span:first-child { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+}
+/* viz.js: a th[data-sparse] column hides while under a quarter of the rows in view have a value */
+.vz-hide { display: none !important; }

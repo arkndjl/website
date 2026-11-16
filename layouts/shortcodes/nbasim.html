@@ -5,28 +5,28 @@
        (the NBA's tiebreakers aren't modelled). */ -}}
 {{- with site.Data.nba_games -}}
 {{- $d := . -}}
-{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xW,Top 6,Play-in,Playoff,Conf title,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
-<table class="cfb__table tstick">
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Conf,Rec,xW,Top 6,Play-in,Playoff,Conf title,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
+<table class="cfb__table tstick2">
   <thead><tr>
-    <th>Team</th><th title="record (won-lost)">Rec</th>
+    <th>RK</th><th>Team</th><th title="conference">Conf</th><th title="record (won-lost)">Rec</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(top 6 seed: straight into the playoffs)">Top 6</th>
     <th title="P(7-10 seed: the play-in)">Play-in</th>
     <th title="P(playoffs, through the play-in)">Playoff</th>
     <th title="P(conference title)">Conf title</th>
-    <th title="P(NBA title)">Title</th>
-    <th title="conference">Conf</th>
+    <th data-vz title="P(NBA title)">Title</th>
   </tr></thead>
   <tbody>
-  {{- range sort .power "title" "desc" }}
+  {{- range $i, $p := sort .power "title" "desc" }}
   <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
     <td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td>{{ .cname }}</td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float .wins)) }}</td>
     {{- range $v := slice .top6 .playin .playoff .conf .title }}
     <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul $v 100))) }}%{{ end }}</td>
     {{- end }}
-    <td>{{ .cname }}</td>
   </tr>
   {{- end }}
   </tbody>
