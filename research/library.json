@@ -1262,7 +1262,7 @@
      "short": "Series win chance vs the average top-20 team.",
      "body": [
       "Player Elo that follows players between rosters (per map, on round share), bo3.gg team map rating with veto,",
-      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .552 vs VRS .667. No picks: the model loses to Thunderpick's close."
+      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .552 vs VRS .667. No picks: the model loses to Thunderpick's close and to the CS2Odds consensus close (Sep-Oct 2026, n 764: log loss .608 vs .590; adds nothing to it, t -0.2)."
      ],
      "where": "Counter-Strike ARK Ranking, matches, model",
      "sports": [
@@ -1839,7 +1839,7 @@
      "term": "Not picked",
      "short": "Markets tested and off because they did not beat the close.",
      "body": [
-      "NHL (ML and totals), soccer (1X2, O/U 2.5, MLS, props), CS2 (loses to Thunderpick's close), NBA/NHL props.",
+      "NHL (ML and totals), soccer (1X2, O/U 2.5, MLS, props), CS2 (loses to Thunderpick's and CS2Odds closes), NBA/NHL props.",
       "Their game projections still show; Kelly % reads off."
      ],
      "where": "Predictions game table",
@@ -2060,7 +2060,7 @@
      "body": [
       "Hockey: NHL API, MoneyPuck xG, Daily Faceoff goalies, Tankathon, Central Scouting, HockeyTech.",
       "Soccer: ESPN, football-data.co.uk closes, Understat and FotMob xG, Transfermarkt values and lineups.",
-      "Tennis: Sackmann archive (mirror), weekly tour feed, Tennis Abstract, ESPN. CS2: Valve VRS, Liquipedia, bo3.gg."
+      "Tennis: Sackmann archive (mirror), weekly tour feed, Tennis Abstract, ESPN. CS2: Valve VRS, Liquipedia, bo3.gg, CS2Odds closes."
      ],
      "where": "Hockey, soccer, tennis, Counter-Strike pages",
      "sports": [

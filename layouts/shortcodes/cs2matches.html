@@ -1,7 +1,7 @@
 {{- /* Counter-Strike series (data/cs2.json matches / results, scripts/cs2_model.py, schedule and scores from Liquipedia's
        match ticker): upcoming pro series with the model's win chances and fair odds without the vig; view="results"
-       lists finished series with the chance the model gave before each. No market lines: no free CS2 odds history,
-       so no Counter-Strike picks on Predictions. */ -}}
+       lists finished series with the chance the model gave before each. No market lines: the model does not beat the
+       close (scripts/cs2_cs2odds_research.py), so no Counter-Strike picks on Predictions. */ -}}
 {{- with site.Data.cs2 -}}
 {{- $view := $.Get "view" | default "matches" -}}
 {{- $list := cond (eq $view "results") .results .matches -}}
