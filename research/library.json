@@ -1103,6 +1103,22 @@
       "CBB",
       "Soccer"
      ]
+    },
+    {
+     "term": "G League NBA% / 500% / xVORX",
+     "short": "G League player's chance of NBA minutes next season, of 500+ NBA minutes (per 82 games), and expected NBA VORX over the next 3 seasons.",
+     "body": [
+      "Ridge logistic (L2 1) on 8,036 G League seasons 2008-25, regular season + Showcase Cup, 50+ minutes; Showcase-only seasons 2022-25 pooled in with a part-season flag.",
+      "Inputs: age, age^2, log minutes, games, per-36 box (pts reb ast stl blk tov 3PA FTA, Game Score, +/-), TS%, usage, AST%, OREB%, DREB%, net rating, PIE; NBA minutes and XPM (shrunk to -2 with 500 MP) through last season; draft round, log pick, years since the draft.",
+      "xVORX = P(any NBA game in 3 seasons) x ridge E[3-season VORX | plays].",
+      "Leave one season out vs the same model without G League stats: NBA% log loss .338 vs .378 (t -6.2, 16/18 seasons), AUC .883 vs .846 (no NBA minutes yet: .912 vs .872); 500% .191 vs .207 (t -4.3), AUC .897 vs .862; xVORX RMSE .921 vs .981 (t -3.1). All pass Holm.",
+      "Calibrated by decile held out (top NBA% decile .87 predicted, .86 observed). Base rates 23% / 8%.",
+      "Two-way to standard contract not modelled: no contract-type history."
+     ],
+     "where": "NBA G League tab",
+     "sports": [
+      "NBA"
+     ]
     }
    ]
   },

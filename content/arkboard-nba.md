@@ -2,7 +2,7 @@
 title = "NBA :: ARKBOARD"
 url = "/arkboard/nba/"
 description = "NBA game projections and XPM leaderboard. games: model line, win probability and projected score, with tonight's injuries; ARK Ranking (power rankings) and season odds. XPM leaderboard: XPM, the ARKBOARD's NBA impact metric (50/50 databallr DPM + Basketball-Reference BPM), ranked by VORX, wins over replacement fit to NBA team wins, with offense and defense splits, and XPM (proj), the season to date blended with a preseason prior. contract value: projected wins x the market $ per win against salary, this season and over the contract. every season since 2009-10, filter by minutes, position, team and age. projections: 20th, 50th and 80th percentile VORX, points, rebounds, assists, 3s, steals and blocks, full season and rest of season."
-keywords = ["arkboard", "ark ranking", "nba", "nba game projections", "nba model", "nba power rankings", "nba playoff odds", "xpm", "dpm", "bpm", "nba leaderboard", "plus minus", "vorp", "nba impact metric"]
+keywords = ["arkboard", "ark ranking", "nba", "nba game projections", "nba model", "nba power rankings", "nba playoff odds", "xpm", "dpm", "bpm", "nba leaderboard", "plus minus", "vorp", "nba impact metric", "g league", "g league call-ups", "two-way contracts"]
 draft = false
 cover = "/og/nba.png"
 +++
@@ -11,11 +11,12 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="basketball" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:VORX/XPM leaders,projections,rookies,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches|market:contract value" side="true" label="NBA views" >}}
+{{< wintabs groups="players:VORX/XPM leaders,projections,rookies,G League,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches|market:contract value" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< pctl sport="nba" icon="basketball" title="projections" tab="projections" >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
 {{< rookies sport="nba" icon="basketball" title="rookies" tab="rookies" >}}
+{{< gleague title="G League" tab="G League" >}}
 {{< awards sport="nba" tab="awards" >}}
 {{< arklist sport="nba" title="ARKLIST" tab="ARKLIST" >}}
 {{< nbagames title="games" tab="games" >}}
