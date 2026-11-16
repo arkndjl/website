@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T04:24:32Z",
+ "asof": "2026-11-16T04:27:54Z",
  "recenter": {
-  "2026-11-16": 2.02
+  "2026-11-16": 2.01
  },
  "monitor": {
   "clocks": {
@@ -2365,6 +2365,22 @@
    "tm": 141.5
   },
   {
+   "id": "401929419",
+   "sport": "cbb",
+   "kick": "2026-11-16T19:00:00Z",
+   "home": "UTEP",
+   "away": "Florida A&M",
+   "mk": "total",
+   "side": "under",
+   "line": 141.5,
+   "price": -119.0,
+   "edge": 0.5,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 19.8,
+   "tm": 141.0
+  },
+  {
    "id": "401919807",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2379,22 +2395,6 @@
    "why": "edge under 7",
    "m": -2.1,
    "tm": 148.0
-  },
-  {
-   "id": "401929419",
-   "sport": "cbb",
-   "kick": "2026-11-16T19:00:00Z",
-   "home": "UTEP",
-   "away": "Florida A&M",
-   "mk": "total",
-   "side": "over",
-   "line": 140.5,
-   "price": -129.0,
-   "edge": 0.5,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 19.8,
-   "tm": 141.0
   }
  ],
  "games": {
@@ -2641,9 +2641,9 @@
   },
   "401929419": {
    "mk": "total",
-   "side": "over",
-   "line": 140.5,
-   "price": -129.0,
+   "side": "under",
+   "line": 141.5,
+   "price": -119.0,
    "edge": 0.5,
    "ev": null,
    "units": 0.0,
@@ -2717,7 +2717,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16433,
+  "snapshots": 16438,
   "buckets": [
    {
     "when": "24h+",
@@ -2730,12 +2730,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3259,
+    "clvN": 3261,
     "clvRet": -0.0218,
-    "clvT": -12.08,
+    "clvT": -12.09,
     "clv": 0.31,
     "beat": 0.349,
-    "still": 0.461
+    "still": 0.462
    },
    {
     "when": "1-6h",
@@ -19264,7 +19264,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T04:24:32Z",
+ "checked": "2026-11-16T04:27:54Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
