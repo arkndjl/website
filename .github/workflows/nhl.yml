@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: write
+  issues: write        # scripts/model_monitor.py opens an issue when a game model's alarm turns on
 
 concurrency:
   group: nhl
@@ -113,6 +114,8 @@ jobs:
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/model_monitor.py nhl
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
       - name: Board moves

@@ -41,6 +41,7 @@ on:
 
 permissions:
   contents: write
+  issues: write        # scripts/model_monitor.py opens an issue when a game model's alarm turns on
 
 concurrency:
   group: cfb-board
@@ -217,6 +218,8 @@ jobs:
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/model_monitor.py cfb
       # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py cfb -> static/data/teams/cfb.json):
       # each FBS team's schedule from ESPN at the ranking's scores, and key players from the board; display only

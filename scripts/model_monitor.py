@@ -313,8 +313,9 @@ def expectation(sport, season, rows=None):
     rows = rows if rows is not None else wf_rows(sport)
     seasons = sorted({r['S'] for r in rows if r['S'] < season})[-EXPECT_SEASONS:]
     by = {}
-    for r in rows:
-        if r['S'] in seasons:
+    used = [r for r in rows if r['S'] in seasons]
+    for r in used:
+        if True:
             x = loss(sport, r)
             by.setdefault(iso(r['k']).month, []).append(x)
             by.setdefault('all', []).append(x)
@@ -324,6 +325,9 @@ def expectation(sport, season, rows=None):
         m = sum(xs) / n
         sd = math.sqrt(sum((x - m) ** 2 for x in xs) / max(n - 1, 1))
         out[k] = (m, sd, n)
+    # a walk-forward that holds lined games only (CBB's: ~1,100 a November, no games against non-D-I sides or
+    # unpriced mismatches): live is held to it on lined games only, or the unlined blowouts read as a model failure
+    out['lined'] = bool(used) and all(r.get('L') is not None for r in used)
     return out, seasons
 
 
@@ -335,6 +339,8 @@ def report(sport, log, season, now, E=None, seasons=None):
     games = sorted([dict(e, id=gid) for gid, e in log.items() if e.get('res') is not None and season_of(sport, e['k']) == season
                     and (sport != 'soccer' or e.get('lg') in SOCCER_LGS and not e.get('et'))],
                    key=lambda e: e['k'])
+    if E.get('lined'):
+        games = [g for g in games if g.get('L') is not None]
     rows, by = [], {}
     for g in games:
         x = loss(sport, g)
@@ -355,7 +361,7 @@ def report(sport, log, season, now, E=None, seasons=None):
     n = len(rows)
     out = {'asof': stamp(now), 'sport': sport, 'season': season, 'loss': LOSS[sport], 'n': n, 'logged': sum(1 for e in log.values() if season_of(sport, e['k']) == season),
            'expectFrom': "the model's own chances" if sport in OWN else
-           f'walk-forward {seasons[0]}-{seasons[-1]}, same calendar month' if seasons else None}
+           f"walk-forward {seasons[0]}-{seasons[-1]}, same calendar month{', lined games' if E.get('lined') else ''}" if seasons else None}
     if n:
         lines = [r['line'] for r in rows if r['line'] is not None]
         out.update({'model': round(sum(r['loss'] for r in rows) / n, 4), 'expected': round(sum(r['exp'] for r in rows) / n, 4),
@@ -402,10 +408,38 @@ def run(sport, backfill=False, now=None, offline=False):
     with open(lp, 'w') as f:
         json.dump(st, f, separators=(',', ':'), sort_keys=True)
     R = report(sport, st['log'], season, now)
-    with open(os.path.join(OUT, sport + '.json'), 'w') as f:
+    op = os.path.join(OUT, sport + '.json')
+    try:
+        prev = json.load(open(op)).get('status')
+    except (OSError, ValueError):
+        prev = None
+    with open(op, 'w') as f:
         json.dump(R, f, indent=1)
+    alert(sport, R, prev)
     print(sport, R['status'], R.get('n'), 'scored', R.get('model'), 'vs', R.get('expected'), R.get('why', ''))
     return R
+
+
+def alert(sport, R, prev):
+    """an alarm shows as a warning on the run every time, and the run that turns it on opens a GitHub issue (the
+    repo owner's notification; workflows pass GITHUB_TOKEN with issues: write). Nothing else stops or changes"""
+    if R.get('status') != 'alarm':
+        return
+    msg = (f"{sport} game model alarm: {R.get('why')}. Live {R.get('model')} vs its walk-forward {R.get('expected')} "
+           f"on {R.get('n')} games; the close {R.get('line')} (model {R.get('modelAtLine')} on the same {R.get('lineN')}).")
+    print('::warning::' + msg, flush=True)
+    tok, repo = os.environ.get('GITHUB_TOKEN'), os.environ.get('GITHUB_REPOSITORY')
+    if prev == 'alarm' or not tok or not repo:
+        return
+    body = json.dumps({'title': f'Model monitor alarm: {sport}', 'labels': ['model-monitor'],
+                       'body': msg + '\n\nReport: data/model_monitor/' + sport + '.json (Predictions page, game models tab).'}).encode()
+    req = urllib.request.Request(f'https://api.github.com/repos/{repo}/issues', data=body, method='POST',
+                                 headers={'Authorization': 'Bearer ' + tok, 'Accept': 'application/vnd.github+json', 'User-Agent': 'model-monitor'})
+    try:
+        urllib.request.urlopen(req, timeout=20).read()
+        print('opened an issue for the alarm', flush=True)
+    except Exception as e:          # the warning above still shows
+        print('alarm issue not opened:', e, flush=True)
 
 
 def stale_ledger(today=None):

@@ -39,6 +39,7 @@ on:
 
 permissions:
   contents: write
+  issues: write        # scripts/model_monitor.py opens an issue when a game model's alarm turns on
 
 concurrency:
   group: nfl
@@ -165,6 +166,8 @@ jobs:
       # the NFL game model's season so far against its own walk-forward record (scripts/model_monitor.py)
       - name: Model monitor
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/model_monitor.py nfl
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)
       - name: Board moves
