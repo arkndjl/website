@@ -3,7 +3,7 @@
  "week": 10,
  "asof": "2026-11-16",
  "through": "2026-11-15",
- "slots": 744,
+ "slots": 745,
  "k": 300,
  "min": 50,
  "rows": [
@@ -12,20 +12,40 @@
    "team": "LA",
    "pos": "WR",
    "str": 2,
-   "g": 0.4,
+   "g": 0.41,
    "use": 424,
    "pos2": "WR",
    "age": 25,
    "starter": {
     "name": "CJ Daniels",
     "g": 0.0,
-    "use": 6,
+    "use": 52,
     "age": 24
    },
-   "gap": 0.4,
+   "gap": 0.41,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ipy6qw7hdygdfc8k86ba",
    "logo": "/img/nfl/la.png",
-   "xgap": 0.264
+   "xgap": 0.271
+  },
+  {
+   "name": "Drew Lock",
+   "team": "SEA",
+   "pos": "QB",
+   "str": 2,
+   "g": 0.54,
+   "use": 239,
+   "pos2": "QB",
+   "age": 29,
+   "starter": {
+    "name": "Sam Darnold",
+    "g": 0.2,
+    "use": 412,
+    "age": 29
+   },
+   "gap": 0.34,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/vdixnkk1uglfpwowalf8",
+   "logo": "/img/nfl/sea.png",
+   "xgap": 0.227
   },
   {
    "name": "Kirk Cousins",
@@ -33,39 +53,19 @@
    "pos": "QB",
    "str": 2,
    "g": 0.69,
-   "use": 582,
+   "use": 651,
    "pos2": "QB",
    "age": 38,
    "starter": {
     "name": "Kyler Murray",
-    "g": 0.3,
+    "g": 0.32,
     "use": 331,
     "age": 29
    },
-   "gap": 0.39,
+   "gap": 0.37,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/za7cynvpwlsro1tsaijk",
    "logo": "/img/nfl/min.png",
-   "xgap": 0.216
-  },
-  {
-   "name": "Jalon Daniels",
-   "team": "TB",
-   "pos": "QB",
-   "str": 2,
-   "g": 0.19,
-   "use": 219,
-   "pos2": "QB",
-   "age": 23,
-   "starter": {
-    "name": "Baker Mayfield",
-    "g": -0.07,
-    "use": 372,
-    "age": 31
-   },
-   "gap": 0.26,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hwhfl6i5drktwjvslfpn",
-   "logo": "/img/nfl/tb.png",
-   "xgap": 0.211
+   "xgap": 0.202
   },
   {
    "name": "Genesis Smith",
@@ -92,7 +92,7 @@
    "team": "DEN",
    "pos": "DE",
    "str": 2,
-   "g": 0.26,
+   "g": 0.27,
    "use": 360,
    "pos2": "DL",
    "age": 28,
@@ -102,10 +102,70 @@
     "use": 303,
     "age": 28
    },
-   "gap": 0.28,
+   "gap": 0.29,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/oxcd8veodm7hkiualglu",
    "logo": "/img/nfl/den.png",
-   "xgap": 0.184
+   "xgap": 0.192
+  },
+  {
+   "name": "Jalon Daniels",
+   "team": "TB",
+   "pos": "QB",
+   "str": 2,
+   "g": 0.19,
+   "use": 219,
+   "pos2": "QB",
+   "age": 23,
+   "starter": {
+    "name": "Baker Mayfield",
+    "g": -0.04,
+    "use": 372,
+    "age": 31
+   },
+   "gap": 0.23,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hwhfl6i5drktwjvslfpn",
+   "logo": "/img/nfl/tb.png",
+   "xgap": 0.19
+  },
+  {
+   "name": "Blake Corum",
+   "team": "LA",
+   "pos": "RB",
+   "str": 2,
+   "g": 0.41,
+   "use": 233,
+   "pos2": "RB",
+   "age": 25,
+   "starter": {
+    "name": "Kyren Williams",
+    "g": 0.14,
+    "use": 467,
+    "age": 26
+   },
+   "gap": 0.27,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/axzqbqjkrbwfzodwwakq",
+   "logo": "/img/nfl/la.png",
+   "xgap": 0.182
+  },
+  {
+   "name": "Cody Simon",
+   "team": "ARI",
+   "pos": "MLB",
+   "str": 2,
+   "g": 0.1,
+   "use": 100,
+   "pos2": "LB",
+   "age": 24,
+   "starter": {
+    "name": "Mack Wilson Sr.",
+    "g": -0.13,
+    "use": 641,
+    "age": 28
+   },
+   "gap": 0.23,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/spyk3s7fvbcbz7vj32sg",
+   "logo": "/img/nfl/ari.png",
+   "xgap": 0.169
   },
   {
    "name": "Jaylin Noel",
@@ -118,81 +178,21 @@
    "age": 23,
    "starter": {
     "name": "Xavier Hutchinson",
-    "g": 0.12,
-    "use": 307,
+    "g": 0.14,
+    "use": 358,
     "age": 26
    },
-   "gap": 0.24,
+   "gap": 0.22,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ysyfwwvlkop9rd3lbck9",
    "logo": "/img/nfl/hou.png",
-   "xgap": 0.171
-  },
-  {
-   "name": "Davante Adams",
-   "team": "LA",
-   "pos": "WR",
-   "str": 3,
-   "g": 0.3,
-   "use": 327,
-   "pos2": "WR",
-   "age": 33,
-   "starter": {
-    "name": "Konata Mumpfield",
-    "g": -0.02,
-    "use": 269,
-    "age": 23
-   },
-   "gap": 0.32,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/tdzluk4xau3arxqk9zsl",
-   "logo": "/img/nfl/la.png",
-   "xgap": 0.162
-  },
-  {
-   "name": "Marcus Harris",
-   "team": "TEN",
-   "pos": "CB",
-   "str": 2,
-   "g": 0.15,
-   "use": 317,
-   "pos2": "CB",
-   "age": 25,
-   "starter": {
-    "name": "Joshua Williams",
-    "g": -0.09,
-    "use": 227,
-    "age": 26
-   },
-   "gap": 0.24,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/s9i62mpjjwtbn2xolnx5",
-   "logo": "/img/nfl/ten.png",
-   "xgap": 0.161
-  },
-  {
-   "name": "Drew Lock",
-   "team": "SEA",
-   "pos": "QB",
-   "str": 2,
-   "g": 0.44,
-   "use": 182,
-   "pos2": "QB",
-   "age": 29,
-   "starter": {
-    "name": "Sam Darnold",
-    "g": 0.2,
-    "use": 412,
-    "age": 29
-   },
-   "gap": 0.24,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/vdixnkk1uglfpwowalf8",
-   "logo": "/img/nfl/sea.png",
-   "xgap": 0.156
+   "xgap": 0.157
   },
   {
    "name": "Malik Muhammad II",
    "team": "CHI",
    "pos": "CB",
    "str": 2,
-   "g": 0.21,
+   "g": 0.23,
    "use": 275,
    "pos2": "CB",
    "age": 21,
@@ -202,29 +202,89 @@
     "use": 298,
     "age": 26
    },
-   "gap": 0.18,
+   "gap": 0.2,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/jya34gjpa0pgojtqygvn",
    "logo": "/img/nfl/chi.png",
-   "xgap": 0.139
+   "xgap": 0.153
   },
   {
-   "name": "Jarrian Jones",
-   "team": "JAX",
-   "pos": "CB",
+   "name": "DeMarvion Overshown",
+   "team": "DAL",
+   "pos": "ILB",
    "str": 2,
-   "g": 0.32,
-   "use": 364,
+   "g": 0.17,
+   "use": 158,
+   "pos2": "LB",
+   "age": 26,
+   "starter": {
+    "name": "Shemar James",
+    "g": -0.08,
+    "use": 437,
+    "age": 22
+   },
+   "gap": 0.25,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/dxo0ebmthyvvgwfqqbbj",
+   "logo": "/img/nfl/dal.png",
+   "xgap": 0.143
+  },
+  {
+   "name": "Harold Perkins Jr.",
+   "team": "ATL",
+   "pos": "ILB",
+   "str": 2,
+   "g": 0.1,
+   "use": 380,
+   "pos2": "LB",
+   "age": 21,
+   "starter": {
+    "name": "Divine Deablo",
+    "g": -0.07,
+    "use": 378,
+    "age": 28
+   },
+   "gap": 0.17,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/sdvimzmhvfuaj6m4wpsu",
+   "logo": "/img/nfl/atl.png",
+   "xgap": 0.142
+  },
+  {
+   "name": "Elijah Roberts",
+   "team": "TB",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.07,
+   "use": 113,
+   "pos2": "EDGE",
+   "age": 24,
+   "starter": {
+    "name": "Calijah Kancey",
+    "g": -0.14,
+    "use": 353,
+    "age": 25
+   },
+   "gap": 0.21,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/konvzhfxyunroyoihh4m",
+   "logo": "/img/nfl/tb.png",
+   "xgap": 0.14
+  },
+  {
+   "name": "Marcus Harris",
+   "team": "TEN",
+   "pos": "NB",
+   "str": 2,
+   "g": 0.15,
+   "use": 317,
    "pos2": "CB",
    "age": 25,
    "starter": {
-    "name": "Montaric Brown",
-    "g": 0.12,
-    "use": 219,
+    "name": "Alontae Taylor",
+    "g": -0.05,
+    "use": 448,
     "age": 27
    },
    "gap": 0.2,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/zauu0tt26tt32qevyvtm",
-   "logo": "/img/nfl/jax.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/s9i62mpjjwtbn2xolnx5",
+   "logo": "/img/nfl/ten.png",
    "xgap": 0.138
   },
   {
@@ -246,6 +306,26 @@
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/gfdhupqzscbwdyhvowq4",
    "logo": "/img/nfl/lac.png",
    "xgap": 0.135
+  },
+  {
+   "name": "Sam Williams",
+   "team": "CLE",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.15,
+   "use": 236,
+   "pos2": "EDGE",
+   "age": 27,
+   "starter": {
+    "name": "Jared Verse",
+    "g": -0.07,
+    "use": 428,
+    "age": 25
+   },
+   "gap": 0.22,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/md3ve45qqpeukka2exk0",
+   "logo": "/img/nfl/cle.png",
+   "xgap": 0.132
   },
   {
    "name": "Tez Johnson",
@@ -288,43 +368,23 @@
    "xgap": 0.128
   },
   {
-   "name": "Harold Perkins Jr.",
-   "team": "ATL",
-   "pos": "ILB",
-   "str": 2,
-   "g": 0.08,
-   "use": 342,
-   "pos2": "LB",
-   "age": 21,
+   "name": "Davante Adams",
+   "team": "LA",
+   "pos": "WR",
+   "str": 3,
+   "g": 0.32,
+   "use": 327,
+   "pos2": "WR",
+   "age": 33,
    "starter": {
-    "name": "Divine Deablo",
-    "g": -0.07,
-    "use": 378,
-    "age": 28
+    "name": "Konata Mumpfield",
+    "g": 0.05,
+    "use": 317,
+    "age": 23
    },
-   "gap": 0.15,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/sdvimzmhvfuaj6m4wpsu",
-   "logo": "/img/nfl/atl.png",
-   "xgap": 0.128
-  },
-  {
-   "name": "Elijah Roberts",
-   "team": "TB",
-   "pos": "DE",
-   "str": 2,
-   "g": 0.07,
-   "use": 113,
-   "pos2": "EDGE",
-   "age": 24,
-   "starter": {
-    "name": "Calijah Kancey",
-    "g": -0.12,
-    "use": 353,
-    "age": 25
-   },
-   "gap": 0.19,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/konvzhfxyunroyoihh4m",
-   "logo": "/img/nfl/tb.png",
+   "gap": 0.27,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/tdzluk4xau3arxqk9zsl",
+   "logo": "/img/nfl/la.png",
    "xgap": 0.126
   },
   {
@@ -352,8 +412,8 @@
    "team": "PIT",
    "pos": "SS",
    "str": 2,
-   "g": 0.14,
-   "use": 183,
+   "g": 0.13,
+   "use": 234,
    "pos2": "S",
    "age": 22,
    "starter": {
@@ -362,50 +422,50 @@
     "use": 43,
     "age": 29
    },
-   "gap": 0.14,
+   "gap": 0.13,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/e0h7triczbebvcoqdgnx",
    "logo": "/img/nfl/pit.png",
-   "xgap": 0.121
+   "xgap": 0.114
   },
   {
-   "name": "Cody Simon",
-   "team": "ARI",
-   "pos": "MLB",
+   "name": "Jessie Bates III",
+   "team": "JAX",
+   "pos": "SS",
    "str": 2,
-   "g": 0.03,
-   "use": 60,
-   "pos2": "LB",
-   "age": 24,
+   "g": 0.1,
+   "use": 589,
+   "pos2": "S",
+   "age": 29,
    "starter": {
-    "name": "Mack Wilson Sr.",
-    "g": -0.12,
-    "use": 565,
-    "age": 28
+    "name": "Eric Murray",
+    "g": -0.05,
+    "use": 253,
+    "age": 32
    },
    "gap": 0.15,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/spyk3s7fvbcbz7vj32sg",
-   "logo": "/img/nfl/ari.png",
-   "xgap": 0.113
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/znove1dnb3dmhiknvgza",
+   "logo": "/img/nfl/jax.png",
+   "xgap": 0.108
   },
   {
-   "name": "Colby Wooden",
-   "team": "NO",
-   "pos": "DE",
+   "name": "Gabe Jacas",
+   "team": "NE",
+   "pos": "SLB",
    "str": 2,
-   "g": 0.07,
-   "use": 254,
-   "pos2": "DL",
-   "age": 25,
+   "g": 0.14,
+   "use": 352,
+   "pos2": "EDGE",
+   "age": 22,
    "starter": {
-    "name": "Cameron Jordan",
-    "g": -0.02,
-    "use": 200,
-    "age": 37
+    "name": "Dre'Mont Jones",
+    "g": 0.02,
+    "use": 336,
+    "age": 29
    },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/h0afdfwuynhrlzwlj9ua",
-   "logo": "/img/nfl/no.png",
-   "xgap": 0.111
+   "gap": 0.12,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pfj4ln4kaoimfwezeviq",
+   "logo": "/img/nfl/ne.png",
+   "xgap": 0.107
   },
   {
    "name": "Josh Cuevas",
@@ -428,63 +488,43 @@
    "xgap": 0.107
   },
   {
-   "name": "Sam Williams",
-   "team": "CLE",
-   "pos": "DE",
-   "str": 2,
-   "g": 0.15,
-   "use": 217,
-   "pos2": "EDGE",
-   "age": 27,
-   "starter": {
-    "name": "Jared Verse",
-    "g": -0.03,
-    "use": 386,
-    "age": 25
-   },
-   "gap": 0.18,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/md3ve45qqpeukka2exk0",
-   "logo": "/img/nfl/cle.png",
-   "xgap": 0.103
-  },
-  {
-   "name": "Roman Wilson",
-   "team": "PIT",
-   "pos": "WR",
+   "name": "JJ Pegues",
+   "team": "LV",
+   "pos": "NT",
    "str": 3,
-   "g": 0.15,
-   "use": 158,
-   "pos2": "WR",
-   "age": 25,
+   "g": 0.06,
+   "use": 51,
+   "pos2": "DL",
+   "age": 24,
    "starter": {
-    "name": "DK Metcalf",
-    "g": 0.01,
-    "use": 504,
-    "age": 28
-   },
-   "gap": 0.14,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xuhjoscmhmmsutbvfmrs",
-   "logo": "/img/nfl/pit.png",
-   "xgap": 0.101
-  },
-  {
-   "name": "Jessie Bates III",
-   "team": "JAX",
-   "pos": "SS",
-   "str": 2,
-   "g": 0.1,
-   "use": 589,
-   "pos2": "S",
-   "age": 29,
-   "starter": {
-    "name": "Eric Murray",
-    "g": -0.04,
-    "use": 253,
+    "name": "Adam Butler",
+    "g": -0.05,
+    "use": 354,
     "age": 32
    },
+   "gap": 0.11,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/dvqvxiv0lmy8wyunoztu",
+   "logo": "/img/nfl/lv.png",
+   "xgap": 0.105
+  },
+  {
+   "name": "Seth McGowan",
+   "team": "IND",
+   "pos": "RB",
+   "str": 2,
+   "g": 0.2,
+   "use": 150,
+   "pos2": "RB",
+   "age": 24,
+   "starter": {
+    "name": "Jonathan Taylor",
+    "g": 0.06,
+    "use": 496,
+    "age": 27
+   },
    "gap": 0.14,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/znove1dnb3dmhiknvgza",
-   "logo": "/img/nfl/jax.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/f4h7kmayu7kqncha3f6v",
+   "logo": "/img/nfl/ind.png",
    "xgap": 0.101
   },
   {
@@ -508,78 +548,18 @@
    "xgap": 0.101
   },
   {
-   "name": "Gabe Jacas",
-   "team": "NE",
-   "pos": "SLB",
-   "str": 2,
-   "g": 0.16,
-   "use": 308,
-   "pos2": "EDGE",
-   "age": 22,
-   "starter": {
-    "name": "Dre'Mont Jones",
-    "g": 0.05,
-    "use": 300,
-    "age": 29
-   },
-   "gap": 0.11,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pfj4ln4kaoimfwezeviq",
-   "logo": "/img/nfl/ne.png",
-   "xgap": 0.1
-  },
-  {
-   "name": "Kayshon Boutte",
-   "team": "HOU",
-   "pos": "WR",
-   "str": 2,
-   "g": 0.26,
-   "use": 272,
-   "pos2": "WR",
-   "age": 24,
-   "starter": {
-    "name": "Xavier Hutchinson",
-    "g": 0.12,
-    "use": 307,
-    "age": 26
-   },
-   "gap": 0.14,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/afjemks6p7md28t57f0g",
-   "logo": "/img/nfl/hou.png",
-   "xgap": 0.096
-  },
-  {
-   "name": "Darius Robinson",
-   "team": "ARI",
-   "pos": "DE",
-   "str": 2,
-   "g": 0.14,
-   "use": 211,
-   "pos2": "DL",
-   "age": 24,
-   "starter": {
-    "name": "Dante Stills",
-    "g": 0.0,
-    "use": 340,
-    "age": 26
-   },
-   "gap": 0.14,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hctx4lm0ru8shpgb4vkc",
-   "logo": "/img/nfl/ari.png",
-   "xgap": 0.096
-  },
-  {
    "name": "TJ Parker",
    "team": "BUF",
    "pos": "SLB",
    "str": 2,
-   "g": 0.06,
-   "use": 165,
+   "g": 0.08,
+   "use": 204,
    "pos2": "EDGE",
    "age": 21,
    "starter": {
     "name": "Bradley Chubb",
-    "g": -0.03,
-    "use": 380,
+    "g": -0.01,
+    "use": 422,
     "age": 30
    },
    "gap": 0.09,
@@ -588,84 +568,44 @@
    "xgap": 0.096
   },
   {
-   "name": "Corey Kiner",
-   "team": "NE",
-   "pos": "RB",
+   "name": "Khristian Boyd",
+   "team": "NO",
+   "pos": "NT",
    "str": 2,
-   "g": 0.13,
-   "use": 77,
-   "pos2": "RB",
-   "age": 24,
-   "starter": {
-    "name": "Rhamondre Stevenson",
-    "g": 0.01,
-    "use": 378,
-    "age": 28
-   },
-   "gap": 0.12,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/zz4imen7bzozyeicm1mn",
-   "logo": "/img/nfl/ne.png",
-   "xgap": 0.092
-  },
-  {
-   "name": "Percy Butler",
-   "team": "WAS",
-   "pos": "FS",
-   "str": 3,
-   "g": 0.08,
-   "use": 55,
-   "pos2": "S",
+   "g": 0.11,
+   "use": 229,
+   "pos2": "DL",
    "age": 26,
    "starter": {
-    "name": "Jeremy Reaves",
-    "g": -0.04,
-    "use": 521,
-    "age": 30
+    "name": "Nathan Shepherd",
+    "g": 0.0,
+    "use": 243,
+    "age": 32
    },
-   "gap": 0.12,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/uqx9zb1asrcvsenbus1p",
-   "logo": "/img/nfl/was.png",
-   "xgap": 0.092
+   "gap": 0.11,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xuoa3lak4hjemcwdg1dj",
+   "logo": "/img/nfl/no.png",
+   "xgap": 0.095
   },
   {
-   "name": "Michael Wilson",
-   "team": "ARI",
-   "pos": "WR",
+   "name": "Tim Keenan III",
+   "team": "LV",
+   "pos": "NT",
    "str": 2,
-   "g": 0.1,
-   "use": 563,
-   "pos2": "WR",
-   "age": 26,
+   "g": 0.03,
+   "use": 91,
+   "pos2": "DL",
+   "age": 23,
    "starter": {
-    "name": "Simi Fehoko",
-    "g": -0.03,
-    "use": 94,
-    "age": 28
+    "name": "Adam Butler",
+    "g": -0.05,
+    "use": 354,
+    "age": 32
    },
-   "gap": 0.13,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hm2b9z4zujjmbiyldh8n",
-   "logo": "/img/nfl/ari.png",
-   "xgap": 0.088
-  },
-  {
-   "name": "Tyquan Thornton",
-   "team": "KC",
-   "pos": "WR",
-   "str": 3,
-   "g": 0.24,
-   "use": 156,
-   "pos2": "WR",
-   "age": 26,
-   "starter": {
-    "name": "Josh Downs",
-    "g": 0.09,
-    "use": 479,
-    "age": 25
-   },
-   "gap": 0.15,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/bjqzuempyiwxe0hl7e5a",
-   "logo": "/img/nfl/kc.png",
-   "xgap": 0.087
+   "gap": 0.08,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qasbqd0pea2nnfgtg9fj",
+   "logo": "/img/nfl/lv.png",
+   "xgap": 0.089
   },
   {
    "name": "Jeremiah Trotter Jr.",
@@ -688,77 +628,77 @@
    "xgap": 0.087
   },
   {
-   "name": "Darren Waller",
-   "team": "CAR",
-   "pos": "TE",
-   "str": 2,
+   "name": "Edgerrin Cooper",
+   "team": "GB",
+   "pos": "ILB",
+   "str": 3,
    "g": 0.21,
-   "use": 273,
-   "pos2": "TE",
-   "age": 33,
+   "use": 227,
+   "pos2": "LB",
+   "age": 24,
    "starter": {
-    "name": "Tommy Tremble",
-    "g": 0.02,
-    "use": 321,
-    "age": 26
+    "name": "Isaiah McDuffie",
+    "g": 0.09,
+    "use": 388,
+    "age": 27
    },
-   "gap": 0.19,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/t0advoaoix6fvhu6zs5e",
-   "logo": "/img/nfl/car.png",
-   "xgap": 0.085
+   "gap": 0.12,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/acedii0jqmzxqm5lqtn8",
+   "logo": "/img/nfl/gb.png",
+   "xgap": 0.086
   },
   {
-   "name": "Deion Burks",
-   "team": "IND",
-   "pos": "WR",
-   "str": 2,
-   "g": 0.03,
-   "use": 93,
-   "pos2": "WR",
-   "age": 23,
-   "starter": {
-    "name": "Laquon Treadwell",
-    "g": -0.05,
-    "use": 453,
-    "age": 31
-   },
-   "gap": 0.08,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/j4rcng9wtk5wmew7gpmv",
-   "logo": "/img/nfl/ind.png",
-   "xgap": 0.084
-  },
-  {
-   "name": "Blake Corum",
+   "name": "Wesley Bailey",
    "team": "LA",
-   "pos": "RB",
-   "str": 2,
-   "g": 0.32,
-   "use": 194,
-   "pos2": "RB",
+   "pos": "SLB",
+   "str": 3,
+   "g": 0.23,
+   "use": 187,
+   "pos2": "EDGE",
    "age": 25,
    "starter": {
-    "name": "Kyren Williams",
-    "g": 0.19,
-    "use": 428,
-    "age": 26
+    "name": "Myles Garrett",
+    "g": 0.13,
+    "use": 94,
+    "age": 30
    },
-   "gap": 0.13,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/axzqbqjkrbwfzodwwakq",
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/roysfq0w8zqapiaxl5ef",
    "logo": "/img/nfl/la.png",
-   "xgap": 0.083
+   "xgap": 0.082
+  },
+  {
+   "name": "Elijah Garcia",
+   "team": "DAL",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.09,
+   "use": 122,
+   "pos2": "DL",
+   "age": 28,
+   "starter": {
+    "name": "Kenny Clark",
+    "g": -0.03,
+    "use": 449,
+    "age": 30
+   },
+   "gap": 0.12,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/frixlfufg2vdswusiy24",
+   "logo": "/img/nfl/dal.png",
+   "xgap": 0.081
   },
   {
    "name": "Kaevon Merriweather",
    "team": "JAX",
    "pos": "SS",
    "str": 3,
-   "g": 0.05,
-   "use": 142,
+   "g": 0.04,
+   "use": 152,
    "pos2": "S",
    "age": 26,
    "starter": {
     "name": "Eric Murray",
-    "g": -0.04,
+    "g": -0.05,
     "use": 253,
     "age": 32
    },
@@ -768,24 +708,64 @@
    "xgap": 0.08
   },
   {
-   "name": "Lathan Ransom",
-   "team": "CAR",
-   "pos": "FS",
+   "name": "Derick Hall",
+   "team": "SEA",
+   "pos": "SLB",
    "str": 2,
-   "g": 0.04,
-   "use": 174,
+   "g": 0.28,
+   "use": 336,
+   "pos2": "EDGE",
+   "age": 25,
+   "starter": {
+    "name": "Uchenna Nwosu",
+    "g": 0.18,
+    "use": 249,
+    "age": 29
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pblbd65bo6myp030qbes",
+   "logo": "/img/nfl/sea.png",
+   "xgap": 0.077
+  },
+  {
+   "name": "Percy Butler",
+   "team": "WAS",
+   "pos": "FS",
+   "str": 3,
+   "g": 0.08,
+   "use": 55,
    "pos2": "S",
+   "age": 26,
+   "starter": {
+    "name": "Jeremy Reaves",
+    "g": -0.02,
+    "use": 521,
+    "age": 30
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/uqx9zb1asrcvsenbus1p",
+   "logo": "/img/nfl/was.png",
+   "xgap": 0.077
+  },
+  {
+   "name": "Corey Kiner",
+   "team": "NE",
+   "pos": "RB",
+   "str": 2,
+   "g": 0.07,
+   "use": 102,
+   "pos2": "RB",
    "age": 24,
    "starter": {
-    "name": "Nick Scott",
-    "g": -0.04,
-    "use": 411,
-    "age": 31
+    "name": "Rhamondre Stevenson",
+    "g": -0.03,
+    "use": 404,
+    "age": 28
    },
-   "gap": 0.08,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/gg0ztjfsso4y7yx4fxfb",
-   "logo": "/img/nfl/car.png",
-   "xgap": 0.079
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/zz4imen7bzozyeicm1mn",
+   "logo": "/img/nfl/ne.png",
+   "xgap": 0.077
   },
   {
    "name": "Ethan Burke",
@@ -808,104 +788,64 @@
    "xgap": 0.077
   },
   {
-   "name": "Juice Scruggs",
-   "team": "DET",
-   "pos": "C",
+   "name": "Josh Wallace",
+   "team": "LA",
+   "pos": "CB",
    "str": 2,
-   "g": 0.2,
-   "use": 450,
-   "pos2": "OL",
+   "g": 0.33,
+   "use": 469,
+   "pos2": "CB",
    "age": 26,
    "starter": {
-    "name": "Cade Mays",
-    "g": 0.08,
-    "use": 90,
+    "name": "Jaylen Watson",
+    "g": 0.21,
+    "use": 382,
     "age": 27
    },
    "gap": 0.12,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ni0rm2lbpplykzufmm5q",
-   "logo": "/img/nfl/det.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/rl9xt27qup1xfmv1h1gc",
+   "logo": "/img/nfl/la.png",
    "xgap": 0.076
   },
   {
-   "name": "Dylan Sampson",
-   "team": "CLE",
-   "pos": "RB",
-   "str": 2,
-   "g": 0.0,
-   "use": 118,
-   "pos2": "RB",
-   "age": 21,
+   "name": "Javon Solomon",
+   "team": "BUF",
+   "pos": "SLB",
+   "str": 3,
+   "g": 0.08,
+   "use": 55,
+   "pos2": "EDGE",
+   "age": 25,
    "starter": {
-    "name": "Quinshon Judkins",
-    "g": -0.12,
-    "use": 275,
-    "age": 22
+    "name": "Bradley Chubb",
+    "g": -0.01,
+    "use": 422,
+    "age": 30
    },
-   "gap": 0.12,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/den1hzzomdxfcsgk88o5",
-   "logo": "/img/nfl/cle.png",
-   "xgap": 0.076
-  },
-  {
-   "name": "Tim Keenan III",
-   "team": "LV",
-   "pos": "NT",
-   "str": 2,
-   "g": 0.03,
-   "use": 74,
-   "pos2": "DL",
-   "age": 23,
-   "starter": {
-    "name": "Adam Butler",
-    "g": -0.03,
-    "use": 322,
-    "age": 32
-   },
-   "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qasbqd0pea2nnfgtg9fj",
-   "logo": "/img/nfl/lv.png",
+   "gap": 0.09,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wsvijxntg04709ss4ngd",
+   "logo": "/img/nfl/buf.png",
    "xgap": 0.075
   },
   {
-   "name": "Jaylen McCollough",
-   "team": "LA",
-   "pos": "SS",
+   "name": "Michael Wilson",
+   "team": "ARI",
+   "pos": "WR",
    "str": 2,
-   "g": 0.04,
-   "use": 229,
-   "pos2": "S",
-   "age": 25,
-   "starter": {
-    "name": "Kam Curl",
-    "g": -0.07,
-    "use": 541,
-    "age": 27
-   },
-   "gap": 0.11,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/g4k2pwpoyaethnwwerpy",
-   "logo": "/img/nfl/la.png",
-   "xgap": 0.074
-  },
-  {
-   "name": "Khristian Boyd",
-   "team": "NO",
-   "pos": "NT",
-   "str": 2,
-   "g": 0.08,
-   "use": 190,
-   "pos2": "DL",
+   "g": 0.09,
+   "use": 563,
+   "pos2": "WR",
    "age": 26,
    "starter": {
-    "name": "Nathan Shepherd",
-    "g": 0.0,
-    "use": 207,
-    "age": 32
+    "name": "Simi Fehoko",
+    "g": -0.02,
+    "use": 120,
+    "age": 28
    },
-   "gap": 0.08,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xuoa3lak4hjemcwdg1dj",
-   "logo": "/img/nfl/no.png",
-   "xgap": 0.073
+   "gap": 0.11,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hm2b9z4zujjmbiyldh8n",
+   "logo": "/img/nfl/ari.png",
+   "xgap": 0.074
   },
   {
    "name": "Kyle Monangai",
@@ -928,64 +868,24 @@
    "xgap": 0.072
   },
   {
-   "name": "Edgerrin Cooper",
-   "team": "GB",
-   "pos": "ILB",
-   "str": 3,
-   "g": 0.21,
-   "use": 227,
-   "pos2": "LB",
-   "age": 24,
-   "starter": {
-    "name": "Isaiah McDuffie",
-    "g": 0.11,
-    "use": 320,
-    "age": 27
-   },
-   "gap": 0.1,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/acedii0jqmzxqm5lqtn8",
-   "logo": "/img/nfl/gb.png",
-   "xgap": 0.072
-  },
-  {
-   "name": "Zakee Wheatley",
+   "name": "Darren Waller",
    "team": "CAR",
-   "pos": "SS",
+   "pos": "TE",
    "str": 2,
-   "g": 0.12,
-   "use": 284,
-   "pos2": "S",
-   "age": 24,
+   "g": 0.21,
+   "use": 316,
+   "pos2": "TE",
+   "age": 33,
    "starter": {
-    "name": "Tre'von Moehrig",
-    "g": 0.02,
-    "use": 533,
-    "age": 27
+    "name": "Tommy Tremble",
+    "g": 0.04,
+    "use": 368,
+    "age": 26
    },
-   "gap": 0.1,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qvujxg50a70hzrg4luzm",
+   "gap": 0.17,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/t0advoaoix6fvhu6zs5e",
    "logo": "/img/nfl/car.png",
-   "xgap": 0.072
-  },
-  {
-   "name": "Isaiah Bond",
-   "team": "CLE",
-   "pos": "WR",
-   "str": 2,
-   "g": 0.05,
-   "use": 95,
-   "pos2": "WR",
-   "age": 22,
-   "starter": {
-    "name": "Jerry Jeudy",
-    "g": -0.03,
-    "use": 355,
-    "age": 27
-   },
-   "gap": 0.08,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pmbagsijcdb8hxdnwovq",
-   "logo": "/img/nfl/cle.png",
-   "xgap": 0.068
+   "xgap": 0.071
   },
   {
    "name": "Keondre Jackson",
@@ -1006,6 +906,26 @@
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/nseq4vwhoakwfp7ytpp0",
    "logo": "/img/nfl/bal.png",
    "xgap": 0.068
+  },
+  {
+   "name": "Darius Robinson",
+   "team": "ARI",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.13,
+   "use": 246,
+   "pos2": "DL",
+   "age": 24,
+   "starter": {
+    "name": "Dante Stills",
+    "g": 0.03,
+    "use": 380,
+    "age": 26
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hctx4lm0ru8shpgb4vkc",
+   "logo": "/img/nfl/ari.png",
+   "xgap": 0.067
   },
   {
    "name": "RJ Mickens",
@@ -1048,44 +968,104 @@
    "xgap": 0.066
   },
   {
-   "name": "Charles Woods",
-   "team": "NE",
-   "pos": "CB",
-   "str": 2,
-   "g": 0.13,
-   "use": 224,
-   "pos2": "CB",
-   "age": 26,
+   "name": "Roman Wilson",
+   "team": "PIT",
+   "pos": "WR",
+   "str": 3,
+   "g": 0.15,
+   "use": 158,
+   "pos2": "WR",
+   "age": 25,
    "starter": {
-    "name": "Carlton Davis III",
-    "g": 0.04,
-    "use": 260,
-    "age": 29
+    "name": "DK Metcalf",
+    "g": 0.06,
+    "use": 554,
+    "age": 28
    },
    "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/bxq4zmhaarr9jpuyljor",
-   "logo": "/img/nfl/ne.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xuhjoscmhmmsutbvfmrs",
+   "logo": "/img/nfl/pit.png",
    "xgap": 0.065
   },
   {
-   "name": "Efton Chism III",
-   "team": "NE",
+   "name": "Juice Scruggs",
+   "team": "DET",
+   "pos": "C",
+   "str": 2,
+   "g": 0.18,
+   "use": 511,
+   "pos2": "OL",
+   "age": 26,
+   "starter": {
+    "name": "Cade Mays",
+    "g": 0.08,
+    "use": 90,
+    "age": 27
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ni0rm2lbpplykzufmm5q",
+   "logo": "/img/nfl/det.png",
+   "xgap": 0.062
+  },
+  {
+   "name": "Ameer Speed",
+   "team": "DAL",
+   "pos": "CB",
+   "str": 2,
+   "g": 0.0,
+   "use": 158,
+   "pos2": "CB",
+   "age": 26,
+   "starter": {
+    "name": "DaRon Bland",
+    "g": -0.1,
+    "use": 612,
+    "age": 27
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/um91wslqjbgjbxm6q9uu",
+   "logo": "/img/nfl/dal.png",
+   "xgap": 0.062
+  },
+  {
+   "name": "Kayshon Boutte",
+   "team": "HOU",
    "pos": "WR",
    "str": 2,
-   "g": 0.07,
-   "use": 278,
+   "g": 0.23,
+   "use": 319,
    "pos2": "WR",
    "age": 24,
    "starter": {
-    "name": "A.J. Brown",
-    "g": 0.0,
-    "use": 132,
-    "age": 29
+    "name": "Xavier Hutchinson",
+    "g": 0.14,
+    "use": 358,
+    "age": 26
    },
-   "gap": 0.07,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/zbnf3ujmwprzgjnwdtlo",
-   "logo": "/img/nfl/ne.png",
-   "xgap": 0.061
+   "gap": 0.09,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/afjemks6p7md28t57f0g",
+   "logo": "/img/nfl/hou.png",
+   "xgap": 0.06
+  },
+  {
+   "name": "Jaylen McCollough",
+   "team": "LA",
+   "pos": "SS",
+   "str": 2,
+   "g": 0.06,
+   "use": 235,
+   "pos2": "S",
+   "age": 25,
+   "starter": {
+    "name": "Kam Curl",
+    "g": -0.03,
+    "use": 571,
+    "age": 27
+   },
+   "gap": 0.09,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/g4k2pwpoyaethnwwerpy",
+   "logo": "/img/nfl/la.png",
+   "xgap": 0.06
   },
   {
    "name": "Darien Porter",
@@ -1093,13 +1073,13 @@
    "pos": "CB",
    "str": 2,
    "g": -0.02,
-   "use": 235,
+   "use": 265,
    "pos2": "CB",
    "age": 25,
    "starter": {
     "name": "Eric Stokes",
     "g": -0.11,
-    "use": 597,
+    "use": 649,
     "age": 27
    },
    "gap": 0.09,
@@ -1108,18 +1088,38 @@
    "xgap": 0.06
   },
   {
+   "name": "Tyquan Thornton",
+   "team": "KC",
+   "pos": "WR",
+   "str": 3,
+   "g": 0.24,
+   "use": 156,
+   "pos2": "WR",
+   "age": 26,
+   "starter": {
+    "name": "Josh Downs",
+    "g": 0.13,
+    "use": 490,
+    "age": 25
+   },
+   "gap": 0.11,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/bjqzuempyiwxe0hl7e5a",
+   "logo": "/img/nfl/kc.png",
+   "xgap": 0.059
+  },
+  {
    "name": "Hunter Wohler",
    "team": "IND",
    "pos": "SS",
    "str": 2,
    "g": 0.02,
-   "use": 160,
+   "use": 170,
    "pos2": "S",
    "age": 23,
    "starter": {
     "name": "A.J. Haulcy",
     "g": -0.09,
-    "use": 396,
+    "use": 455,
     "age": 22
    },
    "gap": 0.11,
@@ -1128,103 +1128,83 @@
    "xgap": 0.059
   },
   {
-   "name": "Josh Wallace",
-   "team": "LA",
-   "pos": "CB",
-   "str": 2,
-   "g": 0.32,
-   "use": 439,
-   "pos2": "CB",
-   "age": 26,
-   "starter": {
-    "name": "Jaylen Watson",
-    "g": 0.23,
-    "use": 382,
-    "age": 27
-   },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/rl9xt27qup1xfmv1h1gc",
-   "logo": "/img/nfl/la.png",
-   "xgap": 0.055
-  },
-  {
-   "name": "Ameer Speed",
+   "name": "Shavon Revel Jr.",
    "team": "DAL",
    "pos": "CB",
-   "str": 2,
-   "g": 0.02,
-   "use": 143,
+   "str": 3,
+   "g": -0.02,
+   "use": 162,
    "pos2": "CB",
-   "age": 26,
+   "age": 24,
    "starter": {
     "name": "DaRon Bland",
-    "g": -0.07,
-    "use": 603,
+    "g": -0.1,
+    "use": 612,
     "age": 27
    },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/um91wslqjbgjbxm6q9uu",
+   "gap": 0.08,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/af84hncoicg65gvvainl",
    "logo": "/img/nfl/dal.png",
-   "xgap": 0.055
+   "xgap": 0.058
   },
   {
-   "name": "Corey Thornton",
+   "name": "Marco Wilson",
    "team": "CAR",
-   "pos": "NB",
+   "pos": "CB",
    "str": 2,
-   "g": 0.11,
-   "use": 75,
+   "g": 0.04,
+   "use": 207,
    "pos2": "CB",
-   "age": 25,
+   "age": 27,
    "starter": {
-    "name": "Chau Smith-Wade",
-    "g": 0.0,
-    "use": 133,
-    "age": 23
+    "name": "Akayleb Evans",
+    "g": -0.06,
+    "use": 243,
+    "age": 27
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/m4jq4nxx4nwauuobcznx",
+   "logo": "/img/nfl/car.png",
+   "xgap": 0.057
+  },
+  {
+   "name": "Austin Ajiake",
+   "team": "IND",
+   "pos": "SLB",
+   "str": 2,
+   "g": 0.07,
+   "use": 125,
+   "pos2": "LB",
+   "age": 26,
+   "starter": {
+    "name": "Bryce Boettcher",
+    "g": -0.04,
+    "use": 219,
+    "age": 24
    },
    "gap": 0.11,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/fqf0gc9owhcrxgua2kbr",
-   "logo": "/img/nfl/car.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qenkght35bitascb9jfv",
+   "logo": "/img/nfl/ind.png",
    "xgap": 0.054
   },
   {
-   "name": "Elijah Garcia",
-   "team": "DAL",
-   "pos": "DE",
+   "name": "Ty'Ron Hopper",
+   "team": "GB",
+   "pos": "ILB",
    "str": 2,
-   "g": 0.07,
-   "use": 100,
-   "pos2": "DL",
-   "age": 28,
+   "g": 0.17,
+   "use": 280,
+   "pos2": "LB",
+   "age": 25,
    "starter": {
-    "name": "Kenny Clark",
-    "g": -0.01,
-    "use": 411,
-    "age": 30
+    "name": "Isaiah McDuffie",
+    "g": 0.09,
+    "use": 388,
+    "age": 27
    },
    "gap": 0.08,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/frixlfufg2vdswusiy24",
-   "logo": "/img/nfl/dal.png",
-   "xgap": 0.053
-  },
-  {
-   "name": "Jaden Hicks",
-   "team": "KC",
-   "pos": "SS",
-   "str": 2,
-   "g": 0.06,
-   "use": 318,
-   "pos2": "S",
-   "age": 24,
-   "starter": {
-    "name": "Chamarri Conner",
-    "g": -0.02,
-    "use": 325,
-    "age": 26
-   },
-   "gap": 0.08,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/kg90d5bciznpqbpafke4",
-   "logo": "/img/nfl/kc.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/taqdlsfufqh99ucbl5zm",
+   "logo": "/img/nfl/gb.png",
    "xgap": 0.053
   },
   {
@@ -1248,23 +1228,23 @@
    "xgap": 0.052
   },
   {
-   "name": "Seth McGowan",
-   "team": "IND",
-   "pos": "RB",
+   "name": "Charles Woods",
+   "team": "NE",
+   "pos": "CB",
    "str": 2,
-   "g": 0.12,
-   "use": 133,
-   "pos2": "RB",
-   "age": 24,
+   "g": 0.11,
+   "use": 258,
+   "pos2": "CB",
+   "age": 26,
    "starter": {
-    "name": "Jonathan Taylor",
-    "g": 0.05,
-    "use": 456,
-    "age": 27
+    "name": "Carlton Davis III",
+    "g": 0.04,
+    "use": 260,
+    "age": 29
    },
    "gap": 0.07,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/f4h7kmayu7kqncha3f6v",
-   "logo": "/img/nfl/ind.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/bxq4zmhaarr9jpuyljor",
+   "logo": "/img/nfl/ne.png",
    "xgap": 0.051
   },
   {
@@ -1288,86 +1268,6 @@
    "xgap": 0.051
   },
   {
-   "name": "TeRah Edwards",
-   "team": "CAR",
-   "pos": "DE",
-   "str": 3,
-   "g": 0.0,
-   "use": 110,
-   "pos2": "DL",
-   "age": 25,
-   "starter": {
-    "name": "Tershawn Wharton",
-    "g": -0.07,
-    "use": 159,
-    "age": 28
-   },
-   "gap": 0.07,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/kmlrbebwbksnogrboyo0",
-   "logo": "/img/nfl/car.png",
-   "xgap": 0.051
-  },
-  {
-   "name": "Dondrea Tillman",
-   "team": "DEN",
-   "pos": "WLB",
-   "str": 2,
-   "g": 0.11,
-   "use": 227,
-   "pos2": "EDGE",
-   "age": 28,
-   "starter": {
-    "name": "Jonathon Cooper",
-    "g": 0.02,
-    "use": 127,
-    "age": 28
-   },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/rqo88erhkag4dfighxdw",
-   "logo": "/img/nfl/den.png",
-   "xgap": 0.05
-  },
-  {
-   "name": "Marco Wilson",
-   "team": "CAR",
-   "pos": "CB",
-   "str": 2,
-   "g": 0.02,
-   "use": 144,
-   "pos2": "CB",
-   "age": 27,
-   "starter": {
-    "name": "Akayleb Evans",
-    "g": -0.07,
-    "use": 243,
-    "age": 27
-   },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/m4jq4nxx4nwauuobcznx",
-   "logo": "/img/nfl/car.png",
-   "xgap": 0.05
-  },
-  {
-   "name": "Joshua Farmer",
-   "team": "NE",
-   "pos": "DE",
-   "str": 2,
-   "g": 0.07,
-   "use": 130,
-   "pos2": "DL",
-   "age": 23,
-   "starter": {
-    "name": "Milton Williams",
-    "g": 0.01,
-    "use": 379,
-    "age": 27
-   },
-   "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qjxdixlsyuy3ph9m43to",
-   "logo": "/img/nfl/ne.png",
-   "xgap": 0.049
-  },
-  {
    "name": "Bauer Sharp",
    "team": "TB",
    "pos": "TE",
@@ -1388,244 +1288,244 @@
    "xgap": 0.049
   },
   {
-   "name": "Ty'Ron Hopper",
-   "team": "GB",
-   "pos": "ILB",
+   "name": "Chris Blair",
+   "team": "ATL",
+   "pos": "WR",
    "str": 2,
-   "g": 0.18,
-   "use": 213,
-   "pos2": "LB",
-   "age": 25,
+   "g": -0.11,
+   "use": 148,
+   "pos2": "WR",
+   "age": 28,
    "starter": {
-    "name": "Isaiah McDuffie",
-    "g": 0.11,
-    "use": 320,
-    "age": 27
+    "name": "Olamide Zaccheaus",
+    "g": -0.19,
+    "use": 232,
+    "age": 29
    },
-   "gap": 0.07,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/taqdlsfufqh99ucbl5zm",
-   "logo": "/img/nfl/gb.png",
-   "xgap": 0.046
+   "gap": 0.08,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/unvrabuns2qjrjotregw",
+   "logo": "/img/nfl/atl.png",
+   "xgap": 0.048
   },
   {
-   "name": "Bobby Brown III",
-   "team": "CAR",
-   "pos": "DE",
+   "name": "Deion Burks",
+   "team": "IND",
+   "pos": "WR",
    "str": 2,
-   "g": 0.0,
-   "use": 170,
-   "pos2": "DL",
-   "age": 26,
+   "g": -0.02,
+   "use": 127,
+   "pos2": "WR",
+   "age": 23,
    "starter": {
-    "name": "Tershawn Wharton",
-    "g": -0.07,
-    "use": 159,
-    "age": 28
+    "name": "Laquon Treadwell",
+    "g": -0.05,
+    "use": 505,
+    "age": 31
    },
-   "gap": 0.07,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/f3fspidlfqws3asws3gw",
-   "logo": "/img/nfl/car.png",
-   "xgap": 0.046
-  },
-  {
-   "name": "Trevor Nowaske",
-   "team": "DET",
-   "pos": "DE",
-   "str": 3,
-   "g": 0.07,
-   "use": 161,
-   "pos2": "LB",
-   "age": 27,
-   "starter": {
-    "name": "Tyler Lacy",
-    "g": -0.02,
-    "use": 192,
-    "age": 26
-   },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/m65qtbao0n91lg4gprrp",
-   "logo": "/img/nfl/det.png",
-   "xgap": 0.045
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/j4rcng9wtk5wmew7gpmv",
+   "logo": "/img/nfl/ind.png",
+   "xgap": 0.048
   },
   {
    "name": "DJ Wonnum",
    "team": "DET",
    "pos": "DE",
    "str": 2,
-   "g": 0.07,
-   "use": 276,
+   "g": 0.1,
+   "use": 320,
    "pos2": "EDGE",
    "age": 28,
    "starter": {
     "name": "Tyler Lacy",
-    "g": -0.02,
-    "use": 192,
+    "g": 0.0,
+    "use": 214,
     "age": 26
    },
-   "gap": 0.09,
+   "gap": 0.1,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ajj965d0f6fmtfprrsgo",
    "logo": "/img/nfl/det.png",
-   "xgap": 0.04
+   "xgap": 0.047
   },
   {
-   "name": "Austin Ajiake",
-   "team": "IND",
-   "pos": "SLB",
-   "str": 2,
-   "g": 0.07,
-   "use": 109,
-   "pos2": "LB",
-   "age": 26,
-   "starter": {
-    "name": "Bryce Boettcher",
-    "g": -0.02,
-    "use": 166,
-    "age": 24
-   },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qenkght35bitascb9jfv",
-   "logo": "/img/nfl/ind.png",
-   "xgap": 0.04
-  },
-  {
-   "name": "K'Lavon Chaisson",
-   "team": "WAS",
-   "pos": "SLB",
-   "str": 2,
-   "g": 0.11,
-   "use": 414,
-   "pos2": "EDGE",
-   "age": 27,
-   "starter": {
-    "name": "Dorance Armstrong",
-    "g": 0.05,
-    "use": 267,
-    "age": 29
-   },
-   "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/rkw8y7v1yhff36ffxsbo",
-   "logo": "/img/nfl/was.png",
-   "xgap": 0.039
-  },
-  {
-   "name": "Romeo Doubs",
+   "name": "Efton Chism III",
    "team": "NE",
    "pos": "WR",
    "str": 2,
-   "g": 0.19,
-   "use": 236,
+   "g": 0.05,
+   "use": 286,
    "pos2": "WR",
+   "age": 24,
+   "starter": {
+    "name": "A.J. Brown",
+    "g": 0.0,
+    "use": 160,
+    "age": 29
+   },
+   "gap": 0.05,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/zbnf3ujmwprzgjnwdtlo",
+   "logo": "/img/nfl/ne.png",
+   "xgap": 0.047
+  },
+  {
+   "name": "Jaden Hicks",
+   "team": "KC",
+   "pos": "SS",
+   "str": 2,
+   "g": 0.08,
+   "use": 327,
+   "pos2": "S",
+   "age": 24,
+   "starter": {
+    "name": "Chamarri Conner",
+    "g": 0.01,
+    "use": 392,
+    "age": 26
+   },
+   "gap": 0.07,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/kg90d5bciznpqbpafke4",
+   "logo": "/img/nfl/kc.png",
+   "xgap": 0.046
+  },
+  {
+   "name": "Shemar Stewart",
+   "team": "CIN",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.03,
+   "use": 52,
+   "pos2": "EDGE",
+   "age": 22,
+   "starter": {
+    "name": "Myles Murphy",
+    "g": -0.04,
+    "use": 407,
+    "age": 24
+   },
+   "gap": 0.07,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/cxyzfhkxg3ydlilhyunr",
+   "logo": "/img/nfl/cin.png",
+   "xgap": 0.046
+  },
+  {
+   "name": "Dylan Laube",
+   "team": "LV",
+   "pos": "RB",
+   "str": 3,
+   "g": 0.06,
+   "use": 59,
+   "pos2": "RB",
    "age": 26,
    "starter": {
-    "name": "Mack Hollins",
-    "g": 0.16,
-    "use": 211,
-    "age": 32
-   },
-   "gap": 0.03,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/d27wez0jqd5vfcrjizpb",
-   "logo": "/img/nfl/ne.png",
-   "xgap": 0.038
-  },
-  {
-   "name": "Avieon Terrell",
-   "team": "ATL",
-   "pos": "CB",
-   "str": 3,
-   "g": -0.02,
-   "use": 227,
-   "pos2": "CB",
-   "age": 21,
-   "starter": {
-    "name": "A.J. Terrell Jr.",
+    "name": "Ashton Jeanty",
     "g": -0.05,
-    "use": 250,
-    "age": 27
+    "use": 434,
+    "age": 22
    },
-   "gap": 0.03,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wrwnxp7n6xxbr17ytslr",
-   "logo": "/img/nfl/atl.png",
-   "xgap": 0.038
+   "gap": 0.11,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/lpizdza73bgksstymv5t",
+   "logo": "/img/nfl/lv.png",
+   "xgap": 0.044
   },
   {
-   "name": "Shavon Revel Jr.",
-   "team": "DAL",
+   "name": "Dondrea Tillman",
+   "team": "DEN",
+   "pos": "WLB",
+   "str": 2,
+   "g": 0.13,
+   "use": 227,
+   "pos2": "EDGE",
+   "age": 28,
+   "starter": {
+    "name": "Jonathon Cooper",
+    "g": 0.05,
+    "use": 127,
+    "age": 28
+   },
+   "gap": 0.08,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/rqo88erhkag4dfighxdw",
+   "logo": "/img/nfl/den.png",
+   "xgap": 0.043
+  },
+  {
+   "name": "Kris Abrams-Draine",
+   "team": "DEN",
    "pos": "CB",
-   "str": 3,
-   "g": -0.02,
-   "use": 159,
+   "str": 2,
+   "g": 0.21,
+   "use": 213,
    "pos2": "CB",
    "age": 24,
    "starter": {
-    "name": "DaRon Bland",
-    "g": -0.07,
-    "use": 603,
-    "age": 27
+    "name": "Riley Moss",
+    "g": 0.15,
+    "use": 434,
+    "age": 26
    },
-   "gap": 0.05,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/af84hncoicg65gvvainl",
-   "logo": "/img/nfl/dal.png",
-   "xgap": 0.037
+   "gap": 0.06,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hc2oebsxs7vx7ydwiozy",
+   "logo": "/img/nfl/den.png",
+   "xgap": 0.039
   },
   {
-   "name": "Jaleel McLaughlin",
-   "team": "CLE",
+   "name": "Emari Demercado",
+   "team": "HOU",
    "pos": "RB",
    "str": 3,
    "g": -0.03,
-   "use": 68,
+   "use": 52,
    "pos2": "RB",
-   "age": 25,
+   "age": 27,
    "starter": {
-    "name": "Quinshon Judkins",
-    "g": -0.12,
-    "use": 275,
-    "age": 22
-   },
-   "gap": 0.09,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/fqxfibzrwgg3xutf71fx",
-   "logo": "/img/nfl/cle.png",
-   "xgap": 0.035
-  },
-  {
-   "name": "Derick Hall",
-   "team": "SEA",
-   "pos": "SLB",
-   "str": 2,
-   "g": 0.23,
-   "use": 305,
-   "pos2": "EDGE",
-   "age": 25,
-   "starter": {
-    "name": "Uchenna Nwosu",
-    "g": 0.19,
-    "use": 222,
+    "name": "David Montgomery",
+    "g": -0.09,
+    "use": 155,
     "age": 29
    },
-   "gap": 0.04,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pblbd65bo6myp030qbes",
-   "logo": "/img/nfl/sea.png",
-   "xgap": 0.035
+   "gap": 0.06,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wojuvwuzqhesa93iwlzd",
+   "logo": "/img/nfl/hou.png",
+   "xgap": 0.039
   },
   {
-   "name": "Rayuan Lane III",
-   "team": "JAX",
-   "pos": "FS",
+   "name": "Dylan Sampson",
+   "team": "CLE",
+   "pos": "RB",
    "str": 2,
-   "g": 0.18,
-   "use": 210,
-   "pos2": "S",
-   "age": 23,
+   "g": -0.02,
+   "use": 153,
+   "pos2": "RB",
+   "age": 21,
    "starter": {
-    "name": "Antonio Johnson",
-    "g": 0.12,
-    "use": 370,
-    "age": 24
+    "name": "Quinshon Judkins",
+    "g": -0.08,
+    "use": 307,
+    "age": 22
    },
    "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/emzamsuwuuxtpw4natjw",
-   "logo": "/img/nfl/jax.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/den1hzzomdxfcsgk88o5",
+   "logo": "/img/nfl/cle.png",
    "xgap": 0.034
+  },
+  {
+   "name": "Jourdan Lewis",
+   "team": "JAX",
+   "pos": "NB",
+   "str": 2,
+   "g": 0.42,
+   "use": 325,
+   "pos2": "CB",
+   "age": 31,
+   "starter": {
+    "name": "Jarrian Jones",
+    "g": 0.31,
+    "use": 399,
+    "age": 25
+   },
+   "gap": 0.11,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pfd9esqxpi8xgedprdls",
+   "logo": "/img/nfl/jax.png",
+   "xgap": 0.033
   },
   {
    "name": "Keaton Mitchell",
@@ -1648,43 +1548,83 @@
    "xgap": 0.031
   },
   {
-   "name": "Jackson Powers-Johnson",
-   "team": "LV",
-   "pos": "RG",
+   "name": "Avieon Terrell",
+   "team": "ATL",
+   "pos": "CB",
    "str": 3,
-   "g": 0.13,
-   "use": 256,
-   "pos2": "OL",
-   "age": 23,
+   "g": 0.0,
+   "use": 227,
+   "pos2": "CB",
+   "age": 21,
    "starter": {
-    "name": "Trey Zuhn III",
-    "g": 0.07,
-    "use": 114,
-    "age": 23
+    "name": "A.J. Terrell Jr.",
+    "g": -0.02,
+    "use": 315,
+    "age": 27
    },
-   "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/o2lpxcphdigzwbjr12jh",
-   "logo": "/img/nfl/lv.png",
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wrwnxp7n6xxbr17ytslr",
+   "logo": "/img/nfl/atl.png",
+   "xgap": 0.031
+  },
+  {
+   "name": "TeRah Edwards",
+   "team": "CAR",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.0,
+   "use": 110,
+   "pos2": "DL",
+   "age": 25,
+   "starter": {
+    "name": "Tershawn Wharton",
+    "g": -0.04,
+    "use": 202,
+    "age": 28
+   },
+   "gap": 0.04,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/kmlrbebwbksnogrboyo0",
+   "logo": "/img/nfl/car.png",
+   "xgap": 0.03
+  },
+  {
+   "name": "Samaje Perine",
+   "team": "CIN",
+   "pos": "RB",
+   "str": 2,
+   "g": 0.1,
+   "use": 201,
+   "pos2": "RB",
+   "age": 30,
+   "starter": {
+    "name": "Chase Brown",
+    "g": 0.01,
+    "use": 402,
+    "age": 26
+   },
+   "gap": 0.09,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/fllwhcdovol5i7xxahf6",
+   "logo": "/img/nfl/cin.png",
    "xgap": 0.029
   },
   {
-   "name": "Alijah Clark",
-   "team": "DAL",
-   "pos": "FS",
+   "name": "Dareke Young",
+   "team": "LV",
+   "pos": "WR",
    "str": 2,
-   "g": 0.03,
-   "use": 83,
-   "pos2": "S",
-   "age": 23,
+   "g": -0.03,
+   "use": 74,
+   "pos2": "WR",
+   "age": 27,
    "starter": {
-    "name": "Malik Hooker",
-    "g": 0.02,
-    "use": 307,
-    "age": 30
+    "name": "Jalen Nailor",
+    "g": -0.09,
+    "use": 348,
+    "age": 27
    },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/sr5sjigohu5fufu4yxm7",
-   "logo": "/img/nfl/dal.png",
+   "gap": 0.06,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xd0585sr1fy1wpry0ued",
+   "logo": "/img/nfl/lv.png",
    "xgap": 0.029
   },
   {
@@ -1708,83 +1648,43 @@
    "xgap": 0.028
   },
   {
-   "name": "Kenyon Sadiq",
-   "team": "NYJ",
-   "pos": "TE",
+   "name": "K'Lavon Chaisson",
+   "team": "WAS",
+   "pos": "SLB",
    "str": 2,
-   "g": 0.07,
-   "use": 239,
-   "pos2": "TE",
-   "age": 21,
+   "g": 0.11,
+   "use": 414,
+   "pos2": "EDGE",
+   "age": 27,
    "starter": {
-    "name": "Mason Taylor",
-    "g": 0.02,
-    "use": 269,
-    "age": 22
-   },
-   "gap": 0.05,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/mnswulwto4yqkgmugoiq",
-   "logo": "/img/nfl/nyj.png",
-   "xgap": 0.027
-  },
-  {
-   "name": "Kamari Ramsey",
-   "team": "HOU",
-   "pos": "FS",
-   "str": 2,
-   "g": 0.0,
-   "use": 57,
-   "pos2": "S",
-   "age": 22,
-   "starter": {
-    "name": "Calen Bullock",
-    "g": -0.05,
-    "use": 523,
-    "age": 23
-   },
-   "gap": 0.05,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/s9ic4ugfij0tqrrfk9yw",
-   "logo": "/img/nfl/hou.png",
-   "xgap": 0.027
-  },
-  {
-   "name": "Jonah Elliss",
-   "team": "DEN",
-   "pos": "WLB",
-   "str": 3,
-   "g": 0.04,
-   "use": 249,
-   "pos2": "LB",
-   "age": 23,
-   "starter": {
-    "name": "Jonathon Cooper",
-    "g": 0.02,
-    "use": 127,
-    "age": 28
-   },
-   "gap": 0.02,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/f3dukr2ntse8qnsyhu3b",
-   "logo": "/img/nfl/den.png",
-   "xgap": 0.026
-  },
-  {
-   "name": "Kris Abrams-Draine",
-   "team": "DEN",
-   "pos": "CB",
-   "str": 2,
-   "g": 0.19,
-   "use": 213,
-   "pos2": "CB",
-   "age": 24,
-   "starter": {
-    "name": "Riley Moss",
-    "g": 0.15,
-    "use": 434,
-    "age": 26
+    "name": "Dorance Armstrong",
+    "g": 0.07,
+    "use": 267,
+    "age": 29
    },
    "gap": 0.04,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hc2oebsxs7vx7ydwiozy",
-   "logo": "/img/nfl/den.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/rkw8y7v1yhff36ffxsbo",
+   "logo": "/img/nfl/was.png",
+   "xgap": 0.025
+  },
+  {
+   "name": "Caden Curry",
+   "team": "IND",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.05,
+   "use": 121,
+   "pos2": "EDGE",
+   "age": 23,
+   "starter": {
+    "name": "Laiatu Latu",
+    "g": 0.01,
+    "use": 492,
+    "age": 25
+   },
+   "gap": 0.04,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/svivgctsfcw8guax6rmo",
+   "logo": "/img/nfl/ind.png",
    "xgap": 0.025
   },
   {
@@ -1808,23 +1708,43 @@
    "xgap": 0.024
   },
   {
-   "name": "Mitchell Evans",
-   "team": "CAR",
-   "pos": "TE",
+   "name": "Jaishawn Barham",
+   "team": "DAL",
+   "pos": "WLB",
    "str": 3,
-   "g": 0.05,
-   "use": 257,
-   "pos2": "TE",
-   "age": 23,
+   "g": 0.0,
+   "use": 346,
+   "pos2": "LB",
+   "age": 22,
    "starter": {
-    "name": "Tommy Tremble",
-    "g": 0.02,
-    "use": 321,
-    "age": 26
+    "name": "Rashan Gary",
+    "g": -0.01,
+    "use": 454,
+    "age": 28
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/h35ij5cb5g5a8av170ca",
+   "logo": "/img/nfl/dal.png",
+   "xgap": 0.024
+  },
+  {
+   "name": "Anthony Campbell",
+   "team": "GB",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.09,
+   "use": 144,
+   "pos2": "DL",
+   "age": 25,
+   "starter": {
+    "name": "Devonte Wyatt",
+    "g": 0.06,
+    "use": 348,
+    "age": 28
    },
    "gap": 0.03,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/yruhsxdnyfaa7iswn1dp",
-   "logo": "/img/nfl/car.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wyekuw2nez6ldavs3kwt",
+   "logo": "/img/nfl/gb.png",
    "xgap": 0.023
   },
   {
@@ -1848,18 +1768,58 @@
    "xgap": 0.023
   },
   {
+   "name": "Za'Darius Smith",
+   "team": "ATL",
+   "pos": "WLB",
+   "str": 2,
+   "g": 0.2,
+   "use": 144,
+   "pos2": "EDGE",
+   "age": 33,
+   "starter": {
+    "name": "Cameron Thomas",
+    "g": 0.1,
+    "use": 429,
+    "age": 26
+   },
+   "gap": 0.1,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/votchuqwz222wmgzcgdg",
+   "logo": "/img/nfl/atl.png",
+   "xgap": 0.021
+  },
+  {
+   "name": "Kenyon Sadiq",
+   "team": "NYJ",
+   "pos": "TE",
+   "str": 2,
+   "g": 0.04,
+   "use": 268,
+   "pos2": "TE",
+   "age": 21,
+   "starter": {
+    "name": "Mason Taylor",
+    "g": 0.0,
+    "use": 322,
+    "age": 22
+   },
+   "gap": 0.04,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/mnswulwto4yqkgmugoiq",
+   "logo": "/img/nfl/nyj.png",
+   "xgap": 0.02
+  },
+  {
    "name": "Kenneth Harris",
    "team": "IND",
    "pos": "CB",
    "str": 2,
    "g": 0.0,
-   "use": 82,
+   "use": 110,
    "pos2": "CB",
    "age": 24,
    "starter": {
     "name": "Sauce Gardner",
     "g": -0.04,
-    "use": 468,
+    "use": 509,
     "age": 25
    },
    "gap": 0.04,
@@ -1868,18 +1828,38 @@
    "xgap": 0.02
   },
   {
+   "name": "Isaiah Bond",
+   "team": "CLE",
+   "pos": "WR",
+   "str": 2,
+   "g": 0.05,
+   "use": 96,
+   "pos2": "WR",
+   "age": 22,
+   "starter": {
+    "name": "Jerry Jeudy",
+    "g": 0.04,
+    "use": 392,
+    "age": 27
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pmbagsijcdb8hxdnwovq",
+   "logo": "/img/nfl/cle.png",
+   "xgap": 0.019
+  },
+  {
    "name": "Aaron Hall",
    "team": "CAR",
    "pos": "DE",
    "str": 2,
-   "g": 0.02,
-   "use": 184,
+   "g": 0.04,
+   "use": 186,
    "pos2": "DL",
    "age": 23,
    "starter": {
     "name": "Derrick Brown",
-    "g": 0.01,
-    "use": 384,
+    "g": 0.03,
+    "use": 427,
     "age": 28
    },
    "gap": 0.01,
@@ -1888,24 +1868,24 @@
    "xgap": 0.019
   },
   {
-   "name": "Anthony Campbell",
-   "team": "GB",
+   "name": "Joshua Farmer",
+   "team": "NE",
    "pos": "DE",
    "str": 2,
-   "g": 0.1,
-   "use": 119,
+   "g": 0.04,
+   "use": 157,
    "pos2": "DL",
-   "age": 25,
+   "age": 23,
    "starter": {
-    "name": "Devonte Wyatt",
-    "g": 0.08,
-    "use": 306,
-    "age": 28
+    "name": "Milton Williams",
+    "g": 0.03,
+    "use": 425,
+    "age": 27
    },
-   "gap": 0.02,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wyekuw2nez6ldavs3kwt",
-   "logo": "/img/nfl/gb.png",
-   "xgap": 0.016
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qjxdixlsyuy3ph9m43to",
+   "logo": "/img/nfl/ne.png",
+   "xgap": 0.014
   },
   {
    "name": "D'Angelo Ponds",
@@ -1913,7 +1893,7 @@
    "pos": "NB",
    "str": 2,
    "g": 0.03,
-   "use": 86,
+   "use": 93,
    "pos2": "CB",
    "age": 21,
    "starter": {
@@ -1928,24 +1908,24 @@
    "xgap": 0.014
   },
   {
-   "name": "Jared Wayne",
-   "team": "MIA",
-   "pos": "WR",
+   "name": "Woody Marks",
+   "team": "HOU",
+   "pos": "RB",
    "str": 2,
-   "g": -0.02,
-   "use": 151,
-   "pos2": "WR",
+   "g": -0.08,
+   "use": 357,
+   "pos2": "RB",
    "age": 25,
    "starter": {
-    "name": "Chris Bell",
-    "g": -0.08,
-    "use": 296,
-    "age": 22
+    "name": "David Montgomery",
+    "g": -0.09,
+    "use": 155,
+    "age": 29
    },
-   "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/l6tihsdzjreazpc94pvo",
-   "logo": "/img/nfl/mia.png",
-   "xgap": 0.013
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ksk0fjj4bl9jvfh2s0rm",
+   "logo": "/img/nfl/hou.png",
+   "xgap": 0.014
   },
   {
    "name": "Terry McLaurin",
@@ -1968,84 +1948,104 @@
    "xgap": 0.011
   },
   {
-   "name": "Caleb Rogers",
-   "team": "LV",
-   "pos": "RG",
+   "name": "Lathan Ransom",
+   "team": "CAR",
+   "pos": "SS",
    "str": 2,
-   "g": 0.11,
-   "use": 245,
-   "pos2": "OL",
+   "g": 0.04,
+   "use": 174,
+   "pos2": "S",
    "age": 24,
    "starter": {
-    "name": "Trey Zuhn III",
-    "g": 0.07,
-    "use": 114,
-    "age": 23
-   },
-   "gap": 0.04,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ov3wd6opxyreuuofq5rk",
-   "logo": "/img/nfl/lv.png",
-   "xgap": 0.009
-  },
-  {
-   "name": "Nick Kallerup",
-   "team": "SEA",
-   "pos": "TE",
-   "str": 3,
-   "g": -0.05,
-   "use": 93,
-   "pos2": "TE",
-   "age": 25,
-   "starter": {
-    "name": "AJ Barner",
-    "g": -0.09,
-    "use": 517,
-    "age": 24
-   },
-   "gap": 0.04,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/eetx8ba2ztsmk9wabbzp",
-   "logo": "/img/nfl/sea.png",
-   "xgap": 0.009
-  },
-  {
-   "name": "Anton Harrison",
-   "team": "JAX",
-   "pos": "LT",
-   "str": 2,
-   "g": 0.14,
-   "use": 281,
-   "pos2": "OL",
-   "age": 24,
-   "starter": {
-    "name": "Walker Little",
-    "g": 0.13,
-    "use": 236,
+    "name": "Tre'von Moehrig",
+    "g": 0.03,
+    "use": 596,
     "age": 27
    },
    "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/l90ccbzqvqoblyonrdr3",
-   "logo": "/img/nfl/jax.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/gg0ztjfsso4y7yx4fxfb",
+   "logo": "/img/nfl/car.png",
    "xgap": 0.009
   },
   {
-   "name": "Dylan Laube",
-   "team": "LV",
-   "pos": "RB",
-   "str": 3,
-   "g": 0.06,
-   "use": 59,
-   "pos2": "RB",
-   "age": 26,
+   "name": "Nehemiah Pritchett",
+   "team": "SEA",
+   "pos": "CB",
+   "str": 2,
+   "g": 0.34,
+   "use": 207,
+   "pos2": "CB",
+   "age": 25,
    "starter": {
-    "name": "Ashton Jeanty",
-    "g": 0.0,
-    "use": 392,
+    "name": "Devon Witherspoon",
+    "g": 0.31,
+    "use": 610,
+    "age": 25
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/zxtribbeeejhqlt43dmj",
+   "logo": "/img/nfl/sea.png",
+   "xgap": 0.007
+  },
+  {
+   "name": "Barion Brown",
+   "team": "NO",
+   "pos": "WR",
+   "str": 2,
+   "g": 0.14,
+   "use": 51,
+   "pos2": "WR",
+   "age": 22,
+   "starter": {
+    "name": "Jordyn Tyson",
+    "g": 0.11,
+    "use": 63,
     "age": 22
    },
-   "gap": 0.06,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/lpizdza73bgksstymv5t",
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/npjiglbaqpngbxyraftk",
+   "logo": "/img/nfl/no.png",
+   "xgap": 0.007
+  },
+  {
+   "name": "Jackson Powers-Johnson",
+   "team": "LV",
+   "pos": "RG",
+   "str": 3,
+   "g": 0.11,
+   "use": 256,
+   "pos2": "OL",
+   "age": 23,
+   "starter": {
+    "name": "Trey Zuhn III",
+    "g": 0.08,
+    "use": 173,
+    "age": 23
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/o2lpxcphdigzwbjr12jh",
    "logo": "/img/nfl/lv.png",
-   "xgap": 0.008
+   "xgap": 0.007
+  },
+  {
+   "name": "Jaleel McLaughlin",
+   "team": "CLE",
+   "pos": "RB",
+   "str": 3,
+   "g": -0.03,
+   "use": 69,
+   "pos2": "RB",
+   "age": 25,
+   "starter": {
+    "name": "Quinshon Judkins",
+    "g": -0.08,
+    "use": 307,
+    "age": 22
+   },
+   "gap": 0.05,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/fqxfibzrwgg3xutf71fx",
+   "logo": "/img/nfl/cle.png",
+   "xgap": 0.006
   },
   {
    "name": "Poona Ford",
@@ -2059,7 +2059,7 @@
    "starter": {
     "name": "Ty Hamilton",
     "g": 0.02,
-    "use": 120,
+    "use": 135,
     "age": 24
    },
    "gap": 0.07,
@@ -2088,6 +2088,66 @@
    "xgap": 0.005
   },
   {
+   "name": "Rayuan Lane III",
+   "team": "JAX",
+   "pos": "FS",
+   "str": 2,
+   "g": 0.16,
+   "use": 266,
+   "pos2": "S",
+   "age": 23,
+   "starter": {
+    "name": "Antonio Johnson",
+    "g": 0.14,
+    "use": 427,
+    "age": 24
+   },
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/emzamsuwuuxtpw4natjw",
+   "logo": "/img/nfl/jax.png",
+   "xgap": 0.005
+  },
+  {
+   "name": "Michael Pittman Jr.",
+   "team": "PIT",
+   "pos": "WR",
+   "str": 2,
+   "g": 0.02,
+   "use": 156,
+   "pos2": "WR",
+   "age": 28,
+   "starter": {
+    "name": "Ben Skowronek",
+    "g": 0.0,
+    "use": 49,
+    "age": 29
+   },
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/q1ythn05kwcmdr4mwzll",
+   "logo": "/img/nfl/pit.png",
+   "xgap": 0.005
+  },
+  {
+   "name": "Pat Freiermuth",
+   "team": "PIT",
+   "pos": "TE",
+   "str": 2,
+   "g": 0.13,
+   "use": 382,
+   "pos2": "TE",
+   "age": 27,
+   "starter": {
+    "name": "Darnell Washington",
+    "g": 0.09,
+    "use": 375,
+    "age": 25
+   },
+   "gap": 0.04,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/pyrdsypgggjshiaygkr7",
+   "logo": "/img/nfl/pit.png",
+   "xgap": 0.004
+  },
+  {
    "name": "Kimani Vidal",
    "team": "LAC",
    "pos": "RB",
@@ -2106,6 +2166,26 @@
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/tqdctdun0bv60d5ziwtl",
    "logo": "/img/nfl/lac.png",
    "xgap": 0.004
+  },
+  {
+   "name": "R Mason Thomas",
+   "team": "KC",
+   "pos": "DE",
+   "str": 2,
+   "g": 0.08,
+   "use": 290,
+   "pos2": "EDGE",
+   "age": 22,
+   "starter": {
+    "name": "Felix Anudike-Uzomah",
+    "g": 0.07,
+    "use": 312,
+    "age": 24
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/kyj9zy752wgq6nnn4ui6",
+   "logo": "/img/nfl/kc.png",
+   "xgap": 0.003
   },
   {
    "name": "Christian Rozeboom",
@@ -2128,6 +2208,66 @@
    "xgap": 0.003
   },
   {
+   "name": "Jarrett Kingston",
+   "team": "MIA",
+   "pos": "C",
+   "str": 3,
+   "g": 0.05,
+   "use": 123,
+   "pos2": "OL",
+   "age": 26,
+   "starter": {
+    "name": "Aaron Brewer",
+    "g": 0.04,
+    "use": 480,
+    "age": 28
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/g2h5sjp9tlx2lqcjxbka",
+   "logo": "/img/nfl/mia.png",
+   "xgap": 0.003
+  },
+  {
+   "name": "Mike Washington Jr.",
+   "team": "LV",
+   "pos": "RB",
+   "str": 2,
+   "g": -0.02,
+   "use": 172,
+   "pos2": "RB",
+   "age": 23,
+   "starter": {
+    "name": "Ashton Jeanty",
+    "g": -0.05,
+    "use": 434,
+    "age": 22
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ocdjq5ohmtgdghqdh5m4",
+   "logo": "/img/nfl/lv.png",
+   "xgap": 0.002
+  },
+  {
+   "name": "DJ Ivey",
+   "team": "CIN",
+   "pos": "CB",
+   "str": 2,
+   "g": 0.1,
+   "use": 212,
+   "pos2": "CB",
+   "age": 26,
+   "starter": {
+    "name": "Tacario Davis",
+    "g": 0.05,
+    "use": 79,
+    "age": 22
+   },
+   "gap": 0.05,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/bgycp6whsc4bd61aumsq",
+   "logo": "/img/nfl/cin.png",
+   "xgap": 0.001
+  },
+  {
    "name": "Tony Jefferson",
    "team": "LAC",
    "pos": "SS",
@@ -2148,104 +2288,144 @@
    "xgap": 0.001
   },
   {
-   "name": "Za'Darius Smith",
-   "team": "ATL",
-   "pos": "WLB",
-   "str": 2,
-   "g": 0.19,
-   "use": 127,
-   "pos2": "EDGE",
-   "age": 33,
-   "starter": {
-    "name": "Cameron Thomas",
-    "g": 0.12,
-    "use": 384,
-    "age": 26
-   },
-   "gap": 0.07,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/votchuqwz222wmgzcgdg",
-   "logo": "/img/nfl/atl.png",
-   "xgap": 0.0
-  },
-  {
-   "name": "Dareke Young",
-   "team": "LV",
-   "pos": "WR",
-   "str": 2,
-   "g": -0.03,
+   "name": "DeeJay Dallas",
+   "team": "MIN",
+   "pos": "RB",
+   "str": 3,
+   "g": -0.05,
    "use": 73,
-   "pos2": "WR",
+   "pos2": "RB",
    "age": 27,
    "starter": {
-    "name": "Jalen Nailor",
-    "g": -0.05,
-    "use": 297,
+    "name": "Jordan Mason",
+    "g": -0.07,
+    "use": 142,
     "age": 27
    },
    "gap": 0.02,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xd0585sr1fy1wpry0ued",
-   "logo": "/img/nfl/lv.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/te9kl13yqhpij5nenoyu",
+   "logo": "/img/nfl/min.png",
    "xgap": 0.0
   },
   {
-   "name": "Isaiah Adams",
-   "team": "ARI",
-   "pos": "RG",
+   "name": "Brevyn Spann-Ford",
+   "team": "DAL",
+   "pos": "TE",
    "str": 2,
-   "g": 0.06,
-   "use": 218,
-   "pos2": "OL",
+   "g": 0.03,
+   "use": 360,
+   "pos2": "TE",
    "age": 26,
    "starter": {
-    "name": "Jon Gaines II",
-    "g": 0.05,
-    "use": 258,
+    "name": "Jake Ferguson",
+    "g": 0.02,
+    "use": 344,
     "age": 27
    },
    "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ule1nyboygcfxxc0qz8l",
-   "logo": "/img/nfl/ari.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/sko2pmuqociwa92ep1ad",
+   "logo": "/img/nfl/dal.png",
    "xgap": -0.002
   },
   {
-   "name": "Mike Washington Jr.",
-   "team": "LV",
-   "pos": "RB",
+   "name": "Kamari Ramsey",
+   "team": "HOU",
+   "pos": "FS",
    "str": 2,
-   "g": 0.02,
-   "use": 155,
-   "pos2": "RB",
-   "age": 23,
+   "g": 0.0,
+   "use": 57,
+   "pos2": "S",
+   "age": 22,
    "starter": {
-    "name": "Ashton Jeanty",
+    "name": "Calen Bullock",
+    "g": -0.01,
+    "use": 591,
+    "age": 23
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/s9ic4ugfij0tqrrfk9yw",
+   "logo": "/img/nfl/hou.png",
+   "xgap": -0.002
+  },
+  {
+   "name": "Trevor Nowaske",
+   "team": "DET",
+   "pos": "DE",
+   "str": 3,
+   "g": 0.02,
+   "use": 194,
+   "pos2": "LB",
+   "age": 27,
+   "starter": {
+    "name": "Tyler Lacy",
     "g": 0.0,
-    "use": 392,
-    "age": 22
+    "use": 214,
+    "age": 26
    },
    "gap": 0.02,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ocdjq5ohmtgdghqdh5m4",
-   "logo": "/img/nfl/lv.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/m65qtbao0n91lg4gprrp",
+   "logo": "/img/nfl/det.png",
    "xgap": -0.005
   },
   {
-   "name": "Samaje Perine",
-   "team": "CIN",
+   "name": "Nick Kallerup",
+   "team": "SEA",
+   "pos": "TE",
+   "str": 3,
+   "g": -0.05,
+   "use": 119,
+   "pos2": "TE",
+   "age": 25,
+   "starter": {
+    "name": "AJ Barner",
+    "g": -0.07,
+    "use": 565,
+    "age": 24
+   },
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/eetx8ba2ztsmk9wabbzp",
+   "logo": "/img/nfl/sea.png",
+   "xgap": -0.005
+  },
+  {
+   "name": "Alvin Kamara",
+   "team": "NO",
    "pos": "RB",
    "str": 2,
-   "g": 0.04,
-   "use": 181,
+   "g": 0.06,
+   "use": 188,
    "pos2": "RB",
-   "age": 30,
+   "age": 31,
    "starter": {
-    "name": "Chase Brown",
-    "g": 0.0,
-    "use": 354,
-    "age": 26
+    "name": "Travis Etienne Jr.",
+    "g": 0.02,
+    "use": 139,
+    "age": 27
    },
    "gap": 0.04,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/fllwhcdovol5i7xxahf6",
-   "logo": "/img/nfl/cin.png",
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hedvtdbdgdyf4lo5e12p",
+   "logo": "/img/nfl/no.png",
    "xgap": -0.006
+  },
+  {
+   "name": "Jared Wayne",
+   "team": "MIA",
+   "pos": "WR",
+   "str": 2,
+   "g": -0.02,
+   "use": 151,
+   "pos2": "WR",
+   "age": 25,
+   "starter": {
+    "name": "Chris Bell",
+    "g": -0.05,
+    "use": 296,
+    "age": 22
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/l6tihsdzjreazpc94pvo",
+   "logo": "/img/nfl/mia.png",
+   "xgap": -0.008
   },
   {
    "name": "RJ Harvey",
@@ -2268,24 +2448,64 @@
    "xgap": -0.01
   },
   {
-   "name": "DJ Ivey",
-   "team": "CIN",
-   "pos": "CB",
+   "name": "Andrew Armstrong",
+   "team": "KC",
+   "pos": "WR",
    "str": 2,
-   "g": 0.08,
-   "use": 194,
-   "pos2": "CB",
-   "age": 26,
+   "g": -0.02,
+   "use": 134,
+   "pos2": "WR",
+   "age": 25,
    "starter": {
-    "name": "Tacario Davis",
-    "g": 0.05,
-    "use": 71,
-    "age": 22
+    "name": "Xavier Worthy",
+    "g": -0.04,
+    "use": 478,
+    "age": 23
    },
-   "gap": 0.03,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/bgycp6whsc4bd61aumsq",
-   "logo": "/img/nfl/cin.png",
-   "xgap": -0.013
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hkw32xqnimm6dvx2qfvl",
+   "logo": "/img/nfl/kc.png",
+   "xgap": -0.01
+  },
+  {
+   "name": "Caleb Rogers",
+   "team": "LV",
+   "pos": "RG",
+   "str": 2,
+   "g": 0.09,
+   "use": 245,
+   "pos2": "OL",
+   "age": 24,
+   "starter": {
+    "name": "Trey Zuhn III",
+    "g": 0.08,
+    "use": 173,
+    "age": 23
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/ov3wd6opxyreuuofq5rk",
+   "logo": "/img/nfl/lv.png",
+   "xgap": -0.012
+  },
+  {
+   "name": "Jordan Meredith",
+   "team": "NYJ",
+   "pos": "LG",
+   "str": 2,
+   "g": 0.07,
+   "use": 309,
+   "pos2": "OL",
+   "age": 28,
+   "starter": {
+    "name": "Dylan Parham",
+    "g": 0.06,
+    "use": 319,
+    "age": 27
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/fskl1xxujtlk6tvwuwka",
+   "logo": "/img/nfl/nyj.png",
+   "xgap": -0.012
   },
   {
    "name": "Yasir Abdullah",
@@ -2293,13 +2513,13 @@
    "pos": "SLB",
    "str": 3,
    "g": 0.03,
-   "use": 88,
+   "use": 93,
    "pos2": "EDGE",
    "age": 26,
    "starter": {
     "name": "James Pearce Jr.",
     "g": 0.0,
-    "use": 15,
+    "use": 31,
     "age": 22
    },
    "gap": 0.03,
@@ -2328,44 +2548,124 @@
    "xgap": -0.015
   },
   {
-   "name": "Brian Burns",
-   "team": "NYG",
-   "pos": "WLB",
-   "str": 2,
-   "g": 0.02,
-   "use": 116,
-   "pos2": "EDGE",
-   "age": 28,
+   "name": "Austin Hooper",
+   "team": "ATL",
+   "pos": "TE",
+   "str": 3,
+   "g": 0.05,
+   "use": 140,
+   "pos2": "TE",
+   "age": 31,
    "starter": {
-    "name": "Kayvon Thibodeaux",
-    "g": 0.0,
-    "use": 436,
+    "name": "Kyle Pitts Sr.",
+    "g": 0.01,
+    "use": 385,
     "age": 25
    },
-   "gap": 0.02,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/glmrmpqkmsc0jiyicmlg",
-   "logo": "/img/nfl/nyg.png",
-   "xgap": -0.015
+   "gap": 0.04,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xcl350pogjbc7ilaqhjk",
+   "logo": "/img/nfl/atl.png",
+   "xgap": -0.016
   },
   {
-   "name": "Christian Haynes",
-   "team": "MIA",
-   "pos": "RG",
-   "str": 2,
+   "name": "Kendrick Bourne",
+   "team": "ARI",
+   "pos": "WR",
+   "str": 3,
    "g": 0.06,
-   "use": 210,
-   "pos2": "OL",
-   "age": 26,
+   "use": 317,
+   "pos2": "WR",
+   "age": 31,
    "starter": {
-    "name": "Jonah Savaiinaea",
-    "g": 0.04,
-    "use": 432,
+    "name": "Reggie Virgil",
+    "g": 0.0,
+    "use": 91,
     "age": 22
    },
-   "gap": 0.02,
-   "photo": null,
-   "logo": "/img/nfl/mia.png",
-   "xgap": -0.02
+   "gap": 0.06,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/yzfa94cmhpcqamrwzdzk",
+   "logo": "/img/nfl/ari.png",
+   "xgap": -0.017
+  },
+  {
+   "name": "Terrell Burgess",
+   "team": "TEN",
+   "pos": "FS",
+   "str": 2,
+   "g": 0.0,
+   "use": 67,
+   "pos2": "S",
+   "age": 27,
+   "starter": {
+    "name": "Kevin Winston Jr.",
+    "g": -0.03,
+    "use": 482,
+    "age": 22
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/qxwxyritvbyjdd8t6q7q",
+   "logo": "/img/nfl/ten.png",
+   "xgap": -0.018
+  },
+  {
+   "name": "Jonathan Ford",
+   "team": "GB",
+   "pos": "NT",
+   "str": 3,
+   "g": -0.02,
+   "use": 117,
+   "pos2": "DL",
+   "age": 27,
+   "starter": {
+    "name": "Chris McClellan",
+    "g": -0.05,
+    "use": 315,
+    "age": 22
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xvjepsl8u5unzc5qc8fu",
+   "logo": "/img/nfl/gb.png",
+   "xgap": -0.018
+  },
+  {
+   "name": "Trace Ford",
+   "team": "NYG",
+   "pos": "SLB",
+   "str": 2,
+   "g": 0.03,
+   "use": 90,
+   "pos2": "EDGE",
+   "age": 25,
+   "starter": {
+    "name": "Abdul Carter",
+    "g": 0.02,
+    "use": 503,
+    "age": 22
+   },
+   "gap": 0.01,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/wfwaqxn21kdhpybvhqih",
+   "logo": "/img/nfl/nyg.png",
+   "xgap": -0.022
+  },
+  {
+   "name": "Devin Duvernay",
+   "team": "ARI",
+   "pos": "WR",
+   "str": 2,
+   "g": 0.03,
+   "use": 68,
+   "pos2": "WR",
+   "age": 28,
+   "starter": {
+    "name": "Reggie Virgil",
+    "g": 0.0,
+    "use": 91,
+    "age": 22
+   },
+   "gap": 0.03,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/tj3t166iwsxbnyzxcyyl",
+   "logo": "/img/nfl/ari.png",
+   "xgap": -0.023
   },
   {
    "name": "Charles Snowden",
@@ -2373,13 +2673,13 @@
    "pos": "SLB",
    "str": 2,
    "g": 0.03,
-   "use": 57,
+   "use": 78,
    "pos2": "EDGE",
    "age": 28,
    "starter": {
     "name": "James Pearce Jr.",
     "g": 0.0,
-    "use": 15,
+    "use": 31,
     "age": 22
    },
    "gap": 0.03,
@@ -2388,24 +2688,24 @@
    "xgap": -0.023
   },
   {
-   "name": "Damar Hamlin",
-   "team": "BUF",
-   "pos": "FS",
+   "name": "Von Miller",
+   "team": "DAL",
+   "pos": "WLB",
    "str": 2,
-   "g": -0.02,
-   "use": 246,
-   "pos2": "S",
-   "age": 28,
+   "g": 0.04,
+   "use": 168,
+   "pos2": "LB",
+   "age": 37,
    "starter": {
-    "name": "Cole Bishop",
-    "g": -0.04,
-    "use": 523,
-    "age": 23
+    "name": "Rashan Gary",
+    "g": -0.01,
+    "use": 454,
+    "age": 28
    },
-   "gap": 0.02,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/jznu79uczeedyyc2adbg",
-   "logo": "/img/nfl/buf.png",
-   "xgap": -0.025
+   "gap": 0.05,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/jeupufpwbvikxkjpurt8",
+   "logo": "/img/nfl/dal.png",
+   "xgap": -0.024
   },
   {
    "name": "Tavius Robinson",
@@ -2425,26 +2725,6 @@
    "gap": 0.01,
    "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/mmvqyuqlg73zp0jwydxr",
    "logo": "/img/nfl/bal.png",
-   "xgap": -0.027
-  },
-  {
-   "name": "Alvin Kamara",
-   "team": "NO",
-   "pos": "RB",
-   "str": 2,
-   "g": 0.06,
-   "use": 172,
-   "pos2": "RB",
-   "age": 31,
-   "starter": {
-    "name": "Travis Etienne Jr.",
-    "g": 0.05,
-    "use": 118,
-    "age": 27
-   },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/hedvtdbdgdyf4lo5e12p",
-   "logo": "/img/nfl/no.png",
    "xgap": -0.027
   },
   {
@@ -2468,144 +2748,44 @@
    "xgap": -0.03
   },
   {
-   "name": "Derek Barnett",
-   "team": "CLE",
-   "pos": "DE",
-   "str": 2,
-   "g": 0.02,
-   "use": 208,
-   "pos2": "EDGE",
-   "age": 30,
-   "starter": {
-    "name": "Isaiah McGuire",
-    "g": 0.01,
-    "use": 374,
-    "age": 25
-   },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/lyh9saxk0oevtehwa6g4",
-   "logo": "/img/nfl/cle.png",
-   "xgap": -0.032
-  },
-  {
-   "name": "Jonathan Ford",
+   "name": "Jordon Riley",
    "team": "GB",
    "pos": "NT",
-   "str": 3,
-   "g": -0.02,
-   "use": 117,
-   "pos2": "DL",
-   "age": 27,
+   "str": 2,
+   "g": -0.03,
+   "use": 94,
+   "pos2": "EDGE",
+   "age": 28,
    "starter": {
     "name": "Chris McClellan",
-    "g": -0.03,
-    "use": 283,
+    "g": -0.05,
+    "use": 315,
     "age": 22
    },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/xvjepsl8u5unzc5qc8fu",
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/tr46ilf5hznzboea38ag",
    "logo": "/img/nfl/gb.png",
-   "xgap": -0.032
+   "xgap": -0.03
   },
   {
-   "name": "Tyler Allgeier",
-   "team": "ARI",
-   "pos": "RB",
+   "name": "Chidobe Awuzie",
+   "team": "BAL",
+   "pos": "CB",
    "str": 2,
-   "g": -0.05,
-   "use": 352,
-   "pos2": "RB",
-   "age": 26,
-   "starter": {
-    "name": "Jeremiyah Love",
-    "g": -0.06,
-    "use": 189,
-    "age": 21
-   },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/sp9lhhmpv4qy3xy2msxd",
-   "logo": "/img/nfl/ari.png",
-   "xgap": -0.032
-  },
-  {
-   "name": "Eric Saubert",
-   "team": "SEA",
-   "pos": "TE",
-   "str": 2,
-   "g": -0.06,
-   "use": 170,
-   "pos2": "TE",
-   "age": 32,
-   "starter": {
-    "name": "AJ Barner",
-    "g": -0.09,
-    "use": 517,
-    "age": 24
-   },
-   "gap": 0.03,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/czzieyox5rht6ae3g5tx",
-   "logo": "/img/nfl/sea.png",
-   "xgap": -0.033
-  },
-  {
-   "name": "LaCale London",
-   "team": "ATL",
-   "pos": "DE",
-   "str": 2,
-   "g": 0.09,
-   "use": 265,
-   "pos2": "DL",
-   "age": 29,
-   "starter": {
-    "name": "Maason Smith",
-    "g": 0.08,
-    "use": 334,
-    "age": 23
-   },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/f89fptq48mbw8pjf2fdv",
-   "logo": "/img/nfl/atl.png",
-   "xgap": -0.037
-  },
-  {
-   "name": "Kendrick Bourne",
-   "team": "ARI",
-   "pos": "WR",
-   "str": 3,
-   "g": 0.06,
-   "use": 317,
-   "pos2": "WR",
+   "g": 0.02,
+   "use": 168,
+   "pos2": "CB",
    "age": 31,
    "starter": {
-    "name": "Reggie Virgil",
-    "g": 0.03,
-    "use": 75,
-    "age": 22
+    "name": "Nate Wiggins",
+    "g": 0.0,
+    "use": 487,
+    "age": 23
    },
-   "gap": 0.03,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/yzfa94cmhpcqamrwzdzk",
-   "logo": "/img/nfl/ari.png",
-   "xgap": -0.038
-  },
-  {
-   "name": "Von Miller",
-   "team": "DAL",
-   "pos": "WLB",
-   "str": 2,
-   "g": 0.05,
-   "use": 140,
-   "pos2": "LB",
-   "age": 37,
-   "starter": {
-    "name": "Rashan Gary",
-    "g": 0.04,
-    "use": 409,
-    "age": 28
-   },
-   "gap": 0.01,
-   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/jeupufpwbvikxkjpurt8",
-   "logo": "/img/nfl/dal.png",
-   "xgap": -0.053
+   "gap": 0.02,
+   "photo": "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/o7hb0bwvyuymmsknlubx",
+   "logo": "/img/nfl/bal.png",
+   "xgap": -0.04
   }
  ]
 }
