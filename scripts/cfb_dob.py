@@ -10,6 +10,8 @@ Sources, first that has him (scripts/dob_sources.py):
   0. data/dob_overrides.json "cfb" (key '<name>|<team>'): checked by hand against a cited page
   1. Wikidata entity search (accents, aliases), day precision, a football player whose teams or schools include his
      school
+  1b. Wikidata, no team or school listed but a Sports Reference college football id: the one such item with his
+     name, his name unique on the board, born to fit his class
   2. his school's athletics roster bio (scripts/school_bios.py), when the school prints a birth date
 Each date is kept with its source; a miss is retried after 30 days. --check also compares every dated player's
 Wikidata date with the one used and logs disagreements to data/dob_conflicts_cfb.json. Tankathon's robots.txt
@@ -71,11 +73,24 @@ def main():
             store[key(r)] = {'dob': hits.pop(), 'src': 'wikidata'}; found['wikidata'] += 1
         elif hits and have.get('dob') and DS.gap(have['dob'], next(iter(hits))) > 3:
             conflicts.append({'key': key(r), 'why': 'sources disagree', 'dates': {have.get('src', 'store'): have['dob'], 'wikidata': next(iter(hits))}, 'used': have['dob']})
+    # 1b. Wikidata items with a Sports Reference college football id (all of them, past the per-name search budget)
+    # that list no team or list his school: the one such player with his name, no other board player with it, born
+    # to fit his class
+    import names as N
+    from collections import Counter
+    n_name = Counter(N.key(r[ci['name']]) for r in rows)
+    sr = DS.sr_players('football')
+    found['wikidata-sr'] = 0
+    for r in todo:
+        if (store.get(key(r)) or {}).get('dob'): continue
+        nk = N.key(r[ci['name']])
+        c = [x for x in sr.get(nk, []) if plausible(x['dob'])]
+        if len(c) == 1 and (not c[0]['teams'] or school_in((r[ci['team']] or '').lower(), c[0]['teams'])) and n_name[nk] == 1 and DS.fits_class(c[0]['dob'], r[ci['cls']], SEASON):
+            store[key(r)] = {'dob': c[0]['dob'], 'src': 'wikidata-sr', 'qid': c[0]['qid']}; found['wikidata-sr'] += 1
     # 2. school bios for the rest, best-graded first
     rest = [r for r in todo if not (store.get(key(r)) or {}).get('dob')]
     tid = lambda r: (re.search(r'/(\d+)\.png', r[ci['logo']] or '') or [None, None])[1]
     bios = SB.lookup('cfb', [(r[ci['name']], r[ci['team']], tid(r)) for r in rest], arg('--bios', 300))
-    import names as N
     for r in rest:
         b = bios.get(f"{N.key(r[ci['name']])}|{r[ci['team']]}")
         if b and plausible(b['dob']):

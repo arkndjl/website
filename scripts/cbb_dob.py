@@ -13,6 +13,8 @@ Sources, first that has him (scripts/dob_sources.py):
   3. Wikidata, school not listed: the only basketball player with that name born 2000 on, and his teams are clubs
      (or none, for a player from outside the US), not another college, and no other board player has the name: internationals and pro-to-college transfers, whose items list Trento, Milano,
      Mega, not the school. Names go through Wikidata's entity search, so accents and aliases match.
+  3b. Wikidata, no team listed but a Sports Reference college basketball id: the one such item with his name, his
+     name unique on the board, born to fit his class and within a year of his Barttorvik birth year
   4. Wikipedia search ("<name>" basketball), lead section {{birth date}}, school named in the lead
   5. his school's athletics roster bio (scripts/school_bios.py), when it prints a birth date (also for players whose
      only date is Barttorvik's birth-year stand-in)
@@ -71,6 +73,16 @@ def pick_wd(cands, school):
     if len(c) == 1 and len(clubs) == 1:
         return clubs[0]['dob'], 'wikidata-club' if clubs[0]['teams'] else 'wikidata-name', clubs[0]['qid']
     return None, ('ambiguous' if len(c) > 1 else None), None
+
+
+fits_class = DS.fits_class
+UNI = re.compile(r'\b(university|college)\b')
+HS = re.compile(r'\b(high school|prep|preparatory|academy)\b')
+
+
+def other_college(labels, school):
+    """his Wikidata teams name a college that isn't his school (a namesake, or a transfer the school match missed)"""
+    return any(UNI.search(t) and not HS.search(t) and not school_in(school, t) for t in labels.split('|') if t)
 
 
 def school_of(team): return re.sub(r'\bst$', 'state', (team or '').lower())
@@ -144,6 +156,27 @@ def main():
                 if abs(a - r[ci['age']]) > 0.03:
                     conflicts.append({'key': k, 'name': r[ci['name']], 'team': r[ci['team']], 'why': 'sources disagree',
                                       'dates': {'board age': r[ci['age']], 'wikidata ' + qid: d}, 'used': 'board'})
+    # Wikidata items with a Sports Reference college basketball id but no team (Toni Bryant, Caleb Holt): the one
+    # such player with his name, no other board player with it, born to fit his class and his Barttorvik birth year
+    sr = DS.sr_players('basketball')
+    bt_years = {}
+    try:
+        for v in json.load(open(os.path.join(HERE, 'data', 'cbb_bt_dob.json'))).values():
+            if v[0]: bt_years.setdefault(v[1], set()).add(int(v[0][:4]))
+    except (OSError, ValueError): pass
+    found['wikidata-sr'] = 0
+    season = today.year if today.month >= 7 else today.year - 1
+    still = []
+    for r in miss:
+        nk = N.key(r[ci['name']])
+        c = [x for x in sr.get(nk, []) if plausible(x['dob'])]
+        if len(c) == 1 and n_name[nk] == 1 and not other_college(c[0]['teams'], school_of(r[ci['team']])) \
+                and fits_class(c[0]['dob'], r[ci['cls']], season, bt_years.get(nk)):
+            store[key(r[ci['name']], r[ci['team']])] = {'name': r[ci['name']], 'dob': c[0]['dob'], 'src': 'wikidata-sr',
+                                                        'qid': c[0]['qid'], 'sr': c[0]['sr']}
+            found['wikidata-sr'] += 1
+        else: still.append(r)
+    miss = still
     # Wikipedia search for the rest, best-graded first (Wikimedia rate limits: a capped number a run)
     miss.sort(key=lambda r: r[ci['ovr']])
     wp = DS.wikipedia([r[ci['name']] for r in miss], 'basketball', limit=int(os.environ.get('WP_MAX', 120)))

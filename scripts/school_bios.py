@@ -11,7 +11,7 @@ layout most schools use) lists each player's bio link; a bio is read only for a 
 (scripts/names.py) matches the link's slug. Bios are plain public pages; every site's robots.txt is read first and
 honored, one request per site at a time, a second apart, under a generic UA. Results are cached in
 scripts/data/school_bios_<sport>.json (sites 60 days, roster links 7, bios 30 days a miss; a site that shows a bot
-wall is left alone until its roster is due again) and returned to the caller as
+wall is left alone for a day) and returned to the caller as
 {'<name key>|<team>': {'dob', 'url'}}. Most D-I bios carry no birth date; the ones that do are exact.
 """
 import concurrent.futures as cf, datetime as dt, json, os, re, subprocess, sys, time, urllib.parse, urllib.robotparser
@@ -21,10 +21,11 @@ import names as N
 
 ROOT = os.path.dirname(HERE)
 UA = 'arkboard-research/1.0 (+https://arkndjl.net)'
-SPORT = {'cbb': ('basketball/mens-college-basketball', 'mens-basketball', 'static/data/cbb-all.json'),
-         'cfb': ('football/college-football', 'football', 'static/data/cfb-all.json')}
+SPORT = {'cbb': ('basketball/mens-college-basketball', ('mens-basketball', 'mbball', 'm-baskbl', 'mbkb'), 'static/data/cbb-all.json'),
+         'cfb': ('football/college-football', ('football', 'fball', 'm-footbl'), 'static/data/cfb-all.json')}
 MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December'
-BORN = re.compile(r'\bBorn\b[^.<>]{0,80}?\b(' + MONTHS + r')\.?\s+(\d{1,2}),?\s+((?:19|20)\d\d)')
+# full or short month ("Born Nov. 14, 2007"): the short form is the first three letters (Sept. too)
+BORN = re.compile(r'\bBorn\b[^.<>]{0,80}?\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2}),?\s+((?:19|20)\d\d)')
 BDAY = re.compile(r'Birth\s?date\W{0,20}(\d{1,2})/(\d{1,2})/((?:19|20)\d\d)', re.I)
 
 
@@ -84,8 +85,12 @@ def sites_for(names):
 BLOCK = re.compile(r'Incapsula|_Incapsula_Resource|Just a moment\.\.\.|cf-chl|captcha', re.I)
 
 
+ROSTER_LINK = r'/roster/(?:player/[a-z0-9-]+(?=["\'?#/\\])|(?!season/|coaches/|staff/)[a-z0-9-]+/\d+)'
+
+
 def slug_key(u):
-    m = re.search(r'/roster/([a-z0-9-]+)/\d+', u)
+    """a bio link's name key: the older Sidearm layout (/roster/<slug>/<id>) or the newer one (/roster/player/<slug>)"""
+    m = re.search(r'/roster/player/([a-z0-9-]+)$', u) or re.search(r'/roster/([a-z0-9-]+)/\d+$', u)
     return N.key(m.group(1).replace('-', ' ')) if m else None
 
 
@@ -93,14 +98,14 @@ def parse_dob(html):
     text = re.sub(r'<[^>]+>', ' ', html)
     m = BORN.search(text)
     if m:
-        mo = MONTHS.split('|').index(m[1]) + 1
+        mo = [x[:3] for x in MONTHS.split('|')].index(m[1]) + 1
         return f'{m[3]}-{mo:02d}-{int(m[2]):02d}'
     m = BDAY.search(text)
     if m and 1 <= int(m[1]) <= 12 and 1 <= int(m[2]) <= 31: return f'{m[3]}-{int(m[1]):02d}-{int(m[2]):02d}'
     return None
 
 
-def site_job(host, path, want, C, today, budget):
+def site_job(host, paths, want, C, today, budget):
     """one school: its roster links (cached 7 days), then the bios of the wanted players not read in the last 30 days.
     Returns ({key: {'dob', 'url'}}, new bio cache rows, status)"""
     ros = C['rosters'].get(host)
@@ -113,19 +118,20 @@ def site_job(host, path, want, C, today, budget):
             rp.parse(body.splitlines() if code == 200 else [])
         return rp.can_fetch(UA, u)
     status = 'cached'
-    if not ros or (today - dt.date.fromisoformat(ros['checked'])).days >= 7:
-        roster = f'https://{host}/sports/{path}/roster'
-        if not allowed(roster): status = 'robots'; links = {}
-        else:
+    if not ros or (today - dt.date.fromisoformat(ros['checked'])).days >= (1 if ros.get('status') == 'blocked' else 7):
+        status, links = 'roster', {}
+        for p in paths:   # schools name the sport's folder differently (mens-basketball, mbball, m-baskbl)
+            roster = f'https://{host}/sports/{p}/roster'
+            if not allowed(roster): status = 'robots'; break
             code, html = get(roster)
-            if BLOCK.search(html[:5000]): status, links = 'blocked', {}   # a bot wall: leave the site alone
-            elif code != 200: status, links = 'roster', {}
-            else:
-                status, links = 'ok', {}
-                for u in set(re.findall(r'/sports/' + re.escape(path) + r'/roster/[a-z0-9-]+/\d+', html)):
-                    k = slug_key(u)
-                    if k: links.setdefault(k, []).append(u)
-                links = {k: v[0] for k, v in links.items() if len(v) == 1}
+            if BLOCK.search(html[:5000]): status = 'blocked'; break   # a bot wall: leave the site alone
+            if code != 200: continue
+            status = 'ok'
+            for u in set(re.findall(r'/sports/' + re.escape(p) + ROSTER_LINK, html)):
+                k = slug_key(u)
+                if k: links.setdefault(k, []).append(u)
+            links = {k: v[0] for k, v in links.items() if len(v) == 1}
+            if links: break
         ros = C['rosters'][host] = {'checked': today.isoformat(), 'status': status, 'links': links}
     if ros.get('status') in ('blocked', 'robots'): return {}, {}, ros['status']
     found, rows = {}, {}
@@ -149,11 +155,11 @@ def site_job(host, path, want, C, today, budget):
     return found, rows, status
 
 
-def lookup(sport, want_rows, max_bios=600, today=None, threads=8):
+def lookup(sport, want_rows, max_bios=600, today=None, threads=4):
     """want_rows: [(name, team, espn team id)] -> {'<name key>|<team>': {'dob', 'url'}}"""
     today = today or dt.date.today()
     C = load(sport)
-    path = SPORT[sport][1]
+    paths = SPORT[sport][1]
     teams = espn_teams(sport)
     by_team = {}
     for name, team, tid in want_rows:
@@ -169,7 +175,7 @@ def lookup(sport, want_rows, max_bios=600, today=None, threads=8):
     with cf.ThreadPoolExecutor(threads) as ex:
         for (tid, team), want in by_team.items():
             host = C['sites'].get(teams[tid], {}).get('host')
-            if host: jobs[ex.submit(site_job, host, path, want, C, today, budget)] = host
+            if host: jobs[ex.submit(site_job, host, paths, want, C, today, budget)] = host
         for f in cf.as_completed(jobs):
             try: found, rows, st = f.result()
             except Exception as e: found, rows, st = {}, {}, f'error {e}'
