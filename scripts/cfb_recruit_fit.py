@@ -1068,6 +1068,9 @@ def main():
         # the index with the 247 composite, for the classes CFBD's copy covers (scripts/cfb_recruit.mjs indexOf)
         ic = json.load(open(RETARGET)).get('indexComp')
         if ic: out['indexComp'] = ic
+        # ARK stars are cut on the index's expected NFL outcome (scripts/cfb_recruit_retarget.py stars_block)
+        si = json.load(open(RETARGET)).get('stars')
+        if si: out['stars']['idx'] = si
         out['boardWeights'] = board_test
     sf = os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json')
     if os.path.exists(sf):   # 247's pages sit behind a bot check: a class this run could not read keeps its last snapshot
