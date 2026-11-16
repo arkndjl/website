@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""1NTERLYTICS: 1NT's descriptive history book for the team tab of /laursen_111/.
+"""1NTERLYTICS: 1NT's descriptive history book for the 1NTERLYTICS tab of /1nt/.
 
 Reads every official 1NT match (research/esea_1nt_history.json.gz, scripts/esea_1nt_history.mjs) plus any
 finished match in data/esea.json the history has not caught yet, and writes data/esea_lab.json:

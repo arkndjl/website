@@ -1,0 +1,64 @@
+{{- /* achievements.exe: LAURSEN_111's unlocks as pixel badges, every value read from data (no hand copy):
+       data/cs.json results (ESEA log, podiums, FACEIT ladder), data/esea.json (live season, profile.me,
+       profile.split aces, allTime 1NT line). {{< lzwall class="desk__wide" >}} */ -}}
+{{- $c := site.Data.cs -}}
+{{- $d := site.Data.esea -}}
+{{- $me := dict }}{{ with $d }}{{ with .profile }}{{ with .me }}{{ $me = . }}{{ end }}{{ end }}{{ end -}}
+{{- $sp := dict }}{{ with $d }}{{ with .profile }}{{ with .split }}{{ $sp = . }}{{ end }}{{ end }}{{ end -}}
+{{- $at := dict }}{{ with $d }}{{ range .allTime.rows }}{{ if eq .name $c.player.nickname }}{{ $at = . }}{{ end }}{{ end }}{{ end -}}
+{{- $livePlayed := false }}{{ with $d }}{{ with .record }}{{ if .played }}{{ $livePlayed = true }}{{ end }}{{ end }}{{ end -}}
+{{- $liveMain := false }}{{ with $d }}{{ with .championship }}{{ if findRE "(?i)\\bMain\\b" .name }}{{ $liveMain = $livePlayed }}{{ end }}{{ end }}{{ end -}}
+{{- $seasons := len $c.results.esea }}{{ if $livePlayed }}{{ $seasons = add $seasons 1 }}{{ end -}}
+{{- $main := len (where $c.results.esea "div" "Main") }}{{ if $liveMain }}{{ $main = add $main 1 }}{{ end -}}
+{{- $1nt := where $c.results.esea "team" "1NT" }}{{ $c1 := len $1nt }}{{ if $livePlayed }}{{ $c1 = add $c1 1 }}{{ end -}}
+{{- $aces := 0 }}{{ range slice "pug" "scrim" "league" }}{{ with index $sp . }}{{ $aces = add $aces (int (.aces | default 0)) }}{{ end }}{{ end -}}
+{{- $top := $c.results.faceit -}}
+{{- $topS := slice }}{{ range sort $top "season" }}{{ $topS = $topS | append (printf "S%v" .season) }}{{ end -}}
+{{- $b := slice -}}
+{{- range where $c.results.esea "podium" true }}
+  {{- $b = $b | append (dict "ic" "px-tr-medal-3" "v" (replaceRE "(?i)\\s*place$" "" .finish) "k" (printf "ESEA %s S%v" .div .season) "s" (printf "%s%s" .team (cond (isset . "prize") (printf " · %s" (.prize | default "")) "")) "gold" true) }}
+{{- end }}
+{{- with $top }}{{ $b = $b | append (dict "ic" "px-tr-faceit-top1000" "v" (printf "×%d" (len .)) "k" "FACEIT NA top 1000" "s" (delimit $topS " ") "gold" true) }}{{ end }}
+{{- with $me.level }}{{ $b = $b | append (dict "ic" "px-faceit10" "v" (string .) "k" "FACEIT level" "s" (printf "%s elo" (lang.FormatNumber 0 $me.elo))) }}{{ end }}
+{{- $b = $b | append (dict "ic" "px-tr-esea-main" "v" (string $main) "k" "ESEA Main seasons" "s" (printf "%d ESEA seasons" $seasons)) }}
+{{- $b = $b | append (dict "ic" "px-1nt" "v" "C" "k" "1NT captain" "s" (printf "%d seasons" $c1)) }}
+{{- with $at.maps }}{{ $b = $b | append (dict "ic" "px-tr-esea-open" "v" (string .) "k" "1NT maps" "s" (printf "%d–%d" (int $at.w) (int $at.l))) }}{{ end }}
+{{- with $at.k }}{{ $b = $b | append (dict "ic" "px-awp" "v" (lang.FormatNumber 0 .) "k" "1NT kills" "s" (printf "%v K/D" $at.kd)) }}{{ end }}
+{{- if gt $aces 0 }}{{ $b = $b | append (dict "ic" "px-ak47" "v" (string $aces) "k" "aces" "s" "FACEIT, scrims, 1NT") }}{{ end }}
+{{- with $me.longestStreak }}{{ $b = $b | append (dict "ic" "icon-trophy" "v" (string .) "k" "win streak" "s" "FACEIT") }}{{ end }}
+{{- with $me.matches }}{{ $b = $b | append (dict "ic" "icon-crosshair" "v" (lang.FormatNumber 0 .) "k" "FACEIT matches" "s" (printf "%d%% won" (int $me.winRate))) }}{{ end }}
+{{- with $c.player.faceit_since }}{{ $b = $b | append (dict "ic" "icon-calendar" "v" (string .) "k" "on FACEIT since" "s" (printf "Steam %s" $c.player.steam_since)) }}{{ end }}
+<div class="win lzw{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>achievements.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <ul class="lzw__grid">
+    {{- range $b }}{{ $wide := or (eq .ic "px-ak47") (eq .ic "px-awp") }}{{ $sm := hasPrefix .ic "icon-" }}
+    <li class="lzw__b{{ if .gold }} is-gold{{ end }}">
+      <span class="lzw__ic{{ if $wide }} is-wide{{ end }}{{ if $sm }} is-sm{{ end }}">{{ if eq .ic "px-1nt" }}<img src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="" width="40" height="40">{{ else }}<svg aria-hidden="true"><use href="#{{ .ic }}"/></svg>{{ end }}</span>
+      <b class="lzw__v">{{ .v }}</b>
+      <span class="lzw__k">{{ .k }}</span>
+      <span class="lzw__s">{{ .s }}</span>
+    </li>
+    {{- end }}
+  </ul>
+  <div class="win__status"><span>{{ len $b }} unlocked</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.lzw__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;list-style:none;margin:0;padding:12px}
+.lzw__b::before{content:none!important}
+.lzw__b{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:10px;align-items:center;padding:10px;background:var(--win-well);box-shadow:inset 2px 2px 0 var(--win-dark),inset -2px -2px 0 var(--win-light)}
+.lzw__b.is-gold{box-shadow:inset 0 0 0 2px var(--n1-lilac),inset 4px 4px 0 var(--win-dark)}
+.lzw__b.is-gold::after{content:"";position:absolute;right:6px;top:6px;width:6px;height:6px;background:var(--n1-lilac);box-shadow:-8px 0 0 var(--lz-lilac,#c8c7ff)}
+.lzw__ic{grid-row:1/4;display:flex;align-items:center;justify-content:center;width:44px;height:52px}
+.lzw__ic svg{width:32px;height:40px;color:var(--n1-lilac);fill:currentColor}
+.lzw__ic.is-sm svg{width:28px;height:28px}
+.lzw__ic.is-wide svg{width:44px;height:14px}
+.lzw__ic img{width:40px;height:40px;object-fit:contain;border:0;padding:0;margin:0;box-shadow:none;background:none}
+.lzw__v{font-weight:normal;font-size:1.6em;line-height:1;color:#fff}
+.lzw__b.is-gold .lzw__v{color:var(--n1-lilac)}
+.lzw__k{font-size:.7em;letter-spacing:.1em;text-transform:uppercase;color:var(--n1-grey)}
+.lzw__s{font-size:.75em;color:var(--foreground);opacity:.8;overflow-wrap:anywhere}
+@media (max-width:684px){.lzw__grid{grid-template-columns:repeat(2,minmax(0,1fr));padding:8px;gap:6px}.lzw__b{grid-template-columns:34px minmax(0,1fr);padding:8px;column-gap:8px}.lzw__ic{width:34px;height:44px}.lzw__ic svg{width:26px;height:32px}.lzw__ic.is-wide svg{width:34px;height:11px}.lzw__ic.is-sm svg{width:22px;height:22px}.lzw__v{font-size:1.3em}}
+</style>

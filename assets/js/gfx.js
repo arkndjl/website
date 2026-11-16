@@ -7,11 +7,11 @@
   // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
-  var SITE = 'arkndjl.net/' + ([[/^\/laursen_111/i, '1nt'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
+  var SITE = 'arkndjl.net/' + ([[/^\/1nt/i, '1nt'], [/^\/laursen_111/i, 'laursen_111'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
     [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'],
     [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/reference/, 'reference'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
-  function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/1nt$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
+  function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/(1nt|laursen_111)$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   function loadPhoto(src) {
@@ -1746,7 +1746,7 @@
     row.insertAdjacentHTML('afterend', m ? pdHtml(m.closest('.win'), m.closest('table'), m, pdExtra(row), row.cells.length) : pdHtml(win, table, row)); return row.nextElementSibling;
   }
   document.addEventListener('click', function (e) {
-    if (/1nt$/.test(SITE)) return;
+    if (/(1nt|laursen_111)$/.test(SITE)) return;
     var t = e.target; if (!t.closest) return;
     var table = t.closest('table'); if (!table || !table.tHead || !table.tBodies[0]) return;
     if (t.closest('thead')) { pdClose(table); return; }
@@ -1762,7 +1762,7 @@
   // button in every dropdown that has none (the CFB board draws its own card)
   function pcName(r, ni) { var c = r.cells[ni]; if (!c) return ''; c = (c.querySelector('button.cfb__who, b') || c).cloneNode(true); c.querySelectorAll('svg, .gfx-off, .cfb__dim').forEach(function (e) { e.remove(); }); return txt(c); }
   function addCardPickers() {
-    if (/1nt$/.test(SITE)) return;
+    if (/(1nt|laursen_111)$/.test(SITE)) return;
     document.querySelectorAll('[data-gfx]').forEach(function (btn) {
       if (btn.getAttribute('data-gfx-mode') || btn.dataset.gfxCard) return;
       var win = btn.closest('.win'), table = win && win.querySelector('table'); if (!table || !table.tHead || win.hasAttribute('data-cfb')) return;
@@ -1788,7 +1788,7 @@
     });
   }
   function addCardButtons() {
-    if (/1nt$/.test(SITE)) return;
+    if (/(1nt|laursen_111)$/.test(SITE)) return;
     document.querySelectorAll('tr.cfb__detail, tr.cfbm__detail, tr.cfbrc__detail').forEach(function (d) {
       if (d.querySelector('[data-gfx]') || d.closest('[data-cfb]')) return;
       var row = d.previousElementSibling, table = d.closest('table'); if (!row || !table || pcNameAt(pcHeads(table).map(txt)) < 0) return;
@@ -2809,7 +2809,7 @@
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
-        var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
+        var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
         var name = mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);

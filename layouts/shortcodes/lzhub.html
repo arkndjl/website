@@ -1,0 +1,140 @@
+{{- /* The LAURSEN_111 section shell (content/laursen_111.md): teal-on-charcoal palette, the hero (pixel
+       portrait, live/offline from the Twitch player, FACEIT level and elo, career tiles, socials, next stream)
+       and the page's tabs inside. {{< lzhub >}} {{< wintabs ... >}} {{< /lzhub >}}
+       Shares the window parts of the 1NT page (n1.html, esea.html), which read the --n1-* colours set here.
+       Data: data/cs.json (player, links, results), data/esea.json (profile.me live FACEIT, next 1NT match). */ -}}
+{{- $p := site.Data.cs.player -}}
+{{- $d := site.Data.esea -}}
+{{- $me := dict }}{{ with $d }}{{ with .profile }}{{ with .me }}{{ $me = . }}{{ end }}{{ end }}{{ end -}}
+{{- $elo := $p.faceit_elo }}{{ with $me.elo }}{{ $elo = lang.FormatNumber 0 . }}{{ end -}}
+{{- $lvl := $p.faceit_level }}{{ with $me.level }}{{ $lvl = . }}{{ end -}}
+<style>
+html:has(.lz){--background:#0e1113;--win-face:#151a1c;--win-well:#0a0d0e;--win-dark:#030404;--win-light:#4c5a5e;--win-title:#1d2629;--accent:#7fffd4;--foreground:#eef7f5;--n1-grey:#8a9a9c;--n1-line:#24302f;--n1-lilac:#7fffd4;--n1-loss:#c8c7ff;--lz-lilac:#c8c7ff;--lz-red:#ff5a6e}
+.post:has(.lz)>.post-title{display:none}
+.lz{margin:0 0 2rem}
+.lz>.wintabs{max-width:none}
+.lz img.esea__logo,.lz img.csres__ic--1nt{border:0;padding:0;margin:0;box-shadow:none;background:none;image-rendering:auto;object-fit:contain}
+html:has(.lz) table tbody tr{background:#141a1b}
+html:has(.lz) table tbody tr:nth-child(even){background:#101516}
+html:has(.lz) table tbody tr:hover{background:#21302f}
+html:has(.lz) .wintable__scroll{background:var(--win-well);border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark)}
+.lz .win__title{box-shadow:inset 0 -2px 0 var(--n1-lilac)}
+.lz .esea-box tbody tr:nth-child(odd) td{background:rgba(255,255,255,.03)}
+.lz-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 24px;align-items:center;padding:20px 20px 0;margin:0 0 14px;background:#080b0c;border:2px solid;border-color:var(--win-light) var(--win-dark) var(--win-dark) var(--win-light)}
+.lz-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(127,255,212,.045) 2px 3px)}
+.lz-hero>*{position:relative}
+.lz-av{position:relative;width:176px}
+.lz-av img{display:block;width:176px;height:176px;image-rendering:pixelated;border:0;padding:0;margin:0;background:#000;box-shadow:0 0 0 2px var(--n1-lilac),6px 6px 0 #000}
+.lz-live{position:absolute;left:-4px;bottom:-10px;display:inline-flex;align-items:center;gap:6px;padding:2px 8px;font-size:.8em;letter-spacing:.14em;background:#1d2629;color:var(--n1-grey);box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark),3px 3px 0 #000}
+.lz-live i{width:8px;height:8px;background:currentColor}
+.lz-live[data-live="1"]{background:var(--lz-red);color:#fff}
+.lz-live[data-live="1"] i{animation:lzblink 1s steps(2) infinite}
+@keyframes lzblink{50%{opacity:0}}
+.lz-h{margin:0 0 6px;font-size:64px;line-height:1;font-weight:normal;color:#fff;letter-spacing:.03em;text-shadow:4px 4px 0 #000,0 0 0 var(--n1-lilac);overflow-wrap:anywhere}
+.lz-h::before,.lz-h::after{content:none}
+.lz-h span{color:var(--n1-lilac)}
+.lz-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 12px;color:var(--n1-grey)}
+.lz-meta svg{width:22px;height:22px;vertical-align:middle}
+.lz-meta .esea-flag{width:24px;height:16px}
+.lz-meta b{font-weight:normal;color:#fff}
+.lz-stats{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.lz-stats li::before,.lz-soc li::before{content:none!important}
+.lz-stats li{display:flex;flex-direction:column;min-width:84px;padding:6px 10px;background:#101516;box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark)}
+.lz-stats b{font-weight:normal;font-size:1.35em;color:#fff;line-height:1.1}
+.lz-stats span{font-size:.7em;letter-spacing:.1em;text-transform:uppercase;color:var(--n1-grey)}
+.lz-stats .is-t b{color:var(--n1-lilac)}
+.lz-soc{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
+.lz-soc a{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:#101516;color:#fff;text-decoration:none;box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark)}
+.lz-soc a:hover,.lz-soc a:focus-visible{background:var(--n1-lilac);color:#080b0c}
+.lz-soc svg{width:16px;height:16px;fill:currentColor}
+.lz-band{grid-column:1/-1;height:6px;margin:14px -20px 0;background:repeating-linear-gradient(90deg,var(--n1-lilac) 0 12px,var(--lz-lilac) 12px 24px)}
+.lz-tick{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin:0 -20px;padding:8px 20px;background:#101516;font-size:.9em}
+.lz-tick__k{color:#080b0c;background:var(--n1-lilac);padding:0 6px;letter-spacing:.1em}
+.lz-tick b{font-weight:normal;color:#fff}
+.lz-tick a{color:var(--n1-lilac)}
+.lz-dim{color:var(--n1-grey)}
+.lz>.wintabs>.wintabs__strip{gap:4px;padding:0}
+.lz>.wintabs>.wintabs__strip>.wintabs__tab{padding:6px 18px 8px;font-size:1.05em;letter-spacing:.1em;color:var(--n1-grey)}
+.lz>.wintabs>.wintabs__strip>.wintabs__tab.is-active{color:#fff;box-shadow:inset 0 3px 0 var(--n1-lilac);padding-top:8px;padding-bottom:10px}
+@media (max-width:684px){
+ .lz-hero{grid-template-columns:auto minmax(0,1fr);padding:14px 14px 0;gap:10px 14px}
+ .lz-av{grid-row:1/3}
+ .lz-av,.lz-av img{width:96px;height:96px}
+ .lz-h{grid-column:2;align-self:end;margin:0;font-size:clamp(20px,7vw,40px);white-space:nowrap}
+ .lz-id{display:contents}
+ .lz-meta{grid-column:2;align-self:start;margin:0;font-size:.9em}
+ .lz-stats{grid-column:1/-1;margin-top:8px}
+ .lz-stats li{min-width:0;flex:1 1 calc(33% - 6px)}
+ .lz-soc a{flex:1 1 auto;justify-content:center;padding:6px 8px}
+ .lz-soc li{flex:1 1 calc(33% - 6px);display:flex}
+ .lz-band{margin:12px -14px 0}
+ .lz-tick{margin:0 -14px;padding:8px 14px}
+ .lz>.wintabs>.wintabs__strip{overflow-x:auto}
+ .lz>.wintabs>.wintabs__strip>.wintabs__tab{padding:6px 12px 8px;font-size:.95em}
+}
+</style>
+<div class="lz">
+<header class="lz-hero">
+  <div class="lz-av">
+    <img src="{{ $p.avatar | relURL }}" alt="{{ $p.nickname }}" width="176" height="176">
+    <span class="lz-live" data-lz-live title="twitch.tv/laursen_111"><i aria-hidden="true"></i><span data-lz-live-t>TWITCH</span></span>
+  </div>
+  <div class="lz-id">
+    <h1 class="lz-h">LAURSEN<span>_</span>111</h1>
+    <p class="lz-meta">
+      {{ partial "px/flag.html" (lower $p.country) }}
+      <span><svg viewBox="0 0 16 16" role="img" aria-label="FACEIT level {{ $lvl }}"><use href="#px-faceit10"/></svg> <b>{{ $elo }}</b> elo</span>
+      <span>1NT <b>(c)</b></span>
+    </p>
+    {{- $at := dict }}{{ with $d }}{{ range .allTime.rows }}{{ if eq .name $p.nickname }}{{ $at = . }}{{ end }}{{ end }}{{ end }}
+    <ul class="lz-stats">
+      {{- with $me.kd }}<li><b>{{ . }}</b><span>K/D</span></li>{{ end }}
+      {{- with $me.adr }}<li><b>{{ . }}</b><span>ADR</span></li>{{ end }}
+      {{- with $me.hs }}<li><b>{{ . }}%</b><span>HS</span></li>{{ end }}
+      {{- with $me.matches }}<li><b>{{ lang.FormatNumber 0 . }}</b><span>FACEIT matches</span></li>{{ end }}
+      {{- with $at.maps }}<li class="is-t"><b>{{ . }}</b><span>1NT maps</span></li>{{ end }}
+      {{- range first 1 (where site.Data.cs.results.esea "podium" true) }}<li class="is-t"><b>{{ .finish | replaceRE " place$" "" }}</b><span>ESEA S{{ .season }}</span></li>{{ end }}
+    </ul>
+  </div>
+  <ul class="lz-soc">
+    {{- range site.Data.cs.links }}
+    <li><a href="{{ .href }}" rel="noopener"><svg aria-hidden="true" viewBox="0 0 16 16"><use href="#{{ .icon }}"/></svg>{{ .k }}</a></li>
+    {{- end }}
+  </ul>
+  <div class="lz-band" aria-hidden="true"></div>
+  <p class="lz-tick">
+    {{- with $d.next }}
+    <span class="lz-tick__k">NEXT LIVE</span>
+    <span><a href="{{ "1nt/" | relURL }}">1NT</a> vs <b>{{ .opp.name }}</b></span>
+    <span data-n1-at="{{ .at }}">{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span>
+    <span class="lz-dim" data-n1-count="{{ .at }}"></span>
+    {{- else }}<span class="lz-tick__k">NEXT LIVE</span><span class="lz-dim">–</span>{{ end }}
+  </p>
+</header>
+{{ .Inner }}
+</div>
+<script>
+(function () {   // old 1NT deep links on this page (/laursen_111/#1nt, #1nterlytics, ...) now live on /1nt/
+  var h = (location.hash || '').slice(1).toLowerCase();
+  if (/^(1nt|1nterlytics|matchday|roster|history|watch)$/.test(h)) location.replace('/1nt/#' + (h === '1nt' ? 'matchday' : h));
+})();
+(function () {   // match times in the viewer's own time zone; countdowns tick once a minute
+  var fmt = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
+  function local() {
+    document.querySelectorAll('[data-n1-at]').forEach(function (el) {
+      try { el.textContent = new Date(+el.getAttribute('data-n1-at')).toLocaleString([], fmt).replace(/,/g, ' ·').replace(' · ', ' '); } catch (e) {}
+    });
+  }
+  function tick() {
+    document.querySelectorAll('[data-n1-count]').forEach(function (el) {
+      var s = (+el.getAttribute('data-n1-count') - Date.now()) / 1000;
+      if (s <= -3 * 3600) { el.textContent = ''; return; }
+      if (s <= 0) { el.textContent = 'live now'; return; }
+      var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+      el.textContent = 'in ' + (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + m + 'm';
+    });
+  }
+  function go() { local(); tick(); setInterval(tick, 60000); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>

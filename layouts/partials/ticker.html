@@ -16,7 +16,7 @@
       {{- if .games }}
       {{- $h := .hours }}
       {{- range .games }}
-      <a class="tick__g tick__g--nt" href="/laursen_111/#1nt" data-at="{{ .at }}" data-h="{{ $h }}" data-nt="{{ .id }}" data-bo="{{ .bo }}">
+      <a class="tick__g tick__g--nt" href="/1nt/" data-at="{{ .at }}" data-h="{{ $h }}" data-nt="{{ .id }}" data-bo="{{ .bo }}">
         <span class="tick__l1">
           <span class="tick__ha">vs</span>
           {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
