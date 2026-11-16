@@ -345,10 +345,15 @@ def cbb_feat_live(rows, season, need=('gc', 'gm')):
     out = {}
     if 'gc' in need:
         E.season('cbb', season, [str(g['id']) for g in rows if g.get('hs') is not None])
-        out['gc'] = ratings(gl, game_control('cbb', E.load('cbb', season)), prev=H['final']['gc'].get(str(season - 1), {}), **CBB_FIT)[0]
+        out['gc'], fin = ratings(gl, game_control('cbb', E.load('cbb', season)), prev=H['final']['gc'].get(str(season - 1), {}), **CBB_FIT)
+        LIVE_FINAL['gc'] = fin.get(season, {})
     if 'gm' in need:
-        out['gm'] = ratings(gl, margin_control(rows), prev=H['final']['gm'].get(str(season - 1), {}), **CBB_FIT)[0]
+        out['gm'], fin = ratings(gl, margin_control(rows), prev=H['final']['gm'].get(str(season - 1), {}), **CBB_FIT)
+        LIVE_FINAL['gm'] = fin.get(season, {})
     return out
+
+
+LIVE_FINAL = {}     # cbb_feat_live's team ratings after the finished games (the power table's control parts)
 
 
 if __name__ == '__main__':

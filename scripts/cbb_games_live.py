@@ -712,8 +712,16 @@ def build():
     gm_avg = float(np.mean([gm_t.get(t, 0.0) for t in teams]))
     md_avg = float(np.mean([W.md[t] for t in teams]))
     md_t = {t: float(W.md[t]) for t in teams} if coef.get('mdis') else None
-    rating = cbb_tourney.team_rating(net_, T_, float(R.tau), W.elo, gm_t, teams, coef, md=md_t)
-    edge = lambda g: 0.0 if g['neutral'] else cbb_tourney.home_edge(coef, 1.0 if g.get('conf') else 0.0, g['home'])
+    # game control: each team's rating after the finished games (control_ratings.cbb_feat_live, run above for the games'
+    # inputs); missing (ESPN down) -> average, as the games' input sits at 0
+    import control_ratings
+    gc_t = {t: v for t, v in control_ratings.LIVE_FINAL.get('gc', {}).items() if t in R.ix} if 'gc' in feats else None
+    gc_avg = float(np.mean([gc_t.get(t, 0.0) for t in teams])) if gc_t else 0.0
+    rating = cbb_tourney.team_rating(net_, T_, float(R.tau), W.elo, gm_t, teams, coef, md=md_t, gc=gc_t)
+    # the home edge of a game not yet on the slate: the model's home court with BPI's, conference-home, altitude and the
+    # home side's crowd ('hatt')
+    edge = lambda g: 0.0 if g['neutral'] else (cbb_tourney.home_edge(coef, 1.0 if g.get('conf') else 0.0, g['home'])
+                                                + coef.get('hatt', 0.0) * W.hatt(dict(g, season=SEASON)))
     order = sorted(teams, key=lambda t: -rating[t])
     rk = {t: i + 1 for i, t in enumerate(order)}
     prior_rk = {t: i + 1 for i, t in enumerate(sorted(teams, key=lambda t: -pri.get(t, {}).get('net', -99)))}
@@ -791,7 +799,7 @@ def build():
     tmeta = None
     try:
         nc, tmeta = cbb_tourney.live(rows, set(teams), confs, net_, T_, float(R.tau), W.elo, R.ng, coef, sd, SEASON,
-                                     gm=gm_t if 'gm' in feats else None, md=md_t)
+                                     gm=gm_t if 'gm' in feats else None, md=md_t, gc=gc_t)
         for r in power:
             if r['id'] in nc:
                 r['nc'] = nc[r['id']]
@@ -825,6 +833,8 @@ def build():
                      ['elo', round(coef.get('elo', 0.0) * (W.elo[t] - elo_avg) / 25, 2)]]
             if coef.get('gm'):
                 parts.append(['gm', round(coef['gm'] * (gm_t.get(t, 0.0) - gm_avg), 2)])
+            if gc_t and coef.get('gc'):
+                parts.append(['gc', round(coef['gc'] * (gc_t.get(t, 0.0) - gc_avg), 2)])
             if md_t:
                 parts.append(['market', round(coef['mdis'] * (md_t[t] - md_avg), 2)])
             TD[t] = {'parts': parts, 'pparts': pp}
