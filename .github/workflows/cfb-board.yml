@@ -131,12 +131,13 @@ jobs:
         run: |
           python3 scripts/st_kickers.py --current
           python3 scripts/st_kickers.py cfb
-      # hand-checked birth dates (data/dob_overrides.json, scripts/cfb_dob.py -> data/cfb_dob.json, which fetch_cfb.mjs
-      # reads and fills from Wikidata and Wikipedia)
+      # birth dates (scripts/cfb_dob.py -> data/cfb_dob.json, which fetch_cfb.mjs reads): hand pins, Wikidata entity
+      # search, school athletics bios, best-graded undated players first; Mondays' morning run also checks every
+      # dated player against Wikidata (data/dob_conflicts_cfb.json)
       - name: Birth dates
         continue-on-error: true
-        timeout-minutes: 10
-        run: python3 scripts/cfb_dob.py
+        timeout-minutes: 15
+        run: python3 scripts/cfb_dob.py $( [ "$(date -u +%u%H)" = 111 ] && echo --check )
       # RotoWire's college injury news into scripts/data/rotowire_news.json (scripts/rotowire.py; odds-snap.yml polls it
       # every half hour, this catches the last minutes), read by fetch_cfb.mjs's availability log
       - name: RotoWire injury news
@@ -253,4 +254,4 @@ jobs:
           python3 scripts/data_push.py -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))" \
             --rebuild data/games_picks_cfb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
-            -- 'data/cfb*.json' data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json 'scripts/data/odds/cfb-*.jsonl'
+            -- 'data/cfb*.json' data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json scripts/data/school_bios_cfb.json data/dob_conflicts_cfb.json 'scripts/data/odds/cfb-*.jsonl'

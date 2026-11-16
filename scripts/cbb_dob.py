@@ -14,8 +14,10 @@ Sources, first that has him (scripts/dob_sources.py):
      (or none, for a player from outside the US), not another college, and no other board player has the name: internationals and pro-to-college transfers, whose items list Trento, Milano,
      Mega, not the school. Names go through Wikidata's entity search, so accents and aliases match.
   4. Wikipedia search ("<name>" basketball), lead section {{birth date}}, school named in the lead
+  5. his school's athletics roster bio (scripts/school_bios.py), when it prints a birth date (also for players whose
+     only date is Barttorvik's birth-year stand-in)
 Each date is kept with its source; a miss is retried after 14 days. Matching goes through scripts/names.py.
-Two sources more than 3 days apart, or two same-name Wikidata players, go to data/dob_conflicts.json ("cbb").
+Two sources more than 3 days apart, or two same-name Wikidata players, go to data/dob_conflicts_cbb.json.
     python3 scripts/cbb_dob.py --all        # retry recent misses too (after a source is added)
     python3 scripts/cbb_dob.py --check      # also check every dated board player against Wikidata
 """
@@ -158,6 +160,15 @@ def main():
             if plausible(x['dob']) and DS.gap(x['dob'], v['dob']) > 3 and school_in(school_of(k.split('|', 1)[1]), x['teams']):
                 conflicts.append({'key': k, 'name': v['name'], 'team': k.split('|', 1)[1], 'why': 'override vs Wikidata',
                                   'dates': {'override': v['dob'], 'wikidata ' + x['qid']: x['dob']}, 'used': v['dob']})
+    # school athletics bios for whoever still has no day-precise date (scripts/school_bios.py), best-graded first
+    import school_bios as SB
+    left = sorted([r for r in rows if not (store.get(key(r[ci['name']], r[ci['team']])) or {}).get('dob')], key=lambda r: r[ci['ovr']])
+    tid = lambda r: (re.search(r'/(\d+)\.png', r[ci['logo']] or '') or [None, None])[1]
+    nm = {key(r[ci['name']], r[ci['team']]): r[ci['name']] for r in left}
+    for k, b in SB.lookup('cbb', [(r[ci['name']], r[ci['team']], tid(r)) for r in left], int(os.environ.get('BIO_MAX', 300))).items():
+        if plausible(b['dob']):
+            store[k] = {'name': nm.get(k, k.split('|')[0]), 'dob': b['dob'], 'src': 'school', 'url': b['url']}
+            found['school'] = found.get('school', 0) + 1
     if check or conflicts: DS.log_conflicts('cbb', conflicts)
     json.dump(dict(sorted(store.items())), open(OUT, 'w'), indent=0, separators=(',', ':'))
     have = sum(1 for v in store.values() if v.get('dob'))
