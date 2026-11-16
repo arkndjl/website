@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T04:19:35Z",
+ "asof": "2026-11-16T04:24:32Z",
  "recenter": {
-  "2026-11-16": 2.01
+  "2026-11-16": 2.02
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T04:13:52Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [],
@@ -2165,28 +2165,12 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 3.9,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
    "m": 11.4,
    "tm": 156.2
-  },
-  {
-   "id": "401927364",
-   "sport": "cbb",
-   "kick": "2026-11-17T00:30:00Z",
-   "home": "Drake",
-   "away": "Tarleton State",
-   "mk": "total",
-   "side": "under",
-   "line": 146.5,
-   "price": -124.0,
-   "edge": 4.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 14.0,
-   "tm": 141.6
   },
   {
    "id": "401916307",
@@ -2235,6 +2219,22 @@
    "why": "edge under 6.5 (tier: mixed)",
    "m": 35.8,
    "tm": 157.5
+  },
+  {
+   "id": "401927364",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:30:00Z",
+   "home": "Drake",
+   "away": "Tarleton State",
+   "mk": "total",
+   "side": "under",
+   "line": 145.5,
+   "price": -110.0,
+   "edge": 3.9,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 14.0,
+   "tm": 141.6
   },
   {
    "id": "401924265",
@@ -2450,7 +2450,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -2594,9 +2594,9 @@
   "401927364": {
    "mk": "total",
    "side": "under",
-   "line": 146.5,
-   "price": -124.0,
-   "edge": 4.9,
+   "line": 145.5,
+   "price": -110.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "Drake",
@@ -2717,7 +2717,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16426,
+  "snapshots": 16433,
   "buckets": [
    {
     "when": "24h+",
@@ -2730,11 +2730,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3256,
+    "clvN": 3259,
     "clvRet": -0.0218,
-    "clvT": -12.05,
+    "clvT": -12.08,
     "clv": 0.31,
-    "beat": 0.35,
+    "beat": 0.349,
     "still": 0.461
    },
    {
@@ -19264,7 +19264,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T04:19:35Z",
+ "checked": "2026-11-16T04:24:32Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
