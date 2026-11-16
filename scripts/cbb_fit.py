@@ -165,7 +165,9 @@ def features(c, i):
         f['age_x_rk'] = (a - 18.9) * (f['rg_lrk'] + math.log(100)) if a else None
     if prev:
         a = D.age_on(c['dob'], s['year'] - 1, 11, 1)
-        f['age'] = a if a else 18.6 + len(prev)
+        # unknown birth date: 18.6 plus his years in college, counted from the class Barttorvik lists (a D-II, juco or
+        # pro transfer has fewer D-I seasons than years; counting seasons alone made a senior from Daemen a 19.6 breakout)
+        f['age'] = a if a else 18.6 + max(len(prev), CLS.get(prev[-1].get('yr'), 0))
         f['age_known'] = 1.0 if a else 0.0
         L = season_line(prev[-1])
         for k, v in L.items(): f[k] = v
