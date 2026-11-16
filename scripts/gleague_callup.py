@@ -16,7 +16,7 @@ Rows: a player's G League season (both season types summed, 50+ minutes). Featur
 minutes, games, per-36 box (pts reb ast stl blk tov 3PA FTA, Game Score, +/-), TS%, usage, AST%, OREB%, DREB%, net
 rating, PIE; NBA history through LAST season only (log career minutes, career XPM shrunk to -2 with 500 MP), draft
 round 1 / 2, log pick, years since the draft; `part` = 1 while only the Showcase Cup is played, falling to 0 as the
-34-game regular season fills. Training pools full seasons 2008-25 with Showcase-only rows 2022-25 (part 1).
+34-game regular season fills. Training pools full seasons 2009-25 (2008-09 on) with Showcase-only rows 2022-25 (part 1).
 Targets: NBA 1 = any NBA minutes next season; NBA 500 = 500+ minutes (per 82 games); xVORX 3Y = P(any NBA game in the
 next 3 seasons) x E[3-season VORX | he plays] (ridge on those who played). Ridge logistic (lambda 1), standardized.
 Backtest: leave one season out, scored per season against the same model without G League production.
@@ -259,7 +259,10 @@ def research():
     for y in range(2008, current_season() + 1): fetch(y, fresh=(y >= current_season() - 1))
     rows = []      # (season, features, targets, sc flag)
     seasons = {}
-    for y in range(2008, LAST1 + 1):
+    # from 2008-09: a 2007-08 row's label is the 2008-09 NBA season, before the XPM boards (2009-10 on), so every one
+    # read 'no NBA'. Dropping them (Nov 16 2026), leave one season out: NBA% LL .3345 -> .3338 (t -0.7, 10/17), 500%
+    # .1886 -> .1885 (t -0.4, 11/17), xVORX MSE .881 -> .880 (t -1.8, 11/15); shipped as a label fix
+    for y in range(2009, LAST1 + 1):
         seasons[y] = (gl_season(y), [gl_season(y, ('SC',))] if y >= 2022 else [])
     births = collections.defaultdict(list); nm = {}
     for y, (full, scs) in seasons.items():
