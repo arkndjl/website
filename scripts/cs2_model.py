@@ -535,13 +535,31 @@ def build():
                 tpp[(k1, k2)], tpp[(k2, k1)] = c["p"], 1 - c["p"]
     except Exception as ex:  # noqa: BLE001
         print("thunderpick blend skipped:", ex)
+    # market rating (scripts/cs2odds.py): ridge Bradley-Terry on CS2Odds bookmaker closes, as a second-stage term on the
+    # model's logit (research/cs2_market_prereg.md H2, held t -2.7 by day). Matches tab and the Thunderpick archive's
+    # model column; ARK Ranking, event odds and Pick'Em stay on the ratings alone.
+    mkw, mkr = None, {}
+    try:
+        import cs2odds
+        mres = json.loads((ROOT / "data" / "cs2_market_research.json").read_text())["tests"]["H2"]
+        if mres.get("pass"):
+            mkw, mkr = mres["w"], cs2odds.rating()
+    except Exception as ex:  # noqa: BLE001
+        print("cs2 market rating skipped:", ex)
+
+    def mchance(ka, kb, bo=3):
+        p = chance(ka, kb, bo)
+        if mkw is None:
+            return p
+        f = mkr[ka] - mkr[kb] if ka in mkr and kb in mkr else 0.0
+        return float(1 / (1 + math.exp(-(mkw[0] * cs2_bo3.logit(p) + mkw[1] * f))))
     matches = []
     for m in H.get("upcoming", []):
         ka, kb = key(m["a"]), key(m["b"])
         if ka not in names and kb not in names:
             continue
         bo = int(m["fmt"][2:]) if (m.get("fmt") or "").startswith("Bo") and m["fmt"][2:].isdigit() else 3
-        pa = chance(ka, kb, bo)
+        pa = mchance(ka, kb, bo)
         pm = poly_pa(ka, kb, m.get("ts") or 0)
         pmod = pa
         pa = cs2_poly.blend(pa, pm, is_top(ka, kb), pfit)
@@ -600,7 +618,7 @@ def build():
             ka, kb = key(r["n1"]), key(r["n2"])
             ka, kb = bo3.k(r["t1"]) or ka, bo3.k(r["t2"]) or kb
             if ka in names and kb in names:
-                tp[str(mid)] = round(chance(ka, kb, r.get("bo") or 3), 4)
+                tp[str(mid)] = round(mchance(ka, kb, r.get("bo") or 3), 4)
     # Novig's moneyline where it lists the series (none listed as of Oct 27 2026; scripts/novig.py archives any it does)
     try:
         import novig
