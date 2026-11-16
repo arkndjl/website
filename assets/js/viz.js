@@ -44,6 +44,17 @@
       td.classList.toggle('vz-up', /^(\+\d|W\d)/.test(s)); td.classList.toggle('vz-dn', /^([\-−]\d|L\d)/.test(s));
     }
   }
+  // th[data-sparse]: a column only some rows have (special teams, an under-22 grade) shows only when a quarter of the rows in view fill it
+  function sparse(t, c, n) {
+    var cells = [], filled = 0;
+    for (var b = 0; b < t.tBodies.length; b++) for (var i = 0, R = t.tBodies[b].rows; i < R.length; i++) {
+      var r = R[i]; if (r.cells.length !== n || r.style.display === 'none' || r.hidden) continue;
+      var td = r.cells[c]; cells.push(td); if (!/^[\s–—-]*$/.test(td.textContent)) filled++;
+    }
+    var hide = cells.length > 0 && filled < cells.length * 0.25;
+    headRow(t).cells[c].classList.toggle('vz-hide', hide);
+    for (i = 0; i < cells.length; i++) cells[i].classList.toggle('vz-hide', hide);
+  }
   function keyCol(t, n) {
     var hits = [], rows = 0;
     for (var b = 0; b < t.tBodies.length; b++) for (var i = 0, R = t.tBodies[b].rows; i < R.length && rows < 60; i++) {
@@ -62,6 +73,7 @@
     var count = 0; for (i = 0; i < t.tBodies.length; i++) count += t.tBodies[i].rows.length;
     if (count > MAXROWS) return;
     var st = t.classList.contains('st-table');
+    for (i = 0; i < ths.length; i++) if (ths[i].hasAttribute('data-sparse') && ths.length === n) sparse(t, i, n);
     var drawn = false;
     for (i = 0; i < ths.length; i++) {
       var th = ths[i], name = label(th);

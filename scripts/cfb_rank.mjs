@@ -134,6 +134,15 @@ export function readPolls(espn) {
   return out;
 }
 
+// one poll from ESPN's core API (seasons/<S>/types/2/weeks/<w>/rankings/<id>: 1 AP, 2 Coaches, 21 CFP) in readPolls' shape.
+// The site feed lists only the current week's polls, so early in a week it can hold the Coaches Poll alone.
+export function corePoll(doc) {
+  if (!doc?.ranks?.length) return null;
+  return { name: doc.shortName || doc.name, date: doc.date?.slice(0, 10) || null, week: doc.occurrence?.value ?? null,
+    ranks: doc.ranks.map(x => ({ rk: x.current, prev: x.previous || null, tid: String(/teams\/(\d+)/.exec(x.team?.$ref || '')?.[1] ?? ''), team: '',
+      abbr: null, logo: null, rec: x.record?.summary || null, pts: x.points ?? null, fpv: x.firstPlaceVotes || null })) };
+}
+
 // model: runModel's result; teamList and coaches: scripts/cfb_teams.mjs; talentZ: the model's live talent input;
 // late: the coming week is week 5 or later (the talentLate term applies); polls: readPolls(); hist: CFBD rankings by
 // season; resolve: school name -> team id; prev: last run's data/cfb_rank.json; week: weeks played
