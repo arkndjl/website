@@ -162,7 +162,7 @@
     var bar = win.querySelector('[data-sp-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
         count = win.querySelector('[data-sp-count]'), none = win.querySelector('[data-sp-none]'), loading = win.querySelector('[data-sp-loading]'),
         asof = win.querySelector('[data-sp-asof]'), pager = win.querySelector('[data-sp-pager]'), pageEl = win.querySelector('[data-sp-page]'), pagesEl = win.querySelector('[data-sp-pages]');
-    var PER = 50, data = null, pos = '', sortKey = 'rk', dir = 1, page = 0;
+    var PER = 50, data = null, pos = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
     function chips() { [].forEach.call(bar.querySelectorAll('[data-pos]'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
     function readHash() {
       var h = __hp(win), s = h.get('season');
@@ -190,7 +190,6 @@
       list.forEach(function (p, i) { p['rk' + KEY] = i + 1; p['pr' + KEY] = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
       var wkf = stats ? null : data.wkFrom; __wk.rank(list.filter(function (p) { return !p.more; }), 'rk' + KEY); __wk.show(win, wkf);
       var shown = list.length;
-      if (q) list = list.filter(function (p) { return (p.n + ' ' + p.team).toLowerCase().indexOf(q) >= 0; });
       if (sortKey !== 'rk') {
         var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
         list = list.slice().sort(function (a, b) {
@@ -200,6 +199,8 @@
           return String(x).localeCompare(String(y)) * dir || a['rk' + KEY] - b['rk' + KEY];
         });
       } else if (dir < 0) list = list.slice().reverse();
+      if (sortKey !== 'rk') __rr(list, 'rk' + KEY, dir, best, function (p) { return p[sortKey]; });
+      if (q) list = list.filter(function (p) { return (p.n + ' ' + p.team).toLowerCase().indexOf(q) >= 0; });
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var gfxRow = function (p) {
         var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf ? __wk.none : __wk.rk(p, wkf, 'GAR', null, p.gar));
@@ -251,7 +252,7 @@
     });
     ths.forEach(function (th) {
       th.tabIndex = 0;
-      function go() { var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk'; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render(); }
+      function go() { var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk'; best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render(); }
       th.addEventListener('click', go);
       th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });

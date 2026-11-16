@@ -68,7 +68,7 @@
       count = win.querySelector('[data-ns-count]'), none = win.querySelector('[data-ns-none]'), loading = win.querySelector('[data-ns-loading]'),
       asof = win.querySelector('[data-ns-asof]'), pager = win.querySelector('[data-ns-pager]'), pageEl = win.querySelector('[data-ns-page]'), pagesEl = win.querySelector('[data-ns-pages]');
   var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
-  var data = null, view = '', sortKey = 'rk', dir = 1, page = 0;
+  var data = null, view = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // ESPN headshot (ph, from the XPM board) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
@@ -99,7 +99,6 @@
     }).sort(function (a, b) { return sgn * (b[key] - a[key]) || b.pxpm - a.pxpm; });
     list.forEach(function (p, i) { p.rk = i + 1; });
     var shown = list.length;
-    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
       list = list.slice().sort(function (a, b) {
@@ -108,6 +107,8 @@
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
     } else if (dir < 0) list = list.slice().reverse();
+    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey]; });
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     table.dataset.key = key;
     function k(c) { return c === key ? ' is-key' : ''; }
@@ -152,7 +153,7 @@
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
-      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+      best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });

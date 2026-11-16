@@ -44,7 +44,7 @@
         count = $('[data-pc-count]'), none = $('[data-pc-none]'), loading = $('[data-pc-loading]'), asof = $('[data-pc-asof]'),
         pager = $('[data-pc-pager]'), pageEl = $('[data-pc-page]'), pagesEl = $('[data-pc-pages]'), defEl = $('[data-pc-def]');
     var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
-    var D = null, stat = '', pos = '', sortKey = 'rk', dir = 1, page = 0, started = false;
+    var D = null, stat = '', pos = '', sortKey = 'rk', dir = 1, best = 1, page = 0, started = false;
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     // photo (ph: ESPN id for NBA / NHL, nflverse headshot for the NFL) and team logo; none shows the neutral frame
     var SP = win.getAttribute('data-gfx-logo') ? win.getAttribute('data-gfx-logo').split('/')[2] : '';
@@ -107,7 +107,6 @@
       }).sort(function (a, b) { return num(b, 'p50') - num(a, 'p50') || num(b, 'p80') - num(a, 'p80'); });
       list.forEach(function (r, i) { r.rk = i + 1; });
       var shown = list.length;
-      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos).toLowerCase().indexOf(q) >= 0; });
       if (sortKey !== 'rk') {
         list = list.slice().sort(function (a, b) {
           var x = sortKey === 'n' || sortKey === 'pos' ? a[sortKey] : val(a, sortKey, span), y = sortKey === 'n' || sortKey === 'pos' ? b[sortKey] : val(b, sortKey, span);
@@ -115,6 +114,8 @@
           return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * dir || a.rk - b.rk;
         });
       } else if (dir < 0) list = list.slice().reverse();
+      if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return sortKey === 'n' || sortKey === 'pos' ? p[sortKey] : val(p, sortKey, span); });
+      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos).toLowerCase().indexOf(q) >= 0; });
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var CC = SP === 'nba' && D.players.some(function (r) { return r.x3 != null; }) ? C.concat(XC) : C;
       // the percentile columns name the stat and the span they are for
@@ -177,7 +178,7 @@
     });
     function sortBy(th) {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
-      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+      best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     head.addEventListener('click', function (e) { var th = e.target.closest('th'); if (th) sortBy(th); });
     head.addEventListener('keydown', function (e) { var th = e.target.closest('th'); if (th && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sortBy(th); } });

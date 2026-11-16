@@ -53,7 +53,7 @@
         count = $('[data-rk-count]'), none = $('[data-rk-none]'), loading = $('[data-rk-loading]'), asof = $('[data-rk-asof]'),
         pager = $('[data-rk-pager]'), pageEl = $('[data-rk-page]'), pagesEl = $('[data-rk-pages]'), defEl = $('[data-rk-def]');
     var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
-    var D = null, view = '', pos = '', grp = '', sortKey = 'rk', dir = 1, page = 0, started = false;
+    var D = null, view = '', pos = '', grp = '', sortKey = 'rk', dir = 1, best = 1, page = 0, started = false;
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     var DASH = '<span class="cfb__dim">–</span>';
     // ph / lo: photo and team-logo URLs from scripts/rookies.py; no photo, or one that fails, shows the neutral frame
@@ -133,7 +133,6 @@
       wp.slice().sort(function (a, b) { return a.pre - b.pre; }).forEach(function (r, i) { r._p = i + 1; });
       wp.forEach(function (r, i) { r.dl = r._p - (i + 1); });
       var shown = list.length;
-      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos + ' ' + (r.sub || '')).toLowerCase().indexOf(q) >= 0; });
       if (sortKey !== 'rk') {
         var num = C.some(function (c) { return c.k === sortKey && c.num; });
         list = list.slice().sort(function (a, b) {
@@ -142,6 +141,8 @@
           return (num ? (x - y) : String(x).localeCompare(String(y))) * dir || a.rk - b.rk;
         });
       } else if (dir < 0) list = list.slice().reverse();
+      if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey]; });
+      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos + ' ' + (r.sub || '')).toLowerCase().indexOf(q) >= 0; });
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       head.innerHTML = C.map(function (c) {
         return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
@@ -214,7 +215,7 @@
     });
     function sortBy(th) {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age' || k === 'pre';
-      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+      best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     head.addEventListener('click', function (e) { var th = e.target.closest('th'); if (th) sortBy(th); });
     head.addEventListener('keydown', function (e) { var th = e.target.closest('th'); if (th && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sortBy(th); } });

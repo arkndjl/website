@@ -266,9 +266,12 @@
         return (!pos || r.pos === pos) && (!cls || String(r.elig) === cls) && (!uc || r.elig <= 2) && (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || r.fv >= fv) &&
           (!conf || r.conf === conf) && (!team || r.team === team) && (!role || r.role === role) && (!nw || r.new) && lvlOk(r, lvl) && (!mv || (r.npos && r.npos[2]));
       });
-      // RK and the position rank count only the players in view (this tab plus its filters), in FV order whatever the sort
+      // RK and the position rank count only the players in view (this tab plus its filters); RK in the sorted column's order, the position rank in FV order
       RK = {}; PRK = {}; var seen = {};
       view.slice().sort(function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) { RK[r.i] = i + 1; PRK[r.i] = seen[r.pos] = (seen[r.pos] || 0) + 1; });
+      if (cur !== 'rk') { var th = ths.filter(function (t) { return t.dataset.sort === cur; })[0];   // RK follows the sort
+        window.__rr(view, '_rk', dir, !(th && th.hasAttribute('data-num')) && cur !== 'out' || /^(rk|age|cls)$/.test(cur) ? 1 : -1, KEY[cur] || function (r) { return r[cur]; });
+        view.forEach(function (r) { RK[r.i] = r._rk; }); }
       match = q ? view.filter(function (r) { return r._q.indexOf(q) >= 0; }) : view;
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
