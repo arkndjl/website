@@ -40,8 +40,8 @@ DOB_FILE = os.path.join(D.ROOT, 'data', 'cbb_dob.json')
 
 def dob_lookup():
     """birth dates for players the frozen preseason careers lack (freshmen, mostly): Barttorvik's 2026-27 file (it
-    adds a freshman's date once his games count), then data/cbb_dob.json (scripts/cbb_dob.py: Tankathon draft age,
-    Wikidata), with a hand-checked date in data/dob_overrides.json ahead of all of them (and ahead of the careers' own
+    adds a freshman's date once his games count), then data/cbb_dob.json (scripts/cbb_dob.py: Wikidata, Wikipedia
+    search), with a hand-checked date in data/dob_overrides.json ahead of all of them (and ahead of the careers' own
     date, passed as `have`). Returns f(pid, name, team, bt_team=None, have=None) -> 'YYYY-MM-DD' or None."""
     import dob_sources as DS
     pins = {k: v['dob'] for k, v in DS.pinned('cbb').items() if v.get('dob')}

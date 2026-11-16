@@ -48,13 +48,13 @@ jobs:
             scripts/.cache/cbb/lineups
           key: cbb-bt-${{ github.run_id }}
           restore-keys: cbb-bt-
-      # birth dates Barttorvik doesn't have yet (hand pins, Tankathon draft age, Wikidata, Wikipedia search:
+      # birth dates Barttorvik doesn't have yet (hand pins, Wikidata, Wikipedia search:
       # scripts/cbb_dob.py -> data/cbb_dob.json); the Monday morning run also checks every dated player against Wikidata
       # (data/dob_conflicts.json)
       - name: Birth dates
         continue-on-error: true
         timeout-minutes: 15
-        run: python3 scripts/cbb_dob.py --max 150 $( [ "$(date -u +%u%H)" = 110 ] && echo --check )
+        run: python3 scripts/cbb_dob.py $( [ "$(date -u +%u%H)" = 110 ] && echo --check )
       - name: Blend this season into the board
         run: python3 scripts/cbb_live.py
       # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/cbb.json), display only
