@@ -111,6 +111,8 @@ def measurer():
         h = hs.get(k, [])
         h = h[0] if len(h) == 1 and h[0]['cls'] >= SEASON - 6 else None
         e_ht = D.inches(str(ht).replace("' ", '-').replace('"', '')) if ht else None
+        lst = e_ht or bt_hti
+        if c and lst and num(c['HGT']) and abs(num(c['HGT']) + 1.17 - lst) > 3: c = None   # a namesake's combine row
         H, W = M.cbb(espn_ht=e_ht, bt_ht=bt_hti, tk_ht=t.get('ht') if t else None, hs_ht=h.get('ht') if h else None,
                      comb_ht=num(c['HGT']) if c else None, espn_wt=float(wt) if wt else None, tk_wt=t.get('wt') if t else None,
                      hs_wt=h.get('wt') if h else None, comb_wt=num(c['WGT']) if c else None,
@@ -691,7 +693,7 @@ def main():
         bt_hti = next((q.get('hti') for q in reversed(sz) if q.get('year', SEASON) < SEASON and q.get('hti')), None)
         mht, mwt, msrc = meas(row[ci['name']], row[ci['team']], row[ci['ht']], row[ci['wt']], bt_hti)
         new = {'mht': mht, 'mwt': mwt, 'msrc': msrc, 'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
-               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos),
+               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos, row[ci['name']]),
                'fv0': (r['fv'] if not r['w'] else r['fv0']) if r.get('fv0') is not None else None}
         for c in new:
             if c in ci: row[ci[c]] = new[c]

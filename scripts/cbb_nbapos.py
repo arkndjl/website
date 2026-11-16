@@ -21,7 +21,13 @@ Position change: the flag is the NBA group (G = PG + SG, F = SF + PF, C) at 50%+
 Against Barttorvik's college position (G / F / C) held out: 139 flags, 93 right (67%), 93 of the 172 changes found;
 at 70%+ 40 of 50 right. Most changes are college bigs who play the 4 and big college guards who play on the wing.
 Height against the projected position's NBA players (in place of height for his college role, ht_g) failed the FV
-gate in every form (scripts/research/nbapos/nbapos_fv.py; scripts/data/cbb_nbapos_fv*.json), so FV doesn't read it."""
+gate in every form (scripts/research/nbapos/nbapos_fv.py; scripts/data/cbb_nbapos_fv*.json), so FV doesn't read it.
+
+Combine frame layer (combine testers only): the model's logits plus the NBA combine's barefoot height, its square,
+weight and BMI (multinomial logit with the line's logits as an offset, L2 3), fit on 585 testers. Class held out on
+testers: cross-entropy .854 against .881 for the line alone (t 5.3, 5 of 5 class blocks, 2015+ classes hold the gain).
+Wingspan and ape index on top of it add nothing (t -0.06; /mnt/project-files/cbb/wingspan-nov16/), so it reads
+height and weight only. Live: scripts/data/cbb_combine/anthro.csv, matched by name (one row per name)."""
 import csv, gzip, json, math, os, sys
 from collections import defaultdict
 import numpy as np
@@ -99,6 +105,26 @@ def fit_mnl(X, Y, w, lam):
     return B
 
 
+def fit_offset(X, Y, O, lam, iters=4000):
+    """multinomial logit on top of fixed logits O (soft targets, L2 on slopes); gradient steps with backtracking"""
+    n, d = X.shape; K = Y.shape[1]
+    Xb = np.hstack([np.ones((n, 1)), X]); B = np.zeros((d + 1, K))
+    def loss(B):
+        P = np.clip(softmax(O + Xb @ B), 1e-12, 1)
+        return -(Y * np.log(P)).sum() / n + lam / n * (B[1:] ** 2).sum() / 2
+    lr, L = 1.0, loss(B)
+    for _ in range(iters):
+        G = Xb.T @ (softmax(O + Xb @ B) - Y) / n; G[1:] += lam / n * B[1:]
+        while True:
+            Bn = B - lr * G; Ln = loss(Bn)
+            if Ln <= L - 1e-4 * lr * (G ** 2).sum() or lr < 1e-9: break
+            lr /= 2
+        done = L - Ln < 1e-11
+        B, L, lr = Bn, Ln, lr * 1.5
+        if done: break
+    return B
+
+
 def load_fit():
     global _FIT
     if _FIT is None:
@@ -107,17 +133,56 @@ def load_fit():
     return _FIT
 
 
-def project(seasons):
-    """odds at PG, SG, SF, PF, C for a career's seasons so far (None without a fit)"""
+ANTHRO = os.path.join(HERE, 'data', 'cbb_combine', 'anthro.csv')
+FRAME_LAM = 3.0
+_COMB = None
+
+
+def frame_x(ht, wt):
+    return [ht, (ht - 78) ** 2, wt, 703 * wt / ht ** 2]
+
+
+def combine_frame(name):
+    """(barefoot height, weight) from the NBA combine for a board name, or None (no row, or two rows share the name)"""
+    global _COMB
+    if _COMB is None:
+        import names as NM
+        _COMB, seen = {}, defaultdict(int)
+        try:
+            for r in csv.DictReader(open(ANTHRO, newline='', encoding='utf-8')):
+                k = NM.key(r['name']); seen[k] += 1
+                try: _COMB[k] = (float(r['HGT']), float(r['WGT']))
+                except (TypeError, ValueError): _COMB.pop(k, None)
+        except OSError: pass
+        for k, n in seen.items():
+            if n > 1: _COMB.pop(k, None)
+    if not name: return None
+    import names as NM
+    return _COMB.get(NM.key(name))
+
+
+def logits(seasons, m):
+    x = (design([pooled(seasons)]) - np.array(m['mu'])) / np.array(m['sd'])
+    return (np.hstack([np.ones((1, 1)), x]) @ np.array(m['B']))[0]
+
+
+def project(seasons, name=None):
+    """odds at PG, SG, SF, PF, C for a career's seasons so far (None without a fit); a combine tester gets the frame layer"""
     m = load_fit()
     if not m: return None
-    x = (design([pooled(seasons)]) - np.array(m['mu'])) / np.array(m['sd'])
-    return softmax(np.hstack([np.ones((1, 1)), x]) @ np.array(m['B']))[0]
+    z = logits(seasons, m)
+    fr = m.get('frame'); cf = combine_frame(name) if fr else None
+    hti = next((s.get('hti') for s in reversed(seasons) if s.get('hti')), None)
+    if cf and hti and abs(cf[0] + 1.17 - hti) > 3: cf = None   # a namesake (listings run 1.17 in over barefoot, sd .72)
+    if cf:
+        x = (np.array(frame_x(*cf)) - np.array(fr['mu'])) / np.array(fr['sd'])
+        z = z + np.concatenate([[1.0], x]) @ np.array(fr['B'])
+    return softmax(z[None, :])[0]
 
 
-def describe(seasons, pos=None):
+def describe(seasons, pos=None, name=None):
     """[odds at PG..C (2 decimals), expected position 1-5, move group or None, move odds or None] for the board"""
-    p = project(seasons)
+    p = project(seasons, name)
     if p is None: return None
     g = {k: float(sum(p[i] for i in ix)) for k, ix in GRP.items()}
     to = max(g, key=g.get)
@@ -157,17 +222,33 @@ def fit():
         pool = float(np.sqrt((Ys * (v[:, None] - m_) ** 2).sum() / Ys.sum()))
         return {'mean': [round(float(a), 2) for a in m_], 'sd': [round(float(a), 2) for a in s_], 'pooledSd': round(pool, 2), 'n': int(ok.sum())}
     norms = {'htListed': norm([h for _, _, h in last], Yl)}
+    frame = None
     if os.path.exists(COMBINE):
         cm = {}
         for r in csv.DictReader(open(COMBINE, newline='', encoding='utf-8')):
             p = (r.get('pid') or '').split('.')[0]
             if p: cm[p] = r
-        num = lambda r, k: float(r[k]) if r and r.get(k) not in (None, '') else float('nan')
+        num = lambda r, k: float(r[k]) if r and r.get(k) not in (None, '', 'NA') else float('nan')
         for k, col in (('htCombine', 'HGT'), ('wtCombine', 'WGT'), ('bmiCombine', 'BMI'), ('wingCombine', 'WNGSPN')):
             norms[k] = norm([num(cm.get(p), col) for p in pids], Yl)
+        # the frame layer: testers in their final college season (the combine came after it)
+        Xf, Yf, Of = [], [], []
+        for (y, f, _), p in zip(last, pids):
+            r = cm.get(str(p))
+            if not r or r.get('linked') != 'True' or not r.get('career_last') or int(float(r['career_last'])) != int(r['YEAR']): continue
+            h, w = num(r, 'HGT'), num(r, 'WGT')
+            if math.isnan(h) or math.isnan(w): continue
+            x = (design([f]) - mu) / sd
+            Of.append((np.hstack([np.ones((1, 1)), x]) @ B)[0]); Xf.append(frame_x(h, w)); Yf.append(y)
+        if Xf:
+            Xf = np.array(Xf); fmu, fsd = Xf.mean(0), Xf.std(0) + 1e-9
+            FB = fit_offset((Xf - fmu) / fsd, np.array(Yf), np.array(Of), FRAME_LAM)
+            frame = {'feats': ['htCombine', 'ht2', 'wtCombine', 'bmi'], 'lam': FRAME_LAM, 'n': len(Xf),
+                     'mu': [round(float(a), 6) for a in fmu], 'sd': [round(float(a), 6) for a in fsd], 'B': np.round(FB, 6).tolist(),
+                     'cv': {'ce': 0.854, 'ceLine': 0.881, 't': 5.3, 'blocks': [5, 5], 'wingAdds': {'t': -0.06}}}
     json.dump({'asof': __import__('datetime').date.today().isoformat(), 'pos': POS, 'feats': ['ht', 'ht2'] + SKILL, 'lam': LAM,
                'mu': [round(float(a), 6) for a in mu], 'sd': [round(float(a), 6) for a in sd], 'B': np.round(B, 6).tolist(),
-               'n': len(last), 'flag': FLAG, 'norms': norms,
+               'n': len(last), 'flag': FLAG, 'norms': norms, 'frame': frame,
                'cv': {'ce': 0.881, 'ceRoleHt': 0.941, 'ceHt': 0.999, 'acc': 0.71, 'accRoleHt': 0.64,
                       'fwd2020_25': {'ce': 0.952, 'ceRoleHt': 0.972, 'ceHt': 1.030},
                       'flags': {'n': 139, 'right': 93, 'changes': 172, 'at70': [40, 50]}}}, open(OUT, 'w'), indent=1)

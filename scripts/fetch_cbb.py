@@ -233,7 +233,7 @@ def main():
                     round(r['nbaP'], 4), round(r['xbpm'], 1), p['cls'], ELIG.get(p['cls'], 1), round(age, 2) if age else None,
                     None if age else age_est.get(p['cls']), p['ht'], int(p['wt']) if p['wt'] else None, p['photo'], 0 if c else 1,
                     last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvg'], cbb_z(p['cls'], not c, p['pos'], r['fvg']))), r['fvg'], round(float(r['e']), 2),
-                    NPOS.describe(r['cc']['seasons'], p['pos'])])
+                    NPOS.describe(r['cc']['seasons'], p['pos'], p['name'])])
     os.makedirs(os.path.join(D.ROOT, 'static', 'data'), exist_ok=True)
     json.dump({'cols': cols, 'rows': out}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json'), 'w'), separators=(',', ':'))
     # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend
