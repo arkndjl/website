@@ -28,11 +28,12 @@
   var dim = '<span class="cfb__dim">—</span>';
   var CLS = { 1: 'Fr', 2: 'So', 3: 'Jr', 4: 'Sr', 5: 'Gr' };
   var ROLEPOS = { 'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C' };
-  // projected NBA position (scripts/cbb_nbapos.py, display only): npos = [odds at PG..C, expected position, change group, its odds]
+  // projected NBA position (scripts/cbb_nbapos.py, display only): npos = [odds at PG..C, expected position, change group, its odds].
+  // Shown: the top three at 10%+ (held out, a position shown at 10%+ took 5%+ of his NBA minutes 84% of the time; at 5%+, 77%)
   var NPOS = ['PG', 'SG', 'SF', 'PF', 'C'];
   function nposLine(r) {
-    return r.npos ? r.npos[0].map(function (v, k) { return [v, NPOS[k]]; }).filter(function (x) { return x[0] >= 0.05; })
-      .sort(function (a, b) { return b[0] - a[0]; }).map(function (x) { return x[1] + ' ' + Math.round(x[0] * 100) + '%'; }).join(' · ') : '';
+    return r.npos ? r.npos[0].map(function (v, k) { return [v, NPOS[k]]; }).filter(function (x) { return x[0] >= 0.1; })
+      .sort(function (a, b) { return b[0] - a[0]; }).slice(0, 3).map(function (x) { return x[1] + ' ' + Math.round(x[0] * 100) + '%'; }).join(' · ') : '';
   }
   function moveChip(r) { return r.npos && r.npos[2] ? '<span class="cfb__movechip" title="NBA position: ' + esc(nposLine(r)) + '. ' + esc(r.npos[2]) + ' ' + Math.round(r.npos[3] * 100) + '%">⇄' + esc(r.npos[2]) + '</span>' : ''; }
   function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
@@ -88,19 +89,21 @@
   // historical comps (static/data/cbb-comps.json, scripts/cbb_comps.py): his nearest preseason profiles on the 2009-19
   // boards and what they did in the NBA. Fetched with the first open dropdown. A comp file row: [name, school, season,
   // class, FV, NBA role, pick, draft year]
-  var COMPS_URL = null, COMPS = null;
+  var COMPS_URL = null, COMPS = {};
   var COMP_TIP = 'comps: the nearest preseason profiles on the 2009-19 boards (players out of college by 2020), each player once. Returners by last-season production (BPM, PORPAG), age and seasons played, recruiting rank, height and conference; newcomers by recruiting rank and grades, height and class (weights picked by how well the comps\' NBA outcomes predict, classes held out). The shares are his 100 nearest; the three shown are his nearest who reached the NBA. Descriptive: the comp mix did not improve FV held out, so it does not move FV.';
-  function compsHtml(r) { return r.src === 'bt' || r.intl || r.low ? '' : '<div class="cfb__comps" data-comps="' + esc(r.name + '|' + r.team) + '"></div>'; }
+  var COMP_TIP_INTL = 'comps: the nearest draft-day profiles among the 2009-20 internationals on the final boards (277), each player once, by June board rank, the international model\'s out-of-fold E[FV] and position group. The shares are his 50 nearest; the three shown are his nearest who reached the NBA. Descriptive: does not move FV.';
+  function compsHtml(r) { return r.src === 'bt' || r.low ? '' : '<div class="cfb__comps" data-comps="' + esc(r.name + '|' + r.team) + '"' + (r.intl ? ' data-comps-intl' : '') + '></div>'; }
   function compRow(c) {
     var pick = c[6] ? '#' + c[6] + " '" + String(c[7]).slice(2) : 'undrafted';
-    return '<li><b>' + esc(c[0]) + '</b> <span class="cfb__dim">' + esc(c[1]) + ' ' + (c[2] - 1) + '-' + String(c[2]).slice(2) + ' ' + esc(c[3]) + '</span> · <span class="fv-chip" data-fv="' + tierOf(c[4]) + '">' + Math.round(c[4]) + '</span> ' + esc(c[5]) + ' · ' + pick + '</li>';
+    return '<li><b>' + esc(c[0]) + '</b> <span class="cfb__dim">' + [esc(c[1]), (c[2] - 1) + '-' + String(c[2]).slice(2), esc(c[3])].filter(Boolean).join(' ') + '</span> · <span class="fv-chip" data-fv="' + tierOf(c[4]) + '">' + Math.round(c[4]) + '</span> ' + esc(c[5]) + ' · ' + pick + '</li>';
   }
   function fillComps(root) {
     var el = root && root.querySelector('[data-comps]'); if (!el || !COMPS_URL) return;
-    (COMPS || (COMPS = window.__arkJson(COMPS_URL).catch(function () { return null; }))).then(function (d) {
+    var intl = el.hasAttribute('data-comps-intl'), u = intl ? COMPS_URL.replace(/cbb-comps\.json$/, 'cbb-comps-intl.json') : COMPS_URL;
+    (COMPS[u] || (COMPS[u] = window.__arkJson(u).catch(function () { return null; }))).then(function (d) {
       var e = d && d.players[el.getAttribute('data-comps')]; if (!e) { el.remove(); return; }
       var m = e[e.length - 1], pc = function (x) { return Math.round(x * 100) + '%'; }, near = e.slice(0, -1);
-      el.title = COMP_TIP;
+      el.title = intl ? COMP_TIP_INTL : COMP_TIP;
       el.innerHTML = '<p class="cfb__past"><span class="cfb__pastk">Comps</span><span>his ' + m[0] + ' nearest profiles: ' + pc(m[1]) + ' NBA, ' + pc(m[2]) + ' NBA starters (FV 45+), ' + pc(m[3]) + ' All-Star level (FV 60+)</span></p>' +
         (near.length ? '<ul class="cfb__compl">' + near.map(function (x) { return compRow(d.pool[x[0]]); }).join('') + '</ul>' : '');
     });
@@ -191,7 +194,7 @@
       '<p class="cfb__role">' + line + '.</p><p class="cfb__role">draft boards: consensus No. ' + r.cons + ', on ' + r.boards + ' of 7 boards.</p>' +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      fvBox(r, bars, sum) + '</div></td></tr>';
+      fvBox(r, bars, sum) + compsHtml(r) + '</div></td></tr>';
   }
   // a D-II / D-III player's report: his line at that level and what moves his D-1%
   function lowDetail(r, cols, width) {
