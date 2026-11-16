@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T03:30:21Z",
+ "asof": "2026-11-16T03:39:05Z",
  "recenter": {
   "2026-11-16": 2.02
  },
@@ -1829,7 +1829,7 @@
   }
  },
  "model": {
-  "asof": "2026-11-16T03:23:42Z",
+  "asof": "2026-11-16T03:35:32Z",
   "ageH": 0.1,
   "stale": false
  },
@@ -2137,22 +2137,6 @@
  ],
  "board": [
   {
-   "id": "401917964",
-   "sport": "cbb",
-   "kick": "2026-11-17T01:00:00Z",
-   "home": "Missouri State",
-   "away": "Abilene Christian",
-   "mk": "spread",
-   "side": "away",
-   "line": 7.5,
-   "price": -129.0,
-   "edge": 7.6,
-   "x": 5.0,
-   "why": "no edge at -129",
-   "m": -0.1,
-   "tm": 146.0
-  },
-  {
    "id": "401921804",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2249,6 +2233,22 @@
    "tm": 156.2
   },
   {
+   "id": "401927364",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:30:00Z",
+   "home": "Drake",
+   "away": "Tarleton State",
+   "mk": "total",
+   "side": "under",
+   "line": 146.5,
+   "price": -124.0,
+   "edge": 4.9,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 14.0,
+   "tm": 141.6
+  },
+  {
    "id": "401916298",
    "sport": "cbb",
    "kick": "2026-11-16T23:00:00Z",
@@ -2289,7 +2289,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 3.1,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2311,22 +2311,6 @@
    "why": "edge under 6.5 (tier: mixed)",
    "m": 35.9,
    "tm": 157.5
-  },
-  {
-   "id": "401927364",
-   "sport": "cbb",
-   "kick": "2026-11-17T00:30:00Z",
-   "home": "Drake",
-   "away": "Tarleton State",
-   "mk": "total",
-   "side": "under",
-   "line": 145.5,
-   "price": -110.0,
-   "edge": 3.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 14.0,
-   "tm": 141.6
   },
   {
    "id": "401924265",
@@ -2401,7 +2385,7 @@
    "mk": "spread",
    "side": "away",
    "line": 18.5,
-   "price": -129.0,
+   "price": -110.0,
    "edge": 1.2,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2502,7 +2486,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -2670,9 +2654,9 @@
   "401927364": {
    "mk": "total",
    "side": "under",
-   "line": 145.5,
-   "price": -110.0,
-   "edge": 3.9,
+   "line": 146.5,
+   "price": -124.0,
+   "edge": 4.9,
    "ev": null,
    "units": 0.0,
    "home": "Drake",
@@ -2707,7 +2691,7 @@
    "mk": "spread",
    "side": "away",
    "line": 18.5,
-   "price": -129.0,
+   "price": -110.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -2730,14 +2714,15 @@
   "401917964": {
    "mk": "spread",
    "side": "away",
-   "line": 7.5,
-   "price": -129.0,
+   "line": 3.5,
+   "price": 162,
+   "ev": 0.006,
    "edge": 7.6,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
+   "bk": "poly",
    "home": "Missouri State",
    "away": "Abilene Christian",
-   "state": "under"
+   "state": "paper"
   }
  },
  "record": {
@@ -2792,7 +2777,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16382,
+  "snapshots": 16401,
   "buckets": [
    {
     "when": "24h+",
@@ -2805,12 +2790,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3235,
-    "clvRet": -0.0216,
-    "clvT": -11.9,
+    "clvN": 3246,
+    "clvRet": -0.0217,
+    "clvT": -11.98,
     "clv": 0.31,
-    "beat": 0.352,
-    "still": 0.457
+    "beat": 0.351,
+    "still": 0.459
    },
    {
     "when": "1-6h",
@@ -19303,7 +19288,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T03:30:21Z",
+ "checked": "2026-11-16T03:39:05Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
