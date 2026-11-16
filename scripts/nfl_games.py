@@ -1691,6 +1691,11 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
     orders = []                           # the first ORDERS_KEPT simulated draft orders (the mock's simulated drafts: mockSims)
     rng = random.Random(7)
     drng = random.Random(11)              # the draft order's coin flips, apart from the game draws
+    import sim_draws                      # every draw kept for the private TLS feed when ARK_DRAWS=1 (never in git)
+    DR = sim_draws.Draws('nfl', last, teams, {
+        'wins': 'regular-season wins (ties count .5)', 'seed': 'playoff seed 1-7, 0 = missed',
+        'stage': '0 missed, 1 lost wild card, 2 lost divisional, 3 lost conference final, 4 lost Super Bowl, 5 won it',
+        'pick': 'draft slot 1-32'})
     t0 = time.time()
     for _ in range(SIMS):
         shock = {t: rng.gauss(0, rsd) for t in teams}
@@ -1741,6 +1746,10 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
         for i, t in enumerate(do):
             slot[t] += i + 1
             top[t] += i < 5
+        if DR.on:
+            DR.add(wins=w, seed={t: i + 1 for c in ('AFC', 'NFC') for i, t in enumerate(field[c])}, stage=exits,
+                   pick={t: i + 1 for i, t in enumerate(do)})
+    DR.write()
     print(f'nfl games: {SIMS} season sims in {time.time() - t0:.1f}s (rating sd {rsd:.2f})')
     try:
         nfl_bracket(BK, tal, SIMS)

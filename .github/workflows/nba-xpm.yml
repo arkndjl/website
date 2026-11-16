@@ -81,6 +81,7 @@ jobs:
     timeout-minutes: 20
     env:
       FULL: ${{ needs.gate.outputs.full }}
+      ARK_DRAWS: '1'     # season sims keep every draw for the TLS feed (scripts/sim_draws.py)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -218,3 +219,11 @@ jobs:
             --rebuild data/games_picks_nba.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py nba; python3 scripts/rule_monitor.py" \
             -- $files
+      # the private TLS feed (ops/tls-feed): this run's model output and sim draws (draws never go to git); skipped
+      # without the TLS_FEED_URL / TLS_UPLOAD_TOKEN secrets, never fails the run
+      - name: TLS feed upload
+        continue-on-error: true
+        env:
+          TLS_FEED_URL: ${{ secrets.TLS_FEED_URL }}
+          TLS_UPLOAD_TOKEN: ${{ secrets.TLS_UPLOAD_TOKEN }}
+        run: python3 scripts/tls_upload.py nba

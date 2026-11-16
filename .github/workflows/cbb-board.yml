@@ -31,6 +31,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      ARK_DRAWS: '1'     # season sims keep every draw for the TLS feed (scripts/sim_draws.py)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -164,6 +166,14 @@ jobs:
             --rebuild data/games_picks_cbb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cbb; python3 scripts/rule_monitor.py" \
             -- $files
+      # the private TLS feed (ops/tls-feed): this run's model output and sim draws (draws never go to git); skipped
+      # without the TLS_FEED_URL / TLS_UPLOAD_TOKEN secrets, never fails the run
+      - name: TLS feed upload
+        continue-on-error: true
+        env:
+          TLS_FEED_URL: ${{ secrets.TLS_FEED_URL }}
+          TLS_UPLOAD_TOKEN: ${{ secrets.TLS_UPLOAD_TOKEN }}
+        run: python3 scripts/tls_upload.py cbb
       # the steps above keep yesterday's file on a failure so one broken step can't hold back the rest; the run still
       # goes red here so a broken step shows in the Actions tab (the game model failed quietly on Nov 2: a missing cbb_games.poss_secs)
       - name: Save Barttorvik game logs

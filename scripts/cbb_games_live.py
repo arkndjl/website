@@ -763,6 +763,11 @@ def build():
         W_, CW, CL, title = np.zeros(len(teams)), np.zeros(len(teams)), np.zeros(len(teams)), np.zeros(len(teams))
         conf_of = np.array([confs.get(t, '') for t in teams])
         base_cw = np.array([rec[t][2] for t in teams], float); base_cl = np.array([rec[t][3] for t in teams], float)
+        import sim_draws                  # every draw kept for the private TLS feed when ARK_DRAWS=1 (never in git)
+        DR = sim_draws.Draws('cbb', SEASON, teams, {
+            'wins': 'regular-season wins (games played + simulated; conference tournaments not included)',
+            'cwins': 'regular-season conference wins', 'ctitle': '1 = won or shared the regular-season conference title'})
+        base_w = np.array([rec[t][0] for t in teams], float)
         for chunk in range(SIMS // 1000):
             shock = rng.normal(0, 1, (1000, len(teams))) * tsd
             m = mm + shock[:, hi] - shock[:, ai]
@@ -774,12 +779,19 @@ def build():
             np.add.at(cl, (slice(None), hi), (~hw * cf)); np.add.at(cl, (slice(None), ai), (hw * cf))
             W_ += w.sum(0); CW += cw.sum(0); CL += cl.sum(0)
             pct = (base_cw + cw) - (base_cl + cl)
+            ct = np.zeros((1000, len(teams)), bool)
             for c in set(conf_of):
                 if not c:
                     continue
                 k = conf_of == c
                 top = pct[:, k].max(1, keepdims=True)
                 title[k] += (pct[:, k] >= top - 1e-9).sum(0)
+                if DR.on:
+                    ct[:, k] = pct[:, k] >= top - 1e-9
+            if DR.on:
+                for r_w, r_c, r_t in zip((base_w + w).astype(int).tolist(), (base_cw + cw).astype(int).tolist(), ct.astype(int).tolist()):
+                    DR.add(wins=r_w, cwins=r_c, ctitle=r_t)
+        DR.write()
         for t, i in ti.items():
             sims[t] = {'xW': rec[t][0] + W_[i] / SIMS, 'xL': rec[t][1] + (sum(1 for g in left if t in (g['home'], g['away'])) - W_[i] / SIMS),
                        'cxW': rec[t][2] + CW[i] / SIMS, 'cxL': rec[t][3] + CL[i] / SIMS, 'title': title[i] / SIMS}
