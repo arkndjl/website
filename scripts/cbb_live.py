@@ -111,6 +111,8 @@ def measurer():
         h = hs.get(k, [])
         h = h[0] if len(h) == 1 and h[0]['cls'] >= SEASON - 6 else None
         e_ht = D.inches(str(ht).replace("' ", '-').replace('"', '')) if ht else None
+        lst = e_ht or bt_hti
+        if c and lst and num(c['HGT']) and abs(num(c['HGT']) + 1.17 - lst) > 3: c = None   # a namesake's combine row
         H, W = M.cbb(espn_ht=e_ht, bt_ht=bt_hti, tk_ht=t.get('ht') if t else None, hs_ht=h.get('ht') if h else None,
                      comb_ht=num(c['HGT']) if c else None, espn_wt=float(wt) if wt else None, tk_wt=t.get('wt') if t else None,
                      hs_wt=h.get('wt') if h else None, comb_wt=num(c['WGT']) if c else None,
