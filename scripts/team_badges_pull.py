@@ -43,7 +43,8 @@ def cbb(current):
         if os.path.exists(p) and y < S - 1:
             continue
         b = get(f'https://barttorvik.com/getgamestats.php?year={y}&csv=1')
-        if b and len(b) > 1000:
+        if b and len(b) > 1000 and not b.lstrip()[:1] == b'<':     # a bot-check page is HTML, not the CSV
+            os.makedirs(C, exist_ok=True)
             open(p, 'wb').write(b)
         print('cbb', y, len(b or b''), flush=True)
 
