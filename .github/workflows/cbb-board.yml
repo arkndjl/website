@@ -10,8 +10,9 @@ name: cbb board
 
 on:
   schedule:
-    # 10:41 UTC: after the last West Coast games end (about 07:00 UTC) and Barttorvik's overnight update
-    - cron: "41 10 * 11,12,1,2,3,4 *"
+    # 07:41 UTC: after the last West Coast games end (about 07:00 UTC). GitHub has started these 4-7 hours late all
+    # November, so an earlier slot lands the overnight finals by mid-morning ET
+    - cron: "41 7 * 11,12,1,2,3,4 *"
     # 17:11 UTC, the backup for a late or dropped run (GitHub has delayed scheduled runs by hours, see cfb-board)
     - cron: "11 17 * 11,12,1,2,3,4 *"
     # 21:41 UTC (4:41 pm ET): lines and picks again before the evening games

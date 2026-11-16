@@ -67,8 +67,8 @@ def parse(e):
     side = {x['homeAway']: x for x in c['competitors']}
     g['ha'], g['aa'] = side['home']['team'].get('abbreviation'), side['away']['team'].get('abbreviation')
     g['venue'] = (c.get('venue') or {}).get('fullName')
-    if c.get('timeValid') is False:
-        g['tba'] = True               # ESPN lists a date with no tip time yet (05:00Z)
+    if c.get('timeValid') is False or (e.get('date') or '')[11:16] == '04:59':
+        g['tba'] = True               # ESPN lists a date with no tip time yet (05:00Z), or ESPN's 11:59 pm ET placeholder (04:59Z)
     g['tv'] = ', '.join(n for b in c.get('broadcasts') or [] for n in b.get('names', []))
     for k in ('home', 'away'):
         rk = (side[k].get('curatedRank') or {}).get('current')

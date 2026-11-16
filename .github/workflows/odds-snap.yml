@@ -73,6 +73,12 @@ jobs:
         run: python3 scripts/nba_refs.py --today
       # the Predictions page's picks on DraftKings' current lines, and a dispatch for any sport build gone stale
       # (scripts/picks_refresh.py; the same step runs in picks-refresh.yml on its own schedule)
+      # the CBB injury re-price (cbb_games.py --injuries, run by picks_refresh.py) needs numpy: without it every
+      # re-price since PR #814 exited 1 on the import and the run stayed green
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
       - name: Picks refresh
         continue-on-error: true
         env:

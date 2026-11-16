@@ -25,6 +25,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      # the CBB injury re-price (cbb_games.py --injuries, run by picks_refresh.py) needs numpy: without it every
+      # re-price since PR #814 exited 1 on the import and the run stayed green
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
       - name: Picks refresh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
