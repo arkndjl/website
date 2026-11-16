@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-16T04:28:09Z",
+ "asof": "2026-11-16T04:32:01Z",
  "recenter": {
-  "2026-11-16": 1.76
+  "2026-11-16": 1.74
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-16T03:07:10Z",
-  "ageH": 1.3,
+  "ageH": 1.4,
   "stale": false
  },
  "picks": [],
@@ -349,7 +349,7 @@
    "x": 4.0,
    "why": "edge under 4 (line: <4)",
    "m": 0.1,
-   "tm": 231.5
+   "tm": 231.6
   },
   {
    "id": "401909999",
@@ -361,11 +361,11 @@
    "side": "under",
    "line": 228.5,
    "price": -114.0,
-   "edge": 2.3,
+   "edge": 2.2,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
    "m": 0.7,
-   "tm": 226.2
+   "tm": 226.3
   },
   {
    "id": "401910000",
@@ -377,11 +377,11 @@
    "side": "over",
    "line": 225.5,
    "price": -119.0,
-   "edge": 1.8,
+   "edge": 1.9,
    "x": 6.5,
    "why": "edge under 6.5 (side: over)",
    "m": -3.9,
-   "tm": 227.3
+   "tm": 227.4
   },
   {
    "id": "401910001",
@@ -393,11 +393,11 @@
    "side": "over",
    "line": 228.5,
    "price": -110.0,
-   "edge": 1.5,
+   "edge": 1.6,
    "x": 6.5,
    "why": "edge under 6.5 (side: over)",
    "m": 10.6,
-   "tm": 230.0
+   "tm": 230.1
   },
   {
    "id": "401909995",
@@ -409,11 +409,27 @@
    "side": "under",
    "line": 241.5,
    "price": -110.0,
-   "edge": 0.9,
+   "edge": 0.8,
    "x": 6.0,
    "why": "edge under 6 (total: high)",
    "m": 9.2,
-   "tm": 240.6
+   "tm": 240.7
+  },
+  {
+   "id": "401909997",
+   "sport": "nba",
+   "kick": "2026-11-17T00:30:00Z",
+   "home": "BKN",
+   "away": "PHI",
+   "mk": "total",
+   "side": "over",
+   "line": 225.5,
+   "price": -114.0,
+   "edge": 0.5,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": -6.9,
+   "tm": 226.0
   },
   {
    "id": "401909994",
@@ -424,28 +440,12 @@
    "mk": "total",
    "side": "under",
    "line": 211.5,
-   "price": -110.0,
-   "edge": 1.5,
+   "price": -106.0,
+   "edge": 1.4,
    "x": null,
    "why": "total market off",
    "m": 10.4,
-   "tm": 210.0
-  },
-  {
-   "id": "401909997",
-   "sport": "nba",
-   "kick": "2026-11-17T00:30:00Z",
-   "home": "BKN",
-   "away": "PHI",
-   "mk": "spread",
-   "side": "away",
-   "line": -6.5,
-   "price": -106.0,
-   "edge": 0.4,
-   "x": null,
-   "why": "spread market off",
-   "m": -6.9,
-   "tm": 225.9
+   "tm": 210.1
   }
  ],
  "games": {
@@ -453,8 +453,8 @@
    "mk": "total",
    "side": "under",
    "line": 211.5,
-   "price": -110.0,
-   "edge": 1.5,
+   "price": -106.0,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "BOS",
@@ -466,7 +466,7 @@
    "side": "under",
    "line": 241.5,
    "price": -110.0,
-   "edge": 0.9,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "CLE",
@@ -474,16 +474,16 @@
    "state": "under"
   },
   "401909997": {
-   "mk": "spread",
-   "side": "away",
-   "line": -6.5,
-   "price": -106.0,
-   "edge": 0.4,
+   "mk": "total",
+   "side": "over",
+   "line": 225.5,
+   "price": -114.0,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "BKN",
    "away": "PHI",
-   "state": "off"
+   "state": "under"
   },
   "401909998": {
    "mk": "spread",
@@ -502,7 +502,7 @@
    "side": "under",
    "line": 228.5,
    "price": -114.0,
-   "edge": 2.3,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "MIN",
@@ -514,7 +514,7 @@
    "side": "over",
    "line": 225.5,
    "price": -119.0,
-   "edge": 1.8,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "NO",
@@ -526,7 +526,7 @@
    "side": "over",
    "line": 228.5,
    "price": -110.0,
-   "edge": 1.5,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "DEN",
@@ -586,7 +586,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4457,
+  "snapshots": 4459,
   "buckets": [
    {
     "when": "24h+",
@@ -599,9 +599,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1018,
-    "clvRet": -0.0209,
-    "clvT": -5.61,
+    "clvN": 1019,
+    "clvRet": -0.021,
+    "clvT": -5.62,
     "clv": 0.38,
     "beat": 0.444,
     "still": 0.408
@@ -7261,7 +7261,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T04:28:09Z",
+ "checked": "2026-11-16T04:32:01Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
