@@ -1,9 +1,10 @@
 {{- /* The 20-80 scale across every board: what each FV tier means per sport. Football, basketball and baseball are the
-       hand-written outcome labels; hockey and soccer come from each FV fit's outcome map (data/hockey.json fit.cuts:
+       hand-written outcome labels (basketball adds the peak XPM where each FV starts, data/cbb.json fvTable); hockey and soccer come from each FV fit's outcome map (data/hockey.json fit.cuts:
        peak NHL WAR a season by rarity in a draft class; data/soccer_prospects.json fit.cuts: rarity in a birth year),
        so they follow a refit. {{< fvglance title="..." >}} */ -}}
 {{- $hk := dict -}}{{ with site.Data.hockey }}{{ range .fit.cuts }}{{ $hk = merge $hk (dict (string (index . 0)) (index . 1)) }}{{ end }}{{ end -}}
 {{- $sp := dict -}}{{ with site.Data.soccer_prospects }}{{ range .fit.cuts }}{{ $sp = merge $sp (dict (string (index . 0)) .) }}{{ end }}{{ end -}}
+{{- $bx := dict -}}{{ with site.Data.cbb }}{{ range $r := .fvTable }}{{ with $r.xpmLo }}{{ $bx = merge $bx (dict (string $r.fv) .) }}{{ end }}{{ end }}{{ end -}}
 {{- $hkPer := dict "80" "1 in 4 classes" "75" "1 in 2 classes" "70" "#1 / class" "65" "top 2 / class" "60" "top 5 / class" "55" "top 10 / class" "50" "top 20 / class" "45" "top 30 / class" "40" "top 45 / class" -}}
 {{- $spPer := dict "80" "#1 / 2 birth years" "75" "#1 / birth year" "70" "top 3 / birth year" "65" "top 8 / birth year" "60" "top 20 / birth year" "55" "top 45 / birth year" "50" "top 90 / birth year (big-five regular)" "45" "top 150 / birth year" "40" "top 250 / birth year (top-flight regular)" -}}
 {{- $rows := slice
@@ -22,7 +23,8 @@
 {{- with index $hk $fv }}{{ $h = printf "%s, %.2f+ peak WAR" (index $hkPer $fv) (float .) }}{{ end -}}
 {{- $s := cond (eq $fv "30") "some senior value" (cond (eq $fv "20") "no senior value" "—") -}}
 {{- with index $sp $fv }}{{ $s = index $spPer $fv }}{{ end -}}
-{{- $md = printf "%s| %s | %s | %s | %s | %s | %s | %s |\n" $md $fv (index . 1) (index . 2) (index . 3) $h $s (index . 4) -}}
+{{- $b := index . 3 }}{{ with index $bx $fv }}{{ $b = printf "%s, %.1f+ peak XPM" $b (float .) }}{{ end -}}
+{{- $md = printf "%s| %s | %s | %s | %s | %s | %s | %s |\n" $md $fv (index . 1) (index . 2) $b $h $s (index . 4) -}}
 {{- end -}}
 {{- $md = printf "%s{title=%q icon=\"arkboard\" gfx=\"1\"}\n" $md (.Get "title" | default "fv at a glance") -}}
 {{ $md | .Page.RenderString (dict "display" "block") }}
