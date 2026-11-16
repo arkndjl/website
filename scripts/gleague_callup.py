@@ -5,6 +5,7 @@ season, of a 500-minute NBA season next season, and his expected NBA VORX over t
 
     python3 scripts/gleague_callup.py --research   # fetch every season, fit, backtest -> data/gleague_callup_fit.json
     python3 scripts/gleague_callup.py              # this season -> static/data/gleague.json (uses the fit file)
+    python3 scripts/gleague_callup.py --past       # every past season's end-of-season board -> static/data/gleague-past.json
 
 Source: stats.gleague.nba.com leaguedashplayerstats (LeagueID 20), Base + Advanced totals, regular season and
 Showcase Cup (its own season type since 2021-22), cached in scripts/.cache/gleague/<YYYY-YY>_<Base|Advanced>_<0|SC>.json.
@@ -32,6 +33,7 @@ XPM = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
 DRAFT = os.path.join(HERE, 'nba_draft.json')
 FIT = os.path.join(ROOT, 'data', 'gleague_callup_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'gleague.json')
+PAST = os.path.join(ROOT, 'static', 'data', 'gleague-past.json')
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
 API = ('https://stats.gleague.nba.com/stats/leaguedashplayerstats?LeagueID=20&Season={s}&SeasonType={t}&PerMode=Totals'
        '&MeasureType={m}&LastNGames=0&Month=0&OpponentTeamID=0&PaceAdjust=N&Period=0&PlusMinus=N&Rank=N&TeamID=0&TwoWay=0')
@@ -361,6 +363,68 @@ def build():
     open(OUT, 'w').write(s); print('wrote', OUT, len(players), 'players, part', part)
 
 
+def past():
+    """each past season's board as it read the day that G League season ended: the same features, fit walk forward on
+    the seasons whose outcome was known by then (NBA% and 500%: seasons through s-1; xVORX: through s-3, shown once four
+    seasons are in). Training starts with 2008-09 (the XPM boards begin 2009-10, so 2007-08 has no next-season label).
+    Each row carries what happened next: NBA minutes the next season (per 82) and NBA VORX over the next three."""
+    W = World(); last = current_season() - 1
+    seasons = {y: (gl_season(y), [gl_season(y, ('SC',))] if y >= 2022 else []) for y in range(2009, last + 1)}
+    births = collections.defaultdict(list); nm = {}
+    for y, (full, scs) in seasons.items():
+        for p, o in full.items():
+            if o['n']: nm[p] = o['n']
+            if o['age']: births[p].append(y - o['age'])
+    for p, n in nm.items(): W.link(p, n, births[p])
+    rows = []
+    for y, (full, scs) in seasons.items():
+        for part, src in [(0.0, full)] + [(1.0, s) for s in scs]:
+            for p, o in src.items():
+                o['n'] = o['n'] or nm.get(p)
+                if (o['MIN'] or 0) < MIN_ROW or not o['n']: continue
+                f, t, info = W.row(y, o, part)
+                rows.append((y, f, t, part, info, o))
+    have = max(W.NB)            # the latest NBA season on the XPM board (may be running)
+    out, score = [], collections.defaultdict(list)
+    for s in range(2011, last + 1):
+        tr1 = [r for r in rows if r[0] <= s - 1]; tr3 = [r for r in rows if r[0] <= s - 3]
+        te = [r for r in rows if r[0] == s and r[3] == 0.0]
+        X, mu, sd = design([r[1] for r in tr1], FEATS)
+        b1 = logit_fit(X, np.array([r[2]['nba1'] for r in tr1])); b5 = logit_fit(X, np.array([r[2]['stick'] for r in tr1]))
+        Xt, _, _ = design([r[1] for r in te], FEATS, mu, sd)
+        p1 = sig(lin(b1, Xt)); p5 = np.minimum(sig(lin(b5, Xt)), p1); xv = [None] * len(te)
+        if len({r[0] for r in tr3}) >= 4:
+            X3, m3, s3 = design([r[1] for r in tr3], FEATS); a = np.array([r[2]['any3'] for r in tr3])
+            ba = logit_fit(X3, a); bp = ridge_fit(X3[a == 1], np.array([r[2]['xv3'] for r in tr3])[a == 1])
+            Xt3, _, _ = design([r[1] for r in te], FEATS, m3, s3)
+            xv = (sig(lin(ba, Xt3)) * lin(bp, Xt3)).tolist()
+        players = []
+        for i, (y, f, t, part, info, o) in enumerate(te):
+            b = info['b']; nb = W.NB.get(s, {}).get(b, {}) if b else {}
+            ph = next((W.NB[z][b].get('ph') for z in sorted(W.NB, reverse=True) if b and b in W.NB[z] and W.NB[z][b].get('ph')), None)
+            par, logo = TEAMS.get(o['tm'], (None, None))
+            done1, done3 = s + 1 < have, s + 3 < have
+            mp1 = round((W.NB.get(s + 1, {}).get(b, {}).get('mp') or 0) * 82 / W.GAMES.get(s + 1, 82)) if b else 0
+            # no NBA parent: TEAMS is today's affiliations, and several clubs changed parents (or names) since
+            players.append({'id': o['id'], 'n': o['n'], 'tm': o['tm'], 'lg': logo, 'age': int(o['age']) if o['age'] else None,
+                            'gp': o['GP'], 'min': round(o['MIN']), 'gs': round(f['gs36'], 1), 'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
+                            'cmp': round(info['cmp'] + (nb.get('mp') or 0)), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'],
+                            'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': None if xv[i] is None else round(float(xv[i]), 2),
+                            'o1': mp1 if done1 else None, 'o3': round(t['xv3'], 2) if done3 else None})
+            if done1:
+                score['p1'].append(float(p1[i])); score['y1'].append(t['nba1'])
+        players.sort(key=lambda r: (-r['p1'], -(r['xv'] or 0)))
+        out.append({'season': s, 'label': sname(s), 'next': sname(s + 1), 'train': [2009, s - 1], 'players': players})
+        print(s, len(players), 'trained on', len(tr1), 'rows', '3y' if xv[0] is not None else '')
+    p, y = np.array(score['p1']), np.array(score['y1'])
+    base = np.full(len(y), y.mean())
+    res = {'n': len(y), 'auc': round(auc(p, y), 3), 'll': round(ll(p, y), 4), 'brier': round(float(np.mean((p - y) ** 2)), 4), 'rate': round(float(y.mean()), 3)}
+    print('walk forward NBA%', res)
+    s = json.dumps({'asof': datetime.date.today().isoformat(), 'test': res, 'seasons': out[::-1]}, separators=(',', ':'), allow_nan=False)
+    open(PAST, 'w').write(s); print('wrote', PAST, round(len(s) / 1e6, 2), 'MB')
+
+
 if __name__ == '__main__':
     if '--research' in sys.argv: research()
+    elif '--past' in sys.argv: past()
     else: build()
