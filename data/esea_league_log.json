@@ -1,6 +1,6 @@
 {
- "lines": 45,
- "pending": 45,
+ "lines": 48,
+ "pending": 47,
  "void": 0,
  "forfeit": 0,
  "coin": {
@@ -8,19 +8,19 @@
   "brier": 0.25
  },
  "all": {
-  "n": 0,
-  "ll": null,
-  "brier": null,
-  "hit": null,
-  "fav": null
+  "n": 1,
+  "ll": 0.547,
+  "brier": 0.1775,
+  "hit": 1.0,
+  "fav": 0.5787
  },
  "calibration": [
   {
    "lo": 0.5,
    "hi": 0.6,
-   "n": 0,
-   "p": null,
-   "won": null
+   "n": 1,
+   "p": 0.5787,
+   "won": 1.0
   },
   {
    "lo": 0.6,
@@ -51,7 +51,32 @@
    "won": null
   }
  ],
- "days": [],
- "by_div": {},
- "by_version": {}
+ "days": [
+  {
+   "day": "2026-11-16",
+   "n": 1,
+   "ll": 0.547,
+   "brier": 0.1775,
+   "hit": 1.0,
+   "fav": 0.5787
+  }
+ ],
+ "by_div": {
+  "main": {
+   "n": 1,
+   "ll": 0.547,
+   "brier": 0.1775,
+   "hit": 1.0,
+   "fav": 0.5787
+  }
+ },
+ "by_version": {
+  "pv3/rwa0.316-14.2/sharp7": {
+   "n": 1,
+   "ll": 0.547,
+   "brier": 0.1775,
+   "hit": 1.0,
+   "fav": 0.5787
+  }
+ }
 }
