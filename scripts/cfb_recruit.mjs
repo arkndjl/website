@@ -143,6 +143,14 @@ export function predict(fit, r) {
   const pOn = sig(lin(fit.model.on)), fvOn = Math.max(fit.floor, lin(fit.model.fv));
   return atMeanOn(fit, r, pOn, fvOn);
 }
+// The recruit index's expected NFL outcome on the FV scale (scripts/cfb_recruit_retarget.py index_score): the chance
+// he is drafted times the FV a drafted recruit of his profile reaches, the floor otherwise. No year or board terms.
+export function indexScore(fit, r) {
+  const ix = indexOf(fit, r); if (!ix) return null;
+  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, ix);
+  const p = sig(fit.index.on.b0 + b.idx.iOn), f = Math.max(fit.floor, fit.index.fv.b0 + b.idx.iFv);
+  return p * f + (1 - p) * fit.floor;
+}
 // the fit projects the board's grade (it was fit on grades); FV if on and xFV are shown at the mean outcome, as the
 // board's FV is since Oct 21 2026 (scripts/fv_dist.mjs atMean). g keeps the grade-scale numbers: the ARK star cuts and
 // the redshirt shifts were set on them
@@ -403,10 +411,13 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const sz = fit.sizeNorms;
   const mk = (c, k) => { const g = group(c.pos, c.wt), p = prog[c.tid]; return g && p ? { ...c, g, k: Math.min(k, KMAX), level: p.level, eloZ: p.eloZ, dev: fit.model.dev[c.tid] || 0 } : null; };
   const pathOf = r => [1, 2, 3].map(k => r1(predict(fit, { ...r, k }).xfv));
-  const starsOf = r => arkStars(predict(fit, { ...r, k: 3 }).g.xfv);    // the cuts are on the grade's scale
-  // ARK stars: the year-3 xFV cut where the fit's backtest put each tier (fit.stars.cuts, 4 ascending)
-  // plus a half star (1.5-4.5) past the tier's half cut (fit.stars.half); 6 is 5-star+
-  const arkStars = x => { if (x == null || !fit.stars) return null; const t = 1 + fit.stars.cuts.filter(c => c <= x).length, h = fit.stars.half?.[t - 1]; return t <= 4 && h != null && x >= h ? t + 0.5 : t; };
+  // ARK stars: the recruit index's expected NFL outcome (indexScore) cut where the 2011-19 classes' outcomes put each
+  // tier (fit.stars.idx, scripts/cfb_recruit_retarget.py stars_block), plus a half star (1.5-4.5) past the tier's half
+  // cut; 6 is 5-star+. A fit without the index cuts falls back to the year-3 xFV cuts (fit.stars.cuts).
+  const SI = fit.stars?.idx && fit.index ? fit.stars.idx : null;
+  const cutStars = (x, S) => { if (x == null || !S) return null; const t = 1 + S.cuts.filter(c => c <= x).length, h = S.half?.[t - 1]; return t <= 4 && h != null && x >= h ? t + 0.5 : t; };
+  const arkStars = x => cutStars(x, fit.stars);
+  const starsOf = r => SI ? cutStars(indexScore(fit, r), SI) : arkStars(predict(fit, { ...r, k: 3 }).g.xfv);
   // where FV if on sits on this season's board (percentile), and the P10-P90 range of FV if on at year k:
   // the fit's out-of-sample miss at that year, widened by a mapped grade's own miss when ESPN has no grade yet
   const boardFv = rows.filter(r => r.fv != null && r.pos !== 'K' && r.pos !== 'P').map(r => r.fv).sort((a, b) => a - b);
@@ -476,7 +487,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv),
       pct: pct(p.fvOn), range: range(p, k + 1, 0, r), xnil: xnil(P.level, p),
       pOn2: p2 ? r3(p2.pOn) : null, fvOn2: p2 ? r1(p2.fvOn) : null, xfv2: p2 ? r1(p2.xfv) : null, pct2: p2 ? pct(p2.fvOn) : null,
-      ark: arkStars(p2 ? p2.g.xfv : p.g.xfv), stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+      ark: SI ? starsOf(r) : arkStars(p2 ? p2.g.xfv : p.g.xfv), stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
     whyQueue[whyQueue.length - 1][0] = redshirts[redshirts.length - 1];
   }
   redshirts.sort((a, b) => b.xfv - a.xfv);

@@ -4,6 +4,7 @@
 
     python3 scripts/cfb_recruit_retarget.py            # pulls (cached in scripts/.cache/recruit, fvrefit), test, write
     python3 scripts/cfb_recruit_retarget.py --offline
+    python3 scripts/cfb_recruit_retarget.py --stars    # the ARK star cuts only, for the index on file
 
 Why: scripts/cfb_recruit_fit.py trains on this season's board grade (fvg). For young players that grade is mostly
 pedigree (fetch_cfb.mjs hsZ reads 247's composite), so a recruit model fit on it learns to copy the 247 composite
@@ -302,6 +303,57 @@ def stars_nfl(data, scores):
     return out
 
 
+# ---- ARK stars on the index (Nov 16 2026) -------------------------------------------------------------------
+# The stars are cut on the index's expected NFL outcome, not on the year-3 board xFV, which adds the board's position,
+# year and program terms (held out, the star tiers' rank correlation with the outcome is higher in all nine classes,
+# and in the 2020 and 2021 classes neither fit saw). The tier shares are where the cuts explain the most outcome
+# variance in the classes left out (tests: scripts/research/recruits_cfb_nov16).
+STAR_SHARES = [0.625, 0.85, 0.9475, 0.985]   # cumulative share of signees below 2, 3, 4 and 5 stars
+PLUS_PER = 6                                  # 5-star+ recruits a class, on average (the line is a score, not a count)
+
+
+def index_score(ix, rows, sz):
+    for r in rows: r.pop('_bc', None)
+    X, _ = R.design(rows, ix['on']['blocks'], sz); p = R.sig(ix['on']['b0'] + X @ np.array(ix['on']['coef']))
+    X1, _ = R.design(rows, ix['fv']['blocks'], sz); f = np.maximum(R.FLOOR, ix['fv']['b0'] + X1 @ np.array(ix['fv']['coef']))
+    return p * f + (1 - p) * R.FLOOR
+
+
+def stars_block(data, ix, sz, oof):
+    """Cuts on the index score (the live scale: the index fit on every row), half-star cuts inside each tier (where
+    the monotone outcome-on-score curve passes the midpoint of the two tiers' means, kept in the tier's middle half),
+    and each tier's outcomes read on the out-of-fold score."""
+    s = index_score(ix, data, sz); y = np.array([r['rfv'] for r in data])
+    cuts = [float(x) for x in np.quantile(s, STAR_SHARES)] + [float(np.sort(s)[::-1][PLUS_PER * len(CLASSES) - 1])]
+    st = R.cut(s, cuts[:4]); mu = [y[st == t].mean() for t in (1, 2, 3, 4, 5)]
+    o = np.argsort(s); bins = np.array_split(o, 80); bx = np.array([s[b].mean() for b in bins]); by = np.maximum.accumulate([y[b].mean() for b in bins])
+    half = []
+    for t in range(4):
+        lo = cuts[t - 1] if t else float(s.min()); hi = cuts[t]
+        x = float(np.interp((mu[t] + mu[t + 1]) / 2, by + np.arange(len(by)) * 1e-9, bx))
+        half.append(min(max(x, lo + 0.25 * (hi - lo)), lo + 0.75 * (hi - lo)))
+    so = R.cut(oof, list(np.quantile(oof, STAR_SHARES)) + [float(np.sort(oof)[::-1][PLUS_PER * len(CLASSES) - 1])]); rows = []
+    for v in (6, 5, 4, 3, 2, 1):
+        j = np.where(so == v)[0]
+        rows.append({'stars': v, 'n': len(j), 'perClass': round(len(j) / len(CLASSES), 1), 'drafted': round(float(np.mean([data[x]['drafted'] for x in j])), 3),
+                     'top32': round(float(np.mean([bool(data[x]['pick']) and data[x]['pick'] <= 32 for x in j])), 3),
+                     'top64': round(float(np.mean([bool(data[x]['pick']) and data[x]['pick'] <= 64 for x in j])), 3),
+                     'starter': round(float(np.mean([data[x]['avps'] >= 3 for x in j])), 3), 'fv': round(float(y[j].mean()), 1)})
+    return {'shares': STAR_SHARES, 'plusPer': PLUS_PER, 'cuts': [round(x, 3) for x in cuts], 'half': [round(x, 3) for x in half], 'tiers': rows}
+
+
+def stars_only():
+    """--stars: the star cuts for the index already in data/cfb_recruit_retarget.json (no refit)"""
+    out = json.load(open(OUT)); data, _, _ = dataset()
+    tms = [t for t in (R.commit_timing(r) for r in data) if t]
+    R.TM_MEAN = [round(float(np.mean([t[0] for t in tms])), 3), round(float(np.mean([t[1] for t in tms])), 3)]
+    as_hurdle(data); sz = R.size_norms(data)
+    oof, _, _ = cvx(data, out['use'], sz)
+    out['stars'] = stars_block(data, out['index'], sz, oof)
+    print(json.dumps(out['stars'], indent=1))
+    json.dump(out, open(OUT, 'w'), indent=1)
+
+
 def main():
     data, how, capfit = dataset()
     tms = [t for t in (R.commit_timing(r) for r in data) if t]
@@ -341,9 +393,10 @@ def main():
     use_c = {'on': use['on'] + [COMP], 'fv': use['fv']}
     out['compGate'] = comp_gate(data, use, SZ); print('composite', out['compGate'])
     out['indexComp'] = {**index_fit(data, use_c, SZ), 'tm': R.TM_MEAN}
+    out['stars'] = stars_block(data, out['index'], SZ, new)
     json.dump(out, open(OUT, 'w'), indent=1)
     return data, use, SZ
 
 
 if __name__ == '__main__':
-    main()
+    stars_only() if '--stars' in sys.argv else main()

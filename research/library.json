@@ -299,7 +299,8 @@
      "term": "ARK stars",
      "short": "Recruit star rating cut from the projected FV, not the industry stars.",
      "body": [
-      "CFB: 5-star+ top 6 a class, 5 top 3% of board FV, 4 top 10%, 3 above median, 2 on board, 1 off board (year-3 xFV).",
+      "CFB: cut on the recruit index (expected NFL outcome, ESPN 2011-19 signees), not on board xFV. Drafted, held out: 5-star+ 76% (about 6 a class; 52% top-64 picks), 5 56% (35 a class), 4 29% (102), 3 18% (265), 2 9%, 1 3%.",
+      "CFB tests (9 classes, 2020-21 never fit): index stars vs year-3 xFV stars, rank correlation with the NFL outcome .251 vs .244 (9/9, t 3.9); outcome-fit tier shares vs the old shares, tier R2 .130 vs .119 (9/9, t 3.0). 5-star+ line: ranks 1-3 a class 63% top-64, ranks 4-6 41%, ranks 7-10 39%; the estimate is 3 with a 90% interval of 0-6, so the line stays at 6. A score line against a fixed count: no difference (t 0.1).",
       "CBB: 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.",
       "Arrow = ARK stars minus industry stars."
      ],
@@ -927,6 +928,7 @@
      "body": [
       "Conditional logit over the schools in his ESPN recruitment list (3+ schools): school pull and tier, his grade x tier, |grade - tier|, log(1 + miles from home / 100), home-state school.",
       "Walk-forward by class, CFB 2018-26 (n 16,934) and CBB 2015-26 (n 1,553). Distance + home state: log loss 2.076 -> 2.011 (t 21.7), top-1 24.3% -> 29.2% CFB; 1.945 -> 1.932 (t 3.8), 22.6% -> 25.4% CBB.",
+      "CFB, Nov 16 2026: added the school's conversion rate (signed / listed, prior three classes; t 15.6), on-field strength (final Elo z and its one-season change; t 13.3) and recency weights (.75 a class; t 14.0). Together log loss 2.011 -> 1.962 (t 20.4, 8/9 classes), top-1 29.2% -> 30.4%, top-3 59.9% -> 61.9%. Failed: top-tier / nearest school in his list, high-school pipeline.",
       "Failed: state pipeline, distance x school tier, distance x recruit grade. Top-1 chance calibrated held out (mean .25 vs hit .26). CBB shows On3's prediction leader where On3 has one."
      ],
      "where": "CFB 2028-2029 class tabs, CBB 2027-2029 class tabs (Team column)",

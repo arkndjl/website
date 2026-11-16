@@ -8,8 +8,14 @@ in the prior 3 classes). School terms come only from earlier classes. Pre-regist
 /mnt/project-files/recruits/commit-distance/prereg.md
   python3 scripts/recruit_commit_fit.py            walk-forward tests, then the live fit and leans
   python3 scripts/recruit_commit_fit.py --live     live fit and leans only, with the terms in data/recruit_commit_fit.json
+  python3 scripts/recruit_commit_fit.py --refit [cfb|cbb]   the stored tests kept, the live models fit again, then the leans
+
+CFB LIST model, Nov 16 2026 (tests: scripts/research/recruits_cfb_nov16/commit_tests.py, each on top of the kept terms,
+walk-forward 2018-26, Holm): the school's conversion rate (signed / listed, prior three classes), its on-field
+strength (final Elo z of the last season and the change from the one before), and recency weights on the training
+classes (.75 a class). Failed there: top-tier / nearest school in his list, high-school pipeline.
 """
-import json, math, os, sys
+import csv, json, math, os, sys, time
 from collections import defaultdict
 import numpy as np
 
@@ -26,6 +32,10 @@ HELD = {'cfb': range(2018, 2027), 'cbb': range(2015, 2027)}
 LIVE = (2027, 2028, 2029)
 BASE = ['pull', 'tier', 'gxt', 'gap']
 DIST = ['ld', 'inst', 'pipe', 'ld_tier', 'ld_g']
+MORE = ['conv', 'elo', 'delo']
+EXTRA = {'cfb': {'list': ['conv', 'elo', 'delo']}}   # added to the kept terms of that sport's model
+DECAY = {'cfb': {'list': 0.75}}                      # weight of a training class, per class back from the newest
+SCHED = os.path.join(ROOT, 'scripts', '.cache', 'fvrefit', 'ros')
 LAM = 1.0
 NALT = 40
 RNG = np.random.default_rng(7)
@@ -56,35 +66,65 @@ def load(sp):
     return loc, cls
 
 
-def school_stats(cls, y, loc):
-    """from classes y-3..y-1: signee count, tier (shrunk mean grade z), signees by home state"""
-    n, s, bys = defaultdict(int), defaultdict(float), defaultdict(int)
+_ELO = {}
+
+
+def elo_z(season):
+    """CFB: each program's final Elo of a season as a z among FBS programs (cfbfastR schedules, as
+    scripts/cfb_recruit_retarget.py programs_hist; FCS 0). {} when the file can't be read: the terms then stay neutral."""
+    if season in _ELO: return _ELO[season]
+    f = os.path.join(SCHED, f's{season}.csv'); out = {}
+    stale = os.path.exists(f) and season >= time.gmtime().tm_year - 1 and time.time() - os.path.getmtime(f) > 72000   # a season still being played
+    if not os.path.exists(f) or not os.path.getsize(f) or stale:
+        os.makedirs(SCHED, exist_ok=True)
+        os.system(f'curl -sSLf -m 120 -o {f}.tmp "https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/schedules/csv/cfb_schedules_{season}.csv" && mv {f}.tmp {f}')
+    if os.path.exists(f) and os.path.getsize(f):
+        last, div = {}, {}
+        for r in sorted(csv.DictReader(open(f)), key=lambda r: (int(r['week'] or 0), r['season_type'] == 'postseason')):
+            for sd in ('home', 'away'):
+                t = r[sd + '_id']; div[t] = r[sd + '_division']
+                if r[sd + '_postgame_elo'] not in ('', 'NA'): last[t] = float(r[sd + '_postgame_elo'])
+        fbs = [last[t] for t in last if div.get(t) == 'fbs']
+        if len(fbs) > 50:
+            m, sd_ = float(np.mean(fbs)), float(np.std(fbs))
+            out = {t: ((last.get(t, m) - m) / sd_ if d == 'fbs' else 0.0) for t, d in div.items() if d in ('fbs', 'fcs')}
+    _ELO[season] = out
+    return out
+
+
+def school_stats(cls, y, loc, sp=None):
+    """from classes y-3..y-1: signee count, tier (shrunk mean grade z), signees by home state, times listed by a
+    recruit; CFB: the program's Elo z of season y-1 and of season y-2"""
+    n, s, bys, listed = defaultdict(int), defaultdict(float), defaultdict(int), defaultdict(int)
     for k in (y - 3, y - 2, y - 1):
         for x in cls.get(k, []):
+            for t in x['list']: listed[t] += 1
             if x['chose'] in loc: n[x['chose']] += 1; s[x['chose']] += x['g']; bys[(x['chose'], x['st'])] += 1
     allm = sum(s.values()) / max(1, sum(n.values()))
     tier = {t: (s[t] + 5 * allm) / (n[t] + 5) for t in n}
-    return n, tier, bys
+    e1, e0 = (elo_z(y - 1), elo_z(y - 2)) if sp == 'cfb' else ({}, {})
+    return n, tier, bys, listed, e1, e0
 
 
 def feats(x, alts, st, loc):
-    n, tier, bys = st
+    n, tier, bys, listed, e1, e0 = st
     F = []
     for t in alts:
         lat, lon, sst, _ = loc[t]
         ld = math.log1p(miles(x['home'], (lat, lon)) / 100); tr = tier.get(t, -1.0)
         F.append([math.log1p(n.get(t, 0)), tr, x['g'] * tr, abs(x['g'] - tr), ld, float(sst == x['st']),
-                  math.log1p(bys.get((t, x['st']), 0)), ld * tr, ld * x['g']])
+                  math.log1p(bys.get((t, x['st']), 0)), ld * tr, ld * x['g'],
+                  math.log((n.get(t, 0) + 1) / (listed.get(t, 0) + 5)), e1.get(t, 0.0), e1.get(t, 0.0) - e0.get(t, e1.get(t, 0.0))])
     return np.array(F)
 
 
-COLS = BASE + DIST
+COLS = BASE + DIST + MORE
 
 
 def build(sp, loc, cls, years, mode, sample):
     X, grp, yv, meta = [], [], [], []
     for y in years:
-        st = school_stats(cls, y, loc); active = [t for t in st[0] if t in loc]
+        st = school_stats(cls, y, loc, sp); active = [t for t in st[0] if t in loc]
         for x in cls.get(y, []):
             c = x['chose']
             if mode == 'list':
@@ -100,19 +140,20 @@ def build(sp, loc, cls, years, mode, sample):
     return X, np.array(yv), meta
 
 
-def fit(X, yv, cols, lam=LAM):
-    idx = [COLS.index(c) for c in cols]
+def fit(X, yv, cols, lam=LAM, w=None):
+    """ridge conditional logit; w: a weight on each recruit (mean 1)"""
+    idx = [COLS.index(c) for c in cols]; w = np.ones(len(X)) if w is None else np.asarray(w, float) / np.mean(w)
     A = np.vstack([x[:, idx] for x in X]); mu, sd = A.mean(0), A.std(0) + 1e-9
     off = np.cumsum([0] + [len(x) for x in X]); Z = (A - mu) / sd; ch = off[:-1] + yv
-    n = np.diff(off); b = np.zeros(len(idx))
+    n = np.diff(off); b = np.zeros(len(idx)); wr = np.repeat(w, n)
     def obj(b):
         u = Z @ b; m = np.maximum.reduceat(u, off[:-1]); e = np.exp(u - np.repeat(m, n)); s = np.add.reduceat(e, off[:-1])
-        return -(u[ch] - m - np.log(s)).sum() + lam * b @ b, e / np.repeat(s, n)
+        return -(w * (u[ch] - m - np.log(s))).sum() + lam * b @ b, e / np.repeat(s, n)
     f0, p = obj(b)
     for _ in range(100):   # damped Newton on the ridge conditional logit (convex)
         zb = np.add.reduceat(p[:, None] * Z, off[:-1])
-        gr = Z[ch].sum(0) - zb.sum(0) - 2 * lam * b
-        H = (p[:, None] * Z).T @ Z - zb.T @ zb + 2 * lam * np.eye(len(b))
+        gr = (w[:, None] * Z[ch]).sum(0) - (w[:, None] * zb).sum(0) - 2 * lam * b
+        H = ((wr * p)[:, None] * Z).T @ Z - (w[:, None] * zb).T @ zb + 2 * lam * np.eye(len(b))
         step, a = np.linalg.solve(H, gr), 1.0
         while a > 1e-6:
             f1, p1 = obj(b + a * step)
@@ -196,11 +237,12 @@ def live(sp, loc, cls, spec, refit=True):
     last = max(HELD[sp])
     for mode in ('list', 'open'):
         if not refit and spec.get('models', {}).get(mode): models[mode] = spec['models'][mode]; continue
-        cols = spec[mode]['kept']
+        cols = spec[mode]['kept'] + [c for c in EXTRA.get(sp, {}).get(mode, []) if c not in spec[mode]['kept']]
         yrs = range(2022 if spec[mode].get('nilOnly') else YEARS[sp][0] + 3, last + 1)
-        X, yv, _ = build(sp, loc, cls, yrs, mode, True); models[mode] = fit(X, yv, cols)
+        X, yv, meta = build(sp, loc, cls, yrs, mode, True); dec = DECAY.get(sp, {}).get(mode)
+        models[mode] = fit(X, yv, cols, w=[dec ** (last - y) for y, _ in meta] if dec else None)
     for y in LIVE:
-        st = school_stats(cls, min(y, last + 1), loc); active = [t for t in st[0] if t in loc]
+        st = school_stats(cls, min(y, last + 1), loc, sp); active = [t for t in st[0] if t in loc]
         for x in cls.get(y, []):
             if x['chose']: continue
             mode = 'list' if len(x['list']) >= 3 else 'open'
@@ -239,7 +281,9 @@ def site_keys(sp, leans):
 
 def main():
     prev = json.load(open(OUT)) if os.path.exists(OUT) else {}
-    only_live = '--live' in sys.argv
+    refit = '--refit' in sys.argv
+    which = [a for a in sys.argv[sys.argv.index('--refit') + 1:] if a in YEARS] if refit else []   # --refit cfb: that sport only
+    only_live = '--live' in sys.argv or refit
     res = prev if only_live else {}
     if only_live:   # the live classes change daily; the school terms read the last three finished classes
         from recruit_commit_pull import pull, teams
@@ -251,14 +295,16 @@ def main():
         loc, cls = load(sp)
         if not only_live:
             res[sp] = {'distance': distance_table(loc, cls, HELD[sp])}
-            for mode in ('list', 'open'): res[sp][mode] = forward(sp, loc, cls, mode)
+            for mode in ('list', 'open'):
+                res[sp][mode] = forward(sp, loc, cls, mode)
+                if prev.get(sp, {}).get(mode, {}).get('more'): res[sp][mode]['more'] = prev[sp][mode]['more']   # the added terms' own tests
             for mode in ('list', 'open'):
                 k = res[sp][mode]; nil = [g for g in k['tests'] if g['term'] in k['kept'] and g['nilGain'] < 0 and g['nilT'] <= -1]
                 k['nilOnly'] = bool(nil)
-        models, lv = live(sp, loc, cls, res[sp], refit=not only_live)
+        models, lv = live(sp, loc, cls, res[sp], refit=(refit and (not which or sp in which)) or not only_live)
         res[sp]['models'] = models
         leans[sp] = site_keys(sp, lv)
-        if not only_live: json.dump(res, open(OUT, 'w'), indent=1)
+        if refit or not only_live: json.dump(res, open(OUT, 'w'), indent=1)
     json.dump(leans, open(LEANS, 'w'), separators=(',', ':'))
     print('wrote', LEANS, {sp: {y: len(v) for y, v in d.items()} for sp, d in leans.items()})
 
