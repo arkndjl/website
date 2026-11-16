@@ -2585,7 +2585,8 @@ const carriedRows = now => {
   const ark = new Set(ARKLIST['college-football'] || []);
   return PREV_ALL.rows.map(a => Object.fromEntries(PREV_ALL.cols.map((c, j) => [c, a[j]])))
     .filter(r => r.src !== 'espn' && !(espnId(r) && ids.has(espnId(r))) && !m.find(r.name, { team: r.team, pos: r.pos, id: espnId(r), crossTeam: 'none' })[0])
-    .map(r => ({ ...r, carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
+    .map(r => ({ ...r, ...(r.age > 35 ? { age: null, ageEst: r.elig ? r1(18.4 + r.elig) : null } : {}),   // an impossible age kept from an older build
+      carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
 };
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
