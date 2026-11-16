@@ -1418,7 +1418,7 @@ def load_all():
     return games, btname, d1s, tprior, avs
 
 
-def matrices(rows, feats, tfeats=TFEATS):
+def matrices(rows, feats, tfeats=TFEATS, cuts=None, states=None):
     """'mdis' in feats / 'tdis' in tfeats: the market-disagreement column is built here from the other columns'
     walk-forward prediction (dis_col), so every reader of the history walk gets the same input"""
     D = [(g, x, tx) for g, x, tx in rows if g['season'] >= FIRST + 1]
@@ -1430,17 +1430,19 @@ def matrices(rows, feats, tfeats=TFEATS):
     d1 = np.array([g['home'] != X and g['away'] != X and 'hb' in g for g, _, _ in D])
     if 'mdis' in feats:
         j = list(feats).index('mdis'); o = [i for i in range(len(feats)) if i != j]
-        Xm[:, j] = dis_col(D, Xm[:, o], y, S, d1, line, -1)
+        Xm[:, j] = dis_col(D, Xm[:, o], y, S, d1, line, -1, cuts=cuts, states=states)
     if 'tdis' in tfeats:
         j = list(tfeats).index('tdis'); o = [i for i in range(len(tfeats)) if i != j]
         TX[:, j] = dis_col(D, TX[:, o], ty, S, d1, tline, +1)
     return D, Xm, y, TX, ty, S, line, tline, d1
 
 
-def dis_col(D, X0, y, S, d1, line, sign, k=None):
+def dis_col(D, X0, y, S, d1, line, sign, k=None, cuts=None, states=None):
     """the market-disagreement input for every history game (DIS_K): the other inputs X0 give each game's margin
     walk-forward (the first season, with none before it, from its own fit: training rows only), and each team's
-    running gap to the close is read before its day's lines are added. sign -1: margin (home minus away), +1: total"""
+    running gap to the close is read before its day's lines are added. sign -1: margin (home minus away), +1: total.
+    cuts {season: [cut dates]} with states {}: states gets {(season, cut date): {team: d}}, each team's gap the morning
+    of the cut (before that day's games), as the live walk's W.md reads it"""
     k = DIS_K if k is None else k
     p0 = walk_pred(X0, y, S, d1, first=int(S.min()) + 1)
     nn = np.isnan(p0)
@@ -1451,9 +1453,13 @@ def dis_col(D, X0, y, S, d1, line, sign, k=None):
     by = defaultdict(lambda: defaultdict(list))
     for i, (g, _, _) in enumerate(D):
         by[g['season']][et_date(g['date'])].append(i)
+    cuts = cuts or {}
     for s in sorted(by):
         d = defaultdict(float)
+        pend = sorted(cuts.get(s, ()))
         for day in sorted(by[s]):
+            while pend and day >= pend[0]:
+                states[(s, pend.pop(0))] = dict(d)
             for i in by[s][day]:
                 out[i] = d[D[i][0]['home']] + sign * d[D[i][0]['away']]
             for i in by[s][day]:
@@ -1462,6 +1468,8 @@ def dis_col(D, X0, y, S, d1, line, sign, k=None):
                 h, a = D[i][0]['home'], D[i][0]['away']
                 e = (line[i] - p0[i]) - (d[h] + sign * d[a])
                 d[h] += k * e; d[a] += sign * k * e
+        for c in pend:
+            states[(s, c)] = dict(d)
     return out
 
 

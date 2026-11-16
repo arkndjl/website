@@ -119,9 +119,10 @@ def walk():
     return out
 
 
-def gm_snaps(games, cuts, d1s):
-    """the long-memory margin rating (the game model's 'gm' input, scripts/control_ratings.py) of every D-I team the
-    morning of each cut: probe games with no result (each team at home to a reference team) read it off the walk"""
+def gm_snaps(games, cuts, d1s, ctl=None):
+    """a control rating (scripts/control_ratings.py) of every D-I team the morning of each cut: the long-memory margin
+    twin ('gm') by default, or game control ('gc') with ctl the history's per-game control. Probe games with no
+    result (each team at home to a reference team) read it off the walk"""
     import control_ratings as CR
     probes, ref = [], {}
     for (s, c), cd in cuts.items():
@@ -130,7 +131,7 @@ def gm_snaps(games, cuts, d1s):
         for t in ts[1:]:
             probes.append({'id': f'probe|{s}|{c}|{t}', 'date': cd + 'T00:00Z', 'season': s, 'home': t, 'away': ts[0], 'neutral': True})
     done = [g for g in games if g.get('hs') is not None]
-    feat, _ = CR.ratings(CR.cbb_gl(done + probes), CR.margin_control(done), **CR.CBB_FIT)
+    feat, _ = CR.ratings(CR.cbb_gl(done + probes), CR.margin_control(done) if ctl is None else ctl, **CR.CBB_FIT)
     out = defaultdict(dict)
     for k, v in feat.items():
         if k.startswith('probe|'):
@@ -139,6 +140,26 @@ def gm_snaps(games, cuts, d1s):
     for (s, c) in cuts:
         out[(s, c)][ref[s]] = 0.0
     return dict(out)
+
+
+def fill_mdis(rows, feats, G, cuts):
+    """the walk leaves the market-disagreement input at 0 (cbb_games.matrices fills it for the game fit): the same
+    column here, written into the rows so the weights and the tournament games read it, and each team's running gap
+    the morning of each cut for the rating -> {(season, cut): {team: gap}}"""
+    if 'mdis' not in feats:
+        return {}
+    by = defaultdict(list)
+    for (s, c), d in cuts.items():
+        by[s].append(d)
+    states = {}
+    keep = [r for r in rows if r[1] in G and G[r[1]].get('hs') is not None]
+    D, Xm = C.matrices([(G[r[1]], r[2], {}) for r in keep], list(feats), tfeats=(), cuts=dict(by), states=states)[:2]
+    j = list(feats).index('mdis')
+    col = {g['id']: float(Xm[i, j]) for i, (g, _, _) in enumerate(D)}
+    for r in rows:
+        if 'mdis' in r[2]:
+            r[2]['mdis'] = col.get(r[1], 0.0)
+    return {(s, c): states.get((s, d), {}) for (s, c), d in cuts.items()}
 
 
 def coefs(rows, feats, margin):
@@ -153,17 +174,21 @@ def coefs(rows, feats, margin):
     return out
 
 
-def team_rating(net, T, tau, elo, gm, teams, coef, md=None):
+def team_rating(net, T, tau, elo, gm, teams, coef, md=None, gc=None):
     """points against an average D-I team on a neutral floor, from the game model's weights: efficiency (its own and,
-    with no ESPN forecast for a game not yet scheduled, BPI's fallback to it), Elo, long-memory margin, and (md, live)
-    the market-disagreement rating (cbb_games DIS_K)"""
+    with no ESPN forecast for a game not yet scheduled, BPI's fallback to it), Elo, the control ratings (gc game control,
+    gm its long-memory margin twin: whichever the game model has as inputs) and the market-disagreement rating
+    (cbb_games DIS_K), so a rating gap plus the home edge is the game model's margin"""
     P0 = tau + 2 * float(np.mean([T[t] for t in teams]))
     mn = float(np.mean([net[t] for t in teams])); me = float(np.mean([elo[t] for t in teams]))
-    mg = float(np.mean([gm.get(t, 0.0) for t in teams]))
     ce = coef.get('eff', 0.0) + coef.get('bpi', 0.0)
-    mm = float(np.mean([md.get(t, 0.0) for t in teams])) if md else 0.0
-    return {t: ce * (net[t] - mn) * P0 / 100 + coef.get('elo', 0.0) * (elo[t] - me) / 25 + coef.get('gm', 0.0) * (gm.get(t, 0.0) - mg)
-            + (coef.get('mdis', 0.0) * (md.get(t, 0.0) - mm) if md else 0.0) for t in teams}
+    out = {t: ce * (net[t] - mn) * P0 / 100 + coef.get('elo', 0.0) * (elo[t] - me) / 25 for t in teams}
+    for k, v in (('gm', gm), ('gc', gc), ('mdis', md)):
+        if v and coef.get(k):
+            m = float(np.mean([v.get(t, 0.0) for t in teams]))
+            for t in teams:
+                out[t] += coef[k] * (v.get(t, 0.0) - m)
+    return out
 
 
 def home_edge(coef, conf_game, h):
@@ -471,9 +496,15 @@ def prepare():
     F = json.load(open(C.FIT))
     games = C.load_hist()
     margin = {g['id']: g['hs'] - g['as'] for g in games if g.get('hs') is not None}
-    co = coefs(rows, F['feats'], margin)
     cuts = {(s, c): snaps[(s, c)]['date'] for s in SEASONS for c in ('feb1', 'mar1', 'sel') if (s, c) in snaps}
-    gm = gm_snaps(games, cuts, d1s)
+    mds = fill_mdis(rows, F['feats'], {g['id']: g for g in games}, cuts)
+    co = coefs(rows, F['feats'], margin)
+    gm = gm_snaps(games, cuts, d1s) if 'gm' in F['feats'] else {}
+    if 'gc' in F['feats']:
+        import control_ratings as CR
+        gcs = gm_snaps(games, cuts, d1s, ctl=json.load(gzip.open(CR.CBB_HIST, 'rt'))['control'])
+    else:
+        gcs = {}
     by_s = defaultdict(list)
     for g in games:
         by_s[g['season']].append(g)
@@ -505,7 +536,7 @@ def prepare():
         for c in ('feb1', 'mar1', 'sel'):
             sn = snaps[(s, c)]
             teams = [t for t in sorted(d1s[s]) if t in sn['net']]
-            rating = team_rating(sn['net'], sn['T'], sn['tau'], sn['elo'], gm[(s, c)], teams, co[s])
+            rating = team_rating(sn['net'], sn['T'], sn['tau'], sn['elo'], gm.get((s, c)), teams, co[s], md=mds.get((s, c)), gc=gcs.get((s, c)))
             rank = {t: i + 1 for i, t in enumerate(sorted(teams, key=lambda t: -rating[t]))}
             ts = set(teams)
             d1g = [g for g in gs if g['home'] in ts and g['away'] in ts]
@@ -805,7 +836,7 @@ def fit():
     print('rounds', res['rounds'], flush=True)
 
     # forecasts from Feb 1 and Mar 1: the whole chain, scored on every eligible team
-    fc = {}
+    fc, fc_items = {}, {}
     configs = {'model': (sel['feats'], seed['feats'], seed['sigma']), 'rating-only committee': (['r'], ['r'], seed['tests']['rating only']['sigma'])}
     for cut in ('feb1', 'mar1'):
         rec = defaultdict(lambda: defaultdict(list))
@@ -849,8 +880,12 @@ def fit():
         out['calibration'] = [{'bin': f'{a:.2f}-{min(b, 1):.2f}', 'n': int(((p >= a) & (p < b)).sum()), 'pred': round(float(p[(p >= a) & (p < b)].mean()), 3),
                                'real': round(float(yy[(p >= a) & (p < b)].mean()), 3)} for a, b in bins if ((p >= a) & (p < b)).any()]
         fc[cut] = out
+        fc_items[cut] = {k: rec['model'][k] for k in ('bid', 'seed', 'f4', 'champ')}
         print(cut, out, flush=True)
     res['forecast'] = fc
+    if os.environ.get('CBB_TOURNEY_ITEMS'):      # per-team losses, for paired comparisons of two fits (research)
+        json.dump({'rounds': {rd: rr[rd] for rd in ROUNDS}, 'games_model': list(map(float, lm)), 'games_sim': list(map(float, lr)),
+                   'forecast': fc_items}, open(os.environ['CBB_TOURNEY_ITEMS'], 'w'))
     res['committee'] = committee(R, sel['feats'], seed['feats'], seed['sigma'])
     res['summary'] = summary(res)
     with open(FIT, 'w') as f:
@@ -873,7 +908,7 @@ def live_gm(rows, season):
     return fin.get(season) or {t: CR.CBB_FIT['carry'] * v for t, v in H['final']['gm'].get(str(season - 1), {}).items()}
 
 
-def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=None, md=None):
+def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=None, md=None, gc=None):
     """today's tournament odds for cbb_games_live: rows (this season's ESPN games), d1 (rated teams), confs (team ->
     board conference), the efficiency solve's net/T/tau, Elo, games played (gm: live_gm's, when the caller has it).
     Returns {team: odds} or {} with no fit"""
@@ -883,9 +918,9 @@ def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=
     mdl = Fit['committee']
     teams = sorted(d1)
     ts = set(teams)
-    if gm is None:
+    if gm is None and coef.get('gm'):
         gm = live_gm(rows, season)
-    rating = team_rating(net, T, tau, elo, gm, teams, coef, md=md)
+    rating = team_rating(net, T, tau, elo, gm, teams, coef, md=md, gc=gc)
     rank = {t: i + 1 for i, t in enumerate(sorted(teams, key=lambda t: -rating[t]))}
     hist = C.load_hist()
     d1s = {s: C.d1_set([g for g in hist if g['season'] == s]) for s in range(season - 4, season)}
