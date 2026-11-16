@@ -15,13 +15,14 @@
 {{- $d := . -}}
 {{- $s0 := index .seasons 0 }}{{ $s1 := index .seasons 1 -}}
 {{- $draft := eq (.basis | default "") "draft" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "all-time FV :: %s %v-%v by position" (cond $draft "draft-day grades" "best grades") $s0 $s1)) "icon" $c.icon "filter" "Pos,Season,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,Season,FV,Out" "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "all-time FV :: %s %v-%v by position" (cond $draft "draft-day grades" "best grades") $s0 $s1)) "icon" $c.icon "filter" "Pos,Season,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,Season,FV,Out,Δ" "gfxMax" "25") -}}
 <table class="cfb__table fvat">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Pos</th><th>Season</th><th>{{ if eq $sport "tennis" }}Nat{{ else }}Team{{ end }}</th>
     <th class="cfb__g" title="{{ if $draft }}the grade at the draft after his last season{{ else }}the grade at his best season{{ end }}: the mean outcome, stretched above the board's top few a season">FV</th>
     <th class="cfb__num" title="the exact mean outcome behind the FV">Mean</th>
     <th title="what his career became, on the same scale">Out</th>
+    <th class="cfb__num" title="Out minus Mean: + beat the grade, − fell short">Δ</th>
     {{- if in (slice "cfb" "cbb" "hockey") $sport }}<th class="cfb__num" title="draft year and overall pick">Draft</th>{{ end }}
     <th class="fvat__x">{{ if eq $sport "cfb" }}NFL{{ else if eq $sport "cbb" }}NBA{{ else if eq $sport "hockey" }}NHL{{ else if eq $sport "soccer" }}Age{{ else }}Peak{{ end }}</th>
   </tr></thead>
@@ -40,6 +41,8 @@
     {{- else }}
     <td class="cfb__dim" data-v="0">{{ if eq $r.status "college" }}college{{ else }}pending{{ end }}</td>
     {{- end }}
+    {{- with .out }}{{ $dv := sub (float .) (float $r.fvx) }}<td class="cfb__num" data-v="{{ printf "%.2f" $dv }}">{{ partial "num.html" (slice "%+.1f" $dv) }}</td>
+    {{- else }}<td class="cfb__num cfb__dim">–</td>{{ end }}
     {{- if in (slice "cfb" "cbb" "hockey") $sport }}<td class="cfb__num">{{ with .pick }}{{ $r.draft }} #{{ . }}{{ else }}{{ if eq $r.status "college" }}{{ else }}<span class="cfb__dim">undrafted</span>{{ end }}{{ end }}</td>{{ end }}
     <td class="fvat__x cfb__dim">
       {{- if eq $sport "cfb" }}{{ with .av }}{{ partial "num.html" (slice "%.1f" (float .)) }} AV/season{{ end }}{{ with .pb }} · {{ . }} PB{{ end }}{{ with .ap }} · {{ . }} AP{{ end }}
