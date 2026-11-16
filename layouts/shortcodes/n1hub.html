@@ -1,4 +1,4 @@
-{{- /* The 1NT section shell (content/laursen_111.md): Night palette over the whole page, the hero (team logo,
+{{- /* The 1NT section shell (content/1nt.md): Night palette over the whole page, the hero (team logo,
        season line, next match) and the section's tabs inside. {{< n1hub >}} {{< wintabs ... >}} {{< /n1hub >}}
        Palette from the team's logo: black, grey wireframe, lilac equator, white lettering. Styles are scoped under .n1 (the parts are layouts/shortcodes/n1.html and esea.html). */ -}}
 {{- $d := site.Data.esea -}}
@@ -63,8 +63,7 @@ html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--wi
   <img class="n1-hero__logo" src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="1NT logo" width="192" height="192">
   <div class="n1-hero__id">
     <p class="n1-kick">ESEA League · North America{{ with $d.championship.name }} · {{ replaceRE "(?i)^ESEA League\\s*" "" . | replaceRE " - Regular Season$" "" }}{{ end }}</p>
-    <h1 class="n1-hero__h">1NT<span>/</span>LAURSEN_111</h1>
-    <p class="n1-hero__sub">Counter-Strike 2 team · captain LAURSEN_111</p>
+    <h1 class="n1-hero__h">1NT</h1>
     {{- with $d.record }}
     <ul class="n1-hero__stats">
       <li><b>{{ .w }}–{{ .l }}</b><span>S{{ $season }} record</span></li>
@@ -83,12 +82,16 @@ html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--wi
     <span class="n1-dim" data-n1-count="{{ .at }}"></span>
     {{- with $d.preview }}{{ if eq .id $d.next.id }}{{ with .p.win }}<span>1NT <b>{{ . }}%</b></span>{{ end }}{{ end }}{{ end }}
     {{- else }}<span class="n1-tick__k">NEXT</span><span class="n1-dim">no match scheduled</span>{{ end }}
-    <span class="n1-tick__links"><a href="https://www.twitch.tv/laursen_111" rel="noopener">watch live ↗</a></span>
+    <span class="n1-tick__links"><a href="https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" rel="noopener">FACEIT ↗</a><a href="https://www.twitch.tv/laursen_111" rel="noopener">watch live ↗</a></span>
   </p>
 </header>
 {{ .Inner }}
 </div>
 <script>
+(function () {   // the old combined page's tab names (/1nt/#1nt, #laursen-111) land on the right page
+  var h = (location.hash || '').slice(1).toLowerCase();
+  if (h === 'laursen-111' || h === 'laursen_111') location.replace('/laursen_111/');
+})();
 (function () {   // match times in the viewer's own time zone; countdowns tick once a minute
   var fmt = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
   function local() {

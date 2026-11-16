@@ -51,13 +51,13 @@ draft = false
 {{< /winpane >}}
 
 {{< winpane title="counter-strike.exe" icon="tv" status="LAURSEN_111" >}}
-**[1NT](/laursen_111/)** :: captain, ESEA League North America, seasons 52-59 (Open, Intermediate, Main).
+**[1NT](/1nt/)** :: captain, ESEA League North America, seasons 52-59 (Open, Intermediate, Main).
 
 - ESEA Intermediate S50, 3rd place ($750), with Bomb Squad
 - FACEIT level 10; North America top 1000 in FACEIT seasons 2, 3 and 6
 - 1NT, all time: 134 maps, 1.10 K/D, 86.1 ADR
-- streams FACEIT and ESEA on [twitch](https://www.twitch.tv/laursen_111); clips and VODs on [youtube](https://www.youtube.com/@LAURSEN_111)
-- built the [1NT page](/laursen_111/): ratings, match previews, season sims
+- [LAURSEN_111](/laursen_111/): streams FACEIT and ESEA on [twitch](https://www.twitch.tv/laursen_111); clips and VODs on [youtube](https://www.youtube.com/@LAURSEN_111)
+- built the [1NT page](/1nt/): ratings, match previews, season sims
 {{< /winpane >}}
 
 {{< winpane title="music.exe" icon="note" status="ARKNDJL" >}}

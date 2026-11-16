@@ -1,0 +1,48 @@
+{{- /* stream.exe: the Twitch player and chat side by side (stacked on phones). The player is Twitch's embed
+       script, whose ONLINE / OFFLINE events light the LIVE tag in the hero (data-lz-live in lzhub.html).
+       {{< lzstream channel="laursen_111" class="desk__wide" >}} */ -}}
+{{- $ch := .Get "channel" | default "laursen_111" -}}
+<div class="win lzs{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-twitch"/></svg>twitch.tv/{{ $ch }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="lzs__body">
+    <div class="lzs__player" id="lzs-player" data-ch="{{ $ch }}">
+      <a class="lzs__off" href="https://www.twitch.tv/{{ $ch }}" rel="noopener"><svg aria-hidden="true" viewBox="0 0 16 16"><use href="#icon-twitch"/></svg>twitch.tv/{{ $ch }}</a>
+    </div>
+    <div class="lzs__chat"><iframe data-src="https://www.twitch.tv/embed/{{ $ch }}/chat?darkpopout" title="{{ $ch }} chat" loading="lazy"></iframe></div>
+  </div>
+  <div class="win__status"><span><a href="https://www.twitch.tv/{{ $ch }}" target="_blank" rel="noopener">open on Twitch ↗</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<style>
+.lzs__body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:0;background:#000}
+.lzs__player{position:relative;aspect-ratio:16/9;background:#050607}
+.lzs__player iframe,.lzs__chat iframe{display:block;width:100%;height:100%;border:0}
+.lzs__off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--n1-lilac);text-decoration:none;letter-spacing:.1em}
+.lzs__off svg{width:24px;height:24px;fill:currentColor}
+.lzs__chat{min-height:0;border-left:2px solid var(--win-light)}
+@media (max-width:900px){.lzs__body{grid-template-columns:1fr}.lzs__chat{height:380px;border-left:0;border-top:2px solid var(--win-light)}}
+</style>
+<script>
+(function () {
+  var box = document.getElementById('lzs-player'); if (!box) return;
+  var ch = box.getAttribute('data-ch'), host = location.hostname;
+  var chat = document.querySelector('.lzs__chat iframe');
+  if (chat) chat.src = chat.getAttribute('data-src') + '&parent=' + host + (host === 'arkndjl.net' ? '&parent=www.arkndjl.net' : '');
+  function live(on) {
+    document.querySelectorAll('[data-lz-live]').forEach(function (el) { el.setAttribute('data-live', on ? '1' : '0'); });
+    document.querySelectorAll('[data-lz-live-t]').forEach(function (el) { el.textContent = on ? 'LIVE' : 'OFFLINE'; });
+  }
+  var s = document.createElement('script'); s.src = 'https://player.twitch.tv/js/embed/v1.js'; s.async = true;
+  s.onload = function () {
+    try {
+      box.innerHTML = '';
+      var p = new Twitch.Player('lzs-player', { channel: ch, parent: [host, 'www.arkndjl.net', 'arkndjl.net'], width: '100%', height: '100%', autoplay: false, muted: true });
+      p.addEventListener(Twitch.Player.ONLINE, function () { live(true); });
+      p.addEventListener(Twitch.Player.OFFLINE, function () { live(false); });
+    } catch (e) {}
+  };
+  document.head.appendChild(s);
+})();
+</script>
