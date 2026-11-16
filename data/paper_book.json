@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-15T23:58:28Z",
+ "asof": "2026-11-16T01:03:22Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 85.13,
+  "now": 85.9,
   "peak": 117.38,
-  "drawdown": 0.2748,
-  "open": 0.75,
+  "drawdown": 0.2682,
+  "open": 0,
   "path": [
-   116.03,
    116.7,
    117.38,
    111.97,
@@ -408,7 +407,8 @@
    84.98,
    85.17,
    84.95,
-   85.13
+   85.13,
+   85.9
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -1.96,
   "clv": 0.06,
   "beat": 0.328,
-  "settled": 436,
-  "w": 218,
+  "settled": 437,
+  "w": 219,
   "l": 218,
   "p": 0,
-  "roi": -0.0125,
-  "roiT": -0.26,
-  "profit": -13.06,
-  "risked": 407.5,
-  "yield": -0.032
+  "roi": -0.0096,
+  "roiT": -0.2,
+  "profit": -12.14,
+  "risked": 408.25,
+  "yield": -0.0297
  },
  "tEff": -1.53,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -1.2% vs -1.0% (SE 4.8)",
+   "value": "ROI -1.0% vs -1.0% (SE 4.8)",
    "pass": true
   }
  ],
@@ -707,18 +707,19 @@
    "clvT": -1.32,
    "clv": null,
    "beat": null,
-   "settled": 67,
-   "w": 45,
+   "settled": 68,
+   "w": 46,
    "l": 22,
    "p": 0,
-   "roi": 0.3326,
-   "roiT": 2.87,
-   "profit": 33.18,
-   "risked": 83.5,
-   "yield": 0.3973
+   "roi": 0.3457,
+   "roiT": 3.01,
+   "profit": 34.09,
+   "risked": 84.25,
+   "yield": 0.4046
   }
  ],
- "open": [
+ "open": [],
+ "recent": [
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -739,10 +740,12 @@
    "event": null,
    "pass": false,
    "clvRet": -0.0271,
-   "close": 2.5
-  }
- ],
- "recent": [
+   "close": 2.5,
+   "score": 1.0,
+   "res": "w",
+   "ret": 1.22,
+   "profit": 0.915
+  },
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -2491,37 +2494,6 @@
    "res": "w",
    "ret": 1.08,
    "profit": 3.24
-  },
-  {
-   "rule": "nba-total",
-   "sport": "nba",
-   "id": "401909949",
-   "k": "2026-11-09T01:00:00Z",
-   "slate": "nba:2026-11-08",
-   "h": "MIL",
-   "a": "BOS",
-   "mk": "total",
-   "side": "under",
-   "line": 223.5,
-   "price": -104.0,
-   "bet": "under 223.5 -104",
-   "placed": "2026-11-08T02:47:09Z",
-   "stake": 0.5,
-   "edge": 3.8,
-   "ev": 0.0077,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.0244,
-   "clv": 1.0,
-   "beat": 1,
-   "close": 222.5,
-   "score": [
-    117.0,
-    97.0
-   ],
-   "res": "w",
-   "ret": 0.9615,
-   "profit": 0.4808
   }
  ],
  "ledger": [
@@ -17637,7 +17609,11 @@
    "event": null,
    "pass": false,
    "clvRet": -0.0271,
-   "close": 2.5
+   "close": 2.5,
+   "score": 1.0,
+   "res": "w",
+   "ret": 1.22,
+   "profit": 0.915
   }
  ]
 }
