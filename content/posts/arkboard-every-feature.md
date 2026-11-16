@@ -236,7 +236,7 @@ Every ATP and WTA player under 22 with a ranking or a pro match in the last year
 
 ## Counter-Strike
 
-An ARK Ranking of pro CS2 teams. Each player has an Elo that follows him between rosters, updated per map on round share, and a team is the mean of its five. A team map rating with a simulated veto and Valve's regional points (VRS) are blended in. Held out from July 2025, log loss is .559 against .667 for VRS alone. Roster continuity, inactivity and team-name Elo failed. There's no free closing-odds history, so CS2 picks stay off until the forward archive can test them.
+An ARK Ranking of pro CS2 teams. Each player has an Elo that follows him between rosters, updated per map on round share, and a team is the mean of its five. A team map rating with a simulated veto and Valve's regional points (VRS) are blended in. Held out from July 2025, log loss is .559 against .667 for VRS alone. Roster continuity, inactivity and team-name Elo failed. Against bookmaker closes from [CS2Odds](https://cs2odds.com/results) (Sep-Oct 2026, 764 series), the close scores .590 to the model's .608 and the model adds nothing to it, so CS2 picks stay off.
 
 [![Counter-Strike ARK Ranking with player Elo and VRS](/img/arkboard/cs2-rank.webp)](/img/arkboard/cs2-rank.webp)
 
