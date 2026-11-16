@@ -2478,6 +2478,62 @@
   }
 
   // ---- research card (layouts/shortcodes/rq.html): question, one-line answer, key number and/or bars, 16:9 for X ----
+  // ---- projected bracket (layouts/shortcodes/bracket.html): every section's rounds as columns, games spread over
+  // the section's height, the projected winner bright, % = P(reach that round); one section or all, stacked ----
+  async function buildBracket(win, btn) {
+    var D; try { D = JSON.parse(btn.getAttribute('data-gfx-bk') || '{}'); } catch (e) { return null; }
+    var sel = win.querySelector('.bk-gsel'), pick = sel && sel.value !== 'all' ? +sel.value : null;
+    var secs = (D.sections || []).filter(function (s, i) { return pick === null || i === pick; });
+    if (!secs.length) return null;
+    var T = D.teams || {}, BOX = 132, GAP = 20, COLW = 380, CG = 28, LAB = 56, SECH = 72;
+    var cols = function (s) { return s.rounds.length + (s.champ ? 1 : 0); };
+    var ng = function (s) { return Math.max.apply(null, s.rounds.map(function (r) { return r.games.length; })); };
+    var maxC = Math.max.apply(null, secs.map(cols));
+    var W0 = Math.max(1350, 2 * PAD + 48 + maxC * COLW + (maxC - 1) * CG);
+    var bodyH = secs.reduce(function (a, s) { return a + SECH + LAB + ng(s) * (BOX + GAP) + 24; }, 0);
+    var title = (D.title || txt(win.querySelector('.win__title-text')).replace(/_$/, '')) + (pick !== null ? ' :: ' + secs[0].name : '');
+    var stamp = D.asof ? new Date(D.asof + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toLowerCase() : '';
+    var F = await frame(W0, Math.max(1080, bodyH + 2 * PAD + 56 + 124 + 24), title.toUpperCase(), stamp);
+    var g = F.g, x0 = F.x, y = F.y;
+    var ids = {}; secs.forEach(function (s) { s.rounds.forEach(function (r) { r.games.forEach(function (gm) { [gm.a, gm.b].forEach(function (t) { if (t) ids[t.t] = 1; }); }); }); if (s.champ) ids[s.champ.t] = 1; });
+    var imgs = {}; await Promise.all(Object.keys(ids).map(function (id) { return loadImg((T[id] || {}).logo).then(function (im) { imgs[id] = im; }); }));
+    var pct = function (p) { return p >= 0.995 ? '>99%' : p > 0 && p < 0.005 ? '<1%' : Math.round(p * 100) + '%'; };
+    function row(t, x, cy, w, win_, big) {
+      var tm = T[t.t] || { n: t.t }, sz = big ? 48 : 40;
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+      var sx = x + 14; if (t.seed != null && t.seed !== '') g.fillText(String(t.seed), sx, cy);
+      var lx = x + 74; if (imgs[t.t]) drawLogo(g, imgs[t.t], lx, cy - 22, 44, 44);
+      g.font = sz + 'px ' + FONT; g.fillStyle = win_ ? C.teal : C.lilac;
+      var ps = pct(t.p); var pw = (g.font = '36px ' + FONT, g.measureText(ps).width);
+      g.font = sz + 'px ' + FONT; g.fillText(fit(g, tm.a || tm.n, w - 74 - 56 - pw - 36), lx + 56, cy);
+      g.font = '36px ' + FONT; g.fillStyle = win_ ? C.white : C.lilac; g.fillText(ps, x + w - pw - 14, cy);
+    }
+    secs.forEach(function (s) {
+      g.font = '48px ' + FONT; g.fillStyle = C.white; g.fillText(String(s.name).toUpperCase(), x0, y + 32); y += SECH;
+      var n = ng(s), hgt = n * (BOX + GAP), c = 0;
+      s.rounds.forEach(function (r) {
+        var cx = x0 + c * (COLW + CG);
+        g.font = '32px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, String(r.name).toUpperCase(), COLW), cx, y + 20);
+        r.games.forEach(function (gm, i) {
+          var cy = y + LAB + (i + 0.5) * hgt / r.games.length - BOX / 2;
+          well(g, cx, cy, COLW, BOX);
+          if (gm.a) row(gm.a, cx, cy + BOX * 0.27, COLW, gm.w === gm.a.t);
+          if (gm.b) row(gm.b, cx, cy + BOX * 0.73, COLW, gm.w === gm.b.t);
+          else { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('bye', cx + 74, cy + BOX * 0.73); }
+        });
+        c++;
+      });
+      if (s.champ) {
+        var cx = x0 + c * (COLW + CG), cy = y + LAB + hgt / 2 - BOX / 2;
+        g.font = '32px ' + FONT; g.fillStyle = C.teal; g.fillText('CHAMPION', cx, y + 20);
+        g.fillStyle = C.title; g.fillRect(cx, cy, COLW, BOX); bevel(g, cx, cy, COLW, BOX, true);
+        row({ t: s.champ.t, seed: '', p: s.champ.p }, cx, cy + BOX / 2, COLW, true, true);
+      }
+      y += LAB + hgt + 24;
+    });
+    return F.canvas;
+  }
+
   async function buildRQ(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-rq') || '{}'); } catch (e) { return null; }
     if (!d.q || !d.a) return null;
@@ -2605,14 +2661,14 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {

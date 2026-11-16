@@ -12,6 +12,12 @@
 {{- $asof := lower ((time .asof).Format "Jan 2") -}}
 <div class="win bk-win"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ $.Get "title" | default "projected bracket" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  {{- /* GFX card (assets/js/gfx.js buildBracket): the sections below as JSON, one section or all */ -}}
+  {{- $used := dict }}{{ range .sections }}{{ range .rounds }}{{ range .games }}{{ range $s := slice .a .b }}{{ if $s }}{{ $used = merge $used (dict $s.t (index $T $s.t | default (dict "n" $s.t))) }}{{ end }}{{ end }}{{ end }}{{ end }}{{ with .champ }}{{ $used = merge $used (dict .t (index $T .t | default (dict "n" .t))) }}{{ end }}{{ end }}
+  <div class="cfb__bar bk-bar">
+    {{- if gt (len .sections) 1 }}<label class="cfb__field"><span>GFX</span><select class="bk-gsel"><option value="all">all</option>{{ range $i, $s := .sections }}<option value="{{ $i }}">{{ $s.name }}</option>{{ end }}</select></label>{{ end }}
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="bracket" data-gfx-name="{{ $k }}-projected-bracket" data-gfx-bk="{{ dict "sections" .sections "teams" $used "asof" .asof "title" (printf "%s projected bracket" (index (dict "cfb" "CFP" "nfl" "NFL" "nba" "NBA" "nhl" "NHL" "cbb" "NCAA" "soccer" "MLS" "ucl" "Champions League" "uel" "Europa League" "uecl" "Conference League") $k | default (upper $k))) | jsonify }}" title="graphic of the projected bracket">GFX</button>
+  </div>
   <div class="bk-body">
   {{- range .sections }}
     <section class="bk-sec">
