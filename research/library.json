@@ -1262,7 +1262,7 @@
      "short": "Series win chance vs the average top-20 team.",
      "body": [
       "Player Elo that follows players between rosters (per map, on round share), bo3.gg team map rating with veto,",
-      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .552 vs VRS .667. No picks: the model loses to Thunderpick's close and to the CS2Odds consensus close (Sep-Oct 2026, n 764: log loss .608 vs .590; adds nothing to it, t -0.2)."
+      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .552 vs VRS .667. No picks: the model loses to Thunderpick's close and to the CS2Odds consensus close (Sep-Oct 2026, n 764: log loss .608 vs .590; adds nothing to it, t -0.2). Closes do move toward the model from the open (k .047, t 4.6), about 0.7 pp a series: well short of the vig."
      ],
      "where": "Counter-Strike ARK Ranking, matches, model",
      "sports": [
@@ -1859,7 +1859,8 @@
       "Team map rating from bo3.gg's map results since June 2020: a team Elo moved by round share on every map, plus each team's offset on each map. A series chance comes from a simple veto (each side bans its worst map and picks its best, both orders averaged).",
       "Valve's VRS points from the snapshot before each day, blended in log-odds, with separate weights when both teams are VRS top 50: Valve's points carry real information at the top and little below it.",
       "Only maps played to the end (13+ rounds) update on round share; bo3.gg lists forfeits as 1-0.",
-      "Where Thunderpick prices a series, the shown chance blends the price with the model (weights refit each build on the archive; Oct 28 - Nov 10 2026, 173 series: price .597 log loss, model .687). ARK Ranking, event odds and Pick'Em stay model-only.",
+      "Market rating: ridge Bradley-Terry on CS2Odds bookmaker closes (half-life 30 days), a second-stage term on the series logit (x.49, model x.64). Held Oct 1 - Nov 10 2026, n 1,274: log loss .624 to .612 (t -2.7 by day, Holm over 5), top 50 better too. Matches tab only. Team residual vs close and a newcomer-only version also passed (not stacked); a stale non-Thunderpick price blend failed (t -1.1).",
+"Where Thunderpick prices a series, the shown chance blends the price with the model (weights refit each build on the archive; Oct 28 - Nov 10 2026, 173 series: price .597 log loss, model .687). ARK Ranking, event odds and Pick'Em stay model-only.",
       "Walk-forward over every series since Feb 2024; weights tuned Aug 2024 - Jun 2025, scored from Jul 2025 on.",
       "Nov 13 2026, failed held out (Holm over 8): round share adjusted for side and buy (bo3.gg round data), Valve's four VRS factors as separate terms, new-player start from teammates, event-tier K, Bo1/Bo5 slopes, experience shrink, boosted-tree stack."
      ],
