@@ -2655,20 +2655,76 @@
     box.querySelector('[data-close]').focus();
   }
 
+  // ---- ARKLIST performances (arklistperf.html): one sport's ARKLIST players on one day, a tile each with photo, team,
+  // the game (opponent, result or live clock) and the statline as pixel cells, the first three stats in teal ----
+  async function buildPerf(win, btn) {
+    var P = win.__arkPerf; if (!P || !P.data) return null;
+    var pick = window.__arkPerfPick, SP = window.__arkPerfSport || {}, ps = P.data.players || [];
+    var sport = P.sport, day = P.day;
+    // no sport chosen: the sport of the newest game on the day (or overall); no day: that sport's newest game day
+    if (!sport) { var best = null; ps.forEach(function (p) { var g = pick(p, day); if (g && (!best || g.d > best.g.d)) best = { p: p, g: g }; }); if (!best) return null; sport = best.p.s; }
+    if (!day) { ps.forEach(function (p) { if (p.s === sport && p.g && p.g[0] && (!day || p.g[0].day > day)) day = p.g[0].day; }); if (!day) return null; }
+    var rows = ps.filter(function (p) { return p.s === sport; }).map(function (p) { return { p: p, g: pick(p, day) }; }).filter(function (o) { return o.g; });
+    if (!rows.length) return null;
+    // the biggest night first: first stat (PTS, G+A, yards) high to low
+    function lead(o) { var st = o.g.st || []; if (!st.length) return -1; var v = parseFloat(String(st[0][1]).split(/[\/-]/)[0]); return isNaN(v) ? 0 : v; }
+    rows.sort(function (a, b) { return lead(b) - lead(a); });
+    var dTxt = new Date(day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    var F = await frame(2160, 2700, 'ARKLIST :: ' + (SP[sport] || sport) + ' :: ' + dTxt, '', 'arkndjl.net/arklist#performances');
+    var g = F.g, n = rows.length, cols = n > 7 ? 2 : 1, rn = Math.ceil(n / cols), gap = 20;
+    var tw = (F.w - (cols - 1) * gap) / cols, th = Math.min(cols === 1 ? 640 : 420, (F.h - (rn - 1) * gap) / rn);
+    var y0 = F.y + Math.max(0, (F.h - (rn * th + (rn - 1) * gap)) / 2);
+    for (var i = 0; i < n; i++) {
+      var o = rows[i], p = o.p, gm = o.g, tx = F.x + (i % cols) * (tw + gap), ty = y0 + Math.floor(i / cols) * (th + gap), pad = Math.round(th * 0.07);
+      well(g, tx, ty, tw, th);
+      var phH = th - 2 * pad, phW = Math.round(phH * 0.82), photo = await loadPhoto(p.ph);
+      photoFrame(g, photo, tx + pad, ty + pad, phW, phH);
+      var x = tx + pad + phW + pad, w = tx + tw - pad - x, sz = Math.max(26, Math.round(th * (cols === 1 ? 0.105 : 0.12))), y = ty + pad + sz * 0.6;
+      // name, then team logo + team and the game: @ / vs, opponent logo, result or the live clock
+      g.font = sz + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.n, w), x, y);
+      y += sz * 1.25;
+      var s2 = Math.round(sz * 0.7), lx = x, tl = await loadImg(p.lo), ol = await loadImg(gm.ol);
+      g.font = s2 + 'px ' + FONT;
+      if (tl) { drawLogo(g, tl, lx, y - s2 * 0.6, s2 * 1.2, s2 * 1.2); lx += s2 * 1.2 + 10; }
+      g.fillStyle = C.lilac; var t1 = (p.pos ? p.pos + ' · ' : '') + p.t + ' ' + gm.ha + ' '; t1 = fit(g, t1, w * 0.6); g.fillText(t1, lx, y); lx += g.measureText(t1).width;
+      if (ol) { drawLogo(g, ol, lx, y - s2 * 0.6, s2 * 1.2, s2 * 1.2); lx += s2 * 1.2 + 10; }
+      g.fillStyle = C.white; var t2 = (gm.o || '') + '  '; g.fillText(t2, lx, y); lx += g.measureText(t2).width;
+      var rs = gm.live ? 'LIVE ' + gm.live : ((gm.r || '') + ' ' + (gm.sc || '')).trim();
+      g.fillStyle = gm.live || gm.r === 'W' ? C.teal : gm.r === 'L' ? C.down : C.lilac; g.fillText(fit(g, rs, Math.max(40, x + w - lx)), lx, y);
+      y += s2 * 1.1;
+      // statline cells: as many to a row as fit, the rows sharing what height is left
+      var st = gm.st || [], top = y, avail = ty + th - pad - top;
+      if (!st.length) { g.font = sz + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText('DNP', x, top + avail / 2); continue; }
+      var minW = Math.max(110, sz * 2.6), per = Math.max(1, Math.min(st.length, Math.floor((w + 10) / minW))), lines = Math.ceil(st.length / per);
+      per = Math.ceil(st.length / lines);
+      var cw = (w - (per - 1) * 10) / per, ch = Math.min(sz * 3.6, (avail - (lines - 1) * 10) / lines);
+      for (var k = 0; k < st.length; k++) {
+        var cx = x + (k % per) * (cw + 10), cy = top + Math.floor(k / per) * (ch + 10);
+        g.fillStyle = C.dark; g.fillRect(cx, cy, cw, ch); bevel(g, cx, cy, cw, ch, false, 3);
+        var vs = Math.round(Math.min(ch * 0.5, cw * 0.32)), ls = Math.round(Math.max(16, vs * 0.45));
+        g.font = vs + 'px ' + FONT; g.fillStyle = k < 3 ? C.teal : C.white;
+        var v = fit(g, String(st[k][1]), cw - 12); g.fillText(v, cx + (cw - g.measureText(v).width) / 2, cy + ch * 0.42);
+        g.font = ls + 'px ' + FONT; g.fillStyle = C.lilac;
+        var lb = fit(g, st[k][0], cw - 12); g.fillText(lb, cx + (cw - g.measureText(lb).width) / 2, cy + ch * 0.8);
+      }
+    }
+    return F.canvas;
+  }
+
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
     var win = btn.closest('.win'); if (!win) return;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'perf' ? await buildPerf(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {

@@ -1,0 +1,97 @@
+{{- /* ARKLIST performances: every ARKLIST player ESPN covers, with his game on the chosen day (default: his latest game) and his
+       next game. static/data/arklist-perf.json, written by scripts/arklist_perf.py in the odds snapshot (every 30 minutes):
+       season game logs, next game, live box scores. High school recruits and players at clubs ESPN doesn't cover have no
+       feed and are left out. GFX (gfx.js buildPerf): one sport's ARKLIST statlines on one day.
+       {{< arklistperf tab="performances" >}} */ -}}
+<div class="win wintable arkp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-arkp data-src="{{ "data/arklist-perf.json" | relURL }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ .Get "title" | default "ARKLIST :: performances" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar" data-arkp-bar onsubmit="return false" aria-label="ARKLIST performances">
+    <label class="cfb__field"><span>sport</span><select name="sport"><option value="">all</option></select></label>
+    <label class="cfb__field"><span>day</span><select name="day"><option value="">last game</option></select></label>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="perf" title="graphic: the sport's ARKLIST statlines on the day">GFX</button>
+  </form>
+  <div class="wintable__scroll">
+    <table class="cfb__table arkp__t" data-pd-kind="arkp">
+      <thead><tr><th>Player</th><th>Sport</th><th>Team</th><th title="the game on the chosen day, else his latest (US Eastern date)">Game</th><th>Line</th><th title="next game, in your time zone">Next</th></tr></thead>
+      <tbody><tr><td colspan="6" class="cfb__dim" data-arkp-msg>loading…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="win__status" title="ESPN game logs and box scores, refreshed every 30 minutes. recruits and players outside ESPN's coverage are not listed."><span data-arkp-count>0 rows</span><span class="cfb__asof" data-arkp-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- if not ($.Page.Store.Get "arkpjs") }}{{ $.Page.Store.Set "arkpjs" true -}}
+<style>
+.arkp__t td { vertical-align: middle; }
+.arkp__g { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.arkp__g img { width: 18px; height: 18px; object-fit: contain; background: none; border: 0; }
+.arkp__t td.arkp__line { white-space: normal; min-width: 16em; }
+.arkp__line b { color: var(--teal, #7fffd4); font-weight: normal; }
+.arkp__live { color: var(--teal, #7fffd4); }
+.arkp__W { color: var(--teal, #7fffd4); }
+.arkp__L { color: #ff9ec7; }
+</style>
+<script>
+(function () {
+  var SPORT = { 'college-football': 'CFB', 'college-basketball': 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', 'hockey-prospects': 'Hockey prospects' };
+  var ORDER = Object.keys(SPORT);
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function dayTxt(d) { var t = new Date(d + 'T12:00:00'); return t.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); }
+  function dayShort(d) { return +d.slice(5, 7) + '/' + +d.slice(8, 10); }
+  function whenTxt(iso) { var t = new Date(iso); return t.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }) + ' ' + t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+  function logo(u) { return u ? '<img class="cfb__logo" src="' + esc(u) + '" alt="" width="18" height="18" loading="lazy" onerror="this.remove()">' : ''; }
+  function face(u) { return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  function line(st) { return (st || []).map(function (x, i) { return (i < 3 ? '<b>' + esc(x[1]) + '</b>' : esc(x[1])) + ' ' + esc(x[0]); }).join(' · '); }
+  function res(g) { return g.live ? '<span class="arkp__live">' + esc(g.live) + '</span> ' + esc(g.sc) : (g.r ? '<span class="arkp__' + esc(g.r) + '">' + esc(g.r) + '</span> ' : '') + esc(g.sc); }
+  // the game a player shows: the chosen day's, else (no day) his latest
+  function pick(p, day) { var g = p.g || []; return day ? g.filter(function (x) { return x.day === day; })[0] || null : g[0] || null; }
+  window.__arkPerfPick = pick; window.__arkPerfSport = SPORT;
+  function init(w) {
+    var bar = w.querySelector('[data-arkp-bar]'), body = w.querySelector('tbody'), D;
+    function days(sport) {
+      var s = {}; (D.players || []).forEach(function (p) { if (!sport || p.s === sport) (p.g || []).forEach(function (g) { s[g.day] = 1; }); });
+      return Object.keys(s).sort().reverse();
+    }
+    function fillDays() {
+      var cur = bar.day.value, ds = days(bar.sport.value);
+      bar.day.innerHTML = '<option value="">last game</option>' + ds.map(function (d) { return '<option value="' + d + '">' + dayTxt(d) + '</option>'; }).join('');
+      if (ds.indexOf(cur) >= 0) bar.day.value = cur;
+    }
+    function draw() {
+      var sport = bar.sport.value, day = bar.day.value;
+      var ps = (D.players || []).filter(function (p) { return !sport || p.s === sport; }).map(function (p) { return { p: p, g: pick(p, day) }; });
+      if (day) ps = ps.filter(function (o) { return o.g; });
+      ps.sort(function (a, b) { return (ORDER.indexOf(a.p.s) - ORDER.indexOf(b.p.s)) || ((b.g ? b.g.d : '') < (a.g ? a.g.d : '') ? -1 : (b.g ? b.g.d : '') > (a.g ? a.g.d : '') ? 1 : 0) || (a.p.n < b.p.n ? -1 : 1); });
+      w.__arkPerf = { data: D, sport: sport, day: day, rows: ps };
+      body.innerHTML = ps.length ? ps.map(function (o) {
+        var p = o.p, g = o.g, n = p.nx;
+        return '<tr><td class="arkl__name">' + face(p.ph) + esc(p.n) + '<span class="cfb__star" title="ARKLIST">★</span></td><td>' + SPORT[p.s] + '</td>' +
+          '<td><span class="cfb__team">' + (p.lo ? '<img class="cfb__logo" src="' + esc(p.lo) + '" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">' : '') + '<span>' + esc(p.t) + '</span></span></td>' +
+          '<td>' + (g ? '<span class="arkp__g">' + esc(dayShort(g.day)) + ' ' + esc(g.ha) + ' ' + logo(g.ol) + esc(g.o) + ' ' + res(g) + '</span>' : '<span class="cfb__dim">—</span>') + '</td>' +
+          '<td class="arkp__line">' + (g ? (g.st && g.st.length ? line(g.st) : '<span class="cfb__dim">DNP</span>') : '<span class="cfb__dim">—</span>') + '</td>' +
+          '<td>' + (n ? '<span class="arkp__g">' + esc(whenTxt(n.d)) + ' ' + esc(n.ha) + ' ' + logo(n.ol) + esc(n.o) + '</span>' : '<span class="cfb__dim">—</span>') + '</td></tr>';
+      }).join('') : '<tr><td colspan="6" class="cfb__dim">no games</td></tr>';
+      w.querySelector('[data-arkp-count]').textContent = ps.length + ' rows';
+    }
+    window.__arkJson(w.getAttribute('data-src')).then(function (d) {
+      D = d || { players: [] };
+      var have = {}; D.players.forEach(function (p) { have[p.s] = 1; });
+      bar.sport.innerHTML = '<option value="">all</option>' + ORDER.filter(function (s) { return have[s]; }).map(function (s) { return '<option value="' + s + '">' + SPORT[s] + '</option>'; }).join('');
+      if (D.asof) w.querySelector('[data-arkp-asof]').textContent = 'updated ' + whenTxt(D.asof.replace(/Z$/, ':00Z'));
+      fillDays(); draw();
+      bar.sport.addEventListener('change', function () { fillDays(); draw(); });
+      bar.day.addEventListener('change', draw);
+    }).catch(function () { body.innerHTML = '<tr><td colspan="6" class="cfb__dim">no data</td></tr>'; });
+  }
+  function go() {
+    [].forEach.call(document.querySelectorAll('[data-arkp]'), function (w) {
+      if (!('IntersectionObserver' in window)) return init(w);
+      var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); init(w); } }, { rootMargin: '200px' });
+      io.observe(w);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
+{{- end }}
