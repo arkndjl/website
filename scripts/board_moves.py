@@ -63,7 +63,8 @@ BOARDS = {
 # hash between two runs is a model change, and the earlier snapshots are regraded by it (regrade)
 MODEL = {
     'cbb': ('data/cbb_fit.json', 'data/cbb_live_fit.json', 'data/fv_dist.json', 'data/fv_scale.json',
-            'scripts/fetch_cbb.py', 'scripts/cbb_live.py'),
+            'scripts/fetch_cbb.py', 'scripts/cbb_live.py', 'scripts/cbb_fit.py', 'data/cbb_end_map.json',
+            'scripts/data/cbb_board_att.json', 'scripts/cbb_combine.py', 'scripts/cbb_boards.py'),
     'hockey': ('data/hockey_fit.json', 'data/fv_scale.json', 'scripts/hockey_prospects.py'),
     'soccerp': ('data/soccer_prospects_fit.json', 'data/fv_scale.json', 'scripts/soccer_prospects.py'),
     'tennisp': ('data/tennis_prospects_fit.json', 'data/fv_scale.json', 'scripts/tennis_prospects.py'),

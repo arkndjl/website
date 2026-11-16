@@ -422,8 +422,8 @@ def cbb():
     write('cbb', {
         'title': 'true freshmen', 'key': 'fv',
         'def': 'true freshmen: Fr, first year of eligibility. pre = On3 national recruiting rank. season lines join once games start.',
-        'views': [['fv', 'FV', 'FV: mean outcome grade'], ['xbpm', 'xBPM', 'projected NBA BPM'], ['nbaP', 'NBA%', 'chance of an NBA career']],
-        'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('xbpm', 'xBPM', 'projected NBA BPM', 's1'),
+        'views': [['fv', 'FV', 'FV: mean outcome grade'], ['xbpm', 'xBPM', 'projected BPM this season'], ['nbaP', 'NBA%', 'chance of an NBA career']],
+        'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('xbpm', 'xBPM', 'projected BPM this season', 's1'),
                  col('nbaP', 'NBA%', 'chance of an NBA career', 'p', 1), col('w', 'Season wt', 'weight on this season\'s line in the grade', '2', 1),
                  col('line', 'Line', 'season line so far', 's', 1, 0)],
         'pre': {'l': 'Rec', 't': 'On3 national recruiting rank'},

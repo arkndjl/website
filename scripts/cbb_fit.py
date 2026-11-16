@@ -953,9 +953,17 @@ def live_consensus(names_teams):
             boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in csv.DictReader(fh)])
     ppl = M.consensus(boards)
     idx = M.build_index([{'name': p['name'], 'school': p['school'], 'cons': p['cons']} for p in ppl.values()])
+    import names as N
+    # the matcher's last step takes the name alone when the boards list one player by it; the D-I board can hold two
+    # (Duke's and Kent State's Cameron Williams), so a cross-school hit counts only for a name the D-I board has once
+    many = defaultdict(int)
+    for n, _ in names_teams:
+        many[N.key(n)] += 1
     out = []
     for n, t in names_teams:
         m = M.match(n, t, idx)
+        if m and many[N.key(n)] > 1 and not N.same_team(m.get('school') or '', t or ''):
+            m = None
         out.append(-math.log(m['cons']) if m else None)
     return out
 
