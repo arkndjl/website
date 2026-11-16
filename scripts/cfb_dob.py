@@ -7,12 +7,13 @@
     python3 scripts/cfb_dob.py --max 300
 
 Tankathon prints each prospect's age on draft day to two decimals; the birth date backed out of it (tankathon_bio.dob_of)
-is good to about +-2 days. The school must match (scripts/names.py), so a namesake at another school is never taken.
+is good to about +-2 days. Dates in data/dob_overrides.json "cfb" (checked by hand, with a cited page) replace it. The school must match (scripts/names.py), so a namesake at another school is never taken.
 """
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import tankathon_bio as T
+import dob_sources as DS
 
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, 'data', 'cfb_dob.json')
@@ -38,6 +39,8 @@ def main():
         r = rows[i]
         store[f"{r[ci['name']]}|{r[ci['team']]}"] = {'dob': d, 'src': 'tankathon', 'slug': b['slug'], 'dage': [b['dy'], b['dage']]}
         n += 1
+    for k, v in DS.pinned('cfb').items():   # hand-checked dates (data/dob_overrides.json, key '<name>|<team>') win
+        if v.get('dob'): store[k] = {'dob': v['dob'], 'src': 'override', 'cite': v['src']}
     json.dump(dict(sorted(store.items())), open(OUT, 'w'), indent=1)
     open(OUT, 'a').write('\n')
     print(f'{len(rows)} board players without a birth date; Tankathon {n}; store holds {sum(1 for v in store.values() if v.get("dob"))} dates')

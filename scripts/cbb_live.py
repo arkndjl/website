@@ -41,7 +41,10 @@ DOB_FILE = os.path.join(D.ROOT, 'data', 'cbb_dob.json')
 def dob_lookup():
     """birth dates for players the frozen preseason careers lack (freshmen, mostly): Barttorvik's 2026-27 file (it
     adds a freshman's date once his games count), then data/cbb_dob.json (scripts/cbb_dob.py: Tankathon draft age,
-    Wikidata). Returns f(pid, name, team) -> 'YYYY-MM-DD' or None."""
+    Wikidata), with a hand-checked date in data/dob_overrides.json ahead of all of them (and ahead of the careers' own
+    date, passed as `have`). Returns f(pid, name, team, bt_team=None, have=None) -> 'YYYY-MM-DD' or None."""
+    import dob_sources as DS
+    pins = {k: v['dob'] for k, v in DS.pinned('cbb').items() if v.get('dob')}
     adv = os.path.join(D.CACHE, 'bt', f'adv{SEASON}.csv')
     by_pid, by_key = {}, {}
     if os.path.exists(adv):
@@ -52,11 +55,21 @@ def dob_lookup():
     try: store = json.load(open(DOB_FILE))
     except (OSError, ValueError): store = {}
     by_store = {k: v['dob'] for k, v in store.items() if v.get('dob')}
-    def f(pid, name, team, bt_team=None):
-        if pid is not None and str(pid).split('.')[0] in by_pid: return by_pid[str(pid).split('.')[0]]
+    def f(pid, name, team, bt_team=None, have=None):
+        # Barttorvik writes Oct 15 of a birth year when it has no day (3,490 of 4,978 rows in 2025-26): a day-precise
+        # date from any source beats it, and a board age built on it shows as an estimate (exact_dob)
         k = D.norm(name)
-        return by_key.get((k, bt_team or team)) or by_store.get(f'{k}|{team}')
+        if f'{k}|{team}' in pins: return pins[f'{k}|{team}']
+        bt = by_pid.get(str(pid).split('.')[0]) if pid is not None else None
+        bt = bt or by_key.get((k, bt_team or team))
+        cands = [have, bt, by_store.get(f'{k}|{team}')]
+        return next((d for d in cands if exact_dob(d)), None) or next((d for d in cands if d), None)
     return f
+
+
+def exact_dob(d):
+    """a day-precise birth date (not Barttorvik's Oct 15 year-only stand-in)"""
+    return bool(d) and not d.endswith('-10-15')
 
 
 def measurer():
@@ -412,6 +425,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         hti = int(ln.get('hti') or 77)
         dob = dob_of(pid, ln['name'], tname, ln['team'])
         if dob: age = age_now(dob)
+        age_est = None if exact_dob(dob) or age is None else age
         bt = ln.get('rec')
         d = {'ht': hti, 'wt': wt, 'elig': elig, 'age': age, 'rg_lrk': -math.log(min(round((100 - bt) / 0.2) + 1, 500)) if bt else -math.log(600),
              'power': 1.0 if conf in POWER else 0.0, 'team8': pf['team8'].get(tname, 20.0), 'newcomer': 1.0}
@@ -442,7 +456,8 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
         row = [None] * len(prior['cols'])
         for c, v in (('name', ln['name']), ('team', tname), ('logo', logo), ('conf', conf), ('pos', 'G' if hti <= 76 else 'F' if hti <= 80 else 'C'),
-                     ('cls', yr), ('elig', elig), ('ht', f'{hti // 12}-{hti % 12}'), ('wt', wt), ('age', age), ('new', 1),
+                     ('cls', yr), ('elig', elig), ('ht', f'{hti // 12}-{hti % 12}'), ('wt', wt), ('age', None if age_est else age),
+                     ('ageEst', round(age_est, 1) if age_est else None), ('new', 1),
                      ('links', {'bt': f"https://barttorvik.com/playerstat.php?year={SEASON}&p={ln['name'].replace(' ', '%20')}&t={ln['team'].replace(' ', '%20')}"})):
             if c in ci: row[ci[c]] = v
         out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
@@ -478,9 +493,10 @@ def main():
     dob_of = dob_lookup()
     for row, m, bd in zip(prior['rows'], prior['careers'], bdg):
         # a birth date the preseason careers lacked feeds the same age terms a returner's has (the "now" grade's age)
-        dob = m['dob'] or dob_of(m['pid'], row[ci['name']], row[ci['team']], m.get('bt'))
+        dob = dob_of(m['pid'], row[ci['name']], row[ci['team']], m.get('bt'), have=m['dob'])
         cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': dob, 'rec': m['rec'], 'seasons': [dict(zip(keep, s)) for s in m['seasons']]}
-        if dob: row[ci['age']], row[ci['ageEst']] = age_now(dob), None
+        if exact_dob(dob): row[ci['age']], row[ci['ageEst']] = age_now(dob), None
+        elif dob: row[ci['age']], row[ci['ageEst']] = None, round(age_now(dob), 1)
         i = len(cc['seasons']) - 1
         f_pre = F.features(cc, i)
         e0, p0, parts0 = score(f_pre, fit)
