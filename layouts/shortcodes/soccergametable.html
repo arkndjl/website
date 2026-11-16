@@ -22,7 +22,7 @@
     <td data-v="{{ .hn }} {{ .an }}"><img class="cfb__logo" src="/img/soccer/{{ .h }}.png" alt="" width="16" height="16" loading="lazy"> {{ .hab }} <span class="cfb__dim">v</span> <img class="cfb__logo" src="/img/soccer/{{ .a }}.png" alt="" width="16" height="16" loading="lazy"> {{ .aab }}</td>
     <td class="cfb__num" data-v="{{ $q }}">{{ partial "num.html" (slice "%.0f" $q) }}</td>
     <td>{{ index $short .lg | default .lg }}</td>
-    <td class="cfb__num" data-v="{{ .tip }}">{{ (time.In "America/New_York" (time .tip)).Format "Mon 3:04 PM" }}</td>
+    <td class="cfb__num" data-v="{{ (time .tip).Unix }}">{{ (time.In "America/New_York" (time .tip)).Format "Mon 3:04 PM" }}</td>
     {{- range $v := .p }}<td class="cfb__num" data-v="{{ $v }}">{{ partial "num.html" (slice "%.0f" (mul $v 100)) }}%</td>{{ end }}
     <td class="cfb__num">{{ printf "%+d" (int (index .fair 0)) }} <span class="cfb__dim">/</span> {{ printf "%+d" (int (index .fair 1)) }} <span class="cfb__dim">/</span> {{ printf "%+d" (int (index .fair 2)) }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%.1f" (float (index .l 0))) }}-{{ partial "num.html" (slice "%.1f" (float (index .l 1))) }}</td>

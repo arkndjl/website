@@ -60,11 +60,13 @@
     W.querySelector('[data-lu-count]').textContent = Z.games + ' games read · ' + label(S);
     if (!Z.games) { body.innerHTML = '<p class="cfb__dim">no games yet this season.</p>'; return; }
     if (t === '*') {
-      var all = [];
-      Object.keys(Z.teams).forEach(function (k) { var T = Z.teams[k]; T.players.forEach(function (p) { if (p[1] >= 200 && p[5] != null) all.push([p, T]); }); });
+      var all = [], mx = 0;
+      Object.keys(Z.teams).forEach(function (k) { Z.teams[k].players.forEach(function (p) { if (p[1] > mx) mx = p[1]; }); });
+      var cut = Math.min(200, Math.round(0.6 * mx));   /* 200 minutes, or 60% of the most anyone has early in a season */
+      Object.keys(Z.teams).forEach(function (k) { var T = Z.teams[k]; T.players.forEach(function (p) { if (p[1] >= cut && p[5] != null) all.push([p, T]); }); });
       all.sort(function (a, b) { return b[0][5] - a[0][5]; });
       all = all.slice(0, 100);
-      if (!all.length) { body.innerHTML = '<p class="cfb__dim">no player has 200 minutes yet.</p>'; return; }
+      if (!all.length) { body.innerHTML = '<p class="cfb__dim">no qualified players yet.</p>'; return; }
       body.innerHTML = table(W, [{ h: 'Player' }, { h: 'Team', x: 1 }, { h: 'MIN', n: 1 }, { h: 'On', n: 1, x: 1, t: 'net per 100 possessions with him on' }, { h: 'Off', n: 1, x: 1, t: 'net per 100 with him off' }, { h: 'On-Off', n: 1, x: 1 }, { h: 'Shrunk', n: 1, t: 'on-off shrunk toward 0 by its noise (the rank)' }],
         all.map(function (x) { var p = x[0], T = x[1]; return { v: [null, null, p[1], p[2], p[3], p[4], p[5]], c: ['<span class="cfb__name">' + chip(p[6]) + '<b>' + esc(p[0]) + '</b></span>', '<span class="cfb__team">' + logo(T.logo) + '<span>' + esc(T.name) + '</span></span>', Math.round(p[1]), sg(p[2]), sg(p[3]), '<span class="' + cl(p[4]) + '">' + sg(p[4]) + '</span>', '<b class="' + cl(p[5]) + '">' + sg(p[5]) + '</b>'] }; }), 'all' + S);
       return;
