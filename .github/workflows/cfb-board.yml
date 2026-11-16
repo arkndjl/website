@@ -130,11 +130,12 @@ jobs:
         run: |
           python3 scripts/st_kickers.py --current
           python3 scripts/st_kickers.py cfb
-      # birth dates from Tankathon's draft ages (scripts/cfb_dob.py -> data/cfb_dob.json, which fetch_cfb.mjs reads)
+      # hand-checked birth dates (data/dob_overrides.json, scripts/cfb_dob.py -> data/cfb_dob.json, which fetch_cfb.mjs
+      # reads and fills from Wikidata and Wikipedia)
       - name: Birth dates
         continue-on-error: true
         timeout-minutes: 10
-        run: python3 scripts/cfb_dob.py --max 300
+        run: python3 scripts/cfb_dob.py
       # RotoWire's college injury news into scripts/data/rotowire_news.json (scripts/rotowire.py; odds-snap.yml polls it
       # every half hour, this catches the last minutes), read by fetch_cfb.mjs's availability log
       - name: RotoWire injury news

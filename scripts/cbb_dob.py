@@ -4,18 +4,16 @@
 count, a few transfers): data/cbb_dob.json, read by scripts/cbb_live.py and scripts/fetch_cbb.py.
 
     python3 scripts/cbb_dob.py              # look up every board player without a birth date
-    python3 scripts/cbb_dob.py --max 300    # read at most 300 new Tankathon pages this run (default 600)
 
 Sources, first that has him (scripts/dob_sources.py):
   0. data/dob_overrides.json: a date checked by hand against a cited page (RealGM, Wikipedia, a club page)
   1. Barttorvik's season file (the live board reads it directly; this script records the date too, so the preseason
      builder has it)
-  2. Tankathon (scripts/tankathon_bio.py): draft age to two decimals -> birth date, about +-2 days. School must match.
-  3. Wikidata P569 (day precision) for a basketball player whose teams or schools include his school
-  4. Wikidata, school not listed: the only basketball player with that name born 2000 on, and his teams are clubs
+  2. Wikidata P569 (day precision) for a basketball player whose teams or schools include his school
+  3. Wikidata, school not listed: the only basketball player with that name born 2000 on, and his teams are clubs
      (or none, for a player from outside the US), not another college, and no other board player has the name: internationals and pro-to-college transfers, whose items list Trento, Milano,
      Mega, not the school. Names go through Wikidata's entity search, so accents and aliases match.
-  5. Wikipedia search ("<name>" basketball), lead section {{birth date}}, school named in the lead
+  4. Wikipedia search ("<name>" basketball), lead section {{birth date}}, school named in the lead
 Each date is kept with its source; a miss is retried after 14 days. Matching goes through scripts/names.py.
 Two sources more than 3 days apart, or two same-name Wikidata players, go to data/dob_conflicts.json ("cbb").
     python3 scripts/cbb_dob.py --all        # retry recent misses too (after a source is added)
@@ -25,7 +23,6 @@ import datetime as dt, json, os, re, subprocess, sys, time, urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import names as N
-import tankathon_bio as T
 import dob_sources as DS
 
 ROOT = os.path.dirname(HERE)
@@ -96,28 +93,21 @@ def cbb_age(d):
 
 
 def main():
-    max_new = int(sys.argv[sys.argv.index('--max') + 1]) if '--max' in sys.argv else 600
     today = dt.date.today()
     store = load()
     B = json.load(open(BOARD))
     ci = {c: j for j, c in enumerate(B['cols'])}
     rows = [r for r in B['rows'] if (r[ci['age']] is None or year_only(r[ci['age']], today)) and r[ci['cls']] != 'Intl']
-    todo = []
     every = '--all' in sys.argv   # retry misses checked in the last 14 days too (after a new source is added)
+    # Tankathon's robots.txt disallows Claude and AI crawlers: none of its dates are kept; those players are looked up again
+    for k, v in list(store.items()):
+        if v.get('src') == 'tankathon': store[k] = {'name': v.get('name'), 'dob': None, 'checked': '2000-01-01'}
+    todo = []
     for r in rows:
         s = store.get(key(r[ci['name']], r[ci['team']]))
         if s and (s.get('dob') or (not every and (today - dt.date.fromisoformat(s['checked'])).days < 14)): continue
         todo.append(r)
-    # Tankathon: the school prospect lists are in its cache; guess slugs best-graded first
-    todo.sort(key=lambda r: r[ci['ovr']])
-    hits = T.lookup('nba', [{'name': r[ci['name']], 'team': r[ci['team']]} for r in todo], max_new=max_new, today=today)
-    found = {'tankathon': 0, 'wikidata': 0}
-    for i, b in hits.items():
-        d = T.dob_of('nba', b)
-        if plausible(d):
-            r = todo[i]
-            store[key(r[ci['name']], r[ci['team']])] = {'name': r[ci['name']], 'dob': d, 'src': 'tankathon', 'slug': b['slug'], 'dage': [b['dy'], b['dage']]}
-            found['tankathon'] += 1
+    found = {'wikidata': 0}
     pins = DS.pinned('cbb')
     for k, v in pins.items():
         if v.get('dob'): store[k] = {'name': v['name'], 'dob': v['dob'], 'src': 'override', 'cite': v['src']}
