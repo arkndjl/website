@@ -73,7 +73,7 @@
       count = win.querySelector('[data-xa-count]'), none = win.querySelector('[data-xa-none]'), loading = win.querySelector('[data-xa-loading]'),
       asof = win.querySelector('[data-xa-asof]'), pager = win.querySelector('[data-xa-pager]'), pageEl = win.querySelector('[data-xa-page]'), pagesEl = win.querySelector('[data-xa-pages]');
   var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
-  var data = null, view = '', sortKey = 'rk', dir = 1, page = 0;
+  var data = null, view = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function face(p) {
     var u = !p.ph ? '/img/face.svg' : NHL ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph;
@@ -109,7 +109,6 @@
     }).sort(function (a, b) { return view === 'u' ? b.gap - a.gap : view === 'o' ? a.gap - b.gap : b.x - a.x || (b.war || 0) - (a.war || 0); });
     list.forEach(function (p, i) { p.rk = i + 1; });
     var shown = list.length;
-    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
       list = list.slice().sort(function (a, b) {
@@ -118,6 +117,8 @@
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
     } else if (dir < 0) list = list.slice().reverse();
+    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey]; });
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     var gfxRow = function (p) {
       var d = deal(p), sub = esc(p.tm) + ' · ' + esc(p.pos) + (p.age == null ? '' : ' · ' + p.age) + (d == null ? '' : ' · $' + d.toFixed(1) + 'M');
@@ -158,7 +159,7 @@
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
-      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+      best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });

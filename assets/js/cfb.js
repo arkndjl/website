@@ -310,7 +310,7 @@
       Object.keys(bs).sort().forEach(function (a) { var o = document.createElement('option'); o.textContent = a; bdgSel.appendChild(o); }); }
     // RK and the position rank (TE3) count only the players in view: this tab plus its filters (the search box
     // aside), in FV order whatever the sort. apply() refills RK and PRK; the global ranks show on hover
-    var PRK = {};
+    var PRK = {}, rkGet = null, rkBest = 1;   // the sorted column (none: the board's own rank), so RK follows any sort
     recs.forEach(function (r) { byI[r.i] = r; r._q = r._q || (r.name + ' ' + r.team).toLowerCase(); });
     var chips = [].slice.call(bar.querySelectorAll('[data-pos]'));
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
@@ -353,6 +353,7 @@
         RK[r.i] = i + 1; if (opt.rankBy === 'war' ? r.war != null : opt.rankBy === 'nil' ? r.xnil != null : fvOf(r) != null) PRK[r.i] = seenPos[posOf(r)] = (seenPos[posOf(r)] || 0) + 1; });
       // the default order (RK) follows the year's ranks
       if (yr && cur === 'rk') view.sort(function (a, b) { return (RK[a.i] - RK[b.i]) * dir; });
+      if (rkGet) { window.__rr(view, '_rk', dir, rkBest, rkGet); view.forEach(function (r) { RK[r.i] = r._rk; }); }
       match = q ? view.filter(function (r) { return r._q.indexOf(q) >= 0; }) : view;
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
@@ -423,7 +424,7 @@
       th.tabIndex = 0;
       function go() {
         var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|age|cls|cons)$/.test(k), get = k === 'rk' && opt.rankBy === 'war' ? function (r) { return -wa(r); } : k === 'rk' && opt.rankBy === 'nil' ? function (r) { return -(r.xnil || 0); } : k === 'fv' && opt.yr ? function (r) { return pastAt(r, opt.yr); } : KEY[k] || function (r) { return r[k]; };
-        dir = k === cur ? -dir : (asc ? 1 : -1); cur = k;
+        dir = k === cur ? -dir : (asc ? 1 : -1); cur = k; rkGet = k === 'rk' || (k === sort0[0] && dir === sort0[1]) ? null : get; rkBest = asc ? 1 : -1;
         recs.sort(function (a, b) {
           var x = get(a), y = get(b);
           if (num) { x = x == null || x === '' ? NaN : +x; y = y == null || y === '' ? NaN : +y; if (isNaN(x)) return isNaN(y) ? a.ovr - b.ovr : 1; if (isNaN(y)) return -1; return (x - y) * dir || (a.ovr - b.ovr); }

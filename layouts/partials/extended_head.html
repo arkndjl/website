@@ -26,6 +26,8 @@ rank:function(list,rf){rf=rf||'rk';var s=list.filter(function(p){return p.w0!=nu
 rk:function(p,from,label,fmt,now){if(!from)return '';if(p.w0==null||p.wr==null)return fresh(from);var d=p.wk,v=now==null?null:now-p.w0;
 return td(arrow(d,Math.abs(d)),d,day(from)+': #'+p.wr+(v==null?'':', '+label+' '+(v>=0?'+':'')+(fmt?fmt(v):v.toFixed(2))));},
 fv:function(now,w0,from,label){if(!from)return '';if(now==null)return none;if(w0==null)return fresh(from);var d=Math.round(now-w0);return td(arrow(d,Math.abs(d)),d,day(from)+': '+(label||'FV')+' '+w0);}};})();</script>
+<script>/* RK follows the sort: __rr(rows in sorted order, rank field, dir, the column's best-first dir, value getter) numbers them 1, 2, 3… best first (a flipped sort counts down from the other end); no value = – */
+window.__rr=function(list,f,dir,best,get){function ok(p){var v=get(p);return v!=null&&v!==''&&v===v;}var n=list.filter(ok).length,i=0;list.forEach(function(p){p[f]=ok(p)?(dir===best?++i:n-i++):'–';});};</script>
 {{- $links := $.Site.Params.links | default dict }}
 {{- with $links.twitter }}
 <link rel="me" href="{{ . }}">

@@ -73,7 +73,7 @@
       pager = win.querySelector('[data-ff-pager]'), pageEl = win.querySelector('[data-ff-page]'), pagesEl = win.querySelector('[data-ff-pages]'),
       ptsTh = win.querySelector('[data-ff-pts]'), oppTh = win.querySelector('[data-ff-opp]'), kickTh = win.querySelector('[data-ff-kick]');
   var PER = 50, FLEX = { RB: 1, WR: 1, TE: 1 }, LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
-  var all = [], S = {}, BOCUT = 0.2, pos = '', sortKey = 'rk', dir = 1, page = 0;
+  var all = [], S = {}, BOCUT = 0.2, pos = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
@@ -149,7 +149,6 @@
     list.sort(function (a, b) { return b.pts - a.pts || (b._ppg || 0) - (a._ppg || 0); });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
-    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
       var key = sortKey === 'av' ? '_av' : sortKey === 'ppg' ? '_ppg' : sortKey;
@@ -159,6 +158,8 @@
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
     } else if (dir < 0) list = list.slice().reverse();
+    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[key]; });
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     var gfxRow = function (p) {
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + esc(p.st.toLowerCase()) + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
@@ -202,7 +203,7 @@
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'kick';
-      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+      best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });

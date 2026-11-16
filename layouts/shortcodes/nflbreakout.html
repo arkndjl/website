@@ -54,7 +54,7 @@
   var win = document.querySelector('[data-nflbo]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
   var bar = win.querySelector('[data-bo-bar]'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-bo-count]'), none = win.querySelector('[data-bo-none]'), loading = win.querySelector('[data-bo-loading]');
-  var all = [], S = {}, CUT = 0.2, LINE = { QB: 18, RB: 12, WR: 12, TE: 9 }, pos = '', sortKey = 'rk', dir = 1;
+  var all = [], S = {}, CUT = 0.2, LINE = { QB: 18, RB: 12, WR: 12, TE: 9 }, pos = '', sortKey = 'rk', dir = 1, best = 1;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
@@ -74,7 +74,6 @@
     list.sort(function (a, b) { return b.odds - a.odds || b.job - a.job; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
-    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
       var key = sortKey === 'ppg' ? '_ppg' : sortKey;
@@ -84,6 +83,8 @@
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
     } else if (dir < 0) list = list.slice().reverse();
+    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[key]; });
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     body.innerHTML = list.map(function (p) {
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + esc(p.st.toLowerCase()) + '">' + esc(p.st) + '</span>' : '';
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
@@ -110,7 +111,7 @@
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
-      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+      best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });

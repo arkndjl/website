@@ -20,6 +20,10 @@
           count = w.querySelector('[data-tf-count]'), reset = bar.querySelector('[type=reset]'),
           want = bar.dataset.cols.split(',').map(function (s) { return s.trim().toLowerCase(); }), sels = [];
       rows.forEach(function (r, i) { r.dataset.i = i; });
+      // the RK (or #) column: renumbered 1, 2, 3… best first in whatever column the table is sorted by; its own sort and the
+      // unsorted table keep the ranks as built (data-tf-rerank: counted within the filters). Search narrows the rows, not the ranks.
+      var rc = /^(rk|#)$/i.test(heads[0] || '') && rows.length && rows[0].cells[0] && rows[0].cells[0].classList.contains('cfb__rk') ? 0 : -1, rkSort = null;
+      if (rc >= 0) rows.forEach(function (r) { r.__rk0 = txt(r.cells[rc]); });
       function col(name) { return heads.findIndex(function (h) { return h.toLowerCase() === name; }); }
       want.forEach(function (name) {
         // "label@key" filters on each row's data-key (a value no column shows as text, e.g. nationality behind a flag)
@@ -75,20 +79,26 @@
       function apply() {
         var q = fold(bar.elements.q.value.trim()), n = 0, amax = ageSel ? parseFloat(ageSel.value) : NaN;
         rows.forEach(function (r) {
-          var ok = (!q || fold(txt(r)).indexOf(q) >= 0) && (!day || r.dataset.day === day);
+          var ok = !day || r.dataset.day === day;
           sels.forEach(function (s) {
             if (!ok || !s.el.value) return;
             var v = s.attr ? r.getAttribute(s.attr) || '' : txt(r.cells[s.c]);
             ok = s.fv ? num(v) >= num(s.el.value) : v === s.el.value;
           });
           if (ok && !isNaN(amax)) { var a = num(txt(r.cells[ageC])); ok = !isNaN(a) && a <= amax; }
+          r.__f = ok; ok = ok && (!q || fold(txt(r)).indexOf(q) >= 0);
           r.hidden = !ok; if (ok) n++;
         });
-        if (w.hasAttribute('data-tf-rerank')) {   // ranks within the filters, in the table's first order
-          var k = 0; rows.slice().sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (r) {
-            var c = r.querySelector('.cfb__rk'); if (c && !r.hidden) c.textContent = ++k; });
-        }
+        renum();
         if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
+      }
+      function renum() {
+        if (rc < 0) return;
+        var on = rows.filter(function (r) { return r.__f !== false; });
+        if (rkSort) { window.__rr(on, '__rk', dir, rkSort.best, rkSort.get); }
+        else if (w.hasAttribute('data-tf-rerank')) { var k = 0; on.slice().sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (r) { r.__rk = ++k; }); }
+        else on.forEach(function (r) { r.__rk = r.__rk0; });
+        on.forEach(function (r) { r.cells[rc].textContent = r.__rk; });
       }
       bar.addEventListener('input', function () { apply(); writeHash(); }); bar.addEventListener('change', function () { apply(); writeHash(); });
       bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(function () { apply(); writeHash(); }); });
@@ -97,7 +107,7 @@
       var ths = [].slice.call(table.tHead.rows[0].cells), cur = -1, dir = 1;
       ths.forEach(function (th, c) {
         th.tabIndex = 0; th.setAttribute('data-sort', '');
-        function key(r) { var cell = r.cells[c]; return cell && cell.hasAttribute('data-v') ? cell.getAttribute('data-v') : txt(cell); }
+        function key(r) { var cell = r.cells[c]; return cell && cell.hasAttribute('data-v') ? cell.getAttribute('data-v') : c === rc ? r.__rk0 : txt(cell); }
         function go() {
           var h = heads[c].toLowerCase(), isHt = /(^|\W)(ht|height)\b/.test(h),
               vals = rows.map(key).filter(function (v) { return !/^[-–—]?$/.test(v); }), isNum = vals.length && vals.every(function (v) { return !isNaN(num(v, isHt)); }),
@@ -109,6 +119,8 @@
             return x.localeCompare(y) * dir || a.dataset.i - b.dataset.i;
           });
           rows.forEach(function (r) { body.appendChild(r); });
+          rkSort = c === rc ? null : { best: asc ? 1 : -1, get: function (r) { var v = key(r); return /^[-–—]?$/.test(v) ? null : isNum ? num(v, isHt) : v; } };
+          renum();
           ths.forEach(function (t) { t.removeAttribute('aria-sort'); });
           th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending');
         }
