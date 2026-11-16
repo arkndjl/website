@@ -160,6 +160,13 @@ class Index:
         return hits
 
 
+def cfb_photo(code, espnl):
+    """cfb-all photo 1 = ESPN's standard headshot for the player's ESPN id (scripts/fetch_cfb.mjs photoCode)"""
+    if code != 1: return code
+    m = re.search(r'/id/(\d+)', espnl or '')
+    return f'https://a.espncdn.com/i/headshots/college-football/players/full/{m.group(1)}.png' if m else None
+
+
 def board_rows(sport):
     """every board player: name, school, position, Transfer% (for the backtest and lock reads)"""
     rows = []
@@ -169,7 +176,7 @@ def board_rows(sport):
         for x in d['rows']:
             rows.append({'name': x[c['name']], 'team': x[c['team']], 'pos': x[c['pos']], 'tp': x[c['transferP']],
                          'fv': x[c['fv']], 'xnil': x[c['xnil']], 'ynil': x[c['ynil']], 'div': x[c['div']], '_teams': [x[c['team']]],
-                         'cls': x[c['cls']], 'conf': x[c['conf']], 'logo': x[c['logo']], 'photo': x[c['photo']],
+                         'cls': x[c['cls']], 'conf': x[c['conf']], 'logo': x[c['logo']], 'photo': cfb_photo(x[c['photo']], x[c['espnl']]),
                          'locked': bool(x[c['lock']]) if 'lock' in c else False})
         pr = json.load(open(os.path.join(ROOT, 'data', 'cfb_portal.json')))['moves']
         ix = {(names.key(r['name']), names.team_key(r['team'])): r for r in rows}

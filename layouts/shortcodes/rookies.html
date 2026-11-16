@@ -66,7 +66,7 @@
       if (f === 'p') return Math.round(x) + '%';
       if (f === 'm') return (x < 0 ? '<span class="cfb__down">-$' : '$') + Math.abs(x).toFixed(1) + 'M' + (x < 0 ? '</span>' : '');
       if (f === 'e') return '€' + x.toFixed(x >= 10 ? 0 : 1) + 'M';
-      if (f.charAt(0) === 's') { var d = +f.slice(1); return '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d) + '</span>'; }
+      if (f.charAt(0) === 's') { var d = +f.slice(1), s = x.toFixed(d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
       return x < 0 ? '<span class="cfb__down">' + x.toFixed(+f) + '</span>' : x.toFixed(+f);
     }
     function season() { var v = bar.elements.season.value; return D.seasons.filter(function (s) { return String(s.s) === v; })[0] || D.seasons[0]; }

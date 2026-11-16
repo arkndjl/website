@@ -1,6 +1,6 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Pixel bars inside table cells: the column a table is sorted by (th[aria-sort]) and any column whose header
-// carries data-vz draw each value's size under the number, so gaps and tiers show without reading every figure.
+// carries data-vz draw each value's size under the number (sorted by rank: the is-key column), so gaps and tiers show without reading every figure.
 // Scale: a column that crosses zero is drawn from zero (pink below it); one whose values all sit in the top half
 // of their range (ratings, 20-80 grades) runs low to high; anything else runs from zero. Rank columns get no bar.
 // Standings tables also colour streaks and differentials by sign. static/style.css draws the bar (td.vz).
@@ -44,6 +44,15 @@
       td.classList.toggle('vz-up', /^(\+\d|W\d)/.test(s)); td.classList.toggle('vz-dn', /^([\-−]\d|L\d)/.test(s));
     }
   }
+  function keyCol(t, n) {
+    var hits = [], rows = 0;
+    for (var b = 0; b < t.tBodies.length; b++) for (var i = 0, R = t.tBodies[b].rows; i < R.length && rows < 60; i++) {
+      var r = R[i]; if (r.cells.length !== n) continue; rows++;
+      for (var c = 0; c < n; c++) if (r.cells[c].classList.contains('is-key')) { hits[c] = (hits[c] || 0) + 1; break; }
+    }
+    for (c = 0; c < n; c++) if (rows >= 3 && hits[c] >= rows * 0.6) return c;
+    return -1;
+  }
   function draw(t) {
     var hr = headRow(t); if (!hr) return;
     var n = 0, i, ths = hr.cells, span = false;
@@ -53,11 +62,14 @@
     var count = 0; for (i = 0; i < t.tBodies.length; i++) count += t.tBodies[i].rows.length;
     if (count > MAXROWS) return;
     var st = t.classList.contains('st-table');
+    var drawn = false;
     for (i = 0; i < ths.length; i++) {
       var th = ths[i], name = label(th);
       if (st && SIGNED.test(name)) signs(t, i, n);
-      if (th.hasAttribute('data-vz') || (th.hasAttribute('aria-sort') && !RANK.test(name))) column(t, i, n);
+      if (th.hasAttribute('data-vz') || (th.hasAttribute('aria-sort') && !RANK.test(name))) { column(t, i, n); drawn = true; }
     }
+    // sorted by rank (or not at all): the table's headline column (cells marked is-key) carries the bars
+    if (!drawn && ths.length === n) { var k = keyCol(t, n); if (k >= 0 && !RANK.test(label(ths[k]))) column(t, k, n); }
   }
   var queue = [], tick = 0;
   function later(t) {

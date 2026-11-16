@@ -7,7 +7,7 @@
 {{- $names := dict "elo" "Elo" "eff" "net rating x pace" "mkt" "market rating" "lin" "lineup vs baseline" "rest" "rest days" "b2b" "back-to-back" "home" "home court" "roster" "roster value" "trav" "travel distance" "tz" "time zones crossed" "alt" "altitude (DEN, UTAH)" "n4" "games in 4 nights" "b2bRoad" "road back-to-back" "po" "playoff home court" "early" "Elo early in the season" "eloPo" "Elo in the playoffs" -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" | default "model backtest" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ $.Get "title" | default "model backtest" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">

@@ -7,7 +7,7 @@
 {{- $about := "Net = points scored minus allowed per 100 possessions with the group on the floor together. sNet pulls Net toward the team's own net by k possessions (k from odd/even game splits, per unit size), the rank. Trios and pairs sum every five that holds them. No opponent adjustment; garbage time counts." -}}
 <div class="win cfb lld" data-tab="{{ .Get "tab" | default "lineup leaders" }}" data-lld="{{ $sport }}"{{ if eq $sport "nba" }} data-gfx-logo="/img/nba/{}.png"{{ end }} data-gfx-cols="RK,Lineup,Team,Poss,Net,sNet" data-src="{{ printf "data/%s-lineup-leaders.json" $sport | relURL }}?v={{ now.Unix }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ if eq $sport "nba" }}hoop{{ else }}basketball{{ end }}"/></svg>{{ .Get "title" | default "lineup leaders" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "lineup leaders" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar" data-lld-bar onsubmit="return false" aria-label="filter lineup leaders">

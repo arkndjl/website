@@ -1876,6 +1876,11 @@ def build(days_ahead=4):
         if len(r.get('t') or '') > 5:
             r['t'] = r['t'][11:16]
     rows.sort(key=lambda r: (r['day'], r.get('t') or '', r['id']))
+    # an international break leaves the next four days empty: the window then runs through the next matchday's first three days
+    t0 = dt.datetime.now(ET).date()
+    nxt = min((lday(r) for r in rows if r.get('hs') is None and lday(r) >= t0.isoformat() and r['lg'] in LEAGUES_SHOWN), default=None)
+    if nxt:
+        days_ahead = min(12, max(days_ahead, (dt.date.fromisoformat(nxt) - t0).days + 3))
     add_market(rows, P['rho'])
     add_mv(rows, live=True)
     if P.get('av'):

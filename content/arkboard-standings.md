@@ -29,11 +29,11 @@ draft = false
 {{< lazytab tab="CFB scores" >}}{{< standings part="scores" k="cfb" title="CFB scores and schedule" tab="CFB scores" icon="football" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="NBA" tabs="NBA standings,NBA playoffs,NBA bracket,NBA leaders,NBA scores" sub="true" label="NBA views" >}}
-{{< lazytab tab="NBA standings" >}}{{< standings part="table" k="nba" title="NBA standings" tab="NBA standings" icon="hoop" >}}{{< /lazytab >}}
-{{< lazytab tab="NBA playoffs" >}}{{< standings part="picture" k="nba" title="NBA playoff picture" tab="NBA playoffs" icon="hoop" >}}{{< /lazytab >}}
+{{< lazytab tab="NBA standings" >}}{{< standings part="table" k="nba" title="NBA standings" tab="NBA standings" icon="basketball" >}}{{< /lazytab >}}
+{{< lazytab tab="NBA playoffs" >}}{{< standings part="picture" k="nba" title="NBA playoff picture" tab="NBA playoffs" icon="basketball" >}}{{< /lazytab >}}
 {{< lazytab tab="NBA bracket" >}}{{< bracket k="nba" title="NBA projected bracket" tab="NBA bracket" icon="basketball" >}}{{< /lazytab >}}
-{{< lazytab tab="NBA leaders" >}}{{< standings part="leaders" k="nba" title="NBA stat leaders" tab="NBA leaders" icon="hoop" >}}{{< /lazytab >}}
-{{< lazytab tab="NBA scores" >}}{{< standings part="scores" k="nba" title="NBA scores and schedule" tab="NBA scores" icon="hoop" >}}{{< /lazytab >}}
+{{< lazytab tab="NBA leaders" >}}{{< standings part="leaders" k="nba" title="NBA stat leaders" tab="NBA leaders" icon="basketball" >}}{{< /lazytab >}}
+{{< lazytab tab="NBA scores" >}}{{< standings part="scores" k="nba" title="NBA scores and schedule" tab="NBA scores" icon="basketball" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="CBB" tabs="CBB standings,CBB polls,CBB bracket,CBB leaders,CBB scores" sub="true" label="CBB views" >}}
 {{< lazytab tab="CBB standings" >}}{{< standings part="table" k="cbb" title="CBB standings" tab="CBB standings" icon="basketball" >}}{{< /lazytab >}}

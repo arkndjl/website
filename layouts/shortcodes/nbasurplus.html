@@ -8,7 +8,7 @@
        in the address with a c prefix, apart from the XPM tab's (#cteam=OKC&cview=s). */ -}}
 <div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-xaav="{{ "data/xaav-nba.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,xAAV,Value,Surplus,Contract">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_contracts.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "nba_contracts.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar nbaxpm__bar" data-ns-bar hidden onsubmit="return false" aria-label="filter contracts">
@@ -73,7 +73,7 @@
   // ESPN headshot (ph, from the XPM board) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
   function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nba/' + esc(String(t).toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
-  function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
+  function sg(x, d) { if (x == null) return '<span class="cfb__dim">–</span>'; var s = x.toFixed(d == null ? 1 : d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function m(x) { return x == null ? '' : x.toFixed(1); }
   function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {

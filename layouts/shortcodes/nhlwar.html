@@ -105,7 +105,7 @@
   function nth(n) { return n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'); }
   // drawn twice: after the name (desktop) and on the team line under it (phones, so the name column stays narrow)
   function medals(p, where) { return p.bdg ? ' <span class="cfb__medals nhlwar__md' + where + '" title="' + esc(p.bdg.map(function (b) { return TIER[b[1]] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct at position, ' + b[3]; }).join('\n') + '\npredictive of next season\'s WAR beyond the grade') + '">' + p.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
-  function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
+  function sg(x, d) { if (x == null) return '<span class="cfb__dim">–</span>'; var s = x.toFixed(d == null ? 1 : d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function od(o, d) { return o == null ? '' : '<span class="cfb__dim nbaxpm__od">' + (o > 0 ? '+' : '') + o.toFixed(1) + ' / ' + (d > 0 ? '+' : '') + d.toFixed(1) + '</span>'; }
   function chips() {
     [].forEach.call(bar.querySelectorAll('[data-side]'), function (c) { var on = c.dataset.side === side; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
