@@ -323,6 +323,35 @@ def season_to_date(prior):
     return lines, keys, tg, last
 
 
+
+def claim_lines(careers, names, lines, keys):
+    """each board row's season line (a Barttorvik pid, or None), one line per row: first the rows whose own pid has a
+    line at the row's team; then the name at the row's team (exact, then the shared matcher, scripts/names.py: Ant /
+    Anthony Brown Jr.); a pid whose line is at another school is left to that school's row (one Barttorvik career sat
+    on two rows, e.g. Colorado's and Montana's Josiah Sanders, and the wrong one took the line)"""
+    import names as N
+    out, used = [None] * len(careers), set()
+    for i, m in enumerate(careers):
+        ln = lines.get(m['pid'])
+        if ln and (not m.get('bt') or ln['team'] == m['bt']) and m['pid'] not in used:
+            out[i] = m['pid']; used.add(m['pid'])
+    free = [{'pid': p, 'name': ln['name'], 'team': ln['team']} for p, ln in lines.items() if p not in used]
+    idx = N.Matcher(free, name='name', team='team', pos=None, sport='basketball')
+    for i, m in enumerate(careers):
+        if out[i] is not None:
+            continue
+        pid = keys.get((m['key'], m['bt']))
+        if pid is None or pid in used:
+            hit = idx.find(names[i], m.get('bt'))[0] if m.get('bt') else None
+            pid = hit['pid'] if hit and hit['team'] == m['bt'] else None
+        if pid is not None and pid not in used:
+            out[i] = pid; used.add(pid)
+    # a row whose own pid has a line at another school that no row there claimed: his transfer, the board's team stale
+    for i, m in enumerate(careers):
+        if out[i] is None and m['pid'] in lines and m['pid'] not in used:
+            out[i] = m['pid']; used.add(m['pid'])
+    return out
+
 def show_line(L, season_label, seasons):
     return {'season': season_label, 'team': L['team'], 'gp': int(L['gp'] or 0), 'mpg': round(L['mp'] or 0, 1),
             'ppg': round(L['pts_g'] or 0, 1) if L.get('pts_g') is not None else None, 'rpg': round(L['treb_g'] or 0, 1) if L.get('treb_g') is not None else None,
@@ -499,7 +528,8 @@ def main():
     # badges (scripts/cbb_badges.py): from last college season, the line the preseason grade reads; shown, not in FV
     bdg = CBADGE.prior_badges(prior)
     dob_of = dob_lookup()
-    for row, m, bd in zip(prior['rows'], prior['careers'], bdg):
+    pick = claim_lines(prior['careers'], [r[ci['name']] for r in prior['rows']], lines, keys)
+    for row, m, bd, pid in zip(prior['rows'], prior['careers'], bdg, pick):
         # a birth date the preseason careers lacked feeds the same age terms a returner's has (the "now" grade's age)
         dob = dob_of(m['pid'], row[ci['name']], row[ci['team']], m.get('bt'), have=m['dob'])
         cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': dob, 'rec': m['rec'], 'seasons': [dict(zip(keep, s)) for s in m['seasons']]}
@@ -509,8 +539,6 @@ def main():
         f_pre = F.features(cc, i)
         e0, p0, parts0 = score(f_pre, fit)
         xb0 = xbpm_of(f_pre, fit)
-        pid = m['pid'] if m['pid'] in lines else keys.get((m['key'], m['bt']))
-        if pid in used: pid = None          # two board rows can't share one Barttorvik player
         ln = lines.get(pid) if pid else None
         rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd,
                'seas': cc['seasons']}
@@ -528,7 +556,9 @@ def main():
             for k, v, x in parts1: mix[k][0] += w * v; mix[k][1] = x       # the driver's value now: this season's
             kb = lf['kb'][grp]['k']
             rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
-            n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
+            # rest-of-season minutes at least kb: a deep-bench line (0.2 min at BPM 490) otherwise weighs its own
+            # few minutes as heavily as the shrunk rate and shows xBPM +45
+            n_ros = max(kb, (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g'])))
             rec['seas'] = next_career(cc, ln)['seasons']   # npos reads minutes played, not the full-season projection
             rec.update(e=(1 - w) * e0 + w * e1, p=(1 - w) * p0 + w * p1, parts=[(k, v, x) for k, (v, x) in mix.items()],
                        xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
