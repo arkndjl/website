@@ -30,3 +30,17 @@ Family (Holm over 5):
 Not tested, and why: player ratings / RWA (a team-level price cannot be split across players without a lineup-level
 market); map and round totals (the site shows no CS2 totals; one market, two books); ARK Ranking itself is the base
 model's rating and changes only if H1/H2 ship.
+
+## Round 2 (written before any score below was read)
+
+Same data, rows, features and scoring as above (held Valve series Oct 1 - Nov 10 2026, leave-one-day-out, t over
+days, one-sided .025). Family of 4, Holm. Script: `scripts/cs2_market_research.py --round2` -> `round2` in
+data/cs2_market_research.json.
+
+- S1 stack residual: base + H2 + H1 vs base + H2 (all rows). Pass adds the H1 term to the live chance.
+- S2 stack newcomer: base + H2 + H3 vs base + H2 (all rows).
+- A1 ARK Ranking: base + H2 vs base on rows where both teams have 15+ earlier Valve series (the ranking's own
+  eligibility count). Pass = the ARK (Bo3 chance vs the top 20) is computed on the market-rated logit.
+- P1 Pick'Em and Major event odds: base + H2 vs base on rows where both teams are VRS top 50 (a Major field is drawn
+  from them). No Major stage falls inside the data window (Sep 19 - Nov 10 2026), so P(5+) itself cannot be scored;
+  this series-level test is the only evidence. Pass = Pick'Em and event odds simulate on the market-rated logit.
