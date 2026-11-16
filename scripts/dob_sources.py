@@ -10,7 +10,7 @@
   wikipedia(names, kw) Wikipedia's own search API ("<name> basketball"), then the lead section's
                        {{birth date}} template: the fallback for players whose Wikidata item has no date. One call a
                        second with maxlag; a 429 stops the run's Wikipedia step (the next run picks up).
-  conflict(...)        two dates more than `tol` days apart are logged to data/dob_conflicts.json.
+  conflict(...)        two dates more than `tol` days apart are logged to data/dob_conflicts_<sport>.json.
 
 RealGM, Proballers, EliteProspects and On3 answer bots with a Cloudflare challenge or disallow AI crawlers in
 robots.txt: they are not fetched; a date read off one of them by hand goes in the overrides file with its URL.
@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OVERRIDES = os.path.join(ROOT, 'data', 'dob_overrides.json')
-CONFLICTS = os.path.join(ROOT, 'data', 'dob_conflicts.json')
+CONFLICTS = os.path.join(ROOT, 'data', 'dob_conflicts_{sport}.json')
 UA = 'arkboard-research/1.0 (+https://arkndjl.net)'
 OCC = {'basketball': 'Q3665646', 'football': 'Q19204627', 'hockey': 'Q11774891', 'soccer': 'Q937857', 'tennis': 'Q10833314'}
 
@@ -105,11 +105,10 @@ def gap(a, b): return abs((dt.date.fromisoformat(a) - dt.date.fromisoformat(b)).
 
 
 def log_conflicts(sport, rows):
-    """rows: [{'key', 'name', 'team', 'dates': {src: dob}, 'used'}]; replaces this sport's list"""
-    try: c = json.load(open(CONFLICTS))
-    except (OSError, ValueError): c = {}
-    c[sport] = sorted(rows, key=lambda r: r['key'])
-    json.dump(c, open(CONFLICTS, 'w'), indent=1, ensure_ascii=False); open(CONFLICTS, 'a').write('\n')
+    """rows: [{'key', 'why', 'dates', 'used', ...}] -> data/dob_conflicts_<sport>.json (one file a sport, so two board
+    workflows never write the same file)"""
+    p = CONFLICTS.format(sport=sport)
+    json.dump(sorted(rows, key=lambda r: r['key']), open(p, 'w'), indent=1, ensure_ascii=False); open(p, 'a').write('\n')
 
 
 def disagree(dates, tol=3):
