@@ -1,7 +1,7 @@
 +++
-title = "art :: ARKNDJL"
-url = "/arkndjl/art/"
-aliases = ["/arkndjl/uniforms/", "/arkndjl-uniforms/"]
+title = "art :: ST. CLAIRE"
+url = "/stclaire/art/"
+aliases = ["/arkndjl/art/", "/arkndjl/uniforms/", "/arkndjl-uniforms/"]
 description = "visual art by arkndjl."
 draft = false
 

@@ -1,7 +1,7 @@
 +++
-title = "style guide :: ARKNDJL"
-url = "/arkndjl/style/"
-aliases = ["/arkndjl/brand/"]
+title = "style guide :: ST. CLAIRE"
+url = "/stclaire/style/"
+aliases = ["/arkndjl/style/", "/arkndjl/brand/"]
 description = "arkndjl.net style guide: palette, type, pixel art, components, icons."
 draft = false
 +++

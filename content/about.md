@@ -61,7 +61,7 @@ draft = false
 {{< /winpane >}}
 
 {{< winpane title="music.exe" icon="note" status="ARKNDJL" >}}
-**[ARKNDJL](/arkndjl/)** :: music and visual art.
+**[ST. CLAIRE](/stclaire/)** :: music and visual art.
 
 - tracks: ambro_sia, PHOENiX, on [soundcloud](https://soundcloud.com/arkndjl) and [youtube](https://www.youtube.com/@arkndjl)
 - [ARKLIBRARY](/arklibrary/): music, film, games, books and art i like

@@ -58,6 +58,13 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
     soundcloud = "https://soundcloud.com/arkndjl"
     email = "arkndjl@gmail.com"
 
+  # ST. CLAIRE (the art section, /stclaire/): its own accounts, shown as pixel tiles on the hub (shortcodes/arkndjlhub.html)
+  [params.stclaire]
+    twitter = "https://x.com/stclairenyc"
+    instagram = "https://www.instagram.com/stclairenyc/"
+    youtube = "https://www.youtube.com/@stclairenyc"
+    tiktok = "https://www.tiktok.com/@stclairenyc"
+
 [params.twitter]
   creator = "arkndjl"
   site = ""
@@ -97,17 +104,17 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           weight = 10
         [[languages.en.menu.main]]
           identifier = "arkndjl"
-          name = "ARKNDJL"
-          url = "/arkndjl/"
+          name = "ST. CLAIRE"
+          url = "/stclaire/"
           weight = 20
           [languages.en.menu.main.params]
             icon = "img/icons/arkndjl.svg"
-        # ARKNDJL children (content/arkndjl-*.md): one bespoke page each, grouped like ARKBOARD (params.group / gname)
+        # ST. CLAIRE children (content/arkndjl-*.md): one bespoke page each, grouped like ARKBOARD (params.group / gname)
         [[languages.en.menu.main]]
           identifier = "arkndjl-music"
           parent = "arkndjl"
           name = "music"
-          url = "/arkndjl/music/"
+          url = "/stclaire/music/"
           weight = 21
           [languages.en.menu.main.params]
             icon = "img/icons/note.svg"
@@ -117,7 +124,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           identifier = "arkndjl-art"
           parent = "arkndjl"
           name = "art"
-          url = "/arkndjl/art/"
+          url = "/stclaire/art/"
           weight = 22
           [languages.en.menu.main.params]
             icon = "img/icons/brush.svg"
@@ -127,7 +134,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           identifier = "arkndjl-style"
           parent = "arkndjl"
           name = "style guide"
-          url = "/arkndjl/style/"
+          url = "/stclaire/style/"
           weight = 25
           [languages.en.menu.main.params]
             icon = "img/icons/sulfur.svg"
