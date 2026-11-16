@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T06:20:57Z",
+ "asof": "2026-11-16T06:37:46Z",
  "recenter": {
   "2026-11-16": 2.08
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T05:13:03Z",
-  "ageH": 1.1,
+  "ageH": 1.4,
   "stale": false
  },
  "picks": [],
@@ -1956,22 +1956,6 @@
  ],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401920808",
-   "sport": "cbb",
-   "kick": "2026-11-17T01:30:00Z",
-   "home": "Texas A&M",
-   "away": "SE Louisiana",
-   "mk": "spread",
-   "side": "away",
-   "line": 34.5,
-   "price": -129.0,
-   "edge": 4.8,
-   "x": 3.5,
-   "why": "no edge at -129",
-   "m": 29.7,
-   "tm": 155.4
-  },
   {
    "id": "401918075",
    "sport": "cbb",
@@ -2115,6 +2099,22 @@
    "why": "edge under 7",
    "m": 19.8,
    "tm": 154.2
+  },
+  {
+   "id": "401920808",
+   "sport": "cbb",
+   "kick": "2026-11-17T01:30:00Z",
+   "home": "Texas A&M",
+   "away": "SE Louisiana",
+   "mk": "total",
+   "side": "under",
+   "line": 159.5,
+   "price": -124.0,
+   "edge": 4.1,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 29.7,
+   "tm": 155.4
   },
   {
    "id": "401916307",
@@ -2391,11 +2391,11 @@
    "state": "under"
   },
   "401920808": {
-   "mk": "spread",
-   "side": "away",
-   "line": 34.5,
-   "price": -129.0,
-   "edge": 4.8,
+   "mk": "total",
+   "side": "under",
+   "line": 159.5,
+   "price": -124.0,
+   "edge": 4.1,
    "ev": null,
    "units": 0.0,
    "home": "Texas A&M",
@@ -2612,25 +2612,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16494,
+  "snapshots": 16501,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 541,
-    "clvRet": -0.0263,
-    "clvT": -3.38,
+    "clvRet": -0.0262,
+    "clvT": -3.36,
     "clv": 0.27,
-    "beat": 0.322,
-    "still": 0.292
+    "beat": 0.323,
+    "still": 0.29
    },
    {
     "when": "6-24h",
-    "clvN": 3284,
-    "clvRet": -0.022,
-    "clvT": -12.24,
+    "clvN": 3287,
+    "clvRet": -0.0218,
+    "clvT": -12.16,
     "clv": 0.31,
     "beat": 0.352,
-    "still": 0.455
+    "still": 0.457
    },
    {
     "when": "1-6h",
@@ -19189,7 +19189,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T06:20:57Z",
+ "checked": "2026-11-16T06:37:46Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
