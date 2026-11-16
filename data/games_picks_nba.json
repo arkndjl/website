@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-16T03:03:11Z",
+ "asof": "2026-11-16T03:09:21Z",
  "recenter": {
   "2026-11-16": 1.73
  },
@@ -311,24 +311,24 @@
   "since": null,
   "why": null,
   "pooled": {
-   "n": 89,
+   "n": 91,
    "days": 17,
-   "llr": 1.489,
+   "llr": 1.507,
    "lo": -2.944,
    "hi": 2.944,
    "state": "watching",
    "at": null,
    "sd": 0.12,
    "rho": 0.05,
-   "real": 1.22,
+   "real": 1.23,
    "realSe": 0.622,
-   "clvRet": 0.0266,
-   "evDU": 0.015
+   "clvRet": 0.0268,
+   "evDU": 0.0148
   }
  },
  "model": {
-  "asof": "2026-11-16T02:59:41Z",
-  "ageH": 0.1,
+  "asof": "2026-11-16T03:07:10Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -366,6 +366,22 @@
   }
  ],
  "board": [
+  {
+   "id": "401910001",
+   "sport": "nba",
+   "kick": "2026-11-17T02:00:00Z",
+   "home": "DEN",
+   "away": "PHX",
+   "mk": "spread",
+   "side": "home",
+   "line": -7.5,
+   "price": -5413.0,
+   "edge": 18.1,
+   "x": 5.0,
+   "why": "gap too big: a bad line",
+   "m": 10.6,
+   "tm": 231.8
+  },
   {
    "id": "401909998",
    "sport": "nba",
@@ -423,7 +439,7 @@
    "mk": "total",
    "side": "over",
    "line": 226.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 0.9,
    "x": 6.5,
    "why": "edge under 6.5 (side: over)",
@@ -528,12 +544,24 @@
    "mk": "total",
    "side": "over",
    "line": 226.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "NO",
    "away": "GS",
+   "state": "under"
+  },
+  "401910001": {
+   "mk": "spread",
+   "side": "home",
+   "line": -7.5,
+   "price": -5413.0,
+   "edge": 18.1,
+   "ev": null,
+   "units": 0.0,
+   "home": "DEN",
+   "away": "PHX",
    "state": "under"
   }
  },
@@ -589,7 +617,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4441,
+  "snapshots": 4443,
   "buckets": [
    {
     "when": "24h+",
@@ -7264,7 +7292,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T03:03:11Z",
+ "checked": "2026-11-16T03:09:21Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
