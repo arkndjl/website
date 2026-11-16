@@ -691,7 +691,7 @@ def main():
         bt_hti = next((q.get('hti') for q in reversed(sz) if q.get('year', SEASON) < SEASON and q.get('hti')), None)
         mht, mwt, msrc = meas(row[ci['name']], row[ci['team']], row[ci['ht']], row[ci['wt']], bt_hti)
         new = {'mht': mht, 'mwt': mwt, 'msrc': msrc, 'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
-               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos),
+               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos, row[ci['name']]),
                'fv0': (r['fv'] if not r['w'] else r['fv0']) if r.get('fv0') is not None else None}
         for c in new:
             if c in ci: row[ci[c]] = new[c]
