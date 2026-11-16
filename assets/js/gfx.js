@@ -1333,6 +1333,36 @@
   }
   // numbers a line of text carries, for telling when it only repeats what the card already shows
   function pcNumsIn(s) { return (String(s).replace(/−/g, '-').match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function (n) { return String(parseFloat(n.replace(/,/g, ''))); }); }
+  // CBB comps (cbb.js fillComps, static/data/cbb-comps.json): the 100-nearest mix and the 3 nearest who reached the NBA
+  async function pcComps(win, d) {
+    var el = d && d.querySelector('[data-comps]'), src = win.getAttribute('data-cbb-src'); if (!el || !src || !window.__arkJson) return null;
+    var cd = await window.__arkJson(src.replace(/cbb-all\.json.*$/, 'cbb-comps.json')).catch(function () { return null; });
+    var e = cd && cd.players[el.getAttribute('data-comps')]; if (!e || !e.length) return null;
+    var lg = {}; (window.__arkCbbRecs || []).forEach(function (r) { if (r.logo && r.team && !lg[r.team]) lg[r.team] = r.logo; });
+    var near = e.slice(0, -1).map(function (x) { return cd.pool[x[0]]; }).filter(Boolean).slice(0, 3);
+    var logos = await Promise.all(near.map(function (c) { return lg[c[1]] ? loadImg(lg[c[1]]) : null; }));
+    return { mix: e[e.length - 1], near: near, logos: logos };
+  }
+  var COMP_H = 156, COMP_ROLE = { 'reached the NBA': 'NBA', 'bench, 100+ games': 'bench', 'rotation, 3+ seasons': 'rotation', '2+ seasons as a starter': 'starter', '4+ seasons as a starter': 'starter 4+', 'All-Star or 6+ seasons as a starter': 'All-Star' };
+  function pcCompsH(cp) { return cp ? 50 + COMP_H + 30 : 0; }
+  // the comps strip: three share cells (NBA, starter FV 45+, All-Star level FV 60+), then the nearest NBA comps
+  function compStrip(g, cp, x, y, w) {
+    var m = cp.mix, gap = 20, h = COMP_H, sw = 200, shares = [['NBA', m[1]], ['FV 45+', m[2]], ['FV 60+', m[3]]];
+    cardRule(g, x, y, w, 'COMPS', m[0] + ' NEAREST'); y += 50;
+    shares.forEach(function (s, k) { var v = Math.round(s[1] * 100); statCell(g, { h: s[0], t: v + '%', prob: v }, x + k * (sw + gap), y, sw, h); });
+    var cx0 = x + 3 * (sw + gap), n = cp.near.length; if (!n) return;
+    var cw = Math.floor((x + w - cx0 - (n - 1) * gap) / n);
+    cp.near.forEach(function (c, k) {
+      var cx = cx0 + k * (cw + gap), pad = 22, img = cp.logos[k], tx = cx + pad + (img ? 84 : 0), tw = cx + cw - pad - tx;
+      g.fillStyle = C.face; g.fillRect(cx, y, cw, h); bevel(g, cx, y, cw, h, true, 3);
+      if (img) drawLogo(g, img, cx + pad, y + pad, 64, 64);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, c[0], tw), tx, y + pad + 18);
+      g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, c[1] + ' ' + String(c[2] - 1).slice(2) + '-' + String(c[2]).slice(2) + ' ' + c[3], tw), tx, y + 76);
+      var by = y + h - 40, fvT = String(Math.round(c[4])); g.font = '40px ' + FONT; var chw = chip(g, cx + pad, by, fvT, 40, c[4]), rx = cx + pad + chw + 16;
+      var pk = c[6] ? '#' + c[6] + " '" + String(c[7]).slice(2) : 'undrafted'; g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(pk, rx, by); rx += g.measureText(pk).width + 16;
+      g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, COMP_ROLE[c[5]] || c[5], cx + cw - pad - rx), rx, by);
+    });
+  }
   async function buildPCard(win, row) {
     var table = row.closest('table'); if (!table) return null;
     var mainR = pcMain(row), subRow = mainR ? row : null, mv = pcMove(mainR || row);
@@ -1341,6 +1371,7 @@
     var hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
     var rows = pcAll(table), at = pcAt(table, rows, row), nameI = pcNameAt(heads);
     var det = await pcDetail(row), d = det.el;
+    var comps = await pcComps(win, d), compH = pcCompsH(comps);   // the comps strip adds its own height, so no band gives way
     var gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
     var nameC = cells[nameI >= 0 ? nameI : 1];
     var name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : txt(d && d.querySelector('.cfb__dhead b'));
@@ -1402,7 +1433,7 @@
     var pk = row.getAttribute('data-pk'), link = tabLink(win);
     if (pk && /#/.test(link)) link += ':p=' + pk;
     else if (win.getAttribute('data-cbb') && window.__arkCbbPid && row.hasAttribute('data-i') && window.__arkCbbRecs) { var rec = window.__arkCbbRecs[+row.getAttribute('data-i')]; if (rec) link = SITE + '#' + win.getAttribute('data-cbb') + ':p=' + window.__arkCbbPid(rec); }
-    var F = await frame(2160, 2700, base + ' :: ' + name, win.getAttribute('data-gfx-date'), link);
+    var F = await frame(2160, 2700 + compH, base + ' :: ' + name, win.getAttribute('data-gfx-date'), link);
     var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, bottom = F.y + F.h - 30;
     well(g, F.x, F.y, F.w, F.h);
     var px = 400, PW = 350, PH = 290, plq = hasFv || !!feat, tcol = w - px - (plq ? PW + 36 : 0);
@@ -1503,7 +1534,7 @@
       var s = seen(); u = used();
       var p2 = tidy(plus, s), m2 = tidy(minus, s);
       repH = plus.length || minus.length ? 96 + Math.min(430, Math.max(repRows(p2), repRows(m2), 54)) + 20 : 0;
-      var room = bottom - yb - partsH - repH - bdgH - (u.ls.length ? Math.min(u.ls.length, 3) * 64 + 20 : 0);
+      var room = bottom - yb - partsH - repH - bdgH - compH - (u.ls.length ? Math.min(u.ls.length, 3) * 64 + 20 : 0);
       var fixed = 0, wsum = 0; bands.forEach(function (b) { fixed += 50 + (b.rows - 1) * gap + 30; wsum += b.rows * b.wgt; });
       U = wsum ? (room - fixed) / wsum : 0; return { p: p2, m: m2 };
     }
@@ -1543,6 +1574,7 @@
       });
       y += 20;
     }
+    if (comps) { compStrip(g, comps, x, y, w); y += compH; }
     // badges: the slot for the board's predictive badges (only badges that pass a held-out test are on a board)
     if (badges.length) { y += 6; cardRule(g, x, y, w, 'BADGES'); y += 50; y += badgeRows(g, badges, x, y, w); }
     if (repH) {
