@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-16T06:03:06Z",
+ "asof": "2026-11-16T06:14:56Z",
  "recenter": {
   "week": 0.18
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-16",
-  "ageH": -17.9,
+  "ageH": -17.8,
   "stale": false
  },
  "picks": [],
@@ -325,6 +325,22 @@
    "tm": 53.0
   },
   {
+   "id": "401858528",
+   "sport": "cfb",
+   "kick": "2026-11-21T20:30:00.000Z",
+   "home": "Michigan",
+   "away": "UCLA",
+   "mk": "total",
+   "side": "over",
+   "line": 37.5,
+   "price": -134.0,
+   "edge": 4.6,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -0.9,
+   "tm": 42.1
+  },
+  {
    "id": "401864541",
    "sport": "cfb",
    "kick": "2026-11-22T03:30:00.000Z",
@@ -365,7 +381,7 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.9,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -659,22 +675,6 @@
    "why": "total market off",
    "m": 0.1,
    "tm": 47.0
-  },
-  {
-   "id": "401856868",
-   "sport": "cfb",
-   "kick": "2026-11-21T18:00:00.000Z",
-   "home": "West Virginia",
-   "away": "Houston",
-   "mk": "total",
-   "side": "under",
-   "line": 68.5,
-   "price": -110.0,
-   "edge": 6.2,
-   "x": null,
-   "why": "total market off",
-   "m": -7,
-   "tm": 62.3
   }
  ],
  "games": {
@@ -730,7 +730,7 @@
    "mk": "total",
    "side": "under",
    "line": 57.5,
-   "price": -134.0,
+   "price": -119.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -775,16 +775,16 @@
    "state": "off"
   },
   "401858528": {
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -119.0,
+   "mk": "total",
+   "side": "over",
+   "line": 37.5,
+   "price": -134.0,
    "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
    "away": "UCLA",
-   "state": "off"
+   "state": "under"
   },
   "401856752": {
    "mk": "total",
@@ -1042,7 +1042,7 @@
    "mk": "total",
    "side": "under",
    "line": 62.5,
-   "price": -124.0,
+   "price": -134.0,
    "edge": 6.0,
    "ev": null,
    "units": 0.0,
@@ -1054,7 +1054,7 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -1414,7 +1414,7 @@
    "mk": "total",
    "side": "under",
    "line": 50.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -1425,9 +1425,9 @@
   "401871081": {
    "mk": "spread",
    "side": "away",
-   "line": -6.5,
-   "price": -112.0,
-   "edge": 1.8,
+   "line": -5.5,
+   "price": -117.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "Sam Houston",
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20778,
+  "snapshots": 20798,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4135,
-    "clvRet": -0.0492,
-    "clvT": -35.56,
+    "clvN": 4140,
+    "clvRet": -0.0489,
+    "clvT": -35.25,
     "clv": 0.18,
-    "beat": 0.343,
-    "still": 0.303
+    "beat": 0.346,
+    "still": 0.3
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T06:03:06Z",
+ "checked": "2026-11-16T06:14:56Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
