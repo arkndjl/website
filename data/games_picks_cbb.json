@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T04:16:50Z",
+ "asof": "2026-11-16T04:19:35Z",
  "recenter": {
-  "2026-11-16": 2.02
+  "2026-11-16": 2.01
  },
  "monitor": {
   "clocks": {
@@ -1807,30 +1807,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 361,
+   "n": 365,
    "days": 6,
-   "llr": -3.064,
+   "llr": -3.04,
    "lo": -2.944,
    "hi": 2.944,
    "state": "paused",
    "at": "2026-11-15",
    "sd": 0.12,
    "rho": 0.05,
-   "real": -0.157,
+   "real": -0.155,
    "realSe": 0.229,
-   "clvRet": -0.0113,
-   "evDU": 0.021
+   "clvRet": -0.0111,
+   "evDU": 0.0209
   },
   "back": {
-   "n": 238,
-   "clvRet": 0.0032,
-   "t": 0.47,
+   "n": 242,
+   "clvRet": 0.0033,
+   "t": 0.5,
    "days": 3
   }
  },
  "model": {
   "asof": "2026-11-16T04:13:52Z",
-  "ageH": 0.0,
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
@@ -2117,10 +2117,10 @@
    "mk": "spread",
    "side": "away",
    "line": 33.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.7,
    "x": 3.5,
-   "why": "no edge at -114",
+   "why": "no edge at -110",
    "m": 29.8,
    "tm": 156.0
   },
@@ -2173,6 +2173,22 @@
    "tm": 156.2
   },
   {
+   "id": "401927364",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:30:00Z",
+   "home": "Drake",
+   "away": "Tarleton State",
+   "mk": "total",
+   "side": "under",
+   "line": 146.5,
+   "price": -124.0,
+   "edge": 4.9,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 14.0,
+   "tm": 141.6
+  },
+  {
    "id": "401916307",
    "sport": "cbb",
    "kick": "2026-11-17T01:00:00Z",
@@ -2221,22 +2237,6 @@
    "tm": 157.5
   },
   {
-   "id": "401927364",
-   "sport": "cbb",
-   "kick": "2026-11-17T00:30:00Z",
-   "home": "Drake",
-   "away": "Tarleton State",
-   "mk": "total",
-   "side": "under",
-   "line": 145.5,
-   "price": -110.0,
-   "edge": 3.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 14.0,
-   "tm": 141.6
-  },
-  {
    "id": "401924265",
    "sport": "cbb",
    "kick": "2026-11-17T03:00:00Z",
@@ -2277,7 +2277,7 @@
    "mk": "total",
    "side": "over",
    "line": 150.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.5,
    "x": 7.0,
    "why": "edge under 7",
@@ -2474,7 +2474,7 @@
    "mk": "total",
    "side": "over",
    "line": 150.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -2499,7 +2499,7 @@
    "mk": "spread",
    "side": "away",
    "line": 33.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -2594,9 +2594,9 @@
   "401927364": {
    "mk": "total",
    "side": "under",
-   "line": 145.5,
-   "price": -110.0,
-   "edge": 3.9,
+   "line": 146.5,
+   "price": -124.0,
+   "edge": 4.9,
    "ev": null,
    "units": 0.0,
    "home": "Drake",
@@ -2717,7 +2717,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16420,
+  "snapshots": 16426,
   "buckets": [
    {
     "when": "24h+",
@@ -2730,9 +2730,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3254,
-    "clvRet": -0.0217,
-    "clvT": -12.04,
+    "clvN": 3256,
+    "clvRet": -0.0218,
+    "clvT": -12.05,
     "clv": 0.31,
     "beat": 0.35,
     "still": 0.461
@@ -19264,7 +19264,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T04:16:50Z",
+ "checked": "2026-11-16T04:19:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
