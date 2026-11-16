@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-15T23:58:08Z",
+ "asof": "2026-11-16T00:00:33Z",
  "recenter": {
-  "week": 0.2
+  "week": 0.22
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-15",
-  "ageH": -0.0,
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -285,12 +285,28 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 5.8,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
    "m": -7.5,
    "tm": 48.3
+  },
+  {
+   "id": "401858306",
+   "sport": "cfb",
+   "kick": "2026-11-21T05:00:00.000Z",
+   "home": "Louisville",
+   "away": "Pittsburgh",
+   "mk": "total",
+   "side": "over",
+   "line": 49.5,
+   "price": -122.0,
+   "edge": 5.0,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 13.8,
+   "tm": 54.5
   },
   {
    "id": "401856748",
@@ -373,22 +389,6 @@
    "tm": 43.7
   },
   {
-   "id": "401858306",
-   "sport": "cfb",
-   "kick": "2026-11-21T05:00:00.000Z",
-   "home": "Louisville",
-   "away": "Pittsburgh",
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -111.0,
-   "edge": 3.0,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 13.8,
-   "tm": 54.5
-  },
-  {
    "id": "401856751",
    "sport": "cfb",
    "kick": "2026-11-22T00:30:00.000Z",
@@ -413,7 +413,7 @@
    "mk": "total",
    "side": "over",
    "line": 54.5,
-   "price": -134.0,
+   "price": -140.0,
    "edge": 2.5,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -477,7 +477,7 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 1.8,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -525,7 +525,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -129.0,
+   "price": -134.0,
    "edge": 1.0,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -682,7 +682,7 @@
    "mk": "total",
    "side": "over",
    "line": 42.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 5.8,
    "ev": null,
    "units": 0.0,
@@ -727,11 +727,11 @@
    "state": "off"
   },
   "401856871": {
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -134.0,
-   "edge": 1.1,
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": 101.0,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "Baylor",
@@ -777,9 +777,9 @@
   "401858528": {
    "mk": "spread",
    "side": "home",
-   "line": -5.5,
-   "price": 105.0,
-   "edge": 4.6,
+   "line": -6.5,
+   "price": -146.0,
+   "edge": 5.6,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
@@ -790,7 +790,7 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -850,7 +850,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -129.0,
+   "price": -134.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -861,9 +861,9 @@
   "401858306": {
    "mk": "total",
    "side": "over",
-   "line": 51.5,
-   "price": -111.0,
-   "edge": 3.0,
+   "line": 49.5,
+   "price": -122.0,
+   "edge": 5.0,
    "ev": null,
    "units": 0.0,
    "home": "Louisville",
@@ -1030,7 +1030,7 @@
    "mk": "total",
    "side": "over",
    "line": 54.5,
-   "price": -134.0,
+   "price": -140.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -1246,7 +1246,7 @@
    "mk": "total",
    "side": "under",
    "line": 44.5,
-   "price": -129.0,
+   "price": -119.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -1390,7 +1390,7 @@
    "mk": "spread",
    "side": "home",
    "line": 25.5,
-   "price": -124.0,
+   "price": -122.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20310,
+  "snapshots": 20323,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4009,
-    "clvRet": -0.0489,
-    "clvT": -34.75,
+    "clvN": 4011,
+    "clvRet": -0.0491,
+    "clvT": -34.91,
     "clv": 0.18,
-    "beat": 0.346,
-    "still": 0.303
+    "beat": 0.343,
+    "still": 0.306
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-15T23:58:08Z",
+ "checked": "2026-11-16T00:00:33Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
