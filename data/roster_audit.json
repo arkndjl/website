@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-16T19:42Z",
+ "asof": "2026-11-16T21:12Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -310,8 +310,8 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
-     "rows": 2150
+     "flags": 9,
+     "rows": 2152
     },
     "static/data/nfl-fantasy.json": {
      "flags": 16,
@@ -330,7 +330,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 46,
+     "flags": 47,
      "rows": 1650
     }
    },
@@ -372,6 +372,24 @@
      "site": "CIN"
     },
     {
+     "d": "2026-09-14",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Indianapolis",
+     "kind": "waived",
+     "move": {
+      "d": "2026-09-14",
+      "head": "Cut loose by Indianapolis",
+      "kind": "waived"
+     },
+     "pid": "19078",
+     "player": "Johnathan Edwards",
+     "pos": "CB",
+     "rotowire": "FA",
+     "site": "IND"
+    },
+    {
      "d": "2026-09-15",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -408,24 +426,6 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-16",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "released",
-     "head": "Let go by Dolphins",
-     "kind": null,
-     "move": {
-      "d": "2026-11-14",
-      "head": "Signed to Miami's active roster",
-      "kind": "sign"
-     },
-     "pid": "11831",
-     "player": "Zane Gonzalez",
-     "pos": "K",
-     "rotowire": "FA",
-     "site": "MIA"
-    },
-    {
      "d": "2026-10-19",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -442,6 +442,24 @@
      "pos": "LG",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-08-31",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Philadelphia",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-31",
+      "head": "Cut loose by Philadelphia",
+      "kind": "waived"
+     },
+     "pid": "17142",
+     "player": "John Ojukwu",
+     "pos": "RT",
+     "rotowire": "FA",
+     "site": "PHI"
     },
     {
      "d": "2026-08-30",
@@ -1704,16 +1722,16 @@
      "site": "BAL"
     },
     {
-     "d": "2026-11-10",
+     "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Cut loose by Bolts",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-10",
-      "head": "Cut loose by Bolts",
-      "kind": "waived"
+      "d": "2026-11-16",
+      "head": "Signs to practice squad",
+      "kind": "practice"
      },
      "pid": "18251",
      "player": "Hayden Rucci",
@@ -1936,6 +1954,24 @@
      "pos": "OL",
      "rotowire": "NE",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Set to join Tampa Bay practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Set to join Tampa Bay practice squad",
+      "kind": "practice"
+     },
+     "pid": "11841",
+     "player": "Cooper Rush",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "ATL"
     },
     {
      "d": "2026-10-05",
@@ -3846,16 +3882,16 @@
      "site": "BAL"
     },
     {
-     "d": "2026-11-10",
+     "d": "2026-11-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Cut loose by Bolts",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-10",
-      "head": "Cut loose by Bolts",
-      "kind": "waived"
+      "d": "2026-11-16",
+      "head": "Signs to practice squad",
+      "kind": "practice"
      },
      "pid": "18251",
      "player": "Hayden Rucci",
@@ -3936,24 +3972,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Let go by Dolphins",
-     "kind": null,
-     "move": {
-      "d": "2026-11-14",
-      "head": "Signed to Miami's active roster",
-      "kind": "sign"
-     },
-     "pid": "11831",
-     "player": "Zane Gonzalez",
-     "pos": "K",
-     "rotowire": "FA",
-     "site": "MIA"
-    },
-    {
      "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4024,6 +4042,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "MIN"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Set to join Tampa Bay practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Set to join Tampa Bay practice squad",
+      "kind": "practice"
+     },
+     "pid": "11841",
+     "player": "Cooper Rush",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "ATL"
     },
     {
      "d": "2026-11-09",
@@ -4226,7 +4262,7 @@
    ],
    "joined": 0,
    "players": 2279,
-   "rows": 8078
+   "rows": 8080
   },
   "nhl": {
    "by_file": {
