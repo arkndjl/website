@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-16T21:20:45Z",
+ "asof": "2026-11-16T21:23:37Z",
  "recenter": {
   "week": 0.33
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-16",
-  "ageH": -2.7,
+  "ageH": -2.6,
   "stale": false
  },
  "picks": [],
@@ -501,22 +501,6 @@
    "tm": 54.0
   },
   {
-   "id": "401862836",
-   "sport": "cfb",
-   "kick": "2026-11-22T01:00:00.000Z",
-   "home": "UAB",
-   "away": "UTSA",
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -140.0,
-   "edge": 2.2,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -4.5,
-   "tm": 53.7
-  },
-  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -563,6 +547,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": -10.3,
    "tm": 46.0
+  },
+  {
+   "id": "401862836",
+   "sport": "cfb",
+   "kick": "2026-11-22T01:00:00.000Z",
+   "home": "UAB",
+   "away": "UTSA",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -124.0,
+   "edge": 1.2,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -4.5,
+   "tm": 53.7
   },
   {
    "id": "401858307",
@@ -1077,9 +1077,9 @@
   "401862836": {
    "mk": "total",
    "side": "over",
-   "line": 51.5,
-   "price": -140.0,
-   "edge": 2.2,
+   "line": 52.5,
+   "price": -124.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "UAB",
@@ -1174,7 +1174,7 @@
    "mk": "spread",
    "side": "away",
    "line": 13.5,
-   "price": -112.0,
+   "price": -106.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -1219,11 +1219,11 @@
    "state": "off"
   },
   "401869953": {
-   "mk": "spread",
-   "side": "home",
-   "line": -9.5,
+   "mk": "total",
+   "side": "under",
+   "line": 48.5,
    "price": -124.0,
-   "edge": 0.9,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Troy",
@@ -1499,15 +1499,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21474,
+  "snapshots": 21484,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4329,
+    "clvN": 4330,
     "clvRet": -0.048,
     "clvT": -35.21,
     "clv": 0.2,
-    "beat": 0.34,
+    "beat": 0.339,
     "still": 0.325
    },
    {
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T21:20:45Z",
+ "checked": "2026-11-16T21:23:37Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
