@@ -72,7 +72,8 @@
     function season() { var v = bar.elements.season.value; return D.seasons.filter(function (s) { return String(s.s) === v; })[0] || D.seasons[0]; }
     // a column or view with no value in the season shown (a past season's projection, last season's WAR) is dropped
     function has(k) { return season().rows.some(function (r) { return r[k] != null; }); }
-    function fixView() { if (!has(view)) { var v = D.views.filter(function (x) { return has(x[0]); })[0]; if (v) view = v[0]; } }
+    // a season can name its own default view (key: a past draft opens on FV)
+    function fixView() { if (!has(view)) { var k = season().key, v = D.views.filter(function (x) { return has(x[0]); })[0]; if (k && has(k)) view = k; else if (v) view = v[0]; } }
     function chips() {
       var h = D.views.filter(function (v) { return has(v[0]); }).map(function (v) { return '<button type="button" class="cfb__chip' + (v[0] === view ? ' is-on' : '') + '" data-view="' + v[0] + '" aria-pressed="' + (v[0] === view) + '" title="' + esc(v[2]) + '">' + esc(v[1]) + '</button>'; }).join('');
       var rows = season().rows, have = {}, ps = [];
@@ -203,7 +204,7 @@
     }
     // the minutes floor: a season can carry its own default (mdef: low early in a season, higher for a full one)
     function minDef() { if (D.min) { var m = season().mdef; bar.elements.min.value = String(m != null ? m : (D.min.def || 0)); } }
-    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { fixView(); teams(); chips(); minDef(); } render(); }
+    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { if (season().key || D.seasons.some(function (x) { return x.key; })) view = season().key || D.key; fixView(); teams(); chips(); minDef(); } render(); }
     bar.addEventListener('input', update); bar.addEventListener('change', update);
     bar.addEventListener('reset', function () { setTimeout(function () { if (D) { reset(); render(); } }); });
     chipsEl.addEventListener('click', function (e) {

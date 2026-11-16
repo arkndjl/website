@@ -1,12 +1,14 @@
 {{- /* G League call-up odds: every G League player this season (static/data/gleague.json, scripts/gleague_callup.py),
-       50 to a page. {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
-<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-gfx-cols="RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,500%,xVORX">
+       50 to a page. The season select swaps in a past season's end-of-season board (static/data/gleague-past.json,
+       gleague_callup.py --past: fit walk forward) with what happened next (MP next, VORX 3Y). {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
+<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-past="{{ "data/gleague-past.json" | relURL }}" data-gfx-cols="RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,500%,xVORX">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar nbaxpm__bar" data-gl-bar hidden onsubmit="return false" aria-label="filter G League players">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field" data-gl-season hidden><span>season</span><select name="season"></select></label>
     <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
     <label class="cfb__field"><span>NBA</span><select name="nb">
       <option value="">any</option><option value="0">no NBA minutes</option><option value="1">has NBA minutes</option><option value="d">drafted</option><option value="u">undrafted</option>
@@ -31,17 +33,19 @@
         <th data-sort="min" data-num class="nbaxpm__ph" title="G League minutes this season">MIN</th>
         <th data-sort="gs" data-num class="nbaxpm__ph" title="Game Score per 36 minutes, G League">GmSc/36</th>
         <th data-sort="ts" data-num class="nbaxpm__ph" title="true shooting %, G League">TS%</th>
-        <th data-sort="cmp" data-num class="nbaxpm__ph" title="NBA minutes, career through today">NBA MP</th>
+        <th data-sort="cmp" data-num class="nbaxpm__ph" title="NBA minutes, career through the season shown">NBA MP</th>
         <th data-sort="p1" data-num class="c-p1" title="chance of NBA minutes next season. Out of sample: AUC .88, calibrated by decile">NBA%</th>
         <th data-sort="p5" data-num class="c-p5" title="chance of 500+ NBA minutes (per 82 games) next season. Out of sample: AUC .90">500%</th>
         <th data-sort="xv" data-num class="c-xv" title="expected NBA VORX (wins over replacement), next 3 seasons combined">xVORX</th>
+        <th data-sort="o1" data-num data-gl-out hidden title="what happened: NBA minutes the next season (per 82 games)">MP next</th>
+        <th data-sort="o3" data-num data-gl-out hidden title="what happened: NBA VORX over the next 3 seasons">VORX 3Y</th>
       </tr></thead>
       <tbody></tbody>
     </table>
     <p class="cfb__none" data-gl-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-gl-none hidden>no players match.</p>
   </div>
-  <div class="win__status" title="NBA%, 500% and xVORX: ridge logistic on G League seasons 2008-25 (age, minutes, per-36 box, TS%, usage, AST%, rebound %, net rating, PIE, NBA minutes and XPM through last season, draft slot), Showcase Cup-only seasons pooled in; tested leaving one season out against the same model without G League stats (all three pass Holm). Players with 50+ G League minutes."><span data-gl-count></span>
+  <div class="win__status" data-gl-def title="NBA%, 500% and xVORX: ridge logistic on G League seasons 2008-25 (age, minutes, per-36 box, TS%, usage, AST%, rebound %, net rating, PIE, NBA minutes and XPM through last season, draft slot), Showcase Cup-only seasons pooled in; tested leaving one season out against the same model without G League stats (all three pass Holm). Players with 50+ G League minutes."><span data-gl-count></span>
     <span class="winpager" data-gl-pager hidden>
       <button type="button" class="winpager__btn" data-gl-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
       <span class="winpager__at" aria-live="polite"><span data-gl-page>1</span>/<span data-gl-pages>1</span></span>
@@ -61,9 +65,9 @@
   var win = document.querySelector('[data-nbagl]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
   var bar = win.querySelector('[data-gl-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-gl-count]'), none = win.querySelector('[data-gl-none]'), loading = win.querySelector('[data-gl-loading]'),
-      asof = win.querySelector('[data-gl-asof]'), pager = win.querySelector('[data-gl-pager]'), pageEl = win.querySelector('[data-gl-page]'), pagesEl = win.querySelector('[data-gl-pages]');
+      asof = win.querySelector('[data-gl-asof]'), defEl = win.querySelector('[data-gl-def]'), DEF = defEl.title, pager = win.querySelector('[data-gl-pager]'), pageEl = win.querySelector('[data-gl-page]'), pagesEl = win.querySelector('[data-gl-pages]');
   var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' '), VIEWS = ['p1', 'p5', 'xv'];
-  var data = null, view = 'p1', sortKey = 'rk', dir = 1, best = 1, page = 0;
+  var cur = null, past = null, data = null, view = 'p1', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // ESPN headshot from the XPM board, else NBA's own by person id; a miss shows the neutral frame
   function face(p) {
@@ -76,12 +80,14 @@
   function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {
     var h = __hp(win), e = bar.elements;
+    var gs = h.get('gs'); if (gs && past) { var S = past.seasons.filter(function (x) { return String(x.season) === gs; })[0]; if (S) { e.season.value = gs; data = S; } }
     view = h.get('gview') || 'p1'; if (VIEWS.indexOf(view) < 0) view = 'p1';
     e.team.value = h.get('gteam') || ''; e.q.value = h.get('gq') || ''; e.nb.value = h.get('gnb') || ''; e.age.value = h.get('gage') || ''; chips();
   }
   function writeHash() {
     var h = __hp(win), e = bar.elements;
-    ['gview', 'gteam', 'gnb', 'gage', 'gq'].forEach(function (k) { h.delete(k); });
+    ['gview', 'gteam', 'gnb', 'gage', 'gq', 'gs'].forEach(function (k) { h.delete(k); });
+    if (data !== cur) h.set('gs', data.season);
     if (view !== 'p1') h.set('gview', view); if (e.team.value) h.set('gteam', e.team.value); if (e.nb.value) h.set('gnb', e.nb.value);
     if (e.age.value) h.set('gage', e.age.value); if (e.q.value.trim()) h.set('gq', e.q.value.trim());
     __hw(win, h.toString());
@@ -96,7 +102,7 @@
       if (nb === 'd' && !p.pk) return false; if (nb === 'u' && p.pk) return false;
       if (e.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
       return true;
-    }).sort(function (a, b) { return b[key] - a[key] || b.p1 - a.p1; });
+    }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return b.p1 - a.p1; if (x == null) return 1; if (y == null) return -1; return y - x || b.p1 - a.p1; });
     list.forEach(function (p, i) { p.rk = i + 1; });
     var shown = list.length;
     if (sortKey !== 'rk') {
@@ -111,6 +117,10 @@
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + (p.nba || '')).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     table.dataset.key = key;
+    var isPast = data !== cur;
+    ths.forEach(function (th) { if (th.hasAttribute('data-gl-out')) th.hidden = !isPast; });
+    win.dataset.gfxCols = 'RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,500%,xVORX' + (isPast ? ',MP next,VORX 3Y' : '');
+    defEl.title = isPast ? DEF + ' Past seasons: the board the day that season ended, refit walk forward on the seasons known by then (NBA% and 500% through the season before, xVORX three back, from 2014-15); out of sample 2010-11 to 2024-25: NBA% AUC ' + past.test.auc + ', Brier ' + past.test.brier + ' (rate ' + past.test.rate + ').' : DEF;
     function k(c) { return c === key ? ' is-key' : ''; }
     var row = function (p) {
       var dr = p.pk ? '#' + p.pk + " '" + String(p.dy).slice(2) : 'UDFA';
@@ -124,7 +134,8 @@
         '<td class="cfb__num nbaxpm__ph">' + p.cmp + '</td>' +
         '<td class="cfb__num c-p1 nbaxpm__v' + k('p1') + '">' + pct(p.p1) + '</td>' +
         '<td class="cfb__num c-p5 nbaxpm__v' + k('p5') + '">' + pct(p.p5) + '</td>' +
-        '<td class="cfb__num c-xv nbaxpm__v' + k('xv') + '">' + sg(p.xv) + '</td></tr>';
+        '<td class="cfb__num c-xv nbaxpm__v' + k('xv') + '">' + sg(p.xv) + '</td>' +
+        (isPast ? '<td class="cfb__num">' + (p.o1 == null ? '<span class="cfb__dim">–</span>' : p.o1) + '</td><td class="cfb__num">' + sg(p.o3) + '</td>' : '') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(row).join('');
     var gfxAll = null; body.parentNode.__gfxOff = page * PER;
@@ -132,8 +143,8 @@
     none.hidden = list.length > 0;
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
-    var t = new Date(data.asof);
-    asof.textContent = data.label + ' G League · next: ' + data.next + ' NBA · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
+    var t = new Date(isPast ? past.asof + 'T12:00Z' : data.asof);
+    asof.textContent = data.label + ' G League · next: ' + data.next + ' NBA · ' + (isPast ? 'season end' : 'updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear());
     ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
   }
   function teams() {
@@ -143,8 +154,13 @@
     sel.value = seen[want] ? want : '';
   }
   function update() { page = 0; writeHash(); render(); }
-  bar.addEventListener('input', update); bar.addEventListener('change', update);
-  bar.addEventListener('reset', function () { view = 'p1'; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
+  function pick(v) {
+    var S = past && past.seasons.filter(function (x) { return String(x.season) === v; })[0];
+    data = S || cur; teams(); update();
+  }
+  bar.addEventListener('input', function (e) { if (e.target !== bar.elements.season) update(); });
+  bar.addEventListener('change', function (e) { if (e.target === bar.elements.season) pick(e.target.value); else update(); });
+  bar.addEventListener('reset', function () { view = 'p1'; sortKey = 'rk'; dir = 1; setTimeout(function () { bar.elements.season.value = String(cur.season); data = cur; teams(); chips(); update(); }); });
   bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
     var c = e.target.closest('.cfb__chip'); if (!c) return;
     view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
@@ -159,8 +175,14 @@
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
   win.querySelectorAll('[data-gl-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.glStep; if (page < 0) page = 0; render(); }); });
-  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
-    data = d; readHash(); teams(); readHash(); loading.hidden = true; bar.hidden = false; render();
+  // the past seasons file loads with the board (the select needs its list); a miss leaves this season alone
+  Promise.all([fetch(win.dataset.src).then(function (r) { return r.json(); }),
+               fetch(win.dataset.past).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })]).then(function (d) {
+    cur = data = d[0]; past = d[1];
+    var sel = bar.elements.season;
+    sel.innerHTML = '<option value="' + cur.season + '">' + esc(cur.label) + '</option>' + (past ? past.seasons.filter(function (x) { return x.season !== cur.season; }).map(function (x) { return '<option value="' + x.season + '">' + esc(x.label) + '</option>'; }).join('') : '');
+    sel.value = String(cur.season); win.querySelector('[data-gl-season]').hidden = !past;
+    readHash(); teams(); readHash(); loading.hidden = true; bar.hidden = false; render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();
 </script>

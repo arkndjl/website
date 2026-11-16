@@ -9,6 +9,7 @@ game line or an existing model output (FV, xBPM, NBA%, the mocks); nothing here 
 
 Outputs
     static/data/cbb/{stats,war,breakouts,top,draft,portal}.json   player tables, drawn by layouts/shortcodes/rookies.html (src=)
+                                                                    (draft: this draft, then each past draft at draft week, past_drafts)
     data/cbb_teamtabs.json                                          team tables (returning, talent), drawn by teamunits.html (feed=)
 
 Definitions
@@ -433,22 +434,29 @@ def main():
         drows.append({'n': m['name'], 'tm': m['school'], 'pos': m.get('pos') or '', 'age': m.get('age'), 'ph': m.get('photo') or r.get('photo'), 'lo': m.get('logo'),
                       'sub': m.get('cls') or '', 'slot': m['pick'], 'cons': m.get('cons'), 'dec': r1((m.get('declare') or 0) * 100, 0), 'fv': m.get('fv'),
                       'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'),
-                      'rng': f"{sim['lo']}-{sim['hi']}" if sim.get('lo') else '', 'conv': (m.get('slots') or {}).get('conv'), 'pre': m.get('cons'), 'preL': f"#{m['cons']}" if m.get('cons') else ''})
+                      'rng': f"{sim['lo']}-{sim['hi']}" if sim.get('lo') else '', 'conv': (m.get('slots') or {}).get('conv')})
     for s in M.get('staying') or []:
         r = fvby.get((s['name'], s['school'])) or {}
         drows.append({'n': s['name'], 'tm': s['school'], 'pos': r.get('pos') or '', 'age': age(r) if r else None, 'ph': r.get('photo'), 'lo': r.get('logo'),
                       'sub': (s.get('cls') or '') + ' · stays', 'slot': None, 'cons': s.get('cons'), 'dec': r1((s.get('declare') or 0) * 100, 0), 'fv': r.get('fv'),
-                      'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'), 'rng': '', 'conv': None,
-                      'pre': s.get('cons'), 'preL': f"#{s['cons']}" if s.get('cons') else ''})
+                      'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'), 'rng': '', 'conv': None})
     write('draft', {
-        'title': 'draft board', 'key': 'slot', 'def': '',
-        'views': [['slot', 'Mock', 'predictive mock pick'], ['cons', 'Cons', 'consensus rank across the boards'], ['fv', 'FV', 'FV'], ['dec', 'Declare%', 'chance he enters the 2027 draft']],
-        'cols': [col('slot', 'Mock', 'predictive mock pick (consensus + model, Tankathon order)', 'i', 1, 1), col('cons', 'Cons', f"median rank on {M['boards']} 2027 boards", 'i', 1, 1),
+        'title': 'draft board', 'key': 'slot',
+        'def': 'past drafts: the board in draft week. FV = draft-day grade (scripts/cbb_draftday.py: season just played + the June boards; '
+               'college exits 2009-16 graded by fits that held out his class, later exits by the fit on 2009-16), Cons = consensus of '
+               'the ESPN and NBADraft.net final boards, Pick = actual NBA pick, Out = the career on the FV scale (drafts through 2020).',
+        'views': [['slot', 'Mock', 'predictive mock pick'], ['cons', 'Cons', 'consensus rank across the boards'], ['fv', 'FV', 'FV'], ['dec', 'Declare%', 'chance he enters the 2027 draft'],
+                  ['out', 'Out', 'what he became: NBA career on the FV scale']],
+        'cols': [col('slot', 'Mock', 'predictive mock pick (consensus + model, Tankathon order)', 'i', 1, 1),
+                 col('cons', 'Cons', f"consensus rank: median on {M['boards']} 2027 boards; past drafts, ESPN and NBADraft.net final boards", 'i', 1, 1),
                  col('rng', '80%', '80% range of his pick across 2,000 simulated drafts', 's', 0), col('conv', 'Conv', 'conviction mock pick', 'i', 1, 1),
                  col('dec', 'Declare%', 'chance he enters the 2027 draft (declare model)', 'p'), col('fv', 'FV', 'FV now', 'i'),
-                 col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xBPM', 'projected BPM this season', 's1')],
+                 col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xBPM', 'projected BPM this season', 's1'),
+                 col('out', 'Out', 'what he became: NBA career on the FV scale (drafts through 2020, six NBA seasons or more)', 'i'),
+                 col('role', 'Career', 'NBA career: peak XPM and role', 's', 0)],
+        'pre': {'l': 'Pick', 't': 'actual NBA pick (UDFA: undrafted)'},
         'pos': ['G', 'F', 'C'],
-        'seasons': [{'s': SEASON, 'l': '2027 draft', 'rows': drows}]})
+        'seasons': [{'s': SEASON, 'l': '2027 draft', 'rows': drows}] + past_drafts(esp)})
 
     # ---- portal: D-I transfers into this season, last season's production against their new grade
     last_by = {l['pid']: l for l in F['lines']}
@@ -556,6 +564,29 @@ def clean(x):
     if isinstance(x, dict): return {k: clean(v) for k, v in x.items()}
     if isinstance(x, list): return [clean(v) for v in x]
     return x
+
+
+def past_drafts(esp):
+    """each past draft (2009 on) at draft week, from the all-time list's draft-day grades (scripts/data/cbb_draftday.json.gz):
+    the college players who left that season and the internationals drafted or on the final boards, if on a June
+    board or picked. The grade only uses what was known in draft week; the player's own class never trains it."""
+    import names as NM
+    R = json.load(gzip.open(os.path.join(HERE, 'data', 'cbb_draftday.json.gz')))['rows']
+    picks = {}
+    for yr, lst in json.load(open(os.path.join(HERE, 'nba_draft.json'))).items():
+        for pk, _, n, _ in lst: picks.setdefault((int(yr), NM.key(n)), pk)
+    by = defaultdict(list)
+    for r in R:
+        s = r['draft'] if r['cls'] == 'Intl' else r['season']
+        if not s or r['status'] == 'college': continue
+        pk = r['pick'] if r.get('draft') == s and r.get('pick') else picks.get((s, NM.key(r['name'])))
+        if pk is None and r.get('june') is None: continue
+        tm, lo, _ = esp(r['team']) if r['cls'] != 'Intl' else (r['team'] or 'International', None, None)
+        by[s].append({'n': r['name'], 'tm': tm, 'pos': r['pos'] or '', 'age': None, 'ph': None, 'lo': lo, 'sub': r['cls'],
+                      'cons': r.get('june'), 'fv': r['fv'], 'out': r.get('out'), 'role': r.get('role') or None,
+                      'pre': pk, 'preL': f'#{pk}' if pk else 'UDFA'})
+    return [{'s': s, 'l': f'{s} draft', 'key': 'fv', 'rows': sorted(by[s], key=lambda r: (-r['fv'], r['cons'] or 999))}
+            for s in sorted(by, reverse=True) if s < SEASON]
 
 
 def write(name, d):
