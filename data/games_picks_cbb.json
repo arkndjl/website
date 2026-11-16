@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T04:38:13Z",
+ "asof": "2026-11-16T04:41:08Z",
  "recenter": {
-  "2026-11-16": 2.0
+  "2026-11-16": 2.03
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T04:13:52Z",
-  "ageH": 0.4,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -2077,6 +2077,22 @@
  ],
  "board": [
   {
+   "id": "401918075",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:00:00Z",
+   "home": "Clemson",
+   "away": "The Citadel",
+   "mk": "spread",
+   "side": "away",
+   "line": 23.5,
+   "price": -114.0,
+   "edge": 6.6,
+   "x": 5.0,
+   "why": "no edge at -114",
+   "m": 16.9,
+   "tm": 144.7
+  },
+  {
    "id": "401921804",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2205,6 +2221,22 @@
    "tm": 135.1
   },
   {
+   "id": "401916298",
+   "sport": "cbb",
+   "kick": "2026-11-16T23:00:00Z",
+   "home": "Maryland",
+   "away": "Alcorn State",
+   "mk": "total",
+   "side": "over",
+   "line": 152.5,
+   "price": -124.0,
+   "edge": 4.4,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 37.1,
+   "tm": 156.9
+  },
+  {
    "id": "401906783",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2213,7 +2245,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -124.0,
+   "price": -129.0,
    "edge": 3.1,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2251,22 +2283,6 @@
    "why": "edge under 6.5 (side: under)",
    "m": 32.3,
    "tm": 145.0
-  },
-  {
-   "id": "401916298",
-   "sport": "cbb",
-   "kick": "2026-11-16T23:00:00Z",
-   "home": "Maryland",
-   "away": "Alcorn State",
-   "mk": "total",
-   "side": "over",
-   "line": 153.5,
-   "price": -124.0,
-   "edge": 3.4,
-   "x": 6.5,
-   "why": "edge under 6.5 (tier: mixed)",
-   "m": 37.1,
-   "tm": 156.9
   },
   {
    "id": "401917532",
@@ -2365,22 +2381,6 @@
    "tm": 141.5
   },
   {
-   "id": "401929419",
-   "sport": "cbb",
-   "kick": "2026-11-16T19:00:00Z",
-   "home": "UTEP",
-   "away": "Florida A&M",
-   "mk": "total",
-   "side": "under",
-   "line": 141.5,
-   "price": -119.0,
-   "edge": 0.5,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 19.8,
-   "tm": 141.0
-  },
-  {
    "id": "401919807",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2395,6 +2395,22 @@
    "why": "edge under 7",
    "m": -2.1,
    "tm": 148.0
+  },
+  {
+   "id": "401929419",
+   "sport": "cbb",
+   "kick": "2026-11-16T19:00:00Z",
+   "home": "UTEP",
+   "away": "Florida A&M",
+   "mk": "total",
+   "side": "over",
+   "line": 140.5,
+   "price": -124.0,
+   "edge": 0.5,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 19.8,
+   "tm": 141.0
   }
  ],
  "games": {
@@ -2426,7 +2442,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -124.0,
+   "price": -129.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -2485,15 +2501,14 @@
   "401918075": {
    "mk": "spread",
    "side": "away",
-   "line": 20.5,
-   "price": 149,
-   "ev": 0.043,
+   "line": 23.5,
+   "price": -114.0,
    "edge": 6.6,
-   "units": 0.25,
-   "bk": "poly",
+   "ev": null,
+   "units": 0.0,
    "home": "Clemson",
    "away": "The Citadel",
-   "state": "paper"
+   "state": "under"
   },
   "401920808": {
    "mk": "spread",
@@ -2558,9 +2573,9 @@
   "401916298": {
    "mk": "total",
    "side": "over",
-   "line": 153.5,
+   "line": 152.5,
    "price": -124.0,
-   "edge": 3.4,
+   "edge": 4.4,
    "ev": null,
    "units": 0.0,
    "home": "Maryland",
@@ -2641,9 +2656,9 @@
   },
   "401929419": {
    "mk": "total",
-   "side": "under",
-   "line": 141.5,
-   "price": -119.0,
+   "side": "over",
+   "line": 140.5,
+   "price": -124.0,
    "edge": 0.5,
    "ev": null,
    "units": 0.0,
@@ -2717,25 +2732,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16448,
+  "snapshots": 16457,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 541,
-    "clvRet": -0.0257,
-    "clvT": -3.3,
-    "clv": 0.28,
+    "clvRet": -0.0267,
+    "clvT": -3.43,
+    "clv": 0.27,
     "beat": 0.322,
-    "still": 0.301
+    "still": 0.287
    },
    {
     "when": "6-24h",
-    "clvN": 3265,
-    "clvRet": -0.0218,
-    "clvT": -12.12,
+    "clvN": 3271,
+    "clvRet": -0.0221,
+    "clvT": -12.27,
     "clv": 0.31,
-    "beat": 0.349,
-    "still": 0.462
+    "beat": 0.348,
+    "still": 0.46
    },
    {
     "when": "1-6h",
@@ -19264,7 +19279,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T04:38:13Z",
+ "checked": "2026-11-16T04:41:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
