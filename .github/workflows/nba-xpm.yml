@@ -29,6 +29,7 @@ on:
 
 permissions:
   contents: write
+  issues: write        # scripts/model_monitor.py opens an issue when a game model's alarm turns on
 
 concurrency:
   group: nba-xpm
@@ -193,6 +194,8 @@ jobs:
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/model_monitor.py nba
       # the lineup term's pre-registered live test (drop verdict at 400 games if it makes live margins worse)
       - name: Lineup term watch

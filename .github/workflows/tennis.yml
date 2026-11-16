@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  issues: write        # scripts/model_monitor.py opens an issue when a game model's alarm turns on
 
 concurrency:
   group: tennis
@@ -58,6 +59,8 @@ jobs:
       # the series model's season so far against its own chances (scripts/model_monitor.py -> data/model_monitor/tennis.json)
       - name: Model monitor
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/model_monitor.py tennis
       - name: Commit if anything changed
         run: |
