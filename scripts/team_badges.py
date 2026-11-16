@@ -164,6 +164,54 @@ def ev_cbb(years=None):
     return ev, idx
 
 
+def ev_cbb_espn(S, skip=()):
+    """season S's D-I games from ESPN's public box scores (team keys = ESPN ids), for the games Barttorvik's
+    getgamestats file lacks (it serves GitHub's runners a browser check). skip: (date, {id, id}) already held.
+    Summaries come through cbb_espn_logs.espn_summary, which keeps finished ones in the workflow's box cache."""
+    import cbb_espn_logs as EL
+    gp = os.path.join(HERE, 'data', f'cbb_games_{S}.json.gz')
+    try:
+        games = json.load(gzip.open(gp))
+    except (OSError, ValueError):
+        return []
+    names = {g[k]: g[n] for g in games for k, n in (('home', 'hn'), ('away', 'an')) if g.get(k)}
+    d1 = EL.d1_ids(names)
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%MZ')
+    ev = []
+    num = lambda v: float(v) if v not in (None, '', '--') else None
+    for g in games:
+        if g.get('season') != S or g.get('state') != 'post' or g['date'] >= now or g.get('home') not in d1 or g.get('away') not in d1:
+            continue
+        d = datetime.datetime.strptime(EL.et_date(g['date']), '%Y%m%d') if len(EL.et_date(g['date'])) == 8 else None
+        if d is None:
+            continue
+        if (d.date(), frozenset((g['home'], g['away']))) in skip:
+            continue
+        sm = EL.espn_summary(g['id'])
+        side = {}
+        for t in ((sm or {}).get('boxscore') or {}).get('teams') or []:
+            st = {x['name']: x.get('displayValue') for x in t.get('statistics') or []}
+            try:
+                fgm, fga = st['fieldGoalsMade-fieldGoalsAttempted'].split('-')
+                tpm, tpa = st['threePointFieldGoalsMade-threePointFieldGoalsAttempted'].split('-')
+                ftm, fta = st['freeThrowsMade-freeThrowsAttempted'].split('-')
+                f = {'fgm': float(fgm), 'fga': float(fga), 'fg3m': float(tpm), 'fg3a': float(tpa), 'ftm': float(ftm),
+                     'fta': float(fta), 'orb': num(st.get('offensiveRebounds')), 'drb': num(st.get('defensiveRebounds')),
+                     'ast': num(st.get('assists')), 'stl': num(st.get('steals')), 'blk': num(st.get('blocks')),
+                     'tov': num(st.get('totalTurnovers') or st.get('turnovers'))}
+            except (KeyError, ValueError, AttributeError):
+                continue
+            if None in f.values():
+                continue
+            side[str(t['team']['id'])] = f
+        f1, f2 = side.get(str(g['home'])), side.get(str(g['away']))
+        if not f1 or not f2 or f1['fga'] < 30 or f2['fga'] < 30:
+            continue
+        P = 0.5 * (poss(f1) + poss(f2))
+        ev.append(dict(t=d, S=S, h=str(g['home']), a=str(g['away']), gid=f'e{g["id"]}', sh=bb_side(f1, f2, P), sa=bb_side(f2, f1, P)))
+    return ev
+
+
 def ev_nfl(years=None):
     import csv
     tg = collections.defaultdict(dict)
