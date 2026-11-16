@@ -168,6 +168,46 @@ def term_test(BR, f):
             "w": [round(float(z), 3) for z in w]}
 
 
+def stack_test(BR, cols0, cols1, mask=None):
+    """Paired LODO log-loss difference: base logit + cols1 vs base logit + cols0 (lists of feature arrays)."""
+    rows = [i for i, r in enumerate(BR) if BURN <= r["d"] <= END and (mask is None or mask[i])]
+    y = np.array([BR[i]["s"] for i in rows])
+    L = np.array([BR[i]["L"] for i in rows])
+    days = np.array([BR[i]["d"] for i in rows])
+    top = np.array([BR[i]["top"] for i in rows])
+    out = []
+    for cols in (cols0, cols1):
+        X = np.column_stack([L] + [c[rows] for c in cols])
+        Lb = np.zeros(len(rows))
+        for d in sorted(set(days)):
+            te = days == d
+            Lb[te] = X[te] @ CM.fitlog(X[~te], y[~te], l2=1e-2)
+        out.append((CM.ll(1 / (1 + np.exp(-Lb)), y), CM.fitlog(X, y, l2=1e-2)))
+    dl = out[1][0] - out[0][0]
+    t, nd = tday(dl, days)
+    return {"n": len(rows), "days": nd, "ll0": round(float(out[0][0].mean()), 4), "ll1": round(float(out[1][0].mean()), 4),
+            "d": round(float(dl.mean()), 5), "t": round(t, 2), "top50": round(float(dl[top].mean()), 5) if top.any() else 0.0,
+            "w": [round(float(z), 3) for z in out[1][1]]}
+
+
+def round2():
+    BR = base_rows()
+    MS = market_series()
+    link(MS, BR)
+    newc = np.array([min(r["na"], r["nb"]) < NEW for r in BR])
+    f1, f2 = residual_feature(MS, BR), rating_feature(MS, BR)
+    f3 = np.where(newc, f1, 0.0)
+    ranked = np.array([min(r["na"], r["nb"]) >= 15 for r in BR])
+    top = np.array([r["top"] for r in BR])
+    res = {"S1": stack_test(BR, [f2], [f2, f1]), "S2": stack_test(BR, [f2], [f2, f3]),
+           "A1": stack_test(BR, [], [f2], ranked), "P1": stack_test(BR, [], [f2], top)}
+    holm(res)
+    out = json.loads(OUT.read_text())
+    out["round2"] = res
+    OUT.write_text(json.dumps(out, indent=1) + "\n")
+    print(json.dumps(res, indent=1))
+
+
 def h4(MS):
     rows = [s for s in MS if "L" in s and not s["tp"] and s["stale"] is not None]
     y = np.array([s["y"] for s in rows])
@@ -276,4 +316,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    round2() if "--round2" in sys.argv else main()
