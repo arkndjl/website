@@ -57,7 +57,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
-  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + esc(String(t).toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
+  function tl(t) { t = String(t || '').split('/').pop(); return t && !/^(fa|ufa|rfa)$/i.test(t) ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + esc(String(t).toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function score(p, v, fmt) {
     if (!v) return 0;
     var w, s = 0, k;

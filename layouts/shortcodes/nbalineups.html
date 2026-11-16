@@ -9,7 +9,7 @@
 {{- $view := .Get "view" | default "units" -}}
 <div class="win cfb nbaln" data-tab="{{ .Get "tab" | default "lineups" }}" data-nbaln="{{ $view }}" data-gfx-logo="/img/nba/{}.png" data-gfx-cols="{{ if eq $view "onoff" }}RK,Player,Team,MIN,On,Off,On-Off,sOn-Off{{ else }}RK,Lineup,MIN,Poss,Net,sNet{{ end }}" data-src="{{ "data/nba-lineups.json" | relURL }}?v={{ now.Unix }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "lineups" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "lineups" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar" data-ln-bar onsubmit="return false" aria-label="filter lineups">

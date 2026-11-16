@@ -4,7 +4,7 @@
 {{- $hasFinal := false }}{{ range .games }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
 {{- $d := . -}}
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
-{{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hoop" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "basketball" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
 <table class="cfb__table cfbg">
   <thead><tr>
     <th>Matchup</th><th title="game quality, 0-100: mean of both teams' rating percentiles in their league (weight 2/3) x closeness, 1 - (P home win - P away win)², (weight 1/3). Default sort">GQ</th><th title="tip, Eastern">Tip</th>

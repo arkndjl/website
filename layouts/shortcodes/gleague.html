@@ -2,7 +2,7 @@
        50 to a page. {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
 <div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-gfx-cols="RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,500%,xVORX">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar nbaxpm__bar" data-gl-bar hidden onsubmit="return false" aria-label="filter G League players">

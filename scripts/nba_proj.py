@@ -153,7 +153,13 @@ def project(fresh=True):
         for p in last['players']: lastn[p['id']] = p
     ids = set(curp) | {i for i in con if i in lastp}
     aging = __import__('nba_games').aging_curve(season)
-    p3 = proj3(json.load(open(FIT3)), (gp or 0) / 82) if os.path.exists(FIT3) else None
+    fit3 = json.load(open(FIT3)) if os.path.exists(FIT3) else None
+    p3 = proj3(fit3, (gp or 0) / 82) if fit3 else None
+    try:            # the G League term (scripts/gleague.py): a season there moves the 1Y / 3Y
+        import gleague
+        glt = gleague.term(fit3, season)
+    except Exception as e:
+        print('gleague term skipped:', e, flush=True); glt = {}
     hist = [{p['id']: p for p in (d['players'] if d else []) if p.get('xpm') is not None and not p.get('pr')}
             for d in (last, load(season - 2))]
     rows = []
@@ -186,7 +192,9 @@ def project(fresh=True):
             h1, h2 = hist[0].get(pid), hist[1].get(pid)
             d = [(h['xpm'] + 2) * h['mp'] / (h['mp'] + 1000) if h else 0.0 for h in (h1, h2)]
             c3 = mp + sum(h['mp'] for h in (h1, h2) if h)
-            r['p1'], r['p3'] = (round(v, 1) for v in p3(pv[0], r['age'], mpg * share * 82, d[0], d[1], c3))
+            y1, y3 = p3(pv[0], r['age'], mpg * share * 82, d[0], d[1], c3)
+            g1, g3 = glt.get(pid, (0.0, 0.0))
+            r['p1'], r['p3'] = round(y1 + g1, 1), round(y3 + g3, 1)
         if pid in con: r['sal'] = con[pid]['yrs']
         rows.append(r)
     # the market's $ per win this season: payroll above the minimum over the projected wins it buys

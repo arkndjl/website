@@ -9,7 +9,7 @@
 <table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th><th title="division">Div</th>
-    <th title="rating = expected goal margin vs an average team, neutral ice: Elo + xG rating + lineup value, at the model's weights">Rating</th>
+    <th data-vz title="rating = expected goal margin vs an average team, neutral ice: Elo + xG rating + lineup value, at the model's weights">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th title="wins-losses-overtime losses">Rec</th>
     <th>Pts</th>

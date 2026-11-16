@@ -20,6 +20,7 @@ Ships only if both hold everywhere.
 
 Refit order: nba_proj3y_research.py, nba_proj3y_star_research.py --write, then this with --write (the first rewrites
 the fit file without 'cp' and nba_proj.py falls back to the shrunk coefficients).
+Then scripts/gleague.py --fit (the G League term, 'gleague', fit on this form's residuals).
 
 Result: passes at every f. Season end, 3Y: RMSE 1.125 vs 1.344 for the shrunk target (t -7.8, 12/12 seasons), bias by
 prediction bin -.07 / +.05 / -.22 / .00 (shrunk -.49 / -.70 / -1.21 / -1.09); 1Y 1.138 vs 1.474 (t -9.9, 14/14),

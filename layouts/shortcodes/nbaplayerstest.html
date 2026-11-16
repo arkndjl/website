@@ -5,7 +5,7 @@
        over at that season-average line (on the half point), held-out seasons, binned. */ -}}
 {{- with index site.Data ($.Get "src" | default "nba_players") -}}
 {{- $d := . -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA player projections") "icon" "hoop" "tab" ($.Get "tab") "gfxCols" "Stat,Model,Season avg,Better,t" "gfxDate" "2024-26, held out") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA player projections") "icon" "basketball" "tab" ($.Get "tab") "gfxCols" "Stat,Model,Season avg,Better,t" "gfxDate" "2024-26, held out") -}}
 <table class="cfb__table">
   <thead><tr>
     <th>Stat</th>

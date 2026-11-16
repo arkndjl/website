@@ -13,7 +13,7 @@
 <table class="cfb__table tstick2 tennis__table">
   <thead><tr>
     <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Player</th>
-    <th title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ partial "num.html" (slice "%.0f" (mul (index $t.mix $s) 100)) }}%{{ end }})">ARK</th>
+    <th data-vz title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ partial "num.html" (slice "%.0f" (mul (index $t.mix $s) 100)) }}%{{ end }})">ARK</th>
     <th title="projected ARK in 12 months if still active: from ARK, age, matches in the last 52 weeks, career matches and official rank, fit on {{ $tl }} top-300 boards each quarter end 2006-25 (cell: 24 and 36 months, projected Elo)">1Y</th>
     <th title="WAR: wins above replacement, last 52 weeks, every level: wins minus the chance a replacement player (Elo of the No. 101-150 ranked) beats the same opponents on the same surfaces">WAR</th>
     <th title="PA: points won a 100 points over the average top-100 player against the same opponents, serve and return, opponent-adjusted; each match weighted by recency (half-life a year), shrunk by 300 points">PA</th>
