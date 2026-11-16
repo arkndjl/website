@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T07:35:19Z",
+ "asof": "2026-11-16T07:45:45Z",
  "recenter": {
-  "2026-11-16": 2.03
+  "2026-11-16": 2.04
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T07:22:15Z",
-  "ageH": 0.2,
+  "ageH": 0.4,
   "stale": false
  },
  "picks": [],
@@ -1980,22 +1980,6 @@
    "tm": 144.7
   },
   {
-   "id": "401921804",
-   "sport": "cbb",
-   "kick": "2026-11-17T00:00:00Z",
-   "home": "Kentucky",
-   "away": "Grambling",
-   "mk": "spread",
-   "side": "away",
-   "line": 30.5,
-   "price": -124.0,
-   "edge": 5.7,
-   "x": 5.0,
-   "why": "no edge at -124",
-   "m": 24.8,
-   "tm": 156.3
-  },
-  {
    "id": "401909798",
    "sport": "cbb",
    "kick": "2026-11-17T01:00:00Z",
@@ -2042,6 +2026,22 @@
    "why": "edge under 5 (role: dog)",
    "m": 16.8,
    "tm": 162.1
+  },
+  {
+   "id": "401921804",
+   "sport": "cbb",
+   "kick": "2026-11-17T00:00:00Z",
+   "home": "Kentucky",
+   "away": "Grambling",
+   "mk": "spread",
+   "side": "away",
+   "line": 29.5,
+   "price": -114.0,
+   "edge": 4.7,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 24.8,
+   "tm": 156.3
   },
   {
    "id": "401925864",
@@ -2204,22 +2204,6 @@
    "tm": 153.7
   },
   {
-   "id": "401921087",
-   "sport": "cbb",
-   "kick": "2026-11-16T23:00:00Z",
-   "home": "UMBC",
-   "away": "Iona",
-   "mk": "total",
-   "side": "under",
-   "line": 145.5,
-   "price": -119.0,
-   "edge": 1.7,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": -2.6,
-   "tm": 143.8
-  },
-  {
    "id": "401911240",
    "sport": "cbb",
    "kick": "2026-11-17T00:00:00Z",
@@ -2252,6 +2236,22 @@
    "tm": 141.5
   },
   {
+   "id": "401921087",
+   "sport": "cbb",
+   "kick": "2026-11-16T23:00:00Z",
+   "home": "UMBC",
+   "away": "Iona",
+   "mk": "total",
+   "side": "under",
+   "line": 144.5,
+   "price": -119.0,
+   "edge": 0.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -2.6,
+   "tm": 143.8
+  },
+  {
    "id": "401929419",
    "sport": "cbb",
    "kick": "2026-11-16T19:00:00Z",
@@ -2276,7 +2276,7 @@
    "mk": "total",
    "side": "over",
    "line": 147.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 0.5,
    "x": 7.0,
    "why": "edge under 7",
@@ -2420,9 +2420,9 @@
   "401921804": {
    "mk": "spread",
    "side": "away",
-   "line": 30.5,
-   "price": -124.0,
-   "edge": 5.7,
+   "line": 29.5,
+   "price": -114.0,
+   "edge": 4.7,
    "ev": null,
    "units": 0.0,
    "home": "Kentucky",
@@ -2494,7 +2494,7 @@
    "mk": "total",
    "side": "over",
    "line": 147.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 0.5,
    "ev": null,
    "units": 0.0,
@@ -2505,9 +2505,9 @@
   "401921087": {
    "mk": "total",
    "side": "under",
-   "line": 145.5,
+   "line": 144.5,
    "price": -119.0,
-   "edge": 1.7,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "UMBC",
@@ -2604,7 +2604,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16570,
+  "snapshots": 16575,
   "buckets": [
    {
     "when": "24h+",
@@ -2617,12 +2617,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3308,
-    "clvRet": -0.0219,
-    "clvT": -12.28,
+    "clvN": 3310,
+    "clvRet": -0.0217,
+    "clvT": -12.18,
     "clv": 0.31,
-    "beat": 0.351,
-    "still": 0.46
+    "beat": 0.354,
+    "still": 0.457
    },
    {
     "when": "1-6h",
@@ -19181,7 +19181,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T07:35:19Z",
+ "checked": "2026-11-16T07:45:45Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
