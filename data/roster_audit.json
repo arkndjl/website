@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-16T21:31Z",
+ "asof": "2026-11-16T22:51Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -83,7 +83,7 @@
   "nba": {
    "by_file": {
     "static/data/depth/nba.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 596
     },
     "static/data/nba-proj.json": {
@@ -104,6 +104,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nba.json",
+     "flag": "released",
+     "head": "Waived by Utah",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Waived by Utah",
+      "kind": "waived"
+     },
+     "pid": "6291",
+     "player": "Trey Alexander",
+     "pos": "PG",
+     "rotowire": "FA",
+     "site": "UTA"
+    },
     {
      "d": "2026-11-06",
      "field": "tm",
@@ -304,7 +322,7 @@
     }
    ],
    "joined": 0,
-   "players": 598,
+   "players": 599,
    "rows": 2044
   },
   "nfl": {
