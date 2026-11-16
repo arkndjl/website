@@ -4086,6 +4086,11 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 @media (max-width: 684px) {
   .nbasur__table:not([data-key=sur]) .c-sur, .nbasur__table:not([data-key=csur]) .c-csur { display: none; }
 }
+/* G League ({{< gleague >}}): team, parent club, age and draft slot under the name; on phones NBA% plus the odds the view ranks by */
+.nbagl .nbaxpm__tm { display: block; font-size: 0.85em; }
+@media (max-width: 684px) {
+  .nbagl__table:not([data-key=p5]) .c-p5, .nbagl__table:not([data-key=xv]) .c-xv { display: none; }
+}
 
 /* backup watch: the playing-time columns fold away on phones */
 @media (max-width: 640px) { .bw .bw__x { display: none; } }

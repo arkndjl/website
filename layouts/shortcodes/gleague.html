@@ -1,0 +1,166 @@
+{{- /* G League call-up odds: every G League player this season (static/data/gleague.json, scripts/gleague_callup.py),
+       50 to a page. {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
+<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-gfx-cols="RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,500%,xVORX">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nbaxpm__bar" data-gl-bar hidden onsubmit="return false" aria-label="filter G League players">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <label class="cfb__field"><span>NBA</span><select name="nb">
+      <option value="">any</option><option value="0">no NBA minutes</option><option value="1">has NBA minutes</option><option value="d">drafted</option><option value="u">undrafted</option>
+    </select></label>
+    <label class="cfb__field"><span>age</span><select name="age">
+      <option value="">any</option><option value="-21">21 and under</option><option value="-23">23 and under</option><option value="24-26">24 to 26</option><option value="27-">27 and over</option>
+    </select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
+    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
+      <button type="button" class="cfb__chip is-on" data-view="p1" aria-pressed="true" title="chance of NBA minutes next season">NBA%</button>
+      <button type="button" class="cfb__chip" data-view="p5" aria-pressed="false" title="chance of 500+ NBA minutes next season">500%</button>
+      <button type="button" class="cfb__chip" data-view="xv" aria-pressed="false" title="expected NBA VORX over the next 3 seasons">xVORX</button>
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaxpm__table nbagl__table">
+      <thead><tr>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
+        <th data-sort="n">Player</th>
+        <th data-sort="gp" data-num class="nbaxpm__ph" title="G League games this season (Showcase Cup + regular season)">GP</th>
+        <th data-sort="min" data-num class="nbaxpm__ph" title="G League minutes this season">MIN</th>
+        <th data-sort="gs" data-num class="nbaxpm__ph" title="Game Score per 36 minutes, G League">GmSc/36</th>
+        <th data-sort="ts" data-num class="nbaxpm__ph" title="true shooting %, G League">TS%</th>
+        <th data-sort="cmp" data-num class="nbaxpm__ph" title="NBA minutes, career through today">NBA MP</th>
+        <th data-sort="p1" data-num class="c-p1" title="chance of NBA minutes next season. Out of sample: AUC .88, calibrated by decile">NBA%</th>
+        <th data-sort="p5" data-num class="c-p5" title="chance of 500+ NBA minutes (per 82 games) next season. Out of sample: AUC .90">500%</th>
+        <th data-sort="xv" data-num class="c-xv" title="expected NBA VORX (wins over replacement), next 3 seasons combined">xVORX</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-gl-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-gl-none hidden>no players match.</p>
+  </div>
+  <div class="win__status" title="NBA%, 500% and xVORX: ridge logistic on G League seasons 2008-25 (age, minutes, per-36 box, TS%, usage, AST%, rebound %, net rating, PIE, NBA minutes and XPM through last season, draft slot), Showcase Cup-only seasons pooled in; tested leaving one season out against the same model without G League stats (all three pass Holm). Players with 50+ G League minutes."><span data-gl-count></span>
+    <span class="winpager" data-gl-pager hidden>
+      <button type="button" class="winpager__btn" data-gl-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-gl-page>1</span>/<span data-gl-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-gl-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-gl-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  window.__hp = window.__hp || function (win) { var x = location.hash.slice(1), i = x.indexOf(':'), t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    if (i < 0) return new URLSearchParams(x.indexOf('=') >= 0 ? x : '');
+    return new URLSearchParams(!tab || decodeURIComponent(x.slice(0, i)) === tab ? x.slice(i + 1) : ''); };
+  window.__hw = window.__hw || function (win, s) { if (!win.offsetParent) return; var t = win.closest('[data-wintab]'),
+      tab = t ? String(t.getAttribute('data-wintab')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    history.replaceState(null, '', tab ? '#' + tab + (s ? ':' + s : '') : s ? '#' + s : location.pathname + location.search); };
+  var win = document.querySelector('[data-nbagl]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var bar = win.querySelector('[data-gl-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
+      count = win.querySelector('[data-gl-count]'), none = win.querySelector('[data-gl-none]'), loading = win.querySelector('[data-gl-loading]'),
+      asof = win.querySelector('[data-gl-asof]'), pager = win.querySelector('[data-gl-pager]'), pageEl = win.querySelector('[data-gl-page]'), pagesEl = win.querySelector('[data-gl-pages]');
+  var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' '), VIEWS = ['p1', 'p5', 'xv'];
+  var data = null, view = 'p1', sortKey = 'rk', dir = 1, page = 0;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // ESPN headshot from the XPM board, else NBA's own by person id; a miss shows the neutral frame
+  function face(p) {
+    var u = p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : 'https://cdn.nba.com/headshots/nba/latest/260x190/' + p.id + '.png';
+    return '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
+  }
+  function logo(src) { return '<img class="cfb__logo cfb__logo--in" src="' + src + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> '; }
+  function pct(x) { return x == null ? '<span class="cfb__dim">–</span>' : (100 * x < 1 ? '<1' : 100 * x > 99 ? '>99' : Math.round(100 * x)); }
+  function sg(x) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(1) + '</span>'; }
+  function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+  function readHash() {
+    var h = __hp(win), e = bar.elements;
+    view = h.get('gview') || 'p1'; if (VIEWS.indexOf(view) < 0) view = 'p1';
+    e.team.value = h.get('gteam') || ''; e.q.value = h.get('gq') || ''; e.nb.value = h.get('gnb') || ''; e.age.value = h.get('gage') || ''; chips();
+  }
+  function writeHash() {
+    var h = __hp(win), e = bar.elements;
+    ['gview', 'gteam', 'gnb', 'gage', 'gq'].forEach(function (k) { h.delete(k); });
+    if (view !== 'p1') h.set('gview', view); if (e.team.value) h.set('gteam', e.team.value); if (e.nb.value) h.set('gnb', e.nb.value);
+    if (e.age.value) h.set('gage', e.age.value); if (e.q.value.trim()) h.set('gq', e.q.value.trim());
+    __hw(win, h.toString());
+  }
+  function render() {
+    if (!data) return;
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, nb = e.nb.value, key = view,
+        ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
+    var list = data.players.filter(function (p) {
+      if (team && p.tm !== team) return false;
+      if (nb === '0' && p.cmp > 0) return false; if (nb === '1' && !(p.cmp > 0)) return false;
+      if (nb === 'd' && !p.pk) return false; if (nb === 'u' && p.pk) return false;
+      if (e.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
+      return true;
+    }).sort(function (a, b) { return b[key] - a[key] || b.p1 - a.p1; });
+    list.forEach(function (p, i) { p.rk = i + 1; });
+    var shown = list.length;
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + (p.nba || '')).toLowerCase().indexOf(q) >= 0; });
+    if (sortKey !== 'rk') {
+      var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
+      list = list.slice().sort(function (a, b) {
+        var x = a[sortKey], y = b[sortKey];
+        if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
+        return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
+      });
+    } else if (dir < 0) list = list.slice().reverse();
+    var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+    table.dataset.key = key;
+    function k(c) { return c === key ? ' is-key' : ''; }
+    var row = function (p) {
+      var dr = p.pk ? '#' + p.pk + " '" + String(p.dy).slice(2) : 'UDFA';
+      return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + (p.lg ? logo('/img/gleague/' + esc(p.lg) + '.png') : '') + esc(p.tm) +
+          (p.nba ? ' ' + logo('/img/nba/' + esc(p.nba.toLowerCase()) + '.png') + esc(p.nba) : '') + ' · ' + (p.age == null ? '' : p.age + ' · ') + dr + '</span></td>' +
+        '<td class="cfb__num nbaxpm__ph">' + p.gp + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + p.min + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + p.gs.toFixed(1) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + (p.ts == null ? '<span class="cfb__dim">–</span>' : p.ts.toFixed(1)) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + p.cmp + '</td>' +
+        '<td class="cfb__num c-p1 nbaxpm__v' + k('p1') + '">' + pct(p.p1) + '</td>' +
+        '<td class="cfb__num c-p5 nbaxpm__v' + k('p5') + '">' + pct(p.p5) + '</td>' +
+        '<td class="cfb__num c-xv nbaxpm__v' + k('xv') + '">' + sg(p.xv) + '</td></tr>';
+    };
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(row).join('');
+    var gfxAll = null; body.parentNode.__gfxOff = page * PER;
+    body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(row).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
+    none.hidden = list.length > 0;
+    count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
+    pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+    var t = new Date(data.asof);
+    asof.textContent = data.label + ' G League · next: ' + data.next + ' NBA · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+  }
+  function teams() {
+    var sel = bar.elements.team, want = sel.value, seen = {};
+    data.players.forEach(function (p) { if (p.tm) seen[p.tm] = 1; });
+    sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
+    sel.value = seen[want] ? want : '';
+  }
+  function update() { page = 0; writeHash(); render(); }
+  bar.addEventListener('input', update); bar.addEventListener('change', update);
+  bar.addEventListener('reset', function () { view = 'p1'; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
+  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
+  });
+  ths.forEach(function (th) {
+    th.tabIndex = 0;
+    function go() {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  win.querySelectorAll('[data-gl-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.glStep; if (page < 0) page = 0; render(); }); });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+    data = d; readHash(); teams(); readHash(); loading.hidden = true; bar.hidden = false; render();
+  }).catch(function () { loading.textContent = 'load failed.'; });
+})();
+</script>
+{{- partial "gfx.html" . -}}
