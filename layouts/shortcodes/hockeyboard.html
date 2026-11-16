@@ -9,7 +9,7 @@
 {{- $view := $.Get "view" | default "board" -}}
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- if eq $view "board" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%v NHL draft :: draft board" .year)) "icon" "hockey" "filter" "Pos,League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%v NHL draft :: draft board" .year)) "icon" "hockey" "filter" "Pos,League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Δ,Pos,Club,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk" {{ with .rungs }}data-pd-b="{{ index .p30 1 }},{{ index .p60 1 }}" {{ end }}data-pd-kind="hk-board" data-pd-src="{{ (resources.FromString "data/hockey-board-detail.json" (jsonify .board)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean NHL outcome for a player with this profile (steps of 1)">FV</th>{{ partial "wkth.html" (dict "from" $d.wkFrom) }}<th>Pos</th><th>Club</th><th>League</th>
@@ -43,7 +43,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "hockey" "note" (printf "Tankathon board + %v provisional · updated %s" ($pv.shown | default 0) $date) "about" (printf "Every player on Tankathon's %v big board, graded on what past picks became: the board rank stands in for the draft slot, plus this season's production translated to NHL points a season (NHLe at league factors fit on the careers of every pick since 2008, shrunk toward the slot's typical NHLe until he has %v-odd games). Rows tagged prov are draft-eligibles in the OHL, WHL, QMJHL, AHL and Liiga feeds who are not on the board, graded up from the 20 floor on NHLe, age, weight and position (shown when graded %v+; %v graded in all). FV is the mean outcome of players with this profile, so it sits below the best case: a 60 is a first-liner on average, with busts and stars around it. Above the board's top few players a season the scale stretches, so an 80 comes about once every five seasons; the order is the mean's." .year 20 ($pv.min | default 22) ($pv.n | default 0))) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "pipe" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "drafted prospects") "icon" "hockey" "filter" "Pos,Org,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Org,Class,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "drafted prospects") "icon" "hockey" "filter" "Pos,Org,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Δ,Pos,Org,Class,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk" {{ with .rungs }}data-pd-b="{{ index .p30 1 }},{{ index .p60 1 }}" {{ end }}data-pd-kind="hk-pipe" data-pd-src="{{ (resources.FromString "data/hockey-pipe-detail.json" (jsonify .pipe)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean NHL outcome; after the draft year the grade adds his latest season (NHLe, pro or junior), NHL games and WAR so far">FV</th>{{ partial "wkth.html" (dict "from" $d.wkFrom) }}<th>Pos</th><th>Org</th>

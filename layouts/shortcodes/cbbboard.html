@@ -10,7 +10,7 @@
 {{- $d := site.Data.cbb -}}
 {{- $id := .Get "id" | default "cbb" -}}
 <div class="win cfb cbb" data-cbb="{{ $id }}" data-cbb-src="{{ "data/cbb-all.json" | relURL }}" data-cbb-past="{{ "data/cbb-past.json" | relURL }}" data-cbb-intl="{{ "data/cbb-intl.json" | relURL }}" data-cbb-low="{{ "data/cbb-lowdiv.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="RK,Player,FV,Pos,School,Class,Age,Ht / Wt,BPM"{{ with site.Data.cbb_live | default $d }} data-gfx-date="updated {{ (time .asof).Format "Jan 2, 2006" | lower }}"{{ end }}>
+     data-gfx-cols="RK,Player,FV,Δ,Pos,School,Class,Age,Ht / Wt,BPM"{{ with site.Data.cbb_live | default $d }} data-gfx-date="updated {{ (time .asof).Format "Jan 2, 2006" | lower }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "cbb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
