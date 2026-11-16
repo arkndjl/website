@@ -679,8 +679,10 @@ gl = [('80', 'generational', '5+ time All-Pro', '7+ All-NBA teams', 'top 5 overa
       ('40', 'bench', 'rotational', 'end of rotation', 'bench'),
       ('30', 'organizational', 'camp body', 'two-way / fringe', 'up and down'),
       ('20', 'non-pro', 'non-NFL', 'G-League', 'organizational')]
+xlo = {str(r['fv']): r['xpmLo'] for r in cbb['fvTable']}
 rows = []
 for f, tier, fb, bb, mlb in gl:
+    if xlo.get(f) is not None: bb = f"{bb}, {xlo[f]:.1f}+ peak XPM"
     h = {'30': 'some NHL games', '20': 'no NHL games'}.get(f) or f"{hper[f]}, {hkc[f]:.2f}+ peak WAR"
     s = {'30': 'some senior value', '20': 'no senior value'}.get(f) or sper[f]
     rows.append([f, tier, fb, bb, h, s, mlb])
