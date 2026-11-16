@@ -301,7 +301,8 @@
     g.fillStyle = C.title; g.fillRect(wx + 6, wy + 6, ww - 12, HEAD - 20);
     g.font = '48px ' + FONT; g.fillStyle = C.white;
     if (logo) g.drawImage(logo, wx + 22, wy + 18, 52, 52);
-    g.fillText(fit(g, title, ww - 300) + '_', wx + 92, wy + 45);
+    var wkW = weekTag(g, wx, wy, ww, seas && seas.value && seas.selectedIndex > 0 ? '' : seasonWeek());
+    g.fillText(fit(g, title, ww - 300 - wkW) + '_', wx + 92, wy + 45);
     for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
     // subtitle strip: what is shown
     var hasReal = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return t.real; }); }); }),
@@ -484,6 +485,60 @@
   }
 
   // ---- shared frame for the custom graphics: backdrop, window with title bar, footer ----
+  // the week of the season a graphic is made in (New York date), by the page's sport: CFB/NFL official weeks
+  // (Tue-Mon, week 1 holds Labor Day / its Thursday), the rest Mon-Sun weeks from the season's first week;
+  // outside the season a preseason / postseason / offseason tag. Multi-sport pages get none.
+  function seasonWeek() {
+    var p = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-');
+    var y = +p[0], t = Date.UTC(y, +p[1] - 1, +p[2]), DAY = 864e5;
+    function d(yy, m, dd) { return Date.UTC(yy, m - 1, dd); }
+    function on(yy, m, dd, wd) { var x = d(yy, m, dd); return x + ((wd - new Date(x).getUTCDay() + 7) % 7) * DAY; }   // first weekday wd on/after
+    function mon(x) { return x - ((new Date(x).getUTCDay() + 6) % 7) * DAY; }   // that week's Monday
+    function wk(x0) { return Math.floor((t - x0) / (7 * DAY)) + 1; }
+    function W(n) { return 'WEEK ' + n; }
+    var sp = /college-football|cfb/.test(location.pathname) ? 'cfb' : /arkboard\/nfl/.test(location.pathname) ? 'nfl'
+      : /college-basketball/.test(location.pathname) ? 'cbb' : /arkboard\/nba/.test(location.pathname) ? 'nba'
+      : /arkboard\/nhl|hockey-prospects/.test(location.pathname) ? 'nhl' : /arkboard\/soccer/.test(location.pathname) ? 'soccer'
+      : /arkboard\/tennis/.test(location.pathname) ? 'tennis' : /arkboard\/(cs2|counter)/.test(location.pathname) ? 'cs2'
+      : /arkboard\/baseball/.test(location.pathname) ? 'mlb' : '';
+    if (sp === 'cfb' || sp === 'nfl') {
+      var s = t < d(y, 3, 1) ? y - 1 : y, ld = on(s, 9, 1, 1);   // Labor Day
+      if (sp === 'cfb') { var w0 = ld - 6 * DAY, n = Math.floor((t - w0) / (7 * DAY)) + 1;
+        return t < w0 - 14 * DAY ? (t >= d(s, 8, 1) ? 'PRESEASON' : 'OFFSEASON') : n <= 0 ? 'WEEK 0' : n <= 15 ? W(n) : t < d(s + 1, 1, 25) ? 'POSTSEASON' : 'OFFSEASON'; }
+      var n2 = Math.floor((t - (ld + DAY)) / (7 * DAY)) + 1;
+      return n2 < 1 ? (t >= d(s, 7, 25) ? 'PRESEASON' : 'OFFSEASON') : n2 <= 18 ? W(n2) : ['WILD CARD', 'DIVISIONAL', 'CONF CHAMPIONSHIPS', 'SUPER BOWL', 'SUPER BOWL'][n2 - 19] || 'OFFSEASON';
+    }
+    if (sp === 'tennis' || sp === 'cs2') {   // calendar weeks: week 1 = the Mon-Sun week holding Jan 1
+      var a = mon(d(y + 1, 1, 1)), x1 = t >= a ? a : mon(d(y, 1, 1));
+      if (sp === 'tennis' && t >= d(y, 11, 30) && t < a) return 'OFFSEASON';
+      return W(wk(x1));
+    }
+    // fall-to-spring seasons: [opener(season year), last regular week, postseason tag, postseason end (month, day)]
+    var C2 = { cbb: [function (s) { return on(s, 11, 1, 1); }, function (s) { return on(s + 1, 3, 8, 0) + DAY; }, 'NCAA TOURNAMENT', [4, 10]],
+      nba: [function (s) { return on(s, 10, 20, 2); }, function (s) { return on(s + 1, 4, 10, 1); }, 'PLAYOFFS', [6, 25]],
+      nhl: [function (s) { return on(s, 10, 6, 2); }, function (s) { return on(s + 1, 4, 13, 1); }, 'PLAYOFFS', [6, 25]],
+      soccer: [function (s) { return mon(on(s, 8, 15, 6)); }, function (s) { return d(s + 1, 6, 1); }, '', [6, 1]] }[sp];
+    if (C2) {
+      var s2 = t < d(y, 7, 15) ? y - 1 : y, o = C2[0](s2);
+      if (t < mon(o)) return t >= o - 30 * DAY ? 'PRESEASON' : 'OFFSEASON';
+      if (t < C2[1](s2)) return W(wk(mon(o)));
+      return C2[2] && t < d(s2 + 1, C2[3][0], C2[3][1]) ? C2[2] : 'OFFSEASON';
+    }
+    if (sp === 'mlb') {
+      var od = on(y, 3, 25, 4);
+      return t < mon(od) ? (t >= d(y, 2, 20) ? 'SPRING TRAINING' : 'OFFSEASON') : t < d(y, 9, 30) ? W(wk(mon(od))) : t < d(y, 11, 5) ? 'POSTSEASON' : 'OFFSEASON';
+    }
+    return '';
+  }
+  // the season week as a teal tab at the right of a title bar, left of the window buttons; returns its width
+  function weekTag(g, wx, wy, ww, lab) {
+    if (!lab) return 0;
+    g.font = '40px ' + FONT; var tw = g.measureText(lab).width + 36, tx = wx + ww - 190 - tw;
+    g.fillStyle = C.well; g.fillRect(tx, wy + 20, tw, 48); bevel(g, tx, wy + 20, tw, 48, false, 3);
+    g.fillStyle = C.teal; g.fillText(lab, tx + 18, wy + 45);
+    g.font = '48px ' + FONT; g.fillStyle = C.white;
+    return tw + 20;
+  }
   async function frame(w, h, title, stamp, link) {
     W = w; H = h;
     await document.fonts.ready;
@@ -498,7 +553,8 @@
     g.fillStyle = C.title; g.fillRect(wx + 6, wy + 6, ww - 12, 76);
     g.font = '48px ' + FONT; g.fillStyle = C.white;
     if (logo) g.drawImage(logo, wx + 22, wy + 18, 52, 52);
-    g.fillText(fit(g, title, ww - 300) + '_', wx + 92, wy + 45);
+    var wkW = weekTag(g, wx, wy, ww, seasonWeek());
+    g.fillText(fit(g, title, ww - 300 - wkW) + '_', wx + 92, wy + 45);
     for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
     g.fillText(link || SITE, PAD, H - PAD - 8);
