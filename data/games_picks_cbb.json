@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T19:10:08Z",
+ "asof": "2026-11-16T19:12:55Z",
  "recenter": {
-  "2026-11-16": 2.11
+  "2026-11-16": 2.12
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T17:31:12Z",
-  "ageH": 1.6,
+  "ageH": 1.7,
   "stale": false
  },
  "picks": [],
@@ -2004,7 +2004,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -114.0,
+   "price": -124.0,
    "edge": 4.3,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2188,22 +2188,6 @@
    "tm": 135.0
   },
   {
-   "id": "401924265",
-   "sport": "cbb",
-   "kick": "2026-11-17T03:00:00Z",
-   "home": "UCLA",
-   "away": "Long Beach State",
-   "mk": "total",
-   "side": "under",
-   "line": 146.5,
-   "price": -114.0,
-   "edge": 1.6,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 32.2,
-   "tm": 144.9
-  },
-  {
    "id": "401920373",
    "sport": "cbb",
    "kick": "2026-11-17T03:00:00Z",
@@ -2234,6 +2218,22 @@
    "why": "edge under 7",
    "m": -2.1,
    "tm": 147.9
+  },
+  {
+   "id": "401924265",
+   "sport": "cbb",
+   "kick": "2026-11-17T03:00:00Z",
+   "home": "UCLA",
+   "away": "Long Beach State",
+   "mk": "spread",
+   "side": "home",
+   "line": 31.5,
+   "price": -106.0,
+   "edge": 0.7,
+   "x": 5.0,
+   "why": "edge under 5 (tier: mixed)",
+   "m": 32.2,
+   "tm": 144.9
   },
   {
    "id": "401920735",
@@ -2313,7 +2313,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -114.0,
+   "price": -124.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -2346,11 +2346,11 @@
    "state": "under"
   },
   "401924265": {
-   "mk": "total",
-   "side": "under",
-   "line": 146.5,
-   "price": -114.0,
-   "edge": 1.6,
+   "mk": "spread",
+   "side": "home",
+   "line": 31.5,
+   "price": -106.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "UCLA",
@@ -2591,7 +2591,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16739,
+  "snapshots": 16742,
   "buckets": [
    {
     "when": "24h+",
@@ -2604,7 +2604,7 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3364,
+    "clvN": 3365,
     "clvRet": -0.0204,
     "clvT": -11.51,
     "clv": 0.33,
@@ -19168,7 +19168,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T19:10:08Z",
+ "checked": "2026-11-16T19:12:55Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
