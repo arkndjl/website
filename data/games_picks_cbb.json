@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-16T15:52:30Z",
+ "asof": "2026-11-16T16:14:57Z",
  "recenter": {
-  "2026-11-16": 2.09
+  "2026-11-16": 2.12
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-16T07:22:15Z",
-  "ageH": 8.5,
+  "ageH": 8.9,
   "stale": false
  },
  "picks": [],
@@ -1863,7 +1863,14 @@
    "paper": true,
    "betTo": 19.0,
    "close": 23.5,
-   "now": null
+   "now": {
+    "mk": "spread",
+    "side": "away",
+    "line": 23.5,
+    "price": -101.0,
+    "ev": 0.08,
+    "units": 0.25
+   }
   },
   {
    "id": "401917964",
@@ -2261,22 +2268,6 @@
    "tm": 141.4
   },
   {
-   "id": "401929192",
-   "sport": "cbb",
-   "kick": "2026-11-17T02:30:00Z",
-   "home": "Oregon State",
-   "away": "East Texas A&M",
-   "mk": "total",
-   "side": "under",
-   "line": 154.5,
-   "price": -119.0,
-   "edge": 0.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 15.1,
-   "tm": 153.6
-  },
-  {
    "id": "401921087",
    "sport": "cbb",
    "kick": "2026-11-16T23:00:00Z",
@@ -2291,6 +2282,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": -2.6,
    "tm": 143.7
+  },
+  {
+   "id": "401929192",
+   "sport": "cbb",
+   "kick": "2026-11-17T02:30:00Z",
+   "home": "Oregon State",
+   "away": "East Texas A&M",
+   "mk": "spread",
+   "side": "away",
+   "line": 15.5,
+   "price": -114.0,
+   "edge": 0.4,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 15.1,
+   "tm": 153.6
   }
  ],
  "games": {
@@ -2416,11 +2423,11 @@
    "state": "under"
   },
   "401929192": {
-   "mk": "total",
-   "side": "under",
-   "line": 154.5,
-   "price": -119.0,
-   "edge": 0.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 15.5,
+   "price": -114.0,
+   "edge": 0.4,
    "ev": null,
    "units": 0.0,
    "home": "Oregon State",
@@ -2612,7 +2619,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 16666,
+  "snapshots": 16669,
   "buckets": [
    {
     "when": "24h+",
@@ -2625,12 +2632,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3344,
+    "clvN": 3346,
     "clvRet": -0.0207,
-    "clvT": -11.64,
+    "clvT": -11.65,
     "clv": 0.33,
     "beat": 0.365,
-    "still": 0.439
+    "still": 0.44
    },
    {
     "when": "1-6h",
@@ -19189,7 +19196,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T15:52:30Z",
+ "checked": "2026-11-16T16:14:57Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
