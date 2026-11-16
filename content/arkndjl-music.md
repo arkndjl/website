@@ -1,8 +1,8 @@
 +++
-title = "music :: ARKNDJL"
-url = "/arkndjl/music/"
+title = "music :: ST. CLAIRE"
+url = "/stclaire/music/"
 description = "music by arkndjl: tracks to play here, on soundcloud and on youtube."
-aliases = ["/music/"]
+aliases = ["/music/", "/arkndjl/music/"]
 draft = false
 
 # Tracks for arkplayer.exe (layouts/shortcodes/arkplayer.html) and the disc page (layouts/shortcodes/arkndjlmusic.html).

@@ -1,6 +1,8 @@
 +++
-title = "ARKNDJL"
-description = "art and music by arkndjl."
+title = "ST. CLAIRE"
+url = "/stclaire/"
+aliases = ["/arkndjl/"]
+description = "art and music by ST. CLAIRE."
 draft = false
 
 # The hub: layouts/shortcodes/arkndjlhub.html draws the index and one portal per ARKNDJL page (the ARKNDJL children

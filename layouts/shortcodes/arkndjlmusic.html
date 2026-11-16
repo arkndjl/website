@@ -52,7 +52,7 @@
 @media (max-width:684px){.am-title{font-size:48px}.am-spin{width:min(100%,320px)}}
 </style>
 <div class="am" data-am>
-<section class="am-deck" aria-label="ARKNDJL music">
+<section class="am-deck" aria-label="ST. CLAIRE music">
   <span class="am-stars" aria-hidden="true">{{ if templates.Exists "partials/px/star.html" }}{{ range (slice (slice 4 6) (slice 46 9) (slice 93 14) (slice 88 82) (slice 52 90)) }}<span style="position:absolute;left:{{ index . 0 }}%;top:{{ index . 1 }}%">{{ partial "px/star.html" $ }}</span>{{ end }}{{ end }}</span>
   <div class="am-spin">
     <canvas width="160" height="160" data-am-ring aria-hidden="true"></canvas>

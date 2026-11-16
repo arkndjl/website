@@ -11,6 +11,7 @@
   "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks" $nTracks))
   "arkndjl-art" (dict "img" "img/px/rose-window.png" "sub" (cond (gt $nPieces 0) (printf "%d pieces" $nPieces) ""))
   "arkndjl-style" (dict "img" "" "sub" "") -}}
+{{- $sc := site.Params.stclaire | default dict -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
 .ah{--ah-ink:#0e0e12;--ah-coal:#2e2e35;--ah-lil:#c8c7ff;--ah-aq:#7fffd4;--ah-grey:#8d8d96;display:grid;gap:1.5rem;margin:0 0 2rem;color:var(--ah-lil)}
@@ -34,6 +35,12 @@
 .ah-idx .n{color:var(--ah-grey);font-size:.8rem}
 .ah-idx .g{order:4;color:var(--ah-grey);font-size:.75rem;letter-spacing:.12em}
 .ah-idx .t{order:2}
+.ah-soc{display:flex;flex-wrap:wrap;gap:8px;padding:0;list-style:none}
+.ah-soc a{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 10px 4px 4px;background:#131316;border:2px solid;border-color:var(--ah-lil) var(--ah-ink) var(--ah-ink) var(--ah-lil);color:var(--ah-aq);text-decoration:none;font-size:.85rem}
+.ah-soc svg{width:32px;height:32px;fill:currentColor;shape-rendering:crispEdges;flex:none}
+.ah-soc a:hover,.ah-soc a:focus-visible{background:#57068c;color:#fff;outline:0}
+.ah-soc a:hover svg,.ah-soc a:focus-visible svg{--ic-face:#241a3a;--ic-hi:var(--ah-aq)}
+.ah-soc a:active{border-color:var(--ah-ink) var(--ah-lil) var(--ah-lil) var(--ah-ink)}
 .ah-portals{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1rem}
 .ah-p{grid-column:span 2}
 .ah-p{position:relative;display:grid;grid-template-rows:auto 1fr;background:var(--ah-ink);color:var(--ah-lil);text-decoration:none;border:2px solid;border-color:var(--ah-lil) var(--ah-coal) var(--ah-coal) var(--ah-lil);transition:transform .12s steps(2),box-shadow .12s steps(2)}
@@ -58,18 +65,26 @@
 .ah-low .winlist{margin:0;max-width:none;--win-dark:#0e0e12;--win-face:#131316;--win-well:#0e0e12;--win-title:#2e2e35;--background:#131316}
 @media (prefers-reduced-motion:reduce){.ah-p{transition:none}}
 @media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--style{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
-@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .px--glyph{width:48px;height:48px;margin:-24px 0 0 -24px}.ah-title{font-size:48px;letter-spacing:.08em}}
+@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .px--glyph{width:48px;height:48px;margin:-24px 0 0 -24px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 </style>
 <div class="ah">
-<section class="ah-hero" aria-label="ARKNDJL">
+<section class="ah-hero" aria-label="ST. CLAIRE">
   <div class="ah-rel"><canvas width="128" height="128" data-ah-rel aria-hidden="true"></canvas>{{ if templates.Exists "partials/px/glyph.html" }}{{ partial "px/glyph.html" . }}{{ end }}</div>
   <div class="ah-head">
-    <h1 class="ah-title">ARKNDJL</h1>
+    <h1 class="ah-title">ST. CLAIRE</h1>
     <ol class="ah-idx">
     {{- range site.Menus.main }}{{ if eq .Identifier "arkndjl" }}{{ range $i, $c := .Children }}
       <li><a href="{{ $c.URL }}"><span class="n">{{ printf "%02d" (add $i 1) }}</span><span class="t">{{ $c.Params.gname | default $c.Name }}</span><span class="g">{{ $c.Params.group }}</span></a></li>
     {{- end }}{{ end }}{{ end }}
     </ol>
+    {{- if $sc }}
+    <ul class="ah-soc" aria-label="ST. CLAIRE links">
+      {{- range $it := slice (dict "k" "instagram" "l" "Instagram") (dict "k" "twitter" "l" "X / Twitter") (dict "k" "tiktok" "l" "TikTok") (dict "k" "youtube" "l" "YouTube") }}
+      {{- with index $sc $it.k }}
+      <li><a href="{{ . }}" target="_blank" rel="noopener me" title="{{ $it.l }}" aria-label="{{ $it.l }} @stclairenyc"><svg aria-hidden="true"><use href="#icon-s-{{ $it.k }}"/></svg><span>@{{ path.Base (strings.TrimSuffix "/" .) | strings.TrimPrefix "@" | upper }}</span></a></li>
+      {{- end }}{{ end }}
+    </ul>
+    {{- end }}
   </div>
 </section>
 
