@@ -195,6 +195,17 @@ def roto_items(sport):
     return out
 
 
+CLAUSE = re.compile(r"\s+(?:as|after|while|and|but|with|amid|plus|so)\s+|[;:,|]\s*|\s+[-–—]\s+|\.\s+", re.I)
+
+
+def about(title, name, kind, target, sport):
+    """True when a clause of the headline that holds his name (surname at least) reads as the same kind of report"""
+    last = names.key(name).split()[-1]
+    for c in CLAUSE.split(title):
+        if last in names.key(c).split() and reading(c, target, sport)[0] == kind: return True
+    return False
+
+
 def collect(sport, items, target, ix, since=None):
     """headline items -> report rows {name, team, pos, kind, pend, amt, date, src, title}"""
     out, seen = [], set()
@@ -206,9 +217,15 @@ def collect(sport, items, target, ix, since=None):
         if it.get('_name'): hits = [r for r in hits if names.same(r['name'], it['_name'])][:1]
         if len(hits) != 1: continue     # a list story ("Four Gophers starters confirm...") or nobody on the board
         r = hits[0]
-        # the school, when the headline names one, must be his (a "commits to" story about his new school is a move)
+        # the report must be about him: the clause that names him carries the return (or out) reading. "Five-star QB
+        # reaffirms commitment to Nebraska as X re-signs" counts for X only through "X re-signs"
+        if not it.get('_name') and not about(it['title'], r['name'], kind, target, sport): continue
         k = (names.key(r['name']), kind, it['date'][:10])
-        if k in seen: continue
+        if k in seen:
+            prev = next(x for x in out if (names.key(x['name']), x['kind'], x['date'][:10]) == k)
+            if not names.key(prev['title']).startswith(names.key(r['name'])) and names.key(it['title']).startswith(names.key(r['name'])):
+                prev.update(title=it['title'][:200], url=it.get('url'), src=it['pub'] or None)
+            continue
         seen.add(k)
         out.append({'name': r['name'], 'team': r['team'], 'pos': r['pos'], 'kind': kind, 'pend': pend or None,
                     'amt': amount(it['title']) if kind == 'return' else None, 'date': it['date'],
@@ -270,13 +287,17 @@ def main():
         ix = Index(board_rows(s))
         old = prev.get('sports', {}).get(s, {})
         feed = [x for x in old.get('feed', []) if old.get('target') == target]
-        feed = [x for x in feed if reading(x['title'], target, s)[0] == x['kind']]   # re-read with today's rules
+        feed = [x for x in feed if reading(x['title'], target, s)[0] == x['kind'] and (x['src'] == 'RotoWire' or about(x['title'], x['name'], x['kind'], target, s))]   # re-read with today's rules
         try:
             new = pull(s, a.days, target, ix)
         except Exception as e:      # a dead feed keeps what was pulled before
             print(f'{s}: pull failed ({e}); keeping the cached feed', file=sys.stderr); new = []
-        have = {(names.key(x['name']), x['kind'], x['date'][:10]) for x in feed}
-        feed += [x for x in new if (names.key(x['name']), x['kind'], x['date'][:10]) not in have]
+        have = {(names.key(x['name']), x['kind'], x['date'][:10]): x for x in feed}
+        opens = lambda x: names.key(x['title']).startswith(names.key(x['name']))
+        for x in new:
+            o = have.get((names.key(x['name']), x['kind'], x['date'][:10]))
+            if o is None: feed.append(x)
+            elif opens(x) and not opens(o): o.update(title=x['title'], url=x['url'], src=x['src'])   # the headline about him
         feed.sort(key=lambda x: x['date'], reverse=True)
         lk = locks(feed)
         # board fields for the re-signed table; tp0 = Transfer% before the report (kept from the first run that saw him)
