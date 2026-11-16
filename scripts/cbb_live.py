@@ -36,6 +36,7 @@ OFFLINE = '--offline' in sys.argv
 PRIOR = os.path.join(D.HERE, 'cbb_prior.json.gz')   # outside data/: Hugo would load it on every build
 LIVE_FIT = os.path.join(D.ROOT, 'data', 'cbb_live_fit.json')
 DOB_FILE = os.path.join(D.ROOT, 'data', 'cbb_dob.json')
+BT_DOB = os.path.join(D.HERE, 'data', 'cbb_bt_dob.json')
 
 
 def dob_lookup():
@@ -47,11 +48,18 @@ def dob_lookup():
     pins = {k: v['dob'] for k, v in DS.pinned('cbb').items() if v.get('dob')}
     adv = os.path.join(D.CACHE, 'bt', f'adv{SEASON}.csv')
     by_pid, by_key = {}, {}
-    if os.path.exists(adv):
+    # Barttorvik often refuses Actions runners, and the season file isn't cached there: its birth dates are kept in
+    # scripts/data/cbb_bt_dob.json (pid -> [dob, name key, team]) whenever a run reads the file, and read when one can't
+    try: snap = json.load(open(BT_DOB))
+    except (OSError, ValueError): snap = {}
+    if os.path.exists(adv) and os.path.getsize(adv) > 1000:
         for r in D.load_bt(SEASON):
             d = r.get('dob')
             if d and re.match(r'\d{4}-\d\d-\d\d$', d):
-                by_pid[str(r['pid']).split('.')[0]] = d; by_key[(r['key'], r['team'])] = d
+                snap[str(r['pid']).split('.')[0]] = [d, r['key'], r['team']]
+        json.dump(dict(sorted(snap.items())), open(BT_DOB, 'w'), separators=(',', ':'))
+    for pid, (d, k, t) in snap.items():
+        by_pid[pid] = d; by_key[(k, t)] = d
     try: store = json.load(open(DOB_FILE))
     except (OSError, ValueError): store = {}
     by_store = {k: v['dob'] for k, v in store.items() if v.get('dob')}
