@@ -361,7 +361,9 @@ def main():
                     'xup': r1(r['xbpm'] - xb0) if xb0 is not None and r.get('xbpm') is not None else None,
                     'over': r1(L['bpm'] - xb0) if xb0 is not None else None, 'bpm': L['bpm'], 'xb0': xb0,
                     'minup': r1(L['mpg'] - last['mpg']) if last else None, 'usgup': r1(L['usg'] - last['usg']) if last else None,
-                    'fvup': r['fv'] - P['fv'] if P.get('fv') is not None else None, 'fv': r['fv'], 'mp': round(mins),
+                    # against the preseason grade under today's model (cbb_live fv0), not the Oct 26 file's grade
+                    'fvup': r['fv'] - (r['fv0'] if r.get('fv0') is not None else P['fv']) if (r.get('fv0') is not None or P.get('fv') is not None) else None,
+                    'fv': r['fv'], 'mp': round(mins),
                     'pre': P.get('ovr'), 'preL': f"#{P['ovr']}" if P.get('ovr') else ''})
     brk_last = []
     for l in F['lines']:

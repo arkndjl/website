@@ -23,6 +23,7 @@ import json, math, os, re, sys, time
 from collections import Counter, defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cbb_role as ROLE
 import cbb_data as D
 import cbb_fit as F
 import cbb_combine as CB
@@ -324,6 +325,65 @@ def season_to_date(prior):
 
 
 
+def repair_links(prior, ci):
+    """the frozen preseason board's link errors, fixed where the live board reads them (fetch_cbb.py is locked after
+    Nov 1 and its preseason caches are gone, so the board can't be rebuilt):
+    - one Barttorvik career on two rows (fetch_cbb's name fallback for unplaced transfers didn't skip claimed careers:
+      Grambling's Isaiah Howard graded on Iowa's): the row at the career's own school keeps it; the other is graded as
+      a newcomer with no history and no recruiting grade;
+    - a recruiting grade whose class is at or after the player's first college season (Kent State's Cameron Williams
+      carried Duke's 247 No. 4 of 2026), or one shared by two or more same-name rows (name-only recruit matches: Devin Brown at
+      Alabama A&M carried Notre Dame's): dropped, except on the row whose Barttorvik career carries a recruit rating (the highest), else the one
+      row whose first season fits the class"""
+    K = {k: i for i, k in enumerate(prior['keep'])}
+    by = defaultdict(list)
+    for j, m in enumerate(prior['careers']):
+        if m.get('pid'):
+            by[m['pid']].append(j)
+    fixed = 0
+    for pid, js in by.items():
+        if len(js) < 2:
+            continue
+        last = lambda j: next((q[K['team']] for q in reversed(prior['careers'][j]['seasons']) if q[K['year']] < SEASON), None)
+        own = [j for j in js if prior['careers'][j].get('bt') and prior['careers'][j]['bt'] == last(j)]
+        keepj = own[0] if own else js[0]
+        for j in js:
+            if j == keepj:
+                continue
+            m = prior['careers'][j]
+            m['pid'], m['rec'], m['dob'] = None, None, None
+            m['seasons'] = [q for q in m['seasons'] if q[K['year']] >= SEASON]
+            fixed += 1
+    import names as N
+    held = defaultdict(set)
+    for j, m in enumerate(prior['careers']):
+        r = m.get('rec')
+        if not r or not r.get('cls'):
+            continue
+        played = [q[K['year']] for q in m['seasons'] if q[K['year']] < SEASON]
+        if played and r['cls'] >= min(played):
+            m['rec'] = None; fixed += 1; continue
+        nk = N.key(prior['rows'][j][ci['name']])
+        for f in ('on3rk', 'rk247'):           # ranks tie (two 247 No. 372s), so the same name must hold it too
+            if r.get(f):
+                held[(nk, r['cls'], f, r[f])].add(j)
+    def fits(j, r):            # a class C recruit plays first in C + 1 (C + 2 after a prep year)
+        played = [q[K['year']] for q in prior['careers'][j]['seasons'] if q[K['year']] < SEASON]
+        return r['cls'] >= SEASON - 2 if not played else min(played) - r['cls'] in (1, 2)
+    drop = set()
+    for k, js in held.items():
+        if len(js) < 2:
+            continue
+        btr = {j: max([q[K['rec']] for q in prior['careers'][j]['seasons'] if q[K['rec']] is not None], default=None)
+               for j in js}           # Barttorvik's own recruit rating on the career marks the real recruit
+        hold = [j for j in js if btr[j] is not None]
+        ok = [max(hold, key=btr.get)] if hold else [j for j in js if fits(j, prior['careers'][j]['rec'])]
+        drop |= {j for j in js if not (len(ok) == 1 and j == ok[0])}
+    for j in drop:
+        prior['careers'][j]['rec'] = None; fixed += 1
+    print(f'preseason links repaired: {fixed}', flush=True)
+
+
 def claim_lines(careers, names, lines, keys):
     """each board row's season line (a Barttorvik pid, or None), one line per row: first the rows whose own pid has a
     line at the row's team; then the name at the row's team (exact, then the shared matcher, scripts/names.py: Ant /
@@ -470,7 +530,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         contrib = pf['w'][1:] * z
         pre = max(float(F.FLOOR), F.FLOOR + float(pf['w'][0] + contrib.sum()))
         # this season's line, graded by the board's model as next preseason's board would see it
-        srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': bt, 'role': None}
+        srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': bt, 'role': ln.get('role') or ROLE.predict(ln, hti)}
         cc = {'pid': pid, 'name': ln['name'], 'dob': dob, 'rec': None, 'seasons': [srow]}
         grp = 'newcomer'
         proj = lf['now'][grp] == 'projected'
@@ -513,9 +573,10 @@ def main():
     lf = json.load(open(LIVE_FIT))
     F.VALIDITY = fit.get('validity', 1.0)
     keep = prior['keep']
-    lines, keys, tg, last = season_to_date(prior)
     cols = prior['cols']
     ci = {c: j for j, c in enumerate(cols)}
+    repair_links(prior, ci)
+    lines, keys, tg, last = season_to_date(prior)
     # the team context the xBPM ridge reads (cbb_fit.set_context): this season's rosters are the board's rows
     F.set_context([{'pid': m['pid'], 'name': row[ci['name']], 'rec': m['rec'], 'seasons': [dict(zip(keep, q)) for q in m['seasons']]}
                    for row, m in zip(prior['rows'], prior['careers'])])
@@ -540,10 +601,14 @@ def main():
         e0, p0, parts0 = score(f_pre, fit)
         xb0 = xbpm_of(f_pre, fit)
         ln = lines.get(pid) if pid else None
-        rec = {'row': list(row), 'e': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd,
+        rec = {'row': list(row), 'e': e0, 'e_pre': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd,
                'seas': cc['seasons']}
         if ln:
             used.add(pid)
+            if not ln.get('role'):
+                # Barttorvik's role from his season file, else his last one, else from the line's box rates and height (scripts/cbb_role.py):
+                # CI rebuilds every line from game logs, and with no role a freshman was scored as a wing
+                ln = dict(ln, role=next((x.get('role') for x in reversed(cc['seasons']) if x.get('role')), None) or ROLE.predict(ln, cc['seasons'][-1].get('hti')))
             grp = 'newcomer' if f_pre['newcomer'] else 'returner'
             proj = lf['now'][grp] == 'projected'
             gp_full = ln['gp'] * full_games / max(1, ln['team_g']) if proj and ln['team_g'] < full_games else None
@@ -569,14 +634,20 @@ def main():
     for r, lr in zip(recs, lrs):
         e2, p2 = F.board_e(r['e'], lr, fit.get('boards'))
         if p2 is None: continue
+        r['e_pre'] = F.board_e(r['e_pre'], lr, fit.get('boards'))[0]
         r['parts'] = list(r['parts']) + [('boards', e2 - r['e'], lr if lr is not None else float('nan'))]
         r['e'], r['p'] = e2, p2
     # the combine stage (scripts/cbb_combine.py): a tester's athletic numbers on top of the boards
     for r, c in zip(recs, CB.combine_terms([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs], [r['row'][ci['pos']] for r in recs])):
-        if c: r['e'] += c[0]; r['parts'] = list(r['parts']) + [('combine', c[0], c[1])]
+        if c: r['e'] += c[0]; r['e_pre'] += c[0]; r['parts'] = list(r['parts']) + [('combine', c[0], c[1])]
     sc = np.array([r['e'] for r in recs])
     # one fixed map from E[FV] to FV (cbb_fit.emap_fit, Oct 26 2026): no longer the rank on this board
     fv, plus, fvx = F.live_grade(sc, fit)
+    # fv0: the preseason grade under today's model (the same stages at weight 0), the breakouts tab's FV-up baseline
+    fvx0 = F.live_grade(np.array([r['e_pre'] for r in recs]), fit)[2]
+    for r, g0 in zip(recs, fvx0):
+        row = r['row']
+        r['fv0'] = FS.fv_of('cbb', at_mean('cbb', float(g0), cbb_z(row[ci['cls']], row[ci['new']], row[ci['pos']], float(g0))))
     # the season-end map (scripts/cbb_draftday.py end_map, Nov 3 2026): the preseason map left draft week's top 10 a
     # season 5.0 FV under what they became (-0.3 with it; MSE t -1.9, 3/5 folds; top-25 bias smaller 5/8 seasons); each
     # player's grade moves to it by his weight on this season
@@ -601,7 +672,7 @@ def main():
     # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges; e: E[FV] after the stages (the FV inputs add up to it)
     # xb0: preseason xBPM under today's model (the breakouts tab's baseline, scripts/cbb_tabs.py)
     # npos: projected NBA position (scripts/cbb_nbapos.py, display only): odds at PG..C, expected position, change flag
-    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0', 'npos', 'mht', 'mwt', 'msrc') if c not in ci]
+    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0', 'fv0', 'npos', 'mht', 'mwt', 'msrc') if c not in ci]
     meas = measurer()
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
@@ -620,7 +691,8 @@ def main():
         bt_hti = next((q.get('hti') for q in reversed(sz) if q.get('year', SEASON) < SEASON and q.get('hti')), None)
         mht, mwt, msrc = meas(row[ci['name']], row[ci['team']], row[ci['ht']], row[ci['wt']], bt_hti)
         new = {'mht': mht, 'mwt': mwt, 'msrc': msrc, 'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
-               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos)}
+               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos),
+               'fv0': (r['fv'] if not r['w'] else r['fv0']) if r.get('fv0') is not None else None}
         for c in new:
             if c in ci: row[ci[c]] = new[c]
         out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + [new[c] for c in add])

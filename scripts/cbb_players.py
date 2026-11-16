@@ -447,6 +447,14 @@ def build():
             hit, _ = m.find(name)
             if hit:
                 listed[t][hit['pid']] = (sit, stt)
+    # position and logo for the Predictions table: the board's G/F/C by name at the ESPN school, the slate's logo
+    try:
+        bd = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
+        bc = {k: i for i, k in enumerate(bd['cols'])}
+        BIX = NM.Matcher([{'name': r[bc['name']], 'team': r[bc['team']], 'pos': r[bc['pos']]} for r in bd['rows']], pos=None, sport='basketball')
+    except (OSError, ValueError, KeyError):
+        BIX = None
+    pos_of = lambda n, team: ((BIX.find(n, team, cross_team='none')[0] or {}).get('pos') if BIX else None)
     for g in up:
         if g['date'] not in days:
             continue
@@ -454,14 +462,15 @@ def build():
         if h not in played or a not in played:
             continue
         players = []
-        for t, o, home in ((h, a, 0.0 if g.get('neutral') else 1.0), (a, h, 0.0 if g.get('neutral') else -1.0)):
+        for t, o, home, side in ((h, a, 0.0 if g.get('neutral') else 1.0, g['home']), (a, h, 0.0 if g.get('neutral') else -1.0, g['away'])):
             st = {p: v[0] for p, v in listed.get(t, {}).items()}
             for p, (pr, mS, fx) in W.rows(t, o, home, status=st).items():
                 mu, sd = project(F, fx)
                 if mu['min'] < 8:
                     continue
                 c = W.seas.get((S, p))
-                players.append({'id': p, 'n': W_name(W, p), 't': t, 'st': (listed.get(t, {}).get(p) or (None, None))[1],
+                players.append({'id': p, 'n': W_name(W, p), 't': t, 'lo': side.get('logo'), 'pos': pos_of(W_name(W, p), side['n']),
+                                'st': (listed.get(t, {}).get(p) or (None, None))[1],
                                 'pr': round(pr, 2), 'min': round(mu['min'], 1), **{s: round(mu[s], 1) for s in PSTATS + ('pra',)},
                                 'sd': sd, 'gp': c[0] if c else 0,
                                 'avg': None if not c else {s: round(c[i] / c[0], 1) for i, s in ((2, 'pts'), (3, 'reb'), (4, 'ast'))}})
