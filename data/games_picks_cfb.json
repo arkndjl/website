@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-16T04:35:31Z",
+ "asof": "2026-11-16T04:38:04Z",
  "recenter": {
-  "week": 0.19
+  "week": 0.2
  },
  "monitor": {
   "clocks": {
@@ -469,22 +469,6 @@
    "tm": 48.7
   },
   {
-   "id": "401856865",
-   "sport": "cfb",
-   "kick": "2026-11-22T00:00:00.000Z",
-   "home": "Kansas State",
-   "away": "Arizona",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -111.0,
-   "edge": 1.7,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -10.4,
-   "tm": 54.2
-  },
-  {
    "id": "401856752",
    "sport": "cfb",
    "kick": "2026-11-21T20:45:00.000Z",
@@ -493,7 +477,7 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": -111.0,
+   "price": -106.0,
    "edge": 1.6,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -604,9 +588,9 @@
    "away": "Memphis",
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -129.0,
-   "edge": 10.2,
+   "line": 65.5,
+   "price": -110.0,
+   "edge": 9.2,
    "x": null,
    "why": "total market off",
    "m": -3.7,
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": 3,
    "tm": 41.2
+  },
+  {
+   "id": "401856869",
+   "sport": "cfb",
+   "kick": "2026-11-20T23:00:00.000Z",
+   "home": "UCF",
+   "away": "Iowa State",
+   "mk": "total",
+   "side": "under",
+   "line": 53.5,
+   "price": -119.0,
+   "edge": 6.5,
+   "x": null,
+   "why": "total market off",
+   "m": 0.1,
+   "tm": 47.0
   }
  ],
  "games": {
@@ -790,7 +790,7 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": -111.0,
+   "price": -106.0,
    "edge": 1.6,
    "ev": null,
    "units": 0.0,
@@ -919,16 +919,16 @@
    "state": "off"
   },
   "401856865": {
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -111.0,
-   "edge": 1.7,
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": -125.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
    "away": "Arizona",
-   "state": "under"
+   "state": "off"
   },
   "401858305": {
    "mk": "total",
@@ -957,9 +957,9 @@
   "401862834": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -129.0,
-   "edge": 10.2,
+   "line": 65.5,
+   "price": -110.0,
+   "edge": 9.2,
    "ev": null,
    "units": 0.0,
    "home": "Navy",
@@ -1042,7 +1042,7 @@
    "mk": "total",
    "side": "under",
    "line": 62.5,
-   "price": -119.0,
+   "price": -134.0,
    "edge": 6.0,
    "ev": null,
    "units": 0.0,
@@ -1499,13 +1499,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20703,
+  "snapshots": 20717,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4115,
+    "clvN": 4117,
     "clvRet": -0.0494,
-    "clvT": -35.57,
+    "clvT": -35.59,
     "clv": 0.17,
     "beat": 0.342,
     "still": 0.302
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-16T04:35:31Z",
+ "checked": "2026-11-16T04:38:04Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
