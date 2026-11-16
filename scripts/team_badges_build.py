@@ -294,7 +294,10 @@ def cbb():
         h, a = mp.get(e['h']), mp.get(e['a'])
         if h and a:
             out.append(dict(e, h=h, a=a))
-    return badges_from('cbb', out, S)
+    held = {(e['t'].date(), frozenset((e['h'], e['a']))) for e in out if e['S'] == S}
+    esp = T.ev_cbb_espn(S, skip=held)              # games Barttorvik's file lacks (blocked in CI) from ESPN boxes
+    print(f'cbb team badges: {len(held)} Barttorvik games, {len(esp)} from ESPN box scores', flush=True)
+    return badges_from('cbb', out + esp, S)
 
 
 def cfb():

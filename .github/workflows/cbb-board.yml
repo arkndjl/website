@@ -87,7 +87,8 @@ jobs:
         run: |
           python3 scripts/cbb_polls_live.py || { echo "polls not updated"; echo polls >> /tmp/cbb_failed; }
           python3 scripts/rank_polls.py cbb $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") || echo "poll history not updated"
-      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/cbb.json and the team file
+      # team badges (scripts/team_badges.py): this season's trait badges into data/team_badges/cbb.json and the team file;
+      # games Barttorvik's getgamestats file lacks come from ESPN box scores (espn_box cache)
       - name: Team badges
         continue-on-error: true
         timeout-minutes: 10
