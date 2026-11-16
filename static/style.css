@@ -4713,3 +4713,5 @@ code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
   .winpane--art > .win__status { margin: 4px 6px 4px 8px; font-size: 0.9em; }
   .winpane--art > .win__status > span:first-child { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 }
+/* viz.js: a th[data-sparse] column hides while under a quarter of the rows in view have a value */
+.vz-hide { display: none !important; }
