@@ -8,8 +8,9 @@ draft = false
 
 {{< arknav >}}
 
-{{< wintabs groups="all sports:all sports|football:college football,NFL|basketball:college basketball,NBA|hockey:hockey prospects,NHL|soccer:soccer prospects,soccer|esports:CS2|recruits:recruits" side="true" label="ARKLIST views" >}}
+{{< wintabs groups="all sports:all sports|performances:performances|football:college football,NFL|basketball:college basketball,NBA|hockey:hockey prospects,NHL|soccer:soccer prospects,soccer|esports:CS2|recruits:recruits" side="true" label="ARKLIST views" >}}
 {{< arklist title="ARKLIST :: every sport" tab="all sports" >}}
+{{< arklistperf tab="performances" >}}
 {{< arklist sport="college-football" title="ARKLIST :: college football + recruits" tab="college football" >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="college basketball" >}}
 {{< arklist sport="nfl" title="ARKLIST :: NFL" tab="NFL" >}}
