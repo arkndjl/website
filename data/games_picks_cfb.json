@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T18:43:59Z",
+ "asof": "2026-11-17T19:17:11Z",
  "recenter": {
   "week": 0.36
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-17",
-  "ageH": -5.3,
+  "ageH": -4.7,
   "stale": false
  },
  "picks": [],
@@ -339,6 +339,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": -7.5,
    "tm": 48.1
+  },
+  {
+   "id": "401862835",
+   "sport": "cfb",
+   "kick": "2026-11-21T17:00:00.000Z",
+   "home": "Tulane",
+   "away": "North Texas",
+   "mk": "total",
+   "side": "over",
+   "line": 55.5,
+   "price": -119.0,
+   "edge": 4.5,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -2.8,
+   "tm": 60.0
   },
   {
    "id": "401858528",
@@ -485,22 +501,6 @@
    "tm": 53.6
   },
   {
-   "id": "401871081",
-   "sport": "cfb",
-   "kick": "2026-11-21T19:00:00.000Z",
-   "home": "Sam Houston",
-   "away": "Middle Tennessee",
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -124.0,
-   "edge": 1.8,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -5.7,
-   "tm": 49.3
-  },
-  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -531,22 +531,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": 5.3,
    "tm": 48.2
-  },
-  {
-   "id": "401861968",
-   "sport": "cfb",
-   "kick": "2026-11-21T20:30:00.000Z",
-   "home": "UConn",
-   "away": "Old Dominion",
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -114.0,
-   "edge": 1.6,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 12,
-   "tm": 48.1
   },
   {
    "id": "401856752",
@@ -595,6 +579,22 @@
    "why": "edge under 8 (game: non-conference)",
    "m": 20.6,
    "tm": 55.3
+  },
+  {
+   "id": "401871081",
+   "sport": "cfb",
+   "kick": "2026-11-21T19:00:00.000Z",
+   "home": "Sam Houston",
+   "away": "Middle Tennessee",
+   "mk": "total",
+   "side": "over",
+   "line": 48.5,
+   "price": -110.0,
+   "edge": 0.8,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -5.7,
+   "tm": 49.3
   },
   {
    "id": "401856755",
@@ -653,7 +653,7 @@
    "mk": "total",
    "side": "under",
    "line": 65.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 7.0,
    "x": null,
    "why": "total market off",
@@ -706,7 +706,7 @@
    "mk": "spread",
    "side": "home",
    "line": -16.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -943,16 +943,16 @@
    "state": "off"
   },
   "401862835": {
-   "mk": "spread",
-   "side": "home",
-   "line": -6.5,
-   "price": -114.0,
-   "edge": 3.7,
+   "mk": "total",
+   "side": "over",
+   "line": 55.5,
+   "price": -119.0,
+   "edge": 4.5,
    "ev": null,
    "units": 0.0,
    "home": "Tulane",
    "away": "North Texas",
-   "state": "off"
+   "state": "under"
   },
   "401856870": {
    "mk": "spread",
@@ -1159,16 +1159,16 @@
    "state": "off"
   },
   "401861968": {
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -114.0,
-   "edge": 1.6,
+   "mk": "spread",
+   "side": "away",
+   "line": 14.5,
+   "price": -122.0,
+   "edge": 2.5,
    "ev": null,
    "units": 0.0,
    "home": "UConn",
    "away": "Old Dominion",
-   "state": "under"
+   "state": "off"
   },
   "401864544": {
    "mk": "spread",
@@ -1282,7 +1282,7 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -1342,7 +1342,7 @@
    "mk": "total",
    "side": "under",
    "line": 65.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 7.0,
    "ev": null,
    "units": 0.0,
@@ -1425,9 +1425,9 @@
   "401871081": {
    "mk": "total",
    "side": "over",
-   "line": 47.5,
-   "price": -124.0,
-   "edge": 1.8,
+   "line": 48.5,
+   "price": -110.0,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "Sam Houston",
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 22390,
+  "snapshots": 22404,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4573,
+    "clvN": 4576,
     "clvRet": -0.0446,
-    "clvT": -33.68,
+    "clvT": -33.69,
     "clv": 0.27,
-    "beat": 0.357,
-    "still": 0.33
+    "beat": 0.356,
+    "still": 0.331
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T18:43:59Z",
+ "checked": "2026-11-17T19:17:11Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
