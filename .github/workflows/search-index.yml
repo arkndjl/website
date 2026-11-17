@@ -1,0 +1,43 @@
+# Rebuilds the site search's player and team index (scripts/search_index.py: static/data/search-players.json) after the
+# board workflows and commits it when a name, team or rank moved (the write is skipped when nothing but asof would
+# change). Pages, tabs, glossary terms and the rest of the index are written by Hugo on every build, so they need no run.
+name: search index
+
+on:
+  schedule:
+    - cron: "40 */6 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["cfb board", "cbb board", "cbb boards", "nfl", "nba xpm", "nhl", "soccer", "soccer prospects", "tennis", "tennis prospects", "cs2"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: search-index
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build the player and team index
+        run: python3 scripts/search_index.py
+      - name: Commit if anything changed
+        run: |
+          git add static/data/search-players.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
+          git commit -m "Update the search index ($(date -u +%Y-%m-%dT%H:%MZ))"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git pull --rebase -X theirs origin main || exit 1
+          done
+          exit 1

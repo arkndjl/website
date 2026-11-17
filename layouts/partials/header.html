@@ -6,6 +6,7 @@
       {{ partial "logo.html" . }}
     </div>
     {{ partial "social-icons.html" . }}
+    <button type="button" class="srch-tile" data-srch-toggle aria-expanded="false" aria-label="search"><svg aria-hidden="true"><use href="#icon-search"/></svg></button>
     {{ if len $.Site.Menus }}
       {{ partial "mobile-menu.html" . }}
     {{ end }}

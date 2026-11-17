@@ -65,6 +65,14 @@
       count.textContent = hits.length ? hits.length + ' match' + (hits.length === 1 ? '' : 'es') + (hits.length > 40 ? ', first 40 shown' : '') : 'no match.';
     }
     q.addEventListener('input', run);
+    // a site-search link: #<tab>:q=<name> opens that row (its exact name first, else the first match)
+    var hm = /^#([^:]*):(?:.*&)?q=([^&]*)/.exec(location.hash);
+    if (hm) {
+      var want = decodeURIComponent(hm[2].replace(/\+/g, ' ')), tab = hm[1], lw = want.toLowerCase();
+      var hit = all.filter(function (it) { return it.name.toLowerCase() === lw && it.tab.toLowerCase().replace(/[^a-z0-9]+/g, '-') === tab; })[0]
+        || all.filter(function (it) { return it.name.toLowerCase() === lw; })[0];
+      if (hit) setTimeout(function () { open(hit); }, 120); else { q.value = want; run(); }
+    }
     q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var b = list.querySelector('button'); if (b) { e.preventDefault(); b.click(); } } });
   }
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }

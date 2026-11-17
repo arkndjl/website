@@ -39,6 +39,7 @@
       {{ range $.Site.Menus.main }}{{ template "menu-item" . }}{{ end }}
     {{ end }}
   </ul>
+  {{ partial "search-bar.html" . }}
 </nav>
 <script>
 (function () {
