@@ -118,6 +118,7 @@ def espn_injuries():
     return out
 
 
+from nfl_games import IG    # noqa: E402  in-game news phrases ("won't return", "exits"), shared with the NFL reader
 RW_NBA = {'Out (season)': 'Out', 'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Questionable', 'Probable': 'Probable',
           'Active': 'Available'}
 
@@ -139,7 +140,7 @@ def rotowire_injuries(ros):
                 mt[t] = RW.matcher([{'id': k, 'name': v} for k, v in ros[t].items()], team=None, pos=None)
             hit, _ = mt[t].find(it['player'])
             if hit:
-                out[hit['id']] = (st, it['ts'])
+                out[hit['id']] = (st, it['ts'], it['head'])
         return out
     except Exception as e:  # noqa: BLE001
         print('nba games: RotoWire news unavailable:', e)
@@ -368,7 +369,10 @@ def build():
             r_ = today_rep.get(t, {}).get(k)
             s_ = r_ or espn.get(p)
             w = rwn.get(p)
-            if w and w[1] > last_tip[t] and (not r_ or w[1] > rep_ts):
+            # news from during the last game is left out here: in-game Outs played the next game 45% of the time
+            # (scripts/research/ingame_nov17, 2024-26), not the ~0% an Out status gives
+            ingame = w and IG.search(w[2]) and last_tip[t] <= w[1] <= last_tip[t] + 6 * 3600
+            if w and not ingame and w[1] > last_tip[t] and (not r_ or w[1] > rep_ts):
                 s_ = w[0]
             elif not s_ and p in rlong and (rlong[p] is None or rlong[p] > today_iso):
                 s_ = 'Out'
