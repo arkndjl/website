@@ -18,6 +18,10 @@ on:
     - cron: "23 11 * 11,12,1,2,3,4,5,6 *"
     # 22:40 UTC (6:40 PM ET, 5:40 in winter): the injury report before the evening tips; games only
     - cron: "40 22 * 10,11,12,1,2,3,4,5,6 *"
+    # light evening refreshes (games, the injury report and RotoWire's news, no xPM rebuild) before the 7 PM and 10 PM ET
+    # tips, after most late scratches and upgrades (Nov 17 2026)
+    - cron: "50 23 * 10,11,12,1,2,3,4,5,6 *"
+    - cron: "20 1 * 10,11,12,1,2,3,4,5,6 *"
     # off-season (Nov 2 2026): Mondays July-September (free agency, trades, the projections) and Mondays and
     # Thursdays October 1-17 (preseason rosters) before the daily runs start
     - cron: "23 11 * 7,8,9 1"
@@ -70,7 +74,7 @@ jobs:
               full = go and age('data/nba_xpm.json', lambda d: d.get('updated') or d['seasons'][0]['asof']) >= dt.timedelta(hours=20)
           else:
               go = True
-              full = sched != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+              full = sched not in ('40 22 * 10,11,12,1,2,3,4,5,6 *', '50 23 * 10,11,12,1,2,3,4,5,6 *', '20 1 * 10,11,12,1,2,3,4,5,6 *')
           print('go=' + str(go).lower())
           print('full=' + str(full).lower())
           PY

@@ -10,6 +10,7 @@ check in ops/odds-cron/worker.js (same issue titles, so the two can coexist).
     python3 scripts/data_health.py deploy [--dry]    # is arkndjl.net serving main? (Cloudflare stuck or failing)
     python3 scripts/data_health.py report            # print every feed's age and limit (no GitHub calls)
     python3 scripts/data_health.py rollover [--dry]  # season constants that the calendar has passed (ROLLOVER)
+    python3 scripts/data_health.py injuries [report] [--dry]   # each sport's injury sources and snapshot (INJ)
     python3 scripts/data_health.py test              # self-check, no GitHub calls
 
 Alerts are GitHub issues (label data-alert), which notify the repo owner by mail and on the GitHub app:
@@ -21,6 +22,8 @@ Alerts are GitHub issues (label data-alert), which notify the repo owner by mail
                           (`runs`) closes it once the workflow's latest run is green, and opens one for a run a job
                           time limit cancelled (GitHub reports those as cancelled, like a replaced pending run, so the
                           check reads the run's jobs). The workflow_run job only starts for a failed run.
+  "stale injuries: <sport>"  in season, RotoWire's injury news for the sport, the model's injury snapshot or one of
+                          its sources has gone quiet (INJ). Dispatches odds-snap (news) or the sport's workflow.
   "deploy stuck"          main has a commit older than 90 minutes that the live site still doesn't serve.
   "season rollover: <x>"  a season constant (ROLLOVER below) is behind the calendar. The yearly rollover carries
                           more than the constant (new draft-year URLs, frozen priors, FV weights by year), so it is
@@ -259,6 +262,101 @@ def cmd_stale():
     print(f'{bad} sport(s) with stale feeds')
 
 
+# ---------------------------------------------------------------- injuries
+# Each sport's injury inputs, checked apart from the feeds (Nov 17 2026, after Drake Maye's injury sat at last week's
+# Doubtful): a build can stay fresh while an injury source has gone quiet. In season, per sport:
+#   news:  RotoWire's injury log (scripts/data/rotowire_news.json, polled every half hour by odds-snap) has an item for
+#          the sport within newsH hours; a stall dispatches odds-snap.yml
+#   snap:  the model's injury snapshot (file, its checked/asof) is under snapH hours old; dispatches the sport's workflow
+#   srcs:  the snapshot's per-source counts (NFL: data/nfl_injuries.json srcs) are above zero for each named source
+# "stale injuries: <sport>" issues open and close like the stale-data ones.
+INJ = {
+    'nfl': {'news': 'football', 'newsH': 12, 'snap': 'nfl_injuries', 'snapH': 16, 'srcs': ['espn', 'rotowire']},
+    'cfb': {'news': 'cfootball', 'newsH': 36, 'snap': 'cfb_injuries', 'snapH': 36},
+    'nba': {'news': 'basketball', 'newsH': 12, 'snap': 'nba_games', 'snapH': 16},
+    'cbb': {'news': 'cbasketball', 'newsH': 24, 'snap': 'cbb_injuries', 'snapH': 12},
+    'nhl': {'news': 'hockey', 'newsH': 18, 'snap': 'nhl_games', 'snapH': 20},
+    'soccer': {'news': 'soccer', 'newsH': 72},
+}
+
+
+def check_injuries(now=NOW):
+    """{sport: {label, workflow, inSeason, rows: [(check, stamp, hours, limit, ok)], bad: [...], fix: workflow}}"""
+    fr = json.load(open(os.path.join(ROOT, 'data', 'freshness.json')))['sports']
+    try:
+        items = json.load(open(os.path.join(ROOT, 'scripts', 'data', 'rotowire_news.json'))).get('items', {}).values()
+    except (OSError, ValueError, AttributeError):
+        items = []
+    newest = {}
+    for it in items:
+        if isinstance(it, dict) and it.get('sport'):
+            newest[it['sport']] = max(newest.get(it['sport'], 0), it.get('ts') or 0)
+    out = {}
+    for k, c in INJ.items():
+        f = fr.get(k, {})
+        ins = in_season(f.get('season'), now)
+        rows, fix = [], set()
+        ts = newest.get(c['news'])
+        h = None if not ts else (now.timestamp() - ts) / 3600
+        rows.append(('RotoWire news', None if not ts else dt.datetime.fromtimestamp(ts, dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
+                     None if h is None else round(h, 1), c['newsH'], h is not None and h <= c['newsH']))
+        if c.get('snap'):
+            a, t = feed_asof(c['snap'])
+            h = None if t is None else (now - t).total_seconds() / 3600
+            rows.append((f"snapshot {c['snap']}", a, None if h is None else round(h, 1), c['snapH'], h is not None and h <= c['snapH']))
+            if c.get('srcs'):
+                try:
+                    n = json.load(open(os.path.join(ROOT, 'data', c['snap'] + '.json'))).get('srcs') or {}
+                except (OSError, ValueError):
+                    n = {}
+                for sname in c['srcs']:
+                    rows.append((f'source {sname}', str(n.get(sname, 0)) + ' items', None, None, (n.get(sname) or 0) > 0))
+        bad = [r for r in rows if not r[4]] if ins else []
+        for r in bad:
+            fix.add('odds-snap.yml' if r[0] == 'RotoWire news' else f.get('workflow'))
+        out[k] = {'label': f.get('label', k), 'workflow': f.get('workflow'), 'inSeason': ins, 'rows': rows, 'bad': bad,
+                  'fix': sorted(x for x in fix if x)}
+    return out
+
+
+def inj_body(s, last):
+    lines = '\n'.join(f'| {n} | {a or "missing"} | {"-" if h is None else round(h)} | {"-" if lim is None else lim} |'
+                      for n, a, h, lim, _ in s['bad'])
+    return (f'The {s["label"]} injury inputs have gone quiet in season.\n\n| check | stamp | hours | limit |\n|---|---|---|---|\n'
+            f'{lines}\n\nDispatched: {", ".join(f"`{w}`" for w in s["fix"]) or "nothing"} (at most once a day while this is '
+            f'open). Rules: INJ in scripts/data_health.py. Closes itself when every check passes (every 3 hours).\n\n{MARK}{last} -->')
+
+
+def cmd_injuries():
+    issues = open_issues()
+    for k, s in check_injuries().items():
+        title = f'stale injuries: {k}'
+        i = find(issues, title)
+        if s['bad']:
+            print(f'{k}: {[(r[0], r[2]) for r in s["bad"]]}')
+            if not i:
+                d = [dispatch(w) for w in s['fix']]
+                open_issue(title, inj_body(s, NOW.strftime('%Y-%m-%dT%H:%M:%SZ')))
+                print(f'  issue opened, {d}')
+            else:
+                body = i.get('body') or ''
+                last = body.split(MARK, 1)[1].split(' -->')[0] if MARK in body else i['created_at']
+                if hours_since(last) >= 24:
+                    print(f'  still quiet after {round(hours_since(last))} h: {[dispatch(w) for w in s["fix"]]}')
+                    last = NOW.strftime('%Y-%m-%dT%H:%M:%SZ')
+                gh(f'/issues/{i["number"]}', 'PATCH', {'body': inj_body(s, last)})
+        elif i:
+            close_issue(i, 'Injury inputs current again: ' + ', '.join(f'{r[0]} {r[1]}' for r in s['rows']))
+            print(f'{k}: current, issue #{i["number"]} closed')
+
+
+def cmd_injury_report():
+    for k, s in check_injuries().items():
+        print(f'{k} injuries ({"in season" if s["inSeason"] else "off-season"})')
+        for n, a, h, lim, ok in s['rows']:
+            print(f'  {n:24} {str(a):30} {"" if h is None else f"{h:6.1f} h"}  {"" if lim is None else f"limit {lim:4}"} {"" if ok else "STALE"}')
+
+
 # the workflows data-health.yml listens to (its workflow_run list; `test` fails when the two differ)
 WATCH = ['cbb board', 'cbb boards', 'cbb recruits', 'cfb board', 'cs2', 'esea season', 'nba xpm', 'nfl', 'nhl',
          'nhl goalies', 'odds snap', 'picks refresh', 'soccer', 'soccer prospects', 'tennis', 'tennis prospects',
@@ -415,6 +513,11 @@ def cmd_test():
     assert not check_rollover(NOW), check_rollover(NOW)
     later = NOW.replace(year=NOW.year + 1)
     assert len(check_rollover(later)) == len(ROLLOVER), [x[0] for x in ROLLOVER if x[0] not in {y[0] for y in check_rollover(later)}]
+    # every injury check names a sport in data/freshness.json and a snapshot with a stamp
+    for k, sp in check_injuries().items():
+        assert k in json.load(open(os.path.join(ROOT, 'data', 'freshness.json')))['sports'], k
+        for name, a, h, lim, ok in sp['rows']:
+            assert a, (k, name, 'no stamp')
     # every feed in data/freshness.json names a data file with a stamp
     for k, sp in check_feeds().items():
         for name, a, h, lim in sp['feeds']:
@@ -470,5 +573,7 @@ if __name__ == '__main__':
         cmd_deploy()
     elif c == 'rollover':
         cmd_rollover()
+    elif c == 'injuries':
+        cmd_injury_report() if 'report' in a[1:] else cmd_injuries()
     else:
         print(__doc__)

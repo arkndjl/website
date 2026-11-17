@@ -99,7 +99,37 @@ def espn_depth(league):
                 out.append((t['abbreviation'], u.get('name') or '', slot,
                             [(a.get('displayName'), a.get('id'), espn_inj(a)) for a in v.get('athletes') or []]))
         time.sleep(0.15)
-    return hold_starters(league, rotowire_gap(league, out))
+    return hold_starters(league, model_status(league, rotowire_gap(league, out)))
+
+
+# the game model's statuses over ESPN's chart tags (NFL: data/nfl_injuries.json, the league's report, ESPN, RotoWire and
+# Rotoballer merged): ESPN's chart can lag the news (Drake Maye, Nov 17 2026: ESPN D, out by the coach's word)
+MODEL_TAG = {'Out': 'O', 'Out (season)': 'O', 'Doubtful': 'D', 'Questionable': 'Q', 'Probable': 'P', 'Injured Reserve': 'IR',
+             'Physically Unable to Perform': 'PUP', 'Non Football Injury': 'NFI', 'Suspended': 'SUSP', 'Active': None}
+
+
+def model_status(league, charts):
+    if league != 'football/nfl':
+        return charts
+    try:
+        d = json.load(open(os.path.join(ROOT, 'data', 'nfl_injuries.json')))
+        names = d.get('names') or {}
+        st = {(t, NM.key(names[g])): v[0] for t, ps in d['teams'].items() for g, v in ps.items() if g in names}
+    except (OSError, ValueError, KeyError):
+        return charts
+    n = 0
+    for i, (tm, chart, slot, ath) in enumerate(charts):
+        t = NFL_TEAM.get(tm, tm)
+        new = []
+        for nm, aid, inj in ath:
+            m = st.get((t, NM.key(nm or '')))
+            # '(last week)' carries keep ESPN's tag, and so does a reserve-list tag (IR, PUP) where the model just says out
+            if m is not None and m in MODEL_TAG and MODEL_TAG[m] != inj and not (MODEL_TAG[m] == 'O' and inj in ('IR', 'PUP', 'NFI', 'SUSP')):
+                inj = MODEL_TAG[m]; n += 1
+            new.append((nm, aid, inj))
+        charts[i] = (tm, chart, slot, new)
+    print(f'depth nfl: {n} chart tags set from the game model\'s statuses')
+    return charts
 
 
 def rotowire_gap(league, charts):
@@ -146,6 +176,11 @@ def hold_starters(league, charts):
             ath.insert(0, ath.pop(i))
         elif ath[0][2] not in HURT:
             M[k] = ath[0][0]
+        # the starter is out (ESPN kept him first, or he was just put back): the first healthy name under him fills in
+        if ath[0][2] in HURT:
+            nxt = next((a for a in ath[1:] if a[2] not in HURT), None)
+            if nxt:
+                FILL.add((tm, slot, nxt[0]))
     try:
         json.dump(M, open(path, 'w'), indent=0, sort_keys=True)
     except Exception as e:
