@@ -50,6 +50,7 @@ CLS = {"30": 0, "adv": 1, "out": 2, "03": 3}
 SPLIT = E.SPLIT
 COIN = {"Bronze": 1, "Silver": 4, "Gold": 8, "Diamond": 11}
 FREE = 5
+QF8 = [(0, 7), (3, 4), (1, 6), (2, 5)]  # Major playoff quarter-finals by Stage 3 seed, in bracket order
 
 
 # ---------------------------------------------------------------------------------------------------- simulation
@@ -459,19 +460,53 @@ def majors(rows):
 
 
 # ---------------------------------------------------------------------------------------------------- live
-def coin_odds(p_stage, fit):
-    """P(Gold) and P(Diamond) for the whole Major: the known stages' pass chances (p_stage: {stage: P}), the
-    backtest's mean model chance for stages not drawn yet, and the playoff challenge count from the backtest's
-    brackets, treated as independent of each other (each stage is picked on its own field)."""
+def later_stages(logit, st, sd, rng, nw=60, m=1200):
+    """This Major's own chances for the stages still to be drawn: nw sample paths through the event (the current
+    stage, then each later stage's field = its invites + the 8 simulated advancers in seed order, then the playoff
+    bracket); on each path's field the max P(5+) picks (or the all-three bracket) are found on m sims and scored on
+    m fresh ones. -> {"Stage 2": P(5+), "Stage 3": P(5+), "bracket": [P(1+), P(2+), P(3)]} (keys still ahead)."""
+    later = {int(k): v for k, v in (st.get("later") or {}).items()}
+    cur = int(st["stage"][-1])
+    known = [[tuple(x) for x in rr] for rr in st.get("known") or []] or \
+        ([[(a, b, None) for a, b in st["r1"]]] if st.get("r1") else ())
+    acc = defaultdict(list)
+    for _ in range(nw):
+        _, _, o = E.swiss(st["seeds"], E.noisy(logit, st["seeds"], sd, rng), rng, known, st.get("allbo3", False))
+        for s2 in range(cur + 1, 4):
+            if s2 not in later:
+                return {}
+            field = later[s2] + o[:8]
+            Cs = sim_swiss(field, logit, None, s2 == 3, m, sd, rng)
+            Ce = sim_swiss(field, logit, None, s2 == 3, m, sd, rng)
+            P = np.stack([(Cs == c).mean(0) for c in range(4)], 1)
+            pk, _ = tier_picks(hits(Cs), ev_picks(P, 3))
+            acc[f"Stage {s2}"].append(p_pass(hits(Ce), pk))
+            _, _, o = E.swiss(field, E.noisy(logit, field, sd, rng), rng, (), s2 == 3)
+        s8 = o[:8]
+        qf, lg = QF8, (lambda a, b, bo, s8=s8: logit(s8[a], s8[b], bo))  # seed indices 0-7 (chalk = lower index)
+        Xs, _ = sim_bracket(qf, lg, m, sd, rng, 5)
+        Xe, _ = sim_bracket(qf, lg, m, sd, rng, 5)
+        acc["bracket"].append(pick_bracket(Xs, Xe, qf)["k3"]["pk"])
+    return {k: (round(float(np.mean(v)), 4) if k != "bracket" else [round(float(x), 4) for x in np.mean(v, 0)])
+            for k, v in acc.items()}
+
+
+def coin_odds(p_stage, fit, later=None):
+    """P(Gold) and P(Diamond) for the whole Major: the known stages' pass chances (p_stage: {stage: P}), this Major's
+    simulated chances for stages not drawn yet (later, from later_stages; the backtest's means when missing), and the
+    playoff challenge count, treated as independent of each other (each stage is picked on its own field)."""
     sw = fit["score"]["all/swiss"]["ARK tier"]["pPass"]
     pk = fit["score"]["all/se"]
     k = [pk["ARK k3"]["pAll3"]]
     # P(at least 1 / 2 / 3 of the bracket's three) from the held brackets' simulated chances
     rows = [r["m"]["ARK"]["k3"]["pk"] for r in fit["stages"] if r["kind"] == "se"]
     ge = np.mean(rows, 0) if rows else np.array([0.8, 0.5, k[0]])
+    later = later or {}
+    if later.get("bracket"):   # this Major's simulated playoff fields, when computed
+        ge = np.array(later["bracket"])
     dist = np.array([1 - ge[0], ge[0] - ge[1], ge[1] - ge[2], ge[2]])
     for st in ("Stage 1", "Stage 2", "Stage 3"):
-        q = p_stage.get(st, sw)
+        q = p_stage.get(st, later.get(st, sw))
         d2 = np.zeros(len(dist) + 1)
         d2[:-1] += dist * (1 - q)
         d2[1:] += dist * q
@@ -506,12 +541,14 @@ def live(logit, st, n=40000):
            "projected": bool(st.get("projected")), "nsim": n, "sd": sd}
     if st["stage"] == "Playoffs":
         s8 = seeds[:8]
-        qf = [(s8[0], s8[7]), (s8[3], s8[4]), (s8[1], s8[6]), (s8[2], s8[5])]
-        Xs, _ = sim_bracket(qf, logit, n, sd, rng, 5)
-        Xe, _ = sim_bracket(qf, logit, n, sd, rng, 5)
-        pol = pick_bracket(Xs, Xe, qf)
+        lg = lambda a, b, bo: logit(s8[a], s8[b], bo)  # noqa: E731  (seed indices 0-7: chalk = lower index)
+        Xs, _ = sim_bracket(QF8, lg, n, sd, rng, 5)
+        Xe, _ = sim_bracket(QF8, lg, n, sd, rng, 5)
+        pol = pick_bracket(Xs, Xe, QF8)
+        pol = {k: dict(v, picks=[s8[i] for i in v["picks"]]) for k, v in pol.items()}
+        qf = [(s8[a], s8[b]) for a, b in QF8]
         if locked and same and prev.get("bracket"):
-            pol = {k: dict(v, picks=prev["bracket"][k]["picks"]) for k, v in pol.items()}
+            pol = {k: dict(v, picks=[r["k"] for r in prev["bracket"][k]["picks"]]) for k, v in pol.items() if k in prev["bracket"]}
         out["qf"] = [[team_row(a, names, M.LOGOS), team_row(b, names, M.LOGOS)] for a, b in qf]
         out["bracket"] = {k: {"picks": [team_row(t, names, M.LOGOS) for t in v["picks"]], "pk": v["pk"]}
                           for k, v in pol.items() if k in ("k1", "k2", "k3")}
@@ -541,7 +578,10 @@ def live(logit, st, n=40000):
         p_stage = {st["stage"]: tier["pPass"]}
         for i in range(1, int(st["stage"][-1])):
             p_stage[f"Stage {i}"] = 1.0  # earlier stages are scored by now; the coin line counts the rest
-    out["coin"] = coin_odds(p_stage, fit)
+    later = later_stages(logit, st, sd, random.Random(int(time.time()) // 86400 + 7)) \
+        if st["stage"] != "Playoffs" else {"bracket": pol["k3"]["pk"]}
+    out["later"] = later
+    out["coin"] = coin_odds(p_stage, fit, later)
     hs = fit["score"]["held/swiss"]
     out["bt"] = {"n": hs["n"], "pPass": hs["ARK tier"]["pPass"], "pass": hs["ARK tier"]["pass"],
                  "chalk": hs["ARK chalk"]["pass"], "correct": hs["ARK tier"]["correct"],
