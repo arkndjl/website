@@ -21,6 +21,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 SDIR = os.path.join(ROOT, 'static', 'data', 'soccer-war')
 FIT = os.path.join(ROOT, 'data', 'soccer_breakout_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'next-up', 'soccer.json')
+CEIL = os.path.join(ROOT, 'data', 'soccer_ceiling_fit.json')     # scripts/soccer_ceiling_research.py
 LOGOS = os.path.join(ROOT, 'data', 'soccer_logos.json')
 LG = {'eng.1': 'EPL', 'esp.1': 'LaLiga', 'ger.1': 'BuLi', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1'}
 PH = 'https://img.a.transfermarkt.technology/portrait/medium/'
@@ -206,6 +207,13 @@ def marcel(hist, S):
     return num / (den + 1000.0)
 
 
+def ceil_inputs(a, hist):
+    """ceiling inputs for one base season; hist includes it (scripts/soccer_ceiling_research.py)"""
+    age = a.get('age') or 25.0
+    return {'s0': shr(a['g90'], a['min']), 'mar': marcel(hist, a['S']), 'age': age, 'age2': age * age,
+            'lnm': math.log(max(a['min'], 1.0)), 'U': a['U'], 'eff': a['eff'], 'tx': a['tx'], 'fw': 1.0 if a['pos'] == 'F' else 0.0}
+
+
 def bo_feats(a, s0, ref, vac, mar, moved, dTx):
     """ref: his best shrunk GAR a 90 to date; vac: vacated() or None; moved: 1 if his club now is not last season's; dTx: new club's npxG a 90 minus the old"""
     age, mn = a['age'] or 26.0, a['min']
@@ -319,6 +327,8 @@ def main():
     up99 = fit['dU_p99']
     cols = ['base'] + bo['keep']
     C = careers(P)
+    import ceiling as CE
+    cf = json.load(open(CEIL))
     rows = []
     for p, c in Pc.items():
         a = P.get((p, base))
@@ -351,7 +361,9 @@ def main():
         rows.append({'id': p, 'n': c['n'], 'tm': team, 'lo': logo(team), 'sub': LG.get(c['lg'], c['lg']),
                      'pos': a['pos'],
                      'age': round(age, 1) if age else None, 'ph': PH + c['ph'] if c.get('ph') else None,
-                     'p': round(pr, 3), 'best': round(ref, 3), 'u': round(a['U'], 1), 't': t, 'sig': sig})
+                     'p': round(pr, 3), 'best': round(ref, 3), 'u': round(a['U'], 1), 't': t, 'sig': sig,
+                     'x': round(shr(c['g90'], c['min']) if c is not a else shr(a['g90'], a['min']), 3),
+                     'xc': round(CE.value(cf, ceil_inputs(a, hist), max(0.0, min(cf['scen'], cf['cap'] - a['U']))), 3)})
     rows.sort(key=lambda r: -r['p'])
     lab = lambda s: f'{s - 1}-{str(s)[2:]}'  # noqa: E731
     d = bo['def']
@@ -367,7 +379,12 @@ def main():
            'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'base': lab(base),
            'u': {'lab': 'SI%', 'dec': 1}, 'tiers': tiers,
            'stat': {'lab': 'xG+xA/90', 'eff': 'xGI/inv', 'dec': 2, 'edec': 3},
-           'about': about, 'rows': rows[:400]}
+           'cur': {'lab': 'GAR/90', 't': 'GAR a 90 this season, shrunk to replacement by minutes (k 600)', 'dec': 3},
+           'ceil': {'lab': 'CEIL', 't': 'ceiling GAR a 90 (shrunk, like Best): 80th percentile season if SI%% rises %g points' % cf['scen'], 'dec': 3},
+           'about': about + (f" CEIL: 80th percentile of next-season shrunk GAR a 90 with SI% +{cf['scen']:g} (cap {cf['cap']}) on 1,500+ "
+                             "minutes: shrunk GAR a 90, Marcel, age, ln minutes + SI% change x age, SI%, xG+xA per involvement, GAR, "
+                             f"club npxG, forward; spread by age, minutes, SI% (held-out 80th-percentile loss t {cf['final']['t']}, "
+                             f"{cf['final']['won']}/{cf['final']['seasons']} seasons; {round(100 * cf['coverage']['up'])}% of SI-up seasons under it)."), 'rows': rows[:400]}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
     print('wrote', OUT, len(out['rows']), 'rows; base', lab(base), flush=True)
