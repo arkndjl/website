@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-17T17:06:20Z",
+ "asof": "2026-11-17T17:09:05Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,29 +52,13 @@
  },
  "model": {
   "asof": "2026-11-17T17:05:26Z",
-  "ageH": 0.0,
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
-  {
-   "id": "2026_11_IND_HOU",
-   "sport": "nfl",
-   "kick": "2026-11-20T01:15:00Z",
-   "home": "HOU",
-   "away": "IND",
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -132.0,
-   "edge": 5.5,
-   "x": null,
-   "why": "spread market off",
-   "m": 8.0,
-   "tm": 42.8
-  },
   {
    "id": "2026_11_TB_DET",
    "sport": "nfl",
@@ -188,6 +172,22 @@
    "tm": 40.0
   },
   {
+   "id": "2026_11_IND_HOU",
+   "sport": "nfl",
+   "kick": "2026-11-20T01:15:00Z",
+   "home": "HOU",
+   "away": "IND",
+   "mk": "spread",
+   "side": "away",
+   "line": 10.5,
+   "price": 107.0,
+   "edge": 2.5,
+   "x": null,
+   "why": "spread market off",
+   "m": 8.0,
+   "tm": 42.8
+  },
+  {
    "id": "2026_11_MIA_BUF",
    "sport": "nfl",
    "kick": "2026-11-22T18:00:00Z",
@@ -272,9 +272,9 @@
   "2026_11_IND_HOU": {
    "mk": "spread",
    "side": "away",
-   "line": 13.5,
-   "price": -132.0,
-   "edge": 5.5,
+   "line": 10.5,
+   "price": 107.0,
+   "edge": 2.5,
    "ev": null,
    "units": 0.0,
    "home": "HOU",
@@ -478,16 +478,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4522,
+  "snapshots": 4525,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1723,
-    "clvRet": -0.0213,
-    "clvT": -10.74,
-    "clv": 0.45,
-    "beat": 0.36,
-    "still": 0.593
+    "clvN": 1724,
+    "clvRet": -0.0194,
+    "clvT": -9.77,
+    "clv": 0.48,
+    "beat": 0.367,
+    "still": 0.589
    },
    {
     "when": "6-24h",
@@ -2894,7 +2894,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T17:06:20Z",
+ "checked": "2026-11-17T17:09:05Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
