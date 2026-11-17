@@ -22,6 +22,15 @@
         </svg>
         <p class="esea-fc__axis lzf__axis"><span>{{ (time.In "America/New_York" (time (int (div (index $tr 0).t 1000)))).Format "Jan 2" }}</span><span>today</span></p>
         {{- end }}
+        {{- with index ($s.goals | default dict) $k }}{{ $g := . }}{{ $now := time (int (div (index $tr (sub (len $tr) 1)).t 1000)) }}
+        <ul class="lzs__goals">
+          <li><span class="esea__k" title="projected net gain a month: lifetime pace as the prior, updated by tracked days">pace</span> <b>+{{ .rate }}</b><span class="cfb__dim">/mo</span></li>
+          {{- range $T := slice 30 90 }}{{ with index $g (printf "d%d" $T) }}
+          <li><span class="esea__k">{{ ($now.AddDate 0 0 $T).Format "Jan 2" }}</span> <b>{{ lang.FormatNumber 0 .goal }}</b> <span class="cfb__dim" title="chance of reaching it">{{ .p }}%</span></li>
+          {{- end }}{{ end }}
+          {{- with .next }}<li><span class="esea__k">{{ lang.FormatNumber 0 .goal }}</span> <b>{{ with .eta }}{{ (time .).Format "Jan 2, 2006" }}{{ else }}—{{ end }}</b> <span class="cfb__dim" title="chance within 90 days">{{ .p90 }}% in 90d</span></li>{{ end }}
+        </ul>
+        {{- end }}
       </div>
     {{- end }}{{ end }}
     </div>
@@ -29,5 +38,5 @@
   {{- else }}
   <p class="esea__empty-line">no social data yet.</p>
   {{- end }}
-  <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

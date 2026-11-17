@@ -4743,3 +4743,7 @@ code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
 @media (max-width: 1000px) { .lzf__body > .lzs__trend { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .lzsoc .lzf__trh .win__icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
 @media (max-width: 640px) { .lzf__body > .lzs__trend { grid-template-columns: minmax(0, 1fr); } }
+.lzs__goals { list-style: none; margin: 6px 0 0; padding: 6px 0 0; border-top: 2px solid var(--win-dark); display: grid; gap: 2px; font-size: .85em; }
+.lzs__goals li::before { content: none !important; }
+.lzs__goals li { display: flex; gap: 6px; align-items: baseline; }
+.lzs__goals .esea__k { min-width: 6ch; }
