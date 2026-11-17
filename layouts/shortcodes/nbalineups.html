@@ -18,6 +18,9 @@
       {{- if eq $view "onoff" }}<option value="0">any</option><option value="100" selected>100+</option><option value="250">250+</option><option value="500">500+</option>
       {{- else }}<option value="0">any</option><option value="10" selected>10+</option><option value="25">25+</option><option value="50">50+</option><option value="100">100+</option>{{ end -}}
     </select></label>
+    {{- if eq $view "onoff" }}
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off" enterkeyhint="search" aria-label="find player or team"></label>
+    {{- end }}
     {{- if ne $view "onoff" }}
     <fieldset class="cfb__pos"><legend class="visually-hidden">units</legend>
       <button type="button" class="cfb__chip is-on" data-unit="5" data-gfx-chip aria-pressed="true" title="five-man units">5-man</button>
@@ -62,6 +65,7 @@
   function glogo(t) { return t ? '<img class="cfb__logo" src="/img/nba/' + esc(String(t).toLowerCase()) + '.png" alt="" width="18" height="18" loading="lazy" style="display:none">' : ''; }
   var MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   function gdate(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? 'updated ' + MON[+m[2] - 1] + ' ' + (+m[3]) + ', ' + m[1] : ''; }
+  function fold(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
   function cols(view, all) {
     if (view === 'onoff') return [['rk', 'RK', 1], ['n', 'Player'], all ? ['t', 'Team'] : null, ['min', 'MIN', 1, 'nbaln__x'], ['soo', 'sOn-Off', 1, '', 'on-off shrunk toward 0 by possessions'], ['on', 'On', 1, '', 'team net per 100 with him on the floor'], ['off', 'Off', 1, '', 'team net per 100 with him off the floor'], ['oo', 'On-Off', 1, 'nbaln__x', 'on minus off, unshrunk']].filter(Boolean);
     return [['rk', 'RK', 1], ['n', 'Lineup'], ['min', 'MIN', 1], ['poss', 'Poss', 1, 'nbaln__x'], ['or', 'ORtg', 1, 'nbaln__x', 'points scored per 100 possessions'], ['dr', 'DRtg', 1, 'nbaln__x', 'points allowed per 100 possessions'], ['net', 'Net', 1, 'nbaln__x', 'ORtg - DRtg'], ['sn', 'sNet', 1, '', 'Net shrunk toward 0 by possessions']];
@@ -82,11 +86,12 @@
       render();
     }).catch(function () { W.querySelector('[data-ln-body]').innerHTML = '<tr><td class="cfb__dim">lineups not available right now.</td></tr>'; });
     function rows() {
-      var t = bar.elements.team.value, mn = +bar.elements.min.value || 0, out = [];
+      var t = bar.elements.team.value, mn = +bar.elements.min.value || 0, out = []; var q = bar.elements.q ? fold(bar.elements.q.value.trim()) : '';
       if (view === 'onoff') {
         (t ? [t] : Object.keys(D.teams)).forEach(function (tm) {
           D.teams[tm].onoff.forEach(function (r) {
             if (r[1] < mn) return;
+            if (q && fold((D.names[r[0]] || r[0]) + ' ' + tm + ' ' + (TEAMS[tm] || '')).indexOf(q) < 0) return;
             var on = per(r[3] - r[4], r[2]), off = per(r[6] - r[7], r[5]), oo = on != null && off != null ? on - off : null;
             out.push({ n: D.names[r[0]] || r[0], t: tm, min: r[1], on: on, off: off, oo: oo, soo: oo == null ? null : oo * (1 / (1 / r[2] + 1 / r[5])) / (1 / (1 / r[2] + 1 / r[5]) + D.ko) });
           });
@@ -128,7 +133,8 @@
       W.querySelector('[data-ln-count]').textContent = list.length + (view === 'onoff' ? ' players' : unit === '5' ? ' units' : ' pairs') + (list.length > shown.length ? ' (top ' + shown.length + ' shown)' : '');
       if (window.__arkGfxScan) window.__arkGfxScan();
     }
-    bar.addEventListener('change', function (e) { if (!e.target.name) return; try { localStorage.setItem('ark-ln-' + view, bar.elements.team.value); } catch (e) {} render(); });
+    if (bar.elements.q) bar.elements.q.addEventListener('input', function () { render(); });
+    bar.addEventListener('change', function (e) { if (!e.target.name || e.target.name === 'q') return; try { localStorage.setItem('ark-ln-' + view, bar.elements.team.value); } catch (e) {} render(); });
     [].forEach.call(bar.querySelectorAll('[data-unit]'), function (c) {
       c.addEventListener('click', function () {
         unit = c.dataset.unit;
