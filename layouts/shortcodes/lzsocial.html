@@ -1,10 +1,10 @@
-{{- /* followers.exe: LAURSEN_111's Twitch / YouTube / TikTok / X followers over time (data/laursen_socials.json,
+{{- /* social_data.exe: LAURSEN_111's Twitch / YouTube / TikTok / X followers over time (data/laursen_socials.json,
        scripts/laursen_socials.mjs in esea.yml). {{< lzsocial class="desk__wide" >}} */ -}}
 {{- $s := site.Data.laursen_socials -}}
 {{- $syncd := "" }}{{ with $s }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
 <div class="win lzf lzsoc{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-twitch"/></svg>followers.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-twitch"/></svg>social_data.exe<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- with $s.series }}{{ $tr := . }}
@@ -27,7 +27,7 @@
     </div>
   </div>
   {{- else }}
-  <p class="esea__empty-line">no follower counts yet.</p>
+  <p class="esea__empty-line">no social data yet.</p>
   {{- end }}
   <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
