@@ -58,3 +58,12 @@
 - Tab names are the URL hash. A subtab's own name still opens it (`#defense`), so nest without renaming; a renamed
   or removed name needs an ALIAS entry in `layouts/shortcodes/wintabs.html`.
 - Phones show the groups in one row and the open group's tabs in the next. A lazytab that renders nothing hides its tab.
+
+## Site search
+
+- Header bar on every page + `/search/` results page (`assets/js/search.js`, `layouts/partials/search-bar.html`,
+  `layouts/shortcodes/search.html`). Index = `/search/index.json`, written by Hugo each build
+  (`layouts/_default/single.searchindex.json`: pages, every wintabs tab/subtab, Process terms + research, ARKLIBRARY lists,
+  ST. CLAIRE, 1NT, LAURSEN_111, articles) + `static/data/search-players.json` (players/teams, `scripts/search_index.py`,
+  rerun by the `search index` workflow). Player rows name a page stem + tab, so moved pages and ALIASed tabs keep working.
+  A new player board: add it to `scripts/search_index.py`. A page to keep out: `searchExclude = true`.

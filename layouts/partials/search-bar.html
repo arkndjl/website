@@ -1,0 +1,7 @@
+{{- /* The site search bar (assets/js/search.js): the end of the menu row on desktop, a magnifier tile in the header
+       on phones (data-srch-toggle) that opens it as a full-width row. Enter opens /search/?q=… (every result). */ -}}
+<form class="srch-bar" action="{{ "search/" | relURL }}" method="get" role="search" data-srch-bar>
+  <label class="srch-bar__box"><svg class="srch-bar__icon" aria-hidden="true"><use href="#icon-search"/></svg><span class="visually-hidden">search</span><input type="search" name="q" placeholder="search" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-label="search arkndjl.net" aria-expanded="false" aria-controls="srch-drop"><kbd class="srch-bar__kbd" aria-hidden="true">/</kbd></label>
+  <div class="srch-bar__drop" id="srch-drop" data-srch-drop hidden></div>
+</form>
+{{ partial "js.html" "search" }}

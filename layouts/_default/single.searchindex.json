@@ -1,0 +1,81 @@
+{{- /* The site search index (/search/index.json), written on every build so it follows the site: pages, every
+       wintabs tab and subtab (parsed from each page's source, the same way arkhub.html reads its quick links),
+       Process glossary terms and research questions, ARKLIBRARY lists and gallery, ST. CLAIRE tracks and art,
+       1NT players, LAURSEN_111 log entries, articles. Players and teams come from static/data/search-players.json
+       (scripts/search_index.py); "pages" maps its page stems to the page's URL and title here, so a moved page
+       keeps its player links. Rows: {g group, t title, s sub, u url, i img} (img: a path, "#icon-<name>" or "").
+       Groups: b ARKBOARD, x Process, l ARKLIBRARY, s ST. CLAIRE, n 1NT, z LAURSEN_111, a articles, o other pages.
+       Drafts (Franchise Fantasy) are not built, so never indexed; a page with searchExclude = true is left out. */ -}}
+{{- $icons := dict -}}
+{{- range site.Menus.main }}{{ $icons = merge $icons (dict .URL (.Params.icon | default "")) }}{{ range .Children }}{{ $icons = merge $icons (dict .URL (.Params.icon | default "")) }}{{ end }}{{ end -}}
+{{- $rows := slice -}}
+{{- $pages := dict -}}
+{{- range site.Pages -}}
+{{- if and (in (slice "page" "home" "section") .Kind) (not .Params.searchExclude) (not .Draft) -}}
+{{- $u := .RelPermalink -}}
+{{- $g := "o" -}}
+{{- if hasPrefix $u "/arkboard/process/" }}{{ $g = "x" }}{{ else if hasPrefix $u "/arkboard/" }}{{ $g = "b" }}{{ else if hasPrefix $u "/stclaire/" }}{{ $g = "s" }}{{ else if hasPrefix $u "/arklibrary/" }}{{ $g = "l" }}{{ else if hasPrefix $u "/1nt/" }}{{ $g = "n" }}{{ else if hasPrefix $u "/laursen_111/" }}{{ $g = "z" }}{{ else if eq .Section "posts" }}{{ $g = "a" }}{{ end -}}
+{{- $short := replaceRE ` :: (ARKBOARD|ST\. CLAIRE)$` "" .Title -}}
+{{- if eq .Kind "home" }}{{ $short = "home" }}{{ end -}}
+{{- $icon := index $icons $u | default "" -}}
+{{- with .File }}{{ $pages = merge $pages (dict .ContentBaseName (slice $u $short $icon $g)) }}{{ end -}}
+{{- $sub := "" -}}
+{{- if eq $g "a" }}{{ $sub = lower (.Date.Format "Jan 2, 2006") }}{{ else if eq $g "b" }}{{ $sub = "ARKBOARD" }}{{ else if eq $g "x" }}{{ $sub = "ARKBOARD" }}{{ else if eq $g "s" }}{{ $sub = "ST. CLAIRE" }}{{ end -}}
+{{- if ne .Kind "section" }}{{ $rows = $rows | append (dict "g" $g "t" $short "s" $sub "u" $u "i" $icon) }}{{ end -}}
+{{- /* tabs and subtabs: every {{< wintabs >}} on the page */ -}}
+{{- $seen := dict -}}
+{{- range findRESubmatch `\{\{<\s*wintabs\s+([^>]*?)/?>\}\}` .RawContent -1 -}}
+  {{- $a := index . 1 -}}
+  {{- $parent := "" }}{{ with findRESubmatch `(?:^|\s)tab="([^"]*)"` $a 1 }}{{ $parent = index (index . 0) 1 }}{{ end -}}
+  {{- $spec := "" -}}
+  {{- with findRESubmatch `groups="([^"]*)"` $a 1 }}{{ $spec = index (index . 0) 1 }}{{ else }}{{ with findRESubmatch `tabs="([^"]*)"` $a 1 }}{{ $spec = printf ":%s" (index (index . 0) 1) }}{{ end }}{{ end -}}
+  {{- range split $spec "|" -}}
+    {{- $parts := split . ":" -}}
+    {{- $label := index $parts 0 | default $parent -}}
+    {{- $list := index $parts (sub (len $parts) 1) -}}
+    {{- range split $list "," -}}
+      {{- $t := trim . " " -}}
+      {{- $s := strings.Trim (replaceRE "[^a-z0-9]+" "-" (lower $t)) "-" -}}
+      {{- if and $t (not (index $seen $s)) -}}
+        {{- $seen = merge $seen (dict $s true) -}}
+        {{- $rows = $rows | append (dict "g" $g "t" $t "s" (delimit (complement (slice "" nil) (slice $short $label)) " · ") "u" (printf "%s#%s" $u $s) "i" $icon) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- /* ARKLIBRARY: each {{< desk tab="…" >}} block's list rows (name | by | year | image), and the gallery */ -}}
+{{- if eq $u "/arklibrary/" -}}
+  {{- range after 1 (split .RawContent `{{< desk tab="`) -}}
+    {{- $tab := index (split . `"`) 0 -}}
+    {{- $body := index (split . `{{< /desk >}}`) 0 -}}
+    {{- range findRE `(?m)^- .+$` $body -}}
+      {{- $c := split (strings.TrimPrefix "- " .) "|" -}}
+      {{- $name := trim (index $c 0) " " -}}
+      {{- with findRESubmatch `^\[([^\]]+)\]` $name 1 }}{{ $name = index (index . 0) 1 }}{{ end -}}
+      {{- $by := "" }}{{ if gt (len $c) 1 }}{{ $by = trim (index $c 1) " " }}{{ end -}}
+      {{- $yr := "" }}{{ if gt (len $c) 2 }}{{ $yr = trim (index $c 2) " " }}{{ end -}}
+      {{- $img := "" }}{{ range after 1 $c }}{{ $i := trim . " " }}{{ if hasPrefix $i "/" }}{{ $img = $i }}{{ end }}{{ end -}}
+      {{- if hasPrefix $yr "/" }}{{ $yr = "" }}{{ end }}{{ if or (hasPrefix $yr "#") (hasPrefix $by "#") }}{{ $yr = "" }}{{ end -}}
+      {{- if $name }}{{ $rows = $rows | append (dict "g" "l" "t" (htmlUnescape $name) "s" (delimit (complement (slice "" nil) (slice $by $yr $tab)) " · ") "u" (printf "%s#%s:q=%s" $u (urlquery $tab) (urlquery (htmlUnescape $name))) "i" $img) }}{{ end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range .Params.gallery }}{{ $rows = $rows | append (dict "g" "l" "t" .title "s" (delimit (complement (slice "" nil) (slice .artist .year "art")) " · ") "u" (printf "%s#art:q=%s" $u (urlquery .title)) "i" (.src | default "")) }}{{ end -}}
+  {{- range site.Data.sports.athletes }}{{ $rows = $rows | append (dict "g" "l" "t" .name "s" (delimit (complement (slice "" nil) (slice .teamName "sports")) " · ") "u" (printf "%s#sports:q=%s" $u (urlquery .name)) "i" (.img | default "")) }}{{ end -}}
+  {{- range site.Data.sports.teams }}{{ $rows = $rows | append (dict "g" "l" "t" .name "s" (delimit (complement (slice "" nil) (slice .sport "sports")) " · ") "u" (printf "%s#sports" $u) "i" "#icon-standings") }}{{ end -}}
+{{- end -}}
+{{- /* ST. CLAIRE: tracks and art */ -}}
+{{- if eq $g "s" -}}
+  {{- range .Params.tracks }}{{ $rows = $rows | append (dict "g" "s" "t" .title "s" (delimit (complement (slice "" nil) (slice .artist "track")) " · ") "u" $u "i" "#icon-note") }}{{ end -}}
+  {{- range .Params.gallery }}{{ $rows = $rows | append (dict "g" "s" "t" .title "s" (delimit (complement (slice "" nil) (slice .year "art")) " · ") "u" $u "i" (.src | default "")) }}{{ end -}}
+{{- end -}}
+{{- /* Process: glossary terms (#g-<term>) and research questions (#rq-<id>) */ -}}
+{{- if eq $g "x" -}}
+  {{- range site.Data.library.sections }}{{ $sec := .title }}{{ range .entries }}{{ $rows = $rows | append (dict "g" "x" "t" .term "s" $sec "u" (printf "%s#%s" $u (partial "glossid.html" .term)) "i" "#icon-process") }}{{ end }}{{ end -}}
+  {{- range site.Data.library.studies }}{{ $rows = $rows | append (dict "g" "x" "t" .question "s" (delimit (complement (slice "" nil) (slice .sport "research")) " · ") "u" (printf "%s#rq-%s" $u .id) "i" "#icon-library") }}{{ end -}}
+{{- end -}}
+{{- /* 1NT players, LAURSEN_111 log */ -}}
+{{- if eq $u "/1nt/" }}{{ with site.Data.esea }}{{ range .players }}{{ $rows = $rows | append (dict "g" "n" "t" .name "s" "1NT · roster" "u" (printf "%s#roster" $u) "i" (cond (ne (.country | default "") "") (printf "/img/flags/%s.png" (.country | default "x")) "")) }}{{ end }}{{ end }}{{ end -}}
+{{- if eq $u "/laursen_111/" }}{{ with site.Data.laurlog }}{{ range .entries }}{{ $rows = $rows | append (dict "g" "z" "t" (printf "#%d %s" (int .n) (truncate 70 .text)) "s" (printf "log · %s" (lower ((time .at).Format "Jan 2, 2006"))) "u" (printf "%s#log" $u) "i" "#icon-note") }}{{ end }}{{ end }}{{ end -}}
+{{- end -}}
+{{- end -}}
+{{- dict "built" (now.UTC.Format "2006-01-02T15:04Z") "pages" $pages "rows" $rows | jsonify -}}

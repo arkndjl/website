@@ -1,0 +1,24 @@
+{{- /* The search results page (/search/?q=…&g=…): search.exe with the pixel hero, the query field, one chip per section
+       with its count (results sorted by section, the best-matching section first) and one window per section.
+       Logic in assets/js/search.js; the index is built by layouts/_default/single.searchindex.json and
+       scripts/search_index.py. */ -}}
+<div class="srch" data-srch-page>
+  <div class="win winpane winpane--hero srch__head">
+    <div class="win__title">
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-search"/></svg>search.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+    </div>
+    <div class="winpane__body">
+      <div class="winpane__sprite" aria-hidden="true">{{ partial "px/hero-search.html" . }}</div>
+      <div class="winpane__text srch__main">
+        <form class="srch__form" action="{{ "search/" | relURL }}" method="get" role="search">
+          <label class="srch__box"><svg class="srch__boxicon" aria-hidden="true"><use href="#icon-search"/></svg><input type="search" name="q" data-srch-q placeholder="search" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-label="search arkndjl.net"></label>
+        </form>
+        <div class="srch__chips" data-srch-chips></div>
+      </div>
+    </div>
+    <div class="win__status"><span data-srch-status>&nbsp;</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  </div>
+  <div class="srch__out" data-srch-out aria-live="polite"></div>
+</div>
+{{ partial "js.html" "search" }}

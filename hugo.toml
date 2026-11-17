@@ -18,6 +18,13 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
   isPlainText = true
   notAlternative = true
 
+# Site search index (/search/index.json, layouts/_default/single.searchindex.json), on content/search.md only.
+[outputFormats.SearchIndex]
+  mediaType = 'application/json'
+  baseName = 'index'
+  isPlainText = true
+  notAlternative = true
+
 [outputs]
   home = ['HTML', 'RSS', 'BuildInfo']
 
