@@ -37,7 +37,7 @@ UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like 
 KEEP_DAYS = 120
 SITES = {'247': '247sports.com', 'on3': 'on3.com'}
 SPORT_WORD = {'cfb': 'football', 'cbb': 'basketball'}
-QUERIES = ['commits', 'commitment', 'decommits', 'flips', '"transfer portal"', 'rankings']
+QUERIES = ['commits', 'commitment', 'decommits', 'flips', 'reclassifies', 'signs', '"transfer portal"', 'rankings']
 
 OTHER = re.compile(r"\bwomen'?s\b|\bWBB\b|\bgirls\b|\blady\b|softball|volleyball|baseball|soccer|wrestling|\btrack\b|"
                    r"\bgolf\b|lacrosse|gymnast|\bswim", re.I)
@@ -54,6 +54,7 @@ KIND = [
                           r"\bportal entry\b|\bplaces? (his )?name in the portal\b", re.I)),
     ('transfer', re.compile(r"\btransfer\b[^:]*\b(commits?|signs?|commitment|lands?|lands|lands a|lands transfer|picks)\b|"
                             r"\b(commits?|lands?|adds?|picks up)\b[^:]*\b(transfer|from the portal|portal)\b", re.I)),
+    ('sign', re.compile(r"(?<!re-)(?<!re)\bsigns? with\b|\bsigned with\b|\bsigning of\b|\binks?\b|\bofficially signs?\b", re.I)),
     ('commit', re.compile(r"\bcommit(s|ted)? to\b|\bcommits\b|\bcommitment (to|from)\b|\bpledges?\b|\bverbal(ly)? commit|"
                           r"\bCOMMIT\b|\blands?\b|\bgets? (a )?commit|\bpicks up (a )?commit|\bsecures? (a )?commit|"
                           r"\bchooses\b|\bpicks\b", re.I)),
@@ -61,6 +62,10 @@ KIND = [
                         r"(rankings?|No\. ?\d+|Top ?247|top-?\d+|five-star|four-star|5-star|4-star)\b|\brankings? (update|release)\b|\bbumped to\b|\bearns? "
                         r"(a |his )?(fifth|5th) star\b|\bnew (Top247|rankings)\b|\bre-?rank", re.I)),
 ]
+RECLASS_TO = re.compile(r"\breclass(?:if(?:y|ies|ied|ying|ication))?\b[^,:;]*?\b(?:to|into)\s+(?:the\s+)?(?:class\s+of\s+)?"
+                        r"(?:'(\d\d)\b|(20[2-3]\d)\b)", re.I)
+RECLASS_FROM = re.compile(r"\breclass(?:if(?:y|ies|ied|ying|ication))?\b\s+(?:up\s+|down\s+)?from\s+(?:the\s+)?(?:class\s+of\s+)?"
+                          r"(?:'(\d\d)\b|(20[2-3]\d)\b)", re.I)
 NOUN_COMMIT = re.compile(r"\bcommit(s)?\b(?! to)", re.I)
 POS_RE = re.compile(r"\b(QB|RB|WR|TE|OL|OT|OG|IOL|DL|DT|DE|EDGE|LB|CB|S|DB|ATH|K|P|LS|APB|PG|SG|SF|PF|CG|C)\b")
 POS_WORD = {'quarterback': 'QB', 'running back': 'RB', 'receiver': 'WR', 'wideout': 'WR', 'tight end': 'TE',
@@ -77,8 +82,8 @@ DESC = (r"(?:(?:(?i:No\. ?\d+|\d+-star|five-star|four-star|three-star|top-?\d+|t
 NAME = r"((?:[A-Z][a-zA-Z'\.\-]+|[A-Z]\.[A-Z]\.)(?: (?:[A-Z][a-zA-Z'\.\-]+|Jr\.?|Sr\.?|II|III|IV)){1,3})"
 SCHOOL = r"([A-Z][A-Za-z&'\.\-]+(?: (?:[A-Z][A-Za-z&'\.\-]+|A&M|of))*)"
 PLAIN = [  # player-first and school-first headline shapes that name the player plainly
-    re.compile(rf"^(?:[^:]*: )?{DESC}{NAME},? (?:[^,]*?, )?(?:officially |verbally )?(?:commits|commits to|pledges to|flips to|flips from "
-               rf"\S+(?: \S+)? to|decommits from|decommits|enters the transfer portal|enters transfer portal|enters the portal|picks|chooses)\b"),
+    re.compile(rf"(?:^|[a-z0-9:,] ){DESC}{NAME},? (?:[^,]*?, )?(?:officially |verbally )?(?:commits|commits to|pledges to|flips to|flips from "
+               rf"\S+(?: \S+)? to|decommits from|decommits|reclassifies|will reclassify|is reclassifying|reclassifying|enters the transfer portal|enters transfer portal|enters the portal|picks|chooses)\b"),
     re.compile(rf"\b{NAME}(?:'s)? (?:decommitment|de-commitment|decommits|flip|commitment)\b"),
     re.compile(rf"^(?:[^:]*: )?{SCHOOL} (?:lands|flips|adds|gets|secures|loses)(?: (?:commitment|commit|pledge) from)? {DESC}{NAME}\b"),
 ]
@@ -92,6 +97,10 @@ FR_RE = [re.compile(rf"\b(?:decommits?|de-commits?|flips?|flipped|backs off|tran
          re.compile(rf"\b(?:former|ex-) {SCHOOL}\b")]
 STOP_SCHOOL = {'the', 'his', 'a', 'top', 'five', 'four', 'no', 'class', 'early', 'national', 'signing', 'day', 'portal',
                'transfer', 'commit', 'commits', 'official', 'visit'}
+
+
+SHORT = {'FSU': 'Florida State', 'Bama': 'Alabama', 'UGA': 'Georgia', 'OU': 'Oklahoma', 'UK': 'Kentucky', 'UF': 'Florida',
+         'UT': 'Tennessee', 'Vandy': 'Vanderbilt', 'Cuse': 'Syracuse', 'ASU': 'Arizona State', 'KU': 'Kansas', 'UW': 'Washington'}
 
 
 def gnews(q, timeout=25):
@@ -165,6 +174,7 @@ class Pool:
         """the board's spelling of a school named in a headline, trimming trailing words until one fits"""
         if not s: return None
         w = s.split()
+        w[0] = SHORT.get(w[0], w[0])
         for i in range(min(len(w), 4), 0, -1):
             k = names.team_key(' '.join(w[:i]))
             if k in self.teams: return self.teams[k]
@@ -229,12 +239,32 @@ def pos_of(t):
     return m.group(1) if m else None
 
 
+def reclass_of(t, row):
+    """(new class, old class) of a reclassification headline, or None: "reclassifies to 2027", "reclassifies from 2029
+    to 2028", "reclassifying from 2028" (one class up); the old class from the headline, else the board's, else one later"""
+    if not re.search(r"\breclass", t, re.I) or re.search(r"\b(could|might|may|considering|weighs?|likely|possible|exploring)\b|\?", t, re.I):
+        return None
+    yr = lambda m: (2000 + int(m.group(1))) if m.group(1) else int(m.group(2))
+    mt, mf = RECLASS_TO.search(t), RECLASS_FROM.search(t)
+    new = yr(mt) if mt else None
+    old = yr(mf) if mf else None
+    if new is None and old is None: return None
+    if new is None: new = old - 1
+    if old is None:
+        ys = [int(y) for y in YEAR.findall(t) if int(y) != new]
+        old = ys[0] if ys else (row or {}).get('cls') if (row or {}).get('cls') not in (None, new) else new + 1
+    return (new, old) if new != old else None
+
+
 def parse(title, pool):
-    """one headline -> a move row (without date/source), or None"""
+    """one headline -> its move rows (without date/source): the move, and a reclassification when it names one
+    ("K'Majay Jenkins commits to Kansas, will reclassify to 2027" is two rows)"""
     t = re.sub(r'\s+', ' ', title).strip()
+    if OTHER.search(t): return []
     k = kind_of(t)
-    if not k: return None
     row = pool.player(t)
+    rc = reclass_of(t, row)
+    if not k and not rc: return []
     hp = pos_of(t)
     if row and hp and not names.pos_fits(row.get('pos'), hp, 'football' if pool.sport == 'cfb' else 'basketball'):
         row = None      # a namesake: "JUCO OL Dorian Williams" is not the board's WR Dorian Williams
@@ -246,7 +276,7 @@ def parse(title, pool):
             if m:
                 name = clean_name(m.group(m.lastindex), pool)
                 if name: break
-    if not name: return None
+    if not name: return []
     to = fr = None
     for rx in TO_RE:
         for m in rx.finditer(t):
@@ -257,20 +287,26 @@ def parse(title, pool):
         if m and pool.school(m.group(1)): fr = fr or pool.school(m.group(1))
     if k == 'decommit':
         fr, to = fr or to, None
-    if k in ('commit', 'flip', 'transfer') and not to: return None
-    if k == 'rank' and not on_board: return None
     if to and fr and to == fr: fr = None
     yrs = [int(y) for y in YEAR.findall(t)]
-    return {'n': name, 'pos': (row or {}).get('pos') or pos_of(t), 'cls': (row or {}).get('cls') or (yrs[0] if yrs else None),
-            'k': k, 'to': to, 'fr': fr, 't': t, 'b': 1 if on_board else None}
+    pos = (row or {}).get('pos') or hp
+    out = []
+    if rc:
+        out.append({'n': name, 'pos': pos, 'cls': rc[0], 'ocls': rc[1], 'k': 'reclass', 'to': to if k in ('commit', 'sign', 'flip') else None,
+                    't': t, 'b': 1 if on_board else None})
+    if k and not (k in ('commit', 'sign', 'flip', 'transfer') and not to) and not (k == 'rank' and not on_board):
+        cls = rc[0] if rc else (row or {}).get('cls') or (yrs[0] if yrs else None)
+        out.append({'n': name, 'pos': pos, 'cls': cls, 'k': k, 'to': to, 'fr': fr, 't': t, 'b': 1 if on_board else None})
+    return out
 
 
 def same_move(a, b):
     ks = {a['k'], b['k']}
-    if not (len(ks) == 1 or ks == {'commit', 'flip'}) or not names.same(a['n'], b['n']): return False
+    if not (len(ks) == 1 or ks <= {'commit', 'flip', 'sign'}) or not names.same(a['n'], b['n']): return False
     if a.get('to') and b.get('to') and not names.same_team(a['to'], b['to']): return False
     da, db = dt.date.fromisoformat(a['d']), dt.date.fromisoformat(b['d'])
-    return abs((da - db).days) <= 4
+    # the same move to the same school is one move however late a site re-runs the story
+    return abs((da - db).days) <= (60 if a['k'] == b['k'] and a.get('to') and b.get('to') or a['k'] == 'reclass' else 4)
 
 
 def merge(rows, new):
@@ -278,10 +314,10 @@ def merge(rows, new):
     for r in new:
         hit = next((x for x in rows if same_move(x, r)), None)
         if hit:
-            if r['k'] == 'flip': hit['k'] = 'flip'           # a commitment story about a flip
+            if r['k'] == 'flip' or (r['k'] == 'sign' and hit['k'] == 'commit'): hit['k'] = r['k']   # a commitment story about a flip
             for s, u in r['src'].items(): hit['src'].setdefault(s, u)
             if r['d'] < hit['d']: hit['d'] = r['d']
-            for f in ('pos', 'cls', 'to', 'fr', 'b'):
+            for f in ('pos', 'cls', 'ocls', 'to', 'fr', 'b'):
                 if not hit.get(f) and r.get(f): hit[f] = r[f]
         else:
             rows.append(r)
@@ -305,22 +341,21 @@ def sport_of(t, rows, asked):
     return asked
 
 
-def pull(today):
+def pull(today, days=7):
     pools = {s: Pool(s) for s in SPORT_WORD}
-    since = (today - dt.timedelta(days=10)).isoformat()
+    since = (today - dt.timedelta(days=days + 3)).isoformat()
     found, seen = {s: [] for s in SPORT_WORD}, set()
     for src, site in SITES.items():
         for asked, word in SPORT_WORD.items():
             for q in QUERIES:
-                for it in gnews(f'site:{site} {word} recruiting {q} when:7d'):
+                for it in gnews(f'site:{site} {word} recruiting {q} when:{days}d'):
                     if it['date'] < since or (src, it['title']) in seen: continue
                     seen.add((src, it['title']))
                     rows = {s: parse(it['title'], p) for s, p in pools.items()}
-                    s = sport_of(it['title'], rows, asked)
-                    r = rows[s]
-                    if not r: continue
-                    r.update(d=it['date'], src={src: it['url']})
-                    found[s].append(r)
+                    s = sport_of(it['title'], {x: (v[0] if v else None) for x, v in rows.items()}, asked)
+                    for r in rows[s]:
+                        r.update(d=it['date'], src={src: it['url']})
+                        found[s].append(r)
                 time.sleep(1)
     out = {}
     for s, f in found.items():
@@ -338,12 +373,18 @@ def main():
         old = {}
     cut = (today - dt.timedelta(days=KEEP_DAYS)).isoformat()
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
-    pulled = pull(today)
+    days = int(sys.argv[sys.argv.index('--days') + 1]) if '--days' in sys.argv else 7
+    pulled = pull(today, days)
     for sport in ('cfb', 'cbb'):
         new = pulled[sport]
-        rows = merge([r for r in old.get(sport) or [] if r.get('d', '') >= cut], new)
+        pool = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
+        kept = [r for r in old.get(sport) or [] if r.get('d', '') >= cut and any(x['k'] == r['k'] for x in parse(r.get('t', ''), pool))]
+        rows = merge(kept, new)
         # a decommitment story that names no school, within 4 days of a flip or commitment of his: the old school's
         # side of that move ("Alabama pushing for backs after Nigel Newkirk decommitment"), not a second move
+        for rc in [r for r in rows if r['k'] == 'reclass']:     # his other stories from then on are in the new class
+            for r in rows:
+                if r is not rc and r.get('cls') == rc.get('ocls') and r['d'] >= rc['d'] and names.same(r['n'], rc['n']): r['cls'] = rc['cls']
         rows = [r for r in rows if not (r['k'] == 'decommit' and not r.get('fr') and any(
             x['k'] in ('flip', 'commit') and names.same(x['n'], r['n']) and
             abs((dt.date.fromisoformat(x['d']) - dt.date.fromisoformat(r['d'])).days) <= 4 for x in rows))]
@@ -363,7 +404,7 @@ def _test():
             self.sport, self.rows, self.teams = 'cfb', [], {}
             for t in ('Arkansas', 'Kentucky', 'Iowa State', 'Oklahoma', 'Maryland', 'North Carolina', 'Florida State',
                       'Alabama', 'Miami', 'Notre Dame', 'Texas A&M', 'Ohio State', 'LSU', 'Penn State', 'Tennessee',
-                      'Michigan', 'Michigan State', 'Ole Miss'):
+                      'Michigan', 'Michigan State', 'Ole Miss', 'Kansas', 'SMU'):
                 self.team(t)
             self.add('Cayden Daughtry', 'WR', 2027, 'Arkansas', 3)
             self.add('Kaegan Morton', 'WR', 2027, 'Arkansas', 210)
@@ -392,17 +433,25 @@ def _test():
     ]
     bad = 0
     for t, want in cases:
-        r = parse(t, p)
-        got = None if r is None else (r['n'], r['k'], r['to'], r['fr'])
+        rs = parse(t, p)
+        got = None if not rs else (rs[-1]['n'], rs[-1]['k'], rs[-1]['to'], rs[-1]['fr'])
         if got != want:
             bad += 1
             print(f'FAIL {t!r}\n  want {want}\n  got  {got}')
+    rc = [(r['k'], r.get('cls'), r.get('ocls'), r.get('to')) for t in (
+        "No. 52-ranked 2028 recruit K'Majay Jenkins commits to Kansas, will reclassify to 2027",
+        'SMU WR commit Sukora Cooper Jr. reclassifies from 2029 to 2028',
+        'Michigan kicker commit Ryan Jung reclassifies to 2027; ready to compete for starting role',
+        'Reclassification likely to play a major role in shaping the class of 2028') for r in parse(t, p)]
+    want = [('reclass', 2027, 2028, 'Kansas'), ('commit', 2027, None, 'Kansas'), ('reclass', 2028, 2029, None), ('reclass', 2027, 2028, None)]
+    if rc != want:
+        bad += 1; print('FAIL reclass', rc)
     a = {'n': 'Cayden Daughtry', 'k': 'commit', 'to': 'Arkansas', 'd': '2026-11-17', 'src': {'247': 'x'}}
     b = {'n': 'Cayden Daughtry', 'k': 'commit', 'to': 'Arkansas', 'd': '2026-11-16', 'src': {'on3': 'y'}}
     m = merge([a], [b])
     if len(m) != 1 or set(m[0]['src']) != {'247', 'on3'} or m[0]['d'] != '2026-11-16':
         bad += 1; print('FAIL dedupe', m)
-    print(f'{len(cases) + 1 - bad}/{len(cases) + 1} ok')
+    print(f'{len(cases) + 2 - bad}/{len(cases) + 2} ok')
     sys.exit(1 if bad else 0)
 
 

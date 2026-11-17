@@ -1,4 +1,4 @@
-# Recruit news for the CFB and CBB recruit tabs (data/recruit_news.json): commitments, decommitments, flips, portal
+# Recruit transactions for the CFB and CBB recruit tabs (data/recruit_news.json): commitments, decommitments, flips, portal
 # entries and portal commitments from 247Sports and On3 headlines through Google News search RSS (scripts/recruit_news.py;
 # 247sports.com and on3.com block CI directly). Every 3 hours; the CFB and CBB recruit builds read the file, so a flip
 # or decommitment moves the recruit's school on their next run, and this run re-scores the CFB classes from the

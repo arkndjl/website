@@ -1012,6 +1012,27 @@ def recent_news():
     return last, toward
 
 
+def reclassed(c, raw):
+    """class c's On3 rows after reclassifications in the recruit news (any age): a recruit reported moving from class
+    A to B leaves A's list and joins B's with his On3 row, until On3 lists him in B itself"""
+    try:
+        rc = [n for n in json.load(open(os.path.join(ROOT, 'data', 'recruit_news.json'), encoding='utf-8')).get('cbb') or []
+              if n.get('k') == 'reclass' and n.get('cls') and n.get('ocls')]
+    except (OSError, ValueError):
+        return raw
+    if not rc: return raw
+    have = {N.key(r.get('name') or '') for r in raw}
+    out = [r for r in raw if not any(n['ocls'] == c and N.key(n['n']) == N.key(r.get('name') or '') for n in rc)
+           or any(n['cls'] == c and N.key(n['n']) == N.key(r.get('name') or '') for n in rc)]
+    for n in rc:
+        if n['cls'] != c or N.key(n['n']) in have: continue
+        r = next((r for r in load_on3(n['ocls']) if N.key(r.get('name') or '') == N.key(n['n'])), None)
+        if r:
+            out.append(dict(r, reclass=n['ocls'])); have.add(N.key(n['n']))
+            print(f"  {n['n']}: class {n['ocls']} -> {c} (reclass {n['d']})", file=sys.stderr)
+    return out
+
+
 def news_team(name, cls, tm, signed, news, smap, bt):
     """the board team after commitment changes On3's table hasn't caught up to; a signing stays"""
     last, toward = news
@@ -1113,7 +1134,7 @@ def write():
     out_classes = []
     news = recent_news()
     for c in LIVE:
-        raw = load_on3(c)
+        raw = reclassed(c, load_on3(c))
         lst = []
         for r in raw:
             row = compact(r, c)

@@ -376,6 +376,22 @@ export function applyNews(cl, prog, news = readNews(), today = new Date()) {
   }
   return moved;
 }
+// Reclassifications (recruit news, any age): a recruit reported moving from class A to B leaves A's list and joins B's
+// with his ESPN row, until ESPN lists him in B itself.
+export async function reclassed(y, cl, load, news = readNews()) {
+  const rc = news.filter(n => n.k === 'reclass' && n.cls && n.ocls);
+  if (!rc.length) return cl;
+  const have = new Set(cl.map(c => key(c.name)));
+  const out = cl.filter(c => !rc.some(n => n.ocls === y && key(n.n) === key(c.name)) || rc.some(n => n.cls === y && key(n.n) === key(c.name)));
+  for (const oy of [...new Set(rc.filter(n => n.cls === y && !have.has(key(n.n))).map(n => n.ocls))]) {
+    const from = await load(oy);
+    for (const n of rc.filter(n => n.cls === y && n.ocls === oy && !have.has(key(n.n)))) {
+      const c = from.find(c => key(c.name) === key(n.n));
+      if (c) { out.push({ ...c, year: y, reclass: oy }); have.add(key(c.name)); console.error(`  ${c.name}: class ${oy} -> ${y} (reclass ${n.d})`); }
+    }
+  }
+  return out;
+}
 function readNews() {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'recruit_news.json'), 'utf8')).cfb || []; } catch { return []; }
 }
@@ -459,7 +475,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const whyQueue = [];   // [output row, feature row, redshirt?]: filled once the reference signee is known
   const cfbdCover = {};  // class -> CFBD composite coverage (attachCfbd)
   const prep = async (y, fresh) => {
-    const raw = await espnClass(y, fresh, offline), moved = applyNews(raw, prog);
+    const raw = await reclassed(y, await espnClass(y, fresh, offline), y2 => espnClass(y2, false, offline)), moved = applyNews(raw, prog);
     if (moved) console.error(`class ${y}: ${moved} commitment changes from recruit news`);
     const cl = enrich(raw, prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
     if (comp.length) attach247(cl, comp);
