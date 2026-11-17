@@ -11,7 +11,7 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,standouts,next up,awards,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,season odds,units,team WAR|market:contract value" side="true" label="NFL views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,standouts,next up,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,season odds,units,team WAR,all-time|market:contract value" side="true" label="NFL views" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
 {{< xaav sport="nfl" title="contract value" tab="contract value" >}}
 {{< nflteamwar title="team WAR" tab="team WAR" >}}
@@ -54,6 +54,25 @@ cover = "/og/nfl.png"
 {{< /lazytab >}}
 {{< lazytab tab="special teams" >}}
 {{< stteams sport="nfl" title="special teams" tab="special teams" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
+{{< lazytab tab="all-time teams" >}}
+{{< alltime sport="nfl" list="teams" title="all-time teams" tab="all-time teams" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time offenses" >}}
+{{< alltime sport="nfl" list="offense" title="all-time offenses" tab="all-time offenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time defenses" >}}
+{{< alltime sport="nfl" list="defense" title="all-time defenses" tab="all-time defenses" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="nfl" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="careers" >}}
+{{< alltime sport="nfl" list="career" title="careers" tab="careers" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< /wintabs >}}

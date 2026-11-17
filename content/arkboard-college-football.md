@@ -11,7 +11,7 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
@@ -188,6 +188,17 @@ cover = "/og/college-football.png"
 {{< /lazytab >}}
 {{< lazytab tab="udfa signings" >}}
 {{< cfbudfa src="cfb_mock_pred" title="udfa signings" tab="udfa signings" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
+{{< lazytab tab="all-time teams" >}}
+{{< alltime sport="cfb" list="teams" title="all-time teams" tab="all-time teams" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time offenses" >}}
+{{< alltime sport="cfb" list="offense" title="all-time offenses" tab="all-time offenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time defenses" >}}
+{{< alltime sport="cfb" list="defense" title="all-time defenses" tab="all-time defenses" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< /wintabs >}}

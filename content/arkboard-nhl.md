@@ -11,7 +11,7 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,next up,awards,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches|market:contract value" side="true" label="NHL views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,next up,awards,all-time players,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time|market:contract value" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
@@ -53,7 +53,26 @@ cover = "/og/nhl.png"
 {{< teamunits sport="nhl" view="penalty kill" title="penalty kill" tab="penalty kill" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses,all-time coaches" sub="true" label="all-time views" >}}
+{{< lazytab tab="all-time teams" >}}
+{{< alltime sport="nhl" list="teams" title="all-time teams" tab="all-time teams" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time offenses" >}}
+{{< alltime sport="nhl" list="offense" title="all-time offenses" tab="all-time offenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time defenses" >}}
+{{< alltime sport="nhl" list="defense" title="all-time defenses" tab="all-time defenses" >}}
+{{< /lazytab >}}
 {{< lazytab tab="all-time coaches" >}}
 {{< coachalltime sport="nhl" title="all-time coaches" tab="all-time coaches" >}}
 {{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="nhl" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="careers" >}}
+{{< alltime sport="nhl" list="career" title="careers" tab="careers" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}
