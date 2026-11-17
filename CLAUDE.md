@@ -29,8 +29,11 @@
   written by `scripts/library_build.py` (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it
   rather than hand-editing.
 - Glossary GFX cards: every term window has a GFX card button (`assets/js/gfx.js` buildTerm, link `arkndjl.net/process#g-<term>`).
-  The card's visual (formula, scale, split bar, bars, key number) comes from `data/glossary_gfx.json`, keyed by the term exactly
-  as in `data/library.json`; a term without an entry gets the plain card (name + short definition).
+  `data/glossary_gfx.json` is written by `scripts/glossary_gfx.py` (rerun after a season file or refit): compact cards from
+  `research/glossary_gfx_base.json` (16:9, formula + one picture) and explainer cards (3:4: stands for, what, use, formula,
+  held-out test vs similar metrics, distribution/calibration, top 10 from the site's data) from its EXPLAIN builders. Keys =
+  the term exactly as in `data/library.json`; a term with no entry gets the plain card. Test numbers come from backtest files
+  only, reported as they are even when ours does not win.
 - Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
   source adds the source there (name, link, what the site takes from it).
 
