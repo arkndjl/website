@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T16:33:46Z",
+ "asof": "2026-11-17T17:05:50Z",
  "recenter": {
-  "week": 0.31
+  "week": 0.33
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-17",
-  "ageH": -7.4,
+  "ageH": -6.9,
   "stale": false
  },
  "picks": [],
@@ -333,7 +333,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 4.7,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -549,22 +549,6 @@
    "tm": 40.0
   },
   {
-   "id": "401866466",
-   "sport": "cfb",
-   "kick": "2026-11-18T00:00:00.000Z",
-   "home": "Kent State",
-   "away": "Miami (OH)",
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
-   "price": -114.0,
-   "edge": 1.5,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -10.3,
-   "tm": 46.0
-  },
-  {
    "id": "401858307",
    "sport": "cfb",
    "kick": "2026-11-22T00:30:00.000Z",
@@ -579,6 +563,22 @@
    "why": "edge under 8 (game: non-conference)",
    "m": 20.6,
    "tm": 55.4
+  },
+  {
+   "id": "401869938",
+   "sport": "cfb",
+   "kick": "2026-11-22T00:00:00.000Z",
+   "home": "Louisiana Tech",
+   "away": "Arkansas State",
+   "mk": "total",
+   "side": "over",
+   "line": 53.5,
+   "price": -114.0,
+   "edge": 0.9,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 15.3,
+   "tm": 54.4
   },
   {
    "id": "401856755",
@@ -682,7 +682,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -934,7 +934,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -112.0,
+   "price": -114.0,
    "edge": 3.3,
    "ev": null,
    "units": 0.0,
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -110.0,
+   "price": -119.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -1078,7 +1078,7 @@
    "mk": "spread",
    "side": "home",
    "line": -6.5,
-   "price": -124.0,
+   "price": -122.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -1183,16 +1183,16 @@
    "state": "off"
   },
   "401869938": {
-   "mk": "spread",
-   "side": "home",
-   "line": 13.5,
-   "price": -122.0,
-   "edge": 1.8,
+   "mk": "total",
+   "side": "over",
+   "line": 53.5,
+   "price": -114.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana Tech",
    "away": "Arkansas State",
-   "state": "off"
+   "state": "under"
   },
   "401860919": {
    "mk": "spread",
@@ -1351,22 +1351,22 @@
    "state": "off"
   },
   "401866466": {
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
+   "mk": "spread",
+   "side": "away",
+   "line": -8.5,
    "price": -114.0,
-   "edge": 1.5,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "Kent State",
    "away": "Miami (OH)",
-   "state": "under"
+   "state": "off"
   },
   "401866464": {
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -1389,9 +1389,9 @@
   "401864543": {
    "mk": "spread",
    "side": "home",
-   "line": 25.5,
-   "price": -114.0,
-   "edge": 1.9,
+   "line": 24.5,
+   "price": -112.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "North Dakota State",
@@ -1499,25 +1499,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 22321,
+  "snapshots": 22337,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4560,
+    "clvN": 4563,
     "clvRet": -0.044,
-    "clvT": -33.05,
+    "clvT": -33.08,
     "clv": 0.29,
-    "beat": 0.362,
+    "beat": 0.361,
     "still": 0.325
    },
    {
     "when": "6-24h",
-    "clvN": 566,
-    "clvRet": -0.0646,
-    "clvT": -24.4,
+    "clvN": 567,
+    "clvRet": -0.0647,
+    "clvT": -24.46,
     "clv": -0.07,
     "beat": 0.159,
-    "still": 0.604
+    "still": 0.605
    },
    {
     "when": "1-6h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T16:33:46Z",
+ "checked": "2026-11-17T17:05:50Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
