@@ -62,6 +62,7 @@
         {{- with $t.soundcloud }}<a href="{{ . }}" target="_blank" rel="noopener" title="{{ $t.title }} on SoundCloud" aria-label="{{ $t.title }} on SoundCloud"><svg><use href="#icon-soundcloud"/></svg></a>{{ end }}
         {{- with $t.youtube }}<a href="{{ . }}" target="_blank" rel="noopener" title="{{ $t.title }} on YouTube" aria-label="{{ $t.title }} on YouTube"><svg><use href="#icon-youtube"/></svg></a>{{ end }}
       </span>
+      <span class="player__plays" data-player-plays="{{ path.BaseName $t.src }}" title="plays"><svg aria-hidden="true"><use href="#icon-play"/></svg><span data-player-playsn>-</span></span>
       <span class="winlist__year" data-player-rowdur="{{ $i }}">-:--</span>
     </li>
     {{- end }}
@@ -94,7 +95,7 @@
       bar.setAttribute('aria-valuetext', fmt(t) + ' of ' + fmt(d));
     }
     function load(n, play) {
-      i = (n + rows.length) % rows.length;
+      var prev = i; i = (n + rows.length) % rows.length; if (i !== prev) counted = -1;
       var r = rows[i];
       rows.forEach(function (x) { x.classList.toggle('is-active', x === r); });
       titleEl.textContent = r.getAttribute('data-title'); artistEl.textContent = r.getAttribute('data-artist');
@@ -116,8 +117,8 @@
       setIcon(volIcon, muted || volume === 0 ? 'mute' : 'vol');
     }
     q('[data-player-toggle]').addEventListener('click', function () { if (audio.paused) { wantPlay = true; audio.play().catch(function () {}); } else { audio.pause(); } });
-    q('[data-player-stop]').addEventListener('click', function () { audio.pause(); audio.currentTime = 0; wantPlay = false; paint(); setStatus('stopped'); });
-    q('[data-player-prev]').addEventListener('click', function () { if (audio.currentTime > 3) { audio.currentTime = 0; return; } load(i - 1, !audio.paused || wantPlay); });
+    q('[data-player-stop]').addEventListener('click', function () { audio.pause(); audio.currentTime = 0; wantPlay = false; counted = -1; paint(); setStatus('stopped'); });
+    q('[data-player-prev]').addEventListener('click', function () { if (audio.currentTime > 3) { audio.currentTime = 0; counted = -1; if (!audio.paused) countPlay(); return; } load(i - 1, !audio.paused || wantPlay); });
     q('[data-player-next]').addEventListener('click', function () { load(i + 1, !audio.paused || wantPlay); });
     q('[data-player-mute]').addEventListener('click', function () { muted = !muted; applyVolume(); });
     blocks.forEach(function (b) { b.addEventListener('click', function () { volume = parseInt(b.getAttribute('data-player-volstep'), 10) / 5; muted = false; applyVolume(); }); });
@@ -128,14 +129,32 @@
     bar.addEventListener('pointerup', function () { seeking = false; });
     bar.addEventListener('pointercancel', function () { seeking = false; });
     bar.addEventListener('keydown', function (e) { if (!isFinite(audio.duration)) return; if (e.key === 'ArrowRight') { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); e.preventDefault(); } if (e.key === 'ArrowLeft') { audio.currentTime = Math.max(0, audio.currentTime - 5); e.preventDefault(); } if (e.key === ' ') { e.preventDefault(); q('[data-player-toggle]').click(); } });
-    audio.addEventListener('play', function () { playing(true); });
+    // play counts (worker/site.js): one count per play start; a resume after pause or a seek is not a new play
+    var playsApi = '/api/plays', counted = -1;
+    function slugOf(k) { var el = rows[k].querySelector('[data-player-plays]'); return el ? el.getAttribute('data-player-plays') : ''; }
+    function showPlays(slug, n) {
+      p.querySelectorAll('[data-player-plays="' + slug + '"] [data-player-playsn]').forEach(function (el) { el.textContent = Number(n).toLocaleString('en-US'); });
+    }
+    function countPlay() {
+      if (counted === i) return; counted = i;
+      var slug = slugOf(i); if (!slug) return;
+      fetch(playsApi + '/' + encodeURIComponent(slug), { method: 'POST', keepalive: true })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { if (d && typeof d.plays === 'number') showPlays(slug, d.plays); })
+        .catch(function () {});
+    }
+    fetch(playsApi, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return; rows.forEach(function (r, k) { var s = slugOf(k); if (s) showPlays(s, d[s] || 0); });
+      p.classList.add('has-plays');
+    }).catch(function () {});
+    audio.addEventListener('play', function () { playing(true); countPlay(); });
     audio.addEventListener('pause', function () { playing(false); });
     audio.addEventListener('timeupdate', paint);
     audio.addEventListener('durationchange', paint);
     audio.addEventListener('loadedmetadata', paint);
     audio.addEventListener('waiting', function () { setStatus('buffering'); });
     audio.addEventListener('error', function () { setStatus('could not load'); });
-    audio.addEventListener('ended', function () { if (i < rows.length - 1) { load(i + 1, true); } else { wantPlay = false; audio.currentTime = 0; paint(); setStatus('end of list'); } });
+    audio.addEventListener('ended', function () { if (i < rows.length - 1) { load(i + 1, true); } else { wantPlay = false; counted = -1; audio.currentTime = 0; paint(); setStatus('end of list'); } });
     window.addEventListener('resize', paint);
     // row durations (metadata only)
     rows.forEach(function (r, k) {
