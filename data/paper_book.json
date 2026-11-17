@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-16T01:03:22Z",
+ "asof": "2026-11-17T01:17:43Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 85.9,
   "peak": 117.38,
   "drawdown": 0.2682,
-  "open": 0,
+  "open": 1.0,
   "path": [
    116.7,
    117.38,
@@ -412,10 +412,10 @@
   ]
  },
  "record": {
-  "n": 437,
-  "clvN": 437,
-  "clvRet": -0.0096,
-  "clvT": -1.96,
+  "n": 438,
+  "clvN": 438,
+  "clvRet": -0.0092,
+  "clvT": -1.87,
   "clv": 0.06,
   "beat": 0.328,
   "settled": 437,
@@ -428,23 +428,23 @@
   "risked": 408.25,
   "yield": -0.0297
  },
- "tEff": -1.53,
+ "tEff": -1.42,
  "corr": {
-  "rho": 0.027,
-  "n": 437,
-  "slates": 45,
-  "nEff": 266.0,
-  "avgSlate": 9.71
+  "rho": 0.033,
+  "n": 438,
+  "slates": 46,
+  "nEff": 253.1,
+  "avgSlate": 9.52
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 437,
+   "value": 438,
    "pass": true
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.0% t -1.53",
+   "value": "-0.9% t -1.42",
    "pass": false
   },
   {
@@ -454,7 +454,7 @@
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-total: -1.6%",
+   "value": "without nba-total: -1.5%",
    "pass": false
   },
   {
@@ -701,10 +701,10 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 68,
-   "clvN": 68,
-   "clvRet": -0.0162,
-   "clvT": -1.32,
+   "n": 69,
+   "clvN": 69,
+   "clvRet": -0.0134,
+   "clvT": -1.08,
    "clv": null,
    "beat": null,
    "settled": 68,
@@ -718,7 +718,30 @@
    "yield": 0.4046
   }
  ],
- "open": [],
+ "open": [
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873065-4430968-rc",
+   "k": "2026-11-17T01:15:00Z",
+   "slate": "nflprops:2026-11-16",
+   "h": "BAL",
+   "a": "LAC",
+   "mk": "prop",
+   "side": "under",
+   "line": 1.5,
+   "price": 138.0,
+   "bet": "Kimani Vidal under 1.5 rec +138",
+   "placed": "2026-11-11T18:58:00Z",
+   "stake": 1.0,
+   "edge": 15.2,
+   "ev": 0.265,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.1784,
+   "close": 1.5
+  }
+ ],
  "recent": [
   {
    "rule": "nflprops-prop",
@@ -17614,6 +17637,28 @@
    "res": "w",
    "ret": 1.22,
    "profit": 0.915
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873065-4430968-rc",
+   "k": "2026-11-17T01:15:00Z",
+   "slate": "nflprops:2026-11-16",
+   "h": "BAL",
+   "a": "LAC",
+   "mk": "prop",
+   "side": "under",
+   "line": 1.5,
+   "price": 138.0,
+   "bet": "Kimani Vidal under 1.5 rec +138",
+   "placed": "2026-11-11T18:58:00Z",
+   "stake": 1.0,
+   "edge": 15.2,
+   "ev": 0.265,
+   "event": null,
+   "pass": false,
+   "clvRet": 0.1784,
+   "close": 1.5
   }
  ]
 }
