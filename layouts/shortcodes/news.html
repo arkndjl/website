@@ -1,0 +1,113 @@
+{{- /* /news/: the site's news (data/news.json, scripts/news.py; rules for the weight w in that script). front_page.exe is
+       the newest day's roundup (the day's `top` ids: heaviest first, capped per category); wire.log is every item by
+       day with section chips and a major-only switch. Each day's GFX button draws that day's roundup card
+       (assets/js/gfx.js buildNews, 4:5); /news/#gfx opens the newest one. Icons: layouts/partials/newsicons.html. */ -}}
+{{- $d := site.Data.news | default dict -}}
+{{- $major := $d.major | default 60 -}}
+{{- $items := $d.items | default slice -}}
+{{- $by := dict -}}{{- range $items }}{{ $by = merge $by (dict .id .) }}{{ end -}}
+{{- $secs := slice (slice "stclaire" "ST. CLAIRE") (slice "arkboard" "ARKBOARD") (slice "1nt" "1NT") (slice "laursen" "LAURSEN_111") -}}
+{{- partial "newsicons.html" .Page -}}
+<div class="nws" data-nws data-major="{{ $major }}">
+{{- with index ($d.days | default slice) 0 }}
+{{- $top := slice }}{{ range .top }}{{ with index $by . }}{{ $top = $top | append . }}{{ end }}{{ end -}}
+{{- with $top }}
+<div class="win nws__front">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#nw-log"/></svg>front_page.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="nws__mast">
+    <span class="nws__mdate">{{ lower ((time (index $d.days 0).d).Format "Mon Jan 2 2006") }}</span>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="news" data-gfx-day="{{ (index $d.days 0).d }}" title="the day's roundup card (4:5)">daily GFX</button>
+  </div>
+  <div class="nws__grid">
+    {{- range $i, $it := first 5 . }}
+    <a class="nws__card{{ if not $i }} nws__card--lead{{ end }}" href="{{ .href }}" data-cat="{{ .cat }}">
+      <span class="nws__chead"><svg class="nws__ic" aria-hidden="true"><use href="#nw-{{ .cat }}"/></svg><span class="nws__tag">{{ .tag }}</span><span class="nws__cat">{{ .cat }}</span>{{ partial "newspips.html" .w }}</span>
+      <span class="nws__cbody">
+        {{- if or .logo .logo2 }}<span class="nws__logos">{{ with .logo }}<img src="{{ . }}" alt="" loading="lazy">{{ end }}{{ with .logo2 }}<img src="{{ . }}" alt="" loading="lazy">{{ end }}</span>{{ end -}}
+        <span class="nws__t">{{ .t }}</span>
+      </span>
+      {{- with .s }}<span class="nws__s">{{ . }}</span>{{ end }}
+    </a>
+    {{- end }}
+  </div>
+  <div class="win__status"><span>{{ (index $d.days 0).n }} items · {{ (index $d.days 0).major }} major</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}
+{{- end }}
+<div class="win nws__wire">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-rss"/></svg>wire.log<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="nws__bar" role="toolbar" aria-label="filter">
+    <button type="button" class="nws__chip" data-nws-sec="" aria-pressed="true">all</button>
+    {{- range $secs }}{{ if where $items "sec" (index . 0) }}
+    <button type="button" class="nws__chip" data-nws-sec="{{ index . 0 }}" aria-pressed="false">{{ index . 1 }}</button>
+    {{- end }}{{ end }}
+    <button type="button" class="nws__chip nws__chip--major" data-nws-major aria-pressed="false" title="weight {{ $major }}+">major</button>
+  </div>
+  {{- range $d.days }}
+  {{- $day := .d }}
+  <section class="nws__day" data-day="{{ .d }}">
+    <header class="nws__dh">
+      <span class="nws__date">{{ lower ((time .d).Format "Mon Jan 2") }}</span>
+      <span class="nws__cnt" data-nws-cnt>{{ .n }}</span>
+      {{- if .top }}<button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="news" data-gfx-day="{{ .d }}" title="the day's roundup card (4:5)">GFX</button>{{ end }}
+    </header>
+    <ol class="nws__list">
+      {{- range where $items "d" $day }}
+      <li class="nws__it{{ if ge .w $major }} nws__it--major{{ end }}" data-sec="{{ .sec }}" data-w="{{ .w }}">
+        <a href="{{ .href }}">
+          <svg class="nws__ic" aria-hidden="true"><use href="#nw-{{ .cat }}"/></svg>
+          <span class="nws__tag">{{ .tag }}</span>
+          <span class="nws__main">
+            {{- with .logo }}<img class="nws__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            <span class="nws__t">{{ .t }}</span>
+            {{- with .logo2 }}<img class="nws__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          </span>
+          <span class="nws__s">{{ .s }}</span>
+          {{- partial "newspips.html" .w }}
+        </a>
+      </li>
+      {{- end }}
+    </ol>
+  </section>
+  {{- end }}
+  <div class="win__status"><span data-nws-status>{{ len $items }} items · {{ len ($d.days | default slice) }} days</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+</div>
+<script type="application/json" id="nws-data">{{ dict "days" ($d.days | default slice) "items" $items "icons" site.Data.news_icons | jsonify | safeJS }}</script>
+<script>
+(function () {
+  var root = document.querySelector('[data-nws]'); if (!root) return;
+  var sec = '', major = false, total = root.querySelectorAll('.nws__it').length, MJ = +root.getAttribute('data-major');
+  function apply() {
+    var shown = 0;
+    root.querySelectorAll('.nws__day').forEach(function (day) {
+      var n = 0;
+      day.querySelectorAll('.nws__it').forEach(function (li) {
+        var ok = (!sec || li.getAttribute('data-sec') === sec) && (!major || +li.getAttribute('data-w') >= MJ);
+        li.hidden = !ok; if (ok) n++;
+      });
+      day.hidden = !n; shown += n;
+      var c = day.querySelector('[data-nws-cnt]'); if (c) c.textContent = n;
+    });
+    var st = root.querySelector('[data-nws-status]'); if (st) st.textContent = shown + (shown === total ? '' : ' of ' + total) + ' items';
+  }
+  root.querySelectorAll('[data-nws-sec]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      sec = b.getAttribute('data-nws-sec');
+      root.querySelectorAll('[data-nws-sec]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      apply();
+    });
+  });
+  var mj = root.querySelector('[data-nws-major]');
+  if (mj) mj.addEventListener('click', function () { major = !major; mj.setAttribute('aria-pressed', major ? 'true' : 'false'); apply(); });
+  // /news/#gfx: the newest day's card
+  if (location.hash === '#gfx') window.addEventListener('load', function () { var b = root.querySelector('[data-gfx-mode="news"]'); if (b) setTimeout(function () { b.click(); }, 300); });
+})();
+</script>
+{{ partial "gfx.html" . }}

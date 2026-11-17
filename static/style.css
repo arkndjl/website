@@ -4899,3 +4899,99 @@ code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
   .srch__out { grid-template-columns: 1fr; gap: 12px; }
   .srch__rows { margin: 6px 6px 0; }
 }
+
+/* ------------------------------------------------------------------
+   News (scripts/news.py -> data/news.json). The header strip's news cells
+   (layouts/partials/ticker.html) and the /news/ page (layouts/shortcodes/news.html).
+   Category icons are 11x11 pixel bitmaps (layouts/partials/newsicons.html).
+   ------------------------------------------------------------------ */
+a.tick__tag--news { margin-left: 8px; background: #7fffd4; color: var(--win-dark); text-decoration: none; }
+.tick__run > a.tick__tag--news:first-child { margin-left: 0; }
+a.tick__tag--news:hover, a.tick__tag--news:focus-visible { background: #fff; color: var(--win-dark); outline: none; }
+.tick__ic { flex: none; width: 11px; height: 11px; fill: #7fffd4; image-rendering: pixelated; }
+a.tick__g--nw:hover .tick__ic { fill: #fff; }
+.tick__g--nw .tick__me { color: #7fffd4; }
+a.tick__g--nw:hover .tick__me { color: #fff; }
+.tick__g--nw .tick__opp { color: var(--foreground); }
+
+.nws { display: grid; gap: 16px; }
+.nws .win { margin: 0; }
+.nws__ic { flex: none; width: 22px; height: 22px; fill: #7fffd4; }
+.nws__tag { flex: none; padding: 0 6px; background: var(--win-dark); color: #7fffd4; letter-spacing: 0.08em; white-space: nowrap; box-shadow: 2px 2px 0 #000; }
+.nws__w { display: inline-flex; flex: none; gap: 2px; }
+.nws__w i { width: 6px; height: 12px; background: var(--win-dark); }
+.nws__w i.on { background: var(--accent); }
+.nws__w[data-n="4"] i.on, .nws__w[data-n="5"] i.on { background: #7fffd4; }
+.nws__logo, .nws__logos img { width: 20px; height: 20px; object-fit: contain; border: 0; margin: 0; padding: 0; flex: none; }
+
+/* front page: the lead across two rows, four more beside it */
+.nws__mast { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px 0; }
+.nws__mdate { color: var(--accent); text-transform: uppercase; letter-spacing: 0.125em; }
+.nws__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; padding: 8px 10px 10px; }
+.nws__card {
+  display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 8px 10px;
+  border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  background: var(--win-well); color: var(--foreground); text-decoration: none;
+}
+.nws__card:hover, .nws__card:focus-visible { background: var(--win-title); color: #fff; outline: none; }
+.nws__card--lead { grid-row: span 2; justify-content: space-between; padding: 12px 14px;
+  background: var(--win-well) repeating-linear-gradient(0deg, transparent 0 3px, rgba(200, 199, 255, 0.05) 3px 4px); }
+.nws__card--lead:hover { background: var(--win-title); }
+.nws__chead { display: flex; align-items: center; gap: 8px; }
+.nws__cat { color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.875em; margin-right: auto; }
+.nws__cbody { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.nws__logos { display: flex; flex: none; gap: 4px; }
+.nws__card .nws__t { color: #fff; overflow-wrap: anywhere; }
+.nws__card .nws__s { color: var(--accent); font-size: 0.875em; }
+.nws__card--lead .nws__ic { width: 33px; height: 33px; }
+.nws__card--lead .nws__t { font-size: 1.75em; line-height: 1.15; }
+.nws__card--lead .nws__logos img { width: 48px; height: 48px; }
+.nws__card--lead .nws__s { font-size: 1em; }
+
+/* wire: one row per item, a day header with the day's GFX */
+.nws__bar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border-bottom: 2px solid var(--win-dark); }
+.nws__chip {
+  padding: 1px 8px; border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  background: var(--win-face); color: var(--foreground); font: inherit; letter-spacing: 0.05em; cursor: pointer;
+}
+.nws__chip[aria-pressed="true"] { border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); background: var(--win-dark); color: #7fffd4; }
+.nws__chip--major { margin-left: auto; }
+.nws__day[hidden], .nws__it[hidden] { display: none; }
+.nws__dh { display: flex; align-items: center; gap: 10px; padding: 4px 10px; background: var(--win-title); color: #fff; position: sticky; top: 0; z-index: 2; }
+.nws__date { text-transform: uppercase; letter-spacing: 0.125em; }
+.nws__cnt { padding: 0 6px; background: var(--win-dark); color: var(--accent); margin-right: auto; }
+.nws__dh .cfb__btn { margin: 0; }
+.nws__list { list-style: none; margin: 0; padding: 0; background: var(--win-well); }
+.nws__list li { margin: 0; padding: 0; }
+.nws__list li::before, .nws__list li::marker { content: none; display: none; }
+.nws__it a {
+  display: grid; grid-template-columns: 22px 13ch minmax(0, 1.5fr) minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  padding: 4px 10px; border-bottom: 1px solid var(--win-dark); color: var(--foreground); text-decoration: none;
+}
+.nws__it a:hover, .nws__it a:focus-visible { background: var(--win-title); color: #fff; outline: none; }
+.nws__it .nws__tag { justify-self: start; }
+.nws__main { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.nws__it .nws__t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nws__it .nws__s { color: var(--accent); font-size: 0.875em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nws__it:not(.nws__it--major) .nws__ic { fill: var(--accent); opacity: 0.7; }
+.nws__it:not(.nws__it--major) .nws__tag { color: var(--accent); }
+.nws__it--major .nws__t { color: #fff; }
+.nws__it:not(.nws__it--major) .nws__t { color: var(--accent); }
+.nws__it a:hover .nws__t, .nws__it a:hover .nws__s { color: #fff; }
+@media (max-width: 900px) {
+  .nws__grid { grid-template-columns: 1fr 1fr; }
+  .nws__card--lead { grid-column: 1 / -1; grid-row: auto; }
+}
+@media (max-width: 684px) {
+  .nws__grid { grid-template-columns: 1fr; padding: 8px; }
+  .nws__card--lead .nws__t { font-size: 1.375em; }
+  .nws__card--lead .nws__logos img { width: 32px; height: 32px; }
+  .nws__it a { grid-template-columns: 22px minmax(0, 1fr) auto; grid-template-areas: "ic main w" "ic sub tag"; gap: 2px 8px; padding: 5px 8px; }
+  .nws__it .nws__ic { grid-area: ic; }
+  .nws__it .nws__main { grid-area: main; }
+  .nws__it .nws__t { white-space: normal; }
+  .nws__it .nws__s { grid-area: sub; }
+  .nws__it .nws__tag { grid-area: tag; justify-self: end; box-shadow: none; font-size: 0.875em; }
+  .nws__it .nws__w { grid-area: w; }
+  .nws__chip--major { margin-left: 0; }
+}

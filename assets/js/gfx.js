@@ -3358,12 +3358,97 @@
     return F.canvas;
   }
 
+
+  // ---- daily news roundup (/news/, layouts/shortcodes/news.html): one ET day's heaviest items (the day's `top` ids from
+  // scripts/news.py: by weight, capped per category), the lead as a hero tile, the rest as rows; category icons are the
+  // 11x11 bitmaps of data/news_icons.json, the weight five pips ----
+  function nwIcon(g, rows, x, y, u, col) {
+    if (!rows) return; g.fillStyle = col;
+    rows.forEach(function (r, j) { for (var i = 0; i < r.length; i++) if (r[i] === '#') g.fillRect(x + i * u, y + j * u, u, u); });
+  }
+  function nwPips(g, w, right, cy, u) {
+    var n = w >= 86 ? 5 : w >= 72 ? 4 : w >= 60 ? 3 : w >= 48 ? 2 : 1, pw = 2 * u, gap = Math.round(u * 0.75), x = right - 5 * pw - 4 * gap;
+    for (var i = 0; i < 5; i++) { g.fillStyle = i < n ? (n >= 4 ? C.teal : C.lilac) : C.dark; g.fillRect(x + i * (pw + gap), cy - 2 * u, pw, 4 * u); }
+    return 5 * pw + 4 * gap;
+  }
+  function nwTag(g, t, x, cy, sz) {
+    g.font = sz + 'px ' + FONT; var w = g.measureText(t).width + sz, h = Math.round(sz * 1.5);
+    g.fillStyle = '#000'; g.fillRect(x + 4, cy - h / 2 + 4, w, h);
+    g.fillStyle = C.dark; g.fillRect(x, cy - h / 2, w, h);
+    g.fillStyle = C.teal; g.fillText(t, x + sz / 2, cy + 1);
+    return w;
+  }
+  async function buildNews(win, btn) {
+    var D; try { D = JSON.parse(document.getElementById('nws-data').textContent); } catch (e) { return null; }
+    var day = btn.getAttribute('data-gfx-day'), dy = (D.days || []).filter(function (x) { return x.d === day; })[0]; if (!dy) return null;
+    var by = {}; D.items.forEach(function (i) { by[i.id] = i; });
+    var top = (dy.top || []).map(function (id) { return by[id]; }).filter(Boolean); if (!top.length) return null;
+    var dTxt = new Date(day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    var F = await frame(2160, 2700, 'NEWS :: ' + dTxt, '', 'arkndjl.net/news');
+    var g = F.g, IC = D.icons || {};
+    var imgs = await Promise.all(top.map(function (it) { return Promise.all([it.logo ? loadImg(it.logo) : null, it.logo2 ? loadImg(it.logo2) : null]); }));
+    // counts strip: the day by section
+    var SEC = [['stclaire', 'ST. CLAIRE'], ['arkboard', 'ARKBOARD'], ['1nt', '1NT'], ['laursen', 'LAURSEN_111']], dayItems = D.items.filter(function (i) { return i.d === day; });
+    var sh = 112, sy = F.y + F.h - sh, sw = (F.w - 3 * 16) / 4;
+    SEC.forEach(function (s, k) {
+      var n = dayItems.filter(function (i) { return i.sec === s[0]; }).length, x = F.x + k * (sw + 16);
+      well(g, x, sy, sw, sh);
+      g.font = '64px ' + FONT; g.fillStyle = n ? C.teal : C.lilac; g.globalAlpha = n ? 1 : 0.45; g.fillText(String(n), x + 24, sy + sh / 2 + 2);
+      var nw = g.measureText(String(n)).width;
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(s[1], x + 24 + nw + 20, sy + sh / 2 + 2); g.globalAlpha = 1;
+    });
+    var bodyH = F.h - sh - 20;
+    // the lead: a hero tile
+    var L = top[0], rest = top.slice(1), gap = 12, HMIN = 560;
+    var rh = rest.length ? Math.min(236, Math.floor((bodyH - HMIN - 20 - gap * (rest.length - 1)) / rest.length)) : 0;
+    var hh = rest.length ? Math.min(960, bodyH - 20 - rest.length * rh - gap * (rest.length - 1)) : Math.min(bodyH, 1200);
+    well(g, F.x, F.y, F.w, hh);
+    g.fillStyle = 'rgba(200,199,255,0.05)'; for (var ly = F.y + 8; ly < F.y + hh - 4; ly += 8) g.fillRect(F.x + 4, ly, F.w - 8, 2);
+    var iu = 12, ix = F.x + 40, iy = F.y + 40;
+    g.fillStyle = C.dark; g.fillRect(ix - 16, iy - 16, 11 * iu + 32, 11 * iu + 32); bevel(g, ix - 16, iy - 16, 11 * iu + 32, 11 * iu + 32, true, 3);
+    nwIcon(g, IC[L.cat], ix, iy, iu, C.teal);
+    var hx = ix + 11 * iu + 48, tagW = nwTag(g, L.tag, hx, F.y + 76, 48);
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(L.cat).toUpperCase(), hx + tagW + 28, F.y + 78);
+    nwPips(g, L.w, F.x + F.w - 40, F.y + 76, 12);
+    var lg = imgs[0].filter(Boolean), lgS = 176, lgW = lg.length ? lg.length * (lgS + 20) + 20 : 0;
+    lg.forEach(function (im, k) { drawLogo(g, im, F.x + F.w - 40 - lgW + 20 + k * (lgS + 20), F.y + hh - 40 - lgS - (L.s ? 0 : 0), lgS, lgS); });
+    var tx = F.x + 40, tw = F.w - 80 - lgW, lines, sz = 112;
+    for (;;) { g.font = sz + 'px ' + FONT; lines = wrap(g, L.t, tw); if (lines.length <= 2 || sz <= 64) break; sz -= 16; }
+    lines = lines.slice(0, 2); if (lines.length === 2) lines[1] = fit(g, lines[1], tw);
+    var subH = L.s ? 72 : 0, blockH = lines.length * sz * 1.12 + subH, by0 = F.y + 40 + 11 * iu + 32, ty = by0 + Math.max(0, (F.y + hh - 28 - by0 - blockH) / 2) + sz * 0.56;
+    g.fillStyle = C.white; lines.forEach(function (ln, k) { g.fillText(ln, tx, ty + k * sz * 1.12); });
+    if (L.s) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, L.s, tw), tx, ty + (lines.length - 1) * sz * 1.12 + sz * 0.56 + 44); }
+    // the rest: one row each
+    if (rest.length) {
+      var ry0 = F.y + hh + 20;
+      var big = rh >= 170, ts = big ? 56 : 48, ss = big ? 40 : 32, u = big ? 8 : 6;
+      rest.forEach(function (it, k) {
+        var y = ry0 + k * (rh + gap), cy = y + rh / 2;
+        g.fillStyle = C.face; g.fillRect(F.x, y, F.w, rh); bevel(g, F.x, y, F.w, rh, true, 3);
+        var bx = F.x + 20, bs = 11 * u + 2 * u * 2;
+        g.fillStyle = C.well; g.fillRect(bx, cy - bs / 2, bs, bs); bevel(g, bx, cy - bs / 2, bs, bs, false, 3);
+        nwIcon(g, IC[it.cat], bx + 2 * u, cy - 5.5 * u, u, it.w >= 60 ? C.teal : C.lilac);
+        var x = bx + bs + 28, right = F.x + F.w - 28;
+        right -= nwPips(g, it.w, right, cy, big ? 9 : 8) + 28;
+        var ls = imgs[k + 1].filter(Boolean), S = Math.min(rh - 48, 128);
+        ls.slice().reverse().forEach(function (im) { right -= S; drawLogo(g, im, right, cy - S / 2, S, S); right -= 16; });
+        var l1 = cy - (it.s ? ss * 0.7 : 0), l2 = cy + ts * 0.62;
+        var tgw = nwTag(g, it.tag, x, l1, big ? 36 : 32);
+        var tmax = right - x - tgw - 28 - 12; g.font = ts + 'px ' + FONT; if (g.measureText(it.t).width > tmax) g.font = (ts - 8) + 'px ' + FONT;
+        g.fillStyle = C.white; g.fillText(fit(g, it.t, tmax), x + tgw + 28, l1 + 2);
+        if (it.s) { g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, it.s, right - x - 12), x, l2); }
+      });
+    }
+    return F.canvas;
+  }
+
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
     var win = btn.closest('.win'); if (!win) return;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
+      if (mode === 'news') { var nc = await buildNews(win, btn); if (nc) preview(nc, 'arkndjl-news-' + btn.getAttribute('data-gfx-day')); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);

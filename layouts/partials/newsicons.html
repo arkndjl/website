@@ -1,0 +1,9 @@
+{{- /* Pixel icons for the news feed, one 11x11 bitmap per category (data/news_icons.json; the daily GFX in
+       assets/js/gfx.js draws the same bitmaps). Printed once per page as an SVG sprite: <use href="#nw-<cat>">. */ -}}
+{{- if not (page.Store.Get "nwicons") }}{{ page.Store.Set "nwicons" true -}}
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+{{- range $k, $rows := site.Data.news_icons }}<symbol id="nw-{{ $k }}" viewBox="0 0 11 11" shape-rendering="crispEdges">
+{{- range $y, $r := $rows }}{{ range $x, $c := split $r "" }}{{ if eq $c "#" }}<rect x="{{ $x }}" y="{{ $y }}" width="1" height="1"/>{{ end }}{{ end }}{{ end -}}
+</symbol>{{ end -}}
+</svg>
+{{- end -}}
