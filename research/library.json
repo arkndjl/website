@@ -915,14 +915,14 @@
     },
     {
      "term": "Next up (breakout odds)",
-     "short": "P(breakout next season): value jump over his established level, with a real role.",
+     "short": "P(first season at a quality bar next season), for players who have never reached it.",
      "body": [
-      "Established level = best of this season shrunk to replacement and a 3-season Marcel; bounce-backs are not breakouts.",
-      "NBA: BPM +2 with 1,000+ MP. CBB: BPM +3 with 40% min. NHL: WAR/1,000 min +1.0. Soccer: GAR/90 +.06 with 1,500 min.",
-      "NFL: 8+ games at a fantasy starter line, never before. CFB: PFN score z +.75 as a regular.",
+      "Bar = shrunk value near the 75-80th percentile of regulars; anyone already over it (career, this season included) is out.",
+      "NBA: BPM +1.0, 1,000+ MP. CBB: BPM +2.8, 40%+ min. NHL: WAR/1,000 min 1.19. Soccer: GAR/90 .090. NFL: PPR/G 12 (TE 9). CFB: PFN z .32.",
       "Logistic on shrunk value + signals; each added alone, leave-one-season-out, t >= 2 and most seasons won, then Holm.",
-      "Pass everywhere tested: age or class curve. Most sports: low-volume efficiency, projection gap, pedigree (draft/recruit).",
-      "Vacated role (teammates leaving) failed in all six sports. Final t: NBA 11.4, CBB 15.7, NHL 8.8, soccer 9.3, CFB 7.9, NFL 2.7."
+      "Pass: age or class curve everywhere; most sports: low-volume efficiency, projection gap. CBB adds team context (t 3.8).",
+      "Fail: vacated role (all six), coaching change, opportunity ahead, improvement trend, splines, Platt, boosted trees (never beat logistic).",
+      "Held-out t: NBA 7.9, CBB 14.4, NHL 5.6, soccer 6.2, CFB 6.0, NFL 3.3."
      ],
      "where": "next up tab on every sport page",
      "sports": [

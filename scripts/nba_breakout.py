@@ -20,6 +20,7 @@ FIT = os.path.join(ROOT, 'data', 'nba_breakout_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'next-up', 'nba.json')
 HTWT = os.path.join(ROOT, 'scripts', 'nba_htwt.json')
 HIST = os.path.join(ROOT, 'scripts', 'data', 'nba_breakout_hist.json')
+BEST = os.path.join(ROOT, 'scripts', 'data', 'nba_career_best.json')   # best shrunk BPM per bbref id through 2025-26 (LAKER history)
 
 TARGETS = ('ts_plus', 'tov_pct')
 MEAN = {'ts_plus': 100.0, 'tov_pct': 13.0}
@@ -115,10 +116,59 @@ def marcel(hist, y):
     return (num + BPM_REP * 1000) / (den + 1000)
 
 
-def bo_feats(a, s0, vac, mar):
+BAR = 1.0                    # quality bar: shrunk BPM, about the 80th percentile of 1,000+ MP seasons
+BO_CANDS2 = ('draft curve', 'coaching change', 'opportunity ahead', 'improvement trend')
+BO_LABEL.update({'draft curve': ['pick', 'pick', 'pick'], 'coaching change': ['new coach'],
+                 'opportunity ahead': ['room ahead', 'old room'], 'improvement trend': ['rising', 'rising']})
+TM = {'BRK': 'BKN', 'PHO': 'PHX', 'CHO': 'CHA', 'NJN': 'BKN', 'NOH': 'NOP', 'NOK': 'NOP', 'GS': 'GSW', 'NY': 'NYK',
+      'SA': 'SAS', 'NO': 'NOP', 'UTAH': 'UTA', 'WSH': 'WAS'}
+KN_S, KN_A, KN_M = (-4.0, -2.6, -1.4, 0.0), (20.0, 23.0, 26.0, 30.0), (6.2, 7.0, 7.5, 7.9)
+
+
+def group(o):
+    if o.get('pg_pct', 0) + o.get('sg_pct', 0) >= 50:
+        return 'G'
+    return 'C' if o.get('c_pct', 0) >= 50 else 'F'
+
+
+_IDX = {}
+
+
+def career_best(P, pid, y):
+    """best shrunk BPM of any season through y"""
+    ix = _IDX.get(id(P))
+    if ix is None:
+        ix = _IDX[id(P)] = {}
+        for (q, s), o in P.items():
+            ix.setdefault(q, []).append(o)
+    return max([shr(o['bpm'], o['mp']) for o in ix.get(pid, []) if o['y'] <= y] or [-9.0])
+
+
+def prev_shr(P, pid, y):
+    o = P.get((pid, y - 1))
+    return shr(o['bpm'], o['mp']) if o else None
+
+
+def spline(x, k):
+    """restricted cubic spline terms (k - 2 columns), Harrell's form"""
+    import numpy as np
+    k = list(k)
+    t = lambda v: np.maximum(v, 0) ** 3  # noqa: E731
+    d = (k[-1] - k[0]) ** 2
+    cols = []
+    for j in range(len(k) - 2):
+        cols.append((t(x - k[j]) - t(x - k[-2]) * (k[-1] - k[j]) / (k[-1] - k[-2])
+                     + t(x - k[-1]) * (k[-2] - k[j]) / (k[-1] - k[-2])) / d)
+    return np.column_stack(cols)
+
+
+def bo_feats(a, s0, vac, mar, prev=None, draft=None, coach=None, opp=(0.0, 0.0)):
     age, usg, ts, mp = a['age'], a['usage_pct'], a['ts_plus'], a['mp']
     lowu = max(0.0, 22 - usg) / 10
     lm = math.log(mp)
+    lp = math.log(draft[1]) if draft else math.log(61)
+    yrs = a['y'] - draft[0] if draft else max(0.0, age - 20)
+    tr = s0 - prev if prev is not None else 0.0
     return {'base': [s0, lm],
             'age curve': [age, age * age, age * s0],
             'low-volume efficiency': [(ts - 100) * lowu, usg],
@@ -126,7 +176,11 @@ def bo_feats(a, s0, vac, mar):
             'shooting luck': [(a['fg3_plus'] - 100) * a['threepar_plus'] / 100, a['ft_plus'] - 100],
             'projection gap': [mar - s0],
             'minutes room': [lm * s0, (mp < 1500) * a['obpm']],
-            'usage scaling': [a['ftr_plus'] * lowu, a['ast_pct'] * lowu]}
+            'usage scaling': [a['ftr_plus'] * lowu, a['ast_pct'] * lowu],
+            'draft curve': [lp, lp * (age - 22), yrs],
+            'coaching change': [coach or 0.0],
+            'opportunity ahead': list(opp),
+            'improvement trend': [tr, tr * (age - 24)]}
 
 
 # ---------- live build ----------
@@ -235,7 +289,8 @@ def main():
     gh = json.load(gzip.open(os.path.join(ROOT, 'scripts', 'nba_games_hist.json.gz')))['games']
     poss = [g['poss'] for g in gh if g.get('S') == cur - 1 and g.get('poss')]
     pace = sum(poss) / len(poss) if poss else 99.0
-    keep = fit['breakout']['keep']
+    keep = fit['breakout']['keep'] + fit['breakout'].get('keep2', [])
+    CB = json.load(open(BEST))
     tiers = [20.0, 25.0, 30.0]
     rows = []
     for pid, now in cur_rows.items():
@@ -253,7 +308,11 @@ def main():
         if a['y'] == cur and not any(o['y'] == cur for o in hist):
             hist.append(a)
         s0 = shr(a['bpm'], mp_real)
-        bf = bo_feats(a, s0, 0.0, marcel(hist, a['y']))
+        best = max([CB.get(pid, -9.0)] + [shr(o['bpm'], o['mp']) for o in hist] + [shr(now['bpm'], now['mp'])])
+        if best >= BAR:
+            continue                                           # already at the bar: a standout, not next up
+        prv = P.get((pid, a['y'] - 1))
+        bf = bo_feats(a, s0, 0.0, marcel(hist, a['y']), prev=shr(prv['bpm'], prv['mp']) if prv else None)
         xv = bf['base'] + sum([bf[k] for k in keep], [])
         p = sig_x(fit, xv)
         f = fit['breakout']['fit']
@@ -273,7 +332,7 @@ def main():
             p100 = 2 * ts / 100 * (1 - tov / 100) * U / 100 * K
             t.append([round(p100 * pace / 100 * 36 / 48, 1), round(ts / 100 * lgts * 100, 1), 1 if dU > 9 else 0])
         rows.append({'id': pid, 'n': now['n'], 'tm': X.TEAM.get(now['tm'], now['tm']), 'pos': now['pos'],
-                     'age': now['age'], 'ph': None, 'p': round(p, 3),
+                     'age': now['age'], 'ph': None, 'p': round(p, 3), 'best': round(best, 1),
                      'u': round(now['usage_pct'] if now['mp'] >= 60 else a['usage_pct'], 1), 't': t, 'sig': sig})
     # headshots from the XPM board file (ESPN ids)
     try:
@@ -290,12 +349,14 @@ def main():
            'base': lab(bs), 'u': {'lab': 'USG', 'dec': 1},
            'tiers': [{'k': u, 'lab': 'USG %d' % u} for u in tiers],
            'stat': {'lab': 'PTS/36', 'eff': 'TS%', 'dec': 1, 'edec': 1},
-           'about': ('breakout: next season BPM 2+ over his established level (higher of BPM shrunk to -2, k 600, and 3-season Marcel) with 1000+ MP; '
-                     f'base {lab(bs)}; odds = logistic on shrunk BPM, ln MP + {", ".join(keep)} '
-                     f'(each passes leave-one-season-out 1990-2026, final t {B["final"]["t"]}, {B["final"]["won"]}/{B["final"]["seasons"]} seasons). '
+           'about': (f'players not yet at the bar (best shrunk BPM so far under +{BAR:g}, BPM shrunk to -2 by MP, k 600, about the '
+                     f'80th percentile of 1,000+ MP seasons; this season to date counts); breakout = next season 1,000+ MP at +{BAR:g} '
+                     f'or better for the first time; base {lab(bs)}; odds = logistic on shrunk BPM, ln MP + {", ".join(keep)} '
+                     f'(leave-one-season-out 1990-2026, Holm; final t {B["final"]["t"]}, {B["final"]["won"]}/{B["final"]["seasons"]} seasons; '
+                     'draft curve, coaching change, opportunity ahead, trend, splines, boosted trees, Platt tested and failed). '
                      'tiers: next-season TS+ and TOV% at that usage from players whose usage changed, shot profile '
                      '(2P%+, FT%+, FTr, 3PAr) sets how fast efficiency falls; PTS/36 = 2 x TS x (1 - TOV%) x USG x plays; '
-                     'dim = a usage jump beyond 9 points (1 in 600 player-seasons)'),
+                     'usage jumps past 9 points are beyond the data'),
            'rows': rows[:400]}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))

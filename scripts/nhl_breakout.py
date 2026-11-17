@@ -105,7 +105,7 @@ def season(S, fresh=False):
              'pdo': r.get('skaterShootingPlusSavePct5v5') or 1.0,
              'hits60': (r.get('hits') or 0) / tmin * 60, 'ht': float(ht), 'bmi': 703.0 * wt / ht ** 2, 'age': age,
              'pick': r.get('draftOverall') or 0, 'tm': w.get('tm'), 'war': w.get('war'), 'hpm': w.get('hpm'),
-             'ph': w.get('ph')}
+             'ph': w.get('ph'), 'go': w.get('go') or 0.0, 'gd': w.get('gd') or 0.0}
         P[pid] = o
     return P
 
@@ -202,10 +202,15 @@ def tier(fit, a, hist, k):
 
 
 # ---------- breakout odds ----------
-K_SHR, J_WAR, ROLE_MIN, ROW_MIN = 600.0, 1.0, 900.0, 200.0
+K_SHR, ROLE_MIN, ROW_MIN = 600.0, 900.0, 200.0
 BO_CANDS = ('age curve', 'low-TOI efficiency', 'vacated TOI', 'shooting luck', 'projection gap', 'TOI room',
             'TOI scaling', 'draft capital', 'site HPM', 'shot share', 'production')
-BO_LABEL = {'age curve': 'age', 'low-TOI efficiency': 'low-TOI eff', 'vacated TOI': 'open TOI', 'shooting luck': 'shot luck',
+BO_NEW = ('development curve', 'depth opportunity', 'departures ahead', 'coaching change', 'within-season trend',
+          'experience', 'offence / defence split')
+BO_LABEL = {'development curve': 'dev curve', 'depth opportunity': 'depth', 'departures ahead': 'open spot',
+            'coaching change': 'new coach', 'within-season trend': 'trend', 'experience': 'experience',
+            'offence / defence split': 'off/def',
+            'age curve': 'age', 'low-TOI efficiency': 'low-TOI eff', 'vacated TOI': 'open TOI', 'shooting luck': 'shot luck',
             'projection gap': 'proj gap', 'TOI room': 'TOI room', 'TOI scaling': 'scales', 'draft capital': 'pedigree',
             'site HPM': 'HPM', 'shot share': 'shot share', 'production': 'points'}
 
@@ -221,8 +226,24 @@ def shr(o):
 
 
 def best(a, hist):
-    """the bar to clear: the best shrunk WAR rate of this season and the ones before it (6 back)"""
+    """his best shrunk WAR rate of this season and the ones before it (6 back)"""
     return max([shr(a)] + [shr(o) for o in hist if o['y'] < a['y'] and o['war'] is not None])
+
+
+def career(first=2009, last=None):
+    """{pid: {season: shrunk WAR rate}} over every season file of the site's WAR (skaters)"""
+    C = {}
+    for S in range(first, (last or D.current_season()) + 1):
+        for p in (war_file(S) or {}).get('players', []):
+            if p.get('grp') != 'G' and p.get('war') is not None and p.get('toi'):
+                C.setdefault(str(p['id']), {})[S] = p['war'] / (p['toi'] + K_SHR) * 1000
+    return C
+
+
+def peak(C, pid, y):
+    """best shrunk WAR rate of any season through y (None: no season)"""
+    v = [r for S, r in C.get(pid, {}).items() if S <= y]
+    return max(v) if v else None
 
 
 def marcel(hist, y):
@@ -264,8 +285,102 @@ def vacated(Pa, Pb):
     return V
 
 
-def bo_feats(a, hist, vac):
-    """vac: (position-group share, power-play share) or None when next season's rosters are not known"""
+def depth(Pa):
+    """{pid: [share of his club's position group ahead of him by TOI a game, minutes-weighted mean age of those ahead
+    - 28, share of the minutes ahead of him held by team-mates aged 31+]}; team-mates with 20+ GP (per 82)"""
+    G = {}
+    for o in Pa.values():
+        if o['tm'] and o['gp'] >= 20 * o['gmax'] / 82:
+            G.setdefault((o['tm'], o['d']), []).append(o)
+    out = {}
+    for pid, a in Pa.items():
+        g = G.get((a['tm'], a['d']), [])
+        ah = [o for o in g if o['toi'] > a['toi'] and o['pid'] != pid]
+        m = sum(o['tmin'] for o in ah)
+        n = len([o for o in g if o['pid'] != pid])
+        out[pid] = [len(ah) / n if n else 0.0, sum(o['age'] * o['tmin'] for o in ah) / m - 28 if m else 0.0,
+                    sum(o['tmin'] for o in ah if o['age'] >= 31) / m if m else 0.0]
+    return out
+
+
+def ahead_gone(Pa, Pb):
+    """{pid: [share of the minutes of same-group team-mates with more TOI a game that left the club, the same for the
+    power-play minutes of team-mates with more PP TOI a game]}"""
+    T = {}
+    for o in Pa.values():
+        if o['tm']:
+            T.setdefault(o['tm'], []).append(o)
+    left = {pid: (Pb.get(pid) is None or Pb[pid]['tm'] != o['tm']) for pid, o in Pa.items()}
+    out = {}
+    for pid, a in Pa.items():
+        tm = T.get(a['tm'], [])
+        ah = [o for o in tm if o['d'] == a['d'] and o['toi'] > a['toi']]
+        pa = [o for o in tm if o['pp'] > a['pp']]
+        m, q = sum(o['tmin'] for o in ah), sum(o['ppmin'] for o in pa)
+        out[pid] = [sum(o['tmin'] for o in ah if left[o['pid']]) / m if m else 0.0,
+                    sum(o['ppmin'] for o in pa if left[o['pid']]) / q if q else 0.0]
+    return out
+
+
+REC = 'https://records.nhl.com/site/api'
+
+
+def coach_stints(fresh=False):
+    """{team: [(first game, last game, coach)]} regular-season head-coach stints (records.nhl.com), cached"""
+    path = os.path.join(CACHE, 'coaches.json')
+    if os.path.exists(path) and not fresh:
+        return D.load(path)
+    fr, rec = D.get(f'{REC}/franchise'), D.get(f'{REC}/coach-franchise-records')
+    if not fr or not rec:
+        return D.load(path) if os.path.exists(path) else {}
+    tri = {f['id']: D.team(f['teamAbbrev']) for f in fr['data']}
+    out = {}
+    for r in rec['data']:
+        tm = tri.get(r['franchiseId'])
+        if tm in D.TEAMS and r.get('gameTypeId') == 2 and r.get('firstCoachedDate') and r.get('lastCoachedDate'):
+            out.setdefault(tm, []).append([r['firstCoachedDate'][:10], r['lastCoachedDate'][:10], r['coachName']])
+    D.save(path, out)
+    return out
+
+
+def coach_changed(CS, tm, y):
+    """1.0 when the club opens the season after y under a different head coach than it ended y with (None: unknown)"""
+    end = '2020-03-12' if y == 2020 else f'{y}-04-30'
+    start = {2012: '2013-02-05', 2020: '2021-02-01'}.get(y, f'{y}-11-01')
+    st = CS.get(tm) or []
+    a = [c for c in st if c[0] <= end]
+    b = [c for c in st if c[0] <= start and c[1] >= f'{y}-09-01']
+    if not a or not b:
+        return None
+    return 0.0 if max(a)[2] == max(b)[2] else 1.0
+
+
+def trend(logs):
+    """{pid: [TOI a game change (min), points a 60 change, shots a 60 change]}: the second half of his regular-season
+    games minus the first, changes in the rates shrunk by GP / (GP + 40); 30+ GP"""
+    by = {}
+    for r in logs:
+        if str(r[0])[4:6] == '02':
+            by.setdefault(str(r[1]), []).append(r)
+    out = {}
+    for pid, g in by.items():
+        if len(g) < 30:
+            continue
+        g.sort(key=lambda r: r[0])
+        h = len(g) // 2
+        v = []
+        for part in (g[:h], g[h:]):
+            sec = sum(r[5] for r in part) or 1.0
+            v.append((sec / 60 / len(part), sum(r[6] + r[7] for r in part) / sec * 3600, sum(r[8] for r in part) / sec * 3600))
+        k = len(g) / (len(g) + 40.0)
+        out[pid] = [v[1][0] - v[0][0], (v[1][1] - v[0][1]) * k, (v[1][2] - v[0][2]) * k]
+    return out
+
+
+def bo_feats(a, hist, vac, ctx=None):
+    """vac: (position-group share, power-play share) or None when next season's rosters are not known;
+    ctx: {'depth', 'ahead', 'coach', 'trend'} values for this player-season (None = not known)"""
+    ctx = ctx or {}
     s0, age, toi = shr(a), a['age'], a['toi']
     ref = 20.0 if a['d'] else 16.0
     low = max(0.0, ref - toi) / 4
@@ -286,11 +401,26 @@ def bo_feats(a, hist, vac):
             'draft capital': [ped, ped * max(0.0, 25 - age)],
             'site HPM': [hpm, hpm * low],
             'shot share': [a['satrel'], a['satrel'] * low],
-            'production': [p60c, evc]}
+            'production': [p60c, evc],
+            'development curve': [ped * (age - 24), ped * (age - 24) ** 2, age * a['d'], age * age * a['d']],
+            'depth opportunity': ctx.get('depth'),
+            'departures ahead': ctx.get('ahead'),
+            'coaching change': [ctx['coach'], ctx['coach'] * low] if ctx.get('coach') is not None else None,
+            'within-season trend': ctx.get('trend'),
+            'experience': [math.log(1 + min(246, sum(o['gp'] for o in hist if o['y'] < a['y']))),
+                           0.0 if any(o['y'] < a['y'] for o in hist) else 1.0],
+            'offence / defence split': [a['go'] / (a['tmin'] + K_SHR) * 1000, a['gd'] / (a['tmin'] + K_SHR) * 1000]}
 
 
-def bo_prob(fit, f):
-    """(probability, [(signal, contribution)]) from the kept signals"""
+def hinges(a):
+    """hinge terms for the spline form: age, shrunk WAR rate, TOI against the position's reference"""
+    s0, t = shr(a), a['toi'] - (20.0 if a['d'] else 16.0)
+    return ([max(0.0, a['age'] - k) for k in (22, 25, 28)] + [max(0.0, s0 - k) for k in (0, .4, .8)]
+            + [max(0.0, t - k) for k in (-4, -2, 0)])
+
+
+def bo_prob(fit, f, a=None):
+    """(probability, [(signal, contribution)]) from the kept signals (+ the hinge terms when the fit carries them)"""
     B = fit['breakout']
     b, mu = B['fit']['b'], B['fit']['mu']
     x, groups = list(f['base']), [('base', len(f['base']))]
@@ -301,6 +431,8 @@ def bo_prob(fit, f):
             v = mu[i:i + B['width'][k]]
         x += list(v)
         groups.append((k, len(v)))
+    if B.get('splines'):
+        x += hinges(a)
     eta = B['fit']['b0'] + sum(bi * xi for bi, xi in zip(b, x))
     con, i = [], 0
     for k, n in groups:
@@ -343,13 +475,29 @@ def main():
     V = vacated(base, now) if y0 < cur else {}
     live = {str(p['id']): p for p in wf['players'] if p.get('grp') != 'G'}
     q99 = fit['scaling']['pp_toi']['du_q99']
+    C, Lq = career(last=cur), fit['L']
+    keep = fit['breakout']['keep']
+    dp = depth(base)
+    ag = ahead_gone(base, now) if y0 < cur else {}
+    CS = coach_stints(fresh=True) if 'coaching change' in keep else {}
+    tr = {}
+    if 'within-season trend' in keep:
+        try:
+            tr = trend(D._logs('skater', y0, 2, y0 == cur))
+        except Exception as e:
+            print('nhl breakout: game logs skipped:', e)
     rows = []
     for pid, a in base.items():
         w = live.get(pid)
         if not w or a['war'] is None or a['tmin'] < ROW_MIN * a['gmax'] / 82:
             continue
+        pk = peak(C, pid, cur)
+        if pk is not None and pk >= Lq:   # already at the bar in a past season or this one to date
+            continue
         hist = history(P, pid, y0)
-        p, con = bo_prob(fit, bo_feats(a, hist, V.get(pid)))
+        ctx = {'depth': dp.get(pid), 'ahead': ag.get(pid), 'coach': coach_changed(CS, a['tm'], y0),
+               'trend': tr.get(pid, [0.0, 0.0, 0.0]) if tr else None}
+        p, con = bo_prob(fit, bo_feats(a, hist, V.get(pid), ctx), a)
         c = now.get(pid)
         u = c['toi'] if c and c['gp'] >= 5 else a['toi']
         t = []
@@ -361,12 +509,13 @@ def main():
         tm = w.get('tm') or a['tm']
         rows.append({'id': pid, 'n': a['n'] or w.get('n'), 'tm': tm, 'pos': a['pos'], 'lo': logo(tm),
                      'age': round((c or a)['age'] + (0 if c else cur - y0), 1), 'ph': FACE % ph if ph else None,
-                     'p': round(p, 3), 'u': round(u, 1), 't': t, 'sig': sig})
+                     'p': round(p, 3), 'best': round(pk, 2) if pk is not None else None, 'u': round(u, 1), 't': t, 'sig': sig})
     rows.sort(key=lambda r: -r['p'])
     rows = rows[:400]
     B, Sc = fit['breakout'], fit['scaling']
     lab = lambda S: f'{S - 1}-{S % 100:02d}'  # noqa: E731
-    about = (f"Skaters with {int(ROW_MIN)}+ minutes in {lab(y0)} who have played in {lab(cur)}. Breakout: {fit['definition']} "
+    about = (f"Skaters with {int(ROW_MIN)}+ minutes in {lab(y0)} who have played in {lab(cur)} and have never reached the bar "
+             f"(any season since 2008-09, {lab(cur)} to date included). Breakout: {fit['definition']} "
              f"Odds: logistic on shrunk WAR rate, gap to his best, ln minutes, D + {', '.join(B['keep'])}; held-out log loss "
              f"{B['final']['base']:.4f} -> {B['final']['cand']:.4f} (t {B['final']['t']}, {B['final']['won']}/"
              f"{B['final']['seasons']} seasons). Tiers: next-season even-strength and power-play points a 60 at the minutes "

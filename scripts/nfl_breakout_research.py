@@ -12,8 +12,8 @@ A. Workload scaling, one fit a position. Rows: season pairs (both seasons with a
    weight = the smaller opportunity count, block = the season of the outcome. Next efficiency on this one's (shrunk by
    sample) + age + share + last season's, then + the share change (dU), then + dU x context blocks. Held-out error on
    all rows and on the rows whose share rose 3+ points (the case the tab projects).
-B. Breakout odds. Rows: WR/TE/RB with 4+ games and 15+ opportunities. Breakout = next season 8+ games at a fantasy
-   starter's PPR points a game (RB/WR 12, TE 9) and 4+ over this season's shrunk to a depth player's by 4 games.
+B. Breakout odds. Rows: WR/TE/RB with 4+ games and 15+ opportunities. No season so far at the bar L (RB/WR 12, TE 9
+   PPR points a game, shrunk to a depth player's by 4 games). Breakout = next season 8+ games at or over L.
    Baseline logistic: shrunk PPR/G, ln opportunities, position, share. Candidates one at a time, then the passers."""
 import json
 import math
@@ -30,6 +30,7 @@ DATA0 = 2004                                        # first season loaded (caree
 Y0, Y1 = 2010, 2025                                 # seasons with a known next season: Y0..Y1-1
 ROSE = 3.0
 LAMS = (1e-4, 1e-3, 1e-2, 3e-2, 0.1, 0.3)
+ISO_LAM = 1e-2
 
 
 def pick_lam(X, y, w, S):
@@ -210,7 +211,7 @@ def breakout(P, fit):
         if not (Y0 <= y < Y1) or a['g'] < B.BO_MIN_G or a['n'] < B.BO_MIN_N or not B.eligible(P, a):
             continue
         b = P.get((pid, y + 1))
-        hit = 1.0 if (b and b['g'] >= B.G_NEXT and b['ppg'] >= B.LINE[a['pos']] and b['ppg'] >= B.shr(a) + B.JUMP) else 0.0
+        hit = float(B.broke_out(a, b))
         old, vac = rooms[y]
         R.append((a, hit, B.bo_feats(fit, a, B.history(P, pid, y), old[pid], vac[pid])))
     S = np.array([a['y'] + 1 for a, *_ in R], float)
@@ -252,15 +253,219 @@ def breakout(P, fit):
         print(' ', k, v, flush=True)
     print(' final', keep, final, flush=True)
     print(' calib (held out)', cal, flush=True)
-    return {'definition': f"next season {B.G_NEXT}+ games, PPR points a game >= the starter line (RB/WR 12, TE 9) and >= "
-                          f"this season's PPR/G shrunk to a depth player's (RB/WR 4, TE 2.5) by {B.K_SHR:g} games + {B.JUMP:g}; never at the line before",
-            'rows': f'WR/TE/RB, {B.BO_MIN_G}+ games, {B.BO_MIN_N}+ opportunities, under the starter line this season '
-                    f'(shrunk) and in every {B.G_NEXT}+ game season of the eight before', 'seasons': f'{Y0 + 1}-{Y1}',
+    return {'L': B.LINE, 'L_pct': '79th (RB, WR) and 81st (TE) percentile',
+            'L_basis': f'PPR points a game shrunk to a depth player (RB/WR 4, TE 2.5) by {B.K_SHR:g} games; percentile of '
+                       f'2010-25 seasons with 8+ games and 60+ (RB) / 40+ (WR) / 25+ (TE) opportunities',
+            'definition': f'next season {B.G_NEXT}+ games and shrunk PPR points a game at or over L, for the first time',
+            'rows': f'WR/TE/RB, {B.BO_MIN_G}+ games, {B.BO_MIN_N}+ opportunities, no season so far (this one included, any '
+                    f'role) at or over L shrunk; career = seasons since {DATA0}',
+            'seasons': f'{Y0 + 1}-{Y1}',
             'n': len(y), 'rate': round(float(y.mean()), 4),
             'rate_pos': {p: round(float(y[pos == p].mean()), 4) for p in B.POS}, 'tests': res, 'keep': keep,
             'research_only': [k for k in B.LIVE_OFF if res[k]['pass']], 'final': final, 'calib_held_out': cal,
             'fit': {'b0': round(float(b0), 5), 'b': [round(float(v), 6) for v in b],
                     'mu': [round(float(v), 5) for v in X.mean(axis=0)]}}
+
+
+# ---------- C. improvement sweep (pre-registered: project files next-up/prereg-nfl.md) ----------
+def pav(x, y, increasing=True):
+    """isotonic fit of y on x (pool adjacent violators) -> (knots x, fitted values) for np.interp"""
+    o = np.argsort(x, kind='stable')
+    xs, ys = x[o], (y[o] if increasing else -y[o])
+    v, wt, lo = [], [], []
+    for i in range(len(xs)):
+        v.append(float(ys[i])); wt.append(1.0); lo.append(i)
+        while len(v) > 1 and v[-2] > v[-1]:
+            w2 = wt[-2] + wt[-1]
+            v[-2] = (v[-2] * wt[-2] + v[-1] * wt[-1]) / w2
+            wt[-2] = w2
+            v.pop(); wt.pop(); lo.pop()
+    kx, kv = [], []
+    for j, i in enumerate(lo):
+        hi = (lo[j + 1] - 1) if j + 1 < len(lo) else len(xs) - 1
+        kx += [xs[i], xs[hi]]
+        kv += [v[j], v[j]]
+    kv = np.array(kv) if increasing else -np.array(kv)
+    return np.array(kx, float), kv
+
+
+def gbt_fit(X, y, rounds, depth=2, lr=0.05, leaf=40, bins=24, Xv=None, yv=None):
+    """gradient-boosted depth-2 trees on log loss (Newton leaves). With a validation set returns the best round count."""
+    n, m = X.shape
+    edges = [np.unique(np.quantile(X[:, j], np.linspace(0, 1, bins + 1)[1:-1])) for j in range(m)]
+    B_ = np.column_stack([np.searchsorted(edges[j], X[:, j], side='right') for j in range(m)])
+    f0 = float(np.log(y.mean() / (1 - y.mean())))
+    F = np.full(n, f0)
+    Fv = np.full(len(Xv), f0) if Xv is not None else None
+    trees, best, bi = [], 1e9, 0
+
+    def split(idx, g, h):
+        G, H = g[idx].sum(), h[idx].sum()
+        top = (0.0, None)
+        for j in range(m):
+            nb = len(edges[j]) + 1
+            if nb < 2:
+                continue
+            b = B_[idx, j]
+            gs = np.cumsum(np.bincount(b, g[idx], nb))[:-1]
+            hs = np.cumsum(np.bincount(b, h[idx], nb))[:-1]
+            cs = np.cumsum(np.bincount(b, minlength=nb))[:-1]
+            ok = (cs >= leaf) & (len(idx) - cs >= leaf)
+            if not ok.any():
+                continue
+            gain = np.where(ok, gs ** 2 / (hs + 1) + (G - gs) ** 2 / (H - hs + 1) - G ** 2 / (H + 1), -1)
+            k = int(gain.argmax())
+            if gain[k] > top[0]:
+                top = (float(gain[k]), (j, float(edges[j][k])))
+        return top[1]
+
+    def grow(idx, g, h, d):
+        sp = split(idx, g, h) if d > 0 and len(idx) >= 2 * leaf else None
+        if sp is None:
+            return [round(float(lr * g[idx].sum() / (h[idx].sum() + 1)), 6)]
+        j, thr = sp
+        L_ = idx[X[idx, j] < thr]
+        R_ = idx[X[idx, j] >= thr]
+        return [j, thr, grow(L_, g, h, d - 1), grow(R_, g, h, d - 1)]
+    allidx = np.arange(n)
+    for r in range(rounds):
+        p = L.sig(F)
+        t = grow(allidx, y - p, p * (1 - p), depth)
+        trees.append(t)
+        F += tree_eval(t, X)
+        if Xv is not None:
+            Fv += tree_eval(t, Xv)
+            pv = np.clip(L.sig(Fv), 1e-6, 1 - 1e-6)
+            e = float(-(yv * np.log(pv) + (1 - yv) * np.log(1 - pv)).mean())
+            if e < best - 1e-6:
+                best, bi = e, r + 1
+            elif r + 1 - bi >= 60:
+                break
+    return (f0, trees) if Xv is None else bi
+
+
+def tree_eval(t, X):
+    if len(t) == 1:
+        return np.full(len(X), t[0])
+    m = X[:, t[0]] < t[1]
+    out = np.empty(len(X))
+    out[m] = tree_eval(t[2], X[m])
+    out[~m] = tree_eval(t[3], X[~m])
+    return out
+
+
+def sweep(P, fit, info):
+    bo = fit['breakout']
+    Kc = B.load_contracts(info)
+    C = B.team_context()
+    R = []
+    ctx = {y: (B.room(P, y), B.depth(P, y, Kc), B.offense(P, y)) for y in range(Y0, Y1)}
+    for (pid, y), a in P.items():
+        if not (Y0 <= y < Y1) or a['g'] < B.BO_MIN_G or a['n'] < B.BO_MIN_N or not B.eligible(P, a):
+            continue
+        (old, vac), D, off = ctx[y]
+        b = P.get((pid, y + 1))
+        f = B.bo_feats(fit, a, B.history(P, pid, y), old[pid], vac[pid])
+        R.append((a, float(B.broke_out(a, b)), f, B.sweep_feats(a, D[pid], C, off), B.op_row(a, D[pid]), b['u'] if b else 0.0))
+    S = np.array([r[0]['y'] + 1 for r in R], float)
+    y = np.array([r[1] for r in R])
+    X0 = np.array([r[2]['base'] + sum([r[2][k] for k in bo['keep']], []) for r in R])
+    OP = np.array([r[4] for r in R])
+    u1 = np.array([r[5] for r in R])
+    ref = np.array([B.UREF[r[0]['pos']] for r in R])
+
+    def ll(p, te):
+        p = np.clip(p, 1e-6, 1 - 1e-6)
+        return (float(-(y[te] * np.log(p) + (1 - y[te]) * np.log(1 - p)).sum()), float(te.sum()))
+
+    def lg(X):
+        def fp(trn, te):
+            b0, b = L.logit(X[trn], y[trn])
+            return L.sig(b0 + X[te] @ b)
+        return fp
+
+    def op_feats(trn):
+        b0, b = L.wls(OP[trn], u1[trn], np.ones(int(trn.sum())), 1e-2)
+        ph = (b0 + OP @ b) / ref
+        return np.column_stack([ph, ph - OP[:, 0]]), (b0, b)
+
+    def fp_op(trn, te):
+        Z = np.column_stack([X0, op_feats(trn)[0]])
+        b0, b = L.logit(Z[trn], y[trn])
+        return L.sig(b0 + Z[te] @ b)
+    r0 = L.loso(S, lg(X0), ll)
+    A = {k: np.array([r[3][k] for r in R]) for k in B.SWEEP if k != 'opportunity model'}
+    res = {}
+    for k in B.SWEEP:
+        res[k] = L.compare(r0, L.loso(S, fp_op, ll) if k == 'opportunity model' else L.loso(S, lg(np.column_stack([X0, A[k]])), ll))
+        print(' A', k, res[k], flush=True)
+
+    # provisional passers (per-test bar) define the columns the model-form tests run on; Holm over all 18 comes last
+    def cols_for(keep):
+        return np.column_stack([X0] + [A[k] for k in keep if k != 'opportunity model'])
+    prov = [k for k in B.SWEEP if res[k]['t'] >= 2 and res[k]['won'] * 2 > res[k]['seasons'] and k not in B.SWEEP_RO
+            and k != 'opportunity model']
+    XA = cols_for(prov)
+    rA = L.loso(S, lg(XA), ll)
+
+    def fp_gbt(trn, te):
+        u = sorted(set(S[trn].tolist()))
+        hold = trn & np.isin(S, u[1::3])
+        n = gbt_fit(XA[trn & ~hold], y[trn & ~hold], 400, Xv=XA[hold], yv=y[hold]) or 1
+        f0, trees = gbt_fit(XA[trn], y[trn], n)
+        return L.sig(f0 + sum(tree_eval(t, XA[te]) for t in trees))
+    res['gradient-boosted trees'] = L.compare(rA, L.loso(S, fp_gbt, ll))
+    print(' B gbt', res['gradient-boosted trees'], flush=True)
+    mono = [(0, True), (X0.shape[1] - 7, False), (X0.shape[1] - 1, False)]       # s0, age, ln pick in K0's columns
+
+    def iso_cols(trn):
+        out = []
+        for j, inc in mono:
+            kx, kv = pav(X0[trn, j], y[trn], inc)
+            out.append(np.interp(X0[:, j], kx, kv))
+        return np.column_stack(out)
+
+    def fp_iso(trn, te):
+        Z = np.column_stack([XA, iso_cols(trn)])
+        # the default ridge (1e-3) diverges here (the in-fold step functions nearly separate the training rows; the
+        # first run scored 1.46): 1e-2 is the weakest of the grid that converges in every fold
+        b0, b = L.logit(Z[trn], y[trn], lam=ISO_LAM)
+        return L.sig(b0 + Z[te] @ b)
+    res['logistic + monotone transforms'] = L.compare(rA, L.loso(S, fp_iso, ll))
+    print(' B iso', res['logistic + monotone transforms'], flush=True)
+
+    # calibration: inner leave-one-season-out predictions of each training fold
+    def inner(trn):
+        ph = np.zeros(len(y))
+        for s in sorted(set(S[trn].tolist())):
+            te = trn & (S == s)
+            tr = trn & (S != s)
+            b0, b = L.logit(XA[tr], y[tr])
+            ph[te] = L.sig(b0 + XA[te] @ b)
+        return ph
+
+    def lo(p):
+        p = np.clip(p, 1e-5, 1 - 1e-5)
+        return np.log(p / (1 - p))
+
+    def fp_platt(trn, te):
+        ph = inner(trn)
+        a0, a1 = L.logit(lo(ph[trn])[:, None], y[trn], lam=1e-6)
+        return L.sig(a0 + a1[0] * lo(lg(XA)(trn, te)))
+
+    def fp_isocal(trn, te):
+        ph = inner(trn)
+        kx, kv = pav(ph[trn], y[trn])
+        return np.clip(np.interp(lg(XA)(trn, te), kx, kv), 0.002, 0.9)
+    res['Platt calibration'] = L.compare(rA, L.loso(S, fp_platt, ll))
+    res['isotonic calibration'] = L.compare(rA, L.loso(S, fp_isocal, ll))
+    print(' C platt', res['Platt calibration'], '\n C iso', res['isotonic calibration'], flush=True)
+    L.holm(res)
+    keep = [k for k in B.SWEEP if res[k]['pass'] and k not in B.SWEEP_RO]
+    print(' sweep passers after Holm (18 tests):', [k for k in res if res[k]['pass']], flush=True)
+    out = {'prereg': 'project files next-up/prereg-nfl.md', 'tests': res, 'keep': keep,
+           'provisional_columns': prov, 'k0': L.compare(r0, r0)['base']}
+    return out, R, S, y, X0, A, op_feats
 
 
 def main():
@@ -283,6 +488,7 @@ def main():
         c['use'] = c['halves']['iv'] if alive else 0.0
         print(p, 'causal slope used', c['use'], 'pooled t', c['t'], 'p', c['p'])
     fit['breakout'] = breakout(P, fit)
+    fit['sweep'] = sweep(P, fit, info)[0]
     json.dump(fit, open(B.FIT, 'w'), indent=1)
     print('wrote', B.FIT)
 

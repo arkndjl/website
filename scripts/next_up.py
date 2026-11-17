@@ -10,6 +10,12 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 DIR = os.path.join(ROOT, 'static', 'data', 'next-up')
+BEST = {'nba': ('best BPM', 'best season BPM so far, shrunk by minutes; breakout bar +1.0', 's1'),
+        'cbb': ('best BPM', 'best season BPM so far, shrunk by minutes; breakout bar +2.8', 's1'),
+        'nhl': ('best WAR/1k', 'best season WAR a 1,000 minutes so far, shrunk; breakout bar 1.19', 's2'),
+        'soccer': ('best GAR/90', 'best season GAR/90 so far, shrunk; breakout bar .090', '3'),
+        'nfl': ('best PPR/G', 'best season PPR points a game so far, shrunk; breakout bar 12 (TE 9)', '1'),
+        'cfb': ('best z', 'best season PFN score z so far, shrunk; breakout bar .32', 's2')}
 POS = ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'QB', 'RB', 'WR', 'TE', 'D', 'LW', 'RW', 'FW', 'AM', 'W', 'MF', 'CM',
        'DM', 'DF', 'FB', 'CB', 'GK']
 
@@ -26,6 +32,9 @@ def convert(sport):
             {'k': 'sig', 'l': 'Signals', 't': 'signals pushing his odds up most', 'f': 's', 'ph': 1},
             {'k': 'u', 'l': u.get('lab', 'USE'), 't': u.get('t') or (u.get('lab', 'workload') + ' now'),
              'f': str(u.get('dec', 1)), 'ph': 1, 'num': 1}]
+    if any(r.get('best') is not None for r in src.get('rows') or []) and sport in BEST:
+        lb, tt, f = BEST[sport]
+        cols.append({'k': 'best', 'l': 'Best', 't': tt, 'f': f, 'ph': 1, 'num': 1})
     views = [['p', 'BO%', 'breakout odds next season']]
     sl, el = short(st.get('lab', '')), short(st.get('eff') or '')
     if sl == el:                                               # P/82 and P/60: keep the rate part
@@ -42,7 +51,7 @@ def convert(sport):
     for r in src.get('rows') or []:
         o = {'n': r['n'], 'tm': r.get('tm') or '', 'pos': r.get('pos') or '', 'age': r.get('age'), 'ph': r.get('ph'),
              'lo': r.get('lo'), 'sub': r.get('sub') or '', 'p': None if r.get('p') is None else round(100 * r['p'], 1),
-             'u': r.get('u'), 'sig': ' · '.join(r.get('sig') or [])}
+             'u': r.get('u'), 'sig': ' · '.join(r.get('sig') or []), 'best': r.get('best')}
         if o['lo'] is None and sport in ('nba', 'nfl', 'nhl') and o['tm']:
             o['lo'] = '/img/%s/%s.png' % (sport, o['tm'].split('/')[0].lower())
         for i, c in enumerate(r.get('t') or []):

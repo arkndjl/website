@@ -182,52 +182,169 @@ def pick_lam(X, y, w, S):
     return bl
 
 
-# ---------- B. breakout odds ----------
+# ---------- B. breakout odds (not yet broken out -> first season at the quality bar) ----------
+def coach_change():
+    """{(franchise, next season): 1 if the franchise opened next season with a different head coach}"""
+    C = json.load(open(os.path.join(ROOT, 'scripts', 'nba_coaches.json')))
+    out = {}
+    for y in C:
+        nx = C.get(str(int(y) + 1))
+        if not nx:
+            continue
+        for tm, cs in C[y].items():
+            n = nx.get(tm)
+            if cs and n:
+                out[(B.TM.get(tm, tm), int(y) + 1)] = 1.0 if n[0]['id'] != cs[-1]['id'] else 0.0
+    return out
+
+
+def opportunity(P):
+    """MP (/1000) of same-group teammates with a higher shrunk BPM who leave the franchise, and of teammates 32+"""
+    by = defaultdict(list)
+    for (pid, y), o in P.items():
+        by[(o['fr'], y)].append(o)
+    out = {}
+    for (pid, y), o in P.items():
+        g = B.group(o)
+        s0 = B.shr(o['bpm'], o['mp'])
+        ahead = old = 0.0
+        for t in by[(o['fr'], y)]:
+            if t['pid'] == pid or B.group(t) != g:
+                continue
+            nx = P.get((t['pid'], y + 1))
+            if B.shr(t['bpm'], t['mp']) > s0 and (nx is None or nx['fr'] != o['fr']):
+                ahead += t['mp'] / 1000
+            if t['age'] >= 32:
+                old += t['mp'] / 1000
+        out[(pid, y)] = (ahead, old)
+    return out
+
+
 def breakout(P, V):
+    DR = json.load(open(os.path.join(ROOT, 'scripts', 'nba_draft_picks.json')))
+    CC = coach_change()
+    OP = opportunity(P)
     R = []
     for (pid, y), a in P.items():
         if y < Y0 or y >= 2026 or a['mp'] < 300:
             continue
+        if B.career_best(P, pid, y) >= B.BAR:
+            continue                                         # already broke out: Standouts, not next up
         b = P.get((pid, y + 1))
         s0 = shr(a['bpm'], a['mp'])
-        mar = marcel(P, pid, y)
-        hit = 1.0 if (b and b['mp'] >= 1000 and b['bpm'] >= max(s0, mar) + 2) else 0.0
-        R.append((a, s0, hit, V[(pid, y)], mar))
+        hit = 1.0 if (b and b['mp'] >= 1000 and shr(b['bpm'], b['mp']) >= B.BAR) else 0.0
+        nfr = b['fr'] if b else a['fr']
+        R.append((a, s0, hit, V[(pid, y)], marcel(P, pid, y), B.prev_shr(P, pid, y), DR.get(pid),
+                  CC.get((nfr, y + 1)), OP[(pid, y)]))
     S = np.array([a['y'] + 1 for a, *_ in R], float)
-    y = np.array([h for _, _, h, _, _ in R])
-    rows = [B.bo_feats(a, s0, v, m) for a, s0, _, v, m in R]
+    y = np.array([r[2] for r in R])
+    rows = [B.bo_feats(a, s0, v, m, prev=pv, draft=dr, coach=cc, opp=op) for a, s0, _, v, m, pv, dr, cc, op in R]
     base = np.array([r['base'] for r in rows])
     cands = {k: np.array([r[k] for r in rows]) for k in B.BO_CANDS}
+    cands2 = {k: np.array([r[k] for r in rows]) for k in B.BO_CANDS2}
+    has_cc = np.array([cc is not None for *_, cc, _ in R])
 
-    def run(X):
+    def ll(p, te):
+        p = np.clip(p, 1e-6, 1 - 1e-6)
+        return (float(-(y[te] * np.log(p) + (1 - y[te]) * np.log(1 - p)).sum()), float(te.sum()))
+
+    def run(X, mask=None):
         def fp(trn, te):
+            if mask is not None:
+                trn = trn & mask
             b0, b = L.logit(X[trn], y[trn])
             return L.sig(b0 + X[te] @ b)
-
-        def err(p, te):
-            p = np.clip(p, 1e-6, 1 - 1e-6)
-            return (float(-(y[te] * np.log(p) + (1 - y[te]) * np.log(1 - p)).sum()), float(te.sum()))
-        return L.loso(S, fp, err)
+        return L.loso(S, fp, ll) if mask is None else _loso_mask(S, mask, fp, ll)
     rb = run(base)
     res = {k: L.compare(rb, run(np.column_stack([base, X]))) for k, X in cands.items()}
     L.holm(res)
     keep = [k for k in cands if res[k]['pass']]
-    X = np.column_stack([base] + [cands[k] for k in keep])
-    final = L.compare(rb, run(X))
-    b0, b = L.logit(X, y)
-    p = L.sig(b0 + X @ b)
-    cal = []
-    for lo, hi in ((0, .05), (.05, .1), (.1, .2), (.2, .35), (.35, 1)):
-        m = (p >= lo) & (p < hi)
-        if m.sum():
-            cal.append([lo, hi, int(m.sum()), round(float(p[m].mean()), 3), round(float(y[m].mean()), 3)])
-    print('breakout rate', round(float(y.mean()), 4), 'n', len(y), flush=True)
+    X1 = np.column_stack([base] + [cands[k] for k in keep])
+    r1 = run(X1)
+    stage1 = L.compare(rb, r1)
+    print('population', len(y), 'rate', round(float(y.mean()), 4), flush=True)
     for k, v in res.items():
         print(' ', k, v, flush=True)
-    print(' final', keep, final, flush=True)
-    return {'n': len(y), 'rate': round(float(y.mean()), 4), 'tests': res, 'keep': keep, 'final': final,
-            'calib': cal, 'fit': {'b0': round(b0, 5), 'b': [round(float(v), 6) for v in b],
-                                  'mu': [round(float(v), 5) for v in X.mean(axis=0)]}}
+    print(' stage 1', keep, stage1, flush=True)
+    # ---- stage 2: each alone on top of the stage-1 model ----
+    res2 = {}
+    for k, Xc in cands2.items():
+        if k == 'coaching change':
+            res2[k] = L.compare(run(X1, has_cc), run(np.column_stack([X1, Xc]), has_cc))
+        else:
+            res2[k] = L.compare(r1, run(np.column_stack([X1, Xc])))
+        print('  s2', k, res2[k], flush=True)
+    # splines on shrunk BPM, age, ln MP
+    Xs = np.column_stack([X1, B.spline(base[:, 0], B.KN_S), B.spline(np.array([a['age'] for a, *_ in R], float), B.KN_A),
+                          B.spline(base[:, 1], B.KN_M)])
+    res2['splines'] = L.compare(r1, run(Xs))
+    print('  s2 splines', res2['splines'], flush=True)
+    # Platt on inner held-out predictions
+    def fp_platt(trn, te):
+        inner = np.zeros(len(y))
+        for s in sorted(set(S[trn].tolist())):
+            it = trn & (S == s)
+            b0, b = L.logit(X1[trn & ~it], y[trn & ~it])
+            inner[it] = b0 + X1[it] @ b
+        a0, a1 = L.logit(inner[trn][:, None], y[trn], lam=1e-6)
+        b0, b = L.logit(X1[trn], y[trn])
+        return L.sig(a0 + a1[0] * (b0 + X1[te] @ b))
+    res2['platt'] = L.compare(r1, L.loso(S, fp_platt, ll))
+    print('  s2 platt', res2['platt'], flush=True)
+    # GBM vs logistic, 6 blocks of seasons (fit cost), both on the same blocks
+    blocks = _blocks(S, 6)
+    lg, gb = {}, {}
+    for te_s in blocks:
+        te = np.isin(S, te_s)
+        trn = ~te
+        b0, b = L.logit(X1[trn], y[trn])
+        pl = L.sig(b0 + X1[te] @ b)
+        tr_s = sorted(set(S[trn].tolist()))
+        iv = np.isin(S, tr_s[2::3]) & trn
+        _, _, best = L.gbm_fit(X1[trn & ~iv], y[trn & ~iv], rounds=250, lr=0.05, Xv=X1[iv], yv=y[iv])
+        f0, trees, _ = L.gbm_fit(X1[trn], y[trn], rounds=best, lr=0.05)
+        pg = L.gbm_pred(f0, trees, X1[te])
+        for s in te_s:
+            m = S[te] == s
+            lg[s] = ll(pl[m], S == s)
+            gb[s] = ll(pg[m], S == s)
+    res2['gbm'] = L.compare(lg, gb)
+    print('  s2 gbm', res2['gbm'], flush=True)
+    L.holm(res2)
+    keep2 = [k for k in B.BO_CANDS2 if res2[k]['pass']]
+    X = np.column_stack([X1] + [cands2[k] for k in keep2])
+    final = L.compare(rb, run(X))
+    vs1 = L.compare(r1, run(X))
+    b0, b = L.logit(X, y)
+    # held-out calibration of the final model
+    pho = np.zeros(len(y))
+    for s in sorted(set(S.tolist())):
+        te = S == s
+        c0, c = L.logit(X[~te], y[~te])
+        pho[te] = L.sig(c0 + X[te] @ c)
+    cal = []
+    for lo, hi in ((0, .03), (.03, .06), (.06, .1), (.1, .2), (.2, .35), (.35, 1)):
+        m = (pho >= lo) & (pho < hi)
+        if m.sum():
+            cal.append([lo, hi, int(m.sum()), round(float(pho[m].mean()), 3), round(float(y[m].mean()), 3)])
+    print(' final', keep, keep2, final, 'vs stage 1', vs1, flush=True)
+    print(' calib', cal, flush=True)
+    return {'bar': B.BAR, 'n': len(y), 'rate': round(float(y.mean()), 4), 'tests': res, 'keep': keep, 'stage1': stage1,
+            'tests2': res2, 'keep2': keep2, 'final': final, 'final_vs_stage1': vs1, 'calib': cal,
+            'fit': {'b0': round(b0, 5), 'b': [round(float(v), 6) for v in b], 'mu': [round(float(v), 5) for v in X.mean(axis=0)]}}
+
+
+def _blocks(S, k):
+    u = sorted(set(S.tolist()))
+    return [u[i::k] for i in range(k)]
+
+
+def _loso_mask(S, mask, fp, err):
+    out = {}
+    for s in sorted(set(S[mask].tolist())):
+        te = (S == s) & mask
+        out[s] = err(fp(~(S == s), te), te)
+    return out
 
 
 def main():

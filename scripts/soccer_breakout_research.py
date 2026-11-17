@@ -13,8 +13,9 @@ A. Workload scaling. Workload = shot involvement share (SI%: shots + key passes 
    SI%; then each context block's traits (levels, all pairs); then the SI% change (dU); then dU x each block against
    the block's traits + dU, on the pairs whose SI% changed UP+ points either way.
 B. Breakout odds. Rows: outfield, 450+ minutes this season, in the big five next season. Breakout = next season
-   1500+ minutes and GAR a 90 at least JUMP over his best season to date (each season's GAR a 90 shrunk to
-   replacement by minutes, k 600), so a return to an old level is not one. Baseline logistic: shrunk GAR a 90,
+   1500+ minutes at or over the quality bar LEVEL (GAR a 90 shrunk to replacement by minutes, k 600; about the 76th
+   percentile of outfield 1500+ minute seasons) for the first time: a player with any season to date at the bar is
+   out of the rows. Baseline logistic: shrunk GAR a 90,
    ln minutes, best to date minus this season. Candidates one at a time, then the passers together."""
 import json
 import os
@@ -145,13 +146,18 @@ def scaling(P, T, last):
 
 # ---------- B. breakout odds ----------
 def breakout(P, T, squad, last):
-    R = []
+    R, C = [], B.careers(P)
+    reg = [B.shr(o['g90'], o['min']) for (p, s), o in P.items() if s <= last and o['pos'] != 'GK' and o['min'] >= B.MIN_NEXT]
+    pct = round(float((np.array(reg) < B.LEVEL).mean()) * 100, 1)
     for (p, s), a in P.items():
         b = P.get((p, s + 1))
         if s + 1 > last or not b or a['pos'] == 'GK' or a['min'] < B.MIN_BASE or a['inv'] < 5:
             continue
-        s0, ref, f = B.bo_row(a, B.history(P, p, s), T[s], b['team'], squad[s + 1][b['team']])
-        R.append((s, f, 1.0 if (b['min'] >= B.MIN_NEXT and b['g90'] >= ref + B.JUMP) else 0.0))
+        ref = max(v for q, v in C[p] if q <= s)
+        if ref >= B.LEVEL:
+            continue
+        s0, f = B.bo_row(a, B.history(P, p, s), T[s], b['team'], squad[s + 1][b['team']], ref)
+        R.append((s, f, 1.0 if (b['min'] >= B.MIN_NEXT and B.shr(b['g90'], b['min']) >= B.LEVEL) else 0.0))
     S = np.array([s + 1 for s, _, _ in R], float)
     y = np.array([h for _, _, h in R])
     base = np.array([f['base'] for _, f, _ in R])
@@ -187,10 +193,11 @@ def breakout(P, T, squad, last):
         print(' ', k, v, flush=True)
     print(' final', keep, final, flush=True)
     print(' held-out calibration', cal, flush=True)
-    return {'def': f'next season {B.MIN_NEXT}+ minutes and GAR a 90 at least {B.JUMP} over his best season to date (GAR a 90 '
-                   f'shrunk to replacement by minutes, k {B.K_SHR:.0f}, this season and the six before); outfield, {B.MIN_BASE}+ minutes, in the big '
+    return {'def': f'first season at the bar: next season {B.MIN_NEXT}+ minutes and GAR a 90 of {B.LEVEL}+ (shrunk to '
+                   f'replacement by minutes, k {B.K_SHR:.0f}; the {pct:.0f}th percentile of outfield {B.MIN_NEXT}+ minute '
+                   f'seasons), no season to date at the bar; outfield, {B.MIN_BASE}+ minutes, in the big '
                    f'five next season',
-            'n': len(y), 'rate': round(float(y.mean()), 4), 'tests': res, 'keep': keep, 'final': final,
+            'level': B.LEVEL, 'level_pct': pct, 'n': len(y), 'rate': round(float(y.mean()), 4), 'tests': res, 'keep': keep, 'final': final,
             'calib_heldout': cal, 'fit': {'b0': round(b0, 5), 'b': [round(float(v), 6) for v in b],
                                           'mu': [round(float(v), 5) for v in X.mean(axis=0)]}}
 
@@ -206,7 +213,7 @@ def main():
                'scaling': A, 'breakout': Bo, 'dU_p99': round(float(np.percentile(du, 99)), 2),
                'U_pct': {str(q): round(float(np.percentile(U, q)), 1) for q in (50, 75, 90, 95, 99)},
                'tiers': [{'k': 20, 'lab': 'SI 20'}, {'k': 30, 'lab': 'SI 30'}, {'k': 40, 'lab': 'SI 40'}],
-               'k_shrink': B.K_SHR, 'jump': B.JUMP}, open(OUT, 'w'), indent=1)
+               'k_shrink': B.K_SHR, 'level': B.LEVEL}, open(OUT, 'w'), indent=1)
     print('wrote', OUT)
 
 

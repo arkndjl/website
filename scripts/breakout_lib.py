@@ -106,3 +106,73 @@ def holm(results, alpha=0.05):
             alive = False
         r['pass'] = bool(ok)
     return results
+
+
+# ---------- gradient-boosted trees (log loss), numpy fit, plain-dict trees served stdlib ----------
+def _bins(X, nb=32):
+    return [np.unique(np.quantile(X[:, j], np.linspace(0, 1, nb + 1)[1:-1])) for j in range(X.shape[1])]
+
+
+def _tree(X, g, h, cuts, depth, min_leaf, lam=1.0):
+    def leaf(idx):
+        return {'v': float(-g[idx].sum() / (h[idx].sum() + lam))}
+
+    def grow(idx, d):
+        if d == 0 or len(idx) < 2 * min_leaf:
+            return leaf(idx)
+        G, H = g[idx].sum(), h[idx].sum()
+        best = (0.0, None, None)
+        for j, cj in enumerate(cuts):
+            xj = X[idx, j]
+            for c in cj:
+                m = xj <= c
+                nl = m.sum()
+                if nl < min_leaf or len(idx) - nl < min_leaf:
+                    continue
+                gl, hl = g[idx][m].sum(), h[idx][m].sum()
+                gain = gl * gl / (hl + lam) + (G - gl) ** 2 / (H - hl + lam) - G * G / (H + lam)
+                if gain > best[0]:
+                    best = (gain, j, float(c))
+        if best[1] is None:
+            return leaf(idx)
+        m = X[idx, best[1]] <= best[2]
+        return {'f': best[1], 't': best[2], 'l': grow(idx[m], d - 1), 'r': grow(idx[~m], d - 1)}
+    return grow(np.arange(len(X)), depth)
+
+
+def tree_pred(t, x):
+    while 'v' not in t:
+        t = t['l'] if x[t['f']] <= t['t'] else t['r']
+    return t['v']
+
+
+def gbm_fit(X, y, rounds=400, lr=0.05, depth=3, min_leaf=60, Xv=None, yv=None):
+    """returns (f0, trees, best_rounds). With a validation set, best_rounds = argmin validation log loss."""
+    p0 = min(max(y.mean(), 1e-4), 1 - 1e-4)
+    f0 = math.log(p0 / (1 - p0))
+    F = np.full(len(y), f0)
+    Fv = None if Xv is None else np.full(len(yv), f0)
+    cuts = _bins(X)
+    trees, hist = [], []
+    for _ in range(rounds):
+        p = sig(F)
+        t = _tree(X, p - y, p * (1 - p), cuts, depth, min_leaf)
+        t = _scale(t, lr)
+        trees.append(t)
+        F += np.array([tree_pred(t, x) for x in X])
+        if Fv is not None:
+            Fv += np.array([tree_pred(t, x) for x in Xv])
+            pv = np.clip(sig(Fv), 1e-6, 1 - 1e-6)
+            hist.append(float(-(yv * np.log(pv) + (1 - yv) * np.log(1 - pv)).mean()))
+    best = int(np.argmin(hist)) + 1 if hist else rounds
+    return f0, trees, best
+
+
+def _scale(t, lr):
+    if 'v' in t:
+        return {'v': round(t['v'] * lr, 6)}
+    return {'f': t['f'], 't': round(t['t'], 6), 'l': _scale(t['l'], lr), 'r': _scale(t['r'], lr)}
+
+
+def gbm_pred(f0, trees, X):
+    return sig(np.array([f0 + sum(tree_pred(t, x) for t in trees) for x in X]))
