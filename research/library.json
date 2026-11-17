@@ -989,6 +989,21 @@
      "sports": [
       "NBA"
      ]
+    },
+    {
+     "term": "ARK lean (recruit commitment)",
+     "short": "Chance an uncommitted recruit signs with each school in his recruitment list; the top school is shown in the Team cell.",
+     "body": [
+      "Conditional logit over his ESPN recruitment list (3+ schools), fit walk-forward by class, recency weight .75 a class (CFB).",
+      "Terms: program pull and tier, grade x tier, hometown distance, home state, conversion rate (signed / listed), on-field Elo (CFB).",
+      "CFB also: On3/Rivals visits (official, unofficial count, latest, last 90 days) and the confidence-weighted share of On3 expert picks. Trained as of 30 days before each commitment; live uses everything to date.",
+      "Held out 2018-26 (CFB): log loss 1.962 to 1.896, top-1 30.4% to 32.3%. Failed: RPM % on top of picks (CFB), every On3 term (CBB). Leans above 80% have run about 10-20 points hot."
+     ],
+     "where": "CFB and CBB recruit class tabs",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
     }
    ]
   },

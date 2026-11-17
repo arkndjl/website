@@ -1,7 +1,9 @@
 # Refreshes the ARK lean for uncommitted recruits (data/recruit_commit_leans.json, read by the CFB and CBB class tabs):
 # re-pulls ESPN's live recruiting classes (2027-29, plus 2024-26 for the school terms) and scores them with the stored
 # commitment model in data/recruit_commit_fit.json (scripts/recruit_commit_fit.py --live; no refit). Daily, after each
-# CFB board and CBB recruits run (the leans join their recruit rows by name), or by hand.
+# CFB board and CBB recruits run (the leans join their recruit rows by name), or by hand. The daily (and hand) run
+# first re-pulls On3/Rivals visits, expert picks and RPM for the uncommitted recruits of the shown classes
+# (scripts/recruit_on3_visits.mjs --open -> scripts/data/recruit_on3_live.json.gz); the board-triggered runs reuse it.
 name: recruit leans
 
 on:
@@ -22,7 +24,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,10 +33,24 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -q numpy requests
+      - uses: actions/setup-node@v4
+        if: github.event_name != 'workflow_run'
+        with:
+          node-version: "22"
+      - name: On3 visits, expert picks and RPM (uncommitted, shown classes)
+        if: github.event_name != 'workflow_run'
+        continue-on-error: true
+        timeout-minutes: 50
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          node scripts/recruit_on3_visits.mjs cfb 2028 2029 --open --top 400
+          node scripts/recruit_on3_visits.mjs cbb 2027 2028 2029 --open --top 120
+          python3 scripts/recruit_on3_join.py --live 2027 2028 2029
       - name: Score the live classes
         run: python3 scripts/recruit_commit_fit.py --live
       - name: Commit if it changed
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update the recruit leans ($(date -u +%Y-%m-%d))" \
-            -- data/recruit_commit_leans.json scripts/geo/recruit_campus.json
+            -- data/recruit_commit_leans.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz

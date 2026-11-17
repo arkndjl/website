@@ -14,6 +14,10 @@ CFB LIST model, Nov 16 2026 (tests: scripts/research/recruits_cfb_nov16/commit_t
 walk-forward 2018-26, Holm): the school's conversion rate (signed / listed, prior three classes), its on-field
 strength (final Elo z of the last season and the change from the one before), and recency weights on the training
 classes (.75 a class). Failed there: top-tier / nearest school in his list, high-school pipeline.
+
+Nov 17 2026 (scripts/research/recruit_visits_nov17/, as of the On3 commitment date - 30 days): CFB adds On3/Rivals
+visits (official, unofficial count, latest, last 90 days) and the expert picks' confidence-weighted share
+(scripts/recruit_on3_join.py). Failed: RPM % on top of those (CFB), every On3 term in CBB.
 """
 import csv, json, math, os, sys, time
 from collections import defaultdict
@@ -25,6 +29,7 @@ OUT = os.path.join(ROOT, 'data', 'recruit_commit_fit.json')
 LEANS = os.path.join(ROOT, 'data', 'recruit_commit_leans.json')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cfb_transfer_fit import geocode, miles  # noqa: E402
+import recruit_on3_join as ON3  # noqa: E402
 
 CHOSE = ('Signed', 'Enrolled', 'Committed', 'Verbal')
 YEARS = {'cfb': (2012, 2029), 'cbb': (2010, 2029)}
@@ -33,7 +38,8 @@ LIVE = (2027, 2028, 2029)
 BASE = ['pull', 'tier', 'gxt', 'gap']
 DIST = ['ld', 'inst', 'pipe', 'ld_tier', 'ld_g']
 MORE = ['conv', 'elo', 'delo']
-EXTRA = {'cfb': {'list': ['conv', 'elo', 'delo']}}   # added to the kept terms of that sport's model
+ON3_H = 30   # On3 visits / expert picks / RPM as of the commitment date - 30 days in training; live: everything to date
+EXTRA = {'cfb': {'list': ['conv', 'elo', 'delo', 'ov', 'luv', 'vlast', 'vrec', 'esh', 'eany']}}   # added to the kept terms of that sport's model
 DECAY = {'cfb': {'list': 0.75}}                      # weight of a training class, per class back from the newest
 SCHED = os.path.join(ROOT, 'scripts', '.cache', 'fvrefit', 'ros')
 LAM = 1.0
@@ -63,6 +69,7 @@ def load(sp):
         lo = np.percentile(g, 5) if len(g) else 0
         for x in rows: x['g'] = ((x['grade'] if x['grade'] > 0 else lo) - mu) / sd
         cls[y] = rows
+    ON3.attach(sp, cls, ON3_H, live_years=LIVE)
     return loc, cls
 
 
@@ -114,11 +121,12 @@ def feats(x, alts, st, loc):
         ld = math.log1p(miles(x['home'], (lat, lon)) / 100); tr = tier.get(t, -1.0)
         F.append([math.log1p(n.get(t, 0)), tr, x['g'] * tr, abs(x['g'] - tr), ld, float(sst == x['st']),
                   math.log1p(bys.get((t, x['st']), 0)), ld * tr, ld * x['g'],
-                  math.log((n.get(t, 0) + 1) / (listed.get(t, 0) + 5)), e1.get(t, 0.0), e1.get(t, 0.0) - e0.get(t, e1.get(t, 0.0))])
+                  math.log((n.get(t, 0) + 1) / (listed.get(t, 0) + 5)), e1.get(t, 0.0), e1.get(t, 0.0) - e0.get(t, e1.get(t, 0.0))]
+                 + ON3.alt_feats(x.get('ex'), t))
     return np.array(F)
 
 
-COLS = BASE + DIST + MORE
+COLS = BASE + DIST + MORE + ON3.COLS
 
 
 def build(sp, loc, cls, years, mode, sample):
