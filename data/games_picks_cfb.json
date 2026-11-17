@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T00:27:15Z",
+ "asof": "2026-11-17T00:29:55Z",
  "recenter": {
-  "week": 0.3
+  "week": 0.31
  },
  "monitor": {
   "clocks": {
@@ -501,6 +501,22 @@
    "tm": 53.7
   },
   {
+   "id": "401869938",
+   "sport": "cfb",
+   "kick": "2026-11-22T00:00:00.000Z",
+   "home": "Louisiana Tech",
+   "away": "Arkansas State",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -129.0,
+   "edge": 1.9,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 12.4,
+   "tm": 54.4
+  },
+  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -557,7 +573,7 @@
    "mk": "total",
    "side": "over",
    "line": 55.5,
-   "price": -106.0,
+   "price": -114.0,
    "edge": 1.4,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -659,22 +675,6 @@
    "why": "total market off",
    "m": 0.1,
    "tm": 50.2
-  },
-  {
-   "id": "401864542",
-   "sport": "cfb",
-   "kick": "2026-11-21T02:00:00.000Z",
-   "home": "Wyoming",
-   "away": "New Mexico",
-   "mk": "spread",
-   "side": "away",
-   "line": -7.5,
-   "price": -114.0,
-   "edge": 5.9,
-   "x": null,
-   "why": "spread market off",
-   "m": -13.4,
-   "tm": 39.6
   }
  ],
  "games": {
@@ -1030,7 +1030,7 @@
    "mk": "total",
    "side": "over",
    "line": 55.5,
-   "price": -106.0,
+   "price": -114.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -1159,16 +1159,16 @@
    "state": "off"
   },
   "401869938": {
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -112.0,
-   "edge": 1.1,
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -129.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana Tech",
    "away": "Arkansas State",
-   "state": "off"
+   "state": "under"
   },
   "401861968": {
    "mk": "spread",
@@ -1219,11 +1219,11 @@
    "state": "off"
   },
   "401869953": {
-   "mk": "spread",
-   "side": "home",
-   "line": -9.5,
+   "mk": "total",
+   "side": "under",
+   "line": 48.5,
    "price": -124.0,
-   "edge": 0.9,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Troy",
@@ -1294,7 +1294,7 @@
    "mk": "total",
    "side": "under",
    "line": 66.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 5.2,
    "ev": null,
    "units": 0.0,
@@ -1426,7 +1426,7 @@
    "mk": "spread",
    "side": "away",
    "line": -5.5,
-   "price": -114.0,
+   "price": -117.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -1499,11 +1499,11 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21618,
+  "snapshots": 21625,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4357,
+    "clvN": 4358,
     "clvRet": -0.0482,
     "clvT": -35.51,
     "clv": 0.2,
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T00:27:15Z",
+ "checked": "2026-11-17T00:29:55Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
