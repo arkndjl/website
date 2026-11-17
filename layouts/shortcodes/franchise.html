@@ -1,0 +1,45 @@
+{{- /* Franchise Fantasy (content/franchise-fantasy.md): coming-soon screen in a mid-2000s football game menu
+       look (skewed chrome bars, stadium light flares, perspective field). Original art, CSS only. */ -}}
+<style>
+.post:has(.ff)>.post-title{display:none}
+.ff{--ff-lil:#c8c7ff;--ff-teal:#7fffd4;--ff-ink:#0b0d12;position:relative;overflow:hidden;min-height:30rem;margin:0 0 2rem;border:2px solid #3a3f4a;box-shadow:inset 0 0 0 2px #000,0 0 0 1px #000;background:radial-gradient(ellipse 38% 30% at 14% -4%,rgba(200,199,255,.55),transparent 70%),radial-gradient(ellipse 38% 30% at 86% -4%,rgba(127,255,212,.45),transparent 70%),linear-gradient(#141826 0%,#0b0d12 58%,#05070a 100%);isolation:isolate}
+.ff__flare{position:absolute;top:-3rem;width:9rem;height:9rem;border-radius:50%;background:radial-gradient(circle,#fff 0 6%,rgba(255,255,255,.4) 12%,transparent 60%);mix-blend-mode:screen;animation:ff-flick 5s steps(1) infinite;z-index:0}
+.ff__flare--l{left:6%}.ff__flare--r{right:6%;animation-delay:2.3s}
+.ff__beam{position:absolute;top:0;width:40%;height:100%;background:linear-gradient(180deg,rgba(200,199,255,.16),transparent 70%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);z-index:0}
+.ff__beam--l{left:-6%}.ff__beam--r{right:-6%;background:linear-gradient(180deg,rgba(127,255,212,.13),transparent 70%)}
+.ff__field{position:absolute;left:-25%;right:-25%;bottom:1.2rem;height:20rem;transform:perspective(18rem) rotateX(58deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 3px),rgba(200,199,255,.8) calc(10% - 3px) 10%),repeating-linear-gradient(0deg,#123f3a 0 2rem,#16504a 2rem 4rem);animation:ff-scroll 6s linear infinite;z-index:0}
+.ff__field::after{content:"";position:absolute;inset:0;background:linear-gradient(#0b0d12,rgba(11,13,18,.35) 40%,transparent 70%)}
+.ff__head{position:relative;z-index:2;display:inline-block;margin:1.6rem 0 0 -1rem;padding:.55rem 2.4rem .55rem 2.2rem;transform:skewX(-14deg);background:linear-gradient(#f4f5fb 0%,#b9bcc9 46%,#7d8192 50%,#d6d8e2 100%);border:2px solid #000;box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 #50545f,4px 4px 0 #000}
+.ff__head span{display:block;transform:skewX(14deg);font-size:clamp(1.3rem,5vw,2.4rem);font-weight:bold;font-style:italic;letter-spacing:.04em;line-height:1;color:var(--ff-ink);text-shadow:1px 1px 0 #fff}
+.ff__head::after{content:"";position:absolute;left:100%;top:0;bottom:0;width:1.6rem;margin-left:4px;background:var(--ff-teal);border:2px solid #000}
+.ff__menu{position:relative;z-index:2;display:flex;flex-direction:column;gap:.55rem;width:min(26rem,86%);margin:2.6rem auto 9rem;padding:0;list-style:none}
+.ff__bar{position:relative;height:2.6rem;transform:skewX(-14deg);background:linear-gradient(#2a2f3c,#171a22 52%,#10131a);border:2px solid #000;box-shadow:inset 0 1px 0 #4a5060,inset 0 -2px 0 #07080b;opacity:.75}
+.ff__bar:nth-child(1){margin-left:1.6rem}.ff__bar:nth-child(2){margin-left:.8rem}.ff__bar:nth-child(4){margin-left:.8rem}.ff__bar:nth-child(5){margin-left:1.6rem}
+.ff__bar::before{content:"";position:absolute;left:.7rem;top:50%;width:.9rem;height:.9rem;margin-top:-.45rem;background:#3a4050;box-shadow:inset 2px 2px 0 #565d70}
+.ff__bar--on{height:3.4rem;opacity:1;overflow:hidden;background:linear-gradient(#f4f5fb 0%,#c8c7ff 44%,#8f8ee6 52%,#dcdcff 100%);box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 #5f5eb0,0 0 0 2px var(--ff-teal),0 0 18px rgba(127,255,212,.55);animation:ff-pulse 1.6s ease-in-out infinite}
+.ff__bar--on::before{background:var(--ff-teal);box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 #2c9c7c}
+.ff__bar--on::after{content:"";position:absolute;top:0;bottom:0;width:30%;left:-40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:ff-sweep 2.4s ease-in-out infinite}
+.ff__bar--on span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:skewX(14deg);font-size:clamp(1.15rem,4.4vw,1.7rem);font-weight:bold;font-style:italic;letter-spacing:.12em;color:var(--ff-ink);text-shadow:1px 1px 0 #fff}
+.ff__strip{position:absolute;z-index:2;left:0;right:0;bottom:0;height:1.4rem;background:linear-gradient(#c9ccd8,#7d8192 50%,#a7aab8);border-top:2px solid #000;box-shadow:inset 0 1px 0 #fff}
+.ff__strip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:22%;background:repeating-linear-gradient(-60deg,var(--ff-teal) 0 .5rem,var(--ff-lil) .5rem 1rem);border-right:2px solid #000}
+@keyframes ff-sweep{0%{left:-40%}60%,100%{left:120%}}
+@keyframes ff-pulse{50%{box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 #5f5eb0,0 0 0 2px var(--ff-teal),0 0 30px rgba(127,255,212,.9)}}
+@keyframes ff-scroll{to{background-position:0 0,0 8rem}}
+@keyframes ff-flick{0%,100%{opacity:1}48%{opacity:.82}50%{opacity:1}}
+@media (max-width:600px){.ff{min-height:26rem}.ff__head{margin-left:-.6rem;padding-left:1.4rem}.ff__menu{margin-top:2rem}.ff__bar:nth-child(1),.ff__bar:nth-child(5){margin-left:.8rem}.ff__bar:nth-child(2),.ff__bar:nth-child(4){margin-left:.4rem}}
+@media (prefers-reduced-motion:reduce){.ff *,.ff *::after{animation:none!important}}
+</style>
+<section class="ff" aria-label="Franchise Fantasy">
+  <i class="ff__beam ff__beam--l" aria-hidden="true"></i><i class="ff__beam ff__beam--r" aria-hidden="true"></i>
+  <i class="ff__flare ff__flare--l" aria-hidden="true"></i><i class="ff__flare ff__flare--r" aria-hidden="true"></i>
+  <i class="ff__field" aria-hidden="true"></i>
+  <h1 class="ff__head"><span>FRANCHISE FANTASY</span></h1>
+  <ul class="ff__menu">
+    <li class="ff__bar" aria-hidden="true"></li>
+    <li class="ff__bar" aria-hidden="true"></li>
+    <li class="ff__bar ff__bar--on"><span>COMING SOON</span></li>
+    <li class="ff__bar" aria-hidden="true"></li>
+    <li class="ff__bar" aria-hidden="true"></li>
+  </ul>
+  <i class="ff__strip" aria-hidden="true"></i>
+</section>
