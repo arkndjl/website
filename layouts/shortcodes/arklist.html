@@ -36,7 +36,7 @@
 <script type="application/json" data-arkl-cbbrec>{{ jsonify $cr | safeJS }}</script>{{ end }}{{ end }}
 <table class="cfb__table arkl" data-arkl{{ if $all }} data-arkl-all{{ end }} data-arkl-only="{{ $only }}" data-arkl-coaches="{{ jsonify $coaches }}" data-arkl-lists="{{ jsonify $lists }}"{{ with $inline }} data-arkl-inline="{{ jsonify . }}"{{ end }}
        data-arkl-from='{{ jsonify (dict "cfb" ("data/cfb-all.json" | relURL) "rec" ("data/cfb-recruits.json" | relURL) "cbb" ("data/cbb-all.json" | relURL) "intl" ("data/cbb-intl.json" | relURL) "nfl" ("data/nfl-war.json" | relURL) "nba" (printf "data/nba-xpm/%v.json" (site.Data.nba_xpm.current | default 2026) | relURL) "nhl" (printf "data/nhl-war/%v.json" (site.Data.nhl_war.current | default 2027) | relURL) "soc" (printf "data/soccer-war/%v.json" (site.Data.soccer_war.current | default 2027) | relURL)) }}'>
-  {{- $tip := dict "Sport" "the board the player is on" "Pos" "position on his board" "Class" "recruiting class (high school graduation year)" "Rank" "national recruit rank: ESPN for football, On3 industry for basketball" "Stage" "where he is now: college, recruit, international, pro league or prospect pool" "Grade" "each board's own metric, not one scale: FV (20-80) for college players, internationals and hockey, soccer and CS2 prospects; xFV (projected FV) for recruits; staff score for coaches; WAR this season (NFL, NHL); rXPM last season (NBA); GAR this season (soccer); RWA (other CS2 players)" }}
+  {{- $tip := dict "Sport" "the board the player is on" "Pos" "position on his board" "Class" "recruiting class (high school graduation year)" "Rank" "national recruit rank: ESPN for football, On3 industry for basketball" "Stage" "where he is now: college, recruit, international, pro league or prospect pool" "Grade" "each board's own metric, not one scale: FV (20-80) for college players, internationals and hockey, soccer and CS2 prospects; xFV (projected FV) for recruits; staff score for coaches; WAR this season (NFL, NHL); XPM last season (NBA); GAR this season (soccer); RWA (other CS2 players)" }}
   <thead><tr>{{ range split $cols "," }}<th{{ with index $tip . }} title="{{ . }}"{{ end }}>{{ . }}</th>{{ end }}</tr></thead>
   <tbody><tr><td colspan="{{ len (split $cols ",") }}" class="cfb__dim" data-arkl-msg>{{ if $n }}loading the boards…{{ else }}no one on this ARKLIST yet{{ end }}</td></tr></tbody>
 </table>
@@ -88,7 +88,7 @@
       ((D.inline || {}).cs || []).forEach(function (r) { out.push({ name: r.n, team: r.t, logo: r.lo, ph: r.ph, pos: '', stage: 'tier ' + r.tier, grade: r.fv != null ? fvTxt(r.fv) : r.r != null ? 'RWA ' + (r.r > 0 ? '+' : '') + (+r.r).toFixed(2) : '—', v: r.fv != null ? r.fv : r.r == null ? null : 50 + r.r * 10 }); });
     } else if (sport === 'nba') {
       var N = D.nba || {};
-      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'rXPM ' + (x > 0 ? '+' : '') + (+x).toFixed(1) : '—', v: x == null ? null : 50 + x * 3 }); });
+      (N.players || []).forEach(function (r) { var x = r.xpm; out.push({ name: r.n, team: r.tm, logo: '/img/nba/' + String(r.tm).toLowerCase() + '.png', ph: ESPN('nba', r.ph), pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: x != null ? 'XPM ' + (x > 0 ? '+' : '') + (+x).toFixed(1) : '—', v: x == null ? null : 50 + x * 3 }); });
     }
     return out;
   }

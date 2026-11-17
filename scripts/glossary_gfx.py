@@ -78,7 +78,7 @@ def nba():
         'use': 'Default sort of the XPM and rookie boards. Converts to dollars in contract value.',
         'f': ['VORX = .030 × (XPM + 1.4) × MP / 48', 'replacement XPM -1.4 · .030 wins a point'],
         'test': {'t': 'rookies: order of next-3-season VORX · Spearman', 'lo': False, 'unit': '',
-                 'rows': [['VORX', .398, 1], ['pXPM', .395, 0], ['aXPM', .379, 0], ['rXPM', .330, 0]],
+                 'rows': [['VORX', .398, 1], ['pXPM', .395, 0], ['aXPM', .379, 0], ['XPM', .330, 0]],
                  'n': 'held out · rookies 2010-23'},
         'viz': {'kind': 'bars', 't': 'VORX at 2,000 MP', 'unit': '',
                 'rows': [['XPM -1.4', 0], ['XPM 0', 1.75], ['XPM +2', 4.25], ['XPM +4', 6.75], ['XPM +6', 9.25]]},
@@ -261,7 +261,7 @@ def main():
     out = J('research/glossary_gfx_base.json')
     xpm, vorx, pxpm = nba()
     war, pwar = nhl()
-    full = {'rXPM (raw XPM)': xpm, 'VORX': vorx, 'pXPM (predictive XPM)': pxpm, 'NHL WAR': war, 'pWAR / HPM': pwar,
+    full = {'XPM': xpm, 'VORX': vorx, 'pXPM (predictive XPM)': pxpm, 'NHL WAR': war, 'pWAR / HPM': pwar,
             'GAR (soccer, senior)': soccer(), 'NFL WAR': nfl(), 'FV (future value)': fv(), 'RWA (CS2)': cs2(),
             'G League NBA% / 500% / xVORX': gleague(), 'Next up (breakout odds)': nextup(), 'Stat+': statplus()}
     ab = {'G League NBA% / 500% / xVORX': 'NBA%', 'Next up (breakout odds)': 'BO%', 'pWAR / HPM': 'pWAR'}

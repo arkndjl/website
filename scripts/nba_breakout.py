@@ -373,7 +373,7 @@ def main():
            'base': lab(bs), 'u': {'lab': 'USG', 'dec': 1},
            'tiers': [{'k': u, 'lab': 'USG %d' % u} for u in tiers],
            'stat': {'lab': 'PTS/36', 'eff': 'TS%', 'dec': 1, 'edec': 1},
-           'cur': {'lab': 'XPM', 't': 'shrunk XPM this season (XPM leaders board)', 'dec': 1},
+           'cur': {'lab': 'pXPM', 't': 'pXPM: XPM shrunk by minutes, this season (XPM leaders board)', 'dec': 1},
            'ceil': {'lab': 'CEIL', 't': 'ceiling XPM: 80th percentile season if usage rises %g points' % cf['scen'],
                     'dec': 1},
            'about': (f'players not yet at the bar (best shrunk BPM so far under +{BAR:g}, BPM shrunk to -2 by MP, k 600, about the '
