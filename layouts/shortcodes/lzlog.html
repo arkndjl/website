@@ -1,4 +1,4 @@
-{{- /* laursen111.log: LAURSEN_111's journal as a retro chat room (DS PictoChat ruled pane, MSN "says:" lines,
+{{- /* laursen111.log: LAURSEN_111's journal as a retro chat room (DS PictoChat ruled pane, MSN-style name tab,
        TeamSpeak channel tree). Entries live in data/laurlog.json {n, at (ISO, ET offset), cat, text}; a new entry is a
        one-line add. Channels filter by cat. JS replays the newest entries with a typing line + pop-in when the window
        first shows; without JS (or with reduced motion) every entry is simply there. {{< lzlog class="desk__wide" >}} */ -}}
@@ -87,7 +87,7 @@
         {{- range $es }}{{ $t := time.In "America/New_York" (time .at) }}{{ $d := $t.Format "Mon Jan 2 2006" }}
         {{- if ne $d $day }}{{ $day = $d }}<div class="lzl__day">{{ $d }}</div>{{ end }}
         <div class="lzl__m" data-lzl-cat="{{ .cat }}" id="laurlog-{{ .n }}">
-          <span class="lzl__tab"><b>{{ $u }} says:</b><time datetime="{{ .at }}">{{ $t.Format "15:04" }}</time></span>
+          <span class="lzl__tab"><b>{{ $u }}</b><time datetime="{{ .at }}">{{ $t.Format "15:04" }}</time></span>
           <div class="lzl__box">
             {{ .text }}
             <div class="lzl__meta"><span class="lzl__cat">{{ .cat }}</span><span>#{{ .n }}</span></div>
