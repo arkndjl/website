@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-17T23:37:16Z",
+ "asof": "2026-11-17T23:40:39Z",
  "recenter": {
   "2026-11-17": 2.17
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-17T17:11:55Z",
-  "ageH": 6.4,
+  "ageH": 6.5,
   "stale": false
  },
  "picks": [],
@@ -2200,22 +2200,6 @@
    "tm": 145.4
   },
   {
-   "id": "401909729",
-   "sport": "cbb",
-   "kick": "2026-11-18T00:00:00Z",
-   "home": "Wake Forest",
-   "away": "Monmouth",
-   "mk": "spread",
-   "side": "home",
-   "line": 14.5,
-   "price": -119.0,
-   "edge": 5.1,
-   "x": 4.5,
-   "why": "no edge at -119",
-   "m": 19.6,
-   "tm": 142.9
-  },
-  {
    "id": "401927388",
    "sport": "cbb",
    "kick": "2026-11-18T01:00:00Z",
@@ -2326,6 +2310,22 @@
    "why": "edge under 6.5 (tier: mixed)",
    "m": 30.4,
    "tm": 147.9
+  },
+  {
+   "id": "401909729",
+   "sport": "cbb",
+   "kick": "2026-11-18T00:00:00Z",
+   "home": "Wake Forest",
+   "away": "Monmouth",
+   "mk": "spread",
+   "side": "home",
+   "line": 15.5,
+   "price": -106.0,
+   "edge": 4.1,
+   "x": 5.0,
+   "why": "edge under 5 (tier: mixed)",
+   "m": 19.6,
+   "tm": 142.9
   },
   {
    "id": "401920426",
@@ -2753,9 +2753,9 @@
   "401909729": {
    "mk": "spread",
    "side": "home",
-   "line": 14.5,
-   "price": -119.0,
-   "edge": 5.1,
+   "line": 15.5,
+   "price": -106.0,
+   "edge": 4.1,
    "ev": null,
    "units": 0.0,
    "home": "Wake Forest",
@@ -3202,7 +3202,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 18376,
+  "snapshots": 18380,
   "buckets": [
    {
     "when": "24h+",
@@ -3216,29 +3216,29 @@
    {
     "when": "6-24h",
     "clvN": 3769,
-    "clvRet": -0.0132,
-    "clvT": -7.26,
-    "clv": 0.45,
-    "beat": 0.389,
-    "still": 0.415
+    "clvRet": -0.0126,
+    "clvT": -6.95,
+    "clv": 0.46,
+    "beat": 0.395,
+    "still": 0.411
    },
    {
     "when": "1-6h",
     "clvN": 1948,
     "clvRet": -0.0401,
-    "clvT": -34.52,
+    "clvT": -34.43,
     "clv": 0.08,
-    "beat": 0.161,
-    "still": 0.716
+    "beat": 0.162,
+    "still": 0.715
    },
    {
     "when": "<1h",
-    "clvN": 334,
-    "clvRet": -0.046,
-    "clvT": -25.93,
+    "clvN": 335,
+    "clvRet": -0.0458,
+    "clvT": -25.71,
     "clv": -0.01,
-    "beat": 0.075,
-    "still": 0.835
+    "beat": 0.078,
+    "still": 0.833
    }
   ]
  },
@@ -20158,7 +20158,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T23:37:16Z",
+ "checked": "2026-11-17T23:40:39Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
