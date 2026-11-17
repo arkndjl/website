@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """G League call-up odds for the NBA ARKBOARD: every G League player this season with his chance of NBA minutes next
-season, of a 500-minute NBA season next season, and his expected NBA VORX per season over the next three.
+season, of being an NBA regular next season (1,000+ minutes), and his expected NBA VORX per season over the next three.
 
     python3 scripts/gleague_callup.py --research   # fetch every season, fit, backtest -> data/gleague_callup_fit.json
     python3 scripts/gleague_callup.py              # this season -> static/data/gleague.json (uses the fit file)
@@ -17,7 +17,8 @@ minutes, games, per-36 box (pts reb ast stl blk tov 3PA FTA, Game Score, +/-), T
 rating, PIE; NBA history through LAST season only (log career minutes, career XPM shrunk to -2 with 500 MP), draft
 round 1 / 2, log pick, years since the draft; `part` = 1 while only the Showcase Cup is played, falling to 0 as the
 34-game regular season fills. Training pools full seasons 2009-25 (2008-09 on) with Showcase-only rows 2022-25 (part 1).
-Targets: NBA 1 = any NBA minutes next season; NBA 500 = 500+ minutes (per 82 games); xVORX 3Y = P(any NBA game in the
+Targets: NBA 1 = any NBA minutes next season; REG = 1,000+ minutes (per 82 games; the league's 270th player, nine a team, plays about
+1,000 every season, and that line splits later VORX best: Nov 17 2026, was 500); xVORX 3Y = P(any NBA game in the
 next 3 seasons) x E[3-season VORX | he plays] (ridge, lambda POS_LAM, on those who played), shown per season (/ 3).
 Ridge logistic (lambda 1), standardized. Draft slot counts only drafts held before the G League season.
 Backtest: leave one season out, scored per season against the same model without G League production.
@@ -39,6 +40,7 @@ UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 API = ('https://stats.gleague.nba.com/stats/leaguedashplayerstats?LeagueID=20&Season={s}&SeasonType={t}&PerMode=Totals'
        '&MeasureType={m}&LastNGames=0&Month=0&OpponentTeamID=0&PaceAdjust=N&Period=0&PlusMinus=N&Rank=N&TeamID=0&TwoWay=0')
 REG_GAMES = 34
+REG_MP = 1000      # NBA regular: minutes next season per 82 games
 MIN_ROW = 50        # the fit's floor: fewer G League minutes than this and he is not on the board yet
 # G League team -> NBA parent (None: no affiliate) and its ESPN logo code
 TEAMS = {'AUS': ('SA', 'aus'), 'CCG': ('WSH', 'cap'), 'CLC': ('CLE', 'clc'), 'CVL': ('LAL', 'cvl'), 'CPS': ('ATL', 'cps'),
@@ -183,7 +185,7 @@ class World:
         info = {'pk': pk, 'dy': dy, 'cmp': cmp_, 'gs36': f['gs36'], 'b': b}
         mp = lambda z: (self.NB.get(z, {}).get(b, {}).get('mp') or 0) * 82 / self.GAMES.get(z, 82) if b else 0.0
         vx = lambda z: (self.NB.get(z, {}).get(b, {}).get('vorx') or 0) if b else 0.0
-        t = {'nba1': 1.0 if mp(y + 1) > 0 else 0.0, 'stick': 1.0 if mp(y + 1) >= 500 else 0.0,
+        t = {'nba1': 1.0 if mp(y + 1) > 0 else 0.0, 'stick': 1.0 if mp(y + 1) >= REG_MP else 0.0,
              'any3': 1.0 if b and any(self.NB.get(z, {}).get(b) for z in (y + 1, y + 2, y + 3)) else 0.0,
              'xv3': sum(vx(z) for z in (y + 1, y + 2, y + 3))}
         return f, t, info
