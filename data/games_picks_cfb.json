@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T02:57:49Z",
+ "asof": "2026-11-17T03:04:07Z",
  "recenter": {
   "week": 0.3
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-16",
-  "ageH": 3.0,
+  "ageH": 3.1,
   "stale": false
  },
  "picks": [],
@@ -293,22 +293,6 @@
    "tm": 52.1
   },
   {
-   "id": "401858306",
-   "sport": "cfb",
-   "kick": "2026-11-22T00:30:00.000Z",
-   "home": "Louisville",
-   "away": "Pittsburgh",
-   "mk": "total",
-   "side": "over",
-   "line": 48.5,
-   "price": -110.0,
-   "edge": 5.9,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 13.8,
-   "tm": 54.4
-  },
-  {
    "id": "401856748",
    "sport": "cfb",
    "kick": "2026-11-21T17:00:00.000Z",
@@ -316,9 +300,9 @@
    "away": "Vanderbilt",
    "mk": "total",
    "side": "over",
-   "line": 47.5,
-   "price": -110.0,
-   "edge": 5.4,
+   "line": 46.5,
+   "price": -124.0,
+   "edge": 6.4,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
    "m": 10.5,
@@ -371,6 +355,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": 10.2,
    "tm": 44.4
+  },
+  {
+   "id": "401858306",
+   "sport": "cfb",
+   "kick": "2026-11-22T00:30:00.000Z",
+   "home": "Louisville",
+   "away": "Pittsburgh",
+   "mk": "total",
+   "side": "over",
+   "line": 50.5,
+   "price": -114.0,
+   "edge": 3.9,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 13.8,
+   "tm": 54.4
   },
   {
    "id": "401862831",
@@ -565,22 +565,6 @@
    "tm": 55.4
   },
   {
-   "id": "401856755",
-   "sport": "cfb",
-   "kick": "2026-11-21T20:30:00.000Z",
-   "home": "Texas",
-   "away": "Arkansas",
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -119.0,
-   "edge": 0.8,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 20.2,
-   "tm": 47.3
-  },
-  {
    "id": "401862834",
    "sport": "cfb",
    "kick": "2026-11-21T17:00:00.000Z",
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 39.6
+  },
+  {
+   "id": "401860925",
+   "sport": "cfb",
+   "kick": "2026-11-22T02:30:00.000Z",
+   "home": "Boise State",
+   "away": "San Diego State",
+   "mk": "total",
+   "side": "under",
+   "line": 61.5,
+   "price": -106.0,
+   "edge": 5.1,
+   "x": null,
+   "why": "total market off",
+   "m": 19.5,
+   "tm": 56.4
   }
  ],
  "games": {
@@ -811,16 +811,16 @@
    "state": "under"
   },
   "401856755": {
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -119.0,
-   "edge": 0.8,
+   "mk": "spread",
+   "side": "away",
+   "line": 20.5,
+   "price": -108.0,
+   "edge": 0.3,
    "ev": null,
    "units": 0.0,
    "home": "Texas",
    "away": "Arkansas",
-   "state": "under"
+   "state": "off"
   },
   "401856866": {
    "mk": "total",
@@ -861,9 +861,9 @@
   "401858306": {
    "mk": "total",
    "side": "over",
-   "line": 48.5,
-   "price": -110.0,
-   "edge": 5.9,
+   "line": 50.5,
+   "price": -114.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "Louisville",
@@ -885,9 +885,9 @@
   "401856748": {
    "mk": "total",
    "side": "over",
-   "line": 47.5,
-   "price": -110.0,
-   "edge": 5.4,
+   "line": 46.5,
+   "price": -124.0,
+   "edge": 6.4,
    "ev": null,
    "units": 0.0,
    "home": "Florida",
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -1293,9 +1293,9 @@
   "401871101": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -124.0,
-   "edge": 5.2,
+   "line": 65.5,
+   "price": -110.0,
+   "edge": 4.2,
    "ev": null,
    "units": 0.0,
    "home": "Southern Miss",
@@ -1499,14 +1499,14 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21771,
+  "snapshots": 21786,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4395,
+    "clvN": 4399,
     "clvRet": -0.0478,
-    "clvT": -35.14,
-    "clv": 0.21,
+    "clvT": -35.27,
+    "clv": 0.2,
     "beat": 0.339,
     "still": 0.328
    },
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T02:57:49Z",
+ "checked": "2026-11-17T03:04:07Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

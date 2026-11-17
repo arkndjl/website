@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-17T02:04Z",
+ "asof": "2026-11-17T03:02Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -77,7 +77,7 @@
     }
    ],
    "joined": 0,
-   "players": 2585,
+   "players": 2586,
    "rows": 16716
   },
   "nba": {
@@ -274,7 +274,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 13,
+     "flags": 17,
      "rows": 2148
     },
     "static/data/nfl-fantasy.json": {
@@ -282,11 +282,11 @@
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 78,
+     "flags": 81,
      "rows": 1823
     },
     "static/data/pctl-nfl.json": {
-     "flags": 76,
+     "flags": 79,
      "rows": 1752
     },
     "static/data/personnel/nfl.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 51,
+     "flags": 53,
      "rows": 1650
     }
    },
@@ -426,6 +426,24 @@
      "site": "KC"
     },
     {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "19996",
+     "player": "Jacob De Jesus",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "KC"
+    },
+    {
      "d": "2026-08-31",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -442,6 +460,60 @@
      "pos": "CB",
      "rotowire": "TEN",
      "site": "KC"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "18482",
+     "player": "Brady Cook",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "MIA"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to Miami's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Miami's practice squad",
+      "kind": "practice"
+     },
+     "pid": "14421",
+     "player": "Jalen Reagor",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIA"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "17691",
+     "player": "Jeshaun Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
     },
     {
      "d": "2026-10-19",
@@ -676,6 +748,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "SEA"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "17691",
+     "player": "Jeshaun Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
     },
     {
      "d": "2026-10-21",
@@ -1560,6 +1650,24 @@
      "site": "LA"
     },
     {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Reverts to Miami's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Miami's practice squad",
+      "kind": "practice"
+     },
+     "pid": "14421",
+     "player": "Jalen Reagor",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIA"
+    },
+    {
      "d": "2026-10-19",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1576,6 +1684,24 @@
      "pos": "OL",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Reverts to Vegas' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Vegas' practice squad",
+      "kind": "practice"
+     },
+     "pid": "18863",
+     "player": "Carter Runyon",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LV"
     },
     {
      "d": "2026-09-17",
@@ -2532,6 +2658,24 @@
      "site": "NE"
     },
     {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Returns to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Returns to practice squad",
+      "kind": "practice"
+     },
+     "pid": "17965",
+     "player": "Devin Culp",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "MIN"
+    },
+    {
      "d": "2026-09-01",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2620,6 +2764,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "LAC"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "18482",
+     "player": "Brady Cook",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "MIA"
     },
     {
      "d": "2026-10-08",
@@ -3034,6 +3196,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "SEA"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back with practice squad",
+      "kind": "practice"
+     },
+     "pid": "17691",
+     "player": "Jeshaun Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
     },
     {
      "d": "2026-10-21",
@@ -3954,6 +4134,24 @@
      "site": "LA"
     },
     {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Reverts to Miami's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Miami's practice squad",
+      "kind": "practice"
+     },
+     "pid": "14421",
+     "player": "Jalen Reagor",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIA"
+    },
+    {
      "d": "2026-10-19",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3970,6 +4168,24 @@
      "pos": "OL",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Reverts to Vegas' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Vegas' practice squad",
+      "kind": "practice"
+     },
+     "pid": "18863",
+     "player": "Carter Runyon",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LV"
     },
     {
      "d": "2026-11-11",
