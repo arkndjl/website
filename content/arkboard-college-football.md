@@ -1,7 +1,7 @@
 +++
 title = "Football Prospects / CFB :: ARKBOARD"
 url = "/arkboard/college-football/"
-description = "Football Prospects (CFB) ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; breakouts; team talent; coaching staffs. auto-updated in season."
+description = "Football Prospects (CFB) ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; standouts; team talent; coaching staffs. auto-updated in season."
 keywords = ["arkboard", "ark ranking", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
 cover = "/og/college-football.png"
@@ -11,13 +11,16 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,breakouts,awards,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
 {{< awards sport="cfb" tab="awards" >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits) and coaches" tab="ARKLIST" >}}
-{{< cfbbreakout title="breakout watch" tab="breakouts" >}}
+{{< cfbbreakout title="standouts" tab="standouts" >}}
+{{< lazytab tab="next up" >}}
+{{< rookies sport="cfb" src="data/next-up/cfb-tab.json" icon="football" title="next up" tab="next up" >}}
+{{< /lazytab >}}
 {{< wintabs tab="portal" tabs="portal,re-signed" sub="true" label="portal views" >}}
 {{< lazytab tab="portal" >}}
 {{< xferwatch sport="cfb" view="players" tab="portal" >}}

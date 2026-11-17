@@ -11,11 +11,14 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,rookies,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:leaders,rookies,next up,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
 {{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
 {{< rookies sport="soccer" icon="soccer" title="rookies" tab="rookies" >}}
+{{< lazytab tab="next up" >}}
+{{< rookies sport="soccer" src="data/next-up/soccer-tab.json" icon="soccer" title="next up" tab="next up" >}}
+{{< /lazytab >}}
 {{< lazytab tab="awards" >}}{{< awards sport="soccer" tab="awards" >}}{{< /lazytab >}}
 {{< arklist sport="soccer" title="ARKLIST" tab="ARKLIST" >}}
 {{< soccerlineups title="lineups" tab="lineups" >}}

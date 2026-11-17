@@ -213,6 +213,10 @@ jobs:
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py cfb
+      # next up tab: breakout odds (scripts/cfb_breakout.py -> static/data/next-up/cfb.json; PFN pages cached 6 h)
+      - name: Next up tab
+        continue-on-error: true
+        run: python3 scripts/cfb_breakout.py && python3 scripts/next_up.py cfb
       # weekly moves on the true freshmen tab: each row's values as of the last Wednesday post (scripts/board_moves.py)
       - name: Board moves
         continue-on-error: true
@@ -256,4 +260,4 @@ jobs:
           python3 scripts/data_push.py -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))" \
             --rebuild data/games_picks_cfb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
-            -- 'data/cfb*.json' data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json scripts/data/school_bios_cfb.json data/dob_conflicts_cfb.json 'scripts/data/odds/cfb-*.jsonl'
+            -- 'data/cfb*.json' static/data/next-up/cfb.json static/data/next-up/cfb-tab.json data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json scripts/data/school_bios_cfb.json data/dob_conflicts_cfb.json 'scripts/data/odds/cfb-*.jsonl'

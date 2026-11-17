@@ -11,13 +11,16 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,awards,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches|market:contract value" side="true" label="NHL views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,next up,awards,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches|market:contract value" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
 {{< xaav sport="nhl" title="contract value" tab="contract value" >}}
 {{< rookies sport="nhl" icon="hockey" title="rookies" tab="rookies" >}}
+{{< lazytab tab="next up" >}}
+{{< rookies sport="nhl" src="data/next-up/nhl-tab.json" icon="hockey" title="next up" tab="next up" >}}
+{{< /lazytab >}}
 {{< awards sport="nhl" tab="awards" >}}
 {{< arklist sport="nhl" title="ARKLIST" tab="ARKLIST" >}}
 {{< nhllines title="lines" tab="lines" >}}
