@@ -903,6 +903,24 @@ async function leetifyPugs(steam) {
   fs.mkdirSync(path.dirname(LC), { recursive: true }); fs.writeFileSync(LC, JSON.stringify(keep));
   return { status, rows, premier: prof?.ranks?.premier ?? null, leetify: prof?.ranks?.leetify ?? null };
 }
+// PUG form: last 10, streak, every match oldest -> newest with a rolling 5-match RWA, per-map and per-source splits
+function pugForm(rows) {
+  const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100;
+  const sum = rs => { const m = rs.map(r => r.me).filter(Boolean), k = m.reduce((a, x) => a + (x.k || 0), 0), d = m.reduce((a, x) => a + (x.d || 0), 0);
+    const avg = f => { const v = m.map(f).filter(x => x != null); return v.length ? v.reduce((a, x) => a + x, 0) / v.length : null; };
+    const rw = avg(x => x.rwa), rt = avg(x => x.rating), adr = avg(x => x.adr);
+    return { n: rs.length, w: rs.filter(r => r.win).length, l: rs.filter(r => !r.win).length, rwa: rw == null ? null : r1(rw), rating: rt == null ? null : r2(rt),
+      kd: d ? r2(k / d) : null, adr: adr == null ? null : r1(adr) }; };
+  const newest = rows.filter(r => r.me);
+  let st = 0; for (const r of newest) { if (!st || Math.sign(st) === (r.win ? 1 : -1)) st += r.win ? 1 : -1; else break; }
+  const old = [...newest].reverse(), series = old.map((r, i) => { const win = old.slice(Math.max(0, i - 4), i + 1).map(x => x.me.rwa).filter(x => x != null);
+    return { at: r.at, src: r.src, map: r.map, win: r.win, score: `${r.rf}-${r.ra}`, rwa: r.me.rwa, rating: r.me.rating, kd: r.me.d ? r2(r.me.k / r.me.d) : null, adr: r.me.adr,
+      roll: win.length ? r1(win.reduce((a, x) => a + x, 0) / win.length) : null }; });
+  const maps = {}; for (const r of newest) (maps[r.map] ||= []).push(r);
+  return { last10: sum(newest.slice(0, 10)), all: sum(newest), streak: st ? `${st > 0 ? 'W' : 'L'}${Math.abs(st)}` : null, form: newest.slice(0, 10).map(r => (r.win ? 'W' : 'L')).join(''),
+    series, maps: Object.entries(maps).map(([map, rs]) => ({ map, ...sum(rs) })).sort((a, b) => b.n - a.n || (b.rwa ?? -99) - (a.rwa ?? -99)),
+    src: ['faceit', 'premier', 'comp'].map(k => ({ src: k, ...sum(newest.filter(r => r.src === k)) })).filter(x => x.n) };
+}
 if (prof?.me?.id) {
   PUG_ME.add(prof.me.id); if (prof.me.steam) PUG_ME.add(prof.me.steam);
   const fr = await faceitPugs(prof.me.id).catch(e => (console.log('faceit pugs:', e.message), []));
@@ -913,7 +931,7 @@ if (prof?.me?.id) {
   for (const r of rows) { const m = meLine(r); r.me = m ? { k: m.k, d: m.d, adr: m.adr, rwa: m.rwa, rating: m.rating } : null; }
   const n = s => rows.filter(r => r.src === s).length;
   prof.pugs = { rows, w: rows.filter(r => r.win).length, l: rows.filter(r => !r.win).length, faceit: n('faceit'), premier: n('premier'), comp: n('comp'),
-    leetify: { status: lr.status, premier: lr.premier, rating: lr.leetify } };
+    leetify: { status: lr.status, premier: lr.premier, rating: lr.leetify }, ...pugForm(rows) };
 }
 
 // ---- season summary ---------------------------------------------------------------------------

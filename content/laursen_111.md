@@ -22,6 +22,7 @@ draft = false
 {{< desk tab="stats" >}}
 {{< csprofile class="desk__wide" >}}
 {{< esea part="faceit" >}}
+{{< esea part="pugform" class="desk__wide" >}}
 {{< esea part="pugs" class="desk__wide" >}}
 {{< esea part="split" class="desk__wide" >}}
 {{< /desk >}}
