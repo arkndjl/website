@@ -485,8 +485,11 @@ def build():
     for k, v in vt.items():
         names[k] = v[2]
     cands = [k for k in lastd if lastd[k] >= cut and n[k] >= 15 and st["lastros"].get(k)]
+    # one row per five: a rebrand rated as a listed team (rated()) is that team, not a second entry
+    cset = set(cands)
+    cands = [k for k in cands if rated(k) == k or rated(k) not in cset]
     wt = W["top"]
-    z = {k: wt[0] * strength(k)[0] + wt[1] * strength(k)[1] for k in cands}
+    z = {k: wt[0] * strength(rated(k))[0] + wt[1] * strength(rated(k))[1] for k in cands}
     order = sorted(cands, key=lambda k: -z[k])
     # ARK: Bo3 chance against the top 20 (top-50 weights, veto included); the top 20 re-picked once on ARK itself
     vs = {}
