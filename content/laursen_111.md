@@ -12,10 +12,10 @@ draft = false
 {{< /desk >}}
 {{< desk tab="social" >}}
 {{< lzsocial class="desk__wide" >}}
-{{< lzsocplan part="plan" class="desk__wide" >}}
 {{< lzsocplan part="twitch" class="desk__wide" >}}
 {{< lzsocplan part="youtube" class="desk__wide" >}}
 {{< lzsocplan part="tiktok" class="desk__wide" >}}
+{{< lzsocplan part="plan" class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="clips" >}}
 {{< vods title="uploads.exe" class="desk__wide" >}}

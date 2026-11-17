@@ -4,7 +4,7 @@
 // TWITCH_CLIENT_SECRET add Helix stream start times and the VOD archive), and the schedule / growth read built
 // from them. Called by scripts/laursen_socials.mjs, which writes everything to data/laursen_socials.json.
 const YT_CH = 'UC6FmXC9DL1Rc4ATAVPeBYtQ', TW_LOGIN = 'laursen_111';
-const DAY = 864e5, HR = 36e5, MIN_AGE = 3;           // uploads younger than 3 days are left out of timing splits
+const PRIOR = 30, DAY = 864e5, HR = 36e5, MIN_AGE = 3;           // uploads younger than 3 days are left out of timing splits
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const BLOCKS = ['12a', '4a', '8a', '12p', '4p', '8p']; // 4-hour ET blocks
 const etf = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', hourCycle: 'h23' });
@@ -106,7 +106,7 @@ function streams(tw) {
   return out.sort((a, b) => a.s - b.s);
 }
 
-export async function build({ prev, now, series, goals, cur, get }) {
+export async function build({ prev, now, series, goals, cur, get, hist = {} }) {
   const { yt, src: ytSrc } = await youtube(prev, now, get);
   const { tw, src: twSrc } = await twitch(prev, now, get, cur.twitch);
   const { tt, ok: ttOk } = await tiktok(prev, now, get);
@@ -197,5 +197,37 @@ export async function build({ prev, now, series, goals, cur, get }) {
   if (plan.tt) I.push({ k: 'TikTok hearts', v: `${plan.tt.hpv} / video`, d: `${plan.tt.videos} videos · ${r2(plan.tt.fpv)} followers / video`, n: plan.tt.videos });
   const ytShorts = ups.filter(u => u.short).length;
   if (plan.tt && ytShorts) I.push({ k: 'Cross-post', v: `${plan.tt.videos} TikTok · ${ytShorts} Shorts`, d: plan.tt.videos > ytShorts ? `${plan.tt.videos - ytShorts} TikToks not on Shorts${ytSrc === 'rss' ? ' (feed shows latest 15)' : ''}` : 'even', n: plan.tt.videos });
+  // ---- rolling views: the last X Shorts / TikToks (sum, mean, median) and a trailing-5 mean per post; history kept per change
+  const X = 10, sum = a => a.reduce((x, y) => x + y, 0);
+  const rollOf = a => { const l = a.slice(-X).map(u => u.views); return l.length ? { n: l.length, sum: sum(l), avg: Math.round(sum(l) / l.length), med: median(l) } : null; };
+  const trail = (a, id) => { const i = a.findIndex(u => u.id === id); if (i < 0) return null; const w = a.slice(Math.max(0, i - 4), i + 1).map(u => u.views); return w.length >= 3 ? Math.round(sum(w) / w.length) : null; };
+  const ytS = ups.filter(u => u.short);
+  plan.roll = { x: X, yt: rollOf(ytS), tt: rollOf(tv) };
+  for (const u of plan.yt.ups) u.r5 = u.short ? trail(ytS, u.id) : null;
+  if (plan.tt?.vids) for (const u of plan.tt.vids) u.r5 = trail(tv, u.id);
+  // ---- insights that unlock as samples grow (pending ones list what they wait on)
+  const NETS = { twitch: 'Twitch', youtube: 'YouTube', tiktok: 'TikTok', x: 'X' }, pend = (k, d) => I.push({ k, v: null, d, n: null, wait: true });
+  const vs = (a, lbl) => { const cur10 = a.slice(-X).map(u => u.views), prev10 = a.slice(-2 * X, -X).map(u => u.views);
+    if (prev10.length >= 5) { const c = sum(cur10) / cur10.length, q = sum(prev10) / prev10.length, ch = (c / Math.max(1, q) - 1) * 100;
+      I.push({ k: `${lbl} L10 trend`, v: `${ch >= 0 ? '+' : ''}${Math.round(ch)}%`, d: `${fmt(c)} vs ${fmt(q)} avg, prior ${prev10.length}`, n: cur10.length + prev10.length }); }
+    else pend(`${lbl} L10 trend`, `at ${X + 5} ${lbl === 'Shorts' ? 'Shorts' : 'TikToks'} tracked (${a.length})`); };
+  vs(ytS, 'Shorts'); vs(tv, 'TikTok');
+  for (const [k, nm] of Object.entries(NETS)) { const g = goals[k]; if (!g) continue;
+    if (g.tracked >= 14) { const t = (g.rate * (PRIOR + g.tracked) - g.prior * PRIOR) / Math.max(1, g.tracked);
+      I.push({ k: `${nm} pace`, v: `${t >= g.prior ? '+' : ''}${r1(t - g.prior)}/mo vs lifetime`, d: `${r1(t)}/mo tracked · ${g.prior}/mo lifetime`, n: Math.round(g.tracked) }); }
+    else pend(`${nm} pace`, `at 14 days tracked (${r1(g.tracked)})`); }
+  const res = Object.values(hist).flatMap(h => (h.dated || []).filter(d => d.done)), msHit = Object.values(hist).flatMap(h => (h.ms || []).filter(m => m.hit && !m.est && m.ahead != null));
+  if (res.length >= 3) { const hit = res.filter(d => d.hit).length, exp = sum(res.map(d => d.p)) / res.length;
+    I.push({ k: 'Goal calibration', v: `${hit} of ${res.length} hit`, d: `${Math.round(hit / res.length * 100)}% hit vs ${Math.round(exp)}% forecast`, n: res.length }); }
+  else pend('Goal calibration', `at 3 dated goals resolved (${res.length})`);
+  if (msHit.length) { const a = sum(msHit.map(m => m.ahead)) / msHit.length; I.push({ k: 'Milestones vs pace', v: `${a >= 0 ? '+' : ''}${Math.round(a)} days`, d: `mean over ${msHit.length} tracked milestone${msHit.length > 1 ? 's' : ''}`, n: msHit.length }); }
+  else pend('Milestones vs pace', 'at the first tracked milestone');
+  const ttTr = series.filter(x => x.tiktok != null), ttDays = ttTr.length > 1 ? (ttTr.at(-1).t - ttTr[0].t) / DAY : 0;
+  if (ttDays >= 7 && tdv > 0) { const f = ttTr.at(-1).tiktok - ttTr[0].tiktok; I.push({ k: 'TikTok follows / 1k views', v: `${r2(f / tdv * 1e3)}`, d: `${f} follows on ${fmt(tdv)} new views`, n: Math.round(ttDays) }); }
+  else pend('TikTok follows / 1k views', `at 7 days tracked (${r1(ttDays)})`);
+  if (!lpH) pend('Follows / hour', `at 1 live hour sampled (${r1(hLive)})`);
+  if (subsPerK == null) pend('Subs / 1k views', 'at 3 days of YouTube view history');
+  const rh = prev.plan?.roll_t || [], lr = rh[rh.length - 1], pt = [now, plan.roll.yt?.sum ?? null, plan.roll.tt?.sum ?? null];
+  plan.roll_t = !lr || lr[1] !== pt[1] || lr[2] !== pt[2] || now - lr[0] > DAY ? [...rh, pt].slice(-1500) : rh;
   return { yt, tw, plan };
 }

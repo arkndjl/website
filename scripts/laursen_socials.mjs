@@ -87,7 +87,7 @@ for (const k of Object.keys(OPENED)) {
   goals[k].opened = OPENED[k];
 }
 console.log('goals:', JSON.stringify(goals));
-const { yt, tw, plan } = await import('./laursen_social_plan.mjs').then(m => m.build({ prev, now, series, goals, cur, get }));
+const { yt, tw, plan } = await import('./laursen_social_plan.mjs').then(m => m.build({ prev, now, series, goals, cur, get, hist }));
 const body = { status, goals, hist, series, yt, tw, plan };
 const strip = o => JSON.stringify({ ...o, asof: undefined });
 if (strip(body) === strip(prev) && !stale) process.exit(0);

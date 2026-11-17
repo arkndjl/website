@@ -4,7 +4,7 @@
 {{- $syncd := "" }}{{ with $s }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
 {{- $days := slice "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }}{{ $blocks := slice "12a" "4a" "8a" "12p" "4p" "8p" -}}
 {{- $fmt := "Jan 2" -}}
-{{- $names := dict "plan" (slice "growth_plan.exe" "icon-twitch") "youtube" (slice "youtube.exe" "icon-youtube") "twitch" (slice "twitch.exe" "icon-twitch") "tiktok" (slice "tiktok_stats.exe" "icon-tiktok") -}}
+{{- $names := dict "plan" (slice "insights.exe" "icon-twitch") "youtube" (slice "youtube.exe" "icon-youtube") "twitch" (slice "twitch.exe" "icon-twitch") "tiktok" (slice "tiktok_stats.exe" "icon-tiktok") -}}
 {{- $nm := index $names $part -}}
 <div class="win lzf lzp{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
@@ -15,24 +15,32 @@
 {{- if eq $part "plan" }}
   {{- with $p.ideas }}
     <div class="esea-m__box lzp__gbox">
-    <p class="esea__gfxbar"><button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ $syncd }}" data-gfx-title="LAURSEN_111 :: GROWTH PLAN" title="growth plan graphic (16:9)">GFX</button></p>
+    <p class="esea__gfxbar"><button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ $syncd }}" data-gfx-title="LAURSEN_111 :: SOCIAL INSIGHTS" title="insights graphic (16:9)">GFX</button></p>
     <div class="wintable__scroll">
     <table class="esea-box lzp__ideas">
       <thead><tr><th>Call</th><th>Pick</th><th title="what the pick rests on">Data</th><th title="sample size">n</th></tr></thead>
-      <tbody>{{ range . }}<tr><td>{{ .k }}</td><td><b>{{ .v }}</b></td><td class="cfb__dim">{{ .d }}</td><td>{{ .n }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range where . "wait" "!=" true }}<tr><td>{{ .k }}</td><td><b>{{ .v }}</b></td><td class="cfb__dim">{{ .d }}</td><td>{{ .n }}</td></tr>{{ end }}</tbody>
     </table>
     </div>
     </div>
+    {{- with where . "wait" true }}
+    <div class="wintable__scroll lzp__wait">
+    <table class="esea-box">
+      <thead><tr><th>Next</th><th title="unlocks when the sample reaches this size">Unlocks</th></tr></thead>
+      <tbody>{{ range . }}<tr><td class="cfb__dim">{{ .k }}</td><td class="cfb__dim">{{ .d }}</td></tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
   {{- else }}<p class="esea__empty-line">no social data yet.</p>{{ end }}
 {{- else if eq $part "youtube" }}
   {{- with $p.yt }}{{ $y := . }}
     <ul class="esea__tiles lzf__tiles">
       <li><span class="esea__v">{{ .n }}</span><span class="esea__k" title="uploads tracked{{ if eq $p.src.yt "rss" }} (channel feed: latest 15, more kept as they post){{ end }}">uploads</span></li>
-      <li><span class="esea__v">{{ with .median }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="median views, uploads 3+ days old">med views</span></li>
+      <li><span class="esea__v">{{ with $p.roll }}{{ with .yt }}{{ lang.FormatNumber 0 (float .avg) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span><span class="esea__k" title="mean views, last {{ with $p.roll }}{{ with .yt }}{{ .n }}{{ end }}{{ end }} Shorts{{ with $p.roll }}{{ with .yt }} · median {{ lang.FormatNumber 0 (float .med) }}{{ end }}{{ end }}">L10 avg</span></li>
       <li><span class="esea__v">{{ with .shorts.med }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="median views, Shorts ({{ .shorts.n }})">Shorts</span></li>
       <li><span class="esea__v">{{ with .long.med }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="median views, long uploads ({{ .long.n }})">long</span></li>
       <li><span class="esea__v">{{ with .likeRate }}{{ . }}%{{ else }}—{{ end }}</span><span class="esea__k" title="likes per view">like rate</span></li>
-      <li><span class="esea__v">{{ with .vpd }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="views added per day across tracked uploads">views/day</span></li>
+      <li><span class="esea__v">{{ with $p.roll }}{{ with .yt }}{{ lang.FormatNumber 0 (float .sum) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span><span class="esea__k" title="total views, last {{ with $p.roll }}{{ with .yt }}{{ .n }}{{ end }}{{ end }} Shorts">L10 views</span></li>
     </ul>
     {{- with .ups }}{{ $n := len . }}{{ $max := 1.0 }}{{ range . }}{{ if gt (float .views) $max }}{{ $max = float .views }}{{ end }}{{ end }}
     {{- $h := 90.0 }}{{ $w := 10 }}
@@ -40,8 +48,17 @@
       {{- range $i, $u := . }}{{ $bh := math.Max (div (mul (float $u.views) (sub $h 2)) $max) 0.6 }}
       <rect x="{{ add (mul $i $w) 1 }}" y="{{ sub $h $bh }}" width="{{ sub $w 2 }}" height="{{ $bh }}" class="{{ if $u.short }}is-short{{ else }}is-long{{ end }}"><title>{{ (time.In "America/New_York" (time (int (div $u.pub 1000)))).Format "Jan 2 3:04 PM" }} · {{ $u.title }} · {{ lang.FormatNumber 0 (float $u.views) }} views</title></rect>
       {{- end }}
+      {{- range $i, $u := . }}{{ with $u.r5 }}<rect x="{{ mul $i $w }}" y="{{ math.Max (sub (sub $h (div (mul (float .) (sub $h 2)) $max)) 1) 0 }}" width="{{ $w }}" height="2" class="lzf__roll"><title>trailing 5 {{ lang.FormatNumber 0 (float .) }}</title></rect>{{ end }}{{ end }}
     </svg>
-    <p class="esea-fc__axis lzf__axis"><span>older</span><span>views · <i class="lzp__key is-short"></i> Shorts <i class="lzp__key is-long"></i> long</span><span>latest</span></p>
+    <p class="esea-fc__axis lzf__axis"><span>older</span><span>views · <i class="lzp__key is-short"></i> Shorts <i class="lzp__key is-long"></i> long <i class="lzf__key"></i> 5-Short</span><span>latest</span></p>
+    {{- with $p.roll_t }}{{ $pts := slice }}{{ range . }}{{ with index . 1 }}{{ $pts = $pts | append (float .) }}{{ end }}{{ end }}
+    {{- if gt (len $pts) 1 }}{{ $n := len $pts }}{{ $lo := index $pts 0 }}{{ $hi := index $pts 0 }}{{ range $pts }}{{ if lt . $lo }}{{ $lo = . }}{{ end }}{{ if gt . $hi }}{{ $hi = . }}{{ end }}{{ end }}{{ $span := math.Max (sub $hi $lo) 1.0 }}{{ $W := 200 }}{{ $H := 40.0 }}{{ $sw := div (float $W) (sub $n 1) }}
+    <div class="lzf__tr lzp__roll"><p class="lzf__trh"><span class="esea__k">L10 views · Shorts</span> <b>{{ lang.FormatNumber 0 (index $pts (sub $n 1)) }}</b></p>
+    <svg class="lzf__trc" viewBox="0 0 {{ $W }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="last-10 views over time">
+      {{- range $i, $v := $pts }}{{ if lt $i (sub $n 1) }}{{ $y := sub (sub $H 2) (mul (div (sub $v $lo) $span) (sub $H 4)) }}<rect x="{{ mul $i $sw }}" y="{{ $y }}" width="{{ $sw }}" height="2" class="lzf__trl"/>{{ $nx := index $pts (add $i 1) }}{{ $y2 := sub (sub $H 2) (mul (div (sub $nx $lo) $span) (sub $H 4)) }}<rect x="{{ sub (mul (add $i 1) $sw) 1 }}" y="{{ math.Min $y $y2 }}" width="2" height="{{ add (math.Abs (sub $y2 $y)) 2 }}" class="lzf__trl"/>{{ end }}{{ end }}
+    </svg>
+    <p class="esea-fc__axis lzf__axis"><span>{{ lang.FormatNumber 0 $lo }}</span><span>{{ lang.FormatNumber 0 $hi }}</span></p></div>
+    {{- end }}{{ end }}
     {{- end }}
     {{- with .grid }}{{ $mx := 1.0 }}{{ range . }}{{ range . }}{{ with .med }}{{ if gt (float .) $mx }}{{ $mx = float . }}{{ end }}{{ end }}{{ end }}{{ end }}
     <div class="lzp__hmw">
@@ -113,8 +130,8 @@
       <li><span class="esea__v">{{ with .hpv }}{{ . }}{{ else }}—{{ end }}</span><span class="esea__k" title="likes per video">likes/video</span></li>
       <li><span class="esea__v">{{ with .videos }}{{ . }}{{ else }}—{{ end }}</span><span class="esea__k">videos</span></li>
       <li><span class="esea__v">{{ with .views }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="views summed over the {{ .n }} videos tracked (TikTok's public embed lists the latest ~10; older ones stay once seen)">views ({{ .n }})</span></li>
-      <li><span class="esea__v">{{ with .median }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="median views, videos 3+ days old">med views</span></li>
-      <li><span class="esea__v">{{ with .vpd }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="views added per day across tracked videos">views/day</span></li>
+      <li><span class="esea__v">{{ with $p.roll }}{{ with .tt }}{{ lang.FormatNumber 0 (float .avg) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span><span class="esea__k" title="mean views, last {{ with $p.roll }}{{ with .tt }}{{ .n }}{{ end }}{{ end }} TikToks{{ with $p.roll }}{{ with .tt }} · median {{ lang.FormatNumber 0 (float .med) }}{{ end }}{{ end }}">L10 avg</span></li>
+      <li><span class="esea__v">{{ with $p.roll }}{{ with .tt }}{{ lang.FormatNumber 0 (float .sum) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span><span class="esea__k" title="total views, last {{ with $p.roll }}{{ with .tt }}{{ .n }}{{ end }}{{ end }} TikToks">L10 views</span></li>
     </ul>
     {{- with .vids }}{{ $n := len . }}{{ $max := 1.0 }}{{ range . }}{{ if gt (float .views) $max }}{{ $max = float .views }}{{ end }}{{ end }}
     {{- $h := 90.0 }}{{ $w := 10 }}
@@ -122,8 +139,17 @@
       {{- range $i, $u := . }}{{ $bh := math.Max (div (mul (float $u.views) (sub $h 2)) $max) 0.6 }}
       <rect x="{{ add (mul $i $w) 1 }}" y="{{ sub $h $bh }}" width="{{ sub $w 2 }}" height="{{ $bh }}" class="{{ if $u.photo }}is-long{{ else }}is-short{{ end }}"><title>{{ (time.In "America/New_York" (time (int (div $u.pub 1000)))).Format "Jan 2 3:04 PM" }} · {{ $u.desc }} · {{ lang.FormatNumber 0 (float $u.views) }} views</title></rect>
       {{- end }}
+      {{- range $i, $u := . }}{{ with $u.r5 }}<rect x="{{ mul $i $w }}" y="{{ math.Max (sub (sub $h (div (mul (float .) (sub $h 2)) $max)) 1) 0 }}" width="{{ $w }}" height="2" class="lzf__roll"><title>trailing 5 {{ lang.FormatNumber 0 (float .) }}</title></rect>{{ end }}{{ end }}
     </svg>
-    <p class="esea-fc__axis lzf__axis"><span>older</span><span>views · <i class="lzp__key is-short"></i> video <i class="lzp__key is-long"></i> photo</span><span>latest</span></p>
+    <p class="esea-fc__axis lzf__axis"><span>older</span><span>views · <i class="lzp__key is-short"></i> video <i class="lzp__key is-long"></i> photo <i class="lzf__key"></i> 5-post</span><span>latest</span></p>
+    {{- with $p.roll_t }}{{ $pts := slice }}{{ range . }}{{ with index . 2 }}{{ $pts = $pts | append (float .) }}{{ end }}{{ end }}
+    {{- if gt (len $pts) 1 }}{{ $n := len $pts }}{{ $lo := index $pts 0 }}{{ $hi := index $pts 0 }}{{ range $pts }}{{ if lt . $lo }}{{ $lo = . }}{{ end }}{{ if gt . $hi }}{{ $hi = . }}{{ end }}{{ end }}{{ $span := math.Max (sub $hi $lo) 1.0 }}{{ $W := 200 }}{{ $H := 40.0 }}{{ $sw := div (float $W) (sub $n 1) }}
+    <div class="lzf__tr lzp__roll"><p class="lzf__trh"><span class="esea__k">L10 views · TikTok</span> <b>{{ lang.FormatNumber 0 (index $pts (sub $n 1)) }}</b></p>
+    <svg class="lzf__trc" viewBox="0 0 {{ $W }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="last-10 views over time">
+      {{- range $i, $v := $pts }}{{ if lt $i (sub $n 1) }}{{ $y := sub (sub $H 2) (mul (div (sub $v $lo) $span) (sub $H 4)) }}<rect x="{{ mul $i $sw }}" y="{{ $y }}" width="{{ $sw }}" height="2" class="lzf__trl"/>{{ $nx := index $pts (add $i 1) }}{{ $y2 := sub (sub $H 2) (mul (div (sub $nx $lo) $span) (sub $H 4)) }}<rect x="{{ sub (mul (add $i 1) $sw) 1 }}" y="{{ math.Min $y $y2 }}" width="2" height="{{ add (math.Abs (sub $y2 $y)) 2 }}" class="lzf__trl"/>{{ end }}{{ end }}
+    </svg>
+    <p class="esea-fc__axis lzf__axis"><span>{{ lang.FormatNumber 0 $lo }}</span><span>{{ lang.FormatNumber 0 $hi }}</span></p></div>
+    {{- end }}{{ end }}
     <div class="wintable__scroll lzp__ups">
     <table class="esea-box">
       <thead><tr><th>Posted</th><th>Video</th><th>Views</th></tr></thead>
@@ -138,6 +164,6 @@
   {{- else }}<p class="esea__empty-line">no TikTok data yet.</p>{{ end }}
 {{- end }}
   </div>
-  <div class="win__status"><span title="{{ if eq $part "youtube" }}YouTube {{ if eq $p.src.yt "api" }}Data API{{ else }}channel feed{{ end }}; timing splits use uploads 3+ days old; xViews = exp of mean log views shrunk toward the channel's with 3 uploads of weight{{ else if eq $part "tiktok" }}TikTok public profile (likes, videos) and creator embed (views on the latest videos){{ else if eq $part "twitch" }}Twitch {{ if eq $p.src.tw "helix" }}Helix API (streams + VOD archive){{ else }}live viewer count via decapi.me, sampled about every 30 minutes{{ end }}; follows per hour split by whether he was live between follower readings{{ else }}calls from youtube.exe, twitch.exe and social_data.exe; n = sample size{{ end }}">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="{{ if eq $part "youtube" }}YouTube {{ if eq $p.src.yt "api" }}Data API{{ else }}channel feed{{ end }}; timing splits use uploads 3+ days old; xViews = exp of mean log views shrunk toward the channel's with 3 uploads of weight{{ else if eq $part "tiktok" }}TikTok public profile (likes, videos) and creator embed (views on the latest videos){{ else if eq $part "twitch" }}Twitch {{ if eq $p.src.tw "helix" }}Helix API (streams + VOD archive){{ else }}live viewer count via decapi.me, sampled about every 30 minutes{{ end }}; follows per hour split by whether he was live between follower readings{{ else }}calls from youtube.exe, twitch.exe, tiktok_stats.exe and social_data.exe; each unlocks once its sample is big enough; n = sample size{{ end }}">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{ partial "gfx.html" . }}
