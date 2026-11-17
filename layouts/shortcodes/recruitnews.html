@@ -12,15 +12,15 @@
     <th>Date</th><th>Player</th><th>Pos</th><th title="recruiting class (old→new on a reclassification)">Class</th><th>Move</th><th>From</th><th>To</th><th class="tx__x" title="247Sports, On3">Src</th>
   </tr></thead>
   <tbody>
-  {{- range $rows }}
+  {{- range $r := $rows }}
   <tr>
     <td class="cfb__num" data-v="{{ .d }}">{{ lower ((time .d).Format "Jan 2") }}</td>
     <td class="cfb__name" title="{{ .t }}"><b>{{ .n }}</b></td>
     <td>{{ .pos }}</td>
     <td class="cfb__num" data-v="{{ .cls }}">{{ with .ocls }}{{ . }}→{{ end }}{{ .cls }}</td>
     <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}</span></td>
-    <td>{{ .fr }}</td>
-    <td>{{ .to }}</td>
+    <td>{{ with .fr }}<span class="cfb__team">{{ with $r.fl }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ end }}</td>
+    <td>{{ with .to }}<span class="cfb__team">{{ with $r.tl }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ end }}</td>
     <td class="tx__x tx__src">{{ with index .src "247" }}<a href="{{ . }}" rel="noopener" target="_blank">247</a>{{ end }}{{ with index .src "on3" }} <a href="{{ . }}" rel="noopener" target="_blank">On3</a>{{ end }}</td>
   </tr>
   {{- end }}

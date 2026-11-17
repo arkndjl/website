@@ -130,12 +130,21 @@ class Pool:
     """the players and schools a headline can name: the sport's recruit classes and portal list"""
 
     def __init__(self, sport):
-        self.sport, self.rows, self.teams = sport, [], {}
+        self.sport, self.rows, self.teams, self.logos = sport, [], {}, {}
         def j(p):
             try:
                 return json.load(open(os.path.join(ROOT, p), encoding='utf-8'))
             except (OSError, ValueError):
                 return {}
+        def logo(t, u):
+            if t and u: self.logos.setdefault(names.team_key(t), u)
+        for t in (j('data/cfb_teams.json').get('teams') or []): logo(t.get('team'), t.get('logo'))
+        for t in (j('data/cfb_recruits.json').get('teams') or []) + (j('data/cbb_recruits.json').get('teams') or []): logo(t.get('team'), t.get('logo'))
+        for c in [{'list': j('data/cfb_recruits.json').get('class') or []}] + (j('data/cfb_recruits.json').get('future') or []) + (j('data/cbb_recruits.json').get('classes') or []):
+            for r in c.get('list') or []: logo(r.get('team'), r.get('logo'))
+        for r in j('data/cfb_portal.json').get('moves') or []: logo(r.get('from'), r.get('fromLogo')); logo(r.get('to'), r.get('toLogo'))
+        for x in j('static/data/cbb/portal.json').get('seasons') or []:
+            for r in x.get('rows') or []: logo(r.get('tm'), r.get('lo'))
         if sport == 'cfb':
             d = j('data/cfb_recruits.json')
             for r in d.get('class') or []: self.add(r.get('name'), r.get('pos'), d.get('next'), r.get('team'), r.get('rank'))
@@ -380,6 +389,11 @@ def main():
         pool = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
         kept = [r for r in old.get(sport) or [] if r.get('d', '') >= cut and any(x['k'] == r['k'] for x in parse(r.get('t', ''), pool))]
         rows = merge(kept, new)
+        for r in rows:          # school logos (full colour, the boards' files)
+            for f, lf in (('to', 'tl'), ('fr', 'fl')):
+                u = pool.logos.get(names.team_key(r[f])) if r.get(f) else None
+                if u: r[lf] = u
+                else: r.pop(lf, None)
         # a decommitment story that names no school, within 4 days of a flip or commitment of his: the old school's
         # side of that move ("Alabama pushing for backs after Nigel Newkirk decommitment"), not a second move
         for rc in [r for r in rows if r['k'] == 'reclass']:     # his other stories from then on are in the new class
