@@ -247,6 +247,38 @@ def nfl_players():
     return peak, car[:TOP]
 
 
+def nfl_wav():
+    """draft picks: pfr id -> (name, drafted, last season, pos, team, weighted career AV)"""
+    out = {}
+    for r in csv.DictReader(open(os.path.join(CACHE, 'nfl', 'draft_picks.csv'))):
+        if r['pfr_player_id'] and r['w_av']:
+            out[r['pfr_player_id']] = [r['pfr_player_name'], int(r['season']), int(r['to'] or r['season']), r['position'], r['team'], float(r['w_av']), r['hof'] == 'TRUE']
+    return out
+
+
+def nfl_career(pk, wav):
+    """career = the site's AV WAR summed over 2012 on, plus for seasons before 2012 c x weighted career AV x the share of
+    his seasons played before 2012. c fit (through 0) on players drafted 2003-11 still playing after 2012: their 2012-on
+    WAR against weighted career AV x the share of seasons from 2012 on"""
+    last = max(s['y'] for s in pk)
+    tot = defaultdict(lambda: dict(v=0.0, n=0, ys=[], tm=Counter()))
+    for s in pk:
+        t = tot[s['id']]; t['v'] += s['v']; t['n'] += 1; t['ys'].append(s['y']); t['tm'][s['tm']] += 1; t['nm'] = s['n']; t['pos'] = s['pos']
+    pre = lambda w: max(0.0, min(1.0, (2012 - w[1]) / (w[2] - w[1] + 1)))
+    pr = [(w[5] * (1 - pre(w)), tot[i]['v']) for i, w in wav.items() if 2003 <= w[1] < 2012 and w[2] >= 2013 and i in tot and pre(w) <= .7]
+    a = np.array(pr); c = float((a[:, 0] @ a[:, 1]) / (a[:, 0] @ a[:, 0])); r = float(np.corrcoef(a[:, 0], a[:, 1])[0, 1])
+    rows = []
+    for i, t in tot.items():
+        w = wav.get(i); est = None; v = t['v']; y0 = min(t['ys'])
+        if w and w[1] < 2012:
+            y0 = w[1]; v += c * w[5] * pre(w); est = True
+        rows.append(dict(n=t['nm'], y0=y0, y1=max(t['ys']), tm=t['tm'].most_common(1)[0][0], pos=t['pos'], v=round(v, 1), s=t['n'] + (2012 - w[1] if est else 0), est=est, hof=(w[6] if w else None) or None))
+    for i, w in wav.items():
+        if i not in tot and w[2] < 2012:
+            rows.append(dict(n=w[0], y0=w[1], y1=w[2], tm=w[4], pos=w[3], v=round(c * w[5], 1), s=w[2] - w[1] + 1, est=True, hof=w[6] or None))
+    rows.sort(key=lambda r: -r['v'])
+    return rows[:TOP], dict(b=round(c, 4), r=round(r, 3), n=len(a))
+
 def soccer_teams():
     d = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_team_ratings.json.gz')))['seasons']
     nm = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_teams.json.gz')))
@@ -321,16 +353,28 @@ def nba():
     fit = [p for p in P if 1974 <= p['y'] <= 1985 and p['bpm'] is not None and p['ws48'] is not None and p['per'] is not None and (p['mp'] or 0) >= 500]
     X = np.array([[1, p['ws48'], p['per']] for p in fit]); b = np.linalg.lstsq(X, np.array([p['bpm'] for p in fit]), rcond=None)[0]
     r = float(np.corrcoef(X @ b, [p['bpm'] for p in fit])[0, 1])
+    # VORX (scripts/nba_xpm.py): .030 x (XPM + 1.4) x MP / 48, per 82 games. The published XPM files (2009-10 on: DPM + BPM
+    # blend) as they are; before them XPM = BPM (the XPM rule for a player with no DPM row), and before 1973-74 BPM from
+    # WS / 48 and PER
+    import nba_xpm
+    pub = {}
+    for f in glob.glob(os.path.join(ROOT, 'static', 'data', 'nba-xpm', '*.json')):
+        d = json.load(open(f))
+        if d['season'] >= nba_xpm.current_season(): continue
+        for q in d['players']:
+            if q.get('vorx') is not None: pub[(q['id'], d['season'])] = (q['vorx'], q.get('xpm'))
     S = []
     for p in P:
         if not p['mp'] or not p['gs']: continue
-        if p['vorp'] is not None and p['bpm'] is not None:
-            v, est = p['vorp'] * 82 / p['gs'], False
+        if p['bpm'] is not None:
+            x, est = p['bpm'], False
         elif p['ws48'] is not None and p['per'] is not None:
-            v, est = (b[0] + b[1] * p['ws48'] + b[2] * p['per'] + 2) * p['mp'] / (240 * p['gs']), True
+            x, est = b[0] + b[1] * p['ws48'] + b[2] * p['per'], True
         else: continue
-        S.append(dict(id=p['id'], n=p['n'], y=p['y'], tm=p['tm'], pos=(p['pos'] or '').split('-')[0], v=v, raw=p['bpm'] if p['bpm'] is not None else None, est=est,
-                      reg=(p['g'] or 0) >= p['gs'] / 2 and (p['mp'] or 0) >= 12 * p['gs']))
+        v = nba_xpm.VORX_K * (x - nba_xpm.VORX_REP) * p['mp'] / 48
+        if (p['id'], p['y']) in pub: v, x = pub[(p['id'], p['y'])][0], pub[(p['id'], p['y'])][1] or x
+        S.append(dict(id=p['id'], n=p['n'], y=p['y'], tm=p['tm'], pos=(p['pos'] or '').split('-')[0], v=v * 82 / p['gs'], raw=round(x, 1), est=est,
+                      reg=(p['g'] or 0) >= p['gs'] / 2 and (p['mp'] or 0) >= 12 * p['gs'], pub=(p['id'], p['y']) in pub))
     return T, S, dict(b=[round(float(x), 3) for x in b], r=round(r, 3), n=len(fit))
 
 
@@ -375,7 +419,47 @@ def nhl():
         k = (s['id'], s['y'])
         if k in by: by[k]['v'] += s['v']; by[k]['raw'] += s['raw']; by[k]['reg'] = by[k]['reg'] or s['reg']
         else: by[k] = s
-    return T, list(by.values())
+    return T, nhl_war(list(by.values()), {r['y']: max(x['wl'][0] + x['wl'][1] + x['wl'][2] for x in T if x['y'] == r['y']) for r in T})
+
+
+NHL_FIT = {}
+
+
+def nhl_war(PS, gs):
+    """the site's NHL WAR (static/data/nhl-war, 2008-09 on) per 82 games; before it WAR from point shares per 82
+    (least squares, skaters and goalies apart, fit on the seasons both have, joined by name key + season)"""
+    import names as NM
+    W = []
+    for f in sorted(glob.glob(os.path.join(ROOT, 'static', 'data', 'nhl-war', '*.json'))):
+        d = json.load(open(f)); y = d['season']
+        if y not in gs or y >= 2027: continue
+        for q in d['players']:
+            if q.get('war') is None: continue
+            W.append(dict(id='nhl' + q['id'], n=q['n'], y=y, tm=q.get('tm'), pos='G' if q.get('grp') == 'G' or q.get('pos') == 'G' else (q.get('grp') or q.get('pos') or '')[:1],
+                          v=q['war'] * 82 / gs[y], raw=q['war'], reg=(q.get('gp') or 0) >= gs[y] / 2, k=NM.key(q['n'])))
+    first = min(w['y'] for w in W)
+    wk = {(w['k'], w['y'], w['pos'] == 'G'): w for w in W}
+    fit = {}
+    for g in (False, True):
+        pr = [(p['v'], wk[(NM.key(p['n']), p['y'], g)]['v']) for p in PS if p['y'] >= first and (p['pos'] == 'G') == g and (NM.key(p['n']), p['y'], g) in wk]
+        a = np.array(pr); X = np.column_stack([np.ones(len(a)), a[:, 0]]); c = np.linalg.lstsq(X, a[:, 1], rcond=None)[0]
+        fit[g] = dict(a=float(c[0]), b=float(c[1]), r=round(float(np.corrcoef(a[:, 0], a[:, 1])[0, 1]), 3), n=len(a))
+    out = [dict(w) for w in W]
+    idmap = {}
+    for p in PS:
+        if p['y'] >= first: continue
+        f_ = fit[p['pos'] == 'G']
+        out.append(dict(p, v=f_['a'] + f_['b'] * p['v'], raw=None, est=True))
+    # one id per player across the switch: the NHL id's name key + the latest Hockey Reference id with that key
+    hr = {}
+    for p in PS:
+        if p['y'] >= first - 3: hr.setdefault((NM.key(p['n']), p['pos'] == 'G'), set()).add(p['id'])
+    for o in out:
+        if o['id'].startswith('nhl'):
+            ids = hr.get((o.pop('k'), o['pos'] == 'G'))
+            if ids and len(ids) == 1: o['id'] = next(iter(ids))
+    NHL_FIT.update({('G' if g else 'S'): v for g, v in fit.items()}); NHL_FIT['first'] = first
+    return out
 
 
 def cbb_teams():
@@ -474,7 +558,7 @@ def main():
     else:
         nT, nS, nfit = nba(); hT, hS = nhl()
         nflpk, nflcar = nfl_players()
-        src = dict(cfb=cfb_rows(), nfl=nfl_rows(), nflch=nfl_champs(), cbb=cbb_teams(), nbaT=nT, nbaS=nS, nbafit=nfit, nhlT=hT, nhlS=hS,
+        src = dict(nhlfit=NHL_FIT, nflwav=nfl_wav(), cfb=cfb_rows(), nfl=nfl_rows(), nflch=nfl_champs(), cbb=cbb_teams(), nbaT=nT, nbaS=nS, nbafit=nfit, nhlT=hT, nhlS=hS,
                    soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(),
                    atp=tennis_players('atp'), wta=tennis_players('wta'))
         rnd = lambda x: round(x, 3) if isinstance(x, float) else [rnd(v) for v in x] if isinstance(x, list) else {k: rnd(v) for k, v in x.items()} if isinstance(x, dict) else x
@@ -492,21 +576,26 @@ def main():
     res['cs2'] = {'teams': teams_out('cs2', src['cs2T'], keys=('r',))}
     nf = src['nbafit']
     for k in ('nbaS', 'nhlS'): player_era(src[k])
-    res['nba']['players'] = players_out(src['nbaS'], dict(l='VORP', t='value over replacement player (Basketball Reference), per 82 games', f='%.1f', rl='BPM', rt='box plus-minus', rf='%.1f'),
-                                        dict(l='VORP', t='career VORP, each season per 82 games', f='%.0f', s=1, pl='Peak', pt='best season VORP per 82'),
-                                        'Basketball Reference', est=f'before 1973-74 (no BPM): BPM from WS/48 and PER, fit on 1974-85 (r {nf["r"]:.2f})',
-                                        abouts=('Regular season. VORP = (BPM + 2) x share of team minutes, per 82 games.', 'Regular season, 1951-52 on (minutes).'))
+    hf = src['nhlfit']
+    res['nba']['players'] = players_out(src['nbaS'], dict(l='VORX', t='wins over replacement on XPM: .030 x (XPM + 1.4) x MP / 48, per 82 games, in today\'s units', f='%.1f', rl='XPM', rt='XPM (DPM + BPM blend from 2009-10; BPM alone before)', rf='%.1f'),
+                                        dict(l='VORX', t='career VORX, each season per 82 games in today\'s units', f='%.0f', s=1, pl='Peak', pt='best season VORX per 82'),
+                                        'Basketball Reference + databallr', est=f'before 1973-74 (no BPM): XPM from WS/48 and PER, fit on 1974-85 (r {nf["r"]:.2f})',
+                                        abouts=('Regular season. XPM = DPM + BPM blend from 2009-10, BPM alone 1973-74 to 2008-09.', 'Regular season, 1951-52 on (minutes).'))
     res['nba']['players']['fit_r'] = nf['r']
-    res['nhl']['players'] = players_out(src['nhlS'], dict(l='PS', t='point shares (Hockey Reference: standings points created), per 82 games', f='%.1f', rl='Raw', rt='point shares, as played', rf='%.1f'),
-                                        dict(l='PS', t='career point shares, each season per 82 games', f='%.0f', s=1, pl='Peak', pt='best season PS per 82'),
-                                        'Hockey Reference', abouts=('Skaters OPS + DPS, goalies GPS.', ''))
+    res['nhl']['players'] = players_out(src['nhlS'], dict(l='WAR', t='NHL WAR (2008-09 on), per 82 games, in today\'s units', f='%.1f', rl='Raw', rt='NHL WAR as played', rf='%.1f'),
+                                        dict(l='WAR', t='career WAR, each season per 82 games in today\'s units', f='%.0f', s=1, pl='Peak', pt='best season WAR per 82'),
+                                        'MoneyPuck + Hockey Reference', est=f"before {hf['first'] - 1}-{str(hf['first'])[2:]}: WAR from point shares (skaters r {hf['S']['r']:.2f}, goalies r {hf['G']['r']:.2f} on the seasons both have)",
+                                        abouts=(f"NHL WAR from {hf['first'] - 1}-{str(hf['first'])[2:]}; earlier seasons est from point shares.", ''))
+    res['nhl']['players']['fit'] = hf
     res['cbb']['players'] = players_out(src['cbbS'], dict(l='WAR', t='wins over a replacement player: (BPM + 2) x minutes / 40 x .68 x wins a point (CBB WAR)', f='%.1f', rl='BPM', rt='Barttorvik box plus-minus', rf='%.1f'),
                                         dict(l='WAR', t='career WAR, D-I seasons 2007-08 on', f='%.1f', s=1, pl='Peak', pt='best season WAR'),
                                         'Barttorvik', pos=False)
-    car = [dict(c, est=None) for c in src['nflcar']]
-    res['nfl']['players'] = players_out(src['nflpk'], dict(l='WAR', t='NFL WAR from rebuilt AV (AV WAR, no special teams), 2012 on (snap counts)', f='%.2f', rl='AV', rt='approximate value, rebuilt from nflverse', rf='%.1f'),
-                                        dict(l='wAV', t="Pro Football Reference weighted career AV (best season 100%, next 95%, ...): players drafted 1980 on", f='%.0f', s=1, pl='', pt=''),
-                                        'nflverse + Pro Football Reference', career=car, abouts=('Seasons 2012 on.', 'Drafted players 1980 on (undrafted players are not in the file).'))
+    car, nfit = nfl_career(src['nflpk'], src['nflwav'])
+    res['nfl']['players'] = players_out(src['nflpk'], dict(l='WAR', t='NFL WAR (AV WAR, no special teams), 2012 on (snap counts)', f='%.2f', rl='AV', rt='approximate value, rebuilt from nflverse', rf='%.1f'),
+                                        dict(l='WAR', t='career NFL WAR: seasons 2012 on, earlier seasons est from weighted career AV', f='%.1f', s=1, pl='', pt=''),
+                                        'nflverse + Pro Football Reference', career=car, est=f"seasons before 2012: weighted career AV x pre-2012 share of his seasons x {nfit['b']:.3f} (fit on 2003-11 draftees' 2012-on WAR, r {nfit['r']:.2f})",
+                                        abouts=('Seasons 2012 on.', 'NFL WAR 2012 on; earlier careers est from weighted career AV (drafted players 1980 on).'))
+    res['nfl']['players']['fit'] = nfit
     res['soccer']['players'] = players_out(src['soccerS'], dict(l='GAR', t='goals above replacement (soccer GAR), big-five leagues', f='%.1f', rl='Min', rt='minutes', rf='%.0f'),
                                            dict(l='GAR', t='career GAR, big-five seasons 2014-15 on', f='%.0f', s=1, pl='Peak', pt='best season GAR'), 'ESPN + FotMob',
                                            abouts=('Big-five league seasons 2014-15 on.', ''))
