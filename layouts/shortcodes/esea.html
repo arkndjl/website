@@ -370,6 +370,59 @@
   <div class="win__status"><span>FACEIT CS2 · {{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
+{{- else if eq $part "pugform" }}
+{{- /* LAURSEN_111 PUG form: data/esea.json profile.pugs (pugForm in scripts/fetch_esea.mjs) */ -}}
+{{- $pg := cond (and $d $d.profile $d.profile.pugs) $d.profile.pugs dict }}
+{{- $src := dict "faceit" "FACEIT" "premier" "Premier" "comp" "Comp" }}
+<div class="win lzf{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>pug_form.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- with $pg.series }}
+  {{- $t := $pg.last10 }}
+  <div class="lzf__body">
+    <ul class="esea__tiles lzf__tiles">
+      <li><span class="esea__v">{{ $t.w }}–{{ $t.l }}</span><span class="esea__k">last 10</span></li>
+      <li><span class="esea__v">{{ $pg.streak | default "—" }}</span><span class="esea__k">streak</span></li>
+      <li><span class="esea__v">{{ if ne $t.rwa nil }}{{ partial "num.html" (slice "%+.1f" (float $t.rwa)) }}{{ else }}—{{ end }}</span><span class="esea__k" title="round win % added per round, last 10">RWA L10</span></li>
+      <li><span class="esea__v">{{ with $t.rating }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ else }}—{{ end }}</span><span class="esea__k" title="ARK Rating, last 10">Rating L10</span></li>
+      <li><span class="esea__v">{{ $t.kd | default "—" }}</span><span class="esea__k">K/D L10</span></li>
+      <li><span class="esea__v">{{ with $t.adr }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}—{{ end }}</span><span class="esea__k">ADR L10</span></li>
+    </ul>
+    <ol class="esea__strip lzf__strip" aria-label="last 10, oldest to newest">{{ range collections.Reverse (split $pg.form "") }}<li class="{{ if eq . "W" }}is-w{{ else }}is-l{{ end }}">{{ . }}</li>{{ end }}</ol>
+    {{- $n := len . }}{{ $max := 4.0 }}
+    {{- range . }}{{ with .rwa }}{{ if gt (math.Abs (float .)) $max }}{{ $max = math.Abs (float .) }}{{ end }}{{ end }}{{ end }}
+    {{- $h := 80.0 }}{{ $mid := div $h 2 }}{{ $w := 10 }}
+    <svg class="lzf__chart" viewBox="0 0 {{ mul $n $w }} {{ $h }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="RWA by match, oldest to newest">
+      {{- range $i, $m := . }}{{ $v := float ($m.rwa | default 0) }}{{ $bh := div (mul (math.Abs $v) $mid) $max }}
+      <rect x="{{ add (mul $i $w) 1 }}" y="{{ cond (ge $v 0.0) (sub $mid $bh) $mid }}" width="{{ sub $w 2 }}" height="{{ math.Max $bh 0.6 }}" class="{{ if $m.win }}is-w{{ else }}is-l{{ end }}"><title>{{ index $src $m.src }} · {{ $m.map }} · {{ if $m.win }}W{{ else }}L{{ end }} {{ $m.score }}{{ if ne $m.rwa nil }} · {{ partial "num.html" (slice "%+.1f" (float $m.rwa)) }} RWA{{ end }}{{ with $m.rating }} · {{ . }} Rating{{ end }}</title></rect>
+      {{- end }}
+      <rect x="0" y="{{ sub $mid 0.3 }}" width="{{ mul $n $w }}" height="0.6" class="lzf__zero"/>
+      {{- range $i, $m := . }}{{ with $m.roll }}<rect x="{{ mul $i $w }}" y="{{ sub (sub $mid (div (mul (float .) $mid) $max)) 1 }}" width="{{ $w }}" height="2" class="lzf__roll"><title>5-match RWA {{ partial "num.html" (slice "%+.1f" (float .)) }}</title></rect>{{ end }}{{ end }}
+    </svg>
+    <p class="esea-fc__axis lzf__axis"><span>older</span><span>RWA · <i class="lzf__key"></i> 5-match</span><span>latest</span></p>
+    {{- range $tb := slice (slice "Map" $pg.maps) (slice "Queue" $pg.src) }}{{ with index $tb 1 }}
+    <div class="wintable__scroll">
+    <table class="esea-box lzf__split">
+      <thead><tr><th>{{ index $tb 0 }}</th><th>W–L</th><th title="round win % added per round">RWA</th><th title="ARK Rating">Rating</th><th>K/D</th><th>ADR</th></tr></thead>
+      <tbody>{{ range . }}<tr>
+        <td>{{ with .map }}<span class="esea-map" data-map="{{ . }}">{{ . }}</span>{{ end }}{{ with .src }}<span class="esea-pug__src" data-src="{{ . }}">{{ index $src . }}</span>{{ end }}</td>
+        <td>{{ .w }}–{{ .l }}</td>
+        <td class="esea-rt" data-r="{{ with .rwa }}{{ if ge (float .) 2.0 }}hi{{ else if lt (float .) -2.0 }}lo{{ end }}{{ end }}"><b>{{ if ne .rwa nil }}{{ partial "num.html" (slice "%+.1f" (float .rwa)) }}{{ else }}—{{ end }}</b></td>
+        <td>{{ with .rating }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ else }}—{{ end }}</td>
+        <td>{{ .kd | default "—" }}</td><td>{{ with .adr }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}—{{ end }}</td>
+      </tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}{{ end }}
+  </div>
+  {{- else }}
+  <p class="esea__empty-line">no PUGs synced yet.</p>
+  {{- end }}
+  <div class="win__status"><span>{{ with $pg.all }}{{ .n }} PUGs · {{ .w }}–{{ .l }} · {{ end }}{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
 {{- else if eq $part "pugs" }}
 {{- /* LAURSEN_111's PUGs (FACEIT matchmaking + Premier via Leetify), one box score each: data/esea.json profile.pugs */ -}}
 {{- $pg := cond (and $d $d.profile $d.profile.pugs) $d.profile.pugs dict }}
