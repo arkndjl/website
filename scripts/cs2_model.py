@@ -66,8 +66,11 @@ HELD = ("2025-07-01", "2099-12-31")
 BURN = "2024-03-15"
 TOP = 50
 # rebrands: the new name plays on the old name's five until the new key has a roster of its own in the data
-# (ratings follow the players; the new name keeps its display name and logo). GOSH = BC.Game's roster (Nov 2026)
-RENAMED = {"gosh": "bcgame"}
+# (ratings follow the players; the new name keeps its display name and logo). Betting sponsors lost their names at
+# the Singapore Major (Nov 2026): BC.Game -> GOSH, BetBoom -> BB, 1win -> THEONE. Unlisted rebrands are caught by
+# roster overlap (rated() in build: SHARED+ of the five in common with a team that has a VRS standing).
+RENAMED = {"gosh": "bcgame", "bb": "betboom", "theone": "1win"}
+SHARED = 3
 DEF = {"K": 480, "Kmin": 144, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0, "kmap": 0.6, "span": 0.4,
        "valid": 1}  # valid: only maps played to the end (13+ rounds) update on round share (forfeits are listed 1-0)
 OLD = {"K": 160, "Kmin": 32, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0}  # the Oct 26 series-level model
@@ -428,9 +431,33 @@ def build():
         ta, tb = bo3.team_of(ka), bo3.team_of(kb)
         return tm.chance(ta, tb, bo, today) if ta and tb and ta != tb else 0.0
 
-    def rated(k):   # a rebrand with no roster yet rates as its old name's five (RENAMED)
-        o = RENAMED.get(k)
-        return o if o and not st["lastros"].get(k) and st["lastros"].get(o) else k
+    # a team under a new name (sponsor rebrand) keeps its five's history: an explicit RENAMED entry while the new key
+    # has no roster, else the VRS-listed team sharing SHARED+ players when the new key has no VRS standing of its own
+    by_pl = defaultdict(set)
+    for o, ros in st["lastros"].items():
+        if o in vt:
+            for q in ros:
+                by_pl[q].add(o)
+    linked = {}
+
+    def rated(k):
+        if k in linked:
+            return linked[k]
+        o, ros = RENAMED.get(k), st["lastros"].get(k)
+        if not (o and not ros and st["lastros"].get(o)):
+            o = k
+            if ros and k not in vt:
+                hits = defaultdict(int)
+                for q in ros:
+                    for c in by_pl.get(q, ()):
+                        hits[c] += 1
+                best = max(hits, key=hits.get) if hits else None
+                if best and best != k and hits[best] >= SHARED:
+                    o = best
+        linked[k] = o
+        if o != k:
+            print(f"cs2: {k} rated as {o} (rebrand)")
+        return o
 
     def logit_ab(ka, kb, bo=3, w=None):
         ka, kb = rated(ka), rated(kb)
