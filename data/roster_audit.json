@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-17T19:36Z",
+ "asof": "2026-11-17T20:01Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -274,8 +274,8 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
-     "rows": 2132
+     "flags": 9,
+     "rows": 2134
     },
     "static/data/nfl-fantasy.json": {
      "flags": 17,
@@ -334,6 +334,24 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to Indy's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Indy's practice squad",
+      "kind": "practice"
+     },
+     "pid": "14464",
+     "player": "Quez Watkins",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "IND"
     },
     {
      "d": "2026-09-14",
@@ -4568,7 +4586,7 @@
    ],
    "joined": 0,
    "players": 2280,
-   "rows": 8061
+   "rows": 8063
   },
   "nhl": {
    "by_file": {
