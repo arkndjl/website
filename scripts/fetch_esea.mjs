@@ -92,23 +92,25 @@ function saveCache() {
 }
 // cached line: [k, sniper, entries, flashCount, utilCount, clutchSetups, d, a, adr, k2, k3, k4, k5, entryWins, 1v1W, 1v2W, utilDmg, flashed,
 //               roundMVPs, flashSuccesses, utilSuccesses, clutchKills, pistolKills, headshots, 1v1Count, 1v2Count]
-async function boxLines(mid, at) {
-  if (mcache[mid]?.v === 5) return mcache[mid];
+async function boxLines(mid, at, names = false) {
+  if (mcache[mid]?.v === 5 && (!names || mcache[mid].N)) return mcache[mid];
   const st = await api(`/matches/${mid}/stats`).catch(() => null);
+  const N = {};   // player id -> nickname, team names per map (PUG box scores)
   const maps = (st?.rounds || []).map(r => {
     const R = n(r.round_stats?.Rounds) || (r.teams || []).reduce((a, t) => a + (n(t.team_stats?.['Final Score']) || 0), 0);
     const L = {}, T = (r.teams || []).map(t => (t.players || []).map(p => p.player_id)), S = (r.teams || []).map(t => n(t.team_stats?.['Final Score']) ?? 0);
     for (const t of r.teams || []) for (const p of t.players || []) {
       const x = p.player_stats || {};
+      N[p.player_id] = p.nickname;
       L[p.player_id] = [n(x.Kills) || 0, n(x['Sniper Kills']) || 0, n(x['Entry Count']) || 0, n(x['Flash Count']) || 0, n(x['Utility Count']) || 0, (n(x['1v1Count']) || 0) + (n(x['1v2Count']) || 0),
         n(x.Deaths) || 0, n(x.Assists) || 0, n(x.ADR) || 0, n(x['Double Kills']) || 0, n(x['Triple Kills']) || 0, n(x['Quadro Kills']) || 0, n(x['Penta Kills']) || 0,
         n(x['Entry Wins']) || 0, n(x['1v1Wins']) || 0, n(x['1v2Wins']) || 0, n(x['Utility Damage']) || 0, n(x['Enemies Flashed']) || 0,
         n(x.MVPs) || 0, n(x['Flash Successes']) || 0, n(x['Utility Successes']) || 0, n(x['Clutch Kills']) || 0, n(x['Pistol Kills']) || 0,
         n(x.Headshots) || 0, n(x['1v1Count']) || 0, n(x['1v2Count']) || 0];
     }
-    return { R, L, T, S, map: String(r.round_stats?.Map || '').replace(/^de_/, '') };
+    return { R, L, T, S, TN: (r.teams || []).map(t => t.team_stats?.Team || null), map: String(r.round_stats?.Map || '').replace(/^de_/, '') };
   });
-  return (mcache[mid] = { v: 5, at, maps });
+  return (mcache[mid] = { v: 5, at, maps, ...(maps.length ? { N } : {}) });
 }
 const MEMBER_IDS = new Set();   // 1NT's FACEIT members, for spotting scrims in the rolling window
 async function rollingRole(pid, maxMaps = ROLE_MAPS) {
@@ -155,7 +157,7 @@ async function profile() {
   if (p?.player_id) {
     const cs = p.games?.cs2 || {};
     const st = await api(`/players/${p.player_id}/stats/cs2`).catch(() => null), L = st?.lifetime || {};
-    out.me = { id: p.player_id, nickname: p.nickname, avatar: p.avatar || null, country: p.country || null, level: cs.skill_level ?? null, elo: cs.faceit_elo ?? null,
+    out.me = { id: p.player_id, steam: cs.game_player_id || null, nickname: p.nickname, avatar: p.avatar || null, country: p.country || null, level: cs.skill_level ?? null, elo: cs.faceit_elo ?? null,
       matches: n(pick(L, 'Matches', 'Total Matches')), wins: n(pick(L, 'Wins')), winRate: n(pick(L, 'Win Rate %', 'Win Rate')),
       kd: n(pick(L, 'Average K/D Ratio', 'K/D Ratio')), hs: n(pick(L, 'Average Headshots %', 'Headshots %')), adr: n(pick(L, 'ADR', 'Average ADR')),
       longestStreak: n(pick(L, 'Longest Win Streak')), currentStreak: n(pick(L, 'Current Win Streak')),
@@ -193,6 +195,7 @@ async function profile() {
 // "championship" (ESEA and other leagues/cups: "1NT matches"). Queue/hub matches with five 1NT members
 // on his side are scrims. Matches missing from the history fall back on the team name: queue teams are
 // named "team_<captain>".
+const PUG_LIST = [];            // his PUG match ids, newest first (filled by split(), box scores built after the ARK fit)
 const COMP_NAMES = new Map();   // competition id -> name, from LAURSEN_111's history (filled by split())
 async function split(pid) {
   const kind = new Map(), compKind = new Map(), compName = COMP_NAMES, stack = new Map();
@@ -249,6 +252,7 @@ async function split(pid) {
     // scrims: queue/hub matches with 5 1NT members on his side
     const b = league ? 'league' : (stack.get(mid) ?? 0) >= 5 ? 'scrim' : 'pug';
     add(B[b], g); if (now - g.at < 30 * 864e5) add(D30[b], g);
+    if (b === 'pug' && mid && !PUG_LIST.some(x => x.id === mid)) PUG_LIST.push({ id: mid, at: g.at });
     if (g.map) add(M[b][g.map] ||= blank(), g);
     if (league) {
       const name = compName.get(cid) || 'league match', sn = /(?:^|\b)S(?:eason\s*)?(\d{2,3})\b/i.exec(name);
@@ -590,9 +594,11 @@ function arkFeats(l) {
   let ew = l.entryWins ?? 0, el = Math.max(0, (l.entries ?? 0) - ew), c11 = l.c11 ?? 0, c12 = l.c12 ?? 0;
   if (agg && l.entries) { const p = (ew + 10 * PLUS.lgEntry) / (l.entries + 10); ew = l.entries * p; el = l.entries * (1 - p); }
   if (agg && l.setups) { const won = c11 + c12, p = (won + 10 * PLUS.lgClutch) / (l.setups + 10), f = won ? p * l.setups / won : 1; c11 *= f; c12 *= f; }
-  return { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: (l.adr ?? 0) / 100, mks: ((l.k2 ?? 0) + 2 * (l.k3 ?? 0) + 3 * (l.k4 ?? 0) + 4 * (l.k5 ?? 0)) / R,
+  const f = { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: (l.adr ?? 0) / 100, mks: ((l.k2 ?? 0) + 2 * (l.k3 ?? 0) + 3 * (l.k4 ?? 0) + 4 * (l.k5 ?? 0)) / R,
     entry: (ew - el) / R, clutch: (c11 + 1.5 * c12) / R, apr: (l.a ?? 0) / R, fpr: (l.flashed ?? 0) / R, udr: (l.util ?? 0) / 100 / R,
     fsr: (l.fsucc ?? 0) / R, usr: (l.usucc ?? 0) / R };
+  for (const k of l.miss || []) f[k] = ARK_MODEL.mu[k];   // a stat the source doesn't carry counts as average
+  return f;
 }
 const lineFromCache = (q, R, rw) => ({ k: q[0], d: q[6], a: q[7], adr: q[8], k2: q[9], k3: q[10], k4: q[11], k5: q[12], entries: q[2], entryWins: q[13],
   c11: q[14], c12: q[15], util: q[16], flashed: q[17], flashes: q[3], snip: q[1], mvp: q[18] ?? 0, fsucc: q[19] ?? 0, usucc: q[20] ?? 0,
@@ -823,6 +829,79 @@ for (const m of matches) for (const x of m.maps) {
 for (const m of matches) for (const x of m.maps) {
   const all = [...(x.players || [])].filter(p => (p.rwa ?? p.rating) != null).sort((a, b) => (b.rwa ?? b.rating) - (a.rwa ?? a.rating) || (b.k ?? 0) - (a.k ?? 0));
   if (all[0]) { all[0].mapMvp = true; x.mvp = all[0].name; }
+}
+
+// ---- PUG box scores (FACEIT matchmaking + Premier) -------------------------------------------------
+// FACEIT: his last PUG_N queue/hub matches (split() labels them; scrims and league matches excluded), both
+// fives from the cached box scores. Premier / competitive matchmaking: Leetify's public API (no key) by his
+// Steam id, when he has a Leetify profile. Each line gets ARK Rating and RWA the same way as the ESEA box
+// scores (ARK swing + team-result credit + the opposing five's mean RWA; unknown players at data/esea_rwa.json
+// 'new'). Leetify carries no opening duels, clutches or utility successes: those count as average there.
+const PUG_N = 30, LEET_N = 30, LEET_MISS = ['entry', 'clutch', 'fsr', 'usr', 'udr'];
+const LEET = 'https://api-public.cs-prod.leetify.com/v3', PUG_ME = new Set();
+function pugMap(sides, R, S, mineIdx, names) {
+  const [us, them] = [sides[mineIdx], sides[1 - mineIdx]], [rf, ra] = [S[mineIdx], S[1 - mineIdx]];
+  const ct = mapCredit(us, them, R, rf, ra), co = mapCredit(them, us, R, ra, rf);
+  us.forEach((p, i) => { p.resid = ct[i]; }); them.forEach((p, i) => { p.resid = co[i]; });
+  const om = t => t.reduce((a, p) => a + rwaOf(p.pid), 0) / (t.length || 1);
+  const fin = (t, oppMean) => t.map(({ pid, miss, refs, ...p }) => { const a = ark({ ...p, miss }) || {};
+    return { ...p, ...(PUG_ME.has(pid) ? { isMe: true } : {}), country: countries[pid] || null, rating: a.rating ?? null, swing: a.swing ?? null, rwa: a.swing != null && RWA?.p ? Math.round((a.swing + oppMean) * 10) / 10 : null }; })
+    .sort((a, b) => (b.rwa ?? b.rating ?? 0) - (a.rwa ?? a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
+  const players = fin(us, om(them)), opp = fin(them, om(us));
+  const top = players.filter(p => (p.rwa ?? p.rating) != null)[0]; if (top) top.mapMvp = true;
+  return { rf, ra, win: rf > ra, players, opp, names: names || null };
+}
+async function faceitPugs(pid) {
+  const rows = [];
+  for (const { id, at } of PUG_LIST.slice(0, PUG_N)) {
+    const c = await boxLines(id, at, true).catch(() => null);
+    for (const mp of c?.maps || []) {
+      const mi = (mp.T || []).findIndex(t => t.includes(pid)); if (mi < 0 || !mp.R || mp.T.length !== 2) continue;
+      const sides = mp.T.map((t, i) => t.filter(q => mp.L[q]).map(q => {
+        const L = mp.L[q], ln = lineFromCache(L, mp.R, mp.S[i]);
+        return { name: c.N?.[q] || q.slice(0, 8), pid: q, ...ln, hs: L[0] && L[23] != null ? Math.round(L[23] / L[0] * 100) : null, clutch: (L[14] || 0) + (L[15] || 0) };
+      }));
+      rows.push({ src: 'faceit', id, url: `https://www.faceit.com/en/cs2/room/${id}`, at: (c.at || at) || null, map: mp.map, rounds: mp.R,
+        ...pugMap(sides, mp.R, mp.S, mi, mp.TN ? [mp.TN[mi], mp.TN[1 - mi]] : null) });
+    }
+  }
+  return rows;
+}
+async function leetifyPugs(steam) {
+  const get = async u => { for (let a = 0; a < 3; a++) { const r = await fetch(LEET + u, { headers: { Accept: 'application/json', 'User-Agent': 'arkndjl.net' } }).catch(() => null);
+    if (r?.status === 429 || (r && r.status >= 500)) { await new Promise(s => setTimeout(s, 3000 * (a + 1))); continue; } return r; } return null; };
+  const rp = await get(`/profile?steam64_id=${steam}`), prof = rp?.ok ? await rp.json().catch(() => null) : null;
+  const rm = await get(`/profile/matches?steam64_id=${steam}`), list = rm?.ok ? await rm.json().catch(() => null) : null;
+  const status = rm ? rm.status : 'no response';
+  const rows = [];
+  for (const m of (Array.isArray(list) ? list : []).filter(x => /^matchmaking/.test(x.data_source || '')).slice(0, LEET_N)) {
+    const st = m.stats || [], me = st.find(x => x.steam64_id === steam); if (!me || st.length < 8) continue;
+    const score = t => (m.team_scores || []).find(x => x.team_number === t)?.score ?? 0;
+    const mt = me.initial_team_number, ot = (m.team_scores || []).map(x => x.team_number).find(t => t !== mt) ?? (mt === 2 ? 3 : 2);
+    const R = score(mt) + score(ot); if (!R) continue;
+    const line = x => { const k = x.total_kills ?? 0;
+      return { name: x.name, pid: x.steam64_id, k, d: x.total_deaths ?? 0, a: x.total_assists ?? 0, adr: x.dpr != null ? Math.round(x.dpr * 10) / 10 : null,
+        hs: k ? Math.round((x.total_hs_kills ?? 0) / k * 100) : null, kd: x.kd_ratio ?? null, mvp: x.mvps ?? 0,
+        k2: x.multi2k ?? 0, k3: x.multi3k ?? 0, k4: x.multi4k ?? 0, k5: x.multi5k ?? 0, flashed: x.flashbang_hit_foe ?? 0,
+        util: Math.round((x.he_foes_damage_avg ?? 0) * (x.he_thrown ?? 0)), entries: null, entryWins: null, clutch: null,
+        rounds: R, rw: score(x.initial_team_number), miss: LEET_MISS }; };
+    const sides = [st.filter(x => x.initial_team_number === mt).map(line), st.filter(x => x.initial_team_number !== mt).map(line)];
+    rows.push({ src: m.data_source === 'matchmaking' ? 'premier' : 'comp', id: m.id, url: `https://leetify.com/app/match-details/${m.id}`,
+      at: Date.parse(m.finished_at) || null, map: String(m.map_name || '').replace(/^de_/, ''), rounds: R, ...pugMap(sides, R, [score(mt), score(ot)], 0, null) });
+  }
+  return { status, rows, premier: prof?.ranks?.premier ?? null, leetify: prof?.ranks?.leetify ?? null };
+}
+if (prof?.me?.id) {
+  PUG_ME.add(prof.me.id); if (prof.me.steam) PUG_ME.add(prof.me.steam);
+  const fr = await faceitPugs(prof.me.id).catch(e => (console.log('faceit pugs:', e.message), []));
+  const lr = prof.me.steam ? await leetifyPugs(prof.me.steam).catch(e => (console.log('leetify:', e.message), { status: 'error', rows: [] })) : { status: 'no steam id', rows: [] };
+  console.log(`PUG box scores: FACEIT ${fr.length}, Leetify ${lr.rows.length} (status ${lr.status})`);
+  const rows = [...fr, ...lr.rows].sort((a, b) => (b.at || 0) - (a.at || 0));
+  const meLine = r => r.players.find(p => p.isMe);
+  for (const r of rows) { const m = meLine(r); r.me = m ? { k: m.k, d: m.d, adr: m.adr, rwa: m.rwa, rating: m.rating } : null; }
+  const n = s => rows.filter(r => r.src === s).length;
+  prof.pugs = { rows, w: rows.filter(r => r.win).length, l: rows.filter(r => !r.win).length, faceit: n('faceit'), premier: n('premier'), comp: n('comp'),
+    leetify: { status: lr.status, premier: lr.premier, rating: lr.leetify } };
 }
 
 // ---- season summary ---------------------------------------------------------------------------

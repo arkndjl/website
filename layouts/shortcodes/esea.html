@@ -370,6 +370,67 @@
   <div class="win__status"><span>FACEIT CS2 · {{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
+{{- else if eq $part "pugs" }}
+{{- /* LAURSEN_111's PUGs (FACEIT matchmaking + Premier via Leetify), one box score each: data/esea.json profile.pugs */ -}}
+{{- $pg := cond (and $d $d.profile $d.profile.pugs) $d.profile.pugs dict }}
+{{- $src := dict "faceit" "FACEIT" "premier" "Premier" "comp" "Comp" }}
+<div class="win esea-log esea-pug{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#px-faceit10"/></svg>pugs.log<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="esea-log__body">
+  {{- with $pg.rows }}
+  {{- range $i, $m := . }}
+  {{- $when := cond (gt (int (.at | default 0)) 0) ((time.In "America/New_York" (time (int (div .at 1000)))).Format "Mon Jan 2") "" }}
+  <details class="esea-m {{ if .win }}is-w{{ else }}is-l{{ end }}">
+    <summary>
+      <span class="esea-m__wk">{{ add $i 1 }}</span>
+      <span class="esea-m__res">{{ if .win }}W{{ else }}L{{ end }}</span>
+      <span class="esea-m__opp"><span class="esea-pug__src" data-src="{{ .src }}">{{ index $src .src }}</span></span>
+      <span class="esea-m__maps"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></span>
+      <span class="esea-m__score">{{ .rf }}–{{ .ra }}</span>
+      <span class="esea-m__me">{{ with .me }}{{ .k }}-{{ .d }}{{ with .adr }} · {{ . }} ADR{{ end }}{{ if ne .rwa nil }} · <b>{{ partial "num.html" (slice "%+.1f" (float .rwa)) }}</b> RWA{{ end }}{{ end }}</span>
+      <span class="esea-m__when cfb__dim">{{ $when }}</span>
+    </summary>
+    <div class="esea-m__box">
+      {{- $nm := .names | default (slice "" "") }}
+      {{- range $k, $side := slice (slice (cond (ne (index $nm 0) "") (index $nm 0) "us") $m.players) (slice (cond (ne (index $nm 1) "") (index $nm 1) "them") $m.opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
+      <div class="wintable__scroll">
+      <table class="esea-box{{ if $k }} esea-box--opp{{ end }}">
+        <thead><tr><th>{{ index $side 0 }} · {{ cond (eq $k 0) $m.rf $m.ra }}</th><th title="RWA: round win % added per round on this map, plus the opposing five's mean RWA (opponent credit); 0 = average ESEA Main player">RWA</th><th title="ARK Rating: 1.00 = league average player">Rating</th><th>K</th><th>D</th><th>A</th><th title="kills minus deaths">+/−</th><th title="average damage a round">ADR</th><th title="headshot share of kills">HS%</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 clutches won">Clutch</th><th title="3k / 4k / 5k rounds">3k·4k·5k</th><th title="utility damage · enemies flashed">Util</th></tr></thead>
+        <tbody>
+        {{- range $p := $ps }}
+        {{- $pm := sub (int $p.k) (int $p.d) }}
+        <tr{{ if $p.isMe }} class="is-me"{{ end }}>
+          <td>{{ with $p.country }}{{ partial "px/flag.html" . }}{{ end }}{{ $p.name }}{{ if $p.mapMvp }} <span class="esea-box__top" title="best RWA on his team">★ MVP</span>{{ end }}</td>
+          <td class="esea-rt" data-r="{{ with $p.rwa }}{{ if ge (float .) 2.0 }}hi{{ else if lt (float .) -2.0 }}lo{{ end }}{{ end }}"><b>{{ if ne $p.rwa nil }}{{ partial "num.html" (slice "%+.1f" (float $p.rwa)) }}{{ else }}—{{ end }}</b></td>
+          <td>{{ with $p.rating }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ else }}—{{ end }}</td>
+          <td>{{ $p.k }}</td><td>{{ $p.d }}</td><td>{{ $p.a }}</td>
+          <td class="{{ if ge $pm 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $pm 0 }}+{{ end }}{{ $pm }}</td>
+          <td>{{ $p.adr | default "—" }}</td><td>{{ $p.hs | default "—" }}</td>
+          {{- if ne $p.entries nil }}{{ $ep := sub (int ($p.entryWins | default 0)) (sub (int $p.entries) (int ($p.entryWins | default 0))) }}
+          <td class="{{ if ge $ep 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $ep 0 }}+{{ end }}{{ $ep }}</td><td>{{ $p.clutch | default 0 }}</td>
+          {{- else }}<td>—</td><td>—</td>{{ end }}
+          <td>{{ $p.k3 | default 0 }}·{{ $p.k4 | default 0 }}·{{ $p.k5 | default 0 }}</td>
+          <td>{{ $p.util | default 0 }}·{{ $p.flashed | default 0 }}</td>
+        </tr>
+        {{- end }}
+        </tbody>
+      </table>
+      </div>
+      {{- end }}{{ end }}
+    </div>
+    {{- with .url }}<p class="esea-m__link"><a href="{{ . }}" rel="noopener">{{ if eq $m.src "faceit" }}match room on FACEIT{{ else }}match on Leetify{{ end }} ↗</a></p>{{ end }}
+  </details>
+  {{- end }}
+  {{- else }}
+  <p class="esea__empty-line">no PUGs synced yet.</p>
+  {{- end }}
+  </div>
+  <div class="win__status"><span title="FACEIT Data API; Premier via Leetify public API. Premier lines carry no opening duels, clutches or utility successes (counted as average in RWA and Rating).">{{ with $pg.rows }}{{ $pg.w }}–{{ $pg.l }} · FACEIT {{ $pg.faceit }} · Premier {{ $pg.premier }}{{ with $pg.leetify.premier }} · {{ lang.FormatNumber 0 . }} rating{{ end }} · {{ end }}{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
 {{- else if eq $part "stakes" }}
 {{- /* what S59 is worth and where 1NT sits: playoff line, move-up and move-down rules, Season Finals
        prizes (data/esea.json format + stakes, rules from FACEIT's support articles) */ -}}
