@@ -120,14 +120,14 @@ def nfl_rows():
         for t, (rt, o, d, n) in R.items():
             if n < 6: continue
             lg = 'AAFC' if t in NFL_LG['AAFC'] else ('AFL' if 1960 <= y <= 1969 and t in AFL_TEAMS else None)
-            out.append(dict(t=nfl_name(t, y), y=y, r=rt, o=o, d=d, wl=wl[(t, y)], lg=lg))
+            out.append(dict(t=nfl_name(t, y), y=y, r=rt, o=o, d=d, wl=wl[(t, y)], lg=lg, c=t))
     return out
 
 
 def cfb_rows():
     d = json.load(gzip.open(os.path.join(HERE, 'data', 'coach_alltime_src.json.gz')))['cfb']
     nm = d['teams']
-    return [dict(t=nm.get(r['t'], r['t']), y=r['y'], r=r['r'], o=r['o'], d=r['d'], wl=r['wl'], lg=None, nt=r.get('nt') or 0)
+    return [dict(t=nm.get(r['t'], r['t']), y=r['y'], r=r['r'], o=r['o'], d=r['d'], wl=r['wl'], lg=None, nt=r.get('nt') or 0, c=nm.get(r['t'], r['t']))
             for r in d['rows']]
 
 
@@ -141,7 +141,7 @@ def team_lists(rows, keys=('r', 'o', 'd')):
     for k in keys:
         if not any(r.get('p' + k) is not None for r in rows): continue
         L = pick(rows, 'p' + k)
-        out[names[k]] = [{**{f: r.get(f) for f in ('t', 'y', 'wl', 'lg', 'nt')}, 'pr': r.get('pr'), 'po': r.get('po'), 'pd': r.get('pd'),
+        out[names[k]] = [{**{f: r.get(f) for f in ('t', 'y', 'wl', 'lg', 'nt', 'c')}, 'pr': r.get('pr'), 'po': r.get('po'), 'pd': r.get('pd'),
                           'raw': round(r[k], 2)} for r in L]
         out[names[k] + '_check'] = era_check(rows, 'z' + k, k)
     out['n'] = len(rows); out['from'] = min(r['y'] for r in rows); out['to'] = max(r['y'] for r in rows)
@@ -164,12 +164,17 @@ def player_lists(seasons, key_v, minv=None, per=None):
         c['nm'] = s['n']; c['tm'] = c.get('tms', Counter()); c.setdefault('tms', Counter())[s.get('tm') or ''] += max(1.0, s.get('w', 1))
         c['pos'] = s.get('pos'); c['est'] = c.get('est', False) or bool(s.get('est'))
         c['bestv'] = max(c.get('bestv', -99), s['v'])
+        if s.get('ph') and s['y'] >= c.get('phy', 0): c['ph'], c['phy'] = s['ph'], s['y']
+        if s.get('ox') is not None and s.get('mp'):
+            c['om'] = c.get('om', 0) + s['ox'] * s['mp']; c['dm'] = c.get('dm', 0) + s['dx'] * s['mp']; c['xm'] = c.get('xm', 0) + s['mp']
     C = sorted(car.items(), key=lambda kv: -kv[1]['v'])
     def prow(s):
-        return dict(n=s['n'], y=s['y'], tm=s.get('tm'), pos=s.get('pos'), v=round(s['v'], 2), raw=s.get('raw'), est=s.get('est') or None)
+        return dict(n=s['n'], y=s['y'], tm=s.get('tm'), pos=s.get('pos'), v=round(s['v'], 2), raw=s.get('raw'), est=s.get('est') or None,
+                    ph=s.get('ph'), ox=s.get('ox'), dx=s.get('dx'))
     def crow(pid, c):
         return dict(n=c['nm'], y0=c['y0'], y1=c['y1'], tm=c['tms'].most_common(1)[0][0], pos=c['pos'], v=round(c['v'], 1), s=c['n'],
-                    pk=round(c['bestv'], 2), est=c['est'] or None)
+                    pk=round(c['bestv'], 2), est=c['est'] or None, ph=c.get('ph'),
+                    ox=round(c['om'] / c['xm'], 1) if c.get('xm') else None, dx=round(c['dm'] / c['xm'], 1) if c.get('xm') else None)
     for p in P: p['y'] = p['y']
     peaks = pick([dict(p) for p in P], 'v')
     cars = [crow(pid, c) for pid, c in C[:TOP]]
@@ -283,7 +288,7 @@ def soccer_teams():
     d = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_team_ratings.json.gz')))['seasons']
     nm = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_teams.json.gz')))
     BIG = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1'}
-    return [dict(t=(nm.get(c) or [c])[0], y=int(s), r=v[1], o=v[2], d=v[3], wl=None, lg=v[0]) for s, L in d.items() for c, v in L.items() if v[0] in BIG]
+    return [dict(t=(nm.get(c) or [c])[0], y=int(s), r=v[1], o=v[2], d=v[3], wl=None, lg=v[0], c=c) for s, L in d.items() for c, v in L.items() if v[0] in BIG]
 
 
 def soccer_players():
@@ -292,7 +297,7 @@ def soccer_players():
         d = json.load(open(f))
         if d['season'] >= json.load(open(os.path.join(ROOT, 'data', 'soccer_war.json')))['current']: continue
         for p in d['players']:
-            if p.get('gar') is not None: out.append(dict(id=p['p'], n=p['n'], y=d['season'], tm=p['team'], pos=p['pos'], v=p['gar'], raw=p.get('min'), w=p.get('min', 1)))
+            if p.get('gar') is not None: out.append(dict(id=p['p'], n=p['n'], y=d['season'], tm=p['team'], pos=p['pos'], v=p['gar'], raw=p.get('min'), w=p.get('min', 1), ph=p.get('ph')))
     return out
 
 
@@ -304,7 +309,7 @@ def cs2_teams():
         for rk, t, pts, *_ in L:
             k = (t, y)
             if rk > 50: continue
-            if pts and (k not in best or pts > best[k]['r']): best[k] = dict(t=t, y=y, r=float(pts), wl=None, lg=None, d0=d)
+            if pts and (k not in best or pts > best[k]['r']): best[k] = dict(t=t, y=y, r=float(pts), wl=None, lg=None, d0=d, c=t)
     return [v for v in best.values()]
 
 
@@ -313,6 +318,14 @@ def _sr():
     import coach_alltime_pro as cap
     cap.CACHE = os.path.join(CACHE, 'sr')
     return cap
+
+
+FACES_NBA = json.load(open(os.path.join(HERE, 'data', 'faces_nba.json')))
+
+
+def _team(cell):
+    m = re.search(r'/teams/([A-Z0-9]+)/', cell or '')
+    return m.group(1) if m else None
 
 
 def _pid(cell):
@@ -337,7 +350,7 @@ def nba():
             w, l = cap.num(r.get('wins')), cap.num(r.get('losses')); gs = max(gs, (w or 0) + (l or 0))
             o, d = cap.num(r.get('off_rtg')), cap.num(r.get('def_rtg'))
             T.append(dict(t=nm, y=y, r=srs, o=(o - lo) if (o and lo and y >= 1952) else None, d=(ld - d) if (d and ld and y >= 1952) else None,
-                          wl=[int(w or 0), int(l or 0), 0], lg=None, nt='*' in cap.text(r.get('team')) and 0))
+                          wl=[int(w or 0), int(l or 0), 0], lg=None, c=_team(r.get('team'))))
         a = cap.get(f'{cap.BB}/leagues/{lg}_{y}_advanced.html', False)
         if not a: continue
         seen = set()
@@ -348,7 +361,8 @@ def nba():
             mp, g = cap.num(r.get('mp')), cap.num(r.get('games') or r.get('g'))
             P.append(dict(id=pid, n=cap.text(r.get('name_display') or r.get('player')).rstrip('*'), y=y, tm=cap.text(r.get('team_name_abbr') or r.get('team_id')),
                           pos=cap.text(r.get('pos')), mp=mp, g=g, gs=gs, vorp=cap.num(r.get('vorp')), bpm=cap.num(r.get('bpm')),
-                          ws48=cap.num(r.get('ws_per_48')), per=cap.num(r.get('per')), ws=cap.num(r.get('ws'))))
+                          ws48=cap.num(r.get('ws_per_48')), per=cap.num(r.get('per')), ws=cap.num(r.get('ws')),
+                          ob=cap.num(r.get('obpm')), db=cap.num(r.get('dbpm'))))
     # before 1974 (no BPM): BPM from WS / 48 and PER, fit on 1974-85 players with 500+ minutes
     fit = [p for p in P if 1974 <= p['y'] <= 1985 and p['bpm'] is not None and p['ws48'] is not None and p['per'] is not None and (p['mp'] or 0) >= 500]
     X = np.array([[1, p['ws48'], p['per']] for p in fit]); b = np.linalg.lstsq(X, np.array([p['bpm'] for p in fit]), rcond=None)[0]
@@ -362,7 +376,7 @@ def nba():
         d = json.load(open(f))
         if d['season'] >= nba_xpm.current_season(): continue
         for q in d['players']:
-            if q.get('vorx') is not None: pub[(q['id'], d['season'])] = (q['vorx'], q.get('xpm'))
+            if q.get('vorx') is not None: pub[(q['id'], d['season'])] = (q['vorx'], q.get('xpm'), q.get('oxpm'), q.get('dxpm'))
     S = []
     for p in P:
         if not p['mp'] or not p['gs']: continue
@@ -372,8 +386,12 @@ def nba():
             x, est = b[0] + b[1] * p['ws48'] + b[2] * p['per'], True
         else: continue
         v = nba_xpm.VORX_K * (x - nba_xpm.VORX_REP) * p['mp'] / 48
-        if (p['id'], p['y']) in pub: v, x = pub[(p['id'], p['y'])][0], pub[(p['id'], p['y'])][1] or x
+        ox, dx = p['ob'], p['db']
+        if (p['id'], p['y']) in pub:
+            q = pub[(p['id'], p['y'])]; v, x = q[0], q[1] if q[1] is not None else x
+            if q[2] is not None: ox, dx = q[2], q[3]
         S.append(dict(id=p['id'], n=p['n'], y=p['y'], tm=p['tm'], pos=(p['pos'] or '').split('-')[0], v=v * 82 / p['gs'], raw=round(x, 1), est=est,
+                      ox=None if ox is None else round(ox, 1), dx=None if dx is None else round(dx, 1), mp=p['mp'], ph=FACES_NBA.get(p['id']),
                       reg=(p['g'] or 0) >= p['gs'] / 2 and (p['mp'] or 0) >= 12 * p['gs'], pub=(p['id'], p['y']) in pub))
     return T, S, dict(b=[round(float(x), 3) for x in b], r=round(r, 3), n=len(fit))
 
@@ -391,7 +409,7 @@ def nhl():
             gp = cap.num(r.get('games')); gf, ga = cap.num(r.get('goals')), cap.num(r.get('goals_against') or r.get('opp_goals'))
             if srs is None or not gp or 'League Average' in nm or gf is None: continue
             gs = max(gs, gp)
-            rows.append(dict(t=nm, y=y, r=srs, gf=gf / gp, ga=ga / gp, sos=cap.num(r.get('sos')) or 0,
+            rows.append(dict(t=nm, y=y, c=_team(r.get('team_name')), r=srs, gf=gf / gp, ga=ga / gp, sos=cap.num(r.get('sos')) or 0,
                              wl=[int(cap.num(r.get('wins')) or 0), int(cap.num(r.get('losses')) or 0), int((cap.num(r.get('ties')) or 0) + (cap.num(r.get('losses_ot')) or 0))]))
         if not rows: continue
         mf = float(np.mean([r['gf'] for r in rows]))
@@ -436,7 +454,7 @@ def nhl_war(PS, gs):
         for q in d['players']:
             if q.get('war') is None: continue
             W.append(dict(id='nhl' + q['id'], n=q['n'], y=y, tm=q.get('tm'), pos='G' if q.get('grp') == 'G' or q.get('pos') == 'G' else (q.get('grp') or q.get('pos') or '')[:1],
-                          v=q['war'] * 82 / gs[y], raw=q['war'], reg=(q.get('gp') or 0) >= gs[y] / 2, k=NM.key(q['n'])))
+                          v=q['war'] * 82 / gs[y], raw=q['war'], ph=q.get('ph'), reg=(q.get('gp') or 0) >= gs[y] / 2, k=NM.key(q['n'])))
     first = min(w['y'] for w in W)
     wk = {(w['k'], w['y'], w['pos'] == 'G'): w for w in W}
     fit = {}
@@ -471,7 +489,7 @@ def cbb_teams():
             nm = cap.text(r.get('school_name')); srs = cap.num(r.get('srs'))
             if not nm or srs is None: continue
             w, l = cap.num(r.get('wins')), cap.num(r.get('losses'))
-            T.append(dict(t=nm, y=y, r=srs, o=cap.num(r.get('srs_off')), d=cap.num(r.get('srs_def')),
+            T.append(dict(t=nm, y=y, r=srs, o=cap.num(r.get('srs_off')), d=cap.num(r.get('srs_def')), c=nm,
                           wl=[int(w or 0), int(l or 0), 0], lg=None))
     return T
 
@@ -531,9 +549,74 @@ SRC = {'cfb': 'jhowell.net scores', 'nfl': 'FiveThirtyEight + nflverse scores', 
        'nhl': 'Hockey Reference', 'soccer': 'ESPN', 'cs2': 'Valve VRS'}
 
 
+# ---------------------------------------------------------------- logos
+IMG = os.path.join(ROOT, 'static', 'img')
+FR = {'nba': {'NJN': 'BRK', 'NYN': 'BRK', 'NOH': 'NOP', 'NOK': 'NOP', 'SEA': 'OKC', 'VAN': 'MEM', 'CHH': 'CHO', 'CHA': 'CHO', 'WSB': 'WAS',
+              'CAP': 'WAS', 'BAL': 'WAS', 'CHZ': 'WAS', 'CHP': 'WAS', 'KCK': 'SAC', 'KCO': 'SAC', 'CIN': 'SAC', 'ROC': 'SAC', 'SDC': 'LAC',
+              'BUF': 'LAC', 'NOJ': 'UTA', 'SDR': 'HOU', 'SFW': 'GSW', 'PHW': 'GSW', 'SYR': 'PHI', 'STL': 'ATL', 'MLH': 'ATL', 'TRI': 'ATL',
+              'MNL': 'LAL', 'FTW': 'DET', 'NJA': 'BRK'},
+      'nhl': {'PHX': 'UTA', 'ARI': 'UTA', 'QUE': 'COL', 'HAR': 'CAR', 'MNS': 'DAL', 'ATF': 'CGY', 'KCS': 'NJD', 'CLR': 'NJD', 'ATL': 'WPG',
+              'MDA': 'ANA', 'CBH': 'CHI', 'DTC': 'DET', 'DTF': 'DET', 'TRS': 'TOR', 'TRA': 'TOR', 'WIN': 'UTA', 'TBL': 'TBL', 'VEG': 'VGK',
+              'LA': 'LAK', 'NJ': 'NJD', 'SJ': 'SJS', 'TB': 'TBL', 'CLB': 'CBJ', 'MON': 'MTL', 'WAS': 'WSH', 'AFM': 'WPG'},
+      'nfl': {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA', 'LAR': 'LA', 'WSH': 'WAS', 'SFO': 'SF', 'TAM': 'TB', 'SDG': 'LAC', 'GNB': 'GB', 'KAN': 'KC',
+              'NWE': 'NE', 'NOR': 'NO', 'RAI': 'LV', 'RAM': 'LA', 'PHO': 'ARI', 'CRD': 'ARI', 'CLT': 'IND', 'HTX': 'HOU', 'OTI': 'TEN',
+              'RAV': 'BAL', 'LVR': 'LV', 'LAC': 'LAC', 'BOS': 'NE', 'STL': 'LA'}}
+ESPN = {}
+
+
+def espn_map(sp):
+    """school name key -> ESPN logo url (CFB: /img/cfb/logos/<id>.png when the site has it)"""
+    if sp in ESPN: return ESPN[sp]
+    import names as NM, subprocess
+    f = os.path.join(CACHE, f'espn_{sp}.json')
+    if not os.path.exists(f):
+        path = 'football/college-football' if sp == 'cfb' else 'basketball/mens-college-basketball'
+        subprocess.run(['curl', '-s', '-m', '60', '-o', f, f'https://site.api.espn.com/apis/site/v2/sports/{path}/teams?limit=2000'])
+    out = {}
+    for t in json.load(open(f))['sports'][0]['leagues'][0]['teams']:
+        t = t['team']; i = t['id']
+        u = f'/img/cfb/logos/{i}.png' if sp == 'cfb' and os.path.exists(os.path.join(IMG, 'cfb', 'logos', f'{i}.png')) else \
+            f'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{i}.png&w=40&h=40'
+        for n in (t.get('location'), t.get('shortDisplayName'), t.get('displayName'), t.get('nickname')):
+            if n: out.setdefault(NM.team_key(n), u)
+    ESPN[sp] = out
+    return out
+
+
+def logo(sp, c):
+    if not c: return None
+    if sp in ('nba', 'nhl', 'nfl'):
+        k = FR[sp].get(c, c).lower()
+        for x in (k, {'gsw': 'gs', 'pho': 'phx', 'sas': 'sa', 'nop': 'no'}.get(k, k)):
+            if os.path.exists(os.path.join(IMG, sp, f'{x}.png')): return f'/img/{sp}/{x}.png'
+        return None
+    if sp == 'soccer':
+        return f'/img/soccer/{c}.png' if os.path.exists(os.path.join(IMG, 'soccer', f'{c}.png')) else None
+    if sp == 'cs2':
+        k = re.sub(r'[^a-z0-9]', '', c.lower())
+        return f'/img/cs2/{k}.png' if os.path.exists(os.path.join(IMG, 'cs2', f'{k}.png')) else None
+    if sp in ('cfb', 'cbb'):
+        import names as NM
+        return espn_map(sp).get(NM.team_key(c))
+    return None
+
+
+def face(sp, ph):
+    if not ph: return None
+    if sp == 'nba': return f'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/{ph}.png&w=96&h=70&scale=crop'
+    if sp == 'nhl':
+        ph = str(ph)
+        if ph.startswith('e'): ph = ph[1:]
+        return f'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/{ph}.png&w=96&h=70&scale=crop' if ph.isdigit() else None
+    if sp == 'soccer': return f'https://img.a.transfermarkt.technology/portrait/medium/{ph}'
+    return None
+
+
 def teams_out(sp, rows, keys=('r', 'o', 'd')):
     for r in rows: r['t'] = fixenc(r['t'])
     T = team_lists(rows, keys)
+    for k in ('teams', 'offense', 'defense'):
+        for r in T.get(k, []): r['lo'] = logo(sp, r.pop('c', None))
     T['units'] = dict(zip(['teams', 'offense', 'defense'], UNITS[sp])); T['src'] = SRC[sp]
     T['wl'] = any(r.get('wl') for r in rows); T['lg'] = any(r.get('lg') for r in rows)
     return T
@@ -609,6 +692,22 @@ def main():
         pk['career'] = cr['career']; pk['car'] = cr['car']
         pk['peak_about'] = 'Tour-level singles; peak counts after 40 matches.'; pk['career_about'] = 'Years with 20+ tour-level matches.'
         res[t] = {'players': pk}
+    snm = {}
+    import names as NM
+    for r in src['soccerT']: snm[NM.team_key(fixenc(r['t']))] = r.get('c')
+    for sp in ('nba', 'nhl', 'cbb', 'nfl', 'soccer'):
+        P = res[sp]['players']
+        for L in (P['peak'], P['career']):
+            for r in L:
+                tm = (r.get('tm') or '').split('/')[-1]
+                if sp == 'soccer':
+                    k = NM.team_key({'RasenBallsport Leipzig': 'RB Leipzig', 'Inter': 'Internazionale'}.get(tm, tm))
+                    c = snm.get(k) or next((v for kk, v in snm.items() if kk.startswith(k) or k.startswith(kk)), None)
+                    r['lo'] = logo(sp, c)
+                else: r['lo'] = logo(sp, tm)
+                r['ph'] = face(sp, r.get('ph'))
+        P['ph'] = any(r.get('ph') for r in P['peak'] + P['career'])
+    res['nba']['players']['od'] = True
     json.dump(res, open(OUT, 'w'), ensure_ascii=False, separators=(',', ':'))
     for s in ('cfb', 'nfl', 'cbb', 'nba', 'nhl', 'soccer', 'cs2', 'atp', 'wta'):
         v = res[s]; T = v.get('teams')

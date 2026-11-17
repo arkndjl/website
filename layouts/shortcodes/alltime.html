@@ -1,42 +1,39 @@
 {{- /* All-time team-seasons and players (scripts/alltime.py, data/alltime.json). sport="cfb|cbb|nfl|nba|nhl|soccer|cs2|atp|wta"
        list="teams|offense|defense" (team-seasons, era-adjusted: 100 + 25 SD over that season's league) or "peak|career" (players).
-       Method on Reference (Glossary/Methodology). Mobile: the cfbp cards. */ -}}
+       Method on Process (Glossary/Methodology). Mobile: the cfbp cards (name + key number, season under it, the rest labelled). */ -}}
 {{- $sp := $.Get "sport" -}}{{- $L := $.Get "list" | default "teams" -}}
 {{- $D := index site.Data.alltime $sp -}}
 {{- $asof := lower ((time site.Data.alltime.asof).Format "Jan 2, 2006") -}}
 {{- $icon := index (dict "cfb" "football" "nfl" "football" "cbb" "basketball" "nba" "basketball" "nhl" "hockey" "soccer" "soccer" "cs2" "cs" "atp" "tennis" "wta" "tennis") $sp -}}
 {{- $split := in (slice "cbb" "nba" "nhl" "soccer") $sp -}}
+{{- $lgN := dict "eng.1" "EPL" "esp.1" "LaLiga" "ger.1" "BL" "ita.1" "Serie A" "fra.1" "L1" "AFL" "AFL" "AAFC" "AAFC" -}}
 {{- if and $D (in (slice "teams" "offense" "defense") $L) -}}{{- with $D.teams -}}
 {{- $T := . -}}{{- $rows := index . $L -}}
-{{- $key := index (dict "teams" "pr" "offense" "po" "defense" "pd") $L -}}
-{{- $kl := index (dict "teams" "Rtg+" "offense" "Off+" "defense" "Def+") $L -}}
 {{- $chk := index . (printf "%s_check" $L) -}}
 {{- $hasOD := isset . "offense" -}}
-{{- $unit := .unit -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "all-time %s" $L)) "filter" "Era" "rerank" true "tab" ($.Get "tab") "icon" $icon "gfxCols" (cond $hasOD (printf "RK,Team,Season,%s,Rtg+,Off+,Def+" (cond .wl "W-L" "Lg")) "RK,Team,Season,Rtg+") "gfxDate" $asof "gfxMax" "25") -}}
+{{- $rawL := cond (eq $L "teams") "Rtg" (cond (eq $L "offense") "Off" "Def") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "all-time %s" $L)) "filter" "Era" "rerank" true "tab" ($.Get "tab") "icon" $icon "gfxCols" (cond $hasOD (printf "RK,Team,Season,%sRtg+,Off+,Def+,%s" (cond .wl "W-L," "") $rawL) "RK,Team,Season,Rtg+,Rtg") "gfxDate" $asof "gfxMax" "25") -}}
 <table class="cfb__table cfbp alltime">
-  <thead><tr><th>RK</th><th>Team</th><th>Season</th><th title="decade">Era</th>
+  <thead><tr><th>RK</th><th>Team</th><th>Season</th>
     {{- if .wl }}<th title="regular-season record">W-L</th>{{ end }}
-    {{- if .lg }}<th title="league">Lg</th>{{ end }}
-    <th title="overall rating against that season's league: 100 = average, +25 = one SD (SD pooled over the season and two either side)">Rtg+</th>
+    <th class="cfb__g" title="overall rating against that season's league: 100 = average, +25 = one SD (SD pooled over the season and two either side)">Rtg+</th>
     {{- if $hasOD }}<th title="offense against that season's league, same scale">Off+</th><th title="defense against that season's league, same scale">Def+</th>{{ end }}
-    <th title="{{ index .units $L }}">{{ cond (eq $L "teams") "Rtg" (cond (eq $L "offense") "Off" "Def") }}</th>
+    <th class="cfb__g" title="{{ index .units $L }}">{{ $rawL }}</th>
+    <th class="cfb__g" title="decade">Era</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $rows }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfbp__name"><b>{{ .t }}</b>{{ if .nt }} <span class="cfb__dim" title="champion">CH</span>{{ end }}</td>
+    <td class="cfbp__name"><span class="cfb__team">{{ with .lo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span><b>{{ .t }}</b>{{ with .lg }} <span class="cfb__dim">{{ index $lgN . | default . }}</span>{{ end }}{{ if .nt }} <span class="cfb__dim" title="champion">CH</span>{{ end }}</span></span></td>
     <td class="cfbp__role">{{ if $split }}{{ sub .y 1 }}-{{ substr (string .y) 2 2 }}{{ else }}{{ .y }}{{ end }}</td>
-    <td class="cfbp__conf">{{ mul (int (div .y 10)) 10 }}s</td>
-    {{- if $T.wl }}<td class="cfb__num" data-l="W-L">{{ with .wl }}{{ index . 0 }}-{{ index . 1 }}{{ if gt (index . 2) 0 }}-{{ index . 2 }}{{ end }}{{ else }}-{{ end }}</td>{{ end }}
-    {{- if $T.lg }}<td class="cfbp__conf" data-l="Lg">{{ .lg | default "-" }}</td>{{ end }}
-    <td class="cfb__num{{ if eq $L "teams" }} cfbp__surplus is-key{{ end }}" data-l="Rtg+" data-v="{{ .pr }}">{{ with .pr }}{{ if eq $L "teams" }}<b>{{ partial "num.html" (slice "%.0f" .) }}</b>{{ else }}{{ partial "num.html" (slice "%.0f" .) }}{{ end }}{{ else }}-{{ end }}</td>
-    {{- if $hasOD }}
-    <td class="cfb__num{{ if eq $L "offense" }} cfbp__surplus is-key{{ end }}" data-l="Off+" data-v="{{ .po }}">{{ with .po }}{{ if eq $L "offense" }}<b>{{ partial "num.html" (slice "%.0f" .) }}</b>{{ else }}{{ partial "num.html" (slice "%.0f" .) }}{{ end }}{{ else }}-{{ end }}</td>
-    <td class="cfb__num{{ if eq $L "defense" }} cfbp__surplus is-key{{ end }}" data-l="Def+" data-v="{{ .pd }}">{{ with .pd }}{{ if eq $L "defense" }}<b>{{ partial "num.html" (slice "%.0f" .) }}</b>{{ else }}{{ partial "num.html" (slice "%.0f" .) }}{{ end }}{{ else }}-{{ end }}</td>
+    {{- if $T.wl }}<td class="cfb__num at-first" data-l="W-L">{{ with .wl }}{{ index . 0 }}-{{ index . 1 }}{{ if gt (index . 2) 0 }}-{{ index . 2 }}{{ end }}{{ else }}-{{ end }}</td>{{ end }}
+    {{- range $k := (cond $hasOD (slice "pr" "po" "pd") (slice "pr")) }}
+    {{- $on := eq $k (index (dict "teams" "pr" "offense" "po" "defense" "pd") $L) }}{{ $v := index $r $k }}
+    <td class="cfb__num{{ if eq $k "pr" }} cfb__g{{ end }}{{ if $on }} cfbp__surplus is-key{{ end }}" data-l="{{ index (dict "pr" "Rtg+" "po" "Off+" "pd" "Def+") $k }}" data-v="{{ $v }}">{{ with $v }}{{ if $on }}<b>{{ partial "num.html" (slice "%.0f" .) }}</b>{{ else }}{{ partial "num.html" (slice "%.0f" .) }}{{ end }}{{ else }}-{{ end }}</td>
     {{- end }}
-    <td class="cfb__num" data-l="{{ cond (eq $L "teams") "Rtg" (cond (eq $L "offense") "Off" "Def") }}" data-v="{{ .raw }}">{{ if ge .raw 0.0 }}+{{ end }}{{ partial "num.html" (slice (cond (lt (math.Abs .raw) 10.0) "%.2f" "%.1f") .raw) }}</td>
+    <td class="cfb__num cfb__g{{ if not $T.wl }} at-first{{ end }}" data-l="{{ $rawL }}" data-v="{{ .raw }}">{{ if ge .raw 0.0 }}+{{ end }}{{ partial "num.html" (slice (cond (lt (math.Abs .raw) 10.0) "%.2f" "%.1f") .raw) }}</td>
+    <td class="cfbp__conf cfb__g">{{ mul (int (div .y 10)) 10 }}s</td>
   </tr>
   {{- end }}
   </tbody>
@@ -47,39 +44,43 @@
 {{- else if $D -}}{{- with $D.players -}}
 {{- $P := . -}}{{- $rows := index . $L -}}
 {{- $peak := eq $L "peak" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $peak "all-time peak seasons" "all-time careers")) "filter" (cond .pos "Era,Pos" "Era") "rerank" true "tab" ($.Get "tab") "icon" $icon "gfxCols" (cond $peak (printf "RK,Player,Season,Team,%s" .pk.l) (printf "RK,Player,Years,Team,%s" .car.l)) "gfxDate" $asof "gfxMax" "25") -}}
+{{- $M := cond $peak .pk .car -}}
+{{- $od := and .od true -}}
+{{- $gfx := printf "RK,Player,%s,%s%s%s" (cond $peak "Season" "Years") (cond .tm "Team," "") $M.l (cond $od ",O-XPM,D-XPM" "") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $peak "all-time peak seasons" "all-time careers")) "filter" (cond .pos "Era,Pos" "Era") "rerank" true "tab" ($.Get "tab") "icon" $icon "gfxCols" $gfx "gfxDate" $asof "gfxMax" "25") -}}
 <table class="cfb__table cfbp alltime">
-  <thead><tr><th>RK</th><th>Player</th><th>{{ if $peak }}Season{{ else }}Years{{ end }}</th><th title="{{ if $peak }}decade{{ else }}decade of the middle of his career{{ end }}">Era</th>
+  <thead><tr><th>RK</th><th>Player</th><th>{{ if $peak }}Season{{ else }}Years{{ end }}</th>
     {{- if .tm }}<th>Team</th>{{ end }}{{ if .pos }}<th>Pos</th>{{ end }}
-    {{- if $peak }}
-    <th title="{{ .pk.t }}">{{ .pk.l }}</th>{{ with .pk.rl }}<th title="{{ $P.pk.rt }}">{{ . }}</th>{{ end }}
-    {{- else }}
-    {{- if .car.s }}<th title="seasons">Seasons</th>{{ end }}
-    <th title="{{ .car.t }}">{{ .car.l }}</th>{{ with .car.pl }}<th title="{{ $P.car.pt }}">{{ . }}</th>{{ end }}
-    {{- end }}
+    <th class="cfb__g" title="{{ $M.t }}">{{ $M.l }}</th>
+    {{- if $od }}<th title="{{ if $peak }}offensive XPM that season{{ else }}career offensive XPM, minutes-weighted{{ end }} (.5 ODPM + .5 OBPM from 2009-10, OBPM before; - before 1973-74)">O-XPM</th><th title="{{ if $peak }}defensive XPM that season{{ else }}career defensive XPM, minutes-weighted{{ end }} (.5 DDPM + .5 DBPM from 2009-10, DBPM before; - before 1973-74)">D-XPM</th>{{ end }}
+    {{- if $peak }}{{ with .pk.rl }}<th title="{{ $P.pk.rt }}">{{ . }}</th>{{ end }}
+    {{- else }}{{ if .car.s }}<th title="seasons">Seasons</th>{{ end }}{{ with .car.pl }}<th title="{{ $P.car.pt }}">{{ . }}</th>{{ end }}{{ end }}
+    <th class="cfb__g" title="{{ if $peak }}decade{{ else }}decade of the middle of his career{{ end }}">Era</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $rows }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfbp__name"><b>{{ .n }}</b>{{ if .est }} <span class="cfb__dim" title="{{ $P.estT }}">est</span>{{ end }}{{ if .hof }} <span class="cfb__dim" title="Hall of Fame">HOF</span>{{ end }}</td>
+    <td class="cfbp__name"><span class="cfb__team">{{ if $P.ph }}{{ partial "face.html" (dict "u" (.ph | default "")) }}{{ end }}<span><b>{{ .n }}</b>{{ if .est }} <span class="cfb__dim" title="{{ $P.estT }}">est</span>{{ end }}{{ if .hof }} <span class="cfb__dim" title="Hall of Fame">HOF</span>{{ end }}</span></span></td>
     {{- if $peak }}
     <td class="cfbp__role">{{ if $split }}{{ sub .y 1 }}-{{ substr (string .y) 2 2 }}{{ else }}{{ .y }}{{ end }}</td>
-    <td class="cfbp__conf">{{ mul (int (div .y 10)) 10 }}s</td>
     {{- else }}
     <td class="cfbp__role">{{ if $split }}{{ sub .y0 1 }}{{ else }}{{ .y0 }}{{ end }}-{{ if $split }}{{ substr (string .y1) 2 2 }}{{ else }}{{ .y1 }}{{ end }}</td>
-    <td class="cfbp__conf">{{ mul (int (div (add .y0 .y1) 20)) 10 }}s</td>
     {{- end }}
-    {{- if $P.tm }}<td class="cfb__team"><span>{{ .tm }}</span></td>{{ end }}
+    {{- if $P.tm }}<td class="cfb__team">{{ with .lo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .tm }}</span></td>{{ end }}
     {{- if $P.pos }}<td class="cfbp__conf">{{ .pos | default "-" }}</td>{{ end }}
+    <td class="cfb__num cfb__g cfbp__surplus is-key" data-l="{{ $M.l }}" data-v="{{ .v }}"><b>{{ partial "num.html" (slice $M.f .v) }}</b></td>
+    {{- if $od }}
+    <td class="cfb__num{{ if eq .ox nil }} at-na{{ end }}" data-l="O-XPM" data-v="{{ .ox }}">{{ with .ox }}{{ if ge . 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num{{ if eq .dx nil }} at-na{{ end }}" data-l="D-XPM" data-v="{{ .dx }}">{{ with .dx }}{{ if ge . 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}-{{ end }}</td>
+    {{- end }}
     {{- if $peak }}
-    <td class="cfb__num cfbp__surplus is-key" data-l="{{ $P.pk.l }}" data-v="{{ .v }}"><b>{{ partial "num.html" (slice $P.pk.f .v) }}</b></td>
-    {{- if $P.pk.rl }}<td class="cfb__num" data-l="{{ $P.pk.rl }}" data-v="{{ .raw }}">{{ with .raw }}{{ partial "num.html" (slice $P.pk.rf .) }}{{ else }}-{{ end }}</td>{{ end }}
+    {{- if $P.pk.rl }}<td class="cfb__num{{ if not .raw }} at-na{{ end }}" data-l="{{ $P.pk.rl }}" data-v="{{ .raw }}">{{ with .raw }}{{ partial "num.html" (slice $P.pk.rf .) }}{{ else }}-{{ end }}</td>{{ end }}
     {{- else }}
-    {{- if $P.car.s }}<td class="cfb__num" data-l="Seasons" data-v="{{ .s }}">{{ .s }}</td>{{ end }}
-    <td class="cfb__num cfbp__surplus is-key" data-l="{{ $P.car.l }}" data-v="{{ .v }}"><b>{{ partial "num.html" (slice $P.car.f .v) }}</b></td>
+    {{- if $P.car.s }}<td class="cfb__num" data-l="Seasons" data-v="{{ .s }}">{{ .s | default "-" }}</td>{{ end }}
     {{- if $P.car.pl }}<td class="cfb__num" data-l="{{ $P.car.pl }}" data-v="{{ .pk }}">{{ with .pk }}{{ partial "num.html" (slice $P.pk.f .) }}{{ else }}-{{ end }}</td>{{ end }}
     {{- end }}
+    <td class="cfbp__conf cfb__g">{{ if $peak }}{{ mul (int (div .y 10)) 10 }}{{ else }}{{ mul (int (div (add .y0 .y1) 20)) 10 }}{{ end }}s</td>
   </tr>
   {{- end }}
   </tbody>
