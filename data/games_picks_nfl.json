@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-17T05:08:29Z",
+ "asof": "2026-11-17T05:18:00Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -51,29 +51,13 @@
   }
  },
  "model": {
-  "asof": "2026-11-17T04:49:45Z",
-  "ageH": 0.3,
+  "asof": "2026-11-17T05:17:56Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
- "withdrawn": [
-  {
-   "id": "2026_10_LAC_BAL",
-   "sport": "nfl",
-   "kick": "2026-11-17T01:15:00Z",
-   "home": "BAL",
-   "away": "LAC",
-   "mk": "total",
-   "side": "over",
-   "line": 38.5,
-   "price": -108.0,
-   "units": 0.25,
-   "edge": 2.8,
-   "x": 1.5,
-   "withdrawn": "2026-11-15T17:35:56Z"
-  }
- ],
+ "withdrawn": [],
  "board": [
   {
    "id": "2026_11_IND_HOU",
@@ -136,7 +120,7 @@
    "edge": 3.6,
    "x": null,
    "why": "total market off",
-   "m": 10.3,
+   "m": 10.4,
    "tm": 50.9
   },
   {
@@ -164,7 +148,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -122.0,
+   "price": -124.0,
    "edge": 3.2,
    "x": null,
    "why": "total market off",
@@ -212,28 +196,12 @@
    "mk": "total",
    "side": "over",
    "line": 41.5,
-   "price": -108.0,
+   "price": -110.0,
    "edge": 2.5,
    "x": null,
    "why": "total market off",
    "m": 15.4,
    "tm": 44.0
-  },
-  {
-   "id": "2026_11_BAL_CAR",
-   "sport": "nfl",
-   "kick": "2026-11-22T18:00:00Z",
-   "home": "CAR",
-   "away": "BAL",
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": 105.0,
-   "edge": 2.5,
-   "x": null,
-   "why": "spread market off",
-   "m": -0.0,
-   "tm": 45.3
   },
   {
    "id": "2026_11_CIN_WAS",
@@ -282,6 +250,22 @@
    "why": "total market off",
    "m": 10.7,
    "tm": 47.5
+  },
+  {
+   "id": "2026_11_BAL_CAR",
+   "sport": "nfl",
+   "kick": "2026-11-22T18:00:00Z",
+   "home": "CAR",
+   "away": "BAL",
+   "mk": "total",
+   "side": "over",
+   "line": 43.5,
+   "price": -143.0,
+   "edge": 1.8,
+   "x": null,
+   "why": "total market off",
+   "m": -0.0,
+   "tm": 45.3
   }
  ],
  "games": {
@@ -301,7 +285,7 @@
    "mk": "total",
    "side": "over",
    "line": 41.5,
-   "price": -108.0,
+   "price": -110.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -310,11 +294,11 @@
    "state": "off"
   },
   "2026_11_BAL_CAR": {
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": 105.0,
-   "edge": 2.5,
+   "mk": "total",
+   "side": "over",
+   "line": 43.5,
+   "price": -143.0,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "CAR",
@@ -385,7 +369,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -122.0,
+   "price": -124.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -494,16 +478,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4359,
+  "snapshots": 4367,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1601,
-    "clvRet": -0.0197,
-    "clvT": -9.48,
+    "clvN": 1607,
+    "clvRet": -0.0198,
+    "clvT": -9.58,
     "clv": 0.48,
     "beat": 0.379,
-    "still": 0.573
+    "still": 0.572
    },
    {
     "when": "6-24h",
@@ -2910,7 +2894,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T05:08:29Z",
+ "checked": "2026-11-17T05:18:00Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
