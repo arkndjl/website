@@ -543,7 +543,8 @@ def next_stage(fields, known, po_known, names, by_stage, logit):
                     "start": min(m[1] for m in sm) if sm else MAJOR["dates"][st - 1] + "T00:00:00Z",
                     "seeds": seeds, "names": {t: names.get(t, t) for t in seeds},
                     "r1": [(a, b) for a, b, _ in kr[0]] if kr else [(seeds[i], seeds[i + 8]) for i in range(8)],
-                    "known": kr, "allbo3": st == 3, "projected": not kr}
+                    "known": kr, "allbo3": st == 3, "projected": not kr,
+                    "later": {str(s2): fields[s2] for s2 in (2, 3) if s2 > st}}
         _, _, order = swiss(seeds, lambda a, b, bo: 0.5, rng, kr, st == 3)
         carry = order[:8]
     sm = by_stage[3] if len(by_stage) >= 4 else []
