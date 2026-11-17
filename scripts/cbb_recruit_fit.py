@@ -427,7 +427,7 @@ def extras(rows, out):
         else: f['commit_m'], f['commit_nov'] = -6.0, 0.0
         by[r['cls']].append(f)
     for fs in by.values():
-        b = np.polyfit([f['lrk'] for f in fs], [f['interest'] for f in fs], 1) if len(fs) > 10 else [0.0, float(np.mean([f['interest'] for f in fs]))]
+        b = np.polyfit([f['lrk'] for f in fs], [f['interest'] for f in fs], 1) if len(fs) > 10 and len({f['lrk'] for f in fs}) > 1 else [0.0, float(np.mean([f['interest'] for f in fs]))]
         for f in fs: f['interest'] -= float(np.polyval(b, f['lrk']))
 
 
@@ -978,6 +978,68 @@ def old_p(age, c, today=None):
     return 1.0 if lo >= 18 else round(p_hi, 3) if lo == 17 else 0.0
 
 
+FIBA = os.path.join(ROOT, 'scripts', 'data', 'cbb_fiba_youth.json')
+# FIBA's three-letter codes where they differ from ISO 3166 (the flags are ISO two-letter)
+IOC = {'SLO': 'SVN', 'GER': 'DEU', 'DEN': 'DNK', 'BUL': 'BGR', 'LAT': 'LVA', 'GRE': 'GRC', 'SUI': 'CHE', 'CHA': 'TCD',
+       'NGR': 'NGA', 'MAD': 'MDG', 'TPE': 'TWN', 'IRI': 'IRN', 'PHI': 'PHL', 'BRN': 'BHR', 'PUR': 'PRI', 'NED': 'NLD',
+       'CRO': 'HRV', 'POR': 'PRT', 'ANG': 'AGO', 'RSA': 'ZAF', 'KSA': 'SAU', 'UAE': 'ARE', 'LIB': 'LBN', 'CHI': 'CHL'}
+
+
+def fiba_class(p, cls_override):
+    """the HS class a FIBA youth player is graded in: the US grade cutoff (born Sep-Dec counts with the next year), with
+    no live class before 2027 (an international born in 2008 enrolls in 2027, as On3 classes its ranked ones); no birth
+    date: the oldest birth year his youngest event allows"""
+    if str(p['pid']) in cls_override: return cls_override[str(p['pid'])]['cls']
+    if p.get('dob'):
+        y, m = int(p['dob'][:4]), int(p['dob'][5:7])
+        c = y + 18 + (m >= 9)
+    else:
+        c = min(e_year - age + 1 for e_year, age in p['_ages']) + 18
+    return max(LIVE[0], c)
+
+
+def fiba_rows(on3_names):
+    """FIBA youth event leaders no service ranks, for the international board: provisional rows, graded by the recruit
+    model with no ranking (rank at the cap, from abroad) in the class they project to; event lines ride along"""
+    if not os.path.exists(FIBA): return {}
+    d = json.load(open(FIBA))
+    ev = d['events']
+    ages = {k: int(v['name'].split()[1][1:]) for k, v in ev.items()}
+    seen = set(on3_names)
+    for f in ('cbb-all.json', 'cbb-intl.json'):
+        try:
+            b = json.load(open(os.path.join(ROOT, 'static', 'data', f)))
+            i = b['cols'].index('name')
+            seen |= {N.key(r[i]) for r in b['rows']} | {N.key(n) for n in (b.get('overseas') or {})}
+        except Exception:
+            pass
+    a3 = json.load(open(os.path.join(ROOT, 'data', 'soccer_countries.json')))
+    out = defaultdict(list)
+    for p in sorted(d['players'], key=lambda p: -p.get('s', 0)):    # ties on the grade list by event scoring
+        if N.key(p['name']) in seen: continue
+        p['_ages'] = [(ev[e[0]]['year'], ages[e[0]]) for e in p['ev']]
+        c = fiba_class(p, d.get('override') or {})
+        if c not in LIVE: continue
+        iso3 = IOC.get(p['nat'], p['nat'])
+        nat = a3['a3'].get(iso3)
+        ht = int(p['cm'] / 2.54) if p.get('cm') else None
+        out[c].append({'cls': c, 'key': f"fiba-{p['pid']}", 'name': p['name'], 'pos': p.get('pos'), 'ht': ht, 'wt': None,
+                       'cons': None, 'rk': None, 'stars': None, 'fsp': False, 'state': None, 'home': a3['name'].get(nat, p['nat']) if nat else p['nat'],
+                       'team': None, 'svc': {}, 'svr': {}, 'x': {}, 'nat': nat, 'dob': p.get('dob'), 'hs': p.get('club'),
+                       'htf': f"{ht // 12}-{ht % 12}" if ht else None,
+                       'fiba': [[ev[e[0]]['name'] + ' ' + str(ev[e[0]]['year']), e[1], e[2], e[3]] for e in p['ev']],
+                       'url': f"{ev[p['ev'][0][0]]['url']}/teams", 's': p.get('s', 0), 'src': (d.get('override') or {}).get(str(p['pid']), {}).get('src')})
+    return out
+
+
+def dob_old(dob, c):
+    """18 or older on Oct 26 of his senior year (the history's 'old'), from a birth date"""
+    import datetime as dt
+    b = dt.date.fromisoformat(dob)
+    ref = dt.date(c - 1, 10, 26)
+    return 1.0 if (ref.year - b.year - ((ref.month, ref.day) < (b.month, b.day))) >= 18 else 0.0
+
+
 def board_teams():
     d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
     i = {c: k for k, c in enumerate(d['cols'])}
@@ -1131,10 +1193,12 @@ def write():
     bd = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
     bi = {c: k for k, c in enumerate(bd['cols'])}
     bfv = np.sort([float(r[bi['fvx']] if r[bi['fvx']] is not None else r[bi['fv']]) for r in bd['rows'] if r[bi['fv']] is not None])
-    out_classes = []
+    out_classes, intl = [], []
     news = recent_news()
+    raws = {c: reclassed(c, load_on3(c)) for c in LIVE}
+    fiba = fiba_rows({N.key(r['name']) for c in LIVE for r in raws[c]})
     for c in LIVE:
-        raw = reclassed(c, load_on3(c))
+        raw = raws[c]
         lst = []
         for r in raw:
             row = compact(r, c)
@@ -1152,7 +1216,13 @@ def write():
             a = r.get('age')
             if a is not None and 14 <= a <= 21: row['old'] = old_p(a, c)
             lst.append((r, row, tm))
-        Fl, _ = frame([x[1] for x in lst], smap, teams, ref)
+        n_ranked = len(lst)
+        if c in fiba:
+            for row in fiba[c]:
+                if row.get('dob'): row['old'] = dob_old(row['dob'], c)
+                lst.append((row, row, None))
+        # FIBA rows framed on their own, so the On3 rows' within-class terms (interest residual) are as before
+        Fl = frame([x[1] for x in lst[:n_ranked]], smap, teams, ref)[0] + (frame([x[1] for x in lst[n_ranked:]], smap, teams, ref)[0] if len(lst) > n_ranked else [])
         G = grade(M, Fl, rel[c]['shrink'])
         P = path_of(pmods, Fl)
         recs = []
@@ -1170,8 +1240,13 @@ def write():
                          'ark': ark_of(stars, g['fvx']), 'pct': int(min(99, np.searchsorted(bfv, g['fvx'], side='right') * 100 // len(bfv))),
                          'path': pth, 'xnil': int(round(pth[0]['v'] * xnil_price(H, teams, tm, bt[tm]['conf'] if tm else None, f, ref), -3)),
                          'status': 'signed' if r.get('signed') else 'committed' if tm or row['team'] else 'uncommitted'})
+            if r.get('fiba'):
+                recs[-1].update({'prov': True, 'cls': c, 's': r['s'], 'fiba': r['fiba'], 'dob': r.get('dob'), 'fibaUrl': r['url'], 'src': r.get('src')})
             d = round(g['fvx'] - fv_of(float(M.ets([f])[0])), 1)
             if abs(d) >= 0.1: recs[-1]['why']['rows'].append(['class still settling', d])
+        # FIBA youth rows go to the international board, not the class lists
+        intl += recs[n_ranked:]
+        recs = recs[:n_ranked]
         recs.sort(key=lambda x: (-x['ets'], x['rk'] or 999))
         for i, x in enumerate(recs): x['ovr'] = i + 1
         out_classes.append({'year': c, 'n': len(recs), 'committed': sum(1 for x in recs if x['team'] or x['school']),
@@ -1208,6 +1283,7 @@ def write():
                            'levels': {k: sorted(v) for k, v in LEVELS.items()}},
                   'research': RESEARCH},
         'classes': out_classes, 'teams': trows,
+        'intl': sorted(intl, key=lambda x: (-x['fv'], -x['s'])),
     }
     json.dump(res, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print('wrote', OUT, {x['year']: (x['n'], x['committed'], x['reliability']['shrink']) for x in out_classes})
