@@ -1,0 +1,3 @@
+{{- /* an item's weight (0-100, scripts/news.py) as five pixel pips; context: the weight */ -}}
+{{- $n := 1 }}{{ if ge . 86 }}{{ $n = 5 }}{{ else if ge . 72 }}{{ $n = 4 }}{{ else if ge . 60 }}{{ $n = 3 }}{{ else if ge . 48 }}{{ $n = 2 }}{{ end -}}
+<span class="nws__w" title="weight {{ . }}" data-n="{{ $n }}">{{ range seq 5 }}<i{{ if le . $n }} class="on"{{ end }}></i>{{ end }}</span>

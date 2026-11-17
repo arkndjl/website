@@ -6,11 +6,21 @@
        chance with the score and clock (static/js/livewp.js; fits and backtest in data/live_wp_research.json). 1NT's
        live number comes from live/1nt.json (scripts/nt_live.mjs, the FACEIT room: veto and map results). Model win
        chance only, never a betting line (those stay on Predictions). */ -}}
-{{- with $.Site.Data.ticker }}
+{{- /* News (Nov 17): the strip is on every page. The home page keeps the games above and adds the site's news after
+       them; every other page shows the news alone. Cells: data/news.json `ticker` (scripts/news.py: each day's roundup
+       order, majors only, newest day first); the "news" tag opens /news/. A page with noTicker = true gets no strip. */ -}}
+{{- $home := .IsHome }}
+{{- $nw := site.Data.news | default dict }}
+{{- $nby := dict }}{{ range $nw.items }}{{ $nby = merge $nby (dict .id .) }}{{ end }}
+{{- $news := slice }}{{ range $nw.ticker }}{{ with index $nby . }}{{ $news = $news | append . }}{{ end }}{{ end }}
+{{- $tk := cond $home ($.Site.Data.ticker | default dict) dict }}
+{{- if and (or $tk $news) (not .Params.noTicker) }}
+{{- partial "newsicons.html" . }}
 {{- $links := dict "knicks" "/arkboard/nba/" "rangers" "/arkboard/nhl/" "ravens" "/arkboard/nfl/" "barcelona" "/arkboard/soccer/" }}
-<aside class="tick" aria-label="next games">
+<aside class="tick{{ if not $home }} tick--news{{ end }}" aria-label="{{ if $home }}next games and news{{ else }}news{{ end }}">
   <div class="tick__track">
     <div class="tick__run">
+      {{- with $tk }}
       {{- with .nt }}
       <span class="tick__tag tick__tag--nt">1NT</span>
       {{- if .games }}
@@ -65,10 +75,29 @@
         {{- end }}
       </div>
       {{- end }}
+      {{- end }}
+      {{- with $news }}
+      <a class="tick__tag tick__tag--news" href="{{ "news/" | relURL }}">news</a>
+      {{- range . }}
+      <a class="tick__g tick__g--nw" href="{{ .href }}">
+        <span class="tick__l1">
+          <svg class="tick__ic" aria-hidden="true"><use href="#nw-{{ .cat }}"/></svg>
+          {{- with .logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          <span class="tick__opp">{{ .t }}</span>
+          {{- with .logo2 }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+        </span>
+        <span class="tick__l2">
+          <span class="tick__me">{{ .tag }}</span>
+          {{- with .s }}<span class="tick__when">{{ . }}</span>{{ end -}}
+          <span class="tick__note">{{ lower ((time .d).Format "Jan 2") }}</span>
+        </span>
+      </a>
+      {{- end }}
+      {{- end }}
     </div>
   </div>
 </aside>
-<script src="{{ "js/livewp.js" | relURL }}"></script>
+{{ if $home }}<script src="{{ "js/livewp.js" | relURL }}"></script>{{ end }}
 <script>
 (function () {
   var box = document.querySelector('.tick'); if (!box) return;
@@ -90,7 +119,8 @@
   // 1NT first; then the teams, soonest game first; teams with nothing scheduled go last
   var run0 = box.querySelector('.tick__run'), teams = [].slice.call(box.querySelectorAll('.tick__team'));
   teams.sort(function (a, b) { return (Date.parse(a.dataset.at) || 9e15) - (Date.parse(b.dataset.at) || 9e15); });
-  teams.forEach(function (t) { run0.appendChild(t); });
+  var nwTag = run0.querySelector('.tick__tag--news');   // the news cells stay after the games
+  teams.forEach(function (t) { run0.insertBefore(t, nwTag); });
   box.querySelectorAll('a.tick__g--nt').forEach(function (a) { if (done(a)) a.hidden = true; else mark(a); });
 
   // ---- live: score, clock and the in-game win chance ---------------------------------------------------------

@@ -67,3 +67,13 @@
   ST. CLAIRE, 1NT, LAURSEN_111, articles) + `static/data/search-players.json` (players/teams, `scripts/search_index.py`,
   rerun by the `search index` workflow). Player rows name a page stem + tab, so moved pages and ALIASed tabs keep working.
   A new player board: add it to `scripts/search_index.py`. A page to keep out: `searchExclude = true`.
+
+## News (ticker, /news/, daily GFX)
+
+- One feed, no hand posting: `scripts/news.py` reads the site's data files and writes `data/news.json` (state in
+  `scripts/data/news_state.json`); the odds-snap workflow reruns it every half hour. A new kind of news = a new source
+  function there with an explicit weight rule in the docstring (MAJOR = w >= 60 feeds the strip and the GFX).
+- The header strip is `layouts/partials/ticker.html` on every page (home: games then news; elsewhere news only;
+  `noTicker = true` drops it). `/news/` = `layouts/shortcodes/news.html`; the daily card = `buildNews` in
+  `assets/js/gfx.js` (`/news/#gfx` opens the newest). Category icons: 11x11 bitmaps in `data/news_icons.json`.
+- Never surface hidden pages (Franchise Fantasy) or betting lines in the feed.
