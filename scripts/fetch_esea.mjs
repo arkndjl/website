@@ -932,6 +932,10 @@ if (prof?.me?.id) {
   const n = s => rows.filter(r => r.src === s).length;
   prof.pugs = { rows, w: rows.filter(r => r.win).length, l: rows.filter(r => !r.win).length, faceit: n('faceit'), premier: n('premier'), comp: n('comp'),
     leetify: { status: lr.status, premier: lr.premier, rating: lr.leetify }, ...pugForm(rows) };
+  // rating trend: one reading per run, kept when FACEIT Elo or Premier rating moved (neither API has a history)
+  const tr = [...(prev.profile?.pugs?.trend || [])], last = tr[tr.length - 1], elo = prof.me.elo ?? null, pr = lr.premier ?? null;
+  if ((elo != null || pr != null) && (!last || last.elo !== elo || last.pr !== pr)) tr.push({ t: Date.now(), elo, pr });
+  prof.pugs.trend = tr.slice(-1500);
 }
 
 // ---- season summary ---------------------------------------------------------------------------
