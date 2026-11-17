@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T01:42:45Z",
+ "asof": "2026-11-17T01:47:08Z",
  "recenter": {
-  "week": 0.29
+  "week": 0.28
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-16",
-  "ageH": 1.7,
+  "ageH": 1.8,
   "stale": false
  },
  "picks": [],
@@ -485,22 +485,6 @@
    "tm": 47.8
   },
   {
-   "id": "401869938",
-   "sport": "cfb",
-   "kick": "2026-11-22T00:00:00.000Z",
-   "home": "Louisiana Tech",
-   "away": "Arkansas State",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -129.0,
-   "edge": 1.9,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 12.4,
-   "tm": 54.4
-  },
-  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": 16.9,
    "tm": 58.6
+  },
+  {
+   "id": "401858308",
+   "sport": "cfb",
+   "kick": "2026-11-22T00:30:00.000Z",
+   "home": "California",
+   "away": "Stanford",
+   "mk": "total",
+   "side": "under",
+   "line": 56.5,
+   "price": -114.0,
+   "edge": 6.3,
+   "x": null,
+   "why": "total market off",
+   "m": 0.1,
+   "tm": 50.2
   }
  ],
  "games": {
@@ -1159,16 +1159,16 @@
    "state": "off"
   },
   "401869938": {
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -129.0,
-   "edge": 1.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 13.5,
+   "price": -112.0,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana Tech",
    "away": "Arkansas State",
-   "state": "under"
+   "state": "off"
   },
   "401861968": {
    "mk": "spread",
@@ -1258,7 +1258,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -117.0,
+   "price": -114.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -1294,7 +1294,7 @@
    "mk": "total",
    "side": "under",
    "line": 66.5,
-   "price": -119.0,
+   "price": -110.0,
    "edge": 5.2,
    "ev": null,
    "units": 0.0,
@@ -1499,13 +1499,13 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21694,
+  "snapshots": 21699,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4378,
+    "clvN": 4379,
     "clvRet": -0.048,
-    "clvT": -35.41,
+    "clvT": -35.42,
     "clv": 0.2,
     "beat": 0.34,
     "still": 0.329
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T01:42:45Z",
+ "checked": "2026-11-17T01:47:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
