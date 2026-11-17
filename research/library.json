@@ -444,13 +444,14 @@
     },
     {
      "term": "pXPM (predictive XPM)",
-     "short": "XPM shrunk by minutes toward what he is expected to be.",
+     "short": "XPM shrunk by minutes: toward his expected XPM on the boards, toward replacement in depth charts and backup watch.",
      "body": [
-      "raw x MP / (MP + 600) + mean x 600 / (MP + 600).",
+      "Boards: raw x MP / (MP + 600) + mean x 600 / (MP + 600).",
       "Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.",
-      "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw."
+      "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw.",
+      "Depth chart and backup watch: XPM over three seasons (minutes weighted 1, .5, .25) x M / (M + 500) + replacement (-1.4) x 500 / (M + 500)."
      ],
-     "where": "NBA VORX/XPM leaders (pXPM chip), rookies",
+     "where": "NBA VORX/XPM leaders (pXPM chip), rookies, depth chart, backup watch",
      "sports": [
       "NBA"
      ]
@@ -948,7 +949,7 @@
      "term": "Backup watch / xGap",
      "short": "Second and third-string players graded above a starter.",
      "body": [
-      "Gap = backup value - starter value (FV in college; WAR, XPM, HPM or GAR in the pros). College listed at gap >= 3.",
+      "Gap = backup value - starter value (FV in college; WAR, pXPM, HPM or GAR in the pros). College listed at gap >= 3.",
       "Rank by xGap = the gap projected over two seasons, adding the age (or class) gap; held out t -3.0 to -15.6."
      ],
      "where": "backup watch tab on every sport page",
