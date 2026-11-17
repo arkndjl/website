@@ -269,7 +269,7 @@ def research():
     rows = []      # (season, features, targets, sc flag)
     seasons = {}
     # from 2008-09: a 2007-08 row's label is the 2008-09 NBA season, before the XPM boards (2009-10 on), so every one
-    # read 'no NBA'. Dropping them (Nov 16 2026), leave one season out: NBA% LL .3345 -> .3338 (t -0.7, 10/17), 500%
+    # read 'no NBA'. Dropping them (Nov 16 2026), leave one season out: NBA% LL .3345 -> .3338 (t -0.7, 10/17), REG% (500 MP)
     # .1886 -> .1885 (t -0.4, 11/17), xVORX MSE .881 -> .880 (t -1.8, 11/15); shipped as a label fix
     for y in range(2009, LAST1 + 1):
         seasons[y] = (gl_season(y), [gl_season(y, ('SC',))] if y >= 2022 else [])
@@ -377,7 +377,7 @@ def build():
 
 def past():
     """each past season's board as it read the day that G League season ended: the same features, fit walk forward on
-    the seasons whose outcome was known by then (NBA% and 500%: seasons through s-1; xVORX: through s-3, shown once four
+    the seasons whose outcome was known by then (NBA% and REG%: seasons through s-1; xVORX: through s-3, shown once four
     seasons are in). Training starts with 2008-09 (the XPM boards begin 2009-10, so 2007-08 has no next-season label).
     Each row carries what happened next: NBA minutes the next season (per 82) and NBA VORX per season over the next three."""
     W = World(); last = current_season() - 1
