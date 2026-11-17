@@ -6,12 +6,12 @@
 {{- $tracks := .Page.Params.tracks | default slice -}}
 <style>
 .post:has(.am)>.post-title{display:none}
-.am{--am-ink:#0b0b10;--am-coal:#2e2e35;--am-lil:#c8c7ff;--am-aq:#7fffd4;--am-wh:#ffffff;--am-grey:#8d8d96;display:grid;gap:1.25rem;margin:0 0 2rem;color:var(--am-lil)}
+.am{--am-ink:#0b0b10;--am-coal:#2e2e35;--am-lil:#c8c7ff;--am-aq:#e8e7f4;--am-wh:#ffffff;--am-grey:#8d8d96;display:grid;gap:1.25rem;margin:0 0 2rem;color:var(--am-lil)}
 .am *{box-sizing:border-box}
 .am img{border:0;margin:0;border-radius:0}
 .am ol,.am ul{margin:0}
 .am li::before{content:none!important}
-.am-deck{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:center;padding:2rem 1.5rem;background:var(--am-ink);border:1px solid var(--am-coal);overflow:hidden}
+.am-deck{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:center;padding:2rem 1.5rem;background:var(--am-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/256px 256px;border:1px solid var(--am-coal);overflow:hidden}
 .am-deck::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(var(--am-lil) 1px,transparent 1px);background-size:32px 32px;opacity:.12}
 .am-stars{position:absolute;inset:0;pointer-events:none}
 .am-stars .px{position:absolute;width:16px;height:16px}
@@ -50,7 +50,8 @@
 .am-out small{color:var(--am-grey)}
 @media (max-width:900px){.am-deck{grid-template-columns:minmax(0,1fr);padding:1.25rem 1rem}.am-low{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:684px){.am-title{font-size:48px}.am-spin{width:min(100%,320px)}}
-.am-mono{position:relative;display:block;width:64px;height:64px;margin:0;border:0;image-rendering:pixelated}
+.am .px .t{fill:#8e8e98}
+.am-mono{position:relative;display:block;width:104px;height:104px;margin:0;border:0;image-rendering:pixelated}
 </style>
 <div class="am" data-am>
 <section class="am-deck" aria-label="ST. CLAIRE music">
@@ -60,7 +61,7 @@
     <div class="am-label" aria-hidden="true"><span data-am-label>ARKNDJL</span></div>
   </div>
   <div class="am-cover">
-    <img class="am-mono" src="{{ "img/px/stclaire-logo.png" | relURL }}" width="64" height="64" alt="ST. CLAIRE">
+    <img class="am-mono" src="{{ "img/px/stclaire-mark.png" | relURL }}" width="104" height="104" alt="ST. CLAIRE">
     <h1 class="am-title">music</h1>
     <ol class="am-tl">
     {{- range $i, $t := $tracks }}
@@ -111,7 +112,7 @@
   }
   // the disc, pixel by pixel: hard-stop holographic bands by angle, grooves every 4 px, hub and rim; it turns 1/24 of
   // a revolution per step while a track plays
-  var BAND = [[.09, '#c8c7ff'], [.12, '#ffffff'], [.24, '#7fffd4'], [.31, '#e7e6ff'], [.40, '#c8c7ff'], [.42, '#ffffff'], [.55, '#7fffd4'], [.63, '#b6b5f0'], [.66, '#ffffff'], [.78, '#7fffd4'], [.91, '#c8c7ff'], [.93, '#ffffff'], [1, '#7fffd4']], rot = 0;
+  var BAND = [[.09, '#c8c7ff'], [.12, '#ffffff'], [.24, '#8e8e98'], [.31, '#e7e6ff'], [.40, '#c8c7ff'], [.42, '#ffffff'], [.55, '#8e8e98'], [.63, '#b6b5f0'], [.66, '#ffffff'], [.78, '#8e8e98'], [.91, '#c8c7ff'], [.93, '#ffffff'], [1, '#8e8e98']], rot = 0;
   function disc() {
     for (var y = -55; y <= 55; y++) for (var x = -55; x <= 55; x++) {
       var r = Math.sqrt(x * x + y * y), c = null;
@@ -130,7 +131,7 @@
     for (var k = 0; k < K; k++) {
       var a = k / K * Math.PI * 2 - Math.PI / 2, v;
       if (play && an) { var b = Math.floor(Math.pow(((k < K / 2 ? k : K - 1 - k) / (K / 2)), 1.6) * 90) + 1; v = buf[b] / 255; } else v = play ? .25 + .2 * Math.sin(t / 3 + k) : 0;
-      var L = Math.round(v * 19), col = k % 2 ? '#7fffd4' : '#c8c7ff';
+      var L = Math.round(v * 19), col = k % 2 ? '#8e8e98' : '#c8c7ff';
       if (!L) { if (((k + Math.floor(t / 4)) % 4) === 0) g.fillStyle = '#2e2e35', g.fillRect(Math.round(C + (R + 2) * Math.cos(a)), Math.round(C + (R + 2) * Math.sin(a)), 1, 1); continue; }
       g.fillStyle = col;
       for (var r = 0; r <= L; r++) g.fillRect(Math.round(C + (R + r) * Math.cos(a)), Math.round(C + (R + r) * Math.sin(a)), 1, 1);

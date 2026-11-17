@@ -14,17 +14,17 @@
 {{- $sc := site.Params.stclaire | default dict -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
-.ah{--ah-ink:#0e0e12;--ah-coal:#2e2e35;--ah-lil:#c8c7ff;--ah-aq:#7fffd4;--ah-grey:#8d8d96;display:grid;gap:1.5rem;margin:0 0 2rem;color:var(--ah-lil)}
+.ah{--ah-ink:#0e0e12;--ah-coal:#2e2e35;--ah-lil:#c8c7ff;--ah-aq:#e8e7f4;--ah-grey:#8d8d96;display:grid;gap:1.5rem;margin:0 0 2rem;color:var(--ah-lil)}
 .ah *{box-sizing:border-box}
 .ah img{border:0;border-radius:0;margin:0}
-.ah .px .p{fill:#131316}.ah .px .d{fill:#2e2e35}.ah .px .k{fill:#0e0e12}.ah .px .v{fill:#2e2e35}
+.ah .px .t{fill:#8e8e98}.ah .px .p{fill:#131316}.ah .px .d{fill:#2e2e35}.ah .px .k{fill:#0e0e12}.ah .px .v{fill:#2e2e35}
 .ah ul,.ah ol,.ah figure{margin:0}
 .ah li::before{content:none!important}
-.ah-hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem;background:var(--ah-ink);border:1px solid var(--ah-coal);overflow:hidden}
+.ah-hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem;background:var(--ah-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/256px 256px;image-rendering:pixelated;border:1px solid var(--ah-coal);overflow:hidden}
 .ah-hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(200,199,255,.035) 3px 4px);pointer-events:none}
 .ah-rel{position:relative;width:384px;height:384px;flex:none}
 .ah-rel canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
-.ah-rel .ah-mono{position:absolute;left:50%;top:50%;width:128px;height:128px;margin:-64px 0 0 -64px;image-rendering:pixelated}
+.ah-rel .ah-mono{position:absolute;left:50%;top:50%;width:256px;height:256px;margin:-128px 0 0 -128px;image-rendering:pixelated}
 .ah-head{position:relative;display:grid;gap:1rem;min-width:0}
 .ah-title{margin:0;font-size:64px;line-height:1;letter-spacing:.12em;color:var(--ah-aq);font-weight:normal;text-shadow:4px 4px 0 var(--ah-coal)}
 .ah-title::before,.ah-title::after{content:none}
@@ -65,11 +65,11 @@
 .ah-low .winlist{margin:0;max-width:none;--win-dark:#0e0e12;--win-face:#131316;--win-well:#0e0e12;--win-title:#2e2e35;--background:#131316}
 @media (prefers-reduced-motion:reduce){.ah-p{transition:none}}
 @media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--style{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
-@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .ah-mono{width:96px;height:96px;margin:-48px 0 0 -48px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .ah-mono{width:128px;height:128px;margin:-64px 0 0 -64px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 </style>
 <div class="ah">
 <section class="ah-hero" aria-label="ST. CLAIRE">
-  <div class="ah-rel"><canvas width="128" height="128" data-ah-rel aria-hidden="true"></canvas><img class="ah-mono" src="{{ "img/px/stclaire-logo.png" | relURL }}" width="64" height="64" alt=""></div>
+  <div class="ah-rel"><canvas width="128" height="128" data-ah-rel aria-hidden="true"></canvas><img class="ah-mono" src="{{ "img/px/stclaire-logo.png" | relURL }}" width="128" height="128" alt=""></div>
   <div class="ah-head">
     <h1 class="ah-title">ST. CLAIRE</h1>
     <ol class="ah-idx">
@@ -114,7 +114,7 @@
 <script>
 (function () {
   // The reliquary: an icosahedron on a 128 px grid. Vertices are rounded to whole pixels after projection (the PS1's
-  // missing subpixel precision), edges drawn with Bresenham, near edges aquamarine, far edges lilac at half strength,
+  // missing subpixel precision), edges drawn with Bresenham, near edges grey, far edges lilac at half strength,
   // two dashed rings turning the other way. ~15 fps on purpose. Reduced motion draws one still frame.
   var cv = document.querySelector('[data-ah-rel]'); if (!cv || !cv.getContext) return;
   var g = cv.getContext('2d'), N = 128, C = N / 2, P = (1 + Math.sqrt(5)) / 2;
@@ -132,7 +132,7 @@
     var ay = t * 0.021, ax = 0.42 + Math.sin(t * 0.008) * 0.25, cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
     var S = V.map(function (v) { var x = v[0] * cy + v[2] * sy, z = -v[0] * sy + v[2] * cy, y = v[1] * cx - z * sx; z = v[1] * sx + z * cx; var f = 150 / (z + 7); return [Math.round(C + x * f * 1.12), Math.round(C + y * f * 1.12), z]; });
     E.map(function (e) { return [e, (S[e[0]][2] + S[e[1]][2]) / 2]; }).sort(function (a, b) { return a[1] - b[1]; }).forEach(function (q) {
-      var far = q[1] < 0; line(S[q[0][0]], S[q[0][1]], far ? 'rgba(200,199,255,.38)' : '#7fffd4', far);
+      var far = q[1] < 0; line(S[q[0][0]], S[q[0][1]], far ? 'rgba(200,199,255,.38)' : '#8e8e98', far);
     });
     S.forEach(function (s) { if (s[2] > 0) { px(s[0] - 1, s[1], '#ffffff'); px(s[0], s[1], '#ffffff'); px(s[0], s[1] - 1, '#ffffff'); } });
   }

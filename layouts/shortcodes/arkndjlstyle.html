@@ -211,10 +211,15 @@
 <section class="ab-sec" id="monogram">
   <h2 class="ab-h"><span>08</span>monogram</h2>
   <div class="ab-grid ab-mono">
-    {{- range (slice (slice "#000000" "stclaire-logo" "colour") (slice "#4a3b6b" "stclaire-logo-flat" "flat") (slice "#131316" "stclaire-logo-mono" "lilac") (slice "#4a3b6b" "stclaire-logo-white" "white")) }}
-    <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><img src="{{ printf "img/px/%s.png" (index . 1) | relURL }}" width="64" height="64" alt="ST. CLAIRE monogram, {{ index . 2 }}"></span></figure>
+    {{- range (slice (slice "#000000" "stclaire-logo" "glitch") (slice "#000000" "stclaire-mark" "mark") (slice "#131316" "stclaire-mark-mono" "lilac") (slice "#2a2a30" "stclaire-mark-white" "white")) }}
+    <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><img src="{{ printf "img/px/%s.png" (index . 1) | relURL }}" width="104" height="104" alt="ST. CLAIRE logo, {{ index . 2 }}"></span></figure>
     {{- end }}
     <figure class="ab-card"><span class="ab-tile" style="background:#000000"><img class="ab-mono__ic" src="{{ "img/icons/stclaire.svg" | relURL }}" width="16" height="16" alt="ST. CLAIRE icon"></span></figure>
+  </div>
+  <div class="ab-sw">
+    {{- range (slice "#c8c7ff" "#e9e8ff" "#9796d8" "#5f5e9a" "#e8e7f4" "#8e8e98" "#5c5c66" "#2a2a30" "#0b0b0e" "#000000") }}
+    <div><i style="background:{{ . }}"></i><span><b>{{ . }}</b></span></div>
+    {{- end }}
   </div>
 </section>
 

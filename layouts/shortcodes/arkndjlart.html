@@ -6,13 +6,13 @@
 {{- $portal := "polygon(0.0% 100.0%,0.0% 36.0%,0.0% 31.7%,0.5% 31.7%,0.5% 27.4%,2.2% 27.4%,2.2% 23.2%,4.9% 23.2%,4.9% 19.1%,8.6% 19.1%,8.6% 15.2%,13.4% 15.2%,13.4% 11.6%,19.1% 11.6%,19.1% 8.2%,25.7% 8.2%,25.7% 5.1%,33.1% 5.1%,33.1% 2.4%,41.2% 2.4%,41.2% 0.0%,50.0% 0.0%,58.8% 0.0%,58.8% 2.4%,66.9% 2.4%,66.9% 5.1%,74.3% 5.1%,74.3% 8.2%,80.9% 8.2%,80.9% 11.6%,86.6% 11.6%,86.6% 15.2%,91.4% 15.2%,91.4% 19.1%,95.1% 19.1%,95.1% 23.2%,97.8% 23.2%,97.8% 27.4%,99.5% 27.4%,99.5% 31.7%,100.0% 31.7%,100.0% 36.0%,100.0% 100.0%)" -}}
 <style>
 .post:has(.aa)>.post-title{display:none}
-.aa{--aa-ink:#0e0e12;--aa-coal:#2e2e35;--aa-stone:#1a1a20;--aa-lil:#c8c7ff;--aa-aq:#7fffd4;--aa-grey:#8d8d96;--aa-portal:{{ $portal | safeCSS }};display:grid;gap:2.25rem;margin:0 0 2rem;color:var(--aa-lil);position:relative}
+.aa{--aa-ink:#0e0e12;--aa-coal:#2e2e35;--aa-stone:#1a1a20;--aa-lil:#c8c7ff;--aa-aq:#e8e7f4;--aa-grey:#8d8d96;--aa-portal:{{ $portal | safeCSS }};display:grid;gap:2.25rem;margin:0 0 2rem;color:var(--aa-lil);position:relative}
 .aa *{box-sizing:border-box}
 .aa img{border:0;margin:0;border-radius:0;max-width:100%}
 .aa ul,.aa ol,.aa figure{margin:0}
 .aa li::before{content:none!important}
 .aa-goth{font-weight:normal;letter-spacing:.04em}
-.aa-west{position:relative;display:grid;justify-items:center;gap:.6rem;padding:2rem 1rem 1.75rem;text-align:center;background:var(--aa-ink);border:1px solid var(--aa-coal);overflow:hidden}
+.aa-west{position:relative;display:grid;justify-items:center;gap:.6rem;padding:2rem 1rem 1.75rem;text-align:center;background:var(--aa-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/256px 256px;border:1px solid var(--aa-coal);overflow:hidden}
 .aa-west::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;background:
   linear-gradient(90deg,transparent calc(50% - 1px),var(--aa-lil) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),
   repeating-linear-gradient(90deg,transparent 0 79px,var(--aa-lil) 79px 81px)}
@@ -46,12 +46,12 @@
 .aa-lb__cap b{font-size:32px;font-weight:normal;color:#ffffff}
 .aa-lb__cap a{color:var(--aa-aq)}
 @media (max-width:760px){.aa-rose{width:192px;height:192px}.aa-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}}
-.aa-mono{position:relative;display:block;width:64px;height:64px;margin:0;border:0;image-rendering:pixelated}
+.aa-mono{position:relative;display:block;width:104px;height:104px;margin:0;border:0;image-rendering:pixelated}
 </style>
 <div class="aa">
 <section class="aa-west" aria-label="ST. CLAIRE art">
   <img class="aa-rose" src="{{ "img/px/rose-window.png" | relURL }}" width="96" height="96" alt="">
-  <img class="aa-mono" src="{{ "img/px/stclaire-logo.png" | relURL }}" width="64" height="64" alt="ST. CLAIRE">
+  <img class="aa-mono" src="{{ "img/px/stclaire-mark.png" | relURL }}" width="104" height="104" alt="ST. CLAIRE">
   <h1 class="aa-title aa-goth">Art</h1>
 </section>
 
