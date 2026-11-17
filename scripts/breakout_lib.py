@@ -254,3 +254,18 @@ def ceiling_tests(S, y, w, X0, cands, up):
             tot += float(w[te][mm].sum())
         cov[nm] = round(hit / tot, 3) if tot else None
     return tests, keep, final, cov, ceiling_fit(Xf, y, w, SXf), cols
+
+
+def ceiling_study(S, y, w, F, du, base, ctx, spread, up):
+    """F: {input: array}. Pre-registered ceiling candidates from named inputs: usage change (dU, dU^2), usage change x
+    context (dU, dU x ctx), scaled spread (spread inputs + |dU|). Returns the result dict with the fit's column names
+    in the form scripts/ceiling.py evaluates."""
+    X0 = np.column_stack([F[k] for k in base])
+    cn = ['dU'] + ['dU*' + k for k in ctx]
+    cands = {'usage change': (np.column_stack([du, du ** 2]), None, ['dU', 'dU2']),
+             'usage change x context': (np.column_stack([du] + [du * F[k] for k in ctx]), None, cn),
+             'scaled spread': (None, np.column_stack([F[k] for k in spread] + [np.abs(du)]), [])}
+    tests, keep, final, cov, fit, extra = ceiling_tests(S, y, w, X0, cands, up)
+    fit.update({'cols': list(base) + extra, 'scol': (list(spread) + ['absdU']) if 'scaled spread' in keep else []})
+    return {'n': int(len(y)), 'seasons': [int(S.min()), int(S.max())], 'tests': tests, 'keep': keep, 'final': final,
+            'coverage': cov, 'fit': fit}
