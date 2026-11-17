@@ -50,6 +50,7 @@
 .am-out small{color:var(--am-grey)}
 @media (max-width:900px){.am-deck{grid-template-columns:minmax(0,1fr);padding:1.25rem 1rem}.am-low{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:684px){.am-title{font-size:48px}.am-spin{width:min(100%,320px)}}
+.am-mono{position:relative;display:block;width:64px;height:64px;margin:0;border:0;image-rendering:pixelated}
 </style>
 <div class="am" data-am>
 <section class="am-deck" aria-label="ST. CLAIRE music">
@@ -59,7 +60,7 @@
     <div class="am-label" aria-hidden="true"><span data-am-label>ARKNDJL</span></div>
   </div>
   <div class="am-cover">
-    <p class="am-kick">arkndjl :: music</p>
+    <img class="am-mono" src="{{ "img/px/stclaire-logo.png" | relURL }}" width="64" height="64" alt="ST. CLAIRE">
     <h1 class="am-title">music</h1>
     <ol class="am-tl">
     {{- range $i, $t := $tracks }}
