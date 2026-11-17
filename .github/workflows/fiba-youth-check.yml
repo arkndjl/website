@@ -1,0 +1,22 @@
+# Fails each October when scripts/data/cbb_fiba_youth.json (the CBB international board's FIBA youth leaders) has no
+# event from the summer just past: the yearly refresh task (late Aug and Sep) did not run or did not merge. Refresh with
+# scripts/cbb_fiba_youth.py (events / lines / need / page / build), then python3 scripts/cbb_recruit_fit.py --offline.
+name: fiba youth check
+
+on:
+  schedule:
+    - cron: "23 14 15 10 *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stale:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/cbb_fiba_youth.py stale
