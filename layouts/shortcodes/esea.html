@@ -390,6 +390,24 @@
       <li><span class="esea__v">{{ $t.kd | default "—" }}</span><span class="esea__k">K/D L10</span></li>
       <li><span class="esea__v">{{ with $t.adr }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}—{{ end }}</span><span class="esea__k">ADR L10</span></li>
     </ul>
+    {{- with $pg.trend }}{{ $tr := . }}
+    <div class="lzf__trend">
+    {{- range $sp := slice (slice "elo" "FACEIT Elo") (slice "pr" "Premier") }}{{ $k := index $sp 0 }}
+    {{- $pts := slice }}{{ range $tr }}{{ with index . $k }}{{ $pts = $pts | append (float .) }}{{ end }}{{ end }}
+    {{- with $pts }}{{ $n := len . }}{{ $lo := index . 0 }}{{ $hi := index . 0 }}{{ range . }}{{ if lt . $lo }}{{ $lo = . }}{{ end }}{{ if gt . $hi }}{{ $hi = . }}{{ end }}{{ end }}
+      {{- $cur := index . (sub $n 1) }}{{ $dl := sub $cur (index . 0) }}
+      <div class="lzf__tr">
+        <p class="lzf__trh"><span class="esea__k">{{ index $sp 1 }}</span> <b>{{ lang.FormatNumber 0 $cur }}</b>{{ if gt $n 1 }} <span class="{{ if ge $dl 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $dl 0.0 }}+{{ end }}{{ lang.FormatNumber 0 $dl }}</span>{{ end }}</p>
+        {{- if gt $n 1 }}{{ $span := math.Max (sub $hi $lo) 1.0 }}{{ $W := 200 }}{{ $H := 40.0 }}{{ $sw := div (float $W) (sub $n 1) }}
+        <svg class="lzf__trc" viewBox="0 0 {{ $W }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="{{ index $sp 1 }} trend">
+          {{- range $i, $v := . }}{{ if lt $i (sub $n 1) }}{{ $y := sub (sub $H 2) (mul (div (sub $v $lo) $span) (sub $H 4)) }}<rect x="{{ mul $i $sw }}" y="{{ $y }}" width="{{ $sw }}" height="2" class="lzf__trl"/>{{ $nx := index $pts (add $i 1) }}{{ $y2 := sub (sub $H 2) (mul (div (sub $nx $lo) $span) (sub $H 4)) }}<rect x="{{ sub (mul (add $i 1) $sw) 1 }}" y="{{ math.Min $y $y2 }}" width="2" height="{{ add (math.Abs (sub $y2 $y)) 2 }}" class="lzf__trl"/>{{ end }}{{ end }}
+        </svg>
+        <p class="esea-fc__axis lzf__axis"><span>{{ lang.FormatNumber 0 $lo }}</span><span>{{ lang.FormatNumber 0 $hi }}</span></p>
+        {{- end }}
+      </div>
+    {{- end }}{{ end }}
+    </div>
+    {{- end }}
     <ol class="esea__strip lzf__strip" aria-label="last 10, oldest to newest">{{ range collections.Reverse (split $pg.form "") }}<li class="{{ if eq . "W" }}is-w{{ else }}is-l{{ end }}">{{ . }}</li>{{ end }}</ol>
     {{- $n := len . }}{{ $max := 4.0 }}
     {{- range . }}{{ with .rwa }}{{ if gt (math.Abs (float .)) $max }}{{ $max = math.Abs (float .) }}{{ end }}{{ end }}{{ end }}
