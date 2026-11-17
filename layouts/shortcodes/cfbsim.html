@@ -7,19 +7,15 @@
        Notre Dame if top 12, the rest by rank; seeds straight from the ranking, top four bye, bracket played out.
        Bowl: six regular-season wins. */ -}}
 {{- with site.Data.cfb_model -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "season odds") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Record,Proj W,Title,Playoff" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "season odds") "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xW,Playoff,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cfbs">
   <thead><tr>
     <th title="by model rating">RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="model rating = points vs an average FBS team, neutral field (Elo, opponent-adjusted EPA, talent, special teams, situational stats kept by the backtest)">Rating</th>
-    <th title="success rate edge = offense - defense allowed, opponent-adjusted, percentage points">SR</th>
-    <th title="early-down (1st, 2nd) success rate edge = offense - defense allowed, opponent-adjusted, percentage points">Early</th>
-    <th title="3rd-down conversion rate edge = offense - defense allowed, opponent-adjusted, percentage points">3rd</th>
-    <th title="red-zone points per trip edge = offense - defense allowed, opponent-adjusted">RZ</th>
-    <th>Record</th><th title="projected regular-season wins">Proj W</th>
+    <th title="record (won-lost)">Rec</th><th title="projected regular-season wins">xW</th>
     <th title="P(conference title game)">Title game</th><th title="P(conference title)">Conf title</th>
     <th title="P(12-team playoff), committee model">Playoff</th><th title="P(top-four seed and a first-round bye)">Bye</th>
-    <th title="P(reach the playoff semifinals)">Semis</th><th title="P(win the national title)">Natl title</th>
+    <th title="P(reach the playoff semifinals)">Semis</th><th title="P(win the national title)">Title</th>
     <th title="P(6+ regular-season wins)">Bowl</th>
   </tr></thead>
   <tbody>
@@ -29,11 +25,6 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .rating }}"><b>{{ if gt .rating 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .rating) }}</b></td>
-    {{- $sit := .situ }}
-    {{- range $k := slice "sr" "ed" "td" "rz" }}{{ $x := false }}{{ with $sit }}{{ $x = index . $k }}{{ end }}
-    {{- if $x }}{{ $pct := ne $k "rz" }}{{ $n := sub $x.o $x.d }}{{ if $pct }}{{ $n = mul $n 100 }}{{ end }}
-    <td class="cfb__num" data-v="{{ $n }}" title="offense {{ if $pct }}{{ partial "num.html" (slice "%.1f%%" (mul $x.o 100)) }}{{ else }}{{ partial "num.html" (slice "%.2f" $x.o) }}{{ end }} · defense allowed {{ if $pct }}{{ partial "num.html" (slice "%.1f%%" (mul $x.d 100)) }}{{ else }}{{ partial "num.html" (slice "%.2f" $x.d) }}{{ end }}">{{ if gt $n 0.0 }}+{{ end }}{{ partial "num.html" (slice (cond $pct "%.1f" "%.2f") $n) }}</td>
-    {{- else }}<td class="cfb__num" data-v="">—</td>{{ end }}{{ end }}
     <td class="cfb__num">{{ .rec }}</td>
     <td class="cfb__num" data-v="{{ .projW }}">{{ partial "num.html" (slice "%.1f" .projW) }}</td>
     {{- range (slice .ccg .title .cfp (.bye | default 0.0) (.semi | default 0.0) (.natl | default 0.0) .bowl) }}

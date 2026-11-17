@@ -11,16 +11,18 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,standouts,awards,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
 {{< awards sport="cfb" tab="awards" >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits) and coaches" tab="ARKLIST" >}}
+{{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
 {{< cfbbreakout title="standouts" tab="standouts" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="cfb" src="data/next-up/cfb-tab.json" icon="football" title="next up" tab="next up" >}}
 {{< /lazytab >}}
+{{< /wintabs >}}
 {{< wintabs tab="portal" tabs="portal,re-signed" sub="true" label="portal views" >}}
 {{< lazytab tab="portal" >}}
 {{< xferwatch sport="cfb" view="players" tab="portal" >}}
