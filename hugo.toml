@@ -348,10 +348,11 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           weight = 26
           [languages.en.menu.main.params]
             icon = "img/eephus-favicon.png"
-        [[languages.en.menu.main]]
-          identifier = "franchise-fantasy"
-          name = "Franchise Fantasy"
-          url = "/franchise-fantasy/"
-          weight = 27
-          [languages.en.menu.main.params]
-            icon = "img/icons/franchise.svg"
+        # hidden (Noah Nov 17): Franchise Fantasy; to restore, uncomment this entry and set draft = false in content/franchise-fantasy.md
+        # [[languages.en.menu.main]]
+        #   identifier = "franchise-fantasy"
+        #   name = "Franchise Fantasy"
+        #   url = "/franchise-fantasy/"
+        #   weight = 27
+        #   [languages.en.menu.main.params]
+        #   icon = "img/icons/franchise.svg"
