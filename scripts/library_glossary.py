@@ -177,7 +177,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       ['Quality = Stat+ z + .5 badge z + .25 FV z. Team R2 vs 2026 SRS .63 vs .44 for summed FV value.',
        'Used for college injury cost and team value; NFL value stays on AV at FV.'],
       'CFB team talent (Season AV), fv to war chart', ['CFB']),
-    E('XPM', 'Composite Plus-Minus. NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.',
+    E('XPM', 'Cross Plus-Minus. NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.',
       ['The headline XPM on every NBA board. O-XPM and D-XPM are the same blend of each side.',
        'Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).',
        'XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: XPM orders next-three-season VORX .607 (VORX .604); all rookies .330.'],
