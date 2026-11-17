@@ -1,0 +1,974 @@
+{
+ "source": "nflverse stats_player_week 2004-2025 + snap_counts 2013-2025, REG; rows 2010 on",
+ "workload": "WR/TE: targets / team targets in games played; RB: (carries + targets) / team (carries + targets)",
+ "efficiency": "WR/TE receiving yards a target; RB scrimmage yards a carry or target",
+ "not_scaled": "QB, OL, defense",
+ "xtd": {
+  "WR": [
+   -0.012876,
+   0.007825,
+   -0.009252,
+   0.005541
+  ],
+  "TE": [
+   -0.003263,
+   0.00771,
+   0.013548,
+   0.011733
+  ],
+  "RB": [
+   -0.038925,
+   0.010784,
+   -0.00208,
+   0.007841
+  ]
+ },
+ "scaling": {
+  "WR": {
+   "tier_fit": {
+    "b0": 8.20853,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "half",
+     "half*x0"
+    ],
+    "b": [
+     -0.1864825,
+     0.642401,
+     -4.2335201,
+     0.0108729,
+     -0.0014992,
+     0.0026005,
+     0.1507842,
+     0.1756439,
+     -0.7915024,
+     0.1071397
+    ]
+   },
+   "causal": {
+    "n": 2644,
+    "ols": 0.0437,
+    "first_stage": 0.032,
+    "iv": -0.0409,
+    "se": 0.0841,
+    "t": -0.49,
+    "halves": {
+     "n": 1530,
+     "ols": 0.0257,
+     "first_stage": 0.098,
+     "iv": 0.0061,
+     "se": 0.0744,
+     "t": 0.08
+    },
+    "seasons": {
+     "n": 1114,
+     "ols": 0.0574,
+     "first_stage": 0.019,
+     "iv": -0.0864,
+     "se": 0.1402,
+     "t": -0.62
+    },
+    "p": 0.3121,
+    "pass": false,
+    "use": 0.0
+   },
+   "n": 3000,
+   "n_season": 1430,
+   "n_half": 1570,
+   "n_rose": 795,
+   "du99": 11.7,
+   "tests": {
+    "dU vs base (all)": {
+     "base": 2.57104,
+     "cand": 2.53559,
+     "gain": 0.03545,
+     "t": 4.91,
+     "won": 14,
+     "seasons": 16,
+     "pass": true
+    },
+    "dU vs base (rose)": {
+     "base": 2.22981,
+     "cand": 2.17809,
+     "gain": 0.051728,
+     "t": 2.39,
+     "won": 11,
+     "seasons": 16,
+     "pass": true
+    },
+    "full vs base (all)": {
+     "base": 2.57104,
+     "cand": 2.51324,
+     "gain": 0.0578,
+     "t": 2.97,
+     "won": 12,
+     "seasons": 16,
+     "pass": true
+    },
+    "full vs base (rose)": {
+     "base": 2.22981,
+     "cand": 2.17136,
+     "gain": 0.058457,
+     "t": 1.28,
+     "won": 10,
+     "seasons": 16,
+     "pass": false
+    },
+    "full vs dU (rose)": {
+     "base": 2.17809,
+     "cand": 2.17136,
+     "gain": 0.006729,
+     "t": 0.22,
+     "won": 10,
+     "seasons": 16,
+     "pass": false
+    }
+   },
+   "blocks": {
+    "role": {
+     "base": 2.17809,
+     "cand": 2.14557,
+     "gain": 0.032514,
+     "t": 1.22,
+     "won": 9,
+     "seasons": 16,
+     "p": 0.1112,
+     "pass": false,
+     "all rows": {
+      "gain": 0.0233,
+      "t": 1.37,
+      "won": 12
+     }
+    },
+    "frame": {
+     "base": 2.17809,
+     "cand": 2.17851,
+     "gain": -0.000425,
+     "t": -0.05,
+     "won": 8,
+     "seasons": 16,
+     "p": 0.5199,
+     "pass": false,
+     "all rows": {
+      "gain": 0.004856,
+      "t": 0.75,
+      "won": 8
+     }
+    },
+    "profile": {
+     "base": 2.17809,
+     "cand": 2.1697,
+     "gain": 0.008385,
+     "t": 0.45,
+     "won": 10,
+     "seasons": 16,
+     "p": 0.3264,
+     "pass": false,
+     "all rows": {
+      "gain": 0.010136,
+      "t": 1.01,
+      "won": 11
+     }
+    },
+    "past usage history": {
+     "base": 2.17809,
+     "cand": 2.18486,
+     "gain": -0.006771,
+     "t": -1.14,
+     "won": 9,
+     "seasons": 16,
+     "p": 0.8729,
+     "pass": false,
+     "all rows": {
+      "gain": -0.002787,
+      "t": -0.82,
+      "won": 9
+     }
+    },
+    "age": {
+     "base": 2.17809,
+     "cand": 2.17989,
+     "gain": -0.001807,
+     "t": -0.55,
+     "won": 7,
+     "seasons": 16,
+     "p": 0.7088,
+     "pass": false,
+     "all rows": {
+      "gain": -0.00045,
+      "t": -0.34,
+      "won": 7
+     }
+    },
+    "low-volume rates": {
+     "base": 2.17809,
+     "cand": 2.19587,
+     "gain": -0.017783,
+     "t": -1.9,
+     "won": 4,
+     "seasons": 16,
+     "p": 0.9713,
+     "pass": false,
+     "all rows": {
+      "gain": 0.004186,
+      "t": 0.77,
+      "won": 11
+     }
+    },
+    "draft capital": {
+     "base": 2.17809,
+     "cand": 2.18449,
+     "gain": -0.006404,
+     "t": -1.27,
+     "won": 6,
+     "seasons": 16,
+     "p": 0.898,
+     "pass": false,
+     "all rows": {
+      "gain": -0.002495,
+      "t": -0.34,
+      "won": 10
+     }
+    }
+   },
+   "keep": [],
+   "lam": 0.001,
+   "slope": {
+    "dU": 0.0449
+   },
+   "fit": {
+    "b0": 7.523,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "half",
+     "half*x0",
+     "dU"
+    ],
+    "b": [
+     -0.1707441,
+     0.5840861,
+     -4.144742,
+     0.0389362,
+     -0.0018519,
+     0.0184067,
+     0.146411,
+     0.1990729,
+     -0.830022,
+     0.102231,
+     0.0448914
+    ]
+   }
+  },
+  "TE": {
+   "tier_fit": {
+    "b0": 8.90667,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "half",
+     "half*x0"
+    ],
+    "b": [
+     -0.182173,
+     0.8518123,
+     -6.7738851,
+     -0.0860587,
+     0.001041,
+     0.0396995,
+     0.124074,
+     0.0145063,
+     -0.0345495,
+     -0.0087424
+    ]
+   },
+   "causal": {
+    "n": 1325,
+    "ols": 0.0317,
+    "first_stage": 0.03,
+    "iv": 0.0293,
+    "se": 0.1164,
+    "t": 0.25,
+    "halves": {
+     "n": 760,
+     "ols": 0.0473,
+     "first_stage": 0.092,
+     "iv": -0.0192,
+     "se": 0.1013,
+     "t": -0.19
+    },
+    "seasons": {
+     "n": 565,
+     "ols": 0.0213,
+     "first_stage": 0.019,
+     "iv": 0.0707,
+     "se": 0.194,
+     "t": 0.36
+    },
+    "p": 0.4013,
+    "pass": false,
+    "use": 0.0
+   },
+   "n": 1461,
+   "n_season": 695,
+   "n_half": 766,
+   "n_rose": 327,
+   "du99": 12.4,
+   "tests": {
+    "dU vs base (all)": {
+     "base": 2.36695,
+     "cand": 2.35867,
+     "gain": 0.008276,
+     "t": 0.68,
+     "won": 9,
+     "seasons": 16,
+     "pass": false
+    },
+    "dU vs base (rose)": {
+     "base": 1.77412,
+     "cand": 1.72967,
+     "gain": 0.04445,
+     "t": 2.28,
+     "won": 13,
+     "seasons": 16,
+     "pass": true
+    },
+    "full vs base (all)": {
+     "base": 2.36695,
+     "cand": 2.34972,
+     "gain": 0.017232,
+     "t": 0.76,
+     "won": 11,
+     "seasons": 16,
+     "pass": false
+    },
+    "full vs base (rose)": {
+     "base": 1.77412,
+     "cand": 1.72864,
+     "gain": 0.045483,
+     "t": 1.6,
+     "won": 12,
+     "seasons": 16,
+     "pass": false
+    },
+    "full vs dU (rose)": {
+     "base": 1.72967,
+     "cand": 1.72864,
+     "gain": 0.001033,
+     "t": 0.05,
+     "won": 8,
+     "seasons": 16,
+     "pass": false
+    }
+   },
+   "blocks": {
+    "role": {
+     "base": 1.72967,
+     "cand": 1.72251,
+     "gain": 0.007166,
+     "t": 0.47,
+     "won": 8,
+     "seasons": 16,
+     "p": 0.3192,
+     "pass": false,
+     "all rows": {
+      "gain": -0.017785,
+      "t": -1.39,
+      "won": 6
+     }
+    },
+    "frame": {
+     "base": 1.72967,
+     "cand": 1.74634,
+     "gain": -0.016665,
+     "t": -1.56,
+     "won": 4,
+     "seasons": 16,
+     "p": 0.9406,
+     "pass": false,
+     "all rows": {
+      "gain": -0.003935,
+      "t": -0.4,
+      "won": 7
+     }
+    },
+    "profile": {
+     "base": 1.72967,
+     "cand": 1.70732,
+     "gain": 0.022351,
+     "t": 0.91,
+     "won": 8,
+     "seasons": 16,
+     "p": 0.1814,
+     "pass": false,
+     "all rows": {
+      "gain": 0.017126,
+      "t": 1.59,
+      "won": 10
+     }
+    },
+    "past usage history": {
+     "base": 1.72967,
+     "cand": 1.74665,
+     "gain": -0.016975,
+     "t": -1.17,
+     "won": 7,
+     "seasons": 16,
+     "p": 0.879,
+     "pass": false,
+     "all rows": {
+      "gain": -0.009955,
+      "t": -2.89,
+      "won": 5
+     }
+    },
+    "age": {
+     "base": 1.72967,
+     "cand": 1.73532,
+     "gain": -0.005648,
+     "t": -0.8,
+     "won": 8,
+     "seasons": 16,
+     "p": 0.7881,
+     "pass": false,
+     "all rows": {
+      "gain": -0.004561,
+      "t": -1.74,
+      "won": 5
+     }
+    },
+    "low-volume rates": {
+     "base": 1.72967,
+     "cand": 1.75414,
+     "gain": -0.024465,
+     "t": -1.51,
+     "won": 6,
+     "seasons": 16,
+     "p": 0.9345,
+     "pass": false,
+     "all rows": {
+      "gain": 0.001818,
+      "t": 0.28,
+      "won": 10
+     }
+    },
+    "draft capital": {
+     "base": 1.72967,
+     "cand": 1.73449,
+     "gain": -0.004818,
+     "t": -0.21,
+     "won": 9,
+     "seasons": 16,
+     "p": 0.5832,
+     "pass": false,
+     "all rows": {
+      "gain": -0.016398,
+      "t": -1.17,
+      "won": 7
+     }
+    }
+   },
+   "keep": [],
+   "lam": 0.01,
+   "slope": {
+    "dU": 0.0306
+   },
+   "fit": {
+    "b0": 6.82874,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "half",
+     "half*x0",
+     "dU"
+    ],
+    "b": [
+     -0.0355326,
+     0.4957154,
+     -4.1778093,
+     -0.0271448,
+     8.19e-05,
+     0.0488758,
+     0.1238356,
+     0.0191817,
+     0.1506193,
+     -0.0377437,
+     0.0306487
+    ]
+   }
+  },
+  "RB": {
+   "tier_fit": {
+    "b0": 3.60508,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "half",
+     "half*x0"
+    ],
+    "b": [
+     0.187029,
+     0.064955,
+     -0.2293536,
+     -0.0162211,
+     -0.0003498,
+     -0.0030655,
+     0.1428028,
+     0.1191083,
+     -0.0436753,
+     0.018062
+    ]
+   },
+   "causal": {
+    "n": 1793,
+    "ols": 0.012,
+    "first_stage": 0.08,
+    "iv": -0.0561,
+    "se": 0.0239,
+    "t": -2.35,
+    "halves": {
+     "n": 1028,
+     "ols": 0.0094,
+     "first_stage": 0.334,
+     "iv": -0.0232,
+     "se": 0.0114,
+     "t": -2.03
+    },
+    "seasons": {
+     "n": 765,
+     "ols": 0.0138,
+     "first_stage": 0.034,
+     "iv": -0.1139,
+     "se": 0.0826,
+     "t": -1.38
+    },
+    "p": 0.0094,
+    "pass": true,
+    "use": -0.0232
+   },
+   "n": 2064,
+   "n_season": 1000,
+   "n_half": 1064,
+   "n_rose": 664,
+   "du99": 19.0,
+   "tests": {
+    "dU vs base (all)": {
+     "base": 0.53194,
+     "cand": 0.52591,
+     "gain": 0.006029,
+     "t": 2.62,
+     "won": 10,
+     "seasons": 16,
+     "pass": true
+    },
+    "dU vs base (rose)": {
+     "base": 0.45129,
+     "cand": 0.44631,
+     "gain": 0.004985,
+     "t": 0.86,
+     "won": 10,
+     "seasons": 16,
+     "pass": false
+    },
+    "full vs base (all)": {
+     "base": 0.53194,
+     "cand": 0.51068,
+     "gain": 0.021258,
+     "t": 3.95,
+     "won": 13,
+     "seasons": 16,
+     "pass": true
+    },
+    "full vs base (rose)": {
+     "base": 0.45129,
+     "cand": 0.42786,
+     "gain": 0.023432,
+     "t": 1.9,
+     "won": 12,
+     "seasons": 16,
+     "pass": false
+    },
+    "full vs dU (rose)": {
+     "base": 0.44631,
+     "cand": 0.42786,
+     "gain": 0.018447,
+     "t": 1.8,
+     "won": 10,
+     "seasons": 16,
+     "pass": false
+    }
+   },
+   "blocks": {
+    "role": {
+     "base": 0.44631,
+     "cand": 0.43492,
+     "gain": 0.011385,
+     "t": 2.02,
+     "won": 10,
+     "seasons": 16,
+     "p": 0.0217,
+     "pass": false,
+     "all rows": {
+      "gain": 0.016675,
+      "t": 2.96,
+      "won": 11
+     }
+    },
+    "frame": {
+     "base": 0.44631,
+     "cand": 0.44204,
+     "gain": 0.00427,
+     "t": 1.05,
+     "won": 10,
+     "seasons": 16,
+     "p": 0.1469,
+     "pass": false,
+     "all rows": {
+      "gain": 0.001495,
+      "t": 0.5,
+      "won": 10
+     }
+    },
+    "profile": {
+     "base": 0.44631,
+     "cand": 0.44807,
+     "gain": -0.001767,
+     "t": -1.3,
+     "won": 5,
+     "seasons": 16,
+     "p": 0.9032,
+     "pass": false,
+     "all rows": {
+      "gain": -0.000529,
+      "t": -0.58,
+      "won": 8
+     }
+    },
+    "past usage history": {
+     "base": 0.44631,
+     "cand": 0.44728,
+     "gain": -0.00097,
+     "t": -0.78,
+     "won": 7,
+     "seasons": 16,
+     "p": 0.7823,
+     "pass": false,
+     "all rows": {
+      "gain": -0.001315,
+      "t": -1.2,
+      "won": 8
+     }
+    },
+    "age": {
+     "base": 0.44631,
+     "cand": 0.44633,
+     "gain": -2.8e-05,
+     "t": -0.09,
+     "won": 9,
+     "seasons": 16,
+     "p": 0.5359,
+     "pass": false,
+     "all rows": {
+      "gain": -0.000301,
+      "t": -2.13,
+      "won": 4
+     }
+    },
+    "low-volume rates": {
+     "base": 0.44631,
+     "cand": 0.44181,
+     "gain": 0.0045,
+     "t": 1.27,
+     "won": 11,
+     "seasons": 16,
+     "p": 0.102,
+     "pass": false,
+     "all rows": {
+      "gain": 0.002544,
+      "t": 1.61,
+      "won": 10
+     }
+    },
+    "draft capital": {
+     "base": 0.44631,
+     "cand": 0.43874,
+     "gain": 0.007566,
+     "t": 1.18,
+     "won": 11,
+     "seasons": 16,
+     "p": 0.119,
+     "pass": false,
+     "all rows": {
+      "gain": 0.00103,
+      "t": 0.38,
+      "won": 9
+     }
+    }
+   },
+   "keep": [],
+   "lam": 0.1,
+   "slope": {
+    "dU": 0.0116
+   },
+   "fit": {
+    "b0": 3.5239,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "half",
+     "half*x0",
+     "dU"
+    ],
+    "b": [
+     0.1803587,
+     0.0526317,
+     -0.1914979,
+     -0.0144758,
+     -0.0003313,
+     -0.0002586,
+     0.1417745,
+     0.127738,
+     -0.0572472,
+     0.0171953,
+     0.0115664
+    ]
+   }
+  }
+ },
+ "breakout": {
+  "definition": "next season 8+ games, PPR points a game >= the starter line (RB/WR 12, TE 9) and >= this season's PPR/G shrunk to a depth player's (RB/WR 4, TE 2.5) by 4 games + 4; never at the line before",
+  "rows": "WR/TE/RB, 4+ games, 15+ opportunities, under the starter line this season (shrunk) and in every 8+ game season of the eight before",
+  "seasons": "2011-2025",
+  "n": 2844,
+  "rate": 0.0731,
+  "rate_pos": {
+   "WR": 0.0672,
+   "TE": 0.0719,
+   "RB": 0.0822
+  },
+  "tests": {
+   "age curve": {
+    "base": 0.24107,
+    "cand": 0.23482,
+    "gain": 0.006246,
+    "t": 2.77,
+    "won": 11,
+    "seasons": 15,
+    "p": 0.0028,
+    "pass": true
+   },
+   "experience and draft": {
+    "base": 0.24107,
+    "cand": 0.232,
+    "gain": 0.009068,
+    "t": 2.68,
+    "won": 11,
+    "seasons": 15,
+    "p": 0.0037,
+    "pass": true
+   },
+   "low-volume efficiency": {
+    "base": 0.24107,
+    "cand": 0.23919,
+    "gain": 0.001884,
+    "t": 1.19,
+    "won": 11,
+    "seasons": 15,
+    "p": 0.117,
+    "pass": false
+   },
+   "old room": {
+    "base": 0.24107,
+    "cand": 0.24117,
+    "gain": -0.000101,
+    "t": -0.24,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.5948,
+    "pass": false
+   },
+   "TD luck": {
+    "base": 0.24107,
+    "cand": 0.24059,
+    "gain": 0.000479,
+    "t": 0.65,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.2578,
+    "pass": false
+   },
+   "projection gap": {
+    "base": 0.24107,
+    "cand": 0.23927,
+    "gain": 0.001796,
+    "t": 1.39,
+    "won": 10,
+    "seasons": 15,
+    "p": 0.0823,
+    "pass": false
+   },
+   "role trend": {
+    "base": 0.24107,
+    "cand": 0.24105,
+    "gain": 1.4e-05,
+    "t": 0.02,
+    "won": 9,
+    "seasons": 15,
+    "p": 0.492,
+    "pass": false
+   },
+   "snap role": {
+    "base": 0.24107,
+    "cand": 0.24076,
+    "gain": 0.00031,
+    "t": 0.43,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.3336,
+    "pass": false
+   },
+   "workload scaling": {
+    "base": 0.24107,
+    "cand": 0.2417,
+    "gain": -0.000633,
+    "t": -1.83,
+    "won": 4,
+    "seasons": 15,
+    "p": 0.9664,
+    "pass": false
+   },
+   "vacated work": {
+    "base": 0.24107,
+    "cand": 0.24105,
+    "gain": 1.7e-05,
+    "t": 0.03,
+    "won": 9,
+    "seasons": 15,
+    "p": 0.488,
+    "pass": false
+   }
+  },
+  "keep": [
+   "age curve",
+   "experience and draft"
+  ],
+  "research_only": [],
+  "final": {
+   "base": 0.24107,
+   "cand": 0.23176,
+   "gain": 0.009309,
+   "t": 2.68,
+   "won": 11,
+   "seasons": 15
+  },
+  "calib_held_out": [
+   [
+    0,
+    0.03,
+    921,
+    0.018,
+    0.018
+   ],
+   [
+    0.03,
+    0.07,
+    964,
+    0.047,
+    0.044
+   ],
+   [
+    0.07,
+    0.15,
+    606,
+    0.101,
+    0.116
+   ],
+   [
+    0.15,
+    0.3,
+    280,
+    0.201,
+    0.204
+   ],
+   [
+    0.3,
+    1,
+    73,
+    0.388,
+    0.301
+   ]
+  ],
+  "fit": {
+   "b0": -2.81566,
+   "b": [
+    0.135587,
+    0.912335,
+    -0.179571,
+    1.500592,
+    -0.000932,
+    -0.115587,
+    -1.402893,
+    -0.045188,
+    -0.001979,
+    0.003573,
+    0.526543,
+    0.18907,
+    -0.033579,
+    -0.39648
+   ],
+   "mu": [
+    5.38603,
+    3.86616,
+    0.33368,
+    0.20042,
+    1.78996,
+    0.8644,
+    0.5594,
+    25.08966,
+    634.9128,
+    134.29411,
+    0.22574,
+    0.21976,
+    2.94008,
+    4.83215
+   ]
+  }
+ }
+}

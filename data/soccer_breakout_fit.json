@@ -1,0 +1,579 @@
+{
+ "source": "static/data/soccer-war 2015-2026 (Understat big five)",
+ "workload": "SI% = shots + key passes per 100 team shots while on the pitch; efficiency = (npxG + xA) per shot involvement",
+ "scaling": {
+  "eff": {
+   "n": 8733,
+   "n_changed": 2478,
+   "n_rose": 1148,
+   "n_rose2x": 211,
+   "changed": 5.0,
+   "rose2x": 10.0,
+   "unit": "efficiency x 100",
+   "tests": {
+    "levels vs base (all)": {
+     "base": 6.15967,
+     "cand": 5.8206,
+     "gain": 0.339075,
+     "t": 6.4,
+     "won": 11,
+     "seasons": 11
+    },
+    "dU vs levels (all)": {
+     "base": 5.8206,
+     "cand": 5.82139,
+     "gain": -0.000793,
+     "t": -1.1,
+     "won": 4,
+     "seasons": 11
+    },
+    "dU vs levels (changed)": {
+     "base": 5.60127,
+     "cand": 5.60127,
+     "gain": 3e-06,
+     "t": 0.0,
+     "won": 8,
+     "seasons": 11
+    },
+    "dU vs levels (rose)": {
+     "base": 5.29722,
+     "cand": 5.29562,
+     "gain": 0.001593,
+     "t": 0.21,
+     "won": 4,
+     "seasons": 11
+    },
+    "kept vs base (all)": {
+     "base": 6.15967,
+     "cand": 5.79485,
+     "gain": 0.364822,
+     "t": 6.29,
+     "won": 11,
+     "seasons": 11
+    },
+    "kept vs base (changed)": {
+     "base": 6.0523,
+     "cand": 5.52087,
+     "gain": 0.531435,
+     "t": 6.34,
+     "won": 11,
+     "seasons": 11
+    },
+    "kept vs base (rose)": {
+     "base": 5.50379,
+     "cand": 5.2768,
+     "gain": 0.226986,
+     "t": 2.73,
+     "won": 9,
+     "seasons": 11
+    },
+    "kept vs base (rose 2x)": {
+     "base": 5.10647,
+     "cand": 5.05239,
+     "gain": 0.054081,
+     "t": 0.3,
+     "won": 7,
+     "seasons": 11
+    },
+    "kept vs levels + dU (changed)": {
+     "base": 5.60127,
+     "cand": 5.52087,
+     "gain": 0.080403,
+     "t": 2.99,
+     "won": 9,
+     "seasons": 11
+    },
+    "kept vs levels + dU (rose)": {
+     "base": 5.29562,
+     "cand": 5.2768,
+     "gain": 0.018822,
+     "t": 0.42,
+     "won": 7,
+     "seasons": 11
+    },
+    "every block vs kept (changed)": {
+     "base": 5.52087,
+     "cand": 5.56335,
+     "gain": -0.042484,
+     "t": -1.54,
+     "won": 4,
+     "seasons": 11
+    }
+   },
+   "levels": {
+    "role": {
+     "base": 6.15967,
+     "cand": 5.95831,
+     "gain": 0.20136,
+     "t": 5.37,
+     "won": 11,
+     "seasons": 11,
+     "p": 0.0,
+     "pass": true
+    },
+    "shot profile": {
+     "base": 6.15967,
+     "cand": 5.98014,
+     "gain": 0.179531,
+     "t": 5.53,
+     "won": 11,
+     "seasons": 11,
+     "p": 0.0,
+     "pass": true
+    },
+    "past workload history": {
+     "base": 6.15967,
+     "cand": 6.15747,
+     "gain": 0.002204,
+     "t": 0.6,
+     "won": 7,
+     "seasons": 11,
+     "p": 0.2743,
+     "pass": false
+    },
+    "age": {
+     "base": 6.15967,
+     "cand": 6.15978,
+     "gain": -0.000102,
+     "t": -0.69,
+     "won": 6,
+     "seasons": 11,
+     "p": 0.7549,
+     "pass": false
+    },
+    "low-workload rates": {
+     "base": 6.15967,
+     "cand": 6.16558,
+     "gain": -0.005903,
+     "t": -0.7,
+     "won": 4,
+     "seasons": 11,
+     "p": 0.758,
+     "pass": false
+    },
+    "low-minute rates": {
+     "base": 6.15967,
+     "cand": 6.1701,
+     "gain": -0.010423,
+     "t": -0.81,
+     "won": 6,
+     "seasons": 11,
+     "p": 0.791,
+     "pass": false
+    },
+    "team strength": {
+     "base": 6.15967,
+     "cand": 6.10704,
+     "gain": 0.05263,
+     "t": 3.15,
+     "won": 9,
+     "seasons": 11,
+     "p": 0.0008,
+     "pass": true
+    }
+   },
+   "blocks": {
+    "role": {
+     "base": 5.60127,
+     "cand": 5.52087,
+     "gain": 0.080403,
+     "t": 2.99,
+     "won": 9,
+     "seasons": 11,
+     "rose": {
+      "t": 0.42,
+      "won": 7
+     },
+     "p": 0.0014,
+     "pass": true
+    },
+    "shot profile": {
+     "base": 5.60127,
+     "cand": 5.5912,
+     "gain": 0.01007,
+     "t": 0.76,
+     "won": 6,
+     "seasons": 11,
+     "rose": {
+      "t": -0.01,
+      "won": 5
+     },
+     "p": 0.2236,
+     "pass": false
+    },
+    "past workload history": {
+     "base": 5.59812,
+     "cand": 5.58973,
+     "gain": 0.008389,
+     "t": 0.9,
+     "won": 7,
+     "seasons": 11,
+     "rose": {
+      "t": -0.56,
+      "won": 6
+     },
+     "p": 0.1841,
+     "pass": false
+    },
+    "age": {
+     "base": 5.60114,
+     "cand": 5.61481,
+     "gain": -0.013664,
+     "t": -2.56,
+     "won": 2,
+     "seasons": 11,
+     "rose": {
+      "t": -1.87,
+      "won": 3
+     },
+     "p": 0.9948,
+     "pass": false
+    },
+    "low-workload rates": {
+     "base": 5.6078,
+     "cand": 5.60672,
+     "gain": 0.001079,
+     "t": 0.14,
+     "won": 6,
+     "seasons": 11,
+     "rose": {
+      "t": -0.94,
+      "won": 5
+     },
+     "p": 0.4443,
+     "pass": false
+    },
+    "low-minute rates": {
+     "base": 5.61279,
+     "cand": 5.61752,
+     "gain": -0.004736,
+     "t": -1.64,
+     "won": 4,
+     "seasons": 11,
+     "rose": {
+      "t": -1.47,
+      "won": 2
+     },
+     "p": 0.9495,
+     "pass": false
+    },
+    "team strength": {
+     "base": 5.60127,
+     "cand": 5.5916,
+     "gain": 0.009672,
+     "t": 0.87,
+     "won": 6,
+     "seasons": 11,
+     "rose": {
+      "t": -0.49,
+      "won": 6
+     },
+     "p": 0.1922,
+     "pass": false
+    }
+   },
+   "keep_levels": [
+    "role",
+    "shot profile",
+    "team strength"
+   ],
+   "keep": [
+    "role"
+   ],
+   "lam": 0.0001,
+   "fit": {
+    "b0": 0.0865877,
+    "cols": [
+     "x0",
+     "x0*r0",
+     "r0",
+     "age",
+     "age2",
+     "u0",
+     "xprev",
+     "hasprev",
+     "F",
+     "D",
+     "kpsh",
+     "bu90",
+     "stsh",
+     "xgsh",
+     "xakp",
+     "sh90",
+     "tsh",
+     "dT",
+     "dU",
+     "dU*F",
+     "dU*D",
+     "dU*kpsh",
+     "dU*bu90",
+     "dU*stsh"
+    ],
+    "b": [
+     0.020770704,
+     0.544562814,
+     -0.038802977,
+     -0.000165319,
+     -1.083e-06,
+     0.000127305,
+     0.211756445,
+     0.002921441,
+     0.007737329,
+     0.003609227,
+     -0.018869542,
+     -0.009757558,
+     -0.010151694,
+     0.088549928,
+     -0.05987682,
+     -0.00217508,
+     0.001422751,
+     0.002061832,
+     0.000100379,
+     -0.000440223,
+     -0.000311138,
+     0.001022383,
+     0.000781441,
+     -0.000654102
+    ]
+   }
+  }
+ },
+ "breakout": {
+  "def": "next season 1500+ minutes and GAR a 90 at least 0.06 over his best season to date (GAR a 90 shrunk to replacement by minutes, k 600, this season and the six before); outfield, 450+ minutes, in the big five next season",
+  "n": 15034,
+  "rate": 0.0767,
+  "tests": {
+   "age curve": {
+    "base": 0.26159,
+    "cand": 0.2557,
+    "gain": 0.005891,
+    "t": 4.35,
+    "won": 10,
+    "seasons": 11,
+    "p": 0.0,
+    "pass": true
+   },
+   "low-workload efficiency": {
+    "base": 0.26159,
+    "cand": 0.25928,
+    "gain": 0.002312,
+    "t": 4.72,
+    "won": 10,
+    "seasons": 11,
+    "p": 0.0,
+    "pass": true
+   },
+   "vacated minutes": {
+    "base": 0.26159,
+    "cand": 0.26072,
+    "gain": 0.000867,
+    "t": 1.72,
+    "won": 9,
+    "seasons": 11,
+    "p": 0.0427,
+    "pass": false
+   },
+   "finishing luck": {
+    "base": 0.26159,
+    "cand": 0.26095,
+    "gain": 0.000642,
+    "t": 2.83,
+    "won": 9,
+    "seasons": 11,
+    "p": 0.0023,
+    "pass": true
+   },
+   "projection gap": {
+    "base": 0.26159,
+    "cand": 0.25906,
+    "gain": 0.002529,
+    "t": 4.78,
+    "won": 10,
+    "seasons": 11,
+    "p": 0.0,
+    "pass": true
+   },
+   "minutes room": {
+    "base": 0.26159,
+    "cand": 0.26154,
+    "gain": 4.6e-05,
+    "t": 0.39,
+    "won": 5,
+    "seasons": 11,
+    "p": 0.3483,
+    "pass": false
+   },
+   "workload scaling": {
+    "base": 0.26159,
+    "cand": 0.2592,
+    "gain": 0.002391,
+    "t": 4.43,
+    "won": 10,
+    "seasons": 11,
+    "p": 0.0,
+    "pass": true
+   },
+   "team move": {
+    "base": 0.26159,
+    "cand": 0.25753,
+    "gain": 0.004059,
+    "t": 5.71,
+    "won": 10,
+    "seasons": 11,
+    "p": 0.0,
+    "pass": true
+   },
+   "club strength": {
+    "base": 0.26159,
+    "cand": 0.25473,
+    "gain": 0.006862,
+    "t": 5.64,
+    "won": 11,
+    "seasons": 11,
+    "p": 0.0,
+    "pass": true
+   },
+   "market value": {
+    "base": 0.26159,
+    "cand": 0.25377,
+    "gain": 0.007821,
+    "t": 3.67,
+    "won": 10,
+    "seasons": 11,
+    "p": 0.0001,
+    "pass": true
+   }
+  },
+  "keep": [
+   "age curve",
+   "low-workload efficiency",
+   "finishing luck",
+   "projection gap",
+   "workload scaling",
+   "team move",
+   "club strength",
+   "market value"
+  ],
+  "final": {
+   "base": 0.26159,
+   "cand": 0.24315,
+   "gain": 0.018437,
+   "t": 9.27,
+   "won": 11,
+   "seasons": 11
+  },
+  "calib_heldout": [
+   [
+    0,
+    0.03,
+    4132,
+    0.017,
+    0.015
+   ],
+   [
+    0.03,
+    0.06,
+    4022,
+    0.044,
+    0.045
+   ],
+   [
+    0.06,
+    0.1,
+    3200,
+    0.078,
+    0.093
+   ],
+   [
+    0.1,
+    0.15,
+    1918,
+    0.121,
+    0.12
+   ],
+   [
+    0.15,
+    0.25,
+    1286,
+    0.187,
+    0.196
+   ],
+   [
+    0.25,
+    1,
+    476,
+    0.327,
+    0.275
+   ]
+  ],
+  "fit": {
+   "b0": -6.49268,
+   "b": [
+    -8.008789,
+    0.454497,
+    -13.342494,
+    -0.01528,
+    -0.00063,
+    -0.02784,
+    -0.40099,
+    0.026319,
+    1.453707,
+    0.419159,
+    13.577659,
+    -2.533072,
+    0.206284,
+    -0.210814,
+    0.284912,
+    1.22145,
+    0.136778,
+    0.309961,
+    -0.516669
+   ],
+   "mu": [
+    0.05431,
+    7.42967,
+    0.02375,
+    26.87366,
+    737.26349,
+    1.46977,
+    -0.0034,
+    18.10856,
+    -0.00383,
+    -0.00313,
+    -0.00943,
+    0.07902,
+    0.37523,
+    0.25376,
+    -0.00022,
+    1.3421,
+    -0.1534,
+    1.98597,
+    0.99481
+   ]
+  }
+ },
+ "dU_p99": 12.28,
+ "U_pct": {
+  "50": 14.8,
+  "75": 25.8,
+  "90": 32.4,
+  "95": 36.1,
+  "99": 42.3
+ },
+ "tiers": [
+  {
+   "k": 20,
+   "lab": "SI 20"
+  },
+  {
+   "k": 30,
+   "lab": "SI 30"
+  },
+  {
+   "k": 40,
+   "lab": "SI 40"
+  }
+ ],
+ "k_shrink": 600.0,
+ "jump": 0.06
+}

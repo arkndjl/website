@@ -92,7 +92,11 @@ jobs:
       - name: Flags, headshots and prospect FV (Transfermarkt)
         continue-on-error: true
         run: python3 scripts/soccer_faces.py
-      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/soccer.json), display only
+      # next up tab: breakout odds + shot-involvement tiers (scripts/soccer_breakout.py -> static/data/next-up/soccer.json)
+      - name: Next up tab
+        continue-on-error: true
+        run: python3 scripts/soccer_breakout.py && python3 scripts/next_up.py soccer
+      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/soccer.json static/data/next-up/soccer.json static/data/next-up/soccer-tab.json), display only
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py soccer

@@ -1231,7 +1231,7 @@
     });
     return { group: group, rest: rest.length ? rest.join('. ') + (/\.\s*$/.test(text) ? '.' : '') : '' };
   }
-  var PC_XSKIP = /mock|backup|arklist|breakout|past|^v\d+$|game|ranking|odds|lineup|on\/off|fv model/i;
+  var PC_XSKIP = /mock|backup|arklist|breakout|standout|next up|past|^v\d+$|game|ranking|odds|lineup|on\/off|fv model/i;
   // the player's row on the page's other player tables (same name by the shared rules, same team): its columns the card lacks
   function pcXGroups(table, name, team, pos, shown) {
     var nk = window.arkName ? window.arkName.key : pdNorm, key = nk(name), tk = function (s) { return String(s || '').toUpperCase().split('/').map(function (x) { return x.trim(); }).filter(Boolean); };
