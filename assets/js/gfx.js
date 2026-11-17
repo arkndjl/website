@@ -63,9 +63,9 @@
   function g0font(sz) { mctx.font = tagSz(sz) + 'px ' + FONT; return { measure: function (t) { return mctx.measureText(t).width; } }; }
   function tagBox(g, t, x, cy, ts) {
     var w = g.measureText(t.t).width + 16, h = Math.round(ts * 1.25), y = Math.round(cy - h / 2);
-    if (t.real || t.kind === 'value') {                              // solid: lilac (traded pick) or teal (value)
+    if (t.real || t.kind === 'value' || t.kind === 'lilac') {        // solid: lilac (traded pick, NBA contract) or teal (value, two-way)
       g.fillStyle = C.title; g.fillRect(x + 3, y + 3, w, h);        // pixel drop shadow
-      g.fillStyle = t.real ? C.lilac : C.teal; g.fillRect(x, y, w, h);
+      g.fillStyle = t.real || t.kind === 'lilac' ? C.lilac : C.teal; g.fillRect(x, y, w, h);
       g.fillStyle = C.dark; g.fillText(t.t, x + 8, cy);
     } else if (t.kind === 'reach') {                                 // pink outline on dark, as on the site
       g.fillStyle = C.title; g.fillRect(x + 3, y + 3, w, h);
@@ -256,8 +256,9 @@
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
         if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = C.teal; cell.glow = an > 5; }
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
-        var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
-        if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
+        var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g], .nbagl__ct[data-g]')) : [];
+        // G League contract tags: two-way teal, NBA contract lilac (solid, no legend)
+        if (tags.length) cell.tags = tags.map(function (e) { var g = e.getAttribute('data-g'); return e.classList.contains('nbagl__ct') ? { t: g, kind: g === 'TW' ? 'value' : 'lilac' } : { t: g, real: e.classList.contains('is-real') }; });
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }

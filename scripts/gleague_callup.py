@@ -22,6 +22,9 @@ Targets: NBA 1 = any NBA minutes next season; REG = 1,000+ minutes (per 82 games
 next 3 seasons) x E[3-season VORX | he plays] (ridge, lambda POS_LAM, on those who played), shown per season (/ 3).
 Ridge logistic (lambda 1), standardized. Draft slot counts only drafts held before the G League season.
 Backtest: leave one season out, scored per season against the same model without G League production.
+Display only (build): exact age on Feb 1 from the G League team rosters' birth dates (ESPN's NBA rosters for assigned
+players missing there), contract tag TW = the stats API's TwoWay list, NBA = on an ESPN NBA roster and not two-way;
+cached in scripts/data/gleague_status.json. Exhibit 10 deals have no free source.
 """
 import json, math, os, sys, time, glob, collections, datetime, urllib.request
 import numpy as np
@@ -36,6 +39,7 @@ DRAFT = os.path.join(HERE, 'nba_draft.json')
 FIT = os.path.join(ROOT, 'data', 'gleague_callup_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'gleague.json')
 PAST = os.path.join(ROOT, 'static', 'data', 'gleague-past.json')
+STATUS = os.path.join(HERE, 'data', 'gleague_status.json')   # {season: {'dob': {pid: date}, 'tw': [pid], 'nba': [pid]}}
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
 API = ('https://stats.gleague.nba.com/stats/leaguedashplayerstats?LeagueID=20&Season={s}&SeasonType={t}&PerMode=Totals'
        '&MeasureType={m}&LastNGames=0&Month=0&OpponentTeamID=0&PaceAdjust=N&Period=0&PlusMinus=N&Rank=N&TeamID=0&TwoWay=0')
@@ -83,6 +87,59 @@ def fetch(y, fresh=False):
                     if k == 3: raise
                     time.sleep(5 * (k + 1))
             json.dump(d, open(fn, 'w')); time.sleep(1.5)
+
+
+def gl_get(url):
+    req = urllib.request.Request(url, headers={'User-Agent': UA, 'Referer': 'https://gleague.nba.com/', 'Origin': 'https://gleague.nba.com',
+                                               'Accept': 'application/json'})
+    for k in range(3):
+        try:
+            return json.load(urllib.request.urlopen(req, timeout=60))
+        except Exception:
+            if k == 2: raise
+            time.sleep(4 * (k + 1))
+
+
+def table(d):
+    r = d['resultSets'][0]; return [dict(zip(r['headers'], x)) for x in r['rowSet']]
+
+
+def status(y, players):
+    """birth dates (G League team rosters), two-way contracts (the stats API's TwoWay filter, both season types) and
+    NBA contracts on assignment (on an ESPN NBA roster, not two-way) for season y; each part keeps the last good pull"""
+    st = json.load(open(STATUS)) if os.path.exists(STATUS) else {}
+    cur = st.get(str(y), {'dob': {}, 'tw': [], 'nba': []})
+    teams = set()
+    for tag in ('0', 'SC'):
+        teams |= {r['TEAM_ID'] for r in rs(os.path.join(CACHE, f'{sname(y)}_Base_{tag}.json')) if r.get('TEAM_ID')}
+    for t in sorted(teams):
+        try:
+            for r in table(gl_get(f'https://stats.gleague.nba.com/stats/commonteamroster?LeagueID=20&Season={sname(y)}&TeamID={t}')):
+                try: cur['dob'][str(r['PLAYER_ID'])] = datetime.datetime.strptime(r['BIRTH_DATE'], '%b %d, %Y').date().isoformat()
+                except (TypeError, ValueError): pass
+        except Exception as e: print('roster', t, 'kept:', e)
+        time.sleep(0.6)
+    try:
+        tw = set()
+        for st_ in ('Regular%20Season', 'Showcase'):
+            tw |= {r['PLAYER_ID'] for r in table(gl_get(API.format(s=sname(y), t=st_, m='Base').replace('TwoWay=0', 'TwoWay=1')))}
+            time.sleep(0.6)
+        cur['tw'] = sorted(tw)
+    except Exception as e: print('two-way list kept:', e)
+    try:
+        import faces
+        ros = faces.espn_rosters(faces.ESPN_NBA)
+        by_ph = {str(a['id']) for a in ros}; by_nm = {(names.key(a['name']), a['team']) for a in ros}
+        tws = set(cur['tw']); dph = {str(a['id']): a.get('dob') for a in ros}; dnm = {(names.key(a['name']), a['team']): a.get('dob') for a in ros}
+        on = [p for p in players if (p.get('ph') and str(p['ph']) in by_ph) or (p.get('nba') and (names.key(p['n']), p['nba']) in by_nm)]
+        cur['nba'] = sorted(p['id'] for p in on if p['id'] not in tws)
+        for p in on:      # assigned NBA players are not always on the G League club's roster: ESPN's birth date
+            d = dph.get(str(p.get('ph'))) or dnm.get((names.key(p['n']), p.get('nba')))
+            if d and str(p['id']) not in cur['dob']: cur['dob'][str(p['id'])] = d
+    except Exception as e: print('NBA rosters kept:', e)
+    st[str(y)] = cur
+    json.dump(st, open(STATUS, 'w'), separators=(',', ':'), sort_keys=True)
+    return cur
 
 
 def rs(fn):
@@ -367,6 +424,18 @@ def build():
                         'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
                         'cmp': round(info['cmp'] + now), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'], 'bb': b,
                         'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(float(xv[i]) / 3, 2)})
+    try:
+        stt = status(y, players)
+    except Exception as e:
+        print('status skipped:', e); stt = (json.load(open(STATUS)) if os.path.exists(STATUS) else {}).get(str(y), {'dob': {}, 'tw': [], 'nba': []})
+    tw, nb = set(stt['tw']), set(stt['nba'])
+    NBADOB = json.load(open(os.path.join(HERE, 'data', 'nba_dob.json'))) if os.path.exists(os.path.join(HERE, 'data', 'nba_dob.json')) else {}
+    for r in players:
+        dob = stt['dob'].get(str(r['id'])) or (NBADOB.get(r['bb']) if r.get('bb') else None)
+        if dob: r['ax'] = round((datetime.date(y, 2, 1) - datetime.date.fromisoformat(dob)).days / 365.25, 1)    # Feb 1, like the XPM board
+        if r['id'] in tw: r['ct'] = 'TW'
+        elif r['id'] in nb: r['ct'] = 'NBA'
+    print('ages', sum('ax' in r for r in players), 'two-way', sum(r.get('ct') == 'TW' for r in players), 'NBA', sum(r.get('ct') == 'NBA' for r in players))
     players.sort(key=lambda r: (-r['p1'], -r['xv']))
     out = {'season': y, 'label': sname(y), 'next': sname(y + 1), 'part': round(part, 2), 'reg': reg,
            'asof': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),

@@ -1,7 +1,7 @@
 {{- /* G League call-up odds: every G League player this season (static/data/gleague.json, scripts/gleague_callup.py),
        50 to a page. The season select swaps in a past season's end-of-season board (static/data/gleague-past.json,
        gleague_callup.py --past: fit walk forward) with what happened next (MP next, VORX 3Y). {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
-<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-past="{{ "data/gleague-past.json" | relURL }}" data-gfx-cols="RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX">
+<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-past="{{ "data/gleague-past.json" | relURL }}" data-gfx-cols="RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -28,7 +28,8 @@
     <table class="cfb__table nbaxpm__table nbagl__table">
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
-        <th data-sort="n">Player</th>
+        <th data-sort="n" title="tags: TW two-way contract, NBA standard NBA contract on assignment; no tag G League contract">Player</th>
+        <th data-sort="ax" data-num title="age on Feb 1 of the season">Age</th>
         <th data-sort="gp" data-num class="nbaxpm__ph" title="G League games this season (Showcase Cup + regular season)">GP</th>
         <th data-sort="min" data-num class="nbaxpm__ph" title="G League minutes this season">MIN</th>
         <th data-sort="gs" data-num class="nbaxpm__ph" title="Game Score per 36 minutes, G League">GmSc/36</th>
@@ -102,7 +103,7 @@
       if (nb === 'd' && !p.pk) return false; if (nb === 'u' && p.pk) return false;
       if (e.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
       return true;
-    }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return b.p1 - a.p1; if (x == null) return 1; if (y == null) return -1; return y - x || b.p1 - a.p1; });
+    }).map(function (p) { if (p.ax == null && p.age != null) p.ax = p.age; return p; }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return b.p1 - a.p1; if (x == null) return 1; if (y == null) return -1; return y - x || b.p1 - a.p1; });
     list.forEach(function (p, i) { p.rk = i + 1; });
     var shown = list.length;
     if (sortKey !== 'rk') {
@@ -119,14 +120,15 @@
     table.dataset.key = key;
     var isPast = data !== cur;
     ths.forEach(function (th) { if (th.hasAttribute('data-gl-out')) th.hidden = !isPast; });
-    win.dataset.gfxCols = 'RK,Player,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX' + (isPast ? ',MP next,VORX 3Y' : '');
+    win.dataset.gfxCols = 'RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX' + (isPast ? ',MP next,VORX 3Y' : '');
     defEl.title = isPast ? DEF + ' Past seasons: the board the day that season ended, refit walk forward on the seasons known by then (NBA% and REG% through the season before, xVORX three back, from 2014-15); out of sample 2010-11 to 2024-25: NBA% AUC ' + past.test.auc + ', Brier ' + past.test.brier + ' (rate ' + past.test.rate + ').' : DEF;
     function k(c) { return c === key ? ' is-key' : ''; }
     var row = function (p) {
       var dr = p.pk ? '#' + p.pk + " '" + String(p.dy).slice(2) : 'UDFA';
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + (p.lg ? logo('/img/gleague/' + esc(p.lg) + '.png') : '') + esc(p.tm) +
-          (p.nba ? ' ' + logo('/img/nba/' + esc(p.nba.toLowerCase()) + '.png') + esc(p.nba) : '') + ' · ' + (p.age == null ? '' : p.age + ' · ') + dr + '</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + (p.ct ? '<span class="nbagl__ct nbagl__ct--' + p.ct.toLowerCase() + '" data-g="' + p.ct + '" title="' + (p.ct === 'TW' ? 'two-way contract' : 'NBA contract, on assignment') + '"></span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + (p.lg ? logo('/img/gleague/' + esc(p.lg) + '.png') : '') + esc(p.tm) +
+          (p.nba ? ' ' + logo('/img/nba/' + esc(p.nba.toLowerCase()) + '.png') + esc(p.nba) : '') + ' · ' + dr + '</span></td>' +
+        '<td class="cfb__num">' + (p.ax == null ? '<span class="cfb__dim">–</span>' : p.ax.toFixed(1)) + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.gp + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.min + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.gs.toFixed(1) + '</td>' +
