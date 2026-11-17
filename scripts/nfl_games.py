@@ -816,7 +816,10 @@ def injury_costs(last, week, games, coef):
     rep, n = live_injuries(last, week, games)
     import datetime
     with open(INJ_OUT, 'w') as f:
-        f.write(json.dumps({'season': last, 'week': week, 'asof': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')})[:-1] + ', "teams": {\n'
+        # srcs: items read from each source this run (scripts/data_health.py injuries flags a source that went quiet);
+        # names: for the depth chart (scripts/backup_watch.py shows these statuses over ESPN's own)
+        f.write(json.dumps({'season': last, 'week': week, 'asof': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
+                            'srcs': n, 'names': {g: p['name'] for ps in rep.values() for g, p in sorted(ps.items())}})[:-1] + ', "teams": {\n'
                 + ',\n'.join(json.dumps(t) + ': ' + json.dumps({g: [p['status'], p['src']] for g, p in sorted(ps.items())})
                               for t, ps in sorted(rep.items())) + '\n}}\n')
     maps = W.gsis_map(last)

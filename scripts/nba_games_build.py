@@ -357,11 +357,21 @@ def build():
     for (a_, h_), d_ in (rep or {}).items():
         for t in (a_, h_):
             today_rep.setdefault(t, {}).update(d_)
+    # RotoWire's news and long-term cards count here as in the slate's games (newer than the team's last tip, and on
+    # game day newer than the league's report), so a star hurt last night drops his team before ESPN's list catches up
     tstat = {}
+    today_iso = today.isoformat()
     for t in E.TEAMS:
         st_ = {}
         for p in m.roster(t):
-            s_ = today_rep.get(t, {}).get(N.norm(names.get(p, ''))) or espn.get(p)
+            k = N.norm(names.get(p, ''))
+            r_ = today_rep.get(t, {}).get(k)
+            s_ = r_ or espn.get(p)
+            w = rwn.get(p)
+            if w and w[1] > last_tip[t] and (not r_ or w[1] > rep_ts):
+                s_ = w[0]
+            elif not s_ and p in rlong and (rlong[p] is None or rlong[p] > today_iso):
+                s_ = 'Out'
             if s_:
                 st_[p] = s_
         tstat[t] = st_
@@ -492,8 +502,10 @@ def nba_bracket(BK, tal, sims):
 
 # ---------------------------------------------------------------- power rankings and season odds
 def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
-    """tstat: {team: {player: status}} today's injury report and ESPN's list; the ranking's rating counts it (the game
-    model's lineup term at those statuses), the season sims' games past the slate play at full strength"""
+    """tstat: {team: {player: status}} today's injury report, ESPN's list and RotoWire's news; the ranking's rating
+    counts it (the game model's lineup term at those statuses), the season sims' games past the slate at the no-report
+    lineup (a player out for weeks is already at his missed-games streak's chance to play: forcing RotoWire's long-term
+    outs to zero moved a team 0.4 points at most, Nov 17 2026, so it isn't done)"""
     b, sd = F['coef'], F['sd']
     tstat = tstat or {}
     teams = sorted(E.TEAMS)
