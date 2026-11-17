@@ -124,6 +124,17 @@ jobs:
           if [ "$(node scripts/nt_live.mjs --due)" = due ] && [ -z "$(gh run list -w nt-live.yml -s in_progress -L 1 --json databaseId -q '.[].databaseId')" ] && [ -z "$(gh run list -w nt-live.yml -s queued -L 1 --json databaseId -q '.[].databaseId')" ]; then
             gh workflow run nt-live.yml && echo "dispatched 1nt live"
           fi
+      # LAURSEN_111 / 1NT data (esea.yml): its own cron fires only a few times a day, so start it here when
+      # data/esea.json is over 25 minutes old and no run is queued or in progress
+      - name: ESEA refresh
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          age=$(python3 -c "import json,datetime as D;a=json.load(open('data/esea.json'))['asof'];print(int((D.datetime.now(D.timezone.utc)-D.datetime.fromisoformat(a.replace('Z','+00:00'))).total_seconds()))" 2>/dev/null || echo 99999)
+          if [ "$age" -gt 1500 ] && [ -z "$(gh run list -w esea.yml -s in_progress -L 1 --json databaseId -q '.[].databaseId')" ] && [ -z "$(gh run list -w esea.yml -s queued -L 1 --json databaseId -q '.[].databaseId')" ]; then
+            gh workflow run esea.yml && echo "dispatched esea (data ${age}s old)"
+          fi
       # The college basketball slate is re-priced on the newest injury report inside the picks refresh, so its games and
       # injury files ride along (rebuilt on a newer main like the picks: the re-price reruns on the build's snapshot).
       # Only the paper books, the picks, the ticker, the standings and those CBB files are on the site (--site): a snapshot-only commit
