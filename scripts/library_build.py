@@ -160,7 +160,7 @@ def write_page(studies, sections, fv_tables):
     """content/arkboard-process.md (the Process page, was Reference, before that Library): hero + the research and glossary tab groups
     built from data/library.json, then the Data Sources tab (layouts/shortcodes/datasources.html)."""
     page = ROOT / 'content/arkboard-process.md'
-    head = page.read_text().split('{{< wintabs', 1)[0]
+    head = page.read_text().split('{{< glossfind', 1)[0].split('{{< wintabs', 1)[0]
     groups = [g for g in GROUP_ORDER if any(s['group'] == g for s in studies)]
     rtabs = ['all studies'] + groups
     gtabs = [(x['id'], x.get('tab') or GLOSS_TAB.get(x['id'], x['title'])) for x in sections]
@@ -168,7 +168,9 @@ def write_page(studies, sections, fv_tables):
         at = next((i + 1 for i, (sid, _) in enumerate(gtabs) if sid == 'fv'), 0)
         gtabs.insert(at, ('fv-scales', 'FV scales'))
     gl = ('|Glossary/Methodology:' + ','.join(t for _, t in gtabs)) if gtabs else ''
-    lines = ['{{< wintabs groups="Research:' + ','.join(rtabs) + gl + '|Data Sources:data sources" side="true" class="libtabs" label="Process views" >}}',
+    gidx = '|'.join(f'{sid}={tab}' for sid, tab in gtabs if sid != 'fv-scales')
+    lines = ['{{< glossfind tabs="' + gidx + '" >}}', '',   # glossary search (layouts/shortcodes/glossfind.html)
+             '{{< wintabs groups="Research:' + ','.join(rtabs) + gl + '|Data Sources:data sources" side="true" class="libtabs" label="Process views" >}}',
              '{{< libresearch tab="all studies" group="all" >}}']
     lazy = lambda tab, sc: f'{{{{< lazytab tab="{tab}" >}}}}{sc}{{{{< /lazytab >}}}}'   # later tabs load on first open
     lines += [lazy(g, f'{{{{< libresearch tab="{g}" group="{g}" >}}}}') for g in groups]
@@ -178,7 +180,7 @@ def write_page(studies, sections, fv_tables):
     lines.append(lazy('data sources', '{{< datasources tab="data sources" >}}'))
     lines.append('{{< /wintabs >}}')
     # #g-<term> links open the lazy glossary tab the term is in (layouts/shortcodes/libgidx.html, gfx.js rqFromHash)
-    lines.append('{{< libgidx tabs="' + '|'.join(f'{sid}={tab}' for sid, tab in gtabs if sid != 'fv-scales') + '" >}}')
+    lines.append('{{< libgidx tabs="' + gidx + '" >}}')
     page.write_text(head + '\n'.join(lines) + '\n')
 
 def rq_card(s):

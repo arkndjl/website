@@ -10,6 +10,8 @@ draft = false
 
 {{< winpane title="process.exe" icon="process" sprite="px/hero-library" status="" class="winpane--art" />}}
 
+{{< glossfind tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|data=data and names" >}}
+
 {{< wintabs groups="Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Glossary/Methodology:FV,FV scales,player value,player odds,team ratings,game models,drafts and mocks,data and names|Data Sources:data sources" side="true" class="libtabs" label="Process views" >}}
 {{< libresearch tab="all studies" group="all" >}}
 {{< lazytab tab="football" >}}{{< libresearch tab="football" group="football" >}}{{< /lazytab >}}

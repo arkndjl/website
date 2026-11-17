@@ -4334,7 +4334,7 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 @media (min-width: 685px) { .winlist__row:has(.winlist__by:empty) .winlist__name { grid-column-end: span 2; } .winlist__row:has(.winlist__by:empty) .winlist__by { display: none; } }
 
 /* a row opened from find.exe */
-.winlist__row.is-found, .gallery__row.is-found .gallery__rowbtn, .athletes__card.is-found { animation: lib-found 0.6s steps(2) 4; }
+.winlist__row.is-found, .gallery__row.is-found .gallery__rowbtn, .athletes__card.is-found, .libterm.is-found { animation: lib-found 0.6s steps(2) 4; }
 @keyframes lib-found { 0%, 100% { background: transparent; } 50% { background: var(--win-title); color: #fff; } }
 
 @media (max-width: 899px) {
