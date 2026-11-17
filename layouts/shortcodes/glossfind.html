@@ -1,0 +1,50 @@
+{{- /* Process: find.exe over the glossary. The terms sit in lazy tabs, so the index (term, one-line definition, sports,
+       tab, #g- anchor) is built here from data/library.json; a result sets #g-<term>, which gfx.js rqFromHash opens.
+       Same look as ARKLIBRARY's libfind. Usage: {{< glossfind tabs="fv=FV|value=player value|…" >}} before the wintabs. */ -}}
+{{- $tabs := dict -}}
+{{- range split (.Get "tabs") "|" }}{{ $kv := split . "=" }}{{ if eq (len $kv) 2 }}{{ $tabs = merge $tabs (dict (index $kv 0) (index $kv 1)) }}{{ end }}{{ end -}}
+{{- $ix := slice -}}
+{{- range site.Data.library.sections }}{{ $t := index $tabs .id }}{{ if $t }}{{ range .entries }}
+{{- $ix = $ix | append (dict "t" .term "s" .short "sp" (delimit (.sports | default slice) " ") "tab" $t "id" (partial "glossid.html" .term)) }}
+{{- end }}{{ end }}{{ end -}}
+<div class="win libfind" data-glossfind>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>glossary.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <label class="gallery__filter libfind__box"><span class="gallery__filter-label">find</span><input type="search" data-glossfind-q placeholder="term or definition" autocomplete="off" enterkeyhint="search"></label>
+  <ol class="libfind__rows" data-glossfind-rows hidden></ol>
+  <div class="win__status"><span data-glossfind-count>{{ len $ix }} terms</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <script type="application/json" data-glossfind-ix>{{ jsonify $ix | safeJS }}</script>
+</div>
+<script>
+(function () {
+  var f = document.querySelector('[data-glossfind]'); if (!f || f.__on) return; f.__on = true;
+  var ix = []; try { ix = JSON.parse(f.querySelector('[data-glossfind-ix]').textContent); } catch (e) {}
+  var all = ix.map(function (r) { return { term: r.t, short: r.s, sp: r.sp, tab: r.tab, id: r.id, t: r.t.toLowerCase(), hay: (r.t + ' ' + r.s + ' ' + r.sp + ' ' + r.tab).toLowerCase() }; });
+  var q = f.querySelector('[data-glossfind-q]'), list = f.querySelector('[data-glossfind-rows]'), count = f.querySelector('[data-glossfind-count]'), hint = count.textContent;
+  function run() {
+    var s = q.value.trim().toLowerCase(); list.innerHTML = '';
+    if (!s) { list.hidden = true; count.textContent = hint; return; }
+    var words = s.split(/\s+/);
+    var hits = all.filter(function (it) { return words.every(function (w) { return it.hay.indexOf(w) !== -1; }); });
+    // term hits first (exact, then starts with, then inside the name), then definition-only hits
+    var rank = function (it) { return it.t === s ? 0 : it.t.indexOf(s) === 0 ? 1 : it.t.indexOf(s) !== -1 ? 2 : 3; };
+    hits.sort(function (a, b) { return rank(a) - rank(b); });
+    hits.slice(0, 40).forEach(function (it) {
+      var li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button'; b.className = 'libfind__hit';
+      [['libfind__tab', it.tab], ['libfind__name', it.term], ['libfind__by', it.short], ['libfind__year', it.sp]].forEach(function (c) { var sp = document.createElement('span'); sp.className = c[0]; sp.textContent = c[1]; b.appendChild(sp); });
+      b.addEventListener('click', function () {
+        if (location.hash === '#' + it.id) window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = '#' + it.id;
+        setTimeout(function () { var el = document.getElementById(it.id); if (el) { el.classList.remove('is-found'); void el.offsetWidth; el.classList.add('is-found'); setTimeout(function () { el.classList.remove('is-found'); }, 2400); } }, 900);
+      });
+      li.appendChild(b); list.appendChild(li);
+    });
+    list.hidden = !hits.length;
+    count.textContent = hits.length ? hits.length + ' match' + (hits.length === 1 ? '' : 'es') + (hits.length > 40 ? ', first 40 shown' : '') : 'no match.';
+  }
+  q.addEventListener('input', run);
+  q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var b = list.querySelector('button'); if (b) { e.preventDefault(); b.click(); } } });
+})();
+</script>

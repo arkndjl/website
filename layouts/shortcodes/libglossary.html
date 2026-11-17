@@ -1,5 +1,5 @@
-{{- /* Library > Glossary/Methodology: one section of data/library.json (research/library.json via scripts/library_build.py).
-       {{< libglossary tab="FV" section="fv" >}}   entries of that section as term windows.
+{{- /* Process > Glossary/Methodology: one section of data/library.json (research/library.json via scripts/library_build.py).
+       {{< libglossary tab="FV" section="fv" >}}   entries of that section as term windows, each with a GFX card (gfx.js buildTerm; visual from data/glossary_gfx.json).
        {{< libglossary tab="FV scales" fv="true" >}} the FV conversion tables, one window per board. */ -}}
 {{- $sec := .Get "section" -}}
 <div class="desk libgrid{{ if eq (.Get "fv") "true" }} libgrid--one{{ end }}" data-tab="{{ .Get "tab" }}">
@@ -19,15 +19,22 @@
 {{- else }}
 {{- range site.Data.library.sections }}{{ if eq .id $sec }}
 {{- range .entries }}
-<div class="win libterm" id="g-{{ .term | urlize }}">
+<div class="win libterm" id="{{ partial "glossid.html" .term }}">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>{{ .term }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="libterm__body">
     <p class="libterm__short">{{ .short }}</p>
     {{- with .body }}<ul class="libterm__lines">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
   </div>
+  {{- $gid := partial "glossid.html" .term }}
+  {{- $card := merge (dict "t" .term "s" .short "sp" (.sports | default slice) "id" $gid) (index site.Data.glossary_gfx .term | default dict) }}
+  <p class="rq__bar libstudy__bar">
+    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="term" data-gfx-term="{{ jsonify $card }}" title="glossary card PNG, 16:9 for X">GFX card</button>
+    <a class="cfb__btn rq__link" href="#{{ $gid }}" title="link to this term">link</a>
+  </p>
   <div class="win__status"><span>{{ with .sports }}{{ delimit . " · " }}{{ end }}</span><span>{{ .where }}</span></div>
 </div>
 {{- end }}
 {{- end }}{{ end }}
 {{- end }}
 </div>
+{{- partial "js.html" "gfx" -}}

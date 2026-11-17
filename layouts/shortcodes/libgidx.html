@@ -1,0 +1,7 @@
+{{- /* Process page: #g-<term> -> its glossary tab, so a glossary link (and the GFX card's printed link) opens the
+       lazy tab the term lives in (gfx.js rqFromHash). tabs="fv=FV|value=player value|…" from scripts/library_build.py. */ -}}
+{{- $tabs := dict -}}
+{{- range split (.Get "tabs") "|" }}{{ $kv := split . "=" }}{{ if eq (len $kv) 2 }}{{ $tabs = merge $tabs (dict (index $kv 0) (index $kv 1)) }}{{ end }}{{ end -}}
+{{- $m := dict -}}
+{{- range site.Data.library.sections }}{{ $t := index $tabs .id }}{{ if $t }}{{ range .entries }}{{ $m = merge $m (dict (partial "glossid.html" .term) $t) }}{{ end }}{{ end }}{{ end -}}
+<script type="application/json" id="libgidx">{{ jsonify $m | safeJS }}</script>

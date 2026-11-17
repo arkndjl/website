@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-17T17:07:22.954Z",
+ "asof": "2026-11-17T17:43:35.551Z",
  "status": {
   "twitch": true,
   "youtube": true,
@@ -10,7 +10,7 @@
   "twitch": {
    "rate": 7.3,
    "prior": 7.4,
-   "tracked": 0.4,
+   "tracked": 0.5,
    "d30": {
     "goal": 281,
     "base": 274,
@@ -19,7 +19,7 @@
     "p0": 54,
     "p": 52,
     "f": 0,
-    "m": 0.012
+    "m": 0.015
    },
    "d90": {
     "goal": 295,
@@ -27,9 +27,9 @@
     "set": 1794899610245,
     "due": 1802675610245,
     "p0": 52,
-    "p": 51,
+    "p": 50,
     "f": 0,
-    "m": 0.004
+    "m": 0.005
    },
    "next": {
     "goal": 300,
@@ -47,7 +47,7 @@
   "youtube": {
    "rate": 1.1,
    "prior": 1.1,
-   "tracked": 0.4,
+   "tracked": 0.5,
    "d30": {
     "goal": 43,
     "base": 42,
@@ -56,7 +56,7 @@
     "p0": 55,
     "p": 54,
     "f": 0,
-    "m": 0.012
+    "m": 0.015
    },
    "d90": {
     "goal": 44,
@@ -66,7 +66,7 @@
     "p0": 62,
     "p": 61,
     "f": 0,
-    "m": 0.004
+    "m": 0.005
    },
    "next": {
     "goal": 50,
@@ -77,14 +77,14 @@
     "set": 1794899610245,
     "eta0": "2027-08-21",
     "f": 0.68,
-    "m": 0.68
+    "m": 0.681
    },
    "opened": "2023-11-10"
   },
   "tiktok": {
    "rate": 3.7,
    "prior": 2.7,
-   "tracked": 0.4,
+   "tracked": 0.5,
    "d30": {
     "goal": 102,
     "base": 100,
@@ -93,7 +93,7 @@
     "p0": 64,
     "p": 92,
     "f": 0.5,
-    "m": 0.012
+    "m": 0.015
    },
    "d90": {
     "goal": 107,
@@ -103,11 +103,11 @@
     "p0": 54,
     "p": 79,
     "f": 0.143,
-    "m": 0.004
+    "m": 0.005
    },
    "next": {
     "goal": 150,
-    "eta": "2028-01-27",
+    "eta": "2028-01-28",
     "p90": 0,
     "from": 100,
     "base": 100,
@@ -121,7 +121,7 @@
   "x": {
    "rate": 1.4,
    "prior": 1.4,
-   "tracked": 0.4,
+   "tracked": 0.5,
    "d30": {
     "goal": 39,
     "base": 38,
@@ -130,7 +130,7 @@
     "p0": 61,
     "p": 61,
     "f": 0,
-    "m": 0.012
+    "m": 0.015
    },
    "d90": {
     "goal": 41,
@@ -138,9 +138,9 @@
     "set": 1794899610245,
     "due": 1802675610245,
     "p0": 56,
-    "p": 56,
+    "p": 55,
     "f": 0,
-    "m": 0.004
+    "m": 0.005
    },
    "next": {
     "goal": 50,
@@ -378,6 +378,15 @@
    "x": 38,
    "ttv": 86,
    "tth": 2036
+  },
+  {
+   "t": 1794937317804,
+   "twitch": 274,
+   "youtube": 42,
+   "tiktok": 101,
+   "x": 38,
+   "ttv": 86,
+   "tth": 2038
   }
  ],
  "yt": {
@@ -667,28 +676,28 @@
    {
     "k": "Twitch pace",
     "v": null,
-    "d": "at 14 days tracked (0.4)",
+    "d": "at 14 days tracked (0.5)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (0.4)",
+    "d": "at 14 days tracked (0.5)",
     "n": null,
     "wait": true
    },
    {
     "k": "TikTok pace",
     "v": null,
-    "d": "at 14 days tracked (0.4)",
+    "d": "at 14 days tracked (0.5)",
     "n": null,
     "wait": true
    },
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (0.4)",
+    "d": "at 14 days tracked (0.5)",
     "n": null,
     "wait": true
    },
@@ -709,7 +718,7 @@
    {
     "k": "TikTok follows / 1k views",
     "v": null,
-    "d": "at 7 days tracked (0.4)",
+    "d": "at 7 days tracked (0.5)",
     "n": null,
     "wait": true
    },
@@ -1273,7 +1282,7 @@
    "lpH": null,
    "opH": 0,
    "hLive": 0,
-   "hOff": 9.6,
+   "hOff": 11.2,
    "live": null,
    "grid": [
     [
@@ -1505,13 +1514,13 @@
   },
   "tt": {
    "videos": 86,
-   "hearts": 2036,
+   "hearts": 2038,
    "hpv": 23.7,
    "newVideos": 0,
-   "newHearts": 4,
+   "newHearts": 6,
    "fpv": 1.17,
    "n": 10,
-   "views": 4522,
+   "views": 4534,
    "median": 1009,
    "vpd": null,
    "hearts_t": [
@@ -1530,6 +1539,10 @@
     [
      1794931735284,
      2036
+    ],
+    [
+     1794937317804,
+     2038
     ]
    ],
    "grid": [
@@ -1733,7 +1746,7 @@
      "d": "Tue",
      "n": 3,
      "med": 1009,
-     "x": 729
+     "x": 731
     },
     {
      "d": "Wed",
@@ -1774,7 +1787,7 @@
      "desc": "laursen 111 best in the world all headshots usp-s pistol | #laursen_111 on #Twitch",
      "pub": 1791335213000,
      "photo": false,
-     "views": 1012,
+     "views": 1013,
      "r5": null
     },
     {
@@ -1782,64 +1795,64 @@
      "desc": "all my kills from our first esea league game of the season #laursen #fyp #cs2 #wow",
      "pub": 1791341584000,
      "photo": false,
-     "views": 380,
-     "r5": 800
+     "views": 382,
+     "r5": 801
     },
     {
      "id": "7708839920646868237",
      "desc": "classiest 1v3 4k anubis on game point ever ? #fyp #cs2 #csgo #counterstrike #faceit ",
      "pub": 1794854160000,
      "photo": false,
-     "views": 237,
-     "r5": 660
+     "views": 239,
+     "r5": 661
     },
     {
      "id": "7708840753362996493",
      "desc": "\"slap it on camera please\" #fyp",
      "pub": 1794854354000,
      "photo": false,
-     "views": 804,
-     "r5": 688
+     "views": 805,
+     "r5": 690
     },
     {
      "id": "7708841279043407118",
      "desc": "give me that shit boy !!! #fyp #cs2 #csgo #counterstrike #gamertok",
      "pub": 1794854476000,
      "photo": false,
-     "views": 293,
-     "r5": 545
+     "views": 294,
+     "r5": 547
     },
     {
      "id": "7708842078356229389",
      "desc": "LAURGOD 4K IN ESEA PLAYOFFS THROWBACK #fyp #cs2 #csgo #viral #gamertok",
      "pub": 1794854662000,
      "photo": false,
-     "views": 33,
-     "r5": 349
+     "views": 34,
+     "r5": 351
     },
     {
      "id": "7708842952415563021",
      "desc": "LAURGOD PLAYOFF 4K #FYP #CS2 #csgo #counterstrike #gamertok ",
      "pub": 1794854866000,
      "photo": false,
-     "views": 251,
-     "r5": 324
+     "views": 252,
+     "r5": 325
     },
     {
      "id": "7708843806589750542",
      "desc": "CS2 PLAYER PLAYS VAL NONCHALANT AURAFARMER ACE #fyp #valorant #valtok #gamertok #eboy",
      "pub": 1794855065000,
      "photo": false,
-     "views": 434,
-     "r5": 363
+     "views": 436,
+     "r5": 364
     },
     {
      "id": "7708847220732349709",
      "desc": "prerendered backgrounds and low poly gfx were peak... #fyp #zelda #oot #retro #nintendo64",
      "pub": 1794855860000,
      "photo": true,
-     "views": 69,
-     "r5": 216
+     "views": 70,
+     "r5": 217
     }
    ]
   },
@@ -1853,9 +1866,9 @@
    },
    "tt": {
     "n": 10,
-    "sum": 4522,
-    "avg": 452,
-    "med": 336.5
+    "sum": 4534,
+    "avg": 453,
+    "med": 338
    }
   },
   "roll_t": [
@@ -1893,6 +1906,16 @@
     1794935242954,
     10095,
     4522
+   ],
+   [
+    1794937317804,
+    10095,
+    4524
+   ],
+   [
+    1794937415551,
+    10095,
+    4534
    ]
   ]
  }

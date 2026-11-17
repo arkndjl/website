@@ -20,13 +20,20 @@
 - A spelling the rules miss (Neo / Neoklis Avdalas, a source's typo) goes in `data/name_aliases.json` "players"; a
   common nickname goes in its "nicknames". Matches still check team and position, so same-name players stay apart.
 
-## ARKBOARD Reference (was "Library")
+## ARKBOARD Process (was "Reference", before that "Library")
 
-- The ARKBOARD section with Research, Glossary/Methodology and Data Sources tabs is **Reference**: page
-  `content/arkboard-reference.md`, URL `/arkboard/reference/`, short link `arkndjl.net/reference`, menu identifier
-  `arkboard-reference`. Never call it "Library" (that is ARKLIBRARY) or "Lab". `/library`, `/lab`, `/arkboard/library/`
-  and `/arkboard/lab/` redirect to it in `static/_redirects`. The page is written by `scripts/library_build.py`
-  (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it rather than hand-editing.
+- The ARKBOARD section with Research, Glossary/Methodology and Data Sources tabs is **Process** (Noah, Nov 17 2026): page
+  `content/arkboard-process.md`, URL `/arkboard/process/`, short link `arkndjl.net/process`, menu identifier
+  `arkboard-process`. Never call it "Library" (that is ARKLIBRARY), "Lab", "Reference" or "ARKPROCESS". `/reference`, `/library`,
+  `/lab`, `/arkboard/reference/`, `/arkboard/library/` and `/arkboard/lab/` redirect to it in `static/_redirects`. The page is
+  written by `scripts/library_build.py` (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it
+  rather than hand-editing.
+- Glossary GFX cards: every term window has a GFX card button (`assets/js/gfx.js` buildTerm, link `arkndjl.net/process#g-<term>`).
+  `data/glossary_gfx.json` is written by `scripts/glossary_gfx.py` (rerun after a season file or refit): compact cards from
+  `research/glossary_gfx_base.json` (16:9, formula + one picture) and explainer cards (3:4: stands for, what, use, formula,
+  held-out test vs similar metrics, distribution/calibration, top 10 from the site's data) from its EXPLAIN builders. Keys =
+  the term exactly as in `data/library.json`; a term with no entry gets the plain card. Test numbers come from backtest files
+  only, reported as they are even when ours does not win.
 - Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
   source adds the source there (name, link, what the site takes from it).
 
@@ -37,8 +44,8 @@
   let the page speak for itself. When unsure, cut.
 - A note on how a table is built goes in the `about` of `wintable-close.html`, which is only the status bar's hover
   title, never a visible paragraph. Column meanings go in `<th title>` tooltips.
-- Method prose lives only in Reference (Glossary/Methodology). Model and backtest tabs on sport pages show tables,
-  formulas and numbers, no explanatory paragraphs or "how it works" windows (Noah, Nov 2). Kept: Reference text,
+- Method prose lives only in Process (Glossary/Methodology). Model and backtest tabs on sport pages show tables,
+  formulas and numbers, no explanatory paragraphs or "how it works" windows (Noah, Nov 2). Kept: Process text,
   article bodies, source attributions in status bars, résumé content on about/contact.
 
 ## ARKBOARD tabs
