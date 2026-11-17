@@ -1,0 +1,5 @@
+{{- /* pixel progress bar: dict "f" fill 0..1, "m" pace marker 0..1 (or -1 for none), "t" title */ -}}
+{{- $f := math.Min (math.Max (float .f) 0.0) 1.0 }}{{ $m := float (.m | default -1) }}{{ $n := 20 }}
+{{- $fc := int (math.Floor (mul $f $n)) }}{{ $mc := cond (ge $m 0.0) (int (math.Min (math.Floor (mul $m $n)) (sub $n 1))) -1 -}}
+<span class="lzbar{{ if and (ge $mc 0) (lt $fc $mc) }} is-behind{{ end }}" role="img" aria-label="{{ .t }}" title="{{ .t }}">{{ range $i := seq 0 (sub $n 1) }}<i class="{{ if lt $i $fc }}is-on{{ end }}{{ if eq $i $mc }} is-pace{{ end }}"></i>{{ end }}</span>
+{{- /**/ -}}

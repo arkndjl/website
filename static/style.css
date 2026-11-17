@@ -4747,3 +4747,29 @@ code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
 .lzs__goals li::before { content: none !important; }
 .lzs__goals li { display: flex; gap: 6px; align-items: baseline; }
 .lzs__goals .esea__k { min-width: 6ch; }
+/* LAURSEN_111 social tab */
+.lzp .lzf__chart .is-short, .lzp__key.is-short { fill: var(--accent); background: var(--accent); }
+.lzp .lzf__chart .is-long, .lzp__key.is-long { fill: #c8a2ff; background: #c8a2ff; }
+.lzp__key { display: inline-block; width: 8px; height: 8px; vertical-align: middle; margin: 0 2px 0 6px; }
+.lzf__body > .lzp__hmw, .lzf__body > .lzp__ups, .lzf__body > .wintable__scroll:has(.lzp__ideas) { grid-column: 1 / -1; }
+.lzp__hmw { background: var(--win-well); padding: 6px 8px; }
+.lzp__hmh { margin: 0 0 4px; }
+.lzp__hm { display: grid; grid-template-columns: 4ch repeat(6, minmax(0, 1fr)); gap: 2px; font-size: .75em; }
+.lzp__hx { text-align: center; color: var(--accent); } .lzp__hy { color: var(--accent); }
+.lzp__c { position: relative; min-height: 18px; display: flex; align-items: center; justify-content: center; color: var(--foreground); background: color-mix(in srgb, #c8a2ff calc(var(--a) * 100%), var(--win-dark)); }
+.lzp__c.is-tw { background: color-mix(in srgb, var(--accent) calc(var(--a) * 100%), var(--win-dark)); }
+.lzp__c.is-0 { background: var(--win-dark); opacity: .5; }
+.lzp__t { max-width: 34ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lzp__tag { display: inline-block; padding: 0 3px; color: var(--win-dark); } .lzp__tag.is-short { background: var(--accent); } .lzp__tag.is-long { background: #c8a2ff; }
+.lzp__ideas td:first-child { white-space: nowrap; }
+@media (max-width: 640px) { .lzp__t { max-width: 18ch; } }
+.lzbar { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 1px; width: 100%; height: 8px; }
+.lzbar i { background: var(--win-dark); } .lzbar i.is-on { background: var(--accent); }
+.lzbar.is-behind i.is-on { background: #c8a2ff; }
+.lzbar i.is-pace { box-shadow: inset 0 0 0 1px #ffffff; }
+.lzs__goals li.lzs__bar { display: block; margin: 0 0 3px; }
+.lzf__body > .lzs__log { grid-column: 1 / -1; }
+.lzp__t { text-align: left; }
+.lzf__body > .lzs__gfx { grid-column: 1 / -1; padding: 0; }
+.lzf__body > .lzp__gbox { grid-column: 1 / -1; }
+.lzp__gbox .esea__gfxbar { padding: 0 0 6px; margin: 0; }
