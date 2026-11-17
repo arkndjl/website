@@ -41,6 +41,10 @@ jobs:
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_DEMO_PROBE: ${{ inputs.probe && '1' || '' }}
+      # LAURSEN_111 follower counts (Twitch, YouTube, TikTok) over time: data/laursen_socials.json
+      - name: Socials
+        continue-on-error: true
+        run: node scripts/laursen_socials.mjs
       - name: 1NT live
         continue-on-error: true
         env:
@@ -66,4 +70,4 @@ jobs:
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update 1NT's ESEA season ($(date -u +%Y-%m-%dT%H:%MZ))" \
-            -- data/esea.json data/esea_lab.json data/esea_rwa.json data/esea_league_log.json scripts/data/esea_league_log.jsonl static/img/1nt/opp
+            -- data/esea.json data/laursen_socials.json data/esea_lab.json data/esea_rwa.json data/esea_league_log.json scripts/data/esea_league_log.jsonl static/img/1nt/opp
