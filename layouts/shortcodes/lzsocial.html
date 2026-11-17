@@ -1,0 +1,33 @@
+{{- /* followers.exe: LAURSEN_111's Twitch / YouTube / TikTok / X followers over time (data/laursen_socials.json,
+       scripts/laursen_socials.mjs in esea.yml). {{< lzsocial class="desk__wide" >}} */ -}}
+{{- $s := site.Data.laursen_socials -}}
+{{- $syncd := "" }}{{ with $s }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
+<div class="win lzf lzsoc{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-twitch"/></svg>followers.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- with $s.series }}{{ $tr := . }}
+  <div class="lzf__body">
+    <div class="lzf__trend lzs__trend">
+    {{- range $sp := slice (slice "twitch" "Twitch" "icon-twitch") (slice "youtube" "YouTube" "icon-youtube") (slice "tiktok" "TikTok" "icon-tiktok") (slice "x" "X" "icon-twitter") }}{{ $k := index $sp 0 }}
+    {{- $pts := slice }}{{ range $tr }}{{ with index . $k }}{{ $pts = $pts | append (float .) }}{{ end }}{{ end }}
+    {{- with $pts }}{{ $n := len . }}{{ $lo := index . 0 }}{{ $hi := index . 0 }}{{ range . }}{{ if lt . $lo }}{{ $lo = . }}{{ end }}{{ if gt . $hi }}{{ $hi = . }}{{ end }}{{ end }}
+      {{- $cur := index . (sub $n 1) }}{{ $dl := sub $cur (index . 0) }}
+      <div class="lzf__tr">
+        <p class="lzf__trh"><svg class="win__icon" aria-hidden="true"><use href="#{{ index $sp 2 }}"/></svg><span class="esea__k">{{ index $sp 1 }}</span> <b>{{ lang.FormatNumber 0 $cur }}</b>{{ if gt $n 1 }} <span class="{{ if ge $dl 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $dl 0.0 }}+{{ end }}{{ lang.FormatNumber 0 $dl }}</span>{{ end }}</p>
+        {{- if gt $n 1 }}{{ $span := math.Max (sub $hi $lo) 1.0 }}{{ $W := 200 }}{{ $H := 40.0 }}{{ $sw := div (float $W) (sub $n 1) }}
+        <svg class="lzf__trc" viewBox="0 0 {{ $W }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="{{ index $sp 1 }} followers over time">
+          {{- range $i, $v := . }}{{ if lt $i (sub $n 1) }}{{ $y := sub (sub $H 2) (mul (div (sub $v $lo) $span) (sub $H 4)) }}<rect x="{{ mul $i $sw }}" y="{{ $y }}" width="{{ $sw }}" height="2" class="lzf__trl"/>{{ $nx := index $pts (add $i 1) }}{{ $y2 := sub (sub $H 2) (mul (div (sub $nx $lo) $span) (sub $H 4)) }}<rect x="{{ sub (mul (add $i 1) $sw) 1 }}" y="{{ math.Min $y $y2 }}" width="2" height="{{ add (math.Abs (sub $y2 $y)) 2 }}" class="lzf__trl"/>{{ end }}{{ end }}
+        </svg>
+        <p class="esea-fc__axis lzf__axis"><span>{{ (time.In "America/New_York" (time (int (div (index $tr 0).t 1000)))).Format "Jan 2" }}</span><span>today</span></p>
+        {{- end }}
+      </div>
+    {{- end }}{{ end }}
+    </div>
+  </div>
+  {{- else }}
+  <p class="esea__empty-line">no follower counts yet.</p>
+  {{- end }}
+  <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>

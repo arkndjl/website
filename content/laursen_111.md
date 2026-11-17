@@ -9,6 +9,7 @@ draft = false
 {{< wintabs tabs="stream,clips,achievements,stats" label="LAURSEN_111 section" >}}
 {{< desk tab="stream" >}}
 {{< lzstream channel="laursen_111" class="desk__wide" >}}
+{{< lzsocial class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="clips" >}}
 {{< vods title="uploads.exe" class="desk__wide" >}}
