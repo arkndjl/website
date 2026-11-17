@@ -1,0 +1,143 @@
+{{- /* laursen111.log: LAURSEN_111's journal as a retro chat room (DS PictoChat ruled pane, MSN "says:" lines,
+       TeamSpeak channel tree). Entries live in data/laurlog.json {n, at (ISO, ET offset), cat, text}; a new entry is a
+       one-line add. Channels filter by cat. JS replays the newest entries with a typing line + pop-in when the window
+       first shows; without JS (or with reduced motion) every entry is simply there. {{< lzlog class="desk__wide" >}} */ -}}
+{{- $L := site.Data.laurlog -}}
+{{- $u := $L.user | default "laursen_111" -}}
+{{- $es := sort ($L.entries | default slice) "n" -}}
+{{- $cats := slice }}{{ range $es }}{{ if not (in $cats .cat) }}{{ $cats = $cats | append .cat }}{{ end }}{{ end -}}
+<style>
+.lzl{--lzl-line:rgba(127,255,212,.10);--lzl-ink:#eef7f5;--lzl-tab:var(--lz-lilac,#c8c7ff)}
+.lzl__body{display:grid;grid-template-columns:168px minmax(0,1fr);gap:0;background:var(--win-well);border:2px solid;border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark)}
+.lzl__tree{margin:0;padding:8px 0;list-style:none;background:#0c1011;border-right:2px solid var(--win-dark);box-shadow:inset -2px 0 0 #1d2629;font-size:.9em}
+.lzl__tree li::before{content:none!important}
+.lzl__tree li{margin:0;padding:0}
+.lzl__tree .lzl__srv{display:flex;align-items:center;gap:6px;padding:2px 10px 6px;color:var(--n1-grey);letter-spacing:.06em}
+.lzl__srv i,.lzl__ch i,.lzl__usr i{display:inline-block;flex:none;width:8px;height:8px}
+.lzl__srv i{background:var(--n1-grey);box-shadow:2px 2px 0 #000}
+.lzl__ch{display:flex;align-items:center;gap:6px;width:100%;margin:0;padding:3px 10px 3px 18px;border:0;background:none;color:var(--n1-grey);font:inherit;text-align:left;cursor:pointer}
+.lzl__ch i{background:none;box-shadow:inset 0 0 0 2px currentColor}
+.lzl__ch span{margin-left:auto;color:#5d6d6f}
+.lzl__ch:hover,.lzl__ch:focus-visible{color:#fff;outline:0;background:#151d1f}
+.lzl__ch[aria-pressed="true"]{color:#080b0c;background:var(--n1-lilac)}
+.lzl__ch[aria-pressed="true"] span{color:#080b0c}
+.lzl__ch[aria-pressed="true"] i{background:#080b0c;box-shadow:none}
+.lzl__tree .lzl__usr{display:flex;align-items:center;gap:6px;padding:6px 10px 2px 30px;color:#fff}
+.lzl__usr i{background:#4cff7a;box-shadow:0 0 0 1px #000;animation:lzlpulse 2s steps(2) infinite}
+@keyframes lzlpulse{50%{background:#1f8f3c}}
+.lzl__main{display:flex;flex-direction:column;min-width:0}
+.lzl__pane{position:relative;height:440px;overflow-y:auto;padding:10px 12px 14px;background:#0a0d0e repeating-linear-gradient(180deg,transparent 0 23px,var(--lzl-line) 23px 24px);scrollbar-color:var(--n1-lilac) #0a0d0e}
+.lzl__day{display:flex;align-items:center;gap:8px;margin:6px 0 10px;color:var(--n1-grey);font-size:.8em;letter-spacing:.12em;text-transform:uppercase}
+.lzl__day::before,.lzl__day::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--n1-line) 0 4px,transparent 4px 8px)}
+.lzl__m{position:relative;max-width:640px;margin:0 0 14px;padding-top:18px;transform-origin:0 100%}
+.lzl__tab{position:absolute;left:0;top:0;display:inline-flex;gap:8px;align-items:baseline;padding:1px 8px 2px;background:var(--lzl-tab);color:#080b0c;font-size:.85em;letter-spacing:.04em;box-shadow:2px 0 0 #000}
+.lzl__tab b{font-weight:normal}
+.lzl__tab time{opacity:.75}
+.lzl__box{padding:8px 12px 9px;background:#121819;color:var(--lzl-ink);box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark),4px 4px 0 #000;line-height:24px}
+.lzl__meta{display:flex;gap:6px;justify-content:flex-end;margin:4px 0 0;font-size:.75em;letter-spacing:.1em;color:#5d6d6f}
+.lzl__meta span{padding:0 5px;box-shadow:inset 0 0 0 1px currentColor}
+.lzl__meta .lzl__cat{color:var(--n1-lilac)}
+.lzl__typing{display:none;align-items:center;gap:8px;margin:0 0 6px;color:var(--n1-grey);font-size:.85em}
+.lzl__typing.is-on{display:flex}
+.lzl__typing i{display:inline-block;width:5px;height:5px;background:var(--n1-lilac);animation:lzldot .9s steps(1) infinite}
+.lzl__typing i:nth-child(2){animation-delay:.3s}.lzl__typing i:nth-child(3){animation-delay:.6s}
+@keyframes lzldot{0%{opacity:1}33%{opacity:.2}}
+.lzl__in{display:flex;gap:6px;padding:6px;background:#0c1011;border-top:2px solid var(--win-dark)}
+.lzl__field{flex:1;min-width:0;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#050707;color:var(--n1-grey);box-shadow:inset 2px 2px 0 var(--win-dark),inset -2px -2px 0 var(--win-light);white-space:nowrap;overflow:hidden}
+.lzl__field b{font-weight:normal;color:var(--n1-lilac)}
+.lzl__caret{display:inline-block;width:8px;height:1.1em;background:var(--n1-lilac);animation:lzlblink 1s steps(2) infinite}
+@keyframes lzlblink{50%{opacity:0}}
+.lzl__send{padding:4px 14px;background:#1d2629;color:var(--n1-grey);letter-spacing:.1em;box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark)}
+.lzl.is-anim .lzl__m.is-wait{display:none}
+.lzl__m.is-pop{animation:lzlpop .32s steps(4) both}
+@keyframes lzlpop{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+.lzl__m.is-pop .lzl__box{animation:lzlflash .5s steps(2) 1}
+@keyframes lzlflash{0%{box-shadow:inset 2px 2px 0 var(--n1-lilac),inset -2px -2px 0 var(--n1-lilac),4px 4px 0 #000}}
+.lzl__pane[data-cat] .lzl__m:not(.is-cat){display:none}
+.lzl__pane[data-cat] .lzl__day{display:none}
+@media (prefers-reduced-motion:reduce){.lzl__m.is-pop,.lzl__m.is-pop .lzl__box,.lzl__usr i,.lzl__caret,.lzl__typing i{animation:none}}
+@media (max-width:684px){
+ .lzl__body{grid-template-columns:1fr}
+ .lzl__tree{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border-right:0;border-bottom:2px solid var(--win-dark);box-shadow:none}
+ .lzl__srv,.lzl__usr{display:none}
+ .lzl__tree li{flex:1 1 auto}
+ .lzl__ch{justify-content:center;padding:4px 8px;box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark)}
+ .lzl__ch span{margin-left:6px}
+ .lzl__pane{height:62vh;padding:8px 8px 12px}
+ .lzl__box{line-height:22px}
+}
+</style>
+<div class="win lzl{{ with .Get "class" }} {{ . }}{{ end }}" data-lzl>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-note"/></svg>laursen111.log<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="lzl__body">
+    <ul class="lzl__tree" aria-label="channels">
+      <li class="lzl__srv"><i aria-hidden="true"></i>111LOG</li>
+      <li><button type="button" class="lzl__ch" data-lzl-ch="" aria-pressed="true"><i aria-hidden="true"></i>#all<span>{{ len $es }}</span></button></li>
+      {{- range $cats }}{{ $c := . }}
+      <li><button type="button" class="lzl__ch" data-lzl-ch="{{ $c }}" aria-pressed="false"><i aria-hidden="true"></i>#{{ $c }}<span>{{ len (where $es "cat" $c) }}</span></button></li>
+      {{- end }}
+      <li class="lzl__usr"><i aria-hidden="true"></i>{{ $u }}</li>
+    </ul>
+    <div class="lzl__main">
+      <div class="lzl__pane" data-lzl-pane role="log" aria-label="{{ $u }} log">
+        {{- $day := "" }}
+        {{- range $es }}{{ $t := time.In "America/New_York" (time .at) }}{{ $d := $t.Format "Mon Jan 2 2006" }}
+        {{- if ne $d $day }}{{ $day = $d }}<div class="lzl__day">{{ $d }}</div>{{ end }}
+        <div class="lzl__m" data-lzl-cat="{{ .cat }}" id="laurlog-{{ .n }}">
+          <span class="lzl__tab"><b>{{ $u }} says:</b><time datetime="{{ .at }}">{{ $t.Format "15:04" }}</time></span>
+          <div class="lzl__box">
+            {{ .text }}
+            <div class="lzl__meta"><span class="lzl__cat">{{ .cat }}</span><span>#{{ .n }}</span></div>
+          </div>
+        </div>
+        {{- end }}
+        <div class="lzl__typing" data-lzl-typing aria-hidden="true"><i></i><i></i><i></i>{{ $u }} is typing</div>
+      </div>
+      <div class="lzl__in" aria-hidden="true"><span class="lzl__field"><b>{{ $u }}:</b>111: :<span class="lzl__caret"></span></span><span class="lzl__send">SEND</span></div>
+    </div>
+  </div>
+  {{- $last := "" }}{{ with last 1 $es }}{{ range . }}{{ $last = (time.In "America/New_York" (time .at)).Format "Jan 2 2006 15:04 ET" }}{{ end }}{{ end }}
+  <div class="win__status"><span>{{ len $es }} {{ cond (eq (len $es) 1) "entry" "entries" }}</span>{{ with $last }}<span>last {{ . }}</span>{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('[data-lzl]').forEach(function (w) {
+    if (w.__lzl) return; w.__lzl = 1;
+    var pane = w.querySelector('[data-lzl-pane]'), typing = w.querySelector('[data-lzl-typing]');
+    var ms = [].slice.call(w.querySelectorAll('.lzl__m'));
+    var bottom = function () { pane.scrollTop = pane.scrollHeight; };
+    w.querySelectorAll('[data-lzl-ch]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var c = b.getAttribute('data-lzl-ch');
+        w.querySelectorAll('[data-lzl-ch]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        if (c) pane.setAttribute('data-cat', c); else pane.removeAttribute('data-cat');
+        ms.forEach(function (m) { m.classList.toggle('is-cat', m.getAttribute('data-lzl-cat') === c); });
+        bottom();
+      });
+    });
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still || !('IntersectionObserver' in window) || !ms.length) { bottom(); return; }
+    var replay = ms.slice(-6);   // the newest few type in; older ones are already on screen
+    w.classList.add('is-anim'); replay.forEach(function (m) { m.classList.add('is-wait'); }); bottom();
+    var io = new IntersectionObserver(function (es) {
+      if (!es.some(function (e) { return e.isIntersecting; })) return;
+      io.disconnect();
+      var i = 0;
+      (function next() {
+        if (i >= replay.length) { typing.classList.remove('is-on'); w.classList.remove('is-anim'); return; }
+        var m = replay[i++];
+        typing.classList.add('is-on'); pane.appendChild(typing); bottom();
+        setTimeout(function () {
+          typing.classList.remove('is-on');
+          m.classList.remove('is-wait'); m.classList.add('is-pop'); bottom();
+          setTimeout(next, 260);
+        }, Math.min(1400, 500 + m.textContent.length * 6));
+      })();
+    }, { threshold: .25 });
+    io.observe(pane);
+  });
+})();
+</script>
