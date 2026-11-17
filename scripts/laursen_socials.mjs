@@ -23,6 +23,36 @@ const now = Date.now(), cur = { t: now, twitch: twitch ?? last.twitch ?? null, y
 const moved = ['twitch', 'youtube', 'tiktok', 'x'].some(k => cur[k] !== (last[k] ?? null)), stale = !last.t || now - last.t > 864e5;
 const status = { twitch: twitch != null, youtube: youtube != null, tiktok: tiktok != null, x: x != null };
 console.log('socials:', JSON.stringify({ twitch, youtube, tiktok, x }));
-if (!moved && !stale && JSON.stringify(prev.status) === JSON.stringify(status)) process.exit(0);
+if (!moved && !stale && prev.goals && JSON.stringify(prev.status) === JSON.stringify(status)) process.exit(0);
 const series = moved || stale ? [...prev.series, cur].slice(-3000) : prev.series;
-fs.writeFileSync(OUT, JSON.stringify({ asof: new Date(now).toISOString(), status, series }, null, 1) + '\n');
+
+// ---- goals: projected net follower gain per network ------------------------------------------------
+// Daily rate lambda ~ Gamma(a, b). Prior: his lifetime pace (count / days since the account opened), worth 30 days
+// of tracking (b = 30, a = 30 x pace). Each tracked day updates it: a += net gain since the first reading,
+// b += days tracked, so his own trend takes over within a few weeks. Gain over t days is then negative binomial
+// (r = a, p = b / (b + t)). Goals: the 30- and 90-day median count (at least +1), with the chance
+// of reaching it; next milestone: median date and the chance within 90 days.
+const OPENED = { twitch: '2023-10-31', youtube: '2023-11-10', tiktok: '2023-11-11', x: '2024-08-11' };   // decapi /twitch/creation, YouTube about, TikTok createTime, fxtwitter joined
+const PRIOR_DAYS = 30, MILESTONES = [25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 2500, 5000, 10000, 25000, 50000, 100000];
+function lgamma(z) { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  let x = z, y = z, t = x + 5.5; t -= (x + 0.5) * Math.log(t); let ser = 1.000000000190015; for (const q of c) ser += q / ++y; return -t + Math.log(2.5066282746310005 * ser / x); }
+// P(gain >= need) under NB(r, p): 1 - sum_{k<need} pmf(k)
+function pAtLeast(need, r, p) { if (need <= 0) return 1; let cdf = 0; for (let k = 0; k < need; k++) cdf += Math.exp(lgamma(k + r) - lgamma(k + 1) - lgamma(r) + r * Math.log(p) + k * Math.log(1 - p)); return Math.max(0, Math.min(1, 1 - cdf)); }
+function medianGain(r, p) { let k = 0; while (pAtLeast(k + 1, r, p) >= 0.5 && k < 1e6) k++; return k; }
+const goals = {};
+for (const k of Object.keys(OPENED)) {
+  const pts = series.filter(x => x[k] != null); if (!pts.length) continue;
+  const first = pts[0], lastP = pts[pts.length - 1], c = lastP[k];
+  const life = Math.max(1, (pts[0].t - Date.parse(OPENED[k])) / 864e5), pace = first[k] / life;
+  const days = (lastP.t - first.t) / 864e5, gain = Math.max(0, lastP[k] - first[k]);
+  const a = Math.max(0.5, PRIOR_DAYS * pace) + gain, b = PRIOR_DAYS + days, rate = a / b;
+  const g = {};
+  for (const T of [30, 90]) { const p = b / (b + T), med = c + medianGain(a, p), goal = Math.max(med, c + 1);
+    g[`d${T}`] = { goal, p: Math.round(pAtLeast(goal - c, a, p) * 100), median: med }; }
+  const next = MILESTONES.find(m => m > c);
+  if (next) { const need = next - c; let lo = 1, hi = 36500; while (lo < hi) { const mid = (lo + hi) >> 1; if (pAtLeast(need, a, b / (b + mid)) >= 0.5) hi = mid; else lo = mid + 1; }
+    g.next = { goal: next, eta: lo >= 36500 ? null : new Date(lastP.t + lo * 864e5).toISOString().slice(0, 10), p90: Math.round(pAtLeast(need, a, b / (b + 90)) * 100) }; }
+  goals[k] = { rate: Math.round(rate * 30 * 10) / 10, prior: Math.round(pace * 30 * 10) / 10, tracked: Math.round(days * 10) / 10, ...g };
+}
+console.log('goals:', JSON.stringify(goals));
+fs.writeFileSync(OUT, JSON.stringify({ asof: new Date(now).toISOString(), status, goals, series }, null, 1) + '\n');
