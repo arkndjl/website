@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-16T23:00Z",
+ "asof": "2026-11-17T00:23Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 886,
+   "players": 887,
    "rows": 5286
   },
   "cfb": {
@@ -91,11 +91,11 @@
      "rows": 506
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 3,
+     "flags": 2,
      "rows": 471
     },
     "static/data/pctl-nba.json": {
-     "flags": 3,
+     "flags": 2,
      "rows": 471
     },
     "static/data/xaav-nba.json": {
@@ -249,24 +249,6 @@
      "site": "OKC"
     },
     {
-     "d": "2026-10-17",
-     "field": "tm",
-     "file": "static/data/nba-xpm/2027.json",
-     "flag": "released",
-     "head": "Let go by LAC",
-     "kind": null,
-     "move": {
-      "d": "2026-09-27",
-      "head": "Signs with Clippers",
-      "kind": "sign"
-     },
-     "pid": "5652",
-     "player": "Blake Wesley",
-     "pos": "SG",
-     "rotowire": "FA",
-     "site": "LAC"
-    },
-    {
      "d": "2026-11-08",
      "field": "tm",
      "file": "static/data/pctl-nba.json",
@@ -301,46 +283,28 @@
      "pos": "F",
      "rotowire": "FA",
      "site": "MIL"
-    },
-    {
-     "d": "2026-10-17",
-     "field": "tm",
-     "file": "static/data/pctl-nba.json",
-     "flag": "released",
-     "head": "Let go by LAC",
-     "kind": null,
-     "move": {
-      "d": "2026-09-27",
-      "head": "Signs with Clippers",
-      "kind": "sign"
-     },
-     "pid": "5652",
-     "player": "Blake Wesley",
-     "pos": "G",
-     "rotowire": "FA",
-     "site": "LAC"
     }
    ],
    "joined": 0,
-   "players": 599,
+   "players": 600,
    "rows": 2044
   },
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 9,
+     "flags": 11,
      "rows": 2152
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 16,
+     "flags": 19,
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 73,
+     "flags": 75,
      "rows": 1823
     },
     "static/data/pctl-nfl.json": {
-     "flags": 71,
+     "flags": 73,
      "rows": 1752
     },
     "static/data/personnel/nfl.json": {
@@ -348,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 46,
+     "flags": 48,
      "rows": 1650
     }
    },
@@ -444,6 +408,24 @@
      "site": "KC"
     },
     {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Rams",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Cut loose by Rams",
+      "kind": "waived"
+     },
+     "pid": "18919",
+     "player": "Brennan Presley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
+    },
+    {
      "d": "2026-10-19",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -460,6 +442,24 @@
      "pos": "LG",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Let go by G-Men",
+     "kind": null,
+     "move": {
+      "d": "2026-09-29",
+      "head": "Signed to active roster",
+      "kind": "up"
+     },
+     "pid": "16719",
+     "player": "Charlie Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NYG"
     },
     {
      "d": "2026-08-31",
@@ -1038,6 +1038,24 @@
      "site": "LAC"
     },
     {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Let go by G-Men",
+     "kind": null,
+     "move": {
+      "d": "2026-09-29",
+      "head": "Signed to active roster",
+      "kind": "up"
+     },
+     "pid": "16719",
+     "player": "Charlie Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NYG"
+    },
+    {
      "d": "2026-10-27",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1452,6 +1470,24 @@
      "site": "CHI"
     },
     {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Cut loose by Rams",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Cut loose by Rams",
+      "kind": "waived"
+     },
+     "pid": "18919",
+     "player": "Brennan Presley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
+    },
+    {
      "d": "2026-10-19",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1650,22 +1686,40 @@
      "site": "GB"
     },
     {
-     "d": "2026-11-10",
+     "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Cut by Bucs",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Back on Buccaneers' practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-10",
-      "head": "Cut by Bucs",
-      "kind": "waived"
+      "d": "2026-11-16",
+      "head": "Back on Buccaneers' practice squad",
+      "kind": "practice"
      },
      "pid": "13634",
      "player": "David Sills V",
      "pos": "WR",
      "rotowire": "FA",
      "site": "TB"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Back on Philly's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back on Philly's practice squad",
+      "kind": "practice"
+     },
+     "pid": "18499",
+     "player": "Jaydon Blue",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "PHI"
     },
     {
      "d": "2026-11-16",
@@ -1756,24 +1810,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "PIT"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Let go by Ravens",
-     "kind": null,
-     "move": {
-      "d": "2026-10-07",
-      "head": "Signed to Baltimore's 53-man roster",
-      "kind": "sign"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
     },
     {
      "d": "2026-11-12",
@@ -2316,6 +2352,24 @@
      "site": "LAC"
     },
     {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Back on Philly's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back on Philly's practice squad",
+      "kind": "practice"
+     },
+     "pid": "18499",
+     "player": "Jaydon Blue",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "PHI"
+    },
+    {
      "d": "2026-10-12",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2568,6 +2622,24 @@
      "site": "BUF"
     },
     {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "moved",
+     "head": "Elevated to 53-man roster",
+     "kind": "up",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Elevated to 53-man roster",
+      "kind": "up"
+     },
+     "pid": "10949",
+     "player": "Nick Vannett",
+     "pos": "TE",
+     "rotowire": "BAL",
+     "site": "FA"
+    },
+    {
      "d": "2026-11-11",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2728,6 +2800,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "NE"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Let go by G-Men",
+     "kind": null,
+     "move": {
+      "d": "2026-09-29",
+      "head": "Signed to active roster",
+      "kind": "up"
+     },
+     "pid": "16719",
+     "player": "Charlie Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NYG"
     },
     {
      "d": "2026-08-31",
@@ -3558,6 +3648,24 @@
      "site": "DEN"
     },
     {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Back on Philly's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back on Philly's practice squad",
+      "kind": "practice"
+     },
+     "pid": "18499",
+     "player": "Jaydon Blue",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "PHI"
+    },
+    {
      "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3646,6 +3754,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "CHI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Rams",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Cut loose by Rams",
+      "kind": "waived"
+     },
+     "pid": "18919",
+     "player": "Brennan Presley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
     },
     {
      "d": "2026-10-19",
@@ -3792,16 +3918,16 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-10",
+     "d": "2026-11-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Cut by Bucs",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Back on Buccaneers' practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-10",
-      "head": "Cut by Bucs",
-      "kind": "waived"
+      "d": "2026-11-16",
+      "head": "Back on Buccaneers' practice squad",
+      "kind": "practice"
      },
      "pid": "13634",
      "player": "David Sills V",
@@ -3885,24 +4011,6 @@
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Let go by Ravens",
-     "kind": null,
-     "move": {
-      "d": "2026-10-07",
-      "head": "Signed to Baltimore's 53-man roster",
-      "kind": "sign"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
      "flag": "practice",
      "head": "Joins Dallas practice squad",
      "kind": "practice",
@@ -3972,6 +4080,24 @@
      "site": "CHI"
     },
     {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Back on Philly's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back on Philly's practice squad",
+      "kind": "practice"
+     },
+     "pid": "18499",
+     "player": "Jaydon Blue",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "PHI"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4026,6 +4152,24 @@
      "site": "ATL"
     },
     {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Let go by G-Men",
+     "kind": null,
+     "move": {
+      "d": "2026-09-29",
+      "head": "Signed to active roster",
+      "kind": "up"
+     },
+     "pid": "16719",
+     "player": "Charlie Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "NYG"
+    },
+    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4078,6 +4222,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "MIA"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "moved",
+     "head": "Elevated to 53-man roster",
+     "kind": "up",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Elevated to 53-man roster",
+      "kind": "up"
+     },
+     "pid": "10949",
+     "player": "Nick Vannett",
+     "pos": "TE",
+     "rotowire": "BAL",
+     "site": "FA"
     },
     {
      "d": "2026-11-09",
@@ -4225,7 +4387,7 @@
     }
    ],
    "joined": 0,
-   "players": 2279,
+   "players": 2280,
    "rows": 8080
   },
   "nhl": {
