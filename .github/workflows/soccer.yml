@@ -76,7 +76,9 @@ jobs:
         timeout-minutes: 15
         run: python3 scripts/team_units.py soccer
       - name: Player values, stats and backup watch (Understat)
-        run: python3 scripts/soccer_players.py
+        run: |
+          python3 scripts/soccer_players.py
+          python3 scripts/depth_stats.py soccer || echo "depth chart stats not updated"   # key stats for the depth chart GFX card
       # lineups tab (formations, most-used XI, pairs; static/data/lineups/soccer.json) from the warm Understat cache
       - name: Lineups tab
         continue-on-error: true

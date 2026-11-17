@@ -20,6 +20,8 @@
   </div>
   <div class="dc__bar">
     <label class="dc__pick"><span>team</span><select data-dc-team aria-label="team"><option>loading…</option></select></label>
+    <label class="dc__pick dc__unitpick" hidden><span>unit</span><select data-dc-unit aria-label="unit"><option value="">all</option></select></label>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="depth" title="depth chart graphic (4:5)">GFX</button>
   </div>
   <div class="dc__body" data-dc-body><p class="cfb__dim">loading…</p></div>
   <div class="win__status" title="{{ index $about $sport | plainify }}"><span data-dc-count></span><span class="cfb__asof" data-dc-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -73,11 +75,20 @@
       h += (u.u ? '<h4 class="dc__unit">' + esc(u.u) + '</h4>' : '') + '<div class="dc__grid">' + u.s.map(function (s) { return slot(D, sport, s, sport === 'cbb'); }).join('') + '</div>';
     });
     W.querySelector('[data-dc-body]').innerHTML = h + legend(D);
+    W.__dcTeam = T;
+    var us = W.querySelector('[data-dc-unit]'), named = T.units.filter(function (u) { return u.u; });
+    if (us) {
+      var keepU = us.value;
+      us.innerHTML = '<option value="">all</option>' + named.map(function (u) { return '<option>' + esc(u.u) + '</option>'; }).join('');
+      if (named.some(function (u) { return u.u === keepU; })) us.value = keepU;
+      us.closest('label').hidden = named.length < 2;
+    }
     try { localStorage.setItem('ark-dc-' + sport, T.t); } catch (e) {}
   }
   function load(W) {
     if (W.__dc) return; W.__dc = true;
     fetch(W.getAttribute('data-dc-src')).then(function (r) { return r.json(); }).then(function (D) {
+      W.__dcData = D;
       var sel = W.querySelector('[data-dc-team]'), sport = W.getAttribute('data-dc'), groups = {}, order = [];
       D.teams.forEach(function (T) { var g = T.grp || ''; if (!groups[g]) { groups[g] = []; order.push(g); } groups[g].push(T); });
       order.sort();

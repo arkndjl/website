@@ -2799,20 +2799,128 @@
     return F.canvas;
   }
 
+  // ---- depth chart card: one team's chart (layouts/shortcodes/depthchart.html), each player's headline stats
+  // (scripts/depth_stats.py) coloured by percentile tier among every team's charted players. Injured starters stay
+  // on top with their tag; the player standing in carries FILL-IN. Slots pack into the column count that gives the
+  // biggest type, in chart order.
+  var DC_LG = { cfb: 'CFB', cbb: 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'SOCCER' };
+  var DC_INJ = { out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
+  function dcNum(v, f) {
+    if (v == null) return '—';
+    if (f === 'i') return String(Math.round(v));
+    var dp = +String(f).slice(1) || 1, r = +Math.abs(v).toFixed(dp);
+    return (r === 0 ? '' : v > 0 ? '+' : '−') + r.toFixed(dp);
+  }
+  function dcPack(slots, cols) {   // chart order, column by column, the tallest column as short as it can be
+    var tot = slots.reduce(function (a, s) { return a + s.n; }, 0), tgt = Math.ceil(tot / cols);
+    for (;; tgt++) {
+      var out = [[]], h = 0, ok = true;
+      for (var i = 0; i < slots.length; i++) {
+        if (h && h + slots[i].n > tgt) { if (out.length === cols) { ok = false; break; } out.push([]); h = 0; }
+        out[out.length - 1].push(slots[i]); h += slots[i].n;
+      }
+      if (ok) return { cols: out, h: Math.max.apply(null, out.map(function (c) { return c.reduce(function (a, s) { return a + s.n; }, 0); })) };
+    }
+  }
+  async function buildDepth(win, btn) {
+    var D = win.__dcData, T = win.__dcTeam; if (!D || !T) return null;
+    var sport = win.getAttribute('data-dc'), us = win.querySelector('[data-dc-unit]'), only = us && !us.closest('label').hidden ? us.value : '';
+    var units = T.units.filter(function (u) { return !only || u.u === only; }), ST = D.stats || [], ns = ST.length;
+    var stamp = D.week ? 'week ' + D.week : D.label || '';
+    var F = await frame(2160, 2700, (DC_LG[sport] || '') + ' :: depth chart' + (only ? ' :: ' + only : ''), stamp, tabLink(win));
+    var g = F.g, x = F.x + 32, y = F.y + 32, w = F.w - 64, gap = 24;
+    well(g, F.x, F.y, F.w, F.h);
+    // logo in a raised frame, the team name and its group beside it
+    var LS = 220, logo = T.logo ? await loadImg(T.logo) : null;
+    g.fillStyle = C.face; g.fillRect(x, y, LS, LS); bevel(g, x, y, LS, LS, true, 6);
+    g.fillStyle = C.dark; g.fillRect(x + 10, y + 10, LS - 20, LS - 20);
+    if (logo) { var lr = Math.min(168 / logo.width, 168 / logo.height), lw = logo.width * lr, lh = logo.height * lr; drawLogo(g, logo, x + (LS - lw) / 2, y + (LS - lh) / 2, lw, lh); }
+    var tx = x + LS + 40, tw = w - LS - 40, nsz = 96;
+    g.font = nsz + 'px ' + FONT; while (nsz > 60 && g.measureText(T.n).width > tw) { nsz -= 4; g.font = nsz + 'px ' + FONT; }
+    g.fillStyle = C.white; g.fillText(fit(g, T.n, tw), tx, y + (T.grp ? 80 : LS / 2));
+    if (T.grp) { g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, T.grp + (T.div ? ' · ' + T.div : ''), tw), tx, y + 164); }
+    var top = y + LS + 44, bottom = F.y + F.h - 24, avail = bottom - top;
+    // slots: a header line, then a line a player; half a line between slots in a column
+    var U = units.map(function (u) { return { u: u.u, slots: u.s.map(function (s) { return { s: s, n: s[1].length + 1.5 }; }) }; });
+    var ruleH = function (u) { return u.u && units.length > 1 ? 64 : 0; }, best = null, cands = [];
+    for (var cols = 1; cols <= 4; cols++) {
+      var packs = U.map(function (u) { return dcPack(u.slots, cols); }), lines = packs.reduce(function (a, p) { return a + p.h; }, 0);
+      var fixed = U.reduce(function (a, u) { return a + ruleH(u) + 16; }, 0), lineH = Math.min(128, (avail - fixed) / lines);
+      var colW = (w - (cols - 1) * gap) / cols, font = Math.floor(Math.min(72, lineH * 0.6, colW / (8.5 + 2.9 * ns)));
+      var waste = packs.reduce(function (a, pk, i) { var tot = U[i].slots.reduce(function (b, q) { return b + q.n; }, 0); return a + (pk.cols.length < cols ? 1 : 0) + (cols * pk.h - tot) / (cols * pk.h); }, 0);
+      cands.push({ cols: cols, packs: packs, lineH: lineH, colW: colW, font: font, waste: waste });
+    }
+    // the biggest type, unless a layout within 15% of it leaves fewer holes (NHL lines side by side)
+    var top1 = Math.max.apply(null, cands.map(function (c) { return c.font; }));
+    cands.filter(function (c) { return c.font >= top1 * 0.85; }).forEach(function (c) { if (!best || c.waste < best.waste - 0.05 || (Math.abs(c.waste - best.waste) <= 0.05 && c.font > best.font)) best = c; });
+    var fs = best.font, LH = best.lineH, CW = best.colW, sw = Math.round(fs * 2.9), ss = Math.max(24, Math.round(fs * 0.55));
+    var cy = top;
+    U.forEach(function (u, ui) {
+      if (ruleH(u)) { cardRule(g, x, cy + 20, w, u.u.toUpperCase()); cy += ruleH(u); }
+      best.packs[ui].cols.forEach(function (col, ci) {
+        var cx = x + ci * (CW + gap), ry = cy;
+        col.forEach(function (sl) {
+          var s = sl.s, bh = Math.round((sl.n - 0.5) * LH);
+          g.fillStyle = C.dark; g.fillRect(cx, ry, CW, bh); bevel(g, cx, ry, CW, bh, false, 3);
+          // header: slot in teal, stat labels over their columns
+          var hy = ry + LH / 2;
+          g.font = fs + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, String(s[0]).toUpperCase(), CW - 24 - ns * sw), cx + 18, hy);
+          g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'right';
+          ST.forEach(function (st, k) { g.fillText(st[0], cx + CW - 18 - (ns - 1 - k) * sw, hy); });
+          g.textAlign = 'left';
+          s[1].forEach(function (p, i) {
+            var py = ry + (i + 1) * LH, my = py + LH / 2, starter = i === 0 || (sport === 'cbb' && s[0] === 'starters');
+            if (starter) { g.fillStyle = 'rgba(200,199,255,0.10)'; g.fillRect(cx + 6, py + 4, CW - 12, LH - 8); }
+            g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(i + 1), cx + 18, my);
+            var nx = cx + 18 + fs * 0.9, room = CW - 18 - ns * sw - (nx - cx) - 12;
+            // tags right after the name: injury (pink), fill-in (teal)
+            var tags = [], inj = p[3] ? DC_INJ[String(p[3]).toLowerCase()] || String(p[3]).toUpperCase() : '';
+            if (inj) tags.push([inj, C.down]);
+            if (p[4] === 'fill-in') tags.push(['FILL-IN', C.teal]);
+            g.font = ss + 'px ' + FONT; var tagW = tags.reduce(function (a, t) { return a + g.measureText(t[0]).width + ss * 0.6 + 10; }, 0);
+            g.font = fs + 'px ' + FONT; g.fillStyle = starter ? C.white : C.light;
+            var nroom = Math.max(fs * 3, room - tagW), nm = p[0];
+            if (g.measureText(nm).width > nroom) { var pw = String(nm).split(' '); if (pw.length > 1) nm = pw[0][0] + '. ' + surname(nm); }   // C. Beck before a cut name
+            nm = fit(g, nm, nroom); g.fillText(nm, nx, my);
+            var tgx = nx + g.measureText(nm).width + 12;
+            g.font = ss + 'px ' + FONT;
+            tags.forEach(function (t) {
+              var tw2 = g.measureText(t[0]).width + ss * 0.6;
+              if (tgx + tw2 > cx + CW - 18 - ns * sw) return;
+              g.fillStyle = t[1]; g.fillRect(tgx, my - ss * 0.62, tw2, ss * 1.24);
+              g.fillStyle = C.dark; g.fillText(t[0], tgx + ss * 0.3, my + 1); tgx += tw2 + 10;
+            });
+            // stats, right-aligned, in tier colours
+            g.font = fs + 'px ' + FONT; g.textAlign = 'right';
+            ST.forEach(function (st, k) {
+              var v = p[6] && p[6][k], val = v ? v[0] : null;
+              g.fillStyle = v ? tierCol(v[1]) : C.face;
+              g.fillText(dcNum(val, st[1]), cx + CW - 18 - (ns - 1 - k) * sw, my);
+            });
+            g.textAlign = 'left';
+          });
+          ry += Math.round(sl.n * LH);
+        });
+      });
+      cy += best.packs[ui].h * LH + 16;
+    });
+    return F.canvas;
+  }
+
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
     var win = btn.closest('.win'); if (!win) return;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'perf' ? await buildPerf(win, btn)
+      var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {
