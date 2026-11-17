@@ -10,7 +10,7 @@
   {{- with $s.series }}{{ $tr := . }}
   <div class="lzf__body">
     <div class="lzf__trend lzs__trend">
-    {{- range $sp := slice (slice "twitch" "Twitch" "icon-twitch") (slice "youtube" "YouTube" "icon-youtube") (slice "tiktok" "TikTok" "icon-tiktok") (slice "x" "X" "icon-twitter") }}{{ $k := index $sp 0 }}
+    {{- range $sp := slice (slice "twitch" "Twitch" "icon-twitch") (slice "youtube" "YouTube" "icon-youtube") (slice "tiktok" "TikTok" "icon-tiktok") (slice "x" "X" "icon-twitter") (slice "tth" "TikTok likes" "icon-tiktok") }}{{ $k := index $sp 0 }}
     {{- $pts := slice }}{{ range $tr }}{{ with index . $k }}{{ $pts = $pts | append (float .) }}{{ end }}{{ end }}
     {{- with $pts }}{{ $n := len . }}{{ $lo := index . 0 }}{{ $hi := index . 0 }}{{ range . }}{{ if lt . $lo }}{{ $lo = . }}{{ end }}{{ if gt . $hi }}{{ $hi = . }}{{ end }}{{ end }}
       {{- $cur := index . (sub $n 1) }}{{ $dl := sub $cur (index . 0) }}
@@ -22,12 +22,56 @@
         </svg>
         <p class="esea-fc__axis lzf__axis"><span>{{ (time.In "America/New_York" (time (int (div (index $tr 0).t 1000)))).Format "Jan 2" }}</span><span>today</span></p>
         {{- end }}
+        {{- with index ($s.goals | default dict) $k }}{{ $g := . }}{{ $now := time (int (div (index $tr (sub (len $tr) 1)).t 1000)) }}
+        {{- $c := float $cur }}
+        <ul class="lzs__goals">
+          <li><span class="esea__k" title="projected net gain a month: lifetime pace as the prior, updated by tracked days">pace</span> <b>+{{ .rate }}</b><span class="cfb__dim">/mo</span></li>
+          {{- range $T := slice 30 90 }}{{ with index $g (printf "d%d" $T) }}
+          <li><span class="esea__k">{{ with .due }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2" }}{{ else }}{{ ($now.AddDate 0 0 $T).Format "Jan 2" }}{{ end }}</span> <b>{{ lang.FormatNumber 0 .goal }}</b> <span class="cfb__dim" title="chance of reaching it">{{ .p }}%</span></li>
+          {{- if ne .f nil }}<li class="lzs__bar">{{ partial "lzbar.html" (dict "f" .f "m" .m "t" (printf "%.0f of %v from %v · marker = time elapsed" $c .goal .base)) }}</li>{{ end }}
+          {{- end }}{{ end }}
+          {{- with .next }}
+          <li><span class="esea__k">{{ lang.FormatNumber 0 .goal }}</span> <b>{{ with .eta }}{{ (time .).Format "Jan 2, 2006" }}{{ else }}—{{ end }}</b> <span class="cfb__dim" title="chance within 90 days">{{ .p90 }}% in 90d</span></li>
+          {{- if ne .f nil }}<li class="lzs__bar">{{ partial "lzbar.html" (dict "f" .f "m" (.m | default -1) "t" (printf "%.0f of %.0f from %v · marker = projected pace" $c (float .goal) .from)) }}</li>{{ end }}{{ end }}
+        </ul>
+        {{- end }}
       </div>
     {{- end }}{{ end }}
     </div>
+    {{- $rows := slice }}{{ $nets := dict "twitch" "Twitch" "youtube" "YouTube" "tiktok" "TikTok" "x" "X" }}
+    {{- range $k, $h := $s.hist | default dict }}
+      {{- range $h.ms }}{{ if .hit }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" "milestone" "t" .hit "est" .est "target" .eta0 "ahead" .ahead "hit" true) }}{{ end }}{{ end }}
+      {{- range $h.dated }}{{ if .done }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" (printf "%dd" .T) "t" (.hit | default .due) "due" .due "ahead" .ahead "hit" (ne .hit nil) "final" .final) }}{{ end }}{{ end }}
+    {{- end }}
+    {{- $gx := slice }}
+    {{- range $sp := slice (slice "twitch" "Twitch") (slice "youtube" "YouTube") (slice "tiktok" "TikTok") (slice "x" "X") }}{{ $k := index $sp 0 }}
+      {{- $cv := 0.0 }}{{ range $s.series }}{{ with index . $k }}{{ $cv = float . }}{{ end }}{{ end }}
+      {{- with index ($s.goals | default dict) $k }}{{ $g := . }}{{ $gl := slice }}
+        {{- range $T := slice 30 90 }}{{ with index $g (printf "d%d" $T) }}{{ $gl = $gl | append (dict "l" (cond (ne .due nil) ((time.In "America/New_York" (time (int (div (.due | default 0) 1000)))).Format "Jan 2") (printf "%dd" $T)) "v" (lang.FormatNumber 0 (float .goal)) "p" (printf "%v%%" .p) "f" (.f | default 0) "m" (.m | default -1)) }}{{ end }}{{ end }}
+        {{- with $g.next }}{{ $gl = $gl | append (dict "l" (printf "%s by" (lang.FormatNumber 0 (float .goal))) "v" (cond (ne .eta nil) ((time (.eta | default "2000-01-01")).Format "Jan 2006") "—") "f" (.f | default 0) "m" (.m | default -1)) }}{{ end }}
+        {{- $last := "" }}{{ with index ($s.hist | default dict) $k }}{{ range .ms }}{{ if .hit }}{{ $last = printf "LAST %s · %s%s" (lang.FormatNumber 0 (float .goal)) (cond (eq .est true) "~" "") ((time.In "America/New_York" (time (int (div .hit 1000)))).Format "Jan 2006") }}{{ end }}{{ end }}{{ end }}
+        {{- $sub := "" }}{{ if eq $k "tiktok" }}{{ with $s.plan }}{{ with .tt }}{{ with .hearts }}{{ $sub = printf "%s LIKES" (lang.FormatNumber 0 (float .)) }}{{ end }}{{ end }}{{ end }}{{ end }}
+        {{- $gx = $gx | append (dict "n" (index $sp 1) "c" (lang.FormatNumber 0 $cv) "pace" $g.rate "goals" $gl "last" $last "sub" $sub) }}
+      {{- end }}
+    {{- end }}
+    {{- with $gx }}<div class="esea__gfxbar lzs__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="lz-social" data-gfx-social="{{ . | jsonify }}" data-gfx-date="{{ $syncd }}" data-gfx-title="LAURSEN_111 :: SOCIAL DATA" title="social data graphic (16:9)">GFX</button></div>{{ end }}
+    {{- with $rows }}
+    <div class="wintable__scroll lzs__log">
+    <table class="esea-box">
+      <thead><tr><th>Net</th><th>Goal</th><th title="milestone, or a dated goal set 30 / 90 days out">Type</th><th>Target</th><th>Hit</th><th title="days ahead (+) or behind (−) the projection made when the goal was set">vs pace</th></tr></thead>
+      <tbody>{{ range sort . "t" "desc" }}<tr>
+        <td>{{ .net }}</td><td><b>{{ lang.FormatNumber 0 (float .goal) }}</b></td><td class="cfb__dim">{{ .kind }}</td>
+        <td class="cfb__dim">{{ with .due }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ else }}{{ with .target }}{{ (time .).Format "Jan 2, 2006" }}{{ else }}—{{ end }}{{ end }}</td>
+        <td>{{ if .hit }}<span title="{{ if .est }}before tracking: date implied by lifetime pace{{ end }}">{{ if .est }}~{{ end }}{{ (time.In "America/New_York" (time (int (div .t 1000)))).Format "Jan 2, 2006" }}</span>{{ else }}<span class="cfb__down">missed{{ with .final }} ({{ . }}){{ end }}</span>{{ end }}</td>
+        <td>{{ with .ahead }}<span class="{{ if ge . 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt . 0 }}+{{ end }}{{ . }}d</span>{{ else }}—{{ end }}</td>
+      </tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
   </div>
   {{- else }}
   <p class="esea__empty-line">no social data yet.</p>
   {{- end }}
-  <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
+{{ partial "gfx.html" . }}

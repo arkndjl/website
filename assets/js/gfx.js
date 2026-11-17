@@ -2278,6 +2278,38 @@
     return F.canvas;
   }
 
+  // ---- LAURSEN_111 social data: count, change, pace, goal progress bars, latest milestone per network ----
+  async function buildSocial(win, btn) {
+    var d; try { d = JSON.parse(btn.getAttribute('data-gfx-social')); } catch (e) { return null; }
+    if (!d || !d.length) return null;
+    var F = await frame(2400, 1350, btn.getAttribute('data-gfx-title') || 'LAURSEN_111 :: SOCIAL DATA', btn.getAttribute('data-gfx-date'));
+    var g = F.g, gap = 24, cw = (F.w - gap * (d.length - 1)) / d.length;
+    function bar(x, y, w, h, f, m) {
+      var n = 20, cg = 4, bw = (w - cg * (n - 1)) / n, on = Math.floor(Math.max(0, Math.min(1, f)) * n), mk = m == null || m < 0 ? -1 : Math.min(n - 1, Math.floor(m * n));
+      for (var i = 0; i < n; i++) {
+        var bx = x + i * (bw + cg);
+        g.fillStyle = i < on ? (mk >= 0 && on < mk ? C.lilac : C.teal) : C.dark; g.fillRect(bx, y, bw, h);
+        if (i === mk) { g.fillStyle = C.white; g.fillRect(bx, y - 6, bw, 4); g.fillRect(bx, y + h + 2, bw, 4); }
+      }
+    }
+    d.forEach(function (n, k) {
+      var x = F.x + k * (cw + gap), y = F.y; well(g, x, y, cw, F.h);
+      var px = x + 32, pw = cw - 64, yy = y + 70;
+      g.font = '44px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(n.n).toUpperCase(), px, yy);
+      yy += 150; g.font = '150px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, n.c, pw), px, yy);
+      yy += 110; g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, '+' + n.pace + ' / MO' + (n.sub ? '  ·  ' + n.sub : ''), pw), px, yy);
+      yy += 50;
+      (n.goals || []).forEach(function (q) {
+        yy += 70; g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, String(q.l).toUpperCase(), pw * 0.5), px, yy);
+        g.fillStyle = C.white; var vt = String(q.v); g.font = '44px ' + FONT; var vw = g.measureText(vt).width; g.fillText(vt, px + pw - vw - (q.p != null ? 130 : 0), yy);
+        if (q.p != null) { g.font = '32px ' + FONT; g.fillStyle = C.teal; var pt = q.p; g.fillText(pt, px + pw - g.measureText(pt).width, yy); }
+        yy += 30; bar(px, yy, pw, 28, q.f, q.m); yy += 40;
+      });
+      if (n.last) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, n.last, pw), px, y + F.h - 40); }
+    });
+    return F.canvas;
+  }
+
   // ---- 1NT season overview: record, rank, odds, ratings, map pool, results ----
   async function buildEseaSeason(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-season')); } catch (e) { return null; }
@@ -2948,7 +2980,7 @@
     try {
       var mode = btn.getAttribute('data-gfx-mode');
       var canvas = mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
-        : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
+        : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';

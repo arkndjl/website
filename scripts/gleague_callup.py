@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """G League call-up odds for the NBA ARKBOARD: every G League player this season with his chance of NBA minutes next
-season, of a 500-minute NBA season next season, and his expected NBA VORX over the next three seasons.
+season, of a 500-minute NBA season next season, and his expected NBA VORX per season over the next three.
 
     python3 scripts/gleague_callup.py --research   # fetch every season, fit, backtest -> data/gleague_callup_fit.json
     python3 scripts/gleague_callup.py              # this season -> static/data/gleague.json (uses the fit file)
@@ -18,7 +18,8 @@ rating, PIE; NBA history through LAST season only (log career minutes, career XP
 round 1 / 2, log pick, years since the draft; `part` = 1 while only the Showcase Cup is played, falling to 0 as the
 34-game regular season fills. Training pools full seasons 2009-25 (2008-09 on) with Showcase-only rows 2022-25 (part 1).
 Targets: NBA 1 = any NBA minutes next season; NBA 500 = 500+ minutes (per 82 games); xVORX 3Y = P(any NBA game in the
-next 3 seasons) x E[3-season VORX | he plays] (ridge on those who played). Ridge logistic (lambda 1), standardized.
+next 3 seasons) x E[3-season VORX | he plays] (ridge, lambda POS_LAM, on those who played), shown per season (/ 3).
+Ridge logistic (lambda 1), standardized. Draft slot counts only drafts held before the G League season.
 Backtest: leave one season out, scored per season against the same model without G League production.
 """
 import json, math, os, sys, time, glob, collections, datetime, urllib.request
@@ -160,7 +161,7 @@ class World:
 
     def dinfo(self, n, y, age, b):
         for dy, pk, bid in self.draft.get(names.key(n), []):
-            if dy > y: continue
+            if dy >= y: continue        # the June draft after this G League season is not known during it
             if (b and bid == b) or (not b and (age is None or 17 <= age - (y - dy) <= 25.5)): return pk, dy
         return None, None
 
@@ -205,6 +206,14 @@ def logit_fit(X, y, lam=1.0):
     return b
 
 
+# E[3-season VORX | plays] ridge. Lambda 3 -> 300 (Nov 17 2026): early-season boards (3 / 6 / 10 games in, DateTo
+# snapshots 2009-10..2022-23) overshot, held-out slope of actual on predicted .56 (.43 at 3 games). Leave one season out
+# on snapshot rows, lambda nested from {3, 30, 100, 300}: MSE .7205 -> .6976, t -3.20, 11/13 seasons, passes Holm over
+# 4; full seasons .8736 -> .8800, t +0.71. Minute shrinkage of rates, training on snapshots, a global calibration slope
+# and a wider grid {300..10000} failed
+POS_LAM = 300.0
+
+
 def ridge_fit(X, y, lam=3.0):
     n, k = X.shape; Xb = np.column_stack([np.ones(n), X]); P = lam * np.eye(k + 1); P[0, 0] = 0
     return np.linalg.solve(Xb.T @ Xb + P, Xb.T @ y)
@@ -224,7 +233,7 @@ def fit_all(rows, feats):
     a = np.array([r[2]['any3'] for r in rows])
     out['any3'] = logit_fit(X[m3], a[m3]).tolist()
     pos = m3 & (a == 1)
-    out['pos'] = ridge_fit(X[pos], np.array([r[2]['xv3'] for r in rows])[pos]).tolist()
+    out['pos'] = ridge_fit(X[pos], np.array([r[2]['xv3'] for r in rows])[pos], POS_LAM).tolist()
     return out
 
 
@@ -260,7 +269,7 @@ def research():
     rows = []      # (season, features, targets, sc flag)
     seasons = {}
     # from 2008-09: a 2007-08 row's label is the 2008-09 NBA season, before the XPM boards (2009-10 on), so every one
-    # read 'no NBA'. Dropping them (Nov 16 2026), leave one season out: NBA% LL .3345 -> .3338 (t -0.7, 10/17), 500%
+    # read 'no NBA'. Dropping them (Nov 16 2026), leave one season out: NBA% LL .3345 -> .3338 (t -0.7, 10/17), REG% (500 MP)
     # .1886 -> .1885 (t -0.4, 11/17), xVORX MSE .881 -> .880 (t -1.8, 11/15); shipped as a label fix
     for y in range(2009, LAST1 + 1):
         seasons[y] = (gl_season(y), [gl_season(y, ('SC',))] if y >= 2022 else [])
@@ -355,7 +364,7 @@ def build():
                         'gp': o['GP'], 'min': round(o['MIN']), 'pts': round(f['pts36'], 1), 'gs': round(f['gs36'], 1),
                         'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
                         'cmp': round(info['cmp'] + now), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'], 'bb': b,
-                        'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(float(xv[i]), 2)})
+                        'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(float(xv[i]) / 3, 2)})
     players.sort(key=lambda r: (-r['p1'], -r['xv']))
     out = {'season': y, 'label': sname(y), 'next': sname(y + 1), 'part': round(part, 2), 'reg': reg,
            'asof': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
@@ -368,9 +377,9 @@ def build():
 
 def past():
     """each past season's board as it read the day that G League season ended: the same features, fit walk forward on
-    the seasons whose outcome was known by then (NBA% and 500%: seasons through s-1; xVORX: through s-3, shown once four
+    the seasons whose outcome was known by then (NBA% and REG%: seasons through s-1; xVORX: through s-3, shown once four
     seasons are in). Training starts with 2008-09 (the XPM boards begin 2009-10, so 2007-08 has no next-season label).
-    Each row carries what happened next: NBA minutes the next season (per 82) and NBA VORX over the next three."""
+    Each row carries what happened next: NBA minutes the next season (per 82) and NBA VORX per season over the next three."""
     W = World(); last = current_season() - 1
     seasons = {y: (gl_season(y), [gl_season(y, ('SC',))] if y >= 2022 else []) for y in range(2009, last + 1)}
     births = collections.defaultdict(list); nm = {}
@@ -398,7 +407,7 @@ def past():
         p1 = sig(lin(b1, Xt)); p5 = np.minimum(sig(lin(b5, Xt)), p1); xv = [None] * len(te)
         if len({r[0] for r in tr3}) >= 4:
             X3, m3, s3 = design([r[1] for r in tr3], FEATS); a = np.array([r[2]['any3'] for r in tr3])
-            ba = logit_fit(X3, a); bp = ridge_fit(X3[a == 1], np.array([r[2]['xv3'] for r in tr3])[a == 1])
+            ba = logit_fit(X3, a); bp = ridge_fit(X3[a == 1], np.array([r[2]['xv3'] for r in tr3])[a == 1], POS_LAM)
             Xt3, _, _ = design([r[1] for r in te], FEATS, m3, s3)
             xv = (sig(lin(ba, Xt3)) * lin(bp, Xt3)).tolist()
         players = []
@@ -412,8 +421,8 @@ def past():
             players.append({'id': o['id'], 'n': o['n'], 'tm': o['tm'], 'lg': logo, 'age': int(o['age']) if o['age'] else None,
                             'gp': o['GP'], 'min': round(o['MIN']), 'gs': round(f['gs36'], 1), 'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
                             'cmp': round(info['cmp'] + (nb.get('mp') or 0)), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'],
-                            'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': None if xv[i] is None else round(float(xv[i]), 2),
-                            'o1': mp1 if done1 else None, 'o3': round(t['xv3'], 2) if done3 else None})
+                            'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': None if xv[i] is None else round(float(xv[i]) / 3, 2),
+                            'o1': mp1 if done1 else None, 'o3': round(t['xv3'] / 3, 2) if done3 else None})
             if done1:
                 score['p1'].append(float(p1[i])); score['y1'].append(t['nba1'])
         players.sort(key=lambda r: (-r['p1'], -(r['xv'] or 0)))

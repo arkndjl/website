@@ -45,6 +45,10 @@ jobs:
       - name: Socials
         continue-on-error: true
         run: node scripts/laursen_socials.mjs
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
       - name: 1NT live
         continue-on-error: true
         env:

@@ -1,10 +1,339 @@
 {
- "asof": "2026-11-17T06:32:54.450Z",
+ "asof": "2026-11-17T07:13:30.245Z",
  "status": {
   "twitch": true,
   "youtube": true,
   "tiktok": true,
-  "x": true
+  "x": false
+ },
+ "goals": {
+  "twitch": {
+   "rate": 7.4,
+   "prior": 7.4,
+   "tracked": 0,
+   "d30": {
+    "goal": 281,
+    "base": 274,
+    "set": 1794899610245,
+    "due": 1797491610245,
+    "p0": 54,
+    "p": 54,
+    "f": 0,
+    "m": 0
+   },
+   "d90": {
+    "goal": 295,
+    "base": 274,
+    "set": 1794899610245,
+    "due": 1802675610245,
+    "p0": 52,
+    "p": 52,
+    "f": 0,
+    "m": 0
+   },
+   "next": {
+    "goal": 300,
+    "eta": "2027-03-07",
+    "p90": 32,
+    "from": 250,
+    "base": 274,
+    "set": 1794899610245,
+    "eta0": "2027-03-07",
+    "f": 0.48,
+    "m": 0.48
+   },
+   "opened": "2023-10-31"
+  },
+  "youtube": {
+   "rate": 1.1,
+   "prior": 1.1,
+   "tracked": 0,
+   "d30": {
+    "goal": 43,
+    "base": 42,
+    "set": 1794899610245,
+    "due": 1797491610245,
+    "p0": 55,
+    "p": 55,
+    "f": 0,
+    "m": 0
+   },
+   "d90": {
+    "goal": 44,
+    "base": 42,
+    "set": 1794899610245,
+    "due": 1802675610245,
+    "p0": 62,
+    "p": 62,
+    "f": 0,
+    "m": 0
+   },
+   "next": {
+    "goal": 50,
+    "eta": "2027-08-21",
+    "p90": 12,
+    "from": 25,
+    "base": 42,
+    "set": 1794899610245,
+    "eta0": "2027-08-21",
+    "f": 0.68,
+    "m": 0.68
+   },
+   "opened": "2023-11-10"
+  },
+  "tiktok": {
+   "rate": 2.7,
+   "prior": 2.7,
+   "tracked": 0,
+   "d30": {
+    "goal": 102,
+    "base": 100,
+    "set": 1794899610245,
+    "due": 1797491610245,
+    "p0": 64,
+    "p": 64,
+    "f": 0,
+    "m": 0
+   },
+   "d90": {
+    "goal": 107,
+    "base": 100,
+    "set": 1794899610245,
+    "due": 1802675610245,
+    "p0": 54,
+    "p": 54,
+    "f": 0,
+    "m": 0
+   },
+   "next": {
+    "goal": 150,
+    "eta": "2028-08-01",
+    "p90": 0,
+    "from": 100,
+    "base": 100,
+    "set": 1794899610245,
+    "eta0": "2028-08-01",
+    "f": 0,
+    "m": 0
+   },
+   "opened": "2023-11-11"
+  },
+  "x": {
+   "rate": 1.4,
+   "prior": 1.4,
+   "tracked": 0,
+   "d30": {
+    "goal": 39,
+    "base": 38,
+    "set": 1794899610245,
+    "due": 1797491610245,
+    "p0": 61,
+    "p": 61,
+    "f": 0,
+    "m": 0
+   },
+   "d90": {
+    "goal": 41,
+    "base": 38,
+    "set": 1794899610245,
+    "due": 1802675610245,
+    "p0": 56,
+    "p": 56,
+    "f": 0,
+    "m": 0
+   },
+   "next": {
+    "goal": 50,
+    "eta": "2027-10-13",
+    "p90": 6,
+    "from": 25,
+    "base": 38,
+    "set": 1794899610245,
+    "eta0": "2027-10-13",
+    "f": 0.52,
+    "m": 0.52
+   },
+   "opened": "2024-08-11"
+  }
+ },
+ "hist": {
+  "twitch": {
+   "dated": [
+    {
+     "T": 30,
+     "goal": 281,
+     "p": 54,
+     "base": 274,
+     "set": 1794899610245,
+     "due": 1797491610245
+    },
+    {
+     "T": 90,
+     "goal": 295,
+     "p": 52,
+     "base": 274,
+     "set": 1794899610245,
+     "due": 1802675610245
+    }
+   ],
+   "ms": [
+    {
+     "goal": 25,
+     "hit": 1707486565552,
+     "est": true
+    },
+    {
+     "goal": 50,
+     "hit": 1716262731104,
+     "est": true
+    },
+    {
+     "goal": 75,
+     "hit": 1725038896656,
+     "est": true
+    },
+    {
+     "goal": 100,
+     "hit": 1733815062208,
+     "est": true
+    },
+    {
+     "goal": 150,
+     "hit": 1751367393312,
+     "est": true
+    },
+    {
+     "goal": 200,
+     "hit": 1768919724416,
+     "est": true
+    },
+    {
+     "goal": 250,
+     "hit": 1786472055520,
+     "est": true
+    },
+    {
+     "goal": 300,
+     "set": 1794899610245,
+     "base": 274,
+     "eta0": "2027-03-07"
+    }
+   ]
+  },
+  "youtube": {
+   "dated": [
+    {
+     "T": 30,
+     "goal": 43,
+     "p": 55,
+     "base": 42,
+     "set": 1794899610245,
+     "due": 1797491610245
+    },
+    {
+     "T": 90,
+     "goal": 44,
+     "p": 62,
+     "base": 42,
+     "set": 1794899610245,
+     "due": 1802675610245
+    }
+   ],
+   "ms": [
+    {
+     "goal": 25,
+     "hit": 1756314146696,
+     "est": true
+    },
+    {
+     "goal": 50,
+     "set": 1794899610245,
+     "base": 42,
+     "eta0": "2027-08-21"
+    }
+   ]
+  },
+  "tiktok": {
+   "dated": [
+    {
+     "T": 30,
+     "goal": 102,
+     "p": 64,
+     "base": 100,
+     "set": 1794899610245,
+     "due": 1797491610245
+    },
+    {
+     "T": 90,
+     "goal": 107,
+     "p": 54,
+     "base": 100,
+     "set": 1794899610245,
+     "due": 1802675610245
+    }
+   ],
+   "ms": [
+    {
+     "goal": 25,
+     "hit": 1723469893613,
+     "est": true
+    },
+    {
+     "goal": 50,
+     "hit": 1747278987225,
+     "est": true
+    },
+    {
+     "goal": 75,
+     "hit": 1771088080838,
+     "est": true
+    },
+    {
+     "goal": 100,
+     "hit": 1794897174450,
+     "est": true
+    },
+    {
+     "goal": 150,
+     "set": 1794899610245,
+     "base": 100,
+     "eta0": "2028-08-01"
+    }
+   ]
+  },
+  "x": {
+   "dated": [
+    {
+     "T": 30,
+     "goal": 39,
+     "p": 61,
+     "base": 38,
+     "set": 1794899610245,
+     "due": 1797491610245
+    },
+    {
+     "T": 90,
+     "goal": 41,
+     "p": 56,
+     "base": 38,
+     "set": 1794899610245,
+     "due": 1802675610245
+    }
+   ],
+   "ms": [
+    {
+     "goal": 25,
+     "hit": 1770415172664,
+     "est": true
+    },
+    {
+     "goal": 50,
+     "set": 1794899610245,
+     "base": 38,
+     "eta0": "2027-10-13"
+    }
+   ]
+  }
  },
  "series": [
   {
@@ -13,6 +342,1325 @@
    "youtube": 42,
    "tiktok": 100,
    "x": 38
+  },
+  {
+   "t": 1794899610245,
+   "twitch": 274,
+   "youtube": 42,
+   "tiktok": 100,
+   "x": 38,
+   "ttv": 86,
+   "tth": 2032
   }
- ]
+ ],
+ "yt": {
+  "-Vugi6xrvz4": {
+   "v": [
+    [
+     1794899610245,
+     989
+    ]
+   ],
+   "title": "LAURGOD PLAYOFF 4K WHEN IT MATTERS MOST THROWBACK #ca2 #fyp #shorts #csgo #counterstrike #eboy",
+   "pub": 1794856856000,
+   "short": true,
+   "likes": 9
+  },
+  "qSVbafKlev4": {
+   "v": [
+    [
+     1794899610245,
+     8
+    ]
+   ],
+   "title": "THROWBACK 1v3 deagle only all headshots DEMON #cs2 #csgo #twitch #fyp #shorts #counterstrike",
+   "pub": 1794856818000,
+   "short": true,
+   "likes": 0
+  },
+  "cnyt-lqgESc": {
+   "v": [
+    [
+     1794899610245,
+     831
+    ]
+   ],
+   "title": "laursen classy 1v3 4k on match point #csgo #laursen_111 #gaming #twitch #cs2 #counterstrike #eboy",
+   "pub": 1794856782000,
+   "short": true,
+   "likes": 18
+  },
+  "cV3EgqBZYTk": {
+   "v": [
+    [
+     1794899610245,
+     364
+    ]
+   ],
+   "title": "#29 1NT vs #78 Strafe | ESEA Main S59 Game 2",
+   "pub": 1791429550000,
+   "short": false,
+   "likes": 0
+  },
+  "vSRlOidgdlQ": {
+   "v": [
+    [
+     1794899610245,
+     312
+    ]
+   ],
+   "title": "1NT vs p4s (Bo1) | ESEA Main NA S59 Game 1",
+   "pub": 1791343018000,
+   "short": false,
+   "likes": 0
+  },
+  "0whUsrfN0Ug": {
+   "v": [
+    [
+     1794899610245,
+     299
+    ]
+   ],
+   "title": "laursen 111 best in the world all headshots usp-s pistol | #laursen_111 on #Twitch",
+   "pub": 1791341348000,
+   "short": true,
+   "likes": 4
+  },
+  "eazuxKOQ4lY": {
+   "v": [
+    [
+     1794899610245,
+     522
+    ]
+   ],
+   "title": "pistol goat holyyyy | #laursen_111 on #Twitch",
+   "pub": 1790727884000,
+   "short": true,
+   "likes": 4
+  },
+  "LQ_2wx9__RQ": {
+   "v": [
+    [
+     1794899610245,
+     172
+    ]
+   ],
+   "title": "LAURSEN_111 ALL CLIPS/STREAM COMPIlATION 2024",
+   "pub": 1790107018000,
+   "short": false,
+   "likes": 10
+  },
+  "JMJw663SC0c": {
+   "v": [
+    [
+     1794899610245,
+     506
+    ]
+   ],
+   "title": "PISTOL USP 4K SITE HOLD ALL HEADSHOTS | #laursen_111 on #Twitch",
+   "pub": 1790039615000,
+   "short": true,
+   "likes": 5
+  },
+  "FlfgsFkymUQ": {
+   "v": [
+    [
+     1794899610245,
+     1329
+    ]
+   ],
+   "title": "CLUTCH 1V4 ALL HEADSHOTS AK47 BLINK AND YOULL MISS IT | #laursen_111 on #Twitch",
+   "pub": 1790039442000,
+   "short": true,
+   "likes": 10
+  },
+  "2Kfk3zTzd3g": {
+   "v": [
+    [
+     1794899610245,
+     92
+    ]
+   ],
+   "title": "1NT vs BIRB | ESEA Main S58 Playoffs LB2 (Nuke)",
+   "pub": 1788671613000,
+   "short": false,
+   "likes": 1
+  },
+  "5rgUAetSerQ": {
+   "v": [
+    [
+     1794899610245,
+     1473
+    ]
+   ],
+   "title": "1NT (#30) vs crescent (#51) | ESEA Main S58 Game 12",
+   "pub": 1787288661000,
+   "short": false,
+   "likes": 1
+  },
+  "B04HQ0wTSWk": {
+   "v": [
+    [
+     1794899610245,
+     1266
+    ]
+   ],
+   "title": "DEAGLE ALL HEADSHOT ECO ROUND 4K IN ESEA LEAGUE MATCH | #laursen_111 on #Twitch",
+   "pub": 1787280239000,
+   "short": true,
+   "likes": 21
+  },
+  "b7TkBrLSmTY": {
+   "v": [
+    [
+     1794899610245,
+     2953
+    ]
+   ],
+   "title": "laursen 3k + beasty flashes mid hold on cache | #laursen_111 on #Twitch",
+   "pub": 1786496716000,
+   "short": true,
+   "likes": 19
+  },
+  "krxcihGL7Ms": {
+   "v": [
+    [
+     1794899610245,
+     996
+    ]
+   ],
+   "title": "mirage ak47 ACE to end the game | #laursen_111 on #Twitch",
+   "pub": 1786143504000,
+   "short": true,
+   "likes": 21
+  }
+ },
+ "tw": {
+  "live": null,
+  "sessions": [],
+  "vods": []
+ },
+ "plan": {
+  "src": {
+   "yt": "rss",
+   "tw": "decapi",
+   "tt": "embed"
+  },
+  "ideas": [
+   {
+    "k": "YouTube post slot",
+    "v": "Fri · 8p ET",
+    "d": "766 expected views vs 565",
+    "n": 2
+   },
+   {
+    "k": "Shorts vs long",
+    "v": "Shorts",
+    "d": "996 vs 312 median views",
+    "n": 12
+   },
+   {
+    "k": "Batch uploads",
+    "v": "space out",
+    "d": "409 batched vs 522 solo",
+    "n": 9
+   },
+   {
+    "k": "Upload gap",
+    "v": "7.1 days",
+    "d": "3 in 30 days",
+    "n": 10
+   },
+   {
+    "k": "TikTok hearts",
+    "v": "23.6 / video",
+    "d": "86 videos · 1.16 followers / video",
+    "n": 86
+   },
+   {
+    "k": "Cross-post",
+    "v": "86 TikTok · 10 Shorts",
+    "d": "76 TikToks not on Shorts (feed shows latest 15)",
+    "n": 86
+   }
+  ],
+  "yt": {
+   "n": 15,
+   "nOld": 12,
+   "median": 514,
+   "shorts": {
+    "n": 7,
+    "med": 996
+   },
+   "long": {
+    "n": 5,
+    "med": 312
+   },
+   "batch": {
+    "n": 4,
+    "med": 409
+   },
+   "solo": {
+    "n": 5,
+    "med": 522
+   },
+   "last30": 3,
+   "gap": 7.1,
+   "vpd": null,
+   "subsPerK": null,
+   "likeRate": 0.93,
+   "grid": [
+    [
+     {
+      "n": 1,
+      "med": 92
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 2,
+      "med": 917.5
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 1,
+      "med": 172
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 4,
+      "med": 417
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 1,
+      "med": 364
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 1,
+      "med": 1266
+     }
+    ],
+    [
+     {
+      "n": 1,
+      "med": 1473
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 1,
+      "med": 996
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ]
+   ],
+   "base": 565,
+   "days": [
+    {
+     "d": "Sun",
+     "n": 1,
+     "med": 92,
+     "x": 359
+    },
+    {
+     "d": "Mon",
+     "n": 2,
+     "med": 917.5,
+     "x": 655
+    },
+    {
+     "d": "Tue",
+     "n": 5,
+     "med": 312,
+     "x": 508
+    },
+    {
+     "d": "Wed",
+     "n": 1,
+     "med": 364,
+     "x": 506
+    },
+    {
+     "d": "Thu",
+     "n": 1,
+     "med": 1266,
+     "x": 691
+    },
+    {
+     "d": "Fri",
+     "n": 2,
+     "med": 1234.5,
+     "x": 766
+    },
+    {
+     "d": "Sat",
+     "n": 0,
+     "med": null,
+     "x": null
+    }
+   ],
+   "blocks": [
+    {
+     "b": "12a",
+     "n": 2,
+     "med": 782.5,
+     "x": 476
+    },
+    {
+     "b": "4a",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "b": "8a",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "b": "12p",
+     "n": 1,
+     "med": 172,
+     "x": 420
+    },
+    {
+     "b": "4p",
+     "n": 1,
+     "med": 996,
+     "x": 651
+    },
+    {
+     "b": "8p",
+     "n": 8,
+     "med": 514,
+     "x": 645
+    }
+   ],
+   "ups": [
+    {
+     "id": "krxcihGL7Ms",
+     "title": "mirage ak47 ACE to end the game | #laursen_111 on #Twitch",
+     "pub": 1786143504000,
+     "short": true,
+     "views": 996,
+     "likes": 21,
+     "comments": null,
+     "age": 101.3,
+     "et": {
+      "d": 5,
+      "h": 18,
+      "b": 4
+     }
+    },
+    {
+     "id": "b7TkBrLSmTY",
+     "title": "laursen 3k + beasty flashes mid hold on cache | #laursen_111 on #Twitch",
+     "pub": 1786496716000,
+     "short": true,
+     "views": 2953,
+     "likes": 19,
+     "comments": null,
+     "age": 97.3,
+     "et": {
+      "d": 2,
+      "h": 21,
+      "b": 5
+     }
+    },
+    {
+     "id": "B04HQ0wTSWk",
+     "title": "DEAGLE ALL HEADSHOT ECO ROUND 4K IN ESEA LEAGUE MATCH | #laursen_111 on #Twitch",
+     "pub": 1787280239000,
+     "short": true,
+     "views": 1266,
+     "likes": 21,
+     "comments": null,
+     "age": 88.2,
+     "et": {
+      "d": 4,
+      "h": 22,
+      "b": 5
+     }
+    },
+    {
+     "id": "5rgUAetSerQ",
+     "title": "1NT (#30) vs crescent (#51) | ESEA Main S58 Game 12",
+     "pub": 1787288661000,
+     "short": false,
+     "views": 1473,
+     "likes": 1,
+     "comments": null,
+     "age": 88.1,
+     "et": {
+      "d": 5,
+      "h": 1,
+      "b": 0
+     }
+    },
+    {
+     "id": "2Kfk3zTzd3g",
+     "title": "1NT vs BIRB | ESEA Main S58 Playoffs LB2 (Nuke)",
+     "pub": 1788671613000,
+     "short": false,
+     "views": 92,
+     "likes": 1,
+     "comments": null,
+     "age": 72.1,
+     "et": {
+      "d": 0,
+      "h": 1,
+      "b": 0
+     }
+    },
+    {
+     "id": "FlfgsFkymUQ",
+     "title": "CLUTCH 1V4 ALL HEADSHOTS AK47 BLINK AND YOULL MISS IT | #laursen_111 on #Twitch",
+     "pub": 1790039442000,
+     "short": true,
+     "views": 1329,
+     "likes": 10,
+     "comments": null,
+     "age": 56.3,
+     "et": {
+      "d": 1,
+      "h": 21,
+      "b": 5
+     }
+    },
+    {
+     "id": "JMJw663SC0c",
+     "title": "PISTOL USP 4K SITE HOLD ALL HEADSHOTS | #laursen_111 on #Twitch",
+     "pub": 1790039615000,
+     "short": true,
+     "views": 506,
+     "likes": 5,
+     "comments": null,
+     "age": 56.2,
+     "et": {
+      "d": 1,
+      "h": 21,
+      "b": 5
+     }
+    },
+    {
+     "id": "LQ_2wx9__RQ",
+     "title": "LAURSEN_111 ALL CLIPS/STREAM COMPIlATION 2024",
+     "pub": 1790107018000,
+     "short": false,
+     "views": 172,
+     "likes": 10,
+     "comments": null,
+     "age": 55.5,
+     "et": {
+      "d": 2,
+      "h": 15,
+      "b": 3
+     }
+    },
+    {
+     "id": "eazuxKOQ4lY",
+     "title": "pistol goat holyyyy | #laursen_111 on #Twitch",
+     "pub": 1790727884000,
+     "short": true,
+     "views": 522,
+     "likes": 4,
+     "comments": null,
+     "age": 48.3,
+     "et": {
+      "d": 2,
+      "h": 20,
+      "b": 5
+     }
+    },
+    {
+     "id": "0whUsrfN0Ug",
+     "title": "laursen 111 best in the world all headshots usp-s pistol | #laursen_111 on #Twitch",
+     "pub": 1791341348000,
+     "short": true,
+     "views": 299,
+     "likes": 4,
+     "comments": null,
+     "age": 41.2,
+     "et": {
+      "d": 2,
+      "h": 22,
+      "b": 5
+     }
+    },
+    {
+     "id": "vSRlOidgdlQ",
+     "title": "1NT vs p4s (Bo1) | ESEA Main NA S59 Game 1",
+     "pub": 1791343018000,
+     "short": false,
+     "views": 312,
+     "likes": 0,
+     "comments": null,
+     "age": 41.2,
+     "et": {
+      "d": 2,
+      "h": 23,
+      "b": 5
+     }
+    },
+    {
+     "id": "cV3EgqBZYTk",
+     "title": "#29 1NT vs #78 Strafe | ESEA Main S59 Game 2",
+     "pub": 1791429550000,
+     "short": false,
+     "views": 364,
+     "likes": 0,
+     "comments": null,
+     "age": 40.2,
+     "et": {
+      "d": 3,
+      "h": 23,
+      "b": 5
+     }
+    },
+    {
+     "id": "cnyt-lqgESc",
+     "title": "laursen classy 1v3 4k on match point #csgo #laursen_111 #gaming #twitch #cs2 #counterstrike #eboy",
+     "pub": 1794856782000,
+     "short": true,
+     "views": 831,
+     "likes": 18,
+     "comments": null,
+     "age": 0.5,
+     "et": {
+      "d": 1,
+      "h": 14,
+      "b": 3
+     }
+    },
+    {
+     "id": "qSVbafKlev4",
+     "title": "THROWBACK 1v3 deagle only all headshots DEMON #cs2 #csgo #twitch #fyp #shorts #counterstrike",
+     "pub": 1794856818000,
+     "short": true,
+     "views": 8,
+     "likes": 0,
+     "comments": null,
+     "age": 0.5,
+     "et": {
+      "d": 1,
+      "h": 14,
+      "b": 3
+     }
+    },
+    {
+     "id": "-Vugi6xrvz4",
+     "title": "LAURGOD PLAYOFF 4K WHEN IT MATTERS MOST THROWBACK #ca2 #fyp #shorts #csgo #counterstrike #eboy",
+     "pub": 1794856856000,
+     "short": true,
+     "views": 989,
+     "likes": 9,
+     "comments": null,
+     "age": 0.5,
+     "et": {
+      "d": 1,
+      "h": 14,
+      "b": 3
+     }
+    }
+   ]
+  },
+  "tw": {
+   "n": 0,
+   "tracked": 0,
+   "hrs": 0,
+   "perWeek": null,
+   "avg": null,
+   "peak": null,
+   "lpH": null,
+   "opH": null,
+   "hLive": 0,
+   "hOff": 0.7,
+   "live": null,
+   "grid": [
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ],
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ],
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ],
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ],
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ],
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ],
+    [
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     },
+     {
+      "hrs": 0,
+      "n": 0,
+      "avg": null
+     }
+    ]
+   ],
+   "streams": []
+  },
+  "tt": {
+   "videos": 86,
+   "hearts": 2032,
+   "hpv": 23.6,
+   "newVideos": 0,
+   "newHearts": 0,
+   "fpv": 1.16,
+   "n": 10,
+   "views": 4470,
+   "median": 1008,
+   "vpd": null,
+   "hearts_t": [
+    [
+     1794899610245,
+     2032
+    ]
+   ],
+   "grid": [
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 3,
+      "med": 1008
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ],
+    [
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     },
+     {
+      "n": 0,
+      "med": null
+     }
+    ]
+   ],
+   "days": [
+    {
+     "d": "Sun",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "d": "Mon",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "d": "Tue",
+     "n": 3,
+     "med": 1008,
+     "x": 728
+    },
+    {
+     "d": "Wed",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "d": "Thu",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "d": "Fri",
+     "n": 0,
+     "med": null,
+     "x": null
+    },
+    {
+     "d": "Sat",
+     "n": 0,
+     "med": null,
+     "x": null
+    }
+   ],
+   "vids": [
+    {
+     "id": "7691117383066373390",
+     "desc": "pistol goat holyyyy | #laursen_111 on #Twitch",
+     "pub": 1790727810000,
+     "photo": false,
+     "views": 1008
+    },
+    {
+     "id": "7693726159439285518",
+     "desc": "laursen 111 best in the world all headshots usp-s pistol | #laursen_111 on #Twitch",
+     "pub": 1791335213000,
+     "photo": false,
+     "views": 1011
+    },
+    {
+     "id": "7693753520452865293",
+     "desc": "all my kills from our first esea league game of the season #laursen #fyp #cs2 #wow",
+     "pub": 1791341584000,
+     "photo": false,
+     "views": 379
+    },
+    {
+     "id": "7708839920646868237",
+     "desc": "classiest 1v3 4k anubis on game point ever ? #fyp #cs2 #csgo #counterstrike #faceit ",
+     "pub": 1794854160000,
+     "photo": false,
+     "views": 223
+    },
+    {
+     "id": "7708840753362996493",
+     "desc": "\"slap it on camera please\" #fyp",
+     "pub": 1794854354000,
+     "photo": false,
+     "views": 800
+    },
+    {
+     "id": "7708841279043407118",
+     "desc": "give me that shit boy !!! #fyp #cs2 #csgo #counterstrike #gamertok",
+     "pub": 1794854476000,
+     "photo": false,
+     "views": 292
+    },
+    {
+     "id": "7708842078356229389",
+     "desc": "LAURGOD 4K IN ESEA PLAYOFFS THROWBACK #fyp #cs2 #csgo #viral #gamertok",
+     "pub": 1794854662000,
+     "photo": false,
+     "views": 32
+    },
+    {
+     "id": "7708842952415563021",
+     "desc": "LAURGOD PLAYOFF 4K #FYP #CS2 #csgo #counterstrike #gamertok ",
+     "pub": 1794854866000,
+     "photo": false,
+     "views": 247
+    },
+    {
+     "id": "7708843806589750542",
+     "desc": "CS2 PLAYER PLAYS VAL NONCHALANT AURAFARMER ACE #fyp #valorant #valtok #gamertok #eboy",
+     "pub": 1794855065000,
+     "photo": false,
+     "views": 430
+    },
+    {
+     "id": "7708847220732349709",
+     "desc": "prerendered backgrounds and low poly gfx were peak... #fyp #zelda #oot #retro #nintendo64",
+     "pub": 1794855860000,
+     "photo": true,
+     "views": 48
+    }
+   ]
+  }
+ }
 }
