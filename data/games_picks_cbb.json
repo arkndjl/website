@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-17T17:36:11Z",
+ "asof": "2026-11-17T17:40:28Z",
  "recenter": {
   "2026-11-17": 1.97
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-17T17:11:55Z",
-  "ageH": 0.4,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -2280,22 +2280,6 @@
    "tm": 144.4
   },
   {
-   "id": "401921826",
-   "sport": "cbb",
-   "kick": "2026-11-18T01:00:00Z",
-   "home": "Vanderbilt",
-   "away": "Eastern Illinois",
-   "mk": "spread",
-   "side": "away",
-   "line": 42.5,
-   "price": -124.0,
-   "edge": 4.6,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": 37.9,
-   "tm": 145.4
-  },
-  {
    "id": "401925064",
    "sport": "cbb",
    "kick": "2026-11-18T01:30:00Z",
@@ -2376,6 +2360,22 @@
    "tm": 171.2
   },
   {
+   "id": "401921826",
+   "sport": "cbb",
+   "kick": "2026-11-18T01:00:00Z",
+   "home": "Vanderbilt",
+   "away": "Eastern Illinois",
+   "mk": "spread",
+   "side": "away",
+   "line": 41.5,
+   "price": -110.0,
+   "edge": 3.6,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 37.9,
+   "tm": 145.4
+  },
+  {
    "id": "401920194",
    "sport": "cbb",
    "kick": "2026-11-18T00:00:00Z",
@@ -2390,22 +2390,6 @@
    "why": "edge under 5 (role: dog)",
    "m": 12.9,
    "tm": 140.9
-  },
-  {
-   "id": "401926143",
-   "sport": "cbb",
-   "kick": "2026-11-18T01:00:00Z",
-   "home": "North Dakota",
-   "away": "SIU Edwardsville",
-   "mk": "total",
-   "side": "over",
-   "line": 144.5,
-   "price": -114.0,
-   "edge": 4.9,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 0.9,
-   "tm": 149.4
   },
   {
    "id": "401920953",
@@ -2550,6 +2534,22 @@
    "why": "edge under 5 (line: <4)",
    "m": 4.4,
    "tm": 137.1
+  },
+  {
+   "id": "401926143",
+   "sport": "cbb",
+   "kick": "2026-11-18T01:00:00Z",
+   "home": "North Dakota",
+   "away": "SIU Edwardsville",
+   "mk": "total",
+   "side": "over",
+   "line": 145.5,
+   "price": -114.0,
+   "edge": 3.9,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 0.9,
+   "tm": 149.4
   },
   {
    "id": "401906761",
@@ -2923,9 +2923,9 @@
   "401921826": {
    "mk": "spread",
    "side": "away",
-   "line": 42.5,
-   "price": -124.0,
-   "edge": 4.6,
+   "line": 41.5,
+   "price": -110.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "Vanderbilt",
@@ -3068,7 +3068,7 @@
    "mk": "total",
    "side": "over",
    "line": 146.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -3152,9 +3152,9 @@
   "401926143": {
    "mk": "total",
    "side": "over",
-   "line": 144.5,
+   "line": 145.5,
    "price": -114.0,
-   "edge": 4.9,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "North Dakota",
@@ -3274,25 +3274,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 18152,
+  "snapshots": 18159,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 562,
-    "clvRet": -0.017,
-    "clvT": -2.06,
+    "clvRet": -0.0169,
+    "clvT": -2.05,
     "clv": 0.48,
     "beat": 0.352,
     "still": 0.272
    },
    {
     "when": "6-24h",
-    "clvN": 3733,
-    "clvRet": -0.0144,
-    "clvT": -8.09,
-    "clv": 0.43,
-    "beat": 0.389,
-    "still": 0.425
+    "clvN": 3735,
+    "clvRet": -0.0139,
+    "clvT": -7.77,
+    "clv": 0.44,
+    "beat": 0.39,
+    "still": 0.424
    },
    {
     "when": "1-6h",
@@ -20230,7 +20230,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T17:36:11Z",
+ "checked": "2026-11-17T17:40:28Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
