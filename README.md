@@ -142,6 +142,8 @@ Before a commit lands, `python3 scripts/check_build.py` checks every JSON file u
 After a merge, run `python3 scripts/check_live.py` (polls until the live site serves your commit, 20 minute limit).
 The `deploy check` workflow does the same on every push to main and fails if the deploy never lands.
 
+The site Worker (`wrangler.toml`, code in `worker/site.js`) serves `public/` and runs code only for `/api/*`: `/api/plays`, the ST. CLAIRE song play counts, kept in a SQLite Durable Object that the deploy creates (no KV namespace or secret).
+
 If Cloudflare's Git build is stuck, the `deploy cloudflare` workflow (Actions tab, Run workflow) builds and deploys with wrangler.
 One-time setup from a computer:
 1. dash.cloudflare.com > My Profile > API Tokens > Create Token > "Edit Cloudflare Workers" template > Create. Copy the token.

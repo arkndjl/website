@@ -1,7 +1,20 @@
 name = "website"
 compatibility_date = "2026-02-14"
+# Worker code runs only for /api/* (the ST. CLAIRE play counter); every other path is plain static assets.
+main = "worker/site.js"
 
 [assets]
 directory = "./public/"
+binding = "ASSETS"
 not_found_handling = "404-page"
 html_handling = "auto-trailing-slash"
+run_worker_first = ["/api/*"]
+
+# Song play counts (worker/site.js PlayCounter). SQLite Durable Objects are created on deploy; nothing to set up.
+[[durable_objects.bindings]]
+name = "PLAYS"
+class_name = "PlayCounter"
+
+[[migrations]]
+tag = "v1-plays"
+new_sqlite_classes = ["PlayCounter"]
