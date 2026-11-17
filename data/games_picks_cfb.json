@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T12:01:18Z",
+ "asof": "2026-11-17T12:05:41Z",
  "recenter": {
-  "week": 0.28
+  "week": 0.29
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-17",
-  "ageH": -12.0,
+  "ageH": -11.9,
   "stale": false
  },
  "picks": [],
@@ -565,22 +565,6 @@
    "tm": 56.9
   },
   {
-   "id": "401862836",
-   "sport": "cfb",
-   "kick": "2026-11-22T01:00:00.000Z",
-   "home": "UAB",
-   "away": "UTSA",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -106.0,
-   "edge": 1.2,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -4.5,
-   "tm": 53.7
-  },
-  {
    "id": "401858307",
    "sport": "cfb",
    "kick": "2026-11-22T00:30:00.000Z",
@@ -620,9 +604,9 @@
    "away": "Memphis",
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "x": null,
    "why": "total market off",
    "m": -3.7,
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": 0.1,
    "tm": 50.2
+  },
+  {
+   "id": "401864542",
+   "sport": "cfb",
+   "kick": "2026-11-21T02:00:00.000Z",
+   "home": "Wyoming",
+   "away": "New Mexico",
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": -106.0,
+   "edge": 5.9,
+   "x": null,
+   "why": "spread market off",
+   "m": -13.4,
+   "tm": 39.6
   }
  ],
  "games": {
@@ -969,9 +969,9 @@
   "401862834": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "ev": null,
    "units": 0.0,
    "home": "Navy",
@@ -1075,16 +1075,16 @@
    "state": "under"
   },
   "401862836": {
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -106.0,
-   "edge": 1.2,
+   "mk": "spread",
+   "side": "home",
+   "line": -6.5,
+   "price": -124.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "UAB",
    "away": "UTSA",
-   "state": "under"
+   "state": "off"
   },
   "401858532": {
    "mk": "total",
@@ -1499,11 +1499,11 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 22149,
+  "snapshots": 22160,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4516,
+    "clvN": 4518,
     "clvRet": -0.046,
     "clvT": -34.23,
     "clv": 0.25,
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T12:01:18Z",
+ "checked": "2026-11-17T12:05:41Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
