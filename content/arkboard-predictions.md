@@ -63,7 +63,7 @@ cover = "/og/predictions.png"
 {{< propspaper tab="paper book" >}}
 {{< nflprops tab="paper book" >}}
 {{< /lazytab >}}
-{{< wintabs tab="players" tabs="NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players" sub="true" label="players views" >}}
+{{< wintabs tab="players" tabs="NBA players,CBB players,CFB players,NFL fantasy,NFL rankings,NFL breakouts" sub="true" label="players views" >}}
 {{< lazytab tab="NBA players" >}}
 {{< nbaplayers title="NBA players" tab="NBA players" >}}
 {{< propspaper title="NBA props :: paper book" tab="NBA players" >}}

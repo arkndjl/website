@@ -11,15 +11,16 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,standouts,next up,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,season odds,units,team WAR,all-time|market:contract value" side="true" label="NFL views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time|market:contract value" side="true" label="NFL views" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
 {{< xaav sport="nfl" title="contract value" tab="contract value" >}}
-{{< nflteamwar title="team WAR" tab="team WAR" >}}
 {{< rookies sport="nfl" icon="football" title="rookies" tab="rookies" >}}
+{{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
 {{< nflbreakouts title="standouts" tab="standouts" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="nfl" src="data/next-up/nfl-tab.json" icon="football" title="next up" tab="next up" >}}
 {{< /lazytab >}}
+{{< /wintabs >}}
 {{< awards sport="nfl" tab="awards" >}}
 {{< arklist sport="nfl" title="ARKLIST" tab="ARKLIST" >}}
 {{< nflgames title="games" tab="games" >}}
@@ -42,7 +43,7 @@ cover = "/og/nfl.png"
 {{< nflsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nfl" title="projected bracket" tab="bracket" icon="football" >}}{{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="units" tabs="offense,defense,formations,special teams" sub="true" label="units views" >}}
+{{< wintabs tab="units" tabs="offense,defense,formations,special teams,team WAR" sub="true" label="units views" >}}
 {{< lazytab tab="offense" >}}
 {{< teamunits sport="nfl" view="offense" title="offense" tab="offense" >}}
 {{< /lazytab >}}
@@ -55,6 +56,7 @@ cover = "/og/nfl.png"
 {{< lazytab tab="special teams" >}}
 {{< stteams sport="nfl" title="special teams" tab="special teams" >}}
 {{< /lazytab >}}
+{{< nflteamwar title="team WAR" tab="team WAR" >}}
 {{< /wintabs >}}
 {{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
 {{< lazytab tab="all-time teams" >}}

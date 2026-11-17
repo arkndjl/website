@@ -12,10 +12,8 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: players") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,RWA,RAR,xTV" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk cs__table">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Team</th>
-    <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
-    <th>Age</th>
-    <th data-vz class="cfb__g" title="RWA: round win % added per round, opponent-adjusted, 0 = the average tier-1 starter; recent maps count more (half-life {{ $f.params.h }} days)">RWA</th>{{ with $d.wkFrom }}<th data-num title="± = rank change in RWA since {{ (time .).Format "Jan 2" }}; hover for the rank and RWA change">±</th>{{ end }}
+    <th>RK</th><th>Player</th>{{ with $d.wkFrom }}<th data-num title="± = rank change in RWA since {{ (time .).Format "Jan 2" }}; hover for the rank and RWA change">±</th>{{ end }}
+    <th data-vz class="cfb__g" title="RWA: round win % added per round, opponent-adjusted, 0 = the average tier-1 starter; recent maps count more (half-life {{ $f.params.h }} days)">RWA</th>
     <th title="projected RWA in six months if still active: RWA and age, fit on the monthly boards since Jul 2024">6M</th>
     <th title="RWA change over the last 90 days">90d</th>
     <th title="rounds above replacement over the last year: extra rounds won against a median active pro in the same seat">RAR</th>
@@ -25,6 +23,9 @@
     <th class="hk__x" title="rounds with a kill, assist, survival or trade, last year">KAST</th>
     <th class="hk__x" title="opening kills minus opening deaths per 100 rounds, last year">Open</th>
     <th title="transfer value: what a buyout would cost, from the round wins he adds over two seasons (aging included), priced on reported fees">xTV</th>
+    <th>Team</th>
+    <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
+    <th>Age</th>
   </tr></thead>
   <tbody>
   {{- range .board }}{{ partial "cs2prow.html" (dict "r" . "ctry" $ctry "view" "board" "from" $d.wkFrom) }}{{ end }}

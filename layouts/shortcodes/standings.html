@@ -14,7 +14,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" $icon "tab" $tab) -}}
 <table class="cfb__table st-table">
   {{- $tip := dict "GP" "games played" "W" "wins" "L" "losses" "D" "draws" "T" "ties" "OTL" "overtime and shootout losses" "RW" "regulation wins" "GF" "goals for" "GA" "goals against" "GD" "goal difference" "Pts" "points" "PTS" "points" "PF" "points for" "PA" "points against" "Diff" "point differential" "PCT" "win percentage" "L10" "record, last 10 games" "Strk" "current streak" "GB" "games behind the leader" "PPG" "points a game" "Conf" "conference record" "Div" "division record" "Home" "home record" "Road" "road record" "Away" "road record" "Overall" "overall record" "vs AP" "record against AP top 25 teams" "#" "position" }}
-  <thead><tr><th{{ if .rankcol }} title="position"{{ end }}>{{ if .rankcol }}#{{ end }}</th><th>Team</th>{{ range $i, $c := .cols }}{{ if or (ne $i 0) (not $T.rankcol) }}<th{{ with index $tip $c }} title="{{ . }}"{{ end }}>{{ $c }}</th>{{ end }}{{ end }}</tr></thead>
+  <thead><tr><th title="{{ if .rankcol }}position{{ else }}place in the group{{ end }}">RK</th><th>Team</th>{{ range $i, $c := .cols }}{{ if or (ne $i 0) (not $T.rankcol) }}<th{{ with index $tip $c }} title="{{ . }}"{{ end }}>{{ $c }}</th>{{ end }}{{ end }}</tr></thead>
   <tbody>
   {{- range .groups }}
     {{- with .name }}<tr class="st-grp"><th colspan="{{ add (len $T.cols) 2 }}">{{ . }}</th></tr>{{ end }}

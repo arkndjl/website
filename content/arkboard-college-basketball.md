@@ -11,22 +11,24 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
-{{< wintabs tab="board" tabs="all,draft board,international" sub="true" label="board views" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,standouts,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs tab="board" tabs="all,international" sub="true" label="board views" >}}
 {{< cbbboard title="CBB 2026-27" tab="all" >}}
-{{< lazytab tab="draft board" >}}
-{{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board" tab="draft board" >}}
-{{< /lazytab >}}
 {{< lazytab tab="international" >}}
 {{< cbbintl title="international" tab="international" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< rookies sport="cbb" icon="basketball" title="true freshmen" tab="true freshmen" >}}
+{{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
 {{< lazytab tab="standouts" >}}
 {{< rookies sport="cbb" src="data/cbb/breakouts.json" icon="basketball" title="standouts" tab="standouts" >}}
 {{< /lazytab >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="cbb" src="data/next-up/cbb-tab.json" icon="basketball" title="next up" tab="next up" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< lazytab tab="draft board" >}}
+{{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board" tab="draft board" >}}
 {{< /lazytab >}}
 {{< awards sport="cbb" tab="awards" >}}
 {{< arklist sport="college-basketball" title="ARKLIST" tab="ARKLIST" >}}
