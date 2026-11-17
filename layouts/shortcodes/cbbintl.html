@@ -9,7 +9,7 @@
 {{- with $pro.rows }}{{ $c := $pro.cols }}
 {{- range . }}{{ $r := . }}{{ $m := dict }}{{ range $i, $k := $c }}{{ $m = merge $m (dict $k (index $r $i)) }}{{ end }}
 {{- $l := $m.last | default dict }}
-{{- $rows = $rows | append (dict "name" $m.name "nat" "" "prov" false "fv" $m.fv "fvx" $m.fvx "p" $m.nbaP "pos" $m.pos "age" $m.age "ht" $m.ht "club" $m.team "lg" ($m.conf | default "") "gp" ($l.gp | default 0) "mpg" ($l.mpg | default 0) "ppg" ($l.ppg | default 0) "path" "NBA draft" "rk" ($m.cons | default 0) "url" ($m.links.bbref | default "")) }}
+{{- $rows = $rows | append (dict "name" $m.name "nat" (index (site.Data.cbb_intl_nat.nat | default dict) $m.name | default "") "prov" false "fv" $m.fv "fvx" $m.fvx "p" $m.nbaP "pos" $m.pos "age" $m.age "ht" $m.ht "club" $m.team "lg" ($m.conf | default "") "gp" ($l.gp | default 0) "mpg" ($l.mpg | default 0) "ppg" ($l.ppg | default 0) "path" "NBA draft" "rk" ($m.cons | default 0) "url" ($m.links.bbref | default "")) }}
 {{- end }}{{ end -}}
 {{- with $y.intl }}{{ range . }}{{ $e := index .fiba 0 }}
 {{- $age := 0.0 }}{{ with .dob }}{{ $age = div (float (sub now.Unix (time .).Unix)) 31557600.0 }}{{ end }}
