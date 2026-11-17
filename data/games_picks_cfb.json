@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T03:04:07Z",
+ "asof": "2026-11-17T03:07:55Z",
  "recenter": {
-  "week": 0.3
+  "week": 0.29
  },
  "monitor": {
   "clocks": {
@@ -300,9 +300,9 @@
    "away": "Vanderbilt",
    "mk": "total",
    "side": "over",
-   "line": 46.5,
-   "price": -124.0,
-   "edge": 6.4,
+   "line": 47.5,
+   "price": -110.0,
+   "edge": 5.4,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
    "m": 10.5,
@@ -565,6 +565,22 @@
    "tm": 55.4
   },
   {
+   "id": "401869953",
+   "sport": "cfb",
+   "kick": "2026-11-21T21:00:00.000Z",
+   "home": "Troy",
+   "away": "Georgia Southern",
+   "mk": "total",
+   "side": "over",
+   "line": 47.5,
+   "price": -129.0,
+   "edge": 0.4,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -8.6,
+   "tm": 47.9
+  },
+  {
    "id": "401862834",
    "sport": "cfb",
    "kick": "2026-11-21T17:00:00.000Z",
@@ -659,22 +675,6 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 39.6
-  },
-  {
-   "id": "401860925",
-   "sport": "cfb",
-   "kick": "2026-11-22T02:30:00.000Z",
-   "home": "Boise State",
-   "away": "San Diego State",
-   "mk": "total",
-   "side": "under",
-   "line": 61.5,
-   "price": -106.0,
-   "edge": 5.1,
-   "x": null,
-   "why": "total market off",
-   "m": 19.5,
-   "tm": 56.4
   }
  ],
  "games": {
@@ -885,9 +885,9 @@
   "401856748": {
    "mk": "total",
    "side": "over",
-   "line": 46.5,
-   "price": -124.0,
-   "edge": 6.4,
+   "line": 47.5,
+   "price": -110.0,
+   "edge": 5.4,
    "ev": null,
    "units": 0.0,
    "home": "Florida",
@@ -922,7 +922,7 @@
    "mk": "spread",
    "side": "away",
    "line": -6.5,
-   "price": -120.0,
+   "price": -117.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -1220,15 +1220,15 @@
   },
   "401869953": {
    "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -124.0,
-   "edge": 0.6,
+   "side": "over",
+   "line": 47.5,
+   "price": -129.0,
+   "edge": 0.4,
    "ev": null,
    "units": 0.0,
    "home": "Troy",
    "away": "Georgia Southern",
-   "state": "off"
+   "state": "under"
   },
   "401866468": {
    "mk": "spread",
@@ -1293,9 +1293,9 @@
   "401871101": {
    "mk": "total",
    "side": "under",
-   "line": 65.5,
-   "price": -110.0,
-   "edge": 4.2,
+   "line": 66.5,
+   "price": -119.0,
+   "edge": 5.2,
    "ev": null,
    "units": 0.0,
    "home": "Southern Miss",
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21786,
+  "snapshots": 21796,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4399,
-    "clvRet": -0.0478,
-    "clvT": -35.27,
+    "clvN": 4402,
+    "clvRet": -0.0479,
+    "clvT": -35.3,
     "clv": 0.2,
     "beat": 0.339,
-    "still": 0.328
+    "still": 0.329
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T03:04:07Z",
+ "checked": "2026-11-17T03:07:55Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
