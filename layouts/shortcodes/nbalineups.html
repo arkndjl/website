@@ -7,7 +7,7 @@
        sNet / sOn-Off: shrunk toward 0 with the file's k / ko possessions (split-half fits, scripts/nba_lineups.py).
        Ranks follow the current sort and recount within the filters; headers sort. */ -}}
 {{- $view := .Get "view" | default "units" -}}
-<div class="win cfb nbaln" data-tab="{{ .Get "tab" | default "lineups" }}" data-nbaln="{{ $view }}" data-gfx-logo="/img/nba/{}.png" data-gfx-cols="{{ if eq $view "onoff" }}RK,Player,Team,MIN,On,Off,On-Off,sOn-Off{{ else }}RK,Lineup,MIN,Poss,Net,sNet{{ end }}" data-src="{{ "data/nba-lineups.json" | relURL }}?v={{ now.Unix }}">
+<div class="win cfb nbaln" data-tab="{{ .Get "tab" | default "lineups" }}" data-nbaln="{{ $view }}" data-gfx-logo="/img/nba/{}.png" data-gfx-cols="{{ if eq $view "onoff" }}RK,Player,Team,MIN,sOn-Off,On,Off{{ else }}RK,Lineup,MIN,Poss,Net,sNet{{ end }}" data-src="{{ "data/nba-lineups.json" | relURL }}?v={{ now.Unix }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "lineups" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -41,7 +41,9 @@
 .nbaln__table .nbaln__tm img { width: 18px; height: 18px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; }
 @media (max-width: 600px) {
   .nbaln__table .nbaln__x { display: none; }
-  .nbaln__table td.nbaln__who { min-width: 8em; }
+  .nbaln__table td.nbaln__who { min-width: 6em; font-size: .9em; }
+  .nbaln__table th, .nbaln__table td { padding: 4px 5px; }
+  .nbaln__table th { letter-spacing: 0; font-size: .8em; }
   .nbaln__table .nbaln__ab { display: none; }
 }
 </style>
@@ -61,7 +63,7 @@
   var MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   function gdate(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? 'updated ' + MON[+m[2] - 1] + ' ' + (+m[3]) + ', ' + m[1] : ''; }
   function cols(view, all) {
-    if (view === 'onoff') return [['rk', 'RK', 1], ['n', 'Player'], all ? ['t', 'Team'] : null, ['min', 'MIN', 1], ['on', 'On', 1, 'nbaln__x', 'team net per 100 with him on the floor'], ['off', 'Off', 1, 'nbaln__x', 'team net per 100 with him off the floor'], ['oo', 'On-Off', 1, 'nbaln__x', 'on minus off'], ['soo', 'sOn-Off', 1, '', 'on-off shrunk toward 0 by possessions']].filter(Boolean);
+    if (view === 'onoff') return [['rk', 'RK', 1], ['n', 'Player'], all ? ['t', 'Team'] : null, ['min', 'MIN', 1, 'nbaln__x'], ['soo', 'sOn-Off', 1, '', 'on-off shrunk toward 0 by possessions'], ['on', 'On', 1, '', 'team net per 100 with him on the floor'], ['off', 'Off', 1, '', 'team net per 100 with him off the floor'], ['oo', 'On-Off', 1, 'nbaln__x', 'on minus off, unshrunk']].filter(Boolean);
     return [['rk', 'RK', 1], ['n', 'Lineup'], ['min', 'MIN', 1], ['poss', 'Poss', 1, 'nbaln__x'], ['or', 'ORtg', 1, 'nbaln__x', 'points scored per 100 possessions'], ['dr', 'DRtg', 1, 'nbaln__x', 'points allowed per 100 possessions'], ['net', 'Net', 1, 'nbaln__x', 'ORtg - DRtg'], ['sn', 'sNet', 1, '', 'Net shrunk toward 0 by possessions']];
   }
   function init(W) {

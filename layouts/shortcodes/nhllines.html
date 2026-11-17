@@ -47,12 +47,12 @@
   }
   function onoff(T) {
     var h = '<div class="wintable__scroll"><table class="cfb__table"><thead><tr><th>Player</th><th>Pos</th><th class="nhll__w">GP</th><th title="5v5 minutes">min</th>' +
-      '<th class="nhll__w" title="share of goals with him on">GF%</th><th title="share of expected goals with him on">xGF%</th><th class="nhll__w" title="team xGF% in his games with him off">off</th><th title="on minus off, xGF%">rel</th>' +
+      '<th title="on minus off, xGF%">rel</th><th title="share of expected goals with him on">xGF%</th><th title="team xGF% in his games with him off">off</th><th class="nhll__w" title="share of goals with him on">GF%</th>' +
       '<th>linemate</th><th class="nhll__w" title="5v5 minutes together">min</th><th title="xGF% together">with</th><th class="nhll__w" title="his xGF% without that linemate">him w/o</th><th class="nhll__w" title="the linemate\'s xGF% without him">mate w/o</th></tr></thead><tbody>';
     T.skaters.forEach(function (s) {
       var m = s.mate || {};
       h += '<tr><td title="' + esc(s.n) + '"><b>' + esc(s.p) + '</b></td><td>' + esc(s.pos) + '</td><td class="cfb__num nhll__w">' + s.gp + '</td><td class="cfb__num">' + mins(s.min) + '</td>' +
-        '<td class="cfb__num nhll__w">' + pct(s.gfp) + '</td><td class="cfb__num">' + pct(s.xgfp) + '</td><td class="cfb__num nhll__w">' + pct(s.offx) + '</td><td class="cfb__num">' + rel(s.rel) + '</td>' +
+        '<td class="cfb__num">' + rel(s.rel) + '</td><td class="cfb__num">' + pct(s.xgfp) + '</td><td class="cfb__num">' + pct(s.offx) + '</td><td class="cfb__num nhll__w">' + pct(s.gfp) + '</td>' +
         '<td>' + esc(m.p || '—') + '</td><td class="cfb__num nhll__w">' + mins(m.min) + '</td><td class="cfb__num">' + pct(m.xgfp) + '</td><td class="cfb__num nhll__w">' + pct(m.apart) + '</td><td class="cfb__num nhll__w">' + pct(m.mateApart) + '</td></tr>';
     });
     return h + '</tbody></table></div>';
