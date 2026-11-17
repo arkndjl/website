@@ -91,6 +91,7 @@ import json
 import math
 import os
 import sys
+import re
 import time
 import urllib.request
 from collections import Counter, defaultdict
@@ -393,6 +394,8 @@ def play_prob(status, recent=True, practice=None, ctx=None, qfit=None):
         return 1.0
     if status.endswith(' (last week)'):
         return CARRY.get(status[:-12], 1.0)
+    if status.endswith(' (in game)'):
+        return INGAME.get(status[:-10], 1.0)
     if status == 'Out':
         return 0.0
     if status == 'Doubtful':
@@ -567,6 +570,14 @@ def modified(url):
 # next week's report, 2021-25 (scripts/nfl_inj_carry.py): cleared or listed with no designation (plays), questionable
 # again (plays at the questionable rate), doubtful, out. Players moved to a reserve list are left out: the roster has them.
 GAME_LEN = 4 * 3600         # kickoff to final whistle, with margin
+# news written during the team's last game ("won't return Sunday", "questionable to return"): the next game's play
+# rates (scripts/research/ingame_nov17: RotoWire 2024-26, PFR snaps; held 2025-26 log loss .853 -> .638, t -6.6, Brier
+# t -7.2, both seasons; carried at last week's rates failed, t +2.5). A firm read had Out at 0 and Questionable at .75.
+INGAME = {'Out': 0.196, 'Doubtful': 0.196, 'Questionable': 0.483}
+INGAME_H = 6 * 3600        # kickoff to this many hours after: the game's own news
+IG = re.compile(r"won't return|will not return|not return to|won't finish|ruled out for (the )?(rest|remainder)|done for the "
+                r"(day|night|game|evening)|\b(exits|leaves|exited|departs)\b|questionable to return|doubtful to return|"
+                r"carted off|out for the (rest|remainder) of|won't come back|not be returning|unlikely to return", re.I)
 CARRY = {'Questionable': 0.84, 'Doubtful': 0.55, 'Out': 0.38}
 LATE = 26 * 3600      # news this close to kickoff (Saturday's activations, gameday inactives) beats the final report
 INACT = 100 * 60      # gameday inactives post 90 minutes before kickoff; ESPN dates them then
@@ -698,7 +709,10 @@ def live_injuries(last, week, games):
                             hit = ids[0]; break
                     if hit:
                         r = ros[hit]
-                        put(team(r['team']), hit, r['full_name'], r['position'], stt, float(it['ts']), 'rotoballer', True)
+                        t_ = team(r['team'])
+                        if stt in INGAME and IG.search(it['title']) and lastko.get(t_, 0) <= float(it['ts']) <= lastko.get(t_, 0) + INGAME_H:
+                            stt += ' (in game)'
+                        put(t_, hit, r['full_name'], r['position'], stt, float(it['ts']), 'rotoballer', True)
                         n['rotoballer'] += 1
                         break
     except Exception as e:
@@ -713,6 +727,8 @@ def live_injuries(last, week, games):
             t = team(RW_TEAM.get(it['abbr'], it['abbr']))
             if not stt or t not in TEAMS:
                 continue
+            if stt in INGAME and IG.search(it['head']) and lastko.get(t, 0) <= float(it['ts']) <= lastko.get(t, 0) + INGAME_H:
+                stt += ' (in game)'
             ids = [x for x in by_name.get(_norm(it['player']), []) if team(ros[x]['team']) == t]
             gsis = ids[0] if len(ids) == 1 else None
             if not gsis:
@@ -1608,7 +1624,7 @@ def miss_later(table, status, j):
     (scripts/nfl_inj_hazard.py: league reports and weekly rosters 2016-25). Last week's designation, before this
     week's report, counts one game further on."""
     lw = status.endswith(' (last week)')
-    st, j = (status[:-12], j + 1) if lw else (status, j)
+    st, j = (status[:-12], j + 1) if lw else (status[:-10], j + 1) if status.endswith(' (in game)') else (status, j)
     t = table.get(st)
     if not t or j < 1:
         return 0.0
