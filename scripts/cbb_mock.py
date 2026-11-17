@@ -34,6 +34,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import names as N
+import cbb_boards as CB
 
 BOARDS_DIR = os.environ.get('CBB_BOARDS', '/mnt/project-files/cbb/boards')
 LIVE = ['tankathon_2027', 'cbs_2027', 'br_wasserman_2027', 'espn_woo_2027', 'fansided_2027', 'si_2027']
@@ -82,8 +83,14 @@ def draft_order(offline):
 
 
 # ---------------------------------------------------------------- consensus
-def consensus(boards):
-    """boards: list of lists of (name, school, pos, rank). Returns {key: dict(name, school, pos, cons score, ranks)}."""
+def wmedian(x, w):
+    o = np.argsort(x, kind='stable'); x, w = np.asarray(x, float)[o], np.asarray(w, float)[o]
+    return float(x[np.searchsorted(np.cumsum(w) / w.sum(), 0.5)])
+
+
+def consensus(boards, weights=None):
+    """boards: list of lists of (name, school, pos, rank); weights: one per board (the recency weight,
+    cbb_boards.live_boards), None = equal. Returns {key: dict(name, school, pos, cons score, ranks)}."""
     ppl = {}
     for b, rows in enumerate(boards):
         for name, school, pos, rk in rows:
@@ -99,7 +106,8 @@ def consensus(boards):
     depth = [max(r[3] for r in rows) for rows in boards]
     for p in ppl.values():
         rr = [p['ranks'].get(b, 1.5 * depth[b]) for b in range(len(boards))]
-        p['score'] = 0.5 * float(np.median(rr)) + 0.5 * float(np.mean(rr))
+        if weights is None: p['score'] = 0.5 * float(np.median(rr)) + 0.5 * float(np.mean(rr))
+        else: p['score'] = 0.5 * wmedian(rr, weights) + 0.5 * float(np.average(rr, weights=weights))
         p['nboards'] = len(p['ranks'])
     order = sorted(ppl, key=lambda k: (ppl[k]['score'], -ppl[k]['nboards']))
     for i, k in enumerate(order, 1): ppl[k]['cons'] = i
@@ -318,9 +326,9 @@ def noise_sd(noise, days):
     return bs[0]['sd'] if days >= 150 else bs[-1]['sd']
 
 
-def make_pool(boards, ours, slots, year, extra=40):
+def make_pool(boards, ours, slots, year, extra=40, weights=None):
     """consensus over boards, our board matched in, plus our top `extra` players no board has."""
-    ppl = consensus(boards)
+    ppl = consensus(boards, weights)
     idx = build_index(ours)
     pool = []
     seen = set()
@@ -330,7 +338,8 @@ def make_pool(boards, ours, slots, year, extra=40):
         pool.append({'name': p['name'], 'school': p['school'], 'pos': p['pos'], 'consScore': p['score'], 'ranks': p['ranks'],
                      'nboards': p['nboards'], 'ours': m})
     depth = [max(r[3] for r in b) for b in boards]
-    fill = 0.5 * float(np.median([1.5 * d for d in depth])) + 0.5 * float(np.mean([1.5 * d for d in depth]))
+    wt = weights if weights is not None else [1.0] * len(depth)
+    fill = 0.5 * wmedian([1.5 * d for d in depth], wt) + 0.5 * float(np.average([1.5 * d for d in depth], weights=wt))
     for r in sorted(ours, key=lambda r: -G(r))[:extra]:
         if id(r) in seen: continue
         pool.append({'name': r['name'], 'school': r['school'], 'pos': r.get('pos'), 'consScore': fill + 1, 'ranks': {}, 'nboards': 0, 'ours': r})
@@ -498,9 +507,9 @@ def save_live_boards():
 
 
 def live_pool():
-    boards = []   # every board in scripts/data/cbb_boards: the research copies plus what the weekly pull adds (ESPN, NBADraft.net)
-    for f in sorted(x for x in os.listdir(LIVE_DIR) if x.endswith('.csv')):
-        boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv(f, LIVE_DIR)])
+    import cbb_boards as CB
+    LB = CB.live_boards()   # every board in scripts/data/cbb_boards, with its recency weight
+    boards, wts = [b['rows'] for b in LB], [b['w'] for b in LB]
     a = json.load(open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')))
     ours = [dict(zip(a['cols'], r)) for r in a['rows']]
     # the internationals on the same FV scale (scripts/cbb_intl.py): they carry our FV and age, no college BPM
@@ -512,7 +521,7 @@ def live_pool():
     # board entrants from our side: FV 40+ (one-and-done or upperclass) the boards have not listed (40 on the mean
     # scale, Oct 21 2026, is the old 75th-percentile 50: about the top 15 on the board)
     top = [r for r in ours if G(r) >= 40]
-    pool = make_pool(boards, top, None, 2027, extra=len(top))
+    pool = make_pool(boards, top, None, 2027, extra=len(top), weights=wts)
     # players a board lists who are on our board below FV 40: match against everyone
     idx = build_index(ours)
     for p in pool:
@@ -723,7 +732,7 @@ def main():
         for m in mocks.values(): photos.attach('cbb', m, team='school')
     except Exception as e:
         print('mock photos skipped', e)
-    out = {'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'orderAsof': order_asof, 'boards': nb, 'pool': len(pool),
+    out = {'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'orderAsof': order_asof, 'boards': nb, 'sources': CB.source_list(), 'pool': len(pool),
            'staying': [{'name': (p['ours'] or {}).get('name') or p['name'], 'school': (p['ours'] or {}).get('team') or p['school'],
                         'cls': (p['ours'] or {}).get('cls'), 'cons': p['cons'] if p['nboards'] else None, 'declare': round(p['declare'], 3)}
                        for p in sorted(staying, key=lambda p: p['cons'])],

@@ -4,6 +4,7 @@
 board rank on a given day to the June rank it predicts (audit item #23, Oct 25 2026).
 
     python3 scripts/cbb_boards.py --pull    # weekly (cbb-boards.yml): re-pull the live boards into scripts/data/cbb_boards/
+    python3 scripts/cbb_boards.py --articles  # the one-off articles in ARTICLES (rerun after swapping in a newer URL)
     python3 scripts/cbb_boards.py --fit     # the dated rank -> June map and its backtest -> scripts/data/cbb_board_att.json
                                             # (needs the board history in /mnt/project-files/cbb/boards or $CBB_BOARDS)
 
@@ -37,6 +38,57 @@ YEAR = 2027
 MIN_ROWS = 25
 COLS = ['source', 'draft_year', 'board_date', 'rank', 'name', 'school', 'pos']
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
+
+
+# who each board in scripts/data/cbb_boards is: file stem -> (analyst, outlet, kind). One board per analyst: the
+# newest of his big board and his mock.
+SOURCES = {
+    'espn_woo': ('Jeremy Woo', 'ESPN', 'board'),
+    'br_wasserman': ('Jonathan Wasserman', 'Bleacher Report', 'mock'),
+    'floorandceiling': ('Wilko Martinez', 'Floor and Ceiling', 'board'),
+    'noceilings': ('No Ceilings staff', 'No Ceilings', 'board'),
+    'fansided': ('Christopher Kline', 'FanSided', 'board'),
+    'clutchpoints': ('Bailey Bassett', 'ClutchPoints', 'mock'),
+    'nbadraftnet': ('Aran Smith', 'NBADraft.net', 'mock'),
+    'cbs': ('Kyle Boone', 'CBS Sports', 'board'),
+    'tankathon': ('Tankathon', 'Tankathon', 'board'),
+    'si': ('Kevin Sweeney', 'Sports Illustrated', 'board'),
+    'espn': ('Givony / Woo', 'ESPN', 'board'),
+}
+# recency weight on each board: 0.5 ** (days older than the newest board / HALF_LIFE). Tested Nov 17 2026
+# (scripts/research/cbb_consensus_nov17/recency.py): ESPN + NBADraft.net finals plus one older No Ceilings board,
+# drafts 2022-26, real slot: mean |ln slot err| .3144 equal -> .3011 held out (t 8.0, 5/5 drafts); 7-30 days flat
+# (.3007-.3008), 30 kept to leave stale independent boards some say. No Ceilings versions alone: .500 -> .423 (t 10, 4/5).
+HALF_LIFE = 30.0
+
+
+def live_boards():
+    """the current boards in scripts/data/cbb_boards: [{src, date, rows [(name, school, pos, rank)], age, w}], age in
+    days behind the newest board, w the recency weight."""
+    out = []
+    for f in sorted(x for x in os.listdir(LIVE_DIR) if x.endswith('.csv')) if os.path.isdir(LIVE_DIR) else []:
+        with open(os.path.join(LIVE_DIR, f), newline='', encoding='utf-8') as fh:
+            R = list(csv.DictReader(fh))
+        if not R: continue
+        d = R[0]['board_date'] if re.match(r'\d{4}-\d\d-\d\d$', R[0]['board_date'] or '') else None
+        out.append({'src': f[:-4].replace(f'_{YEAR}', ''), 'date': d,
+                    'rows': [(r['name'], r['school'], r['pos'], int(r['rank'])) for r in R]})
+    dates = [b['date'] for b in out if b['date']]
+    top = max(dates) if dates else None
+    for b in out:
+        b['age'] = (datetime.date.fromisoformat(top) - datetime.date.fromisoformat(b['date'])).days if b['date'] and top else 0
+        b['w'] = 0.5 ** (b['age'] / HALF_LIFE)
+    return out
+
+
+def source_list(boards=None):
+    """the boards as the site lists them, newest first"""
+    out = []
+    for b in boards if boards is not None else live_boards():
+        a, o, k = SOURCES.get(b['src'], (b['src'], '', 'board'))
+        out.append({'src': b['src'], 'analyst': a, 'outlet': o, 'kind': k, 'date': b['date'], 'n': len(b['rows']),
+                    'w': round(b['w'], 3)})
+    return sorted(out, key=lambda x: (x['date'] or '', x['n']), reverse=True)
 
 
 def days_to_draft(date, year=YEAR):
@@ -222,8 +274,36 @@ def pull_cbs():
     rows = []
     for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', t, flags=re.S):
         c = [re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', x))).strip() for x in re.findall(r'<td[^>]*>(.*?)</td>', tr, flags=re.S)]
-        if len(c) >= 5 and c[0].isdigit(): rows.append((int(c[0]), c[1], c[2], c[4]))
+        if len(c) >= 5 and c[0].isdigit() and re.search(r'[A-Za-z]{2}', c[1]): rows.append((int(c[0]), c[1], c[2], c[4]))   # skip stat lines
     return 'cbs', time.strftime('%Y-%m-%d'), consecutive(rows)
+
+
+def substack_posts(api, q):
+    """a Substack archive search. Since Nov 2026 the API refuses limit/offset and wraps the list in {'posts': [...]}"""
+    try: j = json.loads(curl(f'{api}/archive?sort=new&search={q}') or '[]')
+    except ValueError: return []
+    return j.get('posts', []) if isinstance(j, dict) else j
+
+
+def pull_floorandceiling():
+    """Wilko Martinez's newest 2027 big board (Floor and Ceiling, Substack; the free part runs '1. Name' then
+    'POS | SCHOOL | BIRTHDAY | COUNTRY')."""
+    api = 'https://floorandceiling.substack.com/api/v1'
+    posts = sorted((p for p in substack_posts(api, f'{YEAR}%20big%20board') if re.match(rf'^{YEAR}-nba-draft-big-board', p.get('slug', ''))),
+                   key=lambda p: p['post_date'])
+    if not posts: return 'floorandceiling', None, []
+    p = posts[-1]
+    try: body = json.loads(curl(f"{api}/posts/{p['slug']}") or '{}').get('body_html') or ''
+    except ValueError: body = ''
+    L = _nc_lines(body)
+    out = []
+    for i, l in enumerate(L[:-1]):
+        m = re.match(r"^(\d{1,3})\.\s+([A-Za-zÀ-ɏ'’][^|]{1,40})$", l)
+        parts = [x.strip() for x in L[i + 1].split('|')]
+        if m and len(parts) >= 3:
+            sch = parts[1] if len(parts[1]) <= 4 else re.sub(r"(?<=['’])S\b", 's', parts[1].title())   # BYU, UCONN stay caps
+            out.append((int(m.group(1)), m.group(2).strip(), sch, parts[0].title()))
+    return 'floorandceiling', p['post_date'][:10], consecutive(sorted(out))
 
 
 def _nc_lines(body):
@@ -235,8 +315,7 @@ def _nc_lines(body):
 def pull_noceilings():
     """the newest 2027 No Ceilings composite ('#N. Name | POS | School', their 2025+ layout)."""
     api = 'https://www.noceilingsnba.com/api/v1'
-    try: arr = json.loads(curl(f'{api}/archive?sort=new&search=big%20board&offset=0&limit=50') or '[]')
-    except ValueError: arr = []
+    arr = substack_posts(api, 'big%20board')
     posts = sorted((p for p in arr if re.match(rf'^{YEAR}-nba-draft-big-board(-v\d+)?$', p.get('slug', ''))), key=lambda p: p['post_date'])
     if not posts: return 'noceilings', None, []
     p = posts[-1]
@@ -285,28 +364,119 @@ def pull_nbadraftnet():
         c = dict(re.findall(r'<td class="([a-z]+)">(.*?)</td>', tr, flags=re.S))
         if 'rank' in c and strip(c['rank']).isdigit():
             rows.append((int(strip(c['rank'])), strip(c.get('name', '')), strip(c.get('team', '')), strip(c.get('teamposition', ''))))
-    return 'nbadraftnet', time.strftime('%Y-%m-%d'), consecutive(sorted(rows))
+    rows = consecutive(sorted(rows))
+    if len(rows) >= MIN_ROWS: return 'nbadraftnet', time.strftime('%Y-%m-%d'), rows
+    # 2027 big board still empty: their live mock ('Updated: YYYY-MM-DD'), # | Team | Player | H | W | P | School | Yr
+    h = curl(f'https://www.nbadraft.net/nba-mock-drafts/?year-mock={YEAR}')
+    d = re.search(r'Updated:\s*(\d{4}-\d\d-\d\d)', h)
+    # long names are cut ('Hugo Yimga Mouko...'): the player link's slug has the whole name
+    h = re.sub(r'<a href="[^"]*/players/([a-z0-9-]+)/?">([^<]*?)\.\.\.</a>',
+               lambda m: m.group(2) + m.group(1).replace('-', ' ')[len(m.group(2)):], h)
+    t = html.unescape(re.sub(r'<[^>]+>', '\n', re.sub(r'(?s)<(script|style)[^>]*>.*?</\1>', '', h)))
+    L = [x.strip() for x in t.split('\n') if x.strip()]
+    out = []
+    for i in range(len(L) - 7):
+        if L[i].isdigit() and re.match(r'^\d-\d{1,2}$', L[i + 3]) and L[i + 4].isdigit():
+            out.append((int(L[i]), L[i + 2], L[i + 6], L[i + 5]))
+    return 'nbadraftnet', d.group(1) if d else None, consecutive(sorted(set(out)))
+
+
+# ---------------------------------------------------------------- one-off articles (--articles)
+# The newest free article per analyst. When one posts a newer board or mock, swap the URL and rerun --articles.
+ARTICLES = {
+    'espn_woo': 'https://abc7.com/post/2027-nba-draft-big-board-rankings-top-100-prospects/20017483/',   # ESPN, syndicated
+    'br_wasserman': 'https://bleacherreport.com/articles/25520687-new-2027-nba-mock-draft-college-basketball-season-tips',
+    'fansided': 'https://fansided.com/nba/2027-nba-draft-big-board-top-60-prospects-as-college-basketball-gets-underway',
+    'clutchpoints': 'https://clutchpoints.com/nba/nba-stories/2027-nba-mock-draft-1st-round-predictions-after-one-week-college-hoops',
+}
+
+
+def _lines(h):
+    t = html.unescape(re.sub(r'<[^>]+>', '\n', re.sub(r'(?s)<(script|style)[^>]*>.*?</\1>', '', h)))
+    return [re.sub(r'\s+', ' ', x).strip() for x in t.split('\n') if x.strip()]
+
+
+def _published(h):
+    m = re.search(r'"datePublished"\s*:\s*"(\d{4}-\d\d-\d\d)', h)
+    return m.group(1) if m else None
+
+
+def parse_article(src, h):
+    L = _lines(h); rows = []
+    if src == 'espn_woo':            # '7.' | 'Name' | ', POS, School' (or '2. Name, POS, Club')
+        for i, l in enumerate(L):
+            m = re.match(r'^(\d{1,3})\.\s*(.*)$', l)
+            if not m: continue
+            txt = m.group(2) or ''
+            j = i + 1
+            while (not txt or txt.count(',') < 2 or txt.rstrip().endswith(',')) and j < min(i + 5, len(L)):
+                txt += (' ' if txt and not L[j].startswith(('.', ',')) else '') + L[j]; j += 1
+            parts = [x.strip() for x in txt.split('|')[0].split(',')]
+            if len(parts) >= 3 and 1 < len(parts[0]) <= 40:
+                rows.append((int(m.group(1)), parts[0], re.sub(r'\s*Age:.*$', '', parts[2]).strip(), parts[1]))
+    elif src == 'br_wasserman':      # '1. Sacramento Kings: Tyran Stokes (Kansas)'
+        for l in L:
+            m = re.match(r'^(\d{1,2})\.\s+[^:]+:\s+(.+?)\s+\(([^)]+)\)$', l)
+            if m: rows.append((int(m.group(1)), m.group(2), m.group(3), ''))
+    elif src == 'fansided':          # '1. Tyran Stokes' | 'G-F' | 'Kansas'
+        for i, l in enumerate(L[:-2]):
+            m = re.match(r'^(\d{1,2})\.\s+(.{2,40})$', l)
+            if not m: continue
+            nm, *rest = [x.strip() for x in m.group(2).split('|')]
+            if len(rest) >= 2: rows.append((int(m.group(1)), nm, rest[1], rest[0]))
+            elif len(L[i + 1]) <= 6: rows.append((int(m.group(1)), nm, L[i + 2], L[i + 1]))
+    elif src == 'clutchpoints':      # '1. New Orleans Pelicans (via Bucks): Tyran Stokes, Kansas'
+        for l in L:
+            m = re.match(r'^(\d{1,2})\.\s+[^:]+:\s+([^,]+),\s*(.+)$', l)
+            if m: rows.append((int(m.group(1)), m.group(2).strip(), m.group(3).strip(), ''))
+        # a pick run into the paragraph before it ('... 13. Charlotte Hornets (via Mavericks): Dame Sarr, Duke Dame Sarr would')
+        have, txt = {r[0] for r in rows}, ' '.join(L)
+        for n in range(1, 31):
+            if n in have: continue
+            m = re.search(rf'(?<![\d$]){n}\.\s+[A-Z][^:]{{2,45}}:\s+([A-Z][^,]{{2,40}}),\s+', txt)
+            if not m: continue
+            first = m.group(1).split()[0]
+            sch = re.match(rf'(.+?)\s+{re.escape(first)}\b', txt[m.end():m.end() + 80])
+            if sch: rows.append((n, m.group(1).strip(), sch.group(1).strip(), ''))
+    seen, out = set(), []
+    for r in sorted(rows):
+        if r[0] not in seen: seen.add(r[0]); out.append(r)
+    return consecutive(out)
+
+
+def main_articles():
+    for src, url in ARTICLES.items():
+        h = curl(url)
+        rows, date = parse_article(src, h), _published(h)
+        if len(rows) < MIN_ROWS or not date:
+            print(f'{src}: {len(rows)} rows, kept the last copy'); continue
+        write_board(src, date, rows)
+
+
+def write_board(src, date, rows):
+    p = os.path.join(LIVE_DIR, f'{src}_{YEAR}.csv')
+    with open(p, 'w', newline='', encoding='utf-8') as o:
+        w = csv.writer(o); w.writerow(COLS)
+        w.writerows([[src, YEAR, date, rk, nm, sc, ps] for rk, nm, sc, ps in rows])
+    print(f'{src}: {len(rows)} rows ({date}), top 3:', ', '.join(r[1] for r in rows[:3]))
 
 
 def main_pull():
     os.makedirs(LIVE_DIR, exist_ok=True)
     changed = 0
-    for fn in (pull_tankathon, pull_cbs, pull_noceilings, pull_espn, pull_nbadraftnet):
+    for fn in (pull_tankathon, pull_cbs, pull_noceilings, pull_floorandceiling, pull_espn, pull_nbadraftnet):
         try: src, date, rows = fn()
         except Exception as e:      # one source down never stops the others
             print(fn.__name__, 'failed:', e); continue
         if len(rows) < MIN_ROWS or not date:
             print(f'{src}: {len(rows)} rows, kept the last pull'); continue
-        p = os.path.join(LIVE_DIR, f'{src}_{YEAR}.csv')
-        with open(p, 'w', newline='', encoding='utf-8') as o:
-            w = csv.writer(o); w.writerow(COLS)
-            w.writerows([[src, YEAR, date, rk, nm, sc, ps] for rk, nm, sc, ps in rows])
+        write_board(src, date, rows)
         changed += 1
-        print(f'{src}: {len(rows)} rows ({date}), top 3:', ', '.join(r[1] for r in rows[:3]))
     print(changed, 'boards refreshed')
 
 
 if __name__ == '__main__':
     if '--fit' in sys.argv: main_fit()
     elif '--pull' in sys.argv: main_pull()
+    elif '--articles' in sys.argv: main_articles()
     else: sys.exit(__doc__)

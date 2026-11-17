@@ -942,16 +942,11 @@ def _att(C):
 def live_consensus(names_teams):
     """-ln consensus rank on the current boards (scripts/data/cbb_boards, cbb_mock.consensus) for each (name, team),
     None when no board lists him."""
-    import csv
-    base = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_boards')
-    files = sorted(f for f in os.listdir(base) if f.endswith('.csv')) if os.path.isdir(base) else []
-    if not files: return [None] * len(names_teams)
+    import cbb_boards as CB
+    LB = CB.live_boards()          # with each board's recency weight
+    if not LB: return [None] * len(names_teams)
     import cbb_mock as M
-    boards = []
-    for f in files:
-        with open(os.path.join(base, f), newline='', encoding='utf-8') as fh:
-            boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in csv.DictReader(fh)])
-    ppl = M.consensus(boards)
+    ppl = M.consensus([b['rows'] for b in LB], [b['w'] for b in LB])
     idx = M.build_index([{'name': p['name'], 'school': p['school'], 'cons': p['cons']} for p in ppl.values()])
     import names as N
     # the matcher's last step takes the name alone when the boards list one player by it; the D-I board can hold two

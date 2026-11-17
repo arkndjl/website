@@ -875,9 +875,10 @@ def overseas_lines(L, LF, names_now):
 def live_population(teams):
     """internationals on the current boards: not on a D-I roster, not at a college or G League team."""
     import cbb_mock as M
-    files = sorted(f for f in os.listdir(LIVE_BOARDS) if f.endswith('.csv'))
-    boards = [[(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv(os.path.join(LIVE_BOARDS, f))] for f in files]
-    ppl = M.consensus(boards)
+    import cbb_boards as CB
+    LB = CB.live_boards()          # with each board's recency weight
+    files = [b['src'] + '_2027.csv' for b in LB]
+    ppl = M.consensus([b['rows'] for b in LB], [b['w'] for b in LB])
     a = json.load(open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')))
     ours = {D.norm(r[0]) for r in a['rows']}
     teams = set(teams) | {D.norm(r[1]).replace('st', 'state') for r in a['rows']}
