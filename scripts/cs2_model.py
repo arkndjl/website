@@ -65,6 +65,9 @@ TUNE = ("2024-08-07", "2025-06-30")
 HELD = ("2025-07-01", "2099-12-31")
 BURN = "2024-03-15"
 TOP = 50
+# rebrands: the new name plays on the old name's five until the new key has a roster of its own in the data
+# (ratings follow the players; the new name keeps its display name and logo). GOSH = BC.Game's roster (Nov 2026)
+RENAMED = {"gosh": "bcgame"}
 DEF = {"K": 480, "Kmin": 144, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0, "kmap": 0.6, "span": 0.4,
        "valid": 1}  # valid: only maps played to the end (13+ rounds) update on round share (forfeits are listed 1-0)
 OLD = {"K": 160, "Kmin": 32, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0}  # the Oct 26 series-level model
@@ -425,7 +428,12 @@ def build():
         ta, tb = bo3.team_of(ka), bo3.team_of(kb)
         return tm.chance(ta, tb, bo, today) if ta and tb and ta != tb else 0.0
 
+    def rated(k):   # a rebrand with no roster yet rates as its old name's five (RENAMED)
+        o = RENAMED.get(k)
+        return o if o and not st["lastros"].get(k) and st["lastros"].get(o) else k
+
     def logit_ab(ka, kb, bo=3, w=None):
+        ka, kb = rated(ka), rated(kb)
         xa, va, ra = strength(ka)
         xb, vb, rb = strength(kb)
         if w is None:
