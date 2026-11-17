@@ -11,6 +11,7 @@ QB, OL and defense are not scaled (their workload is the snap count; it does not
 
 Feature columns live here so the research fit and the live board build them the same way."""
 import csv
+import gzip
 import datetime as dt
 import json
 import math
@@ -67,7 +68,7 @@ def load_players(fresh=False):
             continue
         info[g] = {'n': r['display_name'], 'birth': r['birth_date'], 'ht': num(r['height']), 'wt': num(r['weight']),
                    'pick': int(num(r['draft_pick'])), 'rookie': int(num(r['rookie_season'])), 'img': r['headshot'],
-                   'team': r.get('latest_team') or '', 'last': int(num(r.get('last_season')))}
+                   'otc': r.get('otc_id') or '', 'team': r.get('latest_team') or '', 'last': int(num(r.get('last_season')))}
         if r['pfr_id']:
             pfr[r['pfr_id']] = g
     return info, pfr
@@ -244,9 +245,13 @@ def predict(fit, a, hist, dU):
 
 
 # ---------- breakout odds ----------
-LINE = {'RB': 12.0, 'WR': 12.0, 'TE': 9.0}          # a fantasy starter's PPR points a game (scripts/nfl_fantasy.py BO_LINE)
+# the quality bar L: PPR points a game of a clearly good player with a real role, the 79th (RB, WR) and 81st (TE)
+# percentile of 2010-25 seasons with 8+ games and 60+ / 40+ / 25+ opportunities, shrunk as below (also the fantasy
+# starter line, scripts/nfl_fantasy.py BO_LINE)
+LINE = {'RB': 12.0, 'WR': 12.0, 'TE': 9.0}
 REP = {'RB': 4.0, 'WR': 4.0, 'TE': 2.5}             # a depth player's PPR points a game
-K_SHR, JUMP, G_NEXT = 4.0, 4.0, 8
+K_SHR, G_NEXT = 4.0, 8
+CAREER = 14                                         # seasons back that count as his career to date
 BO_MIN_G, BO_MIN_N = 4, 15
 BO_CANDS = ('age curve', 'experience and draft', 'low-volume efficiency', 'old room', 'TD luck', 'projection gap',
             'role trend', 'snap role', 'workload scaling', 'vacated work')
@@ -257,12 +262,19 @@ BO_LABEL = {'age curve': 'age', 'experience and draft': 'draft', 'low-volume eff
 
 
 def eligible(P, a):
-    """not yet a starter: under the line this season (shrunk) and in every 8+ game season of the eight before"""
+    """not broken out yet: under the bar (shrunk) this season and in every season before it, real role or not"""
     ln = LINE[a['pos']]
-    if shr(a) >= ln:
-        return False
-    return not any(o['g'] >= G_NEXT and o['ppg'] >= ln
-                   for o in (P.get((a['pid'], s)) for s in range(a['y'] - 8, a['y'])) if o)
+    return shr(a) < ln and not any(shr(o) >= ln for o in (P.get((a['pid'], s)) for s in range(a['y'] - CAREER, a['y'])) if o)
+
+
+def broke_out(a, b):
+    """b = the next season: at or over the bar (shrunk) with a real role"""
+    return bool(b and b['g'] >= G_NEXT and shr(b) >= LINE[a['pos']])
+
+
+def best(P, a):
+    """his best shrunk PPR points a game so far, this season included"""
+    return max(shr(o) for o in (P.get((a['pid'], s)) for s in range(a['y'] - CAREER, a['y'] + 1)) if o)
 
 
 def shr(a):
@@ -333,12 +345,163 @@ def bo_feats(fit, a, hist, old, vac):
             'vacated work': [vac]}
 
 
+# ---------- improvement sweep signals (prereg: project files next-up/prereg-nfl.md) ----------
+GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
+SWEEP = ('draft development curve', 'position age curves', 'draft round steps', 'depth chart', 'depth contracts',
+         'opportunity model', 'new head coach next season', 'head coach year one', 'QB change next season',
+         'offense environment', 'in-season trend', 'snap trend', 'peak window', 'targets per snap')
+SWEEP_RO = ('new head coach next season', 'QB change next season')      # next season's facts: never served in-season
+SWEEP_LABEL = {'draft development curve': 'dev curve', 'position age curves': 'age', 'draft round steps': 'draft',
+               'depth chart': 'depth', 'depth contracts': 'room opens', 'opportunity model': 'role ahead',
+               'head coach year one': 'new coach', 'offense environment': 'offense', 'in-season trend': 'trending',
+               'snap trend': 'snaps up', 'peak window': 'peak games', 'targets per snap': 'demand'}
+TPS_MEAN = {'WR': 0.25, 'TE': 0.23, 'RB': 0.47}     # opportunities per snap-share of the team's, league mean
+
+
+def team_context(fresh=False):
+    """(team, season) -> head coach of the first and last game, most frequent starting QB and the share of games
+    someone else started (nfldata games.csv, REG)"""
+    p = get('games.csv', GAMES, fresh)
+    T = defaultdict(list)
+    for g in (csv.DictReader(open(p, newline='', encoding='utf-8')) if p else ()):
+        if g['game_type'] != 'REG':
+            continue
+        done = g['home_score'] not in ('', 'NA')
+        for side in ('home', 'away'):
+            t = FRANCHISE.get(g[side + '_team'], g[side + '_team'])
+            T[(t, int(g['season']))].append((int(g['week']), g[side + '_coach'], g[side + '_qb_id'] if done else ''))
+    C = {}
+    for k, L in T.items():
+        L.sort()
+        qb = defaultdict(int)
+        for _, _, q in L:
+            if q:
+                qb[q] += 1
+        played = [x for x in L if x[2]]
+        main = max(qb, key=qb.get) if qb else ''
+        C[k] = {'hc0': L[0][1], 'hc1': (played or L)[-1][1], 'qb': main,
+                'qb_other': 1 - qb[main] / len(played) if played else 0.0}
+    return C
+
+
+def load_contracts(info, fresh=False):
+    """gsis -> [(year signed, last season covered)] from OverTheCap history (nflverse contracts)"""
+    p = get('historical_contracts.csv.gz', f'{REL}/contracts/historical_contracts.csv.gz', fresh)
+    otc = {i['otc']: g for g, i in info.items() if i.get('otc')}
+    K = defaultdict(list)
+    if p:
+        with gzip.open(p, 'rt', encoding='utf-8', newline='') as f:
+            for r in csv.DictReader(f):
+                g = otc.get(r['otc_id'])
+                ys, n = int(num(r['year_signed'])), int(num(r['years']))
+                if g and ys and n:
+                    K[g].append((ys, ys + n - 1))
+    return K
+
+
+def expiring(K, pid, y):
+    c = [k for k in K.get(pid, ()) if k[0] <= y]
+    return bool(c) and max(c)[1] == y
+
+
+def depth(P, y, K):
+    """per player: depth rank in his team's group (RB; WR + TE) by opportunities a game, and what those ahead hold"""
+    grp = defaultdict(list)
+    for (pid, s), o in P.items():
+        if s == y:
+            grp[(o['tm'], o['pos'] == 'RB')].append(o)
+    D = {}
+    for (tm, rb), L in grp.items():
+        tot = sum(o['n'] for o in L) or 1.0
+        for o in L:
+            ah = [q for q in L if q is not o and q['g'] >= 4 and q['n'] / q['g'] > o['n'] / o['g']]
+            n = sum(q['n'] for q in ah)
+            D[o['pid']] = {'rank': min(4, 1 + len(ah)), 'ahead': n / tot,
+                           'ahead_age': n / tot * (sum(q['n'] * q['age'] for q in ah) / n - 27) if n else 0.0,
+                           'ahead_exp': sum(q['n'] for q in ah if expiring(K, q['pid'], y)) / tot,
+                           'ahead_old': sum(q['n'] for q in ah if q['age'] >= (28 if rb else 30)) / tot}
+    return D
+
+
+def offense(P, y):
+    """team -> receiving yards a target and (RB) rushing yards a carry against the league that season"""
+    T = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
+    for (pid, s), o in P.items():
+        if s == y:
+            rb = o['pos'] == 'RB'
+            for g in o['games']:
+                t = T[g['tm']]
+                t[0] += g['wy']
+                t[1] += g['tg']
+                t[2] += g['ry'] * rb
+                t[3] += g['ca'] * rb
+    lw = sum(t[0] for t in T.values()) / (sum(t[1] for t in T.values()) or 1)
+    lr = sum(t[2] for t in T.values()) / (sum(t[3] for t in T.values()) or 1)
+    return {tm: (t[0] / t[1] - lw if t[1] else 0.0, t[2] / t[3] - lr if t[3] else 0.0) for tm, t in T.items()}
+
+
+def op_row(a, d):
+    """inputs of the opportunity model (next-season share from the depth chart)"""
+    pos = a['pos']
+    snap = a['snap'] if a['snap'] is not None else SNAPMEAN[pos]
+    return [a['u'] / UREF[pos], snap, d['rank'], d['ahead'], d['ahead_age'], a['age'], math.log(a['pick']),
+            min(a['exp'], 4), part(a, a['games'][-5:])['u'] / UREF[pos], float(pos == 'RB'), float(pos == 'TE')]
+
+
+def sweep_feats(a, d, C, off, op=None):
+    """the prereg's A-tests; op = (b0, b) of the opportunity model when one is fit"""
+    pos, y, tm = a['pos'], a['y'], a['tm']
+    rb, te = float(pos == 'RB'), float(pos == 'TE')
+    agec, lp, e4, early = a['age'] - 26, math.log(a['pick']), min(a['exp'], 4), float(a['exp'] <= 2)
+    r1, r23 = float(a['pick'] <= 32), float(32 < a['pick'] <= 100)
+    c0, c1, cp = C.get((tm, y)) or {}, C.get((tm, y + 1)) or {}, C.get((tm, y - 1)) or {}
+    G = a['games']
+    h = len(G) // 2
+    trend = [0.0, 0.0, 0.0]
+    if len(G) >= 4:
+        f1, f2 = part(a, G[:h]), part(a, G[h:])
+        sn = (f2['snap'] - f1['snap']) if f1['snap'] is not None and f2['snap'] is not None else 0.0
+        trend = [f2['ppg'] - f1['ppg'], (f2['u'] - f1['u']) / UREF[pos], sn]
+    sv = [g['snap'] for g in G]
+    st = [0.0, 0.0]
+    if a['snap'] is not None and all(v is not None for v in sv):
+        if len(G) >= 6:
+            st[0] = sum(sv[-4:]) / 4 - sum(sv[:4]) / 4
+        if len(G) >= 3:
+            st[1] = max(sum(sv[i:i + 3]) / 3 for i in range(len(G) - 2)) - a['snap']
+    pk = max(sum(g['ppr'] for g in G[i:i + 3]) / 3 for i in range(len(G) - 2)) if len(G) >= 3 else a['ppg']
+    tps = [0.0, 0.0]
+    if a['snap']:
+        den = sum((g['snap'] or 0.0) * ((g['tca'] + g['ttg']) if rb else g['ttg']) for g in G)
+        if den > 0:
+            v = (a['n'] / den * a['n'] + TPS_MEAN[pos] * 100) / (a['n'] + 100) - TPS_MEAN[pos]
+            tps = [v, v * max(0.0, UREF[pos] - a['u']) / 10.0]
+    o = off.get(tm, (0.0, 0.0))
+    F = {'draft development curve': [agec * lp, e4, e4 * lp],
+         'position age curves': [agec * rb, agec * te, agec * agec * rb, agec * agec * te],
+         'draft round steps': [r1, r23, r1 * early, r23 * early],
+         'depth chart': [d['rank'], d['ahead'], d['ahead_age']],
+         'depth contracts': [d['ahead_exp'], d['ahead_old']],
+         'new head coach next season': [float(bool(c1) and bool(c0) and c1['hc0'] != c0['hc1'])],
+         'head coach year one': [float(bool(cp) and bool(c0) and cp['hc1'] != c0['hc1'])],
+         'QB change next season': [float(bool(c1.get('qb')) and bool(c0.get('qb')) and c1['qb'] != c0['qb'])],
+         'offense environment': [o[1] if rb else o[0], c0.get('qb_other', 0.0)],
+         'in-season trend': trend, 'snap trend': st,
+         'peak window': [pk / LINE[pos], float(sum(g['ppr'] >= 1.5 * LINE[pos] for g in G))],
+         'targets per snap': tps}
+    if op:
+        x = op_row(a, d)
+        u1 = op[0] + sum(b * v for b, v in zip(op[1], x))
+        F['opportunity model'] = [u1 / UREF[pos], u1 / UREF[pos] - a['u'] / UREF[pos]]
+    return F
+
+
 # ---------- live board ----------
 def build():
     fit = json.load(open(FIT))
     info, pfr = load_players(True)
     y = dt.date.today().year - (dt.date.today().month < 8)
-    P = load(y - 8, y, info, pfr, fresh_last=True)
+    P = load(y - CAREER, y, info, pfr, fresh_last=True)
     if not any(s == y for _, s in P):
         y -= 1
     week = max(g['wk'] for (pid, s), o in P.items() if s == y for g in o['games'])
@@ -381,17 +544,22 @@ def build():
                      'age': round(cur + (dt.date.today() - dt.date(y, 9, 1)).days / 365.25, 1) if cur else None,
                      'ph': img.replace('/f_auto,q_auto/', '/f_auto,q_auto,w_96/') if img.startswith('https://') else None,
                      'lo': lo if os.path.exists(os.path.join(ROOT, 'static', lo.lstrip('/'))) else None,
-                     'p': round(p, 3), 'u': round(a['u'], 1), 't': t,
+                     'p': round(p, 3), 'best': round(best(P, a), 1), 'u': round(a['u'], 1), 't': t,
                      'sig': [BO_LABEL[k] for v, k in push[:2] if v > 0.1]})
     rows.sort(key=lambda r: -r['p'])
     fin = bo['final']
+    sw = fit.get('sweep') or {}
+    sw = (f"; {len(sw['tests'])} more pre-registered signals, model forms and recalibrations tested, "
+          f"{sum(t['pass'] for t in sw['tests'].values())} passed") if sw else ''
     sl = '; '.join(f"{p} {fit['scaling'][p]['causal']['use']:+.3f} (measured {fit['scaling'][p]['causal']['iv']:+.3f}, "
                    f"t {fit['scaling'][p]['causal']['t']})" for p in POS)
-    about = (f"WR, TE, RB not yet starters (QB, OL and defense are not scaled). breakout: next season {G_NEXT}+ games at a "
-             f"fantasy starter's PPR points a game (RB/WR {LINE['WR']:g}, TE {LINE['TE']:g}), {JUMP:g}+ over this season's "
-             f"(shrunk to a depth player's by {K_SHR:g} games), never at the line before; base {y} through week {week}; odds "
+    about = (f"WR, TE, RB who have not broken out: no season so far, this one included, at the bar L = RB/WR "
+             f"{LINE['WR']:g}, TE {LINE['TE']:g} PPR points a game shrunk to a depth player's by {K_SHR:g} games (L is the "
+             f"{bo['L_pct']} of seasons with a real role); anyone at or over L is left out. QB, OL and defense are not "
+             f"scaled. breakout: next season at or over L with {G_NEXT}+ games, for the first time; base {y} through week "
+             f"{week}; odds "
              f"= logistic on shrunk PPR/G, ln opportunities, position, share + {', '.join(keep)} (each passes "
-             f"leave-one-season-out {bo['seasons']}, final t {fin['t']}, {fin['won']}/{fin['seasons']} seasons). SHARE: WR/TE "
+             f"leave-one-season-out {bo['seasons']}, final t {fin['t']}, {fin['won']}/{fin['seasons']} seasons{sw}). SHARE: WR/TE "
              f"share of team targets, RB share of team carries + targets. tiers: that many share points more; Y/OPP = "
              f"next-season yards per target (RB: per carry or target) from his rate shrunk for sample, age and last season, "
              f"plus yards per opportunity per added share point where teammates leaving the lineup forced the change: {sl}; "

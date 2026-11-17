@@ -366,7 +366,8 @@ def predict(fit, side, a, hist, dU):
 
 
 # ---------- B. breakout odds ----------
-K_SHR, REP, JUMP = 4.0, -1.0, 0.75
+K_SHR, REP = 4.0, -1.0
+L_PCT = 0.775        # the quality bar: this quantile of regulars' shrunk score z (set in the fit json as 'L')
 BO_CANDS = ('class curve', 'low-volume efficiency', 'vacated workload', 'recruiting grade', 'projection gap',
             'finishing luck', 'workload room', 'workload scaling', 'frame', 'level')
 BO_LABEL = {'class curve': 'class', 'low-volume efficiency': 'low-vol eff', 'vacated workload': 'open role',
@@ -376,6 +377,16 @@ BO_LABEL = {'class curve': 'class', 'low-volume efficiency': 'low-vol eff', 'vac
 
 def shr(vz, v):
     return (vz * v + REP * K_SHR) / (v + K_SHR)
+
+
+def best(hist):
+    """the best shrunk score z of his seasons so far (None with no season)"""
+    return max((shr(o['vz'], o['v']) for o in hist), default=None)
+
+
+def career(P, pid, y):
+    """every season on file through y (the not-yet-broken-out test looks at all of them)"""
+    return [o for (i, s), o in P.items() if i == pid and s <= y]
 
 
 def marcel(hist, y):
@@ -422,6 +433,120 @@ def vacated(P, gone):
     return V
 
 
+# ---------- improvement sweep: extra signal blocks, splines, trees (shared by the research fit and the live build) ----------
+COACH = os.path.join(ROOT, 'scripts', 'data', 'coach_alltime_src.json.gz')
+STAFF = os.path.join(ROOT, 'data', 'cfb_staff.json')
+EXTRA = ('position class curve', 'recruit development', 'depth opportunity', 'coaching change', 'skill profile',
+         'career to date')
+BO_LABEL.update({'position class curve': 'pos curve', 'recruit development': 'recruit', 'depth opportunity': 'depth',
+                 'coaching change': 'new staff', 'skill profile': 'profile', 'career to date': 'career'})
+
+
+def _ck(n):
+    import names as NM
+    return NM.key(re.sub(r'\s*\(.*?\)', '', n or ''))
+
+
+def staff_index(live=None, board_ids=None):
+    """{(team key, season): (head coaches, offensive coordinators, defensive coordinators)} as name-key sets: the
+    all-time coach rows, plus the live season from data/cfb_staff.json (board_ids: {team name: ESPN team id})"""
+    import names as NM
+    ST = {}
+    for r in json.load(gzip.open(COACH))['cfb']['rows']:
+        if r['y'] >= 2017:
+            ST[(NM.team_key(r['t']), r['y'])] = ({_ck(c[0]) for c in r.get('cs') or []}, {_ck(c) for c in r.get('oc') or []},
+                                                 {_ck(c) for c in r.get('dc') or []})
+    if live and board_ids and os.path.exists(STAFF):
+        teams = json.load(open(STAFF))['teams']
+        for name, tid in board_ids.items():
+            t = teams.get(str(tid))
+            if not t:
+                continue
+            nm = lambda k: {_ck(x) for x in ((t.get(k) or {}).get('names') or [(t.get(k) or {}).get('name')]) if x}  # noqa: E731
+            ST[(NM.team_key(name), live)] = (nm('hc'), nm('oc'), nm('dc'))
+    return ST
+
+
+def staff_feats(o, ST):
+    import names as NM
+    tk = NM.team_key(o['tm'])
+    a, b = ST.get((tk, o['y'])), ST.get((tk, o['y'] - 1))
+    if not a or not b or not a[0] or not b[0]:
+        return [0.0, 0.0, 0.0]
+    i = 1 if o['g'] in OFF else 2
+    return [0.0 if a[0] & b[0] else 1.0, 1.0 if (a[i] and b[i] and not a[i] & b[i]) else 0.0, 1.0]
+
+
+def depth(P):
+    """who is ahead of him at his team and position group: count, the share held by those in year 4+, the returning
+    ones' quality, his own share"""
+    grp = defaultdict(list)
+    for o in P.values():
+        grp[(o['tm'], o['y'], GROUP[o['g']])].append(o)
+    D = {}
+    for key, o in P.items():
+        g = grp[(o['tm'], o['y'], GROUP[o['g']])]
+        tot = sum(x['opp'] for x in g)
+        ah = [x for x in g if x['opp'] > o['opp']]
+        back = [x for x in ah if x['yrs'] < 4]
+        wb = sum(x['opp'] for x in back)
+        D[key] = [min(len(ah), 4) / 4, sum(x['opp'] for x in ah if x['yrs'] >= 4) / tot,
+                  sum(x['opp'] * x['vz'] for x in back) / wb if wb else 0.0, o['opp'] / tot]
+    return D
+
+
+def extra_feats(a, dep, stf, earlier, Lq):
+    """the sweep's candidate blocks. earlier = his seasons on file before this one"""
+    yc = a['yrs'] - 2.5
+    sc = a['stars'] - 3
+    top = best(earlier + [a])
+    return {'position class curve': [yc if a['g'] == g else 0.0 for g in POS[1:]],
+            'recruit development': [sc, a['unr'], sc * yc, sc * yc * yc, a['unr'] * yc],
+            'depth opportunity': list(dep),
+            'coaching change': list(stf),
+            'skill profile': [a['prof'], a['prof2'], a['recsh']],
+            'career to date': [0.0 if earlier else 1.0, math.log(1 + sum(o['v'] for o in earlier)), Lq - top]}
+
+
+SPLINE = ('s0', 'lnv', 'yc', 'gap')
+
+
+def spline_raw(a, s0, mar):
+    return [s0, math.log(a['v']), a['yrs'] - 2.5, mar - s0]
+
+
+def hinges(raw, knots):
+    """piecewise-linear terms: max(0, x - knot) for each top feature's knots"""
+    return [max(0.0, x - k) for x, ks in zip(raw, knots) for k in ks]
+
+
+def tree_score(trees, x):
+    """sum of the leaf values of serialized depth-limited trees: node = [feature, threshold, left, right] or [leaf]"""
+    s = 0.0
+    for t in trees:
+        n = t
+        while len(n) == 4:
+            n = n[2] if x[n[0]] <= n[1] else n[3]
+        s += n[0]
+    return s
+
+
+def recal(p, cal):
+    """the shipped recalibration: Platt (a + b logit p) or isotonic knots, or nothing"""
+    if not cal:
+        return p
+    if cal['kind'] == 'platt':
+        p = min(max(p, 1e-6), 1 - 1e-6)
+        return 1 / (1 + math.exp(-(cal['a'] + cal['b'] * math.log(p / (1 - p)))))
+    xs, ys = cal['x'], cal['y']
+    if p <= xs[0]:
+        return ys[0]
+    for i in range(1, len(xs)):
+        if p <= xs[i]:
+            return ys[i - 1] + (ys[i] - ys[i - 1]) * (p - xs[i - 1]) / ((xs[i] - xs[i - 1]) or 1)
+    return ys[-1]
+
+
 # ---------- live build ----------
 def main():
     import names as NM
@@ -453,8 +578,16 @@ def main():
             return 1 - b['stayP']
         return 1.0 if (b.get('cls') or '').endswith(('Sr', 'Gr')) else 0.25
     V = vacated(cur, gone)
+    by_id = defaultdict(list)
+    for (pid, y), o in P.items():
+        by_id[pid].append(o)
     bo = fit['breakout']
-    keep = bo['keep']
+    keep, fb = bo['keep'], bo['fit']
+    fb.setdefault('form', 'logistic')
+    fb.setdefault('extra', [])
+    D = depth(cur)
+    ST = staff_index(live, {o['tm']: re.search(r'/(\d+)\.png', o['b'].get('logo') or '/0.png').group(1)
+                            for o in cur.values() if o.get('b')})
     tiers = fit['tiers']
     rows = []
     for key, o in cur.items():
@@ -464,17 +597,29 @@ def main():
         if o['u0'] < bo['u0_min'][o['g']]:
             continue                                      # a workload smaller than any the fit has seen at the position
         hist = history(P, o['id'], live)
+        top = best(by_id[o['id']])
+        if top >= bo['L']:
+            continue                                      # already at the quality bar this season or an earlier one
         s0, mar = shr(o['vz'], o['v']), marcel(hist, live)
         f = bo_feats(o, s0, V[key], mar)
-        x = f['base'] + sum([f[k] for k in keep], [])
-        eta = bo['fit']['b0'] + sum(c * v for c, v in zip(bo['fit']['b'], x))
-        p = 1 / (1 + math.exp(-eta))
-        nb, parts, i = len(f['base']), [], len(f['base'])
-        for k in keep:
-            n = len(f[k])
-            parts.append((sum(c * (v - m) for c, v, m in zip(bo['fit']['b'][i:i + n], f[k], bo['fit']['mu'][i:i + n])), k))
-            i += n
-        sig = [BO_LABEL[k] for c, k in sorted(parts, reverse=True)[:2] if c > 0.1]
+        f.update(extra_feats(o, D[key], staff_feats(o, ST), [x for x in by_id[o['id']] if x['y'] < live], bo['L']))
+        blocks = keep + fb['extra']
+        x = f['base'] + sum([f[k] for k in blocks], [])
+        if fb['form'].startswith('trees'):
+            if fb.get('all_columns'):
+                x = f['base'] + sum([f[k] for k in keep + list(EXTRA) + [c for c in BO_CANDS if c not in keep]], [])
+            p, sig = 1 / (1 + math.exp(-(fb['f0'] + tree_score(fb['trees'], x)))), []
+        else:
+            if fb.get('knots'):
+                x = x + hinges(spline_raw(o, s0, mar), fb['knots'])
+            p = 1 / (1 + math.exp(-(fb['b0'] + sum(c * v for c, v in zip(fb['b'], x)))))
+            parts, i = [], len(f['base'])
+            for k in blocks:
+                n = len(f[k])
+                parts.append((sum(c * (v - m) for c, v, m in zip(fb['b'][i:i + n], f[k], fb['mu'][i:i + n])), k))
+                i += n
+            sig = list(dict.fromkeys(BO_LABEL[k] for c, k in sorted(parts, reverse=True)[:2] if c > 0.1))
+        p = recal(p, fb.get('cal'))
         side = 'off' if o['g'] in OFF else 'def'
         t = []
         sc = fit['scaling'].get(side)
@@ -495,7 +640,7 @@ def main():
         rows.append({'id': m.group(1) if m else o['id'], 'n': b['name'], 'tm': b['team'],
                      'pos': 'DT' if o['g'] == 'DL' else o['g'], 'age': b.get('age') or b.get('ageEst'),
                      'ph': ph or None, 'lo': b.get('logo'), 'sub': b.get('conf') or '', 'cls': b.get('cls'),
-                     'p': round(p, 3), 'u': round(o['u'], 1), 't': t, 'sig': sig})
+                     'p': round(p, 3), 'best': round(top, 2), 'u': round(o['u'], 1), 't': t, 'sig': sig})
     rows.sort(key=lambda r: -r['p'])
     rows = rows[:400]
     sc = fit['scaling']['off']

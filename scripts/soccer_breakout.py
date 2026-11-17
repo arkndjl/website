@@ -25,7 +25,7 @@ LOGOS = os.path.join(ROOT, 'data', 'soccer_logos.json')
 LG = {'eng.1': 'EPL', 'esp.1': 'LaLiga', 'ger.1': 'BuLi', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1'}
 PH = 'https://img.a.transfermarkt.technology/portrait/medium/'
 
-SUM = ('min', 'mp', 'st', 'g', 'a', 'npxg', 'xa', 'xg', 'sh', 'kp', 'ch', 'bu', 'gar')
+SUM = ('min', 'mp', 'st', 'g', 'a', 'npxg', 'xa', 'xg', 'sh', 'kp', 'ch', 'bu', 'gar', 'off', 'def')
 TARGETS = ('eff',)
 MEAN = {'eff': 0.10}
 K_INV = 40.0          # shot involvements that carry half the weight of a season's efficiency
@@ -80,6 +80,7 @@ def load(S):
         o['tsh'] = sum(T[r['team']]['sh90'] * r['min'] for r in rs) / o['min']
         o['tx'] = sum(T[r['team']]['x90'] * r['min'] for r in rs) / o['min']
         o['g90'] = o['gar'] * 90.0 / o['min']
+        o['onxgd'] = sum((r.get('onxgd') or 0.0) * r['min'] for r in rs) / o['min']
         P[p] = o
     return P, dict(T), {k: J.get(k) for k in ('games', 'asof', 'label')}
 
@@ -180,7 +181,7 @@ def predict(fit, tgt, a, hist, dT, dU):
 
 
 # ---------- breakout odds ----------
-K_SHR, JUMP, MIN_NEXT, MIN_BASE = 600.0, 0.06, 1500, 450
+K_SHR, LEVEL, MIN_NEXT, MIN_BASE = 600.0, 0.09, 1500, 450   # LEVEL: the quality bar, shrunk GAR a 90
 BO_CANDS = ('age curve', 'low-workload efficiency', 'vacated minutes', 'finishing luck', 'projection gap',
             'minutes room', 'workload scaling', 'team move', 'club strength', 'market value')
 BO_LABEL = {'age curve': 'age', 'low-workload efficiency': 'low-vol eff', 'vacated minutes': 'open minutes',
@@ -228,14 +229,63 @@ def bo_feats(a, s0, ref, vac, mar, moved, dTx):
             'market value': [has * math.log(mv / xmv) if has else 0.0, has * math.log(mv) if has else 0.0, has]}
 
 
-def bo_row(a, hist, Tb, team_now, stay):
-    """(shrunk GAR a 90, best shrunk GAR a 90 to date, breakout feature dict) of base season a for a player now at
-    team_now (stay = ids at that side now)"""
+# ---------- signals of the improvement sweep (scripts/soccer_breakout_sweep_research.py) ----------
+BO_EXTRA = ('position age curve', 'pedigree x age', 'depth opportunity', 'coaching change', 'within-season trend',
+            'on-pitch impact', 'league')
+BO_LABEL.update({'position age curve': 'age', 'pedigree x age': 'pedigree', 'depth opportunity': 'depth',
+                 'coaching change': 'new coach', 'within-season trend': 'trend', 'on-pitch impact': 'on-pitch',
+                 'league': 'league'})
+
+
+def bo_extra(a, s0, mates, coach, half, lg_now):
+    """mates: base-season rows of the other players now at his club; coach: (new head coach at his club this summer,
+    change at his base club during the base season) or None; half: (first-half minutes, first-half npxG + xA,
+    second-half starts, second-half team matches) or None; lg_now: the league he is in now"""
+    age, mn = (a['age'] or 26.0) - 24, a['min']
+    F, Dd = float(a['pos'] == 'F'), float(a['pos'] == 'D')
+    mv = a.get('mv')
+    lmv = math.log(mv) if mv and mv > 0 else None
+    ahead = [o for o in mates if o['pos'] == a['pos'] and shr(o['g90'], o['min']) > s0]
+    am = sum(o['min'] for o in ahead)
+    aage = sum((o['age'] or 27.0) * o['min'] for o in ahead) / am - 27 if am else 0.0
+    rate = (a['npxg'] + a['xa']) / mn
+    if half and 0 < half[0] < mn:
+        m1, x1 = half[0], half[1]
+        m2, x2 = mn - m1, a['npxg'] + a['xa'] - x1
+        r1, r2 = (x1 + 450 * rate) / (m1 + 450), (x2 + 450 * rate) / (m2 + 450)
+        tr = [90 * (r2 - r1), (m2 - m1) / mn, half[2] / max(1, half[3])]
+    else:
+        tr = [0.0, 0.0, a['st'] / max(1, a['mp'])]
+    m90 = mn / 90.0
+    return {'position age curve': [F * age, F * age * age, Dd * age, Dd * age * age],
+            'pedigree x age': [lmv * age if lmv is not None else 0.0, lmv * (age <= -3) if lmv is not None else 0.0],
+            'depth opportunity': [float(len(ahead)), min(3.0, am / 3420.0), aage, 0.0 if ahead else 1.0, mn / 3420.0],
+            'coaching change': list(coach or (0.0, 0.0)),
+            'within-season trend': tr,
+            'on-pitch impact': [a['onxgd'], a['off'] / m90, a['def'] / m90],
+            'league': [float(lg_now == k) for k in ('ger.1', 'esp.1', 'ita.1', 'fra.1')] + [float(lg_now != a['lg'])]}
+
+
+def best(P, p, S):
+    """his best shrunk GAR a 90 in any season through S (P: {(p, S): season})"""
+    return max(shr(o['g90'], o['min']) for (q, s), o in P.items() if q == p and s <= S)
+
+
+def careers(P):
+    """{p: [(S, shrunk GAR a 90)]} for best-to-date lookups without a scan per player"""
+    C = defaultdict(list)
+    for (p, s), o in P.items():
+        C[p].append((s, shr(o['g90'], o['min'])))
+    return C
+
+
+def bo_row(a, hist, Tb, team_now, stay, ref):
+    """(shrunk GAR a 90, breakout feature dict) of base season a for a player now at team_now (stay = ids at that
+    side now; ref = his best shrunk GAR a 90 to date)"""
     s0 = shr(a['g90'], a['min'])
-    ref = max(shr(o['g90'], o['min']) for o in hist)
     moved = 0.0 if team_now in a['teams'] else 1.0
     dTx = team_x(Tb, team_now, a['lg']) - a['tx'] if moved else 0.0
-    return s0, ref, bo_feats(a, s0, ref, vacated(Tb, team_now, stay, a['p'], a['pos']), marcel(hist, a['S']), moved, dTx)
+    return s0, bo_feats(a, s0, ref, vacated(Tb, team_now, stay, a['p'], a['pos']), marcel(hist, a['S']), moved, dTx)
 
 
 # ---------- live build ----------
@@ -247,8 +297,8 @@ def main():
     done = (meta.get('asof') or '')[5:7] in ('06', '07')
     base = cur if done else cur - 1
     P = {}
-    for s in range(base - 6, base + 1):
-        if s in SS:
+    for s in SS:
+        if s <= base:
             Ps, Ts, _ = (Pc, Tc, None) if s == cur else load(s)
             if s == base:
                 Tb = Ts
@@ -268,14 +318,18 @@ def main():
     tiers = fit['tiers'] if sc['keep'] and sc['tests']['kept vs levels + dU (changed)']['t'] >= 2 else []
     up99 = fit['dU_p99']
     cols = ['base'] + bo['keep']
+    C = careers(P)
     rows = []
     for p, c in Pc.items():
         a = P.get((p, base))
         if not a or a['pos'] == 'GK' or a['min'] < MIN_BASE or a['inv'] < 5:
             continue
+        ref = max(v for s, v in C[p])
+        if max(ref, shr(c['g90'], c['min'])) >= LEVEL:      # already at the bar, this season to date included
+            continue
         hist = history(P, p, base)
         team = c['team']
-        s0, ref, f = bo_row(a, hist, Tb, team, squad[team])
+        s0, f = bo_row(a, hist, Tb, team, squad[team], ref)
         x = sum([f[k] for k in cols], [])
         z = bo['fit']['b0'] + sum(b * v for b, v in zip(bo['fit']['b'], x))
         pr = 1 / (1 + math.exp(-max(-30, min(30, z))))
@@ -297,11 +351,11 @@ def main():
         rows.append({'id': p, 'n': c['n'], 'tm': team, 'lo': logo(team), 'sub': LG.get(c['lg'], c['lg']),
                      'pos': a['pos'],
                      'age': round(age, 1) if age else None, 'ph': PH + c['ph'] if c.get('ph') else None,
-                     'p': round(pr, 3), 'u': round(a['U'], 1), 't': t, 'sig': sig})
+                     'p': round(pr, 3), 'best': round(ref, 3), 'u': round(a['U'], 1), 't': t, 'sig': sig})
     rows.sort(key=lambda r: -r['p'])
     lab = lambda s: f'{s - 1}-{str(s)[2:]}'  # noqa: E731
     d = bo['def']
-    about = (f"Breakout = {d}. Odds: ridge logistic on {lab(base)} ({', '.join(BO_LABEL[k] for k in bo['keep'])}), "
+    about = (f"Breakout = {d}; players already there are left out, this season to date included. Odds: ridge logistic on {lab(base)} ({', '.join(BO_LABEL[k] for k in bo['keep'])}), "
              f"held-out log loss gain {bo['final']['gain']:.4f}, t {bo['final']['t']}, "
              f"{bo['final']['won']}/{bo['final']['seasons']} seasons. SI% = shots + key passes per 100 team shots "
              f"while on the pitch; tiers = xG+xA a 90 at that SI% for his club, efficiency (xG+xA per shot involvement) "

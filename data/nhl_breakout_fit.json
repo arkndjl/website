@@ -1,7 +1,9 @@
 {
  "source": "NHL stats API skater reports + site WAR, 2009-10 to 2025-26",
  "workload": "ice time a game by state (even strength, power play); goalies not modelled",
- "definition": "next season 900+ minutes (per 82 team games) and WAR a 1,000 minutes 1.0+ over his best to date: the highest WAR a 1,000 minutes, shrunk to replacement by ice time (k 600 minutes), of this season and the six before.",
+ "definition": "next season at or over L = 1.19 WAR a 1,000 minutes (shrunk to replacement by ice time, k 600 minutes; the 78th percentile of regular-role skater-seasons) with 900+ minutes (per 82 team games), for the first time.",
+ "L": 1.19,
+ "L_pct": 78,
  "scaling": {
   "ev_p60": {
    "n": 8426,
@@ -791,118 +793,298 @@
   }
  },
  "breakout": {
-  "n": 11168,
-  "rate": 0.0689,
+  "L": 1.19,
+  "n_all": 9134,
+  "n": 5259,
+  "rate": 0.0542,
   "tests": {
    "age curve": {
-    "base": 0.233,
-    "cand": 0.22513,
-    "gain": 0.007869,
-    "t": 5.81,
-    "won": 15,
-    "seasons": 16,
+    "base": 0.19366,
+    "cand": 0.18673,
+    "gain": 0.006927,
+    "t": 4.26,
+    "won": 13,
+    "seasons": 13,
     "p": 0.0,
     "pass": true
    },
    "low-TOI efficiency": {
-    "base": 0.233,
-    "cand": 0.22865,
-    "gain": 0.004353,
-    "t": 5.34,
-    "won": 14,
-    "seasons": 16,
+    "base": 0.19366,
+    "cand": 0.18864,
+    "gain": 0.005021,
+    "t": 4.29,
+    "won": 11,
+    "seasons": 13,
     "p": 0.0,
     "pass": true
    },
    "vacated TOI": {
-    "base": 0.233,
-    "cand": 0.23311,
-    "gain": -0.000103,
-    "t": -1.53,
-    "won": 9,
-    "seasons": 16,
-    "p": 0.937,
+    "base": 0.19366,
+    "cand": 0.19375,
+    "gain": -8.7e-05,
+    "t": -0.56,
+    "won": 7,
+    "seasons": 13,
+    "p": 0.7123,
     "pass": false
    },
    "shooting luck": {
-    "base": 0.233,
-    "cand": 0.23216,
-    "gain": 0.000839,
-    "t": 1.84,
-    "won": 11,
-    "seasons": 16,
-    "p": 0.0329,
+    "base": 0.19366,
+    "cand": 0.19336,
+    "gain": 0.000299,
+    "t": 0.46,
+    "won": 7,
+    "seasons": 13,
+    "p": 0.3228,
     "pass": false
    },
    "projection gap": {
-    "base": 0.233,
-    "cand": 0.23016,
-    "gain": 0.002843,
-    "t": 3.81,
-    "won": 13,
-    "seasons": 16,
-    "p": 0.0001,
+    "base": 0.19366,
+    "cand": 0.19106,
+    "gain": 0.002597,
+    "t": 2.61,
+    "won": 8,
+    "seasons": 13,
+    "p": 0.0045,
     "pass": true
    },
    "TOI room": {
-    "base": 0.233,
-    "cand": 0.23011,
-    "gain": 0.002892,
-    "t": 5.91,
-    "won": 15,
-    "seasons": 16,
-    "p": 0.0,
+    "base": 0.19366,
+    "cand": 0.18949,
+    "gain": 0.004171,
+    "t": 3.76,
+    "won": 11,
+    "seasons": 13,
+    "p": 0.0001,
     "pass": true
    },
    "TOI scaling": {
-    "base": 0.233,
-    "cand": 0.23026,
-    "gain": 0.002747,
-    "t": 5.31,
-    "won": 14,
-    "seasons": 16,
+    "base": 0.19366,
+    "cand": 0.19,
+    "gain": 0.00366,
+    "t": 4.65,
+    "won": 11,
+    "seasons": 13,
     "p": 0.0,
     "pass": true
    },
    "draft capital": {
-    "base": 0.233,
-    "cand": 0.22806,
-    "gain": 0.004948,
-    "t": 6.12,
-    "won": 14,
-    "seasons": 16,
-    "p": 0.0,
+    "base": 0.19366,
+    "cand": 0.18801,
+    "gain": 0.00565,
+    "t": 3.8,
+    "won": 12,
+    "seasons": 13,
+    "p": 0.0001,
     "pass": true
    },
    "site HPM": {
-    "base": 0.233,
-    "cand": 0.22877,
-    "gain": 0.004232,
-    "t": 5.89,
-    "won": 15,
-    "seasons": 16,
-    "p": 0.0,
-    "pass": true
+    "base": 0.19366,
+    "cand": 0.19059,
+    "gain": 0.003069,
+    "t": 2.13,
+    "won": 11,
+    "seasons": 13,
+    "p": 0.0166,
+    "pass": false
    },
    "shot share": {
-    "base": 0.233,
-    "cand": 0.22956,
-    "gain": 0.003439,
-    "t": 5.0,
-    "won": 15,
-    "seasons": 16,
+    "base": 0.19366,
+    "cand": 0.19038,
+    "gain": 0.003285,
+    "t": 4.44,
+    "won": 12,
+    "seasons": 13,
     "p": 0.0,
     "pass": true
    },
    "production": {
-    "base": 0.233,
-    "cand": 0.22872,
-    "gain": 0.004284,
-    "t": 6.78,
-    "won": 15,
-    "seasons": 16,
-    "p": 0.0,
-    "pass": true
+    "base": 0.19366,
+    "cand": 0.18957,
+    "gain": 0.004094,
+    "t": 2.18,
+    "won": 11,
+    "seasons": 13,
+    "p": 0.0146,
+    "pass": false
+   }
+  },
+  "redo": {
+   "keep": [
+    "age curve",
+    "low-TOI efficiency",
+    "projection gap",
+    "TOI room",
+    "TOI scaling",
+    "draft capital",
+    "shot share"
+   ],
+   "final": {
+    "base": 0.19366,
+    "cand": 0.1812,
+    "gain": 0.012461,
+    "t": 5.59,
+    "won": 13,
+    "seasons": 13
+   },
+   "calib_held_out": [
+    [
+     0,
+     0.03,
+     2638,
+     0.013,
+     0.014
+    ],
+    [
+     0.03,
+     0.06,
+     1046,
+     0.043,
+     0.049
+    ],
+    [
+     0.06,
+     0.1,
+     692,
+     0.077,
+     0.075
+    ],
+    [
+     0.1,
+     0.15,
+     417,
+     0.123,
+     0.132
+    ],
+    [
+     0.15,
+     0.25,
+     356,
+     0.189,
+     0.16
+    ],
+    [
+     0.25,
+     1,
+     110,
+     0.305,
+     0.309
+    ]
+   ]
+  },
+  "sweep": {
+   "prereg": "project files next-up/prereg-nhl.md",
+   "tests": {
+    "development curve": {
+     "base": 0.1812,
+     "cand": 0.18156,
+     "gain": -0.000363,
+     "t": -4.2,
+     "won": 1,
+     "seasons": 13,
+     "p": 1.0,
+     "pass": false
+    },
+    "depth opportunity": {
+     "base": 0.1812,
+     "cand": 0.1813,
+     "gain": -0.0001,
+     "t": -0.26,
+     "won": 6,
+     "seasons": 13,
+     "p": 0.6026,
+     "pass": false
+    },
+    "departures ahead": {
+     "base": 0.1812,
+     "cand": 0.18125,
+     "gain": -5.4e-05,
+     "t": -0.22,
+     "won": 5,
+     "seasons": 13,
+     "p": 0.5871,
+     "pass": false
+    },
+    "coaching change": {
+     "base": 0.1812,
+     "cand": 0.18163,
+     "gain": -0.000435,
+     "t": -0.97,
+     "won": 8,
+     "seasons": 13,
+     "p": 0.834,
+     "pass": false
+    },
+    "within-season trend": {
+     "base": 0.1812,
+     "cand": 0.18149,
+     "gain": -0.000288,
+     "t": -0.78,
+     "won": 6,
+     "seasons": 13,
+     "p": 0.7823,
+     "pass": false
+    },
+    "experience": {
+     "base": 0.1812,
+     "cand": 0.18143,
+     "gain": -0.000235,
+     "t": -0.53,
+     "won": 7,
+     "seasons": 13,
+     "p": 0.7019,
+     "pass": false
+    },
+    "offence / defence split": {
+     "base": 0.1812,
+     "cand": 0.18143,
+     "gain": -0.000228,
+     "t": -3.19,
+     "won": 3,
+     "seasons": 13,
+     "p": 0.9993,
+     "pass": false
+    },
+    "M1 boosted trees": {
+     "base": 0.1812,
+     "cand": 0.18473,
+     "gain": -0.003535,
+     "t": -5.06,
+     "won": 1,
+     "seasons": 13,
+     "p": 1.0,
+     "pass": false
+    },
+    "M2 hinge splines": {
+     "base": 0.1812,
+     "cand": 0.18171,
+     "gain": -0.000514,
+     "t": -1.45,
+     "won": 6,
+     "seasons": 13,
+     "p": 0.9265,
+     "pass": false
+    },
+    "C1 Platt step": {
+     "base": 0.1812,
+     "cand": 0.18119,
+     "gain": 1.5e-05,
+     "t": 0.09,
+     "won": 6,
+     "seasons": 13,
+     "p": 0.4641,
+     "pass": false
+    }
+   },
+   "provisional": [],
+   "not_tested": "play-type / tracking rates: NHL EDGE starts 2021-22, no free source for the window",
+   "final_vs_redo": {
+    "base": 0.1812,
+    "cand": 0.1812,
+    "gain": 0.0,
+    "t": 0.0,
+    "won": 0,
+    "seasons": 13
    }
   },
   "keep": [
@@ -912,60 +1094,59 @@
    "TOI room",
    "TOI scaling",
    "draft capital",
-   "site HPM",
-   "shot share",
-   "production"
+   "shot share"
   ],
+  "splines": false,
   "final": {
-   "base": 0.233,
-   "cand": 0.21701,
-   "gain": 0.015993,
-   "t": 8.8,
-   "won": 16,
-   "seasons": 16
+   "base": 0.19366,
+   "cand": 0.1812,
+   "gain": 0.012461,
+   "t": 5.59,
+   "won": 13,
+   "seasons": 13
   },
   "calib_held_out": [
    [
     0,
     0.03,
-    4267,
-    0.015,
+    2638,
+    0.013,
     0.014
    ],
    [
     0.03,
     0.06,
-    2548,
-    0.044,
+    1046,
+    0.043,
     0.049
    ],
    [
     0.06,
     0.1,
-    1729,
-    0.078,
-    0.074
+    692,
+    0.077,
+    0.075
    ],
    [
     0.1,
     0.15,
-    1237,
-    0.122,
-    0.133
+    417,
+    0.123,
+    0.132
    ],
    [
     0.15,
     0.25,
-    1044,
-    0.191,
-    0.173
+    356,
+    0.189,
+    0.16
    ],
    [
     0.25,
     1,
-    343,
-    0.309,
-    0.324
+    110,
+    0.305,
+    0.309
    ]
   ],
   "width": {
@@ -975,63 +1156,52 @@
    "TOI room": 2,
    "TOI scaling": 2,
    "draft capital": 2,
-   "site HPM": 2,
-   "shot share": 2,
-   "production": 2
+   "shot share": 2
   },
   "fit": {
-   "b0": -1.89588,
+   "b0": -3.29554,
    "b": [
-    -0.564823,
-    -1.440727,
-    0.463771,
-    -0.979577,
-    -0.088984,
-    -0.000613,
-    0.003123,
-    0.009584,
-    0.085976,
-    0.385399,
-    -0.076725,
-    0.415964,
-    -0.022251,
-    3.162031,
-    -0.034691,
-    -0.004303,
-    0.939959,
-    -0.580421,
-    8.470382,
-    -0.151425,
-    0.46864,
-    0.008589
+    -0.265309,
+    -0.026563,
+    0.432693,
+    -1.103057,
+    -0.069605,
+    -0.000501,
+    0.007127,
+    0.368499,
+    0.157876,
+    0.465509,
+    0.068659,
+    0.74535,
+    0.002099,
+    4.335968,
+    -0.011406,
+    -0.026365,
+    10.82527,
+    -3.409053
    ],
    "mu": [
-    0.42638,
-    0.56029,
-    6.76388,
-    0.35476,
-    27.16182,
-    756.96714,
-    11.30989,
-    -0.08629,
-    -1.18401,
-    0.22095,
-    3.03155,
-    -0.12222,
-    2.82548,
-    0.018,
-    -3.74837,
-    -2.51694,
-    -0.03481,
-    -0.10225,
-    -0.0031,
-    -0.00953,
-    0.02348,
-    0.03916
+    0.10697,
+    0.45216,
+    6.57787,
+    0.47005,
+    26.15802,
+    700.70143,
+    2.44183,
+    -0.12939,
+    -2.54007,
+    0.08423,
+    0.76269,
+    -0.179,
+    3.83467,
+    0.02113,
+    -3.97613,
+    -3.43481,
+    -0.01443,
+    -0.01585
    ]
   }
  },
  "k_shrink": 600.0,
- "jump": 1.0,
  "role_min": 900.0
 }

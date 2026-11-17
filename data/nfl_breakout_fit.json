@@ -773,115 +773,122 @@
   }
  },
  "breakout": {
-  "definition": "next season 8+ games, PPR points a game >= the starter line (RB/WR 12, TE 9) and >= this season's PPR/G shrunk to a depth player's (RB/WR 4, TE 2.5) by 4 games + 4; never at the line before",
-  "rows": "WR/TE/RB, 4+ games, 15+ opportunities, under the starter line this season (shrunk) and in every 8+ game season of the eight before",
+  "L": {
+   "RB": 12.0,
+   "WR": 12.0,
+   "TE": 9.0
+  },
+  "L_pct": "79th (RB, WR) and 81st (TE) percentile",
+  "L_basis": "PPR points a game shrunk to a depth player (RB/WR 4, TE 2.5) by 4 games; percentile of 2010-25 seasons with 8+ games and 60+ (RB) / 40+ (WR) / 25+ (TE) opportunities",
+  "definition": "next season 8+ games and shrunk PPR points a game at or over L, for the first time",
+  "rows": "WR/TE/RB, 4+ games, 15+ opportunities, no season so far (this one included, any role) at or over L shrunk; career = seasons since 2004",
   "seasons": "2011-2025",
-  "n": 2844,
-  "rate": 0.0731,
+  "n": 3209,
+  "rate": 0.0508,
   "rate_pos": {
-   "WR": 0.0672,
-   "TE": 0.0719,
-   "RB": 0.0822
+   "WR": 0.0491,
+   "TE": 0.0648,
+   "RB": 0.0447
   },
   "tests": {
    "age curve": {
-    "base": 0.24107,
-    "cand": 0.23482,
-    "gain": 0.006246,
-    "t": 2.77,
-    "won": 11,
+    "base": 0.16718,
+    "cand": 0.16361,
+    "gain": 0.003576,
+    "t": 3.41,
+    "won": 13,
     "seasons": 15,
-    "p": 0.0028,
+    "p": 0.0003,
     "pass": true
    },
    "experience and draft": {
-    "base": 0.24107,
-    "cand": 0.232,
-    "gain": 0.009068,
-    "t": 2.68,
+    "base": 0.16718,
+    "cand": 0.16155,
+    "gain": 0.005631,
+    "t": 3.13,
     "won": 11,
     "seasons": 15,
-    "p": 0.0037,
+    "p": 0.0009,
     "pass": true
    },
    "low-volume efficiency": {
-    "base": 0.24107,
-    "cand": 0.23919,
-    "gain": 0.001884,
-    "t": 1.19,
-    "won": 11,
+    "base": 0.16718,
+    "cand": 0.16632,
+    "gain": 0.000869,
+    "t": 0.94,
+    "won": 9,
     "seasons": 15,
-    "p": 0.117,
+    "p": 0.1736,
     "pass": false
    },
    "old room": {
-    "base": 0.24107,
-    "cand": 0.24117,
-    "gain": -0.000101,
-    "t": -0.24,
+    "base": 0.16718,
+    "cand": 0.16722,
+    "gain": -3.4e-05,
+    "t": -0.17,
     "won": 8,
     "seasons": 15,
-    "p": 0.5948,
+    "p": 0.5675,
     "pass": false
    },
    "TD luck": {
-    "base": 0.24107,
-    "cand": 0.24059,
-    "gain": 0.000479,
-    "t": 0.65,
-    "won": 8,
+    "base": 0.16718,
+    "cand": 0.16711,
+    "gain": 7.3e-05,
+    "t": 0.15,
+    "won": 10,
     "seasons": 15,
-    "p": 0.2578,
+    "p": 0.4404,
     "pass": false
    },
    "projection gap": {
-    "base": 0.24107,
-    "cand": 0.23927,
-    "gain": 0.001796,
-    "t": 1.39,
-    "won": 10,
+    "base": 0.16718,
+    "cand": 0.16746,
+    "gain": -0.000274,
+    "t": -1.18,
+    "won": 6,
     "seasons": 15,
-    "p": 0.0823,
+    "p": 0.881,
     "pass": false
    },
    "role trend": {
-    "base": 0.24107,
-    "cand": 0.24105,
-    "gain": 1.4e-05,
-    "t": 0.02,
-    "won": 9,
+    "base": 0.16718,
+    "cand": 0.16765,
+    "gain": -0.000467,
+    "t": -1.61,
+    "won": 7,
     "seasons": 15,
-    "p": 0.492,
+    "p": 0.9463,
     "pass": false
    },
    "snap role": {
-    "base": 0.24107,
-    "cand": 0.24076,
-    "gain": 0.00031,
-    "t": 0.43,
+    "base": 0.16718,
+    "cand": 0.16731,
+    "gain": -0.000121,
+    "t": -0.26,
     "won": 8,
     "seasons": 15,
-    "p": 0.3336,
+    "p": 0.6026,
     "pass": false
    },
    "workload scaling": {
-    "base": 0.24107,
-    "cand": 0.2417,
-    "gain": -0.000633,
-    "t": -1.83,
-    "won": 4,
+    "base": 0.16718,
+    "cand": 0.16749,
+    "gain": -0.000303,
+    "t": -0.85,
+    "won": 8,
     "seasons": 15,
-    "p": 0.9664,
+    "p": 0.8023,
     "pass": false
    },
    "vacated work": {
-    "base": 0.24107,
-    "cand": 0.24105,
-    "gain": 1.7e-05,
-    "t": 0.03,
-    "won": 9,
+    "base": 0.16718,
+    "cand": 0.16738,
+    "gain": -0.0002,
+    "t": -0.69,
+    "won": 7,
     "seasons": 15,
-    "p": 0.488,
+    "p": 0.7549,
     "pass": false
    }
   },
@@ -891,84 +898,272 @@
   ],
   "research_only": [],
   "final": {
-   "base": 0.24107,
-   "cand": 0.23176,
-   "gain": 0.009309,
-   "t": 2.68,
-   "won": 11,
+   "base": 0.16718,
+   "cand": 0.1619,
+   "gain": 0.005289,
+   "t": 3.25,
+   "won": 12,
    "seasons": 15
   },
   "calib_held_out": [
    [
     0,
     0.03,
-    921,
-    0.018,
-    0.018
+    1955,
+    0.012,
+    0.012
    ],
    [
     0.03,
     0.07,
-    964,
+    585,
     0.047,
-    0.044
+    0.05
    ],
    [
     0.07,
     0.15,
-    606,
-    0.101,
-    0.116
+    389,
+    0.103,
+    0.1
    ],
    [
     0.15,
     0.3,
-    280,
-    0.201,
-    0.204
+    206,
+    0.205,
+    0.233
    ],
    [
     0.3,
     1,
-    73,
-    0.388,
-    0.301
+    74,
+    0.404,
+    0.324
    ]
   ],
   "fit": {
-   "b0": -2.81566,
+   "b0": -4.43215,
    "b": [
-    0.135587,
-    0.912335,
-    -0.179571,
-    1.500592,
-    -0.000932,
-    -0.115587,
-    -1.402893,
-    -0.045188,
-    -0.001979,
-    0.003573,
-    0.526543,
-    0.18907,
-    -0.033579,
-    -0.39648
+    0.332616,
+    0.382607,
+    0.821754,
+    1.386089,
+    -0.119024,
+    0.019279,
+    -0.306652,
+    -0.091024,
+    -0.000187,
+    0.005683,
+    0.858996,
+    0.32031,
+    -0.027611,
+    -0.290236
    ],
    "mu": [
-    5.38603,
-    3.86616,
-    0.33368,
-    0.20042,
-    1.78996,
-    0.8644,
-    0.5594,
-    25.08966,
-    634.9128,
-    134.29411,
-    0.22574,
-    0.21976,
-    2.94008,
-    4.83215
+    5.57279,
+    3.91714,
+    0.33437,
+    0.20193,
+    1.86189,
+    0.91069,
+    0.58558,
+    25.33307,
+    647.75322,
+    140.62204,
+    0.20006,
+    0.20349,
+    2.69726,
+    4.76884
    ]
   }
+ },
+ "sweep": {
+  "prereg": "project files next-up/prereg-nfl.md",
+  "tests": {
+   "draft development curve": {
+    "base": 0.1619,
+    "cand": 0.16214,
+    "gain": -0.000244,
+    "t": -1.94,
+    "won": 5,
+    "seasons": 15,
+    "p": 0.9738,
+    "pass": false
+   },
+   "position age curves": {
+    "base": 0.1619,
+    "cand": 0.16179,
+    "gain": 0.000105,
+    "t": 0.08,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.4681,
+    "pass": false
+   },
+   "draft round steps": {
+    "base": 0.1619,
+    "cand": 0.16283,
+    "gain": -0.000933,
+    "t": -1.88,
+    "won": 4,
+    "seasons": 15,
+    "p": 0.9699,
+    "pass": false
+   },
+   "depth chart": {
+    "base": 0.1619,
+    "cand": 0.16157,
+    "gain": 0.000326,
+    "t": 0.77,
+    "won": 10,
+    "seasons": 15,
+    "p": 0.2206,
+    "pass": false
+   },
+   "depth contracts": {
+    "base": 0.1619,
+    "cand": 0.16248,
+    "gain": -0.000581,
+    "t": -2.82,
+    "won": 7,
+    "seasons": 15,
+    "p": 0.9976,
+    "pass": false
+   },
+   "opportunity model": {
+    "base": 0.1619,
+    "cand": 0.16206,
+    "gain": -0.000168,
+    "t": -0.42,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.6628,
+    "pass": false
+   },
+   "new head coach next season": {
+    "base": 0.1619,
+    "cand": 0.16208,
+    "gain": -0.000186,
+    "t": -2.78,
+    "won": 0,
+    "seasons": 15,
+    "p": 0.9973,
+    "pass": false
+   },
+   "head coach year one": {
+    "base": 0.1619,
+    "cand": 0.16221,
+    "gain": -0.000318,
+    "t": -2.38,
+    "won": 5,
+    "seasons": 15,
+    "p": 0.9913,
+    "pass": false
+   },
+   "QB change next season": {
+    "base": 0.1619,
+    "cand": 0.16188,
+    "gain": 1.4e-05,
+    "t": 0.03,
+    "won": 10,
+    "seasons": 15,
+    "p": 0.488,
+    "pass": false
+   },
+   "offense environment": {
+    "base": 0.1619,
+    "cand": 0.16202,
+    "gain": -0.00012,
+    "t": -0.24,
+    "won": 9,
+    "seasons": 15,
+    "p": 0.5948,
+    "pass": false
+   },
+   "in-season trend": {
+    "base": 0.1619,
+    "cand": 0.16216,
+    "gain": -0.000261,
+    "t": -0.38,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.648,
+    "pass": false
+   },
+   "snap trend": {
+    "base": 0.1619,
+    "cand": 0.16213,
+    "gain": -0.000236,
+    "t": -0.65,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.7422,
+    "pass": false
+   },
+   "peak window": {
+    "base": 0.1619,
+    "cand": 0.16223,
+    "gain": -0.000336,
+    "t": -0.88,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.8106,
+    "pass": false
+   },
+   "targets per snap": {
+    "base": 0.1619,
+    "cand": 0.16214,
+    "gain": -0.000243,
+    "t": -0.81,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.791,
+    "pass": false
+   },
+   "gradient-boosted trees": {
+    "base": 0.1619,
+    "cand": 0.16373,
+    "gain": -0.001832,
+    "t": -1.45,
+    "won": 5,
+    "seasons": 15,
+    "p": 0.9265,
+    "pass": false
+   },
+   "logistic + monotone transforms": {
+    "base": 0.1619,
+    "cand": 0.16381,
+    "gain": -0.00191,
+    "t": -1.39,
+    "won": 4,
+    "seasons": 15,
+    "p": 0.9177,
+    "pass": false
+   },
+   "Platt calibration": {
+    "base": 0.1619,
+    "cand": 0.16187,
+    "gain": 2.7e-05,
+    "t": 0.21,
+    "won": 8,
+    "seasons": 15,
+    "p": 0.4168,
+    "pass": false
+   },
+   "isotonic calibration": {
+    "base": 0.1619,
+    "cand": 0.16392,
+    "gain": -0.002023,
+    "t": -1.94,
+    "won": 6,
+    "seasons": 15,
+    "p": 0.9738,
+    "pass": false
+   }
+  },
+  "keep": [],
+  "provisional_columns": [],
+  "k0": 0.1619
  }
 }

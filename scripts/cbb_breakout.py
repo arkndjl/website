@@ -29,13 +29,13 @@ TIERS = (20, 25, 30)
 # a season line: the columns kept from the Barttorvik research table (floats unless named in TEXT)
 KEEP = ('pid', 'name', 'team', 'conf', 'role', 'year', 'cls', 'gp', 'min_per', 'usg', 'ts', 'to', 'ast', 'orb', 'ftr',
         'tpar', 'rimr', 'midr', 'dunkr', 'ft_shr', 'tp_shr', 'twop_shr', 'tp_raw', 'ft_raw', 'tpa40', 'hti', 'hgt_role',
-        'age', 'big', 'guard', 'bpm', 'obpm', 'rg_lrk', 'unranked2', 'pts40')
+        'age', 'big', 'guard', 'bpm', 'obpm', 'rg_lrk', 'unranked2', 'pts40', 'stl', 'blk')
 TEXT = {'pid', 'name', 'team', 'conf', 'role'}
 # a missing value takes the D-I middle (20%+ of minutes, 2010 on); age falls back on the class
 FILL = {'usg': 18.9, 'ts': 53.0, 'to': 18.1, 'ast': 10.7, 'orb': 4.4, 'ftr': 33.3, 'tpar': 0.35, 'rimr': 0.35,
         'midr': 0.26, 'dunkr': 0.015, 'ft_shr': 0.72, 'tp_shr': 0.33, 'twop_shr': 0.48, 'tp_raw': 0.33, 'ft_raw': 0.70,
         'tpa40': 3.8, 'hti': 77.0, 'hgt_role': 0.0, 'big': 0.0, 'guard': 0.0, 'bpm': -2.0, 'obpm': -1.0,
-        'rg_lrk': -6.2146, 'unranked2': 1.0, 'pts40': 13.3, 'cls': 2.0, 'gp': 0.0, 'min_per': 0.0}
+        'rg_lrk': -6.2146, 'unranked2': 1.0, 'pts40': 13.3, 'stl': 1.7, 'blk': 1.2, 'cls': 2.0, 'gp': 0.0, 'min_per': 0.0}
 AGE_CLS = {1: 19.4, 2: 20.6, 3: 21.7, 4: 22.8}
 
 
@@ -86,7 +86,7 @@ def columns(tgt=None):
 
 
 def history(P, pid, y):
-    return [P[(pid, s)] for s in range(y - 4, y + 1) if (pid, s) in P]
+    return [P[(pid, s)] for s in range(y - 6, y + 1) if (pid, s) in P]
 
 
 def own_slope(hist, tgt):
@@ -171,8 +171,9 @@ NO_TEAM = {'lvl': -1.5, 'vac': 0.45, 'inc': 0.25}
 
 # ---------- breakout odds ----------
 K_SHR, BPM_REP = 10.0, -2.0       # BPM shrunk to replacement by 10 points of min%
-JUMP, ROLE_M = 3.0, 40.0          # breakout: next-season BPM 3+ over his best shrunk BPM so far, on 40%+ of team minutes
-LVL_M = 10.0                      # min% a season needs to count toward his best so far
+ROLE_M = 40.0                     # a real role: 40%+ of team minutes
+BAR_PCT = 80                      # the quality bar L: this percentile of shrunk BPM among real-role seasons (in the fit json)
+# breakout: next season at or over L (shrunk BPM) with a real role, for a player with no season at or over L so far
 BO_CANDS = ('age curve', 'class year', 'low-volume efficiency', 'vacated usage', 'incoming talent', 'recruiting gap',
             'shooting luck', 'projection gap', 'minutes room', 'transfer level', 'usage scaling')
 BO_LABEL = {'age curve': 'age', 'class year': 'class', 'low-volume efficiency': 'low-vol eff',
@@ -197,9 +198,13 @@ def marcel(hist, y):
 
 
 def level(a, hist):
-    """(his best shrunk BPM so far, this season's shrunk BPM): a comeback to an old level is not a breakout"""
+    """(his best shrunk BPM so far, any role; this season's shrunk BPM). Best at or over the bar = already broken out"""
     cur = shr(a['bpm'], a['m'])
-    return max([cur] + [shr(o['bpm'], o['m']) for o in hist if o['y'] < a['y'] and o['m'] >= LVL_M]), cur
+    return max([cur] + [shr(o['bpm'], o['m']) for o in hist if o['y'] < a['y']]), cur
+
+
+def broke_out(o, bar):
+    return o['m'] >= ROLE_M and shr(o['bpm'], o['m']) >= bar
 
 
 def bo_feats(a, s0, cur, mar, ctx, scal):
@@ -225,12 +230,80 @@ def bo_feats(a, s0, cur, mar, ctx, scal):
             'usage scaling': [scal, scal * lowu]}
 
 
+# ---------- the improvement sweep's signals (scripts/cbb_breakout_sweep.py) ----------
+BO_EXTRA = ('dev curve by pedigree', 'dev curve by archetype', 'depth opportunity', 'coaching change', 'box profile',
+            'team context')
+BO_LABEL.update({'dev curve by pedigree': 'pedigree x age', 'dev curve by archetype': 'archetype',
+                 'depth opportunity': 'depth', 'coaching change': 'new coach', 'box profile': 'box profile',
+                 'team context': 'team level'})
+
+
+def group(a):
+    return 'g' if a['guard'] else 'b' if a['big'] else 'w'
+
+
+def depth_tables(lines_y, next_team):
+    """pid -> [players ahead of him in his position group on next season's team, ahead of him on the whole team,
+    min% / 100 of the position-group players ahead, min% / 100 played ahead of him in his group this season by
+    teammates who are not back]. Ahead = a higher shrunk BPM this season; players known to be there = returners and
+    arriving transfers with 10%+ of minutes this season"""
+    by_next, by_team = defaultdict(list), defaultdict(list)
+    for o in lines_y:
+        if o['m'] >= 10:
+            by_team[o['team']].append(o)
+            if next_team.get(o['pid']):
+                by_next[next_team[o['pid']]].append(o)
+    out = {}
+    for o in lines_y:
+        nt = next_team.get(o['pid'])
+        if not nt:
+            continue
+        v, g = shr(o['bpm'], o['m']), group(o)
+        ah = [q for q in by_next[nt] if q['pid'] != o['pid'] and shr(q['bpm'], q['m']) > v]
+        ap = [q for q in ah if group(q) == g]
+        gone = [q for q in by_team[o['team']] if q['pid'] != o['pid'] and group(q) == g
+                and shr(q['bpm'], q['m']) > v and next_team.get(q['pid']) != o['team']]
+        out[o['pid']] = [float(len(ap)), float(len(ah)), sum(q['m'] for q in ap) / 100, sum(q['m'] for q in gone) / 100]
+    return out
+
+
+def bo_extra(a, cur, ctx, dep, newcoach):
+    agec, rgc, ht = a['age'] - 21, a['rg_lrk'] + 6.2146, a['hti'] - 77
+    fr = 1.0 if a['cls'] == 1 else 0.0
+    return {'dev curve by pedigree': [agec * rgc, agec * agec * rgc, fr * rgc],
+            'dev curve by archetype': [a['big'], a['guard'], agec * a['big'], agec * a['guard'], ht, agec * ht],
+            'depth opportunity': list(dep),
+            'coaching change': [float(newcoach), float(newcoach) * (1 - ctx['xfer'])],
+            'box profile': [a['stl'], a['blk'], a['orb'], a['ast'], a['bpm'] - a['obpm']],
+            'team context': [ctx['lvl'], ctx['lvl'] * (a['m'] < ROLE_M), cur - ctx['lvl']]}
+
+
+NO_DEP = [0.0, 0.0, 0.0, 0.0]
+
+
 def bo_row(a, hist, ctx, sfit, keep):
     s0, cur = level(a, hist)
     lv = (ctx['lvl'], ctx['nlvl'], ctx['xfer'])
     scal = predict(sfit, 'ts', a, hist, lv, 6.0) - predict(sfit, 'ts', a, hist, lv, 0.0)
     f = bo_feats(a, s0, cur, marcel(hist, a['y']), ctx, scal)
     return f, sum([f['base']] + [f[k] for k in keep], [])
+
+
+def leaf(nodes, x):
+    """one serialized tree ([feature, threshold, left, right] or [-1, value]) on a feature row: x <= threshold goes left"""
+    i = 0
+    while nodes[i][0] != -1:
+        i = nodes[i][2] if x[nodes[i][0]] <= nodes[i][1] else nodes[i][3]
+    return nodes[i][1]
+
+
+def interp(p, kx, kv):
+    if p <= kx[0]:
+        return kv[0]
+    for i in range(1, len(kx)):
+        if p <= kx[i]:
+            return kv[i - 1] + (kv[i] - kv[i - 1]) * (p - kx[i - 1]) / ((kx[i] - kx[i - 1]) or 1.0)
+    return kv[-1]
 
 
 # ---------- live build ----------
@@ -294,15 +367,32 @@ def main():
             tops[bt_of.get(r['team']) or r['team']] += 1
     sfit, bfit = fit['scaling'], fit['breakout']
     keep, K, dmax = bfit['keep'], fit['K'], fit['dU_p99']
-    b0, bb, mu = bfit['fit']['b0'], bfit['fit']['b'], bfit['fit']['mu']
+    # the improvement sweep's shipped model when it has run (extra signals, hinge terms, recalibration), else the kept logistic
+    sw = bfit.get('sweep') or {}
+    extra = sw.get('extra') or []
+    mfit = sw.get('fit') or bfit['fit']
+    b0, bb, mu = mfit['b0'], mfit['b'], mfit['mu']
+    spline = mfit.get('spline') or []
+    zero = {'vac': 0, 'inc': 0, 'top': 0, 'lvl': 0, 'nlvl': 0, 'xfer': 0}
+    width = {**{k: len(v) for k, v in bo_feats(cur[0], 0.0, 0.0, 0.0, zero, 0.0).items()},
+             **{k: len(v) for k, v in bo_extra(cur[0], 0.0, zero, NO_DEP, 0.0).items()}}
     spans, i = {}, 2
-    for k in keep:
-        n = len(bo_feats(cur[0], 0.0, 0.0, 0.0, {'vac': 0, 'inc': 0, 'top': 0, 'lvl': 0, 'nlvl': 0, 'xfer': 0}, 0.0)[k])
-        spans[k] = (i, i + n)
-        i += n
-    out = []
+    for k in keep + extra:
+        spans[k] = (i, i + width[k])
+        i += width[k]
+    DEP = depth_tables(cur, next_team)
+    out, bar, done = [], bfit['L'], 0
     for r, a in match:
         if a['m'] < fit['min_m'] or a['gp'] < fit['min_gp']:
+            continue
+        # already broken out: a past season, or this season to date (shrunk by its share of a 31-game season), at the bar
+        now = r.get('now') or {}
+        m_now = (now.get('mpg') or 0) / 40 * 100 * min(1.0, (now.get('gp') or 0) / 31)
+        best = level(a, history(P, a['pid'], a['y']))[0]
+        if now.get('bpm') is not None:
+            best = max(best, shr(now['bpm'], m_now))
+        if best >= bar:
+            done += 1
             continue
         nt = next_team[a['pid']]
         here, there = T.get(a['team'], NO_TEAM), T.get(nt, NO_TEAM)
@@ -310,11 +400,23 @@ def main():
                'nlvl': there['lvl'], 'xfer': 1.0 if nt != a['team'] else 0.0}
         hist = history(P, a['pid'], a['y'])
         _, x = bo_row(a, hist, ctx, sfit, keep)
-        z = b0 + sum(b * v for b, v in zip(bb, x))
-        p = 1 / (1 + math.exp(-max(-30, min(30, z))))
-        push = sorted(((sum(bb[j] * (x[j] - mu[j]) for j in range(*spans[k])), k) for k in keep), reverse=True)
+        if extra:
+            # a first-year head coach is not in the live inputs: the coaching-change signal did not ship
+            e = bo_extra(a, shr(a['bpm'], a['m']), ctx, DEP.get(a['pid'], NO_DEP), 0.0)
+            x = x + sum([e[k] for k in extra], [])
+        x = x + [max(0.0, x[j] - kn) for j, ks in spline for kn in ks]
+        if sw.get('gbt'):
+            z = sw['gbt']['f0'] + sum(leaf(t, x) for t in sw['gbt']['trees'])
+        else:
+            z = b0 + sum(b * v for b, v in zip(bb, x))
+        z = max(-30, min(30, z))
+        if sw.get('platt'):
+            z = sw['platt'][0] + sw['platt'][1] * z
+        p = 1 / (1 + math.exp(-z))
+        if sw.get('isotonic'):
+            p = interp(p, *sw['isotonic'])
+        push = sorted(((sum(bb[j] * (x[j] - mu[j]) for j in range(*spans[k])), k) for k in keep + extra), reverse=True)
         sig = [('usage' if k == 'low-volume efficiency' and a['usg'] >= 20 else BO_LABEL[k]) for v, k in push[:2] if v > 0.1]
-        now = r.get('now') or {}
         u_now = now.get('usg') if (now.get('gp') or 0) >= 2 else None
         u = u_now if u_now is not None else a['usg']
         lv = (ctx['lvl'], ctx['nlvl'], ctx['xfer'])
@@ -327,13 +429,17 @@ def main():
         age = r.get('age') if r.get('age') is not None else r.get('ageEst')
         out.append({'id': a['pid'], 'n': r['name'], 'tm': r['team'], 'lo': r.get('logo'), 'sub': r.get('conf') or '', 'pos': r.get('pos') or '',
                     'age': age, 'ph': r.get('photo'), 'p': round(p, 3), 'u': round(u, 1), 'u0': round(a['usg'], 1),
-                    't': tiers, 'sig': sig})
+                    'best': round(best, 1), 't': tiers, 'sig': sig})
     out.sort(key=lambda o: -o['p'])
     out = out[:400]
     d = bfit['definition']
     f = bfit['final']
-    about = (f"odds from {label} Barttorvik lines; breakout = {d}; held-out log loss {f['base']:.4f} -> {f['cand']:.4f} "
-             f"(t {f['t']}, {f['won']}/{f['seasons']} seasons); signals: {', '.join(keep)}; tiers = TS% and points a 40 "
+    more = ''
+    if sw:
+        g = sw['final_vs_redo']
+        more = f"; improvement sweep {g['base']:.4f} -> {g['cand']:.4f} (t {g['t']}, {g['won']}/{g['seasons']})"
+    about = (f"odds from {label} Barttorvik lines; breakout = {d}; players already there are left out; held-out log loss {f['base']:.4f} -> {f['cand']:.4f} "
+             f"(t {f['t']}, {f['won']}/{f['seasons']} seasons){more}; signals: {', '.join(keep + extra)}; tiers = TS% and points a 40 "
              f"at that usage from the contextual scaling fit ({', '.join(sfit['ts']['keep'])}); * = a usage jump past "
              f"the 99th percentile of observed jumps (+{dmax:.0f}); u = usage this season (2+ games) or last")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
@@ -342,7 +448,7 @@ def main():
                'tiers': [{'k': k, 'lab': f'USG {k}'} for k in TIERS],
                'stat': {'lab': 'PTS/40', 'eff': 'TS%', 'dec': 1, 'edec': 1}, 'about': about, 'rows': out},
               open(OUT, 'w'), separators=(',', ':'))
-    print(f'{len(match)} board players with a {label} line, {len(out)} rows -> {OUT}')
+    print(f'{len(match)} board players with a {label} line, {done} already at the bar ({bar}), {len(out)} rows -> {OUT}')
 
 
 if __name__ == '__main__':

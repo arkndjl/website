@@ -5,6 +5,8 @@ all held out (scripts/breakout_lib.py).
 
     python3 scripts/cbb_breakout_research.py [research_seasons.csv]
         -> data/cbb_breakout_fit.json, scripts/data/cbb_breakout_base.json.gz (last season's lines for the live build)
+    then python3 scripts/cbb_breakout_sweep.py  (the improvement sweep; adds breakout.sweep to the fit json, which this
+    script rewrites without it)
 
 History: Barttorvik D-I player seasons 2010-2026 (shot-location and role columns start in 2010), the project files'
 cbb/backtest/research_seasons.csv. Pairs = the same Barttorvik pid in consecutive seasons, transfers included.
@@ -13,9 +15,9 @@ A. Usage scaling. Pairs with 20%+ of team minutes and 10+ games both seasons, we
    TS% (and TO%) on this season's (shrunk by min%) + age + usage, then + the usage change (dU), then + dU x traits by
    block. Held-out error on all pairs and on the pairs whose usage rose 3+ points (the case the tab projects).
 B. Breakout odds. Rows: 10%+ of minutes and 10+ games this season and a D-I line next season (the live board only
-   lists players on a roster). Breakout = next season 40%+ of team minutes and BPM 3+ over his best season so far
-   (each season's BPM shrunk to -2 by min%, k 10; a comeback to an old level doesn't count). Baseline logistic: that
-   best shrunk BPM, ln min%. Candidates one at a time, then the passers together.
+   lists players on a roster) and no season so far at the quality bar L (the 80th percentile of shrunk BPM among
+   seasons with 40%+ of team minutes; BPM shrunk to -2 by min%, k 10). Breakout = next season at or over L on 40%+ of
+   team minutes, for the first time. Baseline logistic: his best shrunk BPM so far, ln min%. Candidates one at a time, then the passers together.
    The usage-scaling candidate uses a scaling fit that never saw the held-out season.
 C. NBA translation. Does projected TS% at 28 usage (and the +6 usage TS% change) add to the board's baseline drivers
    for reaching the NBA and peak BPM given NBA? Hurdle, leave one draft class out (the backtest README's framework)."""
@@ -178,19 +180,25 @@ def scaling(P, C):
 
 # ---------- B. breakout odds ----------
 def breakout(P, C, sfit, folds):
-    R = []
+    bar = round(float(np.percentile([B.shr(o['bpm'], o['m']) for o in P.values() if o['y'] >= Y0 and o['m'] >= B.ROLE_M],
+                                    B.BAR_PCT)), 1)
+    R, already = [], 0
     for (pid, y), a in P.items():
         b = P.get((pid, y + 1))
         if y < Y0 or not b or a['m'] < ROW_M or a['gp'] < ROW_GP:
             continue
+        if B.level(a, B.history(P, pid, y))[0] >= bar:
+            already += 1
+            continue
         R.append((pid, y, a, b))
+    print('bar L', bar, 'already at the bar (left out)', already, flush=True)
     S = np.array([y + 1 for _, y, _, _ in R], float)
     yv, rows, X6, X0 = [], [], [], []
     f0, fb, fin = folds['ts'][int(S[0])]
     for pid, y, a, b in R:
         hist = B.history(P, pid, y)
         s0, cur = B.level(a, hist)
-        yv.append(1.0 if (b['m'] >= B.ROLE_M and b['bpm'] >= s0 + B.JUMP) else 0.0)
+        yv.append(1.0 if B.broke_out(b, bar) else 0.0)
         c = C[(pid, y)]
         lv = (c['lvl'], c['nlvl'], c['xfer'])
         v6, v0 = B.features('ts', a, hist, lv, 6.0), B.features('ts', a, hist, lv, 0.0)
@@ -254,8 +262,11 @@ def breakout(P, C, sfit, folds):
     for k, v in marg.items():
         print('  on top of the rest:', k, v['t'], v['won'], flush=True)
     print(' held-out calibration', cal, 'top-decile hit rate', round(float(y[top].mean()), 3), flush=True)
-    return {'definition': f'next season {B.ROLE_M:.0f}%+ of team minutes and BPM {B.JUMP:.0f}+ over his best season so far '
-                          f'(each shrunk to {B.BPM_REP:.0f} by min%, k {B.K_SHR:.0f}), among players with a D-I line next season',
+    return {'definition': f'first season at or over L = {bar} shrunk BPM (the {B.BAR_PCT}th percentile of seasons with '
+                          f'{B.ROLE_M:.0f}%+ of team minutes; BPM shrunk to {B.BPM_REP:.0f} by min%, k {B.K_SHR:.0f}) on '
+                          f'{B.ROLE_M:.0f}%+ of minutes next season, among players with no season at L so far and a D-I '
+                          f'line next season',
+            'L': bar, 'already_out': already,
             'n': len(y), 'rate': round(float(y.mean()), 4), 'tests': res, 'keep': keep, 'final': final,
             'marginal': marg, 'calib_heldout': cal, 'top_decile_rate': round(float(y[top].mean()), 3),
             'fit': {'b0': round(b0, 5), 'b': [round(float(v), 6) for v in b],
