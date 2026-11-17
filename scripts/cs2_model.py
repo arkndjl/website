@@ -489,7 +489,7 @@ def build():
     cset = set(cands)
     cands = [k for k in cands if rated(k) == k or rated(k) not in cset]
     wt = W["top"]
-    z = {k: wt[0] * strength(k)[0] + wt[1] * strength(k)[1] for k in cands}
+    z = {k: wt[0] * strength(rated(k))[0] + wt[1] * strength(rated(k))[1] for k in cands}
     order = sorted(cands, key=lambda k: -z[k])
     # ARK: Bo3 chance against the top 20 (top-50 weights, veto included); the top 20 re-picked once on ARK itself
     vs = {}
