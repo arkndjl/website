@@ -13,6 +13,7 @@
     <label class="dc__pick nhll__view"><span>view</span><select data-nhll-view aria-label="view">
       <option value="lines">current lines</option><option value="units">most-used units</option><option value="onoff">on/off + linemates</option>
     </select></label>
+    <label class="dc__pick nhll__find"><span>find</span><input type="search" size="8" data-nhll-q placeholder="player" autocomplete="off" enterkeyhint="search" aria-label="find player"></label>
   </div>
   <div class="dc__body" data-nhll-body><p class="cfb__dim">loading…</p></div>
   <div class="win__status" title="{{ `5-on-5 only (five skaters and a goalie each side), from the NHL's shift charts (its HTML time-on-ice reports when the API has none) and MoneyPuck's shot expected goals. Current lines are the last game's forward trios and defence pairs ordered by 5v5 time together in that game; the numbers beside them are the unit's season so far. GF% and xGF% are the unit's share of goals and expected goals while together. On/off: the team's xGF% with the skater on the ice and in his games with him off it; rel is the gap. Linemate: the skater he played the most 5v5 time with, their xGF% together, his without that linemate and the linemate's without him (60+ minutes apart). Small samples: under ~100 minutes these swing a lot.` | plainify }}"><span data-nhll-count></span><span class="cfb__asof" data-nhll-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -45,14 +46,15 @@
     });
     return h + '</tbody></table></div>';
   }
-  function onoff(T) {
+  function fold(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+  function onoff(T, q) {
     var h = '<div class="wintable__scroll"><table class="cfb__table"><thead><tr><th>Player</th><th>Pos</th><th class="nhll__w">GP</th><th title="5v5 minutes">min</th>' +
-      '<th class="nhll__w" title="share of goals with him on">GF%</th><th title="share of expected goals with him on">xGF%</th><th class="nhll__w" title="team xGF% in his games with him off">off</th><th title="on minus off, xGF%">rel</th>' +
+      '<th title="on minus off, xGF%">rel</th><th title="share of expected goals with him on">xGF%</th><th title="team xGF% in his games with him off">off</th><th class="nhll__w" title="share of goals with him on">GF%</th>' +
       '<th>linemate</th><th class="nhll__w" title="5v5 minutes together">min</th><th title="xGF% together">with</th><th class="nhll__w" title="his xGF% without that linemate">him w/o</th><th class="nhll__w" title="the linemate\'s xGF% without him">mate w/o</th></tr></thead><tbody>';
-    T.skaters.forEach(function (s) {
+    T.skaters.filter(function (s) { return !q || fold(s.n + ' ' + s.p + ' ' + ((s.mate || {}).p || '')).indexOf(q) >= 0; }).forEach(function (s) {
       var m = s.mate || {};
       h += '<tr><td title="' + esc(s.n) + '"><b>' + esc(s.p) + '</b></td><td>' + esc(s.pos) + '</td><td class="cfb__num nhll__w">' + s.gp + '</td><td class="cfb__num">' + mins(s.min) + '</td>' +
-        '<td class="cfb__num nhll__w">' + pct(s.gfp) + '</td><td class="cfb__num">' + pct(s.xgfp) + '</td><td class="cfb__num nhll__w">' + pct(s.offx) + '</td><td class="cfb__num">' + rel(s.rel) + '</td>' +
+        '<td class="cfb__num">' + rel(s.rel) + '</td><td class="cfb__num">' + pct(s.xgfp) + '</td><td class="cfb__num">' + pct(s.offx) + '</td><td class="cfb__num nhll__w">' + pct(s.gfp) + '</td>' +
         '<td>' + esc(m.p || '—') + '</td><td class="cfb__num nhll__w">' + mins(m.min) + '</td><td class="cfb__num">' + pct(m.xgfp) + '</td><td class="cfb__num nhll__w">' + pct(m.apart) + '</td><td class="cfb__num nhll__w">' + pct(m.mateApart) + '</td></tr>';
     });
     return h + '</tbody></table></div>';
@@ -64,7 +66,7 @@
       (T.kept != null ? ' · ' + T.kept + ' of 4 lines as the game before' : '') + (T.xgGames < T.gp ? ' · xG through ' + T.xgGames + ' games' : '');
     var h = '<div class="dc__head"><img class="dc__logo" src="' + esc(T.logo) + '" alt="" width="48" height="48"><div><h4 class="dc__name">' + esc(T.n || T.t) + '</h4><p class="cfb__dim">' + esc(sub) + '</p></div></div>';
     if (view === 'units') h += '<h4 class="nhll__sub">forward trios, most 5v5 time</h4>' + unitTable(T.topF, 'line', false) + '<h4 class="nhll__sub">defence pairs, most 5v5 time</h4>' + unitTable(T.topD, 'pair', false);
-    else if (view === 'onoff') h += '<h4 class="nhll__sub">skaters, 60+ 5v5 minutes</h4>' + onoff(T);
+    else if (view === 'onoff') h += '<h4 class="nhll__sub">skaters, 60+ 5v5 minutes</h4>' + onoff(T, fold((W.querySelector('[data-nhll-q]') || {}).value || '').trim());
     else h += '<h4 class="nhll__sub">forward lines</h4>' + unitTable(T.lines, 'line', true) + '<h4 class="nhll__sub">defence pairs</h4>' + unitTable(T.pairs, 'pair', true);
     W.querySelector('[data-nhll-body]').innerHTML = h;
     try { localStorage.setItem('ark-dc-nhl', T.t); } catch (e) {}
@@ -78,6 +80,9 @@
       var keep = null; try { keep = localStorage.getItem('ark-dc-nhl'); } catch (e) {}
       if (keep && D.teams.some(function (T) { return T.t === keep; })) sel.value = keep;
       function go() { render(W, D, sel.value, vw.value); }
+      var qi = W.querySelector('[data-nhll-q]');
+      function vis() { qi.parentNode.style.display = vw.value === 'onoff' ? '' : 'none'; }
+      qi.addEventListener('input', go); vw.addEventListener('change', vis); vis();
       sel.addEventListener('change', go); vw.addEventListener('change', go); go();
       W.querySelector('[data-nhll-count]').textContent = D.games + ' games · ' + D.label;
       W.querySelector('[data-nhll-asof]').textContent = 'updated ' + (D.asof || '').slice(0, 10);

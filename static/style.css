@@ -4188,8 +4188,9 @@ img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; 
    builder's FV ramp (--t fill, --k ink); two columns on a phone */
 .dc__bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px 0; }
 .dc__pick { display: flex; gap: 8px; align-items: center; flex: 1 1 260px; max-width: 420px; }
-.dc__pick span { color: #7fffd4; }
+.dc__pick span { color: #7fffd4; white-space: nowrap; }
 .dc__pick select { flex: 1; min-width: 0; min-height: 28px; font: inherit; color: #fff; background: var(--win-dark); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); padding: 2px 6px; }
+.dc__pick input[type="search"] { flex: 1; min-width: 0; min-height: 28px; font: inherit; color: #fff; background: var(--win-dark); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); padding: 2px 6px; }
 .dc__body { padding: 8px 12px 10px; }
 .dc__head { display: flex; gap: 12px; align-items: center; padding: 8px 10px; background: var(--win-well); box-shadow: inset 4px 0 0 var(--accent); }
 .dc__logo { width: 48px; height: 48px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; image-rendering: auto; }
@@ -4218,7 +4219,7 @@ img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; 
   .dc__slot { padding: 4px 6px; }
   .dc__g { min-width: 2.6em; font-size: .8em; }
   .dc__pick { max-width: none; }
-  .dc__pick select { min-height: 36px; }
+  .dc__pick select, .dc__pick input[type="search"] { min-height: 36px; }
 }
 @media (max-width: 360px) {
   .dc__grid { grid-template-columns: minmax(0, 1fr); }
