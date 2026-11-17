@@ -59,7 +59,7 @@ def nba():
     top = lambda k: [[p['n'], p['lab'], p['tm'], p[k]] for p in best(rows, k)]
     last = [p for p in S[-1]['players'] if (p.get('mp') or 0) >= 1000 * S[-1]['games'] / 82]
     xpm = {
-        'stands': 'blended plus-minus · NBA',
+        'stands': 'Composite Plus-Minus · NBA',
         'what': 'Points a 100 possessions a player adds over an average player, as played.',
         'use': 'Headline impact number on every NBA board. Feeds VORX, the game models and the CBB FV target.',
         'f': ['XPM = .5 DPM + .5 BPM', 'O-XPM, D-XPM: same blend each side'],
@@ -73,7 +73,7 @@ def nba():
         'foot': 'qualified = 1,000 MP a 82 games · BPM only where no DPM row',
     }
     vorx = {
-        'stands': 'value over replacement · XPM · NBA',
+        'stands': 'Value Over Replacement XPM · NBA',
         'what': 'Wins a player adds over a replacement player across his minutes.',
         'use': 'Default sort of the XPM and rookie boards. Converts to dollars in contract value.',
         'f': ['VORX = .030 × (XPM + 1.4) × MP / 48', 'replacement XPM -1.4 · .030 wins a point'],

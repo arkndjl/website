@@ -444,7 +444,7 @@
     },
     {
      "term": "rXPM (raw XPM)",
-     "short": "NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.",
+     "short": "Composite Plus-Minus. NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.",
      "body": [
       "The headline XPM on every NBA board. O-XPM and D-XPM are the same blend of each side.",
       "Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).",
@@ -470,7 +470,7 @@
     },
     {
      "term": "VORX",
-     "short": "NBA wins over replacement: .030 x (rXPM + 1.4) x MP / 48.",
+     "short": "Value Over Replacement XPM. NBA wins over replacement: .030 x (rXPM + 1.4) x MP / 48.",
      "body": [
       "Replacement rXPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM and rookie boards.",
       "Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, rXPM .330).",
