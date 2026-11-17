@@ -943,7 +943,10 @@
       "Workload change alone: no efficiency drop on average (selection: players earn the work).",
       "NBA: shot profile sets the slope (high-2P% finishers lose most); CBB: shot profile, role, frame, level, low-usage rates.",
       "NHL: EV P/60 rises with minutes (instrumented 0.14 a minute). Soccer: role. NFL RB: -0.23 Y/OPP per 10 share points.",
-      "Tiers past the 99th percentile of observed jumps are beyond the data. CFB: no tiers, every test failed."
+      "Tiers past the 99th percentile of observed jumps are beyond the data. CFB: no tiers, every test failed.",
+      "CEIL (NBA XPM, CBB BPM): 80th percentile season with usage +5 (cap 32), role seasons only; mean + q x spread.",
+      "CEIL tests (pinball loss .80, held out, Holm): usage change x context passes NBA t 3.9, CBB t 4.3; spread CBB only.",
+      "CEIL held-out coverage: NBA 79% of usage-up seasons under it, CBB 80%."
      ],
      "where": "next up tab",
      "sports": [
@@ -1704,8 +1707,6 @@
      "term": "CBB mock inputs",
      "short": "Consensus of 2027 boards (.5 median rank + .5 mean) and conviction on slot plus college line.",
      "body": [
-      "Boards: one per analyst (newest board or mock): ESPN (Woo), Bleacher Report (Wasserman), Floor and Ceiling (Martinez), No Ceilings, FanSided (Kline), ClutchPoints, NBADraft.net, CBS (Boone), Tankathon, SI (Sweeney).",
-      "Recency weight 0.5^(days behind newest board / 30). Held out 2022-26 (fresh ESPN + NBADraft.net finals plus an older board, real slot): |ln slot error| .314 -> .301, t 8.0, 5/5 drafts.",
       "xXPM = expected NBA peak XPM vs the average drafted player, given slot and college line.",
       "Entrants: Dec% draws; FV 40+ rule for the pool."
      ],
@@ -2123,7 +2124,7 @@
   },
   {
    "board": "CBB / NBA prospects",
-   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,542). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
+   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,544). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning (rarity anchor; most common role in band)",
@@ -2199,7 +2200,7 @@
      "50",
      "4+ seasons as a starter; most common: 4+ seasons as a starter (31%)",
      "3.56",
-     "2 of 5,542 (0.04%)",
+     "1 of 5,544 (0.02%)",
      "+0.0 to +0.6",
      "28",
      "median pick 17, 84% drafted",
@@ -2209,7 +2210,7 @@
      "45",
      "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
      "5.89",
-     "19 of 5,542 (0.34%)",
+     "13 of 5,544 (0.23%)",
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
@@ -2219,7 +2220,7 @@
      "40",
      "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
      "7.33",
-     "26 of 5,542 (0.47%)",
+     "21 of 5,544 (0.38%)",
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
@@ -2229,7 +2230,7 @@
      "35",
      "bench, 100+ games; most common: bench, 100+ games (52%)",
      "12",
-     "51 of 5,542 (0.92%)",
+     "49 of 5,544 (0.88%)",
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
@@ -2239,7 +2240,7 @@
      "30",
      "reached the NBA; most common: reached the NBA (83%)",
      "23",
-     "100 of 5,542 (1.8%)",
+     "96 of 5,544 (1.7%)",
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",

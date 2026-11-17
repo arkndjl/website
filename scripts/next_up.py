@@ -36,6 +36,10 @@ def convert(sport):
         lb, tt, f = BEST[sport]
         cols.append({'k': 'best', 'l': 'Best', 't': tt, 'f': f, 'ph': 1, 'num': 1})
     views = [['p', 'BO%', 'breakout odds next season']]
+    for k, m in (('x', src.get('cur')), ('xc', src.get('ceil'))):     # current value and its usage-up ceiling
+        if m:
+            cols.append({'k': k, 'l': m['lab'], 't': m['t'], 'f': str(m.get('dec', 1)), 'ph': 1, 'num': 1})
+            views.append([k, m['lab'], m['t']])
     sl, el = short(st.get('lab', '')), short(st.get('eff') or '')
     if sl == el:                                               # P/82 and P/60: keep the rate part
         sl, el = st.get('lab', ''), st.get('eff') or ''
@@ -51,7 +55,8 @@ def convert(sport):
     for r in src.get('rows') or []:
         o = {'n': r['n'], 'tm': r.get('tm') or '', 'pos': r.get('pos') or '', 'age': r.get('age'), 'ph': r.get('ph'),
              'lo': r.get('lo'), 'sub': r.get('sub') or '', 'p': None if r.get('p') is None else round(100 * r['p'], 1),
-             'u': r.get('u'), 'sig': ' · '.join(r.get('sig') or []), 'best': r.get('best')}
+             'u': r.get('u'), 'sig': ' · '.join(r.get('sig') or []), 'best': r.get('best'), 'x': r.get('x'),
+             'xc': r.get('xc')}
         if o['lo'] is None and sport in ('nba', 'nfl', 'nhl') and o['tm']:
             o['lo'] = '/img/%s/%s.png' % (sport, o['tm'].split('/')[0].lower())
         for i, c in enumerate(r.get('t') or []):

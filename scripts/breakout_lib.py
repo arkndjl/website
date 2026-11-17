@@ -176,3 +176,81 @@ def _scale(t, lr):
 
 def gbm_pred(f0, trees, X):
     return sig(np.array([f0 + sum(tree_pred(t, x) for t in trees) for x in X]))
+
+
+# ---------- ceiling: 80th percentile of next season's value under a workload change ----------
+TAU = 0.8
+
+
+def pinball(y, c, w, tau=TAU):
+    u = y - c
+    return w * np.where(u >= 0, tau * u, (tau - 1) * u)
+
+
+def wq(x, w, q):
+    o = np.argsort(x)
+    cw = np.cumsum(w[o]) / w.sum()
+    return float(x[o][min(len(x) - 1, int(np.searchsorted(cw, q)))])
+
+
+def ceiling_fit(X, y, w, SX=None, lam=1e-3):
+    """mean by ridge WLS on X; spread: E|resid| by WLS on SX (or a constant), ceiling = mean + q x spread, q = the
+    weighted 80th percentile of resid / spread. Returns a plain dict the live builds evaluate stdlib-only."""
+    b0, b = wls(X, y, w, lam)
+    r = y - (b0 + X @ b)
+    if SX is None:
+        c0, c = float(np.average(np.abs(r), weights=w)), np.zeros(0)
+        s = np.full(len(y), c0)
+    else:
+        c0, c = wls(SX, np.abs(r), w, lam)
+        s = np.maximum(c0 + SX @ c, 0.25 * np.average(np.abs(r), weights=w))
+    return {'b0': float(b0), 'b': [float(v) for v in b], 'c0': float(c0), 'c': [float(v) for v in c],
+            'floor': float(0.25 * np.average(np.abs(r), weights=w)), 'q': wq(r / s, w, TAU)}
+
+
+def ceiling_pred(f, X, SX=None):
+    m = f['b0'] + X @ np.array(f['b'])
+    s = np.full(len(X), f['c0']) if not f['c'] else np.maximum(f['c0'] + SX @ np.array(f['c']), f['floor'])
+    return m + f['q'] * s, m
+
+
+def ceiling_tests(S, y, w, X0, cands, up):
+    """S season, y next value, w weight, X0 base columns, cands {name: (extra mean columns, spread columns or None,
+    names of the extra columns)}; passers' columns are pooled once by name for the final model,
+    up = rows whose workload rose (coverage check). Each candidate alone vs the base (pinball loss at .80, held out by
+    season), Holm, then base + passers. Returns (tests, keep, final compare, coverage, fit on all rows)."""
+    def make(Xm, SX):
+        def fp(tr, te):
+            f = ceiling_fit(Xm[tr], y[tr], w[tr], None if SX is None else SX[tr])
+            return ceiling_pred(f, Xm[te], None if SX is None else SX[te])[0]
+        return fp
+    err = lambda c, te: (float(pinball(y[te], c, w[te]).sum()), float(w[te].sum()))
+    base = loso(S, make(X0, None), err)
+    tests = {}
+    for k, (xm, sx, _) in cands.items():
+        Xm = X0 if xm is None else np.column_stack([X0, xm])
+        tests[k] = compare(base, loso(S, make(Xm, sx), err))
+    holm(tests)
+    keep = [k for k in cands if tests[k]['pass']]
+    xs, cols = [], []
+    for k in keep:
+        for j, nm in enumerate(cands[k][2]):
+            if nm not in cols:
+                cols.append(nm)
+                xs.append(cands[k][0][:, j])
+    sxs = [cands[k][1] for k in keep if cands[k][1] is not None]
+    Xf = np.column_stack([X0] + xs) if xs else X0
+    SXf = sxs[0] if sxs else None
+    final = compare(base, loso(S, make(Xf, SXf), err)) if keep else None
+    cov = {}
+    for nm, m in (('all', np.ones(len(y), bool)), ('up', up)):
+        hit = tot = 0.0
+        for s in sorted(set(S.tolist())):
+            te, tr = S == s, S != s
+            f = ceiling_fit(Xf[tr], y[tr], w[tr], None if SXf is None else SXf[tr])
+            c = ceiling_pred(f, Xf[te], None if SXf is None else SXf[te])[0]
+            mm = m[te]
+            hit += float((w[te] * (y[te] <= c))[mm].sum())
+            tot += float(w[te][mm].sum())
+        cov[nm] = round(hit / tot, 3) if tot else None
+    return tests, keep, final, cov, ceiling_fit(Xf, y, w, SXf), cols

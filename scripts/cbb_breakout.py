@@ -170,6 +170,7 @@ NO_TEAM = {'lvl': -1.5, 'vac': 0.45, 'inc': 0.25}
 
 
 # ---------- breakout odds ----------
+CEIL = os.path.join(ROOT, 'data', 'cbb_ceiling_fit.json')     # scripts/cbb_ceiling_research.py
 K_SHR, BPM_REP = 10.0, -2.0       # BPM shrunk to replacement by 10 points of min%
 ROLE_M = 40.0                     # a real role: 40%+ of team minutes
 BAR_PCT = 80                      # the quality bar L: this percentile of shrunk BPM among real-role seasons (in the fit json)
@@ -195,6 +196,24 @@ def marcel(hist, y):
             num += w * o['bpm'] * o['m']
             den += w * o['m']
     return (num + BPM_REP * 5 * 40) / (den + 5 * 40)
+
+
+def ceil_feats(a, hist):
+    """ceiling inputs for one base line; hist = his earlier seasons (scripts/cbb_ceiling_research.py)"""
+    return {'s0': shr(a['bpm'], a['m']), 'mar': marcel(hist + [a], a['y']), 'age': a['age'], 'lnm': math.log(max(a['m'], 1.0)),
+            'usg': a['usg'], 'rimr': a['rimr'], 'tpar': a['tpar'], 'ast': a['ast']}
+
+
+def ceiling(cf, a, hist):
+    """80th percentile next-season BPM with usage up cf['scen'] points (capped at cf['ucap'])"""
+    f, v = cf['fit'], ceil_feats(a, hist)
+    du = max(0.0, min(cf['scen'], cf['ucap'] - a['usg']))
+    v.update({'age2': v['age'] ** 2, 'dU': du, 'dU2': du * du, 'absdU': du})
+    for k in ('age', 'usg', 'rimr', 'tpar', 'ast', 's0'):
+        v['dU*' + k] = du * v[k]
+    m = f['b0'] + sum(b * v[c] for b, c in zip(f['b'], f['cols']))
+    sp = max(f['floor'], f['c0'] + sum(c * v[k] for c, k in zip(f['c'], f['scol']))) if f['c'] else f['c0']
+    return m + f['q'] * sp
 
 
 def level(a, hist):
@@ -366,6 +385,7 @@ def main():
         if r.get('cls') == 'Fr' and r.get('new') and top100(r.get('rec')):
             tops[bt_of.get(r['team']) or r['team']] += 1
     sfit, bfit = fit['scaling'], fit['breakout']
+    cf = json.load(open(CEIL))
     keep, K, dmax = bfit['keep'], fit['K'], fit['dU_p99']
     # the improvement sweep's shipped model when it has run (extra signals, hinge terms, recalibration), else the kept logistic
     sw = bfit.get('sweep') or {}
@@ -429,7 +449,9 @@ def main():
         age = r.get('age') if r.get('age') is not None else r.get('ageEst')
         out.append({'id': a['pid'], 'n': r['name'], 'tm': r['team'], 'lo': r.get('logo'), 'sub': r.get('conf') or '', 'pos': r.get('pos') or '',
                     'age': age, 'ph': r.get('photo'), 'p': round(p, 3), 'u': round(u, 1), 'u0': round(a['usg'], 1),
-                    'best': round(best, 1), 't': tiers, 'sig': sig})
+                    'best': round(best, 1), 't': tiers, 'sig': sig,
+                    'x': round(shr(now['bpm'], m_now) if now.get('bpm') is not None and (now.get('gp') or 0) >= 2 else shr(a['bpm'], a['m']), 1),
+                    'xc': round(ceiling(cf, a, [o for o in hist if o['y'] < a['y']]), 1)})
     out.sort(key=lambda o: -o['p'])
     out = out[:400]
     d = bfit['definition']
@@ -441,12 +463,19 @@ def main():
     about = (f"odds from {label} Barttorvik lines; breakout = {d}; players already there are left out; held-out log loss {f['base']:.4f} -> {f['cand']:.4f} "
              f"(t {f['t']}, {f['won']}/{f['seasons']} seasons){more}; signals: {', '.join(keep + extra)}; tiers = TS% and points a 40 "
              f"at that usage from the contextual scaling fit ({', '.join(sfit['ts']['keep'])}); * = a usage jump past "
-             f"the 99th percentile of observed jumps (+{dmax:.0f}); u = usage this season (2+ games) or last")
+             f"the 99th percentile of observed jumps (+{dmax:.0f}); u = usage this season (2+ games) or last; "
+             f"CEIL = 80th percentile of next-season BPM with usage +{cf['scen']:g} (cap {cf['ucap']:g}) on 40%+ of minutes: "
+             f"shrunk BPM, Marcel, age, ln min% + usage change x age, usage, rim and 3PA rates, assist %, BPM, spread by age, minutes, "
+             f"usage (held-out 80th-percentile loss t {cf['final']['t']}, {cf['final']['won']}/{cf['final']['seasons']} seasons; "
+             f"{round(100 * cf['coverage']['up'])}% of usage-up seasons under it)")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump({'sport': 'cbb', 'season': '2026-27', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
                'base': label, 'u': {'lab': 'USG', 'dec': 1},
                'tiers': [{'k': k, 'lab': f'USG {k}'} for k in TIERS],
-               'stat': {'lab': 'PTS/40', 'eff': 'TS%', 'dec': 1, 'edec': 1}, 'about': about, 'rows': out},
+               'stat': {'lab': 'PTS/40', 'eff': 'TS%', 'dec': 1, 'edec': 1},
+               'cur': {'lab': 'BPM', 't': 'shrunk BPM this season (2+ games; to -2 by minutes, k 10), else last season', 'dec': 1},
+               'ceil': {'lab': 'CEIL', 't': 'ceiling BPM: 80th percentile season if usage rises %g points' % cf['scen'], 'dec': 1},
+               'about': about, 'rows': out},
               open(OUT, 'w'), separators=(',', ':'))
     print(f'{len(match)} board players with a {label} line, {done} already at the bar ({bar}), {len(out)} rows -> {OUT}')
 

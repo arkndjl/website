@@ -20,6 +20,7 @@ FIT = os.path.join(ROOT, 'data', 'nba_breakout_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'next-up', 'nba.json')
 HTWT = os.path.join(ROOT, 'scripts', 'nba_htwt.json')
 HIST = os.path.join(ROOT, 'scripts', 'data', 'nba_breakout_hist.json')
+CEIL = os.path.join(ROOT, 'data', 'nba_ceiling_fit.json')         # scripts/nba_ceiling_research.py
 BEST = os.path.join(ROOT, 'scripts', 'data', 'nba_career_best.json')   # best shrunk BPM per bbref id through 2025-26 (LAKER history)
 
 TARGETS = ('ts_plus', 'tov_pct')
@@ -251,6 +252,19 @@ def season_rows(season, fresh=False):
     return out, lg
 
 
+def ceiling(cf, sx, a):
+    """80th percentile next-season XPM with usage up cf['scen'] points (capped at cf['ucap'])"""
+    f = cf['fit']
+    du = max(0.0, min(cf['scen'], cf['ucap'] - a['usage_pct']))
+    age = a['age'] or 25.0
+    v = {'sxpm': sx, 'age': age, 'age2': age * age, 'lnmp': math.log(max(a['mp'], 1.0)), 'dU': du, 'dU2': du * du,
+         'dU*age': du * age, 'dU*usg': du * a['usage_pct'], 'dU*fg2+': du * a.get('fg2_plus', 100.0),
+         'dU*3par+': du * a.get('threepar_plus', 100.0), 'dU*sxpm': du * sx, 'absdU': du, 'usg': a['usage_pct']}
+    m = f['b0'] + sum(b * v[c] for b, c in zip(f['b'], f['cols']))
+    sp = max(f['floor'], f['c0'] + sum(c * v[k] for c, k in zip(f['c'], f['scol']))) if f['c'] else f['c0']
+    return m + f['q'] * sp
+
+
 def sig_x(fit, X):
     f = fit['breakout']['fit']
     return 1 / (1 + math.exp(-max(-30, min(30, f['b0'] + sum(b * x for b, x in zip(f['b'], X))))))
@@ -292,6 +306,13 @@ def main():
     keep = fit['breakout']['keep'] + fit['breakout'].get('keep2', [])
     CB = json.load(open(BEST))
     tiers = [20.0, 25.0, 30.0]
+    cf = json.load(open(CEIL))
+    XS = {}
+    for y in (bs, cur):
+        try:
+            XS[y] = {r['id']: r.get('sxpm') for r in json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', f'{y}.json')))['players']}
+        except (OSError, ValueError):
+            XS[y] = {}
     rows = []
     for pid, now in cur_rows.items():
         a = dict(P.get((pid, bs)) or {})
@@ -331,7 +352,10 @@ def main():
             tov = max(3.0, predict(fit, 'tov_pct', a, hist, ht, dU))
             p100 = 2 * ts / 100 * (1 - tov / 100) * U / 100 * K
             t.append([round(p100 * pace / 100 * 36 / 48, 1), round(ts / 100 * lgts * 100, 1), 1 if dU > 9 else 0])
-        rows.append({'id': pid, 'n': now['n'], 'tm': X.TEAM.get(now['tm'], now['tm']), 'pos': now['pos'],
+        sxb = XS[a['y']].get(pid) if a['y'] in XS else None
+        sxc = XS[cur].get(pid)
+        xc = round(ceiling(cf, sxb, a), 1) if sxb is not None else None
+        rows.append({'id': pid, 'n': now['n'], 'x': sxc if sxc is not None else sxb, 'xc': xc, 'tm': X.TEAM.get(now['tm'], now['tm']), 'pos': now['pos'],
                      'age': now['age'], 'ph': None, 'p': round(p, 3), 'best': round(best, 1),
                      'u': round(now['usage_pct'] if now['mp'] >= 60 else a['usage_pct'], 1), 't': t, 'sig': sig})
     # headshots from the XPM board file (ESPN ids)
@@ -349,6 +373,9 @@ def main():
            'base': lab(bs), 'u': {'lab': 'USG', 'dec': 1},
            'tiers': [{'k': u, 'lab': 'USG %d' % u} for u in tiers],
            'stat': {'lab': 'PTS/36', 'eff': 'TS%', 'dec': 1, 'edec': 1},
+           'cur': {'lab': 'XPM', 't': 'shrunk XPM this season (XPM leaders board)', 'dec': 1},
+           'ceil': {'lab': 'CEIL', 't': 'ceiling XPM: 80th percentile season if usage rises %g points' % cf['scen'],
+                    'dec': 1},
            'about': (f'players not yet at the bar (best shrunk BPM so far under +{BAR:g}, BPM shrunk to -2 by MP, k 600, about the '
                      f'80th percentile of 1,000+ MP seasons; this season to date counts); breakout = next season 1,000+ MP at +{BAR:g} '
                      f'or better for the first time; base {lab(bs)}; odds = logistic on shrunk BPM, ln MP + {", ".join(keep)} '
@@ -356,7 +383,11 @@ def main():
                      'draft curve, coaching change, opportunity ahead, trend, splines, boosted trees, Platt tested and failed). '
                      'tiers: next-season TS+ and TOV% at that usage from players whose usage changed, shot profile '
                      '(2P%+, FT%+, FTr, 3PAr) sets how fast efficiency falls; PTS/36 = 2 x TS x (1 - TOV%) x USG x plays; '
-                     'usage jumps past 9 points are beyond the data'),
+                     'usage jumps past 9 points are beyond the data; '
+                     f'CEIL = 80th percentile of next-season XPM with usage +{cf["scen"]:g} (cap {cf["ucap"]:g}): ridge on base-season shrunk XPM, '
+                     'age, ln MP + usage change x age, usage, 2P%+, 3PAr+, XPM, held-out 80th-percentile loss '
+                     f'(t {cf["final"]["t"]}, {cf["final"]["won"]}/{cf["final"]["seasons"]} seasons; '
+                     f'{round(100 * cf["coverage"]["up"])}% of usage-up seasons under it)'),
            'rows': rows[:400]}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
