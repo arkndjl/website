@@ -178,7 +178,12 @@
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
       var kl = (D.cols.filter(function (c) { return c.k === key; })[0] || {}).l || key;
       var rx = D.cols.filter(function (c) { return c.k === 'xpm'; })[0];   // NBA: rXPM, headed XPM, stands in for the pick on the GFX
-      win.dataset.gfxCols = (rx ? ['RK', 'Player'].concat(key === 'xpm' ? [] : [kl], [rx.l + '=XPM']) : ['RK', 'Player', kl].concat(D.pre ? [D.pre.l, 'Δ'] : D.pfv ? [D.pfv.l] : [])).join(',');
+      var lab = function (k) { return (D.cols.filter(function (c) { return c.k === k; })[0] || {}).l; };
+      var gc = rx ? ['RK', 'Player'].concat(key === 'xpm' ? [] : [kl], [rx.l + '=XPM']) : ['RK', 'Player', kl].concat(D.pre ? [D.pre.l, 'Δ'] : D.pfv ? [D.pfv.l] : []);
+      if (D.title === 'next up') {   // next up: age, best so far, then the current value and its ceiling (or the workload)
+        gc = ['RK', 'Player', 'Age', kl].concat((lab('xc') ? ['best', 'x', 'xc'] : ['best', 'u']).map(lab).filter(function (l) { return l && l !== kl; }));
+      }
+      win.dataset.gfxCols = gc.join(',');
       var t = D.asof ? new Date(D.asof.length === 10 ? D.asof + 'T12:00Z' : D.asof) : null;
       asof.textContent = S.l + (S.games ? ' · ' + S.games + ' games' : '') + (t && !isNaN(t) ? ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear() : '');
     }
