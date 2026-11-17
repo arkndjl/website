@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-17T23:25:52Z",
+ "asof": "2026-11-17T23:33:41Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-17T23:22:43Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [],
@@ -132,7 +132,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.0,
    "x": null,
    "why": "total market off",
@@ -188,22 +188,6 @@
    "tm": 40.0
   },
   {
-   "id": "2026_11_MIA_BUF",
-   "sport": "nfl",
-   "kick": "2026-11-22T18:00:00Z",
-   "home": "BUF",
-   "away": "MIA",
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
-   "price": -124.0,
-   "edge": 2.8,
-   "x": null,
-   "why": "total market off",
-   "m": 18.9,
-   "tm": 47.3
-  },
-  {
    "id": "2026_11_ARI_KC",
    "sport": "nfl",
    "kick": "2026-11-22T18:00:00Z",
@@ -236,6 +220,22 @@
    "tm": 44.0
   },
   {
+   "id": "2026_11_MIA_BUF",
+   "sport": "nfl",
+   "kick": "2026-11-22T18:00:00Z",
+   "home": "BUF",
+   "away": "MIA",
+   "mk": "spread",
+   "side": "home",
+   "line": 16.5,
+   "price": -110.0,
+   "edge": 2.4,
+   "x": null,
+   "why": "spread market off",
+   "m": 18.9,
+   "tm": 47.3
+  },
+  {
    "id": "2026_11_BAL_CAR",
    "sport": "nfl",
    "kick": "2026-11-22T18:00:00Z",
@@ -244,7 +244,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.0,
    "x": null,
    "why": "spread market off",
@@ -297,7 +297,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -318,11 +318,11 @@
    "state": "off"
   },
   "2026_11_MIA_BUF": {
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
-   "price": -124.0,
-   "edge": 2.8,
+   "mk": "spread",
+   "side": "home",
+   "line": 16.5,
+   "price": -110.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "BUF",
@@ -417,7 +417,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -478,16 +478,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4620,
+  "snapshots": 4627,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 1778,
+    "clvN": 1782,
     "clvRet": -0.0204,
-    "clvT": -10.42,
+    "clvT": -10.46,
     "clv": 0.47,
-    "beat": 0.357,
-    "still": 0.6
+    "beat": 0.356,
+    "still": 0.601
    },
    {
     "when": "6-24h",
@@ -2894,7 +2894,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T23:25:52Z",
+ "checked": "2026-11-17T23:33:41Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
