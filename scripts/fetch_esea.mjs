@@ -838,7 +838,7 @@ for (const m of matches) for (const x of m.maps) {
 // scores (ARK swing + team-result credit + the opposing five's mean RWA; unknown players at data/esea_rwa.json
 // 'new'). Leetify carries no opening duels, clutches or utility successes: those count as average there.
 const PUG_N = 30, LEET_N = 30, LEET_MISS = ['entry', 'clutch', 'fsr', 'usr', 'udr'];
-const LEET = 'https://api-public.cs-prod.leetify.com/v3', PUG_ME = new Set();
+const LEET = 'https://api-public.cs-prod.leetify.com', PUG_ME = new Set();
 function pugMap(sides, R, S, mineIdx, names) {
   const [us, them] = [sides[mineIdx], sides[1 - mineIdx]], [rf, ra] = [S[mineIdx], S[1 - mineIdx]];
   const ct = mapCredit(us, them, R, rf, ra), co = mapCredit(them, us, R, ra, rf);
@@ -870,8 +870,8 @@ async function faceitPugs(pid) {
 async function leetifyPugs(steam) {
   const get = async u => { for (let a = 0; a < 3; a++) { const r = await fetch(LEET + u, { headers: { Accept: 'application/json', 'User-Agent': 'arkndjl.net' } }).catch(() => null);
     if (r?.status === 429 || (r && r.status >= 500)) { await new Promise(s => setTimeout(s, 3000 * (a + 1))); continue; } return r; } return null; };
-  const rp = await get(`/profile?steam64_id=${steam}`), prof = rp?.ok ? await rp.json().catch(() => null) : null;
-  const rm = await get(`/profile/matches?steam64_id=${steam}`), list = rm?.ok ? await rm.json().catch(() => null) : null;
+  const rp = await get(`/v3/profile?steam64_id=${steam}`), prof = rp?.ok ? await rp.json().catch(() => null) : null;
+  const rm = await get(`/v3/profile/matches?steam64_id=${steam}`), list = rm?.ok ? await rm.json().catch(() => null) : null;
   const status = rm ? rm.status : 'no response';
   const rows = [];
   // the list carries only his own line: the full ten come from /v2/matches/{id}, cached (.cache/esea/leetify.json)
