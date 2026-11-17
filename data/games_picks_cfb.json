@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T00:29:55Z",
+ "asof": "2026-11-17T01:03:18Z",
  "recenter": {
-  "week": 0.31
+  "week": 0.28
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-16",
-  "ageH": 0.5,
+  "ageH": 1.1,
   "stale": false
  },
  "picks": [],
@@ -485,22 +485,6 @@
    "tm": 47.8
   },
   {
-   "id": "401862836",
-   "sport": "cfb",
-   "kick": "2026-11-22T01:00:00.000Z",
-   "home": "UAB",
-   "away": "UTSA",
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -129.0,
-   "edge": 2.2,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -4.5,
-   "tm": 53.7
-  },
-  {
    "id": "401869938",
    "sport": "cfb",
    "kick": "2026-11-22T00:00:00.000Z",
@@ -573,12 +557,28 @@
    "mk": "total",
    "side": "over",
    "line": 55.5,
-   "price": -114.0,
+   "price": -106.0,
    "edge": 1.4,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
    "m": 9.4,
    "tm": 56.9
+  },
+  {
+   "id": "401862836",
+   "sport": "cfb",
+   "kick": "2026-11-22T01:00:00.000Z",
+   "home": "UAB",
+   "away": "UTSA",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -119.0,
+   "edge": 1.2,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -4.5,
+   "tm": 53.7
   },
   {
    "id": "401858307",
@@ -706,7 +706,7 @@
    "mk": "spread",
    "side": "home",
    "line": -16.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -921,9 +921,9 @@
   "401856865": {
    "mk": "spread",
    "side": "away",
-   "line": -7.5,
-   "price": 108.0,
-   "edge": 2.9,
+   "line": -6.5,
+   "price": -135.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -946,7 +946,7 @@
    "mk": "spread",
    "side": "home",
    "line": -6.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -1030,7 +1030,7 @@
    "mk": "total",
    "side": "over",
    "line": 55.5,
-   "price": -114.0,
+   "price": -106.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -1054,7 +1054,7 @@
    "mk": "total",
    "side": "under",
    "line": 58.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.9,
    "ev": null,
    "units": 0.0,
@@ -1077,9 +1077,9 @@
   "401862836": {
    "mk": "total",
    "side": "over",
-   "line": 51.5,
-   "price": -129.0,
-   "edge": 2.2,
+   "line": 52.5,
+   "price": -119.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "UAB",
@@ -1209,9 +1209,9 @@
   "401871080": {
    "mk": "spread",
    "side": "home",
-   "line": 16.5,
-   "price": -127.0,
-   "edge": 3.2,
+   "line": 17.5,
+   "price": -110.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Liberty",
@@ -1219,11 +1219,11 @@
    "state": "off"
   },
   "401869953": {
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -124.0,
-   "edge": 0.6,
+   "mk": "spread",
+   "side": "home",
+   "line": -9.5,
+   "price": -127.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Troy",
@@ -1258,7 +1258,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -112.0,
+   "price": -117.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -1269,9 +1269,9 @@
   "401869946": {
    "mk": "total",
    "side": "under",
-   "line": 50.5,
-   "price": -114.0,
-   "edge": 1.7,
+   "line": 51.5,
+   "price": -124.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana",
@@ -1318,7 +1318,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -127.0,
+   "price": -122.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -1411,11 +1411,11 @@
    "state": "off"
   },
   "401869929": {
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -114.0,
-   "edge": 0.2,
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -129.0,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "App State",
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21625,
+  "snapshots": 21651,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4358,
-    "clvRet": -0.0482,
-    "clvT": -35.51,
+    "clvN": 4364,
+    "clvRet": -0.0479,
+    "clvT": -35.27,
     "clv": 0.2,
-    "beat": 0.336,
-    "still": 0.33
+    "beat": 0.341,
+    "still": 0.327
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T00:29:55Z",
+ "checked": "2026-11-17T01:03:18Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
