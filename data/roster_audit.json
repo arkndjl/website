@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-17T00:23Z",
+ "asof": "2026-11-17T00:26Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -292,11 +292,11 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 11,
-     "rows": 2152
+     "flags": 10,
+     "rows": 2148
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 19,
+     "flags": 20,
      "rows": 639
     },
     "static/data/nfl-war.json": {
@@ -408,24 +408,6 @@
      "site": "KC"
     },
     {
-     "d": "2026-11-16",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "released",
-     "head": "Cut loose by Rams",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Cut loose by Rams",
-      "kind": "waived"
-     },
-     "pid": "18919",
-     "player": "Brennan Presley",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "LA"
-    },
-    {
      "d": "2026-10-19",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -444,20 +426,20 @@
      "site": "NE"
     },
     {
-     "d": "2026-11-16",
+     "d": "2026-08-30",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
      "flag": "released",
-     "head": "Let go by G-Men",
-     "kind": null,
+     "head": "Released by Minnesota",
+     "kind": "waived",
      "move": {
-      "d": "2026-09-29",
-      "head": "Signed to active roster",
-      "kind": "up"
+      "d": "2026-08-30",
+      "head": "Released by Minnesota",
+      "kind": "waived"
      },
-     "pid": "16719",
-     "player": "Charlie Jones",
-     "pos": "WR",
+     "pid": "13219",
+     "player": "Tavierre Thomas",
+     "pos": "NB",
      "rotowire": "FA",
      "site": "NYG"
     },
@@ -4314,6 +4296,24 @@
      "site": "DAL"
     },
     {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Signs to practice squad",
+      "kind": "practice"
+     },
+     "pid": "18251",
+     "player": "Hayden Rucci",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "LAC"
+    },
+    {
      "d": "2026-09-15",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4388,7 +4388,7 @@
    ],
    "joined": 0,
    "players": 2280,
-   "rows": 8080
+   "rows": 8076
   },
   "nhl": {
    "by_file": {
