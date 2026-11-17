@@ -2193,9 +2193,21 @@
     var tables = [].slice.call(box.querySelectorAll('table')); if (!tables.length) return null;
     var F = await frame(2400, 1350, btn.getAttribute('data-gfx-title') || 'box score', btn.getAttribute('data-gfx-date'));
     var g = F.g; well(g, F.x, F.y, F.w, F.h);
+    // optional stat tiles across the top (data-gfx-tiles: [{l: label, v: value, t: tone}, ...]; tone up/down colours the value)
+    var tiles = null, top = 0; try { tiles = JSON.parse(btn.getAttribute('data-gfx-tiles') || 'null'); } catch (e) { tiles = null; }
+    if (tiles && tiles.length) {
+      var tw = (F.w - 24 - 12 * (tiles.length - 1)) / tiles.length, th = 200;
+      tiles.forEach(function (t, i) {
+        var tx = F.x + 12 + i * (tw + 12), ty = F.y + 12;
+        g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 2);
+        g.font = '96px ' + FONT; g.fillStyle = t.t === 'up' ? C.teal : t.t === 'down' ? C.down : C.white; g.fillText(fit(g, String(t.v), tw - 40), tx + 24, ty + 84);
+        g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(t.l).toUpperCase(), tx + 24, ty + 160);
+      });
+      top = th + 24;
+    }
     var heads = [].slice.call(tables[0].tHead.rows[0].cells).map(txt);
     var nRows = tables.reduce(function (a, t) { return a + t.tBodies[0].rows.length + 1; }, 0);
-    var rowH = Math.min(78, (F.h - 24 - 24 * (tables.length - 1)) / nRows), size = rowH >= 64 ? 32 : 24;
+    var rowH = Math.min(78, (F.h - top - 24 - 24 * (tables.length - 1)) / nRows), size = rowH >= 64 ? 32 : 24;
     g.font = size + 'px ' + FONT;
     // column widths from the widest cell; the name column also holds a flag
     var colW = heads.map(function (h, i) {
@@ -2206,7 +2218,7 @@
     var tot = colW.reduce(function (a, b) { return a + b; }, 0), gw = F.w - 24;
     if (tot < gw) colW = colW.map(function (w) { return w + (gw - tot) / colW.length; });
     else if (tot > gw) { size = Math.floor(size * gw / tot); g.font = size + 'px ' + FONT; colW = colW.map(function (w) { return w * gw / tot; }); }
-    var y = F.y + 12;
+    var y = F.y + 12 + top;
     for (var ti = 0; ti < tables.length; ti++) {
       var t = tables[ti], x0 = F.x + 12, hx = x0, opp = t.classList.contains('esea-box--opp');
       g.fillStyle = C.face; g.fillRect(x0, y, gw, rowH - 4); bevel(g, x0, y, gw, rowH - 4, true, 2);

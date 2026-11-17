@@ -921,6 +921,25 @@ function pugForm(rows) {
     series, maps: Object.entries(maps).map(([map, rs]) => ({ map, ...sum(rs) })).sort((a, b) => b.n - a.n || (b.rwa ?? -99) - (a.rwa ?? -99)),
     src: ['faceit', 'premier', 'comp'].map(k => ({ src: k, ...sum(newest.filter(r => r.src === k)) })).filter(x => x.n) };
 }
+// daily report: his PUGs grouped by ET day, a day running to 6 AM (late sessions stay on the evening they started),
+// each game's line plus the day's averages (per game; RWA and Rating as plain means)
+function pugDays(rows, nDays = 14) {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const tfmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+  const D = new Map();
+  for (const r of rows) { const p = r.players.find(x => x.isMe); if (!p || !r.at) continue;
+    const day = fmt.format(new Date(r.at - 6 * 36e5));
+    (D.get(day) || D.set(day, []).get(day)).push({ at: r.at, time: tfmt.format(new Date(r.at)), src: r.src, map: r.map, win: r.win, score: `${r.rf}-${r.ra}`,
+      k: p.k, d: p.d, a: p.a, adr: p.adr, hs: p.hs, rwa: p.rwa, rating: p.rating, mvp: !!p.mapMvp }); }
+  const avg = (gs, f, dp) => { const v = gs.map(f).filter(x => x != null); return v.length ? Math.round(v.reduce((a, x) => a + x, 0) / v.length * 10 ** dp) / 10 ** dp : null; };
+  return [...D.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, nDays).map(([day, gs]) => {
+    gs.sort((a, b) => a.at - b.at);
+    const k = gs.reduce((a, g) => a + (g.k || 0), 0), d = gs.reduce((a, g) => a + (g.d || 0), 0);
+    return { day, n: gs.length, w: gs.filter(g => g.win).length, l: gs.filter(g => !g.win).length, mvps: gs.filter(g => g.mvp).length,
+      avg: { k: avg(gs, g => g.k, 1), d: avg(gs, g => g.d, 1), a: avg(gs, g => g.a, 1), adr: avg(gs, g => g.adr, 1), hs: avg(gs, g => g.hs, 0),
+        rwa: avg(gs, g => g.rwa, 1), rating: avg(gs, g => g.rating, 2), kd: d ? Math.round(k / d * 100) / 100 : null }, games: gs };
+  });
+}
 if (prof?.me?.id) {
   PUG_ME.add(prof.me.id); if (prof.me.steam) PUG_ME.add(prof.me.steam);
   const fr = await faceitPugs(prof.me.id).catch(e => (console.log('faceit pugs:', e.message), []));
@@ -931,7 +950,7 @@ if (prof?.me?.id) {
   for (const r of rows) { const m = meLine(r); r.me = m ? { k: m.k, d: m.d, adr: m.adr, rwa: m.rwa, rating: m.rating } : null; }
   const n = s => rows.filter(r => r.src === s).length;
   prof.pugs = { rows, w: rows.filter(r => r.win).length, l: rows.filter(r => !r.win).length, faceit: n('faceit'), premier: n('premier'), comp: n('comp'),
-    leetify: { status: lr.status, premier: lr.premier, rating: lr.leetify }, ...pugForm(rows) };
+    leetify: { status: lr.status, premier: lr.premier, rating: lr.leetify }, ...pugForm(rows), days: pugDays(rows) };
   // rating trend: one reading per run, kept when FACEIT Elo or Premier rating moved (neither API has a history)
   const tr = [...(prev.profile?.pugs?.trend || [])], last = tr[tr.length - 1], elo = prof.me.elo ?? null, pr = lr.premier ?? null;
   if ((elo != null || pr != null) && (!last || last.elo !== elo || last.pr !== pr)) tr.push({ t: Date.now(), elo, pr });

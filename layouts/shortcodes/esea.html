@@ -441,6 +441,74 @@
   <div class="win__status"><span>{{ with $pg.all }}{{ .n }} PUGs · {{ .w }}–{{ .l }} · {{ end }}{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
+{{- else if eq $part "daily" }}
+{{- /* LAURSEN_111 daily report: data/esea.json profile.pugs.days (pugDays in scripts/fetch_esea.mjs); an ET day runs to 6 AM */ -}}
+{{- $pg := cond (and $d $d.profile $d.profile.pugs) $d.profile.pugs dict }}
+{{- $src := dict "faceit" "FACEIT" "premier" "Premier" "comp" "Comp" }}
+<div class="win esea-log lzd{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>daily_report.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="esea-log__body">
+  {{- with $pg.days }}
+  {{- range $i, $dy := . }}
+  {{- $dt := time.AsTime (printf "%sT12:00:00Z" $dy.day) }}{{ $lbl := $dt.Format "Mon Jan 2" }}{{ $a := $dy.avg }}
+  <details class="esea-m {{ if gt $dy.w $dy.l }}is-w{{ else if lt $dy.w $dy.l }}is-l{{ end }}"{{ if eq $i 0 }} open{{ end }}>
+    <summary>
+      <span class="esea-m__wk">{{ $dy.n }}×</span>
+      <span class="esea-m__res">{{ $dy.w }}–{{ $dy.l }}</span>
+      <span class="esea-m__opp">{{ $lbl }}</span>
+      <span class="esea-m__maps">{{ range $dy.games }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
+      <span class="esea-m__score">{{ if ne $a.rwa nil }}{{ partial "num.html" (slice "%+.1f" (float $a.rwa)) }}{{ end }}</span>
+      <span class="esea-m__me">{{ with $a.kd }}{{ . }} K/D{{ end }}{{ with $a.adr }} · {{ . }} ADR{{ end }}{{ with $a.rating }} · {{ . }} Rating{{ end }}</span>
+      <span class="esea-m__when cfb__dim">{{ with $dy.mvps }}{{ . }}★{{ end }}</span>
+    </summary>
+    <div class="esea-m__box">
+      <p class="esea-m__head"><b>{{ $lbl }}</b> <b class="esea-m__sc">{{ $dy.w }}–{{ $dy.l }}</b>
+        <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ $dt.Format "Jan 2, 2006" }}" {{ $tl := slice (dict "l" "record" "v" (printf "%d–%d" (int $dy.w) (int $dy.l)) "t" (cond (gt $dy.w $dy.l) "up" (cond (lt $dy.w $dy.l) "down" ""))) }}{{ if ne $a.rwa nil }}{{ $tl = $tl | append (dict "l" "avg RWA" "v" (printf "%+.1f" (float $a.rwa)) "t" (cond (ge (float $a.rwa) 0.0) "up" "down")) }}{{ end }}{{ with $a.rating }}{{ $tl = $tl | append (dict "l" "avg Rating" "v" (printf "%.2f" (float .)) "t" "") }}{{ end }}{{ with $a.kd }}{{ $tl = $tl | append (dict "l" "K/D" "v" (printf "%.2f" (float .)) "t" "") }}{{ end }}{{ with $a.adr }}{{ $tl = $tl | append (dict "l" "avg ADR" "v" (printf "%.1f" (float .)) "t" "") }}{{ end }}
+        data-gfx-tiles="{{ $tl | jsonify }}" data-gfx-title="LAURSEN_111 :: DAILY REPORT" title="daily report graphic (16:9)">GFX</button></p>
+      <div class="wintable__scroll">
+      <table class="esea-box">
+        <thead><tr><th>{{ $lbl }}</th><th title="round win % added per round">RWA</th><th title="ARK Rating">Rating</th><th>Map</th><th>W/L</th><th>K</th><th>D</th><th>A</th><th title="kills minus deaths">+/−</th><th>ADR</th><th>HS%</th></tr></thead>
+        <tbody>
+        {{- range $g := $dy.games }}{{ $pm := sub (int $g.k) (int $g.d) }}
+        <tr>
+          <td>{{ $g.time }} {{ index $src $g.src }}{{ if $g.mvp }} <span class="esea-box__top" title="best RWA on his team">★ MVP</span>{{ end }}</td>
+          <td class="esea-rt" data-r="{{ with $g.rwa }}{{ if ge (float .) 2.0 }}hi{{ else if lt (float .) -2.0 }}lo{{ end }}{{ end }}"><b>{{ if ne $g.rwa nil }}{{ partial "num.html" (slice "%+.1f" (float $g.rwa)) }}{{ else }}—{{ end }}</b></td>
+          <td>{{ with $g.rating }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ else }}—{{ end }}</td>
+          <td>{{ $g.map }}</td>
+          <td class="{{ if $g.win }}cfb__up{{ else }}cfb__down{{ end }}">{{ if $g.win }}W{{ else }}L{{ end }} {{ $g.score }}</td>
+          <td>{{ $g.k }}</td><td>{{ $g.d }}</td><td>{{ $g.a }}</td>
+          <td class="{{ if ge $pm 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $pm 0 }}+{{ end }}{{ $pm }}</td>
+          <td>{{ $g.adr | default "—" }}</td><td>{{ $g.hs | default "—" }}</td>
+        </tr>
+        {{- end }}
+        {{- $apm := sub (float ($a.k | default 0)) (float ($a.d | default 0)) }}
+        <tr class="is-me lzd__avg">
+          <td>AVG · {{ $dy.n }} {{ if eq $dy.n 1 }}game{{ else }}games{{ end }}</td>
+          <td class="esea-rt" data-r="{{ with $a.rwa }}{{ if ge (float .) 2.0 }}hi{{ else if lt (float .) -2.0 }}lo{{ end }}{{ end }}"><b>{{ if ne $a.rwa nil }}{{ partial "num.html" (slice "%+.1f" (float $a.rwa)) }}{{ else }}—{{ end }}</b></td>
+          <td>{{ with $a.rating }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ else }}—{{ end }}</td>
+          <td>{{ with $a.kd }}{{ . }} K/D{{ end }}</td>
+          <td class="{{ if gt $dy.w $dy.l }}cfb__up{{ else if lt $dy.w $dy.l }}cfb__down{{ end }}">{{ $dy.w }}–{{ $dy.l }}</td>
+          <td>{{ $a.k }}</td><td>{{ $a.d }}</td><td>{{ $a.a }}</td>
+          <td class="{{ if ge $apm 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $apm 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" $apm) }}</td>
+          <td>{{ $a.adr | default "—" }}</td><td>{{ $a.hs | default "—" }}</td>
+        </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </details>
+  {{- end }}
+  {{- else }}
+  <p class="esea__empty-line">no PUGs synced yet.</p>
+  {{- end }}
+  </div>
+  {{ partial "gfx.html" . }}
+  <div class="win__status"><span title="a day runs to 6 AM ET">{{ with $pg.days }}{{ len . }} days · {{ end }}{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
 {{- else if eq $part "pugs" }}
 {{- /* LAURSEN_111's PUGs (FACEIT matchmaking + Premier via Leetify), one box score each: data/esea.json profile.pugs */ -}}
 {{- $pg := cond (and $d $d.profile $d.profile.pugs) $d.profile.pugs dict }}
@@ -466,6 +534,8 @@
     </summary>
     <div class="esea-m__box">
       {{- $nm := .names | default (slice "" "") }}
+      <p class="esea-m__head"><span class="esea-pug__src" data-src="{{ .src }}">{{ index $src .src }}</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> <b class="esea-m__sc">{{ .rf }}–{{ .ra }}</b>
+        <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="LAURSEN_111 :: {{ index $src .src }} {{ if .win }}W{{ else }}L{{ end }} {{ .rf }}–{{ .ra }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
       {{- range $k, $side := slice (slice (cond (ne (index $nm 0) "") (index $nm 0) "us") $m.players) (slice (cond (ne (index $nm 1) "") (index $nm 1) "them") $m.opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
       <div class="wintable__scroll">
       <table class="esea-box{{ if $k }} esea-box--opp{{ end }}">
@@ -499,6 +569,7 @@
   <p class="esea__empty-line">no PUGs synced yet.</p>
   {{- end }}
   </div>
+  {{ partial "gfx.html" . }}
   <div class="win__status"><span title="FACEIT Data API; Premier via Leetify public API. Premier lines carry no opening duels, clutches or utility successes (counted as average in RWA and Rating).">{{ with $pg.rows }}{{ $pg.w }}–{{ $pg.l }} · FACEIT {{ $pg.faceit }} · Premier {{ $pg.premier }}{{ with $pg.leetify.premier }} · {{ lang.FormatNumber 0 . }} rating{{ end }} · {{ end }}{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
