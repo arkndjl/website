@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-17T01:17:43Z",
+ "asof": "2026-11-17T04:34:11Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 85.9,
+  "now": 85.04,
   "peak": 117.38,
-  "drawdown": 0.2682,
-  "open": 1.0,
+  "drawdown": 0.2755,
+  "open": 0,
   "path": [
-   116.7,
    117.38,
    111.97,
    109.69,
@@ -408,7 +407,8 @@
    85.17,
    84.95,
    85.13,
-   85.9
+   85.9,
+   85.04
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -1.87,
   "clv": 0.06,
   "beat": 0.328,
-  "settled": 437,
+  "settled": 438,
   "w": 219,
-  "l": 218,
+  "l": 219,
   "p": 0,
-  "roi": -0.0096,
-  "roiT": -0.2,
-  "profit": -12.14,
-  "risked": 408.25,
-  "yield": -0.0297
+  "roi": -0.0119,
+  "roiT": -0.25,
+  "profit": -13.14,
+  "risked": 409.25,
+  "yield": -0.0321
  },
  "tEff": -1.42,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -1.0% vs -1.0% (SE 4.8)",
+   "value": "ROI -1.2% vs -0.9% (SE 4.8)",
    "pass": true
   }
  ],
@@ -707,18 +707,19 @@
    "clvT": -1.08,
    "clv": null,
    "beat": null,
-   "settled": 68,
+   "settled": 69,
    "w": 46,
-   "l": 22,
+   "l": 23,
    "p": 0,
-   "roi": 0.3457,
-   "roiT": 3.01,
-   "profit": 34.09,
-   "risked": 84.25,
-   "yield": 0.4046
+   "roi": 0.3262,
+   "roiT": 2.84,
+   "profit": 33.09,
+   "risked": 85.25,
+   "yield": 0.3882
   }
  ],
- "open": [
+ "open": [],
+ "recent": [
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -739,10 +740,12 @@
    "event": null,
    "pass": false,
    "clvRet": 0.1784,
-   "close": 1.5
-  }
- ],
- "recent": [
+   "close": 1.5,
+   "score": 2.0,
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.0
+  },
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -2491,32 +2494,6 @@
    "res": "l",
    "ret": -1.0,
    "profit": -0.25
-  },
-  {
-   "rule": "nflprops-prop",
-   "sport": "nflprops",
-   "id": "401873050-5220680-rc",
-   "k": "2026-11-09T01:20:00Z",
-   "slate": "nflprops:2026-11-08",
-   "h": "",
-   "a": "",
-   "mk": "prop",
-   "side": "under",
-   "line": 1.5,
-   "price": 108.0,
-   "bet": "Ted Hurst III under 1.5 rec +108",
-   "placed": "2026-11-06T16:50:00Z",
-   "stake": 3.0,
-   "edge": 15.2,
-   "ev": 0.1055,
-   "event": null,
-   "pass": false,
-   "clvRet": 0.04,
-   "close": 1.5,
-   "score": 0.0,
-   "res": "w",
-   "ret": 1.08,
-   "profit": 3.24
   }
  ],
  "ledger": [
@@ -17658,7 +17635,11 @@
    "event": null,
    "pass": false,
    "clvRet": 0.1784,
-   "close": 1.5
+   "close": 1.5,
+   "score": 2.0,
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.0
   }
  ]
 }
