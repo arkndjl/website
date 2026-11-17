@@ -11,7 +11,7 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,rookies,next up,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:leaders,rookies,next up,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
 {{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
@@ -82,5 +82,24 @@ cover = "/og/soccer.png"
 {{< lazytab tab="world ranking" >}}{{< soccerintl view="ranking" title="world ranking" tab="world ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="internationals" >}}{{< soccerintl view="games" title="internationals" tab="internationals" >}}{{< /lazytab >}}
 {{< lazytab tab="Nations League" >}}{{< soccerintl view="nl" title="Nations League" tab="Nations League" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
+{{< lazytab tab="all-time teams" >}}
+{{< alltime sport="soccer" list="teams" title="all-time teams" tab="all-time teams" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time offenses" >}}
+{{< alltime sport="soccer" list="offense" title="all-time offenses" tab="all-time offenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time defenses" >}}
+{{< alltime sport="soccer" list="defense" title="all-time defenses" tab="all-time defenses" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="soccer" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="careers" >}}
+{{< alltime sport="soccer" list="career" title="careers" tab="careers" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}
 {{< /wintabs >}}

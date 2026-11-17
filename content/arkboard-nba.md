@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="basketball" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:VORX/XPM leaders,projections,rookies,next up,G League,awards,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time coaches|market:contract value" side="true" label="NBA views" >}}
+{{< wintabs groups="players:VORX/XPM leaders,projections,rookies,next up,G League,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time|market:contract value" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< pctl sport="nba" icon="basketball" title="projections" tab="projections" >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
@@ -49,7 +49,26 @@ cover = "/og/nba.png"
 {{< teamunits sport="nba" view="defense" title="defense" tab="defense" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses,all-time coaches" sub="true" label="all-time views" >}}
+{{< lazytab tab="all-time teams" >}}
+{{< alltime sport="nba" list="teams" title="all-time teams" tab="all-time teams" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time offenses" >}}
+{{< alltime sport="nba" list="offense" title="all-time offenses" tab="all-time offenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time defenses" >}}
+{{< alltime sport="nba" list="defense" title="all-time defenses" tab="all-time defenses" >}}
+{{< /lazytab >}}
 {{< lazytab tab="all-time coaches" >}}
 {{< coachalltime sport="nba" title="all-time coaches" tab="all-time coaches" >}}
 {{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="nba" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="careers" >}}
+{{< alltime sport="nba" list="career" title="careers" tab="careers" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
 {{< /wintabs >}}

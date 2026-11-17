@@ -25,22 +25,23 @@
     ]},
     { "name": "NFL", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap); weekly player lines (rookie defenders for DROY, the award backtest by week)" },
+      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap); weekly player lines (rookie defenders for DROY, the award backtest by week); weighted career AV from draft picks for all-time careers" },
       { "n": "nfldata (Lee Sharpe)", "u": "https://github.com/nflverse/nfldata", "w": "games and closing lines" },
       { "n": "ESPN", "u": "https://www.espn.com/nfl/", "w": "scores, injuries, depth charts, headshots, season stats and leaders (award races)" },
       { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "AP award winners (MVP, OPOY, DPOY, OROY, DROY)" },
-      { "n": "NFL.com", "u": "https://www.nfl.com/", "w": "headshots" }
+      { "n": "NFL.com", "u": "https://www.nfl.com/", "w": "headshots" },
+      { "n": "FiveThirtyEight", "u": "https://github.com/fivethirtyeight/nfl-elo-game", "w": "every NFL, AFL and AAFC score 1920-2019 for all-time team ratings" }
     ]},
     { "name": "college basketball", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, program exits, transactions log" },
-      { "n": "Barttorvik (T-Rank)", "u": "https://barttorvik.com/", "w": "player and team efficiency, game logs, birth dates" },
+      { "n": "Barttorvik (T-Rank)", "u": "https://barttorvik.com/", "w": "player and team efficiency, game logs, birth dates; every player season since 2008 for all-time players" },
       { "n": "ESPN", "u": "https://www.espn.com/mens-college-basketball/", "w": "scores, box scores, rosters, headshots, recruiting classes (hometowns, recruitment lists)" },
       { "n": "NCAA.com (via ncaa-api)", "u": "https://www.ncaa.com/scoreboard/basketball-men/d2", "w": "Division II and III box scores" },
       { "n": "SportsDataverse (hoopR)", "u": "https://github.com/sportsdataverse/sportsdataverse-data", "w": "historical play-by-play" },
       { "n": "On3", "u": "https://www.on3.com/", "w": "recruiting ratings, NIL valuations, transfer portal; recruit news headlines (via Google News)" },
       { "n": "FIBA", "u": "https://www.fiba.basketball/", "w": "youth event leaders (U16-U18 EuroBasket, World Cup, AmeriCup, AfroBasket, Asia Cup): stat lines, birth dates, heights, clubs of international recruits no service ranks" },
       { "n": "USA Today coach salaries", "u": "https://sportsdata.usatoday.com/ncaa/salaries/mens-basketball/coach", "w": "head coach pay" },
-      { "n": "Sports Reference", "u": "https://www.sports-reference.com/cbb/", "w": "head coaches by season; every Division I season since 1939 (SRS, records, NCAA results, head coaches) for all-time coaches" },
+      { "n": "Sports Reference", "u": "https://www.sports-reference.com/cbb/", "w": "head coaches by season; every Division I season since 1939 (SRS, records, NCAA results, head coaches) for all-time coaches; season ratings (SRS, OSRS, DSRS) since 1950 for all-time teams" },
       { "n": "247Sports", "u": "https://247sports.com/", "w": "recruit news headlines: commits, flips, decommits, portal (via Google News)" },
       { "n": "Covers", "u": "https://www.covers.com/sport/basketball/ncaab/injuries", "w": "injuries" },
       { "n": "KenPom (via Kaggle March Machine Learning Mania)", "u": "https://kenpom.com/", "w": "research backtests only" },
@@ -52,7 +53,7 @@
     { "name": "NBA", "sources": [
       { "n": "NBA G League Stats", "u": "https://stats.gleague.nba.com/", "w": "G League season totals (1Y / 3Y G League term); player seasons since 2005-06 (box and advanced, regular season and Showcase Cup) for G League call-up odds" },
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions, award voting (incl. All-NBA teams), standings, coach registers, Hall of Fame list" },
+      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions, award voting (incl. All-NBA teams), standings, coach registers, Hall of Fame list; team ratings (SRS, ORtg, DRtg) and advanced player seasons since 1947 for all-time rankings" },
       { "n": "NBA.com", "u": "https://www.nba.com/", "w": "officials, headshots" },
       { "n": "ESPN", "u": "https://www.espn.com/nba/", "w": "scores, injuries, depth, G League team logos" },
       { "n": "databallr", "u": "https://databallr.com/", "w": "DPM" },
@@ -64,7 +65,7 @@
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
       { "n": "NHL API", "u": "https://www.nhl.com/", "w": "games, rosters, stats, headshots; skater totals by date (award backtest)" },
       { "n": "MoneyPuck", "u": "https://moneypuck.com/", "w": "expected goals, skater and goalie data" },
-      { "n": "Hockey Reference", "u": "https://www.hockey-reference.com/", "w": "award voting (Hart, Norris, Vezina, Calder), standings, coach records by season, Stanley Cup finals" },
+      { "n": "Hockey Reference", "u": "https://www.hockey-reference.com/", "w": "award voting (Hart, Norris, Vezina, Calder), standings, coach records by season, Stanley Cup finals; team SRS and goals by season since 1918, skater and goalie point shares for all-time rankings" },
       { "n": "Daily Faceoff", "u": "https://www.dailyfaceoff.com/", "w": "starting goalies, lines" },
       { "n": "HockeyTech / LeagueStat", "u": "https://lscluster.hockeytech.com/", "w": "CHL, AHL, USHL stats and headshots" },
       { "n": "Liiga", "u": "https://liiga.fi/", "w": "Finnish league stats" },
@@ -81,7 +82,7 @@
       { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "Ballon d'Or voting by year" }
     ]},
     { "name": "tennis", "sources": [
-      { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches (Challenger, ITF and qualifying results since June 2026 from the player pages), rankings, Elo, player data" }
+      { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches (Challenger, ITF and qualifying results since June 2026 from the player pages), rankings, Elo, player data; tour-level matches since 1968 for all-time Elo" }
     ]},
     { "name": "Counter-Strike", "sources": [
       { "n": "bo3.gg", "u": "https://bo3.gg/", "w": "matches, maps, rounds, player stats, odds, event stages and pairings" },

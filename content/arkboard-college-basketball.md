@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< wintabs tab="board" tabs="all,draft board,international" sub="true" label="board views" >}}
 {{< cbbboard title="CBB 2026-27" tab="all" >}}
 {{< lazytab tab="draft board" >}}
@@ -199,5 +199,24 @@ cover = "/og/college-basketball.png"
 {{< cbbmock mode="pred" title="predictive mock" tab="predictive mock" >}}
 {{< cbbmock mode="blend" title="blended mock" tab="blended mock" >}}
 {{< cbbmock mode="conv" title="conviction mock" tab="conviction mock" >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
+{{< lazytab tab="all-time teams" >}}
+{{< alltime sport="cbb" list="teams" title="all-time teams" tab="all-time teams" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time offenses" >}}
+{{< alltime sport="cbb" list="offense" title="all-time offenses" tab="all-time offenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time defenses" >}}
+{{< alltime sport="cbb" list="defense" title="all-time defenses" tab="all-time defenses" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="cbb" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="careers" >}}
+{{< alltime sport="cbb" list="career" title="careers" tab="careers" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}
 {{< /wintabs >}}

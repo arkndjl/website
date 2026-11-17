@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="tennis.exe" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:ATP,WTA|games:games,game table,event odds|model:model" side="true" label="Tennis views" >}}
+{{< wintabs groups="players:ATP,WTA,all-time|games:games,game table,event odds|model:model" side="true" label="Tennis views" >}}
 {{< tennismatches title="games" tab="games" >}}
 {{< tennismatches view="results" title="game table" tab="game table" >}}
 {{< lazytab tab="event odds" >}}{{< tennisevents tab="event odds" >}}{{< /lazytab >}}
@@ -22,5 +22,19 @@ draft = false
 {{< wintabs tab="WTA" tabs="WTA ARK Ranking,WTA serve + return" sub="true" label="WTA views" >}}
 {{< lazytab tab="WTA ARK Ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ARK Ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA serve + return" >}}{{< tennisstats tour="wta" title="WTA :: serve + return" tab="WTA serve + return" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="all-time" tabs="ATP peaks,ATP careers,WTA peaks,WTA careers" sub="true" label="all-time views" >}}
+{{< lazytab tab="ATP peaks" >}}
+{{< alltime sport="atp" list="peak" title="ATP peaks" tab="ATP peaks" >}}
+{{< /lazytab >}}
+{{< lazytab tab="ATP careers" >}}
+{{< alltime sport="atp" list="career" title="ATP careers" tab="ATP careers" >}}
+{{< /lazytab >}}
+{{< lazytab tab="WTA peaks" >}}
+{{< alltime sport="wta" list="peak" title="WTA peaks" tab="WTA peaks" >}}
+{{< /lazytab >}}
+{{< lazytab tab="WTA careers" >}}
+{{< alltime sport="wta" list="career" title="WTA careers" tab="WTA careers" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}
 {{< /wintabs >}}
