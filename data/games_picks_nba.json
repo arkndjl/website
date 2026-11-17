@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-17T04:47:55Z",
+ "asof": "2026-11-17T04:49:55Z",
  "recenter": {
-  "2026-11-17": 1.5
+  "2026-11-17": 1.49
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-17T04:45:02Z",
-  "ageH": 0.0,
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
@@ -341,13 +341,13 @@
    "kick": "2026-11-18T01:00:00Z",
    "home": "SA",
    "away": "DET",
-   "mk": "spread",
-   "side": "away",
-   "line": 8.5,
-   "price": -110.0,
-   "edge": 2.4,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
+   "mk": "total",
+   "side": "under",
+   "line": 222.5,
+   "price": -119.0,
+   "edge": 3.2,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
    "m": 6.1,
    "tm": 219.3
   },
@@ -360,7 +360,7 @@
    "mk": "total",
    "side": "under",
    "line": 226.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.2,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
@@ -433,7 +433,7 @@
    "mk": "total",
    "side": "under",
    "line": 226.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -442,11 +442,11 @@
    "state": "under"
   },
   "401910004": {
-   "mk": "spread",
-   "side": "away",
-   "line": 8.5,
-   "price": -110.0,
-   "edge": 2.4,
+   "mk": "total",
+   "side": "under",
+   "line": 222.5,
+   "price": -119.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "SA",
@@ -530,7 +530,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4580,
+  "snapshots": 4581,
   "buckets": [
    {
     "when": "24h+",
@@ -543,12 +543,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1039,
-    "clvRet": -0.0203,
-    "clvT": -5.55,
+    "clvN": 1040,
+    "clvRet": -0.0204,
+    "clvT": -5.56,
     "clv": 0.39,
-    "beat": 0.449,
-    "still": 0.408
+    "beat": 0.448,
+    "still": 0.409
    },
    {
     "when": "1-6h",
@@ -7205,7 +7205,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T04:47:55Z",
+ "checked": "2026-11-17T04:49:55Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
