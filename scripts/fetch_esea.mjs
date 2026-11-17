@@ -876,10 +876,12 @@ async function leetifyPugs(steam) {
   const rows = [];
   // the list carries only his own line: the full ten come from /v2/matches/{id}, cached (.cache/esea/leetify.json)
   const LC = path.join(ROOT, '.cache', 'esea', 'leetify.json');
-  const lc = (() => { try { return JSON.parse(fs.readFileSync(LC, 'utf8')); } catch { return {}; } })(), keep = {};
+  const lc = (() => { try { return JSON.parse(fs.readFileSync(LC, 'utf8')); } catch { return {}; } })(), keep = {}, dstat = {};
+  const L0 = Array.isArray(list) ? list : [];
+  console.log(`leetify list: ${L0.length} (${[...new Set(L0.map(x => x.data_source))].join(',')})`);
   for (const m0 of (Array.isArray(list) ? list : []).filter(x => /^matchmaking(_competitive)?$/.test(x.data_source || '')).slice(0, LEET_N)) {
     let m = lc[m0.id];
-    if (!m) { const r = await get(`/v2/matches/${m0.id}`); m = r?.ok ? await r.json().catch(() => null) : null; }
+    if (!m) { await new Promise(s => setTimeout(s, 400)); const r = await get(`/v2/matches/${m0.id}`); m = r?.ok ? await r.json().catch(() => null) : null; dstat[r ? r.status : 'none'] = (dstat[r ? r.status : 'none'] || 0) + 1; }
     if (!m?.stats) continue;
     keep[m0.id] = m;
     const st = m.stats || [], me = st.find(x => x.steam64_id === steam); if (!me || st.length < 8) continue;
@@ -896,6 +898,7 @@ async function leetifyPugs(steam) {
     rows.push({ src: m.data_source === 'matchmaking' ? 'premier' : 'comp', id: m.id, url: `https://leetify.com/app/match-details/${m.id}`,
       at: Date.parse(m.finished_at) || null, map: String(m.map_name || '').replace(/^de_/, ''), rounds: R, ...pugMap(sides, R, [score(mt), score(ot)], 0, null) });
   }
+  console.log('leetify match detail:', JSON.stringify(dstat), 'cached', Object.keys(keep).length);
   fs.mkdirSync(path.dirname(LC), { recursive: true }); fs.writeFileSync(LC, JSON.stringify(keep));
   return { status, rows, premier: prof?.ranks?.premier ?? null, leetify: prof?.ranks?.leetify ?? null };
 }
