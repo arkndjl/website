@@ -8,7 +8,7 @@
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
   var SITE = 'arkndjl.net/' + ([[/^\/1nt/i, '1nt'], [/^\/laursen_111/i, 'laursen_111'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
-    [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'],
+    [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'], [/arkboard\/counter-strike/, 'cs2'],
     [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/process/, 'process'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/(1nt|laursen_111)$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
@@ -2688,6 +2688,68 @@
     return F.canvas;
   }
 
+  // CS2 Major Pick'Em (layouts/shortcodes/cs2pickem.html): coin chances, then 3-0 / 0-3 picks left and 3-1 / 3-2 right,
+  // or the playoff bracket picks (QF, SF, champion) once the Swiss stages are done
+  async function buildPickem(win, btn) {
+    var D; try { D = JSON.parse(btn.getAttribute('data-gfx-pk') || '{}'); } catch (e) { return null; }
+    var P = D.picks || {}, B = D.bracket || {}, sw = (P['30'] || []).length > 0, br = !sw && (B.picks || []).length > 0;
+    if (!sw && !br) return null;
+    var W0 = 2400, H0 = 1350;
+    var stamp = D.asof ? new Date(D.asof).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' }).toLowerCase() : '';
+    var F = await frame(W0, H0, (String(D.event || '') + ' :: ' + (sw ? D.stage : 'playoffs') + " pick'em").toUpperCase(), stamp, tabLink(win));
+    var g = F.g, x0 = F.x, y = F.y + 8, w = F.w;
+    var rows = sw ? [].concat(P['30'], P.adv || [], P['03'] || []) : B.picks;
+    var imgs = await Promise.all(rows.map(function (r) { return loadImg(r.logo); }));
+    var im = function (r) { return imgs[rows.indexOf(r)]; };
+    var pct = function (p) { return p >= 0.995 ? '>99%' : p > 0 && p < 0.005 ? '<1%' : Math.round(p * 100) + '%'; };
+    // coin strip: SILVER / GOLD / DIAMOND chance, then the stage line
+    var CH = 116, coins = [['SILVER', '#b9b8d8'], ['GOLD', '#eec35e'], ['DIAMOND', '#9eeadf']], cw = sw ? (w - 3 * 24) / 4 : (w - 2 * 24) / 3;
+    coins.forEach(function (c, i) {
+      var cx = x0 + i * (cw + 24); well(g, cx, y, cw, CH);
+      var s = 44, sx = cx + 24, sy = y + CH / 2 - s / 2;   // a pixel coin
+      g.fillStyle = c[1]; g.fillRect(sx + 8, sy, s - 16, s); g.fillRect(sx, sy + 8, s, s - 16);
+      g.fillStyle = C.dark; g.fillRect(sx + 16, sy + 12, s - 32, s - 24);
+      g.font = '44px ' + FONT; g.fillStyle = c[1]; g.fillText(c[0], sx + s + 20, y + CH / 2);
+      var v = pct(((D.coin || {})[c[0].charAt(0) + c[0].slice(1).toLowerCase()]) || 0);
+      g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(v, cx + cw - 24 - g.measureText(v).width, y + CH / 2);
+    });
+    if (sw) {
+      var cx = x0 + 3 * (cw + 24); well(g, cx, y, cw, CH);
+      g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText('5+ / 10', cx + 24, y + CH / 2);
+      var v = pct(D.pPass || 0); g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(v, cx + cw - 24 - g.measureText(v).width, y + CH / 2);
+    }
+    y += CH + 36;
+    var bot = F.y + F.h, GAP = 36;
+    // one slot: heading, then a well of rows (logo, name, chance)
+    function slot(label, col, list, x, top, sw_, hgt, cols) {
+      g.font = '44px ' + FONT; g.fillStyle = col; g.fillText(label, x, top + 22);
+      var wy = top + 56, wh = hgt - 56; well(g, x, wy, sw_, wh);
+      cols = cols || 1; var per = Math.ceil(list.length / cols), rh = wh / per, cwid = sw_ / cols;
+      list.forEach(function (r, i) {
+        var c = Math.floor(i / per), rx = x + c * cwid, cy = wy + (i % per + 0.5) * rh, ls = Math.min(72, rh * 0.62);
+        if (c) { g.fillStyle = C.dark; g.fillRect(rx, wy + 10, 3, wh - 20); }
+        if (im(r)) drawLogo(g, im(r), rx + 24, cy - ls / 2, ls, ls);
+        var ps = r.p != null ? pct(r.p) : ''; g.font = '56px ' + FONT; var pw = ps ? g.measureText(ps).width : 0;
+        g.font = '52px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, r.n, cwid - 24 - ls - 24 - pw - 48), rx + 24 + ls + 24, cy);
+        if (ps) { g.font = '56px ' + FONT; g.fillStyle = col; g.fillText(ps, rx + cwid - 24 - pw, cy); }
+      });
+    }
+    if (sw) {
+      var lw = (w - GAP) * 0.4, rw = w - GAP - lw, hh = (bot - y - GAP) / 2;
+      slot('3-0', C.teal, P['30'], x0, y, lw, hh);
+      slot('0-3', C.down, P['03'] || [], x0, y + hh + GAP, lw, hh);
+      slot('3-1 / 3-2', C.white, P.adv || [], x0 + lw + GAP, y, rw, bot - y);
+    } else {
+      var k = B.picks, colw = (w - 2 * GAP) / 3, hb = bot - y - 80;
+      slot('QF', C.lilac, k.slice(0, 4), x0, y, colw, hb);
+      slot('SF', C.teal, k.slice(4, 6), x0 + colw + GAP, y, colw, hb);
+      slot('CHAMPION', C.white, k.slice(6, 7), x0 + 2 * (colw + GAP), y, colw, hb);
+      var line = (B.pk || []).map(function (p, i) { return (i + 1) + '+ ' + pct(p); }).join('   ');
+      g.font = '44px ' + FONT; g.fillStyle = C.lilac; g.fillText(line, x0, bot - 24);
+    }
+    return F.canvas;
+  }
+
   async function buildRQ(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-rq') || '{}'); } catch (e) { return null; }
     if (!d.q || !d.a) return null;
@@ -3299,7 +3361,7 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
+      var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
@@ -3307,7 +3369,7 @@
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'term') { preview(canvas, 'arkboard-process-' + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {
