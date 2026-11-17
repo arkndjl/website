@@ -24,7 +24,7 @@
 .ah-hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(200,199,255,.035) 3px 4px);pointer-events:none}
 .ah-rel{position:relative;width:384px;height:384px;flex:none}
 .ah-rel canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
-.ah-rel .px--glyph{position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;--px-dur:2.4s}
+.ah-rel .ah-mono{position:absolute;left:50%;top:50%;width:128px;height:128px;margin:-64px 0 0 -64px;image-rendering:pixelated}
 .ah-head{position:relative;display:grid;gap:1rem;min-width:0}
 .ah-title{margin:0;font-size:64px;line-height:1;letter-spacing:.12em;color:var(--ah-aq);font-weight:normal;text-shadow:4px 4px 0 var(--ah-coal)}
 .ah-title::before,.ah-title::after{content:none}
@@ -65,11 +65,11 @@
 .ah-low .winlist{margin:0;max-width:none;--win-dark:#0e0e12;--win-face:#131316;--win-well:#0e0e12;--win-title:#2e2e35;--background:#131316}
 @media (prefers-reduced-motion:reduce){.ah-p{transition:none}}
 @media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--style{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
-@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .px--glyph{width:48px;height:48px;margin:-24px 0 0 -24px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .ah-mono{width:96px;height:96px;margin:-48px 0 0 -48px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 </style>
 <div class="ah">
 <section class="ah-hero" aria-label="ST. CLAIRE">
-  <div class="ah-rel"><canvas width="128" height="128" data-ah-rel aria-hidden="true"></canvas>{{ if templates.Exists "partials/px/glyph.html" }}{{ partial "px/glyph.html" . }}{{ end }}</div>
+  <div class="ah-rel"><canvas width="128" height="128" data-ah-rel aria-hidden="true"></canvas><img class="ah-mono" src="{{ "img/px/stclaire-logo.png" | relURL }}" width="64" height="64" alt=""></div>
   <div class="ah-head">
     <h1 class="ah-title">ST. CLAIRE</h1>
     <ol class="ah-idx">

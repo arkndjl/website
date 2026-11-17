@@ -85,6 +85,8 @@
 .ab-strip .wintabs__tab{cursor:default}
 .ab-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;color:var(--ab-lil);font-size:.8rem}
 .ab-shadow{display:inline-block;width:4rem;height:2rem;background:var(--ab-deep);color:var(--ab-aq);box-shadow:3px 3px 0 #241a3a;border:1px solid var(--ab-lil)}
+.ab-mono{grid-template-columns:repeat(5,minmax(0,1fr))}.ab-mono .ab-tile{display:grid;place-items:center;aspect-ratio:1}.ab-mono img{width:75%;height:auto;image-rendering:pixelated}.ab-mono img.ab-mono__ic{width:50%}
+@media (max-width:684px){.ab-mono{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <div class="ab">
 
@@ -203,6 +205,16 @@
     {{- range (slice (slice "#4a3b6b" "#c8c7ff" "lilac on purple") (slice "#c8c7ff" "#4a3b6b" "purple on lilac") (slice "#131316" "#c8c7ff" "lilac on black")) }}
     <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><svg viewBox="-68.2 -795.4 840.4 840.4" aria-label="glyph, {{ index . 2 }}"><path transform="scale(1,-1)" fill="{{ index . 1 }}" d="{{ $glyph }}"/></svg></span></figure>
     {{- end }}
+  </div>
+</section>
+
+<section class="ab-sec" id="monogram">
+  <h2 class="ab-h"><span>08</span>monogram</h2>
+  <div class="ab-grid ab-mono">
+    {{- range (slice (slice "#000000" "stclaire-logo" "colour") (slice "#4a3b6b" "stclaire-logo-flat" "flat") (slice "#131316" "stclaire-logo-mono" "lilac") (slice "#4a3b6b" "stclaire-logo-white" "white")) }}
+    <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><img src="{{ printf "img/px/%s.png" (index . 1) | relURL }}" width="64" height="64" alt="ST. CLAIRE monogram, {{ index . 2 }}"></span></figure>
+    {{- end }}
+    <figure class="ab-card"><span class="ab-tile" style="background:#000000"><img class="ab-mono__ic" src="{{ "img/icons/stclaire.svg" | relURL }}" width="16" height="16" alt="ST. CLAIRE icon"></span></figure>
   </div>
 </section>
 

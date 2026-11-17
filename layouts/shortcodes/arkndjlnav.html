@@ -8,13 +8,14 @@
 .an a:hover,.an a:focus-visible{color:var(--an-acc)}
 .an a.is-here{color:var(--an-acc);border-bottom-color:var(--an-acc)}
 .an svg{width:16px;height:16px;fill:currentColor;flex:none}
+.an__mono{width:16px;height:16px;image-rendering:pixelated;flex:none;margin:0;border:0}
 .an__grp{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.1rem .7rem}
 .an__lbl{color:color-mix(in srgb,var(--an-fg) 55%,transparent);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
 .an__lbl::after{content:" ::"}
 </style>
 <nav class="an" aria-label="ST. CLAIRE pages">
   {{- range site.Menus.main }}{{ if eq .Identifier "arkndjl" }}
-  <a class="{{ if eq $here .URL }}is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}><svg aria-hidden="true"><use href="#icon-arkndjl"/></svg><span>ST. CLAIRE</span></a>
+  <a class="{{ if eq $here .URL }}is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}><img class="an__mono" src="{{ "img/icons/stclaire.svg" | relURL }}" width="16" height="16" alt=""><span>ST. CLAIRE</span></a>
   {{- range partial "arkgroups.html" . }}
   <span class="an__grp">{{ with .label }}<span class="an__lbl">{{ . }}</span>{{ end }}
   {{- range .items }}{{ $ic := replace (path.Base (.Params.icon | default "")) ".svg" "" }}
