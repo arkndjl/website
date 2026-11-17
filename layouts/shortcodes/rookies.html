@@ -177,7 +177,7 @@
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
       var kl = (D.cols.filter(function (c) { return c.k === key; })[0] || {}).l || key;
-      var rx = D.cols.filter(function (c) { return c.k === 'xpm'; })[0];   // NBA: rXPM, headed XPM, stands in for the pick on the GFX
+      var rx = D.cols.filter(function (c) { return c.k === 'xpm'; })[0];   // NBA: XPM, stands in for the pick on the GFX
       var lab = function (k) { return (D.cols.filter(function (c) { return c.k === k; })[0] || {}).l; };
       var gc = rx ? ['RK', 'Player'].concat(key === 'xpm' ? [] : [kl], [rx.l + '=XPM']) : ['RK', 'Player', kl].concat(D.pre ? [D.pre.l, 'Δ'] : D.pfv ? [D.pfv.l] : []);
       if (D.title === 'next up') {   // next up: age, best so far, then the current value and its ceiling (or the workload)

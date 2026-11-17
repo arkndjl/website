@@ -65,19 +65,6 @@
      ]
     },
     {
-     "term": "fvx / fvg",
-     "short": "fvx = exact mean outcome; fvg = the pre-outcome grade the tier odds are computed from.",
-     "body": [
-      "Headline FV = round(fvx), stretched above K. fvg feeds fits built on the grade (mock value, recruit stars).",
-      "The raw grade is not shown on the site; the outcome step stays (owner decision, Nov 1 2026)."
-     ],
-     "where": "Data fields on CFB and CBB boards; tooltips",
-     "sports": [
-      "CFB",
-      "CBB"
-     ]
-    },
-    {
      "term": "FV range and tier odds",
      "short": "Each player's odds of every outcome tier and their 10th-90th percentile outcome.",
      "body": [
@@ -443,12 +430,12 @@
      ]
     },
     {
-     "term": "rXPM (raw XPM)",
+     "term": "XPM",
      "short": "Composite Plus-Minus. NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.",
      "body": [
       "The headline XPM on every NBA board. O-XPM and D-XPM are the same blend of each side.",
       "Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).",
-      "XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: rXPM orders next-three-season VORX .607 (VORX .604); all rookies .330."
+      "XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: XPM orders next-three-season VORX .607 (VORX .604); all rookies .330."
      ],
      "where": "NBA VORX/XPM leaders, rookies, team pages, ARKLIST",
      "sports": [
@@ -457,7 +444,7 @@
     },
     {
      "term": "pXPM (predictive XPM)",
-     "short": "rXPM shrunk by minutes toward what he is expected to be.",
+     "short": "XPM shrunk by minutes toward what he is expected to be.",
      "body": [
       "raw x MP / (MP + 600) + mean x 600 / (MP + 600).",
       "Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.",
@@ -470,11 +457,11 @@
     },
     {
      "term": "VORX",
-     "short": "Value Over Replacement XPM. NBA wins over replacement: .030 x (rXPM + 1.4) x MP / 48.",
+     "short": "Value Over Replacement XPM. NBA wins over replacement: .030 x (XPM + 1.4) x MP / 48.",
      "body": [
-      "Replacement rXPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM and rookie boards.",
-      "Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, rXPM .330).",
-      "Next-three-season XPM: the rookie 3Y orders it best (.481; aXPM .413, rXPM .417, VORX .351)."
+      "Replacement XPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM and rookie boards.",
+      "Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, XPM .330).",
+      "Next-three-season XPM: the rookie 3Y orders it best (.481; aXPM .413, XPM .417, VORX .351)."
      ],
      "where": "NBA VORX/XPM leaders, projections, contract value",
      "sports": [
@@ -501,7 +488,7 @@
       "prior + (XPM - prior) x MP / (k + MP); k 509 veterans, 809 newcomers (7,269 player seasons 2012-26).",
       "80% range covers .806 / .799 held out. Display only."
      ],
-     "where": "NBA contract value, XPM chip",
+     "where": "NBA contract value, proj chip",
      "sports": [
       "NBA"
      ]
@@ -1761,54 +1748,11 @@
    "title": "Data and names",
    "entries": [
     {
-     "term": "Sources: football",
-     "short": "Free public sources for CFB and NFL.",
-     "body": [
-      "CFB: PFN impact rankings, On3, ESPN rosters and play-by-play (2015-26), CFBD (1,000 calls/month), 247, Rotoballer.",
-      "Consensus boards: PFN industry (7 analysts), Tankathon, PFF, Kiper. Conference availability reports.",
-      "NFL: nflverse (play-by-play, rosters, injuries, draft picks), PFR AV, ESPN."
-     ],
-     "where": "CFB, NFL pages",
-     "sports": [
-      "CFB",
-      "NFL"
-     ]
-    },
-    {
-     "term": "Sources: basketball",
-     "short": "Free public sources for CBB and NBA.",
-     "body": [
-      "CBB: Barttorvik (ESPN fallback when blocked), On3, 247, ESPN, Covers injuries, ESPN BPI, NBA draft boards.",
-      "NBA: Basketball-Reference BPM and contracts, databallr DPM, LUMA ARC (CC BY 4.0), ESPN, official injury report."
-     ],
-     "where": "CBB, NBA pages",
-     "sports": [
-      "CBB",
-      "NBA"
-     ]
-    },
-    {
-     "term": "Sources: hockey, soccer, tennis, CS2",
-     "short": "Free public sources for the other sports.",
-     "body": [
-      "Hockey: NHL API, MoneyPuck xG, Daily Faceoff goalies, Tankathon, Central Scouting, HockeyTech.",
-      "Soccer: ESPN, football-data.co.uk closes, Understat and FotMob xG, Transfermarkt values and lineups.",
-      "Tennis: Sackmann archive (mirror), weekly tour feed, Tennis Abstract, ESPN. CS2: Valve VRS, Liquipedia, bo3.gg."
-     ],
-     "where": "Hockey, soccer, tennis, Counter-Strike pages",
-     "sports": [
-      "NHL",
-      "Hockey",
-      "Soccer",
-      "Tennis",
-      "CS2"
-     ]
-    },
-    {
      "term": "Odds",
-     "short": "Novig (free, no key) is the price source; DraftKings via ESPN is the fallback.",
+     "short": "Polymarket US (after its .095 p(1 - p) taker fee) is the price source; Novig fills gaps; DraftKings via ESPN last.",
      "body": [
-      "Polymarket prices are a data signal only. Odds snapshots every 30 min, 13-04 UTC, plus 08 and 11 UTC."
+      "A 50/50 side costs about .529 all in (-112). Free, no key, paper only.",
+      "Odds snapshots every 30 min, 13-04 UTC, plus 08 and 11 UTC."
      ],
      "where": "Predictions; game cards",
      "sports": [
@@ -2152,7 +2096,7 @@
   },
   {
    "board": "CBB / NBA prospects",
-   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,544). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
+   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,543). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning (rarity anchor; most common role in band)",
@@ -2228,7 +2172,7 @@
      "50",
      "4+ seasons as a starter; most common: 4+ seasons as a starter (31%)",
      "3.56",
-     "1 of 5,544 (0.02%)",
+     "2 of 5,543 (0.04%)",
      "+0.0 to +0.6",
      "28",
      "median pick 17, 84% drafted",
@@ -2238,7 +2182,7 @@
      "45",
      "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
      "5.89",
-     "13 of 5,544 (0.23%)",
+     "16 of 5,543 (0.29%)",
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
@@ -2248,7 +2192,7 @@
      "40",
      "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
      "7.33",
-     "21 of 5,544 (0.38%)",
+     "24 of 5,543 (0.43%)",
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
@@ -2258,7 +2202,7 @@
      "35",
      "bench, 100+ games; most common: bench, 100+ games (52%)",
      "12",
-     "49 of 5,544 (0.88%)",
+     "51 of 5,543 (0.92%)",
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
@@ -2268,7 +2212,7 @@
      "30",
      "reached the NBA; most common: reached the NBA (83%)",
      "23",
-     "96 of 5,544 (1.7%)",
+     "99 of 5,543 (1.8%)",
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",
