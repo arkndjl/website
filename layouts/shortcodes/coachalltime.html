@@ -1,6 +1,6 @@
 {{- /* All-time head coaches (scripts/coach_alltime.py, data/coach_alltime.json). sport="cfb" | "cbb" | "nba" | "nhl".
        Score (wins) = cWAR + per-title and per-conference-title weights fit on Hall of Fame selection (+ CFB coordinator
-       wins at the measured translation rate). Method on Reference (Glossary/Methodology). Mobile: the cfbp cards. */ -}}
+       wins at the measured translation rate). Method on Process (Glossary/Methodology). Mobile: the cfbp cards. */ -}}
 {{- $sp := $.Get "sport" | default "cfb" -}}
 {{- with index site.Data.coach_alltime $sp -}}
 {{- $cfb := eq $sp "cfb" -}}
