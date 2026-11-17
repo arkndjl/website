@@ -25,6 +25,12 @@
       {{- if .picks }}<span title="chance of 5+ of the 10 picks correct">5+ / 10 · <b>{{ partial "num.html" (slice "%.0f" (mul .pPass 100)) }}%</b></span><span class="cfb__dim" title="expected correct picks">{{ partial "num.html" (slice "%.1f" .ev) }} xC</span>{{ end }}
       {{- if .locked }}<span class="pickem__tag">LOCKED</span>{{ else if .start }}<span class="cfb__dim">lock {{ (time.In "America/New_York" (time .start)).Format "Jan 2 · 3:04 PM" }} ET</span>{{ end }}
       {{- if .projected }}<span class="pickem__tag pickem__tag--dim" title="field from Valve's invitation standings, not yet confirmed">PROJ</span>{{ end }}
+      {{- if or .picks .bracket }}
+      {{- /* GFX card (assets/js/gfx.js buildPickem): picks per slot with chances, or the playoff bracket picks */ -}}
+      {{- $gp := dict }}{{ with .picks }}{{ range $sl := slice "30" "adv" "03" }}{{ $rows := slice }}{{ range index $d.picks $sl }}{{ $rows = $rows | append (dict "n" .n "logo" (cond .logo (printf "/img/cs2/%s.png" .k) "") "p" (index .p (index $col $sl))) }}{{ end }}{{ $gp = merge $gp (dict $sl $rows) }}{{ end }}{{ end }}
+      {{- $gb := dict }}{{ with .bracket }}{{ $rows := slice }}{{ range .k3.picks }}{{ $rows = $rows | append (dict "n" .n "logo" (cond .logo (printf "/img/cs2/%s.png" .k) "")) }}{{ end }}{{ $gb = dict "picks" $rows "pk" .k3.pk }}{{ end }}
+      <button type="button" class="cfb__btn cfb__gfx pickem__gfx" data-gfx data-gfx-mode="pickem" data-gfx-name="cs2-pickem-{{ .event | urlize }}-{{ .stage | urlize }}" data-gfx-pk="{{ dict "event" .event "stage" .stage "asof" .asof "coin" .coin "pPass" .pPass "ev" .ev "picks" $gp "bracket" $gb "proj" .projected | jsonify }}" title="graphic of the pick'em picks">GFX</button>
+      {{- end }}
     </div>
     {{- with .picks }}
     <div class="pickem__grid">
