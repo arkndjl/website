@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T04:39:11Z",
+ "asof": "2026-11-17T04:59:20Z",
  "recenter": {
   "week": 0.29
  },
@@ -268,8 +268,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-16",
-  "ageH": 4.7,
+  "asof": "2026-11-17",
+  "ageH": -19.0,
   "stale": false
  },
  "picks": [],
@@ -369,7 +369,7 @@
    "edge": 3.9,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
-   "m": 13.8,
+   "m": 14.1,
    "tm": 54.4
   },
   {
@@ -429,7 +429,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.1,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -481,7 +481,7 @@
    "edge": 2.3,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
-   "m": -15.7,
+   "m": -15.6,
    "tm": 47.8
   },
   {
@@ -563,6 +563,22 @@
    "why": "edge under 8 (game: non-conference)",
    "m": 20.6,
    "tm": 55.4
+  },
+  {
+   "id": "401871081",
+   "sport": "cfb",
+   "kick": "2026-11-21T19:00:00.000Z",
+   "home": "Sam Houston",
+   "away": "Middle Tennessee",
+   "mk": "total",
+   "side": "over",
+   "line": 48.5,
+   "price": -110.0,
+   "edge": 0.9,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -5.7,
+   "tm": 49.4
   },
   {
    "id": "401862834",
@@ -659,22 +675,6 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 39.6
-  },
-  {
-   "id": "401871101",
-   "sport": "cfb",
-   "kick": "2026-11-21T21:00:00.000Z",
-   "home": "Southern Miss",
-   "away": "South Alabama",
-   "mk": "total",
-   "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 5.2,
-   "x": null,
-   "why": "total market off",
-   "m": -5.5,
-   "tm": 61.3
   }
  ],
  "games": {
@@ -706,7 +706,7 @@
    "mk": "spread",
    "side": "home",
    "line": -16.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -1158,18 +1158,6 @@
    "away": "Syracuse",
    "state": "off"
   },
-  "401869938": {
-   "mk": "spread",
-   "side": "away",
-   "line": 13.5,
-   "price": -112.0,
-   "edge": 1.1,
-   "ev": null,
-   "units": 0.0,
-   "home": "Louisiana Tech",
-   "away": "Arkansas State",
-   "state": "off"
-  },
   "401861968": {
    "mk": "spread",
    "side": "away",
@@ -1186,12 +1174,24 @@
    "mk": "spread",
    "side": "home",
    "line": -6.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "San Jos\u00e9 State",
    "away": "UNLV",
+   "state": "off"
+  },
+  "401869938": {
+   "mk": "spread",
+   "side": "home",
+   "line": 13.5,
+   "price": -117.0,
+   "edge": 1.8,
+   "ev": null,
+   "units": 0.0,
+   "home": "Louisiana Tech",
+   "away": "Arkansas State",
    "state": "off"
   },
   "401860919": {
@@ -1219,11 +1219,11 @@
    "state": "off"
   },
   "401869953": {
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
+   "mk": "spread",
+   "side": "home",
+   "line": -9.5,
    "price": -124.0,
-   "edge": 0.6,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Troy",
@@ -1306,7 +1306,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -1423,16 +1423,16 @@
    "state": "off"
   },
   "401871081": {
-   "mk": "spread",
-   "side": "away",
-   "line": -5.5,
-   "price": -117.0,
-   "edge": 2.8,
+   "mk": "total",
+   "side": "over",
+   "line": 48.5,
+   "price": -110.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Sam Houston",
    "away": "Middle Tennessee",
-   "state": "off"
+   "state": "under"
   },
   "401866467": {
    "mk": "spread",
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21891,
+  "snapshots": 21911,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4432,
-    "clvRet": -0.0482,
-    "clvT": -35.88,
+    "clvN": 4440,
+    "clvRet": -0.0483,
+    "clvT": -35.94,
     "clv": 0.2,
-    "beat": 0.332,
-    "still": 0.338
+    "beat": 0.331,
+    "still": 0.339
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T04:39:11Z",
+ "checked": "2026-11-17T04:59:20Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
