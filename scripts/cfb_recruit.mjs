@@ -22,7 +22,7 @@ import crypto from 'node:crypto';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { avOf, STARTERS } from './cfb_teams.mjs';
-import { compact, key } from './names.mjs';
+import { compact, key, sameTeam, teamKey } from './names.mjs';
 import { fvDist, cfbZ } from './fv_dist.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -300,7 +300,7 @@ function attachOn3(cl, y, asOf) {
   for (const o of o3) { (by[norm(o[0]) + '|' + o[1]] ||= []).push(o); if (n[norm(o[0])] === 1) (by[norm(o[0]) + '|'] ||= []).push(o); }
   for (const r of cl) {
     const m = by[norm(r.name) + '|' + r.state] || by[norm(r.name) + '|'] || [], o = m.length === 1 ? m[0] : [];
-    r.ind = o[2] ?? null; r.indRank = o[3] ?? null; r.g247 = o[5] ?? null; r.gEspn = o[6] ?? null; r.commit = o[7] ?? null; r.asOf = asOf; r.byRank = byRank(y);
+    r.ind = o[2] ?? null; r.indRank = o[3] ?? null; r.g247 = o[5] ?? null; r.gEspn = o[6] ?? null; r.commit = o[7] ?? null; r.rRiv = o[8] ?? null; r.sRiv = o[9] ?? null; r.asOf = asOf; r.byRank = byRank(y);
     if (o[4] && !r.r247) r.r247 = o[4];
   }
   return cl;
@@ -352,6 +352,50 @@ function attach247(cl, comp) {
 }
 // the fit's candidate drivers for a class (scripts/cfb_recruit_fit.py enrich()): the programs in his recruitment,
 // his high school's output, and offer counts as residuals on grade within the class
+// Commitment changes ESPN hasn't caught up to: the latest commit / flip / decommit headline (247Sports, On3:
+// data/recruit_news.json, scripts/recruit_news.py) from the last NEWS_DAYS days moves the recruit's school. A
+// signing ESPN shows stays.
+const NEWS_DAYS = 21;
+export function applyNews(cl, prog, news = readNews(), today = new Date()) {
+  const cut = new Date(today.getTime() - NEWS_DAYS * 864e5).toISOString().slice(0, 10), tidOf = {};
+  for (const [tid, p] of Object.entries(prog)) if (p.team) tidOf[teamKey(p.team)] ??= tid;
+  const last = {};
+  for (const n of news) if (['commit', 'flip', 'decommit'].includes(n.k) && n.d >= cut && (!last[key(n.n)] || n.d > last[key(n.n)].d)) last[key(n.n)] = n;
+  const toward = {};   // schools a recent commit / flip story took him to: a decommit story without a school is about the old one
+  for (const n of news) if (['commit', 'flip'].includes(n.k) && n.d >= cut && n.to) (toward[key(n.n)] ||= new Set()).add(teamKey(n.to));
+  let moved = 0;
+  for (const c of cl) {
+    const n = last[key(c.name)];
+    if (!n || (n.cls && c.year && n.cls !== c.year) || c.year <= today.getUTCFullYear() || c.status === 'Signed' || c.status === 'Enrolled') continue;
+    if (n.k === 'decommit') {
+      if (c.tid && (n.fr ? sameTeam(n.fr, prog[c.tid]?.team) : !toward[key(c.name)]?.has(teamKey(prog[c.tid]?.team || '')))) { console.error(`  ${c.name} (${c.year}): ${prog[c.tid]?.team} decommitted (${n.d})`); c.tid = null; c.status = null; c.news = n.d; moved++; }
+    } else {
+      const tid = tidOf[teamKey(n.to)];
+      if (tid && tid !== c.tid) { console.error(`  ${c.name} (${c.year}): ${prog[c.tid]?.team || '-'} -> ${n.to} (${n.k} ${n.d})`); c.tid = tid; c.status = 'Verbal'; c.news = n.d; moved++; }
+    }
+  }
+  return moved;
+}
+// Reclassifications (recruit news, any age): a recruit reported moving from class A to B leaves A's list and joins B's
+// with his ESPN row, until ESPN lists him in B itself.
+export async function reclassed(y, cl, load, news = readNews()) {
+  const rc = news.filter(n => n.k === 'reclass' && n.cls && n.ocls);
+  if (!rc.length) return cl;
+  const have = new Set(cl.map(c => key(c.name)));
+  const out = cl.filter(c => !rc.some(n => n.ocls === y && key(n.n) === key(c.name)) || rc.some(n => n.cls === y && key(n.n) === key(c.name)));
+  for (const oy of [...new Set(rc.filter(n => n.cls === y && !have.has(key(n.n))).map(n => n.ocls))]) {
+    const from = await load(oy);
+    for (const n of rc.filter(n => n.cls === y && n.ocls === oy && !have.has(key(n.n)))) {
+      const c = from.find(c => key(c.name) === key(n.n));
+      if (c) { out.push({ ...c, year: y, reclass: oy }); have.add(key(c.name)); console.error(`  ${c.name}: class ${oy} -> ${y} (reclass ${n.d})`); }
+    }
+  }
+  return out;
+}
+function readNews() {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'recruit_news.json'), 'utf8')).cfb || []; } catch { return []; }
+}
+
 function enrich(cl, prog, hsN) {
   for (const r of cl) {
     const offs = [...new Set(r.offers || [])].map(t => prog[t]).filter(Boolean), fbs = offs.filter(o => o.level !== 'FCS');
@@ -431,7 +475,9 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const whyQueue = [];   // [output row, feature row, redshirt?]: filled once the reference signee is known
   const cfbdCover = {};  // class -> CFBD composite coverage (attachCfbd)
   const prep = async (y, fresh) => {
-    const cl = enrich(await espnClass(y, fresh, offline), prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
+    const raw = await reclassed(y, await espnClass(y, fresh, offline), y2 => espnClass(y2, false, offline)), moved = applyNews(raw, prog);
+    if (moved) console.error(`class ${y}: ${moved} commitment changes from recruit news`);
+    const cl = enrich(raw, prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
     if (comp.length) attach247(cl, comp);
     else for (const r of cl) { r.comp = r.grade >= 60 ? 0.87 + 0.04 * (r.grade - 75) / 5 : null; r.cRank = r.r247 = null; }
     attachOn3(cl, y, y === season0);
@@ -458,7 +504,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     whyQueue.push([null, r, false]);
     klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
       status: c.status === 'Verbal' ? 'committed' : c.status === 'Signed' ? 'signed' : String(c.status || '').toLowerCase(), team: P.team, tid: c.tid, logo: P.logo, conf: P.conf, level: P.level,
-      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
     { const x = klass[klass.length - 1]; x.ark = starsOf(r); whyQueue[whyQueue.length - 1][0] = x; }
   }
   // default order (and RK): ARK stars, then xFV, then ESPN grade
@@ -543,7 +589,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       list.push({ name: c.name, pos: c.pos, g, ht: c.ht, wt: c.wt, grade: r1(c.grade), src: c.src, rank: c.rank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
         status: committed ? 'committed' : 'uncommitted', team: committed ? P.team : null, tid: committed ? c.tid : null, logo: committed ? P.logo : null, conf: committed ? P.conf : null,
         pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, c.gsd || 0, r), path: pathOf(r), xnil: xnil(P.level, p),
-        stars: c.src === 'espn' ? band(c.grade) || 2 : null });
+        rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, stars: c.src === 'espn' ? band(c.grade) || 2 : null });
       list[list.length - 1].ark = starsOf(r);
       whyQueue[whyQueue.length - 1][0] = list[list.length - 1];
     }

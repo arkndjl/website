@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings|draft:mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:board,leaders,true freshmen,standouts,next up,awards,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< wintabs tab="board" tabs="all,draft board,international" sub="true" label="board views" >}}
 {{< cbbboard title="CBB 2026-27" tab="all" >}}
 {{< lazytab tab="draft board" >}}
@@ -56,6 +56,9 @@ cover = "/og/college-basketball.png"
 {{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" unless="cbb" >}}
 {{< /lazytab >}}
 {{< cbbbuilder title="team builder" tab="team builder" >}}
+{{< lazytab tab="recruit transactions" >}}
+{{< recruitnews sport="cbb" title="recruit transactions" tab="recruit transactions" >}}
+{{< /lazytab >}}
 {{< lazytab tab="class rankings" >}}
 {{< cbbrecruits view="teams" title="class rankings" tab="class rankings" >}}
 {{< /lazytab >}}

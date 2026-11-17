@@ -1053,6 +1053,60 @@ TEAM_SLUG = {'detroit-titans': 'Detroit Mercy', 'albany-great-danes': 'UAlbany',
              'lindenwood-university-lions': 'Lindenwood'}
 
 
+NEWS_DAYS = 21
+
+
+def recent_news():
+    """latest commit / flip / decommit headline per player (247Sports, On3: data/recruit_news.json, scripts/recruit_news.py)
+    from the last NEWS_DAYS days, and the schools recent commit/flip stories took each player to"""
+    import datetime as dt
+    try:
+        rows = json.load(open(os.path.join(ROOT, 'data', 'recruit_news.json'), encoding='utf-8')).get('cbb') or []
+    except (OSError, ValueError):
+        return {}, {}
+    cut = (dt.date.today() - dt.timedelta(days=NEWS_DAYS)).isoformat()
+    last, toward = {}, {}
+    for n in rows:
+        if n.get('k') not in ('commit', 'flip', 'decommit') or n.get('d', '') < cut: continue
+        k = N.key(n['n'])
+        if k not in last or n['d'] > last[k]['d']: last[k] = n
+        if n['k'] != 'decommit' and n.get('to'): toward.setdefault(k, set()).add(N.team_key(n['to']))
+    return last, toward
+
+
+def reclassed(c, raw):
+    """class c's On3 rows after reclassifications in the recruit news (any age): a recruit reported moving from class
+    A to B leaves A's list and joins B's with his On3 row, until On3 lists him in B itself"""
+    try:
+        rc = [n for n in json.load(open(os.path.join(ROOT, 'data', 'recruit_news.json'), encoding='utf-8')).get('cbb') or []
+              if n.get('k') == 'reclass' and n.get('cls') and n.get('ocls')]
+    except (OSError, ValueError):
+        return raw
+    if not rc: return raw
+    have = {N.key(r.get('name') or '') for r in raw}
+    out = [r for r in raw if not any(n['ocls'] == c and N.key(n['n']) == N.key(r.get('name') or '') for n in rc)
+           or any(n['cls'] == c and N.key(n['n']) == N.key(r.get('name') or '') for n in rc)]
+    for n in rc:
+        if n['cls'] != c or N.key(n['n']) in have: continue
+        r = next((r for r in load_on3(n['ocls']) if N.key(r.get('name') or '') == N.key(n['n'])), None)
+        if r:
+            out.append(dict(r, reclass=n['ocls'])); have.add(N.key(n['n']))
+            print(f"  {n['n']}: class {n['ocls']} -> {c} (reclass {n['d']})", file=sys.stderr)
+    return out
+
+
+def news_team(name, cls, tm, signed, news, smap, bt):
+    """the board team after commitment changes On3's table hasn't caught up to; a signing stays"""
+    last, toward = news
+    n = last.get(N.key(name))
+    if not n or signed or (n.get('cls') and n['cls'] != cls): return tm
+    if n['k'] == 'decommit':
+        if tm and (N.same_team(n['fr'], tm) if n.get('fr') else N.team_key(tm) not in toward.get(N.key(name), ())): return None
+        return tm
+    to = team_of(n['to'].lower().replace(' ', '-') + '-x', smap, bt) if n.get('to') else None
+    return to or tm
+
+
 def team_of(slug, smap, bt):
     """On3 school slug -> the board's team: the school words of the slug (the mascot dropped), else the learned map"""
     if not slug: return None
@@ -1140,7 +1194,8 @@ def write():
     bi = {c: k for k, c in enumerate(bd['cols'])}
     bfv = np.sort([float(r[bi['fvx']] if r[bi['fvx']] is not None else r[bi['fv']]) for r in bd['rows'] if r[bi['fv']] is not None])
     out_classes, intl = [], []
-    raws = {c: load_on3(c) for c in LIVE}
+    news = recent_news()
+    raws = {c: reclassed(c, load_on3(c)) for c in LIVE}
     fiba = fiba_rows({N.key(r['name']) for c in LIVE for r in raws[c]})
     for c in LIVE:
         raw = raws[c]
@@ -1148,6 +1203,11 @@ def write():
         for r in raw:
             row = compact(r, c)
             tm = team_of(row['team'], smap, bt)
+            nt = news_team(row['name'], c, tm, r.get('signed'), news, smap, bt)
+            if nt != tm:
+                print(f'  {row["name"]} ({c}): {tm or "-"} -> {nt or "-"} (recruit news)', file=sys.stderr)
+                tm = nt
+                if not tm: row['team'] = None
             if tm: row['college'] = {'team': tm, 'conf': bt[tm]['conf'], 'y1': c + 1}
             # flag from the hometown (the state is where he plays: a Canadian prep school, say)
             hm = (r.get('home') or '').split(',')[-1].strip()
@@ -1174,12 +1234,12 @@ def write():
                          'svc': {k: v for k, v in row['svc'].items()}, 'age': r.get('age'),
                          'team': tm, 'logo': bt[tm]['logo'] if tm else None, 'conf': bt[tm]['conf'] if tm else None,
                          'school': ' '.join(row['team'].split('-')[:-1]).title() if row['team'] and not tm else None, 'signed': bool(r.get('signed')),
-                         'lead': [lead, rpm[1]] if lead and not row['team'] else None,
+                         'lead': [lead, rpm[1]] if lead and not row['team'] and not tm else None,
                          'nat': row['nat'], 'img': r.get('img'), 'on3': f"https://www.on3.com/db/{r['slug']}/" if r.get('slug') else None,
                          'nil': r.get('nil'), 'why': why(M, f, avg), **g,
                          'ark': ark_of(stars, g['fvx']), 'pct': int(min(99, np.searchsorted(bfv, g['fvx'], side='right') * 100 // len(bfv))),
                          'path': pth, 'xnil': int(round(pth[0]['v'] * xnil_price(H, teams, tm, bt[tm]['conf'] if tm else None, f, ref), -3)),
-                         'status': 'signed' if r.get('signed') else 'committed' if row['team'] else 'uncommitted'})
+                         'status': 'signed' if r.get('signed') else 'committed' if tm or row['team'] else 'uncommitted'})
             if r.get('fiba'):
                 recs[-1].update({'prov': True, 'cls': c, 's': r['s'], 'fiba': r['fiba'], 'dob': r.get('dob'), 'fibaUrl': r['url'], 'src': r.get('src')})
             d = round(g['fvx'] - fv_of(float(M.ets([f])[0])), 1)

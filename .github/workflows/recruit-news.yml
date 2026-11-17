@@ -1,0 +1,45 @@
+# Recruit transactions for the CFB and CBB recruit tabs (data/recruit_news.json): commitments, decommitments, flips, portal
+# entries and portal commitments from 247Sports and On3 headlines through Google News search RSS (scripts/recruit_news.py;
+# 247sports.com and on3.com block CI directly). Every 3 hours; the CFB and CBB recruit builds read the file, so a flip
+# or decommitment moves the recruit's school on their next run, and this run re-scores the CFB classes from the
+# committed board files when the news changed.
+name: recruit news
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recruit-news
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pull 247Sports and On3 headlines
+        run: python3 scripts/recruit_news.py
+      - name: Apply commitment changes to the CFB classes
+        id: cfb
+        continue-on-error: true
+        run: |
+          if git diff --quiet -- data/recruit_news.json; then echo "no news change"; exit 0; fi
+          node scripts/cfb_recruit.mjs
+      - name: Commit if anything changed
+        run: |
+          python3 scripts/data_push.py -m "Update the recruit news ($(date -u +%Y-%m-%d))" \
+            -- data/recruit_news.json data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json
