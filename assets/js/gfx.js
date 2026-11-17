@@ -284,6 +284,7 @@
     // one logo per row: when the team column carries it, the name goes without
     var nameK = idx.findIndex(function (i) { return NAME_COL.test(heads[i]) && !TEAM_COL.test(heads[i]); });
     if (teamK >= 0 && nameK >= 0 && nameK !== teamK) data.forEach(function (r) { if (r[teamK].img && r[nameK].img) delete r[nameK].img; });
+    try { await document.fonts.load('48px "MS PGothic Pixel"'); } catch (e) {}   // draw only once the site face is in; never a fallback face
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim(), base = title.split('::')[0].trim();
@@ -563,6 +564,7 @@
   }
   async function frame(w, h, title, stamp, link) {
     W = w; H = h;
+    try { await document.fonts.load('48px "MS PGothic Pixel"'); } catch (e) {}   // draw only once the site face is in; never a fallback face
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
