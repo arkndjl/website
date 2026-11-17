@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-17T19:17:21Z",
+ "asof": "2026-11-17T19:33:04Z",
  "recenter": {
   "2026-11-17": 1.97
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-17T17:11:55Z",
-  "ageH": 2.1,
+  "ageH": 2.4,
   "stale": false
  },
  "picks": [],
@@ -1905,8 +1905,8 @@
     "side": "under",
     "line": 156.5,
     "price": -114.0,
-    "ev": 0.13,
-    "units": 1.0
+    "ev": 0.134,
+    "units": 1.25
    }
   },
   {
@@ -2200,22 +2200,6 @@
    "tm": 145.6
   },
   {
-   "id": "401911521",
-   "sport": "cbb",
-   "kick": "2026-11-18T02:00:00Z",
-   "home": "UC Davis",
-   "away": "Alabama State",
-   "mk": "spread",
-   "side": "home",
-   "line": 11.5,
-   "price": -119.0,
-   "edge": 5.6,
-   "x": 4.5,
-   "why": "no edge at -119",
-   "m": 17.1,
-   "tm": 141.0
-  },
-  {
    "id": "401909729",
    "sport": "cbb",
    "kick": "2026-11-18T00:00:00Z",
@@ -2262,6 +2246,22 @@
    "why": "no edge at -119",
    "m": -0.0,
    "tm": 143.2
+  },
+  {
+   "id": "401911521",
+   "sport": "cbb",
+   "kick": "2026-11-18T02:00:00Z",
+   "home": "UC Davis",
+   "away": "Alabama State",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -101.0,
+   "edge": 4.6,
+   "x": 4.5,
+   "why": "no edge at -101",
+   "m": 17.1,
+   "tm": 141.0
   },
   {
    "id": "401921729",
@@ -2480,7 +2480,7 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 3.2,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2621,7 +2621,7 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -3127,11 +3127,11 @@
   "401925012": {
    "mk": "total",
    "side": "under",
-   "line": 157.5,
-   "price": 107,
-   "ev": 0.032,
+   "line": 158.5,
+   "price": -101,
+   "ev": 0.041,
    "edge": 7.5,
-   "units": 1.0,
+   "units": 1.25,
    "bk": "poly",
    "home": "Omaha",
    "away": "Lamar",
@@ -3141,7 +3141,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -3200,9 +3200,9 @@
   "401911521": {
    "mk": "spread",
    "side": "home",
-   "line": 11.5,
-   "price": -119.0,
-   "edge": 5.6,
+   "line": 12.5,
+   "price": -101.0,
+   "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "UC Davis",
@@ -3262,34 +3262,34 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 18245,
+  "snapshots": 18254,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 562,
-    "clvRet": -0.0169,
-    "clvT": -2.05,
-    "clv": 0.48,
+    "clvRet": -0.0163,
+    "clvT": -1.97,
+    "clv": 0.49,
     "beat": 0.352,
     "still": 0.27
    },
    {
     "when": "6-24h",
-    "clvN": 3763,
-    "clvRet": -0.0142,
-    "clvT": -7.96,
-    "clv": 0.43,
-    "beat": 0.386,
-    "still": 0.423
+    "clvN": 3765,
+    "clvRet": -0.0137,
+    "clvT": -7.63,
+    "clv": 0.44,
+    "beat": 0.388,
+    "still": 0.421
    },
    {
     "when": "1-6h",
-    "clvN": 1918,
+    "clvN": 1920,
     "clvRet": -0.0401,
-    "clvT": -34.28,
+    "clvT": -34.32,
     "clv": 0.08,
     "beat": 0.16,
-    "still": 0.716
+    "still": 0.717
    },
    {
     "when": "<1h",
@@ -20218,7 +20218,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T19:17:21Z",
+ "checked": "2026-11-17T19:33:04Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
