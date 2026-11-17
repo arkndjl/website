@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T06:25:10Z",
+ "asof": "2026-11-17T06:36:56Z",
  "recenter": {
-  "week": 0.29
+  "week": 0.3
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-17",
-  "ageH": -17.6,
+  "ageH": -17.4,
   "stale": false
  },
  "picks": [],
@@ -485,6 +485,22 @@
    "tm": 47.8
   },
   {
+   "id": "401862836",
+   "sport": "cfb",
+   "kick": "2026-11-22T01:00:00.000Z",
+   "home": "UAB",
+   "away": "UTSA",
+   "mk": "total",
+   "side": "over",
+   "line": 51.5,
+   "price": -129.0,
+   "edge": 2.2,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -4.5,
+   "tm": 53.7
+  },
+  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -588,9 +604,9 @@
    "away": "Memphis",
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "x": null,
    "why": "total market off",
    "m": -3.7,
@@ -659,22 +675,6 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 39.6
-  },
-  {
-   "id": "401871101",
-   "sport": "cfb",
-   "kick": "2026-11-21T21:00:00.000Z",
-   "home": "Southern Miss",
-   "away": "South Alabama",
-   "mk": "total",
-   "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 5.2,
-   "x": null,
-   "why": "total market off",
-   "m": -5.5,
-   "tm": 61.3
   }
  ],
  "games": {
@@ -921,9 +921,9 @@
   "401856865": {
    "mk": "spread",
    "side": "away",
-   "line": -6.5,
-   "price": -120.0,
-   "edge": 3.9,
+   "line": -7.5,
+   "price": 113.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -969,9 +969,9 @@
   "401862834": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "ev": null,
    "units": 0.0,
    "home": "Navy",
@@ -1075,16 +1075,16 @@
    "state": "under"
   },
   "401862836": {
-   "mk": "spread",
-   "side": "home",
-   "line": -6.5,
-   "price": -127.0,
-   "edge": 2.0,
+   "mk": "total",
+   "side": "over",
+   "line": 51.5,
+   "price": -129.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "UAB",
    "away": "UTSA",
-   "state": "off"
+   "state": "under"
   },
   "401858532": {
    "mk": "total",
@@ -1330,7 +1330,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -110.0,
+   "price": -112.0,
    "edge": 5.2,
    "ev": null,
    "units": 0.0,
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21959,
+  "snapshots": 21971,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4457,
-    "clvRet": -0.0472,
+    "clvN": 4463,
+    "clvRet": -0.0471,
     "clvT": -34.99,
     "clv": 0.22,
-    "beat": 0.335,
-    "still": 0.337
+    "beat": 0.336,
+    "still": 0.336
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T06:25:10Z",
+ "checked": "2026-11-17T06:36:56Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
