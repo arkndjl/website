@@ -511,9 +511,9 @@ def status_of(text):
     t = (text or '').lower()
     if re.search(r"season-ending|out for (the )?(rest of the |remainder of the )?(season|year)|(rest|remainder) of the (season|year)|miss the (rest|remainder)|torn acl|achilles|placed on (injured reserve|ir)\b|lands on ir|to ir\b|career-ending", t):
         return 'Out (season)'
-    if re.search(r"doubtful|unlikely to play", t):
+    if re.search(r"doubtful|unlikely to (play|be cleared)|not likely to (play|be cleared)", t):
         return 'Doubtful'
-    if re.search(r"\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bout\b(?! of)|\bsidelined|\binactive|healthy scratch|\bwill sit|\bnot dress|\bout for a (week|month)", t):
+    if re.search(r"\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bout\b(?! of)|\bsidelined|\binactive|healthy scratch|\bwill sit|\bnot dress|\bout for a (week|month)|\b(not (expected to )?be|won't be) available(?! (for|at|to) practice)|wouldn't imagine (him|her) being available|\bsideline (him|her|them)", t):
         return 'Out'
     if re.search(r"questionable|game-time decision|day-to-day|uncertain to play|status (is )?uncertain|limited in practice|week-to-week", t):
         return 'Questionable'
@@ -566,6 +566,7 @@ def modified(url):
 # last week's designation, carried into a week whose report isn't out yet: what became of each Q, D and O on the
 # next week's report, 2021-25 (scripts/nfl_inj_carry.py): cleared or listed with no designation (plays), questionable
 # again (plays at the questionable rate), doubtful, out. Players moved to a reserve list are left out: the roster has them.
+GAME_LEN = 4 * 3600         # kickoff to final whistle, with margin
 CARRY = {'Questionable': 0.84, 'Doubtful': 0.55, 'Out': 0.38}
 LATE = 26 * 3600      # news this close to kickoff (Saturday's activations, gameday inactives) beats the final report
 INACT = 100 * 60      # gameday inactives post 90 minutes before kickoff; ESPN dates them then
@@ -609,6 +610,8 @@ def live_injuries(last, week, games):
             return 0.0
     # each team's last kickoff (news from before it is about an earlier game) and this week's
     lastko, ko = {}, {}
+    this_wk = {team(g[f'{sd}_team']) for g in games if int(g['season']) == last and int(g['week']) == week
+               and g['home_score'] in ('', 'NA') for sd in ('home', 'away')}
     for g in games:
         if int(g['season']) != last:
             continue
@@ -619,6 +622,14 @@ def live_injuries(last, week, games):
                 lastko[t] = max(lastko.get(t, 0), k)
             elif int(g['week']) == week:
                 ko[t] = k
+    # a team on its bye: its next game stands in for this week's (a return date or a firm Out counts against it)
+    for g in games:
+        if int(g['season']) == last and g['home_score'] in ('', 'NA') and int(g['week']) > week:
+            k = epoch(kick(g))
+            for side in ('home', 'away'):
+                t = team(g[f'{side}_team'])
+                if t not in this_wk and k < ko.get(t, float('inf')):
+                    ko[t] = k
     news = defaultdict(dict)
     team_m = {}
 
@@ -629,9 +640,12 @@ def live_injuries(last, week, games):
         # the newest item wins; first/first_src = the earliest report of the status it holds (lead-time record)
         same = cur is not None and cur['status'] == stt
         first = (cur['first'], cur['first_src']) if same and cur['first'] <= ts else (ts, src)
-        if cur is None or ts >= cur['ts']:
+        # firm news from after the last game ("won't play in Week 12") outranks a carried listing (ESPN refreshes last
+        # week's designation with each note), whatever their times; news during that game ("won't return") doesn't
+        pri = bool(firm or stt in GONE) and ts >= lastko.get(t, 0) + GAME_LEN
+        if cur is None or (pri, ts) >= (cur['pri'], cur['ts']):
             news[t][gsis] = {'name': name, 'pos': pos, 'status': stt, 'src': src, 'ts': ts, 'firm': firm or stt in GONE,
-                             'first': first[0], 'first_src': first[1]}
+                             'pri': pri, 'first': first[0], 'first_src': first[1]}
         elif same:
             cur['first'], cur['first_src'] = first
     try:
@@ -776,7 +790,7 @@ def live_injuries(last, week, games):
                 e['status'] += ' (last week)'
             e['name'] = e.get('name') or (L or {}).get('full_name') or r.get('full_name', gsis)
             e['pos'] = e.get('pos') or (L or {}).get('position') or r.get('position', '')
-            e.pop('firm', None)
+            e.pop('firm', None); e.pop('pri', None)
             out[t][gsis] = e
     # once a team's gameday inactives are out (ESPN marks the five to seven names Out in the last 100 minutes before
     # kickoff), everyone still Questionable or Doubtful, or carried from last week, is dressed: Active
