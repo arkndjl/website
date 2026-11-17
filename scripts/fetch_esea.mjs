@@ -845,8 +845,8 @@ function pugMap(sides, R, S, mineIdx, names) {
   const ct = mapCredit(us, them, R, rf, ra), co = mapCredit(them, us, R, ra, rf);
   us.forEach((p, i) => { p.resid = ct[i]; }); them.forEach((p, i) => { p.resid = co[i]; });
   const om = t => t.reduce((a, p) => a + rwaOf(p.pid), 0) / (t.length || 1);
-  const fin = (t, oppMean) => t.map(({ pid, miss, refs, ...p }) => { const a = ark({ ...p, miss }) || {};
-    return { ...p, ...(PUG_ME.has(pid) ? { isMe: true } : {}), country: countries[pid] || null, rating: a.rating ?? null, swing: a.swing ?? null, rwa: a.swing != null && RWA?.p ? Math.round((a.swing + oppMean) * 10) / 10 : null }; })
+  const fin = (t, oppMean) => t.map(({ miss, refs, ...p }) => { const pid = p.pid, a = ark({ ...p, miss }) || {};
+    return { ...p, ...(PUG_ME.has(pid) ? { isMe: true } : {}), country: countries[pid] || countries['s:' + pid] || null, rating: a.rating ?? null, swing: a.swing ?? null, rwa: a.swing != null && RWA?.p ? Math.round((a.swing + oppMean) * 10) / 10 : null }; })
     .sort((a, b) => (b.rwa ?? b.rating ?? 0) - (a.rwa ?? a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
   const players = fin(us, om(them)), opp = fin(them, om(us));
   const top = players.filter(p => (p.rwa ?? p.rating) != null)[0]; if (top) top.mapMvp = true;
@@ -946,6 +946,20 @@ if (prof?.me?.id) {
   const lr = prof.me.steam ? await leetifyPugs(prof.me.steam).catch(e => (console.log('leetify:', e.message), { status: 'error', rows: [] })) : { status: 'no steam id', rows: [] };
   console.log(`PUG box scores: FACEIT ${fr.length}, Leetify ${lr.rows.length} (status ${lr.status})`);
   const rows = [...fr, ...lr.rows].sort((a, b) => (b.at || 0) - (a.at || 0));
+  // flags for every PUG player (FACEIT id, or a Steam id on Leetify rows): one lookup per new player, cached in `countries`;
+  // a failed lookup is not cached, so the next run retries it
+  let looked = 0;
+  for (const r of rows) for (const p of [...r.players, ...r.opp]) {
+    if (p.country || !p.pid) continue;
+    const key = String(p.pid), steam = /^\d{15,}$/.test(key), ck = steam ? 's:' + key : key;
+    if (!(ck in countries) && looked < 250) {
+      looked++;
+      const j = await api(steam ? `/players?game=cs2&game_player_id=${key}` : `/players/${key}`).catch(() => undefined);
+      if (j !== undefined) countries[ck] = j?.country?.toLowerCase() || null;
+    }
+    p.country = countries[ck] || (PUG_ME.has(key) ? prof.me.country?.toLowerCase() : null) || null;
+  }
+  for (const r of rows) for (const p of [...r.players, ...r.opp]) delete p.pid;
   const meLine = r => r.players.find(p => p.isMe);
   for (const r of rows) { const m = meLine(r); r.me = m ? { k: m.k, d: m.d, adr: m.adr, rwa: m.rwa, rating: m.rating } : null; }
   const n = s => rows.filter(r => r.src === s).length;
