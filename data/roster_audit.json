@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-17T01:19Z",
+ "asof": "2026-11-17T01:41Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -292,7 +292,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 10,
+     "flags": 12,
      "rows": 2148
     },
     "static/data/nfl-fantasy.json": {
@@ -300,11 +300,11 @@
      "rows": 639
     },
     "static/data/nfl-war.json": {
-     "flags": 75,
+     "flags": 77,
      "rows": 1823
     },
     "static/data/pctl-nfl.json": {
-     "flags": 73,
+     "flags": 75,
      "rows": 1752
     },
     "static/data/personnel/nfl.json": {
@@ -312,11 +312,29 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 48,
+     "flags": 50,
      "rows": 1650
     }
    },
    "flags": [
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
     {
      "d": "2026-08-29",
      "field": "depth",
@@ -334,6 +352,24 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "ATL"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "15262",
+     "player": "Shane Buechele",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "BUF"
     },
     {
      "d": "2026-09-16",
@@ -1455,6 +1491,42 @@
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Reverts to Cleveland's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Cleveland's practice squad",
+      "kind": "practice"
+     },
+     "pid": "16530",
+     "player": "Zaire Mitchell-Paden",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
      "flag": "released",
      "head": "Cut loose by Rams",
      "kind": "waived",
@@ -2280,6 +2352,24 @@
      "site": "HOU"
     },
     {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
+    {
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2332,6 +2422,24 @@
      "pos": "OL",
      "rotowire": "FA",
      "site": "LAC"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Reverts to Cleveland's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Cleveland's practice squad",
+      "kind": "practice"
+     },
+     "pid": "16530",
+     "player": "Zaire Mitchell-Paden",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
     },
     {
      "d": "2026-11-16",
@@ -3736,6 +3844,42 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "CHI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Reverts to Cleveland's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Cleveland's practice squad",
+      "kind": "practice"
+     },
+     "pid": "16530",
+     "player": "Zaire Mitchell-Paden",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "CLE"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
     },
     {
      "d": "2026-11-16",
