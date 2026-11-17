@@ -2761,9 +2761,200 @@
   }
   // a glossary term (Process > Glossary/Methodology): the term, its formula, and one picture of its scale
   // (data/glossary_gfx.json: ab, name, f lines, scale {lo,hi,ticks,mark}, parts [[label,w]], bars [[label,v]] + unit + bl, n + nl)
+  // explainer card (portrait 3:4, data/glossary_gfx.json entries with x: 1, built by scripts/glossary_gfx.py):
+  // head (term + what it stands for + sports), WHAT / USE lines, formula, held-out test vs similar metrics,
+  // a picture (distribution, calibration, bars or scale), top 10, footnote
+  async function buildExplain(d) {
+    var F = await frame(1800, 2400, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 32, gap = 20, cy = y;
+    var num = function (v, dec, sign, unit) {
+      if (typeof v === 'string') return v;
+      v = +v; var s = dec == null ? (Math.abs(v) >= 10 ? (Math.round(v * 10) / 10).toString() : (Math.round(v * 1000) / 1000).toString()) : v.toFixed(dec);
+      s = s.replace(/^(-?)0\./, '$1.').replace('-', '−');
+      if (sign && v > 0) s = '+' + s;
+      return unit === '%' ? s + '%' : s;
+    };
+    var cap = function (t, X, Y, col) { g.font = '32px ' + FONT; g.fillStyle = col || C.lilac; g.fillText(String(t).toUpperCase(), X, Y); };
+    // head
+    var ab = d.ab || String(d.t).replace(/\s*\(.*$/, ''), sp = (d.sp || []).slice(0, 6), HH = 300;
+    well(g, x, cy, w, HH);
+    g.font = '40px ' + FONT; var tagW = 0; sp.forEach(function (s) { tagW = Math.max(tagW, g.measureText(String(s).toUpperCase()).width + 36); });
+    var tagsW = sp.length ? (sp.length > 3 ? 2 * tagW + 12 : tagW) : 0, room = w - 2 * pad - (tagsW ? tagsW + 32 : 0), as = 176;
+    for (; as > 80; as -= 16) { g.font = as + 'px ' + FONT; if (g.measureText(ab).width <= room) break; }
+    g.fillStyle = C.teal; g.font = as + 'px ' + FONT; g.fillText(ab, x + pad, cy + 40 + as * 0.5);
+    g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, String(d.stands || '').toUpperCase(), room), x + pad, cy + HH - 40);
+    sp.forEach(function (s, i) {
+      var two = sp.length > 3, c = two ? i % 2 : 0, r = two ? Math.floor(i / 2) : i;
+      var tx = x + w - pad - tagsW + c * (tagW + 12), ty = cy + pad + r * 72;
+      g.fillStyle = C.title; g.fillRect(tx, ty, tagW, 58); bevel(g, tx, ty, tagW, 58, true, 4);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.textAlign = 'center'; g.fillText(String(s).toUpperCase(), tx + tagW / 2, ty + 30); g.textAlign = 'left';
+    });
+    cy += HH + gap;
+    // WHAT / USE
+    var LW = 150, tw = w - 2 * pad - LW, lines = [];
+    g.font = '40px ' + FONT;
+    [['what', d.what], ['use', d.use]].forEach(function (r) { if (r[1]) lines.push([r[0], wrap(g, r[1], tw).slice(0, 2)]); });
+    var lh = 54, bh = 2 * pad - 12 + lines.reduce(function (a, r) { return a + r[1].length * lh + 14; }, -14);
+    well(g, x, cy, w, bh);
+    var ly = cy + pad + 20;
+    lines.forEach(function (r) {
+      cap(r[0], x + pad, ly);
+      g.font = '40px ' + FONT; g.fillStyle = C.white;
+      r[1].forEach(function (t, i) { g.fillText(t, x + pad + LW, ly + i * lh); });
+      ly += r[1].length * lh + 14;
+    });
+    cy += bh + gap;
+    // formula (+ split bar of the blend's weights)
+    var fl = d.f || [], parts = d.parts || [], fs = 52;
+    g.font = fs + 'px ' + FONT;
+    while (fs > 36 && fl.some(function (t) { return g.measureText(t).width > w - 2 * pad; })) { fs -= 4; g.font = fs + 'px ' + FONT; }
+    var fh = 2 * pad + 40 + fl.length * fs * 1.3 + (parts.length ? 130 : 0);
+    well(g, x, cy, w, fh);
+    cap('formula', x + pad, cy + pad + 10);
+    g.font = fs + 'px ' + FONT; g.fillStyle = C.white;
+    fl.forEach(function (t, i) { g.fillText(t, x + pad, cy + pad + 40 + fs * 0.75 + i * fs * 1.3); });
+    if (parts.length) {
+      var px = x + pad, pw = w - 2 * pad, tot = parts.reduce(function (a, p) { return a + (+p[1]); }, 0) || 1, py = cy + fh - pad - 104, PC = [C.teal, C.lilac, '#9a8cc4', C.white];
+      parts.forEach(function (p, i) {
+        var ww = i === parts.length - 1 ? x + pad + pw - px : Math.round(pw * (+p[1]) / tot / 8) * 8, inner = ww - (i < parts.length - 1 ? 8 : 0);
+        g.fillStyle = PC[i % PC.length]; g.fillRect(px, py, inner, 56);
+        g.fillStyle = C.dark; g.fillRect(px, py + 52, inner, 4);
+        g.font = '36px ' + FONT; g.fillStyle = C.dark; g.fillText(num(p[1], 2).replace(/0$/, ''), px + 12, py + 30);
+        g.font = '32px ' + FONT; g.fillStyle = PC[i % PC.length]; g.fillText(fit(g, p[0], inner - 8), px, py + 88);
+        px += ww;
+      });
+    }
+    cy += fh + gap;
+    // test (left) + picture (right)
+    var rowsH = (d.top && d.top.rows && d.top.rows.length) ? 560 : Math.max(560, y + h - cy - (d.foot ? 52 : 0)), lw2 = Math.round((w - gap) * 0.54), rw = w - gap - lw2, rx = x + lw2 + gap;
+    var T = d.test;
+    well(g, x, cy, lw2, rowsH);
+    if (T && T.tiles) {
+      cap('test', x + pad, cy + pad + 10, C.teal);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+      var tl0 = wrap(g, T.t, lw2 - 2 * pad).slice(0, 2); tl0.forEach(function (t, i) { g.fillText(t, x + pad, cy + pad + 56 + i * 40); });
+      var tt = T.tiles, ty0 = cy + pad + 56 + tl0.length * 40 + 16, th = (cy + rowsH - pad - (T.n ? 56 : 0) - ty0) / tt.length;
+      tt.forEach(function (r, i) {
+        var my = ty0 + i * th + th / 2;
+        g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(r[0]).toUpperCase(), x + pad, my - 22);
+        if (r[2]) g.fillText(r[2], x + pad, my + 22);
+        g.font = '88px ' + FONT; g.fillStyle = C.teal; g.textAlign = 'right'; g.fillText(String(r[1]).replace('-', '−'), x + lw2 - pad, my); g.textAlign = 'left';
+      });
+      if (T.n) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, T.n, lw2 - 2 * pad), x + pad, cy + rowsH - pad - 8); }
+    } else if (T) {
+      cap('test · ' + (T.lo ? 'lower is better' : 'higher is better'), x + pad, cy + pad + 10, C.teal);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+      var tl = wrap(g, T.t, lw2 - 2 * pad).slice(0, 2); tl.forEach(function (t, i) { g.fillText(t, x + pad, cy + pad + 56 + i * 40); });
+      var R = T.rows || [], top0 = cy + pad + 56 + tl.length * 40 + 16, foot = T.n ? 56 : 0, avail = cy + rowsH - pad - foot - top0, rh = Math.min(100, avail / Math.max(1, R.length));
+      var fsz = rh >= 88 ? 48 : rh >= 64 ? 40 : 32; g.font = fsz + 'px ' + FONT;
+      var labW = Math.min((lw2 - 2 * pad) * 0.5, Math.max.apply(null, R.map(function (r) { return g.measureText(r[0]).width; }).concat([0])) + 20);
+      var vals = R.map(function (r) { return num(r[1], Math.abs(+r[1]) < 1 ? 3 : null, false, T.unit); }), valW = Math.max.apply(null, vals.map(function (t) { return g.measureText(t).width; }).concat([0])) + 20;
+      var bx = x + pad + labW, bw = lw2 - 2 * pad - labW - valW, mx = Math.max.apply(null, R.map(function (r) { return Math.abs(+r[1]); }).concat([1e-9]));
+      var mn = T.lo ? Math.min.apply(null, R.map(function (r) { return +r[1]; })) * 0.9 : 0;   // lower is better: bars from 90% of the best, so gaps show
+      R.forEach(function (r, i) {
+        var mid = top0 + i * rh + rh / 2, v = +r[1], len = Math.max(8, Math.round(bw * (Math.abs(v) - mn) / (mx - mn || 1) / 8) * 8), col = r[2] ? C.teal : '#9a8cc4';
+        g.font = fsz + 'px ' + FONT; g.fillStyle = r[2] ? C.white : C.lilac; g.fillText(fit(g, r[0], labW - 12), x + pad, mid);
+        g.fillStyle = col; g.fillRect(bx, Math.round(mid - rh * 0.22), len, Math.round(rh * 0.44));
+        g.fillStyle = C.dark; g.fillRect(bx, Math.round(mid + rh * 0.22) - 4, len, 4);
+        g.fillStyle = r[2] ? C.teal : C.lilac; g.fillText(vals[i], bx + len + 14, mid);
+      });
+      if (T.n) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, T.n, lw2 - 2 * pad), x + pad, cy + rowsH - pad - 8); }
+    }
+    well(g, rx, cy, rw, rowsH);
+    var V = d.viz;
+    if (V) {
+      cap(V.t || '', rx + pad, cy + pad + 10);
+      var vx = rx + pad, vw = rw - 2 * pad, vy = cy + pad + 50, vh = rowsH - 2 * pad - 50;
+      if (V.kind === 'dist') {
+        var B = V.bins, n = B.length, step = n > 1 ? B[1][0] - B[0][0] : 1, lo = B[0][0], hi = B[n - 1][0] + step, mxc = Math.max.apply(null, B.map(function (b) { return b[1]; })) || 1;
+        var bw2 = Math.floor(vw / n), base = vy + vh - 130, hh = vh - 150;
+        var X = function (v) { return vx + (v - lo) / (hi - lo) * bw2 * n; };
+        B.forEach(function (b, i) {
+          var bh2 = Math.max(b[1] ? 8 : 0, Math.round(hh * b[1] / mxc / 8) * 8), x0 = vx + i * bw2;
+          g.fillStyle = b[0] + step / 2 >= (V.mark != null ? V.mark : -1e9) ? C.teal : '#9a8cc4';
+          g.fillRect(x0 + 2, base - bh2, bw2 - 6, bh2);
+        });
+        g.fillStyle = C.lilac; g.fillRect(vx, base, bw2 * n, 4);
+        g.font = '32px ' + FONT; g.fillStyle = C.white;
+        var ax = function (v) { return String(+v.toFixed(3)).replace('-', '−'); };
+        g.textAlign = 'left'; g.fillText(ax(lo), vx, base + 116); g.textAlign = 'right'; g.fillText(ax(hi), vx + bw2 * n, base + 116); g.textAlign = 'left';
+        var mEnd = -1e9;
+        (V.marks || []).forEach(function (m) {   // a mark: a pixel post under the axis, its label below (a second row when they touch)
+          var mx2 = Math.round(X(m[0])); g.font = '28px ' + FONT; var mw = g.measureText(m[1]).width, row = mx2 - mw / 2 < mEnd + 12 ? 1 : 0;
+          g.fillStyle = C.white; g.fillRect(mx2 - 2, base + 4, 4, 16 + row * 36);
+          g.textAlign = 'center'; g.fillText(m[1], mx2, base + 44 + row * 36); g.textAlign = 'left';
+          if (!row) mEnd = mx2 + mw / 2;
+        });
+      } else if (V.kind === 'cal') {
+        var lo2 = V.lo, hi2 = V.hi, sz = Math.min(vw, vh - 40), ox = vx + (vw - sz) / 2 + 20, oy = vy + 10, s2 = sz - 40;
+        var P = function (v) { return (v - lo2) / (hi2 - lo2) * s2; };
+        g.fillStyle = C.dark; g.fillRect(ox, oy, s2, s2);
+        for (var k = 0; k <= s2; k += 8) { g.fillStyle = 'rgba(200,199,255,0.45)'; g.fillRect(ox + k, oy + s2 - k - 4, 4, 4); }   // the exact line, in pixels
+        V.rows.forEach(function (r) {
+          var px2 = ox + P(r[0]), py2 = oy + s2 - P(r[1]), rr = Math.max(8, Math.min(24, Math.round(Math.sqrt(r[2]) / 2 / 4) * 4));
+          g.fillStyle = C.teal; g.fillRect(Math.round(px2 - rr / 2), Math.round(py2 - rr / 2), rr, rr);
+        });
+        g.font = '28px ' + FONT; g.fillStyle = C.lilac;
+        var lab = function (v) { return V.pct ? Math.round(v * 100) + '%' : String(v); };
+        g.fillText(lab(lo2), ox, oy + s2 + 28); g.textAlign = 'right'; g.fillText(lab(hi2), ox + s2, oy + s2 + 28);
+        g.fillText('given →', ox + s2, oy + s2 + 60); g.textAlign = 'left'; g.fillText('became ↑', ox - 20, oy - 6 < cy + pad + 40 ? oy + 24 : oy - 6);
+      } else if (V.kind === 'bars') {
+        var VR = V.rows, rh2 = Math.min(84, vh / VR.length), fz = rh2 >= 72 ? 40 : 32; g.font = fz + 'px ' + FONT;
+        var lw3 = Math.max.apply(null, VR.map(function (r) { return g.measureText(r[0]).width; })) + 20;
+        var vv = VR.map(function (r) { return num(r[1], null, false, V.unit); }), vw3 = Math.max.apply(null, vv.map(function (t) { return g.measureText(t).width; })) + 16;
+        var bx3 = vx + lw3, bw3 = vw - lw3 - (V.txt ? 0 : vw3), mx3 = Math.max.apply(null, VR.map(function (r) { return +r[1] || 0; })) || 1;
+        VR.forEach(function (r, i) {
+          var mid = vy + i * rh2 + rh2 / 2; g.font = fz + 'px ' + FONT; g.fillStyle = C.white; g.fillText(r[0], vx, mid);
+          if (V.txt) { g.fillStyle = C.teal; g.fillText(fit(g, String(r[1]), bw3), bx3, mid); return; }
+          var len = Math.max(8, Math.round(bw3 * (+r[1]) / mx3 / 8) * 8);
+          g.fillStyle = C.teal; g.fillRect(bx3, Math.round(mid - rh2 * 0.22), len, Math.round(rh2 * 0.44));
+          g.fillStyle = C.teal; g.fillText(vv[i], bx3 + len + 12, mid);
+        });
+      } else if (V.kind === 'scale') {
+        var lo4 = V.lo, hi4 = V.hi, ry = vy + vh / 2 - 30, X4 = function (v) { return vx + Math.round((v - lo4) / (hi4 - lo4) * vw / 8) * 8; };
+        for (var q = 0; q < 10; q++) { var t4 = q / 9; g.fillStyle = t4 < .5 ? 'rgba(200,199,255,' + (.25 + t4 * 1.3).toFixed(2) + ')' : 'rgba(127,255,212,' + (.35 + (t4 - .5) * 1.3).toFixed(2) + ')'; g.fillRect(vx + Math.round(vw * q / 10), ry, Math.round(vw / 10) - 4, 60); }
+        (V.ticks || []).forEach(function (tk, i) {
+          var tx4 = X4(tk[0]), L = i === V.ticks.length - 1, F0 = i === 0; g.fillStyle = C.white; g.fillRect(tx4 - (L ? 8 : F0 ? 0 : 4), ry - 14, 8, 88);
+          g.textAlign = F0 ? 'left' : L ? 'right' : 'center'; g.font = '40px ' + FONT; g.fillText(num(tk[0]), tx4, ry + 116);
+          g.font = '32px ' + FONT; g.fillStyle = +tk[0] === +V.mark ? C.teal : C.lilac; g.fillText(tk[1], tx4, ry - 44); g.textAlign = 'left';
+        });
+      }
+    }
+    cy += rowsH + gap;
+    // top 10
+    var TP = d.top;
+    var left = y + h - cy - (d.foot ? 52 : 0);
+    if (TP && TP.rows && TP.rows.length && left > 200) {
+      well(g, x, cy, w, left);
+      cap(TP.t, x + pad, cy + pad + 10, C.teal);
+      var TR = TP.rows, t0 = cy + pad + 48, trh = Math.min(64, (left - (t0 - cy) - pad) / TR.length), tfz = trh >= 60 ? 40 : 32;
+      var tv = TR.map(function (r) { return num(r[3], TP.dec, TP.sign, TP.unit); }), tmax = Math.max.apply(null, TR.map(function (r) { return Math.abs(+r[3]) || 0; })) || 1;
+      g.font = tfz + 'px ' + FONT;
+      var valCol = Math.max.apply(null, tv.map(function (t) { return g.measureText(t).width; })) + 24;
+      g.font = '32px ' + FONT; var subCol = Math.max.apply(null, TR.map(function (r) { return r[4] ? g.measureText(r[4]).width + 32 : 0; })); g.font = tfz + 'px ' + FONT;
+      var cRk = x + pad, cNm = cRk + 72, cSe = x + Math.round(w * 0.42), cTm = x + Math.round(w * 0.55), cBar = x + Math.round(w * 0.68), cVal = x + w - pad;
+      TR.forEach(function (r, i) {
+        var mid = t0 + i * trh + trh / 2;
+        if (i % 2 === 0) { g.fillStyle = 'rgba(200,199,255,0.06)'; g.fillRect(x + 8, Math.round(mid - trh / 2), w - 16, Math.round(trh)); }
+        g.font = tfz + 'px ' + FONT;
+        g.fillStyle = C.lilac; g.fillText(String(i + 1), cRk, mid);
+        g.fillStyle = C.white; g.fillText(fit(g, r[0], cSe - cNm - 16), cNm, mid);
+        g.fillStyle = C.lilac; g.fillText(fit(g, r[1], cTm - cSe - 12), cSe, mid);
+        g.fillText(fit(g, String(r[2]) + (r[4] ? '' : ''), cBar - cTm - 12), cTm, mid);
+        var bmax = cVal - valCol - subCol - cBar, len = Math.max(8, Math.round(bmax * Math.abs(+r[3]) / tmax / 8) * 8);
+        if (r[4]) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[4], cVal - valCol - subCol + 16, mid); g.font = tfz + 'px ' + FONT; }
+        g.fillStyle = i === 0 ? C.teal : '#5fd9b4'; g.fillRect(cBar, Math.round(mid - trh * 0.2), len, Math.round(trh * 0.4));
+        g.textAlign = 'right'; g.fillStyle = C.teal; g.fillText(tv[i], cVal, mid); g.textAlign = 'left';
+      });
+      cy += left;
+    }
+    if (d.foot) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.foot, w), x, y + h - 18); }
+    return F.canvas;
+  }
   async function buildTerm(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-term') || '{}'); } catch (e) { return null; }
     if (!d.t) return null;
+    if (d.x) return buildExplain(d);
     var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
     var ab = d.ab || String(d.t).replace(/\s*\(.*$/, ''), name = d.name || ((/\(([^)]*)\)/.exec(d.t) || [])[1]) || '';

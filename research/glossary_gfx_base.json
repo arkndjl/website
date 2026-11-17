@@ -1,0 +1,685 @@
+{
+ "FV (future value)": {
+  "ab": "FV",
+  "name": "future value",
+  "f": [
+   "mean outcome of past players with the profile"
+  ],
+  "scale": {
+   "lo": 20,
+   "hi": 80,
+   "ticks": [
+    [
+     20,
+     "floor"
+    ],
+    [
+     50,
+     "regular"
+    ],
+    [
+     60,
+     "plus"
+    ],
+    [
+     70,
+     "star"
+    ],
+    [
+     80,
+     "generational"
+    ]
+   ],
+   "mark": 50
+  }
+ },
+ "CS2 prospect FV": {
+  "ab": "FV",
+  "name": "CS2 prospect",
+  "f": [
+   "projected RWA vs tier-1 starters, next year"
+  ],
+  "scale": {
+   "lo": 20,
+   "hi": 80,
+   "ticks": [
+    [
+     20,
+     "floor"
+    ],
+    [
+     50,
+     "avg tier-1"
+    ],
+    [
+     80,
+     "top"
+    ]
+   ],
+   "mark": 50
+  }
+ },
+ "Stat+": {
+  "ab": "Stat+",
+  "name": "production index",
+  "f": [
+   "100 + 25 × z"
+  ],
+  "scale": {
+   "lo": 50,
+   "hi": 150,
+   "ticks": [
+    [
+     50,
+     "-2σ"
+    ],
+    [
+     75,
+     "-1σ"
+    ],
+    [
+     100,
+     "avg"
+    ],
+    [
+     125,
+     "+1σ"
+    ],
+    [
+     150,
+     "+2σ"
+    ]
+   ],
+   "mark": 100
+  }
+ },
+ "Stat+ (CBB)": {
+  "ab": "Stat+",
+  "name": "CBB production index",
+  "f": [
+   "100 + 25 × (BPM − pos mean) / pos sd"
+  ],
+  "scale": {
+   "lo": 50,
+   "hi": 150,
+   "ticks": [
+    [
+     50,
+     "-2σ"
+    ],
+    [
+     75,
+     "-1σ"
+    ],
+    [
+     100,
+     "avg"
+    ],
+    [
+     125,
+     "+1σ"
+    ],
+    [
+     150,
+     "+2σ"
+    ]
+   ],
+   "mark": 100
+  }
+ },
+ "rXPM (raw XPM)": {
+  "ab": "XPM",
+  "name": "raw · pts / 100 poss",
+  "f": [
+   "XPM = .5 DPM + .5 BPM"
+  ],
+  "parts": [
+   [
+    "databallr DPM",
+    0.5
+   ],
+   [
+    "BBRef BPM",
+    0.5
+   ]
+  ],
+  "scale": {
+   "lo": -4,
+   "hi": 8,
+   "ticks": [
+    [
+     -4,
+     ""
+    ],
+    [
+     -1.4,
+     "repl"
+    ],
+    [
+     0,
+     "avg"
+    ],
+    [
+     4,
+     ""
+    ],
+    [
+     8,
+     ""
+    ]
+   ],
+   "mark": 0
+  }
+ },
+ "pXPM (predictive XPM)": {
+  "ab": "pXPM",
+  "name": "predictive XPM",
+  "f": [
+   "raw × MP / (MP + 600)",
+   "+ mean × 600 / (MP + 600)"
+  ],
+  "bars": [
+   [
+    "300 MP",
+    33
+   ],
+   [
+    "600 MP",
+    50
+   ],
+   [
+    "1,200 MP",
+    67
+   ],
+   [
+    "2,400 MP",
+    80
+   ]
+  ],
+  "unit": "%",
+  "bl": "weight on raw"
+ },
+ "XPM (proj)": {
+  "ab": "XPM",
+  "name": "projected",
+  "f": [
+   "season XPM + preseason prior, by minutes"
+  ]
+ },
+ "1Y / 3Y XPM": {
+  "ab": "1Y / 3Y",
+  "name": "projected XPM",
+  "f": [
+   "minutes-weighted, given he plays"
+  ]
+ },
+ "VORX": {
+  "ab": "VORX",
+  "name": "NBA wins over replacement",
+  "f": [
+   ".030 × (XPM + 1.4)",
+   "× MP / 48"
+  ],
+  "bars": [
+   [
+    "XPM -1.4",
+    0
+   ],
+   [
+    "XPM 0",
+    1.75
+   ],
+   [
+    "XPM +2",
+    4.25
+   ],
+   [
+    "XPM +4",
+    6.75
+   ],
+   [
+    "XPM +6",
+    9.25
+   ]
+  ],
+  "bl": "VORX at 2,000 MP"
+ },
+ "G League NBA% / 500% / xVORX": {
+  "ab": "xVORX",
+  "name": "G League · NBA% · 500%",
+  "f": [
+   "P(NBA game, 3 seasons)",
+   "× E[3-season VORX | plays]"
+  ],
+  "bars": [
+   [
+    "NBA%",
+    23
+   ],
+   [
+    "500%",
+    8
+   ]
+  ],
+  "unit": "%",
+  "bl": "base rates"
+ },
+ "Peak XPM (CBB scale)": {
+  "ab": "Peak XPM",
+  "name": "CBB FV target",
+  "f": [
+   "mean of best 3 NBA XPM seasons",
+   "each shrunk to -2 by 500 MP"
+  ]
+ },
+ "NFL WAR": {
+  "ab": "WAR",
+  "name": "NFL wins above replacement",
+  "f": [
+   ".6 × AV WAR + .4 × XV",
+   "AV WAR = (AV − repl AV × snaps) × .091"
+  ],
+  "parts": [
+   [
+    "AV WAR",
+    0.6
+   ],
+   [
+    "XV",
+    0.4
+   ]
+  ]
+ },
+ "College WAR": {
+  "ab": "WAR",
+  "name": "college · 12 games",
+  "f": [
+   "snaps × (line + w × quality) × .227"
+  ],
+  "bars": [
+   [
+    "QB",
+    2.7
+   ],
+   [
+    "RB",
+    1.7
+   ],
+   [
+    "EDGE",
+    1.4
+   ],
+   [
+    "WR",
+    1.35
+   ],
+   [
+    "CB",
+    1.3
+   ],
+   [
+    "S",
+    1.1
+   ],
+   [
+    "DT",
+    1.0
+   ],
+   [
+    "LB",
+    1.0
+   ]
+  ],
+  "bl": "line · pts a game"
+ },
+ "WAA": {
+  "ab": "WAA",
+  "name": "wins above average",
+  "f": [
+   "WAR − snaps × line"
+  ],
+  "scale": {
+   "lo": -2,
+   "hi": 2,
+   "ticks": [
+    [
+     -2,
+     ""
+    ],
+    [
+     0,
+     "avg starter"
+    ],
+    [
+     2,
+     ""
+    ]
+   ],
+   "mark": 0
+  }
+ },
+ "XV": {
+  "ab": "XV",
+  "name": "stat-line WAR",
+  "f": [
+   "WAR, quality from the parts that track winning"
+  ],
+  "bars": [
+   [
+    "XV",
+    0.88
+   ],
+   [
+    "WAR",
+    0.86
+   ]
+  ],
+  "bl": "held-out team r"
+ },
+ "CBB WAR / WAA": {
+  "ab": "WAR",
+  "name": "CBB wins above replacement",
+  "f": [
+   "(BPM + 2) × MIN / 40 × .68 × .0143"
+  ],
+  "n": "-2.0",
+  "nl": "replacement BPM · 9th man"
+ },
+ "NHL WAR": {
+  "ab": "WAR",
+  "name": "NHL wins above replacement",
+  "f": [
+   "5v5 xG + PP xG / 5 + PK / 4",
+   "+ finishing + penalties"
+  ],
+  "n": ".991",
+  "nl": "R² to team goal diff"
+ },
+ "pWAR / HPM": {
+  "ab": "pWAR",
+  "name": "projected WAR · HPM",
+  "f": [
+   "(HPM − repl) × TOI / 60 ÷ goals per win"
+  ],
+  "bars": [
+   [
+    "Y-1",
+    1
+   ],
+   [
+    "Y-2",
+    0.5
+   ],
+   [
+    "Y-3",
+    0.25
+   ]
+  ],
+  "bl": "Marcel weights"
+ },
+ "GSAx": {
+  "ab": "GSAx",
+  "name": "goals saved above expected",
+  "f": [
+   "xG faced − goals allowed"
+  ]
+ },
+ "NHLe": {
+  "ab": "NHLe",
+  "name": "NHL equivalency",
+  "f": [
+   "points × league factor, full season"
+  ],
+  "bars": [
+   [
+    "CHL",
+    0.11
+   ],
+   [
+    "NCAA",
+    0.21
+   ]
+  ],
+  "bl": "league factor"
+ },
+ "GAR (soccer, senior)": {
+  "ab": "GAR",
+  "name": "goals above replacement",
+  "f": [
+   "PAR = GAR × .626"
+  ],
+  "bars": [
+   [
+    "GK",
+    -0.14
+   ],
+   [
+    "D",
+    -0.09
+   ],
+   [
+    "M",
+    -0.05
+   ],
+   [
+    "F",
+    0
+   ]
+  ],
+  "bl": "replacement · a match"
+ },
+ "tGAR (soccer prospects)": {
+  "ab": "tGAR",
+  "name": "team-share GAR",
+  "f": [
+   "MIN / 90 × (club rating + 2.5) / 11"
+  ]
+ },
+ "xMV": {
+  "ab": "xMV",
+  "name": "market value · EUR M",
+  "f": [
+   "ridge on log value, no market input"
+  ],
+  "n": ".78",
+  "nl": "held-out R²"
+ },
+ "xNIL / yNIL / zNIL": {
+  "ab": "x/y/zNIL",
+  "name": "NIL",
+  "f": [
+   "xNIL = market worth",
+   "yNIL = est. pay",
+   "zNIL = xNIL − yNIL"
+  ],
+  "bars": [
+   [
+    "P4",
+    20
+   ],
+   [
+    "G5",
+    3
+   ],
+   [
+    "FCS",
+    0.4
+   ]
+  ],
+  "unit": "$M",
+  "bl": "budget · a program"
+ },
+ "xAAV": {
+  "ab": "xAAV",
+  "name": "free-agent AAV",
+  "f": [
+   "share of the cap: position, age, last season"
+  ]
+ },
+ "RWA (CS2)": {
+  "ab": "RWA",
+  "name": "round win % added",
+  "f": [
+   "box + ½ plus-minus residual",
+   "opponent-adjusted"
+  ],
+  "n": "0",
+  "nl": "average tier-1 starter"
+ },
+ "Elo": {
+  "ab": "Elo",
+  "name": "rating",
+  "f": [
+   "+400 = 10 to 1"
+  ],
+  "scale": {
+   "lo": 1100,
+   "hi": 1900,
+   "ticks": [
+    [
+     1100,
+     ""
+    ],
+    [
+     1500,
+     "avg"
+    ],
+    [
+     1900,
+     ""
+    ]
+   ],
+   "mark": 1500
+  }
+ },
+ "Elo / Elo+ (tennis)": {
+  "ab": "Elo+",
+  "name": "tennis",
+  "f": [
+   "Elo vs players the same age"
+  ]
+ },
+ "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)": {
+  "ab": "REG%",
+  "name": "tier chances",
+  "f": [
+   "P(outcome FV ≥ tier)"
+  ],
+  "bars": [
+   [
+    "NHL% / Top%",
+    40
+   ],
+   [
+    "Reg%",
+    50
+   ],
+   [
+    "Star%",
+    60
+   ]
+  ],
+  "bl": "FV bar"
+ },
+ "Next up (breakout odds)": {
+  "ab": "BO%",
+  "name": "breakout odds",
+  "f": [
+   "P(first season over the 75-80th pct bar)"
+  ],
+  "bars": [
+   [
+    "CBB",
+    14.4
+   ],
+   [
+    "NBA",
+    7.9
+   ],
+   [
+    "Soccer",
+    6.2
+   ],
+   [
+    "CFB",
+    6.0
+   ],
+   [
+    "NHL",
+    5.6
+   ],
+   [
+    "NFL",
+    3.3
+   ]
+  ],
+  "bl": "held-out t"
+ },
+ "Game Score": {
+  "ab": "GmSc",
+  "name": "game score",
+  "f": [
+   "PTS + .4 FGM − .7 FGA − .4 FT miss",
+   "+ .7 ORB + .3 DRB + STL + .7 AST",
+   "+ .7 BLK − .4 PF − TOV"
+  ]
+ },
+ "Kelly %": {
+  "ab": "Kelly %",
+  "name": "stake",
+  "f": [
+   "Kelly(calibrated edge) × r"
+  ],
+  "bars": [
+   [
+    "a bet",
+    5
+   ],
+   [
+    "tennis bet",
+    2
+   ],
+   [
+    "ET night",
+    40
+   ]
+  ],
+  "unit": "%",
+  "bl": "cap"
+ },
+ "Edge / gap": {
+  "ab": "Edge",
+  "name": "model vs market",
+  "f": [
+   "model − no-vig market"
+  ]
+ },
+ "Pick rule (X)": {
+  "ab": "X",
+  "name": "pick rule",
+  "f": [
+   "|model − line| ≥ X"
+  ]
+ },
+ "xPick": {
+  "ab": "xPick",
+  "name": "expected pick",
+  "f": [
+   "market weight .55 + .3 × √(boards / 9)"
+  ]
+ },
+ "Season AV (college)": {
+  "ab": "AV",
+  "name": "college season",
+  "f": [
+   "snaps × position weight × quality"
+  ]
+ },
+ "Game control": {
+  "ab": "Control",
+  "name": "game control",
+  "f": [
+   "share of the game with the win in hand"
+  ]
+ }
+}
