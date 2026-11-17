@@ -12,7 +12,7 @@ NFL     ESPN's depth charts (offense and base defense; no specialists). The star
         (static/data/nfl-war.json), shrunk toward replacement (0) with NFL_K snaps, per 1,000 snaps. A backup needs
         NFL_MIN snaps to be listed: with none, the grade is the shrink target, not a measure of him.
 NBA     ESPN's depth charts (PG, SG, SF, PF, C). Starter = first at each slot; a non-starter listed 2nd or 3rd at a slot
-        backs up that slot's starter (his highest listing). The grade is XPM (static/data/nba-xpm/): this season's
+        backs up that slot's starter (his highest listing). The grade is pXPM (XPM from static/data/nba-xpm/): this season's
         minutes, last season's at half weight and the one before at a quarter (NBA_W: a starter back from a lost
         season keeps his line), shrunk to NBA_REPL with NBA_K weighted minutes. A backup needs NBA_MIN minutes.
 NHL     ESPN's depth charts, even strength only (C, LW, RW, LD, RD, G; the power-play and penalty-kill units are
@@ -366,7 +366,7 @@ def nba():
         return {'g': round((p['num'] + NBA_K * NBA_REPL) / (p['den'] + NBA_K), 2), 'n': p['mp'], 'age': p['age']}
     charts = espn_depth('basketball/nba')
     rows, n = depth_rows(charts, grade, lambda a: NBA_TEAM.get(a, a), need=NBA_MIN, league='basketball/nba')
-    write_depth('nba', {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'grade': 'XPM', 'use': 'MP',
+    write_depth('nba', {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'grade': 'pXPM', 'use': 'MP',
                         'fmt': 1, 'min': NBA_MIN, 'k': NBA_K, 'repl': NBA_REPL},
                 espn_depth_teams(charts, lambda nm, t, slot: grade(nm, t), lambda a: NBA_TEAM.get(a, a),
                                  [('', [(k, k.upper()) for k in ('pg', 'sg', 'sf', 'pf', 'c')])], lambda slot: 4,

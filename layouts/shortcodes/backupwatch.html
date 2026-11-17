@@ -2,7 +2,7 @@
        each sport, from data/backup_<sport>.json (cfb: scripts/backup_watch_cfb.mjs; cbb, nfl, nba, nhl:
        scripts/backup_watch.py). Every sport compares production (CBB BPM, CFB WAA a full-time season; ESPN keeps
        no college depth charts, so the college order is playing time); the NFL and NBA compare production on ESPN's depth
-       charts (NFL: WAR per 1,000 snaps, shrunk; NBA: XPM, shrunk). Ranks follow xGap (a backup
+       charts (NFL: WAR per 1,000 snaps, shrunk; NBA: pXPM, XPM shrunk to replacement). Ranks follow xGap (a backup
        younger than his starter ranks above a veteran): the gap projected over the next two seasons from today's gap
        and the age gap (college: class gap), data/backup_age.json from scripts/backup_age_fit.py; they recount within
        the filters. Photos and team logos: scripts/photos.py, from each sport's board. */ -}}
@@ -11,13 +11,13 @@
 {{- with $d -}}
 {{- $college := in (slice "cfb" "cbb") $sport -}}
 {{- $fvg := false -}}
-{{- $g := cond (eq $sport "cfb") "WAA/FT" (cond (eq $sport "cbb") "BPM" (cond (eq $sport "nfl") "WAR/1k" (cond (eq $sport "nhl") "HPM" (cond (eq $sport "soccer") "GAR/90" "XPM")))) -}}
+{{- $g := cond (eq $sport "cfb") "WAA/FT" (cond (eq $sport "cbb") "BPM" (cond (eq $sport "nfl") "WAR/1k" (cond (eq $sport "nhl") "HPM" (cond (eq $sport "soccer") "GAR/90" "pXPM")))) -}}
 {{- $use := cond (eq $sport "nfl") "Snaps" (cond (eq $sport "nba") "MP" (cond (eq $sport "cbb") "Min" (cond (eq $sport "nhl") "TOI" (cond (eq $sport "soccer") "Min" "Use")))) -}}
 {{- $gtitle := dict
       "cfb" (printf "production: the board's college WAA (wins over an average starter) a season at a full-time snap share, shrunk toward the position's replacement line with %v snaps" .k)
       "cbb" (printf "production: Barttorvik BPM this season and last (half weight), by minutes, shrunk to %v with %v minutes" .repl .k)
       "nfl" (printf "production: the board's WAR a snap this season, shrunk toward replacement (0) with %v snaps, per 1,000 snaps" .k)
-      "nba" (printf "production: XPM over this season, last season (half weight) and the one before (quarter), shrunk to %v with %v minutes" .repl .k)
+      "nba" (printf "production: pXPM, XPM over this season, last season (half weight) and the one before (quarter), shrunk to %v with %v minutes" .repl .k)
       "soccer" (printf "goals above replacement a 90: this season and last (half weight), shrunk to replacement with %v minutes" .k)
       "nhl" (printf "HPM, goals a 60 above average: this season, last season (half weight) and the one before (quarter), shrunk to the position's replacement level with %v minutes (goalies %v)" .k .kg) -}}
 {{- $utitle := dict
