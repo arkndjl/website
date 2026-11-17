@@ -11,7 +11,7 @@
 .am img{border:0;margin:0;border-radius:0}
 .am ol,.am ul{margin:0}
 .am li::before{content:none!important}
-.am-deck{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:center;padding:2rem 1.5rem;background:var(--am-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/256px 256px;border:1px solid var(--am-coal);overflow:hidden}
+.am-deck{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:center;padding:2rem 1.5rem;background:url({{ "img/px/stclaire-column.png" | relURL }}) 10px 0/44px 768px repeat-y,url({{ "img/px/stclaire-column.png" | relURL }}) right 10px top -200px/44px 768px repeat-y,var(--am-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/512px 512px;border:1px solid var(--am-coal);overflow:hidden}
 .am-deck::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(var(--am-lil) 1px,transparent 1px);background-size:32px 32px;opacity:.12}
 .am-stars{position:absolute;inset:0;pointer-events:none}
 .am-stars .px{position:absolute;width:16px;height:16px}
@@ -52,6 +52,8 @@
 @media (max-width:684px){.am-title{font-size:48px}.am-spin{width:min(100%,320px)}}
 .am .px .t{fill:#8e8e98}
 .am-mono{position:relative;display:block;width:104px;height:104px;margin:0;border:0;image-rendering:pixelated}
+.am-deck{padding-left:76px;padding-right:76px;border:2px solid;border-color:#60606c #000 #000 #60606c;image-rendering:pixelated}
+@media (max-width:684px){.am-deck{padding-left:1rem;padding-right:1rem;background:var(--am-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/512px 512px}}
 </style>
 <div class="am" data-am>
 <section class="am-deck" aria-label="ST. CLAIRE music">

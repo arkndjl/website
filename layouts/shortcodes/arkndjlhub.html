@@ -20,7 +20,7 @@
 .ah .px .t{fill:#8e8e98}.ah .px .p{fill:#131316}.ah .px .d{fill:#2e2e35}.ah .px .k{fill:#0e0e12}.ah .px .v{fill:#2e2e35}
 .ah ul,.ah ol,.ah figure{margin:0}
 .ah li::before{content:none!important}
-.ah-hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem;background:var(--ah-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/256px 256px;image-rendering:pixelated;border:1px solid var(--ah-coal);overflow:hidden}
+.ah-hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem;background:url({{ "img/px/stclaire-column.png" | relURL }}) 10px 0/44px 768px repeat-y,url({{ "img/px/stclaire-column.png" | relURL }}) right 10px top -200px/44px 768px repeat-y,var(--ah-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/512px 512px;image-rendering:pixelated;border:1px solid var(--ah-coal);overflow:hidden}
 .ah-hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(200,199,255,.035) 3px 4px);pointer-events:none}
 .ah-rel{position:relative;width:384px;height:384px;flex:none}
 .ah-rel canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
@@ -66,6 +66,8 @@
 @media (prefers-reduced-motion:reduce){.ah-p{transition:none}}
 @media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--style{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
 @media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .ah-mono{width:128px;height:128px;margin:-64px 0 0 -64px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+.ah-hero{padding-left:76px;padding-right:76px;border:2px solid;border-color:#60606c #000 #000 #60606c;image-rendering:pixelated}
+@media (max-width:684px){.ah-hero{padding-left:1rem;padding-right:1rem;background:var(--ah-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/512px 512px}}
 </style>
 <div class="ah">
 <section class="ah-hero" aria-label="ST. CLAIRE">
