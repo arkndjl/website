@@ -161,6 +161,17 @@
     return kc >= 0 && r.cells.length === hcells.length ? kc : -1;
   }
 
+  // index (in hcells) of the weekly move column, or -1: a ± / Δ header whose cells are weekly move cells (cfb__wk) or whose
+  // hover says it counts from last week / the last post / a date (not a standard error, a pick delta or an outcome gap)
+  function weekCol(table, hcells) {
+    var r = [].slice.call(table.tBodies[0].rows).find(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length === hcells.length; });
+    return hcells.findIndex(function (h, i) {
+      if (h.hidden || !/^[±Δ]$/.test(txt(h))) return false;
+      if (r && r.cells[i] && r.cells[i].classList.contains('cfb__wk')) return true;
+      return /since|last (week|7 days)|over the last week/i.test(h.getAttribute('title') || '');
+    });
+  }
+
   async function build(win, btn) {
     var table = win.querySelector('table'); if (!table) return null;
     var hcells = [].slice.call(table.tHead.rows[0].cells), vis = hcells.filter(function (h) { return !h.hidden; });
@@ -168,9 +179,12 @@
     var row0 = [].slice.call(table.tBodies[0].rows).find(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2; });
     if (row0 && vis.length < hcells.length && row0.cells.length === vis.length) hcells = vis;
     var heads = hcells.map(txt);
-    var want = (win.getAttribute('data-gfx-cols') || '').split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
-    // a column name ending in "!" draws only its logo
-    var iconOnly = {};
+    // a column name ending in "!" draws only its logo; "name=Label" draws that column under another header
+    var iconOnly = {}, relabel = {};
+    var want = (win.getAttribute('data-gfx-cols') || '').split(',').map(function (s) { s = s.trim(); var e = s.indexOf('=');
+                 if (e > 0) { relabel[s.slice(0, e).trim().toLowerCase()] = s.slice(e + 1).trim(); s = s.slice(0, e).trim(); } return s.toLowerCase(); }).filter(Boolean);
+    heads = heads.map(function (h) { return relabel[h.toLowerCase()] || h; });
+    want = want.map(function (n) { return (relabel[n.replace(/!$/, '')] || n.replace(/!$/, '')).toLowerCase() + (/!$/.test(n) ? '!' : ''); });
     var idx = want.length ? want.map(function (n) { var io = /!$/.test(n); n = n.replace(/!$/, '');
                               var i = heads.findIndex(function (h) { return h.toLowerCase() === n; }); if (io) iconOnly[i] = 1; return i; }).filter(function (i) { return i >= 0; })
                           : heads.slice(0, 6).map(function (_, i) { return i; });
@@ -205,6 +219,14 @@
       var at0 = fvAt >= 0 ? fvAt + 1 : nameAt >= 0 ? nameAt + 1 : idx.length;
       while (at0 < idx.length && ([POS_COL, CLASS_COL, TEAM_COL, FV_COL].some(function (re) { return re.test(heads[idx[at0]]); }) || idx[at0] === ageI)) at0++;
       idx.splice(at0, 0, sortI);
+    }
+    // the weekly move column (± rank change / Δ FV change since the last post day, scripts/board_moves.py; ± on the ARK
+    // Rankings) rides beside the sorted column on every graphic and is never auto-dropped
+    var wkI = weekCol(table, hcells);
+    if (wkI >= 0 && idx.indexOf(wkI) < 0) {
+      var wAt = sortI >= 0 ? idx.indexOf(sortI) + 1 : nameAt >= 0 ? nameAt + 1 : idx.length;
+      while (sortI < 0 && wAt < idx.length && ([POS_COL, CLASS_COL, TEAM_COL, FV_COL].some(function (re) { return re.test(heads[idx[wAt]]); }) || idx[wAt] === ageI)) wAt++;
+      idx.splice(wAt, 0, wkI);
     }
     var teamK = idx.findIndex(function (i) { return TEAM_COL.test(heads[i]); });
     var all =[].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; });
@@ -337,7 +359,7 @@
     // the largest size (64 down to 32 px, steps of 8) that fits the row height and the width. When none fits, the rightmost
     // column goes, but never the rank, name, position, class, team or FV (or any column with logos). With nothing left to
     // drop: first names to initials, then the team as its logo alone, then 24 px; text is cut short only past all of that.
-    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || cols[k] === sortI || (ageI >= 0 && cols[k] === ageI) || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
+    var keep = function (k) { var h = heads[cols[k]]; return k === 0 || cols[k] === sortI || cols[k] === wkI || (ageI >= 0 && cols[k] === ageI) || NAME_COL.test(h) || POS_COL.test(h) || CLASS_COL.test(h) || TEAM_COL.test(h) || FV_COL.test(h) || cdata.some(function (r) { return r[k].img; }); };
     var size, colW, SIZES = [64, 56, 48, 40, 32];
     var fits = function (sizes) {
       for (var si = 0; si < sizes.length; si++) { size = sizes[si]; if (rowH < size * 1.3) continue; colW = widths(size); if (sum(colW) <= gw) return true; }
