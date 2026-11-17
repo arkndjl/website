@@ -25,6 +25,7 @@ import nhl_data as D  # noqa: E402
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 FIT = os.path.join(ROOT, 'data', 'nhl_breakout_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'next-up', 'nhl.json')
+CEIL = os.path.join(ROOT, 'data', 'nhl_ceiling_fit.json')      # scripts/nhl_ceiling_research.py
 WAR = os.path.join(ROOT, 'static', 'data', 'nhl-war')
 CACHE = os.path.join(D.CACHE, 'bo')
 FACE = 'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/%s.png&w=96&h=70&scale=crop'
@@ -257,6 +258,13 @@ def marcel(hist, y):
     return num / (den + 1000) * 1000
 
 
+def ceil_inputs(a, hist):
+    """ceiling inputs for one base season; hist includes it (scripts/nhl_ceiling_research.py)"""
+    return {'s0': shr(a), 'mar': marcel(hist, a['y']), 'age': a['age'], 'age2': a['age'] ** 2,
+            'lnm': math.log(max(a['tmin'], 1.0)), 'd': a['d'], 'toi': a['toi'], 'pps': a['pp'] / max(a['toi'], 1.0),
+            'ev60': a['ev_p60']}
+
+
 def career_sh(hist, y):
     """shooting % over the seasons before y, shrunk to the league's"""
     g = sum(o['g'] for o in hist if o['y'] < y)
@@ -486,6 +494,8 @@ def main():
             tr = trend(D._logs('skater', y0, 2, y0 == cur))
         except Exception as e:
             print('nhl breakout: game logs skipped:', e)
+    import ceiling as CE
+    cf = json.load(open(CEIL))
     rows = []
     for pid, a in base.items():
         w = live.get(pid)
@@ -509,7 +519,10 @@ def main():
         tm = w.get('tm') or a['tm']
         rows.append({'id': pid, 'n': a['n'] or w.get('n'), 'tm': tm, 'pos': a['pos'], 'lo': logo(tm),
                      'age': round((c or a)['age'] + (0 if c else cur - y0), 1), 'ph': FACE % ph if ph else None,
-                     'p': round(p, 3), 'best': round(pk, 2) if pk is not None else None, 'u': round(u, 1), 't': t, 'sig': sig})
+                     'p': round(p, 3), 'best': round(pk, 2) if pk is not None else None, 'u': round(u, 1), 't': t, 'sig': sig,
+                     'x': round(shr(c) if c and c.get('war') is not None else shr(a), 2),
+                     'xc': round(CE.value(cf, ceil_inputs(a, hist),
+                                          max(0.0, min(cf['scen'], cf['cap']['D' if a['d'] else 'F'] - a['toi']))), 2)})
     rows.sort(key=lambda r: -r['p'])
     rows = rows[:400]
     B, Sc = fit['breakout'], fit['scaling']
@@ -522,11 +535,18 @@ def main():
              f"that ice time brings, fit on {Sc['ev_p60']['n']:,} season pairs; kept context: "
              + '; '.join(f"{k} {', '.join(v['keep']) or 'none'}" for k, v in Sc.items())
              + f". Tiers past the 99th percentile of rises seen (+{q99:.1f} min) are beyond the data. Goalies not included. "
-             "NHL stats API, site WAR (MoneyPuck).")
+             f"CEIL: 80th percentile of next-season shrunk WAR a 1,000 minutes with TOI +{cf['scen']:g} a game (cap {cf['cap']['F']} F, "
+             f"{cf['cap']['D']} D) on 900+ minutes: shrunk WAR rate, Marcel, age, ln minutes, D + TOI change x age, TOI, D, WAR rate, "
+             f"PP share, EV P/60, spread by age, minutes, TOI, D (held-out 80th-percentile loss t {cf['final']['t']}, {cf['final']['won']}/{cf['final']['seasons']} "
+             f"seasons; {round(100 * cf['coverage']['up'])}% of TOI-up seasons under it). NHL stats API, site WAR (MoneyPuck).")
     out = {'sport': 'nhl', 'season': lab(cur), 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'base': lab(y0), 'u': {'lab': 'TOI', 'dec': 1},
            'tiers': [{'k': k, 'lab': f'TOI {k}'} for k in TIERS],
-           'stat': {'lab': 'P/82', 'eff': 'P/60', 'dec': 0, 'edec': 2}, 'about': about, 'rows': rows}
+           'stat': {'lab': 'P/82', 'eff': 'P/60', 'dec': 0, 'edec': 2},
+           'cur': {'lab': 'WAR/1k', 't': 'WAR a 1,000 minutes this season, shrunk to replacement by ice time (k 600)', 'dec': 2},
+           'ceil': {'lab': 'CEIL', 't': 'ceiling WAR a 1,000 minutes (shrunk, like Best): 80th percentile season if TOI rises %g minutes a game' % cf['scen'],
+                    'dec': 2},
+           'about': about, 'rows': rows}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
     print('wrote', OUT, len(rows), 'rows; top', [(r['n'], r['p']) for r in rows[:5]])

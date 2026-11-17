@@ -7,7 +7,7 @@ two files the recruit fit and the recruit tabs read:
     python3 scripts/cfb_on3_pack.py --hist 2011 2026        # scripts/data/cfb_on3_hist.json.gz (signed classes, the fits)
 
 A row: [name, home state, industry rating, industry rank, 247's own national rank, 247 vs industry, ESPN vs industry,
-commit date]. The two gaps are the service's rating less the industry rating, each as a z-score within the class among
+commit date, Rivals rank (the Rivals300: On3's own service, 'On3' in its ratings), Rivals stars]. The two gaps are the service's rating less the industry rating, each as a z-score within the class among
 the recruits it rated. The live file also carries the line from the industry rating to 247's composite scale (fit on
 the classes both cover in scripts/cfb_recruit_247.json), for the recruit tabs' composite-to-grade map.
 """
@@ -45,7 +45,7 @@ def rows(y):
         zc = (o['cons'] - mc) / sc; sv = o.get('svc') or {}
         gap = lambda s: round((sv[s][0] - z[s][0]) / z[s][1] - zc, 3) if s in sv and z[s] else None
         out.append([o['name'], o.get('state'), round(o['cons'], 2), o.get('consRank'), sv.get('247', [None, None])[1], gap('247'), gap('espn'),
-                    (o.get('commitDate') or '')[:10] or None])
+                    (o.get('commitDate') or '')[:10] or None, o.get('on3Rank'), sv.get('on3', [None, None, None])[2]])
     return out
 
 
