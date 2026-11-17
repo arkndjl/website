@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T04:33:45Z",
+ "asof": "2026-11-17T04:36:51Z",
  "recenter": {
   "week": 0.3
  },
@@ -485,22 +485,6 @@
    "tm": 47.8
   },
   {
-   "id": "401862836",
-   "sport": "cfb",
-   "kick": "2026-11-22T01:00:00.000Z",
-   "home": "UAB",
-   "away": "UTSA",
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -129.0,
-   "edge": 2.2,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -4.5,
-   "tm": 53.7
-  },
-  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -588,9 +572,9 @@
    "away": "Memphis",
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "x": null,
    "why": "total market off",
    "m": -3.7,
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 39.6
+  },
+  {
+   "id": "401871101",
+   "sport": "cfb",
+   "kick": "2026-11-21T21:00:00.000Z",
+   "home": "Southern Miss",
+   "away": "South Alabama",
+   "mk": "total",
+   "side": "under",
+   "line": 66.5,
+   "price": -119.0,
+   "edge": 5.2,
+   "x": null,
+   "why": "total market off",
+   "m": -5.5,
+   "tm": 61.3
   }
  ],
  "games": {
@@ -969,9 +969,9 @@
   "401862834": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "ev": null,
    "units": 0.0,
    "home": "Navy",
@@ -1075,16 +1075,16 @@
    "state": "under"
   },
   "401862836": {
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -129.0,
-   "edge": 2.2,
+   "mk": "spread",
+   "side": "home",
+   "line": -6.5,
+   "price": -127.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "UAB",
    "away": "UTSA",
-   "state": "under"
+   "state": "off"
   },
   "401858532": {
    "mk": "total",
@@ -1219,11 +1219,11 @@
    "state": "off"
   },
   "401869953": {
-   "mk": "spread",
-   "side": "home",
-   "line": -9.5,
+   "mk": "total",
+   "side": "under",
+   "line": 48.5,
    "price": -124.0,
-   "edge": 0.9,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Troy",
@@ -1499,7 +1499,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21882,
+  "snapshots": 21888,
   "buckets": [
    {
     "when": "24h+",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T04:33:45Z",
+ "checked": "2026-11-17T04:36:51Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
