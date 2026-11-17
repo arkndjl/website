@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-17T06:40:07Z",
+ "asof": "2026-11-17T06:42:51Z",
  "recenter": {
   "week": 0.3
  },
@@ -485,22 +485,6 @@
    "tm": 47.8
   },
   {
-   "id": "401869938",
-   "sport": "cfb",
-   "kick": "2026-11-22T00:00:00.000Z",
-   "home": "Louisiana Tech",
-   "away": "Arkansas State",
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -129.0,
-   "edge": 1.9,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 15.3,
-   "tm": 54.4
-  },
-  {
    "id": "401858527",
    "sport": "cfb",
    "kick": "2026-11-21T19:30:00.000Z",
@@ -573,7 +557,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 1.2,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -620,9 +604,9 @@
    "away": "Memphis",
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "x": null,
    "why": "total market off",
    "m": -3.7,
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": 0.1,
    "tm": 50.2
+  },
+  {
+   "id": "401864542",
+   "sport": "cfb",
+   "kick": "2026-11-21T02:00:00.000Z",
+   "home": "Wyoming",
+   "away": "New Mexico",
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": -106.0,
+   "edge": 5.9,
+   "x": null,
+   "why": "spread market off",
+   "m": -13.4,
+   "tm": 39.6
   }
  ],
  "games": {
@@ -730,7 +730,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -112.0,
+   "price": -110.0,
    "edge": 0.8,
    "ev": null,
    "units": 0.0,
@@ -969,9 +969,9 @@
   "401862834": {
    "mk": "total",
    "side": "under",
-   "line": 66.5,
-   "price": -119.0,
-   "edge": 10.3,
+   "line": 65.5,
+   "price": -106.0,
+   "edge": 9.3,
    "ev": null,
    "units": 0.0,
    "home": "Navy",
@@ -1078,7 +1078,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -1174,7 +1174,7 @@
    "mk": "spread",
    "side": "home",
    "line": -6.5,
-   "price": -101.0,
+   "price": -106.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -1183,16 +1183,16 @@
    "state": "off"
   },
   "401869938": {
-   "mk": "total",
-   "side": "over",
-   "line": 52.5,
-   "price": -129.0,
-   "edge": 1.9,
+   "mk": "spread",
+   "side": "home",
+   "line": 13.5,
+   "price": -117.0,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "Louisiana Tech",
    "away": "Arkansas State",
-   "state": "under"
+   "state": "off"
   },
   "401860919": {
    "mk": "spread",
@@ -1246,7 +1246,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": -110.0,
+   "price": -112.0,
    "edge": 0.4,
    "ev": null,
    "units": 0.0,
@@ -1318,7 +1318,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -124.0,
+   "price": -127.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -1438,7 +1438,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": -101.0,
+   "price": -104.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21976,
+  "snapshots": 21996,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4464,
+    "clvN": 4471,
     "clvRet": -0.0472,
-    "clvT": -35.0,
+    "clvT": -35.09,
     "clv": 0.22,
-    "beat": 0.336,
-    "still": 0.336
+    "beat": 0.335,
+    "still": 0.338
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-17T06:40:07Z",
+ "checked": "2026-11-17T06:42:51Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
