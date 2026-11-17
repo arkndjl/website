@@ -196,7 +196,9 @@ jobs:
       # backup watch tab, college (scripts/backup_watch_cfb.mjs): by playing time, after the board
       - name: Backup watch, college football
         continue-on-error: true
-        run: node scripts/backup_watch_cfb.mjs
+        run: |
+          node scripts/backup_watch_cfb.mjs
+          python3 scripts/depth_stats.py cfb || echo "depth chart stats not updated"   # key stats for the depth chart GFX card
       # pre-registered 2027 draft ledger (scripts/draft_ledger.py): a weekly snapshot of the class's FV parts, Draft%
       # and mocks, scored after the draft
       - name: Draft ledger

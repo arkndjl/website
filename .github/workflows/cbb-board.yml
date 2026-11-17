@@ -133,7 +133,9 @@ jobs:
         timeout-minutes: 10
         run: python3 scripts/cbb_lineups.py --daily || echo "lineups not updated"
       - name: Backup watch (minutes order)
-        run: python3 scripts/backup_watch.py cbb || echo "backup watch not updated"
+        run: |
+          python3 scripts/backup_watch.py cbb || echo "backup watch not updated"
+          python3 scripts/depth_stats.py cbb || echo "depth chart stats not updated"   # key stats for the depth chart GFX card
       # pre-registered 2027 draft ledger (scripts/draft_ledger.py) and the injury SIT refit on the logged listings
       # (scripts/cbb_sit_refit.py, changes nothing below 400 scored listings)
       - name: Draft ledger and SIT refit

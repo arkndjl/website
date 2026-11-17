@@ -189,7 +189,9 @@ jobs:
         continue-on-error: true
         run: python3 scripts/futures_archive.py nba $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))")
       - name: Backup watch (ESPN depth charts)
-        run: python3 scripts/backup_watch.py nba || echo "backup watch not updated"
+        run: |
+          python3 scripts/backup_watch.py nba || echo "backup watch not updated"
+          python3 scripts/depth_stats.py nba || echo "depth chart stats not updated"   # key stats for the depth chart GFX card
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor

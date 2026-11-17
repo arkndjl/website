@@ -71,6 +71,7 @@ jobs:
         run: |
           python3 scripts/nhl_players.py --current || echo "nhl players: not updated"
           python3 scripts/backup_watch.py nhl
+          python3 scripts/depth_stats.py nhl || echo "depth chart stats not updated"   # key stats for the depth chart GFX card
           python3 scripts/hockey_data.py --pre || echo "NHL preseason: not updated"   # once a year (from Oct 10): who dressed in the preseason, a stage-model input
           python3 scripts/hockey_prospects.py || echo "hockey prospects: not updated"
           python3 scripts/hockey_logos.py || echo "hockey club logos: not updated"   # junior/AHL/NCAA club logos
