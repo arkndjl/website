@@ -252,7 +252,8 @@ async function split(pid) {
     // scrims: queue/hub matches with 5 1NT members on his side
     const b = league ? 'league' : (stack.get(mid) ?? 0) >= 5 ? 'scrim' : 'pug';
     add(B[b], g); if (now - g.at < 30 * 864e5) add(D30[b], g);
-    if (b === 'pug' && mid && !PUG_LIST.some(x => x.id === mid)) PUG_LIST.push({ id: mid, at: g.at });
+    // PUG box scores: every queue/hub match, 1NT five-stacks included (they are still matchmaking)
+    if (b !== 'league' && mid && !PUG_LIST.some(x => x.id === mid)) PUG_LIST.push({ id: mid, at: g.at });
     if (g.map) add(M[b][g.map] ||= blank(), g);
     if (league) {
       const name = compName.get(cid) || 'league match', sn = /(?:^|\b)S(?:eason\s*)?(\d{2,3})\b/i.exec(name);
@@ -832,7 +833,7 @@ for (const m of matches) for (const x of m.maps) {
 }
 
 // ---- PUG box scores (FACEIT matchmaking + Premier) -------------------------------------------------
-// FACEIT: his last PUG_N queue/hub matches (split() labels them; scrims and league matches excluded), both
+// FACEIT: his last PUG_N queue/hub matches (split() labels them; league matches excluded), both
 // fives from the cached box scores. Premier / competitive matchmaking: Leetify's public API (no key) by his
 // Steam id, when he has a Leetify profile. Each line gets ARK Rating and RWA the same way as the ESEA box
 // scores (ARK swing + team-result credit + the opposing five's mean RWA; unknown players at data/esea_rwa.json
