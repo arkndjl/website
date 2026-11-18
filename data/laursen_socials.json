@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-18T03:00:34.711Z",
+ "asof": "2026-11-18T03:20:33.909Z",
  "status": {
   "twitch": true,
   "youtube": true,
@@ -10,7 +10,7 @@
   "twitch": {
    "rate": 7.2,
    "prior": 7.4,
-   "tracked": 0.8,
+   "tracked": 0.9,
    "d30": {
     "goal": 281,
     "base": 274,
@@ -19,7 +19,7 @@
     "p0": 54,
     "p": 50,
     "f": 0,
-    "m": 0.025
+    "m": 0.028
    },
    "d90": {
     "goal": 295,
@@ -29,11 +29,11 @@
     "p0": 52,
     "p": 49,
     "f": 0,
-    "m": 0.008
+    "m": 0.009
    },
    "next": {
     "goal": 300,
-    "eta": "2027-03-10",
+    "eta": "2027-03-11",
     "p90": 30,
     "from": 250,
     "base": 274,
@@ -47,7 +47,7 @@
   "youtube": {
    "rate": 1.1,
    "prior": 1.1,
-   "tracked": 0.8,
+   "tracked": 0.9,
    "d30": {
     "goal": 43,
     "base": 42,
@@ -56,7 +56,7 @@
     "p0": 55,
     "p": 53,
     "f": 0,
-    "m": 0.025
+    "m": 0.028
    },
    "d90": {
     "goal": 44,
@@ -66,11 +66,11 @@
     "p0": 62,
     "p": 61,
     "f": 0,
-    "m": 0.008
+    "m": 0.009
    },
    "next": {
     "goal": 50,
-    "eta": "2027-08-29",
+    "eta": "2027-08-30",
     "p90": 12,
     "from": 25,
     "base": 42,
@@ -84,16 +84,16 @@
   "tiktok": {
    "rate": 4.6,
    "prior": 2.7,
-   "tracked": 0.8,
+   "tracked": 0.9,
    "d30": {
     "goal": 106,
     "base": 102,
     "set": 1794958047627,
     "due": 1797550047627,
     "p0": 59,
-    "p": 59,
+    "p": 58,
     "f": 0,
-    "m": 0.002
+    "m": 0.005
    },
    "d90": {
     "goal": 107,
@@ -103,11 +103,11 @@
     "p0": 54,
     "p": 93,
     "f": 0.286,
-    "m": 0.008
+    "m": 0.009
    },
    "next": {
     "goal": 150,
-    "eta": "2027-10-18",
+    "eta": "2027-10-19",
     "p90": 0,
     "from": 100,
     "base": 100,
@@ -121,7 +121,7 @@
   "x": {
    "rate": 1.3,
    "prior": 1.4,
-   "tracked": 0.8,
+   "tracked": 0.9,
    "d30": {
     "goal": 39,
     "base": 38,
@@ -130,7 +130,7 @@
     "p0": 61,
     "p": 60,
     "f": 0,
-    "m": 0.025
+    "m": 0.028
    },
    "d90": {
     "goal": 41,
@@ -140,12 +140,12 @@
     "p0": 56,
     "p": 55,
     "f": 0,
-    "m": 0.008
+    "m": 0.009
    },
    "next": {
     "goal": 50,
-    "eta": "2027-10-23",
-    "p90": 6,
+    "eta": "2027-10-24",
+    "p90": 5,
     "from": 25,
     "base": 38,
     "set": 1794899610245,
@@ -434,6 +434,15 @@
    "x": 38,
    "ttv": 86,
    "tth": 2043
+  },
+  {
+   "t": 1794972033909,
+   "twitch": 274,
+   "youtube": 42,
+   "tiktok": 102,
+   "x": 38,
+   "ttv": 86,
+   "tth": 2044
   }
  ],
  "yt": {
@@ -526,6 +535,10 @@
     [
      1794968996972,
      1318
+    ],
+    [
+     1794972033909,
+     1319
     ]
    ],
    "title": "laursen classy 1v3 4k on match point #csgo #laursen_111 #gaming #twitch #cs2 #counterstrike #eboy",
@@ -691,18 +704,18 @@
   }
  },
  "tw": {
-  "live": {
-   "s": 1794970834711,
-   "g": "Counter-Strike",
-   "n": [
-    [
-     1794970834711,
-     4
-    ]
-   ],
-   "f0": 274
-  },
-  "sessions": [],
+  "live": null,
+  "sessions": [
+   {
+    "s": 1794970834711,
+    "e": 1794970834711,
+    "peak": 4,
+    "avg": 4,
+    "n": 1,
+    "g": "Counter-Strike",
+    "f": 0
+   }
+  ],
   "vods": []
  },
  "plan": {
@@ -737,6 +750,12 @@
     "n": 10
    },
    {
+    "k": "Most streamed",
+    "v": "Tue 8p ET",
+    "d": "0.3 hrs",
+    "n": 1
+   },
+   {
     "k": "TikTok hearts",
     "v": "23.8 / video",
     "d": "86 videos · 1.19 followers / video",
@@ -765,28 +784,28 @@
    {
     "k": "Twitch pace",
     "v": null,
-    "d": "at 14 days tracked (0.8)",
+    "d": "at 14 days tracked (0.9)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (0.8)",
+    "d": "at 14 days tracked (0.9)",
     "n": null,
     "wait": true
    },
    {
     "k": "TikTok pace",
     "v": null,
-    "d": "at 14 days tracked (0.8)",
+    "d": "at 14 days tracked (0.9)",
     "n": null,
     "wait": true
    },
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (0.8)",
+    "d": "at 14 days tracked (0.9)",
     "n": null,
     "wait": true
    },
@@ -807,7 +826,7 @@
    {
     "k": "TikTok follows / 1k views",
     "v": null,
-    "d": "at 7 days tracked (0.8)",
+    "d": "at 7 days tracked (0.9)",
     "n": null,
     "wait": true
    },
@@ -848,7 +867,7 @@
    },
    "last30": 3,
    "gap": 7.1,
-   "vpd": 652.6,
+   "vpd": 643,
    "subsPerK": null,
    "likeRate": 0.93,
    "grid": [
@@ -1316,7 +1335,7 @@
      "title": "laursen classy 1v3 4k on match point #csgo #laursen_111 #gaming #twitch #cs2 #counterstrike #eboy",
      "pub": 1794856782000,
      "short": true,
-     "views": 1318,
+     "views": 1319,
      "likes": 19,
      "comments": null,
      "age": 1.3,
@@ -1357,26 +1376,22 @@
       "h": 14,
       "b": 3
      },
-     "r5": 636
+     "r5": 637
     }
    ]
   },
   "tw": {
-   "n": 0,
-   "tracked": 0,
-   "hrs": 0,
-   "perWeek": null,
-   "avg": null,
-   "peak": null,
+   "n": 1,
+   "tracked": 1,
+   "hrs": 0.3,
+   "perWeek": 0.3,
+   "avg": 4,
+   "peak": 4,
    "lpH": null,
    "opH": 0,
    "hLive": 0,
-   "hOff": 18.5,
-   "live": {
-    "s": 1794970834711,
-    "v": 4,
-    "g": "Counter-Strike"
-   },
+   "hOff": 20.8,
+   "live": null,
    "grid": [
     [
      {
@@ -1469,9 +1484,9 @@
       "avg": null
      },
      {
-      "hrs": 0,
-      "n": 0,
-      "avg": null
+      "hrs": 0.3,
+      "n": 1,
+      "avg": 4
      }
     ],
     [
@@ -1603,17 +1618,27 @@
      }
     ]
    ],
-   "streams": []
+   "streams": [
+    {
+     "s": 1794970834711,
+     "hrs": 0.3,
+     "avg": 4,
+     "peak": 4,
+     "f": 0,
+     "views": null,
+     "src": "live"
+    }
+   ]
   },
   "tt": {
    "videos": 86,
-   "hearts": 2043,
+   "hearts": 2044,
    "hpv": 23.8,
    "newVideos": 0,
-   "newHearts": 11,
+   "newHearts": 12,
    "fpv": 1.19,
    "n": 10,
-   "views": 4556,
+   "views": 4558,
    "median": 1009,
    "vpd": null,
    "hearts_t": [
@@ -1652,6 +1677,10 @@
     [
      1794963922067,
      2043
+    ],
+    [
+     1794972033909,
+     2044
     ]
    ],
    "grid": [
@@ -1920,7 +1949,7 @@
      "desc": "\"slap it on camera please\" #fyp",
      "pub": 1794854354000,
      "photo": false,
-     "views": 811,
+     "views": 812,
      "r5": 691
     },
     {
@@ -1929,7 +1958,7 @@
      "pub": 1794854476000,
      "photo": false,
      "views": 295,
-     "r5": 548
+     "r5": 549
     },
     {
      "id": "7708842078356229389",
@@ -1953,14 +1982,14 @@
      "pub": 1794855065000,
      "photo": false,
      "views": 437,
-     "r5": 366
+     "r5": 367
     },
     {
      "id": "7708847220732349709",
      "desc": "prerendered backgrounds and low poly gfx were peak... #fyp #zelda #oot #retro #nintendo64",
      "pub": 1794855860000,
      "photo": true,
-     "views": 79,
+     "views": 80,
      "r5": 220
     }
    ]
@@ -1969,13 +1998,13 @@
    "x": 10,
    "yt": {
     "n": 10,
-    "sum": 10232,
+    "sum": 10233,
     "avg": 1023,
     "med": 1015
    },
    "tt": {
     "n": 10,
-    "sum": 4556,
+    "sum": 4558,
     "avg": 456,
     "med": 338.5
    }
@@ -2075,6 +2104,11 @@
     1794970834711,
     10232,
     4556
+   ],
+   [
+    1794972033909,
+    10233,
+    4558
    ]
   ]
  }
