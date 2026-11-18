@@ -1,0 +1,135 @@
+{{- /* 1NT season summary: one panel per ESEA league season (data/esea_seasons.json, scripts/esea_season_log.py):
+       record, W/L by match, round diff by match + cumulative, round diff by map, every player's line for that
+       season only. GFX (16:9 summary card) and roundsGFX (16:9 round diff charts) per season.
+       Season buttons use data-n1s, not data-wintab, so they don't share hash names with players_sNN.exe. */ -}}
+{{- $D := site.Data.esea_seasons -}}
+{{- $me := "LAURSEN_111" -}}
+{{- if and $D $D.seasons }}
+{{- $ks := slice }}{{ range $k, $_ := $D.seasons }}{{ $ks = $ks | append (int $k) }}{{ end }}{{ $ks = sort $ks "value" "desc" }}
+{{- if not ($.Page.Store.Get "n1season-css") }}{{ $.Page.Store.Set "n1season-css" true }}
+<style>
+.n1s__strip { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px 0; }
+.n1s__panel[hidden] { display: none; }
+.n1s__hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 12px 20px; padding: 14px; align-items: center; }
+.n1s__strip2 { grid-column: 1 / -1; }
+.n1s__strip2 li { font-size: .75em; }
+.n1s__h { margin: 12px 14px 4px; }
+.n1s__chart { padding: 0 14px; }
+.n1s__chart svg { width: 100%; height: 140px; display: block; background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); }
+.n1s__chart .is-w { fill: var(--foreground); } .n1s__chart .is-l { fill: #ff9ec7; } .n1s__chart .is-ff { fill: var(--accent); opacity: .5; }
+.n1s__chart .n1s__zero { fill: var(--accent); opacity: .6; } .n1s__chart .n1s__po { fill: var(--accent); opacity: .12; }
+.n1s__chart polyline { fill: none; stroke: #c8c7ff; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.n1s__chart .n1s__dot { fill: #c8c7ff; }
+.n1s__axis { display: flex; justify-content: space-between; font-size: .75em; opacity: .8; margin: 4px 0 0; gap: 8px; }
+.n1s__maps { list-style: none; margin: 0; padding: 0 14px; display: flex; flex-direction: column; gap: 4px; }
+.n1s__maps li { display: grid; grid-template-columns: 9ch minmax(0, 1fr) 5ch 5ch; gap: 10px; align-items: center; }
+.n1s__maps li::before { content: none !important; }
+.n1s__bar { position: relative; height: 14px; background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); }
+.n1s__bar i { position: absolute; top: 2px; bottom: 2px; background: var(--foreground); }
+.n1s__bar i.is-l { background: #ff9ec7; }
+.n1s__bar b { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 2px; background: var(--accent); }
+.n1s__tbl { margin: 0 14px; overflow-x: auto; }
+.n1s__tbl td:first-child { white-space: nowrap !important; }
+.n1s__tbl td:first-child > * { display: inline-block; vertical-align: middle; }
+.n1s__bar2 { display: flex; justify-content: flex-end; padding: 10px 14px; }
+.n1s__bar2 .cfb__gfx { margin: 0 0 0 6px !important; }
+@media (max-width: 684px) {
+  .n1s__hero { grid-template-columns: 1fr; }
+  .n1s__hero .esea__tiles { grid-column: 1; grid-row: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .n1s__hero .esea__board { grid-row: auto; }
+  .n1s__chart svg { height: 110px; }
+  .n1s__maps li { grid-template-columns: 8ch minmax(0, 1fr) 4ch 4ch; gap: 6px; }
+}
+</style>
+{{- end }}
+<div class="win n1s{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg><span class="n1s__ttl">season_s{{ index $ks 0 }}.exe</span><span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1s__strip wintabs__strip" role="tablist" aria-label="season">
+    {{- range $i, $k := $ks }}<button type="button" class="wintabs__tab{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-n1s="{{ $k }}">S{{ $k }}</button>{{ end }}
+  </div>
+  {{- range $i, $k := $ks }}{{ $s := index $D.seasons (string $k) }}
+  <div class="n1s__panel" data-n1s-panel="{{ $k }}"{{ if gt $i 0 }} hidden{{ end }}>
+    <div class="n1s__hero">
+      <div class="esea__board">
+        <img class="esea__logo" src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="" width="64" height="64">
+        <div class="esea__score">
+          <span class="esea__k">S{{ $k }} · {{ $s.div }}</span>
+          {{ partial "px/digits.html" (dict "s" (printf "%d-%d" (int $s.w) (int $s.l)) "class" "esea__digits" "label" (printf "%d wins, %d losses" (int $s.w) (int $s.l))) }}
+        </div>
+      </div>
+      {{- $rd := sub (int $s.rf) (int $s.ra) }}
+      <ul class="esea__tiles">
+        <li><span class="esea__v">{{ $s.mapsW }}–{{ $s.mapsL }}</span><span class="esea__k">maps</span></li>
+        <li><span class="esea__v {{ if ge $rd 0 }}is-up{{ else }}is-down{{ end }}">{{ if gt $rd 0 }}+{{ end }}{{ $rd }}</span><span class="esea__k">round diff</span></li>
+        <li><span class="esea__v">{{ $s.rf }}–{{ $s.ra }}</span><span class="esea__k">rounds</span></li>
+        <li><span class="esea__v">{{ if $s.current }}{{ len $s.matches }}/{{ $s.total | default (len $s.matches) }}{{ else if $s.playoffs }}PO{{ else }}RS{{ end }}</span><span class="esea__k">{{ if $s.current }}played{{ else }}{{ if $s.playoffs }}playoffs{{ else }}no playoffs{{ end }}{{ end }}</span></li>
+      </ul>
+      <ol class="esea__strip n1s__strip2" aria-label="results in order">
+        {{- range $s.matches }}<li class="{{ if eq .res "W" }}is-w{{ else }}is-l{{ end }}" title="{{ with .at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2" }} · {{ end }}{{ if .po }}playoffs · {{ end }}{{ .opp }}{{ if .ff }} · forfeit{{ else }}{{ range .maps }} · {{ .map }} {{ .rf }}-{{ .ra }}{{ end }}{{ end }}">{{ .res }}</li>{{ end }}
+      </ol>
+    </div>
+    {{- /* round diff by match (bars) + cumulative (line); playoff matches on a faint band */}}
+    {{- $n := len $s.matches }}{{ $M := 5.0 }}{{ range $s.matches }}{{ with .rd }}{{ $M = math.Max $M (math.Abs (float .)) }}{{ end }}{{ $M = math.Max $M (math.Abs (float .cum)) }}{{ end }}
+    {{- $W := 12 }}{{ $vw := mul (math.Max $n 1) $W }}
+    <p class="esea__k n1s__h">round diff · by match · cumulative</p>
+    <div class="n1s__chart">
+      <svg viewBox="0 0 {{ $vw }} 60" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="round differential per match and cumulative">
+        {{- range $j, $m := $s.matches }}{{ if $m.po }}<rect class="n1s__po" x="{{ mul $j $W }}" y="0" width="{{ $W }}" height="60"/>{{ end }}{{ end }}
+        <rect class="n1s__zero" x="0" y="29.75" width="{{ $vw }}" height="0.5"/>
+        {{- $pts := slice }}
+        {{- range $j, $m := $s.matches }}{{ $x := add (mul $j $W) 2 }}
+          {{- if $m.ff }}<rect class="is-ff" x="{{ $x }}" y="28.5" width="{{ sub $W 4 }}" height="3"><title>{{ $m.opp }} · forfeit {{ $m.res }}</title></rect>
+          {{- else }}{{ $h := mul 28.0 (div (math.Abs (float $m.rd)) $M) }}<rect class="{{ if ge (int $m.rd) 0 }}is-w{{ else }}is-l{{ end }}" x="{{ $x }}" y="{{ cond (ge (int $m.rd) 0) (sub 30.0 $h) 30.0 }}" width="{{ sub $W 4 }}" height="{{ math.Max $h 0.6 }}"><title>{{ $m.opp }} · {{ $m.res }} · {{ if gt (int $m.rd) 0 }}+{{ end }}{{ $m.rd }}</title></rect>{{ end }}
+          {{- $pts = $pts | append (printf "%v,%.2f" (add (mul $j $W) (div $W 2)) (sub 30.0 (mul 28.0 (div (float $m.cum) $M)))) }}
+        {{- end }}
+        {{- if gt $n 1 }}<polyline points="{{ delimit $pts " " }}"/>{{ end }}
+      </svg>
+      <p class="n1s__axis"><span>{{ with index $s.matches 0 }}{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2" }}{{ end }}</span><span title="cumulative round diff">{{ with $s.matches }}{{ $c := (index . (sub (len .) 1)).cum }}{{ if gt (int $c) 0 }}+{{ end }}{{ $c }}{{ end }}</span><span>{{ with $s.matches }}{{ (time.In "America/New_York" (time (int (div (index . (sub (len .) 1)).at 1000)))).Format "Jan 2" }}{{ end }}</span></p>
+    </div>
+    {{- with $s.maps }}{{ $mm := 1 }}{{ range . }}{{ $mm = math.Max $mm (math.Abs (sub (int .rf) (int .ra))) }}{{ end }}
+    <p class="esea__k n1s__h">round diff · by map</p>
+    <ul class="n1s__maps">
+      {{- range . }}{{ $r := sub (int .rf) (int .ra) }}{{ $pct := mul 50.0 (div (math.Abs (float $r)) (float $mm)) }}
+      <li title="{{ .rf }}–{{ .ra }} rounds"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span><span class="n1s__bar"><b></b><i class="{{ if lt $r 0 }}is-l{{ end }}" style="{{ if ge $r 0 }}left:50%{{ else }}right:50%{{ end }};width:{{ printf "%.1f" $pct }}%"></i></span><span class="cfb__num">{{ .w }}–{{ .l }}</span><span class="cfb__num {{ if gt $r 0 }}cfb__up{{ else if lt $r 0 }}cfb__down{{ end }}">{{ if gt $r 0 }}+{{ end }}{{ $r }}</span></li>
+      {{- end }}
+    </ul>
+    {{- end }}
+    {{- with $s.players }}
+    <p class="esea__k n1s__h">players · S{{ $k }}</p>
+    <div class="n1s__tbl">
+    <table class="cfb__table esea-season">
+      <thead><tr><th>Player</th><th>Maps</th><th title="round win % added per round, that season's league maps; 0 = average Main player">RWA</th><th title="ARK Rating: rounds added per round, 1.00 = average">ARK</th><th title="HLTV Rating 1.0 formula">Rating 1.0</th><th title="kills per death">K/D</th><th title="average damage a round">ADR</th><th title="headshot share of kills">HS%</th><th title="opening duels won minus lost">Entry ±</th><th title="clutch rounds won">Clutch</th><th title="map MVPs">MVP</th></tr></thead>
+      <tbody>
+      {{- range . }}
+      <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</td><td class="cfb__num">{{ .maps }}</td>
+        <td class="cfb__num"><b class="{{ with .rwa }}{{ if ge (float .) 0.0 }}cfb__up{{ else }}cfb__down{{ end }}{{ end }}">{{ with .rwa }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}—{{ end }}</b></td>
+        <td class="cfb__num">{{ with .rating }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ end }}</td><td class="cfb__num">{{ with .hltv }}{{ partial "num.html" (slice "%.2f" (float .)) }}{{ end }}</td>
+        <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</td><td class="cfb__num">{{ .clutch }}</td><td class="cfb__num">{{ .mapMvps }}</td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- end }}
+    <div class="esea__gfxbar n1s__bar2">
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-summary" data-gfx-sum="{{ $s | jsonify }}" data-gfx-title="s{{ $k }}-season-summary" data-gfx-date="ESEA S{{ $k }}" title="season summary graphic (16:9)">GFX</button>
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-rounds" data-gfx-sum="{{ $s | jsonify }}" data-gfx-title="s{{ $k }}-round-diff" data-gfx-date="ESEA S{{ $k }}" title="round differential graphic (16:9)">roundsGFX</button>
+    </div>
+  </div>
+  {{- end }}
+  <div class="win__status"><span title="league matches, regular season then playoffs · bars = round diff per match, line = cumulative, shaded = playoffs, FF = forfeit (no rounds) · players: that season's league maps only">ESEA S{{ index $ks (sub (len $ks) 1) }}–S{{ index $ks 0 }} · FACEIT</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{ partial "gfx.html" . }}
+<script>document.querySelectorAll('.n1s').forEach(function (w) {
+  var t = w.querySelector('.n1s__ttl');
+  w.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-n1s]'); if (!b || !w.contains(b)) return;
+    var k = b.getAttribute('data-n1s');
+    w.querySelectorAll('[data-n1s]').forEach(function (x) { var on = x === b; x.classList.toggle('is-active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    w.querySelectorAll('[data-n1s-panel]').forEach(function (p) { p.hidden = p.getAttribute('data-n1s-panel') !== k; });
+    if (t) t.textContent = 'season_s' + k + '.exe';
+  });
+});</script>
+{{- end -}}
