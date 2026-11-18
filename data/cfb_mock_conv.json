@@ -4,15 +4,15 @@
  "first": {
   "sims": 200,
   "orders": true,
-  "qb": 0.185,
+  "qb": 0.175,
   "teams": [
    {
     "t": "TEN",
-    "p": 0.46
+    "p": 0.455
    },
    {
     "t": "MIA",
-    "p": 0.355
+    "p": 0.36
    },
    {
     "t": "PHI",
@@ -32,19 +32,13 @@
     "name": "Jeremiah Smith",
     "school": "Ohio State",
     "pos": "WR",
-    "p": 0.245
+    "p": 0.325
    },
    {
     "name": "Leonard Moore",
     "school": "Notre Dame",
     "pos": "CB",
-    "p": 0.175
-   },
-   {
-    "name": "Colin Simmons",
-    "school": "Texas",
-    "pos": "EDGE",
-    "p": 0.15
+    "p": 0.17
    },
    {
     "name": "Drew Mestemaker",
@@ -53,10 +47,16 @@
     "p": 0.11
    },
    {
+    "name": "Colin Simmons",
+    "school": "Texas",
+    "pos": "EDGE",
+    "p": 0.105
+   },
+   {
     "name": "Dylan Stewart",
     "school": "South Carolina",
     "pos": "EDGE",
-    "p": 0.06
+    "p": 0.05
    }
   ]
  },
@@ -114,7 +114,7 @@
      ],
      [
       "Sims",
-      "#1 overall 15%; round 1 97%; picks 1-18 in 80% of 200 simulated drafts; likeliest team TEN (16%)."
+      "#1 overall 11%; round 1 96%; picks 1-20 in 80% of 200 simulated drafts; likeliest team PHI (14%)."
      ],
      [
       "Grade",
@@ -147,12 +147,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.97,
-    "p1": 0.15,
+    "r1": 0.96,
+    "p1": 0.105,
     "lo": 1,
-    "hi": 18,
-    "tm": "TEN",
-    "tp": 0.16
+    "hi": 20,
+    "tm": "PHI",
+    "tp": 0.14
    },
    "teamLogo": "/img/nfl/ten.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079689.png",
@@ -211,7 +211,7 @@
      ],
      [
       "Sims",
-      "#1 overall 25%; round 1 99%; picks 1-12 in 80% of 200 simulated drafts; likeliest team TEN (19%)."
+      "#1 overall 33%; round 1 >99%; picks 1-9 in 80% of 200 simulated drafts; likeliest team MIA (22%)."
      ],
      [
       "Grade",
@@ -240,12 +240,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.99,
-    "p1": 0.245,
+    "r1": 1,
+    "p1": 0.325,
     "lo": 1,
-    "hi": 12,
-    "tm": "TEN",
-    "tp": 0.19
+    "hi": 9,
+    "tm": "MIA",
+    "tp": 0.22
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079720.png",
@@ -304,7 +304,7 @@
      ],
      [
       "Sims",
-      "#1 overall 2%; round 1 72%; picks 4-87 in 80% of 200 simulated drafts; likeliest team NYJ (13%)."
+      "#1 overall 2%; round 1 75%; picks 4-60 in 80% of 200 simulated drafts; likeliest team NYJ (13%)."
      ],
      [
       "Grade",
@@ -335,10 +335,10 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.72,
-    "p1": 0.015,
+    "r1": 0.75,
+    "p1": 0.02,
     "lo": 4,
-    "hi": 87,
+    "hi": 60,
     "tm": "NYJ",
     "tp": 0.13
    },
@@ -399,7 +399,7 @@
      ],
      [
       "Sims",
-      "round 1 37%; picks 13-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (10%)."
+      "round 1 37%; picks 9-UDFA in 80% of 200 simulated drafts; likeliest team NYG (7%)."
      ],
      [
       "Reach",
@@ -439,10 +439,10 @@
    "sim": {
     "r1": 0.37,
     "p1": 0,
-    "lo": 13,
+    "lo": 9,
     "hi": null,
-    "tm": "NYJ",
-    "tp": 0.1
+    "tm": "NYG",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/nyj.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079711.png",
@@ -501,7 +501,7 @@
      ],
      [
       "Sims",
-      "round 1 5%; picks 49-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
+      "round 1 8%; picks 40-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
      ],
      [
       "Reach",
@@ -540,12 +540,12 @@
     }
    ],
    "sim": {
-    "r1": 0.05,
+    "r1": 0.08,
     "p1": 0,
-    "lo": 49,
+    "lo": 40,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.06
+    "tm": "IND",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/lac.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5224269.png",
@@ -604,7 +604,7 @@
      ],
      [
       "Sims",
-      "round 1 13%; picks 28-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
+      "round 1 11%; picks 32-UDFA in 80% of 200 simulated drafts; likeliest team NE (7%)."
      ],
      [
       "Reach",
@@ -642,12 +642,12 @@
     }
    ],
    "sim": {
-    "r1": 0.13,
+    "r1": 0.11,
     "p1": 0,
-    "lo": 28,
+    "lo": 32,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.06
+    "tm": "NE",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/ari.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5223986.png",
@@ -711,7 +711,7 @@
      ],
      [
       "Sims",
-      "#1 overall 2%; round 1 71%; picks 6-75 in 80% of 200 simulated drafts; likeliest team NYJ (14%)."
+      "#1 overall 3%; round 1 71%; picks 4-62 in 80% of 200 simulated drafts; likeliest team NYJ (14%)."
      ],
      [
       "Grade",
@@ -744,9 +744,9 @@
    "grades": [],
    "sim": {
     "r1": 0.71,
-    "p1": 0.015,
-    "lo": 6,
-    "hi": 75,
+    "p1": 0.025,
+    "lo": 4,
+    "hi": 62,
     "tm": "NYJ",
     "tp": 0.14
    },
@@ -841,7 +841,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 12%; picks 26-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
+      "round 1 14%; picks 26-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
      ],
      [
       "Reach",
@@ -880,12 +880,12 @@
     }
    ],
    "sim": {
-    "r1": 0.12,
-    "p1": 0.005,
+    "r1": 0.14,
+    "p1": 0,
     "lo": 26,
     "hi": null,
     "tm": "CLE",
-    "tp": 0.05
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/cle.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4917971.png",
@@ -944,7 +944,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 68-UDFA in 80% of 200 simulated drafts; likeliest team ATL (2%)."
+      "round 1 5%; picks 62-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
      ],
      [
       "Reach",
@@ -982,12 +982,12 @@
     }
    ],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 68,
+    "lo": 62,
     "hi": null,
-    "tm": "ATL",
-    "tp": 0.02
+    "tm": "MIN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/lv.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4922981.png",
@@ -1046,7 +1046,7 @@
      ],
      [
       "Sims",
-      "#1 overall 3%; round 1 86%; picks 3-53 in 80% of 200 simulated drafts; likeliest team NYJ (14%)."
+      "#1 overall 5%; round 1 80%; picks 3-67 in 80% of 200 simulated drafts; likeliest team NYJ (13%)."
      ],
      [
       "Grade",
@@ -1076,12 +1076,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.86,
-    "p1": 0.025,
+    "r1": 0.8,
+    "p1": 0.045,
     "lo": 3,
-    "hi": 53,
+    "hi": 67,
     "tm": "NYJ",
-    "tp": 0.14
+    "tp": 0.13
    },
    "teamLogo": "/img/nfl/atl.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5127738.png",
@@ -1159,7 +1159,7 @@
      ],
      [
       "Sims",
-      "#1 overall 18%; round 1 99%; picks 1-15 in 80% of 200 simulated drafts; likeliest team TEN (17%)."
+      "#1 overall 17%; round 1 97%; picks 1-16 in 80% of 200 simulated drafts; likeliest team TEN (21%)."
      ],
      [
       "Grade",
@@ -1188,12 +1188,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.99,
-    "p1": 0.175,
+    "r1": 0.97,
+    "p1": 0.17,
     "lo": 1,
-    "hi": 15,
+    "hi": 16,
     "tm": "TEN",
-    "tp": 0.17
+    "tp": 0.21
    },
    "teamLogo": "/img/nfl/car.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079629.png",
@@ -1252,7 +1252,7 @@
      ],
      [
       "Sims",
-      "round 1 7%; picks 37-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 10%; picks 35-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
      ],
      [
       "Reach",
@@ -1290,12 +1290,12 @@
     }
    ],
    "sim": {
-    "r1": 0.07,
+    "r1": 0.1,
     "p1": 0,
-    "lo": 37,
+    "lo": 35,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.04
+    "tm": "CLE",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/wsh.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4871052.png",
@@ -1324,7 +1324,7 @@
    "plus": false,
    "fcs": null,
    "cls": "RS-Sr",
-   "age": 22.41,
+   "age": 22.42,
    "ageEst": false,
    "ovr": 14,
    "need": "need #1",
@@ -1354,7 +1354,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 62-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (4%)."
+      "round 1 4%; picks 58-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
      ],
      [
       "Reach",
@@ -1399,10 +1399,10 @@
    "sim": {
     "r1": 0.04,
     "p1": 0,
-    "lo": 62,
+    "lo": 58,
     "hi": null,
-    "tm": "NYJ",
-    "tp": 0.04
+    "tm": "IND",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/hou.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4698710.png",
@@ -1480,7 +1480,7 @@
      ],
      [
       "Sims",
-      "#1 overall 3%; round 1 87%; picks 3-36 in 80% of 200 simulated drafts; likeliest team LV (9%)."
+      "#1 overall 2%; round 1 87%; picks 3-40 in 80% of 200 simulated drafts; likeliest team NYJ (10%)."
      ],
      [
       "Grade",
@@ -1509,11 +1509,11 @@
    "grades": [],
    "sim": {
     "r1": 0.87,
-    "p1": 0.03,
+    "p1": 0.02,
     "lo": 3,
-    "hi": 36,
-    "tm": "LV",
-    "tp": 0.09
+    "hi": 40,
+    "tm": "NYJ",
+    "tp": 0.1
    },
    "teamLogo": "/img/nfl/nyg.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5146735.png",
@@ -1584,7 +1584,7 @@
      ],
      [
       "Sims",
-      "round 1 25%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team ATL (8%)."
+      "round 1 21%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team ATL (7%)."
      ],
      [
       "Reach",
@@ -1622,12 +1622,12 @@
     }
    ],
    "sim": {
-    "r1": 0.25,
+    "r1": 0.21,
     "p1": 0,
     "lo": 22,
     "hi": null,
     "tm": "ATL",
-    "tp": 0.08
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/bal.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079559.png",
@@ -1691,7 +1691,7 @@
      ],
      [
       "Sims",
-      "#1 overall 3%; round 1 56%; picks 3-119 in 80% of 200 simulated drafts; likeliest team NYJ (16%)."
+      "#1 overall 4%; round 1 59%; picks 3-120 in 80% of 200 simulated drafts; likeliest team NYJ (16%)."
      ],
      [
       "Grade",
@@ -1724,10 +1724,10 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.56,
-    "p1": 0.025,
+    "r1": 0.59,
+    "p1": 0.035,
     "lo": 3,
-    "hi": 119,
+    "hi": 120,
     "tm": "NYJ",
     "tp": 0.16
    },
@@ -1788,7 +1788,7 @@
      ],
      [
       "Sims",
-      "round 1 17%; picks 21-UDFA in 80% of 200 simulated drafts; likeliest team ARI (7%)."
+      "round 1 14%; picks 25-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
      ],
      [
       "Reach",
@@ -1830,11 +1830,11 @@
     }
    ],
    "sim": {
-    "r1": 0.17,
+    "r1": 0.14,
     "p1": 0,
-    "lo": 21,
+    "lo": 25,
     "hi": null,
-    "tm": "ARI",
+    "tm": "CLE",
     "tp": 0.07
    },
    "teamLogo": "/img/nfl/ne.png",
@@ -1906,7 +1906,7 @@
      ],
      [
       "Sims",
-      "#1 overall 3%; round 1 83%; picks 3-54 in 80% of 200 simulated drafts; likeliest team NYJ (11%)."
+      "#1 overall 2%; round 1 80%; picks 4-65 in 80% of 200 simulated drafts; likeliest team TEN (11%)."
      ],
      [
       "Grade",
@@ -1938,11 +1938,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.83,
-    "p1": 0.03,
-    "lo": 3,
-    "hi": 54,
-    "tm": "NYJ",
+    "r1": 0.8,
+    "p1": 0.02,
+    "lo": 4,
+    "hi": 65,
+    "tm": "TEN",
     "tp": 0.11
    },
    "teamLogo": "/img/nfl/tb.png",
@@ -2007,7 +2007,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 18%; picks 19-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
+      "round 1 16%; picks 24-UDFA in 80% of 200 simulated drafts; likeliest team NE (8%)."
      ],
      [
       "Reach",
@@ -2046,12 +2046,12 @@
     }
    ],
    "sim": {
-    "r1": 0.18,
-    "p1": 0.01,
-    "lo": 19,
+    "r1": 0.16,
+    "p1": 0,
+    "lo": 24,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.07
+    "tm": "NE",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/dal.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5112647.png",
@@ -2110,7 +2110,7 @@
      ],
      [
       "Sims",
-      "round 1 18%; picks 18-UDFA in 80% of 200 simulated drafts; likeliest team CLE (11%)."
+      "round 1 21%; picks 20-UDFA in 80% of 200 simulated drafts; likeliest team NYG (5%)."
      ],
      [
       "Grade",
@@ -2138,12 +2138,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.18,
+    "r1": 0.21,
     "p1": 0,
-    "lo": 18,
+    "lo": 20,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.11
+    "tm": "NYG",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/cle.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5086388.png",
@@ -2219,7 +2219,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 25%; picks 12-UDFA in 80% of 200 simulated drafts; likeliest team SEA (10%)."
+      "#1 overall 1%; round 1 25%; picks 19-UDFA in 80% of 200 simulated drafts; likeliest team MIN (10%)."
      ],
      [
       "Grade",
@@ -2255,9 +2255,9 @@
    "sim": {
     "r1": 0.25,
     "p1": 0.005,
-    "lo": 12,
+    "lo": 19,
     "hi": null,
-    "tm": "SEA",
+    "tm": "MIN",
     "tp": 0.1
    },
    "teamLogo": "/img/nfl/no.png",
@@ -2317,7 +2317,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 9%; picks 36-UDFA in 80% of 200 simulated drafts; likeliest team PIT (7%)."
+      "#1 overall 1%; round 1 13%; picks 28-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
      ],
      [
       "Reach",
@@ -2357,11 +2357,11 @@
     }
    ],
    "sim": {
-    "r1": 0.09,
+    "r1": 0.13,
     "p1": 0.005,
-    "lo": 36,
+    "lo": 28,
     "hi": null,
-    "tm": "PIT",
+    "tm": "CLE",
     "tp": 0.07
    },
    "teamLogo": "/img/nfl/sea.png",
@@ -2421,7 +2421,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 30%; picks 13-UDFA in 80% of 200 simulated drafts; likeliest team NE (8%)."
+      "round 1 31%; picks 14-UDFA in 80% of 200 simulated drafts; likeliest team TEN (9%)."
      ],
      [
       "Grade",
@@ -2447,12 +2447,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.3,
-    "p1": 0.005,
-    "lo": 13,
+    "r1": 0.31,
+    "p1": 0,
+    "lo": 14,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.08
+    "tm": "TEN",
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079334.png",
@@ -2530,7 +2530,7 @@
      ],
      [
       "Sims",
-      "round 1 43%; picks 11-190 in 80% of 200 simulated drafts; likeliest team BAL (6%)."
+      "round 1 45%; picks 12-205 in 80% of 200 simulated drafts; likeliest team SF (6%)."
      ],
      [
       "Grade",
@@ -2560,11 +2560,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.43,
+    "r1": 0.45,
     "p1": 0,
-    "lo": 11,
-    "hi": 190,
-    "tm": "BAL",
+    "lo": 12,
+    "hi": 205,
+    "tm": "SF",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/sf.png",
@@ -2629,7 +2629,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 76-UDFA in 80% of 200 simulated drafts; likeliest team MIA (3%)."
+      "round 1 2%; picks 98-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (4%)."
      ],
      [
       "Reach",
@@ -2671,12 +2671,12 @@
     }
    ],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 76,
+    "lo": 98,
     "hi": null,
-    "tm": "MIA",
-    "tp": 0.03
+    "tm": "NYJ",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/ten.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5294564.png",
@@ -2735,7 +2735,7 @@
      ],
      [
       "Sims",
-      "round 1 22%; picks 18-UDFA in 80% of 200 simulated drafts; likeliest team TB (7%)."
+      "round 1 20%; picks 24-UDFA in 80% of 200 simulated drafts; likeliest team IND (6%)."
      ],
      [
       "Grade",
@@ -2767,12 +2767,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.22,
+    "r1": 0.2,
     "p1": 0,
-    "lo": 18,
+    "lo": 24,
     "hi": null,
-    "tm": "TB",
-    "tp": 0.07
+    "tm": "IND",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/cin.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5139001.png",
@@ -2831,7 +2831,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 96-UDFA in 80% of 200 simulated drafts; likeliest team GB (3%)."
+      "round 1 1%; picks 97-UDFA in 80% of 200 simulated drafts; likeliest team PHI (2%)."
      ],
      [
       "Reach",
@@ -2871,10 +2871,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 96,
+    "lo": 97,
     "hi": null,
-    "tm": "GB",
-    "tp": 0.03
+    "tm": "PHI",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870711.png",
@@ -2933,7 +2933,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 51%; picks 11-153 in 80% of 200 simulated drafts; likeliest team LV (8%)."
+      "#1 overall 1%; round 1 50%; picks 9-163 in 80% of 200 simulated drafts; likeliest team NYJ (9%)."
      ],
      [
       "Grade",
@@ -2965,12 +2965,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.51,
+    "r1": 0.5,
     "p1": 0.005,
-    "lo": 11,
-    "hi": 153,
-    "tm": "LV",
-    "tp": 0.08
+    "lo": 9,
+    "hi": 163,
+    "tm": "NYJ",
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/den.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5112633.png",
@@ -3053,7 +3053,7 @@
      ],
      [
       "Sims",
-      "round 1 21%; picks 18-UDFA in 80% of 200 simulated drafts; likeliest team IND (8%)."
+      "round 1 21%; picks 19-UDFA in 80% of 200 simulated drafts; likeliest team LV (7%)."
      ],
      [
       "Grade",
@@ -3083,10 +3083,10 @@
    "sim": {
     "r1": 0.21,
     "p1": 0,
-    "lo": 18,
+    "lo": 19,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.08
+    "tm": "LV",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/lac.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4702828.png",
@@ -3145,7 +3145,7 @@
      ],
      [
       "Sims",
-      "#1 overall 11%; round 1 85%; picks 1-66 in 80% of 200 simulated drafts; likeliest team NYJ (28%)."
+      "#1 overall 11%; round 1 86%; picks 1-45 in 80% of 200 simulated drafts; likeliest team MIA (26%)."
      ],
      [
       "Value",
@@ -3181,12 +3181,12 @@
     }
    ],
    "sim": {
-    "r1": 0.85,
+    "r1": 0.86,
     "p1": 0.11,
     "lo": 1,
-    "hi": 66,
-    "tm": "NYJ",
-    "tp": 0.28
+    "hi": 45,
+    "tm": "MIA",
+    "tp": 0.26
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5219834.png",
@@ -3257,7 +3257,7 @@
      ],
      [
       "Sims",
-      "#1 overall 6%; round 1 91%; picks 2-32 in 80% of 200 simulated drafts; likeliest team PHI (11%)."
+      "#1 overall 5%; round 1 94%; picks 2-24 in 80% of 200 simulated drafts; likeliest team NE (8%)."
      ],
      [
       "Value",
@@ -3293,12 +3293,12 @@
     }
    ],
    "sim": {
-    "r1": 0.91,
-    "p1": 0.06,
+    "r1": 0.94,
+    "p1": 0.05,
     "lo": 2,
-    "hi": 32,
-    "tm": "PHI",
-    "tp": 0.11
+    "hi": 24,
+    "tm": "NE",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079709.png",
@@ -3377,7 +3377,7 @@
      ],
      [
       "Sims",
-      "round 1 13%; picks 26-UDFA in 80% of 200 simulated drafts; likeliest team LV (5%)."
+      "round 1 12%; picks 27-UDFA in 80% of 200 simulated drafts; likeliest team KC (6%)."
      ],
      [
       "Grade",
@@ -3406,12 +3406,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.13,
+    "r1": 0.12,
     "p1": 0,
-    "lo": 26,
+    "lo": 27,
     "hi": null,
-    "tm": "LV",
-    "tp": 0.05
+    "tm": "KC",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/ari.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5148787.png",
@@ -3470,7 +3470,7 @@
      ],
      [
       "Sims",
-      "round 1 28%; picks 14-UDFA in 80% of 200 simulated drafts; likeliest team NE (8%)."
+      "round 1 19%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team TEN (9%)."
      ],
      [
       "Grade",
@@ -3500,12 +3500,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.28,
+    "r1": 0.19,
     "p1": 0,
-    "lo": 14,
+    "lo": 22,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.08
+    "tm": "TEN",
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/ten.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5087950.png",
@@ -3584,7 +3584,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 55%; picks 7-UDFA in 80% of 200 simulated drafts; likeliest team TB (8%)."
+      "#1 overall 1%; round 1 51%; picks 9-114 in 80% of 200 simulated drafts; likeliest team NYG (7%)."
      ],
      [
       "Grade",
@@ -3612,12 +3612,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.55,
-    "p1": 0.01,
-    "lo": 7,
-    "hi": null,
-    "tm": "TB",
-    "tp": 0.08
+    "r1": 0.51,
+    "p1": 0.005,
+    "lo": 9,
+    "hi": 114,
+    "tm": "NYG",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/tb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079322.png",
@@ -3676,7 +3676,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 45%; picks 9-172 in 80% of 200 simulated drafts; likeliest team NO (8%)."
+      "#1 overall 1%; round 1 42%; picks 11-205 in 80% of 200 simulated drafts; likeliest team CAR (11%)."
      ],
      [
       "Grade",
@@ -3709,12 +3709,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.45,
-    "p1": 0.005,
-    "lo": 9,
-    "hi": 172,
-    "tm": "NO",
-    "tp": 0.08
+    "r1": 0.42,
+    "p1": 0.01,
+    "lo": 11,
+    "hi": 205,
+    "tm": "CAR",
+    "tp": 0.11
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079420.png",
@@ -3773,7 +3773,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 84-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 2%; picks 97-UDFA in 80% of 200 simulated drafts; likeliest team MIA (4%)."
      ],
      [
       "Reach",
@@ -3810,9 +3810,9 @@
    "sim": {
     "r1": 0.02,
     "p1": 0,
-    "lo": 84,
+    "lo": 97,
     "hi": null,
-    "tm": "IND",
+    "tm": "MIA",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/nyj.png",
@@ -3884,7 +3884,7 @@
      ],
      [
       "Sims",
-      "round 1 18%; picks 27-UDFA in 80% of 200 simulated drafts; likeliest team ATL (6%)."
+      "round 1 16%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team SF (5%)."
      ],
      [
       "Grade",
@@ -3914,12 +3914,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.18,
+    "r1": 0.16,
     "p1": 0,
-    "lo": 27,
+    "lo": 22,
     "hi": null,
-    "tm": "ATL",
-    "tp": 0.06
+    "tm": "SF",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870727.png",
@@ -3978,7 +3978,7 @@
      ],
      [
       "Sims",
-      "round 1 8%; picks 36-UDFA in 80% of 200 simulated drafts; likeliest team NE (7%)."
+      "round 1 10%; picks 34-UDFA in 80% of 200 simulated drafts; likeliest team ARI (7%)."
      ],
      [
       "Grade",
@@ -4011,11 +4011,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.08,
+    "r1": 0.1,
     "p1": 0,
-    "lo": 36,
+    "lo": 34,
     "hi": null,
-    "tm": "NE",
+    "tm": "ARI",
     "tp": 0.07
    },
    "teamLogo": "/img/nfl/ari.png",
@@ -4075,7 +4075,7 @@
      ],
      [
       "Sims",
-      "round 1 55%; picks 8-147 in 80% of 200 simulated drafts; likeliest team LV (7%)."
+      "round 1 60%; picks 8-120 in 80% of 200 simulated drafts; likeliest team LV (7%)."
      ],
      [
       "Grade",
@@ -4101,10 +4101,10 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.55,
+    "r1": 0.6,
     "p1": 0,
     "lo": 8,
-    "hi": 147,
+    "hi": 120,
     "tm": "LV",
     "tp": 0.07
    },
@@ -4184,7 +4184,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 117-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
+      "round 1 3%; picks 102-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
      ],
      [
       "Reach",
@@ -4220,9 +4220,9 @@
     }
    ],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 117,
+    "lo": 102,
     "hi": null,
     "tm": "NE",
     "tp": 0.03
@@ -4284,7 +4284,7 @@
      ],
      [
       "Sims",
-      "round 1 30%; picks 16-UDFA in 80% of 200 simulated drafts; likeliest team ATL (6%)."
+      "round 1 27%; picks 18-UDFA in 80% of 200 simulated drafts; likeliest team CIN (5%)."
      ],
      [
       "Grade",
@@ -4316,12 +4316,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.3,
+    "r1": 0.27,
     "p1": 0,
-    "lo": 16,
+    "lo": 18,
     "hi": null,
-    "tm": "ATL",
-    "tp": 0.06
+    "tm": "CIN",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/lv.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4819239.png",
@@ -4380,7 +4380,7 @@
      ],
      [
       "Sims",
-      "round 1 17%; picks 27-UDFA in 80% of 200 simulated drafts; likeliest team TEN (8%)."
+      "round 1 12%; picks 24-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (5%)."
      ],
      [
       "Grade",
@@ -4410,12 +4410,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.17,
+    "r1": 0.12,
     "p1": 0,
-    "lo": 27,
+    "lo": 24,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.08
+    "tm": "NYJ",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/atl.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5219097.png",
@@ -4474,7 +4474,7 @@
      ],
      [
       "Sims",
-      "round 1 24%; picks 17-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
+      "round 1 20%; picks 20-UDFA in 80% of 200 simulated drafts; likeliest team CLE (8%)."
      ],
      [
       "Grade",
@@ -4504,12 +4504,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.24,
+    "r1": 0.2,
     "p1": 0,
-    "lo": 17,
+    "lo": 20,
     "hi": null,
     "tm": "CLE",
-    "tp": 0.07
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/bal.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5138451.png",
@@ -4580,7 +4580,7 @@
      ],
      [
       "Sims",
-      "round 1 32%; picks 15-216 in 80% of 200 simulated drafts; likeliest team CLE (11%)."
+      "round 1 28%; picks 15-UDFA in 80% of 200 simulated drafts; likeliest team MIA (6%)."
      ],
      [
       "Grade",
@@ -4610,12 +4610,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.32,
+    "r1": 0.28,
     "p1": 0,
     "lo": 15,
-    "hi": 216,
-    "tm": "CLE",
-    "tp": 0.11
+    "hi": null,
+    "tm": "MIA",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/no.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4871079.png",
@@ -4691,7 +4691,7 @@
      ],
      [
       "Sims",
-      "round 1 11%; picks 30-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
+      "round 1 14%; picks 27-UDFA in 80% of 200 simulated drafts; likeliest team TEN (7%)."
      ],
      [
       "Grade",
@@ -4721,12 +4721,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.11,
+    "r1": 0.14,
     "p1": 0,
-    "lo": 30,
+    "lo": 27,
     "hi": null,
     "tm": "TEN",
-    "tp": 0.06
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/buf.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4922989.png",
@@ -4797,7 +4797,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 130-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
+      "round 1 <1%; picks 81-UDFA in 80% of 200 simulated drafts; likeliest team DEN (4%)."
      ],
      [
       "Reach",
@@ -4835,12 +4835,12 @@
     }
    ],
    "sim": {
-    "r1": 0.03,
+    "r1": 0,
     "p1": 0,
-    "lo": 130,
+    "lo": 81,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.03
+    "tm": "DEN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4871039.png",
@@ -4911,7 +4911,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 143-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
+      "round 1 1%; picks 132-UDFA in 80% of 200 simulated drafts; likeliest team TEN (4%)."
      ],
      [
       "Reach",
@@ -4947,10 +4947,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 143,
+    "lo": 132,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.03
+    "tm": "TEN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/bal.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5107875.png",
@@ -5009,7 +5009,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 47-UDFA in 80% of 200 simulated drafts; likeliest team ARI (4%)."
+      "round 1 4%; picks 60-UDFA in 80% of 200 simulated drafts; likeliest team KC (4%)."
      ],
      [
       "Grade",
@@ -5042,11 +5042,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 47,
+    "lo": 60,
     "hi": null,
-    "tm": "ARI",
+    "tm": "KC",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/dal.png",
@@ -5106,7 +5106,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 85-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
+      "round 1 3%; picks 87-UDFA in 80% of 200 simulated drafts; likeliest team PIT (4%)."
      ],
      [
       "Grade",
@@ -5139,10 +5139,10 @@
    "sim": {
     "r1": 0.03,
     "p1": 0,
-    "lo": 85,
+    "lo": 87,
     "hi": null,
-    "tm": "MIN",
-    "tp": 0.03
+    "tm": "PIT",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/ne.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5152504.png",
@@ -5213,7 +5213,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 71-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
+      "round 1 2%; picks 66-UDFA in 80% of 200 simulated drafts; likeliest team TB (3%)."
      ],
      [
       "Reach",
@@ -5250,12 +5250,12 @@
     }
    ],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 71,
+    "lo": 66,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.05
+    "tm": "TB",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/tb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5154717.png",
@@ -5333,7 +5333,7 @@
      ],
      [
       "Sims",
-      "round 1 12%; picks 27-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
+      "round 1 9%; picks 34-UDFA in 80% of 200 simulated drafts; likeliest team ARI (7%)."
      ],
      [
       "Grade",
@@ -5363,12 +5363,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.12,
+    "r1": 0.09,
     "p1": 0,
-    "lo": 27,
+    "lo": 34,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.06
+    "tm": "ARI",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/lar.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918098.png",
@@ -5427,7 +5427,7 @@
      ],
      [
       "Sims",
-      "round 1 37%; picks 11-196 in 80% of 200 simulated drafts; likeliest team CLE (9%)."
+      "round 1 36%; picks 11-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
      ],
      [
       "Grade",
@@ -5459,12 +5459,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.37,
+    "r1": 0.36,
     "p1": 0,
     "lo": 11,
-    "hi": 196,
+    "hi": null,
     "tm": "CLE",
-    "tp": 0.09
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/cle.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4922988.png",
@@ -5535,7 +5535,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 62-UDFA in 80% of 200 simulated drafts; likeliest team DET (5%)."
+      "round 1 5%; picks 54-UDFA in 80% of 200 simulated drafts; likeliest team MIN (4%)."
      ],
      [
       "Reach",
@@ -5572,12 +5572,12 @@
     }
    ],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 62,
+    "lo": 54,
     "hi": null,
-    "tm": "DET",
-    "tp": 0.05
+    "tm": "MIN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/gb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079551.png",
@@ -5636,7 +5636,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team MIN (1%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team LAC (1%)."
      ],
      [
       "Reach",
@@ -5678,7 +5678,7 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "MIN",
+    "tm": "LAC",
     "tp": 0.01
    },
    "teamLogo": "/img/nfl/sea.png",
@@ -5738,7 +5738,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 46-UDFA in 80% of 200 simulated drafts; likeliest team TEN (5%)."
+      "round 1 8%; picks 42-UDFA in 80% of 200 simulated drafts; likeliest team WSH (5%)."
      ],
      [
       "Grade",
@@ -5766,11 +5766,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.06,
+    "r1": 0.08,
     "p1": 0,
-    "lo": 46,
+    "lo": 42,
     "hi": null,
-    "tm": "TEN",
+    "tm": "WSH",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/pit.png",
@@ -5830,7 +5830,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 117-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
+      "round 1 2%; picks 112-UDFA in 80% of 200 simulated drafts; likeliest team PIT (4%)."
      ],
      [
       "Reach",
@@ -5866,12 +5866,12 @@
     }
    ],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 117,
+    "lo": 112,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.03
+    "tm": "PIT",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5181309.png",
@@ -5930,7 +5930,7 @@
      ],
      [
       "Sims",
-      "round 1 36%; picks 12-UDFA in 80% of 200 simulated drafts; likeliest team CLE (10%)."
+      "round 1 34%; picks 14-UDFA in 80% of 200 simulated drafts; likeliest team NO (8%)."
      ],
      [
       "Grade",
@@ -5960,12 +5960,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.36,
+    "r1": 0.34,
     "p1": 0,
-    "lo": 12,
+    "lo": 14,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.1
+    "tm": "NO",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/chi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870970.png",
@@ -6024,7 +6024,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 79-UDFA in 80% of 200 simulated drafts; likeliest team TEN (4%)."
+      "round 1 2%; picks 64-UDFA in 80% of 200 simulated drafts; likeliest team PHI (3%)."
      ],
      [
       "Reach",
@@ -6062,12 +6062,12 @@
     }
    ],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 79,
+    "lo": 64,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.04
+    "tm": "PHI",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/cin.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5121453.png",
@@ -6126,7 +6126,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 49-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
+      "round 1 4%; picks 58-UDFA in 80% of 200 simulated drafts; likeliest team CIN (4%)."
      ],
      [
       "Grade",
@@ -6159,12 +6159,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.06,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 49,
+    "lo": 58,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.06
+    "tm": "CIN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4907786.png",
@@ -6223,7 +6223,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 61-UDFA in 80% of 200 simulated drafts; likeliest team LV (4%)."
+      "round 1 1%; picks 76-UDFA in 80% of 200 simulated drafts; likeliest team MIN (5%)."
      ],
      [
       "Reach",
@@ -6262,12 +6262,12 @@
     }
    ],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 61,
+    "lo": 76,
     "hi": null,
-    "tm": "LV",
-    "tp": 0.04
+    "tm": "MIN",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/den.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5081328.png",
@@ -6331,7 +6331,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 121-UDFA in 80% of 200 simulated drafts; likeliest team LAR (3%)."
+      "round 1 2%; picks 136-UDFA in 80% of 200 simulated drafts; likeliest team IND (2%)."
      ],
      [
       "Reach",
@@ -6374,12 +6374,12 @@
     }
    ],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 121,
+    "lo": 136,
     "hi": null,
-    "tm": "LAR",
-    "tp": 0.03
+    "tm": "IND",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/atl.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079765.png",
@@ -6438,7 +6438,7 @@
      ],
      [
       "Sims",
-      "round 1 7%; picks 50-UDFA in 80% of 200 simulated drafts; likeliest team MIN (5%)."
+      "round 1 3%; picks 76-UDFA in 80% of 200 simulated drafts; likeliest team TB (5%)."
      ],
      [
       "Grade",
@@ -6464,11 +6464,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.07,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 50,
+    "lo": 76,
     "hi": null,
-    "tm": "MIN",
+    "tm": "TB",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/min.png",
@@ -6540,7 +6540,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 50-UDFA in 80% of 200 simulated drafts; likeliest team LAC (4%)."
+      "round 1 5%; picks 47-UDFA in 80% of 200 simulated drafts; likeliest team DET (5%)."
      ],
      [
       "Grade",
@@ -6570,12 +6570,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.06,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 50,
+    "lo": 47,
     "hi": null,
-    "tm": "LAC",
-    "tp": 0.04
+    "tm": "DET",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5075540.png",
@@ -6658,7 +6658,7 @@
      ],
      [
       "Sims",
-      "round 1 14%; picks 28-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
+      "round 1 16%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team NE (6%)."
      ],
      [
       "Grade",
@@ -6688,11 +6688,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.14,
+    "r1": 0.16,
     "p1": 0,
-    "lo": 28,
+    "lo": 22,
     "hi": null,
-    "tm": "TEN",
+    "tm": "NE",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/atl.png",
@@ -6752,7 +6752,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 53-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
+      "round 1 5%; picks 55-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
      ],
      [
       "Grade",
@@ -6780,9 +6780,9 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.06,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 53,
+    "lo": 55,
     "hi": null,
     "tm": "CLE",
     "tp": 0.04
@@ -6844,7 +6844,7 @@
      ],
      [
       "Sims",
-      "round 1 14%; picks 26-UDFA in 80% of 200 simulated drafts; likeliest team NE (5%)."
+      "round 1 19%; picks 20-UDFA in 80% of 200 simulated drafts; likeliest team BAL (5%)."
      ],
      [
       "Grade",
@@ -6874,11 +6874,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.14,
+    "r1": 0.19,
     "p1": 0,
-    "lo": 26,
+    "lo": 20,
     "hi": null,
-    "tm": "NE",
+    "tm": "BAL",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/mia.png",
@@ -6943,7 +6943,7 @@
      ],
      [
       "Sims",
-      "round 1 5%; picks 47-UDFA in 80% of 200 simulated drafts; likeliest team MIN (5%)."
+      "round 1 7%; picks 46-UDFA in 80% of 200 simulated drafts; likeliest team KC (4%)."
      ],
      [
       "Grade",
@@ -6976,12 +6976,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.05,
+    "r1": 0.07,
     "p1": 0,
-    "lo": 47,
+    "lo": 46,
     "hi": null,
-    "tm": "MIN",
-    "tp": 0.05
+    "tm": "KC",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4857878.png",
@@ -7060,7 +7060,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 74-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 3%; picks 73-UDFA in 80% of 200 simulated drafts; likeliest team MIA (3%)."
      ],
      [
       "Reach",
@@ -7097,12 +7097,12 @@
     }
    ],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 74,
+    "lo": 73,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.04
+    "tm": "MIA",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/bal.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079426.png",
@@ -7173,7 +7173,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 63%; picks 6-113 in 80% of 200 simulated drafts; likeliest team NYJ (11%)."
+      "#1 overall 1%; round 1 62%; picks 6-100 in 80% of 200 simulated drafts; likeliest team NYJ (12%)."
      ],
      [
       "Value",
@@ -7209,12 +7209,12 @@
     }
    ],
    "sim": {
-    "r1": 0.63,
+    "r1": 0.62,
     "p1": 0.005,
     "lo": 6,
-    "hi": 113,
+    "hi": 100,
     "tm": "NYJ",
-    "tp": 0.11
+    "tp": 0.12
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079698.png",
@@ -7285,7 +7285,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 118-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
+      "round 1 <1%; picks 122-UDFA in 80% of 200 simulated drafts; likeliest team NE (2%)."
      ],
      [
       "Reach",
@@ -7325,10 +7325,10 @@
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 118,
+    "lo": 122,
     "hi": null,
-    "tm": "MIN",
-    "tp": 0.03
+    "tm": "NE",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/buf.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4868925.png",
@@ -7387,7 +7387,7 @@
      ],
      [
       "Sims",
-      "round 1 19%; picks 19-UDFA in 80% of 200 simulated drafts; likeliest team IND (7%)."
+      "round 1 23%; picks 18-UDFA in 80% of 200 simulated drafts; likeliest team NYG (7%)."
      ],
      [
       "Grade",
@@ -7419,11 +7419,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.19,
+    "r1": 0.23,
     "p1": 0,
-    "lo": 19,
+    "lo": 18,
     "hi": null,
-    "tm": "IND",
+    "tm": "NYG",
     "tp": 0.07
    },
    "teamLogo": "/img/nfl/ind.png",
@@ -7483,7 +7483,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 131-UDFA in 80% of 200 simulated drafts; likeliest team DEN (3%)."
+      "round 1 1%; picks 168-UDFA in 80% of 200 simulated drafts; likeliest team JAX (2%)."
      ],
      [
       "Reach",
@@ -7523,10 +7523,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 131,
+    "lo": 168,
     "hi": null,
-    "tm": "DEN",
-    "tp": 0.03
+    "tm": "JAX",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/no.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079353.png",
@@ -7585,7 +7585,7 @@
      ],
      [
       "Sims",
-      "round 1 17%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
+      "round 1 16%; picks 28-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (7%)."
      ],
      [
       "Grade",
@@ -7615,12 +7615,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.17,
+    "r1": 0.16,
     "p1": 0,
-    "lo": 22,
+    "lo": 28,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.06
+    "tm": "NYJ",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/lv.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5065596.png",
@@ -7691,7 +7691,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 80-UDFA in 80% of 200 simulated drafts; likeliest team GB (3%)."
+      "round 1 2%; picks 85-UDFA in 80% of 200 simulated drafts; likeliest team MIN (4%)."
      ],
      [
       "Grade",
@@ -7723,12 +7723,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 80,
+    "lo": 85,
     "hi": null,
-    "tm": "GB",
-    "tp": 0.03
+    "tm": "MIN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/ten.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4832033.png",
@@ -7799,7 +7799,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 135-UDFA in 80% of 200 simulated drafts; likeliest team DEN (3%)."
+      "round 1 2%; picks 125-UDFA in 80% of 200 simulated drafts; likeliest team PIT (2%)."
      ],
      [
       "Reach",
@@ -7835,12 +7835,12 @@
     }
    ],
    "sim": {
-    "r1": 0,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 135,
+    "lo": 125,
     "hi": null,
-    "tm": "DEN",
-    "tp": 0.03
+    "tm": "PIT",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/nyj.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5151166.png",
@@ -7919,7 +7919,7 @@
      ],
      [
       "Sims",
-      "round 1 26%; picks 14-UDFA in 80% of 200 simulated drafts; likeliest team CLE (8%)."
+      "round 1 25%; picks 17-UDFA in 80% of 200 simulated drafts; likeliest team ARI (9%)."
      ],
      [
       "Grade",
@@ -7949,12 +7949,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.26,
+    "r1": 0.25,
     "p1": 0,
-    "lo": 14,
+    "lo": 17,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.08
+    "tm": "ARI",
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/den.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079748.png",
@@ -8013,7 +8013,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 86-UDFA in 80% of 200 simulated drafts; likeliest team KC (3%)."
+      "round 1 <1%; picks 88-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
      ],
      [
       "Grade",
@@ -8045,12 +8045,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0,
     "p1": 0,
-    "lo": 86,
+    "lo": 88,
     "hi": null,
-    "tm": "KC",
-    "tp": 0.03
+    "tm": "IND",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/hou.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5086393.png",
@@ -8121,7 +8121,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 5%; picks 75-UDFA in 80% of 200 simulated drafts; likeliest team PIT (4%)."
+      "#1 overall 1%; round 1 5%; picks 60-UDFA in 80% of 200 simulated drafts; likeliest team PIT (5%)."
      ],
      [
       "Grade",
@@ -8153,10 +8153,10 @@
    "sim": {
     "r1": 0.05,
     "p1": 0.005,
-    "lo": 75,
+    "lo": 60,
     "hi": null,
     "tm": "PIT",
-    "tp": 0.04
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4875127.png",
@@ -8215,7 +8215,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 172-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
+      "round 1 1%; picks 127-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
      ],
      [
       "Reach",
@@ -8251,7 +8251,7 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 172,
+    "lo": 127,
     "hi": null,
     "tm": "CLE",
     "tp": 0.03
@@ -8318,7 +8318,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 130-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
+      "round 1 1%; picks 167-UDFA in 80% of 200 simulated drafts; likeliest team WSH (2%)."
      ],
      [
       "Grade",
@@ -8343,7 +8343,7 @@
     "minus": [
      "Consensus #142 (median board 80, 2/10 boards); model FV 47, +0 FV",
      "Cast talent 90th pct QB; top target Luke Dehnicke; -0.07 comp",
-     "Injury: Questionable"
+     "Injury: Doubtful"
     ]
    },
    "slots": {
@@ -8354,10 +8354,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 130,
+    "lo": 167,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.03
+    "tm": "WSH",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5075805.png",
@@ -8416,7 +8416,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 64-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
+      "round 1 6%; picks 45-UDFA in 80% of 200 simulated drafts; likeliest team CLE (8%)."
      ],
      [
       "Grade",
@@ -8436,8 +8436,7 @@
     ],
     "minus": [
      "No PFN line this season (2 prior yrs)",
-     "NFL frame 6-2, 225 lb, BMI 28.9 (-0.8 FV)",
-     "Injury: Out"
+     "NFL frame 6-2, 225 lb, BMI 28.9 (-0.8 FV)"
     ]
    },
    "slots": {
@@ -8446,12 +8445,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.06,
     "p1": 0,
-    "lo": 64,
+    "lo": 45,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.03
+    "tm": "CLE",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/ne.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918126.png",
@@ -8510,7 +8509,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 130-UDFA in 80% of 200 simulated drafts; likeliest team TB (3%)."
+      "round 1 1%; picks 168-UDFA in 80% of 200 simulated drafts; likeliest team CLE (2%)."
      ],
      [
       "Reach",
@@ -8553,10 +8552,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 130,
+    "lo": 168,
     "hi": null,
-    "tm": "TB",
-    "tp": 0.03
+    "tm": "CLE",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/nyg.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079732.png",
@@ -8615,7 +8614,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 132-UDFA in 80% of 200 simulated drafts; likeliest team IND (2%)."
+      "round 1 <1%; picks 140-UDFA in 80% of 200 simulated drafts; likeliest team PIT (2%)."
      ],
      [
       "Reach",
@@ -8653,11 +8652,11 @@
     }
    ],
    "sim": {
-    "r1": 0.02,
+    "r1": 0,
     "p1": 0,
-    "lo": 132,
+    "lo": 140,
     "hi": null,
-    "tm": "IND",
+    "tm": "PIT",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/gb.png",
@@ -8736,7 +8735,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 58-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
+      "round 1 5%; picks 70-UDFA in 80% of 200 simulated drafts; likeliest team LV (3%)."
      ],
      [
       "Grade",
@@ -8768,12 +8767,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 58,
+    "lo": 70,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.04
+    "tm": "LV",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/jax.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5149301.png",
@@ -8856,7 +8855,7 @@
      ],
      [
       "Sims",
-      "round 1 7%; picks 46-UDFA in 80% of 200 simulated drafts; likeliest team TEN (4%)."
+      "round 1 8%; picks 43-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
      ],
      [
       "Grade",
@@ -8882,12 +8881,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.07,
+    "r1": 0.08,
     "p1": 0,
-    "lo": 46,
+    "lo": 43,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.04
+    "tm": "CLE",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/cin.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5173431.png",
@@ -8951,7 +8950,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 81-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 3%; picks 77-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
      ],
      [
       "Grade",
@@ -8983,9 +8982,9 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 81,
+    "lo": 77,
     "hi": null,
     "tm": "IND",
     "tp": 0.03
@@ -9066,7 +9065,7 @@
      ],
      [
       "Sims",
-      "#1 overall 1%; round 1 55%; picks 6-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (10%)."
+      "#1 overall 1%; round 1 56%; picks 7-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (10%)."
      ],
      [
       "Value",
@@ -9102,9 +9101,9 @@
     }
    ],
    "sim": {
-    "r1": 0.55,
+    "r1": 0.56,
     "p1": 0.01,
-    "lo": 6,
+    "lo": 7,
     "hi": null,
     "tm": "NYJ",
     "tp": 0.1
@@ -9186,7 +9185,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 122-UDFA in 80% of 200 simulated drafts; likeliest team BUF (2%)."
+      "round 1 1%; picks 114-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
      ],
      [
       "Reach",
@@ -9225,11 +9224,11 @@
     }
    ],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 122,
+    "lo": 114,
     "hi": null,
-    "tm": "BUF",
+    "tm": "DEN",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/car.png",
@@ -9289,7 +9288,7 @@
      ],
      [
       "Sims",
-      "round 1 18%; picks 23-UDFA in 80% of 200 simulated drafts; likeliest team NYG (5%)."
+      "round 1 16%; picks 25-UDFA in 80% of 200 simulated drafts; likeliest team KC (6%)."
      ],
      [
       "Grade",
@@ -9315,12 +9314,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.18,
+    "r1": 0.16,
     "p1": 0,
-    "lo": 23,
+    "lo": 25,
     "hi": null,
-    "tm": "NYG",
-    "tp": 0.05
+    "tm": "KC",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/chi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5114311.png",
@@ -9391,7 +9390,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 65-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 5%; picks 47-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
      ],
      [
       "Grade",
@@ -9424,12 +9423,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 65,
+    "lo": 47,
     "hi": null,
     "tm": "IND",
-    "tp": 0.03
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5126999.png",
@@ -9488,7 +9487,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 126-UDFA in 80% of 200 simulated drafts; likeliest team BUF (2%)."
+      "round 1 1%; picks 74-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
      ],
      [
       "Grade",
@@ -9516,12 +9515,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 126,
+    "lo": 74,
     "hi": null,
-    "tm": "BUF",
-    "tp": 0.02
+    "tm": "IND",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5077060.png",
@@ -9592,7 +9591,7 @@
      ],
      [
       "Sims",
-      "round 1 20%; picks 23-UDFA in 80% of 200 simulated drafts; likeliest team KC (7%)."
+      "round 1 20%; picks 22-UDFA in 80% of 200 simulated drafts; likeliest team PHI (5%)."
      ],
      [
       "Grade",
@@ -9622,10 +9621,10 @@
    "sim": {
     "r1": 0.2,
     "p1": 0,
-    "lo": 23,
+    "lo": 22,
     "hi": null,
-    "tm": "KC",
-    "tp": 0.07
+    "tm": "PHI",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/wsh.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5141711.png",
@@ -9692,7 +9691,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 125-UDFA in 80% of 200 simulated drafts; likeliest team LAC (2%)."
+      "round 1 1%; picks 131-UDFA in 80% of 200 simulated drafts; likeliest team PHI (3%)."
      ],
      [
       "Grade",
@@ -9723,12 +9722,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 125,
+    "lo": 131,
     "hi": null,
-    "tm": "LAC",
-    "tp": 0.02
+    "tm": "PHI",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/cle.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5152410.png",
@@ -9792,7 +9791,7 @@
      ],
      [
       "Sims",
-      "round 1 38%; picks 11-169 in 80% of 200 simulated drafts; likeliest team LV (6%)."
+      "round 1 43%; picks 11-219 in 80% of 200 simulated drafts; likeliest team WSH (7%)."
      ],
      [
       "Value",
@@ -9826,12 +9825,12 @@
     }
    ],
    "sim": {
-    "r1": 0.38,
+    "r1": 0.43,
     "p1": 0,
     "lo": 11,
-    "hi": 169,
-    "tm": "LV",
-    "tp": 0.06
+    "hi": 219,
+    "tm": "WSH",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/lv.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079376.png",
@@ -9890,7 +9889,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 103-UDFA in 80% of 200 simulated drafts; likeliest team CAR (2%)."
+      "round 1 1%; picks 194-UDFA in 80% of 200 simulated drafts; likeliest team TEN (2%)."
      ],
      [
       "Reach",
@@ -9932,9 +9931,9 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 103,
+    "lo": 194,
     "hi": null,
-    "tm": "CAR",
+    "tm": "TEN",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/sf.png",
@@ -9994,7 +9993,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 44-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (4%)."
+      "round 1 6%; picks 46-UDFA in 80% of 200 simulated drafts; likeliest team IND (7%)."
      ],
      [
       "Grade",
@@ -10026,12 +10025,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.06,
     "p1": 0,
-    "lo": 44,
+    "lo": 46,
     "hi": null,
-    "tm": "NYJ",
-    "tp": 0.04
+    "tm": "IND",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/buf.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5136784.png",
@@ -10090,7 +10089,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 133-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 2%; picks 122-UDFA in 80% of 200 simulated drafts; likeliest team CIN (3%)."
      ],
      [
       "Grade",
@@ -10123,11 +10122,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 133,
+    "lo": 122,
     "hi": null,
-    "tm": "IND",
+    "tm": "CIN",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/ten.png",
@@ -10187,7 +10186,7 @@
      ],
      [
       "Sims",
-      "round 1 21%; picks 23-UDFA in 80% of 200 simulated drafts; likeliest team TEN (7%)."
+      "round 1 19%; picks 25-UDFA in 80% of 200 simulated drafts; likeliest team CIN (5%)."
      ],
      [
       "Grade",
@@ -10217,12 +10216,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.21,
+    "r1": 0.19,
     "p1": 0,
-    "lo": 23,
+    "lo": 25,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.07
+    "tm": "CIN",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918438.png",
@@ -10281,7 +10280,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 72-UDFA in 80% of 200 simulated drafts; likeliest team NYG (4%)."
+      "round 1 5%; picks 48-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
      ],
      [
       "Grade",
@@ -10311,12 +10310,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 72,
+    "lo": 48,
     "hi": null,
-    "tm": "NYG",
-    "tp": 0.04
+    "tm": "CLE",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079345.png",
@@ -10375,7 +10374,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 90-UDFA in 80% of 200 simulated drafts; likeliest team DET (2%)."
+      "round 1 2%; picks 117-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
      ],
      [
       "Grade",
@@ -10401,12 +10400,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 90,
+    "lo": 117,
     "hi": null,
-    "tm": "DET",
-    "tp": 0.02
+    "tm": "MIN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/nyj.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918449.png",
@@ -10485,7 +10484,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 68-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 6%; picks 48-UDFA in 80% of 200 simulated drafts; likeliest team TEN (4%)."
      ],
      [
       "Grade",
@@ -10519,11 +10518,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.06,
     "p1": 0,
-    "lo": 68,
+    "lo": 48,
     "hi": null,
-    "tm": "IND",
+    "tm": "TEN",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/ari.png",
@@ -10595,7 +10594,7 @@
      ],
      [
       "Sims",
-      "round 1 17%; picks 21-UDFA in 80% of 200 simulated drafts; likeliest team NO (6%)."
+      "round 1 15%; picks 21-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
      ],
      [
       "Grade",
@@ -10627,11 +10626,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.17,
+    "r1": 0.15,
     "p1": 0,
     "lo": 21,
     "hi": null,
-    "tm": "NO",
+    "tm": "CLE",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/buf.png",
@@ -10703,7 +10702,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 79-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 4%; picks 60-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
      ],
      [
       "Grade",
@@ -10735,12 +10734,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 79,
+    "lo": 60,
     "hi": null,
     "tm": "IND",
-    "tp": 0.03
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5296021.png",
@@ -10814,7 +10813,7 @@
      ],
      [
       "Sims",
-      "round 1 29%; picks 16-UDFA in 80% of 200 simulated drafts; likeliest team NYG (7%)."
+      "round 1 28%; picks 14-UDFA in 80% of 200 simulated drafts; likeliest team LV (7%)."
      ],
      [
       "Value",
@@ -10849,11 +10848,11 @@
     }
    ],
    "sim": {
-    "r1": 0.29,
+    "r1": 0.28,
     "p1": 0,
-    "lo": 16,
+    "lo": 14,
     "hi": null,
-    "tm": "NYG",
+    "tm": "LV",
     "tp": 0.07
    },
    "teamLogo": "/img/nfl/cle.png",
@@ -10913,7 +10912,7 @@
      ],
      [
       "Sims",
-      "round 1 5%; picks 53-UDFA in 80% of 200 simulated drafts; likeliest team TEN (5%)."
+      "round 1 9%; picks 37-UDFA in 80% of 200 simulated drafts; likeliest team NE (4%)."
      ],
      [
       "Grade",
@@ -10943,12 +10942,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.05,
+    "r1": 0.09,
     "p1": 0,
-    "lo": 53,
+    "lo": 37,
     "hi": null,
-    "tm": "TEN",
-    "tp": 0.05
+    "tm": "NE",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/lv.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5077638.png",
@@ -11019,7 +11018,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team GB (1%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team PIT (2%)."
      ],
      [
       "Grade",
@@ -11056,8 +11055,8 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "GB",
-    "tp": 0.01
+    "tm": "PIT",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/ten.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4871074.png",
@@ -11133,7 +11132,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 53-UDFA in 80% of 200 simulated drafts; likeliest team WSH (3%)."
+      "round 1 2%; picks 64-UDFA in 80% of 200 simulated drafts; likeliest team CIN (4%)."
      ],
      [
       "Grade",
@@ -11163,12 +11162,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 53,
+    "lo": 64,
     "hi": null,
-    "tm": "WSH",
-    "tp": 0.03
+    "tm": "CIN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/lac.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870946.png",
@@ -11239,7 +11238,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 62-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
+      "round 1 3%; picks 73-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
      ],
      [
       "Grade",
@@ -11271,12 +11270,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 62,
+    "lo": 73,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.05
+    "tm": "MIN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/no.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5218931.png",
@@ -11335,7 +11334,7 @@
      ],
      [
       "Sims",
-      "round 1 35%; picks 13-UDFA in 80% of 200 simulated drafts; likeliest team LV (7%)."
+      "round 1 27%; picks 17-UDFA in 80% of 200 simulated drafts; likeliest team CIN (6%)."
      ],
      [
       "Value",
@@ -11372,12 +11371,12 @@
     }
    ],
    "sim": {
-    "r1": 0.35,
+    "r1": 0.27,
     "p1": 0,
-    "lo": 13,
+    "lo": 17,
     "hi": null,
-    "tm": "LV",
-    "tp": 0.07
+    "tm": "CIN",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/hou.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918430.png",
@@ -11448,7 +11447,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 74-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 2%; picks 60-UDFA in 80% of 200 simulated drafts; likeliest team NYG (5%)."
      ],
      [
       "Reach",
@@ -11486,12 +11485,12 @@
     }
    ],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 74,
+    "lo": 60,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.03
+    "tm": "NYG",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4812383.png",
@@ -11528,7 +11527,7 @@
    "cls": "RS-Sr",
    "age": 22.9,
    "ageEst": true,
-   "ovr": 296,
+   "ovr": 295,
    "need": null,
    "cons": null,
    "xPick": 130,
@@ -11562,7 +11561,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 136-UDFA in 80% of 200 simulated drafts; likeliest team PIT (3%)."
+      "round 1 1%; picks 138-UDFA in 80% of 200 simulated drafts; likeliest team PIT (3%)."
      ],
      [
       "Reach",
@@ -11600,9 +11599,9 @@
     }
    ],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 136,
+    "lo": 138,
     "hi": null,
     "tm": "PIT",
     "tp": 0.03
@@ -11669,7 +11668,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 98-UDFA in 80% of 200 simulated drafts; likeliest team WSH (4%)."
+      "round 1 2%; picks 78-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
      ],
      [
       "Grade",
@@ -11698,11 +11697,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 98,
+    "lo": 78,
     "hi": null,
-    "tm": "WSH",
+    "tm": "CLE",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/gb.png",
@@ -11762,7 +11761,7 @@
      ],
      [
       "Sims",
-      "round 1 7%; picks 40-UDFA in 80% of 200 simulated drafts; likeliest team IND (6%)."
+      "round 1 11%; picks 30-UDFA in 80% of 200 simulated drafts; likeliest team CLE (8%)."
      ],
      [
       "Grade",
@@ -11794,12 +11793,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.07,
+    "r1": 0.11,
     "p1": 0,
-    "lo": 40,
+    "lo": 30,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.06
+    "tm": "CLE",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/ne.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4685314.png",
@@ -11882,7 +11881,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 51-UDFA in 80% of 200 simulated drafts; likeliest team NE (5%)."
+      "round 1 3%; picks 53-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
      ],
      [
       "Grade",
@@ -11910,12 +11909,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.06,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 51,
+    "lo": 53,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.05
+    "tm": "TEN",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/buf.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079349.png",
@@ -11974,7 +11973,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 154-UDFA in 80% of 200 simulated drafts; likeliest team SEA (5%)."
+      "round 1 <1%; picks 134-UDFA in 80% of 200 simulated drafts; likeliest team PIT (9%)."
      ],
      [
       "Grade",
@@ -11999,10 +11998,10 @@
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 154,
+    "lo": 134,
     "hi": null,
-    "tm": "SEA",
-    "tp": 0.05
+    "tm": "PIT",
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/gb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5082358.png",
@@ -12073,7 +12072,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 89-UDFA in 80% of 200 simulated drafts; likeliest team DET (3%)."
+      "round 1 3%; picks 83-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
      ],
      [
       "Grade",
@@ -12105,9 +12104,9 @@
    "sim": {
     "r1": 0.03,
     "p1": 0,
-    "lo": 89,
+    "lo": 83,
     "hi": null,
-    "tm": "DET",
+    "tm": "CLE",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/no.png",
@@ -12167,7 +12166,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 77-UDFA in 80% of 200 simulated drafts; likeliest team MIA (3%)."
+      "round 1 1%; picks 129-UDFA in 80% of 200 simulated drafts; likeliest team ARI (2%)."
      ],
      [
       "Grade",
@@ -12199,12 +12198,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 77,
+    "lo": 129,
     "hi": null,
-    "tm": "MIA",
-    "tp": 0.03
+    "tm": "ARI",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/lar.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5153074.png",
@@ -12235,7 +12234,7 @@
    "cls": "RS-Gr",
    "age": 23.9,
    "ageEst": true,
-   "ovr": 286,
+   "ovr": 285,
    "need": null,
    "cons": null,
    "xPick": 131,
@@ -12264,7 +12263,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 148-UDFA in 80% of 200 simulated drafts; likeliest team MIN (4%)."
+      "round 1 1%; picks 127-UDFA in 80% of 200 simulated drafts; likeliest team CAR (3%)."
      ],
      [
       "Grade",
@@ -12297,10 +12296,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 148,
+    "lo": 127,
     "hi": null,
-    "tm": "MIN",
-    "tp": 0.04
+    "tm": "CAR",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/cle.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4682510.png",
@@ -12331,7 +12330,7 @@
    "cls": "Sr",
    "age": 23.01,
    "ageEst": false,
-   "ovr": 285,
+   "ovr": 284,
    "need": null,
    "cons": 416,
    "xPick": 114,
@@ -12364,7 +12363,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 56-UDFA in 80% of 200 simulated drafts; likeliest team TB (4%)."
+      "round 1 4%; picks 62-UDFA in 80% of 200 simulated drafts; likeliest team BAL (4%)."
      ],
      [
       "Grade",
@@ -12400,9 +12399,9 @@
    "sim": {
     "r1": 0.04,
     "p1": 0,
-    "lo": 56,
+    "lo": 62,
     "hi": null,
-    "tm": "TB",
+    "tm": "BAL",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/dal.png",
@@ -12481,7 +12480,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 119-UDFA in 80% of 200 simulated drafts; likeliest team LAC (2%)."
+      "round 1 1%; picks 103-UDFA in 80% of 200 simulated drafts; likeliest team NYG (3%)."
      ],
      [
       "Grade",
@@ -12504,16 +12503,16 @@
    },
    "slots": {
     "pred": null,
-    "blend": 169
+    "blend": 180
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 119,
+    "lo": 103,
     "hi": null,
-    "tm": "LAC",
-    "tp": 0.02
+    "tm": "NYG",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/lv.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5209945.png",
@@ -12601,7 +12600,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 57-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
+      "round 1 4%; picks 47-UDFA in 80% of 200 simulated drafts; likeliest team TEN (5%)."
      ],
      [
       "Grade",
@@ -12631,12 +12630,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 57,
+    "lo": 47,
     "hi": null,
     "tm": "TEN",
-    "tp": 0.06
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5142588.png",
@@ -12695,7 +12694,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 79-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 3%; picks 56-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (3%)."
      ],
      [
       "Grade",
@@ -12728,10 +12727,10 @@
    "sim": {
     "r1": 0.03,
     "p1": 0,
-    "lo": 79,
+    "lo": 56,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.04
+    "tm": "NYJ",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/cin.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5294521.png",
@@ -12795,7 +12794,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 57-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 4%; picks 59-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
      ],
      [
       "Grade",
@@ -12827,12 +12826,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 57,
+    "lo": 59,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.04
+    "tm": "CLE",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/ind.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4871005.png",
@@ -12903,7 +12902,7 @@
      ],
      [
       "Sims",
-      "round 1 9%; picks 37-UDFA in 80% of 200 simulated drafts; likeliest team BUF (5%)."
+      "round 1 10%; picks 34-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (5%)."
      ],
      [
       "Grade",
@@ -12939,11 +12938,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.09,
+    "r1": 0.1,
     "p1": 0,
-    "lo": 37,
+    "lo": 34,
     "hi": null,
-    "tm": "BUF",
+    "tm": "NYJ",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/wsh.png",
@@ -12981,7 +12980,7 @@
    "cls": "RS-Sr",
    "age": 23.71,
    "ageEst": false,
-   "ovr": 290,
+   "ovr": 289,
    "need": null,
    "cons": 388,
    "xPick": 142,
@@ -13011,7 +13010,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 157-UDFA in 80% of 200 simulated drafts; likeliest team NE (2%)."
+      "round 1 1%; picks 141-UDFA in 80% of 200 simulated drafts; likeliest team PHI (2%)."
      ],
      [
       "Grade",
@@ -13047,9 +13046,9 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 157,
+    "lo": 141,
     "hi": null,
-    "tm": "NE",
+    "tm": "PHI",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/cle.png",
@@ -13126,7 +13125,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 85-UDFA in 80% of 200 simulated drafts; likeliest team CIN (4%)."
+      "round 1 <1%; picks 85-UDFA in 80% of 200 simulated drafts; likeliest team NE (4%)."
      ],
      [
       "Grade",
@@ -13159,11 +13158,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
     "lo": 85,
     "hi": null,
-    "tm": "CIN",
+    "tm": "NE",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/det.png",
@@ -13240,7 +13239,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 81-UDFA in 80% of 200 simulated drafts; likeliest team PHI (3%)."
+      "round 1 1%; picks 72-UDFA in 80% of 200 simulated drafts; likeliest team KC (4%)."
      ],
      [
       "Grade",
@@ -13272,12 +13271,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 81,
+    "lo": 72,
     "hi": null,
-    "tm": "PHI",
-    "tp": 0.03
+    "tm": "KC",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5112630.png",
@@ -13336,7 +13335,7 @@
      ],
      [
       "Sims",
-      "round 1 9%; picks 40-UDFA in 80% of 200 simulated drafts; likeliest team IND (6%)."
+      "round 1 5%; picks 43-UDFA in 80% of 200 simulated drafts; likeliest team NE (5%)."
      ],
      [
       "Grade",
@@ -13364,12 +13363,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.09,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 40,
+    "lo": 43,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.06
+    "tm": "NE",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/buf.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5218633.png",
@@ -13406,7 +13405,7 @@
    "cls": "Sr",
    "age": 21.86,
    "ageEst": false,
-   "ovr": 314,
+   "ovr": 313,
    "need": null,
    "cons": 321,
    "xPick": 144,
@@ -13441,7 +13440,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 207-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
+      "round 1 1%; picks 167-UDFA in 80% of 200 simulated drafts; likeliest team NE (2%)."
      ],
      [
       "Grade",
@@ -13474,9 +13473,9 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 207,
+    "lo": 167,
     "hi": null,
-    "tm": "DEN",
+    "tm": "NE",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/cle.png",
@@ -13555,7 +13554,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 68-UDFA in 80% of 200 simulated drafts; likeliest team MIN (4%)."
+      "round 1 5%; picks 63-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (4%)."
      ],
      [
       "Grade",
@@ -13585,11 +13584,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 68,
+    "lo": 63,
     "hi": null,
-    "tm": "MIN",
+    "tm": "NYJ",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/nyj.png",
@@ -13621,7 +13620,7 @@
    "cls": "RS-Sr",
    "age": 22.7,
    "ageEst": true,
-   "ovr": 287,
+   "ovr": 286,
    "need": null,
    "cons": 333,
    "xPick": 136,
@@ -13649,7 +13648,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 101-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
+      "round 1 2%; picks 116-UDFA in 80% of 200 simulated drafts; likeliest team NE (4%)."
      ],
      [
       "Grade",
@@ -13678,12 +13677,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 101,
+    "lo": 116,
     "hi": null,
-    "tm": "MIN",
-    "tp": 0.03
+    "tm": "NE",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4819260.png",
@@ -13754,7 +13753,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team GB (1%)."
+      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team LV (1%)."
      ],
      [
       "Grade",
@@ -13782,11 +13781,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "GB",
+    "tm": "LV",
     "tp": 0.01
    },
    "teamLogo": "/img/nfl/mia.png",
@@ -13846,7 +13845,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 145-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
+      "round 1 1%; picks 168-UDFA in 80% of 200 simulated drafts; likeliest team BUF (2%)."
      ],
      [
       "Grade",
@@ -13876,15 +13875,15 @@
    },
    "slots": {
     "pred": null,
-    "blend": 223
+    "blend": 218
    },
    "grades": [],
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 145,
+    "lo": 168,
     "hi": null,
-    "tm": "DEN",
+    "tm": "BUF",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/lac.png",
@@ -13961,7 +13960,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 137-UDFA in 80% of 200 simulated drafts; likeliest team WSH (2%)."
+      "round 1 1%; picks 141-UDFA in 80% of 200 simulated drafts; likeliest team WSH (2%)."
      ],
      [
       "Grade",
@@ -13995,7 +13994,7 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 137,
+    "lo": 141,
     "hi": null,
     "tm": "WSH",
     "tp": 0.02
@@ -14057,7 +14056,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 118-UDFA in 80% of 200 simulated drafts; likeliest team TB (3%)."
+      "round 1 2%; picks 80-UDFA in 80% of 200 simulated drafts; likeliest team GB (3%)."
      ],
      [
       "Grade",
@@ -14091,9 +14090,9 @@
    "sim": {
     "r1": 0.02,
     "p1": 0,
-    "lo": 118,
+    "lo": 80,
     "hi": null,
-    "tm": "TB",
+    "tm": "GB",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/ind.png",
@@ -14168,7 +14167,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 162-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
+      "round 1 1%; picks 109-UDFA in 80% of 200 simulated drafts; likeliest team TEN (3%)."
      ],
      [
       "Grade",
@@ -14200,12 +14199,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 162,
+    "lo": 109,
     "hi": null,
-    "tm": "DEN",
-    "tp": 0.02
+    "tm": "TEN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/ne.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5080547.png",
@@ -14276,7 +14275,7 @@
      ],
      [
       "Sims",
-      "drafted in under 1% of 200 simulated drafts."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team LAC (1%)."
      ],
      [
       "Grade",
@@ -14307,7 +14306,14 @@
     "blend": 186
    },
    "grades": [],
-   "sim": null,
+   "sim": {
+    "r1": 0,
+    "p1": 0,
+    "lo": null,
+    "hi": null,
+    "tm": "LAC",
+    "tp": 0.01
+   },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4921290.png",
    "fvx": 38
@@ -14370,7 +14376,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 55-UDFA in 80% of 200 simulated drafts; likeliest team TEN (6%)."
+      "round 1 2%; picks 64-UDFA in 80% of 200 simulated drafts; likeliest team IND (6%)."
      ],
      [
       "Grade",
@@ -14399,11 +14405,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 55,
+    "lo": 64,
     "hi": null,
-    "tm": "TEN",
+    "tm": "IND",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/chi.png",
@@ -14468,7 +14474,7 @@
      ],
      [
       "Sims",
-      "round 1 18%; picks 21-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (7%)."
+      "#1 overall 1%; round 1 21%; picks 20-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (9%)."
      ],
      [
       "Value",
@@ -14503,12 +14509,12 @@
     }
    ],
    "sim": {
-    "r1": 0.18,
-    "p1": 0,
-    "lo": 21,
+    "r1": 0.21,
+    "p1": 0.005,
+    "lo": 20,
     "hi": null,
     "tm": "NYJ",
-    "tp": 0.07
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870921.png",
@@ -14567,7 +14573,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 126-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 6%; picks 63-UDFA in 80% of 200 simulated drafts; likeliest team TB (3%)."
      ],
      [
       "Grade",
@@ -14597,11 +14603,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.06,
     "p1": 0,
-    "lo": 126,
+    "lo": 63,
     "hi": null,
-    "tm": "IND",
+    "tm": "TB",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/wsh.png",
@@ -14662,7 +14668,7 @@
      ],
      [
       "Sims",
-      "round 1 21%; picks 15-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (7%)."
+      "round 1 20%; picks 18-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (7%)."
      ],
      [
       "Value",
@@ -14694,9 +14700,9 @@
     }
    ],
    "sim": {
-    "r1": 0.21,
+    "r1": 0.2,
     "p1": 0,
-    "lo": 15,
+    "lo": 18,
     "hi": null,
     "tm": "NYJ",
     "tp": 0.07
@@ -14758,7 +14764,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 68-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
+      "round 1 5%; picks 73-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
      ],
      [
       "Grade",
@@ -14784,12 +14790,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 68,
+    "lo": 73,
     "hi": null,
     "tm": "IND",
-    "tp": 0.05
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/tb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4923226.png",
@@ -14872,7 +14878,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 145-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 2%; picks 95-UDFA in 80% of 200 simulated drafts; likeliest team CLE (2%)."
      ],
      [
       "Grade",
@@ -14901,12 +14907,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 145,
+    "lo": 95,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.03
+    "tm": "CLE",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870858.png",
@@ -14970,7 +14976,7 @@
      ],
      [
       "Sims",
-      "round 1 13%; picks 26-UDFA in 80% of 200 simulated drafts; likeliest team DEN (6%)."
+      "round 1 8%; picks 38-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
      ],
      [
       "Grade",
@@ -15003,11 +15009,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.13,
+    "r1": 0.08,
     "p1": 0,
-    "lo": 26,
+    "lo": 38,
     "hi": null,
-    "tm": "DEN",
+    "tm": "CLE",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/pit.png",
@@ -15072,7 +15078,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 209-UDFA in 80% of 200 simulated drafts; likeliest team KC (3%)."
+      "round 1 <1%; picks 176-UDFA in 80% of 200 simulated drafts; likeliest team PIT (6%)."
      ],
      [
       "Grade",
@@ -15097,10 +15103,10 @@
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 209,
+    "lo": 176,
     "hi": null,
-    "tm": "KC",
-    "tp": 0.03
+    "tm": "PIT",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/phi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5092217.png",
@@ -15164,7 +15170,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 73-UDFA in 80% of 200 simulated drafts; likeliest team MIN (4%)."
+      "round 1 2%; picks 115-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
      ],
      [
       "Grade",
@@ -15192,16 +15198,16 @@
    },
    "slots": {
     "pred": null,
-    "blend": 198
+    "blend": 193
    },
    "grades": [],
    "sim": {
     "r1": 0.02,
     "p1": 0,
-    "lo": 73,
+    "lo": 115,
     "hi": null,
-    "tm": "MIN",
-    "tp": 0.04
+    "tm": "CLE",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079337.png",
@@ -15256,7 +15262,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 94-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
+      "round 1 1%; picks 96-UDFA in 80% of 200 simulated drafts; likeliest team LV (3%)."
      ],
      [
       "Grade",
@@ -15284,15 +15290,15 @@
    },
    "slots": {
     "pred": null,
-    "blend": 180
+    "blend": 191
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 94,
+    "lo": 96,
     "hi": null,
-    "tm": "CLE",
+    "tm": "LV",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/gb.png",
@@ -15330,7 +15336,7 @@
    "cls": "RS-Jr",
    "age": 22.17,
    "ageEst": false,
-   "ovr": 309,
+   "ovr": 308,
    "need": null,
    "cons": 301,
    "xPick": 145,
@@ -15364,7 +15370,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 103-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
+      "round 1 1%; picks 105-UDFA in 80% of 200 simulated drafts; likeliest team TEN (3%)."
      ],
      [
       "Grade",
@@ -15389,16 +15395,16 @@
    },
    "slots": {
     "pred": null,
-    "blend": 195
+    "blend": 188
    },
    "grades": [],
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 103,
+    "lo": 105,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.04
+    "tm": "TEN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/no.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4923046.png",
@@ -15465,7 +15471,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 177-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
+      "round 1 1%; picks 142-UDFA in 80% of 200 simulated drafts; likeliest team GB (2%)."
      ],
      [
       "Grade",
@@ -15495,16 +15501,16 @@
    },
    "slots": {
     "pred": null,
-    "blend": 201
+    "blend": 199
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 177,
+    "lo": 142,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.03
+    "tm": "GB",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/gb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5078278.png",
@@ -15535,7 +15541,7 @@
    "cls": "Jr",
    "age": 20.9,
    "ageEst": true,
-   "ovr": 291,
+   "ovr": 290,
    "need": null,
    "cons": 252,
    "xPick": 149,
@@ -15563,7 +15569,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 87-UDFA in 80% of 200 simulated drafts; likeliest team TEN (3%)."
+      "round 1 1%; picks 93-UDFA in 80% of 200 simulated drafts; likeliest team CIN (3%)."
      ],
      [
       "Grade",
@@ -15590,11 +15596,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 87,
+    "lo": 93,
     "hi": null,
-    "tm": "TEN",
+    "tm": "CIN",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/sea.png",
@@ -15671,7 +15677,7 @@
      ],
      [
       "Sims",
-      "round 1 8%; picks 43-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
+      "round 1 8%; picks 42-UDFA in 80% of 200 simulated drafts; likeliest team KC (6%)."
      ],
      [
       "Grade",
@@ -15707,10 +15713,10 @@
    "sim": {
     "r1": 0.08,
     "p1": 0,
-    "lo": 43,
+    "lo": 42,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.05
+    "tm": "KC",
+    "tp": 0.06
    },
    "teamLogo": "/img/nfl/ten.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4867887.png",
@@ -15781,7 +15787,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 146-UDFA in 80% of 200 simulated drafts; likeliest team BUF (2%)."
+      "round 1 1%; picks 150-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
      ],
      [
       "Grade",
@@ -15818,10 +15824,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 146,
+    "lo": 150,
     "hi": null,
-    "tm": "BUF",
-    "tp": 0.02
+    "tm": "MIN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5102910.png",
@@ -15897,7 +15903,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 65-UDFA in 80% of 200 simulated drafts; likeliest team NE (4%)."
+      "round 1 1%; picks 83-UDFA in 80% of 200 simulated drafts; likeliest team TB (3%)."
      ],
      [
       "Grade",
@@ -15927,12 +15933,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 65,
+    "lo": 83,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.04
+    "tm": "TB",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/no.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4966262.png",
@@ -16003,7 +16009,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 215-UDFA in 80% of 200 simulated drafts; likeliest team LV (4%)."
+      "round 1 1%; picks 206-UDFA in 80% of 200 simulated drafts; likeliest team LV (2%)."
      ],
      [
       "Grade",
@@ -16033,12 +16039,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 215,
+    "lo": 206,
     "hi": null,
     "tm": "LV",
-    "tp": 0.04
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5153514.png",
@@ -16102,7 +16108,7 @@
      ],
      [
       "Sims",
-      "round 1 9%; picks 41-UDFA in 80% of 200 simulated drafts; likeliest team PIT (6%)."
+      "round 1 7%; picks 43-UDFA in 80% of 200 simulated drafts; likeliest team MIN (6%)."
      ],
      [
       "Grade",
@@ -16135,11 +16141,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.09,
+    "r1": 0.07,
     "p1": 0,
-    "lo": 41,
+    "lo": 43,
     "hi": null,
-    "tm": "PIT",
+    "tm": "MIN",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/ind.png",
@@ -16211,7 +16217,7 @@
      ],
      [
       "Sims",
-      "#1 overall 2%; round 1 31%; picks 7-UDFA in 80% of 200 simulated drafts; likeliest team PIT (11%)."
+      "#1 overall 1%; round 1 33%; picks 8-218 in 80% of 200 simulated drafts; likeliest team NYJ (12%)."
      ],
      [
       "Value",
@@ -16245,12 +16251,12 @@
     }
    ],
    "sim": {
-    "r1": 0.31,
-    "p1": 0.015,
-    "lo": 7,
-    "hi": null,
-    "tm": "PIT",
-    "tp": 0.11
+    "r1": 0.33,
+    "p1": 0.005,
+    "lo": 8,
+    "hi": 218,
+    "tm": "NYJ",
+    "tp": 0.12
    },
    "teamLogo": "/img/nfl/wsh.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870906.png",
@@ -16309,7 +16315,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 65-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
+      "round 1 2%; picks 72-UDFA in 80% of 200 simulated drafts; likeliest team TEN (3%)."
      ],
      [
       "Grade",
@@ -16337,12 +16343,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 65,
+    "lo": 72,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.04
+    "tm": "TEN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/jax.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870736.png",
@@ -16421,7 +16427,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 199-UDFA in 80% of 200 simulated drafts; likeliest team PHI (2%)."
+      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team PHI (2%)."
      ],
      [
       "Grade",
@@ -16457,7 +16463,7 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 199,
+    "lo": null,
     "hi": null,
     "tm": "PHI",
     "tp": 0.02
@@ -16504,7 +16510,7 @@
    "cls": "RS-Jr",
    "age": 21.9,
    "ageEst": true,
-   "ovr": 313,
+   "ovr": 312,
    "need": null,
    "cons": 122,
    "xPick": 166,
@@ -16538,7 +16544,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 64-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
+      "round 1 4%; picks 58-UDFA in 80% of 200 simulated drafts; likeliest team KC (5%)."
      ],
      [
       "Grade",
@@ -16567,11 +16573,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 64,
+    "lo": 58,
     "hi": null,
-    "tm": "CLE",
+    "tm": "KC",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/tb.png",
@@ -16635,7 +16641,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 161-UDFA in 80% of 200 simulated drafts; likeliest team CAR (3%)."
+      "round 1 <1%; picks 128-UDFA in 80% of 200 simulated drafts; likeliest team CLE (5%)."
      ],
      [
       "Grade",
@@ -16664,10 +16670,10 @@
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 161,
+    "lo": 128,
     "hi": null,
-    "tm": "CAR",
-    "tp": 0.03
+    "tm": "CLE",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/cle.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5027438.png",
@@ -16698,7 +16704,7 @@
    "cls": "Jr",
    "age": 21.07,
    "ageEst": false,
-   "ovr": 274,
+   "ovr": 273,
    "need": null,
    "cons": 150,
    "xPick": 169,
@@ -16726,7 +16732,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 55-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 2%; picks 74-UDFA in 80% of 200 simulated drafts; likeliest team WSH (4%)."
      ],
      [
       "Grade",
@@ -16755,11 +16761,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 55,
+    "lo": 74,
     "hi": null,
-    "tm": "IND",
+    "tm": "WSH",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/ten.png",
@@ -16819,7 +16825,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team PIT (1%)."
+      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team MIA (2%)."
      ],
      [
       "Grade",
@@ -16849,12 +16855,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "PIT",
-    "tp": 0.01
+    "tm": "MIA",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870992.png",
@@ -16930,7 +16936,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 117-UDFA in 80% of 200 simulated drafts; likeliest team CAR (3%)."
+      "round 1 3%; picks 105-UDFA in 80% of 200 simulated drafts; likeliest team TEN (3%)."
      ],
      [
       "Grade",
@@ -16958,11 +16964,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 117,
+    "lo": 105,
     "hi": null,
-    "tm": "CAR",
+    "tm": "TEN",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/det.png",
@@ -17027,7 +17033,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 88-UDFA in 80% of 200 simulated drafts; likeliest team JAX (2%)."
+      "round 1 1%; picks 121-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
      ],
      [
       "Grade",
@@ -17051,16 +17057,16 @@
    },
    "slots": {
     "pred": null,
-    "blend": 215
+    "blend": 211
    },
    "grades": [],
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 88,
+    "lo": 121,
     "hi": null,
-    "tm": "JAX",
-    "tp": 0.02
+    "tm": "IND",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4880937.png",
@@ -17124,7 +17130,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team WSH (1%)."
+      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team NYG (1%)."
      ],
      [
       "Grade",
@@ -17148,15 +17154,15 @@
    },
    "slots": {
     "pred": null,
-    "blend": 200
+    "blend": 212
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "WSH",
+    "tm": "NYG",
     "tp": 0.01
    },
    "teamLogo": "/img/nfl/no.png",
@@ -17221,7 +17227,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team SEA (2%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team CAR (2%)."
      ],
      [
       "Grade",
@@ -17253,11 +17259,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "SEA",
+    "tm": "CAR",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/hou.png",
@@ -17346,7 +17352,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team SEA (1%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team LAC (1%)."
      ],
      [
       "Grade",
@@ -17379,7 +17385,7 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "SEA",
+    "tm": "LAC",
     "tp": 0.01
    },
    "teamLogo": "/img/nfl/cin.png",
@@ -17440,7 +17446,7 @@
      ],
      [
       "Sims",
-      "#1 overall 2%; round 1 32%; picks 10-220 in 80% of 200 simulated drafts; likeliest team PIT (12%)."
+      "round 1 32%; picks 8-203 in 80% of 200 simulated drafts; likeliest team NO (12%)."
      ],
      [
       "Value",
@@ -17477,10 +17483,10 @@
    ],
    "sim": {
     "r1": 0.32,
-    "p1": 0.015,
-    "lo": 10,
-    "hi": 220,
-    "tm": "PIT",
+    "p1": 0,
+    "lo": 8,
+    "hi": 203,
+    "tm": "NO",
     "tp": 0.12
    },
    "teamLogo": "/img/nfl/ne.png",
@@ -17540,7 +17546,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 70-UDFA in 80% of 200 simulated drafts; likeliest team LV (3%)."
+      "round 1 4%; picks 67-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
      ],
      [
       "Grade",
@@ -17570,11 +17576,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 70,
+    "lo": 67,
     "hi": null,
-    "tm": "LV",
+    "tm": "IND",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/lv.png",
@@ -17639,7 +17645,7 @@
      ],
      [
       "Sims",
-      "#1 overall 2%; round 1 67%; picks 6-92 in 80% of 200 simulated drafts; likeliest team NYJ (9%)."
+      "#1 overall 1%; round 1 75%; picks 5-84 in 80% of 200 simulated drafts; likeliest team PHI (12%)."
      ],
      [
       "Value",
@@ -17677,12 +17683,12 @@
     }
    ],
    "sim": {
-    "r1": 0.67,
-    "p1": 0.015,
-    "lo": 6,
-    "hi": 92,
-    "tm": "NYJ",
-    "tp": 0.09
+    "r1": 0.75,
+    "p1": 0.005,
+    "lo": 5,
+    "hi": 84,
+    "tm": "PHI",
+    "tp": 0.12
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079682.png",
@@ -17746,7 +17752,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team MIN (2%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team DET (2%)."
      ],
      [
       "Grade",
@@ -17774,7 +17780,7 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "MIN",
+    "tm": "DET",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/ind.png",
@@ -17834,7 +17840,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 179-UDFA in 80% of 200 simulated drafts; likeliest team CLE (2%)."
+      "round 1 <1%; picks 203-UDFA in 80% of 200 simulated drafts; likeliest team DET (1%)."
      ],
      [
       "Grade",
@@ -17868,10 +17874,10 @@
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 179,
+    "lo": 203,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.02
+    "tm": "DET",
+    "tp": 0.01
    },
    "teamLogo": "/img/nfl/wsh.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5221043.png",
@@ -17947,7 +17953,7 @@
      ],
      [
       "Sims",
-      "round 1 11%; picks 32-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
+      "round 1 5%; picks 43-UDFA in 80% of 200 simulated drafts; likeliest team NE (6%)."
      ],
      [
       "Grade",
@@ -17977,11 +17983,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.11,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 32,
+    "lo": 43,
     "hi": null,
-    "tm": "CLE",
+    "tm": "NE",
     "tp": 0.06
    },
    "teamLogo": "/img/nfl/no.png",
@@ -18053,7 +18059,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 147-UDFA in 80% of 200 simulated drafts; likeliest team NE (2%)."
+      "round 1 1%; picks 140-UDFA in 80% of 200 simulated drafts; likeliest team TEN (2%)."
      ],
      [
       "Grade",
@@ -18079,11 +18085,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 147,
+    "lo": 140,
     "hi": null,
-    "tm": "NE",
+    "tm": "TEN",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/sf.png",
@@ -18155,7 +18161,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 76-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 3%; picks 59-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (3%)."
      ],
      [
       "Grade",
@@ -18181,10 +18187,10 @@
    "sim": {
     "r1": 0.03,
     "p1": 0,
-    "lo": 76,
+    "lo": 59,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.04
+    "tm": "NYJ",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5189756.png",
@@ -18215,7 +18221,7 @@
    "cls": "RS-Jr",
    "age": 21.77,
    "ageEst": false,
-   "ovr": 311,
+   "ovr": 310,
    "need": "need #2",
    "cons": 102,
    "xPick": 212,
@@ -18248,7 +18254,7 @@
      ],
      [
       "Sims",
-      "round 1 7%; picks 37-UDFA in 80% of 200 simulated drafts; likeliest team LV (5%)."
+      "round 1 6%; picks 46-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
      ],
      [
       "Grade",
@@ -18278,11 +18284,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.07,
+    "r1": 0.06,
     "p1": 0,
-    "lo": 37,
+    "lo": 46,
     "hi": null,
-    "tm": "LV",
+    "tm": "IND",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/pit.png",
@@ -18371,7 +18377,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team BUF (2%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team WSH (2%)."
      ],
      [
       "Grade",
@@ -18399,7 +18405,7 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "BUF",
+    "tm": "WSH",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/nyg.png",
@@ -18459,7 +18465,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 149-UDFA in 80% of 200 simulated drafts; likeliest team IND (2%)."
+      "round 1 <1%; picks 141-UDFA in 80% of 200 simulated drafts; likeliest team MIN (3%)."
      ],
      [
       "Grade",
@@ -18495,10 +18501,10 @@
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 149,
+    "lo": 141,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.02
+    "tm": "MIN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/nyg.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4685574.png",
@@ -18558,7 +18564,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 206-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (2%)."
+      "round 1 1%; picks 191-UDFA in 80% of 200 simulated drafts; likeliest team DET (1%)."
      ],
      [
       "Grade",
@@ -18586,12 +18592,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 206,
+    "lo": 191,
     "hi": null,
-    "tm": "NYJ",
-    "tp": 0.02
+    "tm": "DET",
+    "tp": 0.01
    },
    "teamLogo": "/img/nfl/gb.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5294063.png",
@@ -18655,7 +18661,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 90-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
+      "round 1 1%; picks 70-UDFA in 80% of 200 simulated drafts; likeliest team MIN (4%)."
      ],
      [
       "Grade",
@@ -18677,16 +18683,16 @@
    },
    "slots": {
     "pred": 205,
-    "blend": 204
+    "blend": 202
    },
    "grades": [],
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 90,
+    "lo": 70,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.03
+    "tm": "MIN",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/hou.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5078914.png",
@@ -18745,7 +18751,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 204-UDFA in 80% of 200 simulated drafts; likeliest team NE (1%)."
+      "round 1 <1%; picks 173-UDFA in 80% of 200 simulated drafts; likeliest team MIA (3%)."
      ],
      [
       "Grade",
@@ -18776,12 +18782,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
-    "lo": 204,
+    "lo": 173,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.01
+    "tm": "MIA",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/lar.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918427.png",
@@ -18845,7 +18851,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 65-UDFA in 80% of 200 simulated drafts; likeliest team DET (5%)."
+      "round 1 3%; picks 58-UDFA in 80% of 200 simulated drafts; likeliest team GB (4%)."
      ],
      [
       "Grade",
@@ -18866,16 +18872,16 @@
    },
    "slots": {
     "pred": 179,
-    "blend": 188
+    "blend": 184
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 65,
+    "lo": 58,
     "hi": null,
-    "tm": "DET",
-    "tp": 0.05
+    "tm": "GB",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/lac.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4913037.png",
@@ -18939,7 +18945,7 @@
      ],
      [
       "Sims",
-      "round 1 51%; picks 8-154 in 80% of 200 simulated drafts; likeliest team DET (7%)."
+      "round 1 49%; picks 10-173 in 80% of 200 simulated drafts; likeliest team PHI (9%)."
      ],
      [
       "Value",
@@ -18975,12 +18981,12 @@
     }
    ],
    "sim": {
-    "r1": 0.51,
+    "r1": 0.49,
     "p1": 0,
-    "lo": 8,
-    "hi": 154,
-    "tm": "DET",
-    "tp": 0.07
+    "lo": 10,
+    "hi": 173,
+    "tm": "PHI",
+    "tp": 0.09
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5076950.png",
@@ -19039,7 +19045,7 @@
      ],
      [
       "Sims",
-      "round 1 28%; picks 16-UDFA in 80% of 200 simulated drafts; likeliest team KC (8%)."
+      "round 1 26%; picks 15-UDFA in 80% of 200 simulated drafts; likeliest team LV (7%)."
      ],
      [
       "Value",
@@ -19073,12 +19079,12 @@
     }
    ],
    "sim": {
-    "r1": 0.28,
+    "r1": 0.26,
     "p1": 0,
-    "lo": 16,
+    "lo": 15,
     "hi": null,
-    "tm": "KC",
-    "tp": 0.08
+    "tm": "LV",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5031157.png",
@@ -19137,7 +19143,7 @@
      ],
      [
       "Sims",
-      "round 1 10%; picks 33-UDFA in 80% of 200 simulated drafts; likeliest team ATL (6%)."
+      "round 1 10%; picks 33-UDFA in 80% of 200 simulated drafts; likeliest team IND (7%)."
      ],
      [
       "Value",
@@ -19177,8 +19183,8 @@
     "p1": 0,
     "lo": 33,
     "hi": null,
-    "tm": "ATL",
-    "tp": 0.06
+    "tm": "IND",
+    "tp": 0.07
    },
    "teamLogo": "/img/nfl/chi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4917984.png",
@@ -19249,7 +19255,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 81-UDFA in 80% of 200 simulated drafts; likeliest team PIT (4%)."
+      "round 1 3%; picks 107-UDFA in 80% of 200 simulated drafts; likeliest team BUF (3%)."
      ],
      [
       "Grade",
@@ -19275,16 +19281,16 @@
    },
    "slots": {
     "pred": 207,
-    "blend": 191
+    "blend": 205
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.03,
     "p1": 0,
-    "lo": 81,
+    "lo": 107,
     "hi": null,
-    "tm": "PIT",
-    "tp": 0.04
+    "tm": "BUF",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/buf.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5079451.png",
@@ -19348,7 +19354,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 124-UDFA in 80% of 200 simulated drafts; likeliest team IND (2%)."
+      "round 1 1%; picks 129-UDFA in 80% of 200 simulated drafts; likeliest team PHI (2%)."
      ],
      [
       "Grade",
@@ -19374,11 +19380,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 124,
+    "lo": 129,
     "hi": null,
-    "tm": "IND",
+    "tm": "PHI",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/nyj.png",
@@ -19450,7 +19456,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 132-UDFA in 80% of 200 simulated drafts; likeliest team IND (3%)."
+      "round 1 1%; picks 135-UDFA in 80% of 200 simulated drafts; likeliest team CAR (3%)."
      ],
      [
       "Grade",
@@ -19478,15 +19484,15 @@
    },
    "slots": {
     "pred": null,
-    "blend": 212
+    "blend": null
    },
    "grades": [],
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 132,
+    "lo": 135,
     "hi": null,
-    "tm": "IND",
+    "tm": "CAR",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/min.png",
@@ -19563,7 +19569,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 123-UDFA in 80% of 200 simulated drafts; likeliest team CAR (2%)."
+      "round 1 1%; picks 173-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
      ],
      [
       "Grade",
@@ -19594,11 +19600,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 123,
+    "lo": 173,
     "hi": null,
-    "tm": "CAR",
+    "tm": "DEN",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/min.png",
@@ -19659,7 +19665,7 @@
      ],
      [
       "Sims",
-      "round 1 10%; picks 35-UDFA in 80% of 200 simulated drafts; likeliest team CLE (6%)."
+      "round 1 9%; picks 38-UDFA in 80% of 200 simulated drafts; likeliest team DET (5%)."
      ],
      [
       "Grade",
@@ -19689,12 +19695,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.1,
+    "r1": 0.09,
     "p1": 0,
-    "lo": 35,
+    "lo": 38,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.06
+    "tm": "DET",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/ne.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5197086.png",
@@ -19758,7 +19764,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 84-UDFA in 80% of 200 simulated drafts; likeliest team DEN (4%)."
+      "round 1 1%; picks 87-UDFA in 80% of 200 simulated drafts; likeliest team KC (4%)."
      ],
      [
       "Grade",
@@ -19787,11 +19793,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 84,
+    "lo": 87,
     "hi": null,
-    "tm": "DEN",
+    "tm": "KC",
     "tp": 0.04
    },
    "teamLogo": "/img/nfl/kc.png",
@@ -19851,7 +19857,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 192-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
+      "round 1 <1%; picks 157-UDFA in 80% of 200 simulated drafts; likeliest team KC (2%)."
      ],
      [
       "Grade",
@@ -19883,11 +19889,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
-    "lo": 192,
+    "lo": 157,
     "hi": null,
-    "tm": "DEN",
+    "tm": "KC",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/buf.png",
@@ -19947,7 +19953,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 99-UDFA in 80% of 200 simulated drafts; likeliest team ATL (3%)."
+      "round 1 1%; picks 111-UDFA in 80% of 200 simulated drafts; likeliest team SF (3%)."
      ],
      [
       "Grade",
@@ -19972,15 +19978,15 @@
    },
    "slots": {
     "pred": 196,
-    "blend": 202
+    "blend": 200
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 99,
+    "lo": 111,
     "hi": null,
-    "tm": "ATL",
+    "tm": "SF",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/ten.png",
@@ -20045,7 +20051,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 62-UDFA in 80% of 200 simulated drafts; likeliest team NE (5%)."
+      "round 1 4%; picks 50-UDFA in 80% of 200 simulated drafts; likeliest team KC (4%)."
      ],
      [
       "Grade",
@@ -20077,10 +20083,10 @@
    "sim": {
     "r1": 0.04,
     "p1": 0,
-    "lo": 62,
+    "lo": 50,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.05
+    "tm": "KC",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5121819.png",
@@ -20140,7 +20146,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 63-UDFA in 80% of 200 simulated drafts; likeliest team MIN (5%)."
+      "round 1 5%; picks 78-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
      ],
      [
       "Grade",
@@ -20168,15 +20174,15 @@
    },
    "slots": {
     "pred": 146,
-    "blend": 173
+    "blend": 170
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.05,
     "p1": 0,
-    "lo": 63,
+    "lo": 78,
     "hi": null,
-    "tm": "MIN",
+    "tm": "IND",
     "tp": 0.05
    },
    "teamLogo": "/img/nfl/ne.png",
@@ -20241,7 +20247,7 @@
      ],
      [
       "Sims",
-      "round 1 14%; picks 25-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
+      "round 1 15%; picks 26-UDFA in 80% of 200 simulated drafts; likeliest team LAC (5%)."
      ],
      [
       "Value",
@@ -20275,12 +20281,12 @@
     }
    ],
    "sim": {
-    "r1": 0.14,
+    "r1": 0.15,
     "p1": 0,
-    "lo": 25,
+    "lo": 26,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.07
+    "tm": "LAC",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/car.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5152158.png",
@@ -20344,7 +20350,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 54-UDFA in 80% of 200 simulated drafts; likeliest team GB (6%)."
+      "round 1 3%; picks 58-UDFA in 80% of 200 simulated drafts; likeliest team DET (4%)."
      ],
      [
       "Grade",
@@ -20370,16 +20376,16 @@
    },
    "slots": {
     "pred": 144,
-    "blend": 170
+    "blend": 169
    },
    "grades": [],
    "sim": {
     "r1": 0.03,
     "p1": 0,
-    "lo": 54,
+    "lo": 58,
     "hi": null,
-    "tm": "GB",
-    "tp": 0.06
+    "tm": "DET",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/det.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4881031.png",
@@ -20450,7 +20456,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team CLE (1%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team DET (1%)."
      ],
      [
       "Grade",
@@ -20481,7 +20487,7 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "CLE",
+    "tm": "DET",
     "tp": 0.01
    },
    "teamLogo": "/img/nfl/lac.png",
@@ -20541,7 +20547,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 114-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (2%)."
+      "round 1 1%; picks 125-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
      ],
      [
       "Grade",
@@ -20568,12 +20574,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 114,
+    "lo": 125,
     "hi": null,
-    "tm": "NYJ",
-    "tp": 0.02
+    "tm": "NE",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/ind.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4921116.png",
@@ -20649,7 +20655,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 98-UDFA in 80% of 200 simulated drafts; likeliest team NE (3%)."
+      "round 1 1%; picks 95-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
      ],
      [
       "Grade",
@@ -20677,16 +20683,16 @@
    },
    "slots": {
     "pred": 201,
-    "blend": 213
+    "blend": 201
    },
    "grades": [],
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 98,
+    "lo": 95,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.03
+    "tm": "IND",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4685575.png",
@@ -20717,7 +20723,7 @@
    "cls": "Sr",
    "age": 22.4,
    "ageEst": true,
-   "ovr": 294,
+   "ovr": 293,
    "need": null,
    "cons": null,
    "xPick": 200,
@@ -20746,7 +20752,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 186-UDFA in 80% of 200 simulated drafts; likeliest team DET (3%)."
+      "round 1 <1%; picks 208-UDFA in 80% of 200 simulated drafts; likeliest team CLE (2%)."
      ],
      [
       "Grade",
@@ -20769,16 +20775,16 @@
    },
    "slots": {
     "pred": 194,
-    "blend": 193
+    "blend": 195
    },
    "grades": [],
    "sim": {
     "r1": 0,
     "p1": 0,
-    "lo": 186,
+    "lo": 208,
     "hi": null,
-    "tm": "DET",
-    "tp": 0.03
+    "tm": "CLE",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/ind.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5150302.png",
@@ -20842,7 +20848,7 @@
      ],
      [
       "Sims",
-      "round 1 10%; picks 33-UDFA in 80% of 200 simulated drafts; likeliest team NE (6%)."
+      "round 1 7%; picks 38-UDFA in 80% of 200 simulated drafts; likeliest team TEN (8%)."
      ],
      [
       "Grade",
@@ -20868,12 +20874,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.1,
+    "r1": 0.07,
     "p1": 0,
-    "lo": 33,
+    "lo": 38,
     "hi": null,
-    "tm": "NE",
-    "tp": 0.06
+    "tm": "TEN",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/sea.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5067875.png",
@@ -20949,7 +20955,7 @@
      ],
      [
       "Sims",
-      "round 1 3%; picks 63-UDFA in 80% of 200 simulated drafts; likeliest team DEN (3%)."
+      "round 1 2%; picks 65-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
      ],
      [
       "Grade",
@@ -20975,12 +20981,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.03,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 63,
+    "lo": 65,
     "hi": null,
-    "tm": "DEN",
-    "tp": 0.03
+    "tm": "CLE",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/nyj.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4918136.png",
@@ -21039,7 +21045,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 81-UDFA in 80% of 200 simulated drafts; likeliest team PIT (5%)."
+      "round 1 1%; picks 123-UDFA in 80% of 200 simulated drafts; likeliest team NE (4%)."
      ],
      [
       "Grade",
@@ -21073,10 +21079,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 81,
+    "lo": 123,
     "hi": null,
-    "tm": "PIT",
-    "tp": 0.05
+    "tm": "NE",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/wsh.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5219993.png",
@@ -21136,7 +21142,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 174-UDFA in 80% of 200 simulated drafts; likeliest team PHI (2%)."
+      "round 1 1%; picks 128-UDFA in 80% of 200 simulated drafts; likeliest team IND (2%)."
      ],
      [
       "Grade",
@@ -21168,11 +21174,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 174,
+    "lo": 128,
     "hi": null,
-    "tm": "PHI",
+    "tm": "IND",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/cle.png",
@@ -21244,7 +21250,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team IND (1%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team NYG (1%)."
      ],
      [
       "Grade",
@@ -21274,11 +21280,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "IND",
+    "tm": "NYG",
     "tp": 0.01
    },
    "teamLogo": "/img/nfl/sf.png",
@@ -21338,7 +21344,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 88-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 2%; picks 76-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
      ],
      [
       "Grade",
@@ -21368,9 +21374,9 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 88,
+    "lo": 76,
     "hi": null,
     "tm": "IND",
     "tp": 0.04
@@ -21437,7 +21443,7 @@
      ],
      [
       "Sims",
-      "round 1 9%; picks 37-UDFA in 80% of 200 simulated drafts; likeliest team CLE (7%)."
+      "round 1 15%; picks 25-UDFA in 80% of 200 simulated drafts; likeliest team DET (8%)."
      ],
      [
       "Value",
@@ -21468,12 +21474,12 @@
     }
    ],
    "sim": {
-    "r1": 0.09,
+    "r1": 0.15,
     "p1": 0,
-    "lo": 37,
+    "lo": 25,
     "hi": null,
-    "tm": "CLE",
-    "tp": 0.07
+    "tm": "DET",
+    "tp": 0.08
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4707184.png",
@@ -21537,7 +21543,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 150-UDFA in 80% of 200 simulated drafts; likeliest team DET (2%)."
+      "round 1 <1%; picks 181-UDFA in 80% of 200 simulated drafts; likeliest team CIN (2%)."
      ],
      [
       "Grade",
@@ -21569,11 +21575,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
-    "lo": 150,
+    "lo": 181,
     "hi": null,
-    "tm": "DET",
+    "tm": "CIN",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/dal.png",
@@ -21638,7 +21644,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team GB (2%)."
+      "round 1 1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team IND (1%)."
      ],
      [
       "Grade",
@@ -21668,8 +21674,8 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "GB",
-    "tp": 0.02
+    "tm": "IND",
+    "tp": 0.01
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4870708.png",
@@ -21724,7 +21730,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 96-UDFA in 80% of 200 simulated drafts; likeliest team PIT (3%)."
+      "round 1 1%; picks 121-UDFA in 80% of 200 simulated drafts; likeliest team SEA (3%)."
      ],
      [
       "Grade",
@@ -21752,15 +21758,15 @@
    },
    "slots": {
     "pred": null,
-    "blend": 219
+    "blend": null
    },
    "grades": [],
    "sim": {
-    "r1": 0.02,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 96,
+    "lo": 121,
     "hi": null,
-    "tm": "PIT",
+    "tm": "SEA",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/gb.png",
@@ -21816,7 +21822,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 149-UDFA in 80% of 200 simulated drafts; likeliest team GB (2%)."
+      "round 1 1%; picks 166-UDFA in 80% of 200 simulated drafts; likeliest team CAR (2%)."
      ],
      [
       "Grade",
@@ -21848,11 +21854,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 149,
+    "lo": 166,
     "hi": null,
-    "tm": "GB",
+    "tm": "CAR",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/cle.png",
@@ -21917,7 +21923,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 174-UDFA in 80% of 200 simulated drafts; likeliest team LAR (2%)."
+      "round 1 1%; picks 169-UDFA in 80% of 200 simulated drafts; likeliest team IND (2%)."
      ],
      [
       "Grade",
@@ -21951,11 +21957,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 174,
+    "lo": 169,
     "hi": null,
-    "tm": "LAR",
+    "tm": "IND",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/lac.png",
@@ -22015,7 +22021,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 99-UDFA in 80% of 200 simulated drafts; likeliest team IND (5%)."
+      "round 1 2%; picks 83-UDFA in 80% of 200 simulated drafts; likeliest team ARI (3%)."
      ],
      [
       "Grade",
@@ -22051,10 +22057,10 @@
    "sim": {
     "r1": 0.02,
     "p1": 0,
-    "lo": 99,
+    "lo": 83,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.05
+    "tm": "ARI",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/sea.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4717429.png",
@@ -22113,7 +22119,7 @@
      ],
      [
       "Sims",
-      "round 1 4%; picks 57-UDFA in 80% of 200 simulated drafts; likeliest team DET (4%)."
+      "round 1 2%; picks 64-UDFA in 80% of 200 simulated drafts; likeliest team BUF (5%)."
      ],
      [
       "Grade",
@@ -22145,12 +22151,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.04,
+    "r1": 0.02,
     "p1": 0,
-    "lo": 57,
+    "lo": 64,
     "hi": null,
-    "tm": "DET",
-    "tp": 0.04
+    "tm": "BUF",
+    "tp": 0.05
    },
    "teamLogo": "/img/nfl/pit.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4917302.png",
@@ -22221,7 +22227,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks 160-UDFA in 80% of 200 simulated drafts; likeliest team DEN (2%)."
+      "round 1 1%; picks 149-UDFA in 80% of 200 simulated drafts; likeliest team CLE (2%)."
      ],
      [
       "Grade",
@@ -22253,11 +22259,11 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0,
+    "r1": 0.01,
     "p1": 0,
-    "lo": 160,
+    "lo": 149,
     "hi": null,
-    "tm": "DEN",
+    "tm": "CLE",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/min.png",
@@ -22317,7 +22323,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 151-UDFA in 80% of 200 simulated drafts; likeliest team CIN (3%)."
+      "round 1 <1%; picks 187-UDFA in 80% of 200 simulated drafts; likeliest team NYG (2%)."
      ],
      [
       "Grade",
@@ -22344,12 +22350,12 @@
    },
    "grades": [],
    "sim": {
-    "r1": 0.01,
+    "r1": 0,
     "p1": 0,
-    "lo": 151,
+    "lo": 187,
     "hi": null,
-    "tm": "CIN",
-    "tp": 0.03
+    "tm": "NYG",
+    "tp": 0.02
    },
    "teamLogo": "/img/nfl/chi.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4899368.png",
@@ -22408,7 +22414,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 77-UDFA in 80% of 200 simulated drafts; likeliest team PIT (2%)."
+      "round 1 2%; picks 80-UDFA in 80% of 200 simulated drafts; likeliest team CIN (3%)."
      ],
      [
       "Grade",
@@ -22434,16 +22440,16 @@
    },
    "slots": {
     "pred": 191,
-    "blend": 206
+    "blend": 207
    },
    "grades": [],
    "sim": {
     "r1": 0.02,
     "p1": 0,
-    "lo": 77,
+    "lo": 80,
     "hi": null,
-    "tm": "PIT",
-    "tp": 0.02
+    "tm": "CIN",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/cin.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5219991.png",
@@ -22474,7 +22480,7 @@
    "cls": "Sr",
    "age": 21.9,
    "ageEst": true,
-   "ovr": 945,
+   "ovr": 944,
    "need": "need #3",
    "cons": null,
    "xPick": 255,
@@ -22507,7 +22513,7 @@
      ],
      [
       "Sims",
-      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team MIN (2%)."
+      "round 1 <1%; picks null-UDFA in 80% of 200 simulated drafts; likeliest team TEN (2%)."
      ],
      [
       "Grade",
@@ -22540,7 +22546,7 @@
     "p1": 0,
     "lo": null,
     "hi": null,
-    "tm": "MIN",
+    "tm": "TEN",
     "tp": 0.02
    },
    "teamLogo": "/img/nfl/sf.png",
@@ -22612,7 +22618,7 @@
      ],
      [
       "Sims",
-      "round 1 1%; picks 112-UDFA in 80% of 200 simulated drafts; likeliest team NYJ (2%)."
+      "round 1 1%; picks 144-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
      ],
      [
       "Grade",
@@ -22645,10 +22651,10 @@
    "sim": {
     "r1": 0.01,
     "p1": 0,
-    "lo": 112,
+    "lo": 144,
     "hi": null,
-    "tm": "NYJ",
-    "tp": 0.02
+    "tm": "CLE",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/min.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5152699.png",
@@ -22707,7 +22713,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 59-UDFA in 80% of 200 simulated drafts; likeliest team IND (4%)."
+      "round 1 6%; picks 68-UDFA in 80% of 200 simulated drafts; likeliest team DET (3%)."
      ],
      [
       "Grade",
@@ -22739,10 +22745,10 @@
    "sim": {
     "r1": 0.06,
     "p1": 0,
-    "lo": 59,
+    "lo": 68,
     "hi": null,
-    "tm": "IND",
-    "tp": 0.04
+    "tm": "DET",
+    "tp": 0.03
    },
    "teamLogo": "/img/nfl/jax.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5078165.png",
@@ -22818,7 +22824,7 @@
      ],
      [
       "Sims",
-      "round 1 50%; picks 11-131 in 80% of 200 simulated drafts; likeliest team PHI (8%)."
+      "#1 overall 1%; round 1 57%; picks 8-113 in 80% of 200 simulated drafts; likeliest team ATL (10%)."
      ],
      [
       "Value",
@@ -22856,12 +22862,12 @@
     }
    ],
    "sim": {
-    "r1": 0.5,
-    "p1": 0,
-    "lo": 11,
-    "hi": 131,
-    "tm": "PHI",
-    "tp": 0.08
+    "r1": 0.57,
+    "p1": 0.005,
+    "lo": 8,
+    "hi": 113,
+    "tm": "ATL",
+    "tp": 0.1
    },
    "teamLogo": "/img/nfl/mia.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/4701308.png",
@@ -22937,7 +22943,7 @@
      ],
      [
       "Sims",
-      "round 1 2%; picks 119-UDFA in 80% of 200 simulated drafts; likeliest team CAR (3%)."
+      "round 1 2%; picks 94-UDFA in 80% of 200 simulated drafts; likeliest team CLE (3%)."
      ],
      [
       "Grade",
@@ -22971,9 +22977,9 @@
    "sim": {
     "r1": 0.02,
     "p1": 0,
-    "lo": 119,
+    "lo": 94,
     "hi": null,
-    "tm": "CAR",
+    "tm": "CLE",
     "tp": 0.03
    },
    "teamLogo": "/img/nfl/lac.png",
@@ -23038,7 +23044,7 @@
      ],
      [
       "Sims",
-      "round 1 6%; picks 46-UDFA in 80% of 200 simulated drafts; likeliest team DET (6%)."
+      "round 1 4%; picks 53-UDFA in 80% of 200 simulated drafts; likeliest team CLE (4%)."
      ],
      [
       "Grade",
@@ -23064,16 +23070,16 @@
    },
    "slots": {
     "pred": 122,
-    "blend": 178
+    "blend": 174
    },
    "grades": [],
    "sim": {
-    "r1": 0.06,
+    "r1": 0.04,
     "p1": 0,
-    "lo": 46,
+    "lo": 53,
     "hi": null,
-    "tm": "DET",
-    "tp": 0.06
+    "tm": "CLE",
+    "tp": 0.04
    },
    "teamLogo": "/img/nfl/kc.png",
    "photo": "https://a.espncdn.com/i/headshots/college-football/players/full/5078162.png",
