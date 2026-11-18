@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-18T21:24:05Z",
+ "asof": "2026-11-18T22:25:44Z",
  "recenter": {
-  "2026-11-18": 1.49
+  "2026-11-18": 1.51
  },
  "monitor": {
   "clocks": {
@@ -328,13 +328,29 @@
  },
  "model": {
   "asof": "2026-11-18T19:29:08Z",
-  "ageH": 1.9,
+  "ageH": 2.9,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401910011",
+   "sport": "nba",
+   "kick": "2026-11-19T00:30:00Z",
+   "home": "BKN",
+   "away": "CHI",
+   "mk": "spread",
+   "side": "home",
+   "line": 1.5,
+   "price": -114.0,
+   "edge": 2.4,
+   "x": 4.0,
+   "why": "edge under 4 (line: <4)",
+   "m": 3.9,
+   "tm": 237.7
+  },
   {
    "id": "401910015",
    "sport": "nba",
@@ -408,7 +424,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -114.0,
+   "price": -106.0,
    "edge": 2.1,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -440,7 +456,7 @@
    "mk": "total",
    "side": "under",
    "line": 225.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.0,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
@@ -448,34 +464,18 @@
    "tm": 223.5
   },
   {
-   "id": "401910011",
-   "sport": "nba",
-   "kick": "2026-11-19T00:30:00Z",
-   "home": "BKN",
-   "away": "CHI",
-   "mk": "total",
-   "side": "under",
-   "line": 239.5,
-   "price": -110.0,
-   "edge": 1.8,
-   "x": 6.0,
-   "why": "edge under 6 (total: high)",
-   "m": 3.9,
-   "tm": 237.7
-  },
-  {
    "id": "401910017",
    "sport": "nba",
    "kick": "2026-11-19T03:00:00Z",
    "home": "LAL",
    "away": "UTAH",
-   "mk": "total",
-   "side": "under",
-   "line": 232.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 11.5,
    "price": -114.0,
-   "edge": 1.4,
-   "x": 6.0,
-   "why": "edge under 6 (total: high)",
+   "edge": 1.3,
+   "x": 5.0,
+   "why": "edge under 5 (venue: home)",
    "m": 12.8,
    "tm": 231.1
   },
@@ -520,7 +520,7 @@
    "mk": "spread",
    "side": "away",
    "line": -4.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.9,
    "x": null,
    "why": "spread market off",
@@ -545,7 +545,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -114.0,
+   "price": -106.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -578,11 +578,11 @@
    "state": "under"
   },
   "401910011": {
-   "mk": "total",
-   "side": "under",
-   "line": 239.5,
-   "price": -110.0,
-   "edge": 1.8,
+   "mk": "spread",
+   "side": "home",
+   "line": 1.5,
+   "price": -114.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "BKN",
@@ -605,7 +605,7 @@
    "mk": "spread",
    "side": "away",
    "line": -4.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -629,7 +629,7 @@
    "mk": "total",
    "side": "under",
    "line": 225.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -650,11 +650,11 @@
    "state": "under"
   },
   "401910017": {
-   "mk": "total",
-   "side": "under",
-   "line": 232.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 11.5,
    "price": -114.0,
-   "edge": 1.4,
+   "edge": 1.3,
    "ev": null,
    "units": 0.0,
    "home": "LAL",
@@ -726,7 +726,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4834,
+  "snapshots": 4839,
   "buckets": [
    {
     "when": "24h+",
@@ -739,21 +739,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1107,
-    "clvRet": -0.0206,
-    "clvT": -5.35,
+    "clvN": 1108,
+    "clvRet": -0.0207,
+    "clvT": -5.36,
     "clv": 0.41,
     "beat": 0.437,
-    "still": 0.4
+    "still": 0.401
    },
    {
     "when": "1-6h",
-    "clvN": 425,
-    "clvRet": -0.054,
-    "clvT": -13.3,
+    "clvN": 427,
+    "clvRet": -0.0539,
+    "clvT": -13.35,
     "clv": -0.13,
-    "beat": 0.191,
-    "still": 0.642
+    "beat": 0.19,
+    "still": 0.644
    },
    {
     "when": "<1h",
@@ -7401,7 +7401,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T21:24:05Z",
+ "checked": "2026-11-18T22:25:44Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
