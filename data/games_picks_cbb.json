@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T15:36:23Z",
+ "asof": "2026-11-18T15:45:07Z",
  "recenter": {
   "2026-11-18": 1.94
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-18T15:31:05Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [],
@@ -1897,13 +1897,13 @@
    "flagged": "2026-11-18T00:59:58Z",
    "paper": true,
    "betTo": 145.0,
-   "close": 138.5,
+   "close": 137.5,
    "now": {
     "mk": "total",
     "side": "over",
-    "line": 138.5,
-    "price": -110.0,
-    "ev": 0.136,
+    "line": 137.5,
+    "price": -114.0,
+    "ev": 0.134,
     "units": 1.5
    }
   },
@@ -2030,14 +2030,7 @@
    "paper": true,
    "betTo": 148.5,
    "close": 151.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 151.5,
-    "price": -119.0,
-    "ev": 0.097,
-    "units": 0.25
-   }
+   "now": null
   },
   {
    "id": "401920947",
@@ -2139,7 +2132,7 @@
     "side": "under",
     "line": 146.5,
     "price": -119.0,
-    "ev": 0.087,
+    "ev": 0.088,
     "units": 0.25
    }
   },
@@ -2209,12 +2202,10 @@
     "ev": 0.129,
     "units": 1.0
    }
-  }
- ],
- "withdrawn": [],
- "board": [
+  },
   {
    "id": "401920158",
+   "espn": "401920158",
    "sport": "cbb",
    "kick": "2026-11-19T03:30:00Z",
    "home": "UCLA",
@@ -2222,12 +2213,51 @@
    "mk": "spread",
    "side": "home",
    "line": 32.5,
-   "price": -114.0,
+   "price": -110.0,
+   "p": 0.565,
+   "ev": 0.079,
+   "units": 0.25,
    "edge": 7.1,
    "x": 5.0,
-   "why": "no edge at -114",
+   "pDU": 0.5239,
+   "evDU": 0.0002,
+   "fair": 32.38,
+   "bk": "poly",
+   "seg": "tier: mixed",
    "m": 39.6,
-   "tm": 166.0
+   "tm": 166.0,
+   "tmRaw": 167.9,
+   "flagged": "2026-11-18T15:45:07Z",
+   "paper": true,
+   "betTo": 34.5,
+   "close": 32.5,
+   "now": {
+    "mk": "spread",
+    "side": "home",
+    "line": 32.5,
+    "price": -110.0,
+    "ev": 0.079,
+    "units": 0.25
+   }
+  }
+ ],
+ "withdrawn": [],
+ "board": [
+  {
+   "id": "401920515",
+   "sport": "cbb",
+   "kick": "2026-11-19T00:30:00Z",
+   "home": "West Virginia",
+   "away": "Kansas",
+   "mk": "total",
+   "side": "under",
+   "line": 151.5,
+   "price": -119.0,
+   "edge": 4.9,
+   "x": 2.5,
+   "why": "no edge at -119",
+   "m": -6.2,
+   "tm": 146.6
   },
   {
    "id": "401920516",
@@ -2310,22 +2340,6 @@
    "tm": 147.7
   },
   {
-   "id": "401911377",
-   "sport": "cbb",
-   "kick": "2026-11-19T00:00:00Z",
-   "home": "Charleston Southern",
-   "away": "Wofford",
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -124.0,
-   "edge": 5.8,
-   "x": 5.0,
-   "why": "no edge at -124",
-   "m": 3.3,
-   "tm": 159.5
-  },
-  {
    "id": "401921134",
    "sport": "cbb",
    "kick": "2026-11-19T00:30:00Z",
@@ -2356,6 +2370,22 @@
    "why": "edge under 5 (line: <4)",
    "m": 3.4,
    "tm": 149.4
+  },
+  {
+   "id": "401911377",
+   "sport": "cbb",
+   "kick": "2026-11-19T00:00:00Z",
+   "home": "Charleston Southern",
+   "away": "Wofford",
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -106.0,
+   "edge": 4.8,
+   "x": 5.0,
+   "why": "edge under 5 (line: <4)",
+   "m": 3.3,
+   "tm": 159.5
   },
   {
    "id": "401926064",
@@ -2462,7 +2492,7 @@
    "mk": "total",
    "side": "under",
    "line": 146.5,
-   "price": -110.0,
+   "price": -119.0,
    "edge": 3.2,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2510,7 +2540,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 3.2,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2574,7 +2604,7 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.6,
    "x": 6.5,
    "why": "edge under 6.5 (tier: mixed)",
@@ -2619,7 +2649,7 @@
    "mk": "total",
    "side": "under",
    "line": 146.5,
-   "price": -110.0,
+   "price": -119.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -2642,15 +2672,14 @@
   "401920515": {
    "mk": "total",
    "side": "under",
-   "line": 150.5,
-   "price": -101,
-   "ev": 0.018,
+   "line": 151.5,
+   "price": -119.0,
    "edge": 4.9,
-   "units": 0.5,
-   "bk": "poly",
+   "ev": null,
+   "units": 0.0,
    "home": "West Virginia",
    "away": "Kansas",
-   "state": "paper"
+   "state": "under"
   },
   "401920516": {
    "mk": "spread",
@@ -2765,7 +2794,7 @@
    "mk": "spread",
    "side": "away",
    "line": 29.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2850,21 +2879,22 @@
    "mk": "spread",
    "side": "home",
    "line": 32.5,
-   "price": -114.0,
+   "price": -110.0,
+   "ev": 0.079,
    "edge": 7.1,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
+   "bk": "poly",
    "home": "UCLA",
    "away": "Cal State Fullerton",
-   "state": "under"
+   "state": "paper"
   },
   "401929004": {
    "mk": "total",
    "side": "over",
-   "line": 143.5,
-   "price": 155,
-   "ev": 0.108,
-   "edge": 14.0,
+   "line": 139.5,
+   "price": 111,
+   "ev": 0.071,
+   "edge": 15.0,
    "units": 1.5,
    "bk": "poly",
    "home": "Hawai'i",
@@ -2899,7 +2929,7 @@
    "mk": "spread",
    "side": "away",
    "line": 37.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2935,7 +2965,7 @@
    "mk": "total",
    "side": "over",
    "line": 139.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2995,7 +3025,7 @@
    "mk": "total",
    "side": "over",
    "line": 153.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -3007,7 +3037,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -3031,7 +3061,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -124.0,
+   "price": -134.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -3079,7 +3109,7 @@
    "mk": "spread",
    "side": "home",
    "line": 25.5,
-   "price": -106.0,
+   "price": 103.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -3162,9 +3192,9 @@
   "401911377": {
    "mk": "spread",
    "side": "home",
-   "line": -2.5,
-   "price": -124.0,
-   "edge": 5.8,
+   "line": -1.5,
+   "price": -106.0,
+   "edge": 4.8,
    "ev": null,
    "units": 0.0,
    "home": "Charleston Southern",
@@ -3236,9 +3266,9 @@
   "401922047": {
    "mk": "total",
    "side": "under",
-   "line": 151.5,
-   "price": 126,
-   "ev": 0.068,
+   "line": 149.5,
+   "price": 155,
+   "ev": 0.081,
    "edge": 7.0,
    "units": 1.5,
    "bk": "poly",
@@ -3408,7 +3438,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19030,
+  "snapshots": 19048,
   "buckets": [
    {
     "when": "24h+",
@@ -3421,12 +3451,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3922,
-    "clvRet": -0.0124,
-    "clvT": -6.87,
+    "clvN": 3925,
+    "clvRet": -0.0126,
+    "clvT": -6.97,
     "clv": 0.47,
     "beat": 0.393,
-    "still": 0.413
+    "still": 0.414
    },
    {
     "when": "1-6h",
@@ -18486,7 +18516,7 @@
    "flagged": "2026-11-18T00:59:58Z",
    "paper": true,
    "betTo": 145.0,
-   "close": 138.5
+   "close": 137.5
   },
   {
    "id": "401920514",
@@ -18747,6 +18777,35 @@
    "paper": true,
    "betTo": 135.5,
    "close": 133.5
+  },
+  {
+   "id": "401920158",
+   "espn": "401920158",
+   "sport": "cbb",
+   "kick": "2026-11-19T03:30:00Z",
+   "home": "UCLA",
+   "away": "Cal State Fullerton",
+   "mk": "spread",
+   "side": "home",
+   "line": 32.5,
+   "price": -110.0,
+   "p": 0.565,
+   "ev": 0.079,
+   "units": 0.25,
+   "edge": 7.1,
+   "x": 5.0,
+   "pDU": 0.5239,
+   "evDU": 0.0002,
+   "fair": 32.38,
+   "bk": "poly",
+   "seg": "tier: mixed",
+   "m": 39.6,
+   "tm": 166.0,
+   "tmRaw": 167.9,
+   "flagged": "2026-11-18T15:45:07Z",
+   "paper": true,
+   "betTo": 34.5,
+   "close": 32.5
   }
  ],
  "withdrawnLog": [
@@ -20790,7 +20849,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T15:36:23Z",
+ "checked": "2026-11-18T15:45:07Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
