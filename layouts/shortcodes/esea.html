@@ -1071,6 +1071,7 @@
 {{- $sl := slice (dict "s" (string $season) "rows" (cond (and $d $d.players) $d.players slice)) }}
 {{- with $d }}{{ with .seasons }}{{ $ks := slice }}{{ range $k, $_ := . }}{{ $ks = $ks | append (int $k) }}{{ end }}{{ range sort $ks "value" "desc" }}{{ $rs := index $d.seasons (string .) }}{{ if $rs }}{{ $sl = $sl | append (dict "s" (string .) "rows" $rs) }}{{ end }}{{ end }}{{ end }}{{ end }}
 {{- $rwS := dict }}{{ with site.Data.esea_rwa }}{{ with .seasons }}{{ $rwS = . }}{{ end }}{{ end }}
+{{- $idNick := dict }}{{ with $d }}{{ range .members }}{{ $idNick = merge $idNick (dict .id .nick) }}{{ end }}{{ end }}
 {{- $lv := dict }}{{ with $d }}{{ with .profile }}{{ range .roster }}{{ $lv = merge $lv (dict (lower .nickname) .) }}{{ end }}{{ end }}{{ end }}
 <div class="win esea-pc{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
@@ -1088,7 +1089,7 @@
     <div data-tab="S{{ $sn }}">
     {{- if $t.rows }}
     <div class="esea-pc__grid">
-    {{- range $t.rows }}{{ $rwv := "" }}{{ with index $rwS .name }}{{ with index . $sn }}{{ $rwv = partial "num.html" (slice "%+.1f" (float (index . 0))) }}{{ end }}{{ end }}
+    {{- range $t.rows }}{{ $rwv := "" }}{{ $cur := .name }}{{ with .id }}{{ $cur = index $idNick . | default $cur }}{{ end }}{{ with index $rwS $cur }}{{ with index . $sn }}{{ $rwv = partial "num.html" (slice "%+.1f" (float (index . 0))) }}{{ end }}{{ end }}
       <article class="esea-pc__card{{ if eq .name $me }} is-me{{ end }}">
         <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ if eq $i 0 }}{{ with index $lv (lower .name) }}{{ with .talent }} {{ partial "esea/stars.html" (dict "t" .) }}{{ end }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
         {{- with .role }}<p class="esea-pc__role"><span class="esea-role" data-role="{{ index (split . " ") 0 }}">{{ . }}</span></p>{{ end }}
