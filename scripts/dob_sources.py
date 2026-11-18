@@ -145,6 +145,80 @@ def wikipedia(names, kw='basketball', limit=200):
         if m: out[n] = {'title': hits[0], 'dob': f'{m[1]}-{int(m[2]):02d}-{int(m[3]):02d}', 'text': wt.lower()}
     return out
 
+# ---- English Wikipedia college player articles ------------------------------------------------------------------
+# Many current players' articles carry no {{birth date}} template: the date is plain text ("Oct 28 2005"), month and
+# year only ("January 2006"), or month and day in a hidden comment citing a team's birthday post ("<!-- October 9
+# https://x.com/... -->"). wiki_birth() reads all of them, with the precision.
+INFOBOX = {'football': 'Infobox college football player', 'basketball': 'Infobox basketball biography'}
+MON = {m: i + 1 for i, m in enumerate(['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'])}
+_M = r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?'
+_TPL_TXT = re.compile(r'\{\{\s*birth[ _-]?date(?: and age)?\s*\|(?:\s*\w+\s*=[^|}]*\|)*\s*([^|}]+)', re.I)
+_ISO = re.compile(r'(\d{4})-(\d{2})-(\d{2})')
+_MDY = re.compile(_M + r'\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})', re.I)
+_DMY = re.compile(r'(\d{1,2})\s+' + _M + r',?\s+(\d{4})', re.I)
+_MY = re.compile(_M + r',?\s+(\d{4})', re.I)
+_MD = re.compile(_M + r'\s+(\d{1,2})(?:st|nd|rd|th)?\b(?!,?\s*\d{4})', re.I)
+_BORN = re.compile("'''[^'\\n]+'''[^(\\n]{0,40}\\(born ([^)\\n]{3,40})\\)")
+
+
+def parse_date(s):
+    """free text -> (iso, precision) with precision 'day', 'month' (iso day set to the 15th) or 'md' (month and day,
+    no year: iso year 0000), else None"""
+    s = s or ''
+    for rx, f in ((_ISO, lambda m: (m[1], m[2], m[3])), (_MDY, lambda m: (m[3], MON[m[1][:3].lower()], m[2])),
+                  (_DMY, lambda m: (m[3], MON[m[2][:3].lower()], m[1]))):
+        m = rx.search(s)
+        if m:
+            y, mo, d = (int(x) for x in f(m))
+            if 1 <= mo <= 12 and 1 <= d <= 31: return f'{y:04d}-{mo:02d}-{d:02d}', 'day'
+    m = _MY.search(s)
+    if m: return f'{int(m[2]):04d}-{MON[m[1][:3].lower()]:02d}-15', 'month'
+    m = _MD.search(s)
+    if m and 1 <= int(m[2]) <= 31: return f'0000-{MON[m[1][:3].lower()]:02d}-{int(m[2]):02d}', 'md'
+    return None
+
+
+def wiki_birth(wt):
+    """an article's birth date: the {{birth date}} template, else the infobox birth_date field as text (comments
+    included), else '(born ...)' in the lead -> (iso, precision) or None"""
+    m = BIRTH.search(wt)
+    if m: return f'{m[1]}-{int(m[2]):02d}-{int(m[3]):02d}', 'day'
+    f = re.search(r'\|\s*birth_date\s*=(.*)', wt)
+    if f:
+        m = _TPL_TXT.search(f[1])
+        r = parse_date(m[1] if m else f[1])
+        if r: return r
+    m = _BORN.search(wt)
+    return parse_date(m[1]) if m else None
+
+
+def first_college_year(wt):
+    """the first year of his college career from the infobox college years ('(2024–present)'), or None"""
+    f = re.search(r'\|\s*college\s*=(.*?)(?=\n\s*\||\n\}\})', wt, re.S)   # the value can run over several '*' lines
+    ys = [int(y) for y in re.findall(r'\((\d{4})\s*[–-]', f[1] if f else '')]
+    return min(ys) if ys else None
+
+
+def enwiki_titles(occ='football'):
+    """titles of every English Wikipedia article using the sport's college infobox (one SPARQL call through
+    Wikidata's MWAPI generator, since the Wikimedia action API rate-limits cloud runners)"""
+    q = f'''SELECT ?title WHERE {{ SERVICE wikibase:mwapi {{ bd:serviceParam wikibase:endpoint "en.wikipedia.org";
+      wikibase:api "Generator"; mwapi:generator "embeddedin"; mwapi:geititle "Template:{INFOBOX[occ]}";
+      mwapi:geinamespace "0"; mwapi:geilimit "max". ?title wikibase:apiOutput mwapi:title. }} }}'''
+    for wait in (0, 30, 90):
+        time.sleep(wait)
+        code, body = _get('https://query.wikidata.org/sparql?format=json&query=' + urllib.parse.quote(q), 120)
+        if code != 429: break
+    try: return [b['title']['value'] for b in json.loads(body)['results']['bindings']]
+    except (ValueError, KeyError):
+        print('wikipedia title list failed', code); return []
+
+
+def wiki_raw(title):
+    """an article's wikitext (index.php?action=raw): '' when there is none, None when refused"""
+    code, body = _get('https://en.wikipedia.org/w/index.php?action=raw&title=' + urllib.parse.quote(title.replace(' ', '_')), 30)
+    return body if code == 200 else '' if code == 404 else None
+
 
 def gap(a, b): return abs((dt.date.fromisoformat(a) - dt.date.fromisoformat(b)).days)
 

@@ -4,7 +4,7 @@
 fills from Wikidata and Wikipedia by exact name, school must match).
 
     python3 scripts/cfb_dob.py                    # best-graded undated players first, within the per-run budgets
-    python3 scripts/cfb_dob.py --wd 1500 --bios 300 --check
+    python3 scripts/cfb_dob.py --wd 1500 --bios 300 --wiki 1500 --check
 
 Sources, first that has him (scripts/dob_sources.py):
   0. data/dob_overrides.json "cfb" (key '<name>|<team>'): checked by hand against a cited page
@@ -13,11 +13,13 @@ Sources, first that has him (scripts/dob_sources.py):
   1b. Wikidata, no team or school listed but a Sports Reference college football id: the one such item with his
      name, his name unique on the board, born to fit his class
   2. his school's athletics roster bio (scripts/school_bios.py), when the school prints a birth date
+  3. his English Wikipedia article (college football infobox, school must match): plain-text dates, month and year
+     (the 15th), or month and day only (year from his first college season, kept as an estimate: est)
 Each date is kept with its source; a miss is retried after 30 days. --check also compares every dated player's
 Wikidata date with the one used and logs disagreements to data/dob_conflicts_cfb.json. Tankathon's robots.txt
 disallows Claude and AI crawlers, so its draft-age dates are not read, and the ones kept before are dropped.
 """
-import datetime as dt, json, os, re, sys
+import datetime as dt, json, os, re, sys, time, urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import cfb_all as CA
@@ -41,6 +43,58 @@ def arg(name, default):
     return int(sys.argv[sys.argv.index(name) + 1]) if name in sys.argv else default
 
 
+# 3. English Wikipedia articles with the college football infobox (title list from one SPARQL call, then each
+# matching article's wikitext; cached, a miss re-read after 30 days): plain-text, month-and-year and month-and-day
+# dates the {{birth date}} readers above miss. Month and year -> the 15th (age within .05). Month and day only -> the
+# year his first college season implies (US school cutoff: born Sep-Dec, the year before), kept as an estimate.
+WIKI = os.path.join(HERE, 'data', 'wiki_cfb.json')
+
+
+def md_year(md, first):
+    """month-day with no year + first college season -> the usual birth year (Sep 1 school-entry cutoff)"""
+    mo = int(md[5:7])
+    return f'{first - 18 - (1 if mo >= 9 else 0):04d}{md[4:]}'
+
+
+def wiki_step(todo, store, key, ci, today, budget, guess=150):
+    import names as N
+    cache = json.load(open(WIKI)) if os.path.exists(WIKI) else {}
+    titles = DS.enwiki_titles('football')
+    by = {}
+    for t in titles: by.setdefault(N.key(re.sub(r'\s*\([^)]*\)$', '', t)), []).append(t)
+    # articles under the general gridiron infobox are not in that list (Charlie Becker): the best-graded undated
+    # players with no listed article get the usual '<name> (American football)' title tried
+    for r in [r for r in todo if N.key(r[ci['name']]) not in by][:guess]:
+        by[N.key(r[ci['name']])] = [f"{r[ci['name']]} (American football)"]
+    fresh = lambda t: t in cache and (cache[t].get('birth') or (today - dt.date.fromisoformat(cache[t]['checked'])).days < 30)
+    need = [t for r in todo if not (store.get(key(r)) or {}).get('dob') for t in by.get(N.key(r[ci['name']]), []) if not fresh(t)]
+    for t in list(dict.fromkeys(need))[:budget]:
+        wt = DS.wiki_raw(t)
+        if wt is None: print('wikipedia: refused, stopping this run'); break
+        b = DS.wiki_birth(wt)
+        teams = ' '.join(m for f in ('current_team', 'college') for m in re.findall(r'\|\s*' + f + r'\s*=(.*?)(?=\n\s*\||\n\}\})', wt, re.S)).lower()
+        cache[t] = {'checked': today.isoformat(), 'birth': list(b) if b else None, 'first': DS.first_college_year(wt),
+                    'teams': re.sub(r'\s+', ' ', re.sub(r'\[\[[^|\]]*\|', '', teams).replace('[[', '').replace(']]', ''))[:300]}
+        time.sleep(0.5)
+    json.dump(dict(sorted(cache.items())), open(WIKI, 'w'), indent=1, ensure_ascii=False); open(WIKI, 'a').write('\n')
+    n = {'wikipedia-day': 0, 'wikipedia-month': 0, 'wikipedia-md': 0}
+    for r in todo:
+        if (store.get(key(r)) or {}).get('dob'): continue
+        school = (r[ci['team']] or '').lower()
+        hits = [(t, cache[t]) for t in by.get(N.key(r[ci['name']]), []) if (cache.get(t) or {}).get('birth') and re.search(r'\b' + re.escape(school) + r'\b', cache[t]['teams'])]
+        if len(hits) != 1: continue
+        t, c = hits[0]
+        iso, prec = c['birth']
+        if prec == 'md':
+            if not c.get('first'): continue
+            iso = md_year(iso, c['first'])
+        if not plausible(iso): continue
+        store[key(r)] = {'dob': iso, 'src': 'wikipedia', 'prec': prec, 'url': 'https://en.wikipedia.org/wiki/' + urllib.parse.quote(t.replace(' ', '_'))}
+        if prec == 'md': store[key(r)]['est'] = True
+        n['wikipedia-' + prec] += 1
+    return n
+
+
 def main():
     today = dt.date.today()
     store = json.load(open(OUT)) if os.path.exists(OUT) else {}
@@ -52,7 +106,7 @@ def main():
     ci = {c: j for j, c in enumerate(A['cols'])}
     rows = [r for r in A['rows'] if r[ci['team']] and r[ci['name']]]
     key = lambda r: f"{r[ci['name']]}|{r[ci['team']]}"
-    stale = lambda s: not s or (not s.get('dob') and (today - dt.date.fromisoformat(s.get('checked', '2000-01-01'))).days >= 30)
+    stale = lambda s: not s or s.get('est') or (not s.get('dob') and (today - dt.date.fromisoformat(s.get('checked', '2000-01-01'))).days >= 30)
     todo = [r for r in rows if r[ci['age']] is None and stale(store.get(key(r)))]
     todo.sort(key=lambda r: -(r[ci['fvx']] or 0))
     found = {'wikidata': 0, 'school': 0}
@@ -97,6 +151,9 @@ def main():
             store[key(r)] = {'dob': b['dob'], 'src': 'school', 'url': b['url']}; found['school'] += 1
         elif id(r) in in_wd:
             store[key(r)] = {'dob': None, 'checked': today.isoformat()}
+    undated = [r for r in rows if r[ci['age']] is None and not (store.get(key(r)) or {}).get('dob')]
+    undated.sort(key=lambda r: -(r[ci['fvx']] or 0))
+    found.update(wiki_step(undated, store, key, ci, today, arg('--wiki', 1500), arg('--guess', 150)))
     if check or conflicts: DS.log_conflicts('cfb', conflicts)
     json.dump(dict(sorted(store.items())), open(OUT, 'w'), indent=1)
     open(OUT, 'a').write('\n')
