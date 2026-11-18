@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T00:08:51Z",
+ "asof": "2026-11-18T00:12:07Z",
  "recenter": {
-  "2026-11-17": 2.18,
+  "2026-11-17": 2.17,
   "2026-11-18": 2.36
  },
  "monitor": {
@@ -2009,7 +2009,7 @@
     "side": "under",
     "line": 158.5,
     "price": -106.0,
-    "ev": 0.133,
+    "ev": 0.132,
     "units": 1.0
    }
   },
@@ -2222,10 +2222,10 @@
    "mk": "spread",
    "side": "away",
    "line": 13.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 5.0,
    "x": 4.5,
-   "why": "no edge at -114",
+   "why": "no edge at -110",
    "m": 8.5,
    "tm": 157.4
   },
@@ -2276,6 +2276,22 @@
    "why": "edge under 5 (tier: power)",
    "m": 0.9,
    "tm": 140.0
+  },
+  {
+   "id": "401906761",
+   "sport": "cbb",
+   "kick": "2026-11-18T00:30:00Z",
+   "home": "Alabama",
+   "away": "Kennesaw State",
+   "mk": "total",
+   "side": "under",
+   "line": 179.5,
+   "price": -119.0,
+   "edge": 5.8,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 26.9,
+   "tm": 173.7
   },
   {
    "id": "401925064",
@@ -2358,20 +2374,20 @@
    "tm": 157.5
   },
   {
-   "id": "401906761",
+   "id": "401929358",
    "sport": "cbb",
-   "kick": "2026-11-18T00:30:00Z",
-   "home": "Alabama",
-   "away": "Kennesaw State",
+   "kick": "2026-11-18T01:00:00Z",
+   "home": "Southern Miss",
+   "away": "UT Arlington",
    "mk": "total",
    "side": "under",
-   "line": 178.5,
-   "price": -110.0,
-   "edge": 4.8,
+   "line": 149.5,
+   "price": -119.0,
+   "edge": 4.4,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
-   "m": 26.9,
-   "tm": 173.7
+   "m": 3.7,
+   "tm": 145.1
   },
   {
    "id": "401911020",
@@ -2420,22 +2436,6 @@
    "why": "edge under 7",
    "m": 0.9,
    "tm": 149.2
-  },
-  {
-   "id": "401929358",
-   "sport": "cbb",
-   "kick": "2026-11-18T01:00:00Z",
-   "home": "Southern Miss",
-   "away": "UT Arlington",
-   "mk": "total",
-   "side": "under",
-   "line": 148.5,
-   "price": -106.0,
-   "edge": 3.4,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 3.7,
-   "tm": 145.1
   },
   {
    "id": "401921826",
@@ -2674,9 +2674,9 @@
   "401906761": {
    "mk": "total",
    "side": "under",
-   "line": 178.5,
-   "price": -110.0,
-   "edge": 4.8,
+   "line": 179.5,
+   "price": -119.0,
+   "edge": 5.8,
    "ev": null,
    "units": 0.0,
    "home": "Alabama",
@@ -2785,7 +2785,7 @@
    "mk": "spread",
    "side": "away",
    "line": 13.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 5.0,
    "ev": null,
    "units": 0.0,
@@ -2844,9 +2844,9 @@
   "401929358": {
    "mk": "total",
    "side": "under",
-   "line": 148.5,
-   "price": -106.0,
-   "edge": 3.4,
+   "line": 149.5,
+   "price": -119.0,
+   "edge": 4.4,
    "ev": null,
    "units": 0.0,
    "home": "Southern Miss",
@@ -3004,16 +3004,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 18396,
+  "snapshots": 18403,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 564,
+    "clvN": 565,
     "clvRet": -0.0162,
-    "clvT": -1.96,
+    "clvT": -1.97,
     "clv": 0.49,
-    "beat": 0.351,
-    "still": 0.273
+    "beat": 0.35,
+    "still": 0.274
    },
    {
     "when": "6-24h",
@@ -3035,11 +3035,11 @@
    },
    {
     "when": "<1h",
-    "clvN": 335,
+    "clvN": 336,
     "clvRet": -0.0458,
-    "clvT": -25.71,
+    "clvT": -25.78,
     "clv": -0.01,
-    "beat": 0.078,
+    "beat": 0.077,
     "still": 0.833
    }
   ]
@@ -19988,7 +19988,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T00:08:51Z",
+ "checked": "2026-11-18T00:12:07Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
