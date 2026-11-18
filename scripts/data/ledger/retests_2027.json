@@ -82,6 +82,23 @@
      "gate": "ranked probability score gain, t >= 2.33 over recruits, 8 of 10 classes, squared error of E[FV] not worse; scored on the 2017-18 classes plus the pooled ten"
     }
    ]
+  },
+  {
+   "key": "cbb_eybl_prior",
+   "trigger": "2027-28 CBB regular season final (class of 2027 freshman year); confirm on class 2028 after 2028-29",
+   "harness": "scripts/research/eybl_nov18/prereg.md (snapshot /mnt/project-files/research/eybl-nov18/)",
+   "tests": [
+    {
+     "key": "eybl_bpm_freshman",
+     "form": "EYBL 17U BPM Blend residual on projected FV, freshman box BPM 200+ min",
+     "gate": "t >= 2 HC1, positive, leave-one-conference-out MSE not worse, Holm in family"
+    },
+    {
+     "key": "eybl_bpm_fv_move",
+     "form": "same x, end-of-freshman board FV minus preseason projected FV",
+     "gate": "same"
+    }
+   ]
   }
  ]
 }
