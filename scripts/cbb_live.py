@@ -482,7 +482,8 @@ def prov_fit(prior, ci, lam=5.0):
 
 
 def espn_sizes(team_ids):
-    """weight, age and class from ESPN's current rosters (a player added after the preseason pull): name key -> (wt, age, yr)"""
+    """weight, age, class and height (inches) from ESPN's current rosters (a player added after the preseason pull):
+    name key -> (wt, age, yr, ht)"""
     import fetch_cbb as B
     out = {}
     for tid in team_ids:
@@ -492,7 +493,7 @@ def espn_sizes(team_ids):
             continue
         for a in d.get('athletes', []):
             yr = B.CLS.get((a.get('experience') or {}).get('displayValue'))
-            out[(tid, D.norm(a.get('displayName') or a.get('fullName') or ''))] = (a.get('weight'), a.get('age'), 'Sr' if yr == 'Gr' else yr)
+            out[(tid, D.norm(a.get('displayName') or a.get('fullName') or ''))] = (a.get('weight'), a.get('age'), 'Sr' if yr == 'Gr' else yr, a.get('height'))
     return out
 
 
@@ -517,11 +518,11 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
     out = []
     for pid, ln in todo:
         tname, logo, conf = teams[ln['team']]
-        wt, age, eyr = sizes.get((tid(logo), D.norm(ln['name'])), (None, None, None))
+        wt, age, eyr, eht = sizes.get((tid(logo), D.norm(ln['name'])), (None, None, None, None))
         # class: Barttorvik's (the line), else ESPN's current roster; Fr only when neither source has him
         yr = ln.get('yr') if ln.get('yr') in NEXT_YR else eyr if eyr in NEXT_YR else 'Fr'
         elig = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 1)
-        hti = int(ln.get('hti') or 77)
+        hti = int(ln.get('hti') or eht or 77)   # ESPN box-score lines carry no height: the roster's, before the 6-5 default
         dob = dob_of(pid, ln['name'], tname, ln['team'])
         if dob: age = age_now(dob)
         age_est = None if exact_dob(dob) or age is None else age
