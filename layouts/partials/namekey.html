@@ -19,7 +19,7 @@ window.arkName = window.arkName || (function (D) {
   }
   (D.nicknames || []).forEach(function (g, i) { g.forEach(function (n) { (NICK[n] = NICK[n] || []).push(i); }); });
   (D.players || []).forEach(function (g) { var c = base(g.names[0]); g.names.slice(1).forEach(function (n) { AL[base(n)] = c; }); });
-  var MEMO = {};
+  var MEMO = {}, IX = new WeakMap();
   function key(s) { s = s == null ? '' : String(s); if (MEMO[s] !== undefined) return MEMO[s]; var b = base(s); return (MEMO[s] = AL[b] || b); }
   function oneOff(a, b, least) {
     if (a === b) return true;
@@ -72,9 +72,17 @@ window.arkName = window.arkName || (function (D) {
   // row whose name fits (Neo / Neoklis, Will / William, a typo only at the named team)
   function find(pool, name, team) {
     var k = key(name), tk = team ? teamKey(team) : null, atTeam = function (p) { return !tk || teamKey(p.team) === tk; };
-    var hits = pool.filter(function (p) { return key(p.name) === k && atTeam(p); });
+    var ix = IX.get(pool); if (!ix || ix.length !== pool.length) { ix = pool.map(function (p) { var kk = key(p.name), t = kk ? kk.split(' ') : []; return { k: kk, n: kk.replace(/ /g, ''), t: t, l: t[t.length - 1] || '', j: t.length === 3 ? t[1] + t[2] : null }; }); IX.set(pool, ix); }
+    var hits = pool.filter(function (p, i) { return ix[i].k === k && atTeam(p); });
     if (hits.length) return hits;
-    var v = pool.filter(function (p) { var s = strength(name, p.name); return atTeam(p) && (s >= 2 || (s === 1 && tk)); });
+    // strength() is nonzero only when the keys match outright, share a last name or a middle token, join two tokens into the other's last, or have
+    // last names (6+ letters) within one length: a cheap test on parsed keys, cached per pool, leaves the full call to those
+    var ka = k, na = ka.replace(/ /g, ''), ta = ka ? ka.split(' ') : [], la = ta[ta.length - 1] || '', ja = ta.length === 3 ? ta[1] + ta[2] : null;
+    var v = pool.filter(function (p, i) {
+      var x = ix[i];
+      if (!(x.k === ka || x.n === na || (ja !== null && ja === x.l) || (x.j !== null && x.j === la) || (la.length >= 6 && oneOff(la, x.l, 6)) || x.l === la || (ta.length === 3 && ta[1] === x.l) || (x.t.length === 3 && x.t[1] === la))) return false;
+      var s = strength(name, p.name); return atTeam(p) && (s >= 2 || (s === 1 && tk));
+    });
     return v.length === 1 ? v : [];
   }
   return { key: key, teamKey: teamKey, strength: strength, find: find };
