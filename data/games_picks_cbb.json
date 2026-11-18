@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T04:10:12Z",
+ "asof": "2026-11-18T04:13:16Z",
  "recenter": {
   "2026-11-17": 2.14,
   "2026-11-18": 2.02
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-18T03:13:29Z",
-  "ageH": 0.9,
+  "ageH": 1.0,
   "stale": false
  },
  "picks": [],
@@ -1861,8 +1861,15 @@
    "flagged": "2026-11-18T00:59:58Z",
    "paper": true,
    "betTo": 144.5,
-   "close": 142.5,
-   "now": null
+   "close": 143.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 143.5,
+    "price": -110,
+    "ev": 0.128,
+    "units": 1.5
+   }
   },
   {
    "id": "401925782",
@@ -1892,8 +1899,8 @@
    "paper": true,
    "betTo": 144.0,
    "close": null,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401909555",
@@ -1958,7 +1965,14 @@
    "paper": true,
    "betTo": 148.5,
    "close": 148.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 148.5,
+    "price": -110.0,
+    "ev": 0.112,
+    "units": 0.25
+   }
   },
   {
    "id": "401920426",
@@ -2116,22 +2130,6 @@
    "tm": 147.5
   },
   {
-   "id": "401929004",
-   "sport": "cbb",
-   "kick": "2026-11-19T03:00:00Z",
-   "home": "Hawai'i",
-   "away": "Washington State",
-   "mk": "total",
-   "side": "over",
-   "line": 142.5,
-   "price": -101.0,
-   "edge": 9.1,
-   "x": 7.0,
-   "why": "no edge at -101",
-   "m": 3.6,
-   "tm": 151.6
-  },
-  {
    "id": "401920947",
    "sport": "cbb",
    "kick": "2026-11-18T23:30:00Z",
@@ -2236,7 +2234,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 5.9,
    "x": 7.0,
    "why": "edge under 7",
@@ -2332,7 +2330,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.1,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
@@ -2476,12 +2474,28 @@
    "mk": "spread",
    "side": "away",
    "line": 14.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 0.9,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
    "m": 13.6,
    "tm": 147.0
+  },
+  {
+   "id": "401920682",
+   "sport": "cbb",
+   "kick": "2026-11-19T00:00:00Z",
+   "home": "St. John's",
+   "away": "Siena",
+   "mk": "total",
+   "side": "under",
+   "line": 167.5,
+   "price": -119.0,
+   "edge": 1.2,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 29.0,
+   "tm": 166.3
   }
  ],
  "games": {
@@ -2501,10 +2515,10 @@
    "mk": "total",
    "side": "under",
    "line": 150.5,
-   "price": -134,
-   "ev": 0.021,
+   "price": -129,
+   "ev": 0.038,
    "edge": 5.0,
-   "units": 0.75,
+   "units": 1.25,
    "bk": "poly",
    "home": "Florida",
    "away": "Houston",
@@ -2707,7 +2721,7 @@
    "mk": "spread",
    "side": "away",
    "line": 14.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -2718,14 +2732,15 @@
   "401929004": {
    "mk": "total",
    "side": "over",
-   "line": 142.5,
-   "price": -101.0,
-   "edge": 9.1,
-   "ev": null,
-   "units": 0.0,
+   "line": 143.5,
+   "price": -110,
+   "ev": 0.128,
+   "edge": 8.1,
+   "units": 1.5,
+   "bk": "poly",
    "home": "Hawai'i",
    "away": "Washington State",
-   "state": "under"
+   "state": "paper"
   },
   "401909753": {
    "mk": "total",
@@ -2755,7 +2770,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 5.9,
    "ev": null,
    "units": 0.0,
@@ -2827,7 +2842,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -2937,7 +2952,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 18643,
+  "snapshots": 18656,
   "buckets": [
    {
     "when": "24h+",
@@ -2950,12 +2965,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 3822,
-    "clvRet": -0.0122,
-    "clvT": -6.66,
+    "clvN": 3823,
+    "clvRet": -0.0124,
+    "clvT": -6.73,
     "clv": 0.47,
     "beat": 0.391,
-    "still": 0.417
+    "still": 0.415
    },
    {
     "when": "1-6h",
@@ -17993,7 +18008,7 @@
    "flagged": "2026-11-18T00:59:58Z",
    "paper": true,
    "betTo": 144.5,
-   "close": 142.5
+   "close": 143.5
   },
   {
    "id": "401920514",
@@ -20153,7 +20168,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T04:10:12Z",
+ "checked": "2026-11-18T04:13:16Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
