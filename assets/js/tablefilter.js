@@ -20,6 +20,22 @@
           count = w.querySelector('[data-tf-count]'), reset = bar.querySelector('[type=reset]'),
           want = bar.dataset.cols.split(',').map(function (s) { return s.trim().toLowerCase(); }), sels = [];
       rows.forEach(function (r, i) { r.dataset.i = i; });
+      // a long table (thousands of rows: the all-time FV lists) keeps only the first WIN matching rows in the page and adds the
+      // next WIN as the end scrolls into view; filters, search, sort and ranks still run over every row, attached or not
+      var WIN = total > 1500 ? 300 : 0, shown = WIN, more = null, io = null;
+      function paint() {
+        if (!WIN) return;
+        var list = [], left = 0;
+        for (var k = 0; k < rows.length; k++) { var r = rows[k]; if (r.hidden) continue; if (list.length < shown) list.push(r); else left++; }
+        body.replaceChildren.apply(body, list);
+        more.hidden = !left;
+        if (left && io) { io.unobserve(more); io.observe(more); }
+      }
+      if (WIN) {
+        more = document.createElement('div'); more.className = 'tf__more'; more.style.minHeight = '1px'; more.hidden = true;
+        table.parentNode.insertBefore(more, table.nextSibling);
+        if ('IntersectionObserver' in window) io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { shown += WIN; paint(); } }, { rootMargin: '800px' });
+      }
       // the RK (or #) column: renumbered 1, 2, 3… best first in whatever column the table is sorted by; its own sort and the
       // unsorted table keep the ranks as built (data-tf-rerank: counted within the filters). Search narrows the rows, not the ranks.
       var rc = /^(rk|#)$/i.test(heads[0] || '') && rows.length && rows[0].cells[0] && rows[0].cells[0].classList.contains('cfb__rk') ? 0 : -1, rkSort = null;
@@ -90,6 +106,7 @@
           r.hidden = !ok; if (ok) n++;
         });
         renum();
+        shown = WIN; paint();
         if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
       }
       function renum() {
@@ -103,6 +120,7 @@
       bar.addEventListener('input', function () { apply(); writeHash(); }); bar.addEventListener('change', function () { apply(); writeHash(); });
       bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(function () { apply(); writeHash(); }); });
       sels.forEach(function (s) { if (s.fv) s.el.previousElementSibling.textContent = 'FV ≥'; });
+      paint();
       bar.hidden = false;
       var ths = [].slice.call(table.tHead.rows[0].cells), cur = -1, dir = 1;
       ths.forEach(function (th, c) {
@@ -118,7 +136,7 @@
             if (isNum) { x = num(x, isHt); y = num(y, isHt); if (isNaN(x)) return 1; if (isNaN(y)) return -1; return (x - y) * dir || a.dataset.i - b.dataset.i; }
             return x.localeCompare(y) * dir || a.dataset.i - b.dataset.i;
           });
-          rows.forEach(function (r) { body.appendChild(r); });
+          if (WIN) { shown = WIN; paint(); } else rows.forEach(function (r) { body.appendChild(r); });
           rkSort = c === rc ? null : { best: asc ? 1 : -1, get: function (r) { var v = key(r); return /^[-–—]?$/.test(v) ? null : isNum ? num(v, isHt) : v; } };
           renum();
           ths.forEach(function (t) { t.removeAttribute('aria-sort'); });
@@ -166,6 +184,7 @@
         var group = w.parentElement && w.parentElement.closest('[data-wintabs]');
         if (group && group.__show && !w.classList.contains('is-active')) group.__show(w.getAttribute('data-tab'));
         var row = want.p && rows.filter(function (r) { return r.dataset.pk === want.p; })[0];
+        if (row && WIN && !row.isConnected) { shown = total; paint(); }
         writeHash();
         setTimeout(function () {
           if (row && !row.hidden) row.click();
