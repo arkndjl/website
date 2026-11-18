@@ -5,24 +5,25 @@
 // from them. Called by scripts/laursen_socials.mjs, which writes everything to data/laursen_socials.json.
 const YT_CH = 'UC6FmXC9DL1Rc4ATAVPeBYtQ', TW_LOGIN = 'laursen_111';
 const PRIOR = 30, DAY = 864e5, HR = 36e5, MIN_AGE = 3;           // uploads younger than 3 days are left out of timing splits
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const BLOCKS = ['12a', '4a', '8a', '12p', '4p', '8p']; // 4-hour ET blocks
+export const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const BLOCKS = ['12a', '4a', '8a', '12p', '4p', '8p']; // 4-hour ET blocks
 const etf = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', hourCycle: 'h23' });
 export function et(t) { const p = Object.fromEntries(etf.formatToParts(new Date(t)).map(x => [x.type, x.value])); const h = +p.hour % 24; return { d: DAYS.indexOf(p.weekday), h, b: Math.floor(h / 4) }; }
-const median = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
-const r1 = v => v == null || !isFinite(v) ? null : Math.round(v * 10) / 10, r2 = v => v == null || !isFinite(v) ? null : Math.round(v * 100) / 100;
+export const median = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+export const r1 = v => v == null || !isFinite(v) ? null : Math.round(v * 10) / 10;
+export const r2 = v => v == null || !isFinite(v) ? null : Math.round(v * 100) / 100;
 const isoDur = s => { const m = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(s || ''); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : null; };
 const twDur = s => { const m = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/.exec(s || ''); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : null; };
 async function json(u, opt = {}) { try { const r = await fetch(u, opt); return r.ok ? await r.json() : null; } catch { return null; } }
 
-async function youtube(prev, now, get) {
+export async function youtube(prev, now, get, ch = YT_CH) {
   const yt = { ...(prev.yt || {}) }; let src = null;
   const seen = {};
   const key = process.env.YOUTUBE_API_KEY;
   if (key) {
     const ids = []; let tok = '';
     for (let i = 0; i < 10; i++) {
-      const j = await json(`https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=UU${YT_CH.slice(2)}&key=${key}${tok ? '&pageToken=' + tok : ''}`);
+      const j = await json(`https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=UU${ch.slice(2)}&key=${key}${tok ? '&pageToken=' + tok : ''}`);
       if (!j) break; for (const it of j.items || []) ids.push(it.contentDetails.videoId); if (!(tok = j.nextPageToken)) break;
     }
     for (let i = 0; i < ids.length; i += 50) {
@@ -33,7 +34,7 @@ async function youtube(prev, now, get) {
     if (Object.keys(seen).length) src = 'api';
   }
   if (!src) {
-    const x = await get(`https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CH}`);
+    const x = await get(`https://www.youtube.com/feeds/videos.xml?channel_id=${ch}`);
     for (const e of (x || '').split('<entry>').slice(1)) {
       const id = (/<yt:videoId>([^<]+)/.exec(e) || [])[1]; if (!id) continue;
       const dec = s => s.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');

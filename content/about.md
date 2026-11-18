@@ -68,3 +68,10 @@ draft = false
 {{< /winpane >}}
 
 {{< /desk >}}
+
+{{< desk id="social" >}}
+{{< lzsocial src="arkndjl_socials" nets="x,youtube" name="ARKNDJL" icon="icon-twitter" class="desk__wide" >}}
+{{< lzsocplan src="arkndjl_socials" name="ARKNDJL" part="x" class="desk__wide" >}}
+{{< lzsocplan src="arkndjl_socials" name="ARKNDJL" part="youtube" class="desk__wide" >}}
+{{< lzsocplan src="arkndjl_socials" name="ARKNDJL" part="plan" class="desk__wide" >}}
+{{< /desk >}}
