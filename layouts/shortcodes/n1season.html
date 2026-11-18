@@ -1,6 +1,6 @@
 {{- /* 1NT season summary: one panel per ESEA league season (data/esea_seasons.json, scripts/esea_season_log.py):
        record, W/L by match, round diff by match + cumulative, round diff by map, every player's line for that
-       season only. GFX (16:9 summary card) and roundsGFX (16:9 round diff charts) per season.
+       season only. GFX per season: one 4:5 card with all of it.
        Season buttons use data-n1s, not data-wintab, so they don't share hash names with players_sNN.exe. */ -}}
 {{- $D := site.Data.esea_seasons -}}
 {{- $me := "LAURSEN_111" -}}
@@ -114,8 +114,7 @@
     </div>
     {{- end }}
     <div class="esea__gfxbar n1s__bar2">
-      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-summary" data-gfx-sum="{{ $s | jsonify }}" data-gfx-title="s{{ $k }}-season-summary" data-gfx-date="ESEA S{{ $k }}" title="season summary graphic (16:9)">GFX</button>
-      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-rounds" data-gfx-sum="{{ $s | jsonify }}" data-gfx-title="s{{ $k }}-round-diff" data-gfx-date="ESEA S{{ $k }}" title="round differential graphic (16:9)">roundsGFX</button>
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-summary" data-gfx-sum="{{ $s | jsonify }}" data-gfx-title="s{{ $k }}-season-summary" data-gfx-date="ESEA S{{ $k }}" title="season summary graphic (4:5)">GFX</button>
     </div>
   </div>
   {{- end }}
