@@ -1,39 +1,39 @@
 {
- "asof": "2026-11-17T17:15:41Z",
+ "asof": "2026-11-18T00:02:10Z",
  "sport": "cbb",
  "season": 2027,
  "loss": "abs margin error",
- "n": 651,
+ "n": 653,
  "logged": 1041,
  "expectFrom": "walk-forward 2022-2026, same calendar month, lined games",
- "model": 9.872,
+ "model": 9.8602,
  "expected": 9.444,
- "z": -0.058,
- "line": 9.29,
- "lineN": 651,
- "modelAtLine": 9.872,
+ "z": -0.057,
+ "line": 9.276,
+ "lineN": 653,
+ "modelAtLine": 9.8602,
  "byMonth": [
   {
    "month": "nov",
-   "n": 651,
-   "model": 9.872,
+   "n": 653,
+   "model": 9.8602,
    "expected": 9.444
   }
  ],
  "test": {
-  "n": 651,
+  "n": 653,
   "window": 300,
-  "mean": -0.0787,
-  "t": -1.3,
-  "p": 0.1182,
-  "days": 8,
+  "mean": -0.078,
+  "t": -1.29,
+  "p": 0.1168,
+  "days": 9,
   "sd": 1.0,
-  "cusum": 12.88,
+  "cusum": 11.44,
   "cusumMax": 14.53,
   "h": 10.0,
   "stop": true,
-  "why": "last 300 worth t -1.30 at the close; CUSUM 12.9 past 10"
+  "why": "last 300 worth t -1.29 at the close; CUSUM 11.4 past 10"
  },
  "status": "alarm",
- "why": "last 300 worth t -1.30 at the close; CUSUM 12.9 past 10"
+ "why": "last 300 worth t -1.29 at the close; CUSUM 11.4 past 10"
 }
