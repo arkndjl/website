@@ -344,6 +344,25 @@ def soccer():
 
 
 # ---------------------------------------------------------------- CFB true freshmen
+# qualifying role by position: share of team snaps, snaps where the share is missing (~11 games at ~65 snaps a side)
+FR_SHARE = {'QB': .20, 'RB': .20, 'TE': .20, 'DT': .20, 'DL': .20, 'EDGE': .20, 'LB': .20, 'WR': .25, 'OL': .25, 'CB': .25, 'S': .25}
+FR_SNAPS = {p: 130 if v == .20 else 160 for p, v in FR_SHARE.items()}
+
+
+def qualifies(r):
+    p = r.get('pos')
+    if p in ('K', 'P'):
+        return r.get('war') is not None
+    if p not in FR_SHARE:
+        return False
+    sh, sn = r.get('snapShare'), r.get('snaps')
+    if sh is not None and sh >= FR_SHARE[p]:
+        return True
+    if sn is not None and sn >= FR_SNAPS[p]:
+        return True
+    return sh is None and not sn and r.get('pfn') is not None
+
+
 def cfb():
     import cfb_all
     d = cfb_all.read_cfb_all(os.path.join(SD, 'cfb-all.json'))
@@ -366,7 +385,10 @@ def cfb():
             keep.append(r)
         elif r.get('elig') == 1:
             keep.append(r)
-    fr = keep
+    # qualifiers only (Noah, Nov 18): a freshman who has not played a real role stays graded on the main board but is left off
+    # this one. Snap share of the team's snaps at or above the position bar, or snaps at or above it where the share is
+    # missing; neither on file: PFN's own qualifier (a Stat+); K/P (no snap counts): a WAR this season (kicks or punts on file).
+    fr = [r for r in keep if qualifies(r)]
     rows = [{'n': r['name'], 'tm': r['team'], 'pos': 'DT' if r['pos'] == 'DL' else r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'], 'war': r.get('war'),
              'xv': r.get('xv'), 'pfn': r.get('pfn'), 'sn': r.get('snaps'), 'xnil': r['xnil'] / 1e6 if r.get('xnil') else None,
              'pre': r.get('_rk'), 'preL': f"#{r['_rk']}" if r.get('_rk') else '', 'pfv': None,
@@ -375,7 +397,9 @@ def cfb():
             for r in fr]
     write('cfb', {
         'asof': d.get('asof'), 'title': f'{yr} true freshmen', 'key': 'fv',
-        'def': 'true freshmen: the high school class of this season (247 composite), no redshirt, plus first-year walk-ons. Rec = 247 composite national rank.',
+        'def': 'true freshmen: the high school class of this season (247 composite), no redshirt, plus first-year walk-ons. Qualifiers only: '
+               '20%+ of team snaps (130+ snaps if no share) at QB/RB/TE/DT/EDGE/LB, 25%+ (160+) at WR/OL/CB/S, K/P with kicks or punts on file; '
+               'the rest stay graded on the main board. Rec = 247 composite national rank.',
         'views': [['fv', 'FV', 'FV: mean outcome grade'], ['war', 'WAR', 'college WAR this season'], ['pfn', 'Stat+', 'Stat+: position all-in-one, 100 = average'],
                   ['xnil', 'xNIL', 'expected NIL market worth, $M']],
         'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('war', 'WAR', 'college WAR this season', '2'),
