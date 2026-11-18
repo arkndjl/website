@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-18T19:47:17.186Z",
+ "asof": "2026-11-18T20:32:49.428Z",
  "status": {
   "twitch": true,
   "youtube": true,
@@ -10,16 +10,16 @@
   "twitch": {
    "rate": 7,
    "prior": 7.4,
-   "tracked": 1.5,
+   "tracked": 1.6,
    "d30": {
     "goal": 281,
     "base": 274,
     "set": 1794899610245,
     "due": 1797491610245,
     "p0": 54,
-    "p": 47,
+    "p": 46,
     "f": 0,
-    "m": 0.051
+    "m": 0.052
    },
    "d90": {
     "goal": 295,
@@ -47,7 +47,7 @@
   "youtube": {
    "rate": 1.1,
    "prior": 1.1,
-   "tracked": 1.5,
+   "tracked": 1.6,
    "d30": {
     "goal": 43,
     "base": 42,
@@ -56,7 +56,7 @@
     "p0": 55,
     "p": 52,
     "f": 0,
-    "m": 0.051
+    "m": 0.052
    },
    "d90": {
     "goal": 44,
@@ -70,7 +70,7 @@
    },
    "next": {
     "goal": 50,
-    "eta": "2027-09-05",
+    "eta": "2027-09-06",
     "p90": 11,
     "from": 25,
     "base": 42,
@@ -82,18 +82,18 @@
    "opened": "2023-11-10"
   },
   "tiktok": {
-   "rate": 7.3,
+   "rate": 8.3,
    "prior": 2.7,
-   "tracked": 1.5,
+   "tracked": 1.6,
    "d30": {
-    "goal": 106,
-    "base": 102,
-    "set": 1794958047627,
-    "due": 1797550047627,
-    "p0": 59,
-    "p": 99,
-    "f": 0.75,
-    "m": 0.028
+    "goal": 114,
+    "base": 106,
+    "set": 1795033969428,
+    "due": 1797625969428,
+    "p0": 53,
+    "p": 53,
+    "f": 0,
+    "m": 0
    },
    "d90": {
     "goal": 107,
@@ -102,18 +102,18 @@
     "due": 1802675610245,
     "p0": 54,
     "p": 100,
-    "f": 0.714,
+    "f": 0.857,
     "m": 0.017
    },
    "next": {
     "goal": 150,
-    "eta": "2027-05-28",
-    "p90": 2,
+    "eta": "2027-05-02",
+    "p90": 4,
     "from": 100,
     "base": 100,
     "set": 1794899610245,
     "eta0": "2028-08-01",
-    "f": 0.1,
+    "f": 0.12,
     "m": 0.002
    },
    "opened": "2023-11-11"
@@ -121,7 +121,7 @@
   "x": {
    "rate": 4.2,
    "prior": 1.4,
-   "tracked": 1.5,
+   "tracked": 1.6,
    "d30": {
     "goal": 45,
     "base": 41,
@@ -130,7 +130,7 @@
     "p0": 53,
     "p": 52,
     "f": 0,
-    "m": 0.003
+    "m": 0.005
    },
    "d90": {
     "goal": 52,
@@ -140,7 +140,7 @@
     "p0": 56,
     "p": 55,
     "f": 0,
-    "m": 0.001
+    "m": 0.002
    },
    "next": {
     "goal": 50,
@@ -280,7 +280,18 @@
      "p": 59,
      "base": 102,
      "set": 1794958047627,
-     "due": 1797550047627
+     "due": 1797550047627,
+     "done": true,
+     "hit": 1795033969428,
+     "ahead": 29
+    },
+    {
+     "T": 30,
+     "goal": 114,
+     "p": 53,
+     "base": 106,
+     "set": 1795033969428,
+     "due": 1797625969428
     }
    ],
    "ms": [
@@ -548,6 +559,15 @@
    "x": 41,
    "ttv": 86,
    "tth": 2056
+  },
+  {
+   "t": 1795033969428,
+   "twitch": 274,
+   "youtube": 42,
+   "tiktok": 106,
+   "x": 41,
+   "ttv": 86,
+   "tth": 2057
   }
  ],
  "yt": {
@@ -884,6 +904,10 @@
     [
      1795030615163,
      6
+    ],
+    [
+     1795033969428,
+     9
     ]
    ],
    "title": "#34 1NT vs #25 THE GUILD | ESEA Main S59 Game 13 (Bo1)",
@@ -908,6 +932,10 @@
     [
      1795031237186,
      120
+    ],
+    [
+     1795033969428,
+     127
     ]
    ],
    "title": "LAURACE DEAGLE NUKE #shorts #fyp #reels #cs2 #csgo #counterstrike #valorant #eboy #twitch #streamer",
@@ -971,7 +999,7 @@
    {
     "k": "TikTok hearts",
     "v": "23.9 / video",
-    "d": "86 videos · 1.22 followers / video",
+    "d": "86 videos · 1.23 followers / video",
     "n": 86
    },
    {
@@ -997,36 +1025,36 @@
    {
     "k": "Twitch pace",
     "v": null,
-    "d": "at 14 days tracked (1.5)",
+    "d": "at 14 days tracked (1.6)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (1.5)",
+    "d": "at 14 days tracked (1.6)",
     "n": null,
     "wait": true
    },
    {
     "k": "TikTok pace",
     "v": null,
-    "d": "at 14 days tracked (1.5)",
+    "d": "at 14 days tracked (1.6)",
     "n": null,
     "wait": true
    },
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (1.5)",
+    "d": "at 14 days tracked (1.6)",
     "n": null,
     "wait": true
    },
    {
     "k": "Goal calibration",
-    "v": "4 of 4 hit",
-    "d": "100% hit vs 60% forecast",
-    "n": 4
+    "v": "5 of 5 hit",
+    "d": "100% hit vs 59% forecast",
+    "n": 5
    },
    {
     "k": "Milestones vs pace",
@@ -1038,7 +1066,7 @@
    {
     "k": "TikTok follows / 1k views",
     "v": null,
-    "d": "at 7 days tracked (1.5)",
+    "d": "at 7 days tracked (1.6)",
     "n": null,
     "wait": true
    },
@@ -1079,7 +1107,7 @@
    },
    "last30": 5,
    "gap": 5.6,
-   "vpd": 496,
+   "vpd": 502.6,
    "subsPerK": null,
    "likeRate": 0.93,
    "grid": [
@@ -1550,7 +1578,7 @@
      "views": 1410,
      "likes": 19,
      "comments": null,
-     "age": 2,
+     "age": 2.1,
      "et": {
       "d": 1,
       "h": 14,
@@ -1566,7 +1594,7 @@
      "views": 11,
      "likes": 0,
      "comments": null,
-     "age": 2,
+     "age": 2.1,
      "et": {
       "d": 1,
       "h": 14,
@@ -1595,7 +1623,7 @@
      "title": "#34 1NT vs #25 THE GUILD | ESEA Main S59 Game 13 (Bo1)",
      "pub": 1794978828000,
      "short": false,
-     "views": 6,
+     "views": 9,
      "likes": 0,
      "comments": null,
      "age": 0.6,
@@ -1611,7 +1639,7 @@
      "title": "LAURACE DEAGLE NUKE #shorts #fyp #reels #cs2 #csgo #counterstrike #valorant #eboy #twitch #streamer",
      "pub": 1795016552000,
      "short": true,
-     "views": 120,
+     "views": 127,
      "likes": 3,
      "comments": null,
      "age": 0.2,
@@ -1620,7 +1648,7 @@
       "h": 10,
       "b": 2
      },
-     "r5": 576
+     "r5": 577
     }
    ]
   },
@@ -1634,7 +1662,7 @@
    "lpH": null,
    "opH": 0,
    "hLive": 0,
-   "hOff": 37.1,
+   "hOff": 38,
    "live": null,
    "grid": [
     [
@@ -1876,13 +1904,13 @@
   },
   "tt": {
    "videos": 86,
-   "hearts": 2056,
+   "hearts": 2057,
    "hpv": 23.9,
    "newVideos": 0,
-   "newHearts": 24,
-   "fpv": 1.22,
+   "newHearts": 25,
+   "fpv": 1.23,
    "n": 10,
-   "views": 4734,
+   "views": 4749,
    "median": 1009,
    "vpd": null,
    "hearts_t": [
@@ -1957,6 +1985,10 @@
     [
      1795030615163,
      2056
+    ],
+    [
+     1795033969428,
+     2057
     ]
    ],
    "grid": [
@@ -2249,24 +2281,24 @@
      "desc": "CS2 PLAYER PLAYS VAL NONCHALANT AURAFARMER ACE #fyp #valorant #valtok #gamertok #eboy",
      "pub": 1794855065000,
      "photo": false,
-     "views": 439,
-     "r5": 412
+     "views": 443,
+     "r5": 413
     },
     {
      "id": "7708847220732349709",
      "desc": "prerendered backgrounds and low poly gfx were peak... #fyp #zelda #oot #retro #nintendo64",
      "pub": 1794855860000,
      "photo": true,
-     "views": 95,
-     "r5": 382
+     "views": 96,
+     "r5": 383
     },
     {
      "id": "7709535742065691918",
      "desc": "ACE DEAGLE IN ESEA LEAGUE MATCH #fyp #cs2 #csgo #valorant #eboy ",
      "pub": 1795016169000,
      "photo": false,
-     "views": 175,
-     "r5": 254
+     "views": 185,
+     "r5": 257
     }
    ]
   },
@@ -2274,14 +2306,14 @@
    "x": 10,
    "yt": {
     "n": 10,
-    "sum": 9456,
+    "sum": 9463,
     "avg": 946,
     "med": 780.5
    },
    "tt": {
     "n": 10,
-    "sum": 4734,
-    "avg": 473,
+    "sum": 4749,
+    "avg": 475,
     "med": 341.5
    }
   },
@@ -2460,6 +2492,11 @@
     1795031237186,
     9456,
     4734
+   ],
+   [
+    1795033969428,
+    9463,
+    4749
    ]
   ]
  }
