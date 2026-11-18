@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T23:34:39Z",
+ "asof": "2026-11-18T23:38:26Z",
  "recenter": {
-  "2026-11-18": 1.92,
+  "2026-11-18": 1.94,
   "2026-11-19": 2.04
  },
  "monitor": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-18T23:27:29Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [],
@@ -1868,9 +1868,9 @@
     "mk": "total",
     "side": "under",
     "line": 173.5,
-    "price": -110.0,
-    "ev": 0.132,
-    "units": 1.25
+    "price": -119.0,
+    "ev": 0.107,
+    "units": 1.0
    }
   },
   {
@@ -2201,15 +2201,8 @@
    "flagged": "2026-11-18T15:34:21Z",
    "paper": true,
    "betTo": 145.0,
-   "close": 146.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 146.5,
-    "price": -119.0,
-    "ev": 0.1,
-    "units": 0.75
-   }
+   "close": 144.5,
+   "now": null
   },
   {
    "id": "401925782",
@@ -2383,22 +2376,6 @@
    "tm": 155.6
   },
   {
-   "id": "401921134",
-   "sport": "cbb",
-   "kick": "2026-11-19T00:30:00Z",
-   "home": "Texas Tech",
-   "away": "LSU New Orleans",
-   "mk": "spread",
-   "side": "home",
-   "line": 35.5,
-   "price": -119.0,
-   "edge": 5.7,
-   "x": 5.0,
-   "why": "no edge at -119",
-   "m": 41.2,
-   "tm": 153.1
-  },
-  {
    "id": "401920516",
    "sport": "cbb",
    "kick": "2026-11-19T03:00:00Z",
@@ -2463,6 +2440,22 @@
    "tm": 149.5
   },
   {
+   "id": "401921134",
+   "sport": "cbb",
+   "kick": "2026-11-19T00:30:00Z",
+   "home": "Texas Tech",
+   "away": "LSU New Orleans",
+   "mk": "spread",
+   "side": "home",
+   "line": 36.5,
+   "price": -110.0,
+   "edge": 4.7,
+   "x": 5.0,
+   "why": "edge under 5 (tier: mixed)",
+   "m": 41.2,
+   "tm": 153.1
+  },
+  {
    "id": "401911377",
    "sport": "cbb",
    "kick": "2026-11-19T00:00:00Z",
@@ -2509,6 +2502,22 @@
    "why": "edge under 5.5 (inj: none)",
    "m": 33.3,
    "tm": 169.3
+  },
+  {
+   "id": "401909526",
+   "sport": "cbb",
+   "kick": "2026-11-19T00:30:00Z",
+   "home": "Marquette",
+   "away": "Northern Illinois",
+   "mk": "total",
+   "side": "under",
+   "line": 144.5,
+   "price": -110.0,
+   "edge": 5.0,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 29.1,
+   "tm": 139.5
   },
   {
    "id": "401906805",
@@ -2603,7 +2612,7 @@
    "edge": 3.7,
    "x": 6.5,
    "why": "edge under 6.5 (tier: mixed)",
-   "m": 41.9,
+   "m": 41.6,
    "tm": 157.2
   },
   {
@@ -2695,28 +2704,12 @@
    "mk": "spread",
    "side": "home",
    "line": 24.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 2.2,
    "x": 5.0,
    "why": "edge under 5 (tier: mixed)",
    "m": 26.7,
    "tm": 154.0
-  },
-  {
-   "id": "401917982",
-   "sport": "cbb",
-   "kick": "2026-11-19T01:00:00Z",
-   "home": "LSU",
-   "away": "UL Monroe",
-   "mk": "spread",
-   "side": "away",
-   "line": 37.5,
-   "price": -114.0,
-   "edge": 2.1,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": 35.4,
-   "tm": 160.7
   }
  ],
  "games": {
@@ -2785,15 +2778,14 @@
   "401909526": {
    "mk": "total",
    "side": "under",
-   "line": 146.5,
-   "price": -119.0,
-   "ev": 0.1,
-   "edge": 7.0,
-   "units": 0.75,
-   "bk": "poly",
+   "line": 144.5,
+   "price": -110.0,
+   "edge": 5.0,
+   "ev": null,
+   "units": 0.0,
    "home": "Marquette",
    "away": "Northern Illinois",
-   "state": "paper"
+   "state": "under"
   },
   "401921734": {
    "mk": "spread",
@@ -2895,7 +2887,7 @@
    "mk": "spread",
    "side": "home",
    "line": 24.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2993,9 +2985,9 @@
   "401921134": {
    "mk": "spread",
    "side": "home",
-   "line": 35.5,
-   "price": -119.0,
-   "edge": 5.7,
+   "line": 36.5,
+   "price": -110.0,
+   "edge": 4.7,
    "ev": null,
    "units": 0.0,
    "home": "Texas Tech",
@@ -3236,7 +3228,7 @@
    "side": "under",
    "line": 151.5,
    "price": 126,
-   "ev": 0.063,
+   "ev": 0.064,
    "edge": 6.6,
    "units": 1.5,
    "bk": "poly",
@@ -3369,7 +3361,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -3466,7 +3458,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19500,
+  "snapshots": 19511,
   "buckets": [
    {
     "when": "24h+",
@@ -3480,29 +3472,29 @@
    {
     "when": "6-24h",
     "clvN": 4023,
-    "clvRet": -0.0138,
-    "clvT": -7.73,
+    "clvRet": -0.0137,
+    "clvT": -7.67,
     "clv": 0.45,
-    "beat": 0.389,
-    "still": 0.41
+    "beat": 0.39,
+    "still": 0.409
    },
    {
     "when": "1-6h",
-    "clvN": 2009,
-    "clvRet": -0.0408,
-    "clvT": -35.54,
+    "clvN": 2010,
+    "clvRet": -0.0407,
+    "clvT": -35.52,
     "clv": 0.07,
     "beat": 0.159,
-    "still": 0.712
+    "still": 0.711
    },
    {
     "when": "<1h",
-    "clvN": 352,
-    "clvRet": -0.0466,
-    "clvT": -26.87,
-    "clv": -0.02,
-    "beat": 0.074,
-    "still": 0.832
+    "clvN": 354,
+    "clvRet": -0.0464,
+    "clvT": -26.74,
+    "clv": -0.01,
+    "beat": 0.076,
+    "still": 0.831
    }
   ]
  },
@@ -18717,7 +18709,7 @@
    "flagged": "2026-11-18T15:34:21Z",
    "paper": true,
    "betTo": 145.0,
-   "close": 146.5
+   "close": 144.5
   },
   {
    "id": "401920947",
@@ -20935,7 +20927,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T23:34:39Z",
+ "checked": "2026-11-18T23:38:26Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
