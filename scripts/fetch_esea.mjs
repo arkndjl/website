@@ -548,7 +548,7 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
           entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']), c11: num(s['1v1Wins']) ?? 0, c12: num(s['1v2Wins']) ?? 0, setups: (num(s['1v1Count']) ?? 0) + (num(s['1v2Count']) ?? 0),
           snip: num(s['Sniper Kills']) ?? 0, flashes: num(s['Flash Count']) ?? 0, fsucc: num(s['Flash Successes']) ?? 0, usucc: num(s['Utility Successes']) ?? 0,
           clutchK: num(s['Clutch Kills']) ?? 0, pistolK: num(s['Pistol Kills']) ?? 0,
-          util: num(s['Utility Damage']), flashed: num(s['Enemies Flashed']), rounds, rw: num(team?.team_stats?.['Final Score']) ?? null };
+          util: num(s['Utility Damage']), utilN: num(s['Utility Count']) ?? 0, flashed: num(s['Enemies Flashed']), rounds, rw: num(team?.team_stats?.['Final Score']) ?? null };
         ln.clutch = ln.c11 + ln.c12;
         allLines.push(ln);
         return { ...ln, hltv: rate(ln, rounds).rating, impact: rate(ln, rounds).impact };
@@ -976,11 +976,14 @@ const done = matches.filter(m => m.result);
 const maps = done.flatMap(m => m.maps.filter(x => x.rf != null));
 const pool = {};
 for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
+// one row per player over a set of maps (this season's league maps; past seasons below)
+function seasonRows(maps) {
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
   const q = (ppl[p.name] ||= { country: p.country || null, name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
   q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0); q.rw = (q.rw || 0) + (p.rw ?? 0);
   q.residR = (q.residR || 0) + (p.resid ?? 0) * ((x.rf ?? 0) + (x.ra ?? 0)); q.fsucc = (q.fsucc || 0) + (p.fsucc ?? 0); q.usucc = (q.usucc || 0) + (p.usucc ?? 0); q.mvpR = (q.mvpR || 0) + (p.mvp ?? 0); q.setups = (q.setups || 0) + (p.setups ?? 0); q.snip = (q.snip || 0) + (p.snip ?? 0); q.flashes = (q.flashes || 0) + (p.flashes ?? 0);
+  q.utilN = (q.utilN || 0) + (p.utilN ?? 0);
   q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0; if (p.mapMvp) q.mapMvps++;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
@@ -988,13 +991,44 @@ for (const x of maps) for (const p of x.players) {
   q.hsSum += (p.hs ?? 0) * (p.k ?? 0); q.k3 += p.k3 ?? 0; q.k4 += p.k4 ?? 0; q.k5 += p.k5 ?? 0; q.mvp += p.mvp ?? 0;
 }
 const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
-const players = Object.values(ppl).map(q => ({ name: q.name, country: q.country, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
+return Object.values(ppl).map(q => ({ name: q.name, country: q.country, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
   multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, mapMvps: q.mapMvps, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
   ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }),
   entryPM: q.entryWins - (q.entries - q.entryWins), entries: q.entries, clutch: q.clutch, utilPR: q.rounds ? r1(q.util / q.rounds) : null, flashPR: q.rounds ? r2(q.flashed / q.rounds) : null,
-  best: [...q.games].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0] || null, games: q.games.map(g => g.rating), ...plus(q) }))
+  best: [...q.games].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0] || null, games: q.games.map(g => g.rating), ...plus(q), ...seasonRole(q) }))
   .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+}
+// role from the season's own maps (the FACEIT role rule: sniper share, opening duels, flashes, utility, clutch setups; 200+ rounds)
+function seasonRole(q) {
+  const R = q.rounds || 0; if (R < 200 || !q.k) return {};
+  const snip = q.snip / q.k, z = { entry: (q.entries / R - 0.22) / 0.035, flash: ((q.flashes || 0) / R - 0.55) / 0.15, util: ((q.utilN || 0) / R - 0.5) / 0.12, clutch: ((q.setups || 0) / R - 0.055) / 0.012 };
+  const sc = { entry: z.entry, support: (z.flash + z.util) / 2 - 0.5 * z.entry, lurker: z.clutch - 0.5 * z.entry };
+  const top = Object.entries(sc).sort((a, b) => b[1] - a[1])[0], main = top[1] >= 0.5 ? top[0] : 'rifler';
+  return { role: snip >= 0.25 ? 'AWPer' : snip >= 0.15 ? `hybrid AWP / ${main}` : main };
+}
+const players = seasonRows(maps);
+const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
+// past league seasons: 1NT's own league history (research/esea_1nt_history.json.gz, scripts/esea_1nt_history.mjs),
+// box lines in cache order, rated like a PUG map (ARK + team-result credit); playoffs count in their season
+const pastSeasons = (() => {
+  let H; try { H = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, 'research', 'esea_1nt_history.json.gz')))); } catch { return {}; }
+  const by = {};
+  for (const m of H.matches || []) {
+    const sm = /\bS(\d{2})\b/.exec(m.compName || ''); if (!sm || /Qualifier/i.test(m.compName)) continue;
+    const sn = +sm[1]; if (sn >= SEASON) continue;
+    for (const mp of m.maps || []) {
+      const R = (mp.rf ?? 0) + (mp.ra ?? 0); if (!R || !(mp.us || []).length || !(mp.them || []).length) continue;
+      const S = [mp.rf, mp.ra];
+      const sides = [mp.us, mp.them].map((t, i) => t.filter(x => Array.isArray(x[2]) && x[2].length >= 26).map(([pid, name, q]) => ({ pid, name, ...lineFromCache(q, R, S[i]),
+        hs: q[0] ? Math.round(q[23] / q[0] * 100) : 0, kd: q[6] ? r2(q[0] / q[6]) : null, utilN: q[4], clutch: (q[14] ?? 0) + (q[15] ?? 0) })));
+      if (!sides[0].length || !sides[1].length) continue;
+      const x = pugMap(sides, R, S, 0);
+      (by[sn] ||= []).push({ map: mp.map, rf: mp.rf, ra: mp.ra, win: mp.rf > mp.ra, players: x.players.map(p => ({ ...p, country: p.country || countries[p.pid] || null })) });
+    }
+  }
+  return Object.fromEntries(Object.entries(by).map(([sn, ms]) => [sn, seasonRows(ms)]));
+})();
 let streak = null;
 for (const m of [...done].reverse()) { if (!streak) streak = { t: m.result, n: 1 }; else if (m.result === streak.t) streak.n++; else break; }
 const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && m.at > Date.now() - 3 * 3600e3) || null;
@@ -1778,7 +1812,7 @@ const out = {
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
   standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: safe(stakes), sim: safe(simulate), calibration, calib, ou: safe(() => totals(0.5)), combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
-  statKeys: [...statKeys].sort(), rankings: RANKINGS, arkModel: { fitted: ARK_MODEL.fitted, maps: ARK_MODEL.n, r2: ARK_MODEL.r2, beta: Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), centre: Math.round(ARK_MU * 10000) / 10000, stretch: Math.round(ARK_K * 100) / 100 }, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
+  statKeys: [...statKeys].sort(), rankings: RANKINGS, arkModel: { fitted: ARK_MODEL.fitted, maps: ARK_MODEL.n, r2: ARK_MODEL.r2, beta: Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), centre: Math.round(ARK_MU * 10000) / 10000, stretch: Math.round(ARK_K * 100) / 100 }, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, seasons: pastSeasons, profile: prof,
 };
 saveCache();
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
