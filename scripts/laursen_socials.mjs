@@ -18,7 +18,7 @@ const youtube = ytHtml ? num((/([\d.,]+[KkMm]?) subscribers/.exec(ytHtml) || [])
 const ttHtml = await get('https://www.tiktok.com/@laursen_111');
 const tiktok = ttHtml ? num((/"followerCount":(\d+)/.exec(ttHtml) || [])[1]) : null;
 const ttVideos = ttHtml ? num((/"videoCount":(\d+)/.exec(ttHtml) || [])[1]) : null, ttHearts = ttHtml ? num((/"heartCount":(\d+)/.exec(ttHtml) || [])[1]) : null;
-const xj = await get('https://api.fxtwitter.com/LAURSEN_111', 'arkndjl.net');
+const xj = await get('https://api.fxtwitter.com/LAURSEN_111', 'arkndjl.net') ?? await get('https://api.fxtwitter.com/laursen_111', 'arkndjl.net');   // retry once: fxtwitter drops the odd CI run
 const x = (() => { try { return JSON.parse(xj).user.followers ?? null; } catch { return null; } })();
 const last = prev.series[prev.series.length - 1] || {};
 const now = Date.now(), cur = { t: now, twitch: twitch ?? last.twitch ?? null, youtube: youtube ?? last.youtube ?? null, tiktok: tiktok ?? last.tiktok ?? null, x: x ?? last.x ?? null, ttv: ttVideos ?? last.ttv ?? null, tth: ttHearts ?? last.tth ?? null };
