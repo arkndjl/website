@@ -20,6 +20,7 @@ draft = false
 {{< esea part="cards" class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="history" >}}
+{{< n1season class="desk__wide" >}}
 {{< n1 part="history" class="desk__wide" >}}
 {{< esea part="alltime" class="desk__wide" >}}
 {{< /desk >}}

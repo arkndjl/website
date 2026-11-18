@@ -2373,6 +2373,145 @@
     return F.canvas;
   }
 
+  // ---- 1NT season summary (n1season.html, data/esea_seasons.json): summary card + round diff card ----
+  async function n1Logo(g, x, y, size) {
+    var logo = document.getElementById('px-1nt'); if (!logo) return;
+    var li = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + (logo.getAttribute('viewBox') || '0 0 32 32') + '" shape-rendering="crispEdges">' + logo.innerHTML + '</svg>'));
+    if (li) g.drawImage(li, x, y, size, size);
+  }
+  function sgn(v) { return (v > 0 ? '+' : '') + v; }
+  function n1Tiles(g, x, y, w, tiles, cols, th) {
+    var gp = 24, tw = (w - gp * (cols - 1)) / cols;
+    tiles.forEach(function (t, i) {
+      var tx = x + (i % cols) * (tw + gp), ty = y + Math.floor(i / cols) * (th + gp);
+      g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 20, ty + 40);
+      g.font = '64px ' + FONT; g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw - 40), tx + 20, ty + th - 44);
+    });
+    return Math.ceil(tiles.length / cols) * (th + gp);
+  }
+  function sumData(btn) { try { return JSON.parse(btn.getAttribute('data-gfx-sum')); } catch (e) { return null; } }
+  async function buildEseaSummary(win, btn) {
+    var d = sumData(btn); if (!d) return null;
+    var F = await frame(2400, 1350, '1NT :: ESEA S' + d.season + ' SUMMARY', btn.getAttribute('data-gfx-date'));
+    var g = F.g, gap = 24, lw = 780, rx = F.x + lw + gap, rw = F.w - lw - gap;
+    well(g, F.x, F.y, lw, F.h); well(g, rx, F.y, rw, F.h);
+    var x = F.x + 40, y = F.y + 40, iw = lw - 80;
+    await n1Logo(g, x, y, 128);
+    var dv = 'S' + d.season + ' · ' + (d.div || '').toUpperCase(); g.font = '40px ' + FONT; if (g.measureText(dv).width > iw - 160) g.font = '32px ' + FONT;
+    g.fillStyle = C.lilac; g.fillText(fit(g, dv, iw - 160), x + 160, y + 24);
+    g.font = '160px ' + FONT; g.fillStyle = C.white; g.fillText(d.w + '-' + d.l, x + 156, y + 120);
+    y += 200;
+    var rd = d.rf - d.ra;
+    y += n1Tiles(g, x, y, iw, [['MAPS', d.mapsW + '-' + d.mapsL], ['ROUND DIFF', sgn(rd), rd >= 0 ? C.teal : C.down], ['ROUNDS', d.rf + '-' + d.ra],
+      d.current ? ['PLAYED', (d.matches || []).length + '/' + (d.total || (d.matches || []).length)] : ['PLAYOFFS', d.playoffs ? 'YES' : 'NO']], 2, 140) + 12;
+    // W/L by match: one cell per match in order; playoffs outlined
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('W/L BY MATCH', x, y); y += 36;
+    var ms = d.matches || [], cols = Math.min(Math.max(ms.length, 1), 9), cs = Math.floor((iw - (cols - 1) * 10) / cols), rows = Math.ceil(ms.length / cols);
+    cs = Math.min(cs, Math.floor((F.y + F.h - 30 - y - (rows - 1) * 10) / Math.max(rows, 1)));
+    ms.forEach(function (m, i) {
+      var cx = x + (i % cols) * (cs + 10), cy = y + Math.floor(i / cols) * (cs + 10);
+      g.fillStyle = m.res === 'W' ? C.teal : C.down; g.fillRect(cx, cy, cs, cs); bevel(g, cx, cy, cs, cs, true, 3);
+      if (m.po) { g.fillStyle = C.white; g.fillRect(cx, cy + cs - 8, cs, 8); }
+      g.fillStyle = C.dark; g.font = Math.round(cs * 0.5) + 'px ' + FONT; var t = m.ff ? 'FF' : m.res; g.fillText(t, cx + (cs - g.measureText(t).width) / 2, cy + cs * 0.46);
+    });
+    // cumulative round diff, small, in the space left under the cells
+    var sy = y + rows * (cs + 10) + 20, sh = F.y + F.h - 30 - sy - 40;
+    if (sh > 120 && ms.length > 1) {
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROUND DIFF · CUMULATIVE', x, sy); sy += 30;
+      g.fillStyle = C.dark; g.fillRect(x, sy, iw, sh); bevel(g, x, sy, iw, sh, false, 3);
+      var Mx = 5; ms.forEach(function (m) { Mx = Math.max(Mx, Math.abs(m.cum || 0), Math.abs(m.rd || 0)); });
+      var smid = sy + sh / 2, sl = (iw - 24) / ms.length, YY = function (v) { return Math.round(smid - v / Mx * (sh / 2 - 12)); };
+      g.fillStyle = C.lilac; g.fillRect(x + 12, smid - 1, iw - 24, 2);
+      var prev = null;
+      ms.forEach(function (m, i) {
+        var cx = x + 12 + i * sl + sl / 2, bw2 = Math.max(4, Math.floor(sl * 0.5));
+        if (!m.ff) { var y1 = YY(m.rd); g.fillStyle = m.rd >= 0 ? C.teal : C.down; g.fillRect(Math.round(cx - bw2 / 2), Math.min(y1, smid), bw2, Math.max(3, Math.abs(y1 - smid))); }
+        var py = YY(m.cum || 0); g.fillStyle = C.white; g.fillRect(cx - 6, py - 6, 12, 12);
+        if (prev) { g.fillRect(prev[0], prev[1] - 2, cx - prev[0], 4); g.fillRect(cx - 2, Math.min(py, prev[1]), 4, Math.abs(py - prev[1])); }
+        prev = [cx, py];
+      });
+    }
+    // right: every player's line, this season only
+    var bx = rx + 36, bw = rw - 72, by = F.y + 50;
+    var cols2 = [['PLAYER', 0, 'l'], ['MAPS', 0.36, 'r'], ['RWA', 0.48, 'r'], ['ARK', 0.6, 'r'], ['K/D', 0.71, 'r'], ['ADR', 0.83, 'r'], ['HS%', 0.95, 'r']];
+    var colX = function (c) { return bx + bw * (c[2] === 'r' ? c[1] + 0.05 : c[1]); };
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+    cols2.forEach(function (c) { var cx = colX(c); g.fillText(c[0], c[2] === 'r' ? cx - g.measureText(c[0]).width : cx, by); });
+    by += 30; g.fillStyle = C.dark; g.fillRect(bx, by, bw, 3); by += 16;
+    var pl = (d.players || []).slice(0, 10), rowH = Math.min(92, Math.floor((F.y + F.h - 30 - by) / Math.max(pl.length, 1))), fs = Math.min(44, Math.round(rowH * 0.5));
+    for (var i = 0; i < pl.length; i++) {
+      var p = pl[i], cy = by + rowH / 2;
+      if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx - 12, by, bw + 24, rowH); }
+      var img = p.country ? await flagImg(String(p.country).toLowerCase()) : null, tx = bx;
+      if (img) { g.drawImage(img, tx, cy - fs * 0.38, fs * 1.1, fs * 0.76); tx += fs * 1.1 + 16; }
+      g.font = fs + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.name, bw * 0.34 - (tx - bx)), tx, cy);
+      var vals = [String(p.maps), p.rwa != null ? (p.rwa > 0 ? '+' : '') + Number(p.rwa).toFixed(1) : '—', p.rating != null ? Number(p.rating).toFixed(2) : '—', p.kd != null ? Number(p.kd).toFixed(2) : '—', p.adr != null ? Number(p.adr).toFixed(1) : '—', p.hs != null ? String(p.hs) : '—'];
+      vals.forEach(function (v, k) {
+        var c = cols2[k + 1], cx = colX(c);
+        g.fillStyle = k === 1 && p.rwa != null ? (p.rwa >= 0 ? C.teal : C.down) : k === 2 && p.rating != null ? (p.rating >= 1 ? C.teal : C.down) : C.white;
+        g.font = (k === 1 ? fs : fs - 6) + 'px ' + FONT; g.fillText(v, cx - g.measureText(v).width, cy);
+      });
+      by += rowH;
+    }
+    return F.canvas;
+  }
+  async function buildEseaRounds(win, btn) {
+    var d = sumData(btn); if (!d) return null;
+    var F = await frame(2400, 1350, '1NT :: ESEA S' + d.season + ' ROUND DIFF', btn.getAttribute('data-gfx-date'));
+    var g = F.g, gap = 24, ch = 620, ms = d.matches || [];
+    well(g, F.x, F.y, F.w, ch);
+    // round diff by match (bars) + cumulative (stepped line of pixel blocks); playoffs on a faint band
+    var x0 = F.x + 40, w0 = F.w - 80 - 200, top = F.y + 70, hh = ch - 70 - 110, mid = top + hh / 2, n = Math.max(ms.length, 1), slot = w0 / n;
+    var M = 5; ms.forEach(function (m) { if (m.rd != null) M = Math.max(M, Math.abs(m.rd)); M = Math.max(M, Math.abs(m.cum || 0)); });
+    var Y = function (v) { return Math.round(mid - v / M * (hh / 2 - 6)); };
+    g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText('BY MATCH · CUMULATIVE', x0, F.y + 36);
+    ms.forEach(function (m, i) { if (m.po) { g.fillStyle = 'rgba(200,199,255,0.10)'; g.fillRect(x0 + i * slot, top, slot, hh); } });
+    g.fillStyle = C.lilac; g.fillRect(x0, mid - 1, w0, 3);
+    [M, -M].forEach(function (v) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(sgn(v), x0 - 4 - g.measureText(sgn(v)).width + 0, Y(v)); });
+    var bwid = Math.max(8, Math.floor(slot * 0.6)), pts = [];
+    ms.forEach(function (m, i) {
+      var cx = x0 + i * slot + slot / 2, bxp = Math.round(cx - bwid / 2);
+      if (m.ff) { g.fillStyle = C.lilac; g.fillRect(bxp, mid - 5, bwid, 10); }
+      else { var y1 = Y(m.rd); g.fillStyle = m.rd >= 0 ? C.teal : C.down; g.fillRect(bxp, Math.min(y1, mid), bwid, Math.max(4, Math.abs(y1 - mid))); }
+      pts.push([cx, Y(m.cum || 0)]);
+      var lab = m.ff ? 'FF' : m.res, fsz = Math.min(36, Math.round(slot * 0.4));
+      g.font = fsz + 'px ' + FONT; g.fillStyle = m.res === 'W' ? C.teal : C.down; g.fillText(lab, cx - g.measureText(lab).width / 2, top + hh + 34);
+      g.font = Math.min(26, Math.round(slot * 0.22)) + 'px ' + FONT; g.fillStyle = C.lilac; var o = fit(g, m.opp, slot - 6); g.fillText(o, cx - g.measureText(o).width / 2, top + hh + 76);
+    });
+    g.fillStyle = C.white;   // cumulative: stepped pixel line
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i]; g.fillRect(p[0] - 9, p[1] - 9, 18, 18);
+      if (i) { var q = pts[i - 1]; g.fillRect(q[0], q[1] - 3, p[0] - q[0], 6); g.fillRect(p[0] - 3, Math.min(p[1], q[1]), 6, Math.abs(p[1] - q[1])); }
+    }
+    var last = ms.length ? ms[ms.length - 1].cum || 0 : 0, rx0 = x0 + w0 + 40;
+    g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText('TOTAL', rx0, top + 20);
+    g.font = '96px ' + FONT; g.fillStyle = last >= 0 ? C.teal : C.down; g.fillText(sgn(last), rx0, top + 100);
+    // bottom left: round diff by map (diverging bars); bottom right: tiles
+    var by = F.y + ch + gap, bh = F.h - ch - gap, lw = Math.round(F.w * 0.56), rx = F.x + lw + gap, rw = F.w - lw - gap;
+    well(g, F.x, by, lw, bh); well(g, rx, by, rw, bh);
+    g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText('BY MAP', F.x + 40, by + 40);
+    var mp = (d.maps || []).slice(0, 7), mm = 1; mp.forEach(function (m) { mm = Math.max(mm, Math.abs(m.rf - m.ra)); });
+    var mx = F.x + 40, mw = lw - 80, rowH = Math.min(64, Math.floor((bh - 80) / Math.max(mp.length, 1))), nameW = 220, recW = 260, barW = mw - nameW - recW, bmid = mx + nameW + barW / 2, ry = by + 76;
+    mp.forEach(function (m) {
+      var cy = ry + rowH / 2, r = m.rf - m.ra, len = barW / 2 * Math.abs(r) / mm;
+      g.font = Math.min(36, rowH - 20) + 'px ' + FONT; g.fillStyle = C.white; g.fillText(m.map, mx, cy);
+      g.fillStyle = C.dark; g.fillRect(mx + nameW, cy - 16, barW, 32);
+      g.fillStyle = r >= 0 ? C.teal : C.down; g.fillRect(r >= 0 ? bmid : bmid - len, cy - 12, Math.max(len, 3), 24);
+      g.fillStyle = C.lilac; g.fillRect(bmid - 1, cy - 22, 3, 44);
+      g.fillStyle = C.lilac; g.fillText(m.w + '-' + m.l, mx + nameW + barW + 24, cy);
+      var t = sgn(r); g.fillStyle = r >= 0 ? C.teal : C.down; g.fillText(t, mx + mw - g.measureText(t).width, cy);
+      ry += rowH;
+    });
+    var all = []; ms.forEach(function (m) { (m.maps || []).forEach(function (x) { all.push(x); }); });
+    var close = all.filter(function (x) { return Math.abs(x.rf - x.ra) <= 3; }), cw = close.filter(function (x) { return x.rf > x.ra; }).length;
+    var best = mp.slice().sort(function (a, b) { return (b.rf - b.ra) - (a.rf - a.ra); })[0];
+    var rd = d.rf - d.ra, per = all.length ? rd / all.length : 0;
+    n1Tiles(g, rx + 36, by + 36, rw - 72, [['ROUNDS', d.rf + '-' + d.ra], ['PER MAP', (per > 0 ? '+' : '') + per.toFixed(1), per >= 0 ? C.teal : C.down],
+      ['WITHIN 3 RDS', cw + '-' + (close.length - cw)], ['BEST MAP', best ? best.map + ' ' + sgn(best.rf - best.ra) : '—']], 2, Math.floor((bh - 72 - 24) / 2));
+    return F.canvas;
+  }
+
   // ---- 1NT next match: fanGFX (for fans) and teamGFX (for us) ----
   function drawStars(g, x, cy, n, size) {   // 1-5 stars in half steps, pixel style
     var pts = [[4,0],[5,3],[9,3],[6,5],[7,9],[4,7],[1,9],[2,5],[-1,3],[3,3]], u = size / 10, w = 0;
@@ -3451,6 +3590,7 @@
       if (mode === 'news') { var nc = await buildNews(win, btn); if (nc) preview(nc, 'arkndjl-news-' + btn.getAttribute('data-gfx-day')); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
+        : mode === 'esea-summary' ? await buildEseaSummary(win, btn) : mode === 'esea-rounds' ? await buildEseaRounds(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';
