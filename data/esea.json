@@ -1,6 +1,6 @@
 {
  "season": 59,
- "asof": "2026-11-18T03:56:46.118Z",
+ "asof": "2026-11-18T03:58:42.143Z",
  "championship": {
   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
   "name": "S59 NA Main A - Regular Season",
@@ -130,17 +130,17 @@
  },
  "sim": {
   "runs": 10000,
-  "pPlayoffs": 96.9,
+  "pPlayoffs": 96.6,
   "pTop16": 0,
   "pTop4": 0,
   "seedMedian": 32,
   "seedP10": 22,
   "seedP90": 46,
-  "expWins": 7.6,
+  "expWins": 7.7,
   "cutWins": 7,
   "cutDist": {
-   "6": 10.3,
-   "7": 89.7
+   "6": 9.8,
+   "7": 90.2
   },
   "buckets": [
    {
@@ -157,15 +157,15 @@
    },
    {
     "range": "17-32",
-    "p": 53.7
+    "p": 54
    },
    {
     "range": "33-48",
-    "p": 43.2
+    "p": 42.6
    },
    {
     "range": "49+",
-    "p": 3.1
+    "p": 3.4
    }
   ]
  },
@@ -405,7 +405,7 @@
    "id": "1-532dd022-2f4d-4cb7-8075-2e2d4b43d109",
    "at": 1795145400000,
    "opp": "Kaos",
-   "win": 70,
+   "win": 69,
    "line": 4.5,
    "ou": 20.5,
    "over": 52,
@@ -719,31 +719,31 @@
    "points": 21,
    "roster": [
     {
-     "id": "3ddbb58b-6f57-4d73-b220-513ffecc95d3",
-     "nickname": "Lucan",
-     "country": "ca",
+     "id": "c4fec783-4bb9-4e08-84fd-6705926b6323",
+     "nickname": "Narbig",
+     "country": "us",
      "level": 10,
-     "elo": 2069,
-     "role": "rifler",
+     "elo": 2286,
+     "role": "entry",
      "roleMaps": 39,
-     "form": 1.07,
+     "form": 1.04,
      "formMaps": 39,
      "plus": {
-      "entryPlus": 96,
-      "duelPlus": 105,
+      "entryPlus": 99,
+      "duelPlus": 99,
       "multiPlus": 100,
-      "clutchPlus": 95,
-      "utilPlus": 90,
-      "awpPlus": 90,
-      "survPlus": 106,
-      "entryPct": 49
+      "clutchPlus": 99,
+      "utilPlus": 100,
+      "awpPlus": 94,
+      "survPlus": 96,
+      "entryPct": 50
      },
      "talent": {
-      "exact": 2.98,
+      "exact": 3.07,
       "stars": 3
      },
-     "apps": 23,
-     "share": 0.171
+     "apps": 60,
+     "share": 0.2
     },
     {
      "id": "d046674c-73ea-4105-a264-8aeed08e9783",
@@ -771,6 +771,131 @@
      },
      "apps": 60,
      "share": 0.2
+    },
+    {
+     "id": "35976470-f8ae-4518-8124-5436f3ecd7b9",
+     "nickname": "geese",
+     "country": "us",
+     "level": 10,
+     "elo": 2397,
+     "role": null,
+     "roleMaps": null,
+     "form": null,
+     "formMaps": 0,
+     "plus": {},
+     "talent": {
+      "exact": 2.99,
+      "stars": 3
+     },
+     "apps": 1
+    },
+    {
+     "id": "0cc2c697-1e36-442a-bc2a-447dbfac4b8a",
+     "nickname": "jm0",
+     "country": "us",
+     "level": 10,
+     "elo": 2301,
+     "role": "lurker",
+     "roleMaps": 11,
+     "form": 1.06,
+     "formMaps": 11,
+     "plus": {
+      "entryPlus": 104,
+      "duelPlus": 107,
+      "multiPlus": 104,
+      "clutchPlus": 92,
+      "utilPlus": 101,
+      "awpPlus": 94,
+      "survPlus": 106,
+      "entryPct": 54
+     },
+     "talent": {
+      "exact": 3.07,
+      "stars": 3
+     },
+     "apps": 16,
+     "share": 0.043
+    },
+    {
+     "id": "fd1cb7f5-d73f-493b-af04-d22365c3131d",
+     "nickname": "AronJ",
+     "country": "pe",
+     "level": 10,
+     "elo": 2590,
+     "role": "hybrid AWP / rifler",
+     "roleMaps": 60,
+     "form": 1.14,
+     "formMaps": 60,
+     "plus": {
+      "entryPlus": 114,
+      "duelPlus": 110,
+      "multiPlus": 109,
+      "clutchPlus": 102,
+      "utilPlus": 99,
+      "awpPlus": 113,
+      "survPlus": 104,
+      "entryPct": 59
+     },
+     "talent": {
+      "exact": 3.94,
+      "stars": 4
+     },
+     "apps": 12,
+     "share": 0.029
+    },
+    {
+     "id": "3ddbb58b-6f57-4d73-b220-513ffecc95d3",
+     "nickname": "Lucan",
+     "country": "ca",
+     "level": 10,
+     "elo": 2069,
+     "role": "rifler",
+     "roleMaps": 39,
+     "form": 1.07,
+     "formMaps": 39,
+     "plus": {
+      "entryPlus": 96,
+      "duelPlus": 105,
+      "multiPlus": 100,
+      "clutchPlus": 95,
+      "utilPlus": 90,
+      "awpPlus": 90,
+      "survPlus": 106,
+      "entryPct": 49
+     },
+     "talent": {
+      "exact": 2.98,
+      "stars": 3
+     },
+     "apps": 23,
+     "share": 0.171
+    },
+    {
+     "id": "88ed0a5c-a233-4016-af45-43e9d2c5fc6e",
+     "nickname": "WILD4FLOWER",
+     "country": "us",
+     "level": 9,
+     "elo": 1894,
+     "role": "support",
+     "roleMaps": 22,
+     "form": 1.04,
+     "formMaps": 22,
+     "plus": {
+      "entryPlus": 97,
+      "duelPlus": 98,
+      "multiPlus": 100,
+      "clutchPlus": 109,
+      "utilPlus": 111,
+      "awpPlus": 91,
+      "survPlus": 107,
+      "entryPct": 49
+     },
+     "talent": {
+      "exact": 2.53,
+      "stars": 2.5
+     },
+     "apps": 45,
+     "share": 0.157
     },
     {
      "id": "96280420-abfc-4533-839e-879d48daa9cf",
@@ -815,131 +940,6 @@
      },
      "apps": 59,
      "share": 0.2
-    },
-    {
-     "id": "35976470-f8ae-4518-8124-5436f3ecd7b9",
-     "nickname": "geese",
-     "country": "us",
-     "level": 10,
-     "elo": 2397,
-     "role": null,
-     "roleMaps": null,
-     "form": null,
-     "formMaps": 0,
-     "plus": {},
-     "talent": {
-      "exact": 2.99,
-      "stars": 3
-     },
-     "apps": 1
-    },
-    {
-     "id": "fd1cb7f5-d73f-493b-af04-d22365c3131d",
-     "nickname": "AronJ",
-     "country": "pe",
-     "level": 10,
-     "elo": 2590,
-     "role": "hybrid AWP / rifler",
-     "roleMaps": 60,
-     "form": 1.14,
-     "formMaps": 60,
-     "plus": {
-      "entryPlus": 114,
-      "duelPlus": 110,
-      "multiPlus": 109,
-      "clutchPlus": 102,
-      "utilPlus": 99,
-      "awpPlus": 113,
-      "survPlus": 104,
-      "entryPct": 59
-     },
-     "talent": {
-      "exact": 3.94,
-      "stars": 4
-     },
-     "apps": 12,
-     "share": 0.029
-    },
-    {
-     "id": "c4fec783-4bb9-4e08-84fd-6705926b6323",
-     "nickname": "Narbig",
-     "country": "us",
-     "level": 10,
-     "elo": 2286,
-     "role": "entry",
-     "roleMaps": 39,
-     "form": 1.04,
-     "formMaps": 39,
-     "plus": {
-      "entryPlus": 99,
-      "duelPlus": 99,
-      "multiPlus": 100,
-      "clutchPlus": 99,
-      "utilPlus": 100,
-      "awpPlus": 94,
-      "survPlus": 96,
-      "entryPct": 50
-     },
-     "talent": {
-      "exact": 3.07,
-      "stars": 3
-     },
-     "apps": 60,
-     "share": 0.2
-    },
-    {
-     "id": "0cc2c697-1e36-442a-bc2a-447dbfac4b8a",
-     "nickname": "jm0",
-     "country": "us",
-     "level": 10,
-     "elo": 2301,
-     "role": "lurker",
-     "roleMaps": 11,
-     "form": 1.06,
-     "formMaps": 11,
-     "plus": {
-      "entryPlus": 104,
-      "duelPlus": 107,
-      "multiPlus": 104,
-      "clutchPlus": 92,
-      "utilPlus": 101,
-      "awpPlus": 94,
-      "survPlus": 106,
-      "entryPct": 54
-     },
-     "talent": {
-      "exact": 3.07,
-      "stars": 3
-     },
-     "apps": 16,
-     "share": 0.043
-    },
-    {
-     "id": "88ed0a5c-a233-4016-af45-43e9d2c5fc6e",
-     "nickname": "WILD4FLOWER",
-     "country": "us",
-     "level": 9,
-     "elo": 1894,
-     "role": "support",
-     "roleMaps": 22,
-     "form": 1.04,
-     "formMaps": 22,
-     "plus": {
-      "entryPlus": 97,
-      "duelPlus": 98,
-      "multiPlus": 100,
-      "clutchPlus": 109,
-      "utilPlus": 111,
-      "awpPlus": 91,
-      "survPlus": 107,
-      "entryPct": 49
-     },
-     "talent": {
-      "exact": 2.53,
-      "stars": 2.5
-     },
-     "apps": 45,
-     "share": 0.157
     }
    ],
    "elo": 2371,
@@ -1341,8 +1341,8 @@
      "wr": 48,
      "dev": -0.07
     },
-    "edge": 6.3,
-    "p": 76
+    "edge": 6.4,
+    "p": 75
    },
    {
     "map": "cache",
@@ -1356,7 +1356,7 @@
      "wr": 8,
      "dev": -0.18
     },
-    "edge": 5.7,
+    "edge": 5.8,
     "p": 75
    },
    {
@@ -1375,21 +1375,6 @@
     "p": 70
    },
    {
-    "map": "nuke",
-    "us": {
-     "n": 337,
-     "wr": 41,
-     "dev": -0.06
-    },
-    "them": {
-     "n": 99,
-     "wr": 54,
-     "dev": 0
-    },
-    "edge": -1.5,
-    "p": 68
-   },
-   {
     "map": "ancient",
     "us": {
      "n": 747,
@@ -1402,7 +1387,22 @@
      "dev": 0.05
     },
     "edge": -1.5,
-    "p": 68
+    "p": 67
+   },
+   {
+    "map": "nuke",
+    "us": {
+     "n": 337,
+     "wr": 41,
+     "dev": -0.06
+    },
+    "them": {
+     "n": 99,
+     "wr": 54,
+     "dev": 0
+    },
+    "edge": -1.6,
+    "p": 67
    },
    {
     "map": "mirage",
@@ -1416,8 +1416,8 @@
      "wr": 47,
      "dev": -0.05
     },
-    "edge": -1.9,
-    "p": 68
+    "edge": -2,
+    "p": 67
    },
    {
     "map": "inferno",
@@ -1432,7 +1432,7 @@
      "dev": 0.16
     },
     "edge": -2.9,
-    "p": 67
+    "p": 66
    }
   ],
   "vetoes": [
@@ -1441,11 +1441,11 @@
     "bans": [
      {
       "by": "us",
-      "map": "dust2"
+      "map": "mirage"
      },
      {
       "by": "them",
-      "map": "mirage"
+      "map": "dust2"
      },
      {
       "by": "us",
@@ -1501,12 +1501,12 @@
   ],
   "p": {
    "elo": 65,
-   "map": 68,
+   "map": 67,
    "pelo": 53,
-   "rwa": 66,
+   "rwa": 65,
    "rating": 52,
    "matchup": 49,
-   "win": 70
+   "win": 69
   },
   "w": {
    "elo": 25,
@@ -1518,7 +1518,7 @@
   },
   "rwa": {
    "us": -0.8,
-   "them": -5.5,
+   "them": -5.2,
    "five": [
     [
      "LAURSEN_111",
@@ -1527,12 +1527,12 @@
     ],
     [
      "Saintz",
-     1.67,
+     1.68,
      2243
     ],
     [
      "mf_",
-     0,
+     0.01,
      2188
     ],
     [
@@ -1542,39 +1542,39 @@
     ],
     [
      "rezzah",
-     -2.99,
+     -2.98,
      1782
     ]
    ],
    "theirFive": [
     [
      "Purple2124",
-     -2.35,
-     495,
+     -2.29,
+     519,
      0.2
     ],
     [
      "Narbig",
-     -0.57,
-     1532,
+     -0.59,
+     1556,
      0.2
     ],
     [
      "ewo",
-     -0.7,
-     1512,
+     -0.57,
+     1536,
      0.2
     ],
     [
      "Lucan",
-     -1.26,
-     649,
+     -1.16,
+     673,
      0.171
     ],
     [
      "WILD4FLOWER",
-     -0.87,
-     1324,
+     -0.8,
+     1348,
      0.157
     ],
     [
@@ -1675,7 +1675,7 @@
    "opp entry: Narbig; CT: play for the trade, no free opening kill.",
    "talent: 1NT five 3.04★ vs opp 2.87★ (Δ +0.17).",
    "opp five's weakest map: cache (8% over 17 player-maps); strongest: inferno (60%), expect it banned.",
-   "veto: ban dust2, nuke, inferno; likely decider ancient (1NT 68%, anubis is the biggest edge at +6.3).",
+   "veto: ban mirage, nuke, inferno; likely decider ancient (1NT 67%, anubis is the biggest edge at +6.4).",
    "opp S59: 7-6, -4 rounds."
   ],
   "oppMaps": [
@@ -1898,7 +1898,7 @@
      "plus": {
       "entryPlus": 96,
       "duelPlus": 82,
-      "multiPlus": 89,
+      "multiPlus": 88,
       "clutchPlus": 92,
       "utilPlus": 88,
       "awpPlus": 92,
@@ -1951,10 +1951,10 @@
    ]
   },
   "spread": {
-   "q": 0.584,
-   "rounds": 2.9,
+   "q": 0.58,
+   "rounds": 2.8,
    "line": 4.5,
-   "cover": 48,
+   "cover": 47,
    "score": "13-6"
   },
   "total": {
@@ -3542,48 +3542,48 @@
  },
  "members": [
   {
-   "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
-   "nick": "rezzah"
+   "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+   "nick": "mf_"
   },
   {
    "id": "45309b43-02c6-4a57-b47e-6a640f9d91bc",
    "nick": "Chawk"
   },
   {
-   "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
-   "nick": "Saintz"
-  },
-  {
-   "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
-   "nick": "mf_"
-  },
-  {
-   "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
-   "nick": "LAURSEN_111"
+   "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
+   "nick": "-BMoney-"
   },
   {
    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
    "nick": "Yo1nky"
   },
   {
-   "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
-   "nick": "deadacate"
-  },
-  {
-   "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
-   "nick": "Beasty_"
-  },
-  {
-   "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
-   "nick": "-BMoney-"
-  },
-  {
    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
    "nick": "-TMoney-"
   },
   {
+   "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
+   "nick": "rezzah"
+  },
+  {
+   "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
+   "nick": "Saintz"
+  },
+  {
+   "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
+   "nick": "LAURSEN_111"
+  },
+  {
+   "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
+   "nick": "deadacate"
+  },
+  {
    "id": "b76982b5-6b55-4976-9fd7-ad9e25181615",
    "nick": "mIKEY-_-"
+  },
+  {
+   "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
+   "nick": "Beasty_"
   }
  ],
  "memberLog": [
@@ -5527,7 +5527,7 @@
      1.51,
      1.36,
      1.09,
-     1.51,
+     1.52,
      1.2
     ],
     "rank": 2
@@ -5975,7 +5975,7 @@
      0.85,
      1.39,
      1.25,
-     0.99,
+     1,
      1.23,
      1.57,
      1.5,
@@ -6040,7 +6040,7 @@
      0.91,
      1.27,
      1.49,
-     0.81
+     0.82
     ],
     "rank": 19
    },
@@ -6453,7 +6453,7 @@
     "mvpPR": 0.15,
     "games": [
      1.39,
-     1.2,
+     1.21,
      1.12,
      1.58,
      1.02,
@@ -7776,7 +7776,7 @@
     "clutch": 1,
     "mvpPR": 0.13,
     "games": [
-     1.16,
+     1.15,
      1.18,
      1.63,
      0.34,
@@ -7960,7 +7960,7 @@
      0.97,
      0.56,
      0.32,
-     0.74,
+     0.73,
      1.84,
      1.21,
      1.42,
@@ -8617,7 +8617,7 @@
     "games": [
      1.03,
      1.65,
-     1.21,
+     1.2,
      0.86,
      1.22,
      1.07,
@@ -8708,9 +8708,9 @@
     "mvpPR": 0.08,
     "games": [
      1.06,
-     1,
+     0.99,
      1.44,
-     1.05,
+     1.06,
      0.74,
      1.64,
      0.97,
@@ -8957,7 +8957,7 @@
      1.1,
      1.25,
      1.25,
-     1.18,
+     1.17,
      0.71,
      1.07
     ],
@@ -9982,7 +9982,7 @@
      0.51,
      1.19,
      1.08,
-     0.97,
+     0.96,
      0.97
     ],
     "rank": 150
@@ -11508,7 +11508,7 @@
      0.96,
      0.94,
      0.93,
-     0.5
+     0.49
     ],
     "rank": 201
    },
@@ -12485,7 +12485,7 @@
     "clutch": 3,
     "mvpPR": 0.07,
     "games": [
-     0.99,
+     1,
      1.18,
      1.05,
      0.77,
@@ -12894,7 +12894,7 @@
      1.15,
      1.09,
      1.03,
-     0.36,
+     0.37,
      0.95
     ],
     "rank": 247
@@ -14238,7 +14238,7 @@
      0.74,
      1.09,
      0.38,
-     1.2,
+     1.21,
      0.77,
      0.94,
      0.92,
@@ -14793,14 +14793,14 @@
  },
  "arkModel": {
   "fitted": true,
-  "maps": 3884,
+  "maps": 3885,
   "r2": 0.919,
   "beta": {
    "kpr": 0.124,
    "dpr": -0.121,
    "adr": 0.037,
    "mks": 0.051,
-   "entry": 0.012,
+   "entry": 0.011,
    "clutch": 0.2,
    "apr": 0.017,
    "fpr": 0,
@@ -14930,7 +14930,7 @@
        "parts": {
         "kpr": 1,
         "dpr": -0.9,
-        "adr": 0.5,
+        "adr": 0.4,
         "mks": 0.5,
         "entry": -0.1,
         "clutch": 2.1,
@@ -15448,7 +15448,7 @@
         "usr": 0,
         "team": 3.8
        },
-       "rwa": 12.9,
+       "rwa": 13,
        "mapMvp": true
       },
       {
@@ -15501,7 +15501,7 @@
         "usr": 0,
         "team": 3.3
        },
-       "rwa": 5.6
+       "rwa": 5.7
       },
       {
        "name": "mf_",
@@ -15553,7 +15553,7 @@
         "usr": 0,
         "team": 2.3
        },
-       "rwa": 3.3
+       "rwa": 3.4
       },
       {
        "name": "Beasty_",
@@ -15605,7 +15605,7 @@
         "usr": 0,
         "team": 3.3
        },
-       "rwa": 2.6
+       "rwa": 2.7
       },
       {
        "name": "Saintz",
@@ -15657,7 +15657,7 @@
         "usr": 0,
         "team": 2.8
        },
-       "rwa": -0.4
+       "rwa": -0.3
       }
      ],
      "opp": [
@@ -15997,7 +15997,7 @@
        "parts": {
         "kpr": 2.9,
         "dpr": -0.7,
-        "adr": 0.6,
+        "adr": 0.5,
         "mks": 0.8,
         "entry": 0.1,
         "clutch": -0.4,
@@ -18248,7 +18248,7 @@
         "usr": 0,
         "team": -0.9
        },
-       "rwa": -0.1,
+       "rwa": 0,
        "mapMvp": true
       },
       {
@@ -18301,7 +18301,7 @@
         "usr": 0,
         "team": -0.9
        },
-       "rwa": -2.2
+       "rwa": -2.1
       },
       {
        "name": "LAURSEN_111",
@@ -18353,7 +18353,7 @@
         "usr": 0,
         "team": -1.1
        },
-       "rwa": -2.3
+       "rwa": -2.2
       },
       {
        "name": "rezzah",
@@ -18405,7 +18405,7 @@
         "usr": 0,
         "team": -0.8
        },
-       "rwa": -4.5
+       "rwa": -4.4
       },
       {
        "name": "Chawk",
@@ -18457,7 +18457,7 @@
         "usr": 0,
         "team": -0.8
        },
-       "rwa": -6.5
+       "rwa": -6.4
       }
      ],
      "opp": [
@@ -18808,7 +18808,7 @@
         "usr": 0,
         "team": 1
        },
-       "rwa": 5.5,
+       "rwa": 5.6,
        "mapMvp": true
       },
       {
@@ -18850,7 +18850,7 @@
        "parts": {
         "kpr": 2.5,
         "dpr": 0.8,
-        "adr": 0.5,
+        "adr": 0.4,
         "mks": 0.8,
         "entry": 0,
         "clutch": -0.4,
@@ -18861,7 +18861,7 @@
         "usr": 0,
         "team": 0.5
        },
-       "rwa": 3.4
+       "rwa": 3.5
       },
       {
        "name": "mf_",
@@ -18913,7 +18913,7 @@
         "usr": 0,
         "team": 0.5
        },
-       "rwa": 0
+       "rwa": 0.1
       },
       {
        "name": "LAURSEN_111",
@@ -18965,7 +18965,7 @@
         "usr": 0,
         "team": 0.8
        },
-       "rwa": -1
+       "rwa": -0.9
       },
       {
        "name": "Saintz",
@@ -19017,7 +19017,7 @@
         "usr": 0,
         "team": 0.5
        },
-       "rwa": -7.3
+       "rwa": -7.2
       }
      ],
      "opp": [
@@ -20893,7 +20893,7 @@
        "impact": 0.79,
        "resid": -0.036931818181818184,
        "country": "us",
-       "rating": 0.5,
+       "rating": 0.49,
        "swing": -9.1,
        "parts": {
         "kpr": -2.7,
@@ -21651,7 +21651,7 @@
     "multiPlus": 114,
     "clutchPlus": 98,
     "utilPlus": 104,
-    "awpPlus": 109,
+    "awpPlus": 108,
     "survPlus": 112,
     "entryPct": 53,
     "role": "hybrid AWP / lurker"
@@ -24420,7 +24420,7 @@
     "duelPlus": 79,
     "multiPlus": 79,
     "clutchPlus": 108,
-    "utilPlus": 104,
+    "utilPlus": 105,
     "awpPlus": 90,
     "survPlus": 65,
     "entryPct": 75
@@ -24695,296 +24695,6 @@
   },
   "roster": [
    {
-    "nickname": "-BMoney-",
-    "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
-    "country": "us",
-    "level": 10,
-    "elo": 2001,
-    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg",
-    "role": null,
-    "trend": null,
-    "form": null,
-    "formMaps": 0,
-    "talent": {
-     "exact": 1.86,
-     "stars": 2
-    },
-    "rolling": {
-     "all": null,
-     "official": null,
-     "pug": null,
-     "scrim": null
-    },
-    "plus": {}
-   },
-   {
-    "nickname": "-TMoney-",
-    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
-    "country": "us",
-    "level": 10,
-    "elo": 2084,
-    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg",
-    "role": null,
-    "trend": null,
-    "form": null,
-    "formMaps": 0,
-    "talent": {
-     "exact": 2.1,
-     "stars": 2
-    },
-    "rolling": {
-     "all": null,
-     "official": null,
-     "pug": null,
-     "scrim": null
-    },
-    "plus": {}
-   },
-   {
-    "nickname": "Yo1nky",
-    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
-    "country": "us",
-    "level": 10,
-    "elo": 2060,
-    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg",
-    "role": {
-     "role": "lurker",
-     "sniper": 0.14,
-     "entry": 0.22,
-     "flash": 0.3,
-     "util": 0.41,
-     "clutch": 0.074,
-     "maps": 42,
-     "days": 90
-    },
-    "trend": {
-     "last20": 1.3,
-     "last100": 1.3,
-     "delta": 0,
-     "flag": null
-    },
-    "form": 1.3,
-    "formMaps": 42,
-    "talent": {
-     "exact": 4.15,
-     "stars": 4
-    },
-    "rolling": {
-     "all": {
-      "maps": 42,
-      "ark": 1.3,
-      "kd": 1.52,
-      "kpr": 0.99,
-      "adr": 100.1,
-      "entryPM": 69,
-      "clutch": 24,
-      "multi": 82,
-      "udr": 5,
-      "fpr": 0.2,
-      "entryPlus": 126,
-      "duelPlus": 129,
-      "multiPlus": 133,
-      "clutchPlus": 111,
-      "utilPlus": 98,
-      "awpPlus": 106,
-      "survPlus": 116,
-      "entryPct": 67
-     },
-     "official": {
-      "maps": 2,
-      "ark": 0.96,
-      "kd": 0.74,
-      "kpr": 0.63,
-      "adr": 57.2,
-      "entryPM": 4,
-      "clutch": 1,
-      "multi": 1,
-      "udr": 1.8,
-      "fpr": 0.17,
-      "entryPlus": 127,
-      "duelPlus": 79,
-      "multiPlus": 79,
-      "clutchPlus": 108,
-      "utilPlus": 104,
-      "awpPlus": 90,
-      "survPlus": 65,
-      "entryPct": 75
-     },
-     "pug": {
-      "maps": 39,
-      "ark": 1.33,
-      "kd": 1.59,
-      "kpr": 1.02,
-      "adr": 103.1,
-      "entryPM": 65,
-      "clutch": 23,
-      "multi": 81,
-      "udr": 5.2,
-      "fpr": 0.21,
-      "entryPlus": 126,
-      "duelPlus": 132,
-      "multiPlus": 137,
-      "clutchPlus": 111,
-      "utilPlus": 98,
-      "awpPlus": 107,
-      "survPlus": 119,
-      "entryPct": 67
-     },
-     "scrim": {
-      "maps": 1,
-      "ark": 0.86,
-      "kd": 0.93,
-      "kpr": 0.61,
-      "adr": 63.5,
-      "entryPM": 0,
-      "clutch": 0,
-      "multi": 0,
-      "udr": 3.1,
-      "fpr": 0,
-      "entryPlus": 99,
-      "duelPlus": 90,
-      "multiPlus": 75,
-      "clutchPlus": null,
-      "utilPlus": 71,
-      "awpPlus": 90,
-      "survPlus": 116,
-      "entryPct": 50
-     }
-    },
-    "plus": {
-     "entryPlus": 126,
-     "duelPlus": 129,
-     "multiPlus": 133,
-     "clutchPlus": 111,
-     "utilPlus": 98,
-     "awpPlus": 106,
-     "survPlus": 116,
-     "entryPct": 67
-    }
-   },
-   {
-    "nickname": "rezzah",
-    "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
-    "country": "ca",
-    "level": 9,
-    "elo": 1994,
-    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg",
-    "role": {
-     "role": "rifler",
-     "sniper": 0.02,
-     "entry": 0.22,
-     "flash": 0.31,
-     "util": 0.26,
-     "clutch": 0.032,
-     "maps": 41,
-     "days": 90
-    },
-    "trend": {
-     "last20": 0.92,
-     "last100": 0.89,
-     "delta": 0.03,
-     "flag": null
-    },
-    "form": 0.89,
-    "formMaps": 41,
-    "talent": {
-     "exact": 1.99,
-     "stars": 2
-    },
-    "rolling": {
-     "all": {
-      "maps": 41,
-      "ark": 0.89,
-      "kd": 0.81,
-      "kpr": 0.61,
-      "adr": 70.6,
-      "entryPM": -5,
-      "clutch": 7,
-      "multi": 38,
-      "udr": 2.4,
-      "fpr": 0.17,
-      "entryPlus": 96,
-      "duelPlus": 82,
-      "multiPlus": 89,
-      "clutchPlus": 92,
-      "utilPlus": 88,
-      "awpPlus": 92,
-      "survPlus": 89,
-      "entryPct": 49
-     },
-     "official": {
-      "maps": 9,
-      "ark": 0.94,
-      "kd": 0.86,
-      "kpr": 0.63,
-      "adr": 69.3,
-      "entryPM": 1,
-      "clutch": 4,
-      "multi": 8,
-      "udr": 4.2,
-      "fpr": 0.16,
-      "entryPlus": 100,
-      "duelPlus": 86,
-      "multiPlus": 87,
-      "clutchPlus": 105,
-      "utilPlus": 92,
-      "awpPlus": 92,
-      "survPlus": 95,
-      "entryPct": 51
-     },
-     "pug": {
-      "maps": 11,
-      "ark": 1.03,
-      "kd": 1.01,
-      "kpr": 0.75,
-      "adr": 82.6,
-      "entryPM": 9,
-      "clutch": 3,
-      "multi": 17,
-      "udr": 2.5,
-      "fpr": 0.16,
-      "entryPlus": 111,
-      "duelPlus": 98,
-      "multiPlus": 105,
-      "clutchPlus": 101,
-      "utilPlus": 87,
-      "awpPlus": 95,
-      "survPlus": 91,
-      "entryPct": 57
-     },
-     "scrim": {
-      "maps": 21,
-      "ark": 0.85,
-      "kd": 0.7,
-      "kpr": 0.54,
-      "adr": 65.5,
-      "entryPM": -15,
-      "clutch": 0,
-      "multi": 13,
-      "udr": 1.6,
-      "fpr": 0.17,
-      "entryPlus": 86,
-      "duelPlus": 74,
-      "multiPlus": 82,
-      "clutchPlus": 79,
-      "utilPlus": 86,
-      "awpPlus": 90,
-      "survPlus": 85,
-      "entryPct": 42
-     }
-    },
-    "plus": {
-     "entryPlus": 96,
-     "duelPlus": 82,
-     "multiPlus": 89,
-     "clutchPlus": 92,
-     "utilPlus": 88,
-     "awpPlus": 92,
-     "survPlus": 89,
-     "entryPct": 49
-    }
-   },
-   {
     "nickname": "Saintz",
     "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
     "country": "us",
@@ -25107,6 +24817,29 @@
     }
    },
    {
+    "nickname": "-TMoney-",
+    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
+    "country": "us",
+    "level": 10,
+    "elo": 2084,
+    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg",
+    "role": null,
+    "trend": null,
+    "form": null,
+    "formMaps": 0,
+    "talent": {
+     "exact": 2.1,
+     "stars": 2
+    },
+    "rolling": {
+     "all": null,
+     "official": null,
+     "pug": null,
+     "scrim": null
+    },
+    "plus": {}
+   },
+   {
     "nickname": "deadacate",
     "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
     "country": "us",
@@ -25120,6 +24853,395 @@
     "talent": {
      "exact": 1.37,
      "stars": 1.5
+    },
+    "rolling": {
+     "all": null,
+     "official": null,
+     "pug": null,
+     "scrim": null
+    },
+    "plus": {}
+   },
+   {
+    "nickname": "Yo1nky",
+    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
+    "country": "us",
+    "level": 10,
+    "elo": 2060,
+    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg",
+    "role": {
+     "role": "lurker",
+     "sniper": 0.14,
+     "entry": 0.22,
+     "flash": 0.3,
+     "util": 0.41,
+     "clutch": 0.074,
+     "maps": 42,
+     "days": 90
+    },
+    "trend": {
+     "last20": 1.3,
+     "last100": 1.3,
+     "delta": 0,
+     "flag": null
+    },
+    "form": 1.3,
+    "formMaps": 42,
+    "talent": {
+     "exact": 4.15,
+     "stars": 4
+    },
+    "rolling": {
+     "all": {
+      "maps": 42,
+      "ark": 1.3,
+      "kd": 1.52,
+      "kpr": 0.99,
+      "adr": 100.1,
+      "entryPM": 69,
+      "clutch": 24,
+      "multi": 82,
+      "udr": 5,
+      "fpr": 0.2,
+      "entryPlus": 126,
+      "duelPlus": 129,
+      "multiPlus": 133,
+      "clutchPlus": 111,
+      "utilPlus": 98,
+      "awpPlus": 106,
+      "survPlus": 116,
+      "entryPct": 67
+     },
+     "official": {
+      "maps": 2,
+      "ark": 0.96,
+      "kd": 0.74,
+      "kpr": 0.63,
+      "adr": 57.2,
+      "entryPM": 4,
+      "clutch": 1,
+      "multi": 1,
+      "udr": 1.8,
+      "fpr": 0.17,
+      "entryPlus": 127,
+      "duelPlus": 79,
+      "multiPlus": 79,
+      "clutchPlus": 108,
+      "utilPlus": 105,
+      "awpPlus": 90,
+      "survPlus": 65,
+      "entryPct": 75
+     },
+     "pug": {
+      "maps": 39,
+      "ark": 1.33,
+      "kd": 1.59,
+      "kpr": 1.02,
+      "adr": 103.1,
+      "entryPM": 65,
+      "clutch": 23,
+      "multi": 81,
+      "udr": 5.2,
+      "fpr": 0.21,
+      "entryPlus": 126,
+      "duelPlus": 132,
+      "multiPlus": 137,
+      "clutchPlus": 111,
+      "utilPlus": 98,
+      "awpPlus": 107,
+      "survPlus": 119,
+      "entryPct": 67
+     },
+     "scrim": {
+      "maps": 1,
+      "ark": 0.86,
+      "kd": 0.93,
+      "kpr": 0.61,
+      "adr": 63.5,
+      "entryPM": 0,
+      "clutch": 0,
+      "multi": 0,
+      "udr": 3.1,
+      "fpr": 0,
+      "entryPlus": 99,
+      "duelPlus": 90,
+      "multiPlus": 75,
+      "clutchPlus": null,
+      "utilPlus": 71,
+      "awpPlus": 90,
+      "survPlus": 116,
+      "entryPct": 50
+     }
+    },
+    "plus": {
+     "entryPlus": 126,
+     "duelPlus": 129,
+     "multiPlus": 133,
+     "clutchPlus": 111,
+     "utilPlus": 98,
+     "awpPlus": 106,
+     "survPlus": 116,
+     "entryPct": 67
+    }
+   },
+   {
+    "nickname": "Beasty_",
+    "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
+    "country": "us",
+    "level": 10,
+    "elo": 2198,
+    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg",
+    "role": {
+     "role": "support",
+     "sniper": 0.01,
+     "entry": 0.17,
+     "flash": 0.73,
+     "util": 0.38,
+     "clutch": 0.042,
+     "maps": 30,
+     "days": 90
+    },
+    "trend": {
+     "last20": 0.85,
+     "last100": 0.89,
+     "delta": -0.04,
+     "flag": null
+    },
+    "form": 0.89,
+    "formMaps": 30,
+    "talent": {
+     "exact": 2.22,
+     "stars": 2
+    },
+    "rolling": {
+     "all": {
+      "maps": 30,
+      "ark": 0.89,
+      "kd": 0.77,
+      "kpr": 0.59,
+      "adr": 65.7,
+      "entryPM": -28,
+      "clutch": 11,
+      "multi": 17,
+      "udr": 2.7,
+      "fpr": 0.48,
+      "entryPlus": 81,
+      "duelPlus": 82,
+      "multiPlus": 81,
+      "clutchPlus": 106,
+      "utilPlus": 99,
+      "awpPlus": 91,
+      "survPlus": 89,
+      "entryPct": 38
+     },
+     "official": {
+      "maps": 10,
+      "ark": 0.9,
+      "kd": 0.71,
+      "kpr": 0.54,
+      "adr": 61.2,
+      "entryPM": -10,
+      "clutch": 3,
+      "multi": 6,
+      "udr": 2.1,
+      "fpr": 0.61,
+      "entryPlus": 80,
+      "duelPlus": 76,
+      "multiPlus": 76,
+      "clutchPlus": 104,
+      "utilPlus": 102,
+      "awpPlus": 92,
+      "survPlus": 89,
+      "entryPct": 36
+     },
+     "pug": {
+      "maps": 1,
+      "ark": 0.94,
+      "kd": 0.82,
+      "kpr": 0.61,
+      "adr": 69,
+      "entryPM": -4,
+      "clutch": 1,
+      "multi": 0,
+      "udr": 0.7,
+      "fpr": 0.3,
+      "entryPlus": 54,
+      "duelPlus": 93,
+      "multiPlus": 85,
+      "clutchPlus": 118,
+      "utilPlus": 92,
+      "awpPlus": 90,
+      "survPlus": 94,
+      "entryPct": 0
+     },
+     "scrim": {
+      "maps": 19,
+      "ark": 0.92,
+      "kd": 0.8,
+      "kpr": 0.61,
+      "adr": 67.7,
+      "entryPM": -14,
+      "clutch": 7,
+      "multi": 11,
+      "udr": 3.1,
+      "fpr": 0.42,
+      "entryPlus": 85,
+      "duelPlus": 84,
+      "multiPlus": 83,
+      "clutchPlus": 103,
+      "utilPlus": 98,
+      "awpPlus": 91,
+      "survPlus": 89,
+      "entryPct": 40
+     }
+    },
+    "plus": {
+     "entryPlus": 81,
+     "duelPlus": 82,
+     "multiPlus": 81,
+     "clutchPlus": 106,
+     "utilPlus": 99,
+     "awpPlus": 91,
+     "survPlus": 89,
+     "entryPct": 38
+    }
+   },
+   {
+    "nickname": "mf_",
+    "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+    "country": "us",
+    "level": 10,
+    "elo": 2394,
+    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg",
+    "role": {
+     "role": "AWPer",
+     "sniper": 0.42,
+     "entry": 0.18,
+     "flash": 0.39,
+     "util": 0.43,
+     "clutch": 0.085,
+     "maps": 70,
+     "days": 90
+    },
+    "trend": {
+     "last20": 1.02,
+     "last100": 1.03,
+     "delta": -0.01,
+     "flag": null
+    },
+    "form": 1.03,
+    "formMaps": 70,
+    "talent": {
+     "exact": 3.16,
+     "stars": 3
+    },
+    "rolling": {
+     "all": {
+      "maps": 70,
+      "ark": 1.03,
+      "kd": 1.08,
+      "kpr": 0.69,
+      "adr": 72.2,
+      "entryPM": 60,
+      "clutch": 42,
+      "multi": 58,
+      "udr": 3.9,
+      "fpr": 0.27,
+      "entryPlus": 114,
+      "duelPlus": 97,
+      "multiPlus": 96,
+      "clutchPlus": 109,
+      "utilPlus": 97,
+      "awpPlus": 129,
+      "survPlus": 117,
+      "entryPct": 61
+     },
+     "official": {
+      "maps": 17,
+      "ark": 0.97,
+      "kd": 0.99,
+      "kpr": 0.63,
+      "adr": 68.3,
+      "entryPM": 8,
+      "clutch": 8,
+      "multi": 11,
+      "udr": 4.5,
+      "fpr": 0.3,
+      "entryPlus": 109,
+      "duelPlus": 91,
+      "multiPlus": 90,
+      "clutchPlus": 101,
+      "utilPlus": 99,
+      "awpPlus": 120,
+      "survPlus": 118,
+      "entryPct": 59
+     },
+     "pug": {
+      "maps": 9,
+      "ark": 1.02,
+      "kd": 1.04,
+      "kpr": 0.67,
+      "adr": 73.4,
+      "entryPM": 4,
+      "clutch": 6,
+      "multi": 6,
+      "udr": 5.3,
+      "fpr": 0.23,
+      "entryPlus": 106,
+      "duelPlus": 96,
+      "multiPlus": 93,
+      "clutchPlus": 114,
+      "utilPlus": 99,
+      "awpPlus": 124,
+      "survPlus": 117,
+      "entryPct": 56
+     },
+     "scrim": {
+      "maps": 44,
+      "ark": 1.05,
+      "kd": 1.11,
+      "kpr": 0.72,
+      "adr": 73.4,
+      "entryPM": 48,
+      "clutch": 28,
+      "multi": 41,
+      "udr": 3.3,
+      "fpr": 0.26,
+      "entryPlus": 117,
+      "duelPlus": 100,
+      "multiPlus": 99,
+      "clutchPlus": 111,
+      "utilPlus": 95,
+      "awpPlus": 134,
+      "survPlus": 117,
+      "entryPct": 62
+     }
+    },
+    "plus": {
+     "entryPlus": 114,
+     "duelPlus": 97,
+     "multiPlus": 96,
+     "clutchPlus": 109,
+     "utilPlus": 97,
+     "awpPlus": 129,
+     "survPlus": 117,
+     "entryPct": 61
+    }
+   },
+   {
+    "nickname": "-BMoney-",
+    "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
+    "country": "us",
+    "level": 10,
+    "elo": 2001,
+    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg",
+    "role": null,
+    "trend": null,
+    "form": null,
+    "formMaps": 0,
+    "talent": {
+     "exact": 1.86,
+     "stars": 2
     },
     "rolling": {
      "all": null,
@@ -25252,125 +25374,247 @@
     }
    },
    {
-    "nickname": "mf_",
-    "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
-    "country": "us",
+    "nickname": "LAURSEN_111",
+    "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
+    "country": "dk",
     "level": 10,
-    "elo": 2394,
-    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg",
+    "elo": 2438,
+    "avatar": "https://distribution.faceit-cdn.net/images/f003c30c-078f-4f40-a57d-af138c2f081b.jpg",
     "role": {
-     "role": "AWPer",
-     "sniper": 0.42,
-     "entry": 0.18,
-     "flash": 0.39,
-     "util": 0.43,
-     "clutch": 0.085,
-     "maps": 70,
+     "role": "entry",
+     "sniper": 0.04,
+     "entry": 0.26,
+     "flash": 0.46,
+     "util": 0.39,
+     "clutch": 0.038,
+     "maps": 81,
      "days": 90
     },
     "trend": {
-     "last20": 1.02,
-     "last100": 1.03,
-     "delta": -0.01,
+     "last20": 0.96,
+     "last100": 1.01,
+     "delta": -0.05,
      "flag": null
     },
-    "form": 1.03,
-    "formMaps": 70,
+    "form": 1.01,
+    "formMaps": 81,
     "talent": {
-     "exact": 3.16,
+     "exact": 3.09,
      "stars": 3
     },
     "rolling": {
      "all": {
-      "maps": 70,
-      "ark": 1.03,
-      "kd": 1.08,
-      "kpr": 0.69,
-      "adr": 72.2,
-      "entryPM": 60,
-      "clutch": 42,
-      "multi": 58,
-      "udr": 3.9,
-      "fpr": 0.27,
-      "entryPlus": 114,
-      "duelPlus": 97,
-      "multiPlus": 96,
-      "clutchPlus": 109,
+      "maps": 81,
+      "ark": 1.01,
+      "kd": 0.97,
+      "kpr": 0.75,
+      "adr": 86.6,
+      "entryPM": -21,
+      "clutch": 13,
+      "multi": 96,
+      "udr": 4.3,
+      "fpr": 0.28,
+      "entryPlus": 94,
+      "duelPlus": 99,
+      "multiPlus": 103,
+      "clutchPlus": 87,
       "utilPlus": 97,
-      "awpPlus": 129,
-      "survPlus": 117,
-      "entryPct": 61
+      "awpPlus": 94,
+      "survPlus": 85,
+      "entryPct": 48
      },
      "official": {
-      "maps": 17,
-      "ark": 0.97,
-      "kd": 0.99,
-      "kpr": 0.63,
-      "adr": 68.3,
-      "entryPM": 8,
-      "clutch": 8,
-      "multi": 11,
-      "udr": 4.5,
-      "fpr": 0.3,
-      "entryPlus": 109,
-      "duelPlus": 91,
-      "multiPlus": 90,
-      "clutchPlus": 101,
-      "utilPlus": 99,
-      "awpPlus": 120,
-      "survPlus": 118,
-      "entryPct": 59
+      "maps": 19,
+      "ark": 0.98,
+      "kd": 0.9,
+      "kpr": 0.71,
+      "adr": 85.7,
+      "entryPM": -2,
+      "clutch": 3,
+      "multi": 24,
+      "udr": 4.3,
+      "fpr": 0.22,
+      "entryPlus": 97,
+      "duelPlus": 93,
+      "multiPlus": 100,
+      "clutchPlus": 90,
+      "utilPlus": 95,
+      "awpPlus": 91,
+      "survPlus": 80,
+      "entryPct": 49
      },
      "pug": {
-      "maps": 9,
-      "ark": 1.02,
-      "kd": 1.04,
-      "kpr": 0.67,
-      "adr": 73.4,
-      "entryPM": 4,
-      "clutch": 6,
-      "multi": 6,
-      "udr": 5.3,
-      "fpr": 0.23,
-      "entryPlus": 106,
-      "duelPlus": 96,
-      "multiPlus": 93,
-      "clutchPlus": 114,
-      "utilPlus": 99,
-      "awpPlus": 124,
-      "survPlus": 117,
-      "entryPct": 56
+      "maps": 19,
+      "ark": 1.08,
+      "kd": 1.08,
+      "kpr": 0.82,
+      "adr": 90.6,
+      "entryPM": 0,
+      "clutch": 4,
+      "multi": 27,
+      "udr": 3.8,
+      "fpr": 0.26,
+      "entryPlus": 98,
+      "duelPlus": 107,
+      "multiPlus": 112,
+      "clutchPlus": 95,
+      "utilPlus": 95,
+      "awpPlus": 100,
+      "survPlus": 89,
+      "entryPct": 50
      },
      "scrim": {
-      "maps": 44,
-      "ark": 1.05,
-      "kd": 1.11,
-      "kpr": 0.72,
-      "adr": 73.4,
-      "entryPM": 48,
-      "clutch": 28,
-      "multi": 41,
-      "udr": 3.3,
-      "fpr": 0.26,
-      "entryPlus": 117,
-      "duelPlus": 100,
-      "multiPlus": 99,
-      "clutchPlus": 111,
-      "utilPlus": 95,
-      "awpPlus": 134,
-      "survPlus": 117,
-      "entryPct": 62
+      "maps": 43,
+      "ark": 1,
+      "kd": 0.95,
+      "kpr": 0.73,
+      "adr": 85.3,
+      "entryPM": -19,
+      "clutch": 6,
+      "multi": 45,
+      "udr": 4.5,
+      "fpr": 0.31,
+      "entryPlus": 91,
+      "duelPlus": 98,
+      "multiPlus": 101,
+      "clutchPlus": 85,
+      "utilPlus": 99,
+      "awpPlus": 93,
+      "survPlus": 85,
+      "entryPct": 46
      }
     },
     "plus": {
-     "entryPlus": 114,
-     "duelPlus": 97,
-     "multiPlus": 96,
-     "clutchPlus": 109,
+     "entryPlus": 94,
+     "duelPlus": 99,
+     "multiPlus": 103,
+     "clutchPlus": 87,
      "utilPlus": 97,
-     "awpPlus": 129,
-     "survPlus": 117,
-     "entryPct": 61
+     "awpPlus": 94,
+     "survPlus": 85,
+     "entryPct": 48
+    }
+   },
+   {
+    "nickname": "rezzah",
+    "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
+    "country": "ca",
+    "level": 9,
+    "elo": 1994,
+    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg",
+    "role": {
+     "role": "rifler",
+     "sniper": 0.02,
+     "entry": 0.22,
+     "flash": 0.31,
+     "util": 0.26,
+     "clutch": 0.032,
+     "maps": 41,
+     "days": 90
+    },
+    "trend": {
+     "last20": 0.92,
+     "last100": 0.89,
+     "delta": 0.03,
+     "flag": null
+    },
+    "form": 0.89,
+    "formMaps": 41,
+    "talent": {
+     "exact": 1.99,
+     "stars": 2
+    },
+    "rolling": {
+     "all": {
+      "maps": 41,
+      "ark": 0.89,
+      "kd": 0.81,
+      "kpr": 0.61,
+      "adr": 70.6,
+      "entryPM": -5,
+      "clutch": 7,
+      "multi": 38,
+      "udr": 2.4,
+      "fpr": 0.17,
+      "entryPlus": 96,
+      "duelPlus": 82,
+      "multiPlus": 88,
+      "clutchPlus": 92,
+      "utilPlus": 88,
+      "awpPlus": 92,
+      "survPlus": 89,
+      "entryPct": 49
+     },
+     "official": {
+      "maps": 9,
+      "ark": 0.94,
+      "kd": 0.86,
+      "kpr": 0.63,
+      "adr": 69.3,
+      "entryPM": 1,
+      "clutch": 4,
+      "multi": 8,
+      "udr": 4.2,
+      "fpr": 0.16,
+      "entryPlus": 100,
+      "duelPlus": 86,
+      "multiPlus": 87,
+      "clutchPlus": 105,
+      "utilPlus": 92,
+      "awpPlus": 92,
+      "survPlus": 95,
+      "entryPct": 51
+     },
+     "pug": {
+      "maps": 11,
+      "ark": 1.03,
+      "kd": 1.01,
+      "kpr": 0.75,
+      "adr": 82.6,
+      "entryPM": 9,
+      "clutch": 3,
+      "multi": 17,
+      "udr": 2.5,
+      "fpr": 0.16,
+      "entryPlus": 111,
+      "duelPlus": 98,
+      "multiPlus": 105,
+      "clutchPlus": 101,
+      "utilPlus": 87,
+      "awpPlus": 95,
+      "survPlus": 91,
+      "entryPct": 57
+     },
+     "scrim": {
+      "maps": 21,
+      "ark": 0.85,
+      "kd": 0.7,
+      "kpr": 0.54,
+      "adr": 65.5,
+      "entryPM": -15,
+      "clutch": 0,
+      "multi": 13,
+      "udr": 1.6,
+      "fpr": 0.17,
+      "entryPlus": 86,
+      "duelPlus": 74,
+      "multiPlus": 82,
+      "clutchPlus": 79,
+      "utilPlus": 86,
+      "awpPlus": 90,
+      "survPlus": 85,
+      "entryPct": 42
+     }
+    },
+    "plus": {
+     "entryPlus": 96,
+     "duelPlus": 82,
+     "multiPlus": 88,
+     "clutchPlus": 92,
+     "utilPlus": 88,
+     "awpPlus": 92,
+     "survPlus": 89,
+     "entryPct": 49
     }
    },
    {
@@ -25494,250 +25738,6 @@
      "survPlus": 110,
      "entryPct": 50
     }
-   },
-   {
-    "nickname": "LAURSEN_111",
-    "id": "e8e00077-0461-4b0f-ad50-e9f546e6093f",
-    "country": "dk",
-    "level": 10,
-    "elo": 2438,
-    "avatar": "https://distribution.faceit-cdn.net/images/f003c30c-078f-4f40-a57d-af138c2f081b.jpg",
-    "role": {
-     "role": "entry",
-     "sniper": 0.04,
-     "entry": 0.26,
-     "flash": 0.46,
-     "util": 0.39,
-     "clutch": 0.038,
-     "maps": 81,
-     "days": 90
-    },
-    "trend": {
-     "last20": 0.96,
-     "last100": 1.01,
-     "delta": -0.05,
-     "flag": null
-    },
-    "form": 1.01,
-    "formMaps": 81,
-    "talent": {
-     "exact": 3.09,
-     "stars": 3
-    },
-    "rolling": {
-     "all": {
-      "maps": 81,
-      "ark": 1.01,
-      "kd": 0.97,
-      "kpr": 0.75,
-      "adr": 86.6,
-      "entryPM": -21,
-      "clutch": 13,
-      "multi": 96,
-      "udr": 4.3,
-      "fpr": 0.28,
-      "entryPlus": 94,
-      "duelPlus": 99,
-      "multiPlus": 103,
-      "clutchPlus": 87,
-      "utilPlus": 97,
-      "awpPlus": 94,
-      "survPlus": 85,
-      "entryPct": 48
-     },
-     "official": {
-      "maps": 19,
-      "ark": 0.98,
-      "kd": 0.9,
-      "kpr": 0.71,
-      "adr": 85.7,
-      "entryPM": -2,
-      "clutch": 3,
-      "multi": 24,
-      "udr": 4.3,
-      "fpr": 0.22,
-      "entryPlus": 97,
-      "duelPlus": 93,
-      "multiPlus": 100,
-      "clutchPlus": 90,
-      "utilPlus": 95,
-      "awpPlus": 90,
-      "survPlus": 80,
-      "entryPct": 49
-     },
-     "pug": {
-      "maps": 19,
-      "ark": 1.08,
-      "kd": 1.08,
-      "kpr": 0.82,
-      "adr": 90.6,
-      "entryPM": 0,
-      "clutch": 4,
-      "multi": 27,
-      "udr": 3.8,
-      "fpr": 0.26,
-      "entryPlus": 98,
-      "duelPlus": 107,
-      "multiPlus": 112,
-      "clutchPlus": 95,
-      "utilPlus": 95,
-      "awpPlus": 100,
-      "survPlus": 89,
-      "entryPct": 50
-     },
-     "scrim": {
-      "maps": 43,
-      "ark": 1,
-      "kd": 0.95,
-      "kpr": 0.73,
-      "adr": 85.3,
-      "entryPM": -19,
-      "clutch": 6,
-      "multi": 45,
-      "udr": 4.5,
-      "fpr": 0.31,
-      "entryPlus": 91,
-      "duelPlus": 98,
-      "multiPlus": 101,
-      "clutchPlus": 85,
-      "utilPlus": 99,
-      "awpPlus": 93,
-      "survPlus": 85,
-      "entryPct": 46
-     }
-    },
-    "plus": {
-     "entryPlus": 94,
-     "duelPlus": 99,
-     "multiPlus": 103,
-     "clutchPlus": 87,
-     "utilPlus": 97,
-     "awpPlus": 94,
-     "survPlus": 85,
-     "entryPct": 48
-    }
-   },
-   {
-    "nickname": "Beasty_",
-    "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
-    "country": "us",
-    "level": 10,
-    "elo": 2198,
-    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg",
-    "role": {
-     "role": "support",
-     "sniper": 0.01,
-     "entry": 0.17,
-     "flash": 0.73,
-     "util": 0.38,
-     "clutch": 0.042,
-     "maps": 30,
-     "days": 90
-    },
-    "trend": {
-     "last20": 0.85,
-     "last100": 0.89,
-     "delta": -0.04,
-     "flag": null
-    },
-    "form": 0.89,
-    "formMaps": 30,
-    "talent": {
-     "exact": 2.22,
-     "stars": 2
-    },
-    "rolling": {
-     "all": {
-      "maps": 30,
-      "ark": 0.89,
-      "kd": 0.77,
-      "kpr": 0.59,
-      "adr": 65.7,
-      "entryPM": -28,
-      "clutch": 11,
-      "multi": 17,
-      "udr": 2.7,
-      "fpr": 0.48,
-      "entryPlus": 81,
-      "duelPlus": 82,
-      "multiPlus": 81,
-      "clutchPlus": 106,
-      "utilPlus": 99,
-      "awpPlus": 91,
-      "survPlus": 89,
-      "entryPct": 38
-     },
-     "official": {
-      "maps": 10,
-      "ark": 0.9,
-      "kd": 0.71,
-      "kpr": 0.54,
-      "adr": 61.2,
-      "entryPM": -10,
-      "clutch": 3,
-      "multi": 6,
-      "udr": 2.1,
-      "fpr": 0.61,
-      "entryPlus": 80,
-      "duelPlus": 76,
-      "multiPlus": 76,
-      "clutchPlus": 104,
-      "utilPlus": 102,
-      "awpPlus": 92,
-      "survPlus": 89,
-      "entryPct": 36
-     },
-     "pug": {
-      "maps": 1,
-      "ark": 0.94,
-      "kd": 0.82,
-      "kpr": 0.61,
-      "adr": 69,
-      "entryPM": -4,
-      "clutch": 1,
-      "multi": 0,
-      "udr": 0.7,
-      "fpr": 0.3,
-      "entryPlus": 54,
-      "duelPlus": 93,
-      "multiPlus": 85,
-      "clutchPlus": 118,
-      "utilPlus": 92,
-      "awpPlus": 90,
-      "survPlus": 94,
-      "entryPct": 0
-     },
-     "scrim": {
-      "maps": 19,
-      "ark": 0.92,
-      "kd": 0.8,
-      "kpr": 0.61,
-      "adr": 67.7,
-      "entryPM": -14,
-      "clutch": 7,
-      "multi": 11,
-      "udr": 3.1,
-      "fpr": 0.42,
-      "entryPlus": 85,
-      "duelPlus": 84,
-      "multiPlus": 83,
-      "clutchPlus": 103,
-      "utilPlus": 98,
-      "awpPlus": 91,
-      "survPlus": 89,
-      "entryPct": 40
-     }
-    },
-    "plus": {
-     "entryPlus": 81,
-     "duelPlus": 82,
-     "multiPlus": 81,
-     "clutchPlus": 106,
-     "utilPlus": 99,
-     "awpPlus": 91,
-     "survPlus": 89,
-     "entryPct": 38
-    }
    }
   ],
   "teamMaps": [
@@ -25777,14 +25777,14 @@
     "winRate": 0
    },
    {
-    "map": "train",
-    "matches": 3,
-    "winRate": 33
-   },
-   {
     "map": "cache",
     "matches": 3,
     "winRate": 0
+   },
+   {
+    "map": "train",
+    "matches": 3,
+    "winRate": 33
    }
   ],
   "recent": [
@@ -27175,7 +27175,7 @@
        "country": "us",
        "rating": 1.88,
        "swing": 15.8,
-       "rwa": 14.1,
+       "rwa": 14.2,
        "mapMvp": true
       },
       {
@@ -27208,7 +27208,7 @@
        "country": "us",
        "rating": 1.4,
        "swing": 7.3,
-       "rwa": 5.6
+       "rwa": 5.7
       },
       {
        "name": "Saintz",
@@ -27240,7 +27240,7 @@
        "country": "us",
        "rating": 1.18,
        "swing": 3.3,
-       "rwa": 1.6
+       "rwa": 1.7
       },
       {
        "name": "rezzah",
@@ -27272,7 +27272,7 @@
        "country": "ca",
        "rating": 1.13,
        "swing": 2.4,
-       "rwa": 0.7
+       "rwa": 0.8
       },
       {
        "name": "LAURSEN_111",
@@ -27305,7 +27305,7 @@
        "country": "dk",
        "rating": 0.95,
        "swing": -0.8,
-       "rwa": -2.5
+       "rwa": -2.4
       }
      ],
      "opp": [
@@ -27466,8 +27466,8 @@
        "resid": -0.007369614512471655,
        "country": "kr",
        "rating": 0.42,
-       "swing": -10.4,
-       "rwa": -10.6
+       "swing": -10.5,
+       "rwa": -10.7
       }
      ],
      "names": [
@@ -27478,7 +27478,7 @@
       "k": 11,
       "d": 11,
       "adr": 68,
-      "rwa": -2.5,
+      "rwa": -2.4,
       "rating": 0.95
      }
     },
@@ -27524,7 +27524,7 @@
        "country": "dk",
        "rating": 0.86,
        "swing": -2.6,
-       "rwa": -4.4,
+       "rwa": -4.3,
        "mapMvp": true
       },
       {
@@ -27557,7 +27557,7 @@
        "country": "us",
        "rating": 0.79,
        "swing": -3.7,
-       "rwa": -5.5
+       "rwa": -5.4
       },
       {
        "name": "Saintz",
@@ -27589,7 +27589,7 @@
        "country": "us",
        "rating": 0.66,
        "swing": -6.2,
-       "rwa": -8
+       "rwa": -7.9
       },
       {
        "name": "mf_",
@@ -27621,7 +27621,7 @@
        "country": "us",
        "rating": 0.58,
        "swing": -7.7,
-       "rwa": -9.5
+       "rwa": -9.4
       },
       {
        "name": "rezzah",
@@ -27653,7 +27653,7 @@
        "country": "ca",
        "rating": 0.35,
        "swing": -11.7,
-       "rwa": -13.5
+       "rwa": -13.4
       }
      ],
      "opp": [
@@ -27826,7 +27826,7 @@
       "k": 13,
       "d": 14,
       "adr": 75.4,
-      "rwa": -4.4,
+      "rwa": -4.3,
       "rating": 0.86
      }
     },
@@ -28220,7 +28220,7 @@
        "country": "dk",
        "rating": 0.76,
        "swing": -4.3,
-       "rwa": -6,
+       "rwa": -5.9,
        "mapMvp": true
       },
       {
@@ -28253,7 +28253,7 @@
        "country": "us",
        "rating": 0.71,
        "swing": -5.2,
-       "rwa": -6.9
+       "rwa": -6.8
       },
       {
        "name": "Chawk",
@@ -28285,7 +28285,7 @@
        "country": "us",
        "rating": 0.67,
        "swing": -5.9,
-       "rwa": -7.6
+       "rwa": -7.5
       },
       {
        "name": "mIKEY-_-",
@@ -28317,7 +28317,7 @@
        "country": "us",
        "rating": 0.4,
        "swing": -10.8,
-       "rwa": -12.5
+       "rwa": -12.4
       },
       {
        "name": "mf_",
@@ -28349,7 +28349,7 @@
        "country": "us",
        "rating": 0.29,
        "swing": -12.8,
-       "rwa": -14.5
+       "rwa": -14.4
       }
      ],
      "opp": [
@@ -28522,7 +28522,7 @@
       "k": 12,
       "d": 15,
       "adr": 78.9,
-      "rwa": -6,
+      "rwa": -5.9,
       "rating": 0.76
      }
     },
@@ -29612,7 +29612,7 @@
        "country": "dk",
        "rating": 0.81,
        "swing": -3.4,
-       "rwa": -5.1,
+       "rwa": -5,
        "mapMvp": true
       },
       {
@@ -29645,7 +29645,7 @@
        "country": "jp",
        "rating": 0.72,
        "swing": -5.1,
-       "rwa": -6.8
+       "rwa": -6.7
       },
       {
        "name": "cyrusitox",
@@ -29677,7 +29677,7 @@
        "country": "ve",
        "rating": 0.61,
        "swing": -7,
-       "rwa": -8.7
+       "rwa": -8.6
       },
       {
        "name": "rezzah",
@@ -29709,7 +29709,7 @@
        "country": "ca",
        "rating": 0.6,
        "swing": -7.3,
-       "rwa": -9
+       "rwa": -8.9
       },
       {
        "name": "chilled_dan",
@@ -29741,7 +29741,7 @@
        "country": "us",
        "rating": 0.58,
        "swing": -7.7,
-       "rwa": -9.4
+       "rwa": -9.3
       }
      ],
      "opp": [
@@ -29914,7 +29914,7 @@
       "k": 13,
       "d": 15,
       "adr": 80.3,
-      "rwa": -5.1,
+      "rwa": -5,
       "rating": 0.81
      }
     },
@@ -30307,7 +30307,7 @@
        "country": "us",
        "rating": 1.47,
        "swing": 8.6,
-       "rwa": 6.9,
+       "rwa": 7,
        "mapMvp": true
       },
       {
@@ -30340,7 +30340,7 @@
        "country": "us",
        "rating": 1.32,
        "swing": 5.9,
-       "rwa": 4.2
+       "rwa": 4.3
       },
       {
        "name": "LAURSEN_111",
@@ -30373,7 +30373,7 @@
        "country": "dk",
        "rating": 1.13,
        "swing": 2.3,
-       "rwa": 0.6
+       "rwa": 0.7
       },
       {
        "name": "Chawk",
@@ -30405,7 +30405,7 @@
        "country": "us",
        "rating": 0.81,
        "swing": -3.5,
-       "rwa": -5.2
+       "rwa": -5.1
       },
       {
        "name": "rezzah",
@@ -30437,7 +30437,7 @@
        "country": "ca",
        "rating": 0.79,
        "swing": -3.8,
-       "rwa": -5.5
+       "rwa": -5.4
       }
      ],
      "opp": [
@@ -30610,7 +30610,7 @@
       "k": 20,
       "d": 19,
       "adr": 96.5,
-      "rwa": 0.6,
+      "rwa": 0.7,
       "rating": 1.13
      }
     },
@@ -31351,7 +31351,7 @@
        "country": "us",
        "rating": 1.21,
        "swing": 3.8,
-       "rwa": 2.1,
+       "rwa": 2.2,
        "mapMvp": true
       },
       {
@@ -31384,7 +31384,7 @@
        "country": "us",
        "rating": 1.05,
        "swing": 0.8,
-       "rwa": -0.9
+       "rwa": -0.8
       },
       {
        "name": "Chawk",
@@ -31415,8 +31415,8 @@
        "resid": -0.01020408163265306,
        "country": "us",
        "rating": 0.74,
-       "swing": -4.7,
-       "rwa": -6.4
+       "swing": -4.6,
+       "rwa": -6.2
       },
       {
        "name": "rezzah",
@@ -31448,7 +31448,7 @@
        "country": "ca",
        "rating": 0.74,
        "swing": -4.8,
-       "rwa": -6.5
+       "rwa": -6.4
       },
       {
        "name": "LAURSEN_111",
@@ -31481,7 +31481,7 @@
        "country": "dk",
        "rating": 0.66,
        "swing": -6.2,
-       "rwa": -7.9
+       "rwa": -7.8
       }
      ],
      "opp": [
@@ -31654,7 +31654,7 @@
       "k": 11,
       "d": 17,
       "adr": 53.5,
-      "rwa": -7.9,
+      "rwa": -7.8,
       "rating": 0.66
      }
     },
@@ -31694,7 +31694,7 @@
        "country": "dk",
        "rating": 1.54,
        "swing": 9.7,
-       "rwa": 8,
+       "rwa": 8.1,
        "mapMvp": true
       },
       {
@@ -31721,7 +31721,7 @@
        "country": "us",
        "rating": 1.51,
        "swing": 9.1,
-       "rwa": 7.4
+       "rwa": 7.5
       },
       {
        "name": "iBeef",
@@ -31747,7 +31747,7 @@
        "country": "us",
        "rating": 1.18,
        "swing": 3.3,
-       "rwa": 1.6
+       "rwa": 1.7
       },
       {
        "name": "m3A-17d",
@@ -31773,7 +31773,7 @@
        "country": "tc",
        "rating": 1.04,
        "swing": 0.7,
-       "rwa": -1
+       "rwa": -0.9
       },
       {
        "name": "married2themoney",
@@ -31799,7 +31799,7 @@
        "country": "us",
        "rating": 0.96,
        "swing": -0.7,
-       "rwa": -2.4
+       "rwa": -2.3
       }
      ],
      "opp": [
@@ -31827,7 +31827,7 @@
        "country": "cn",
        "rating": 1.01,
        "swing": 0.1,
-       "rwa": -1.6
+       "rwa": -1.5
       },
       {
        "name": "BurgerMan777",
@@ -31853,7 +31853,7 @@
        "country": "ca",
        "rating": 0.92,
        "swing": -1.5,
-       "rwa": -3.2
+       "rwa": -3.1
       },
       {
        "name": "ygrene",
@@ -31879,7 +31879,7 @@
        "country": "ve",
        "rating": 0.76,
        "swing": -4.3,
-       "rwa": -6
+       "rwa": -5.9
       },
       {
        "name": "Piti",
@@ -31905,7 +31905,7 @@
        "country": "us",
        "rating": 0.67,
        "swing": -6,
-       "rwa": -7.7
+       "rwa": -7.6
       },
       {
        "name": "OT",
@@ -31931,7 +31931,7 @@
        "country": "us",
        "rating": 0.5,
        "swing": -9.1,
-       "rwa": -10.8
+       "rwa": -10.7
       }
      ],
      "names": null,
@@ -31939,7 +31939,7 @@
       "k": 25,
       "d": 15,
       "adr": 121.4,
-      "rwa": 8,
+      "rwa": 8.1,
       "rating": 1.54
      }
     },
@@ -32326,7 +32326,7 @@
        "country": "us",
        "rating": 1.16,
        "swing": 2.9,
-       "rwa": 1.2,
+       "rwa": 1.3,
        "mapMvp": true
       },
       {
@@ -32354,7 +32354,7 @@
        "country": "dk",
        "rating": 1.03,
        "swing": 0.5,
-       "rwa": -1.2
+       "rwa": -1.1
       },
       {
        "name": "Saintz",
@@ -32380,7 +32380,7 @@
        "country": "us",
        "rating": 1.02,
        "swing": 0.4,
-       "rwa": -1.3
+       "rwa": -1.2
       },
       {
        "name": "mf",
@@ -32406,7 +32406,7 @@
        "country": "us",
        "rating": 0.95,
        "swing": -0.9,
-       "rwa": -2.6
+       "rwa": -2.5
       },
       {
        "name": "rezzah",
@@ -32432,7 +32432,7 @@
        "country": "ca",
        "rating": 0.94,
        "swing": -1.1,
-       "rwa": -2.8
+       "rwa": -2.7
       }
      ],
      "opp": [
@@ -32460,7 +32460,7 @@
        "country": "us",
        "rating": 1.49,
        "swing": 8.8,
-       "rwa": 7.1
+       "rwa": 7.2
       },
       {
        "name": "Cloudy Ideas",
@@ -32486,7 +32486,7 @@
        "country": "us",
        "rating": 1.34,
        "swing": 6.2,
-       "rwa": 4.5
+       "rwa": 4.6
       },
       {
        "name": "jganjanski",
@@ -32512,7 +32512,7 @@
        "country": "ca",
        "rating": 1.14,
        "swing": 2.4,
-       "rwa": 0.7
+       "rwa": 0.8
       },
       {
        "name": "hoaX**",
@@ -32538,7 +32538,7 @@
        "country": "us",
        "rating": 0.64,
        "swing": -6.5,
-       "rwa": -8.2
+       "rwa": -8.1
       },
       {
        "name": "Corvus",
@@ -32564,7 +32564,7 @@
        "country": "ca",
        "rating": 0.48,
        "swing": -9.5,
-       "rwa": -11.2
+       "rwa": -11.1
       }
      ],
      "names": null,
@@ -32572,7 +32572,7 @@
       "k": 18,
       "d": 17,
       "adr": 81.3,
-      "rwa": -1.2,
+      "rwa": -1.1,
       "rating": 1.03
      }
     },
@@ -32611,7 +32611,7 @@
        "country": "us",
        "rating": 2.13,
        "swing": 20.4,
-       "rwa": 18.7,
+       "rwa": 18.8,
        "mapMvp": true
       },
       {
@@ -32638,7 +32638,7 @@
        "country": "us",
        "rating": 1.89,
        "swing": 16.1,
-       "rwa": 14.4
+       "rwa": 14.5
       },
       {
        "name": "rezzah",
@@ -32664,7 +32664,7 @@
        "country": "ca",
        "rating": 1.14,
        "swing": 2.6,
-       "rwa": 0.9
+       "rwa": 1
       },
       {
        "name": "mIKEY",
@@ -32690,7 +32690,7 @@
        "country": "us",
        "rating": 1.12,
        "swing": 2.1,
-       "rwa": 0.4
+       "rwa": 0.5
       },
       {
        "name": "twitch.tv/LAURSEN_111",
@@ -32717,7 +32717,7 @@
        "country": "dk",
        "rating": 1.06,
        "swing": 1,
-       "rwa": -0.7
+       "rwa": -0.6
       }
      ],
      "opp": [
@@ -32745,7 +32745,7 @@
        "country": "us",
        "rating": 0.89,
        "swing": -2,
-       "rwa": -3.7
+       "rwa": -3.6
       },
       {
        "name": "Magic Man",
@@ -32771,7 +32771,7 @@
        "country": "us",
        "rating": 0.66,
        "swing": -6.2,
-       "rwa": -7.9
+       "rwa": -7.8
       },
       {
        "name": "ADHD PEEK",
@@ -32797,7 +32797,7 @@
        "country": "ca",
        "rating": 0.54,
        "swing": -8.3,
-       "rwa": -10
+       "rwa": -9.9
       },
       {
        "name": "PopPp-",
@@ -32823,7 +32823,7 @@
        "country": "us",
        "rating": 0.53,
        "swing": -8.4,
-       "rwa": -10.1
+       "rwa": -10
       },
       {
        "name": "Hako",
@@ -32849,7 +32849,7 @@
        "country": "us",
        "rating": 0.27,
        "swing": -13.2,
-       "rwa": -14.9
+       "rwa": -14.8
       }
      ],
      "names": null,
@@ -32857,7 +32857,7 @@
       "k": 10,
       "d": 14,
       "adr": 92,
-      "rwa": -0.7,
+      "rwa": -0.6,
       "rating": 1.06
      }
     },
@@ -32896,7 +32896,7 @@
        "country": "ca",
        "rating": 1.64,
        "swing": 11.5,
-       "rwa": 9.8,
+       "rwa": 9.9,
        "mapMvp": true
       },
       {
@@ -32923,7 +32923,7 @@
        "country": "us",
        "rating": 1.43,
        "swing": 7.7,
-       "rwa": 6
+       "rwa": 6.1
       },
       {
        "name": "twitch.tv/LAURSEN_111",
@@ -32950,7 +32950,7 @@
        "country": "dk",
        "rating": 1.42,
        "swing": 7.6,
-       "rwa": 5.9
+       "rwa": 6
       },
       {
        "name": "Saintz",
@@ -32976,7 +32976,7 @@
        "country": "us",
        "rating": 1.3,
        "swing": 5.3,
-       "rwa": 3.6
+       "rwa": 3.7
       },
       {
        "name": "mIKEY",
@@ -33002,7 +33002,7 @@
        "country": "us",
        "rating": 1.03,
        "swing": 0.5,
-       "rwa": -1.2
+       "rwa": -1.1
       }
      ],
      "opp": [
@@ -33030,7 +33030,7 @@
        "country": "ca",
        "rating": 0.74,
        "swing": -4.7,
-       "rwa": -6.4
+       "rwa": -6.3
       },
       {
        "name": "iveRsoN[1g]",
@@ -33056,7 +33056,7 @@
        "country": "ca",
        "rating": 0.64,
        "swing": -6.6,
-       "rwa": -8.3
+       "rwa": -8.2
       },
       {
        "name": "Uncle Juju",
@@ -33082,7 +33082,7 @@
        "country": "us",
        "rating": 0.59,
        "swing": -7.5,
-       "rwa": -9.2
+       "rwa": -9.1
       },
       {
        "name": "w",
@@ -33108,7 +33108,7 @@
        "country": null,
        "rating": 0.55,
        "swing": -8.2,
-       "rwa": -9.9
+       "rwa": -9.8
       },
       {
        "name": "pocari",
@@ -33134,7 +33134,7 @@
        "country": "ca",
        "rating": 0.39,
        "swing": -11,
-       "rwa": -12.7
+       "rwa": -12.6
       }
      ],
      "names": null,
@@ -33142,7 +33142,7 @@
       "k": 14,
       "d": 11,
       "adr": 91.2,
-      "rwa": 5.9,
+      "rwa": 6,
       "rating": 1.42
      }
     },
@@ -33181,7 +33181,7 @@
        "country": "ca",
        "rating": 1.46,
        "swing": 8.3,
-       "rwa": 6.6,
+       "rwa": 6.7,
        "mapMvp": true
       },
       {
@@ -33209,7 +33209,7 @@
        "country": "dk",
        "rating": 1.45,
        "swing": 8.1,
-       "rwa": 6.4
+       "rwa": 6.5
       },
       {
        "name": "mf",
@@ -33235,7 +33235,7 @@
        "country": "us",
        "rating": 1.18,
        "swing": 3.3,
-       "rwa": 1.6
+       "rwa": 1.7
       },
       {
        "name": "dusty",
@@ -33261,7 +33261,7 @@
        "country": "ca",
        "rating": 1.14,
        "swing": 2.5,
-       "rwa": 0.8
+       "rwa": 0.9
       },
       {
        "name": "Seth:)",
@@ -33287,7 +33287,7 @@
        "country": "us",
        "rating": 0.65,
        "swing": -6.4,
-       "rwa": -8.1
+       "rwa": -8
       }
      ],
      "opp": [
@@ -33315,7 +33315,7 @@
        "country": "us",
        "rating": 1.05,
        "swing": 0.9,
-       "rwa": -0.8
+       "rwa": -0.7
       },
       {
        "name": "RiCkY",
@@ -33341,7 +33341,7 @@
        "country": "us",
        "rating": 0.91,
        "swing": -1.6,
-       "rwa": -3.3
+       "rwa": -3.2
       },
       {
        "name": "Dizzy",
@@ -33367,7 +33367,7 @@
        "country": "us",
        "rating": 0.87,
        "swing": -2.3,
-       "rwa": -4
+       "rwa": -3.9
       },
       {
        "name": "cream angel",
@@ -33393,7 +33393,7 @@
        "country": "us",
        "rating": 0.73,
        "swing": -5,
-       "rwa": -6.7
+       "rwa": -6.6
       },
       {
        "name": "Chiwiwi",
@@ -33419,7 +33419,7 @@
        "country": "us",
        "rating": 0.67,
        "swing": -6.1,
-       "rwa": -7.8
+       "rwa": -7.7
       }
      ],
      "names": null,
@@ -33427,7 +33427,7 @@
       "k": 23,
       "d": 18,
       "adr": 127.1,
-      "rwa": 6.4,
+      "rwa": 6.5,
       "rating": 1.45
      }
     },
@@ -33466,7 +33466,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.9,
-       "rwa": -4.6,
+       "rwa": -4.5,
        "mapMvp": true
       },
       {
@@ -33493,7 +33493,7 @@
        "country": "ca",
        "rating": 0.84,
        "swing": -2.9,
-       "rwa": -4.6
+       "rwa": -4.5
       },
       {
        "name": "rezzah",
@@ -33519,7 +33519,7 @@
        "country": "ca",
        "rating": 0.83,
        "swing": -3,
-       "rwa": -4.7
+       "rwa": -4.6
       },
       {
        "name": "twitch.tv/LAURSEN_111",
@@ -33546,7 +33546,7 @@
        "country": "dk",
        "rating": 0.58,
        "swing": -7.6,
-       "rwa": -9.3
+       "rwa": -9.2
       },
       {
        "name": "picky eater",
@@ -33572,7 +33572,7 @@
        "country": null,
        "rating": 0.58,
        "swing": -7.6,
-       "rwa": -9.3
+       "rwa": -9.2
       }
      ],
      "opp": [
@@ -33600,7 +33600,7 @@
        "country": "ca",
        "rating": 1.67,
        "swing": 12.1,
-       "rwa": 10.4
+       "rwa": 10.5
       },
       {
        "name": "Juju",
@@ -33626,7 +33626,7 @@
        "country": "ca",
        "rating": 1.24,
        "swing": 4.3,
-       "rwa": 2.6
+       "rwa": 2.7
       },
       {
        "name": "Pug",
@@ -33652,7 +33652,7 @@
        "country": null,
        "rating": 1.23,
        "swing": 4.1,
-       "rwa": 2.4
+       "rwa": 2.5
       },
       {
        "name": "sHimuN",
@@ -33678,7 +33678,7 @@
        "country": "ca",
        "rating": 1.21,
        "swing": 3.9,
-       "rwa": 2.2
+       "rwa": 2.3
       },
       {
        "name": "nika",
@@ -33704,7 +33704,7 @@
        "country": "us",
        "rating": 0.97,
        "swing": -0.5,
-       "rwa": -2.2
+       "rwa": -2.1
       }
      ],
      "names": null,
@@ -33712,7 +33712,7 @@
       "k": 11,
       "d": 19,
       "adr": 74.2,
-      "rwa": -9.3,
+      "rwa": -9.2,
       "rating": 0.58
      }
     },
@@ -33752,7 +33752,7 @@
        "country": "dk",
        "rating": 1.22,
        "swing": 4,
-       "rwa": 2.3,
+       "rwa": 2.4,
        "mapMvp": true
       },
       {
@@ -33779,7 +33779,7 @@
        "country": "us",
        "rating": 1.15,
        "swing": 2.8,
-       "rwa": 1.1
+       "rwa": 1.2
       },
       {
        "name": "dusty",
@@ -33805,7 +33805,7 @@
        "country": "ca",
        "rating": 0.79,
        "swing": -3.8,
-       "rwa": -5.5
+       "rwa": -5.4
       },
       {
        "name": "rezzah",
@@ -33831,7 +33831,7 @@
        "country": "ca",
        "rating": 0.75,
        "swing": -4.5,
-       "rwa": -6.2
+       "rwa": -6.1
       },
       {
        "name": "Dash",
@@ -33857,7 +33857,7 @@
        "country": "us",
        "rating": 0.49,
        "swing": -9.2,
-       "rwa": -10.9
+       "rwa": -10.8
       }
      ],
      "opp": [
@@ -33885,7 +33885,7 @@
        "country": "us",
        "rating": 1.5,
        "swing": 9,
-       "rwa": 7.3
+       "rwa": 7.4
       },
       {
        "name": "oddball",
@@ -33911,7 +33911,7 @@
        "country": "us",
        "rating": 1.4,
        "swing": 7.3,
-       "rwa": 5.6
+       "rwa": 5.7
       },
       {
        "name": "Dragunov",
@@ -33937,7 +33937,7 @@
        "country": "us",
        "rating": 1.1,
        "swing": 1.8,
-       "rwa": 0.1
+       "rwa": 0.2
       },
       {
        "name": "الوحل المحتال",
@@ -33963,7 +33963,7 @@
        "country": null,
        "rating": 0.89,
        "swing": -2.1,
-       "rwa": -3.8
+       "rwa": -3.7
       },
       {
        "name": "thesnake-_x",
@@ -33989,7 +33989,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.9,
-       "rwa": -4.6
+       "rwa": -4.5
       }
      ],
      "names": null,
@@ -33997,7 +33997,7 @@
       "k": 23,
       "d": 19,
       "adr": 104.1,
-      "rwa": 2.3,
+      "rwa": 2.4,
       "rating": 1.22
      }
     },
@@ -34036,7 +34036,7 @@
        "country": "ca",
        "rating": 1.8,
        "swing": 14.4,
-       "rwa": 12.7,
+       "rwa": 12.8,
        "mapMvp": true
       },
       {
@@ -34063,7 +34063,7 @@
        "country": "us",
        "rating": 1.49,
        "swing": 8.8,
-       "rwa": 7.1
+       "rwa": 7.2
       },
       {
        "name": "twitch.tv/LAURSEN_111",
@@ -34090,7 +34090,7 @@
        "country": "dk",
        "rating": 1.37,
        "swing": 6.7,
-       "rwa": 5
+       "rwa": 5.1
       },
       {
        "name": "dusty",
@@ -34116,7 +34116,7 @@
        "country": "ca",
        "rating": 0.98,
        "swing": -0.4,
-       "rwa": -2.1
+       "rwa": -2
       },
       {
        "name": "Dash",
@@ -34142,7 +34142,7 @@
        "country": "us",
        "rating": 0.6,
        "swing": -7.2,
-       "rwa": -8.9
+       "rwa": -8.8
       }
      ],
      "opp": [
@@ -34170,7 +34170,7 @@
        "country": "mx",
        "rating": 1.23,
        "swing": 4.2,
-       "rwa": 2.5
+       "rwa": 2.6
       },
       {
        "name": "不关橙猫猫的事哦",
@@ -34196,7 +34196,7 @@
        "country": null,
        "rating": 0.84,
        "swing": -2.9,
-       "rwa": -4.6
+       "rwa": -4.5
       },
       {
        "name": "Impulse",
@@ -34222,7 +34222,7 @@
        "country": "us",
        "rating": 0.67,
        "swing": -5.9,
-       "rwa": -7.6
+       "rwa": -7.5
       },
       {
        "name": "mud  ⍤",
@@ -34248,7 +34248,7 @@
        "country": "vn",
        "rating": 0.66,
        "swing": -6.2,
-       "rwa": -7.9
+       "rwa": -7.8
       },
       {
        "name": "Nyx",
@@ -34274,7 +34274,7 @@
        "country": "vn",
        "rating": 0.56,
        "swing": -7.9,
-       "rwa": -9.6
+       "rwa": -9.5
       }
      ],
      "names": null,
@@ -34282,7 +34282,7 @@
       "k": 19,
       "d": 14,
       "adr": 105.9,
-      "rwa": 5,
+      "rwa": 5.1,
       "rating": 1.37
      }
     },
@@ -34322,7 +34322,7 @@
        "country": "dk",
        "rating": 1.45,
        "swing": 8.2,
-       "rwa": 6.5,
+       "rwa": 6.6,
        "mapMvp": true
       },
       {
@@ -34349,7 +34349,7 @@
        "country": "ca",
        "rating": 1.4,
        "swing": 7.3,
-       "rwa": 5.6
+       "rwa": 5.7
       },
       {
        "name": "rezzah",
@@ -34375,7 +34375,7 @@
        "country": "ca",
        "rating": 1.14,
        "swing": 2.5,
-       "rwa": 0.8
+       "rwa": 0.9
       },
       {
        "name": "mf",
@@ -34401,7 +34401,7 @@
        "country": "us",
        "rating": 0.69,
        "swing": -5.7,
-       "rwa": -7.4
+       "rwa": -7.3
       },
       {
        "name": "Dash",
@@ -34427,7 +34427,7 @@
        "country": "us",
        "rating": 0.41,
        "swing": -10.6,
-       "rwa": -12.3
+       "rwa": -12.2
       }
      ],
      "opp": [
@@ -34455,7 +34455,7 @@
        "country": "ch",
        "rating": 1.29,
        "swing": 5.3,
-       "rwa": 3.6
+       "rwa": 3.7
       },
       {
        "name": "Dragunov",
@@ -34481,7 +34481,7 @@
        "country": "us",
        "rating": 1.28,
        "swing": 5,
-       "rwa": 3.3
+       "rwa": 3.4
       },
       {
        "name": "JBG-HypergamousFoidAnnihilator",
@@ -34507,7 +34507,7 @@
        "country": "ch",
        "rating": 1.06,
        "swing": 1.1,
-       "rwa": -0.6
+       "rwa": -0.5
       },
       {
        "name": "520",
@@ -34533,7 +34533,7 @@
        "country": "jp",
        "rating": 0.85,
        "swing": -2.7,
-       "rwa": -4.4
+       "rwa": -4.3
       },
       {
        "name": "Ricken",
@@ -34559,7 +34559,7 @@
        "country": "vn",
        "rating": 0.73,
        "swing": -4.9,
-       "rwa": -6.6
+       "rwa": -6.5
       }
      ],
      "names": null,
@@ -34567,7 +34567,7 @@
       "k": 35,
       "d": 22,
       "adr": 119.6,
-      "rwa": 6.5,
+      "rwa": 6.6,
       "rating": 1.45
      }
     },
@@ -34607,7 +34607,7 @@
        "country": "dk",
        "rating": 1.66,
        "swing": 11.9,
-       "rwa": 10.2,
+       "rwa": 10.3,
        "mapMvp": true
       },
       {
@@ -34634,7 +34634,7 @@
        "country": "ca",
        "rating": 1.47,
        "swing": 8.5,
-       "rwa": 6.8
+       "rwa": 6.9
       },
       {
        "name": "mf",
@@ -34660,7 +34660,7 @@
        "country": "us",
        "rating": 1.39,
        "swing": 7,
-       "rwa": 5.3
+       "rwa": 5.4
       },
       {
        "name": "rezzah",
@@ -34686,7 +34686,7 @@
        "country": "ca",
        "rating": 1.28,
        "swing": 5,
-       "rwa": 3.3
+       "rwa": 3.4
       },
       {
        "name": "nylo",
@@ -34712,7 +34712,7 @@
        "country": "ca",
        "rating": 0.97,
        "swing": -0.6,
-       "rwa": -2.3
+       "rwa": -2.2
       }
      ],
      "opp": [
@@ -34740,7 +34740,7 @@
        "country": "us",
        "rating": 0.82,
        "swing": -3.3,
-       "rwa": -5
+       "rwa": -4.9
       },
       {
        "name": "UFC229",
@@ -34766,7 +34766,7 @@
        "country": "ca",
        "rating": 0.81,
        "swing": -3.4,
-       "rwa": -5.1
+       "rwa": -5
       },
       {
        "name": "Sarg",
@@ -34792,7 +34792,7 @@
        "country": "us",
        "rating": 0.79,
        "swing": -3.9,
-       "rwa": -5.6
+       "rwa": -5.5
       },
       {
        "name": "SlackEr603",
@@ -34818,7 +34818,7 @@
        "country": null,
        "rating": 0.47,
        "swing": -9.6,
-       "rwa": -11.3
+       "rwa": -11.2
       },
       {
        "name": "Boh.",
@@ -34844,7 +34844,7 @@
        "country": "us",
        "rating": 0.44,
        "swing": -10,
-       "rwa": -11.7
+       "rwa": -11.6
       }
      ],
      "names": null,
@@ -34852,7 +34852,7 @@
       "k": 24,
       "d": 14,
       "adr": 119.4,
-      "rwa": 10.2,
+      "rwa": 10.3,
       "rating": 1.66
      }
     },
@@ -34897,7 +34897,7 @@
        "country": "us",
        "rating": 1.01,
        "swing": 0.2,
-       "rwa": -0.5,
+       "rwa": -0.4,
        "mapMvp": true
       },
       {
@@ -34930,7 +34930,7 @@
        "country": "us",
        "rating": 1,
        "swing": 0,
-       "rwa": -0.7
+       "rwa": -0.6
       },
       {
        "name": "Faintzzz",
@@ -34962,7 +34962,7 @@
        "country": "us",
        "rating": 0.94,
        "swing": -1.2,
-       "rwa": -1.9
+       "rwa": -1.8
       },
       {
        "name": "mf_",
@@ -34994,7 +34994,7 @@
        "country": "us",
        "rating": 0.68,
        "swing": -5.8,
-       "rwa": -6.5
+       "rwa": -6.4
       },
       {
        "name": "LAURSEN_111",
@@ -35027,7 +35027,7 @@
        "country": "dk",
        "rating": 0.62,
        "swing": -6.8,
-       "rwa": -7.5
+       "rwa": -7.4
       }
      ],
      "opp": [
@@ -35200,7 +35200,7 @@
       "k": 11,
       "d": 20,
       "adr": 65.1,
-      "rwa": -7.5,
+      "rwa": -7.4,
       "rating": 0.62
      }
     },
@@ -35245,7 +35245,7 @@
        "country": "us",
        "rating": 1.66,
        "swing": 11.9,
-       "rwa": 10.2,
+       "rwa": 10.3,
        "mapMvp": true
       },
       {
@@ -35278,7 +35278,7 @@
        "country": "us",
        "rating": 1.22,
        "swing": 4,
-       "rwa": 2.3
+       "rwa": 2.4
       },
       {
        "name": "mf_",
@@ -35310,7 +35310,7 @@
        "country": "us",
        "rating": 1.2,
        "swing": 3.7,
-       "rwa": 2
+       "rwa": 2.1
       },
       {
        "name": "LAURSEN_111",
@@ -35343,7 +35343,7 @@
        "country": "dk",
        "rating": 1.05,
        "swing": 1,
-       "rwa": -0.7
+       "rwa": -0.6
       },
       {
        "name": "matt2k",
@@ -35375,7 +35375,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.9,
-       "rwa": -4.6
+       "rwa": -4.5
       }
      ],
      "opp": [
@@ -35548,7 +35548,7 @@
       "k": 18,
       "d": 19,
       "adr": 87.5,
-      "rwa": -0.7,
+      "rwa": -0.6,
       "rating": 1.05
      }
     },
@@ -36289,7 +36289,7 @@
        "country": "us",
        "rating": 1.25,
        "swing": 4.5,
-       "rwa": 4.8,
+       "rwa": 4.9,
        "mapMvp": true
       },
       {
@@ -36322,7 +36322,7 @@
        "country": "us",
        "rating": 1.11,
        "swing": 1.9,
-       "rwa": 2.2
+       "rwa": 2.3
       },
       {
        "name": "Saintz",
@@ -36354,7 +36354,7 @@
        "country": "us",
        "rating": 1.03,
        "swing": 0.5,
-       "rwa": 0.8
+       "rwa": 0.9
       },
       {
        "name": "rezzah",
@@ -36386,7 +36386,7 @@
        "country": "ca",
        "rating": 0.97,
        "swing": -0.5,
-       "rwa": -0.2
+       "rwa": -0.1
       },
       {
        "name": "LAURSEN_111",
@@ -36419,7 +36419,7 @@
        "country": "dk",
        "rating": 0.9,
        "swing": -1.8,
-       "rwa": -1.5
+       "rwa": -1.4
       }
      ],
      "opp": [
@@ -36592,7 +36592,7 @@
       "k": 19,
       "d": 22,
       "adr": 69.1,
-      "rwa": -1.5,
+      "rwa": -1.4,
       "rating": 0.9
      }
     },
@@ -37326,8 +37326,8 @@
        "resid": 0.02007168458781362,
        "country": "us",
        "rating": 1.54,
-       "swing": 9.7,
-       "rwa": 8,
+       "swing": 9.8,
+       "rwa": 8.2,
        "mapMvp": true
       },
       {
@@ -37354,8 +37354,8 @@
        "isMe": true,
        "country": "dk",
        "rating": 1.51,
-       "swing": 9.1,
-       "rwa": 7.4
+       "swing": 9.2,
+       "rwa": 7.6
       },
       {
        "name": "Mulppy",
@@ -37381,7 +37381,7 @@
        "country": "ca",
        "rating": 1.48,
        "swing": 8.7,
-       "rwa": 7
+       "rwa": 7.1
       },
       {
        "name": "Chawk",
@@ -37407,7 +37407,7 @@
        "country": "us",
        "rating": 1.25,
        "swing": 4.4,
-       "rwa": 2.7
+       "rwa": 2.8
       },
       {
        "name": "mIKEY",
@@ -37433,7 +37433,7 @@
        "country": "us",
        "rating": 1.17,
        "swing": 3.1,
-       "rwa": 1.4
+       "rwa": 1.5
       }
      ],
      "opp": [
@@ -37461,7 +37461,7 @@
        "country": "us",
        "rating": 0.8,
        "swing": -3.6,
-       "rwa": -5.3
+       "rwa": -5.2
       },
       {
        "name": "chudded",
@@ -37487,7 +37487,7 @@
        "country": "us",
        "rating": 0.68,
        "swing": -5.8,
-       "rwa": -7.5
+       "rwa": -7.4
       },
       {
        "name": "Davy",
@@ -37513,7 +37513,7 @@
        "country": null,
        "rating": 0.65,
        "swing": -6.4,
-       "rwa": -8.1
+       "rwa": -8
       },
       {
        "name": "Sfurious",
@@ -37539,7 +37539,7 @@
        "country": "us",
        "rating": 0.47,
        "swing": -9.5,
-       "rwa": -11.2
+       "rwa": -11.1
       },
       {
        "name": ".mistr",
@@ -37565,7 +37565,7 @@
        "country": "us",
        "rating": 0.41,
        "swing": -10.6,
-       "rwa": -12.3
+       "rwa": -12.2
       }
      ],
      "names": null,
@@ -37573,7 +37573,7 @@
       "k": 19,
       "d": 14,
       "adr": 102.1,
-      "rwa": 7.4,
+      "rwa": 7.6,
       "rating": 1.51
      }
     },
@@ -37618,7 +37618,7 @@
        "country": "us",
        "rating": 1.79,
        "swing": 14.3,
-       "rwa": 12.6,
+       "rwa": 12.7,
        "mapMvp": true
       },
       {
@@ -37651,7 +37651,7 @@
        "country": "us",
        "rating": 1.19,
        "swing": 3.4,
-       "rwa": 1.7
+       "rwa": 1.8
       },
       {
        "name": "LAURSEN_111",
@@ -37684,7 +37684,7 @@
        "country": "dk",
        "rating": 1.06,
        "swing": 1.1,
-       "rwa": -0.6
+       "rwa": -0.5
       },
       {
        "name": "rezzah",
@@ -37716,7 +37716,7 @@
        "country": "ca",
        "rating": 0.94,
        "swing": -1.1,
-       "rwa": -2.8
+       "rwa": -2.7
       },
       {
        "name": "Saintz",
@@ -37748,7 +37748,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.8,
-       "rwa": -4.5
+       "rwa": -4.4
       }
      ],
      "opp": [
@@ -37921,7 +37921,7 @@
       "k": 19,
       "d": 19,
       "adr": 87.1,
-      "rwa": -0.6,
+      "rwa": -0.5,
       "rating": 1.06
      }
     },
@@ -38257,8 +38257,8 @@
        "resid": -0.017337461300309595,
        "country": "us",
        "rating": 0.55,
-       "swing": -8.2,
-       "rwa": -8.4
+       "swing": -8.1,
+       "rwa": -8.3
       }
      ],
      "names": [
@@ -38314,7 +38314,7 @@
        "country": "us",
        "rating": 1.83,
        "swing": 15,
-       "rwa": 13.3,
+       "rwa": 13.4,
        "mapMvp": true
       },
       {
@@ -38347,7 +38347,7 @@
        "country": "us",
        "rating": 1.53,
        "swing": 9.6,
-       "rwa": 7.9
+       "rwa": 8
       },
       {
        "name": "Chawk",
@@ -38379,7 +38379,7 @@
        "country": "us",
        "rating": 1.46,
        "swing": 8.3,
-       "rwa": 6.6
+       "rwa": 6.7
       },
       {
        "name": "LAURSEN_111",
@@ -38412,7 +38412,7 @@
        "country": "dk",
        "rating": 1.21,
        "swing": 3.8,
-       "rwa": 2.1
+       "rwa": 2.2
       },
       {
        "name": "ijk_",
@@ -38444,7 +38444,7 @@
        "country": "us",
        "rating": 1.07,
        "swing": 1.2,
-       "rwa": -0.5
+       "rwa": -0.4
       }
      ],
      "opp": [
@@ -38617,7 +38617,7 @@
       "k": 14,
       "d": 12,
       "adr": 96.6,
-      "rwa": 2.1,
+      "rwa": 2.2,
       "rating": 1.21
      }
     },
@@ -39139,8 +39139,8 @@
        "resid": -0.01020408163265306,
        "country": "us",
        "rating": 0.65,
-       "swing": -6.3,
-       "rwa": -8.4
+       "swing": -6.4,
+       "rwa": -8.5
       }
      ],
      "opp": [
@@ -39391,7 +39391,7 @@
        "country": "us",
        "rating": 1.27,
        "swing": 4.9,
-       "rwa": 3.7
+       "rwa": 3.8
       },
       {
        "name": "rezzah",
@@ -39423,7 +39423,7 @@
        "country": "ca",
        "rating": 0.97,
        "swing": -0.6,
-       "rwa": -1.8
+       "rwa": -1.7
       },
       {
        "name": "LAURSEN_111",
@@ -39456,7 +39456,7 @@
        "country": "dk",
        "rating": 0.95,
        "swing": -1,
-       "rwa": -2.2
+       "rwa": -2.1
       },
       {
        "name": "Saintz",
@@ -39488,7 +39488,7 @@
        "country": "us",
        "rating": 0.86,
        "swing": -2.6,
-       "rwa": -3.8
+       "rwa": -3.7
       }
      ],
      "opp": [
@@ -39661,7 +39661,7 @@
       "k": 14,
       "d": 17,
       "adr": 88.2,
-      "rwa": -2.2,
+      "rwa": -2.1,
       "rating": 0.95
      }
     },
@@ -40403,7 +40403,7 @@
        "country": "dk",
        "rating": 1.3,
        "swing": 5.4,
-       "rwa": 3.7,
+       "rwa": 3.8,
        "mapMvp": true
       },
       {
@@ -40436,7 +40436,7 @@
        "country": "us",
        "rating": 0.93,
        "swing": -1.3,
-       "rwa": -3
+       "rwa": -2.9
       },
       {
        "name": "Saintz",
@@ -40468,7 +40468,7 @@
        "country": "us",
        "rating": 0.88,
        "swing": -2.3,
-       "rwa": -4
+       "rwa": -3.9
       },
       {
        "name": "rezzah",
@@ -40500,7 +40500,7 @@
        "country": "ca",
        "rating": 0.86,
        "swing": -2.6,
-       "rwa": -4.3
+       "rwa": -4.2
       },
       {
        "name": "Chawk",
@@ -40532,7 +40532,7 @@
        "country": "us",
        "rating": 0.77,
        "swing": -4.1,
-       "rwa": -5.8
+       "rwa": -5.7
       }
      ],
      "opp": [
@@ -40705,7 +40705,7 @@
       "k": 30,
       "d": 21,
       "adr": 109.3,
-      "rwa": 3.7,
+      "rwa": 3.8,
       "rating": 1.3
      }
     },
@@ -40745,7 +40745,7 @@
        "country": "dk",
        "rating": 1.27,
        "swing": 4.8,
-       "rwa": 3.1,
+       "rwa": 3.2,
        "mapMvp": true
       },
       {
@@ -40772,7 +40772,7 @@
        "country": "us",
        "rating": 1.26,
        "swing": 4.8,
-       "rwa": 3.1
+       "rwa": 3.2
       },
       {
        "name": "Chawk",
@@ -40798,7 +40798,7 @@
        "country": "us",
        "rating": 1.14,
        "swing": 2.6,
-       "rwa": 0.9
+       "rwa": 1
       },
       {
        "name": "rezzah",
@@ -40824,7 +40824,7 @@
        "country": "ca",
        "rating": 1.12,
        "swing": 2.1,
-       "rwa": 0.4
+       "rwa": 0.5
       },
       {
        "name": "mf",
@@ -40850,7 +40850,7 @@
        "country": "us",
        "rating": 1.1,
        "swing": 1.8,
-       "rwa": 0.1
+       "rwa": 0.2
       }
      ],
      "opp": [
@@ -40878,7 +40878,7 @@
        "country": "iq",
        "rating": 0.99,
        "swing": -0.2,
-       "rwa": -1.9
+       "rwa": -1.8
       },
       {
        "name": "burger brain",
@@ -40904,7 +40904,7 @@
        "country": "us",
        "rating": 0.95,
        "swing": -1,
-       "rwa": -2.7
+       "rwa": -2.6
       },
       {
        "name": "mc jin represent nation",
@@ -40930,7 +40930,7 @@
        "country": "us",
        "rating": 0.94,
        "swing": -1.1,
-       "rwa": -2.8
+       "rwa": -2.7
       },
       {
        "name": "BANAN",
@@ -40956,7 +40956,7 @@
        "country": "pl",
        "rating": 0.87,
        "swing": -2.3,
-       "rwa": -4
+       "rwa": -3.9
       },
       {
        "name": "FRANZ HERMANNツ",
@@ -40982,7 +40982,7 @@
        "country": "us",
        "rating": 0.5,
        "swing": -9,
-       "rwa": -10.7
+       "rwa": -10.6
       }
      ],
      "names": null,
@@ -40990,7 +40990,7 @@
       "k": 22,
       "d": 18,
       "adr": 98.6,
-      "rwa": 3.1,
+      "rwa": 3.2,
       "rating": 1.27
      }
     },
@@ -41030,7 +41030,7 @@
        "country": "dk",
        "rating": 1.15,
        "swing": 2.7,
-       "rwa": 1,
+       "rwa": 1.1,
        "mapMvp": true
       },
       {
@@ -41057,7 +41057,7 @@
        "country": "us",
        "rating": 0.81,
        "swing": -3.5,
-       "rwa": -5.2
+       "rwa": -5.1
       },
       {
        "name": "brooksb522",
@@ -41083,7 +41083,7 @@
        "country": "us",
        "rating": 0.8,
        "swing": -3.6,
-       "rwa": -5.3
+       "rwa": -5.2
       },
       {
        "name": "BlameTheLag",
@@ -41109,7 +41109,7 @@
        "country": null,
        "rating": 0.55,
        "swing": -8.2,
-       "rwa": -9.9
+       "rwa": -9.8
       },
       {
        "name": "misper",
@@ -41135,7 +41135,7 @@
        "country": "us",
        "rating": 0.23,
        "swing": -13.9,
-       "rwa": -15.6
+       "rwa": -15.5
       }
      ],
      "opp": [
@@ -41163,7 +41163,7 @@
        "country": "us",
        "rating": 1.51,
        "swing": 9.2,
-       "rwa": 7.5
+       "rwa": 7.6
       },
       {
        "name": "Flight",
@@ -41189,7 +41189,7 @@
        "country": null,
        "rating": 1.39,
        "swing": 7,
-       "rwa": 5.3
+       "rwa": 5.4
       },
       {
        "name": "armand",
@@ -41215,7 +41215,7 @@
        "country": "ca",
        "rating": 1.38,
        "swing": 6.9,
-       "rwa": 5.2
+       "rwa": 5.3
       },
       {
        "name": "moitch",
@@ -41241,7 +41241,7 @@
        "country": "ca",
        "rating": 1.28,
        "swing": 5.1,
-       "rwa": 3.4
+       "rwa": 3.5
       },
       {
        "name": "-Maniac-",
@@ -41267,7 +41267,7 @@
        "country": "us",
        "rating": 0.97,
        "swing": -0.6,
-       "rwa": -2.3
+       "rwa": -2.2
       }
      ],
      "names": null,
@@ -41275,7 +41275,7 @@
       "k": 20,
       "d": 16,
       "adr": 113.5,
-      "rwa": 1,
+      "rwa": 1.1,
       "rating": 1.15
      }
     },
@@ -41314,7 +41314,7 @@
        "country": "ca",
        "rating": 0.96,
        "swing": -0.7,
-       "rwa": -2.4,
+       "rwa": -2.3,
        "mapMvp": true
       },
       {
@@ -41342,7 +41342,7 @@
        "country": "dk",
        "rating": 0.9,
        "swing": -1.8,
-       "rwa": -3.5
+       "rwa": -3.4
       },
       {
        "name": "Chawk",
@@ -41368,7 +41368,7 @@
        "country": "us",
        "rating": 0.82,
        "swing": -3.3,
-       "rwa": -5
+       "rwa": -4.9
       },
       {
        "name": "mf",
@@ -41394,7 +41394,7 @@
        "country": "us",
        "rating": 0.77,
        "swing": -4.2,
-       "rwa": -5.9
+       "rwa": -5.8
       },
       {
        "name": "brooksb522",
@@ -41420,7 +41420,7 @@
        "country": "us",
        "rating": 0.67,
        "swing": -6,
-       "rwa": -7.7
+       "rwa": -7.6
       }
      ],
      "opp": [
@@ -41448,7 +41448,7 @@
        "country": "mx",
        "rating": 1.58,
        "swing": 10.5,
-       "rwa": 8.8
+       "rwa": 8.9
       },
       {
        "name": "winster",
@@ -41474,7 +41474,7 @@
        "country": "us",
        "rating": 1.45,
        "swing": 8.1,
-       "rwa": 6.4
+       "rwa": 6.5
       },
       {
        "name": "PoKaZideia",
@@ -41500,7 +41500,7 @@
        "country": "us",
        "rating": 1.24,
        "swing": 4.3,
-       "rwa": 2.6
+       "rwa": 2.7
       },
       {
        "name": "pr0digyIWNL",
@@ -41526,7 +41526,7 @@
        "country": "ca",
        "rating": 1.01,
        "swing": 0.2,
-       "rwa": -1.5
+       "rwa": -1.4
       },
       {
        "name": "Skankhunt42",
@@ -41552,7 +41552,7 @@
        "country": "us",
        "rating": 0.89,
        "swing": -2,
-       "rwa": -3.7
+       "rwa": -3.6
       }
      ],
      "names": null,
@@ -41560,7 +41560,7 @@
       "k": 16,
       "d": 17,
       "adr": 90.9,
-      "rwa": -3.5,
+      "rwa": -3.4,
       "rating": 0.9
      }
     },
@@ -41600,7 +41600,7 @@
        "country": "dk",
        "rating": 1.72,
        "swing": 13,
-       "rwa": 11.3,
+       "rwa": 11.4,
        "mapMvp": true
       },
       {
@@ -41627,7 +41627,7 @@
        "country": "us",
        "rating": 1.59,
        "swing": 10.7,
-       "rwa": 9
+       "rwa": 9.1
       },
       {
        "name": "Chawk",
@@ -41653,7 +41653,7 @@
        "country": "us",
        "rating": 1.44,
        "swing": 8,
-       "rwa": 6.3
+       "rwa": 6.4
       },
       {
        "name": "Untradable Teammate",
@@ -41679,7 +41679,7 @@
        "country": "us",
        "rating": 1.35,
        "swing": 6.4,
-       "rwa": 4.7
+       "rwa": 4.8
       },
       {
        "name": "rezzah",
@@ -41705,7 +41705,7 @@
        "country": "ca",
        "rating": 1.21,
        "swing": 3.7,
-       "rwa": 2
+       "rwa": 2.1
       }
      ],
      "opp": [
@@ -41733,7 +41733,7 @@
        "country": "us",
        "rating": 0.81,
        "swing": -3.5,
-       "rwa": -5.2
+       "rwa": -5.1
       },
       {
        "name": "Wiglay",
@@ -41759,7 +41759,7 @@
        "country": "us",
        "rating": 0.69,
        "swing": -5.7,
-       "rwa": -7.4
+       "rwa": -7.3
       },
       {
        "name": "Dr. Boofenshmirts",
@@ -41785,7 +41785,7 @@
        "country": "us",
        "rating": 0.5,
        "swing": -9,
-       "rwa": -10.7
+       "rwa": -10.6
       },
       {
        "name": "KYY",
@@ -41811,7 +41811,7 @@
        "country": "us",
        "rating": 0.4,
        "swing": -10.9,
-       "rwa": -12.6
+       "rwa": -12.5
       },
       {
        "name": "sneakman",
@@ -41837,7 +41837,7 @@
        "country": "us",
        "rating": 0.38,
        "swing": -11.2,
-       "rwa": -12.9
+       "rwa": -12.8
       }
      ],
      "names": null,
@@ -41845,7 +41845,7 @@
       "k": 21,
       "d": 11,
       "adr": 117.2,
-      "rwa": 11.3,
+      "rwa": 11.4,
       "rating": 1.72
      }
     },
@@ -41884,7 +41884,7 @@
        "country": "ca",
        "rating": 1.75,
        "swing": 13.5,
-       "rwa": 11.8,
+       "rwa": 11.9,
        "mapMvp": true
       },
       {
@@ -41911,7 +41911,7 @@
        "country": "us",
        "rating": 1.56,
        "swing": 10.1,
-       "rwa": 8.4
+       "rwa": 8.5
       },
       {
        "name": "mf",
@@ -41937,7 +41937,7 @@
        "country": "us",
        "rating": 1.28,
        "swing": 5.1,
-       "rwa": 3.4
+       "rwa": 3.5
       },
       {
        "name": "Untradable Teammate",
@@ -41963,7 +41963,7 @@
        "country": "us",
        "rating": 1.04,
        "swing": 0.7,
-       "rwa": -1
+       "rwa": -0.9
       },
       {
        "name": "LAURSEN_111",
@@ -41990,7 +41990,7 @@
        "country": "dk",
        "rating": 1.03,
        "swing": 0.5,
-       "rwa": -1.2
+       "rwa": -1.1
       }
      ],
      "opp": [
@@ -42018,7 +42018,7 @@
        "country": "ca",
        "rating": 0.92,
        "swing": -1.5,
-       "rwa": -3.2
+       "rwa": -3.1
       },
       {
        "name": "bl-ade",
@@ -42044,7 +42044,7 @@
        "country": "nz",
        "rating": 0.83,
        "swing": -3.1,
-       "rwa": -4.8
+       "rwa": -4.7
       },
       {
        "name": "1millis",
@@ -42070,7 +42070,7 @@
        "country": null,
        "rating": 0.74,
        "swing": -4.6,
-       "rwa": -6.3
+       "rwa": -6.2
       },
       {
        "name": "Mars",
@@ -42096,7 +42096,7 @@
        "country": "us",
        "rating": 0.66,
        "swing": -6.2,
-       "rwa": -7.9
+       "rwa": -7.8
       },
       {
        "name": "turkeyman5",
@@ -42122,7 +42122,7 @@
        "country": "us",
        "rating": 0.45,
        "swing": -9.9,
-       "rwa": -11.6
+       "rwa": -11.5
       }
      ],
      "names": null,
@@ -42130,7 +42130,7 @@
       "k": 11,
       "d": 14,
       "adr": 81.8,
-      "rwa": -1.2,
+      "rwa": -1.1,
       "rating": 1.03
      }
     },
@@ -42169,7 +42169,7 @@
        "country": "us",
        "rating": 1.77,
        "swing": 14,
-       "rwa": 12.3,
+       "rwa": 12.4,
        "mapMvp": true
       },
       {
@@ -42196,7 +42196,7 @@
        "country": "us",
        "rating": 1.55,
        "swing": 9.9,
-       "rwa": 8.2
+       "rwa": 8.3
       },
       {
        "name": "mf_plug",
@@ -42222,7 +42222,7 @@
        "country": "us",
        "rating": 1.44,
        "swing": 7.9,
-       "rwa": 6.2
+       "rwa": 6.3
       },
       {
        "name": "LAURSEN_111",
@@ -42249,7 +42249,7 @@
        "country": "dk",
        "rating": 1.31,
        "swing": 5.6,
-       "rwa": 3.9
+       "rwa": 4
       },
       {
        "name": "Little Fella",
@@ -42275,7 +42275,7 @@
        "country": "us",
        "rating": 1.16,
        "swing": 2.9,
-       "rwa": 1.2
+       "rwa": 1.3
       }
      ],
      "opp": [
@@ -42303,7 +42303,7 @@
        "country": "us",
        "rating": 0.82,
        "swing": -3.2,
-       "rwa": -4.9
+       "rwa": -4.8
       },
       {
        "name": "shifty",
@@ -42329,7 +42329,7 @@
        "country": "aq",
        "rating": 0.77,
        "swing": -4.1,
-       "rwa": -5.8
+       "rwa": -5.7
       },
       {
        "name": "Bdot",
@@ -42355,7 +42355,7 @@
        "country": "ca",
        "rating": 0.55,
        "swing": -8.1,
-       "rwa": -9.8
+       "rwa": -9.7
       },
       {
        "name": "jon",
@@ -42381,7 +42381,7 @@
        "country": null,
        "rating": 0.52,
        "swing": -8.6,
-       "rwa": -10.3
+       "rwa": -10.2
       },
       {
        "name": "motillonc",
@@ -42407,7 +42407,7 @@
        "country": "ca",
        "rating": 0.25,
        "swing": -13.5,
-       "rwa": -15.2
+       "rwa": -15.1
       }
      ],
      "names": null,
@@ -42415,7 +42415,7 @@
       "k": 13,
       "d": 9,
       "adr": 82.8,
-      "rwa": 3.9,
+      "rwa": 4,
       "rating": 1.31
      }
     },
@@ -42454,7 +42454,7 @@
        "country": "ca",
        "rating": 1.82,
        "swing": 14.9,
-       "rwa": 13.2,
+       "rwa": 13.3,
        "mapMvp": true
       },
       {
@@ -42481,7 +42481,7 @@
        "country": "us",
        "rating": 1.36,
        "swing": 6.4,
-       "rwa": 4.7
+       "rwa": 4.8
       },
       {
        "name": "LAURSEN_111",
@@ -42508,7 +42508,7 @@
        "country": "dk",
        "rating": 1.24,
        "swing": 4.3,
-       "rwa": 2.6
+       "rwa": 2.7
       },
       {
        "name": "Flix",
@@ -42534,7 +42534,7 @@
        "country": "us",
        "rating": 1,
        "swing": -0.1,
-       "rwa": -1.8
+       "rwa": -1.7
       },
       {
        "name": "Dash",
@@ -42560,7 +42560,7 @@
        "country": "us",
        "rating": 0.71,
        "swing": -5.3,
-       "rwa": -7
+       "rwa": -6.9
       }
      ],
      "opp": [
@@ -42588,7 +42588,7 @@
        "country": "us",
        "rating": 1.14,
        "swing": 2.6,
-       "rwa": 0.9
+       "rwa": 1
       },
       {
        "name": "ScaR",
@@ -42614,7 +42614,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.8,
-       "rwa": -4.5
+       "rwa": -4.4
       },
       {
        "name": "AGx119",
@@ -42640,7 +42640,7 @@
        "country": "us",
        "rating": 0.81,
        "swing": -3.4,
-       "rwa": -5.1
+       "rwa": -5
       },
       {
        "name": "Resistance",
@@ -42666,7 +42666,7 @@
        "country": "us",
        "rating": 0.63,
        "swing": -6.6,
-       "rwa": -8.3
+       "rwa": -8.2
       },
       {
        "name": "GSmilazera",
@@ -42692,7 +42692,7 @@
        "country": "us",
        "rating": 0.61,
        "swing": -7,
-       "rwa": -8.7
+       "rwa": -8.6
       }
      ],
      "names": null,
@@ -42700,7 +42700,7 @@
       "k": 17,
       "d": 15,
       "adr": 92,
-      "rwa": 2.6,
+      "rwa": 2.7,
       "rating": 1.24
      }
     },
@@ -42739,7 +42739,7 @@
        "country": "us",
        "rating": 1.59,
        "swing": 10.6,
-       "rwa": 8.9,
+       "rwa": 9,
        "mapMvp": true
       },
       {
@@ -42767,7 +42767,7 @@
        "country": "dk",
        "rating": 1.44,
        "swing": 8,
-       "rwa": 6.3
+       "rwa": 6.4
       },
       {
        "name": "fght ff yr dmns",
@@ -42793,7 +42793,7 @@
        "country": "us",
        "rating": 0.98,
        "swing": -0.3,
-       "rwa": -2
+       "rwa": -1.9
       },
       {
        "name": "fundel b. chundy",
@@ -42819,7 +42819,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.8,
-       "rwa": -4.5
+       "rwa": -4.4
       },
       {
        "name": "theCosmicdolphin",
@@ -42845,7 +42845,7 @@
        "country": "us",
        "rating": 0.82,
        "swing": -3.2,
-       "rwa": -4.9
+       "rwa": -4.8
       }
      ],
      "opp": [
@@ -42873,7 +42873,7 @@
        "country": null,
        "rating": 1.25,
        "swing": 4.5,
-       "rwa": 2.8
+       "rwa": 2.9
       },
       {
        "name": "󠀡",
@@ -42899,7 +42899,7 @@
        "country": null,
        "rating": 0.87,
        "swing": -2.4,
-       "rwa": -4.1
+       "rwa": -4
       },
       {
        "name": "cat",
@@ -42925,7 +42925,7 @@
        "country": "us",
        "rating": 0.84,
        "swing": -2.8,
-       "rwa": -4.5
+       "rwa": -4.4
       },
       {
        "name": "Ev0kE",
@@ -42951,7 +42951,7 @@
        "country": "us",
        "rating": 0.81,
        "swing": -3.4,
-       "rwa": -5.1
+       "rwa": -5
       },
       {
        "name": "PhD in Whiffing",
@@ -42977,7 +42977,7 @@
        "country": "us",
        "rating": 0.71,
        "swing": -5.2,
-       "rwa": -6.9
+       "rwa": -6.8
       }
      ],
      "names": null,
@@ -42985,7 +42985,7 @@
       "k": 25,
       "d": 17,
       "adr": 125.8,
-      "rwa": 6.3,
+      "rwa": 6.4,
       "rating": 1.44
      }
     },
@@ -43024,7 +43024,7 @@
        "country": null,
        "rating": 3.63,
        "swing": 47.6,
-       "rwa": 45.9,
+       "rwa": 46,
        "mapMvp": true
       },
       {
@@ -43051,7 +43051,7 @@
        "country": "us",
        "rating": 1.68,
        "swing": 12.3,
-       "rwa": 10.6
+       "rwa": 10.7
       },
       {
        "name": "mf",
@@ -43077,7 +43077,7 @@
        "country": "us",
        "rating": 1.44,
        "swing": 7.9,
-       "rwa": 6.2
+       "rwa": 6.3
       },
       {
        "name": "C9 Gihun",
@@ -43103,7 +43103,7 @@
        "country": "us",
        "rating": 1.43,
        "swing": 7.8,
-       "rwa": 6.1
+       "rwa": 6.2
       },
       {
        "name": "LAURSEN_111",
@@ -43130,7 +43130,7 @@
        "country": "dk",
        "rating": 1.04,
        "swing": 0.7,
-       "rwa": -1
+       "rwa": -0.9
       }
      ],
      "opp": [
@@ -43158,7 +43158,7 @@
        "country": "fm",
        "rating": 0.16,
        "swing": -15.2,
-       "rwa": -16.9
+       "rwa": -16.8
       },
       {
        "name": "Be Quiet My Mom is in my room",
@@ -43184,7 +43184,7 @@
        "country": "us",
        "rating": 0.07,
        "swing": -16.8,
-       "rwa": -18.5
+       "rwa": -18.4
       },
       {
        "name": "BIGJ0E",
@@ -43210,7 +43210,7 @@
        "country": "us",
        "rating": 0.04,
        "swing": -17.4,
-       "rwa": -19.1
+       "rwa": -19
       },
       {
        "name": "Jin",
@@ -43236,7 +43236,7 @@
        "country": "us",
        "rating": -0.08,
        "swing": -19.6,
-       "rwa": -21.3
+       "rwa": -21.2
       },
       {
        "name": "p h o b i x",
@@ -43262,7 +43262,7 @@
        "country": "us",
        "rating": -0.09,
        "swing": -19.8,
-       "rwa": -21.5
+       "rwa": -21.4
       }
      ],
      "names": null,
@@ -43270,7 +43270,7 @@
       "k": 2,
       "d": 2,
       "adr": 28.6,
-      "rwa": -1,
+      "rwa": -0.9,
       "rating": 1.04
      }
     },
@@ -43310,7 +43310,7 @@
        "country": "dk",
        "rating": 1.09,
        "swing": 1.6,
-       "rwa": -0.1,
+       "rwa": 0,
        "mapMvp": true
       },
       {
@@ -43337,7 +43337,7 @@
        "country": null,
        "rating": 0.9,
        "swing": -1.9,
-       "rwa": -3.6
+       "rwa": -3.5
       },
       {
        "name": "YXDN",
@@ -43363,7 +43363,7 @@
        "country": null,
        "rating": 0.76,
        "swing": -4.3,
-       "rwa": -6
+       "rwa": -5.9
       },
       {
        "name": "yougi",
@@ -43389,7 +43389,7 @@
        "country": null,
        "rating": 0.75,
        "swing": -4.6,
-       "rwa": -6.3
+       "rwa": -6.2
       },
       {
        "name": "maceyroni",
@@ -43415,7 +43415,7 @@
        "country": null,
        "rating": 0.38,
        "swing": -11.2,
-       "rwa": -12.9
+       "rwa": -12.8
       }
      ],
      "opp": [
@@ -43443,7 +43443,7 @@
        "country": "us",
        "rating": 1.44,
        "swing": 8,
-       "rwa": 6.3
+       "rwa": 6.4
       },
       {
        "name": "Wolf The Sniper",
@@ -43469,7 +43469,7 @@
        "country": null,
        "rating": 1.43,
        "swing": 7.8,
-       "rwa": 6.1
+       "rwa": 6.2
       },
       {
        "name": "Fun Size",
@@ -43495,7 +43495,7 @@
        "country": "us",
        "rating": 1.17,
        "swing": 3,
-       "rwa": 1.3
+       "rwa": 1.4
       },
       {
        "name": "Josue-0087",
@@ -43521,7 +43521,7 @@
        "country": "us",
        "rating": 1.14,
        "swing": 2.5,
-       "rwa": 0.8
+       "rwa": 0.9
       },
       {
        "name": "asheski",
@@ -43547,7 +43547,7 @@
        "country": "us",
        "rating": 0.92,
        "swing": -1.5,
-       "rwa": -3.2
+       "rwa": -3.1
       }
      ],
      "names": null,
@@ -43555,7 +43555,7 @@
       "k": 19,
       "d": 17,
       "adr": 105.8,
-      "rwa": -0.1,
+      "rwa": 0,
       "rating": 1.09
      }
     }
@@ -43583,7 +43583,7 @@
     "n": 51,
     "w": 29,
     "l": 22,
-    "rwa": -0.2,
+    "rwa": -0.1,
     "rating": 1.06,
     "kd": 1.03,
     "adr": 87
@@ -43597,11 +43597,11 @@
      "map": "cache",
      "win": false,
      "score": "8-13",
-     "rwa": -0.1,
+     "rwa": 0,
      "rating": 1.09,
      "kd": 1.12,
      "adr": 105.8,
-     "roll": -0.1
+     "roll": 0
     },
     {
      "at": 1780605312000,
@@ -43609,11 +43609,11 @@
      "map": "ancient",
      "win": true,
      "score": "7-0",
-     "rwa": -1,
+     "rwa": -0.9,
      "rating": 1.04,
      "kd": 1,
      "adr": 28.6,
-     "roll": -0.5
+     "roll": -0.4
     },
     {
      "at": 1782870954000,
@@ -43621,11 +43621,11 @@
      "map": "dust2",
      "win": true,
      "score": "13-10",
-     "rwa": 6.3,
+     "rwa": 6.4,
      "rating": 1.44,
      "kd": 1.47,
      "adr": 125.8,
-     "roll": 1.7
+     "roll": 1.8
     },
     {
      "at": 1782951443000,
@@ -43633,11 +43633,11 @@
      "map": "inferno",
      "win": true,
      "score": "13-7",
-     "rwa": 2.6,
+     "rwa": 2.7,
      "rating": 1.24,
      "kd": 1.13,
      "adr": 92,
-     "roll": 1.9
+     "roll": 2.1
     },
     {
      "at": 1783983326000,
@@ -43645,11 +43645,11 @@
      "map": "cache",
      "win": true,
      "score": "13-3",
-     "rwa": 3.9,
+     "rwa": 4,
      "rating": 1.31,
      "kd": 1.44,
      "adr": 82.8,
-     "roll": 2.3
+     "roll": 2.4
     },
     {
      "at": 1785359929000,
@@ -43657,11 +43657,11 @@
      "map": "anubis",
      "win": true,
      "score": "13-5",
-     "rwa": -1.2,
+     "rwa": -1.1,
      "rating": 1.03,
      "kd": 0.79,
      "adr": 81.8,
-     "roll": 2.1
+     "roll": 2.2
     },
     {
      "at": 1785361983000,
@@ -43669,11 +43669,11 @@
      "map": "dust2",
      "win": true,
      "score": "13-4",
-     "rwa": 11.3,
+     "rwa": 11.4,
      "rating": 1.72,
      "kd": 1.91,
      "adr": 117.2,
-     "roll": 4.6
+     "roll": 4.7
     },
     {
      "at": 1785363901000,
@@ -43681,11 +43681,11 @@
      "map": "inferno",
      "win": false,
      "score": "6-13",
-     "rwa": -3.5,
+     "rwa": -3.4,
      "rating": 0.9,
      "kd": 0.94,
      "adr": 90.9,
-     "roll": 2.6
+     "roll": 2.7
     },
     {
      "at": 1789845415000,
@@ -43693,11 +43693,11 @@
      "map": "inferno",
      "win": false,
      "score": "6-13",
-     "rwa": 1,
+     "rwa": 1.1,
      "rating": 1.15,
      "kd": 1.25,
      "adr": 113.5,
-     "roll": 2.3
+     "roll": 2.4
     },
     {
      "at": 1790812922000,
@@ -43705,11 +43705,11 @@
      "map": "inferno",
      "win": true,
      "score": "13-9",
-     "rwa": 3.1,
+     "rwa": 3.2,
      "rating": 1.27,
      "kd": 1.22,
      "adr": 98.6,
-     "roll": 2.1
+     "roll": 2.2
     },
     {
      "at": 1791941385000,
@@ -43717,11 +43717,11 @@
      "map": "anubis",
      "win": false,
      "score": "14-16",
-     "rwa": 3.7,
+     "rwa": 3.8,
      "rating": 1.3,
      "kd": 1.43,
      "adr": 109.3,
-     "roll": 3.1
+     "roll": 3.2
     },
     {
      "at": 1792019414000,
@@ -43733,7 +43733,7 @@
      "rating": 0.83,
      "kd": 0.75,
      "adr": 62.8,
-     "roll": 0.1
+     "roll": 0.2
     },
     {
      "at": 1792026173000,
@@ -43753,11 +43753,11 @@
      "map": "anubis",
      "win": true,
      "score": "13-10",
-     "rwa": -2.2,
+     "rwa": -2.1,
      "rating": 0.95,
      "kd": 0.82,
      "adr": 88.2,
-     "roll": -1.6
+     "roll": -1.5
     },
     {
      "at": 1792106991000,
@@ -43769,7 +43769,7 @@
      "rating": 0.74,
      "kd": 0.71,
      "adr": 75.4,
-     "roll": -3.6
+     "roll": -3.5
     },
     {
      "at": 1792114146000,
@@ -43789,11 +43789,11 @@
      "map": "dust2",
      "win": true,
      "score": "13-4",
-     "rwa": 2.1,
+     "rwa": 2.2,
      "rating": 1.21,
      "kd": 1.17,
      "adr": 96.6,
-     "roll": -2.9
+     "roll": -2.8
     },
     {
      "at": 1792458287000,
@@ -43805,7 +43805,7 @@
      "rating": 1.23,
      "kd": 1.17,
      "adr": 80,
-     "roll": -0.3
+     "roll": -0.2
     },
     {
      "at": 1792546255000,
@@ -43813,11 +43813,11 @@
      "map": "ancient",
      "win": true,
      "score": "13-11",
-     "rwa": -0.6,
+     "rwa": -0.5,
      "rating": 1.06,
      "kd": 1,
      "adr": 87.1,
-     "roll": 0
+     "roll": 0.1
     },
     {
      "at": 1793155942000,
@@ -43825,11 +43825,11 @@
      "map": "dust2",
      "win": true,
      "score": "13-5",
-     "rwa": 7.4,
+     "rwa": 7.6,
      "rating": 1.51,
      "kd": 1.36,
      "adr": 102.1,
-     "roll": 2.9
+     "roll": 3
     },
     {
      "at": 1793211265000,
@@ -43841,7 +43841,7 @@
      "rating": 0.62,
      "kd": 0.56,
      "adr": 58.7,
-     "roll": 0.9
+     "roll": 1
     },
     {
      "at": 1793216812000,
@@ -43853,7 +43853,7 @@
      "rating": 0.97,
      "kd": 0.94,
      "adr": 66,
-     "roll": 0.5
+     "roll": 0.6
     },
     {
      "at": 1793246898000,
@@ -43861,7 +43861,7 @@
      "map": "cache",
      "win": true,
      "score": "16-13",
-     "rwa": -1.5,
+     "rwa": -1.4,
      "rating": 0.9,
      "kd": 0.86,
      "adr": 69.1,
@@ -43877,7 +43877,7 @@
      "rating": 1.28,
      "kd": 1.45,
      "adr": 84.4,
-     "roll": 0.5
+     "roll": 0.6
     },
     {
      "at": 1793329491000,
@@ -43889,7 +43889,7 @@
      "rating": 0.64,
      "kd": 0.61,
      "adr": 55,
-     "roll": -2.5
+     "roll": -2.4
     },
     {
      "at": 1793397309000,
@@ -43897,7 +43897,7 @@
      "map": "dust2",
      "win": true,
      "score": "13-11",
-     "rwa": -0.7,
+     "rwa": -0.6,
      "rating": 1.05,
      "kd": 0.95,
      "adr": 87.5,
@@ -43909,11 +43909,11 @@
      "map": "mirage",
      "win": false,
      "score": "9-13",
-     "rwa": -7.5,
+     "rwa": -7.4,
      "rating": 0.62,
      "kd": 0.55,
      "adr": 65.1,
-     "roll": -2.4
+     "roll": -2.3
     },
     {
      "at": 1793484490000,
@@ -43921,11 +43921,11 @@
      "map": "mirage",
      "win": true,
      "score": "13-6",
-     "rwa": 10.2,
+     "rwa": 10.3,
      "rating": 1.66,
      "kd": 1.71,
      "adr": 119.4,
-     "roll": -0.1
+     "roll": 0
     },
     {
      "at": 1793486732000,
@@ -43933,11 +43933,11 @@
      "map": "cache",
      "win": false,
      "score": "15-15",
-     "rwa": 6.5,
+     "rwa": 6.6,
      "rating": 1.45,
      "kd": 1.59,
      "adr": 119.6,
-     "roll": 0.2
+     "roll": 0.3
     },
     {
      "at": 1793490017000,
@@ -43945,11 +43945,11 @@
      "map": "ancient",
      "win": true,
      "score": "13-7",
-     "rwa": 5,
+     "rwa": 5.1,
      "rating": 1.37,
      "kd": 1.36,
      "adr": 105.9,
-     "roll": 2.7
+     "roll": 2.8
     },
     {
      "at": 1793491962000,
@@ -43957,11 +43957,11 @@
      "map": "mirage",
      "win": false,
      "score": "10-13",
-     "rwa": 2.3,
+     "rwa": 2.4,
      "rating": 1.22,
      "kd": 1.21,
      "adr": 104.1,
-     "roll": 3.3
+     "roll": 3.4
     },
     {
      "at": 1793563112000,
@@ -43969,11 +43969,11 @@
      "map": "dust2",
      "win": false,
      "score": "6-13",
-     "rwa": -9.3,
+     "rwa": -9.2,
      "rating": 0.58,
      "kd": 0.58,
      "adr": 74.2,
-     "roll": 2.9
+     "roll": 3
     },
     {
      "at": 1793565011000,
@@ -43981,11 +43981,11 @@
      "map": "anubis",
      "win": true,
      "score": "13-8",
-     "rwa": 6.4,
+     "rwa": 6.5,
      "rating": 1.45,
      "kd": 1.28,
      "adr": 127.1,
-     "roll": 2.2
+     "roll": 2.3
     },
     {
      "at": 1793670449000,
@@ -43993,11 +43993,11 @@
      "map": "anubis",
      "win": true,
      "score": "13-4",
-     "rwa": 5.9,
+     "rwa": 6,
      "rating": 1.42,
      "kd": 1.27,
      "adr": 91.2,
-     "roll": 2.1
+     "roll": 2.2
     },
     {
      "at": 1793672350000,
@@ -44005,11 +44005,11 @@
      "map": "inferno",
      "win": true,
      "score": "13-2",
-     "rwa": -0.7,
+     "rwa": -0.6,
      "rating": 1.06,
      "kd": 0.71,
      "adr": 92,
-     "roll": 0.9
+     "roll": 1
     },
     {
      "at": 1793674351000,
@@ -44017,11 +44017,11 @@
      "map": "dust2",
      "win": false,
      "score": "11-13",
-     "rwa": -1.2,
+     "rwa": -1.1,
      "rating": 1.03,
      "kd": 1.06,
      "adr": 81.3,
-     "roll": 0.2
+     "roll": 0.3
     },
     {
      "at": 1793757528000,
@@ -44033,7 +44033,7 @@
      "rating": 0.54,
      "kd": 0.8,
      "adr": 85.2,
-     "roll": 0.3
+     "roll": 0.4
     },
     {
      "at": 1793838164000,
@@ -44041,11 +44041,11 @@
      "map": "ancient",
      "win": true,
      "score": "13-8",
-     "rwa": 8,
+     "rwa": 8.1,
      "rating": 1.54,
      "kd": 1.67,
      "adr": 121.4,
-     "roll": 0.6
+     "roll": 0.7
     },
     {
      "at": 1794278404000,
@@ -44053,11 +44053,11 @@
      "map": "mirage",
      "win": false,
      "score": "8-13",
-     "rwa": -7.9,
+     "rwa": -7.8,
      "rating": 0.66,
      "kd": 0.65,
      "adr": 53.5,
-     "roll": -2.2
+     "roll": -2.1
     },
     {
      "at": 1794281333000,
@@ -44081,7 +44081,7 @@
      "rating": 1.15,
      "kd": 1.2,
      "adr": 87.9,
-     "roll": -2.7
+     "roll": -2.6
     },
     {
      "at": 1794453103000,
@@ -44089,7 +44089,7 @@
      "map": "dust2",
      "win": true,
      "score": "13-11",
-     "rwa": 0.6,
+     "rwa": 0.7,
      "rating": 1.13,
      "kd": 1.05,
      "adr": 96.5,
@@ -44105,7 +44105,7 @@
      "rating": 0.77,
      "kd": 0.63,
      "adr": 79.3,
-     "roll": -3.2
+     "roll": -3.1
     },
     {
      "at": 1794782602000,
@@ -44113,7 +44113,7 @@
      "map": "ancient",
      "win": false,
      "score": "5-13",
-     "rwa": -5.1,
+     "rwa": -5,
      "rating": 0.81,
      "kd": 0.87,
      "adr": 80.3,
@@ -44129,7 +44129,7 @@
      "rating": 1.68,
      "kd": 1.92,
      "adr": 114.6,
-     "roll": 0.8
+     "roll": 0.9
     },
     {
      "at": 1794787647000,
@@ -44141,7 +44141,7 @@
      "rating": 0.7,
      "kd": 0.59,
      "adr": 69.2,
-     "roll": -0.8
+     "roll": -0.7
     },
     {
      "at": 1794878965000,
@@ -44161,11 +44161,11 @@
      "map": "nuke",
      "win": false,
      "score": "5-13",
-     "rwa": -6,
+     "rwa": -5.9,
      "rating": 0.76,
      "kd": 0.8,
      "adr": 78.9,
-     "roll": -0.2
+     "roll": -0.1
     },
     {
      "at": 1794883695000,
@@ -44185,7 +44185,7 @@
      "map": "ancient",
      "win": false,
      "score": "4-13",
-     "rwa": -4.4,
+     "rwa": -4.3,
      "rating": 0.86,
      "kd": 0.93,
      "adr": 75.4,
@@ -44197,11 +44197,11 @@
      "map": "anubis",
      "win": true,
      "score": "13-8",
-     "rwa": -2.5,
+     "rwa": -2.4,
      "rating": 0.95,
      "kd": 1,
      "adr": 68,
-     "roll": -3.5
+     "roll": -3.4
     }
    ],
    "maps": [
@@ -44210,7 +44210,7 @@
      "n": 11,
      "w": 7,
      "l": 4,
-     "rwa": 0.7,
+     "rwa": 0.8,
      "rating": 1.11,
      "kd": 1.07,
      "adr": 90.7
@@ -44230,7 +44230,7 @@
      "n": 8,
      "w": 2,
      "l": 6,
-     "rwa": -3.9,
+     "rwa": -3.8,
      "rating": 0.86,
      "kd": 0.85,
      "adr": 78
@@ -44250,7 +44250,7 @@
      "n": 7,
      "w": 5,
      "l": 2,
-     "rwa": 0.5,
+     "rwa": 0.6,
      "rating": 1.12,
      "kd": 1.16,
      "adr": 83.8
@@ -44260,7 +44260,7 @@
      "n": 5,
      "w": 3,
      "l": 2,
-     "rwa": 0.5,
+     "rwa": 0.6,
      "rating": 1.12,
      "kd": 1.06,
      "adr": 97.4
@@ -44270,7 +44270,7 @@
      "n": 3,
      "w": 1,
      "l": 2,
-     "rwa": -0.3,
+     "rwa": -0.2,
      "rating": 1.03,
      "kd": 1.05,
      "adr": 91.1
@@ -44282,7 +44282,7 @@
      "n": 30,
      "w": 15,
      "l": 15,
-     "rwa": -2.5,
+     "rwa": -2.4,
      "rating": 0.92,
      "kd": 0.9,
      "adr": 78.8
@@ -44292,7 +44292,7 @@
      "n": 18,
      "w": 13,
      "l": 5,
-     "rwa": 3,
+     "rwa": 3.1,
      "rating": 1.26,
      "kd": 1.24,
      "adr": 97.4
@@ -44302,7 +44302,7 @@
      "n": 3,
      "w": 1,
      "l": 2,
-     "rwa": 2.8,
+     "rwa": 2.9,
      "rating": 1.25,
      "kd": 1.23,
      "adr": 107.1
@@ -44321,7 +44321,7 @@
       "a": 4,
       "adr": 71.7,
       "hs": 62,
-      "rwa": -3.4,
+      "rwa": -3.3,
       "rating": 0.91,
       "kd": 0.96
      },
@@ -44338,7 +44338,7 @@
        "a": 3,
        "adr": 75.4,
        "hs": 69,
-       "rwa": -4.4,
+       "rwa": -4.3,
        "rating": 0.86,
        "mvp": true
       },
@@ -44354,7 +44354,7 @@
        "a": 5,
        "adr": 68,
        "hs": 55,
-       "rwa": -2.5,
+       "rwa": -2.4,
        "rating": 0.95,
        "mvp": false
       }
@@ -44405,7 +44405,7 @@
        "a": 3,
        "adr": 78.9,
        "hs": 75,
-       "rwa": -6,
+       "rwa": -5.9,
        "rating": 0.76,
        "mvp": true
       },
@@ -44456,7 +44456,7 @@
        "a": 3,
        "adr": 80.3,
        "hs": 54,
-       "rwa": -5.1,
+       "rwa": -5,
        "rating": 0.81,
        "mvp": true
       },
@@ -44541,7 +44541,7 @@
       "a": 6,
       "adr": 96.5,
       "hs": 75,
-      "rwa": 0.6,
+      "rwa": 0.7,
       "rating": 1.13,
       "kd": 1.05
      },
@@ -44558,7 +44558,7 @@
        "a": 6,
        "adr": 96.5,
        "hs": 75,
-       "rwa": 0.6,
+       "rwa": 0.7,
        "rating": 1.13,
        "mvp": false
       }
@@ -44628,7 +44628,7 @@
        "a": 3,
        "adr": 53.5,
        "hs": 45,
-       "rwa": -7.9,
+       "rwa": -7.8,
        "rating": 0.66,
        "mvp": false
       },
@@ -44662,7 +44662,7 @@
       "a": 8,
       "adr": 121.4,
       "hs": 52,
-      "rwa": 8,
+      "rwa": 8.1,
       "rating": 1.54,
       "kd": 1.67
      },
@@ -44679,7 +44679,7 @@
        "a": 8,
        "adr": 121.4,
        "hs": 52,
-       "rwa": 8,
+       "rwa": 8.1,
        "rating": 1.54,
        "mvp": true
       }
@@ -44732,7 +44732,7 @@
       "a": 5,
       "adr": 88.2,
       "hs": 71,
-      "rwa": 1.3,
+      "rwa": 1.4,
       "rating": 1.17,
       "kd": 1
      },
@@ -44749,7 +44749,7 @@
        "a": 5,
        "adr": 91.2,
        "hs": 71,
-       "rwa": 5.9,
+       "rwa": 6,
        "rating": 1.42,
        "mvp": false
       },
@@ -44765,7 +44765,7 @@
        "a": 6,
        "adr": 92,
        "hs": 80,
-       "rwa": -0.7,
+       "rwa": -0.6,
        "rating": 1.06,
        "mvp": false
       },
@@ -44781,7 +44781,7 @@
        "a": 4,
        "adr": 81.3,
        "hs": 61,
-       "rwa": -1.2,
+       "rwa": -1.1,
        "rating": 1.03,
        "mvp": false
       }
@@ -44799,7 +44799,7 @@
       "a": 5.5,
       "adr": 100.7,
       "hs": 65,
-      "rwa": -1.5,
+      "rwa": -1.3,
       "rating": 1.01,
       "kd": 0.92
      },
@@ -44816,7 +44816,7 @@
        "a": 5,
        "adr": 74.2,
        "hs": 64,
-       "rwa": -9.3,
+       "rwa": -9.2,
        "rating": 0.58,
        "mvp": false
       },
@@ -44832,7 +44832,7 @@
        "a": 6,
        "adr": 127.1,
        "hs": 65,
-       "rwa": 6.4,
+       "rwa": 6.5,
        "rating": 1.45,
        "mvp": false
       }
@@ -44850,7 +44850,7 @@
       "a": 5,
       "adr": 112.3,
       "hs": 52,
-      "rwa": 6,
+      "rwa": 6.1,
       "rating": 1.43,
       "kd": 1.46
      },
@@ -44867,7 +44867,7 @@
        "a": 2,
        "adr": 119.4,
        "hs": 54,
-       "rwa": 10.2,
+       "rwa": 10.3,
        "rating": 1.66,
        "mvp": true
       },
@@ -44883,7 +44883,7 @@
        "a": 4,
        "adr": 119.6,
        "hs": 43,
-       "rwa": 6.5,
+       "rwa": 6.6,
        "rating": 1.45,
        "mvp": true
       },
@@ -44899,7 +44899,7 @@
        "a": 6,
        "adr": 105.9,
        "hs": 53,
-       "rwa": 5,
+       "rwa": 5.1,
        "rating": 1.37,
        "mvp": false
       },
@@ -44915,7 +44915,7 @@
        "a": 8,
        "adr": 104.1,
        "hs": 57,
-       "rwa": 2.3,
+       "rwa": 2.4,
        "rating": 1.22,
        "mvp": true
       }
@@ -44933,7 +44933,7 @@
       "a": 5.5,
       "adr": 76.3,
       "hs": 66,
-      "rwa": -4.1,
+      "rwa": -4,
       "rating": 0.84,
       "kd": 0.74
      },
@@ -44950,7 +44950,7 @@
        "a": 6,
        "adr": 87.5,
        "hs": 67,
-       "rwa": -0.7,
+       "rwa": -0.6,
        "rating": 1.05,
        "mvp": false
       },
@@ -44966,7 +44966,7 @@
        "a": 5,
        "adr": 65.1,
        "hs": 64,
-       "rwa": -7.5,
+       "rwa": -7.4,
        "rating": 0.62,
        "mvp": false
       }
