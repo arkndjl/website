@@ -12,7 +12,8 @@ layout most schools use) lists each player's bio link; a bio is read only for a 
 honored, one request per site at a time, a second apart, under a generic UA. Results are cached in
 scripts/data/school_bios_<sport>.json (sites 60 days, roster links 7, bios 30 days a miss; a site that shows a bot
 wall is left alone for a day) and returned to the caller as
-{'<name key>|<team>': {'dob', 'url'}}. Most D-I bios carry no birth date; the ones that do are exact.
+{'<name key>|<team>': {'dob', 'url'}}. Most D-I bios carry no birth date; the ones that do are exact. A site with
+15+ bios read and none dated is skipped; the best-dating sites are read first.
 """
 import concurrent.futures as cf, datetime as dt, json, os, re, subprocess, sys, time, urllib.parse, urllib.robotparser
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -172,9 +173,18 @@ def lookup(sport, want_rows, max_bios=600, today=None, threads=4):
     budget = [max_bios]
     out, status = {}, {}
     jobs = {}
+    # most schools never print a birth date: a site with 15+ bios read and none dated is skipped, and the sites that
+    # do print them go first, so the per-run budget reaches whole rosters there (NC State, Cal, Ole Miss: ~all dated)
+    seen, dated = {}, {}
+    for u, c in C['bios'].items():
+        h = u.split('/')[2]; seen[h] = seen.get(h, 0) + 1; dated[h] = dated.get(h, 0) + bool(c.get('dob'))
+    rate = lambda h: (dated.get(h, 0) + 1) / (seen.get(h, 0) + 2)
+    order = sorted(by_team.items(), key=lambda kv: -rate(C['sites'].get(teams[kv[0][0]], {}).get('host') or ''))
     with cf.ThreadPoolExecutor(threads) as ex:
-        for (tid, team), want in by_team.items():
+        for (tid, team), want in order:
             host = C['sites'].get(teams[tid], {}).get('host')
+            if host and seen.get(host, 0) >= 15 and not dated.get(host):
+                status['undated'] = status.get('undated', 0) + 1; continue
             if host: jobs[ex.submit(site_job, host, paths, want, C, today, budget)] = host
         for f in cf.as_completed(jobs):
             try: found, rows, st = f.result()

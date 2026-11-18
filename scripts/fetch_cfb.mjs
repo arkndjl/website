@@ -991,9 +991,11 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // along): half a year added for age, and draft eligibility read off the eligibility class
     else if (e?.years) cls = { years: e.years + 0.5, elig: e.years, label: CLASS_NAMES[Math.min(e.years, 5) - 1] };
     const key = `${p.name}|${t?.name || p.team}`;
-    const dob = dobs[key] || dobs[p.name] || (plausible(dobStore[key]?.dob) ? dobStore[key].dob : null) || (e?.dob && +e.dob.slice(0, 4) >= SEASON - 35 ? e.dob : null);   // ESPN's date unless impossible (it has listed 1979 for a current player; ex-pros in their 30s are real)
+    // a store date marked est (month and day from Wikipedia, year from his first college season) sets the estimate only
+    const st = plausible(dobStore[key]?.dob) ? dobStore[key] : null, guess = !dobs[key] && !dobs[p.name] && st?.est ? st.dob : null;
+    const dob = dobs[key] || dobs[p.name] || (st && !st.est ? st.dob : null) || (e?.dob && +e.dob.slice(0, 4) >= SEASON - 35 ? e.dob : null);   // ESPN's date unless impossible (it has listed 1979 for a current player; ex-pros in their 30s are real)
     const age = dob ? ageOn(dob, asof) : null;
-    const ageEst = age ?? (cls ? 17.9 + cls.years : null);       // ~18.9 for a first-year in October
+    const ageEst = age ?? (guess ? ageOn(guess, asof) : cls ? 17.9 + cls.years : null);       // ~18.9 for a first-year in October
     p.rec = (e ? recruits[e.id] : null) || recByName[norm(p.name) + '|' + p.tid] || null;   // CFBD 247 composite, by ESPN athlete id (else name + school)
     // else by name alone in his class (one year either way), any school: transfers and players ESPN can't match.
     // Taken only when one record fits (several namesakes with different ratings: none)
