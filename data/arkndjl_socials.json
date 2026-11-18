@@ -1,23 +1,23 @@
 {
- "asof": "2026-11-18T17:18:46.912Z",
+ "asof": "2026-11-18T18:15:38.283Z",
  "status": {
-  "x": false,
+  "x": true,
   "youtube": true
  },
  "goals": {
   "x": {
-   "rate": 90.4,
+   "rate": 92.3,
    "prior": 88.5,
-   "tracked": 0,
+   "tracked": 0.1,
    "d30": {
     "goal": 2508,
     "base": 2420,
     "set": 1795021245501,
     "due": 1797613245501,
     "p0": 51,
-    "p": 63,
-    "f": 0.023,
-    "m": 0
+    "p": 73,
+    "f": 0.045,
+    "m": 0.002
    },
    "d90": {
     "goal": 2684,
@@ -25,19 +25,19 @@
     "set": 1795021245501,
     "due": 1802797245501,
     "p0": 51,
-    "p": 60,
-    "f": 0.008,
-    "m": 0
+    "p": 69,
+    "f": 0.015,
+    "m": 0.001
    },
    "next": {
     "goal": 2500,
-    "eta": "2026-12-14",
+    "eta": "2026-12-13",
     "p90": 100,
     "from": 2000,
     "base": 2420,
     "set": 1795021245501,
     "eta0": "2026-12-16",
-    "f": 0.844,
+    "f": 0.848,
     "m": 0.84
    },
    "opened": "2024-08-20"
@@ -45,7 +45,7 @@
   "youtube": {
    "rate": 0.8,
    "prior": 0.8,
-   "tracked": 0,
+   "tracked": 0.1,
    "d30": {
     "goal": 18,
     "base": 17,
@@ -54,7 +54,7 @@
     "p0": 43,
     "p": 43,
     "f": 0,
-    "m": 0
+    "m": 0.002
    },
    "d90": {
     "goal": 18,
@@ -64,7 +64,7 @@
     "p0": 67,
     "p": 67,
     "f": 0,
-    "m": 0
+    "m": 0.001
    },
    "next": {
     "goal": 25,
@@ -220,6 +220,12 @@
    "x": 2422,
    "youtube": 17,
    "xn": 14568
+  },
+  {
+   "t": 1795025738283,
+   "x": 2424,
+   "youtube": 17,
+   "xn": 14569
   }
  ],
  "xp": {
@@ -630,17 +636,22 @@
   "ideas": [
    {
     "k": "X post slot",
-    "v": null,
-    "d": "at 2 posts in a slot, 1+ day old (0 posts)",
-    "n": null,
-    "wait": true
+    "v": "Tue · 12p ET",
+    "d": "990 expected views vs 990",
+    "n": 2
    },
    {
     "k": "X post type",
     "v": null,
-    "d": "at 2 posts of two types, 1+ day old (0)",
+    "d": "at 2 posts of two types, 1+ day old (2)",
     "n": null,
     "wait": true
+   },
+   {
+    "k": "X engagement",
+    "v": "2.04%",
+    "d": "likes, reposts, replies, quotes, bookmarks per view",
+    "n": 2
    },
    {
     "k": "X follows / 1k views",
@@ -679,14 +690,14 @@
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (0)",
+    "d": "at 14 days tracked (0.1)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (0)",
+    "d": "at 14 days tracked (0.1)",
     "n": null,
     "wait": true
    },
@@ -708,31 +719,31 @@
   "x": {
    "n": 15,
    "top": 11,
-   "nOld": 0,
-   "median": null,
-   "er": null,
+   "nOld": 2,
+   "median": 1052.5,
+   "er": 2.04,
    "perDay": 11,
    "last30": 11,
    "gap": 0.4,
    "vpd": null,
    "fpk": null,
-   "base": 0,
+   "base": 990,
    "kinds": {
     "text": {
      "n": 0,
      "med": null
     },
     "photo": {
-     "n": 0,
-     "med": null
+     "n": 1,
+     "med": 1409
     },
     "video": {
      "n": 0,
      "med": null
     },
     "quote": {
-     "n": 0,
-     "med": null
+     "n": 1,
+     "med": 696
     }
    },
    "grid": [
@@ -802,8 +813,8 @@
       "med": null
      },
      {
-      "n": 0,
-      "med": null
+      "n": 2,
+      "med": 1052.5
      },
      {
       "n": 0,
@@ -934,9 +945,9 @@
     },
     {
      "d": "Tue",
-     "n": 0,
-     "med": null,
-     "x": null
+     "n": 2,
+     "med": 1052.5,
+     "x": 990
     },
     {
      "d": "Wed",
@@ -1465,7 +1476,7 @@
      "views": 67,
      "likes": 5,
      "comments": null,
-     "age": 195.8,
+     "age": 195.9,
      "et": {
       "d": 3,
       "h": 17,
@@ -1481,7 +1492,7 @@
      "views": 9,
      "likes": 1,
      "comments": null,
-     "age": 66.4,
+     "age": 66.5,
      "et": {
       "d": 0,
       "h": 3,
