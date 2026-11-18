@@ -382,6 +382,7 @@ def cfb():
                  col('pfn', 'Stat+', 'position Stat+, 100 average, 25 per SD', 'i', 1), col('xv', 'XV', 'WAR from the stat line', '2', 1),
                  col('sn', 'Snaps', 'snaps', 'i', 1), col('xnil', 'xNIL', 'expected NIL worth, $M', 'm', 1)],
         'pre': {'l': 'Rec', 't': '247 composite national rank in the high school class'},
+        'gfx': ['pfn', 'xnil'],      # GFX columns after the view (Noah, Nov 18): Stat+ and xNIL in place of Rec and its Δ
         'pos': ['QB', 'RB', 'WR', 'TE', 'OL', 'DT', 'EDGE', 'LB', 'CB', 'S', 'K', 'P'], 'posGroup': 1, 'divs': ['FBS', 'FCS'],
         'min': {'k': 'sn', 'l': 'snaps', 'opts': [[0, 'any'], [50, '50+'], [150, '150+'], [300, '300+']], 'def': 0},
         'seasons': [{'s': yr, 'l': str(yr), 'rows': rows}]})
