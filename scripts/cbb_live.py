@@ -634,9 +634,9 @@ def main():
     # the board stage: where the draft boards have him (cbb_fit.board_stage), on top of the blended E[FV]
     lrs = F.live_consensus([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs])
     for r, lr in zip(recs, lrs):
-        e2, p2 = F.board_e(r['e'], lr, fit.get('boards'))
+        e2, p2 = F.board_e(r['e'], lr, fit.get('boards'), live=True)
         if p2 is None: continue
-        r['e_pre'] = F.board_e(r['e_pre'], lr, fit.get('boards'))[0]
+        r['e_pre'] = F.board_e(r['e_pre'], lr, fit.get('boards'), live=True)[0]
         r['parts'] = list(r['parts']) + [('boards', e2 - r['e'], lr if lr is not None else float('nan'))]
         r['e'], r['p'] = e2, p2
     # the combine stage (scripts/cbb_combine.py): a tester's athletic numbers on top of the boards
