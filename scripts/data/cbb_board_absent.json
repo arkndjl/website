@@ -1,0 +1,107 @@
+{
+ "onLogit": [
+  -5.827815,
+  0.15505
+ ],
+ "onRank": [
+  0.042216,
+  -4.973952
+ ],
+ "onSd": 0.6168,
+ "keep": true,
+ "rows": 1305,
+ "onJune": 169,
+ "test": {
+  "all": {
+   "wins": 4,
+   "classes": [
+    {
+     "class": 2022,
+     "n": 277,
+     "mseOld": 12.652,
+     "mseNew": 12.399,
+     "biasOld": -0.377,
+     "biasNew": -0.58
+    },
+    {
+     "class": 2023,
+     "n": 268,
+     "mseOld": 8.827,
+     "mseNew": 8.164,
+     "biasOld": 0.04,
+     "biasNew": -0.164
+    },
+    {
+     "class": 2024,
+     "n": 260,
+     "mseOld": 12.908,
+     "mseNew": 12.287,
+     "biasOld": -0.24,
+     "biasNew": -0.44
+    },
+    {
+     "class": 2025,
+     "n": 255,
+     "mseOld": 11.44,
+     "mseNew": 10.111,
+     "biasOld": -0.028,
+     "biasNew": -0.235
+    },
+    {
+     "class": 2026,
+     "n": 245,
+     "mseOld": 7.635,
+     "mseNew": 8.135,
+     "biasOld": -0.094,
+     "biasNew": -0.484
+    }
+   ]
+  },
+  "E33+": {
+   "wins": 4,
+   "classes": [
+    {
+     "class": 2022,
+     "n": 4,
+     "mseOld": 28.685,
+     "mseNew": 3.827,
+     "biasOld": 5.35,
+     "biasNew": 1.956
+    },
+    {
+     "class": 2023,
+     "n": 9,
+     "mseOld": 19.783,
+     "mseNew": 5.195,
+     "biasOld": 3.835,
+     "biasNew": 0.767
+    },
+    {
+     "class": 2024,
+     "n": 4,
+     "mseOld": 22.696,
+     "mseNew": 7.182,
+     "biasOld": 4.122,
+     "biasNew": 0.652
+    },
+    {
+     "class": 2025,
+     "n": 5,
+     "mseOld": 29.272,
+     "mseNew": 6.089,
+     "biasOld": 5.406,
+     "biasNew": 2.467
+    },
+    {
+     "class": 2026,
+     "n": 10,
+     "mseOld": 6.026,
+     "mseNew": 11.676,
+     "biasOld": 1.023,
+     "biasNew": -2.645
+    }
+   ]
+  }
+ },
+ "note": "players off No Ceilings first board, 2022-26 classes; live uses min(old term, this)"
+}

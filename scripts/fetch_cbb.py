@@ -177,7 +177,7 @@ def main():
         r['xbpm'] = float(xb['w'][0] + np.array(xb['w'][1:]) @ zz)
     # the board stage: where the draft boards have him (cbb_fit.board_stage)
     for r, lr in zip(rows, F.live_consensus([(r['p']['name'], r['t']['bt'] or r['t']['name']) for r in rows])):
-        e2, p2 = F.board_e(r['e'], lr, fit.get('boards'))
+        e2, p2 = F.board_e(r['e'], lr, fit.get('boards'), live=True)
         if p2 is None: continue
         r['parts'].append(('boards', e2 - r['e'], lr if lr is not None else float('nan')))
         r['e'], r['nbaP'] = e2, p2

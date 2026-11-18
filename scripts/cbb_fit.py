@@ -904,10 +904,12 @@ def emap_cal(rows, E, tail=4e-3):
 _GH = np.polynomial.hermite_e.hermegauss(9)
 
 
-def board_e(e, lr_pre, C, att=None):
+def board_e(e, lr_pre, C, att=None, live=False):
     """E[FV] and P(NBA) after the board stage, for a player whose model E[FV] is e and whose preseason consensus is
     -ln rank lr_pre (None when no board lists him). Returns (e, p) unchanged when the stage wasn't kept. att: the
-    preseason -> June rank map to use (default today's, _att)."""
+    preseason -> June rank map to use (default today's, _att). live: the live board, where a player on none of today's
+    boards also gets the off-board fit (scripts/data/cbb_board_absent.json, scripts/cbb_board_absent.py) and keeps the lower of
+    the two (Nov 18 2026: the E-only term overcredited E 33+ players off the boards by +4 to +5)."""
     if not C or not C.get('keep'): return e, None
     mu, sd, W = np.array(C['mean']), np.array(C['sd']), [np.array(w) for w in C['w']]
 
@@ -922,9 +924,29 @@ def board_e(e, lr_pre, C, att=None):
     if lr_pre is not None:
         a = att or _att(C); v = spread(a['a'] + a['b'] * lr_pre, a['sd'])
     else:
-        p_on = 1 / (1 + math.exp(-(C['onLogit'][0] + C['onLogit'][1] * e)))
-        v = (1 - p_on) * at(C['fill']) + p_on * spread(C['onRank'][0] * e + C['onRank'][1], C['onSd'])
+        def off(A):
+            p_on = 1 / (1 + math.exp(-max(-30, min(30, A['onLogit'][0] + A['onLogit'][1] * e))))
+            return (1 - p_on) * at(C['fill']) + p_on * spread(A['onRank'][0] * e + A['onRank'][1], A['onSd'])
+        v = off(C)
+        A = board_absent() if live else None
+        if A:
+            v2 = off(A)
+            if v2[1] < v[1]: v = v2
     return float(v[1]), float(v[0])
+
+
+_ABS = {}
+
+
+def board_absent():
+    """the kept off-board fit (scripts/data/cbb_board_absent.json), None when missing or not kept"""
+    if 'v' not in _ABS:
+        try:
+            A = json.load(open(os.path.join(D.ROOT, 'scripts', 'data', 'cbb_board_absent.json')))
+            _ABS['v'] = A if A.get('keep') else None
+        except (OSError, ValueError):
+            _ABS['v'] = None
+    return _ABS['v']
 
 
 _ATT = {}
