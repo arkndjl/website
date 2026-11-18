@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T11:51:03Z",
+ "asof": "2026-11-18T11:53:49Z",
  "recenter": {
   "2026-11-18": 1.95
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-18T03:13:29Z",
-  "ageH": 8.6,
+  "ageH": 8.7,
   "stale": false
  },
  "picks": [],
@@ -2179,7 +2179,7 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 3.6,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2411,6 +2411,22 @@
    "tm": 147.0
   },
   {
+   "id": "401909753",
+   "sport": "cbb",
+   "kick": "2026-11-18T17:00:00Z",
+   "home": "Baylor",
+   "away": "Jackson State",
+   "mk": "spread",
+   "side": "away",
+   "line": 35.5,
+   "price": -119.0,
+   "edge": 1.0,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 34.5,
+   "tm": 155.1
+  },
+  {
    "id": "401920682",
    "sport": "cbb",
    "kick": "2026-11-19T00:00:00Z",
@@ -2425,22 +2441,6 @@
    "why": "edge under 6.5 (side: under)",
    "m": 29.0,
    "tm": 166.3
-  },
-  {
-   "id": "401921141",
-   "sport": "cbb",
-   "kick": "2026-11-19T00:00:00Z",
-   "home": "South Carolina",
-   "away": "Elon",
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": -114.0,
-   "edge": 0.8,
-   "x": 5.0,
-   "why": "edge under 5 (tier: mixed)",
-   "m": 16.3,
-   "tm": 137.1
   }
  ],
  "games": {
@@ -2472,7 +2472,7 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -2675,11 +2675,11 @@
    "state": "paper"
   },
   "401909753": {
-   "mk": "total",
-   "side": "under",
-   "line": 155.5,
+   "mk": "spread",
+   "side": "away",
+   "line": 35.5,
    "price": -119.0,
-   "edge": 0.4,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "Baylor",
@@ -2787,7 +2787,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -100.0,
+   "price": 104.0,
    "edge": 0.4,
    "ev": null,
    "units": 0.0,
@@ -2885,7 +2885,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 18854,
+  "snapshots": 18859,
   "buckets": [
    {
     "when": "24h+",
@@ -20122,7 +20122,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T11:51:03Z",
+ "checked": "2026-11-18T11:53:49Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
