@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-18T03:28:11Z",
+ "asof": "2026-11-18T03:30:44Z",
  "recenter": {
-  "2026-11-17": 1.5,
+  "2026-11-17": 1.52,
   "2026-11-18": 1.55
  },
  "monitor": {
@@ -329,7 +329,7 @@
  },
  "model": {
   "asof": "2026-11-18T02:31:34Z",
-  "ageH": 0.9,
+  "ageH": 1.0,
   "stale": false
  },
  "picks": [],
@@ -465,38 +465,6 @@
    "tm": 224.9
   },
   {
-   "id": "401910010",
-   "sport": "nba",
-   "kick": "2026-11-19T00:00:00Z",
-   "home": "ORL",
-   "away": "PHI",
-   "mk": "total",
-   "side": "over",
-   "line": 221.5,
-   "price": -119.0,
-   "edge": 1.7,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: over)",
-   "m": -0.9,
-   "tm": 223.2
-  },
-  {
-   "id": "401910006",
-   "sport": "nba",
-   "kick": "2026-11-18T03:30:00Z",
-   "home": "LAC",
-   "away": "UTAH",
-   "mk": "total",
-   "side": "under",
-   "line": 226.5,
-   "price": -106.0,
-   "edge": 1.1,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": 5.9,
-   "tm": 225.4
-  },
-  {
    "id": "401910009",
    "sport": "nba",
    "kick": "2026-11-19T00:00:00Z",
@@ -511,6 +479,22 @@
    "why": "edge under 5 (role: dog)",
    "m": 11.9,
    "tm": 236.3
+  },
+  {
+   "id": "401910010",
+   "sport": "nba",
+   "kick": "2026-11-19T00:00:00Z",
+   "home": "ORL",
+   "away": "PHI",
+   "mk": "total",
+   "side": "over",
+   "line": 222.5,
+   "price": -110.0,
+   "edge": 0.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": -0.9,
+   "tm": 223.2
   },
   {
    "id": "401910011",
@@ -530,18 +514,6 @@
   }
  ],
  "games": {
-  "401910006": {
-   "mk": "total",
-   "side": "under",
-   "line": 226.5,
-   "price": -106.0,
-   "edge": 1.1,
-   "ev": null,
-   "units": 0.0,
-   "home": "LAC",
-   "away": "UTAH",
-   "state": "under"
-  },
   "401910005": {
    "mk": "total",
    "side": "under",
@@ -593,9 +565,9 @@
   "401910010": {
    "mk": "total",
    "side": "over",
-   "line": 221.5,
-   "price": -119.0,
-   "edge": 1.7,
+   "line": 222.5,
+   "price": -110.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "ORL",
@@ -727,7 +699,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4682,
+  "snapshots": 4683,
   "buckets": [
    {
     "when": "24h+",
@@ -7402,7 +7374,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T03:28:11Z",
+ "checked": "2026-11-18T03:30:44Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
