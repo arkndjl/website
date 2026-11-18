@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T23:06:08Z",
+ "asof": "2026-11-18T23:13:19Z",
  "recenter": {
-  "2026-11-18": 1.94
+  "2026-11-18": 1.93
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-18T22:58:16Z",
-  "ageH": 0.1,
+  "ageH": 0.3,
   "stale": false
  },
  "picks": [],
@@ -1970,7 +1970,7 @@
     "side": "home",
     "line": -7.5,
     "price": -102.0,
-    "ev": 0.103,
+    "ev": 0.092,
     "units": 0.25
    }
   },
@@ -2072,7 +2072,7 @@
     "side": "under",
     "line": 150.5,
     "price": -114.0,
-    "ev": 0.099,
+    "ev": 0.097,
     "units": 0.25
    }
   },
@@ -2296,7 +2296,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -5413.0,
+   "price": -110,
    "edge": 25.4,
    "x": 5.0,
    "why": "gap too big: a bad line",
@@ -2328,10 +2328,10 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 4.8,
    "x": 4.0,
-   "why": "no edge at -114",
+   "why": "no edge at -110",
    "m": -0.3,
    "tm": 135.6
   },
@@ -2416,22 +2416,6 @@
    "tm": 149.5
   },
   {
-   "id": "401909516",
-   "sport": "cbb",
-   "kick": "2026-11-18T23:30:00Z",
-   "home": "Georgetown",
-   "away": "Navy",
-   "mk": "total",
-   "side": "over",
-   "line": 136.5,
-   "price": -119.0,
-   "edge": 4.8,
-   "x": 5.0,
-   "why": "edge under 5 (total: low)",
-   "m": 21.1,
-   "tm": 141.3
-  },
-  {
    "id": "401911377",
    "sport": "cbb",
    "kick": "2026-11-19T00:00:00Z",
@@ -2456,7 +2440,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.7,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2560,6 +2544,22 @@
    "tm": 149.7
   },
   {
+   "id": "401909516",
+   "sport": "cbb",
+   "kick": "2026-11-18T23:30:00Z",
+   "home": "Georgetown",
+   "away": "Navy",
+   "mk": "total",
+   "side": "over",
+   "line": 137.5,
+   "price": -110.0,
+   "edge": 3.8,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 21.1,
+   "tm": 141.3
+  },
+  {
    "id": "401909762",
    "sport": "cbb",
    "kick": "2026-11-19T02:00:00Z",
@@ -2648,7 +2648,7 @@
    "mk": "spread",
    "side": "away",
    "line": 22.5,
-   "price": -110.0,
+   "price": -119.0,
    "edge": 2.3,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2803,7 +2803,7 @@
    "mk": "spread",
    "side": "home",
    "line": 15.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -2973,9 +2973,9 @@
   "401909516": {
    "mk": "total",
    "side": "over",
-   "line": 136.5,
-   "price": -119.0,
-   "edge": 4.8,
+   "line": 137.5,
+   "price": -110.0,
+   "edge": 3.8,
    "ev": null,
    "units": 0.0,
    "home": "Georgetown",
@@ -3022,7 +3022,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 4.8,
    "ev": null,
    "units": 0.0,
@@ -3046,7 +3046,7 @@
    "mk": "spread",
    "side": "away",
    "line": 22.5,
-   "price": -110.0,
+   "price": -119.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -3082,7 +3082,7 @@
    "mk": "total",
    "side": "over",
    "line": 152.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -3166,7 +3166,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -3199,11 +3199,11 @@
    "state": "under"
   },
   "401922283": {
-   "mk": "spread",
+   "mk": "ml",
    "side": "home",
-   "line": -7.5,
-   "price": -102.0,
-   "ev": 0.103,
+   "line": null,
+   "price": 285.0,
+   "ev": 0.128,
    "edge": 7.4,
    "units": 0.25,
    "bk": "novig",
@@ -3290,7 +3290,7 @@
    "mk": "spread",
    "side": "away",
    "line": 15.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -3399,7 +3399,7 @@
    "mk": "spread",
    "side": "away",
    "line": 23.5,
-   "price": -5413.0,
+   "price": -110,
    "edge": 25.4,
    "ev": null,
    "units": 0.0,
@@ -3460,16 +3460,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19449,
+  "snapshots": 19463,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 572,
+    "clvN": 573,
     "clvRet": -0.0156,
-    "clvT": -1.91,
-    "clv": 0.51,
+    "clvT": -1.92,
+    "clv": 0.5,
     "beat": 0.353,
-    "still": 0.274
+    "still": 0.276
    },
    {
     "when": "6-24h",
@@ -3482,21 +3482,21 @@
    },
    {
     "when": "1-6h",
-    "clvN": 2004,
+    "clvN": 2005,
     "clvRet": -0.0408,
-    "clvT": -35.65,
+    "clvT": -35.67,
     "clv": 0.07,
     "beat": 0.159,
     "still": 0.712
    },
    {
     "when": "<1h",
-    "clvN": 342,
-    "clvRet": -0.0459,
-    "clvT": -26.28,
+    "clvN": 346,
+    "clvRet": -0.046,
+    "clvT": -26.6,
     "clv": -0.01,
-    "beat": 0.076,
-    "still": 0.836
+    "beat": 0.075,
+    "still": 0.838
    }
   ]
  },
@@ -20900,7 +20900,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T23:06:08Z",
+ "checked": "2026-11-18T23:13:19Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
