@@ -1,16 +1,20 @@
 {{- /* social_data.exe: LAURSEN_111's Twitch / YouTube / TikTok / X followers over time (data/laursen_socials.json,
-       scripts/laursen_socials.mjs in esea.yml). {{< lzsocial class="desk__wide" >}} */ -}}
-{{- $s := site.Data.laursen_socials -}}
+       scripts/laursen_socials.mjs in esea.yml). {{< lzsocial class="desk__wide" >}}
+       Another account: src = data file, nets = which networks in order, name = GFX title, icon = title icon
+       (about/contact: {{< lzsocial src="arkndjl_socials" nets="x,youtube" name="ARKNDJL" icon="icon-twitter" >}}, scripts/arkndjl_socials.mjs). */ -}}
+{{- $src := .Get "src" | default "laursen_socials" }}{{ $s := index site.Data $src -}}
+{{- $want := split (.Get "nets" | default "twitch,youtube,tiktok,x,tth") "," }}{{ $who := .Get "name" | default "LAURSEN_111" -}}
+{{- $spec := dict "twitch" (slice "twitch" "Twitch" "icon-twitch") "youtube" (slice "youtube" "YouTube" "icon-youtube") "tiktok" (slice "tiktok" "TikTok" "icon-tiktok") "x" (slice "x" "X" "icon-twitter") "tth" (slice "tth" "TikTok likes" "icon-tiktok") -}}
 {{- $syncd := "" }}{{ with $s }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
 <div class="win lzf lzsoc{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-twitch"/></svg>social_data.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#{{ .Get "icon" | default "icon-twitch" }}"/></svg>social_data.exe<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- with $s.series }}{{ $tr := . }}
   <div class="lzf__body">
     <div class="lzf__trend lzs__trend">
-    {{- range $sp := slice (slice "twitch" "Twitch" "icon-twitch") (slice "youtube" "YouTube" "icon-youtube") (slice "tiktok" "TikTok" "icon-tiktok") (slice "x" "X" "icon-twitter") (slice "tth" "TikTok likes" "icon-tiktok") }}{{ $k := index $sp 0 }}
+    {{- range $w := $want }}{{ $sp := index $spec $w }}{{ $k := index $sp 0 }}
     {{- $pts := slice }}{{ range $tr }}{{ with index . $k }}{{ $pts = $pts | append (float .) }}{{ end }}{{ end }}
     {{- with $pts }}{{ $n := len . }}{{ $lo := index . 0 }}{{ $hi := index . 0 }}{{ range . }}{{ if lt . $lo }}{{ $lo = . }}{{ end }}{{ if gt . $hi }}{{ $hi = . }}{{ end }}{{ end }}
       {{- $cur := index . (sub $n 1) }}{{ $dl := sub $cur (index . 0) }}
@@ -44,7 +48,7 @@
       {{- range $h.dated }}{{ if .done }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" (printf "%dd" .T) "t" (.hit | default .due) "due" .due "ahead" .ahead "hit" (ne .hit nil) "final" .final) }}{{ end }}{{ end }}
     {{- end }}
     {{- $gx := slice }}
-    {{- range $sp := slice (slice "twitch" "Twitch") (slice "youtube" "YouTube") (slice "tiktok" "TikTok") (slice "x" "X") }}{{ $k := index $sp 0 }}
+    {{- range $w := $want }}{{ if ne $w "tth" }}{{ $sp := index $spec $w }}{{ $k := index $sp 0 }}
       {{- $cv := 0.0 }}{{ range $s.series }}{{ with index . $k }}{{ $cv = float . }}{{ end }}{{ end }}
       {{- with index ($s.goals | default dict) $k }}{{ $g := . }}{{ $gl := slice }}
         {{- range $T := slice 30 90 }}{{ with index $g (printf "d%d" $T) }}{{ $gl = $gl | append (dict "l" (cond (ne .due nil) ((time.In "America/New_York" (time (int (div (.due | default 0) 1000)))).Format "Jan 2") (printf "%dd" $T)) "v" (lang.FormatNumber 0 (float .goal)) "p" (printf "%v%%" .p) "f" (.f | default 0) "m" (.m | default -1)) }}{{ end }}{{ end }}
@@ -53,8 +57,8 @@
         {{- $sub := "" }}{{ if eq $k "tiktok" }}{{ with $s.plan }}{{ with .tt }}{{ with .hearts }}{{ $sub = printf "%s LIKES" (lang.FormatNumber 0 (float .)) }}{{ end }}{{ end }}{{ end }}{{ end }}
         {{- $gx = $gx | append (dict "n" (index $sp 1) "c" (lang.FormatNumber 0 $cv) "pace" $g.rate "goals" $gl "last" $last "sub" $sub) }}
       {{- end }}
-    {{- end }}
-    {{- with $gx }}<div class="esea__gfxbar lzs__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="lz-social" data-gfx-social="{{ . | jsonify }}" data-gfx-date="{{ $syncd }}" data-gfx-title="LAURSEN_111 :: SOCIAL DATA" title="social data graphic (16:9)">GFX</button></div>{{ end }}
+    {{- end }}{{ end }}
+    {{- with $gx }}<div class="esea__gfxbar lzs__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="lz-social" data-gfx-social="{{ . | jsonify }}" data-gfx-date="{{ $syncd }}" data-gfx-title="{{ $who }} :: SOCIAL DATA" title="social data graphic (16:9)">GFX</button></div>{{ end }}
     {{- with $rows }}
     <div class="wintable__scroll lzs__log">
     <table class="esea-box">
@@ -72,6 +76,6 @@
   {{- else }}
   <p class="esea__empty-line">no social data yet.</p>
   {{- end }}
-  <div class="win__status"><span title="Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="{{ if eq $src "laursen_socials" }}Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com{{ else }}X via api.fxtwitter.com; YouTube from the channel page{{ end }}. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{ partial "gfx.html" . }}
