@@ -1,17 +1,17 @@
 {
- "asof": "2026-11-18T00:10Z",
+ "asof": "2026-11-18T01:02Z",
  "sports": {
   "cbb": {
    "by_file": {
     "static/data/depth/cbb.json": {
      "flags": 0,
-     "rows": 5287
+     "rows": 5291
     }
    },
    "flags": [],
    "joined": 0,
-   "players": 895,
-   "rows": 5287
+   "players": 896,
+   "rows": 5291
   },
   "cfb": {
    "by_file": {
@@ -274,19 +274,19 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 10,
+     "flags": 8,
      "rows": 2138
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 17,
+     "flags": 14,
      "rows": 636
     },
     "static/data/nfl-war.json": {
-     "flags": 80,
+     "flags": 79,
      "rows": 1825
     },
     "static/data/pctl-nfl.json": {
-     "flags": 78,
+     "flags": 77,
      "rows": 1754
     },
     "static/data/personnel/nfl.json": {
@@ -294,7 +294,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 54,
+     "flags": 53,
      "rows": 1650
     }
    },
@@ -334,24 +334,6 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Reverts to Indy's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Indy's practice squad",
-      "kind": "practice"
-     },
-     "pid": "14464",
-     "player": "Quez Watkins",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "IND"
     },
     {
      "d": "2026-09-14",
@@ -424,24 +406,6 @@
      "pos": "NB",
      "rotowire": "FA",
      "site": "NYG"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Back on Philly's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back on Philly's practice squad",
-      "kind": "practice"
-     },
-     "pid": "18499",
-     "player": "Jaydon Blue",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "PHI"
     },
     {
      "d": "2026-08-31",
@@ -1722,16 +1686,16 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-14",
+     "d": "2026-11-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Let go by Packers",
-     "kind": null,
+     "flag": "practice",
+     "head": "Back with Green Bay on practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-10-24",
-      "head": "Signs with active roster",
-      "kind": "sign"
+      "d": "2026-11-17",
+      "head": "Back with Green Bay on practice squad",
+      "kind": "practice"
      },
      "pid": "18877",
      "player": "Coleman Owen",
@@ -1756,24 +1720,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "TB"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Back on Philly's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back on Philly's practice squad",
-      "kind": "practice"
-     },
-     "pid": "18499",
-     "player": "Jaydon Blue",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "PHI"
     },
     {
      "d": "2026-11-16",
@@ -1866,16 +1812,16 @@
      "site": "PIT"
     },
     {
-     "d": "2026-11-12",
+     "d": "2026-11-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Lands with Baltimore's practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Cut by Baltimore",
+     "kind": "waived",
      "move": {
-      "d": "2026-11-12",
-      "head": "Lands with Baltimore's practice squad",
-      "kind": "practice"
+      "d": "2026-11-17",
+      "head": "Cut by Baltimore",
+      "kind": "waived"
      },
      "pid": "17921",
      "player": "Harrison Mevis",
@@ -2010,16 +1956,16 @@
      "site": "FA"
     },
     {
-     "d": "2026-11-12",
+     "d": "2026-11-17",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Lands with Baltimore's practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Cut by Baltimore",
+     "kind": "waived",
      "move": {
-      "d": "2026-11-12",
-      "head": "Lands with Baltimore's practice squad",
-      "kind": "practice"
+      "d": "2026-11-17",
+      "head": "Cut by Baltimore",
+      "kind": "waived"
      },
      "pid": "17921",
      "player": "Harrison Mevis",
@@ -2478,24 +2424,6 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-16",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Back on Philly's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back on Philly's practice squad",
-      "kind": "practice"
-     },
-     "pid": "18499",
-     "player": "Jaydon Blue",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "PHI"
-    },
-    {
      "d": "2026-10-12",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2658,21 +2586,21 @@
      "site": "LAC"
     },
     {
-     "d": "2026-11-16",
+     "d": "2026-11-17",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Back with practice squad",
-     "kind": "practice",
+     "flag": "moved",
+     "head": "Signed to active roster",
+     "kind": "up",
      "move": {
-      "d": "2026-11-16",
-      "head": "Back with practice squad",
-      "kind": "practice"
+      "d": "2026-11-17",
+      "head": "Signed to active roster",
+      "kind": "up"
      },
      "pid": "18482",
      "player": "Brady Cook",
      "pos": "QB",
-     "rotowire": "FA",
+     "rotowire": "MIA",
      "site": "NYJ"
     },
     {
@@ -3720,16 +3648,16 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-14",
+     "d": "2026-11-17",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Let go by Packers",
-     "kind": null,
+     "flag": "practice",
+     "head": "Back with Green Bay on practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-10-24",
-      "head": "Signs with active roster",
-      "kind": "sign"
+      "d": "2026-11-17",
+      "head": "Back with Green Bay on practice squad",
+      "kind": "practice"
      },
      "pid": "18877",
      "player": "Coleman Owen",
@@ -3808,24 +3736,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "DEN"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Back on Philly's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back on Philly's practice squad",
-      "kind": "practice"
-     },
-     "pid": "18499",
-     "player": "Jaydon Blue",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "PHI"
     },
     {
      "d": "2026-11-09",
@@ -4296,24 +4206,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Back with practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back with practice squad",
-      "kind": "practice"
-     },
-     "pid": "18482",
-     "player": "Brady Cook",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "MIA"
-    },
-    {
      "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4372,24 +4264,6 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Back on Philly's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back on Philly's practice squad",
-      "kind": "practice"
-     },
-     "pid": "18499",
-     "player": "Jaydon Blue",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "PHI"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
      "head": "Reverts to Miami's practice squad",
      "kind": "practice",
      "move": {
@@ -4420,24 +4294,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "KC"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Reverts to Indy's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Indy's practice squad",
-      "kind": "practice"
-     },
-     "pid": "14464",
-     "player": "Quez Watkins",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "IND"
     },
     {
      "d": "2026-11-16",
