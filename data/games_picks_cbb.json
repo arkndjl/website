@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-18T23:17:19Z",
+ "asof": "2026-11-18T23:21:21Z",
  "recenter": {
   "2026-11-18": 1.93
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-18T22:58:16Z",
-  "ageH": 0.3,
+  "ageH": 0.4,
   "stale": false
  },
  "picks": [],
@@ -2072,7 +2072,7 @@
     "side": "under",
     "line": 150.5,
     "price": -114.0,
-    "ev": 0.097,
+    "ev": 0.099,
     "units": 0.25
    }
   },
@@ -2640,22 +2640,6 @@
    "tm": 141.6
   },
   {
-   "id": "401920075",
-   "sport": "cbb",
-   "kick": "2026-11-19T00:00:00Z",
-   "home": "George Mason",
-   "away": "North Carolina Central",
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": -119.0,
-   "edge": 2.3,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": 20.2,
-   "tm": 133.2
-  },
-  {
    "id": "401927357",
    "sport": "cbb",
    "kick": "2026-11-19T01:00:00Z",
@@ -2686,6 +2670,22 @@
    "why": "edge under 5 (tier: mixed)",
    "m": 26.7,
    "tm": 154.0
+  },
+  {
+   "id": "401920974",
+   "sport": "cbb",
+   "kick": "2026-11-18T23:30:00Z",
+   "home": "Winthrop",
+   "away": "Chattanooga",
+   "mk": "spread",
+   "side": "home",
+   "line": -4.5,
+   "price": -129.0,
+   "edge": 2.2,
+   "x": 5.0,
+   "why": "edge under 5 (line: 4-9)",
+   "m": -2.3,
+   "tm": 164.9
   }
  ],
  "games": {
@@ -2803,7 +2803,7 @@
    "mk": "spread",
    "side": "home",
    "line": 15.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -3043,11 +3043,11 @@
    "state": "under"
   },
   "401920075": {
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": -119.0,
-   "edge": 2.3,
+   "mk": "total",
+   "side": "over",
+   "line": 131.5,
+   "price": -114.0,
+   "edge": 1.7,
    "ev": null,
    "units": 0.0,
    "home": "George Mason",
@@ -3165,9 +3165,9 @@
   "401920974": {
    "mk": "spread",
    "side": "home",
-   "line": -3.5,
-   "price": -101.0,
-   "edge": 1.2,
+   "line": -4.5,
+   "price": -129.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Winthrop",
@@ -3276,9 +3276,9 @@
   "401922047": {
    "mk": "total",
    "side": "under",
-   "line": 153.5,
-   "price": 107,
-   "ev": 0.075,
+   "line": 151.5,
+   "price": 126,
+   "ev": 0.063,
    "edge": 6.6,
    "units": 1.5,
    "bk": "poly",
@@ -3460,7 +3460,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19468,
+  "snapshots": 19475,
   "buckets": [
    {
     "when": "24h+",
@@ -3474,26 +3474,26 @@
    {
     "when": "6-24h",
     "clvN": 4023,
-    "clvRet": -0.0134,
-    "clvT": -7.51,
-    "clv": 0.45,
+    "clvRet": -0.0133,
+    "clvT": -7.44,
+    "clv": 0.46,
     "beat": 0.389,
     "still": 0.412
    },
    {
     "when": "1-6h",
     "clvN": 2006,
-    "clvRet": -0.0408,
-    "clvT": -35.69,
+    "clvRet": -0.0407,
+    "clvT": -35.46,
     "clv": 0.07,
     "beat": 0.159,
     "still": 0.712
    },
    {
     "when": "<1h",
-    "clvN": 347,
+    "clvN": 348,
     "clvRet": -0.046,
-    "clvT": -26.68,
+    "clvT": -26.75,
     "clv": -0.01,
     "beat": 0.075,
     "still": 0.839
@@ -20900,7 +20900,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-18T23:17:19Z",
+ "checked": "2026-11-18T23:21:21Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
