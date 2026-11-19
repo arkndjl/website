@@ -2263,6 +2263,13 @@
             if (img) { g.drawImage(img, tx, cy - size * 0.34, size, size * 0.69); tx += size + 10; }
             else { var cc = c.querySelector('.esea-flag--cc'); if (cc) { g.fillStyle = C.lilac; g.fillRect(tx, cy - size * 0.34, size, size * 0.69); g.font = Math.round(size * 0.5) + 'px ' + FONT; g.fillStyle = C.dark; g.fillText(txt(cc), tx + 3, cy); g.font = size + 'px ' + FONT; tx += size + 10; } }
             var mvp = /★/.test(s0); s0 = s0.replace(/★\s*MVP/, '').trim();
+            var lg = c.querySelector('.lzd__tag');   // ESEA League row: a filled badge, set apart from PUG rows
+            if (lg) {
+              s0 = s0.replace(/^(\S+\s*[AP]M)\s*ESEA/, '$1').trim();
+              var bw = g.measureText('ESEA').width + size * 0.6;
+              g.fillStyle = C.title; g.fillRect(tx, cy - size * 0.55, bw, size * 1.1); bevel(g, tx, cy - size * 0.55, bw, size * 1.1, true, 2);
+              g.fillStyle = C.teal; g.fillText('ESEA', tx + size * 0.3, cy); tx += bw + size * 0.4;
+            }
             g.fillStyle = rows[r].classList.contains('is-me') ? C.white : C.lilac; g.fillText(s0, tx, cy);
             var mw = g.measureText(s0).width;
             if (isSub) { g.fillStyle = '#ffd166'; g.fillText(' SUB', tx + mw, cy); mw += g.measureText(' SUB').width; }

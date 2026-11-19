@@ -3576,6 +3576,9 @@ table.trophycase__hist td.trophycase__post {
 .esea-box tbody tr:nth-child(odd) td { background: rgba(36, 26, 58, .35); }
 .esea-box tr.is-me td, .esea-season tr.is-me td { color: var(--foreground); background: color-mix(in srgb, var(--win-title) 55%, transparent); }
 .esea-box__top { color: #ffd28a; }
+.lzd__tag { display: inline-block; padding: 0 5px; margin-right: 4px; background: #57068c; color: #7fffd4; box-shadow: inset 1px 1px 0 #8a5cc2, inset -1px -1px 0 #241a3a; }
+.lzd__lg { outline: 1px solid #7fffd4; }
+.lzd__lgrow td:first-child { box-shadow: inset 3px 0 0 #7fffd4; }
 
 .esea-pool__list { list-style: none; margin: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
 .esea-pool__list li { display: grid; grid-template-columns: 9ch minmax(0, 1fr) 5ch 5ch; gap: 10px; align-items: center; }

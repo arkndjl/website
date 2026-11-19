@@ -924,6 +924,7 @@ function pugForm(rows) {
 // daily report: his PUGs grouped by ET day, a day running to 6 AM (late sessions stay on the evening they started),
 // each game's line plus the day's averages (per game; RWA and Rating as plain means)
 function pugDays(rows, nDays = 14) {
+  // ESEA League maps he played (1NT's own matches, same RWA/Rating lines) join the day, tagged src 'esea' with the opponent
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
   const tfmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
   const D = new Map();
@@ -931,11 +932,17 @@ function pugDays(rows, nDays = 14) {
     const day = fmt.format(new Date(r.at - 6 * 36e5));
     (D.get(day) || D.set(day, []).get(day)).push({ at: r.at, time: tfmt.format(new Date(r.at)), src: r.src, map: r.map, win: r.win, score: `${r.rf}-${r.ra}`,
       k: p.k, d: p.d, a: p.a, adr: p.adr, hs: p.hs, rwa: p.rwa, rating: p.rating, mvp: !!p.mapMvp }); }
+  const me = String(prof?.me?.nickname || '').toLowerCase();
+  for (const m of matches) { if (!m.at || m.status === 'SCHEDULED' || !m.maps) continue;
+    for (const mp of m.maps) { const p = (mp.players || []).find(x => String(x.name).toLowerCase() === me); if (!p) continue;
+      const day = fmt.format(new Date(m.at - 6 * 36e5));
+      (D.get(day) || D.set(day, []).get(day)).push({ at: m.at, time: tfmt.format(new Date(m.at)), src: 'esea', opp: m.opp?.name || null, map: mp.map, win: mp.win, score: `${mp.rf}-${mp.ra}`,
+        k: p.k, d: p.d, a: p.a, adr: p.adr, hs: p.hs, rwa: p.rwa, rating: p.rating, mvp: !!mp.players.find(x => x.mapMvp && x === p) }); } }
   const avg = (gs, f, dp) => { const v = gs.map(f).filter(x => x != null); return v.length ? Math.round(v.reduce((a, x) => a + x, 0) / v.length * 10 ** dp) / 10 ** dp : null; };
   return [...D.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, nDays).map(([day, gs]) => {
     gs.sort((a, b) => a.at - b.at);
     const k = gs.reduce((a, g) => a + (g.k || 0), 0), d = gs.reduce((a, g) => a + (g.d || 0), 0);
-    return { day, n: gs.length, w: gs.filter(g => g.win).length, l: gs.filter(g => !g.win).length, mvps: gs.filter(g => g.mvp).length,
+    return { day, n: gs.length, lw: gs.filter(g => g.src === 'esea' && g.win).length, ll: gs.filter(g => g.src === 'esea' && !g.win).length, w: gs.filter(g => g.win).length, l: gs.filter(g => !g.win).length, mvps: gs.filter(g => g.mvp).length,
       avg: { k: avg(gs, g => g.k, 1), d: avg(gs, g => g.d, 1), a: avg(gs, g => g.a, 1), adr: avg(gs, g => g.adr, 1), hs: avg(gs, g => g.hs, 0),
         rwa: avg(gs, g => g.rwa, 1), rating: avg(gs, g => g.rating, 2), kd: d ? Math.round(k / d * 100) / 100 : null }, games: gs };
   });
