@@ -5,7 +5,7 @@
     python3 scripts/hockey_data.py [first last]     -> scripts/.cache/hockey/class_<year>.json (one file a draft class)
     python3 scripts/hockey_data.py --ahl            -> scripts/data/hockey_ahl.json.gz (AHL shots, completed seasons)
     python3 scripts/hockey_data.py --pre            -> scripts/data/hockey_pre.json.gz (NHL preseason games, each September)
-    python3 scripts/hockey_data.py --euro [season]  -> scripts/data/hockey_euro.json.gz (Liiga/SHL TOI and SOG, display only)
+    python3 scripts/hockey_data.py --euro [season]  -> scripts/data/hockey_euro.json.gz (Liiga/SHL/NCAA TOI and SOG, NCAA xG and CHIP; display only)
 
 Each class: every pick from the NHL's draft API (api-web.nhle.com/v1/draft/picks/<year>/all) and every player in
 Central Scouting's final rankings (/v1/draft/rankings/<year>/<1-4>: North American and international skaters and
@@ -210,7 +210,7 @@ def pre_pull():
 
 
 # -- Liiga and SHL ice time and shots on goal (display only on the prospects pipeline: too few gradable Euro-pro picks to fit)
-EURO_FILE = os.path.join(HERE, 'data', 'hockey_euro.json.gz')   # frozen, small: {season: {liiga, shl: [[name, birth, pos, gp, gp with TOI, TOI s, SOG]]}}
+EURO_FILE = os.path.join(HERE, 'data', 'hockey_euro.json.gz')   # frozen, small: {season: {liiga, shl, ncaa: [[name, birth, pos, gp, gp with TOI, TOI s, SOG(, xG, CHIP: ncaa)]]}}
 LIIGA = 'https://liiga.fi/api/v2'
 SHL = 'https://www.shl.se/api'
 # SHL's API has no season list: each season's uuid (and the regular-season series/game-type ids) comes from shl.se's schedule page
@@ -284,6 +284,42 @@ def shl_season(y):
     return [p for p in P.values() if p[0]] if len(gs) > 100 else None
 
 
+CHN = 'https://www.collegehockeynews.com/stats/overall.php?season={}{}'
+
+
+def ncaa_season(y):
+    """College Hockey News national skater table for the season ending in y:
+    [[name, None, pos F/D, gp, gp with TOI, TOI s, shots, xG, CHIP]] (TOI, xG and CHIP from 2024-25 on; display only)"""
+    import html
+    import urllib.request
+    try:
+        req = urllib.request.Request(CHN.format(y - 1, y), headers={'User-Agent': 'arkndjl.net-arkboard/1.0 (https://arkndjl.net)'})
+        t = urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace')
+    except Exception as e:  # noqa: BLE001
+        print('college hockey news:', repr(e)); return None
+    out, hdr = [], None
+    for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', t, re.S):
+        c = [html.unescape(re.sub(r'<!--.*?-->|<[^>]+>', '', x, flags=re.S)).replace('\xa0', ' ').strip()
+             for x in re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', re.sub(r'<!--\s*<th.*?-->', '', tr, flags=re.S), re.S)]
+        if 'Name' in c and 'Shots' in c:
+            hdr = {k: i for i, k in enumerate(c)}
+            continue
+        if not hdr or len(c) != len(hdr) or not c[hdr['GP']].isdigit() or c[hdr['Pos']] in ('', 'G'):
+            continue
+
+        def num(k):
+            try:
+                return float(c[hdr[k]]) if k in hdr and c[hdr[k]] else None
+            except ValueError:
+                return None
+        gp = int(c[hdr['GP']])
+        mm = re.fullmatch(r'(\d+):(\d\d)', c[hdr['TOI/G']]) if 'TOI/G' in hdr else None
+        toi = (int(mm.group(1)) * 60 + int(mm.group(2))) * gp if mm else 0
+        out.append([re.sub(r'\s+', ' ', c[hdr['Name']]), None, 'D' if c[hdr['Pos']] == 'D' else 'F', gp, gp if toi else 0, toi,
+                    int(num('Shots') or 0), num('xG'), num('CHIP')])
+    return out if len(out) > 500 else None
+
+
 def euro_pull(seasons=None):
     """add completed Liiga / SHL seasons missing from the frozen file (default: the last completed season, the one the
     pipeline's lines show)"""
@@ -292,7 +328,7 @@ def euro_pull(seasons=None):
     new = 0
     for y in seasons or [cur - 1]:                    # Liiga TOI is 0 before 2021-22
         e = have.setdefault(str(y), {})
-        for lg, fn in (('liiga', liiga_season), ('shl', shl_season)):
+        for lg, fn in (('liiga', liiga_season), ('shl', shl_season), ('ncaa', ncaa_season)):
             if lg not in e and y < cur:
                 r = fn(y)
                 if r:
@@ -302,7 +338,7 @@ def euro_pull(seasons=None):
     if new:
         with gzip.open(EURO_FILE, 'wt') as f:
             json.dump(have, f, separators=(',', ':'))
-    print('Liiga/SHL seasons', {k: sorted(v) for k, v in have.items()}, 'new', new)
+    print('Liiga/SHL/NCAA seasons', {k: sorted(v) for k, v in have.items()}, 'new', new)
 
 
 if __name__ == '__main__':
