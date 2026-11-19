@@ -1,0 +1,31 @@
+# The sportsdataverse play-by-play release against the CFBD pulls already in the board's cache, play by play
+# (scripts/research/sweep_nov19/cfb/mirror_parity_cache.mjs). Makes no CFBD call and commits nothing. Run by hand.
+name: cfb mirror parity
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_week:
+        description: "compare regular-season weeks 1 to this"
+        default: "10"
+
+jobs:
+  parity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache
+          key: cfb-none
+          restore-keys: cfb-
+      - name: Mirror
+        run: |
+          python3 -m venv /tmp/mv && /tmp/mv/bin/pip install -q pyarrow
+          /tmp/mv/bin/python scripts/cfb_mirror.py 2026 --max-week ${{ inputs.max_week || '10' }}
+      - name: Parity
+        run: node scripts/research/sweep_nov19/cfb/mirror_parity_cache.mjs 2026 ${{ inputs.max_week || '10' }}
