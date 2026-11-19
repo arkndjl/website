@@ -11,7 +11,7 @@ Appends to scripts/data/lineups_proj/nhl-YYYY-MM.jsonl, one row per (source, key
        injuries (one request a run)
   dfg  Daily Faceoff starting goalies for the day with the news strength (one request a run)
   dfl  Daily Faceoff line combinations of each team playing today (forward lines, pairs, PP and PK units, goalies, who
-       posted them and when); refetched at most every DFL_HOURS hours a team
+       posted them and when); read once when the slate appears, then again in the DFL_SLOTS runs
 Logging only: nothing here feeds a model. Stdlib only.
 """
 import datetime as dt
@@ -30,7 +30,7 @@ UA = {'User-Agent': 'arkndjl.net-arkboard/1.0 (https://arkndjl.net)'}
 RW = 'https://www.rotowire.com/hockey/nhl-lineups.php'
 DFG = 'https://www.dailyfaceoff.com/starting-goalies/{}'
 DFL = 'https://www.dailyfaceoff.com/teams/{}/line-combinations'
-DFL_HOURS = 4
+DFL_SLOTS = (15, 18, 21, 23, 1)     # UTC hours whose first half-hour run rereads a team's lines page (no state file needed)
 # both sources' short codes -> the site's
 CODE = {'TB': 'TBL', 'T.B': 'TBL', 'NJ': 'NJD', 'N.J': 'NJD', 'SJ': 'SJS', 'S.J': 'SJS', 'LA': 'LAK', 'L.A': 'LAK', 'UTAH': 'UTA',
         'ARI': 'UTA', 'VEG': 'VGK', 'LV': 'VGK', 'MON': 'MTL', 'WAS': 'WSH', 'CLB': 'CBJ', 'CAL': 'CGY', 'NAS': 'NSH', 'WIN': 'WPG'}
@@ -165,9 +165,7 @@ def main(test=False):
                 slugs[t] = s
     n_l = 0
     for t, s in sorted(slugs.items())[:2 if test else None]:
-        prev = seen.get(('dfl', t))
-        chk = seen.get(('dfl_chk', t), prev)
-        if chk and (now - dt.datetime.strptime(chk[1], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=dt.timezone.utc)).total_seconds() < DFL_HOURS * 3600:
+        if seen.get(('dfl', t)) and not (now.hour in DFL_SLOTS and now.minute < 30):
             continue
         time.sleep(1.2)
         try:
