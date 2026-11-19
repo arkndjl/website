@@ -1,0 +1,32 @@
+# Research ledgers for two Counter-Strike scoring targets (scripts/cs2_market_log.py): Polymarket's Major stage
+# markets beside the hash of our event odds file, and bo3.gg's crowd share before and after each series. Appends to
+# scripts/data/ledger/cs2/*.jsonl; nothing here feeds a page, so the commit skips the site build.
+name: cs2 market log
+
+on:
+  schedule:
+    - cron: "50 */2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cs2-market-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Log
+        run: python3 scripts/cs2_market_log.py
+      - name: Commit
+        run: |
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/data_push.py -m "CS2 market log ($(date -u +%Y-%m-%dT%H:%MZ)) [skip ci]" -- scripts/data/ledger/cs2/stage_markets.jsonl scripts/data/ledger/cs2/bo3_share.jsonl
