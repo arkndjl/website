@@ -11,8 +11,13 @@ key, move and school within 4 days). Players join the recruit classes and portal
 ("X commits to Y").
 
 data/recruit_news.json {asof, cfb: [rows], cbb: [rows]}, newest first, last 120 days, merged with the previous file:
-  d date, n player, pos, cls class year, k move (commit / decommit / flip / portal / transfer / rank), to school,
+  d date, n player, pos, cls class year, k move (commit / decommit / flip / portal / transfer / rank / cb), to school,
   fr school left, src {"247": url, "on3": url}, t headline, b 1 when the player is on a board
+
+247Sports Crystal Ball alerts (k "cb", Nov 19 2026): headlines that a Crystal Ball went in on a board player
+(`intitle:"crystal ball"` / `intitle:"where will"` on 247sports.com), with the school when the headline names it.
+Alerts only: they move nothing on the boards and are not a model input (about 4% of Crystal Ball headlines name
+player and school; scripts/research/recruit_experts_nov19/README.md).
 
     python3 scripts/recruit_news.py           # pull and merge
     python3 scripts/recruit_news.py --test    # headline parser cases
@@ -309,6 +314,55 @@ def parse(title, pool):
     return out
 
 
+CB_QUERIES = ['intitle:"crystal ball"', 'intitle:"where will"']
+CB_NAME = [re.compile(r"^(.+?)'s? Crystal Ball Predictions$"), re.compile(r"^Where will (.+?) commit to\?$")]
+CB_TO = [re.compile(rf"\b(?:to|toward|towards) (?:the )?{SCHOOL}"), re.compile(rf"\bfor (?:the )?{SCHOOL}")]
+
+
+def parse_cb(title, pool):
+    """a 247Sports Crystal Ball headline -> [alert row] when it names a board player ("X's Crystal Ball Predictions",
+    "Where will X commit to?", "Crystal Ball Forecast: QB X to Y"); the school only when the headline names one"""
+    t = re.sub(r'\s+', ' ', title).strip()
+    if OTHER.search(t) or re.search(r'\btransfer to\?|\bportal\b', t, re.I): return []
+    if not (re.search(r'crystal ball', t, re.I) or CB_NAME[1].search(t)): return []
+    row = None
+    for rx in CB_NAME:
+        m = rx.search(t)
+        if m: row = pool.player(m.group(1)); break
+    else:
+        row = pool.player(t)
+    if not row or not row.get('cls'): return []   # recruit classes only: a portal-list namesake is too easy to mistake
+    hp = pos_of(t)
+    if hp and not names.pos_fits(row.get('pos'), hp, 'football' if pool.sport == 'cfb' else 'basketball'): return []
+    to = None
+    if not any(rx.search(t) for rx in CB_NAME):
+        for rx in CB_TO:
+            for m in rx.finditer(t):
+                sc = pool.school(m.group(1))
+                if sc and not names.same(sc, row['n']): to = sc; break
+            if to: break
+    return [{'n': row['n'], 'pos': row.get('pos') or hp, 'cls': row.get('cls'), 'k': 'cb', 'to': to, 't': t, 'b': 1}]
+
+
+def pull_cb(pools, today, days=7):
+    """Crystal Ball alerts: the sport whose board names the player (both: the headline's sport words / position)"""
+    since = (today - dt.timedelta(days=days + 3)).isoformat()
+    found, seen = {s: [] for s in SPORT_WORD}, set()
+    for q in CB_QUERIES:
+        for it in gnews(f'{q} site:247sports.com when:{days}d'):
+            if it['date'] < since or it['title'] in seen: continue
+            seen.add(it['title'])
+            rows = {s: parse_cb(it['title'], p) for s, p in pools.items()}
+            hit = [s for s, v in rows.items() if v]
+            if not hit: continue
+            s = hit[0] if len(hit) == 1 else sport_of(it['title'], {x: (v[0] if v else None) for x, v in rows.items()}, 'cfb')
+            for r in rows[s]:
+                r.update(d=it['date'], src={'247': it['url']})
+                found[s].append(r)
+        time.sleep(1)
+    return found
+
+
 def same_move(a, b):
     ks = {a['k'], b['k']}
     if not (len(ks) == 1 or ks <= {'commit', 'flip', 'sign'}) or not names.same(a['n'], b['n']): return False
@@ -366,6 +420,7 @@ def pull(today, days=7):
                         r.update(d=it['date'], src={src: it['url']})
                         found[s].append(r)
                 time.sleep(1)
+    for s, f in pull_cb(pools, today, days).items(): found[s] += f
     out = {}
     for s, f in found.items():
         f.sort(key=lambda r: (r['d'], '247' not in r['src']))
@@ -387,7 +442,7 @@ def main():
     for sport in ('cfb', 'cbb'):
         new = pulled[sport]
         pool = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
-        kept = [r for r in old.get(sport) or [] if r.get('d', '') >= cut and any(x['k'] == r['k'] for x in parse(r.get('t', ''), pool))]
+        kept = [r for r in old.get(sport) or [] if r.get('d', '') >= cut and any(x['k'] == r['k'] for x in (parse_cb if r.get('k') == 'cb' else parse)(r.get('t', ''), pool))]
         rows = merge(kept, new)
         for r in rows:          # school logos (full colour, the boards' files)
             for f, lf in (('to', 'tl'), ('fr', 'fl')):
@@ -460,12 +515,21 @@ def _test():
     want = [('reclass', 2027, 2028, 'Kansas'), ('commit', 2027, None, 'Kansas'), ('reclass', 2028, 2029, None), ('reclass', 2027, 2028, None)]
     if rc != want:
         bad += 1; print('FAIL reclass', rc)
+    cb = [(r['n'], r['to']) for t in (
+        "Cayden Daughtry's Crystal Ball Predictions", 'Where will Kaegan Morton commit to?',
+        '247Sports Crystal Ball Forecast: WR Cayden Daughtry to Ohio State',
+        'Crystal Ball prediction in for Arkansas receiver Kaegan Morton to Ole Miss',
+        'Inside a Crystal Ball pick for Penn State to land Cayden Daughtry',
+        'Where will Kaegan Morton transfer to?', 'Michigan 2027 Football Crystal Ball Predictions',
+        '247Sports Crystal Ball Forecast: QB John Nobody to Tennessee') for r in parse_cb(t, p)]
+    if cb != [('Cayden Daughtry', None), ('Kaegan Morton', None), ('Cayden Daughtry', 'Ohio State'), ('Kaegan Morton', 'Ole Miss'), ('Cayden Daughtry', 'Penn State')]:
+        bad += 1; print('FAIL cb', cb)
     a = {'n': 'Cayden Daughtry', 'k': 'commit', 'to': 'Arkansas', 'd': '2026-11-17', 'src': {'247': 'x'}}
     b = {'n': 'Cayden Daughtry', 'k': 'commit', 'to': 'Arkansas', 'd': '2026-11-16', 'src': {'on3': 'y'}}
     m = merge([a], [b])
     if len(m) != 1 or set(m[0]['src']) != {'247', 'on3'} or m[0]['d'] != '2026-11-16':
         bad += 1; print('FAIL dedupe', m)
-    print(f'{len(cases) + 2 - bad}/{len(cases) + 2} ok')
+    print(f'{len(cases) + 3 - bad}/{len(cases) + 3} ok')
     sys.exit(1 if bad else 0)
 
 

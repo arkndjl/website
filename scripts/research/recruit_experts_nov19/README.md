@@ -28,3 +28,11 @@ On3/Rivals picks: on3.com (robots.txt allows; rivals.com blocks ClaudeBot / anth
 247 Crystal Ball: robots.txt allows, but the bot wall blocks plain requests; not bypassed. Google News RSS carries
 about 40 Crystal Ball headlines a month (`intitle:"crystal ball" site:247sports.com`), mostly without the pick or
 expert. CFBD carries 247 rankings only. No free X read API; 247 main Bluesky account suspended.
+
+## 247 Crystal Ball headlines as a model input (Nov 19, not testable)
+Backfill Jan 2023 - Nov 2026 (Google News, `intitle:"crystal ball" site:247sports.com` and `intitle:"crystal ball" 247Sports`,
+14-day windows, 8 windows lost to 429s): 451 distinct headlines. 219 player pages ("X's Crystal Ball Predictions",
+"Where will X commit to?": the player, never the school or expert), 52 team pages (school, no player), 52 articles
+that name a school, of which about 16 name both a high school recruit and the school (3.5%); 6 of those 16 already
+have On3 picks in the model. 16 recruits over four classes cannot carry a walk-forward test (the E family needed 442
+pick recruits for t 12.5), so headlines ship as alerts only (recruit_news.py k "cb"), not as a lean input.
