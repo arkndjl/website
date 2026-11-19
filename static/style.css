@@ -4442,8 +4442,23 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
   border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
   background: var(--win-well);
   line-height: 1.35;
+  display: flex;
 }
+.tick__pin {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  padding: 4px;
+  border-right: 2px solid var(--win-dark);
+  box-shadow: 2px 0 0 var(--win-light);
+  background: var(--win-well);
+}
+.tick__pin[hidden] { display: none; }
+.tick__g--lz .tick__me { color: #7fffd4; }
+.tick__pin .tick__g--nt .tick__ha::before { content: "1NT "; color: #7fffd4; letter-spacing: 0.05em; }
 .tick__track {
+  flex: 1;
+  min-width: 0;
   display: flex;
   overflow-x: auto;
   scrollbar-width: none;
@@ -4451,6 +4466,9 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 }
 .tick__track::-webkit-scrollbar { display: none; }
 .tick--crawl .tick__track { scroll-behavior: auto; }
+@media (hover: hover) and (pointer: fine) { .tick--crawl .tick__track { cursor: grab; } }
+.tick--drag .tick__track { cursor: grabbing; user-select: none; }
+.tick--drag a.tick__g { pointer-events: none; }
 .tick__run {
   display: flex;
   flex: none;
