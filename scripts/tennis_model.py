@@ -180,6 +180,35 @@ def p_match_pts(pa, pb, bo=3):
     return p_sets(s, need)
 
 
+SET_TAU = 1.1            # set-to-set spread of the per-set logit (one N(0, tau^2) draw a match), fit on 2012-22
+# exact set scores: held out 2023 - Nov 10 2026, n 20,336, log loss 1.2870 (sets independent) -> 1.2668, t -11.3 by
+# tournament, 4/4 seasons (scripts/research/sweep_nov19/tennis-cs2/ts_sets.py): a match's sets are not independent
+
+
+def set_scores(p, bo=3, tau=SET_TAU, nodes=21):
+    """chances of each set score with match chance p for A: [[sets A, sets B, chance], ...], A's wins first. The
+    per-set logit x + tau e (e normal, once a match) with x solved so A wins the match with chance p"""
+    from math import comb
+    import numpy as np
+    gx, gw = np.polynomial.hermite_e.hermegauss(nodes)
+    gw = gw / gw.sum()
+    need = 3 if bo == 5 else 2
+    p = min(max(p, 1e-4), 1 - 1e-4)
+
+    def parts(x):
+        s = 1 / (1 + np.exp(-(x + tau * gx)))
+        win = [float(gw @ (comb(need - 1 + k, k) * s ** need * (1 - s) ** k)) for k in range(need)]
+        lose = [float(gw @ (comb(need - 1 + k, k) * (1 - s) ** need * s ** k)) for k in range(need)]
+        return win, lose
+    lo, hi = -15.0, 15.0
+    for _ in range(60):
+        x = (lo + hi) / 2
+        if sum(parts(x)[0]) < p: lo = x
+        else: hi = x
+    win, lose = parts((lo + hi) / 2)
+    return [[need, k, round(v, 4)] for k, v in enumerate(win)] + [[k, need, round(v, 4)] for k, v in reversed(list(enumerate(lose)))]
+
+
 def p_sets(s, need):
     """first to `need` sets, each won with chance s"""
     tot = 0.0
@@ -1142,7 +1171,7 @@ def build(rows, players, tn):
                          'rk': rk.get(pid), 'rank': pl.get('rank'), 'won': won})
         games_.append({'id': c['id'], 'tour': c['tour'], 'ev': c['tn'], 'lv': lv, 'sf': sf, 'rd': rd, 'bo': bo, 'tip': when.strftime('%Y-%m-%dT%H:%M:%SZ'),
                        'state': c['state'], 'detail': c.get('detail', ''), 'court': c.get('court', ''), 'p': round(p, 4),
-                       'fair': [fair(p), fair(1 - p)], 'sc': sc, 'a': side[0], 'b': side[1]})
+                       'fair': [fair(p), fair(1 - p)], 'sc': sc, 'a': side[0], 'b': side[1], 'ss': set_scores(p, bo)})
     # Novig's moneyline beside the model on matches still to play (scripts/novig.py; the archive odds_snap keeps is
     # where tennis closing lines, and so any tennis pick rule, must come from)
     try:

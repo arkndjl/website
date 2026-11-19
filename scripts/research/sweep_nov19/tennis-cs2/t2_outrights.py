@@ -51,7 +51,7 @@ def events(rows, y0=20250501):
 
 
 def match(evs, search, R):
-    """winner markets -> our events: same tour, market end within the event window, 60%+ of the draw among its names"""
+    """winner markets -> our events: same tour, market end within the event window, 6+ of its names and 60%+ of them in the draw"""
     out = []
     for e in search:
         t = e.get('title') or ''
@@ -71,8 +71,9 @@ def match(evs, search, R):
                 if ev['tour'] != tour: continue
                 gap = end.date().toordinal() - dord(ev['d'])
                 if not -1 <= gap <= 18: continue
-                ov = sum(1 for p in ev['P'] if p in ids) / len(ev['P'])
-                if ov >= .6 and (best is None or ov > best[0]): best = (ov, ev, ids)
+                inn = sum(1 for p in ids if p in ev['P'])
+                ov = inn / max(1, len(ids))
+                if inn >= 6 and ov >= .6 and (best is None or ov > best[0]): best = (ov, ev, ids)
         if best: out.append({'pe': e, 'ev': best[1], 'ids': best[2], 'ov': best[0]})
     # one market per event: the most traded
     by = {}

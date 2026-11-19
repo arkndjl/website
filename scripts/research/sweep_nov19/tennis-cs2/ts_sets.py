@@ -31,7 +31,16 @@ def dist(s, need):
     return win, lose
 
 
+_memo = {}
+
+
 def probs(p, need, tau):
+    k = (round(p, 3), need, tau)
+    if k not in _memo: _memo[k] = _probs(min(max(k[0], .001), .999), need, tau)
+    return _memo[k]
+
+
+def _probs(p, need, tau):
     """mixture set-score chances with match chance p: bisection on x"""
     lo, hi = -12.0, 12.0
     for _ in range(50):

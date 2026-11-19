@@ -43,21 +43,26 @@ class Resolver:
         act = set()
         for r in rows:
             if r[0] >= since: act.add(r[7]); act.add(r[8])
-        self.by = {'atp': {}, 'wta': {}}; self.pool = {'atp': [], 'wta': []}
+        self.by = {'atp': {}, 'wta': {}}; self.last = {'atp': {}, 'wta': {}}
         for pid in act:
             n = (players.get(pid) or {}).get('n')
             if not n: continue
             tour = 'atp' if pid[0] == 'a' else 'wta'
-            self.by[tour].setdefault(names.key(n), []).append(pid)
-            self.pool[tour].append((pid, n))
+            k = names.key(n)
+            self.by[tour].setdefault(k, []).append(pid)
+            for tok in set(k.split()): self.last[tour].setdefault(tok, []).append((pid, n))
         self.memo = {}
 
     def pid(self, name, tour):
         k = (name, tour)
         if k in self.memo: return self.memo[k]
-        c = self.by[tour].get(self.nm.key(name), [])
-        if len(c) != 1:
-            c = [p for p, n in self.pool[tour] if self.nm.same(name, n)] if not c else c
+        kk = self.nm.key(name)
+        c = self.by[tour].get(kk, [])
+        if not c:                                  # names.same among players who share a name token
+            cand = {}
+            for tok in set(kk.split()):
+                for p, n in self.last[tour].get(tok, []): cand[p] = n
+            c = [p for p, n in cand.items() if self.nm.same(name, n)]
         self.memo[k] = c[0] if len(c) == 1 else None
         return self.memo[k]
 
