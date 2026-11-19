@@ -78,11 +78,11 @@ countryMap{clientCountryName requests} responseStatusMap{edgeResponseStatus requ
 
 
 def cloudflare(d):
-    tok = os.environ.get('CLOUDFLARE_ANALYTICS_TOKEN') or os.environ.get('CLOUDFLARE_API_TOKEN')
+    tok = (os.environ.get('CLOUDFLARE_ANALYTICS_TOKEN') or os.environ.get('CLOUDFLARE_API_TOKEN') or '').strip()
     if not tok:
         print('cloudflare: no token, skipped')
         return 0
-    z = os.environ.get('CLOUDFLARE_ZONE_ID')
+    z = (os.environ.get('CLOUDFLARE_ZONE_ID') or '').strip()
     if not z:
         r = cf('zones?name=' + urllib.parse.quote(ZONE), tok)
         z = r['result'][0]['id']
