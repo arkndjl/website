@@ -1,0 +1,31 @@
+# Rebuilds the SOCCER ARKBOARD's source tables (scripts/soccer_extra.py -> data/soccer_extra.json): MLS players and
+# keepers from American Soccer Analysis (goals added, xG, MLSPA pay), UEFA competition top speeds, national-team
+# scorers from martj42. Once a day and by hand; the managers table is rebuilt by hand from the research record.
+name: soccer extra
+
+on:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: soccer-extra
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tables
+        continue-on-error: true
+        run: python3 scripts/soccer_extra.py mls speed scorers
+      - name: Commit if anything changed
+        run: python3 scripts/data_push.py -m "Update the soccer source tables ($(date -u +%Y-%m-%d))" -- data/soccer_extra.json

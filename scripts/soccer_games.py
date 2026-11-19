@@ -1778,7 +1778,12 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
         out[t] = {'rec': f'{x[1]}-{x[2]}-{x[3]}', 'pts': x[6], 'gp': x[0], 'gd': x[4] - x[5],
                   'xpts': round(float(pts[:, i].mean()), 1), 'pos': round(float(pos[:, i].mean()) + 1, 1),
                   **{k: round(float(v[i] / n), 4) for k, v in reach.items()}}
-    return {'teams': out, 'left': len(fx), 'games': len(lp)}
+    cut = {}
+    if nt >= 24:
+        for k, place in (('top8', 7), ('top24', 23)):      # points of the last club inside each line, across the sims
+            v = pts[ar, seat[:, place]]
+            cut[k] = {'med': int(np.median(v)), 'lo': int(np.quantile(v, 0.1)), 'hi': int(np.quantile(v, 0.9))}
+    return {'teams': out, 'left': len(fx), 'games': len(lp), 'cut': cut}
 
 
 def uefa_bracket(L, lg, teams, seat, reach, n):
@@ -2061,7 +2066,7 @@ def build(days_ahead=4):
                                                          'rel': REL[lg], 'split': SPLIT[lg][1][0][0] if lg in SPLIT else None,
                                                          'teams': [dict(id=t, n=L.names.get(t, ['?'])[0], ab=L.names.get(t, ['?', '?'])[1], **v) for t, v in sorted(leagues[lg].items(), key=lambda kv: kv[1]['pos'])]}
                                                     for lg in leagues},
-           'uefa': {lg: (dict(name=D.NAME[lg], left=u['left'], games=u['games'],
+           'uefa': {lg: (dict(name=D.NAME[lg], left=u['left'], games=u['games'], cut=u.get('cut') or {},
                               teams=[dict(id=t, n=L.names.get(t, ['?'])[0], ab=L.names.get(t, ['?', '?'])[1], lg=clubs.get(t, 'x'), **v)
                                      for t, v in sorted(u['teams'].items(), key=lambda kv: kv[1]['pos'])]) if u else None)
                     for lg, u in uefa.items()},
