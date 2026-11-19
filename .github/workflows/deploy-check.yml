@@ -1,6 +1,8 @@
 # Fails visibly when a push to main has not reached arkndjl.net within 20 minutes (the Cloudflare build writes
 # /build.json with its commit; scripts/check_live.py polls it). Bot data commits pushed with GITHUB_TOKEN don't
 # trigger it; runs queue (only the newest waits), and a deploy of any later commit counts as landed.
+# Not live after 10 minutes: POSTs the Cloudflare deploy hook (secret CF_DEPLOY_HOOK_URL, production branch main) to
+# start a build, then waits 20 more. Run it by hand (workflow_dispatch) to kick a build when Cloudflare skipped one.
 name: deploy check
 
 on:
@@ -18,10 +20,17 @@ permissions:
 jobs:
   live:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Wait for the deploy
-        run: python3 scripts/check_live.py --sha "$GITHUB_SHA" --timeout 1200
+      - name: Wait for the deploy, kick the build hook if it stalls
+        env:
+          HOOK: ${{ secrets.CF_DEPLOY_HOOK_URL }}
+        run: |
+          python3 scripts/check_live.py --sha "$GITHUB_SHA" --timeout 600 && exit 0
+          if [ -z "$HOOK" ]; then echo "no CF_DEPLOY_HOOK_URL secret: cannot start a build"; exit 1; fi
+          echo "not live after 10 min: starting a build through the deploy hook"
+          curl -fsS -X POST "$HOOK" > /dev/null || { echo "deploy hook POST failed"; exit 1; }
+          python3 scripts/check_live.py --sha "$GITHUB_SHA" --timeout 1200
