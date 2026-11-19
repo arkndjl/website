@@ -38,6 +38,7 @@
       </div>
       <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}
         {{- if $pred }}{{ with .nv }} · <span class="cfb__dim" title="Polymarket US after its fee (else Novig), no-vig chance in brackets">market</span> {{ printf "%+d" (int (index .o 0)) }} / {{ printf "%+d" (int (index .o 1)) }} <span class="cfb__dim">({{ partial "num.html" (slice "%.0f" (mul .p 100)) }}%)</span>{{ end }}{{ end }}</p>
+      {{- with .ss }}<p class="tennis__sets" title="model chance of each set score"><span class="cfb__dim">sets</span>{{ range . }} {{ index . 0 }}-{{ index . 1 }} <b>{{ partial "num.html" (slice "%.0f" (mul (index . 2) 100)) }}%</b>{{ end }}</p>{{ end }}
       {{- with index $pk (string .id) }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ partial "num.html" (slice "%.1f" (float .edge)) }} · {{ .units }}% Kelly</p>{{ end }}
     </div>
   </article>
