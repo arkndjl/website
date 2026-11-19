@@ -4,6 +4,7 @@
 # CFB board and CBB recruits run (the leans join their recruit rows by name), or by hand. The daily (and hand) run
 # first re-pulls On3/Rivals visits, expert picks and RPM for the uncommitted recruits of the shown classes
 # (scripts/recruit_on3_visits.mjs --open -> scripts/data/recruit_on3_live.json.gz); the board-triggered runs reuse it.
+# The expert picks (leader + experts on it) go to data/recruit_expert_picks.json for the recruit GFX card.
 name: recruit leans
 
 on:
@@ -49,8 +50,10 @@ jobs:
           python3 scripts/recruit_on3_join.py --live 2027 2028 2029
       - name: Score the live classes
         run: python3 scripts/recruit_commit_fit.py --live
+      - name: Expert picks for the recruit GFX card
+        run: python3 scripts/recruit_expert_picks.py
       - name: Commit if it changed
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update the recruit leans ($(date -u +%Y-%m-%d))" \
-            -- data/recruit_commit_leans.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz
+            -- data/recruit_commit_leans.json data/recruit_expert_picks.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz

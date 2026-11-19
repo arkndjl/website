@@ -1,5 +1,5 @@
 {{- /* /site/ (content/site.md): the site's own numbers from data/site_stats.json (scripts/site_stats.py, workflow
-       site-stats.yml: Cloudflare zone analytics + GitHub) and data/freshness.json. {{< sitestats part="visitors|trend|traffic|build|fresh" >}}
+       site-stats.yml: Cloudflare zone analytics + GitHub) and data/freshness.json. {{< sitestats part="views|trend|traffic|build|fresh" >}}
        Days are UTC (Cloudflare's day). The newest day is drawn dim while it is still open. */ -}}
 {{- $d := site.Data.site_stats }}{{ $s := $d.summary }}{{ $part := .Get "part" }}{{ $cls := .Get "class" -}}
 {{- $today := now.UTC.Format "2006-01-02" -}}
@@ -8,38 +8,38 @@
 {{- $cx := cond (ne $cls "") (printf " %s" $cls) "" -}}
 {{- $stamp := "" }}{{ with $d.asof }}{{ $stamp = printf `<span class="cfb__asof">updated %s</span>` (lower ((time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET")) }}{{ end -}}
 
-{{- if eq $part "visitors" }}{{ with $d.days -}}
-{{- $ks := slice }}{{ $us := slice }}{{ range $k, $v := . }}{{ with $v.u }}{{ $ks = $ks | append $k }}{{ $us = $us | append (float .) }}{{ end }}{{ end -}}
+{{- if or (eq $part "views") (eq $part "visitors") }}{{ with $d.days -}}
+{{- $ks := slice }}{{ $us := slice }}{{ range $k, $v := . }}{{ with $v.pv }}{{ $ks = $ks | append $k }}{{ $us = $us | append (float .) }}{{ end }}{{ end -}}
 {{- $ks = last 90 $ks }}{{ $us = last 90 $us }}{{ $n := len $us -}}
 {{- $ma := slice }}{{ $ts := slice }}{{ range $i, $u := $us }}{{ $m := 0.0 }}{{ if ge $i 6 }}{{ $w := after (sub $i 6) (first (add $i 1) $us) }}{{ $t := 0.0 }}{{ range $w }}{{ $t = add $t . }}{{ end }}{{ $m = div $t 7.0 }}{{ end }}{{ $ma = $ma | append $m -}}
-{{- $ts = $ts | append (printf "%s · %s uniques%s" ((time (index $ks $i)).Format "Mon Jan 2") (lang.FormatNumber 0 $u) (cond (gt $m 0.0) (printf " · 7d %s" (lang.FormatNumber 0 $m)) "")) }}{{ end -}}
-{{- printf $win $cx "visitors.exe" | safeHTML }}
+{{- $ts = $ts | append (printf "%s · %s page views%s" ((time (index $ks $i)).Format "Mon Jan 2") (lang.FormatNumber 0 $u) (cond (gt $m 0.0) (printf " · 7d %s" (lang.FormatNumber 0 $m)) "")) }}{{ end -}}
+{{- printf $win $cx "views.exe" | safeHTML }}
   <ul class="sst__kpis">
-    <li><span class="esea__k" title="unique visitors, last full day ({{ (time $s.last).Format "Jan 2" }})">day</span><b>{{ lang.FormatNumber 0 $s.lastU }}</b></li>
-    <li><span class="esea__k" title="mean daily unique visitors, last 7 full days">7d</span><b>{{ lang.FormatNumber 0 $s.avg7 }}</b>{{ with $s.wow }}<span class="{{ if ge . 0.0 }}sst__up{{ else }}sst__dn{{ end }}" title="vs the 7 days before">{{ if gt . 0.0 }}+{{ end }}{{ . }}%</span>{{ end }}</li>
-    <li><span class="esea__k" title="sum of daily unique visitors, last 30 full days (a person on two days counts twice)">30d</span><b>{{ lang.FormatNumber 0 $s.sum30 }}</b></li>
+    <li><span class="esea__k" title="page views, last full day ({{ (time $s.last).Format "Jan 2" }})">day</span><b>{{ lang.FormatNumber 0 $s.lastU }}</b></li>
+    <li><span class="esea__k" title="mean daily page views, last 7 full days">7d</span><b>{{ lang.FormatNumber 0 $s.avg7 }}</b>{{ with $s.wow }}<span class="{{ if ge . 0.0 }}sst__up{{ else }}sst__dn{{ end }}" title="vs the 7 days before">{{ if gt . 0.0 }}+{{ end }}{{ . }}%</span>{{ end }}</li>
+    <li><span class="esea__k" title="page views, last 30 full days">30d</span><b>{{ lang.FormatNumber 0 $s.sum30 }}</b></li>
     <li><span class="esea__k" title="best day">high</span><b>{{ lang.FormatNumber 0 $s.rec }}</b><span class="cfb__dim">{{ (time $s.recDay).Format "Jan 2" }}</span></li>
   </ul>
-  {{ partial "sitebars.html" (dict "v" $us "line" $ma "t" $ts "dim" (cond (eq (index $ks (sub $n 1)) $today) (sub $n 1) -1) "label" "daily unique visitors") }}
-  <p class="sst__axis"><span>{{ (time (index $ks 0)).Format "Jan 2" }}</span><span><i class="sst__key sst__key--b"></i>uniques <i class="sst__key sst__key--l"></i>7d mean</span><span>{{ (time (index $ks (sub $n 1))).Format "Jan 2" }}</span></p>
-{{- printf $end ` title="Cloudflare zone analytics, unique visitor IPs per UTC day (bots included)"` (printf "%d days" $n) $stamp | safeHTML }}
+  {{ partial "sitebars.html" (dict "v" $us "line" $ma "t" $ts "dim" (cond (eq (index $ks (sub $n 1)) $today) (sub $n 1) -1) "label" "daily page views") }}
+  <p class="sst__axis"><span>{{ (time (index $ks 0)).Format "Jan 2" }}</span><span><i class="sst__key sst__key--b"></i>views <i class="sst__key sst__key--l"></i>7d mean</span><span>{{ (time (index $ks (sub $n 1))).Format "Jan 2" }}</span></p>
+{{- printf $end ` title="Cloudflare zone analytics, page views (HTML loads) per UTC day"` (printf "%d days" $n) $stamp | safeHTML }}
 {{- end }}{{ end -}}
 
 {{- if and (eq $part "trend") $s.g7 -}}
 {{- printf $win $cx "trend.exe" | safeHTML }}
   <ul class="sst__kpis">
-    <li><span class="esea__k" title="log-linear fit of daily uniques, last {{ math.Min $s.n 60 }} days; ± 2 SE">growth/wk</span><b>{{ if gt $s.g7 0.0 }}+{{ end }}{{ $s.g7 }}%</b><span class="cfb__dim">{{ $s.g7lo }} to {{ $s.g7hi }}</span></li>
+    <li><span class="esea__k" title="log-linear fit of daily page views, last {{ math.Min $s.n 60 }} days; ± 2 SE">growth/wk</span><b>{{ if gt $s.g7 0.0 }}+{{ end }}{{ $s.g7 }}%</b><span class="cfb__dim">{{ $s.g7lo }} to {{ $s.g7hi }}</span></li>
     {{- with $s.dbl }}<li><span class="esea__k" title="days to double at the fitted rate">doubling</span><b>{{ . }}</b><span class="cfb__dim">days</span></li>{{ end }}
     <li><span class="esea__k" title="typical day's miss from the trend (RMS of log residuals)">noise</span><b>±{{ math.Round (mul $s.sd 100) }}%</b></li>
   </ul>
   {{- with $s.wd }}{{ $mx := 0.0 }}{{ range . }}{{ $mx = math.Max $mx . }}{{ end }}
   <ul class="sst__hbar">
     {{- range $i, $x := . }}
-    <li title="mean ratio of actual to trend"><span class="esea__k">{{ index (slice "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun") $i }}</span><i style="{{ printf "--w:%.1f%%" (mul 100 (div $x $mx)) | safeCSS }}" class="{{ if ge $x 1.0 }}is-hi{{ end }}"></i><b>{{ printf "%.2f" $x }}</b></li>
+    <li title="geometric mean ratio of actual to trend"><span class="esea__k">{{ index (slice "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun") $i }}</span><i style="{{ printf "--w:%.1f%%" (mul 100 (div $x $mx)) | safeCSS }}" class="{{ if ge $x 1.0 }}is-hi{{ end }}"></i><b>{{ printf "%.2f" $x }}</b></li>
     {{- end }}
   </ul>
   {{- end }}
-{{- printf $end ` title="weekday index = mean of actual / trend on that weekday"` "trend" $stamp | safeHTML }}
+{{- printf $end ` title="weekday index = geometric mean of actual / trend on that weekday, last 60 days"` "trend" $stamp | safeHTML }}
 {{- end -}}
 
 {{- if eq $part "traffic" }}{{ with $s.cf -}}
@@ -62,7 +62,7 @@
     {{- range . }}<li><span class="esea__k">{{ index . 0 }}</span><i style="{{ printf "--w:%.1f%%" (mul 100 (div (float (index . 1)) $mx)) | safeCSS }}"></i><b>{{ lang.FormatNumber 0 (index . 1) }}</b></li>{{ end }}
   </ul>
   {{- end }}
-{{- printf $end ` title="Cloudflare zone analytics, last 30 UTC days; countries by requests"` (printf "%d days" .n) $stamp | safeHTML }}
+{{- printf $end ` title="Cloudflare zone analytics, last 30 UTC days; countries by requests"` (printf "%d days" (int .n)) $stamp | safeHTML }}
 {{- end }}{{ end -}}
 
 {{- if eq $part "build" }}{{ with $d.days -}}
