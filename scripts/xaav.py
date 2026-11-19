@@ -5,6 +5,8 @@ metrics, for the pro leagues (NBA, NHL, NFL). Fit on real free-agent and veteran
 salary cap, then priced at this season's cap and clipped to the league's floor and ceiling.
 
     python3 scripts/xaav.py --fit nhl|nba|nfl    # signings, held-out test against the baselines, data/xaav_fit.json
+    python3 scripts/xaav.py --signings           # NHL: refresh the CapWages signings cache the fit reads
+    python3 scripts/xaav.py --fit-term           # NHL xTerm (expected contract length) only; the xAAV fit is not touched
     python3 scripts/xaav.py nhl|nba|nfl          # this season's xAAV for every player -> static/data/xaav-<sport>.json
 
 Held out one signing year at a time (and forward: each year from a fit on the years before only). Baseline = the
@@ -520,6 +522,39 @@ def save_fit(sport, res):
         json.dump(allf, f, indent=1)
         f.write('\n')
 
+def nhl_signings_pull():
+    """CapWages signings by league year -> scripts/.cache/xaav/nhl_signings.json (the rows nhl_rows reads)"""
+    out = []
+    for y in range(2009, LEAGUE_YEAR + 1):
+        s = f'{y}-{str(y + 1)[2:]}'
+        out += next_data(get(f'https://capwages.com/signings/{s}', f'cw_signings_{s}.html', 24).decode())['signings']
+        time.sleep(1.2)
+    json.dump(out, open(os.path.join(CACHE, 'nhl_signings.json'), 'w'))
+    print('nhl signings', len(out))
+
+
+def term_fit(rows, forms, form):
+    """xTerm: contract length (years) on the xAAV form's inputs, linear, clipped 1-8; against the position x age mean,
+    held out a signing year at a time and forward (the xAAV rule: both t <= -2 and most years)"""
+    lr = [dict(r, t=float(r['len'])) for r in rows]
+    lo_ = L.compare(lr, L.loyo(lr, forms[form], 1.0, 8.0, log=False), L.loyo(lr, forms['base'], 1.0, 8.0, log=False))
+    fa, fb = L.forward(lr, forms[form], 2016, 1.0, 8.0, log=False), L.forward(lr, forms['base'], 2016, 1.0, 8.0, log=False)
+    fw = L.compare(lr, fa, fb, sorted(fa))
+    for c in (lo_, fw):                       # compare() reports x 100 (points of cap); lengths are in years
+        for k in ('maeA', 'maeB'):
+            c[k] = round(c[k] / 100, 3)
+    kept = bool(lo_['t'] <= -2 and int(lo_['won'].split('/')[0]) * 2 > int(lo_['won'].split('/')[1]) and (fw['t'] or 0) <= -2)
+    m = L.fit(lr, forms[form], log=False)
+    return {'form': form, 'kept': kept, 'loyo': lo_, 'forward': fw, 'b': [round(v, 6) for v in m['b']]}
+
+
+def term(f, forms, r):
+    xt = (f or {}).get('xterm')
+    if not xt or not xt.get('kept'):
+        return None
+    return round(min(max(sum(b * x for b, x in zip(xt['b'], forms[xt['form']](r))), 1.0), 8.0), 1)
+
+
 # ---------------------------------------------------------------- live
 def live_model(sport):
     try:
@@ -635,16 +670,19 @@ def nhl_live():
             continue
         r = nhl_feats(p, pid2.get(p['id']), (p['ax'] + 1) if p.get('ax') else (p.get('age') or 27) + 1)
         x = price(f, forms, r, lo, hi) * cap
+        xt = term(f, forms, r)
         c = cw.get((NM.key(p['n']), p['grp']))
         q = now.get(p['id'], {})
         rows.append({'id': p['id'], 'n': p['n'], 'tm': (c[4] if c else None) or q.get('tm') or p['tm'], 'pos': p['pos'], 'grp': p['grp'],
                      'age': q.get('age') or p.get('age'), 'war': p.get('war'), 'pwar': p.get('pwar'), 'p3': p.get('p3'),
                      'pts': p.get('pts'), 'gp': p.get('gp'), 'x': round(x, 2), 'cap': round(c[0], 2) if c and c[0] else None,
                      'yl': c[1] if c else None, 'ct': c[2] if c else None, 'st': c[3] if c else None,
-                     'gap': round(x - c[0], 2) if c and c[0] else None, 'ph': p.get('ph')})
+                     'gap': round(x - c[0], 2) if c and c[0] else None, 'xt': xt,
+                     'sv': round((x - c[0]) * c[1], 1) if c and c[0] and c[1] else None, 'ph': p.get('ph')})
     rows.sort(key=lambda r: -r['x'])
     write('nhl', {'season': y + 1, 'label': f'{y}-{str(y + 1)[2:]}', 'basis': last['label'], 'cap': cap,
-                  'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'test': f['forms'][f['best']], 'players': rows})
+                  'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'test': f['forms'][f['best']],
+                  'termTest': (f.get('xterm') or {}).get('loyo') if (f.get('xterm') or {}).get('kept') else None, 'players': rows})
 
 
 NFL_BASIS = os.path.join(ROOT, 'data', 'xaav_nfl_basis.json')
@@ -730,11 +768,23 @@ NBA_MIN_SHARE = 0.008
 
 def main():
     a = sys.argv[1:]
+    if '--signings' in a:
+        nhl_signings_pull()
+        return
+    if '--fit-term' in a:                     # xTerm only: the xAAV fit stays as it is
+        allf = json.load(open(FIT))
+        allf['nhl']['xterm'] = term_fit(nhl_rows(), nhl_forms(), allf['nhl']['live']['form'])
+        print(json.dumps({k: v for k, v in allf['nhl']['xterm'].items() if k != 'b'}, indent=1))
+        with open(FIT, 'w') as fh:
+            json.dump(allf, fh, indent=1)
+            fh.write('\n')
+        return
     if '--fit' in a:
         sport = a[a.index('--fit') + 1]
         if sport == 'nhl':
             rows = nhl_rows()
             res = research('nhl', rows, nhl_forms(), lambda r: NHL_MIN[r['y']] / NHL_CAP[r['y']], NHL_MAX, 2016)
+            res['xterm'] = term_fit(rows, nhl_forms(), res['live']['form'])
         if sport == 'nfl':
             rows = nfl_rows()
             res = research('nfl', rows, nfl_forms(), 0.0015, NFL_MAX, 2018)

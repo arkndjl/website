@@ -158,13 +158,13 @@ def features(c, i):
     if not prev:
         # age entering his first season (Nov 1), from his date of birth; a freshman's median is 18.9. Unknown on the live
         # board until Barttorvik lists him (games start), so it sits at the mean (z 0) until then
-        a = D.age_on(c.get('dob'), s['year'] - 1, 11, 1)
+        a = D.age_on(D.dob_est(c.get('dob'), c['seasons']), s['year'] - 1, 11, 1)
         f['age_new'] = a
         f['young_new'] = max(0.0, 19.0 - a) if a else None
         f['old_new'] = max(0.0, a - 19.5) if a else None
         f['age_x_rk'] = (a - 18.9) * (f['rg_lrk'] + math.log(100)) if a else None
     if prev:
-        a = D.age_on(c['dob'], s['year'] - 1, 11, 1)
+        a = D.age_on(D.dob_est(c['dob'], c['seasons']), s['year'] - 1, 11, 1)
         # unknown birth date: 18.6 plus his years in college, counted from the class Barttorvik lists (a D-II, juco or
         # pro transfer has fewer D-I seasons than years; counting seasons alone made a senior from Daemen a 19.6 breakout)
         f['age'] = a if a else 18.6 + max(len(prev), CLS.get(prev[-1].get('yr'), 0))

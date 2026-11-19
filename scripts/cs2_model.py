@@ -36,6 +36,8 @@ player rating's teammate prior (scripts/cs2_players.py), and Thunderpick's price
 Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
 flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
 the blend weight absorbs the scale. Kept as is.
+The map pool and veto chances use c fit on Polymarket Map 1 prices instead (data/cs2_map_scale.json, c 1.82),
+which held out beat the outcome fit's 2.43 on Map 1 results (t -2.51 by day).
 """
 import bisect
 import datetime as dt
@@ -614,8 +616,13 @@ def build():
     # map pool (display only): each ranked team's map win chance against the top 20's average on that map, on the
     # map-win scale (TeamMaps' round-share logit x c, scripts/cs2_scale_research.py), and each upcoming series' veto
     pool = tm.pool(today)
-    sc = json.loads((ROOT / "data" / "cs2_scale_research.json").read_text()).get("cFinal", 1.0) \
-        if (ROOT / "data" / "cs2_scale_research.json").exists() else 1.0
+    # c fit on Polymarket Map 1 closes (data/cs2_map_scale.json: held out May - Nov 10 2026 map log loss .6891 -> .6814,
+    # t -2.51 by day, scripts/research/sweep_nov19/tennis-cs2/c5_maps.py); the outcome fit's cFinal otherwise
+    sc = 1.0
+    for f, k in (("cs2_map_scale.json", "c"), ("cs2_scale_research.json", "cFinal")):
+        if (ROOT / "data" / f).exists():
+            sc = json.loads((ROOT / "data" / f).read_text()).get(k, 1.0)
+            break
 
     def mr(t, mp):
         return tm.R.get(t, 0.0) + tm.Mo[(t, mp)]

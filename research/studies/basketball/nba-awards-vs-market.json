@@ -1,0 +1,61 @@
+{
+ "id": "nba-awards-vs-market",
+ "sport": "NBA",
+ "question": "How do the in-season award odds (NBA, NFL, NHL, CFB) compare with traded prices?",
+ "answer": "The market is far ahead: winner log loss 2.34 (model) vs 1.22 (Polymarket) on the 2025-26 races.",
+ "findings": [
+  "Held 2025-26: 19 race-checkpoints, 10 races. Model 2.345, market 1.218; market better in 7 of 10 (t 2.44).",
+  "Tune 2024-25: 17 race-checkpoints, 7 races. Model 2.045, market 1.098.",
+  "A temperature fit to the market (T 1.5) did not help on outcomes: held change -.07 (t -.53).",
+  "CFB first backtest (2005-25, 246 checkpoints): favourite .33/.37/.42 vs hit rate .11/.24/.31 at 25/50/75%."
+ ],
+ "method": "As-of races rebuilt at 25/50/75% of each season with leave-one-season-out voter fits (scripts/awards_asof.py). Market = Polymarket (global) daily price of the eventual winner on the day after the checkpoint, renormalised over listed candidates; checkpoints whose prices sum more than 25% off 1 are dropped as illiquid.",
+ "data": "scripts/data/poly_hist (36 closed events, 2024-26); nflverse, in-repo NBA boxes, sportsdataverse ESPN CFB boxes.",
+ "n": 36,
+ "robust": true,
+ "interest": 3,
+ "publish": true,
+ "split_check": "Market ahead in both seasons (2024-25 and 2025-26).",
+ "chart": {
+  "type": "bar",
+  "title": "Winner log loss, model vs market",
+  "x_label": "season",
+  "y_label": "log loss",
+  "y_fmt": "num",
+  "x_reverse": false,
+  "ref": null,
+  "mark": null,
+  "series": [
+   {
+    "name": "model",
+    "points": [
+     {
+      "x": "2024-25",
+      "y": 2.045,
+      "n": 17
+     },
+     {
+      "x": "2025-26",
+      "y": 2.345,
+      "n": 19
+     }
+    ]
+   },
+   {
+    "name": "Polymarket",
+    "points": [
+     {
+      "x": "2024-25",
+      "y": 1.098,
+      "n": 17
+     },
+     {
+      "x": "2025-26",
+      "y": 1.218,
+      "n": 19
+     }
+    ]
+   }
+  ]
+ }
+}

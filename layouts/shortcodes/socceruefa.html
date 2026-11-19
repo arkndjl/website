@@ -42,6 +42,8 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "soccer_games" "rows" (len .teams) "note" (printf "%v of %v league-phase matches left" .left .games)) -}}
+{{- $note := printf "%v of %v league-phase matches left" .left .games -}}
+{{- with .cut }}{{ with .top8 }}{{ $note = printf "%s · top 8 line %v pts (%v-%v)" $note .med .lo .hi }}{{ end }}{{ with .top24 }}{{ $note = printf "%s · top 24 line %v pts (%v-%v)" $note .med .lo .hi }}{{ end }}{{ end -}}
+{{- partial "wintable-close.html" (dict "fresh" "soccer_games" "rows" (len .teams) "note" $note "about" "Line = points of the 8th and 24th placed club across the simulated league phases: median (10th to 90th percentile).") -}}
 {{- end -}}
 {{- end -}}

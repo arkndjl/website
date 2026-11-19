@@ -4,7 +4,7 @@
 
     python3 scripts/futures_hist.py         # first: the free lines (scripts/data/futures/win_totals.json)
     python3 scripts/futures_backtest.py     # numpy; NFL pulls nflverse games on a cold cache (a few minutes)
-    python3 scripts/futures_backtest.py nba # one sport
+    python3 scripts/futures_backtest.py nba # one sport (nba, nfl, nhl)
 
   Preseason projection, point in time: each sport's game model frozen before its season's first game (ratings carried
   over the summer, the opening rosters, last season's market ratings; coefficients fit only on earlier seasons), every
@@ -13,6 +13,8 @@
   Nothing learned during the season enters, so no injury or result leaks.
     NBA  2015-16 to 2025-26 (Basketball-Reference lines, graded at -110); 2019-20 left out (season cut short)
     NFL  2015-20 (nflverse lines with their prices; the walk-forward NFL model starts in 2015, the free lines end 2020)
+    NHL  2013-14 to 2025-26 in points (Hockey-Reference preseason points O/U, graded at -110); 2019-20 left out (season
+         cut short); the season sim at its shipped settings from day-0 ratings (scripts/nhl_sim_backtest.py)
   Each team-season: P(over), P(under), P(push) from the sims; the side with the higher EV at the price is the bet,
   1u flat. Reported for every bet and for EV cuts chosen on tuning seasons (NBA 2016-21, NFL 2015-17) and scored on
   the held-out ones (NBA 2022-26, NFL 2018-20). Also the market test: actual - line = b x (ours - line); b > 0 means our
@@ -38,9 +40,10 @@ HIST = os.path.join(ROOT, 'scripts', 'data', 'futures', 'win_totals.json')
 OUT = os.path.join(ROOT, 'data', 'futures_fit.json')
 NS = 20000
 CUTS = [0.0, 0.02, 0.05, 0.08, 0.12]
-MONTHS = {'nba': 5.8, 'nfl': 4.2}
-SPLIT = {'nba': (range(2016, 2022), range(2022, 2027)), 'nfl': (range(2015, 2018), range(2018, 2021))}
-RSD = {'nba': 3.7, 'nfl': 5.0}
+MONTHS = {'nba': 5.8, 'nfl': 4.2, 'nhl': 6.3}
+SPLIT = {'nba': (range(2016, 2022), range(2022, 2027)), 'nfl': (range(2015, 2018), range(2018, 2021)),
+         'nhl': (range(2014, 2020), range(2021, 2027))}
+RSD = {'nba': 3.7, 'nfl': 5.0, 'nhl': None}      # NHL: the season sim's own rating error (logits), read from its fit
 
 
 def dec(american):
@@ -132,6 +135,31 @@ def nfl_preseason():
     return out
 
 
+# ---------------------------------------------------------------- NHL
+def nhl_preseason():
+    """points, not wins: the season sim (scripts/nhl_sim_backtest.py) run from each season's day-0 ratings at the shipped
+    settings, weights fit on earlier seasons only"""
+    import nhl_games as G
+    import nhl_sim_backtest as B
+    B.CPS = [0]; B.NSIM = NS
+    fit = json.load(open(G.FIT))
+    RSD['nhl'] = fit['seasonSd']
+    hist, rows, snaps = B.snapshots(fit['params'])
+    snaps = [s for s in snaps if s['S'] >= 2014]
+    coefs = B.bases(snaps, rows, fit['feats'])
+    B.OTW.update(B.ot_fits(rows, coefs))
+    sd = min(B.SD_GRID, key=lambda v: abs(v - fit['seasonSd']))
+    out = {}
+    for sn in snaps:
+        S, c = sn['S'], coefs[sn['S']]
+        base = {t: sum(c[k] * v for k, v in sn['comp'][t].items() if k in c) for t in sn['comp']}
+        reg = [g for g in hist if g['S'] == S and not g['po']]
+        teams, P = B.sim(S, base, sn['pts'], reg, c.get('home', 0.13), fit['ot'], 0.0, sd, 1.0, np.random.default_rng(13 * S), full=True)
+        pts = B.outcomes(hist, S)[0]
+        out[S] = {t: {'W': P[i], 'act': float(pts[t]), 'n': sum(1 for g in reg if t in (g['h'], g['a']))} for i, t in enumerate(teams)}
+    return out
+
+
 # ---------------------------------------------------------------- scoring
 def probs(W, line, shift=0.0, k=1.0):
     """P(over), P(under) from the sims, the centre moved by shift and the spread scaled by k around it"""
@@ -188,7 +216,7 @@ def evaluate(sport, pre, lines):
     L = {(r['S'], r['t']): r for r in lines}
     rows = []
     for s, teams in sorted(pre.items()):
-        if sport == 'nba' and s == 2020:
+        if sport in ('nba', 'nhl') and s == 2020:
             continue
         for t, d in teams.items():
             ln = L.get((s, t))
@@ -278,7 +306,7 @@ def evaluate(sport, pre, lines):
 
 
 def main():
-    want = [a for a in sys.argv[1:] if a in ('nba', 'nfl')] or ['nba', 'nfl']
+    want = [a for a in sys.argv[1:] if a in ('nba', 'nfl', 'nhl')] or ['nba', 'nfl', 'nhl']
     H = json.load(open(HIST))
     res = json.load(open(OUT)) if os.path.exists(OUT) else {}
     import pickle
@@ -288,12 +316,14 @@ def main():
         if os.path.exists(cp) and '--fresh' not in sys.argv:
             pre = pickle.load(open(cp, 'rb'))
         else:
-            pre = nba_preseason() if sp == 'nba' else nfl_preseason()
+            pre = {'nba': nba_preseason, 'nfl': nfl_preseason, 'nhl': nhl_preseason}[sp]()
             pickle.dump(pre, open(cp, 'wb'))
         if sp == 'nfl':
             # model-only accuracy for the seasons past the free lines (2021-25)
             res['nflModelOnly'] = {str(s): round(float(np.mean([abs(d['W'].mean() - d['act']) for d in pre[s].values()])), 3)
                                    for s in range(2021, 2026)}
+        if sp == 'nhl':
+            RSD['nhl'] = json.load(open(os.path.join(ROOT, 'data', 'nhl_games_fit.json')))['seasonSd']
         res[sp] = evaluate(sp, pre, H[sp])
         r = res[sp]
         print(sp, json.dumps(r['accuracy'], indent=0))

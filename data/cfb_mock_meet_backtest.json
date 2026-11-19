@@ -1,0 +1,90 @@
+{
+ "info": {
+  "2024": {
+   "meetings": 1120,
+   "onBoard": 979,
+   "board": 300,
+   "pickedHadT30": 30,
+   "pickedHadOther": 13
+  },
+  "2025": {
+   "meetings": 943,
+   "onBoard": 700,
+   "board": 300,
+   "pickedHadT30": 29,
+   "pickedHadOther": 3
+  },
+  "2026": {
+   "meetings": 707,
+   "onBoard": 512,
+   "board": 300,
+   "pickedHadT30": 18,
+   "pickedHadOther": 4
+  }
+ },
+ "folds": {
+  "2024": {
+   "n": 100,
+   "llBase": -3.6341,
+   "gain": 0.1902,
+   "top1Base": 0.07,
+   "top1Meet": 0.14,
+   "coef": [
+    0.377,
+    0.06,
+    1.229,
+    0.521
+   ]
+  },
+  "2025": {
+   "n": 100,
+   "llBase": -3.9999,
+   "gain": 0.2219,
+   "top1Base": 0.02,
+   "top1Meet": 0.06,
+   "coef": [
+    0.888,
+    -0.216,
+    1.274,
+    0.92
+   ]
+  },
+  "2026": {
+   "n": 100,
+   "llBase": -3.6252,
+   "gain": 0.0188,
+   "top1Base": 0.08,
+   "top1Meet": 0.08,
+   "coef": [
+    0.334,
+    -0.021,
+    1.589,
+    0.806
+   ]
+  }
+ },
+ "pooled": {
+  "n": 300,
+  "gain": 0.1436,
+  "t": 4.52,
+  "clusters": 96
+ },
+ "all": {
+  "coef": [
+   0.457,
+   -0.048,
+   1.378,
+   0.804
+  ],
+  "names": [
+   "-ln board rank",
+   "repeat position",
+   "T30 or PRI",
+   "other meeting only"
+  ],
+  "perLogPick": {
+   "t30": 3.02,
+   "other": 1.76
+  }
+ }
+}

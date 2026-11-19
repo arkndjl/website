@@ -599,6 +599,30 @@ PROJ = os.path.join(ROOT, 'data', 'nhl_proj_fit.json')
 PM_K, PM_W = 1600.0, (1.0, 0.7, 0.5)             # the percentile tab's Marcel WAR a minute (scripts/player_pctl.py)
 
 
+EXITF = os.path.join(ROOT, 'data', 'nhl_exit_fit.json')
+
+
+def _lg(m, x):
+    return 1 / (1 + math.exp(-sum(b * (v - u) / d for b, v, u, d in zip(m['b'], x, m['mu'], m['sd']))))
+
+
+def exit_at(ef, part, f):
+    """the exit hurdle's coefficients at season share f (scripts/research/sweep_nov19/methods/hurdle_nhl_grid.py), None when
+    the part's hurdle was not kept; 'il' (the chance he plays in season S+3) is None when its calibration check failed"""
+    P = (ef or {}).get(part)
+    if not P or not P.get('kept'):
+        return None
+    g = P['grid']
+    a, b, w = g[-1], g[-1], 0.0
+    for u, v in zip(g, g[1:]):
+        if f <= v['f']:
+            a, b, w = u, v, (f - u['f']) / (v['f'] - u['f'])
+            break
+    mix = lambda p, q: [x + (y - x) * w for x, y in zip(p, q)]  # noqa: E731
+    lm = lambda k: {j: mix(a[k][j], b[k][j]) for j in ('mu', 'sd', 'b')}  # noqa: E731
+    return {'cc': mix(a['cc'], b['cc']), 'stay': lm('stay'), 'il': lm('il') if P.get('il') else None}
+
+
 def proj3(S, rows, repl, f, gS):
     """p3: projected WAR over the next three seasons (82-game pace), data/nhl_proj_fit.json (scripts/nhl_proj_research.py):
     c . [1, pw, pm, age terms by group, pw x (age - 27), HPM - replacement, ln(1 + TOI82 / 100)], pw = pWAR at an 82-game
@@ -608,6 +632,10 @@ def proj3(S, rows, repl, f, gS):
         pf = json.load(open(PROJ))
     except (OSError, ValueError):
         return
+    try:
+        ef = json.load(open(EXITF))
+    except (OSError, ValueError):
+        ef = None
     past = []
     for j in (1, 2):
         try:
@@ -641,6 +669,14 @@ def proj3(S, rows, repl, f, gS):
             m = float(r['grp'] == grp)
             x += [m * A, m * A * A] + ([m] if grp != part['grps'][0] else [])
         x += [pw * A, r['hpm'] - repl[r['grp']], math.log1p(toi82 / 100)]
+        ex = exit_at(ef, 'goalies' if r['grp'] == 'G' else 'skaters', ff)
+        if ex:
+            # the exit hurdle (data/nhl_exit_fit.json): the chance he plays in the next three seasons x the form refit on those who did
+            hz = [1.0, pw, A, A * A, math.log1p(toi82 / 100), min(1.0, (r.get('gp') or 0) / gS) if gS else 0.0]
+            r['p3'] = round(_lg(ex['stay'], hz) * sum(a * b for a, b in zip(ex['cc'], x)), 1)
+            if ex['il'] is not None:
+                r['il'] = round(100 * _lg(ex['il'], hz))
+            continue
         r['p3'] = round(sum(a * b for a, b in zip(c, x)), 1)
 
 

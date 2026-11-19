@@ -4,7 +4,7 @@
        Views: xAAV (default), underpaid (xAAV over his deal), overpaid. Filters ride in the address with an x prefix. */ -}}
 {{- $s := .Get "sport" -}}
 {{- $nhl := eq $s "nhl" -}}
-<div class="win cfb nbaxpm xaav"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-xaav="{{ $s }}" data-gfx-logo="/img/{{ $s }}/{}.png" data-src="{{ printf "data/xaav-%s.json" $s | relURL }}" data-gfx-cols="{{ if $nhl }}RK,Player,WAR,pWAR,3Y,Cap hit,xAAV,Gap{{ else }}RK,Player,WAR,WAA,Snaps,APY,xAAV,Gap{{ end }}">
+<div class="win cfb nbaxpm xaav"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-xaav="{{ $s }}" data-gfx-logo="/img/{{ $s }}/{}.png" data-src="{{ printf "data/xaav-%s.json" $s | relURL }}" data-gfx-cols="{{ if $nhl }}RK,Player,WAR,pWAR,3Y,Cap hit,xAAV,Gap,xTerm,Surplus{{ else }}RK,Player,WAR,WAA,Snaps,APY,xAAV,Gap{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ if $nhl }}hockey{{ else }}football{{ end }}"/></svg>{{ .Get "title" | default (printf "%s_contracts.exe" $s) }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -42,6 +42,10 @@
         {{- end }}
         <th data-sort="x" data-num class="c-x" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's {{ if $nhl }}WAR, pWAR, 3Y, points and ice time{{ else }}WAR and snaps{{ end }}, priced at this season's cap">xAAV</th>
         <th data-sort="gap" data-num class="c-gap" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, $M: over 0 = paid under what he would get now">Gap</th>
+        {{- if $nhl }}
+        <th data-sort="xt" data-num class="nbaxpm__ph" title="xTerm: the contract length, in years, he would sign for as a free agent now, from the same inputs as xAAV">xTerm</th>
+        <th data-sort="sv" data-num class="nbaxpm__ph" title="Surplus, $M: Gap x seasons left on his deal">Surplus</th>
+        {{- end }}
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -130,7 +134,8 @@
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + sub + '</span></td>' + cells +
         '<td class="cfb__num c-x nbaxpm__v' + (view ? '' : ' is-key') + '">' + p.x.toFixed(1) + '</td>' +
-        '<td class="cfb__num c-gap nbaxpm__v' + (view ? ' is-key' : '') + '">' + sg(p.gap) + '</td></tr>';
+        '<td class="cfb__num c-gap nbaxpm__v' + (view ? ' is-key' : '') + '">' + sg(p.gap) + '</td>' +
+        (NHL ? '<td class="cfb__num nbaxpm__ph">' + f(p.xt) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.sv) + '</td>' : '') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
     // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
@@ -172,7 +177,8 @@
     var order = NHL ? ['F', 'D', 'G'] : ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K', 'P'];
     opts(bar.elements.team, Object.keys(tms).sort()); opts(bar.elements.pos, order.filter(function (k) { return ps[k]; }));
     readHash();
-    if (d.test) win.querySelector('[data-xa-about]').title = 'xAAV fit on ' + d.test.n + ' signings, held out a signing year at a time: ' + d.test.maeA.toFixed(2) + ' points of the cap mean miss vs ' + d.test.maeB.toFixed(2) + ' by position and age alone. Inputs: last full season (' + d.basis + ').';
+    if (d.test) win.querySelector('[data-xa-about]').title = 'xAAV fit on ' + d.test.n + ' signings, held out a signing year at a time: ' + d.test.maeA.toFixed(2) + ' points of the cap mean miss vs ' + d.test.maeB.toFixed(2) + ' by position and age alone. Inputs: last full season (' + d.basis + ').' +
+      (d.termTest ? ' xTerm: ' + d.termTest.maeA.toFixed(2) + ' years mean miss vs ' + d.termTest.maeB.toFixed(2) + ' by position and age alone.' : '');
     loading.hidden = true; bar.hidden = false; render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();

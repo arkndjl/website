@@ -1,0 +1,24 @@
+{{- /* A table straight from data/soccer_extra.json (scripts/soccer_extra.py): k = the table's key. Column spec
+       [label, format, tooltip]: s text, d integer, 1 / 2 / 3 decimals, +2 / +3 signed. Nothing renders (and the
+       lazytab hides its tab) until the key exists. */ -}}
+{{- with site.Data.soccer_extra -}}
+{{- with index . ($.Get "k") -}}
+{{- $cols := .cols -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" "soccer" "filter" .filter "tab" ($.Get "tab")) -}}
+<table class="cfb__table tstick2">
+  <thead><tr><th>#</th>{{ range $cols }}<th{{ with index . 2 }} title="{{ . }}"{{ end }}>{{ index . 0 }}</th>{{ end }}</tr></thead>
+  <tbody>
+  {{- range $i, $r := .rows }}
+  <tr><td class="cfb__num">{{ add $i 1 }}</td>
+    {{- range $j, $c := $cols }}{{ $v := index $r $j }}{{ $f := index $c 1 }}
+    {{- if eq $f "s" }}<td{{ if eq $j 0 }} style="white-space: nowrap"{{ end }}>{{ if eq $j 0 }}<b>{{ $v }}</b>{{ else }}{{ with $v }}{{ . }}{{ end }}{{ end }}</td>
+    {{- else if eq $v nil }}<td class="cfb__num" data-v=""><span class="cfb__dim">-</span></td>
+    {{- else }}<td class="cfb__num" data-v="{{ $v }}">{{ if eq $f "d" }}{{ int $v }}{{ else if eq $f "1" }}{{ printf "%.1f" (float $v) }}{{ else if eq $f "2" }}{{ printf "%.2f" (float $v) }}{{ else if eq $f "3" }}{{ printf "%.3f" (float $v) }}{{ else if eq $f "+2" }}{{ printf "%+.2f" (float $v) }}{{ else }}{{ printf "%+.3f" (float $v) }}{{ end }}</td>
+    {{- end }}{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" .note "about" .about) -}}
+{{- end -}}
+{{- end -}}

@@ -1,25 +1,25 @@
-{{- /* All-time head coaches (scripts/coach_alltime.py, data/coach_alltime.json). sport="cfb" | "cbb" | "nba" | "nhl".
+{{- /* All-time head coaches (scripts/coach_alltime.py, data/coach_alltime.json). sport="cfb" | "cbb" | "nba" | "nhl" | "nfl".
        Score (wins) = cWAR + per-title and per-conference-title weights fit on Hall of Fame selection (+ CFB coordinator
        wins at the measured translation rate). Method on Process (Glossary/Methodology). Mobile: the cfbp cards. */ -}}
 {{- $sp := $.Get "sport" | default "cfb" -}}
 {{- with index site.Data.coach_alltime $sp -}}
 {{- $cfb := eq $sp "cfb" -}}
-{{- $nba := eq $sp "nba" -}}{{- $nhl := eq $sp "nhl" -}}{{- $pro := or $nba $nhl -}}
-{{- $ntL := cond $nhl "Cup" (cond $nba "Title" "NT") -}}{{- $ctL := cond $nhl "Final" (cond $nba "Finals" "CT") -}}
-{{- $tmL := cond $pro "Teams" "Schools" -}}{{- $G := cond $cfb 12 (cond $pro 82 30) -}}
+{{- $nba := eq $sp "nba" -}}{{- $nhl := eq $sp "nhl" -}}{{- $nfl := eq $sp "nfl" -}}{{- $pro := or $nba $nhl $nfl -}}
+{{- $ntL := cond $nhl "Cup" (cond (or $nba $nfl) "Title" "NT") -}}{{- $ctL := cond $nhl "Final" (cond $nba "Finals" (cond $nfl "Title game" "CT")) -}}
+{{- $tmL := cond $pro "Teams" "Schools" -}}{{- $G := cond $cfb 12 (cond $nfl 17 (cond $pro 82 30)) -}}
 {{- $t := .test -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "all-time coaches") "filter" "Status,Era" "rerank" true "tab" ($.Get "tab") "icon" (cond $cfb "football" (cond $nhl "hockey" "basketball")) "gfxCols" (printf "RK,Coach,%s,Years,W-L,%s,%s,WAx,Score" $tmL $ntL $ctL) "gfxDate" (lower ((time site.Data.coach_alltime.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "all-time coaches") "filter" "Status,Era" "rerank" true "tab" ($.Get "tab") "icon" (cond (or $cfb $nfl) "football" (cond $nhl "hockey" "basketball")) "gfxCols" (printf "RK,Coach,%s,Years,W-L,%s,%s,WAx,Score" $tmL $ntL $ctL) "gfxDate" (lower ((time site.Data.coach_alltime.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cfbp coachat">
   <thead><tr><th>RK</th><th>Coach</th><th title="{{ lower $tmL }}, most seasons first">{{ $tmL }}</th><th>Years</th>
     <th title="active = head coach this season">Status</th><th title="decade of the middle of his head-coaching career">Era</th>
-    <th title="head-coaching seasons{{ if $cfb }} at major-college (FBS / pre-split major) programs{{ else if $nba }} in the NBA and BAA (a part season counts its share of the games){{ else if $nhl }} in the NHL (a part season counts its share of the games){{ else }} in Division I{{ end }}">Seasons</th>
+    <th title="head-coaching seasons{{ if $cfb }} at major-college (FBS / pre-split major) programs{{ else if $nba }} in the NBA and BAA (a part season counts its share of the games){{ else if $nhl }} in the NHL (a part season counts its share of the games){{ else if $nfl }} in the NFL, AFL and AAFC (a part season counts its share of the games){{ else }} in Division I{{ end }}">Seasons</th>
     <th>W-L</th>
     <th title="wins over the {{ cond $pro "franchise" "program" }}'s expectation (its other coaches' seasons, nearest weighted most), per {{ $G }}-game season, summed">WAx</th>
     <th title="WAx + {{ printf "%.2f" (math.Abs .R0) }} a season (replacement level: coaches with two or fewer seasons)">cWAR</th>
-    <th title="{{ if $nba }}NBA / BAA championships{{ else if $nhl }}Stanley Cups{{ else }}national titles ({{ if $cfb }}AP / Coaches Poll shares from 1936; major-selector shares before{{ else }}NCAA tournament{{ end }}){{ end }}, era-weighted by field difficulty">{{ $ntL }}</th>
-    <th title="{{ if $nba }}Finals appearances (conference titles){{ else if $nhl }}Stanley Cup Final appearances{{ else }}conference titles{{ if $cfb }} (title game, else best conference record; ties split){{ else }} (regular season, ties split){{ end }}{{ end }}, weighted by conference difficulty">{{ $ctL }}</th>
+    <th title="{{ if $nba }}NBA / BAA championships{{ else if $nhl }}Stanley Cups{{ else if $nfl }}league championships (NFL, AFL, AAFC; Super Bowls from 1966){{ else }}national titles ({{ if $cfb }}AP / Coaches Poll shares from 1936; major-selector shares before{{ else }}NCAA tournament{{ end }}){{ end }}, era-weighted by field difficulty">{{ $ntL }}</th>
+    <th title="{{ if $nba }}Finals appearances (conference titles){{ else if $nhl }}Stanley Cup Final appearances{{ else if $nfl }}title-game seasons (conference championships; league title games before the merger){{ else }}conference titles{{ if $cfb }} (title game, else best conference record; ties split){{ else }} (regular season, ties split){{ end }}{{ end }}, weighted by conference difficulty">{{ $ctL }}</th>
     {{- if $cfb }}<th title="coordinator wins: his unit's points over the program's expectation as OC/DC (1990-2025), in wins; counts x {{ printf "%.2f" .coordW }} in Score (rate at which coordinator value carried into head-coaching value)">Coord</th>{{ end }}
-    <th title="cWAR + {{ printf "%.0f" .lamN }} a {{ if $nba }}championship{{ else if $nhl }}Stanley Cup{{ else }}national title{{ end }} + {{ printf "%.1f" .lamC }} a {{ if $pro }}Finals appearance{{ else }}conference title{{ end }}{{ if $cfb }} + Coord{{ end }}; title weights fit on Hall of Fame selection">Score</th>
+    <th title="cWAR + {{ printf "%.0f" .lamN }} a {{ if or $nba $nfl }}championship{{ else if $nhl }}Stanley Cup{{ else }}national title{{ end }} + {{ printf "%.1f" .lamC }} a {{ if $nfl }}title-game season{{ else if $pro }}Finals appearance{{ else }}conference title{{ end }}{{ if $cfb }} + Coord{{ end }}; title weights fit on Hall of Fame selection">Score</th>
     <th title="Score per season, shrunk toward 0 by {{ printf "%.1f" .kc }} seasons">Rate</th>
   </tr></thead>
   <tbody>

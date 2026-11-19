@@ -1,0 +1,29 @@
+# Point-in-time log of DRatings' posted pregame win chances (scripts/dratings_log.py -> scripts/data/dratings_log/).
+# The NBA stack on its completed pages passed held out but the posted numbers have never been checked for
+# after-the-fact rewrites; this log is that check (python3 scripts/dratings_log.py --check). Predictions only.
+name: dratings log
+
+on:
+  schedule:
+    - cron: "10 15,21 * 10-12,1-6 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dratings-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log the upcoming rows
+        run: python3 scripts/dratings_log.py
+      - name: Commit
+        run: |
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/data_push.py -m "DRatings pregame log ($(date -u +%Y-%m-%dT%H:%MZ)) [skip ci]" -- scripts/data/dratings_log/nba.jsonl scripts/data/dratings_log/nhl.jsonl

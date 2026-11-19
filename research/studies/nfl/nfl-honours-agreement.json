@@ -1,0 +1,156 @@
+{
+ "id": "nfl-honours-agreement",
+ "sport": "NFL",
+ "question": "How well does NFL WAR rank the first-team All-Pros at each position?",
+ "answer": "AUC .92+ at QB, WR, TE, DL, LB and DB; 0.82 on the offensive line and 0.75 at running back.",
+ "findings": [
+  "WAR AUC: QB 0.97, WR 0.92, TE 0.99, DL 0.97, LB 0.92, DB 0.92.",
+  "OL: WAR 0.82 (0.79-0.85), XV 0.78 (0.72-0.83); n=39 All-Pros.",
+  "RB: WAR 0.75 (0.65-0.88), XV 0.74; n=13.",
+  "Pro Bowl AUC is lower everywhere: OL WAR 0.73, DB 0.80, QB 0.86."
+ ],
+ "method": "AUC of the season value against AP first-team All-Pro among players with 400+ snaps at the position group, seasons pooled; 90% interval from resampling seasons. XV uses no AV; WAR is .6 AV WAR + .4 XV, and AV carries an All-Pro bonus.",
+ "data": "Site NFL board replayed 2018-25 (nflverse); AP All-Pro teams and Pro Bowl rosters from Wikipedia; 6,665 player-seasons.",
+ "n": 6665,
+ "robust": true,
+ "interest": 3,
+ "split_check": "Intervals are across seasons; OL and RB sit below every other group in WAR and XV.",
+ "chart": {
+  "type": "bar",
+  "title": "AUC against first-team All-Pro, 2018-25",
+  "x_label": "position group",
+  "y_label": "AUC",
+  "y_fmt": "num",
+  "x_reverse": false,
+  "ref": {
+   "y": 0.5,
+   "label": "chance"
+  },
+  "mark": null,
+  "series": [
+   {
+    "name": "WAR",
+    "points": [
+     {
+      "x": "QB",
+      "y": 0.969,
+      "lo": 0.937,
+      "hi": 0.99,
+      "n": 8
+     },
+     {
+      "x": "RB",
+      "y": 0.749,
+      "lo": 0.648,
+      "hi": 0.882,
+      "n": 13
+     },
+     {
+      "x": "WR",
+      "y": 0.919,
+      "lo": 0.873,
+      "hi": 0.969,
+      "n": 26
+     },
+     {
+      "x": "TE",
+      "y": 0.994,
+      "lo": 0.979,
+      "hi": 1.0,
+      "n": 8
+     },
+     {
+      "x": "OL",
+      "y": 0.821,
+      "lo": 0.789,
+      "hi": 0.851,
+      "n": 39
+     },
+     {
+      "x": "DL",
+      "y": 0.975,
+      "lo": 0.97,
+      "hi": 0.982,
+      "n": 26
+     },
+     {
+      "x": "LB",
+      "y": 0.92,
+      "lo": 0.88,
+      "hi": 0.961,
+      "n": 27
+     },
+     {
+      "x": "DB",
+      "y": 0.922,
+      "lo": 0.883,
+      "hi": 0.959,
+      "n": 42
+     }
+    ]
+   },
+   {
+    "name": "XV",
+    "points": [
+     {
+      "x": "QB",
+      "y": 0.967,
+      "lo": 0.94,
+      "hi": 0.989,
+      "n": 8
+     },
+     {
+      "x": "RB",
+      "y": 0.742,
+      "lo": 0.664,
+      "hi": 0.871,
+      "n": 13
+     },
+     {
+      "x": "WR",
+      "y": 0.904,
+      "lo": 0.852,
+      "hi": 0.959,
+      "n": 26
+     },
+     {
+      "x": "TE",
+      "y": 0.984,
+      "lo": 0.954,
+      "hi": 1.0,
+      "n": 8
+     },
+     {
+      "x": "OL",
+      "y": 0.775,
+      "lo": 0.724,
+      "hi": 0.829,
+      "n": 39
+     },
+     {
+      "x": "DL",
+      "y": 0.952,
+      "lo": 0.918,
+      "hi": 0.98,
+      "n": 26
+     },
+     {
+      "x": "LB",
+      "y": 0.874,
+      "lo": 0.821,
+      "hi": 0.933,
+      "n": 27
+     },
+     {
+      "x": "DB",
+      "y": 0.888,
+      "lo": 0.833,
+      "hi": 0.938,
+      "n": 42
+     }
+    ]
+   }
+  ]
+ },
+ "publish": true
+}

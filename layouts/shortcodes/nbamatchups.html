@@ -1,0 +1,34 @@
+{{- /* Defensive matchups (data/nba_matchups.json, scripts/nba_matchups.py; shufinskiy/nba_data, Apache-2.0): every
+       defender with 1,000+ partial possessions last season, ranked by matchup difficulty. History only (the source
+       updates about once a year). Phones keep RK, Player, MD and PAOE. */ -}}
+{{- with site.Data.nba_matchups -}}
+{{- $d := . }}{{ $rows := .players }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "matchups") "icon" "basketball" "filter" "Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,MD,Allowed,PAOE" "gfxDate" (printf "matchups · %v" $d.season) "gfxMax" "25") }}
+<table class="cfb__table nbmu">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="nbmu__x">Team</th>
+    <th title="partial possessions guarded">Poss</th>
+    <th title="matchup difficulty: points per 100 matchup possessions his assignments scored against every defender, weighted by the possessions he guarded them (league {{ $d.lg }})">MD</th>
+    <th title="points per 100 partial possessions his assignments scored against him">Allowed</th>
+    <th title="Allowed - MD, shrunk toward 0 by poss / (poss + {{ $d.k }}); below 0 = held them under their usual">PAOE</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="/img/nba/{{ .tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .n }}</span></td>
+    <td class="nbmu__x">{{ .ab }}</td>
+    <td class="cfb__num" data-v="{{ .poss }}">{{ .poss }}</td>
+    <td class="cfb__num is-key" data-v="{{ .md }}">{{ partial "num.html" (slice "%.1f" (float .md)) }}</td>
+    <td class="cfb__num" data-v="{{ .al }}">{{ partial "num.html" (slice "%.1f" (float .al)) }}</td>
+    <td class="cfb__num" data-v="{{ .paoe }}"><span class="{{ if le (float .paoe) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .paoe)) }}</span></td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "%v · shufinskiy/nba_data (NBA.com matchups)" $d.season)
+      "about" (printf "Box score matchups: each row of the source is one defender on one offensive player in one game, in partial possessions. MD = the possessions-weighted points per 100 his assignments scored against all defenders that season (each assignment's rate pulled toward the league %v by 100 possessions). Allowed = what they scored against him per 100. PAOE = Allowed - MD, shrunk by poss / (poss + %v). Defenders with %v+ partial possessions." $d.lg $d.k $d.minPoss)) }}
+<style>
+@media (max-width: 600px) { .nbmu .nbmu__x { display: none; } }
+</style>
+{{- end -}}

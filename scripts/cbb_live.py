@@ -647,7 +647,7 @@ def main():
         dob = dob_of(m['pid'], row[ci['name']], row[ci['team']], m.get('bt'), have=m['dob'])
         cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': dob, 'rec': m['rec'], 'seasons': [dict(zip(keep, s)) for s in m['seasons']]}
         if exact_dob(dob): row[ci['age']], row[ci['ageEst']] = age_now(dob), None
-        elif dob: row[ci['age']], row[ci['ageEst']] = None, round(age_now(dob), 1)
+        elif dob: row[ci['age']], row[ci['ageEst']] = None, round(age_now(D.dob_est(dob, cc['seasons'])), 1)
         i = len(cc['seasons']) - 1
         f_pre = F.features(cc, i)
         e0, p0, parts0 = score(f_pre, fit)

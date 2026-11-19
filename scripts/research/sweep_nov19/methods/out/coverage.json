@@ -1,0 +1,155 @@
+{
+ "level": 0.8,
+ "tolerance": 0.03,
+ "boards": {
+  "cbb_fv": {
+   "label": "CBB FV range",
+   "outcome": "realised FV, boards 2010-16",
+   "scored": [
+    2013,
+    2014,
+    2015,
+    2016
+   ],
+   "top": "45+",
+   "current": {
+    "n": 1199,
+    "cover": 0.9108,
+    "width": 23.669,
+    "groups": {
+     "35-44": {
+      "n": 76,
+      "cover": 0.9474,
+      "width": 42.55
+     },
+     "45+": {
+      "n": 30,
+      "cover": 1.0,
+      "width": 49.988
+     },
+     "<35": {
+      "n": 1093,
+      "cover": 0.9058,
+      "width": 21.634
+     }
+    }
+   },
+   "conformal": {
+    "n": 1199,
+    "cover": 0.9099,
+    "width": 23.655,
+    "groups": {
+     "35-44": {
+      "n": 76,
+      "cover": 0.9474,
+      "width": 42.55
+     },
+     "45+": {
+      "n": 30,
+      "cover": 0.9667,
+      "width": 49.407
+     },
+     "<35": {
+      "n": 1093,
+      "cover": 0.9058,
+      "width": 21.634
+     }
+    }
+   },
+   "currentPass": false,
+   "pass": false
+  },
+  "nba_3y": {
+   "label": "NBA 3Y XPM (shrunk target)",
+   "outcome": "XPM over the next three seasons, shrunk to -2",
+   "scored": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+   ],
+   "top": "2+",
+   "current": null,
+   "conformal": {
+    "n": 3769,
+    "cover": 0.8034,
+    "width": 1.974,
+    "groups": {
+     "0-2": {
+      "n": 690,
+      "cover": 0.8362,
+      "width": 2.447
+     },
+     "2+": {
+      "n": 257,
+      "cover": 0.7588,
+      "width": 3.36
+     },
+     "<0": {
+      "n": 2822,
+      "cover": 0.7994,
+      "width": 1.732
+     }
+    }
+   },
+   "pass": false
+  },
+  "nhl_3y": {
+   "label": "NHL 3Y WAR, skaters",
+   "outcome": "WAR over the next three seasons",
+   "scored": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+   ],
+   "top": "2+",
+   "current": null,
+   "conformal": {
+    "n": 6787,
+    "cover": 0.7787,
+    "width": 5.428,
+    "groups": {
+     "0.5-2": {
+      "n": 2434,
+      "cover": 0.7572,
+      "width": 6.623
+     },
+     "2+": {
+      "n": 837,
+      "cover": 0.7766,
+      "width": 8.334
+     },
+     "<0.5": {
+      "n": 3516,
+      "cover": 0.7941,
+      "width": 3.908
+     }
+    }
+   },
+   "pass": false,
+   "q": {
+    "0.5-2": [
+     -3.31,
+     3.69
+    ],
+    "2+": [
+     -4.12,
+     4.64
+    ],
+    "<0.5": [
+     -1.89,
+     2.06
+    ]
+   }
+  }
+ }
+}

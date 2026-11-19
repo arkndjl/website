@@ -1,0 +1,34 @@
+# The Bracket Matrix's live consensus (bracketmatrix.com), logged once a day in season to
+# scripts/data/ledger/cbb/bracket_matrix_2027.jsonl (scripts/cbb_bracket_matrix.py). A record only: the committee
+# model's season-end score reads it; no page does.
+name: cbb bracket matrix
+
+on:
+  schedule:
+    - cron: "23 13 * 11,12,1,2,3 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cbb-bracket-matrix
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Log the live matrix
+        run: python3 scripts/cbb_bracket_matrix.py
+      - name: Commit if anything changed
+        run: |
+          python3 scripts/data_push.py -m "Log the Bracket Matrix ($(date -u +%Y-%m-%d)) [skip ci]" \
+            -- scripts/data/ledger/cbb/bracket_matrix_2027.jsonl

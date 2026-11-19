@@ -397,10 +397,66 @@ def fit_move(rows):
 
 
 # ---- landing ---------------------------------------------------------------------------------------------------
-LAND_F = ['dstr', 'dstr2', 'dstr_x_bpm', 'up_x_lowbpm', 'sameconf', 'logmi', 'near', 'follow', 'newhc', 'open', 'p6', 'p6_x_frp6']
+LAND_F = ['dstr', 'dstr2', 'dstr_x_bpm', 'up_x_lowbpm', 'sameconf', 'logmi', 'near', 'follow', 'newhc', 'open', 'p6', 'p6_x_frp6', 'hlogmi', 'hnear']
+RECRUITS = os.path.join(HERE, 'data', 'cbb_recruit_hist.json.gz')
+_PLACES = {}
 
 
-def land_events(by, TS, raw, loc, years):
+def home_loc(home):
+    """(lat, lon) of a 'City, ST' hometown: the place table, else the state's mean place; None outside it"""
+    import re
+    if not _PLACES:
+        d = json.load(open(os.path.join(HERE, 'geo', 'us_places.json')))
+        _PLACES.update({st: v for st, v in d.items() if isinstance(v, dict) and v and st != '_src'})
+    try:
+        city, st = [x.strip() for x in home.rsplit(',', 1)]
+    except (AttributeError, ValueError):
+        return None
+    d = _PLACES.get(st)
+    if not d:
+        return None
+    k = re.sub(r'[^a-z0-9]', '', city.lower())
+    for v in (k, k.replace('saint', 'st'), k.replace('mount', 'mt'), k.replace('fort', 'ft')):
+        if v in d:
+            return tuple(d[v][:2])
+    return (sum(v[0] for v in d.values()) / len(d), sum(v[1] for v in d.values()) / len(d))
+
+
+def recruit_homes():
+    """{(name key, first college team, first season): hometown (lat, lon)} and {(name key, HS class): the same} from the
+    recruiting history (ranked recruits: about a quarter of transfers)"""
+    import names as N
+    by_team, by_cls, dup = {}, {}, set()
+    for r in json.load(gzip.open(RECRUITS))['recruits']:
+        g = home_loc(r.get('home'))
+        if not g:
+            continue
+        c = r.get('college') or {}
+        if c.get('team') and c.get('y1'):
+            by_team[(N.key(r['name']), c['team'], int(c['y1']))] = g
+        k = (N.key(r['name']), r.get('cls'))
+        if k in by_cls:
+            dup.add(k)
+        by_cls[k] = g
+    for k in dup:
+        by_cls.pop(k, None)
+    return by_team, by_cls
+
+
+def player_homes(by):
+    """pid -> hometown, for players whose first college season matches a recruit row"""
+    import names as N
+    idx, _ = recruit_homes()
+    out = {}
+    for y, rs in by.items():
+        for r in rs:
+            g = idx.get((N.key(r['name']), r['team'], y))
+            if g:
+                out[r['pid']] = g
+    return out
+
+
+def land_events(by, TS, raw, loc, years, homes=None):
     """per move (season y -> y+1): every D-I team in y+1 except his old one, features, chosen flag"""
     ev, X, ch, info = [], [], [], []
     e = 0
@@ -430,25 +486,29 @@ def land_events(by, TS, raw, loc, years):
                     continue
                 X.append(feats_land(r, o, t, TS.get((y, t), {}).get('srs'), TS.get((y, o), {}).get('srs'), r['conf'], conf.get(t), loc.get(o), loc.get(t),
                                     coach_y.get(o) is not None and coach_y1.get(t) == coach_y.get(o),
-                                    coach_y.get(t) is not None and coach_y1.get(t) is not None and coach_y.get(t) != coach_y1.get(t), open_.get(t, 0.5)))
+                                    coach_y.get(t) is not None and coach_y1.get(t) is not None and coach_y.get(t) != coach_y1.get(t), open_.get(t, 0.5),
+                                    hl=(homes or {}).get(r['pid'])))
                 ev.append(e); ch.append(1 if t == n['team'] else 0)
             info.append((y, r['pid'], o, n['team']))
             e += 1
     return np.array(X, float), np.array(ev), np.array(ch), info
 
 
-def feats_land(r, o, t, dsrs, osrs, oconf, dconf, ol, dl, follow, newhc, open_):
+def feats_land(r, o, t, dsrs, osrs, oconf, dconf, ol, dl, follow, newhc, open_, hl=None):
     b = max(-10.0, min(15.0, r.get('bpm') or 0.0))
     d = (dsrs if dsrs is not None else -5.0) / 10
     od = (osrs if osrs is not None else -5.0) / 10
     mi = miles(ol, dl)
+    hm = miles(hl, dl) if hl else None     # hometown to the school; no hometown on file: both terms 0 for every school
     return [d, d * d, d * b / 5, max(0.0, d - od) * max(0.0, -b) / 5, float(oconf == dconf), math.log1p(mi if mi is not None else 800) - 6.5,
-            float(mi is not None and mi < 150), float(follow), float(newhc), open_, float(dconf in P6), float(dconf in P6) * float(oconf in P6)]
+            float(mi is not None and mi < 150), float(follow), float(newhc), open_, float(dconf in P6), float(dconf in P6) * float(oconf in P6),
+            math.log1p(hm) - 6.5 if hm is not None else 0.0, float(hm is not None and hm < 150)]
 
 
 def fit_land(by, TS, raw, loc):
-    Xa, eva, cha, ia = land_events(by, TS, raw, loc, range(NIL0, 2025))
-    Xt, evt, cht, it_ = land_events(by, TS, raw, loc, [2025])
+    homes = player_homes(by)
+    Xa, eva, cha, ia = land_events(by, TS, raw, loc, range(NIL0, 2025), homes)
+    Xt, evt, cht, it_ = land_events(by, TS, raw, loc, [2025], homes)
     b = clogit(Xa, eva, cha, lam=1.0)
     p = clogit_p(Xt, evt, b)
     starts = np.r_[0, np.flatnonzero(np.diff(evt)) + 1]
@@ -463,7 +523,10 @@ def fit_land(by, TS, raw, loc):
     test = {'train': '2022-24 moves', 'test': '2025->26 moves', 'n': len(ranks), 'medianRank': float(np.median(ranks)), 'top10': round(float((ranks <= 10).mean()), 3),
             'top25': round(float((ranks <= 25).mean()), 3), 'teams': int(np.diff(np.r_[starts, len(evt)]).mean()),
             'llPerMove': round(lp / len(ranks), 3), 'llUniform': round(lp0 / len(ranks), 3)}
-    X2, ev2, ch2, _ = land_events(by, TS, raw, loc, range(NIL0, 2026))
+    hk = np.array([i[1] in homes for i in it_])[:len(ranks)] if len(it_) == len(ranks) else None
+    if hk is not None and hk.any():
+        test['homeKnown'] = round(float(hk.mean()), 3); test['top10HomeKnown'] = round(float((ranks[hk] <= 10).mean()), 3)
+    X2, ev2, ch2, _ = land_events(by, TS, raw, loc, range(NIL0, 2026), homes)
     b = clogit(X2, ev2, ch2, lam=1.0)
     return {'feats': LAND_F, 'b': b.round(5).tolist(), 'n': int(ev2.max() + 1), 'test': test}
 
@@ -603,7 +666,27 @@ def match_team(name, names):
     return idx.get(k)
 
 
-VAL_F = ['p6', 'lvl', 'wp1', 'wp3', 'srs1', 'ncaa3', 'bid3', 'ten', 'cres']
+VAL_F = ['p6', 'lvl', 'wp1', 'wp3', 'srs1', 'ncaa3', 'bid3', 'ten', 'cres', 'eada']
+EADA = os.path.join(HERE, 'data', 'eada_mbb.json.gz')
+_EADA = {}
+
+
+def eada_z(y, t):
+    """ln(men's basketball expenses) of team t, z-scored inside the academic year, for the newest Equity in Athletics
+    year ending before season y (scripts/eada_pull.py); 0 when the school files none"""
+    if not _EADA:
+        try:
+            raw = json.load(gzip.open(EADA, 'rt'))
+        except (OSError, ValueError):
+            raw = {}
+        for yy, d in raw.items():
+            v = {k: math.log(x[0]) for k, x in d.items() if x and x[0] > 0}
+            if len(v) > 10:
+                mu = float(np.mean(list(v.values()))); sd = float(np.std(list(v.values()))) or 1.0
+                _EADA[int(yy)] = {k: (x - mu) / sd for k, x in v.items()}
+        _EADA.setdefault(0, {})
+    ys = [yy for yy in _EADA if 0 < yy <= y - 1]
+    return _EADA[max(ys)].get(t, 0.0) if ys else 0.0
 
 
 def val_feats(TS, y, t, ten, cr, p6):
@@ -612,7 +695,7 @@ def val_feats(TS, y, t, ten, cr, p6):
     r1 = TS.get((y - 1, t), {})
     r3 = [TS[(z, t)] for z in range(y - 3, y) if (z, t) in TS]
     return [float(p6), (lvl if lvl is not None else -5.0) / 10, r1.get('wp', .5) - .5, (np.mean([x['wp'] for x in r3]) if r3 else .5) - .5,
-            r1.get('srs', -5.0) / 10, sum(x['ncaa'] for x in r3) / 3, sum(x['bid'] for x in r3) / 3, min(10, ten) / 10, cr / 5]
+            r1.get('srs', -5.0) / 10, sum(x['ncaa'] for x in r3) / 3, sum(x['bid'] for x in r3) / 3, min(10, ten) / 10, cr / 5, eada_z(y, t)]
 
 
 def ridge(X, y, lam):

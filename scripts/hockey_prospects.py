@@ -43,7 +43,7 @@ Live      2027 class from Tankathon's NHL big board (rank, league, size, birth m
 Prov      Draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board get a provisional grade
           (scripts/hockey_provisional.py, prov = 1) and join the board in FV order; the table shows those graded PROV_SHOW+.
 Display   Pipeline players whose latest line is in Liiga or the SHL carry that season's ice time and shots on goal a game
-          (etoi, esog; liiga.fi and shl.se, frozen by hockey_data.py --euro; null otherwise). Not a model input: only
+          (etoi, esog; liiga.fi, shl.se and College Hockey News (NCAA, with exg and chip), frozen by hockey_data.py --euro; null otherwise). Not a model input: only
           ~45 gradable Euro-pro picks have TOI seasons, too few to fit (round 2 research, Oct 24 2026).
 Files     --fit freezes the pulled classes in scripts/data/hockey_rows.json.gz so the daily build (nhl.yml) needs no
           cache; after each June draft rerun hockey_data.py for the new class, then --fit.
@@ -272,20 +272,31 @@ _EURO = {}
 
 
 def euro_line(r, season, lg):
-    """(TOI minutes a game, shots on goal a game) in Liiga or the SHL that season, or (None, None). Liiga joins on birth date +
-    the shared name matcher; the SHL feed has no birth dates, so a unique name match at his position."""
+    """(TOI minutes a game, shots on goal a game) in Liiga, the SHL or the NCAA that season, or (None, None). Liiga joins on
+    birth date + the shared name matcher; the SHL and NCAA tables have no birth dates, so a unique name match at his position."""
+    c = _euro_row(r, season, lg)
+    if not c or not c[4]:
+        return None, None
+    nm, b, ps, gp, gpt, toi, sog = c[:7]
+    return round(toi / gpt / 60, 1), round(sog / gp, 2)
+
+
+def _euro_row(r, season, lg):
     if not _EURO and os.path.exists(EURO):
         _EURO.update(json.load(gzip.open(EURO, 'rt')))
-    key = {'Liiga': 'liiga', 'SHL': 'shl'}.get(lg)
+    key = {'Liiga': 'liiga', 'SHL': 'shl', 'NCAA': 'ncaa'}.get(lg)
     t = (_EURO.get(str(season)) or {}).get(key) if key else None
     if not t or r['G']:
-        return None, None
+        return None
     pos = 'D' if r['D'] else 'F'
     c = [p for p in t if (p[1] == r.get('birth') if key == 'liiga' else p[2] == pos) and NM.same(p[0], r['name'])]
-    if len(c) != 1 or not c[0][4]:
-        return None, None
-    nm, b, ps, gp, gpt, toi, sog = c[0]
-    return round(toi / gpt / 60, 1), round(sog / gp, 2)
+    return c[0] if len(c) == 1 else None
+
+
+def ncaa_extra(r, season, lg):
+    """(xG, CHIP) of an NCAA skater that season from College Hockey News, or (None, None); display only"""
+    c = _euro_row(r, season, lg) if lg == 'NCAA' else None
+    return (c[7], c[8]) if c and len(c) > 8 else (None, None)
 
 
 def war_tables():
@@ -1081,11 +1092,12 @@ def build():
         q = r['post'].get(k) if k else r['d0']
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
         etoi, esog = euro_line(r, r['year'] + k, (q or {}).get('lg'))
+        exg, chip = ncaa_extra(r, r['year'] + k, (q or {}).get('lg'))
         pipe.append({'name': r['name'], 'id': r['id'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
                      'nat': nat(r.get('country')),
                      'age': round(age_at(r['birth'], cur - 1), 2) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
-                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
+                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'exg': exg, 'chip': chip, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
                      'nhlgp': gp_all, 'fv0': FS.fv_of('hockey', x0), 'fv0x': round(x0, 2), 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), 'p40': round(p40, 3), 'p50': round(p50, 3),
                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
                      'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
