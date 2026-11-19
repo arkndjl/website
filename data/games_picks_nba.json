@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-19T04:29:19Z",
+ "asof": "2026-11-19T04:36:04Z",
  "recenter": {
-  "2026-11-19": 1.56
+  "2026-11-19": 1.58
  },
  "monitor": {
   "clocks": {
@@ -327,14 +327,30 @@
   }
  },
  "model": {
-  "asof": "2026-11-19T03:49:57Z",
-  "ageH": 0.7,
+  "asof": "2026-11-19T04:33:42Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401910020",
+   "sport": "nba",
+   "kick": "2026-11-20T01:00:00Z",
+   "home": "MIL",
+   "away": "POR",
+   "mk": "total",
+   "side": "over",
+   "line": 225.5,
+   "price": -134.0,
+   "edge": 4.2,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": -9.1,
+   "tm": 229.7
+  },
   {
    "id": "401910022",
    "sport": "nba",
@@ -345,20 +361,60 @@
    "side": "under",
    "line": 225.5,
    "price": -119.0,
-   "edge": 2.7,
+   "edge": 2.8,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
    "m": 17.3,
-   "tm": 222.8
+   "tm": 222.7
+  },
+  {
+   "id": "401910021",
+   "sport": "nba",
+   "kick": "2026-11-20T01:00:00Z",
+   "home": "MIN",
+   "away": "NY",
+   "mk": "total",
+   "side": "under",
+   "line": 216.5,
+   "price": -110.0,
+   "edge": 1.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
+   "m": -2.1,
+   "tm": 214.8
   }
  ],
  "games": {
+  "401910020": {
+   "mk": "total",
+   "side": "over",
+   "line": 225.5,
+   "price": -134.0,
+   "edge": 4.2,
+   "ev": null,
+   "units": 0.0,
+   "home": "MIL",
+   "away": "POR",
+   "state": "under"
+  },
+  "401910021": {
+   "mk": "total",
+   "side": "under",
+   "line": 216.5,
+   "price": -110.0,
+   "edge": 1.7,
+   "ev": null,
+   "units": 0.0,
+   "home": "MIN",
+   "away": "NY",
+   "state": "under"
+  },
   "401910022": {
    "mk": "total",
    "side": "under",
    "line": 225.5,
    "price": -119.0,
-   "edge": 2.7,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "SA",
@@ -418,7 +474,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4867,
+  "snapshots": 4870,
   "buckets": [
    {
     "when": "24h+",
@@ -7093,7 +7149,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T04:29:19Z",
+ "checked": "2026-11-19T04:36:04Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
