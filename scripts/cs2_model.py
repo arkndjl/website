@@ -36,7 +36,7 @@ player rating's teammate prior (scripts/cs2_players.py), and Thunderpick's price
 Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
 flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
 the blend weight absorbs the scale. Kept as is.
-Nov 19 2026: the map pool and veto chances use c fit on Polymarket Map 1 prices instead (data/cs2_map_scale.json, c 1.82),
+The map pool and veto chances use c fit on Polymarket Map 1 prices instead (data/cs2_map_scale.json, c 1.82),
 which held out beat the outcome fit's 2.43 on Map 1 results (t -2.51 by day).
 """
 import bisect
