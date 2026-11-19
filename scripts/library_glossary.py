@@ -846,6 +846,23 @@ fv_tables.append({'board': 'MLB prospects (hand-graded)',
                   'cols': ['FV', 'hitter', 'starting pitcher', 'reliever', 'WAR / season'],
                   'rows': [list(r) for r in mlb]})
 
+# ---------------------------------------------------------------- added terms and lines (research/library_adds.json)
+# Test write-ups that are not read from a fit file: new terms ("add"), lines added to a term ("append"), a term's body ("replace").
+try:
+    _adds = ld('research/library_adds.json')
+except OSError:
+    _adds = {}
+_by = {e['term']: e for sec in sections for e in sec['entries']}
+for _r in _adds.get('replace', []):
+    _by[_r['term']]['body'] = list(_r['body'])
+for _a in _adds.get('append', []):
+    _by[_a['term']]['body'] += [x for x in _a['lines'] if x not in _by[_a['term']]['body']]
+for _n in _adds.get('add', []):
+    _ents = next(x for x in sections if x['id'] == _n['section'])['entries']
+    _ents[:] = [e for e in _ents if e['term'] != _n['entry']['term']]
+    _at = next((i + 1 for i, e in enumerate(_ents) if e['term'] == _n.get('after')), len(_ents))
+    _ents.insert(_at, dict(_n['entry']))
+
 lib = {'asof': '2026-11-02',
        'about': 'ARKBOARD Process: definitions and methods for every metric and model, plus FV conversion charts per board.',
        'sections': sections, 'fv_tables': fv_tables}

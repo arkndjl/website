@@ -115,6 +115,19 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: python3 scripts/cfb_staff_sync.py
+      # coordinators and scheme labels from Wikipedia's season infoboxes (scripts/cfb_coord_sync.py; one request a
+      # team, about 3 minutes; a run where fewer than 80% of the pages answer changes nothing)
+      - name: Coordinators, college football
+        if: env.REFRESH != 'true' && (github.event.schedule == '17 11 * 8-12,1 0,1,2,3,5,6' || github.event.schedule == '17 11 * 2-7 1')
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python3 scripts/cfb_coord_sync.py
+      # pre-draft team meetings, logged with dates once the page exists (scripts/nfl_meetings.py; one request)
+      - name: NFL pre-draft meetings
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python3 scripts/nfl_meetings.py
       # special teams tab: kick and punt returners from the ESPN play-by-play cache (scripts/st_returners.py; ESPN box
       # scores for returner ids, one call a new game; no CFBD quota). Before the grade: it also writes
       # scripts/data/cfb_ret_fv.json, the career return lines behind the RB/WR FV return term (fetch_cfb.mjs)
@@ -260,4 +273,4 @@ jobs:
           python3 scripts/data_push.py -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))" \
             --rebuild data/games_picks_cfb.json data/rule_monitor.json \
             --regen "python3 scripts/games_picks.py cfb; python3 scripts/rule_monitor.py" \
-            -- 'data/cfb*.json' static/data/next-up/cfb.json static/data/next-up/cfb-tab.json data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json scripts/data/school_bios_cfb.json scripts/data/wiki_cfb.json data/dob_conflicts_cfb.json 'scripts/data/odds/cfb-*.jsonl'
+            -- 'data/cfb*.json' static/data/next-up/cfb.json static/data/next-up/cfb-tab.json data/college_returns.json data/brackets/cfb.json data/units_cfb.json scripts/data/cfb_ranks.json scripts/data/cfb_coord_log.jsonl scripts/data/nfl_meetings scripts/data/cfb_avail_reports.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json static/data/depth/cfb.json data/games_picks_cfb.json data/rule_monitor.json 'static/data/cfb-*.json' static/data/teams/cfb.json data/team_badges static/data/rookies/cfb.json scripts/data/moves/r-cfb.json data/st_returners_cfb.json data/st_teams_cfb.json data/st_kickers_cfb.json scripts/data/cfb_ret_fv.json scripts/data/cfb_on3_live.json scripts/data/cfb_recruits_cfbd_live.json static/img/cfb scripts/data/ledger/cfb scripts/data/consensus/cfb scripts/data/tankathon_nfl.json scripts/data/tankathon_draft_days.json scripts/data/school_bios_cfb.json scripts/data/wiki_cfb.json data/dob_conflicts_cfb.json 'scripts/data/odds/cfb-*.jsonl'

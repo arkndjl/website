@@ -49,6 +49,12 @@ jobs:
           path: scripts/.cache/tennis/ta_full
           key: tennis-ta-${{ github.run_id }}
           restore-keys: tennis-ta-
+      # WTA API player match lists (scripts/tennis_wta.py), read again after three days (the matches are committed)
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/tennis/wta_api
+          key: tennis-wta-${{ github.run_id }}
+          restore-keys: tennis-wta-
       - name: Match history (archive + weekly feed + Tennis Abstract + ESPN)
         run: python3 scripts/tennis_data.py
       - name: Ratings, ARK Ranking, matches
@@ -64,7 +70,7 @@ jobs:
         run: python3 scripts/model_monitor.py tennis
       - name: Commit if anything changed
         run: |
-          files="data/tennis.json data/tennis_events.json scripts/data/ledger/tennis_events_2027.json scripts/data/tennis_ta.jsonl scripts/data/tennis_ratings.json.gz scripts/data/tennis_idmap.json.gz scripts/data/tennis_espn_kind.json.gz scripts/data/tennis_faces.json.gz static/img/flags data/model_monitor/tennis.json scripts/data/model_monitor/tennis.json"
+          files="data/tennis.json data/tennis_events.json scripts/data/ledger/tennis_events_2027.json scripts/data/tennis_ta.jsonl scripts/data/tennis_wta.jsonl scripts/data/tennis_ratings.json.gz scripts/data/tennis_idmap.json.gz scripts/data/tennis_espn_kind.json.gz scripts/data/tennis_faces.json.gz static/img/flags data/model_monitor/tennis.json scripts/data/model_monitor/tennis.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
