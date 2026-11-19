@@ -10,8 +10,11 @@ Each race simulates the rest of the season SIMS times and scores every simulated
 - player rates over the games left: the board's predictive value (NBA shrunk XPM, NHL pWAR a minute) and box rates
   blended with last season, each with its talent and sampling noise; games left from his share of games so far
 - eligibility: the NBA's 65 games for MVP and DPOY
-A candidate's P(win) is the voter model's softmax averaged over the simulations. Polymarket's price (no vig, display
-only) sits beside it where a market is open. Stdlib only."""
+A candidate's P(win) is the voter model's softmax averaged over the simulations. Where Polymarket has an open, liquid
+market for the award the shown P(win) is the log-linear blend model^(1 - w) x market^w, w = MKT_W (Noah, Nov 19 2026:
+on the 2025-26 races the model's winner log loss was 2.32 against the market's 1.12, the blend 1.13 at w .95, t -2.26
+by race; scripts/research/sweep_nov19/markets/a1_award_market.py). The model's own number stays on the row (pm) and
+the market's (mkt, no vig) beside it. Stdlib only."""
 import datetime as dt, json, math, os, random, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import awards_engine as E
@@ -24,6 +27,10 @@ TEMP = os.path.join(ROOT, 'data', 'awards_temp.json')
 SIMS = 3000
 PACE_GP = False          # football: rest-of-season rate per game the player appeared in (False = per team game)
 AV_ACT = 0.0             # availability floor of a candidate who is playing now (0 = off)
+MKT_W = 0.95             # the market's weight in the shown P(win) (log-linear blend), where a liquid market is open
+# a liquid market: this many two-sided quotes, raw prices summing inside this range (the test's rule), and this much
+# traded on the event (thin books quote the field near flat and leave the favourite without a two-sided price)
+MKT_MIN, MKT_SUM, MKT_VOL = 3, (0.75, 1.25), 50000
 SHOW = 20
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 POLY = {('nba', 'mvp'): 'nba-2026-27-mvp', ('nba', 'roy'): 'nba-2026-27-rookie-of-the-year-20260624161716143',
@@ -176,22 +183,48 @@ def poly(slug):
             except (ValueError, IndexError, TypeError): continue
             if name and px > 0: out[name] = px
         t = sum(out.values())
+        poly.raw = (len(out), t, float(d[0].get('volume') or 0))
         return {k: v / t for k, v in out.items()} if t > 0 else {}
     except Exception as e:
         print('polymarket', slug, e)
         return {}
 
 
+def blend(rows, m, w=None):
+    """the shown P(win): model^(1 - w) x market^w over the union of candidates, renormalised (the tested form, B1).
+    A model row with no market price takes the smallest listed price split across such rows; a market name outside the
+    rows joins as a bare row at model 1e-3. Rows are re-sorted; each keeps its model number as pm."""
+    w = MKT_W if w is None else w
+    lo = min(m.values())
+    un = sum(1 for r in rows if 'mkt' not in r)
+    used = {r['_mk'] for r in rows if '_mk' in r}
+    for n, v in m.items():
+        if n not in used: rows.append({'n': n, 'tm': '', 'p': 1e-3, 'mkt': round(v, 4), 'x': {}, 'mo': True})
+    z = [max(r['p'], 1e-6) ** (1 - w) * max(r.get('mkt') or lo / max(un, 1), 1e-6) ** w for r in rows]
+    t = sum(z)
+    for r, v in zip(rows, z):
+        r['pm'] = None if r.get('mo') else r['p']
+        r['p'] = round(v / t, 4)
+    rows.sort(key=lambda r: -r['p'])
+    rows[:] = [r for r in rows if not (r.get('mo') and r['p'] < 0.005)]
+
+
 def attach_market(rows, sport, award):
+    """the market's price on each row (mkt); True when the market is liquid enough to blend (then the rows are blended)"""
+    poly.raw = (0, 0.0, 0.0)
     m = poly(POLY.get((sport, award)))
-    if not m: return False
+    if not m: return False, False
     keys = [(n, NM.key(n)) for n in m]
     for r in rows:
         k = NM.key(r['n'])
-        hit = next((m[n] for n, kk in keys if kk == k), None)
-        if hit is None: hit = next((m[n] for n, kk in keys if NM.same(n, r['n'])), None)
-        if hit is not None: r['mkt'] = round(hit, 4)
-    return True
+        hit = next((n for n, kk in keys if kk == k), None)
+        if hit is None: hit = next((n for n, kk in keys if NM.same(n, r['n'])), None)
+        if hit is not None: r['mkt'] = round(m[hit], 4); r['_mk'] = hit
+    n, t, vol = poly.raw
+    liquid = n >= MKT_MIN and MKT_SUM[0] <= t <= MKT_SUM[1] and vol >= MKT_VOL
+    if liquid: blend(rows, m)
+    for r in rows: r.pop('_mk', None)
+    return True, liquid
 
 
 # ---------------------------------------------------------------- NBA
@@ -746,7 +779,7 @@ def main(argv):
         races = []
         for aw, rows, show in res['races']:
             spec = fit[sp][aw]
-            mk = attach_market(rows, sp, aw)
+            mk, bl = (False, False) if spec.get('k') else attach_market(rows, sp, aw)
             t = spec['test']
             races.append({'key': aw, 'label': spec['label'], 'rows': rows, 'mkt': mk,
                           'show': [{'k': k, 'l': l, 'f': f} for k, l, f in show],
@@ -755,8 +788,9 @@ def main(argv):
                                    'from': spec['seasons'][0], 'to': spec['seasons'][1],
                                    'null': [NULL_LABEL.get(c, c) for c in spec['null']]}})
             if spec.get('k'): races[-1]['k'] = spec['k']
+            if bl: races[-1]['blend'] = MKT_W
             top = rows[0] if rows else {}
-            print(sp, spec['label'], 'top:', ', '.join(f"{r['n']} {r['p']:.0%}" + (f" (mkt {r['mkt']:.0%})" if 'mkt' in r else '') for r in rows[:5]))
+            print(sp, spec['label'], 'top:', ', '.join(f"{r['n']} {r['p']:.0%}" + (f" (mkt {r['mkt']:.0%}, model {r['pm']:.0%})" if r.get('pm') is not None and 'mkt' in r else '') for r in rows[:5]))
         cur[sp] = {'season': res['season'], 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
                    'sims': SIMS, 'logo': res['logo'], 'races': races}
         if abs(res.get('T', 1) - 1) > 1e-9: cur[sp]['temp'] = round(res['T'], 3)

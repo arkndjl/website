@@ -23,8 +23,8 @@
 <table class="cfb__table awards__table">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Team</th>
-    <th title="{{ $pl }}: the voter model over {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season">{{ $pl }}</th>
-    {{- if .mkt }}<th title="Polymarket, no vig (display only)">Mkt</th>{{ end }}
+    <th title="{{ $pl }}: {{ with .blend }}the voter model blended with Polymarket ({{ mul . 100 | int }}% market, log-linear); the model alone in each cell's hover{{ else }}the voter model over {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season{{ end }}">{{ $pl }}</th>
+    {{- if .mkt }}<th title="Polymarket, no vig">Mkt</th>{{ end }}
     {{- range $k, $c := .show }}<th{{ if gt $k 0 }} class="awards__x"{{ end }} title="projected finish">{{ .l }}</th>{{ end }}
   </tr></thead>
   <tbody>
@@ -35,7 +35,7 @@
     <td class="cfb__rk">{{ add $j 1 }}</td>
     <td class="cfb__name">{{ partial "face.html" (dict "u" (.phu | default (cond (ne .ph nil) (printf "https://a.espncdn.com/combiner/i?img=/i/headshots/%s/players/full/%v.png&w=96&h=70&scale=crop" $lg .ph) ""))) }}<b>{{ .n }}</b>{{ with .pos }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__team">{{ with $logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .tm }}</span></td>
-    <td class="cfb__num is-key" data-v="{{ .p }}">{{ if lt .p 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul .p 100))) }}%{{ end }}</td>
+    <td class="cfb__num is-key" data-v="{{ .p }}"{{ with .pm }} title="model {{ math.Round (mul . 100) }}%"{{ end }}>{{ if lt .p 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul .p 100))) }}%{{ end }}</td>
     {{- if $r.mkt }}<td class="cfb__num" data-v="{{ .mkt | default -1 }}">{{ with .mkt }}{{ if lt . 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ partial "num.html" (slice "%.0f" (float (mul . 100))) }}%{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
     {{- $x := .x }}
     {{- range $k, $c := $r.show }}

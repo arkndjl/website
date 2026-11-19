@@ -99,6 +99,7 @@
     ]},
     { "name": "tennis", "sources": [
       { "n": "Tennis Abstract (Jeff Sackmann)", "u": "https://www.tennisabstract.com/", "w": "matches (Challenger, ITF and qualifying results since June 2026 from the player pages), rankings, Elo, player data; tour-level matches since 1968 for all-time Elo" },
+      { "n": "Polymarket (global)", "u": "https://polymarket.com/", "w": "tennis match prices 6 to 24 hours out and the price an hour before the start, for the tennis picks (scripts/polymarket_global.py; public reads, no orders)" },
       { "n": "WTA (api.wtatennis.com)", "u": "https://www.wtatennis.com/", "w": "women's ITF, WTA 125 and qualifying results since June 2026 from the players' match lists (top 400 by WTA rank), with entry ranks" }
     ]},
     { "name": "Counter-Strike", "sources": [
@@ -124,7 +125,7 @@
     { "name": "odds and markets", "sources": [
       { "n": "Novig", "u": "https://novig.com/", "w": "lines and props where Polymarket US has none (primary Oct 27 to Nov 15 2026)" },
       { "n": "DraftKings (via ESPN)", "u": "https://www.espn.com/", "w": "fallback lines" },
-      { "n": "Polymarket", "u": "https://polymarket.com/", "w": "CS2 prices as a model input; price histories for the pick signal test; award futures (display only)" },
+      { "n": "Polymarket", "u": "https://polymarket.com/", "w": "CS2 prices as a model input; price histories for the pick signal test; award futures (95% of the shown award odds where the market is liquid)" },
       { "n": "Polymarket US", "u": "https://polymarket.us/", "w": "game lines, props, tennis, CS2, soccer and futures after its taker fee (primary)" },
       { "n": "Sportsbook Reviews Online", "u": "https://www.sportsbookreviewsonline.com/", "w": "historical opening and closing lines" },
       { "n": "Polymarket (global) closed-market history", "u": "https://polymarket.com/", "w": "daily prices of finished award, title and playoff-field markets (gamma events + clob prices-history), research benchmarks only (scripts/poly_hist.py)" },

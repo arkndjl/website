@@ -21,7 +21,9 @@ Contract surplus: the minimum salary + projected VORX x $ per win, minus salary 
                 is worth more (max(0, value - salary)).
 
 1Y / 3Y (p1, p3): next season's and the next three seasons' minutes-weighted XPM given he plays (fit on seasons with
-  minutes, weighted by them; the chance he is off the board is not in it), from XPM (proj), age and the minutes above,
+  minutes, weighted by them). The 3Y is then the exit hurdle (Noah, Nov 19 2026): stay x that + (1 - stay) x -2, stay =
+  the chance he plays in the next three seasons ('exit' and the grid's 'stay' in the fit file,
+  scripts/research/sweep_nov19/methods/hurdle_nba_grid.py; st3 on each row). The 1Y stays XPM given he plays. From XPM (proj), age and the minutes above,
   plus (form H4) a hinge max(0, proj - 3), the two seasons before reliability-weighted, and proj x ln(minutes over
   three seasons) (data/nba_proj3y_fit.json 'cp', scripts/nba_proj3y_play_research.py; without 'cp' the older
   coefficients 'c', whose target pulls every player toward -2 with 500 / 1,000 minutes). Display only;
@@ -63,6 +65,16 @@ def proj3(fit3, f):
         if form == 'H4':
             x += [max(0.0, pj - hc), d1, d2, pj * (math.log1p(c3) - 8)]
         return tuple(sum(c * v for c, v in zip(C[k], x)) for k in ('y1', 'y3y'))
+    # the exit hurdle ('exit', scripts/research/sweep_nov19/methods/hurdle_nba_grid.py): the chance he plays in the next three
+    # seasons, coefficients at the same season share
+    ex = fit3.get('exit') or {}
+    if ex.get('kept') and all('stay' in x for x in g):
+        sm = {j: [u + (v - u) * t for u, v in zip(g[i]['stay'][j], g[i + 1]['stay'][j])] for j in ('mu', 'sd', 'b')}
+        def stay(pj, age, m, share):
+            a = age - A0
+            hz = [1.0, pj, a, a * a, math.log1p(max(m, 0)), share]
+            return 1 / (1 + math.exp(-sum(bb * (v - u) / d for bb, v, u, d in zip(sm['b'], hz, sm['mu'], sm['sd']))))
+        go.stay, go.wash = stay, ex.get('wash', -2.0)
     return go
 
 
@@ -194,7 +206,13 @@ def project(fresh=True):
             c3 = mp + sum(h['mp'] for h in (h1, h2) if h)
             y1, y3 = p3(pv[0], r['age'], mpg * share * 82, d[0], d[1], c3)
             g1, g3 = glt.get(pid, (0.0, 0.0))
-            r['p1'], r['p3'] = round(y1 + g1, 1), round(y3 + g3, 1)
+            y3 += g3
+            if getattr(p3, 'stay', None):
+                # 3Y = the chance he plays in the next three seasons x XPM given he plays + the rest at replacement
+                st = p3.stay(pv[0], r['age'], mpg * share * 82, min(1.0, cg / gp) if gp else 0.0)
+                y3 = st * y3 + (1 - st) * p3.wash
+                r['st3'] = round(100 * st)
+            r['p1'], r['p3'] = round(y1 + g1, 1), round(y3, 1)
         if pid in con: r['sal'] = con[pid]['yrs']
         rows.append(r)
     # the market's $ per win this season: payroll above the minimum over the projected wins it buys
