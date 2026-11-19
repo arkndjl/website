@@ -3,6 +3,9 @@
 
     python3 scripts/awards_asof.py nhl nba nfl     # rebuild the as-of races (cached), score, write data/awards_temp.json
     python3 scripts/awards_asof.py --score         # score the cached races again
+    python3 scripts/awards_asof.py cfb --noscore   # CFB races (Heisman, Maxwell, Walter Camp, O'Brien), 2005-25
+    options: --from=2019 (NBA: in-repo boxes only), --box (skip the 'end' bound), --tag=_x (rows file suffix),
+             --av=.95 (NBA availability floor of a candidate who is playing now), --pacegp (football rate per game played)
 
 For each past season and shown award the candidates' to-date lines and team records are rebuilt at 25 / 50 / 75% of
 the season and run through the live layer's own race functions (awards.nhl_races / nba_races / nfl_races: same draws,
@@ -17,7 +20,11 @@ To-date inputs
   value predicted from to-date box stats by a ridge fit on the other seasons' full-season lines, the predictive rate
   = that estimate shrunk to last season's published value by minutes. Variant 'end' (a bound: it leaks the rest of
   the season, so it can only understate the temperature): the season-end published rate x to-date minutes.
+- CFB: sportsdataverse ESPN player box + schedule files (no positions: QB = 8+ pass attempts a team game, defender
+  = under 50 scrimmage yards and 20+ tackles per 12 games; no defensive interceptions or forced fumbles).
 - Team finish: record to date, games left x win rate shrunk to .500 (PRIOR_G games).
+- Each row keeps the pool's names and the checkpoint day, so a row can be set against a dated market price
+  (scripts/poly_hist.py).
 
 Temperature: p_i' ~ p_i ^ (1 / T), T = 1 + a x (1 - season share); a from GRID, leave one season out. A sport
 passes when the per-season mean log-loss change has t <= -2 (Holm over the sports run at .05) and the full-sample a
@@ -40,6 +47,9 @@ GRID = [x / 4 for x in range(-2, 21)]
 FLOOR = 1e-3
 PRIOR_G = {'nba': 12, 'nhl': 20, 'nfl': 6}
 SEED = 20261114
+DAY = {}                 # the checkpoint's last game day, stamped on each row
+NBA_FIRST = 2013         # --from=2019 skips the 2012-13..2017-18 box backfill
+VARS = ('box', 'end')
 
 
 def get(url, tries=4, raw=False):
@@ -78,6 +88,7 @@ def shrunk_left(w, g, G, sport):
 def row(sp, s, aw, ci, var, pool, p, win_id):
     ids = [c['id'] for c in pool]
     return {'sp': sp, 's': s, 'aw': aw, 'cp': ci, 'var': var, 'p': [round(v, 6) for v in p],
+            'n': [c['n'] for c in pool], 'day': DAY.get('day'),
             'w': ids.index(win_id) if win_id in ids else None,
             'top': [(pool[i]['n'], round(p[i], 3)) for i in sorted(range(len(p)), key=lambda i: -p[i])[:3]]}
 
@@ -233,7 +244,7 @@ BOX_K = ('pts', 'reb', 'ast', 'fg3', 'stl', 'blk', 'tov', 'fga', 'fta')
 def nba_boxes():
     P = json.load(gzip.open(os.path.join(ROOT, 'scripts', 'nba_pbox_hist.json.gz')))
     G = [g for g in json.load(gzip.open(os.path.join(ROOT, 'scripts', 'nba_games_hist.json.gz')))['games']
-         if g['t'] == 2 and g.get('fin') and 2013 <= g['S'] <= 2026 and g['tip'][:10] <= NBA_END.get(g['S'], '9')]
+         if g['t'] == 2 and g.get('fin') and NBA_FIRST <= g['S'] <= 2026 and g['tip'][:10] <= NBA_END.get(g['S'], '9')]
     fn = os.path.join(CACHE, 'nba_pbox_1318.json.gz')
     old = json.load(gzip.open(fn)) if os.path.exists(fn) else {}
     todo = [g['id'] for g in G if g['S'] <= 2018 and g['id'] not in old]
@@ -267,13 +278,14 @@ def nba_lines(G, P, S, day):
             for x in pl:
                 if x[4] <= 0: continue
                 r = L.setdefault(x[0], {'eid': x[0], 'n': x[1], 'tm': tm, 'g': 0, 'mp': 0.0, 'tbox': 0, **{k: 0.0 for k in BOX_K}})
-                r['g'] += 1; r['mp'] += x[4]; r['tm'] = tm
+                r['g'] += 1; r['mp'] += x[4]; r['tm'] = tm; r['lastg'] = T[tm][1]
                 for k, v in zip(BOX_K, (x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13])): r[k] += v
     for r in L.values():
         k = T[r['tm']][1] / B[r['tm']] if B.get(r['tm']) else 1.0
         if k > 1:
             r['g'] = min(r['g'] * k, T[r['tm']][1]); r['mp'] *= k
             for x in BOX_K: r[x] *= k
+    for r in L.values(): r['act'] = T[r['tm']][1] - r.get('lastg', 0) < 3
     return L, {t: tuple(v) for t, v in T.items()}
 
 
@@ -326,12 +338,13 @@ def nba_build(sims):
         for s in range(2010, S): seen |= set(xpm[s])
         for ci, share in enumerate(SHARES):
             day = days[S][int(len(days[S]) * share) - 1]
+            DAY['day'] = day
             L, T = nba_lines(G, P, S, day)
             teams = {}
             for t, (w, g, _) in T.items():
                 xw = shrunk_left(w, g, Gs, 'nba')
                 teams[t] = (w, g, xw, AW.team_sd(max(Gs - g, 0), xw / Gs, 3, .030), Gs)
-            for var in ('box', 'end'):
+            for var in VARS:
                 cands = []
                 for e, r in L.items():
                     pid = idmap.get((S, e))
@@ -349,7 +362,8 @@ def nba_build(sims):
                                   'ppg': r['pts'] / r['g'], 'ppg0': q.get('pts_per_g'), 'rpg': r['reb'] / r['g'],
                                   'rpg0': q.get('trb_per_g'), 'st': (r['stl'] + r['blk']) / r['g'],
                                   'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
-                                  'mpg': r['mp'] / r['g'], 'pos': x.get('pos', ''), 'rookie': pid not in seen})
+                                  'mpg': r['mp'] / r['g'], 'pos': x.get('pos', ''), 'rookie': pid not in seen,
+                                  'act': r['act']})
                 prevS = {aw: {r['id']: r['prev_' + aw] for r in byS[aw][S][0] if r['prev_' + aw]} for aw in ('mvp', 'dpoy')}
                 fit = {aw: specs[aw][S] for aw in specs if S in specs[aw] and byS[aw][S][1]}
                 fit['_prev'] = prevS
@@ -418,6 +432,7 @@ def nfl_build(sims):
                 acc += cum[w]; wk = w
                 if acc >= share * nG: break
             T = nfl_records(GM, wk)
+            DAY['day'] = 'wk%d' % wk
             teams = {}
             for t, (w, g) in T.items():
                 xw = shrunk_left(w, g, Gs, 'nfl')
@@ -437,6 +452,156 @@ def nfl_build(sims):
                 print('nfl', S, aw, share, 'wk', wk, rows[-1]['top'], 'winner', fpool[o[0]]['n'],
                       None if rows[-1]['w'] is None else round(p[rows[-1]['w']], 3), flush=True)
     return rows
+
+
+# ---------------------------------------------------------------- CFB
+
+SDV = 'https://github.com/sportsdataverse/sportsdataverse-data/releases/download/'
+CFB_NUM = {'pass_y': 'passingYards', 'ptd': 'passingTouchdowns', 'int': 'interceptions', 'rush_y': 'rushingYards',
+           'rtd': 'rushingTouchdowns', 'rush_a': 'rushingAttempts', 'rec_y': 'receivingYards', 'ctd': 'receivingTouchdowns',
+           'rec': 'receptions', 'krtd': 'kickReturnTouchdowns', 'prtd': 'puntReturnTouchdowns', 'tackles': 'totalTackles',
+           'sacks': 'sacks', 'tfl': 'tacklesForLoss', 'pd': 'passesDefended', 'itd': 'interceptionTouchdowns'}
+CFB_RACES = ('heisman', 'maxwell', 'camp', 'obrien')
+
+
+def cfb_season(S):
+    """(games [(week, date, home id, away id, home won)], lines {(athlete id, game id): dict}) from the sportsdataverse
+    ESPN files: regular season only (conference title games included), FBS-listed schedule"""
+    import pandas as pd
+    d = os.path.join(CACHE, 'cfb'); os.makedirs(d, exist_ok=True)
+    out = []
+    for name, url in ((f'pb_{S}.parquet', f'espn_cfb_player_box/player_box_{S}.parquet'),
+                      (f'sch_{S}.parquet', f'espn_cfb_schedules/cfb_schedule_{S}.parquet')):
+        fn = os.path.join(d, name)
+        if not os.path.exists(fn) or os.path.getsize(fn) < 5000:
+            r = get(SDV + url, raw=True)
+            if r: open(fn, 'wb').write(r)
+            time.sleep(1)
+        out.append(pd.read_parquet(fn))
+    pb, sch = out
+    sch = sch[(sch['season_type'] == 2) & sch['home_score'].notna() & (sch['status'].astype(str).str.contains('FINAL', case=False) | sch['home_winner'].notna())]
+    games = {}
+    for r in sch.itertuples():
+        if r.home_score == r.away_score == 0: continue
+        games[int(r.game_id)] = (int(r.week), str(r.game_date)[:10], str(int(r.home_id)), str(int(r.away_id)), float(r.home_score) > float(r.away_score))
+    lines = {}
+    num = lambda v: float(v) if v not in (None, '') and v == v else 0.0
+    for r in pb.to_dict('records'):
+        g = int(r['game_id'])
+        if g not in games or r['athlete_id'] != r['athlete_id']: continue
+        x = lines.setdefault((str(int(r['athlete_id'])), g), {'n': r['athlete_name'], 'tid': str(int(r['team_id'])), 'pass_a': 0.0,
+                                                               **{k: 0.0 for k in CFB_NUM}})
+        for k, c in CFB_NUM.items():
+            v = r.get(c)
+            try: x[k] += num(v) if not isinstance(v, str) else float(v)
+            except ValueError: pass
+        ca = r.get('completions/passingAttempts')
+        if isinstance(ca, str) and '/' in ca:
+            try: x['pass_a'] += float(ca.split('/')[1])
+            except ValueError: pass
+    return games, lines
+
+
+def cfb_totals(games, lines, wk):
+    """to-date feature rows (awards_football.features keys) through week wk, and team records {tid: (w, g)}"""
+    T = collections.defaultdict(lambda: [0, 0])
+    for g, (w, _, h, a, hw) in games.items():
+        if w > wk: continue
+        T[h][0] += hw; T[h][1] += 1; T[a][0] += (not hw); T[a][1] += 1
+    P = {}
+    for (aid, g), x in lines.items():
+        if games[g][0] > wk: continue
+        r = P.setdefault(aid, {'id': aid, 'n': x['n'], 'tid': x['tid'], 'gp': 0, 'pass_a': 0.0, **{k: 0.0 for k in CFB_NUM}})
+        r['gp'] += 1; r['tid'] = x['tid']; r['pass_a'] += x['pass_a']
+        for k in CFB_NUM: r[k] += x[k]
+    for r in P.values():
+        w, g = T.get(r['tid'], (0, 0))
+        r['scrim'] = r['rush_y'] + r['rec_y']; r['yds'] = r['pass_y'] + r['scrim']
+        r['td'] = r['ptd'] + r['rtd'] + r['ctd'] + r['krtd'] + r['prtd']
+        r['qb'] = 1.0 if r['pass_a'] >= 8 * max(g, 1) else 0.0
+        r['pos'] = 'QB' if r['qb'] else ''
+        r['def'] = 1.0 if (r['yds'] < 50 and r['tackles'] > 20 * max(g, 1) / 12) else 0.0
+        r['ypa'] = r['pass_y'] / r['pass_a'] if r['pass_a'] >= 50 else 0.0
+        r['ypc'] = r['rush_y'] / r['rush_a'] if r['rush_a'] >= 50 else 0.0
+        r['dint'] = 0.0; r['ff'] = 0.0
+        r['wp'] = w / max(g, 1)
+    return P, {t: tuple(v) for t, v in T.items()}
+
+
+def cfb_build(sims):
+    import awards_football as F
+    F_OK = {'obrien': F.CFB_AWARDS['obrien'][2]}
+    cols = {'heisman': F.HEIS_COLS, 'maxwell': F.HEIS_COLS, 'camp': F.HEIS_COLS, 'obrien': F.CFB_AWARDS['obrien'][3]}
+    seasons = list(range(2005, 2026))
+    D = {S: cfb_season(S) for S in seasons}
+    W = {a: F.award_winners(F.CFB_AWARDS[a][0]) for a in ('maxwell', 'camp', 'obrien')}
+    votes = {S: F.heisman_votes(S) for S in range(2004, 2026)}
+    races = {a: [] for a in CFB_RACES}
+    full = {}
+    for S in seasons:
+        games, lines = D[S]
+        P, T = cfb_totals(games, lines, 99)
+        full[S] = (P, T)
+        prev = {NM.key(n) for n, _, _, _ in votes[S - 1][:5]}
+        rows = list(P.values())
+        for r in rows: r['prev_top5'] = 1.0 if NM.key(r['n']) in prev else 0.0
+        big = [r for r in rows if r['yds'] >= 500 or r['tackles'] >= 40 or r['sacks'] >= 6]
+        o = F._order(big, [n for n, _, _, _ in votes[S]])
+        order = [x for x in o if x is not None]
+        if not o or o[0] is None: order = []; print('cfb', S, 'heisman winner outside pool', votes[S][:1])
+        races['heisman'].append((S, big, order))
+        for a in ('maxwell', 'camp', 'obrien'):
+            pool = big if a != 'obrien' else [r for r in rows if F_OK['obrien'](r)]
+            w = W[a].get(S)
+            o = F._order(pool, [w]) if w else []
+            if not o or o[0] is None: print('cfb', S, a, 'winner outside pool', w); races[a].append((S, pool, [])); continue
+            races[a].append((S, pool, o[:1]))
+    specs = {a: loso_specs(races[a], cols[a], 3 if a == 'heisman' else 1) for a in CFB_RACES}
+    byS = {a: {s: (pool, o) for s, pool, o in races[a]} for a in CFB_RACES}
+    out = []
+    for S in seasons:
+        games, lines = D[S]
+        nG = len(games); cum = collections.Counter(w for w, *_ in games.values())
+        Gt = full[S][1]
+        prev = {NM.key(n) for n, _, _, _ in votes[S - 1][:5]}
+        for ci, share in enumerate(SHARES):
+            acc, wk = 0, 0
+            for w in sorted(cum):
+                acc += cum[w]; wk = w
+                if acc >= share * nG: break
+            P, T = cfb_totals(games, lines, wk)
+            DAY['day'] = max(d for w, d, *_ in games.values() if w <= wk)
+            teams = {}
+            for t, (w, g) in T.items():
+                G = Gt[t][1]
+                xw = w + max(G - g, 0) * (w + 2.0) / (g + 4.0)
+                teams[t] = (w, g, xw, math.sqrt(max(G - g, 0) * .22), G)
+            cands = []
+            for r in P.values():
+                if r['tid'] not in teams: continue
+                f = dict(r); f['prev_top5'] = 1.0 if NM.key(r['n']) in prev else 0.0
+                w, g, _, _, G = teams[r['tid']]
+                k = G / max(g, 1)
+                c = {'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['tid'], 'pos': r['pos'], 'f': f}
+                c['pf'] = dict(f, **{x: f[x] * k for x, _ in AW.CFB_LEFT if x in f}, yds=f['yds'] * k)
+                cands.append(c)
+            left = [(k, kind) for k, kind in AW.CFB_LEFT if k in CFB_NUM or k == 'int']
+            draw = AW.football_draw(teams, left, 'cfb')
+            big = lambda f: f['yds'] >= 300 or f['tackles'] >= 25 or f['sacks'] >= 4
+            rng = random.Random(SEED + S * 10 + ci)
+            for a in CFB_RACES:
+                fpool, o = byS[a][S]
+                if not o: continue
+                ok = big if a != 'obrien' else F_OK['obrien']
+                sub = [c for c in cands if ok(c['pf'])]
+                if not sub: continue
+                spec = specs[a][S]
+                sub = AW.prune(sub, spec, draw, rng)
+                p = AW.race(sub, spec, draw, rng, sims)
+                out.append(row('cfb', S, a, ci, 'box', sub, p, fpool[o[0]]['id']))
+                print('cfb', S, a, share, 'wk', wk, out[-1]['top'], 'winner', fpool[o[0]]['n'],
+                      None if out[-1]['w'] is None else round(p[out[-1]['w']], 3), flush=True)
+    return out
 
 
 # ---------------------------------------------------------------- temperature and scores
@@ -511,14 +676,20 @@ def report(rows):
     return out
 
 
-BUILD = {'nhl': nhl_build, 'nba': nba_build, 'nfl': nfl_build}
+BUILD = {'nhl': nhl_build, 'nba': nba_build, 'nfl': nfl_build, 'cfb': cfb_build}
 
 
 def main(argv):
-    fn = lambda sp: os.path.join(CACHE, f'rows_{sp}.json')
+    tag = next((a[6:] for a in argv if a.startswith('--tag=')), '')
+    fn = lambda sp: os.path.join(CACHE, f'rows_{sp}{tag}.json')
     sims = AW.SIMS
+    global NBA_FIRST, VARS
     for a in argv:
         if a.startswith('--sims='): sims = int(a[7:])
+        if a.startswith('--from='): NBA_FIRST = int(a[7:])
+        if a.startswith('--av='): AW.AV_ACT = float(a[5:])
+    if '--pacegp' in argv: AW.PACE_GP = True
+    if '--box' in argv: VARS = ('box',)
     for sp in [a for a in argv if a in BUILD]:
         os.makedirs(CACHE, exist_ok=True)
         json.dump(BUILD[sp](sims), open(fn(sp), 'w'))
