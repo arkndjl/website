@@ -35,11 +35,11 @@
   {{- with $s.wd }}{{ $mx := 0.0 }}{{ range . }}{{ $mx = math.Max $mx . }}{{ end }}
   <ul class="sst__hbar">
     {{- range $i, $x := . }}
-    <li title="mean ratio of actual to trend"><span class="esea__k">{{ index (slice "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun") $i }}</span><i style="{{ printf "--w:%.1f%%" (mul 100 (div $x $mx)) | safeCSS }}" class="{{ if ge $x 1.0 }}is-hi{{ end }}"></i><b>{{ printf "%.2f" $x }}</b></li>
+    <li title="geometric mean ratio of actual to trend"><span class="esea__k">{{ index (slice "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun") $i }}</span><i style="{{ printf "--w:%.1f%%" (mul 100 (div $x $mx)) | safeCSS }}" class="{{ if ge $x 1.0 }}is-hi{{ end }}"></i><b>{{ printf "%.2f" $x }}</b></li>
     {{- end }}
   </ul>
   {{- end }}
-{{- printf $end ` title="weekday index = mean of actual / trend on that weekday"` "trend" $stamp | safeHTML }}
+{{- printf $end ` title="weekday index = geometric mean of actual / trend on that weekday, last 60 days"` "trend" $stamp | safeHTML }}
 {{- end -}}
 
 {{- if eq $part "traffic" }}{{ with $s.cf -}}
