@@ -16,6 +16,7 @@ Sources, first that has him (scripts/dob_sources.py):
   3b. Wikidata, no team listed but a Sports Reference college basketball id: the one such item with his name, his
      name unique on the board, born to fit his class and within a year of his Barttorvik birth year
   4. Wikipedia search ("<name>" basketball), lead section {{birth date}}, school named in the lead
+  6. FIBA youth rosters on file (scripts/data/fiba_dob.json.gz), for a player whose Barttorvik birth year agrees
   5. his school's athletics roster bio (scripts/school_bios.py), when it prints a birth date (also for players whose
      only date is Barttorvik's birth-year stand-in)
 Each date is kept with its source; a miss is retried after 14 days. Matching goes through scripts/names.py.
@@ -23,7 +24,7 @@ Two sources more than 3 days apart, or two same-name Wikidata players, go to dat
     python3 scripts/cbb_dob.py --all        # retry recent misses too (after a source is added)
     python3 scripts/cbb_dob.py --check      # also check every dated board player against Wikidata
 """
-import datetime as dt, json, os, re, subprocess, sys, time, urllib.parse
+import datetime as dt, gzip, json, os, re, subprocess, sys, time, urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import names as N
@@ -202,6 +203,21 @@ def main():
         if plausible(b['dob']):
             store[k] = {'name': nm.get(k, k.split('|')[0]), 'dob': b['dob'], 'src': 'school', 'url': b['url']}
             found['school'] = found.get('school', 0) + 1
+    # FIBA youth rosters (scripts/data/fiba_dob.json.gz: name key -> birth dates listed at FIBA events 2011-25): the one
+    # date under his name, his name once on the board, and a Barttorvik birth year within a year of it (held out against
+    # day-precise dates from the other sources: 1,401 of 1,427 within 3 days; without the birth-year check 97.8%, not used)
+    try: fiba = json.load(gzip.open(os.path.join(HERE, 'data', 'fiba_dob.json.gz'), 'rt'))
+    except (OSError, ValueError): fiba = {}
+    for r in rows:
+        k = key(r[ci['name']], r[ci['team']])
+        if (store.get(k) or {}).get('dob'): continue
+        nk = N.key(r[ci['name']])
+        c = fiba.get(nk) or []
+        yrs = bt_years.get(nk)
+        if len(c) == 1 and n_name[nk] == 1 and plausible(c[0]) and yrs and min(abs(int(c[0][:4]) - y) for y in yrs) <= 1 \
+                and fits_class(c[0], r[ci['cls']], season, yrs):
+            store[k] = {'name': r[ci['name']], 'dob': c[0], 'src': 'fiba'}
+            found['fiba'] = found.get('fiba', 0) + 1
     if check or conflicts: DS.log_conflicts('cbb', conflicts)
     json.dump(dict(sorted(store.items())), open(OUT, 'w'), indent=0, separators=(',', ':'))
     have = sum(1 for v in store.values() if v.get('dob'))

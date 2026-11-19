@@ -165,6 +165,27 @@ def load_on3(cls):
     return rows
 
 
+# Barttorvik's Oct 15 is a birth-year-only stand-in. The day inside the year depends on how old the player was for his
+# class: mean day of the year by k = first D-I season - birth year - (class index - 1), from careers with a day-precise
+# date (first season through 2022); held out on the 2023+ entrants, mean absolute age error .347 -> .237 years
+BIRTH_DOY = {18: 115, 19: 120, 20: 205, 21: 234, 22: 234, 23: 236}
+BIRTH_DOY_ALL = 185
+_CLS_IX = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}
+
+
+def dob_est(dob, seasons):
+    """dob, with a year-only stand-in (YYYY-10-15) moved to the expected day for his class; seasons: his career rows"""
+    if not dob or not str(dob).endswith('-10-15') or not seasons or os.environ.get('CBB_DOB_EST') == '0':
+        return dob
+    try:
+        s0 = seasons[0]
+        k = int(s0['year']) - int(dob[:4]) - (_CLS_IX.get(s0.get('yr'), 1) - 1)
+        t = time.strptime(f"{dob[:4]}-{BIRTH_DOY.get(k, BIRTH_DOY_ALL):03d}", '%Y-%j')
+        return time.strftime('%Y-%m-%d', t)
+    except (KeyError, TypeError, ValueError):
+        return dob
+
+
 def age_on(dob, y, m, d):
     try:
         b = time.strptime(dob, '%Y-%m-%d')

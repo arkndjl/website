@@ -470,12 +470,16 @@ def main():
     newhc = {t: 1 - jobs.get(t, {}).get('stay', .85) for t in teams}
     pool = [p for p in P if p['pMove'] >= 0.12 and p['team'] in power]
     land = {}
+    # hometown (recruiting history, by name and HS class): the land fit's distance-from-home terms; none on file = 0
+    _, home_by_cls = M.recruit_homes()
+    import names as NMK
     for p in pool:
         o = p['team']
         r = {'bpm': p.get('xbpm')}
         # every other D-I team (the fit's choice set: a mover is on another team's roster)
         ts = [t for t in teams if t != o]
-        X = [M.feats_land(r, o, t, srs_now.get(t), srs_now.get(o), p.get('conf'), tconf[t], loc.get(B[o]), loc.get(B[t]), False, newhc[t], openm.get(t, .5)) for t in ts]
+        hl = home_by_cls.get((NMK.key(p['name']), (p.get('rec') or {}).get('cls')))
+        X = [M.feats_land(r, o, t, srs_now.get(t), srs_now.get(o), p.get('conf'), tconf[t], loc.get(B[o]), loc.get(B[t]), False, newhc[t], openm.get(t, .5), hl=hl) for t in ts]
         X = np.array(X, float)
         # the land fit's power flags are the high-major set (P12 was one through 2024)
         u = X @ lb; u -= u.max(); e = np.exp(u); e /= e.sum()
