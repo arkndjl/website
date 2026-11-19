@@ -7,6 +7,16 @@ ROOT = str(pathlib.Path(__file__).resolve().parent.parent)
 OUT = ROOT + '/research/library.json'
 ld = lambda p: json.load(open(f'{ROOT}/{p}'))
 
+# live fit numbers (Process regenerates from these, never hand-typed)
+_SC = ld('data/fv_scale.json')['boards']
+_KT = ', '.join(f"{n} {_SC[b]['K']:.1f} / {_SC[b]['T']:.1f}" for n, b in
+                (('CFB', 'cfb'), ('CBB', 'cbb'), ('hockey', 'hockey'), ('soccer', 'soccer'), ('ATP', 'atp'), ('WTA', 'wta')))
+_CBBK = ld('data/cbb_live_fit.json')['k']
+_HKF = ld('data/hockey.json')['fit']
+_HKN = {'ls': 'log slot (board rank as slot)', 'nhle': 'draft-year NHLe', 'D': 'defense', 'G': 'goalie',
+        'chl1': 'CHL first-round pick', 'cs': 'class strength', 'agenh': 'age', 'ht': 'height', 'wt': 'weight'}
+_HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'ls2'))
+
 ALLP = ['CFB', 'NFL', 'CBB', 'NBA', 'NHL', 'Hockey', 'Soccer', 'Tennis']
 
 
@@ -37,7 +47,7 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
     E('Stretched top', 'Above each board\'s knot K the headline runs linear to 80 at T, so an 80 comes about once every 5 seasons.',
       ['Mean of a capped outcome cannot reach 80; the stretch makes 80 reachable but rare (Oct 31 2026).',
        'K = mean that about 3 players a season reach; T = one player per about 5 seasons (exponential tail, held out).',
-       'K / T: CFB 67.8 / 76.8, CBB 46.6 / 54.7, hockey 54.0 / 72.7, soccer 64.1 / 72.4, ATP 63.4 / 76.4, WTA 60.2 / 75.0.',
+       f'K / T: {_KT}.',
        'Order is unchanged. The exact mean (fvx) stays in tooltips; above K the headline reads hotter than realized means.'],
       'Headline FV on every prospect board (data/fv_scale.json)', ['CFB', 'CBB', 'Hockey', 'Soccer', 'Tennis']),
     E('FV range and tier odds', 'Each player\'s odds of every outcome tier and their 10th-90th percentile outcome.',
@@ -83,11 +93,11 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
        'Newcomers: recruit rank (On3, 247, Barttorvik), class. Returners: 3-season BPM, conference power, age, size, rates.',
        'Board stage adds June draft-board rank and guard combine testing. E maps to a grade on pooled 2009-16 boards.',
        'Outcome odds are fit on each board\'s top 300; below that range they scale down to the floor those boards realized (1.8% NBA).',
-       'In season: E = (1 - w) preseason + w now, w = minutes / (minutes + k); k 63 newcomers, 128 returners.'],
+       f"In season: E = (1 - w) preseason + w now, w = minutes / (minutes + k); k {_CBBK['newcomer']} newcomers, {_CBBK['returner']} returners."],
       'CBB board, fv model tab, in season window', ['CBB']),
     E('Hockey FV model', 'OLS on outcome FV for the draft class and drafted players short of 100 NHL games.',
-      ['Draft model kept: log slot (board rank as slot), draft-year NHLe, defense, goalie, CHL first-round pick, class strength.',
-       'Leave-one-class-out error 89.86 vs 95.14 for slot alone (2008-19 classes, 2,541 picks).',
+      [f'Draft model kept: {_HKEPT}.',
+       f"Leave-one-class-out error {_HKF['mse']:.2f} vs {_HKF['mseSlot']:.2f} for slot alone ({_HKF['classes'][0]}-{str(_HKF['classes'][1])[2:]} classes, {_HKF['picks']:,} picks).",
        'After the draft: stage models add latest NHLe, pro games, World Juniors spot, NHL games and WAR so far.'],
       'Hockey prospects board, drafted prospects, fv model tab', ['Hockey']),
     E('Soccer FV model', 'OLS on outcome FV for every under-22 in 33 leagues plus academy and feeder leagues.',
@@ -870,6 +880,17 @@ for t in fv_tables:
             chk(str(c), t['board'])
 for p in problems:
     print(p)
+# keep entries other scripts write into research/library.json (alltime_ref.py) or that were added there by hand
+try:
+    _old = json.load(open(OUT))
+except (OSError, ValueError):
+    _old = {'sections': []}
+_mine = {e['term'] for sec in sections for e in sec['entries']}
+for osec in _old.get('sections', []):
+    sec = next((x for x in sections if x['id'] == osec['id']), None)
+    if sec is None:
+        continue
+    sec['entries'] += [e for e in osec['entries'] if e['term'] not in _mine]
 json.dump(lib, open(OUT, 'w'), indent=1, ensure_ascii=False)
 print('sections', len(sections), 'entries', sum(len(s['entries']) for s in sections), 'tables', len(fv_tables), 'problems', len(problems))
 for s in sections:
