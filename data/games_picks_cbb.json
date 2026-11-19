@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-19T11:54:37Z",
+ "asof": "2026-11-19T11:57:18Z",
  "recenter": {
-  "2026-11-19": 1.71
+  "2026-11-19": 1.69
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-19T02:52:25Z",
-  "ageH": 9.0,
+  "ageH": 9.1,
   "stale": false
  },
  "picks": [],
@@ -1891,16 +1891,9 @@
    "tmRaw": 137.5,
    "flagged": "2026-11-19T00:56:27Z",
    "paper": true,
-   "betTo": 142.5,
+   "betTo": 143.0,
    "close": 142.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 142.5,
-    "price": -100.0,
-    "ev": 0.167,
-    "units": 1.25
-   }
+   "now": null
   }
  ],
  "withdrawn": [],
@@ -1952,6 +1945,22 @@
    "why": "no edge at -104",
    "m": 20.5,
    "tm": 163.1
+  },
+  {
+   "id": "401919005",
+   "sport": "cbb",
+   "kick": "2026-11-20T00:30:00Z",
+   "home": "Louisiana Tech",
+   "away": "Tulane",
+   "mk": "total",
+   "side": "under",
+   "line": 142.5,
+   "price": -100.0,
+   "edge": 6.5,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 3.1,
+   "tm": 136.0
   },
   {
    "id": "401917536",
@@ -2010,7 +2019,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -150.0,
+   "price": -144.0,
    "edge": 3.8,
    "x": 5.0,
    "why": "edge under 5 (line: <4)",
@@ -2178,6 +2187,22 @@
    "tm": 151.7
   },
   {
+   "id": "401918959",
+   "sport": "cbb",
+   "kick": "2026-11-19T23:00:00Z",
+   "home": "Murray State",
+   "away": "NC State",
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -108.0,
+   "edge": 1.9,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -5.4,
+   "tm": 159.6
+  },
+  {
    "id": "401918056",
    "sport": "cbb",
    "kick": "2026-11-20T03:00:00Z",
@@ -2208,22 +2233,6 @@
    "why": "edge under 3.5 (inj: with)",
    "m": 3.6,
    "tm": 140.1
-  },
-  {
-   "id": "401918959",
-   "sport": "cbb",
-   "kick": "2026-11-19T23:00:00Z",
-   "home": "Murray State",
-   "away": "NC State",
-   "mk": "spread",
-   "side": "away",
-   "line": -4.5,
-   "price": -110,
-   "edge": 0.9,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": -5.4,
-   "tm": 159.6
   }
  ],
  "games": {
@@ -2240,11 +2249,11 @@
    "state": "under"
   },
   "401918959": {
-   "mk": "spread",
-   "side": "away",
-   "line": -4.5,
-   "price": -110,
-   "edge": 0.9,
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -108.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Murray State",
@@ -2291,7 +2300,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -150.0,
+   "price": -144.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -2424,13 +2433,12 @@
    "side": "under",
    "line": 142.5,
    "price": -100.0,
-   "ev": 0.167,
    "edge": 6.5,
-   "units": 1.25,
-   "bk": "novig",
+   "ev": null,
+   "units": 0.0,
    "home": "Louisiana Tech",
    "away": "Tulane",
-   "state": "paper"
+   "state": "under"
   },
   "401920349": {
    "mk": "total",
@@ -2533,7 +2541,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19823,
+  "snapshots": 19828,
   "buckets": [
    {
     "when": "24h+",
@@ -2546,9 +2554,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4095,
+    "clvN": 4097,
     "clvRet": -0.0138,
-    "clvT": -7.8,
+    "clvT": -7.81,
     "clv": 0.45,
     "beat": 0.389,
     "still": 0.41
@@ -18131,7 +18139,7 @@
    "tmRaw": 137.5,
    "flagged": "2026-11-19T00:56:27Z",
    "paper": true,
-   "betTo": 142.5,
+   "betTo": 143.0,
    "close": 142.5
   },
   {
@@ -20205,7 +20213,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T11:54:37Z",
+ "checked": "2026-11-19T11:57:18Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
