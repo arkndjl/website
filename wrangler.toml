@@ -18,3 +18,12 @@ class_name = "PlayCounter"
 [[migrations]]
 tag = "v1-plays"
 new_sqlite_classes = ["PlayCounter"]
+
+# Ko-fi supporters (worker/site.js Supporters). Needs the KOFI_TOKEN secret (Ko-fi's verification token).
+[[durable_objects.bindings]]
+name = "SUPPORTERS"
+class_name = "Supporters"
+
+[[migrations]]
+tag = "v2-supporters"
+new_sqlite_classes = ["Supporters"]
