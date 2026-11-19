@@ -207,9 +207,9 @@ def derive(d):
         s['sd'] = round(math.exp(math.sqrt(sum(e * e for e in res) / len(res))) - 1, 3)
         wd = {}
         for k, e in zip(days[-60:], res):
-            wd.setdefault(dt.date.fromisoformat(k).weekday(), []).append(math.exp(e))
-        if len(w) >= 14:  # two of each weekday at least
-            s['wd'] = [round(sum(wd.get(j, [1])) / max(len(wd.get(j, [])), 1), 3) for j in range(7)]
+            wd.setdefault(dt.date.fromisoformat(k).weekday(), []).append(e)
+        if len(w) >= 14:  # two of each weekday at least; geometric mean, so one viral day doesn't own its weekday
+            s['wd'] = [round(math.exp(sum(wd.get(j, [0])) / max(len(wd.get(j, [])), 1)), 3) for j in range(7)]
     # 30-day Cloudflare totals, once the API has written them
     cfd = [d['days'][k] for k in days[-30:] if 'req' in d['days'][k]]
     if cfd:
