@@ -22,7 +22,7 @@
   </ul>
   {{ partial "sitebars.html" (dict "v" $us "line" $ma "t" $ts "dim" (cond (eq (index $ks (sub $n 1)) $today) (sub $n 1) -1) "label" "daily page views") }}
   <p class="sst__axis"><span>{{ (time (index $ks 0)).Format "Jan 2" }}</span><span><i class="sst__key sst__key--b"></i>views <i class="sst__key sst__key--l"></i>7d mean</span><span>{{ (time (index $ks (sub $n 1))).Format "Jan 2" }}</span></p>
-{{- printf $end ` title="Cloudflare zone analytics, page views (HTML loads) per UTC day"` (printf "%d days" (int .n)) $stamp | safeHTML }}
+{{- printf $end ` title="Cloudflare zone analytics, page views (HTML loads) per UTC day"` (printf "%d days" $n) $stamp | safeHTML }}
 {{- end }}{{ end -}}
 
 {{- if and (eq $part "trend") $s.g7 -}}
@@ -88,7 +88,7 @@
   {{ partial "sitebars.html" (dict "v" $bt "v2" $dv "t" $ts "dim" $dim "label" "commits to main per day") }}
   <p class="sst__axis"><span>{{ (time (index $ks 0)).Format "Jan 2" }}</span><span><i class="sst__key sst__key--b"></i>data refresh <i class="sst__key sst__key--b2"></i>other</span><span>{{ (time (index $ks (sub $n 1))).Format "Jan 2" }}</span></p>
   {{- end }}
-{{- printf $end ` title="GitHub API, UTC days"` (printf "%d days" (int .n)) $stamp | safeHTML }}
+{{- printf $end ` title="GitHub API, UTC days"` (printf "%d days" $n) $stamp | safeHTML }}
 {{- end }}{{ end -}}
 
 {{- if eq $part "fresh" }}{{ with site.Data.freshness -}}
