@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-19T13:46:49Z",
+ "asof": "2026-11-19T13:48:46Z",
  "recenter": {
   "2026-11-19": 1.73
  },
@@ -1900,7 +1900,14 @@
    "paper": true,
    "betTo": 142.5,
    "close": 143.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 143.5,
+    "price": -124.0,
+    "ev": 0.092,
+    "units": 0.25
+   }
   }
  ],
  "withdrawn": [],
@@ -1920,22 +1927,6 @@
    "why": "no edge at -119",
    "m": 31.9,
    "tm": 160.8
-  },
-  {
-   "id": "401919005",
-   "sport": "cbb",
-   "kick": "2026-11-20T00:30:00Z",
-   "home": "Louisiana Tech",
-   "away": "Tulane",
-   "mk": "total",
-   "side": "under",
-   "line": 143.5,
-   "price": -129.0,
-   "edge": 7.5,
-   "x": 6.5,
-   "why": "no edge at -129",
-   "m": 3.1,
-   "tm": 136.0
   },
   {
    "id": "401926773",
@@ -2202,7 +2193,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 1.7,
    "x": 6.5,
    "why": "edge under 6.5 (tier: mixed)",
@@ -2215,13 +2206,13 @@
    "kick": "2026-11-20T01:30:00Z",
    "home": "Wisconsin",
    "away": "Seton Hall",
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
-   "price": -129.0,
-   "edge": 0.9,
-   "x": 3.5,
-   "why": "edge under 3.5 (inj: with)",
+   "mk": "total",
+   "side": "over",
+   "line": 139.5,
+   "price": -110.0,
+   "edge": 0.6,
+   "x": 5.0,
+   "why": "edge under 5 (tier: power)",
    "m": 3.6,
    "tm": 140.1
   }
@@ -2252,11 +2243,11 @@
    "state": "under"
   },
   "401920888": {
-   "mk": "spread",
-   "side": "away",
-   "line": 4.5,
-   "price": -129.0,
-   "edge": 0.9,
+   "mk": "total",
+   "side": "over",
+   "line": 139.5,
+   "price": -110.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Wisconsin",
@@ -2411,7 +2402,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -2422,14 +2413,15 @@
   "401919005": {
    "mk": "total",
    "side": "under",
-   "line": 143.5,
-   "price": -129.0,
+   "line": 138.5,
+   "price": 137,
+   "ev": 0.01,
    "edge": 7.5,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
+   "bk": "poly",
    "home": "Louisiana Tech",
    "away": "Tulane",
-   "state": "under"
+   "state": "paper"
   },
   "401920349": {
    "mk": "total",
@@ -2533,7 +2525,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19856,
+  "snapshots": 19860,
   "buckets": [
    {
     "when": "24h+",
@@ -20205,7 +20197,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T13:46:49Z",
+ "checked": "2026-11-19T13:48:46Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
