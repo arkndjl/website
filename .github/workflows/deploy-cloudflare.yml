@@ -3,7 +3,7 @@
 # Batched, not per commit: a run waits 10 minutes, then builds the newest main, and skips when the live site already
 # serves it (/build.json). The concurrency group keeps one run going and one waiting, so a burst of bot commits makes
 # one deploy. Bot commits pushed with GITHUB_TOKEN don't fire `push`, so the half-hourly schedule picks those up.
-# Needs repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (README, Deploying); without them the push and
+# Needs repo secret CLOUDFLARE_API_TOKEN (README, Deploying; CLOUDFLARE_ACCOUNT_ID optional); without them the push and
 # schedule runs exit quietly and a manual run fails with the setup hint.
 name: deploy cloudflare
 
@@ -27,7 +27,8 @@ jobs:
     timeout-minutes: 30
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # the account id is an identifier, not a credential (it is in every dashboard URL); a secret overrides it
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '52a0657995734fc044113cc765869e15' }}
     steps:
       - name: Check the secrets
         id: sec
