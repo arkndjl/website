@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-19T04:12:44Z",
+ "asof": "2026-11-19T04:22:21Z",
  "recenter": {
-  "2026-11-19": 1.58
+  "2026-11-19": 1.56
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-19T03:49:57Z",
-  "ageH": 0.4,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -341,24 +341,24 @@
    "kick": "2026-11-20T01:00:00Z",
    "home": "SA",
    "away": "LAC",
-   "mk": "spread",
-   "side": "home",
-   "line": 16.5,
-   "price": -106.0,
-   "edge": 0.8,
-   "x": 5.0,
-   "why": "edge under 5 (venue: home)",
+   "mk": "total",
+   "side": "under",
+   "line": 225.5,
+   "price": -119.0,
+   "edge": 2.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
    "m": 17.3,
    "tm": 222.8
   }
  ],
  "games": {
   "401910022": {
-   "mk": "spread",
-   "side": "home",
-   "line": 16.5,
-   "price": -106.0,
-   "edge": 0.8,
+   "mk": "total",
+   "side": "under",
+   "line": 225.5,
+   "price": -119.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "SA",
@@ -418,7 +418,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 4866,
+  "snapshots": 4867,
   "buckets": [
    {
     "when": "24h+",
@@ -7093,7 +7093,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T04:12:44Z",
+ "checked": "2026-11-19T04:22:21Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
