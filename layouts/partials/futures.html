@@ -13,14 +13,14 @@
   <table class="cfb__table">
     <thead><tr>
       <th>Lg</th><th title="seasons with free lines">Seasons</th><th title="team-seasons">N</th>
-      <th title="mean miss in wins: our preseason sim vs the closing line">Miss ours / line</th>
+      <th title="mean miss in wins (NHL: points): our preseason sim vs the closing line">Miss ours / line</th>
       <th title="actual - line = b x (ours - line): the share of our disagreement that came true (season-clustered t)">b</th>
       <th title="the sim's side of every line, 1u flat">Every line</th>
       <th title="EV cut from the tuning seasons, scored on the held-out ones">Rule held out</th>
       <th title="return over the months the money is locked, compounded to a year">A year</th>
     </tr></thead>
     <tbody>
-    {{- range $sp := slice "nba" "nfl" }}{{ with index $fit $sp }}{{ $a := .accuracy.all }}{{ $e := (index .grid.raw.cuts 0).all }}{{ $h := .rule.held }}
+    {{- range $sp := slice "nba" "nfl" "nhl" }}{{ with index $fit $sp }}{{ $a := .accuracy.all }}{{ $e := (index .grid.raw.cuts 0).all }}{{ $h := .rule.held }}
     <tr>
       <td><b>{{ upper $sp }}</b></td>
       <td>{{ index .seasons 0 }}-{{ index .seasons 1 }}</td>
@@ -36,12 +36,12 @@
   </table>
   </div>
   <div class="cfbm__body">
-    {{- range $sp := slice "nba" "nfl" }}{{ with index $fit $sp }}
+    {{- range $sp := slice "nba" "nfl" "nhl" }}{{ with index $fit $sp }}
     {{- $e := (index .grid.raw.cuts 0).all }}
     <p class="cfb__dim"><b>{{ upper $sp }}</b> {{ if and $e.tSeason (ge $e.tSeason 2.0) (gt .rule.held.roi 0.0) }}<b>beats the line</b>{{ else }}<b>no proven edge</b>{{ end }} · tuning {{ index .tune 0 }}-{{ index .tune 1 }} · held out {{ index .held 0 }}-{{ index .held 1 }} · held-out b {{ partial "num.html" (slice "%.2f" .accuracy.held.b) }} (t {{ partial "num.html" (slice "%.1f" .accuracy.held.bT) }}) · bet = line + {{ partial "num.html" (slice "%.2f" .w) }} x (ours - line) · rho {{ with (index .grid.raw.cuts 0).all.rho }}{{ partial "num.html" (slice "%.2f" .) }}{{ end }} · {{ (index .grid.raw.cuts 0).all.n }} bets = {{ with (index .grid.raw.cuts 0).all.nEff }}{{ partial "num.html" (slice "%.0f" .) }}{{ end }} effective</p>
     {{- end }}{{ end }}
   </div>
-  <div class="win__status" title="An edge needs t 2+ by season and a held-out profit. Bets are shrunk toward the line before EVs; rho is the within-season return correlation, which sets the effective number of bets. College football and basketball: {{ $fit.excluded.cfb }}."><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }} team-seasons</span><span class="cfb__asof">fit {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="An edge needs t 2+ by season and a held-out profit. Bets are shrunk toward the line before EVs; rho is the within-season return correlation, which sets the effective number of bets. College football and basketball: {{ $fit.excluded.cfb }}."><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }}{{ with .nhl }} + {{ .teamSeasons }}{{ end }} team-seasons</span><span class="cfb__asof">fit {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}
 {{- $rows := slice }}{{ $asof := "" }}{{ $books := slice }}
