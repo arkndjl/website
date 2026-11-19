@@ -4,6 +4,8 @@
 (scripts/coach_alltime_pull.py pull + build). NBA and NHL: the same method on scripts/data/coach_alltime_pro_src.json.gz
 (scripts/coach_alltime_pro.py): the rating is Sports Reference SRS, the standard season 82 games, the "program" the
 franchise, the national title the league title and the conference title a place in the Finals / Stanley Cup Final.
+NFL: scripts/data/coach_alltime_nfl_src.json.gz (scripts/coach_alltime_nfl.py): the rating is the all-time teams' ridge points a
+game, the standard season 17 games, the conference title a title-game season.
 
     python3 scripts/coach_alltime.py            # fit, tests, write data/coach_alltime.json
 
@@ -42,11 +44,12 @@ import names as N
 
 SRC = os.path.join(HERE, 'data', 'coach_alltime_src.json.gz')
 SRC_PRO = os.path.join(HERE, 'data', 'coach_alltime_pro_src.json.gz')
+SRC_NFL = os.path.join(HERE, 'data', 'coach_alltime_nfl_src.json.gz')
 OUT = os.path.join(ROOT, 'data', 'coach_alltime.json')
 PHI = NormalDist().cdf
 P = dict(tau=6.0, win=15, k=1.0, skip=2)
-GAMES = {'cfb': 12, 'cbb': 30, 'nba': 82, 'nhl': 82}
-LAST = {'cfb': 2025, 'cbb': 2026, 'nba': 2026, 'nhl': 2026}
+GAMES = {'cfb': 12, 'cbb': 30, 'nba': 82, 'nhl': 82, 'nfl': 17}
+LAST = {'cfb': 2025, 'cbb': 2026, 'nba': 2026, 'nhl': 2026, 'nfl': 2025}
 CUTS = {'cfb': (1980, 1995, 2010)}
 TOP = 300
 MIN_N = 3
@@ -317,9 +320,10 @@ def main():
     global SRC_D
     with gzip.open(SRC, 'rt') as f: SRC_D = json.load(f)
     out = dict(asof=date.today().isoformat())
-    if os.path.exists(SRC_PRO):
-        with gzip.open(SRC_PRO, 'rt') as f: SRC_D.update(json.load(f))
-    for sp in ('cfb', 'cbb', 'nba', 'nhl'):
+    for p in (SRC_PRO, SRC_NFL):
+        if os.path.exists(p):
+            with gzip.open(p, 'rt') as f: SRC_D.update(json.load(f))
+    for sp in ('cfb', 'cbb', 'nba', 'nhl', 'nfl'):
         if sp not in SRC_D: continue
         o = run(sp); o['from'] = o.pop('from_'); out[sp] = o
     with open(OUT, 'w') as f: json.dump(out, f, separators=(',', ':'), allow_nan=False)

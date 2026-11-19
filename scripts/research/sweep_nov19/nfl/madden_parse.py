@@ -5,7 +5,7 @@
     python3 -I madden_parse.py <sheets dir> <out json>
 
 Only the per-team launch sheets are read (never roster updates, final rosters or all-star teams). Edition E is the
-season 2000 + E - 1."""
+season 2000 + E - 1. No launch sheets exist there for the 2021 (final roster only), 2024 and 2025 seasons."""
 import glob
 import json
 import os
@@ -50,6 +50,8 @@ def main():
     src, dst = sys.argv[1], sys.argv[2]
     out = {}
     for d in sorted(os.listdir(src)):
+        if d == '25':      # that page is the 2013 anniversary game of the same name, not the 2024 season's edition
+            continue
         rows = []
         for f in sorted(glob.glob(os.path.join(src, d, '*.xlsx'))):
             b = os.path.basename(f).lower()
