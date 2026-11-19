@@ -45,6 +45,9 @@ FS = [0.25, 0.5, 0.75, 1.0]
 S_FIRST, S_LAST = 2017, 2026
 
 
+_PREV = {}
+
+
 def snapshot(S, f, F, LS):
     """{p: [min, gar, pos]} for season S after share f of each league's matches, and {lg: f actually reached}"""
     rows, fl = [], {}
@@ -63,6 +66,22 @@ def snapshot(S, f, F, LS):
         finally:
             D.BIG5 = keep
         fl[lg] = k / len(d['matches'])
+    if any(f_ in SP.RAPM for f_ in F['feats']):
+        # plus-minus at the snapshot: the two seasons before in full, this one up to the same cut in each league
+        segs = {s_: SP.segments(s_) for s_ in (S - 2, S - 1)}
+        segs[S] = []
+        for lg in keep:
+            d = D.us_league(lg, S)
+            if not d or lg not in fl:
+                continue
+            ms = sorted((m for m in d['matches'] if m['res']), key=lambda m: m['t'] or '')
+            D.BIG5 = [lg]
+            try:
+                segs[S] += SP.segments(S, before=ms[int(round(f * len(d['matches'])))]['t'])
+            finally:
+                D.BIG5 = keep
+        _PREV.setdefault(0, D.load(SP.ROWS))
+        SP.rapm([r for r in _PREV[0] if r['S'] in (S - 1, S - 2)] + rows, [S], segs)
     SP.prep(rows, F['shrink'])
     out = {}
     for r in rows:

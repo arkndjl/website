@@ -4,6 +4,7 @@
 Transfermarkt from what he has done, next to the value Transfermarkt shows and the gap between them.
 
     python3 scripts/soccer_mv.py --link   # Understat player -> Transfermarkt player (needs the dump), frozen
+    python3 scripts/soccer_mv.py --expo   # exposure inputs frozen from the dump (UEFA minutes, major-finals days), each summer
     python3 scripts/soccer_mv.py --fit    # snapshots 2015-26, fit + leave-one-season-out backtest, all seasons written
     python3 scripts/soccer_mv.py          # this season (live): Transfermarkt profiles, xMV at the fitted weights
 
@@ -41,6 +42,7 @@ LINK = os.path.join(HERE, 'data', 'soccer_mv_link.json.gz')
 FIT = os.path.join(ROOT, 'data', 'soccer_mv_fit.json')
 SNAP = os.path.join(HERE, '.cache', 'soccer', 'mv_snaps.json.gz')
 HIST = os.path.join(HERE, 'data', 'soccer_mv_hist.json.gz')
+EXPO = os.path.join(HERE, 'data', 'soccer_mv_expo.json.gz')
 TMLG = {'eng.1': 'GB1', 'esp.1': 'ES1', 'ger.1': 'L1', 'ita.1': 'IT1', 'fra.1': 'FR1'}
 SNAPS = [(9, 15), (10, 24), (1, 15), (4, 1), (7, 1)]      # month, day; Jul 1 = the season just finished
 FIRST, LAST = 2015, 2026
@@ -143,7 +145,16 @@ def team_form(S, before=None):
 def player_rows(S, md, F, full):
     """one row per player in season S at snapshot md (or the whole season): inputs known that day"""
     day = snapdate(S, md).isoformat()
-    cur = gar_rows(SP.build_rows(S, S, before=day) if md != (7, 1) else [dict(r) for r in full.get(S, [])], F)
+    if md != (7, 1):
+        cur = SP.build_rows(S, S, before=day)
+        if any(f_ in SP.RAPM for f_ in F['feats']):
+            segs = {s_: SP.segments(s_) for s_ in (S - 2, S - 1)}
+            segs[S] = SP.segments(S, before=day)
+            ctx = [r for k in (1, 2) for r in full.get(S - k, [])] + cur
+            SP.rapm(ctx, [S], segs)
+        cur = gar_rows(cur, F)
+    else:
+        cur = gar_rows([dict(r) for r in full.get(S, [])], F)
     tf, tf1 = team_form(S, day), team_form(S - 1)
     prev = {}
     for k in (1, 2):
@@ -207,8 +218,15 @@ def snaps():
 
 # ---------------------------------------------------------------- the model
 CANDS = ['a1', 'a2', 'a3', 'g0', 'g1', 'g2', 'g0r', 'g1r', 'gg0', 'gg1', 'ag0', 'ag1', 's0', 's02', 'm1', 'm12', 'm2',
-         'n1', 'as0', 'am1', 'tgd1', 'prom', 'tgd', 'txgd', 'lvl', 'esp.1', 'ger.1', 'ita.1', 'fra.1', 'GK', 'D', 'F']
-NAMES = {'a1': 'age (26 = 0)', 'a2': 'age squared', 'a3': 'age cubed / 10', 'g0': 'GAR this season, per 38 team matches',
+         'n1', 'as0', 'am1', 'tgd1', 'prom', 'tgd', 'txgd', 'lvl', 'esp.1', 'ger.1', 'ita.1', 'fra.1', 'GK', 'D', 'F',
+         'nt12', 'nt24', 'ntm', 'ue1', 'gx1', 'ax1']
+EXPO_KEYS = ['nt12', 'nt24', 'ntm', 'ue1', 'gx1', 'ax1']
+NAMES = {'nt12': 'national-team matchday squads in the last 12 months (log 1 + count)',
+         'nt24': 'national-team matchday squads in the last 24 months (log 1 + count)',
+         'ntm': 'World Cup and continental finals squads in the last 24 months (log 1 + count)',
+         'ue1': 'Champions League + Europa League minutes last season / 900',
+         'gx1': 'goals minus xG last season', 'ax1': 'assists minus xA last season',
+         'a1': 'age (26 = 0)', 'a2': 'age squared', 'a3': 'age cubed / 10', 'g0': 'GAR this season, per 38 team matches',
          'g1': 'GAR last season', 'g2': 'GAR two seasons ago', 'g0r': 'root of positive GAR this season (to date)',
          'g1r': 'root of positive GAR last season', 'gg0': 'positive GAR this season squared / 10',
          'gg1': 'positive GAR last season squared / 10', 'ag0': 'age x GAR this season', 'ag1': 'age x GAR last season',
@@ -238,7 +256,87 @@ def feats(r):
         f[lg] = float(r['lg'] == lg)
     for p in ('GK', 'D', 'F'):
         f[p] = float(r['pos'] == p)
+    for k in EXPO_KEYS:
+        f[k] = r.get(k) or 0.0
     return f
+
+
+# ---------------------------------------------------------------- exposure inputs
+def _day_add(d, k):
+    return (dt.date.fromisoformat(d[:10]) + dt.timedelta(days=k)).isoformat()
+
+
+def expo_build():
+    """scripts/data/soccer_mv_expo.json.gz from the dump and the national-team results: 'ue' = player -> season ->
+    Champions League + Europa League minutes (Jul to Jun), 'maj' = [day, nation] of every World Cup and continental
+    finals match. Rerun each summer with the new dump"""
+    import csv
+    import soccer_intl as I
+    ue = defaultdict(lambda: defaultdict(float))
+    last = f'{LAST}-06-30'
+    with gzip.open(os.path.join(DUMPD, 'appearances.csv.gz'), 'rt') as fh:
+        for r in csv.DictReader(fh):
+            if r['competition_id'] in ('CL', 'EL') and r['date'] <= last:
+                y, m = int(r['date'][:4]), int(r['date'][5:7])
+                ue[r['player_id']][str(y + 1 if m >= 7 else y)] += float(r['minutes_played'] or 0)
+    maj = sorted({(r['day'], t) for r in I.mj_rows() if r['cat'] in ('wc', 'cf') and r['day'] >= '2003-01-01'
+                  for t in (r['h'], r['a'])})
+    with gzip.open(EXPO, 'wt') as f:
+        json.dump({'asof': dt.date.today().isoformat(), 'last': LAST, 'ue': {p: {s: int(v) for s, v in d.items() if v > 0} for p, d in ue.items()},
+                   'maj': [list(x) for x in maj]}, f, separators=(',', ':'))
+    print('exposure:', len(ue), 'players with UEFA minutes,', len(maj), 'major-finals team days', flush=True)
+
+
+_EXPO = []
+
+
+def expo_attach(rows):
+    """the exposure inputs on snapshot / live rows (each needs tm, p, day, S): senior matchday squads before the day
+    (scripts/data/soccer_intl_squads.json.gz), last season's UEFA minutes (the frozen file) and last season's goals
+    and assists over expected (the player rows). A missing source leaves the inputs at 0"""
+    import bisect
+    if not _EXPO:
+        allp, majp, ue, over = defaultdict(list), defaultdict(list), {}, defaultdict(lambda: [0.0, 0.0])
+        try:
+            E = D.load(EXPO)
+            ue = E.get('ue') or {}
+            maj = {(d, t) for d, t in E.get('maj') or []}
+            import soccer_intl as I
+            for t, v in (I.callups().get('sq') or {}).items():
+                for pg in v:
+                    day = pg[0]
+                    big = any((_day_add(day, k), t) in maj for k in (0, -1, 1))
+                    for p in pg[3][0::2]:
+                        allp[p].append(day)
+                        if big:
+                            majp[p].append(day)
+            for m in (allp, majp):
+                for v in m.values():
+                    v.sort()
+        except (OSError, ValueError, KeyError) as e:
+            print(f'xMV exposure inputs missing ({e!r})', file=sys.stderr)
+        try:
+            for r in D.load(SP.ROWS):
+                e = over[(str(r['p']), r['S'])]
+                e[0] += r['g'] - r['x']; e[1] += r['as'] - r['xA']
+        except OSError:
+            pass
+        _EXPO.append((allp, majp, ue, over))
+    allp, majp, ue, over = _EXPO[0]
+
+    def cnt(v, lo, hi):
+        return bisect.bisect_left(v, hi) - bisect.bisect_left(v, lo) if v else 0
+    for r in rows:
+        if r.get('tm') is None:
+            continue
+        tm_, d = int(r['tm']), r['day'][:10]
+        r['nt12'] = math.log1p(cnt(allp.get(tm_), _day_add(d, -365), d))
+        r['nt24'] = math.log1p(cnt(allp.get(tm_), _day_add(d, -730), d))
+        r['ntm'] = math.log1p(cnt(majp.get(tm_), _day_add(d, -730), d))
+        r['ue1'] = (ue.get(str(tm_)) or {}).get(str(r['S'] - 1), 0) / 900
+        o = over.get((str(r['p']), r['S'] - 1))
+        r['gx1'], r['ax1'] = (o[0], o[1]) if o else (0.0, 0.0)
+    return rows
 
 
 def age_of(day, dob):
@@ -323,7 +421,7 @@ def fit():
     for r in rows:
         r['age'] = age_of(r['day'], r['dob'])
     levels(rows)
-    rows = [r for r in rows if r.get('mv') and 15 <= r['age'] <= 42]
+    rows = expo_attach([r for r in rows if r.get('mv') and 15 <= r['age'] <= 42])
     by = {md: [r for r in rows if r['day'][5:] == snapdate(2020, md).isoformat()[5:]] for md in SNAPS}
     mats = {}
     for md, rs in by.items():
@@ -565,10 +663,11 @@ def current():
              'gar': gv(o), 'gar1': prev[1][o['p']][0] if o['p'] in prev[1] else 0.0,
              'min1': prev[1][o['p']][1] if o['p'] in prev[1] else 0, 'gar2': prev[2][o['p']][0] if o['p'] in prev[2] else 0.0,
              'min2': prev[2][o['p']][1] if o['p'] in prev[2] else 0, 'tgd': gd / n, 'txgd': xgd / n,
-             'tgd1': gd1 / n1 if n1 else None, 'txgd1': None, 'mv': mv_now(d), 'tm': i}
+             'tgd1': gd1 / n1 if n1 else None, 'txgd1': None, 'mv': mv_now(d), 'tm': i, 'S': S}
         rows.append(r)
         dobs[o['p']] = dob[:10]
     levels(rows)
+    expo_attach(rows)
     key = predict(rows, F, day)
     cur = {r['p']: [round(r['xmv'] / 1e5) / 10, round(r['mv'] / 1e5) / 10 if r['mv'] else None, int(r['tm'])] for r in rows}
     D.save(CUR, {'season': S, 'asof': day, 'model': key, 'link': {**(old.get('link') or {}), **new}, 'v': cur,
@@ -633,6 +732,8 @@ if __name__ == '__main__':
         link()
     elif '--snaps' in sys.argv:
         snaps()
+    elif '--expo' in sys.argv:
+        expo_build()
     elif '--fit' in sys.argv:
         fit()
         write_hist()
