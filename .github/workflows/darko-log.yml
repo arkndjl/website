@@ -1,0 +1,31 @@
+# Daily forward log of DARKO's current player ratings (scripts/darko_log.py -> scripts/data/darko_log/). Nothing on
+# the site reads it; the log is scored once at season end, so the commit skips the Cloudflare build.
+name: darko log
+
+on:
+  schedule:
+    - cron: "20 15 * 1-6,10-12 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darko-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Snapshot
+        run: python3 scripts/darko_log.py
+      - name: Commit if it changed
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          python3 scripts/data_push.py -m "DARKO rating log ($(date -u +%Y-%m-%d))" --site data static -- scripts/data/darko_log
