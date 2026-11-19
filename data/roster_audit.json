@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-19T07:00Z",
+ "asof": "2026-11-19T08:56Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -4645,7 +4645,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 639
     },
     "static/data/lines/nhl.json": {
@@ -4653,19 +4653,55 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 856
     },
     "static/data/pctl-nhl.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 856
     },
     "static/data/xaav-nhl.json": {
-     "flags": 11,
+     "flags": 12,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-18",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "moved",
+     "head": "Dealt loss in growing rivalry",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-18",
+      "head": "Dealt loss in growing rivalry",
+      "kind": "trade"
+     },
+     "pid": "4804",
+     "player": "Mackenzie Blackwood",
+     "pos": "G",
+     "rotowire": "UTA",
+     "site": "COL"
+    },
+    {
+     "d": "2026-11-18",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Dealt loss in growing rivalry",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-18",
+      "head": "Dealt loss in growing rivalry",
+      "kind": "trade"
+     },
+     "pid": "4804",
+     "player": "Mackenzie Blackwood",
+     "pos": "G",
+     "rotowire": "UTA",
+     "site": "COL"
+    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4719,6 +4755,24 @@
      "pos": "D",
      "rotowire": "CAR",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-18",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "moved",
+     "head": "Dealt loss in growing rivalry",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-18",
+      "head": "Dealt loss in growing rivalry",
+      "kind": "trade"
+     },
+     "pid": "4804",
+     "player": "Mackenzie Blackwood",
+     "pos": "G",
+     "rotowire": "UTA",
+     "site": "COL"
     },
     {
      "d": "2026-09-11",
@@ -4899,6 +4953,24 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-18",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "moved",
+     "head": "Dealt loss in growing rivalry",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-18",
+      "head": "Dealt loss in growing rivalry",
+      "kind": "trade"
+     },
+     "pid": "4804",
+     "player": "Mackenzie Blackwood",
+     "pos": "G",
+     "rotowire": "UTA",
+     "site": "COL"
     },
     {
      "d": "2026-11-13",
