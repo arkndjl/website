@@ -19,6 +19,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +31,7 @@ SHARE = os.path.join(STORE, 'bo3_share.jsonl')
 EVENTS = os.path.join(ROOT, 'data', 'cs2_events.json')
 UA = 'arkndjl.net-arkboard/1.0 (https://arkndjl.net)'
 SEARCH = 'https://gamma-api.polymarket.com/public-search?limit_per_type=50&q='
+BO3 = 'https://api.bo3.gg/api/v1/'
 
 
 def curl(u):
@@ -81,7 +83,6 @@ def read(p):
 
 
 def main():
-    import cs2_bo3
     import cs2_events
     os.makedirs(STORE, exist_ok=True)
     stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -103,7 +104,8 @@ def main():
     try:
         for status, sort in (('upcoming', 'start_date'), ('finished', '-start_date')):
             for off in range(0, 300, 100):
-                res = cs2_bo3.get(f'matches?page[offset]={off}&page[limit]=100&sort={sort}&filter[matches.status][in]={status}')
+                res = curl(BO3 + urllib.parse.quote(f'matches?page[offset]={off}&page[limit]=100&sort={sort}&filter[matches.status][in]={status}', safe='/?&=,%'))
+                time.sleep(1)
                 got = share_rows(res['results'], status, stamp, last)
                 new += got
                 for r in got:
