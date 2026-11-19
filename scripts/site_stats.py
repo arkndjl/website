@@ -77,20 +77,7 @@ sum{requests pageViews bytes cachedBytes cachedRequests threats
 countryMap{clientCountryName requests} responseStatusMap{edgeResponseStatus requests}}}}}}'''
 
 
-def cloudflare(d):
-    tok = (os.environ.get('CLOUDFLARE_ANALYTICS_TOKEN') or os.environ.get('CLOUDFLARE_API_TOKEN') or '').strip()
-    if not tok:
-        print('cloudflare: no token, skipped')
-        return 0
-    z = (os.environ.get('CLOUDFLARE_ZONE_ID') or '').strip()
-    if not z:
-        r = cf('zones?name=' + urllib.parse.quote(ZONE), tok)
-        z = r['result'][0]['id']
-    a = (NOW.date() - dt.timedelta(days=7)).isoformat()
-    b = NOW.date().isoformat()
-    r = cf('graphql', tok, {'query': Q, 'variables': {'z': z, 'a': a, 'b': b}})
-    if r.get('errors'):
-        raise SystemExit('cloudflare: %s' % r['errors'])
+def merge_cf(d, r):
     n = 0
     for g in r['data']['viewer']['zones'][0]['httpRequests1dGroups']:
         s = g['sum']
@@ -105,6 +92,33 @@ def cloudflare(d):
             'cb': s['cachedBytes'], 'creq': s['cachedRequests'], 'thr': s['threats'], 'st': st,
             'cc': {x['clientCountryName']: x['requests'] for x in cc}}
         n += 1
+    return n
+
+
+def cloudflare(d):
+    tok = (os.environ.get('CLOUDFLARE_ANALYTICS_TOKEN') or os.environ.get('CLOUDFLARE_API_TOKEN') or '').strip()
+    if not tok:
+        print('cloudflare: no token, skipped')
+        return 0
+    z = (os.environ.get('CLOUDFLARE_ZONE_ID') or '').strip()
+    if not z:
+        r = cf('zones?name=' + urllib.parse.quote(ZONE), tok)
+        z = r['result'][0]['id']
+    back = int(os.environ.get('BACKFILL_DAYS') or 7)
+    n = 0
+    for k in range(0, back, 8):
+        # newest chunk first; the API's history limit ends the backfill at the first refused chunk
+        b = NOW.date() - dt.timedelta(days=k)
+        a = b - dt.timedelta(days=min(7, back - k))
+        r = cf('graphql', tok, {'query': Q, 'variables': {'z': z, 'a': a.isoformat(), 'b': b.isoformat()}})
+        if r.get('errors'):
+            if k == 0:
+                raise SystemExit('cloudflare: %s' % r['errors'])
+            print('cloudflare: history ends before %s (%s)' % (b, r['errors'][0].get('message', '')[:120]))
+            break
+        n += merge_cf(d, r)
+    if back > 7:
+        print('cloudflare: backfilled %d days' % back)
     print('cloudflare: %d days' % n)
     return n
 
@@ -165,13 +179,14 @@ def fit(us):
 
 
 def derive(d):
-    days = sorted(k for k, v in d['days'].items() if v.get('u') is not None)
+    # the headline series is page views (Noah Nov 19: views, not uniques); uniques stay in the file
+    days = sorted(k for k, v in d['days'].items() if v.get('pv') is not None)
     if not days:
         return
     # the dashboard's day for today is partial; leave it out of the summary until it closes
     if days[-1] >= NOW.date().isoformat():
         days = days[:-1]
-    us = [d['days'][k]['u'] for k in days]
+    us = [d['days'][k]['pv'] for k in days]
     s = {'first': days[0], 'last': days[-1], 'n': len(days), 'lastU': us[-1]}
     s['avg7'] = round(sum(us[-7:]) / min(7, len(us)), 1)
     if len(us) >= 14:
@@ -193,7 +208,8 @@ def derive(d):
         wd = {}
         for k, e in zip(days[-60:], res):
             wd.setdefault(dt.date.fromisoformat(k).weekday(), []).append(math.exp(e))
-        s['wd'] = [round(sum(wd.get(j, [1])) / max(len(wd.get(j, [])), 1), 3) for j in range(7)]
+        if len(w) >= 14:  # two of each weekday at least
+            s['wd'] = [round(sum(wd.get(j, [1])) / max(len(wd.get(j, [])), 1), 3) for j in range(7)]
     # 30-day Cloudflare totals, once the API has written them
     cfd = [d['days'][k] for k in days[-30:] if 'req' in d['days'][k]]
     if cfd:
@@ -228,7 +244,7 @@ def test():
     d = {'days': {}}
     base = dt.date(2026, 1, 1)
     for i in range(28):
-        d['days'][(base + dt.timedelta(i)).isoformat()] = {'u': round(500 * 1.02 ** i)}
+        d['days'][(base + dt.timedelta(i)).isoformat()] = {'pv': round(500 * 1.02 ** i)}
     derive(d)
     s = d['summary']
     assert abs(s['g7'] - 100 * (1.02 ** 7 - 1)) < 0.3, s['g7']

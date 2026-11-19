@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "15 */6 * * *"
   workflow_dispatch:
+    inputs:
+      backfill:
+        description: days of Cloudflare history to pull (the API stops where its history ends)
+        default: "7"
 
 permissions:
   contents: write
@@ -29,6 +33,7 @@ jobs:
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}   # used when the analytics token is unset (give it Zone Analytics Read)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BACKFILL_DAYS: ${{ inputs.backfill || '7' }}
         run: python3 scripts/site_stats.py
       - name: Commit if anything changed
         run: |
