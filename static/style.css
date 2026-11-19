@@ -4998,3 +4998,26 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
   .nws__it .nws__w { grid-area: w; }
   .nws__chip--major { margin-left: 0; }
 }
+/* /site/ (layouts/shortcodes/sitestats.html, partial sitebars.html) */
+.sst__body { padding: 8px 10px; background: var(--win-well); min-width: 0; }
+.sst__kpis { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 10px; padding: 0; list-style: none; }
+.sst__kpis li { display: flex; align-items: baseline; gap: 6px; }
+.sst__kpis b { font-size: 1.35em; color: var(--foreground); font-weight: normal; }
+.sst__up { color: #7fffd4; } .sst__dn { color: #ff9ec7; }
+.sst__c { width: 100%; height: 120px; display: block; }
+.sst__b { fill: #c8a2ff; } .sst__b--dim { fill: #6d5a99; } .sst__b2 { fill: #7fffd4; } .sst__l { fill: #7fffd4; } .sst__g { fill: rgba(200, 199, 255, .18); }
+.sst__c .sst__b:hover, .sst__c .sst__b2:hover { fill: #fff; }
+.sst__key { display: inline-block; width: 8px; height: 8px; margin: 0 4px 0 10px; vertical-align: 0; }
+.sst__key--b { background: #c8a2ff; } .sst__key--b2, .sst__key--l { background: #7fffd4; } .sst__key--l { height: 2px; vertical-align: 3px; }
+.sst__h { margin: 10px 0 4px; }
+.sst__hbar { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px; }
+.sst__hbar li { display: grid; grid-template-columns: 5ch minmax(0, 1fr) 6ch; align-items: center; gap: 8px; }
+.sst__hbar--cc li { grid-template-columns: 14ch minmax(0, 1fr) 9ch; }
+.sst__hbar--cc .esea__k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sst__hbar i { display: block; height: 10px; width: var(--w); background: #c8a2ff; } .sst__hbar i.is-hi { background: #7fffd4; }
+.sst__hbar b { font-weight: normal; text-align: right; }
+.sst__t { width: 100%; }
+@media (max-width: 640px) { .sst__c { height: 96px; } .sst__kpis { gap: 6px 12px; } .sst__hbar--cc li { grid-template-columns: 10ch minmax(0, 1fr) 7ch; } }
+.post ul.sst__kpis li::before, .post ul.sst__hbar li::before { content: none; }
+.sst__axis { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: .75em; opacity: .8; margin: 4px 0 0; } .sst__axis > span:nth-child(2) { white-space: nowrap; }
+@media (max-width: 640px) { .sst__axis > span:nth-child(2) { order: 3; flex-basis: 100%; } }

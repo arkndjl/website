@@ -1,0 +1,44 @@
+# The /site/ section's numbers (scripts/site_stats.py -> data/site_stats.json): Cloudflare zone analytics (needs secret
+# CLOUDFLARE_ANALYTICS_TOKEN: custom token with Zone > Analytics > Read and Zone > Zone > Read on arkndjl.net; optional
+# CLOUDFLARE_ZONE_ID) and GitHub merges/commits. Every 6 hours; Cloudflare's day is UTC.
+name: site stats
+
+on:
+  schedule:
+    - cron: "15 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: site-stats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Fetch
+        env:
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/site_stats.py
+      - name: Commit if anything changed
+        run: |
+          git add data/site_stats.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
+          git commit -m "Update site stats ($(date -u +%Y-%m-%dT%H:%MZ))"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git pull --rebase -X theirs origin main || exit 1
+          done
+          exit 1

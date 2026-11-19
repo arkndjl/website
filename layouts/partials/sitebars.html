@@ -1,0 +1,17 @@
+{{- /* Pixel bar chart for /site/ (layouts/shortcodes/sitestats.html): dict "v" (values) "v2" (optional, stacked on v)
+       "line" (optional, a step line over the bars; 0 or less = none) "t" (hover title per bar) "dim" (index of a bar drawn
+       dim, -1 none) "label" (aria label). Width scales to the window; bars stay crisp. */ -}}
+{{- $v := .v }}{{ $n := len $v }}{{ $v2 := .v2 | default slice }}{{ $ln := .line | default slice }}{{ $dim := .dim | default -1 -}}
+{{- $mx := 1.0 }}{{ range $i, $x := $v }}{{ $s := float $x }}{{ if $v2 }}{{ $s = add $s (float (index $v2 $i)) }}{{ end }}{{ $mx = math.Max $mx $s }}{{ end }}{{ range $ln }}{{ $mx = math.Max $mx (float .) }}{{ end -}}
+{{- $H := 100.0 }}{{ $bw := 6 -}}
+<svg class="sst__c" viewBox="0 0 {{ mul $n $bw }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="{{ .label }}">
+{{- range $i := seq 0 4 }}<rect x="0" y="{{ mul (float $i) 25 }}" width="{{ mul $n $bw }}" height="0.5" class="sst__g"/>{{ end -}}
+{{- range $i, $x := $v }}{{ $h := math.Round (mul (div (float $x) $mx) (sub $H 4)) }}{{ $cls := cond (eq $i $dim) "sst__b sst__b--dim" "sst__b" -}}
+<rect x="{{ mul $i $bw }}" y="{{ sub $H $h }}" width="{{ sub $bw 2 }}" height="{{ $h }}" class="{{ $cls }}"><title>{{ index $.t $i }}</title></rect>
+{{- if $v2 }}{{ $h2 := math.Round (mul (div (float (index $v2 $i)) $mx) (sub $H 4)) }}{{ if gt $h2 0 }}<rect x="{{ mul $i $bw }}" y="{{ sub (sub $H $h) $h2 }}" width="{{ sub $bw 2 }}" height="{{ $h2 }}" class="sst__b2"><title>{{ index $.t $i }}</title></rect>{{ end }}{{ end -}}
+{{- end -}}
+{{- range $i, $y := $ln }}{{ if gt (float $y) 0 }}{{ $py := sub $H (math.Round (mul (div (float $y) $mx) (sub $H 4))) -}}
+<rect x="{{ mul $i $bw }}" y="{{ sub $py 1 }}" width="{{ $bw }}" height="2" class="sst__l"/>
+{{- if lt (add $i 1) (len $ln) }}{{ $ny := float (index $ln (add $i 1)) }}{{ if gt $ny 0 }}{{ $py2 := sub $H (math.Round (mul (div $ny $mx) (sub $H 4))) }}<rect x="{{ sub (mul (add $i 1) $bw) 1 }}" y="{{ sub (math.Min $py $py2) 1 }}" width="2" height="{{ add (math.Abs (sub $py2 $py)) 2 }}" class="sst__l"/>{{ end }}{{ end -}}
+{{- end }}{{ end -}}
+</svg>
