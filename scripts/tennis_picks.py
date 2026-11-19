@@ -49,6 +49,15 @@ LEAK = 0.5               # the share of the open-to-close edge still there at th
 PAPER_FROM = '2026-11-05T15:00:00Z'
 PAPER_BACK = (30, 1.65)  # back live at n graded since PAPER_FROM, clvRet > 0 at t this or more
 CAP = 2.0                # DU a pick, held until live picks grade
+# Polymarket (global) as a venue (Noah, Nov 19 2026; scripts/polymarket_global.py). Its own rule, as tested on the
+# venue's price history (scripts/research/sweep_nov19/tennis-cs2/t1_pm.py, T1b): tour-level main draws, flagged 6 to 24
+# hours before the start at the market's mid e, the model's side when model - e >= PMG_X and .25 <= e <= .75. Tune Oct
+# 2025-Apr 2026 (164 picks, CLV +4.15 points after the fee and half spread, t 3.49), held May-Nov 10 2026 (404 picks,
+# CLV +2.18, t 4.48, realised +8.3%, t 1.28). The price is the ask plus the fee; the calibrated chance moves PMG_K of
+# the way from e toward the model (the held slope of the move to the price an hour before the start). A pick here is
+# on the board whatever the Novig rule's paper switch says (bk 'pmg'), and is judged at the venue's price an hour before
+# the start.
+PMG_X, PMG_K, PMG_E, PMG_H, PMG_SPREAD = 0.04, 0.559, (0.25, 0.75), (6, 24), 0.04
 TUNE, HELD = 2025, 2026
 OOF_TUNE = os.environ.get('TENNIS_OOF_TUNE', '1') == '1'
 CM_LAG = int(os.environ.get('TENNIS_CM_LAG', 7))  # tennis_model.CM_LAG   # market memory sees closes from events started 7+ days earlier, as live
@@ -257,6 +266,43 @@ def stake(pc, o):
     return min(CAP, picks_oos.scaled(max(0.25, round(ev / b * 100 * 4) / 4), 'tennis')), ev
 
 
+def global_pick(g, pmg, now):
+    """the Polymarket (global) rule on one tennis.json match -> the pick's price fields, or None"""
+    import names
+    if not (g.get('lv') in TOUR_LV and not is_qual(g.get('rd', ''))):
+        return None
+    a, b = g['a']['n'], g['b']['n']
+    row = fl = None
+    for r in pmg:
+        if r['lg'] != g['tour'].upper():
+            continue
+        if names.same(a, r['a']) and names.same(b, r['b']):
+            row, fl = r, False
+        elif names.same(a, r['b']) and names.same(b, r['a']):
+            row, fl = r, True
+        if row:
+            break
+    if not row or row['ask'] - row['bid'] > PMG_SPREAD:
+        return None
+    start = datetime.datetime.strptime(row['start'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=datetime.timezone.utc)
+    tip = datetime.datetime.strptime(g['tip'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=datetime.timezone.utc)
+    hrs = (start - now).total_seconds() / 3600
+    if abs((start - tip).total_seconds()) > 12 * 3600 or not PMG_H[0] <= hrs <= PMG_H[1]:
+        return None
+    import polymarket_global as PG
+    # first player's (a's) chance: the model, and the venue's mid, bid and ask
+    pm = float(g['p'])
+    bid, ask = (1 - row['ask'], 1 - row['bid']) if fl else (row['bid'], row['ask'])
+    mid = (bid + ask) / 2
+    side = 'away' if pm > mid else 'home'                  # away = the first player (a)
+    q, e, buy = (pm, mid, ask) if side == 'away' else (1 - pm, 1 - mid, 1 - bid)
+    if q - e < PMG_X or not PMG_E[0] <= e <= PMG_E[1]:
+        return None
+    tok = row['tok'][(1 if fl else 0) if side == 'away' else (0 if fl else 1)]
+    return {'side': side, 'price': american(PG.cost(buy)), 'edge': round((q - e) * 100, 1), 'm': round(q, 4), 'mkt': round(e, 4),
+            'p': round(sig(lg(e) + PMG_K * (lg(q) - lg(e))), 4), 'bk': 'pmg', 'tok': tok, 'pmgStart': row['start']}
+
+
 def live():
     import novig
     import polymarket
@@ -276,13 +322,39 @@ def live():
     except (OSError, ValueError):
         old = {}
     log = {str(e['id']): e for e in old.get('log', [])}
-    pv0 = [e['clvRet'] for e in log.values() if e.get('clvRet') is not None and not e.get('pass') and e.get('flagged', '') >= PAPER_FROM]
+    pv0 = [e['clvRet'] for e in log.values() if e.get('clvRet') is not None and not e.get('pass') and e.get('flagged', '') >= PAPER_FROM and e.get('bk') != 'pmg']
     paper0 = not (len(pv0) >= PAPER_BACK[0] and sum(pv0) > 0 and (tstat(pv0) or 0) >= PAPER_BACK[1])
     games, board = {}, []
+    try:
+        import polymarket_global
+        pmg = polymarket_global.h2h()
+    except Exception as ex:  # noqa: BLE001
+        print('polymarket global failed:', ex)
+        pmg = []
+    n_pmg = 0
     for g in T.get('matches', []):
         if g.get('state') != 'pre' or g['tip'] <= stamp:
             continue
         a, b = g['a'], g['b']
+        # Polymarket (global): its own rule (PMG_*), first in line; a match it does not flag falls through to the rest
+        held = log.get(str(g['id']))
+        if held is not None and held.get('bk') == 'pmg':   # already flagged at Polymarket (global): it stands as flagged
+            held['kick'] = g['tip']
+            games[str(g['id'])] = {'mk': 'ml', 'side': held['side'], 'line': None, 'price': held['price'], 'edge': held['edge'], 'ev': held['ev'],
+                                   'units': held['units'], 'home': held['home'], 'away': held['away'], 'state': 'pick', 'bk': 'pmg'}
+            continue
+        gp = global_pick(g, pmg, now) if pmg and held is None else None
+        if gp:
+            n_pmg += 1
+            u, ev = stake(gp['p'], gp['price'])
+            if u > 0:
+                log[str(g['id'])] = {'id': g['id'], 'nid': None, 'fl': False, 'sport': 'tennis', 'tour': g['tour'], 'ev_': g['ev'],
+                                     'kick': g['tip'], 'home': short(b['n']), 'away': short(a['n']), 'homeN': b['n'], 'awayN': a['n'],
+                                     'mk': 'ml', 'line': None, 'x': round(PMG_X * 100), **gp, 'ev': round(ev, 4), 'pDU': gp['p'], 'evDU': round(ev, 4),
+                                     'units': u, 'flagged': stamp}
+                games[str(g['id'])] = {'mk': 'ml', 'side': gp['side'], 'line': None, 'price': gp['price'], 'edge': gp['edge'], 'ev': round(ev, 4),
+                                       'units': u, 'home': short(b['n']), 'away': short(a['n']), 'state': 'pick', 'bk': 'pmg'}
+                continue
         nv = novig.h2h_price(nvg, a['n'], b['n'], lg=g['tour'].upper()) if nvg else None
         if not nv:
             continue
@@ -354,6 +426,19 @@ def live():
                 e['res'] = 'w' if won else 'l'
                 e['profit'] = round(dec(e['price']) - 1, 4) if won else -1.0
             e['score'] = r.get('sc')
+        if e.get('bk') == 'pmg':
+            # judged at the venue's price an hour before the start (one request a pick, once)
+            if e.get('close') is None and e['kick'] <= stamp and not e.get('noClose'):
+                import polymarket_global as PG
+                pcl = PG.close(e['tok'], e.get('pmgStart') or e['kick'])
+                if pcl is None:
+                    e['noClose'] = True
+                else:
+                    e['close'] = round(pcl, 4)
+                    e['clvRet'] = round(pcl * dec(e['price']) - 1, 4)
+                    e['clv'] = round((pcl - e['mkt']) * 100, 1)
+                    e['beat'] = 1 if pcl > e['mkt'] + .005 else (-1 if pcl < e['mkt'] - .005 else 0)
+            continue
         c = cl.get(e.get('nid'))
         if c and e.get('close') is None and e['kick'] <= stamp:
             pb = 1 - c['p'] if e.get('fl') else c['p']      # the archive's p is Novig's second side; fl: a is that side
@@ -383,16 +468,17 @@ def live():
     rec.update({'clvN': len(cv), 'clvRet': round(sum(cv) / len(cv), 4) if cv else None, 'clvT': tstat(cv)})
     cut = (now - datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:%M:%SZ')
     picks = [e for e in L if e.get('res') is None and e['kick'] > cut]
-    pv = [e['clvRet'] for e in L if e.get('clvRet') is not None and not e.get('pass') and e.get('flagged', '') >= PAPER_FROM]
+    pv = [e['clvRet'] for e in L if e.get('clvRet') is not None and not e.get('pass') and e.get('flagged', '') >= PAPER_FROM and e.get('bk') != 'pmg']
     paper = not (len(pv) >= PAPER_BACK[0] and sum(pv) > 0 and (tstat(pv) or 0) >= PAPER_BACK[1])
     rec['paperSince'] = {'n': len(pv), 'clvRet': round(sum(pv) / len(pv), 4) if pv else None, 'clvT': tstat(pv)}
     paper_picks = []
     if paper:
-        paper_picks, picks = picks, []
+        # the paper switch is the Novig rule's: Polymarket (global) picks stay on the board
+        paper_picks, picks = [e for e in picks if e.get('bk') != 'pmg'], [e for e in picks if e.get('bk') == 'pmg']
         for e in paper_picks:
             e['paper'] = True                              # open picks already flagged drop off the night cap too
         for gm in games.values():
-            if gm['state'] == 'pick':
+            if gm['state'] == 'pick' and gm.get('bk') != 'pmg':
                 gm['state'], gm['units'] = 'paper', 0.0
     recent = [e for e in L if e.get('res') is not None][-12:]
     out = {'sport': 'tennis', 'name': 'Tennis', 'asof': stamp, 'rule': {'on': bool(on), 'x': F['x'], 'k': F['k'], 'leak': LEAK, 'cap': CAP,
@@ -402,7 +488,7 @@ def live():
         json.dump(out, f, separators=(',', ':'), allow_nan=False)
     import night_cap      # the nightly exposure cap over every sport's picks (40% a night)
     night_cap.apply(['tennis'])
-    print(f"tennis picks: {'PAPER ' + str(len(paper_picks)) if paper else len(picks)} open, {len(games)} priced at Novig, rule {'on X ' + str(X) if on else 'off'}, record {rec}")
+    print(f"tennis picks: {len(picks)} open, {len(paper_picks)} paper, {n_pmg} flagged at Polymarket (global) of {len(pmg)} listed, {len(games)} priced, rule {'on X ' + str(X) if on else 'off'}, record {rec}")
 
 
 if __name__ == '__main__':

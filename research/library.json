@@ -501,11 +501,13 @@
     },
     {
      "term": "1Y / 3Y XPM",
-     "short": "Projected XPM next season and over the next three, minutes-weighted, given he plays.",
+     "short": "Projected XPM next season (given he plays) and over the next three (x the chance he plays in them).",
      "body": [
       "From XPM (proj), age, projected minutes, a hinge above +3, and the two seasons before; coefficients by share of the season played.",
-      "Fit on seasons with minutes, weighted by them. The chance he is off the board is not in it.",
-      "Held out 2012-23, 1,000+ minutes in the window: 3Y RMSE 1.13, 1Y 1.14; bias within .25 at every level. Display only."
+      "Given he plays: fit on seasons with minutes, weighted by them. Held out 2012-23, 1,000+ minutes: 3Y RMSE 1.13, 1Y 1.14.",
+      "3Y = stay x XPM given he plays + (1 - stay) x -2. Stay = chance he plays in the next three seasons (XPM, age, minutes, games).",
+      "Held out 2012-23 (6,165 player seasons, 18% out of the league): RMSE 2.81 -> 2.78 (t -4.4, 11/12 seasons).",
+      "Display only."
      ],
      "where": "NBA VORX/XPM leaders (3Y chip), projections",
      "sports": [
@@ -922,22 +924,40 @@
      ]
     },
     {
-     "term": "Exit hurdle (NHL 3Y)",
+     "term": "Award odds",
+     "short": "Chance of each award: a voter model on simulated rests of the season, blended with Polymarket where a liquid market is open.",
+     "body": [
+      "Model: 3,000 simulated rests of the season, each finish scored by a voter model fit on past ballots.",
+      "Blend: model^.05 x market^.95, renormalised. 7 held 2025-26 races, winner log loss: model 2.32, market 1.12, blend 1.13 (t -2.3).",
+      "Blended only when the event has 3+ two-sided quotes, prices summing within 25% of 1 and $50,000 traded. Otherwise model only.",
+      "The cell hover keeps the model number; the weekly ledger scores the model alone against the market."
+     ],
+     "where": "Awards tabs: NBA, NFL, NHL, CFB, CBB, soccer",
+     "sports": [
+      "NBA",
+      "NFL",
+      "NHL",
+      "CFB",
+      "CBB",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Exit hurdle (NHL / NBA 3Y)",
      "short": "3Y WAR = the chance he plays in the next three seasons x his WAR if he does.",
      "body": [
       "Stay chance: logistic on pWAR pace, age, age squared, ln TOI per 82 and share of team games played.",
       "WAR if he plays: the 3Y form refit on players who stayed.",
-      "Leave one season out 2010-23: skaters RMSE 2.455 -> 2.447 (t -6.9 by season, 14 of 14), goalies 4.074 -> 4.066 (t -3.0",
-      "10 of 14). Kept at every season share .1 to 1.",
+      "Leave one season out 2010-23: skaters RMSE 2.455 -> 2.447 (t -6.9 by season, 14 of 14), goalies 4.074 -> 4.066 (t -3.0, 10 of 14).",
+      "Kept at every season share .1 to 1.",
       "IN 3Y column (skaters): chance he plays in season S+3; held-out error under 3 points in every tenth.",
       "Goalies fail that check (up to 10 points) and get no column.",
-      "NBA: the same hurdle beats the shrunk 3Y target (RMSE .8325 -> .818, t -11.0, 12 of 12)",
-      "but the live NBA 3Y is already XPM given he plays",
-      "its in-league chance misses calibration (8 points in one tenth), so no NBA column."
+      "NBA: 3Y XPM = stay x XPM given he plays + (1 - stay) x -2. Numbers under 1Y / 3Y XPM."
      ],
-     "where": "NHL value board (3Y, IN 3Y)",
+     "where": "NHL value board (3Y, IN 3Y); NBA VORX/XPM leaders (3Y)",
      "sports": [
-      "NHL"
+      "NHL",
+      "NBA"
      ]
     },
     {
@@ -1787,7 +1807,10 @@
      "short": "Model side when it differs from the Novig no-vig price by 4+ points of win chance.",
      "body": [
       "Calibrated chance = no-vig + .5 x k toward the model (k .25 logits). Cap 2% a bet.",
-      "Tour-level main draws; tuned 2025, held out 2026: 1,935 picks, +4.5% worth at close (t 19)."
+      "Tour-level main draws; tuned 2025, held out 2026: 1,935 picks, +4.5% worth at close (t 19).",
+      "Polymarket (global) venue: tour-level main draws, 6 to 24 hours out, model 4+ points over the mid, mid between 25% and 75%.",
+      "Price = ask + fee (.03 x p x (1 - p)). Tune Oct 2025-Apr 2026: 164 picks, close value +4.2 points (t 3.5).",
+      "Held May-Nov 10 2026: 404 picks, close value +2.2 points after costs (t 4.5), realised +8.3% (t 1.3). Paper stakes."
      ],
      "where": "Predictions picks, game table",
      "sports": [
@@ -1897,7 +1920,10 @@
      "short": "Teams pick on -ln(xPick) + need weight x need.",
      "body": [
       "Need from the whole NFL position room: rookie-deal draft capital or salary, cut for age and expiring deals.",
-      "Penalties for doubling up, a set QB and position runs. QB top-pick premium decays by pick."
+      "Penalties for doubling up, a set QB and position runs. QB top-pick premium decays by pick.",
+      "Pre-draft meetings: +3.0 log-pick units for a top-30 visit or private workout with the team, +1.75 for another meeting.",
+      "Real picks 1-100, 2024-26: top-1 hits 5.7% -> 11.7%; weight picked on two drafts, scored on the third +4.0 points (t 2.5).",
+      "Off until the 2027 meetings page exists (winter)."
      ],
      "where": "CFB mocks (pick reports)",
      "sports": [

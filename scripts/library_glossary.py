@@ -17,6 +17,10 @@ _HKN = {'ls': 'log slot (board rank as slot)', 'nhle': 'draft-year NHLe', 'D': '
         'chl1': 'CHL first-round pick', 'cs': 'class strength', 'agenh': 'age', 'ht': 'height', 'wt': 'weight'}
 _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'ls2'))
 
+_NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
+_NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
+          f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
+
 ALLP = ['CFB', 'NFL', 'CBB', 'NBA', 'NHL', 'Hockey', 'Soccer', 'Tennis']
 
 
@@ -203,10 +207,11 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, XPM .330).',
        'Next-three-season XPM: the rookie 3Y orders it best (.481; aXPM .413, XPM .417, VORX .351).'],
       'NBA VORX/XPM leaders, projections, contract value', ['NBA']),
-    E('1Y / 3Y XPM', 'Projected XPM next season and over the next three, minutes-weighted, given he plays.',
+    E('1Y / 3Y XPM', 'Projected XPM next season (given he plays) and over the next three (x the chance he plays in them).',
       ['From XPM (proj), age, projected minutes, a hinge above +3, and the two seasons before; coefficients by share of the season played.',
-       'Fit on seasons with minutes, weighted by them. The chance he is off the board is not in it.',
-       'Held out 2012-23, 1,000+ minutes in the window: 3Y RMSE 1.13, 1Y 1.14; bias within .25 at every level. Display only.'],
+       'Given he plays: fit on seasons with minutes, weighted by them. Held out 2012-23, 1,000+ minutes: 3Y RMSE 1.13, 1Y 1.14.',
+       '3Y = stay x XPM given he plays + (1 - stay) x -2. Stay = chance he plays in the next three seasons (XPM, age, minutes, games).',
+       _NBAEX, 'Display only.'],
       'NBA VORX/XPM leaders (3Y chip), projections', ['NBA']),
     E('XPM (proj)', 'Season-to-date XPM blended with a preseason prior by minutes.',
       ['prior + (XPM - prior) x MP / (k + MP); k 509 veterans, 809 newcomers (7,269 player seasons 2012-26).',

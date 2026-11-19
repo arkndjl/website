@@ -2592,7 +2592,21 @@ const carriedRows = now => {
 };
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
-const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : {}), combine });
+// pre-draft meetings by NFL team (scripts/nfl_meetings.py -> scripts/data/nfl_meetings/<draft year>.json, logged by the
+// board workflow once WalterFootball's page exists): { team: { compact name: 2 (top-30 visit or private workout) | 1 } }
+// for the mock's MEET_LN (cfb_teams.mjs); {} before the page exists
+const MEET_F = path.join(ROOT, 'scripts', 'data', 'nfl_meetings', `${SEASON + 1}.json`);
+const meetings = (() => {
+  const out = {};
+  if (!fs.existsSync(MEET_F)) return out;
+  for (const [team, rows] of Object.entries(JSON.parse(fs.readFileSync(MEET_F, 'utf8')).teams || {}))
+    for (const [name, , , tags] of rows) {
+      const k = compact(name), v = (tags || []).some(t => t === 'T30' || t === 'PRI') ? 2 : 1;
+      (out[team] ||= {})[k] = Math.max(out[team][k] || 0, v);
+    }
+  return out;
+})();
+const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : {}), combine, meetings });
 // Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus;
 // Transfer% (cfb_transfer.mjs) once its inputs are in (tctx, below), after Draft%, which sets its floor on leaving
 let tctx = null;

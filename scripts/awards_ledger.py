@@ -43,8 +43,10 @@ def rows_of(d):
         if not t:
             continue
         for r in s.get('races', []):
-            cand = [[c.get('n'), c.get('tm'), round(c['p'], 4), (round(c['mkt'], 4) if c.get('mkt') is not None else None)]
-                    for c in r.get('rows', []) if c.get('p') is not None and (c['p'] >= MIN_P or c.get('mkt') is not None)]
+            # the model's own number: a blended race (awards.py MKT_W) keeps it as pm; rows the market alone added have none
+            mp = lambda c: c.get('pm') if 'pm' in c else c.get('p')  # noqa: E731
+            cand = [[c.get('n'), c.get('tm'), round(mp(c), 4), (round(c['mkt'], 4) if c.get('mkt') is not None else None)]
+                    for c in r.get('rows', []) if mp(c) is not None and (mp(c) >= MIN_P or c.get('mkt') is not None)]
             if cand:
                 out.append({'t': t, 'wk': week(t), 'sport': sport, 'race': r.get('key'), 'mkt': bool(r.get('mkt')), 'rows': cand})
     return out

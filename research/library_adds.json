@@ -97,22 +97,21 @@
    "section": "players",
    "after": "P20 / P50 / P80 projections",
    "entry": {
-    "term": "Exit hurdle (NHL 3Y)",
+    "term": "Exit hurdle (NHL / NBA 3Y)",
     "short": "3Y WAR = the chance he plays in the next three seasons x his WAR if he does.",
     "body": [
      "Stay chance: logistic on pWAR pace, age, age squared, ln TOI per 82 and share of team games played.",
      "WAR if he plays: the 3Y form refit on players who stayed.",
-     "Leave one season out 2010-23: skaters RMSE 2.455 -> 2.447 (t -6.9 by season, 14 of 14), goalies 4.074 -> 4.066 (t -3.0",
-     "10 of 14). Kept at every season share .1 to 1.",
+     "Leave one season out 2010-23: skaters RMSE 2.455 -> 2.447 (t -6.9 by season, 14 of 14), goalies 4.074 -> 4.066 (t -3.0, 10 of 14).",
+     "Kept at every season share .1 to 1.",
      "IN 3Y column (skaters): chance he plays in season S+3; held-out error under 3 points in every tenth.",
      "Goalies fail that check (up to 10 points) and get no column.",
-     "NBA: the same hurdle beats the shrunk 3Y target (RMSE .8325 -> .818, t -11.0, 12 of 12)",
-     "but the live NBA 3Y is already XPM given he plays",
-     "its in-league chance misses calibration (8 points in one tenth), so no NBA column."
+     "NBA: 3Y XPM = stay x XPM given he plays + (1 - stay) x -2. Numbers under 1Y / 3Y XPM."
     ],
-    "where": "NHL value board (3Y, IN 3Y)",
+    "where": "NHL value board (3Y, IN 3Y); NBA VORX/XPM leaders (3Y)",
     "sports": [
-     "NHL"
+     "NHL",
+     "NBA"
     ]
    }
   },
@@ -257,6 +256,29 @@
      "Tennis"
     ]
    }
+  },
+  {
+   "section": "players",
+   "after": "P20 / P50 / P80 projections",
+   "entry": {
+    "term": "Award odds",
+    "short": "Chance of each award: a voter model on simulated rests of the season, blended with Polymarket where a liquid market is open.",
+    "body": [
+     "Model: 3,000 simulated rests of the season, each finish scored by a voter model fit on past ballots.",
+     "Blend: model^.05 x market^.95, renormalised. 7 held 2025-26 races, winner log loss: model 2.32, market 1.12, blend 1.13 (t -2.3).",
+     "Blended only when the event has 3+ two-sided quotes, prices summing within 25% of 1 and $50,000 traded. Otherwise model only.",
+     "The cell hover keeps the model number; the weekly ledger scores the model alone against the market."
+    ],
+    "where": "Awards tabs: NBA, NFL, NHL, CFB, CBB, soccer",
+    "sports": [
+     "NBA",
+     "NFL",
+     "NHL",
+     "CFB",
+     "CBB",
+     "Soccer"
+    ]
+   }
   }
  ],
  "append": [
@@ -300,6 +322,22 @@
    "lines": [
     "NBA minutes in a team's first 10 games add preseason starts (share of the last two preseason games started",
     "fading to 0 by game 11): games 1-10 held 2024-26 minutes MAE 4.714 -> 4.676 (t -3.48, 3/3 seasons)."
+   ]
+  },
+  {
+   "term": "Team needs and pick rule",
+   "lines": [
+    "Pre-draft meetings: +3.0 log-pick units for a top-30 visit or private workout with the team, +1.75 for another meeting.",
+    "Real picks 1-100, 2024-26: top-1 hits 5.7% -> 11.7%; weight picked on two drafts, scored on the third +4.0 points (t 2.5).",
+    "Off until the 2027 meetings page exists (winter)."
+   ]
+  },
+  {
+   "term": "Tennis picks",
+   "lines": [
+    "Polymarket (global) venue: tour-level main draws, 6 to 24 hours out, model 4+ points over the mid, mid between 25% and 75%.",
+    "Price = ask + fee (.03 x p x (1 - p)). Tune Oct 2025-Apr 2026: 164 picks, close value +4.2 points (t 3.5).",
+    "Held May-Nov 10 2026: 404 picks, close value +2.2 points after costs (t 4.5), realised +8.3% (t 1.3). Paper stakes."
    ]
   }
  ],

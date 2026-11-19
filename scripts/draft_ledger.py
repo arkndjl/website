@@ -38,6 +38,13 @@ PRE-REGISTERED SCORING (fixed 2026-10-25; change only with a dated note below, b
             new split = .80 x r / (1 + r) with r halfway between 1.0 and the fit (one class is a small sample);
             otherwise On3 stays .40. Same test at `fall`, reported only.
   Results go to data/draft_ledger_<sport>_<class>.json. A failed test is a result: it is reported, not tuned away.
+
+DATED NOTES
+  2026-11-19  cfb mocks: the pre-draft meetings term (MEET_LN [0, 1.75, 3.0] log-pick units, scripts/cfb_teams.mjs) is
+              on from the first snapshot after WalterFootball's 2027 meetings page exists (winter); snapshots before
+              that are unchanged. Named variant "meetings": scored as the `final` mock's team match (the share of
+              picks 1-100 whose team the mock named) against the last snapshot before the page existed. Scoring rules
+              above are not changed.
 """
 import csv, datetime as dt, gzip, io, json, math, os, random, subprocess, sys
 

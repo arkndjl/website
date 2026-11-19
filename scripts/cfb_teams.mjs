@@ -1421,7 +1421,7 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
 const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
 const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
-function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [], top = 0, rep = 0, draftYear }, conv) {
+function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [], top = 0, rep = 0, meet = 0, draftYear }, conv) {
   const needs = scored.map(([g]) => g), nk = k.group || k.pos, lines = [], ni = needs.indexOf(nk);
   // need: where the position ranks among the team's needs, and who's in the room now
   let need = ni === 0 ? `${nk} #1` : ni > 0 ? `${nk} #${ni + 1} (top: ${needs[0]})`
@@ -1429,6 +1429,7 @@ function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [], top = 0, rep
   if (dup > 0) need += `; ${ordinal(dup + 1)} ${k.pos} of the draft`;
   if (top >= 0.05) need += "; QB premium at the top";   // QB_TOP
   if (rep && k.round <= REPEAT_ROUNDS) need += `; ${LINE_GROUP[nk] || nk} in round 1, ${draftYear - rep}`;   // REPEAT_LN
+  if (meet) need += meet === 2 ? '; top-30 visit or private workout' : '; met before the draft';   // MEET_LN
   lines.push(['Need', need + '.']);
   // every need the team has left at this pick (NEED_MIN and up), with its weight: 1 = an empty room
   if (scored.length) lines.push(['Needs', scored.map(([g, v]) => `${g} ${v.toFixed(2).replace(/^0/, '')}`).join(', ') + '.']);
@@ -1496,7 +1497,15 @@ const futV = r => FUTURE_DISC * mtv(16 + 32 * (r - 1));    // a next-year pick: 
 export const TRADE_SHAPE = { gapLn: 0.2, gapRef: [5, 7], futOwn: 1.5, futR1Round: 1 };
 // the most any team's utility sits above -ln xPick (a need, the kicker need): the best player for a team can't sit
 // further down the xPick order than that, so the scans stop there
-const MAX_BONUS = Math.max(NEED_W, SPEC_NEED_LN * (1 - SPEC_CENTER)) + 1e-9;
+const MAX_BONUS0 = Math.max(NEED_W, SPEC_NEED_LN * (1 - SPEC_CENTER)) + 1e-9;
+// pre-draft meetings (priors.meetings: { team: { compact name: 2 | 1 } }, scripts/nfl_meetings.py, read in fetch_cfb.mjs
+// draftPriors): log-pick units a team adds for a prospect it brought in on a top-30 visit or a private workout (2), or
+// met only at the combine, a pro day, the Senior Bowl, a local day or by video (1). Team information, so all three
+// mocks. Sized as an argmax on real picks 1-100 of the 2024-26 drafts (the 40 best left on the DraftTek final board):
+// top-1 hits 5.7% -> 11.7% at 3.0, the weight picked on two drafts scored on the third +4.0 points (t 2.52 by
+// draft-team, 3/3 drafts); as a logit, +.144 log-lik a pick (t 4.52). scripts/research/sweep_nov19/cfb/meetings.py
+// and meetings_weight.py. 0 for every player until the draft year's page exists (winter).
+const MEET_LN = [0, 1.75, 3.0];
 // UDFA signings: after round 7 the best prospects left (by xPick) sign where they can play: each, in order, goes
 // to the team with the biggest need left at his room after the draft (the picks fill it as in the mock), less what it
 // already added there in the draft and in this list (UDFA_CROWD per signing). A projection from need, not backtested:
@@ -1543,6 +1552,15 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
     return r ? (r[1]?.includes(g) ? REPEAT_LN[0] : 0) + (r[2]?.includes(g) ? REPEAT_LN[1] : 0) : 0;
   };
   const qbPrem = pick => qbTop * Math.exp(-((pick ?? 99) - 1) / QB_TOP_TAU);
+  const meets = P.meetings || {}, hasMeet = Object.keys(meets).length > 0;
+  const meetKey = new Map();
+  const meetOf = (team, p) => {
+    if (!hasMeet) return 0;
+    let k = meetKey.get(p);
+    if (k === undefined) meetKey.set(p, k = compact(p.name));
+    return meets[team]?.[k] || 0;
+  };
+  const MAX_BONUS = MAX_BONUS0 + (hasMeet ? MEET_LN[2] : 0);   // the scans below reach as far down as a visit can lift a player
   const util = (team, round, p, pos, moved, nk = pos, pick = null) => {
     const tn = needOf(team), pr = P.perRound[pos], ri = Math.min(round, pr?.length || 3) - 1, spec = !!SPEC_SLOT[pos];
     const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' || spec ? QB_DUP_LN : DUP_LN);   // a second QB (or kicker) in one draft is rare
@@ -1552,7 +1570,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
     const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
     const need = pos === 'K' ? SPEC_NEED_LN * ((tn.K?.score ?? SPEC_CENTER) - SPEC_CENTER) : spec ? 0 : NEED_W * (tn[nk]?.score ?? 0);
     const top = pos === 'QB' && !dup && (tn.QB?.score ?? 0) >= NEED_MIN ? qbPrem(pick) : 0;   // QB premium at the top (QB_TOP)
-    return -Math.log(p._x) + need + top - dup - run - qbBlock - (moved ? MOVE_LN : 0) - repeatOf(team, round, nk);
+    return -Math.log(p._x) + need + top - dup - run - qbBlock - (moved ? MOVE_LN : 0) - repeatOf(team, round, nk) + MEET_LN[meetOf(team, p)];
   };
   // a player's best fit for a team (over his position, a projected move and, for a lineman, the OL rooms)
   const fitFor = (team, round, p, pick = null) => {
@@ -1691,7 +1709,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise
     taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== pl.pos;
-    ctx.push({ top, rep: (tank.recentR1?.[o.team]?.[1] || []).includes(LINE_GROUP[nk] || nk) ? 1 : (tank.recentR1?.[o.team]?.[2] || []).includes(LINE_GROUP[nk] || nk) ? 2 : 0, draftYear: P.draftYear ?? SEASON + 1, p: pl, needs: needs.map(g => [g, tn[g].score]), room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    ctx.push({ top, meet: meetOf(o.team, pl), rep: (tank.recentR1?.[o.team]?.[1] || []).includes(LINE_GROUP[nk] || nk) ? 1 : (tank.recentR1?.[o.team]?.[2] || []).includes(LINE_GROUP[nk] || nk) ? 2 : 0, draftYear: P.draftYear ?? SEASON + 1, p: pl, needs: needs.map(g => [g, tn[g].score]), room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
     // the pick joins the room: his draft capital fills part of the need for the team's later picks
     if (tn[nk]) tn[nk].score *= SPEC_SLOT[nk] ? 0 : 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[nk] || 2);
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp, trade: o.trade || null,
