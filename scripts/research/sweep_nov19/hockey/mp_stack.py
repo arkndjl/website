@@ -3,6 +3,8 @@
 morning-line timing study (pre-registered H1, H9).
 
 usage: mp_stack.py <dir from mp_pull.py> <out.json>
+       mp_stack.py --freeze <dir from mp_pull.py>     -> scripts/data/public_ratings/nhl_moneypuck.json.gz
+           {gameId: [home win prob (overall), model-only prob or null, morning odds prob or null, Last-Modified]}
 """
 import csv, datetime as dt, email.utils, gzip, json, math, os, sys
 from zoneinfo import ZoneInfo
@@ -111,7 +113,7 @@ def main(d, outp):
                     'llMP': round(float(ll(mp, mk).mean()), 5), 'tMPvsModel': round(tm['t'], 2),
                     'llClose': round(float(ll(c, mk).mean()), 5), 'tStackVsClose': round(tc['t'], 2)}
     for s in range(2020, 2027):
-        mk = S == s
+        mk = (S == s) & ~np.isnan(c)
         if mk.sum():
             res['bySeason'][str(s)] = {'n': int(mk.sum()), 'model': round(float(ll(p, mk).mean()), 4), 'moneypuck': round(float(ll(mp, mk).mean()), 4),
                                        'close': round(float(ll(c, mk).mean()), 4),
@@ -138,5 +140,29 @@ def main(d, outp):
     print(json.dumps(res, indent=1))
 
 
+def freeze(d):
+    out = {}
+    for ln in open(os.path.join(d, 'index.jsonl')):
+        r = json.loads(ln)
+        if r.get('code') != 200:
+            continue
+        try:
+            c = next(csv.DictReader(open(os.path.join(d, '%d.csv' % r['id']), encoding='utf8')))
+            f = lambda k: round(float(c[k]), 4) if c.get(k) not in (None, '') else None
+            out[str(r['id'])] = [f('preGameHomeTeamWinOverallScore'), f('preGameMoneyPuckHomeWinPrediction'),
+                                 f('preGameBettingOddsHomeWinPrediction'),
+                                 email.utils.parsedate_to_datetime(r['lm']).strftime('%Y-%m-%dT%H:%MZ') if r.get('lm') else None]
+        except Exception:
+            continue
+    fn = os.path.join(ROOT, 'scripts', 'data', 'public_ratings', 'nhl_moneypuck.json.gz')
+    os.makedirs(os.path.dirname(fn), exist_ok=True)
+    with gzip.open(fn, 'wt') as fh:
+        json.dump(out, fh, separators=(',', ':'))
+    print('froze', len(out), fn)
+
+
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    if sys.argv[1] == '--freeze':
+        freeze(sys.argv[2])
+    else:
+        main(sys.argv[1], sys.argv[2])
