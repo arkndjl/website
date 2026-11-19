@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-19T11:36:25Z",
+ "asof": "2026-11-19T11:48:32Z",
  "recenter": {
-  "2026-11-19": 1.74
+  "2026-11-19": 1.7
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-19T02:52:25Z",
-  "ageH": 8.7,
+  "ageH": 8.9,
   "stale": false
  },
  "picks": [],
@@ -1898,7 +1898,7 @@
     "side": "under",
     "line": 142.5,
     "price": -100.0,
-    "ev": 0.168,
+    "ev": 0.167,
     "units": 1.25
    }
   }
@@ -1954,6 +1954,22 @@
    "tm": 163.1
   },
   {
+   "id": "401917536",
+   "sport": "cbb",
+   "kick": "2026-11-20T03:30:00Z",
+   "home": "Santa Clara",
+   "away": "VCU",
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": -108.0,
+   "edge": 4.8,
+   "x": 5.0,
+   "why": "edge under 5 (line: <4)",
+   "m": -2.3,
+   "tm": 163.1
+  },
+  {
    "id": "401930884",
    "sport": "cbb",
    "kick": "2026-11-20T02:00:00Z",
@@ -1962,7 +1978,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 3.7,
    "x": 4.0,
    "why": "edge under 4 (venue: neutral)",
@@ -1986,20 +2002,20 @@
    "tm": 148.6
   },
   {
-   "id": "401917536",
+   "id": "401928354",
    "sport": "cbb",
-   "kick": "2026-11-20T03:30:00Z",
-   "home": "Santa Clara",
-   "away": "VCU",
+   "kick": "2026-11-20T02:00:00Z",
+   "home": "Pepperdine",
+   "away": "UC Santa Barbara",
    "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -102.0,
+   "side": "home",
+   "line": -3.5,
+   "price": -144.0,
    "edge": 3.8,
    "x": 5.0,
    "why": "edge under 5 (line: <4)",
-   "m": -2.3,
-   "tm": 163.1
+   "m": 0.3,
+   "tm": 148.2
   },
   {
    "id": "401919050",
@@ -2090,7 +2106,7 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": -127.0,
+   "price": -117.0,
    "edge": 2.0,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2106,12 +2122,28 @@
    "mk": "total",
    "side": "over",
    "line": 144.5,
-   "price": -117.0,
+   "price": -120.0,
    "edge": 2.7,
    "x": 7.0,
    "why": "edge under 7",
    "m": 3.3,
    "tm": 147.2
+  },
+  {
+   "id": "401918950",
+   "sport": "cbb",
+   "kick": "2026-11-20T01:00:00Z",
+   "home": "Louisville",
+   "away": "Stetson",
+   "mk": "total",
+   "side": "under",
+   "line": 154.5,
+   "price": -135.0,
+   "edge": 2.4,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 36.6,
+   "tm": 152.1
   },
   {
    "id": "401911534",
@@ -2130,22 +2162,6 @@
    "tm": 136.0
   },
   {
-   "id": "401928354",
-   "sport": "cbb",
-   "kick": "2026-11-20T02:00:00Z",
-   "home": "Pepperdine",
-   "away": "UC Santa Barbara",
-   "mk": "total",
-   "side": "under",
-   "line": 150.5,
-   "price": -115.0,
-   "edge": 2.3,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 0.3,
-   "tm": 148.2
-  },
-  {
    "id": "401920845",
    "sport": "cbb",
    "kick": "2026-11-20T01:00:00Z",
@@ -2154,12 +2170,28 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 2.2,
    "x": 7.0,
    "why": "edge under 7",
    "m": 6.3,
    "tm": 151.7
+  },
+  {
+   "id": "401918959",
+   "sport": "cbb",
+   "kick": "2026-11-19T23:00:00Z",
+   "home": "Murray State",
+   "away": "NC State",
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -108.0,
+   "edge": 1.9,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -5.4,
+   "tm": 159.6
   },
   {
    "id": "401918056",
@@ -2192,38 +2224,6 @@
    "why": "edge under 3.5 (inj: with)",
    "m": 3.6,
    "tm": 140.1
-  },
-  {
-   "id": "401918959",
-   "sport": "cbb",
-   "kick": "2026-11-19T23:00:00Z",
-   "home": "Murray State",
-   "away": "NC State",
-   "mk": "spread",
-   "side": "away",
-   "line": -4.5,
-   "price": -110,
-   "edge": 0.9,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": -5.4,
-   "tm": 159.6
-  },
-  {
-   "id": "401918950",
-   "sport": "cbb",
-   "kick": "2026-11-20T01:00:00Z",
-   "home": "Louisville",
-   "away": "Stetson",
-   "mk": "spread",
-   "side": "home",
-   "line": 35.5,
-   "price": -104.0,
-   "edge": 1.1,
-   "x": 5.0,
-   "why": "edge under 5 (tier: mixed)",
-   "m": 36.6,
-   "tm": 152.1
   }
  ],
  "games": {
@@ -2240,11 +2240,11 @@
    "state": "under"
   },
   "401918959": {
-   "mk": "spread",
-   "side": "away",
-   "line": -4.5,
-   "price": -110,
-   "edge": 0.9,
+   "mk": "total",
+   "side": "under",
+   "line": 161.5,
+   "price": -108.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Murray State",
@@ -2267,7 +2267,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -2278,9 +2278,9 @@
   "401917536": {
    "mk": "spread",
    "side": "away",
-   "line": 1.5,
-   "price": -102.0,
-   "edge": 3.8,
+   "line": 2.5,
+   "price": -108.0,
+   "edge": 4.8,
    "ev": null,
    "units": 0.0,
    "home": "Santa Clara",
@@ -2288,11 +2288,11 @@
    "state": "under"
   },
   "401928354": {
-   "mk": "total",
-   "side": "under",
-   "line": 150.5,
-   "price": -115.0,
-   "edge": 2.3,
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": -144.0,
+   "edge": 3.8,
    "ev": null,
    "units": 0.0,
    "home": "Pepperdine",
@@ -2351,7 +2351,7 @@
    "mk": "total",
    "side": "over",
    "line": 149.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2360,11 +2360,11 @@
    "state": "under"
   },
   "401918950": {
-   "mk": "spread",
-   "side": "home",
-   "line": 35.5,
-   "price": -104.0,
-   "edge": 1.1,
+   "mk": "total",
+   "side": "under",
+   "line": 154.5,
+   "price": -135.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "Louisville",
@@ -2399,7 +2399,7 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": -127.0,
+   "price": -117.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -2424,7 +2424,7 @@
    "side": "under",
    "line": 142.5,
    "price": -100.0,
-   "ev": 0.168,
+   "ev": 0.167,
    "edge": 6.5,
    "units": 1.25,
    "bk": "novig",
@@ -2460,7 +2460,7 @@
    "mk": "total",
    "side": "over",
    "line": 144.5,
-   "price": -117.0,
+   "price": -120.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2533,24 +2533,24 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19802,
+  "snapshots": 19810,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 596,
-    "clvRet": -0.002,
-    "clvT": -0.22,
-    "clv": 0.83,
-    "beat": 0.362,
-    "still": 0.273
+    "clvRet": -0.0027,
+    "clvT": -0.3,
+    "clv": 0.82,
+    "beat": 0.361,
+    "still": 0.27
    },
    {
     "when": "6-24h",
-    "clvN": 4089,
-    "clvRet": -0.0135,
-    "clvT": -7.62,
-    "clv": 0.46,
-    "beat": 0.391,
+    "clvN": 4091,
+    "clvRet": -0.0138,
+    "clvT": -7.77,
+    "clv": 0.45,
+    "beat": 0.39,
     "still": 0.409
    },
    {
@@ -20205,7 +20205,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T11:36:25Z",
+ "checked": "2026-11-19T11:48:32Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
