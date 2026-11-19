@@ -4,4 +4,19 @@
   {{ with .cashapp }}<a class="tip__btn" href="{{ . }}" target="_blank" rel="noopener">Cash App · $ARKNDJL</a>{{ end }}
 </div>
 {{- end -}}
-<p class="tip__note">Tips go to tuition and site maintenance. Free, no ads.</p>
+<p class="tip__note">thank you so much for considering donating! all money will go towards my NYU tuition and keeping all of my websites, articles, and research free with no ads :)</p>
+<div class="tip-top" hidden>
+  <h2>top supporters</h2>
+  <ol class="tip-top__list"></ol>
+</div>
+<script>
+(function () {
+  var box = document.querySelector('.tip-top'); if (!box) return;
+  fetch('/api/supporters').then(function (r) { return r.ok ? r.json() : []; }).then(function (names) {
+    if (!names || !names.length) return;
+    var ol = box.querySelector('ol');
+    names.forEach(function (n) { var li = document.createElement('li'); li.textContent = n; ol.appendChild(li); });
+    box.hidden = false;
+  }).catch(function () {});
+})();
+</script>

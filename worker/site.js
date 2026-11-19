@@ -35,6 +35,11 @@ function looksLikeBot(ua) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname.replace(/\/+$/, "") === "/api/kofi") return kofi(request, env);
+    if (url.pathname.replace(/\/+$/, "") === "/api/supporters") {
+      const list = await env.SUPPORTERS.get(env.SUPPORTERS.idFromName("kofi")).top(25);
+      return json(list, 200, { "cache-control": "public, max-age=60" });
+    }
     if (!url.pathname.startsWith("/api/plays")) return env.ASSETS.fetch(request);
     const stub = env.PLAYS.get(env.PLAYS.idFromName("stclaire"));
     const rest = url.pathname.slice("/api/plays".length).replace(/^\/+|\/+$/g, "");
@@ -61,6 +66,44 @@ export default {
     return json({ slug: rest, ...out });
   },
 };
+
+// Ko-fi webhook (Ko-fi Settings > API > Webhook URL = https://arkndjl.net/api/kofi). Ko-fi posts form data
+// with one field, data = JSON {verification_token, message_id, from_name, amount, currency, is_public, type}.
+// Checked against the KOFI_TOKEN worker secret. Every payment is stored; /api/supporters lists only names from
+// public payments (is_public true), ranked by total, names only, no amounts.
+async function kofi(request, env) {
+  if (request.method !== "POST") return json({ error: "method" }, 405, { allow: "POST" });
+  if (!env.KOFI_TOKEN) return json({ error: "not set up" }, 503);
+  let d;
+  try { d = JSON.parse((await request.formData()).get("data") || ""); } catch { return json({ error: "bad data" }, 400); }
+  if (!d || d.verification_token !== env.KOFI_TOKEN) return json({ error: "token" }, 403);
+  const amount = Number(d.amount);
+  if (!d.message_id || !Number.isFinite(amount)) return json({ error: "bad data" }, 400);
+  await env.SUPPORTERS.get(env.SUPPORTERS.idFromName("kofi")).add({
+    id: String(d.message_id).slice(0, 80),
+    name: String(d.from_name || "").trim().slice(0, 40),
+    amount, currency: String(d.currency || "USD").slice(0, 8),
+    pub: d.is_public === true || d.is_public === "true" ? 1 : 0,
+    t: Date.parse(d.timestamp) || Date.now(),
+  });
+  return json({ ok: true });
+}
+
+export class Supporters extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.sql = ctx.storage.sql;
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS tips (id TEXT PRIMARY KEY, name TEXT, amount REAL, currency TEXT, pub INTEGER, t INTEGER)`);
+  }
+  add(r) {
+    this.sql.exec(`INSERT OR IGNORE INTO tips (id, name, amount, currency, pub, t) VALUES (?, ?, ?, ?, ?, ?)`, r.id, r.name, r.amount, r.currency, r.pub, r.t);
+  }
+  top(n) {
+    const out = [];
+    for (const r of this.sql.exec(`SELECT name, SUM(amount) a, MAX(t) t FROM tips WHERE pub = 1 AND name != '' GROUP BY lower(name) ORDER BY a DESC, t ASC LIMIT ?`, n)) out.push(r.name);
+    return out;
+  }
+}
 
 export class PlayCounter extends DurableObject {
   constructor(ctx, env) {
