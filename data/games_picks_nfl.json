@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-19T16:57:11Z",
+ "asof": "2026-11-19T17:19:17Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,29 +52,13 @@
  },
  "model": {
   "asof": "2026-11-19T11:32:10Z",
-  "ageH": 5.4,
+  "ageH": 5.8,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
-  {
-   "id": "2026_11_TB_DET",
-   "sport": "nfl",
-   "kick": "2026-11-22T18:00:00Z",
-   "home": "DET",
-   "away": "TB",
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
-   "price": -110.0,
-   "edge": 5.1,
-   "x": null,
-   "why": "total market off",
-   "m": 7.8,
-   "tm": 49.6
-  },
   {
    "id": "2026_11_MIN_SF",
    "sport": "nfl",
@@ -90,6 +74,22 @@
    "why": "spread market off",
    "m": -1.2,
    "tm": 42.9
+  },
+  {
+   "id": "2026_11_TB_DET",
+   "sport": "nfl",
+   "kick": "2026-11-22T18:00:00Z",
+   "home": "DET",
+   "away": "TB",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -114.0,
+   "edge": 4.1,
+   "x": null,
+   "why": "total market off",
+   "m": 7.8,
+   "tm": 49.6
   },
   {
    "id": "2026_11_TEN_DAL",
@@ -212,7 +212,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 2.9,
    "x": null,
    "why": "total market off",
@@ -344,9 +344,9 @@
   "2026_11_TB_DET": {
    "mk": "total",
    "side": "over",
-   "line": 44.5,
-   "price": -110.0,
-   "edge": 5.1,
+   "line": 45.5,
+   "price": -114.0,
+   "edge": 4.1,
    "ev": null,
    "units": 0.0,
    "home": "DET",
@@ -381,7 +381,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -478,13 +478,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5207,
+  "snapshots": 5211,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2149,
+    "clvN": 2150,
     "clvRet": -0.0257,
-    "clvT": -14.48,
+    "clvT": -14.5,
     "clv": 0.39,
     "beat": 0.296,
     "still": 0.654
@@ -2894,7 +2894,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T16:57:11Z",
+ "checked": "2026-11-19T17:19:17Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
