@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-19T13:39:35.466Z",
+ "asof": "2026-11-19T14:58:04.580Z",
  "status": {
   "twitch": true,
   "youtube": true,
@@ -8,18 +8,18 @@
  },
  "goals": {
   "twitch": {
-   "rate": 6.9,
+   "rate": 6.8,
    "prior": 7.4,
-   "tracked": 2.1,
+   "tracked": 2.4,
    "d30": {
     "goal": 281,
     "base": 274,
     "set": 1794899610245,
     "due": 1797491610245,
     "p0": 54,
-    "p": 44,
+    "p": 43,
     "f": 0,
-    "m": 0.069
+    "m": 0.077
    },
    "d90": {
     "goal": 295,
@@ -27,27 +27,27 @@
     "set": 1794899610245,
     "due": 1802675610245,
     "p0": 52,
-    "p": 44,
+    "p": 43,
     "f": 0,
-    "m": 0.023
+    "m": 0.026
    },
    "next": {
     "goal": 300,
-    "eta": "2027-03-16",
+    "eta": "2027-03-17",
     "p90": 26,
     "from": 250,
     "base": 274,
     "set": 1794899610245,
     "eta0": "2027-03-07",
     "f": 0.48,
-    "m": 0.49
+    "m": 0.491
    },
    "opened": "2023-10-31"
   },
   "youtube": {
    "rate": 1.1,
    "prior": 1.1,
-   "tracked": 2.1,
+   "tracked": 2.4,
    "d30": {
     "goal": 43,
     "base": 42,
@@ -56,7 +56,7 @@
     "p0": 55,
     "p": 51,
     "f": 0,
-    "m": 0.069
+    "m": 0.077
    },
    "d90": {
     "goal": 44,
@@ -66,71 +66,71 @@
     "p0": 62,
     "p": 59,
     "f": 0,
-    "m": 0.023
+    "m": 0.026
    },
    "next": {
     "goal": 50,
-    "eta": "2027-09-11",
+    "eta": "2027-09-14",
     "p90": 11,
     "from": 25,
     "base": 42,
     "set": 1794899610245,
     "eta0": "2027-08-21",
     "f": 0.68,
-    "m": 0.682
+    "m": 0.683
    },
    "opened": "2023-11-10"
   },
   "tiktok": {
-   "rate": 8.2,
+   "rate": 9,
    "prior": 2.7,
-   "tracked": 2.1,
+   "tracked": 2.4,
    "d30": {
     "goal": 114,
     "base": 106,
     "set": 1795033969428,
     "due": 1797625969428,
     "p0": 53,
-    "p": 50,
-    "f": 0,
-    "m": 0.017
+    "p": 68,
+    "f": 0.125,
+    "m": 0.026
    },
    "d90": {
-    "goal": 107,
-    "base": 100,
-    "set": 1794899610245,
-    "due": 1802675610245,
-    "p0": 54,
-    "p": 100,
-    "f": 0.857,
-    "m": 0.023
+    "goal": 133,
+    "base": 107,
+    "set": 1795100284580,
+    "due": 1802876284580,
+    "p0": 52,
+    "p": 52,
+    "f": 0,
+    "m": 0
    },
    "next": {
     "goal": 150,
-    "eta": "2027-05-06",
-    "p90": 4,
+    "eta": "2027-04-15",
+    "p90": 8,
     "from": 100,
     "base": 100,
     "set": 1794899610245,
     "eta0": "2028-08-01",
-    "f": 0.12,
-    "m": 0.003
+    "f": 0.14,
+    "m": 0.004
    },
    "opened": "2023-11-11"
   },
   "x": {
-   "rate": 3.2,
+   "rate": 3.1,
    "prior": 1.4,
-   "tracked": 2.1,
+   "tracked": 2.4,
    "d30": {
     "goal": 45,
     "base": 41,
     "set": 1795022156543,
     "due": 1797614156543,
     "p0": 53,
-    "p": 24,
+    "p": 23,
     "f": 0,
-    "m": 0.022
+    "m": 0.03
    },
    "d90": {
     "goal": 52,
@@ -140,11 +140,11 @@
     "p0": 56,
     "p": 30,
     "f": 0,
-    "m": 0.007
+    "m": 0.01
    },
    "next": {
     "goal": 50,
-    "eta": "2027-03-01",
+    "eta": "2027-03-02",
     "p90": 42,
     "from": 25,
     "base": 38,
@@ -272,7 +272,10 @@
      "p": 54,
      "base": 100,
      "set": 1794899610245,
-     "due": 1802675610245
+     "due": 1802675610245,
+     "done": true,
+     "hit": 1795100284580,
+     "ahead": 88
     },
     {
      "T": 30,
@@ -292,6 +295,14 @@
      "base": 106,
      "set": 1795033969428,
      "due": 1797625969428
+    },
+    {
+     "T": 90,
+     "goal": 133,
+     "p": 52,
+     "base": 107,
+     "set": 1795100284580,
+     "due": 1802876284580
     }
    ],
    "ms": [
@@ -685,6 +696,15 @@
    "x": 40,
    "ttv": 87,
    "tth": 2086
+  },
+  {
+   "t": 1795100284580,
+   "twitch": 274,
+   "youtube": 42,
+   "tiktok": 107,
+   "x": 40,
+   "ttv": 87,
+   "tth": 2087
   }
  ],
  "yt": {
@@ -1121,6 +1141,10 @@
     [
      1795060621919,
      53
+    ],
+    [
+     1795100284580,
+     55
     ]
    ],
    "title": "#34 1NT vs #25 THE GUILD | ESEA Main S59 Game 13 (Bo1)",
@@ -1241,6 +1265,10 @@
     [
      1795088281954,
      1174
+    ],
+    [
+     1795100284580,
+     1175
     ]
    ],
    "title": "counter strike player tries val 1v3 clutch!!! #fyp #laursen_111 #shorts #reels #cs2 #valorant #eboy",
@@ -1313,7 +1341,7 @@
    {
     "k": "TikTok hearts",
     "v": "24 / video",
-    "d": "87 videos · 1.22 followers / video",
+    "d": "87 videos · 1.23 followers / video",
     "n": 87
    },
    {
@@ -1339,36 +1367,36 @@
    {
     "k": "Twitch pace",
     "v": null,
-    "d": "at 14 days tracked (2.1)",
+    "d": "at 14 days tracked (2.4)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (2.1)",
+    "d": "at 14 days tracked (2.4)",
     "n": null,
     "wait": true
    },
    {
     "k": "TikTok pace",
     "v": null,
-    "d": "at 14 days tracked (2.1)",
+    "d": "at 14 days tracked (2.4)",
     "n": null,
     "wait": true
    },
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (2.1)",
+    "d": "at 14 days tracked (2.4)",
     "n": null,
     "wait": true
    },
    {
     "k": "Goal calibration",
-    "v": "5 of 5 hit",
+    "v": "6 of 6 hit",
     "d": "100% hit vs 59% forecast",
-    "n": 5
+    "n": 6
    },
    {
     "k": "Milestones vs pace",
@@ -1380,7 +1408,7 @@
    {
     "k": "TikTok follows / 1k views",
     "v": null,
-    "d": "at 7 days tracked (2.1)",
+    "d": "at 7 days tracked (2.4)",
     "n": null,
     "wait": true
    },
@@ -1421,7 +1449,7 @@
    },
    "last30": 6,
    "gap": 4.1,
-   "vpd": 965.8,
+   "vpd": 967.2,
    "subsPerK": null,
    "likeRate": 0.93,
    "grid": [
@@ -1700,7 +1728,7 @@
      "views": 996,
      "likes": 21,
      "comments": null,
-     "age": 103.6,
+     "age": 103.7,
      "et": {
       "d": 5,
       "h": 18,
@@ -1716,7 +1744,7 @@
      "views": 2953,
      "likes": 19,
      "comments": null,
-     "age": 99.5,
+     "age": 99.6,
      "et": {
       "d": 2,
       "h": 21,
@@ -1780,7 +1808,7 @@
      "views": 1331,
      "likes": 10,
      "comments": null,
-     "age": 58.5,
+     "age": 58.6,
      "et": {
       "d": 1,
       "h": 21,
@@ -1796,7 +1824,7 @@
      "views": 506,
      "likes": 5,
      "comments": null,
-     "age": 58.5,
+     "age": 58.6,
      "et": {
       "d": 1,
       "h": 21,
@@ -1812,7 +1840,7 @@
      "views": 185,
      "likes": 10,
      "comments": null,
-     "age": 57.7,
+     "age": 57.8,
      "et": {
       "d": 2,
       "h": 15,
@@ -1860,7 +1888,7 @@
      "views": 312,
      "likes": 0,
      "comments": null,
-     "age": 43.4,
+     "age": 43.5,
      "et": {
       "d": 2,
       "h": 23,
@@ -1876,7 +1904,7 @@
      "views": 364,
      "likes": 0,
      "comments": null,
-     "age": 42.4,
+     "age": 42.5,
      "et": {
       "d": 3,
       "h": 23,
@@ -1937,7 +1965,7 @@
      "title": "#34 1NT vs #25 THE GUILD | ESEA Main S59 Game 13 (Bo1)",
      "pub": 1794978828000,
      "short": false,
-     "views": 53,
+     "views": 55,
      "likes": 1,
      "comments": null,
      "age": 1.4,
@@ -1956,7 +1984,7 @@
      "views": 333,
      "likes": 4,
      "comments": null,
-     "age": 0.9,
+     "age": 1,
      "et": {
       "d": 3,
       "h": 10,
@@ -1969,7 +1997,7 @@
      "title": "counter strike player tries val 1v3 clutch!!! #fyp #laursen_111 #shorts #reels #cs2 #valorant #eboy",
      "pub": 1795037256000,
      "short": true,
-     "views": 1174,
+     "views": 1175,
      "likes": 9,
      "comments": null,
      "age": 0.7,
@@ -1978,7 +2006,7 @@
       "h": 16,
       "b": 4
      },
-     "r5": 799
+     "r5": 800
     }
    ]
   },
@@ -1992,7 +2020,7 @@
    "lpH": null,
    "opH": 0,
    "hLive": 0.5,
-   "hOff": 49.9,
+   "hOff": 55.9,
    "live": null,
    "grid": [
     [
@@ -2243,14 +2271,14 @@
   },
   "tt": {
    "videos": 87,
-   "hearts": 2086,
+   "hearts": 2087,
    "hpv": 24,
    "newVideos": 1,
-   "newHearts": 54,
-   "fpv": 1.22,
+   "newHearts": 55,
+   "fpv": 1.23,
    "n": 10,
-   "views": 4335,
-   "median": 699,
+   "views": 4351,
+   "median": 700,
    "vpd": null,
    "hearts_t": [
     [
@@ -2380,6 +2408,10 @@
     [
      1795078746244,
      2086
+    ],
+    [
+     1795100284580,
+     2087
     ]
    ],
    "grid": [
@@ -2458,7 +2490,7 @@
      },
      {
       "n": 2,
-      "med": 699
+      "med": 700
      }
     ],
     [
@@ -2582,8 +2614,8 @@
     {
      "d": "Tue",
      "n": 2,
-     "med": 699,
-     "x": 624
+     "med": 700,
+     "x": 625
     },
     {
      "d": "Wed",
@@ -2616,7 +2648,7 @@
      "desc": "laursen 111 best in the world all headshots usp-s pistol | #laursen_111 on #Twitch",
      "pub": 1791335213000,
      "photo": false,
-     "views": 1014,
+     "views": 1015,
      "r5": null
     },
     {
@@ -2624,7 +2656,7 @@
      "desc": "all my kills from our first esea league game of the season #laursen #fyp #cs2 #wow",
      "pub": 1791341584000,
      "photo": false,
-     "views": 384,
+     "views": 385,
      "r5": null
     },
     {
@@ -2641,7 +2673,7 @@
      "pub": 1794854354000,
      "photo": false,
      "views": 822,
-     "r5": 616
+     "r5": 617
     },
     {
      "id": "7708841279043407118",
@@ -2649,7 +2681,7 @@
      "pub": 1794854476000,
      "photo": false,
      "views": 307,
-     "r5": 554
+     "r5": 555
     },
     {
      "id": "7708842952415563021",
@@ -2672,24 +2704,24 @@
      "desc": "prerendered backgrounds and low poly gfx were peak... #fyp #zelda #oot #retro #nintendo64",
      "pub": 1794855860000,
      "photo": true,
-     "views": 105,
-     "r5": 388
+     "views": 106,
+     "r5": 389
     },
     {
      "id": "7709535742065691918",
      "desc": "ACE DEAGLE IN ESEA LEAGUE MATCH #fyp #cs2 #csgo #valorant #eboy ",
      "pub": 1795016169000,
      "photo": false,
-     "views": 340,
-     "r5": 292
+     "views": 352,
+     "r5": 295
     },
     {
      "id": "7709624704234949901",
      "desc": "cs2 player tries val 1v3 clutch ice in his veins #fyp #valorant #gaming #cs2 #eboy",
      "pub": 1795036882000,
      "photo": false,
-     "views": 410,
-     "r5": 313
+     "views": 411,
+     "r5": 315
     }
    ]
   },
@@ -2697,15 +2729,15 @@
    "x": 10,
    "yt": {
     "n": 10,
-    "sum": 7922,
+    "sum": 7923,
     "avg": 792,
     "med": 782.5
    },
    "tt": {
     "n": 10,
-    "sum": 4335,
-    "avg": 434,
-    "med": 362
+    "sum": 4351,
+    "avg": 435,
+    "med": 368.5
    }
   },
   "roll_t": [
@@ -2973,6 +3005,11 @@
     1795095575466,
     7922,
     4335
+   ],
+   [
+    1795100284580,
+    7923,
+    4351
    ]
   ]
  }
