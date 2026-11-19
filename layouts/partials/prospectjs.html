@@ -200,7 +200,7 @@
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
       var link = r.id ? ' · <a href="https://www.nhl.com/player/' + esc(r.id) + '" rel="noopener">NHL.com ↗</a>' : '';
       var line = r.k ? 'latest season (' + r.k + ' since the draft): ' + esc(r.league || 'no league line') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') +
-        (r.etoi ? ' · ' + f1(r.etoi) + ' min TOI' : '') + (r.esog ? ', ' + (+r.esog).toFixed(2) + ' shots on goal a game' : '') + (r.progp ? ' · ' + r.progp + ' pro games' : '') + (r.wjc ? ' · World Juniors' : '')
+        (r.etoi ? ' · ' + f1(r.etoi) + ' min TOI' : '') + (r.esog ? ', ' + (+r.esog).toFixed(2) + ' shots on goal a game' : '') + (r.exg != null ? ', ' + f1(r.exg) + ' xG' : '') + (r.chip != null ? ' · CHIP ' + f1(r.chip) + ' (College Hockey News)' : '') + (r.progp ? ' · ' + r.progp + ' pro games' : '') + (r.wjc ? ' · World Juniors' : '')
         : 'draft year: ' + esc(r.league || '-') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '');
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + ' (draft ' + r.fv0 + ') · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + link + '</p>' +

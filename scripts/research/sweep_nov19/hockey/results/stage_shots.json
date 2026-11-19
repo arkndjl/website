@@ -1,0 +1,278 @@
+{
+ "ahlSd": 0.685,
+ "leagueSd": {
+  "NCAA": 0.756,
+  "SHL": 0.656,
+  "HockeyAllsvenskan": 0.696
+ },
+ "1": {
+  "kept": [
+   "fv0",
+   "nh",
+   "wjc",
+   "G",
+   "nhgrow",
+   "gsvc"
+  ],
+  "join": {
+   "ncaa_line": 427,
+   "ncaa_join": 383,
+   "swe_line": 178,
+   "swe_join": 158
+  },
+  "ncaas": {
+   "gain": -0.041,
+   "t": -0.38,
+   "wins": 6,
+   "of": 12,
+   "coef": 0.851,
+   "nz": 383,
+   "mse0": 78.52,
+   "dTopMse": 0.201,
+   "dTopRho": -0.0016,
+   "dFwdMse": 0.22,
+   "dFwdTopMse": 0.33,
+   "dFwdTopRho": -0.0026,
+   "pass": false
+  },
+  "pshots": {
+   "gain": -0.105,
+   "t": -0.82,
+   "wins": 6,
+   "of": 12,
+   "coef": 0.741,
+   "nz": 595,
+   "mse0": 78.52,
+   "dTopMse": 0.284,
+   "dTopRho": -0.0016,
+   "dFwdMse": 0.408,
+   "dFwdTopMse": 1.021,
+   "dFwdTopRho": -0.0048,
+   "pass": false
+  },
+  "ahls_alone": {
+   "gain": -0.033,
+   "t": -0.5,
+   "wins": 8,
+   "of": 12,
+   "coef": 1.657,
+   "nz": 54,
+   "mse0": 78.52,
+   "dTopMse": 0.02,
+   "dTopRho": -0.0001,
+   "dFwdMse": 0.001,
+   "dFwdTopMse": 0.062,
+   "dFwdTopRho": -0.0007,
+   "pass": false
+  }
+ },
+ "2": {
+  "kept": [
+   "fv0",
+   "nh",
+   "wjc",
+   "G",
+   "D",
+   "nhgrow",
+   "progp",
+   "nh_na",
+   "ahls",
+   "gsvc"
+  ],
+  "join": {
+   "ncaa_line": 528,
+   "ncaa_join": 460,
+   "swe_line": 177,
+   "swe_join": 146
+  },
+  "ncaas": {
+   "gain": 0.206,
+   "t": 1.1,
+   "wins": 7,
+   "of": 12,
+   "coef": 1.42,
+   "nz": 460,
+   "mse0": 67.21,
+   "dTopMse": -0.205,
+   "dTopRho": 0.001,
+   "dFwdMse": 0.041,
+   "dFwdTopMse": 0.347,
+   "dFwdTopRho": -0.0027,
+   "pass": false
+  },
+  "pshots_swap": {
+   "gain": 0.392,
+   "t": 1.49,
+   "wins": 8,
+   "of": 12,
+   "coef": 1.704,
+   "nz": 895,
+   "mse0": 67.68,
+   "dTopMse": -0.876,
+   "dTopRho": 0.0032,
+   "dFwdMse": 0.23,
+   "dFwdTopMse": 0.673,
+   "dFwdTopRho": -0.0035,
+   "pass": false
+  },
+  "ahls_alone": {
+   "gain": 0.463,
+   "t": 1.98,
+   "wins": 9,
+   "of": 12,
+   "coef": 3.633,
+   "nz": 290,
+   "mse0": 67.68,
+   "dTopMse": -1.513,
+   "dTopRho": 0.0059,
+   "dFwdMse": -0.013,
+   "dFwdTopMse": -0.353,
+   "dFwdTopRho": 0.0046,
+   "pass": false
+  },
+  "pshots_vs_ahls": {
+   "gain": -0.072,
+   "t": -0.39,
+   "wins": 5,
+   "of": 12,
+   "dtopMse": 0.637,
+   "dtopRho": -0.0027,
+   "dr1Rho": -0.0027,
+   "dfwdMse": 0.2429,
+   "dfwdTopMse": 1.0255,
+   "dfwdTopRho": -0.0081
+  }
+ },
+ "3": {
+  "kept": [
+   "fv0",
+   "nany",
+   "nh",
+   "G",
+   "progp",
+   "D",
+   "age",
+   "nh_na",
+   "comp",
+   "nhgrow",
+   "gsvc"
+  ],
+  "join": {
+   "ncaa_line": 482,
+   "ncaa_join": 414,
+   "swe_line": 136,
+   "swe_join": 110
+  },
+  "ncaas": {
+   "gain": 0.5,
+   "t": 2.35,
+   "wins": 9,
+   "of": 12,
+   "coef": 2.275,
+   "nz": 414,
+   "mse0": 49.92,
+   "dTopMse": -0.702,
+   "dTopRho": 0.0031,
+   "dFwdMse": -0.226,
+   "dFwdTopMse": -0.24,
+   "dFwdTopRho": -0.0015,
+   "pass": false
+  },
+  "pshots": {
+   "gain": 0.639,
+   "t": 3.77,
+   "wins": 10,
+   "of": 12,
+   "coef": 1.772,
+   "nz": 1319,
+   "mse0": 49.92,
+   "dTopMse": -1.336,
+   "dTopRho": 0.0065,
+   "dFwdMse": -0.543,
+   "dFwdTopMse": -1.078,
+   "dFwdTopRho": -0.0066,
+   "pass": false
+  },
+  "ahls_alone": {
+   "gain": 0.127,
+   "t": 1.83,
+   "wins": 8,
+   "of": 12,
+   "coef": 1.131,
+   "nz": 795,
+   "mse0": 49.92,
+   "dTopMse": -0.392,
+   "dTopRho": 0.002,
+   "dFwdMse": -0.173,
+   "dFwdTopMse": -0.082,
+   "dFwdTopRho": -0.0087,
+   "pass": false
+  }
+ },
+ "4": {
+  "kept": [
+   "fv0",
+   "nany",
+   "war",
+   "nh",
+   "G",
+   "D",
+   "pro",
+   "gp",
+   "age",
+   "dur",
+   "comp"
+  ],
+  "join": {
+   "ncaa_line": 378,
+   "ncaa_join": 315,
+   "swe_line": 87,
+   "swe_join": 71
+  },
+  "ncaas": {
+   "gain": 0.262,
+   "t": 2.88,
+   "wins": 8,
+   "of": 12,
+   "coef": 1.508,
+   "nz": 315,
+   "mse0": 33.45,
+   "dTopMse": -0.347,
+   "dTopRho": 0.002,
+   "dFwdMse": -0.262,
+   "dFwdTopMse": -0.365,
+   "dFwdTopRho": 0.0029,
+   "pass": true
+  },
+  "pshots": {
+   "gain": 0.473,
+   "t": 2.56,
+   "wins": 9,
+   "of": 12,
+   "coef": 1.599,
+   "nz": 1260,
+   "mse0": 33.45,
+   "dTopMse": -0.477,
+   "dTopRho": 0.0025,
+   "dFwdMse": -0.275,
+   "dFwdTopMse": 0.288,
+   "dFwdTopRho": -0.0031,
+   "pass": false
+  },
+  "ahls_alone": {
+   "gain": 0.117,
+   "t": 1.25,
+   "wins": 6,
+   "of": 12,
+   "coef": 1.13,
+   "nz": 874,
+   "mse0": 33.45,
+   "dTopMse": -0.165,
+   "dTopRho": 0.0014,
+   "dFwdMse": -0.094,
+   "dFwdTopMse": 0.283,
+   "dFwdTopRho": -0.0033,
+   "pass": false
+  }
+ }
+}

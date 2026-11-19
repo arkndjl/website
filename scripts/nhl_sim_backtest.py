@@ -115,8 +115,9 @@ def outcomes(hist, S):
     return pts, made, divw, cup
 
 
-def sim(S, base, pts0, left_games, hc, otc, a, sd, left, rng):
-    """vectorized season + playoffs; returns per-team P(playoffs), P(division), P(Cup), mean points"""
+def sim(S, base, pts0, left_games, hc, otc, a, sd, left, rng, full=False):
+    """vectorized season + playoffs; returns per-team P(playoffs), P(division), P(Cup), mean points
+    (full: the simulated points of every team, teams x sims, and no playoffs)"""
     divs = divisions(S)
     teams = sorted({x for d in divs.values() for x in d})
     ix = {t: i for i, t in enumerate(teams)}
@@ -136,6 +137,8 @@ def sim(S, base, pts0, left_games, hc, otc, a, sd, left, rng):
         Mh = np.zeros((n, len(hi))); Mh[hi, np.arange(len(hi))] = 1
         Ma = np.zeros((n, len(ai))); Ma[ai, np.arange(len(ai))] = 1
         P += Mh @ (2 * hw + (ot & ~hw)) + Ma @ (2 * ~hw + (ot & hw))
+    if full:
+        return teams, P
     order = P + rng.random(P.shape) * 0.01
     cols = np.arange(NSIM)
     made = np.zeros((n, NSIM), bool); divw = np.zeros((n, NSIM), bool); cup = np.zeros((n, NSIM), bool)

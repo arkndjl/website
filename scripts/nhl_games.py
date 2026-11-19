@@ -1487,7 +1487,9 @@ def build():
                       'rec': f'{m.W[t]}-{m.L[t]}-{m.OTL[t]}', 'gp': gp[t], 'pts': pts[t], 'xpts': sims[t]['pts'],
                       'playoff': sims[t].get('playoff', 0.0), 'divw': sims[t].get('divw', 0.0), 'r2': sims[t].get('r2', 0.0),
                       'cf': sims[t].get('cf', 0.0), 'final': sims[t].get('final', 0.0), 'cup': sims[t].get('cup', 0.0),
-                      'pres': sims[t].get('pres', 0.0), 'lottery': sims[t]['lottery']})
+                      'pres': sims[t].get('pres', 0.0), 'lottery': sims[t]['lottery'],
+                      # display only: WAR a full season of the players on the injury list (replacement-level and below count 0)
+                      'warOut': round(sum(max(i.get('war') or 0.0, 0.0) for i in inj.get(t, [])), 1)})
     # win chance against an average team on neutral ice (the board's headline rating)
     mean_z = sum(r['logit'] for r in power) / len(power)
     for r in power:

@@ -1,0 +1,37 @@
+# As-of archive of projected NHL lineups: scripts/lineups_log.py appends RotoWire's and Daily Faceoff's projected
+# goalies, lines, pairs and special-teams units to scripts/data/lineups_proj/nhl-YYYY-MM.jsonl whenever they change.
+# Logging only, nothing reads it yet. Runs after each odds snap inside the game-day window; the commit carries
+# [skip ci] (no site rebuild). About half a minute a run.
+name: nhl lineups log
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["odds snap"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nhl-lineups-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Game day window (14:00-04:00 UTC, October-June)
+        id: g
+        run: |
+          h=$(date -u +%-H); mo=$(date -u +%-m)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || { [ "$mo" -le 6 -o "$mo" -ge 10 ] && [ "$h" -ge 14 -o "$h" -lt 4 ]; }; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; else echo "go=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Log the projected lineups
+        if: steps.g.outputs.go == 'true'
+        run: |
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/lineups_log.py
+          python3 scripts/data_push.py -m "NHL projected lineups log ($(date -u +%Y-%m-%dT%H:%MZ)) [skip ci]" -- scripts/data/lineups_proj

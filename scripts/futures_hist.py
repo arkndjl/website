@@ -8,6 +8,8 @@
   NBA  Basketball-Reference preseason odds pages (courtesy sportsoddshistory): 2015-16 to 2025-26, the W-L O/U line
        only, no prices (graded at -110 both sides in the backtest); 2019-20 kept but the backtest drops it (the season
        stopped at 63-67 games and books settled the totals differently)
+  NHL  Hockey-Reference preseason odds pages: 2011-12 on, the points O/U line and Stanley Cup odds, no prices on the
+       total (graded at -110); `futures_hist.py nhl` refreshes these alone
   CFB, CBB  no free history found: sportsoddshistory.com (now behind covers.com) and Pro-Football-Reference answer
        bots with 503/403. ESPN's free DraftKings futures (scripts/futures_board.py) carry title, conference and
        division prices but no win totals.
@@ -75,12 +77,47 @@ def nba(first=2016, last=2026):
     return rows
 
 
+NHL_URL = 'https://www.hockey-reference.com/leagues/NHL_{}_preseason_odds.html'
+# Hockey-Reference team names end in these -> the NHL game model's codes (scripts/nhl_games.py)
+NHL = {'Mighty Ducks': 'ANA', 'Ducks': 'ANA', 'Bruins': 'BOS', 'Sabres': 'BUF', 'Flames': 'CGY', 'Hurricanes': 'CAR',
+       'Blackhawks': 'CHI', 'Avalanche': 'COL', 'Blue Jackets': 'CBJ', 'Stars': 'DAL', 'Red Wings': 'DET', 'Oilers': 'EDM',
+       'Panthers': 'FLA', 'Kings': 'LAK', 'Wild': 'MIN', 'Canadiens': 'MTL', 'Predators': 'NSH', 'Devils': 'NJD',
+       'Islanders': 'NYI', 'Rangers': 'NYR', 'Senators': 'OTT', 'Flyers': 'PHI', 'Penguins': 'PIT', 'Sharks': 'SJS',
+       'Kraken': 'SEA', 'Blues': 'STL', 'Lightning': 'TBL', 'Maple Leafs': 'TOR', 'Canucks': 'VAN', 'Golden Knights': 'VGK',
+       'Capitals': 'WSH', 'Jets': 'WPG', 'Thrashers': 'WPG', 'Coyotes': 'UTA', 'Hockey Club': 'UTA', 'Mammoth': 'UTA'}
+
+
+def nhl(first=2012, last=2027):
+    """points O/U and Cup odds by season (the year it ends); the page's Final Pts. column is not read"""
+    rows = []
+    for S in range(first, last + 1):
+        h = get(NHL_URL.format(S))
+        tb = h[h.find('<table class="sortable stats_table" id="preseason_odds"'):]
+        tb = tb[:tb.find('</table>')]
+        for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', tb, re.S):
+            cells = [re.sub(r'<[^>]+>|&nbsp;', ' ', c).strip() for c in re.findall(r'<t[hd][^>]*>(.*?)</t[hd]>', tr, re.S)]
+            code = next((v for k, v in NHL.items() if cells and cells[0].endswith(k)), None)
+            if not code or len(cells) < 3 or not re.fullmatch(r'\d+(\.\d)?', cells[2]):
+                continue
+            rows.append({'S': S, 't': code, 'line': float(cells[2]), 'title': int(cells[1]) if re.fullmatch(r'[+-]\d+', cells[1]) else None})
+        time.sleep(4)                       # Sports Reference asks for <20 requests a minute (robots: crawl-delay 3)
+    return rows
+
+
 def main():
-    out = {'asof': time.strftime('%Y-%m-%d'), 'nfl': nfl(), 'nba': nba()}
+    import sys
+    if 'nhl' in sys.argv[1:]:               # the NHL lines alone, the other sports as stored
+        out = json.load(open(OUT))
+        out['nhl'] = nhl()
+        with open(OUT, 'w') as f:
+            json.dump(out, f, separators=(',', ':'))
+        print('nhl', len(out['nhl']))
+        return
+    out = {'asof': time.strftime('%Y-%m-%d'), 'nfl': nfl(), 'nba': nba(), 'nhl': nhl()}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'))
-    for k in ('nfl', 'nba'):
+    for k in ('nfl', 'nba', 'nhl'):
         by = {}
         for r in out[k]:
             by[r['S']] = by.get(r['S'], 0) + 1
