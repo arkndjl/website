@@ -155,6 +155,28 @@ def main():
     print(json.dumps(out['bid']), flush=True)
     json.dump(out, open(OUT, 'w'), indent=1)
     print('unmatched', miss)
+    if '--write-fit' in sys.argv:
+        # the shipped stack: every season, team names through cbb_bracket_matrix.match (its alias table)
+        import cbb_bracket_matrix as BX
+        games = C.load_hist(); nm = {}
+        for g_ in games: nm[g_['home']] = g_['hn']; nm[g_['away']] = g_['an']
+        n_m = 0
+        for s in seasons:
+            m = BX.match(BX.parse(os.path.join(sys.argv[1], f'matrix_{s}.html')), nm)
+            for r in R:
+                if r['s'] == s:
+                    x = m.get(r['t']); r['bm'] = x['avg'] if x else None; r['share'] = x['share'] if x else 0.0; n_m += x is not None
+        b, sig, _ = stack(seasons)
+        bb = bstack(seasons)
+        fit = {'note': 'Bracket Matrix stack on the committee model, Selection Sunday state (scripts/research/sweep_nov19/cbb/tourney_bm.py --write-fit)',
+               'seasons': seasons, 'matched': n_m,
+               'seed': {'b': [round(float(x), 4) for x in b], 'sigma': sig, 'heldLogLoss': [round(float(np.mean([v[0] for v in out['seed']['held_bySeason_ll0_ll1_exact0_exact1'].values()])), 4), round(float(np.mean([v[1] for v in out['seed']['held_bySeason_ll0_ll1_exact0_exact1'].values()])), 4)],
+                        'heldExact': [round(float(np.mean([v[2] for v in out['seed']['held_bySeason_ll0_ll1_exact0_exact1'].values()])), 3), round(float(np.mean([v[3] for v in out['seed']['held_bySeason_ll0_ll1_exact0_exact1'].values()])), 3)],
+                        't': out['seed']['held_t_season'], 'n': out['seed']['n']},
+               'bid': {'b': [round(float(x), 4) for x in bb], 'heldLogLoss': [round(float(np.mean([v[0] for v in out['bid']['held_bySeason_ll0_ll1'].values()])), 4), round(float(np.mean([v[1] for v in out['bid']['held_bySeason_ll0_ll1'].values()])), 4)],
+                       't': out['bid']['held_t_season'], 'n': out['bid']['n']}, 'tune': TUNE, 'held': HELD}
+        json.dump(fit, open(os.path.join(C.ROOT, 'data', 'cbb_bracket_matrix_fit.json'), 'w'), indent=1)
+        print(json.dumps(fit))
 
 
 if __name__ == '__main__':

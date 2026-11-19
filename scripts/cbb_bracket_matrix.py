@@ -40,6 +40,61 @@ def parse(src):
     return out
 
 
+# the matrix's school names that the shared team key does not already join to ESPN's
+ALIAS = {'Miami (FLA.)': 'Miami', "St. Mary's (CA)": "Saint Mary's", 'NC-Wilmington': 'UNC Wilmington', 'NC-Asheville': 'UNC Asheville',
+         'NC-Greensboro': 'UNC Greensboro', 'College of Charleston': 'Charleston', 'McNeese State': 'McNeese', 'Louisiana-Lafayette': 'Louisiana',
+         'Arkansas-Little Rock': 'Little Rock', 'Wisconsin-Green Bay': 'Green Bay', 'Wisconsin-Milwaukee': 'Milwaukee',
+         'CSU Bakersfield': 'Cal State Bakersfield', 'E. Tennessee State': 'East Tennessee State', 'Maryland-Baltimore County': 'UMBC',
+         'Texas-Arlington': 'UT Arlington', 'Miami (Ohio)': 'Miami (OH)', 'St. Francis (PA.)': 'Saint Francis', 'Appalachian State': 'App State',
+         'Albany': 'UAlbany'}
+FIT = os.path.join(os.path.dirname(HERE), 'data', 'cbb_bracket_matrix_fit.json')
+
+
+def match(rows, id_name):
+    """{ESPN team id: matrix row} by the shared team key (scripts/names.py); id_name: ESPN id -> ESPN school name"""
+    import names as NM
+    by = {}
+    for i, n in id_name.items():
+        by.setdefault(NM.team_key(n), []).append(i)
+    out = {}
+    for x in rows:
+        ids = by.get(NM.team_key(ALIAS.get(x['team'], x['team'])), [])
+        if len(ids) == 1 and ids[0] not in out:
+            out[ids[0]] = x
+    return out
+
+
+def latest(max_age_days=2):
+    """the newest logged matrix, when it is at most max_age_days old: [{team, seed, avg, n, share}]; else None"""
+    try:
+        last = None
+        for ln in open(LEDGER):
+            if ln.strip(): last = json.loads(ln)
+        t = dt.datetime.strptime(last['t'], '%Y-%m-%dT%H:%MZ').replace(tzinfo=dt.timezone.utc)
+        if (dt.datetime.now(dt.timezone.utc) - t).days > max_age_days:
+            return None
+        tot = max(r[3] for r in last['teams'])
+        return [{'team': r[0], 'seed': r[1], 'avg': r[2], 'n': r[3], 'share': r[3] / tot} for r in last['teams']]
+    except (OSError, ValueError, TypeError, KeyError):
+        return None
+
+
+def stack(teams, id_name):
+    """the committee stack's inputs for cbb_tourney.run on Selection Sunday: the fit (data/cbb_bracket_matrix_fit.json)
+    with each team's matrix average seed (nan when the matrix does not list it) and share of brackets; None without a
+    fresh matrix or a fit"""
+    rows = latest()
+    if not rows or not os.path.exists(FIT):
+        return None
+    f = json.load(open(FIT))
+    m = match(rows, id_name)
+    if len(m) < 50:
+        return None
+    nan = float('nan')
+    return {'seed_b': f['seed']['b'], 'sigma': f['seed']['sigma'], 'bid_b': f['bid']['b'],
+            'avg': [m[t]['avg'] if t in m else nan for t in teams], 'share': [m[t]['share'] if t in m else 0.0 for t in teams]}
+
+
 def log():
     req = urllib.request.Request(URL, headers={'User-Agent': UA})
     rows = parse(urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace'))

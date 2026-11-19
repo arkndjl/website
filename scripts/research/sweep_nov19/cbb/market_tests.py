@@ -113,8 +113,14 @@ def event_ll(X, ev, ch, b):
     return np.array(ll), np.array(rk)
 
 
+# the tests score the model as it stood before the leads shipped: the land fit without its hometown terms, the pay
+# model without 'eada'
+BASE_N = M.LAND_F.index('hlogmi') if 'hlogmi' in M.LAND_F else len(M.LAND_F)
+
+
 def land_data(by, TS, raw, loc, years):
     X, ev, ch, info = M.land_events(by, TS, raw, loc, years)
+    X = X[:, :BASE_N]
     cand = []
     for (y, pid, o, dest) in info:
         cand += [t for t in sorted({r['team'] for r in by[y + 1]}) if t != o]
@@ -148,7 +154,7 @@ def land_test(by, TS, raw, loc, extra, covered, label):
     l0, l1, r0, r1, org, b1 = score([2022, 2023, 2024], 2025)
     d = l1 - l0
     res = {'label': label, 'held_n': int(len(d)), 'held_ll_base': round(float(l0.mean()), 4), 'held_ll_cand': round(float(l1.mean()), 4), 'held_t': round(ct(d, org), 2),
-           'top10_base': round(float((r0 <= 10).mean()), 3), 'top10_cand': round(float((r1 <= 10).mean()), 3), 'coef_extra': [round(float(x), 4) for x in b1[len(M.LAND_F):]]}
+           'top10_base': round(float((r0 <= 10).mean()), 3), 'top10_cand': round(float((r1 <= 10).mean()), 3), 'coef_extra': [round(float(x), 4) for x in b1[BASE_N:]]}
     lo = []
     for y in (2022, 2023, 2024):
         a0, a1, *_ = score([z for z in (2022, 2023, 2024) if z != y], y)
@@ -162,7 +168,7 @@ def land_test(by, TS, raw, loc, extra, covered, label):
 def pay_test(TS, raw, miss, E):
     src = json.load(gzip.open(M.SRC))['pay']
     names = {t for (_, t) in TS}
-    kept = json.load(open(M.OUT))['value']['feats']
+    kept = [k for k in json.load(open(M.OUT))['value']['feats'] if k != 'eada']
     rows = []
     for r in src['list']:
         t = M.match_team(r['school'], names)

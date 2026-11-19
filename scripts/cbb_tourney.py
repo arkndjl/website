@@ -453,6 +453,9 @@ def run(SS, played, left, ctinfo, n_at, model, nsim, rng, tsd, actual=None, chun
                  'auto': auto.astype(float)}
         sc = model['sel']
         score = sc['b'][0] + xmat(parts, sc['feats'], sc['M']) @ np.array(sc['b'][1:])
+        bm = model.get('bm')                       # the Bracket Matrix stack (Selection Sunday only; live() sets it)
+        if bm:
+            score = bm['bid_b'][0] + bm['bid_b'][1] * score + bm['bid_b'][2] * np.asarray(bm['share'])[None, :]
         u = rng.random((k, n))
         score = score + np.log(u / (1 - u))
         score[auto | ~SS.elig[None, :]] = -np.inf
@@ -461,7 +464,13 @@ def run(SS, played, left, ctinfo, n_at, model, nsim, rng, tsd, actual=None, chun
         at[rows, top] = True
         field = auto | at
         sm = model['seed']
-        z = -(sm['b'][0] + xmat(parts, sm['feats'], sm['M']) @ np.array(sm['b'][1:])) + sm['sigma'] * rng.normal(0, 1, (k, n))
+        line = sm['b'][0] + xmat(parts, sm['feats'], sm['M']) @ np.array(sm['b'][1:])
+        sig = sm['sigma']
+        if bm:
+            av = np.asarray(bm['avg'], float)[None, :]
+            line = bm['seed_b'][0] + bm['seed_b'][1] * line + bm['seed_b'][2] * np.where(np.isnan(av), line, av)
+            sig = bm['sigma']
+        z = -line + sig * rng.normal(0, 1, (k, n))
         slots = np.zeros((k, 64, 2), int)
         for j in range(k):
             fi = np.nonzero(field[j])[0]
@@ -986,6 +995,21 @@ def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=
             actual = slots
             fdone = [(SS.ti[g['home']], SS.ti[g['away']]) if g['hs'] > g['as'] else (SS.ti[g['away']], SS.ti[g['home']])
                      for g in tg if g.get('hs') is not None and g['home'] in SS.ti and g['away'] in SS.ti]
+    # Selection Sunday (the regular season over, at most the day's last title games to play, no bracket yet): the committee
+    # model is stacked with the Bracket Matrix's final consensus, the one state that stack was tested in
+    open_ct = sum(1 for i in ctinfo.values() if i.get('champ') is None)
+    stacked = False
+    if not left and not actual and open_ct <= 5 and any(g['ct'] for g in played):
+        try:
+            import cbb_bracket_matrix as BX
+            nm = {}
+            for g in rows:
+                nm[g['home']] = g.get('hn'); nm[g['away']] = g.get('an')
+            bm = BX.stack(teams, {t: nm.get(t) or '' for t in teams})
+            if bm:
+                mdl = dict(mdl, bm=bm); stacked = True
+        except Exception as e:        # the stack sits out rather than stop the odds
+            print('bracket matrix stack failed:', repr(e), flush=True)
     o = run(SS, played, left, ctinfo, n_at, mdl, nsim, np.random.default_rng(int(datetime.utcnow().strftime('%Y%m%d'))), tsd,
             actual=actual, done=fdone)
     out = {}
@@ -998,7 +1022,7 @@ def live(rows, d1, confs, net, T, tau, elo, ng, coef, sd, season, nsim=5000, gm=
         if actual:
             if t in sr:
                 out[t]['seed'] = sr[t][0]
-    meta = {'atLarge': n_at, 'autobids': len(ctinfo), 'bracket': bool(actual), 'sims': nsim}
+    meta = {'atLarge': n_at, 'autobids': len(ctinfo), 'bracket': bool(actual), 'sims': nsim, 'matrix': stacked}
     try:
         meta['proj'] = project_bracket(SS, teams, o, ctinfo, confs, actual, sr if actual else None, nsim)
     except Exception as e:            # the projected bracket sits out rather than stop the odds
