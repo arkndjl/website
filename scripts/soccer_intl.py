@@ -24,6 +24,11 @@ the log of the top 18 values in that squad. After each match both terms move by
 k x w(tournament) x (goals - lambda) (goals capped), new nations learn faster, and ratings drift back toward zero
 between matches. 1X2 from a Dixon-Coles score matrix. An Elo rating (World Football Elo's K and goal multiplier) is
 kept beside it as the comparison model. Settings are tuned on 2000-15 walk-forward log loss and scored once on 2016+.
+A second attack/defence pair learns from shots on target (ESPN match summaries, SOT_LG competitions from 2010,
+scripts/data/soccer_intl_sot.json.gz): target = shots on target x the running goals a shot on target, the same update
+form at kx x k. Once both sides have 5 such matches the goal means move by wx x (shots pair gap - goal pair gap) in
+logs (wx .15, kx 1: tuned 2012-15, held 2016 to Jul 2026 t -4.18 on matches where it applies). The goal pair still
+learns from goals alone; the ranking's rating is the goal pair's.
 """
 import bisect
 import csv
@@ -635,6 +640,79 @@ def attach_alt(rows):
             r['alt'] = g
 
 
+# ---------------------------------------------------------------- ESPN shot stats
+SOTF = os.path.join(HERE, 'data', 'soccer_intl_sot.json.gz')
+SOT_LG = ('fifa.world', 'uefa.euro', 'conmebol.america', 'uefa.nations', 'uefa.euroq', 'fifa.worldq.uefa',
+          'fifa.worldq.conmebol', 'concacaf.gold', 'caf.nations', 'afc.asian.cup', 'fifa.worldq.concacaf',
+          'concacaf.nations.league')
+SOT_FROM = '2010-01-01'
+_SOT = []
+
+
+def sot_file():
+    """{'s': 'day|home|away' -> [home shots on target, away], 'tried': [ESPN ids already read]}: the ESPN match
+    summaries' team stats for the competitions in SOT_LG (a match counts when both sides list shots on target and the
+    two sides' shots sum to 4+)"""
+    if not _SOT:
+        try:
+            _SOT.append(json.load(gzip.open(SOTF, 'rt')))
+        except (OSError, ValueError):
+            _SOT.append({'s': {}, 'tried': []})
+    return _SOT[0]
+
+
+def sot_one(lg, gid):
+    u = f'https://site.api.espn.com/apis/site/v2/sports/soccer/{lg}/summary?event={gid}'
+    req = urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=40) as f:
+        d = json.load(f)
+    comp = ((d.get('header') or {}).get('competitions') or [{}])[0]
+    ha = {str(c.get('id')): c.get('homeAway') for c in comp.get('competitors') or []}
+    st = {}
+    for t in (d.get('boxscore') or {}).get('teams') or []:
+        side = ha.get(str((t.get('team') or {}).get('id'))) or t.get('homeAway')
+        st[side] = {x['name']: x.get('displayValue') for x in t.get('statistics') or []}
+    try:
+        h, a = st['home'], st['away']
+        if int(h['totalShots']) + int(a['totalShots']) >= 4:
+            return [int(h['shotsOnTarget']), int(a['shotsOnTarget'])]
+    except (KeyError, TypeError, ValueError):
+        pass
+    return None
+
+
+def update_sot(rows, budget=150):
+    """read the summaries of finished matches in SOT_LG not read before (newest first), one a second"""
+    S = sot_file()
+    tried = set(S['tried'])
+    todo = [r for r in rows if r.get('espn') and r.get('lg') in SOT_LG and r['day'] >= SOT_FROM and str(r['espn']) not in tried]
+    todo.sort(key=lambda r: r['day'], reverse=True)
+    n = 0
+    for r in todo[:budget]:
+        try:
+            v = sot_one(r['lg'], r['espn'])
+        except Exception as ex:
+            print(f'shot stats {r["espn"]}: {ex!r}', file=sys.stderr)
+            continue
+        S['tried'].append(str(r['espn']))
+        if v:
+            S['s'][f"{r['day']}|{r['h']}|{r['a']}"] = v
+        n += 1
+        time.sleep(1.05)
+    if n:
+        with gzip.open(SOTF, 'wt') as f:
+            json.dump(S, f, separators=(',', ':'), ensure_ascii=False)
+    print(f'shot stats: {n} new summaries, {len(S["s"])} matches on record', flush=True)
+
+
+def attach_sot(rows):
+    S = sot_file()['s']
+    for r in rows:
+        v = S.get(f"{r['day']}|{r['h']}|{r['a']}")
+        if v:
+            r['sot'] = v
+
+
 # ---------------------------------------------------------------- the model
 GMAX = 11
 FAC = [math.factorial(i) for i in range(GMAX)]
@@ -675,7 +753,7 @@ def wdl(lh, la, rho):
 # tuned on 2000-15 walk-forward log loss (fit() rewrites data/soccer_intl_fit.json; these are its start and the fallback)
 P0 = {'k': 0.06, 'kh': 0.002, 'H0': 0.30, 'km': 0.001, 'm0': 0.25, 'rev': 0.10, 'boost': 1.5, 'nb': 10.0, 'cap': 5,
       'wwc': 1.2, 'wcf': 1.0, 'wq': 1.0, 'wnl': 1.0, 'wf': 0.6, 'wo': 0.8, 'rho': -0.05, 'sq': 0.0, 'kd': 1.0,
-      'a0': 0.0, 'd0': 0.0, 'sqc': 0.24, 'sqr': 0.04, 'alt': 0.35}
+      'a0': 0.0, 'd0': 0.0, 'sqc': 0.24, 'sqr': 0.04, 'alt': 0.35, 'wx': 0.15, 'kx': 1.0}
 TUNE, HOLD = ('2000-01-01', '2015-12-31'), '2016-01-01'
 ELO_K = {'wc': 60, 'cf': 50, 'q': 40, 'nl': 40, 'o': 30, 'f': 20}
 
@@ -690,6 +768,11 @@ class Ratings:
         self.m = P['m0']
         self.H = P['H0']
         self.elo = defaultdict(lambda: 1500.0)
+        # the shots-on-target pair (process()): attack / defence from shots on target x the running goals a shot on target
+        self.xa = defaultdict(float)
+        self.xd = defaultdict(float)
+        self.xn = Counter()
+        self.xg, self.xs = 30.0, 100.0
 
     def _decay(self, t, day):
         lt = self.last.get(t)
@@ -715,6 +798,35 @@ class Ratings:
         lh = math.exp(self.m + hh + self.a[h] - self.d[a] + x)
         la = math.exp(self.m - hh + self.a[a] - self.d[h] - x)
         return lh, la
+
+    def process(self, h, a):
+        """log shifts of the two goal means toward the shots-on-target ratings (wx of the gap between them and the goal
+        ratings), once both sides have 5 matches with ESPN shot stats; else none"""
+        w = self.P.get('wx') or 0.0
+        if not w or self.xn[h] < 5 or self.xn[a] < 5:
+            return 0.0, 0.0
+        return (w * ((self.xa[h] - self.xd[a]) - (self.a[h] - self.d[a])),
+                w * ((self.xa[a] - self.xd[h]) - (self.a[a] - self.d[h])))
+
+    def update_sot(self, r):
+        """after the goal update: a match with shots on target on record (r['sot'] = home, away) moves the shots pair,
+        the same update form as goals with target = shots on target x running goals a shot on target"""
+        st = r.get('sot')
+        if not st or not self.P.get('wx'):
+            return
+        P = self.P
+        h, a = r['h'], r['a']
+        c = self.xg / self.xs
+        hh = 0 if r['neu'] else self.H / 2
+        lh = math.exp(self.m + hh + self.xa[h] - self.xd[a])
+        la = math.exp(self.m - hh + self.xa[a] - self.xd[h])
+        k = P['kx'] * P['k'] * P['w' + r['cat']]
+        eh, ea = min(c * st[0], P['cap']) - lh, min(c * st[1], P['cap']) - la
+        self.xa[h] += k * eh; self.xd[a] -= k * eh * P['kd']
+        self.xa[a] += k * ea; self.xd[h] -= k * ea * P['kd']
+        gh, ga = res90(r)
+        self.xg += gh + ga; self.xs += st[0] + st[1]
+        self.xn[h] += 1; self.xn[a] += 1
 
     def strength(self, t, q=None, q0=None):
         """expected goal margin a match against an average side at a neutral ground"""
@@ -770,13 +882,16 @@ def run(rows, P, lo=TUNE[0], hi=TUNE[1], keep=False, minn=5):
         qh, qa = r.get('qh'), r.get('qa')
         lh, la = R.rates(h, a, r['neu'], qh, qa, r.get('ch'), r.get('ca'), r.get('alt', 0.0))
         if lo <= r['day'] <= hi and R.n[h] >= minn and R.n[a] >= minn:
+            xh, xa = R.process(h, a)
+            ph, pa = lh * math.exp(xh), la * math.exp(xa)
             if keep:
-                w, d_, l_, o25, _, _, _ = wdl(lh, la, rho)
+                w, d_, l_, o25, _, _, _ = wdl(ph, pa, rho)
                 dr = R.elo[h] - R.elo[a] + (0 if r['neu'] else 100)
-                sc.append((r, w, d_, l_, dr, lh, la, o25))
+                sc.append((r, w, d_, l_, dr, ph, pa, o25))
             else:
-                sc.append((r, lh, la))
-        R.update(r, lh, la)
+                sc.append((r, ph, pa))
+        R.update(r, lh, la)          # the goal ratings learn from the goal means alone
+        R.update_sot(r)
     return R, sc
 
 
@@ -998,6 +1113,7 @@ def fit(retune=True):
     attach_sq(rows)
     attach_cu(rows)
     attach_alt(rows)
+    attach_sot(rows)
     P = params()
     log = []
 
@@ -1388,6 +1504,11 @@ def build():
         print(f'call-up squads: {ex!r}, on the stored file', file=sys.stderr)
     attach_cu(rows)
     attach_alt(rows)
+    try:
+        update_sot(rows)
+    except Exception as ex:
+        print(f'shot stats: {ex!r}, on the stored file', file=sys.stderr)
+    attach_sot(rows)
     today = dt.date.today().isoformat()
     R, _ = run(rows, P, '9999', '9999')
     week = (dt.date.today() - dt.timedelta(days=7)).isoformat()
@@ -1402,7 +1523,9 @@ def build():
     sqv = {t: math.expm1(q_of(t)) for t in pool}
 
     def rates(h, a, neu, day=today):
-        return R.rates(h, a, neu, q_of(h, day), q_of(a, day), cu_q(h, day, a), cu_q(a, day, h), alt_gap(h, a, neu))
+        lh, la = R.rates(h, a, neu, q_of(h, day), q_of(a, day), cu_q(h, day, a), cu_q(a, day, h), alt_gap(h, a, neu))
+        xh, xa = R.process(h, a)
+        return lh * math.exp(xh), la * math.exp(xa)
 
     def board(Rx, day):
         raw = sorted(pool, key=lambda t: -Rx.strength(t, sq_of(t, day) or 0.0, 0.0))

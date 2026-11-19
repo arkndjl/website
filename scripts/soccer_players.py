@@ -16,6 +16,11 @@ him off (off); his own non-penalty xG and his xA; xGBuildup (xG of possessions h
 and the shot); for goalkeepers, goals saved against xG faced (non-penalty shots on target and off: Understat's xG is
 before the shot, so this is mostly finishing luck against him). Every rate is per 90 minutes, relative to the
 league-season average, and shrunk toward the average for his position by minutes (the shrink minutes tuned).
+Two more rates, xG plus-minus (rapm_window): a weighted ridge over three seasons of on-pitch spells (the same 22 on the
+field), each spell's non-penalty xG a 90 on the attacking side's players (orp, offence) and the defending side's (drp,
+defence), with league-season and home terms; offence shrunk toward his own xG + xA a 90 over the window, defence
+toward 0. The coefficient of season S uses seasons S-2..S only. The live run keeps the two finished seasons' spells in
+scripts/data/soccer_rapm_segs.json.gz (written by --fit).
 
 The weights: each team-season's goal difference a match is predicted from LAST season's shrunk rates of its players,
 weighted by THIS season's minutes, centred within the league-season; a ridge fit, leave-one-season-out. A rate keeps
@@ -61,8 +66,12 @@ FIT = os.path.join(ROOT, 'data', 'soccer_war_fit.json')
 OUT = os.path.join(ROOT, 'data', 'soccer_war.json')
 SDIR = os.path.join(ROOT, 'static', 'data', 'soccer-war')
 FIRST = 2015
-FEATS = ['onf', 'ona', 'rel', 'npxg', 'xas', 'bup', 'gk']
-NAMES = {'onf': 'team xG for with him on', 'ona': 'team xG against with him on (negative = fewer)',
+FEATS = ['onf', 'ona', 'rel', 'npxg', 'xas', 'bup', 'gk', 'orp', 'drp']
+RAPM = ('orp', 'drp')            # plus-minus coefficients (rapm()): already shrunk, so rates() leaves them as they are
+SEGF = os.path.join(HERE, 'data', 'soccer_rapm_segs.json.gz')
+RAPM_LAM, RAPM_K = 1000.0, 450
+NAMES = {'orp': 'xG plus-minus, offence (regression over on-pitch spells, 3 seasons)', 'drp': 'xG plus-minus, defence (fewer against = higher)',
+         'onf': 'team xG for with him on', 'ona': 'team xG against with him on (negative = fewer)',
          'rel': 'on minus off: team xG difference', 'npxg': 'own non-penalty xG', 'xas': 'expected assists (xA)',
          'bup': 'xGBuildup', 'gk': 'goalkeeper: goals saved vs xG faced'}
 POS = {'GK': 'GK', 'DR': 'D', 'DL': 'D', 'DC': 'D', 'DMR': 'M', 'DML': 'M', 'DMC': 'M', 'MR': 'M', 'ML': 'M', 'MC': 'M',
@@ -195,6 +204,139 @@ def team_seasons(S0, S1):
     return out
 
 
+# ---------------------------------------------------------------- xG plus-minus
+def segments(S, before=None):
+    """season S's on-pitch spells, big five: [league, [home player ids], [away ids], minutes, home npxG, away npxG]
+    (a spell = minutes with the same 22, or fewer after a red card; own goals and penalties out of the xG). before:
+    only matches kicked off before this 'YYYY-MM-DD' (an in-season snapshot)"""
+    out = []
+    for lg in D.BIG5:
+        d = D.us_league(lg, S)
+        for mt in (d or {}).get('matches', []):
+            if not mt['res'] or (before and (mt.get('t') or '') >= before):
+                continue
+            m = D.us_match(mt['id'])
+            if not m:
+                continue
+            iv = {}
+            for s_ in 'ha':
+                rs = {}
+                for r in m['ro'][s_]:
+                    if all(str(q.get('player_id')) != str(r.get('player_id')) for q in rs.values()):
+                        rs[r['id']] = r
+                start = {}
+                for r in rs.values():
+                    if int(f(r.get('positionOrder'))) < 17 and str(r.get('roster_out')) in ('0', 'None', ''):
+                        start[r['id']] = 0
+                for _ in range(6):
+                    for r in rs.values():
+                        ro_ = str(r.get('roster_out') or '0')
+                        if r['id'] not in start and ro_ in start and ro_ in rs:
+                            start[r['id']] = start[ro_] + int(f(rs[ro_]['time']))
+                iv[s_] = []
+                for r in rs.values():
+                    mins = int(f(r['time']))
+                    if mins <= 0 or r['id'] not in start:
+                        continue
+                    a = start[r['id']]
+                    b = min(90, a + mins)
+                    if b > a:
+                        iv[s_].append((str(r['player_id']), a, b))
+            cuts = sorted({0, 90} | {x for s_ in 'ha' for _, a, b in iv[s_] for x in (a, b)})
+            sh = {s_: [(int(f(x[0])), f(x[1])) for x in m['sh'].get(s_, []) if x[4] != 'Penalty' and x[3] != 'OwnGoal'] for s_ in 'ha'}
+            for a, b in zip(cuts, cuts[1:]):
+                last = b >= 90
+                on = {s_: [p for p, x, y in iv[s_] if x <= a and y >= b] for s_ in 'ha'}
+                if len(on['h']) < 7 or len(on['a']) < 7:
+                    continue
+                xg = {s_: sum(v for mn, v in sh[s_] if a <= mn < b or (last and mn >= 90)) for s_ in 'ha'}
+                out.append([lg, on['h'], on['a'], b - a, round(xg['h'], 4), round(xg['a'], 4)])
+    return out
+
+
+def _pcg(mv, b, diag, iters=3000, tol=1e-8):
+    """conjugate gradient with a diagonal preconditioner on a symmetric positive operator mv (numpy only)"""
+    x = np.zeros_like(b)
+    r = b - mv(x)
+    z = r / diag
+    p = z.copy()
+    rz = r @ z
+    nb = np.sqrt(b @ b) or 1.0
+    for _ in range(iters):
+        q = mv(p)
+        al = rz / (p @ q)
+        x += al * p
+        r -= al * q
+        if np.sqrt(r @ r) < tol * nb:
+            break
+        z = r / diag
+        rz2 = r @ z
+        p = z + (rz2 / rz) * p
+        rz = rz2
+    return x
+
+
+def rapm_window(segs, rows, S, lam=RAPM_LAM):
+    """player id -> (offence, defence) xG plus-minus a 90 over seasons S-2..S: weighted ridge of each spell's npxG a
+    90 on the attacking side's players (offence), the defending side's (defence), a league-season level and the home
+    side; shrunk toward a box prior (his non-penalty xG + xA a 90 over the window, less its average, with 450
+    minutes of regression) for offence and 0 for defence. Defence is returned with fewer against = higher"""
+    W = [(lg, s_, x) for s_, v in segs.items() if S - 2 <= s_ <= S for lg, *x in v]
+    box = defaultdict(lambda: [0.0, 0.0])
+    for r in rows:
+        if S - 2 <= r['S'] <= S:
+            e = box[str(r['p'])]
+            e[0] += r['x'] - r['pen'] + r['xA']; e[1] += r['min']
+    tot = sum(e[1] for e in box.values()) or 1
+    mu = sum(e[0] for e in box.values()) / tot * 90
+    pid, ls = {}, {}
+    for lg, s_, x in W:
+        for p in x[0] + x[1]:
+            pid.setdefault(p, len(pid))
+        ls.setdefault((lg, s_), len(ls))
+    n = len(pid)
+    k = 2 * n + len(ls) + 1
+    ri, ci, y, w = [], [], [], []
+    i = 0
+    for lg, s_, (H, A, mins, xh, xa) in W:
+        for att, dfn, xg, home in ((H, A, xh, 1), (A, H, xa, 0)):
+            cols = [pid[p] for p in att] + [n + pid[p] for p in dfn] + [2 * n + ls[(lg, s_)]] + ([k - 1] if home else [])
+            ri += [i] * len(cols); ci += cols
+            y.append(xg / mins * 90); w.append(mins / 90)
+            i += 1
+    if not i:
+        return {}
+    ri, ci, y, w = np.array(ri), np.array(ci), np.array(y), np.array(w)
+    prior = np.zeros(k)
+    for p, j in pid.items():
+        e = box.get(p)
+        if e and e[1] > 0:
+            prior[j] = (e[0] / e[1] * 90 - mu) * e[1] / (e[1] + RAPM_K)
+    pen = np.r_[np.full(2 * n, lam), np.full(k - 2 * n, 1e-6)]
+    Xv = lambda v: np.bincount(ri, weights=v[ci], minlength=i)
+    XTu = lambda u: np.bincount(ci, weights=u[ri], minlength=k)
+    mv = lambda v: XTu(w * Xv(v)) + pen * v
+    diag = np.bincount(ci, weights=w[ri], minlength=k) + pen
+    beta = prior + _pcg(mv, XTu(w * (y - Xv(prior))), diag)
+    return {p: (float(beta[j]), float(-beta[n + j])) for p, j in pid.items()}
+
+
+def load_segs():
+    try:
+        return {int(k): v for k, v in D.load(SEGF).items()}
+    except (OSError, ValueError):
+        return {}
+
+
+def rapm(rows, seasons, segs):
+    """orp / drp on every row of the given seasons (0 for a player with no spell in the window)"""
+    co = {S: rapm_window(segs, rows, S) for S in seasons}
+    for r in rows:
+        if r['S'] in co:
+            r['orp'], r['drp'] = co[r['S']].get(str(r['p']), (0.0, 0.0))
+    return rows
+
+
 # ---------------------------------------------------------------- rates
 def rates(rows, shrink):
     """per-90 rates relative to the league-season average (minutes-weighted), shrunk toward the position mean by
@@ -213,14 +355,14 @@ def rates(rows, shrink):
             r['_bup'] = r['bu'] / m90
             r['_gk'] = r['gks'] / m90 if r['pos'] == 'GK' else 0.0
             r['_rel'] = 0.0                               # on minus off: set in prep()
-        for k in FEATS:
+        for k in [x for x in FEATS if x not in RAPM]:
             mu = sum(r['_' + k] * r['min'] for r in rs) / tot
             for r in rs:
                 r['_' + k] -= mu
         for pos in ('GK', 'D', 'M', 'F'):
             ps = [r for r in rs if r['pos'] == pos]
             pm = sum(r['min'] for r in ps) or 1
-            for k in FEATS:
+            for k in [x for x in FEATS if x not in RAPM]:
                 mu = sum(r['_' + k] * r['min'] for r in ps) / pm
                 for r in ps:
                     w = r['min'] / (r['min'] + shrink)
@@ -386,6 +528,10 @@ def fit():
     else:
         rows = build_rows(FIRST, S1)
         D.save(ROWS, rows)
+    segs = {S: segments(S) for S in range(FIRST, S1 + 1)}
+    rapm(rows, range(FIRST, S1 + 1), segs)
+    D.save(ROWS, rows)
+    D.save(SEGF, {str(S): segs[S] for S in (S1 - 2, S1 - 1) if S in segs})     # the live window's finished seasons
     ts = team_seasons(FIRST, S1)
     done = [r for r in rows if r['S'] < S1]
     tsd = {k: v for k, v in ts.items() if k[1] < S1}
@@ -448,7 +594,7 @@ def fit():
 
 
 def value(r, F):
-    return sum(F['w'][f_] * r[f_] for f_ in F['feats'])
+    return sum(F['w'][f_] * r.get(f_, 0.0) for f_ in F['feats'])
 
 
 def movers(rows, LS, F):
@@ -524,6 +670,28 @@ def _fit():
     return _FIT[0]
 
 
+def staleness(S):
+    """big-five leagues whose Understat match files trail the results: 18+ finished league matches (about two rounds)
+    on ESPN's scoreboard after the league's newest Understat match. [] when every league is in step; the player tabs
+    show it in the status bar and keep the last Understat numbers (no second source is mixed in)"""
+    today = dt.date.today().isoformat()
+    out = []
+    for lg in D.BIG5:
+        try:
+            d = D.us_league(lg, S) or {}
+            us = max((str(m['t'])[:10] for m in d.get('matches', []) if m.get('res') and m.get('t')), default=None)
+            if not us:
+                continue
+            cut = (dt.date.fromisoformat(us) + dt.timedelta(days=1)).isoformat()
+            n = sum(1 for y in sorted({int(us[:4]), int(today[:4])}) for r in (D.espn_year(lg, y) or [])
+                    if r.get('hs') is not None and cut < r['day'] <= today)
+            if n >= 18:
+                out.append({'lg': lg, 'last': us, 'missing': n})
+        except Exception as e:                           # a freshness check never stops the build
+            print(f'staleness {lg}: {e!r}', file=sys.stderr)
+    return out
+
+
 def write(rows, F, ts, all_seasons=False):
     prep(rows, F['shrink'])
     by = defaultdict(list)
@@ -564,8 +732,8 @@ def write(rows, F, ts, all_seasons=False):
             o['rk'] = i
         for o in out:
             c = {f_: o.pop('c_' + f_, 0) for f_ in FEATS}
-            o['off'] = round(sum(c[f_] for f_ in ('onf', 'npxg', 'xas', 'bup')), 2)
-            o['def'] = round(sum(c[f_] for f_ in ('ona', 'gk')), 2)
+            o['off'] = round(sum(c[f_] for f_ in ('onf', 'npxg', 'xas', 'bup', 'orp')), 2)
+            o['def'] = round(sum(c[f_] for f_ in ('ona', 'gk', 'drp')), 2)
             o['oth'] = round(c['rel'] + o.pop('lgx'), 2)          # on-off and league strength
         games = max([r['mp'] for r in rs] or [1])
         # predictive badges (scripts/soccer_badges.py; backtest scripts/soccer_badge_backtest.py): pool and badge at
@@ -581,7 +749,7 @@ def write(rows, F, ts, all_seasons=False):
         rate_attach(S, out)
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
                           'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
-                          'mv': MV.meta(S)}, separators=(',', ':'), allow_nan=False)
+                          'mv': MV.meta(S), 'stale': staleness(S) if S == cur else []}, separators=(',', ':'), allow_nan=False)
         open(os.path.join(SDIR, f'{S}.json'), 'w').write(txt)
         if S == cur:
             top = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': S, 'current': S,
@@ -831,6 +999,9 @@ def current():
     S = D.current_season()
     old = [r for r in D.load(ROWS) if r['S'] < S]          # finished seasons are frozen in ROWS (re-run --fit each summer)
     rows = old + build_rows(S, S)
+    segs = load_segs()
+    segs[S] = segments(S)
+    rapm(rows, [S], segs)
     write(rows, F, None)
 
 

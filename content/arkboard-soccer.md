@@ -11,7 +11,7 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,rookies,next up,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:leaders,rookies,next up,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time,managers|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
 {{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
@@ -25,9 +25,10 @@ cover = "/og/soccer.png"
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="soccer" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
-{{< wintabs tab="leaders" tabs="GAR leaders,player stats" sub="true" label="leaders views" >}}
+{{< wintabs tab="leaders" tabs="GAR leaders,player stats,top speed" sub="true" label="leaders views" >}}
 {{< soccerplayers view="value" title="GAR leaders" tab="GAR leaders" >}}
 {{< soccerplayers view="stats" title="player stats" tab="player stats" >}}
+{{< lazytab tab="top speed" >}}{{< soccerextra k="speed" tab="top speed" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}
 {{< depthchart sport="soccer" title="depth chart" tab="depth chart" >}}
@@ -66,10 +67,13 @@ cover = "/og/soccer.png"
 {{< lazytab tab="Scottish Prem" >}}{{< soccerleague lg="sco.1" title="Scottish Premiership" tab="Scottish Prem" >}}{{< /lazytab >}}
 {{< lazytab tab="Allsvenskan" >}}{{< soccerleague lg="swe.1" title="Allsvenskan" tab="Allsvenskan" >}}{{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="MLS" tabs="MLS,MLS bracket" sub="true" label="MLS views" >}}
+{{< wintabs tab="MLS" tabs="MLS,MLS bracket,MLS players,MLS keepers" sub="true" label="MLS views" >}}
 {{< lazytab tab="MLS" >}}{{< soccermls tab="MLS" >}}{{< /lazytab >}}
 {{< lazytab tab="MLS bracket" >}}{{< bracket k="soccer" title="projected bracket" tab="MLS bracket" icon="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS players" >}}{{< soccerextra k="mls" tab="MLS players" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS keepers" >}}{{< soccerextra k="mlsgk" tab="MLS keepers" >}}{{< /lazytab >}}
 {{< /wintabs >}}
+{{< lazytab tab="managers" >}}{{< soccerextra k="managers" tab="managers" >}}{{< /lazytab >}}
 {{< wintabs tab="UEFA cups" tabs="Champions League,Europa League,Conference League,UCL bracket,UEL bracket,UECL bracket" sub="true" label="UEFA cups views" >}}
 {{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
@@ -78,10 +82,11 @@ cover = "/og/soccer.png"
 {{< lazytab tab="UEL bracket" >}}{{< bracket k="uel" title="Europa League projected bracket" tab="UEL bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="UECL bracket" >}}{{< bracket k="uecl" title="Conference League projected bracket" tab="UECL bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="national teams" tabs="world ranking,internationals,Nations League" sub="true" label="national teams views" >}}
+{{< wintabs tab="national teams" tabs="world ranking,internationals,Nations League,scorers" sub="true" label="national teams views" >}}
 {{< lazytab tab="world ranking" >}}{{< soccerintl view="ranking" title="world ranking" tab="world ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="internationals" >}}{{< soccerintl view="games" title="internationals" tab="internationals" >}}{{< /lazytab >}}
 {{< lazytab tab="Nations League" >}}{{< soccerintl view="nl" title="Nations League" tab="Nations League" >}}{{< /lazytab >}}
+{{< lazytab tab="scorers" >}}{{< soccerextra k="scorers" tab="scorers" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
 {{< lazytab tab="all-time teams" >}}
