@@ -160,3 +160,17 @@ LOGGING on (daily forward log + lockbox score registered here), never a ship (hi
   2025 and the tune split (2022-23) cannot have a sign. For this flag only: scored on 2025-26 (the seasons whose fit
   has seen a policy season); pass = t <= -2 on 2025-26 all rows with both seasons lower, Holm in PLAY; no tune-sign
   condition. natl and cup keep the general rule (cup also has no row before 2024: same treatment as star).
+
+## Addendum B (Nov 19 2026 21:13Z; before any lead 11 row was scored)
+- DARKO's Time Machine returns no rows for x_drb_100 / x_orb_100 on any past date (matching_players 0; current
+  roster only). Lead 11 therefore uses DARKO for MIN, PTS and AST; REB keeps the shipped line (c_reb = 0) inside PRA,
+  and the REB scorecard row is not reported. Everything else as registered.
+
+## Addendum C (Nov 19 2026 21:20Z; gate results recorded, no stack row scored yet)
+- Gate: G1 17 final games unchanged after 30 min (weak: same day); G2 200 games, predictor home gameProjection vs the
+  summary's first in-game home win % median |diff| .88, p90 1.03 points (pass: consistent with a frozen pre-tip
+  value); G3 on the 801 sampled games fetched so far, predictor MAE 10.70 vs close 10.51 (no leak signature). Gate
+  passes, so the stack test runs.
+- Stack form, fixed now: candidate = committed walk-forward margin + c x (bpi - walk margin), c fit by least squares
+  on the sampled games of the seasons before (expanding). 2022 has no earlier season, so it only trains: tune
+  scored 2023-24, held 2025-26 (both seasons lower needed for "most seasons", plus tune same sign).

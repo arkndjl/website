@@ -123,7 +123,7 @@ def darko(D, names, feats, folder):
     for fn in glob.glob(os.path.join(folder, 'x_*.json')):
         m, d = os.path.basename(fn)[:-5].rsplit('_', 1)
         snap.setdefault(dt.date.fromisoformat(d), {})[m] = json.load(open(fn))
-    dates = sorted(d for d, v in snap.items() if len(v) == 5)
+    dates = sorted(d for d, v in snap.items() if all(len(v.get(m) or {}) for m in ('x_minutes', 'x_pts_100', 'x_ast_100')))
     idx = {}
     for d in dates:
         s = d.year + 1 if d.month >= 10 else d.year
@@ -131,8 +131,8 @@ def darko(D, names, feats, folder):
         mp = {}
         for nid, v in snap[d]['x_minutes'].items():
             pid = find(v[0])
-            if pid and all(nid in snap[d][m] for m in snap[d]):
-                mp[pid] = {m: snap[d][m][nid][2] for m in snap[d]}
+            if pid and all(nid in snap[d][m] for m in ('x_pts_100', 'x_ast_100')):
+                mp[pid] = {m: snap[d][m][nid][2] for m in ('x_minutes', 'x_pts_100', 'x_ast_100')}
         idx[d] = mp
     dk = {s: np.full(len(D), np.nan) for s in STATS}; rate = {s: np.full(len(D), np.nan) for s in STATS}
     for i, r in enumerate(D):
@@ -140,14 +140,14 @@ def darko(D, names, feats, folder):
         for d in dates:
             if 0 < (day - d).days <= 21 and r['p'] in idx[d]:
                 v = idx[d][r['p']]; ps = poss.get(r['S'] - 1, 100.0) / 100.0
-                per = {'pts': v['x_pts_100'], 'reb': v['x_drb_100'] + v['x_orb_100'], 'ast': v['x_ast_100']}
+                per = {'pts': v['x_pts_100'], 'ast': v['x_ast_100']}      # no rebound history (PREREG addendum B)
                 dk['min'][i] = v['x_minutes']
                 for s in per:
                     rate[s][i] = per[s] * ps / 48.0
                     dk[s][i] = rate[s][i] * v['x_minutes']
-    ok = ~np.isnan(dk['min']) & ~np.isnan(pred0['min'][0])
+    ok = ~np.isnan(dk['min']) & ~np.isnan(pred0['min'][0]) & ~np.isnan(pred0['pts'][0])
     res = {'n': int(ok.sum()), 'dates': [str(d) for d in dates], 'scorecard': {}}
-    for s in STATS:
+    for s in ('min', 'pts', 'ast'):
         p0, y = pred0[s]
         res['scorecard'][s] = {'ours': round(float(np.abs(p0 - y)[ok].mean()), 4), 'darko': round(float(np.abs(dk[s] - y)[ok].mean()), 4),
                                't': round(C.paired((np.abs(dk[s] - y) - np.abs(p0 - y))[ok], G[ok])['t'], 2)}
@@ -156,6 +156,8 @@ def darko(D, names, feats, folder):
     pra1 = np.zeros(len(D)); cs = {}
     for s in ('pts', 'reb', 'ast'):
         p0, y = pred0[s]
+        if s == 'reb':
+            pra1 += p0; cs[s] = 0.0; continue
         gap = rate[s] * pred0['min'][0] - p0
         c = float((gap[fit] * (y - p0)[fit]).sum() / (gap[fit] ** 2).sum())
         cs[s] = round(c, 4)
