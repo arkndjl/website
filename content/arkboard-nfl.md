@@ -58,7 +58,7 @@ cover = "/og/nfl.png"
 {{< /lazytab >}}
 {{< nflteamwar title="team WAR" tab="team WAR" >}}
 {{< /wintabs >}}
-{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
+{{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses,all-time coaches" sub="true" label="all-time views" >}}
 {{< lazytab tab="all-time teams" >}}
 {{< alltime sport="nfl" list="teams" title="all-time teams" tab="all-time teams" >}}
 {{< /lazytab >}}
@@ -67,6 +67,9 @@ cover = "/og/nfl.png"
 {{< /lazytab >}}
 {{< lazytab tab="all-time defenses" >}}
 {{< alltime sport="nfl" list="defense" title="all-time defenses" tab="all-time defenses" >}}
+{{< /lazytab >}}
+{{< lazytab tab="all-time coaches" >}}
+{{< coachalltime sport="nfl" title="all-time coaches" tab="all-time coaches" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
