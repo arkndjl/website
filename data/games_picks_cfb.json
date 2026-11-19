@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-19T14:55:51Z",
+ "asof": "2026-11-19T15:30:11Z",
  "recenter": {
-  "week": 0.39
+  "week": 0.38
  },
  "monitor": {
   "clocks": {
@@ -269,29 +269,13 @@
  },
  "model": {
   "asof": "2026-11-19",
-  "ageH": -9.1,
+  "ageH": -8.5,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401858531",
-   "sport": "cfb",
-   "kick": "2026-11-21T17:00:00.000Z",
-   "home": "Nebraska",
-   "away": "Ohio State",
-   "mk": "total",
-   "side": "over",
-   "line": 41.5,
-   "price": -114.0,
-   "edge": 6.8,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -6.4,
-   "tm": 48.3
-  },
   {
    "id": "401856754",
    "sport": "cfb",
@@ -323,6 +307,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": 10.5,
    "tm": 52.8
+  },
+  {
+   "id": "401858531",
+   "sport": "cfb",
+   "kick": "2026-11-21T17:00:00.000Z",
+   "home": "Nebraska",
+   "away": "Ohio State",
+   "mk": "total",
+   "side": "over",
+   "line": 42.5,
+   "price": -110.0,
+   "edge": 5.8,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -6.4,
+   "tm": 48.3
   },
   {
    "id": "401858528",
@@ -525,7 +525,7 @@
    "mk": "total",
    "side": "over",
    "line": 46.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 1.7,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -653,7 +653,7 @@
    "mk": "total",
    "side": "under",
    "line": 66.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 8.0,
    "x": null,
    "why": "total market off",
@@ -717,9 +717,9 @@
   "401858531": {
    "mk": "total",
    "side": "over",
-   "line": 41.5,
-   "price": -114.0,
-   "edge": 6.8,
+   "line": 42.5,
+   "price": -110.0,
+   "edge": 5.8,
    "ev": null,
    "units": 0.0,
    "home": "Nebraska",
@@ -946,7 +946,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -122.0,
+   "price": -124.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -970,7 +970,7 @@
    "mk": "spread",
    "side": "home",
    "line": 17.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -1006,7 +1006,7 @@
    "mk": "spread",
    "side": "home",
    "line": 48.5,
-   "price": -129.0,
+   "price": -127.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -1066,7 +1066,7 @@
    "mk": "total",
    "side": "over",
    "line": 46.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -1234,7 +1234,7 @@
    "mk": "spread",
    "side": "away",
    "line": 9.5,
-   "price": -112.0,
+   "price": -114.0,
    "edge": 4.4,
    "ev": null,
    "units": 0.0,
@@ -1294,7 +1294,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 101.0,
+   "price": 103.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
@@ -1378,7 +1378,7 @@
    "mk": "total",
    "side": "under",
    "line": 66.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 8.0,
    "ev": null,
    "units": 0.0,
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23942,
+  "snapshots": 23965,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 4975,
+    "clvN": 4983,
     "clvRet": -0.0437,
-    "clvT": -34.74,
+    "clvT": -34.81,
     "clv": 0.29,
     "beat": 0.353,
-    "still": 0.357
+    "still": 0.358
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T14:55:51Z",
+ "checked": "2026-11-19T15:30:11Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
