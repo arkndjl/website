@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-19T21:26:49Z",
+ "asof": "2026-11-19T21:53:35Z",
  "recenter": {
-  "week": 0.4
+  "week": 0.41
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-19",
-  "ageH": -2.6,
+  "ageH": -2.1,
   "stale": false
  },
  "picks": [],
@@ -477,7 +477,7 @@
    "mk": "total",
    "side": "over",
    "line": 51.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 2.1,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -605,7 +605,7 @@
    "mk": "total",
    "side": "under",
    "line": 66.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 10.4,
    "x": null,
    "why": "total market off",
@@ -661,20 +661,20 @@
    "tm": 46.8
   },
   {
-   "id": "401858308",
+   "id": "401858532",
    "sport": "cfb",
-   "kick": "2026-11-22T00:30:00.000Z",
-   "home": "California",
-   "away": "Stanford",
-   "mk": "total",
-   "side": "under",
-   "line": 56.5,
-   "price": -119.0,
-   "edge": 6.5,
+   "kick": "2026-11-21T20:30:00.000Z",
+   "home": "Penn State",
+   "away": "Rutgers",
+   "mk": "spread",
+   "side": "away",
+   "line": 27.5,
+   "price": -129.0,
+   "edge": 6.1,
    "x": null,
-   "why": "total market off",
-   "m": 0,
-   "tm": 50.0
+   "why": "spread market off",
+   "m": 21.4,
+   "tm": 53.9
   }
  ],
  "games": {
@@ -787,11 +787,11 @@
    "state": "under"
   },
   "401856752": {
-   "mk": "total",
-   "side": "under",
-   "line": 38.5,
-   "price": -119.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
+   "price": 105.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Oklahoma",
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 66.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 10.4,
    "ev": null,
    "units": 0.0,
@@ -1090,7 +1090,7 @@
    "mk": "total",
    "side": "over",
    "line": 51.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -1149,9 +1149,9 @@
   "401858308": {
    "mk": "total",
    "side": "under",
-   "line": 56.5,
-   "price": -119.0,
-   "edge": 6.5,
+   "line": 55.5,
+   "price": -106.0,
+   "edge": 5.5,
    "ev": null,
    "units": 0.0,
    "home": "California",
@@ -1294,7 +1294,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 101.0,
+   "price": -101.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
@@ -1318,7 +1318,7 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -112.0,
+   "price": -114.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -1435,11 +1435,11 @@
    "state": "off"
   },
   "401869929": {
-   "mk": "total",
-   "side": "under",
-   "line": 50.5,
-   "price": -119.0,
-   "edge": 0.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 13.5,
+   "price": -101.0,
+   "edge": 0.2,
    "ev": null,
    "units": 0.0,
    "home": "App State",
@@ -1499,16 +1499,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 24178,
+  "snapshots": 24196,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5027,
-    "clvRet": -0.0427,
-    "clvT": -33.93,
-    "clv": 0.31,
-    "beat": 0.371,
-    "still": 0.345
+    "clvN": 5034,
+    "clvRet": -0.0408,
+    "clvT": -32.11,
+    "clv": 0.35,
+    "beat": 0.384,
+    "still": 0.332
    },
    {
     "when": "6-24h",
@@ -6282,7 +6282,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T21:26:49Z",
+ "checked": "2026-11-19T21:53:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

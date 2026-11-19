@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-19T21:27:02Z",
+ "asof": "2026-11-19T21:53:44Z",
  "recenter": {
-  "2026-11-19": 1.83
+  "2026-11-19": 1.82
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-19T16:51:32Z",
-  "ageH": 4.6,
+  "ageH": 5.0,
   "stale": false
  },
  "picks": [],
@@ -1992,7 +1992,7 @@
    "mk": "spread",
    "side": "away",
    "line": 36.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.7,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2024,7 +2024,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 3.5,
    "x": 4.0,
    "why": "edge under 4 (venue: neutral)",
@@ -2136,7 +2136,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.4,
    "x": 3.5,
    "why": "edge under 3.5 (inj: with)",
@@ -2256,22 +2256,6 @@
    "tm": 142.0
   },
   {
-   "id": "401920519",
-   "sport": "cbb",
-   "kick": "2026-11-19T22:00:00Z",
-   "home": "Auburn",
-   "away": "Notre Dame",
-   "mk": "spread",
-   "side": "home",
-   "line": 3.5,
-   "price": -119.0,
-   "edge": 1.5,
-   "x": 4.0,
-   "why": "edge under 4 (tier: power)",
-   "m": 5.0,
-   "tm": 152.7
-  },
-  {
    "id": "401920878",
    "sport": "cbb",
    "kick": "2026-11-20T00:00:00Z",
@@ -2334,6 +2318,22 @@
    "why": "edge under 7",
    "m": 6.4,
    "tm": 151.8
+  },
+  {
+   "id": "401918056",
+   "sport": "cbb",
+   "kick": "2026-11-20T03:00:00Z",
+   "home": "California",
+   "away": "East Texas A&M",
+   "mk": "total",
+   "side": "over",
+   "line": 145.5,
+   "price": -114.0,
+   "edge": 1.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 14.5,
+   "tm": 147.2
   }
  ],
  "games": {
@@ -2353,7 +2353,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -2364,9 +2364,9 @@
   "401920519": {
    "mk": "spread",
    "side": "home",
-   "line": 3.5,
-   "price": -119.0,
-   "edge": 1.5,
+   "line": 4.5,
+   "price": -101.0,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "Auburn",
@@ -2401,7 +2401,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -2461,7 +2461,7 @@
    "mk": "spread",
    "side": "away",
    "line": 36.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -2727,7 +2727,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20031,
+  "snapshots": 20040,
   "buckets": [
    {
     "when": "24h+",
@@ -2741,20 +2741,20 @@
    {
     "when": "6-24h",
     "clvN": 4158,
-    "clvRet": -0.0122,
-    "clvT": -6.92,
-    "clv": 0.47,
+    "clvRet": -0.0121,
+    "clvT": -6.85,
+    "clv": 0.48,
     "beat": 0.398,
     "still": 0.406
    },
    {
     "when": "1-6h",
-    "clvN": 2029,
+    "clvN": 2031,
     "clvRet": -0.0407,
-    "clvT": -35.64,
+    "clvT": -35.77,
     "clv": 0.07,
-    "beat": 0.161,
-    "still": 0.709
+    "beat": 0.16,
+    "still": 0.71
    },
    {
     "when": "<1h",
@@ -20428,7 +20428,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T21:27:02Z",
+ "checked": "2026-11-19T21:53:44Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
