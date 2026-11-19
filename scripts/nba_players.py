@@ -108,7 +108,7 @@ PSTATS = ('pts', 'reb', 'ast')
 IDX = {'min': 4, 'pts': 5, 'reb': 6, 'ast': 7, 'fg3': 8, 'stl': 9, 'blk': 10, 'tov': 11}
 # the inputs of each stat's line (each one is the player's base line, minutes x rate, times a factor; see feats())
 FEATS = ('base', 'long', 'savg', 'fill', 'use', 'pace', 'opp', 'home', 'rest', 'n2', 'imp', 'eS', 'eB', 'eL',
-         'bo', 'boR', 'fav', 'tot', 'gsm')
+         'bo', 'boR', 'fav', 'tot', 'gsm', 'ps', 'psb')
 # game script, from tonight's line (Oct 21 2026): bo = expected blowout size (E|margin| over its usual, margin ~ N(line, SDM)),
 # boR = bo x role (starters lose minutes in blowouts, the bench gains), fav = his team's expected margin, tot = the
 # market total over the league's; gsm (pts/reb/ast) = his stat moved by the share of his minutes the script moves
@@ -117,6 +117,24 @@ SDM, EA0 = 13.6, 12.39
 # candidates tested as one: the season's first games, when last season's tail (rest, tanking, injuries) misleads
 GROUPS = {'early': ('eS', 'eB', 'eL')}
 EARLY = 5.0
+# preseason starts in a team's first ten games (scripts/nba_preseason.py): ps = share of the team's last two preseason
+# games he started x e, psb = ps x base minutes, e = 1 - team games played / 10. Pre-registered and passed as a pair on
+# minutes (scripts/research/sweep_nov19/nba/PREREG.md 7a: games 1-10 held 2024-26 t -3.48, 3/3 seasons), so the
+# minutes line always carries them (not put through the selection below); the other stats carry zeros
+FORCED = {'min': ('ps', 'psb')}
+PRE_GAMES = 10.0
+_PRE = None
+
+
+def pre_share(S, t, pid):
+    global _PRE
+    if _PRE is None:
+        try:
+            import nba_preseason
+            _PRE = nba_preseason.load()
+        except Exception:
+            _PRE = {}
+    return (_PRE.get(str(S)) or {}).get(t, {}).get(pid, 0.0)
 
 
 class Rates:
@@ -261,6 +279,7 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
         n2 = n2m.get(N.b2b_group(m.ages.get(p, 0), mS), 1.0) - 1.0 if n2m else 0.0
         mL = R.long_min(p) or mS
         role = (mS - 24) / 12.0
+        pe = pre_share(g['S'], t, p) * max(0.0, 1 - m.ngp[t] / PRE_GAMES)
         fx = {}
         for s in PSTATS:
             r = R.rate(p, s)
@@ -270,10 +289,11 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
             fx[s] = {'base': b, 'long': mL * r, 'fill': b * fill, 'use': b * use, 'pace': b * pace_rel,
                      'opp': b * R.opp(o, s), 'home': b * home, 'rest': b * (1.0 if rest == 0 else 0.0),
                      'n2': b * n2, 'imp': b * imp_rel, 'bo': b * bo, 'boR': b * bo * role, 'fav': b * fav,
-                     'tot': b * trel, 'gsm': 0.0}
+                     'tot': b * trel, 'gsm': 0.0, 'ps': 0.0, 'psb': 0.0}
         fx['min'] = {'base': mS, 'long': mL, 'fill': mS * fill, 'use': 0.0, 'pace': 0.0, 'opp': 0.0,
                      'home': mS * home, 'rest': mS * (1.0 if rest == 0 else 0.0), 'n2': mS * n2, 'imp': 0.0,
-                     'bo': mS * bo, 'boR': mS * bo * role, 'fav': mS * fav, 'tot': mS * trel, 'gsm': 0.0}
+                     'bo': mS * bo, 'boR': mS * bo * role, 'fav': mS * fav, 'tot': mS * trel, 'gsm': 0.0,
+                     'ps': pe, 'psb': pe * mS}
         out[p] = (pr, mS, fx)
     return out
 
@@ -499,7 +519,7 @@ def fit(write=True):
         log = []
         cands = [f for f in FEATS if not any(f in g for g in GROUPS.values())] + list(GROUPS)
         for f in cands:
-            if f in feats or (s == 'min' and f in ('use', 'pace', 'opp', 'imp', 'gsm')):
+            if f in feats or (s == 'min' and f in ('use', 'pace', 'opp', 'imp', 'gsm')) or any(f in v for v in FORCED.values()):
                 continue
             add = list(GROUPS.get(f, (f,)))
             new = wf(s, feats + add)
@@ -514,6 +534,8 @@ def fit(write=True):
             print(s, f, round(tt, 2), round(th, 2), keep, flush=True)
             if keep:
                 feats += add; cur = new
+        if FORCED.get(s):
+            feats += list(FORCED[s]); cur = wf(s, feats)
         A = np.column_stack([X[s][f] for f in feats])
         coef = np.linalg.lstsq(A[S <= max(HOLD)], Y[s][S <= max(HOLD)], rcond=None)[0]
         preds[s] = cur
