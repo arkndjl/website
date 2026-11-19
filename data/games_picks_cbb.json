@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-19T11:51:00Z",
+ "asof": "2026-11-19T11:54:37Z",
  "recenter": {
-  "2026-11-19": 1.7
+  "2026-11-19": 1.71
  },
  "monitor": {
   "clocks": {
@@ -2010,7 +2010,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -144.0,
+   "price": -150.0,
    "edge": 3.8,
    "x": 5.0,
    "why": "edge under 5 (line: <4)",
@@ -2090,7 +2090,7 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": 102.0,
+   "price": -104.0,
    "edge": 1.8,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -2106,7 +2106,7 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": -117.0,
+   "price": -127.0,
    "edge": 2.0,
    "x": 5.0,
    "why": "edge under 5 (role: dog)",
@@ -2178,22 +2178,6 @@
    "tm": 151.7
   },
   {
-   "id": "401918959",
-   "sport": "cbb",
-   "kick": "2026-11-19T23:00:00Z",
-   "home": "Murray State",
-   "away": "NC State",
-   "mk": "total",
-   "side": "under",
-   "line": 161.5,
-   "price": -108.0,
-   "edge": 1.9,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": -5.4,
-   "tm": 159.6
-  },
-  {
    "id": "401918056",
    "sport": "cbb",
    "kick": "2026-11-20T03:00:00Z",
@@ -2224,6 +2208,22 @@
    "why": "edge under 3.5 (inj: with)",
    "m": 3.6,
    "tm": 140.1
+  },
+  {
+   "id": "401918959",
+   "sport": "cbb",
+   "kick": "2026-11-19T23:00:00Z",
+   "home": "Murray State",
+   "away": "NC State",
+   "mk": "spread",
+   "side": "away",
+   "line": -4.5,
+   "price": -110,
+   "edge": 0.9,
+   "x": 4.0,
+   "why": "edge under 4 (venue: neutral)",
+   "m": -5.4,
+   "tm": 159.6
   }
  ],
  "games": {
@@ -2240,11 +2240,11 @@
    "state": "under"
   },
   "401918959": {
-   "mk": "total",
-   "side": "under",
-   "line": 161.5,
-   "price": -108.0,
-   "edge": 1.9,
+   "mk": "spread",
+   "side": "away",
+   "line": -4.5,
+   "price": -110,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Murray State",
@@ -2291,7 +2291,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -144.0,
+   "price": -150.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -2375,7 +2375,7 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": 102.0,
+   "price": -104.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -2399,7 +2399,7 @@
    "mk": "spread",
    "side": "away",
    "line": 31.5,
-   "price": -117.0,
+   "price": -127.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -2533,7 +2533,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19814,
+  "snapshots": 19823,
   "buckets": [
    {
     "when": "24h+",
@@ -2546,11 +2546,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4092,
+    "clvN": 4095,
     "clvRet": -0.0138,
-    "clvT": -7.78,
+    "clvT": -7.8,
     "clv": 0.45,
-    "beat": 0.39,
+    "beat": 0.389,
     "still": 0.41
    },
    {
@@ -20205,7 +20205,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T11:51:00Z",
+ "checked": "2026-11-19T11:54:37Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
