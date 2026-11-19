@@ -1,16 +1,16 @@
 {
- "asof": "2026-11-19T18:28:55.274Z",
+ "asof": "2026-11-19T19:44:05.942Z",
  "status": {
   "twitch": true,
   "youtube": true,
-  "tiktok": false,
+  "tiktok": true,
   "x": true
  },
  "goals": {
   "twitch": {
    "rate": 6.8,
    "prior": 7.4,
-   "tracked": 2.4,
+   "tracked": 2.5,
    "d30": {
     "goal": 281,
     "base": 274,
@@ -19,7 +19,7 @@
     "p0": 54,
     "p": 42,
     "f": 0,
-    "m": 0.08
+    "m": 0.084
    },
    "d90": {
     "goal": 295,
@@ -29,25 +29,25 @@
     "p0": 52,
     "p": 42,
     "f": 0,
-    "m": 0.027
+    "m": 0.028
    },
    "next": {
     "goal": 300,
     "eta": "2027-03-18",
-    "p90": 26,
+    "p90": 25,
     "from": 250,
     "base": 274,
     "set": 1794899610245,
     "eta0": "2027-03-07",
     "f": 0.48,
-    "m": 0.491
+    "m": 0.492
    },
    "opened": "2023-10-31"
   },
   "youtube": {
    "rate": 1.1,
    "prior": 1.1,
-   "tracked": 2.4,
+   "tracked": 2.5,
    "d30": {
     "goal": 43,
     "base": 42,
@@ -56,7 +56,7 @@
     "p0": 55,
     "p": 50,
     "f": 0,
-    "m": 0.08
+    "m": 0.084
    },
    "d90": {
     "goal": 44,
@@ -66,11 +66,11 @@
     "p0": 62,
     "p": 59,
     "f": 0,
-    "m": 0.027
+    "m": 0.028
    },
    "next": {
     "goal": 50,
-    "eta": "2027-09-14",
+    "eta": "2027-09-15",
     "p90": 11,
     "from": 25,
     "base": 42,
@@ -84,16 +84,16 @@
   "tiktok": {
    "rate": 9.9,
    "prior": 2.7,
-   "tracked": 2.4,
+   "tracked": 2.5,
    "d30": {
     "goal": 114,
     "base": 106,
     "set": 1795033969428,
     "due": 1797625969428,
     "p0": 53,
-    "p": 84,
+    "p": 83,
     "f": 0.25,
-    "m": 0.028
+    "m": 0.032
    },
    "d90": {
     "goal": 133,
@@ -103,7 +103,7 @@
     "p0": 52,
     "p": 66,
     "f": 0.038,
-    "m": 0.001
+    "m": 0.002
    },
    "next": {
     "goal": 150,
@@ -121,16 +121,16 @@
   "x": {
    "rate": 3.1,
    "prior": 1.4,
-   "tracked": 2.4,
+   "tracked": 2.5,
    "d30": {
     "goal": 45,
     "base": 41,
     "set": 1795022156543,
     "due": 1797614156543,
     "p0": 53,
-    "p": 23,
+    "p": 22,
     "f": 0,
-    "m": 0.033
+    "m": 0.037
    },
    "d90": {
     "goal": 52,
@@ -138,13 +138,13 @@
     "set": 1795022156543,
     "due": 1802798156543,
     "p0": 56,
-    "p": 30,
+    "p": 29,
     "f": 0,
-    "m": 0.011
+    "m": 0.012
    },
    "next": {
     "goal": 50,
-    "eta": "2027-03-02",
+    "eta": "2027-03-03",
     "p90": 42,
     "from": 25,
     "base": 38,
@@ -714,6 +714,15 @@
    "x": 40,
    "ttv": 87,
    "tth": 2088
+  },
+  {
+   "t": 1795117445942,
+   "twitch": 274,
+   "youtube": 42,
+   "tiktok": 108,
+   "x": 40,
+   "ttv": 88,
+   "tth": 2094
   }
  ],
  "yt": {
@@ -1170,6 +1179,10 @@
     [
      1795112935274,
      60
+    ],
+    [
+     1795117445942,
+     58
     ]
    ],
    "title": "#34 1NT vs #25 THE GUILD | ESEA Main S59 Game 13 (Bo1)",
@@ -1246,6 +1259,10 @@
     [
      1795112935274,
      386
+    ],
+    [
+     1795117445942,
+     431
     ]
    ],
    "title": "LAURACE DEAGLE NUKE #shorts #fyp #reels #cs2 #csgo #counterstrike #valorant #eboy #twitch #streamer",
@@ -1322,12 +1339,16 @@
     [
      1795112935274,
      12
+    ],
+    [
+     1795117445942,
+     149
     ]
    ],
    "title": "insane spraydown ez reads #fyp #shorts #valorant #cs2 #eboy",
    "pub": 1795112266000,
    "short": true,
-   "likes": 0
+   "likes": 1
   }
  },
  "tw": {
@@ -1362,22 +1383,28 @@
   },
   "ideas": [
    {
+    "k": "TikTok post day",
+    "v": "Mon",
+    "d": "355 expected views vs 314",
+    "n": 6
+   },
+   {
     "k": "YouTube post slot",
     "v": "Fri · 8p ET",
-    "d": "769 expected views vs 568",
+    "d": "701 expected views vs 486",
     "n": 2
    },
    {
     "k": "Shorts vs long",
     "v": "Shorts",
-    "d": "996 vs 312 median views",
-    "n": 12
+    "d": "1,019 vs 312 median views",
+    "n": 15
    },
    {
     "k": "Batch uploads",
     "v": "space out",
-    "d": "409 batched vs 522 solo",
-    "n": 9
+    "d": "506 batched vs 522 solo",
+    "n": 12
    },
    {
     "k": "Upload gap",
@@ -1393,15 +1420,15 @@
    },
    {
     "k": "TikTok hearts",
-    "v": "24 / video",
-    "d": "87 videos · 1.24 followers / video",
-    "n": 87
+    "v": "23.8 / video",
+    "d": "88 videos · 1.23 followers / video",
+    "n": 88
    },
    {
     "k": "Cross-post",
-    "v": "87 TikTok · 13 Shorts",
-    "d": "74 TikToks not on Shorts (feed shows latest 15)",
-    "n": 87
+    "v": "88 TikTok · 13 Shorts",
+    "d": "75 TikToks not on Shorts (feed shows latest 15)",
+    "n": 88
    },
    {
     "k": "Shorts L10 trend",
@@ -1420,28 +1447,28 @@
    {
     "k": "Twitch pace",
     "v": null,
-    "d": "at 14 days tracked (2.4)",
+    "d": "at 14 days tracked (2.5)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (2.4)",
+    "d": "at 14 days tracked (2.5)",
     "n": null,
     "wait": true
    },
    {
     "k": "TikTok pace",
     "v": null,
-    "d": "at 14 days tracked (2.4)",
+    "d": "at 14 days tracked (2.5)",
     "n": null,
     "wait": true
    },
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (2.4)",
+    "d": "at 14 days tracked (2.5)",
     "n": null,
     "wait": true
    },
@@ -1461,7 +1488,7 @@
    {
     "k": "TikTok follows / 1k views",
     "v": null,
-    "d": "at 7 days tracked (2.4)",
+    "d": "at 7 days tracked (2.5)",
     "n": null,
     "wait": true
    },
@@ -1482,19 +1509,19 @@
   ],
   "yt": {
    "n": 19,
-   "nOld": 12,
-   "median": 514,
+   "nOld": 15,
+   "median": 522,
    "shorts": {
-    "n": 7,
-    "med": 996
+    "n": 10,
+    "med": 1019
    },
    "long": {
     "n": 5,
     "med": 312
    },
    "batch": {
-    "n": 4,
-    "med": 409
+    "n": 7,
+    "med": 506
    },
    "solo": {
     "n": 5,
@@ -1502,9 +1529,9 @@
    },
    "last30": 7,
    "gap": 2.7,
-   "vpd": 881.7,
+   "vpd": 954.6,
    "subsPerK": null,
-   "likeRate": 0.93,
+   "likeRate": 0.97,
    "grid": [
     [
      {
@@ -1546,8 +1573,8 @@
       "med": null
      },
      {
-      "n": 0,
-      "med": null
+      "n": 3,
+      "med": 1042
      },
      {
       "n": 0,
@@ -1689,43 +1716,43 @@
      }
     ]
    ],
-   "base": 568,
+   "base": 486,
    "days": [
     {
      "d": "Sun",
      "n": 1,
      "med": 92,
-     "x": 361
+     "x": 321
     },
     {
      "d": "Mon",
-     "n": 2,
-     "med": 918.5,
-     "x": 658
+     "n": 5,
+     "med": 1042,
+     "x": 439
     },
     {
      "d": "Tue",
      "n": 5,
      "med": 312,
-     "x": 515
+     "x": 485
     },
     {
      "d": "Wed",
      "n": 1,
      "med": 364,
-     "x": 508
+     "x": 452
     },
     {
      "d": "Thu",
      "n": 1,
      "med": 1266,
-     "x": 694
+     "x": 618
     },
     {
      "d": "Fri",
      "n": 2,
      "med": 1234.5,
-     "x": 769
+     "x": 701
     },
     {
      "d": "Sat",
@@ -1739,7 +1766,7 @@
      "b": "12a",
      "n": 2,
      "med": 782.5,
-     "x": 478
+     "x": 436
     },
     {
      "b": "4a",
@@ -1755,21 +1782,21 @@
     },
     {
      "b": "12p",
-     "n": 1,
-     "med": 185,
-     "x": 429
+     "n": 4,
+     "med": 613.5,
+     "x": 325
     },
     {
      "b": "4p",
      "n": 1,
      "med": 996,
-     "x": 654
+     "x": 582
     },
     {
      "b": "8p",
      "n": 8,
      "med": 514,
-     "x": 646
+     "x": 620
     }
    ],
    "ups": [
@@ -1781,7 +1808,7 @@
      "views": 996,
      "likes": 21,
      "comments": null,
-     "age": 103.8,
+     "age": 103.9,
      "et": {
       "d": 5,
       "h": 18,
@@ -1797,7 +1824,7 @@
      "views": 2953,
      "likes": 19,
      "comments": null,
-     "age": 99.7,
+     "age": 99.8,
      "et": {
       "d": 2,
       "h": 21,
@@ -1861,7 +1888,7 @@
      "views": 1331,
      "likes": 10,
      "comments": null,
-     "age": 58.7,
+     "age": 58.8,
      "et": {
       "d": 1,
       "h": 21,
@@ -1877,7 +1904,7 @@
      "views": 506,
      "likes": 5,
      "comments": null,
-     "age": 58.7,
+     "age": 58.8,
      "et": {
       "d": 1,
       "h": 21,
@@ -1893,7 +1920,7 @@
      "views": 185,
      "likes": 10,
      "comments": null,
-     "age": 57.9,
+     "age": 58,
      "et": {
       "d": 2,
       "h": 15,
@@ -1941,7 +1968,7 @@
      "views": 312,
      "likes": 0,
      "comments": null,
-     "age": 43.6,
+     "age": 43.7,
      "et": {
       "d": 2,
       "h": 23,
@@ -1957,7 +1984,7 @@
      "views": 364,
      "likes": 0,
      "comments": null,
-     "age": 42.6,
+     "age": 42.7,
      "et": {
       "d": 3,
       "h": 23,
@@ -2018,7 +2045,7 @@
      "title": "#34 1NT vs #25 THE GUILD | ESEA Main S59 Game 13 (Bo1)",
      "pub": 1794978828000,
      "short": false,
-     "views": 60,
+     "views": 58,
      "likes": 1,
      "comments": null,
      "age": 1.6,
@@ -2034,16 +2061,16 @@
      "title": "LAURACE DEAGLE NUKE #shorts #fyp #reels #cs2 #csgo #counterstrike #valorant #eboy #twitch #streamer",
      "pub": 1795016552000,
      "short": true,
-     "views": 386,
+     "views": 431,
      "likes": 4,
      "comments": null,
-     "age": 1.1,
+     "age": 1.2,
      "et": {
       "d": 3,
       "h": 10,
       "b": 2
      },
-     "r5": 636
+     "r5": 645
     },
     {
      "id": "NWTOcYienEk",
@@ -2059,23 +2086,23 @@
       "h": 16,
       "b": 4
      },
-     "r5": 812
+     "r5": 821
     },
     {
      "id": "fzmyN1A3-zQ",
      "title": "insane spraydown ez reads #fyp #shorts #valorant #cs2 #eboy",
      "pub": 1795112266000,
      "short": true,
-     "views": 12,
-     "likes": 0,
+     "views": 149,
+     "likes": 1,
      "comments": null,
-     "age": 0,
+     "age": 0.1,
      "et": {
       "d": 4,
       "h": 13,
       "b": 3
      },
-     "r5": 526
+     "r5": 562
     }
    ]
   },
@@ -2089,7 +2116,7 @@
    "lpH": null,
    "opH": 0,
    "hLive": 0.5,
-   "hOff": 57.9,
+   "hOff": 60.6,
    "live": null,
    "grid": [
     [
@@ -2339,15 +2366,15 @@
    ]
   },
   "tt": {
-   "videos": 87,
-   "hearts": 2088,
-   "hpv": 24,
-   "newVideos": 1,
-   "newHearts": 56,
-   "fpv": 1.24,
+   "videos": 88,
+   "hearts": 2094,
+   "hpv": 23.8,
+   "newVideos": 2,
+   "newHearts": 62,
+   "fpv": 1.23,
    "n": 10,
-   "views": 3427,
-   "median": 385,
+   "views": 3500,
+   "median": 308,
    "vpd": null,
    "hearts_t": [
     [
@@ -2485,6 +2512,10 @@
     [
      1795107646733,
      2088
+    ],
+    [
+     1795117445942,
+     2094
     ]
    ],
    "grid": [
@@ -2528,8 +2559,8 @@
       "med": null
      },
      {
-      "n": 0,
-      "med": null
+      "n": 6,
+      "med": 286.5
      },
      {
       "n": 0,
@@ -2680,15 +2711,15 @@
     },
     {
      "d": "Mon",
-     "n": 0,
-     "med": null,
-     "x": null
+     "n": 6,
+     "med": 286.5,
+     "x": 307
     },
     {
      "d": "Tue",
      "n": 1,
      "med": 385,
-     "x": 385
+     "x": 330
     },
     {
      "d": "Wed",
@@ -2745,7 +2776,7 @@
      "desc": "give me that shit boy !!! #fyp #cs2 #csgo #counterstrike #gamertok",
      "pub": 1794854476000,
      "photo": false,
-     "views": 307,
+     "views": 308,
      "r5": 440
     },
     {
@@ -2753,7 +2784,7 @@
      "desc": "LAURGOD PLAYOFF 4K #FYP #CS2 #csgo #counterstrike #gamertok ",
      "pub": 1794854866000,
      "photo": false,
-     "views": 264,
+     "views": 265,
      "r5": 405
     },
     {
@@ -2777,15 +2808,15 @@
      "desc": "ACE DEAGLE IN ESEA LEAGUE MATCH #fyp #cs2 #csgo #valorant #eboy ",
      "pub": 1795016169000,
      "photo": false,
-     "views": 358,
-     "r5": 296
+     "views": 359,
+     "r5": 297
     },
     {
      "id": "7709624704234949901",
      "desc": "cs2 player tries val 1v3 clutch ice in his veins #fyp #valorant #gaming #cs2 #eboy",
      "pub": 1795036882000,
      "photo": false,
-     "views": 415,
+     "views": 417,
      "r5": 318
     },
     {
@@ -2793,8 +2824,8 @@
      "desc": "insane spraydown ez reads #valorant #cs2 #fyp #gaming #eboy ",
      "pub": 1795112055000,
      "photo": false,
-     "views": 79,
-     "r5": 281
+     "views": 147,
+     "r5": 295
     }
    ]
   },
@@ -2802,15 +2833,15 @@
    "x": 10,
    "yt": {
     "n": 10,
-    "sum": 6729,
-    "avg": 673,
+    "sum": 6911,
+    "avg": 691,
     "med": 514
    },
    "tt": {
     "n": 10,
-    "sum": 3427,
-    "avg": 343,
-    "med": 332.5
+    "sum": 3500,
+    "avg": 350,
+    "med": 333.5
    }
   },
   "roll_t": [
@@ -3098,6 +3129,11 @@
     1795112935274,
     6729,
     3427
+   ],
+   [
+    1795117445942,
+    6911,
+    3500
    ]
   ]
  }
