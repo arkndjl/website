@@ -1,9 +1,17 @@
-# Fallback deploy from Actions with wrangler, for when Cloudflare's own Git build is stuck or disconnected.
-# Manual only (run it from the Actions tab); needs repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
-# Setup steps are in the README ("Deploying").
+# Builds the site with Hugo and deploys it with wrangler from Actions (Cloudflare's own Git build is paused when the
+# account's free Workers Builds minutes run out: Nov 19 2026, 3,000/month used up).
+# Batched, not per commit: a run waits 10 minutes, then builds the newest main, and skips when the live site already
+# serves it (/build.json). The concurrency group keeps one run going and one waiting, so a burst of bot commits makes
+# one deploy. Bot commits pushed with GITHUB_TOKEN don't fire `push`, so the half-hourly schedule picks those up.
+# Needs repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (README, Deploying); without them the push and
+# schedule runs exit quietly and a manual run fails with the setup hint.
 name: deploy cloudflare
 
 on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "5,35 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,21 +24,45 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      HUGO_COMMIT_SHA: ${{ github.sha }}
     steps:
       - name: Check the secrets
+        id: sec
         run: |
-          [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || { echo "Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repo secrets (README, Deploying)"; exit 1; }
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then echo "ok=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repo secrets (README, Deploying)"
+          [ "${{ github.event_name }}" = "workflow_dispatch" ] && exit 1 || exit 0
+      - name: Batch commits
+        if: steps.sec.outputs.ok && github.event_name == 'push'
+        run: sleep 600
       - uses: actions/checkout@v4
+        if: steps.sec.outputs.ok
         with:
+          ref: main
           submodules: recursive
+      - name: Skip if the live site already serves main
+        if: steps.sec.outputs.ok
+        id: live
+        run: |
+          head=$(git rev-parse HEAD)
+          live=$(curl -fsS https://arkndjl.net/build.json | python3 -c "import json,sys; print(json.load(sys.stdin).get('sha',''))" || true)
+          echo "main $head, live $live"
+          echo "sha=$head" >> "$GITHUB_OUTPUT"
+          if [ "$live" = "$head" ]; then echo "already live"; else echo "go=1" >> "$GITHUB_OUTPUT"; fi
       - uses: peaceiris/actions-hugo@v3
+        if: steps.live.outputs.go
         with:
           hugo-version: "0.147.7"   # the version Cloudflare builds the live site with (build-gate.yml pins the same)
           extended: true
-      - run: hugo --minify
-      - run: npx --yes wrangler@4 deploy
+      - name: Build
+        if: steps.live.outputs.go
+        env:
+          WORKERS_CI_COMMIT_SHA: ${{ steps.live.outputs.sha }}
+          WORKERS_CI_BRANCH: main
+        run: hugo -b https://arkndjl.net   # the Cloudflare build command
+      - name: Deploy
+        if: steps.live.outputs.go
+        run: npx --yes wrangler@4 deploy
