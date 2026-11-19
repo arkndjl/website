@@ -27,7 +27,8 @@
   `arkboard-process`. Never call it "Library" (that is ARKLIBRARY), "Lab", "Reference" or "ARKPROCESS". `/reference`, `/library`,
   `/lab`, `/arkboard/reference/`, `/arkboard/library/` and `/arkboard/lab/` redirect to it in `static/_redirects`. The page is
   written by `scripts/library_build.py` (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it
-  rather than hand-editing.
+  rather than hand-editing. Glossary numbers are read from the live fit files in `scripts/library_glossary.py` (never typed in), and
+  `.github/workflows/process-refresh.yml` reruns both scripts after every board/refit workflow (Noah, Nov 19: always auto-refresh).
 - Glossary GFX cards: every term window has a GFX card button (`assets/js/gfx.js` buildTerm, link `arkndjl.net/process#g-<term>`).
   `data/glossary_gfx.json` is written by `scripts/glossary_gfx.py` (rerun after a season file or refit): compact cards from
   `research/glossary_gfx_base.json` (16:9, formula + one picture) and explainer cards (3:4: stands for, what, use, formula,
