@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-19T13:48:46Z",
+ "asof": "2026-11-19T13:51:28Z",
  "recenter": {
-  "2026-11-19": 1.73
+  "2026-11-19": 1.72
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-19T02:52:25Z",
-  "ageH": 10.9,
+  "ageH": 11.0,
   "stale": false
  },
  "picks": [],
@@ -2033,7 +2033,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.5,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
@@ -2055,6 +2055,22 @@
    "why": "edge under 5 (line: <4)",
    "m": -0.9,
    "tm": 157.2
+  },
+  {
+   "id": "401916318",
+   "sport": "cbb",
+   "kick": "2026-11-20T00:00:00Z",
+   "home": "Ohio State",
+   "away": "UMBC",
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
+   "price": -124.0,
+   "edge": 3.0,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 29.5,
+   "tm": 155.5
   },
   {
    "id": "401920845",
@@ -2103,22 +2119,6 @@
    "why": "edge under 6.5 (tier: mixed)",
    "m": 15.4,
    "tm": 158.1
-  },
-  {
-   "id": "401916318",
-   "sport": "cbb",
-   "kick": "2026-11-20T00:00:00Z",
-   "home": "Ohio State",
-   "away": "UMBC",
-   "mk": "spread",
-   "side": "away",
-   "line": 31.5,
-   "price": -124.0,
-   "edge": 2.0,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": 29.5,
-   "tm": 155.5
   },
   {
    "id": "401920878",
@@ -2193,7 +2193,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 1.7,
    "x": 6.5,
    "why": "edge under 6.5 (tier: mixed)",
@@ -2206,13 +2206,13 @@
    "kick": "2026-11-20T01:30:00Z",
    "home": "Wisconsin",
    "away": "Seton Hall",
-   "mk": "total",
-   "side": "over",
-   "line": 139.5,
-   "price": -110.0,
-   "edge": 0.6,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
+   "mk": "spread",
+   "side": "away",
+   "line": 4.5,
+   "price": -129.0,
+   "edge": 0.9,
+   "x": 3.5,
+   "why": "edge under 3.5 (inj: with)",
    "m": 3.6,
    "tm": 140.1
   }
@@ -2243,11 +2243,11 @@
    "state": "under"
   },
   "401920888": {
-   "mk": "total",
-   "side": "over",
-   "line": 139.5,
-   "price": -110.0,
-   "edge": 0.6,
+   "mk": "spread",
+   "side": "away",
+   "line": 4.5,
+   "price": -129.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Wisconsin",
@@ -2387,11 +2387,11 @@
    "state": "under"
   },
   "401916318": {
-   "mk": "spread",
-   "side": "away",
-   "line": 31.5,
+   "mk": "total",
+   "side": "under",
+   "line": 158.5,
    "price": -124.0,
-   "edge": 2.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Ohio State",
@@ -2402,7 +2402,7 @@
    "mk": "total",
    "side": "over",
    "line": 145.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -2440,7 +2440,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -2525,7 +2525,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 19860,
+  "snapshots": 19867,
   "buckets": [
    {
     "when": "24h+",
@@ -2538,12 +2538,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4106,
+    "clvN": 4107,
     "clvRet": -0.0136,
     "clvT": -7.71,
     "clv": 0.45,
     "beat": 0.391,
-    "still": 0.409
+    "still": 0.41
    },
    {
     "when": "1-6h",
@@ -20197,7 +20197,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-19T13:48:46Z",
+ "checked": "2026-11-19T13:51:28Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
