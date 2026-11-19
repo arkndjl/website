@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-19T21:52Z",
+ "asof": "2026-11-19T21:56Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -293,10 +293,10 @@
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 9,
-     "rows": 2145
+     "rows": 2148
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 17,
+     "flags": 16,
      "rows": 637
     },
     "static/data/nfl-war.json": {
@@ -312,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 54,
+     "flags": 55,
      "rows": 1650
     }
    },
@@ -2278,6 +2278,24 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "MIA"
+    },
+    {
+     "d": "2026-11-18",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "practice",
+     "head": "Lands on practice squad IL",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-18",
+      "head": "Lands on practice squad IL",
+      "kind": "practice"
+     },
+     "pid": "17534",
+     "player": "Claudin Cherelus",
+     "pos": "LB",
+     "rotowire": "FA",
+     "site": "CAR"
     },
     {
      "d": "2026-11-09",
@@ -4638,24 +4656,6 @@
      "site": "CLE"
     },
     {
-     "d": "2026-11-19",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Back with Cleveland",
-     "kind": null,
-     "move": {
-      "d": "2026-11-14",
-      "head": "Signed to Cleveland's active roster",
-      "kind": "sign"
-     },
-     "pid": "19608",
-     "player": "Carsen Ryan",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "CLE"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4676,7 +4676,7 @@
    ],
    "joined": 0,
    "players": 2289,
-   "rows": 8075
+   "rows": 8078
   },
   "nhl": {
    "by_file": {
