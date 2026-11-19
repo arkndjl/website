@@ -133,7 +133,7 @@ def mj_rows(fresh=False):
         k = (r['date'], r['home_team'], r['away_team'])
         rows.append({'day': r['date'], 'h': r['home_team'], 'a': r['away_team'], 'hs': hs, 'as': as_,
                      't': r['tournament'], 'neu': int(r['neutral'].upper() == 'TRUE'), 'so': so.get(k),
-                     'cat': cat_of(r['tournament'])})
+                     'cat': cat_of(r['tournament']), 'city': f"{r['city']}|{r['country']}"})
     return rows
 
 
@@ -592,6 +592,49 @@ def attach_cu(rows):
                 r['ca'] = c
 
 
+# ---------------------------------------------------------------- altitude
+ELF = os.path.join(HERE, 'data', 'venue_elev.json')
+_ALT = None
+
+
+def alt_gap(h, a, neu, city=None):
+    """the altitude gap of a match in km, home side's view: how far the venue sits above each side's own home ground
+    past the first 1,000 m, the visitor's less the home side's (La Paz against a sea-level visitor: 2.8; two sides from
+    the same height, or a venue under 1,000 m above both: 0). Venue elevation from scripts/data/venue_elev.json by
+    "city|country" (srtm90m; scripts/research/sweep_nov19/methods/elev.py); a nation's home elevation is the median
+    over its home matches' venues since 1990; a venue not in the table is taken at the home side's elevation when the
+    match is not neutral, else the gap is 0. Fitted constant P['alt'] (.35 a km, tuned 2000-15, held 2016 to Jul 2026
+    t -2.59 by match day; pre-registered, scripts/research/sweep_nov19/methods/PREREG.md M8)."""
+    if _ALT is None:
+        return 0.0
+    E, V = _ALT
+    v = V.get(city) if city else None
+    eh, ea = E.get(h), E.get(a)
+    if v is None and not neu:
+        v = eh
+    if v is None or ea is None:
+        return 0.0
+    return (max(0.0, v - ea - 1000) - max(0.0, v - (eh if eh is not None else v) - 1000)) / 1000
+
+
+def attach_alt(rows):
+    """alt on each row (alt_gap); the nations' home elevations come from these rows' venues"""
+    global _ALT
+    try:
+        V = json.load(open(ELF))['intl']
+    except (OSError, ValueError, KeyError):
+        return
+    home = defaultdict(list)
+    for r in rows:
+        if r['day'] >= '1990-01-01' and not r['neu'] and V.get(r.get('city')) is not None:
+            home[r['h']].append(V[r['city']])
+    _ALT = ({k: float(np.median(v)) for k, v in home.items()}, V)
+    for r in rows:
+        g = alt_gap(r['h'], r['a'], r['neu'], r.get('city'))
+        if g:
+            r['alt'] = g
+
+
 # ---------------------------------------------------------------- the model
 GMAX = 11
 FAC = [math.factorial(i) for i in range(GMAX)]
@@ -632,7 +675,7 @@ def wdl(lh, la, rho):
 # tuned on 2000-15 walk-forward log loss (fit() rewrites data/soccer_intl_fit.json; these are its start and the fallback)
 P0 = {'k': 0.06, 'kh': 0.002, 'H0': 0.30, 'km': 0.001, 'm0': 0.25, 'rev': 0.10, 'boost': 1.5, 'nb': 10.0, 'cap': 5,
       'wwc': 1.2, 'wcf': 1.0, 'wq': 1.0, 'wnl': 1.0, 'wf': 0.6, 'wo': 0.8, 'rho': -0.05, 'sq': 0.0, 'kd': 1.0,
-      'a0': 0.0, 'd0': 0.0, 'sqc': 0.24, 'sqr': 0.04}
+      'a0': 0.0, 'd0': 0.0, 'sqc': 0.24, 'sqr': 0.04, 'alt': 0.35}
 TUNE, HOLD = ('2000-01-01', '2015-12-31'), '2016-01-01'
 ELO_K = {'wc': 60, 'cf': 50, 'q': 40, 'nl': 40, 'o': 30, 'f': 20}
 
@@ -657,7 +700,7 @@ class Ratings:
             self.d[t] *= f
         self.last[t] = day
 
-    def rates(self, h, a, neu, qh=None, qa=None, ch=None, ca=None):
+    def rates(self, h, a, neu, qh=None, qa=None, ch=None, ca=None, alt=0.0):
         P = self.P
         hh = 0 if neu else self.H / 2
         x = 0.0
@@ -667,6 +710,8 @@ class Ratings:
                 x = (P['sqc'] * (ch - ca) + P['sqr'] * (qh - qa)) / 2
             else:
                 x = P['sq'] * (qh - qa) / 2
+        if alt:
+            x += P.get('alt', 0.0) * alt / 2          # the altitude gap (alt_gap), km past the first 1,000 m
         lh = math.exp(self.m + hh + self.a[h] - self.d[a] + x)
         la = math.exp(self.m - hh + self.a[a] - self.d[h] - x)
         return lh, la
@@ -723,7 +768,7 @@ def run(rows, P, lo=TUNE[0], hi=TUNE[1], keep=False, minn=5):
         R._decay(h, r['day'])
         R._decay(a, r['day'])
         qh, qa = r.get('qh'), r.get('qa')
-        lh, la = R.rates(h, a, r['neu'], qh, qa, r.get('ch'), r.get('ca'))
+        lh, la = R.rates(h, a, r['neu'], qh, qa, r.get('ch'), r.get('ca'), r.get('alt', 0.0))
         if lo <= r['day'] <= hi and R.n[h] >= minn and R.n[a] >= minn:
             if keep:
                 w, d_, l_, o25, _, _, _ = wdl(lh, la, rho)
@@ -952,6 +997,7 @@ def fit(retune=True):
     rows, _, _ = load()
     attach_sq(rows)
     attach_cu(rows)
+    attach_alt(rows)
     P = params()
     log = []
 
@@ -1341,6 +1387,7 @@ def build():
     except Exception as ex:
         print(f'call-up squads: {ex!r}, on the stored file', file=sys.stderr)
     attach_cu(rows)
+    attach_alt(rows)
     today = dt.date.today().isoformat()
     R, _ = run(rows, P, '9999', '9999')
     week = (dt.date.today() - dt.timedelta(days=7)).isoformat()
@@ -1355,7 +1402,7 @@ def build():
     sqv = {t: math.expm1(q_of(t)) for t in pool}
 
     def rates(h, a, neu, day=today):
-        return R.rates(h, a, neu, q_of(h, day), q_of(a, day), cu_q(h, day, a), cu_q(a, day, h))
+        return R.rates(h, a, neu, q_of(h, day), q_of(a, day), cu_q(h, day, a), cu_q(a, day, h), alt_gap(h, a, neu))
 
     def board(Rx, day):
         raw = sorted(pool, key=lambda t: -Rx.strength(t, sq_of(t, day) or 0.0, 0.0))
