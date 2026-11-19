@@ -4443,8 +4443,23 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
   border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
   background: var(--win-well);
   line-height: 1.35;
+  display: flex;
 }
+.tick__pin {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  padding: 4px;
+  border-right: 2px solid var(--win-dark);
+  box-shadow: 2px 0 0 var(--win-light);
+  background: var(--win-well);
+}
+.tick__pin[hidden] { display: none; }
+.tick__g--lz .tick__me { color: #7fffd4; }
+.tick__pin .tick__g--nt .tick__ha::before { content: "1NT "; color: #7fffd4; letter-spacing: 0.05em; }
 .tick__track {
+  flex: 1;
+  min-width: 0;
   display: flex;
   overflow-x: auto;
   scrollbar-width: none;
@@ -4452,6 +4467,9 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 }
 .tick__track::-webkit-scrollbar { display: none; }
 .tick--crawl .tick__track { scroll-behavior: auto; }
+@media (hover: hover) and (pointer: fine) { .tick--crawl .tick__track { cursor: grab; } }
+.tick--drag .tick__track { cursor: grabbing; user-select: none; }
+.tick--drag a.tick__g { pointer-events: none; }
 .tick__run {
   display: flex;
   flex: none;
@@ -4659,6 +4677,7 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .tx__k--flip { background: #7fe0c8; color: #241a3a; }
 .tx__k--decommit, .tx__k--portal { background: #b89cf0; color: #241a3a; }
 .tx__k--rank { background: #6b54a0; }
+.tx__k--cb { background: #241a3a; color: #7fe0c8; }
 .tx__src { white-space: nowrap; }
 @media (max-width: 640px) { .tx .tx__x { display: none; } }
 
@@ -5022,3 +5041,18 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .post ul.sst__kpis li::before, .post ul.sst__hbar li::before { content: none; }
 .sst__axis { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: .75em; opacity: .8; margin: 4px 0 0; } .sst__axis > span:nth-child(2) { white-space: nowrap; }
 @media (max-width: 640px) { .sst__axis > span:nth-child(2) { order: 3; flex-basis: 100%; } }
+
+/* Tip menu entry (/tip/): teal pixel cup with a soft steady glow, no motion */
+.menu-tip > a { color: #5fd4c4; }
+.menu-tip .menu__icon { filter: drop-shadow(0 0 2px rgba(95, 212, 196, 0.75)); }
+.menu-tip > a:hover .menu__icon { filter: drop-shadow(0 0 3px rgba(200, 199, 255, 0.9)); }
+
+/* Tip page buttons (shortcodes/tip.html) */
+.tip { display: flex; flex-wrap: wrap; gap: 12px; margin: 1.5em 0; }
+.tip__btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px solid #5fd4c4;
+  background: #3a2d57; color: #c8c7ff; font-family: "MS PGothic", monospace; text-decoration: none;
+  box-shadow: 3px 3px 0 #2a1f40, 0 0 6px rgba(95, 212, 196, 0.35); image-rendering: pixelated; }
+.tip__btn:hover { border-color: #c8c7ff; color: #fff; }
+.tip__btn img { width: 16px; height: 16px; image-rendering: pixelated; border: 0; margin: 0; padding: 0; }
+.tip__note { opacity: .8; }
+@media (max-width: 600px) { .tip__btn { flex: 1 1 100%; justify-content: center; } }

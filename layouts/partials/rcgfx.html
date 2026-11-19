@@ -1,0 +1,11 @@
+{{- /* the recruit GFX card's stars and predictions, as one row attribute (data-rc, read by assets/js/gfx.js rcBand):
+       a ARK stars, s industry stars, p industry 5-star+, o uncommitted, l ARK lean [school, %, espn id],
+       e On3/Rivals expert picks [school, experts on it, experts with a pick, espn id] (data/recruit_expert_picks.json),
+       r On3 RPM leader [school, %] (CBB) */ -}}
+{{- $m := dict "a" (.ark | default 0) "s" (.stars | default 0) -}}
+{{- with .plus }}{{ $m = merge $m (dict "p" 1) }}{{ end -}}
+{{- if .open }}{{ $m = merge $m (dict "o" 1) }}{{ end -}}
+{{- with .lean }}{{ $m = merge $m (dict "l" .) }}{{ end -}}
+{{- with .exp }}{{ $m = merge $m (dict "e" .) }}{{ end -}}
+{{- with .rpm }}{{ $m = merge $m (dict "r" .) }}{{ end -}}
+{{- return (jsonify $m) -}}

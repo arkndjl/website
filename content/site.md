@@ -8,7 +8,7 @@ draft = false
 
 {{< wintabs tabs="traffic,build,data" label="site section" >}}
 {{< desk tab="traffic" >}}
-{{< sitestats part="visitors" class="desk__wide" >}}
+{{< sitestats part="views" class="desk__wide" >}}
 {{< sitestats part="trend" >}}
 {{< sitestats part="traffic" >}}
 {{< /desk >}}

@@ -21,7 +21,7 @@ Weight `w` ranks an item; MAJOR (w >= 60) is what the ticker and the daily GFX d
   injury            RotoWire item that takes a player out (OUT pattern; rest days skipped): 90th percentile 72; 75th 54;
                     college FV 50+ 70; 45+ 54; +16 for a long absence (SEVERE: season, ACL, Achilles, tear,
                     fracture, surgery, IR); everyone else stays on the injury tabs
-  recruit           commit / sign / flip / decommit / reclass: a recruit on the site's board 70 (flip 76, decommit 66);
+  recruit           commit / sign / flip / decommit / reclass: a recruit on the site's board 70 (flip 76, decommit 66); cb (247 Crystal Ball alert) 45, never MAJOR;
                     off the board 40
   FV                |change| >= 2 since the day's first build on an FV board: 44 + 6 per point (cap 92), so >= 3 is major;
                     a player under FV 40 before and after needs >= 3 and tops out at 55 (college boards track FV 40+ only)
@@ -240,8 +240,9 @@ def recruits(since):
             elif k == 'reclass': t = '%s reclassifies%s' % (who, ' to %s' % r['cls'] if r.get('cls') else '')
             elif k == 'sign': t = '%s signs%s' % (who, ' with %s' % r['to'] if r.get('to') else '')
             elif k in ('portal',): t = '%s enters the portal' % who
+            elif k == 'cb': t = '%s: 247 Crystal Ball%s' % (who, ' → %s' % r['to'] if r.get('to') else '')
             else: t = '%s commits%s' % (who, ' to %s' % r['to'] if r.get('to') else '')
-            w = ({'flip': 76, 'decommit': 66}.get(k, 70)) if on else 40
+            w = 45 if k == 'cb' else ({'flip': 76, 'decommit': 66}.get(k, 70)) if on else 40   # a Crystal Ball is a lean, not a move: never MAJOR
             out.append(item('rc|%s|%s|%s|%s' % (sp, r['d'], slug(r['n']), k), r['d'], 'arkboard', 'recruit', TAG[sp], ' '.join(t.split()), w,
                             'recruit · %s' % k + (' · on board' if on else ''), PAGE[sp] + '#recruit-transactions',
                             logo=r.get('fl') if k == 'flip' else (r.get('tl') or r.get('fl')), logo2=r.get('tl') if k == 'flip' else None, sp=sp))

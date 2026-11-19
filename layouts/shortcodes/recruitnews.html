@@ -5,7 +5,7 @@
 {{- $rows := index $d $sport | default slice -}}
 {{- with $rows -}}
 {{- $icon := cond (eq $sport "cbb") "basketball" "football" -}}
-{{- $kt := dict "commit" "committed" "decommit" "decommitted" "flip" "flipped his commitment" "portal" "entered the transfer portal" "transfer" "committed as a transfer" "rank" "ranking move" "sign" "signed" "reclass" "reclassified" -}}
+{{- $kt := dict "commit" "committed" "decommit" "decommitted" "flip" "flipped his commitment" "portal" "entered the transfer portal" "transfer" "committed as a transfer" "rank" "ranking move" "sign" "signed" "reclass" "reclassified" "cb" "247Sports Crystal Ball pick (alert only)" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruit transactions") "icon" $icon "filter" "Move,Class,To" "tab" ($.Get "tab") "gfxCols" "Date,Player,Pos,Class,Move,From,To" "gfxDate" (lower ((time $d.asof).Format "Jan 2")) "gfxMax" "30") -}}
 <table class="cfb__table tx">
   <thead><tr>
@@ -26,5 +26,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "recruit_news" "note" "247Sports · On3 · " "about" "247Sports and On3 headlines (Google News search RSS), last 120 days. A move both sites report is one row. Commits, flips and decommits from the last 21 days, and reclassifications, move the recruit's school or class on the class tabs when ESPN or On3 hasn't caught up.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "recruit_news" "note" "247Sports · On3 · " "about" "247Sports and On3 headlines (Google News search RSS), last 120 days. A move both sites report is one row. Commits, flips and decommits from the last 21 days, and reclassifications, move the recruit's school or class on the class tabs when ESPN or On3 hasn't caught up. cb = a 247Sports Crystal Ball headline on a board player (To when the headline names the school); alert only, moves nothing.") -}}
 {{- end -}}

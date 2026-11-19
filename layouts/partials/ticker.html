@@ -13,34 +13,26 @@
 {{- $nw := site.Data.news | default dict }}
 {{- $nby := dict }}{{ range $nw.items }}{{ $nby = merge $nby (dict .id .) }}{{ end }}
 {{- $news := slice }}{{ range $nw.ticker }}{{ with index $nby . }}{{ $news = $news | append . }}{{ end }}{{ end }}
+{{- $nt := (site.Data.ticker | default dict).nt }}
 {{- $tk := cond $home ($.Site.Data.ticker | default dict) dict }}
-{{- if and (or $tk $news) (not .Params.noTicker) }}
+{{- if and (or $tk $news $nt) (not .Params.noTicker) }}
 {{- partial "newsicons.html" . }}
 {{- $links := dict "knicks" "/arkboard/nba/" "rangers" "/arkboard/nhl/" "ravens" "/arkboard/nfl/" "barcelona" "/arkboard/soccer/" }}
 <aside class="tick{{ if not $home }} tick--news{{ end }}" aria-label="{{ if $home }}next games and news{{ else }}news{{ end }}">
+  <div class="tick__pin" hidden>
+    <a class="tick__g tick__g--lz" href="{{ "laursen_111/" | relURL }}" data-lz="laursen_111" hidden>
+      <span class="tick__l1"><span class="tick__me">LAURSEN_111</span></span>
+      <span class="tick__l2"><span class="tick__live">live</span><span class="tick__when">twitch</span></span>
+    </a>
+    {{- if and (not $home) $nt }}{{ with $nt.games }}{{ partial "inline/tick-nt.html" $nt }}{{ end }}{{ end }}
+  </div>
   <div class="tick__track">
     <div class="tick__run">
       {{- with $tk }}
       {{- with .nt }}
       <span class="tick__tag tick__tag--nt">1NT</span>
       {{- if .games }}
-      {{- $h := .hours }}
-      {{- range .games }}
-      <a class="tick__g tick__g--nt" href="/1nt/" data-at="{{ .at }}" data-h="{{ $h }}" data-nt="{{ .id }}" data-bo="{{ .bo }}">
-        <span class="tick__l1">
-          <span class="tick__ha">vs</span>
-          {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
-          <span class="tick__opp">{{ .opp }}</span>
-          {{- with .oppRank }}<span class="tick__note">#{{ . }}</span>{{ end -}}
-        </span>
-        <span class="tick__l2">
-          <span class="tick__when">{{ .day }}{{ with .time }} {{ . }} ET{{ end }}</span>
-          <span class="tick__score" hidden></span>
-          <span class="tick__note tick__bo">bo{{ .bo }}</span>
-          <span class="tick__p"{{ with .p }} data-pre="{{ . }}"{{ else }} hidden{{ end }}>{{ with .p }}win {{ . }}%{{ end }}</span>
-        </span>
-      </a>
-      {{- end }}
+      {{- partial "inline/tick-nt.html" . }}
       {{- else }}
       <span class="tick__g tick__g--off"><span class="tick__l2"><span class="tick__when">no match scheduled</span></span></span>
       {{- end }}
@@ -122,6 +114,31 @@
   var nwTag = run0.querySelector('.tick__tag--news');   // the news cells stay after the games
   teams.forEach(function (t) { run0.insertBefore(t, nwTag); });
   box.querySelectorAll('a.tick__g--nt').forEach(function (a) { if (done(a)) a.hidden = true; else mark(a); });
+
+  // pinned slot (left, never scrolls): a 1NT match from 10 min before start to the end, and LAURSEN_111 when live on Twitch
+  var pin = box.querySelector('.tick__pin'), home = !box.classList.contains('tick--news');
+  function pinNow(a) { var t = Date.parse(a.dataset.at); return Date.now() >= t - 10 * 60e3 && !done(a); }
+  function repin() {
+    [].slice.call(box.querySelectorAll('a.tick__g--nt')).forEach(function (a) {
+      if (a.closest('[aria-hidden]')) return;
+      if (pinNow(a)) { if (a.parentNode !== pin) pin.appendChild(a); a.hidden = false; mark(a); }
+      else if (a.parentNode === pin) { if (home && !done(a)) box.querySelector('.tick__run').insertBefore(a, box.querySelector('.tick__tag--next')); else a.hidden = true; }
+      else if (!home) a.hidden = true;
+    });
+    pin.hidden = ![].some.call(pin.children, function (c) { return !c.hidden; });
+  }
+  repin(); setInterval(repin, 60000);
+  var lz = pin.querySelector('a.tick__g--lz');
+  function lzCheck() {
+    if (document.hidden || !lz) return;
+    fetch('https://decapi.me/twitch/uptime/' + lz.dataset.lz, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
+      var on = !!t && !/offline|error|not found/i.test(t);
+      lz.hidden = !on;
+      if (on) lz.querySelector('.tick__when').textContent = t.replace(/(\d+) hours?/, '$1h').replace(/(\d+) minutes?/, '$1m').replace(/,? ?\d+ seconds?/, '').replace(/,/g, '').trim();
+      pin.hidden = ![].some.call(pin.children, function (c) { return !c.hidden; });
+    }).catch(function () {});
+  }
+  lzCheck(); setInterval(lzCheck, 120000);
 
   // ---- live: score, clock and the in-game win chance ---------------------------------------------------------
   var W = window.LiveWP, ESPN = 'https://site.api.espn.com/apis/site/v2/sports/',
@@ -219,24 +236,69 @@
   setInterval(function () { if (anyLive()) tick(); }, 30000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden && anyLive()) tick(); });
 
-  // a slow 1px crawl when the strip is wider than the screen; touch, hover or focus pauses it
+  // a slow 1px crawl when the strip is wider than the screen; hover, focus or touch pauses it.
+  // Desktop: drag with the mouse, or scroll with the wheel / trackpad; the crawl picks up from where it was left.
   var track = box.querySelector('.tick__track'), run = box.querySelector('.tick__run');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || run.scrollWidth <= track.clientWidth + 2) return;
+  if (run.scrollWidth <= track.clientWidth + 2) return;
+  var crawl = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   var copy = run.cloneNode(true); copy.setAttribute('aria-hidden', 'true');
   copy.querySelectorAll('a').forEach(function (a) { a.tabIndex = -1; });
   track.appendChild(copy); box.classList.add('tick--crawl');
   var paused = false, last = 0, pos = track.scrollLeft;
+  function go(x) { var w = run.offsetWidth; x = ((x % w) + w) % w; track.scrollLeft = pos = x; }
   ['mouseenter', 'focusin', 'touchstart'].forEach(function (e) { box.addEventListener(e, function () { paused = true; }, { passive: true }); });
-  ['mouseleave', 'focusout'].forEach(function (e) { box.addEventListener(e, function () { paused = false; pos = track.scrollLeft; }); });
+  ['mouseleave', 'focusout'].forEach(function (e) { box.addEventListener(e, function () { if (!drag) { paused = false; pos = track.scrollLeft; } }); });
   box.addEventListener('touchend', function () { setTimeout(function () { paused = false; pos = track.scrollLeft; }, 2500); }, { passive: true });
+  track.addEventListener('wheel', function (e) {
+    var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
+    if (!d && Math.abs(e.deltaY) > 0) d = e.deltaY;
+    if (!d) return;
+    e.preventDefault(); go(track.scrollLeft + (e.deltaMode === 1 ? d * 16 : d));
+  }, { passive: false });
+  var drag = null, moved = false;
+  track.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, s: track.scrollLeft }; moved = false; paused = true;
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x;
+    if (!moved && Math.abs(dx) > 4) { moved = true; box.classList.add('tick--drag'); }
+    if (moved) { e.preventDefault(); go(drag.s - dx); }
+  });
+  window.addEventListener('pointerup', function (e) {
+    if (!drag) return;
+    drag = null; box.classList.remove('tick--drag');
+    if (!box.matches(':hover')) paused = false;
+  });
+  track.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  track.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  track.addEventListener('scroll', function () { if (paused) { var w = run.offsetWidth; if (track.scrollLeft >= w) go(track.scrollLeft); } }, { passive: true });
+  if (!crawl) return;
   function step(ts) {
-    if (!paused && ts - last >= 40) {
-      last = ts; var w = run.offsetWidth;
-      pos = pos + 1 >= w ? pos + 1 - w : pos + 1; track.scrollLeft = pos;
-    }
+    if (!paused && ts - last >= 40) { last = ts; go(pos + 1); }
     requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
 })();
 </script>
+{{- end }}
+{{- define "partials/inline/tick-nt.html" }}
+      {{- $h := .hours }}
+{{- range .games }}
+      <a class="tick__g tick__g--nt" href="/1nt/" data-at="{{ .at }}" data-h="{{ $h }}" data-nt="{{ .id }}" data-bo="{{ .bo }}">
+        <span class="tick__l1">
+          <span class="tick__ha">vs</span>
+          {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          <span class="tick__opp">{{ .opp }}</span>
+          {{- with .oppRank }}<span class="tick__note">#{{ . }}</span>{{ end -}}
+        </span>
+        <span class="tick__l2">
+          <span class="tick__when">{{ .day }}{{ with .time }} {{ . }} ET{{ end }}</span>
+          <span class="tick__score" hidden></span>
+          <span class="tick__note tick__bo">bo{{ .bo }}</span>
+          <span class="tick__p"{{ with .p }} data-pre="{{ . }}"{{ else }} hidden{{ end }}>{{ with .p }}win {{ . }}%{{ end }}</span>
+        </span>
+      </a>
+      {{- end }}
 {{- end }}

@@ -6,6 +6,9 @@
 #   - arkndjl.net still serves an older build 90 minutes after a commit to main ("deploy stuck"), or
 #   - a hard-coded season constant is behind the calendar ("season rollover: <x>"), or
 #   - a sport's injury news, injury snapshot or one of its sources goes quiet in season ("stale injuries: <sport>").
+# Repair (Nov 19 2026): a failed run is read from its log and rerun once when the cause is transient; a stale sport's
+# workflow is redispatched 3 h after main moves past its red run, daily otherwise, with the sport's cached-source
+# fallback inputs (data/freshness.json) when the red run is on the current main.
 # Issues notify the repo owner. Nothing here commits.
 name: data health
 
@@ -39,15 +42,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: scripts/data_health.py
+          sparse-checkout: |
+            scripts/data_health.py
+            data/freshness.json
           sparse-checkout-cone-mode: false
-      - name: Red-run alert
+      # the failed log decides the repair: a network/rate-limit/push-race failure reruns its failed jobs once (attempt 1),
+      # a code error opens the issue with its traceback (label needs-fix) and is not retried
+      - name: Red-run alert and retry
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_NAME: ${{ github.event.workflow_run.name }}
           RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           RUN_URL: ${{ github.event.workflow_run.html_url }}
-        run: python3 scripts/data_health.py run "$RUN_NAME" "$RUN_CONCLUSION" "$RUN_URL"
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          RUN_LOG: ${{ runner.temp }}/failed.log
+        run: |
+          gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --log-failed 2>/dev/null | tail -n 400 > "$RUN_LOG" || true
+          python3 scripts/data_health.py run "$RUN_NAME" "$RUN_CONCLUSION" "$RUN_URL"
 
   check:
     if: github.event_name != 'workflow_run'
