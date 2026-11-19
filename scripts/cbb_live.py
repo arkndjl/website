@@ -497,6 +497,34 @@ def espn_sizes(team_ids):
     return out
 
 
+HIST = os.path.join(D.HERE, 'data', 'cbb_unboarded_hist.json.gz')
+
+
+def unboarded_hist():
+    """last season's D-I players the preseason board left off, with their careers (scripts/cbb_unboarded_hist.py):
+    f(pid, name, age) -> career or None. By Barttorvik id; else by name through the shared matcher (ESPN-filled lines
+    carry ESPN's ids), one player of that name only, his age within 1.5 years of the roster's when both are known."""
+    import gzip
+    import names as N
+    try: H = json.load(gzip.open(HIST))
+    except (OSError, ValueError): return lambda pid, name, age=None: None
+    if H.get('season') != SEASON: return lambda pid, name, age=None: None
+    keep, P = H['keep'], H['players']
+    by_key = defaultdict(list)
+    for p, c in P.items(): by_key[N.key(c['name'])].append(p)
+
+    def f(pid, name, age=None):
+        p = str(pid).split('.')[0]
+        if p not in P or not N.same(P[p]['name'], name):
+            c = by_key.get(N.key(name), [])
+            if len(c) != 1: return None
+            p = c[0]
+            if age and P[p]['dob'] and abs(age_now(P[p]['dob']) - age) > 1.5: return None
+        c = P[p]
+        return {'pid': p, 'name': name, 'dob': c['dob'], 'rec': None, 'seasons': [dict(zip(keep, q)) for q in c['seasons']]}
+    return f
+
+
 def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
     """players in this season's box scores the preseason board doesn't have (a walk-on, a mid-year arrival, a player
     ESPN's roster missed). Each starts at the 20 floor and takes the board-calibrated drivers we have on him (prov_fit:
@@ -512,6 +540,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
     if not todo:
         return []
     pf = prov_fit(prior, ci)
+    hist_of = unboarded_hist()
     dob_of = dob_lookup()
     tid = lambda logo: (re.search(r'/(\d+)\.png', logo or '') or [None, None])[1]
     sizes = espn_sizes({tid(teams[ln['team']][1]) for _, ln in todo} - {None})
@@ -536,33 +565,53 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': bt, 'role': ln.get('role') or ROLE.predict(ln, hti)}
         cc = {'pid': pid, 'name': ln['name'], 'dob': dob, 'rec': None, 'seasons': [srow]}
         grp = 'newcomer'
+        # a returner the October board left off (a senior granted another year): his D-I career, graded by the board's
+        # returner model as every boarded returner, in place of the provisional drivers (Nov 19 2026; last season's such
+        # players, preseason xBPM RMSE 4.26 as newcomers -> 2.70 on their careers, scripts/cbb_unboarded_hist.py --test)
+        hc = hist_of(pid, ln['name'], age)
+        if hc:
+            last = hc['seasons'][-1]
+            if not ln.get('hti') and last.get('hti'): hti = int(last['hti']); d['ht'] = hti; srow['hti'] = hti
+            if ln.get('yr') not in NEXT_YR and eyr not in NEXT_YR:
+                yr = NEXT_YR.get(last.get('yr'), 'Sr'); elig = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 4); srow['yr'] = yr
+            if not ln.get('role'): srow['role'] = last.get('role') or srow['role']
+            dob = dob or hc['dob']
+            if dob: age = age_now(dob)
+            age_est = None if exact_dob(dob) or age is None else age
+            cc = {'pid': pid, 'name': ln['name'], 'dob': dob, 'rec': None, 'seasons': hc['seasons'] + [srow]}
+            grp = 'returner'
+            f_pre = F.features(cc, len(cc['seasons']) - 1)
+            pre = max(float(F.FLOOR), float(emap(score(f_pre, fit)[0])))
         proj = lf['now'][grp] == 'projected'
         gp_full = ln['gp'] * full_games / max(1, ln['team_g']) if proj and ln['team_g'] < full_games else None
         cn = next_career(cc, ln, gp_full)
-        f_now = F.features(cn, 1)
+        f_now = F.features(cn, len(cc['seasons']))
         e1, p1, parts1 = score(f_now, fit)
         w = weight(ln['n'], lf['k'][grp])
         fvx = (1 - w) * pre + w * emap(e1)
         # each input's move above the 20 floor: the provisional drivers, then this season's line pulling toward its own grade
         nan = float('nan')
-        parts = [('typical low-information player', float(pf['w'][0]), nan)]
-        parts += [(PROV_LABEL[k], float(c), pf['raw'](d)[j]) for j, (k, c) in enumerate(zip(PROV, contrib)) if abs(c) >= 0.005]
-        lift = pre - (F.FLOOR + float(pf['w'][0] + contrib.sum()))   # held at the 20 floor: the bars still add up to the grade
-        if lift >= 0.005: parts += [('20 floor', lift, nan)]
+        if hc:
+            parts = [('last season', pre - F.FLOOR, nan)]
+        else:
+            parts = [('typical low-information player', float(pf['w'][0]), nan)]
+            parts += [(PROV_LABEL[k], float(c), pf['raw'](d)[j]) for j, (k, c) in enumerate(zip(PROV, contrib)) if abs(c) >= 0.005]
+            lift = pre - (F.FLOOR + float(pf['w'][0] + contrib.sum()))   # held at the 20 floor: the bars still add up to the grade
+            if lift >= 0.005: parts += [('20 floor', lift, nan)]
         parts += [('this season', w * (emap(e1) - pre), nan)]
         kb = lf['kb'][grp]['k']
-        xb0 = xbpm_of(F.features(cc, 0), fit)
+        xb0 = xbpm_of(F.features(cc, len(cc['seasons']) - 1), fit)
         rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
         n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
         row = [None] * len(prior['cols'])
         for c, v in (('name', ln['name']), ('team', tname), ('logo', logo), ('conf', conf), ('pos', 'G' if hti <= 76 else 'F' if hti <= 80 else 'C'),
                      ('cls', yr), ('elig', elig), ('ht', f'{hti // 12}-{hti % 12}'), ('wt', wt), ('age', None if age_est else age),
-                     ('ageEst', round(age_est, 1) if age_est else None), ('new', 1),
+                     ('ageEst', round(age_est, 1) if age_est else None), ('new', 0 if hc else 1),
                      ('links', {'bt': f"https://barttorvik.com/playerstat.php?year={SEASON}&p={ln['name'].replace(' ', '%20')}&t={ln['team'].replace(' ', '%20')}"})):
             if c in ci: row[ci[c]] = v
         out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
                     'xbpm': (ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
-                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt', 'seas': next_career(cc, ln)['seasons']})
+                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, len(cc['seasons']) if hc else 0), 'src': 'bt', 'seas': next_career(cc, ln)['seasons']})
     print(f"{len(out)} players in this season's box scores are not on the preseason board: graded from the 20 floor "
           f"(drivers fit on {pf['n']} low-information board players, 5-fold R2 {pf['r2']:.3f}), then on their lines")
     return out
