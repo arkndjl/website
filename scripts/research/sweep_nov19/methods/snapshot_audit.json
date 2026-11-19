@@ -1,0 +1,66 @@
+{
+ "asof": "2026-11-19",
+ "note": "Feeds the models read whose past values are rewritten at the source. pit = the repo holds point-in-time history; archive = what keeps it. 'check' = not confirmed from the repo in this pass.",
+ "feeds": [
+  {
+   "feed": "ESPN FPI (CFB, NFL)",
+   "reader": "scripts/public_ratings.py",
+   "pit": "2023 on (dated snapshots)",
+   "archive": "scripts/data/public_ratings/{cfb,nfl}_fpi.json.gz"
+  },
+  {
+   "feed": "ESPN BPI game forecast (CBB)",
+   "reader": "scripts/cbb_games_live.py, public_ratings.bpi_one",
+   "pit": "per game, stored once when first seen",
+   "archive": "cbb games log ('bpi' field); no dated team-rating snapshot"
+  },
+  {
+   "feed": "ESPN NHL predictor / matchup predictor",
+   "reader": "none yet",
+   "pit": "no",
+   "archive": "none (candidate: store with the nightly NHL games build)"
+  },
+  {
+   "feed": "RotoWire injury news and estimated return",
+   "reader": "scripts/rotowire.py",
+   "pit": "Jul-Sep 2026 on",
+   "archive": "scripts/data/rotowire_history/*.json.gz"
+  },
+  {
+   "feed": "On3 NIL valuations",
+   "reader": "cfb/cbb NIL builds",
+   "pit": "partial",
+   "archive": "scripts/data/cfb_on3_hist.json.gz, cfb_on3_live.json, recruit_on3_*.json.gz (check: daily valuation snapshots)"
+  },
+  {
+   "feed": "Award and futures odds (DraftKings via ESPN)",
+   "reader": "scripts/awards.py, futures",
+   "pit": "2026-27 on",
+   "archive": "scripts/data/futures/archive/*.jsonl (daily), scripts/data/ledger/awards_2027.jsonl (weekly)"
+  },
+  {
+   "feed": "247Sports composite (via CFBD)",
+   "reader": "cfb recruits",
+   "pit": "class-final values only",
+   "archive": "scripts/data/cfb_recruits_cfbd.json.gz; live pulls gated by CFBD quota"
+  },
+  {
+   "feed": "ESPN coaches / rosters (class labels)",
+   "reader": "cfb, cbb boards",
+   "pit": "no (current class shown for past seasons)",
+   "archive": "none"
+  },
+  {
+   "feed": "FotMob unavailable lists",
+   "reader": "soccer lineups",
+   "pit": "no",
+   "archive": "none (host closed to new fetchers)"
+  },
+  {
+   "feed": "Polls (AP / coaches)",
+   "reader": "scripts/data/polls",
+   "pit": "yes (weekly files)",
+   "archive": "scripts/data/polls/{cbb,cfb}.json"
+  }
+ ]
+}
