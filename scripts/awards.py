@@ -22,6 +22,8 @@ FIT = os.path.join(ROOT, 'data', 'awards_fit.json')
 OUT = os.path.join(ROOT, 'data', 'awards.json')
 TEMP = os.path.join(ROOT, 'data', 'awards_temp.json')
 SIMS = 3000
+PACE_GP = False          # football: rest-of-season rate per game the player appeared in (False = per team game)
+AV_ACT = 0.0             # availability floor of a candidate who is playing now (0 = off)
 SHOW = 20
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 POLY = {('nba', 'mvp'): 'nba-2026-27-mvp', ('nba', 'roy'): 'nba-2026-27-rookie-of-the-year-20260624161716143',
@@ -256,6 +258,7 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
     def draw(c, td, rng, elig65=False):
         left = max(G - c['tg'], 0)
         av = min((c['g'] + .9 * 8) / (c['tg'] + 8), 1.0)
+        if AV_ACT and c.get('act'): av = max(av, AV_ACT)
         gr = games_left(rng, left, av, 'nba')
         gf = c['g'] + gr
         if elig65 and gf < min_g: return None
@@ -488,6 +491,7 @@ def football_draw(teams, per_left, sport):
         gr = games_left(rng, left, .97, sport)
         f = dict(c['f'])
         gn = max(g, 1)
+        if PACE_GP and c['f'].get('gp'): gn = max(min(c['f']['gp'], gn), 1)
         for k, kind in per_left:
             rate = c['f'][k] / gn
             mu = rate * gr
