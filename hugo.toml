@@ -45,7 +45,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
 
 [params]
   contentTypeName = "posts"
-  showMenuItems = 7
+  showMenuItems = 8
   showLanguageSelector = false
   fullWidthTheme = false
   centerTheme = true
@@ -54,6 +54,11 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
 
   # Site-wide links. Used by the footer (layouts/partials/footer.html) and
   # the structured data in layouts/partials/extended_head.html.
+  # Tip page (/tip/, shortcodes/tip.html)
+  [params.tip]
+    kofi = "https://ko-fi.com/arkndjl"
+    cashapp = "https://cash.app/$ARKNDJL"
+
   [params.links]
     eephus = "https://eephus.io"
     twitter = "https://x.com/ARKNDJL"
@@ -362,6 +367,14 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           weight = 60
           [languages.en.menu.main.params]
             icon = "img/icons/site.svg"
+        [[languages.en.menu.main]]
+          identifier = "tip"
+          name = "tip"
+          url = "/tip/"
+          weight = 61
+          [languages.en.menu.main.params]
+            icon = "img/icons/tip.svg"
+            class = "menu-tip"
         # hidden (Noah Nov 17): Franchise Fantasy; to restore, uncomment this entry and set draft = false in content/franchise-fantasy.md
         # [[languages.en.menu.main]]
         #   identifier = "franchise-fantasy"

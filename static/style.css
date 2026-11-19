@@ -5040,3 +5040,18 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .post ul.sst__kpis li::before, .post ul.sst__hbar li::before { content: none; }
 .sst__axis { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: .75em; opacity: .8; margin: 4px 0 0; } .sst__axis > span:nth-child(2) { white-space: nowrap; }
 @media (max-width: 640px) { .sst__axis > span:nth-child(2) { order: 3; flex-basis: 100%; } }
+
+/* Tip menu entry (/tip/): teal pixel cup with a soft steady glow, no motion */
+.menu-tip > a { color: #5fd4c4; }
+.menu-tip .menu__icon { filter: drop-shadow(0 0 2px rgba(95, 212, 196, 0.75)); }
+.menu-tip > a:hover .menu__icon { filter: drop-shadow(0 0 3px rgba(200, 199, 255, 0.9)); }
+
+/* Tip page buttons (shortcodes/tip.html) */
+.tip { display: flex; flex-wrap: wrap; gap: 12px; margin: 1.5em 0; }
+.tip__btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px solid #5fd4c4;
+  background: #3a2d57; color: #c8c7ff; font-family: "MS PGothic", monospace; text-decoration: none;
+  box-shadow: 3px 3px 0 #2a1f40, 0 0 6px rgba(95, 212, 196, 0.35); image-rendering: pixelated; }
+.tip__btn:hover { border-color: #c8c7ff; color: #fff; }
+.tip__btn img { width: 16px; height: 16px; image-rendering: pixelated; border: 0; margin: 0; padding: 0; }
+.tip__note { opacity: .8; }
+@media (max-width: 600px) { .tip__btn { flex: 1 1 100%; justify-content: center; } }

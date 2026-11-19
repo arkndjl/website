@@ -5,7 +5,7 @@
   <li>
     <ul class="menu__dropdown">
       {{ range $.Site.Menus.main }}
-          <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
+          <li{{ with .Params.class }} class="{{ . }}"{{ end }}><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
           {{- if .HasChildren }}{{ range partial "arkgroups.html" . }}
           <li class="menu-child menu-grp">{{ with .label }}<span class="menu-grp__label">{{ . }}</span>{{ end }}<span class="menu-grp__links">
             {{- range .items }}<a href="{{ .URL }}" title="{{ .Name }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Params.gname | default .Name }}</a>{{ end -}}

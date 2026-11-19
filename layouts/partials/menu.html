@@ -16,7 +16,7 @@
     </ul>
   </li>
   {{- else }}
-  <li><a href="{{ .URL }}" {{ if .Params.NewTab -}} target="_blank" {{- end }}>{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
+  <li{{ with .Params.class }} class="{{ . }}"{{ end }}><a href="{{ .URL }}" {{ if .Params.NewTab -}} target="_blank" {{- end }}>{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
   {{- end }}
 {{- end -}}
 <nav class="navigation-menu">
