@@ -144,7 +144,9 @@ The `deploy check` workflow does the same on every push to main and fails if the
 
 The site Worker (`wrangler.toml`, code in `worker/site.js`) serves `public/` and runs code only for `/api/*`: `/api/plays`, the ST. CLAIRE song play counts, kept in a SQLite Durable Object that the deploy creates (no KV namespace or secret).
 
-If Cloudflare's Git build is stuck, the `deploy cloudflare` workflow (Actions tab, Run workflow) builds and deploys with wrangler.
+The `deploy cloudflare` workflow builds and deploys with wrangler from Actions (Cloudflare's own Git build stops when the
+free Workers Builds minutes run out). It runs on push to main (after a 10 minute batch wait), every half hour and by hand,
+and skips when `/build.json` already shows the newest main.
 One-time setup from a computer:
 1. dash.cloudflare.com > My Profile > API Tokens > Create Token > "Edit Cloudflare Workers" template > Create. Copy the token.
 2. The Account ID is on the Workers & Pages overview page (right sidebar).
