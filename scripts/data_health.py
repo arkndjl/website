@@ -30,6 +30,14 @@ Alerts are GitHub issues (label data-alert), which notify the repo owner by mail
                           flagged for a build thread, not flipped blind; the data would otherwise stay fresh-looking
                           while describing last season.
 
+Repair (Nov 19 2026, Noah: "fix all stale feeds and set up ways to autofix them"):
+  - a red run's failed log is classified first (classify): a network, rate-limit, 5xx or push-race failure reruns its
+    failed jobs once; a code error is not retried, and its issue carries the traceback with label needs-fix
+  - a stale sport with its issue open is redispatched by plan_redispatch: nothing while a run is going, 3 h after main
+    moves past a red run (a fix landed), once a day otherwise; when the red run is on the current main and the sport
+    has `fallback` inputs in data/freshness.json (cfb/nfl refresh = cached PFN/On3/CFBD), that run goes first
+  - writers that keep an unchanged file stamp `checked` (scripts/checked.py) so a quiet stretch isn't stale
+
 Feed limits (data/freshness.json): in season inHours (36), out of season the sport's offHours, unless feedHours names
 the feed (a weekly product gets 8 days). A feed's stamp is its checked, else asof, else updated. A date-only asof counts from the end of that day (UTC). A feed whose file is
 missing or has no asof counts as stale, so a renamed file can't hide.
@@ -84,6 +92,12 @@ def in_season(season, now=NOW):
     md = now.strftime('%m-%d')
     a, b = season
     return a <= md <= b if a <= b else (md >= a or md <= b)
+
+
+try:
+    FRESH = json.load(open(os.path.join(ROOT, 'data', 'freshness.json')))
+except (OSError, ValueError):
+    FRESH = {'sports': {}}
 
 
 def check_feeds(now=NOW):
@@ -152,11 +166,90 @@ def close_issue(i, note):
     gh(f'/issues/{i["number"]}', 'PATCH', {'state': 'closed', 'state_reason': 'completed'})
 
 
-def dispatch(workflow):
+def dispatch(workflow, inputs=None):
     if not workflow:
         return 'no workflow'
-    r = gh(f'/actions/workflows/{workflow}/dispatches', 'POST', {'ref': 'main'})
-    return 'dispatched' if r is not None else 'dispatch failed'
+    r = gh(f'/actions/workflows/{workflow}/dispatches', 'POST', {'ref': 'main', **({'inputs': inputs} if inputs else {})})
+    return ('dispatched' + (f' {inputs}' if inputs else '')) if r is not None else 'dispatch failed'
+
+
+# ---------------------------------------------------------------- repair (Nov 19 2026, "fix all stale feeds and autofix them")
+# A red run is read from its failed log before anything is retried, so a code bug doesn't burn a rerun:
+#   transient  network, rate limit, 5xx, push race: the failed jobs rerun once (attempt 1 only)
+#   code       a Python/Node exception that isn't a network one: no rerun; the issue carries the traceback, label needs-fix
+#   unknown    no log or no exception line: one rerun, same as transient
+# Time-limit stops (timed_out, cancelled-long) never rerun: a second 30-minute run costs more than the alert saves.
+NET = ('URLError', 'HTTPError', 'TimeoutError', 'timeout', 'ConnectionError', 'ConnectionResetError', 'ConnectionRefusedError',
+       'RemoteDisconnected', 'IncompleteRead', 'SSLError', 'ProtocolError', 'ReadTimeout', 'ConnectTimeout', 'gaierror',
+       'ChunkedEncodingError', 'FetchError', 'AbortError')
+NET_TEXT = ('HTTP Error 5', 'HTTP Error 429', 'Too Many Requests', 'rate limit', 'timed out', 'Temporary failure in name',
+            'Could not resolve host', 'ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN', 'socket hang up', 'Connection reset',
+            '[rejected]', 'fetch first', 'cannot lock ref', 'non-fast-forward', 'failed to push', '502 Bad Gateway',
+            '503 Service', '504 Gateway', 'The runner has received a shutdown signal', 'Internal Server Error')
+NEEDS_FIX = 'needs-fix'
+
+
+def clean_log(text, keep=40):
+    """the failed log's last lines without the runner's timestamps and the post-job git cleanup"""
+    import re
+    out = []
+    for ln in (text or '').splitlines():
+        ln = re.sub(r'^(\S+\t){0,2}\d{4}-\d\d-\d\dT[\d:.]+Z ?', '', ln).rstrip()
+        if ln.startswith(('Post job cleanup', '[command]/usr/bin/git', 'Cleaning up orphan')):
+            break
+        if ln and not ln.startswith(('##[group]', '##[endgroup]')):
+            out.append(ln)
+    return out[-keep:]
+
+
+def classify(text):
+    """(kind, reason) of a failed log: transient | code | unknown"""
+    import re
+    lines = clean_log(text, 400)
+    exc = [m.group(1) for ln in lines for m in [re.match(r'^\s*(?:Uncaught )?([A-Za-z_][\w.]*(?:Error|Exception|Interrupt)):?', ln)] if m]
+    last = exc[-1] if exc else None
+    if last and not any(n in last for n in NET):
+        return 'code', last
+    hit = next((t for t in NET_TEXT if any(t in ln for ln in lines)), None)
+    if last or hit:
+        return 'transient', last or hit
+    return 'unknown', None
+
+
+def rerun(run_id):
+    r = gh(f'/actions/runs/{run_id}/rerun-failed-jobs', 'POST', {})
+    return r is not None
+
+
+def plan_redispatch(since_dispatch_h, latest, main_sha, fallback, since_fallback_h):
+    """what the stale check does for a sport whose issue is already open:
+    (action, why) with action in None | 'dispatch' | 'fallback'.
+      a run queued or in progress         wait: it is the repair
+      latest run red on today's main      the same code fails the same way: the fallback inputs (cached sources) once a
+                                          day if the sport has them, else a plain retry once a day
+      latest run red, main has moved      a fix may have landed: dispatch after 3 h
+      latest run green, feeds still stale the writer ran and kept the file: a retry at most once a day"""
+    if latest and latest.get('status') in ('queued', 'in_progress', 'waiting', 'requested', 'pending'):
+        return None, 'a run is already going'
+    red = bool(latest) and latest.get('conclusion') in RED
+    if red and latest.get('head_sha') == main_sha:
+        if fallback and since_fallback_h >= 24:
+            return 'fallback', 'latest run red on the current main: cached-source run'
+        return ('dispatch', 'latest run red on the current main, daily retry') if since_dispatch_h >= 24 else (None, 'red on the current main; waiting for a fix')
+    if red:
+        return ('dispatch', 'main moved since the red run') if since_dispatch_h >= 3 else (None, 'main moved; dispatched lately')
+    return ('dispatch', 'daily retry') if since_dispatch_h >= 24 else (None, 'dispatched lately')
+
+
+def latest_run(workflow):
+    rs = gh(f'/actions/workflows/{workflow}/runs?branch=main&per_page=5') if workflow else None
+    rs = [r for r in (rs.get('workflow_runs', []) if isinstance(rs, dict) else []) if r.get('event') != 'pull_request']
+    return rs[0] if rs else None
+
+
+def main_sha():
+    c = gh('/commits/main')
+    return c.get('sha') if isinstance(c, dict) else None
 
 
 def hours_since(iso):
@@ -222,11 +315,17 @@ def cmd_report():
             print(f'  {name:22} {str(a):28} {"-" if h is None else h:>7} h  limit {lim:>4} {flag}')
 
 
-def stale_body(s, last):
+FMARK = '<!-- last-fallback: '
+
+
+def stale_body(s, last, run=None, why=None):
     lines = '\n'.join(f'| {n} | {a or "missing"} | {"-" if h is None else round(h)} | {lim} |' for n, a, h, lim in s['stale'])
     return (f'The {s["label"]} data has feeds past their limit ({"in season" if s["inSeason"] else "off-season"}).\n\n'
             f'| feed | asof | hours | limit |\n|---|---|---|---|\n{lines}\n\n'
-            f'Refresh workflow: `{s["workflow"]}` (dispatched automatically, at most once a day while this is open). '
+            f'Refresh workflow: `{s["workflow"]}`, dispatched automatically while this is open: after 3 h when main has '
+            f'moved past a red run, daily otherwise, with the sport\'s cached-source fallback (data/freshness.json '
+            f'`fallback`) when the red run is on the current main.'
+            + (f' Latest run: {run.get("conclusion") or run.get("status")} {run.get("html_url")} ({why}).' if run else '') + ' '
             f'Feed rules: data/freshness.json. This issue closes itself when every feed is fresh '
             f'(scripts/data_health.py, every 3 hours).\n\n{MARK}{last} -->')
 
@@ -247,10 +346,19 @@ def cmd_stale():
             else:
                 body = i.get('body') or ''
                 last = body.split(MARK, 1)[1].split(' -->')[0] if MARK in body else i['created_at']
-                if hours_since(last) >= 24:
-                    print(f'  still stale after {round(hours_since(last))} h: {dispatch(s["workflow"])}')
+                lastfb = body.split(FMARK, 1)[1].split(' -->')[0] if FMARK in body else '2000-01-01T00:00:00Z'
+                fb = FRESH['sports'].get(k, {}).get('fallback')
+                run = latest_run(s['workflow'])
+                act, why = plan_redispatch(hours_since(last), run, main_sha() if run else None, fb, hours_since(lastfb))
+                if act == 'fallback':
+                    print(f'  {why}: {dispatch(s["workflow"], fb)}')
+                    lastfb = last = NOW.strftime('%Y-%m-%dT%H:%M:%SZ')
+                elif act:
+                    print(f'  still stale after {round(hours_since(last))} h, {why}: {dispatch(s["workflow"])}')
                     last = NOW.strftime('%Y-%m-%dT%H:%M:%SZ')
-                gh(f'/issues/{i["number"]}', 'PATCH', {'body': stale_body(s, last)})
+                else:
+                    print(f'  {why}')
+                gh(f'/issues/{i["number"]}', 'PATCH', {'body': stale_body(s, last, run, why) + f'\n{FMARK}{lastfb} -->'})
         elif i:
             close_issue(i, 'Every feed is fresh again: ' + ', '.join(f'{n} {a}' for n, a, _, _ in s['feeds']))
             print(f'{k}: fresh, issue #{i["number"]} closed')
@@ -368,25 +476,46 @@ LONG_MIN = 9      # a cancelled run with a job that ran this long hit its time l
 SWEEP_H = 3.5     # the 3-hourly check opens an issue only for a run that ended since its last pass
 
 
-def cmd_run(name, conclusion, url):
+def cmd_run(name, conclusion, url, run_id=None, attempt=1, log=None):
+    """a red run: read its failed log, rerun a transient failure once, then file or update the issue"""
     issues = open_issues()
     title = f'red run: {name}'
     i = find(issues, title)
     if conclusion in RED or conclusion == 'cancelled-long':
         word = RED_WORD.get(conclusion, RED_WORD['cancelled'])
+        kind, reason = classify(log) if conclusion == 'failure' else ('limit', conclusion)
+        if run_id and int(attempt or 1) == 1 and kind in ('transient', 'unknown'):
+            if rerun(run_id):
+                print(f'{name}: {kind} failure ({reason}), failed jobs rerun')
+                return 'rerun'
+        tail = clean_log(log)
+        excerpt = ('\n\n```\n' + '\n'.join(tail)[-3500:] + '\n```') if tail else ''
+        what = {'code': f'a code error (`{reason}`): a rerun fails the same way, so nothing was retried',
+                'transient': f'a source or network failure (`{reason}`) that failed again on its rerun',
+                'unknown': 'a failure with no exception in the log, after one rerun',
+                'limit': 'a job time limit (not retried)'}[kind]
         if not i:
-            open_issue(title, f'The `{name}` workflow {word}: {url}\n\nThe step that failed kept the last good file, so '
-                              f'the site shows older data for that product until a run passes. This issue closes once '
-                              f'the workflow\'s latest run is green (scripts/data_health.py, every 3 hours).')
-            print('issue opened')
+            r = open_issue(title, f'The `{name}` workflow {word}: {url}\n\nCause: {what}.{excerpt}\n\nThe step that failed '
+                                  f'kept the last good file, so the site shows older data for that product until a run passes. '
+                                  f'This issue closes once the workflow\'s latest run is green (scripts/data_health.py, every 3 hours).')
+            if kind == 'code' and isinstance(r, dict) and r.get('number'):
+                label_fix(r['number'])
+            print(f'issue opened ({kind})')
         elif hours_since(i['updated_at']) >= 6:
-            gh(f'/issues/{i["number"]}/comments', 'POST', {'body': f'{word.capitalize()} again: {url}'})
+            gh(f'/issues/{i["number"]}/comments', 'POST', {'body': f'{word.capitalize()} again: {url}\n\nCause: {what}.{excerpt}'})
+            if kind == 'code':
+                label_fix(i['number'])
             print('comment added')
     elif conclusion == 'success' and i:
         close_issue(i, f'Green again: {url}')
         print(f'issue #{i["number"]} closed')
     else:
         print(f'{name}: {conclusion}, nothing to do')    # cancelled (a replaced pending run), skipped, neutral
+
+
+def label_fix(n):
+    gh('/labels', 'POST', {'name': NEEDS_FIX, 'color': 'd94f8a', 'description': 'a data workflow fails on a code error: rerunning will not fix it'})
+    gh(f'/issues/{n}/labels', 'POST', {'labels': [NEEDS_FIX]})
 
 
 def minutes(a, b):
@@ -507,6 +636,42 @@ def cmd_test():
         assert closed == ['/issues/1'], closed          # nfl closed; tennis (a 14-minute wait in the queue, then replaced) stays open
     finally:
         gh = real
+    # repair: a failed log is read before a rerun (code errors don't rerun), and the stale redispatch plan
+    soccer = ('2026-11-19T21:57:57.6655191Z injuries: refreshed 2162 players at 95 clubs\n'
+              '2026-11-19T21:58:23.5591554Z Traceback (most recent call last):\n'
+              '2026-11-19T21:58:23.5600985Z   File "scripts/soccer_games.py", line 2103, in <module>\n'
+              "2026-11-19T21:58:23.5605622Z TypeError: type NoneType doesn't define __round__ method\n"
+              '2026-11-19T21:58:24.0087012Z ##[error]Process completed with exit code 1.\n'
+              '2026-11-19T21:58:24.0257785Z Post job cleanup.\n2026-11-19T21:58:24.1 [command]/usr/bin/git version\n')
+    assert classify(soccer) == ('code', 'TypeError'), classify(soccer)
+    assert clean_log(soccer)[-1] == '##[error]Process completed with exit code 1.', clean_log(soccer)
+    assert classify('Traceback\nurllib.error.URLError: <urlopen error timed out>')[0] == 'transient'
+    assert classify('Traceback\nurllib.error.HTTPError: HTTP Error 503: Service Unavailable')[0] == 'transient'
+    assert classify(' ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs')[0] == 'transient'
+    assert classify('KeyError: \'games\'')[0] == 'code'
+    assert classify('') == ('unknown', None)
+    calls.clear(); state['issues'] = []
+    gh = lambda path, method='GET', body=None: (calls.append((method, path)) or {}) if method != 'GET' else []
+    assert cmd_run('soccer', 'failure', 'u', run_id=5, attempt=1, log=soccer) is None
+    assert not any('rerun' in c[1] for c in calls) and any(c[1] == '/issues' for c in calls), calls
+    calls.clear()
+    assert cmd_run('nfl', 'failure', 'u', run_id=6, attempt=1, log='URLError: timed out') == 'rerun'
+    calls.clear()
+    assert cmd_run('nfl', 'failure', 'u', run_id=6, attempt=2, log='URLError: timed out') is None    # one rerun only
+    assert cmd_run('cs2', 'timed_out', 'u', run_id=7, attempt=1) is None and not any('rerun' in c[1] for c in calls)
+    gh = real
+    R = lambda c, sha='m', st='completed': {'conclusion': c, 'head_sha': sha, 'status': st, 'html_url': 'u'}
+    P = plan_redispatch
+    assert P(30, R(None, st='in_progress'), 'm', None, 99)[0] is None
+    assert P(5, R('failure'), 'm', {'refresh': 'true'}, 99)[0] == 'fallback'
+    assert P(5, R('failure'), 'm', {'refresh': 'true'}, 5)[0] is None
+    assert P(5, R('failure'), 'm', None, 99)[0] is None and P(25, R('failure'), 'm', None, 99)[0] == 'dispatch'
+    assert P(4, R('failure', 'old'), 'm', None, 99)[0] == 'dispatch' and P(2, R('failure', 'old'), 'm', None, 99)[0] is None
+    assert P(5, R('success'), 'm', None, 99)[0] is None and P(25, R('success'), 'm', None, 99)[0] == 'dispatch'
+    for k, sp in FRESH['sports'].items():        # a fallback names inputs its workflow declares
+        if sp.get('fallback'):
+            y = open(os.path.join(ROOT, '.github', 'workflows', sp['workflow'])).read()
+            assert all(re.search(rf'^\s+{re.escape(x)}:\s*$', y, re.M) for x in sp['fallback']), (k, sp['fallback'])
     # rollover rules: every constant is found, none due today, each due a year on
     for label, f, rx, want in ROLLOVER:
         assert re.search(rx, open(os.path.join(ROOT, f)).read(), re.M), (label, 'constant not found')
@@ -564,7 +729,9 @@ if __name__ == '__main__':
     elif c == 'stale':
         cmd_stale()
     elif c == 'run':
-        cmd_run(*a[1:4])
+        lp = os.environ.get('RUN_LOG')
+        cmd_run(*a[1:4], run_id=os.environ.get('RUN_ID'), attempt=os.environ.get('RUN_ATTEMPT') or 1,
+                log=open(lp, errors='replace').read() if lp and os.path.exists(lp) else None)
     elif c == 'runs':
         cmd_runs()
     elif c == 'test':

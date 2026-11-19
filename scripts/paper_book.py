@@ -208,10 +208,15 @@ def build(now=None):
            'open': [b for b in ledger if b.get('res') is None],
            'recent': sorted([b for b in ledger if b.get('res') is not None], key=lambda b: b['k'], reverse=True)[:60],
            'ledger': ledger}
-    if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
+    import checked                     # quiet stretches (every sport on the paper switch) keep the file fresh-stamped
+    same = checked.body(old) == json.loads(json.dumps(checked.body(out)))
+    w = checked.stamp(old, out, now, same=same)
+    if w is None:
         return print('paper book: no change')
     with open(OUT, 'w') as f:
-        json.dump(out, f, indent=1, allow_nan=False)
+        json.dump(w, f, indent=1, allow_nan=False)
+    if same:
+        return print('paper book: no change (checked)')
     print(f"paper book: {len(ledger)} picks ({len(out['open'])} open), bankroll {bank:.2f} DU, gates {'pass' if out['gatesPass'] else 'not yet'}")
 
 

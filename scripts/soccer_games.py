@@ -2020,8 +2020,8 @@ def build(days_ahead=4):
         if pend:
             R.last[r['h']] = R.last[r['a']] = lday(r)
         pw_, pd_, pl_ = wdl(lh, la, P['rho'])
-        mu = R.total(r, lh, la)                  # projected score and totals: the market totals ratings, else
-        lv = mu / (lh + la) if mu else level(r['lg'], D.season_of(r['day'], r['lg']))    # the league's scoring level
+        mt = R.total(r, lh, la)                  # projected score and totals: the market totals ratings, else
+        lv = mt / (lh + la) if mt else level(r['lg'], D.season_of(r['day'], r['lg']))    # the league's scoring level
         lh, la = lh * lv, la * lv
         M = score_matrix(lh, la, P['rho'])
         tot = np.add.outer(np.arange(GMAX), np.arange(GMAX))
