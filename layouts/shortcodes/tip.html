@@ -1,0 +1,7 @@
+{{- with site.Params.tip -}}
+<div class="tip">
+  {{ with .kofi }}<a class="tip__btn" href="{{ . }}" target="_blank" rel="noopener"><img src="{{ "img/icons/tip.svg" | absURL }}" alt="" width="16" height="16">Ko-fi</a>{{ end }}
+  {{ with .cashapp }}<a class="tip__btn" href="{{ . }}" target="_blank" rel="noopener">Cash App · $ARKNDJL</a>{{ end }}
+</div>
+{{- end -}}
+<p class="tip__note">Tips go to tuition and site maintenance. Free, no ads.</p>
