@@ -66,4 +66,8 @@ jobs:
         run: hugo -b https://arkndjl.net   # the Cloudflare build command
       - name: Deploy
         if: steps.live.outputs.go
-        run: npx --yes wrangler@4 deploy
+        run: |
+          # pasted secrets can carry a trailing newline or space, which wrangler rejects
+          export CLOUDFLARE_ACCOUNT_ID="$(printf %s "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')"
+          export CLOUDFLARE_API_TOKEN="$(printf %s "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]')"
+          npx --yes wrangler@4 deploy
