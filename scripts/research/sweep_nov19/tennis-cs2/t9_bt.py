@@ -9,7 +9,7 @@ HLS = (30, 60, 90); LAM = 3.0; SPAN = 365
 class BT(M.Model):
     def __init__(self, P, lag):
         super().__init__(P, lag)
-        self.cl, self._half, self._d, self.mr = [], None, None, [{} for _ in HLS]
+        self.cl, self._half, self._d, self.mr, self.dirty = [], None, None, [{} for _ in HLS], False
 
     def _mres(self, p, day, v):
         super()._mres(p, day, v)
@@ -21,29 +21,34 @@ class BT(M.Model):
     def release(self, d):
         n0 = len(self.cl)
         super().release(d)
-        if d == self._d and len(self.cl) == n0: return
-        self._d = d
-        ref = (M.ymd(d) - M.DAY0).days
+        if d != self._d or len(self.cl) != n0: self._d, self.dirty = d, True
+
+    def solve(self):
+        """lazy: only a scored row asks; ATP and WTA never meet, so each tour is its own system"""
+        self.dirty = False
+        ref = (M.ymd(self._d) - M.DAY0).days
         while self.cl and self.cl[0][0] < ref - SPAN - 30: self.cl.pop(0)
-        rows = [c for c in self.cl if ref - c[0] <= SPAN]
         self.mr = [{} for _ in HLS]
-        if len(rows) < 20: return
-        ids = {}
-        for _, w, l, _ in rows:
-            ids.setdefault(w, len(ids)); ids.setdefault(l, len(ids))
-        iw = np.array([ids[c[1]] for c in rows]); il = np.array([ids[c[2]] for c in rows])
-        v = np.array([c[3] for c in rows]); age = np.array([max(0, ref - c[0]) for c in rows], float)
-        n = len(ids)
-        for j, hl in enumerate(HLS):
-            wt = 0.5 ** (age / hl)
-            A = np.zeros((n, n)); b = np.zeros(n)
-            np.add.at(A, (iw, iw), wt); np.add.at(A, (il, il), wt)
-            np.add.at(A, (iw, il), -wt); np.add.at(A, (il, iw), -wt)
-            np.add.at(b, iw, wt * v); np.add.at(b, il, -wt * v)
-            m = np.linalg.solve(A + LAM * np.eye(n), b)
-            self.mr[j] = {p: float(m[i]) for p, i in ids.items()}
+        for t in 'aw':
+            rows = [c for c in self.cl if ref - c[0] <= SPAN and c[1][0] == t]
+            if len(rows) < 20: continue
+            ids = {}
+            for _, w, l, _ in rows:
+                ids.setdefault(w, len(ids)); ids.setdefault(l, len(ids))
+            iw = np.array([ids[c[1]] for c in rows]); il = np.array([ids[c[2]] for c in rows])
+            v = np.array([c[3] for c in rows]); age = np.array([max(0, ref - c[0]) for c in rows], float)
+            n = len(ids)
+            for j, hl in enumerate(HLS):
+                wt = 0.5 ** (age / hl)
+                A = np.zeros((n, n)); b = np.zeros(n)
+                np.add.at(A, (iw, iw), wt); np.add.at(A, (il, il), wt)
+                np.add.at(A, (iw, il), -wt); np.add.at(A, (il, iw), -wt)
+                np.add.at(b, iw, wt * v); np.add.at(b, il, -wt * v)
+                m = np.linalg.solve(A + LAM * np.eye(n), b)
+                self.mr[j].update({p: float(m[i]) for p, i in ids.items()})
 
     def ctx(self, a, b, day):
+        if self.dirty and self._d is not None: self.solve()
         return super().ctx(a, b, day) + [mr.get(a, 0.0) - mr.get(b, 0.0) for mr in self.mr]
 
 

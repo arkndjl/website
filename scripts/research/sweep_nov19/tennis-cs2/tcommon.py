@@ -31,3 +31,37 @@ def save(name, obj):
     json.dump(obj, open(os.path.join(HERE, name + '.json'), 'w'), indent=1, default=str)
     try: json.dump(obj, open(os.path.join(RES, name + '.json'), 'w'), indent=1, default=str)
     except OSError: pass
+
+
+class Resolver:
+    """player name -> our id inside one tour, through scripts/names.py (exact key, then names.same among players
+    with a match in the window); a name two ids share stays unresolved"""
+    def __init__(self, players, rows, since=20100101):
+        sys.path.insert(0, SCRIPTS)
+        import names
+        self.nm = names
+        act = set()
+        for r in rows:
+            if r[0] >= since: act.add(r[7]); act.add(r[8])
+        self.by = {'atp': {}, 'wta': {}}; self.pool = {'atp': [], 'wta': []}
+        for pid in act:
+            n = (players.get(pid) or {}).get('n')
+            if not n: continue
+            tour = 'atp' if pid[0] == 'a' else 'wta'
+            self.by[tour].setdefault(names.key(n), []).append(pid)
+            self.pool[tour].append((pid, n))
+        self.memo = {}
+
+    def pid(self, name, tour):
+        k = (name, tour)
+        if k in self.memo: return self.memo[k]
+        c = self.by[tour].get(self.nm.key(name), [])
+        if len(c) != 1:
+            c = [p for p, n in self.pool[tour] if self.nm.same(name, n)] if not c else c
+        self.memo[k] = c[0] if len(c) == 1 else None
+        return self.memo[k]
+
+
+def dord(d):
+    import datetime as dt
+    return dt.date(d // 10000, d // 100 % 100, d % 100).toordinal()

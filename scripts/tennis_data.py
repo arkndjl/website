@@ -570,6 +570,16 @@ def build(refresh=True):
         print(f'Tennis Abstract: {len(ta_new)} matches added')
     except Exception as e:  # noqa: BLE001
         print('Tennis Abstract results skipped:', e)
+    # WTA lower-level results (ITF, 125, qualifying) from the WTA's own API (scripts/tennis_wta.py): the ITF rows
+    # Tennis Abstract's pages no longer carry
+    try:
+        import tennis_wta
+        w_all, _ = tennis_wta.refresh(bios, fetch=refresh)
+        w_new = tennis_wta.add(hist, w_all)
+        hist += w_new
+        print(f'WTA API: {len(w_new)} matches added')
+    except Exception as e:  # noqa: BLE001
+        print('WTA API results skipped:', e)
     hist.sort(key=lambda r: (r[0], r[6], RORD.get(r[4], 5)))
     # ESPN: 2025 to next week, for ids (headshots), flags and each ESPN tournament's surface
     today = dt.date.today()
