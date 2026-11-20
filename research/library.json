@@ -795,9 +795,10 @@
     },
     {
      "term": "QB value (NFL)",
-     "short": "Points a game over a replacement QB from the game model's QB term.",
+     "short": "Pts/G = this season's points a game over a replacement QB (-0.12 EPA a play), opponent-adjusted. Proj = the game model's QB term.",
      "body": [
-      "Rating = weighted career EPA/play shrunk toward replacement (-0.12) with 250 pseudo-plays."
+      "Pts/G: each dropback and QB run less the defense's EPA allowed a play over the league's (its other games, shrunk with 300 plays); sum(aEPA + 0.12) / games with 10+ plays. Split-half r .512 raw, .528 adjusted (QB-seasons 250+ plays, 2021-26); wind, cold and rain added nothing.",
+      "Proj: weighted career EPA/play shrunk toward replacement with 100 pseudo-plays (fit), x the game model's QB coefficient. This season's Pts/G in the game model, as a swap or an extra term, failed held-out 2021-25 (margin MAE 10.010 -> 10.034 / 10.027)."
      ],
      "where": "NFL QBs tab",
      "sports": [

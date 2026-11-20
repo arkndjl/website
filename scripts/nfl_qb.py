@@ -16,6 +16,12 @@ and this season's play-by-play line (nflverse pbp, regular season + playoffs, tw
   btt   big throws %: completions 10+ air yards at cp <= .45, per dropback (free proxy for a big-time throw;
         descriptive only: it failed as a forward driver, data/qb_btt_research.json)
   rush  EPA on QB runs (designed + scrambles, kneels out), season total
+  aepa  opponent-adjusted EPA a play: each dropback and QB run less the defense's EPA allowed a play over the league's
+        (its other games, shrunk with K_DEF = 300 plays). Split-half reliability 2021-26 (QB-seasons 250+ plays, alternate
+        games): r .512 raw -> .528 adjusted (P better .91 of 1,000 boots); wind / cold / rain adjustments added nothing
+        (.528 -> .529, P .57-.67) and are left out (/mnt/project-files/qb-season-metric/)
+  spts  this season's points over a replacement QB (-0.12 EPA a play) a game played (10+ plays): sum(aepa - REPL) / games.
+        Descriptive, this season only; pts (proj) is the game model's career-weighted term
 Join: pbp by gsis id -> name + team (stats_player_week) -> scripts/names.py matcher against the QB list and the WAR board."""
 import csv
 import gzip
@@ -54,8 +60,13 @@ def f(x):
         return None
 
 
+REPL, K_DEF = -0.12, 300      # replacement QB EPA a play (the game model's), defense prior in plays
+
+
 def pbp_lines(y, fresh=True):
     S = defaultdict(lambda: defaultdict(float))
+    D, DG, LG = defaultdict(lambda: [0.0, 0]), defaultdict(lambda: [0.0, 0]), [0.0, 0]   # EPA allowed by defense, by defense-game
+    QP = defaultdict(list)                                                                # player -> [(game, defense, EPA)]
     with gzip.open(get(f'play_by_play_{y}.csv.gz', f'{REL}/pbp/play_by_play_{y}.csv.gz', fresh), 'rt', encoding='utf-8') as fh:
         rd = csv.reader(fh)
         h = next(rd); I = {k: i for i, k in enumerate(h)}
@@ -68,10 +79,14 @@ def pbp_lines(y, fresh=True):
             if not db and not run:
                 continue
             pid = g(r, 'id') if db else g(r, 'rusher_player_id')
+            epa = f(g(r, 'qb_epa')) if db else f(g(r, 'epa'))
+            dt, gid = FR.get(g(r, 'defteam'), g(r, 'defteam')), g(r, 'game_id')
+            if epa is not None and g(r, 'qb_spike') != '1':
+                for a_ in (D[dt], DG[(gid, dt)], LG): a_[0] += epa; a_[1] += 1
+                if pid and pid != 'NA': QP[pid].append((gid, dt, epa))
             if not pid or pid == 'NA':
                 continue
             A = S[pid]
-            epa = f(g(r, 'qb_epa')) if db else f(g(r, 'epa'))
             scr = g(r, 'qb_scramble') == '1'
             if run or scr:
                 if epa is not None:
@@ -100,6 +115,16 @@ def pbp_lines(y, fresh=True):
                     A['cpoe'] += cpoe; A['cpn'] += 1
                 if g(r, 'complete_pass') == '1' and ay is not None and ay >= 10 and cp is not None and cp <= .45:
                     A['btt'] += 1
+    # this season's value: every QB play (dropbacks, his runs) less the defense's EPA allowed a play over the league's,
+    # from its other games, shrunk with K_DEF plays; points over a replacement QB (REPL a play) a game played (10+ plays)
+    m = LG[0] / LG[1] if LG[1] else 0.0
+    for pid, L in QP.items():
+        A = S[pid]; gp = defaultdict(int)
+        for gid, dt, epa in L:
+            sd, nd = D[dt]; sg, ng = DG[(gid, dt)]
+            adj = epa - ((sd - sg) - m * (nd - ng)) / (nd - ng + K_DEF)
+            A['aepa'] += adj; A['apl'] += 1; A['par'] += adj - REPL; gp[gid] += 1
+        A['gp'] = sum(1 for v in gp.values() if v >= 10) or 1
     return S
 
 
@@ -126,6 +151,9 @@ def line(A):
         'int': r(A['int'] / att if att else None),
         'btt': r(A['btt'] / db if db else None),
         'rush': r(A['rush'], 1),
+        'aepa': r(A['aepa'] / A['apl'] if A['apl'] else None),
+        'spts': r(A['par'] / A['gp'] if A['apl'] else None, 1),
+        'gp': int(A['gp']),
     }
 
 
@@ -152,7 +180,7 @@ def main():
         else:
             miss.append(q['n'])
         rows.append(row)
-    rows.sort(key=lambda r: -(r['pts'] or -99))
+    rows.sort(key=lambda r: -(r['spts'] if r.get('spts') is not None else -99))
     out = {'season': y, 'week': G.get('week'), 'asof': G.get('asof'), 'rows': rows}
     with open(os.path.join(ROOT, 'data', 'nfl_qb.json'), 'w') as fh:
         json.dump(out, fh, separators=(',', ':'), allow_nan=False)
