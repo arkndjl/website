@@ -842,7 +842,7 @@
     {{- end }}
     {{- /* fanGFX / teamGFX: the preview as a graphic (layouts/partials/gfx.html) */}}
     {{- $soc := site.Data.cs.socials | default dict }}{{ $watch := slice }}
-    {{- range $pv.matchups }}{{ with .us }}{{ with index $soc .name }}{{ with .twitch }}{{ $watch = $watch | append . }}{{ end }}{{ end }}{{ end }}{{ end }}
+    {{- range $pv.matchups }}{{ with .us }}{{ with index $soc .name }}{{ with .twitch }}{{ $watch = $watch | append . }}{{ end }}{{ end }}{{ end }}{{ end }}{{ range site.Data.cs.casters }}{{ $watch = $watch | append . }}{{ end }}
     {{- $rwn := dict }}{{ with $pv.rwa }}{{ range .five | append .theirFive }}{{ if index . 1 }}{{ $rwn = merge $rwn (dict (index . 0) (index . 1)) }}{{ end }}{{ end }}{{ end }}
     {{- $five := slice }}{{ $tf := slice }}{{ range $pv.matchups }}{{ with .us }}{{ $five = $five | append (merge . (dict "rwa" (index $rwn .name))) }}{{ end }}{{ with .them }}{{ $tf = $tf | append (merge . (dict "rwa" (index $rwn .name))) }}{{ end }}{{ end }}
     {{- $ln := "" }}{{ with $pv.spread }}{{ $ln = printf "%s −%.1f" (cond (ge (float .line) 0) "1NT" $o.name) (math.Abs (float .line)) }}{{ end }}
