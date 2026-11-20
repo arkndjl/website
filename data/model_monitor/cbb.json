@@ -1,39 +1,39 @@
 {
- "asof": "2026-11-20T16:31:03Z",
+ "asof": "2026-11-20T23:11:58Z",
  "sport": "cbb",
  "season": 2027,
  "loss": "abs margin error",
- "n": 796,
+ "n": 804,
  "logged": 1193,
  "expectFrom": "walk-forward 2022-2026, same calendar month, lined games",
- "model": 9.9933,
+ "model": 9.993,
  "expected": 9.444,
  "z": -0.075,
- "line": 9.426,
- "lineN": 796,
- "modelAtLine": 9.9933,
+ "line": 9.434,
+ "lineN": 804,
+ "modelAtLine": 9.993,
  "byMonth": [
   {
    "month": "nov",
-   "n": 796,
-   "model": 9.9933,
+   "n": 804,
+   "model": 9.993,
    "expected": 9.444
   }
  ],
  "test": {
-  "n": 796,
+  "n": 804,
   "window": 300,
-  "mean": -0.1484,
-  "t": -2.51,
-  "p": null,
-  "days": 7,
+  "mean": -0.1358,
+  "t": -2.24,
+  "p": 0.0299,
+  "days": 8,
   "sd": 1.0,
-  "cusum": 1.75,
+  "cusum": 1.16,
   "cusumMax": 16.1,
   "h": 10.0,
-  "stop": false,
-  "why": ""
+  "stop": true,
+  "why": "last 300 worth t -2.24 at the close"
  },
- "status": "watch",
- "why": ""
+ "status": "alarm",
+ "why": "last 300 worth t -2.24 at the close"
 }
