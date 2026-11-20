@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-20T03:59:04Z",
+ "asof": "2026-11-20T04:24:16Z",
  "recenter": {
-  "2026-11-20": 1.46
+  "2026-11-20": 1.47
  },
  "monitor": {
   "clocks": {
@@ -327,8 +327,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-20T03:44:01Z",
-  "ageH": 0.3,
+  "asof": "2026-11-20T04:21:53Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -352,20 +352,20 @@
    "tm": 242.1
   },
   {
-   "id": "401909313",
+   "id": "401909306",
    "sport": "nba",
-   "kick": "2026-11-21T03:00:00Z",
-   "home": "LAL",
-   "away": "SAC",
+   "kick": "2026-11-21T00:30:00Z",
+   "home": "BKN",
+   "away": "ORL",
    "mk": "total",
    "side": "under",
-   "line": 231.5,
-   "price": -119.0,
+   "line": 223.5,
+   "price": -114.0,
    "edge": 3.0,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
-   "m": 14.7,
-   "tm": 228.5
+   "m": -5.4,
+   "tm": 220.5
   },
   {
    "id": "401909307",
@@ -384,38 +384,6 @@
    "tm": 232.1
   },
   {
-   "id": "401909310",
-   "sport": "nba",
-   "kick": "2026-11-21T01:00:00Z",
-   "home": "OKC",
-   "away": "NO",
-   "mk": "total",
-   "side": "under",
-   "line": 229.5,
-   "price": -119.0,
-   "edge": 2.4,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": 12.6,
-   "tm": 227.1
-  },
-  {
-   "id": "401909306",
-   "sport": "nba",
-   "kick": "2026-11-21T00:30:00Z",
-   "home": "BKN",
-   "away": "ORL",
-   "mk": "total",
-   "side": "under",
-   "line": 222.5,
-   "price": -114.0,
-   "edge": 2.0,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": -5.4,
-   "tm": 220.5
-  },
-  {
    "id": "401909311",
    "sport": "nba",
    "kick": "2026-11-21T02:30:00Z",
@@ -430,6 +398,22 @@
    "why": "edge under 6.5 (total: mid)",
    "m": -3.8,
    "tm": 225.5
+  },
+  {
+   "id": "401909313",
+   "sport": "nba",
+   "kick": "2026-11-21T03:00:00Z",
+   "home": "LAL",
+   "away": "SAC",
+   "mk": "total",
+   "side": "under",
+   "line": 230.5,
+   "price": -110.0,
+   "edge": 2.0,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
+   "m": 14.7,
+   "tm": 228.5
   },
   {
    "id": "401909312",
@@ -464,18 +448,34 @@
    "tm": 215.0
   },
   {
+   "id": "401909310",
+   "sport": "nba",
+   "kick": "2026-11-21T01:00:00Z",
+   "home": "OKC",
+   "away": "NO",
+   "mk": "total",
+   "side": "under",
+   "line": 228.5,
+   "price": -110.0,
+   "edge": 1.4,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
+   "m": 12.6,
+   "tm": 227.1
+  },
+  {
    "id": "401909305",
    "sport": "nba",
    "kick": "2026-11-21T00:00:00Z",
    "home": "ATL",
    "away": "CHA",
    "mk": "spread",
-   "side": "home",
-   "line": 5.5,
+   "side": "away",
+   "line": 6.5,
    "price": -119.0,
-   "edge": 0.3,
+   "edge": 0.7,
    "x": 5.0,
-   "why": "edge under 5 (venue: home)",
+   "why": "edge under 5 (role: dog)",
    "m": 5.8,
    "tm": 219.2
   }
@@ -483,10 +483,10 @@
  "games": {
   "401909305": {
    "mk": "spread",
-   "side": "home",
-   "line": 5.5,
+   "side": "away",
+   "line": 6.5,
    "price": -119.0,
-   "edge": 0.3,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "ATL",
@@ -496,9 +496,9 @@
   "401909306": {
    "mk": "total",
    "side": "under",
-   "line": 222.5,
+   "line": 223.5,
    "price": -114.0,
-   "edge": 2.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "BKN",
@@ -544,9 +544,9 @@
   "401909310": {
    "mk": "total",
    "side": "under",
-   "line": 229.5,
-   "price": -119.0,
-   "edge": 2.4,
+   "line": 228.5,
+   "price": -110.0,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "OKC",
@@ -580,9 +580,9 @@
   "401909313": {
    "mk": "total",
    "side": "under",
-   "line": 231.5,
-   "price": -119.0,
-   "edge": 3.0,
+   "line": 230.5,
+   "price": -110.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "LAL",
@@ -642,7 +642,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5000,
+  "snapshots": 5004,
   "buckets": [
    {
     "when": "24h+",
@@ -7317,7 +7317,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T03:59:04Z",
+ "checked": "2026-11-20T04:24:16Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
