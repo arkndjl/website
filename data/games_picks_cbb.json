@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-20T03:48:46Z",
+ "asof": "2026-11-20T03:53:00Z",
  "recenter": {
   "2026-11-19": 1.77,
   "2026-11-20": 1.49
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-20T03:19:49Z",
-  "ageH": 0.5,
+  "ageH": 0.6,
   "stale": false
  },
  "picks": [],
@@ -1968,11 +1968,11 @@
    "home": "Canisius",
    "away": "Mercyhurst",
    "mk": "spread",
-   "side": "away",
-   "line": 11.5,
+   "side": "home",
+   "line": -18.5,
    "price": -5413.0,
-   "edge": 14.7,
-   "x": 4.5,
+   "edge": 15.3,
+   "x": 5.0,
    "why": "gap too big: a bad line",
    "m": -3.2,
    "tm": 135.8
@@ -1994,22 +1994,6 @@
    "tm": 128.7
   },
   {
-   "id": "401929459",
-   "sport": "cbb",
-   "kick": "2026-11-21T01:00:00Z",
-   "home": "SMU",
-   "away": "South Alabama",
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": -369.0,
-   "edge": 6.0,
-   "x": 5.0,
-   "why": "no edge at -369",
-   "m": 16.5,
-   "tm": 152.3
-  },
-  {
    "id": "401920518",
    "sport": "cbb",
    "kick": "2026-11-20T04:00:00Z",
@@ -2018,10 +2002,10 @@
    "mk": "spread",
    "side": "away",
    "line": -3.5,
-   "price": -101.0,
+   "price": -106.0,
    "edge": 2.2,
    "x": 2.0,
-   "why": "no edge at -101",
+   "why": "no edge at -106",
    "m": -5.7,
    "tm": 150.0
   },
@@ -2122,6 +2106,22 @@
    "tm": 154.9
   },
   {
+   "id": "401929459",
+   "sport": "cbb",
+   "kick": "2026-11-21T01:00:00Z",
+   "home": "SMU",
+   "away": "South Alabama",
+   "mk": "total",
+   "side": "over",
+   "line": 147.5,
+   "price": -146.0,
+   "edge": 4.8,
+   "x": 6.5,
+   "why": "edge under 6.5 (tier: mixed)",
+   "m": 16.5,
+   "tm": 152.3
+  },
+  {
    "id": "401921723",
    "sport": "cbb",
    "kick": "2026-11-20T22:00:00Z",
@@ -2170,6 +2170,22 @@
    "tm": 149.6
   },
   {
+   "id": "401920195",
+   "sport": "cbb",
+   "kick": "2026-11-21T00:00:00Z",
+   "home": "Drexel",
+   "away": "Saint Joseph's",
+   "mk": "total",
+   "side": "under",
+   "line": 139.5,
+   "price": -152.0,
+   "edge": 4.2,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -1.9,
+   "tm": 135.3
+  },
+  {
    "id": "401921107",
    "sport": "cbb",
    "kick": "2026-11-21T00:00:00Z",
@@ -2210,7 +2226,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.5,
    "x": 4.0,
    "why": "edge under 4 (tier: power)",
@@ -2282,22 +2298,6 @@
    "tm": 163.6
   },
   {
-   "id": "401920195",
-   "sport": "cbb",
-   "kick": "2026-11-21T00:00:00Z",
-   "home": "Drexel",
-   "away": "Saint Joseph's",
-   "mk": "spread",
-   "side": "home",
-   "line": -4.5,
-   "price": -124.0,
-   "edge": 2.6,
-   "x": 5.0,
-   "why": "edge under 5 (line: 4-9)",
-   "m": -1.9,
-   "tm": 135.3
-  },
-  {
    "id": "401916290",
    "sport": "cbb",
    "kick": "2026-11-21T01:00:00Z",
@@ -2322,7 +2322,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 1.6,
    "x": 4.0,
    "why": "edge under 4 (tier: power)",
@@ -2335,7 +2335,7 @@
    "mk": "spread",
    "side": "away",
    "line": -3.5,
-   "price": -101.0,
+   "price": -106.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2359,7 +2359,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 1.6,
    "ev": null,
    "units": 0.0,
@@ -2443,7 +2443,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -2464,11 +2464,11 @@
    "state": "under"
   },
   "401929459": {
-   "mk": "spread",
-   "side": "away",
-   "line": 22.5,
-   "price": -369.0,
-   "edge": 6.0,
+   "mk": "total",
+   "side": "over",
+   "line": 147.5,
+   "price": -146.0,
+   "edge": 4.8,
    "ev": null,
    "units": 0.0,
    "home": "SMU",
@@ -2476,11 +2476,11 @@
    "state": "under"
   },
   "401912710": {
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -129.0,
-   "edge": 2.2,
+   "mk": "spread",
+   "side": "home",
+   "line": 20.5,
+   "price": -119.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "North Carolina",
@@ -2620,11 +2620,11 @@
    "state": "under"
   },
   "401920195": {
-   "mk": "spread",
-   "side": "home",
-   "line": -4.5,
-   "price": -124.0,
-   "edge": 2.6,
+   "mk": "total",
+   "side": "under",
+   "line": 139.5,
+   "price": -152.0,
+   "edge": 4.2,
    "ev": null,
    "units": 0.0,
    "home": "Drexel",
@@ -2707,7 +2707,7 @@
    "mk": "total",
    "side": "over",
    "line": 139.5,
-   "price": -125.0,
+   "price": -140.0,
    "edge": 1.6,
    "ev": null,
    "units": 0.0,
@@ -2825,10 +2825,10 @@
   },
   "401919827": {
    "mk": "spread",
-   "side": "away",
-   "line": 11.5,
+   "side": "home",
+   "line": -18.5,
    "price": -5413.0,
-   "edge": 14.7,
+   "edge": 15.3,
    "ev": null,
    "units": 0.0,
    "home": "Canisius",
@@ -2912,7 +2912,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20586,
+  "snapshots": 20606,
   "buckets": [
    {
     "when": "24h+",
@@ -2925,9 +2925,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4232,
-    "clvRet": -0.0092,
-    "clvT": -4.89,
+    "clvN": 4235,
+    "clvRet": -0.0093,
+    "clvT": -4.98,
     "clv": 0.54,
     "beat": 0.399,
     "still": 0.406
@@ -2943,9 +2943,9 @@
    },
    {
     "when": "<1h",
-    "clvN": 360,
+    "clvN": 361,
     "clvRet": -0.0466,
-    "clvT": -27.14,
+    "clvT": -27.21,
     "clv": -0.02,
     "beat": 0.075,
     "still": 0.831
@@ -20652,7 +20652,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T03:48:46Z",
+ "checked": "2026-11-20T03:53:00Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
