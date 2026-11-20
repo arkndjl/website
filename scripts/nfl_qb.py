@@ -61,6 +61,7 @@ def f(x):
 
 
 REPL, K_DEF = -0.12, 300      # replacement QB EPA a play (the game model's), defense prior in plays
+PTS_PER_WIN = 36.0            # season points a win (nfl_games.PTS_PER_WIN): SVAR = SV points over replacement / 36
 
 
 def pbp_lines(y, fresh=True):
@@ -153,6 +154,7 @@ def line(A):
         'rush': r(A['rush'], 1),
         'aepa': r(A['aepa'] / A['apl'] if A['apl'] else None),
         'spts': r(A['par'] / A['gp'] if A['apl'] else None, 1),
+        'svar': r(A['par'] / PTS_PER_WIN if A['apl'] else None, 2),
         'gp': int(A['gp']),
     }
 

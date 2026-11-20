@@ -75,6 +75,35 @@ def pick(rows, key, top=TOP, per=PER_DEC):
     return [r for r in R if id(r) in keep]
 
 
+def sv_hist(sp):
+    """SV (season value) rows for past seasons (scripts/sv_history.py -> scripts/data/sv_hist.json.gz), [] when missing"""
+    try:
+        return json.load(gzip.open(os.path.join(HERE, 'data', 'sv_hist.json.gz'), 'rt')).get(sp) or []
+    except (OSError, ValueError):
+        return []
+
+
+def pick_sv(rows, key='v'):
+    """the peak list by the main key plus the top by SV (so a header sort by SV ranks the real SV leaders); rows without
+    the main key last"""
+    keep, out = set(), []
+    for r in pick(rows, key) + pick(rows, 'sv') + pick(rows, 'svar'):
+        if id(r) not in keep:
+            keep.add(id(r)); out.append(r)
+    return sorted(out, key=lambda r: (r.get(key) is None, -(r.get(key) or 0), -(r.get('sv') or 0)))
+
+
+def svar(r, sp):
+    """SVAR: the season's SV points over replacement in wins (NFL / 36 a win, on 17 games; CFB / 1 / .0189 = 52.9 a win)"""
+    if r.get('tot') is None: return None
+    return round(r['tot'] * 17 / (16 if r['y'] <= 2020 else 17) / 36, 2) if sp == 'nfl' else round(r['tot'] * 0.0189, 2)
+
+
+SV_T = ('SV (season value): points over replacement a game that season, EPA a play (QB dropbacks + runs; runs + targets; '
+        'defenders: credited EPA on negative plays) less the opponent\'s rate where it helped, replacement moved with that '
+        "season's league EPA (era)")
+
+
 # ---------------------------------------------------------------- ridge ratings from scores (NFL)
 def ridge(G, cap=CAP, lam=2.0):
     """G: dicts a, b, pa, pb, h (+1 a home, -1 b home, 0 neutral). -> {team: (rating, off, def, games)}"""
@@ -425,7 +454,11 @@ def cfb_qb_lists(rows, minq=150):
         if s['att'] < minq: continue
         peak.append(dict(id=s['id'], n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos='QB', v=round(s['v']), raw=round(s['tay'], 2),
                          q=dict(q_of([s]), ix=round(s['ix'])), est=None, ph=None))
-    pk = pick([dict(r) for r in peak], 'v')      # every player-season on its own
+    svm = {(str(r['id']), r['y']): r for r in sv_hist('cfb') if r['g'] == 'QB'}
+    for r in peak:
+        m_ = svm.get((str(r['id']), r['y'])) or {}
+        r['sv'], r['svar'] = m_.get('sv'), svar(m_, 'cfb') if m_ else None
+    pk = pick_sv([dict(r) for r in peak]) if svm else pick([dict(r) for r in peak], 'v')      # every player-season on its own
     for r in pk: r.pop('id', None)
     C = defaultdict(list)
     for s in S: C[s['id']].append(s)
@@ -505,6 +538,7 @@ def cfb_skill_lists(rows, qbrows=()):
     qb = {(r[0], r[2]) for r in qbrows if r[6] >= 50}      # a season with 50+ passes is a QB season (ESPN lists many QBs with no position)
     S = [dict(id=r[0], n=r[1], y=r[2], tid=r[3], tm=r[4], pos=r[5], g=r[6], ra=r[7], ry=r[8], rtd=r[9], rc=r[10], cy=r[11], ctd=r[12], fl=r[13]) for r in rows if (r[0], r[2]) not in qb]
     for s in S: s['ay'] = s['ry'] + s['cy'] + 20 * (s['rtd'] + s['ctd']) - 45 * s['fl']
+    SVM = {(str(r['id']), r['y']): r for r in sv_hist('cfb') if r['g'] in ('RB', 'WR', 'TE')}
     base = {}
     by = defaultdict(list)
     for s in S: by[(s['y'], s['pos'])].append(s['ay'])
@@ -520,8 +554,9 @@ def cfb_skill_lists(rows, qbrows=()):
                     rc=int(rc), cy=int(cy), ypr=round(cy / rc, 1) if rc >= 10 else None, ctd=int(sum(s['ctd'] for s in L)), scr=int(ry + cy))
     P = []
     for s in S:    # every player-season on its own
-        P.append(dict(n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos=s['pos'], v=round(s['v']), raw=round(s['ay']), est=None, ph=None, q=dict(q_of([s]), ix=round(s['ix']))))
-    pk = pick([dict(r) for r in P], 'v')
+        P.append(dict(n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos=s['pos'], v=round(s['v']), raw=round(s['ay']), est=None, ph=None, q=dict(q_of([s]), ix=round(s['ix'])),
+                      sv=(SVM.get((str(s['id']), s['y'])) or {}).get('sv'), svar=svar(SVM[(str(s['id']), s['y'])], 'cfb') if (str(s['id']), s['y']) in SVM else None))
+    pk = pick_sv([dict(r) for r in P]) if SVM else pick([dict(r) for r in P], 'v')
     C = defaultdict(list)
     for s in S: C[s['id']].append(s)
     car = []
@@ -1012,6 +1047,11 @@ def main():
     res['cfb'] = {'teams': teams_out('cfb', src['cfb'])}
     if src.get('cfbqb'): res['cfb']['qbs'] = cfb_qb_lists(src['cfbqb'])
     if src.get('cfbsk'): res['cfb']['players'] = cfb_skill_lists(src['cfbsk'], src.get('cfbqb') or ())
+    for g_, t_ in (('qbs', 'CFB 2014 on (cfbfastR play-by-play), FBS games'), ('players', 'CFB 2014 on: RBs on runs; WR, TE and RB targets 2025 on (target ids)')):
+        P_ = res['cfb'].get(g_)
+        if P_ and any(r.get('sv') is not None for r in P_['peak']):
+            P_['sv'], P_['svT'] = True, SV_T + '; ' + t_
+            P_['svarT'] = 'SVAR = SV points over replacement that season, in wins: points x .0189 (FBS: win % rises .0189 a point of margin a game, 12 games)'
     res['nfl'] = {'teams': teams_out('nfl', src['nfl'])}
     res['cbb'] = {'teams': teams_out('cbb', src['cbb'])}
     res['nba'] = {'teams': teams_out('nba', src['nbaT'])}
@@ -1074,13 +1114,28 @@ def main():
         allc, nfit = nfl_career(pk17, src['nflwav'], top=None)
         base = res['nfl']['players']
         pkm = dict(base['pk'], t='NFL WAR (AV WAR, no special teams), 2012 on (snap counts), on 17 games (2012-20 x 17 / 16)')
+        SVN = sv_hist('nfl')
         for g, keep in (('qbs', lambda p: p == 'QB'), ('players', lambda p: p != 'QB')):
             S_ = [s_ for s_ in pk17 if keep(s_.get('pos'))]
             P = players_out(S_, pkm, base['car'], base['src'],
                             career=[r for r in allc if keep(r.get('pos'))][:TOP], est=base['estT'],
-                            abouts=('Seasons 2012 on, on 17 games; every player-season ranks on its own.', base['career_about']))
-            P['peak'] = [dict(n=fixenc(x['n']), y=x['y'], tm=x.get('tm'), pos=x.get('pos'), v=round(x['v'], 2), raw=x.get('raw'), est=None, ph=None, ox=None, dx=None)
-                         for x in pick([dict(x) for x in S_], 'v')]
+                            abouts=('WAR seasons 2012 on, on 17 games; every player-season ranks on its own. SV seasons 1999 on (defenders 2013 on): the list holds the top by WAR and the top by SV.', base['career_about']))
+            # SV (scripts/sv_history.py) by pfr id + season; seasons with SV and no WAR row (1999-2012, before snap counts)
+            # join the list with WAR blank, so a sort by SV covers every season the play-by-play reaches
+            svr = [r for r in SVN if (r['g'] == 'QB') == (g == 'qbs')]
+            svm = {(r['pfr'], r['y']): r for r in svr if r.get('pfr')}
+            for x in S_:
+                m_ = svm.pop((x.get('id'), x['y']), None)
+                x['sv'], x['svar'] = (m_['sv'], svar(m_, 'nfl')) if m_ else (None, None)
+            extra = [dict(n=r['n'], y=r['y'], tm=r.get('t'), pos=r['g'], v=None, raw=None, sv=r['sv'], svar=svar(r, 'nfl'))
+                     for r in svm.values() if r.get('n')]
+            P['peak'] = [dict(n=fixenc(x['n']), y=x['y'], tm=x.get('tm'), pos=x.get('pos'), v=None if x['v'] is None else round(x['v'], 2), raw=x.get('raw'),
+                              sv=x.get('sv'), svar=x.get('svar'), est=None, ph=None, ox=None, dx=None)
+                         for x in (pick_sv([dict(x) for x in S_ + extra]) if SVN else pick([dict(x) for x in S_], 'v'))]
+            if SVN:
+                P['sv'], P['svT'] = True, SV_T + '; NFL 1999 on (defenders 2013 on, snap counts); WAR 2012 on'
+                P['svarT'] = 'SVAR = SV points over replacement that season, in wins: points / 36 a win (the game model), on 17 games (1999-2020 x 17 / 16)'
+                P['from'] = min(P['from'], min(r['y'] for r in svr))
             P['fit'] = nfit
             res['nfl'][g] = P
         nfl_qb_attach(res['nfl']['qbs'], src['nflqb'])

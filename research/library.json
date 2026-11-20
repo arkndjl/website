@@ -837,6 +837,21 @@
      ]
     },
     {
+     "term": "SVAR",
+     "short": "SVAR = SV points over replacement for the season, in wins. Shown next to WAR; the models keep WAR.",
+     "body": [
+      "NFL: points / 36 a win (the game model's points a win). All-time seasons put on 17 games (1999-2020 x 17 / 16).",
+      "CFB: points / 53 a win (FBS win % rises .0189 a point of margin a game over 12 games, cfb_war_backtest college fit).",
+      "All-time SV history: NFL 1999 on (defenders 2013 on, snap counts); CFB 2014 on (cfbfastR play-by-play), CFB WR/TE and RB targets 2025 on (target ids); replacement moved with each season's league EPA a play (era).",
+      "Game model: every SV test failed against WAR (NFL QB MAE 10.010 -> 10.034; NFL non-QB injury term 0/5 seasons; CFB QB = raw), so WAR stays the model input."
+     ],
+     "where": "NFL QBs, skill players, defenders; CFB QB SV, skill players; rookie boards; all-time peak seasons",
+     "sports": [
+      "NFL",
+      "CFB"
+     ]
+    },
+    {
      "term": "Yds+ / YOE (returners)",
      "short": "Kick and punt return yards over expected, shrunk.",
      "body": [

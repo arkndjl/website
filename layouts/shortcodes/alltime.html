@@ -54,6 +54,7 @@
   <thead><tr><th>RK</th><th>Player</th><th>{{ if $peak }}Season{{ else }}Years{{ end }}</th>
     {{- if .tm }}<th>{{ .tmL | default "Team" }}</th>{{ end }}{{ if $posOn }}<th>Pos</th>{{ end }}{{ if and $peak .age }}<th title="age on Dec 31 of the season">Age</th>{{ end }}
     <th class="cfb__g" title="{{ $M.t }}">{{ $M.l }}</th>
+    {{- if and $peak .sv }}<th title="{{ .svT }}">SV</th><th title="{{ .svarT }}">SVAR</th>{{ end }}
     {{- if and $peak .u }}<th title="{{ .ut | default "as played, before the era adjustment" }}">{{ .ul | default "Unadj" }}</th>{{ end }}
     {{- if $od }}<th title="{{ if $peak }}offensive XPM that season{{ else }}career offensive XPM, minutes-weighted{{ end }} (.5 ODPM + .5 OBPM from 2009-10, OBPM before; - before 1973-74)">O-XPM</th><th title="{{ if $peak }}defensive XPM that season{{ else }}career defensive XPM, minutes-weighted{{ end }} (.5 DDPM + .5 DBPM from 2009-10, DBPM before; - before 1973-74)">D-XPM</th>{{ end }}
     {{- if $peak }}{{ with .pk.rl }}<th title="{{ $P.pk.rt }}">{{ . }}</th>{{ end }}
@@ -76,7 +77,8 @@
     {{- end }}
     {{- if $P.tm }}<td class="cfb__team">{{ with .lo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .tm }}</span></td>{{ end }}
     {{- if $posOn }}<td class="cfbp__conf">{{ .pos | default "-" }}</td>{{ end }}{{ if and $peak $P.age }}<td class="cfb__num" data-l="Age" data-v="{{ .age }}">{{ .age | default "-" }}</td>{{ end }}
-    <td class="cfb__num cfb__g cfbp__surplus is-key" data-l="{{ $M.l }}" data-v="{{ .v }}"><b>{{ partial "num.html" (slice $M.f .v) }}</b></td>
+    <td class="cfb__num cfb__g cfbp__surplus is-key{{ if eq .v nil }} at-na{{ end }}" data-l="{{ $M.l }}" data-v="{{ .v }}">{{ if ne .v nil }}<b>{{ partial "num.html" (slice $M.f .v) }}</b>{{ else }}-{{ end }}</td>
+    {{- if and $peak $P.sv }}<td class="cfb__num{{ if eq .sv nil }} at-na{{ end }}" data-l="SV" data-v="{{ .sv }}">{{ with .sv }}{{ partial "num.html" (slice "%+.1f" .) }}{{ else }}-{{ end }}</td><td class="cfb__num{{ if eq .svar nil }} at-na{{ end }}" data-l="SVAR" data-v="{{ .svar }}">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" .) }}{{ else }}-{{ end }}</td>{{ end }}
     {{- if and $peak $P.u }}<td class="cfb__num{{ if eq .u nil }} at-na{{ end }}" data-l="{{ $P.ul | default "Unadj" }}" data-v="{{ .u }}">{{ with .u }}{{ partial "num.html" (slice $P.pk.f .) }}{{ else }}-{{ end }}</td>{{ end }}
     {{- if $od }}
     <td class="cfb__num{{ if eq .ox nil }} at-na{{ end }}" data-l="O-XPM" data-v="{{ .ox }}">{{ with .ox }}{{ if ge . 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}-{{ end }}</td>

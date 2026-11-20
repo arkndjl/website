@@ -44,8 +44,18 @@ OPP = {'QB', 'RB'}
 REPL = {'QB': -0.0741, ('RB', 0): -0.0862, ('RB', 1): 0.0828, ('WR', 0): -0.0251, ('WR', 1): 0.3377, ('TE', 0): 0.4468,
         ('TE', 1): 0.4082}
 MIN_QB, MIN_SKILL = 100, 30
+
+
+def pts_per_win():
+    """season points a win in FBS: 1 / the slope of win % on margin a game (data/cfb_war_backtest.json college fit; ~53)"""
+    try:
+        return 1 / json.load(open(os.path.join(ROOT, 'data', 'cfb_war_backtest.json')))['college']['slope']
+    except (OSError, ValueError, KeyError, ZeroDivisionError):
+        return 52.9
+
+DUP_N, DUP_SHARE = 110, 0.2   # duplicate team-games: run / pass plays a side above DUP_N (real games top out near 100) or repeats
 COLS = ['season', 'week', 'season_type', 'game_id', 'pos_team', 'def_pos_team', 'home', 'away', 'home_team_id', 'away_team_id',
-        'home_team_division', 'away_team_division', 'EPA', 'rush', 'pass', 'rush_player_id', 'rush_player', 'position_rush',
+        'home_team_division', 'away_team_division', 'EPA', 'rush', 'pass', 'period', 'play_text', 'rush_player_id', 'rush_player', 'position_rush',
         'reception_player_id', 'reception_player', 'position_reception', 'target_player_id', 'target_player', 'position_target',
         'completion_player_id', 'completion_player', 'incompletion_player_id', 'incompletion_player', 'sack_taken_player_id',
         'sack_taken_player', 'interception_thrown_player_id', 'interception_thrown_player']
@@ -73,7 +83,7 @@ def plays(path):
     import pyarrow.parquet as pq
     have = set(pq.ParquetFile(path).schema_arrow.names)
     t = pq.read_table(path, columns=[c for c in COLS if c in have]).to_pydict()
-    out, fbs, tid = [], set(), {}
+    out, key, fbs, tid = [], [], set(), {}
     for i in range(len(t['game_id'])):
         g = lambda k: nn(t[k][i]) if k in t else None  # noqa: E731
         for s in ('home', 'away'):
@@ -102,7 +112,22 @@ def plays(path):
         ru = sid(g('rush_player_id')) if not db else None
         out.append((g('game_id'), g('pos_team'), g('def_pos_team'), int(db), float(g('EPA')), qb if db else None, qbn,
                     ru, g('position_rush'), g('rush_player'), rec, recp, recn))
-    return out, fbs, tid
+        key.append((g('period'), g('play_text')))
+    # some team-games are in the release twice (two feeds merged; 2021 and 2025 worst, none in 2026 so far): a side with
+    # more than DUP_N run / pass plays, or with more than DUP_SHARE of its plays repeating a (quarter, play text) it already
+    # has (real games: ~0.05%), keeps each (quarter, play text) once
+    n, u = Counter((r[0], r[1]) for r in out), defaultdict(set)
+    for r, k in zip(out, key):
+        u[(r[0], r[1])].add(k)
+    dup = {sk for sk, c in n.items() if c > DUP_N or len(u[sk]) < (1 - DUP_SHARE) * c}
+    seen, keep = set(), []
+    for r, k in zip(out, key):
+        if (r[0], r[1]) in dup:
+            if (r[0], r[1]) + k in seen:
+                continue
+            seen.add((r[0], r[1]) + k)
+        keep.append(r)
+    return keep, fbs, tid
 
 
 def main():
@@ -170,6 +195,7 @@ def main():
             board[m.group(1)] = p
     r1 = lambda x, k=1: None if x is None else round(x, k)  # noqa: E731
     qbs, skill = [], []
+    PPW = pts_per_win()
     for i, X in V.items():
         g = POS[i]
         n, t = nm.get(i, (None, None))
@@ -180,7 +206,7 @@ def main():
         base = {'id': i, 'n': b.get('name') or n, 't': t, 'lo': b.get('logo') or (f'/img/cfb/logos/{tid[t]}.png' if tid.get(t) else None),
                 'conf': b.get('conf'), 'cls': b.get('cls'), 'war': b.get('war'), 'waa': b.get('waa'),
                 'ph': f'https://a.espncdn.com/combiner/i?img=/i/headshots/college-football/players/full/{i}.png&w=96&h=70&scale=crop&cquality=60' if b.get('photo') else None,
-                'pts': r1(X['par'] / gp), 'tot': r1(X['par']), 'aepa': r1(X['a'] / X['n'], 3), 'g': gp, 'plays': int(X['n'])}
+                'pts': r1(X['par'] / gp), 'tot': r1(X['par']), 'svar': r1(X['par'] / PPW, 2), 'aepa': r1(X['a'] / X['n'], 3), 'g': gp, 'plays': int(X['n'])}
         if g == 'QB' and X['n'] >= MIN_QB:
             qbs.append(dict(base, epa=r1(X['raw'] / X['n'], 3), db=int(X['db']), runs=int(X['n0'])))
         elif g in ('RB', 'WR', 'TE') and X['n'] >= MIN_SKILL:
