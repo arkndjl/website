@@ -15,7 +15,10 @@ cover = "/og/college-football.png"
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< rookies sport="cfb" icon="football" title="true freshmen" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
-{{< awards sport="cfb" tab="awards" >}}
+{{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
+{{< awards sport="cfb" tab="predictive awards" >}}
+{{< awards sport="cfb" tab="conviction awards" view="conv" >}}
+{{< /wintabs >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits) and coaches" tab="ARKLIST" >}}
 {{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
 {{< cfbbreakout title="standouts" tab="standouts" >}}
