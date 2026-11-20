@@ -341,6 +341,105 @@ def nfl_qb_attach(P, Q):
     P['peak'] = [r for r in P['peak'] if 'q' in r]; P['career'] = [r for r in P['career'] if 'q' in r]
 
 
+
+def cfb_qb_pull(y0=2004, y1=2025, per=150, workers=8):
+    """CFB QB seasons for the all-time QB lists: each FBS regular season's top `per` passers by yards (ESPN byathlete,
+    one call a season), then each one's season line (ESPN core athletes/<id>/statistics; cached in CACHE/cfb_qb).
+    -> [espn id, name, y, team id, school, games, att, cmp, yds, td, int, sacks, sack yds, adj QBR, rush att, rush yds, rush td]
+    (college rush att / yds include sacks)"""
+    import urllib.request, time
+    from concurrent.futures import ThreadPoolExecutor
+    D = os.path.join(CACHE, 'cfb_qb'); os.makedirs(D, exist_ok=True)
+    def get(u, fn):
+        p = os.path.join(D, fn)
+        if os.path.exists(p): return json.load(open(p))
+        for k in range(4):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0'}), timeout=30) as r: d = json.load(r)
+                json.dump(d, open(p, 'w')); return d
+            except Exception as e:  # noqa: BLE001
+                if getattr(e, 'code', None) == 404: return {}
+                time.sleep(2 * (k + 1))
+        return {}
+    who = []
+    for y in range(y0, y1 + 1):
+        d = get('https://site.web.api.espn.com/apis/common/v3/sports/football/college-football/statistics/byathlete?region=us&lang=en'
+                f'&contentorigin=espn&isqualified=false&page=1&limit={per}&season={y}&seasontype=2&category=offense&sort=passing.passingYards:desc', f'lead_{y}.json')
+        for a in d.get('athletes', []):
+            x = a['athlete']; t = (x.get('teams') or [{}])[0]
+            who.append((x['id'], x['displayName'], y, x.get('teamId') or t.get('id'), t.get('shortDisplayName') or x.get('teamShortName')))
+    def line(w):
+        aid, n, y, tid, sch = w
+        d = get(f'https://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/{y}/types/2/athletes/{aid}/statistics', f'{y}_{aid}.json')
+        S = {}
+        for c in (d.get('splits') or {}).get('categories', []):
+            for st in c.get('stats', []): S[c['name'] + '.' + st['name']] = st.get('value')
+        g = lambda k: float(S.get(k) or 0.0)  # noqa: E731
+        if g('passing.passingAttempts') < 1: return None
+        return [aid, n, y, tid, sch, int(g('general.gamesPlayed')), g('passing.passingAttempts'), g('passing.completions'), g('passing.passingYards'),
+                g('passing.passingTouchdowns'), g('passing.interceptions'), g('passing.sacks'), abs(g('passing.sackYardsLost')),
+                S.get('passing.adjQBR'), g('rushing.rushingAttempts'), g('rushing.rushingYards'), g('rushing.rushingTouchdowns')]
+    with ThreadPoolExecutor(workers) as ex:
+        return [r for r in ex.map(line, who) if r]
+
+
+def cfb_qb_lists(rows, minq=150):
+    """CFB all-time QB lists (peak seasons, careers), FBS regular seasons from 2004. Each season's plays = pass att + rush
+    att (college counts sacks as runs, sack yards in rushing). TAY/P = (pass yds + 20 pass TD - 45 INT + rush yds + 20 rush
+    TD) / plays. Yds+ = (TAY/P - that season's average TAY/P over QBs with minq+ attempts, play-weighted) x plays: adjusted
+    yards over an average FBS QB, no opponent adjustment. TAY/P+ = 100 + 25 z within the season (QBs with minq+ attempts).
+    peak = best season by Yds+; career = Yds+ summed over the seasons in the pool (top 150 passers a season)."""
+    import names as NM
+    S = []
+    for r in rows:
+        aid, n, y, tid, sch, gp, att, cm, yd, td, it, sk, sky, qbr, ra, ry, rtd = r
+        pl = att + ra
+        S.append(dict(id=aid, n=n, y=y, tid=tid, tm=sch, g=gp, att=att, cm=cm, yd=yd, td=td, it=it, sk=sk, sky=sky, qbr=qbr, ra=ra, ry=ry, rtd=rtd,
+                      pl=pl, tay=(yd + 20 * td - 45 * it + ry + 20 * rtd) / pl if pl else 0.0))
+    by = defaultdict(list)
+    for s in S:
+        if s['att'] >= minq: by[s['y']].append(s)
+    for s in S:
+        Q = by[s['y']]; w = sum(q['pl'] for q in Q)
+        m = sum(q['tay'] * q['pl'] for q in Q) / w
+        sd = (sum((q['tay'] - m) ** 2 for q in Q) / len(Q)) ** .5
+        s['v'] = (s['tay'] - m) * s['pl']; s['ix'] = 100 + 25 * (s['tay'] - m) / sd
+    lo = lambda tid: f'/img/cfb/logos/{tid}.png' if tid and os.path.exists(os.path.join(IMG, 'cfb', 'logos', f'{tid}.png')) else (f'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{tid}.png&w=40&h=40' if tid else None)
+    def q_of(L):
+        att = sum(s['att'] for s in L); sk = sum(s['sk'] for s in L); yd = sum(s['yd'] for s in L); td = sum(s['td'] for s in L); it = sum(s['it'] for s in L)
+        qa = [(s['qbr'], s['att']) for s in L if s['qbr'] is not None]
+        return dict(cmp=round(100 * sum(s['cm'] for s in L) / att, 1), ya=round(yd / att, 1), anya=round((yd + 20 * td - 45 * it - sum(s['sky'] for s in L)) / (att + sk), 2),
+                    yds=int(yd), td=int(td), int=int(it), qbr=round(sum(a * b for a, b in qa) / sum(b for _, b in qa), 1) if qa else None,
+                    ry=int(sum(s['ry'] for s in L)), rtd=int(sum(s['rtd'] for s in L)), pl=int(sum(s['pl'] for s in L)))
+    peak = []
+    for s in S:
+        if s['att'] < minq: continue
+        peak.append(dict(id=s['id'], n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos='QB', v=round(s['v']), raw=round(s['tay'], 2),
+                         q=dict(q_of([s]), ix=round(s['ix'])), est=None, ph=None))
+    peak.sort(key=lambda r: -r['v'])
+    best, P = set(), []
+    for r in peak:
+        if r['id'] in best: continue
+        best.add(r['id']); P.append(r)
+    pk = pick([dict(r) for r in P], 'v')
+    for r in pk: r.pop('id', None)
+    C = defaultdict(list)
+    for s in S: C[s['id']].append(s)
+    car = []
+    for i, L in C.items():
+        if sum(s['att'] for s in L) < 300: continue
+        tms = Counter(s['tm'] for s in L for _ in range(int(s['pl']))); tm = tms.most_common(1)[0][0]
+        car.append(dict(n=L[0]['n'], y0=min(s['y'] for s in L), y1=max(s['y'] for s in L), tm=tm, lo=lo(next(s['tid'] for s in L if s['tm'] == tm)),
+                        pos='QB', v=round(sum(s['v'] for s in L)), s=len(L), pk=round(max(s['v'] for s in L)), est=None, ph=None, q=q_of(L)))
+    car.sort(key=lambda r: -r['v'])
+    return dict(peak=pk, career=car[:TOP], n=len(S), **{'from': min(s['y'] for s in S)}, to=max(s['y'] for s in S),
+                pk=dict(l='Yds+', t='adjusted yards over an average FBS QB that season: (TAY/P - season average) x plays; TAY/P = (pass yds + 20 x pass TD - 45 x INT + rush yds + 20 x rush TD) / (attempts + rushes), sacks count as rushes. no opponent adjustment', f='%+.0f', rl='TAY/P', rt='total adjusted yards a play', rf='%.2f'),
+                car=dict(l='Yds+', t='career Yds+: each season\'s adjusted yards over an average FBS QB, summed (seasons among the top 150 passers)', f='%+.0f', s=1, pl='Peak', pt='best season Yds+', pf='%+.0f'),
+                src='ESPN', pos=True, tm=True, estT='', qb=True, ph=False,
+                peak_about=f'FBS regular seasons {min(s["y"] for s in S)}-{max(s["y"] for s in S)}, QBs with {minq}+ attempts; the season average and SD over the same QBs.',
+                career_about='FBS regular seasons from 2004 (careers that started earlier count from 2004), 300+ attempts.')
+
+
 def soccer_teams():
     d = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_team_ratings.json.gz')))['seasons']
     nm = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_teams.json.gz')))
@@ -697,12 +796,13 @@ def main():
         src = json.load(gzip.open(SNAP))
         if '--qb' in sys.argv:   # add the all-time QB lines to the snapshot (no other pull needed)
             src['nflqb'] = nfl_qb_pull(max(s['y'] for s in src['nflpk']))
+            src['cfbqb'] = cfb_qb_pull()
             json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
     else:
         nT, nS, nfit = nba(); hT, hS = nhl()
         nflpk, nflcar = nfl_players()
         src = dict(nhlfit=NHL_FIT, nflwav=nfl_wav(), cfb=cfb_rows(), nfl=nfl_rows(), nflch=nfl_champs(), cbb=cbb_teams(), nbaT=nT, nbaS=nS, nbafit=nfit, nhlT=hT, nhlS=hS,
-                   soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(), nflqb=nfl_qb_pull(max(s['y'] for s in nflpk)),
+                   soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(), nflqb=nfl_qb_pull(max(s['y'] for s in nflpk)), cfbqb=cfb_qb_pull(),
                    atp=tennis_players('atp'), wta=tennis_players('wta'))
         rnd = lambda x: round(x, 3) if isinstance(x, float) else [rnd(v) for v in x] if isinstance(x, list) else {k: rnd(v) for k, v in x.items()} if isinstance(x, dict) else x
         json.dump(rnd(src), gzip.open(SNAP, 'wt'), separators=(',', ':'))
@@ -710,6 +810,7 @@ def main():
     for r in src['nfl']: r['nt'] = 1 if ch.get(r['y']) == r['t'] else 0
     for r in src['nbaT'] + src['nhlT']: r['nt'] = 0
     res['cfb'] = {'teams': teams_out('cfb', src['cfb'])}
+    if src.get('cfbqb'): res['cfb']['qbs'] = cfb_qb_lists(src['cfbqb'])
     res['nfl'] = {'teams': teams_out('nfl', src['nfl'])}
     res['cbb'] = {'teams': teams_out('cbb', src['cbb'])}
     res['nba'] = {'teams': teams_out('nba', src['nbaT'])}

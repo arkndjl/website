@@ -1,6 +1,6 @@
 {{- /* All-time team-seasons and players (scripts/alltime.py, data/alltime.json). sport="cfb|cbb|nfl|nba|nhl|soccer|cs2|atp|wta"
        list="teams|offense|defense" (team-seasons, era-adjusted: 100 + 25 SD over that season's league) or "peak|career" (players);
-       group="qbs" (NFL: the QB lists, with QB columns; the default players lists then hold everyone else).
+       group="qbs" (NFL, CFB: the QB lists, with QB columns; NFL's default players lists then hold everyone else).
        Method on Process (Glossary/Methodology). Mobile: the cfbp cards (name + key number, season under it, the rest labelled). */ -}}
 {{- $sp := $.Get "sport" -}}{{- $L := $.Get "list" | default "teams" -}}
 {{- $D := index site.Data.alltime $sp -}}
@@ -48,7 +48,7 @@
 {{- $M := cond $peak .pk .car -}}
 {{- $od := and .od true -}}
 {{- $qb := and .qb true -}}{{- $posOn := and .pos (not $qb) -}}
-{{- $gfx := printf "RK,Player,%s,%s%s%s%s" (cond $peak "Season" "Years") (cond .tm "Team," "") $M.l (cond $od ",O-XPM,D-XPM" "") (cond $qb (cond $peak ",EPA/db,ANY/A" ",Yds,TD") "") -}}
+{{- $gfx := printf "RK,Player,%s,%s%s%s%s" (cond $peak "Season" "Years") (cond .tm "Team," "") $M.l (cond $od ",O-XPM,D-XPM" "") (cond $qb (cond (eq $sp "cfb") ",QBR,ANY/A" (cond $peak ",EPA/db,ANY/A" ",Yds,TD")) "") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $peak "all-time peak seasons" "all-time careers")) "filter" (cond $posOn "Era,Pos" "Era") "rerank" true "tab" ($.Get "tab") "icon" $icon "gfxCols" $gfx "gfxDate" $asof "gfxMax" "25") -}}
 <table class="cfb__table cfbp alltime">
   <thead><tr><th>RK</th><th>Player</th><th>{{ if $peak }}Season{{ else }}Years{{ end }}</th>
@@ -57,7 +57,8 @@
     {{- if $od }}<th title="{{ if $peak }}offensive XPM that season{{ else }}career offensive XPM, minutes-weighted{{ end }} (.5 ODPM + .5 OBPM from 2009-10, OBPM before; - before 1973-74)">O-XPM</th><th title="{{ if $peak }}defensive XPM that season{{ else }}career defensive XPM, minutes-weighted{{ end }} (.5 DDPM + .5 DBPM from 2009-10, DBPM before; - before 1973-74)">D-XPM</th>{{ end }}
     {{- if $peak }}{{ with .pk.rl }}<th title="{{ $P.pk.rt }}">{{ . }}</th>{{ end }}
     {{- else }}{{ if .car.s }}<th title="seasons">Seasons</th>{{ end }}{{ with .car.pl }}<th title="{{ $P.car.pt }}">{{ . }}</th>{{ end }}{{ end }}
-    {{- if and $qb $peak }}<th title="EPA per dropback: pass EPA / (attempts + sacks), regular season">EPA/db</th><th title="completion % over expected (nflverse)">CPOE</th><th title="ANY/A = (pass yds + 20 x TD - 45 x INT - sack yds) / (attempts + sacks)">ANY/A</th><th title="sacks / (attempts + sacks)">Sack%</th><th title="aDOT = air yards per attempt">aDOT</th><th title="interceptions / attempts">INT%</th><th title="EPA on runs, season total">Rush EPA</th><th title="dropbacks: attempts + sacks">DB</th>
+    {{- if and $qb (eq $sp "cfb") }}{{ if $peak }}<th title="TAY/P+ = 100 + 25 SD against that season's FBS QBs (150+ attempts)">TAY/P+</th>{{ end }}<th title="ESPN adjusted QBR (opponent-adjusted, 0-100){{ if not $peak }}, attempt-weighted{{ end }}">QBR</th><th title="completion %">Cmp%</th><th title="pass yards / attempt">Y/A</th><th title="ANY/A = (pass yds + 20 x TD - 45 x INT - sack yds) / (attempts + sacks)">ANY/A</th><th title="pass yards">Yds</th><th title="TD passes">TD</th><th title="interceptions">INT</th><th title="rushing yards, sacks included (college scoring)">Rush</th><th title="rushing TD">RTD</th><th title="plays: attempts + rushes (sacks count as rushes)">Plays</th>
+    {{- else if and $qb $peak }}<th title="EPA per dropback: pass EPA / (attempts + sacks), regular season">EPA/db</th><th title="completion % over expected (nflverse)">CPOE</th><th title="ANY/A = (pass yds + 20 x TD - 45 x INT - sack yds) / (attempts + sacks)">ANY/A</th><th title="sacks / (attempts + sacks)">Sack%</th><th title="aDOT = air yards per attempt">aDOT</th><th title="interceptions / attempts">INT%</th><th title="EPA on runs, season total">Rush EPA</th><th title="dropbacks: attempts + sacks">DB</th>
     {{- else if $qb }}<th title="completion %, regular season career">Cmp%</th><th title="pass yards">Yds</th><th title="TD passes">TD</th><th title="interceptions">INT</th><th title="AY/A = (pass yds + 20 x TD - 45 x INT) / attempts">AY/A</th><th title="rushing yards">Rush</th>{{ end }}
     <th class="cfb__g" title="{{ if $peak }}decade{{ else }}decade of the middle of his career{{ end }}">Era</th>
   </tr></thead>
@@ -84,7 +85,19 @@
     {{- if $P.car.s }}<td class="cfb__num" data-l="Seasons" data-v="{{ .s }}">{{ .s | default "-" }}</td>{{ end }}
     {{- if $P.car.pl }}<td class="cfb__num" data-l="{{ $P.car.pl }}" data-v="{{ .pk }}">{{ with .pk }}{{ partial "num.html" (slice $P.pk.f .) }}{{ else }}-{{ end }}</td>{{ end }}
     {{- end }}
-    {{- with .q }}{{ if $peak }}
+    {{- if eq $sp "cfb" }}{{ with .q }}
+    {{- if $peak }}<td class="cfb__num" data-l="TAY/P+" data-v="{{ .ix }}">{{ printf "%.0f" .ix }}</td>{{ end }}
+    <td class="cfb__num" data-l="QBR" data-v="{{ .qbr }}">{{ with .qbr }}{{ printf "%.1f" . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-l="Cmp%" data-v="{{ .cmp }}">{{ printf "%.1f" .cmp }}</td>
+    <td class="cfb__num" data-l="Y/A" data-v="{{ .ya }}">{{ printf "%.1f" .ya }}</td>
+    <td class="cfb__num" data-l="ANY/A" data-v="{{ .anya }}">{{ printf "%.2f" .anya }}</td>
+    <td class="cfb__num" data-l="Yds" data-v="{{ .yds }}">{{ .yds }}</td>
+    <td class="cfb__num" data-l="TD" data-v="{{ .td }}">{{ .td }}</td>
+    <td class="cfb__num" data-l="INT" data-v="{{ .int }}">{{ .int }}</td>
+    <td class="cfb__num" data-l="Rush" data-v="{{ .ry }}">{{ .ry }}</td>
+    <td class="cfb__num" data-l="RTD" data-v="{{ .rtd }}">{{ .rtd }}</td>
+    <td class="cfb__num" data-l="Plays" data-v="{{ .pl }}">{{ .pl }}</td>
+    {{- end }}{{ else }}{{ with .q }}{{ if $peak }}
     <td class="cfb__num" data-l="EPA/db" data-v="{{ .epa }}">{{ partial "num.html" (slice "%+.3f" .epa) }}</td>
     <td class="cfb__num" data-l="CPOE" data-v="{{ .cpoe }}">{{ partial "num.html" (slice "%+.1f" .cpoe) }}</td>
     <td class="cfb__num" data-l="ANY/A" data-v="{{ .anya }}">{{ printf "%.2f" .anya }}</td>
@@ -100,7 +113,7 @@
     <td class="cfb__num" data-l="INT" data-v="{{ .int }}">{{ .int }}</td>
     <td class="cfb__num" data-l="AY/A" data-v="{{ .aya }}">{{ printf "%.2f" .aya }}</td>
     <td class="cfb__num" data-l="Rush" data-v="{{ .ry }}">{{ .ry }}</td>
-    {{- end }}{{ end }}
+    {{- end }}{{ end }}{{ end }}
     <td class="cfbp__conf cfb__g">{{ if $peak }}{{ mul (int (div .y 10)) 10 }}{{ else }}{{ mul (int (div (add .y0 .y1) 20)) 10 }}{{ end }}s</td>
   </tr>
   {{- end }}
