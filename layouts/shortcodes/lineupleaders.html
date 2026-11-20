@@ -5,6 +5,7 @@
        Ranks follow the current sort and recount within the filters; headers sort. Fetched when the window is on screen. */ -}}
 {{- $sport := .Get "sport" | default "nba" -}}
 {{- $about := "Net = points scored minus allowed per 100 possessions with the group on the floor together. sNet pulls Net toward the team's own net by k possessions (k from odd/even game splits, per unit size), the rank. Trios and pairs sum every five that holds them. No opponent adjustment; garbage time counts." -}}
+{{- if eq $sport "nba" }}{{ $about = replace $about "No opponent adjustment;" "Points are opponent-adjusted (what that team allowed and scored per possession in its other games, shrunk by 500 possessions);" }}{{ end -}}
 <div class="win cfb lld" data-tab="{{ .Get "tab" | default "lineup leaders" }}" data-lld="{{ $sport }}"{{ if eq $sport "nba" }} data-gfx-logo="/img/nba/{}.png"{{ end }} data-gfx-cols="RK,Lineup,Team,Poss,Net,sNet" data-src="{{ printf "data/%s-lineup-leaders.json" $sport | relURL }}?v={{ now.Unix }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "lineup leaders" }}<span class="win__cursor" aria-hidden="true">_</span></span>

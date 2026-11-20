@@ -279,6 +279,30 @@
      "Soccer"
     ]
    }
+  },
+  {
+   "section": "data",
+   "after": "Held out / LOSO / LOCO",
+   "entry": {
+    "term": "Opponent adjustment (player and lineup rates)",
+    "short": "A game's rate minus what that opponent allowed in its other games, shrunk.",
+    "body": [
+     "adjusted = value - exposure x D[opponent]. D = the opponent's allowed rate in its other games minus the league's,",
+     "shrunk toward 0 by n / (n + K). Kept only where the odd / even game split-half r of a season rises",
+     "(paired bootstrap P >= .90 on held seasons) and the first part of a season predicts the rest no worse.",
+     "NBA lineups and on/off (held 2025-26): fives r .13 to .17, trios .35 to .41, pairs .50 to .55, on-off .22 to .24.",
+     "Soccer GAR inputs (held 2022-26): on-pitch xG for .65 to .70, against .45 to .54, buildup .64 to .65.",
+     "Failed: NHL goalie GSAx against opposing finishing (P .18 to .60), NHL lines, pairs and on-ice xG (P .02 to .77),",
+     "NBA box value (+.003, too small to move a rank).",
+     "Adjusted at the source already: XPM, college BPM, tennis SPW+ / RPW+, CS2 and 1NT RWA, team units, every game model."
+    ],
+    "where": "NBA lineups, on/off, lineup leaders; soccer GAR",
+    "sports": [
+     "NBA",
+     "Soccer",
+     "NHL"
+    ]
+   }
   }
  ],
  "append": [
@@ -345,8 +369,11 @@
   {
    "term": "GAR (soccer, senior)",
    "body": [
-    "Shrunk per-90 rates (on-pitch xG against, on-off, npxG, xGBuildup, keeper saves) plus xG plus-minus (offence, defence)",
+    "Shrunk per-90 rates (on-pitch xG for and against, on-off, npxG, xGBuildup, keeper saves) plus xG plus-minus (offence, defence)",
     "weighted to next-season team goal difference.",
+    "On-pitch xG and xGBuildup are opponent and home adjusted: minus what that club allowed in its other matches, shrunk,",
+    "and the league's home / away gap. Odd vs even matches of a player-season, held 2022-26: on-pitch xG for r .65 to .70,",
+    "against .45 to .54, buildup .64 to .65. Own npxG and xA gain .003 to .006 and stay raw.",
     "xG plus-minus: weighted ridge over 3 seasons of on-pitch spells (same 22 on the field)",
     "a spell's npxG a 90 on the attacking side's players (offence) and the defending side's (defence), league-season and home terms",
     "offence shrunk toward his xG + xA a 90 over the window, defence toward 0.",

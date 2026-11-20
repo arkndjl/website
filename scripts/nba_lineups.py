@@ -30,8 +30,9 @@ OUT = os.path.join(E.ROOT, 'static', 'data', 'nba-lineups.json')
 LEAD_OUT = os.path.join(E.ROOT, 'static', 'data', 'nba-lineup-leaders.json')
 # shrinkage (possessions) for the display's sNet and sOn-Off: noise variance over true variance from odd/even game
 # splits (--split; 2024-26: units 447 / 671 / 751, on-off 1,408 / 2,610 / 1,462): Net of a five (20+ possessions in both halves) and a player's on-off
-# (effective possessions 1 / (1/on + 1/off))
-K_UNIT, K_ONOFF = 600, 1800
+# (effective possessions 1 / (1/on + 1/off)). On opponent-adjusted points (opp_rates, Nov 20 2026) 2025-26: units 555 / 647,
+# on-off 1,919 / 1,247
+K_UNIT, K_ONOFF = 600, 1600
 # lineup leaders (scripts/lineup_leaders.py): sNet toward the team's net, k by unit size = the out-of-sample best
 # (odd games predict even and back, 2024-26 pooled; a team prior beat a prior of 0 in every season and size:
 # MSE 5-man 820 vs 841, trios 330 vs 348, pairs 215 vs 226; raw Net 1558 / 613 / 385)
@@ -293,11 +294,48 @@ def split(S):
 
 
 # ------------------------------------------------------------------- display
-def agg_season(gs, res, upto=None):
-    """per team: 5-man units, pairs, player on/off from the cached stints of season games (tip before upto)"""
+OPP_K = 500      # possessions of shrink on an opponent's rates (about five games)
+
+
+def opp_rates(gs, res, upto=None, K=OPP_K):
+    """{(team, game id): [defence, offence]}: points per possession that team allowed / scored in its OTHER games, over
+    the league's rate, shrunk toward 0 by poss / (poss + K). Subtracted from what a lineup did against it (Nov 20
+    2026, scripts/research/oppwx_nov20/nba_lineups_test.py: odd/even-game r of Net on held 2025-26 up .13 -> .17 for
+    fives, .35 -> .41 trios, .50 -> .55 pairs, on-off .22 -> .24, every one P >= .97 on paired bootstraps)."""
+    G = {}
+    tot = defaultdict(lambda: [0.0, 0.0, 0.0])           # team -> poss, scored, allowed
+    lp = lpts = 0.0
+    for g in gs:
+        if upto and g['tip'] >= upto:
+            continue
+        r = res.get(g['id'])
+        if not r:
+            continue
+        x = {r['h']: [0.0, 0.0, 0.0], r['a']: [0.0, 0.0, 0.0]}
+        for h5, a5, sec, hp, ap, ph, pa, *_ in r['st']:
+            poss = (ph + pa) / 2
+            x[r['h']][0] += poss; x[r['h']][1] += hp; x[r['h']][2] += ap
+            x[r['a']][0] += poss; x[r['a']][1] += ap; x[r['a']][2] += hp
+        for t, v in x.items():
+            G[(t, g['id'])] = v
+            for i in range(3):
+                tot[t][i] += v[i]
+            lp += v[0]; lpts += v[1]
+    m = lpts / lp if lp else 0.0
+    out = {}
+    for (t, gid), v in G.items():
+        n = tot[t][0] - v[0]
+        out[(t, gid)] = [((tot[t][2] - v[2]) - m * n) / (n + K), ((tot[t][1] - v[1]) - m * n) / (n + K)]
+    return out
+
+
+def agg_season(gs, res, upto=None, adj=True):
+    """per team: 5-man units, pairs, player on/off from the cached stints of season games (tip before upto). Points
+    for and against are opponent-adjusted (opp_rates) unless adj is False."""
     U = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0, 0.0, 0.0]))   # team -> five -> [sec, poss, pf, pa]
     T = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
     ON = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0, 0.0, 0.0]))
+    OR = opp_rates(gs, res, upto) if adj else {}
     for g in gs:
         if upto and g['tip'] >= upto:
             continue
@@ -306,14 +344,17 @@ def agg_season(gs, res, upto=None):
             continue
         for h5, a5, sec, hp, ap, ph, pa, *_ in r['st']:
             poss = (ph + pa) / 2
-            for t, five, pf, pg in ((r['h'], h5, hp, ap), (r['a'], a5, ap, hp)):
+            for t, o, five, pf, pg in ((r['h'], r['a'], h5, hp, ap), (r['a'], r['h'], a5, ap, hp)):
+                d = OR.get((o, g['id']))
+                if d:
+                    pf = pf - poss * d[0]; pg = pg - poss * d[1]
                 u = U[t][tuple(sorted(five))]
                 u[0] += sec; u[1] += poss; u[2] += pf; u[3] += pg
                 x = T[t]
                 x[0] += sec; x[1] += poss; x[2] += pf; x[3] += pg
                 for p in five:
-                    o = ON[t][p]
-                    o[0] += sec; o[1] += poss; o[2] += pf; o[3] += pg
+                    o_ = ON[t][p]
+                    o_[0] += sec; o_[1] += poss; o_[2] += pf; o_[3] += pg
     return U, T, ON
 
 
@@ -330,7 +371,7 @@ def build(S=None):
         for five, (sec, poss, pf, pa) in U[t].items():
             if sec < 60 or len(five) != 5:             # a missed substitution leaves 4 or 6 (about 1 stint in 800)
                 continue
-            units.append([list(five), round(sec / 60, 1), round(poss, 1), pf, pa])
+            units.append([list(five), round(sec / 60, 1), round(poss, 1), round(pf, 1), round(pa, 1)])
         units.sort(key=lambda u: -u[1])
         pairs = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
         for five, (sec, poss, pf, pa) in U[t].items():
@@ -341,13 +382,13 @@ def build(S=None):
                 for j in range(i + 1, 5):
                     x = pairs[(f[i], f[j])]
                     x[0] += sec; x[1] += poss; x[2] += pf; x[3] += pa
-        pr = sorted(([list(k), round(v[0] / 60, 1), round(v[1], 1), v[2], v[3]] for k, v in pairs.items() if v[0] >= 600), key=lambda u: -u[1])
+        pr = sorted(([list(k), round(v[0] / 60, 1), round(v[1], 1), round(v[2], 1), round(v[3], 1)] for k, v in pairs.items() if v[0] >= 600), key=lambda u: -u[1])
         onoff = []
         for p, (sec, poss, pf, pa) in ON[t].items():
             offp = tt[1] - poss
-            onoff.append([p, round(sec / 60, 1), round(poss, 1), pf, pa, round(offp, 1), tt[2] - pf, tt[3] - pa])
+            onoff.append([p, round(sec / 60, 1), round(poss, 1), round(pf, 1), round(pa, 1), round(offp, 1), round(tt[2] - pf, 1), round(tt[3] - pa, 1)])
         onoff.sort(key=lambda u: -u[1])
-        out['teams'][t] = {'min': round(tt[0] / 60, 1), 'poss': round(tt[1], 1), 'pf': tt[2], 'pa': tt[3],
+        out['teams'][t] = {'min': round(tt[0] / 60, 1), 'poss': round(tt[1], 1), 'pf': round(tt[2], 1), 'pa': round(tt[3], 1),
                            'units': units[:40], 'pairs': pr[:40], 'onoff': onoff}
     used = {p for t in out['teams'].values() for k in ('units', 'pairs') for u in t[k] for p in u[0]} | \
            {u[0] for t in out['teams'].values() for u in t['onoff']}

@@ -139,6 +139,46 @@ def penalties(m):
     return p
 
 
+OPP_K = 5000        # player-minutes of shrink on what an opponent allows (about five matches)
+OPP_KEYS = {'xf': 'xfA', 'xa': 'xaA', 'bu': 'buA', 'np': 'npA', 'xA': 'xAA'}
+OPP_CLASS = ('bu', 'np', 'xA')          # own-production rates: the opponent's allowance is by position class
+ADJ = ('xf', 'xa', 'bu')                # the inputs rates() and on_off() read opponent- and home-adjusted (Nov 20 2026)
+
+
+def opp_adjust(parsed, K=OPP_K):
+    """adds the opponent- and home-adjusted match values (OPP_KEYS) to one league-season's parsed player-match rows.
+
+        adjusted = value - minutes x (the league's home / away gap in that rate) - minutes x D[opponent]
+        D[opponent] = what that club allowed per player-minute in its OTHER matches (home gap out), minus the league's
+                      rate, shrunk toward 0 by n / (n + K)
+
+    Nov 20 2026 (scripts/research/oppwx_nov20/soccer_test.py, odd / even matches of a player-season, held 2022-26,
+    900+ minutes): on-pitch xG for r .652 -> .700, against .451 -> .537, xGBuildup .638 -> .652, own npxG .789 -> .795,
+    xA .640 -> .643, each P >= .99 on paired bootstraps; the first third of a season predicts the rest no worse."""
+    for key, out in OPP_KEYS.items():
+        cls = (lambda r: POS.get(r['pos'], 'S')) if key in OPP_CLASS else (lambda r: 0)
+        hm = defaultdict(lambda: [0.0, 0.0])
+        for r in parsed:
+            c = cls(r)
+            hm[(c, r['side'])][0] += r[key]; hm[(c, r['side'])][1] += r['min']
+            hm[(c, None)][0] += r[key]; hm[(c, None)][1] += r['min']
+        base = []
+        for r in parsed:
+            c = cls(r); a = hm[(c, r['side'])]; m = hm[(c, None)]
+            base.append(r[key] - r['min'] * (a[0] / a[1] - m[0] / m[1]) if a[1] > 0 and m[1] > 0 else r[key])
+        tot = defaultdict(lambda: [0.0, 0.0]); gm = defaultdict(lambda: [0.0, 0.0]); lg = defaultdict(lambda: [0.0, 0.0])
+        for r, v in zip(parsed, base):
+            c = cls(r)
+            for d_, k_ in ((tot, (c, r['opp'])), (gm, (c, r['opp'], r['mid'])), (lg, c)):
+                d_[k_][0] += v; d_[k_][1] += r['min']
+        for r, v in zip(parsed, base):
+            c = cls(r)
+            V, E = tot[(c, r['opp'])]; v1, e1 = gm[(c, r['opp'], r['mid'])]
+            n = E - e1
+            mu = lg[c][0] / lg[c][1] if lg[c][1] else 0.0
+            r[out] = v - r['min'] * ((V - v1) - mu * n) / (n + K)
+
+
 def build_rows(S0, S1, before=None):
     """player-season rows: (league, season, team title) -> player totals (before: only matches kicked off before this
     'YYYY-MM-DD', for an in-season snapshot)"""
@@ -152,6 +192,7 @@ def build_rows(S0, S1, before=None):
             for tid, t in d['teams'].items():
                 teams[tid] = t['title']
             nm = 0
+            parsed = []
             for mt in d['matches']:
                 if not mt['res'] or (before and (mt.get('t') or '') >= before):
                     continue
@@ -160,17 +201,23 @@ def build_rows(S0, S1, before=None):
                     continue
                 nm += 1
                 pens = penalties(m)
-                gd = {'h': int(mt['hg']) - int(mt['ag']), 'a': int(mt['ag']) - int(mt['hg'])}
                 for r in parse_match(m, lg, S, mt['id']):
-                    tid = mt['hid'] if r['side'] == 'h' else mt['aid']
+                    r['mid'] = mt['id']; r['opp'] = mt['aid'] if r['side'] == 'h' else mt['hid']
+                    r['np'] = r['x'] - pens.get(r['p'], 0.0); r['_pen'] = pens.get(r['p'], 0.0)
+                    r['_tid'] = mt['hid'] if r['side'] == 'h' else mt['aid']
+                    parsed.append(r)
+            opp_adjust(parsed)
+            for r in parsed:
+                    tid = r['_tid']
                     k = (lg, S, tid, r['p'])
                     a = agg.setdefault(k, {'n': r['n'], 'pos': Counter(), 'mp': 0, 'min': 0, 'xf': 0, 'xa': 0, 'tf': 0, 'ta': 0,
                                            'gf': 0, 'ga': 0, 'g': 0, 'as': 0, 'x': 0, 'pen': 0, 'xA': 0, 'bu': 0, 'ch': 0, 'kp': 0,
-                                           'gks': 0, 'start': 0, 'sh': 0})
+                                           'gks': 0, 'start': 0, 'sh': 0, 'xfA': 0, 'xaA': 0, 'buA': 0, 'npA': 0, 'xAA': 0})
                     a['mp'] += 1; a['min'] += r['min']
-                    for kk in ('xf', 'xa', 'tf', 'ta', 'gf', 'ga', 'g', 'as', 'x', 'xA', 'bu', 'ch', 'kp', 'gks', 'sh'):
+                    for kk in ('xf', 'xa', 'tf', 'ta', 'gf', 'ga', 'g', 'as', 'x', 'xA', 'bu', 'ch', 'kp', 'gks', 'sh',
+                               'xfA', 'xaA', 'buA', 'npA', 'xAA'):
                         a[kk] += r[kk]
-                    a['pen'] += pens.get(r['p'], 0.0)
+                    a['pen'] += r['_pen']
                     if r['pos'] != 'Sub':
                         a['pos'][r['pos']] += 1; a['start'] += 1
                     else:
@@ -338,6 +385,11 @@ def rapm(rows, seasons, segs):
 
 
 # ---------------------------------------------------------------- rates
+def _in(r, key):
+    """a row's summed input: the opponent- and home-adjusted sum when the key is in ADJ and the row has it"""
+    return r[OPP_KEYS[key]] if key in ADJ and OPP_KEYS[key] in r else r[key]
+
+
 def rates(rows, shrink):
     """per-90 rates relative to the league-season average (minutes-weighted), shrunk toward the position mean by
     `shrink` minutes"""
@@ -348,11 +400,11 @@ def rates(rows, shrink):
         tot = sum(r['min'] for r in rs) or 1
         for r in rs:
             m90 = max(r['min'], 1) / 90
-            r['_onf'] = r['xf'] / m90
-            r['_ona'] = -r['xa'] / m90
-            r['_npxg'] = (r['x'] - r['pen']) / m90
-            r['_xas'] = r['xA'] / m90
-            r['_bup'] = r['bu'] / m90
+            r['_onf'] = _in(r, 'xf') / m90
+            r['_ona'] = -_in(r, 'xa') / m90
+            r['_npxg'] = (_in(r, 'np') if 'np' in ADJ and 'npA' in r else r['x'] - r['pen']) / m90
+            r['_xas'] = _in(r, 'xA') / m90
+            r['_bup'] = _in(r, 'bu') / m90
             r['_gk'] = r['gks'] / m90 if r['pos'] == 'GK' else 0.0
             r['_rel'] = 0.0                               # on minus off: set in prep()
         for k in [x for x in FEATS if x not in RAPM]:
@@ -375,7 +427,7 @@ def on_off(rows, ts):
     team = defaultdict(lambda: [0.0, 0.0, 0.0])          # minutes x 1/11, xG for, against (from on-pitch, / 11)
     for r in rows:
         t = team[(r['lg'], r['S'], r['tid'])]
-        t[0] += r['min']; t[1] += r['xf']; t[2] += r['xa']
+        t[0] += r['min']; t[1] += _in(r, 'xf'); t[2] += _in(r, 'xa')
     for r in rows:
         t = team[(r['lg'], r['S'], r['tid'])]
         tm = t[0] / 11                                    # team minutes
@@ -384,8 +436,8 @@ def on_off(rows, ts):
         if r['min'] < 90 or offm < 90:
             r['_relraw'] = 0.0
             continue
-        on_d = (r['xf'] - r['xa']) / (r['min'] / 90)
-        off_d = ((tf - r['xf']) - (ta - r['xa'])) / (offm / 90)
+        on_d = (_in(r, 'xf') - _in(r, 'xa')) / (r['min'] / 90)
+        off_d = ((tf - _in(r, 'xf')) - (ta - _in(r, 'xa'))) / (offm / 90)
         r['_relraw'] = on_d - off_d
 
 
