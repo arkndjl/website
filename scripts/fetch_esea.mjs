@@ -985,9 +985,11 @@ const pool = {};
 for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
 // one row per player over a set of maps (this season's league maps; past seasons below)
 function seasonRows(maps) {
-const ppl = {};
+// keyed by FACEIT id, so a mid-season rename (mf_plug -> mf_goat -> mf_) stays one row, named by the current nickname
+const ppl = {}, nowNick = new Map((team?.members || []).map(m => [m.user_id, m.nickname])), seen = {};
 for (const x of maps) for (const p of x.players) {
-  const q = (ppl[p.name] ||= { id: p.pid || null, country: p.country || null, name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
+  const key = p.pid || p.name; (seen[key] ||= {})[p.name] = (seen[key][p.name] || 0) + 1;
+  const q = (ppl[key] ||= { id: p.pid || null, country: p.country || null, name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
   q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0); q.rw = (q.rw || 0) + (p.rw ?? 0);
   q.residR = (q.residR || 0) + (p.resid ?? 0) * ((x.rf ?? 0) + (x.ra ?? 0)); q.fsucc = (q.fsucc || 0) + (p.fsucc ?? 0); q.usucc = (q.usucc || 0) + (p.usucc ?? 0); q.mvpR = (q.mvpR || 0) + (p.mvp ?? 0); q.setups = (q.setups || 0) + (p.setups ?? 0); q.snip = (q.snip || 0) + (p.snip ?? 0); q.flashes = (q.flashes || 0) + (p.flashes ?? 0);
   q.utilN = (q.utilN || 0) + (p.utilN ?? 0);
@@ -998,6 +1000,7 @@ for (const x of maps) for (const p of x.players) {
   q.hsSum += (p.hs ?? 0) * (p.k ?? 0); q.k3 += p.k3 ?? 0; q.k4 += p.k4 ?? 0; q.k5 += p.k5 ?? 0; q.mvp += p.mvp ?? 0;
 }
 const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
+for (const [key, q] of Object.entries(ppl)) q.name = nowNick.get(q.id) || Object.entries(seen[key]).sort((a, b) => b[1] - a[1])[0][0];
 return Object.values(ppl).map(q => ({ ...(q.id ? { id: q.id } : {}), name: q.name, country: q.country, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
   multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, mapMvps: q.mapMvps, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
