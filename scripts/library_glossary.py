@@ -1,6 +1,6 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Build research/library.json (then run scripts/library_build.py): ARKBOARD Process tab content (glossary + FV conversion charts)."""
-import json, re
+import json, os, re
 
 import pathlib
 ROOT = str(pathlib.Path(__file__).resolve().parent.parent)
@@ -305,8 +305,12 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
     E('SPW+ / RPW+ / xHold / xBreak', 'Serve and return points won over the average top-100 player, opponent-adjusted.',
       ['Percentage points, hard court. xHold / xBreak = games held or broken vs an average top-100 opponent via the game chain.'],
       'Tennis serve + return tabs', ['Tennis']),
-    E('QB value (NFL)', 'Points a game over a replacement QB from the game model\'s QB term.',
-      ['Rating = weighted career EPA/play shrunk toward replacement (-0.12) with 250 pseudo-plays.'],
+    E('QB value (NFL)', 'Pts/G = this season\'s points a game over a replacement QB (-0.12 EPA a play), opponent-adjusted. Proj = the game model\'s QB term.',
+      ['Pts/G: each dropback and QB run less the defense\'s EPA allowed a play over the league\'s (its other games, shrunk with 300 plays); '
+       'sum(aEPA + 0.12) / games with 10+ plays. Split-half r .512 raw, .528 adjusted (QB-seasons 250+ plays, 2021-26); wind, cold and rain added nothing.',
+       'Proj: weighted career EPA/play shrunk toward replacement with %d pseudo-plays (fit), x the game model\'s QB coefficient. '
+       'This season\'s Pts/G in the game model, as a swap or an extra term, failed held-out 2021-25 (margin MAE 10.010 -> 10.034 / 10.027).'
+       % round(json.load(open(os.path.join(ROOT, 'data', 'nfl_games_fit.json')))['params']['qb_n0'])],
       'NFL QBs tab', ['NFL']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat).'],
