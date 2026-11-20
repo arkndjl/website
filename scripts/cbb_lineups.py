@@ -559,14 +559,17 @@ def team_ratings(games, upto=None, K=OPP_K, iters=40):
     return out
 
 
-def season_tables(games, upto=None, k_lineup=150.0, k_onoff=600.0):
+def season_tables(games, upto=None, k_lineup=150.0, k_onoff=600.0, adj=True):
     """per team: 5-man units and player on/off over the season's games (before `upto` when given).
-    Net shrunk to the team's own net by k possessions (units) / to 0 by k possessions (on-off)."""
+    Net shrunk to the team's own net by k possessions (units) / to 0 by k possessions (on-off).
+    Points for and against are opponent- and home-adjusted (team_ratings) unless adj=False; a team's total also keeps
+    its raw points for / against in [5], [6]."""
     unit = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0, 0])        # (team, names) -> secs, poss, pf, pa, games
     on = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])              # (team, name) -> secs, poss, pf, pa
-    tot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0, 0])
+    tot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0])
     tname = {}
-    for g in games.values():
+    R = team_ratings(games, upto) if adj else {}
+    for gid, g in games.items():
         if 'stints' not in g or (upto and g['date'] >= upto) or None in g['players'][g['home']] + g['players'][g['away']]:
             continue
         secs = g['secs'] or 1
@@ -577,9 +580,13 @@ def season_tables(games, upto=None, k_lineup=150.0, k_onoff=600.0):
             seen = set()
             T = tot[side]
             T[4] += 1
+            d = R.get((opp, gid)) if R else None
             for s in g['stints']:
                 ps = poss * s[0] / secs
                 pf, pa = (s[3], s[4]) if si == 1 else (s[4], s[3])
+                T[5] += pf; T[6] += pa
+                if d:
+                    pf -= ps * (d[0] + d[2] / 2); pa -= ps * (d[1] - d[2] / 2)
                 T[0] += s[0]; T[1] += ps; T[2] += pf; T[3] += pa
                 key = (side, tuple(sorted(names_[i] for i in s[si])))
                 u = unit[key]
@@ -717,8 +724,8 @@ def build(seasons=None):
             for u in us:
                 u[0] = [pos[n] for n in u[0]]
                 u[2] = round(u[2])
-            teams[t] = dict(name=cand[0]['team'], conf=conf, logo=logo, g=T[4], min=round(T[0] / 60), poss=round(T[1]), ortg=round(100 * T[2] / T[1], 1),
-                            drtg=round(100 * T[3] / T[1], 1), units=us, players=ps)
+            teams[t] = dict(name=cand[0]['team'], conf=conf, logo=logo, g=T[4], min=round(T[0] / 60), poss=round(T[1]), ortg=round(100 * T[5] / T[1], 1),
+                            drtg=round(100 * T[6] / T[1], 1), units=us, players=ps)
         out['seasons'][str(S)] = dict(games=len(ok), teams=teams)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     s = json.dumps(out, separators=(',', ':'), allow_nan=False)

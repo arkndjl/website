@@ -2203,15 +2203,24 @@
       "(paired bootstrap P >= .90 on held seasons) and the first part of a season predicts the rest no worse.",
       "NBA lineups and on/off (held 2025-26): fives r .13 to .17, trios .35 to .41, pairs .50 to .55, on-off .22 to .24.",
       "Soccer GAR inputs (held 2022-26): on-pitch xG for .65 to .70, against .45 to .54, buildup .64 to .65.",
+      "College basketball lineups and on/off (2025-26, 6,247 games): the opponent is its season offence and defence rating,",
+      "schedule counted, with a home term. Odd / even r: fives .18 to .25, pairs .48 to .64, on court .54 to .69, on-off .08 to .12.",
+      "First half to second half with ratings solved apart on each side: pairs r .41 to .44 (t -6.3), on court .46 to .50 (t -4.4).",
       "Failed: NHL goalie GSAx against opposing finishing (P .18 to .60), NHL lines, pairs and on-ice xG (P .02 to .77),",
       "NBA box value (+.003, too small to move a rank).",
-      "Adjusted at the source already: XPM, college BPM, tennis SPW+ / RPW+, CS2 and 1NT RWA, team units, every game model."
+      "Adjusted at the source already: XPM, college BPM, tennis SPW+ / RPW+, CS2 and 1NT RWA, team units, every game model.",
+      "Weather, tested Nov 20 2026 (airport hourly observations nearest the venue), none used:",
+      "soccer, 24,926 matches 2013-26: wet +2% goals, cold -0.7% per F under 40, wind -0.3% per mph over 10; walk-forward totals",
+      "deviance t +.1 to -1.5, xG totals worse. Tennis, 1,125 outdoor events: +.37 serve points won and +.50 aces per 100",
+      "per 10 F inside an event (held 2020-26 t -2.7), .04% of the error and no match dates or forecast feed."
      ],
-     "where": "NBA lineups, on/off, lineup leaders; soccer GAR",
+     "where": "NBA and college basketball lineups, on/off, lineup leaders; soccer GAR",
      "sports": [
       "NBA",
+      "CBB",
       "Soccer",
-      "NHL"
+      "NHL",
+      "Tennis"
      ]
     },
     {
