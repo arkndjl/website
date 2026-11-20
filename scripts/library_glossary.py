@@ -312,6 +312,13 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'This season\'s Pts/G in the game model, as a swap or an extra term, failed held-out 2021-25 (margin MAE 10.010 -> 10.034 / 10.027).'
        % round(json.load(open(os.path.join(ROOT, 'data', 'nfl_games_fit.json')))['params']['qb_n0'])],
       'NFL QBs tab', ['NFL']),
+    E('Season value (NFL skill players, defenders)', 'Pts/G = this season\'s points a game over replacement. Skill: EPA a run / target. Defenders: credited EPA on plays with negative EPA.',
+      ['Skill (RB, WR, TE): EPA less the defense\'s EPA allowed on that play type over the league\'s (other games, shrunk 300 plays) for RB and WR, less the play\'s weather for RB; '
+       'replacement = the level of players past the starters (RB 48, WR 96, TE 48 by volume, 2016-25).',
+       'Defenders (DL, LB, DB): sack, INT, pass defensed, forced fumble, TFL, QB hit or a tackle on a failed play split -(EPA less the offense\'s rate over the league\'s; DL, DB); replacement = credit a snap past the starters (DL 128, LB 80, DB 160) x snaps.',
+       'Kept only where split-half r rose (P >= .9): opponent RB .199 -> .217, WR .172 -> .190, DL .308 -> .315, DB .147 -> .149; TE and LB stay raw. Weather only for RB (.217 -> .220).',
+       'In the game model\'s injury term in place of WAR a game it failed held out 2021-25 (MAE 10.010 -> 10.070, 0/5 seasons); WAR stays.'],
+      'NFL skill players + defenders tabs', ['NFL']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat).'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),
