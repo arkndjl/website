@@ -820,6 +820,20 @@
      ]
     },
     {
+     "term": "Season value (CFB QBs, skill players)",
+     "short": "Pts/G = this season's points a game over replacement from EPA a play (QB: dropbacks + runs; skill: runs + targets), FBS games.",
+     "body": [
+      "Opponent-adjusted for QB and RB (the defense's EPA allowed on that play type over the league's, other games, shrunk 300 plays): split-half r QB .360 -> .403, RB .179 -> .199; WR and TE stay raw (P .84 / .88 on 2025-26, when target ids are complete). Weather (Open-Meteo at the stadium) added nothing.",
+      "Replacement = players past the starters by volume in 2025 (QB 134, RB 268, WR 402, TE 134).",
+      "Defenders left out: public plays carry no tackles or snaps; splash credits had no split-half reliability.",
+      "Game model: the starter's adjusted season value scored the same as raw season EPA (t +0.5); the QB charge stays."
+     ],
+     "where": "CFB QB EPA + skill players tabs",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
      "term": "Yds+ / YOE (returners)",
      "short": "Kick and punt return yards over expected, shrunk.",
      "body": [
